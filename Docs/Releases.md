@@ -12,11 +12,13 @@
 	 - Syntax errors in rule definitions are now reported using rule reference and character position.
 	 - Constant arguments are now allowed for function and method calls. Example: trigger("!w") for a function call on the Controller that enables the wind screen wiper.
 	 - Multiple consecutive function or method calls can now be defined for one single conversation action.
-	 - Hold down the Control key while clicking on "Ok" button will not leave the editor, but instead will show you the API tool definitino in JSON format.
-  10. The ["Plan Pitstop" conversation action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#trigger-actions-from-conversation) for the Race Engineer now lso allows to call for a driver swap in team races.
-  11. Two [predefined conversation actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#trigger-actions-from-conversation) for the Spotter are now available:
+	 - Hold down the Control key while clicking on "Ok" button will not leave the editor, but instead will show you the API tool definitions in JSON format.
+  10. Whenever a conversation booster is configured for a Race Assistant, a transcript of every LLM activation is stored in the *Simulator Controller\Temp\Transcripts* folder which is located in your user *Documents* folder.
+  11. The ["Plan Pitstop" conversation action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#trigger-actions-from-conversation) for the Race Engineer now lso allows to call for a driver swap in team races.
+  12. Two [predefined conversation actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#trigger-actions-from-conversation) for the Spotter are now available:
       - The LLM can decide to reset and recalculate the delta and lap time history for all cars.
 	  - And you can ask the LLM to reset the reference speed data of all cars around the track, when too many false positives for accidents and slow cars are given.
+  13. [Expert only] All definition files for "Simulator Setup" can be *overwritten* in the *Simulator Controller\Setup\Definitions* folder which is located in your user *Documents* folder. This can be used to introduce new bundled applications or to replace the startup video, just to name two examples.
 
 ## 5.7.6.0-release 06/14/24
   1. Minor bugfixes, as always

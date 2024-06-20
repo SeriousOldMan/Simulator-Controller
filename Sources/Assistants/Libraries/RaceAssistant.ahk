@@ -2401,7 +2401,7 @@ class GridRaceAssistant extends RaceAssistant {
 	getKnowledge(options := false) {
 		local knowledgeBase := this.KnowledgeBase
 		local knowledge := super.getKnowledge(options)
-		local driver := knowledgeBase.getValue("Driver.Car", false)
+		local driver := (knowledgeBase ? knowledgeBase.getValue("Driver.Car", false) : false)
 		local standingsData := CaseInsenseWeakMap()
 		local standings := []
 		local keys, ignore, car, carData, sectorTimes

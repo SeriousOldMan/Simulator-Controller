@@ -19,6 +19,7 @@
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\..\Libraries\Task.ahk"
 #Include "..\..\Libraries\LLMConnector.ahk"
 #Include "..\..\Libraries\SpeechRecognizer.ahk"
 
@@ -160,6 +161,8 @@ class LLMBooster extends ConfigurationItem {
 }
 
 class ConversationBooster extends LLMBooster {
+	iTranscript := false
+
 	Descriptor {
 		Get {
 			return this.Options["Descriptor"]
@@ -190,11 +193,21 @@ class ConversationBooster extends LLMBooster {
 		}
 	}
 
+	Transcript {
+		Get {
+			return this.iTranscript
+		}
+	}
+
 	__New(descriptor, configuration, language := false) {
+		local transcripts := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".Transcripts"
+														   , kTempDirectory . "Transcripts\")
 		local allLanguages, index
 
 		this.Options["Descriptor"] := descriptor
 		this.Options["Language"] := language
+
+		this.iTranscript := (normalizeDirectoryPath(transcripts) . "\" . descriptor . ".txt")
 
 		super.__New(configuration)
 
@@ -212,6 +225,8 @@ class ConversationBooster extends LLMBooster {
 		}
 		else
 			this.Options["Code"] := false
+
+		DirCreate(kTempDirectory . "Transcripts\")
 	}
 
 	loadFromConfiguration(configuration) {
@@ -316,7 +331,13 @@ class SpeechBooster extends ConversationBooster {
 					if answer
 						answer := this.normalizeAnswer(answer)
 
-					return ((answer && (answer != "")) ? answer : text)
+					if (answer && (answer != "")) {
+						Task.startTask(() => FileAppend(translate("-- Driver --------") . "`n`n" . text . "`n`n" . translate("-- " . translate("Rephrasing") . " ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16"), 0, kLowPriority)
+
+						return answer
+					}
+					else
+						return text
 				}
 				catch Any as exception {
 					logError(exception, true)
@@ -468,8 +489,13 @@ class RecognitionBooster extends ConversationBooster {
 
 					if (!answer || (answer = "Unknown") || (answer = "") || !InStr(answer, "->") || InStr(answer, ","))
 						return text
-					else
-						return string2Values("->", answer)[2]
+					else {
+						answer := string2Values("->", answer)[2]
+
+						Task.startTask(() => FileAppend(translate("-- Driver --------") . "`n`n" . text . "`n`n" . translate("-- " . translate("Understanding") . " ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16"), 0, kLowPriority)
+
+						return answer
+					}
 				}
 				catch Any as exception {
 					logError(exception, true)
@@ -577,7 +603,13 @@ class ChatBooster extends ConversationBooster {
 					if (answer && (answer != true))
 						answer := this.normalizeAnswer(answer)
 
-					return ((answer && (answer != "")) ? answer : false)
+					if (answer && (answer != "")) {
+						Task.startTask(() => FileAppend(translate("-- Driver --------") . "`n`n" . question . "`n`n" . translate("-- " . translate("Conversation") . " ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16"), 0, kLowPriority)
+
+						return answer
+					}
+					else
+						return false
 				}
 				catch Any as exception {
 					logError(exception, true)

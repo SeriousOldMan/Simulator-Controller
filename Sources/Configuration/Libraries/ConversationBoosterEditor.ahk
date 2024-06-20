@@ -1381,9 +1381,8 @@ class ActionsEditor {
 				parameters := []
 
 				for ignore, parameter in action.Parameters
-					parameters.Push(LLMTool.Function.Parameter(parameter.Name, parameter.Type
-															 , values2String(",", parameter.Enumeration*)
-															 , parameter.Required, parameter.Description))
+					parameters.Push(LLMTool.Function.Parameter(parameter.Name, parameter.Description
+															 , parameter.Type, parameter.Enumeration, parameter.Required))
 
 				actions.Push(LLMTool.Function(action.Name, action.Description, parameters))
 			}

@@ -1,4 +1,4 @@
-## 5.7.7.0-release 06/21/24 (planned)
+## 5.7.7.0-release 06/21/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Several errors in the translations for Spanish and for French has been fixed.

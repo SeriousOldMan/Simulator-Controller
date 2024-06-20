@@ -12,16 +12,16 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\..\Framework\Framework.ahk"
+#Include "..\Framework\Framework.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\..\Libraries\Task.ahk"
-#Include "..\..\Libraries\LLMConnector.ahk"
-#Include "..\..\Libraries\SpeechRecognizer.ahk"
+#Include "Task.ahk"
+#Include "LLMConnector.ahk"
+#Include "SpeechRecognizer.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -72,49 +72,6 @@ class LLMBooster extends ConfigurationItem {
 	Connector {
 		Get {
 			return this.iConnector
-		}
-	}
-
-	Instructions[language?] {
-		Get {
-			local instructions, ignore, instrLanguage, directory, key, value
-
-			if !this.iInstructions {
-				instructions := CaseInsenseMap()
-
-				for ignore, directory in [kTranslationsDirectory, kUserTranslationsDirectory]
-					loop Files (directory . "Conversation Booster.instructions.*") {
-						SplitPath A_LoopFilePath, , , &instrLanguage
-
-						if !instructions.Has(instrLanguage)
-							instructions[instrLanguage] := newMultiMap()
-
-						addMultiMapValues(instructions[instrLanguage], readMultiMap(A_LoopFilePath))
-					}
-
-				for key, value in getMultiMapValues(this.Configuration, "Conversation Booster")
-					if (InStr(key, "Instructions.") = 1) {
-						key := ConfigurationItem.splitDescriptor(key)
-
-						instrLanguage := key[4]
-
-						if !instructions.Has(instrLanguage)
-							instructions[instrLanguage] := newMultiMap()
-
-						setMultiMapValue(instructions[instrLanguage], key[2] . ".Instructions", key[3], value)
-					}
-
-				this.iInstructions := instructions
-			}
-
-			if isSet(language) {
-				if this.iInstructions.Has(language)
-					return this.iInstructions[language]
-				else
-					return newMultiMap()
-			}
-			else
-				return this.iInstructions
 		}
 	}
 
@@ -190,6 +147,49 @@ class ConversationBooster extends LLMBooster {
 	Temperature {
 		Get {
 			return this.Options["Temperature"]
+		}
+	}
+
+	Instructions[language?] {
+		Get {
+			local instructions, ignore, instrLanguage, directory, key, value
+
+			if !this.iInstructions {
+				instructions := CaseInsenseMap()
+
+				for ignore, directory in [kTranslationsDirectory, kUserTranslationsDirectory]
+					loop Files (directory . "Conversation Booster.instructions.*") {
+						SplitPath A_LoopFilePath, , , &instrLanguage
+
+						if !instructions.Has(instrLanguage)
+							instructions[instrLanguage] := newMultiMap()
+
+						addMultiMapValues(instructions[instrLanguage], readMultiMap(A_LoopFilePath))
+					}
+
+				for key, value in getMultiMapValues(this.Configuration, "Conversation Booster")
+					if (InStr(key, "Instructions.") = 1) {
+						key := ConfigurationItem.splitDescriptor(key)
+
+						instrLanguage := key[4]
+
+						if !instructions.Has(instrLanguage)
+							instructions[instrLanguage] := newMultiMap()
+
+						setMultiMapValue(instructions[instrLanguage], key[2] . ".Instructions", key[3], value)
+					}
+
+				this.iInstructions := instructions
+			}
+
+			if isSet(language) {
+				if this.iInstructions.Has(language)
+					return this.iInstructions[language]
+				else
+					return newMultiMap()
+			}
+			else
+				return this.iInstructions
 		}
 	}
 
@@ -332,7 +332,7 @@ class SpeechBooster extends ConversationBooster {
 						answer := this.normalizeAnswer(answer)
 
 					if (answer && (answer != "")) {
-						Task.startTask(() => FileAppend(translate("-- Driver --------") . "`n`n" . text . "`n`n" . translate("-- " . translate("Rephrasing") . " ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16"), 0, kLowPriority)
+						Task.startTask(() => FileAppend(translate("-- User --------") . "`n`n" . text . "`n`n" . translate("-- " . translate("Rephrasing") . " ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16"), 0, kLowPriority)
 
 						return answer
 					}
@@ -492,7 +492,7 @@ class RecognitionBooster extends ConversationBooster {
 					else {
 						answer := string2Values("->", answer)[2]
 
-						Task.startTask(() => FileAppend(translate("-- Driver --------") . "`n`n" . text . "`n`n" . translate("-- " . translate("Understanding") . " ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16"), 0, kLowPriority)
+						Task.startTask(() => FileAppend(translate("-- User --------") . "`n`n" . text . "`n`n" . translate("-- " . translate("Understanding") . " ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16"), 0, kLowPriority)
 
 						return answer
 					}
@@ -604,7 +604,7 @@ class ChatBooster extends ConversationBooster {
 						answer := this.normalizeAnswer(answer)
 
 					if (answer && (answer != "")) {
-						Task.startTask(() => FileAppend(translate("-- Driver --------") . "`n`n" . question . "`n`n" . translate("-- " . translate("Conversation") . " ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16"), 0, kLowPriority)
+						Task.startTask(() => FileAppend(translate("-- User --------") . "`n`n" . question . "`n`n" . translate("-- " . translate("Conversation") . " ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16"), 0, kLowPriority)
 
 						return answer
 					}

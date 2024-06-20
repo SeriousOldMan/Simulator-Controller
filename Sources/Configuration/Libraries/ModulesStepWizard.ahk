@@ -520,7 +520,7 @@ class DownloadablePreset extends NamedPreset {
 	iWizard := false
 
 	iURL := false
-	iDefnition := false
+	iDefinition := false
 
 	iWindow := false
 	iClosed := false
@@ -535,7 +535,7 @@ class DownloadablePreset extends NamedPreset {
 
 	Installable {
 		Get {
-			return false
+			return true
 		}
 	}
 
@@ -592,11 +592,11 @@ class DownloadablePreset extends NamedPreset {
 
 		chooseObject(listView, line, checked) {
 			if checked {
-				if !this.install(listView.GetText(line))
+				if !this.installItem(listView.GetText(line))
 					listView.Modify(line, "-Check")
 			}
 			else {
-				if !this.uninstall(listView.GetText(line))
+				if !this.uninstallItem(listView.GetText(line))
 					listView.Modify(line, "Check")
 			}
 		}
@@ -628,6 +628,10 @@ class DownloadablePreset extends NamedPreset {
 		dlcGui.Add("Button", "x118 yp+10 w80 h23 Default", translate("Close")).OnEvent("Click", close)
 
 		this.loadObjects()
+	}
+
+	getArguments() {
+		return concatenate(super.getArguments(), Array(this.URL))
 	}
 
 	edit(wizard) {
@@ -687,7 +691,21 @@ class DownloadablePreset extends NamedPreset {
 			this.ObjectsListView.Add(inList(installed, this.objectName(object)) ? "Check" : "", this.objectName(object))
 	}
 
-	install(name) {
+	install(wizard, edit := true) {
+		this.edit(wizard)
+	}
+
+	uninstall(wizard) {
+		local ignore, object
+
+		if !this.Definition
+			this.Definition := this.loadDefinition(this.URL)
+
+		for ignore, object in this.installedObjects()
+			this.uninstallObject(object)
+	}
+
+	installItem(name) {
 		local installed := this.installedObjects()
 		local ignore, object
 
@@ -714,7 +732,7 @@ class DownloadablePreset extends NamedPreset {
 		}
 	}
 
-	uninstall(name) {
+	uninstallItem(name) {
 		local installed := this.installedObjects()
 		local ignore, object
 
@@ -749,7 +767,7 @@ class DownloadablePreset extends NamedPreset {
 		if this.Definition
 			return getMultiMapValue(this.Definition, object, "Name", object)
 		else
-			return Object
+			return object
 	}
 
 	availableObjects() {
@@ -900,6 +918,10 @@ class SplashMedia extends DownloadablePreset {
 		this.iContentURL := contentURL
 
 		super.__New(name, definitionURL)
+	}
+
+	getArguments() {
+		return concatenate(super.getArguments(), Array(this.ContentURL))
 	}
 
 	loadDefinition(url) {

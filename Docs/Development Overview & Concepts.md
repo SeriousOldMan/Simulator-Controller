@@ -372,6 +372,14 @@ The instructions are used to provide the LLM of the Driving Coach with informati
 
 where *LC* stands for the language code.
 
+### Instructions for the GPT-based Conversation Boosters
+
+Very much like the Driving Coach, a GPT service can be used to extend the conversational capabilities fo the *normal* Race Assistants. In those cases, instructions are also used to create a setting for the LLM to behave like an Engineer, for example, and also to provide additional data about the current session, the state of the car, and so on, to the LLM. All instructions are used as defaults in the configuration and can be altered by the user here as well. The language specific default instructions can be found in *Resources\Translations* in the programm installation folder. They are named 
+
+	Conversation Booster.instructions.LC
+
+where *LC* stands for the language code.
+
 ### Translation of "Simulator Setup"
 
 The setup and configuration tool "Simulator Setup" contains lots of help texts which are not handled as part of the normal user interface translation. Fruthermore, there exists no inheritance mechanism to introduce user specific translations. And to make things a lttile bit more complicated, these texts use HTML as their representation and contain embedded pictures. Any changes to the translations of the help texts must therefore be done in the normal development process. The translation files can be found in *Resources\Setup\Translations* in the programm installation folder.

@@ -170,7 +170,7 @@ class ControllerActionsEditor extends ConfiguratorPanel {
 		}
 
 		actionsGui.Add("Text", "x16 yp+10 w86 h23 +0x200", translate("Language"))
-		actionsGui.Add("DropDownList", "x110 yp w120 W:Grow Choose" . chosen . " VcaLanguageDropDown", choices).OnEvent("Change", chooseCALanguage)
+		actionsGui.Add("DropDownList", "x110 yp w120 Choose" . chosen . " VcaLanguageDropDown", choices).OnEvent("Change", chooseCALanguage)
 
 		choices := []
 

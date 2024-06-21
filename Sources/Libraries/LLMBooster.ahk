@@ -201,7 +201,7 @@ class ConversationBooster extends LLMBooster {
 
 	__New(descriptor, configuration, language := false) {
 		local transcripts := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".Transcripts"
-														   , kTempDirectory . "Transcripts\")
+														   , kLogsDirectory . "Transcripts\")
 		local allLanguages, index
 
 		this.Options["Descriptor"] := descriptor
@@ -226,7 +226,7 @@ class ConversationBooster extends LLMBooster {
 		else
 			this.Options["Code"] := false
 
-		DirCreate(kTempDirectory . "Transcripts\")
+		DirCreate(kLogsDirectory . "Transcripts\")
 	}
 
 	loadFromConfiguration(configuration) {

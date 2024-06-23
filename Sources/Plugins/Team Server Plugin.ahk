@@ -764,7 +764,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		if (!this.iDriverForName && (ignore || this.TeamServerActive)) {
 			try {
-				if (this.Connected && !this.iCachedObjects.Has(this.Driver))
+				if ((this.Connected || ignore) && !this.iCachedObjects.Has(this.Driver))
 					this.iCachedObjects[this.Driver] := this.parseObject(this.Connector.GetDriver(this.Driver))
 
 				driver := this.iCachedObjects[this.Driver]

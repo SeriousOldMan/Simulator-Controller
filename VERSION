@@ -1,9 +1,9 @@
 [Development]
-Version=5.7.7.0-release
-Target=5.7.7.0-release
-Date=06/21/2024
-Download=https://cutt.ly/leasMPMb;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.7.7.0-release.zip
-Changes=Translation fixes for Spanish and French, Optimized error messages in conversation actions editor, Allow bound arguments in conversation actions, Allow multiple function calls in conversation actions, Fixed saving of Actions setting, Increased resiliense against unstable Team Server instances, Driver swap can be initiated from pitstop action, Reset accident detection action, Show strategy plot for uncommited strategies, Basic setup is always default in "Simulator Setup"
+Version=5.7.8.0-dev
+Target=5.7.8.0-release
+Date=06/23/2024
+Download=
+Changes=Fixed driver name in Team Server connections
 Components=Media->5.6.1,Configuration->5.7.5,Utilities->5.4.8
 [Release]
 Version=5.7.7.0-release
@@ -24,5 +24,5 @@ Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Ut
 [Current]
 Type=Release
 [Version]
-Development=5.7.7.0-release
+Development=5.7.8.0-dev
 Release=5.7.7.0-release

@@ -1491,7 +1491,7 @@ class PracticeCenter extends ConfigurationItem {
 		setButtonIcon(centerGui["importPressuresButton"], kIconsDirectory . "Copy.ico", 1, "")
 
 		centerGui.Add("Text", "x" . x . " yp+28 w75 h20", translate("Set"))
-		centerGui.Add("Edit", "x" . x1 . " yp-4 w50 h20 Limit2 Number vtyreSetEdit")
+		centerGui.Add("Edit", "x" . x1 . " yp-4 w50 h20 Limit2 Number vtyreSetEdit").OnEvent("Change", updateState)
 		centerGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99")
 
 		centerGui.Add("Text", "x" . x . " yp+28 w85 h40", translate("Pressures") . translate(" (") . getUnit("Pressure") . translate(")"))
@@ -1919,7 +1919,10 @@ class PracticeCenter extends ConfigurationItem {
 			if ((tyreCompound != kUndefined) && (tyreCompoundColor != kUndefined))
 				this.Control["tyreCompoundDropDown"].Choose(inList(this.TyreCompounds, compound(tyreCompound, tyreCompoundColor)) + 2)
 
-			tyreSet := getMultiMapValue(data, "Car Data", "TyreSet", kUndefined)
+			if ((tyreCompound = "Wet") && (SessionDatabase.getSimulatorCode(this.Simulator) = "ACC"))
+				tyreSet := kUndefined
+			else
+				tyreSet := getMultiMapValue(data, "Car Data", "TyreSet", kUndefined)
 
 			if (tyreSet != kUndefined)
 				this.Control["tyreSetEdit"].Text := tyreSet
@@ -2070,6 +2073,8 @@ class PracticeCenter extends ConfigurationItem {
 			window["tyreCompoundDropDown"].Enabled := true
 			if (window["tyreCompoundDropDown"].Value = 0)
 				window["tyreCompoundDropDown"].Choose(2)
+			else if ((window["tyreCompoundDropDown"].Value > 2) && (!isNumber(window["tyreSetEdit"].Text) || (window["tyreSetEdit"].Text = 0)))
+				window["tyreSetEdit"].Text := 1
 
 			window["importPressuresButton"].Enabled := true
 
@@ -2105,7 +2110,7 @@ class PracticeCenter extends ConfigurationItem {
 				window[field].Enabled := true
 
 			if (window["tyreSetEdit"].Text = "")
-				window["tyreSetEdit"].Text := 0
+				window["tyreSetEdit"].Text := 1
 		}
 
 		this.Control["compoundAddButton"].Enabled := (this.AvailableTyreCompounds.Length > this.TyreCompoundsListView.GetCount())
@@ -3002,6 +3007,9 @@ class PracticeCenter extends ConfigurationItem {
 									 , getMultiMapValue(data, "Car Data", "TyreCompoundColor"))
 		local tyreSet := getMultiMapValue(data, "Car Data", "TyreSet", "-")
 		local lap, selectedLap, selectedRun, damage, pLap, fuelConsumption, car, run, sectorTimes
+
+		if ((tyreCompound = "Wet") && (SessionDatabase.getSimulatorCode(this.Simulator) = "ACC"))
+			tyreSet := "-"
 
 		if (this.LastLap && ((this.LastLap.Compound != tyreCompound) || (this.LastLap.TyreSet != tyreSet)
 																	 || (this.LastLap.Driver != driver))) {

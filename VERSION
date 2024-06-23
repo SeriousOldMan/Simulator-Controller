@@ -3,7 +3,7 @@ Version=5.7.8.0-dev
 Target=5.7.8.0-release
 Date=06/23/2024
 Download=
-Changes=Fixed driver name in Team Server connections
+Changes=Fixed driver name in Team Server connections, Tyre set for wet tyres are display as "Auto" in "Race Center" and "Practice Center", "Auto" can be chosen as tyre set in "Race Center"
 Components=Media->5.6.1,Configuration->5.7.5,Utilities->5.4.8
 [Release]
 Version=5.7.7.0-release

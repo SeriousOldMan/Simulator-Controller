@@ -1438,30 +1438,41 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 	saveProfile(profile) {
 		local ignore, plugin, function, index
 
-		profile["Name"] := profilesEditorGui["profileNameEdit"].Text
-		profile["Mode"] :=  ["Solo", "Team"][profilesEditorGui["profileModeDropDown"].Value]
-		profile["Tools"] := ["", "Practice Center", "Race Center"][profilesEditorGui["profilePitwallDropDown"].Value]
+		if (Trim(profilesEditorGui["profileNameEdit"].Text) = "") {
+			OnMessage(0x44, translateOkButton)
+			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			OnMessage(0x44, translateOkButton, 0)
 
-		profile["Assistant.Autonomy"] := ["Yes", "No", "Default"][profilesEditorGui["profileAutonomyDropDown"].Value]
+			return false
+		}
+		else {
+			profile["Name"] := profilesEditorGui["profileNameEdit"].Text
+			profile["Mode"] :=  ["Solo", "Team"][profilesEditorGui["profileModeDropDown"].Value]
+			profile["Tools"] := ["", "Practice Center", "Race Center"][profilesEditorGui["profilePitwallDropDown"].Value]
 
-		for ignore, plugin in activeAssistants
-			if plugin[2].Value
-				profile[plugin[1]] := ["Default", "Disabled", "Silent", "Muted", "Active"][plugin[2].Value]
+			profile["Assistant.Autonomy"] := ["Yes", "No", "Default"][profilesEditorGui["profileAutonomyDropDown"].Value]
 
-		if (profile["Mode"] = "Team") {
-			profile["Team.Mode"] := ["Profile", "Settings"][profilesEditorGui["profileCredentialsDropDown"].Value]
+			for ignore, plugin in activeAssistants
+				if plugin[2].Value
+					profile[plugin[1]] := ["Default", "Disabled", "Silent", "Muted", "Active"][plugin[2].Value]
 
-			if (profile["Team.Mode"] = "Profile") {
-				profile["Server.URL"] := profilesEditorGui["profileServerURLEdit"].Text
-				profile["Server.Token"] := profilesEditorGui["profileServerTokenEdit"].Text
+			if (profile["Mode"] = "Team") {
+				profile["Team.Mode"] := ["Profile", "Settings"][profilesEditorGui["profileCredentialsDropDown"].Value]
 
-				profile["Team.Name"] := profilesEditorGui["profileTeamDropDown"].Text
-				profile["Team.Identifier"] := teamIdentifier
-				profile["Driver.Name"] := profilesEditorGui["profileDriverDropDown"].Text
-				profile["Driver.Identifier"] := driverIdentifier
-				profile["Session.Name"] := profilesEditorGui["profileSessionDropDown"].Text
-				profile["Session.Identifier"] := sessionIdentifier
+				if (profile["Team.Mode"] = "Profile") {
+					profile["Server.URL"] := profilesEditorGui["profileServerURLEdit"].Text
+					profile["Server.Token"] := profilesEditorGui["profileServerTokenEdit"].Text
+
+					profile["Team.Name"] := profilesEditorGui["profileTeamDropDown"].Text
+					profile["Team.Identifier"] := teamIdentifier
+					profile["Driver.Name"] := profilesEditorGui["profileDriverDropDown"].Text
+					profile["Driver.Identifier"] := driverIdentifier
+					profile["Session.Name"] := profilesEditorGui["profileSessionDropDown"].Text
+					profile["Session.Identifier"] := sessionIdentifier
+				}
 			}
+
+			return true
 		}
 	}
 
@@ -1505,8 +1516,15 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 	}
 
 	chooseProfile(listView, line, *) {
+		if (line = selectedProfile)
+			return
+
 		if (selectedProfile > 1)
-			startupProfilesEditor(kEvent, "ProfileSave")
+			if !startupProfilesEditor(kEvent, "ProfileSave") {
+				profilesListView.Modify(selectedProfile, "Vis Select")
+
+				return
+			}
 
 		if (line > 1)
 			startupProfilesEditor(kEvent, "ProfileLoad", line)
@@ -1553,7 +1571,8 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 
 	if (launchPadOrCommand == kSave) {
 		if selectedProfile
-			startupProfilesEditor(kEvent, "ProfileSave")
+			if !startupProfilesEditor(kEvent, "ProfileSave")
+				return false
 
 		saveProfiles()
 
@@ -1564,7 +1583,8 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 	else if (launchPadOrCommand == kEvent) {
 		if (arguments[1] = "ProfilesUpload") {
 			if (selectedProfile > 1)
-				startupProfilesEditor(kEvent, "ProfileSave")
+				if !startupProfilesEditor(kEvent, "ProfileSave")
+					return
 
 			profilesEditorGui.Opt("+OwnDialogs")
 
@@ -1596,7 +1616,8 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 		}
 		else if (arguments[1] = "ProfilesDownload") {
 			if (selectedProfile > 1)
-				startupProfilesEditor(kEvent, "ProfileSave")
+				if !startupProfilesEditor(kEvent, "ProfileSave")
+					return
 
 			profilesEditorGui.Opt("+OwnDialogs")
 
@@ -1620,7 +1641,8 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 		}
 		else if (arguments[1] = "ProfileNew") {
 			if (selectedProfile > 1)
-				startupProfilesEditor(kEvent, "ProfileSave")
+				if !startupProfilesEditor(kEvent, "ProfileSave")
+					return
 
 			profile := newProfile()
 
@@ -1634,7 +1656,8 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 		}
 		else if (arguments[1] = "ProfileCopy") {
 			if (selectedProfile > 1)
-				startupProfilesEditor(kEvent, "ProfileSave")
+				if !startupProfilesEditor(kEvent, "ProfileSave")
+					return
 
 			profile := profiles[selectedProfile - 1].Clone()
 
@@ -1659,7 +1682,8 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 		}
 		else if (arguments[1] = "ProfileLoad") {
 			if (selectedProfile > 1)
-				startupProfilesEditor(kEvent, "ProfileSave")
+				if !startupProfilesEditor(kEvent, "ProfileSave")
+					return
 
 			selectedProfile := arguments[2]
 
@@ -1673,58 +1697,65 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 		}
 		else if (arguments[1] = "ProfileSave") {
 			if (selectedProfile > 1) {
-				saveProfile(profiles[selectedProfile - 1])
+				if saveProfile(profiles[selectedProfile - 1]) {
+					profilesListView.Modify(selectedProfile, "", profilesEditorGui["profileNameEdit"].Text, profilesEditorGui["profileModeDropDown"].Text)
 
-				profilesListView.Modify(selectedProfile, "", profilesEditorGui["profileNameEdit"].Text, profilesEditorGui["profileModeDropDown"].Text)
+					return true
+				}
+				else {
+					profilesListView.Modify(selectedProfile, "Select")
+
+					return false
+				}
 			}
 		}
 		else if (arguments[1] = "ManageSession") {
-			startupProfilesEditor(kEvent, "ProfileSave")
+			if startupProfilesEditor(kEvent, "ProfileSave") {
+				profilesEditorGui.Block()
 
-			profilesEditorGui.Block()
+				try {
+					if FileExist(kUserConfigDirectory . "Team Server.ini")
+						lastModified := FileGetTime(kUserConfigDirectory . "Team Server.ini", "M")
+					else
+						lastModified := false
 
-			try {
-				if FileExist(kUserConfigDirectory . "Team Server.ini")
-					lastModified := FileGetTime(kUserConfigDirectory . "Team Server.ini", "M")
-				else
-					lastModified := false
+					teamManagerEditor(profilesEditorGui)
 
-				teamManagerEditor(profilesEditorGui)
+					if (FileExist(kUserConfigDirectory . "Team Server.ini") && (!lastModified || (lastModified != FileGetTime(kUserConfigDirectory . "Team Server.ini", "M")))) {
+						profile := profiles[selectedProfile - 1]
 
-				if (FileExist(kUserConfigDirectory . "Team Server.ini") && (!lastModified || (lastModified != FileGetTime(kUserConfigDirectory . "Team Server.ini", "M")))) {
-					profile := profiles[selectedProfile - 1]
+						configuration := readMultiMap(kUserConfigDirectory . "Team Server.ini")
 
-					configuration := readMultiMap(kUserConfigDirectory . "Team Server.ini")
+						if (getMultiMapValue(configuration, "Team Server", "Team.Identifier", false)
+						 && getMultiMapValue(configuration, "Team Server", "Driver.Identifier", false)
+						 && getMultiMapValue(configuration, "Team Server", "Session.Identifier", false)) {
+							profile["Team.Mode"] := "Profile"
+							profile["Server.URL"] :=  getMultiMapValue(configuration, "Team Server", "Server.URL")
+							profile["Server.Token"] :=  getMultiMapValue(configuration, "Team Server", "Session.Token")
+							profile["Team.Name"] :=  getMultiMapValue(configuration, "Team Server", "Team.Name")
+							profile["Team.Identifier"] :=  getMultiMapValue(configuration, "Team Server", "Team.Identifier")
+							profile["Driver.Name"] :=  getMultiMapValue(configuration, "Team Server", "Driver.Name")
+							profile["Driver.Identifier"] :=  getMultiMapValue(configuration, "Team Server", "Driver.Identifier")
+							profile["Session.Name"] :=  getMultiMapValue(configuration, "Team Server", "Session.Name")
+							profile["Session.Identifier"] :=  getMultiMapValue(configuration, "Team Server", "Session.Identifier")
 
-					if (getMultiMapValue(configuration, "Team Server", "Team.Identifier", false)
-					 && getMultiMapValue(configuration, "Team Server", "Driver.Identifier", false)
-					 && getMultiMapValue(configuration, "Team Server", "Session.Identifier", false)) {
-						profile["Team.Mode"] := "Profile"
-						profile["Server.URL"] :=  getMultiMapValue(configuration, "Team Server", "Server.URL")
-						profile["Server.Token"] :=  getMultiMapValue(configuration, "Team Server", "Session.Token")
-						profile["Team.Name"] :=  getMultiMapValue(configuration, "Team Server", "Team.Name")
-						profile["Team.Identifier"] :=  getMultiMapValue(configuration, "Team Server", "Team.Identifier")
-						profile["Driver.Name"] :=  getMultiMapValue(configuration, "Team Server", "Driver.Name")
-						profile["Driver.Identifier"] :=  getMultiMapValue(configuration, "Team Server", "Driver.Identifier")
-						profile["Session.Name"] :=  getMultiMapValue(configuration, "Team Server", "Session.Name")
-						profile["Session.Identifier"] :=  getMultiMapValue(configuration, "Team Server", "Session.Identifier")
+							profile := selectedProfile
+							selectedProfile := false
 
-						profile := selectedProfile
-						selectedProfile := false
-
-						startupProfilesEditor(kEvent, "ProfileLoad", profile)
+							startupProfilesEditor(kEvent, "ProfileLoad", profile)
+						}
 					}
 				}
-			}
-			catch Any as exception {
-				logError(exception, true)
+				catch Any as exception {
+					logError(exception, true)
 
-				OnMessage(0x44, translateOkButton)
-				withBlockedWindows(MsgBox, translate("Cannot start the configuration tool - please check the installation..."), translate("Error"), 262160)
-				OnMessage(0x44, translateOkButton, 0)
-			}
-			finally {
-				profilesEditorGui.Unblock()
+					OnMessage(0x44, translateOkButton)
+					withBlockedWindows(MsgBox, translate("Cannot start the configuration tool - please check the installation..."), translate("Error"), 262160)
+					OnMessage(0x44, translateOkButton, 0)
+				}
+				finally {
+					profilesEditorGui.Unblock()
+				}
 			}
 		}
 		else if (arguments[1] = "ManageDriver") {
@@ -2158,8 +2189,8 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 		x7 := x6 + 24
 
 		profilesListView := profilesEditorGui.Add("ListView", "x" . x0 . " yp+10 w392 h146 Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Name", "Mode"], translate))
-		profilesListView.OnEvent("Click", chooseProfile)
-		profilesListView.OnEvent("DoubleClick", chooseProfile)
+		; profilesListView.OnEvent("Click", chooseProfile)
+		; profilesListView.OnEvent("DoubleClick", chooseProfile)
 		profilesListView.OnEvent("ItemCheck", chooseProfile)
 		profilesListView.OnEvent("ItemSelect", selectProfile)
 

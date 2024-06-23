@@ -3624,8 +3624,8 @@ class GridRaceAssistant extends RaceAssistant {
 
 		driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
 
-		this.KnowledgeBase.addFact("Lap." . lapNumber . ".Position.Overall", this.getPosition(false, "Overall", data))
-		this.KnowledgeBase.addFact("Lap." . lapNumber . ".Position.Class", this.getPosition(false, "Class", data))
+		this.KnowledgeBase.setFact("Lap." . lapNumber . ".Position.Overall", this.getPosition(false, "Overall", data))
+		this.KnowledgeBase.setFact("Lap." . lapNumber . ".Position.Class", this.getPosition(false, "Class", data))
 
 		lapValid := getMultiMapValue(data, "Stint Data", "LapValid", true)
 		lapPenalty := getMultiMapValue(data, "Stint Data", "Penalty", false)

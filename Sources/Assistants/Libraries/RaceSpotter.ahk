@@ -1481,7 +1481,7 @@ class RaceSpotter extends GridRaceAssistant {
 					}
 					else {
 						speaker.speakPhrase("HalfTimeSession", {minutes: remainingSessionTime
-															  , laps: Ceil(remainingSessionLaps)})
+															  , laps: Floor(remainingSessionLaps)})
 
 						enoughFuel := (remainingSessionLaps < remainingFuelLaps)
 					}

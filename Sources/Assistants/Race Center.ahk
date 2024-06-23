@@ -8944,7 +8944,7 @@ class RaceCenter extends ConfigurationItem {
 			tyreSet := pitstop["Tyre.Set"]
 
 			if ((tyreCompound = "Wet") && (SessionDatabase.getSimulatorCode(this.Simulator) = "ACC"))
-				tyreSet = "-"
+				tyreSet := "-"
 
 			this.PitstopsListView.Add((pitstop["Status"] = "Planned") ? "" : "Check", A_Index
 									, (pitstop["Lap"] = "-") ? "-" : (pitstop["Lap"] + 1), displayNullValue(pitstop["Driver.Next"]), fuel

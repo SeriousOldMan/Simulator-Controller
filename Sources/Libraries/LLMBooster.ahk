@@ -33,8 +33,6 @@ class LLMBooster extends ConfigurationItem {
 
 	iConnector := false
 
-	iInstructions := false
-
 	Options[key?] {
 		Get {
 			return (isSet(key) ? this.iOptions[key] : this.iOptions)
@@ -119,6 +117,8 @@ class LLMBooster extends ConfigurationItem {
 
 class ConversationBooster extends LLMBooster {
 	iTranscript := false
+
+	iInstructions := false
 
 	Descriptor {
 		Get {

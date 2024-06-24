@@ -1,3 +1,13 @@
+## 5.7.8.0-release 06/28/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Fixed a bug introduced in the last release, which caused connected drivers to no longer show up in Team Server application.
+  4. Tyre set numbers for wet tyres are no longer displayed as numbers in "Race Center" for *Assetto Corsa Competizione*.
+  5. The automatic choice of the next tyre set in *Assetto Corsa Competizione* are now display as "Auto" and no longer as **0** in "Race Center".
+  6. Fixed the unit conversion of tyre pressures in the API of *Automobilista 2*. The API documentation says the values are reported as PSI, but they are actually in kPa.
+  7. Fixed the reporting of remaining laps by the Spotter for races with fixed number of laps.
+  8. More consistency checks for Startup Profiles. It is no longer possible to create a startup profile with no name.
+
 ## 5.7.7.0-release 06/21/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

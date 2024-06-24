@@ -275,7 +275,7 @@ When you want substitute your own translations, you don't have to copy the whole
 	DE=>Deutsch
 	[General]
 	Yes=>Aber natürlich
-	No=>Auf keine Fall
+	No=>Auf keinen Fall
 
 As you can see, you have to provide the "[Locale]" header and the two line for the translations of "Yes" and "No". Store this file as "Translations.de" in the *Simulator Controller\Translations* folder in your user *Documents* folder, where it will be found during loading. You can also use the [translations editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#translations-editor) for small changes to a given language translation, but I do not recommend to use this tool to introduce a full new language. It will be way faster to use a Unicode-capable text editor like notepadd++ for this purpose.
 

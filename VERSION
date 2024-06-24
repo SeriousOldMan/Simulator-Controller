@@ -22,7 +22,7 @@ Utilities.5.4.8.Path=.
 Utilities.5.4.8.Content=Utilities
 Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Utilities-5.4.8.zip?rlkey=alrj8l2z205dd2vm9cu6hbsot&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.4.8.zip
 [Current]
-Type=Release
+Type=Development
 [Version]
 Development=5.7.8.0-dev
 Release=5.7.7.0-release

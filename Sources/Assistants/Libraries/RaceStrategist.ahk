@@ -984,9 +984,9 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	getKnowledge(options := false) {
+	getKnowledge(type, options := false) {
 		local knowledgeBase := this.KnowledgeBase
-		local knowledge := super.getKnowledge(options)
+		local knowledge := super.getKnowledge(type, options)
 		local strategy, nextPitstop, pitstop, pitstops
 
 		if knowledgeBase {

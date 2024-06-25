@@ -367,9 +367,9 @@ class RaceEngineer extends RaceAssistant {
 						   , repairs, repairs, repairs)
 	}
 
-	getKnowledge(options := false) {
+	getKnowledge(type, options := false) {
 		local knowledgeBase := this.KnowledgeBase
-		local knowledge := super.getKnowledge(options)
+		local knowledge := super.getKnowledge(type, options)
 		local psi := " PSI"
 		local celsius := " Celsius"
 		local percent := " %"

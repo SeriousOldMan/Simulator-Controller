@@ -2355,8 +2355,22 @@ class RaceCenter extends ConfigurationItem {
 
 	connect(silent := false) {
 		warmup() {
+			local connector := this.Connector
+			local count := 0
+			local ignore, team, session, stint, lap
+
 			try {
-				this.Connector.Warmup()
+				connector.Warmup()
+
+				for ignore, team in string2Values(";", connector.GetAllTeams())
+					for ignore, session in string2Values(";", connector.GetTeamSessions(team))
+						for ignore, stint in string2Values(";", connector.GetSessionStints(session))
+							for ignore, lap in string2Values(";", connector.GetStintLaps(stint)) {
+								if (Mod(count, 10) = 0)
+									connector.GetLap(lap)
+
+								count += 1
+							}
 			}
 			catch Any as exception {
 				logError(exception, true)

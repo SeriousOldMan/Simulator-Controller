@@ -1410,7 +1410,7 @@ class RaceAssistant extends ConfigurationItem {
 		compiler.compileRules(rules, &productions, &reductions)
 
 		if this.Booster {
-			rules := FileRead(getFileName("Custom Actions.rules", kUserRulesDirectory, kRulesDirectory))
+			rules := FileRead(getFileName("Conversation Actions.rules", kUserRulesDirectory, kRulesDirectory))
 
 			compiler.compileRules(rules, &productions, &reductions)
 		}

@@ -22,107 +22,33 @@
 
 #Include "Task.ahk"
 #Include "LLMConnector.ahk"
+#Include "LLMBooster.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class LLMAgent extends ConfigurationItem {
-	iOptions := CaseInsenseMap()
-
-	iConnector := false
-
-	Options[key?] {
-		Get {
-			return (isSet(key) ? this.iOptions[key] : this.iOptions)
-		}
-
-		Set {
-			return (isSet(key) ? (this.iOptions[key] := value) : (this.iOptions := value))
-		}
-	}
-
-	Providers {
-		Get {
-			return LLMConnector.Providers
-		}
-	}
-
-	Descriptor {
-		Get {
-			throw "Virtual property LLMAgent.Descriptor must be implemented in a subclass..."
-		}
-	}
-
-	Model {
-		Get {
-			return this.Options["Model"]
-		}
-	}
-
-	MaxTokens {
-		Get {
-			return this.Options["MaxTokens"]
-		}
-	}
-
-	Connector {
-		Get {
-			return this.iConnector
-		}
-	}
-
-	loadFromConfiguration(configuration) {
-		local descriptor := this.Descriptor
-		local options := this.Options
-
-		super.loadFromConfiguration(configuration)
-
-		options["Service"] := getMultiMapValue(configuration, "Autonomous Agent", descriptor . ".Service", false)
-		options["Model"] := getMultiMapValue(configuration, "Autonomous Agent", descriptor . ".Model", false)
-		options["MaxTokens"] := getMultiMapValue(configuration, "Autonomous Agent", descriptor . ".MaxTokens", 2048)
-	}
-
-	startAgent() {
-		local service := this.Options["Service"]
-		local ignore, instruction
-
-		if service {
-			service := string2Values("|", service)
-
-			if !inList(this.Providers, service[1])
-				throw "Unsupported service detected in LLMAgent.startAgent..."
-
-			if (service[1] = "LLM Runtime")
-				this.iConnector := LLMConnector.LLMRuntimeConnector(this, this.Options["Model"])
-			else
-				try {
-					this.iConnector := LLMConnector.%StrReplace(service[1], A_Space, "")%Connector(this, this.Options["Model"])
-
-					this.Connector.Connect(service[2], service[3])
-				}
-				catch Any as exception {
-					logError(exception)
-
-					throw "Unsupported service detected in LLMAgent.startAgent..."
-				}
-
-			this.Connector.MaxTokens := this.MaxTokens
-		}
-		else
-			throw "Unsupported service detected in LLMAgent.startAgent..."
-	}
-}
-
-class AutonomousAgent extends LLMAgent {
-	iTranscript := false
+class AgentBooster extends LLMBooster {
+	iManager := false
 
 	iInstructions := false
+
+	Type {
+		Get {
+			return "Agent"
+		}
+	}
 
 	Descriptor {
 		Get {
 			return this.Options["Descriptor"]
+		}
+	}
+
+	Manager {
+		Get {
+			return this.iManager
 		}
 	}
 
@@ -150,6 +76,12 @@ class AutonomousAgent extends LLMAgent {
 		}
 	}
 
+	MaxHistory {
+		Get {
+			return this.Options["MaxHistory"]
+		}
+	}
+
 	Instructions[language?] {
 		Get {
 			local instructions, ignore, instrLanguage, directory, key, value
@@ -158,7 +90,7 @@ class AutonomousAgent extends LLMAgent {
 				instructions := CaseInsenseMap()
 
 				for ignore, directory in [kTranslationsDirectory, kUserTranslationsDirectory]
-					loop Files (directory . "Autonomous Agent.instructions.*") {
+					loop Files (directory . "Agent Booster.instructions.*") {
 						SplitPath A_LoopFilePath, , , &instrLanguage
 
 						if !instructions.Has(instrLanguage)
@@ -167,7 +99,7 @@ class AutonomousAgent extends LLMAgent {
 						addMultiMapValues(instructions[instrLanguage], readMultiMap(A_LoopFilePath))
 					}
 
-				for key, value in getMultiMapValues(this.Configuration, "Autonomous Agent")
+				for key, value in getMultiMapValues(this.Configuration, "Agent Booster")
 					if (InStr(key, "Instructions.") = 1) {
 						key := ConfigurationItem.splitDescriptor(key)
 
@@ -193,20 +125,12 @@ class AutonomousAgent extends LLMAgent {
 		}
 	}
 
-	Transcript {
-		Get {
-			return this.iTranscript
-		}
-	}
-
-	__New(descriptor, configuration, language := false) {
-		local transcripts := getMultiMapValue(configuration, "Autonomous Agents", descriptor . ".Transcripts"
-														   , kTempDirectory . "Transcripts\")
+	__New(manager, descriptor, configuration, language := false) {
 		local allLanguages, index
 
-		this.Options["Descriptor"] := descriptor
+		this.iManager := manager
 
-		this.iTranscript := (normalizeDirectoryPath(transcripts) . "\" . descriptor . ".txt")
+		this.Options["Descriptor"] := descriptor
 
 		super.__New(configuration)
 
@@ -224,14 +148,18 @@ class AutonomousAgent extends LLMAgent {
 		}
 		else
 			this.Options["Code"] := false
-
-		DirCreate(kTempDirectory . "Transcripts\")
 	}
 
 	loadFromConfiguration(configuration) {
+		local descriptor := this.Descriptor
+		local options := this.Options
+
 		super.loadFromConfiguration(configuration)
 
-		this.Options["Language"] := getMultiMapValue(configuration, "Conversation Booster", this.Descriptor . ".Language", this.Language)
+		options["Language"] := getMultiMapValue(configuration, "Agent Booster", descriptor . ".Language", this.Language)
+		options["Active"] := getMultiMapValue(configuration, "Agent Booster", descriptor . ".Agent", false)
+		options["MaxHistory"] := getMultiMapValue(configuration, "Agent Booster", descriptor . ".AgentMaxHistory", 3)
+		options["Temperature"] := getMultiMapValue(configuration, "Agent Booster", descriptor . ".AgentTemperature", 0.2)
 	}
 
 	getInstructions() {
@@ -239,20 +167,81 @@ class AutonomousAgent extends LLMAgent {
 	}
 
 	getTools() {
-		return []
+		return this.Manager.getTools()
 	}
 
 	connectorState(*) {
 	}
 
-	startAgent() {
-		super.startAgent()
+	startBooster() {
+		super.startBooster()
 
 		if this.Connector
-			this.Connector.MaxHistory := 0
+			this.Connector.MaxHistory := this.MaxHistory
 	}
 
-	normalizeAnswer(answer) {
-		return Trim(StrReplace(StrReplace(answer, "*", ""), "|||", ""), " `t`r`n")
+	trigger(event, goal := false, options := false) {
+		local variables := false
+		local doTrigger, code, language, instruction, variables, target
+
+		if (this.Model && this.Active) {
+			code := this.Code
+			language := this.Language
+			doTrigger := true
+
+			if options {
+				if !isInstance(options, Map)
+					options := toMap(options)
+
+				doTrigger := (!options.Has("Trigger") || options["Trigger"])
+
+				if options.Has("Variables")
+					variables := options["Variables"]
+
+				if options.Has("Language")
+					code := options["Language"]
+			}
+
+			if doTrigger {
+				try {
+					if !this.Connector
+						this.startBooster()
+
+					this.Connector.Temperature := this.Temperature
+
+					if variables
+						variables.language := (language ? language : "")
+					else
+						variables := {language: language ? language : ""}
+
+					variables.event := event
+
+					target := (substituteVariables(getMultiMapValue(instruction, "Agent.Instructions", "Event")
+												 , variables) . "`n`n"
+							 . substituteVariables(getMultiMapValue(instruction, "Agent.Instructions", "Goal")
+												 , variables))
+
+					if goal {
+						variables.goal := goal
+
+						target .= ("`n`n" . substituteVariables(getMultiMapValue(instruction, "Agent.Instructions", "Details")
+															  , variables))
+					}
+
+					instruction := this.Instructions[code]
+
+					this.Connector.Ask(target
+									 , [substituteVariables(getMultiMapValue(instruction
+																		   , "Agent.Instructions", "Character")
+														  , variables)
+									  , substituteVariables(getMultiMapValue(instruction
+																		   , "Agent.Instructions", "Knowledge")
+														  , variables)])
+				}
+				catch Any as exception {
+					logError(exception, true)
+				}
+			}
+		}
 	}
 }

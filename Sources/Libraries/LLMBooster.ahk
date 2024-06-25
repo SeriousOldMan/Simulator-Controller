@@ -33,7 +33,11 @@ class LLMBooster extends ConfigurationItem {
 
 	iConnector := false
 
-	iInstructions := false
+	Type {
+		Get {
+			return "Conversation"
+		}
+	}
 
 	Options[key?] {
 		Get {
@@ -81,9 +85,9 @@ class LLMBooster extends ConfigurationItem {
 
 		super.loadFromConfiguration(configuration)
 
-		options["Service"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".Service", false)
-		options["Model"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".Model", false)
-		options["MaxTokens"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".MaxTokens", 2048)
+		options["Service"] := getMultiMapValue(configuration, this.Type . " Booster", descriptor . ".Service", false)
+		options["Model"] := getMultiMapValue(configuration, this.Type . " Booster", descriptor . ".Model", false)
+		options["MaxTokens"] := getMultiMapValue(configuration, this.Type . " Booster", descriptor . ".MaxTokens", 2048)
 	}
 
 	startBooster() {
@@ -280,7 +284,7 @@ class SpeechBooster extends ConversationBooster {
 
 	speak(text, options := false) {
 		local variables := false
-		local doRephrase, doTranslate, code, language, fileName, languageInstructions, instruction
+		local doRephrase, doTranslate, code, language, instruction
 
 		if (this.Model && this.Active) {
 			code := this.Code
@@ -421,7 +425,7 @@ class RecognitionBooster extends ConversationBooster {
 
 	recognize(text, options := false) {
 		local commands := this.Commands
-		local doRecognize, code, language, fileName, languageInstructions, instruction
+		local doRecognize, code, language, instruction
 		local phrase, name, grammar, phrases, candidates, numCandidates
 
 		if !commands {
@@ -554,7 +558,7 @@ class ChatBooster extends ConversationBooster {
 
 	ask(question, options := false) {
 		local variables := false
-		local doTalk, code, language, fileName, languageInstructions, instruction, variables
+		local doTalk, code, language, instruction, variables
 
 		if (this.Model && this.Active) {
 			code := this.Code
@@ -580,8 +584,6 @@ class ChatBooster extends ConversationBooster {
 						this.startBooster()
 
 					this.Connector.Temperature := this.Temperature
-
-					instruction := "Talk"
 
 					if variables
 						variables.language := (language ? language : "")

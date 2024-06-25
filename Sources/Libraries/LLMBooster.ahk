@@ -230,12 +230,9 @@ class ConversationBooster extends LLMBooster {
 	}
 
 	loadFromConfiguration(configuration) {
-		local descriptor := this.Descriptor
-		local options := this.Options
-
 		super.loadFromConfiguration(configuration)
 
-		options["Language"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".Language", this.Language)
+		this.Options["Language"] := getMultiMapValue(configuration, "Conversation Booster", this.Descriptor . ".Language", this.Language)
 	}
 
 	getInstructions() {

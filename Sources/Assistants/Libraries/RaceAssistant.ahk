@@ -1857,7 +1857,7 @@ class RaceAssistant extends ConfigurationItem {
 	addLap(lapNumber, &data, dump := true, lapValid := kUndefined, lapPenalty := kUndefined) {
 		local knowledgeBase := this.KnowledgeBase
 		local adjustedLapTime := false
-		local driverForname, driverSurname, driverNickname, tyreSet, timeRemaining, airTemperature, trackTemperature
+		local driverForname, driverSurname, driverNickname, tyreSet, airTemperature, trackTemperature, sessionTimeRemaining, driverTimeRemaining
 		local weatherNow, weather10Min, weather30Min, lapTime, settingsLapTime, overallTime, values, result, baseLap, enoughData
 		local fuelRemaining, avgFuelConsumption, tyrePressures, tyreTemperatures, tyreWear, brakeTemperatures, brakeWear, key
 
@@ -1884,7 +1884,9 @@ class RaceAssistant extends ConfigurationItem {
 
 		this.updateDynamicValues({EnoughData: enoughData})
 
-		knowledgeBase.setFact("Session.Time.Remaining", getDeprecatedValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0))
+		sessionTimeRemaining := getDeprecatedValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
+
+		knowledgeBase.setFact("Session.Time.Remaining", sessionTimeRemaining)
 		knowledgeBase.setFact("Session.Lap.Remaining", getDeprecatedValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0))
 
 		driverForname := getMultiMapValue(data, "Stint Data", "DriverForname", this.DriverForName)
@@ -1914,10 +1916,10 @@ class RaceAssistant extends ConfigurationItem {
 		if (tyreSet != kUndefined)
 			knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Set", tyreSet)
 
-		timeRemaining := getDeprecatedValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
+		driverTimeRemaining := getMultiMapValue(data, "Stint Data", "DriverTimeRemaining", sessionTimeRemaining)
 
-		knowledgeBase.setFact("Driver.Time.Remaining", getMultiMapValue(data, "Stint Data", "DriverTimeRemaining", timeRemaining))
-		knowledgeBase.setFact("Driver.Time.Stint.Remaining", getMultiMapValue(data, "Stint Data", "StintTimeRemaining", timeRemaining))
+		knowledgeBase.setFact("Driver.Time.Remaining", driverTimeRemaining)
+		knowledgeBase.setFact("Driver.Time.Stint.Remaining", getMultiMapValue(data, "Stint Data", "StintTimeRemaining", driverTimeRemaining))
 
 		airTemperature := Round(getMultiMapValue(data, "Weather Data", "Temperature", 0))
 		trackTemperature := Round(getMultiMapValue(data, "Track Data", "Temperature", 0))

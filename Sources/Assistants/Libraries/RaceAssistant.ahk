@@ -1231,6 +1231,24 @@ class RaceAssistant extends ConfigurationItem {
 			return values2String(", ", arguments*)
 		}
 
+		addRules(rules) {
+			local knowledgeBase := this.KnowledgeBase
+			local productions := false
+			local reductions := false
+			local includes := false
+			local ignore, rule
+
+			knowledgeBase.compileRules(rules, &productions, &reductions, &includes)
+
+			for ignore, rule in productions
+				knowledgeBase.addRule(rule)
+
+			for ignore, rule in reductions
+				knowledgeBase.addRule(rule)
+
+			knowledgeBase.registerIncludes(includes)
+		}
+
 		callMethod(method, enoughData, confirm, arguments*) {
 			local ignore, methodArguments
 
@@ -1249,7 +1267,8 @@ class RaceAssistant extends ConfigurationItem {
 
 		callRule(action, ruleFileName, enoughData, confirm, parameters, arguments*) {
 			local knowledgeBase := this.KnowledgeBase
-			local rules, ignore, rule, productions, reductions, index, parameter, names, variables
+			local index, parameter, names, variables
+			local productions, reductions, includes, ignore, rule
 
 			if knowledgeBase {
 				if !this.confirmCommand(enoughData, confirm)
@@ -1269,18 +1288,16 @@ class RaceAssistant extends ConfigurationItem {
 							logError(exception, true)
 						}
 
-					rules := substituteVariables(rules, variables)
-
-					productions := false
-					reductions := false
-
-					RuleCompiler().compileRules(rules, &productions, &reductions)
+					knowledgeBase.compileRules(substituteVariables(rules, variables)
+											 , &productions := false, &reductions := false, &includes := false)
 
 					for ignore, rule in productions
 						knowledgeBase.addRule(rule)
 
 					for ignore, rule in reductions
 						knowledgeBase.addRule(rule)
+
+					knowledgeBase.registerIncludes(includes)
 
 					loadedRules[ruleFileName] := [("__" . action . ".A"), names]
 				}
@@ -1400,6 +1417,7 @@ class RaceAssistant extends ConfigurationItem {
 
 	createKnowledgeBase(facts := false) {
 		local compiler := RuleCompiler()
+		local includes := []
 		local rules, productions, reductions, engine, knowledgeBase, ignore, compound, compoundColor
 
 		rules := FileRead(getFileName(this.AssistantType . ".rules", kUserRulesDirectory, kRulesDirectory))
@@ -1407,15 +1425,15 @@ class RaceAssistant extends ConfigurationItem {
 		productions := false
 		reductions := false
 
-		compiler.compileRules(rules, &productions, &reductions)
+		compiler.compileRules(rules, &productions, &reductions, &includes)
 
 		if this.Booster {
 			rules := FileRead(getFileName("Conversation Actions.rules", kUserRulesDirectory, kRulesDirectory))
 
-			compiler.compileRules(rules, &productions, &reductions)
+			compiler.compileRules(rules, &productions, &reductions, &includes)
 		}
 
-		engine := RuleEngine(productions, reductions, facts)
+		engine := RuleEngine(productions, reductions, facts, includes)
 
 		knowledgeBase := RaceAssistant.RaceKnowledgeBase(this, engine, engine.createFacts(), engine.createRules())
 
@@ -3795,6 +3813,19 @@ speakAssistant(context, message) {
 }
 
 Assistant_Speak := speakAssistant
+
+triggerAssistant(context, event, arguments*) {
+	try {
+		context.KnowledgeBase.RaceAssistant.trigger(normalizeArguments(arguments)*)
+	}
+	catch Any as exception {
+		logError(exception, true)
+	}
+
+	return true
+}
+
+Assistant_Trigger := triggerAssistant
 
 
 ;;;-------------------------------------------------------------------------;;;

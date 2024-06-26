@@ -64,40 +64,16 @@ allTools([?tool | ?tools], ?index) <= Get(Tool, ?index, ?tool), ?next = ?index -
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                               Callback Rules                            ;;;
+;;;                             Action Callbacks                            ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-Assistant.Call(?function, ?p1) <= Call(callAssistant, ?function, ?p1)
-Assistant.Call(?function, ?p1, ?p2) <= Call(callAssistant, ?function, ?p1, ?p2)
-Assistant.Call(?function, ?p1, ?p2, ?p3) <= Call(callAssistant, ?function, ?p1, ?p2, ?p3)
-Assistant.Call(?function, ?p1, ?p2, ?p3, ?p4) <= Call(callAssistant, ?function, ?p1, ?p2, ?p3, ?p4)
-Assistant.Call(?function, ?p1, ?p2, ?p3, ?p4, ?p5) <= Call(callAssistant, ?function, ?p1, ?p2, ?p3, ?p4, ?p5)
-Assistant.Call(?function, ?p1, ?p2, ?p3, ?p4, ?p5, ?p6) <= Call(callAssistant, ?function, ?p1, ?p2, ?p3, ?p4, ?p5, ?p6)
+#Include %kResourcesDirectory%Rules\Action Callbacks.rules
 
-Function.Call(?function, ?p1) <= Call(callFunction, ?function, ?p1)
-Function.Call(?function, ?p1, ?p2) <= Call(callFunction, ?function, ?p1, ?p2)
-Function.Call(?function, ?p1, ?p2, ?p3) <= Call(callFunction, ?function, ?p1, ?p2, ?p3)
-Function.Call(?function, ?p1, ?p2, ?p3, ?p4) <= Call(callFunction, ?function, ?p1, ?p2, ?p3, ?p4)
-Function.Call(?function, ?p1, ?p2, ?p3, ?p4, ?p5) <= Call(callFunction, ?function, ?p1, ?p2, ?p3, ?p4, ?p5)
-Function.Call(?function, ?p1, ?p2, ?p3, ?p4, ?p5, ?p6) <= Call(callFunction, ?function, ?p1, ?p2, ?p3, ?p4, ?p5, ?p6)
-
-Controller.Call(?function, ?p1) <= Call(callController, ?function, ?p1)
-Controller.Call(?function, ?p1, ?p2) <= Call(callController, ?function, ?p1, ?p2)
-Controller.Call(?function, ?p1, ?p2, ?p3) <= Call(callController, ?function, ?p1, ?p2, ?p3)
-Controller.Call(?function, ?p1, ?p2, ?p3, ?p4) <= Call(callController, ?function, ?p1, ?p2, ?p3, ?p4)
-Controller.Call(?function, ?p1, ?p2, ?p3, ?p4, ?p5) <= Call(callController, ?function, ?p1, ?p2, ?p3, ?p4, ?p5)
-Controller.Call(?function, ?p1, ?p2, ?p3, ?p4, ?p5, ?p6) <= Call(callController, ?function, ?p1, ?p2, ?p3, ?p4, ?p5, ?p6)
-
-Assistant.Ask(?question) <= Call(askAssistant, ?question)
-
-Assistant.Speak(?question) <= Call(speakAssistant, ?question)
+Assistant.Trigger(?event) <= Call(triggerAssistant, ?event)
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                               Utility Rules                             ;;;
+;;;                               Utilities                                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-fact?(?f) <= Get(?f, ?)
-
-bound?(?x) <= unbound?(?x), !, fail
-bound?(?)
+#Include %kResourcesDirectory%Rules\Utilities.rules

@@ -2682,7 +2682,7 @@ class KnowledgeBase {
 		}
 	}
 
-	__New(ruleEngine, facts, rules) {
+	__New(ruleEngine, facts, rules, includes := false) {
 		local production := rules.Productions[false]
 
 		this.iRuleEngine := ruleEngine
@@ -2694,6 +2694,9 @@ class KnowledgeBase {
 
 			production := production.Next[false]
 		}
+
+		if includes
+			this.registerIncludes(includes)
 	}
 
 	registerRuleFacts(rule) {
@@ -2738,6 +2741,10 @@ class KnowledgeBase {
 		this.Rules.activateRules(rules)
 	}
 
+	compileRules(rules, &productions, &reductions, &includes) {
+		this.Rules.compileRules(rules, &productions, &reductions, &includes)
+	}
+
 	addRule(rule) {
 		this.Rules.addRule(rule)
 
@@ -2750,6 +2757,14 @@ class KnowledgeBase {
 
 		if (rule.Type == kProduction)
 			this.deregisterRuleFacts(rule)
+	}
+
+	registerIncludes(includes) {
+		this.Rules.registerIncludes(includes)
+	}
+
+	registerInclude(include) {
+		this.Rules.registerInclude(include)
 	}
 
 	setValue(fact, value, propagate := false) {
@@ -3099,6 +3114,7 @@ class Rules {
 	iRuleEngine := false
 	iProductions := false
 	iReductions := CaseInsenseMap()
+	iIncludes := []
 	iGeneration := 1
 
 	iProductionRules := CaseInsenseMap()
@@ -3243,11 +3259,14 @@ class Rules {
 		}
 	}
 
-	__New(ruleEngine, productions, reductions) {
+	__New(ruleEngine, productions, reductions, includes := false) {
 		local last := false
 		local index, production, entry, ignore, reduction, key
 
 		this.iRuleEngine := ruleEngine
+
+		if includes
+			this.iIncludes := includes
 
 		productions := productions.Clone()
 
@@ -3267,6 +3286,14 @@ class Rules {
 
 			this.iReductions[key].Push(reduction)
 		}
+	}
+
+	compileRules(rules, &productions, &reductions, &includes) {
+		local newIncludes := this.iIncludes.Clone()
+
+		RuleCompiler().compileRules(rules, &productions, &reductions, &newIncludes)
+
+		includes := choose(newIncludes, (include) => !inList(this.iIncludes, include))
 	}
 
 	addRule(rule) {
@@ -3346,6 +3373,15 @@ class Rules {
 		}
 	}
 
+	registerIncludes(includes) {
+		do(includes, (include) => this.registerInclude(include))
+	}
+
+	registerInclude(include) {
+		if !inList(this.iIncludes, include)
+			this.iIncludes.Push(include)
+	}
+
 	activateRules(rules) {
 		local productionRules := this.iProductionRules
 		local ignore, rule
@@ -3423,6 +3459,7 @@ class RuleEngine {
 	iInitialFacts := Map()
 	iInitialProductions := []
 	iInitialReductions := []
+	iInitialIncludes := []
 	iTraceLevel := kTraceOff
 
 	InitialFacts {
@@ -3443,18 +3480,27 @@ class RuleEngine {
 		}
 	}
 
+	InitialIncludes {
+		Get {
+			return this.iInitialIncludes
+		}
+	}
+
 	TraceLevel {
 		Get {
 			return this.iTraceLevel
 		}
 	}
 
-	__New(productions, reductions, facts := false) {
+	__New(productions, reductions, facts := false, includes := false) {
 		this.iInitialProductions := productions
 		this.iInitialReductions := reductions
 
 		if facts
 			this.iInitialFacts := facts
+
+		if includes
+			this.iInitialIncludes := includes
 	}
 
 	produce() {
@@ -3475,7 +3521,7 @@ class RuleEngine {
 	}
 
 	createRules() {
-		return Rules(this, this.InitialProductions, this.InitialReductions)
+		return Rules(this, this.InitialProductions, this.InitialReductions, this.InitialIncludes)
 	}
 
 	createKnowledgeBase(facts, rules) {
@@ -3501,7 +3547,7 @@ class RuleEngine {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class RuleCompiler {
-	compile(fileName, &productions, &reductions, path := false, includes := false) {
+	compile(fileName, &productions, &reductions, &includes := false, path := false) {
 		if !includes
 			includes := []
 
@@ -3515,10 +3561,10 @@ class RuleCompiler {
 
 		SplitPath(fileName, , &path)
 
-		this.compileRules(FileRead(fileName), &productions, &reductions, path, includes)
+		this.compileRules(FileRead(fileName), &productions, &reductions, &includes, path)
 	}
 
-	compileRules(text, &productions, &reductions, path := false, includes := false) {
+	compileRules(text, &productions, &reductions, &includes := false, path := false) {
 		local incompleteLine := false
 		local one, line, currentDirectory, fileName, compiledRule
 
@@ -3550,7 +3596,7 @@ class RuleCompiler {
 
 						SplitPath(fileName, , &path)
 
-						this.compile(fileName, &productions, &reductions, path, includes)
+						this.compile(fileName, &productions, &reductions, &includes, path)
 					}
 					finally {
 						SetWorkingDir(currentDirectory)

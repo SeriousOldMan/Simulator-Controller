@@ -21,6 +21,7 @@
 #Include "..\..\Libraries\RuleEngine.ahk"
 #Include "..\..\Libraries\LLMConnector.ahk"
 #Include "..\..\Libraries\LLMBooster.ahk"
+#Include "..\..\Libraries\LLMAgent.ahk"
 #Include "VoiceManager.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\..\Database\Libraries\SettingsDatabase.ahk"
@@ -60,7 +61,8 @@ class RaceAssistant extends ConfigurationItem {
 	iSettings := newMultiMap()
 	iVoiceManager := false
 
-	iBooster := false
+	iConversationBooster := false
+	iAgentBooster := false
 
 	iAnnouncements := CaseInsenseMap()
 
@@ -334,9 +336,15 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	Booster {
+	ConversationBooster {
 		Get {
-			return this.iBooster
+			return this.iConversationBooster
+		}
+	}
+
+	AgentBooster {
+		Get {
+			return this.iAgentBooster
 		}
 	}
 
@@ -528,7 +536,8 @@ class RaceAssistant extends ConfigurationItem {
 
 	__New(configuration, assistantType, remoteHandler, name := false, language := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, speakerBooster := false
-		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, muted := false, voiceServer := false) {
+		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, agentBooster := false
+		, muted := false, voiceServer := false) {
 		global kUnknown
 
 		local userName := SessionDatabase.getUserName()
@@ -572,6 +581,7 @@ class RaceAssistant extends ConfigurationItem {
 			options["SpeakerBooster"] := ((speakerBooster == true) ? options["SpeakerBooster"] : speakerBooster)
 			options["ListenerBooster"] := ((listenerBooster == true) ? options["ListenerBooster"] : listenerBooster)
 			options["ConversationBooster"] := ((conversationBooster == true) ? options["ConversationBooster"] : conversationBooster)
+			options["AgentBooster"] := ((agentBooster == true) ? options["AgentBooster"] : agentBooster)
 		}
 
 		this.iVoiceManager := this.createVoiceManager(name, options)
@@ -588,7 +598,14 @@ class RaceAssistant extends ConfigurationItem {
 			booster := ChatBooster(this, options["ConversationBooster"], this.Configuration, this.VoiceManager.Language)
 
 			if (booster.Model && booster.Active)
-				this.iBooster := booster
+				this.iConversationBooster := booster
+		}
+
+		if options["AgentBooster"] {
+			booster := AgentBooster(this, options["AgentBooster"], this.Configuration, this.VoiceManager.Language)
+
+			if (booster.Model && booster.Active)
+				this.iAgentBooster := booster
 		}
 
 		if muted
@@ -627,6 +644,11 @@ class RaceAssistant extends ConfigurationItem {
 			options["ConversationBooster"] := ((getMultiMapValue(configuration, "Conversation Booster", this.AssistantType . ".Model", kUndefined) != kUndefined) ? this.AssistantType : false)
 		else
 			options["ConversationBooster"] := false
+
+		if getMultiMapValue(configuration, "Agent Booster", this.AssistantType . ".Agent", true)
+			options["AgentBooster"] := ((getMultiMapValue(configuration, "Agent Booster", this.AssistantType . ".Model", kUndefined) != kUndefined) ? this.AssistantType : false)
+		else
+			options["AgentBooster"] := false
 	}
 
 	createVoiceManager(name, options) {
@@ -904,9 +926,10 @@ class RaceAssistant extends ConfigurationItem {
 		local ignore, part
 
 		if (grammar = "Text") {
-			if this.Booster {
-				text := this.Booster.ask(text, Map("Variables", {assistant: this.AssistantType, name: this.VoiceManager.Name
-															   , knowledge: JSON.print(this.getKnowledge("Conversation"))}))
+			if this.ConversationBooster {
+				text := this.ConversationBooster.ask(text
+												   , Map("Variables", {assistant: this.AssistantType, name: this.VoiceManager.Name
+																	 , knowledge: JSON.print(this.getKnowledge("Conversation"))}))
 
 				if text {
 					if (text != true)
@@ -1427,8 +1450,14 @@ class RaceAssistant extends ConfigurationItem {
 
 		compiler.compileRules(rules, &productions, &reductions, &includes)
 
-		if this.Booster {
+		if this.ConversationBooster {
 			rules := FileRead(getFileName("Conversation Actions.rules", kUserRulesDirectory, kRulesDirectory))
+
+			compiler.compileRules(rules, &productions, &reductions, &includes)
+		}
+
+		if this.AgentBooster {
+			rules := FileRead(getFileName("Agent Actions.rules", kUserRulesDirectory, kRulesDirectory))
 
 			compiler.compileRules(rules, &productions, &reductions, &includes)
 		}

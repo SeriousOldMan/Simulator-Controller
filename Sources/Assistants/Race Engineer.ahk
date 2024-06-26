@@ -92,6 +92,7 @@ startupRaceEngineer() {
 	local engineerListener := false
 	local engineerListenerBooster := false
 	local engineerConversationBooster := false
+	local engineerAgentBooster := false
 	local engineerMuted := false
 	local debug := false
 	local voiceServer, index, engineer, label
@@ -141,6 +142,9 @@ startupRaceEngineer() {
 			case "-ConversationBooster":
 				engineerConversationBooster := A_Args[index + 1]
 				index += 2
+			case "-AgentBooster":
+				engineerAgentBooster := A_Args[index + 1]
+				index += 2
 			case "-Muted":
 				engineerMuted := true
 				index += 1
@@ -172,7 +176,8 @@ startupRaceEngineer() {
 						   , remotePID ? RaceEngineer.RaceEngineerRemoteHandler(remotePID) : false
 						   , engineerName, engineerLanguage
 						   , engineerSynthesizer, engineerSpeaker, engineerSpeakerVocalics, engineerSpeakerBooster
-						   , engineerRecognizer, engineerListener, engineerListenerBooster, engineerConversationBooster, engineerMuted, voiceServer)
+						   , engineerRecognizer, engineerListener, engineerListenerBooster, engineerConversationBooster, engineerAgentBooster
+						   , engineerMuted, voiceServer)
 
 	RaceEngineer.Instance := engineer
 

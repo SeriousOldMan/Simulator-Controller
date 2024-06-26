@@ -684,7 +684,7 @@ testAssistants(configurator, assistants := kRaceAssistants, booster := false) {
 			}
 
 		if booster
-			for ignore, parameter in ["SpeakerBooster", "ListenerBooster", "ConversationBooster"]
+			for ignore, parameter in ["SpeakerBooster", "ListenerBooster", "ConversationBooster", "AgentBooster"]
 				if thePlugin.hasArgument("raceAssistant" . parameter) {
 					value := thePlugin.getArgumentValue("raceAssistant" . parameter)
 

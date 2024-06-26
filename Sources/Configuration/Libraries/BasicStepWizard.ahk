@@ -664,6 +664,15 @@ class BasicStepWizard extends StepWizard {
 			return false
 	}
 
+	assistantAgentBooster(assistant, editor := true) {
+		local agentBooster := this.SetupWizard.getModuleValue(assistant, "Agent Booster", this.assistantDefaults(assistant).AgentBooster)
+
+		if agentBooster
+			agentBooster := (isInstance(agentBooster, Map) ? agentBooster : string2Map("|||", "--->>>", agentBooster))
+
+		return (agentBooster ? agentBooster : false)
+	}
+
 	assistantSetup(assistant, editor := true) {
 		return {Enabled: this.assistantEnabled(assistant, editor), Name: this.assistantName(assistant, editor)
 			  , Language: this.assistantLanguage(assistant, editor), Synthesizer: this.assistantSynthesizer(assistant, editor)
@@ -671,7 +680,8 @@ class BasicStepWizard extends StepWizard {
 			  , Volume: this.assistantVolume(assistant), Pitch: this.assistantPitch(assistant), Speed: this.assistantSpeed(assistant)
 			  , SpeakerBooster: this.assistantSpeakerBooster(assistant)
 			  , ListenerBooster: this.assistantListenerBooster(assistant)
-			  , ConversationBooster: this.assistantConversationBooster(assistant)}
+			  , ConversationBooster: this.assistantConversationBooster(assistant)
+			  , AgentBooster: this.assistantAgentBooster(assistant)}
 	}
 
 	assistantDefaults(assistant) {
@@ -680,7 +690,7 @@ class BasicStepWizard extends StepWizard {
 		local ignore, key
 
 		for ignore, key in ["Name", "Synthesizer", "Voice", "Volume", "Pitch", "Speed"
-						  , "SpeakerBooster", "ListenerBooster", "ConversationBooster"]
+						  , "SpeakerBooster", "ListenerBooster", "ConversationBooster", "AgentBooster"]
 			defaults.%key% := getMultiMapValue(wizard.Definition, "Setup.Basic", "Basic.Defaults." . assistant . "." . key, false)
 
 		return defaults
@@ -900,6 +910,12 @@ class BasicStepWizard extends StepWizard {
 									, assistantSetups.%key%.ConversationBooster ? map2String("|||", "--->>>", assistantSetups.%key%.ConversationBooster) : false, false)
 			else
 				wizard.setModuleValue(assistant, "Conversation Booster", false, false)
+
+			if assistantSetups.%key%.HasProp("AgentBooster")
+				wizard.setModuleValue(assistant, "Agent Booster"
+									, assistantSetups.%key%.AgentBooster ? map2String("|||", "--->>>", assistantSetups.%key%.AgentBooster) : false, false)
+			else
+				wizard.setModuleValue(assistant, "Agent Booster", false, false)
 		}
 
 		setMultiMapValue(voiceConfiguration, "Voice Control", "Language", getLanguage())
@@ -997,7 +1013,7 @@ class BasicStepWizard extends StepWizard {
 	editBooster(assistant) {
 		local wizard := this.SetupWizard
 		local window := this.Window
-		local configuration, setup, speakerBooster, listenerBooster, conversationBooster
+		local configuration, setup, speakerBooster, listenerBooster, conversationBooster, agentBooster
 
 		window.Block()
 
@@ -1035,6 +1051,14 @@ class BasicStepWizard extends StepWizard {
 				setMultiMapValue(configuration, "Conversation Booster", assistant . ".ConversationActions", setup.ConversationBooster["ConversationActions"])
 			}
 
+			if (setup.HasProp("AgentBooster") && setup.AgentBooster) {
+				setMultiMapValue(configuration, "Agent Booster", assistant . ".Service", setup.AgentBooster["Service"])
+				setMultiMapValue(configuration, "Agent Booster", assistant . ".Model", setup.AgentBooster["Model"])
+				setMultiMapValue(configuration, "Agent Booster", assistant . ".Agent", setup.AgentBooster["Agent"])
+				setMultiMapValue(configuration, "Agent Booster", assistant . ".AgentMaxHistory", setup.AgentBooster["AgentMaxHistory"])
+				setMultiMapValue(configuration, "Agent Booster", assistant . ".AgentTemperature", setup.AgentBooster["AgentTemperature"])
+			}
+
 			configuration := ConversationBoosterEditor(assistant, configuration).editBooster(window)
 
 			if configuration {
@@ -1062,6 +1086,14 @@ class BasicStepWizard extends StepWizard {
 										  , "ConversationMaxHistory", getMultiMapValue(configuration, "Conversation Booster", assistant . ".ConversationMaxHistory")
 										  , "ConversationTemperature", getMultiMapValue(configuration, "Conversation Booster", assistant . ".ConversationTemperature")
 										  , "ConversationActions", getMultiMapValue(configuration, "Conversation Booster", assistant . ".ConversationActions"))
+
+				wizard.setModuleValue(assistant, "Conversation Booster", map2String("|||", "--->>>", conversationBooster))
+
+				agentBooster := Map("Service", getMultiMapValue(configuration, "Agent Booster", assistant . ".Service")
+								  , "Model", getMultiMapValue(configuration, "Agent Booster", assistant . ".Model")
+								  , "Agent", getMultiMapValue(configuration, "Agent Booster", assistant . ".Agent")
+								  , "AgentMaxHistory", getMultiMapValue(configuration, "Agent Booster", assistant . ".AgentMaxHistory")
+								  , "AgentTemperature", getMultiMapValue(configuration, "Agent Booster", assistant . ".AgentTemperature"))
 
 				wizard.setModuleValue(assistant, "Conversation Booster", map2String("|||", "--->>>", conversationBooster))
 

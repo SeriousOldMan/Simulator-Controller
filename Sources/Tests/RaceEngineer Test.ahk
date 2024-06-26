@@ -61,8 +61,11 @@ global vPitstopRepairEngine := kNotInitialized
 
 class TestRaceEngineer extends RaceEngineer {
 	__New(configuration, settings, remoteHandler := false, name := false, language := kUndefined, synthesizer := false, speaker := false, vocalics := false, speakerBooster := false
-		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, muted := false, voiceServer := false) {
-		super.__New(configuration, remoteHandler, name, language, synthesizer, speaker, vocalics, speakerBooster, recognizer, listener, listenerBooster, conversationBooster, muted, voiceServer)
+		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, agentBooster := false
+		, muted := false, voiceServer := false) {
+		super.__New(configuration, remoteHandler, name, language, synthesizer, speaker, vocalics, speakerBooster
+				  , recognizer, listener, listenerBooster, conversationBooster, agentBooster
+				  , muted, voiceServer)
 
 		this.updateConfigurationValues({Settings: settings})
 

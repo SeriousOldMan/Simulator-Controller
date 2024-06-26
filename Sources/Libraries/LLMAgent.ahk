@@ -167,7 +167,7 @@ class AgentBooster extends LLMBooster {
 	}
 
 	getTools() {
-		return this.Manager.getTools()
+		return this.Manager.getTools("Agent")
 	}
 
 	connectorState(*) {

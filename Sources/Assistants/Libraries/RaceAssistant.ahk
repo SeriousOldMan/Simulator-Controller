@@ -830,13 +830,22 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	getTools() {
-		static tools := false
+	getTools(type) {
+		static conversationTools := false
+		static agentTools := false
 
-		if !tools
-			tools := this.createConversationTools()
+		if (type = "Conversation") {
+			if !conversationTools
+				conversationTools := this.createConversationTools()
 
-		return tools
+			return conversationTools
+		}
+		else if (type = "Agent") {
+			if !agentTools
+				agentTools := this.createAgentTools()
+
+			return agentTools
+		}
 	}
 
 	activeTopic(options, topic) {
@@ -1436,6 +1445,10 @@ class RaceAssistant extends ConfigurationItem {
 		}
 
 		return tools
+	}
+
+	createAgentTools() {
+		return []
 	}
 
 	createKnowledgeBase(facts := false) {

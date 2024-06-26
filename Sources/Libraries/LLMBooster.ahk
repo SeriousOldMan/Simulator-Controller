@@ -555,7 +555,7 @@ class ChatBooster extends ConversationBooster {
 	}
 
 	getTools() {
-		return (this.Options["Actions"] ? this.Manager.getTools() : [])
+		return (this.Options["Actions"] ? this.Manager.getTools("Conversation") : [])
 	}
 
 	ask(question, options := false) {

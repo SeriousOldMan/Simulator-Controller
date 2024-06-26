@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.7.8.0-alpha](https://www.dropbox.com/scl/fi/3ejnwa7q4nmkebstu8aug/Simulator-Controller-5.7.8.0-alpha.zip?rlkey=md5y8pbz02a2cp4949fvwrxcs&st=ve64wvvn&dl=1) (Test build for 5.7.8. Changes: ixed driver name in Team Server connections, Tyre set for wet tyres are displayed as "Auto" in "Race Center" and "Practice Center", "Auto" can be chosen as tyre set in "Race Center", Fixed tyre pressures for AMS2, Better warmup of Team Server.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-578) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

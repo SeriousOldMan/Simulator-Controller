@@ -257,10 +257,10 @@ int main(int argc, char* argv[]) {
 				localCopy->mTyreTempRight[TYRE_REAR_RIGHT]);
 		}
 
-		printf("TyrePressure=%f,%f,%f,%f\n", localCopy->mAirPressure[TYRE_FRONT_LEFT] / 10,
-			localCopy->mAirPressure[TYRE_FRONT_RIGHT] / 10,
-			localCopy->mAirPressure[TYRE_REAR_LEFT] / 10,
-			localCopy->mAirPressure[TYRE_REAR_RIGHT] / 10);
+		printf("TyrePressure=%f,%f,%f,%f\n", localCopy->mAirPressure[TYRE_FRONT_LEFT] / 100 * 14.5,
+			localCopy->mAirPressure[TYRE_FRONT_RIGHT] / 100 * 14.5,
+			localCopy->mAirPressure[TYRE_REAR_LEFT] / 100 * 14.5,
+			localCopy->mAirPressure[TYRE_REAR_RIGHT] / 100 * 14.5);
 
 		printf("TyreWear=%d,%d,%d,%d\n", (int)round(localCopy->mTyreWear[TYRE_FRONT_LEFT] * 100),
 			(int)round(localCopy->mTyreWear[TYRE_FRONT_RIGHT] * 100),

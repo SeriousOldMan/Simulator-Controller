@@ -275,7 +275,7 @@ When you want substitute your own translations, you don't have to copy the whole
 	DE=>Deutsch
 	[General]
 	Yes=>Aber natürlich
-	No=>Auf keine Fall
+	No=>Auf keinen Fall
 
 As you can see, you have to provide the "[Locale]" header and the two line for the translations of "Yes" and "No". Store this file as "Translations.de" in the *Simulator Controller\Translations* folder in your user *Documents* folder, where it will be found during loading. You can also use the [translations editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#translations-editor) for small changes to a given language translation, but I do not recommend to use this tool to introduce a full new language. It will be way faster to use a Unicode-capable text editor like notepadd++ for this purpose.
 
@@ -369,6 +369,14 @@ You may have noticed, that the grammar files support a kind of include mechanism
 The instructions are used to provide the LLM of the Driving Coach with information about the personality of the coach or to transfer context specific data to the LLM. All instructions are used as defaults in the configuration for the Driving Coach and can be altered by the user. The language specific default instructions can be found in *Resources\Translations* in the programm installation folder. They are named 
 
 	Driving Coach.instructions.LC
+
+where *LC* stands for the language code.
+
+### Instructions for the GPT-based Conversation Boosters
+
+Very much like the Driving Coach, a GPT service can be used to extend the conversational capabilities fo the *normal* Race Assistants. In those cases, instructions are also used to create a setting for the LLM to behave like an Engineer, for example, and also to provide additional data about the current session, the state of the car, and so on, to the LLM. All instructions are used as defaults in the configuration and can be altered by the user here as well. The language specific default instructions can be found in *Resources\Translations* in the programm installation folder. They are named 
+
+	Conversation Booster.instructions.LC
 
 where *LC* stands for the language code.
 

@@ -2292,7 +2292,7 @@ class RaceCenter extends ConfigurationItem {
 		setButtonIcon(centerGui["copyPressuresButton"], kIconsDirectory . "Copy.ico", 1, "")
 
 		centerGui.Add("Text", "x24 yp+26 w85 h20", translate("Tyre Set"))
-		centerGui.Add("Edit", "x106 yp-2 w50 h20 Limit2 Number vpitstopTyreSetEdit")
+		centerGui.Add("Edit", "x106 yp-2 w50 h20 Limit2 Number vpitstopTyreSetEdit").OnEvent("Change", (*) => this.updateState())
 		centerGui.Add("UpDown", "x138 yp w18 h20 Range0-99")
 
 		centerGui.Add("Text", "x24 yp+24 w85 h20", translate("Pressures"))
@@ -2355,8 +2355,22 @@ class RaceCenter extends ConfigurationItem {
 
 	connect(silent := false) {
 		warmup() {
+			local connector := this.Connector
+			local count := 0
+			local ignore, team, session, stint, lap
+
 			try {
-				this.Connector.Warmup()
+				connector.Warmup()
+
+				for ignore, team in string2Values(";", connector.GetAllTeams())
+					for ignore, session in string2Values(";", connector.GetTeamSessions(team))
+						for ignore, stint in string2Values(";", connector.GetSessionStints(session))
+							for ignore, lap in string2Values(";", connector.GetStintLaps(stint)) {
+								if (Mod(count, 10) = 0)
+									connector.GetLap(lap)
+
+								count += 1
+							}
 			}
 			catch Any as exception {
 				logError(exception, true)
@@ -2759,6 +2773,11 @@ class RaceCenter extends ConfigurationItem {
 			window["pitstopPressureFREdit"].Enabled := true
 			window["pitstopPressureRLEdit"].Enabled := true
 			window["pitstopPressureRREdit"].Enabled := true
+
+			if ((InStr(window["pitstopTyreCompoundDropDown"].Text, "Wet") = 1) && (SessionDatabase.getSimulatorCode(this.Simulator) = "ACC"))
+				window["pitstopTyreSetEdit"].Text := "Auto"
+			else if ((window["pitstopTyreSetEdit"].Text = 0) || (window["pitstopTyreSetEdit"].Text = "-"))
+				window["pitstopTyreSetEdit"].Text := "Auto"
 		}
 		else {
 			window["pitstopTyreSetEdit"].Enabled := false
@@ -2766,6 +2785,12 @@ class RaceCenter extends ConfigurationItem {
 			window["pitstopPressureFREdit"].Enabled := false
 			window["pitstopPressureRLEdit"].Enabled := false
 			window["pitstopPressureRREdit"].Enabled := false
+
+			window["pitstopTyreSetEdit"].Text := "Auto"
+			window["pitstopPressureFLEdit"].Text := ""
+			window["pitstopPressureFREdit"].Text := ""
+			window["pitstopPressureRLEdit"].Text := ""
+			window["pitstopPressureRREdit"].Text := ""
 		}
 
 		window["driverDropDown"].Enabled := false
@@ -4191,6 +4216,9 @@ class RaceCenter extends ConfigurationItem {
 
 			pitstopTyreSet := this.Control["pitstopTyreSetEdit"].Text
 
+			if ((pitstopTyreSet = "Auto") || (pitstopTyreSet = "-"))
+				pitstopTyreSet := false
+
 			pitstopPressureFL := false
 			pitstopPressureFR := false
 			pitstopPressureRL := false
@@ -4275,7 +4303,7 @@ class RaceCenter extends ConfigurationItem {
 			setMultiMapValue(pitstopPlan, "Pitstop", "Tyre.Change", true)
 
 			if (((SessionDatabase.getSimulatorCode(this.Simulator) = "ACC") && (pitstopTyreCompound = "Wet"))
-			 || ((pitstopTyreSet = "") || (pitstopTyreSet = "-")))
+			 || ((pitstopTyreSet = "") || (pitstopTyreSet = "-") || (pitstopTyreSet = "Auto")))
 				pitstopTyreSet := false
 
 			setMultiMapValue(pitstopPlan, "Pitstop", "Tyre.Set", pitstopTyreSet)
@@ -4320,7 +4348,11 @@ class RaceCenter extends ConfigurationItem {
 			}
 
 		if (tyreCompound && (tyreCompound != "-")) {
-			tyreSet := getMultiMapValue(pitstopPlan, "Pitstop", "Tyre.Set")
+			if ((tyreCompound = "Wet") && (SessionDatabase.getSimulatorCode(this.Simulator) = "ACC"))
+				tyreSet := "-"
+			else
+				tyreSet := getMultiMapValue(pitstopPlan, "Pitstop", "Tyre.Set")
+
 			pressures := string2Values(",", getMultiMapValue(pitstopPlan, "Pitstop", "Tyre.Pressures"))
 
 			displayPressures := values2String(", ", displayValue("Float", convertUnit("Pressure", pressures[1]))
@@ -7171,6 +7203,9 @@ class RaceCenter extends ConfigurationItem {
 							if this.Laps.Has(lap + 1)
 								splitCompound(this.Laps[lap + 1].Stint.Compound, &tyreCompound, &tyreCompoundColor)
 
+							if ((tyreCompound = "Wet") && (SessionDatabase.getSimulatorCode(this.Simulator) = "ACC"))
+								tyreSet := "-"
+
 							pressures := values2String(", ", Round(pressureFL, 1), Round(pressureFR, 1)
 														   , Round(pressureRL, 1), Round(pressureRR, 1))
 
@@ -7379,6 +7414,9 @@ class RaceCenter extends ConfigurationItem {
 							pitlaneTime := Round(pitlaneTime / 1000)
 
 						if (tyreCompound && (tyreCompound != "-")) {
+							if ((tyreCompound = "Wet") && (SessionDatabase.getSimulatorCode(this.Simulator) = "ACC"))
+								tyreSet := "-"
+
 							pressures := values2String(", ", Round(pressureFL, 1), Round(pressureFR, 1)
 														   , Round(pressureRL, 1), Round(pressureRR, 1))
 
@@ -8932,6 +8970,9 @@ class RaceCenter extends ConfigurationItem {
 					fuel := displayValue("Float", convertUnit("Volume", fuel))
 
 			tyreSet := pitstop["Tyre.Set"]
+
+			if ((tyreCompound = "Wet") && (SessionDatabase.getSimulatorCode(this.Simulator) = "ACC"))
+				tyreSet := "-"
 
 			this.PitstopsListView.Add((pitstop["Status"] = "Planned") ? "" : "Check", A_Index
 									, (pitstop["Lap"] = "-") ? "-" : (pitstop["Lap"] + 1), displayNullValue(pitstop["Driver.Next"]), fuel

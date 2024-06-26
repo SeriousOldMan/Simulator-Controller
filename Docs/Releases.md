@@ -1,4 +1,15 @@
-## 5.7.7.0-release 06/21/24 (planned)
+## 5.7.8.0-release 06/28/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Fixed a bug introduced in the last release, which caused connected drivers to no longer show up in Team Server application.
+  4. The *warmup* procedure of the Team Server has been improved for installations where the Team Server is run as a swappable virtual machine in a shared environment like in Azure.
+  5. Tyre set numbers for wet tyres are no longer displayed as numbers in "Race Center" for *Assetto Corsa Competizione*.
+  6. The automatic choice of the next tyre set in *Assetto Corsa Competizione* are now display as "Auto" and no longer as **0** in "Race Center".
+  7. Fixed the unit conversion of tyre pressures in the API of *Automobilista 2*. The API documentation says the values are reported as PSI, but they are actually in kPa.
+  8. Fixed the reporting of remaining laps by the Spotter for races with fixed number of laps.
+  9. More consistency checks for Startup Profiles. It is no longer possible to create a startup profile with no name.
+
+## 5.7.7.0-release 06/21/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Several errors in the translations for Spanish and for French has been fixed.
@@ -13,7 +24,7 @@
 	 - Constant arguments are now allowed for function and method calls. Example: trigger("!w") for a function call on the Controller that enables the wind screen wiper.
 	 - Multiple consecutive function or method calls can now be defined for one single conversation action.
 	 - Hold down the Control key while clicking on "Ok" button will not leave the editor, but instead will show you the API tool definitions in JSON format.
-  10. Whenever a conversation booster is configured for a Race Assistant, a transcript of every LLM activation is stored in the *Simulator Controller\Temp\Transcripts* folder which is located in your user *Documents* folder.
+  10. Whenever a conversation booster is configured for a Race Assistant, a transcript of every LLM activation is stored in the *Simulator Controller\Logs\Transcripts* folder which is located in your user *Documents* folder.
   11. The ["Plan Pitstop" conversation action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#trigger-actions-from-conversation) for the Race Engineer now lso allows to call for a driver swap in team races.
   12. Two [predefined conversation actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#trigger-actions-from-conversation) for the Spotter are now available:
       - The LLM can decide to reset and recalculate the delta and lap time history for all cars.

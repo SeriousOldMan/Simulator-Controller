@@ -256,21 +256,21 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 
-	DriverForName[ignore := false] {
+	DriverForName[force := false] {
 		Get {
-			return this.getDriverForName(ignore)
+			return this.getDriverForName(force)
 		}
 	}
 
-	DriverSurName[ignore := false] {
+	DriverSurName[force := false] {
 		Get {
-			return this.getDriverSurName(ignore)
+			return this.getDriverSurName(force)
 		}
 	}
 
-	DriverNickName[ignore := false] {
+	DriverNickName[force := false] {
 		Get {
-			return this.getDriverNickName(ignore)
+			return this.getDriverNickName(force)
 		}
 	}
 
@@ -759,12 +759,12 @@ class TeamServerPlugin extends ControllerPlugin {
 		return false
 	}
 
-	getDriverForName(ignore := false) {
+	getDriverForName(force := false) {
 		local driver
 
-		if (!this.iDriverForName && (ignore || this.TeamServerActive)) {
+		if (!this.iDriverForName && (force || this.TeamServerActive)) {
 			try {
-				if (this.Connected && !this.iCachedObjects.Has(this.Driver))
+				if ((this.Connected || force) && !this.iCachedObjects.Has(this.Driver))
 					this.iCachedObjects[this.Driver] := this.parseObject(this.Connector.GetDriver(this.Driver))
 
 				driver := this.iCachedObjects[this.Driver]
@@ -777,7 +777,7 @@ class TeamServerPlugin extends ControllerPlugin {
 					logMessage(kLogInfo, translate("Fetching Driver (Driver: ") . this.Driver . translate(", Name: ") . driver["ForName"] . A_Space . driver["SurName"] . translate(")"))
 			}
 			catch Any as exception {
-				if !ignore {
+				if !force {
 					this.LastMessage := (translate("Error while fetching driver names (Driver: ") . this.Driver
 									   . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))
 
@@ -793,14 +793,14 @@ class TeamServerPlugin extends ControllerPlugin {
 		return (this.iDriverForName ? this.iDriverForName : "")
 	}
 
-	getDriverSurName(ignore := false) {
-		this.getDriverForName(ignore)
+	getDriverSurName(force := false) {
+		this.getDriverForName(force)
 
 		return (this.iDriverSurName ? this.iDriverSurName : "")
 	}
 
-	getDriverNickName(ignore := false) {
-		this.getDriverForName(ignore)
+	getDriverNickName(force := false) {
+		this.getDriverForName(force)
 
 		return (this.iDriverNickName ? this.iDriverNickName : "")
 	}

@@ -318,10 +318,10 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 			printLine(&output, ",", localCopy->mTyreTempRight[TYRE_REAR_RIGHT]);
 		}
 
-		print(&output, "TyrePressure=", localCopy->mAirPressure[TYRE_FRONT_LEFT] / 10);
-		print(&output, ",", localCopy->mAirPressure[TYRE_FRONT_RIGHT] / 10);
-		print(&output, ",", localCopy->mAirPressure[TYRE_REAR_LEFT] / 10);
-		printLine(&output, ",", localCopy->mAirPressure[TYRE_REAR_RIGHT] / 10);
+		print(&output, "TyrePressure=", localCopy->mAirPressure[TYRE_FRONT_LEFT] / 100 * 14.5);
+		print(&output, ",", localCopy->mAirPressure[TYRE_FRONT_RIGHT] / 100 * 14.5);
+		print(&output, ",", localCopy->mAirPressure[TYRE_REAR_LEFT] / 100 * 14.5);
+		printLine(&output, ",", localCopy->mAirPressure[TYRE_REAR_RIGHT] / 100 * 14.5);
 
 		print(&output, "TyreWear=", (int)round(localCopy->mTyreWear[TYRE_FRONT_LEFT] * 100));
 		print(&output, ",", (int)round(localCopy->mTyreWear[TYRE_FRONT_RIGHT] * 100));

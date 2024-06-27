@@ -1686,6 +1686,22 @@ updateInstallationForV500() {
 	}
 }
 
+updateConfigurationForV580() {
+	local ignore, assistant, section, actions
+
+	for ignore, assistant in ["Race Engineer", "Race Strategist", "Race Spotter"]
+		if FileExist(kUserHomeDirectory . "Actions\" . assistant . ".actions") {
+			actions := readMultiMap(kUserHomeDirectory . "Actions\" . assistant . ".actions")
+
+			for ignore, section in ["Actions", "Builtin", "Custom", "Parameters"] {
+				setMultiMapValues(actions, "Conversation." . section, getMultiMapValues(actions, section))
+				removeMultiMapValues(actions, section)
+			}
+
+			writeMultiMap(kUserHomeDirectory . "Actions\" . assistant . ".actions", actions)
+		}
+}
+
 updateConfigurationForV575() {
 	local data, count
 

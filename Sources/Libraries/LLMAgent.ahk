@@ -230,18 +230,20 @@ class AgentBooster extends LLMBooster {
 
 					instruction := this.Instructions[code]
 
-					this.Connector.Ask(target
-									 , [substituteVariables(getMultiMapValue(instruction
-																		   , "Agent.Instructions", "Character")
-														  , variables)
-									  , substituteVariables(getMultiMapValue(instruction
-																		   , "Agent.Instructions", "Knowledge")
-														  , variables)])
+					return (this.Connector.Ask(target
+											 , [substituteVariables(getMultiMapValue(instruction
+																				   , "Agent.Instructions", "Character")
+																  , variables)
+											  , substituteVariables(getMultiMapValue(instruction
+																				   , "Agent.Instructions", "Knowledge")
+																  , variables)]) = true)
 				}
 				catch Any as exception {
 					logError(exception, true)
 				}
 			}
 		}
+
+		return false
 	}
 }

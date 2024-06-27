@@ -765,7 +765,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 		window.Block()
 
 		try {
-			actions := ActionsEditor(this).editActions(window)
+			actions := ActionsEditor(this, "Conversation").editActions(window)
 		}
 		finally {
 			window.Unblock()
@@ -775,6 +775,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 
 class ActionsEditor {
 	iEditor := false
+	iType := false
 
 	iWindow := false
 	iResult := false
@@ -791,6 +792,12 @@ class ActionsEditor {
 	Editor {
 		Get {
 			return this.iEditor
+		}
+	}
+
+	Type {
+		Get {
+			return this.iType
 		}
 	}
 
@@ -858,8 +865,9 @@ class ActionsEditor {
 		}
 	}
 
-	__New(editor) {
+	__New(editor, type) {
 		this.iEditor := editor
+		this.iType := type
 	}
 
 	createGui() {
@@ -1402,16 +1410,16 @@ class ActionsEditor {
 
 		addMultiMapValues(configuration, readMultiMap(kUserHomeDirectory . "Actions\" . this.Assistant . ".actions"))
 
-		active := string2Values(",", getMultiMapValue(configuration, "Actions", "Active", ""))
+		active := string2Values(",", getMultiMapValue(configuration, this.Type . ".Actions", "Active", ""))
 
-		for ignore, type in ["Builtin", "Custom"]
+		for ignore, type in [this.Type . ".Builtin", this.Type . ".Custom"]
 			for action, descriptor in getMultiMapValues(configuration, type) {
 				descriptor := string2Values("|", descriptor)
 
 				parameters := []
 
 				loop descriptor[5] {
-					parameter := string2Values("|", getMultiMapValue(configuration, "Parameters", ConfigurationItem.descriptor(action, A_Index)))
+					parameter := string2Values("|", getMultiMapValue(configuration, this.Type . ".Parameters", ConfigurationItem.descriptor(action, A_Index)))
 
 					parameters.Push({Name: parameter[1], Type: parameter[2], Enumeration: string2Values(",", parameter[3])
 								   , Required: ((parameter[4] = kTrue) ? true : ((parameter[4] = kFalse) ? false : parameter[4]))
@@ -1419,7 +1427,7 @@ class ActionsEditor {
 				}
 
 				theAction := {Name: action, Active: inList(active, action), Type: descriptor[1], Definition: descriptor[2]
-							, Description: descriptor[6], Parameters: parameters, Builtin: (type = "Builtin")
+							, Description: descriptor[6], Parameters: parameters, Builtin: (type = (this.Type . ".Builtin"))
 							, Initialized: ((descriptor[3] = kTrue) ? true : ((descriptor[3] = kFalse) ? false : descriptor[3]))
 							, Confirm: ((descriptor[4] = kTrue) ? true : ((descriptor[4] = kFalse) ? false : descriptor[4]))}
 
@@ -1470,19 +1478,19 @@ class ActionsEditor {
 					FileAppend(action.Script, kUserHomeDirectory . "Actions\" . action.Definition)
 				}
 
-				setMultiMapValue(configuration, "Custom", action.Name
+				setMultiMapValue(configuration, this.Type . ".Custom", action.Name
 											  , values2String("|", action.Type, action.Definition, action.Initialized
 																 , action.Confirm, action.Parameters.Length, action.Description))
 
 				for index, parameter in action.Parameters
-					setMultiMapValue(configuration, "Parameters", action.Name . "." . index
+					setMultiMapValue(configuration, this.Type . ".Parameters", action.Name . "." . index
 												  , values2String("|", parameter.Name, parameter.Type
 																	 , values2String(",", parameter.Enumeration*)
 																	 , parameter.Required, parameter.Description))
 			}
 		}
 
-		setMultiMapValue(configuration, "Actions", "Active", values2String(",", active*))
+		setMultiMapValue(configuration, this.Type . ".Actions", "Active", values2String(",", active*))
 
 		if save
 			writeMultiMap(kUserHomeDirectory . "Actions\" . this.Assistant . ".actions", configuration)

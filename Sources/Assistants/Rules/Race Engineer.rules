@@ -553,7 +553,7 @@ reportNewDamage(?lap) <= pitstopLap(?pitstopLap), ?pitstopLap = ?lap - 1,
 						 newDamageAfterRepair(?lSDamage, ?suspensionRepaired, ?newSDamage),
 						 newDamageAfterRepair(?lBDamage, ?bodyworkRepaired, ?newBDamage),
 						 newDamageAfterRepair(?lEDamage, ?engineRepaired, ?newEDamage),
-						 any?(true, [?newSDamage, ?newBDamage, ?newEDamage]), Call(damageWarning, ?newSDamage, ?newBDamage, ?newEDamage),
+						 any?(true, [?newSDamage, ?newBDamage, ?newEDamage]), reportDamage(?newSDamage, ?newBDamage, ?newEDamage),
 						 setDamageReported(Suspension, ?newSDamage), setDamageReported(Bodywork, ?newBDamage),
 						 setDamageReported(Engine, ?newEDamage)
 reportNewDamage(?lap) <= pitstopLap(?pitstopLap), ?pitstopLap = ?lap - 1,
@@ -573,8 +573,11 @@ reportNewDamage(?oldSDamage, ?newSDamage, ?oldBDamage, ?newBDamage, ?oldEDamage,
 						 setDamageReported(Engine, ?eGreater)
 reportNewDamage(?oldSDamage, ?newSDamage, ?oldBDamage, ?newBDamage, ?oldEDamage, ?newEDamage) <=
 						 >(?newSDamage, ?oldSDamage, ?sGreater), >(?newBDamage, ?oldBDamage, ?bGreater), >(?newEDamage, ?oldEDamage, ?eGreater),
-						 any?(true, [?sGreater, ?bGreater, ?eGreater]), Call(damageWarning, ?sGreater, ?bGreater, ?eGreater),
+						 any?(true, [?sGreater, ?bGreater, ?eGreater]), reportDamage(?sGreater, ?bGreater, ?eGreater),
 						 setDamageReported(Suspension, ?sGreater), setDamageReported(Bodywork, ?bGreater), setDamageReported(Engine, ?eGreater)
+
+reportDamage(?newSDamage, ?newBDamage, ?newEDamage) <= Assistant.Raise(Damage, ?newSDamage, ?newBDamage, ?newEDamage), !
+reportDamage(?newSDamage, ?newBDamage, ?newEDamage) <= Call(damageWarning, ?newSDamage, ?newBDamage, ?newEDamage)
 
 newDamageAfterRepair(0, ?, false)
 newDamageAfterRepair(?damage, true, true) <= ?damage > 0

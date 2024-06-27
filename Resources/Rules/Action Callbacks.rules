@@ -9,6 +9,7 @@
 ;;;                               Callback Rules                            ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+Assistant.Call(?function) <= Call(callAssistant, ?function)
 Assistant.Call(?function, ?p1) <= Call(callAssistant, ?function, ?p1)
 Assistant.Call(?function, ?p1, ?p2) <= Call(callAssistant, ?function, ?p1, ?p2)
 Assistant.Call(?function, ?p1, ?p2, ?p3) <= Call(callAssistant, ?function, ?p1, ?p2, ?p3)
@@ -16,6 +17,7 @@ Assistant.Call(?function, ?p1, ?p2, ?p3, ?p4) <= Call(callAssistant, ?function, 
 Assistant.Call(?function, ?p1, ?p2, ?p3, ?p4, ?p5) <= Call(callAssistant, ?function, ?p1, ?p2, ?p3, ?p4, ?p5)
 Assistant.Call(?function, ?p1, ?p2, ?p3, ?p4, ?p5, ?p6) <= Call(callAssistant, ?function, ?p1, ?p2, ?p3, ?p4, ?p5, ?p6)
 
+Function.Call(?function) <= Call(callFunction, ?function)
 Function.Call(?function, ?p1) <= Call(callFunction, ?function, ?p1)
 Function.Call(?function, ?p1, ?p2) <= Call(callFunction, ?function, ?p1, ?p2)
 Function.Call(?function, ?p1, ?p2, ?p3) <= Call(callFunction, ?function, ?p1, ?p2, ?p3)
@@ -23,6 +25,7 @@ Function.Call(?function, ?p1, ?p2, ?p3, ?p4) <= Call(callFunction, ?function, ?p
 Function.Call(?function, ?p1, ?p2, ?p3, ?p4, ?p5) <= Call(callFunction, ?function, ?p1, ?p2, ?p3, ?p4, ?p5)
 Function.Call(?function, ?p1, ?p2, ?p3, ?p4, ?p5, ?p6) <= Call(callFunction, ?function, ?p1, ?p2, ?p3, ?p4, ?p5, ?p6)
 
+Controller.Call(?function) <= Call(callController, ?function)
 Controller.Call(?function, ?p1) <= Call(callController, ?function, ?p1)
 Controller.Call(?function, ?p1, ?p2) <= Call(callController, ?function, ?p1, ?p2)
 Controller.Call(?function, ?p1, ?p2, ?p3) <= Call(callController, ?function, ?p1, ?p2, ?p3)
@@ -32,4 +35,4 @@ Controller.Call(?function, ?p1, ?p2, ?p3, ?p4, ?p5, ?p6) <= Call(callController,
 
 Assistant.Ask(?question) <= Call(askAssistant, ?question)
 
-Assistant.Speak(?question) <= Call(speakAssistant, ?question)
+Assistant.Speak(?message) <= Call(speakAssistant, ?message)

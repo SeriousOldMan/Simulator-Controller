@@ -57,8 +57,8 @@ class AgentEvent {
 	iAssistant := false
 
 	iEvent := false
-
 	iGoal := false
+
 	iOptions := []
 
 	Assistant {
@@ -85,6 +85,12 @@ class AgentEvent {
 		}
 	}
 
+	Asynchronous {
+		Get {
+			return false
+		}
+	}
+
 	__New(assistant, event, goal := false, options := false) {
 		this.iAssistant := assistant
 
@@ -98,18 +104,42 @@ class AgentEvent {
 		return []
 	}
 
+	createEvent(event, arguments) {
+		return event
+	}
+
+	createGoal(goal, arguments) {
+		return goal
+	}
+
+	createVariables(event, arguments) {
+		local assistant := this.Assistant
+
+		return {assistant: assistant.AssistantType, name: assistant.VoiceManager.Name
+			  , knowledge: JSON.print(assistant.getKnowledge("Agent", this.Options))}
+	}
+
 	handledEvent(event) {
 		return ((this.Event = event) || (this = event))
 	}
 
 	handleEvent(event, arguments*) {
-		local assistant := this.Assistant
-		local booster := assistant.AgentBooster
+		local booster := this.Assistant.AgentBooster
 
-		if (booster && this.handledEvent(event))
-			return booster.trigger(this.Event, this.Goal
-								 , Map("Variables", {assistant: assistant.AssistantType, name: assistant.VoiceManager.Name
-												   , knowledge: JSON.print(this.getKnowledge("Agent", this.Options))}))
+		triggerEvent() {
+			return booster.trigger(this.createEvent(this.Event, arguments), this.createGoal(this.Goal, arguments)
+								 , Map("Variables", this.createVariables(event, arguments)))
+		}
+
+		if (booster && this.handledEvent(event)) {
+			if this.Asynchronous {
+				Task.startTask(triggerEvent, 0, (Task.CurrentTask ? Task.CurrentTask.Priority : kNormalPriority))
+
+				return true
+			}
+			else
+				return triggerEvent()
+		}
 		else
 			return false
 	}
@@ -666,7 +696,7 @@ class RaceAssistant extends ConfigurationItem {
 		}
 
 		if options["AgentBooster"] {
-			booster := AgentBooster(this, options["AgentBooster"], this.Configuration, this.VoiceManager.Language)
+			booster := EventBooster(this, options["AgentBooster"], this.Configuration, this.VoiceManager.Language)
 
 			if (booster.Model && booster.Active)
 				this.iAgentBooster := booster

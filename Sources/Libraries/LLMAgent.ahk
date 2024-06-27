@@ -179,10 +179,12 @@ class AgentBooster extends LLMBooster {
 		if this.Connector
 			this.Connector.MaxHistory := this.MaxHistory
 	}
+}
 
+class EventBooster extends AgentBooster {
 	trigger(event, goal := false, options := false) {
 		local variables := false
-		local doTrigger, code, language, instruction, variables, target
+		local doTrigger, code, language, instruction, variables, target, answer
 
 		if (this.Model && this.Active) {
 			code := this.Code
@@ -216,27 +218,26 @@ class AgentBooster extends LLMBooster {
 
 					variables.event := event
 
-					target := (substituteVariables(getMultiMapValue(instruction, "Agent.Instructions", "Event")
-												 , variables) . "`n`n"
-							 . substituteVariables(getMultiMapValue(instruction, "Agent.Instructions", "Goal")
-												 , variables))
+					target := substituteVariables(getMultiMapValue(instruction, "Agent.Instructions", "Event"), variables)
 
 					if goal {
 						variables.goal := goal
 
-						target .= ("`n`n" . substituteVariables(getMultiMapValue(instruction, "Agent.Instructions", "Details")
+						target .= ("`n`n" . substituteVariables(getMultiMapValue(instruction, "Agent.Instructions", "Goal")
 															  , variables))
 					}
 
 					instruction := this.Instructions[code]
 
-					return (this.Connector.Ask(target
-											 , [substituteVariables(getMultiMapValue(instruction
-																				   , "Agent.Instructions", "Character")
-																  , variables)
-											  , substituteVariables(getMultiMapValue(instruction
-																				   , "Agent.Instructions", "Knowledge")
-																  , variables)]) = true)
+					answer := this.Connector.Ask(target
+											   , [substituteVariables(getMultiMapValue(instruction
+																					 , "Agent.Instructions", "Character")
+																	, variables)
+												, substituteVariables(getMultiMapValue(instruction
+																					 , "Agent.Instructions", "Knowledge")
+																	, variables)])
+
+					return (answer = true)
 				}
 				catch Any as exception {
 					logError(exception, true)

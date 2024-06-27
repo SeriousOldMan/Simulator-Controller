@@ -27,6 +27,25 @@
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+class DamageEvent extends AgentEvent {
+	Asynchronous {
+		Get {
+			return true
+		}
+	}
+
+	createEvent(event, arguments) {
+		local damage := []
+		local index, type
+
+		for index, type in ["Suspension", "Bodywork", "Engine"]
+			if arguments[index]
+				damage.Push(type)
+
+		return ("Damage has just been collected for " . values2String(", ", damage*))
+	}
+}
+
 class RaceEngineer extends RaceAssistant {
 	iAdjustLapTime := true
 
@@ -150,6 +169,8 @@ class RaceEngineer extends RaceAssistant {
 												  , muted, voiceServer)
 
 		this.updateConfigurationValues({Announcements: {FuelWarning: true, DamageReporting: true, DamageAnalysis: true, PressureReporting: true, WeatherUpdate: true}})
+
+		this.registerEvent(DamageEvent(this, "Damage"))
 	}
 
 	updateConfigurationValues(values) {

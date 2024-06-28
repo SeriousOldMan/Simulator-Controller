@@ -137,6 +137,10 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 			this.editInstructions(type, title)
 		}
 
+		editEvents(*) {
+			this.editEvents(this.Assistant)
+		}
+
 		editActions(type, *) {
 			this.editActions(this.Assistant, type)
 		}
@@ -274,7 +278,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		widget41 := editorGui.Add("DropDownList", "x" . x1 . " yp w60 vviConversationActionsDropdown", collect(["Yes", "No"], translate))
 		widget41.OnEvent("Change", (*) => this.updateState())
 		widget42 := editorGui.Add("Button", "x" . (x1 + 61) . " yp-1 w23 h23 X:Move Center +0x200 vviConversationEditActionsButton")
-		widget42.OnEvent("Click", editActions.Bind("Conversation"))
+		widget42.OnEvent("Click", editActions.Bind("Conversation.Actions"))
 		setButtonIcon(widget42, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
 
 		editorGui.SetFont("Italic", "Arial")
@@ -284,9 +288,10 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		editorGui.SetFont("Norm", "Arial")
 
 		widget46 := editorGui.Add("Button", "x" . x0 . " yp+24 w100 h23 vviAgentEventsButton", translate("Events..."))
+		widget46.OnEvent("Click", editEvents)
 
 		widget47 := editorGui.Add("Button", "x" . x0 + Round((width / 2) - 50) . " yp w100 h23 vviAgentActionsButton X:Move(0.5)", translate("Actions..."))
-		widget47.OnEvent("Click", editActions.Bind("Agent"))
+		widget47.OnEvent("Click", editActions.Bind("Agent.Actions"))
 
 		widget48 := editorGui.Add("Button", "x" . (width + 8 - 100) . " yp w100 h23 X:Move vviAgentInstructionsButton", translate("Instructions..."))
 		widget48.OnEvent("Click", editInstructions.Bind("Agent", translate("Agent")))
@@ -810,14 +815,26 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		}
 	}
 
-	editActions(assistant, type) {
+	editEvents(assistant) {
 		local window := this.Window
-		local actions
 
 		window.Block()
 
 		try {
-			actions := ActionsEditor(this, type).editActions(window)
+			return EventsEditor(this, "Agent.Events").editEvents(window)
+		}
+		finally {
+			window.Unblock()
+		}
+	}
+
+	editActions(assistant, type) {
+		local window := this.Window
+
+		window.Block()
+
+		try {
+			return ActionsEditor(this, type).editActions(window)
 		}
 		finally {
 			window.Unblock()
@@ -825,20 +842,20 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 	}
 }
 
-class ActionsEditor {
+class CallbacksEditor {
 	iEditor := false
 	iType := false
 
 	iWindow := false
 	iResult := false
 
-	iActionsListView := false
+	iCallbacksListView := false
 	iParametersListView := false
 	iCallableField := false
 	iScriptEditor := false
 
-	iActions := []
-	iSelectedAction := false
+	iCallbacks := []
+	iSelectedCallback := false
 	iSelectedParameter := false
 
 	Editor {
@@ -871,9 +888,9 @@ class ActionsEditor {
 		}
 	}
 
-	ActionsListView {
+	CallbacksListView {
 		Get {
-			return this.iActionsListView
+			return this.iCallbacksListView
 		}
 	}
 
@@ -895,19 +912,19 @@ class ActionsEditor {
 		}
 	}
 
-	Actions[key?] {
+	Callbacks[key?] {
 		Get {
-			return (isSet(key) ? this.iActions[key] : this.iActions)
+			return (isSet(key) ? this.iCallbacks[key] : this.iCallbacks)
 		}
 
 		Set {
-			return (isSet(key) ? (this.iActions[key] := value) : (this.iActions := value))
+			return (isSet(key) ? (this.iCallbacks[key] := value) : (this.iCallbacks := value))
 		}
 	}
 
-	SelectedAction {
+	SelectedCallback {
 		Get {
-			return this.iSelectedAction
+			return this.iSelectedCallback
 		}
 	}
 
@@ -925,15 +942,15 @@ class ActionsEditor {
 	createGui() {
 		local editorGui
 
-		chooseAction(listView, line, *) {
-			this.selectAction(line ? this.Actions[line] : false)
+		chooseCallback(listView, line, *) {
+			this.selectCallback(line ? this.Callbacks[line] : false)
 		}
 
 		chooseParameter(listView, line, *) {
-			this.selectParameter(line ? this.SelectedAction.Parameters[line] : false)
+			this.selectParameter(line ? this.SelectedCallback.Parameters[line] : false)
 		}
 
-		editorGui := Window({Descriptor: "Actions Editor", Resizeable: true, Options: "0x400000"})
+		editorGui := Window({Descriptor: (this.Type . " Editor"), Resizeable: true, Options: "0x400000"})
 
 		this.iWindow := editorGui
 
@@ -943,39 +960,56 @@ class ActionsEditor {
 
 		editorGui.SetFont("Norm", "Arial")
 
-		if (this.Type = "Conversation")
+		if (this.Type = "Conversation.Actions")
 			editorGui.Add("Documentation", "x368 YP+20 w128 H:Center Center", translate("Conversation Actions")
 						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-conversation-actions")
-		else
+		else if (this.Type = "Agent.Actions")
 			editorGui.Add("Documentation", "x368 YP+20 w128 H:Center Center", translate("Agent Actions")
 						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-agent-actions")
+		else
+			editorGui.Add("Documentation", "x368 YP+20 w128 H:Center Center", translate("Agent Events")
+						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-agent-events")
 
 		editorGui.SetFont("Norm", "Arial")
 
 		editorGui.Add("Text", "x8 yp+30 w848 W:Grow 0x10")
 
-		this.iActionsListView := editorGui.Add("ListView", "x16 y+10 w832 h140 W:Grow H:Grow(0.25) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Action", "Active", "Description"], translate))
-		this.iActionsListView.OnEvent("Click", chooseAction)
-		this.iActionsListView.OnEvent("DoubleClick", chooseAction)
+		this.iCallbacksListView := editorGui.Add("ListView", "x16 y+10 w832 h140 W:Grow H:Grow(0.25) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Action", "Active", "Description"], translate))
+		this.iCallbacksListView.OnEvent("Click", chooseCallback)
+		this.iCallbacksListView.OnEvent("DoubleClick", chooseCallback)
 
-		editorGui.Add("Button", "x800 yp+142 w23 h23 Center +0x200 X:Move Y:Move(0.25) vaddActionButton").OnEvent("Click", (*) => this.addAction())
-		setButtonIcon(editorGui["addActionButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
-		editorGui.Add("Button", "x824 yp w23 h23 Center +0x200 X:Move Y:Move(0.25) vdeleteActionButton").OnEvent("Click", (*) => this.deleteAction())
-		setButtonIcon(editorGui["deleteActionButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+		editorGui.Add("Button", "x800 yp+142 w23 h23 Center +0x200 X:Move Y:Move(0.25) vaddCallbackButton").OnEvent("Click", (*) => this.addCallback())
+		setButtonIcon(editorGui["addCallbackButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		editorGui.Add("Button", "x824 yp w23 h23 Center +0x200 X:Move Y:Move(0.25) vdeleteCallbackButton").OnEvent("Click", (*) => this.deleteCallback())
+		setButtonIcon(editorGui["deleteCallbackButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
-		editorGui.Add("Text", "x16 yp+28 w70 h23 +0x200 Section Y:Move(0.25)", translate("Action"))
-		editorGui.Add("CheckBox", "x90 yp h23 w23 Y:Move(0.25) vactionActiveCheck")
-		editorGui.Add("DropDownList", "x110 yp w127 Y:Move(0.25) vactionTypeDropDown", collect(["Assistant Method", "Assistant Rule", "Controller Method", "Controller Function"], translate)).OnEvent("Change", (*) => this.updateState())
-		editorGui.Add("Edit", "x241 yp h23 w177 W:Grow(0.34) Y:Move(0.25) vactionNameEdit")
+		if (this.Type = "Agent.Events")
+			editorGui.Add("Text", "x16 yp+28 w70 h23 +0x200 Section Y:Move(0.25)", translate("Event"))
+		else
+			editorGui.Add("Text", "x16 yp+28 w70 h23 +0x200 Section Y:Move(0.25)", translate("Action"))
+
+		editorGui.Add("CheckBox", "x90 yp h23 w23 Y:Move(0.25) vcallbackActiveCheck")
+
+		if (this.Type = "Agent.Events")
+			editorGui.Add("DropDownList", "x110 yp w127 Y:Move(0.25) vcallbackTypeDropDown", collect(["Event Class", "Event Rule"], translate)).OnEvent("Change", (*) => this.updateState())
+		else
+			editorGui.Add("DropDownList", "x110 yp w127 Y:Move(0.25) vcallbackTypeDropDown", collect(["Assistant Method", "Assistant Rule", "Controller Method", "Controller Function"], translate)).OnEvent("Change", (*) => this.updateState())
+
+		editorGui.Add("Edit", "x241 yp h23 w177 W:Grow(0.34) Y:Move(0.25) vcallbackNameEdit")
 
 		editorGui.Add("Text", "x16 yp+28 w90 h23 +0x200 Y:Move(0.25)", translate("Description"))
-		editorGui.Add("Edit", "x110 yp h96 w308 W:Grow(0.34) Y:Move(0.25) vactionDescriptionEdit")
+		editorGui.Add("Edit", "x110 yp h96 w308 W:Grow(0.34) Y:Move(0.25) vcallbackDescriptionEdit")
 
-		editorGui.Add("Text", "x16 yp+100 w90 h23 +0x200 Y:Move(0.25)", translate("Learning Phase"))
-		editorGui.Add("DropDownList", "x110 yp w90 Y:Move(0.25) vactionInitializationDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", (*) => this.updateState())
+		editorGui.Add("Text", "x16 yp+100 w90 h23 +0x200 Y:Move(0.25)", translate("Learning Phase")).Visible := (this.Type != "Agent.Events")
+		editorGui.Add("DropDownList", "x110 yp w90 Y:Move(0.25) vcallbackInitializationDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", (*) => this.updateState())
+		editorGui["callbackInitializationDropDown"].Visible := (this.Type != "Agent.Events")
 
-		editorGui.Add("Text", "x16 yp+24 w90 h23 +0x200 Y:Move(0.25)", translate("Confirmation"))
-		editorGui.Add("DropDownList", "x110 yp w90 Y:Move(0.25) vactionConfirmationDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", (*) => this.updateState())
+		editorGui.Add("Text", "x16 yp w90 h23 +0x200 Y:Move(0.25)", translate("Event")).Visible := (this.Type = "Agent.Events")
+		editorGui.Add("Edit", "x110 yp w127 Y:Move(0.25) vcallbackEventEdit").Visible := (this.Type = "Agent.Events")
+
+		editorGui.Add("Text", "x16 yp+24 w90 h23 +0x200 Y:Move(0.25)", translate("Confirmation")).Visible := (this.Type != "Agent.Events")
+		editorGui.Add("DropDownList", "x110 yp w90 Y:Move(0.25) vcallbackConfirmationDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", (*) => this.updateState())
+		editorGui["callbackConfirmationDropDown"].Visible := (this.Type != "Agent.Events")
 
 		this.iCallableField := [editorGui.Add("Text", "x16 yp+28 w90 h23 +0x200 Y:Move(0.25)", translate("Call"))
 							  , editorGui.Add("Edit", "x110 yp w308 h140 H:Grow(0.75) W:Grow(0.34) Y:Move(0.25)")]
@@ -990,7 +1024,7 @@ class ActionsEditor {
 
 		editorGui.SetFont("Norm", "Arial")
 
-		editorGui.Add("Button", "x350 yp+10 w80 h23 Default X:Move(0.5) Y:Move", translate("Ok")).OnEvent("Click", (*) => GetKeyState("Ctrl") ? this.showActions() : this.iResult := kOk)
+		editorGui.Add("Button", "x350 yp+10 w80 h23 Default X:Move(0.5) Y:Move", translate("Ok")).OnEvent("Click", (*) => GetKeyState("Ctrl") ? this.showCallbacks() : this.iResult := kOk)
 		editorGui.Add("Button", "x436 yp w80 h23 X:Move(0.5) Y:Move", translate("&Cancel")).OnEvent("Click", (*) => this.iResult := kCancel)
 
 		this.iParametersListView := editorGui.Add("ListView", "x430 ys w418 h96 X:Move(0.34) W:Grow(0.66) Y:Move(0.25) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Parameter", "Description"], translate))
@@ -1013,7 +1047,7 @@ class ActionsEditor {
 		this.updateState()
 	}
 
-	editActions(owner := false) {
+	editCallbacks(owner := false) {
 		local window, x, y, w, h
 
 		this.createGui()
@@ -1023,15 +1057,15 @@ class ActionsEditor {
 		if owner
 			window.Opt("+Owner" . owner.Hwnd)
 
-		if getWindowPosition("Actions Editor", &x, &y)
+		if getWindowPosition(this.Type . " Editor", &x, &y)
 			window.Show("x" . x . " y" . y)
 		else
 			window.Show()
 
-		if getWindowSize("Actions Editor", &w, &h)
+		if getWindowSize(this.Type . " Editor", &w, &h)
 			window.Resize("Initialize", w, h)
 
-		this.loadActions()
+		this.loadCallbacks()
 
 		try {
 			loop {
@@ -1040,7 +1074,7 @@ class ActionsEditor {
 				until this.iResult
 
 				if (this.iResult = kOk) {
-					this.iResult := this.saveActions()
+					this.iResult := this.saveCallbacks()
 
 					if this.iResult
 						return this.iResult
@@ -1059,43 +1093,49 @@ class ActionsEditor {
 	updateState() {
 		local type
 
-		this.Control["addActionButton"].Enabled := true
+		this.Control["addCallbackButton"].Enabled := true
 
-		if this.SelectedAction {
-			this.Control["actionActiveCheck"].Enabled := true
+		if this.SelectedCallback {
+			this.Control["callbackActiveCheck"].Enabled := true
 
-			if this.SelectedAction.Builtin {
+			if this.SelectedCallback.Builtin {
 				this.Control["addParameterButton"].Enabled := false
 				this.Control["deleteParameterButton"].Enabled := false
 
-				this.Control["deleteActionButton"].Enabled := false
+				this.Control["deleteCallbackButton"].Enabled := false
 
 				this.ScriptEditor.Opt("+ReadOnly")
 				this.CallableField[2].Enabled := false
 
-				this.Control["actionNameEdit"].Enabled := false
-				this.Control["actionDescriptionEdit"].Enabled := false
-				this.Control["actionTypeDropDown"].Enabled := false
-				this.Control["actionInitializationDropDown"].Enabled := false
-				this.Control["actionConfirmationDropDown"].Enabled := false
+				this.Control["callbackNameEdit"].Enabled := false
+				this.Control["callbackDescriptionEdit"].Enabled := false
+				this.Control["callbackTypeDropDown"].Enabled := false
+				this.Control["callbackEventEdit"].Enabled := false
+				this.Control["callbackInitializationDropDown"].Enabled := false
+				this.Control["callbackConfirmationDropDown"].Enabled := false
 			}
 			else {
-				this.Control["deleteActionButton"].Enabled := true
+				this.Control["deleteCallbackButton"].Enabled := true
 				this.Control["addParameterButton"].Enabled := true
 				this.Control["deleteParameterButton"].Enabled := (this.SelectedParameter != false)
 
 				this.ScriptEditor.Opt("-ReadOnly")
 				this.CallableField[2].Enabled := true
 
-				this.Control["actionNameEdit"].Enabled := true
-				this.Control["actionDescriptionEdit"].Enabled := true
-				this.Control["actionTypeDropDown"].Enabled := true
-				this.Control["actionInitializationDropDown"].Enabled := true
-				this.Control["actionConfirmationDropDown"].Enabled := true
+				this.Control["callbackNameEdit"].Enabled := true
+				this.Control["callbackDescriptionEdit"].Enabled := true
+				this.Control["callbackTypeDropDown"].Enabled := true
+				this.Control["callbackEventEdit"].Enabled := true
+				this.Control["callbackInitializationDropDown"].Enabled := true
+				this.Control["callbackConfirmationDropDown"].Enabled := true
 			}
 
-			if (this.Control["actionTypeDropDown"].Value != 0)
-				type := ["Method", "Rule", "Method", "Function"][this.Control["actionTypeDropDown"].Value]
+			if (this.Control["callbackTypeDropDown"].Value != 0) {
+				if this.Type = "Agent.Events"
+					type := ["Class", "Rule"][this.Control["callbackTypeDropDown"].Value]
+				else
+					type := ["Method", "Rule", "Method", "Function"][this.Control["callbackTypeDropDown"].Value]
+			}
 			else
 				type := "Rule"
 
@@ -1109,37 +1149,39 @@ class ActionsEditor {
 				this.CallableField[1].Visible := true
 				this.CallableField[2].Visible := true
 
-				this.CallableField[1].Text := translate(type . "(s)")
+				this.CallableField[1].Text := translate(type . ((this.Type != "Agent.Events") ? "(s)" : ""))
 			}
 		}
 		else {
-			this.Control["deleteActionButton"].Enabled := false
+			this.Control["deleteCallbackButton"].Enabled := false
 			this.Control["addParameterButton"].Enabled := false
 			this.Control["deleteParameterButton"].Enabled := false
 
 			this.ScriptEditor.Text := ""
 			this.CallableField[2].Text := ""
-			this.Control["actionNameEdit"].Text := ""
-			this.Control["actionDescriptionEdit"].Text := ""
-			this.Control["actionActiveCheck"].Value := 0
-			this.Control["actionTypeDropDown"].Choose(0)
-			this.Control["actionInitializationDropDown"].Choose(0)
-			this.Control["actionConfirmationDropDown"].Choose(0)
+			this.Control["callbackNameEdit"].Text := ""
+			this.Control["callbackDescriptionEdit"].Text := ""
+			this.Control["callbackActiveCheck"].Value := 0
+			this.Control["callbackTypeDropDown"].Choose(0)
+			this.Control["callbackEventEdit"].Text := ""
+			this.Control["callbackInitializationDropDown"].Choose(0)
+			this.Control["callbackConfirmationDropDown"].Choose(0)
 
 			this.ScriptEditor.Opt("+ReadOnly")
 			this.ScriptEditor.Visible := true
 			this.CallableField[1].Visible := false
 			this.CallableField[2].Visible := false
-			this.Control["actionNameEdit"].Enabled := false
-			this.Control["actionDescriptionEdit"].Enabled := false
-			this.Control["actionActiveCheck"].Enabled := false
-			this.Control["actionTypeDropDown"].Enabled := false
-			this.Control["actionInitializationDropDown"].Enabled := false
-			this.Control["actionConfirmationDropDown"].Enabled := false
+			this.Control["callbackNameEdit"].Enabled := false
+			this.Control["callbackDescriptionEdit"].Enabled := false
+			this.Control["callbackActiveCheck"].Enabled := false
+			this.Control["callbackTypeDropDown"].Enabled := false
+			this.Control["callbackEventEdit"].Enabled := false
+			this.Control["callbackInitializationDropDown"].Enabled := false
+			this.Control["callbackConfirmationDropDown"].Enabled := false
 		}
 
 		if this.SelectedParameter {
-			if this.SelectedAction.Builtin {
+			if this.SelectedCallback.Builtin {
 				this.Control["parameterNameEdit"].Enabled := false
 				this.Control["parameterDescriptionEdit"].Enabled := false
 				this.Control["parameterTypeDropDown"].Enabled := false
@@ -1165,21 +1207,21 @@ class ActionsEditor {
 		}
 	}
 
-	selectAction(action, force := false, save := true) {
-		if (force || (this.SelectedAction != action)) {
-			if (save && this.SelectedAction)
-				if !this.saveAction(this.SelectedAction) {
-					this.ActionsListView.Modify(inList(this.Actions, this.SelectedAction), "Select Vis")
+	selectCallback(callback, force := false, save := true) {
+		if (force || (this.SelectedCallback != callback)) {
+			if (save && this.SelectedCallback)
+				if !this.saveCallback(this.SelectedCallback) {
+					this.CallbacksListView.Modify(inList(this.Callbacks, this.SelectedCallback), "Select Vis")
 
 					return
 				}
 
-			this.iSelectedAction := action
+			this.iSelectedCallback := callback
 
-			if action
-				this.ActionsListView.Modify(inList(this.Actions, action), "Select Vis")
+			if callback
+				this.CallbacksListView.Modify(inList(this.Callbacks, callback), "Select Vis")
 
-			this.loadAction(action)
+			this.loadCallback(callback)
 
 			this.updateState()
 		}
@@ -1189,7 +1231,7 @@ class ActionsEditor {
 		if (force || (this.SelectedParameter != parameter)) {
 			if (save && this.SelectedParameter)
 				if !this.saveParameter(this.SelectedParameter) {
-					this.ParametersListView.Modify(inList(this.SelectedAction.Parameters, this.SelectedParameter), "Select Vis")
+					this.ParametersListView.Modify(inList(this.SelectedCallback.Parameters, this.SelectedParameter), "Select Vis")
 
 					return
 				}
@@ -1197,7 +1239,7 @@ class ActionsEditor {
 			this.iSelectedParameter := parameter
 
 			if parameter
-				this.ParametersListView.Modify(inList(this.SelectedAction.Parameters, parameter), "Select Vis")
+				this.ParametersListView.Modify(inList(this.SelectedCallback.Parameters, parameter), "Select Vis")
 
 			this.loadParameter(parameter)
 
@@ -1205,62 +1247,74 @@ class ActionsEditor {
 		}
 	}
 
-	addAction() {
-		local action
+	addCallback() {
+		local callback
 
-		if this.SelectedAction
-			if !this.saveAction(this.SelectedAction) {
-				this.ActionsListView.Modify(inList(this.Actions, this.SelectedAction), "Select Vis")
+		if this.SelectedCallback
+			if !this.saveCallback(this.SelectedCallback) {
+				this.CallbacksListView.Modify(inList(this.Callbacks, this.SelectedCallback), "Select Vis")
 
 				return
 			}
 
-		action := {Name: "", Type: "Controller.Function", Active: true, Description: "", Parameters: []
-				 , Builtin: false, Initialized: true, Confirm: true, Definition: ""}
+		if (this.Type = "Agent.Events")
+			callback := {Name: "", Type: "Assistant.Rule", Active: true, Event: "", Description: "", Parameters: []
+					   , Builtin: false, Initialized: false, Confirm: false, Definition: ""}
+		else
+			callback := {Name: "", Type: "Controller.Function", Active: true, Description: "", Parameters: []
+					   , Builtin: false, Initialized: true, Confirm: true, Definition: ""}
 
-		this.Actions.Push(action)
+		this.Callbacks.Push(callback)
 
-		this.ActionsListView.Add("", "", translate("x"), "")
+		this.CallbacksListView.Add("", "", translate("x"), "")
 
-		this.selectAction(action, true, false)
+		this.selectCallback(callback, true, false)
 	}
 
-	deleteAction() {
-		local index := inList(this.Actions, this.SelectedAction)
+	deleteCallback() {
+		local index := inList(this.Callbacks, this.SelectedCallback)
 
-		this.ActionsListView.Delete(index)
+		this.CallbacksListView.Delete(index)
 
-		this.Actions.RemoveAt(index)
+		this.Callbacks.RemoveAt(index)
 
-		this.selectAction(false, true, false)
+		this.selectCallback(false, true, false)
 	}
 
-	loadAction(action) {
+	loadCallback(callback) {
 		local ignore, parameter
 
 		this.ParametersListView.Delete()
 		this.selectParameter(false, true, false)
 
-		if action {
-			this.Control["actionNameEdit"].Text := action.Name
-			this.Control["actionTypeDropDown"].Choose(inList(["Assistant.Method", "Assistant.Rule", "Controller.Method", "Controller.Function"], action.Type))
-			this.Control["actionActiveCheck"].Value := !!action.Active
-			this.Control["actionDescriptionEdit"].Text := action.Description
-			this.Control["actionInitializationDropDown"].Choose(1 + (!action.Initialized ? 1 : 0))
-			this.Control["actionConfirmationDropDown"].Choose(1 + (!action.Confirm ? 1 : 0))
+		if callback {
+			this.Control["callbackNameEdit"].Text := callback.Name
 
-			if (action.Type = "Assistant.Rule") {
-				this.ScriptEditor.Text := action.Script
+			if (this.Type = "Agent.Events") {
+				this.Control["callbackEventEdit"].Text := callback.Event
+				this.Control["callbackTypeDropDown"].Choose(inList(["Assistant.Class", "Assistant.Rule"], callback.Type))
+			}
+			else {
+				this.Control["callbackInitializationDropDown"].Choose(1 + (!callback.Initialized ? 1 : 0))
+				this.Control["callbackConfirmationDropDown"].Choose(1 + (!callback.Confirm ? 1 : 0))
+				this.Control["callbackTypeDropDown"].Choose(inList(["Assistant.Method", "Assistant.Rule", "Controller.Method", "Controller.Function"], callback.Type))
+			}
+
+			this.Control["callbackActiveCheck"].Value := !!callback.Active
+			this.Control["callbackDescriptionEdit"].Text := callback.Description
+
+			if (callback.Type = "Assistant.Rule") {
+				this.ScriptEditor.Text := callback.Script
 
 				this.CallableField[2].Text := ""
 			}
 			else {
 				this.ScriptEditor.Text := ""
 
-				this.CallableField[2].Text := action.Definition
+				this.CallableField[2].Text := callback.Definition
 			}
 
-			for ignore, parameter in action.Parameters
+			for ignore, parameter in callback.Parameters
 				this.ParametersListView.Add("", parameter.Name, parameter.Description)
 
 			this.ParametersListView.ModifyCol()
@@ -1269,12 +1323,13 @@ class ActionsEditor {
 				this.ParametersListView.ModifyCol(A_Index, "AutoHdr")
 		}
 		else {
-			this.Control["actionNameEdit"].Text := ""
-			this.Control["actionTypeDropDown"].Choose(0)
-			this.Control["actionActiveCheck"].Value := 0
-			this.Control["actionDescriptionEdit"].Text := ""
-			this.Control["actionInitializationDropDown"].Choose(0)
-			this.Control["actionConfirmationDropDown"].Choose(0)
+			this.Control["callbackNameEdit"].Text := ""
+			this.Control["callbackTypeDropDown"].Choose(0)
+			this.Control["callbackActiveCheck"].Value := 0
+			this.Control["callbackDescriptionEdit"].Text := ""
+			this.Control["callbackEventEdit"].Text := ""
+			this.Control["callbackInitializationDropDown"].Choose(0)
+			this.Control["callbackConfirmationDropDown"].Choose(0)
 
 			this.ScriptEditor.Text := ""
 		}
@@ -1282,9 +1337,9 @@ class ActionsEditor {
 		this.updateState()
 	}
 
-	saveAction(action) {
+	saveCallback(callback) {
 		local valid := true
-		local name := this.Control["actionNameEdit"].Text
+		local name := this.Control["callbackNameEdit"].Text
 		local errorMessage := ""
 		local ignore, other, type
 
@@ -1298,14 +1353,17 @@ class ActionsEditor {
 			valid := false
 		}
 
-		for ignore, other in this.Actions
-			if ((other != action) && (name = other.Name)) {
+		for ignore, other in this.Callbacks
+			if ((other != callback) && (name = other.Name)) {
 				errorMessage .= ("`n" . translate("Error: ") . "Name must be unique...")
 
 				valid := false
 			}
 
-		type := ["Assistant.Method", "Assistant.Rule", "Controller.Method", "Controller.Function"][this.Control["actionTypeDropDown"].Value]
+		if (this.Type = "Agent.Events")
+			type := ["Assistant.Class", "Assistant.Rule"][this.Control["callbackTypeDropDown"].Value]
+		else
+			type := ["Assistant.Method", "Assistant.Rule", "Controller.Method", "Controller.Function"][this.Control["callbackTypeDropDown"].Value]
 
 		if (type = "Assistant.Rule")
 			try {
@@ -1318,19 +1376,24 @@ class ActionsEditor {
 			}
 
 		if valid {
-			action.Name := name
-			action.Active := Trim(this.Control["actionActiveCheck"].Value)
-			action.Description := Trim(this.Control["actionDescriptionEdit"].Text)
-			action.Type := type
-			action.Initialized := (this.Control["actionInitializationDropDown"].Value = 1)
-			action.Confirm := (this.Control["actionConfirmationDropDown"].Value = 1)
+			callback.Name := name
+			callback.Active := Trim(this.Control["callbackActiveCheck"].Value)
+			callback.Description := Trim(this.Control["callbackDescriptionEdit"].Text)
+			callback.Type := type
 
-			if (action.Type = "Assistant.Rule")
-				action.Script := this.ScriptEditor.Text
+			if (this.Type = "Agent.Events")
+				callback.Event := Trim(this.Control["callbackEventEdit"].Text)
+			else {
+				callback.Initialized := (this.Control["callbackInitializationDropDown"].Value = 1)
+				callback.Confirm := (this.Control["callbackConfirmationDropDown"].Value = 1)
+			}
+
+			if (callback.Type = "Assistant.Rule")
+				callback.Script := this.ScriptEditor.Text
 			else
-				action.Definition := this.CallableField[2].Value
+				callback.Definition := this.CallableField[2].Value
 
-			this.ActionsListView.Modify(inList(this.Actions, action), "", action.Name, action.Active ? translate("x") : "", action.Description)
+			this.CallbacksListView.Modify(inList(this.Callbacks, callback), "", callback.Name, callback.Active ? translate("x") : "", callback.Description)
 		}
 		else {
 			if (StrLen(errorMessage) > 0)
@@ -1349,14 +1412,14 @@ class ActionsEditor {
 
 		if this.SelectedParameter
 			if !this.saveParameter(this.SelectedParameter) {
-				this.ParametersListView.Modify(inList(this.SelectedAction.Parameters, this.SelectedParameter), "Select Vis")
+				this.ParametersListView.Modify(inList(this.SelectedCallback.Parameters, this.SelectedParameter), "Select Vis")
 
 				return
 			}
 
 		parameter := {Name: "", Type: "String", Enumeration: [], Required: false, Description: ""}
 
-		this.SelectedAction.Parameters.Push(parameter)
+		this.SelectedCallback.Parameters.Push(parameter)
 
 		this.ParametersListView.Add("", "", "")
 
@@ -1364,11 +1427,11 @@ class ActionsEditor {
 	}
 
 	deleteParameter() {
-		local index := inList(this.SelectedAction.Parameters, this.SelectedParameter)
+		local index := inList(this.SelectedCallback.Parameters, this.SelectedParameter)
 
 		this.ParametersListView.Delete(index)
 
-		this.SelectedAction.Parameters.RemoveAt(index)
+		this.SelectedCallback.Parameters.RemoveAt(index)
 
 		this.selectParameter(false, true, false)
 	}
@@ -1402,7 +1465,7 @@ class ActionsEditor {
 			valid := false
 		}
 
-		for ignore, other in this.SelectedAction.Parameters
+		for ignore, other in this.SelectedCallback.Parameters
 			if ((other != parameter) && (name = other.Name)) {
 				errorMessage .= ("`n" . translate("Error: ") . "Name must be unique...")
 
@@ -1415,7 +1478,7 @@ class ActionsEditor {
 			parameter.Type := ["String", "Integer", "Boolean"][this.Control["parameterTypeDropDown"].Value]
 			parameter.Required := (this.Control["parameterOptionalDropDown"].Value = 1)
 
-			this.ParametersListView.Modify(inList(this.SelectedAction.Parameters, parameter), "", parameter.Name, parameter.Description)
+			this.ParametersListView.Modify(inList(this.SelectedCallback.Parameters, parameter), "", parameter.Name, parameter.Description)
 		}
 		else {
 			if (StrLen(errorMessage) > 0)
@@ -1429,129 +1492,148 @@ class ActionsEditor {
 		return valid
 	}
 
-	showActions() {
-		local actions := []
-		local ignore, action, index, parameter, parameters
+	showCallbacks() {
+		local callbacks := []
+		local ignore, callback, index, parameter, parameters
 
-		if this.SelectedAction
-			if !this.saveAction(this.SelectedAction) {
-				this.ActionsListView.Modify(inList(this.Actions, this.SelectedAction), "Select Vis")
+		if this.SelectedCallback
+			if !this.saveCallback(this.SelectedCallback) {
+				this.CallbacksListView.Modify(inList(this.Callbacks, this.SelectedCallback), "Select Vis")
 
 				return false
 			}
 
-		for ignore, action in this.Actions {
-			if action.Active {
+		for ignore, callback in this.Callbacks {
+			if callback.Active {
 				parameters := []
 
-				for ignore, parameter in action.Parameters
+				for ignore, parameter in callback.Parameters
 					parameters.Push(LLMTool.Function.Parameter(parameter.Name, parameter.Description
 															 , parameter.Type, parameter.Enumeration, parameter.Required))
 
-				actions.Push(LLMTool.Function(action.Name, action.Description, parameters))
+				callbacks.Push(LLMTool.Function(callback.Name, callback.Description, parameters))
 			}
 		}
 
-		deleteFile(kTempDirectory . "LLM Actions.json")
+		deleteFile(kTempDirectory . "LLM Callbacks.json")
 
-		FileAppend(JSON.print(collect(actions, (action) => action.Descriptor), "`t"), kTempDirectory . "LLM Actions.json")
+		FileAppend(JSON.print(collect(callbacks, (callback) => callback.Descriptor), "`t"), kTempDirectory . "LLM Callbacks.json")
 
-		Run("notepad.exe `"" . kTempDirectory . "LLM Actions.json`"")
+		Run("notepad.exe `"" . kTempDirectory . "LLM Callbacks.json`"")
 	}
 
-	loadActions() {
-		local configuration := readMultiMap(kResourcesDirectory . "Actions\" . this.Assistant . ".actions")
-		local actions := []
-		local active, ignore, type, action, descriptor, parameters, theAction
+	loadCallbacks() {
+		local extension := ((this.Type = "Agent.Events") ? ".events" : ".actions")
+		local configuration := readMultiMap(kResourcesDirectory . "Actions\" . this.Assistant . extension)
+		local callbacks := []
+		local active, ignore, type, callback, descriptor, parameters, theCallback
 
-		addMultiMapValues(configuration, readMultiMap(kUserHomeDirectory . "Actions\" . this.Assistant . ".actions"))
+		addMultiMapValues(configuration, readMultiMap(kUserHomeDirectory . "Actions\" . this.Assistant . extension))
 
-		active := string2Values(",", getMultiMapValue(configuration, this.Type . ".Actions", "Active", ""))
+		active := string2Values(",", getMultiMapValue(configuration, this.Type, "Active", ""))
 
-		for ignore, type in [this.Type . ".Actions.Builtin", this.Type . ".Actions.Custom"]
-			for action, descriptor in getMultiMapValues(configuration, type) {
+		for ignore, type in [this.Type . ".Builtin", this.Type . ".Custom"]
+			for callback, descriptor in getMultiMapValues(configuration, type) {
 				descriptor := string2Values("|", descriptor)
 
 				parameters := []
 
-				loop descriptor[5] {
-					parameter := string2Values("|", getMultiMapValue(configuration, this.Type . ".Actions.Parameters", ConfigurationItem.descriptor(action, A_Index)))
+				loop ((this.Type = "Agent.Events") ? descriptor[4] : descriptor[5]) {
+					parameter := string2Values("|", getMultiMapValue(configuration, this.Type . ".Parameters", ConfigurationItem.descriptor(callback, A_Index)))
 
 					parameters.Push({Name: parameter[1], Type: parameter[2], Enumeration: string2Values(",", parameter[3])
 								   , Required: ((parameter[4] = kTrue) ? true : ((parameter[4] = kFalse) ? false : parameter[4]))
 								   , Description: parameter[5]})
 				}
 
-				theAction := {Name: action, Active: inList(active, action), Type: descriptor[1], Definition: descriptor[2]
-							, Description: descriptor[6], Parameters: parameters, Builtin: (type = (this.Type . ".Builtin"))
-							, Initialized: ((descriptor[3] = kTrue) ? true : ((descriptor[3] = kFalse) ? false : descriptor[3]))
-							, Confirm: ((descriptor[4] = kTrue) ? true : ((descriptor[4] = kFalse) ? false : descriptor[4]))}
+				if (this.Type = "Agent.Events")
+					theCallback := {Name: callback, Active: inList(active, callback), Type: descriptor[1], Event: descriptor[2], Definition: descriptor[3]
+								  , Description: descriptor[5], Parameters: parameters, Builtin: (type = (this.Type . ".Builtin"))
+								  , Initialized: false, Confirm: false}
+				else
+					theCallback := {Name: callback, Active: inList(active, callback), Type: descriptor[1], Definition: descriptor[2]
+								  , Description: descriptor[6], Parameters: parameters, Builtin: (type = (this.Type . ".Builtin"))
+								  , Initialized: ((descriptor[3] = kTrue) ? true : ((descriptor[3] = kFalse) ? false : descriptor[3]))
+								  , Confirm: ((descriptor[4] = kTrue) ? true : ((descriptor[4] = kFalse) ? false : descriptor[4]))}
 
-				if (theAction.Type = "Assistant.Rule") {
-					theAction.Script := FileRead(getFileName(this.Assistant . "." . theAction.Name . ".rules"
-														   , kResourcesDirectory . "Actions\", kUserHomeDirectory . "Actions\"))
+				if (theCallback.Type = "Assistant.Rule") {
+					theCallback.Script := FileRead(getFileName(this.Assistant . "." . theCallback.Name . ".rules"
+															 , kResourcesDirectory . "Actions\", kUserHomeDirectory . "Actions\"))
 
-					theAction.Definition := ""
+					theCallback.Definition := ""
 				}
 
-				this.Actions.Push(theAction)
+				this.Callbacks.Push(theCallback)
 			}
 
-		this.ActionsListView.Delete()
+		this.CallbacksListView.Delete()
 
-		for ignore, action in this.Actions
-			this.ActionsListView.Add("", action.Name, action.Active ? translate("x") : "", action.Description)
+		for ignore, callback in this.Callbacks
+			this.CallbacksListView.Add("", callback.Name, callback.Active ? translate("x") : "", callback.Description)
 
-		this.ActionsListView.ModifyCol()
+		this.CallbacksListView.ModifyCol()
 
-		loop this.ActionsListView.GetCount("Col")
-			this.ActionsListView.ModifyCol(A_Index, "AutoHdr")
+		loop this.CallbacksListView.GetCount("Col")
+			this.CallbacksListView.ModifyCol(A_Index, "AutoHdr")
 	}
 
-	saveActions(save := true) {
+	saveCallbacks(save := true) {
 		local active := []
-		local configuration, ignore, action, index, parameter
+		local configuration, ignore, callback, index, parameter
 
-		if this.SelectedAction
-			if !this.saveAction(this.SelectedAction) {
-				this.ActionsListView.Modify(inList(this.Actions, this.SelectedAction), "Select Vis")
+		if this.SelectedCallback
+			if !this.saveCallback(this.SelectedCallback) {
+				this.CallbacksListView.Modify(inList(this.Callbacks, this.SelectedCallback), "Select Vis")
 
 				return false
 			}
 
 		configuration := newMultiMap()
 
-		for ignore, action in this.Actions {
-			if action.Active
-				active.Push(action.Name)
+		for ignore, callback in this.Callbacks {
+			if callback.Active
+				active.Push(callback.Name)
 
-			if !action.Builtin {
-				if (save && (action.Type = "Assistant.Rule")) {
-					action.Definition := (this.Assistant . "." . action.Name . ".rules")
+			if !callback.Builtin {
+				if (save && (callback.Type = "Assistant.Rule")) {
+					callback.Definition := (this.Assistant . "." . callback.Name . ".rules")
 
-					deleteFile(kUserHomeDirectory . "Actions\" . action.Definition)
+					deleteFile(kUserHomeDirectory . "Actions\" . callback.Definition)
 
-					FileAppend(action.Script, kUserHomeDirectory . "Actions\" . action.Definition)
+					FileAppend(callback.Script, kUserHomeDirectory . "Actions\" . callback.Definition)
 				}
 
-				setMultiMapValue(configuration, this.Type . ".Actions.Custom", action.Name
-											  , values2String("|", action.Type, action.Definition, action.Initialized
-																 , action.Confirm, action.Parameters.Length, action.Description))
+				setMultiMapValue(configuration, this.Type . ".Custom", callback.Name
+											  , values2String("|", callback.Type, callback.Definition, callback.Initialized
+																 , callback.Confirm, callback.Parameters.Length, callback.Description))
 
-				for index, parameter in action.Parameters
-					setMultiMapValue(configuration, this.Type . ".Actions.Parameters", action.Name . "." . index
+				for index, parameter in callback.Parameters
+					setMultiMapValue(configuration, this.Type . ".Parameters", callback.Name . "." . index
 												  , values2String("|", parameter.Name, parameter.Type
 																	 , values2String(",", parameter.Enumeration*)
 																	 , parameter.Required, parameter.Description))
 			}
 		}
 
-		setMultiMapValue(configuration, this.Type . ".Actions", "Active", values2String(",", active*))
+		setMultiMapValue(configuration, this.Type, "Active", values2String(",", active*))
 
 		if save
-			writeMultiMap(kUserHomeDirectory . "Actions\" . this.Assistant . ".actions", configuration)
+			writeMultiMap(kUserHomeDirectory . "Actions\" . this.Assistant . ((this.Type = "Agent.Events") ? ".events" : ".actions")
+						, configuration)
 
 		return configuration
+	}
+}
+
+class EventsEditor extends CallbacksEditor {
+	editEvents(owner := false) {
+		this.editCallbacks(owner)
+	}
+}
+
+class ActionsEditor extends CallbacksEditor {
+	editActions(owner := false) {
+		this.editCallbacks(owner)
 	}
 }
 

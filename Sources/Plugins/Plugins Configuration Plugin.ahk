@@ -10,7 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\Configuration\Libraries\ControllerActionsEditor.ahk"
-#Include "..\Configuration\Libraries\ConversationBoosterEditor.ahk"
+#Include "..\Configuration\Libraries\AssistantBoosterEditor.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -283,7 +283,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 		window.Block()
 
 		try {
-			configuration := ConversationBoosterEditor(assistant, this.iConversationBoosterConfiguration).editBooster(window)
+			configuration := AssistantBoosterEditor(assistant, this.iConversationBoosterConfiguration).editBooster(window)
 
 			if configuration {
 				thePlugin := this.buildItemFromEditor()

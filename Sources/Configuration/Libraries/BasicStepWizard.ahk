@@ -11,7 +11,7 @@
 
 #Include "..\..\Libraries\Task.ahk"
 #Include "..\..\Libraries\SpeechSynthesizer.ahk"
-#Include "ConversationBoosterEditor.ahk"
+#Include "AssistantBoosterEditor.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1059,7 +1059,7 @@ class BasicStepWizard extends StepWizard {
 				setMultiMapValue(configuration, "Agent Booster", assistant . ".AgentTemperature", setup.AgentBooster["AgentTemperature"])
 			}
 
-			configuration := ConversationBoosterEditor(assistant, configuration).editBooster(window)
+			configuration := AssistantBoosterEditor(assistant, configuration).editBooster(window)
 
 			if configuration {
 				writeMultiMap(kUserHomeDirectory . "Setup\Conversation Booster Configuration.ini", configuration)

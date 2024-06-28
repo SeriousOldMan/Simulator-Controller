@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Conversation Booster Editor     ;;;
+;;;   Modular Simulator Controller System - Assistant Booster Editor        ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
@@ -35,10 +35,10 @@
 ;;;-------------------------------------------------------------------------;;;
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; ConversationBoosterEditor                                               ;;;
+;;; AssistantBoosterEditor                                                  ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class ConversationBoosterEditor extends ConfiguratorPanel {
+class AssistantBoosterEditor extends ConfiguratorPanel {
 	iResult := false
 
 	iAssistant := false
@@ -137,8 +137,8 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 			this.editInstructions(type, title)
 		}
 
-		editActions(*) {
-			this.editActions(this.Assistant)
+		editActions(type, *) {
+			this.editActions(this.Assistant, type)
 		}
 
 		loadModels(*) {
@@ -166,7 +166,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 
 		editorGui.SetFont("Norm", "Arial")
 
-		editorGui.Add("Documentation", "x178 YP+20 w128 H:Center Center", translate("Conversation Booster")
+		editorGui.Add("Documentation", "x178 YP+20 w128 H:Center Center", translate("Assistant Booster")
 					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm")
 
 		editorGui.SetFont("Norm", "Arial")
@@ -261,8 +261,8 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 		widget34 := editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range1-10")
 		widget35 := editorGui.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200", translate("Conversations"))
 
-		widget42 := editorGui.Add("Button", "x" . (width + 8 - 100) . " yp w100 h23 X:Move vviConversationInstructionsButton", translate("Instructions..."))
-		widget42.OnEvent("Click", editInstructions.Bind("Conversation", translate("Conversation")))
+		widget43 := editorGui.Add("Button", "x" . (width + 8 - 100) . " yp w100 h23 X:Move vviConversationInstructionsButton", translate("Instructions..."))
+		widget43.OnEvent("Click", editInstructions.Bind("Conversation", translate("Conversation")))
 
 		widget36 := editorGui.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200", translate("Creativity"))
 		widget37 := editorGui.Add("Edit", "x" . x1 . " yp w60 Number Limit3 vviConversationTemperatureEdit")
@@ -274,8 +274,22 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 		widget41 := editorGui.Add("DropDownList", "x" . x1 . " yp w60 vviConversationActionsDropdown", collect(["Yes", "No"], translate))
 		widget41.OnEvent("Change", (*) => this.updateState())
 		widget42 := editorGui.Add("Button", "x" . (x1 + 61) . " yp-1 w23 h23 X:Move Center +0x200 vviConversationEditActionsButton")
-		widget42.OnEvent("Click", editActions)
+		widget42.OnEvent("Click", editActions.Bind("Conversation"))
 		setButtonIcon(widget42, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
+
+		editorGui.SetFont("Italic", "Arial")
+		widget44 := editorGui.Add("Checkbox", "x" . x0 . " yp+36 w105 h23 vviAgentCheck", translate("Agent"))
+		widget44.OnEvent("Click", (*) => this.updateState())
+		widget45 := editorGui.Add("Text", "x100 yp+11 w" . (width + 8 - 100) . " 0x10 W:Grow")
+		editorGui.SetFont("Norm", "Arial")
+
+		widget46 := editorGui.Add("Button", "x" . x0 . " yp+24 w100 h23 vviAgentEventsButton", translate("Events..."))
+
+		widget47 := editorGui.Add("Button", "x" . x0 + Round((width / 2) - 50) . " yp w100 h23 vviAgentActionsButton X:Move(0.5)", translate("Actions..."))
+		widget47.OnEvent("Click", editActions.Bind("Agent"))
+
+		widget48 := editorGui.Add("Button", "x" . (width + 8 - 100) . " yp w100 h23 X:Move vviAgentInstructionsButton", translate("Instructions..."))
+		widget48.OnEvent("Click", editInstructions.Bind("Agent", translate("Agent")))
 
 		editorGui.Add("Text", "x8 yp+35 w468 W:Grow 0x10")
 
@@ -346,7 +360,8 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 											, "Speaker", true, "SpeakerTemperature", 0.5, "SpeakerProbability", 0.5
 											, "Listener", false, "ListenerMode", "Unknown", "ListenerTemperature", 0.5
 											, "Conversation", false, "ConversationMaxHistory", 3, "ConversationTemperature", 0.5
-											, "ConversationActions", false)
+											, "ConversationActions", false
+											, "Agent", false)
 
 		super.loadFromConfiguration(configuration)
 
@@ -373,6 +388,8 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 				providerConfiguration["ConversationMaxHistory"] := getMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".ConversationMaxHistory", defaults["ConversationMaxHistory"])
 				providerConfiguration["ConversationTemperature"] := getMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".ConversationTemperature", defaults["ConversationTemperature"])
 				providerConfiguration["ConversationActions"] := getMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".ConversationActions", defaults["ConversationActions"])
+
+				providerConfiguration["Agent"] := getMultiMapValue(configuration, "Agent Booster", this.Assistant . ".Agent", defaults["Agent"])
 
 				if (provider = "LLM Runtime") {
 					providerConfiguration["ServiceURL"] := ""
@@ -407,7 +424,8 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 
 				for ignore, setting in ["Speaker", "SpeakerProbability", "SpeakerTemperature"
 									  , "Listener", "ListenerMode", "ListenerTemperature"
-									  , "Conversation", "ConversationMaxHistory", "ConversationTemperature", "ConversationActions"]
+									  , "Conversation", "ConversationMaxHistory", "ConversationTemperature", "ConversationActions"
+									  , "Agent"]
 					providerConfiguration[setting] := getMultiMapValue(configuration, "Conversation Booster", provider . "." . setting, defaults[setting])
 			}
 
@@ -440,6 +458,11 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 				if (provider = this.iCurrentProvider)
 					setMultiMapValue(configuration, "Conversation Booster", this.Assistant . "." . setting, providerConfiguration[setting])
 			}
+
+			setMultiMapValue(configuration, "Agent Booster", provider . ".Agent", providerConfiguration["Agent"])
+
+			if (provider = this.iCurrentProvider)
+				setMultiMapValue(configuration, "Agent Booster", this.Assistant . ".Agent", providerConfiguration["Agent"])
 		}
 
 		provider := this.iCurrentProvider
@@ -497,7 +520,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 			if ((provider = "Ollama") && (Trim(this.Control["viServiceKeyEdit"].Text) = ""))
 				this.Control["viServiceKeyEdit"].Text := "Ollama"
 
-			for ignore, setting in ["Speaker", "Listener", "Conversation"]
+			for ignore, setting in ["Speaker", "Listener", "Conversation", "Agent"]
 				this.Control["vi" . setting . "Check"].Value := configuration[setting]
 
 			this.Control["viSpeakerProbabilityEdit"].Text := (isNumber(configuration["SpeakerProbability"]) ? Round(configuration["SpeakerProbability"] * 100) : "")
@@ -566,6 +589,11 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 				providerConfiguration["ConversationTemperature"] := ""
 				providerConfiguration["ConversationActions"] := false
 			}
+
+			if (this.Control["viAgentCheck"].Value = 1)
+				providerConfiguration["Agent"] := true
+			else
+				providerConfiguration["Agent"] := false
 		}
 	}
 
@@ -624,6 +652,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 			this.Control["viSpeakerCheck"].Enabled := true
 			this.Control["viListenerCheck"].Enabled := true
 			this.Control["viConversationCheck"].Enabled := true
+			this.Control["viAgentCheck"].Enabled := true
 
 			this.Control["viModelDropDown"].Enabled := true
 			this.Control["viMaxTokensEdit"].Enabled := true
@@ -635,6 +664,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 			this.Control["viSpeakerCheck"].Enabled := false
 			this.Control["viListenerCheck"].Enabled := false
 			this.Control["viConversationCheck"].Enabled := false
+			this.Control["viAgentCheck"].Enabled := false
 			this.Control["viSpeakerCheck"].Value := 0
 			this.Control["viListenerCheck"].Value := 0
 			this.Control["viConversationCheck"].Value := 0
@@ -710,29 +740,44 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 			this.Control["viConversationInstructionsButton"].Enabled := true
 			this.Control["viConversationEditActionsButton"].Enabled := (this.Control["viConversationActionsDropDown"].Value = 1)
 		}
+
+		if (this.Control["viAgentCheck"].Value = 0) {
+			this.Control["viAgentEventsButton"].Enabled := false
+			this.Control["viAgentActionsButton"].Enabled := false
+			this.Control["viAgentInstructionsButton"].Enabled := false
+		}
+		else {
+			this.Control["viAgentEventsButton"].Enabled := true
+			this.Control["viAgentActionsButton"].Enabled := true
+			this.Control["viAgentInstructionsButton"].Enabled := true
+		}
 	}
 
 	getOriginalInstruction(language, type, key) {
-		return getMultiMapValue(this.getInstructions(type, true), "Conversation Booster", "Instructions." . type . "." . key . "." . language, "")
+		if (type = "Agent")
+			return getMultiMapValue(this.getInstructions(type, true), "Agent Booster", "Instructions." . type . "." . key . "." . language, "")
+		else
+			return getMultiMapValue(this.getInstructions(type, true), "Conversation Booster", "Instructions." . type . "." . key . "." . language, "")
 	}
 
 	getInstructions(type, original := false) {
 		local instructions := newMultiMap()
+		local reference := ((type = "Agent") ? "Agent Booster" : "Conversation Booster")
 		local key, value, ignore, directory, configuration, language
 
 		for ignore, directory in [kTranslationsDirectory, kUserTranslationsDirectory]
-			loop Files (directory . "Conversation Booster.instructions.*") {
+			loop Files (directory . reference . ".instructions.*") {
 				SplitPath A_LoopFilePath, , , &language
 
 				for key, value in getMultiMapValues(readMultiMap(A_LoopFilePath), type . ".Instructions")
-					setMultiMapValue(instructions, "Conversation Booster", "Instructions." . type . "." . key . "." . language, value)
+					setMultiMapValue(instructions, reference, "Instructions." . type . "." . key . "." . language, value)
 			}
 
 		if !original
 			for ignore, configuration in [this.Configuration, this.iInstructions]
-				for key, value in getMultiMapValues(configuration, "Conversation Booster")
+				for key, value in getMultiMapValues(configuration, reference)
 					if (InStr(key, "Instructions." . type) = 1)
-						setMultiMapValue(instructions, "Conversation Booster", key, value)
+						setMultiMapValue(instructions, reference, key, value)
 
 		return instructions
 	}
@@ -748,7 +793,7 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 		window.Block()
 
 		try {
-			instructions := editInstructions(this, title, this.getInstructions(type), window)
+			instructions := editInstructions(this, type, title, this.getInstructions(type), window)
 
 			if instructions
 				this.setInstructions(type, instructions)
@@ -758,14 +803,14 @@ class ConversationBoosterEditor extends ConfiguratorPanel {
 		}
 	}
 
-	editActions(assistant) {
+	editActions(assistant, type) {
 		local window := this.Window
 		local actions
 
 		window.Block()
 
 		try {
-			actions := ActionsEditor(this, "Conversation").editActions(window)
+			actions := ActionsEditor(this, type).editActions(window)
 		}
 		finally {
 			window.Unblock()
@@ -891,8 +936,12 @@ class ActionsEditor {
 
 		editorGui.SetFont("Norm", "Arial")
 
-		editorGui.Add("Documentation", "x368 YP+20 w128 H:Center Center", translate("Conversation Actions")
-					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-conversation-actions")
+		if (this.Type = "Conversation")
+			editorGui.Add("Documentation", "x368 YP+20 w128 H:Center Center", translate("Conversation Actions")
+						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-conversation-actions")
+		else
+			editorGui.Add("Documentation", "x368 YP+20 w128 H:Center Center", translate("Agent Actions")
+						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-agent-actions")
 
 		editorGui.SetFont("Norm", "Arial")
 
@@ -1504,10 +1553,10 @@ class ActionsEditor {
 ;;;                        Private Functions Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-editInstructions(editorOrCommand, title := false, originalInstructions := false, owner := false) {
+editInstructions(editorOrCommand, type := false, title := false, originalInstructions := false, owner := false) {
 	local choices, key, value, descriptor, reloadAll
 
-	static editor, instructions, instructionsGui, result, instructionEdit
+	static reference, editor, instructions, instructionsGui, result, instructionEdit
 
 	rephrase(key) {
 		if (key = "RephraseTranslate")
@@ -1523,13 +1572,13 @@ editInstructions(editorOrCommand, title := false, originalInstructions := false,
 	else if (editorOrCommand == "Reload") {
 		reloadALL := GetKeyState("Ctrl")
 
-		for key, value in getMultiMapValues(instructions, "Conversation Booster")
+		for key, value in getMultiMapValues(instructions, reference)
 			if (reloadAll || (instructionsGui["instructionsDropDown"].Value = A_Index)) {
 				descriptor := ConfigurationItem.splitDescriptor(key)
 
 				value := editor.getOriginalInstruction(descriptor[4], descriptor[2], descriptor[3])
 
-				setMultiMapValue(instructions, "Conversation Booster", key, value)
+				setMultiMapValue(instructions, reference, key, value)
 
 				if (instructionsGui["instructionsDropDown"].Value = A_Index)
 					instructionsGui["instructionEdit"].Value := value
@@ -1539,7 +1588,7 @@ editInstructions(editorOrCommand, title := false, originalInstructions := false,
 			}
 	}
 	else if (editorOrCommand == "Load") {
-		for key, value in getMultiMapValues(instructions, "Conversation Booster")
+		for key, value in getMultiMapValues(instructions, reference)
 			if (instructionsGui["instructionsDropDown"].Value = A_Index) {
 				instructionsGui["instructionEdit"].Value := value
 
@@ -1547,14 +1596,16 @@ editInstructions(editorOrCommand, title := false, originalInstructions := false,
 			}
 	}
 	else if (editorOrCommand == "Update") {
-		for key, value in getMultiMapValues(instructions, "Conversation Booster")
+		for key, value in getMultiMapValues(instructions, reference)
 			if (instructionsGui["instructionsDropDown"].Value = A_Index) {
-				setMultiMapValue(instructions, "Conversation Booster", key, instructionsGui["instructionEdit"].Value)
+				setMultiMapValue(instructions, reference, key, instructionsGui["instructionEdit"].Value)
 
 				break
 			}
 	}
 	else {
+		reference := ((type = "Agent") ? "Agent Booster" : "Conversation Booster")
+
 		editor := editorOrCommand
 		result := false
 
@@ -1566,7 +1617,7 @@ editInstructions(editorOrCommand, title := false, originalInstructions := false,
 
 		choices := []
 
-		for key, value in getMultiMapValues(instructions, "Conversation Booster") {
+		for key, value in getMultiMapValues(instructions, reference) {
 			key := ConfigurationItem.splitDescriptor(key)
 
 			choices.Push(translate(rephrase(key[3])) . translate(" (") . StrUpper(key[4]) . translate(")"))

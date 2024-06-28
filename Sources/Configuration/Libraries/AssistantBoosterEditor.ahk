@@ -852,6 +852,7 @@ class CallbacksEditor {
 	iCallbacksListView := false
 	iParametersListView := false
 	iCallableField := false
+	iPhraseField := false
 	iScriptEditor := false
 
 	iCallbacks := []
@@ -897,6 +898,12 @@ class CallbacksEditor {
 	ParametersListView {
 		Get {
 			return this.iParametersListView
+		}
+	}
+
+	PhraseField {
+		Get {
+			return this.iPhraseField
 		}
 	}
 
@@ -1011,6 +1018,12 @@ class CallbacksEditor {
 		editorGui.Add("DropDownList", "x110 yp w90 Y:Move(0.25) vcallbackConfirmationDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", (*) => this.updateState())
 		editorGui["callbackConfirmationDropDown"].Visible := (this.Type != "Agent.Events")
 
+		this.iPhraseField := [editorGui.Add("Text", "x16 yp w90 h23 +0x200 Y:Move(0.25)", translate("Phrase"))
+							, editorGui.Add("Edit", "x110 yp w308 Y:Move(0.25) vcallbackPhraseEdit")]
+
+		this.iPhraseField[1].Visible := (this.Type = "Agent.Events")
+		this.iPhraseField[2].Visible := (this.Type = "Agent.Events")
+
 		this.iCallableField := [editorGui.Add("Text", "x16 yp+28 w90 h23 +0x200 Y:Move(0.25)", translate("Call"))
 							  , editorGui.Add("Edit", "x110 yp w308 h140 H:Grow(0.75) W:Grow(0.34) Y:Move(0.25)")]
 
@@ -1111,6 +1124,7 @@ class CallbacksEditor {
 				this.Control["callbackDescriptionEdit"].Enabled := false
 				this.Control["callbackTypeDropDown"].Enabled := false
 				this.Control["callbackEventEdit"].Enabled := false
+				this.PhraseField[2].Enabled := false
 				this.Control["callbackInitializationDropDown"].Enabled := false
 				this.Control["callbackConfirmationDropDown"].Enabled := false
 			}
@@ -1126,12 +1140,13 @@ class CallbacksEditor {
 				this.Control["callbackDescriptionEdit"].Enabled := true
 				this.Control["callbackTypeDropDown"].Enabled := true
 				this.Control["callbackEventEdit"].Enabled := true
+				this.PhraseField[2].Enabled := true
 				this.Control["callbackInitializationDropDown"].Enabled := true
 				this.Control["callbackConfirmationDropDown"].Enabled := true
 			}
 
 			if (this.Control["callbackTypeDropDown"].Value != 0) {
-				if this.Type = "Agent.Events"
+				if (this.Type = "Agent.Events")
 					type := ["Class", "Rule"][this.Control["callbackTypeDropDown"].Value]
 				else
 					type := ["Method", "Rule", "Method", "Function"][this.Control["callbackTypeDropDown"].Value]
@@ -1143,11 +1158,15 @@ class CallbacksEditor {
 				this.ScriptEditor.Visible := true
 				this.CallableField[1].Visible := false
 				this.CallableField[2].Visible := false
+				this.PhraseField[1].Visible := (this.Type = "Agent.Events")
+				this.PhraseField[2].Visible := (this.Type = "Agent.Events")
 			}
 			else {
 				this.ScriptEditor.Visible := false
 				this.CallableField[1].Visible := true
 				this.CallableField[2].Visible := true
+				this.PhraseField[1].Visible := false
+				this.PhraseField[2].Visible := false
 
 				this.CallableField[1].Text := translate(type . ((this.Type != "Agent.Events") ? "(s)" : ""))
 			}
@@ -1164,6 +1183,7 @@ class CallbacksEditor {
 			this.Control["callbackActiveCheck"].Value := 0
 			this.Control["callbackTypeDropDown"].Choose(0)
 			this.Control["callbackEventEdit"].Text := ""
+			this.PhraseField[2].Text := ""
 			this.Control["callbackInitializationDropDown"].Choose(0)
 			this.Control["callbackConfirmationDropDown"].Choose(0)
 
@@ -1176,6 +1196,7 @@ class CallbacksEditor {
 			this.Control["callbackActiveCheck"].Enabled := false
 			this.Control["callbackTypeDropDown"].Enabled := false
 			this.Control["callbackEventEdit"].Enabled := false
+			this.PhraseField[2].Enabled := false
 			this.Control["callbackInitializationDropDown"].Enabled := false
 			this.Control["callbackConfirmationDropDown"].Enabled := false
 		}
@@ -1258,7 +1279,8 @@ class CallbacksEditor {
 			}
 
 		if (this.Type = "Agent.Events")
-			callback := {Name: "", Type: "Assistant.Rule", Active: true, Event: "", Description: "", Parameters: []
+			callback := {Name: "", Type: "Assistant.Rule", Active: true, Event: ""
+					   , Phrase: "", Description: "", Parameters: []
 					   , Builtin: false, Initialized: false, Confirm: false, Definition: ""}
 		else
 			callback := {Name: "", Type: "Controller.Function", Active: true, Description: "", Parameters: []
@@ -1292,6 +1314,7 @@ class CallbacksEditor {
 
 			if (this.Type = "Agent.Events") {
 				this.Control["callbackEventEdit"].Text := callback.Event
+				this.PhraseField[2].Text := callback.Phrase
 				this.Control["callbackTypeDropDown"].Choose(inList(["Assistant.Class", "Assistant.Rule"], callback.Type))
 			}
 			else {
@@ -1328,6 +1351,7 @@ class CallbacksEditor {
 			this.Control["callbackActiveCheck"].Value := 0
 			this.Control["callbackDescriptionEdit"].Text := ""
 			this.Control["callbackEventEdit"].Text := ""
+			this.PhraseField[2].Text := ""
 			this.Control["callbackInitializationDropDown"].Choose(0)
 			this.Control["callbackConfirmationDropDown"].Choose(0)
 
@@ -1381,8 +1405,10 @@ class CallbacksEditor {
 			callback.Description := Trim(this.Control["callbackDescriptionEdit"].Text)
 			callback.Type := type
 
-			if (this.Type = "Agent.Events")
+			if (this.Type = "Agent.Events") {
 				callback.Event := Trim(this.Control["callbackEventEdit"].Text)
+				callback.Phrase := Trim(this.PhraseField[2].Text)
+			}
 			else {
 				callback.Initialized := (this.Control["callbackInitializationDropDown"].Value = 1)
 				callback.Confirm := (this.Control["callbackConfirmationDropDown"].Value = 1)
@@ -1547,7 +1573,8 @@ class CallbacksEditor {
 				}
 
 				if (this.Type = "Agent.Events")
-					theCallback := {Name: callback, Active: inList(active, callback), Type: descriptor[1], Event: descriptor[2], Definition: descriptor[3]
+					theCallback := {Name: callback, Active: inList(active, callback), Type: descriptor[1]
+								  , Event: descriptor[2], Phrase: descriptor[6], Definition: descriptor[3]
 								  , Description: descriptor[5], Parameters: parameters, Builtin: (type = (this.Type . ".Builtin"))
 								  , Initialized: false, Confirm: false}
 				else
@@ -1603,9 +1630,14 @@ class CallbacksEditor {
 					FileAppend(callback.Script, kUserHomeDirectory . "Actions\" . callback.Definition)
 				}
 
-				setMultiMapValue(configuration, this.Type . ".Custom", callback.Name
-											  , values2String("|", callback.Type, callback.Definition, callback.Initialized
-																 , callback.Confirm, callback.Parameters.Length, callback.Description))
+				if (this.Type = "Agent.Events")
+					setMultiMapValue(configuration, this.Type . ".Custom", callback.Name
+												  , values2String("|", callback.Type, callback.Event, callback.Definition
+																	 , callback.Parameters.Length, callback.Description, callback.Phrase))
+				else
+					setMultiMapValue(configuration, this.Type . ".Custom", callback.Name
+												  , values2String("|", callback.Type, callback.Definition, callback.Initialized
+																	 , callback.Confirm, callback.Parameters.Length, callback.Description))
 
 				for index, parameter in callback.Parameters
 					setMultiMapValue(configuration, this.Type . ".Parameters", callback.Name . "." . index

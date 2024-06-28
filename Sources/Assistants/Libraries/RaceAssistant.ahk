@@ -1364,17 +1364,17 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	createAgentEvents(&productions, &reductions, &includes) {
-		local configuration := readMultiMap(kResourcesDirectory . "Actions\" . assistant.AssistantType . ".events")
+		local configuration := readMultiMap(kResourcesDirectory . "Actions\" . this.AssistantType . ".events")
 		local events := []
 		local ignore, event, definition, parameters, parameter, enumeration, required, handler
 
-		addMultiMapValues(configuration, readMultiMap(kUserHomeDirectory . "Actions\" . assistant.AssistantType . ".events"))
+		addMultiMapValues(configuration, readMultiMap(kUserHomeDirectory . "Actions\" . this.AssistantType . ".events"))
 
-		for ignore, event in string2Values(",", getMultiMapValue(configuration, type . ".Events", "Active", "")) {
-			definition := getMultiMapValue(configuration, type . ".Events.Custom", event, false)
+		for ignore, event in string2Values(",", getMultiMapValue(configuration, "Agent.Events", "Active", "")) {
+			definition := getMultiMapValue(configuration, "Agent.Events.Custom", event, false)
 
 			if !definition
-				definition := getMultiMapValue(configuration, type . ".Events.Builtin", event, false)
+				definition := getMultiMapValue(configuration, "Agent.Events.Builtin", event, false)
 
 			try {
 				if definition {
@@ -1382,7 +1382,7 @@ class RaceAssistant extends ConfigurationItem {
 					parameters := []
 
 					loop definition[4] {
-						parameter := string2Values("|", getMultiMapValue(configuration, type . ".Actions.Parameters", event . "." . A_Index, ""))
+						parameter := string2Values("|", getMultiMapValue(configuration, "Agent.Actions.Parameters", event . "." . A_Index, ""))
 
 						if (parameter.Length >= 5) {
 							enumeration := string2Values(",", parameter[3])

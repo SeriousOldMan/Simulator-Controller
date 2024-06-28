@@ -119,6 +119,7 @@ class AgentBooster extends LLMBooster {
 		this.iManager := manager
 
 		this.Options["Descriptor"] := descriptor
+		this.Options["Language"] := language
 
 		super.__New(configuration)
 
@@ -134,8 +135,10 @@ class AgentBooster extends LLMBooster {
 			else
 				this.Options["Code"] := false
 		}
-		else
-			this.Options["Code"] := false
+		else {
+			this.Options["Code"] := "EN"
+			this.Options["Language"] := "English"
+		}
 	}
 
 	loadFromConfiguration(configuration) {
@@ -196,6 +199,8 @@ class EventBooster extends AgentBooster {
 						variables := {language: language ? language : ""}
 
 					variables.event := event
+
+					instruction := this.Instructions[code]
 
 					target := substituteVariables(getMultiMapValue(instruction, "Agent.Instructions", "Event"), variables)
 

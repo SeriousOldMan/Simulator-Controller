@@ -434,7 +434,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 	}
 
 	saveToConfiguration(configuration) {
-		local provider, value
+		local ignore, provider, reference, setting, value
 
 		super.saveToConfiguration(configuration)
 
@@ -470,21 +470,28 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		if provider {
 			providerConfiguration := this.iProviderConfigurations[provider]
 
-			for ignore, setting in ["Model", "MaxTokens"]
-				setMultiMapValue(configuration, "Conversation Booster", this.Assistant . "." . setting, providerConfiguration[setting])
+			for ignore, reference in ["Conversation Booster", "Agent Booster"] {
+				setMultiMapValue(configuration, reference, this.Assistant . ".Model", providerConfiguration["Model"])
 
-			if (provider = "LLM Runtime")
-				setMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".Service", provider)
-			else
-				setMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".Service"
-											  , values2String("|", provider, Trim(providerConfiguration["ServiceURL"])
-																		   , Trim(providerConfiguration["ServiceKey"])))
+				if (reference = "Conversation Booster")
+					setMultiMapValue(configuration, reference, this.Assistant . ".MaxTokens", providerConfiguration["MaxTokens"])
+
+				if (provider = "LLM Runtime")
+					setMultiMapValue(configuration, reference, this.Assistant . ".Service", provider)
+				else
+					setMultiMapValue(configuration, reference, this.Assistant . ".Service"
+												  , values2String("|", provider, Trim(providerConfiguration["ServiceURL"])
+																			   , Trim(providerConfiguration["ServiceKey"])))
+			}
 		}
 		else {
-			setMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".Model", false)
-			setMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".Service", false)
 			setMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".SpeakerProbability", false)
 			setMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".SpeakerTemperature", false)
+
+			for ignore, reference in ["Conversation Booster", "Agent Booster"] {
+				setMultiMapValue(configuration, reference, this.Assistant . ".Model", false)
+				setMultiMapValue(configuration, reference, this.Assistant . ".Service", false)
+			}
 		}
 	}
 

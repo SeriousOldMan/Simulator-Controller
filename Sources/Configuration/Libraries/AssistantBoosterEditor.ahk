@@ -974,7 +974,8 @@ class CallbacksEditor {
 
 		editorGui.Add("Text", "x8 yp+30 w848 W:Grow 0x10")
 
-		this.iCallbacksListView := editorGui.Add("ListView", "x16 y+10 w832 h140 W:Grow H:Grow(0.25) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Action", "Active", "Description"], translate))
+		this.iCallbacksListView := editorGui.Add("ListView", "x16 y+10 w832 h140 W:Grow H:Grow(0.25) -Multi -LV0x10 AltSubmit NoSort NoSortHdr"
+											   , collect([(this.Type != "Agent.Events") ? "Action" : "Event", "Active", "Description"], translate))
 		this.iCallbacksListView.OnEvent("Click", chooseCallback)
 		this.iCallbacksListView.OnEvent("DoubleClick", chooseCallback)
 
@@ -1004,7 +1005,7 @@ class CallbacksEditor {
 		editorGui.Add("DropDownList", "x110 yp w90 Y:Move(0.25) vcallbackInitializationDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", (*) => this.updateState())
 		editorGui["callbackInitializationDropDown"].Visible := (this.Type != "Agent.Events")
 
-		editorGui.Add("Text", "x16 yp w90 h23 +0x200 Y:Move(0.25)", translate("Event")).Visible := (this.Type = "Agent.Events")
+		editorGui.Add("Text", "x16 yp w90 h23 +0x200 Y:Move(0.25)", translate("Raise")).Visible := (this.Type = "Agent.Events")
 		editorGui.Add("Edit", "x110 yp w127 Y:Move(0.25) vcallbackEventEdit").Visible := (this.Type = "Agent.Events")
 
 		editorGui.Add("Text", "x16 yp+24 w90 h23 +0x200 Y:Move(0.25)", translate("Confirmation")).Visible := (this.Type != "Agent.Events")

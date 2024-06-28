@@ -70,18 +70,6 @@ class AgentBooster extends LLMBooster {
 		}
 	}
 
-	Temperature {
-		Get {
-			return this.Options["Temperature"]
-		}
-	}
-
-	MaxHistory {
-		Get {
-			return this.Options["MaxHistory"]
-		}
-	}
-
 	Instructions[language?] {
 		Get {
 			local instructions, ignore, instrLanguage, directory, key, value
@@ -158,8 +146,6 @@ class AgentBooster extends LLMBooster {
 
 		options["Language"] := getMultiMapValue(configuration, "Agent Booster", descriptor . ".Language", this.Language)
 		options["Active"] := getMultiMapValue(configuration, "Agent Booster", descriptor . ".Agent", false)
-		options["MaxHistory"] := getMultiMapValue(configuration, "Agent Booster", descriptor . ".AgentMaxHistory", 3)
-		options["Temperature"] := getMultiMapValue(configuration, "Agent Booster", descriptor . ".AgentTemperature", 0.2)
 	}
 
 	getInstructions() {
@@ -171,13 +157,6 @@ class AgentBooster extends LLMBooster {
 	}
 
 	connectorState(*) {
-	}
-
-	startBooster() {
-		super.startBooster()
-
-		if this.Connector
-			this.Connector.MaxHistory := this.MaxHistory
 	}
 }
 
@@ -209,7 +188,7 @@ class EventBooster extends AgentBooster {
 					if !this.Connector
 						this.startBooster()
 
-					this.Connector.Temperature := this.Temperature
+					this.Connector.Temperature := 0.2
 
 					if variables
 						variables.language := (language ? language : "")

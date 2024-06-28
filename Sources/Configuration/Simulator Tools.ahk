@@ -1693,8 +1693,11 @@ updateConfigurationForV580() {
 		if FileExist(kUserHomeDirectory . "Actions\" . assistant . ".actions") {
 			actions := readMultiMap(kUserHomeDirectory . "Actions\" . assistant . ".actions")
 
-			for ignore, section in ["Actions", "Builtin", "Custom", "Parameters"] {
-				setMultiMapValues(actions, "Conversation." . section, getMultiMapValues(actions, section))
+			setMultiMapValues(actions, "Conversation.Actions", getMultiMapValues(actions, "Actions"))
+			removeMultiMapValues(actions, "Actions")
+
+			for ignore, section in ["Builtin", "Custom", "Parameters"] {
+				setMultiMapValues(actions, "Conversation.Actions." . section, getMultiMapValues(actions, section))
 				removeMultiMapValues(actions, section)
 			}
 

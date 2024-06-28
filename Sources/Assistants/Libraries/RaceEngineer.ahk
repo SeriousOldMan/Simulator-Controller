@@ -34,6 +34,15 @@ class DamageEvent extends AgentEvent {
 		}
 	}
 
+	createArguments(event, arguments) {
+		local result := []
+
+		loop arguments.Length
+			result.Push(arguments.Has(A_Index) ? arguments[A_Index] : false)
+
+		return result
+	}
+
 	createEvent(event, arguments) {
 		local damage := []
 		local index, type
@@ -43,6 +52,13 @@ class DamageEvent extends AgentEvent {
 				damage.Push(type)
 
 		return ("Damage has just been collected for " . values2String(", ", damage*))
+	}
+
+	handleEvent(event, arguments*) {
+		if !super.handleEvent(event, arguments*)
+			this.Assistant.damageWarning(arguments*)
+
+		return true
 	}
 }
 
@@ -169,8 +185,6 @@ class RaceEngineer extends RaceAssistant {
 												  , muted, voiceServer)
 
 		this.updateConfigurationValues({Announcements: {FuelWarning: true, DamageReporting: true, DamageAnalysis: true, PressureReporting: true, WeatherUpdate: true}})
-
-		this.registerEvent(DamageEvent(this, "Damage"))
 	}
 
 	updateConfigurationValues(values) {

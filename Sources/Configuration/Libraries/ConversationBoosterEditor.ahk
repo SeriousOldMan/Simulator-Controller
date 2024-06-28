@@ -1412,14 +1412,14 @@ class ActionsEditor {
 
 		active := string2Values(",", getMultiMapValue(configuration, this.Type . ".Actions", "Active", ""))
 
-		for ignore, type in [this.Type . ".Builtin", this.Type . ".Custom"]
+		for ignore, type in [this.Type . ".Actions.Builtin", this.Type . ".Actions.Custom"]
 			for action, descriptor in getMultiMapValues(configuration, type) {
 				descriptor := string2Values("|", descriptor)
 
 				parameters := []
 
 				loop descriptor[5] {
-					parameter := string2Values("|", getMultiMapValue(configuration, this.Type . ".Parameters", ConfigurationItem.descriptor(action, A_Index)))
+					parameter := string2Values("|", getMultiMapValue(configuration, this.Type . ".Actions.Parameters", ConfigurationItem.descriptor(action, A_Index)))
 
 					parameters.Push({Name: parameter[1], Type: parameter[2], Enumeration: string2Values(",", parameter[3])
 								   , Required: ((parameter[4] = kTrue) ? true : ((parameter[4] = kFalse) ? false : parameter[4]))
@@ -1478,12 +1478,12 @@ class ActionsEditor {
 					FileAppend(action.Script, kUserHomeDirectory . "Actions\" . action.Definition)
 				}
 
-				setMultiMapValue(configuration, this.Type . ".Custom", action.Name
+				setMultiMapValue(configuration, this.Type . ".Actions.Custom", action.Name
 											  , values2String("|", action.Type, action.Definition, action.Initialized
 																 , action.Confirm, action.Parameters.Length, action.Description))
 
 				for index, parameter in action.Parameters
-					setMultiMapValue(configuration, this.Type . ".Parameters", action.Name . "." . index
+					setMultiMapValue(configuration, this.Type . ".Actions.Parameters", action.Name . "." . index
 												  , values2String("|", parameter.Name, parameter.Type
 																	 , values2String(",", parameter.Enumeration*)
 																	 , parameter.Required, parameter.Description))

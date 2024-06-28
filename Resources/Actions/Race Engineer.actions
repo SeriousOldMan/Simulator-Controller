@@ -1,10 +1,10 @@
 [Conversation.Actions]
 Active=plan_pitstop,cancel_pitstop,recalculate_damage_impact
-[Conversation.Builtin]
+[Conversation.Actions.Builtin]
 plan_pitstop=Assistant.Method|planPitstopAction|false|true|5|Create a plan for the next pitstop.
 cancel_pitstop=Assistant.Rule|Race Engineer.cancel_pitstop.rules|false|false|0|Clears the pitstop plan, if a pitstop is no longer needed.
 recalculate_damage_impact=Assistant.Rule|Race Engineer.recalculate_damage_impact.rules|false|true|0|Resets the damage impact calculation and then starts a full recalculation of the time loss caused by the damage.
-[Conversation.Parameters]
+[Conversation.Actions.Parameters]
 plan_pitstop.1=targetLap|Integer||false|The planned lap for the car to come to the pit.
 plan_pitstop.2=refuelAmount|String||false|The amount of fuel to be filled into the car.
 plan_pitstop.3=changeTyres|Boolean||false|Indicates whether new tyres should be mounted.
@@ -12,9 +12,9 @@ plan_pitstop.4=repairDamage|Boolean||false|Indicates whether all damages should 
 plan_pitstop.5=swapDriver|Boolean||false|Indicates in a team race whether the next driver according to the stint plan should take the car.
 [Agent.Actions]
 Active=report_damage
-[Agent.Builtin]
+[Agent.Actions.Builtin]
 report_damage=Assistant.Method|damageWarning|false|false|3|Report recent damage to the car to the driver.
-[Conversation.Parameters]
+[Agent.Actions.Parameters]
 report_damage.1=suspensionDamage|Boolean||true|Indicates whether new damage to the suspension occured.
 report_damage.2=bodyworkDamage|Boolean||true|Indicates whether new damage to the bodywork and aerodynamics occured.
 report_damage.3=engineDamage|Boolean||true|Indicates whether new damage to the engine occured.

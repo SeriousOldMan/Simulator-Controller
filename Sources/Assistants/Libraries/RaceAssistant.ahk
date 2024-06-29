@@ -3888,9 +3888,9 @@ raiseEvent(context, event, arguments*) {
 	}
 	catch Any as exception {
 		logError(exception, true)
-	}
 
-	return false
+		return false
+	}
 }
 
 Assistant_Raise := raiseEvent
@@ -4162,11 +4162,11 @@ normalizeArguments(arguments, remote := false) {
 
 	for ignore, argument in arguments
 		if (argument = kNotInitialized)
-			result.Push(!remote ? unset : kUndefined)
+			result.Push(remote ? kUndefined : unset)
 		else
 			try {
 				if ((InStr(argument, "?") = 1) || (InStr(argument, "!") = 1))
-					result.Push(!remote ? unset : kUndefined)
+					result.Push(remote ? kUndefined : unset)
 				else
 					result.Push(argument)
 			}

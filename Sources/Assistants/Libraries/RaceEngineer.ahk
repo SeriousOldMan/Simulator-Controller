@@ -28,12 +28,6 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class DamageEvent extends AgentEvent {
-	Asynchronous {
-		Get {
-			return false
-		}
-	}
-
 	createArguments(event, arguments) {
 		local result := []
 

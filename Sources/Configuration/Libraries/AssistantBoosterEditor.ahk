@@ -282,7 +282,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		setButtonIcon(widget42, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
 
 		editorGui.SetFont("Italic", "Arial")
-		widget44 := editorGui.Add("Checkbox", "x" . x0 . " yp+36 w105 h23 vviAgentCheck", translate("Behavior"))
+		widget44 := editorGui.Add("Checkbox", "x" . x0 . " yp+36 w105 h23 vviAgentCheck", translate("Reasoning"))
 		widget44.OnEvent("Click", (*) => this.updateState())
 		widget45 := editorGui.Add("Text", "x100 yp+11 w" . (width + 8 - 100) . " 0x10 W:Grow")
 		editorGui.SetFont("Norm", "Arial")
@@ -294,7 +294,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		widget47.OnEvent("Click", editActions.Bind("Agent.Actions"))
 
 		widget48 := editorGui.Add("Button", "x" . (width + 8 - 100) . " yp w100 h23 X:Move vviAgentInstructionsButton", translate("Instructions..."))
-		widget48.OnEvent("Click", editInstructions.Bind("Agent", translate("Behavior")))
+		widget48.OnEvent("Click", editInstructions.Bind("Agent", translate("Reasoning")))
 
 		editorGui.Add("Text", "x8 yp+35 w468 W:Grow 0x10")
 
@@ -967,11 +967,14 @@ class CallbacksEditor {
 
 		editorGui.SetFont("Norm", "Arial")
 
-		if ((this.Type = "Conversation.Actions") || (this.Type = "Agent.Actions"))
-			editorGui.Add("Documentation", "x368 YP+20 w128 H:Center Center", translate("Conversation Actions")
+		if (this.Type = "Conversation.Actions")
+			editorGui.Add("Documentation", "x308 YP+20 w248 H:Center Center", translate("Conversation Actions")
+						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-booster-actions")
+		else if (this.Type = "Agent.Actions")
+			editorGui.Add("Documentation", "x308 YP+20 w248 H:Center Center", translate("Reasoning Actions")
 						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-booster-actions")
 		else
-			editorGui.Add("Documentation", "x368 YP+20 w128 H:Center Center", translate("Behavior Events")
+			editorGui.Add("Documentation", "x308 YP+20 w248 H:Center Center", translate("Reasoning Events")
 						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-booster-events")
 
 		editorGui.SetFont("Norm", "Arial")

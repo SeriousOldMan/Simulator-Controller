@@ -165,6 +165,26 @@ class AgentEvent {
 	}
 }
 
+class RuleEvent extends AgentEvent {
+	iPhrase := false
+
+	Phrase {
+		Get {
+			return this.iPhrase
+		}
+	}
+
+	__New(assistant, event, phrase, parameters, goal := false, options := false) {
+		this.iPhrase := phrase
+
+		super.__New(assistant, event, parameters, goal, options)
+	}
+
+	createEvent(event, arguments) {
+		return substituteVariables(this.Phrase, {event: event})
+	}
+}
+
 class RaceAssistant extends ConfigurationItem {
 	iDebug := kDebugOff
 	iOptions := CaseInsenseMap()
@@ -1404,7 +1424,7 @@ class RaceAssistant extends ConfigurationItem {
 																						  , kResourcesDirectory . "Actions\"))
 													  , &productions, &reductions, &includes)
 
-							handler := AgentEvent(this, definition[2], parameters)
+							handler := RuleEvent(this, definition[2], definition[6], parameters)
 						default:
 							throw "Unknown event type (" definition[1] . ") detected in RaceAssistant.createAgentEvents..."
 					}

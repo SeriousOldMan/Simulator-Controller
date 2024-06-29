@@ -1,67 +1,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Autonomous Agent Rules          ;;;
+;;;   Modular Simulator Controller System - Agent Actions                   ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;;-------------------------------------------------------------------------;;;
-;;;                             Global Trigger                              ;;;
-;;;                                                                         ;;;
-;;; Entry points for the surrounding script code. Typically, the rule       ;;;
-;;; will be triggered by tool a target fact and call "produce()" on the  ;;;
-;;; KnowledgeBase instance.                                                 ;;;
-;;;-------------------------------------------------------------------------;;;
-
-;;;-------------------------------------------------------------------------;;;
-;;; This trigger must be called, after all dynamic setup rules have been    ;;;
-;;; added to the rule set.                                                  ;;;
-;;;-------------------------------------------------------------------------;;;
-
-; [?Initialize] => ...
-
-
-priority: -5, [?Initialize] => (Clear: Initialize)
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                          Targets Initialization                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-priority: 5, {All: [?Initialize], {None: [?Targets.Count]}} => (Set: Targets.Count, 0)
-
-addTargets([])
-addTargets([?target | ?targets]) <= addTarget(?target), addTargets(?targets)
-
-addTarget(?target) <= addTarget(?target, !Targets.Count)
-
-addTarget(?target, ?index) <= ?next = ?index + 1, Set(target, ?next, ?target), Set(Targets.Count, ?next)
-
-allTargets(?targets) <= allTargets(?targets, !Targets.Count)
-
-allTargets([], 0)
-allTargets([?target | ?targets], ?index) <= Get(target, ?index, ?target), ?next = ?index - 1,
-											allTargets(?targets, ?next)
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                           Tools Initialization                          ;;;
-;;;-------------------------------------------------------------------------;;;
-
-priority: 5, {All: [?Initialize], {None: [?Tools.Count]}} => (Set: Tools.Count, 0)
-
-addTools([])
-addTools([?tool | ?tools]) <= addTool(?tool), addTools(?tools)
-
-addTool(?tool) <= addTool(?tool, !Tools.Count), Set(?tool, Delta, 0)
-
-addTool(?tool, ?index) <= ?next = ?index + 1, Set(Tool, ?next, ?tool), Set(Tools.Count, ?next)
-
-allTools(?tools) <= allTools(?tools, !Tools.Count)
-
-allTools([], 0)
-allTools([?tool | ?tools], ?index) <= Get(Tool, ?index, ?tool), ?next = ?index - 1, allTools(?tools, ?next)
-
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                             Action Callbacks                            ;;;
@@ -76,10 +18,3 @@ Assistant.Raise(?event, ?p1, ?p2, ?p3) <= Call(raiseEvent, ?event, ?p1, ?p2, ?p3
 Assistant.Raise(?event, ?p1, ?p2, ?p3, ?p4) <= Call(raiseEvent, ?event, ?p1, ?p2, ?p3, ?p4)
 Assistant.Raise(?event, ?p1, ?p2, ?p3, ?p4, ?p5) <= Call(raiseEvent, ?event, ?p1, ?p2, ?p3, ?p4, ?p5)
 Assistant.Raise(?event, ?p1, ?p2, ?p3, ?p4, ?p5, ?p6) <= Call(raiseEvent, ?event, ?p1, ?p2, ?p3, ?p4, ?p5, ?p6)
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                               Utilities                                 ;;;
-;;;-------------------------------------------------------------------------;;;
-
-#Include %kResourcesDirectory%Rules\Utilities.rules

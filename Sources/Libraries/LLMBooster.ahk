@@ -605,7 +605,10 @@ class ChatBooster extends ConversationBooster {
 						answer := this.normalizeAnswer(answer)
 
 					if (answer && (answer != "")) {
-						Task.startTask(() => FileAppend(translate("-- User --------") . "`n`n" . question . "`n`n" . translate("-- " . translate("Conversation") . " ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16"), 0, kLowPriority)
+						if (answer = true)
+							Task.startTask(() => FileAppend(translate("-- User --------") . "`n`n" . question . "`n`n" . translate("-- " . translate("Conversation") . " ---------") . "`n`n  -> " . translate("Function") . " <-`n`n", this.Transcript, "UTF-16"), 0, kLowPriority)
+						else
+							Task.startTask(() => FileAppend(translate("-- User --------") . "`n`n" . question . "`n`n" . translate("-- " . translate("Conversation") . " ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16"), 0, kLowPriority)
 
 						return answer
 					}

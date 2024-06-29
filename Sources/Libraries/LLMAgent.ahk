@@ -32,6 +32,8 @@
 class AgentBooster extends LLMBooster {
 	iManager := false
 
+	iTranscript := false
+
 	iInstructions := false
 
 	Type {
@@ -113,13 +115,23 @@ class AgentBooster extends LLMBooster {
 		}
 	}
 
+	Transcript {
+		Get {
+			return this.iTranscript
+		}
+	}
+
 	__New(manager, descriptor, configuration, language := false) {
+		local transcripts := getMultiMapValue(configuration, "Agent Booster", descriptor . ".Transcripts"
+														   , kLogsDirectory . "Transcripts\")
 		local allLanguages, index
 
 		this.iManager := manager
 
 		this.Options["Descriptor"] := descriptor
 		this.Options["Language"] := language
+
+		this.iTranscript := (normalizeDirectoryPath(transcripts) . "\" . descriptor . ".txt")
 
 		super.__New(configuration)
 
@@ -221,7 +233,13 @@ class EventBooster extends AgentBooster {
 																					 , "Agent.Instructions", "Knowledge")
 																	, variables)])
 
-					return (answer = true)
+					if (answer = true) {
+						Task.startTask(() => FileAppend(translate("-- Event --------") . "`n`n" . question . "`n`n" . translate("-- " . translate("Reasoning") . " ---------") . "`n`n  -> " . translate("Function") . " <-`n`n", this.Transcript, "UTF-16"), 0, kLowPriority)
+
+						return true
+					}
+					else
+						return false
 				}
 				catch Any as exception {
 					logError(exception, true)

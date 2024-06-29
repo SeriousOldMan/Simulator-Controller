@@ -282,7 +282,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		setButtonIcon(widget42, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
 
 		editorGui.SetFont("Italic", "Arial")
-		widget44 := editorGui.Add("Checkbox", "x" . x0 . " yp+36 w105 h23 vviAgentCheck", translate("Agent"))
+		widget44 := editorGui.Add("Checkbox", "x" . x0 . " yp+36 w105 h23 vviAgentCheck", translate("Behavior"))
 		widget44.OnEvent("Click", (*) => this.updateState())
 		widget45 := editorGui.Add("Text", "x100 yp+11 w" . (width + 8 - 100) . " 0x10 W:Grow")
 		editorGui.SetFont("Norm", "Arial")
@@ -294,7 +294,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		widget47.OnEvent("Click", editActions.Bind("Agent.Actions"))
 
 		widget48 := editorGui.Add("Button", "x" . (width + 8 - 100) . " yp w100 h23 X:Move vviAgentInstructionsButton", translate("Instructions..."))
-		widget48.OnEvent("Click", editInstructions.Bind("Agent", translate("Agent")))
+		widget48.OnEvent("Click", editInstructions.Bind("Agent", translate("Behavior")))
 
 		editorGui.Add("Text", "x8 yp+35 w468 W:Grow 0x10")
 
@@ -971,10 +971,10 @@ class CallbacksEditor {
 			editorGui.Add("Documentation", "x368 YP+20 w128 H:Center Center", translate("Conversation Actions")
 						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-conversation-actions")
 		else if (this.Type = "Agent.Actions")
-			editorGui.Add("Documentation", "x368 YP+20 w128 H:Center Center", translate("Agent Actions")
+			editorGui.Add("Documentation", "x368 YP+20 w128 H:Center Center", translate("Behavior Actions")
 						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-agent-actions")
 		else
-			editorGui.Add("Documentation", "x368 YP+20 w128 H:Center Center", translate("Agent Events")
+			editorGui.Add("Documentation", "x368 YP+20 w128 H:Center Center", translate("Behavior Events")
 						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-agent-events")
 
 		editorGui.SetFont("Norm", "Arial")
@@ -1013,7 +1013,7 @@ class CallbacksEditor {
 		editorGui.Add("DropDownList", "x110 yp w90 Y:Move(0.25) vcallbackInitializationDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", (*) => this.updateState())
 		editorGui["callbackInitializationDropDown"].Visible := (this.Type != "Agent.Events")
 
-		editorGui.Add("Text", "x16 yp w90 h23 +0x200 Y:Move(0.25)", translate("Raise")).Visible := (this.Type = "Agent.Events")
+		editorGui.Add("Text", "x16 yp w90 h23 +0x200 Y:Move(0.25)", translate("Signal")).Visible := (this.Type = "Agent.Events")
 		editorGui.Add("Edit", "x110 yp w127 Y:Move(0.25) vcallbackEventEdit").Visible := (this.Type = "Agent.Events")
 
 		editorGui.Add("Text", "x16 yp+24 w90 h23 +0x200 Y:Move(0.25)", translate("Confirmation")).Visible := (this.Type != "Agent.Events")
@@ -1282,7 +1282,7 @@ class CallbacksEditor {
 
 		if (this.Type = "Agent.Events")
 			callback := {Name: "", Type: "Assistant.Rule", Active: true, Description: "", Parameters: []
-					   , Builtin: false, Event: "", Phrase: "", Definition: ""}
+					   , Builtin: false, Event: "", Phrase: "", Definition: "", Script: ""}
 		else
 			callback := {Name: "", Type: "Controller.Function", Active: true, Description: "", Parameters: []
 					   , Builtin: false, Initialized: true, Confirm: true, Definition: ""}

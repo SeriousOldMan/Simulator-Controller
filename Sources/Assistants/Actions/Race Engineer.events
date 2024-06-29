@@ -1,10 +1,10 @@
 [Agent.Events]
-Active=damage_event, rain_start, rain_stop
+Active=damage_collected, rain_started, rain_stopped
 [Agent.Events.Builtin]
-damage_event=Assistant.Class|Damage|DamageEvent|3|This event is triggered when the car collected new damage.|
-rain_start=Assistant.Rule|RainStart|Race Engineer.rain_start.rules|0|This event is triggered when it starts raining or will be raining in a few moments.|It just started raining.
-rain_stop=Assistant.Rule|RainStop|Race Engineer.rain_stop.rules|0|This event is triggered when it stopped raining.|It just stopped raining.
+damage_collected=Assistant.Class|DamageEvent|Damage||3|This event is triggered when the car collected new damage.
+rain_started=Assistant.Rule|Race Engineer.rain_start.rules|RainStart|It just started raining.|0|This event is triggered when it starts raining or will be raining in a few moments.
+rain_stopped=Assistant.Rule|Race Engineer.rain_stop.rules|RainStop|It just stopped raining.|0|This event is triggered when it stopped raining.
 [Agent.Events.Parameters]
-damage_event.1=suspensionDamage|Boolean||true|Indicates whether new damage to the suspension occured.
-damage_event.2=bodyworkDamage|Boolean||true|Indicates whether new damage to the bodywork and aerodynamics occured.
-damage_event.3=engineDamage|Boolean||true|Indicates whether new damage to the engine occured.
+damage_collected.1=suspensionDamage|Boolean||true|Indicates whether new damage to the suspension occured.
+damage_collected.2=bodyworkDamage|Boolean||true|Indicates whether new damage to the bodywork and aerodynamics occured.
+damage_collected.3=engineDamage|Boolean||true|Indicates whether new damage to the engine occured.

@@ -981,7 +981,9 @@ class CallbacksEditor {
 
 		editorGui.Add("Text", "x8 yp+30 w848 W:Grow 0x10")
 
-		this.iCallbacksListView := editorGui.Add("ListView", "x16 y+10 w832 h140 W:Grow H:Grow(0.25) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect([(this.Type = "Agent.Events") ? "Event" : "Action", "Active", "Description"], translate))
+		this.iCallbacksListView := editorGui.Add("ListView", "x16 y+10 w832 h140 W:Grow H:Grow(0.25) -Multi -LV0x10 AltSubmit NoSort NoSortHdr"
+											   , collect([(this.Type != "Agent.Events") ? "Action" : "Event", "Active", "Description"], translate))
+
 		this.iCallbacksListView.OnEvent("Click", chooseCallback)
 		this.iCallbacksListView.OnEvent("DoubleClick", chooseCallback)
 
@@ -1011,7 +1013,7 @@ class CallbacksEditor {
 		editorGui.Add("DropDownList", "x110 yp w90 Y:Move(0.25) vcallbackInitializationDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", (*) => this.updateState())
 		editorGui["callbackInitializationDropDown"].Visible := (this.Type != "Agent.Events")
 
-		editorGui.Add("Text", "x16 yp w90 h23 +0x200 Y:Move(0.25)", translate("Event")).Visible := (this.Type = "Agent.Events")
+		editorGui.Add("Text", "x16 yp w90 h23 +0x200 Y:Move(0.25)", translate("Raise")).Visible := (this.Type = "Agent.Events")
 		editorGui.Add("Edit", "x110 yp w127 Y:Move(0.25) vcallbackEventEdit").Visible := (this.Type = "Agent.Events")
 
 		editorGui.Add("Text", "x16 yp+24 w90 h23 +0x200 Y:Move(0.25)", translate("Confirmation")).Visible := (this.Type != "Agent.Events")
@@ -1279,9 +1281,8 @@ class CallbacksEditor {
 			}
 
 		if (this.Type = "Agent.Events")
-			callback := {Name: "", Type: "Assistant.Rule", Active: true, Event: ""
-					   , Phrase: "", Description: "", Parameters: []
-					   , Builtin: false, Initialized: false, Confirm: false, Definition: ""}
+			callback := {Name: "", Type: "Assistant.Rule", Active: true, Description: "", Parameters: []
+					   , Builtin: false, Event: "", Phrase: "", Definition: ""}
 		else
 			callback := {Name: "", Type: "Controller.Function", Active: true, Description: "", Parameters: []
 					   , Builtin: false, Initialized: true, Confirm: true, Definition: ""}
@@ -1564,7 +1565,7 @@ class CallbacksEditor {
 
 				parameters := []
 
-				loop ((this.Type = "Agent.Events") ? descriptor[4] : descriptor[5]) {
+				loop descriptor[5] {
 					parameter := string2Values("|", getMultiMapValue(configuration, this.Type . ".Parameters", ConfigurationItem.descriptor(callback, A_Index)))
 
 					parameters.Push({Name: parameter[1], Type: parameter[2], Enumeration: string2Values(",", parameter[3])
@@ -1573,10 +1574,9 @@ class CallbacksEditor {
 				}
 
 				if (this.Type = "Agent.Events")
-					theCallback := {Name: callback, Active: inList(active, callback), Type: descriptor[1]
-								  , Event: descriptor[2], Phrase: descriptor[6], Definition: descriptor[3]
-								  , Description: descriptor[5], Parameters: parameters, Builtin: (type = (this.Type . ".Builtin"))
-								  , Initialized: false, Confirm: false}
+					theCallback := {Name: callback, Active: inList(active, callback), Type: descriptor[1], Definition: descriptor[2]
+								  , Description: descriptor[6], Parameters: parameters, Builtin: (type = (this.Type . ".Builtin"))
+								  , Event: descriptor[3], Phrase: descriptor[4]}
 				else
 					theCallback := {Name: callback, Active: inList(active, callback), Type: descriptor[1], Definition: descriptor[2]
 								  , Description: descriptor[6], Parameters: parameters, Builtin: (type = (this.Type . ".Builtin"))
@@ -1584,8 +1584,7 @@ class CallbacksEditor {
 								  , Confirm: ((descriptor[4] = kTrue) ? true : ((descriptor[4] = kFalse) ? false : descriptor[4]))}
 
 				if (theCallback.Type = "Assistant.Rule") {
-					theCallback.Script := FileRead(getFileName(this.Assistant . "." . theCallback.Name . ".rules"
-															 , kResourcesDirectory . "Actions\", kUserHomeDirectory . "Actions\"))
+					theCallback.Script := FileRead(getFileName(descriptor[2], kResourcesDirectory . "Actions\", kUserHomeDirectory . "Actions\"))
 
 					theCallback.Definition := ""
 				}
@@ -1632,12 +1631,12 @@ class CallbacksEditor {
 
 				if (this.Type = "Agent.Events")
 					setMultiMapValue(configuration, this.Type . ".Custom", callback.Name
-												  , values2String("|", callback.Type, callback.Event, callback.Definition
-																	 , callback.Parameters.Length, callback.Description, callback.Phrase))
+												  , values2String("|", callback.Type, callback.Definition, callback.Event, callback.Phrase
+																	 , callback.Parameters.Length, callback.Description))
 				else
 					setMultiMapValue(configuration, this.Type . ".Custom", callback.Name
-												  , values2String("|", callback.Type, callback.Definition, callback.Initialized
-																	 , callback.Confirm, callback.Parameters.Length, callback.Description))
+												  , values2String("|", callback.Type, callback.Definition, callback.Initialized, callback.Confirm
+																	 , callback.Parameters.Length, callback.Description))
 
 				for index, parameter in callback.Parameters
 					setMultiMapValue(configuration, this.Type . ".Parameters", callback.Name . "." . index

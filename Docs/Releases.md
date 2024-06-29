@@ -24,7 +24,7 @@
 	 - Constant arguments are now allowed for function and method calls. Example: trigger("!w") for a function call on the Controller that enables the wind screen wiper.
 	 - Multiple consecutive function or method calls can now be defined for one single conversation action.
 	 - Hold down the Control key while clicking on "Ok" button will not leave the editor, but instead will show you the API tool definitions in JSON format.
-  10. Whenever a conversation booster is configured for a Race Assistant, a transcript of every LLM activation is stored in the *Simulator Controller\Logs\Transcripts* folder which is located in your user *Documents* folder.
+  10. Whenever a Conversation Booster is configured for a Race Assistant, a transcript of every LLM activation is stored in the *Simulator Controller\Logs\Transcripts* folder which is located in your user *Documents* folder.
   11. The ["Plan Pitstop" conversation action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#trigger-actions-from-conversation) for the Race Engineer now lso allows to call for a driver swap in team races.
   12. Two [predefined conversation actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#trigger-actions-from-conversation) for the Spotter are now available:
       - The LLM can decide to reset and recalculate the delta and lap time history for all cars.
@@ -40,7 +40,7 @@
   
      Please note, that using *Actions* is not enabled by default, but must be explicitly activated in the configuration.
   6. Action definition files are customizeable in the [Documents]\Simulator Controller\Actions folder.
-  7. An editor has been implemented to enable or disable the predefined conversation actions and even define your own ones. But this will require extensive knowledge of the inner workings of Simulator Controller and the Assistants and also a very good understanding how LLMs work. You have been warned. Please see the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-conversation-actions) for more information.
+  7. An editor has been implemented to enable or disable the predefined *Conversation* or *Behavior* actions and even define your own ones. But this will require extensive knowledge of the inner workings of Simulator Controller and the Assistants and also a very good understanding how LLMs work. You have been warned. Please see the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-booster-actions) for more information.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-576), if you have configured the Conversation Booster for the Assistants.
 
@@ -49,7 +49,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   2. Documentation updates here and there, as always
   3. Fixed a bug in "Simulator Setup", which prevented additional software to be located in the "Applications" step.
   4. Fixed voice test button on the main voice control page in "Simulator Setup".
-  5. Fixed the "Always" activation mode in "Recognition" conversation booster.
+  5. Fixed the "Always" activation mode in "Recognition" Booster.
   6. Cleanup of the additional software supported in "Simulator Setup":
      - Removed "Voice Macro", since it was needed anymore for a long time now.
 	 - Added "Real Head Motion" as optional software, since it is one of the most useful extensions for *Assetto Corsa Competizione*.
@@ -71,7 +71,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   4. The Assistants no longer react, when the *Push-To-Talk* button was pressed, but nothing was said.
   5. Fixed default service URL for GPT4All.
   6. Adopted *GPT4All* 2.8 API. Should be running stable now in all situations.
-  7. The conversation booster no longer consume a voice command, when the invoked GPT service does not returned a valid result.
+  7. The Conversation Booster no longer consume a voice command, when the invoked GPT service does not returned a valid result.
   8. LLMs sometimes use markdown syntax in their answers. Most of this syntactical elements are now removed, so that they do not interfere with the spoken words.
   9. [*Ollama*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#ollama) has been added to the list of supported GPT service providers. This is a GPT server, which can be installed on the local PC.
   10. A [*Generic*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#generic) GPT service provider is now also available. This supports HTTP based GPT services, which implements the OpenAI JSON protocol.
@@ -92,9 +92,9 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   10. The handling of remote server timeouts has been improved in team sessions. The applications like "Race Center" do not wait anymore in cases of non-important data.
   11. Pressing *Push-To-Talk* without saying anything no longer triggers an "I don't understand, please repeat" answer by the Assistants, as long as you are using Azure or Google for voice recognition.
   12. The Spotter now informs you during qualification whether the car before or behind you is on a valid or on an invalid lap.
-  13. It is now possible to configure the instructions for the different GPT-based conversation boosters. Please take a look at the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for more information.
-  14. The default instructions for the conversation boosters has been extended to include more personality and domain specific behaviour. A full overview for all supported instructions can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm).
-  15. Many more announcements and messages by the Spotter can now be rephrased by the conversation booster. Only very urgent messages like proximity alerts are excluded, because of the additional latency introduced when calling a GPT service.
+  13. It is now possible to configure the instructions for the different GPT-based Conversation Boosters. Please take a look at the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for more information.
+  14. The default instructions for the Conversation Boosters has been extended to include more personality and domain specific behaviour. A full overview for all supported instructions can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm).
+  15. Many more announcements and messages by the Spotter can now be rephrased by the Conversation Booster. Only very urgent messages like proximity alerts are excluded, because of the additional latency introduced when calling a GPT service.
   16. The default "Character" instruction for the Driving Coach has been updated. Therefoe all instructions will be reset to their defaults. This is only necessary this time, see next item.
   17. A method has been introduced, that checks whether you are using the default instructions for an LLM, so that you don't need to update them, when they have changed in the distribution package.
   18. It is now possible to manage teams, driver and sessions directly from "Simulator Startup", if you are using the Team Server. Please see the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#team-management) for more information.
@@ -113,7 +113,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   6. The Driving Coach now also has access to the car telemetry data from the general knowledgebase. It therefore is theoretically able to correlate degrading lap times with over the top tyre temperatures, for example.
   7. The default context window size for an LLM has been increased to 2k tokens in the Driving Coach configuration.
   8. The next feature of the AI-based booster for the Assistants now integrates a general conversation capability. Every voice command, that cannot be matched against the list of predefined, pattern-based commands, will be forwarded to the GPT service for a general conversation. The LLM has full access to the knowledgebase of the Assistant, incl. telemetry data, standings and position data, and so on. The exact knowledge will vary with the type of the Assistant (Engineer, Strategist, ...). See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for more information.
-  9. Configuration of the conversation booster is now also possible using "Simulator Configuration". See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) for more information.
+  9. Configuration of the Conversation Booster is now also possible using "Simulator Configuration". See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) for more information.
   10. [*Mistral AI*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#mistral-ai) has been added to the list of supported GPT service providers.
   11. Added "GPT-4o" to the list of OpenAI models.
   12. The pitstop component on the session info page of "System Monitor" now also displays the relative tyre pressure increment values for the next pitstop.

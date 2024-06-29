@@ -414,13 +414,17 @@ Several boosters are available at the moment:
 
      (1) Depending on the availabilty of the data by the current simulator.
 	 
-	 Since large parts of the knowledgebase of the Assistants will be supplied to the LLM for matching, a context window of at least 4k tokens is required for this booster. Full standings history isn't possible at the moment, since this will flood the input context area of the LLM, at least for the *smaller* models like GPT 3.5, Mistral 7b, and so on. Time will cure this problem, and I will update the capabilities of the integration, when more capable models become available. For the time being, the position data is available for the most recent laps and also the gaps for the most important opponents are passed to the LLM (for Strategist and Spotter).
+	 Since large parts of the knowledgebase of the Assistants will be supplied to the LLM for matching, a context window of at least 4k tokens is required for this booster. Full standings history isn't possible at the moment, since this will overflow the input context area of the LLM, at least for the *smaller* models like GPT 3.5, Mistral 7b, and so on. Time will cure this problem, and I will update the capabilities of the integration, when more capable models become available. For the time being, the position data is available for the most recent laps and also the gaps for the most important opponents are passed to the LLM (for Strategist and Spotter).
 	 
-	 Additionally, you can allow the LLM to call [predefined actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-conversation-actions) as a result of your conversation. For example, if you ask the Strategist whether an undercut might be possible in one of the next laps, the LLM may call the Monte Carlo traffic simulation using an internal action. Which actions will be available to the LLM depends on the current Assistant. See corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#trigger-actions-from-conversation) for the Strategist for an example.
+	 Additionally, you can allow the LLM to call [predefined or custom actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-booster-actions) as a result of your conversation. For example, if you ask the Strategist whether an undercut might be possible in one of the next laps, the LLM may call the Monte Carlo traffic simulation using an internal action. Which actions will be available to the LLM depends on the current Assistant. See corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#trigger-actions-from-conversation) for the Strategist for an example.
+	 
+  4. *Behavior* is the most complex and most capable booster, since it allows you to alter or extend the behavior of the Assistant. You can use predefined events or even define your own ones in the rule engine (as shown below), which then result in a request to the LLM. Similar to the *Conversation* bosster above, the LLM then can decide one or more [predefined or custom actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-booster-actions) to fulfill the request or react to the situation. To support its conclusion, the LLM will have full access to the same knowledge as in the *Conversation* booster.
+	 
+     Important: This booster directly alters the behavior of the Assistant for the good or for the bad. Even if you don't change or extend the definition of the events and actions, it still depends on the reasoning capabilities of the used language model, whether the Assistant will behave as expected. Therefore, always test everything before using it in an important race.
 
-Good to know: Whenever one or more conversation boosters are configured for a Race Assistant, a transcript of every LLM activation is stored in the *Simulator Controller\Logs\Transcripts* folder which is located in your user *Documents* folder.
+Good to know: Whenever one or more Assistant Boosters are configured for a Race Assistant, a transcript of every LLM activation is stored in the *Simulator Controller\Logs\Transcripts* folder which is located in your user *Documents* folder.
 
-For each of the above conversation boosters, you can edit the instructions that are send to the LLM by clicking on the button labeled "Instructions...". A new window will open, where you can edit all related instructions for each of the supported languages. Whenever you want to restore the original instruction, you can do this by clicking on the small button with the "Reload" icon.
+For each of the above Assistant Boosters, you can edit the instructions that are send to the LLM by clicking on the button labeled "Instructions...". A new window will open, where you can edit all related instructions for each of the supported languages. Whenever you want to restore the original instruction, you can do this by clicking on the small button with the "Reload" icon.
 
 Below you find all instruction categories and the supported variables:
 
@@ -453,11 +457,11 @@ Below you find all instruction categories and the supported variables:
 
 Important: Using a GPT service like OpenAI may create some costs, and running an LLM locally on your PC will require a very powerful system, especially when doing this while on the track. As already said, extending the capabilities of the Assistants with an LLM is fully optional.
 
-Disclaimer: Large Language Models, although incredible impressive, are still under heavy development. Therefore it depends on the quality and capabilities of the model, whether the Assistant will react like expected. And in most cases, the support for non-English languages is quite limited. I recommend to use the conversation booster only for English-speaking Assistants for the time being. Beside that, you will get good results for the *Rephrasing* booster with almost any model, whereas for the *Conversation* booster you will need one of the big boys like GPT 3.5 and above for decent results. The requirements in terms of language understanding is somewhat in between for the *Recognition* booster. You will have to invest some time experimenting with different models, but that is part of the the fun.
+Disclaimer: Large Language Models, although incredible impressive, are still under heavy development. Therefore it depends on the quality and capabilities of the model, whether the Assistant will react like expected. And in most cases, the support for non-English languages is quite limited. I recommend to use the Assistant Booster only for English-speaking Assistants for the time being. Beside that, you will get good results for the *Rephrasing* booster with almost any model, whereas for the *Conversation* booster you will need one of the big boys like GPT 3.5 and above for decent results. The requirements in terms of language understanding is somewhat in between for the *Recognition* booster. You will have to invest some time experimenting with different models, but that is part of the the fun.
 
-##### Managing conversation actions
+##### Managing booster actions
 
-A special editor is provided to manage the conversation actions for a given Assistant. A conversation action allows the LLM not only to react with a message to your request, but also to trigger some predefined functions. There are several builtin actions available for the different assistants, but you can also define your own ones.
+A special editor is provided to manage the actions for a given Assistant. An action allows the LLM not only to react with a message to your request, but also to trigger some predefined functions. There are several builtin actions available for the different assistants, but you can also define your own ones.
 
 To open this editor, click on the small button with the "Pencil" icon on the right of the "Actions" drop down menu.
 
@@ -490,9 +494,9 @@ You can enable or disable individual predefined actions using the checkbox on th
 		   }
 	   }
 
-   This format is used by many other GPT service providers as well. Every LLM, that *understands* this type of function description, will be able to trigger conversation actions, when used as a conversation booster. The editor for the conversation actions shown above is for the most part a graphical user interface for this type of function definitions. But it also let you define how to react to a *function call* by the LLM (see next item).
+   This format is used by many other GPT service providers as well. Every LLM, that *understands* this type of function description, will be able to trigger actions, when used as a Conversation or Bahavior Booster. The editor for the *Conversation* or *Behavior* actions shown above is for the most part a graphical user interface for this type of function definitions. But it also let you define how to react to a *function call* by the LLM (see next item).
    
-   Additionally to all the information required by the LLM function definition you can specify whether the corresponding action will be available during the learning phase of the Assistant and whether the Assistant will acknowledge your request like it is done with the builtin voice command. This should be enabled for all conversation actions you want to trigger by a corresponding question or command and should be disabled for all functions you expect the LLM to call automatically whenever needed.
+   Additionally to all the information required by the LLM function definition you can specify whether the corresponding action will be available during the learning phase of the Assistant and whether the Assistant will acknowledge your request like it is done with the builtin voice command. This should be enabled for all actions you want to trigger by a corresponding question or command and should be disabled for all functions you expect the LLM to call automatically whenever needed.
    
    Note: The description of a function and each of their parameters is very important, since these are used by the LLM to *understand* when and how to invoke the function. It may require several iterations and different formulations until the LLM reacts as desired. 
 
@@ -537,7 +541,7 @@ You can enable or disable individual predefined actions using the checkbox on th
    
 	   [?Track.Grip = Wet] => (Call: Assistant.Speak("It will be too wet. I will come up with a new strategy.")), (Call: Assistant.Call(planPitstop))
 
-As you can see, defining individual conversation actions is really an expert topic and therefore nothing for the casual user. If you want use this feature, I can offer a personal introduction and coaching as part of the Patreon membership.
+As you can see, defining individual actions is really an expert topic and therefore nothing for the casual user. If you want use this feature, I can offer a personal introduction and coaching as part of the Patreon membership.
 
 #### Tab *Plugins*
 
@@ -547,7 +551,7 @@ In this tab you can configure the plugins currently in use by the Simulator Cont
 
 Beside temporarily deactivating a plugin and all its modes, you can define a comma separated list of simulator names. This will restrict the modes of the plugin to only be available, when these simulators are running. The most important field here is the *Arguments* field. Here you can supply values for all the configuration parameters of the given plugin. The format is like this: "parameter1: value11, value12, value13; parameter2: value21, value22; ...". Please take a look at the [plugin reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) for an in depth explanation of all the parameters of the bundled plugins.
 
-A special editor is available by clicking on the small button with the launching rocket icon, when you have selected a plugin for one of the Race Assistants. This editor allows you to link a GPT service to this Assistant which can dramatically improve the conversation experience with the Assistant. Please see the separate [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for more information about the conversation booster.
+A special editor is available by clicking on the small button with the launching rocket icon, when you have selected a plugin for one of the Race Assistants. This editor allows you to link a GPT service to this Assistant which can dramatically improve the conversation experience with the Assistant. Please see the separate [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for more information about the Assistant Booster.
 
 Last but not least, you will find an "Edit Labels & Icons..." button in the lower left corner of this tab. Pressing this button will open a special editor, which allows you to configure the language specific labels and icons for all controller actions. You will find more information on this in the [chapter on controller layout configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons).
 

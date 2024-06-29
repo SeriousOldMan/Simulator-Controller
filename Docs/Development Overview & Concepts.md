@@ -372,11 +372,15 @@ The instructions are used to provide the LLM of the Driving Coach with informati
 
 where *LC* stands for the language code.
 
-### Instructions for the GPT-based Conversation Boosters
+### Instructions for the GPT-based Assistant Boosters
 
-Very much like the Driving Coach, a GPT service can be used to extend the conversational capabilities fo the *normal* Race Assistants. In those cases, instructions are also used to create a setting for the LLM to behave like an Engineer, for example, and also to provide additional data about the current session, the state of the car, and so on, to the LLM. All instructions are used as defaults in the configuration and can be altered by the user here as well. The language specific default instructions can be found in *Resources\Translations* in the programm installation folder. They are named 
+Very much like the Driving Coach, a GPT service can be used to extend the conversational and behavioral capabilities fo the *normal* Race Assistants. In those cases, instructions are also used to create a setting for the LLM to behave like an Engineer, for example, and also to provide additional data about the current session, the state of the car, and so on, to the LLM. All instructions are used as defaults in the configuration and can be altered by the user here as well. The language specific default instructions can be found in *Resources\Translations* in the programm installation folder. They are named 
 
 	Conversation Booster.instructions.LC
+	
+	and
+	
+	Agent Booster.instructions.LC
 
 where *LC* stands for the language code.
 

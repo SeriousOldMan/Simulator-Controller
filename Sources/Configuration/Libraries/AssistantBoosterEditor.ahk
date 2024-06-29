@@ -967,15 +967,12 @@ class CallbacksEditor {
 
 		editorGui.SetFont("Norm", "Arial")
 
-		if (this.Type = "Conversation.Actions")
+		if ((this.Type = "Conversation.Actions") || (this.Type = "Agent.Actions"))
 			editorGui.Add("Documentation", "x368 YP+20 w128 H:Center Center", translate("Conversation Actions")
-						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-conversation-actions")
-		else if (this.Type = "Agent.Actions")
-			editorGui.Add("Documentation", "x368 YP+20 w128 H:Center Center", translate("Behavior Actions")
-						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-agent-actions")
+						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-booster-actions")
 		else
 			editorGui.Add("Documentation", "x368 YP+20 w128 H:Center Center", translate("Behavior Events")
-						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-agent-events")
+						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-booster-events")
 
 		editorGui.SetFont("Norm", "Arial")
 
@@ -1039,7 +1036,7 @@ class CallbacksEditor {
 
 		editorGui.SetFont("Norm", "Arial")
 
-		editorGui.Add("Button", "x350 yp+10 w80 h23 Default X:Move(0.5) Y:Move", translate("Ok")).OnEvent("Click", (*) => GetKeyState("Ctrl") ? this.showCallbacks() : this.iResult := kOk)
+		editorGui.Add("Button", "x350 yp+10 w80 h23 Default X:Move(0.5) Y:Move", translate("Ok")).OnEvent("Click", (*) => (GetKeyState("Ctrl") && (this.Type != "Agent.Events"))? this.showCallbacks() : (this.iResult := kOk))
 		editorGui.Add("Button", "x436 yp w80 h23 X:Move(0.5) Y:Move", translate("&Cancel")).OnEvent("Click", (*) => this.iResult := kCancel)
 
 		this.iParametersListView := editorGui.Add("ListView", "x430 ys w418 h96 X:Move(0.34) W:Grow(0.66) Y:Move(0.25) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Parameter", "Description"], translate))

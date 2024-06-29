@@ -2,7 +2,7 @@
 Active=damage_collected, rain_started, rain_stopped
 [Agent.Events.Builtin]
 damage_collected=Assistant.Class|DamageEvent|Damage||3|This event is triggered when the car collected new damage.
-rain_started=Assistant.Rule|Race Engineer.rain_start.rules|It just started raining.|RainStart|0|This event is triggered when it starts raining or will be raining in a few moments.
+rain_started=Assistant.Rule|Race Engineer.rain_start.rules|RainStart|It just started raining.|0|This event is triggered when it starts raining or will be raining in a few moments.
 rain_stopped=Assistant.Rule|Race Engineer.rain_stop.rules|RainStop|It just stopped raining.|0|This event is triggered when it stopped raining.
 [Agent.Events.Parameters]
 damage_collected.1=suspensionDamage|Boolean||true|Indicates whether new damage to the suspension occured.

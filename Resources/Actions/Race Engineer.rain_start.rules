@@ -7,6 +7,6 @@
 
 priority: -5, {All: [?Lap], [?Rain.Now != ?Rain.Last]} => (Prove: Rain.Start.updateRain(Rain.Last))
 
-Rain.Start.updateRain(?fact) <= !Weather.Weather.Now = Dry, !, Set(?fact, true)
-Rain.Start.updateRain(?fact) <= !Weather.Weather.Now = Drizzle, !, Set(?fact, true)
+Rain.Start.updateRain(?fact) <= !Weather.Weather.Now = Dry, !, Set(?fact, false)
+Rain.Start.updateRain(?fact) <= !Weather.Weather.Now = Drizzle, !, Set(?fact, false)
 Rain.Start.updateRain(?fact) <= Set(?fact, true)

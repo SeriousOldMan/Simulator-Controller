@@ -1401,7 +1401,7 @@ class RaceAssistant extends ConfigurationItem {
 					definition := string2Values("|", definition)
 					parameters := []
 
-					loop definition[4] {
+					loop definition[5] {
 						parameter := string2Values("|", getMultiMapValue(configuration, "Agent.Actions.Parameters", event . "." . A_Index, ""))
 
 						if (parameter.Length >= 5) {
@@ -1418,13 +1418,13 @@ class RaceAssistant extends ConfigurationItem {
 
 					switch definition[1], false {
 						case "Assistant.Class":
-							handler := %definition[3]%(this, definition[2], parameters)
+							handler := %definition[2]%(this, definition[3], parameters)
 						case "Assistant.Rule":
-							RuleCompiler().compileRules(FileRead(getFileName(definition[3], kUserHomeDirectory . "Actions\"
+							RuleCompiler().compileRules(FileRead(getFileName(definition[2], kUserHomeDirectory . "Actions\"
 																						  , kResourcesDirectory . "Actions\"))
 													  , &productions, &reductions, &includes)
 
-							handler := RuleEvent(this, definition[2], definition[6], parameters)
+							handler := RuleEvent(this, definition[3], definition[4], parameters)
 						default:
 							throw "Unknown event type (" definition[1] . ") detected in RaceAssistant.createAgentEvents..."
 					}

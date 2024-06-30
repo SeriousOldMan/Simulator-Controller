@@ -129,8 +129,14 @@ class AssistantEvent extends AgentEvent {
 		return arguments
 	}
 
-	createEvent(event, arguments) {
-		return event
+	createTrigger(event, phrase, arguments) {
+		local variables := CaseInsenseMap("event", event)
+		local index, parameter
+
+		for index, parameter in this.Parameters
+			variables[parameter.Name] := (arguments.Has(index) ? arguments[index] : "")
+
+		return substituteVariables(phrase, variables)
 	}
 
 	createGoal(goal, arguments) {
@@ -152,7 +158,7 @@ class AssistantEvent extends AgentEvent {
 		local booster := this.Assistant.AgentBooster
 
 		triggerEvent() {
-			return booster.trigger(this, this.createEvent(this.Event, arguments)
+			return booster.trigger(this, this.createTrigger(this.Event, this.Phrase, arguments)
 								 , this.createGoal(this.Goal, arguments)
 								 , Map("Variables", this.createVariables(event, arguments)))
 		}
@@ -182,14 +188,10 @@ class RuleEvent extends AssistantEvent {
 		}
 	}
 
-	__New(assistant, event, phrase, parameters, goal := false, options := false) {
+	__New(assistant, name, event, phrase, parameters, goal := false, options := false) {
 		this.iPhrase := phrase
 
-		super.__New(assistant, event, parameters, goal, options)
-	}
-
-	createEvent(event, arguments) {
-		return substituteVariables(this.Phrase, {event: event})
+		super.__New(assistant, name, event, parameters, goal, options)
 	}
 }
 
@@ -1410,7 +1412,7 @@ class RaceAssistant extends ConfigurationItem {
 					parameters := []
 
 					loop definition[5] {
-						parameter := string2Values("|", getMultiMapValue(configuration, "Agent.Actions.Parameters", event . "." . A_Index, ""))
+						parameter := string2Values("|", getMultiMapValue(configuration, "Agent.Events.Parameters", event . "." . A_Index, ""))
 
 						if (parameter.Length >= 5) {
 							enumeration := string2Values(",", parameter[3])
@@ -1420,7 +1422,8 @@ class RaceAssistant extends ConfigurationItem {
 
 							required := ((parameter[4] = kTrue) ? kTrue : ((parameter[4] = kFalse) ? false : parameter[4]))
 
-							parameters.Push(AgentEvent.Parameter(parameter[1], parameter[5], parameter[2], enumeration, required))
+							parameters.Push(AssistantEvent.Parameter(parameter[1], parameter[5], parameter[2]
+																   , enumeration, required))
 						}
 					}
 

@@ -37,7 +37,7 @@ class DamageEvent extends AssistantEvent {
 		return result
 	}
 
-	createEvent(event, arguments) {
+	createTrigger(event, phrase, arguments) {
 		local damage := []
 		local index, type
 

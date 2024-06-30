@@ -27,7 +27,7 @@
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class DamageEvent extends AgentEvent {
+class DamageEvent extends AssistantEvent {
 	createArguments(event, arguments) {
 		local result := []
 

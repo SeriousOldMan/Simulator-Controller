@@ -53,9 +53,10 @@ global kUnknown := false
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class AgentEvent {
+class AssistantEvent extends AgentEvent {
 	iAssistant := false
 
+	iName := false
 	iEvent := false
 	iGoal := false
 
@@ -69,6 +70,12 @@ class AgentEvent {
 	Assistant {
 		Get {
 			return this.iAssistant
+		}
+	}
+
+	Name {
+		Get {
+			return this.iName
 		}
 	}
 
@@ -102,9 +109,10 @@ class AgentEvent {
 		}
 	}
 
-	__New(assistant, event, parameters, goal := false, options := false) {
+	__New(assistant, name, event, parameters, goal := false, options := false) {
 		this.iAssistant := assistant
 
+		this.iName := name
 		this.iEvent := event
 		this.iGoal := goal
 
@@ -144,7 +152,7 @@ class AgentEvent {
 		local booster := this.Assistant.AgentBooster
 
 		triggerEvent() {
-			return booster.trigger(this.createEvent(this.Event, arguments)
+			return booster.trigger(this, this.createEvent(this.Event, arguments)
 								 , this.createGoal(this.Goal, arguments)
 								 , Map("Variables", this.createVariables(event, arguments)))
 		}
@@ -165,7 +173,7 @@ class AgentEvent {
 	}
 }
 
-class RuleEvent extends AgentEvent {
+class RuleEvent extends AssistantEvent {
 	iPhrase := false
 
 	Phrase {
@@ -1418,13 +1426,13 @@ class RaceAssistant extends ConfigurationItem {
 
 					switch definition[1], false {
 						case "Assistant.Class":
-							handler := %definition[2]%(this, definition[3], parameters)
+							handler := %definition[2]%(this, event, definition[3], parameters)
 						case "Assistant.Rule":
 							RuleCompiler().compileRules(FileRead(getFileName(definition[2], kUserHomeDirectory . "Actions\"
 																						  , kResourcesDirectory . "Actions\"))
 													  , &productions, &reductions, &includes)
 
-							handler := RuleEvent(this, definition[3], definition[4], parameters)
+							handler := RuleEvent(this, event, definition[3], definition[4], parameters)
 						default:
 							throw "Unknown event type (" definition[1] . ") detected in RaceAssistant.createAgentEvents..."
 					}

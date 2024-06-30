@@ -213,7 +213,7 @@ class ConversationBooster extends LLMBooster {
 		this.Options["Descriptor"] := descriptor
 		this.Options["Language"] := language
 
-		this.iTranscript := (normalizeDirectoryPath(transcripts) . "\" . descriptor . ".txt")
+		this.iTranscript := (normalizeDirectoryPath(transcripts) . "\" . descriptor . " Transcript.txt")
 
 		super.__New(configuration)
 
@@ -560,7 +560,17 @@ class ChatBooster extends ConversationBooster {
 
 	ask(question, options := false) {
 		local variables := false
-		local doTalk, code, language, instruction, variables
+		local doTalk, code, language, instruction, variables, calls
+
+		printCall(call) {
+			local arguments := call[2].Clone()
+
+			loop arguments.Length
+				if !arguments.Has(A_Index)
+					arguments[A_Index] := ""
+
+			return ("Call: " . call[1].Name . "(" . values2String(", ", arguments*) . ")")
+		}
 
 		if (this.Model && this.Active) {
 			code := this.Code
@@ -599,14 +609,15 @@ class ChatBooster extends ConversationBooster {
 																			  , variables)
 														  , substituteVariables(getMultiMapValue(instruction
 																							   , "Conversation.Instructions", "Knowledge")
-																			  , variables)])
+																			  , variables)]
+											   , false, &calls := [])
 
 					if (answer && (answer != true))
 						answer := this.normalizeAnswer(answer)
 
 					if (answer && (answer != "")) {
 						if (answer = true)
-							Task.startTask(() => FileAppend(translate("-- User --------") . "`n`n" . question . "`n`n" . translate("-- " . translate("Conversation") . " ---------") . "`n`n  -> " . translate("Function") . " <-`n`n", this.Transcript, "UTF-16"), 0, kLowPriority)
+							Task.startTask(() => FileAppend(translate("-- User --------") . "`n`n" . question . "`n`n" . translate("-- " . translate("Conversation") . " ---------") . "`n`n" . values2String("`n", collect(calls, printCall)*) . "`n`n", this.Transcript, "UTF-16"), 0, kLowPriority)
 						else
 							Task.startTask(() => FileAppend(translate("-- User --------") . "`n`n" . question . "`n`n" . translate("-- " . translate("Conversation") . " ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16"), 0, kLowPriority)
 

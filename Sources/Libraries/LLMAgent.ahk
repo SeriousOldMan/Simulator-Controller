@@ -29,6 +29,20 @@
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+class AgentEvent {
+	Name {
+		Get {
+			throw "Virtual property AgentEvent.Name must be implemented in a subclass..."
+		}
+	}
+
+	Event {
+		Get {
+			throw "Virtual property AgentEvent.Event must be implemented in a subclass..."
+		}
+	}
+}
+
 class AgentBooster extends LLMBooster {
 	iManager := false
 
@@ -131,7 +145,7 @@ class AgentBooster extends LLMBooster {
 		this.Options["Descriptor"] := descriptor
 		this.Options["Language"] := language
 
-		this.iTranscript := (normalizeDirectoryPath(transcripts) . "\" . descriptor . ".txt")
+		this.iTranscript := (normalizeDirectoryPath(transcripts) . "\" . descriptor . " Transcript.txt")
 
 		super.__New(configuration)
 
@@ -176,9 +190,19 @@ class AgentBooster extends LLMBooster {
 }
 
 class EventBooster extends AgentBooster {
-	trigger(event, goal := false, options := false) {
+	trigger(event, trigger, goal := false, options := false) {
 		local variables := false
-		local doTrigger, code, language, instruction, variables, target, answer
+		local doTrigger, code, language, instruction, variables, target, answer, calls
+
+		printCall(call) {
+			local arguments := call[2].Clone()
+
+			loop arguments.Length
+				if !arguments.Has(A_Index)
+					arguments[A_Index] := ""
+
+			return ("Call: " . call[1].Name . "(" . values2String(", ", arguments*) . ")")
+		}
 
 		if (this.Model && this.Active) {
 			code := this.Code
@@ -210,7 +234,7 @@ class EventBooster extends AgentBooster {
 					else
 						variables := {language: language ? language : ""}
 
-					variables.event := event
+					variables.event := trigger
 
 					instruction := this.Instructions[code]
 
@@ -231,10 +255,11 @@ class EventBooster extends AgentBooster {
 																	, variables)
 												, substituteVariables(getMultiMapValue(instruction
 																					 , "Agent.Instructions", "Knowledge")
-																	, variables)])
+																	, variables)]
+											   , false, &calls := [])
 
 					if (answer = true) {
-						Task.startTask(() => FileAppend(translate("-- Event --------") . "`n`n" . question . "`n`n" . translate("-- " . translate("Reasoning") . " ---------") . "`n`n  -> " . translate("Function") . " <-`n`n", this.Transcript, "UTF-16"), 0, kLowPriority)
+						Task.startTask(() => FileAppend(translate("-- Event --------") . "`n`n" . ((event.Name . ":" . event.Event) . " -> " . trigger) . "`n`n" . translate("-- " . translate("Reasoning") . " ---------") . "`n`n" . values2String("`n", collect(calls, printCall)*) . "`n`n", this.Transcript, "UTF-16"), 0, kLowPriority)
 
 						return true
 					}

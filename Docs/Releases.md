@@ -8,6 +8,7 @@
 	 - The LLM then can use any of the predefined actions or actions defined on your own to handle this event or situation.
 	 - Actions triggered this way can raise other events, thereby creating a complex chain of thought for the LLM.
   6. The transcript of LLM invocations in any Assistant Booster now includes the events raised and actions invoked. Transcripts of Assistant Boosters are normally stored in the *Simulator Controller\Logs* folder, which is located in the user *Documents* folder.
+  7. [Internal] Implemented a postprocessor for the compiler which compreesses the binary files. The applications are much smaller now.
 
 ## 5.7.8.0-release 06/28/24 (planned)
   1. Minor bugfixes, as always

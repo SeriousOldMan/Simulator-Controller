@@ -52,7 +52,8 @@ global kUpdateMessages := CaseInsenseMap("updateTranslations", "Updating transla
 									   , "updateActionIcons", "Updating action icons to "
 									   , "updatePhraseGrammars", "Updating phrase grammars to ")
 
-global kCompiler := (kAHKDirectory . "Compiler\ahk2exe.exe")
+global kDevelopmentCompiler := (kAHKDirectory . "Compiler\ahk2exe.exe")
+global kProductionCompiler := (kAHKDirectory . "Compiler\ahk2exe.exe /compress 2")
 
 global kSave := "save"
 global kRevert := "revert"
@@ -3165,22 +3166,22 @@ runBuildTargets(&buildProgress) {
 
 						FileAppend(sourceCode, sourceDirectory . "\compile.ahk")
 
-						result := RunWait(kCompiler . options . " /in `"" . sourceDirectory . "\compile.ahk" . "`"")
+						result := RunWait(kProductionCompiler . options . " /in `"" . sourceDirectory . "\compile.ahk" . "`"")
 
 						deleteFile(sourceDirectory . "\compile.ahk")
 					}
 					else
-						result := RunWait(kCompiler . options . " /in `"" . targetSource . "`"")
+						result := RunWait(kDevelopmentCompiler . options . " /in `"" . targetSource . "`"")
 
 					if !result
 						break
 				}
 			}
 			catch Any as exception {
-				logMessage(kLogCritical, translate("Cannot compile ") . targetSource . translate(" - source file or AHK Compiler (") . kCompiler . translate(") not found"))
+				logMessage(kLogCritical, translate("Cannot compile ") . targetSource . translate(" - source file or AHK Compiler (") . kDevelopmentCompiler . translate(") not found"))
 
-				showMessage(substituteVariables(translate("Cannot compile %targetSource%: Source file or AHK Compiler (%kCompiler%) not found...")
-											  , {targetSource: targetSource, kCompiler: kCompiler})
+				showMessage(substituteVariables(translate("Cannot compile %targetSource%: Source file or AHK Compiler (%compiler%) not found...")
+											  , {targetSource: targetSource, compiler: kDevelopmentCompiler})
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 
 				result := true

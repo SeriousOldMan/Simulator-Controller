@@ -16,4 +16,4 @@
 #Include "Race Engineer Configuration Plugin.ahk"
 #Include "Race Strategist Configuration Plugin.ahk"
 #Include "Race Spotter Configuration Plugin.ahk"
-#Include "Team Server Configuration Plugin.ahk"
+; #Include "Team Server Configuration Plugin.ahk"

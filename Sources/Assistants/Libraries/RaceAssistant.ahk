@@ -105,7 +105,7 @@ class AssistantEvent extends AgentEvent {
 
 	Asynchronous {
 		Get {
-			return true
+			return false
 		}
 	}
 

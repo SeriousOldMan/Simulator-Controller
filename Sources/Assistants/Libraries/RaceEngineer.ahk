@@ -28,6 +28,12 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class DamageEvent extends AssistantEvent {
+	Asynchronous {
+		Get {
+			return true
+		}
+	}
+
 	createArguments(event, arguments) {
 		local result := []
 

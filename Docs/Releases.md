@@ -1,3 +1,14 @@
+## 5.8.0.0-release 08/02/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Renamed "Conversation Booster" to "Assistant Booster" throughout the documentation.
+  4. All documentation regarding the different Assistant Boosters has been collected into a dedicated [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants).
+  5. A new Assistant Booster has been implemented, which let you integrate an LLM into the reasoning process of an Assistant.
+     - Events raised by the rule system of an Assistant or by rules defined on your own can be used to create a request to an LLM.
+	 - The LLM then can use any of the predefined actions or actions defined on your own to handle this event or situation.
+	 - Actions triggered this way can raise other events, thereby creating a complex chain of thought for the LLM.
+  6. The transcript of LLM invocations in any Assistant Booster now includes the events raised and actions invoked. Transcripts of Assistant Boosters are normally stored in the *Simulator Controller\Logs* folder, which is located in the user *Documents* folder.
+
 ## 5.7.8.0-release 06/28/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

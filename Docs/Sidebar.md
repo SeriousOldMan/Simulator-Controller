@@ -200,6 +200,18 @@
   - [Track Mapping](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-mapping)
   - [Track Automations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-automations)
 
+[Customizing Assitants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants)
+------
+  - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#introduction)
+  - [Booster Overview](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#overview-of-the-different-assistant-boosters)
+    - [Rephrasing](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#rephrasing-booster)
+    - [Understanding](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#understanding-booster)
+    - [Conversation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#conversation-booster)
+    - [Reasoning](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster)
+  - [Instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#instructions)
+  - [Managing Actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions)
+  - [Managing Events](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-events)
+
 [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server)
 ------
   - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#introduction)

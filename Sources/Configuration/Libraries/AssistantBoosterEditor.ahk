@@ -969,13 +969,13 @@ class CallbacksEditor {
 
 		if (this.Type = "Conversation.Actions")
 			editorGui.Add("Documentation", "x308 YP+20 w248 H:Center Center", translate("Conversation Actions")
-						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-booster-actions")
+						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-actions")
 		else if (this.Type = "Agent.Actions")
 			editorGui.Add("Documentation", "x308 YP+20 w248 H:Center Center", translate("Reasoning Actions")
-						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-booster-actions")
+						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-actions")
 		else
 			editorGui.Add("Documentation", "x308 YP+20 w248 H:Center Center", translate("Reasoning Events")
-						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-booster-events")
+						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-events")
 
 		editorGui.SetFont("Norm", "Arial")
 

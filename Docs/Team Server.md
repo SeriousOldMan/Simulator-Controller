@@ -452,7 +452,7 @@ Last, but not least, the last page shows you a list of all data currently stored
 
 To get the best possible reesults in "Race Center", the Virtual Race Engineer as well as the Virtual Race Strategist must be enabled in your configuration. Jona will take care of the pitstops and the corresponding data like tyre pressures, fuel level, etc. and Cato is responsible to acquire all performance related telemetry data and the critical knowledge about the performance of your oppenents. When you start a team session as described above, Jona and Cato will act and behave as in a single driver session, though you might notice subtle differences. For example, a new driver will be greated by the Assistants after a driver swap or a returning driver will get a warm welcome. But the important differences are all below the waterline.
 
-  1. Handover of the Knowledgebase
+  1. Handover of the Knowledge Base
   
 	 Jona and Cato both have a working memory, which stores the current state and is used to derive the recommendations and to control the actions of the Assistants. This data is held locally in memory in the "Race Engineer" and "Race Strategist" processes of the current driver. During a pitstop, copies of the complete working memory of the Race Assistants of the current driver are transferred to the *Team Server* and stored there in a database. After the next driver has picked up the car, this copies are requested from the central server and are used to initialize the working memory of the Race Assistants of this driver. This happens completely in the background.
 

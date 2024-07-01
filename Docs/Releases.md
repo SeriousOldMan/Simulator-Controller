@@ -1,3 +1,14 @@
+## 5.8.0.0-release 08/02/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Renamed "Conversation Booster" to "Assistant Booster" throughout the documentation.
+  4. All documentation regarding the different Assistant Boosters has been collected into a dedicated [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants).
+  5. A new Assistant Booster has been implemented, which let you integrate an LLM into the reasoning process of an Assistant.
+     - Events raised by the rule system of an Assistant or by rules defined on your own can be used to create a request to an LLM.
+	 - The LLM then can use any of the predefined actions or actions defined on your own to handle this event or situation.
+	 - Actions triggered this way can raise other events, thereby creating a complex chain of thought for the LLM.
+  6. The transcript of LLM invocations in any Assistant Booster now includes the events raised and actions invoked. Transcripts of Assistant Boosters are normally stored in the *Simulator Controller\Logs* folder, which is located in the user *Documents* folder.
+
 ## 5.7.8.0-release 06/28/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
@@ -40,7 +51,7 @@
   
      Please note, that using *Actions* is not enabled by default, but must be explicitly activated in the configuration.
   6. Action definition files are customizeable in the [Documents]\Simulator Controller\Actions folder.
-  7. An editor has been implemented to enable or disable the predefined *Conversation* or *Behavior* actions and even define your own ones. But this will require extensive knowledge of the inner workings of Simulator Controller and the Assistants and also a very good understanding how LLMs work. You have been warned. Please see the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-booster-actions) for more information.
+  7. An editor has been implemented to enable or disable the predefined *Conversation* or *Behavior* actions and even define your own ones. But this will require extensive knowledge of the inner workings of Simulator Controller and the Assistants and also a very good understanding how LLMs work. You have been warned. Please see the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions) for more information.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-576), if you have configured the Conversation Booster for the Assistants.
 
@@ -110,9 +121,9 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   3. Fixed automatic installation of the French language pack for voice recognition by "Simulator Setup".
   4. Fixed calculation of remaining stint time, if driver time is less than stint time.
   5. The configuration of the *Push-To-Talk* button now supports a test mode, which starts two Assistants, so that you can play with the *Push-To-Talk* button. Depending on the chosen recognizer it might be necessary to use the double-press for activation commands, when using the test mode (see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#activation-commands-vs-normal-commands) for more information).
-  6. The Driving Coach now also has access to the car telemetry data from the general knowledgebase. It therefore is theoretically able to correlate degrading lap times with over the top tyre temperatures, for example.
+  6. The Driving Coach now also has access to the car telemetry data from the general knowledge base. It therefore is theoretically able to correlate degrading lap times with over the top tyre temperatures, for example.
   7. The default context window size for an LLM has been increased to 2k tokens in the Driving Coach configuration.
-  8. The next feature of the AI-based booster for the Assistants now integrates a general conversation capability. Every voice command, that cannot be matched against the list of predefined, pattern-based commands, will be forwarded to the GPT service for a general conversation. The LLM has full access to the knowledgebase of the Assistant, incl. telemetry data, standings and position data, and so on. The exact knowledge will vary with the type of the Assistant (Engineer, Strategist, ...). See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for more information.
+  8. The next feature of the AI-based booster for the Assistants now integrates a general conversation capability. Every voice command, that cannot be matched against the list of predefined, pattern-based commands, will be forwarded to the GPT service for a general conversation. The LLM has full access to the knowledge base of the Assistant, incl. telemetry data, standings and position data, and so on. The exact knowledge will vary with the type of the Assistant (Engineer, Strategist, ...). See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for more information.
   9. Configuration of the Conversation Booster is now also possible using "Simulator Configuration". See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) for more information.
   10. [*Mistral AI*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#mistral-ai) has been added to the list of supported GPT service providers.
   11. Added "GPT-4o" to the list of OpenAI models.
@@ -1718,7 +1729,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   20. All controller preview windows remember their position after being moved with the mouse in "Simulator Setup", as long as the application is not terminated.
   21. It is now possible to send external commands to the central "Simulator Controller" background process to trigger controller actions. See the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#external-commands) for more information.
   22. Temp and Logs folders will be cleaned automatically when an update is installed.
-  23. New options in the Tray menu allow you to dump the knowledgebase and the rule set of various applications  and the position and gap data for the "Race Spotter" as well as trace grammars and recognitions in the "Voice Server". You also have commands to delete the temporary files and the log files.
+  23. New options in the Tray menu allow you to dump the knowledge base and the rule set of various applications  and the position and gap data for the "Race Spotter" as well as trace grammars and recognitions in the "Voice Server". You also have commands to delete the temporary files and the log files.
   24. Significantly reduced CPU consumption of the "Simulator Controller" background process.
   25. Transposed some tables in "Race Center" and "Strategy Workbench" for better readability with many stints.
   26. [For Developer] New Task management system for concurrent processing. All applications have been fully rewritten to utilize the new Task model.

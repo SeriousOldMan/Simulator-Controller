@@ -222,9 +222,15 @@ As you can see, you can define new voice commands by defining a corresponding ac
 
 That said, it depends on the available data in the knowledge base, whether the LLM will decide to trigger this action or not. If the LLM refuses to do so, you still have all the traditional voice commands and the controller actions at your disposal.
 
-Beside the predefined actions for the Engineer, which come with the standard installation as listed above, you can also define your own actions. But this will require a very deep knowledge of the inner workings of Simulator Controller and the Assistants. You have been warned. If you want to try this, check out the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for the "Conversation" booster.
+Beside the predefined actions for the Engineer, which come with the standard installation as listed above, you can also define your own actions. But this will require a very deep knowledge of the inner workings of Simulator Controller and the Assistants. You have been warned. If you want to try this, check out the dedicated [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) for the "Conversation" booster.
 
-IMPORTANT: When action handling is enabled, it might be necessary to disable the "Recognition" booster or at least set the "Creativity" to a very low value. Otherwise the "Recognition" booster might detect a command pattern, which will match to a pre-defined voice command, thereby preventing the LLM from crating a custom action plan.
+IMPORTANT: When action handling is enabled, it might be necessary to disable the "Recognition" booster or at least set the "Creativity" to a very low value. Otherwise the "Recognition" booster might detect a command pattern, which will match to a pre-defined voice command, thereby preventing the LLM from creating a custom action plan.
+
+##### Trigger events during reasoning
+
+Very similar, you can use an LLM to alter or extend the reasoning process of an Assistant. In the reasoning process, events are raised, which then causes the Assistant to react upon them. Events and actions are normally being implemented in the rule system, but it is also prossible to raise an event, which then is inspected by an LLM, possibly taking action using the supplied actions similar to the actions used the conversation as described above.
+
+For a complete description of events and actions, see the dedicated [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants).
 
 ### Enabling and disabling specific warnings and announcements
 
@@ -784,7 +790,7 @@ It is important to understand, that in all cases only data that you created your
 
 This section will give you some background information about the inner workings of Jona. To understand the most of it, you need some background knowledge about programming. Therefore, if you never have coded just a tiny bit, you can safely skip this section.
 
-The most important part of Jona, beside the natural language interface, which has been described above, is the rule engine and the knowledgebase, the rules work with. The major part of the knowledgebase consists of a history of past events, which is used by the rules to give Jona a kind of memory and allows the bot to interact in a context-sensitive manner. The history is also used by the rules to infere future trends, for example, a projection of target tyre pressures for long stints in an evening session, when the air and track temperatures are falling. Past and future weather trend information will be integrated as well, when they are available. Jona is able to recommend whether a repair of a damage be worth of for the next pitstop by calculating the historic impact of the damage on your lap time, and so on. Not all of this has been implemented completely in the alpha version of Jona, but the genetics are all there.
+The most important part of Jona, beside the natural language interface, which has been described above, is the rule engine and the knowledge base, the rules work with. The major part of the knowledge base consists of a history of past events, which is used by the rules to give Jona a kind of memory and allows the bot to interact in a context-sensitive manner. The history is also used by the rules to infere future trends, for example, a projection of target tyre pressures for long stints in an evening session, when the air and track temperatures are falling. Past and future weather trend information will be integrated as well, when they are available. Jona is able to recommend whether a repair of a damage be worth of for the next pitstop by calculating the historic impact of the damage on your lap time, and so on. Not all of this has been implemented completely in the alpha version of Jona, but the genetics are all there.
 
 Below you will find some information about the rule engine and the knowledge base, although this is not a complete documentation at all for the moment.
 

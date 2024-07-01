@@ -61,7 +61,7 @@ Normally an Assistant will tell you that he didn't understand you, when the spok
 
 (1) Depending on the availabilty of the data by the current simulator.
 
-Since large parts of the knowledgebase of the Assistants will be supplied to the LLM for matching, a context window of at least 4k tokens is required for this booster. Full standings history isn't possible at the moment, since this will overflow the input context area of the LLM, at least for the *smaller* models like GPT 3.5, Mistral 7b, and so on. Time will cure this problem, and I will update the capabilities of the integration, when more capable models become available. For the time being, the position data is available for the most recent laps and also the gaps for the most important opponents are passed to the LLM (for Strategist and Spotter).
+Since large parts of the knowledge base of the Assistants will be supplied to the LLM for matching, a context window of at least 4k tokens is required for this booster. Full standings history isn't possible at the moment, since this will overflow the input context area of the LLM, at least for the *smaller* models like GPT 3.5, Mistral 7b, and so on. Time will cure this problem, and I will update the capabilities of the integration, when more capable models become available. For the time being, the position data is available for the most recent laps and also the gaps for the most important opponents are passed to the LLM (for Strategist and Spotter).
 
 Additionally, you can allow the LLM to call [predefined or custom actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-actions) as a result of your conversation. For example, if you ask the Strategist whether an undercut might be possible in one of the next laps, the LLM may call the Monte Carlo traffic simulation using an internal action. Which actions will be available to the LLM depends on the current Assistant. See corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#trigger-actions-from-conversation) for the Strategist for an example.
 	 
@@ -97,12 +97,12 @@ Below you find all instruction categories and the supported variables:
 | Conversation   | Character         | Scope             | This instruction is used when a voice command has been recognized, which cannot be mapped to one of the predefined command patterns, even after using the LLM to map the command semantically. It is assumed that the user wants a free conversation with the LLM. This instruction then defines the profession and the personality of the Assistant. You can also include general instructions like "Keep your answers short and precise", and so on. |
 |                |                   | %assistant%       | The type or role of the current Assistant, for example "Race Engineer". |
 |                |                   | %name%            | Specifies the name of the Assistant. |
-|                | Knowledge         | Scope             | This instruction is used to supply the current content of the knowledgebase to the LLM. The content of the knowledgebase depends on the type of the Assistant. |
-|                |                   | %knowledge%       | This variable is substituted with the content of the knowledgebase in a self-explaining JSON format. |
+|                | Knowledge         | Scope             | This instruction is used to supply the current content of the knowledge base to the LLM. The content of the knowledge base depends on the type of the Assistant. |
+|                |                   | %knowledge%       | This variable is substituted with the content of the knowledge base in a self-explaining JSON format. |
 | Reasoning      | Character         | Scope             | This instruction is used when an event has been raised by the rule engine. The LLM must decide which of the provided actions shall be used to deal with the situaton. |
 |                |                   | %assistant%       | The type or role of the current Assistant, for example "Race Engineer". |
-|                | Knowledge         | Scope             | This instruction is used to supply the current content of the knowledgebase to the LLM. The content of the knowledgebase depends on the type of the Assistant. |
-|                |                   | %knowledge%       | This variable is substituted with the content of the knowledgebase in a self-explaining JSON format. |
+|                | Knowledge         | Scope             | This instruction is used to supply the current content of the knowledge base to the LLM. The content of the knowledge base depends on the type of the Assistant. |
+|                |                   | %knowledge%       | This variable is substituted with the content of the knowledge base in a self-explaining JSON format. |
 |                | Event             | Scope             | The event represents the main instruction for the LLM, which describes what just happened or how the situation has changed. |
 |                |                   | %event%           | This variable is substituted by the phrase which describes the event. Example: "It just started raining.". This phrase is defined by the event code for a builtin event or the event definition for a custom event. |
 |                | Goal              | Scope             | The goal supplies additional information to the LLM by some builtin events, which helps the LLM to come up with a good conclusion. |
@@ -224,5 +224,18 @@ As you can see, this editor looks very similar to the actions editor discussed a
    - Assistant.Raise(signal, p1, p2, ...)
    
      Raises the given *signal*, thereby identifying the event to be processed by the LLM.
-	 
-Please take a look at the predefined events of the Rae Engineer to learn more about writing event rules. And I recommend to take a look at the knowledgebase of a session to learn more about all the facts you canuse in the event rules (and also the action rules). To do this, activate the "Debug Knowledgebase" item in the tray bar menu of a given Assistant applicaton. Then open the corrsponding "*.knowledge" file in the *Simulator Controller\Temp* folder which is located in your user *Documents* folder.
+
+Here is an example of a few rules that together detect that it just started raining. Then the event "RainStart" is signalled to the LLM, which then can react and switch on the wiper, for example.
+
+	{None: [?Rain.Last]} => (Prove: Rain.Start.updateRain(Rain.Last))
+
+	{All: [?Lap], {Prove: Rain.Stop.updateRain(Rain.Now)},
+		  [?Rain.Now != ?Rain.Last], [?Rain.Now = true]} => (Call: Assistant.Raise(RainStart))
+
+	priority: -5, {All: [?Lap], [?Rain.Now != ?Rain.Last]} => (Prove: Rain.Start.updateRain(Rain.Last))
+
+	Rain.Start.updateRain(?fact) <= !Weather.Weather.Now = Dry, !, Set(?fact, false)
+	Rain.Start.updateRain(?fact) <= !Weather.Weather.Now = Drizzle, !, Set(?fact, false)
+	Rain.Start.updateRain(?fact) <= Set(?fact, true)
+
+Please also take a look at the other predefined events of the Race Engineer or the other Assistants to learn more about writing event rules. And I recommend to take a look at the knowledge base of a session to learn more about all the facts you canuse in the event rules (and also the action rules). To do this, activate the "Debug Knowledgebase" item in the tray bar menu of a given Assistant applicaton. Then open the corrsponding "*.knowledge" file in the *Simulator Controller\Temp* folder which is located in your user *Documents* folder.

@@ -3407,54 +3407,57 @@ class PracticeCenter extends ConfigurationItem {
 		if ((lap.FuelConsumption = "-") && (isNumber(fuelConsumption) && (fuelConsumption > 0)))
 			lap.FuelConsumption := fuelConsumption
 
-		while (tyresTable.Length < (lap.Nr - 1)) {
-			recentLap := this.Laps[tyresTable.Length + 1]
-			telemetry := recentLap.Data
+		while (tyresTable.Length < (lap.Nr - 1))
+			if this.Laps.Has(tyresTable.Length + 1) {
+				recentLap := this.Laps[tyresTable.Length + 1]
+				telemetry := recentLap.Data
 
-			tyreLaps := (recentLap.Run.TyreLaps + (recentLap.Nr - recentLap.Run.Lap) + 2)
+				tyreLaps := (recentLap.Run.TyreLaps + (recentLap.Nr - recentLap.Run.Lap) + 2)
 
-			telemetryData := [simulator, car, track
-							, getMultiMapValue(telemetry, "Weather Data", "Weather", "Dry")
-							, getMultiMapValue(telemetry, "Weather Data", "Temperature", 23)
-							, getMultiMapValue(telemetry, "Track Data", "Temperature", 27)
-							, "-"
-							, getMultiMapValue(telemetry, "Car Data", "FuelRemaining", "-")
-							, getMultiMapValue(telemetry, "Stint Data", "LapLastTime", "-")
-							, "-"
-							, getMultiMapValue(telemetry, "Car Data", "Map", "n/a")
-							, getMultiMapValue(telemetry, "Car Data", "TC", "n/a")
-							, getMultiMapValue(telemetry, "Car Data", "ABS", "n/a")
-							, getMultiMapValue(telemetry, "Car Data", "TyreCompound", "Dry")
-							, getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor", "Black")
-							, tyreLaps
-							, getMultiMapValue(telemetry, "Car Data", "TyrePressure", "-,-,-,-")
-							, getMultiMapValue(telemetry, "Car Data", "TyreTemperature", "-,-,-,-")
-							, getMultiMapValue(telemetry, "Car Data", "TyreWear", "null,null,null,null")
-							, "Unknown"]
+				telemetryData := [simulator, car, track
+								, getMultiMapValue(telemetry, "Weather Data", "Weather", "Dry")
+								, getMultiMapValue(telemetry, "Weather Data", "Temperature", 23)
+								, getMultiMapValue(telemetry, "Track Data", "Temperature", 27)
+								, "-"
+								, getMultiMapValue(telemetry, "Car Data", "FuelRemaining", "-")
+								, getMultiMapValue(telemetry, "Stint Data", "LapLastTime", "-")
+								, "-"
+								, getMultiMapValue(telemetry, "Car Data", "Map", "n/a")
+								, getMultiMapValue(telemetry, "Car Data", "TC", "n/a")
+								, getMultiMapValue(telemetry, "Car Data", "ABS", "n/a")
+								, getMultiMapValue(telemetry, "Car Data", "TyreCompound", "Dry")
+								, getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor", "Black")
+								, tyreLaps
+								, getMultiMapValue(telemetry, "Car Data", "TyrePressure", "-,-,-,-")
+								, getMultiMapValue(telemetry, "Car Data", "TyreTemperature", "-,-,-,-")
+								, getMultiMapValue(telemetry, "Car Data", "TyreWear", "null,null,null,null")
+								, "Unknown"]
 
-			recentLap.State := "Unknown"
-			recentLap.TelemetryData := values2String("|||", telemetryData*)
+				recentLap.State := "Unknown"
+				recentLap.TelemetryData := values2String("|||", telemetryData*)
 
-			if (electronicsTable.Length < recentLap.Nr)
-				telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6]
-											 , telemetryData[14], telemetryData[15]
-											 , telemetryData[11], telemetryData[12], telemetryData[13]
-											 , kNull, telemetryData[8], telemetryData[9], driverID)
+				if (electronicsTable.Length < recentLap.Nr)
+					telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6]
+												 , telemetryData[14], telemetryData[15]
+												 , telemetryData[11], telemetryData[12], telemetryData[13]
+												 , kNull, telemetryData[8], telemetryData[9], driverID)
 
-			pressuresData := collect(string2Values(",", telemetryData[16]), null)
-			temperaturesData := collect(string2Values(",", telemetryData[17]), null)
-			wearData := collect(string2Values(",", telemetryData[18]), null)
+				pressuresData := collect(string2Values(",", telemetryData[16]), null)
+				temperaturesData := collect(string2Values(",", telemetryData[17]), null)
+				wearData := collect(string2Values(",", telemetryData[18]), null)
 
-			if (tyresTable.Length < recentLap.Nr)
-				telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]
-									   , telemetryData[14], telemetryData[15], tyreLaps
-									   , pressuresData[1], pressuresData[2], pressuresData[3], pressuresData[4]
-									   , temperaturesData[1], temperaturesData[2], temperaturesData[3], temperaturesData[4]
-									   , wearData[1], wearData[2], wearData[3], wearData[4], kNull, telemetryData[8], telemetryData[9]
-									   , driverID)
+				if (tyresTable.Length < recentLap.Nr)
+					telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]
+										   , telemetryData[14], telemetryData[15], tyreLaps
+										   , pressuresData[1], pressuresData[2], pressuresData[3], pressuresData[4]
+										   , temperaturesData[1], temperaturesData[2], temperaturesData[3], temperaturesData[4]
+										   , wearData[1], wearData[2], wearData[3], wearData[4], kNull, telemetryData[8], telemetryData[9]
+										   , driverID)
 
-			this.modifyLap(recentLap)
-		}
+				this.modifyLap(recentLap)
+			}
+			else
+				break
 
 		lap.State := state
 

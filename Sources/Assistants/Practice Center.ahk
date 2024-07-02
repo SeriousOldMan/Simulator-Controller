@@ -297,6 +297,8 @@ class PracticeCenter extends ConfigurationItem {
 		iPracticeCenter := false
 		iTelemetryDatabase := false
 
+		iLaps := CaseInsenseWeakMap()
+
 		PracticeCenter {
 			Get {
 				return this.iPracticeCenter
@@ -306,6 +308,16 @@ class PracticeCenter extends ConfigurationItem {
 		TelemetryDatabase {
 			Get {
 				return this.iTelemetryDatabase
+			}
+		}
+
+		Laps[key?] {
+			Get {
+				return (isSet(key) ? this.iLaps[key] : this.iLaps)
+			}
+
+			Set {
+				return (isSet(key) ? (this.iLaps[key] := value) : (this.iLaps := value))
 			}
 		}
 
@@ -475,9 +487,21 @@ class PracticeCenter extends ConfigurationItem {
 	class SessionPressuresDatabase {
 		iDatabase := false
 
+		iLaps := CaseInsenseWeakMap()
+
 		Database {
 			Get {
 				return this.iDatabase
+			}
+		}
+
+		Laps[key?] {
+			Get {
+				return (isSet(key) ? this.iLaps[key] : this.iLaps)
+			}
+
+			Set {
+				return (isSet(key) ? (this.iLaps[key] := value) : (this.iLaps := value))
 			}
 		}
 
@@ -3379,11 +3403,10 @@ class PracticeCenter extends ConfigurationItem {
 			   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
 			   , compound, compoundColor, pressures, temperatures, wear, state) {
 		local telemetryDB := this.TelemetryDatabase
-		local electronicsTable := this.TelemetryDatabase.Database.Tables["Electronics"]
 		local tyresTable := this.TelemetryDatabase.Database.Tables["Tyres"]
 		local driver := lap.Run.Driver
 		local telemetry, telemetryData, pressuresData, temperaturesData, wearData, recentLap, tyreLaps
-		local newRun, oldRun, driverID
+		local newRun, oldRun, driverID, baseLap, lastLap
 
 		this.initializeSimulator(simulator, car, track)
 
@@ -3407,10 +3430,16 @@ class PracticeCenter extends ConfigurationItem {
 		if ((lap.FuelConsumption = "-") && (isNumber(fuelConsumption) && (fuelConsumption > 0)))
 			lap.FuelConsumption := fuelConsumption
 
-		while (tyresTable.Length < (lap.Nr - 1))
-			if this.Laps.Has(tyresTable.Length + 1) {
-				recentLap := this.Laps[tyresTable.Length + 1]
-				telemetry := recentLap.Data
+		lastLap := (lap.Nr - 1)
+		baseLap := tyresTable.Length
+
+		loop (lastLap - baseLap) {
+			recentLap := (baseLap + A_Index)
+
+			if (this.Laps.Has(recentLap) && !telemetryDB.Laps.Has(recentLap)) {
+				telemetryDB.Laps[recentLap] := (tyresTable.Length + 1)
+
+				recentLap := this.Laps[recentLap]
 
 				tyreLaps := (recentLap.Run.TyreLaps + (recentLap.Nr - recentLap.Run.Lap) + 2)
 
@@ -3436,28 +3465,25 @@ class PracticeCenter extends ConfigurationItem {
 				recentLap.State := "Unknown"
 				recentLap.TelemetryData := values2String("|||", telemetryData*)
 
-				if (electronicsTable.Length < recentLap.Nr)
-					telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6]
-												 , telemetryData[14], telemetryData[15]
-												 , telemetryData[11], telemetryData[12], telemetryData[13]
-												 , kNull, telemetryData[8], telemetryData[9], driverID)
+				telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6]
+											 , telemetryData[14], telemetryData[15]
+											 , telemetryData[11], telemetryData[12], telemetryData[13]
+											 , kNull, telemetryData[8], telemetryData[9], driverID)
 
 				pressuresData := collect(string2Values(",", telemetryData[16]), null)
 				temperaturesData := collect(string2Values(",", telemetryData[17]), null)
 				wearData := collect(string2Values(",", telemetryData[18]), null)
 
-				if (tyresTable.Length < recentLap.Nr)
-					telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]
-										   , telemetryData[14], telemetryData[15], tyreLaps
-										   , pressuresData[1], pressuresData[2], pressuresData[3], pressuresData[4]
-										   , temperaturesData[1], temperaturesData[2], temperaturesData[3], temperaturesData[4]
-										   , wearData[1], wearData[2], wearData[3], wearData[4], kNull, telemetryData[8], telemetryData[9]
-										   , driverID)
+				telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]
+									   , telemetryData[14], telemetryData[15], tyreLaps
+									   , pressuresData[1], pressuresData[2], pressuresData[3], pressuresData[4]
+									   , temperaturesData[1], temperaturesData[2], temperaturesData[3], temperaturesData[4]
+									   , wearData[1], wearData[2], wearData[3], wearData[4], kNull, telemetryData[8], telemetryData[9]
+									   , driverID)
 
 				this.modifyLap(recentLap)
 			}
-			else
-				break
+		}
 
 		lap.State := state
 
@@ -3467,21 +3493,21 @@ class PracticeCenter extends ConfigurationItem {
 												, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
 												, compound, compoundColor, tyreLaps, pressures, temperatures, wear, state)
 
-		if (electronicsTable.Length < lap.Nr)
-			telemetryDB.addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor
-										 , map, tc, abs, fuelConsumption, fuelRemaining, lapTime
-										 , driverID)
+		telemetryDB.addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor
+									 , map, tc, abs, fuelConsumption, fuelRemaining, lapTime
+									 , driverID)
 
 		pressures := collect(string2Values(",", pressures), null)
 		temperatures := collect(string2Values(",", temperatures), null)
 		wear := collect(string2Values(",", wear), null)
 
-		if (tyresTable.Length < lap.Nr)
-			telemetryDB.addTyreEntry(weather, airTemperature, trackTemperature, compound, compoundColor, tyreLaps
-								   , pressures[1], pressures[2], pressures[3], pressures[4]
-								   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
-								   , wear[1], wear[2], wear[3], wear[4], fuelConsumption, fuelRemaining, lapTime
-								   , driverID)
+		telemetryDB.addTyreEntry(weather, airTemperature, trackTemperature, compound, compoundColor, tyreLaps
+							   , pressures[1], pressures[2], pressures[3], pressures[4]
+							   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
+							   , wear[1], wear[2], wear[3], wear[4], fuelConsumption, fuelRemaining, lapTime
+							   , driverID)
+
+		telemetryDB.Laps[lap.Nr] := tyresTable.Length
 
 		this.modifyLap(lap)
 		this.modifyRun(lap.Run)
@@ -3491,41 +3517,53 @@ class PracticeCenter extends ConfigurationItem {
 
 	addPressures(lap, simulator, car, track, weather, airTemperature, trackTemperature
 			   , compound, compoundColor, coldPressures, hotPressures, pressuresLosses) {
-		local pressuresTable := this.PressuresDatabase.Database.Tables["Tyres.Pressures"]
+		local pressuresDB := this.PressuresDatabase
+		local pressuresTable := pressuresDB.Database.Tables["Tyres.Pressures"]
 		local driverID := lap.Run.Driver.ID
-		local pressures, pressuresData
+		local pressures, pressuresData, lastLap, baseLap
 
-		while (pressuresTable.Length < (lap.Nr - 1)) {
-			pressures := this.Laps[pressuresTable.Length + 1].Data
+		lastLap := (lap.Nr - 1)
+		baseLap := pressuresTable.Length
 
-			pressuresData := [simulator, car, track
-							, getMultiMapValue(pressures, "Weather Data", "Weather", "Dry")
-							, getMultiMapValue(pressures, "Weather Data", "Temperature", 23)
-							, getMultiMapValue(pressures, "Track Data", "Temperature", 27)
-							, getMultiMapValue(pressures, "Car Data", "TyreCompound", "Dry")
-							, getMultiMapValue(pressures, "Car Data", "TyreCompoundColor", "Black")
-							, "-,-,-,-"
-							, getMultiMapValue(pressures, "Car Data", "TyrePressure", "-,-,-,-")
-							, "null,null,null,null"]
+		loop (lastLap - baseLap) {
+			recentLap := (baseLap + A_Index)
 
-			this.Laps[pressuresTable.Length + 1].PressuresData := values2String("|||", pressuresData*)
+			if (this.Laps.Has(recentLap) && !pressuresDB.Laps.Has(recentLap)) {
+				pressuresDB.Laps[recentLap] := (pressuresTable.Length + 1)
 
-			this.PressuresDatabase.updatePressures(pressuresData[4], pressuresData[5], pressuresData[6]
-												 , pressuresData[7], pressuresData[8]
-												 , collect(string2Values(",",  pressuresData[9]), null)
-												 , collect(string2Values(",",  pressuresData[10]), null)
-												 , collect(string2Values(",",  pressuresData[11]), null)
-												 , driverID)
+				pressures := this.Laps[recentLap].Data
+
+				pressuresData := [simulator, car, track
+								, getMultiMapValue(pressures, "Weather Data", "Weather", "Dry")
+								, getMultiMapValue(pressures, "Weather Data", "Temperature", 23)
+								, getMultiMapValue(pressures, "Track Data", "Temperature", 27)
+								, getMultiMapValue(pressures, "Car Data", "TyreCompound", "Dry")
+								, getMultiMapValue(pressures, "Car Data", "TyreCompoundColor", "Black")
+								, "-,-,-,-"
+								, getMultiMapValue(pressures, "Car Data", "TyrePressure", "-,-,-,-")
+								, "null,null,null,null"]
+
+				this.Laps[recentLap].PressuresData := values2String("|||", pressuresData*)
+
+				this.PressuresDatabase.updatePressures(pressuresData[4], pressuresData[5], pressuresData[6]
+													 , pressuresData[7], pressuresData[8]
+													 , collect(string2Values(",",  pressuresData[9]), null)
+													 , collect(string2Values(",",  pressuresData[10]), null)
+													 , collect(string2Values(",",  pressuresData[11]), null)
+													 , driverID)
+			}
 		}
 
 		lap.PressuresData := values2String("|||", simulator, car, track, weather, airTemperature, trackTemperature
 												, compound, compoundColor, coldPressures, hotPressures, pressuresLosses)
 
-		this.PressuresDatabase.updatePressures(weather, airTemperature, trackTemperature, compound, compoundColor
-											 , collect(string2Values(",", coldPressures), null)
-											 , collect(string2Values(",", hotPressures), null)
-											 , collect(string2Values(",", pressuresLosses), null)
-											 , driverID)
+		pressuresDB.updatePressures(weather, airTemperature, trackTemperature, compound, compoundColor
+								  , collect(string2Values(",", coldPressures), null)
+								  , collect(string2Values(",", hotPressures), null)
+								  , collect(string2Values(",", pressuresLosses), null)
+								  , driverID)
+
+		pressuresDB.Laps[lap.Nr] := pressuresTable.Length
 
 		if (lap.Pressures = "-,-,-,-") {
 			lap.Pressures := hotPressures
@@ -5610,7 +5648,7 @@ class PracticeCenter extends ConfigurationItem {
 
 				lap := this.Laps[newLap]
 
-				if ((pressuresTable.Length >= newLap) && (tyresTable.Length >= newLap) && lap.HasProp("TelemetryData")) {
+				if (this.TelemetryDatabase.Laps.Has(newLap) && this.PressuresDatabase.Laps.Has(newLap) && lap.HasProp("TelemetryData")) {
 					lapData := Database.Row("Nr", newLap, "Lap", newLap, "Run", lap.Run.Nr, "Lap.Time", null(lap.LapTime)
 										  , "Sectors.Time", values2String(",", collect(lap.SectorsTime, null)*), "Position", null(lap.Position)
 										  , "Damage", lap.Damage, "EngineDamage", lap.EngineDamage, "Accident", lap.Accident
@@ -5621,8 +5659,8 @@ class PracticeCenter extends ConfigurationItem {
 										  , "Tyre.Compound", compound(lap.Compound), "Tyre.Compound.Color", compoundColor(lap.Compound), "Tyre.Set", lap.TyreSet
 										  , "Data.Telemetry", lap.TelemetryData, "Data.Pressures", lap.PressuresData)
 
-					pressures := pressuresTable[newLap]
-					tyres := tyresTable[newLap]
+					pressures := pressuresTable[this.PressuresDatabase.Laps[newLap]]
+					tyres := tyresTable[this.TelemetryDatabase.Laps[newLap]]
 
 					pressureFL := pressures["Tyre.Pressure.Cold.Front.Left"]
 					pressureFR := pressures["Tyre.Pressure.Cold.Front.Right"]
@@ -6029,7 +6067,7 @@ class PracticeCenter extends ConfigurationItem {
 		local durations := []
 		local numLaps := []
 		local positions := []
-		local AvgLapTimes := []
+		local avgLapTimes := []
 		local fuelConsumptions := []
 		local accidents := []
 		local penalties := []
@@ -6086,7 +6124,7 @@ class PracticeCenter extends ConfigurationItem {
 				durations.Push("<td class=`"td-std`">" . Round(duration / 60) . "</td>")
 				numLaps.Push("<td class=`"td-std`">" . run.Laps.Length . "</td>")
 				positions.Push("<td class=`"td-std`">" . run.StartPosition . translate(" -> ") . run.EndPosition . "</td>")
-				AvgLapTimes.Push("<td class=`"td-std`">" . lapTimeDisplayValue(run.AvgLapTime) . "</td>")
+				avgLapTimes.Push("<td class=`"td-std`">" . lapTimeDisplayValue(run.AvgLapTime) . "</td>")
 
 				fuelConsumption := run.FuelConsumption
 
@@ -6117,7 +6155,7 @@ class PracticeCenter extends ConfigurationItem {
 							. durations[A_Index]
 							. numLaps[A_Index]
 							. positions[A_Index]
-							. AvgLapTimes[A_Index]
+							. avgLapTimes[A_Index]
 							. fuelConsumptions[A_Index]
 							. accidents[A_Index]
 				   . "</tr>")
@@ -6165,7 +6203,7 @@ class PracticeCenter extends ConfigurationItem {
 		local tyreSets := []
 		local tyreLaps := []
 		local bestLapTimes := []
-		local AvgLapTimes := []
+		local avgLapTimes := []
 		local currentRun := this.CurrentRun
 		local lapTable := this.SessionStore.Tables["Lap.Data"]
 		local simulator := this.Simulator
@@ -6222,7 +6260,7 @@ class PracticeCenter extends ConfigurationItem {
 				durations.Push("<td class=`"td-std`">" . Round(duration / 60) . "</td>")
 				numLaps.Push("<td class=`"td-std`">" . run.Laps.Length . "</td>")
 				bestLapTimes.Push("<td class=`"td-std`">" . lapTimeDisplayValue(bestLapTime) . "</td>")
-				AvgLapTimes.Push("<td class=`"td-std`">" . lapTimeDisplayValue(run.AvgLapTime) . "</td>")
+				avgLapTimes.Push("<td class=`"td-std`">" . lapTimeDisplayValue(run.AvgLapTime) . "</td>")
 
 				fuelAmount := run.FuelInitial
 
@@ -6261,7 +6299,7 @@ class PracticeCenter extends ConfigurationItem {
 							. tyreSets[A_Index]
 							. tyreLaps[A_Index]
 							. bestLapTimes[A_Index]
-							. AvgLapTimes[A_Index]
+							. avgLapTimes[A_Index]
 				   . "</tr>")
 
 		html .= "</table>"
@@ -6599,81 +6637,76 @@ class PracticeCenter extends ConfigurationItem {
 		local coldPressures := "-, -, -, -"
 		local pressuresLosses := "-, -, -, -"
 		local hasColdPressures := false
-		local pressuresDB := this.PressuresDatabase
-		local pressuresTable, pressures, tyresTable, tyres
 		local fuel, tyreCompound, tyreCompoundColor, tyreSet, tyrePressures, pressure
-		local fuelConsumption, remainingFuel
+		local fuelConsumption, remainingFuel, pressures, tyres
 
-		if pressuresDB {
-			pressuresTable := pressuresDB.Database.Tables["Tyres.Pressures"]
+		if this.PressuresDatabase.Laps.Has(lap.Nr) {
+			pressures := this.PressuresDatabase.Database.Tables["Tyres.Pressures"][this.PressuresDatabase.Laps[lap.Nr]]
 
-			if (pressuresTable.Length >= lap.Nr) {
-				pressures := pressuresTable[lap.Nr]
+			coldPressures := [displayNullValue(pressures["Tyre.Pressure.Cold.Front.Left"])
+							, displayNullValue(pressures["Tyre.Pressure.Cold.Front.Right"])
+							, displayNullValue(pressures["Tyre.Pressure.Cold.Rear.Left"])
+							, displayNullValue(pressures["Tyre.Pressure.Cold.Rear.Right"])]
 
-				coldPressures := [displayNullValue(pressures["Tyre.Pressure.Cold.Front.Left"]), displayNullValue(pressures["Tyre.Pressure.Cold.Front.Right"])
-								, displayNullValue(pressures["Tyre.Pressure.Cold.Rear.Left"]), displayNullValue(pressures["Tyre.Pressure.Cold.Rear.Right"])]
+			fuel := lap.Run.FuelInitial
 
-				fuel := lap.Run.FuelInitial
+			splitCompound(lap.Run.Compound, &tyreCompound, &tyreCompoundColor)
 
-				splitCompound(lap.Run.Compound, &tyreCompound, &tyreCompoundColor)
+			tyreSet := lap.Run.TyreSet
 
-				tyreSet := lap.Run.TyreSet
+			loop 4 {
+				pressure := coldPressures[A_Index]
 
-				loop 4 {
-					pressure := coldPressures[A_Index]
-
-					if isNumber(pressure)
-						coldPressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
-				}
-
-				coldPressures := values2String(", ", coldPressures*)
-
-				hasColdPressures := (hasColdPressures || (coldPressures != "-, -, -, -"))
-
-				hotPressures := [displayNullValue(pressures["Tyre.Pressure.Hot.Front.Left"]), displayNullValue(pressures["Tyre.Pressure.Hot.Front.Right"])
-							   , displayNullValue(pressures["Tyre.Pressure.Hot.Rear.Left"]), displayNullValue(pressures["Tyre.Pressure.Hot.Rear.Right"])]
-
-				loop 4 {
-					pressure := hotPressures[A_Index]
-
-					if isNumber(pressure)
-						hotPressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
-				}
-
-				hotPressures := values2String(", ", hotPressures*)
-
-				pressuresLosses := [displayNullValue(pressures["Tyre.Pressure.Loss.Front.Left"]), displayNullValue(pressures["Tyre.Pressure.Loss.Front.Right"])
-								  , displayNullValue(pressures["Tyre.Pressure.Loss.Rear.Left"]), displayNullValue(pressures["Tyre.Pressure.Loss.Rear.Right"])]
-
-				loop 4 {
-					pressure := pressuresLosses[A_Index]
-
-					if isNumber(pressure)
-						pressuresLosses[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
-				}
-
-				pressuresLosses := values2String(", ", pressuresLosses*)
-
-				if (hotPressures = "-, -, -, -") {
-					tyresTable := this.TelemetryDatabase.Database.Tables["Tyres"]
-
-					if (tyresTable.Length >= lap.Nr) {
-						tyres := tyresTable[lap.Nr]
-
-						hotPressures := [displayNullValue(tyres["Tyre.Pressure.Front.Left"]), displayNullValue(tyres["Tyre.Pressure.Front.Right"])
-									   , displayNullValue(tyres["Tyre.Pressure.Rear.Left"]), displayNullValue(tyres["Tyre.Pressure.Rear.Right"])]
-
-						loop 4 {
-							pressure := hotPressures[A_Index]
-
-							if isNumber(pressure)
-								hotPressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
-						}
-
-						hotPressures := values2String(", ", hotPressures*)
-					}
-				}
+				if isNumber(pressure)
+					coldPressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
 			}
+
+			coldPressures := values2String(", ", coldPressures*)
+
+			hasColdPressures := (hasColdPressures || (coldPressures != "-, -, -, -"))
+
+			hotPressures := [displayNullValue(pressures["Tyre.Pressure.Hot.Front.Left"]), displayNullValue(pressures["Tyre.Pressure.Hot.Front.Right"])
+						   , displayNullValue(pressures["Tyre.Pressure.Hot.Rear.Left"]), displayNullValue(pressures["Tyre.Pressure.Hot.Rear.Right"])]
+
+			loop 4 {
+				pressure := hotPressures[A_Index]
+
+				if isNumber(pressure)
+					hotPressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
+			}
+
+			hotPressures := values2String(", ", hotPressures*)
+
+			pressuresLosses := [displayNullValue(pressures["Tyre.Pressure.Loss.Front.Left"]), displayNullValue(pressures["Tyre.Pressure.Loss.Front.Right"])
+							  , displayNullValue(pressures["Tyre.Pressure.Loss.Rear.Left"]), displayNullValue(pressures["Tyre.Pressure.Loss.Rear.Right"])]
+
+			loop 4 {
+				pressure := pressuresLosses[A_Index]
+
+				if isNumber(pressure)
+					pressuresLosses[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
+			}
+
+			pressuresLosses := values2String(", ", pressuresLosses*)
+
+			if (hotPressures = "-, -, -, -")
+				if this.TelemetryDatabase.Laps.Has(lap.Nr) {
+					tyres := this.TelemetryDatabase.Database.Tables["Tyres"][this.TelemetryDatabase.Laps[lap.Nr]]
+
+					hotPressures := [displayNullValue(tyres["Tyre.Pressure.Front.Left"])
+								   , displayNullValue(tyres["Tyre.Pressure.Front.Right"])
+								   , displayNullValue(tyres["Tyre.Pressure.Rear.Left"])
+								   , displayNullValue(tyres["Tyre.Pressure.Rear.Right"])]
+
+					loop 4 {
+						pressure := hotPressures[A_Index]
+
+						if isNumber(pressure)
+							hotPressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
+					}
+
+					hotPressures := values2String(", ", hotPressures*)
+				}
 		}
 
 		remainingFuel := lap.FuelRemaining

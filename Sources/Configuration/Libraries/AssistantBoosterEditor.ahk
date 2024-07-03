@@ -1069,18 +1069,17 @@ class CallbacksEditor {
 	setScript(text) {
 		this.ScriptEditor.CaseSense := false
 
-		this.ScriptEditor.setKeywords("Any All None One Predicate"
+		this.ScriptEditor.SetKeywords("Any All None One Predicate"
 									, "priority true false fail"
 									, "Call Prove ProveAll Set Clear Produce"
-									, "option squareRoot plus minus multiply divide greater less lessEqual greaterEqual equal unequal builtin0 builtin1 unbound append get")
+									, "option squareRoot plus minus multiply divide greater less lessEqual greaterEqual equal unequal builtin0 builtin1 unbound append get"
+									, "? !")
 
-		this.ScriptEditor.Brace.Chars := "[]{}()"
+		this.ScriptEditor.Brace.Chars := "()[]{}"
 		this.ScriptEditor.SyntaxEscapeChar := "``"
 		this.ScriptEditor.SyntaxCommentLine := ";"
 
 		this.ScriptEditor.Tab.Width := 4
-
-		this.ScriptEditor.CustomSyntaxHighlighting := true
 
 		this.ScriptEditor.Text := text
 	}
@@ -1124,6 +1123,8 @@ class CallbacksEditor {
 			}
 		}
 		finally {
+			this.ScriptEditor.Deactivate()
+
 			window.Destroy()
 		}
 	}

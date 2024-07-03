@@ -1,7 +1,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Assistant Booster Editor        ;;;
 ;;;                                                                         ;;;
-;;;   Based on the work of the TheArkive and Scintilla.org.                 ;;;
+;;;   Based on the great work of the TheArkive and Scintilla.org.           ;;;
 ;;;   See https://github.com/TheArkive/scintilla_ahk2 for more information  ;;;
 ;;;   and the download of the original work.                                ;;;
 ;;;                                                                         ;;;
@@ -10,7 +10,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                          Local Include Section                          ;;;
+;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 #include "..\Framework\Framework.ahk"
@@ -18,1268 +18,1204 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                          Local Include Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#include "..\Libraries\Task.ahk"
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                         Private Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 class Scintilla extends Gui.Custom {
-    Static p := A_PtrSize, u := StrLen(Chr(0xFFFF))
-    Static DirectFunc := 0, DirectStatusFunc := 0
+    static p := A_PtrSize
+    static u := StrLen(Chr(0xFFFF))
 
-    Static wm_notify := {AutoCCancelled:0x7E9
-                       , AutoCCharDeleted:0x7EA
-                       , AutoCCompleted:0x7EE
-                       , AutoCSelection:0x7E6
-                       , AutoCSelectionChange:0x7F0
-                       , CallTipClick:0x7E5
-                       , CharAdded:0x7D1
-                       , DoubleClick:0x7D6
-                       , DwellEnd:0x7E1
-                       , DwellStart:0x7E0
-                       , FocusIn:0x7EC
-                       , FocusOut:0x7ED
-                       , HotSpotClick:0x7E3
-                       , HotSpotDoubleClick:0x7E4
-                       , HotSpotReleaseClick:0x7EB
-                       , IndicatorClick:0x7E7
-                       , IndicatorRelease:0x7E8
-                       , Key:0x7D5
-                       , MacroRecord:0x7D9
-                       , MarginClick:0x7DA
-                       , MarginRightClick:0x7EF
-                       , Modified:0x7D8
-                       , ModifyAtTempTRO:0x7D4
-                       , NeedShown:0x7DB
-                       , Painted:0x7DD
-                       , SavePointLeft:0x7D3
-                       , SavePointReached:0x7D2
-                       , StyleNeeded:0x7D0
-                       , UpdateUI:0x7D7
-                       , UriDropped:0x7DF            ; Change:0x300
-                       , UserListSelection:0x7DE     ; KillFocus:0x100
-                       , Zoom:0x7E2}                 ; SetFocus:0x200
+    static DirectFunc := 0
+    static DirectStatusFunc := 0
 
-    Static scn_id := this.p         ; NMHDR #2              ; ptr               ; SCNotification offsets
-         , scn_wmmsg := this.p * 2  ; NMHDR #3              ; uint              verified:  13/22 members (not counting NMHDR)
-         , scn_pos := (this.p=4)                ? 12 : 24   ; int Sci_Position  <-- verified offset
-         , scn_ch := (this.p=4)                 ? 16 : 32   ; int               <-- verified offset
-         , scn_mod := (this.p=4)                ? 20 : 36   ; int               <-- verified offset
-         , scn_modType := (this.p=4)            ? 24 : 40   ; int               <-- verified offset
-         , scn_text := (this.p=4)               ? 28 : 48   ; ptr               <-- verified offset
-         , scn_length := (this.p=4)             ? 32 : 56   ; int Sci_Position  <-- verified offset
-         , scn_linesAdded := (this.p=4)         ? 36 : 64   ; int Sci_Position  <-- verified offset
-         , scn_message := (this.p=4)            ? 40 : 72   ; int
-         , scn_wParam := (this.p=4)             ? 44 : 80   ; ptr
-         , scn_lParam := (this.p=4)             ? 48 : 88   ; sptr (signed)
-         , scn_line := (this.p=4)               ? 52 : 96   ; int Sci_Position  <-- verified offset
-         , scn_foldLevelNow := (this.p=4)       ? 56 : 104  ; int                   need folding to verify
-         , scn_foldLevelPrev := (this.p=4)      ? 60 : 108  ; int                   need folding to verify
-         , scn_margin := (this.p=4)             ? 64 : 112  ; int               <-- verified offset
-         , scn_listType := (this.p=4)           ? 68 : 116  ; int                   need user list or auto-complete to verify
-         , scn_x := (this.p=4)                  ? 72 : 120  ; int               <-- verified offset
-         , scn_y := (this.p=4)                  ? 76 : 124  ; int               <-- verified offset
-         , scn_token := (this.p=4)              ? 80 : 128  ; int               <-- verified offset
-         , scn_annotationLinesAdded:=(this.p=4) ? 84 : 136  ; int Sci_Position      need to use annotations to verify
-         , scn_updated := (this.p=4)            ? 88 : 144  ; int               <-- verified offset
-         , scn_listCompletionMethod:=(this.p=4) ? 92 : 148  ; int                   need user list or auto-complete to verify
-         , scn_characterSource := (this.p=4)    ? 96 : 152  ; int                   need IME input to verify this
+    static WM_Notify := {AutoCCancelled: 0x7E9
+                       , AutoCCharDeleted: 0x7EA
+                       , AutoCCompleted: 0x7EE
+                       , AutoCSelection: 0x7E6
+                       , AutoCSelectionChange: 0x7F0
+                       , CallTipClick: 0x7E5
+                       , CharAdded: 0x7D1
+                       , DoubleClick: 0x7D6
+                       , DwellEnd: 0x7E1
+                       , DwellStart: 0x7E0
+                       , FocusIn: 0x7EC
+                       , FocusOut: 0x7ED
+                       , HotSpotClick: 0x7E3
+                       , HotSpotDoubleClick: 0x7E4
+                       , HotSpotReleaseClick: 0x7EB
+                       , IndicatorClick: 0x7E7
+                       , IndicatorRelease: 0x7E8
+                       , Key: 0x7D5
+                       , MacroRecord: 0x7D9
+                       , MarginClick: 0x7DA
+                       , MarginRightClick: 0x7EF
+                       , Modified: 0x7D8
+                       , ModifyAtTempTRO: 0x7D4
+                       , NeedShown: 0x7DB
+                       , Painted: 0x7DD
+                       , SavePointLeft: 0x7D3
+                       , SavePointReached: 0x7D2
+                       , StyleNeeded: 0x7D0
+                       , UpdateUI: 0x7D7
+                       , UriDropped: 0x7DF
+                       , UserListSelection: 0x7DE
+                       , Zoom: 0x7E2}
 
-    Static sc_eol := {Hidden:0
-                    , Standard:0x1
-                    , Boxed:0x2
-                    , Stadium:0x100         ; ( ... )
-                    , FlatCircle:0x101      ; | ... )
-                    , AngleCircle:0x102     ; < ... )
-                    , CircleFlat:0x110      ; ( ... |
-                    , Flats:0x111           ; | ... |
-                    , AngleFlat:0x112       ; < ... |
-                    , CircleAngle:0x120     ; ( ... >
-                    , FlatAngle:0x121       ; | ... >
-                    , Angles:0x122}         ; < ... >
+    static scn_id := this.p
+         , scn_wmmsg := this.p * 2
+         , scn_pos := (this.p = 4)                  ? 12 : 24
+         , scn_ch := (this.p = 4)                   ? 16 : 32
+         , scn_mod := (this.p = 4)                  ? 20 : 36
+         , scn_modType := (this.p = 4)              ? 24 : 40
+         , scn_text := (this.p = 4)                 ? 28 : 48
+         , scn_length := (this.p = 4)               ? 32 : 56
+         , scn_linesAdded := (this.p = 4)           ? 36 : 64
+         , scn_message := (this.p = 4)              ? 40 : 72
+         , scn_wParam := (this.p = 4)               ? 44 : 80
+         , scn_lParam := (this.p = 4)               ? 48 : 88
+         , scn_line := (this.p = 4)                 ? 52 : 96
+         , scn_foldLevelNow := (this.p = 4)         ? 56 : 104
+         , scn_foldLevelPrev := (this.p = 4)        ? 60 : 108
+         , scn_margin := (this.p = 4)               ? 64 : 112
+         , scn_listType := (this.p = 4)             ? 68 : 116
+         , scn_x := (this.p = 4)                    ? 72 : 120
+         , scn_y := (this.p = 4)                    ? 76 : 124
+         , scn_token := (this.p = 4)                ? 80 : 128
+         , scn_annotationLinesAdded := (this.p = 4) ? 84 : 136
+         , scn_updated := (this.p = 4)              ? 88 : 144
+         , scn_listCompletionMethod := (this.p = 4) ? 92 : 148
+         , scn_characterSource := (this.p = 4)      ? 96 : 152
 
-    Static sc_mod := {Ctrl:2, Alt:4, Shift:1, Meta:16, Super:8}
+    static sc_eol := {Hidden: 0
+                    , Standard: 0x1
+                    , Boxed: 0x2
+                    , Stadium: 0x100
+                    , FlatCircle: 0x101
+                    , AngleCircle: 0x102
+                    , CircleFlat: 0x110
+                    , Flats: 0x111
+                    , AngleFlat: 0x112
+                    , CircleAngle: 0x120
+                    , FlatAngle: 0x121
+                    , Angles: 0x122}
 
-    Static sc_updated := {Content:0x1, Selection:2, VScroll:4, HScroll:8}
+    static sc_mod := {Ctrl: 2, Alt: 4, Shift: 1, Meta: 16, Super: 8}
 
-    Static sc_marker := {Circle:0x0
-                       , RoundRect:0x1
-                       , Arrow:0x2
-                       , SmallRect:0x3
-                       , ShortArrow:0x4
-                       , Empty:0x5
-                       , ArrowDown:0x6
-                       , Minus:0x7
-                       , Plus:0x8
-                       , Vline:0x9
-                       , LCorner:0xA
-                       , TCorner:0xB
-                       , BoxPlus:0xC
-                       , BoxPlusConnected:0xD
-                       , BoxMinus:0xE
-                       , BoxMinusConnected:0xF
-                       , LCornerCurve:0x10
-                       , TCornerCurve:0x11
-                       , CirclePlus:0x12
-                       , CirclePlusconnected:0x13
-                       , CircleMinus:0x14
-                       , CircleMinusconnected:0x15
-                       , Background:0x16
-                       , DotDotDot:0x17
-                       , Arrows:0x18
-                       , Pixmap:0x19
-                       , FullRect:0x1A
-                       , LeftRect:0x1B
-                       , Available:0x1C
-                       , Underline:0x1D
-                       , RgbaImage:0x1E
-                       , Bookmark:0x1F
-                       , VerticalBookmark:0x20
-                       , Character:0x2710}
+    static sc_updated := {Content: 0x1, Selection: 2, VScroll: 4, HScroll: 8}
 
-    Static sc_MarkerNum := {FolderEnd:0x19
-                          , FolderOpenMid:0x1A
-                          , FolderMidTail:0x1B
-                          , FolderTail:0x1C
-                          , FolderSub:0x1D
-                          , Folder:0x1E
-                          , FolderOpen:0x1F}
+    static sc_marker := {Circle: 0x0
+                       , RoundRect: 0x1
+                       , Arrow: 0x2
+                       , SmallRect: 0x3
+                       , ShortArrow: 0x4
+                       , Empty: 0x5
+                       , ArrowDown: 0x6
+                       , Minus: 0x7
+                       , Plus: 0x8
+                       , Vline: 0x9
+                       , LCorner: 0xA
+                       , TCorner: 0xB
+                       , BoxPlus: 0xC
+                       , BoxPlusConnected: 0xD
+                       , BoxMinus: 0xE
+                       , BoxMinusConnected: 0xF
+                       , LCornerCurve: 0x10
+                       , TCornerCurve: 0x11
+                       , CirclePlus: 0x12
+                       , CirclePlusconnected: 0x13
+                       , CircleMinus: 0x14
+                       , CircleMinusconnected: 0x15
+                       , Background: 0x16
+                       , DotDotDot: 0x17
+                       , Arrows: 0x18
+                       , Pixmap: 0x19
+                       , FullRect: 0x1A
+                       , LeftRect: 0x1B
+                       , Available: 0x1C
+                       , Underline: 0x1D
+                       , RgbaImage: 0x1E
+                       , Bookmark: 0x1F
+                       , VerticalBookmark: 0x20
+                       , Character: 0x2710}
 
-    Static sc_modType := {None:0                    ; SCN members affected below...
-                        , InsertText:0x1            ; pos, length, text, linesAdded
-                        , DeleteText:0x2            ; pos, length, text, linesAdded
-                        , ChangeStyle:0x4           ; pos, length
-                        , ChangeFold:0x8            ; line, foldLevelNow, foldLevelPrev
-                        , User:0x10                 ;
-                        , Undo:0x20                 ;
-                        , Redo:0x40                 ;
-                        , MultiStepUndoRedo:0x80    ;
-                        , LastStepInUndoRedo:0x100  ;
-                        , ChangeMarker:0x200        ; line
-                        , BeforeInsert:0x400        ; pos, if user, text in bytes, length in bytes
-                        , BeforeDelete:0x800        ; position, length
-                        , ChangeIndicator:0x4000    ; position, length
-                        , ChangeLineState:0x8000    ; line
-                        , ChangeTabStops:0x200000   ; line
-                        , LexerState:0x80000        ; position, length
-                        , ChangeMargin:0x10000      ; line
-                        , ChangeAnnotation:0x20000  ; line
-                        , InsertCheck:0x100000      ; position, length, text
-                        , MultiLineUndoRedo:0x1000  ;
-                        , StartAction:0x2000        ;
-                        , Container:0x40000}        ; token
-                        ; , EventMaskAll:0x1FFFFF}    ;
+    static sc_MarkerNum := {FolderEnd: 0x19
+                          , FolderOpenMid: 0x1A
+                          , FolderMidTail: 0x1B
+                          , FolderTail: 0x1C
+                          , FolderSub: 0x1D
+                          , Folder: 0x1E
+                          , FolderOpen: 0x1F}
 
-    Static sc_search := {None:0x0               ; Default, case-insensitive match.
-                       , WholeWord:0x2          ; Matches whole word, see Words.WordChars
-                       , MatchCase:0x4
-                       , WordStart:0x100000     ; Matches beginning of word, see Words.WordChars
-                       , RegXP:0x200000         ; Enables a RegEx search.
-                       , POSIX:0x400000         ; Allows () instead of \(\), but referring to tags still requires \1 instead of $1.
-                                                ;   Don't use with CXX11.
-                       , CXX11RegEx:0x800000}   ; Need to test to see if this will be simple enough to use in AHK.
-                                                ;   This should be the closest to AHK RegEx.  Requires RegXP to also be set.
+    static sc_modType := {None: 0
+                        , InsertText: 0x1
+                        , DeleteText: 0x2
+                        , ChangeStyle: 0x4
+                        , ChangeFold: 0x8
+                        , User: 0x10
+                        , Undo: 0x20
+                        , Redo: 0x40
+                        , MultiStepUndoRedo: 0x80
+                        , LastStepInUndoRedo: 0x100
+                        , ChangeMarker: 0x200
+                        , BeforeInsert: 0x400
+                        , BeforeDelete: 0x800
+                        , ChangeIndicator: 0x4000
+                        , ChangeLineState: 0x8000
+                        , ChangeTabStops: 0x200000
+                        , LexerState: 0x80000
+                        , ChangeMargin: 0x10000
+                        , ChangeAnnotation: 0x20000
+                        , InsertCheck: 0x100000
+                        , MultiLineUndoRedo: 0x1000
+                        , StartAction: 0x2000
+                        , Container: 0x40000}
 
-    Static charset := {8859_15:0x3E8,ANSI:0x0,ARABIC:0xB2,BALTIC:0xBA,CHINESEBIG5:0x88,CYRILLIC:0x4E3,DEFAULT:0x1
-                      ,EASTEUROPE:0xEE,GB2312:0x86,GREEK:0xA1,HANGUL:0x81,HEBREW:0xB1,JOHAB:0x82,MAC:0x4D,OEM:0xFF
-                      ,OEM866:0x362,RUSSIAN:0xCC,SHIFTJIS:0x80,SYMBOL:0x2,THAI:0xDE,TURKISH:0xA2,VIETNAMESE:0xA3}
+    static sc_search := {None: 0x0
+                       , WholeWord: 0x2
+                       , MatchCase: 0x4
+                       , WordStart: 0x100000
+                       , RegXP: 0x200000
+                       , POSIX: 0x400000
+                       , CXX11RegEx: 0x800000}
 
-    Static cp := Map("UTF-8",65001, "Japanese Shift_JIS",932, "Simplified Chinese GBK",936 ; CodePages
-                   , "Korean Unified Hangul Code",949, "Traditional Chinese Big5",950
-                   , "Korean Johab",1361)
+    static charset := {8859_15: 0x3E8, ANSI: 0x0, ARABIC: 0xB2, BALTIC: 0xBA, CHINESEBIG5: 0x88, CYRILLIC: 0x4E3, DEFAULT: 0x1
+                     , EASTEUROPE: 0xEE, GB2312: 0x86, GREEK: 0xA1, HANGUL: 0x81, HEBREW: 0xB1, JOHAB: 0x82, MAC: 0x4D, OEM: 0xFF
+                     , OEM866: 0x362, RUSSIAN: 0xCC, SHIFTJIS: 0x80, SYMBOL: 0x2, THAI: 0xDE, TURKISH: 0xA2, VIETNAMESE: 0xA3}
 
-    Static AddScintilla(_gui, sOptions) {
-        DefaultOpt := false
-        DefaultTheme := false
-        LightTheme := false
+    static cp := Map("UTF-8", 65001, "Japanese Shift_JIS", 932, "Simplified Chinese GBK", 936
+                   , "Korean Unified Hangul Code", 949, "Traditional Chinese Big5", 950
+                   , "Korean Johab", 1361)
 
-        opt_arr := StrSplit(sOptions," ")
-        sOptions := ""
-        For i, str in opt_arr {
-            If RegExMatch(str, "DefaultOpts?")
-                DefaultOpt := true
-            Else If (str = "DefaultTheme")
-                DefaultTheme := true
-            Else If (str = "LightTheme")
-                LightTheme := true
-            Else
-                sOptions .= (sOptions?" ":"") str
+    static AddScintilla(window, options) {
+		local DefaultOpt := false
+		local DefaultTheme := false
+        local LightTheme := false
+        local newOptions := ""
+		local ignore, option, ctl, buf, result
+
+        refresh() {
+            local data
+
+            if (ctl.Active && ctl.HasProp("_wordList")) {
+                DllCall("CustomLexer\ChunkColoring", "UPtr", ctl.all_data().ptr, "Int", ctl.Loading
+                                                   , "UPtr", ctl._wordList.ptr, "Int", ctl.CaseSense)
+
+                Task.CurrentTask.Sleep := 50
+
+                return Task.CurrentTask
+            }
+            else
+                return false
         }
 
-        ctl := _gui.Add("Custom","ClassScintilla " sOptions)
-        ctl.base := Scintilla.Prototype ; attach methods (but not static ones)
+        for ignore, option in StrSplit(options," ")
+            if RegExMatch(option, "DefaultOpts?")
+                DefaultOpt := true
+            else if (option = "DefaultTheme")
+                DefaultTheme := true
+            else if (option = "LightTheme")
+                LightTheme := true
+            else
+                newOptions .= ((newOptions ? A_Space : "") . option)
 
-        ; ======================================================================
-        ; Init CustomLexer DLL functions for using scint control in AHK script and get Direct Func/Ptr
-        ; ======================================================================
-        buf := Buffer(8,0)
-        NumPut("UPtr", ctl.hwnd, buf)
-        result := DllCall("CustomLexer\Init","UPtr",ctl.hwnd,"UPtr") ; init DLL and get direct func/ptr
+        ctl := window.Add("Custom", "ClassScintilla " . newOptions)
+        ctl.Base := Scintilla.Prototype
+        ctl.Active := true
 
-        ; ======================================================================
-        ; Register main SCN notification callback
-        ; ======================================================================
-        ctl.msg_cb := ObjBindMethod(ctl, "wm_messages") ; Register wm_notify messages
+        buf := Buffer(8, 0)
+
+		NumPut("UPtr", ctl.Hwnd, buf)
+
+        result := DllCall("CustomLexer\Init", "UPtr", ctl.Hwnd, "UPtr")
+
+        ctl.msg_cb := ObjBindMethod(ctl, "WM_Messages")
+
         OnMessage(0x4E, ctl.msg_cb)
 
-        ; ======================================================================
-        ; Init some settings
-        ; ======================================================================
-        ctl.loading := 0        ; set this to 1 when loading a document
-        ctl.callback := ""      ; setting some main properties
-        ctl.state := ""         ; used to determine input "mode", ie. string, comment, etc.
+        ctl.Loading := 0
+        ctl.Callback := ""
+        ctl.State := ""
         ctl._StatusD := 0
         ctl._UsePopup := true
-        ctl._UseDirect := false ; set some defaults...
+        ctl._UseDirect := false
         ctl._DirectPtr := 0
-        ctl.LastCode := 0       ; like LastError, captures the return codes of messages sent, if any
+        ctl.LastCode := 0
 
         ctl._AutoSizeNumberMargin := false
         ctl._AutoBraceMatch := false
         ctl._AutoPunctColor := false
-        ctl._CharIndex := 0 ; 0 = NONE (ie. UTF-8) / 1 = UTF-32 / 2 = UTF-16
+        ctl._CharIndex := 0
         ctl.SyntaxCommentLine := ";"
         ctl.SyntaxCommentBlockA := "/*"
         ctl.SyntaxCommentBlockB := "*/"
         ctl.SyntaxStringChar := Chr(34)
         ctl.SyntaxEscapeChar := Chr(96)
         ctl.SyntaxPunctChars := "!`"$%&'()*+,-./:;<=>?@[\]^``{|}~"
-        ; ctl.SyntaxWordChars := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_#"
         ctl.SyntaxWordChars := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_#"
         ctl.SyntaxString1 := Chr(34)
         ctl.SyntaxString2 := "'"
         ctl.CaseSense := false
+        ctl.CustomSyntaxHighlighting := true
 
-        ; ==============================================
-        ; Custom Syntax Highlighting properties
-        ; ==============================================
-        ctl.CustomSyntaxHighlighting := false
+        ctl.InitClasses()
 
-        ; =============================================
-        ; attach main objects to Scintilla control
-        ; =============================================
-        ctl.init_classes()
+        ctl.BufferedDraw := 0
+        ctl.SetTechnology := 2
 
-        ; ====================================================
-        ; These 2 settings are recommended for modern systems.
-        ; ====================================================
-        ctl.BufferedDraw := 0   ; disable buffering for Direct2D
-        ctl.SetTechnology := 2  ; use Direct2D
-
-        ; ==========================================================================================
-        ; These 2 methods are not required.  These only apply the settings that I prefer to use with
-        ; Scintilla.  You can modify the code in these methods to your requirements.
-        ; ==========================================================================================
-        If DefaultOpt
+        if DefaultOpt
             ctl.DefaultOpt()
-        If DefaultTheme
+        if DefaultTheme
             ctl.DefaultTheme()
-        If LightTheme
+        if LightTheme
             ctl.LightTheme()
+
+        ctl.Deactivate := (*) => ctl.Active := false
+
+        Task.startTask(refresh, 500, kInterruptPriority)
 
         return ctl
     }
-    init_classes() {
-        ; =============================================
-        ; attach main objects to Scintilla control
-        ; =============================================
-        ; Annotations
-        ; AutoComplete and "Element Colors"
+
+    InitClasses() {
         this.Brace := Scintilla.Brace(this)
-        ; CallTips
         this.Caret := Scintilla.Caret(this)
-        ; Character Representations
-        this.Doc := Scintilla.Doc(this)           ; Multiple views
-        this.Edge := Scintilla.Edge(this)         ; Long lines
-        this.EOLAnn := Scintilla.EOLAnn(this)     ; End of Line Annotations
-        ; this.Event := Scintilla.Event(this)       ; Custom easy methods for common actions
-        ; Folding + SCI_SETVISIBLEPOLICY
+        this.Doc := Scintilla.Doc(this)
+        this.Edge := Scintilla.Edge(this)
+        this.EOLAnn := Scintilla.EOLAnn(this)
         this.HotSpot := Scintilla.Hotspot(this)
-        ; Indicators (underline and such)
-        ; KeyBindings
-        ; Keyboard Commands
         this.LineEnding := Scintilla.LineEnding(this)
-        this.Macro := Scintilla.Macro(this) ; planning to add obj to index all recordable msg numbers
+        this.Macro := Scintilla.Macro(this)
         this.Margin := Scintilla.Margin(this)
         this.Marker := Scintilla.Marker(this)
-        ; OSX Find Indicator
-        ; Printing
         this.Punct := Scintilla.Punct(this)
         this.Selection := Scintilla.Selection(this)
         this.Style := Scintilla.Style(this)
         this.Styling := Scintilla.Styling(this)
         this.Tab := Scintilla.Tab(this)
         this.Target := Scintilla.Target(this)
-        ; User Lists?
         this.WhiteSpace := Scintilla.WhiteSpace(this)
         this.Word := Scintilla.Word(this)
         this.Wrap := Scintilla.Wrap(this)
+        this.Cust := Scintilla.Cust(this)
 
-        this.cust := Scintilla.cust(this)
-
-        ; ====================================================
-        ; Setup keyword lists
-        ; ====================================================
-        this.kw1 := "", this.kw1_utf8 := Buffer(1,0), this.kw5 := "", this.kw5_utf8 := Buffer(1,0)
-        this.kw2 := "", this.kw2_utf8 := Buffer(1,0), this.kw6 := "", this.kw6_utf8 := Buffer(1,0)
-        this.kw3 := "", this.kw3_utf8 := Buffer(1,0), this.kw7 := "", this.kw7_utf8 := Buffer(1,0)
-        this.kw4 := "", this.kw4_utf8 := Buffer(1,0), this.kw8 := "", this.kw8_utf8 := Buffer(1,0)
+        this.kw1 := "", this.kw1_utf8 := Buffer(1, 0), this.kw5 := "", this.kw5_utf8 := Buffer(1, 0)
+        this.kw2 := "", this.kw2_utf8 := Buffer(1, 0), this.kw6 := "", this.kw6_utf8 := Buffer(1, 0)
+        this.kw3 := "", this.kw3_utf8 := Buffer(1, 0), this.kw7 := "", this.kw7_utf8 := Buffer(1, 0)
+        this.kw4 := "", this.kw4_utf8 := Buffer(1, 0), this.kw8 := "", this.kw8_utf8 := Buffer(1, 0)
     }
-    Static Lookup(member, in_value) {
-        For prop, value in this.%member%.OwnProps()
-            If (value = in_value)
-                return prop
+
+    static Lookup(member, value) {
+		local property, candidate
+
+        for property, candidate in this.%member%.OwnProps()
+            if (candidate = value)
+                return property
+
         return ""
     }
-    Static GetFlags(member, in_value, all:=false) {
-        out_str := ""
-        For prop, value in Scintilla.%member%.OwnProps()
-            If (value & in_value)
-                out_str .= (out_str?" ":"") prop
-        return out_str
-    }
-    Static RGB(R, G, B) => Format("0x{:06X}",(R << 16) | (G << 8) | B)
 
-    wm_messages(wParam, lParam, msg, hwnd) {
-        Static modType := Scintilla.sc_modType
+    static GetFlags(member, value, all := false) {
+        local result := ""
+		local property, candidate
 
-        scn := Scintilla.SCNotification(lParam)
-
-        scn.LineBeforeInsert := this.CurLine
-        scn.LinesBeforeInsert := this.Lines
-        event := scn.wmmsg_txt := Scintilla.Lookup("wm_notify", (msg_num := scn.wmmsg))
-
-        ; =========================================================================
-        ; Easy events: Comment any of these out if you want to fine-tune function
-        ; or performance in the user callback manually.
-        ; =========================================================================
-
-        If (this.AutoSizeNumberMargin)
-            this.MarginWidth(0, 33, scn) ; number margin 0, with default style 33
-
-        If (this.CustomSyntaxHighlighting) {
-
-            data := this.scn_data(scn) ; prep data for DLL calls
-            ; wordList := this.makeWordLists()
-
-            If (scn.modType & modType.InsertText)                           ; Captures text editing and scrolling
-                || (event = "UpdateUI" && (scn.updated=4 || scn.updated=8)) {
-
-                If (event = "Modified") && (scn.length > 1) { ; && (scn.linesAdded) { ; paste or document load operation
-                    ticks := A_TickCount
-                    result := this.ChunkColoring(scn, data, this._wordList)
-                    dbg_Scintilla( "ChunkColoring Seconds:  " (A_TickCount - ticks) / 1000 " / result: " result)
-                }
-                else if (event = "Modified") && (!scn.linesAdded) {
-                ; else if (event = "CharAdded") {
-                    ticks := A_TickCount
-                    result := this.ChunkColoring(scn, data, this._wordList)
-                    dbg_Scintilla( "Line Styling Seconds:  " (A_TickCount - ticks) / 1000 " / result: " result)
-                }
-
-            }
-
-            Else If (scn.modType & modType.BeforeDelete)
-                this.DeleteRoutine(scn, data)
-            Else if (scn.modType & modType.DeleteText)
-                this.ChunkColoring(scn, data, this._wordList) ; redo coloring after delete
-
-            If (scn.wmmsg_txt = "StyleNeeded") {
-                ; ticks := A_TickCount
-                this.Pacify() ; pacify the StyleNeeded bit by styling the last char in the doc
-                ; dbg_Scintilla( "StyleNeeded Seconds:  " (A_TickCount - ticks) / 1000 " / Last: " this.Styling.Last)
-
-            }
-        }
-
-        ; =========================================================================
-        ; User callback
-        ; =========================================================================
-
-        If (this.callback)
-            f := this.callback(scn)
-    }
-
-    MarginWidth(margin:=0, style:=33, scn:="") {
-        Static modType := Scintilla.sc_modType
-
-        If !scn || !((scn.wmmsg_txt = "Modified")
-          && (scn.modType & modType.DeleteText || scn.modType & modType.InsertText))
-            return
-
-        this.Style.ID := style
-        this.Margin.ID := margin
-        min_width := this.Margin.MinWidth
-        width := this.TextWidth(this.Lines) + this.TextWidth("0")
-
-        this.Margin.Width := (width >= min_width) ? width : min_width
-    }
-
-    Pacify() { ; End each notification by styling the last char in the doc to satisfy "StyleNeeded" event.
-        _lastPos := this.Length-1
-        , _style := this.GetStyle(_lastPos)
-        , this._sms(0x7F0, (_lastPos), 0) ;  // SCI_STARTSTYLING
-        , this._sms(0x7F1, 1, _style) ;  // SCI_SETSTYLING
-    }
-
-    ; BraceInit(scn, _type) { ; benchmarking for C code equivalent in AHK -- NEW 1 -- avg 13 secs
-        ; Static q := Chr(34)
-
-        ; startLine := this._sms(0x876, scn.pos, 0) ; // SCI_LINEFROMPOSITION
-        ; startPos  := this._sms(0x877, startLine, 0) ; // SCI_POSITIONFROMLINE
-        ; lineLen   := this._sms(0x92E, startLine, 0) ; // SCI_LINELENGTH
-
-        ; endPos    := !scn.linesAdded ? startPos + lineLen : scn.pos + scn.length
-
-        ; chunkLen  := endPos - startPos
-
-        ; docTextRange := this.GetTextRange(startPos, endPos)
-        ;;;;;;;;;;;;;;;;;;;;;;;; , docTextRange := StrSplit(this.GetTextRange(startPos, endPos))
-
-
-        ; , style_st := 0, style_check := 0, curPos := startPos, mPos := 0, charWidth := 0
-
-        ; , SCINT_NONE := 0
-        ; , SCINT_STRING1 := 1
-        ; , SCINT_STRING2 := 2
-        ; , SCINT_COMMENT1 := 3
-        ; , SCINT_COMMENT2 := 4
-
-        ; , style_type := "", curChar := "", prevChar := "", curStyle := SCINT_NONE
-        ; , com1    := this.SyntaxCommentLine
-        ; , com2a   := this.SyntaxCommentBlockA
-        ; , com2b   := this.SyntaxCommentBlockB
-        ; , escChar := this.SyntaxEscapeChar
-
-        ; Loop Parse docTextRange ; A_LoopField per char
-        ;;;;;;;;;;;;;;;;;;;;;;;; For i, curChar in docTextRange
-        ; {
-            ; curPos += charWidth
-            ; , curChar := A_LoopField
-            ; , charWidth := StrPut(curChar,"UTF-8") - 1
-
-            ;;;;;;;;;;;;;;;;;;;;;;;;; , i := A_Index
-            ;;;;;;;;;;;;;;;;;;;;;;;;; , ahk_pos := curPos + charWidth
-
-            ; switch (curStyle) {
-
-                ; case (SCINT_STRING1):
-
-                    ; if ((curChar != q && curPos != endPos-1) || prevChar == escChar) {
-                        ; prevChar := curChar
-                        ; continue
-                    ; }
-
-                    ; this._sms(0x7F0, (style_st), 0) ;  // SCI_STARTSTYLING
-                    ; , this._sms(0x7F1, (curPos-style_st+1), this.cust.String1.ID) ;  // SCI_SETSTYLING
-                    ; , curStyle := SCINT_NONE, style_st := 0
-                    ; continue
-
-                ; case (SCINT_STRING2):
-
-                    ; if ((curChar != "'" && curPos != endPos-1) || prevChar == escChar) {
-                        ; prevChar := curChar
-                        ; continue
-                    ; }
-
-                    ; this._sms(0x7F0, (style_st), 0) ;  // SCI_STARTSTYLING
-                    ; , this._sms(0x7F1, (curPos-style_st+1), this.cust.String2.ID) ;  // SCI_SETSTYLING
-                    ; , curStyle := SCINT_NONE, style_st := 0
-                    ; continue
-
-                ; case (SCINT_COMMENT1):
-
-                    ; if (curChar = "`n") || (A_Index = chunkLen) {
-                    ;;;;;;;;;;;;;;;;;;;;;;;;; if (curChar = "`n") || (i = chunkLen) {
-                        ; this._sms(0x7F0, (style_st), 0) ;  // SCI_STARTSTYLING
-                        ; , this._sms(0x7F1, (curPos-style_st+1), this.cust.Comment1.ID) ;  // SCI_SETSTYLING
-                        ; , curStyle := SCINT_NONE, style_st := 0
-
-                    ; }
-
-                ; case (SCINT_COMMENT2):
-
-                    ; com2b_test := SubStr(docTextRange, A_Index, strLen(com2b))
-                    ;;;;;;;;;;;;;;;;;;;;;;;;; com2b_test := this.sub_str(docTextRange, i, strLen(com2b))
-
-                    ; if (com2b = com2b_test) {
-                        ; this._sms(0x7F0, (style_st), 0) ;  // SCI_STARTSTYLING
-                        ; , this._sms(0x7F1, (curPos-style_st+strlen(com2b)), this.cust.Comment2.ID) ;  // SCI_SETSTYLING
-                        ; , curStyle := SCINT_NONE, style_st := 0
-
-                    ; }
-
-                ; case (SCINT_NONE):
-
-                    ; com1_test := SubStr(docTextRange, A_Index, strLen(com1))
-                    ; , com2a_test := SubStr(docTextRange, A_Index, strLen(com2a))
-
-                    ;;;;;;;;;;;;;;;;;;;;;;;;; com1_test := this.sub_str(docTextRange, i, strLen(com1))
-                    ;;;;;;;;;;;;;;;;;;;;;;;;; , com2a_test := this.sub_str(docTextRange, i, strLen(com2a))
-
-                    ; if (curChar = q) {
-                        ; curStyle := SCINT_STRING1, style_st := curPos
-
-                    ; } else if (curChar = "'") {
-                        ; curStyle := SCINT_STRING2, style_st := curPos
-
-                    ;;;;;;;;;;;;;;;;;;;;;;;;; } else if (InStr(docTextRange, com1,, ahk_pos) = ahk_pos) {
-                    ; } else if (com1 = com1_test) {
-                        ; curStyle := SCINT_COMMENT1, style_st := curPos
-
-                    ; } else if (com2a = com2a_test) {
-                        ; curStyle := SCINT_COMMENT2, style_st := curPos
-
-                    ; } else if (instr(this.Brace.Chars, curChar)) {
-                        ; this._sms(0x7F0, (curPos), 0) ;  // SCI_STARTSTYLING
-                        ; , this._sms(0x7F1, 1, this.cust.Brace.ID) ;  // SCI_SETSTYLING
-
-                    ; }
-
-            ; } ; // switch statement
-
-        ; }
-
-    ; }
-
-    setKeywords(p*) {
-        Loop 8 {
-            str := (p.Has(A_Index)) ? " " (this.CaseSense ? Trim(p[A_Index]) : Trim(StrLower(p[A_Index]))) " " : ""
-            this.kw%A_Index% := str
-            this.kw%A_Index%_utf8 := Buffer(StrPut(str,"UTF-8"),0)
-            StrPut(str,this.kw%A_Index%_utf8,"UTF-8")
-        }
-
-        this._wordList := this.makeWordLists()
-    }
-    makeWordLists() {
-        buf := Buffer(8 + (8 * A_PtrSize), 0)
-
-        Loop 8
-            NumPut("Char", this.cust.kw%A_Index%.ID, buf, A_Index - 1)
-
-        Loop 8
-            NumPut("UPtr", this.kw%A_Index%_utf8.ptr, buf, ((A_Index-1) * 8) + 8)
-
-        return buf
-    }
-
-    scn_data(scn) { ; prep scn data for DLL call
-        buf := (A_PtrSize=8) ? Buffer(96,0) : Buffer(60,0)
-        NumPut("UInt", scn.pos, "UInt", scn.length, "UInt", scn.linesAdded, buf)
-
-        NumPut("UChar", this.cust.String1.ID, buf, 16)
-        NumPut("UChar", this.cust.String2.ID, buf, 17)
-        NumPut("UChar", this.cust.Comment1.ID, buf, 18)
-        NumPut("UChar", this.cust.Comment2.ID, buf, 19)
-        NumPut("UChar", this.cust.Brace.ID, buf, 20)
-        NumPut("UChar", this.cust.BraceHBad.ID, buf, 21)
-        NumPut("UChar", this.cust.Punct.ID, buf, 22)
-        NumPut("UChar", this.cust.Number.ID, buf, 23)
-
-        braceStr := Buffer(StrPut(this.Brace.Chars,"UTF-8"),0)
-        StrPut(this.Brace.Chars,braceStr,"UTF-8")
-        NumPut("UPtr", braceStr.ptr, buf, 24)
-
-        comment1 := Buffer(StrPut(this.SyntaxCommentLine,"UTF-8"),0)
-        StrPut(this.SyntaxCommentLine,comment1,"UTF-8")
-        NumPut("UPtr", comment1.ptr, buf, (A_PtrSize=8)?32:28)
-
-        comment2a := Buffer(StrPut(this.SyntaxCommentBlockA,"UTF-8"),0)
-        StrPut(this.SyntaxCommentBlockA,comment2a,"UTF-8")
-        NumPut("UPtr", comment2a.ptr, buf, (A_PtrSize=8)?40:32)
-
-        comment2b := Buffer(StrPut(this.SyntaxCommentBlockB,"UTF-8"),0)
-        StrPut(this.SyntaxCommentBlockB,comment2b,"UTF-8")
-        NumPut("UPtr", comment2b.ptr, buf, (A_PtrSize=8)?48:36)
-
-        escapeChar := Buffer(StrPut(this.SyntaxEscapeChar,"UTF-8"),0)
-        StrPut(this.SyntaxEscapeChar,escapeChar,"UTF-8")
-        NumPut("UPtr", escapeChar.ptr, buf, (A_PtrSize=8)?56:40)
-
-        punctChar := Buffer(StrPut(this.SyntaxPunctChars,"UTF-8"),0)
-        StrPut(this.SyntaxPunctChars,punctChar,"UTF-8")
-        NumPut("UPtr", punctChar.ptr, buf, (A_PtrSize=8)?64:44)
-
-        str1 := Buffer(StrPut(this.SyntaxString1,"UTF-8"),0)
-        StrPut(this.SyntaxString1,str1,"UTF-8")
-        NumPut("UPtr", str1.ptr, buf, (A_PtrSize=8)?72:48)
-
-        str2 := Buffer(StrPut(this.SyntaxString2,"UTF-8"),0)
-        StrPut(this.SyntaxString2,str2,"UTF-8")
-        NumPut("UPtr", str2.ptr, buf, (A_PtrSize=8)?80:52)
-
-        wordChars := Buffer(StrPut(this.SyntaxWordChars,"UTF-8"),0)
-        StrPut(this.SyntaxWordChars,wordChars,"UTF-8")
-        NumPut("UPtr", wordChars.ptr, buf, (A_PtrSize=8)?88:56)
-
-        return buf
-    }
-
-    ChunkColoring(scn, data, wordList) { ; the DLL -- avg = 0.68 secs
-        result := DllCall("CustomLexer\ChunkColoring","UPtr",data.ptr,"Int",this.loading,"UPtr", wordList.ptr,"Int",this.CaseSense)
-
-        this.loading := 0 ; reset "loading" status
+        for property, candidate in Scintilla.%member%.OwnProps()
+            if (candidate & value)
+                result .= ((result ? A_Space : "") . property)
 
         return result
     }
 
-    DeleteRoutine(scn, data) { ; the DLL -- avg = 0.68 secs
+    static RGB(R, G, B) => Format("0x{:06X}", (R << 16) | (G << 8) | B)
+
+    WM_Messages(wParam, lParam, msg, hwnd) {
+		local scn := Scintilla.SCNotification(lParam)
+		local event, msg_num, data, ticks
+
+        static modType := Scintilla.sc_modType
+
+        if !this.Active
+            return
+
+        scn.LineBeforeInsert := this.CurLine
+        scn.LinesBeforeInsert := this.Lines
+
+        event := scn.wmmsg_txt := Scintilla.Lookup("WM_Notify", (msg_num := scn.wmmsg))
+
+        if this.AutoSizeNumberMargin
+            this.MarginWidth(0, 33, scn)
+
+        if this.CustomSyntaxHighlighting {
+            data := this.scn_data(scn)
+
+            if ((scn.modType & modType.InsertText) || ((event = "UpdateUI") && ((scn.updated = 4) || (scn.updated = 8)))) {
+                if ((event = "Modified") && (scn.length > 1))
+                    result := this.ChunkColoring(scn, data, this._wordList)
+                else if ((event = "Modified") && !scn.linesAdded)
+                    result := this.ChunkColoring(scn, data, this._wordList)
+			}
+            else if (scn.modType & modType.BeforeDelete)
+                this.DeleteRoutine(scn, data)
+            else if (scn.modType & modType.DeleteText)
+                this.ChunkColoring(scn, data, this._wordList)
+
+            if (scn.wmmsg_txt = "StyleNeeded")
+                this.Pacify()
+        }
+
+        if this.Callback
+            f := this.Callback(scn)
+    }
+
+    MarginWidth(margin := 0, style := 33, scn := "") {
+		local min_width, width
+
+        static modType := Scintilla.sc_modType
+
+        if (!scn || !((scn.wmmsg_txt = "Modified") && ((scn.modType & modType.DeleteText) || (scn.modType & modType.InsertText))))
+            return
+
+        this.Style.ID := style
+        this.Margin.ID := margin
+
+        min_width := this.Margin.MinWidth
+        width := (this.TextWidth(this.Lines) + this.TextWidth("0"))
+
+        this.Margin.Width := ((width >= min_width) ? width : min_width)
+    }
+
+    Pacify() {
+        local _lastPos := (this.Length - 1)
+		local _style := this.GetStyle(_lastPos)
+
+        this._sms(0x7F0, _lastPos, 0)
+        this._sms(0x7F1, 1, _style)
+    }
+
+    SetKeywords(keywords*) {
+		local string
+
+        loop 8 {
+            string := ((keywords.Has(A_Index)) ? (A_Space . (this.CaseSense ? Trim(keywords[A_Index])
+																			: Trim(StrLower(keywords[A_Index]))) . A_Space)
+											   : "")
+
+            this.kw%A_Index% := string
+            this.kw%A_Index%_utf8 := Buffer(StrPut(string, "UTF-8"), 0)
+
+			StrPut(string, this.kw%A_Index%_utf8, "UTF-8")
+        }
+
+        this._wordList := this.MakeWordLists()
+    }
+
+    MakeWordLists() {
+        local buf := Buffer(8 + (8 * A_PtrSize), 0)
+
+        loop 8
+            NumPut("Char", this.Cust.kw%A_Index%.ID, buf, A_Index - 1)
+
+        loop 8
+            NumPut("UPtr", this.kw%A_Index%_utf8.ptr, buf, ((A_Index - 1) * 8) + 8)
+
+        return buf
+    }
+
+    scn_data(scn) {
+        local buf := ((A_PtrSize = 8) ? Buffer(96, 0) : Buffer(60, 0))
+		local braceStr, comment1, comment2a, comment2b, escapeChar, punctChar, str1, str2, wordChars
+
+        NumPut("UInt", scn.pos, "UInt", scn.length, "UInt", scn.linesAdded, buf)
+
+        NumPut("UChar", this.Cust.String1.ID, buf, 16)
+        NumPut("UChar", this.Cust.String2.ID, buf, 17)
+        NumPut("UChar", this.Cust.Comment1.ID, buf, 18)
+        NumPut("UChar", this.Cust.Comment2.ID, buf, 19)
+        NumPut("UChar", this.Cust.Brace.ID, buf, 20)
+        NumPut("UChar", this.Cust.BraceHBad.ID, buf, 21)
+        NumPut("UChar", this.Cust.Punct.ID, buf, 22)
+        NumPut("UChar", this.Cust.Number.ID, buf, 23)
+
+        braceStr := Buffer(StrPut(this.Brace.Chars, "UTF-8"), 0)
+
+		StrPut(this.Brace.Chars, braceStr, "UTF-8")
+        NumPut("UPtr", braceStr.ptr, buf, 24)
+
+        comment1 := Buffer(StrPut(this.SyntaxCommentLine, "UTF-8"), 0)
+
+        StrPut(this.SyntaxCommentLine, comment1, "UTF-8")
+        NumPut("UPtr", comment1.ptr, buf, (A_PtrSize = 8) ? 32 : 28)
+
+        comment2a := Buffer(StrPut(this.SyntaxCommentBlockA, "UTF-8"), 0)
+
+        StrPut(this.SyntaxCommentBlockA, comment2a, "UTF-8")
+        NumPut("UPtr", comment2a.ptr, buf, (A_PtrSize = 8) ? 40 : 32)
+
+        comment2b := Buffer(StrPut(this.SyntaxCommentBlockB, "UTF-8"), 0)
+
+        StrPut(this.SyntaxCommentBlockB, comment2b, "UTF-8")
+        NumPut("UPtr", comment2b.ptr, buf, (A_PtrSize = 8) ? 48 : 36)
+
+        escapeChar := Buffer(StrPut(this.SyntaxEscapeChar, "UTF-8"), 0)
+
+        StrPut(this.SyntaxEscapeChar, escapeChar, "UTF-8")
+        NumPut("UPtr", escapeChar.ptr, buf, (A_PtrSize = 8) ? 56 : 40)
+
+        punctChar := Buffer(StrPut(this.SyntaxPunctChars, "UTF-8"), 0)
+
+        StrPut(this.SyntaxPunctChars, punctChar, "UTF-8")
+        NumPut("UPtr", punctChar.ptr, buf, (A_PtrSize = 8) ? 64: 44)
+
+        str1 := Buffer(StrPut(this.SyntaxString1,"UTF-8"), 0)
+
+        StrPut(this.SyntaxString1, str1, "UTF-8")
+        NumPut("UPtr", str1.ptr, buf, (A_PtrSize = 8) ? 72 : 48)
+
+        str2 := Buffer(StrPut(this.SyntaxString2, "UTF-8"), 0)
+
+        StrPut(this.SyntaxString2, str2, "UTF-8")
+        NumPut("UPtr", str2.ptr, buf, (A_PtrSize = 8) ? 80 : 52)
+
+        wordChars := Buffer(StrPut(this.SyntaxWordChars,"UTF-8"), 0)
+
+        StrPut(this.SyntaxWordChars, wordChars, "UTF-8")
+        NumPut("UPtr", wordChars.ptr, buf, (A_PtrSize = 8) ? 88 : 56)
+
+        return buf
+    }
+
+    all_data() {
+        local buf := ((A_PtrSize = 8) ? Buffer(96, 0) : Buffer(60, 0))
+		local braceStr, comment1, comment2a, comment2b, escapeChar, punctChar, str1, str2, wordChars
+
+        NumPut("UInt", 0, "UInt", StrLen(this.Text), "UInt", 0, buf)
+
+        NumPut("UChar", this.Cust.String1.ID, buf, 16)
+        NumPut("UChar", this.Cust.String2.ID, buf, 17)
+        NumPut("UChar", this.Cust.Comment1.ID, buf, 18)
+        NumPut("UChar", this.Cust.Comment2.ID, buf, 19)
+        NumPut("UChar", this.Cust.Brace.ID, buf, 20)
+        NumPut("UChar", this.Cust.BraceHBad.ID, buf, 21)
+        NumPut("UChar", this.Cust.Punct.ID, buf, 22)
+        NumPut("UChar", this.Cust.Number.ID, buf, 23)
+
+        braceStr := Buffer(StrPut(this.Brace.Chars, "UTF-8"), 0)
+
+		StrPut(this.Brace.Chars, braceStr, "UTF-8")
+        NumPut("UPtr", braceStr.ptr, buf, 24)
+
+        comment1 := Buffer(StrPut(this.SyntaxCommentLine, "UTF-8"), 0)
+
+        StrPut(this.SyntaxCommentLine, comment1, "UTF-8")
+        NumPut("UPtr", comment1.ptr, buf, (A_PtrSize = 8) ? 32 : 28)
+
+        comment2a := Buffer(StrPut(this.SyntaxCommentBlockA, "UTF-8"), 0)
+
+        StrPut(this.SyntaxCommentBlockA, comment2a, "UTF-8")
+        NumPut("UPtr", comment2a.ptr, buf, (A_PtrSize = 8) ? 40 : 32)
+
+        comment2b := Buffer(StrPut(this.SyntaxCommentBlockB, "UTF-8"), 0)
+
+        StrPut(this.SyntaxCommentBlockB, comment2b, "UTF-8")
+        NumPut("UPtr", comment2b.ptr, buf, (A_PtrSize = 8) ? 48 : 36)
+
+        escapeChar := Buffer(StrPut(this.SyntaxEscapeChar, "UTF-8"), 0)
+
+        StrPut(this.SyntaxEscapeChar, escapeChar, "UTF-8")
+        NumPut("UPtr", escapeChar.ptr, buf, (A_PtrSize = 8) ? 56 : 40)
+
+        punctChar := Buffer(StrPut(this.SyntaxPunctChars, "UTF-8"), 0)
+
+        StrPut(this.SyntaxPunctChars, punctChar, "UTF-8")
+        NumPut("UPtr", punctChar.ptr, buf, (A_PtrSize = 8) ? 64: 44)
+
+        str1 := Buffer(StrPut(this.SyntaxString1,"UTF-8"), 0)
+
+        StrPut(this.SyntaxString1, str1, "UTF-8")
+        NumPut("UPtr", str1.ptr, buf, (A_PtrSize = 8) ? 72 : 48)
+
+        str2 := Buffer(StrPut(this.SyntaxString2, "UTF-8"), 0)
+
+        StrPut(this.SyntaxString2, str2, "UTF-8")
+        NumPut("UPtr", str2.ptr, buf, (A_PtrSize = 8) ? 80 : 52)
+
+        wordChars := Buffer(StrPut(this.SyntaxWordChars,"UTF-8"), 0)
+
+        StrPut(this.SyntaxWordChars, wordChars, "UTF-8")
+        NumPut("UPtr", wordChars.ptr, buf, (A_PtrSize = 8) ? 88 : 56)
+
+        return buf
+    }
+
+    ChunkColoring(scn, data, wordList) {
+        result := DllCall("CustomLexer\ChunkColoring", "UPtr", data.ptr, "Int", this.Loading, "UPtr", wordList.ptr, "Int", this.CaseSense)
+
+        this.Loading := 0
+
+        return result
+    }
+
+    DeleteRoutine(scn, data) {
         return DllCall("CustomLexer\DeleteRoutine", "UPtr", data.ptr)
     }
 
     DefaultOpt() {
-        ; this.UseDirect := true
-
         this.Wrap.Mode := 1
-        this.EndAtLastLine := false ; allow scrolling past last line
-        this.Caret.PolicyX(13,50) ; SLOP:=1 | EVEN:=8 | STRICT:=4
-        this.Caret.LineVisible := true   ; allow different active line back color
+        this.EndAtLastLine := false
+        this.Caret.PolicyX(13, 50)
+        this.Caret.LineVisible := true
 
-        this.Margin.ID := 0      ; number margin
-        this.Margin.Style(0,33)  ; set style .Style(line, style)
-        this.Margin.Width := 20  ; 20 px number margin
+        this.Margin.ID := 0
+        this.Margin.Style(0, 33)
+        this.Margin.Width := 20
 
         this.Margin.ID := 1
         this.Margin.Sensitive := true
 
-        this.Tab.Use := false ; use spaces instad of tabs
-        this.Tab.Width := 4 ; number of spaces for a tab
+        this.Tab.Use := false
+        this.Tab.Width := 4
 
-        this.Selection.Multi := true ; allow multli-select, hold CTRL to add selection on left-click
-        this.Selection.MultiTyping := true ; type during multi-selection
-        this.Selection.RectModifier := 4 ; alt + drag for rect selection
-        this.Selection.RectWithMouse := true ; drag + alt also works for rect selection
+        this.Selection.Multi := true
+        this.Selection.MultiTyping := true
+        this.Selection.RectModifier := 4
+        this.Selection.RectWithMouse := true
     }
 
     DefaultTheme() {
-        this.cust.Caret.LineBack := 0x151515  ; active line (with caret)
+        this.Cust.Caret.LineBack := 0x151515
 
-        this.cust.Editor.Back := 0x080808
-        this.cust.Editor.Fore := 0xAAAAAA
-        this.cust.Editor.Font := "Consolas"
-        this.cust.Editor.Size := 12
+        this.Cust.Editor.Back := 0x080808
+        this.Cust.Editor.Fore := 0xAAAAAA
+        this.Cust.Editor.Font := "Consolas"
+        this.Cust.Editor.Size := 12
 
-        this.Style.ClearAll() ; apply style 32
+        this.Style.ClearAll()
 
-        this.cust.Margin.Back := 0x202020
-        this.cust.Margin.Fore := 0xAAAAAA
+        this.Cust.Margin.Back := 0x202020
+        this.Cust.Margin.Fore := 0xAAAAAA
 
-        this.cust.Caret.Fore := 0x00FF00
-        this.cust.Selection.Back := 0x550000
+        this.Cust.Caret.Fore := 0x00FF00
+        this.Cust.Selection.Back := 0x550000
 
-        this.cust.Brace.Fore     := 0x0900ff ; basic brace color
-        this.cust.BraceH.Fore    := 0x00FF00 ; brace color highlight
-        this.cust.BraceHBad.Fore := 0xFF0000 ; brace color bad light
-        this.cust.Punct.Fore     := 0x9090FF
-        this.cust.String1.Fore   := 0x666666
-        this.cust.String2.Fore   := 0x666666
+        this.Cust.Brace.Fore     := 0x0900ff
+        this.Cust.BraceH.Fore    := 0x00FF00
+        this.Cust.BraceHBad.Fore := 0xFF0000
+        this.Cust.Punct.Fore     := 0x9090FF
+        this.Cust.String1.Fore   := 0x666666
+        this.Cust.String2.Fore   := 0x666666
 
-        this.cust.Comment1.Fore  := 0x008800 ; keeping comment color same
-        this.cust.Comment2.Fore  := 0x008800 ; keeping comment color same
-        this.cust.Number.Fore    := 0xFFFF00
+        this.Cust.Comment1.Fore  := 0x008800
+        this.Cust.Comment2.Fore  := 0x008800
+        this.Cust.Number.Fore    := 0xFFFF00
 
-        this.cust.kw1.Fore := 0xc94969 ; flow - red - set keyword list colors, kw1 - kw8
-        this.cust.kw2.Fore := 0x6b66ff ; funcion - blue
-        this.cust.kw3.Fore := 0xbde03c ; method - light green
-        this.cust.kw4.Fore := 0xd6f955 ; prop - green ish
-        this.cust.kw5.Fore := 0xf9c543 ; vars - blueish
-        this.cust.kw6.Fore := 0xb5b2ff ; directives - blueish
-        this.cust.kw7.Fore := 0x127782 ; var decl
+        this.Cust.kw1.Fore := 0xc94969
+        this.Cust.kw2.Fore := 0x6b66ff
+        this.Cust.kw3.Fore := 0xbde03c
+        this.Cust.kw4.Fore := 0xd6f955
+        this.Cust.kw5.Fore := 0xf9c543
+        this.Cust.kw6.Fore := 0xb5b2ff
+        this.Cust.kw7.Fore := 0x127782
     }
+
     LightTheme() {
-        this.cust.Caret.LineBack := 0xF6F9FC  ; active line (with caret)
-        this.cust.Editor.Back := 0xFDFDFD
+        this.Cust.Caret.LineBack := 0xF6F9FC
+        this.Cust.Editor.Back := 0xFDFDFD
 
-        this.cust.Editor.Fore := 0x000000
-        this.cust.Editor.Font := "Consolas"
-        this.cust.Editor.Size := 10
+        this.Cust.Editor.Fore := 0x000000
+        this.Cust.Editor.Font := "Consolas"
+        this.Cust.Editor.Size := 10
 
-        this.Style.ClearAll() ; apply style 32
+        this.Style.ClearAll()
 
-        this.cust.Margin.Back := 0xF0F0F0
-        this.cust.Margin.Fore := 0x000000
+        this.Cust.Margin.Back := 0xF0F0F0
+        this.Cust.Margin.Fore := 0x000000
 
-        this.cust.Caret.Fore := 0x00FF00
-        this.cust.Selection.Back := 0x398FFB
-        this.cust.Selection.ForeColor := 0xFFFFFF
+        this.Cust.Caret.Fore := 0x00FF00
+        this.Cust.Selection.Back := 0x398FFB
+        this.Cust.Selection.ForeColor := 0xFFFFFF
 
-        this.cust.Brace.Fore     := 0x5F6364 ; basic brace color
-        this.cust.BraceH.Fore    := 0x00FF00 ; brace color highlight
-        this.cust.BraceHBad.Fore := 0xFF0000 ; brace color bad light
-        this.cust.Punct.Fore     := 0xA57F5B
-        this.cust.String1.Fore   := 0x329C1B ; "" double quoted text
-        this.cust.String2.Fore   := 0x329C1B ; '' single quoted text
+        this.Cust.Brace.Fore     := 0x5F6364
+        this.Cust.BraceH.Fore    := 0x00FF00
+        this.Cust.BraceHBad.Fore := 0xFF0000
+        this.Cust.Punct.Fore     := 0xA57F5B
+        this.Cust.String1.Fore   := 0x329C1B
+        this.Cust.String2.Fore   := 0x329C1B
 
-        this.cust.Comment1.Fore  := 0x7D8B98 ; keeping comment color same
-        this.cust.Comment2.Fore  := 0x7D8B98 ; keeping comment color same
-        this.cust.Number.Fore    := 0xC72A31
+        this.Cust.Comment1.Fore  := 0x7D8B98
+        this.Cust.Comment2.Fore  := 0x7D8B98
+        this.Cust.Number.Fore    := 0xC72A31
 
-        this.cust.kw1.Fore := 0x329C1B ; flow - set keyword list colors, kw1 - kw8
-        this.cust.kw2.Fore := 0x1049BF ; funcion
-        this.cust.kw2.Bold := true ; funcion
-        this.cust.kw3.Fore := 0x2390B6 ; method
-        this.cust.kw3.Bold := true ; funcion
-        this.cust.kw4.Fore := 0x3F8CD4 ; prop
-        this.cust.kw5.Fore := 0xC72A31 ; vars
+        this.Cust.kw1.Fore := 0x329C1B
+        this.Cust.kw2.Fore := 0x1049BF
+        this.Cust.kw2.Bold := true
+        this.Cust.kw3.Fore := 0x2390B6
+        this.Cust.kw3.Bold := true
+        this.Cust.kw4.Fore := 0x3F8CD4
+        this.Cust.kw5.Fore := 0xC72A31
 
-        this.cust.kw6.Fore := 0xEC9821 ; directives
-        this.cust.kw7.Fore := 0x2390B6 ; var decl
+        this.Cust.kw6.Fore := 0xEC9821
+        this.Cust.kw7.Fore := 0x2390B6
     }
 
-    class cust {
+    class Cust {
         __New(sup) {
-            this.Number := Scintilla.cust.subItem(sup,45)
-            this.Comment1 := Scintilla.cust.subItem(sup,44)
-            this.Comment2 := Scintilla.cust.subItem(sup,47)
-            this.String1 := Scintilla.cust.subItem(sup,43)
-            this.String2 := Scintilla.cust.subItem(sup,46)
-            this.Punct := Scintilla.cust.subItem(sup,42)
-            this.BraceH := Scintilla.cust.subItem(sup,34)
-            this.BraceHBad := Scintilla.cust.subItem(sup,41)
-            this.Brace := Scintilla.cust.subItem(sup,40)
+            this.Number := Scintilla.Cust.subItem(sup, 45)
+            this.Comment1 := Scintilla.Cust.subItem(sup, 44)
+            this.Comment2 := Scintilla.Cust.subItem(sup, 47)
+            this.String1 := Scintilla.Cust.subItem(sup, 43)
+            this.String2 := Scintilla.Cust.subItem(sup, 46)
+            this.Punct := Scintilla.Cust.subItem(sup, 42)
+            this.BraceH := Scintilla.Cust.subItem(sup, 34)
+            this.BraceHBad := Scintilla.Cust.subItem(sup, 41)
+            this.Brace := Scintilla.Cust.subItem(sup, 40)
             this.Selection := sup.Selection
             this.Caret := sup.Caret
-            this.Margin := Scintilla.cust.subItem(sup,33)
-            this.Editor := Scintilla.cust.subItem(sup,32)
+            this.Margin := Scintilla.Cust.subItem(sup, 33)
+            this.Editor := Scintilla.Cust.subItem(sup, 32)
 
-            this.kw1 := Scintilla.cust.subItem(sup,64), this.kw5 := Scintilla.cust.subItem(sup,68)
-            this.kw2 := Scintilla.cust.subItem(sup,65), this.kw6 := Scintilla.cust.subItem(sup,69)
-            this.kw3 := Scintilla.cust.subItem(sup,66), this.kw7 := Scintilla.cust.subItem(sup,70)
-            this.kw4 := Scintilla.cust.subItem(sup,67), this.kw8 := Scintilla.cust.subItem(sup,71)
+            this.kw1 := Scintilla.Cust.subItem(sup, 64), this.kw5 := Scintilla.Cust.subItem(sup, 68)
+            this.kw2 := Scintilla.Cust.subItem(sup, 65), this.kw6 := Scintilla.Cust.subItem(sup, 69)
+            this.kw3 := Scintilla.Cust.subItem(sup, 66), this.kw7 := Scintilla.Cust.subItem(sup, 70)
+            this.kw4 := Scintilla.Cust.subItem(sup, 67), this.kw8 := Scintilla.Cust.subItem(sup, 71)
         }
 
         class subItem {
-            __New(sup,ID:=0) {
-                this.DefineProp("sup",{Value:sup})
-                this.DefineProp("ID",{Value:ID})
+            __New(sup, ID := 0) {
+                this.DefineProp("sup", {Value: sup})
+                this.DefineProp("ID", {Value: ID})
             }
-            __Get(n,p) {
+
+            __Get(n, p) {
                 this.sup.Style.ID := this.ID
+
                 return this.sup.Style.%n%
             }
-            __Set(n,p,v) {
+
+            __Set(n, p, v) {
                 this.sup.Style.ID := this.ID, this.sup.Style.%n% := v
             }
         }
     }
 
-    ; =========================================================================================
-    ; I might not bother with these (for a while, or at all):
-    ; =========================================================================================
-    ; SCI_ADDTEXT -> redundant, AppendText offers more control and makes more sense.
-    ; SCI_ADDSTYLEDTEXT -> i might...
-    ; SCI_CHARPOSITIONFROMPOINT
-    ; SCI_CHARPOSITIONFROMPOINTCLOSE
-    ; SCI_GETLINESELSTARTPOSITION -> using multi-select
-    ; SCI_GETLINESELENDPOSITION -> using multi-select
-    ; SCI_GETSELTEXT -> i'll use text ranges instead from multi-select
-    ; SCI_GETSELECTIONSTART / SCI_GETSELECTIONEND -> using multi-select
-    ; SCI_SETSELECTIONSTART / SCI_SETSELECTIONEND -> using multi-select
-    ; SCI_GETSTYLEDTEXT -> i might...
-    ; SCI_GETANCHOR / SCI_SETANCHOR -> using multi-select
-    ; SCI_HIDESELECTION
-    ; SCI_MOVECARETINSIDEVIEW
-    ; SCI_SETSEL -> using multi-select
-    ; SCI_TEXTHEIGHT
-    ; SCI_POSITIONBEFORE
-    ; SCI_POSITIONAFTER
-    ; SCI_FINDTEXT      ctl.Target.* search functions work well enough
-    ; SCI_SEARCHANCHOR
-    ; SCI_SEARCHNEXT
-    ; SCI_SEARCHPREV
-    ; SCI_GETELEMENTBASECOLOUR(int = elemnt number) - gets "default color" for specified element
+    AppendText(pos, text := "") => this._PutStr(0x8EA, pos, text)
 
-    ; =========================================================================================
-    ; Scintilla Control Content methods and properties
-    ; =========================================================================================
-
-    AppendText(pos, text:="") => this._PutStr(0x8EA, pos, text) ; SCI_APPENDTEXT caret is moved, screen not scrolled
-
-    Characters(start, end) { ; number of actual chars between "start" and "end" byte pos / see PosRelative() method
-        return this._sms(0xA49, start, end) ; SCI_COUNTCHARACTERS
+    Characters(start, end) {
+        return this._sms(0xA49, start, end)
     }
+
     CharIndex {
-        get => this._sms(0xA96)
-        set {
-            If (value != this._CharIndex) {
-                this._sms(0xA98, this._CharIndex)               ; SCI_RELEASELINECHARACTERINDEX
-                this._sms(0xA97, (this._CharIndex := value))    ; SCI_ALLOCATELINECHARACTERINDEX
+        Get => this._sms(0xA96)
+
+        Set {
+            if (value != this._CharIndex) {
+                this._sms(0xA98, this._CharIndex)
+                this._sms(0xA97, (this._CharIndex := value))
             }
         }
     }
-    CodeUnits(start, end) => this._sms(0xA9B, start, end) ; SCI_COUNTCODEUNITS
 
-    Column(pos) => this._sms(0x851, pos)     ; SCI_GETCOLUMN
+    CodeUnits(start, end) => this._sms(0xA9B, start, end)
 
-    CurLine => this.LineFromPos(this.CurPos) ; returns BYTE pos
+    Column(pos) => this._sms(0x851, pos)
 
-    CurPos { ; returns current BYTE pos, not CHAR pos
-        get => this._sms(0x7D8)         ; SCI_GETCURRENTPOS
-        set => this._sms(0x7E9, value)  ; SCI_GOTOPOS (selects destroyed, cursor scrolled)
+    CurLine => this.LineFromPos(this.CurPos)
+
+    CurPos {
+        Get => this._sms(0x7D8)
+        Set => this._sms(0x7E9, value)
     }
 
-    DeleteRange(start, end) => this._sms(0xA55, start, end) ; SCI_DELETERANGE
+    DeleteRange(start, end) => this._sms(0xA55, start, end)
 
-    DocLine(visible) => this._sms(0x8AD, visible) ; SCI_DOCLINEFROMVISIBLE
+    DocLine(visible) => this._sms(0x8AD, visible)
 
-    FindColumn(line, pos) => this._sms(0x998, line, pos)  ; SCI_FINDCOLUMN
+    FindColumn(line, pos) => this._sms(0x998, line, pos)
 
     FirstVisibleDocLine => this.DocLine(this.FirstVisibleLine)
 
     FirstVisibleLine {
-        get => this._sms(0x868) ; SCI_GETFIRSTVISIBLELINE
-        set => this._sms(0xA35, value) ; SCI_SETFIRSTVISIBLELINE
+        Get => this._sms(0x868)
+        Set => this._sms(0xA35, value)
     }
+
     GetChar(pos) {
-        return (pos<this.Length) ? this.GetTextRange(pos, this.NextCharPos(pos)) : ""
+        return ((pos < this.Length) ? this.GetTextRange(pos, this.NextCharPos(pos)) : "")
     }
+
     GetTextRange(start, end) {
-        this._sms(0x872, 0, (tr := Scintilla.TextRange(,start,end)).ptr) ; SCI_GETTEXTRANGE
-        return StrGet(tr.buf, "UTF-8")
+		local tr
+
+        this._sms(0x872, 0, (tr := Scintilla.TextRange( , start, end)).ptr)
+
+		return StrGet(tr.buf, "UTF-8")
     }
-    GetStyle(pos) => this._sms(0x7DA, pos)    ; SCI_GETSTYLEAT
 
-    InsertText(pos:=-1, text:="") => this._PutStr(0x7D3, pos, text) ; SCI_INSERTTEXT caret is moved, screen not scrolled
+    GetStyle(pos) => this._sms(0x7DA, pos)
 
-    Length => this._sms(0x7D6) ; SCI_GETLENGTH document length (bytes)
+    InsertText(pos := -1, text := "") => this._PutStr(0x7D3, pos, text)
 
-    LineEndPos(line) => this._sms(0x858, line) ; SCI_GETLINEENDPOSITION see .PosFromLine() to get the start of a line
+    Length => this._sms(0x7D6)
 
-    LineLength(line) => this._sms(0x92E, line)   ; SCI_LINELENGTH
+    LineEndPos(line) => this._sms(0x858, line)
 
-    Lines => this._sms(0x86A) ; SCI_GETLINECOUNT number of lines in document
+    LineLength(line) => this._sms(0x92E, line)
 
-    LineFromPos(pos) => this._sms(0x876, pos)    ; SCI_LINEFROMPOSITION
+    Lines => this._sms(0x86A)
 
-    LinesOnScreen => this._sms(0x942)         ; SCI_LINESONSCREEN
+    LineFromPos(pos) => this._sms(0x876, pos)
+
+    LinesOnScreen => this._sms(0x942)
 
     LineText(line) {
-        buf := Buffer(this.LineLength(line))
-        this._sms(0x869, line, buf.ptr)     ; SCI_GETLINE
-        return StrGet(buf, "UTF-8")
-    }
-    NextChar(pos, offset:=1) => (p1 := this.NextCharPos(pos, offset))?this.GetChar(p1):""
+        local buf := Buffer(this.LineLength(line))
 
-    NextCharPos(pos, offset:=1) => this._sms(0xA6E, pos, offset) ; SCI_POSITIONRELATIVE
+        this._sms(0x869, line, buf.ptr)
 
-    PointFromPos(pos) => {x:this._sms(0x874,,pos), y:this._sms(0x875,,pos)} ; SCI_POINTXFROMPOSITION, SCI_POINTYFROMPOSITION
-
-    PosFromLine(line) => this._sms(0x877, line)   ; SCI_POSITIONFROMLINE
-
-    PosFromPoint(x, y) => this._sms(0x7E7, x, y)   ; SCI_POSITIONFROMPOINTCLOSE
-
-    PosFromPointAny(x, y) => this._sms(0x7E6, x, y)   ; SCI_POSITIONFROMPOINT
-
-    PosRelative(pos, length) => this._sms(0xA6E, pos, length) ; SCI_POSITIONRELATIVE returns byte pos in doc / length can be negative / See Characters() method
-
-    PrevChar(pos, offset:=-1) => (p1 := this.NextCharPos(pos, offset))?this.GetChar(p1):""
-
-    PrevCharPos(pos, offset:=-1) => this._sms(0xA6E, pos, offset) ; SCI_POSITIONRELATIVE
-
-    ReadOnly {                          ; boolean
-        get => this._sms(0x85C)         ; SCI_GETREADONLY
-        set => this._sms(0x87B, value)  ; SCI_SETREADONLY
-    }
-    Text {                              ; gets/sets entire document text
-        get => this._GetStr(0x886, this.Length + 1)
-        set => this._PutStr(0x885, 0, value)
-    }
-    TextWidth(txt, style:="") { ; returns pixel width of txt drawn with given style
-        style := (style!="")?style:this.Style.ID
-        return this._PutStr(0x8E4, style, txt)    ; SCI_TEXTWIDTH
-    }
-    Value {                              ; gets/sets entire document text
-        get => this._GetStr(0x886, this.Length + 1)
-        set => this._PutStr(0x885, 0, value)
+		return StrGet(buf, "UTF-8")
     }
 
-    ; =========================================================================================
-    ; Scintilla Control Actions
-    ; =========================================================================================
+    NextChar(pos, offset := 1) => ((p1 := this.NextCharPos(pos, offset)) ? this.GetChar(p1) : "")
 
-    Clear() => this._sms(0x884) ; SCI_CLEAR
+    NextCharPos(pos, offset:=1) => this._sms(0xA6E, pos, offset)
 
-    ClearAll() => this._sms(0x7D4)         ; SCI_CLEARALL
+    PointFromPos(pos) => {x: this._sms(0x874,,pos), y: this._sms(0x875,,pos)}
 
-    Copy() => this._sms(0x882) ; SCI_COPY
+    PosFromLine(line) => this._sms(0x877, line)
 
-    CopyLine() => this._sms(0x9D7) ; SCI_COPYALLOWLINE Same as Copy() when selection is active.
+    PosFromPoint(x, y) => this._sms(0x7E7, x, y)
 
-    CopyRange(start, end) => this._sms(0x973, start, end) ; SCI_COPYRANGE
+    PosFromPointAny(x, y) => this._sms(0x7E6, x, y)
 
-    Cut() => this._sms(0x881) ; SCI_CUT
+    PosRelative(pos, length) => this._sms(0xA6E, pos, length)
 
-    Focus() => this._sms(0x960)                ; SCI_GRABFOCUS
+    PrevChar(pos, offset := -1) => ((p1 := this.NextCharPos(pos, offset)) ? this.GetChar(p1) : "")
 
-    LinesJoin() => this._sms(0x8F0)         ; SCI_LINESJOIN target is assumed to be user selection
+    PrevCharPos(pos, offset := -1) => this._sms(0xA6E, pos, offset)
 
-    LinesSplit(pixels) => this._sms(0x8F1, pixels) ; SCI_LINESSPLIT target is assumed to be user selection
-
-    Paste() => this._sms(0x883) ; SCI_PASTE
-
-    SelectAll() => this._sms(0x7DD)         ; SCI_SELECTALL
-
-    VisibleFromDocLine(_in) => this._sms(0x8AC,_in)     ; SCI_VISIBLEFROMDOCLINE
-
-    Zoom {                              ; int points (some measure of "zoom factor" for ZoomIN/OUT commands, default = 0
-        get => this._sms(0x946)         ; SCI_GETZOOM
-        set => this._sms(0x945, value)  ; SCI_SETZOOM
+    ReadOnly {
+        Get => this._sms(0x85C)
+        Set => this._sms(0x87B, value)
     }
-    ZoomIN() => this._sms(0x91D)         ; SCI_ZOOMIN
 
-    ZoomOUT() => this._sms(0x91E)         ; SCI_ZOOMOUT
-
-
-    ; =========================================================================================
-    ; Scintilla Control Undo/Redo
-    ; =========================================================================================
-
-    AddUndo(token, flags:=1) =>         ; flags: 1=COALESCE, 0=NONE
-        this._sms(0xA00, token, flags)  ; SCI_ADDUNDOACTION token is sent in SCN_MODIFIED notification
-
-    CanUndo => this._sms(0x87E) ; SCI_CANUNDO
-
-    CanRedo => this._sms(0x7E0) ; SCI_CANREDO
-
-    BeginUndo() => this._sms(0x81E) ; SCI_BEGINUNDOACTION
-
-    EndUndo() => this._sms(0x81F) ; SCI_ENDUNDOACTION
-
-    Redo() => this._sms(0x7DB) ; SCI_REDO
-
-    Undo() => this._sms(0x880) ; SCI_UNDO
-
-    UndoActive {                        ; bool - enable/disable undo collection
-        get => this._sms(0x7E3)         ; SCI_GETUNDOCOLLECTION
-        set => this._sms(0x7DC, value)  ; SCI_SETUNDOCOLLECTION
+    Text {
+        Get => this._GetStr(0x886, this.Length + 1)
+        Set => this._PutStr(0x885, 0, value)
     }
-    UndoEmpty() => this._sms(0x87F) ; SCI_EMPTYUNDOBUFFER
 
-    ; =========================================================================================
-    ; Scintilla Control Status
-    ; =========================================================================================
+    TextWidth(txt, style := "") {
+        style := ((style != "") ? style : this.Style.ID)
 
-    CanPaste => this._sms(0x87D) ; SCI_CANPASTE
+        return this._PutStr(0x8E4, style, txt)
+    }
 
-    Focused => this._sms(0x94D)         ; SCI_GETFOCUS boolean
+    Value {
+        Get => this._GetStr(0x886, this.Length + 1)
+        Set => this._PutStr(0x885, 0, value)
+    }
 
-    Modified => this._sms(0x86F)         ; SCI_GETMODIFY
+    Clear() => this._sms(0x884)
 
-    ; Status {                            ; 0=NONE, 1=GenericFail, 2=MemoryExhausted, 1001=InvalidRegex
-        ; get => this._sms(0x94F)         ; SCI_GETSTATUS ; Generally meaning the "error status"
-        ; set => this._sms(0x94E, value)  ; SCI_SETSTATUS ; manually set status = 0 to clear
-    ; }
+    ClearAll() => this._sms(0x7D4)
+
+    Copy() => this._sms(0x882)
+
+    CopyLine() => this._sms(0x9D7)
+
+    CopyRange(start, end) => this._sms(0x973, start, end)
+
+    Cut() => this._sms(0x881)
+
+    Focus() => this._sms(0x960)
+
+    LinesJoin() => this._sms(0x8F0)
+
+    LinesSplit(pixels) => this._sms(0x8F1, pixels)
+
+    Paste() => this._sms(0x883)
+
+    SelectAll() => this._sms(0x7DD)
+
+    VisibleFromDocLine(_in) => this._sms(0x8AC, _in)
+
+    Zoom {
+        Get => this._sms(0x946)
+        Set => this._sms(0x945, value)
+    }
+
+    ZoomIN() => this._sms(0x91D)
+
+    ZoomOUT() => this._sms(0x91E)
+
+	AddUndo(token, flags := 1) => this._sms(0xA00, token, flags)
+
+    CanUndo => this._sms(0x87E)
+
+    CanRedo => this._sms(0x7E0)
+
+    BeginUndo() => this._sms(0x81E)
+
+    EndUndo() => this._sms(0x81F)
+
+    Redo() => this._sms(0x7DB)
+
+    Undo() => this._sms(0x880)
+
+    UndoActive {
+        Get => this._sms(0x7E3)
+        Set => this._sms(0x7DC, value)
+    }
+
+	UndoEmpty() => this._sms(0x87F)
+
+    CanPaste => this._sms(0x87D)
+
+    Focused => this._sms(0x94D)
+
+    Modified => this._sms(0x86F)
+
     Status => this._StatusD
 
-    ; =========================================================================================
-    ; Scintilla Control Settings
-    ; =========================================================================================
+    Accessibility {
+        Get => this._sms(0xA8F)
+        Set => this._sms(0xA8E, value)
+    }
 
-    Accessibility {                     ; int 0 = disabled, 1 = enabled
-        get => this._sms(0xA8F)         ; SCI_GETACCESSIBILITY
-        set => this._sms(0xA8E, value)  ; SCI_SETACCESSIBILITY
+    AutoBraceMatch {
+        Get => this._AutoBraceMatch
+        Set => (this._AutoBraceMatch := value)
     }
-    AutoBraceMatch {                    ; boolean - true/false (default = false)
-        get => this._AutoBraceMatch
-        set => this._AutoBraceMatch := value
-    }
+
     AutoPunctColor {
-        get => this._AutoPunctColor
-        set => this._AutoPunctColor := value
+        Get => this._AutoPunctColor
+        Set => (this._AutoPunctColor := value)
     }
-    AutoSizeNumberMargin {              ; boolean - true/false (default = false)
-        get => this._AutoSizeNumberMargin
-        set => this._AutoSizeNumberMargin := value
+
+    AutoSizeNumberMargin {
+        Get => this._AutoSizeNumberMargin
+        Set => (this._AutoSizeNumberMargin := value)
     }
-    BiDirectional {                     ; int 0 = disabled, 1 = Left-to-Right, 2 = Right-to-Left
-        get => this._sms(0xA94)         ; SCI_GETBIDIRECTIONAL
-        set => this._sms(0xA95, value)  ; SCI_SETBIDIRECTIONAL
+
+    BiDirectional {
+        Get => this._sms(0xA94)
+        Set => this._sms(0xA95, value)
     }
-    BufferedDraw {                      ; boolean (true = default)
-        get => this._sms(0x7F2)         ; SCI_GETBUFFEREDDRAW
-        set => this._sms(0x7F3, value)  ; SCI_SETBUFFEREDDRAW
+
+    BufferedDraw {
+        Get => this._sms(0x7F2)
+        Set => this._sms(0x7F3, value)
     }
-    CodePage {                          ; default = 65001
-        get => this._sms(0x859)         ; SCI_GETCODEPAGE
-        set => this._sms(0x7F5, value)  ; SCI_SETCODEPAGE
+
+    CodePage {
+        Get => this._sms(0x859)
+        Set => this._sms(0x7F5, value)
     }
-    CommandEvents {                     ; boolean
-        get => this._sms(0xA9E)         ; SCI_GETCOMMANDEVENTS
-        set => this._sms(0xA9D, value)  ; SCI_SETCOMMANDEVENTS
+
+    CommandEvents {
+        Get => this._sms(0xA9E)
+        Set => this._sms(0xA9D, value)
     }
-    Cursor {                            ; int -1 = normal mouse cursor, 7 = wait mouse cursor (1-7 can be used?)
-        get => this._sms(0x953)         ; SCI_GETCURSOR
-        set => this._sms(0x952, value)  ; SCI_SETCURSOR
+
+    Cursor {
+        Get => this._sms(0x953)
+        Set => this._sms(0x952, value)
     }
-    EndAtLastLine {                     ; boolean -> true = don't scroll past last line (default), false = you can
-        get => this._sms(0x8E6)         ; SCI_GETENDATLASTLINE
-        set => this._sms(0x8E5, value)  ; SCI_SETENDATLASTLINE
+
+    EndAtLastLine {
+        Get => this._sms(0x8E6)
+        Set => this._sms(0x8E5, value)
     }
-    EventMask {                         ; int event mask - scn.modType (modificationType)
-        get => this._sms(0x94A)         ; SCI_GETMODEVENTMASK
-        set => this._sms(0x937, value)  ; SCI_SETMODEVENTMASK
+
+    EventMask {
+        Get => this._sms(0x94A)
+        Set => this._sms(0x937, value)
     }
-    FontQuality {                       ; int 0 = Default, 1 = non-anti-aliased, 2 = anti-aliased, 3 = LCD optimized
-        get => this._sms(0xA34)         ; SCI_GETFONTQUALITY
-        set => this._sms(0xA33, value)  ; SCI_SETFONTQUALITY
+
+    FontQuality {
+        Get => this._sms(0xA34)
+        Set => this._sms(0xA33, value)
     }
+
     FontLocale {
-        get => this._sms(0xAC9)         ; SCI_GETFONTLOCALE
-        set => this._sms(0xAC8)         ; SCI_SETFONTLOCALE
-    }
-    Identifier {                        ; int ID for the control in SCNotifications
-        get => this._sms(0xA3F)         ; SCI_GETIDENTIFIER
-        set => this._sms(0xA3E, value)  ; SCI_SETIDENTIFIER
-    }
-    ImeInteraction {                    ; 0 = windowed, 1 = inline
-        get => this._sms(0xA76)         ; SCI_GETIMEINTERACTION
-        set => this._sms(0xA77, value)  ; SCI_SETIMEINTERACTION
-    }
-    MouseDownCaptures {                 ; boolean - enable/disable
-        get => this._sms(0x951)         ; SCI_GETMOUSEDOWNCAPTURES
-        set => this._sms(0x950)         ; SCI_SETMOUSEDOWNCAPTURES
-    }
-    MouseDwellTime {                    ; int milliseconds / default = 0
-        get => this._sms(0x8D9)         ; SCI_GETMOUSEDWELLTIME
-        set => this._sms(0x8D8, value)  ; SCI_SETMOUSEDWELLTIME
-    }
-    MouseWheelCaptures {                ; boolean - enable/disable
-        get => this._sms(0xA89)         ; SCI_GETMOUSEWHEELCAPTURES
-        set => this._sms(0xA88, value)  ; SCI_SETMOUSEWHEELCAPTURES
-    }
-    OverType {                          ; bool - enable/disable overtype
-        get => this._sms(0x88B)         ; SCI_GETOVERTYPE
-        set => this._sms(0x88A, value)  ; SCI_SETOVERTYPE
-    }
-    PasteConvertEndings {       ; Converts pasted endings to those defined by Scintilla.LineEndings.Mode
-        get => this._sms(0x9A4) ; SCI_GETPASTECONVERTENDINGS
-        set => this._sms(0x9A3) ; SCI_SETPASTECONVERTENDINGS
-    }
-    PhaseDraw {                         ; int 1 = two_phases (default), 2 = multiple_phases
-        get => this._sms(0x8EB)         ; SCI_GETTWOPHASEDRAW
-        set => this._sms(0x8EC, value)  ; SCI_SETTWOPHASEDRAW
-    }
-    ScrollWidthTracking {               ; boolean - in case non-wrap text extends beyond 2000 chars (default = false)
-        get => this._sms(0x9D5)         ; SCI_GETSCROLLWIDTHTRACKING
-        set => this._sms(0x9D4, value)  ; SCI_SETSCROLLWIDTHTRACKING
-    }
-    SetTechnology {                     ; int 0 = GDI (default), 1 = DirectWrite (Direct2D), 2 = DirectWriteRetain
-        get => this._sms(0xA47)         ; SCI_GETTECHNOLOGY
-        set => this._sms(0xA46, value)  ; SCI_SETTECHNOLOGY
-    }
-    ScrollH {                           ; boolean / show hide Horizontal scroll bar
-        get => this._sms(0x853)         ; SCI_GETHSCROLLBAR
-        set => this._sms(0x852, value)  ; SCI_SETHSCROLLBAR
-    }
-    ScrollV {                           ; boolean / show hide vertical scroll bar
-        get => this._sms(0x8E9)         ; SCI_GETVSCROLLBAR
-        set => this._sms(0x8E8, value)  ; SCI_GETVSCROLLBAR
-    }
-    ScrollWidth {                       ; in pixels, default = 2000?
-        get => this._sms(0x8E3)         ; SCI_GETSCROLLWIDTH
-        set => this._sms(0x8E2, value)  ; SCI_SETSCROLLWIDTH
-    }
-    SupportsFeature(n) {                ; SCI_SUPPORTSFEATURE
-        return this._sms(0xABE, n)      ; 0 = LINE_DRAWS_FINAL, 1 = PIXEL_DIVISIONS, 2 = FRACTIONAL_STROKE_WIDTH
-    }                                   ; 3 = TRANSLUCENT_STROKE, 4 = PIXEL_MODIFICATION
-    UsePopup { ; int 0 = off, 1 = default, 2 = only on text area
-        get => this._UsePopup
-        set => this._sms(0x943, (this._UsePopup := value))  ; SCI_USEPOPUP
+        Get => this._sms(0xAC9)
+        Set => this._sms(0xAC8, value)
     }
 
-    ; =========================================================================================
-    ; Scintilla internals, suggested not to use directly, unless you want advanced contlrol
-    ; =========================================================================================
+    Identifier {
+        Get => this._sms(0xA3F)
+        Set => this._sms(0xA3E, value)
+    }
 
-    DirectFunc => Scintilla.DirectFunc ; used internally
+    ImeInteraction {
+        Get => this._sms(0xA76)
+        Set => this._sms(0xA77, value)
+    }
 
-    DirectPtr => this._DirectPtr ; used internally
+    MouseDownCaptures {
+        Get => this._sms(0x951)
+        Set => this._sms(0x950)
+    }
 
-    DirectStatusFunc => Scintilla.DirectStatusFunc ; used internally
+    MouseDwellTime {
+        Get => this._sms(0x8D9)
+        Set => this._sms(0x8D8, value)
+    }
 
-    ; =========================================================================================
-    ; Scintilla Control manual direct access
-    ; =========================================================================================
+    MouseWheelCaptures {
+        Get => this._sms(0xA89)
+        Set => this._sms(0xA88, value)
+    }
 
-    CharacterPointer => this._sms(0x9D8)         ; SCI_GETCHARACTERPOINTER
+    OverType {
+        Get => this._sms(0x88B)
+        Set => this._sms(0x88A, value)
+    }
 
-    GapPosition => this._sms(0xA54)         ; SCI_GETGAPPOSITION
+    PasteConvertEndings {
+        Get => this._sms(0x9A4)
+        Set => this._sms(0x9A3)
+    }
 
-    RangePointer(start, length) => this._sms(0xA53, start, length) ; SCI_GETRANGEPOINTER
+    PhaseDraw {
+        Get => this._sms(0x8EB)
+        Set => this._sms(0x8EC, value)
+    }
+
+    ScrollWidthTracking {
+        Get => this._sms(0x9D5)
+        Set => this._sms(0x9D4, value)
+    }
+
+    SetTechnology {
+        Get => this._sms(0xA47)
+        Set => this._sms(0xA46, value)
+    }
+
+    ScrollH {
+        Get => this._sms(0x853)
+        Set => this._sms(0x852, value)
+    }
+
+    ScrollV {
+        Get => this._sms(0x8E9)
+        Set => this._sms(0x8E8, value)
+    }
+
+    ScrollWidth {
+        Get => this._sms(0x8E3)
+        Set => this._sms(0x8E2, value)
+    }
+
+    SupportsFeature(n) {
+        return this._sms(0xABE, n)
+    }
+
+    UsePopup {
+        Get => this._UsePopup
+        Set => this._sms(0x943, (this._UsePopup := value))
+    }
+
+    DirectFunc => Scintilla.DirectFunc
+
+    DirectPtr => this._DirectPtr
+
+    DirectStatusFunc => Scintilla.DirectStatusFunc
+
+    CharacterPointer => this._sms(0x9D8)
+
+    GapPosition => this._sms(0xA54)
+
+    RangePointer(start, length) => this._sms(0xA53, start, length)
 
     UseDirect {
-        get => this._UseDirect
-        set {
-            If (!Scintilla.DirectFunc And value=true) ; store in Scintilla class, once per module instance
-                Scintilla.DirectFunc := SendMessage(0x888, 0, 0, this.hwnd) ; SCI_GETDIRECTFUNCTION
+        Get => this._UseDirect
+        Set {
+            if (!Scintilla.DirectFunc And (value = true))
+                Scintilla.DirectFunc := SendMessage(0x888, 0, 0, this.Hwnd)
 
-            If (!Scintilla.DirectStatusFunc And value=true)
-                Scintilla.DirectStatusFunc := SendMessage(0xAD4, 0, 0, this.hwnd) ; SCI_GETDIRECTSTATUSFUNCTION
+            if (!Scintilla.DirectStatusFunc And (value = true))
+                Scintilla.DirectStatusFunc := SendMessage(0xAD4, 0, 0, this.Hwnd)
 
-            If (!this.DirectPtr And value=true) ; store in ctl, call once per control
-                this._DirectPtr  := SendMessage(0x889, 0, 0, this.hwnd) ; SCI_GETDIRECTPOINTER
-
-            ; If (value)
-                ; Scintilla.scint_base.Prototype._sms := Scintilla.scint_base.Prototype.__sms_slow
-            ; else
-                ; Scintilla.scint_base.Prototype._sms := Scintilla.scint_base.Prototype.__sms_fast
-
-            ; this.init_classes()
+            if (!this.DirectPtr And (value = true))
+                this._DirectPtr  := SendMessage(0x889, 0, 0, this.Hwnd)
 
             this._UseDirect := value
         }
     }
 
-    ; =========================================================================================
-    ; Subclasses
-    ; =========================================================================================
-
     class Brace extends Scintilla.scint_base {
         Chars := "[]{}()<>"
 
         BadColor {
-            get {
+            Get {
                 this.Style.ID := 35
+
                 return this.Style.Fore
             }
-            set {
+            Set {
                 this.Style.ID := 35
+
                 this.Style.Fore := value
             }
         }
-        BadLight(in_pos:=-1) {              ; ctl.Brace.BadLight() <-- with no value, will clear badlight
-            return this._sms(0x930, in_pos) ; SCI_BRACEBADLIGHT
+        BadLight(in_pos := -1) {
+            return this._sms(0x930, in_pos)
         }
+
         BadLightIndicator(on_off, indicator_int) {
-            return this._sms(0x9C3, on_off, indicator_int) ; SCI_BRACEBADLIGHTINDICATOR
+            return this._sms(0x9C3, on_off, indicator_int)
         }
+
         Color {
-            get {
+            Get {
                 this.Style.ID := 34
+
                 return this.Style.Fore
             }
-            set {
+            Set {
                 this.Style.ID := 34
                 this.Style.Fore := value
             }
         }
+
         Highlight(pos_A, pos_B) {
-            return this._sms(0x92F, pos_A, pos_B) ; SCI_BRACEHIGHLIGHT
+            return this._sms(0x92F, pos_A, pos_B)
         }
+
         HighlightIndicator(on_off, indicator_int) {
-            return this._sms(0x9C2, on_off, indicator_int) ; SCI_BRACEHIGHLIGHTINDICATOR
+            return this._sms(0x9C2, on_off, indicator_int)
         }
-        Match(in_pos) { ; int position (of brace to be matched) ; maxReStyle, 2nd param, must be zero
-            return this._sms(0x931, in_pos) ; SCI_BRACEMATCH
+
+        Match(in_pos) {
+            return this._sms(0x931, in_pos)
         }
+
         MatchNext(in_pos, start_pos) {
-            return this._sms(0x941, in_pos, start_pos) ; SCI_BRACEMATCHNEXT
+            return this._sms(0x941, in_pos, start_pos)
         }
     }
 
     class Caret extends Scintilla.scint_base {
-        Blink {                             ; int milliseconds
-            get => this._sms(0x81B)         ; SCI_GETCARETPERIOD
-            set => this._sms(0x81C, value)  ; SCI_SETCARETPERIOD
+        Blink {
+            Get => this._sms(0x81B)
+            Set => this._sms(0x81C, value)
         }
-        ChooseX() {                 ; remembers X pos of cursor for vertical navigation
-            return this._sms(0x95F) ; SCI_CHOOSECARETX ; uses CURRENT pos as new X value
+
+        ChooseX() {
+            return this._sms(0x95F)
         }
-        Focus() {                   ; moves to caret, and loses selection
-            return this._sms(0x961) ; SCI_MOVECARETINSIDEVIEW
+
+        Focus() {
+            return this._sms(0x961)
         }
-        Fore {                                              ; color
-            get => this._RGB_BGR(this._sms(0x85A))          ; SCI_GETCARETFORE
-            set => this._sms(0x815, this._RGB_BGR(value))   ; SCI_SETCARETFORE
+
+        Fore {
+            Get => this._RGB_BGR(this._sms(0x85A))
+            Set => this._sms(0x815, this._RGB_BGR(value))
         }
+
         GoToLine(line) {
-            return this._sms(0x7E8, line)   ; SCI_GOTOLINE
+            return this._sms(0x7E8, line)
         }
-        GoToPos(pos:="") {                          ; caret new pos is scrolled into view
-            pos := (pos!="")?pos:this.ctl.CurPos    ; use current caret pos by default, and destroys selection
-            return this._sms(0x7E9, pos)            ; SCI_GOTOPOS
+
+        GoToPos(pos := "") {
+            pos := ((pos!="") ? pos : this.ctl.CurPos)
+
+            return this._sms(0x7E9, pos)
         }
-        LineBack { ; SC_ELEMENT_CARET_LINE_BACK = 0x32 (50)
-            get => this._sms(0xAC2, 0x32)                          ; SCI_GETELEMENTCOLOUR
-            set => this._sms(0xAC1, 0x32, this._RGB_BGR(value))    ; SCI_SETELEMENTCOLOUR
+
+        LineBack {
+            Get => this._sms(0xAC2, 0x32)
+            Set => this._sms(0xAC1, 0x32, this._RGB_BGR(value))
         }
-        ; LineBack {                                          ; color
-            ; get => this._RGB_BGR(this._sms(0x831))          ; SCI_GETCARETLINEBACK
-            ; set => this._sms(0x832, this._RGB_BGR(value))   ; SCI_SETCARETLINEBACK
-        ; }
-        ; LineBackAlpha {                     ; 0-255
-            ; get => this._sms(0x9A7)         ; SCI_GETCARETLINEBACKALPHA
-            ; set => this._sms(0x9A6, value)  ; SCI_SETCARETLINEBACKALPHA
-        ; }
-        LineFrame {                         ; int width in pixels (0 = disabled)
-            get => this._sms(0xA90)         ; SCI_GETCARETLINEFRAME
-            set => this._sms(0xA91, value)  ; SCI_SETCARETLINEFRAME
+
+        LineFrame {
+            Get => this._sms(0xA90)
+            Set => this._sms(0xA91, value)
         }
+
         LineLayer {
-            get => this._sms(0xACC)         ; SCI_GETCARETLINELAYER
-            set => this._sms(0xACD)         ; SCI_SETCARETLINELAYER
+            Get => this._sms(0xACC)
+            Set => this._sms(0xACD)
         }
-        ; LineVisible {                       ; boolean -> true/false caret line is/is not visible
-            ; get => this._sms(0x82F)         ; SCI_GETCARETLINEVISIBLE
-            ; set => this._sms(0x830, value)  ; SCI_SETCARETLINEVISIBLE
-        ; }
-        LineVisibleAlways {                 ; boolean
-            get => this._sms(0xA5E)         ; SCI_GETCARETLINEVISIBLEALWAYS
-            set => this._sms(0xA5F, value)  ; SCI_GETCARETLINEVISIBLEALWAYS
+
+        LineVisibleAlways {
+            Get => this._sms(0xA5E)
+            Set => this._sms(0xA5F, value)
         }
-        Multi {                             ; boolean - default = true
-            get => this._sms(0xA31)         ; SCI_GETADDITIONALCARETSVISIBLE
-            set => this._sms(0xA30, value)  ; SCI_SETADDITIONALCARETSVISIBLE
+
+        Multi {
+            Get => this._sms(0xA31)
+            Set => this._sms(0xA30, value)
         }
-        MultiFore {                                         ; get/set Mult-sel fore color
-            get => this._RGB_BGR(this._sms(0xA2D))          ; SCI_GETADDITIONALCARETFORE
-            set => this._sms(0xA2C, this._RGB_BGR(value))   ; SCI_SETADDITIONALCARETFORE
+
+        MultiFore {
+            Get => this._RGB_BGR(this._sms(0xA2D))
+            Set => this._sms(0xA2C, this._RGB_BGR(value))
         }
-        MultiBlink {                        ; boolean - default = true
-            get => this._sms(0xA08)         ; SCI_GETADDITIONALCARETSBLINK
-            set => this._sms(0xA07, value)  ; SCI_SETADDITIONALCARETSBLINK
+
+        MultiBlink {
+            Get => this._sms(0xA08)
+            Set => this._sms(0xA07, value)
         }
-        PolicyX(policy:=0, pixels:=0) {             ; 1 = SLOP, 4 = STRICT, 8 = EVEN, 16 = JUMPS
-            return this._sms(0x962, policy, pixels) ; SCI_SETXCARETPOLICY
+
+        PolicyX(policy := 0, pixels := 0) {
+            return this._sms(0x962, policy, pixels)
         }
-        PolicyY(policy:=0, pixels:=0) {             ; 1 = SLOP, 4 = STRICT, 8 = EVEN, 16 = JUMPS
-            return this._sms(0x963, policy, pixels) ; SCI_SETYCARETPOLICY
+
+        PolicyY(policy := 0, pixels := 0) {
+            return this._sms(0x963, policy, pixels)
         }
-        SetPos(pos) {                           ; caret new pos is NOT scrolled into view
-            return this._sms(0x9FC, pos)            ; SCI_SETEMPTYSELECTION
+
+        SetPos(pos) {
+            return this._sms(0x9FC, pos)
         }
-        Sticky {                            ; int 0, 1, 2 (default = 0 (off))
-            get => this._sms(0x999)         ; SCI_GETCARETSTICKY
-            set => this._sms(0x99A, value)  ; SCI_SETCARETSTICKY
+
+        Sticky {
+            Get => this._sms(0x999)
+            Set => this._sms(0x99A, value)
         }
+
         StickyToggle() {
-            return this._sms(0x99B) ; SCI_TOGGLECARETSTICKY
+            return this._sms(0x99B)
         }
-        Style {                             ; int 0 = invisible / overstrike bar, 1 = line, 2 = Block, 16 = overstrike block, 256 = block after
-            get => this._sms(0x9D1)         ; SCI_GETCARETSTYLE
-            set => this._sms(0x9D0, value)  ; SCI_SETCARETSTYLE
+
+        Style {
+            Get => this._sms(0x9D1)
+            Set => this._sms(0x9D0, value)
         }
-        Width {                             ; int pixels (1 = default)
-            get => this._sms(0x88D)         ; SCI_GETCARETWIDTH
-            set => this._sms(0x88C, value)  ; SCI_SETCARETWIDTH
+
+        Width {
+            Get => this._sms(0x88D)
+            Set => this._sms(0x88C, value)
         }
     }
 
     class Doc extends Scintilla.scint_base {
         AddRef(doc_ptr) {
-            return this._sms(0x948, 0, doc_ptr)     ; SCI_ADDREFDOCUMENT
+            return this._sms(0x948, 0, doc_ptr)
         }
-        Create(size, options:=0) {  ; options - 0 = standard / 1 = no styles / 0x100 = allow larger than 2GB
-            return this._sms(0x947, size, options)  ; SCI_CREATEDOCUMENT
+
+        Create(size, options:=0) {
+            return this._sms(0x947, size, options)
         }
+
         Options {
-            get => this._sms(0x94B)             ; SCI_GETDOCUMENTOPTIONS
+            Get => this._sms(0x94B)
         }
+
         Ptr {
-            get => this._sms(0x935)             ; SCI_GETDOCPOINTER
-            set => this._sms(0x936, 0, value)   ; SCI_SETDOCPOINTER
+            Get => this._sms(0x935)
+            Set => this._sms(0x936, 0, value)
         }
+
         Release(doc_ptr) {
-            return this._sms(0x949, 0, doc_ptr) ; SCI_RELEASEDOCUMENT
+            return this._sms(0x949, 0, doc_ptr)
         }
     }
 
@@ -1288,37 +1224,45 @@ class Scintilla extends Gui.Custom {
             this.ctl := ctl
             this.Multi := Scintilla.Edge.Multi(ctl)
         }
+
         Add(column, color) {
-            return this._sms(0xA86, column, color) ; SCI_MULTIEDGEADDLINE
+            return this._sms(0xA86, column, color)
         }
+
         Clear() {
-            this._sms(0xA87)    ; SCI_MULTIEDGECLEARALL
+            this._sms(0xA87)
         }
-        Column {                            ; int column number
-            get => this._sms(0x938)         ; SCI_GETEDGECOLUMN
-            set => this._sms(0x939, value)  ; SCI_SETEDGECOLUMN
+
+        Column {
+            Get => this._sms(0x938)
+            Set => this._sms(0x939, value)
         }
-        Color {                                             ; color
-            get => this._RGB_BGR(this._sms(0x93C))          ; SCI_GETEDGECOLOUR
-            set => this._sms(0x93D, this._RGB_BGR(value))   ; SCI_SETEDGECOLOUR
+
+        Color {
+            Get => this._RGB_BGR(this._sms(0x93C))
+            Set => this._sms(0x93D, this._RGB_BGR(value))
         }
-        GetNext(start_pos:=0) {                 ; returns int/column of next added edge
-            return this._sms(0xABD, start_pos)  ; SCI_GETMULTIEDGECOLUMN
+
+        GetNext(start_pos:=0) {
+            return this._sms(0xABD, start_pos)
         }
-        Mode {                              ; int 0 = NONE, 1 = LINE, 2 = BACKGROUND, 3 = MULTI LINE
-            get => this._sms(0x93A)         ; SCI_GETEDGEMODE
-            set => this._sms(0x93B, value)  ; SCI_SETEDGEMODE
+
+        Mode {
+            Get => this._sms(0x93A)
+            Set => this._sms(0x93B, value)
         }
 
         class Multi extends Scintilla.scint_base {
-            Add(pos, color) {       ; SCI_MULTIEDGEADDLINE
+            Add(pos, color) {
                 return this._sms(0xA86, pos, this._RGB_BGR(color))
             }
-            ClearAll() {            ; SCI_MULTIEDGECLEARALL
+
+            ClearAll() {
                 return this._sms(0xA87)
             }
-            GetColumn(which) {      ; SCI_GETMULTIEDGECOLUMN
-                return this._sms(0xABD, which) ; 0-based ... like everything else!
+
+            GetColumn(which) {
+                return this._sms(0xABD, which)
             }
         }
     }
@@ -1327,23 +1271,27 @@ class Scintilla extends Gui.Custom {
         Line := 0
 
         ClearAll() {
-            return this._sms(0xAB8)                         ; SCI_EOLANNOTATIONCLEARALL
+            return this._sms(0xAB8)
         }
-        Style {                                             ; int
-            get => this._sms(0xAB7, this.Line)              ; SCI_EOLANNOTATIONGETSTYLE
-            set => this._sms(0xAB6, this.Line, value)       ; SCI_EOLANNOTATIONSETSTYLE
+
+        Style {
+            Get => this._sms(0xAB7, this.Line)
+            Set => this._sms(0xAB6, this.Line, value)
         }
+
         StyleOffset {
-            get => this._sms(0xABC)                         ; SCI_EOLANNOTATIONGETSTYLEOFFSET
-            set => this._sms(0xABB, value)                  ; SCI_EOLANNOTATIONSETSTYLEOFFSET
+            Get => this._sms(0xABC)
+            Set => this._sms(0xABB, value)
         }
-        Text {                                              ; string
-            get => this._GetStr(0xAB5, this.Line)           ; SCI_EOLANNOTATIONGETTEXT
-            set => this._PutStr(0xAB4, this.Line, value)    ; SCI_EOLANNOTATIONSETTEXT
+
+        Text {
+            Get => this._GetStr(0xAB5, this.Line)
+            Set => this._PutStr(0xAB4, this.Line, value)
         }
-        Visible {                                           ; flag value, see Static sc_eol above
-            get => this._sms(0xABA)                         ; SCI_EOLANNOTATIONGETVISIBLE
-            set => this._sms(0xAB9, value)                  ; SCI_EOLANNOTATIONSETVISIBLE
+
+        Visible {
+            Get => this._sms(0xABA)
+            Set => this._sms(0xAB9, value)
         }
     }
 
@@ -1354,69 +1302,86 @@ class Scintilla extends Gui.Custom {
         _ForeEnabled := true
 
         Back(bool, color) {
-            this._BackEnabled := bool,    this._BackColor := color
-            return this._sms(0x96B, bool, this._RGB_BGR(color)) ; SCI_SETHOTSPOTACTIVEBACK
+            this._BackEnabled := bool
+            this._BackColor := color
+
+            return this._sms(0x96B, bool, this._RGB_BGR(color))
         }
+
         BackEnabled {
-            get => this._BackEnabled                                                                ; boolean
-            set => this._sms(0x96B, (this._BackEnabled := value), this._RGB_BGR(this.BackColor))    ; SCI_SETHOTSPOTACTIVEBACK
+            Get => this._BackEnabled
+            Set => this._sms(0x96B, (this._BackEnabled := value), this._RGB_BGR(this.BackColor))
         }
-        BackColor {         ; color
-            get => (0xFF000000 & this._BackColor) ? Format("0x{:08X}", this._BackColor) : Format("0x{:06X}", this._BackColor)
-            set => this._sms(0x96B, this._BackEnabled, this._RGB_BGR(this._BackColor := value)) ; SCI_SETHOTSPOTACTIVEBACK
+
+        BackColor {
+            Get => ((0xFF000000 & this._BackColor) ? Format("0x{:08X}", this._BackColor) : Format("0x{:06X}", this._BackColor))
+            Set => this._sms(0x96B, this._BackEnabled, this._RGB_BGR(this._BackColor := value))
         }
+
         Fore(bool, color) {
-            this._ForeEnabled := bool,    this._ForeColor := color
-            return this._sms(0x96A, bool, this._RGB_BGR(color)) ; SCI_SETHOTSPOTACTIVEFORE
+            this._ForeEnabled := bool
+            this._ForeColor := color
+
+            return this._sms(0x96A, bool, this._RGB_BGR(color))
         }
-        ForeEnabled {       ; boolean
-            get => this.ForeEnabled
-            set => this._sms(0x96A, (this._ForeEnabled := value), this._RGB_BGR(this._ForeColor)) ; SCI_SETHOTSPOTACTIVEFORE
+
+        ForeEnabled {
+            Get => this.ForeEnabled
+            Set => this._sms(0x96A, (this._ForeEnabled := value), this._RGB_BGR(this._ForeColor))
         }
-        ForeColor {         ; color
-            get => (0xFF000000 & this._ForeColor) ? Format("0x{:08X}", this._ForeColor) : Format("0x{:06X}", this._ForeColor)
-            set => this._sms(0x96A, this._ForeEnabled, this._RGB_BGR(this._ForeColor := value)) ; SCI_SETHOTSPOTACTIVEFORE
+
+        ForeColor {
+            Get => ((0xFF000000 & this._ForeColor) ? Format("0x{:08X}", this._ForeColor) : Format("0x{:06X}", this._ForeColor))
+            Set => this._sms(0x96A, this._ForeEnabled, this._RGB_BGR(this._ForeColor := value))
         }
-        SingleLine {                        ; boolean
-            get => this._sms(0x9C1)         ; SCI_GETHOTSPOTSINGLELINE
-            set => this._sms(0x975, value)  ; SCI_SETHOTSPOTSINGLELINE
+
+        SingleLine {
+            Get => this._sms(0x9C1)
+            Set => this._sms(0x975, value)
         }
-        Underline {                         ; boolean
-            get => this._sms(0x9C0)         ; SCI_GETHOTSPOTACTIVEUNDERLINE
-            set => this._sms(0x96C, value)  ; SCI_SETHOTSPOTACTIVEUNDERLINE
+
+        Underline {
+            Get => this._sms(0x9C0)
+            Set => this._sms(0x96C, value)
         }
     }
 
     class LineEnding extends Scintilla.scint_base {
-        Convert(mode) {                     ; mode -> 0 = CRLF, 1 = CR, 2 = LF
-            return this._sms(0x7ED, mode)   ; SCI_CONVERTEOLS
+        Convert(mode) {
+            return this._sms(0x7ED, mode)
         }
-        Mode {                              ; int 0 = CRLF, 1 = CR, 2 = LF
-            get => this._sms(0x7EE)         ; SCI_GETEOLMODE
-            set => this._sms(0x7EF, value)  ; SCI_SETEOLMODE
+
+        Mode {
+            Get => this._sms(0x7EE)
+            Set => this._sms(0x7EF, value)
         }
-        View {                              ; boolean - true = show line endings, false = hide line endings
-            get => this._sms(0x933)         ; SCI_GETVIEWEOL
-            set => this._sms(0x934, value)  ; SCI_SETVIEWEOL
+
+        View {
+            Get => this._sms(0x933)
+            Set => this._sms(0x934, value)
         }
-        TypesActive {                       ; int - result is (TypesSupported & TypesAllowed)
-            get => this._sms(0xA62)         ; SCI_GETLINEENDTYPESACTIVE
+
+        TypesActive {
+            Get => this._sms(0xA62)
         }
-        TypesAllowed {                      ; int 0 = DEFAULT, 1 = UNICODE (works with lexer)
-            get => this._sms(0xA61)         ; SCI_GETLINEENDTYPESALLOWED
-            set => this._sms(0xA60, value)  ; SCI_SETLINEENDTYPESALLOWED
+
+        TypesAllowed {
+            Get => this._sms(0xA61)
+            Set => this._sms(0xA60, value)
         }
-        TypesSupported {                    ; int 0 = DEFAULT, 1 = UNICODE (read only)
-            get => this._sms(0xFB2)         ; SCI_GETLINEENDTYPESSUPPORTED
+
+        TypesSupported {
+            Get => this._sms(0xFB2)
         }
     }
 
     class Macro extends Scintilla.scint_base {
         Start() {
-            return this._sms(0xBB9)         ; SCI_STARTRECORD
+            return this._sms(0xBB9)
         }
+
         Stop() {
-            return this._sms(0xBBA)         ; SCI_STOPRECORD
+            return this._sms(0xBBA)
         }
     }
 
@@ -1428,81 +1393,102 @@ class Scintilla extends Gui.Custom {
         _FoldHiColorEnabled := false
         _FoldHiColor := 0
 
-        Back {                                                      ; color
-            get => this._RGB_BGR(this._sms(0x8CB, this.ID))         ; SCI_GETMARGINBACKN
-            set => this._sms(0x8CA, this.ID, this._RGB_BGR(value))  ; SCI_SETMARGINBACKN
+        Back {
+            Get => this._RGB_BGR(this._sms(0x8CB, this.ID))
+            Set => this._sms(0x8CA, this.ID, this._RGB_BGR(value))
         }
-        Count {                             ; int (default = 5)
-            get => this._sms(0x8CD)         ; SCI_GETMARGINS
-            set => this._sms(0x8CC, value)  ; SCI_SETMARGINS
+
+        Count {
+            Get => this._sms(0x8CD)
+            Set => this._sms(0x8CC, value)
         }
-        Cursor {                                        ; int -1 = normal, 2 = arrow, 4 = wait, 7 = ReverseArrow
-            get => this._sms(0x8C9, this.ID)            ; SCI_GETMARGINCURSORN
-            set => this._sms(0x8C8, this.ID, value)     ; SCI_SETMARGINCURSORN
+
+        Cursor {
+            Get => this._sms(0x8C9, this.ID)
+            Set => this._sms(0x8C8, this.ID, value)
         }
+
         Fold(bool, color) {
-            this._FoldColorEnabled := bool,   this._FoldColor := color
-            return this._sms(0x8F2, bool, this._RGB_BGR(color)) ; SCI_SETFOLDMARGINCOLOUR
+            this._FoldColorEnabled := bool
+            this._FoldColor := color
+
+            return this._sms(0x8F2, bool, this._RGB_BGR(color))
         }
-        FoldColor {         ; color
-            get => (0xFF000000 & this._FoldColor) ? Format("0x{:08X}", this._FoldColor) : Format("0x{:06X}", this._FoldColor)
-            set => this._sms(0x8F2, this._FoldColorEnabled, this._RGB_BGR(this._FoldColor := value)) ; SCI_SETFOLDMARGINCOLOUR
+
+        FoldColor {
+            Get => ((0xFF000000 & this._FoldColor) ? Format("0x{:08X}", this._FoldColor) : Format("0x{:06X}", this._FoldColor))
+            Set => this._sms(0x8F2, this._FoldColorEnabled, this._RGB_BGR(this._FoldColor := value))
         }
-        FoldColorEnabled {  ; boolean
-            get => this._FoldColorEnabled
-            set => this._sms(0x8F2, (this._FoldColorEnabled := value), this._RGB_BGR(this._FoldColor)) ; SCI_SETFOLDMARGINCOLOUR
+
+        FoldColorEnabled {
+            Get => this._FoldColorEnabled
+            Set => this._sms(0x8F2, (this._FoldColorEnabled := value), this._RGB_BGR(this._FoldColor))
         }
+
         FoldHi(bool, color) {
-            this._FoldHiColorEnabled := bool,   this._FoldHiColor := color
-            return this._sms(0x8F3, bool, this._RGB_BGR(color)) ; SCI_SETFOLDMARGINHICOLOUR
+            this._FoldHiColorEnabled := bool
+            this._FoldHiColor := color
+
+            return this._sms(0x8F3, bool, this._RGB_BGR(color))
         }
-        FoldHiColor {       ; color
-            get => (0xFF000000 & this._FoldHiColor) ? Format("0x{:08X}", this._FoldHiColor) : Format("0x{:06X}", this._FoldHiColor)
-            set => this._sms(0x8F3, this._FoldHiColorEnabled, this._RGB_BGR(this._FoldHiColor := value)) ; SCI_SETFOLDMARGINHICOLOUR
+
+        FoldHiColor {
+            Get => ((0xFF000000 & this._FoldHiColor) ? Format("0x{:08X}", this._FoldHiColor) : Format("0x{:06X}", this._FoldHiColor))
+            Set => this._sms(0x8F3, this._FoldHiColorEnabled, this._RGB_BGR(this._FoldHiColor := value))
         }
-        FoldHiColorEnabled { ; boolean
-            get => this._FoldHiColorEnabled
-            set => this._sms(0x8F3, (this._FoldHiColorEnabled := value), this._RGB_BGR(this._FoldHiColor)) ; SCI_SETFOLDMARGINHICOLOUR
+
+        FoldHiColorEnabled {
+            Get => this._FoldHiColorEnabled
+            Set => this._sms(0x8F3, (this._FoldHiColorEnabled := value), this._RGB_BGR(this._FoldHiColor))
         }
-        Left {                                  ; int pixels (margin left... on the margin)
-            get => this._sms(0x86C)             ; SCI_GETMARGINLEFT
-            set => this._sms(0x86B, 0, value)   ; SCI_SETMARGINLEFT
+
+        Left {
+            Get => this._sms(0x86C)
+            Set => this._sms(0x86B, 0, value)
         }
-        Mask {                                      ; int mask (32-bit) - default = SCI_SETMARGINMASKN(1, ~SC_MASK_FOLDERS:=0xFE000000)
-            get => this._sms(0x8C5, this.ID)        ; SCI_GETMARGINMASKN
-            set => this._sms(0x8C4, this.ID, value) ; SCI_SETMARGINMASKN
+
+        Mask {
+            Get => this._sms(0x8C5, this.ID)
+            Set => this._sms(0x8C4, this.ID, value)
         }
+
         MinWidth {
-            get => (this._MinWidth.Has(String(this.ID))) ? this._MinWidth[String(this.ID)] : this.ctl.TextWidth("00")+2
-            set => this._MinWidth[String(this.ID)] := value
+            Get => (this._MinWidth.Has(String(this.ID)) ? this._MinWidth[String(this.ID)] : this.ctl.TextWidth("00") + 2)
+            Set => this._MinWidth[String(this.ID)] := value
         }
-        Right {                                 ; int pixels (margin right... on the margin)
-            get => this._sms(0x86E)             ; SCI_GETMARGINRIGHT
-            set => this._sms(0x86D, 0, value)   ; SCI_SETMARGINRIGHT
+
+        Right {
+            Get => this._sms(0x86E)
+            Set => this._sms(0x86D, 0, value)
         }
-        Sensitive {                                 ; boolean
-            get => this._sms(0x8C7, this.ID)        ; SCI_GETMARGINSENSITIVEN
-            set => this._sms(0x8C6, this.ID, value) ; SCI_SETMARGINSENSITIVEN
+
+        Sensitive {
+            Get => this._sms(0x8C7, this.ID)
+            Set => this._sms(0x8C6, this.ID, value)
         }
-        Style(line, style:="") {                        ; n = line, in/out = int
-            If (style="")
-                return this._sms(0x9E5, line)           ; SCI_MARGINGETSTYLE
-            Else
-                return this._sms(0x9E4, line, style)    ; SCI_MARGINSETSTYLE
+
+        Style(line, style := "") {
+            if (style = "")
+                return this._sms(0x9E5, line)
+            else
+                return this._sms(0x9E4, line, style)
         }
-        Text(line, text:=" ") {                         ; n = line, in/out = string
-            If (text=" ")
-                return this._GetStr(0x9E3, line)        ; SCI_MARGINGETTEXT
-            Else
-                return this._PutStr(0x9E2, line, text)  ; SCI_MARGINSETTEXT
+
+        Text(line, text := A_Space) {
+            if (text = A_Space)
+                return this._GetStr(0x9E3, line)
+            else
+                return this._PutStr(0x9E2, line, text)
         }
-        Type {                                      ; int 0 = symbol, 1 = numbers, 2/3 = back/fore, 4/5 = text/rText, 6 = color
-            get => this._sms(0x8C1, this.ID)        ; SCI_GETMARGINTYPEN
-            set => this._sms(0x8C0, this.ID, value) ; SCI_SETMARGINTYPEN
+
+        Type {
+            Get => this._sms(0x8C1, this.ID)
+            Set => this._sms(0x8C0, this.ID, value)
         }
-        Width {                                     ; int pixels
-            get => this._sms(0x8C3, this.ID)        ; SCI_GETMARGINWIDTHN
-            set => this._sms(0x8C2, this.ID, value) ; SCI_SETMARGINWIDTHN
+
+        Width {
+            Get => this._sms(0x8C3, this.ID)
+            Set => this._sms(0x8C2, this.ID, value)
         }
     }
 
@@ -1518,117 +1504,136 @@ class Scintilla extends Gui.Custom {
         _HighlightEnabled := false
         _Alpha := 255
 
-        Add(line, markerNum:="") {                                              ; returns marker handle
-            return this._sms(0x7FB, line, (markerNum!="")?markerNum:this.num)   ; SCI_MARKERADD
+        Add(line, markerNum:="") {
+            return this._sms(0x7FB, line, (markerNum != "") ? markerNum : this.num)
         }
+
         AddSet(line, markerMask) {
-            return this._sms(0x9A2, line, markerMask)       ; SCI_MARKERADDSET
+            return this._sms(0x9A2, line, markerMask)
         }
+
         Alpha {
-            get => this._Alpha
-            set => this._sms(0x9AC, (this._Alpha := value))  ; SCI_MARKERSETALPHA
+            Get => this._Alpha
+            Set => this._sms(0x9AC, (this._Alpha := value))
         }
         Back {
-            get => (0xFF000000 & this._BackColor) ? Format("0x{:08X}", this._BackColor) : Format("0x{:06X}", this._BackColor)
-            set {
-                If (0xFF000000 & value)
-                    this._sms(0x8F7, this.num, this._RGB_BGR(this._ForeColor := value)) ; SCI_MARKERSETBACKTRANSLUCENT
-                Else
-                    this._sms(0x7FA, this.num, this._RGB_BGR(this._ForeColor := value)) ; SCI_MARKERSETBACK
+            Get => ((0xFF000000 & this._BackColor) ? Format("0x{:08X}", this._BackColor) : Format("0x{:06X}", this._BackColor))
+            Set {
+                if (0xFF000000 & value)
+                    this._sms(0x8F7, this.num, this._RGB_BGR(this._ForeColor := value))
+                else
+                    this._sms(0x7FA, this.num, this._RGB_BGR(this._ForeColor := value))
             }
         }
+
         BackSelected {
-            get => (0xFF000000 & this._BackSelectedColor) ? Format("0x{:08X}", this._BackSelectedColor) : Format("0x{:06X}", this._BackSelectedColor)
-            set {
-                If (0xFF000000 & value)
-                    this._sms(0x8F8, this.num, this._RGB_BGR(this._ForeColor := value)) ; SCI_MARKERSETBACKSELECTEDTRANSLUCENT
-                Else
-                    this._sms(0x8F4, this.num, this._RGB_BGR(this._ForeColor := value)) ; SCI_MARKERSETBACKSELECTED
+            Get => ((0xFF000000 & this._BackSelectedColor) ? Format("0x{:08X}", this._BackSelectedColor) : Format("0x{:06X}", this._BackSelectedColor))
+            Set {
+                if (0xFF000000 & value)
+                    this._sms(0x8F8, this.num, this._RGB_BGR(this._ForeColor := value))
+                else
+                    this._sms(0x8F4, this.num, this._RGB_BGR(this._ForeColor := value))
             }
         }
-        Delete(line, markerNum:="") {
-            return this._sms(0x7FC, line, (markerNum!="")?markerNum:this.num)   ; SCI_MARKERDELETE
+
+        Delete(line, markerNum := "") {
+            return this._sms(0x7FC, line, (markerNum != "") ? markerNum : this.num)
         }
-        DeleteAll(markerNum:="") {
-            return this._sms(0x7FD, (markerNum!="")?markerNum:this.num) ; SCI_MARKERDELETEALL
+
+        DeleteAll(markerNum := "") {
+            return this._sms(0x7FD, (markerNum != "") ? markerNum : this.num)
         }
-        DeleteHandle(hMarker) {
-            return this._sms(0x7E2, hMarker)    ; SCI_MARKERDELETEHANDLE
+
+        DeleteHandle(marker) {
+            return this._sms(0x7E2, marker)
         }
+
         Fore {
-            get => (0xFF000000 & this._ForeColor) ? Format("0x{:08X}", this._ForeColor) : Format("0x{:06X}", this._ForeColor)
-            set {
-                If (0xFF000000 & value)
-                    this._sms(0x8F6, this.num, this._RGB_BGR(this._ForeColor := value)) ; SCI_MARKERSETFORETRANSLUCENT
-                Else
-                    this._sms(0x7F9, this.num, this._RGB_BGR(this._ForeColor := value)) ; SCI_MARKERSETFORE
+            Get => ((0xFF000000 & this._ForeColor) ? Format("0x{:08X}", this._ForeColor) : Format("0x{:06X}", this._ForeColor))
+            Set {
+                if (0xFF000000 & value)
+                    this._sms(0x8F6, this.num, this._RGB_BGR(this._ForeColor := value))
+                else
+                    this._sms(0x7F9, this.num, this._RGB_BGR(this._ForeColor := value))
             }
         }
+
         Get(line) {
-            return this._sms(0x7FE, line)   ; SCI_MARKERGET
+            return this._sms(0x7FE, line)
         }
+
         Handle(line, which) {
-            return this._sms(0xAAC, line, which)   ; SCI_MARKERHANDLEFROMLINE
+            return this._sms(0xAAC, line, which)
         }
+
         Highlight {
-            get => this._HighlightEnabled
-            set => this._sms(0x8F5, (this._HighlightEnabled := value))  ; SCI_MARKERENABLEHIGHLIGHT
+            Get => this._HighlightEnabled
+            Set => this._sms(0x8F5, (this._HighlightEnabled := value))
         }
+
         Layer {
-            get => this._sms(0xAAE)         ; SCI_MARKERGETLAYER
-            set => this._sms(0xAAF, value)  ; SCI_MARKERSETLAYER
+            Get => this._sms(0xAAE)
+            Set => this._sms(0xAAF, value)
         }
-        Line(hMarker) {
-            return this._sms(0x7E1, hMarker)    ; SCI_MARKERLINEFROMHANDLE
+
+        Line(marker) {
+            return this._sms(0x7E1, marker)
         }
-        Next(line, markerMask) {                        ; returns line number
-            return this._sms(0x7FF, line, markerMask)   ; SCI_MARKERNEXT
+
+        Next(line, markerMask) {
+            return this._sms(0x7FF, line, markerMask)
         }
+
         Number(line, which) {
-            return this._sms(0xAAD, line, which)    ; SCI_MARKERNUMBERFROMLINE
+            return this._sms(0xAAD, line, which)
         }
+
         PixMap {
-            set => this._sms(0x801, this.num, (Type(value)="Buffer")?value.ptr:value) ; SCI_MARKERDEFINEPIXMAP
+            Set => this._sms(0x801, this.num, (Type(value) = "Buffer") ? value.ptr : value)
         }
-        Prev(line, markerMask) {                        ; returns line number
-            return this._sms(0x800, line, markerMask)   ; SCI_MARKERPREVIOUS
+
+        Prev(line, markerMask) {
+            return this._sms(0x800, line, markerMask)
         }
+
         StrokeWidth {
-            get => this._StrokeWidth
-            set => this._sms(0x8F9, (this._StrokeWidth := value))   ; SCI_MARKERSETSTROKEWIDTH
+            Get => this._StrokeWidth
+            Set => this._sms(0x8F9, (this._StrokeWidth := value))
         }
+
         Type {
-            get => this._sms(0x9E1, this.num)           ; SCI_MARKERSYMBOLDEFINED
-            set => this._sms(0x7F8, this.num, value)    ; SCI_MARKERDEFINE
+            Get => this._sms(0x9E1, this.num)
+            Set => this._sms(0x7F8, this.num, value)
         }
-        ; ========================================================================
-        ; RGBA properties
-        ; ========================================================================
+
         Height {
-            get => this._height
-            set => this._sms(0xA41, this.num, (this._height := value))  ; SCI_RGBAIMAGESETHEIGHT
+            Get => this._height
+            Set => this._sms(0xA41, this.num, (this._height := value))
         }
+
         Scale {
-            get => this._scale
-            set => this._sms(0xA5B, this.num, (this._scale := value))   ; SCI_RGBAIMAGESETSCALE
+            Get => this._scale
+            Set => this._sms(0xA5B, this.num, (this._scale := value))
         }
+
         Width {
-            get => this._width
-            set => this._sms(0xA40, this.num, (this._width := value))   ; SCI_RGBAIMAGESETWIDTH
+            Get => this._width
+            Set => this._sms(0xA40, this.num, (this._width := value))
         }
+
         RGBA {
-            set => this._sms(0xA42, this.num, (Type(value)="Buffer")?value.ptr:value) ; SCI_MARKERDEFINERGBAIMAGE
+            Set => this._sms(0xA42, this.num, (Type(value) = "Buffer") ? value.ptr : value)
         }
     }
 
     class Punct extends Scintilla.scint_base {
-        Chars { ; set/get punct chars
-            get => this._GetStr(0xA59,,true)    ; SCI_GETPUNCTUATIONCHARS
-            set => this._PutStr(0xA58,,value)   ; SCI_SETPUNCTUATIONCHARS
+        Chars {
+            Get => this._GetStr(0xA59,,true)
+            Set => this._PutStr(0xA58,,value)
         }
     }
 
-    class Selection extends Scintilla.scint_base {  ; GET/SET ADDITIONALSELECTIONTYPING
+    class Selection extends Scintilla.scint_base {
         _BackColor := 0xFFFFFF
         _BackEnabled := true
         _ForeColor := 0x000000
@@ -1636,419 +1641,514 @@ class Scintilla extends Gui.Custom {
         _MultiBack := 0x000000
         _MultiFore := 0x000000
 
-        Add(anchor, caret) {                        ; adds selection with Multi-select enabled
-            return this._sms(0xA0D, anchor, caret)  ; SCI_ADDSELECTION
+        Add(anchor, caret) {
+            return this._sms(0xA0D, anchor, caret)
         }
+
         AddEach() {
-            return this._sms(0xA81) ; SCI_MULTIPLESELECTADDEACH
+            return this._sms(0xA81)
         }
+
         AddNext() {
-            return this._sms(0xA80) ; SCI_MULTIPLESELECTADDNEXT
+            return this._sms(0xA80)
         }
-        Alpha {                             ; 0-255
-            get => this._sms(0x9AD)         ; SCI_GETSELALPHA
-            set => this._sms(0x9AE, value)  ; SCI_SETSELALPHA
+
+        Alpha {
+            Get => this._sms(0x9AD)
+            Set => this._sms(0x9AE, value)
         }
-        AnchorPos(pos:="", sel:=0) {                ; sel is 0-based
-            If (pos="")
-                return this._sms(0xA13, sel)        ; SCI_GETSELECTIONNANCHOR (where selection started, could be on the right)
-            Else
-                return this._sms(0xA12, sel, pos)   ; SCI_SETSELECTIONNANCHOR (modifies selection)
+
+        AnchorPos(pos := "", sel := 0) {
+            if (pos = "")
+                return this._sms(0xA13, sel)
+            else
+                return this._sms(0xA12, sel, pos)
         }
-        AnchorVS(pos:="", sel:=0) {                 ; sel is 0-based
-            If (pos="")
-                return this._sms(0xA17, sel)        ; SCI_GETSELECTIONNANCHORVIRTUALSPACE
-            Else
-                return this._sms(0xA16, sel, pos)   ; SCI_SETSELECTIONNANCHORVIRTUALSPACE
+
+        AnchorVS(pos := "", sel := 0) {
+            if (pos = "")
+                return this._sms(0xA17, sel)
+            else
+                return this._sms(0xA16, sel, pos)
         }
-        ; Back(bool, color) {
-            ; this._BackEnabled := bool,    this._BackColor := color
-            ; return this._sms(0x814, bool, this._RGB_BGR(color)) ; SCI_SETSELBACK
-        ; }
-        Back {              ; previously BackColor
-            get => (0xFF000000 & this._BackColor) ? Format("0x{:08X}", this._BackColor) : Format("0x{:06X}", this._BackColor)
-            set => this._sms(0x814, this._BackEnabled, this._RGB_BGR(this._BackColor := value)) ; SCI_SETSELBACK
+
+        Back {
+            Get => ((0xFF000000 & this._BackColor) ? Format("0x{:08X}", this._BackColor) : Format("0x{:06X}", this._BackColor))
+            Set => this._sms(0x814, this._BackEnabled, this._RGB_BGR(this._BackColor := value))
         }
-        BackEnabled {       ; boolean
-            get => this._BackEnabled
-            set => this._sms(0x814, (this._BackEnabled := value), this._RGB_BGR(this._BackColor)) ; SCI_SETSELBACK
+
+        BackEnabled {
+            Get => this._BackEnabled
+            Set => this._sms(0x814, (this._BackEnabled := value), this._RGB_BGR(this._BackColor))
         }
-        CaretPos(pos:="", sel:=0) {
-            If (pos="")
-                return this._sms(0xA11, sel)        ; SCI_GETSELECTIONNCARET (caret is were selection ends, may be on left)
-            Else
-                return this._sms(0xA10, sel, pos)   ; SCI_SETSELECTIONNCARET (move carat, modifies selection)
+
+        CaretPos(pos := "", sel := 0) {
+            if (pos = "")
+                return this._sms(0xA11, sel)
+            else
+                return this._sms(0xA10, sel, pos)
         }
-        CaretVS(pos:="", sel:=0) {                  ; sel is 0-based
-            If (pos="")
-                return this._sms(0xA15, sel)        ; SCI_GETSELECTIONNCARETVIRTUALSPACE
-            Else
-                return this._sms(0xA14, sel, pos)   ; SCI_SETSELECTIONNCARETVIRTUALSPACE
+
+        CaretVS(pos := "", sel := 0) {
+            if (pos = "")
+                return this._sms(0xA15, sel)
+            else
+                return this._sms(0xA14, sel, pos)
         }
+
         Clear() {
-            return this._sms(0xA0B) ; SCI_CLEARSELECTIONS
+            return this._sms(0xA0B)
         }
-        Count {                     ; int -> number of selections
-            get => this._sms(0xA0A) ; SCI_GETSELECTIONS
+
+        Count {
+            Get => this._sms(0xA0A)
         }
+
         Drop(sel_num) {
-            return this._sms(0xA6F, sel_num) ; SCI_DROPSELECTIONN
+            return this._sms(0xA6F, sel_num)
         }
-        End(pos:="", sel:=0) {                    ; end of selection is always on the right
-            If (pos="")
-                return this._sms(0xA1B, sel)      ; SCI_GETSELECTIONNEND
-            Else
-                return this._sms(0xA1A, sel, pos) ; SCI_SETSELECTIONNEND
+
+        End(pos := "", sel := 0) {
+            if (pos="")
+                return this._sms(0xA1B, sel)
+            else
+                return this._sms(0xA1A, sel, pos)
         }
-        EndVS(sel:=0) {
-            return this._sms(0xAA7, sel)  ; SCI_GETSELECTIONNENDVIRTUALSPACE
+
+        EndVS(sel := 0) {
+            return this._sms(0xAA7, sel)
         }
-        EOLFilled {                         ; boolean
-            get => this._sms(0x9AF)         ; SCI_GETSELEOLFILLED
-            set => this._sms(0x9B0, value)  ; SCI_SETSELEOLFILLED
+
+        EOLFilled {
+            Get => this._sms(0x9AF)
+            Set => this._sms(0x9B0, value)
         }
+
         Fore(bool, color) {
-            this._ForeEnabled := bool,    this._ForeColor := color
-            return this._sms(0x813, bool, this._RGB_BGR(color)) ; SCI_SETSELFORE
+            this._ForeEnabled := bool
+            this._ForeColor := color
+
+            return this._sms(0x813, bool, this._RGB_BGR(color))
         }
-        ForeEnabled {       ; boolean
-            get => this._ForeEnabled
-            set => this._sms(0x813, (this._ForeEnabled := value), this._RGB_BGR(this._ForeColor)) ; SCI_SETSELFORE
+
+        ForeEnabled {
+            Get => this._ForeEnabled
+            Set => this._sms(0x813, (this._ForeEnabled := value), this._RGB_BGR(this._ForeColor))
         }
-        ForeColor {         ; color
-            get => (0xFF000000 & this._ForeColor) ? Format("0x{:08X}", this._ForeColor) : Format("0x{:06X}", this._ForeColor)
-            set => this._sms(0x813, this._ForeEnabled, this._RGB_BGR(this._ForeColor := value)) ; SCI_SETSELFORE
+
+        ForeColor {
+            Get => ((0xFF000000 & this._ForeColor) ? Format("0x{:08X}", this._ForeColor) : Format("0x{:06X}", this._ForeColor))
+            Set => this._sms(0x813, this._ForeEnabled, this._RGB_BGR(this._ForeColor := value))
         }
-        Get(sel_num:=0) {
-            tr := Scintilla.TextRange()
-            tr.cpMin := this.ctl.Selection.Start(,sel_num)
-            tr.cpMax := this.ctl.Selection.End(,sel_num)
-            this._sms(0x872, 0, tr.ptr) ; SCI_GETTEXTRANGE
+
+        Get(sel_num := 0) {
+            local tr := Scintilla.TextRange()
+
+            tr.cpMin := this.ctl.Selection.Start( , sel_num)
+            tr.cpMax := this.ctl.Selection.End( , sel_num)
+
+            this._sms(0x872, 0, tr.ptr)
+
             return StrGet(tr.buf, "UTF-8")
         }
-        GetAll() {      ; For multi-select, gets selection in order, with CRLF breaks between selections.
-            _str := ""  ; For rectangle select, ALWAYS gets top line first.
 
-            If (this.IsRect) And (this.RectAnchor > this.RectCaret) {
-                Loop (i := this.Count)
-                    _str .= ((A_Index=1)?"":"`r`n") this.Get(i-1-(A_Index-1))
-            } Else {
-                Loop this.Count
-                    _str .= ((A_Index=1)?"":"`r`n") this.Get(A_Index-1)
+        GetAll() {
+            local _str := ""
+
+            if (this.IsRect And (this.RectAnchor > this.RectCaret)) {
+                loop (i := this.Count)
+                    _str .= (((A_Index = 1) ? "" : "`r`n") . this.Get(i - 1 - (A_Index - 1)))
+            } else {
+                loop this.Count
+                    _str .= (((A_Index = 1) ? "" : "`r`n") . this.Get(A_Index-1))
             }
+
             return _str
         }
-        IsEmpty {                   ; bool -> return 1 if all selections empty, else 0
-            get => this._sms(0xA5A) ; SCI_GETSELECTIONEMPTY
+
+        IsEmpty {
+            Get => this._sms(0xA5A)
         }
+
         IsExtend {
-            get => this._sms(0xA92)         ; SCI_GETMOVEEXTENDSSELECTION
+            Get => this._sms(0xA92)
         }
-        IsRect {                            ; bool -> is or is not rectangle
-            get => this._sms(0x944)         ; SCI_SELECTIONISRECTANGLE
+
+        IsRect {
+            Get => this._sms(0x944)
         }
-        Main {                              ; int set selection number as main
-            get => this._sms(0xA0F)         ; SCI_GETMAINSELECTION
-            set => this._sms(0xA0E, value)  ; SCI_SETMAINSELECTION
+
+        Main {
+            Get => this._sms(0xA0F)
+            Set => this._sms(0xA0E, value)
         }
-        Mode {                              ; 0=STREAM, 1=RECT, 2=LINES, 3=THIN
-            get => this._sms(0x977)         ; SCI_GETSELECTIONMODE
-            set => this._sms(0x976, value)  ; SCI_SETSELECTIONMODE
+
+        Mode {
+            Get => this._sms(0x977)
+            Set => this._sms(0x976, value)
         }
-        Multi {                             ; boolean - enable/disable multi-select
-            get => this._sms(0xA04)         ; SCI_GETMULTIPLESELECTION
-            set => this._sms(0xA03, value)  ; SCI_SETMULTIPLESELECTION
+
+        Multi {
+            Get => this._sms(0xA04)
+            Set => this._sms(0xA03, value)
         }
-        MultiAlpha {                        ; 0-255
-            get => this._sms(0xA2B)         ; SCI_GETADDITIONALSELALPHA
-            set => this._sms(0xA2A, value)  ; SCI_SETADDITIONALSELALPHA
+
+        MultiAlpha {
+            Get => this._sms(0xA2B)
+            Set => this._sms(0xA2A, value)
         }
-        MultiBack {         ; color
-            get => (0xFF000000 & this._MultiBack) ? Format("0x{:08X}", this._MultiBack) : Format("0x{:06X}", this._MultiBack)
-            set => this._sms(0xA29, this._RGB_BGR(this._MultiBack := value))  ; SCI_SETADDITIONALSELBACK
+
+        MultiBack {
+            Get => ((0xFF000000 & this._MultiBack) ? Format("0x{:08X}", this._MultiBack) : Format("0x{:06X}", this._MultiBack))
+            Set => this._sms(0xA29, this._RGB_BGR(this._MultiBack := value))
         }
+
         MultiFore {
-            get => (0xFF000000 & this._MultiFore) ? Format("0x{:08X}", this._MultiFore) : Format("0x{:06X}", this._MultiFore)
-            set => this._sms(0xA28, this._RGB_BGR(this._MultiFore := value))  ; SCI_SETADDITIONALSELFORE
+            Get => (0xFF000000 & this._MultiFore) ? Format("0x{:08X}", this._MultiFore) : Format("0x{:06X}", this._MultiFore)
+            Set => this._sms(0xA28, this._RGB_BGR(this._MultiFore := value))
         }
-        MultiPaste {                        ; int 0 = PASTE ONCE, 1 = PASTE EACH
-            get => this._sms(0xA37)         ; SCI_GETMULTIPASTE
-            set => this._sms(0xA36, value)  ; SCI_SETMULTIPASTE
+
+        MultiPaste {
+            Get => this._sms(0xA37)
+            Set => this._sms(0xA36, value)
         }
+
         MultiTyping {
-            get => this._sms(0xA06)         ; SCI_GETADDITIONALSELECTIONTYPING
-            set => this._sms(0xA05, value)  ; SCI_SETADDITIONALSELECTIONTYPING
+            Get => this._sms(0xA06)
+            Set => this._sms(0xA05, value)
         }
-        RectAnchor {                        ; get/set RectAnchor position
-            get => this._sms(0xA1F)         ; SCI_GETRECTANGULARSELECTIONANCHOR
-            set => this._sms(0xA1E, value)  ; SCI_SETRECTANGULARSELECTIONANCHOR
+
+        RectAnchor {
+            Get => this._sms(0xA1F)
+            Set => this._sms(0xA1E, value)
         }
-        RectAnchorVS {                      ; get/set RectAnchor virtual space
-            get => this._sms(0xA23)         ; SCI_GETRECTANGULARSELECTIONANCHORVIRTUALSPACE
-            set => this._sms(0xA22, value)  ; SCI_SETRECTANGULARSELECTIONANCHORVIRTUALSPACE
+
+        RectAnchorVS {
+            Get => this._sms(0xA23)
+            Set => this._sms(0xA22, value)
         }
-        RectCaret {                         ; get/set RectCaret position
-            get => this._sms(0xA1D)         ; SCI_GETRECTANGULARSELECTIONCARET
-            set => this._sms(0xA1C, value)  ; SCI_SETRECTANGULARSELECTIONCARET
+
+        RectCaret {
+            Get => this._sms(0xA1D)
+            Set => this._sms(0xA1C, value)
         }
-        RectCaretVS {                       ; get/set RectCaret virtual space
-            get => this._sms(0xA21)         ; SCI_GETRECTANGULARSELECTIONCARETVIRTUALSPACE
-            set => this._sms(0xA20, value)  ; SCI_SETRECTANGULARSELECTIONCARETVIRTUALSPACE
+
+        RectCaretVS {
+            Get => this._sms(0xA21)
+            Set => this._sms(0xA20, value)
         }
-        RectModifier {                      ; int 0 = NONE, 2 = CTRL, 4 = ALT, 8 = SUPER (WinKey)
-            get => this._sms(0xA27)         ; SCI_GETRECTANGULARSELECTIONMODIFIER
-            set => this._sms(0xA26, value)  ; SCI_SETRECTANGULARSELECTIONMODIFIER
+
+        RectModifier {
+            Get => this._sms(0xA27)
+            Set => this._sms(0xA26, value)
         }
-        RectWithMouse {                     ; use rect modifier key while selecting with mouse (default = false)
-            get => this._sms(0xA6D)         ; SCI_GETMOUSESELECTIONRECTANGULARSWITCH
-            set => this._sms(0xA6C, value)  ; SCI_SETMOUSESELECTIONRECTANGULARSWITCH
+
+        RectWithMouse {
+            Get => this._sms(0xA6D)
+            Set => this._sms(0xA6C, value)
         }
-        Replace(text:="") {                 ; replaces all selections with specified text
-            Loop this.Count {
+
+        Replace(text := "") {
+            loop this.Count {
                 this.Main := A_Index - 1
-                this._PutStr(0x87A,,text)   ; SCI_REPLACESEL
+                this._PutStr(0x87A,,text)
             }
         }
-        Rotate() {                  ; makes "next" seletion the "main" selection
-            return this._sms(0xA2E) ; SCI_ROTATESELECTION
+
+        Rotate() {
+            return this._sms(0xA2E)
         }
-        Set(anchor, caret) {                        ; selection set in specified range as only selection
-            return this._sms(0xA0C, anchor, caret)  ; SCI_SETSELECTION
+
+        Set(anchor, caret) {
+            return this._sms(0xA0C, anchor, caret)
         }
-        Start(pos:="", sel:=0) {                    ; start of selection is ALWAYS on the left
-            If (pos="")
-                return this._sms(0xA19, sel)        ; SCI_GETSELECTIONNSTART
-            Else
-                return this._sms(0xA18, sel, pos)   ; SCI_SETSELECTIONNSTART
+
+        Start(pos := "", sel := 0) {
+            if (pos = "")
+                return this._sms(0xA19, sel)
+            else
+                return this._sms(0xA18, sel, pos)
         }
-        StartVS(sel:=0) {                   ; sel is 0-based
-            return this._sms(0xAA6, sel)    ; SCI_GETSELECTIONNSTARTVIRTUALSPACE
+
+        StartVS(sel:=0) {
+            return this._sms(0xAA6, sel)
         }
+
         SwapMainAnchorCaret() {
-            return this._sms(0xA2F) ; SCI_SWAPMAINANCHORCARET
+            return this._sms(0xA2F)
         }
-        VirtualSpaceOpt {                   ; int 0 = NONE (default), 1 = RectSelect, 2 = UserAccessible, 4 = NoWrapLineStart
-            get => this._sms(0xA25)         ; SCI_GETVIRTUALSPACEOPTIONS
-            set => this._sms(0xA24, value)  ; SCI_SETVIRTUALSPACEOPTIONS
+
+        VirtualSpaceOpt {
+            Get => this._sms(0xA25)
+            Set => this._sms(0xA24, value)
         }
     }
 
     class Style extends Scintilla.scint_base {
         ID := 32
-        Back {                                                      ; color
-            get => this._RGB_BGR(this._sms(0x9B2, this.ID))         ; SCI_STYLEGETBACK
-            set => this._sms(0x804, this.ID, this._RGB_BGR(value))  ; SCI_STYLESETBACK
+
+        Back {
+            Get => this._RGB_BGR(this._sms(0x9B2, this.ID))
+            Set => this._sms(0x804, this.ID, this._RGB_BGR(value))
         }
-        Bold {                                          ; boolean
-            get => this._sms(0x9B3, this.ID)            ; SCI_STYLEGETBOLD
-            set => this._sms(0x805, this.ID, value)     ; SCI_STYLESETBOLD
+
+        Bold {
+            Get => this._sms(0x9B3, this.ID)
+            Set => this._sms(0x805, this.ID, value)
         }
-        Case {                                      ; int 0 = mixed (default), 1 = upper, 2 = lower, 3 = camel (title case?)
-            get => this._sms(0x9B9, this.ID)        ; SCI_STYLEGETCASE
-            set => this._sms(0x80C, this.ID, value) ; SCI_STYLESETCASE
+
+        Case {
+            Get => this._sms(0x9B9, this.ID)
+            Set => this._sms(0x80C, this.ID, value)
         }
-        Changeable {                                ; boolean (experimental)
-            get => this._sms(0x9BC, this.ID)        ; SCI_STYLEGETCHANGEABLE
-            set => this._sms(0x833, this.ID, value) ; SCI_STYLESETCHANGEABLE
+
+        Changeable {
+            Get => this._sms(0x9BC, this.ID)
+            Set => this._sms(0x833, this.ID, value)
         }
+
         ClearAll() {
-            return this._sms(0x802) ; SCI_STYLECLEARALL
+            return this._sms(0x802)
         }
-        EOLFilled {                             ; boolean
-            get => this._sms(0x9B7, this.ID)    ; SCI_STYLEGETEOLFILLED
-            set {
-                cs := "8859_15`r`nANSI`r`nArabic`r`nBaltic`r`nChineseBig5`r`nCyrillic`r`nDefault`r`nEastEurope`r`nGB2312`r`nGreek`r`nHangul`r`n"
-                    . "Hebrew`r`nJohab`r`nMAC`r`nOEM`r`nOEM866`r`nRussian`r`nShiftJIS`r`nSymbol`r`nThai`r`nTurkish`r`nVietnamese"
-                If !Scintilla.charset.Has(value) And !IsInteger(value) {
-                    Msgbox("Selecting a charset requires one of the following values:`r`n`r`n" cs)
-                    return
-                }
-                (Scintilla.charset.Has(value)) ? (value := Scintilla.charset.%value%) : "" ; convert str to integer
-                this._sms(0x809, this.ID, value)    ; SCI_STYLESETEOLFILLED
+
+        EOLFilled {
+            Get => this._sms(0x9B7, this.ID)
+            Set {
+                local cs := "8859_15`r`nANSI`r`nArabic`r`nBaltic`r`nChineseBig5`r`nCyrillic`r`nDefault`r`nEastEurope`r`nGB2312`r`nGreek`r`nHangul`r`n"
+                          . "Hebrew`r`nJohab`r`nMAC`r`nOEM`r`nOEM866`r`nRussian`r`nShiftJIS`r`nSymbol`r`nThai`r`nTurkish`r`nVietnamese"
+
+                if (!Scintilla.charset.Has(value) And !isInteger(value))
+                    throw "Invalid charset detected in Scintilla.Style.EOLFilled..."
+
+                if (Scintilla.charset.Has(value))
+                    value := Scintilla.charset.%value%
+                else
+                    value := ""
+
+                this._sms(0x809, this.ID, value)
             }
         }
-        Font {                                          ; string
-            get => this._GetStr(0x9B6, this.ID)         ; SCI_STYLEGETFONT
-            set => this._PutStr(0x808, this.ID, value)  ; SCI_STYLESETFONT
+
+        Font {
+            Get => this._GetStr(0x9B6, this.ID)
+            Set => this._PutStr(0x808, this.ID, value)
         }
-        Fore {                                                      ; color
-            get => this._RGB_BGR(this._sms(0x9B1, this.ID))         ; SCI_STYLEGETFORE
-            set => this._sms(0x803, this.ID, this._RGB_BGR(value))  ; SCI_STYLESETFORE
+
+        Fore {
+            Get => this._RGB_BGR(this._sms(0x9B1, this.ID))
+            Set => this._sms(0x803, this.ID, this._RGB_BGR(value))
         }
-        Hotspot {                                   ; boolean
-            get => this._sms(0x9BC, this.ID)        ; SCI_STYLEGETCHANGEABLE
-            set => this._sms(0x833, this.ID, value) ; SCI_STYLESETCHANGEABLE
+
+        Hotspot {
+            Get => this._sms(0x9BC, this.ID)
+            Set => this._sms(0x833, this.ID, value)
         }
-        Italic {                                    ; boolean
-            get => this._sms(0x9BD, this.ID)        ; SCI_STYLEGETHOTSPOT
-            set => this._sms(0x969, this.ID, value) ; SCI_STYLESETHOTSPOT
+
+        Italic {
+            Get => this._sms(0x9BD, this.ID)
+            Set => this._sms(0x969, this.ID, value)
         }
+
         ResetDefault() {
-            return this._sms(0x80A) ; SCI_STYLERESETDEFAULT
+            return this._sms(0x80A)
         }
-        Size {                                              ; float 0.00
-            get => (this._sms(0x80E, this.ID) / 100)        ; SCI_STYLEGETSIZEFRACTIONAL
-            set => this._sms(0x80D, this.ID, value * 100)   ; SCI_STYLESETSIZEFRACTIONAL
+
+        Size {
+            Get => (this._sms(0x80E, this.ID) / 100)
+            Set => this._sms(0x80D, this.ID, value * 100)
         }
-        Underline {                                     ; boolean
-            get => this._sms(0x9B8, this.ID)            ; SCI_STYLEGETUNDERLINE
-            set => this._sms(0x80B, this.ID, value)     ; SCI_STYLESETUNDERLINE
+
+        Underline {
+            Get => this._sms(0x9B8, this.ID)
+            Set => this._sms(0x80B, this.ID, value)
         }
-        Visible {                                   ; boolean
-            get => this._sms(0x9BB, this.ID)        ; SCI_STYLEGETVISIBLE
-            set => this._sms(0x81A, this.ID, value) ; SCI_STYLESETVISIBLE
+
+        Visible {
+            Get => this._sms(0x9BB, this.ID)
+            Set => this._sms(0x81A, this.ID, value)
         }
-        Weight {                            ; 400 = normal, 600 = semi-bold, 700 = bold (value = 1-999)
-            get => this._sms(0x810)         ; SCI_STYLEGETWEIGHT
-            set => this._sms(0x80F, value)  ; SCI_STYLESETWEIGHT
+
+        Weight {
+            Get => this._sms(0x810)
+            Set => this._sms(0x80F, value)
         }
     }
 
     class Styling extends Scintilla.scint_base {
-        Clear() {                   ; clears styles AND folds
-            return this._sms(0x7D5) ; SCI_CLEARDOCUMENTSTYLE
+        Clear() {
+            return this._sms(0x7D5)
         }
-        Idle {                              ; int 0 = NONE, 1 = TOVISIBLE, 2 = AFTERVISIBLE, 3 = ALL
-            get => this._sms(0xA85)         ; SCI_GETIDLESTYLING
-            set => this._sms(0xA84, value)  ; SCI_SETIDLESTYLING
+
+        Idle {
+            Get => this._sms(0xA85)
+            Set => this._sms(0xA84, value)
         }
+
         Last {
-            get => this._sms(0x7EC) ; SCI_GETENDSTYLED
+            Get => this._sms(0x7EC)
         }
-        LineState(line, state:="") {                    ; int - user defined integer?
-            If (state="")
-                return this._sms(0x82D, line)           ; SCI_GETLINESTATE
-            Else
-                return this._sms(0x82C, line, state)    ; SCI_SETLINESTATE
+
+        LineState(line, state := "") {
+            if (state = "")
+                return this._sms(0x82D, line)
+            else
+                return this._sms(0x82C, line, state)
         }
-        MaxLineState {              ; returns last line with a "state" set
-            get => this._sms(0x82E) ; SCI_GETMAXLINESTATE
+
+        MaxLineState {
+            Get => this._sms(0x82E)
         }
+
         Set(length, style) {
-            return this._sms(0x7F1, length, style)  ; SCI_SETSTYLING
+            return this._sms(0x7F1, length, style)
         }
+
         SetEx(length, style_bytes_ptr) {
-            return this._sms(0x819, length, style_bytes_ptr) ; SCI_SETSTYLINGEX
+            return this._sms(0x819, length, style_bytes_ptr)
         }
+
         Start(pos) {
-            return this._sms(0x7F0, pos) ; SCI_STARTSTYLING
+            return this._sms(0x7F0, pos)
         }
     }
 
     class Tab extends Scintilla.scint_base {
-        Add(line, pixels) {                         ; int line / pixels
-            return this._sms(0xA74, line, pixels)   ; SCI_ADDTABSTOP
-        }
-        Clear(line) {                       ; int line number
-            return this._sms(0xA73, line)   ; SCI_CLEARTABSTOPS
-        }
-        HighlightGuide {                    ; int: column position where highlight indentation guide for matched braces is
-            get => this._sms(0x857)         ; SCI_GETHIGHLIGHTGUIDE
-            set => this._sms(0x856, value)  ; SCI_SETHIGHLIGHTGUIDE
-        }
-        Indents {                           ; boolean - TAB indent without adding space/tab
-            get => this._sms(0x8D5)         ; SCI_GETTABINDENTS
-            set => this._sms(0x8D4, value)  ; SCI_SETTABINDENTS
-        }
-        IndentGuides {                      ; int 0 = NONE, 1 = REAL, 2 = LOOKFORWARD, 3 = LOOKBOTH
-            get => this._sms(0x855)         ; SCI_GETINDENTATIONGUIDES
-            set => this._sms(0x854, value)  ; SCI_SETINDENTATIONGUIDES
-        }
-        IndentPosition(line) {
-            return this._sms(0x850, line)   ; SCI_GETLINEINDENTPOSITION
-        }
-        LineIndentation(line, spaces:="") {             ; n = line, value = num_of_spaces/columns
-            If (spaces="")
-                return this._sms(0x84F, line)           ; SCI_GETLINEINDENTATION
-            Else
-                return this._sms(0x84E, line, spaces)   ; SCI_SETLINEINDENTATION
-        }
-        MinimumWidth {                      ; int pixels
-            get => this._sms(0xAA5)         ; SCI_GETTABMINIMUMWIDTH
-            set => this._sms(0xAA4, value)  ; SCI_SETTABMINIMUMWIDTH
-        }
-        Next(line, pixels_pos) {
-            return this._sms(0xA75, line, pixels_pos)   ; SCI_GETNEXTTABSTOP
-        }
-        Unindents {                         ; boolean - BACKSPACE unindents without removing spaces/tabs
-            get => this._sms(0x8D7)         ; SCI_GETBACKSPACEUNINDENTS
-            set => this._sms(0x8D6, value)  ; SCI_SETBACKSPACEUNINDENTS
-        }
-        Use {                               ; bool /// false means use spaces instead of tabs
-            get => this._sms(0x84D)         ; SCI_GETUSETABS
-            set => this._sms(0x84C, value)  ; SCI_SETUSETABS
+        Add(line, pixels) {
+            return this._sms(0xA74, line, pixels)
         }
 
-        ; ==============================================
-        ; oddly similar me thinks...
-        ; ==============================================
-        Indent {        ; int num_of_spaces
-            get => this._sms(0x84B)         ; SCI_GETINDENT
-            set => this._sms(0x84A, value)  ; SCI_SETINDENT
+        Clear(line) {
+            return this._sms(0xA73, line)
         }
-        Width {         ; int num_of_spaces
-            get => this._sms(0x849)         ; SCI_GETTABWIDTH
-            set => this._sms(0x7F4, value)  ; SCI_SETTABWIDTH
+
+        HighlightGuide {
+            Get => this._sms(0x857)
+            Set => this._sms(0x856, value)
+        }
+
+        Indents {
+            Get => this._sms(0x8D5)
+            Set => this._sms(0x8D4, value)
+        }
+
+        IndentGuides {
+            Get => this._sms(0x855)
+            Set => this._sms(0x854, value)
+        }
+
+        IndentPosition(line) {
+            return this._sms(0x850, line)
+        }
+
+        LineIndentation(line, spaces:="") {
+            if (spaces="")
+                return this._sms(0x84F, line)
+            else
+                return this._sms(0x84E, line, spaces)
+        }
+
+        MinimumWidth {
+            Get => this._sms(0xAA5)
+            Set => this._sms(0xAA4, value)
+        }
+
+        Next(line, pixels_pos) {
+            return this._sms(0xA75, line, pixels_pos)
+        }
+
+        Unindents {
+            Get => this._sms(0x8D7)
+            Set => this._sms(0x8D6, value)
+        }
+
+        Use {
+            Get => this._sms(0x84D)
+            Set => this._sms(0x84C, value)
+        }
+
+        Indent {
+            Get => this._sms(0x84B)
+            Set => this._sms(0x84A, value)
+        }
+
+        Width {
+            Get => this._sms(0x849)
+            Set => this._sms(0x7F4, value)
         }
     }
 
     class Target extends Scintilla.scint_base {
         All() {
-            return this._sms(0xA82)         ; SCI_TARGETWHOLEDOCUMENT
+            return this._sms(0xA82)
         }
-        ; All() {
-            ; return this.SetRange(0, this.ctl.Length)
-        ; }
+
         Anchor() {
-            return this._sms(0x93E)         ; SCI_SEARCHANCHOR
+            return this._sms(0x93E)
         }
-        End {                               ; position values
-            get => this._sms(0x891)         ; SCI_GETTARGETEND
-            set => this._sms(0x890, value)  ; SCI_SETTARGETEND
+
+        End {
+            Get => this._sms(0x891)
+            Set => this._sms(0x890, value)
         }
-        EndVS {                             ; position values
-            get => this._sms(0xAAB)         ; SCI_GETTARGETENDVIRTUALSPACE
-            set => this._sms(0xAAA, value)  ; SCI_SETTARGETENDVIRTUALSPACE
+
+        EndVS {
+            Get => this._sms(0xAAB)
+            Set => this._sms(0xAAA, value)
         }
-        Flags {                             ; int/DWORD
-            get => this._sms(0x897)         ; SCI_GETSEARCHFLAGS
-            set => this._sms(0x896, value)  ; SCI_SETSEARCHFLAGS
+
+        Flags {
+            Get => this._sms(0x897)
+            Set => this._sms(0x896, value)
         }
-        Next(txt, flags:="") {                      ; moves search ahead and selects next match range
-            flags := (flags!="")?flags:this.Flags
-            return this._PutStr(0x93F, flags, txt)  ; SCI_SEARCHNEXT
+
+        Next(txt, flags := "") {
+            flags := ((flags != "") ? flags : this.Flags)
+
+            return this._PutStr(0x93F, flags, txt)
         }
-        Prev(txt, flags:="") {                      ; moves search back from target and selects prev match range
-            flags := (flags!="")?flags:this.Flags
-            return this._PutStr(0x940, flags, txt)  ; SCI_SEARCHPREV
+
+        Prev(txt, flags := "") {
+            flags := ((flags != "") ? flags : this.Flags)
+
+            return this._PutStr(0x940, flags, txt)
         }
+
         Range(start, end) {
-            return this._sms(0xA7E, start, end) ; SCI_SETTARGETRANGE
+            return this._sms(0xA7E, start, end)
         }
-        Replace(txt:="") {
-            return this._PutStr(0x892, StrLen(txt), txt) ; SCI_REPLACETARGET
+
+        Replace(txt := "") {
+            return this._PutStr(0x892, StrLen(txt), txt)
         }
+
         Search(txt) {
-            len := StrPut(txt, "UTF-8")
-            len := ((len-1) != StrLen(txt)) ? len - 2 : len - 1
-            return this._SetStr(0x895, len, txt) ; SCI_SEARCHINTARGET
+            local len := StrPut(txt, "UTF-8")
+
+            len := (((len - 1) != StrLen(txt)) ? (len - 2) : (len - 1))
+
+            return this._SetStr(0x895, len, txt)
         }
+
         Selection() {
-            return this._sms(0x8EF)         ; SCI_TARGETFROMSELECTION
+            return this._sms(0x8EF)
         }
-        Start {                             ; position values
-            get => this._sms(0x88F)         ; SCI_GETTARGETSTART
-            set => this._sms(0x88E, value)  ; SCI_SETTARGETSTART
+
+        Start {
+            Get => this._sms(0x88F)
+            Set => this._sms(0x88E, value)
         }
-        StartVS {                           ; position values
-            get => this._sms(0xAA9)         ; SCI_GETTARGETSTARTVIRTUALSPACE
-            set => this._sms(0xAA8, value)  ; SCI_SETTARGETSTARTVIRTUALSPACE
+
+        StartVS {
+            Get => this._sms(0xAA9)
+            Set => this._sms(0xAA8, value)
         }
-        Tag(n) {                            ; 0 = overall match, tags start at 1
-            return this._GetStr(0xA38, n)   ; SCI_GETTAG
+
+        Tag(n) {
+            return this._GetStr(0xA38, n)
         }
+
         Text {
-            get => this._GetStr(0xA7F)      ; SCI_GETTARGETTEXT
+            Get => this._GetStr(0xA7F)
         }
     }
 
@@ -2059,220 +2159,254 @@ class Scintilla extends Gui.Custom {
         _ForeEnabled := true
 
         Back(bool, color) {
-            this._BackEnabled := bool,    this._BackColor := color
-            return this._sms(0x825, bool, this._RGB_BGR(color)) ; SCI_SETWHITESPACEBACK
+            this._BackEnabled := bool
+            this._BackColor := color
+
+            return this._sms(0x825, bool, this._RGB_BGR(color))
         }
-        BackEnabled {       ; boolean
-            get => this._BackEnabled
-            set => this._sms(0x825, (this._BackEnabled := value), this._RGB_BGR(this._BackColor)) ; SCI_SETWHITESPACEBACK
+
+        BackEnabled {
+            Get => this._BackEnabled
+            Set => this._sms(0x825, (this._BackEnabled := value), this._RGB_BGR(this._BackColor))
         }
-        BackColor {         ; color
-            get => (0xFF000000 & this._BackColor) ? Format("0x{:08X}", this._BackColor) : Format("0x{:06X}", this._BackColor)
-            set => this._sms(0x825, this._BackEnabled, this._RGB_BGR(this._BackColor := value)) ; SCI_SETWHITESPACEBACK
+
+        BackColor {
+            Get => ((0xFF000000 & this._BackColor) ? Format("0x{:08X}", this._BackColor) : Format("0x{:06X}", this._BackColor))
+            Set => this._sms(0x825, this._BackEnabled, this._RGB_BGR(this._BackColor := value))
         }
-        Chars { ; set/get white space chars
-            get => this._GetStr(0xA57,,true)    ; SCI_GETWHITESPACECHARS
-            set => this._PutStr(0x98B,,value)   ; SCI_SETWHITESPACECHARS
+
+        Chars {
+            Get => this._GetStr(0xA57,,true)
+            Set => this._PutStr(0x98B,,value)
         }
-        ExtraAscent { ; int (bool?)
-            get => this._sms(0x9DE)         ; SCI_GETEXTRAASCENT
-            set => this._sms(0x9DD, value)  ; SCI_SETEXTRAASCENT
+
+        ExtraAscent {
+            Get => this._sms(0x9DE)
+            Set => this._sms(0x9DD, value)
         }
-        ExtraDecent { ; int (bool?)
-            get => this._sms(0x9E0)         ; SCI_GETEXTRADESCENT
-            set => this._sms(0x9DF, value)  ; SCI_SETEXTRADESCENT
+
+        ExtraDecent {
+            Get => this._sms(0x9E0)
+            Set => this._sms(0x9DF, value)
         }
+
         Fore(bool, color) {
-            this._ForeEnabled := bool,    this._ForeColor := color
-            return this._sms(0x824, bool, this._RGB_BGR(color)) ; SCI_SETWHITESPACEFORE
+            this._ForeEnabled := bool
+            this._ForeColor := color
+
+            return this._sms(0x824, bool, this._RGB_BGR(color))
         }
-        ForeEnabled {       ; boolean
-            get => this._ForeEnabled
-            set => this._sms(0x824, (this._ForeEnabled := value), this._RGB_BGR(this._ForeColor)) ; SCI_SETWHITESPACEFORE
+
+        ForeEnabled {
+            Get => this._ForeEnabled
+            Set => this._sms(0x824, (this._ForeEnabled := value), this._RGB_BGR(this._ForeColor))
         }
-        ForeColor {         ; color
-            get => (0xFF000000 & this._ForeColor) ? Format("0x{:08X}", this._ForeColor) : Format("0x{:06X}", this._ForeColor)
-            set => this._sms(0x824, this._ForeEnabled, this._RGB_BGR(this._ForeColor := value)) ; SCI_SETWHITESPACEFORE
+
+        ForeColor {
+            Get => ((0xFF000000 & this._ForeColor) ? Format("0x{:08X}", this._ForeColor) : Format("0x{:06X}", this._ForeColor))
+            Set => this._sms(0x824, this._ForeEnabled, this._RGB_BGR(this._ForeColor := value))
         }
-        Size { ; int pixels?
-            get => this._sms(0x827)         ; SCI_GETWHITESPACESIZE
-            set => this._sms(0x826, value)  ; SCI_SETWHITESPACESIZE
+
+        Size {
+            Get => this._sms(0x827)
+            Set => this._sms(0x826, value)
         }
-        TabDrawMode { ; int 0 = arrow, 1 = strike (line)
-            get => this._sms(0xA8A)         ; SCI_GETTABDRAWMODE
-            set => this._sms(0xA8B, value)  ; SCI_SETTABDRAWMODE
+
+        TabDrawMode {
+            Get => this._sms(0xA8A)
+            Set => this._sms(0xA8B, value)
         }
-        View { ; int 0 = Invisible, 1 = VisibleAlways, 2 = VisibleAfterIndent, 3 = VisibleOnlyIndent
-            get => this._sms(0x7E4)         ; SCI_GETVIEWWS
-            set => this._sms(0x7E5, value)  ; SCI_SETVIEWWS
+
+        View {
+            Get => this._sms(0x7E4)
+            Set => this._sms(0x7E5, value)
         }
     }
 
     class Word extends Scintilla.scint_base {
-        CharCatOpt { ; int - see SCI_WORD* and SCI_DELWORD* constants
-            get => this._sms(0xAA1)         ; SCI_GETCHARACTERCATEGORYOPTIMIZATION
-            set => this._sms(0xAA0, value)  ; SCI_SETCHARACTERCATEGORYOPTIMIZATION
-        }
-        Chars { ; set/get word chars
-            get => this._GetStr(0xA56,,true)    ; SCI_GETWORDCHARS
-            set => this._PutStr(0x81D,,value)   ; SCI_SETWORDCHARS
-        }
-        Default() { ; resets chars for words, whiteSpace, and punctuation
-            return this._sms(0x98C) ; SCI_SETCHARSDEFAULT
-        }
-        EndPos(start_pos, OnlyWordChars:=true) { ; get "end of word" pos from specified pos
-            return this._sms(0x8DB, start_pos, OnlyWordChars) ; SCI_WORDENDPOSITION
-        }
-        IsRangeWord(start_pos, end_pos) {
-            return this._sms(0xA83, start_pos, end_pos) ; SCI_ISRANGEWORD
+        CharCatOpt {
+            Get => this._sms(0xAA1)
+            Set => this._sms(0xAA0, value)
         }
 
-        StartPos(start_pos, OnlyWordChars:=true) { ; get "start of word" pos from specified pos
-            return this._sms(0x8DA, start_pos, OnlyWordChars)   ; SCI_WORDSTARTPOSITION
+        Chars {
+            Get => this._GetStr(0xA56, , true)
+            Set => this._PutStr(0x81D, , value)
+        }
+
+        Default() {
+            return this._sms(0x98C)
+        }
+
+        EndPos(start_pos, onlyWordChars := true) {
+            return this._sms(0x8DB, start_pos, onlyWordChars)
+        }
+
+        IsRangeWord(start_pos, end_pos) {
+            return this._sms(0xA83, start_pos, end_pos)
+        }
+
+        StartPos(start_pos, OnlyWordChars:=true) {
+            return this._sms(0x8DA, start_pos, OnlyWordChars)
         }
     }
 
     class Wrap extends Scintilla.scint_base {
-        Count(line) { ; returns # of lines taken up by display for specified line
-            return this._sms(0x8BB, line)   ; SCI_WRAPCOUNT
+        Count(line) {
+            return this._sms(0x8BB, line)
         }
-        IndentMode { ; int 0, 1, 2, 3
-            get => this._sms(0x9A9)         ; SCI_GETWRAPINDENTMODE
-            set => this._sms(0x9A8, value)  ; SCI_SETWRAPINDENTMODE
+
+        IndentMode {
+            Get => this._sms(0x9A9)
+            Set => this._sms(0x9A8, value)
         }
-        LayoutCache { ; int 0 = NONE, 1 = current line, 2 = visible lines + caret line, 3 = whole document
-            get => this._sms(0x8E1)         ; SCI_GETLAYOUTCACHE
-            set => this._sms(0x8E0, value)  ; SCI_SETLAYOUTCACHE
+
+        LayoutCache {
+            Get => this._sms(0x8E1)
+            Set => this._sms(0x8E0, value)
         }
-        Location { ; int 0 = draw near border, 1 = end of subline, 2 = beginning of subline
-            get => this._sms(0x99F)         ; SCI_GETWRAPVISUALFLAGSLOCATION
-            set => this._sms(0x99E, value)  ; SCI_SETWRAPVISUALFLAGSLOCATION
+
+        Location {
+            Get => this._sms(0x99F)
+            Set => this._sms(0x99E, value)
         }
-        Mode { ; int 0 = NONE, 1 = WORD, 2 = CHAR, 3 = WHITE SPACE (combo)
-            get => this._sms(0x8DD)         ; SCI_GETWRAPMODE
-            set => this._sms(0x8DC, value)  ; SCI_SETWRAPMODE
+
+        Mode {
+            Get => this._sms(0x8DD)
+            Set => this._sms(0x8DC, value)
         }
-        PositionCache { ; int -> size of cache for short runs (default = 1024)
-            get => this._sms(0x9D3)         ; SCI_GETPOSITIONCACHE
-            set => this._sms(0x9D2, value)  ; SCI_SETPOSITIONCACHE
+
+        PositionCache {
+            Get => this._sms(0x9D3)
+            Set => this._sms(0x9D2, value)
         }
-        Visual { ; int 0 = NONE, 1 = end of line, 2 = beginning of line, 4 = in number margin (combo)
-            get => this._sms(0x99D)         ; SCI_GETWRAPVISUALFLAGS
-            set => this._sms(0x99C, value)  ; SCI_SETWRAPVISUALFLAGS
+
+        Visual {
+            Get => this._sms(0x99D)
+            Set => this._sms(0x99C, value)
         }
     }
 
     class scint_base {
         LastCode := 0
-        __New(ctl) { ; 1st param in subclass is parent class
+
+        __New(ctl) {
             this.ctl := ctl
         }
-        _GetStr(msg, wParam:=0, reverse:=false) { ; get string with NULL terminator
-            buf := Buffer(this._sms(msg, wParam) + 1, 0), out_str := ""
+
+        _GetStr(msg, wParam := 0, reverse := false) {
+            local buf := Buffer(this._sms(msg, wParam) + 1, 0)
+            local out_str := ""
+            local offset, _asc
+
             this._sms(msg, wParam, buf.ptr)
 
-            If (reverse)
-                Loop (offset := buf.Size - 1)
-                    If (_asc := NumGet(buf,offset - (A_Index-1),"UChar"))
+            if reverse
+                loop (offset := buf.Size - 1)
+                    if (_asc := NumGet(buf, offset - (A_Index - 1), "UChar"))
                         out_str .= Chr(_asc)
 
-            return (reverse) ? out_str : StrGet(buf, "UTF-8")
+            return (reverse ? out_str : StrGet(buf, "UTF-8"))
         }
-        _PutStr(msg, wParam:=0, str:="") { ; pass a string with NULL terminator
-            str_size := StrPut(str,"UTF-8")
-            buf := Buffer(str_size,0)
-            StrPut(str,buf,"UTF-8")
+
+        _PutStr(msg, wParam := 0, str := "") {
+            local str_size := StrPut(str, "UTF-8")
+            local buf := Buffer(str_size, 0)
+
+            StrPut(str, buf, "UTF-8")
 
             return this._sms(msg, wParam, buf.ptr)
         }
-        _SetStr(msg, wParam:=0, str:="") { ; pass a string without NULL terminator
-            buf := Buffer(StrPut(str, "UTF-8"),0)
-            StrPut(str,buf,"UTF-8")
-            len := (NumGet(buf, buf.size-3, "UShort")=0) ? buf.size - 2 : buf.size - 1 ; remove 1 or 2 NULL terminators
+
+        _SetStr(msg, wParam := 0, str := "") {
+            local buf := Buffer(StrPut(str, "UTF-8"), 0)
+            local len, buf2
+
+            StrPut(str, buf, "UTF-8")
+
+            len := ((NumGet(buf, buf.size - 3, "UShort") = 0) ? (buf.size - 2) : (buf.size - 1))
             buf2 := Buffer(len, 0)
+
             DllCall("RtlMoveMemory", "UPtr", buf2.ptr, "UPtr", buf.ptr, "UPtr", len)
+
             buf := ""
+
             return this._sms(msg, wParam, buf2.ptr)
         }
+
         _RGB_BGR(_in) {
-            If (0xFF000000 & _in)
-                return Format("0x{:06X}",(_in & 0xFF) << 24 | (_in & 0xFF00) << 8 | (_in & 0xFF0000) >> 8 | (_in >> 24))
-            Else
-                return Format("0x{:06X}",(_in & 0xFF) << 16 | (_in & 0xFF00) | (_in >> 16))
+            if (0xFF000000 & _in)
+                return Format("0x{:06X}", (_in & 0xFF) << 24 | (_in & 0xFF00) << 8 | (_in & 0xFF0000) >> 8 | (_in >> 24))
+            else
+                return Format("0x{:06X}", (_in & 0xFF) << 16 | (_in & 0xFF00) | (_in >> 16))
         }
 
-        ; __sms_slow(msg, wParam:=0, lParam:=0) {
-            ; obj := (this.__Class = "Scintilla") ? this : this.ctl
-            ; return r := SendMessage(msg, wParam, lParam, obj.hwnd)
-        ; }
+        _sms(msg, wParam := 0, lParam := 0) {
+            local obj := ((this.__Class = "Scintilla") ? this : this.ctl)
+            local r, status
 
-        ; __sms_fast(msg, wParam:=0, lParam:=0) {
-            ; obj := (this.__Class = "Scintilla") ? this : this.ctl
-            ; r := DllCall(obj.DirectStatusFunc, "UPtr", obj.DirectPtr, "UInt", msg, "Int", wParam, "Int", lParam, "Int*", &status:=0)
-            ; obj._StatusD := status
-            ; return r ; every sub-class will have this element
-        ; }
+            if obj.Hwnd {
+                if obj.UseDirect {
+                    r := DllCall(obj.DirectStatusFunc, "UPtr", obj.DirectPtr, "UInt", msg, "Int", wParam, "Int", lParam, "Int*", &status := 0)
 
-        ; _sms(msg, wParam:=0, lParam:=0) {
-
-        ; }
-
-        _sms(msg, wParam:=0, lParam:=0) {
-            obj := (this.__Class = "Scintilla") ? this : this.ctl
-            ; status := 0
-            If (obj.UseDirect) {
-                r := DllCall(obj.DirectStatusFunc, "UPtr", obj.DirectPtr, "UInt", msg, "Int", wParam, "Int", lParam, "Int*", &status:=0)
-                obj._StatusD := status
-                ; dbg_Scintilla("Direct Func Status")
-            } Else {
-                r := SendMessage(msg, wParam, lParam, obj.hwnd)
+                    obj._StatusD := status
+                }
+                else
+                    r := SendMessage(msg, wParam, lParam, obj.Hwnd)
             }
 
-            return (obj.LastCode := r) ; every sub-class will have this element
+            return (obj.LastCode := r)
         }
 
-        _GetRect(_ptr, offset:=0) {
+        _GetRect(_ptr, offset := 0) {
             a := []
-            Loop 4
-                a.Push(NumGet(_ptr, offset + ((A_Index-1) * 4), "UInt"))
+
+            loop 4
+                a.Push(NumGet(_ptr, offset + ((A_Index - 1) * 4), "UInt"))
+
             return a
         }
-        _SetRect(value, _ptr, offset:=0) {
-            If (Type(value) != "Array") Or (value.Length != 4)
-                throw Error("Inalid input for this property.",,"The input for this property must be a linear array with 4 values:`r`n`r`n[1, 2, 3, 4]")
 
-            Loop 4
-                NumPut("UInt", value[A_Index], _ptr, offset + ((A_Index-1) * 4))
+        _SetRect(value, _ptr, offset := 0) {
+            if ((Type(value) != "Array") Or (value.Length != 4))
+                throw "Inalid property type detected in Scintilla.scint_base._SetRect..."
+
+            loop 4
+                NumPut("UInt", value[A_Index], _ptr, offset + ((A_Index - 1) * 4))
         }
     }
 
     class CharRange {
         __New(ptr := 0) {
-            this.DefineProp("struct",{Value:(!ptr) ? Buffer(8,0) : {ptr:ptr}})
-            this.DefineProp("o",{Value:{cpMin:{o:0,t:"UInt"},cpMax:{o:4,t:"UInt"}}})
-            this.DefineProp("Ptr",{Get:(o)=>this.struct.ptr})
+            this.DefineProp("struct", {Value: !ptr ? Buffer(8, 0) : {ptr: ptr}})
+            this.DefineProp("o", {Value: {cpMin: {o: 0, t: "UInt"}, cpMax: {o: 4, t: "UInt"}}})
+            this.DefineProp("Ptr", {Get: (o) => this.struct.ptr})
         }
-        __Get(n,p) => NumGet(this.ptr,this.o.%n%.o,this.o.%n%.t)
-        __Set(n,p,v) => NumPut(this.o.%n%.t,v,this.ptr,this.o.%n%.o)
+
+        __Get(n, p) => NumGet(this.ptr, this.o.%n%.o, this.o.%n%.t)
+        __Set(n, p, v) => NumPut(this.o.%n%.t, v, this.ptr, this.o.%n%.o)
     }
 
     class TextRange {
-        __New(ptr:=0,cpMin:=0,cpMax:=0) {
-            this.DefineProp("struct",{Value:((!ptr) ? Buffer((A_PtrSize=4)?12:16, 0) : {ptr:ptr})})
-            this.DefineProp("Ptr",{Get:(o)=>this.struct.ptr})
-            this.DefineProp("buf",{Value:""})
-            this.DefineProp("o",{Value:{cpMin:{o:0,t:"UInt"}, cpMax:{o:4,t:"UInt"}, lpText:{o:8,t:"UPtr"}}})
+        __New(ptr := 0, cpMin := 0, cpMax := 0) {
+            this.DefineProp("struct", {Value: (!ptr ? Buffer((A_PtrSize = 4) ? 12 : 16, 0) : {ptr: ptr})})
+            this.DefineProp("Ptr", {Get: (o) => this.struct.ptr})
+            this.DefineProp("buf", {Value: ""})
+            this.DefineProp("o", {Value: {cpMin: {o: 0, t: "UInt"}, cpMax: {o: 4, t: "UInt"}, lpText: {o: 8, t: "UPtr"}}})
 
-            this.cpMin := cpMin, this.cpMax := cpMax
+            this.cpMin := cpMin
+            this.cpMax := cpMax
             this.buf := Buffer(Abs(this.cpMax - this.cpMin) + 2, 0)
             this.lpText := this.buf.ptr
         }
-        __Get(n,p) => NumGet(this.ptr,this.o.%n%.o,this.o.%n%.t)
-        __Set(n,p,v) => NumPut(this.o.%n%.t,v,this.ptr,this.o.%n%.o)
+
+        __Get(n, p) => NumGet(this.ptr, this.o.%n%.o, this.o.%n%.t)
+        __Set(n, p, v) => NumPut(this.o.%n%.t, v, this.ptr, this.o.%n%.o)
     }
 
-    class SCNotification { ; SCNotification
-        __New(ptr := 0) => this.ptr := ptr
+    class SCNotification {
+        __New(ptr := 0) => (this.ptr := ptr)
+
         hwnd => NumGet(this.ptr, 0, "UPtr")
         id => NumGet(this.ptr, Scintilla.scn_id, "UPtr")
         wmmsg => NumGet(this.ptr, Scintilla.scn_wmmsg, "UInt")
@@ -2280,7 +2414,7 @@ class Scintilla extends Gui.Custom {
         ch => NumGet(this.ptr, Scintilla.scn_ch, "Int")
         mod => NumGet(this.ptr, Scintilla.scn_mod, "Int")
         modType => NumGet(this.ptr, Scintilla.scn_modType, "Int")
-        text => (ptr := NumGet(this.ptr, Scintilla.scn_text, "UPtr")) ? StrGet(ptr, this.length, "UTF-8") : ""
+        text => ((ptr := NumGet(this.ptr, Scintilla.scn_text, "UPtr")) ? StrGet(ptr, this.length, "UTF-8") : "")
         textPtr => NumGet(this.ptr, Scintilla.scn_text, "UPtr")
         length => NumGet(this.ptr, Scintilla.scn_length, "Int")
         linesAdded => NumGet(this.ptr, Scintilla.scn_linesAdded, "Int")
@@ -2303,81 +2437,9 @@ class Scintilla extends Gui.Custom {
 }
 
 
-dbg_Scintilla(_in) {
-    Loop Parse _in, "`n", "`r"
-        OutputDebug("AHK: " A_LoopField)
-}
-
-
-myFunc() {
-
-}
-
-; =================================================================================
-; Newer Scintilla offsets, where Sci_Position is 8 bytes
-; =================================================================================
-; struct SCNotification {                 offset         size
-    ; struct Sci_NotifyHeader nmhdr;     |0              12/24
-    ; Sci_Position position;             |12/24          16/32
-    ; int ch;                            |16/32          20/36
-    ; int modifiers;                     |20/36          24/40
-    ; int modificationType;              |24/40          28/44
-    ; const char *text;                  |28/48 <------- 32/56 --- x64 offset
-    ; Sci_Position length;               |32/56          36/64
-    ; Sci_Position linesAdded;           |36/64          40/72
-    ; int message;                       |40/72          44/76
-    ; uptr_t wParam;                     |44/80 <------- 48/88 --- x64 offset
-    ; sptr_t lParam;                     |48/88          52/96
-    ; Sci_Position line;                 |52/96          56/104
-    ; int foldLevelNow;                  |56/104         60/108
-    ; int foldLevelPrev;                 |60/108         64/112
-    ; int margin;                        |64/112         68/116
-    ; int listType;                      |68/116         72/120
-    ; int x;                             |72/120         76/124
-    ; int y;                             |76/124         80/128
-    ; int token;                         |80/128         84/132
-    ; Sci_Position annotationLinesAdded; |84/136 <------ 88/144 --- x64 offset
-    ; int updated;                       |88/144         92/148
-    ; int listCompletionMethod;          |92/148         96/152
-    ; int characterSource;               |96/152         100/156 (x64 size = 160)
-; };
-
-; struct SCNotification {
- ; Sci_NotifyHeader nmhdr;
- ; Sci_Position position;
- ; /* SCN_STYLENEEDED, SCN_DOUBLECLICK, SCN_MODIFIED, SCN_MARGINCLICK, */
- ; /* SCN_NEEDSHOWN, SCN_DWELLSTART, SCN_DWELLEND, SCN_CALLTIPCLICK, */
- ; /* SCN_HOTSPOTCLICK, SCN_HOTSPOTDOUBLECLICK, SCN_HOTSPOTRELEASECLICK, */
- ; /* SCN_INDICATORCLICK, SCN_INDICATORRELEASE, */
- ; /* SCN_USERLISTSELECTION, SCN_AUTOCSELECTION */
- ; int ch;
- ; /* SCN_CHARADDED, SCN_KEY, SCN_AUTOCCOMPLETED, SCN_AUTOCSELECTION, */
- ; /* SCN_USERLISTSELECTION */
- ; int modifiers;
- ; /* SCN_KEY, SCN_DOUBLECLICK, SCN_HOTSPOTCLICK, SCN_HOTSPOTDOUBLECLICK, */
- ; /* SCN_HOTSPOTRELEASECLICK, SCN_INDICATORCLICK, SCN_INDICATORRELEASE, */
- ; int modificationType; /* SCN_MODIFIED */
- ; const char *text;
- ; /* SCN_MODIFIED, SCN_USERLISTSELECTION, SCN_AUTOCSELECTION, SCN_URIDROPPED */
- ; Sci_Position length;  /* SCN_MODIFIED */
- ; Sci_Position linesAdded; /* SCN_MODIFIED */
- ; int message; /* SCN_MACRORECORD */
- ; uptr_t wParam; /* SCN_MACRORECORD */
- ; sptr_t lParam; /* SCN_MACRORECORD */
- ; Sci_Position line;  /* SCN_MODIFIED */
- ; int foldLevelNow; /* SCN_MODIFIED */
- ; int foldLevelPrev; /* SCN_MODIFIED */
- ; int margin;  /* SCN_MARGINCLICK */
- ; int listType; /* SCN_USERLISTSELECTION */
- ; int x;   /* SCN_DWELLSTART, SCN_DWELLEND */
- ; int y;  /* SCN_DWELLSTART, SCN_DWELLEND */
- ; int token;  /* SCN_MODIFIED with SC_MOD_CONTAINER */
- ; Sci_Position annotationLinesAdded; /* SCN_MODIFIED with SC_MOD_CHANGEANNOTATION */
- ; int updated; /* SCN_UPDATEUI */
- ; int listCompletionMethod;
- ; /* SCN_AUTOCSELECTION, SCN_AUTOCCOMPLETED, SCN_USERLISTSELECTION, */
- ; int characterSource; /* SCN_CHARADDED */
-; };
+;;;-------------------------------------------------------------------------;;;
+;;;                        Private Function Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
 
 initializeCodeEditor() {
     if !DllCall("LoadLibrary", "Str", kBinariesDirectory . "Code Editor\Scintilla.dll", "UPtr")
@@ -2394,5 +2456,10 @@ initializeCodeEditor() {
         if !(SubStr(prop,1,2) = "__") And (SubStr(prop,1,1) = "_")
             Scintilla.Prototype.%prop% := Scintilla.scint_base.prototype.%prop%
 }
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Initialization Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
 
 initializeCodeEditor()

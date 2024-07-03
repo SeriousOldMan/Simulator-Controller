@@ -729,21 +729,28 @@ class PositionInfo {
 		local trackBehind := this.atBehind(false)
 		local oldObserved := this.Observed
 		local newObserved := ((this.isLeader() ? "L" : "") . (trackAhead ? "TA" : "") . (trackBehind ? "TB" : "")
-							. (standingsAhead ? "SA" : "") . (standingsBehind ? "SB" : "") . ((this == this.Spotter.FocusedCar[true]) ? "F" : "")
-							. (this.Car.InPit ? "P" : ""))
+							. (standingsAhead ? "SA" : "") . (standingsBehind ? "SB" : "")
+							. ((this == this.Spotter.FocusedCar[true]) ? "F" : ""))
 
-		if (this.Car.InPit || this.Spotter.DriverCar.InPit)
+		if this.Car.InPit {
+			if !InStr(this.iObserved, "P")
+				this.iObserved .= "P"
+
 			this.reset(sector, true, true)
-		else if (!(InStr(newObserved, "SA") && InStr(oldObserved, "SA"))
-		  && !(InStr(newObserved, "SB") && InStr(oldObserved, "SB"))
-		  && !(InStr(newObserved, "F") && InStr(oldObserved, "F"))) {
-			if (newObserved != oldObserved)
-				this.reset(sector, true, true)
-			else if ((newObserved = "") || (newObserved = "L"))
-				this.rebase(sector)
 		}
+		else {
+			this.iObserved := newObserved
 
-		this.iObserved := newObserved
+			if this.Spotter.DriverCar.InPit
+				this.reset(sector, true, true)
+			else if (!(InStr(newObserved, "SA") && InStr(oldObserved, "SA"))
+				 && !(InStr(newObserved, "SB") && InStr(oldObserved, "SB"))
+				 && !(InStr(newObserved, "F") && InStr(oldObserved, "F")))
+				if (newObserved != oldObserved)
+					this.reset(sector, true, true)
+				else if ((newObserved = "") || (newObserved = "L"))
+					this.rebase(sector)
+		}
 	}
 }
 

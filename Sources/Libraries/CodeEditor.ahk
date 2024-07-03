@@ -195,7 +195,8 @@ class Scintilla extends Gui.Custom {
 
     static AddScintilla(window, options) {
 		local DefaultOpt := false
-		local DefaultTheme := false
+		local SystemTheme := false
+        local DefaultTheme := false
         local LightTheme := false
         local newOptions := ""
 		local ignore, option, ctl, buf, result
@@ -204,8 +205,9 @@ class Scintilla extends Gui.Custom {
             local data
 
             if (ctl.Active && ctl.HasProp("_wordList")) {
-                DllCall("CustomLexer\ChunkColoring", "UPtr", ctl.all_data().ptr, "Int", ctl.Loading
-                                                   , "UPtr", ctl._wordList.ptr, "Int", ctl.CaseSense)
+                try
+                    DllCall("CustomLexer\ChunkColoring", "UPtr", ctl.all_data().ptr, "Int", ctl.Loading
+                                                       , "UPtr", ctl._wordList.ptr, "Int", ctl.CaseSense)
 
                 Task.CurrentTask.Sleep := 50
 
@@ -218,6 +220,8 @@ class Scintilla extends Gui.Custom {
         for ignore, option in StrSplit(options," ")
             if RegExMatch(option, "DefaultOpts?")
                 DefaultOpt := true
+            else if (option = "SystemTheme")
+                SystemTheme := true
             else if (option = "DefaultTheme")
                 DefaultTheme := true
             else if (option = "LightTheme")
@@ -271,6 +275,8 @@ class Scintilla extends Gui.Custom {
 
         if DefaultOpt
             ctl.DefaultOpt()
+        if SystemTheme
+            ctl.SystemTheme()
         if DefaultTheme
             ctl.DefaultTheme()
         if LightTheme
@@ -340,7 +346,7 @@ class Scintilla extends Gui.Custom {
 
         static modType := Scintilla.sc_modType
 
-        if !this.Active
+        if (!this.Active || !this.HasProp("_wordList"))
             return
 
         scn.LineBeforeInsert := this.CurLine
@@ -351,7 +357,7 @@ class Scintilla extends Gui.Custom {
         if this.AutoSizeNumberMargin
             this.MarginWidth(0, 33, scn)
 
-        if this.CustomSyntaxHighlighting {
+        if (this.CustomSyntaxHighlighting && this.HasProp("_wordList")) {
             data := this.scn_data(scn)
 
             if ((scn.modType & modType.InsertText) || ((event = "UpdateUI") && ((scn.updated = 4) || (scn.updated = 8)))) {
@@ -554,7 +560,12 @@ class Scintilla extends Gui.Custom {
     }
 
     ChunkColoring(scn, data, wordList) {
-        result := DllCall("CustomLexer\ChunkColoring", "UPtr", data.ptr, "Int", this.Loading, "UPtr", wordList.ptr, "Int", this.CaseSense)
+        try {
+            result := DllCall("CustomLexer\ChunkColoring", "UPtr", data.ptr, "Int", this.Loading, "UPtr", wordList.ptr, "Int", this.CaseSense)
+        }
+        catch Any {
+            result := 0
+        }
 
         this.Loading := 0
 
@@ -562,7 +573,12 @@ class Scintilla extends Gui.Custom {
     }
 
     DeleteRoutine(scn, data) {
-        return DllCall("CustomLexer\DeleteRoutine", "UPtr", data.ptr)
+        try {
+            return DllCall("CustomLexer\DeleteRoutine", "UPtr", data.ptr)
+        }
+        catch Any {
+            result := 0
+        }
     }
 
     DefaultOpt() {
@@ -585,6 +601,46 @@ class Scintilla extends Gui.Custom {
         this.Selection.MultiTyping := true
         this.Selection.RectModifier := 4
         this.Selection.RectWithMouse := true
+    }
+
+    SystemTheme() {
+        this.Cust.Caret.LineBack := ("0x" . Theme.CurrentTheme.FieldBackColor)
+        this.Cust.Editor.Back := ("0x" . Theme.CurrentTheme.FieldBackColor)
+
+        this.Cust.Editor.Fore := 0x000000
+        this.Cust.Editor.Font := "Consolas"
+        this.Cust.Editor.Size := 10
+
+        this.Style.ClearAll()
+
+        this.Cust.Margin.Back := ("0x" . Theme.CurrentTheme.WindowBackColor)
+        this.Cust.Margin.Fore := 0x000000
+
+        this.Cust.Caret.Fore := 0x222222
+        this.Cust.Selection.Back := 0x398FFB
+        this.Cust.Selection.ForeColor := 0xFFFFFF
+
+        this.Cust.Brace.Fore     := 0x5F6364
+        this.Cust.BraceH.Fore    := 0x00FF00
+        this.Cust.BraceHBad.Fore := 0xFF0000
+        this.Cust.Punct.Fore     := 0xC57F5B
+        this.Cust.String1.Fore   := 0x329C1B
+        this.Cust.String2.Fore   := 0x329C1B
+
+        this.Cust.Comment1.Fore  := 0x7D8B98
+        this.Cust.Comment2.Fore  := 0x7D8B98
+        this.Cust.Number.Fore    := 0xC72A31
+
+        this.Cust.kw1.Fore := 0x329C1B
+        this.Cust.kw2.Fore := 0x1049BF
+        this.Cust.kw2.Bold := true
+        this.Cust.kw3.Fore := 0x2390B6
+        this.Cust.kw3.Bold := true
+        this.Cust.kw4.Fore := 0x3F8CD4
+        this.Cust.kw5.Fore := 0xC72A31
+
+        this.Cust.kw6.Fore := 0xEC9821
+        this.Cust.kw7.Fore := 0x2390B6
     }
 
     DefaultTheme() {

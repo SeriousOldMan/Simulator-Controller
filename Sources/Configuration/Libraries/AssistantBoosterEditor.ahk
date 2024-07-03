@@ -1035,7 +1035,7 @@ class CallbacksEditor {
 		if false
 			this.iScriptEditor := editorGui.Add("Edit", "x16 yp w832 h140 T14 WantTab W:Grow Y:Move(0.25) H:Grow(0.75)")
 		else
-			this.iScriptEditor := editorGui.Add("CodeEditor", "x16 yp w832 h140 DefaultOpt DefaultTheme W:Grow Y:Move(0.25) H:Grow(0.75)")
+			this.iScriptEditor := editorGui.Add("CodeEditor", "x16 yp w832 h140 DefaultOpt SystemTheme Border W:Grow Y:Move(0.25) H:Grow(0.75)")
 
 		editorGui.SetFont("Norm", "Arial")
 
@@ -1069,11 +1069,11 @@ class CallbacksEditor {
 	setScript(text) {
 		this.ScriptEditor.CaseSense := false
 
-		this.ScriptEditor.SetKeywords("Any All None One Predicate"
-									, "priority true false fail"
-									, "Call Prove ProveAll Set Clear Produce"
+		this.ScriptEditor.SetKeywords("priority true false"
+									, "Any All None One Predicate"
+									, "Call Prove ProveAll Set Get Clear Produce"
 									, "option squareRoot plus minus multiply divide greater less lessEqual greaterEqual equal unequal builtin0 builtin1 unbound append get"
-									, "? !")
+									, "? ! fail")
 
 		this.ScriptEditor.Brace.Chars := "()[]{}"
 		this.ScriptEditor.SyntaxEscapeChar := "``"

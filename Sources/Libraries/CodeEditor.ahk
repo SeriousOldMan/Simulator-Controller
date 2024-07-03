@@ -349,34 +349,38 @@ class Scintilla extends Gui.Custom {
         if (!this.Active || !this.Enabled || !this.Visible || !this.HasProp("_wordList"))
             return
 
-        scn.LineBeforeInsert := this.CurLine
-        scn.LinesBeforeInsert := this.Lines
+        try {
+            scn.LineBeforeInsert := this.CurLine
+            scn.LinesBeforeInsert := this.Lines
 
-        event := scn.wmmsg_txt := Scintilla.Lookup("WM_Notify", (msg_num := scn.wmmsg))
+            event := scn.wmmsg_txt := Scintilla.Lookup("WM_Notify", (msg_num := scn.wmmsg))
 
-        if this.AutoSizeNumberMargin
-            this.MarginWidth(0, 33, scn)
+            if this.AutoSizeNumberMargin
+                this.MarginWidth(0, 33, scn)
 
-        if (this.CustomSyntaxHighlighting && this.HasProp("_wordList")) {
-            data := this.scn_data(scn)
+            if (this.CustomSyntaxHighlighting && this.HasProp("_wordList")) {
+                data := this.scn_data(scn)
 
-            if ((scn.modType & modType.InsertText) || ((event = "UpdateUI") && ((scn.updated = 4) || (scn.updated = 8)))) {
-                if ((event = "Modified") && (scn.length > 1))
-                    result := this.ChunkColoring(scn, data, this._wordList)
-                else if ((event = "Modified") && !scn.linesAdded)
-                    result := this.ChunkColoring(scn, data, this._wordList)
-			}
-            else if (scn.modType & modType.BeforeDelete)
-                this.DeleteRoutine(scn, data)
-            else if (scn.modType & modType.DeleteText)
-                this.ChunkColoring(scn, data, this._wordList)
+                if ((scn.modType & modType.InsertText) || ((event = "UpdateUI") && ((scn.updated = 4) || (scn.updated = 8)))) {
+                    if ((event = "Modified") && (scn.length > 1))
+                        result := this.ChunkColoring(scn, data, this._wordList)
+                    else if ((event = "Modified") && !scn.linesAdded)
+                        result := this.ChunkColoring(scn, data, this._wordList)
+                }
+                else if (scn.modType & modType.BeforeDelete)
+                    this.DeleteRoutine(scn, data)
+                else if (scn.modType & modType.DeleteText)
+                    this.ChunkColoring(scn, data, this._wordList)
 
-            if (scn.wmmsg_txt = "StyleNeeded")
-                this.Pacify()
+                if (scn.wmmsg_txt = "StyleNeeded")
+                    this.Pacify()
+            }
+
+            if this.Callback
+                f := this.Callback(scn)
         }
-
-        if this.Callback
-            f := this.Callback(scn)
+        catch Any {
+        }
     }
 
     MarginWidth(margin := 0, style := 33, scn := "") {

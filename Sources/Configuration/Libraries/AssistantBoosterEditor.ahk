@@ -1041,8 +1041,8 @@ class CallbacksEditor {
 
 			this.ScriptEditor.SetKeywords("priority true false"
 										, "Any All None One Predicate"
-										, "Call Prove ProveAll Set Get Clear Produce"
-										, "option squareRoot plus minus multiply divide greater less lessEqual greaterEqual equal unequal builtin0 builtin1 unbound append get"
+										, "Call Prove ProveAll Set Get Clear Produce Option Sqrt Unbound Append get"
+										, "messageShow messageBox"
 										, "? ! fail")
 
 			this.ScriptEditor.Brace.Chars := "()[]{}"

@@ -238,6 +238,10 @@ class GIFViewer {
 ;;;-------------------------------------------------------------------------;;;
 
 initializeGIFViewer() {
+	AddGIFViewer(window, arguments*) {
+		return createGIFViewer(window, arguments*)
+	}
+
 	createGIFViewer(window, options, fileName) {
 		local control := window.Add("Picture", options, fileName)
 		local viewer := GIFViewer(control, fileName)
@@ -248,6 +252,8 @@ initializeGIFViewer() {
 
 		return control
 	}
+
+	Window.Prototype.AddGIFViewer := AddGIFViewer
 
 	Window.DefineCustomControl("GIFViewer", createGIFViewer)
 }

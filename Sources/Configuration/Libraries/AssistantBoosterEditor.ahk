@@ -27,6 +27,7 @@
 #Include "..\..\Libraries\SpeechSynthesizer.ahk"
 #Include "..\..\Libraries\LLMConnector.ahk"
 #Include "..\..\Libraries\JSON.ahk"
+#Include "..\..\Libraries\SyntaxEditor.ahk"
 #Include "ConfigurationEditor.ahk"
 
 
@@ -1031,7 +1032,10 @@ class CallbacksEditor {
 
 		editorGui.SetFont("Norm", "Courier New")
 
-		this.iScriptEditor := editorGui.Add("Edit", "x16 yp w832 h140 T14 WantTab W:Grow Y:Move(0.25) H:Grow(0.75)")
+		if false
+			this.iScriptEditor := editorGui.Add("Edit", "x16 yp w832 h140 T14 WantTab W:Grow Y:Move(0.25) H:Grow(0.75)")
+		else
+			this.iScriptEditor := editorGui.AddScintilla("x16 yp w832 h140 DefaultOpt DefaultTheme W:Grow Y:Move(0.25) H:Grow(0.75)")
 
 		editorGui.SetFont("Norm", "Arial")
 
@@ -1060,6 +1064,25 @@ class CallbacksEditor {
 		editorGui.Add("Edit", "x536 yp h23 w312 Y:Move(0.25) X:Move(0.34) W:Grow(0.66) vparameterDescriptionEdit")
 
 		this.updateState()
+	}
+
+	setScript(text) {
+		this.ScriptEditor.CaseSense := false
+
+		this.ScriptEditor.setKeywords("Any All None One Predicate"
+									, "priority true false fail"
+									, "Call Prove ProveAll Set Clear Produce"
+									, "option squareRoot plus minus multiply divide greater less lessEqual greaterEqual equal unequal builtin0 builtin1 unbound append get")
+
+		this.ScriptEditor.Brace.Chars := "[]{}()"
+		this.ScriptEditor.SyntaxEscapeChar := "``"
+		this.ScriptEditor.SyntaxCommentLine := ";"
+
+		this.ScriptEditor.Tab.Width := 4
+
+		this.ScriptEditor.CustomSyntaxHighlighting := true
+
+		this.ScriptEditor.Text := text
 	}
 
 	editCallbacks(owner := false) {
@@ -1178,7 +1201,7 @@ class CallbacksEditor {
 			this.Control["addParameterButton"].Enabled := false
 			this.Control["deleteParameterButton"].Enabled := false
 
-			this.ScriptEditor.Text := ""
+			this.setScript("")
 			this.CallableField[2].Text := ""
 			this.Control["callbackNameEdit"].Text := ""
 			this.Control["callbackDescriptionEdit"].Text := ""
@@ -1328,12 +1351,12 @@ class CallbacksEditor {
 			this.Control["callbackDescriptionEdit"].Text := callback.Description
 
 			if (callback.Type = "Assistant.Rule") {
-				this.ScriptEditor.Text := callback.Script
+				this.setScript(callback.Script)
 
 				this.CallableField[2].Text := ""
 			}
 			else {
-				this.ScriptEditor.Text := ""
+				this.setScript("")
 
 				this.CallableField[2].Text := callback.Definition
 			}
@@ -1356,7 +1379,7 @@ class CallbacksEditor {
 			this.Control["callbackInitializationDropDown"].Choose(0)
 			this.Control["callbackConfirmationDropDown"].Choose(0)
 
-			this.ScriptEditor.Text := ""
+			this.setScript("")
 		}
 
 		this.updateState()

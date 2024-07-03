@@ -72,6 +72,7 @@ Speech Interface.16=%kBinariesDirectory%Google\ <- %kSourcesDirectory%Special\Go
 Speech Interface.17=%kBinariesDirectory%Google\ <- %kSourcesDirectory%Special\Google Speech Recognizer\Release\\net472\System.*
 Stream Deck Interface.1=%kBinariesDirectory%Connectors\SimulatorControllerPluginConnector.dll <- %kSourcesDirectory%Special\Stream Deck Plugin\Release\SimulatorControllerPluginConnector.dll
 Stream Deck Interface.2=%kHomeDirectory%Utilities\Plugins\de.thebigo.simulatorcontroller.sdPlugin <- %kSourcesDirectory%Special\Stream Deck Plugin\Release\de.thebigo.simulatorcontroller.sdPlugin
+Code Editor.1=%kBinariesDirectory%Code Editor\ <- %kHomeDirectory%Utilities\3rd Party\Code Editor\*.dll
 Setup Workbench Configuration.1=%kResourcesDirectory%Garage\Setup Workbench.ini <- %kSourcesDirectory%Garage\Setup Workbench.ini
 Setup Workbench Configuration.2=%kTranslationsDirectory% <- %kSourcesDirectory%Garage\Translations\Setup Workbench.*
 Setup Workbench Configuration.3=%kResourcesDirectory%Garage\Definitions\ <- %kSourcesDirectory%Garage\Definitions\*.ini

@@ -1,8 +1,26 @@
-#include "..\Framework\Framework.ahk"
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Assistant Booster Editor        ;;;
+;;;                                                                         ;;;
+;;;   Based on the work of the TheArkive and Scintilla.org.                 ;;;
+;;;   See https://github.com/TheArkive/scintilla_ahk2 for more information  ;;;
+;;;   and the download of the original work.                                ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
+;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; ====================================================================
-; Scintilla Class - sorry, no docs yet!
-; ====================================================================
+;;;-------------------------------------------------------------------------;;;
+;;;                          Local Include Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#include "..\Framework\Framework.ahk"
+#include "..\Framework\Gui.ahk"
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Private Classes Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
 class Scintilla extends Gui.Custom {
     Static p := A_PtrSize, u := StrLen(Chr(0xFFFF))
     Static DirectFunc := 0, DirectStatusFunc := 0
@@ -168,29 +186,6 @@ class Scintilla extends Gui.Custom {
                    , "Korean Unified Hangul Code",949, "Traditional Chinese Big5",950
                    , "Korean Johab",1361)
 
-    Static __New() {                                                        ; Need to do it this way.
-        Gui.Prototype.AddScintilla := ObjBindMethod(this,"AddScintilla")    ; Multiple gui subclass extensions don't play well together.
-
-        scint_path := kBinariesDirectory . "Code Editor\Scintilla.dll" ; Set this as needed.
-
-        If !(this.hModule := DllCall("LoadLibrary", "Str", scint_path, "UPtr")) {    ; load dll, make sure it works
-            MsgBox "Scintilla DLL not found.`n`nModify the path to the appropriate location for your script.`n"
-            ExitApp
-        }
-
-        custom_lexer := kBinariesDirectory . "Code Editor\CustomLexer.dll" ; change this path as needed (if you choose to move the DLL)
-        If !DllCall("LoadLibrary", "Str", custom_lexer, "UPtr") {
-            Msgbox "CustomLexer.dll not found."
-            ExitApp
-        }
-
-        ; Scintilla.scint_base.Prototype._sms := Scintilla.scint_base.Prototype.__sms_slow
-
-        For prop in Scintilla.scint_base.prototype.OwnProps() ; attach utility methods to prototype
-            If !(SubStr(prop,1,2) = "__") And (SubStr(prop,1,1) = "_")
-                this.Prototype.%prop% := Scintilla.scint_base.prototype.%prop%
-
-    }
     Static AddScintilla(_gui, sOptions) {
         DefaultOpt := false
         DefaultTheme := false
@@ -371,13 +366,13 @@ class Scintilla extends Gui.Custom {
                 If (event = "Modified") && (scn.length > 1) { ; && (scn.linesAdded) { ; paste or document load operation
                     ticks := A_TickCount
                     result := this.ChunkColoring(scn, data, this._wordList)
-                    dbg_scintilla( "ChunkColoring Seconds:  " (A_TickCount - ticks) / 1000 " / result: " result)
+                    dbg_Scintilla( "ChunkColoring Seconds:  " (A_TickCount - ticks) / 1000 " / result: " result)
                 }
                 else if (event = "Modified") && (!scn.linesAdded) {
                 ; else if (event = "CharAdded") {
                     ticks := A_TickCount
                     result := this.ChunkColoring(scn, data, this._wordList)
-                    dbg_scintilla( "Line Styling Seconds:  " (A_TickCount - ticks) / 1000 " / result: " result)
+                    dbg_Scintilla( "Line Styling Seconds:  " (A_TickCount - ticks) / 1000 " / result: " result)
                 }
 
             }
@@ -390,7 +385,7 @@ class Scintilla extends Gui.Custom {
             If (scn.wmmsg_txt = "StyleNeeded") {
                 ; ticks := A_TickCount
                 this.Pacify() ; pacify the StyleNeeded bit by styling the last char in the doc
-                ; dbg_scintilla( "StyleNeeded Seconds:  " (A_TickCount - ticks) / 1000 " / Last: " this.Styling.Last)
+                ; dbg_Scintilla( "StyleNeeded Seconds:  " (A_TickCount - ticks) / 1000 " / Last: " this.Styling.Last)
 
             }
         }
@@ -2228,7 +2223,7 @@ class Scintilla extends Gui.Custom {
             If (obj.UseDirect) {
                 r := DllCall(obj.DirectStatusFunc, "UPtr", obj.DirectPtr, "UInt", msg, "Int", wParam, "Int", lParam, "Int*", &status:=0)
                 obj._StatusD := status
-                ; dbg_scintilla("Direct Func Status")
+                ; dbg_Scintilla("Direct Func Status")
             } Else {
                 r := SendMessage(msg, wParam, lParam, obj.hwnd)
             }
@@ -2308,7 +2303,7 @@ class Scintilla extends Gui.Custom {
 }
 
 
-dbg_scintilla(_in) {
+dbg_Scintilla(_in) {
     Loop Parse _in, "`n", "`r"
         OutputDebug("AHK: " A_LoopField)
 }
@@ -2384,3 +2379,20 @@ myFunc() {
  ; int characterSource; /* SCN_CHARADDED */
 ; };
 
+initializeCodeEditor() {
+    if !DllCall("LoadLibrary", "Str", kBinariesDirectory . "Code Editor\Scintilla.dll", "UPtr")
+        throw "Scintalla library not found..."
+
+    if !DllCall("LoadLibrary", "Str", kBinariesDirectory . "Code Editor\CustomLexer.dll", "UPtr")
+        throw "CustomLexer library not found..."
+
+    Window.Prototype.AddCodeEditor := ObjBindMethod(Scintilla, "AddScintilla")
+
+    Window.DefineCustomControl("CodeEditor", ObjBindMethod(Scintilla, "AddScintilla"))
+
+    for prop in Scintilla.scint_base.Prototype.OwnProps() ; attach utility methods to prototype
+        if !(SubStr(prop,1,2) = "__") And (SubStr(prop,1,1) = "_")
+            Scintilla.Prototype.%prop% := Scintilla.scint_base.prototype.%prop%
+}
+
+initializeCodeEditor()

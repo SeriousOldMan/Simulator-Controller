@@ -10,7 +10,6 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\..\Libraries\LLMConnector.ahk"
-#Include "..\..\Libraries\RuleEngine.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -27,7 +26,8 @@
 #Include "..\..\Libraries\SpeechSynthesizer.ahk"
 #Include "..\..\Libraries\LLMConnector.ahk"
 #Include "..\..\Libraries\JSON.ahk"
-#Include "..\..\Libraries\SyntaxEditor.ahk"
+#Include "..\..\Libraries\CodeEditor.ahk"
+#Include "..\..\Libraries\RuleEngine.ahk"
 #Include "ConfigurationEditor.ahk"
 
 
@@ -1035,7 +1035,7 @@ class CallbacksEditor {
 		if false
 			this.iScriptEditor := editorGui.Add("Edit", "x16 yp w832 h140 T14 WantTab W:Grow Y:Move(0.25) H:Grow(0.75)")
 		else
-			this.iScriptEditor := editorGui.AddScintilla("x16 yp w832 h140 DefaultOpt DefaultTheme W:Grow Y:Move(0.25) H:Grow(0.75)")
+			this.iScriptEditor := editorGui.Add("CodeEditor", "x16 yp w832 h140 DefaultOpt DefaultTheme W:Grow Y:Move(0.25) H:Grow(0.75)")
 
 		editorGui.SetFont("Norm", "Arial")
 

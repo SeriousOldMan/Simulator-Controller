@@ -241,7 +241,7 @@ class Scintilla extends Gui.Custom {
 
         ctl.msg_cb := ObjBindMethod(ctl, "WM_Messages")
 
-        OnMessage(0x4E, ctl.msg_cb)
+        Task.startTask(OnMessage.Bind(0x4E, ctl.msg_cb), 1000, kLowPriority)
 
         ctl.Loading := 0
         ctl.Callback := ""
@@ -284,7 +284,7 @@ class Scintilla extends Gui.Custom {
 
         ctl.Deactivate := (*) => ctl.Active := false
 
-        Task.startTask(refresh, 500, kInterruptPriority)
+        Task.startTask(refresh, 2000, kInterruptPriority)
 
         return ctl
     }
@@ -346,7 +346,7 @@ class Scintilla extends Gui.Custom {
 
         static modType := Scintilla.sc_modType
 
-        if (!this.Active || !this.HasProp("_wordList"))
+        if (!this.Active || !this.Enabled || !this.Visible || !this.HasProp("_wordList"))
             return
 
         scn.LineBeforeInsert := this.CurLine

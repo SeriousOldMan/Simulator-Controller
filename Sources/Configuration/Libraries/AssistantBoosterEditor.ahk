@@ -1034,8 +1034,23 @@ class CallbacksEditor {
 
 		if false
 			this.iScriptEditor := editorGui.Add("Edit", "x16 yp w832 h140 T14 WantTab W:Grow Y:Move(0.25) H:Grow(0.75)")
-		else
-			this.iScriptEditor := editorGui.Add("CodeEditor", "x16 yp w832 h140 DefaultOpt SystemTheme Border W:Grow Y:Move(0.25) H:Grow(0.75)")
+		else {
+			this.iScriptEditor := editorGui.Add("CodeEditor", "x16 yp w832 h140 DefaultOpt SystemTheme Disabled W:Grow Y:Move(0.25) H:Grow(0.75)")
+
+			this.ScriptEditor.CaseSense := false
+
+			this.ScriptEditor.SetKeywords("priority true false"
+										, "Any All None One Predicate"
+										, "Call Prove ProveAll Set Get Clear Produce"
+										, "option squareRoot plus minus multiply divide greater less lessEqual greaterEqual equal unequal builtin0 builtin1 unbound append get"
+										, "? ! fail")
+
+			this.ScriptEditor.Brace.Chars := "()[]{}"
+			this.ScriptEditor.SyntaxEscapeChar := "``"
+			this.ScriptEditor.SyntaxCommentLine := ";"
+
+			this.ScriptEditor.Tab.Width := 4
+		}
 
 		editorGui.SetFont("Norm", "Arial")
 
@@ -1067,20 +1082,6 @@ class CallbacksEditor {
 	}
 
 	setScript(text) {
-		this.ScriptEditor.CaseSense := false
-
-		this.ScriptEditor.SetKeywords("priority true false"
-									, "Any All None One Predicate"
-									, "Call Prove ProveAll Set Get Clear Produce"
-									, "option squareRoot plus minus multiply divide greater less lessEqual greaterEqual equal unequal builtin0 builtin1 unbound append get"
-									, "? ! fail")
-
-		this.ScriptEditor.Brace.Chars := "()[]{}"
-		this.ScriptEditor.SyntaxEscapeChar := "``"
-		this.ScriptEditor.SyntaxCommentLine := ";"
-
-		this.ScriptEditor.Tab.Width := 4
-
 		this.ScriptEditor.Text := text
 	}
 
@@ -1143,7 +1144,12 @@ class CallbacksEditor {
 
 				this.Control["deleteCallbackButton"].Enabled := false
 
-				this.ScriptEditor.Opt("+ReadOnly")
+				if false
+					this.ScriptEditor.Opt("+ReadOnly")
+				else
+					this.ScriptEditor.Enabled := false
+
+
 				this.CallableField[2].Enabled := false
 
 				this.Control["callbackNameEdit"].Enabled := false
@@ -1159,7 +1165,11 @@ class CallbacksEditor {
 				this.Control["addParameterButton"].Enabled := true
 				this.Control["deleteParameterButton"].Enabled := (this.SelectedParameter != false)
 
-				this.ScriptEditor.Opt("-ReadOnly")
+				if false
+					this.ScriptEditor.Opt("-ReadOnly")
+				else
+					this.ScriptEditor.Enabled := true
+
 				this.CallableField[2].Enabled := true
 
 				this.Control["callbackNameEdit"].Enabled := true
@@ -1255,6 +1265,14 @@ class CallbacksEditor {
 	}
 
 	selectCallback(callback, force := false, save := true) {
+		loadCallback() {
+			this.iSelectedCallback := callback
+
+			this.loadCallback(callback)
+
+			this.updateState()
+		}
+
 		if (force || (this.SelectedCallback != callback)) {
 			if (save && this.SelectedCallback)
 				if !this.saveCallback(this.SelectedCallback) {
@@ -1268,9 +1286,7 @@ class CallbacksEditor {
 			if callback
 				this.CallbacksListView.Modify(inList(this.Callbacks, callback), "Select Vis")
 
-			this.loadCallback(callback)
-
-			this.updateState()
+			Task.startTask(loadCallback, 500, kLowPriority)
 		}
 	}
 

@@ -790,15 +790,15 @@ It is important to understand, that in all cases only data that you created your
 
 This section will give you some background information about the inner workings of Jona. To understand the most of it, you need some background knowledge about programming. Therefore, if you never have coded just a tiny bit, you can safely skip this section.
 
-The most important part of Jona, beside the natural language interface, which has been described above, is the rule engine and the knowledge base, the rules work with. The major part of the knowledge base consists of a history of past events, which is used by the rules to give Jona a kind of memory and allows the bot to interact in a context-sensitive manner. The history is also used by the rules to infere future trends, for example, a projection of target tyre pressures for long stints in an evening session, when the air and track temperatures are falling. Past and future weather trend information will be integrated as well, when they are available. Jona is able to recommend whether a repair of a damage be worth of for the next pitstop by calculating the historic impact of the damage on your lap time, and so on. Not all of this has been implemented completely in the alpha version of Jona, but the genetics are all there.
+The most important part of Jona, beside the natural language interface, which has been described above, is the [Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine) and the knowledge base, the rules work with. The major part of the knowledge base consists of a history of past events, which is used by the rules to give Jona a kind of memory and allows the bot to interact in a context-sensitive manner. The history is also used by the rules to infere future trends, for example, a projection of target tyre pressures for long stints in an evening session, when the air and track temperatures are falling. Past and future weather trend information will be integrated as well, when they are available. Jona is able to recommend whether a repair of a damage be worth of for the next pitstop by calculating the historic impact of the damage on your lap time, and so on. Not all of this has been implemented completely in the alpha version of Jona, but the genetics are all there.
 
-Below you will find some information about the rule engine and the knowledge base, although this is not a complete documentation at all for the moment.
+Below you will find a short intrduction to the rule engine and the knowledge base for a general understanding. For a complete documentation targeted at developers, see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine).
 
 ### The Rule Engine
 
-The rule engine used for Jona is a so called hybrid rule engine, which means, that rules can derive new knowledge from given knowledge, called forward chaining, or rules can be used to prove a hypothesis by reducing it to more and more simple questions until all those question has been answered or no more possibilities are available, which means, that the hypothesis is considered to be false. This is called backward chaining and the most prominent representative for this kind of logical computation is the programming language Prolog.
+The rule engine used for Jona and the other Assistants implements support for a hybrid approach, which means, that rules can produce new knowledge from given knowledge, called forward chaining, or rules can be used to prove a hypothesis by reducing it to more and more simple questions until all those question has been answered or no more possibilities are available, which means, that the hypothesis is considered to be false. This is called backward chaining and the most prominent representative for this kind of logical computation is the programming language Prolog.
 
-Jonas forward chaining rules look like this:
+Forward chaining rules (aka Productions) look like this:
 
 	{All: [?Pitstop.Plan], [?Tyre.Pressure.Target.FL]} =>
 		(Set: Pitstop.Planned.Tyre.Pressure.FL, ?Tyre.Pressure.Target.FL),
@@ -806,7 +806,7 @@ Jonas forward chaining rules look like this:
 
 This rule, for example, is triggered, when a new pitstop plan had been requested (*[?Pitstop.Plan]*) and when at the same time a target pressure for the front left tyre had been derived (typically by another rule). The rule above then *fires* and thereby copies this information to the pitstop plan.
 
-A backward chaining rule is typically used for calculations and looks like this:
+A backward chaining rule (aka Reduction) is typically used for calculations and looks like this:
 
 	updateRemainingLaps(?lap) <=
 		remainingStintLaps(?lap, ?stintLaps), remainingRaceLaps(?lap, ?raceLaps),
@@ -831,14 +831,14 @@ You can trigger the first two states, as long as logical for the given situation
 
 ### Jonas Memory
 
-The content of the knowledgbase of Jona or the facts, as these are called in the world of rule engines, can be divided into three categories:
+The content of the knowledge base of Jona or the facts, as these are called in the world of rule engines, can be divided into three categories:
 
   - *Historical information:* Here, all recent laps and pitstops are memorized to build a base of historic data for trend anlysis.
-  - *Derived future information:* In this category fall the state information described above, for example the projected settings for the next pitstop.
+  - *Derived future predictions:* In this category fall the state information described above, for example the projected settings for the next pitstop.
   - *Real working memory:* Jona constantly calculates future trends and events, like low fuel in a few laps. These projected values are stored in the memory as well.
   
 For historical information, the format is quite simple. All facts for a past lap start with *Lap.X* where X is the lap number. A similar format is used for pitstops, *Pitstop.X*, where X is the pitstop number here. Normally you will have more laps than pitstops in the memory, except you are me in a reverse grid league race, hey?
-The derived future information is typically categorized by the first part of the fact name, for example *Tyre* for all knowledge about the current and projected tyre state.
+The derived future predictions is typically categorized by the first part of the fact name, for example *Tyre* for all knowledge about the current and projected tyre state.
 
 You can take a look at the knowledge base by enabling "Debug" mode in the configuration, as described in the [Troubleshooting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#troubleshooting) section. By doing this, you will pay a performance penalty, which might or might not be noticeable depending on your hardware.
 

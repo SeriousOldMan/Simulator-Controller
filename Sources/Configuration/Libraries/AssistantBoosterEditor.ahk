@@ -1035,7 +1035,7 @@ class CallbacksEditor {
 		if false
 			this.iScriptEditor := editorGui.Add("Edit", "x16 yp w832 h140 T14 WantTab W:Grow Y:Move(0.25) H:Grow(0.75)")
 		else {
-			this.iScriptEditor := editorGui.Add("CodeEditor", "x16 yp w832 h140 DefaultOpt SystemTheme Disabled W:Grow Y:Move(0.25) H:Grow(0.75)")
+			this.iScriptEditor := editorGui.Add("CodeEditor", "x16 yp w832 h140 DefaultOpt SystemTheme Border Disabled W:Grow Y:Move(0.25) H:Grow(0.75)")
 
 			this.ScriptEditor.CaseSense := false
 
@@ -1265,14 +1265,6 @@ class CallbacksEditor {
 	}
 
 	selectCallback(callback, force := false, save := true) {
-		loadCallback() {
-			this.iSelectedCallback := callback
-
-			this.loadCallback(callback)
-
-			this.updateState()
-		}
-
 		if (force || (this.SelectedCallback != callback)) {
 			if (save && this.SelectedCallback)
 				if !this.saveCallback(this.SelectedCallback) {
@@ -1281,12 +1273,14 @@ class CallbacksEditor {
 					return
 				}
 
-			this.iSelectedCallback := callback
-
 			if callback
 				this.CallbacksListView.Modify(inList(this.Callbacks, callback), "Select Vis")
 
-			Task.startTask(loadCallback, 500, kLowPriority)
+			this.iSelectedCallback := callback
+
+			this.loadCallback(callback)
+
+			this.updateState()
 		}
 	}
 
@@ -1322,7 +1316,7 @@ class CallbacksEditor {
 
 		if (this.Type = "Agent.Events")
 			callback := {Name: "", Type: "Assistant.Rule", Active: true, Description: "", Parameters: []
-					   , Builtin: false, Event: "", Phrase: "", Definition: "", Script: ""}
+					   , Builtin: false, Event: "", Phrase: "", Definition: "", Script: "; Insert your rules here...`n`n"}
 		else
 			callback := {Name: "", Type: "Controller.Function", Active: true, Description: "", Parameters: []
 					   , Builtin: false, Initialized: true, Confirm: true, Definition: ""}

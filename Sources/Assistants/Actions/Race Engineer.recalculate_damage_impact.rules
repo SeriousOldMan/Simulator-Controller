@@ -7,7 +7,7 @@
 
 Damage.Impact.resetDamage([])
 Damage.Impact.resetDamage([?damageType | ?damageTypes]) <=
-		Damage.Impact.resetDamage(?damageType), Damage.Impact.resetDamage(?damageTypes)											 
+		Damage.Impact.resetDamage(?damageType), Damage.Impact.resetDamage(?damageTypes)
 
 Damage.Impact.resetDamage(?damageType) <=
 		Get(Damage, ?damageType, ?damage), ?damage > 0, Clear(Damage.Repair, ?damageType, Target),

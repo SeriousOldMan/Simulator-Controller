@@ -202,12 +202,11 @@ class Scintilla extends Gui.Custom {
 		local ignore, option, ctl, buf, result
 
         refresh() {
-            local data
-
-            if (ctl.Active && ctl.HasProp("_wordList")) {
+            if !ctl.Zoombie {
                 try
-                    DllCall("CustomLexer\ChunkColoring", "UPtr", ctl.all_data().ptr, "Int", ctl.Loading
-                                                       , "UPtr", ctl._wordList.ptr, "Int", ctl.CaseSense)
+                    if ctl.HasProp("_wordList")
+                        DllCall("CustomLexer\ChunkColoring", "UPtr", ctl.all_data().ptr, "Int", ctl.Loading
+                                                           , "UPtr", ctl._wordList.ptr, "Int", ctl.CaseSense)
 
                 Task.CurrentTask.Sleep := 50
 
@@ -231,7 +230,7 @@ class Scintilla extends Gui.Custom {
 
         ctl := window.Add("Custom", "ClassScintilla " . newOptions)
         ctl.Base := Scintilla.Prototype
-        ctl.Active := true
+        ctl.Zoombie := false
 
         buf := Buffer(8, 0)
 
@@ -282,7 +281,7 @@ class Scintilla extends Gui.Custom {
         if LightTheme
             ctl.LightTheme()
 
-        ctl.Deactivate := (*) => ctl.Active := false
+        ctl.Destroy := (*) => ctl.Zoombie := true
 
         Task.startTask(refresh, 2000, kInterruptPriority)
 
@@ -346,7 +345,7 @@ class Scintilla extends Gui.Custom {
 
         static modType := Scintilla.sc_modType
 
-        if (!this.Active || !this.Enabled || !this.Visible || !this.HasProp("_wordList"))
+        if (this.Zoombie || !this.Enabled || !this.Visible || !this.HasProp("_wordList"))
             return
 
         try {
@@ -492,7 +491,7 @@ class Scintilla extends Gui.Custom {
         StrPut(this.SyntaxString2, str2, "UTF-8")
         NumPut("UPtr", str2.ptr, buf, (A_PtrSize = 8) ? 80 : 52)
 
-        wordChars := Buffer(StrPut(this.SyntaxWordChars,"UTF-8"), 0)
+        wordChars := Buffer(StrPut(this.SyntaxWordChars, "UTF-8"), 0)
 
         StrPut(this.SyntaxWordChars, wordChars, "UTF-8")
         NumPut("UPtr", wordChars.ptr, buf, (A_PtrSize = 8) ? 88 : 56)
@@ -545,7 +544,7 @@ class Scintilla extends Gui.Custom {
         StrPut(this.SyntaxPunctChars, punctChar, "UTF-8")
         NumPut("UPtr", punctChar.ptr, buf, (A_PtrSize = 8) ? 64: 44)
 
-        str1 := Buffer(StrPut(this.SyntaxString1,"UTF-8"), 0)
+        str1 := Buffer(StrPut(this.SyntaxString1, "UTF-8"), 0)
 
         StrPut(this.SyntaxString1, str1, "UTF-8")
         NumPut("UPtr", str1.ptr, buf, (A_PtrSize = 8) ? 72 : 48)
@@ -555,7 +554,7 @@ class Scintilla extends Gui.Custom {
         StrPut(this.SyntaxString2, str2, "UTF-8")
         NumPut("UPtr", str2.ptr, buf, (A_PtrSize = 8) ? 80 : 52)
 
-        wordChars := Buffer(StrPut(this.SyntaxWordChars,"UTF-8"), 0)
+        wordChars := Buffer(StrPut(this.SyntaxWordChars, "UTF-8"), 0)
 
         StrPut(this.SyntaxWordChars, wordChars, "UTF-8")
         NumPut("UPtr", wordChars.ptr, buf, (A_PtrSize = 8) ? 88 : 56)

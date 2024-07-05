@@ -10,7 +10,17 @@
   6. The transcript of LLM invocations in any Assistant Booster now includes the events raised and actions invoked. Transcripts of Assistant Boosters are normally stored in the *Simulator Controller\Logs* folder, which is located in the user *Documents* folder.
   7. [Internal] Implemented a postprocessor for the compiler which compreesses the binary files. The applications are much smaller now.
 
-## 5.7.8.0-release 06/28/24 (planned)
+## 5.7.9.0-release 07/05/24
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. A bug has been fixed in "Race Center" which broke the "Initialize from Session" command when the stint plan had been changed during a session.
+  4. The stint plan is now fully reloaded and synchronized with the current session, after it has been altered or extended.
+  5. The stint plan has no higher priority than the loaded strategy, when the "Initialize from Session" command is called from the "Pitstop" menu. The [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#planning-a-pitstop) has been udated accordingly.
+  6. The "Team Management" tab, which has been deprecated for quite some time, has been removed from "Simulator Configuration". You can [manage your teams, session and drivers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#team-management) in the "Simulator Starup" application.
+  7. Inactive or retired cars are no longer *observed* by the Spotter.
+  8. The "Practice Center" can handle a *late join* (i.e. starting the "Practice Center" while already on the track) much better now.
+
+## 5.7.8.0-release 06/28/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a bug introduced in the last release, which caused connected drivers to no longer show up in Team Server application.

@@ -6,10 +6,10 @@ Download=
 Changes=Full implementation of an Agent framwork to include LLMs in the reasoning process of the Race Assistants, Renamed "Conversion Booster" to "Assistant Booster", Added new documention chapter on "Customizing Assistants", New post compilation compression makes binaries much smaller
 Components=Media->5.6.1,Configuration->5.7.5,Utilities->5.4.8
 [Release]
-Version=5.7.7.0-release
-Date=06/21/2024
-Download=https://cutt.ly/leasMPMb;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.7.7.0-release.zip
-Changes=Translation fixes for Spanish and French, Optimized error messages in conversation actions editor, Allow bound arguments in conversation actions, Allow multiple function calls in conversation actions, Fixed saving of Actions setting, Increased resiliense against unstable Team Server instances, Driver swap can be initiated from pitstop action, Reset accident detection action, Show strategy plot for uncommited strategies, Basic setup is always default in "Simulator Setup"
+Version=5.7.9.0-release
+Date=07/05/2024
+Download=https://cutt.ly/eefkWlXJ;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.7.9.0-release.zip
+Changes=Initialize from Session now takes stint plan first in "Race Center", Adding and removing stints from the stint plan now runs a full plan update in "Race Center", Team Management tab in "Simulator Configuration" removed, Removed retired cars from Spotter observation, Better support for late join in "Practice Center"
 Components=Media->5.6.1,Configuration->5.7.5,Utilities->5.4.8
 [Components]
 Media.5.6.1.Path=Resources
@@ -25,4 +25,4 @@ Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Ut
 Type=Development
 [Version]
 Development=5.8.0.0-dev
-Release=5.7.7.0-release
+Release=5.7.9.0-release

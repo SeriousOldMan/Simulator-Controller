@@ -41,6 +41,12 @@ No changes necessary.
 
 ***
 
+## Release 5.7.9
+
+Nothing to do for this release.
+
+***
+
 ## Release 5.7.8
 
 No actions required.

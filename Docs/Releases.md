@@ -16,7 +16,7 @@
   3. A bug has been fixed in "Race Center" which broke the "Initialize from Session" command when the stint plan had been changed during a session.
   4. The stint plan is now fully reloaded and synchronized with the current session, after it has been altered or extended.
   5. The stint plan has no higher priority than the loaded strategy, when the "Initialize from Session" command is called from the "Pitstop" menu. The [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#planning-a-pitstop) has been udated accordingly.
-  6. The "Team Management" tab, which has been deprecated for quite some time, has been removed from "Simulator Configuration". You can [manage your teams, session and drivers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#team-management) in the "Simulator Starup" application.
+  6. The "Team Management" tab, which has been deprecated for quite some time, has been removed from "Simulator Configuration". You can [manage your teams, sessions and drivers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#team-management) in the "Simulator Starup" application.
   7. Inactive or retired cars are no longer *observed* by the Spotter.
   8. The "Practice Center" can handle a *late join* (i.e. starting the "Practice Center" while already on the track) much better now.
 

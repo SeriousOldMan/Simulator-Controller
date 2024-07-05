@@ -48,9 +48,57 @@ The state of the knowledge base is a collection of facts known at a specific poi
 
 #### Facts
 
+### General Syntax
+
+Both production and reduction rules share common snytax rules.
+
+#### Literals
+
+Literals are represented as a sequence of characters. They can contain almost any character except the paranthesis "{[()]}", the vertical bar "|", a white space character, or a comma ",". If a literal should contain one of these characters, it must be enclosed in single or double quotes or the character must be escaped using a backslash "\". Examples:
+   
+	foo
+	bar1
+	Lap.Remaining
+	"This is a string"
+	This\ is\ also\ a\ string
+	24/7
+	24.7
+   
+   1. Numbers
+
+      Literals that represent numbers are all literals which start with a number and adhere to the typical format of a number. Examples: 5, 5.1, 5.47e+2
+
+   2. Variables
+
+      Variables are special literals that start with a question mark. Example: ?CurrentLap
+   
+      Although it is possible to create a variable which starts with a number like *?42*, this is not recommended.
+
+   3. Facts
+
+      Facts are identified by special literals that start with an exclamation mark. Example: !Tyre.Compound.Target
+   
+   4. Strings
+
+      Strings are all literals, that are not numbers, variables or facts. An interesting aspect here is, that strings in the rules must not be enclosed in quotes, as long as they do not contain characters.
+
+#### Expressions
+
+Rules are made up of expressions. Expressions are complex structures composed of literals and additional syntactical elements, for example operators. Examples:
+
+	?a = 5
+	?a = ?b + 4
+	{Predicate: [?Tyre.Pressure.Average > 27.0]}
+	[1, 2, 3 | Foo]
+	grandFather(Peter, Paul)
+  
+The different types of expressions are discussed below. Expressions are not (yet) fully composable, i.e. each element of an expression cannot be a general expression by itself. This is also discussed below.
+
 ### Production Rules (forward chaining)
 
 #### Variables
+
+Variables are 
 
 #### Conditions
 

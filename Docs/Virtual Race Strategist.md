@@ -545,7 +545,7 @@ Notes:
   
 #### Scenario validation
 
-Beside the session rules, you can enter into the fields in the "Rules & Settings" tab, the simulation engine supports a rule based validation of strategy scenarios created during the simulation. These rules use the same technology used by the different Virtual Race Assistants, a hybrid rule engine, which supports forward and backward logic resolution. For the scenario validation rules, only the backward chaining part is used, which is more or less similar to the *Prolog* logic programming language. Let's begin with an easy example:
+Beside the session rules, you can enter into the fields in the "Rules & Settings" tab, the simulation engine supports a rule based validation of strategy scenarios created during the simulation. These rules use the same technology used by the different Virtual Race Assistants, a [Hybrid Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine), which supports forward and backward logic resolution. For the scenario validation rules, only the backward chaining part is used, which is more or less similar to the *Prolog* logic programming language. Let's begin with an easy example:
 
 	validScenario() <= pitstopFuel(?, ?refuels), ?refuels > 0
 

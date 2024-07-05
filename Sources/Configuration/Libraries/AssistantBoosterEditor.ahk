@@ -1039,11 +1039,13 @@ class CallbacksEditor {
 
 			this.ScriptEditor.CaseSense := false
 
-			this.ScriptEditor.SetKeywords("priority true false"
+			this.ScriptEditor.SetKeywords("priority"
 										, "Any All None One Predicate"
 										, "Call Prove ProveAll Set Get Clear Produce Option Sqrt Unbound Append get"
 										, "messageShow messageBox"
-										, "? ! fail")
+										, "? ! fail"
+										, ""
+										, "true false")
 
 			this.ScriptEditor.Brace.Chars := "()[]{}"
 			this.ScriptEditor.SyntaxEscapeChar := "``"
@@ -1124,7 +1126,8 @@ class CallbacksEditor {
 			}
 		}
 		finally {
-			this.ScriptEditor.Deactivate()
+			if true
+				this.ScriptEditor.Destroy()
 
 			window.Destroy()
 		}

@@ -37,21 +37,19 @@ Here is a short video which shows how to configure Simulator Controller for the 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[5.7.7.0-release](https://cutt.ly/leasMPMb) (Changes: Translation fixes for Spanish and French, Optimized error messages in conversation actions editor, Allow bound arguments in conversation actions, Allow multiple function calls in conversation actions, Fixed saving of Actions setting, Increased resiliense against unstable Team Server instances, Driver swap can be initiated from pitstop action, Reset accident detection action, Show strategy plot for uncommited strategies, Basic setup is always default in "Simulator Setup".)
+[5.7.9.0-release](https://cutt.ly/eefkWlXJ) (Changes: Initialize from Session now takes stint plan first in "Race Center", Adding and removing stints from the stint plan now runs a full plan update in "Race Center", Team Management tab in "Simulator Configuration" removed, Removed retired cars from Spotter observation, Better support for late join in "Practice Center".)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-577) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-579) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[5.7.6.0-release](https://cutt.ly/HeoNJPQQ) (Changes: Integrate predefined actions in an LLM conversation, Added action definition files in user home directory, Added an custom action editor to the Conversation Booster, Restructured Conversation Booster instructions, Fixed FasterThan information of the Spotter for multi class.)
+[5.7.8.0-release](https://cutt.ly/4es96Jfl) (Changes: Fixed driver name in Team Server connections, Tyre set for wet tyres are displayed as "Auto" in "Race Center" and "Practice Center", "Auto" can be chosen as tyre set in "Race Center", Fixed tyre pressures for AMS2, Better warmup of Team Server.)
 
-[5.7.5.0-release](https://cutt.ly/keiTVgvM) (Changes: Fixed locating of additional apps and tools in "Simulator Setup", Removed "Voice Macro" from the list of standard software in "Simulator Setup", Added "Real Head Motion" to the list of standard software in "Simulator Setup", Automatic updates from versions prior to 5.0.0 are no longer possible, Fixed voice test button in "Simulator Setup", New "Knowledge" instruction for Driving Coach and Conversation Booster, Added tyre compound to tyres info widget in "System Monitor", Added tyre compound to "Tyres" object in "Session State.json" file, Fixed recognition activation mode "Always" in Conversation Booster, New voice command for car specific pitstop information, Migrated to AHK 2.0.17.)
+[5.7.7.0-release](https://cutt.ly/leasMPMb) (Changes: Translation fixes for Spanish and French, Optimized error messages in conversation actions editor, Allow bound arguments in conversation actions, Allow multiple function calls in conversation actions, Fixed saving of Actions setting, Increased resiliense against unstable Team Server instances, Driver swap can be initiated from pitstop action, Reset accident detection action, Show strategy plot for uncommited strategies, Basic setup is always default in "Simulator Setup".)
 
 #### Latest development build
 
-[5.7.8.0-alpha](https://www.dropbox.com/scl/fi/3ejnwa7q4nmkebstu8aug/Simulator-Controller-5.7.8.0-alpha.zip?rlkey=md5y8pbz02a2cp4949fvwrxcs&st=ve64wvvn&dl=1) (Test build for 5.7.8. Changes: ixed driver name in Team Server connections, Tyre set for wet tyres are displayed as "Auto" in "Race Center" and "Practice Center", "Auto" can be chosen as tyre set in "Race Center", Fixed tyre pressures for AMS2, Better warmup of Team Server.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-578) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 

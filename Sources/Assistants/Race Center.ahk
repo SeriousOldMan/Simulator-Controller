@@ -1367,51 +1367,12 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		choosePlan(listView, line, *) {
-			local stint, driver, timePlanned, timeActual, lapPlanned, lapActual, refuelAmount, tyreChange, time, currentTime
-
 			if line {
 				center.PlanListView.Modify(line, "Select")
 
 				center.iSelectedPlanStint := line
 
-				stint := center.PlanListView.GetText(line, 1)
-				driver := center.PlanListView.GetText(line, 2)
-				timePlanned := center.PlanListView.GetText(line, 3)
-				timeActual := center.PlanListView.GetText(line, 4)
-				lapPlanned := center.PlanListView.GetText(line, 5)
-				lapActual := center.PlanListView.GetText(line, 6)
-				refuelAmount := center.PlanListView.GetText(line, 7)
-				tyreChange := center.PlanListView.GetText(line, 8)
-
-				time := string2Values(":", timePlanned)
-
-				currentTime := "20200101000000"
-
-				if (time.Length = 2) {
-					currentTime := DateAdd(currentTime, time[1], "Hours")
-					currentTime := DateAdd(currentTime, time[2], "Minutes")
-				}
-
-				timePlanned := currentTime
-
-				time := string2Values(":", timeActual)
-
-				currentTime := "20200101000000"
-
-				if (time.Length = 2) {
-					currentTime := DateAdd(currentTime, time[1], "Hours")
-					currentTime := DateAdd(currentTime, time[2], "Minutes")
-				}
-
-				timeActual := currentTime
-
-				centerGui["planDriverDropDownMenu"].Choose(inDrivers(getKeys(center.SessionDrivers), driver) + 1)
-				centerGui["planTimeEdit"].Value := timePlanned
-				centerGui["actTimeEdit"].Value := timeActual
-				centerGui["planLapEdit"].Text := lapPlanned
-				centerGui["actLapEdit"].Text := lapActual
-				centerGui["planRefuelEdit"].Text := refuelAmount
-				centerGui["planTyreCompoundDropDown"].Choose((tyreChange = "x") ? 1 : 2)
+				this.loadPlanEditor()
 			}
 			else
 				this.iSelectedPlanStint := false
@@ -3315,6 +3276,63 @@ class RaceCenter extends ConfigurationItem {
 		return drivers
 	}
 
+	loadPlanEditor() {
+		local driver := this.PlanListView.GetText(this.SelectedPlanStint, 2)
+		local timePlanned := this.PlanListView.GetText(this.SelectedPlanStint, 3)
+		local timeActual := this.PlanListView.GetText(this.SelectedPlanStint, 4)
+		local lapPlanned := this.PlanListView.GetText(this.SelectedPlanStint, 5)
+		local lapActual := this.PlanListView.GetText(this.SelectedPlanStint, 6)
+		local refuelAmount := this.PlanListView.GetText(this.SelectedPlanStint, 7)
+		local tyreChange := this.PlanListView.GetText(this.SelectedPlanStint, 8)
+		local time := string2Values(":", timePlanned)
+		local currentTime := "20200101000000"
+
+		if (time.Length = 2) {
+			currentTime := DateAdd(currentTime, time[1], "Hours")
+			currentTime := DateAdd(currentTime, time[2], "Minutes")
+		}
+
+		timePlanned := currentTime
+
+		time := string2Values(":", timeActual)
+
+		currentTime := "20200101000000"
+
+		if (time.Length = 2) {
+			currentTime := DateAdd(currentTime, time[1], "Hours")
+			currentTime := DateAdd(currentTime, time[2], "Minutes")
+		}
+
+		timeActual := currentTime
+
+		this.Control["planDriverDropDownMenu"].Choose(inDrivers(getKeys(this.SessionDrivers), driver) + 1)
+		this.Control["planTimeEdit"].Value := timePlanned
+		this.Control["actTimeEdit"].Value := timeActual
+		this.Control["planLapEdit"].Text := lapPlanned
+		this.Control["actLapEdit"].Text := lapActual
+		this.Control["planRefuelEdit"].Text := refuelAmount
+		this.Control["planTyreCompoundDropDown"].Choose((tyreChange = "x") ? 1 : 2)
+	}
+
+	updatePlanFromStints() {
+		loop this.PlanListView.GetCount() {
+			this.PlanListView.Modify(A_Index, "Col4", "-")
+
+			if (A_index != 1)
+				this.PlanListView.Modify(A_Index, "Col6", "-")
+		}
+
+		if this.CurrentStint
+			loop this.CurrentStint.Nr
+				if ((A_Index > 1) && this.Stints.Has(A_Index))
+					this.updatePlan(this.Stints[A_Index])
+
+		this.PlanListView.ModifyCol()
+
+		loop 8
+			this.PlanListView.ModifyCol(A_Index, "AutoHdr")
+	}
+
 	updatePlanFromStrategy() {
 		local pitstops, pitstop, numStints, time, currentTime, last, lastTime, msgResult, translator
 		local driver, forName, surName, nickName, found, ignore, candidate
@@ -3597,18 +3615,13 @@ class RaceCenter extends ConfigurationItem {
 			this.PlanListView.Modify(this.PlanListView.Add("", stintNr, "", "", "", initial, initial, initial, initial), "Select Vis")
 		}
 
-		this.Control["planDriverDropDownMenu"].Choose(1)
-		this.Control["planTimeEdit"].Value := "20200101000000"
-		this.Control["actTimeEdit"].Value := "20200101000000"
-		this.Control["planLapEdit"].Text := ""
-		this.Control["actLapEdit"].Text := ""
-		this.Control["planRefuelEdit"].Text := 0
-		this.Control["planTyreCompoundDropDown"].Choose(2)
-
 		stintNr := this.PlanListView.GetText(1, 1)
 
 		loop this.PlanListView.GetCount()
 			this.PlanListView.Modify(A_Index, "", stintNr++)
+
+		this.updatePlanFromStints()
+		this.loadPlanEditor()
 
 		if (this.SelectedDetailReport = "Plan")
 			this.showPlanDetails()
@@ -3640,6 +3653,8 @@ class RaceCenter extends ConfigurationItem {
 					if (A_Index >= stintNr)
 						this.PlanListView.Modify(A_Index, "", stintNr++)
 		}
+
+		this.updatePlanFromStints()
 
 		if (this.SelectedDetailReport = "Plan")
 			this.showPlanDetails()
@@ -5517,7 +5532,6 @@ class RaceCenter extends ConfigurationItem {
 		availableTyreSets := availableTyreSets.Clone()
 
 		translatedCompounds := collect(this.TyreCompounds, translate)
-
 
 		loop this.PitstopsListView.GetCount() {
 			index := inList(translatedCompounds, this.PitstopsListView.GetText(A_Index, 5))

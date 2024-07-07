@@ -218,6 +218,8 @@ As you can see, this editor looks very similar to the actions editor discussed a
 
 2. You have to supply a phrase which decribes the event to the LLM. Example: "It just started raining." If your event has defined parameters, you can reference the values of the arguments to the event in the phrase by enclosing them in "%". Example: "We started lap %lapNumber%."
 
+   ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20Reasoning%20Event%20Arguments.JPG)
+
 3. The following event typs are supported:
 
    | Event Type  | Description |

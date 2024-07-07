@@ -39,7 +39,7 @@ global kSet := "Set:"
 global kClear := "Clear:"
 
 global kBuiltinFunctors := ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=<", ">=", "=", "!=", "builtin0", "builtin1", "unbound?", "append", "get"]
-global kBuiltinFunctions := ["option", "squareRoot", "plus", "minus", "multiply", "divide", "greater", "less", "lessEqual", "greaterEqual", "equal", "unequal", "builtin0", "builtin1", "unbound", "append", "get"]
+global kBuiltinFunctions := [option, squareRoot, plus, minus, multiply, divide, greater, less, lessEqual, greaterEqual, equal, unequal, builtin0, builtin1, unbound, append, get]
 global kBuiltinAritys := [2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 3, 1, -1, -1]
 
 global kProduction := "Production"
@@ -2500,13 +2500,13 @@ class CallChoicePoint extends ChoicePoint {
 				resultSet.RuleEngine.trace(kTraceMedium, "Call " . function . "(" . values2String(", ", values*) . ")")
 		}
 
-		if builtin
-			function := kBuiltinFunctions[inList(kBuiltinFunctors, function)]
-
-		function := StrReplace(function, ".", "_")
-
 		try {
-			return %function%(this, values*)
+			if builtin
+				function := kBuiltinFunctions[inList(kBuiltinFunctors, function)]
+			else
+				function := %StrReplace(function, ".", "_")%
+
+			return function.Call(this, values*)
 		}
 		catch Any as exception {
 			logError(exception, true)
@@ -2533,10 +2533,8 @@ class CallChoicePoint extends ChoicePoint {
 			resultSet.RuleEngine.trace(kTraceMedium, "Call " . function . "(" . values2String(", ", newValues*) . ")")
 		}
 
-		function := kBuiltinFunctions[inList(kBuiltinFunctors, function)]
-
 		try {
-			return %function%(this, values*)
+			return kBuiltinFunctions[inList(kBuiltinFunctors, function)].Call(this, values*)
 		}
 		catch Any as exception {
 			logError(exception, true)

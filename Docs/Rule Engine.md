@@ -38,7 +38,7 @@ In this case, the condition first checks whether **Lap** fact has been changed i
 
 The *updateFuelTarget* reduction rule actually consists of two rules. The first rule looks at the average consumption, the fuel capacity of the car, the number of remaining laps in the session, and so on, to decide whether refueling is necessary. If this is the case (checked by "?neededFuel > ?remainingFuel") the fact **Fuel.Amount.Target** is created in the knowledge base with the calculated refuel amount as value. The second rule is called, when the first does not succceed, which is the case, if the remaining fuel is enough for the remaining session, or if no average consumption is known, and so on. The fact **Fuel.Amount.Target** is removed from the knowledge base, thereby indicating that refueling is not necessary or not possible at the moment.
 
-## Rule Engine Overview
+## Rule Engine
 
 As said in the introduction the rule engine stands on three different pillars, the knowledge base, a set of production rules and a set of reduction rules. Let's take a look at each of these.
 
@@ -60,9 +60,9 @@ A fact always has a value, but a special value is used internally to represent a
 
 WHen you are running one of the applications, which is using the rule engine, you can always take a look at the knowledge base, by choosing "Debug Knowledgebase" from the "Support" menu in the tray icon of that application. This will create a file named like the application process but with an extension ".knowledge", for example "Race Engineer.knowledge". This file contains a textual representation of the knowledge base and will be constantly update. This will slow down everything, of course.
 
-### Syntactical elements
+### Literals, expressions and terms
 
-Both production and reduction rules share common syntactical elements.
+Both production and reduction rules share common basis types and expression.
 
 #### Literals
 
@@ -92,7 +92,7 @@ Literals are represented as a sequence of characters. They can contain almost an
    
    4. Strings
 
-      Strings are all literals, that are not numbers, variables or facts. An interesting aspect here is, that strings in the rules must not be enclosed in quotes, as long as they do not contain characters.
+      Strings are all literals, that are not numbers, variables or facts. An interesting aspect here is, that strings in the rules must not be enclosed in quotes, as long as they do not contain spaces or other characters with a role in the syntax.
 
 #### Expressions
 
@@ -104,9 +104,11 @@ Rules are made up of expressions. Expressions are complex structures composed of
 	[1, 2, 3 | Foo]
 	grandFather(Peter, Paul)
   
-The different types of expressions are discussed below. Expressions are not (yet) fully composable, i.e. each element of an expression cannot be a general expression by itself. This is also discussed below.
+The different types of expressions are discussed below. In the implementation of the rule engine, expressions are not (yet) fully composable, i.e. elements of expressions cannot be of any type. This is also discussed below.
 
-##### lists
+Important: Literals and expressions conjunctly are also called *terms* in reduction rules.
+
+##### Lists
 
 A special expression is a list. A list of elements is delimited by the braces "[" and "]":
 
@@ -125,13 +127,15 @@ Good to know: The following two expressions are equivalent.
 	[1, 2, 3]
 	[1, 2, 3 | []]
 
-##### Terms
+##### Compounds
 
-Another special expresison is the *Term*:
+Another special expression is the *Compound*:
 
 	grandfather(Paul, Peter)
 
 It looks like a function call, but it is a structured object in the first place. Said that, terms are used extensively in reduction roals to represent goals and subgoals and therefore can be treated like a function call in that particular case. More on that later down below.
+
+The name of the structured object, *grandfather* in this case, is called a functor. The number of elements in the structure is called the arity. This will become important if we take a look at unification in reduction rules.
 
 ### Production Rules (forward chaining)
 
@@ -153,7 +157,9 @@ Facts are referenced in conditions and actions of a production rule by either th
  
  - Variable reference
 
-   The variable reference of a fact denoted by "?" prefix will store the value of the fact at the time of the first usage of the fact in the condition of the rule and then use this value for all subsequent uses. 
+   The variable reference of a fact denoted by "?" prefix will store the value of the fact at the time of the first usage of the fact in the condition of the rule and then use this value in all subsequent occurences.
+
+This is a subtle difference, but can be helpful, if one of the actions of the rule modifies the fact.   
 
 #### Conditions
 
@@ -197,7 +203,9 @@ The left-hand side of a production rule is evaluated whenever the knowledge base
 	
   - Prove Quantor
   
-	Snytax: {Prove: unbound?(!Driver.Name)}
+	Snytax: {Prove: goal}
+  
+	Example: {Prove: unbound?(!Driver.Name)}
 	
 	This is a special one. The condition is matched by invoking the given target in the reduction rule engine. Ultimately, this allows to define new types of conditions and even call the host programming language, as you will see below.
 
@@ -205,31 +213,36 @@ The left-hand side of a production rule is evaluated whenever the knowledge base
 
 Once the condition of a production rule is matched, all actions on the right-hand side of the rule are executed. The execution happens sequentially. There are several action types available:
 
-  - Call Action
+  - Call
   
-    Syntax: (Call: messageShow("Hello ", !Driver.Name))
+    Syntax / Example: (Call: messageShow("Hello ", !Driver.Name))
 	
-	This action calls a function in the global namespace of the host programming language. Beside all arguments, an implicit first argument is passed to the function, that represent the knowledge base (acutally an instance of the class *Knowledgebase*) and allows access to the internal state of the rule engine from the host programming language.
+	This action calls a function in the global namespace of the host programming language. Beside all arguments, an implicit first argument is passed to the function, an object with two properties:
 	
-  - Produce Action
+	  1. Knowledgebase - an instance of class *Knowledgebase* in the host language.
+	  2. RuleEngine - an instance of class *RuleEngine* in the host language.
+	
+	They can be used to access the internal state of the knowledge base and the current state of execution in the rule engine. It is even possible to invoke the rule engine recursively while processing the action.
+	
+  - Produce
   
-    Syntax: (Prove: updateAverageLapTime(?Lap, [?lastLapTime, ?previousLapTime, testLapTime]))
+    Syntax / Example: (Prove: updateAverageLapTime(?Lap, [?lastLapTime, ?previousLapTime, testLapTime]))
 	
 	Very similar to the call action above, but this calls a reduction rule. The passed arguments (either variables or direct references to facts) must be bound at the time of the invocation, but you can also supply aaitional unbound variables which then can be computed by the reduction rule.
 	
 	Normally, only the first alternative is calculated (see the documentation for reduction rules below for more information on that). If you need to follow all paths of the reduction, you can use the following action syntax.
 	
-	Syntax: (ProveAll: preparePitstop(?Lap))
+	Syntax / Example: (ProveAll: preparePitstop(?Lap))
   
-  - Set Action
+  - Set
   
-    Syntax: (Set: Session.Laps, ?Lap)
+    Syntax / Example: (Set: Session.Laps, ?Lap)
 	
 	Using this action, you can create a fact in the knowledge base or alter the value of an existing one. If you omit the value, the fact is set to *true*.
   
-  - Clear Action
+  - Clear
   
-    Syntax: (Clear: Session.Laps)
+    Syntax / Example: (Clear: Session.Laps)
 	
 	As the name of the action suggests, the fact is clear and effectivly removed from the knowledge base.
 
@@ -250,9 +263,15 @@ Okay, let's have a break here. Production rules may leave with a somewhat alien 
 At a first look, a reduction rule looks like a function definition with a function signature (called the *head* of the rule) and a (possibly empty) list of function calls to be executed when the rule is called (this part of the reduction rule is called the *tail* of the rule).
 
 Syntax: goal [ **<=** subGoal1, ..., subGoalN ]
-	
-Example:
 
+If a reduction rule has not tail, this can also be called a clause.
+
+Examples:
+
+	availableTyreCompounds(Dry, S)
+	availableTyreCompounds(Dry, M)
+	availableTyreCompounds(Dry, H)
+	
 	updateTyrePressureTarget(?lap, Pressure) <=
 		computePressureCorrections([FL, FR, RL, RR], Pressure, ?corrections),
 		adjustTargetPressures([FL, FR, RL, RR], ?corrections)
@@ -267,7 +286,7 @@ Although reduction rules can be seen as and even be used like functions in tradi
 And now comes the fancy part:
 
   5. If more than one rule is available which matches a given goal, the rule engine will follow all alternative paths until the orignal goal has been proven, or no more alternative paths are available. This is called backtracking.
-  6. While following the path of alternatives the rule engine will create bindings for variables used in a *call*. This is called **unification** and is discussed in more detail below. On the other hand, if the rule execution has reached a dead end, but there are more alternatives available higher in the chain of execution, all variable bindings up to this point are undone.
+  6. While following the path of alternatives the rule engine will create bindings for variables used in a *call*. This is called **unification** and is discussed in more detail below. On the other hand, if the rule execution has reached a dead end, but there are more alternatives available higher in the chain of execution, all variable bindings up to this point are undone and the execution continues with the alternative.
 
 I promised, it is weird. Let's have a look at a concrete implementation of the grandfather *problem*. Let's assume, we have the following rules: 
 
@@ -303,16 +322,212 @@ These rules can concatenate and revers lists. A list of elements is delimited by
 
    Any list can be reversed, if you remove the first element, then reverse the rest of the list and the concatenate the first element at the end of that list. Also quite understandable, but that is all.
 
-Can you figure out on your own now, how **concat** works?
+Can you figure out how **concat** works on your own now?
 
-These rules now can use in many different ways. Of course, you can *call* it with a given list and will get the reversed list as result. But you can also *call* it with two lists, and the *call* will only succeed, if one is the reverse ot the other. Or you can *call* it with two unbound variables, and the rule engine will create an infinite stream of lists and their reversed counterparts with anonymous variables as elements. Funny, eh?
+The *reverse* rule can now be used in many different ways. Of course, you can *call* it with a given list and you will get the reversed list as result. But you can also *call* it with two lists, and the *call* will only succeed, if one is the reverse ot the other. Or you can *call* it with two unbound variables, and the rule engine will create an infinite stream of lists and their reversed counterparts with anonymous variables as elements. Funny, eh?
 
 By the way, reversing lists with the rules used above is not very efficient, but easy to explain. Therefore this example.
 
-#### Predicates
+#### Goals
+
+As introduced above, a goal in a reduction is a compound like "grandfather(?a, Paul)". When a goal is to be proved by the rule engine, all reduction rules with the same functor (i.e. same name) and the same arity (i.e. same number of arguments) are selected and then tested in the order of their definition. A rule is considered to be applicable when its head can be unified with the goal (see below). If this is the case, the rule engine will now try to prove all goals from the tail of the selected rule, in order to prove the original goal.
+
+A goal can be as simple as
+
+	grandfather(?a, ?b)
+	
+or as complex as
+
+	historicPressures(?lap, [hot(?hfl, ?hfr, ?hrl, ?hrr), cold(?cfl, ?cfr, ?crl, ?crr)])
+
+Sometimes, especially when the goal can be interpreted as a logical question, the literature is talking from predicates. To be precise, Prolog is an implementation of first order logic, also called predicate calculus or predicate logic (see [here](https://en.wikipedia.org/wiki/First-order_logic) if interested).
 
 #### Unification
 
+Let's come to the most important and also the most difficult to explain part of reduction rules, the unification. Whenever two terms, for example a goal and the head of a candidate rule, are matched, this is done recursively for each part of the term.
+
+  - If either term is a bound variable, the value of the variable is used for the unfication.
+  - If either term is an unbound variable, the variable is bound to the other term.
+  - If both terms are unbound variables, these variables are forced to share the same value for all future unifications. Here is where the magic happens.
+  - If one term is a literal, the other term must either be an unbound variable or it must be an identical literal term. If the other term is a variable, that variable is bound to the literal term.
+  - If one term is a composite term, the other term must either be an unbound variable or it must be a composite term itself and each part of both terms must be unifyable. If the other term is a variable, that variable is bound to the composite term.
+  - Compound terms can only be unifed with other compound terms if functors and arity are the same.
+  - Anonymous variables (expressed as a single question mark "?") unify with anything.
+  - When the rule engine goes back (aka backtracking) to search for an alternative solution, all bindings are undone.
+  
+Examples:
+
+	test(A, foo([1, 2]))
+
+can be unfied with all the following terms (as long as ?a and ?b are unbound variables or are bound to a unifyable term):
+
+	test(?a, ?b)
+	test(?, foo([?a | ?]))
+	test(?, foo([1, 2]))
+	test(A, ?)
+
+but it cannot be unfied with:
+
+	test(A)
+	test(A, foo(?, ?))
+	test(?a, foo([?a, ?b])
+
+Note: In the last example, the unification fails, because *?a* has been bound to **A** in the first step and **A** cannot be unified with the first element of the list in *foo*, which is a **1**.
+
 #### Cut and Fail
 
-## Integration with GPT and LLMs
+Sometimes you want to stop following the path of alternative rules, once you have found the best answer for a given goal. Example:
+
+	ask(?question, ?answer) <= lookupInCache(?question, ?answer), !
+	ask(?question, ?answer) <= searchInWeb(?question, ?answer)
+
+Once a question and the corresponding answer has been found in the cache, it is not necessary anymore to search the web, even if the answer was not satisfactory.
+
+Another interesting use is to completely stop the search for a solution and consider the current goal to be unsuccessful.
+
+	historicPressures(?lap, [hot(?hfl, ?hfr, ?hrl, ?hrr), cold(?cfl, ?cfr, ?crl, ?crr)]) <= ?lap < 1, !, Fail
+	historicPressures(?lap, [hot(?hfl, ?hfr, ?hrl, ?hrr), cold(?cfl, ?cfr, ?crl, ?crr)]) <= ...
+
+The first rule checks, whether the supplied lap number is invalid (less than 1). If this is the case, the goal completely fails.
+
+#### Builtin Predicates
+
+The rule engine has some builtin predicates which can be used when formulating rules. But they are also helpful to formulate more complex rules.
+
+  - option
+  
+    Syntax: option(*setting*, *value*)
+	
+	This is not a typical predicate, but can be used to alter the behaviour of the rule execution during runtime. *Setting* can be
+	
+    - OccurCheck
+  
+	  If you set this to *true*, each unification checks, whether an unbound variable occurs in a term to which the variable will be bound during unfication. If this is the case, the unification fails, since infinite structures can be created otherwise.
+
+	  Example:
+	
+	      occurs(?x, [1, 2, ?x])
+		
+		  createInfinite(?y) <= occurs(?y, ?y)
+		
+	  But checking for this has a high performance penalty and is therefore not enabled by default.
+
+    - DeterministicFacts
+  
+	  Facts can be altered during the execution of reduction rules. Using this setting you can control, whether the change should be undone during backtracking (if *false*) or if the change to facts should be retained (if *true*, which is the default).
+	
+    - Trace
+  
+	  Not really a change in behaviour, but very helpful. Values can be "Full", "Medium", "Light", "Off". If the *Trace* is not "Off", which is the default, a lot of information is written to the log file during rule execution, not only for reduction rules, but also for production rules. This has a high performance penalt, of course.
+    
+	option always succeeds, even if called with an unknown setting.
+
+  - sqrt
+  
+	Syntax: sqrt(value, term)
+	
+	If *value* is numerical, then sqrt unifies *term* with the square root of this number.
+	
+  - **\+** - plus
+  
+    Syntax: +(value1, value2, sum)    or    sum = value1 + value2
+	
+	**\+** computes the sum of two values using unification. At least two of the three terms must be bound to numerical values, but in contrast to traditional programming languages, it is not required that these are the *value1* and *value2*.
+	
+  - **\-** - minus
+  
+    Syntax: -(value1, value2, sum)    or    sum = value1 - value2
+	
+	**\-** computes the difference of two values using unification. At least two of the three terms must be bound to numerical values, but in contrast to traditional programming languages, it is not required that these are the *value1* and *value2*.
+	
+  - **\*** - multiply
+  
+    Syntax: -(value1, value2, sum)    or    sum = value1 - value2
+	
+	**\*** multiplies two values using unification. At least two of the three terms must be bound to numerical values, but in contrast to traditional programming languages, it is not required that these are the *value1* and *value2*.
+	
+  - **\/** - divide
+  
+    Syntax: -(value1, value2, sum)    or    sum = value1 - value2
+	
+	**\/** divides two values using unification. At least two of the three terms must be bound to numerical values, but in contrast to traditional programming languages, it is not required that these are the *value1* and *value2*.
+	
+  - **\=**
+  
+    Syntax: term1 = term2
+	
+	Unifies *term1* with *term2*.
+	
+  - **\>**, **\<**, **\=\<**, **\>\=**, **\!\=**
+  
+    Syntax: term1 op term2
+	
+	Compares two terms according to the operator. Because the rule engine does not support constrain based unification (yet), both terms must be bound to comparable literals at the moment of execution.
+	
+  - append
+  
+    Syntax: append(term1, ..., termN, result)
+	
+	append accepts any number of terms, concatenates the string reperesentation of those terms and then unifies the resulting string with *result*. Unbound variables are *printed* as variable names, like: "?a".
+	
+  - get
+  
+	Syntax: get(term1, ..., termN, value)
+	
+	Similar to *append*, *get* accepts any number of terms and concatenates the string reperesentation of those terms. But other as *append*, *get* uses the resulting string as the name of a fact in the knowledge base and unifies the value of the fact with *value*. If the fact is unknown, *get* fails.
+	
+  - set
+  
+	Syntax: set(term1, ..., termN, value)
+	
+	Similar to *append*, *set* accepts any number of terms and concatenates the string reperesentation of those terms. But other than *append*, *set* uses the resulting string as the name of a fact in the knowledge base and then sets the fact to the given *value. If *value* is unbound, the variable name, like: "?a", is used.
+	
+  - clear
+  
+	Syntax: clear(term1, ..., termN)
+	
+	Similar to *append*, *clear* accepts any number of terms and concatenates the string reperesentation of those terms. But other than *append*, *clear* uses the resulting string as the name of a fact in the knowledge base and removes that fact.
+	
+  - unbound?
+  
+    Syntax: unbound?(*any*)
+	
+	unbound? can be *called* with a single argument. The *call* succeeds, if the argument is an unbound variable, a fact with no value or an unknown fact. In all other cases, unbound? fails. Creating the reverse predicate is quite simple:
+	
+		bound?(?x) <= unbound?(?x), !, Fail
+		bound?(?x)
+
+  - call
+  
+	Syntax: call(function, arg1, ..., argN)
+  
+    Using *call*, you can invoke functions in the global name space of the host programming language. Beside all arguments, an implicit first argument is passed to the function. This is an instance of the *ChoicePoint* class of the rule engine. This object also contains the following two properties to make is symetrical to the *Call* action in production rules:
+	
+	  1. Knowledgebase - an instance of class *Knowledgebase* in the host language.
+	  2. RuleEngine - an instance of class *RuleEngine* in the host language.
+	
+	They can be used to access the internal state of the knowledge base and the current state of execution in the rule engine. It is even possible to invoke the rule engine recursively while processing the function.
+	
+	*function* must return true, if the call succeeds and the next subgoal should be processed. If *function* returns *false*, it fails and the next alternative will be processed by the rule engine.
+
+  - produce
+  
+    Syntax: produce()
+	
+	This is a very special predicate. It interrupts the reduction rule execution and allows the rule engine to run all pending production rules. Since these can *call* reduction rules in their actions and also in their conditions, this results in a stack of active execution environments.
+  
+### Event-based programming
+
+The combination of the facts in the knowledge base with both type of rules, allows you to build event-based systems very easily. Let's discuss that with regards to the Race Assistants.
+
+  1. The current state of the session, the state of the car like important telemetry values and also information about all opponente are stored as facts in the knowledge base.
+  2. A set of production rules constantly check whether a specific condition exists, for example that fuel will be depleted in about 3 laps.
+  3. If one of this conditions is detected, the production rule can start complex calculations using reductions rules as a resulting action.
+
+This is exactly the approach, how the rule sets for the Race Assistants has been built.
+
+## Customizing the Assistant rules
+
+The rule sets for the Race Assistants can be found in the *Resources\Rules* directory in the installation folder of Simulator Controller. But as with most of the configuration files of Simulator Controller, they can be locally customized or extended. Simply make a copy of one of the rule files and place it in the *Simulator Controller\Rules* directory, which can be found in your user *Documents* folder.
+
+You can also extend the reasoning process of a Race Assistant by connecting the rule engine to a GPT-based large language model. Please see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster) for more information.

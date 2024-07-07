@@ -248,8 +248,6 @@ class AssistantsStepWizard extends ActionsStepWizard {
 						setMultiMapValue(configuration, "Agent Booster", assistant . ".Model", agentBooster["Model"])
 
 						setMultiMapValue(configuration, "Agent Booster", assistant . ".Agent", agentBooster["Agent"])
-						setMultiMapValue(configuration, "Agent Booster", assistant . ".AgentMaxHistory", agentBooster["AgentMaxHistory"])
-						setMultiMapValue(configuration, "Agent Booster", assistant . ".AgentTemperature", agentBooster["AgentTemperature"])
 					}
 					else
 						setMultiMapValue(configuration, "Agent Booster", assistant . ".Agent", false)

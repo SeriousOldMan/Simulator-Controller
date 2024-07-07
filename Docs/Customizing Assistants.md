@@ -18,6 +18,8 @@ Said this, it is clear, that the interaction with the Assistants, although alrea
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20Speech%20Improvement.JPG)
 
+Please note, that the first three conversation-related boosters all share a GPT service and a single model, whereas you can choose a separate GPT service and model for the Agent booster, which requires strong reasoning skills. This might be helpful to select the best possible model for each task.
+
 Please take a look at the documentation for the [Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#installation) for a description of the different providers and LLMs which can be configured here.
 
 IMPORTANT: As said in the beginning, all this is optional. The Race Assistants will do their job really good even without being connected to an LLM. Additionally, using a GPT service like OpenAI may create some costs, and running an LLM locally on your PC will require a very powerful system, especially when doing this while on the track. Therefore I recommend to use this feature not before everything else has been configured and is fully functional.
@@ -70,6 +72,8 @@ Additionally, you can allow the LLM to call [predefined or custom actions](https
 ### Reasoning Booster
 
 *Reasoning* is the most complex and most capable booster, since it allows you to alter or extend the behavior of the Assistant. You can use predefined events or even define your own ones in the [Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine) (as shown below), which then result in a request to the LLM (actually you can process events even without using the LLM directly in rule engine, but this is only half of the fun). Similar to the *Conversation* bosster above, the LLM then can decide to activate one or more [predefined or custom actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-booster-actions) to fulfill the request or react to the situation. To support its conclusion, the LLM will have full access to the same knowledge as in the *Conversation* booster.
+
+As already mentioned, you can choose a different LLM for this booster, because here strong reasoning skills are way more important than conversational excellence.
 	 
 Important: This booster directly alters the behavior of the Assistant for the good or for the bad. Even if you don't change or extend the definition of the events and actions, it still depends on the reasoning capabilities of the used language model, whether the Assistant will behave as expected. Therefore, always test everything before using it in an important race.
 

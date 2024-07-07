@@ -1055,8 +1055,6 @@ class BasicStepWizard extends StepWizard {
 				setMultiMapValue(configuration, "Agent Booster", assistant . ".Service", setup.AgentBooster["Service"])
 				setMultiMapValue(configuration, "Agent Booster", assistant . ".Model", setup.AgentBooster["Model"])
 				setMultiMapValue(configuration, "Agent Booster", assistant . ".Agent", setup.AgentBooster["Agent"])
-				setMultiMapValue(configuration, "Agent Booster", assistant . ".AgentMaxHistory", setup.AgentBooster["AgentMaxHistory"])
-				setMultiMapValue(configuration, "Agent Booster", assistant . ".AgentTemperature", setup.AgentBooster["AgentTemperature"])
 			}
 
 			configuration := AssistantBoosterEditor(assistant, configuration).editBooster(window)
@@ -1091,9 +1089,7 @@ class BasicStepWizard extends StepWizard {
 
 				agentBooster := Map("Service", getMultiMapValue(configuration, "Agent Booster", assistant . ".Service")
 								  , "Model", getMultiMapValue(configuration, "Agent Booster", assistant . ".Model")
-								  , "Agent", getMultiMapValue(configuration, "Agent Booster", assistant . ".Agent")
-								  , "AgentMaxHistory", getMultiMapValue(configuration, "Agent Booster", assistant . ".AgentMaxHistory")
-								  , "AgentTemperature", getMultiMapValue(configuration, "Agent Booster", assistant . ".AgentTemperature"))
+								  , "Agent", getMultiMapValue(configuration, "Agent Booster", assistant . ".Agent"))
 
 				wizard.setModuleValue(assistant, "Conversation Booster", map2String("|||", "--->>>", conversationBooster))
 

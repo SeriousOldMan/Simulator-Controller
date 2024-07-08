@@ -21,6 +21,7 @@ copy "Virtual Race Strategist.md" ..\..\Controller.Wiki\Virtual-Race-Strategist.
 copy "Virtual Race Spotter.md" ..\..\Controller.Wiki\Virtual-Race-Spotter.md
 copy "Team Server.md" ..\..\Controller.Wiki\Team-Server.md
 copy "Setup Workbench.md" ..\..\Controller.Wiki\Setup-Workbench.md
+copy "Practice Center.md" ..\..\Controller.Wiki\Practice-Center.md
 copy "Strategy Workbench.md" ..\..\Controller.Wiki\Strategy-Workbench.md
 copy "Driving Coach Commands (EN).md" ..\..\Controller.Wiki\Driving-Coach-Commands-(EN).md
 copy "Race Engineer Commands (EN).md" ..\..\Controller.Wiki\Race-Engineer-Commands-(EN).md

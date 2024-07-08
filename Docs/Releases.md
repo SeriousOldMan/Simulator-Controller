@@ -10,10 +10,11 @@
 	 - Actions triggered this way can raise other events, thereby creating a complex chain of thought for the LLM.
   6. A new syntax-coloring editor for source code has been implemented and is used in the Assistant Booster dialog when rule code is being edited.
   7. The documentation for "Strategy Workbench" has been moved to a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench).
-  8. All new complete documentation of the builtin [Hybrid Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine).
-  9. The transcript of LLM invocations in any Assistant Booster now includes the events raised and actions invoked. Transcripts of Assistant Boosters are normally stored in the *Simulator Controller\Logs* folder, which is located in the user *Documents* folder.
-  10. [Internal] Implemented a postprocessor for the compiler which compreesses the binary files. The applications are much smaller now.
-  11. [Internal] Migrated to AHK 2.0.18.
+  8. The documentation for "Practice Center" has been moved to a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Practice-Center).
+  9. All new complete documentation of the builtin [Hybrid Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine).
+  10. The transcript of LLM invocations in any Assistant Booster now includes the events raised and actions invoked. Transcripts of Assistant Boosters are normally stored in the *Simulator Controller\Logs* folder, which is located in the user *Documents* folder.
+  11. [Internal] Implemented a postprocessor for the compiler which compreesses the binary files. The applications are much smaller now.
+  12. [Internal] Migrated to AHK 2.0.18.
 
 ## 5.7.9.0-release 07/05/24
   1. Minor bugfixes, as always
@@ -678,7 +679,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   7. Strategies are now saved together with a session in "Race Center".
   8. The top speed of the last lap as well as the overall best top speed are now shown on the session info page in "System Monitor".
   9. The Spotter now informs you whenever you have set a new best top speed.
-  10. You can now [take notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#data-analysis) in the "Practice Center" for each stint, for example to remember and compare any changes made to the setup.
+  10. You can now [take notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Practice-Center#data-analysis) in the "Practice Center" for each stint, for example to remember and compare any changes made to the setup.
   11. You will now get a warning on the dashboard in "System Monitor", when no valid participant information is available in the simulation data.
   12. Thanks to our Discord member @slatmars we will get a full translation of Simulator Controller for the French language. This release contains initial tranlsations for the UI. More translations, as well as Assistant grammars and other stuff will follow with the next releases.
   13. Added configuration support for the newly released GPT models by OpenAI for the "Driving Coach".
@@ -959,8 +960,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   10. Fixed a rare bug with SFX-100 motion intensity controller.
   11. Support for a couple of new fields has been added in the simulator data files - inner, middle and outer tyre temperatures and in-game tyre compound identifiers for *Automobilista 2*.
   12. The telemetry charts in "Race Center" and "Practice Center" now apply unit conversion correctly.
-  13. New data summary report in "Practice Center" and a new tab to review the [available telemtry data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#exploring-data).
-  14. New [stints summary report](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#data-analysis) in "Practice Center".
+  13. New data summary report in "Practice Center" and a new tab to review the [available telemtry data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Practice-Center#exploring-data).
+  14. New [stints summary report](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Practice-Center#data-analysis) in "Practice Center".
   15. Updated *Automobilista 2* data integration to shared memory API version 13.
   16. The Standings info widget in "Session Monitor" now also shows the observed opponent, if one is currently observed by the Spotter.
   17. A new [plugin named "Integration"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) is available, which exposes the internal state of the Race Assistants and many information about the current session to external applications using a JSON file, which is updated periodically, even when another driver is running the car in a team race. With this it is possible, for example, to create a dashboard for Simulator Controller in SimHub.
@@ -974,7 +975,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 ## 5.2.0.0-release 07/28/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. Introducing a complete [new tool "Practice Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#practice-center), which helps you to manage your practice sessions and allows you to inspect and select the data to be transfered to the session database. The development of this application is still in its early stage, but it is already quite usable.
+  3. Introducing a complete [new tool "Practice Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Practice-Center), which helps you to manage your practice sessions and allows you to inspect and select the data to be transfered to the session database. The development of this application is still in its early stage, but it is already quite usable.
   4. A new controller action function "openPracticeCenter" allows you to open the "Practice Center" from your controller hardware.
   5. A new plugin argument "openPracticeCenter" has been introduced for the "Race Engineer" and "Race Strategist" plugins.
   6. Added an "Invalid" column for the "Car" report in "Race Reports".

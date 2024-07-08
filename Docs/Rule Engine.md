@@ -454,13 +454,13 @@ The rule engine has some builtin predicates which can be used when formulating r
 	
   - **\=**
   
-    Syntax: term1 = term2
+    Syntax: =(term1, term2)    or    term1 = term2
 	
 	Unifies *term1* with *term2*.
 	
   - **\>**, **\<**, **\=\<**, **\>\=**, **\!\=**
   
-    Syntax: term1 op term2
+    Syntax: op(term1, term2)    or    term1 op term2
 	
 	Compares two terms according to the operator. Because the rule engine does not support constrain based unification (yet), both terms must be bound to comparable literals at the moment of execution.
 	

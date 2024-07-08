@@ -1005,7 +1005,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("s9 Norm", "Arial")
 
 		workbenchGui.Add("Documentation", "x608 YP+20 w134 Center H:Center", translate("Strategy Workbench")
-					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development")
+					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench")
 
 		workbenchGui.Add("Text", "x8 yp+30 w1350 0x10 W:Grow")
 

@@ -111,6 +111,16 @@
   - [Managing Car Setups](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#managing-car-setups)
   - [Extending and Customizing](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#extending-and-cutomizing-setup-workbench)
 
+[Strategy Workbench](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench)
+------
+  - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#introduction)
+  - [Rules & Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#rules--settings)
+  - [Pitstop & Service](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#pitstop--service)
+  - [Drivers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#drivers)
+  - [Weather](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#weather)
+  - [Simulation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#simulation)
+  - [Strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#strategy)
+
 [Virtual Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach)
 ------
   - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#introduction)
@@ -171,13 +181,6 @@
     - [Planning and managing practice stints](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#managing-tyres-and-planning-practice-stints)
 	- [Exploring data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#exploring-data)
     - [Exporting data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#exporting-data-to-the-session-database)
-  - [Strategy Workbench](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development)
-    - [Rules & Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#rules--settings)
-    - [Pitstop & Service](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#pitstop--service)
-	- [Drivers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#drivers)
-	- [Weather](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#weather)
-    - [Simulation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#simulation)
-    - [Strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy)
   - [Strategy Handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling)
 	- [Recalculating the Strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#adjusting-the-strategy-during-a-race)
 	  - [Handling Full Course Yellow](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#handling-full-course-yellow)
@@ -210,7 +213,7 @@
   - [Instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#instructions)
   - [Managing Actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions)
   - [Managing Events](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-events)
-
+	
 [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server)
 ------
   - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#introduction)

@@ -179,7 +179,7 @@ Based on the data sets, that are acquired during your sessions by the Virtual Ra
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Reports%202.JPG)
 
-Another capability of the Virtual Race Strategist is to support you during the [development of a strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-workbench) for an upcoming race using the telemetry data of past sessions on the same track in similar conditions.
+Another capability of the Virtual Race Strategist is to support you during the [development of a strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench) for an upcoming race using the telemetry data of past sessions on the same track in similar conditions.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Workbench.JPG)
 

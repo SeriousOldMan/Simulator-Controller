@@ -1,6 +1,6 @@
 ## Introduction
 
-The "Practice Center" is an application, which you can run alongside your practice sessions or even while running a solo race. When the Race Assistants detect that the "Practice Center" is running, they transfer all collected data to this application and do not store the data in the [session databse](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) at the end of the session. Instead you can use the "Practice Center" after your session to investigate the data and select the data that should be stored permanently in the session database, if any at all. You can also use the "Practice Center" to plan your practice session, review the car telemetry data and compare your performance to other drivers participating in the same session.
+The "Practice Center" is an application, which you can run alongside your practice sessions or even while running a solo race. When the Race Assistants detect that the "Practice Center" is running, they transfer all collected data to this application and do not store the data in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) tool at the end of the session. Instead you can use the "Practice Center" after your session to investigate the data and select the data that should be stored permanently in the session database, if any at all. You can also use the "Practice Center" to plan your practice session, review the car telemetry data and compare your performance to other drivers participating in the same session.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center.JPG)
 
@@ -16,7 +16,7 @@ Do **not** start the "Practice Center" after you have already started your sessi
 
 Note: If you have [enabled a team session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#connecting-to-a-session), the "Practice Center" cannot be used (it will simply ignore the running session), since all data duties are handled by the Team Server in this case. But you may want to use the "Race Center" to control your race in this case anyway.
 
-Good to know: The "Practice Center" benefits from a high data update frequency of the Race Assistants. Therefore, if your PC is powerful enough, you can lower this value in the [settings of the "Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database):
+Good to know: The "Practice Center" benefits from a high data update frequency of the Race Assistants. Therefore, if your PC is powerful enough, you can lower this value in the settings of the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database):
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%207.JPG)
 

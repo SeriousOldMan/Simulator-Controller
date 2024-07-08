@@ -1207,7 +1207,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("s9 Norm", "Arial")
 
 		editorGui.Add("Documentation", "x258 YP+20 w164 H:Center Center", translate("Session Database")
-					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database")
+					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database")
 
 		editorGui.Add("Text", "x8 yp+30 w670 W:Grow 0x10")
 
@@ -4829,7 +4829,7 @@ selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner :
 		importSettingsGui.SetFont("s9 Norm", "Arial")
 
 		importSettingsGui.Add("Documentation", "x153 YP+20 w104 H:Center Center", translate("Import")
-							, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database")
+							, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database")
 
 		importSettingsGui.SetFont("s8 Norm", "Arial")
 
@@ -5005,7 +5005,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 		importDataGui.SetFont("s9 Norm", "Arial")
 
 		importDataGui.Add("Documentation", "x153 YP+20 w104 H:Center Center", translate("Import")
-						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database")
+						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database")
 
 		importDataGui.SetFont("s8 Norm", "Arial")
 
@@ -5591,7 +5591,7 @@ editSettings(editorOrCommand, arguments*) {
 		settingsEditorGui.SetFont("s9 Norm", "Arial")
 
 		settingsEditorGui.Add("Documentation", "x133 YP+20 w144 Center", translate("Database Settings")
-							, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration")
+							, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration")
 
 		settingsEditorGui.SetFont("s8 Norm", "Arial")
 

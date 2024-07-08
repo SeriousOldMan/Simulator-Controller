@@ -140,7 +140,7 @@ These commands are also available as "Mute" and "Unmute" plugin actions, which c
 
 ## Racing with Cato
 
-Cato will be active during practice and race sessions by default, although the Assistant will be of not much help in a practice session, since it only collects data for future race strategy development purposes. You can configure the sessions, where Cato collects telemetry data using the [settings in the "Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database). 
+Cato will be active during practice and race sessions by default, although the Assistant will be of not much help in a practice session, since it only collects data for future race strategy development purposes. You can configure the sessions, where Cato collects telemetry data using the settings in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database). 
 
 Cato will always be active during a race, even if you have disabled data collection for races. Cato ca support you in a couple of different areas while you are running a race.
 
@@ -152,7 +152,7 @@ Cato will always be active during a race, even if you have disabled data collect
 
 Normally, Cato will not contact you on its own as often as Jona does. Most of the time, you must ask Cato specifically for its support. An exception is, when you have an active race strategy or when a weather change will require you to conduct an unplanned pitstop for tyre change.
 
-Important: In the default configuration, Cato will be activated in the first lap of a session. This is necessary, so that Cato can setup the initial knowledge (starting grid, your position, the initial strategy, etc.). If you join a session later than during the first lap, Cato will refuse to work. This behaviour can be changed with the setting "Strategist: Late Join" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database), but the behaviour of Cato may be somewhat confusing.
+Important: In the default configuration, Cato will be activated in the first lap of a session. This is necessary, so that Cato can setup the initial knowledge (starting grid, your position, the initial strategy, etc.). If you join a session later than during the first lap, Cato will refuse to work. This behaviour can be changed with the setting "Strategist: Late Join" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database), but the behaviour of Cato may be somewhat confusing.
 
 ### Multi-class support
 
@@ -160,7 +160,7 @@ Cato *understands* multi-class and multi-category races. Position evaluation and
 
 ### Race Settings
 
-Cato shares many settings with Jona. Therefore consult the documentation on the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) in the documentation for Jona for the general use of the settings tool and the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database).
+Cato shares many settings with Jona. Therefore consult the documentation on the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) in the documentation for Jona for the general use of the settings tool and the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database).
 
 #### Tab *Strategy*
 
@@ -239,7 +239,7 @@ The weather forecast will be taken into account for the new strategy. If the cur
 
 The Race Strategist will also keep track of all already used tyre sets and will consider this, when running a strategy simulation. However, this only covers tyre set usage in the current session. If there are tyre sets that already have been used in a previous session, for example in a qualifying run, this information is not available.
 
-It is possible to enable a dynamic traffic simulation method, which uses a probabilistic method to predict future race development based on data collected during the race. You can enable or disable this method in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#tab-strategy) or using default settings in ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database). Here you will also find a couple of settings to fine tune various aspects of the algorithm. These [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) are similar to the [options documented for the stratagy handling in the "Race Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#monte-carlo-traffic-model), so please take a look there for more information about the Monte Carlo method.
+It is possible to enable a dynamic traffic simulation method, which uses a probabilistic method to predict future race development based on data collected during the race. You can enable or disable this method in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#tab-strategy) or using default settings in ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database). Here you will also find a couple of settings to fine tune various aspects of the algorithm. These [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) are similar to the [options documented for the stratagy handling in the "Race Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#monte-carlo-traffic-model), so please take a look there for more information about the Monte Carlo method.
 
 Please note, that if you are running a race with Team Server support, a new strategy can be also created and activated using the [strategy support of "Race Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#strategy-handling), which gives you much more control over various aspects of the new strategy.
 

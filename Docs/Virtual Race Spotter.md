@@ -175,7 +175,7 @@ Elisa tracks the positions, lap times and the deltas to your own car for four di
 
 When you approach a car in front of you, Elisa will gather all available information for the given car, whether the driver is quite inconsistent or is doing a lot of mistakes, and so on. Depending on the situation, Elisa might give you this information and will ask you to be careful, if necessary.
 
-Elise uses different delta thresholds to decide, whether the situation changed to an extent that an update will be of any value for you. You can define your own thresholds in the "Race Settings" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database). See the table below for the thresholds and their default values.
+Elise uses different delta thresholds to decide, whether the situation changed to an extent that an update will be of any value for you. You can define your own thresholds in the "Race Settings" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database). See the table below for the thresholds and their default values.
 
 | Threshold                | Default Value (Seconds) |
 | ------------------------ | ----------------------- |
@@ -188,7 +188,7 @@ Elise uses different delta thresholds to decide, whether the situation changed t
 | Lost on car behind       | 0.3                     |
 | Gained on car behind     | 1.5                     |
 
-Please note, that the corresponding settings in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) will follow the naming conventions for Session settings, for example: "Spotter: Threshold for Lap Up car in range".
+Please note, that the corresponding settings in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) will follow the naming conventions for Session settings, for example: "Spotter: Threshold for Lap Up car in range".
 
 ## Simulator Integration
 
@@ -273,9 +273,9 @@ The second file, which is generated using the way points from the meta data file
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Track%20Map.png)
 
-The track maps are recorded using a 20 Hz resolution, which is comparable to the resolution of high end GPS-based track mapping devices. Therefore the resolution of the generated maps is very good. But since the maps are created, while you are driving on a track, it may be possible that the generated map is not perfect, because you had an offtrack or even an accident. If you face such a situation, simply delete the track in question using the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) tool and the track map will be regenerated during your next visit on this track.
+The track maps are recorded using a 20 Hz resolution, which is comparable to the resolution of high end GPS-based track mapping devices. Therefore the resolution of the generated maps is very good. But since the maps are created, while you are driving on a track, it may be possible that the generated map is not perfect, because you had an offtrack or even an accident. If you face such a situation, simply delete the track in question using the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) tool and the track map will be regenerated during your next visit on this track.
 
-Track maps are used by the "Race Center" which provide a [live view](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#data-analysis) of the current race situation. And using the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database), you can associate actions with specific locations on the track map. This actions can change settings in the current simulator by issuing keyboard commands or they can even lauch a Windows script or application, when you arrive at this location. See the section below for a detailed discussion of Track Automation.
+Track maps are used by the "Race Center" which provide a [live view](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#data-analysis) of the current race situation. And using the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database), you can associate actions with specific locations on the track map. This actions can change settings in the current simulator by issuing keyboard commands or they can even lauch a Windows script or application, when you arrive at this location. See the section below for a detailed discussion of Track Automation.
 
 ### Special notes about Track Mapping in *iRacing*
 
@@ -297,7 +297,7 @@ As you can see, the yaw angle is the most important value in this calculation, t
 
 When a track map is available, the Race Spotter is able to trigger special actions at any location of the track. Using this actions, you can send commands to the running simulator to switch between car settings, for example the traction control.
 
-Track Automations are configured in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database). Once a track map is available for a given track, you can choose the "Automation" section there:
+Track Automations are configured in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database). Once a track map is available for a given track, you can choose the "Automation" section there:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Track%20Automation%202.JPG)
 
@@ -347,4 +347,4 @@ In this example, the "<^<!W" stands for the [keyboard command hotkey](https://gi
 
 ### Ex- and importing Track Automations
 
-Track Automations can be exported and imported using the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) administration tool, so you can share them with your team mates. Please note, that for *iRacing* it might be necessary to share the track map as well, since the track coordinates might differ with each recording of the track.
+Track Automations can be exported and imported using the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) administration tool, so you can share them with your team mates. Please note, that for *iRacing* it might be necessary to share the track map as well, since the track coordinates might differ with each recording of the track.

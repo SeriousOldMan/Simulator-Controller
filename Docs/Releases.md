@@ -9,13 +9,14 @@
 	 - The LLM then can use any of the predefined actions or actions defined on your own to handle this event or situation.
 	 - Actions triggered this way can raise other events, thereby creating a complex chain of thought for the LLM.
   6. A new syntax-coloring editor for source code has been implemented and is used in the Assistant Booster dialog when rule code is being edited.
-  7. The documentation for "Strategy Workbench" has been moved to a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench).
-  8. The documentation for "Practice Center" has been moved to a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Practice-Center).
-  9. The documentation for "Race Reports" has been moved to a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports).
-  10. All new complete documentation of the builtin [Hybrid Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine).
-  11. The transcript of LLM invocations in any Assistant Booster now includes the events raised and actions invoked. Transcripts of Assistant Boosters are normally stored in the *Simulator Controller\Logs* folder, which is located in the user *Documents* folder.
-  12. [Internal] Implemented a postprocessor for the compiler which compreesses the binary files. The applications are much smaller now.
-  13. [Internal] Migrated to AHK 2.0.18.
+  7. The documentation for the "Session Database" has been moved to a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database).
+  8. The documentation for "Strategy Workbench" has been moved to a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench).
+  9. The documentation for "Practice Center" has been moved to a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Practice-Center).
+  10. The documentation for "Race Reports" has been moved to a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports).
+  11. All new complete documentation of the builtin [Hybrid Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine).
+  12. The transcript of LLM invocations in any Assistant Booster now includes the events raised and actions invoked. Transcripts of Assistant Boosters are normally stored in the *Simulator Controller\Logs* folder, which is located in the user *Documents* folder.
+  13. [Internal] Implemented a postprocessor for the compiler which compreesses the binary files. The applications are much smaller now.
+  14. [Internal] Migrated to AHK 2.0.18.
 
 ## 5.7.9.0-release 07/05/24
   1. Minor bugfixes, as always
@@ -351,7 +352,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   3. Fixed auto stint creation in "Practice Center", when a *normal* pitstop has been performed without a tyre change in any type of session.
   4. Fixed reporting of incidents and damage by the Engineer in the first lap, if the configured number of learning laps is equal to 1.
   5. New functions are available in the Startup Profiles and the corresponding documentation has been extended with an [overview](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles) of all available functions.
-  6. Race settings can now be exported and imported in the "Session Database". See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings-1) for more information.
+  6. Race settings can now be exported and imported in the "Session Database". See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#race-settings) for more information.
   7. The consumption option has been removed from the optimizer in "Strategy Workbench". The main idea behind this option was to lower the fuel consumption a little bit, for example, when the driver implements a lift and coast driving style, but the results were not convincing.
   8. You now have fine-grained control over the length of the first and also the length of the last stint in the strategy simulation. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#simulation) for more information.
   9. And you can vary the fuel amount added at a pitstop to some extent in the strategy simulation. This is helpful to reduce the car weight over the full race and even out the stint lengths in cases where otherwise a short last stint would have been used. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#simulation) for more information.
@@ -1326,7 +1327,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   2. Documentation updates, as always
   3. Changed default for pressure calculation in "Race Center" to "Adjust (Reference)".
   4. Changed default for repairs to *Everything* in "Race Center".
-  5. A new tool has been added to the "Session Database", which let's you investigate and correct (if necessary) recorded cold tyre pressures recommendations. See the [all new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#browsing-and-editing-tyre-pressures) for more information.
+  5. A new tool has been added to the "Session Database", which let's you investigate and correct (if necessary) recorded cold tyre pressures recommendations. See the [all new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#browsing-and-editing-tyre-pressures) for more information.
   6. Fixed a couple of bugs for pitstop handling in "Race Center".
   7. Fixed a critical bug in "Race Reports" where car and position information got scrambled in team races.
   8. New car models for "Setup Advisor":
@@ -1519,8 +1520,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 ## 4.4.9.0-release 11/25/22
   1. Minor bugfixes, as always
   2. Documentation updates, as always
-  3. Race strategies are now included in the "Session Database" browser and can be [managed there](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#strategies).
-  4. Support for sharing race strategies with the community (your [sharing consent](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database) will popup for review again).
+  3. Race strategies are now included in the "Session Database" browser and can be [managed here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#strategies).
+  4. Support for sharing race strategies with the community (your [sharing consent](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#sharing-data-with-the-community) will popup for review again).
   5. Fixed post pitstop tyre analysis in "Race Center".
   6. Tweaked color coding of used tyres in "Race Center".
   7. Fixed unlimited practice mode for *Assetto Corsa Competizione*.
@@ -1528,9 +1529,9 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 ## 4.4.8.0-release 11/18/22
   1. Minor bugfixes, as always
   2. Documentation updates, as always
-  3. Support for replication of car setups as well as race strategies has been added to the [Team Server data replication](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration). Attention: Using this feature requires an update of the Team Server. Please read the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-448), if you are hosting your own Team Server.
-  4. You can now decide for each car setup individually, whether it will be [shared with the community](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#setups). But as before, sharing of setups with the community generally requires your consent. If you want to review your consent, simply delete the file "CONSENT", which can be found in the *Simulator Controller\Config* folder, which is located in your user *Documents* folder. And you can also decide inidividually, whether a car setup will be synchronized with any of the connected Team Server databases (see 3. above).
-  5. Multiple data connections are now supported for the [Team Server data replication](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration) which allows you to use telemetry data, pressures data and so on from multiple differen teams.
+  3. Support for replication of car setups as well as race strategies has been added to the [Team Server data replication](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration). Attention: Using this feature requires an update of the Team Server. Please read the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-448), if you are hosting your own Team Server.
+  4. You can now decide for each car setup individually, whether it will be [shared with the community](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#setups). But as before, sharing of setups with the community generally requires your consent. If you want to review your consent, simply delete the file "CONSENT", which can be found in the *Simulator Controller\Config* folder, which is located in your user *Documents* folder. And you can also decide inidividually, whether a car setup will be synchronized with any of the connected Team Server databases (see 3. above).
+  5. Multiple data connections are now supported for the [Team Server data replication](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration) which allows you to use telemetry data, pressures data and so on from multiple differen teams.
   6. Fixed end of race detection for fixed-lap races in rFactor 2.
   7. Race Assistant configurations can be [synchronized](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer) by a click of a button.
   8. Optical enhancements for the launch pad of "Simulator Startup".
@@ -1587,8 +1588,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   2. Documentation updates, as always
   3. The position on the screen where info and progress overlays are displayed, can now be configured in the [UI settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#customizing-controller-notifications).
   4. The session synchronization can be [temporarily disabled](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#connecting-to-a-session) in the "Race Center", while you are working with the data.
-  5. The Team Server now supports synchronization of telemetry data between different members of a team. The documentation for [team management](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#managing-teams) of the Team server itself, as well as the [database configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration) of the "Session Database" has been heavily revised.
-  6. A driver may be selected in "Session Database" when [looking for tyre pressures](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tyre-pressures). This very helpful when looking for cold tyre pressures for your team mate during a team race.
+  5. The Team Server now supports synchronization of telemetry data between different members of a team. The documentation for [team management](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#managing-teams) of the Team server itself, as well as the [database configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration) of the "Session Database" has been heavily revised.
+  6. A driver may be selected in the "Session Database" when [looking for tyre pressures](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#tyre-pressures). This very helpful when looking for cold tyre pressures for your team mate during a team race.
   7. Refactoring of the translation framework to better support the new Spanish translation.
   8. Thanks to the great work of Jose Krilin, we have an initial version of a Spanish translation. The UI has been translated for the most part and will be polished in the next weeks and you can also expect a working version of the voice generation and recognition soon.
   9. Fixed startup of Race Spotter in situations with a very short rolling or even a standing start.
@@ -1636,7 +1637,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	 - No more reports for lapped cars for overtaking far too early.
 	 - Fixed tactical advise for possible slipstreaming a slightly faster car approaching from behind.
   5. Fixed volume control for voice output, when SoX is used.
-  6. New settings in the [Session Database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) allow to configure, whether the Assistants will be active, when a session has been joined after the second lap has been completed. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#racing-with-jona) for more information.
+  6. New settings in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) allow to configure, whether the Assistants will be active, when a session has been joined after the second lap has been completed. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#racing-with-jona) for more information.
   7. Increased precision in session end detection in ACC races
   8. New tyre compound data for *Automobilista 2*, thanks to Chris Matthews. With this, all current cars of *Automobilista 2* should be covered now.
   9. New car models for "Setup Advisor":
@@ -1822,7 +1823,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   2. Documentation updates, as always
   3. New options in pitstop rules for always refueling and always changing tyres in strategy simulation.
   4. Introducing track automation, which let you automate your car settings like TC and ABS depending on track location.
-     - A new page has been added to "Session Database", which allows you to specify [location specific actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#automations) for a specific simulator / car / track combination.
+     - A new page has been added to "Session Database", which allows you to specify [location specific actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#automations) for a specific simulator / car / track combination.
      - Added the ["TrackAutomation" action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) to the "Race Spotter" plugin which let's you enable or disable location specific actions when you are out on the track.
 	 - New ["enableTrackAutomation", "disableTrackAutomations" and "selectTrackAutomation"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#choosing-between-different-track-automations), which let you control the track automationsm while on the track.
      - Added a new icon to the Stream Deck icon set for the "TrackAutomation" action.
@@ -1875,7 +1876,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   6. When a stint plan is created from a strategy in "Race Center", the drivers are preselected, if the strategy has been created with driver information.
   7. Optimized Pitstop MFD handling in ACC, almost twice as fast now.
   8. It is now possible to enable/disable the Team Server connection in Simulator Controller tray menu. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#running-a-team-session) for more information.
-  9. All new database maintenance page in "Session Database", where you can browse all available data categories. Data can be deleted, exported and imported even from other drivers, with the driver identity preserved for the imported data. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#administration) for more information.
+  9. All new database maintenance page in "Session Database", where you can browse all available data categories. Data can be deleted, exported and imported even from other drivers, with the driver identity preserved for the imported data. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#administration) for more information.
   10. The information request action "GapToFront" (which was a misnomer) has been renamed to "GapToAhead". See the update notes, if you have used this action in your configuration.
   11. Fixed a couple of glitches in the ACC car models for the "BMW M4 GT3" and the "AMG GT3 2020".
   12. Fixed rear toe calculation when applying recommendations to a given setup in *Assetto Corsa Competizione* or *Assetto Corsa*.
@@ -2064,7 +2065,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   2. Documentation updates, as always
   3. Delta time calculation by the Spotter is much more precise now.
   4. Spotter warnings are much faster now due to caching of the generated sound files.
-  5. Session Database location is now configurable. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration) for more information.
+  5. Session Database location is now configurable. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration) for more information.
   6. The Virtual Race Engineer can be asked about the amount of remaining fuel, like: "How much fuel is remaining?".
   7. The same can be achieved using the new *InformationRequest* action *FuelRemaining*, which is available for all simulator plugins and the "Race Engineer" plugin. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for more information.
   8. Larger window sizes for "Strategy Workbench" and "Race Center" (as requested by the community).
@@ -2205,8 +2206,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   4. Renamed the application "Setup Database" to "Session Database".
   5. Renamed action function "openSetupDatabase" to "openSessionDatabase". Also renamed the similar named plugin parameters of the ["Race Engineer"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) and ["Race Strategist"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugins.
   6. Comprehensive revision of the session database backend to support the new race settings model.
-  7. Completely new [handling of race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings-1) at the start of a session. For the moment, the saving of race settings at the end of a session is disabled. This will be enabled again with the next release.
-  8. All new user interface for "Session Database". See the fully [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database) for more information.
+  7. Completely new [handling of race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#race-settings) at the start of a session. For the moment, the saving of race settings at the end of a session is disabled. This will be enabled again with the next release.
+  8. All new user interface for "Session Database". See the fully [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) for more information.
 
 ## 3.9.6-release 03/11/22
 
@@ -2593,8 +2594,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Full rework of fuel consumption projection after a pitstop.
-  4. Simulator car setup files can be stored together with additional notes in the [setup database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#querying-the-session-database) for future use.
-  5. The setup database consent has been extended to give [separate consents](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--setup-database) for tyre pressures and car setup information.
+  4. Simulator car setup files can be stored together with additional notes in the [setup database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#setups) for future use.
+  5. The setup database consent has been extended to give [separate consents](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#sharing-data-with-the-community) for tyre pressures and car setup information.
   
 ## 3.0.3-release 05/16/21
 

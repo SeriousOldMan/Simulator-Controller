@@ -176,7 +176,7 @@ In many cases all drivers in a given team want to share the same configuration. 
 
 4. *Exports from the "Session Database"*
 
-   You can prepare any number of exports from your session database you want to share with your team mates. Normally you want to use the Control key while exporting the settings from your "Session Database", so that everythig is included. You can also export telemetry data, track maps and other stuff from the [administration page](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#administration) of the "Session Database". Put all the export folders into the folder of the team package.
+   You can prepare any number of exports from your session database you want to share with your team mates. Normally you want to use the Control key while exporting the settings from your "Session Database", so that everythig is included. You can also export telemetry data, track maps and other stuff from the [administration page](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#administration) of the "Session Database". Put all the export folders into the folder of the team package.
    
 The content of a typical folder of common team settings should look like this:
 

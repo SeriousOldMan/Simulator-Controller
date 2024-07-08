@@ -11,10 +11,11 @@
   6. A new syntax-coloring editor for source code has been implemented and is used in the Assistant Booster dialog when rule code is being edited.
   7. The documentation for "Strategy Workbench" has been moved to a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench).
   8. The documentation for "Practice Center" has been moved to a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Practice-Center).
-  9. All new complete documentation of the builtin [Hybrid Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine).
-  10. The transcript of LLM invocations in any Assistant Booster now includes the events raised and actions invoked. Transcripts of Assistant Boosters are normally stored in the *Simulator Controller\Logs* folder, which is located in the user *Documents* folder.
-  11. [Internal] Implemented a postprocessor for the compiler which compreesses the binary files. The applications are much smaller now.
-  12. [Internal] Migrated to AHK 2.0.18.
+  9. The documentation for "Race Reports" has been moved to a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports).
+  10. All new complete documentation of the builtin [Hybrid Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine).
+  11. The transcript of LLM invocations in any Assistant Booster now includes the events raised and actions invoked. Transcripts of Assistant Boosters are normally stored in the *Simulator Controller\Logs* folder, which is located in the user *Documents* folder.
+  12. [Internal] Implemented a postprocessor for the compiler which compreesses the binary files. The applications are much smaller now.
+  13. [Internal] Migrated to AHK 2.0.18.
 
 ## 5.7.9.0-release 07/05/24
   1. Minor bugfixes, as always
@@ -1146,8 +1147,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   2. Documentation updates here and there, as always
   3. You can now set the range of interest for the gap (in seconds) for opponent information given by the Spotter. For example, you can ask the Spotter to give you only information about an opponent, which as at least a minute behind you, but you want no more information, when he is 5 seconds or less behind you, since you then will have visual information in the mirrors. You can find the corresponding [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database".
   4. It is now possible to let the Strategist recalculate the currently chosen strategy from time to time in the background, while you are in a race. Whenever a better strategy can be found (also, when no valid strategy is available anymore), you will be informed and can decide what to do. You can find the corresponding [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database", as well as on the [*Strategy* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#tab-strategy) in "Race Settings". This settings allow you to specify, in what situations the current strategy should revised. See also the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#adjusting-the-strategy-during-a-race) about strategy handling during a race, to understand what the Strategist will do automatically and what not.
-  5. Support for cup categories has been added to the multi-class management. It is now possible to create reports with cars splitted in cup categories and you can also configure the assistants to understand cup categories to give you gap and delta information with regards to your own category. You can find the corresponding [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database". In all interactive reports as well as in the "Race Center", you can use the [settings for the race reports](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports) to specify, how the information about the different car classes and cup categories should be displayed.
-  6. If driver categories are available in the simulator (Platinum, Gold, ...), they can be displayed in various reports as well. See the documentation for the [race reports](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports) for information how to enable this.
+  5. Support for cup categories has been added to the multi-class management. It is now possible to create reports with cars splitted in cup categories and you can also configure the assistants to understand cup categories to give you gap and delta information with regards to your own category. You can find the corresponding [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database". In all interactive reports as well as in the "Race Center", you can use the [settings for the race reports](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports#selecting-report-data) to specify, how the information about the different car classes and cup categories should be displayed.
+  6. If driver categories are available in the simulator (Platinum, Gold, ...), they can be displayed in various reports as well. See the documentation for the ["Race Reports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports#selecting-report-data) tool for information how to enable this.
   7. The "Strategy Workbench" has become a little bit *smarter*:
      - New stint length optimization rules based on data generated by machine learning have been included in the "Strategy Workbench". Will be active, if at least one optimization is enabled in the strategy optimizer. 
      - New tyre wear model based on data generated by machine learning have been included in the "Strategy Workbench". Will be active, if the *Tyre Usage* optimization is enabled in the strategy optimizer. The new approach gives the "Strategy Workbench" the ability to double-stint a tyre set, if necessary.
@@ -1549,7 +1550,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   2. Documentation updates, as always
   3. New notes field for driver specific car setups in "Race Center".
   4. Fixed regression of the driver statistics report in "Race Center", which was introduced by the new mean and median calculation.
-  5. Full support has been added for multi-class races. The Race Assistants are aware of your specific class and will give you all information like standings, gaps, lap times, and so on, in a class-specific way. Tools like "Race Reports" and "Race Center" are also aware of multi-class races and will show you additional information, if necessary. When looking at reports you can now [filter the results](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports) according to class.
+  5. Full support has been added for multi-class races. The Race Assistants are aware of your specific class and will give you all information like standings, gaps, lap times, and so on, in a class-specific way. Tools like "Race Reports" and "Race Center" are also aware of multi-class races and will show you additional information, if necessary. When looking at reports you can now [filter the results](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports#selecting-report-data) according to class.
   6. The "Server Administration" tool now remembers server URL and login name.
 
 ## 4.4.6.0-release 11/04/22
@@ -1562,8 +1563,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   7. Fixed a bug in "Race Reports", when a race number of a car is actually not a number like in '59B'.
   8. Simple tyre compounds now all use the suffix "(Black)" for a better distinguishment from "dry" and "wet" weather conditions, which was necessary for translation support.
   9. Speech synthesizer and recognizer libraries are updated to the latest release of the Azure libraries.
-  10. Race reports have been updated to show both the [median and mean values](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports) of the lap times of the selected drivers / cars.
-  11. A new report has been added to "Race Reports" and "Race Center" which shows the [performance](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports) of a driver / car lap by lap.
+  10. Race reports have been updated to show both the [median and mean values](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports) of the lap times of the selected drivers / cars.
+  11. A new report has been added to "Race Reports" and "Race Center" which shows the [performance](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports#performance-report) of a driver / car lap by lap.
 
 ## 4.4.5.0-release 10/28/22
   1. Minor bugfixes, as always
@@ -1988,7 +1989,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   4. The Virtual Race Strategist will give you now a post race summary. It will be very honest, so if you feel offended, you can disable it in the [configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist). But an AI doesn't lie, does it?
   5. Reversed sign of laptime delta in all apps. Faster cars will have a positive delta, slower cars a negative one.
   6. The Spotter-AI has been trained to detect several typical race situations and can advise you how to best react there. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#alerts--information) for more information.
-  7. New "Consistency" Report in "Race Reports" and "Race Center". See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports) for more information.
+  7. New "Consistency" Report in "Race Reports" and "Race Center". See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports#consistency-report) for more information.
   8. Reduced volume of radio click noise for Race Assistant speech output. Thereby, the overall volume of the speech output has become louder, so you might have to adjust your volume balancing between your sim(s) and the Assistants.
   9. Fixed a bug in "Setup Advisor" where settings were off by one for some cars.
   10. Detect current simulator, car and track in "Setup Advisor", when launched in-game using the *openSetupAdvisor* action.
@@ -2034,7 +2035,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   8. Spotter warnings now mute other voice output **when** *NirCmd* is installed.
   9. Alternative login dialog for name and password when connecting to Team Server (hold the Ctrl key while clicking on the "Key" button).
   10. Engineer now asks, before he replans an already planned pitstop.
-  11. New report in "Race Reports" and "Race Center" with lap times for all cars and laps. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports) for more information.
+  11. New report in "Race Reports" and "Race Center" with lap times for all cars and laps. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports#lap-times-report) for more information.
 
 ## 4.1.6-release 05/20/22
 
@@ -2452,7 +2453,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Three new reports for the ["Race Reports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports) tool:
+  3. Three new reports for the ["Race Reports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports) tool:
      - Overview - as the name says, gives you an overview over the grid (starting positions, best and average lap times and race result.
 	 - Car - specific data for your car, weather conditions, mounted tyres, elecronic settins, lap times and pitstops.
 	 - Driver - compare the different drivers on the grid regarding potential, race craft, speed, consistency and car control.
@@ -2466,7 +2467,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. New ["Race Reports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports) tool. This tool will bring post race analysis to Simulator Controller.
+  3. New ["Race Reports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports) tool. This tool will bring post race analysis to Simulator Controller.
   4. New options for the [Race Strategist configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist) to support the "Race Reports" tool.
   5. More confirmation questions when deleting settings or setups in the "Setup Database" tool.
 

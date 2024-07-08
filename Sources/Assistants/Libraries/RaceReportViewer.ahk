@@ -1538,7 +1538,7 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 		reportSettingsGui.SetFont("s9 Norm", "Arial")
 
 		reportSettingsGui.Add("Documentation", "x106 YP+20 w164 Center", translate("Report Settings")
-							, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports")
+							, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports#selecting-report-data")
 
 		reportSettingsGui.SetFont("s8 Norm", "Arial")
 

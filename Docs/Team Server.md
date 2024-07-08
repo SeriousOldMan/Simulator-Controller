@@ -152,7 +152,7 @@ A public test server is available for your first test ride with "Race Center". U
 
 ### Multi-class support
 
-The "Race Center" *understands* multi-class and/or multi-category races. Please see in the sections below, how information is shown differently, when you are in a multi-class race. For the most part, class-specific information will be shon in the different reports. Please note, that it depends on your choice the [settings for the race reports](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports), how the information about the different classes and categories are interpreted and displayed.
+The "Race Center" *understands* multi-class and/or multi-category races. Please see in the sections below, how information is shown differently, when you are in a multi-class race. For the most part, class-specific information will be shon in the different reports. Please note, that it depends on your choice the [settings for the race reports](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports#selecting-report-data), how the information about the different classes and categories are interpreted and displayed.
 
 ### Data Analysis
 
@@ -160,7 +160,7 @@ The "Race Center" *understands* multi-class and/or multi-category races. Please 
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%205.JPG)
 
-The reports at the top of the list are the well known reports, wich are also available after a session using the ["Race Reports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports) tool. They are mostly useful to analyze the standings and the performance of the various drivers and cars. The other reports will give you an insight into the telemetry data. You can select the data to be shown using the selector menus on the right of the report list. You can also choose the type of visualization using the "Plot" menu on top of the report area. Use the "Driver" menu, it is possible to restrict the data of the various charts to one the drivers who has already driven some laps in the session. Only data of the selected driver will be shown then.
+The reports at the top of the list are the well known reports, wich are also available after a session using the ["Race Reports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports) tool. They are mostly useful to analyze the standings and the performance of the various drivers and cars. The other reports will give you an insight into the telemetry data. You can select the data to be shown using the selector menus on the right of the report list. You can also choose the type of visualization using the "Plot" menu on top of the report area. Use the "Driver" menu, it is possible to restrict the data of the various charts to one the drivers who has already driven some laps in the session. Only data of the selected driver will be shown then.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2019.JPG)
 

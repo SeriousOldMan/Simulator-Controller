@@ -130,6 +130,18 @@
   - [Simulation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#simulation)
   - [Strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#strategy)
 
+[Race Reports](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports)
+------
+  - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports#introduction)
+  - [Overview Report](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports#overview-report)
+  - [Car Report](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports#car-report)
+  - [Driver Report](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports#driver-report)
+  - [Positions Report](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports#positions-report)
+  - [Lap Times Report](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports#lap-times-report)
+  - [Performance Report](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports#performance-report)
+  - [Consistency Report](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports#cosistency-report)
+  - [Pace Report](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports#pace-report)
+
 [Virtual Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach)
 ------
   - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#introduction)
@@ -183,7 +195,6 @@
     - [Strategy Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#tab-strategy)
     - [Pitstop Recommendation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#pitstop-recommendation)
 	- [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#how-it-works)
-  - [Race Reports](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports)
   - [Strategy Handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling)
 	- [Recalculating the Strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#adjusting-the-strategy-during-a-race)
 	  - [Handling Full Course Yellow](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#handling-full-course-yellow)

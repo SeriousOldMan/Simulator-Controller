@@ -904,7 +904,7 @@ The local folder for the *Setup Database* has been renamed from "Setup Database"
 
 ## Release 3.5.6
 
-All configuration changes are handled automatically for this release. New plugin parameters "Call" have been defined for the "Race Engineer" and the "Race Strategist" plugins. You may want to check the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) to check, if these parameters might be useful for you. Please note, that this version introduces [new report types](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports) for the "Race Reports" application. Older reports may show missing data for the new report types.
+All configuration changes are handled automatically for this release. New plugin parameters "Call" have been defined for the "Race Engineer" and the "Race Strategist" plugins. You may want to check the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) to check, if these parameters might be useful for you. Please note, that this version introduces [new report types](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports) for the "Race Reports" application. Older reports may show missing data for the new report types.
 
 IMPORTANT for RaceRoom Racing Experience users:
 

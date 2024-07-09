@@ -412,7 +412,7 @@ class RaceEngineer extends RaceAssistant {
 		local percent := " %"
 		local seconds := " Seconds"
 		local lapNumber, tyres, brakes, tyreCompound, tyreType, setupPressures, ignore, tyreType, goal, resultSet
-		local bodyworkDamage, suspensionDamage, engineDamage, bodyworkDamageSum, suspensionDamageSum, pitstops
+		local bodyworkDamage, suspensionDamage, engineDamage, bodyworkDamageSum, suspensionDamageSum, pitstops, lapNr
 
 		getPitstopForecast() {
 			local pitstop := Map("Refuel", (Round(knowledgeBase.getValue("Fuel.Amount.Target", 0), 1) . " Liters")
@@ -499,6 +499,13 @@ class RaceEngineer extends RaceAssistant {
 
 		if knowledgeBase {
 			lapNumber := knowledgeBase.getValue("Lap", 0)
+
+			if (this.activeTopic(options, "Laps") && knowlegde.Has("Laps"))
+				for ignore, lapNr in getKeys(knowledge["Laps"]) {
+					knowledge["Laps"][lapNr]["BodyworkDamage"] := knowledgeBase.getValue("Lap." . lapNumber . ".Damage.Bodywork", 0)
+					knowledge["Laps"][lapNr]["SuspensionDamage"] := knowledgeBase.getValue("Lap." . lapNumber . ".Damage.Suspension", 0)
+					knowledge["Laps"][lapNr]["EngineDamage"] := knowledgeBase.getValue("Lap." . lapNumber . ".Damage.Engine", 0)
+				}
 
 			if this.activeTopic(options, "Tyres") {
 				tyres := knowledge["Tyres"]

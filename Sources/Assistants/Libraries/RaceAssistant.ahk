@@ -1066,7 +1066,7 @@ class RaceAssistant extends ConfigurationItem {
 								 , "AirTemperature", knowledgeBase.getValue("Lap." . lapNr . ".Temperature.Air")
 								 , "TrackTemperature", knowledgeBase.getValue("Lap." . lapNr . ".Temperature.Track")
 								 , "Grip", knowledgeBase.getValue("Lap." . lapNr . ".Grip")
-								 , "Valid", (knowledgeBase.getValue("Lap." . lapNr . ".Valid") ? kTrue : kFalse)
+								 , "Valid", (knowledgeBase.getValue("Lap." . lapNr . ".Valid") ? kTrue : kFalse))
 					else
 						break
 				}

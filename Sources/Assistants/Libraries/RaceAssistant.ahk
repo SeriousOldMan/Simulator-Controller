@@ -570,7 +570,7 @@ class RaceAssistant extends ConfigurationItem {
 
 	Knowledge {
 		Get {
-			static knowledge := ["Session", "Stint", "Fuel", "Weather", "Track", "Tyres"]
+			static knowledge := ["Session", "Stint", "Fuel", "Laps", "Weather", "Track", "Tyres"]
 
 			return knowledge
 		}
@@ -1018,7 +1018,7 @@ class RaceAssistant extends ConfigurationItem {
 	getKnowledge(type, options := false) {
 		local knowledgeBase := this.KnowledgeBase
 		local knowledge := Map()
-		local lapNumber, tyreSet
+		local lapNumber, tyreSet, lapNr
 
 		static sessionTypes
 
@@ -1050,6 +1050,30 @@ class RaceAssistant extends ConfigurationItem {
 				knowledge["Fuel"] := Map("Capacity", (knowledgeBase.getValue("Session.Settings.Fuel.Max") . " Liter")
 									   , "Remaining", (Round(knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.Remaining", 0), 1) . " Liter")
 									   , "Consumption", (Round(knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.AvgConsumption", 0), 1)  . " Liter"))
+
+			if this.activeTopic(options, "Laps") {
+				knowledge["Laps"] := Map()
+
+				loop lapNumber {
+					lapNr := (lapNumber - A_Index + 1)
+
+					if knowledgeBase.hasFact("Lap." . lapNr . ".Map")
+						knowledge["Laps"][lapNr]
+							:= Map("Time", (Round(knowledgeBase.getValue("Lap." . lapNr . ".Time") / 1000) . " Seconds")
+								 , "FuelConsumption", (Round(knowledgeBase.getValue("Lap." . lapNr . ".Fuel.Consumption")) . " Liters")
+								 , "FuelRemaining", (Round(knowledgeBase.getValue("Lap." . lapNr . ".Fuel.Remaining")) . " Liters")
+								 , "Weather", knowledgeBase.getValue("Lap." . lapNr . ".Weather")
+								 , "AirTemperature", knowledgeBase.getValue("Lap." . lapNr . ".Temperature.Air")
+								 , "TrackTemperature", knowledgeBase.getValue("Lap." . lapNr . ".Temperature.Track")
+								 , "Grip", knowledgeBase.getValue("Lap." . lapNr . ".Grip")
+								 , "Valid", (knowledgeBase.getValue("Lap." . lapNr . ".Valid") ? kTrue : kFalse)
+					else
+						break
+				}
+
+				if (knowledge["Laps"].Count = 0)
+					knowledge.Delete("Laps")
+			}
 
 			if this.activeTopic(options, "Weather")
 				knowledge["Weather"] := Map("Now", knowledgeBase.getValue("Weather.Weather.Now")

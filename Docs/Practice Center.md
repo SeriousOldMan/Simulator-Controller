@@ -1,10 +1,10 @@
 ## Introduction
 
-The "Practice Center" is an application, which you can run alongside your practice sessions or even while running a solo race. When the Race Assistants detect that the "Practice Center" is running, they transfer all collected data to this application and do not store the data in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) tool at the end of the session. Instead you can use the "Practice Center" after your session to investigate the data and select the data that should be stored permanently in the session database, if any at all. You can also use the "Practice Center" to plan your practice session, review the car telemetry data and compare your performance to other drivers participating in the same session.
+The "Practice Center" is an application, which you can run alongside your practice sessions or even while running a solo race. When the Race Assistants detect that the "Practice Center" is running, they transfer all collected data to this application and do not store the data in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) tool at the end of the session. Instead you can use the "Practice Center" after your session to investigate the data and select the data that should be stored permanently in the session database, if any at all. You can also use the "Practice Center" to plan your practice session, review the car telemetry data and compare your performance to other drivers participating in the same session. In this sense, "Race Center" is a kind of pitwall application.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center.JPG)
 
-The "Practice Center" looks very similar to the ["Race Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#race-center), a tool typically used to manage team endurance races. Both tools share common concepts, reports and data views by intention, but there are also many differences, of course.
+The "Practice Center" looks very similar to the ["Race Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center), a tool typically used to manage team endurance races. Both tools share common concepts, reports and data views by intention, but there are also many differences, of course.
 
 ### Starting a session
 
@@ -14,7 +14,7 @@ When you start a new session or when you close the window, the "Practice Center"
 
 Do **not** start the "Practice Center" after you have already started your session in the simulator. Although nothing will explode, you will loose your valuable practice data, since it will be send to the "Practice Center", which most likely will not collect it. Also, do not quit the "Practice Center" **before** quiting the session in your simulator. You will also end up with an inconsistent data constellation. Nothing really harmful, since in the end all data is treated with statistical weights and averages, but if possible, do avoid it.
 
-Note: If you have [enabled a team session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#connecting-to-a-session), the "Practice Center" cannot be used (it will simply ignore the running session), since all data duties are handled by the Team Server in this case. But you may want to use the "Race Center" to control your race in this case anyway.
+Note: If you are [running a team session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#running-a-team-session), the "Practice Center" cannot be used (it will simply ignore the running session), since all data duties are handled by the Team Server in this case. But you may want to use the "Race Center" to control your race in this case anyway.
 
 Good to know: The "Practice Center" benefits from a high data update frequency of the Race Assistants. Therefore, if your PC is powerful enough, you can lower this value in the settings of the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database):
 

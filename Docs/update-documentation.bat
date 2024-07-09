@@ -24,6 +24,7 @@ copy "Setup Workbench.md" ..\..\Controller.Wiki\Setup-Workbench.md
 copy "Practice Center.md" ..\..\Controller.Wiki\Practice-Center.md
 copy "Strategy Workbench.md" ..\..\Controller.Wiki\Strategy-Workbench.md
 copy "Race Reports.md" ..\..\Controller.Wiki\Race-Reports.md
+copy "Race Center.md" ..\..\Controller.Wiki\Race-Center.md
 copy "Session Database.md" ..\..\Controller.Wiki\Session-Database.md
 copy "Driving Coach Commands (EN).md" ..\..\Controller.Wiki\Driving-Coach-Commands-(EN).md
 copy "Race Engineer Commands (EN).md" ..\..\Controller.Wiki\Race-Engineer-Commands-(EN).md

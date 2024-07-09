@@ -102,6 +102,7 @@
   - [Using Tyre Compounds](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#using-tyre-compounds)
 
 [Session Database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database)
+------
   - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#introduction)
   - [Race Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#race-settings)
     - [Settings Overview](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings)
@@ -152,6 +153,19 @@
   - [Consistency Report](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports#cosistency-report)
   - [Pace Report](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports#pace-report)
 
+[Race Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center)
+------
+  - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#introduction)
+  - [Connecting to a session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#connecting-to-a-session)
+  - [Data Analysis](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#data-analysis)
+  - [Strategy Handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#strategy-handling)
+  - [Session & Stint Planning](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#session--stint-planning)
+  - [Driver specific tyre pressures](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#managing-driver-specific-tyre-pressures)
+  - [Planning a Pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#planning-a-pitstop)
+    - [Selecting the next Driver](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#automatically-select-the-next-driver)
+    - [Initiating a pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#initiating-a-pitstop-for-the-current-driver)
+    - [Using the Race Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#planning-and-preparing-pitstops-in-a-team-race-using-the-race-assistants)
+  
 [Virtual Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach)
 ------
   - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#introduction)
@@ -218,7 +232,7 @@
   - [Track Mapping](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-mapping)
   - [Track Automations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-automations)
 
-[Customizing Assitants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants)
+[Customizing Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants)
 ------
   - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#introduction)
   - [Booster Overview](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#overview-of-the-different-assistant-boosters)
@@ -238,16 +252,6 @@
   - [Preparing a team session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#preparing-a-team-session)
   - [Running a team session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#running-a-team-session)
     - [Special Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#special-notes)
-  - [Race Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#race-center)
-    - [Connecting to a session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#connecting-to-a-session)
-    - [Data Analysis](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#data-analysis)
-    - [Strategy Handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#strategy-handling)
-    - [Session & Stint Planning](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#session--stint-planning)
-	- [Driver specific tyre pressures](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#managing-driver-specific-tyre-pressures)
-    - [Planning a Pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#planning-a-pitstop)
-	  - [Selecting the next Driver](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#automatically-select-the-next-driver)
-	  - [Initiating a pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#initiating-a-pitstop-for-the-current-driver)
-	  - [Using the Race Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#planning-and-preparing-pitstops-in-a-team-race-using-the-race-assistants)
   - [Server Administration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration)
   - [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#how-it-works)
   - [Troubleshooting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#troubleshooting)

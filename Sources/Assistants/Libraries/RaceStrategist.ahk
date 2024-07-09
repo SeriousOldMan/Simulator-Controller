@@ -30,6 +30,32 @@
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+class WeatherChangeEvent extends AssistantEvent {
+	Asynchronous {
+		Get {
+			return true
+		}
+	}
+
+	createTrigger(event, phrase, arguments) {
+		local trigger := ("The weather will change to " . arguments[1] . " in " . arguments[2] . ".")
+
+		if arguments[3]
+			trigger .= " A tyre change may be necessary."
+		else
+			trigger .= " A tyre change will not be necessary."
+
+		return trigger
+	}
+
+	handleEvent(event, arguments*) {
+		if !super.handleEvent(event, arguments*)
+			this.Assistant.weatherChangeNotification(arguments[3], arguments[2])
+
+		return true
+	}
+}
+
 class RaceStrategist extends GridRaceAssistant {
 	iRaceInfo := false
 	iRaceInfoSaved := false

@@ -1018,7 +1018,7 @@ class RaceAssistant extends ConfigurationItem {
 	getKnowledge(type, options := false) {
 		local knowledgeBase := this.KnowledgeBase
 		local knowledge := Map()
-		local lapNumber, tyreSet, lapNr
+		local lapNumber, tyreSet, lapNr, laps
 
 		static sessionTypes
 
@@ -1052,27 +1052,27 @@ class RaceAssistant extends ConfigurationItem {
 									   , "Consumption", (Round(knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.AvgConsumption", 0), 1)  . " Liter"))
 
 			if this.activeTopic(options, "Laps") {
-				knowledge["Laps"] := Map()
+				laps := []
 
 				loop lapNumber {
 					lapNr := (lapNumber - A_Index + 1)
 
-					if knowledgeBase.hasFact("Lap." . lapNr . ".Map")
-						knowledge["Laps"][lapNr]
-							:= Map("Time", (Round(knowledgeBase.getValue("Lap." . lapNr . ".Time") / 1000) . " Seconds")
-								 , "FuelConsumption", (Round(knowledgeBase.getValue("Lap." . lapNr . ".Fuel.Consumption")) . " Liters")
-								 , "FuelRemaining", (Round(knowledgeBase.getValue("Lap." . lapNr . ".Fuel.Remaining")) . " Liters")
-								 , "Weather", knowledgeBase.getValue("Lap." . lapNr . ".Weather")
-								 , "AirTemperature", knowledgeBase.getValue("Lap." . lapNr . ".Temperature.Air")
-								 , "TrackTemperature", knowledgeBase.getValue("Lap." . lapNr . ".Temperature.Track")
-								 , "Grip", knowledgeBase.getValue("Lap." . lapNr . ".Grip")
-								 , "Valid", (knowledgeBase.getValue("Lap." . lapNr . ".Valid") ? kTrue : kFalse))
+					if knowledgeBase.hasFact("Lap." . lapNr . ".Time")
+						laps.Push(Map("Nr", lapNr
+									, "Time", (Round(knowledgeBase.getValue("Lap." . lapNr . ".Time") / 1000) . " Seconds")
+									, "FuelConsumption", (Round(knowledgeBase.getValue("Lap." . lapNr . ".Fuel.Consumption")) . " Liters")
+									, "FuelRemaining", (Round(knowledgeBase.getValue("Lap." . lapNr . ".Fuel.Remaining")) . " Liters")
+									, "Weather", knowledgeBase.getValue("Lap." . lapNr . ".Weather")
+									, "AirTemperature", knowledgeBase.getValue("Lap." . lapNr . ".Temperature.Air")
+									, "TrackTemperature", knowledgeBase.getValue("Lap." . lapNr . ".Temperature.Track")
+									, "Grip", knowledgeBase.getValue("Lap." . lapNr . ".Grip")
+									, "Valid", (knowledgeBase.getValue("Lap." . lapNr . ".Valid") ? kTrue : kFalse)))
 					else
 						break
 				}
 
-				if (knowledge["Laps"].Count = 0)
-					knowledge.Delete("Laps")
+				if (laps.Length > 0)
+					knowledge["Laps"] := reverse(laps)
 			}
 
 			if this.activeTopic(options, "Weather")

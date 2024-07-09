@@ -62,6 +62,32 @@ class DamageEvent extends AssistantEvent {
 	}
 }
 
+class WeatherChangeEvent extends AssistantEvent {
+	Asynchronous {
+		Get {
+			return true
+		}
+	}
+
+	createTrigger(event, phrase, arguments) {
+		local trigger := ("The weather will change to " . arguments[1] . " in " . arguments[2] . ".")
+
+		if arguments[3]
+			trigger .= " A tyre change may be necessary."
+		else
+			trigger .= " A tyre change will not be necessary."
+
+		return trigger
+	}
+
+	handleEvent(event, arguments*) {
+		if !super.handleEvent(event, arguments*)
+			this.Assistant.weatherChangeNotification(arguments[3], arguments[2])
+
+		return true
+	}
+}
+
 class RaceEngineer extends RaceAssistant {
 	iAdjustLapTime := true
 
@@ -412,7 +438,7 @@ class RaceEngineer extends RaceAssistant {
 		local percent := " %"
 		local seconds := " Seconds"
 		local lapNumber, tyres, brakes, tyreCompound, tyreType, setupPressures, ignore, tyreType, goal, resultSet
-		local bodyworkDamage, suspensionDamage, engineDamage, bodyworkDamageSum, suspensionDamageSum, pitstops, lapNr
+		local bodyworkDamage, suspensionDamage, engineDamage, bodyworkDamageSum, suspensionDamageSum, pitstops, lap
 
 		getPitstopForecast() {
 			local pitstop := Map("Refuel", (Round(knowledgeBase.getValue("Fuel.Amount.Target", 0), 1) . " Liters")
@@ -501,10 +527,10 @@ class RaceEngineer extends RaceAssistant {
 			lapNumber := knowledgeBase.getValue("Lap", 0)
 
 			if (this.activeTopic(options, "Laps") && knowlegde.Has("Laps"))
-				for ignore, lapNr in getKeys(knowledge["Laps"]) {
-					knowledge["Laps"][lapNr]["BodyworkDamage"] := knowledgeBase.getValue("Lap." . lapNumber . ".Damage.Bodywork", 0)
-					knowledge["Laps"][lapNr]["SuspensionDamage"] := knowledgeBase.getValue("Lap." . lapNumber . ".Damage.Suspension", 0)
-					knowledge["Laps"][lapNr]["EngineDamage"] := knowledgeBase.getValue("Lap." . lapNumber . ".Damage.Engine", 0)
+				for ignore, lap in knowledge["Laps"] {
+					lap["BodyworkDamage"] := knowledgeBase.getValue("Lap." . lap["Nr"] . ".Damage.Bodywork", 0)
+					lap["SuspensionDamage"] := knowledgeBase.getValue("Lap." . lap["Nr"] . ".Damage.Suspension", 0)
+					lap["EngineDamage"] := knowledgeBase.getValue("Lap." . lap["Nr"] . ".Damage.Engine", 0)
 				}
 
 			if this.activeTopic(options, "Tyres") {

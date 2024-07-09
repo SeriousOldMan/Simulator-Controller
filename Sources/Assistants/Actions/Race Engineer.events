@@ -1,10 +1,14 @@
 [Agent.Events]
-Active=damage_collected, rain_started, rain_stopped
+Active=damage_collected, rain_started, rain_stopped, weather_change
 [Agent.Events.Builtin]
 damage_collected=Assistant.Class|DamageEvent|Damage||3|This event is triggered when the car collected new damage.
-rain_started=Assistant.Rule|Race Engineer.rain_start.rules|RainStart|It just started raining.|0|This event is triggered when it starts raining or will be raining in a few moments.
-rain_stopped=Assistant.Rule|Race Engineer.rain_stop.rules|RainStop|It just stopped raining.|0|This event is triggered when it stopped raining.
+weather_change=Assistant.Class|WeatherChangeEvent|WeatherChange||3|This event is triggered when the weather forecast indicates an upcoming weather change.
+rain_started=Assistant.Rule|Race Assistant.rain_start.rules|RainStart|It just started raining.|0|This event is triggered when it starts raining or will be raining in a few moments.
+rain_stopped=Assistant.Rule|Race Assistant.rain_stop.rules|RainStop|It just stopped raining.|0|This event is triggered when it stopped raining.
 [Agent.Events.Parameters]
 damage_collected.1=suspensionDamage|Boolean||true|Indicates whether new damage to the suspension occured.
 damage_collected.2=bodyworkDamage|Boolean||true|Indicates whether new damage to the bodywork and aerodynamics occured.
 damage_collected.3=engineDamage|Boolean||true|Indicates whether new damage to the engine occured.
+weather_change.1=weather|String|Dry,Drizzle,LightRain,MediumRain,HeavyRain,Thunderstorm|true|A symbol that represents the upcoming weather.
+weather_change.2=minutes|Integer||true|The time in minutes when the weather will change.
+weather_change.3=changeTyres|Boolean||true|Indicates that a tyre change might be necessary.

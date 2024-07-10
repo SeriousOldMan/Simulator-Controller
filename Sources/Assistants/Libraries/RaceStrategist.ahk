@@ -30,7 +30,7 @@
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class WeatherChangeEvent extends AssistantEvent {
+class WeatherForecastEvent extends AssistantEvent {
 	Asynchronous {
 		Get {
 			return true
@@ -41,16 +41,14 @@ class WeatherChangeEvent extends AssistantEvent {
 		local trigger := ("The weather will change to " . arguments[1] . " in " . arguments[2] . ".")
 
 		if arguments[3]
-			trigger .= " A tyre change may be necessary."
+			return (trigger . " A tyre change may be necessary.")
 		else
-			trigger .= " A tyre change will not be necessary."
-
-		return trigger
+			return (trigger . " A tyre change will not be necessary.")
 	}
 
 	handleEvent(event, arguments*) {
 		if !super.handleEvent(event, arguments*)
-			this.Assistant.weatherChangeNotification(arguments[3], arguments[2])
+			this.Assistant.weatherForecast(arguments*)
 
 		return true
 	}
@@ -3582,9 +3580,9 @@ class RaceStrategist extends GridRaceAssistant {
 		this.recommendStrategy({FullCourseYellow: true})
 	}
 
-	weatherChangeNotification(change, minutes) {
+	weatherForecast(weather, minutes, changeTyres) {
 		if (this.Speaker[false] && (this.Session == kSessionRace) && this.Announcements["WeatherUpdate"])
-			this.getSpeaker().speakPhrase(change ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
+			this.getSpeaker().speakPhrase(changeTyres ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
 	}
 
 	weatherTyreChangeRecommendation(minutes, recommendedCompound) {
@@ -4193,8 +4191,8 @@ updatePositions(context, futureLap) {
 	return true
 }
 
-weatherChangeNotification(context, change, minutes) {
-	context.KnowledgeBase.RaceAssistant.weatherChangeNotification(change, minutes)
+weatherChangeNotification(context, weather, minutes, change) {
+	context.KnowledgeBase.RaceAssistant.weatherForecast(weather, minutes, change)
 
 	return true
 }

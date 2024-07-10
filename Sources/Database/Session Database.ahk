@@ -1214,7 +1214,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x16 yp+12 w30 h30 Section", kIconsDirectory . "Road.ico")
+		editorGui.Add("Picture", "x16 yp+12 w30 h30 Section", this.themeIcon(kIconsDirectory . "Road.ico"))
 		editorGui.Add("Text", "x50 yp+5 w120 h26", translate("Selection"))
 
 		editorGui.SetFont("s8 Norm", "Arial")
@@ -1265,7 +1265,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x280 ys w30 h30 Section", kIconsDirectory . "Report.ico")
+		editorGui.Add("Picture", "x280 ys w30 h30 Section", this.themeIcon(kIconsDirectory . "Report.ico"))
 		editorGui.Add("Text", "xp+34 yp+5 w120 h26 W:Grow", translate("Notes"))
 
 		button := editorGui.Add("Button", "x647 yp w23 h23 X:Move")
@@ -1281,7 +1281,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x16 yp+12 w30 h30 Section vsettingsImg1", kIconsDirectory . "General Settings.ico").OnEvent("Click", chooseTab.Bind("Settings"))
+		editorGui.Add("Picture", "x16 yp+12 w30 h30 Section vsettingsImg1", this.themeIcon(kIconsDirectory . "General Settings.ico")).OnEvent("Click", chooseTab.Bind("Settings"))
 		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab1", translate("Race Settings")).OnEvent("Click", chooseTab.Bind("Settings"))
 
 		editorGui.Add("Text", "x16 yp+32 w267 0x10")
@@ -1289,7 +1289,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg2", kIconsDirectory . "Strategy.ico").OnEvent("Click", chooseTab.Bind("Strategies"))
+		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg2", this.themeIcon(kIconsDirectory . "Strategy.ico")).OnEvent("Click", chooseTab.Bind("Strategies"))
 		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab2", translate("Strategies")).OnEvent("Click", chooseTab.Bind("Strategies"))
 
 		editorGui.Add("Text", "x16 yp+32 w267 0x10")
@@ -1297,7 +1297,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg3", kIconsDirectory . "Tools BW.ico").OnEvent("Click", chooseTab.Bind("Setups"))
+		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg3", this.themeIcon(kIconsDirectory . "Tools BW.ico")).OnEvent("Click", chooseTab.Bind("Setups"))
 		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab3", translate("Setups")).OnEvent("Click", chooseTab.Bind("Setups"))
 
 		editorGui.Add("Text", "x16 yp+32 w267 0x10")
@@ -1305,7 +1305,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg4", kIconsDirectory . "Pressure.ico").OnEvent("Click", chooseTab.Bind("Pressures"))
+		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg4", this.themeIcon(kIconsDirectory . "Pressure.ico")).OnEvent("Click", chooseTab.Bind("Pressures"))
 		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab4", translate("Tyre Pressures")).OnEvent("Click", chooseTab.Bind("Pressures"))
 
 		editorGui.Add("Text", "x16 yp+32 w267 0x10")
@@ -1313,7 +1313,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg5", kIconsDirectory . "Road.ico").OnEvent("Click", chooseTab.Bind("Automation"))
+		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg5", this.themeIcon(kIconsDirectory . "Road.ico")).OnEvent("Click", chooseTab.Bind("Automation"))
 		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab5", translate("Automations")).OnEvent("Click", chooseTab.Bind("Automation"))
 
 		editorGui.Add("Text", "x16 yp+32 w267 0x10")
@@ -1321,7 +1321,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg6", kIconsDirectory . "Sensor.ico").OnEvent("Click", chooseTab.Bind("Data"))
+		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg6", this.themeIcon(kIconsDirectory . "Sensor.ico")).OnEvent("Click", chooseTab.Bind("Data"))
 		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab6", translate("Administration")).OnEvent("Click", chooseTab.Bind("Data"))
 
 		editorGui.Add("Text", "x16 yp+32 w267 0x10")
@@ -1633,6 +1633,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		OnMessage(0x0200, showActionInfo)
 	}
 
+	themeIcon(fileName) {
+		return this.Window.Theme.InitializeImage(fileName)
+	}
+
 	getSimulators() {
 		return this.SessionDatabase.getSimulators()
 	}
@@ -1700,67 +1704,67 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		if this.moduleAvailable("Settings") {
 			window["settingsImg1"].Enabled := true
-			window["settingsImg1"].Value := kIconsDirectory . "General Settings.ico"
+			window["settingsImg1"].Value := this.themeIcon(kIconsDirectory . "General Settings.ico")
 			window["settingsTab1"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
 		}
 		else {
 			window["settingsImg1"].Enabled := false
-			window["settingsImg1"].Value := kIconsDirectory . "General Settings Gray.ico"
+			window["settingsImg1"].Value := this.themeIcon(kIconsDirectory . "General Settings Gray.ico")
 			window["settingsTab1"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
 		if this.moduleAvailable("Strategies") {
 			window["settingsImg2"].Enabled := true
-			window["settingsImg2"].Value := kIconsDirectory . "Strategy.ico"
+			window["settingsImg2"].Value := this.themeIcon(kIconsDirectory . "Strategy.ico")
 			window["settingsTab2"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
 		}
 		else {
 			window["settingsImg2"].Enabled := false
-			window["settingsImg2"].Value := kIconsDirectory . "Strategy Gray.ico"
+			window["settingsImg2"].Value := this.themeIcon(kIconsDirectory . "Strategy Gray.ico")
 			window["settingsTab2"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
 		if this.moduleAvailable("Setups") {
 			window["settingsImg3"].Enabled := true
-			window["settingsImg3"].Value := kIconsDirectory . "Tools BW.ico"
+			window["settingsImg3"].Value := this.themeIcon(kIconsDirectory . "Tools BW.ico")
 			window["settingsTab3"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
 		}
 		else {
 			window["settingsImg3"].Enabled := false
-			window["settingsImg3"].Value := kIconsDirectory . "Tools Gray.ico"
+			window["settingsImg3"].Value := this.themeIcon(kIconsDirectory . "Tools Gray.ico")
 			window["settingsTab3"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
 		if this.moduleAvailable("Pressures") {
 			window["settingsImg4"].Enabled := true
-			window["settingsImg4"].Value := kIconsDirectory . "Pressure.ico"
+			window["settingsImg4"].Value := this.themeIcon(kIconsDirectory . "Pressure.ico")
 			window["settingsTab4"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
 		}
 		else {
 			window["settingsImg4"].Enabled := false
-			window["settingsImg4"].Value := kIconsDirectory . "Pressure Gray.ico"
+			window["settingsImg4"].Value := this.themeIcon(kIconsDirectory . "Pressure Gray.ico")
 			window["settingsTab4"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
 		if this.moduleAvailable("Automation") {
 			window["settingsImg5"].Enabled := true
-			window["settingsImg5"].Value := kIconsDirectory . "Road.ico"
+			window["settingsImg5"].Value := this.themeIcon(kIconsDirectory . "Road.ico")
 			window["settingsTab5"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
 		}
 		else {
 			window["settingsImg5"].Enabled := false
-			window["settingsImg5"].Value := kIconsDirectory . "Road Gray.ico"
+			window["settingsImg5"].Value := this.themeIcon(kIconsDirectory . "Road Gray.ico")
 			window["settingsTab5"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
 		if this.moduleAvailable("Data") {
 			window["settingsImg6"].Enabled := true
-			window["settingsImg6"].Value := kIconsDirectory . "Sensor.ico"
+			window["settingsImg6"].Value := this.themeIcon(kIconsDirectory . "Sensor.ico")
 			window["settingsTab6"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
 		}
 		else {
 			window["settingsImg6"].Enabled := false
-			window["settingsImg6"].Value := kIconsDirectory . "Sensor Gray.ico"
+			window["settingsImg6"].Value := this.themeIcon(kIconsDirectory . "Sensor Gray.ico")
 			window["settingsTab6"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
@@ -2851,7 +2855,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		DirCreate(directory)
 
 		this.iTrackMap := trackMap
-		this.iTrackImage := trackImage
+		this.iTrackImage := this.Window.Theme.InitializeImage(trackImage)
 
 		this.createTrackMap()
 	}

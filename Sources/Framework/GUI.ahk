@@ -23,6 +23,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\Libraries\Task.ahk"
+#Include "..\Libraries\GDIP.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -174,6 +175,13 @@ class Theme {
 		window.BackColor := this.WindowBackColor
 	}
 
+	InitializeControls(window) {
+	}
+
+	InitializeImage(fileName) {
+		return fileName
+	}
+
 	ComputeControlOptions(window, type, options) {
 		options := StrReplace(options, "-Theme", "")
 
@@ -188,166 +196,18 @@ class Theme {
 					options .= (" Background" . this.FieldBackColor)
 				case "Button":
 					options .= (" Background" . this.ButtonBackColor)
-				case "Text", "Picture", "GroupBox", "Radio", "Slider", "Link":
+				case "Text", "Picture", "GroupBox", "CheckBox", "Radio", "Slider", "Link":
 					options .= (" Background" . this.WindowBackColor)
 			}
 		}
 
-		; if (!RegExMatch(options, "c[0-9a-fA-F]{6}") && !InStr(options, "c" . this.LinkColor))
-		;	options .= (" c" . this.TextColor)
+		if (!RegExMatch(options, "c[0-9a-fA-F]{6}") && !InStr(options, "c" . this.LinkColor))
+			options .= (" c" . this.TextColor)
 
 		return options
 	}
 
 	ApplyThemeProperties(window, control) {
-	}
-}
-
-/*
-class UserTheme extends ConfigurationItem {
-	iDescriptor := false
-
-	iWindowBackground := false
-	iAltBackground := false
-	iFieldBackground := false
-	iMenuBackground := false
-	iHeaderBackground := false
-	iTextColor := false
-	iButtonColor := false
-	iDropDownColor := false
-
-	Descriptor {
-		Get {
-			return this.iDescriptor
-		}
-	}
-
-	WindwBackground {
-		Get {
-			return this.iWindowBackground
-		}
-	}
-
-	AltBackground {
-		Get {
-			return this.iAltBackground
-		}
-	}
-
-	FieldBackground {
-		Get {
-			return this.iFieldBackground
-		}
-	}
-
-	MenuBackground {
-		Get {
-			return this.iMenuBackground
-		}
-	}
-
-	HeaderBackground {
-		Get {
-			return this.iHeaderBackground
-		}
-	}
-
-	TextColor {
-		Get {
-			return this.iTextColor
-		}
-	}
-
-	ButtonColor {
-		Get {
-			return this.iButtonColor
-		}
-	}
-
-	DropDownColor {
-		Get {
-			return this.iDropDownColor
-		}
-	}
-
-	__New(descriptor, configuration := false) {
-		this.iDescriptor := descriptor
-
-		super.__New(configuration)
-	}
-
-	loadFromConfiguration(configuration) {
-		super.loadFromConfiguration(configuration)
-
-		this.iWindowBackground := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "WindowBackground"))
-		this.iAltBackground := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "AltBackground"))
-		this.iFieldBackground := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "FieldBackground"))
-		this.iMenuBackground := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "MenuBackground"))
-		this.iHeaderBackground := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "HeaderBackground"))
-		this.iTextColor := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "TextColor"))
-		this.iButtonColor := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "ButtonColor"))
-		this.iDropDownColor := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "DropDownColor"))
-	}
-
-	saveToConfiguration(configuration) {
-		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "WindowBackground"), this.WindowBackground)
-		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "AltBackground"), this.AltBackground)
-		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "FieldBackground"), this.FieldBackground)
-		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "MenuBackground"), this.MenuBackground)
-		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "HeaderBackground"), this.HeaderBackground)
-		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "TextColor"), this.TextColor)
-		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "ButtonColor"), this.ButtonColor)
-		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "DropDownColor"), this.DropDownColor)
-	}
-}
-*/
-
-class WindowsTheme extends Theme {
-	Descriptor {
-		Get {
-			return "Windows"
-		}
-	}
-
-	WindowBackColor {
-		Get {
-			return "F0F0F0"
-		}
-	}
-
-	AlternateBackColor {
-		Get {
-			return "FFFFFF"
-		}
-	}
-
-	TableColor[type := "Header"] {
-		Get {
-			switch type, false {
-				case "Background":
-					return this.AlternateBackColor
-				case "Header":
-					return this.WindowBackColor
-				case "EvenRow":
-					return this.AlternateBackColor
-				case "OddRow":
-					return this.WindowBackColor
-				case "Frame":
-					return this.WindowBackColor
-			}
-		}
-	}
-
-	InitializeWindow(window) {
-	}
-
-	ComputeControlOptions(window, type, options) {
-		options := StrReplace(options, "-Theme", "")
-
-		if ((type = "Text") && (InStr(options, "0x10") && !InStr(options, "0x100")))
-			options := StrReplace(options, "0x10", "h1 Border")
-
-		return options
 	}
 }
 
@@ -427,10 +287,10 @@ class ClassicTheme extends Theme {
 	}
 }
 
-class DarkTheme extends ClassicTheme {
+class GrayTheme extends ClassicTheme {
 	Descriptor {
 		Get {
-			return "Dark"
+			return "Gray"
 		}
 	}
 
@@ -461,6 +321,371 @@ class DarkTheme extends ClassicTheme {
 					return super.TableColor[type]
 			}
 		}
+	}
+}
+
+class LightTheme extends Theme {
+	Descriptor {
+		Get {
+			return "Light"
+		}
+	}
+
+	WindowBackColor {
+		Get {
+			return "F0F0F0"
+		}
+	}
+
+	AlternateBackColor {
+		Get {
+			return "FFFFFF"
+		}
+	}
+
+	TableColor[type := "Header"] {
+		Get {
+			switch type, false {
+				case "Background":
+					return this.AlternateBackColor
+				case "Header":
+					return this.WindowBackColor
+				case "EvenRow":
+					return this.AlternateBackColor
+				case "OddRow":
+					return this.WindowBackColor
+				case "Frame":
+					return this.WindowBackColor
+			}
+		}
+	}
+
+	InitializeWindow(window) {
+	}
+
+	ComputeControlOptions(window, type, options) {
+		options := StrReplace(super.ComputeControlOptions(window, type, options), "-Theme", "")
+
+		if ((type = "Text") && (InStr(options, "0x10") && !InStr(options, "0x100")))
+			options := StrReplace(options, "0x10", "h1 Border")
+
+		return options
+	}
+}
+
+class DarkTheme extends Theme {
+	static sDarkColors := CaseInsenseMap("Background", "202020", "AltBackground", "2F2F2F", "Controls", "404040"
+									   , "Font", "E0E0E0", "DsbldFont", "606060", "PssvFont", "404040")
+	static sTextBackgroundBrush := DllCall("gdi32\CreateSolidBrush", "UInt", DarkTheme.sDarkColors["Background"], "Ptr")
+
+	/*
+	class DarkListView extends Gui.ListView {
+		class RECT {
+			left: i32, top: i32, right: i32, bottom: i32
+		}
+
+		class NMHDR {
+			hwndFrom: uptr
+			idFrom  : uptr
+			code    : i32
+		}
+
+		class NMCUSTOMDRAW {
+			hdr        : DarkTheme.DarkListView.NMHDR
+			dwDrawStage: u32
+			hdc        : uptr
+			rc         : DarkTheme.DarkListView.RECT
+			dwItemSpec : uptr
+			uItemState : u32
+			lItemlParam: iptr
+		}
+
+		static __New() {
+			static LVM_GETHEADER := 0x101F
+
+			super.Prototype.GetHeader   := SendMessage.Bind(LVM_GETHEADER, 0, 0)
+			super.Prototype.SetDarkMode := this.SetDarkMode.Bind(this)
+		}
+
+		static SetDarkMode(lv, style := "Explorer") {
+			static LVS_EX_DOUBLEBUFFER := 0x10000
+			static NM_CUSTOMDRAW       := -12
+			static UIS_SET             := 1
+			static UISF_HIDEFOCUS      := 0x1
+			static WM_CHANGEUISTATE    := 0x0127
+			static WM_NOTIFY           := 0x4E
+			static WM_THEMECHANGED     := 0x031A
+
+			SetWindowTheme(hwnd, appName, subIdList?) => DllCall("uxtheme\SetWindowTheme", "ptr", hwnd, "ptr", StrPtr(appName)
+																						 , "ptr", isSet(subIdList) ? subIdList : 0)
+			SetTextColor(hdc, color) => DllCall("SetTextColor", "Ptr", hdc, "UInt", color)
+
+			lvMessage(lv, wParam, lParam, Msg) {
+				static CDDS_ITEMPREPAINT   := 0x10001
+				static CDDS_PREPAINT       := 0x1
+				static CDRF_DODEFAULT      := 0x0
+				static CDRF_NOTIFYITEMDRAW := 0x20
+
+				if (StructFromPtr(DarkTheme.DarkListView.NMHDR, lParam).Code != NM_CUSTOMDRAW)
+					return
+
+				nmcd := StructFromPtr(DarkTheme.DarkListView.NMCUSTOMDRAW, lParam)
+
+				if (nmcd.hdr.hWndFrom != lv.Header)
+					return
+
+				switch nmcd.dwDrawStage {
+					case CDDS_PREPAINT:
+						return CDRF_NOTIFYITEMDRAW
+					case CDDS_ITEMPREPAINT:
+						SetTextColor(nmcd.hdc, DarkTheme.DarkColors["Font", true])
+				}
+
+				return CDRF_DODEFAULT
+			}
+
+			lv.Header := lv.GetHeader()
+
+			lv.OnMessage(WM_THEMECHANGED, (*) => 0)
+
+			lv.OnMessage(WM_NOTIFY, lvMessage)
+
+			lv.Opt("+LV" LVS_EX_DOUBLEBUFFER)
+
+			SendMessage(WM_CHANGEUISTATE, (UIS_SET << 8) | UISF_HIDEFOCUS, 0, lv)
+
+			SetWindowTheme(lv.Header, "DarkMode_ItemsView")
+			SetWindowTheme(lv.Hwnd, "DarkMode_Explorer")
+		}
+	}
+	*/
+
+	Descriptor {
+		Get {
+			return "Dark"
+		}
+	}
+
+	static DarkColors[key, asNumber := true] {
+		Get {
+			local value := DarkTheme.sDarkColors[key]
+
+			return (asNumber ? ("0x" . value) : value)
+		}
+	}
+
+	DarkColors[key, asNumber := true] {
+		Get {
+			return DarkTheme.DarkColors[key, asNumber]
+		}
+	}
+
+	static TextBackgroundBrush {
+		Get {
+			return DarkTheme.sTextBackgroundBrush
+		}
+	}
+
+	TextBackgroundBrush {
+		Get {
+			return DarkTheme.TextBackgroundBrush
+		}
+	}
+
+	WindowBackColor {
+		Get {
+			return this.DarkColors["Background", false]
+		}
+	}
+
+	AlternateBackColor {
+		Get {
+			return this.DarkColors["AltBackground", false]
+		}
+	}
+
+	FieldBackColor {
+		Get {
+			return this.DarkColors["Controls", false]
+		}
+	}
+
+	ListBackColor[type := "Header"] {
+		Get {
+			switch type, false {
+				case "Background":
+					return this.AlternateBackColor
+				case "Header":
+					return this.WindowBackColor
+				case "EvenRow":
+					return this.AlternateBackColor
+				case "OddRow":
+					return this.WindowBackColor
+			}
+		}
+	}
+
+	TableColor[type := "Header"] {
+		Get {
+			switch type, false {
+				case "Background":
+					return this.AlternateBackColor
+				case "Header":
+					return this.WindowBackColor
+				case "EvenRow":
+					return this.AlternateBackColor
+				case "OddRow":
+					return this.WindowBackColor
+				case "Frame":
+					return this.WindowBackColor
+			}
+		}
+	}
+
+	ButtonBackColor {
+		Get {
+			return this.AlternateBackColor
+		}
+	}
+
+	TextColor[mode := "Normal"] {
+		Get {
+			switch mode, false {
+				case "Normal":
+					return this.DarkColors["Font", false]
+				case "Disabled":
+					return this.DarkColors["DsbldFont", false]
+				case "Unavailable":
+					return this.DarkColors["PssvFont", false]
+			}
+		}
+	}
+
+	LinkColor {
+		Get {
+			return Theme.GetSystemColor("LinkTextColor")
+		}
+	}
+
+	ButtonColor {
+		Get {
+			return this.DarkColors["Font", false]
+		}
+	}
+
+	SetWindowAttribute(window) {
+		local DWMWA_USE_IMMERSIVE_DARK_MODE, uxTheme
+
+		static GWL_WNDPROC        := -4
+		static PreferredAppMode := Map("Default", 0, "AllowDark", 1, "ForceDark", 2, "ForceLight", 3, "Max", 4)
+		static SetWindowLong    := A_PtrSize = 8 ? "SetWindowLongPtr" : "SetWindowLong"
+
+		if (VerCompare(A_OSVersion, "10.0.17763") >= 0) {
+			DWMWA_USE_IMMERSIVE_DARK_MODE := 19
+
+			if (VerCompare(A_OSVersion, "10.0.18985") >= 0)
+				DWMWA_USE_IMMERSIVE_DARK_MODE := 20
+
+			uxtheme := DllCall("kernel32\GetModuleHandle", "Str", "uxtheme", "Ptr")
+
+			DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", window.Hwnd, "Int", DWMWA_USE_IMMERSIVE_DARK_MODE, "Int*", True, "Int", 4)
+
+			DllCall(DllCall("kernel32\GetProcAddress", "Ptr", uxtheme, "Ptr", 135, "Ptr") , "Int", PreferredAppMode["ForceDark"])
+			DllCall(DllCall("kernel32\GetProcAddress", "Ptr", uxtheme, "Ptr", 136, "Ptr"))
+
+			window.BackColor := this.DarkColors["Background"]
+
+			if !window.HasProp("WindowProc")
+				window.WindowProc := DllCall("user32\" . SetWindowLong, "Ptr", window.Hwnd, "Int", GWL_WNDPROC
+																	  , "Ptr", CallbackCreate(WindowProc), "Ptr")
+		}
+	}
+
+	SetControlTheme(control) {
+		static GWL_STYLE          := -16
+		static ES_MULTILINE       := 0x0004
+		static LVM_GETTEXTCOLOR   := 0x1023
+		static LVM_SETTEXTCOLOR   := 0x1024
+		static LVM_GETTEXTBKCOLOR := 0x1025
+		static LVM_SETTEXTBKCOLOR := 0x1026
+		static LVM_GETBKCOLOR     := 0x1000
+		static LVM_SETBKCOLOR     := 0x1001
+		static LVM_GETHEADER      := 0x101F
+		static GetWindowLong      := A_PtrSize = 8 ? "GetWindowLongPtr" : "GetWindowLong"
+		static LV_Init            := false
+
+		switch control.Type, false {
+			case "Button", "CheckBox", "ListBox", "UpDown":
+				DllCall("uxtheme\SetWindowTheme", "Ptr", control.Hwnd, "Str", "DarkMode_Explorer", "Ptr", 0)
+			case "ComboBox", "DDL":
+				DllCall("uxtheme\SetWindowTheme", "Ptr", control.Hwnd, "Str", "DarkMode_CFD", "Ptr", 0)
+			case "Edit":
+				if (DllCall("user32\" . GetWindowLong, "Ptr", control.Hwnd, "Int", GWL_STYLE) & ES_MULTILINE)
+					DllCall("uxtheme\SetWindowTheme", "Ptr", control.Hwnd, "Str", "DarkMode_Explorer", "Ptr", 0)
+				else
+					DllCall("uxtheme\SetWindowTheme", "Ptr", control.Hwnd, "Str", "DarkMode_CFD", "Ptr", 0)
+			case "ListView":
+				if !LV_Init {
+					static LV_TEXTCOLOR   := SendMessage(LVM_GETTEXTCOLOR,   0, 0, control.Hwnd)
+					static LV_TEXTBKCOLOR := SendMessage(LVM_GETTEXTBKCOLOR, 0, 0, control.Hwnd)
+					static LV_BKCOLOR     := SendMessage(LVM_GETBKCOLOR,     0, 0, control.Hwnd)
+
+					LV_Init := true
+				}
+
+				control.Opt("-Redraw")
+
+				SendMessage(LVM_SETTEXTCOLOR,   0, this.DarkColors["Font"],       control.Hwnd)
+				SendMessage(LVM_SETTEXTBKCOLOR, 0, this.DarkColors["Background"], control.Hwnd)
+				SendMessage(LVM_SETBKCOLOR,     0, this.DarkColors["Background"], control.Hwnd)
+
+				DllCall("uxtheme\SetWindowTheme", "Ptr", control.Hwnd, "Str", "DarkMode_Explorer", "Ptr", 0)
+
+				LV_Header := SendMessage(LVM_GETHEADER, 0, 0, control.Hwnd)
+
+				DllCall("uxtheme\SetWindowTheme", "Ptr", LV_Header, "Str", "DarkMode_ItemsView", "Ptr", 0)
+
+				; control.SetDarkMode()
+
+				control.Opt("+Redraw")
+		}
+	}
+
+	InitializeWindow(window) {
+		this.SetWindowAttribute(window)
+	}
+
+	InitializeImage(fileName) {
+		whiteIcon(graphics, bitmap) {
+			local x, y, value
+
+			loop Gdip_GetImageHeight(bitmap) {
+				y := A_Index - 1
+
+				loop Gdip_GetImageWidth(bitmap) {
+					x := A_Index - 1
+
+					value := Gdip_GetPixel(bitmap, x, y)
+
+					Gdip_SetPixel(bitmap, x, y, ((value & 0xFF000000) + ((value & 0x00FFFFFF) ^ 0xFFFFFF)))
+				}
+			}
+		}
+
+		return modifiedIcon(fileName, "Invrt", whiteIcon)
+	}
+
+	ApplyThemeProperties(window, control) {
+		this.SetControlTheme(control)
+	}
+
+	ComputeControlOptions(window, type, options) {
+		options := StrReplace(super.ComputeControlOptions(window, type, options), "-Theme", "")
+
+		if ((type = "Text") && (InStr(options, "0x10") && !InStr(options, "0x100")))
+			options := StrReplace(options, "0x10", "h1 Border")
+
+		return options
 	}
 }
 
@@ -1073,6 +1298,8 @@ class Window extends Gui {
 		local x, y, cWidth, cHeight, width, height
 		local fullHeight, clientHeight
 
+		this.Theme.InitializeControls(this)
+
 		super.Show(arguments*)
 
 		for ignore, control in this.iCustomControls
@@ -1303,15 +1530,16 @@ class Window extends Gui {
 ;;;-------------------------------------------------------------------------;;;
 
 getAllUIThemes(configuration) {
-	return [WindowsTheme(), ClassicTheme(), DarkTheme()]
+	return [ClassicTheme(), GrayTheme(), LightTheme(), DarkTheme()]
 }
 
 setButtonIcon(buttonHandle, file, index := 1, options := "") {
+	local window := ((buttonHandle is Gui.Control) ? buttonHandle.Gui : GuiCtrlFromHwnd(buttonHandle).Gui)
 	local ptrSize, button_il, normal_il, L, T, R, B, A, W, H, S, DW, PTR
 	local BCM_SETIMAGELIST
 
 ;   Parameters:
-;   1) {Handle} 	HWND handle of Gui button
+;   1) {Handle} 	Hwnd handle of Gui button
 ;   2) {File} 		File containing icon image
 ;   3) {Index} 		Index of icon in file
 ;						Optional: Default = 1
@@ -1324,6 +1552,8 @@ setButtonIcon(buttonHandle, file, index := 1, options := "") {
 ;						R = Right Margin
 ;						B = Botton Margin
 ;						A = Alignment (0 = left, 1 = right, 2 = top, 3 = bottom, 4 = center; default = 4)
+
+	file := window.Theme.InitializeImage(file)
 
 	RegExMatch(options, "i)w\K\d+", &W), !W ? W := 16 : W := W[]
 	RegExMatch(options, "i)h\K\d+", &H), !H ? H := 16 : H := H[]
@@ -1490,10 +1720,10 @@ translateSelectCancelButtons := translateMsgBoxButtons.Bind(["Select", "Cancel"]
 
 withBlockedWindows(function, arguments*) {
 	local windows := []
-	local ignore, hwnd, theWindow
+	local ignore, Hwnd, theWindow
 
-	for ignore, hwnd in WinGetList("ahk_exe " . A_ScriptName) {
-		theWindow := GuiFromHwnd(hwnd)
+	for ignore, Hwnd in WinGetList("ahk_exe " . A_ScriptName) {
+		theWindow := GuiFromHwnd(Hwnd)
 
 		if (isObject(theWindow) && isInstance(theWindow, Window)) {
 			theWindow.Opt("+OwnDialogs")
@@ -1527,6 +1757,39 @@ getControllerActionIcons() {
 			values[key] := substituteVariables(value)
 
 	return icons
+}
+
+modifiedIcon(fileName, postFix, modifier) {
+	local extension, name, modifiedFileName, token, bitmap, graphics
+
+	SplitPath(fileName, , , &extension, &name)
+
+	if (extension = "ico")
+		extension := "png"
+
+	modifiedFileName := (kTempDirectory . "Icons\" . name . "_" . postFix . "." . extension)
+
+	if !FileExist(modifiedFileName) {
+		DirCreate(kTempDirectory . "Icons")
+
+		token := Gdip_Startup()
+
+		bitmap := Gdip_CreateBitmapFromFile(fileName)
+
+		graphics := Gdip_GraphicsFromImage(bitmap)
+
+		modifier(graphics, bitmap)
+
+		Gdip_SaveBitmapToFile(bitmap, modifiedFileName)
+
+		Gdip_DisposeImage(bitmap)
+
+		Gdip_DeleteGraphics(graphics)
+
+		Gdip_Shutdown(token)
+	}
+
+	return modifiedFileName
 }
 
 
@@ -1568,6 +1831,43 @@ initializeGUI() {
 
 	; DllCall("User32\SetProcessDpiAwarenessContext", "UInt" , -1)
 	; DllCall("User32\SetThreadDpiAwarenessContext", "UInt" , -1)
+}
+
+windowProc(hwnd, uMsg, wParam, lParam) {
+	Critical
+
+	local window := GuiFromHwnd(hwnd)
+	local theme := window.Theme
+	local control := GuiCtrlFromHwnd(lParam)
+
+	static WM_CTLCOLOREDIT    := 0x0133
+	static WM_CTLCOLORLISTBOX := 0x0134
+	static WM_CTLCOLORBTN     := 0x0135
+	static WM_CTLCOLORSTATIC  := 0x0138
+	static DC_BRUSH           := 18
+
+	switch uMsg {
+		case WM_CTLCOLOREDIT, WM_CTLCOLORLISTBOX:
+			DllCall("gdi32\SetTextColor", "Ptr", wParam, "UInt", theme.DarkColors["Font"])
+			DllCall("gdi32\SetBkColor", "Ptr", wParam, "UInt", theme.DarkColors["Controls"])
+			DllCall("gdi32\SetDCBrushColor", "Ptr", wParam, "UInt", theme.DarkColors["Controls"], "UInt")
+
+			return DllCall("gdi32\GetStockObject", "Int", DC_BRUSH, "Ptr")
+		case WM_CTLCOLORBTN:
+			DllCall("gdi32\SetDCBrushColor", "Ptr", wParam, "UInt", theme.DarkColors["Background"], "UInt")
+
+			return DllCall("gdi32\GetStockObject", "Int", DC_BRUSH, "Ptr")
+
+		case WM_CTLCOLORSTATIC:
+			if isInstance(control, Gui.Edit) {
+				DllCall("gdi32\SetTextColor", "Ptr", wParam, "UInt", theme.DarkColors["Font"])
+				DllCall("gdi32\SetBkColor", "Ptr", wParam, "UInt", theme.DarkColors["Background"])
+
+				return theme.TextBackgroundBrush
+			}
+	}
+
+	return DllCall("user32\CallWindowProc", "Ptr", window.WindowProc, "Ptr", hwnd, "UInt", uMsg, "Ptr", wParam, "Ptr", lParam)
 }
 
 

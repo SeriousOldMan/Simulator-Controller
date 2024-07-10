@@ -1012,7 +1012,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm")
 		workbenchGui.SetFont("s10 Bold", "Arial")
 
-		workbenchGui.Add("Picture", "x16 yp+12 w30 h30 Section", kIconsDirectory . "Sensor.ico")
+		workbenchGui.Add("Picture", "x16 yp+12 w30 h30 Section", workbenchGui.Theme.InitializeImage(kIconsDirectory . "Sensor.ico"))
 		workbenchGui.Add("Text", "x50 yp+5 w80 h26", translate("Telemetry"))
 
 		workbenchGui.SetFont("s8 Norm", "Arial")
@@ -1123,7 +1123,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.SetFont("s10 Bold", "Arial")
 
-		workbenchGui.Add("Picture", "x16 yp+10 w30 h30 Section", kIconsDirectory . "Strategy.ico")
+		workbenchGui.Add("Picture", "x16 yp+10 w30 h30 Section", workbenchGui.Theme.InitializeImage(kIconsDirectory . "Strategy.ico"))
 		workbenchGui.Add("Text", "x50 yp+5 w80 h26", translate("Strategy"))
 
 		workbenchGui.SetFont("s8 Norm", "Arial")
@@ -1699,7 +1699,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			</html>
 			)"
 
-			html := (before . drawChartFunction . substituteVariables(after,  {width: (this.ChartViewer.getWidth() - 4), height: (this.ChartViewer.getHeight() - 4), backColor: this.Window.AltBackColor}))
+			html := (before . drawChartFunction . substituteVariables(after, {width: (this.ChartViewer.getWidth() - 4), height: (this.ChartViewer.getHeight() - 4), backColor: this.Window.AltBackColor}))
 
 			this.ChartViewer.document.write(html)
 		}

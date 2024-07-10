@@ -219,10 +219,8 @@ class ConfigurationItemList extends ConfiguratorPanel {
 	}
 
 	clickEvent(line, count) {
-		/*
 		if (line != 0)
 			this.openEditor(line)
-		*/
 	}
 
 	selectEvent(line) {
@@ -282,6 +280,9 @@ class ConfigurationItemList extends ConfiguratorPanel {
 				else if ((type == "Select") && line && (line = (isInstance(this.ListView, Gui.ListView) ? this.ListView.GetNext(0) : this.ListView.Value)))
 					this.selectEvent(line)
 			}
+		}
+		catch Any as exception {
+			logError(exception, true)
 		}
 		finally {
 			protectionOff(true, true)

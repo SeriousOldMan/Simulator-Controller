@@ -99,17 +99,18 @@ class RaceReportViewer extends RaceReportReader {
 					<meta charset='utf-8'>
 					<head>
 						<style>
-							.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+							.headerStyle { height: 25; font-size: 11px; font-weight: 500; color: #%fontColor%; background-color: #%headerBackColor%; }
 							.cellStyle { text-align: right; }
-							.rowStyle { font-size: 11px; background-color: #%evenRowBackColor%; }
-							.oddRowStyle { font-size: 11px; background-color: #%oddRowBackColor%; }
+							.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+							.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
 						</style>
 						<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 						<script type="text/javascript">
 							google.charts.load('current', {'packages':['corechart', 'bar', 'table']}).then(drawChart);
 				)"
 
-				before := substituteVariables(before, {headerBackColor: this.Window.Theme.ListBackColor["Header"]
+				before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
+													 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 													 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 													 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
 
@@ -168,9 +169,10 @@ class RaceReportViewer extends RaceReportReader {
 				infoText .= ("<tr><td>" . translate("Conditions: ") . "</td><td>" . values2String(", ", collect(conditions, translate)*) . "</td></tr>")
 				infoText .= "</table>"
 
-				infoText := "<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='3' topmargin='3' rightmargin='3' bottommargin='3'><style> table, p { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><p>" . infoText . "</p></body></html>"
+				infoText := "<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='3' topmargin='3' rightmargin='3' bottommargin='3'><style> table, p { color: #%fontColor%; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><p>" . infoText . "</p></body></html>"
 
-				this.InfoViewer.document.write(substituteVariables(infoText, {backColor: this.Window.AltBackColor}))
+				this.InfoViewer.document.write(substituteVariables(infoText, {fontColor: this.Window.Theme.TextColor
+																			, backColor: this.Window.AltBackColor}))
 			}
 			else {
 				html := "<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"

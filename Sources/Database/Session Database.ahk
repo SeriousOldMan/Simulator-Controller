@@ -5605,7 +5605,7 @@ editSettings(editorOrCommand, arguments*) {
 
 		settingsEditorGui.SetFont("Italic", "Arial")
 
-		settingsEditorGui.Add("GroupBox", "x16 yp+30 w388 h216 Section -Theme", translate("Team Data"))
+		settingsEditorGui.Add("GroupBox", "x16 yp+30 w388 h216 Section", translate("Team Data"))
 
 		settingsEditorGui.SetFont("Norm", "Arial")
 

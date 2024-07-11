@@ -4025,7 +4025,7 @@ createTools(assistant, type) {
 	callRule(action, ruleFileName, enoughData, confirm, parameters, arguments*) {
 		local knowledgeBase := assistant.KnowledgeBase
 		local index, parameter, names, variables
-		local productions, reductions, includes, ignore, rule
+		local productions, reductions, includes, ignore, rule, rules
 
 		if knowledgeBase {
 			if !runAction(enoughData, confirm)

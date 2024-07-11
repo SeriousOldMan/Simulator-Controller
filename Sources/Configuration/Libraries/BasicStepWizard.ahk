@@ -40,15 +40,17 @@ class BasicStepWizard extends StepWizard {
 		}
 
 		Set {
+			local window := this.SetupWizard.Window
+
 			this.SetupWizard.BasicSetup := value
 
 			if this.SetupWizard.BasicSetup {
-				this.Control["basicSetupButton"].Value := (kResourcesDirectory . "Setup\Images\Quick Setup.ico")
-				this.Control["customSetupButton"].Value := (kResourcesDirectory . "Setup\Images\Full Setup Gray.ico")
+				this.Control["basicSetupButton"].Value := window.Theme.InitializeImage(kResourcesDirectory . "Setup\Images\Quick Setup.ico")
+				this.Control["customSetupButton"].Value := window.Theme.InitializeImage(kResourcesDirectory . "Setup\Images\Full Setup Gray.ico")
 			}
 			else {
-				this.Control["basicSetupButton"].Value := (kResourcesDirectory . "Setup\Images\Quick Setup Gray.ico")
-				this.Control["customSetupButton"].Value := (kResourcesDirectory . "Setup\Images\Full Setup.ico")
+				this.Control["basicSetupButton"].Value := window.Theme.InitializeImage(kResourcesDirectory . "Setup\Images\Quick Setup Gray.ico")
+				this.Control["customSetupButton"].Value := window.Theme.InitializeImage(kResourcesDirectory . "Setup\Images\Full Setup.ico")
 			}
 
 			return value
@@ -222,17 +224,17 @@ class BasicStepWizard extends StepWizard {
 
 		text := "<div style='text-align: center; font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 600'>" . text . "</div>"
 
-		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><br>" . text . "</body></html>"
+		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style> div, p, body { color: #" . window.Theme.TextColor . "}</style><br>" . text . "</body></html>"
 
 		widget1.document.write(html)
 
 		y += 150
 
-		widget2 := window.Add("Picture", "x" . button1X . " y" . y . " w64 h64 vbasicSetupButton Hidden X:Move(0.33)", kResourcesDirectory . (this.BasicSetup ? "Setup\Images\Quick Setup.ico" : "Setup\Images\Quick Setup Gray.ico"))
+		widget2 := window.Add("Picture", "x" . button1X . " y" . y . " w64 h64 vbasicSetupButton Hidden X:Move(0.33)", window.Theme.InitializeImage(kResourcesDirectory . (this.BasicSetup ? "Setup\Images\Quick Setup.ico" : "Setup\Images\Quick Setup Gray.ico")))
 		widget2.OnEvent("Click", chooseMethod.Bind("Basic"))
 		widget3 := window.Add("Text", "x" . button1X . " yp+68 w64 Hidden Center X:Move(0.33)", translate("Basic"))
 
-		widget4 := window.Add("Picture", "x" . button2X . " y" . y . " w64 h64 vcustomSetupButton Hidden X:Move(0.66)", kResourcesDirectory . (!this.BasicSetup ? "Setup\Images\Full Setup.ico" : "Setup\Images\Full Setup Gray.ico"))
+		widget4 := window.Add("Picture", "x" . button2X . " y" . y . " w64 h64 vcustomSetupButton Hidden X:Move(0.66)", window.Theme.InitializeImage(kResourcesDirectory . (!this.BasicSetup ? "Setup\Images\Full Setup.ico" : "Setup\Images\Full Setup Gray.ico")))
 		widget4.OnEvent("Click", chooseMethod.Bind("Extended"))
 		widget5 := window.Add("Text", "x" . button2X . " yp+68 w64 Hidden Center X:Move(0.66)", translate("Extended"))
 
@@ -244,7 +246,7 @@ class BasicStepWizard extends StepWizard {
 
 		text := "<div style='text-align: center; font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 600'>" . text . "</div>"
 
-		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><br>" . text . "</body></html>"
+		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style> div, p, body { color: #" . window.Theme.TextColor . "}</style><br>" . text . "</body></html>"
 
 		widget6.document.write(html)
 
@@ -378,12 +380,12 @@ class BasicStepWizard extends StepWizard {
 
 		text := "<div style='text-align: center; font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 600'>" . text . "</div>"
 
-		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><br>" . text . "</body></html>"
+		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style> div, p, body { color: #" . window.Theme.TextColor . "}</style><br>" . text . "</body></html>"
 
 		widget36.document.write(html)
 
 		widget37 := window.Add("Button", "x" . (x + Round((width / 2) - 45)) . " yp+96 w90 h60 X:Move(0.4) W:Grow(0.2) Y:Move(0.8) H:Grow(0.2) Hidden")
-		setButtonIcon(widget37, kResourcesDirectory . "\Setup\Images\Finish Line.png", 1, "w80 h53")
+		setButtonIcon(widget37, kResourcesDirectory . "\Setup\Images\Finish Line.png", 1, "w80 h53", false)
 		widget37.OnEvent("Click", finishSetup)
 
 		loop 51

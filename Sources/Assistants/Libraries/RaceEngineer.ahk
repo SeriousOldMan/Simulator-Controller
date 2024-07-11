@@ -524,7 +524,7 @@ class RaceEngineer extends RaceAssistant {
 		if knowledgeBase {
 			lapNumber := knowledgeBase.getValue("Lap", 0)
 
-			if (this.activeTopic(options, "Laps") && knowlegde.Has("Laps"))
+			if (this.activeTopic(options, "Laps") && knowledge.Has("Laps"))
 				for ignore, lap in knowledge["Laps"] {
 					lap["BodyworkDamage"] := knowledgeBase.getValue("Lap." . lap["Nr"] . ".Damage.Bodywork", 0)
 					lap["SuspensionDamage"] := knowledgeBase.getValue("Lap." . lap["Nr"] . ".Damage.Suspension", 0)

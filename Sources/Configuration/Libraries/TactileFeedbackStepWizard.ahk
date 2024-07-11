@@ -130,7 +130,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 
 		window.SetFont("s10 Bold", "Arial")
 
-		widget1 := window.Add("Picture", "x" . x . " y" . y . " w30 h30 Hidden", kResourcesDirectory . "Setup\Images\Vibration 1.ico")
+		widget1 := window.Add("Picture", "x" . x . " y" . y . " w30 h30 Hidden", window.Theme.InitializeImage(kResourcesDirectory . "Setup\Images\Vibration 1.ico"))
 		widget2 := window.Add("Text", "x" . labelX . " y" . labelY . " w" . labelWidth . " h26 Hidden", translate("Tactile Feedback Configuration"))
 
 		window.SetFont("s8 Norm", "Arial")
@@ -176,7 +176,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 
 		widget15 := window.Add("HTMLViewer", "x" . x . " yp+275 w" . width . " h135 Y:Move(0.66) W:Grow H:Grow(0.33) VtactileFeedbackInfoText Hidden")
 
-		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, p, body { color: #" . window.Theme.TextColor . "}</style>" . info . "</body></html>"
 
 		widget15.document.write(html)
 

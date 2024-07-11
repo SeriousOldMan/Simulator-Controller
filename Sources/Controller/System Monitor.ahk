@@ -110,7 +110,7 @@ updateDashboard(window, viewer, html := "") {
 	if (html == false)
 		html := " "
 
-	html := ("<html><meta charset='utf-8'><body style='background-color: #" . window.BackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 10px }</style><style> #header { font-size: 12px; } </style><div>" . html . "</div></body></html>")
+	html := ("<html><meta charset='utf-8'><body style='background-color: #" . window.BackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style> p, div, table { color: #" . window.Theme.TextColor . "; font-family: Arial, Helvetica, sans-serif; font-size: 10px }</style><style> #header { font-size: 12px; } </style><div>" . html . "</div></body></html>")
 
 	viewer.document.open()
 	viewer.document.write(html)
@@ -128,6 +128,7 @@ getTableCSS(window, textSize) {
 			border-collapse: collapse;
 			padding: .3em .5em;
 			font-size: %textSize%px;
+			color: #%fontColor%
 		}
 
 		.th-std, .td-std {
@@ -195,7 +196,8 @@ getTableCSS(window, textSize) {
 		}
 	)"
 
-	return substituteVariables(script, {evenRowColor: window.Theme.ListBackColor["EvenRow"]
+	return substituteVariables(script, {fontColor: window.Theme.TextColor
+									  , evenRowColor: window.Theme.ListBackColor["EvenRow"]
 									  , oddRowColor: window.Theme.ListBackColor["OddRow"]
 									  , altBackColor: window.AltBackColor, backColor: window.BackColor
 									  , textColor: window.Theme.TextColor, textSize: textSize

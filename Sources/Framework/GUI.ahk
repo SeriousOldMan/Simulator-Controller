@@ -205,8 +205,9 @@ class Theme {
 			}
 		}
 
-		if (!RegExMatch(options, "c[0-9a-fA-F]{6}") && !InStr(options, "c" . this.LinkColor))
-			options .= (" c" . this.TextColor)
+		if !inList(["CheckBox", "Radio", "GroupBox"], type)
+			if (!RegExMatch(options, "c[0-9a-fA-F]{6}") && !InStr(options, "c" . this.LinkColor))
+				options .= (" c" . this.TextColor)
 
 		return options
 	}
@@ -636,6 +637,16 @@ class DarkTheme extends Theme {
 		}
 
 		return modifiedIcon(fileName, "Invrt", whiteIcon)
+	}
+
+	ComputeControlOptions(window, type, options) {
+		options := super.ComputeControlOptions(window, type, options)
+
+		if inList(["CheckBox", "Radio", "GroupBox"], type)
+			if (!RegExMatch(options, "c[0-9a-fA-F]{6}") && !InStr(options, "c" . this.LinkColor))
+				options .= (" c" . this.TextColor)
+
+		return options
 	}
 
 	ApplyThemeProperties(window, control) {
@@ -1487,7 +1498,7 @@ getAllUIThemes(configuration) {
 	return [ClassicTheme(), GrayTheme(), LightTheme(), DarkTheme()]
 }
 
-setButtonIcon(buttonHandle, file, index := 1, options := "") {
+setButtonIcon(buttonHandle, file, index := 1, options := "", theme := true) {
 	local window := ((buttonHandle is Gui.Control) ? buttonHandle.Gui : GuiCtrlFromHwnd(buttonHandle).Gui)
 	local ptrSize, button_il, normal_il, L, T, R, B, A, W, H, S, DW, PTR
 	local BCM_SETIMAGELIST
@@ -1507,7 +1518,8 @@ setButtonIcon(buttonHandle, file, index := 1, options := "") {
 ;						B = Botton Margin
 ;						A = Alignment (0 = left, 1 = right, 2 = top, 3 = bottom, 4 = center; default = 4)
 
-	file := window.Theme.InitializeImage(file)
+	if theme
+		file := window.Theme.InitializeImage(file)
 
 	RegExMatch(options, "i)w\K\d+", &W), !W ? W := 16 : W := W[]
 	RegExMatch(options, "i)h\K\d+", &H), !H ? H := 16 : H := H[]

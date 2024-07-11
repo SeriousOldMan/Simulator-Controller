@@ -610,40 +610,65 @@ class Scintilla extends Gui.Custom {
         this.Cust.Caret.LineBack := ("0x" . Theme.CurrentTheme.FieldBackColor)
         this.Cust.Editor.Back := ("0x" . Theme.CurrentTheme.FieldBackColor)
 
-        this.Cust.Editor.Fore := 0x000000
+        this.Cust.Editor.Fore := ("0x" . Theme.CurrentTheme.TextColor)
         this.Cust.Editor.Font := "Consolas"
         this.Cust.Editor.Size := 10
 
         this.Style.ClearAll()
 
         this.Cust.Margin.Back := ("0x" . Theme.CurrentTheme.WindowBackColor)
-        this.Cust.Margin.Fore := 0x000000
+        this.Cust.Margin.Fore := ("0x" . Theme.CurrentTheme.TextColor)
 
-        this.Cust.Caret.Fore := 0x222222
-        this.Cust.Selection.Back := 0x398FFB
-        this.Cust.Selection.ForeColor := 0xFFFFFF
+        if isInstance(Theme.CurrentTheme, DarkTheme) {
+            this.Cust.Caret.Fore := 0x00FF00
+            this.Cust.Selection.Back := 0x550000
 
-        this.Cust.Brace.Fore     := 0x5F6364
-        this.Cust.BraceH.Fore    := 0x00FF00
-        this.Cust.BraceHBad.Fore := 0xFF0000
-        this.Cust.Punct.Fore     := 0xC57F5B
-        this.Cust.String1.Fore   := 0x329C1B
-        this.Cust.String2.Fore   := 0x329C1B
+            this.Cust.Brace.Fore     := 0x60BB60
+            this.Cust.BraceH.Fore    := 0x00FF00
+            this.Cust.BraceHBad.Fore := 0xFF0000
+            this.Cust.Punct.Fore     := 0x9090FF
+            this.Cust.String1.Fore   := 0x666666
+            this.Cust.String2.Fore   := 0x666666
 
-        this.Cust.Comment1.Fore  := 0x7D8B98
-        this.Cust.Comment2.Fore  := 0x7D8B98
-        this.Cust.Number.Fore    := 0xC72A31
+            this.Cust.Comment1.Fore  := 0x008800
+            this.Cust.Comment2.Fore  := 0x008800
+            this.Cust.Number.Fore    := 0xFFFF00
 
-        this.Cust.kw1.Fore := 0x329C1B
-        this.Cust.kw2.Fore := 0x1049BF
-        this.Cust.kw2.Bold := true
-        this.Cust.kw3.Fore := 0x2390B6
-        this.Cust.kw3.Bold := true
-        this.Cust.kw4.Fore := 0x3F8CD4
-        this.Cust.kw5.Fore := 0xC72A31
+            this.Cust.kw1.Fore := 0xc94969
+            this.Cust.kw2.Fore := 0x6b66ff
+            this.Cust.kw3.Fore := 0xbde03c
+            this.Cust.kw4.Fore := 0xd6f955
+            this.Cust.kw5.Fore := 0xf9c543
+            this.Cust.kw6.Fore := 0xb5b2ff
+            this.Cust.kw7.Fore := 0x127782
+        }
+        else {
+            this.Cust.Caret.Fore := 0x222222
+            this.Cust.Selection.Back := 0x398FFB
+            this.Cust.Selection.ForeColor := 0xFFFFFF
 
-        this.Cust.kw6.Fore := 0xEC9821
-        this.Cust.kw7.Fore := 0x2390B6
+            this.Cust.Brace.Fore     := 0x5F6364
+            this.Cust.BraceH.Fore    := 0x00FF00
+            this.Cust.BraceHBad.Fore := 0xFF0000
+            this.Cust.Punct.Fore     := 0xC57F5B
+            this.Cust.String1.Fore   := 0x329C1B
+            this.Cust.String2.Fore   := 0x329C1B
+
+            this.Cust.Comment1.Fore  := 0x7D8B98
+            this.Cust.Comment2.Fore  := 0x7D8B98
+            this.Cust.Number.Fore    := 0xC72A31
+
+            this.Cust.kw1.Fore := 0x329C1B
+            this.Cust.kw2.Fore := 0x1049BF
+            this.Cust.kw2.Bold := true
+            this.Cust.kw3.Fore := 0x2390B6
+            this.Cust.kw3.Bold := true
+            this.Cust.kw4.Fore := 0x3F8CD4
+            this.Cust.kw5.Fore := 0xC72A31
+
+            this.Cust.kw6.Fore := 0xEC9821
+            this.Cust.kw7.Fore := 0x2390B6
+        }
     }
 
     DefaultTheme() {

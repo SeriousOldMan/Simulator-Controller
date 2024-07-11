@@ -17,8 +17,9 @@
      - The documentation for "Race Center" has been moved to a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center).
      - All new complete documentation of the builtin [Hybrid Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine).
   8. The transcript of LLM invocations in any Assistant Booster now includes the events raised and actions invoked. Transcripts of Assistant Boosters are normally stored in the *Simulator Controller\Logs* folder, which is located in the user *Documents* folder.
-  9. [Internal] Implemented a postprocessor for the compiler which compreesses the binary files. The applications are much smaller now.
-  10. [Internal] Migrated to AHK 2.0.18.
+  9. The available color schemes has been revised and a new dark color scheme has been added.
+  10. [Internal] Implemented a postprocessor for the compiler which compresses the binary files. The applications are much smaller now.
+  11. [Internal] Migrated to AHK 2.0.18.
 
 ## 5.7.9.0-release 07/05/24
   1. Minor bugfixes, as always

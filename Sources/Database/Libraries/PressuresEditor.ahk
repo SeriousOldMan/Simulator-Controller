@@ -649,7 +649,7 @@ class PressuresEditor {
 		)"
 
 		drawChartFunction .= ("`n" . substituteVariables(text, {tyres: translate("Tyres"), pressures: translate("Pressure")
-															  , axisColor: this.Window.Theme.TextColor["Disabled"]
+															  , axisColor: this.Window.Theme.TextColor["Tick"]
 															  , textColor: this.Window.Theme.TextColor
 															  , backColor: this.Window.AltBackColor}))
 

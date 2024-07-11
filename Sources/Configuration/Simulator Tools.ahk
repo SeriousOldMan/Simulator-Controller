@@ -1688,7 +1688,7 @@ updateInstallationForV500() {
 }
 
 updateConfigurationForV580() {
-	local ignore, assistant, section, actions
+	local ignore, assistant, section, actions, settings, theme
 
 	for ignore, assistant in ["Race Engineer", "Race Strategist", "Race Spotter"]
 		if FileExist(kUserHomeDirectory . "Actions\" . assistant . ".actions") {
@@ -1704,6 +1704,23 @@ updateConfigurationForV580() {
 
 			writeMultiMap(kUserHomeDirectory . "Actions\" . assistant . ".actions", actions)
 		}
+
+	if FileExist(kUserConfigDirectory . "Application Settings.ini") {
+		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+		theme := getMultiMapValue(settings, "General", "UI Theme", false)
+
+		if (theme = "Dark") {
+			setMultiMapValue(settings, "General", "UI Theme", "Gray")
+
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+		}
+		else if (theme = "Windows") {
+			setMultiMapValue(settings, "General", "UI Theme", "Light")
+
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+		}
+	}
 }
 
 updateConfigurationForV575() {

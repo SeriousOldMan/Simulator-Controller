@@ -144,9 +144,17 @@ class Theme {
 					return Theme.GetSystemColor("NormalTextColor")
 				case "Disabled":
 					return Theme.GetSystemColor("DisabledTextColor")
+				case "Tick":
+					return Theme.GetSystemColor("DisabledTextColor")
 				case "Unavailable":
 					return "Silver"
 			}
+		}
+	}
+
+	GridColor {
+		Get {
+			return this.TextColor["Disabled"]
 		}
 	}
 
@@ -205,9 +213,8 @@ class Theme {
 			}
 		}
 
-		if !inList(["CheckBox", "Radio", "GroupBox"], type)
-			if (!RegExMatch(options, "c[0-9a-fA-F]{6}") && !InStr(options, "c" . this.LinkColor))
-				options .= (" c" . this.TextColor)
+		; if (!RegExMatch(options, "c[0-9a-fA-F]{6}") && !InStr(options, "c" . this.LinkColor))
+		;	options .= (" c" . this.TextColor)
 
 		return options
 	}
@@ -251,7 +258,7 @@ class ClassicTheme extends Theme {
 				case "EvenRow":
 					return "E0E0E0"
 				case "OddRow":
-					return "AAAAAA" ; "E8E8E8"
+					return "C0C0C0"
 			}
 		}
 	}
@@ -266,7 +273,7 @@ class ClassicTheme extends Theme {
 				case "EvenRow":
 					return "E0E0E0"
 				case "OddRow":
-					return "E8E8E8"
+					return "C0C0C0"
 				case "Frame":
 					return "B0B0B0"
 			}
@@ -281,7 +288,15 @@ class ClassicTheme extends Theme {
 
 	TextColor[mode := "Normal"] {
 		Get {
-			return ((mode = "Normal") ? "000000" : ((mode = "Disabled") ? "505050" : "808080"))
+			return ((mode = "Normal") ? "000000"
+									  : ((mode = "Disabled") ? "505050"
+															 : ((mode = "Tick") ? "A0A0A0" : "808080")))
+		}
+	}
+
+	GridColor {
+		Get {
+			return "A0A0A0"
 		}
 	}
 
@@ -327,6 +342,21 @@ class GrayTheme extends ClassicTheme {
 			}
 		}
 	}
+
+	TextColor[mode := "Normal"] {
+		Get {
+			if (mode = "Tick")
+				return "808080"
+			else
+				return super.TextColor[mode]
+		}
+	}
+
+	GridColor {
+		Get {
+			return "808080"
+		}
+	}
 }
 
 class LightTheme extends Theme {
@@ -362,6 +392,21 @@ class LightTheme extends Theme {
 				case "Frame":
 					return this.WindowBackColor
 			}
+		}
+	}
+
+	TextColor[mode := "Normal"] {
+		Get {
+			if (mode = "Tick")
+				return "BFBFBF"
+			else
+				return super.TextColor[mode]
+		}
+	}
+
+	GridColor {
+		Get {
+			return "BFBFBF"
 		}
 	}
 
@@ -521,7 +566,15 @@ class DarkTheme extends Theme {
 					return this.DarkColors["DsbldFont", false]
 				case "Unavailable":
 					return this.DarkColors["PssvFont", false]
+				case "Tick":
+					return "606060"
 			}
+		}
+	}
+
+	GridColor {
+		Get {
+			return "606060"
 		}
 	}
 
@@ -642,9 +695,8 @@ class DarkTheme extends Theme {
 	ComputeControlOptions(window, type, options) {
 		options := super.ComputeControlOptions(window, type, options)
 
-		if inList(["CheckBox", "Radio", "GroupBox"], type)
-			if (!RegExMatch(options, "c[0-9a-fA-F]{6}") && !InStr(options, "c" . this.LinkColor))
-				options .= (" c" . this.TextColor)
+		if (!RegExMatch(options, "c[0-9a-fA-F]{6}") && !InStr(options, "c" . this.LinkColor))
+			options .= (" c" . this.TextColor)
 
 		return options
 	}

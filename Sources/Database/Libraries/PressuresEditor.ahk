@@ -520,7 +520,7 @@ class PressuresEditor {
 						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
 						.rowStyle { font-size: 11px; background-color: #%evenRowBackColor%; }
 						.oddRowStyle { font-size: 11px; background-color: #%oddRowBackColor%; }
-						.cellStyle { text-align: right; }
+						.cellStyle { border: none; }
 					</style>
 					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 					<script type="text/javascript">

@@ -4897,15 +4897,17 @@ class PracticeCenter extends ConfigurationItem {
 				}
 
 				.table-std tbody tr:nth-child(even) {
-					background-color: #%altBackColor%;
+					background-color: #%evenRowColor%;
 				}
 
 				.table-std tbody tr:nth-child(odd) {
-					background-color: #%backColor%;
+					background-color: #%evenRowColor%;
 				}
 			)"
 
-			return substituteVariables(script, {altBackColor: this.Window.AltBackColor, backColor: this.Window.BackColor
+			return substituteVariables(script, {evenRowColor: this.Window.Theme.ListBackColor["EvenRow"]
+											  , oddRowColor: this.Window.Theme.ListBackColor["OddRow"]
+											  , altBackColor: this.Window.AltBackColor, backColor: this.Window.BackColor
 											  , textColor: this.Window.Theme.TextColor
 											  , headerBackColor: this.Window.Theme.TableColor["Header"], frameColor: this.Window.Theme.TableColor["Frame"]})
 		}

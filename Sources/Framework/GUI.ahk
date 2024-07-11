@@ -106,8 +106,10 @@ class Theme {
 					return this.AlternateBackColor
 				case "Header":
 					return this.FieldBackColor
-				case "EvenRow", "OddRow":
+				case "EvenRow":
 					return this.AlternateBackColor
+				case "OddRow":
+					return this.WindowBackColor
 			}
 		}
 	}
@@ -119,10 +121,12 @@ class Theme {
 					return this.AlternateBackColor
 				case "Header":
 					return this.FieldBackColor
-				case "EvenRow", "OddRow":
+				case "EvenRow":
 					return this.AlternateBackColor
+				case "OddRow":
+					return this.WindowBackColor
 				case "Frame":
-					return "000000"
+					return this.FieldBackColor
 			}
 		}
 	}
@@ -246,7 +250,7 @@ class ClassicTheme extends Theme {
 				case "EvenRow":
 					return "E0E0E0"
 				case "OddRow":
-					return "E8E8E8"
+					return "AAAAAA" ; "E8E8E8"
 			}
 		}
 	}
@@ -361,15 +365,6 @@ class LightTheme extends Theme {
 	}
 
 	InitializeWindow(window) {
-	}
-
-	ComputeControlOptions(window, type, options) {
-		options := StrReplace(super.ComputeControlOptions(window, type, options), "-Theme", "")
-
-		if ((type = "Text") && (InStr(options, "0x10") && !InStr(options, "0x100")))
-			options := StrReplace(options, "0x10", "h1 Border")
-
-		return options
 	}
 }
 
@@ -510,38 +505,6 @@ class DarkTheme extends Theme {
 		}
 	}
 
-	ListBackColor[type := "Header"] {
-		Get {
-			switch type, false {
-				case "Background":
-					return this.AlternateBackColor
-				case "Header":
-					return this.WindowBackColor
-				case "EvenRow":
-					return this.AlternateBackColor
-				case "OddRow":
-					return this.WindowBackColor
-			}
-		}
-	}
-
-	TableColor[type := "Header"] {
-		Get {
-			switch type, false {
-				case "Background":
-					return this.AlternateBackColor
-				case "Header":
-					return this.WindowBackColor
-				case "EvenRow":
-					return this.AlternateBackColor
-				case "OddRow":
-					return this.WindowBackColor
-				case "Frame":
-					return this.WindowBackColor
-			}
-		}
-	}
-
 	ButtonBackColor {
 		Get {
 			return this.AlternateBackColor
@@ -677,15 +640,6 @@ class DarkTheme extends Theme {
 
 	ApplyThemeProperties(window, control) {
 		this.SetControlTheme(control)
-	}
-
-	ComputeControlOptions(window, type, options) {
-		options := StrReplace(super.ComputeControlOptions(window, type, options), "-Theme", "")
-
-		if ((type = "Text") && (InStr(options, "0x10") && !InStr(options, "0x100")))
-			options := StrReplace(options, "0x10", "h1 Border")
-
-		return options
 	}
 }
 

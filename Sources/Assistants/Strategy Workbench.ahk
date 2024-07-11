@@ -2092,7 +2092,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		drawChartFunction .= "`n]);"
 
 		series := "series: {"
-		vAxis := "vAxis: { gridlines: { color: '#" . this.Window.Theme.AlternateBackColor . "' }, "
+		vAxis := "vAxis: { gridlines: { color: '#" . this.Window.Theme.WindowBackColor . "' }, "
 
 		for ignore, yAxis in yAxises {
 			if (A_Index > 1) {
@@ -2113,7 +2113,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		vAxis .= "}"
 
 		if (this.SelectedChartType = "Scatter") {
-			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: { title: '" . translate(xAxis) . "', gridlines: { color: '" . this.Window.Theme.AlternateBackColor . "' } }, " . series . ", " . vAxis . "};")
+			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: { title: '" . translate(xAxis) . "', gridlines: { color: '" . this.Window.Theme.WindowBackColor . "' } }, " . series . ", " . vAxis . "};")
 
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.ScatterChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 		}

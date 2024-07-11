@@ -183,11 +183,11 @@ getTableCSS(window, textSize) {
 		}
 
 		.table-std tbody tr:nth-child(even) {
-			background-color: #%altBackColor%;
+			background-color: #%evenRowColor%;
 		}
 
 		.table-std tbody tr:nth-child(odd) {
-			background-color: #%backColor%;
+			background-color: #%evenRowColor%;
 		}
 
 		#header {
@@ -195,7 +195,9 @@ getTableCSS(window, textSize) {
 		}
 	)"
 
-	return substituteVariables(script, {altBackColor: window.AltBackColor, backColor: window.BackColor
+	return substituteVariables(script, {evenRowColor: window.Theme.ListBackColor["EvenRow"]
+									  , oddRowColor: window.Theme.ListBackColor["OddRow"]
+									  , altBackColor: window.AltBackColor, backColor: window.BackColor
 									  , textColor: window.Theme.TextColor, textSize: textSize
 									  , headerBackColor: window.Theme.TableColor["Header"], frameColor: window.Theme.TableColor["Frame"]})
 }

@@ -1346,7 +1346,7 @@ class PracticeCenter extends ConfigurationItem {
 		centerGui.SetFont("s9 Norm", "Arial")
 
 		centerGui.Add("Documentation", "x608 YP+20 w134 H:Center Center", translate("Practice Center")
-					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#practice-center")
+					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Practice-Center")
 
 		centerGui.Add("Text", "x8 yp+30 w1350 W:Grow 0x10")
 

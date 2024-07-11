@@ -33,6 +33,12 @@ class LLMBooster extends ConfigurationItem {
 
 	iConnector := false
 
+	Type {
+		Get {
+			return "Conversation"
+		}
+	}
+
 	Options[key?] {
 		Get {
 			return (isSet(key) ? this.iOptions[key] : this.iOptions)
@@ -79,9 +85,9 @@ class LLMBooster extends ConfigurationItem {
 
 		super.loadFromConfiguration(configuration)
 
-		options["Service"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".Service", false)
-		options["Model"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".Model", false)
-		options["MaxTokens"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".MaxTokens", 2048)
+		options["Service"] := getMultiMapValue(configuration, this.Type . " Booster", descriptor . ".Service", false)
+		options["Model"] := getMultiMapValue(configuration, this.Type . " Booster", descriptor . ".Model", false)
+		options["MaxTokens"] := getMultiMapValue(configuration, this.Type . " Booster", descriptor . ".MaxTokens", 2048)
 	}
 
 	startBooster() {
@@ -207,7 +213,7 @@ class ConversationBooster extends LLMBooster {
 		this.Options["Descriptor"] := descriptor
 		this.Options["Language"] := language
 
-		this.iTranscript := (normalizeDirectoryPath(transcripts) . "\" . descriptor . ".txt")
+		this.iTranscript := (normalizeDirectoryPath(transcripts) . "\" . descriptor . " Transcript.txt")
 
 		super.__New(configuration)
 
@@ -230,12 +236,9 @@ class ConversationBooster extends LLMBooster {
 	}
 
 	loadFromConfiguration(configuration) {
-		local descriptor := this.Descriptor
-		local options := this.Options
-
 		super.loadFromConfiguration(configuration)
 
-		options["Language"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".Language", this.Language)
+		this.Options["Language"] := getMultiMapValue(configuration, "Conversation Booster", this.Descriptor . ".Language", this.Language)
 	}
 
 	getInstructions() {
@@ -283,7 +286,7 @@ class SpeechBooster extends ConversationBooster {
 
 	speak(text, options := false) {
 		local variables := false
-		local doRephrase, doTranslate, code, language, fileName, languageInstructions, instruction
+		local doRephrase, doTranslate, code, language, instruction
 
 		if (this.Model && this.Active) {
 			code := this.Code
@@ -424,7 +427,7 @@ class RecognitionBooster extends ConversationBooster {
 
 	recognize(text, options := false) {
 		local commands := this.Commands
-		local doRecognize, code, language, fileName, languageInstructions, instruction
+		local doRecognize, code, language, instruction
 		local phrase, name, grammar, phrases, candidates, numCandidates
 
 		if !commands {
@@ -552,12 +555,22 @@ class ChatBooster extends ConversationBooster {
 	}
 
 	getTools() {
-		return (this.Options["Actions"] ? this.Manager.getTools() : [])
+		return (this.Options["Actions"] ? this.Manager.getTools("Conversation") : [])
 	}
 
 	ask(question, options := false) {
 		local variables := false
-		local doTalk, code, language, fileName, languageInstructions, instruction, variables
+		local doTalk, code, language, instruction, variables, calls
+
+		printCall(call) {
+			local arguments := call[2].Clone()
+
+			loop arguments.Length
+				if !arguments.Has(A_Index)
+					arguments[A_Index] := ""
+
+			return ("Call: " . call[1].Name . "(" . values2String(", ", arguments*) . ")")
+		}
 
 		if (this.Model && this.Active) {
 			code := this.Code
@@ -584,8 +597,6 @@ class ChatBooster extends ConversationBooster {
 
 					this.Connector.Temperature := this.Temperature
 
-					instruction := "Talk"
-
 					if variables
 						variables.language := (language ? language : "")
 					else
@@ -598,13 +609,17 @@ class ChatBooster extends ConversationBooster {
 																			  , variables)
 														  , substituteVariables(getMultiMapValue(instruction
 																							   , "Conversation.Instructions", "Knowledge")
-																			  , variables)])
+																			  , variables)]
+											   , false, &calls := [])
 
 					if (answer && (answer != true))
 						answer := this.normalizeAnswer(answer)
 
 					if (answer && (answer != "")) {
-						Task.startTask(() => FileAppend(translate("-- User --------") . "`n`n" . question . "`n`n" . translate("-- " . translate("Conversation") . " ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16"), 0, kLowPriority)
+						if (answer = true)
+							Task.startTask(() => FileAppend(translate("-- User --------") . "`n`n" . question . "`n`n" . translate("-- " . translate("Conversation") . " ---------") . "`n`n" . values2String("`n", collect(calls, printCall)*) . "`n`n", this.Transcript, "UTF-16"), 0, kLowPriority)
+						else
+							Task.startTask(() => FileAppend(translate("-- User --------") . "`n`n" . question . "`n`n" . translate("-- " . translate("Conversation") . " ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16"), 0, kLowPriority)
 
 						return answer
 					}

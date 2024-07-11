@@ -57,6 +57,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	iRaceAssistantListener := false
 	iRaceAssistantListenerBooster := false
 	iRaceAssistantConversationBooster := false
+	iRaceAssistantAgentBooster := false
 	iRaceAssistantMuted := false
 
 	iRaceAssistant := false
@@ -732,6 +733,12 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		}
 	}
 
+	RaceAssistantAgentBooster {
+		Get {
+			return this.iRaceAssistantAgentBooster
+		}
+	}
+
 	RaceAssistantMuted {
 		Get {
 			return this.iRaceAssistantMuted
@@ -900,6 +907,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 					}
 				}
 			}
+					
+			this.iRaceAssistantAgentBooster := this.getArgumentValue("raceAssistantAgentBooster", false)
 
 			this.iRaceAssistantMuted := this.getArgumentValue("raceAssistantMuted", false)
 
@@ -1839,7 +1848,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 					options := " -Remote " . pid
 
 					for ignore, parameter in ["Name", "Logo", "Language", "Synthesizer", "Speaker", "SpeakerVocalics", "Recognizer", "Listener"
-											, "SpeakerBooster", "ListenerBooster", "ConversationBooster"]
+											, "SpeakerBooster", "ListenerBooster", "ConversationBooster", "AgentBooster"]
 						if this.RaceAssistant%parameter%
 							options .= (" -" . parameter . " `"" . this.RaceAssistant%parameter% . "`"")
 

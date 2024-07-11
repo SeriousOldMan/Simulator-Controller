@@ -30,6 +30,30 @@
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+class WeatherForecastEvent extends AssistantEvent {
+	Asynchronous {
+		Get {
+			return true
+		}
+	}
+
+	createTrigger(event, phrase, arguments) {
+		local trigger := ("The weather will change to " . arguments[1] . " in " . arguments[2] . ".")
+
+		if arguments[3]
+			return (trigger . " A tyre change may be necessary.")
+		else
+			return (trigger . " A tyre change will not be necessary.")
+	}
+
+	handleEvent(event, arguments*) {
+		if !super.handleEvent(event, arguments*)
+			this.Assistant.weatherForecast(arguments*)
+
+		return true
+	}
+}
+
 class RaceStrategist extends GridRaceAssistant {
 	iRaceInfo := false
 	iRaceInfoSaved := false
@@ -785,9 +809,11 @@ class RaceStrategist extends GridRaceAssistant {
 
 	__New(configuration, remoteHandler, name := false, language := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, speakerBooster := false
-		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, muted := false, voiceServer := false) {
+		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, agentBooster := false
+		, muted := false, voiceServer := false) {
 		super.__New(configuration, "Race Strategist", remoteHandler, name, language, synthesizer, speaker, vocalics, speakerBooster
-													, recognizer, listener, listenerBooster, conversationBooster, muted, voiceServer)
+													, recognizer, listener, listenerBooster, conversationBooster, agentBooster
+													, muted, voiceServer)
 
 		this.updateConfigurationValues({Announcements: {WeatherUpdate: true, StrategySummary: true, StrategyUpdate: true, StrategyPitstop: false}})
 
@@ -984,9 +1010,9 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	getKnowledge(options := false) {
+	getKnowledge(type, options := false) {
 		local knowledgeBase := this.KnowledgeBase
-		local knowledge := super.getKnowledge(options)
+		local knowledge := super.getKnowledge(type, options)
 		local strategy, nextPitstop, pitstop, pitstops
 
 		if knowledgeBase {
@@ -3554,9 +3580,9 @@ class RaceStrategist extends GridRaceAssistant {
 		this.recommendStrategy({FullCourseYellow: true})
 	}
 
-	weatherChangeNotification(change, minutes) {
+	weatherForecast(weather, minutes, changeTyres) {
 		if (this.Speaker[false] && (this.Session == kSessionRace) && this.Announcements["WeatherUpdate"])
-			this.getSpeaker().speakPhrase(change ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
+			this.getSpeaker().speakPhrase(changeTyres ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
 	}
 
 	weatherTyreChangeRecommendation(minutes, recommendedCompound) {
@@ -4165,8 +4191,8 @@ updatePositions(context, futureLap) {
 	return true
 }
 
-weatherChangeNotification(context, change, minutes) {
-	context.KnowledgeBase.RaceAssistant.weatherChangeNotification(change, minutes)
+weatherChangeNotification(context, weather, minutes, change) {
+	context.KnowledgeBase.RaceAssistant.weatherForecast(weather, minutes, change)
 
 	return true
 }

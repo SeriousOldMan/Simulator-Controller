@@ -141,7 +141,7 @@ class PressuresEditor {
 		pressuresEditorGui.SetFont("s9 Norm", "Arial")
 
 		pressuresEditorGui.Add("Documentation", "x158 YP+20 w88 Center", translate("Tyre Pressures")
-							 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#browsing-and-editing-tyre-pressures")
+							 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#browsing-and-editing-tyre-pressures")
 
 		pressuresEditorGui.SetFont("s8 Norm", "Arial")
 

@@ -20,7 +20,7 @@ I strongly recommed to memorize the phrases in the language you use to interact 
 
 #### Boosting conversation capabilities using an LLM
 
-Beside the builtin pattern-based voice recognition and the speech capabilities based on predefined phrases as described above, it is optionally possible to connect Elisa to a GPT service like OpenAI or a locally hosted LLM, to dramatacilly improve the quality in conversation with the Assistant. When the conversation booster is configured (see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for more information about the necessary configuration steps), the full knowledge about the the car state and the drivers performance will be supplied to the LLM. This includes only basic telemetry data and no pitstop information. The position information includes a history of the last laps and gap and lap time information for the most important opponents are provided.
+Beside the builtin pattern-based voice recognition and the speech capabilities based on predefined phrases as described above, it is optionally possible to connect Elisa to a GPT service like OpenAI or a locally hosted LLM, to dramatacilly improve the quality in conversation with the Assistant. When the *Conversation* Booster is configured (see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for more information about the necessary configuration steps), the full knowledge about the the car state and the drivers performance will be supplied to the LLM. This includes only basic telemetry data and no pitstop information. The position information includes a history of the last laps and gap and lap time information for the most important opponents are provided.
 
 ##### Trigger actions from conversation
 
@@ -45,9 +45,15 @@ As you can see, you can define new voice commands by defining a corresponding ac
 
 That said, it depends on the available data in the knowledge base, whether the LLM will decide to trigger this action or not. If the LLM refuses to do so, you still have all the traditional voice commands and the controller actions at your disposal.
 
-Beside the predefined actions for the Spotter, which come with the standard installation as listed above, you can also define your own actions. But this will require a very deep knowledge of the inner workings of Simulator Controller and the Assistants. You have been warned. If you want to try this, check out the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for the "Conversation" booster.
+Beside the predefined actions for the Spottr, which come with the standard installation as listed above, you can also define your own actions. But this will require a very deep knowledge of the inner workings of Simulator Controller and the Assistants. You have been warned. If you want to try this, check out the dedicated [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) for the "Conversation" booster.
 
-IMPORTANT: When action handling is enabled, it might be necessary to disable the "Recognition" booster or at least set the "Creativity" to a very low value. Otherwise the "Recognition" booster might detect a command pattern, which will match to a pre-defined voice command, thereby preventing the LLM from crating a custom action plan.
+IMPORTANT: When action handling is enabled, it might be necessary to disable the "Recognition" booster or at least set the "Creativity" to a very low value. Otherwise the "Recognition" booster might detect a command pattern, which will match to a pre-defined voice command, thereby preventing the LLM from creating a custom action plan.
+
+##### Trigger events during reasoning
+
+Very similar, you can use an LLM to alter or extend the reasoning process of an Assistant. In the reasoning process, events are raised, which then causes the Assistant to react upon them. Events and actions are normally being implemented in the rule system, but it is also prossible to raise an event, which then is inspected by an LLM, possibly taking action using the supplied actions similar to the actions used the conversation as described above.
+
+For a complete description of events and actions, see the dedicated [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants).
 
 ### Enabling and disabling specific warnings and announcements
 
@@ -169,7 +175,7 @@ Elisa tracks the positions, lap times and the deltas to your own car for four di
 
 When you approach a car in front of you, Elisa will gather all available information for the given car, whether the driver is quite inconsistent or is doing a lot of mistakes, and so on. Depending on the situation, Elisa might give you this information and will ask you to be careful, if necessary.
 
-Elise uses different delta thresholds to decide, whether the situation changed to an extent that an update will be of any value for you. You can define your own thresholds in the "Race Settings" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database). See the table below for the thresholds and their default values.
+Elise uses different delta thresholds to decide, whether the situation changed to an extent that an update will be of any value for you. You can define your own thresholds in the "Race Settings" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database). See the table below for the thresholds and their default values.
 
 | Threshold                | Default Value (Seconds) |
 | ------------------------ | ----------------------- |
@@ -182,7 +188,7 @@ Elise uses different delta thresholds to decide, whether the situation changed t
 | Lost on car behind       | 0.3                     |
 | Gained on car behind     | 1.5                     |
 
-Please note, that the corresponding settings in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) will follow the naming conventions for Session settings, for example: "Spotter: Threshold for Lap Up car in range".
+Please note, that the corresponding settings in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) will follow the naming conventions for Session settings, for example: "Spotter: Threshold for Lap Up car in range".
 
 ## Simulator Integration
 
@@ -267,9 +273,9 @@ The second file, which is generated using the way points from the meta data file
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Track%20Map.png)
 
-The track maps are recorded using a 20 Hz resolution, which is comparable to the resolution of high end GPS-based track mapping devices. Therefore the resolution of the generated maps is very good. But since the maps are created, while you are driving on a track, it may be possible that the generated map is not perfect, because you had an offtrack or even an accident. If you face such a situation, simply delete the track in question using the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) tool and the track map will be regenerated during your next visit on this track.
+The track maps are recorded using a 20 Hz resolution, which is comparable to the resolution of high end GPS-based track mapping devices. Therefore the resolution of the generated maps is very good. But since the maps are created, while you are driving on a track, it may be possible that the generated map is not perfect, because you had an offtrack or even an accident. If you face such a situation, simply delete the track in question using the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) tool and the track map will be regenerated during your next visit on this track.
 
-Track maps are used by the "Race Center" which provide a [live view](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#data-analysis) of the current race situation. And using the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database), you can associate actions with specific locations on the track map. This actions can change settings in the current simulator by issuing keyboard commands or they can even lauch a Windows script or application, when you arrive at this location. See the section below for a detailed discussion of Track Automation.
+Track maps are used by the "Race Center" which provide a [live view](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#data-analysis) of the current race situation. And using the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database), you can associate actions with specific locations on the track map. This actions can change settings in the current simulator by issuing keyboard commands or they can even lauch a Windows script or application, when you arrive at this location. See the section below for a detailed discussion of Track Automation.
 
 ### Special notes about Track Mapping in *iRacing*
 
@@ -291,7 +297,7 @@ As you can see, the yaw angle is the most important value in this calculation, t
 
 When a track map is available, the Race Spotter is able to trigger special actions at any location of the track. Using this actions, you can send commands to the running simulator to switch between car settings, for example the traction control.
 
-Track Automations are configured in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database). Once a track map is available for a given track, you can choose the "Automation" section there:
+Track Automations are configured in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database). Once a track map is available for a given track, you can choose the "Automation" section there:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Track%20Automation%202.JPG)
 
@@ -341,4 +347,4 @@ In this example, the "<^<!W" stands for the [keyboard command hotkey](https://gi
 
 ### Ex- and importing Track Automations
 
-Track Automations can be exported and imported using the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) administration tool, so you can share them with your team mates. Please note, that for *iRacing* it might be necessary to share the track map as well, since the track coordinates might differ with each recording of the track.
+Track Automations can be exported and imported using the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) administration tool, so you can share them with your team mates. Please note, that for *iRacing* it might be necessary to share the track map as well, since the track coordinates might differ with each recording of the track.

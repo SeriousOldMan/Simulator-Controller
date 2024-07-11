@@ -27,6 +27,65 @@
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+class DamageEvent extends AssistantEvent {
+	Asynchronous {
+		Get {
+			return true
+		}
+	}
+
+	createArguments(event, arguments) {
+		local result := []
+
+		loop arguments.Length
+			result.Push(arguments.Has(A_Index) ? arguments[A_Index] : false)
+
+		return result
+	}
+
+	createTrigger(event, phrase, arguments) {
+		local damage := []
+		local index, type
+
+		for index, type in ["Suspension", "Bodywork", "Engine"]
+			if arguments[index]
+				damage.Push(type)
+
+		return ("Damage has just been collected for " . values2String(", ", damage*))
+	}
+
+	handleEvent(event, arguments*) {
+		if !super.handleEvent(event, arguments*)
+			this.Assistant.damageWarning(arguments*)
+
+		return true
+	}
+}
+
+class WeatherForecastEvent extends AssistantEvent {
+	Asynchronous {
+		Get {
+			return true
+		}
+	}
+
+	createTrigger(event, phrase, arguments) {
+		local trigger := ("The weather will change to " . arguments[1] . " in " . arguments[2] . ".")
+
+		if arguments[3]
+			return (trigger . " A tyre change may be necessary.")
+		else
+			return (trigger . " A tyre change will not be necessary.")
+	}
+
+	handleEvent(event, arguments*) {
+		if !super.handleEvent(event, arguments*)
+			this.Assistant.weatherForecast(arguments*)
+
+		return true
+	}
+}
+
 class RaceEngineer extends RaceAssistant {
 	iAdjustLapTime := true
 
@@ -143,9 +202,11 @@ class RaceEngineer extends RaceAssistant {
 
 	__New(configuration, remoteHandler := false, name := false, language := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, speakerBooster := false
-		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, muted := false, voiceServer := false) {
+		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, agentBooster := false
+		, muted := false, voiceServer := false) {
 		super.__New(configuration, "Race Engineer", remoteHandler, name, language, synthesizer, speaker, vocalics, speakerBooster
-												  , recognizer, listener, listenerBooster, conversationBooster, muted, voiceServer)
+												  , recognizer, listener, listenerBooster, conversationBooster, agentBooster
+												  , muted, voiceServer)
 
 		this.updateConfigurationValues({Announcements: {FuelWarning: true, DamageReporting: true, DamageAnalysis: true, PressureReporting: true, WeatherUpdate: true}})
 	}
@@ -367,15 +428,15 @@ class RaceEngineer extends RaceAssistant {
 						   , repairs, repairs, repairs)
 	}
 
-	getKnowledge(options := false) {
+	getKnowledge(type, options := false) {
 		local knowledgeBase := this.KnowledgeBase
-		local knowledge := super.getKnowledge(options)
+		local knowledge := super.getKnowledge(type, options)
 		local psi := " PSI"
 		local celsius := " Celsius"
 		local percent := " %"
 		local seconds := " Seconds"
 		local lapNumber, tyres, brakes, tyreCompound, tyreType, setupPressures, ignore, tyreType, goal, resultSet
-		local bodyworkDamage, suspensionDamage, engineDamage, bodyworkDamageSum, suspensionDamageSum, pitstops
+		local bodyworkDamage, suspensionDamage, engineDamage, bodyworkDamageSum, suspensionDamageSum, pitstops, lap
 
 		getPitstopForecast() {
 			local pitstop := Map("Refuel", (Round(knowledgeBase.getValue("Fuel.Amount.Target", 0), 1) . " Liters")
@@ -462,6 +523,13 @@ class RaceEngineer extends RaceAssistant {
 
 		if knowledgeBase {
 			lapNumber := knowledgeBase.getValue("Lap", 0)
+
+			if (this.activeTopic(options, "Laps") && knowlegde.Has("Laps"))
+				for ignore, lap in knowledge["Laps"] {
+					lap["BodyworkDamage"] := knowledgeBase.getValue("Lap." . lap["Nr"] . ".Damage.Bodywork", 0)
+					lap["SuspensionDamage"] := knowledgeBase.getValue("Lap." . lap["Nr"] . ".Damage.Suspension", 0)
+					lap["EngineDamage"] := knowledgeBase.getValue("Lap." . lap["Nr"] . ".Damage.Engine", 0)
+				}
 
 			if this.activeTopic(options, "Tyres") {
 				tyres := knowledge["Tyres"]
@@ -3275,10 +3343,10 @@ class RaceEngineer extends RaceAssistant {
 				}
 	}
 
-	weatherChangeNotification(change, minutes) {
+	weatherForecast(weather, minutes, changeTyres) {
 		if (!ProcessExist("Race Strategist.exe") && this.Speaker[false]
 												 && (this.Session == kSessionRace) && this.Announcements["WeatherUpdate"])
-			this.getSpeaker().speakPhrase(change ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
+			this.getSpeaker().speakPhrase(changeTyres ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
 	}
 
 	weatherTyreChangeRecommendation(minutes, recommendedCompound) {
@@ -3396,8 +3464,8 @@ pressureLossWarning(context, tyre, lostPressure) {
 	return true
 }
 
-weatherChangeNotification(context, change, minutes) {
-	context.KnowledgeBase.RaceAssistant.weatherChangeNotification(change, minutes)
+weatherChangeNotification(context, weather, minutes, change) {
+	context.KnowledgeBase.RaceAssistant.weatherForecast(weather, minutes, change)
 
 	return true
 }

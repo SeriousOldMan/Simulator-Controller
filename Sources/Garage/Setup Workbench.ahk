@@ -987,27 +987,30 @@ class SetupWorkbench extends ConfigurationItem {
 			this.Control["analyzerButton"].Enabled := true
 	}
 
-	compileRules(fileName, &productions, &reductions) {
+	compileRules(fileName, &productions, &reductions, &includes) {
 		if (fileName && (fileName != "") && FileExist(fileName))
-			RuleCompiler().compileRules(FileRead(fileName), &productions, &reductions)
+			RuleCompiler().compileRules(FileRead(fileName), &productions, &reductions, &includes)
 	}
 
-	loadRules(&productions, &reductions) {
+	loadRules(&productions, &reductions, &includes) {
 		local simulator, car
 
 		productions := false
 		reductions := false
+		
+		if !includes
+			includes := []
 
-		RuleCompiler().compileRules(FileRead(kResourcesDirectory . "Garage\Rules\Setup Workbench.rules"), &productions, &reductions)
+		RuleCompiler().compileRules(FileRead(kResourcesDirectory . "Garage\Rules\Setup Workbench.rules"), &productions, &reductions, &includes)
 
 		simulator := this.SelectedSimulator
 		car := this.SelectedCar[false]
 
-		this.compileRules(getFileName("Garage\Rules\" . simulator . ".rules", kResourcesDirectory, kUserHomeDirectory), &productions, &reductions)
-		this.compileRules(getFileName("Garage\Rules\Cars\" . simulator . ".Generic.rules", kResourcesDirectory, kUserHomeDirectory), &productions, &reductions)
+		this.compileRules(getFileName("Garage\Rules\" . simulator . ".rules", kResourcesDirectory, kUserHomeDirectory), &productions, &reductions, &includes)
+		this.compileRules(getFileName("Garage\Rules\Cars\" . simulator . ".Generic.rules", kResourcesDirectory, kUserHomeDirectory), &productions, &reductions, &includes)
 
 		if (car != true)
-			this.compileRules(getFileName("Garage\Rules\Cars\" . simulator . "." . car . ".rules", kResourcesDirectory, kUserHomeDirectory), &productions, &reductions)
+			this.compileRules(getFileName("Garage\Rules\Cars\" . simulator . "." . car . ".rules", kResourcesDirectory, kUserHomeDirectory), &productions, &reductions, &includes)
 	}
 
 	loadCharacteristics(simulator := false, car := false, track := false, fast := false) {
@@ -1165,8 +1168,8 @@ class SetupWorkbench extends ConfigurationItem {
 			}
 	}
 
-	createKnowledgeBase(productions, reductions, facts := false) {
-		local engine := RuleEngine(productions, reductions, facts)
+	createKnowledgeBase(productions, reductions, facts := false, includes := false) {
+		local engine := RuleEngine(productions, reductions, facts, includes)
 
 		return KnowledgeBase(engine, engine.createFacts(), engine.createRules())
 	}
@@ -1197,7 +1200,7 @@ class SetupWorkbench extends ConfigurationItem {
 	}
 
 	initializeWorkbench(phase1 := "Initializing Setup Workbench", phase2 := "Starting Setup Workbench", phase3 := "Loading Car", fast := false) {
-		local knowledgeBase, simulator, car, x, y, productions, reductions
+		local knowledgeBase, simulator, car, x, y, productions, reductions, includes
 		local simulatorDefinition, carDefinition, ignore, section
 
 		simulator := this.SelectedSimulator
@@ -1257,10 +1260,11 @@ class SetupWorkbench extends ConfigurationItem {
 
 		productions := false
 		reductions := false
+		includes := false
 
-		this.loadRules(&productions, &reductions)
+		this.loadRules(&productions, &reductions, &includes)
 
-		knowledgeBase := this.createKnowledgeBase(productions, reductions)
+		knowledgeBase := this.createKnowledgeBase(productions, reductions, includes)
 
 		this.iKnowledgeBase := knowledgeBase
 

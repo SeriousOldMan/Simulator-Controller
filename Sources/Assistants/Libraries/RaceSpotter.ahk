@@ -1004,9 +1004,11 @@ class RaceSpotter extends GridRaceAssistant {
 
 	__New(configuration, remoteHandler, name := false, language := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, speakerBooster := false
-		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, muted := false, voiceServer := false) {
+		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, agentBooster := false
+		, muted := false, voiceServer := false) {
 		super.__New(configuration, "Race Spotter", remoteHandler, name, language, synthesizer, speaker, vocalics, speakerBooster
-												 , recognizer, listener, listenerBooster, conversationBooster, muted, voiceServer)
+												 , recognizer, listener, listenerBooster, conversationBooster, agentBooster
+												 , muted, voiceServer)
 
 		this.updateConfigurationValues({Announcements: {DeltaInformation: 2, TacticalAdvices: true
 													  , SideProximity: true, RearProximity: true

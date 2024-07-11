@@ -2050,7 +2050,7 @@ class WebView2Viewer extends HTMLViewer {
 				else
 					loop {
 						file := false
-						
+
 						try {
 							file := FileOpen(this.iHTMLFile, "w-rwd", "UTF-8")
 
@@ -2063,7 +2063,7 @@ class WebView2Viewer extends HTMLViewer {
 						}
 						catch Any as exception {
 							logError(exception)
-							
+
 							if file
 								try
 									file.Close()
@@ -2195,6 +2195,10 @@ fixIE(version := 0, exeName := "") {
 }
 
 initializeHTMLViewer() {
+	AddHTMLViewer(window, arguments*) {
+		return createWebView2Viewer(window, arguments*)
+	}
+
 	createWebView2Viewer(window, arguments*) {
 		local control := window.Add("Picture", arguments*)
 		local viewer := WebView2Viewer(control)
@@ -2275,6 +2279,8 @@ initializeHTMLViewer() {
 
 		return control
 	}
+
+	Window.Prototype.AddHTMLViewer := AddHTMLViewer
 
 	fixIE(kExplorerVersions[Strsplit(A_ScriptName, ".")[1]])
 

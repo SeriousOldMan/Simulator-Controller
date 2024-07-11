@@ -414,16 +414,17 @@ class SetupWizard extends ConfiguratorPanel {
 	}
 
 	createKnowledgeBase(facts := false) {
-		local rules, productions, reductions, engine
+		local rules, productions, reductions, includes, engine
 
 		rules := FileRead(kResourcesDirectory . "Setup\Simulator Setup.rules")
 
 		productions := false
 		reductions := false
+		includes := false
 
-		RuleCompiler().compileRules(rules, &productions, &reductions)
+		RuleCompiler().compileRules(rules, &productions, &reductions, &includes)
 
-		engine := RuleEngine(productions, reductions, facts)
+		engine := RuleEngine(productions, reductions, facts, includes)
 
 		return KnowledgeBase(engine, engine.createFacts(), engine.createRules())
 	}

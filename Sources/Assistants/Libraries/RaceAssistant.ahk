@@ -21,6 +21,7 @@
 #Include "..\..\Libraries\RuleEngine.ahk"
 #Include "..\..\Libraries\LLMConnector.ahk"
 #Include "..\..\Libraries\LLMBooster.ahk"
+#Include "..\..\Libraries\LLMAgent.ahk"
 #Include "VoiceManager.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\..\Database\Libraries\SettingsDatabase.ahk"
@@ -52,6 +53,148 @@ global kUnknown := false
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+class AssistantEvent extends AgentEvent {
+	iAssistant := false
+
+	iName := false
+	iEvent := false
+	iGoal := false
+
+	iParameters := []
+
+	iOptions := []
+
+	class Parameter extends LLMTool.Function.Parameter {
+	}
+
+	Assistant {
+		Get {
+			return this.iAssistant
+		}
+	}
+
+	Name {
+		Get {
+			return this.iName
+		}
+	}
+
+	Event {
+		Get {
+			return this.iEvent
+		}
+	}
+
+	Goal {
+		Get {
+			return this.iGoal
+		}
+	}
+
+	Parameters {
+		Get {
+			return this.iParameters
+		}
+	}
+
+	Options {
+		Get {
+			return this.iOptions
+		}
+	}
+
+	Asynchronous {
+		Get {
+			return false
+		}
+	}
+
+	__New(assistant, name, event, parameters, goal := false, options := false) {
+		this.iAssistant := assistant
+
+		this.iName := name
+		this.iEvent := event
+		this.iGoal := goal
+
+		this.iParameters := parameters
+
+		this.iOptions := options
+	}
+
+	createTools() {
+		return []
+	}
+
+	createArguments(event, arguments) {
+		return arguments
+	}
+
+	createTrigger(event, phrase, arguments) {
+		local variables := CaseInsenseMap("event", event)
+		local index, parameter
+
+		for index, parameter in this.Parameters
+			variables[parameter.Name] := (arguments.Has(index) ? arguments[index] : "")
+
+		return substituteVariables(phrase, variables)
+	}
+
+	createGoal(goal, arguments) {
+		return goal
+	}
+
+	createVariables(event, arguments) {
+		local assistant := this.Assistant
+
+		return {assistant: assistant.AssistantType, name: assistant.VoiceManager.Name
+			  , knowledge: JSON.print(assistant.getKnowledge("Agent", this.Options))}
+	}
+
+	handledEvent(event) {
+		return ((this.Event = event) || (this = event))
+	}
+
+	handleEvent(event, arguments*) {
+		local booster := this.Assistant.AgentBooster
+
+		triggerEvent() {
+			return booster.trigger(this, this.createTrigger(this.Event, this.Phrase, arguments)
+								 , this.createGoal(this.Goal, arguments)
+								 , Map("Variables", this.createVariables(event, arguments)))
+		}
+
+		if (booster && this.handledEvent(event)) {
+			arguments := this.createArguments(event, arguments)
+
+			if this.Asynchronous {
+				Task.startTask(triggerEvent, 0, (Task.CurrentTask ? Task.CurrentTask.Priority : kNormalPriority))
+
+				return true
+			}
+			else
+				return triggerEvent()
+		}
+		else
+			return false
+	}
+}
+
+class RuleEvent extends AssistantEvent {
+	iPhrase := false
+
+	Phrase {
+		Get {
+			return this.iPhrase
+		}
+	}
+
+	__New(assistant, name, event, phrase, parameters, goal := false, options := false) {
+		this.iPhrase := phrase
+
+		super.__New(assistant, name, event, parameters, goal, options)
+	}
+}
+
 class RaceAssistant extends ConfigurationItem {
 	iDebug := kDebugOff
 	iOptions := CaseInsenseMap()
@@ -60,7 +203,8 @@ class RaceAssistant extends ConfigurationItem {
 	iSettings := newMultiMap()
 	iVoiceManager := false
 
-	iBooster := false
+	iConversationBooster := false
+	iAgentBooster := false
 
 	iAnnouncements := CaseInsenseMap()
 
@@ -103,6 +247,8 @@ class RaceAssistant extends ConfigurationItem {
 
 	iSettingsDatabase := false
 	iSaveSettings := kNever
+
+	iEvents := []
 
 	class VariablesMap extends CaseInsenseWeakMap {
 		has(*) {
@@ -334,9 +480,15 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	Booster {
+	ConversationBooster {
 		Get {
-			return this.iBooster
+			return this.iConversationBooster
+		}
+	}
+
+	AgentBooster {
+		Get {
+			return this.iAgentBooster
 		}
 	}
 
@@ -418,7 +570,7 @@ class RaceAssistant extends ConfigurationItem {
 
 	Knowledge {
 		Get {
-			static knowledge := ["Session", "Stint", "Fuel", "Weather", "Track", "Tyres"]
+			static knowledge := ["Session", "Stint", "Fuel", "Laps", "Weather", "Track", "Tyres"]
 
 			return knowledge
 		}
@@ -528,7 +680,8 @@ class RaceAssistant extends ConfigurationItem {
 
 	__New(configuration, assistantType, remoteHandler, name := false, language := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, speakerBooster := false
-		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, muted := false, voiceServer := false) {
+		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, agentBooster := false
+		, muted := false, voiceServer := false) {
 		global kUnknown
 
 		local userName := SessionDatabase.getUserName()
@@ -572,6 +725,7 @@ class RaceAssistant extends ConfigurationItem {
 			options["SpeakerBooster"] := ((speakerBooster == true) ? options["SpeakerBooster"] : speakerBooster)
 			options["ListenerBooster"] := ((listenerBooster == true) ? options["ListenerBooster"] : listenerBooster)
 			options["ConversationBooster"] := ((conversationBooster == true) ? options["ConversationBooster"] : conversationBooster)
+			options["AgentBooster"] := ((agentBooster == true) ? options["AgentBooster"] : agentBooster)
 		}
 
 		this.iVoiceManager := this.createVoiceManager(name, options)
@@ -588,7 +742,14 @@ class RaceAssistant extends ConfigurationItem {
 			booster := ChatBooster(this, options["ConversationBooster"], this.Configuration, this.VoiceManager.Language)
 
 			if (booster.Model && booster.Active)
-				this.iBooster := booster
+				this.iConversationBooster := booster
+		}
+
+		if options["AgentBooster"] {
+			booster := EventBooster(this, options["AgentBooster"], this.Configuration, this.VoiceManager.Language)
+
+			if (booster.Model && booster.Active)
+				this.iAgentBooster := booster
 		}
 
 		if muted
@@ -627,6 +788,11 @@ class RaceAssistant extends ConfigurationItem {
 			options["ConversationBooster"] := ((getMultiMapValue(configuration, "Conversation Booster", this.AssistantType . ".Model", kUndefined) != kUndefined) ? this.AssistantType : false)
 		else
 			options["ConversationBooster"] := false
+
+		if getMultiMapValue(configuration, "Agent Booster", this.AssistantType . ".Agent", true)
+			options["AgentBooster"] := ((getMultiMapValue(configuration, "Agent Booster", this.AssistantType . ".Model", kUndefined) != kUndefined) ? this.AssistantType : false)
+		else
+			options["AgentBooster"] := false
 	}
 
 	createVoiceManager(name, options) {
@@ -808,13 +974,22 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	getTools() {
-		static tools := false
+	getTools(type) {
+		static conversationTools := false
+		static agentTools := false
 
-		if !tools
-			tools := this.createConversationTools()
+		if (type = "Conversation") {
+			if !conversationTools
+				conversationTools := this.createConversationTools()
 
-		return tools
+			return conversationTools
+		}
+		else if (type = "Agent") {
+			if !agentTools
+				agentTools := this.createAgentTools()
+
+			return agentTools
+		}
 	}
 
 	activeTopic(options, topic) {
@@ -840,10 +1015,10 @@ class RaceAssistant extends ConfigurationItem {
 			return inList(this.Knowledge, topic)
 	}
 
-	getKnowledge(options := false) {
+	getKnowledge(type, options := false) {
 		local knowledgeBase := this.KnowledgeBase
 		local knowledge := Map()
-		local lapNumber, tyreSet
+		local lapNumber, tyreSet, lapNr, laps
 
 		static sessionTypes
 
@@ -876,6 +1051,30 @@ class RaceAssistant extends ConfigurationItem {
 									   , "Remaining", (Round(knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.Remaining", 0), 1) . " Liter")
 									   , "Consumption", (Round(knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.AvgConsumption", 0), 1)  . " Liter"))
 
+			if this.activeTopic(options, "Laps") {
+				laps := []
+
+				loop lapNumber {
+					lapNr := (lapNumber - A_Index + 1)
+
+					if knowledgeBase.hasFact("Lap." . lapNr . ".Time")
+						laps.Push(Map("Nr", lapNr
+									, "Time", (Round(knowledgeBase.getValue("Lap." . lapNr . ".Time") / 1000) . " Seconds")
+									, "FuelConsumption", (Round(knowledgeBase.getValue("Lap." . lapNr . ".Fuel.Consumption")) . " Liters")
+									, "FuelRemaining", (Round(knowledgeBase.getValue("Lap." . lapNr . ".Fuel.Remaining")) . " Liters")
+									, "Weather", knowledgeBase.getValue("Lap." . lapNr . ".Weather")
+									, "AirTemperature", knowledgeBase.getValue("Lap." . lapNr . ".Temperature.Air")
+									, "TrackTemperature", knowledgeBase.getValue("Lap." . lapNr . ".Temperature.Track")
+									, "Grip", knowledgeBase.getValue("Lap." . lapNr . ".Grip")
+									, "Valid", (knowledgeBase.getValue("Lap." . lapNr . ".Valid") ? kTrue : kFalse)))
+					else
+						break
+				}
+
+				if (laps.Length > 0)
+					knowledge["Laps"] := reverse(laps)
+			}
+
 			if this.activeTopic(options, "Weather")
 				knowledge["Weather"] := Map("Now", knowledgeBase.getValue("Weather.Weather.Now")
 										  , "10Min", knowledgeBase.getValue("Weather.Weather.10Min")
@@ -904,9 +1103,10 @@ class RaceAssistant extends ConfigurationItem {
 		local ignore, part
 
 		if (grammar = "Text") {
-			if this.Booster {
-				text := this.Booster.ask(text, Map("Variables", {assistant: this.AssistantType, name: this.VoiceManager.Name
-															   , knowledge: JSON.print(this.getKnowledge())}))
+			if this.ConversationBooster {
+				text := this.ConversationBooster.ask(text
+												   , Map("Variables", {assistant: this.AssistantType, name: this.VoiceManager.Name
+																	 , knowledge: JSON.print(this.getKnowledge("Conversation"))}))
 
 				if text {
 					if (text != true)
@@ -1191,162 +1391,44 @@ class RaceAssistant extends ConfigurationItem {
 		this.VoiceManager.clearContinuation()
 	}
 
-	createConversationTools() {
-		local configuration := readMultiMap(kResourcesDirectory . "Actions\" . this.AssistantType . ".actions")
-		local tools := []
-		local loadedRules := CaseInsenseMap()
-		local activationIndex := 1
-		local ignore, action, definition, parameters, parameter, enumeration, handler, enoughData, confirm, required
+	registerEvent(event) {
+		this.iEvents.Push(event)
+	}
 
-		normalizeCall(&function, &arguments) {
-			local index, argument
+	handledEvent(event) {
+		local ignore, candidate
 
-			if InStr(function, "(") {
-				function := StrSplit(Trim(function), "(", " `t", 2)
+		if this.AgentBooster
+			for ignore, candidate in this.iEvents
+				if ((candidate = event) || (candidate.Event = event))
+					return candidate.handledEvent(event)
 
-				arguments := concatenate(string2Values(",", SubStr(function[2], 1, StrLen(function[2]) - 1)), arguments)
+		return false
+	}
 
-				for index, argument in arguments {
-					argument := Trim(argument, " `t`n")
+	handleEvent(event, arguments*) {
+		local ignore, candidate
 
-					if (argument = kTrue)
-						arguments[index] := true
-					else if (argument = kFalse)
-						arguments[index] := false
-					else if ((InStr(argument, "`"") = 1) && (StrLen(argument) > 1) && (SubStr(argument, StrLen(argument)) = "`""))
-						arguments[index] := SubStr(argument, 2, StrLen(argument) - 2)
-				}
+		if this.AgentBooster
+			for ignore, candidate in this.iEvents
+				if (candidate.handledEvent(event) && candidate.handleEvent(event, arguments*))
+					return true
 
-				function := Trim(function[1], " `t`n")
-			}
-		}
+		return false
+	}
 
-		printArguments(arguments) {
-			arguments := arguments.Clone()
+	createAgentEvents(&productions, &reductions, &includes) {
+		local configuration := readMultiMap(kResourcesDirectory . "Actions\" . this.AssistantType . ".events")
+		local events := []
+		local ignore, event, definition, parameters, parameter, enumeration, required, handler
 
-			loop arguments.Length
-				if !arguments.Has(A_Index)
-					arguments[A_Index] := ""
+		addMultiMapValues(configuration, readMultiMap(kUserHomeDirectory . "Actions\" . this.AssistantType . ".events"))
 
-			return values2String(", ", arguments*)
-		}
-
-		callMethod(method, enoughData, confirm, arguments*) {
-			local ignore, methodArguments
-
-			if !this.confirmCommand(enoughData, confirm)
-				return
-
-			for ignore, method in StrSplit(method, "`n") {
-				normalizeCall(&method, &methodArguments := arguments)
-
-				if isDebug()
-					showMessage("LLM -> this." . method . "(" .  printArguments(methodArguments) . ")")
-
-				this.%method%(methodArguments*)
-			}
-		}
-
-		callRule(action, ruleFileName, enoughData, confirm, parameters, arguments*) {
-			local knowledgeBase := this.KnowledgeBase
-			local rules, ignore, rule, productions, reductions, index, parameter, names, variables
-
-			if knowledgeBase {
-				if !this.confirmCommand(enoughData, confirm)
-					return
-
-				if !loadedRules.Has(ruleFileName) {
-					rules := FileRead(getFileName(ruleFileName, kUserHomeDirectory . "Actions\", kResourcesDirectory . "Actions\"))
-
-					variables := CaseInsenseMap("activation", "__" . action . ".A")
-					names := CaseInsenseMap()
-
-					for ignore, parameter in parameters
-						try {
-							names[parameter.Name] := variables[parameter.Name] := ("__" . action . ".P" . A_Index)
-						}
-						catch Any as exception {
-							logError(exception, true)
-						}
-
-					rules := substituteVariables(rules, variables)
-
-					productions := false
-					reductions := false
-
-					RuleCompiler().compileRules(rules, &productions, &reductions)
-
-					for ignore, rule in productions
-						knowledgeBase.addRule(rule)
-
-					for ignore, rule in reductions
-						knowledgeBase.addRule(rule)
-
-					loadedRules[ruleFileName] := [("__" . action . ".A"), names]
-				}
-			}
-
-			knowledgeBase.setFact(loadedRules[ruleFileName][1], true)
-
-			names := loadedRules[ruleFileName][2]
-
-			for index, parameter in parameters
-				try {
-					knowledgeBase.setFact(names[parameter.Name], arguments[index])
-				}
-				catch UnsetItemError {
-					knowledgeBase.clearFact(names[parameter.Name])
-				}
-
-			knowledgeBase.produce()
-
-			knowledgeBase.clearFact(loadedRules[ruleFileName][1])
-
-			if this.Debug[kDebugKnowledgeBase]
-				this.dumpKnowledgeBase(knowledgeBase)
-		}
-
-		callControllerMethod(method, enoughData, confirm, arguments*) {
-			local ignore, methodArguments
-
-			if this.RemoteHandler
-				for ignore, method in StrSplit(method, "`n") {
-					if !this.confirmCommand(enoughData, confirm)
-						return
-
-					normalizeCall(&method, &methodArguments := arguments)
-
-					if isDebug()
-						showMessage("LLM -> Controller." . method . "(" .  printArguments(methodArguments) . ")")
-
-					this.RemoteHandler.customAction("Method", method, methodArguments*)
-				}
-		}
-
-		callControllerFunction(function, enoughData, confirm, arguments*) {
-			local ignore, functionArguments
-
-			if this.RemoteHandler
-				for ignore, function in StrSplit(function, "`n") {
-					if !this.confirmCommand(enoughData, confirm)
-						return
-
-					normalizeCall(&function, &functionArguments := arguments)
-
-					if isDebug()
-						showMessage("LLM -> Controller:" . function . "(" .  printArguments(functionArguments) . ")")
-
-					this.RemoteHandler.customAction("Function", function, functionArguments*)
-				}
-		}
-
-		addMultiMapValues(configuration, readMultiMap(kUserHomeDirectory . "Actions\" . this.AssistantType . ".actions"))
-
-		for ignore, action in string2Values(",", getMultiMapValue(configuration, "Actions", "Active", "")) {
-			definition := getMultiMapValue(configuration, "Custom", action, false)
+		for ignore, event in string2Values(",", getMultiMapValue(configuration, "Agent.Events", "Active", "")) {
+			definition := getMultiMapValue(configuration, "Agent.Events.Custom", event, false)
 
 			if !definition
-				definition := getMultiMapValue(configuration, "Builtin", action, false)
+				definition := getMultiMapValue(configuration, "Agent.Events.Builtin", event, false)
 
 			try {
 				if definition {
@@ -1354,7 +1436,7 @@ class RaceAssistant extends ConfigurationItem {
 					parameters := []
 
 					loop definition[5] {
-						parameter := string2Values("|", getMultiMapValue(configuration, "Parameters", action . "." . A_Index, ""))
+						parameter := string2Values("|", getMultiMapValue(configuration, "Agent.Events.Parameters", event . "." . A_Index, ""))
 
 						if (parameter.Length >= 5) {
 							enumeration := string2Values(",", parameter[3])
@@ -1364,42 +1446,61 @@ class RaceAssistant extends ConfigurationItem {
 
 							required := ((parameter[4] = kTrue) ? kTrue : ((parameter[4] = kFalse) ? false : parameter[4]))
 
-							parameters.Push(LLMTool.Function.Parameter(parameter[1], parameter[5], parameter[2], enumeration, required))
+							parameters.Push(AssistantEvent.Parameter(parameter[1], parameter[5], parameter[2]
+																   , enumeration, required))
 						}
 					}
 
-					enoughData := ((definition[3] = kTrue) ? true : ((definition[3] = kFalse) ? false : definition[3]))
-					confirm := ((definition[4] = kTrue) ? true : ((definition[4] = kFalse) ? false : definition[4]))
-
 					switch definition[1], false {
-						case "Assistant.Method":
-							handler := callMethod.Bind(definition[2], enoughData, confirm)
+						case "Assistant.Class":
+							handler := %definition[2]%(this, event, definition[3], parameters)
 						case "Assistant.Rule":
-							handler := callRule.Bind(action, definition[2], enoughData, confirm, parameters)
-						case "Controller.Method":
-							handler := callControllerMethod.Bind(definition[2], enoughData, confirm)
-						case "Controller.Function":
-							handler := callControllerFunction.Bind(definition[2], enoughData, confirm)
+							RuleCompiler().compileRules(FileRead(getFileName(definition[2], kUserHomeDirectory . "Actions\"
+																						  , kResourcesDirectory . "Actions\"))
+													  , &productions, &reductions, &includes)
+
+							handler := RuleEvent(this, event, definition[3], definition[4], parameters)
 						default:
-							throw "Unknown action type (" definition[1] . ") detected in RaceAssistant.createConversationTools..."
+							throw "Unknown event type (" definition[1] . ") detected in RaceAssistant.createAgentEvents..."
 					}
 
-					if handler
-						tools.Push(LLMTool.Function(action, definition[6], parameters, handler))
+					this.registerEvent(handler)
+
+					events.Push(handler)
 				}
 				else
-					throw "Unknown action (" action . ") detected in RaceAssistant.createConversationTools..."
+					throw "Unknown event (" event . ") detected in RaceAssistant.createAgentEvents..."
 			}
 			catch Any as exception {
 				logError(exception, true)
 			}
 		}
 
-		return tools
+		return events
+	}
+
+	createAgentTools() {
+		local tools, ignore, event
+
+		if this.AgentBooster {
+			tools := createTools(this, "Agent")
+
+			for ignore, event in this.iEvents
+				tools := concatenate(tools, event.createTools())
+
+			return tools
+		}
+		else
+			return []
+	}
+
+	createConversationTools() {
+		return createTools(this, "Conversation")
 	}
 
 	createKnowledgeBase(facts := false) {
 		local compiler := RuleCompiler()
+		local includes := []
 		local rules, productions, reductions, engine, knowledgeBase, ignore, compound, compoundColor
 
 		rules := FileRead(getFileName(this.AssistantType . ".rules", kUserRulesDirectory, kRulesDirectory))
@@ -1407,15 +1508,23 @@ class RaceAssistant extends ConfigurationItem {
 		productions := false
 		reductions := false
 
-		compiler.compileRules(rules, &productions, &reductions)
+		compiler.compileRules(rules, &productions, &reductions, &includes)
 
-		if this.Booster {
-			rules := FileRead(getFileName("Custom Actions.rules", kUserRulesDirectory, kRulesDirectory))
+		if this.ConversationBooster {
+			rules := FileRead(getFileName("Conversation Actions.rules", kUserRulesDirectory, kRulesDirectory))
 
-			compiler.compileRules(rules, &productions, &reductions)
+			compiler.compileRules(rules, &productions, &reductions, &includes)
 		}
 
-		engine := RuleEngine(productions, reductions, facts)
+		if this.AgentBooster {
+			rules := FileRead(getFileName("Agent Actions.rules", kUserRulesDirectory, kRulesDirectory))
+
+			compiler.compileRules(rules, &productions, &reductions, &includes)
+
+			this.createAgentEvents(&productions, &reductions, &includes)
+		}
+
+		engine := RuleEngine(productions, reductions, facts, includes)
 
 		knowledgeBase := RaceAssistant.RaceKnowledgeBase(this, engine, engine.createFacts(), engine.createRules())
 
@@ -2084,6 +2193,8 @@ class RaceAssistant extends ConfigurationItem {
 		}
 
 		knowledgeBase.addFact("Lap." . lapNumber . ".Weather", weatherNow)
+		knowledgeBase.addFact("Lap." . lapNumber . ".Weather.10Min", weather10Min)
+		knowledgeBase.addFact("Lap." . lapNumber . ".Weather.30Min", weather30Min)
 		knowledgeBase.addFact("Lap." . lapNumber . ".Grip", getMultiMapValue(data, "Track Data", "Grip", "Green"))
 		knowledgeBase.addFact("Lap." . lapNumber . ".Temperature.Air", airTemperature)
 		knowledgeBase.addFact("Lap." . lapNumber . ".Temperature.Track", trackTemperature)
@@ -2408,9 +2519,9 @@ class GridRaceAssistant extends RaceAssistant {
 		}
 	}
 
-	getKnowledge(options := false) {
+	getKnowledge(type, options := false) {
 		local knowledgeBase := this.KnowledgeBase
-		local knowledge := super.getKnowledge(options)
+		local knowledge := super.getKnowledge(type, options)
 		local driver := (knowledgeBase ? knowledgeBase.getValue("Driver.Car", false) : false)
 		local standingsData := CaseInsenseWeakMap()
 		local standings := []
@@ -3806,10 +3917,262 @@ speakAssistant(context, message) {
 
 Assistant_Speak := speakAssistant
 
+raiseEvent(context, event, arguments*) {
+	try {
+		return context.KnowledgeBase.RaceAssistant.handleEvent(normalizeArguments(Array(event, arguments*))*)
+	}
+	catch Any as exception {
+		logError(exception, true)
+
+		return false
+	}
+}
+
+Assistant_Raise := raiseEvent
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+createTools(assistant, type) {
+	local configuration := readMultiMap(kResourcesDirectory . "Actions\" . assistant.AssistantType . ".actions")
+	local tools := []
+	local loadedRules := CaseInsenseMap()
+	local activationIndex := 1
+	local ignore, action, definition, parameters, parameter, enumeration, handler, enoughData, confirm, required
+
+	normalizeCall(&function, &arguments) {
+		local index, argument
+
+		if InStr(function, "(") {
+			function := StrSplit(Trim(function), "(", " `t", 2)
+
+			arguments := concatenate(string2Values(",", SubStr(function[2], 1, StrLen(function[2]) - 1)), arguments)
+
+			for index, argument in arguments {
+				argument := Trim(argument, " `t`n")
+
+				if (argument = kTrue)
+					arguments[index] := true
+				else if (argument = kFalse)
+					arguments[index] := false
+				else if ((InStr(argument, "`"") = 1) && (StrLen(argument) > 1) && (SubStr(argument, StrLen(argument)) = "`""))
+					arguments[index] := SubStr(argument, 2, StrLen(argument) - 2)
+			}
+
+			function := Trim(function[1], " `t`n")
+		}
+	}
+
+	printArguments(arguments) {
+		arguments := arguments.Clone()
+
+		loop arguments.Length
+			if !arguments.Has(A_Index)
+				arguments[A_Index] := ""
+
+		return values2String(", ", arguments*)
+	}
+
+	addRules(rules) {
+		local knowledgeBase := assistant.KnowledgeBase
+		local productions := false
+		local reductions := false
+		local includes := false
+		local ignore, rule
+
+		knowledgeBase.compileRules(rules, &productions, &reductions, &includes)
+
+		for ignore, rule in productions
+			knowledgeBase.addRule(rule)
+
+		for ignore, rule in reductions
+			knowledgeBase.addRule(rule)
+
+		knowledgeBase.registerIncludes(includes)
+	}
+
+	runAction(enoughData, confirm) {
+		if (type = "Conversation") {
+			if !assistant.confirmCommand(enoughData, confirm)
+				return false
+		}
+		else if (type = "Agent") {
+			if (enoughData && !assistant.hasEnoughData(false))
+				return false
+		}
+
+		return true
+	}
+
+	callMethod(method, enoughData, confirm, arguments*) {
+		local ignore, methodArguments
+
+		if !runAction(enoughData, confirm)
+			return
+
+		for ignore, method in StrSplit(method, "`n") {
+			normalizeCall(&method, &methodArguments := arguments)
+
+			if isDebug()
+				showMessage("LLM -> this." . method . "(" .  printArguments(methodArguments) . ")")
+
+			assistant.%method%(methodArguments*)
+		}
+	}
+
+	callRule(action, ruleFileName, enoughData, confirm, parameters, arguments*) {
+		local knowledgeBase := assistant.KnowledgeBase
+		local index, parameter, names, variables
+		local productions, reductions, includes, ignore, rule
+
+		if knowledgeBase {
+			if !runAction(enoughData, confirm)
+				return
+
+			if !loadedRules.Has(ruleFileName) {
+				rules := FileRead(getFileName(ruleFileName, kUserHomeDirectory . "Actions\", kResourcesDirectory . "Actions\"))
+
+				variables := CaseInsenseMap("activation", "__" . action . ".A")
+				names := CaseInsenseMap()
+
+				for ignore, parameter in parameters
+					try {
+						names[parameter.Name] := variables[parameter.Name] := ("__" . action . ".P" . A_Index)
+					}
+					catch Any as exception {
+						logError(exception, true)
+					}
+
+				knowledgeBase.compileRules(substituteVariables(rules, variables)
+										 , &productions := false, &reductions := false, &includes := false)
+
+				for ignore, rule in productions
+					knowledgeBase.addRule(rule)
+
+				for ignore, rule in reductions
+					knowledgeBase.addRule(rule)
+
+				knowledgeBase.registerIncludes(includes)
+
+				loadedRules[ruleFileName] := [("__" . action . ".A"), names]
+			}
+		}
+
+		knowledgeBase.setFact(loadedRules[ruleFileName][1], true)
+
+		names := loadedRules[ruleFileName][2]
+
+		for index, parameter in parameters
+			try {
+				knowledgeBase.setFact(names[parameter.Name], arguments[index])
+			}
+			catch UnsetItemError {
+				knowledgeBase.clearFact(names[parameter.Name])
+			}
+
+		knowledgeBase.produce()
+
+		knowledgeBase.clearFact(loadedRules[ruleFileName][1])
+
+		if assistant.Debug[kDebugKnowledgeBase]
+			assistant.dumpKnowledgeBase(knowledgeBase)
+	}
+
+	callControllerMethod(method, enoughData, confirm, arguments*) {
+		local ignore, methodArguments
+
+		if assistant.RemoteHandler {
+			if !runAction(enoughData, confirm)
+				return
+
+			for ignore, method in StrSplit(method, "`n") {
+				normalizeCall(&method, &methodArguments := arguments)
+
+				if isDebug()
+					showMessage("LLM -> Controller." . method . "(" .  printArguments(methodArguments) . ")")
+
+				assistant.RemoteHandler.customAction("Method", method, methodArguments*)
+			}
+		}
+	}
+
+	callControllerFunction(function, enoughData, confirm, arguments*) {
+		local ignore, functionArguments
+
+		if assistant.RemoteHandler {
+			if !runAction(enoughData, confirm)
+				return
+
+			for ignore, function in StrSplit(function, "`n") {
+				normalizeCall(&function, &functionArguments := arguments)
+
+				if isDebug()
+					showMessage("LLM -> Controller:" . function . "(" .  printArguments(functionArguments) . ")")
+
+				assistant.RemoteHandler.customAction("Function", function, functionArguments*)
+			}
+		}
+	}
+
+	addMultiMapValues(configuration, readMultiMap(kUserHomeDirectory . "Actions\" . assistant.AssistantType . ".actions"))
+
+	for ignore, action in string2Values(",", getMultiMapValue(configuration, type . ".Actions", "Active", "")) {
+		definition := getMultiMapValue(configuration, type . ".Actions.Custom", action, false)
+
+		if !definition
+			definition := getMultiMapValue(configuration, type . ".Actions.Builtin", action, false)
+
+		try {
+			if definition {
+				definition := string2Values("|", definition)
+				parameters := []
+
+				loop definition[5] {
+					parameter := string2Values("|", getMultiMapValue(configuration, type . ".Actions.Parameters", action . "." . A_Index, ""))
+
+					if (parameter.Length >= 5) {
+						enumeration := string2Values(",", parameter[3])
+
+						if (enumeration.Length = 0)
+							enumeration := false
+
+						required := ((parameter[4] = kTrue) ? kTrue : ((parameter[4] = kFalse) ? false : parameter[4]))
+
+						parameters.Push(LLMTool.Function.Parameter(parameter[1], parameter[5], parameter[2], enumeration, required))
+					}
+				}
+
+				enoughData := ((definition[3] = kTrue) ? true : ((definition[3] = kFalse) ? false : definition[3]))
+				confirm := ((definition[4] = kTrue) ? true : ((definition[4] = kFalse) ? false : definition[4]))
+
+				switch definition[1], false {
+					case "Assistant.Method":
+						handler := callMethod.Bind(definition[2], enoughData, confirm)
+					case "Assistant.Rule":
+						handler := callRule.Bind(action, definition[2], enoughData, confirm, parameters)
+					case "Controller.Method":
+						handler := callControllerMethod.Bind(definition[2], enoughData, confirm)
+					case "Controller.Function":
+						handler := callControllerFunction.Bind(definition[2], enoughData, confirm)
+					default:
+						throw "Unknown action type (" definition[1] . ") detected in RaceAssistant.createConversationTools..."
+				}
+
+				if handler
+					tools.Push(LLMTool.Function(action, definition[6], parameters, handler))
+			}
+			else
+				throw "Unknown action (" action . ") detected in RaceAssistant.createConversationTools..."
+		}
+		catch Any as exception {
+			logError(exception, true)
+		}
+	}
+
+	return tools
+}
 
 matchFragment(words, fragment) {
 	local score := 0
@@ -3834,11 +4197,11 @@ normalizeArguments(arguments, remote := false) {
 
 	for ignore, argument in arguments
 		if (argument = kNotInitialized)
-			result.Push(!remote ? unset : kUndefined)
+			result.Push(remote ? kUndefined : unset)
 		else
 			try {
 				if ((InStr(argument, "?") = 1) || (InStr(argument, "!") = 1))
-					result.Push(!remote ? unset : kUndefined)
+					result.Push(remote ? kUndefined : unset)
 				else
 					result.Push(argument)
 			}

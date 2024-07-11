@@ -1891,7 +1891,7 @@ class RaceCenter extends ConfigurationItem {
 		centerGui.SetFont("s9 Norm", "Arial")
 
 		centerGui.Add("Documentation", "x608 YP+20 w134 H:Center Center", translate("Race Center")
-					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#race-center")
+					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center")
 
 		centerGui.Add("Text", "x8 yp+30 w1350 W:Grow 0x10")
 
@@ -12529,7 +12529,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false, arguments*) {
 		teamGui.SetFont("s9 Norm", "Arial")
 
 		teamGui.Add("Documentation", "x148 YP+20 w112 Center", translate("Team Selection")
-				  , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#session--stint-planning")
+				  , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#session--stint-planning")
 
 		teamGui.SetFont("s8 Norm", "Arial")
 

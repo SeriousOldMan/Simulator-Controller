@@ -198,9 +198,11 @@ class DrivingCoach extends GridRaceAssistant {
 
 	__New(configuration, remoteHandler, name := false, language := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, speakerBooster := false
-		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, muted := false, voiceServer := false) {
+		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, agentBooster := false
+		, muted := false, voiceServer := false) {
 		super.__New(configuration, "Driving Coach", remoteHandler, name, language, synthesizer, speaker, vocalics, speakerBooster
-												  , recognizer, listener, listenerBooster, conversationBooster, muted, voiceServer)
+												  , recognizer, listener, listenerBooster, conversationBooster, agentBooster
+												  , muted, voiceServer)
 
 		this.updateConfigurationValues({Announcements: {SessionInformation: true, StintInformation: false, HandlingInformation: false}})
 
@@ -383,7 +385,7 @@ class DrivingCoach extends GridRaceAssistant {
 				}
 			case "Knowledge":
 				if knowledgeBase
-					return substituteVariables(this.Instructions["Knowledge"], {knowledge: JSON.print(this.getKnowledge())})
+					return substituteVariables(this.Instructions["Knowledge"], {knowledge: JSON.print(this.getKnowledge("Conversation"))})
 			case "Handling":
 				if (knowledgeBase && this.Announcements["HandlingInformation"]) {
 					collector := this.iTelemetryCollector

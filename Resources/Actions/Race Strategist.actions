@@ -1,9 +1,22 @@
-[Actions]
+[Conversation.Actions]
 Active=plan_pitstop,simulate_pitstop,update_strategy
-[Builtin]
+[Conversation.Actions.Builtin]
 plan_pitstop=Assistant.Method|planPitstop|false|true|1|Ask the Engineer to plan a pitstop.
 simulate_pitstop=Assistant.Method|recommendPitstop|false|true|1|Simulates the outcome of an upcoming pitstop. The traffic situation after the pitstop will be evaluated and the target lap will be optimized, if an undercut is possible.
 update_strategy=Assistant.Method|recommendStrategy|true|true|0|Trigger a recalculation of the current race strategy.
-[Parameters]
+[Conversation.Actions.Parameters]
 plan_pitstop.1=targetLap|Integer||false|The planned lap for the car to come to the pit.
 simulate_pitstop.1=targetLap|Integer||false|The planned lap for the car to come to the pit.
+[Agent.Actions]
+Active=report_weather_forecast,plan_pitstop,simulate_pitstop,update_strategy
+[Agent.Actions.Builtin]
+report_weather_forecast=Assistant.Method|weatherForecast|false|false|2|Report an upcoming change in the weather conditions.
+plan_pitstop=Assistant.Method|planPitstop|false|true|1|Ask the Engineer to plan a pitstop.
+simulate_pitstop=Assistant.Method|recommendPitstop|false|true|1|Simulates the outcome of an upcoming pitstop. The traffic situation after the pitstop will be evaluated and the target lap will be optimized, if an undercut is possible.
+update_strategy=Assistant.Method|recommendStrategy|true|true|0|Trigger a recalculation of the current race strategy.
+[Agent.Actions.Parameters]
+plan_pitstop.1=targetLap|Integer||false|The planned lap for the car to come to the pit.
+simulate_pitstop.1=targetLap|Integer||false|The planned lap for the car to come to the pit.
+report_weather_forecast.1=weather|String|Dry,Drizzle,LightRain,MediumRain,HeavyRain,Thunderstorm|true|A symbol that represents the upcoming weather.
+report_weather_forecast.2=minutes|Integer||true|The time in minutes when the weather will change.
+report_weather_forecast.3=changeTyres|Boolean||true|Indicates that a tyre change might be necessary.

@@ -1812,6 +1812,7 @@ windowProc(hwnd, uMsg, wParam, lParam) {
 
 			return DllCall("gdi32\GetStockObject", "Int", DC_BRUSH, "Ptr")
 
+		/*
 		case WM_CTLCOLORSTATIC:
 			if isInstance(control, Gui.Edit) {
 				DllCall("gdi32\SetTextColor", "Ptr", wParam, "UInt", theme.DarkColors["Font"])
@@ -1819,6 +1820,7 @@ windowProc(hwnd, uMsg, wParam, lParam) {
 
 				return theme.TextBackgroundBrush
 			}
+		*/
 	}
 
 	return DllCall("user32\CallWindowProc", "Ptr", window.WindowProc, "Ptr", hwnd, "UInt", uMsg, "Ptr", wParam, "Ptr", lParam)

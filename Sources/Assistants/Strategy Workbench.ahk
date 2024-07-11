@@ -2126,7 +2126,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			if (maxValue = kUndefined)
 				maxValue := 0
 
-			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: {minValue: " . minValue . ", maxValue: " . maxValue . ", titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: { color: '" . this.Window.Theme.WindowBackColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Disabled"] . "'}}, vAxis: {gridlines: { color: '" . this.Window.Theme.WindowBackColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Disabled"] . "'}} };")
+			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: { title: '" . translate(xAxis) . "', minValue: " . minValue . ", maxValue: " . maxValue . ", titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: { color: '" . this.Window.Theme.WindowBackColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Disabled"] . "'}}, vAxis: {gridlines: { color: '" . this.Window.Theme.WindowBackColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Disabled"] . "'}} };")
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 		}
 		else if (this.SelectedChartType = "Bubble") {
@@ -2135,7 +2135,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BubbleChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 		}
 		else if (this.SelectedChartType = "Line") {
-			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, vAxis: { gridlines: { color: '" . this.Window.Theme.WindowBackColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Disabled"] . "'}}, hAxis: { gridlines: { color: '" . this.Window.Theme.WindowBackColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Disabled"] . "'}}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "' };")
+			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, vAxis: { gridlines: { color: '" . this.Window.Theme.WindowBackColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Disabled"] . "'}}, hAxis: { title: '" . translate(xAxis) . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: { color: '" . this.Window.Theme.WindowBackColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Disabled"] . "'}}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "' };")
 
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 		}

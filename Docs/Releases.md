@@ -17,9 +17,13 @@
      - The documentation for "Race Center" has been moved to a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center).
      - All new complete documentation of the builtin [Hybrid Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine).
   8. The transcript of LLM invocations in any Assistant Booster now includes the events raised and actions invoked. Transcripts of Assistant Boosters are normally stored in the *Simulator Controller\Logs* folder, which is located in the user *Documents* folder.
-  9. The available color schemes has been revised and a new dark color scheme has been added.
+  9. The available color schemes has been revised and a new dark color scheme has been added. Four color schemes ae now available:
+     - Classic (default, the original color scheme of Simulator Controller)
+	 - Gray (formerly named "Dark")
+	 - Light (formerly named "Windows", uses the default Windows colors)
+	 - Dark (new, uses the dark theme colors of Windows 10 / 11)
   10. [Internal] Implemented a postprocessor for the compiler which compresses the binary files. The applications are much smaller now.
-  11. [Internal] Migrated to AHK 2.0.18.
+  11. [Internal] Migrated to AHK 2.1-alpha.14 (needed for dark color scheme).
 
 ## 5.7.9.0-release 07/05/24
   1. Minor bugfixes, as always

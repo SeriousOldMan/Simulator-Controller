@@ -1,9 +1,9 @@
 [Development]
 Version=5.8.0.0-dev
 Target=5.8.0.0-release
-Date=07/11/2024
+Date=07/12/2024
 Download=
-Changes=Full implementation of an Agent framwork to include LLMs in the reasoning process of the Race Assistants, Renamed "Conversion Booster" to "Assistant Booster", Added new documention chapter on "Customizing Assistants", New post compilation compression makes binaries much smaller, All new documentation for the rule engine, "Strategy Workbench" has now its own documentation chapter, "Practice Center" has now its own documentation chapter, "Race Reports" has now its own documentation chapter, "Session Database" has now its own documentation chapter, "Race Center" has now its own documentation chapter, New color schemes
+Changes=Full implementation of an Agent framwork to include LLMs in the reasoning process of the Race Assistants, Renamed "Conversion Booster" to "Assistant Booster", Added new documention chapter on "Customizing Assistants", New post compilation compression makes binaries much smaller, All new documentation for the rule engine, "Strategy Workbench" has now its own documentation chapter, "Practice Center" has now its own documentation chapter, "Race Reports" has now its own documentation chapter, "Session Database" has now its own documentation chapter, "Race Center" has now its own documentation chapter, New color scheme names, New dark color scheme
 Components=Media->5.6.1,Configuration->5.7.5,Utilities->5.4.8
 [Release]
 Version=5.7.9.0-release

@@ -44,11 +44,22 @@ You can choose the context with the first two dropdown menus, for example 1. whe
 
 ### Theme and Splash Screen configuration
 
-In the lower part of the settings dialog, you can choose one of the color schemes to be used for all applications and you can select one of the [splash screens](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#splash-screen-editor), which will be used for your entertainment during the startup process. Please see the [installation guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#using-your-own-pictures-videos-and-sounds-for-all-the-splash-screens) on how to install your own media files in a special location in your *Documents* folder and hot to use the splash screen editor. If you decide to play a song while starting your Simulator Controller applications and even your favorite simulation game, the song will keep playing until you press the left mouse button or the Escape key, even if *Simulator Startup* has exited already.
+In the lower part of the settings dialog, you can choose one of the color schemes (see below) to be used for all applications and you can select one of the [splash screens](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#splash-screen-editor), which will be used for your entertainment during the startup process. Please see the [installation guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#using-your-own-pictures-videos-and-sounds-for-all-the-splash-screens) on how to install your own media files in a special location in your *Documents* folder and hot to use the splash screen editor. If you decide to play a song while starting your Simulator Controller applications and even your favorite simulation game, the song will keep playing until you press the left mouse button or the Escape key, even if *Simulator Startup* has exited already.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Splash%20Screen.JPG)
 
 Last, but not least, you can choose a simulation game from your list of Simulators and start it automatically, after all other startup tasks have finished.
+
+#### Color Schemes
+
+Four different color schemes are available:
+
+| Scheme     | Description                                                                    |
+|------------|--------------------------------------------------------------------------------|
+| Classic    | This is the default and original color scheme with a light gray background.    |
+| Gray       | Quite similar to *Classic*, but with darker gray tones.                        |
+| Light      | A very bright color scheme using the default colors of Windows 10 / 11.        |
+| Dark       | Fully Inverted color scheme based on the dark color scheme of Windows 10 / 11. |
 
 ### More Settings & Configurations
 

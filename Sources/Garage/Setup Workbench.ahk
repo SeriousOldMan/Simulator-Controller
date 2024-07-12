@@ -822,7 +822,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 				drawChartFunction .= "`n]);"
 
-				drawChartFunction .= ("`nvar options = { legend: { textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, bar: { groupWidth: " . (settings.Length * 16) . " }, vAxis: { textPosition: 'none', baseline: 'none', gridlines: 'none', textStyle: { color: '" . this.Window.Theme.TextColor["Tick"] . "'} }, hAxis: {maxValue: 1, minValue: -1, gridlines: { color: '" . this.Window.Theme.WindowBackColor . "'}, textStyle: { color: '" . this.Window.Theme.TextColor["Disabled"] . "'}}, bars: 'horizontal', backgroundColor: '" . this.Window.AltBackColor . "', chartArea: { left: '5%', top: '5%', right: '40%', bottom: '5%' } };")
+				drawChartFunction .= ("`nvar options = { legend: { textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, bar: { groupWidth: " . (settings.Length * 16) . " }, vAxis: { textPosition: 'none', baseline: 'none', gridlines: 'none', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, hAxis: {maxValue: 1, minValue: -1, gridlines: { color: '" . this.Window.Theme.WindowBackColor . "'}, textStyle: { color: '" . this.Window.Theme.TextColor["Disabled"] . "'}}, bars: 'horizontal', backgroundColor: '" . this.Window.AltBackColor . "', chartArea: { left: '5%', top: '5%', right: '40%', bottom: '5%' } };")
 
 				drawChartFunction .= "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 			}

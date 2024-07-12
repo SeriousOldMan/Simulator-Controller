@@ -144,7 +144,7 @@ class Theme {
 					return Theme.GetSystemColor("NormalTextColor")
 				case "Disabled":
 					return Theme.GetSystemColor("DisabledTextColor")
-				case "Tick":
+				case "Grid":
 					return Theme.GetSystemColor("DisabledTextColor")
 				case "Unavailable":
 					return "Silver"
@@ -208,7 +208,7 @@ class Theme {
 					options .= (" Background" . this.FieldBackColor)
 				case "Button":
 					options .= (" Background" . this.ButtonBackColor)
-				case "Text", "Picture", "GroupBox", "CheckBox", "Radio", "Slider", "Link":
+				case "Text", "Picture", "GroupBox", "CheckBox", "Radio", "Slider", "Link", "ComboBox":
 					options .= (" Background" . this.WindowBackColor)
 			}
 		}
@@ -290,7 +290,7 @@ class ClassicTheme extends Theme {
 		Get {
 			return ((mode = "Normal") ? "000000"
 									  : ((mode = "Disabled") ? "505050"
-															 : ((mode = "Tick") ? "A0A0A0" : "808080")))
+															 : ((mode = "Grid") ? "A0A0A0" : "808080")))
 		}
 	}
 
@@ -345,7 +345,7 @@ class GrayTheme extends ClassicTheme {
 
 	TextColor[mode := "Normal"] {
 		Get {
-			if (mode = "Tick")
+			if (mode = "Grid")
 				return "808080"
 			else
 				return super.TextColor[mode]
@@ -397,7 +397,7 @@ class LightTheme extends Theme {
 
 	TextColor[mode := "Normal"] {
 		Get {
-			if (mode = "Tick")
+			if (mode = "Grid")
 				return "BFBFBF"
 			else
 				return super.TextColor[mode]
@@ -566,7 +566,7 @@ class DarkTheme extends Theme {
 					return this.DarkColors["DsbldFont", false]
 				case "Unavailable":
 					return this.DarkColors["PssvFont", false]
-				case "Tick":
+				case "Grid":
 					return "606060"
 			}
 		}
@@ -612,27 +612,30 @@ class DarkTheme extends Theme {
 
 			window.BackColor := this.DarkColors["Background"]
 
-			if !window.HasProp("WindowProc")
-				window.WindowProc := DllCall("user32\" . SetWindowLong, "Ptr", window.Hwnd, "Int", GWL_WNDPROC
-																	  , "Ptr", CallbackCreate(WindowProc), "Ptr")
+			; if !window.HasProp("WindowProc")
+			;	window.WindowProc := DllCall("user32\" . SetWindowLong, "Ptr", window.Hwnd, "Int", GWL_WNDPROC
+			;														  , "Ptr", CallbackCreate(windowProc), "Ptr")
 		}
 	}
 
 	SetControlTheme(control) {
 		static GWL_STYLE          := -16
 		static ES_MULTILINE       := 0x0004
-		static LVM_GETTEXTCOLOR   := 0x1023
 		static LVM_SETTEXTCOLOR   := 0x1024
-		static LVM_GETTEXTBKCOLOR := 0x1025
 		static LVM_SETTEXTBKCOLOR := 0x1026
-		static LVM_GETBKCOLOR     := 0x1000
 		static LVM_SETBKCOLOR     := 0x1001
 		static LVM_GETHEADER      := 0x101F
+		static MCSC_BACKGROUND    := 0
+		static MCSC_TEXT          := 1
+		static MCSC_TITLEBK       := 2
+		static MCSC_TITLETEXT     := 3
+		static MCSC_MONTHBK       := 4
+		static MCSC_TRAILINGTEXT  := 5
+		static DTM_SETMCCOLOR     := 0x1006
 		static GetWindowLong      := A_PtrSize = 8 ? "GetWindowLongPtr" : "GetWindowLong"
-		static LV_Init            := false
 
 		switch control.Type, false {
-			case "Button", "CheckBox", "ListBox", "UpDown":
+			case "Button", "CheckBox", "ListBox", "UpDown", "DateTime":
 				DllCall("uxtheme\SetWindowTheme", "Ptr", control.Hwnd, "Str", "DarkMode_Explorer", "Ptr", 0)
 			case "ComboBox", "DDL":
 				DllCall("uxtheme\SetWindowTheme", "Ptr", control.Hwnd, "Str", "DarkMode_CFD", "Ptr", 0)
@@ -642,14 +645,6 @@ class DarkTheme extends Theme {
 				else
 					DllCall("uxtheme\SetWindowTheme", "Ptr", control.Hwnd, "Str", "DarkMode_CFD", "Ptr", 0)
 			case "ListView":
-				if !LV_Init {
-					static LV_TEXTCOLOR   := SendMessage(LVM_GETTEXTCOLOR,   0, 0, control.Hwnd)
-					static LV_TEXTBKCOLOR := SendMessage(LVM_GETTEXTBKCOLOR, 0, 0, control.Hwnd)
-					static LV_BKCOLOR     := SendMessage(LVM_GETBKCOLOR,     0, 0, control.Hwnd)
-
-					LV_Init := true
-				}
-
 				control.Opt("-Redraw")
 
 				SendMessage(LVM_SETTEXTCOLOR,   0, this.DarkColors["Font"],       control.Hwnd)
@@ -663,6 +658,14 @@ class DarkTheme extends Theme {
 				DllCall("uxtheme\SetWindowTheme", "Ptr", LV_Header, "Str", "DarkMode_ItemsView", "Ptr", 0)
 
 				; control.SetDarkMode()
+
+				control.Opt("+Redraw")
+			case "DateTime":
+				control.Opt("-Redraw")
+
+				SendMessage(DTM_SETMCCOLOR, MCSC_BACKGROUND, this.DarkColors["BackGround"], control.Hwnd)
+				SendMessage(DTM_SETMCCOLOR, MCSC_MONTHBK, this.DarkColors["BackGround"], control.Hwnd)
+				SendMessage(DTM_SETMCCOLOR, MCSC_TEXT, this.DarkColors["Font"], control.Hwnd)
 
 				control.Opt("+Redraw")
 		}
@@ -1851,7 +1854,7 @@ initializeGUI() {
 	; DllCall("User32\SetThreadDpiAwarenessContext", "UInt" , -1)
 }
 
-windowProc(hwnd, uMsg, wParam, lParam) {
+WindowProc(hwnd, uMsg, wParam, lParam) {
 	Critical
 
 	local window := GuiFromHwnd(hwnd)

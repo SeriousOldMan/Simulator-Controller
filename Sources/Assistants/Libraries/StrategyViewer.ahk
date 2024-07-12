@@ -259,7 +259,7 @@ class StrategyViewer {
 		}
 
 		drawChartFunction .= ("]);`nvar options = { curveType: 'function', legend: { position: 'Right', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '"
-							. (durationSession ? translate("Lap") : translate("Minute")) . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: { color: '" . this.Window.Theme.GridColor . "'}, textStyle: { color: '" . this.Window.Theme.TextColor["Tick"] . "'} }, vAxis: { viewWindow: { min: 0 }, gridlines: { color: '" . this.Window.Theme.GridColor . "'}, textStyle: { color: '" . this.Window.Theme.TextColor["Tick"] . "'} }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
+							. (durationSession ? translate("Lap") : translate("Minute")) . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: { color: '" . this.Window.Theme.GridColor . "'}, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, vAxis: { viewWindow: { min: 0 }, gridlines: { color: '" . this.Window.Theme.GridColor . "'}, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
 
 		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
 
@@ -359,6 +359,7 @@ class StrategyViewer {
 
 			.th-std, .td-std {
 				text-align: center;
+				color: #%textColor%;
 			}
 
 			.th-std, .caption-std {

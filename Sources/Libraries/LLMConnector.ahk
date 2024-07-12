@@ -315,6 +315,7 @@ class LLMConnector {
 		Ask(question, instructions := false, tools := false, &calls?) {
 			local headers := this.CreateHeaders(Map("Content-Type", "application/json"))
 			local body := {model: this.Model, max_tokens: this.MaxTokens, temperature: this.Temperature}
+			local toolCall := false
 
 			if !instructions
 				instructions := this.GetInstructions()
@@ -358,7 +359,12 @@ class LLMConnector {
 					if answer.Has("message") {
 						answer := answer["message"]
 
-						if this.ProcessToolCalls(tools, answer, &calls?) {
+						if isSet(calls)
+							toolCall := this.ProcessToolCalls(tools, answer, &calls)
+						else
+							toolCall := this.ProcessToolCalls(tools, answer)
+
+						if toolCall {
 							if answer.Has("content") {
 								answer := answer["content"]
 

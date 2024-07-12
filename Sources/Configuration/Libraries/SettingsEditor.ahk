@@ -184,7 +184,7 @@ editModes(&settingsOrCommand, arguments*) {
 		modesListView := modesEditorGui.Add("ListView", "x100 y108 w240 h162 -Multi -LV0x10 Checked NoSort NoSortHdr", [translate("Plugin"), translate("Mode"), translate("Simulator(s)")])
 		modesListView.OnEvent("Click", noSelect)
 		modesListView.OnEvent("DoubleClick", noSelect)
-		
+
 		defaultModes := string2Values(",", getMultiMapValue(newSettings, "Modes", "Default", ""))
 
 		for thePlugin, pluginConfiguration in getMultiMapValues(configuration, "Plugins") {
@@ -487,7 +487,9 @@ editSettings(&settingsOrCommand, owner := false, withContinue := false, fromSetu
 			checked := coreDescriptor[2]
 
 			if (index == 1)
-				coreOption := coreOption . " YP+20 X20"
+				coreOption .= " YP+20 X20"
+			else
+				coreOption .= " X20 YP+20"
 
 			%"coreVariable" . index% := settingsEditorGui.Add("CheckBox", coreOption . " Checked" . checked, coreLabel)
 		}
@@ -508,7 +510,9 @@ editSettings(&settingsOrCommand, owner := false, withContinue := false, fromSetu
 				checked := feedbackDescriptor[2]
 
 				if (index == 1)
-					feedbackOption := feedbackOption . " YP+20 X20"
+					feedbackOption .= " YP+20 X20"
+				else
+					feedbackOption .= " X20 YP+20"
 
 				%"feedbackVariable" . index% := settingsEditorGui.Add("CheckBox", feedbackOption . " Checked" . checked, feedbackLabel)
 			}

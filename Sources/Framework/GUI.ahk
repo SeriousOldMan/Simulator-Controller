@@ -419,7 +419,78 @@ class DarkTheme extends Theme {
 									   , "Font", "E0E0E0", "DsbldFont", "606060", "PssvFont", "404040")
 	static sTextBackgroundBrush := DllCall("gdi32\CreateSolidBrush", "UInt", DarkTheme.sDarkColors["Background"], "Ptr")
 
-	/*
+	class DarkCheckBox extends Gui.CheckBox {
+		Enabled {
+			Get {
+				return super.Enabled
+			}
+
+			Set {
+				if value
+					this.Label.Opt("c" . this.Gui.Theme.TextColor)
+				else
+					this.Label.Opt("c" . this.Gui.Theme.TextColor["Disabled"])
+
+				return (super.Enabled := value)
+			}
+		}
+
+		Visible {
+			Get {
+				return super.Visible
+			}
+
+			Set {
+				this.Label.Visible := value
+
+				return (super.Enabled := value)
+			}
+		}
+
+		Text {
+			Get {
+				return this.Label.Text
+			}
+
+			Set {
+				return (this.Label.Text := value)
+			}
+		}
+
+		static IsLabeled(options, arguments) {
+			return ((arguments.Length > 0) && (StrLen(arguments[1]) > 1))
+		}
+
+		static GetCheckBoxArguments(options, arguments) {
+			options := RegExReplace(options, "i)[\s]+w[0-9]+", " w23")
+			options := RegExReplace(options, "i)^w[0-9]+", "w23")
+
+			return [options]
+		}
+
+		static GetLabelArguments(options, arguments) {
+			local width
+
+			options := RegExReplace(options, "i)[\s]+v[^\s]+", " ")
+			options := RegExReplace(options, "i)^v[^\s]+", "")
+			options := RegExReplace(options, "i)[\s]+Checked[^\s]*", " ")
+			options := RegExReplace(options, "i)^Checked[^\s]*", "")
+
+			if RegExMatch(options, "i)[\s]+w[0-9]+", &width)
+				options := RegExReplace(options, "i)[\s]+w[0-9]+", " w" . (SubStr(Trim(width[]), 2) - 23))
+
+			if RegExMatch(options, "i)^w[0-9]+", &width)
+				options := RegExReplace(options, "i)^w[0-9]+", "w" . (SubStr(Trim(width[]), 2) - 23))
+
+			options := RegExReplace(options, "i)[\s]+x[0-9p\-\+]+", " xp+23")
+			options := RegExReplace(options, "i)^x[0-9p\-\+]+", "xp+23")
+			options := RegExReplace(options, "i)[\s]+y[0-9p\-\+]+", " yp")
+			options := RegExReplace(options, "i)^y[0-9p\-\+]+", "yp")
+
+			return Array(options, arguments*)
+		}
+	}
+
 	class DarkListView extends Gui.ListView {
 		class RECT {
 			left: i32, top: i32, right: i32, bottom: i32
@@ -448,7 +519,10 @@ class DarkTheme extends Theme {
 			super.Prototype.SetDarkMode := this.SetDarkMode.Bind(this)
 		}
 
-		static SetDarkMode(lv, style := "Explorer") {
+		static Initialize() {
+		}
+
+		static SetDarkMode(lv) {
 			static LVS_EX_DOUBLEBUFFER := 0x10000
 			static NM_CUSTOMDRAW       := -12
 			static UIS_SET             := 1
@@ -457,11 +531,11 @@ class DarkTheme extends Theme {
 			static WM_NOTIFY           := 0x4E
 			static WM_THEMECHANGED     := 0x031A
 
-			SetWindowTheme(hwnd, appName, subIdList?) => DllCall("uxtheme\SetWindowTheme", "ptr", hwnd, "ptr", StrPtr(appName)
-																						 , "ptr", isSet(subIdList) ? subIdList : 0)
-			SetTextColor(hdc, color) => DllCall("SetTextColor", "Ptr", hdc, "UInt", color)
+			lv.Header := lv.GetHeader()
 
-			lvMessage(lv, wParam, lParam, Msg) {
+			lv.OnMessage(WM_THEMECHANGED, (*) => 0)
+
+			lv.OnMessage(WM_NOTIFY, (lv, wParam, lParam, Msg) {
 				static CDDS_ITEMPREPAINT   := 0x10001
 				static CDDS_PREPAINT       := 0x1
 				static CDRF_DODEFAULT      := 0x0
@@ -483,23 +557,20 @@ class DarkTheme extends Theme {
 				}
 
 				return CDRF_DODEFAULT
-			}
+			})
 
-			lv.Header := lv.GetHeader()
-
-			lv.OnMessage(WM_THEMECHANGED, (*) => 0)
-
-			lv.OnMessage(WM_NOTIFY, lvMessage)
-
-			lv.Opt("+LV" LVS_EX_DOUBLEBUFFER)
+			lv.Opt("+LV" . LVS_EX_DOUBLEBUFFER)
 
 			SendMessage(WM_CHANGEUISTATE, (UIS_SET << 8) | UISF_HIDEFOCUS, 0, lv)
 
 			SetWindowTheme(lv.Header, "DarkMode_ItemsView")
 			SetWindowTheme(lv.Hwnd, "DarkMode_Explorer")
+
+			SetTextColor(hdc, color) => DllCall("SetTextColor", "Ptr", hdc, "UInt", color)
+
+			SetWindowTheme(hwnd, appName, subIdList?) => DllCall("uxtheme\SetWindowTheme", "ptr", hwnd, "ptr", StrPtr(appName), "ptr", subIdList ?? 0)
 		}
 	}
-	*/
 
 	Descriptor {
 		Get {
@@ -657,14 +728,13 @@ class DarkTheme extends Theme {
 
 				DllCall("uxtheme\SetWindowTheme", "Ptr", LV_Header, "Str", "DarkMode_ItemsView", "Ptr", 0)
 
-				; control.SetDarkMode()
+				control.SetDarkMode()
 
 				control.Opt("+Redraw")
 			case "DateTime":
 				control.Opt("-Redraw")
 
 				SendMessage(DTM_SETMCCOLOR, MCSC_BACKGROUND, this.DarkColors["BackGround"], control.Hwnd)
-				SendMessage(DTM_SETMCCOLOR, MCSC_MONTHBK, this.DarkColors["BackGround"], control.Hwnd)
 				SendMessage(DTM_SETMCCOLOR, MCSC_TEXT, this.DarkColors["Font"], control.Hwnd)
 
 				control.Opt("+Redraw")
@@ -1264,6 +1334,16 @@ class Window extends Gui {
 	Add(type, options := "", arguments*) {
 		local rules := false
 		local newOptions, ignore, option, control
+		local checkBox, label
+
+		if ((type = "CheckBox") && DarkTheme.DarkCheckBox.IsLabeled(options, arguments)) {
+			checkBox := this.Add("DarkCheckBox", DarkTheme.DarkCheckBox.GetCheckBoxArguments(options, arguments)*)
+			checkBox.Label := this.Add("Text", DarkTheme.DarkCheckBox.GetLabelArguments(options, arguments)*)
+
+			checkBox.Base := DarkTheme.DarkCheckBox.Prototype
+
+			return checkBox
+		}
 
 		if type is Window.Resizer
 			return this.AddResizer(type)
@@ -1289,7 +1369,7 @@ class Window extends Gui {
 				this.iCustomControls.Push(control)
 			}
 			else
-				control := super.Add(type, options, arguments*)
+				control := super.Add((type = "DarkCheckBox") ? "CheckBox" : type, options, arguments*)
 
 			if (rules || this.Rules[false].Length > 0) {
 				if !rules
@@ -1819,6 +1899,10 @@ modifiedIcon(fileName, postFix, modifier) {
 ;;;-------------------------------------------------------------------------;;;
 
 initializeGUI() {
+	AddDocumentation(window, arguments*) {
+		return createDocumentation(window, arguments*)
+	}
+
 	createDocumentation(window, options, label?, link?) {
 		local curFontOptions := window.CurrentFontOptions
 		local control
@@ -1841,7 +1925,11 @@ initializeGUI() {
 
 	DllCall("SetThreadDpiAwarenessContext", "Ptr", -5, "Ptr")
 
+	Window.Prototype.AddDocumentation := AddDocumentation
+
 	Window.DefineCustomControl("Documentation", createDocumentation)
+
+	DarkTheme.DarkListView.Initialize()
 
 	try {
 		Theme.CurrentTheme := %getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "General", "UI Theme", "Classic") . "Theme"%()

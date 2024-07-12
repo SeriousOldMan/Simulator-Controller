@@ -188,7 +188,7 @@ class GridButtonBox extends ButtonBox {
 		buttonBoxGui.Add("Text", "x0 y28 w" . width . " h23 +0x200 +0x1 BackgroundTrans", translate(this.Name)).OnEvent("Click", moveButtonBox.Bind(buttonBoxGui))
 
 		buttonBoxGui.BackColor := "0x000000"
-		buttonBoxGui.SetFont("s8 Norm", "Arial")
+		buttonBoxGui.SetFont("s8 Norm c" . buttonBoxGui.Theme.TextColor, "Arial")
 
 		vertical := GridButtonBox.kHeaderHeight
 

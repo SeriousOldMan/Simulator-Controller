@@ -26,6 +26,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\Framework\Application.ahk"
+#Include "..\Framework\Gui.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -241,6 +242,15 @@ class GuiFunctionController extends FunctionController {
 			label := this.getControlLabel(function.Descriptor)
 
 			if (label != false) {
+				switch color, false {
+					case "Black":
+						color := window.Theme.TextColor
+					case "Gray":
+						color := window.Theme.TextColor["Disabled"]
+					case "Silver":
+						color := window.Theme.TextColor["Unavailable"]
+				}
+
 				font := ("s8 c" . color)
 
 				if !label.HasProp("Font")

@@ -194,6 +194,10 @@ class Theme {
 		return fileName
 	}
 
+	GetControlType(type) {
+		return type
+	}
+
 	ComputeControlOptions(window, type, options) {
 		options := StrReplace(options, "-Theme", "")
 
@@ -220,6 +224,10 @@ class Theme {
 	}
 
 	ApplyThemeProperties(window, control) {
+	}
+
+	AddControl(window, type, options, arguments*) {
+		return false
 	}
 }
 
@@ -827,6 +835,29 @@ class DarkTheme extends Theme {
 	ApplyThemeProperties(window, control) {
 		this.SetControlTheme(control)
 	}
+
+	GetControlType(type) {
+		if (type = "DarkCheckBox")
+			return "CheckBox"
+		else
+			return super.GetControlType(type)
+	}
+
+	AddControl(window, type, options, arguments*) {
+		if ((type = "CheckBox") && DarkTheme.DarkCheckBox.IsLabeled(options, arguments)) {
+			label := window.Add("Text", DarkTheme.DarkCheckBox.GetLabelArguments(options, arguments)*)
+			checkBox := window.Add("DarkCheckBox", DarkTheme.DarkCheckBox.GetCheckBoxArguments(options, arguments)*)
+
+			checkBox.Label := label
+			checkBox.Enabled := checkBox.Enabled
+
+			checkBox.Base := DarkTheme.DarkCheckBox.Prototype
+
+			return checkBox
+		}
+		else
+			return super.AddControl(window, type, options, arguments*)
+	}
 }
 
 class Window extends Gui {
@@ -1386,21 +1417,16 @@ class Window extends Gui {
 		local newOptions, ignore, option, control
 		local checkBox, label
 
-		if ((type = "CheckBox") && DarkTheme.DarkCheckBox.IsLabeled(options, arguments)) {
-			label := this.Add("Text", DarkTheme.DarkCheckBox.GetLabelArguments(options, arguments)*)
-			checkBox := this.Add("DarkCheckBox", DarkTheme.DarkCheckBox.GetCheckBoxArguments(options, arguments)*)
+		control := this.Theme.AddControl(this, type, options, arguments*)
 
-			checkBox.Label := label
-			checkBox.Enabled := checkBox.Enabled
-
-			checkBox.Base := DarkTheme.DarkCheckBox.Prototype
-
-			return checkBox
-		}
+		if control
+			return control
 
 		if type is Window.Resizer
 			return this.AddResizer(type)
 		else {
+			type := this.Theme.GetControlType(type)
+
 			options := this.ComputeControlOptions(type, options)
 
 			if RegExMatch(options, "i)[xywhv].*:") {
@@ -1422,7 +1448,7 @@ class Window extends Gui {
 				this.iCustomControls.Push(control)
 			}
 			else
-				control := super.Add((type = "DarkCheckBox") ? "CheckBox" : type, options, arguments*)
+				control := super.Add(type, options, arguments*)
 
 			if (rules || this.Rules[false].Length > 0) {
 				if !rules

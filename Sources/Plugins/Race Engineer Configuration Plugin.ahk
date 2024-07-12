@@ -46,7 +46,7 @@ class RaceEngineerConfigurator extends ConfiguratorPanel {
 
 			if !isNumber(internalValue("Float", field.Text)) {
 				field.Text := (field.HasProp("ValidText") ? field.ValidText : "")
-				
+
 				loop 10
 					SendInput("{Right}")
 			}
@@ -140,7 +140,7 @@ class RaceEngineerConfigurator extends ConfiguratorPanel {
 		widget25 := window.Add("Text", "x" . x3 . " yp+2 w" . w3 . " h20 Hidden", translate("p. Lap"))
 
 		widget26 := window.Add("Text", "x" . x0 . " ys+30 w160 h23 +0x200 Section Hidden", translate("Adjust Lap Time"))
-		widget27 := window.Add("CheckBox", "x" . x1 . " yp w" . w1 . " h23 VreAdjustLapTimeCheck Hidden", translate("for Start, Pitstop or incomplete Laps (use from Settings)"))
+		widget27 := window.Add("CheckBox", "x" . x1 . " yp w" . w1 . " R1 VreAdjustLapTimeCheck Hidden", translate("for Start, Pitstop or incomplete Laps (use from Settings)"))
 
 		widget28 := window.Add("Text", "x" . x0 . " ys+30 w120 h23 +0x200 Section Hidden", translate("Damage Analysis for"))
 		widget29 := window.Add("Edit", "x" . x1 . " yp w40 h21 Number Limit1 VreDamageAnalysisLapsEdit Hidden")

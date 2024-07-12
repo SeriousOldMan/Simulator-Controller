@@ -1348,10 +1348,10 @@ editTargets(command := "", *) {
 
 		if (gCleanupSettings.Count > 0) {
 			for target, setting in gCleanupSettings {
-				option := ""
-
 				if (A_Index == 1)
-					option := option . " YP+20 XP+10"
+					option := " YP+20 XP+10"
+				else
+					option := " YP+20 XP"
 
 				targetsGui.Add("CheckBox", option . " Checked" . setting . " vcleanupVariable" . A_Index, target)
 			}
@@ -1373,10 +1373,10 @@ editTargets(command := "", *) {
 
 		if (gCopySettings.Count > 0) {
 			for target, setting in gCopySettings {
-				option := ""
-
 				if (A_Index == 1)
-					option := option . " YP+20 XP+10"
+					option := " YP+20 XP+10"
+				else
+					option := " YP+20 XP"
 
 				targetsGui.Add("CheckBox", option . " Checked" . setting . " vcopyVariable" . A_Index, target)
 			}
@@ -1398,10 +1398,10 @@ editTargets(command := "", *) {
 
 		if (gBuildSettings.Count > 0) {
 			for target, setting in gBuildSettings {
-				option := ""
-
 				if (A_Index == 1)
-					option := option . " YP+20 XP+10"
+					option := " YP+20 XP+10"
+				else
+					option := " YP+20 XP"
 
 				if (target == "Simulator Tools")
 					option := option . (A_IsCompiled ? " Disabled" : "")

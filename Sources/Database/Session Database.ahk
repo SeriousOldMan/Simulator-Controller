@@ -1378,7 +1378,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui.Add("Text", "x296 yp w80 h23 Y:Move +0x200", translate("Share"))
 		editorGui.Add("CheckBox", "xp+90 yp+4 w140 Y:Move vshareStrategyWithCommunityCheck", translate("with Community")).OnEvent("Click", updateStrategyAccess)
-		editorGui.Add("CheckBox", "x286 yp+24 w140 Y:Move vshareStrategyWithTeamServerCheck", translate("on Team Server")).OnEvent("Click", updateStrategyAccess)
+		editorGui.Add("CheckBox", "x386 yp+24 w140 Y:Move vshareStrategyWithTeamServerCheck", translate("on Team Server")).OnEvent("Click", updateStrategyAccess)
 
 		editorGui["settingsTab"].UseTab(3)
 

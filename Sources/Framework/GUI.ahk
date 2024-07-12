@@ -420,6 +420,9 @@ class DarkTheme extends Theme {
 	static sTextBackgroundBrush := DllCall("gdi32\CreateSolidBrush", "UInt", DarkTheme.sDarkColors["Background"], "Ptr")
 
 	class DarkCheckBox extends Gui.CheckBox {
+		static kCheckWidth := 28
+		static kCheckShift := 1
+
 		Enabled {
 			Get {
 				return super.Enabled
@@ -443,7 +446,7 @@ class DarkTheme extends Theme {
 			Set {
 				this.Label.Visible := value
 
-				return (super.Enabled := value)
+				return (super.Visible := value)
 			}
 		}
 
@@ -458,34 +461,81 @@ class DarkTheme extends Theme {
 		}
 
 		static IsLabeled(options, arguments) {
-			return ((arguments.Length > 0) && (StrLen(arguments[1]) > 1))
+			return ((arguments.Length > 0) && !isNumber(arguments[1]))
 		}
 
 		static GetCheckBoxArguments(options, arguments) {
 			options := RegExReplace(options, "i)[\s]+w[0-9]+", " w23")
 			options := RegExReplace(options, "i)^w[0-9]+", "w23")
 
+			options := RegExReplace(options, "i)[\s]+x[0-9ps\-\+]+", " xp-" . DarkTheme.DarkCheckBox.kCheckWidth)
+			options := RegExReplace(options, "i)^x[0-9ps\-\+]+", "xp-" . DarkTheme.DarkCheckBox.kCheckWidth)
+			options := RegExReplace(options, "i)[\s]+y[0-9ps\-\+]+", " yp-" . DarkTheme.DarkCheckBox.kCheckShift)
+			options := RegExReplace(options, "i)^y[0-9ps\-\+]+", "yp-" . DarkTheme.DarkCheckBox.kCheckShift)
+
 			return [options]
 		}
 
 		static GetLabelArguments(options, arguments) {
-			local width
+			local argument := false
+
+			shiftCoord(axis, offset) {
+				local shift, prefix
+
+				if (RegExMatch(options, "i)[\s]+" . axis . "[0-9ps\-\+]+", &argument) || RegExMatch(options, "i)^" . axis . "[0-9ps\-\+]+", &argument)) {
+					argument := Trim(argument[])
+
+					if ((InStr(argument, axis . "p") = 1) || (InStr(argument, axis . "s") = 1)) {
+						prefix := SubStr(argument, 1, 2)
+						argument := SubStr(argument, 3)
+					}
+					else if (InStr(argument, axis) = 1) {
+						prefix := SubStr(argument, 1, 1)
+						argument := SubStr(argument, 2)
+					}
+
+					if (StrLen(argument) = 0)
+						argument := (A_Space . prefix . "+" . offset)
+					else {
+						shift := ((InStr(argument, "+") = 1) || (InStr(argument, "-") = 1))
+
+						if shift
+							argument := SubStr(argument, 2)
+
+						argument += offset
+
+						if shift {
+							if (argument >= 0)
+								argument := (A_Space . prefix . "+" . argument)
+							else
+								argument := (A_Space . prefix . argument)
+						}
+						else
+							argument := (A_Space . prefix . argument)
+					}
+
+					options := RegExReplace(options, "i)[\s]+" . axis . "[0-9ps\-\+]+", argument)
+					options := RegExReplace(options, "i)^" . axis . "[0-9ps\-\+]+", argument)
+				}
+			}
 
 			options := RegExReplace(options, "i)[\s]+v[^\s]+", " ")
 			options := RegExReplace(options, "i)^v[^\s]+", "")
 			options := RegExReplace(options, "i)[\s]+Checked[^\s]*", " ")
 			options := RegExReplace(options, "i)^Checked[^\s]*", "")
+			options := RegExReplace(options, "i)[\s]+Disabled\s*", " ")
+			options := RegExReplace(options, "i)^Disabled\s*", " ")
+			options := RegExReplace(options, "i)[\s]+Disabled$", " ")
+			options := RegExReplace(options, "i)^Disabled$", " ")
 
-			if RegExMatch(options, "i)[\s]+w[0-9]+", &width)
-				options := RegExReplace(options, "i)[\s]+w[0-9]+", " w" . (SubStr(Trim(width[]), 2) - 23))
+			if RegExMatch(options, "i)[\s]+w[0-9]+", &argument)
+				options := RegExReplace(options, "i)[\s]+w[0-9]+", " w" . (SubStr(Trim(argument[]), 2) - DarkTheme.DarkCheckBox.kCheckWidth))
 
-			if RegExMatch(options, "i)^w[0-9]+", &width)
-				options := RegExReplace(options, "i)^w[0-9]+", "w" . (SubStr(Trim(width[]), 2) - 23))
+			if RegExMatch(options, "i)^w[0-9]+", &argument)
+				options := RegExReplace(options, "i)^w[0-9]+", "w" . (SubStr(Trim(argument[]), 2) - DarkTheme.DarkCheckBox.kCheckWidth))
 
-			options := RegExReplace(options, "i)[\s]+x[0-9p\-\+]+", " xp+23")
-			options := RegExReplace(options, "i)^x[0-9p\-\+]+", "xp+23")
-			options := RegExReplace(options, "i)[\s]+y[0-9p\-\+]+", " yp")
-			options := RegExReplace(options, "i)^y[0-9p\-\+]+", "yp")
+			shiftCoord("x", DarkTheme.DarkCheckBox.kCheckWidth)
+			shiftCoord("y", DarkTheme.DarkCheckBox.kCheckShift)
 
 			return Array(options, arguments*)
 		}
@@ -1337,8 +1387,11 @@ class Window extends Gui {
 		local checkBox, label
 
 		if ((type = "CheckBox") && DarkTheme.DarkCheckBox.IsLabeled(options, arguments)) {
+			label := this.Add("Text", DarkTheme.DarkCheckBox.GetLabelArguments(options, arguments)*)
 			checkBox := this.Add("DarkCheckBox", DarkTheme.DarkCheckBox.GetCheckBoxArguments(options, arguments)*)
-			checkBox.Label := this.Add("Text", DarkTheme.DarkCheckBox.GetLabelArguments(options, arguments)*)
+
+			checkBox.Label := label
+			checkBox.Enabled := checkBox.Enabled
 
 			checkBox.Base := DarkTheme.DarkCheckBox.Prototype
 

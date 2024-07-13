@@ -1,11 +1,14 @@
 [Agent.Events]
-Active=damage_collected, rain_started, rain_stopped, weather_forecast
+Active=damage_collected, rain_started, rain_stopped, weather_forecast, fuel_low
 [Agent.Events.Builtin]
 damage_collected=Assistant.Class|DamageEvent|Damage||3|This event is triggered when the car collected new damage.
+fuel_low=Assistant.Class|FuelLowEvent|FuelLow||2|This event is triggered when the car is running low on fuel.
 weather_forecast=Assistant.Class|WeatherForecastEvent|WeatherForecast||3|This event is triggered when the weather forecast indicates an upcoming weather change.
 rain_started=Assistant.Rule|Race Assistant.rain_start.rules|RainStart|It just started raining.|0|This event is triggered when it starts raining or will be raining in a few moments.
 rain_stopped=Assistant.Rule|Race Assistant.rain_stop.rules|RainStop|It just stopped raining.|0|This event is triggered when it stopped raining.
 [Agent.Events.Parameters]
+fuel_low.1=remainingFuel|Integer||true|The remaining amount of fuel in liters.
+fuel_low.2=remainingLaps|Integer||true|The maximum number of laps that can be driven with the remaining fuel.
 damage_collected.1=suspensionDamage|Boolean||true|Indicates whether new damage to the suspension occured.
 damage_collected.2=bodyworkDamage|Boolean||true|Indicates whether new damage to the bodywork and aerodynamics occured.
 damage_collected.3=engineDamage|Boolean||true|Indicates whether new damage to the engine occured.

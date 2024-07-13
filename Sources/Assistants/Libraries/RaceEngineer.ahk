@@ -27,6 +27,25 @@
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+class FuelLowEvent extends AssistantEvent {
+	Asynchronous {
+		Get {
+			return true
+		}
+	}
+
+	createTrigger(event, phrase, arguments) {
+		return ("Fuel is running low. " . Round(arguments[1], 1) . " Liters remaining which are good for " . Floor(arguments[2]) . " more laps.")
+	}
+
+	handleEvent(event, arguments*) {
+		if !super.handleEvent(event, arguments*)
+			this.Assistant.lowFuelWarning(Round(arguments[1], 1), Floor(arguments[2]))
+
+		return true
+	}
+}
+
 class DamageEvent extends AssistantEvent {
 	Asynchronous {
 		Get {
@@ -3211,7 +3230,7 @@ class RaceEngineer extends RaceAssistant {
 		messageSend(kFileMessage, callbackCategory, callbackMessage . ":" . values2String(";", fileName, arguments*), callbackPID)
 	}
 
-	lowFuelWarning(remainingLaps) {
+	lowFuelWarning(remainingFuel, remainingLaps) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker
 
@@ -3438,8 +3457,8 @@ class RaceEngineer extends RaceAssistant {
 ;;;                  Internal Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-lowFuelWarning(context, remainingLaps) {
-	context.KnowledgeBase.RaceAssistant.lowFuelWarning(Floor(remainingLaps))
+lowFuelWarning(context, remainingFuel, remainingLaps) {
+	context.KnowledgeBase.RaceAssistant.lowFuelWarning(Round(remainingFuel, 1), Floor(remainingLaps))
 
 	return true
 }

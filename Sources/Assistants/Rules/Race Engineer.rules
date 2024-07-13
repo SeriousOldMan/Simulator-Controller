@@ -643,7 +643,8 @@ priority: -50, {All: {Any: [?Lap.Remaining.Fuel < ?Lap.Remaining.Stint], [?Lap.R
 		(Prove: lowFuelWarning(!Lap, !Lap.Remaining.Fuel))
 
 lowFuelWarning(?lap, ?remainingLaps) <= recentPitstopLap(?lap), !, fail
-lowFuelWarning(?lap, ?remainingLaps) <= Call(lowFuelWarning, ?remainingLaps)
+lowFuelWarning(?lap, ?remainingLaps) <= lapRemainingFuel(?lap, ?remainingFuel), Call(raiseEvent, FuelLow, ?remainingFuel, ?remainingLaps), !
+lowFuelWarning(?lap, ?remainingLaps) <= lapRemainingFuel(?lap, ?remainingFuel), Call(lowFuelWarning, ?remainingFuel, ?remainingLaps)
 
 priority: 20, {All: [?Lap.Remaining.Stint <= ?Lap.Remaining.Fuel],
 					[?Lap.Remaining.Stint <= ?Lap.Remaining.Session]} => (Set: Lap.Remaining, ?Lap.Remaining.Stint)

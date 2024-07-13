@@ -18,42 +18,9 @@ The same principles as [described for Jona](https://github.com/SeriousOldMan/Sim
 
 I strongly recommed to memorize the phrases in the language you use to interact with Elisa. You will always find the current version of the grammar files as actually used by the software in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [*Resources\Grammars* directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Race Spotter.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Race%20Spotter.grammars.de).
 
-#### Boosting conversation capabilities using an LLM
+#### Extending conversation and reasoning capabilities using an LLM
 
-Beside the builtin pattern-based voice recognition and the speech capabilities based on predefined phrases as described above, it is optionally possible to connect Elisa to a GPT service like OpenAI or a locally hosted LLM, to dramatacilly improve the quality in conversation with the Assistant. When the *Conversation* Booster is configured (see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for more information about the necessary configuration steps), the full knowledge about the the car state and the drivers performance will be supplied to the LLM. This includes only basic telemetry data and no pitstop information. The position information includes a history of the last laps and gap and lap time information for the most important opponents are provided.
-
-##### Trigger actions from conversation
-
-The LLM may be able to trigger actions as a result of a conversation. This is achieved by the so-called tool interface of the LLM. Tools are supported at the time of this writing by the following models:
-
-  - GPT 3.5 and above from *OpenAI*
-  - Mistral Small, Mistral Large and Mixtral 8x22b from *Mistral AI*
-  - Claude3 by *Anthropic* (via *OpenRouter*)
-  - Command-R+ by *Cohere* (via *OpenRouter*, but not working properly yet)
-  - Some Open Source models, such as Open Hermes, also support tools but with a varying degree of reliability
-
-Please note that calling actions is currently only available when using *OpenAI*, *Mistral AI* or *OpenRouter* are used as GPT service providers.
-
-The following table shows you the predefined actions, that might be triggered by the LLM during a conversation with the Strategist:
-
-| Action                   | Parameter(s) | Example(s) |
-|--------------------------|--------------|------------|
-| Reset Deltas             | -            | "Can you reset the delta information for all cars?" |
-| Reset Accident Detection | -            | "There are false positives for accidents and slow cars on the track. Please correct that." |
-
-As you can see, you can define new voice commands by defining a corresponding action, that can be triggered by the LLM. But that is only one part of the story. Please note, that beside reacting to the phrase as shown in the examples above, the LLM might decide to take the action on its own according to the current situation and based on the current data. So always be alerted, if the LLM gets active unexpectedly.
-
-That said, it depends on the available data in the knowledge base, whether the LLM will decide to trigger this action or not. If the LLM refuses to do so, you still have all the traditional voice commands and the controller actions at your disposal.
-
-Beside the predefined actions for the Spottr, which come with the standard installation as listed above, you can also define your own actions. But this will require a very deep knowledge of the inner workings of Simulator Controller and the Assistants. You have been warned. If you want to try this, check out the dedicated [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) for the "Conversation" booster.
-
-IMPORTANT: When action handling is enabled, it might be necessary to disable the "Recognition" booster or at least set the "Creativity" to a very low value. Otherwise the "Recognition" booster might detect a command pattern, which will match to a pre-defined voice command, thereby preventing the LLM from creating a custom action plan.
-
-##### Trigger events during reasoning
-
-Very similar, you can use an LLM to alter or extend the reasoning process of an Assistant. In the reasoning process, events are raised, which then causes the Assistant to react upon them. Events and actions are normally being implemented in the rule system, but it is also prossible to raise an event, which then is inspected by an LLM, possibly taking action using the supplied actions similar to the actions used the conversation as described above.
-
-For a complete description of events and actions, see the dedicated [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants).
+Beside the builtin pattern-based voice recognition and the speech capabilities based on predefined phrases as described above, it is optionally possible to connect Elisa to a GPT service like OpenAI or a locally hosted LLM, to dramatacilly improve the quality in conversation with the Assistant. And you can also extend the knowledge and reasoning capabilities. When the *Conversation* Booster or the *Reasoning* booster are configured (see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) for more information about the necessary configuration steps), the full knowledge about the car state will be supllied to the LLM. In detail, this includes tyre pressures, tyre temeperatures, tyre wear, brake temperatures, brake wear, fuel level, fuel consumption, damage, and so on. When a pitstop is planned, the plan is available and the pitstop history is also available.
 
 ### Enabling and disabling specific warnings and announcements
 

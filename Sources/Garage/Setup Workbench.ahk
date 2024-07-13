@@ -815,7 +815,6 @@ class SetupWorkbench extends ConfigurationItem {
 				for index, value in values
 					values[index] := (value / theMax)
 
-
 				drawChartFunction .= ("`n['" . values2String("', '", names*) . "'],")
 
 				drawChartFunction .= ("`n[" . values2String(",", values*) . "]")
@@ -1403,6 +1402,8 @@ class SetupWorkbench extends ConfigurationItem {
 				this.Control["trackDropDown"].Choose(1)
 
 				this.initializeWorkbench("Loading Car", "Loading Car", "Loading Car", true)
+
+				this.loadTrack(true, true)
 			}
 			finally {
 				this.Window.Unblock()

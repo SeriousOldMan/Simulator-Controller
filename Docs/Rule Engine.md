@@ -385,7 +385,7 @@ Once a question and the corresponding answer has been found in the cache, it is 
 
 Another interesting use is to completely stop the search for a solution and consider the current goal to be unsuccessful.
 
-	historicPressures(?lap, [hot(?hfl, ?hfr, ?hrl, ?hrr), cold(?cfl, ?cfr, ?crl, ?crr)]) <= ?lap < 1, !, Fail
+	historicPressures(?lap, [hot(?hfl, ?hfr, ?hrl, ?hrr), cold(?cfl, ?cfr, ?crl, ?crr)]) <= ?lap < 1, !, fail
 	historicPressures(?lap, [hot(?hfl, ?hfr, ?hrl, ?hrr), cold(?cfl, ?cfr, ?crl, ?crr)]) <= ...
 
 The first rule checks, whether the supplied lap number is invalid (less than 1). If this is the case, the goal completely fails.
@@ -494,7 +494,7 @@ The rule engine has some builtin predicates which can be used when formulating r
 	
 	unbound? can be *called* with a single argument. The *call* succeeds, if the argument is an unbound variable, a fact with no value or an unknown fact. In all other cases, unbound? fails. Creating the reverse predicate is quite simple:
 	
-		bound?(?x) <= unbound?(?x), !, Fail
+		bound?(?x) <= unbound?(?x), !, fail
 		bound?(?x)
 
   - call

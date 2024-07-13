@@ -68,7 +68,9 @@ Normally an Assistant will tell you that he didn't understand you, when the spok
 Since large parts of the knowledge base of the Assistants will be supplied to the LLM for matching, a context window of at least 4k tokens is required for this booster. Full standings history isn't possible at the moment, since this will overflow the input context area of the LLM, at least for the *smaller* models like GPT 3.5, Mistral 7b, and so on. Time will cure this problem, and I will update the capabilities of the integration, when more capable models become available. For the time being, the position data is available for the most recent laps and also the gaps for the most important opponents are passed to the LLM (for Strategist and Spotter).
 
 Additionally, you can allow the LLM to call [predefined or custom actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-actions) as a result of your conversation. For example, if you ask the Strategist whether an undercut might be possible in one of the next laps, the LLM may call the Monte Carlo traffic simulation using an internal action. Which actions will be available to the LLM depends on the current Assistant. See corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#trigger-actions-from-conversation) for the Strategist for an example.
-	 
+
+IMPORTANT: When action handling is enabled, it might be necessary to disable the *Recognition* booster or at least set the "Creativity" to a very low value. Otherwise the "Recognition" booster might detect a command pattern, which will match to a pre-defined voice command, thereby preventing the LLM from creating a custom action plan.
+
 ### Reasoning Booster
 
 *Reasoning* is the most complex and most capable booster, since it allows you to alter or extend the behavior of the Assistant. You can use predefined events or even define your own ones in the [Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine) (as shown below), which then result in a request to the LLM (actually you can process events even without using the LLM directly in rule engine, but this is only half of the fun). Similar to the *Conversation* bosster above, the LLM then can decide to activate one or more [predefined or custom actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-booster-actions) to fulfill the request or react to the situation. To support its conclusion, the LLM will have full access to the same knowledge as in the *Conversation* booster.
@@ -76,6 +78,18 @@ Additionally, you can allow the LLM to call [predefined or custom actions](https
 As already mentioned, you can choose a different LLM for this booster, because here strong reasoning skills are way more important than conversational excellence.
 	 
 Important: This booster directly alters the behavior of the Assistant for the good or for the bad. Even if you don't change or extend the definition of the events and actions, it still depends on the reasoning capabilities of the used language model, whether the Assistant will behave as expected. Therefore, always test everything before using it in an important race.
+
+### Using Actions & Events
+
+The *Reasoning* bosster as well as to some extent the *Conversation* booster rely on the capability of the configured LLM to *call* external functions as part of their reasoning process. This is achieved by the so-called tool interface of the LLM. Tools are supported at the time of this writing by the following models:
+
+  - GPT 3.5 and above from *OpenAI*
+  - Mistral Small, Mistral Large and Mixtral 8x22b from *Mistral AI*
+  - Claude3 by *Anthropic* (via *OpenRouter*)
+  - Command-R+ by *Cohere* (via *OpenRouter*, but not working properly yet)
+  - Some Open Source models, such as Open Hermes, also support tools but with a varying degree of reliability
+
+Please note that calling actions is currently only available when using *OpenAI*, *Mistral AI* or *OpenRouter* are used as GPT service providers.
 
 ### Instructions
 
@@ -204,6 +218,12 @@ You can enable or disable individual predefined actions using the checkbox on th
 
 As you can see, defining individual actions is really an expert topic and therefore nothing for the casual user. If you want use this feature, I can offer a personal introduction and coaching as part of the Patreon membership.
 
+Here is a very simple example:
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Action%20Definition.JPG)
+
+This action calls the [controller acton]((https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions)) "trigger" with "!w" as an argument in the Simulator Cntroller process. This sends the keyboard command Alt-w to the current simulator, thereby starting the windscreen wiper. This action may be activated by a voice command like "Can you start the windscreen wiper?" when using the *Conversation* booster, or it can be automatically triggered by the *Reasoning* booster, when event is signalled that tells that it just start raining.
+
 ## Managing Events
 
 As discussed above, you can use predefined events or define your own events in the rule engine of a given Assistant, when using the *Reasoning* booster.
@@ -246,4 +266,79 @@ Here is an example of a few rules that together detect that it just started rain
 	Rain.Start.updateRain(?fact) <= !Weather.Weather.Now = Drizzle, !, Set(?fact, false)
 	Rain.Start.updateRain(?fact) <= Set(?fact, true)
 
+Another example, this time using an argument:
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Event%20Definition.png)
+
+This simple event signals the start of a new lap. The lap number is supplied as a parameter and the message send to the LLM is "The lap 42 just has been started."
+ 
 Please also take a look at the other predefined events of the Race Engineer or the other Assistants to learn more about writing event rules. And I recommend to take a look at the knowledge base of a session to learn more about all the facts you canuse in the event rules (and also the action rules). To do this, activate the "Debug Knowledgebase" item in the tray bar menu of a given Assistant applicaton. Then open the corrsponding "*.knowledge" file in the *Simulator Controller\Temp* folder which is located in your user *Documents* folder.
+
+## Predefined Actions & Events
+
+All Race Assistants come with a set of predefined Actions and Events for you to choose from. Most of the Actions will be available both in the *Conversation* and in the *Reasoning* boosters, but there are exceptions. Below is a complete reference for each Assistant.
+
+Please note, that it depends on the available data in the knowledge base, whether the LLM will decide to trigger an action or not. If the LLM refuses to do so, you still have all the traditional voice commands and the controller actions at your disposal.
+
+Beside the predefined actions for the different Assistant, which come with the standard installation as listed below, you can also define your own actions & events. But this will require a very deep knowledge of the inner workings of Simulator Controller and the Assistants. You have been warned.
+
+### Race Engineer
+
+#### Actions
+
+| Action                      | Parameter(s)      | Conversation | Reasoning | Command(s) / Description |
+|-----------------------------|-------------------|--------------|-----------|--------------------------|
+| Pitstop Planning            | 1. [Optional] targetLap<br>2. [Optional] refuelAmount<br>3. [Optional] changeTyres<br>4. [Optional] repairDamage<br>5. [Optional] swapDriver | Yes | Yes | "We must pit for repairs. Can you create a plan without refueling and without tyre change?"<br>*changeTyres*, *repairDamage* and *swapDriver* all indicate using a *Boolean* whether the repsective service will be provided during pitstop. |
+| Pitstop Clearance           | -                 | Yes | Yes | "I have changed my mind, the pitstop is no longer needed." |
+| Damage Impact Recalculation | -                 | Yes | No | "Can you recalculate the time loss caused by the damage?" |
+| Damage Reporting            | 1. [Required] suspensionDamage<br>2. [Required] bodyworkDamage<br>3. [Required] engineDamage | No | Yes | Typically activated when new damage is detected in the telemetry data. There is an event available, that signals new damage. The parameters accept *Boolean* values to indicate, whether this type of damage is to be reported. |
+| Weather Reporting (1)       | 1. [Required] weather<br>2. [Required] minutes<br>3. [Required] impactsStrategy | No | Yes | Typically activated when an upcoming weather change is detected in the telemetry data. There is an event available, that signals a change in the weather forecast. *weather* must be one of "Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain" and "Thunderstorm". *minutes* specify the time, when the new weather will arrive and *impactsStrategy* accepts a *Boolean* that indicates, whether a tyre change might be beneficial. |
+
+##### Notes
+
+1. Not available, when the Race Strategist is active.
+
+#### Events
+
+| Event                       | Parameter(s)      | Description |
+|-----------------------------|-------------------|-------------|
+| Damage Collected            | 1. [Required] suspensionDamage<br>2. [Required] bodyworkDamage<br>3. [Required] engineDamage | This event is signalled, if new damage is detected for a part of the car. The parameters accept *Boolean* values to indicate where the damage occured. |
+| Weather Update (1)          | 1. [Required] weather<br>2. [Required] minutes<br>3. [Required] impactsStrategy | Indicates an upcoming weather change. *weather* must be one of "Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain" and "Thunderstorm". *minutes* specify the time, when the new weather will arrive and *impactsStrategy* accepts a *Boolean* that indicates, whether a tyre change might be beneficial. |
+| Rain Started                | - | This event is signalled, if rain just started. |
+| Rain Stopped                | - | This event is signalled, if rain just stopped. |
+
+##### Notes
+
+1. Not available, when the Race Strategist is active.
+
+### Race Strategist
+
+#### Actions
+
+| Action                 | Parameter(s)      | Conversation | Reasoning | Command(s) / Description |
+|------------------------|-------------------|--------------|-----------|--------------------------|
+| Pitstop Simulation     | [Optional] lap    | Yes | No | "What do you think? Can we go for an undercut in lap 7?" or "Can we get some clean air when we pit earlier?" |
+| Pitstop Planning       | [Optional] lap    | Yes | Yes | "Can you ask the Engineer to create a pitstop plan for the next lap?" |
+| Strategy Recalculation | -                 | Yes | No | "Can you check whether we can skip the last pitstop, if we use a fuel saving map from now on?" |
+| Weather Reporting      | 1. [Required] weather<br>2. [Required] minutes<br>3. [Required] impactsStrategy | No | Yes | Typically activated when an upcoming weather change is detected in the telemetry data. There is an event available, that signals a change in the weather forecast. *weather* must be one of "Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain" and "Thunderstorm". *minutes* specify the time, when the new weather will arrive and *impactsStrategy* accepts a *Boolean* that indicates, whether a tyre change might be beneficial. |
+
+#### Events
+
+| Event                       | Parameter(s)      | Description |
+|-----------------------------|-------------------|-------------|
+| Weather Update            | 1. [Required] weather<br>2. [Required] minutes<br>3. [Required] impactsStrategy | Indicates an upcoming weather change. *weather* must be one of "Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain" and "Thunderstorm". *minutes* specify the time, when the new weather will arrive and *impactsStrategy* accepts a *Boolean* that indicates, whether a tyre change might be beneficial. |
+| Rain Started                | - | This event is signalled, if rain just started. |
+| Rain Stopped                | - | This event is signalled, if rain just stopped. |
+
+### Race Spotter
+
+#### Actions
+
+| Action                   | Parameter(s) | Conversation | Reasoning | Command(s) / Description |
+|--------------------------|--------------|--------------|-----------|--------------------------|
+| Reset Deltas             | -            | Yes | No | "Can you reset the delta information for all cars?" |
+| Reset Accident Detection | -            | Yes | No | "There are false positives for accidents and slow cars on the track. Please correct that." |
+
+#### Events
+
+None.

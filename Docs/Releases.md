@@ -62,7 +62,7 @@
 	 - Multiple consecutive function or method calls can now be defined for one single conversation action.
 	 - Hold down the Control key while clicking on "Ok" button will not leave the editor, but instead will show you the API tool definitions in JSON format.
   10. Whenever a Conversation Booster is configured for a Race Assistant, a transcript of every LLM activation is stored in the *Simulator Controller\Logs\Transcripts* folder which is located in your user *Documents* folder.
-  11. The ["Plan Pitstop" conversation action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#trigger-actions-from-conversation) for the Race Engineer now lso allows to call for a driver swap in team races.
+  11. The "Plan Pitstop" conversation action for the Race Engineer now lso allows to call for a driver swap in team races.
   12. Two [predefined conversation actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#trigger-actions-from-conversation) for the Spotter are now available:
       - The LLM can decide to reset and recalculate the delta and lap time history for all cars.
 	  - And you can ask the LLM to reset the reference speed data of all cars around the track, when too many false positives for accidents and slow cars are given.
@@ -73,7 +73,7 @@
   2. Documentation updates here and there, as always
   3. Fixed the lap time comparison information of the Spotter in multiclass races. A bug resulted in a comparison of cars from different classes which resulted in very confusing information.
   4. The default instructions of the Conversation Booster has been updated again to improve conversation quality further. Please see the Update Notes, if you have modified these instructions.
-  5. The LLMs used to boost the conversation capabilities of the Assistants are now allowed to trigger some actions as a result of your interaction. A few actions already have been defined for the [Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#trigger-actions-from-conversation) and the [Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#trigger-actions-from-conversation) with more to come in the next releases. Using actions, it is possible to define new voice commands, but the LLMs are also allowed to trigger the actions based on the current situation and data constellation.
+  5. The LLMs used to boost the conversation capabilities of the Assistants are now allowed to trigger some actions as a result of your interaction. A few [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#predefined-actions-&-events) already have been defined for the Engineer and the Strategist with more to come in the next releases. Using actions, it is possible to define new voice commands, but the LLMs are also allowed to trigger the actions based on the current situation and data constellation.
   
      Please note, that using *Actions* is not enabled by default, but must be explicitly activated in the configuration.
   6. Action definition files are customizeable in the [Documents]\Simulator Controller\Actions folder.

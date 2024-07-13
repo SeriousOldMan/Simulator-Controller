@@ -38,7 +38,8 @@
     - [Customizing Startup Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#customizing-startup-configuration)
 	- [Customizing Controller Notifications](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#customizing-controller-notifications)
 	- [Controller Mode Automation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#configuration-of-the-controller-mode-automation)
-	- [Splash Screen Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#splash-screen-configuration)
+	- [Themes & Colors](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#themes-&-colors)
+	  - [Color Scheme](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#color-schemes)
 	- [More Settings & Configurations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#more-settings--configurations)
   - [Using Simulator Controller](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#using-simulator-controller)
     - [Startup profiles](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles)
@@ -243,6 +244,7 @@
   - [Instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#instructions)
   - [Managing Actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions)
   - [Managing Events](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-events)
+  - [Predefined Actions & Events](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#predefined-actions-&-events)
 	
 [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server)
 ------

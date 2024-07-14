@@ -1,5 +1,5 @@
 [Development]
-Version=5.7.9.0-release
+Version=5.7.9.0-alpha
 Target=5.7.9.0-release
 Date=07/05/2024
 Download=https://cutt.ly/eefkWlXJ;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.7.9.0-release.zip
@@ -24,5 +24,5 @@ Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Ut
 [Current]
 Type=Release
 [Version]
-Development=5.7.9.0-release
+Development=5.7.9.0-alpha
 Release=5.7.9.0-release

@@ -1738,6 +1738,16 @@ class CallbacksEditor {
 				if (theCallback.Type = "Assistant.Rule") {
 					theCallback.Script := FileRead(getFileName(descriptor[2], kResourcesDirectory . "Actions\", kUserHomeDirectory . "Actions\"))
 
+					if (theCallback.Builtin && isDebug())
+						try {
+							RuleCompiler().compileRules(theCallback.Script, &ignore := false, &ignore := false)
+						}
+						catch Any as exception {
+							OnMessage(0x44, translateOkButton)
+							withBlockedWindows(MsgBox, translate("Error in builtin rule " . theCallback.Name . ":`n`n") . (isObject(exception) ? exception.Message : exception), translate("Error"), 262160)
+							OnMessage(0x44, translateOkButton, 0)
+						}
+
 					theCallback.Definition := ""
 				}
 

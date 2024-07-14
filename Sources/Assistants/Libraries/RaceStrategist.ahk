@@ -30,6 +30,25 @@
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+class PitstopUpcomingEvent extends AssistantEvent {
+	Asynchronous {
+		Get {
+			return true
+		}
+	}
+
+	createTrigger(event, phrase, arguments) {
+		return ("The next pitstop is upcoming in lap " . arguments[1] . ".")
+	}
+
+	handleEvent(event, arguments*) {
+		if !super.handleEvent(event, arguments*)
+			this.Assistant.reportUpcomingPitstop(arguments*)
+
+		return true
+	}
+}
+
 class WeatherForecastEvent extends AssistantEvent {
 	Asynchronous {
 		Get {
@@ -3626,7 +3645,7 @@ class RaceStrategist extends GridRaceAssistant {
 			}
 	}
 
-	reportUpcomingPitstop(plannedPitstopLap) {
+	reportUpcomingPitstop(plannedPitstopLap, planPitstop := true) {
 		local knowledgeBase := this.KnowledgeBase
 		local fullCourseYellow, speaker, plannedLap, nextPitstop, maxLap
 		local refuel, tyreChange, tyreCompound, tyreCompoundColor
@@ -3671,7 +3690,7 @@ class RaceStrategist extends GridRaceAssistant {
 													   , laps: (plannedPitstopLap - knowledgeBase.getValue("Lap"))})
 				}
 
-				if ProcessExist("Race Engineer.exe")
+				if (ProcessExist("Race Engineer.exe") && planPitstop)
 					if fullCourseYellow {
 						refuel := Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"), 1)
 						tyreChange := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change")

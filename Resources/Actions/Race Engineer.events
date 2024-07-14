@@ -1,5 +1,5 @@
 [Agent.Events]
-Active=damage_collected, rain_started, rain_stopped, weather_forecast, fuel_low
+Active=damage_collected,rain_started,rain_stopped,weather_forecast,fuel_low
 [Agent.Events.Builtin]
 damage_collected=Assistant.Class|DamageEvent|Damage||3|This event is triggered when the car collected new damage.
 fuel_low=Assistant.Class|FuelLowEvent|FuelLow||2|This event is triggered when the car is running low on fuel.

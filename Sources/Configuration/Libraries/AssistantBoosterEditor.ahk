@@ -650,9 +650,10 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 	}
 
 	saveProviderConfiguration() {
+		local providerConfiguration, value, ignore, setting
+
 		if this.iCurrentConversationProvider {
-			local providerConfiguration := this.iProviderConfigurations["Conversation." . this.iCurrentConversationProvider]
-			local value, ignore, setting
+			providerConfiguration := this.iProviderConfigurations["Conversation." . this.iCurrentConversationProvider]
 
 			providerConfiguration["ServiceURL"] := Trim(this.Control["viConversationServiceURLEdit"].Text)
 			providerConfiguration["ServiceKey"] := Trim(this.Control["viConversationServiceKeyEdit"].Text)
@@ -699,8 +700,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		}
 
 		if this.iCurrentAgentProvider {
-			local providerConfiguration := this.iProviderConfigurations["Agent." . this.iCurrentAgentProvider]
-			local value, ignore, setting
+			providerConfiguration := this.iProviderConfigurations["Agent." . this.iCurrentAgentProvider]
 
 			providerConfiguration["ServiceURL"] := Trim(this.Control["viAgentServiceURLEdit"].Text)
 			providerConfiguration["ServiceKey"] := Trim(this.Control["viAgentServiceKeyEdit"].Text)
@@ -711,8 +711,6 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 			providerConfiguration["Agent"] := true
 		}
-		else
-			providerConfiguration["Agent"] := false
 	}
 
 	loadConfigurator(configuration, simulators := false) {
@@ -1191,7 +1189,7 @@ class CallbacksEditor {
 
 		editorGui.Add("Text", "x430 yp+28 w90 h23 +0x200 X:Move(0.34) Y:Move(0.25)", translate("Name / Type"))
 		editorGui.Add("Edit", "x536 yp h23 w127 Y:Move(0.25) X:Move(0.34) vparameterNameEdit")
-		editorGui.Add("DropDownList", "x665 yp w90 Y:Move(0.25) X:Move(0.34) vparameterTypeDropDown", collect(["String", "Integer", "Boolean"], translate)).OnEvent("Change", (*) => this.updateState())
+		editorGui.Add("DropDownList", "x665 yp w90 Y:Move(0.25) X:Move(0.34) vparameterTypeDropDown", collect(["String", "Integer", "Number", "Boolean"], translate)).OnEvent("Change", (*) => this.updateState())
 		editorGui.Add("DropDownList", "x758 yp w90 Y:Move(0.25) X:Move(0.34) vparameterOptionalDropDown", collect(["Required", "Optional"], translate)).OnEvent("Change", (*) => this.updateState())
 
 		editorGui.Add("Text", "x430 yp+24 w90 h23 +0x200 Y:Move(0.25) X:Move(0.34)", translate("Description"))
@@ -1620,7 +1618,7 @@ class CallbacksEditor {
 	loadParameter(parameter) {
 		if parameter {
 			this.Control["parameterNameEdit"].Text := parameter.Name
-			this.Control["parameterTypeDropDown"].Choose(inList(["String", "Integer", "Boolean"], parameter.Type))
+			this.Control["parameterTypeDropDown"].Choose(inList(["String", "Integer", "Number", "Boolean"], parameter.Type))
 			this.Control["parameterDescriptionEdit"].Text := parameter.Description
 			this.Control["parameterOptionalDropDown"].Choose(1 + (!parameter.Required ? 1 : 0))
 		}
@@ -1656,7 +1654,7 @@ class CallbacksEditor {
 		if valid {
 			parameter.Name := name
 			parameter.Description := Trim(this.Control["parameterDescriptionEdit"].Text)
-			parameter.Type := ["String", "Integer", "Boolean"][this.Control["parameterTypeDropDown"].Value]
+			parameter.Type := ["String", "Integer", "Number", "Boolean"][this.Control["parameterTypeDropDown"].Value]
 			parameter.Required := (this.Control["parameterOptionalDropDown"].Value = 1)
 
 			this.ParametersListView.Modify(inList(this.SelectedCallback.Parameters, parameter), "", parameter.Name, parameter.Description)

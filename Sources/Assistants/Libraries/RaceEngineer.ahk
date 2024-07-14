@@ -3230,12 +3230,15 @@ class RaceEngineer extends RaceAssistant {
 		messageSend(kFileMessage, callbackCategory, callbackMessage . ":" . values2String(";", fileName, arguments*), callbackPID)
 	}
 
-	lowFuelWarning(remainingFuel, remainingLaps) {
+	lowFuelWarning(remainingFuel, remainingLaps, planPitstop := true) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker
 
 		if (this.hasEnoughData(false) && this.Speaker[false] && this.Announcements["FuelWarning"])
 			if (!knowledgeBase.getValue("InPitlane", false) && !knowledgeBase.getValue("InPit", false)) {
+				remainingFuel := Round(remainingFuel, 1)
+				remainingLaps := Floor(remainingLaps)
+
 				speaker := this.getSpeaker()
 
 				speaker.beginTalk()
@@ -3246,7 +3249,7 @@ class RaceEngineer extends RaceAssistant {
 					if this.supportsPitstop()
 						if this.hasPreparedPitstop()
 							speaker.speakPhrase((remainingLaps <= 2) ? "LowComeIn" : "ComeIn")
-						else if !this.hasPlannedPitstop() {
+						else if (!this.hasPlannedPitstop() && planPitstop) {
 							if this.confirmAction("Pitstop.Fuel") {
 								speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 
@@ -3255,7 +3258,7 @@ class RaceEngineer extends RaceAssistant {
 							else
 								this.planPitstop("Now")
 						}
-						else {
+						else if planPitstop {
 							if this.confirmAction("Pitstop.Fuel") {
 								speaker.speakPhrase("ConfirmPrepare", false, true)
 

@@ -23,8 +23,9 @@
 	 - Light (formerly named "Windows", uses the default Windows colors)
 	 - Dark (new, uses the dark theme colors of Windows 10 / 11)
 	 See the updated [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#color-schemes) for some examples.
-  10. [Internal] Implemented a postprocessor for the compiler which compresses the binary files. The applications are much smaller now.
-  11. [Internal] Migrated to AHK 2.1-alpha.14 (needed for dark color scheme).
+  10. The automaed update procedure now asks before a non-release version is installed.
+  11. [Internal] Implemented a postprocessor for the compiler which compresses the binary files. The applications are much smaller now.
+  12. [Internal] Migrated to AHK 2.1-alpha.14 (needed for dark color scheme).
 
 ## 5.7.9.0-release 07/05/24
   1. Minor bugfixes, as always

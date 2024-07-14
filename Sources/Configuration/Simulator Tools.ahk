@@ -334,7 +334,8 @@ checkInstallation() {
 
 	local installLocation := ""
 	local installInfo, quiet, options, msgResult, hasSplash, command, component, source
-	local install, index, options, isNew, packageLocation, ignore, directory, currentDirectory
+	local install, index, options, isNew, packageLocation, packageInfo, version
+	local ignore, directory, currentDirectory
 
 	installComponents(packageLocation, installLocation, temporary := false) {
 		global gProgressCount
@@ -672,6 +673,26 @@ checkInstallation() {
 					  , StartSetup: isNew, Update: !isNew}
 
 			packageLocation := normalizeDirectoryPath(kHomeDirectory)
+			packageInfo := readMultiMap(packageLocation . "\VERSION")
+			version := getMultiMapValue(packageInfo, "Release", "Version"
+												   , getMultiMapValue(packageInfo, "Version", "Release", false))
+
+			if !InStr(version, "-release") {
+				OnMessage(0x44, translateYesNoButtons)
+				msgResult := withBlockedWindows(MsgBox, substituteVariables(translate("This is a %version% version. Do you really want to install it?")
+																		  , {version: StrTitle(string2Values("-", version)[2])})
+													  , translate("Update"), 262436)
+				OnMessage(0x44, translateYesNoButtons, 0)
+
+				if (msgResult != "Yes") {
+					index := inList(A_Args, "-Start")
+
+					if index
+						Run(A_Args[index + 1])
+
+					ExitApp(0)
+				}
+			}
 
 			if ((!isNew && !options.Verbose) || installOptions(options)) {
 				installLocation := options.InstallLocation

@@ -334,7 +334,7 @@ checkInstallation() {
 
 	local installLocation := ""
 	local installInfo, quiet, options, msgResult, hasSplash, command, component, source
-	local install, index, options, isNew, packageLocation, packageInfo, version
+	local install, index, options, isNew, packageLocation, packageInfo, packageType, version
 	local ignore, directory, currentDirectory
 
 	installComponents(packageLocation, installLocation, temporary := false) {
@@ -674,8 +674,9 @@ checkInstallation() {
 
 			packageLocation := normalizeDirectoryPath(kHomeDirectory)
 			packageInfo := readMultiMap(packageLocation . "\VERSION")
-			version := getMultiMapValue(packageInfo, "Release", "Version"
-												   , getMultiMapValue(packageInfo, "Version", "Release", false))
+			packageType := getMultiMapValue(packageInfo, "Current", "Type")
+			version := getMultiMapValue(packageInfo, packageType, "Version"
+												   , getMultiMapValue(packageInfo, "Version", packageType, false))
 
 			if !InStr(version, "-release") {
 				OnMessage(0x44, translateYesNoButtons)
@@ -3202,7 +3203,7 @@ runBuildTargets(&buildProgress) {
 
 						deleteFile(sourceDirectory . "\compile.ahk")
 
-						FileAppend(sourceCode, sourceDirectory . "\compile.ahk")
+						FileAppend(sourceCode, sourceDirectory . "\compile.ahk", "UTF-8")
 
 						result := RunWait(kProductionCompiler . options . " /in `"" . sourceDirectory . "\compile.ahk" . "`"")
 

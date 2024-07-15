@@ -246,6 +246,7 @@ As you can see, this editor looks very similar to the actions editor discussed a
    |-------------|-------------|
    | Event Class | The event is handled by an instance of a builtin class. This is mainly used for builtin events provided by the Assistant implementation. Butif you are an experienced developer, you can implement your own event classes, which are based on the "AssistantEvent" class. Notes:<br><br>1. The name of the class must be entered into the "Class" field. It must be in the global name space.<br><br>2. You have to supply the "Signal" identifier, but you don't have to provide an event phrase, since this is derived by the implementation of the event class. |
    | Event Rule | The supplied rules are loaded into the rule engine of the given Race Assistant. These rules have full access to the knowledge base and all other rules of this Assistant.<br><br>The event rules can use the full knowledge to derive whether the event in question should be raised. They then raise the event by *calling* the "Assistant.Raise* predicate, optionally supplying additional arguments to the event, which can be referenced in the event phrase.<br><br>Note: Actually, you don't have to raise an event in the event rules, if you are able to handle the situation directly using the rules. In this case, the LLM is not activated. |
+   | Event Disabled | This is a special one, inidcated by a "-" in the "Active" column in the list of events. It declares that the event is consumed, so that the rule engine does not do the default processing for this event. But the event is also processed by the LLM effectively disabling this type of event at all. This makes sense in combination with very smart LLMs, which will trigger actions simply by looking at the data (see the discussion [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#connecting-events-&-actions). This makes only sense for the builtin events, of course. |
 
 3. When defining the rules for a custom event, you can use all predicates the introduced above for actions. Additionally, you can use:
    
@@ -268,7 +269,7 @@ Here is an example of a few rules that together detect that it just started rain
 
 Another example, this time using an argument:
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Event%20Definition.png)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Event%20Definition%201.JPG)
 
 This simple event signals the start of a new lap. The lap number is supplied as a parameter and the message send to the LLM is "The lap 42 just has been started."
  
@@ -351,3 +352,13 @@ Beside the predefined actions for the different Assistant, which come with the s
 |-----------------------------|-------------------|-------------|
 | Position Lost               | - | This event is signalled, if one or more positions has just been lost. |
 | Position Gained             | - | This event is signalled, if one or more positions has just been gained. |
+
+### Connecting Events & Actions
+
+As usual, it depends on the capabilities of the LLM, which actions will be called as a result of a given event. Additionally, because of the inherent non-deterministic nature of LLMs, the behaviour may vary between invocations. You have to decide which events you will send to the LLM (i.e. are activated) and which events should be handled by the rule engine (i.e. are deactivated). Anyway, using the builtin events will not result in a very different behaviour than running an Assistant without the *Reasoning* booster, since in most cases the LLM will decide to connect an event to its natural corresponding action. Example: *Fuel Low* -> *Low Fuel Reporting*
+
+As LLMs become smarter, we will be able to rely more and more on the intelligence and the domain specific knowledge of the LLM. I have run some tests using some of the current high end models (GPT 4o, Claude 3.5 Sonnet, ...) by disabling all events and running only one very simple event:
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Event%20Definition%202.JPG)
+
+The results are very promising, but these models are still very expensive. If you want to use this approach, make sure, that you leave all builtin events "Active" but set their type to "Event Disabled", because otherwise they will be handled by the rule engine and you might end up with duplicate behaviour, for example a pitstop being planned twice.

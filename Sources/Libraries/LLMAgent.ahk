@@ -258,7 +258,7 @@ class EventBooster extends AgentBooster {
 																	, variables)]
 											   , false, &calls := [])
 
-					if (answer = true) {
+					if (calls.Length > 0) {
 						Task.startTask(() => FileAppend(translate("-- Event --------") . "`n`n" . ((event.Name . ":" . event.Event) . " -> " . trigger) . "`n`n" . translate("-- " . translate("Reasoning") . " ---------") . "`n`n" . values2String("`n", collect(calls, printCall)*) . "`n`n", this.Transcript, "UTF-16"), 0, kLowPriority)
 
 						return true

@@ -24,6 +24,16 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;; This fact is set for each invocation of the rule engine. It can be used ;;;
+;;; to start periodic tasks.                                                ;;;
+;;;-------------------------------------------------------------------------;;;
+
+; [?Update] => ...
+
+priority: -20, [?Update] => (Clear: Update)
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;; If "Pitstop.Plan" is set, the current data will be used to compute      ;;;
 ;;; the settings for the next pitstop. The settings might be changed        ;;;
 ;;; afterwards, for example by driver intervention, before they will be     ;;;

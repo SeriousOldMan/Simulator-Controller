@@ -58,8 +58,10 @@ class AssistantEvent extends AgentEvent {
 
 	iName := false
 	iEvent := false
-	iGoal := false
 
+	iEnabled := true
+
+	iGoal := false
 	iParameters := []
 
 	iOptions := []
@@ -85,9 +87,21 @@ class AssistantEvent extends AgentEvent {
 		}
 	}
 
+	Enabled {
+		Get {
+			return this.iEnabled
+		}
+	}
+
 	Goal {
 		Get {
 			return this.iGoal
+		}
+	}
+
+	Phrase {
+		Get {
+			return "Take a look at the current data and decide what to do."
 		}
 	}
 
@@ -109,10 +123,11 @@ class AssistantEvent extends AgentEvent {
 		}
 	}
 
-	__New(assistant, name, event, parameters, goal := false, options := false) {
+	__New(assistant, name, enabled, event, parameters, goal := false, options := false) {
 		this.iAssistant := assistant
 
 		this.iName := name
+		this.iEnabled := enabled
 		this.iEvent := event
 		this.iGoal := goal
 
@@ -163,8 +178,21 @@ class AssistantEvent extends AgentEvent {
 								 , Map("Variables", this.createVariables(event, arguments)))
 		}
 
+		printArguments(arguments) {
+			arguments := arguments.Clone()
+
+			loop arguments.Length
+				if !arguments.Has(A_Index)
+					arguments[A_Index] := ""
+
+			return values2String(", ", arguments*)
+		}
+
 		if (booster && this.handledEvent(event)) {
 			arguments := this.createArguments(event, arguments)
+
+			if isDebug()
+				showMessage("LLM -> " . this.Event . "[" .  printArguments(arguments) . "]")
 
 			if this.Asynchronous {
 				Task.startTask(triggerEvent, 0, (Task.CurrentTask ? Task.CurrentTask.Priority : kNormalPriority))
@@ -188,10 +216,10 @@ class RuleEvent extends AssistantEvent {
 		}
 	}
 
-	__New(assistant, name, event, phrase, parameters, goal := false, options := false) {
+	__New(assistant, name, enabled, event, phrase, parameters, goal := false, options := false) {
 		this.iPhrase := phrase
 
-		super.__New(assistant, name, event, parameters, goal, options)
+		super.__New(assistant, name, enabled, event, parameters, goal, options)
 	}
 }
 
@@ -1055,6 +1083,9 @@ class RaceAssistant extends ConfigurationItem {
 				laps := []
 
 				loop lapNumber {
+					if (A_Index > 5)
+						break
+
 					lapNr := (lapNumber - A_Index + 1)
 
 					if knowledgeBase.hasFact("Lap." . lapNr . ".Time")
@@ -1411,8 +1442,11 @@ class RaceAssistant extends ConfigurationItem {
 
 		if this.AgentBooster
 			for ignore, candidate in this.iEvents
-				if (candidate.handledEvent(event) && candidate.handleEvent(event, arguments*))
-					return true
+				if candidate.handledEvent(event)
+					if !candidate.Enabled
+						return true
+					else if candidate.handleEvent(event, arguments*)
+						return true
 
 		return false
 	}
@@ -1420,9 +1454,11 @@ class RaceAssistant extends ConfigurationItem {
 	createAgentEvents(&productions, &reductions, &includes) {
 		local configuration := readMultiMap(kResourcesDirectory . "Actions\" . this.AssistantType . ".events")
 		local events := []
-		local ignore, event, definition, parameters, parameter, enumeration, required, handler
+		local disabled, ignore, event, definition, parameters, parameter, enumeration, required, handler
 
 		addMultiMapValues(configuration, readMultiMap(kUserHomeDirectory . "Actions\" . this.AssistantType . ".events"))
+
+		disabled := string2Values(",", getMultiMapValue(configuration, "Agent.Events", "Disabled", ""))
 
 		for ignore, event in string2Values(",", getMultiMapValue(configuration, "Agent.Events", "Active", "")) {
 			definition := getMultiMapValue(configuration, "Agent.Events.Custom", event, false)
@@ -1453,13 +1489,13 @@ class RaceAssistant extends ConfigurationItem {
 
 					switch definition[1], false {
 						case "Assistant.Class":
-							handler := %definition[2]%(this, event, definition[3], parameters)
+							handler := %definition[2]%(this, event, !inList(disabled, event), definition[3], parameters)
 						case "Assistant.Rule":
 							RuleCompiler().compileRules(FileRead(getFileName(definition[2], kUserHomeDirectory . "Actions\"
 																						  , kResourcesDirectory . "Actions\"))
 													  , &productions, &reductions, &includes)
 
-							handler := RuleEvent(this, event, definition[3], definition[4], parameters)
+							handler := RuleEvent(this, event, !inList(disabled, event), definition[3], definition[4], parameters)
 						default:
 							throw "Unknown event type (" definition[1] . ") detected in RaceAssistant.createAgentEvents..."
 					}
@@ -2199,6 +2235,8 @@ class RaceAssistant extends ConfigurationItem {
 		knowledgeBase.addFact("Lap." . lapNumber . ".Temperature.Air", airTemperature)
 		knowledgeBase.addFact("Lap." . lapNumber . ".Temperature.Track", trackTemperature)
 
+		knowledgeBase.setFact("Update", true)
+
 		result := knowledgeBase.produce()
 
 		if (dump && this.Debug[kDebugKnowledgeBase])
@@ -2239,6 +2277,8 @@ class RaceAssistant extends ConfigurationItem {
 		knowledgeBase.setFact("Lap.Valid", lapValid)
 		knowledgeBase.setFact("Lap.Penalty", lapPenalty)
 		knowledgeBase.setFact("Lap.Warnings", getMultiMapValue(data, "Stint Data", "Warnings", 0))
+
+		knowledgeBase.setFact("Update", true)
 
 		result := knowledgeBase.produce()
 

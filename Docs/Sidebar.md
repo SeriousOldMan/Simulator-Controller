@@ -245,6 +245,7 @@
   - [Managing Actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions)
   - [Managing Events](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-events)
   - [Predefined Actions & Events](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#predefined-actions-&-events)
+    - [Connecting Events & Actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#connecting-events-&-actions)
 	
 [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server)
 ------

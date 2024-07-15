@@ -70,7 +70,7 @@ class DamageEvent extends AssistantEvent {
 			if arguments[index]
 				damage.Push(type)
 
-		return ("Damage has just been collected for " . values2String(", ", damage*))
+		return ("Damage has just been collected for " . values2String(", ", damage*) . ".")
 	}
 
 	handleEvent(event, arguments*) {

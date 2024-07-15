@@ -34,20 +34,20 @@ showMessage(message, title := false, icon := kUndefined, duration := 1000
 	if (y = kUndefined)
 		y := popupPosition
 
+	messageGui := Window()
+
 	if (icon = kUndefined)
 		icon := "Information.png"
 
 	if (!title || (title = ""))
 		title := translate("Modular Simulator Controller System")
 
-	messageGui := Window()
-
 	messageGui.SetFont("s10 Bold")
 	messageGui.Add("Text", "x8 y8 W" . innerWidth . " +0x200 +0x1 BackgroundTrans", title)
 	messageGui.SetFont()
 
 	if icon {
-		messageGui.Add("Picture", "w50 h50", kIconsDirectory . icon)
+		messageGui.Add("Picture", "w50 h50", messageGui.Theme.InitializeImage(kIconsDirectory . icon))
 
 		innerWidth -= 66
 

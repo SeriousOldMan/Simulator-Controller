@@ -510,7 +510,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 			if (provider = this.iCurrentAgentProvider)
 				setMultiMapValue(configuration, "Agent Booster", this.Assistant . ".Agent"
-											  , this.Control["viConversationProviderDropDown"].Value > 1)
+											  , this.Control["viAgentProviderDropDown"].Value > 1)
 
 			providerConfiguration := this.iProviderConfigurations["Agent." . provider]
 
@@ -1116,7 +1116,7 @@ class CallbacksEditor {
 		editorGui.Add("CheckBox", "x90 yp h23 w23 Y:Move(0.25) vcallbackActiveCheck")
 
 		if (this.Type = "Agent.Events")
-			editorGui.Add("DropDownList", "x110 yp w127 Y:Move(0.25) vcallbackTypeDropDown", collect(["Event Class", "Event Rule"], translate)).OnEvent("Change", (*) => this.updateState())
+			editorGui.Add("DropDownList", "x110 yp w127 Y:Move(0.25) vcallbackTypeDropDown", collect(["Event Class", "Event Rule", "Event Disabled"], translate)).OnEvent("Change", (*) => this.updateState())
 		else
 			editorGui.Add("DropDownList", "x110 yp w127 Y:Move(0.25) vcallbackTypeDropDown", collect(["Assistant Method", "Assistant Rule", "Controller Method", "Controller Function"], translate)).OnEvent("Change", (*) => this.updateState())
 
@@ -1272,7 +1272,16 @@ class CallbacksEditor {
 
 				this.Control["callbackNameEdit"].Enabled := false
 				this.Control["callbackDescriptionEdit"].Enabled := false
-				this.Control["callbackTypeDropDown"].Enabled := false
+
+				if (this.Type = "Agent.Events") {
+					this.Control["callbackTypeDropDown"].Enabled := true
+
+					if (this.Control["callbackTypeDropDown"].Value < 3)
+						this.Control["callbackTypeDropDown"].Choose(inList(["Assistant.Class", "Assistant.Rule"], this.SelectedCallback.Type))
+				}
+				else
+					this.Control["callbackTypeDropDown"].Enabled := false
+
 				this.Control["callbackEventEdit"].Enabled := false
 				this.PhraseField[2].Enabled := false
 				this.Control["callbackInitializationDropDown"].Enabled := false
@@ -1300,8 +1309,12 @@ class CallbacksEditor {
 			}
 
 			if (this.Control["callbackTypeDropDown"].Value != 0) {
-				if (this.Type = "Agent.Events")
-					type := ["Class", "Rule"][this.Control["callbackTypeDropDown"].Value]
+				if (this.Type = "Agent.Events") {
+					if (this.Control["callbackTypeDropDown"].Value = 3)
+						type := ((this.SelectedCallback.Type = "Assistant.Class") ? "Class" : "Rule")
+					else
+						type := ["Class", "Rule", "Disabled"][this.Control["callbackTypeDropDown"].Value]
+				}
 				else
 					type := ["Method", "Rule", "Method", "Function"][this.Control["callbackTypeDropDown"].Value]
 			}
@@ -1396,6 +1409,16 @@ class CallbacksEditor {
 
 			this.iSelectedCallback := callback
 
+			if (callback && (this.Type = "Agent.Events")) {
+				this.Control["callbackTypeDropDown"].Delete()
+
+				if callback.Builtin
+					this.Control["callbackTypeDropDown"].Add(collect(["Event Class", "Event Rule", "Event Disabled"], translate))
+				else
+					this.Control["callbackTypeDropDown"].Add(collect(["Event Class", "Event Rule"], translate))
+
+			}
+
 			this.loadCallback(callback)
 
 			this.updateState()
@@ -1468,7 +1491,11 @@ class CallbacksEditor {
 			if (this.Type = "Agent.Events") {
 				this.Control["callbackEventEdit"].Text := callback.Event
 				this.PhraseField[2].Text := callback.Phrase
-				this.Control["callbackTypeDropDown"].Choose(inList(["Assistant.Class", "Assistant.Rule"], callback.Type))
+
+				if callback.Disabled
+					this.Control["callbackTypeDropDown"].Choose(3)
+				else
+					this.Control["callbackTypeDropDown"].Choose(inList(["Assistant.Class", "Assistant.Rule"], callback.Type))
 			}
 			else {
 				this.Control["callbackInitializationDropDown"].Choose(1 + (!callback.Initialized ? 1 : 0))
@@ -1537,8 +1564,18 @@ class CallbacksEditor {
 				valid := false
 			}
 
-		if (this.Type = "Agent.Events")
-			type := ["Assistant.Class", "Assistant.Rule"][this.Control["callbackTypeDropDown"].Value]
+		if (this.Type = "Agent.Events") {
+			if (this.Control["callbackTypeDropDown"].Value = 3) {
+				callback.Disabled := true
+
+				type := callback.Type
+			}
+			else {
+				callback.Disabled := false
+
+				type := ["Assistant.Class", "Assistant.Rule"][this.Control["callbackTypeDropDown"].Value]
+			}
+		}
 		else
 			type := ["Assistant.Method", "Assistant.Rule", "Controller.Method", "Controller.Function"][this.Control["callbackTypeDropDown"].Value]
 
@@ -1572,7 +1609,7 @@ class CallbacksEditor {
 			else
 				callback.Definition := this.CallableField[2].Value
 
-			this.CallbacksListView.Modify(inList(this.Callbacks, callback), "", callback.Name, callback.Active ? translate("x") : "", callback.Description)
+			this.CallbacksListView.Modify(inList(this.Callbacks, callback), "", callback.Name, callback.Active ? translate(callback.Disabled ? "-" : "x") : "", callback.Description)
 		}
 		else {
 			if (StrLen(errorMessage) > 0)
@@ -1705,11 +1742,12 @@ class CallbacksEditor {
 		local extension := ((this.Type = "Agent.Events") ? ".events" : ".actions")
 		local configuration := readMultiMap(kResourcesDirectory . "Actions\" . this.Assistant . extension)
 		local callbacks := []
-		local active, ignore, type, callback, descriptor, parameters, theCallback
+		local active, disabled, ignore, type, callback, descriptor, parameters, theCallback
 
 		addMultiMapValues(configuration, readMultiMap(kUserHomeDirectory . "Actions\" . this.Assistant . extension))
 
 		active := string2Values(",", getMultiMapValue(configuration, this.Type, "Active", ""))
+		disabled := string2Values(",", getMultiMapValue(configuration, this.Type, "Disabled", ""))
 
 		for ignore, type in [this.Type . ".Builtin", this.Type . ".Custom"]
 			for callback, descriptor in getMultiMapValues(configuration, type) {
@@ -1726,11 +1764,13 @@ class CallbacksEditor {
 				}
 
 				if (this.Type = "Agent.Events")
-					theCallback := {Name: callback, Active: inList(active, callback), Type: descriptor[1], Definition: descriptor[2]
+					theCallback := {Name: callback, Active: inList(active, callback), Disabled: inList(disabled, callback)
+								  , Type: descriptor[1], Definition: descriptor[2]
 								  , Description: descriptor[6], Parameters: parameters, Builtin: (type = (this.Type . ".Builtin"))
 								  , Event: descriptor[3], Phrase: descriptor[4]}
 				else
-					theCallback := {Name: callback, Active: inList(active, callback), Type: descriptor[1], Definition: descriptor[2]
+					theCallback := {Name: callback, Active: inList(active, callback), Disabled: inList(disabled, callback)
+								  , Type: descriptor[1], Definition: descriptor[2]
 								  , Description: descriptor[6], Parameters: parameters, Builtin: (type = (this.Type . ".Builtin"))
 								  , Initialized: ((descriptor[3] = kTrue) ? true : ((descriptor[3] = kFalse) ? false : descriptor[3]))
 								  , Confirm: ((descriptor[4] = kTrue) ? true : ((descriptor[4] = kFalse) ? false : descriptor[4]))}
@@ -1757,7 +1797,7 @@ class CallbacksEditor {
 		this.CallbacksListView.Delete()
 
 		for ignore, callback in this.Callbacks
-			this.CallbacksListView.Add("", callback.Name, callback.Active ? translate("x") : "", callback.Description)
+			this.CallbacksListView.Add("", callback.Name, callback.Active ? translate(callback.Disabled ? "-" : "x") : "", callback.Description)
 
 		this.CallbacksListView.ModifyCol()
 
@@ -1767,6 +1807,7 @@ class CallbacksEditor {
 
 	saveCallbacks(save := true) {
 		local active := []
+		local disabled := []
 		local configuration, ignore, callback, index, parameter
 
 		if this.SelectedCallback
@@ -1781,6 +1822,9 @@ class CallbacksEditor {
 		for ignore, callback in this.Callbacks {
 			if callback.Active
 				active.Push(callback.Name)
+
+			if callback.Disabled
+				disabled.Push(callback.Name)
 
 			if !callback.Builtin {
 				if (save && (callback.Type = "Assistant.Rule")) {
@@ -1809,6 +1853,7 @@ class CallbacksEditor {
 		}
 
 		setMultiMapValue(configuration, this.Type, "Active", values2String(",", active*))
+		setMultiMapValue(configuration, this.Type, "Disabled", values2String(",", disabled*))
 
 		if save
 			writeMultiMap(kUserHomeDirectory . "Actions\" . this.Assistant . ((this.Type = "Agent.Events") ? ".events" : ".actions")

@@ -99,10 +99,14 @@ class RaceReportViewer extends RaceReportReader {
 					<meta charset='utf-8'>
 					<head>
 						<style>
-							.headerStyle { height: 25; font-size: 11px; font-weight: 500; color: #%fontColor%; background-color: #%headerBackColor%; }
-							.cellStyle { border: none; }
+							.headerStyle { height: 25; font-size: 12px; font-weight: 500; color: #%fontColor%; background-color: #%headerBackColor%; border: none; border-spacing: 0; border-collapse: collapse; }
+							.cellStyle { border: none; border-spacing: 0; border-collapse: collapse; }
 							.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
 							.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
+							table {
+								border-collapse: collapse;
+								border-spacing: 0;
+							}
 						</style>
 						<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 						<script type="text/javascript">
@@ -480,7 +484,7 @@ class RaceReportViewer extends RaceReportReader {
 
 			drawChartFunction .= ("`ndata.addRows([" . values2String(", ", rows*) . "]);")
 
-			drawChartFunction .= "`nvar cssClassNames = { headerCell: 'headerStyle', tableRow: 'rowStyle', oddTableRow: 'oddRowStyle' };"
+			drawChartFunction .= "`nvar cssClassNames = { headerCell: 'headerStyle', tableRow: 'rowStyle', oddTableRow: 'oddRowStyle', selectedTableRow: 'selectedRowStyle', hoverTableRow: 'hoverRowStyle', tableCell: 'cellStyle' };"
 			drawChartFunction := drawChartFunction . "`nvar options = { cssClassNames: cssClassNames, width: '100%' };"
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.Table(document.getElementById('chart_id')); chart.draw(data, options); }"
 
@@ -843,7 +847,7 @@ class RaceReportViewer extends RaceReportReader {
 
 			drawChartFunction .= ("`ndata.addRows([" . values2String(", ", rows*) . "]);")
 
-			drawChartFunction .= "`nvar cssClassNames = { headerCell: 'headerStyle', tableCell: 'cellStyle', tableRow: 'rowStyle', oddTableRow: 'oddRowStyle' };"
+			drawChartFunction .= "`nvar cssClassNames = { headerCell: 'headerStyle', tableCell: 'cellStyle', tableRow: 'rowStyle', oddTableRow: 'oddRowStyle', selectedTableRow: 'selectedRowStyle', hoverTableRow: 'hoverRowStyle' };"
 			drawChartFunction := drawChartFunction . "`nvar options = { cssClassNames: cssClassNames, width: '100%' };"
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.Table(document.getElementById('chart_id')); chart.draw(data, options); }"
 

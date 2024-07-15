@@ -47,7 +47,7 @@ showMessage(message, title := false, icon := kUndefined, duration := 1000
 	messageGui.SetFont()
 
 	if icon {
-		messageGui.Add("Picture", "w50 h50", messageGui.Theme.InitializeImage(kIconsDirectory . icon))
+		messageGui.Add("Picture", "w50 h50", messageGui.Theme.RecolorizeImage(kIconsDirectory . icon))
 
 		innerWidth -= 66
 

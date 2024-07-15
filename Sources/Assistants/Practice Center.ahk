@@ -1353,7 +1353,7 @@ class PracticeCenter extends ConfigurationItem {
 		centerGui.SetFont("Norm")
 		centerGui.SetFont("s10 Bold", "Arial")
 
-		centerGui.Add("Picture", "x16 yp+12 w30 h30 Section", centerGui.Theme.InitializeImage(kIconsDirectory . "Report.ico"))
+		centerGui.Add("Picture", "x16 yp+12 w30 h30 Section", centerGui.Theme.RecolorizeImage(kIconsDirectory . "Report.ico"))
 		centerGui.Add("Text", "x50 yp+5 w80 h26", translate("Reports"))
 
 		centerGui.SetFont("s8 Norm", "Arial")
@@ -1439,7 +1439,7 @@ class PracticeCenter extends ConfigurationItem {
 		centerGui.SetFont("Norm")
 		centerGui.SetFont("s10 Bold", "Arial")
 
-		centerGui.Add("Picture", "x16 yp+10 w30 h30 Section", centerGui.Theme.InitializeImage(kIconsDirectory . "Watch.ico"))
+		centerGui.Add("Picture", "x16 yp+10 w30 h30 Section", centerGui.Theme.RecolorizeImage(kIconsDirectory . "Watch.ico"))
 		centerGui.Add("Text", "x50 yp+5 w80 h26", translate("Session"))
 
 		centerGui.SetFont("s8 Norm", "Arial")
@@ -7330,14 +7330,14 @@ recommendDataRun(centerOrCommand := false, arguments*) {
 
 			recoGui.SetFont("Norm", "Arial")
 
-			recoGui.Add("Picture", "x8 yp+10 w32 h32", recoGui.Theme.InitializeImage(kIconsDirectory . "Can.ico"))
+			recoGui.Add("Picture", "x8 yp+10 w32 h32", recoGui.Theme.RecolorizeImage(kIconsDirectory . "Can.ico"))
 
 			recoGui.Add("ListView", "x45 yp w320 h135 -Multi -LV0x10 AltSubmit NoSort NoSortHdr vfuelListView", collect(["Map", "Fuel Level"], translate))
 			recoGui["fuelListView"].OnEvent("Click", recommendDataRun.Bind("Recommend", "Fuel"))
 			recoGui["fuelListView"].OnEvent("DoubleClick", recommendDataRun.Bind("Recommend", "Fuel"))
 			recoGui["fuelListView"].OnEvent("ItemSelect", recommendDataRun.Bind("Recommend", "Fuel"))
 
-			recoGui.Add("Picture", "x8 yp+140 w32 h32", recoGui.Theme.InitializeImage(kIconsDirectory . "Wheel.ico"))
+			recoGui.Add("Picture", "x8 yp+140 w32 h32", recoGui.Theme.RecolorizeImage(kIconsDirectory . "Wheel.ico"))
 
 			recoGui.Add("ListView", "x45 yp w320 h135 -Multi -LV0x10 AltSubmit NoSort NoSortHdr vtyreLapsListView", collect(["Fuel Level", "Tyre Laps"], translate))
 			recoGui["tyreLapsListView"].OnEvent("Click", recommendDataRun.Bind("Recommend", "TyreLaps"))

@@ -1898,7 +1898,7 @@ class RaceCenter extends ConfigurationItem {
 		centerGui.SetFont("Norm")
 		centerGui.SetFont("s10 Bold", "Arial")
 
-		centerGui.Add("Picture", "x16 yp+12 w30 h30 Section", centerGui.Theme.InitializeImage(kIconsDirectory . "Report.ico"))
+		centerGui.Add("Picture", "x16 yp+12 w30 h30 Section", centerGui.Theme.RecolorizeImage(kIconsDirectory . "Report.ico"))
 		centerGui.Add("Text", "x50 yp+5 w80 h26", translate("Reports"))
 
 		centerGui.SetFont("s8 Norm", "Arial")
@@ -1989,7 +1989,7 @@ class RaceCenter extends ConfigurationItem {
 
 		centerGui.SetFont("s8 Norm", "Arial")
 
-		centerGui.Add("Picture", "x16 yp+10 w30 h30 Section", centerGui.Theme.InitializeImage(kIconsDirectory . "Tools BW.ico"))
+		centerGui.Add("Picture", "x16 yp+10 w30 h30 Section", centerGui.Theme.RecolorizeImage(kIconsDirectory . "Tools BW.ico"))
 		centerGui.Add("Text", "x50 yp+5 w80 h26", translate("Session"))
 
 		centerGui.Add("Text", "x935 yp+8 w381 0x2 X:Move vmessageField")

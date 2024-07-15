@@ -1634,7 +1634,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	themeIcon(fileName) {
-		return this.Window.Theme.InitializeImage(fileName)
+		return this.Window.Theme.RecolorizeImage(fileName)
 	}
 
 	getSimulators() {
@@ -2855,7 +2855,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		DirCreate(directory)
 
 		this.iTrackMap := trackMap
-		this.iTrackImage := this.Window.Theme.InitializeImage(trackImage)
+		this.iTrackImage := this.Window.Theme.RecolorizeImage(trackImage)
 
 		this.createTrackMap()
 	}

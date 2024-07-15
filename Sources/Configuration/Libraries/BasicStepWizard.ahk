@@ -45,12 +45,12 @@ class BasicStepWizard extends StepWizard {
 			this.SetupWizard.BasicSetup := value
 
 			if this.SetupWizard.BasicSetup {
-				this.Control["basicSetupButton"].Value := window.Theme.InitializeImage(kResourcesDirectory . "Setup\Images\Quick Setup.ico")
-				this.Control["customSetupButton"].Value := window.Theme.InitializeImage(kResourcesDirectory . "Setup\Images\Full Setup Gray.ico")
+				this.Control["basicSetupButton"].Value := window.Theme.RecolorizeImage(kResourcesDirectory . "Setup\Images\Quick Setup.ico")
+				this.Control["customSetupButton"].Value := window.Theme.RecolorizeImage(kResourcesDirectory . "Setup\Images\Full Setup Gray.ico")
 			}
 			else {
-				this.Control["basicSetupButton"].Value := window.Theme.InitializeImage(kResourcesDirectory . "Setup\Images\Quick Setup Gray.ico")
-				this.Control["customSetupButton"].Value := window.Theme.InitializeImage(kResourcesDirectory . "Setup\Images\Full Setup.ico")
+				this.Control["basicSetupButton"].Value := window.Theme.RecolorizeImage(kResourcesDirectory . "Setup\Images\Quick Setup Gray.ico")
+				this.Control["customSetupButton"].Value := window.Theme.RecolorizeImage(kResourcesDirectory . "Setup\Images\Full Setup.ico")
 			}
 
 			return value
@@ -230,11 +230,11 @@ class BasicStepWizard extends StepWizard {
 
 		y += 150
 
-		widget2 := window.Add("Picture", "x" . button1X . " y" . y . " w64 h64 vbasicSetupButton Hidden X:Move(0.33)", window.Theme.InitializeImage(kResourcesDirectory . (this.BasicSetup ? "Setup\Images\Quick Setup.ico" : "Setup\Images\Quick Setup Gray.ico")))
+		widget2 := window.Add("Picture", "x" . button1X . " y" . y . " w64 h64 vbasicSetupButton Hidden X:Move(0.33)", window.Theme.RecolorizeImage(kResourcesDirectory . (this.BasicSetup ? "Setup\Images\Quick Setup.ico" : "Setup\Images\Quick Setup Gray.ico")))
 		widget2.OnEvent("Click", chooseMethod.Bind("Basic"))
 		widget3 := window.Add("Text", "x" . button1X . " yp+68 w64 Hidden Center X:Move(0.33)", translate("Basic"))
 
-		widget4 := window.Add("Picture", "x" . button2X . " y" . y . " w64 h64 vcustomSetupButton Hidden X:Move(0.66)", window.Theme.InitializeImage(kResourcesDirectory . (!this.BasicSetup ? "Setup\Images\Full Setup.ico" : "Setup\Images\Full Setup Gray.ico")))
+		widget4 := window.Add("Picture", "x" . button2X . " y" . y . " w64 h64 vcustomSetupButton Hidden X:Move(0.66)", window.Theme.RecolorizeImage(kResourcesDirectory . (!this.BasicSetup ? "Setup\Images\Full Setup.ico" : "Setup\Images\Full Setup Gray.ico")))
 		widget4.OnEvent("Click", chooseMethod.Bind("Extended"))
 		widget5 := window.Add("Text", "x" . button2X . " yp+68 w64 Hidden Center X:Move(0.66)", translate("Extended"))
 

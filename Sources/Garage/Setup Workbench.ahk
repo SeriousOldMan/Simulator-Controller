@@ -451,7 +451,7 @@ class SetupWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm")
 		workbenchGui.SetFont("s10 Bold", "Arial")
 
-		workbenchGui.Add("Picture", "x16 yp+12 w30 h30", workbenchGui.Theme.InitializeImage(kIconsDirectory . "Road.ico"))
+		workbenchGui.Add("Picture", "x16 yp+12 w30 h30", workbenchGui.Theme.RecolorizeImage(kIconsDirectory . "Road.ico"))
 		workbenchGui.Add("Text", "x50 yp+5 w120 h26", translate("Selection"))
 
 		workbenchGui.SetFont("s8 Norm", "Arial")
@@ -506,7 +506,7 @@ class SetupWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm")
 		workbenchGui.SetFont("s10 Bold", "Arial")
 
-		workbenchGui.Add("Picture", "x16 yp+12 w30 h30", workbenchGui.Theme.InitializeImage(kIconsDirectory . "Report.ico"))
+		workbenchGui.Add("Picture", "x16 yp+12 w30 h30", workbenchGui.Theme.RecolorizeImage(kIconsDirectory . "Report.ico"))
 		workbenchGui.Add("Text", "x50 yp+5 w180 h26", translate("Characteristics"))
 
 		workbenchGui.SetFont("s8 Norm")
@@ -527,7 +527,7 @@ class SetupWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm")
 		workbenchGui.SetFont("s10 Bold", "Arial")
 
-		workbenchGui.Add("Picture", "x420 ys+12 w30 h30", workbenchGui.Theme.InitializeImage(kIconsDirectory . "Assistant.ico"))
+		workbenchGui.Add("Picture", "x420 ys+12 w30 h30", workbenchGui.Theme.RecolorizeImage(kIconsDirectory . "Assistant.ico"))
 		workbenchGui.Add("Text", "x454 yp+5 w150 h26", translate("Recommendations"))
 
 		workbenchGui.SetFont("s8 Norm", "Arial")

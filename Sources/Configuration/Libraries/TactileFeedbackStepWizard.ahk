@@ -130,7 +130,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 
 		window.SetFont("s10 Bold", "Arial")
 
-		widget1 := window.Add("Picture", "x" . x . " y" . y . " w30 h30 Hidden", window.Theme.InitializeImage(kResourcesDirectory . "Setup\Images\Vibration 1.ico"))
+		widget1 := window.Add("Picture", "x" . x . " y" . y . " w30 h30 Hidden", window.Theme.RecolorizeImage(kResourcesDirectory . "Setup\Images\Vibration 1.ico"))
 		widget2 := window.Add("Text", "x" . labelX . " y" . labelY . " w" . labelWidth . " h26 Hidden", translate("Tactile Feedback Configuration"))
 
 		window.SetFont("s8 Norm", "Arial")

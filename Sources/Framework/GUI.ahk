@@ -16,6 +16,7 @@
 #Include "Localization.ahk"
 #Include "MultiMap.ahk"
 #Include "Configuration.ahk"
+#Include "Progress.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -190,7 +191,7 @@ class Theme {
 	InitializeControls(window) {
 	}
 
-	InitializeImage(fileName) {
+	RecolorizeImage(fileName) {
 		return fileName
 	}
 
@@ -803,7 +804,21 @@ class DarkTheme extends Theme {
 		this.SetWindowAttribute(window)
 	}
 
-	InitializeImage(fileName) {
+	RecolorizeImage(fileName) {
+		local progress := false
+		local recolorizeTask := false
+		local start := A_TickCount
+
+		updateProgress() {
+			if (A_TickCount > (start + 500))
+				if !progress
+					showProgress({progress: ++progress, color: "Blue", title: translate("Recolorizing Image")})
+				else
+					showProgress({progress: Min(100, progress++)})
+
+			return Task.CurrentTask
+		}
+
 		whiteIcon(graphics, bitmap) {
 			local x, y, value
 
@@ -820,7 +835,18 @@ class DarkTheme extends Theme {
 			}
 		}
 
-		return modifiedIcon(fileName, "Invrt", whiteIcon)
+		try {
+			recolorizeTask := Task.startTask(updateProgress, 100, kInterruptPriority)
+
+			return modifiedImage(fileName, "Invrt", whiteIcon)
+		}
+		finally {
+			if recolorizeTask
+				recolorizeTask.stop()
+
+			if progress
+				hideProgress()
+		}
 	}
 
 	ComputeControlOptions(window, type, options) {
@@ -1733,7 +1759,7 @@ setButtonIcon(buttonHandle, file, index := 1, options := "", theme := true) {
 ;						A = Alignment (0 = left, 1 = right, 2 = top, 3 = bottom, 4 = center; default = 4)
 
 	if theme
-		file := window.Theme.InitializeImage(file)
+		file := window.Theme.RecolorizeImage(file)
 
 	RegExMatch(options, "i)w\K\d+", &W), !W ? W := 16 : W := W[]
 	RegExMatch(options, "i)h\K\d+", &H), !H ? H := 16 : H := H[]
@@ -1940,6 +1966,10 @@ getControllerActionIcons() {
 }
 
 modifiedIcon(fileName, postFix, modifier) {
+	return modifiedImage(fileName, postFix, modifier, "Icons")
+}
+
+modifiedImage(fileName, postFix, modifier, cache := "Images") {
 	local extension, name, modifiedFileName, token, bitmap, graphics
 
 	SplitPath(fileName, , , &extension, &name)
@@ -1947,10 +1977,10 @@ modifiedIcon(fileName, postFix, modifier) {
 	if (extension = "ico")
 		extension := "png"
 
-	modifiedFileName := (kTempDirectory . "Icons\" . name . "_" . postFix . "." . extension)
+	modifiedFileName := (kTempDirectory . cache . "\" . name . "_" . postFix . "." . extension)
 
 	if !FileExist(modifiedFileName) {
-		DirCreate(kTempDirectory . "Icons")
+		DirCreate(kTempDirectory . cache)
 
 		token := Gdip_Startup()
 

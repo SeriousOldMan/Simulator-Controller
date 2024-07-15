@@ -3,29 +3,30 @@
   2. Documentation updates here and there, as always
   3. Renamed "Conversation Booster" to "Assistant Booster" throughout the documentation.
   4. All documentation regarding the different Assistant Boosters has been collected into a dedicated [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants).
-  5. A new Assistant Booster has been implemented, which let you integrate an LLM into the reasoning process of an Assistant.
+  5. The knowledge made available to the different Assistant Boosters has been extended massively. A full history of recent laps is now included, which allow the LLM (if smart enough) to make very precise decisions.
+  6. A new Assistant Booster has been implemented, which let you integrate an LLM into the reasoning process of an Assistant.
 	 - This Agent booster can use a different GPT service and LLM than the other conversation-related Assistant Boosters.
      - Events raised by the rule system of an Assistant or by rules defined on your own can be used to create a request to an LLM.
 	 - The LLM then can use any of the predefined actions or actions defined on your own to handle this event or situation.
 	 - Actions triggered this way can raise other events, thereby creating a complex chain of thought for the LLM.
-  6. A new syntax-coloring editor for source code has been implemented and is used in the Assistant Booster dialog when rule code is being edited.
-  7. Large parts of the documentation have been revised, updated and restructured:
+  7. A new syntax-coloring editor for source code has been implemented and is used in the Assistant Booster dialog when rule code is being edited.
+  8. Large parts of the documentation have been revised, updated and restructured:
      - The documentation for the "Session Database" has been moved to a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database).
      - The documentation for "Strategy Workbench" has been moved to a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench).
      - The documentation for "Practice Center" has been moved to a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Practice-Center).
      - The documentation for "Race Reports" has been moved to a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports).
      - The documentation for "Race Center" has been moved to a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center).
      - All new complete documentation of the builtin [Hybrid Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine).
-  8. The transcript of LLM invocations in any Assistant Booster now includes the events raised and actions invoked. Transcripts of Assistant Boosters are normally stored in the *Simulator Controller\Logs* folder, which is located in the user *Documents* folder.
-  9. The available color schemes has been revised and a new dark color scheme has been added. Four color schemes ae now available:
-     - Classic (default, the original color scheme of Simulator Controller)
-	 - Gray (formerly named "Dark")
-	 - Light (formerly named "Windows", uses the default Windows colors)
-	 - Dark (new, uses the dark theme colors of Windows 10 / 11)
-	 See the updated [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#color-schemes) for some examples.
-  10. The automaed update procedure now asks before a non-release version is installed.
-  11. [Internal] Implemented a postprocessor for the compiler which compresses the binary files. The applications are much smaller now.
-  12. [Internal] Migrated to AHK 2.1-alpha.14 (needed for dark color scheme).
+  9. The transcript of LLM invocations in any Assistant Booster now includes the events raised and actions invoked. Transcripts of Assistant Boosters are normally stored in the *Simulator Controller\Logs* folder, which is located in the user *Documents* folder.
+  10. The available color schemes has been revised and a new dark color scheme has been added. Four color schemes ae now available:
+      - Classic (default, the original color scheme of Simulator Controller)
+	  - Gray (formerly named "Dark")
+	  - Light (formerly named "Windows", uses the default Windows colors)
+	  - Dark (new, uses the dark theme colors of Windows 10 / 11)
+	  See the updated [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#color-schemes) for some examples.
+  11. The automaed update procedure now asks before a non-release version is installed.
+  12. [Internal] Implemented a postprocessor for the compiler which compresses the binary files. The applications are much smaller now.
+  13. [Internal] Migrated to AHK 2.1-alpha.14 (needed for dark color scheme).
 
 ## 5.7.9.0-release 07/05/24
   1. Minor bugfixes, as always

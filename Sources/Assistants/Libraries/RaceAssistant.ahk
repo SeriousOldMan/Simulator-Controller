@@ -1108,8 +1108,8 @@ class RaceAssistant extends ConfigurationItem {
 
 			if this.activeTopic(options, "Weather")
 				knowledge["Weather"] := Map("Now", knowledgeBase.getValue("Weather.Weather.Now")
-										  , "10Min", knowledgeBase.getValue("Weather.Weather.10Min")
-										  , "30Min", knowledgeBase.getValue("Weather.Weather.30Min")
+										  , "10 Minutes", knowledgeBase.getValue("Weather.Weather.10Min")
+										  , "30 Minutes", knowledgeBase.getValue("Weather.Weather.30Min")
 										  , "Temperature", (knowledgeBase.getValue("Weather.Temperature.Air") . " Celsius"))
 
 			if this.activeTopic(options, "Track")

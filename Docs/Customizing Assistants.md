@@ -58,10 +58,10 @@ Normally an Assistant will tell you that he didn't understand you, when the spok
      
 | Assistant        | Knowledge (1) |
 | ---------------- | ------------- |
-| Race Engineer    | Telemetry data incl. tyre pressures, tyre temeperatures, tyre wear, brake temperatures, brake wear, fuel level, fuel consumption, damage, and so on. Full pitstop history is included and when a pitstop is planned, the plan is available otherwise a forecast of the next pitstop will be part of the knowledge. |
-| Race Strategist  | Basic telemetry data but no detailed information about tyres, brakes and car damage. A reduced pitstop history is available as well as full information about the active strategy. Current position incl. detailed standings with gap and lap time information for all opponents is also available. |
-| Race Spotter     | Basic telemetry data and no pitstop information. But current position incl. detailed standings with gap and lap time information for all opponents is also available. |
-| Driving Coach    | Beside the [instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-driving-coach) that can be configured for the Driving Coach in general, the full set of telemetry data available to the Race Engineer is available to the Driving Coach as well. |
+| Race Engineer    | Telemetry data incl. tyre pressures, tyre temperatures, tyre wear, brake temperatures, brake wear, fuel level, fuel consumption, damage, and so on. All this is available as real time values as well as historic values for the past 5 laps. Full pitstop history is also included and when a pitstop is planned, the plan is available, otherwise a forecast of the next pitstop will be part of the knowledge. |
+| Race Strategist  | Basic telemetry data (both real time and historic) but no detailed information about tyres, brakes and car damage. A reduced pitstop history is available and full information about the active strategy is included. Current position incl. detailed standings with gap and lap time information for all opponents is also available. |
+| Race Spotter     | Very basic telemetry data (both real time and historic) and no pitstop information. But current position incl. detailed standings with gap and lap time information for all opponents is provided. |
+| Driving Coach    | Beside the [instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-driving-coach) that can be configured for the Driving Coach in general, the same information available to the Race Strategist is available to the Driving Coach as well. |
 
 (1) Depending on the availabilty of the data by the current simulator.
 
@@ -269,7 +269,7 @@ Here is an example of a few rules that together detect that it just started rain
 
 Another example, this time using an argument:
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Event%20Definition%201.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Event%20Definition%201.png)
 
 This simple event signals the start of a new lap. The lap number is supplied as a parameter and the message send to the LLM is "The lap 42 just has been started."
  

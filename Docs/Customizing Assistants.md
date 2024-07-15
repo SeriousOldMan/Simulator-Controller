@@ -271,7 +271,7 @@ Another example, this time using an argument:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Event%20Definition%201.png)
 
-This simple event signals the start of a new lap. The lap number is supplied as a parameter and the message send to the LLM is "The lap 42 just has been started."
+This simple event signals the start of a new lap. The lap number is supplied as a parameter and the message send to the LLM is "The lap 42 just has been started.", if lap 41 just have been finished).
  
 Please also take a look at the other predefined events of the Race Engineer or the other Assistants to learn more about writing event rules. And I recommend to take a look at the knowledge base of a session to learn more about all the facts you canuse in the event rules (and also the action rules). To do this, activate the "Debug Knowledgebase" item in the tray bar menu of a given Assistant applicaton. Then open the corrsponding "*.knowledge" file in the *Simulator Controller\Temp* folder which is located in your user *Documents* folder.
 
@@ -359,6 +359,6 @@ As usual, it depends on the capabilities of the LLM, which actions will be calle
 
 As LLMs become smarter, we will be able to rely more and more on the intelligence and the domain specific knowledge of the LLM. I have run some tests using some of the current high end models (GPT 4o, Claude 3.5 Sonnet, ...) by disabling all events and running only one very simple event:
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Event%20Definition%202.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Event%20Definition%202.png)
 
 The results are very promising, but these models are still very expensive. If you want to use this approach, make sure, that you leave all builtin events "Active" but set their type to "Event Disabled", because otherwise they will be handled by the rule engine and you might end up with duplicate behaviour, for example a pitstop being planned twice.

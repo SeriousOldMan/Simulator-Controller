@@ -1456,10 +1456,10 @@ class CallbacksEditor {
 			}
 
 		if (this.Type = "Agent.Events")
-			callback := {Name: "", Type: "Assistant.Rule", Active: true, Description: "", Parameters: []
+			callback := {Name: "", Type: "Assistant.Rule", Active: true, Disabled: false, Description: "", Parameters: []
 					   , Builtin: false, Event: "", Phrase: "", Definition: "", Script: "; Insert your rules here...`n`n"}
 		else
-			callback := {Name: "", Type: "Controller.Function", Active: true, Description: "", Parameters: []
+			callback := {Name: "", Type: "Controller.Function", Active: true, Disabled: false, Description: "", Parameters: []
 					   , Builtin: false, Initialized: true, Confirm: true, Definition: ""}
 
 		this.Callbacks.Push(callback)

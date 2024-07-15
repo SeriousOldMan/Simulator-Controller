@@ -812,7 +812,7 @@ class DarkTheme extends Theme {
 		updateProgress() {
 			if (A_TickCount > (start + 500))
 				if !progress
-					showProgress({progress: ++progress, color: "Blue", title: translate("Recolorizing Image")})
+					showProgress({progress: 0, color: "Blue", title: translate("Recoloring Image")})
 				else
 					showProgress({progress: Min(100, progress++)})
 

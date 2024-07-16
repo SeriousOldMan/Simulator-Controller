@@ -293,7 +293,7 @@ Beside the predefined actions for the different Assistant, which come with the s
 | Pitstop Clearance           | -                 | Yes | Yes | "I have changed my mind, the pitstop is no longer needed." |
 | Damage Impact Recalculation | -                 | Yes | No | "Can you recalculate the time loss caused by the damage?" |
 | Damage Reporting            | 1. [Required] suspensionDamage<br>2. [Required] bodyworkDamage<br>3. [Required] engineDamage | No | Yes | Typically activated when new damage is detected in the telemetry data. There is an event available, that signals new damage. The parameters accept *Boolean* values to indicate, whether this type of damage is to be reported. |
-| Low Fuel Reporting          | 1. [Required] remainingFuel<br>2. [Required] remainingLaps | No | Yes | Typically activated when a low fuel condition is detected in the telemetry data. There is an event available, that signals low fuel. *remainingFuel accepts a *Number* value and *remainingLaps* an *Integer* value. |
+| Pressure Loss Warning     | 1. [Required] tyre<br>2. [Required] lostPressure | No | Yes | Typically activated when a pressure loss has been detected in the telemetry data. There is an event available, that signals pressure loss. *tyre* must be one of "FL", "FR", "RL" and "RR" and *lostPressure* must be the amount of lost pressure in PSI. |
 | Weather Reporting (1)       | 1. [Required] weather<br>2. [Required] minutes<br>3. [Required] impactsStrategy | No | Yes | Typically activated when an upcoming weather change is detected in the telemetry data. There is an event available, that signals a change in the weather forecast. *weather* must be one of "Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain" and "Thunderstorm". *minutes* specify the time, when the new weather will arrive and *impactsStrategy* accepts a *Boolean* that indicates, whether a tyre change might be beneficial. |
 
 ##### Notes
@@ -306,6 +306,7 @@ Beside the predefined actions for the different Assistant, which come with the s
 |-----------------------------|-------------------|-------------|
 | Fuel Low                    | 1. [Required] remainingFuel<br>2. [Required] remainingLaps | When the car is running low on fuel, this event is signalled. |
 | Damage Collected            | 1. [Required] suspensionDamage<br>2. [Required] bodyworkDamage<br>3. [Required] engineDamage | This event is signalled, if new damage is detected for a part of the car. The parameters accept *Boolean* values to indicate where the damage occured. |
+| Pressure Loss               | 1. [Required] tyre<br>2. [Required] lostPressure | This event is signalled, if a loss of ressure has been detected in a tyre. *tyre* will be one of "FL", "FR", "RL" and "RR" and *lostPressure* will be the amount of lost pressure in PSI. |
 | Weather Update (1)          | 1. [Required] weather<br>2. [Required] minutes<br>3. [Required] impactsStrategy | Indicates an upcoming weather change. *weather* must be one of "Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain" and "Thunderstorm". *minutes* specify the time, when the new weather will arrive and *impactsStrategy* accepts a *Boolean* that indicates, whether a tyre change might be beneficial. |
 | Rain Started                | - | This event is signalled, if rain just started. |
 | Rain Stopped                | - | This event is signalled, if rain just stopped. |
@@ -322,16 +323,16 @@ Beside the predefined actions for the different Assistant, which come with the s
 |------------------------|-------------------|--------------|-----------|--------------------------|
 | Pitstop Simulation     | [Optional] lap    | Yes | No | "What do you think? Can we go for an undercut in lap 7?" or "Can we get some clean air when we pit earlier?" |
 | Pitstop Planning       | [Optional] lap    | Yes | Yes | "Can you ask the Engineer to create a pitstop plan for the next lap?" |
+| Pitstop Announcement   | [Required] lap    | No  | Yes | Announces an upcoming pitstop according to the currently active strategy. |
 | Strategy Recalculation | -                 | Yes | No | "Can you check whether we can skip the last pitstop, if we use a fuel saving map from now on?" |
 | Weather Reporting      | 1. [Required] weather<br>2. [Required] minutes<br>3. [Required] impactsStrategy | No | Yes | Typically activated when an upcoming weather change is detected in the telemetry data. There is an event available, that signals a change in the weather forecast. *weather* must be one of "Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain" and "Thunderstorm". *minutes* specify the time, when the new weather will arrive and *impactsStrategy* accepts a *Boolean* that indicates, whether a tyre change might be beneficial. |
-| Pitstop Announcement   | [Required] lap    | No  | Yes | Announces an upcoming pitstop according to the currently active strategy. |
 
 #### Events
 
 | Event                       | Parameter(s)      | Description |
 |-----------------------------|-------------------|-------------|
-| Weather Update              | 1. [Required] weather<br>2. [Required] minutes<br>3. [Required] impactsStrategy | Indicates an upcoming weather change. *weather* must be one of "Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain" and "Thunderstorm". *minutes* specify the time, when the new weather will arrive and *impactsStrategy* accepts a *Boolean* that indicates, whether a tyre change might be beneficial. |
 | Pitstop Upcoming            | [Required] plannedLap | This event is triggered when the next pitstop according to the currently active strategy is upcoming. *plannedLap* accepts an *Integer*. |
+| Weather Update              | 1. [Required] weather<br>2. [Required] minutes<br>3. [Required] impactsStrategy | Indicates an upcoming weather change. *weather* must be one of "Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain" and "Thunderstorm". *minutes* specify the time, when the new weather will arrive and *impactsStrategy* accepts a *Boolean* that indicates, whether a tyre change might be beneficial. |
 | Rain Started                | - | This event is signalled, if rain just started. |
 | Rain Stopped                | - | This event is signalled, if rain just stopped. |
 | Position Lost               | - | This event is signalled, if one or more positions has just been lost. |

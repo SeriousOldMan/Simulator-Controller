@@ -610,26 +610,28 @@ setDamageReported(?damageType, true) <= Set(Damage.Reported, !Lap), Set(Damage, 
 {None: [?Tyre.Pressure.Loss.RR]} => (Clear: Tyre.Pressure.Loss.Reported.RR)
 
 {All: [?Tyre.Pressure.Loss.FL],
-	  {Any: {None: [?Tyre.Pressure.Loss.Reported.FL],
-				   [?Tyre.Pressure.Loss.FL > ?Tyre.Pressure.Loss.Reported.FL]}}} =>
-		(Call: pressureLossWarning(FL, ?Tyre.Pressure.Loss.FL))
+	  {Any: {None: [?Tyre.Pressure.Loss.Reported.FL]},
+			[?Tyre.Pressure.Loss.FL > ?Tyre.Pressure.Loss.Reported.FL]}} =>
+		(Prove: pressureLossWarning(FL, ?Tyre.Pressure.Loss.FL)),
+		(Set: Tyre.Pressure.Loss.Reported.FL, ?Tyre.Pressure.Loss.FL)
 {All: [?Tyre.Pressure.Loss.FR],
-	  {Any: {None: [?Tyre.Pressure.Loss.Reported.FR],
-				   [?Tyre.Pressure.Loss.FR > ?Tyre.Pressure.Loss.Reported.FR]}}} =>
-		(Call: pressureLossWarning(FR, ?Tyre.Pressure.Loss.FR))
+	  {Any: {None: [?Tyre.Pressure.Loss.Reported.FR]},
+			[?Tyre.Pressure.Loss.FR > ?Tyre.Pressure.Loss.Reported.FR]}} =>
+		(Prove: pressureLossWarning(FR, ?Tyre.Pressure.Loss.FR)),
+		(Set: Tyre.Pressure.Loss.Reported.FR, ?Tyre.Pressure.Loss.FR)
 {All: [?Tyre.Pressure.Loss.RL],
-	  {Any: {None: [?Tyre.Pressure.Loss.Reported.RL],
-				   [?Tyre.Pressure.Loss.RL > ?Tyre.Pressure.Loss.Reported.RL]}}} =>
-		(Call: pressureLossWarning(RL, ?Tyre.Pressure.Loss.RL))
+	  {Any: {None: [?Tyre.Pressure.Loss.Reported.RL]},
+			[?Tyre.Pressure.Loss.RL > ?Tyre.Pressure.Loss.Reported.RL]}} =>
+		(Prove: pressureLossWarning(RL, ?Tyre.Pressure.Loss.RL)),
+		(Set: Tyre.Pressure.Loss.Reported.RL, ?Tyre.Pressure.Loss.RL)
 {All: [?Tyre.Pressure.Loss.RR],
-	  {Any: {None: [?Tyre.Pressure.Loss.Reported.RR],
-				   [?Tyre.Pressure.Loss.RR > ?Tyre.Pressure.Loss.Reported.RR]}}} =>
-		(Call: pressureLossWarning(RR, ?Tyre.Pressure.Loss.RR))
+	  {Any: {None: [?Tyre.Pressure.Loss.Reported.RR]},
+			[?Tyre.Pressure.Loss.RR > ?Tyre.Pressure.Loss.Reported.RR]}} =>
+		(Call: pressureLossWarning(RR, ?Tyre.Pressure.Loss.RR)),
+		(Set: Tyre.Pressure.Loss.Reported.RR, ?Tyre.Pressure.Loss.RR)
 
-[?Tyre.Pressure.Loss.FL] => (Set: Tyre.Pressure.Loss.Reported.FL, ?Tyre.Pressure.Loss.FL)
-[?Tyre.Pressure.Loss.FR] => (Set: Tyre.Pressure.Loss.Reported.FR, ?Tyre.Pressure.Loss.FR)
-[?Tyre.Pressure.Loss.RL] => (Set: Tyre.Pressure.Loss.Reported.RL, ?Tyre.Pressure.Loss.RL)
-[?Tyre.Pressure.Loss.RR] => (Set: Tyre.Pressure.Loss.Reported.RR, ?Tyre.Pressure.Loss.RR)
+pressureLossWarning(?tyre, ?lostPressure) <= Call(raiseEvent, PressureLoss, ?tyre, ?lostPressure), !
+pressureLossWarning(?tyre, ?lostPressure) <= Call(pressureLossWarning, ?tyre, ?lostPressure))
 
 
 ;;;-------------------------------------------------------------------------;;;

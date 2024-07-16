@@ -22,10 +22,10 @@
 #Include "..\..\Libraries\LLMConnector.ahk"
 #Include "..\..\Libraries\LLMBooster.ahk"
 #Include "..\..\Libraries\LLMAgent.ahk"
-#Include "VoiceManager.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\..\Database\Libraries\SettingsDatabase.ahk"
 #Include "..\..\Database\Libraries\TyresDatabase.ahk"
+#Include "VoiceManager.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -56,6 +56,8 @@ global kUnknown := false
 class AssistantEvent extends AgentEvent {
 	iAssistant := false
 
+	iBuiltin := false
+
 	iName := false
 	iEvent := false
 
@@ -72,6 +74,12 @@ class AssistantEvent extends AgentEvent {
 	Assistant {
 		Get {
 			return this.iAssistant
+		}
+	}
+
+	Builtin {
+		Get {
+			return this.iBuiltin
 		}
 	}
 
@@ -123,9 +131,10 @@ class AssistantEvent extends AgentEvent {
 		}
 	}
 
-	__New(assistant, name, enabled, event, parameters, goal := false, options := false) {
+	__New(assistant, builtin, name, enabled, event, parameters, goal := false, options := false) {
 		this.iAssistant := assistant
 
+		this.iBuiltin := builtin
 		this.iName := name
 		this.iEnabled := enabled
 		this.iEvent := event
@@ -216,10 +225,10 @@ class RuleEvent extends AssistantEvent {
 		}
 	}
 
-	__New(assistant, name, enabled, event, phrase, parameters, goal := false, options := false) {
+	__New(assistant, builtin, name, enabled, event, phrase, parameters, goal := false, options := false) {
 		this.iPhrase := phrase
 
-		super.__New(assistant, name, enabled, event, parameters, goal, options)
+		super.__New(assistant, builtin, name, enabled, event, parameters, goal, options)
 	}
 }
 
@@ -937,7 +946,7 @@ class RaceAssistant extends ConfigurationItem {
 		if (enoughData && !this.hasEnoughData())
 			return false
 
-		if confirm
+		if (confirm && this.Speaker)
 			this.getSpeaker().speakPhrase("Confirm")
 
 		Task.yield()
@@ -1454,63 +1463,64 @@ class RaceAssistant extends ConfigurationItem {
 	createAgentEvents(&productions, &reductions, &includes) {
 		local configuration := readMultiMap(kResourcesDirectory . "Actions\" . this.AssistantType . ".events")
 		local events := []
-		local disabled, ignore, event, definition, parameters, parameter, enumeration, required, handler
+		local disabled, ignore, event, definition, parameters, parameter, enumeration, required, handler, type
 
 		addMultiMapValues(configuration, readMultiMap(kUserHomeDirectory . "Actions\" . this.AssistantType . ".events"))
 
 		disabled := string2Values(",", getMultiMapValue(configuration, "Agent.Events", "Disabled", ""))
 
-		for ignore, event in string2Values(",", getMultiMapValue(configuration, "Agent.Events", "Active", "")) {
-			definition := getMultiMapValue(configuration, "Agent.Events.Custom", event, false)
+		for ignore, type in ["Agent.Events.Custom", "Agent.Events.Builtin"]
+			for ignore, event in string2Values(",", getMultiMapValue(configuration, "Agent.Events", "Active", "")) {
+				definition := getMultiMapValue(configuration, type, event, false)
 
-			if !definition
-				definition := getMultiMapValue(configuration, "Agent.Events.Builtin", event, false)
+				if definition
+					try {
+						if definition {
+							definition := string2Values("|", definition)
+							parameters := []
 
-			try {
-				if definition {
-					definition := string2Values("|", definition)
-					parameters := []
+							loop definition[5] {
+								parameter := string2Values("|", getMultiMapValue(configuration, "Agent.Events.Parameters", event . "." . A_Index, ""))
 
-					loop definition[5] {
-						parameter := string2Values("|", getMultiMapValue(configuration, "Agent.Events.Parameters", event . "." . A_Index, ""))
+								if (parameter.Length >= 5) {
+									enumeration := string2Values(",", parameter[3])
 
-						if (parameter.Length >= 5) {
-							enumeration := string2Values(",", parameter[3])
+									if (enumeration.Length = 0)
+										enumeration := false
 
-							if (enumeration.Length = 0)
-								enumeration := false
+									required := ((parameter[4] = kTrue) ? kTrue : ((parameter[4] = kFalse) ? false : parameter[4]))
 
-							required := ((parameter[4] = kTrue) ? kTrue : ((parameter[4] = kFalse) ? false : parameter[4]))
+									parameters.Push(AssistantEvent.Parameter(parameter[1], parameter[5], parameter[2]
+																		   , enumeration, required))
+								}
+							}
 
-							parameters.Push(AssistantEvent.Parameter(parameter[1], parameter[5], parameter[2]
-																   , enumeration, required))
+							switch definition[1], false {
+								case "Assistant.Class":
+									handler := %definition[2]%(this, (type = "Agent.Events.Builtin"), event
+															 , !inList(disabled, event), definition[3], parameters)
+								case "Assistant.Rule":
+									RuleCompiler().compileRules(FileRead(getFileName(definition[2], kUserHomeDirectory . "Actions\"
+																								  , kResourcesDirectory . "Actions\"))
+															  , &productions, &reductions, &includes)
+
+									handler := RuleEvent(this, (type = "Agent.Events.Builtin"), event
+													   , !inList(disabled, event), definition[3], definition[4], parameters)
+								default:
+									throw "Unknown event type (" definition[1] . ") detected in RaceAssistant.createAgentEvents..."
+							}
+
+							this.registerEvent(handler)
+
+							events.Push(handler)
 						}
+						else
+							throw "Unknown event (" event . ") detected in RaceAssistant.createAgentEvents..."
 					}
-
-					switch definition[1], false {
-						case "Assistant.Class":
-							handler := %definition[2]%(this, event, !inList(disabled, event), definition[3], parameters)
-						case "Assistant.Rule":
-							RuleCompiler().compileRules(FileRead(getFileName(definition[2], kUserHomeDirectory . "Actions\"
-																						  , kResourcesDirectory . "Actions\"))
-													  , &productions, &reductions, &includes)
-
-							handler := RuleEvent(this, event, !inList(disabled, event), definition[3], definition[4], parameters)
-						default:
-							throw "Unknown event type (" definition[1] . ") detected in RaceAssistant.createAgentEvents..."
+					catch Any as exception {
+						logError(exception, true)
 					}
-
-					this.registerEvent(handler)
-
-					events.Push(handler)
-				}
-				else
-					throw "Unknown event (" event . ") detected in RaceAssistant.createAgentEvents..."
 			}
-			catch Any as exception {
-				logError(exception, true)
-			}
-		}
 
 		return events
 	}
@@ -3785,8 +3795,10 @@ class GridRaceAssistant extends RaceAssistant {
 
 		driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
 
-		this.KnowledgeBase.setFact("Lap." . lapNumber . ".Position.Overall", this.getPosition(false, "Overall", data))
-		this.KnowledgeBase.setFact("Lap." . lapNumber . ".Position.Class", this.getPosition(false, "Class", data))
+		if this.KnowledgeBase {
+			this.KnowledgeBase.setFact("Lap." . lapNumber . ".Position.Overall", this.getPosition(false, "Overall", data))
+			this.KnowledgeBase.setFact("Lap." . lapNumber . ".Position.Class", this.getPosition(false, "Class", data))
+		}
 
 		lapValid := getMultiMapValue(data, "Stint Data", "LapValid", true)
 		lapPenalty := getMultiMapValue(data, "Stint Data", "Penalty", false)

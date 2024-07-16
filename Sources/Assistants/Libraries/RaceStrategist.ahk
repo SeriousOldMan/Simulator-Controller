@@ -59,15 +59,18 @@ class WeatherForecastEvent extends AssistantEvent {
 	createTrigger(event, phrase, arguments) {
 		local trigger := ("The weather will change to " . arguments[1] . " in " . arguments[2] . ".")
 
-		if arguments[3]
-			return (trigger . " A tyre change may be necessary.")
+		if (arguments.Has(4) && arguments[3])
+			return (trigger . A_Space . " We should plan a pitstop and mount " . arguments[4] . " tyres.")
 		else
 			return (trigger . " A tyre change will not be necessary.")
 	}
 
 	handleEvent(event, arguments*) {
 		if !super.handleEvent(event, arguments*)
-			this.Assistant.weatherForecast(arguments*)
+			if (arguments.Has(4) && arguments[3])
+				this.Assistant.requestTyreChange(arguments[1], arguments[2], arguments[4])
+			else
+				this.Assistant.weatherForecast(arguments[1], arguments[2], arguments[3])
 
 		return true
 	}
@@ -3604,7 +3607,7 @@ class RaceStrategist extends GridRaceAssistant {
 			this.getSpeaker().speakPhrase(changeTyres ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
 	}
 
-	weatherTyreChangeRecommendation(minutes, recommendedCompound) {
+	requestTyreChange(weather, minutes, recommendedCompound) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker, fragments
 
@@ -4210,16 +4213,16 @@ updatePositions(context, futureLap) {
 	return true
 }
 
-weatherChangeNotification(context, weather, minutes, change) {
+weatherForecastNotification(context, weather, minutes, change) {
 	context.KnowledgeBase.RaceAssistant.weatherForecast(weather, minutes, change)
 
 	return true
 }
 
-weatherTyreChangeRecommendation(context, minutes, recommendedCompound) {
+requestTyreChange(context, weather, minutes, recommendedCompound) {
 	context.KnowledgeBase.RaceAssistant.clearContinuation()
 
-	context.KnowledgeBase.RaceAssistant.weatherTyreChangeRecommendation(minutes, recommendedCompound)
+	context.KnowledgeBase.RaceAssistant.requestTyreChange(weather, minutes, recommendedCompound)
 
 	return true
 }

@@ -27,27 +27,6 @@
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class PressureLossEvent extends AssistantEvent {
-	Asynchronous {
-		Get {
-			return true
-		}
-	}
-
-	createTrigger(event, phrase, arguments) {
-		static tyres := CaseInsenseMap("FL", "front left", "FR", "front right", "RL", "rear left", "RR", "rear right")
-
-		return ("The " . tyres[arguments[1]] . " tyre (" . arguments[1] . ") has lost pressure by " . Round(arguments[2], 1) . " PSI.")
-	}
-
-	handleEvent(event, arguments*) {
-		if !super.handleEvent(event, arguments*)
-			this.Assistant.pressureLossWarning(arguments[1], Round(arguments[2], 1))
-
-		return true
-	}
-}
-
 class FuelLowEvent extends AssistantEvent {
 	Asynchronous {
 		Get {
@@ -102,6 +81,27 @@ class DamageEvent extends AssistantEvent {
 	}
 }
 
+class PressureLossEvent extends AssistantEvent {
+	Asynchronous {
+		Get {
+			return true
+		}
+	}
+
+	createTrigger(event, phrase, arguments) {
+		static tyres := CaseInsenseMap("FL", "front left", "FR", "front right", "RL", "rear left", "RR", "rear right")
+
+		return ("The " . tyres[arguments[1]] . " tyre (" . arguments[1] . ") has lost pressure by " . Round(arguments[2], 1) . " PSI.")
+	}
+
+	handleEvent(event, arguments*) {
+		if !super.handleEvent(event, arguments*)
+			this.Assistant.pressureLossWarning(arguments[1], Round(arguments[2], 1))
+
+		return true
+	}
+}
+
 class WeatherForecastEvent extends AssistantEvent {
 	Asynchronous {
 		Get {
@@ -112,15 +112,18 @@ class WeatherForecastEvent extends AssistantEvent {
 	createTrigger(event, phrase, arguments) {
 		local trigger := ("The weather will change to " . arguments[1] . " in " . arguments[2] . ".")
 
-		if arguments[3]
-			return (trigger . " A tyre change may be necessary.")
+		if (arguments.Has(4) && arguments[3])
+			return (trigger . A_Space . " A pitstop must be planned and " . arguments[4] . " tyres must be mounted.")
 		else
 			return (trigger . " A tyre change will not be necessary.")
 	}
 
 	handleEvent(event, arguments*) {
 		if !super.handleEvent(event, arguments*)
-			this.Assistant.weatherForecast(arguments*)
+			if (arguments.Has(4) && arguments[3])
+				this.Assistant.requestTyreChange(arguments[1], arguments[2], arguments[4])
+			else
+				this.Assistant.weatherForecast(arguments[1], arguments[2], arguments[3])
 
 		return true
 	}
@@ -3445,7 +3448,7 @@ class RaceEngineer extends RaceAssistant {
 			this.getSpeaker().speakPhrase(changeTyres ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
 	}
 
-	weatherTyreChangeRecommendation(minutes, recommendedCompound) {
+	requestTyreChange(weather, minutes, recommendedCompound) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker, fragments
 
@@ -3560,16 +3563,16 @@ pressureLossWarning(context, tyre, lostPressure) {
 	return true
 }
 
-weatherChangeNotification(context, weather, minutes, change) {
+weatherForecastNotification(context, weather, minutes, change) {
 	context.KnowledgeBase.RaceAssistant.weatherForecast(weather, minutes, change)
 
 	return true
 }
 
-weatherTyreChangeRecommendation(context, minutes, recommendedCompound) {
+requestTyreChange(context, weather, minutes, recommendedCompound) {
 	context.KnowledgeBase.RaceAssistant.clearContinuation()
 
-	context.KnowledgeBase.RaceAssistant.weatherTyreChangeRecommendation(minutes, recommendedCompound)
+	context.KnowledgeBase.RaceAssistant.requestTyreChange(weather, minutes, recommendedCompound)
 
 	return true
 }

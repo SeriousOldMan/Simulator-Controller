@@ -4,7 +4,7 @@ Active=fuel_low,damage_collected,pressure_loss,weather_forecast,rain_started,rai
 fuel_low=Assistant.Class|FuelLowEvent|FuelLow||2|This event is triggered when the car is running low on fuel.
 damage_collected=Assistant.Class|DamageEvent|Damage||3|This event is triggered when the car collected new damage.
 pressure_loss=Assistant.Class|PressureLossEvent|PressureLoss||2|This event is triggered when a loss of pressure on a given tyre is detected.
-weather_forecast=Assistant.Class|WeatherForecastEvent|WeatherForecast||3|This event is triggered when the weather forecast indicates an upcoming weather change.
+weather_forecast=Assistant.Class|WeatherForecastEvent|WeatherForecast||4|This event is triggered when the weather forecast indicates an upcoming weather change.
 rain_started=Assistant.Rule|Race Assistant.rain_start.rules|RainStart|It just started raining.|0|This event is triggered when it starts raining or will be raining in a few moments.
 rain_stopped=Assistant.Rule|Race Assistant.rain_stop.rules|RainStop|It just stopped raining.|0|This event is triggered when it stopped raining.
 [Agent.Events.Parameters]
@@ -18,3 +18,4 @@ pressure_loss.2=lostPressure|Number||true|The amount of pressure in PSI, that ha
 weather_forecast.1=weather|String|Dry,Drizzle,LightRain,MediumRain,HeavyRain,Thunderstorm|true|A symbol that represents the upcoming weather.
 weather_forecast.2=minutes|Integer||true|The time in minutes when the weather will change.
 weather_forecast.3=impactsStrategy|Boolean||true|Indicates that the strategy is impacted and a tyre change might be necessary.
+weather_forecast.4=tyreCompound|String||false|If supplied, indicates tyre compound that should be mounted at the pitstop.

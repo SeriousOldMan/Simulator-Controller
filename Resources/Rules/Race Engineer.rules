@@ -631,7 +631,7 @@ setDamageReported(?damageType, true) <= Set(Damage.Reported, !Lap), Set(Damage, 
 		(Set: Tyre.Pressure.Loss.Reported.RR, ?Tyre.Pressure.Loss.RR)
 
 pressureLossWarning(?tyre, ?lostPressure) <= Call(raiseEvent, PressureLoss, ?tyre, ?lostPressure), !
-pressureLossWarning(?tyre, ?lostPressure) <= Call(pressureLossWarning, ?tyre, ?lostPressure))
+pressureLossWarning(?tyre, ?lostPressure) <= Call(pressureLossWarning, ?tyre, ?lostPressure)
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -124,9 +124,9 @@ Below you find all instruction categories and the supported variables:
 |                | Knowledge         | Scope             | This instruction is used to supply the current content of the knowledge base to the LLM. The content of the knowledge base depends on the type of the Assistant. |
 |                |                   | %knowledge%       | This variable is substituted with the content of the knowledge base in a self-explaining JSON format. |
 |                | Event             | Scope             | The event represents the main instruction for the LLM, which describes what just happened or how the situation has changed. |
-|                |                   | %event%           | This variable is substituted by the phrase which describes the event. Example: "It just started raining.". This phrase is defined by the event code for a builtin event or the event definition for a custom event. |
-|                | Goal              | Scope             | The goal supplies additional information to the LLM by some builtin events, which helps the LLM to come up with a good conclusion. |
-|                |                   | %goal%            | This variable is substituted by the phrase which instructs the LLM how to handle the given event. Example: "Check how to set up the car for wet onditions.". This phrase is defined by the event code for a builtin event. It cannot be provided for custom event definitions. |
+|                |                   | %event%           | This variable is substituted by the phrase which describes the event. Example: "It just started raining.". This phrase is defined by the event code for a predefined event or the event definition for a custom event. |
+|                | Goal              | Scope             | The goal supplies additional information to the LLM by some predefined events, which helps the LLM to come up with a good conclusion. |
+|                |                   | %goal%            | This variable is substituted by the phrase which instructs the LLM how to handle the given event. Example: "Check how to set up the car for wet onditions.". This phrase is defined by the event code for a predefined event. It cannot be provided for custom event definitions. |
 
 ###### Notes
 
@@ -134,7 +134,7 @@ Below you find all instruction categories and the supported variables:
 
 ## Managing Actions
 
-A special editor is provided to manage the actions for a given Assistant. An action allows the LLM not only to react with a message to your request, but also to trigger some predefined functions. There are several builtin actions available for the different assistants, but you can also define your own ones.
+A special editor is provided to manage the actions for a given Assistant. An action allows the LLM not only to react with a message to your request, but also to trigger some predefined functions. There are several predefined actions available for the different assistants, but you can also define your own ones.
 
 To open this editor, click on the small button with the "Pencil" icon on the right of the "Actions" drop down menu in the *Conversation* booster or by clicking on the "Actions..." button for a *Reasoning* booster.
 
@@ -228,7 +228,7 @@ This action calls the [controller acton]((https://github.com/SeriousOldMan/Simul
 
 As discussed above, you can use predefined events or define your own events in the rule engine of a given Assistant, when using the *Reasoning* booster.
 
-A special editor is provided to manage the events for a given Assistant. There are several builtin events available for the different assistants, but you can also define your own ones.
+A special editor is provided to manage the events for a given Assistant. There are several predefined events available for the different assistants, but you can also define your own ones.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20Reasoning%20Events.JPG)
 
@@ -244,7 +244,7 @@ As you can see, this editor looks very similar to the actions editor discussed a
 
    | Event Type  | Description |
    |-------------|-------------|
-   | Event Class | The event is handled by an instance of a builtin class. This is mainly used for builtin events provided by the Assistant implementation. Butif you are an experienced developer, you can implement your own event classes, which are based on the "AssistantEvent" class. Notes:<br><br>1. The name of the class must be entered into the "Class" field. It must be in the global name space.<br><br>2. You have to supply the "Signal" identifier, but you don't have to provide an event phrase, since this is derived by the implementation of the event class. |
+   | Event Class | The event is handled by an instance of a builtin class. This is mainly used for predefined events provided by the Assistant implementation. Butif you are an experienced developer, you can implement your own event classes, which are based on the "AssistantEvent" class. Notes:<br><br>1. The name of the class must be entered into the "Class" field. It must be in the global name space.<br><br>2. You have to supply the "Signal" identifier, but you don't have to provide an event phrase, since this is derived by the implementation of the event class. |
    | Event Rule | The supplied rules are loaded into the rule engine of the given Race Assistant. These rules have full access to the knowledge base and all other rules of this Assistant.<br><br>The event rules can use the full knowledge to derive whether the event in question should be raised. They then raise the event by *calling* the "Assistant.Raise* predicate, optionally supplying additional arguments to the event, which can be referenced in the event phrase.<br><br>Note: Actually, you don't have to raise an event in the event rules, if you are able to handle the situation directly using the rules. In this case, the LLM is not activated. |
    | Event Disabled | This is a special one, inidcated by a "-" in the "Active" column in the list of events. It declares that the event is consumed, so that the rule engine does not do the default processing for this event. But the event is also processed by the LLM effectively disabling this type of event at all. This makes sense in combination with very smart LLMs, which will trigger actions simply by looking at the data (see the discussion [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#connecting-events-&-actions). This makes only sense for the builtin events, of course. |
 
@@ -274,6 +274,8 @@ Another example, this time using an argument:
 This simple event signals the start of a new lap. The lap number is supplied as a parameter and the message send to the LLM is "The lap 42 just has been started.", if lap 41 just have been finished).
  
 Please also take a look at the other predefined events of the Race Engineer or the other Assistants to learn more about writing event rules. And I recommend to take a look at the knowledge base of a session to learn more about all the facts you canuse in the event rules (and also the action rules). To do this, activate the "Debug Knowledgebase" item in the tray bar menu of a given Assistant applicaton. Then open the corrsponding "*.knowledge" file in the *Simulator Controller\Temp* folder which is located in your user *Documents* folder.
+
+Good to know: When an event handler is located for a given event signal, custom events are checked before all predefined events. This allows for customization of the predefined events.
 
 ## Predefined Actions & Events
 
@@ -307,7 +309,7 @@ Beside the predefined actions for the different Assistant, which come with the s
 | Fuel Low                    | 1. [Required] remainingFuel<br>2. [Required] remainingLaps | When the car is running low on fuel, this event is signalled. |
 | Damage Collected            | 1. [Required] suspensionDamage<br>2. [Required] bodyworkDamage<br>3. [Required] engineDamage | This event is signalled, if new damage is detected for a part of the car. The parameters accept *Boolean* values to indicate where the damage occured. |
 | Pressure Loss               | 1. [Required] tyre<br>2. [Required] lostPressure | This event is signalled, if a loss of ressure has been detected in a tyre. *tyre* will be one of "FL", "FR", "RL" and "RR" and *lostPressure* will be the amount of lost pressure in PSI. |
-| Weather Update (1)          | 1. [Required] weather<br>2. [Required] minutes<br>3. [Required] impactsStrategy | Indicates an upcoming weather change. *weather* must be one of "Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain" and "Thunderstorm". *minutes* specify the time, when the new weather will arrive and *impactsStrategy* accepts a *Boolean* that indicates, whether a tyre change might be beneficial. |
+| Weather Update (1)          | 1. [Required] weather<br>2. [Required] minutes<br>3. [Required] impactsStrategy<br>4. [Optional] tyreCompound | Indicates an upcoming weather change. *weather* must be one of "Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain" and "Thunderstorm". *minutes* specify the time, when the new weather will arrive and *impactsStrategy* accepts a *Boolean* that indicates, whether a tyre change might be beneficial. If *tyreCompound* has been supplied, this indicates that a pitstop for tyre change should be planned. |
 | Rain Started                | - | This event is signalled, if rain just started. |
 | Rain Stopped                | - | This event is signalled, if rain just stopped. |
 
@@ -332,7 +334,7 @@ Beside the predefined actions for the different Assistant, which come with the s
 | Event                       | Parameter(s)      | Description |
 |-----------------------------|-------------------|-------------|
 | Pitstop Upcoming            | [Required] plannedLap | This event is triggered when the next pitstop according to the currently active strategy is upcoming. *plannedLap* accepts an *Integer*. |
-| Weather Update              | 1. [Required] weather<br>2. [Required] minutes<br>3. [Required] impactsStrategy | Indicates an upcoming weather change. *weather* must be one of "Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain" and "Thunderstorm". *minutes* specify the time, when the new weather will arrive and *impactsStrategy* accepts a *Boolean* that indicates, whether a tyre change might be beneficial. |
+| Weather Update              | 1. [Required] weather<br>2. [Required] minutes<br>3. [Required] impactsStrategy<br>4. [Optional] tyreCompound | Indicates an upcoming weather change. *weather* must be one of "Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain" and "Thunderstorm". *minutes* specify the time, when the new weather will arrive and *impactsStrategy* accepts a *Boolean* that indicates, whether a tyre change might be beneficial. If *tyreCompound* has been supplied, this indicates that a pitstop for tyre change should be planned. |
 | Rain Started                | - | This event is signalled, if rain just started. |
 | Rain Stopped                | - | This event is signalled, if rain just stopped. |
 | Position Lost               | - | This event is signalled, if one or more positions has just been lost. |
@@ -356,10 +358,10 @@ Beside the predefined actions for the different Assistant, which come with the s
 
 ### Connecting Events & Actions
 
-As usual, it depends on the capabilities of the LLM, which actions will be called as a result of a given event. Additionally, because of the inherent non-deterministic nature of LLMs, the behaviour may vary between invocations. You have to decide which events you will send to the LLM (i.e. are activated) and which events should be handled by the rule engine (i.e. are deactivated). Anyway, using the builtin events will not result in a very different behaviour than running an Assistant without the *Reasoning* booster, since in most cases the LLM will decide to connect an event to its natural corresponding action. Example: *Fuel Low* -> *Low Fuel Reporting*
+As usual, it depends on the capabilities of the LLM, which actions will be called as a result of a given event. Additionally, because of the inherent non-deterministic nature of LLMs, the behaviour may vary between invocations. You have to decide which events you will send to the LLM (i.e. are activated) and which events should be handled by the rule engine (i.e. are deactivated). Anyway, using the predefined events will not result in a very different behaviour than running an Assistant without the *Reasoning* booster, since in most cases the LLM will decide to connect an event to its natural corresponding action. Example: *Fuel Low* -> *Low Fuel Reporting*
 
 As LLMs become smarter, we will be able to rely more and more on the intelligence and the domain specific knowledge of the LLM. I have run some tests using some of the current high end models (GPT 4o, Claude 3.5 Sonnet, ...) by disabling all events and running only one very simple event:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Event%20Definition%202.png)
 
-The results are very promising, but these models are still very expensive. If you want to use this approach, make sure, that you leave all builtin events "Active" but set their type to "Event Disabled", because otherwise they will be handled by the rule engine and you might end up with duplicate behaviour, for example a pitstop being planned twice.
+The results are very promising, but these models are still very expensive. If you want to use this approach, make sure, that you leave all predefined events "Active" but set their type to "Event Disabled", because otherwise they will be handled by the rule engine and you might end up with duplicate behaviour, for example a pitstop being planned twice.

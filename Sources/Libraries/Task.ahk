@@ -653,6 +653,17 @@ withProtection(function, params*) {
 	}
 }
 
+withTask(task, function, arguments*) {
+	task.start()
+
+	try {
+		return function(arguments*)
+	}
+	finally {
+		task.stop()
+	}
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Initialization Section                          ;;;

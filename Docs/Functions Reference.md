@@ -10,6 +10,9 @@ Finishes a protected section of code. Only if the outermost section has been fin
 #### *withProtection(function :: Func, #rest params)*
 Convenience function to call a given function with supplied parameters in a protected section.
 
+#### *withTask(task :: Task, function :: Func, #rest params)*
+Convenience function to call a given function with supplied parameters. The supplied task will be started before the function is called and is stopped, before the values are returned to the caller.
+
 ***
 
 ## Debugging and Logging ([Debug.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Debug.ahk))

@@ -27,6 +27,7 @@
   11. The automaed update procedure now asks before a non-release version is installed.
   12. [Internal] Implemented a postprocessor for the compiler which compresses the binary files. The applications are much smaller now.
   13. [Internal] Migrated to AHK 2.1-alpha.14 (needed for dark color scheme).
+  14. [Developer] A new generic class library supports a full recursive round-trip between the rule engine and an associated LLM. Using this architecture, fully autonomous agents can be easily configured.
 
 ## 5.7.9.0-release 07/05/24
   1. Minor bugfixes, as always

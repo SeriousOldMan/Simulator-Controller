@@ -805,8 +805,6 @@ class DarkTheme extends Theme {
 	}
 
 	RecolorizeImage(fileName) {
-		local progressTask := false
-
 		whiteIcon(graphics, bitmap) {
 			local x, y, value
 
@@ -823,16 +821,7 @@ class DarkTheme extends Theme {
 			}
 		}
 
-		try {
-			progressTask := RecolorizerTask(false, 100, kInterruptPriority)
-
-			progressTask.start()
-
-			return modifiedImage(fileName, "Invrt", whiteIcon)
-		}
-		finally {
-			progressTask.stop()
-		}
+		return withTask(RecolorizerTask(), modifiedImage.Bind(fileName, "Invrt", whiteIcon))
 	}
 
 	ComputeControlOptions(window, type, options) {
@@ -1726,10 +1715,15 @@ class RecolorizerTask extends PeriodicTask {
 	iStart := A_TickCount
 	iProgress := false
 
+	__New() {
+		super.__New(false, 200, kInterruptPriority)
+	}
+
 	run() {
-		if (A_TickCount > (this.iStart + 200))
+		if (A_TickCount > (this.iStart + 250))
 			if !this.iProgress
-				this.iProgressWindow := ProgressWindow.showProgress({progress: this.iProgress++, color: "Blue", title: translate("Recoloring Image")})
+				this.iProgressWindow := ProgressWindow.showProgress({progress: this.iProgress++, color: "Blue"
+																   , title: translate("Recoloring Image")})
 			else if (this.iProgress != "Stop")
 				this.iProgressWindow.updateProgress({progress: Min(100, this.iProgress++)})
 	}

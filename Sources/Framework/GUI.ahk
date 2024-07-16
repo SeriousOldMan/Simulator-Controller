@@ -805,19 +805,7 @@ class DarkTheme extends Theme {
 	}
 
 	RecolorizeImage(fileName) {
-		local progress := false
-		local recolorizeTask := false
-		local start := A_TickCount
-
-		updateProgress() {
-			if (A_TickCount > (start + 500))
-				if !progress
-					showProgress({progress: 0, color: "Blue", title: translate("Recoloring Image")})
-				else
-					showProgress({progress: Min(100, progress++)})
-
-			return Task.CurrentTask
-		}
+		local progressTask := false
 
 		whiteIcon(graphics, bitmap) {
 			local x, y, value
@@ -836,16 +824,14 @@ class DarkTheme extends Theme {
 		}
 
 		try {
-			recolorizeTask := Task.startTask(updateProgress, 100, kInterruptPriority)
+			progressTask := RecolorizerTask(false, 100, kInterruptPriority)
+
+			progressTask.start()
 
 			return modifiedImage(fileName, "Invrt", whiteIcon)
 		}
 		finally {
-			if recolorizeTask
-				recolorizeTask.stop()
-
-			if progress
-				hideProgress()
+			progressTask.stop()
 		}
 	}
 
@@ -1726,6 +1712,35 @@ class Window extends Gui {
 
 		for ignore, resizer in this.Resizers
 			resizer.Resize(deltaWidth, deltaHeight)
+	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                     Private Class Declaration Section                   ;;;
+;;;-------------------------------------------------------------------------;;;
+
+class RecolorizerTask extends PeriodicTask {
+	iProgressWindow := false
+
+	iStart := A_TickCount
+	iProgress := false
+
+	run() {
+		if (A_TickCount > (this.iStart + 200))
+			if !this.iProgress
+				this.iProgressWindow := ProgressWindow.showProgress({progress: this.iProgress++, color: "Blue", title: translate("Recoloring Image")})
+			else if (this.iProgress != "Stop")
+				this.iProgressWindow.updateProgress({progress: Min(100, this.iProgress++)})
+	}
+
+	stop() {
+		this.iProgress := "Stop"
+
+		if this.iProgressWindow
+			this.iProgressWindow.hideProgress()
+
+		super.stop()
 	}
 }
 

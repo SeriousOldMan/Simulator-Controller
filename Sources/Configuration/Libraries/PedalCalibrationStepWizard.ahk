@@ -119,7 +119,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 
 			pedalWidgets.Push(widget)
 
-			widget := window.Add("CheckBox", "x" . secondX . " yp w24 h23 +0x200 " . checked . " Hidden")
+			widget := window.Add("CheckBox", "x" . secondX . " yp w24 h21 +0x200 " . checked . " Hidden")
 			widget.OnEvent("Click", updatePedals)
 
 			pedalWidgets.Push(widget)

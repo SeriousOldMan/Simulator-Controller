@@ -318,7 +318,7 @@ class BasicStepWizard extends StepWizard {
 		widget39 := window.Add("Text", "xp+98 yp w96 h23 +0x200 Hidden", translate("Language"))
 		widget40 := window.Add("Text", "xp+98 yp w96 h23 +0x200 Hidden", translate("Voice"))
 
-		widget41 := window.Add("CheckBox", "x" . x . " yp+24 w16 h23 vbasicDCEnabledCheck Hidden" . (wizard.isModuleSelected("Driving Coach") ? " Checked" : ""))
+		widget41 := window.Add("CheckBox", "x" . x . " yp+24 w16 h21 vbasicDCEnabledCheck Hidden" . (wizard.isModuleSelected("Driving Coach") ? " Checked" : ""))
 		widget41.OnEvent("Click", updateAssistant.Bind("Driving Coach"))
 		widget42 := window.Add("Text", "xp+16 yp w86 h23 +0x200 Hidden", translate("Driving Coach"))
 		widget43 := window.Add("Edit", "xp+114 yp w96 VbasicDCNameEdit Hidden", "Aiden")
@@ -332,7 +332,7 @@ class BasicStepWizard extends StepWizard {
 		widget47.OnEvent("Click", editBooster.Bind("Driving Coach"))
 		setButtonIcon(widget47, kIconsDirectory . "Booster.ico", 1, "L4 T4 R4 B4")
 
-		widget14 := window.Add("CheckBox", "x" . x . " yp+24 w16 h23 vbasicREEnabledCheck Hidden" . (wizard.isModuleSelected("Race Engineer") ? " Checked" : ""))
+		widget14 := window.Add("CheckBox", "x" . x . " yp+24 w16 h21 vbasicREEnabledCheck Hidden" . (wizard.isModuleSelected("Race Engineer") ? " Checked" : ""))
 		widget14.OnEvent("Click", updateAssistant.Bind("Race Engineer"))
 		widget15 := window.Add("Text", "xp+16 yp w86 h23 +0x200 Hidden", translate("Race Engineer"))
 		widget16 := window.Add("Edit", "xp+114 yp w96 VbasicRENameEdit Hidden", "Jona")
@@ -346,7 +346,7 @@ class BasicStepWizard extends StepWizard {
 		widget48.OnEvent("Click", editBooster.Bind("Race Engineer"))
 		setButtonIcon(widget48, kIconsDirectory . "Booster.ico", 1, "L4 T4 R4 B4")
 
-		widget20 := window.Add("CheckBox", "x" . x . " yp+24 w16 h23 vbasicRSEnabledCheck Hidden" . (wizard.isModuleSelected("Race Strategist") ? " Checked" : ""))
+		widget20 := window.Add("CheckBox", "x" . x . " yp+24 w16 h21 vbasicRSEnabledCheck Hidden" . (wizard.isModuleSelected("Race Strategist") ? " Checked" : ""))
 		widget20.OnEvent("Click", updateAssistant.Bind("Race Strategist"))
 		widget21 := window.Add("Text", "xp+16 yp w86 h23 +0x200 Hidden", translate("Race Strategist"))
 		widget22 := window.Add("Edit", "xp+114 yp w96 VbasicRSNameEdit Hidden", "Khato")
@@ -360,7 +360,7 @@ class BasicStepWizard extends StepWizard {
 		widget49.OnEvent("Click", editBooster.Bind("Race Strategist"))
 		setButtonIcon(widget49, kIconsDirectory . "Booster.ico", 1, "L4 T4 R4 B4")
 
-		widget26 := window.Add("CheckBox", "x" . x . " yp+24 w16 h23 vbasicRSPEnabledCheck Hidden" . (wizard.isModuleSelected("Race Spotter") ? " Checked" : ""))
+		widget26 := window.Add("CheckBox", "x" . x . " yp+24 w16 h21 vbasicRSPEnabledCheck Hidden" . (wizard.isModuleSelected("Race Spotter") ? " Checked" : ""))
 		widget26.OnEvent("Click", updateAssistant.Bind("Race Spotter"))
 		widget27 := window.Add("Text", "xp+16 yp w86 h23 +0x200 Hidden", translate("Race Spotter"))
 		widget28 := window.Add("Edit", "xp+114 yp w96 VbasicRSPNameEdit Hidden", "Elisa")

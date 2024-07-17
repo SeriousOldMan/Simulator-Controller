@@ -1663,7 +1663,7 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 			driversListView.OnEvent("DoubleClick", selectDriver)
 			driversListView.OnEvent("ItemSelect", selectDriver)
 
-			driverSelectCheck := reportSettingsGui.Add("CheckBox", "Check3 x72 yp+2 w15 h23")
+			driverSelectCheck := reportSettingsGui.Add("CheckBox", "Check3 x72 yp+2 w15 h21")
 			driverSelectCheck.OnEvent("Click", selectDrivers)
 
 			editReportSettings("UpdateDrivers")

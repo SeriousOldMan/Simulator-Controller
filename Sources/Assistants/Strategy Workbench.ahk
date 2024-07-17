@@ -1195,11 +1195,11 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w60 h20", translate("Minutes"))
 
 		workbenchGui.Add("Text", "x" . x . " yp+21 w75 h23 +0x200", translate("Formation"))
-		workbenchGui.Add("CheckBox", "x" . x1 . " yp-1 w17 h23 Checked VformationLapCheck")
+		workbenchGui.Add("CheckBox", "x" . x1 . " yp-1 w17 h21 Checked VformationLapCheck")
 		workbenchGui.Add("Text", "x" . x4 . " yp+5 w50 h20", translate("Lap"))
 
 		workbenchGui.Add("Text", "x" . x . " yp+19 w75 h23 +0x200", translate("Post Race"))
-		workbenchGui.Add("CheckBox", "x" . x1 . " yp-1 w17 h23 Checked VpostRaceLapCheck")
+		workbenchGui.Add("CheckBox", "x" . x1 . " yp-1 w17 h21 Checked VpostRaceLapCheck")
 		workbenchGui.Add("Text", "x" . x4 . " yp+5 w50 h20", translate("Lap"))
 
 		workbenchGui.SetFont("Norm", "Arial")

@@ -429,7 +429,7 @@ class DarkTheme extends Theme {
 	static sTextBackgroundBrush := DllCall("gdi32\CreateSolidBrush", "UInt", DarkTheme.sDarkColors["Background"], "Ptr")
 
 	class DarkCheckBox extends Gui.CheckBox {
-		static kCheckWidth := 28
+		static kCheckWidth := 23
 		static kCheckShift := 1
 
 		Enabled {
@@ -474,8 +474,11 @@ class DarkTheme extends Theme {
 		}
 
 		static GetCheckBoxArguments(options, arguments) {
-			options := RegExReplace(options, "i)[\s]+w[0-9]+", " w23")
-			options := RegExReplace(options, "i)^w[0-9]+", "w23")
+			options := RegExReplace(options, "i)[\s]+w[0-9]+", " w21")
+			options := RegExReplace(options, "i)^w[0-9]+", "w21")
+
+			if !RegExMatch(options, "i)^w[0-9]+")
+				options .= " w23"
 
 			options := RegExReplace(options, "i)[\s]+x[0-9ps\-\+]+", " xp-" . DarkTheme.DarkCheckBox.kCheckWidth)
 			options := RegExReplace(options, "i)^x[0-9ps\-\+]+", "xp-" . DarkTheme.DarkCheckBox.kCheckWidth)

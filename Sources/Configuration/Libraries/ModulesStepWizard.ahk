@@ -1279,7 +1279,7 @@ class ModulesStepWizard extends StepWizard {
 
 			widget1 := window.Add("Picture", "x" . x . " y" . y . " w30 h30 Y:Move(" . factor . ") Hidden", kResourcesDirectory . "Setup\Images\Module.png")
 			widget2 := window.Add("Text", "x" . labelX . " y" . labelY . " w" . labelWidth . " h26 Y:Move(" . factor . ") Hidden", label)
-			widget3 := window.Add("CheckBox", "Checked" . selected . " x" . checkX . " y" . labelY . " w23 h23 X:Move Y:Move(" . factor . ") Hidden")
+			widget3 := window.Add("CheckBox", "Checked" . selected . " x" . checkX . " y" . labelY . " w23 h21 X:Move Y:Move(" . factor . ") Hidden")
 			widget3.OnEvent("Click", updateSelectedModules)
 			widget4 := window.Add("HTMLViewer", "x" . x . " yp+26 w" . width . " h120 Y:Move(" . factor . ") W:Grow H:Grow(0.33) Hidden")
 

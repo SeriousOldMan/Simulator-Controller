@@ -221,7 +221,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		editorGui.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 Range32-131072")
 
 		editorGui.SetFont("Italic", "Arial")
-		editorGui.Add("Checkbox", "x" . x0 . " yp+36 w105 h23 vviSpeakerCheck", translate("Rephrasing")).OnEvent("Click", (*) => this.updateState())
+		editorGui.Add("Checkbox", "x" . x0 . " yp+36 w105 h21 vviSpeakerCheck", translate("Rephrasing")).OnEvent("Click", (*) => this.updateState())
 		editorGui.Add("Text", "x100 yp+11 w" . (width + 8 - 100) . " 0x10 W:Grow")
 		editorGui.SetFont("Norm", "Arial")
 
@@ -238,7 +238,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		editorGui.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200", translate("%"))
 
 		editorGui.SetFont("Italic", "Arial")
-		editorGui.Add("Checkbox", "x" . x0 . " yp+36 w105 h23 vviListenerCheck", translate("Understanding")).OnEvent("Click", (*) => this.updateState())
+		editorGui.Add("Checkbox", "x" . x0 . " yp+36 w105 h21 vviListenerCheck", translate("Understanding")).OnEvent("Click", (*) => this.updateState())
 		editorGui.Add("Text", "x100 yp+11 w" . (width + 8 - 100) . " 0x10 W:Grow")
 		editorGui.SetFont("Norm", "Arial")
 
@@ -253,7 +253,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		editorGui.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200", translate("%"))
 
 		editorGui.SetFont("Italic", "Arial")
-		editorGui.Add("Checkbox", "x" . x0 . " yp+36 w105 h23 vviConversationCheck", translate("Conversation")).OnEvent("Click", (*) => this.updateState())
+		editorGui.Add("Checkbox", "x" . x0 . " yp+36 w105 h21 vviConversationCheck", translate("Conversation")).OnEvent("Click", (*) => this.updateState())
 		editorGui.Add("Text", "x100 yp+11 w" . (width + 8 - 100) . " 0x10 W:Grow")
 		editorGui.SetFont("Norm", "Arial")
 
@@ -1126,7 +1126,7 @@ class CallbacksEditor {
 		else
 			editorGui.Add("Text", "x16 yp+28 w70 h23 +0x200 Section Y:Move(0.25)", translate("Action"))
 
-		editorGui.Add("CheckBox", "x90 yp h23 w23 Y:Move(0.25) vcallbackActiveCheck").OnEvent("Click", updateCallbacksList)
+		editorGui.Add("CheckBox", "x90 yp h21 w23 Y:Move(0.25) vcallbackActiveCheck").OnEvent("Click", updateCallbacksList)
 
 		if (this.Type = "Agent.Events")
 			editorGui.Add("DropDownList", "x110 yp w127 Y:Move(0.25) vcallbackTypeDropDown", collect(["Event Class", "Event Rule", "Event Disabled"], translate)).OnEvent("Change", updateCallbacksList)

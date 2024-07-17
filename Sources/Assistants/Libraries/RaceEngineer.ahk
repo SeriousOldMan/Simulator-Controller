@@ -91,7 +91,7 @@ class PressureLossEvent extends AssistantEvent {
 	createTrigger(event, phrase, arguments) {
 		static tyres := CaseInsenseMap("FL", "front left", "FR", "front right", "RL", "rear left", "RR", "rear right")
 
-		return ("The " . tyres[arguments[1]] . " tyre (" . arguments[1] . ") has lost pressure by " . Round(arguments[2], 1) . " PSI.")
+		return ("The " . tyres[arguments[1]] . " (" . arguments[1] . ") tyre has lost pressure by " . Round(arguments[2], 1) . " PSI.")
 	}
 
 	handleEvent(event, arguments*) {

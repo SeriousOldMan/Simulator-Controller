@@ -849,6 +849,9 @@ class DarkTheme extends Theme {
 			label := window.Add("Text", DarkTheme.DarkCheckBox.GetLabelArguments(options, arguments)*)
 			checkBox := window.Add("DarkCheckBox", DarkTheme.DarkCheckBox.GetCheckBoxArguments(options, arguments)*)
 
+			checkBox.GetPos( , &y)
+			label.Move( , y + 2)
+
 			checkBox.Label := label
 			checkBox.Enabled := checkBox.Enabled
 

@@ -1085,12 +1085,11 @@ class SimulatorController extends ConfigurationItem {
 						else
 							throw "Cannot find action for " . function.Descriptor . "[" . trigger . "] in SimulatorController.fireAction..."
 			}
-			else {
-				action := function.Actions[trigger]
 
-				if action
-					action.Call()
-			}
+			action := function.Actions[trigger]
+
+			if action
+				action.Call()
 		}
 	}
 
@@ -2353,9 +2352,9 @@ switchToggle(toggleType, toggleNumber, mode := "activate", async := true) {
 	local function := SimulatorController.Instance.findFunction(descriptor)
 
 	if (function != false) {
-		if (((mode = "activate") || (mode = "on")) && (SimulatorController.Instance.getActions(function, "On").Length > 0))
+		if ((mode = "activate") || (mode = "on")) ; && (SimulatorController.Instance.getActions(function, "On").Length > 0))
 			fireControllerActions(function, "On", async)
-		else if (((mode = "deactivate") || (mode = "off")) && (SimulatorController.Instance.getActions(function, "Off").Length > 0))
+		else if ((mode = "deactivate") || (mode = "off")) ; && (SimulatorController.Instance.getActions(function, "Off").Length > 0))
 			fireControllerActions(function, "Off", async)
 		else {
 			logMessage(kLogWarn, translate("Unsupported argument (") . mode . translate(") detected in switchToggle - please check the configuration"))

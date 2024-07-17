@@ -4218,7 +4218,7 @@ class PracticeCenter extends ConfigurationItem {
 				}
 			}
 
-			showProgress({title: translate("Updating Driver Statistics"), message: translate("...")})
+			showProgress({color: "Blue", title: translate("Updating Driver Statistics"), message: translate("...")})
 
 			count := this.Drivers.Length
 

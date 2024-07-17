@@ -902,7 +902,7 @@ class SimulatorController extends ConfigurationItem {
 
 						name := application.Application
 
-						showProgress({message: name, title: translate("Starting Simulator")})
+						showProgress({color: "Blue", message: name, title: translate("Starting Simulator")})
 
 						started := false
 

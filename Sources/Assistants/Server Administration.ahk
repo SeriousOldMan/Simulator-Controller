@@ -560,6 +560,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 					administrationGui["refreshConnectionsListButton"].Enabled := true
 					administrationGui["refreshObjectsListButton"].Enabled := true
+					administrationGui["cleanupDatabaseButton"].Enabled := true
 				}
 				else {
 					administrationGui["changePasswordButton"].Enabled := false
@@ -576,6 +577,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 					administrationGui["refreshConnectionsListButton"].Enabled := false
 					administrationGui["refreshObjectsListButton"].Enabled := false
+					administrationGui["cleanupDatabaseButton"].Enabled := false
 
 					connectionsListView.Delete()
 				}

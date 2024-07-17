@@ -804,7 +804,7 @@ class AssettoCorsaCarMetas extends DownloadablePreset {
 		if (Trim(url) != "") {
 			updateTask := PeriodicTask(updateProgress, 50, kInterruptPriority)
 
-			showProgress({title: translate("Downloading Components"), message: translate("Downloading...")})
+			showProgress({color: "Blue", title: translate("Downloading Components"), message: translate("Downloading...")})
 
 			updateTask.start()
 
@@ -812,7 +812,7 @@ class AssettoCorsaCarMetas extends DownloadablePreset {
 
 			DirCreate(A_Temp . "\Simulator Controller DLC")
 
-			showProgress({message: translate("Extracting...")})
+			showProgress({color: "Green", message: translate("Extracting...")})
 
 			RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Simulator Controller DLC.zip' -DestinationPath '" . A_Temp . "\Simulator Controller DLC' -Force", , "Hide")
 
@@ -950,7 +950,7 @@ class SplashMedia extends DownloadablePreset {
 		if (Trim(url) != "") {
 			updateTask := PeriodicTask(updateProgress, 50, kInterruptPriority)
 
-			showProgress({title: translate("Downloading Components"), message: translate("Downloading...")})
+			showProgress({color: "Blue", title: translate("Downloading Components"), message: translate("Downloading...")})
 
 			updateTask.start()
 
@@ -958,7 +958,7 @@ class SplashMedia extends DownloadablePreset {
 
 			DirCreate(A_Temp . "\Simulator Controller DLC")
 
-			showProgress({message: translate("Extracting...")})
+			showProgress({color: "Green", message: translate("Extracting...")})
 
 			RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Simulator Controller DLC.zip' -DestinationPath '" . A_Temp . "\Simulator Controller DLC' -Force", , "Hide")
 
@@ -1073,7 +1073,7 @@ class SettingsImport extends NamedPreset {
 				OnMessage(0x44, translator, 0)
 
 				if (folder != "") {
-					showProgress({title: translate("Importing settings")})
+					showProgress({color: "Green", title: translate("Importing settings")})
 
 					this.importSettings(folder, &progress)
 

@@ -495,7 +495,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 						showMessage(message . translate(", Set ") . setupTyreSet . translate("; ")
 										    . dryFrontLeft . translate(", ") . dryFrontRight . translate(", ")
-											. dryRearLeft . translate(", ") . dryRearRight, false, "Information.png", 5000)
+											. dryRearLeft . translate(", ") . dryRearRight, false, "Information.ico", 5000)
 					}
 				}
 
@@ -521,7 +521,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 						showMessage(message . translate("; ")
 											. wetFrontLeft . translate(", ") . wetFrontRight . translate(", ")
-											. wetRearLeft . translate(", ") . wetRearRight, false, "Information.png", 5000)
+											. wetRearLeft . translate(", ") . wetRearRight, false, "Information.ico", 5000)
 					}
 				}
 

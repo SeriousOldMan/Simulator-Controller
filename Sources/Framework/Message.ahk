@@ -37,7 +37,7 @@ showMessage(message, title := false, icon := kUndefined, duration := 1000
 	messageGui := Window()
 
 	if (icon = kUndefined)
-		icon := "Information.png"
+		icon := "Information.ico"
 
 	if (!title || (title = ""))
 		title := translate("Modular Simulator Controller System")

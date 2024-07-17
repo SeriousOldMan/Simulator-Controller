@@ -1073,6 +1073,19 @@ class CallbacksEditor {
 			this.selectParameter(line ? this.SelectedCallback.Parameters[line] : false)
 		}
 
+		updateCallbacksList(*) {
+			local name := this.Control["callbackNameEdit"].Text
+			local active := Trim(this.Control["callbackActiveCheck"].Value)
+			local description := Trim(this.Control["callbackDescriptionEdit"].Text)
+			local disabled := (this.Control["callbackTypeDropDown"].Text = translate("Event Disabled"))
+
+			if this.SelectedCallback
+				this.CallbacksListView.Modify(inList(this.Callbacks, this.SelectedCallback), ""
+											, name, active ? translate(disabled ? "-" : "x") : "", description)
+
+			this.updateState()
+		}
+
 		editorGui := Window({Descriptor: (this.Type . " Editor"), Resizeable: true, Options: "0x400000"})
 
 		this.iWindow := editorGui
@@ -1113,17 +1126,17 @@ class CallbacksEditor {
 		else
 			editorGui.Add("Text", "x16 yp+28 w70 h23 +0x200 Section Y:Move(0.25)", translate("Action"))
 
-		editorGui.Add("CheckBox", "x90 yp h23 w23 Y:Move(0.25) vcallbackActiveCheck")
+		editorGui.Add("CheckBox", "x90 yp h23 w23 Y:Move(0.25) vcallbackActiveCheck").OnEvent("Click", updateCallbacksList)
 
 		if (this.Type = "Agent.Events")
-			editorGui.Add("DropDownList", "x110 yp w127 Y:Move(0.25) vcallbackTypeDropDown", collect(["Event Class", "Event Rule", "Event Disabled"], translate)).OnEvent("Change", (*) => this.updateState())
+			editorGui.Add("DropDownList", "x110 yp w127 Y:Move(0.25) vcallbackTypeDropDown", collect(["Event Class", "Event Rule", "Event Disabled"], translate)).OnEvent("Change", updateCallbacksList)
 		else
-			editorGui.Add("DropDownList", "x110 yp w127 Y:Move(0.25) vcallbackTypeDropDown", collect(["Assistant Method", "Assistant Rule", "Controller Method", "Controller Function"], translate)).OnEvent("Change", (*) => this.updateState())
+			editorGui.Add("DropDownList", "x110 yp w127 Y:Move(0.25) vcallbackTypeDropDown", collect(["Assistant Method", "Assistant Rule", "Controller Method", "Controller Function"], translate)).OnEvent("Change", updateCallbacksList)
 
-		editorGui.Add("Edit", "x241 yp h23 w177 W:Grow(0.34) Y:Move(0.25) vcallbackNameEdit")
+		editorGui.Add("Edit", "x241 yp h23 w177 W:Grow(0.34) Y:Move(0.25) vcallbackNameEdit").OnEvent("Change", updateCallbacksList)
 
 		editorGui.Add("Text", "x16 yp+28 w90 h23 +0x200 Y:Move(0.25)", translate("Description"))
-		editorGui.Add("Edit", "x110 yp h96 w308 W:Grow(0.34) Y:Move(0.25) vcallbackDescriptionEdit")
+		editorGui.Add("Edit", "x110 yp h96 w308 W:Grow(0.34) Y:Move(0.25) vcallbackDescriptionEdit").OnEvent("Change", updateCallbacksList)
 
 		editorGui.Add("Text", "x16 yp+100 w90 h23 +0x200 Y:Move(0.25)", translate("Learning Phase")).Visible := (this.Type != "Agent.Events")
 		editorGui.Add("DropDownList", "x110 yp w90 Y:Move(0.25) vcallbackInitializationDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", (*) => this.updateState())
@@ -1276,8 +1289,20 @@ class CallbacksEditor {
 				if (this.Type = "Agent.Events") {
 					this.Control["callbackTypeDropDown"].Enabled := true
 
-					if (this.Control["callbackTypeDropDown"].Value < 3)
+					if (this.Control["callbackTypeDropDown"].Text != translate("Event Disabled")) {
+						this.Control["callbackTypeDropDown"].Delete()
+
+						this.Control["callbackTypeDropDown"].Add(collect(["Event Class", "Event Rule", "Event Disabled"], translate))
+
 						this.Control["callbackTypeDropDown"].Choose(inList(["Assistant.Class", "Assistant.Rule"], this.SelectedCallback.Type))
+					}
+					else {
+						this.Control["callbackTypeDropDown"].Delete()
+
+						this.Control["callbackTypeDropDown"].Add(collect(["Event Enabled", "Event Disabled"], translate))
+
+						this.Control["callbackTypeDropDown"].Choose(2)
+					}
 				}
 				else
 					this.Control["callbackTypeDropDown"].Enabled := false
@@ -1310,7 +1335,7 @@ class CallbacksEditor {
 
 			if (this.Control["callbackTypeDropDown"].Value != 0) {
 				if (this.Type = "Agent.Events") {
-					if (this.Control["callbackTypeDropDown"].Value = 3)
+					if (this.Control["callbackTypeDropDown"].Text = translate("Event Disabled"))
 						type := ((this.SelectedCallback.Type = "Assistant.Class") ? "Class" : "Rule")
 					else
 						type := ["Class", "Rule", "Disabled"][this.Control["callbackTypeDropDown"].Value]
@@ -1412,8 +1437,12 @@ class CallbacksEditor {
 			if (callback && (this.Type = "Agent.Events")) {
 				this.Control["callbackTypeDropDown"].Delete()
 
-				if callback.Builtin
-					this.Control["callbackTypeDropDown"].Add(collect(["Event Class", "Event Rule", "Event Disabled"], translate))
+				if callback.Builtin {
+					if callback.Disabled
+						this.Control["callbackTypeDropDown"].Add(collect(["Event Enabled", "Event Disabled"], translate))
+					else
+						this.Control["callbackTypeDropDown"].Add(collect(["Event Class", "Event Rule", "Event Disabled"], translate))
+				}
 				else
 					this.Control["callbackTypeDropDown"].Add(collect(["Event Class", "Event Rule"], translate))
 
@@ -1493,7 +1522,7 @@ class CallbacksEditor {
 				this.PhraseField[2].Text := callback.Phrase
 
 				if callback.Disabled
-					this.Control["callbackTypeDropDown"].Choose(3)
+					this.Control["callbackTypeDropDown"].Choose(2)
 				else
 					this.Control["callbackTypeDropDown"].Choose(inList(["Assistant.Class", "Assistant.Rule"], callback.Type))
 			}
@@ -1565,7 +1594,7 @@ class CallbacksEditor {
 			}
 
 		if (this.Type = "Agent.Events") {
-			if (this.Control["callbackTypeDropDown"].Value = 3) {
+			if (this.Control["callbackTypeDropDown"].Text = translate("Event Disabled")) {
 				callback.Disabled := true
 
 				type := callback.Type

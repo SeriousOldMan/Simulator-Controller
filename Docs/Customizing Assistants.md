@@ -14,6 +14,8 @@ But is also possible to connect the rule based Assistants to an LLM to improve t
 
 Note: Seting up a connection to a GPT service and configuring the Assistant Boosters require some knowledge. Customizing the *Conversation* and the *Reasoning* bosters may require even some development skills. If you feel overwhelmed, no problem. Simply leave it aside and use the Assistants without connecting them to a GPT service. The will do their job. Or you can become a Patreon of the project and I will setup everything for you.
 
+Important: Even if you are not using a local LLM Runtime are the resource requirements significantly higher compared to running an Assistant based on the rule engine alone. Therefore take a look at the Windows Task Manager to check whether your system can handle all that while using your favorite simulator.
+
 ## Connecting an Assistant to an LLM
 
 The voice recognition for all Assistants except the Driving Coach is normally pattern-based. [Here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(EN)), for example, you can find a documentation for the definition of the recognized commands of the Race Engineer and similar documentation is available for the other Assistants as well. The speech output of all Assistants is also preprogrammed with several different phrases for each message, to create at least a little variation.
@@ -70,6 +72,243 @@ Normally an Assistant will tell you that he didn't understand you, when the spok
 (1) Depending on the availabilty of the data by the current simulator.
 
 Since large parts of the knowledge base of the Assistants will be supplied to the LLM for matching, a context window of at least 4k tokens is required for this booster. Full standings history isn't possible at the moment, since this will overflow the input context area of the LLM, at least for the *smaller* models like GPT 3.5, Mistral 7b, and so on. Time will cure this problem, and I will update the capabilities of the integration, when more capable models become available. For the time being, the position data is available for the most recent laps and also the gaps for the most important opponents are passed to the LLM (for Strategist and Spotter).
+
+Here is an example of the knowledge supplied by the Race Engineer to the LLM:
+
+	{
+		"Damage": {
+			"Bodywork": {
+				"Front": "66.4 %",
+				"Left": "0.0 %",
+				"Rear": "0.0 %",
+				"Right": "33.6 %"
+			},
+			"LapTimeLoss": "3.3 Seconds",
+			"RepairTime": "0 Seconds",
+			"Suspension": {
+				"Suspension": {
+					"FrontLeft": "27.3 %",
+					"FrontRight": "43.2 %",
+					"RearLeft": "15.9 %",
+					"RearRight": "13.6 %"
+				}
+			}
+		},
+		"Fuel": {
+			"Capacity": "125 Liter",
+			"Consumption": "2.6 Liter",
+			"Remaining": "1.5 Liter"
+		},
+		"Laps": [
+			{
+				"AirTemperature": 25,
+				"BodyworkDamage": 0.0,
+				"EngineDamage": 0.0,
+				"FuelConsumption": "2 Liters",
+				"FuelRemaining": "9 Liters",
+				"Grip": "Green",
+				"Nr": 2,
+				"SuspensionDamage": 0.0,
+				"Time": "110 Seconds",
+				"TrackTemperature": 32,
+				"Tyres": {
+					"Pressures": {
+						"Front.Left": "27.13 PSI",
+						"Front.Right": "27.34 PSI",
+						"Rear.Left": "27.17 PSI",
+						"Rear.Right": "27.50 PSI"
+					},
+					"Temperatures": {
+						"Front.Left": "82.8 Celsius",
+						"Front.Right": "71.4 Celsius",
+						"Rear.Left": "86.3 Celsius",
+						"Rear.Right": "77.3 Celsius"
+					}
+				},
+				"Valid": true,
+				"Weather": "Dry"
+			},
+			{
+				"AirTemperature": 25,
+				"BodyworkDamage": 0.0,
+				"EngineDamage": 0.0,
+				"FuelConsumption": "3 Liters",
+				"FuelRemaining": "7 Liters",
+				"Grip": "Green",
+				"Nr": 3,
+				"SuspensionDamage": 0.0,
+				"Time": "108 Seconds",
+				"TrackTemperature": 32,
+				"Tyres": {
+					"Pressures": {
+						"Front.Left": "27.22 PSI",
+						"Front.Right": "27.41 PSI",
+						"Rear.Left": "27.26 PSI",
+						"Rear.Right": "27.58 PSI"
+					},
+					"Temperatures": {
+						"Front.Left": "83.8 Celsius",
+						"Front.Right": "72.2 Celsius",
+						"Rear.Left": "87.3 Celsius",
+						"Rear.Right": "78.1 Celsius"
+					}
+				},
+				"Valid": true,
+				"Weather": "Dry"
+			},
+			{
+				"AirTemperature": 25,
+				"BodyworkDamage": 0.0,
+				"EngineDamage": 0.0,
+				"FuelConsumption": "3 Liters",
+				"FuelRemaining": "4 Liters",
+				"Grip": "Green",
+				"Nr": 4,
+				"SuspensionDamage": 3.099,
+				"Time": "113 Seconds",
+				"TrackTemperature": 32,
+				"Tyres": {
+					"Pressures": {
+						"Front.Left": "27.03 PSI",
+						"Front.Right": "27.34 PSI",
+						"Rear.Left": "27.14 PSI",
+						"Rear.Right": "26.57 PSI"
+					},
+					"Temperatures": {
+						"Front.Left": "82.3 Celsius",
+						"Front.Right": "71.5 Celsius",
+						"Rear.Left": "87.2 Celsius",
+						"Rear.Right": "78.0 Celsius"
+					}
+				},
+				"Valid": true,
+				"Weather": "Dry"
+			},
+			{
+				"AirTemperature": 25,
+				"BodyworkDamage": 22.90,
+				"EngineDamage": 0.0,
+				"FuelConsumption": "3 Liters",
+				"FuelRemaining": "2 Liters",
+				"Grip": "Green",
+				"Nr": 5,
+				"SuspensionDamage": 4.399,
+				"Time": "107 Seconds",
+				"TrackTemperature": 32,
+				"Tyres": {
+					"Pressures": {
+						"Front.Left": "27.24 PSI",
+						"Front.Right": "27.52 PSI",
+						"Rear.Left": "27.23 PSI",
+						"Rear.Right": "26.62 PSI"
+					},
+					"Temperatures": {
+						"Front.Left": "84.4 Celsius",
+						"Front.Right": "73.4 Celsius",
+						"Rear.Left": "88.2 Celsius",
+						"Rear.Right": "78.6 Celsius"
+					}
+				},
+				"Valid": true,
+				"Weather": "Dry"
+			}
+		],
+		"Pitstop": {
+			"Refuel": "60.0 Liters",
+			"Repairs": false,
+			"Status": "Forecast",
+			"TyreChange": true,
+			"TyreCompound": "Dry (Black)",
+			"TyrePressures": {
+				"FrontLeft": "27.1 PSI",
+				"FrontRight": "26.7 PSI",
+				"RearLeft": "27.1 PSI",
+				"RearRight": "27.2 PSI"
+			},
+			"TyreSet": 9
+		},
+		"Pitstops": [
+			{
+				"AirTemperature": "25.0 Celsius",
+				"Lap": 4,
+				"Nr": 1,
+				"Refuel": "56.8 Liters",
+				"Repairs": false,
+				"TrackTemperature": "32.0 Celsius",
+				"TyreChange": true,
+				"TyreCompound": "Dry (Black)",
+				"TyrePressures": {
+					"FrontLeft": "26.6 PSI",
+					"FrontRight": "26.4 PSI",
+					"RearLeft": "26.6 PSI",
+					"RearRight": "26.1 PSI"
+				},
+				"TyreSet": 8
+			}
+		],
+		"Session": {
+			"Car": "mclaren_720s_gt3",
+			"Format": "Time",
+			"RemainingLaps": 21,
+			"RemainingTime": "2140 seconds",
+			"Simulator": "Unknown",
+			"Track": "Barcelona",
+			"TrackLength": "0 Meters",
+			"Type": "Practice"
+		},
+		"Stint": {
+			"Driver": "Oliver Doe (JD)",
+			"Lap": 6,
+			"RemainingTime": "2140 Seconds"
+		},
+		"Track": {
+			"Grip": "Green",
+			"Temperature": "32 Celsius"
+		},
+		"Tyres": {
+			"Compound": "Dry (Black)",
+			"Pressures": {
+				"Current": {
+					"FrontLeft": "27.24 PSI",
+					"FrontRight": "27.52 PSI",
+					"RearLeft": "27.23 PSI",
+					"RearRight": "26.62 PSI"
+				},
+				"Ideal": {
+					"FrontLeft": "27.7 PSI",
+					"FrontRight": "27.7 PSI",
+					"RearLeft": "27.7 PSI",
+					"RearRight": "27.7 PSI"
+				},
+				"Setup": {
+					"FrontLeft": "26.6 PSI",
+					"FrontRight": "26.4 PSI",
+					"RearLeft": "26.6 PSI",
+					"RearRight": "26.1 PSI"
+				}
+			},
+			"Temperatures": {
+				"Current": {
+					"FrontLeft": "84.4 Celsius",
+					"FrontRight": "73.4 Celsius",
+					"RearLeft": "88.2 Celsius",
+					"RearRight": "78.6 Celsius"
+				}
+			}
+		},
+		"Weather": {
+			"10 Minutes": "Dry",
+			"30 Minutes": "Dry",
+			"Now": "Dry",
+			"Temperature": "25 Celsius"
+		}
+	}
+
+Notes:
+
+- As said, the available data depeneds on the current simulator. If available, information about tyre wear, brake temeperatures and wear and so on are included as well.
+- The number of laps in the lap history is limited to the 5 recent laps.
+- The number of pitstops in the pitstop history is unlimited.
 
 Additionally, you can allow the LLM to call [predefined or custom actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-actions) as a result of your conversation. For example, if you ask the Strategist whether an undercut might be possible in one of the next laps, the LLM may call the Monte Carlo traffic simulation using an internal action. Which actions will be available to the LLM depends on the current Assistant. See corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#trigger-actions-from-conversation) for the Strategist for an example.
 

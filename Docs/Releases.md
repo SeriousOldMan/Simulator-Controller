@@ -9,7 +9,7 @@
      - Events raised by the rule system of an Assistant or by rules defined on your own can be used to create a request to an LLM.
 	 - The LLM then can use any of the predefined actions or actions defined on your own to handle this event or situation.
 	 - Actions triggered this way can raise other events, thereby creating a complex chain of thought for the LLM.
-  7. A new syntax-coloring editor for source code has been implemented and is used in the Assistant Booster dialog when rule code is being edited.
+  7. A new syntax-coloring editor for source code has been implemented and is used in the Assistant Booster dialog when rules are being edited.
   8. Large parts of the documentation have been revised, updated and restructured:
      - The documentation for the "Session Database" has been moved to a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database).
      - The documentation for "Strategy Workbench" has been moved to a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench).
@@ -27,7 +27,8 @@
   11. The automaed update procedure now asks before a non-release version is installed.
   12. [Internal] Implemented a postprocessor for the compiler which compresses the binary files. The applications are much smaller now.
   13. [Internal] Migrated to AHK 2.1-alpha.14 (needed for dark color scheme).
-  14. [Developer] A new generic class library supports a full recursive round-trip between the rule engine and an associated LLM. Using this architecture, fully autonomous agents can be easily configured.
+  14. [Developer] A new class library (*LLMAgent*) supports a full recursive round-trip between the rule engine and an associated LLM. Using this architecture, fully autonomous agents can be configured.
+  15. [Developer] A new class library (*CodeEditor*) integrates the "SciTex" editor with an easy to use programmin interface.
 
 ## 5.7.9.0-release 07/05/24
   1. Minor bugfixes, as always

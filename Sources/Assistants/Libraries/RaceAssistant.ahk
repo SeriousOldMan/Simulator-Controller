@@ -170,6 +170,19 @@ class AssistantEvent extends AgentEvent {
 	createVariables(event, arguments) {
 		local assistant := this.Assistant
 
+
+		local ticks := A_TickCount
+
+		knowledge := assistant.getKnowledge("Agent")
+
+		ticks := A_TickCount - ticks
+
+		ticks := A_TickCount
+
+		local knowledge := JSON.print(knowledge, "`t")
+
+		ticks := A_TickCount - ticks
+
 		return {assistant: assistant.AssistantType, name: assistant.VoiceManager.Name
 			  , knowledge: JSON.print(assistant.getKnowledge("Agent", this.Options))}
 	}

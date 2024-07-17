@@ -1498,7 +1498,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui["settingsTab"].UseTab(6)
 
-		editorGui.Add("CheckBox", "Check3 x296 ys+2 w15 h23 vdataSelectCheck").OnEvent("Click", selectAllData)
+		editorGui.Add("CheckBox", "Check3 x296 ys+2 w15 h21 vdataSelectCheck").OnEvent("Click", selectAllData)
 
 		this.iAdministrationListView := editorGui.Add("ListView", "x314 ys w342 h404 W:Grow H:Grow -Multi -LV0x10 Checked AltSubmit", collect(["Type", "Car / Track", "Driver", "#"], translate))
 		this.iAdministrationListView.OnEvent("ItemCheck", selectData)
@@ -1522,12 +1522,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.iDataListView := editorGui.Add("ListView", "x16 ys+301 w244 h151 H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Type", "#"], translate))
 		this.iDataListView.OnEvent("Click", noSelect)
 		this.iDataListView.OnEvent("DoubleClick", noSelect)
-
-		/*
-		editorGui.Add("Text", "x8 y700 w670 0x10 Y:Move W:Grow")
-
-		editorGui.Add("Button", "x304 y708 w80 h23 Y:Move H:Center", translate("Close")).OnEvent("Click", closeSessionDatabaseEditor)
-		*/
 
 		editorGui.Add(SessionDatabaseEditor.EditorResizer(editorGui))
 
@@ -1583,9 +1577,17 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						ToolTip()
 
 						if isObject(currentAction) {
-							actionInfo := translate((currentAction.Type = "Hotkey") ? (InStr(currentAction.Action, "|") ? "Hotkey(s): "
-																														: "Hotkey: ")
-																					: "Command: ")
+							switch currentAction.Type, false {
+								case "Hotkey":
+									actionInfo := translate(InStr(currentAction.Action, "|") ? "Hotkey(s): " : "Hotkey: ")
+								case "Command":
+									actionInfo := translate("Command: ")
+								case "Speak":
+									actionInfo := translate("Speak: ")
+								default:
+									throw "Unknown action type detected in SessionDatabaseEditor.show..."
+							}
+
 							actionInfo := (inList(this.SelectedTrackAutomation.Actions, currentAction) . translate(": ")
 										 . (Round(currentAction.X, 3) . translate(", ") . Round(currentAction.Y, 3))
 										 . translate(" -> ")
@@ -4688,11 +4690,11 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 		actionDialog("Update")
 	}
 	else if (xOrCommand = "Update") {
-		actionLabel.Text := translate((actionTypeDropDown.Value = 1) ? "Hotkey(s)" : "Command")
+		actionLabel.Text := translate((actionTypeDropDown.Value = 1) ? "Hotkey(s)" : ((actionTypeDropDown.Value = 1) ? "Command" : "Speak"))
 
-		if (actionTypeDropDown.Value = 1)
+		if (actionTypeDropDown.Value != 2)
 			commandChooserButton.Enabled := false
-		else
+		else if (actionTypeDropDown.Value = 2)
 			commandChooserButton.Enabled := true
 	}
 	else if (xOrCommand = "Command") {
@@ -4717,7 +4719,7 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 		actionDialogGui.Add("Text", "x16 y16 w70 h23 +0x200", translate("Action"))
 
 		if action {
-			chosen := inList(["Hotkey", "Command"], action.Type)
+			chosen := inList(["Hotkey", "Command", "Speak"], action.Type)
 
 			actionEdit := action.Action
 		}
@@ -4727,7 +4729,7 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 			actionEdit := ""
 		}
 
-		actionTypeDropDown := actionDialogGui.Add("DropDownList", "x90 yp+1 w180 Choose" . chosen, collect(["Hotkey(s)", "Command"], translate))
+		actionTypeDropDown := actionDialogGui.Add("DropDownList", "x90 yp+1 w180 Choose" . chosen, collect(["Hotkey(s)", "Command", "Speak"], translate))
 		actionTypeDropDown.OnEvent("Change", actionDialog.Bind("Type"))
 
 		actionLabel := actionDialogGui.Add("Text", "x16 yp+23 w70 h23 +0x200", translate("Hotkey(s)"))
@@ -4762,7 +4764,7 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 				else
 					action := Object()
 
-				action.Type := ["Hotkey", "Command"][actionTypeDropDown.Value]
+				action.Type := ["Hotkey", "Command", "Speak"][actionTypeDropDown.Value]
 				action.Action := actionEdit.Text
 
 				return action
@@ -4839,7 +4841,7 @@ selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner :
 
 		importSettingsGui.Add("Text", "x8 yp+30 w410 W:Grow 0x10")
 
-		importSelectCheck := importSettingsGui.Add("CheckBox", "Check3 x16 yp+12 w15 h23 vimportSelectCheck")
+		importSelectCheck := importSettingsGui.Add("CheckBox", "Check3 x16 yp+12 w15 h21 vimportSelectCheck")
 		importSelectCheck.OnEvent("Click", selectAllImportEntries)
 
 		importListView := importSettingsGui.Add("ListView", "x34 yp-2 w375 h400 H:Grow W:Grow -Multi -LV0x10 Checked AltSubmit", collect(["Car", "Track", "Weather", "Setting", "Value"], translate))
@@ -5015,7 +5017,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 
 		importDataGui.Add("Text", "x8 yp+30 w410 W:Grow 0x10")
 
-		importSelectCheck := importDataGui.Add("CheckBox", "Check3 x16 yp+12 w15 h23 vimportSelectCheck")
+		importSelectCheck := importDataGui.Add("CheckBox", "Check3 x16 yp+12 w15 h21 vimportSelectCheck")
 		importSelectCheck.OnEvent("Click", selectAllImportEntries)
 
 		importListView := importDataGui.Add("ListView", "x34 yp-2 w375 h400 H:Grow W:Grow -Multi -LV0x10 Checked AltSubmit", collect(["Type", "Car / Track", "Driver", "#"], translate))

@@ -1074,14 +1074,25 @@ class CallbacksEditor {
 		}
 
 		updateCallbacksList(*) {
-			local name := this.Control["callbackNameEdit"].Text
-			local active := Trim(this.Control["callbackActiveCheck"].Value)
+			local name := Trim(this.Control["callbackNameEdit"].Text)
+			local active := this.Control["callbackActiveCheck"].Value
 			local description := Trim(this.Control["callbackDescriptionEdit"].Text)
 			local disabled := (this.Control["callbackTypeDropDown"].Text = translate("Event Disabled"))
 
 			if this.SelectedCallback
 				this.CallbacksListView.Modify(inList(this.Callbacks, this.SelectedCallback), ""
 											, name, active ? translate(disabled ? "-" : "x") : "", description)
+
+			this.updateState()
+		}
+
+		updateParametersList(*) {
+			local name := Trim(this.Control["parameterNameEdit"].Text)
+			local description := Trim(this.Control["parameterDescriptionEdit"].Text)
+
+			if this.SelectedParameter
+				this.ParametersListView.Modify(inList(this.SelectedCallback.Parameters, this.SelectedParameter), ""
+											, name, description)
 
 			this.updateState()
 		}
@@ -1201,12 +1212,12 @@ class CallbacksEditor {
 		setButtonIcon(editorGui["deleteParameterButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
 		editorGui.Add("Text", "x430 yp+28 w90 h23 +0x200 X:Move(0.34) Y:Move(0.25)", translate("Name / Type"))
-		editorGui.Add("Edit", "x536 yp h23 w127 Y:Move(0.25) X:Move(0.34) vparameterNameEdit")
-		editorGui.Add("DropDownList", "x665 yp w90 Y:Move(0.25) X:Move(0.34) vparameterTypeDropDown", collect(["String", "Integer", "Number", "Boolean"], translate)).OnEvent("Change", (*) => this.updateState())
-		editorGui.Add("DropDownList", "x758 yp w90 Y:Move(0.25) X:Move(0.34) vparameterOptionalDropDown", collect(["Required", "Optional"], translate)).OnEvent("Change", (*) => this.updateState())
+		editorGui.Add("Edit", "x536 yp h23 w127 Y:Move(0.25) X:Move(0.34) vparameterNameEdit").OnEvent("Change", updateParametersList)
+		editorGui.Add("DropDownList", "x665 yp w90 Y:Move(0.25) X:Move(0.34) vparameterTypeDropDown", collect(["String", "Integer", "Number", "Boolean"], translate)).OnEvent("Change", updateParametersList)
+		editorGui.Add("DropDownList", "x758 yp w90 Y:Move(0.25) X:Move(0.34) vparameterOptionalDropDown", collect(["Required", "Optional"], translate)).OnEvent("Change", updateParametersList)
 
 		editorGui.Add("Text", "x430 yp+24 w90 h23 +0x200 Y:Move(0.25) X:Move(0.34)", translate("Description"))
-		editorGui.Add("Edit", "x536 yp h23 w312 Y:Move(0.25) X:Move(0.34) W:Grow(0.66) vparameterDescriptionEdit")
+		editorGui.Add("Edit", "x536 yp h23 w312 Y:Move(0.25) X:Move(0.34) W:Grow(0.66) vparameterDescriptionEdit").OnEvent("Change", updateParametersList)
 
 		this.updateState()
 	}

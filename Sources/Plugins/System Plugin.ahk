@@ -814,6 +814,15 @@ speak(message) {
 		speaker.speak(message)
 }
 
+play(soundFileName) {
+	try {
+		SoundPlay(soundFileName)
+	}
+	catch Any as exception {
+		logError(exception, true)
+	}
+}
+
 execute(command) {
 	local thePlugin := false
 

@@ -1582,8 +1582,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 									actionInfo := translate(InStr(currentAction.Action, "|") ? "Hotkey(s): " : "Hotkey: ")
 								case "Command":
 									actionInfo := translate("Command: ")
-								case "Speak":
-									actionInfo := translate("Speak: ")
+								case "Speech":
+									actionInfo := translate("Speech: ")
+								case "Audio":
+									actionInfo := translate("Audio: ")
 								default:
 									throw "Unknown action type detected in SessionDatabaseEditor.show..."
 							}
@@ -4690,20 +4692,21 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 		actionDialog("Update")
 	}
 	else if (xOrCommand = "Update") {
-		actionLabel.Text := translate((actionTypeDropDown.Value = 1) ? "Hotkey(s)" : ((actionTypeDropDown.Value = 1) ? "Command" : "Speak"))
+		actionLabel.Text := translate(["Hotkey(s)", "Command", "Speech", "Audio"][actionTypeDropDown.Value])
 
-		if (actionTypeDropDown.Value != 2)
-			commandChooserButton.Enabled := false
-		else if (actionTypeDropDown.Value = 2)
-			commandChooserButton.Enabled := true
+		commandChooserButton.Enabled := ((actionTypeDropDown.Value = 2) || (actionTypeDropDown.Value = 4))
 	}
-	else if (xOrCommand = "Command") {
+	else if (xOrCommand = "File") {
 		actionDialogGui.Opt("+OwnDialogs")
 
 		translator := translateMsgBoxButtons.Bind(["Select", "Cancel"])
 
 		OnMessage(0x44, translator)
-		fileName := withBlockedWindows(FileSelect, 1, actionEdit.Text, translate("Select executable file..."), "Script (*.*)")
+
+		if (actionTypeDropDown.Value = 2)
+			fileName := withBlockedWindows(FileSelect, 1, actionEdit.Text, translate("Select executable file..."), "Script (*.*)")
+		else
+			fileName := withBlockedWindows(FileSelect, 1, actionEdit.Text, translate("Select Sound File..."), "Audio (*.*)")
 		OnMessage(0x44, translator, 0)
 
 		if fileName
@@ -4719,7 +4722,7 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 		actionDialogGui.Add("Text", "x16 y16 w70 h23 +0x200", translate("Action"))
 
 		if action {
-			chosen := inList(["Hotkey", "Command", "Speak"], action.Type)
+			chosen := inList(["Hotkey", "Command", "Speech", "Audio"], action.Type)
 
 			actionEdit := action.Action
 		}
@@ -4729,13 +4732,13 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 			actionEdit := ""
 		}
 
-		actionTypeDropDown := actionDialogGui.Add("DropDownList", "x90 yp+1 w180 Choose" . chosen, collect(["Hotkey(s)", "Command", "Speak"], translate))
+		actionTypeDropDown := actionDialogGui.Add("DropDownList", "x90 yp+1 w180 Choose" . chosen, collect(["Hotkey(s)", "Command", "Speech", "Audio"], translate))
 		actionTypeDropDown.OnEvent("Change", actionDialog.Bind("Type"))
 
 		actionLabel := actionDialogGui.Add("Text", "x16 yp+23 w70 h23 +0x200", translate("Hotkey(s)"))
 		actionEdit := actionDialogGui.Add("Edit", "x90 yp+1 w155 h21", actionEdit)
 		commandChooserButton := actionDialogGui.Add("Button", "x247 yp w23 h23", translate("..."))
-		commandChooserButton.OnEvent("Click", actionDialog.Bind("Command"))
+		commandChooserButton.OnEvent("Click", actionDialog.Bind("File"))
 
 		actionDialogGui.Add("Button", "x16 yp+35 w80 h23 Y:Move", translate("Trigger...")).OnEvent("Click", toggleTriggerDetector)
 		actionDialogGui.Add("Button", "x104 yp w80 h23 Default", translate("Ok")).OnEvent("Click", actionDialog.Bind(kOk))
@@ -4745,6 +4748,8 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 		y := (y - 35)
 
 		actionDialog("Update")
+
+		actionDialogGui.Opt("+Owner" . SessionDatabaseEditor.Instance.Window.Hwnd)
 
 		actionDialogGui.Show("x" . x . " y" . y . " AutoSize")
 
@@ -4764,7 +4769,7 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 				else
 					action := Object()
 
-				action.Type := ["Hotkey", "Command", "Speak"][actionTypeDropDown.Value]
+				action.Type := ["Hotkey", "Command", "Speech", "Audio"][actionTypeDropDown.Value]
 				action.Action := actionEdit.Text
 
 				return action

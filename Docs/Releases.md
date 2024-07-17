@@ -24,13 +24,14 @@
 	  - Light (formerly named "Windows", uses the default Windows colors)
 	  - Dark (new, uses the dark theme colors of Windows 10 / 11)
 	  See the updated [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#color-schemes) for some examples.
-  11. A new [controller action functions "speak"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allows you to output spoken messags from your controller scripts.
-  12. A third option has been added to the [location specific actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#automations) in Track Automation, which let's you put out a spoken message at a given track location. Rally support is coming...
-  13. The automated update procedure now asks before a non-release version is installed.
-  14. [Internal] Implemented a postprocessor for the compiler which compresses the binary files. The applications are much smaller now.
-  15. [Internal] Migrated to AHK 2.1-alpha.14 (needed for dark color scheme).
-  16. [Developer] A new class library (*LLMAgent*) supports a full recursive round-trip between the rule engine and an associated LLM. Using this architecture, fully autonomous agents can be configured.
-  17. [Developer] A new class library (*CodeEditor*) integrates the "SciTex" editor with an easy to use programmin interface.
+  11. A new [controller action functions "speak"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allows you to output spoken messages from your controller scripts.
+  12. A new [controller action functions "play"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allows you to play sound files from your controller scripts.
+  13. "speak" and "play" has been added to the [location specific actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#automations) in Track Automation, which let's you put out a spoken message or play a sound file at a given track location. Rally support is coming...
+  14. The automated update procedure now asks before a non-release version is installed.
+  15. [Internal] Implemented a postprocessor for the compiler which compresses the binary files. The applications are much smaller now.
+  16. [Internal] Migrated to AHK 2.1-alpha.14 (needed for dark color scheme).
+  17. [Developer] A new class library (*LLMAgent*) supports a full recursive round-trip between the rule engine and an associated LLM. Using this architecture, fully autonomous agents can be configured.
+  18. [Developer] A new class library (*CodeEditor*) integrates the "SciTex" editor with an easy to use programmin interface.
 
 ## 5.7.9.0-release 07/05/24
   1. Minor bugfixes, as always

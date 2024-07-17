@@ -1110,8 +1110,10 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			}
 			else if (action.Type = "Command")
 				execute(action.Action)
-			else if (action.Type = "Speak")
+			else if (action.Type = "Speech")
 				speak(action.Action)
+			else if (action.Type = "Audio")
+				play(action.Action)
 		}
 	}
 

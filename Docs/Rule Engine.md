@@ -203,7 +203,7 @@ The left-hand side of a production rule is evaluated whenever the knowledge base
 	
   - Prove Quantor
   
-	Snytax: {Prove: goal}
+	Syntax: {Prove: goal}
   
 	Example: {Prove: unbound?(!Driver.Name)}
 	

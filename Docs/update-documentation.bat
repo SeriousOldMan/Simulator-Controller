@@ -19,6 +19,7 @@ copy "Virtual Driving Coach.md" ..\..\Controller.Wiki\Virtual-Driving-Coach.md
 copy "Virtual Race Engineer.md" ..\..\Controller.Wiki\Virtual-Race-Engineer.md
 copy "Virtual Race Strategist.md" ..\..\Controller.Wiki\Virtual-Race-Strategist.md
 copy "Virtual Race Spotter.md" ..\..\Controller.Wiki\Virtual-Race-Spotter.md
+copy "Customizing Assistants.md" ..\..\Controller.Wiki\Customizing-Assistants.md
 copy "Team Server.md" ..\..\Controller.Wiki\Team-Server.md
 copy "Setup Workbench.md" ..\..\Controller.Wiki\Setup-Workbench.md
 copy "Practice Center.md" ..\..\Controller.Wiki\Practice-Center.md

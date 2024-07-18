@@ -16,6 +16,7 @@
 #Include "Localization.ahk"
 #Include "MultiMap.ahk"
 #Include "Configuration.ahk"
+#Include "Progress.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -23,6 +24,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\Libraries\Task.ahk"
+#Include "..\Libraries\GDIP.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -105,8 +107,10 @@ class Theme {
 					return this.AlternateBackColor
 				case "Header":
 					return this.FieldBackColor
-				case "EvenRow", "OddRow":
+				case "EvenRow":
 					return this.AlternateBackColor
+				case "OddRow":
+					return this.WindowBackColor
 			}
 		}
 	}
@@ -118,10 +122,12 @@ class Theme {
 					return this.AlternateBackColor
 				case "Header":
 					return this.FieldBackColor
-				case "EvenRow", "OddRow":
+				case "EvenRow":
 					return this.AlternateBackColor
+				case "OddRow":
+					return this.WindowBackColor
 				case "Frame":
-					return "000000"
+					return this.FieldBackColor
 			}
 		}
 	}
@@ -139,9 +145,17 @@ class Theme {
 					return Theme.GetSystemColor("NormalTextColor")
 				case "Disabled":
 					return Theme.GetSystemColor("DisabledTextColor")
+				case "Grid":
+					return Theme.GetSystemColor("DisabledTextColor")
 				case "Unavailable":
 					return "Silver"
 			}
+		}
+	}
+
+	GridColor {
+		Get {
+			return this.TextColor["Disabled"]
 		}
 	}
 
@@ -174,6 +188,17 @@ class Theme {
 		window.BackColor := this.WindowBackColor
 	}
 
+	InitializeControls(window) {
+	}
+
+	RecolorizeImage(fileName) {
+		return fileName
+	}
+
+	GetControlType(type) {
+		return type
+	}
+
 	ComputeControlOptions(window, type, options) {
 		options := StrReplace(options, "-Theme", "")
 
@@ -188,7 +213,7 @@ class Theme {
 					options .= (" Background" . this.FieldBackColor)
 				case "Button":
 					options .= (" Background" . this.ButtonBackColor)
-				case "Text", "Picture", "GroupBox", "Radio", "Slider", "Link":
+				case "Text", "Picture", "GroupBox", "CheckBox", "Radio", "Slider", "Link", "ComboBox":
 					options .= (" Background" . this.WindowBackColor)
 			}
 		}
@@ -201,153 +226,9 @@ class Theme {
 
 	ApplyThemeProperties(window, control) {
 	}
-}
 
-/*
-class UserTheme extends ConfigurationItem {
-	iDescriptor := false
-
-	iWindowBackground := false
-	iAltBackground := false
-	iFieldBackground := false
-	iMenuBackground := false
-	iHeaderBackground := false
-	iTextColor := false
-	iButtonColor := false
-	iDropDownColor := false
-
-	Descriptor {
-		Get {
-			return this.iDescriptor
-		}
-	}
-
-	WindwBackground {
-		Get {
-			return this.iWindowBackground
-		}
-	}
-
-	AltBackground {
-		Get {
-			return this.iAltBackground
-		}
-	}
-
-	FieldBackground {
-		Get {
-			return this.iFieldBackground
-		}
-	}
-
-	MenuBackground {
-		Get {
-			return this.iMenuBackground
-		}
-	}
-
-	HeaderBackground {
-		Get {
-			return this.iHeaderBackground
-		}
-	}
-
-	TextColor {
-		Get {
-			return this.iTextColor
-		}
-	}
-
-	ButtonColor {
-		Get {
-			return this.iButtonColor
-		}
-	}
-
-	DropDownColor {
-		Get {
-			return this.iDropDownColor
-		}
-	}
-
-	__New(descriptor, configuration := false) {
-		this.iDescriptor := descriptor
-
-		super.__New(configuration)
-	}
-
-	loadFromConfiguration(configuration) {
-		super.loadFromConfiguration(configuration)
-
-		this.iWindowBackground := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "WindowBackground"))
-		this.iAltBackground := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "AltBackground"))
-		this.iFieldBackground := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "FieldBackground"))
-		this.iMenuBackground := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "MenuBackground"))
-		this.iHeaderBackground := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "HeaderBackground"))
-		this.iTextColor := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "TextColor"))
-		this.iButtonColor := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "ButtonColor"))
-		this.iDropDownColor := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "DropDownColor"))
-	}
-
-	saveToConfiguration(configuration) {
-		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "WindowBackground"), this.WindowBackground)
-		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "AltBackground"), this.AltBackground)
-		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "FieldBackground"), this.FieldBackground)
-		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "MenuBackground"), this.MenuBackground)
-		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "HeaderBackground"), this.HeaderBackground)
-		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "TextColor"), this.TextColor)
-		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "ButtonColor"), this.ButtonColor)
-		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "DropDownColor"), this.DropDownColor)
-	}
-}
-*/
-
-class WindowsTheme extends Theme {
-	Descriptor {
-		Get {
-			return "Windows"
-		}
-	}
-
-	WindowBackColor {
-		Get {
-			return "F0F0F0"
-		}
-	}
-
-	AlternateBackColor {
-		Get {
-			return "FFFFFF"
-		}
-	}
-
-	TableColor[type := "Header"] {
-		Get {
-			switch type, false {
-				case "Background":
-					return this.AlternateBackColor
-				case "Header":
-					return this.WindowBackColor
-				case "EvenRow":
-					return this.AlternateBackColor
-				case "OddRow":
-					return this.WindowBackColor
-				case "Frame":
-					return this.WindowBackColor
-			}
-		}
-	}
-
-	InitializeWindow(window) {
-	}
-
-	ComputeControlOptions(window, type, options) {
-		options := StrReplace(options, "-Theme", "")
-
-		if ((type = "Text") && (InStr(options, "0x10") && !InStr(options, "0x100")))
-			options := StrReplace(options, "0x10", "h1 Border")
-
-		return options
+	AddControl(window, type, options, arguments*) {
+		return false
 	}
 }
 
@@ -386,7 +267,7 @@ class ClassicTheme extends Theme {
 				case "EvenRow":
 					return "E0E0E0"
 				case "OddRow":
-					return "E8E8E8"
+					return "C0C0C0"
 			}
 		}
 	}
@@ -401,7 +282,7 @@ class ClassicTheme extends Theme {
 				case "EvenRow":
 					return "E0E0E0"
 				case "OddRow":
-					return "E8E8E8"
+					return "C0C0C0"
 				case "Frame":
 					return "B0B0B0"
 			}
@@ -416,7 +297,15 @@ class ClassicTheme extends Theme {
 
 	TextColor[mode := "Normal"] {
 		Get {
-			return ((mode = "Normal") ? "000000" : ((mode = "Disabled") ? "505050" : "808080"))
+			return ((mode = "Normal") ? "000000"
+									  : ((mode = "Disabled") ? "505050"
+															 : ((mode = "Grid") ? "A0A0A0" : "808080")))
+		}
+	}
+
+	GridColor {
+		Get {
+			return "A0A0A0"
 		}
 	}
 
@@ -427,10 +316,10 @@ class ClassicTheme extends Theme {
 	}
 }
 
-class DarkTheme extends ClassicTheme {
+class GrayTheme extends ClassicTheme {
 	Descriptor {
 		Get {
-			return "Dark"
+			return "Gray"
 		}
 	}
 
@@ -461,6 +350,520 @@ class DarkTheme extends ClassicTheme {
 					return super.TableColor[type]
 			}
 		}
+	}
+
+	TextColor[mode := "Normal"] {
+		Get {
+			if (mode = "Grid")
+				return "808080"
+			else
+				return super.TextColor[mode]
+		}
+	}
+
+	GridColor {
+		Get {
+			return "808080"
+		}
+	}
+}
+
+class LightTheme extends Theme {
+	Descriptor {
+		Get {
+			return "Light"
+		}
+	}
+
+	WindowBackColor {
+		Get {
+			return "F0F0F0"
+		}
+	}
+
+	AlternateBackColor {
+		Get {
+			return "FFFFFF"
+		}
+	}
+
+	TableColor[type := "Header"] {
+		Get {
+			switch type, false {
+				case "Background":
+					return this.AlternateBackColor
+				case "Header":
+					return this.WindowBackColor
+				case "EvenRow":
+					return this.AlternateBackColor
+				case "OddRow":
+					return this.WindowBackColor
+				case "Frame":
+					return this.WindowBackColor
+			}
+		}
+	}
+
+	TextColor[mode := "Normal"] {
+		Get {
+			if (mode = "Grid")
+				return "BFBFBF"
+			else
+				return super.TextColor[mode]
+		}
+	}
+
+	GridColor {
+		Get {
+			return "BFBFBF"
+		}
+	}
+
+	InitializeWindow(window) {
+	}
+}
+
+class DarkTheme extends Theme {
+	static sDarkColors := CaseInsenseMap("Background", "202020", "AltBackground", "2F2F2F", "Controls", "404040"
+									   , "Font", "E0E0E0", "DsbldFont", "606060", "PssvFont", "404040")
+	static sTextBackgroundBrush := DllCall("gdi32\CreateSolidBrush", "UInt", DarkTheme.sDarkColors["Background"], "Ptr")
+
+	class DarkCheckBox extends Gui.CheckBox {
+		static kCheckWidth := 23
+		static kCheckShift := 1
+
+		Enabled {
+			Get {
+				return super.Enabled
+			}
+
+			Set {
+				if value
+					this.Label.Opt("c" . this.Gui.Theme.TextColor)
+				else
+					this.Label.Opt("c" . this.Gui.Theme.TextColor["Disabled"])
+
+				return (super.Enabled := value)
+			}
+		}
+
+		Visible {
+			Get {
+				return super.Visible
+			}
+
+			Set {
+				this.Label.Visible := value
+
+				return (super.Visible := value)
+			}
+		}
+
+		Text {
+			Get {
+				return this.Label.Text
+			}
+
+			Set {
+				return (this.Label.Text := value)
+			}
+		}
+
+		static IsLabeled(options, arguments) {
+			return ((arguments.Length > 0) && !isNumber(arguments[1]))
+		}
+
+		static GetCheckBoxArguments(options, arguments) {
+			options := RegExReplace(options, "i)[\s]+w[0-9]+", " w21")
+			options := RegExReplace(options, "i)^w[0-9]+", "w21")
+
+			if !RegExMatch(options, "i)^w[0-9]+")
+				options .= " w23"
+
+			options := RegExReplace(options, "i)[\s]+x[0-9ps\-\+]+", " xp-" . DarkTheme.DarkCheckBox.kCheckWidth)
+			options := RegExReplace(options, "i)^x[0-9ps\-\+]+", "xp-" . DarkTheme.DarkCheckBox.kCheckWidth)
+			options := RegExReplace(options, "i)[\s]+y[0-9ps\-\+]+", " yp-" . DarkTheme.DarkCheckBox.kCheckShift)
+			options := RegExReplace(options, "i)^y[0-9ps\-\+]+", "yp-" . DarkTheme.DarkCheckBox.kCheckShift)
+
+			return [options]
+		}
+
+		static GetLabelArguments(options, arguments) {
+			local argument := false
+
+			shiftCoord(axis, offset) {
+				local shift, prefix
+
+				if (RegExMatch(options, "i)[\s]+" . axis . "[0-9ps\-\+]+", &argument) || RegExMatch(options, "i)^" . axis . "[0-9ps\-\+]+", &argument)) {
+					argument := Trim(argument[])
+
+					if ((InStr(argument, axis . "p") = 1) || (InStr(argument, axis . "s") = 1)) {
+						prefix := SubStr(argument, 1, 2)
+						argument := SubStr(argument, 3)
+					}
+					else if (InStr(argument, axis) = 1) {
+						prefix := SubStr(argument, 1, 1)
+						argument := SubStr(argument, 2)
+					}
+
+					if (StrLen(argument) = 0)
+						argument := (A_Space . prefix . "+" . offset)
+					else {
+						shift := ((InStr(argument, "+") = 1) || (InStr(argument, "-") = 1))
+
+						if shift
+							argument := SubStr(argument, 2)
+
+						argument += offset
+
+						if shift {
+							if (argument >= 0)
+								argument := (A_Space . prefix . "+" . argument)
+							else
+								argument := (A_Space . prefix . argument)
+						}
+						else
+							argument := (A_Space . prefix . argument)
+					}
+
+					options := RegExReplace(options, "i)[\s]+" . axis . "[0-9ps\-\+]+", argument)
+					options := RegExReplace(options, "i)^" . axis . "[0-9ps\-\+]+", argument)
+				}
+			}
+
+			options := RegExReplace(options, "i)[\s]+v[^\s]+", " ")
+			options := RegExReplace(options, "i)^v[^\s]+", "")
+			options := RegExReplace(options, "i)[\s]+Checked[^\s]*", " ")
+			options := RegExReplace(options, "i)^Checked[^\s]*", "")
+			options := RegExReplace(options, "i)[\s]+Disabled\s*", " ")
+			options := RegExReplace(options, "i)^Disabled\s*", " ")
+			options := RegExReplace(options, "i)[\s]+Disabled$", " ")
+			options := RegExReplace(options, "i)^Disabled$", " ")
+
+			if RegExMatch(options, "i)[\s]+w[0-9]+", &argument)
+				options := RegExReplace(options, "i)[\s]+w[0-9]+", " w" . (SubStr(Trim(argument[]), 2) - DarkTheme.DarkCheckBox.kCheckWidth))
+
+			if RegExMatch(options, "i)^w[0-9]+", &argument)
+				options := RegExReplace(options, "i)^w[0-9]+", "w" . (SubStr(Trim(argument[]), 2) - DarkTheme.DarkCheckBox.kCheckWidth))
+
+			shiftCoord("x", DarkTheme.DarkCheckBox.kCheckWidth)
+			shiftCoord("y", DarkTheme.DarkCheckBox.kCheckShift)
+
+			return Array(options, arguments*)
+		}
+	}
+
+	class DarkListView extends Gui.ListView {
+		class RECT {
+			left: i32, top: i32, right: i32, bottom: i32
+		}
+
+		class NMHDR {
+			hwndFrom: uptr
+			idFrom  : uptr
+			code    : i32
+		}
+
+		class NMCUSTOMDRAW {
+			hdr        : DarkTheme.DarkListView.NMHDR
+			dwDrawStage: u32
+			hdc        : uptr
+			rc         : DarkTheme.DarkListView.RECT
+			dwItemSpec : uptr
+			uItemState : u32
+			lItemlParam: iptr
+		}
+
+		static __New() {
+			static LVM_GETHEADER := 0x101F
+
+			super.Prototype.GetHeader   := SendMessage.Bind(LVM_GETHEADER, 0, 0)
+			super.Prototype.SetDarkMode := this.SetDarkMode.Bind(this)
+		}
+
+		static Initialize() {
+		}
+
+		static SetDarkMode(lv) {
+			static LVS_EX_DOUBLEBUFFER := 0x10000
+			static NM_CUSTOMDRAW       := -12
+			static UIS_SET             := 1
+			static UISF_HIDEFOCUS      := 0x1
+			static WM_CHANGEUISTATE    := 0x0127
+			static WM_NOTIFY           := 0x4E
+			static WM_THEMECHANGED     := 0x031A
+
+			lv.Header := lv.GetHeader()
+
+			lv.OnMessage(WM_THEMECHANGED, (*) => 0)
+
+			lv.OnMessage(WM_NOTIFY, (lv, wParam, lParam, Msg) {
+				static CDDS_ITEMPREPAINT   := 0x10001
+				static CDDS_PREPAINT       := 0x1
+				static CDRF_DODEFAULT      := 0x0
+				static CDRF_NOTIFYITEMDRAW := 0x20
+
+				if (StructFromPtr(DarkTheme.DarkListView.NMHDR, lParam).Code != NM_CUSTOMDRAW)
+					return
+
+				nmcd := StructFromPtr(DarkTheme.DarkListView.NMCUSTOMDRAW, lParam)
+
+				if (nmcd.hdr.hWndFrom != lv.Header)
+					return
+
+				switch nmcd.dwDrawStage {
+					case CDDS_PREPAINT:
+						return CDRF_NOTIFYITEMDRAW
+					case CDDS_ITEMPREPAINT:
+						SetTextColor(nmcd.hdc, DarkTheme.DarkColors["Font", true])
+				}
+
+				return CDRF_DODEFAULT
+			})
+
+			lv.Opt("+LV" . LVS_EX_DOUBLEBUFFER)
+
+			SendMessage(WM_CHANGEUISTATE, (UIS_SET << 8) | UISF_HIDEFOCUS, 0, lv)
+
+			SetWindowTheme(lv.Header, "DarkMode_ItemsView")
+			SetWindowTheme(lv.Hwnd, "DarkMode_Explorer")
+
+			SetTextColor(hdc, color) => DllCall("SetTextColor", "Ptr", hdc, "UInt", color)
+
+			SetWindowTheme(hwnd, appName, subIdList?) => DllCall("uxtheme\SetWindowTheme", "ptr", hwnd, "ptr", StrPtr(appName), "ptr", subIdList ?? 0)
+		}
+	}
+
+	Descriptor {
+		Get {
+			return "Dark"
+		}
+	}
+
+	static DarkColors[key, asNumber := true] {
+		Get {
+			local value := DarkTheme.sDarkColors[key]
+
+			return (asNumber ? ("0x" . value) : value)
+		}
+	}
+
+	DarkColors[key, asNumber := true] {
+		Get {
+			return DarkTheme.DarkColors[key, asNumber]
+		}
+	}
+
+	static TextBackgroundBrush {
+		Get {
+			return DarkTheme.sTextBackgroundBrush
+		}
+	}
+
+	TextBackgroundBrush {
+		Get {
+			return DarkTheme.TextBackgroundBrush
+		}
+	}
+
+	WindowBackColor {
+		Get {
+			return this.DarkColors["Background", false]
+		}
+	}
+
+	AlternateBackColor {
+		Get {
+			return this.DarkColors["AltBackground", false]
+		}
+	}
+
+	FieldBackColor {
+		Get {
+			return this.DarkColors["Controls", false]
+		}
+	}
+
+	ButtonBackColor {
+		Get {
+			return this.AlternateBackColor
+		}
+	}
+
+	TextColor[mode := "Normal"] {
+		Get {
+			switch mode, false {
+				case "Normal":
+					return this.DarkColors["Font", false]
+				case "Disabled":
+					return this.DarkColors["DsbldFont", false]
+				case "Unavailable":
+					return this.DarkColors["PssvFont", false]
+				case "Grid":
+					return "606060"
+			}
+		}
+	}
+
+	GridColor {
+		Get {
+			return "606060"
+		}
+	}
+
+	LinkColor {
+		Get {
+			return Theme.GetSystemColor("LinkTextColor")
+		}
+	}
+
+	ButtonColor {
+		Get {
+			return this.DarkColors["Font", false]
+		}
+	}
+
+	SetWindowAttribute(window) {
+		local DWMWA_USE_IMMERSIVE_DARK_MODE, uxTheme
+
+		static GWL_WNDPROC        := -4
+		static PreferredAppMode := Map("Default", 0, "AllowDark", 1, "ForceDark", 2, "ForceLight", 3, "Max", 4)
+		static SetWindowLong    := A_PtrSize = 8 ? "SetWindowLongPtr" : "SetWindowLong"
+
+		if (VerCompare(A_OSVersion, "10.0.17763") >= 0) {
+			DWMWA_USE_IMMERSIVE_DARK_MODE := 19
+
+			if (VerCompare(A_OSVersion, "10.0.18985") >= 0)
+				DWMWA_USE_IMMERSIVE_DARK_MODE := 20
+
+			uxtheme := DllCall("kernel32\GetModuleHandle", "Str", "uxtheme", "Ptr")
+
+			DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", window.Hwnd, "Int", DWMWA_USE_IMMERSIVE_DARK_MODE, "Int*", True, "Int", 4)
+
+			DllCall(DllCall("kernel32\GetProcAddress", "Ptr", uxtheme, "Ptr", 135, "Ptr") , "Int", PreferredAppMode["ForceDark"])
+			DllCall(DllCall("kernel32\GetProcAddress", "Ptr", uxtheme, "Ptr", 136, "Ptr"))
+
+			window.BackColor := this.DarkColors["Background"]
+
+			; if !window.HasProp("WindowProc")
+			;	window.WindowProc := DllCall("user32\" . SetWindowLong, "Ptr", window.Hwnd, "Int", GWL_WNDPROC
+			;														  , "Ptr", CallbackCreate(windowProc), "Ptr")
+		}
+	}
+
+	SetControlTheme(control) {
+		static GWL_STYLE          := -16
+		static ES_MULTILINE       := 0x0004
+		static LVM_SETTEXTCOLOR   := 0x1024
+		static LVM_SETTEXTBKCOLOR := 0x1026
+		static LVM_SETBKCOLOR     := 0x1001
+		static LVM_GETHEADER      := 0x101F
+		static MCSC_BACKGROUND    := 0
+		static MCSC_TEXT          := 1
+		static MCSC_TITLEBK       := 2
+		static MCSC_TITLETEXT     := 3
+		static MCSC_MONTHBK       := 4
+		static MCSC_TRAILINGTEXT  := 5
+		static DTM_SETMCCOLOR     := 0x1006
+		static GetWindowLong      := A_PtrSize = 8 ? "GetWindowLongPtr" : "GetWindowLong"
+
+		switch control.Type, false {
+			case "Button", "CheckBox", "ListBox", "UpDown", "DateTime":
+				DllCall("uxtheme\SetWindowTheme", "Ptr", control.Hwnd, "Str", "DarkMode_Explorer", "Ptr", 0)
+			case "ComboBox", "DDL":
+				DllCall("uxtheme\SetWindowTheme", "Ptr", control.Hwnd, "Str", "DarkMode_CFD", "Ptr", 0)
+			case "Edit":
+				if (DllCall("user32\" . GetWindowLong, "Ptr", control.Hwnd, "Int", GWL_STYLE) & ES_MULTILINE)
+					DllCall("uxtheme\SetWindowTheme", "Ptr", control.Hwnd, "Str", "DarkMode_Explorer", "Ptr", 0)
+				else
+					DllCall("uxtheme\SetWindowTheme", "Ptr", control.Hwnd, "Str", "DarkMode_CFD", "Ptr", 0)
+			case "ListView":
+				control.Opt("-Redraw")
+
+				SendMessage(LVM_SETTEXTCOLOR,   0, this.DarkColors["Font"],       control.Hwnd)
+				SendMessage(LVM_SETTEXTBKCOLOR, 0, this.DarkColors["Background"], control.Hwnd)
+				SendMessage(LVM_SETBKCOLOR,     0, this.DarkColors["Background"], control.Hwnd)
+
+				DllCall("uxtheme\SetWindowTheme", "Ptr", control.Hwnd, "Str", "DarkMode_Explorer", "Ptr", 0)
+
+				LV_Header := SendMessage(LVM_GETHEADER, 0, 0, control.Hwnd)
+
+				DllCall("uxtheme\SetWindowTheme", "Ptr", LV_Header, "Str", "DarkMode_ItemsView", "Ptr", 0)
+
+				control.SetDarkMode()
+
+				control.Opt("+Redraw")
+			case "DateTime":
+				control.Opt("-Redraw")
+
+				SendMessage(DTM_SETMCCOLOR, MCSC_BACKGROUND, this.DarkColors["BackGround"], control.Hwnd)
+				SendMessage(DTM_SETMCCOLOR, MCSC_TEXT, this.DarkColors["Font"], control.Hwnd)
+
+				control.Opt("+Redraw")
+		}
+	}
+
+	InitializeWindow(window) {
+		this.SetWindowAttribute(window)
+	}
+
+	RecolorizeImage(fileName) {
+		whiteIcon(graphics, bitmap) {
+			local x, y, value
+
+			loop Gdip_GetImageHeight(bitmap) {
+				y := A_Index - 1
+
+				loop Gdip_GetImageWidth(bitmap) {
+					x := A_Index - 1
+
+					value := Gdip_GetPixel(bitmap, x, y)
+
+					Gdip_SetPixel(bitmap, x, y, ((value & 0xFF000000) + ((value & 0x00FFFFFF) ^ 0xFFFFFF)))
+				}
+			}
+		}
+
+		return withTask(RecolorizerTask(), modifiedImage.Bind(fileName, "Invrt", whiteIcon))
+	}
+
+	ComputeControlOptions(window, type, options) {
+		options := super.ComputeControlOptions(window, type, options)
+
+		if (!RegExMatch(options, "c[0-9a-fA-F]{6}") && !InStr(options, "c" . this.LinkColor))
+			options .= (" c" . this.TextColor)
+
+		return options
+	}
+
+	ApplyThemeProperties(window, control) {
+		this.SetControlTheme(control)
+	}
+
+	GetControlType(type) {
+		if (type = "DarkCheckBox")
+			return "CheckBox"
+		else
+			return super.GetControlType(type)
+	}
+
+	AddControl(window, type, options, arguments*) {
+		if ((type = "CheckBox") && DarkTheme.DarkCheckBox.IsLabeled(options, arguments)) {
+			label := window.Add("Text", DarkTheme.DarkCheckBox.GetLabelArguments(options, arguments)*)
+			checkBox := window.Add("DarkCheckBox", DarkTheme.DarkCheckBox.GetCheckBoxArguments(options, arguments)*)
+
+			checkBox.GetPos( , &y)
+			label.Move( , y + 2)
+
+			checkBox.Label := label
+			checkBox.Enabled := checkBox.Enabled
+
+			checkBox.Base := DarkTheme.DarkCheckBox.Prototype
+
+			return checkBox
+		}
+		else
+			return super.AddControl(window, type, options, arguments*)
 	}
 }
 
@@ -1019,10 +1422,18 @@ class Window extends Gui {
 	Add(type, options := "", arguments*) {
 		local rules := false
 		local newOptions, ignore, option, control
+		local checkBox, label
+
+		control := this.Theme.AddControl(this, type, options, arguments*)
+
+		if control
+			return control
 
 		if type is Window.Resizer
 			return this.AddResizer(type)
 		else {
+			type := this.Theme.GetControlType(type)
+
 			options := this.ComputeControlOptions(type, options)
 
 			if RegExMatch(options, "i)[xywhv].*:") {
@@ -1072,6 +1483,8 @@ class Window extends Gui {
 	Show(arguments*) {
 		local x, y, cWidth, cHeight, width, height
 		local fullHeight, clientHeight
+
+		this.Theme.InitializeControls(this)
 
 		super.Show(arguments*)
 
@@ -1299,19 +1712,54 @@ class Window extends Gui {
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                     Private Class Declaration Section                   ;;;
+;;;-------------------------------------------------------------------------;;;
+
+class RecolorizerTask extends PeriodicTask {
+	iProgressWindow := false
+
+	iStart := A_TickCount
+	iProgress := false
+
+	__New() {
+		super.__New(false, 200, kInterruptPriority)
+	}
+
+	run() {
+		if (A_TickCount > (this.iStart + 250))
+			if !this.iProgress
+				this.iProgressWindow := ProgressWindow.showProgress({progress: this.iProgress++, color: "Blue"
+																   , title: translate("Recoloring Image")})
+			else if (this.iProgress != "Stop")
+				this.iProgressWindow.updateProgress({progress: Min(100, this.iProgress++)})
+	}
+
+	stop() {
+		this.iProgress := "Stop"
+
+		if this.iProgressWindow
+			this.iProgressWindow.hideProgress()
+
+		super.stop()
+	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 getAllUIThemes(configuration) {
-	return [WindowsTheme(), ClassicTheme(), DarkTheme()]
+	return [ClassicTheme(), GrayTheme(), LightTheme(), DarkTheme()]
 }
 
-setButtonIcon(buttonHandle, file, index := 1, options := "") {
+setButtonIcon(buttonHandle, file, index := 1, options := "", theme := true) {
+	local window := ((buttonHandle is Gui.Control) ? buttonHandle.Gui : GuiCtrlFromHwnd(buttonHandle).Gui)
 	local ptrSize, button_il, normal_il, L, T, R, B, A, W, H, S, DW, PTR
 	local BCM_SETIMAGELIST
 
 ;   Parameters:
-;   1) {Handle} 	HWND handle of Gui button
+;   1) {Handle} 	Hwnd handle of Gui button
 ;   2) {File} 		File containing icon image
 ;   3) {Index} 		Index of icon in file
 ;						Optional: Default = 1
@@ -1324,6 +1772,9 @@ setButtonIcon(buttonHandle, file, index := 1, options := "") {
 ;						R = Right Margin
 ;						B = Botton Margin
 ;						A = Alignment (0 = left, 1 = right, 2 = top, 3 = bottom, 4 = center; default = 4)
+
+	if theme
+		file := window.Theme.RecolorizeImage(file)
 
 	RegExMatch(options, "i)w\K\d+", &W), !W ? W := 16 : W := W[]
 	RegExMatch(options, "i)h\K\d+", &H), !H ? H := 16 : H := H[]
@@ -1490,10 +1941,10 @@ translateSelectCancelButtons := translateMsgBoxButtons.Bind(["Select", "Cancel"]
 
 withBlockedWindows(function, arguments*) {
 	local windows := []
-	local ignore, hwnd, theWindow
+	local ignore, Hwnd, theWindow
 
-	for ignore, hwnd in WinGetList("ahk_exe " . A_ScriptName) {
-		theWindow := GuiFromHwnd(hwnd)
+	for ignore, Hwnd in WinGetList("ahk_exe " . A_ScriptName) {
+		theWindow := GuiFromHwnd(Hwnd)
 
 		if (isObject(theWindow) && isInstance(theWindow, Window)) {
 			theWindow.Opt("+OwnDialogs")
@@ -1529,12 +1980,53 @@ getControllerActionIcons() {
 	return icons
 }
 
+modifiedIcon(fileName, postFix, modifier) {
+	return modifiedImage(fileName, postFix, modifier, "Icons")
+}
+
+modifiedImage(fileName, postFix, modifier, cache := "Images") {
+	local extension, name, modifiedFileName, token, bitmap, graphics
+
+	SplitPath(fileName, , , &extension, &name)
+
+	if (extension = "ico")
+		extension := "png"
+
+	modifiedFileName := (kTempDirectory . cache . "\" . name . "_" . postFix . "." . extension)
+
+	if !FileExist(modifiedFileName) {
+		DirCreate(kTempDirectory . cache)
+
+		token := Gdip_Startup()
+
+		bitmap := Gdip_CreateBitmapFromFile(fileName)
+
+		graphics := Gdip_GraphicsFromImage(bitmap)
+
+		modifier(graphics, bitmap)
+
+		Gdip_SaveBitmapToFile(bitmap, modifiedFileName)
+
+		Gdip_DisposeImage(bitmap)
+
+		Gdip_DeleteGraphics(graphics)
+
+		Gdip_Shutdown(token)
+	}
+
+	return modifiedFileName
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 initializeGUI() {
+	AddDocumentation(window, arguments*) {
+		return createDocumentation(window, arguments*)
+	}
+
 	createDocumentation(window, options, label?, link?) {
 		local curFontOptions := window.CurrentFontOptions
 		local control
@@ -1557,7 +2049,11 @@ initializeGUI() {
 
 	DllCall("SetThreadDpiAwarenessContext", "Ptr", -5, "Ptr")
 
+	Window.Prototype.AddDocumentation := AddDocumentation
+
 	Window.DefineCustomControl("Documentation", createDocumentation)
+
+	DarkTheme.DarkListView.Initialize()
 
 	try {
 		Theme.CurrentTheme := %getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "General", "UI Theme", "Classic") . "Theme"%()
@@ -1568,6 +2064,45 @@ initializeGUI() {
 
 	; DllCall("User32\SetProcessDpiAwarenessContext", "UInt" , -1)
 	; DllCall("User32\SetThreadDpiAwarenessContext", "UInt" , -1)
+}
+
+WindowProc(hwnd, uMsg, wParam, lParam) {
+	Critical
+
+	local window := GuiFromHwnd(hwnd)
+	local theme := window.Theme
+	local control := GuiCtrlFromHwnd(lParam)
+
+	static WM_CTLCOLOREDIT    := 0x0133
+	static WM_CTLCOLORLISTBOX := 0x0134
+	static WM_CTLCOLORBTN     := 0x0135
+	static WM_CTLCOLORSTATIC  := 0x0138
+	static DC_BRUSH           := 18
+
+	switch uMsg {
+		case WM_CTLCOLOREDIT, WM_CTLCOLORLISTBOX:
+			DllCall("gdi32\SetTextColor", "Ptr", wParam, "UInt", theme.DarkColors["Font"])
+			DllCall("gdi32\SetBkColor", "Ptr", wParam, "UInt", theme.DarkColors["Controls"])
+			DllCall("gdi32\SetDCBrushColor", "Ptr", wParam, "UInt", theme.DarkColors["Controls"], "UInt")
+
+			return DllCall("gdi32\GetStockObject", "Int", DC_BRUSH, "Ptr")
+		case WM_CTLCOLORBTN:
+			DllCall("gdi32\SetDCBrushColor", "Ptr", wParam, "UInt", theme.DarkColors["Background"], "UInt")
+
+			return DllCall("gdi32\GetStockObject", "Int", DC_BRUSH, "Ptr")
+
+		/*
+		case WM_CTLCOLORSTATIC:
+			if isInstance(control, Gui.Edit) {
+				DllCall("gdi32\SetTextColor", "Ptr", wParam, "UInt", theme.DarkColors["Font"])
+				DllCall("gdi32\SetBkColor", "Ptr", wParam, "UInt", theme.DarkColors["Background"])
+
+				return theme.TextBackgroundBrush
+			}
+		*/
+	}
+
+	return DllCall("user32\CallWindowProc", "Ptr", window.WindowProc, "Ptr", hwnd, "UInt", uMsg, "Ptr", wParam, "Ptr", lParam)
 }
 
 

@@ -35,6 +35,12 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars*, *Simulator Controller\Rules* and other folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on its own. But be sure to make a backup copy of all the files, just for the peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 5.8.0
+
+No manual changes necessary.
+
+***
+
 ## Release 5.7.9
 
 Nothing to do for this release.
@@ -654,7 +660,7 @@ Nothing to do regarding the configuration update, but:
 
 ## Release 4.2.1
 
-Database and configuration update is again handled automatically, but there is a major change in this version, how the Pitstop MFD in ACC is handled. Before this release, you had to create small search images, so that the available options and the current state of the ACC Pitstop MFD could be detected using image recognition. The new method introduced with this release uses a different approach, a kind of fuzzy option walk, to achieve the same result. But you can still use the image recognition method, if you feel disturbed by the fast moving cursor of the Pitstop MFD or - even more important - if there is a malfunction with the new method. To do this, open the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database) and insert and check the setting "Pitstop: Image Search" for the *Assetto Corsa Competizione* simulator.
+Database and configuration update is again handled automatically, but there is a major change in this version, how the Pitstop MFD in ACC is handled. Before this release, you had to create small search images, so that the available options and the current state of the ACC Pitstop MFD could be detected using image recognition. The new method introduced with this release uses a different approach, a kind of fuzzy option walk, to achieve the same result. But you can still use the image recognition method, if you feel disturbed by the fast moving cursor of the Pitstop MFD or - even more important - if there is a malfunction with the new method. To do this, open the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) and insert and check the setting "Pitstop: Image Search" for the *Assetto Corsa Competizione* simulator.
 
 ***
 
@@ -898,7 +904,7 @@ The local folder for the *Setup Database* has been renamed from "Setup Database"
 
 ## Release 3.5.6
 
-All configuration changes are handled automatically for this release. New plugin parameters "Call" have been defined for the "Race Engineer" and the "Race Strategist" plugins. You may want to check the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) to check, if these parameters might be useful for you. Please note, that this version introduces [new report types](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports) for the "Race Reports" application. Older reports may show missing data for the new report types.
+All configuration changes are handled automatically for this release. New plugin parameters "Call" have been defined for the "Race Engineer" and the "Race Strategist" plugins. You may want to check the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) to check, if these parameters might be useful for you. Please note, that this version introduces [new report types](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports) for the "Race Reports" application. Older reports may show missing data for the new report types.
 
 IMPORTANT for RaceRoom Racing Experience users:
 

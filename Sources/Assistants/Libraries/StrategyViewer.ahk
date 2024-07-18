@@ -258,8 +258,8 @@ class StrategyViewer {
 			drawChartFunction .= ("[" . xAxis . ", " . convertUnit("Volume", fuelSeries[A_Index]) . ", " . tyreSeries[A_Index] . "]")
 		}
 
-		drawChartFunction .= ("]);`nvar options = { curveType: 'function', legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '"
-							. (durationSession ? translate("Lap") : translate("Minute")) . "' }, vAxis: { viewWindow: { min: 0 } }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
+		drawChartFunction .= ("]);`nvar options = { curveType: 'function', legend: { position: 'Right', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '"
+							. (durationSession ? translate("Lap") : translate("Minute")) . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: { color: '" . this.Window.Theme.GridColor . "'}, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, vAxis: { viewWindow: { min: 0 }, gridlines: { color: '" . this.Window.Theme.GridColor . "'}, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
 
 		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
 
@@ -309,15 +309,16 @@ class StrategyViewer {
 				<head>
 					<style>
 						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
-						.rowStyle { font-size: 11px; background-color: #%evenRowBackColor%; }
-						.oddRowStyle { font-size: 11px; background-color: #%oddRowBackColor%; }
+						.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+						.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
 					</style>
 					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 					<script type="text/javascript">
 						google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawChart%chartID%);
 			)"
 
-			before := substituteVariables(before, {headerBackColor: this.Window.Theme.ListBackColor["Header"]
+			before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
+												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]
 												 , chartID: chartID})
@@ -337,7 +338,7 @@ class StrategyViewer {
 
 		tableCSS := this.getTableCSS()
 
-		html := ("<html>" . before . drawChartFunction . after . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style>" . tableCSS . "</style><style> #header { font-size: 12px; } </style><div>" . html . "</div><br>" . chartArea . "</body></html>")
+		html := ("<html>" . before . drawChartFunction . after . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style>" . tableCSS . "</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style><div>" . html . "</div><br>" . chartArea . "</body></html>")
 
 		if this.StrategyViewer {
 			this.StrategyViewer.document.open()
@@ -358,6 +359,7 @@ class StrategyViewer {
 
 			.th-std, .td-std {
 				text-align: center;
+				color: #%textColor%;
 			}
 
 			.th-std, .caption-std {
@@ -398,15 +400,17 @@ class StrategyViewer {
 			}
 
 			.table-std tbody tr:nth-child(even) {
-				background-color: #%altBackColor%;
+				background-color: #%evenRowColor%;
 			}
 
 			.table-std tbody tr:nth-child(odd) {
-				background-color: #%backColor%;
+				background-color: #%evenRowColor%;
 			}
 		)"
 
-		return substituteVariables(script, {altBackColor: this.Window.AltBackColor, backColor: this.Window.BackColor
+		return substituteVariables(script, {evenRowColor: this.Window.Theme.ListBackColor["EvenRow"]
+										  , oddRowColor: this.Window.Theme.ListBackColor["OddRow"]
+										  , altBackColor: this.Window.AltBackColor, backColor: this.Window.BackColor
 										  , textColor: this.Window.Theme.TextColor
 										  , headerBackColor: this.Window.Theme.TableColor["Header"], frameColor: this.Window.Theme.TableColor["Frame"]})
 	}

@@ -1,0 +1,15 @@
+[Agent.Events]
+Active=pitstop_upcoming,weather_forecast,rain_started,rain_stopped,position_lost,position_gained
+[Agent.Events.Builtin]
+pitstop_upcoming=Assistant.Class|PitstopUpcomingEvent|PitstopUpcoming||1|This event is triggered when the next pitstop according to the currently active strategy is upcoming.
+weather_forecast=Assistant.Class|WeatherForecastEvent|WeatherForecast||4|This event is triggered when the weather forecast indicates an upcoming weather change.
+rain_started=Assistant.Rule|Race Assistant.rain_start.rules|RainStart|It just started raining.|0|This event is triggered when it starts raining or will be raining in a few moments.
+rain_stopped=Assistant.Rule|Race Assistant.rain_stop.rules|RainStop|It just stopped raining.|0|This event is triggered when it stopped raining.
+position_lost=Assistant.Rule|Race Assistant.position_lost.rules|PositionLost|A position has just been lost.|0|This event is triggered when one or more positions has been lost.
+position_gained=Assistant.Rule|Race Assistant.position_gained.rules|PositionGained|A position has just been gained.|0|This event is triggered when one or more positions has been gained.
+[Agent.Events.Parameters]
+pitstop_upcoming.1=plannedLap|Integer||true|The lap, when the pitstop is planned according to the strategy.
+weather_forecast.1=weather|String|Dry,Drizzle,LightRain,MediumRain,HeavyRain,Thunderstorm|true|A symbol that represents the upcoming weather.
+weather_forecast.2=minutes|Integer||true|The time in minutes when the weather will change.
+weather_forecast.3=impactsStrategy|Boolean||true|Indicates that the strategy is impacted and a tyre change might be necessary.
+weather_forecast.4=tyreCompound|String||false|If supplied, indicates tyre compound that should be mounted at the pitstop.

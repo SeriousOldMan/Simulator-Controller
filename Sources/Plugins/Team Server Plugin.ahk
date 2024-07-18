@@ -696,7 +696,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				showMessage(translate("Successfully connected to the Team Server.") . "`n`n" . translate("Team: ") . this.Team[true] . "`n"
 									. translate("Driver: ") . this.Driver[true] . "`n"
 									. translate("Session: ") . this.Session[true]
-						  , false, "Information.png", 5000, "Center", "Bottom", 400, 120)
+						  , false, "Information.ico", 5000, "Center", "Bottom", 400, 120)
 
 			A_IconTip := (string2Values(".", A_ScriptName)[1] . translate(" (Team: ") . this.Team[true] . translate(")"))
 		}

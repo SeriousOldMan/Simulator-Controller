@@ -9,6 +9,13 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\Framework\Gui.ahk"
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
 #Include "..\Libraries\Task.ahk"
 #Include "..\Libraries\Messages.ahk"
 #Include "..\Libraries\CLR.ahk"
@@ -562,36 +569,6 @@ class StreamDeck extends FunctionController {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-modifiedIcon(fileName, postFix, modifier) {
-	local extension, name, modifiedFileName, token, bitmap, graphics
-
-	SplitPath(fileName, , , &extension, &name)
-
-	modifiedFileName := (kTempDirectory . "Icons\" . name . "_" . postFix . "." . extension)
-
-	if !FileExist(modifiedFileName) {
-		DirCreate(kTempDirectory . "Icons")
-
-		token := Gdip_Startup()
-
-		bitmap := Gdip_CreateBitmapFromFile(fileName)
-
-		graphics := Gdip_GraphicsFromImage(bitmap)
-
-		modifier(graphics, bitmap)
-
-		Gdip_SaveBitmapToFile(bitmap, modifiedFileName)
-
-		Gdip_DisposeImage(bitmap)
-
-		Gdip_DeleteGraphics(graphics)
-
-		Gdip_Shutdown(token)
-	}
-
-	return modifiedFileName
-}
 
 activatedIcon(fileName) {
 	addGreenBar(graphics, bitmap) {

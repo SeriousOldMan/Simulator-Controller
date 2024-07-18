@@ -52,7 +52,8 @@ global kUpdateMessages := CaseInsenseMap("updateTranslations", "Updating transla
 									   , "updateActionIcons", "Updating action icons to "
 									   , "updatePhraseGrammars", "Updating phrase grammars to ")
 
-global kCompiler := (kAHKDirectory . "Compiler\ahk2exe.exe")
+global kDevelopmentCompiler := (kAHKDirectory . "Compiler\ahk2exe.exe")
+global kProductionCompiler := (kAHKDirectory . "Compiler\ahk2exe.exe /compress 2")
 
 global kSave := "save"
 global kRevert := "revert"
@@ -333,7 +334,8 @@ checkInstallation() {
 
 	local installLocation := ""
 	local installInfo, quiet, options, msgResult, hasSplash, command, component, source
-	local install, index, options, isNew, packageLocation, ignore, directory, currentDirectory
+	local install, index, options, isNew, packageLocation, packageInfo, packageType, version
+	local ignore, directory, currentDirectory
 
 	installComponents(packageLocation, installLocation, temporary := false) {
 		global gProgressCount
@@ -671,6 +673,27 @@ checkInstallation() {
 					  , StartSetup: isNew, Update: !isNew}
 
 			packageLocation := normalizeDirectoryPath(kHomeDirectory)
+			packageInfo := readMultiMap(packageLocation . "\VERSION")
+			packageType := getMultiMapValue(packageInfo, "Current", "Type")
+			version := getMultiMapValue(packageInfo, packageType, "Version"
+												   , getMultiMapValue(packageInfo, "Version", packageType, false))
+
+			if !InStr(version, "-release") {
+				OnMessage(0x44, translateYesNoButtons)
+				msgResult := withBlockedWindows(MsgBox, substituteVariables(translate("This is a %version% version. Do you really want to install it?")
+																		  , {version: StrTitle(string2Values("-", version)[2])})
+													  , translate("Update"), 262436)
+				OnMessage(0x44, translateYesNoButtons, 0)
+
+				if (msgResult != "Yes") {
+					index := inList(A_Args, "-Start")
+
+					if index
+						Run(A_Args[index + 1])
+
+					ExitApp(0)
+				}
+			}
 
 			if ((!isNew && !options.Verbose) || installOptions(options)) {
 				installLocation := options.InstallLocation
@@ -1347,10 +1370,10 @@ editTargets(command := "", *) {
 
 		if (gCleanupSettings.Count > 0) {
 			for target, setting in gCleanupSettings {
-				option := ""
-
 				if (A_Index == 1)
-					option := option . " YP+20 XP+10"
+					option := " YP+20 XP+10"
+				else
+					option := " YP+20 XP"
 
 				targetsGui.Add("CheckBox", option . " Checked" . setting . " vcleanupVariable" . A_Index, target)
 			}
@@ -1372,10 +1395,10 @@ editTargets(command := "", *) {
 
 		if (gCopySettings.Count > 0) {
 			for target, setting in gCopySettings {
-				option := ""
-
 				if (A_Index == 1)
-					option := option . " YP+20 XP+10"
+					option := " YP+20 XP+10"
+				else
+					option := " YP+20 XP"
 
 				targetsGui.Add("CheckBox", option . " Checked" . setting . " vcopyVariable" . A_Index, target)
 			}
@@ -1397,10 +1420,10 @@ editTargets(command := "", *) {
 
 		if (gBuildSettings.Count > 0) {
 			for target, setting in gBuildSettings {
-				option := ""
-
 				if (A_Index == 1)
-					option := option . " YP+20 XP+10"
+					option := " YP+20 XP+10"
+				else
+					option := " YP+20 XP"
 
 				if (target == "Simulator Tools")
 					option := option . (A_IsCompiled ? " Disabled" : "")
@@ -1682,6 +1705,42 @@ updateInstallationForV500() {
 		}
 		catch Any as exception {
 			logError(exception)
+		}
+	}
+}
+
+updateConfigurationForV580() {
+	local ignore, assistant, section, actions, settings, theme
+
+	for ignore, assistant in ["Race Engineer", "Race Strategist", "Race Spotter"]
+		if FileExist(kUserHomeDirectory . "Actions\" . assistant . ".actions") {
+			actions := readMultiMap(kUserHomeDirectory . "Actions\" . assistant . ".actions")
+
+			setMultiMapValues(actions, "Conversation.Actions", getMultiMapValues(actions, "Actions"))
+			removeMultiMapValues(actions, "Actions")
+
+			for ignore, section in ["Builtin", "Custom", "Parameters"] {
+				setMultiMapValues(actions, "Conversation.Actions." . section, getMultiMapValues(actions, section))
+				removeMultiMapValues(actions, section)
+			}
+
+			writeMultiMap(kUserHomeDirectory . "Actions\" . assistant . ".actions", actions)
+		}
+
+	if FileExist(kUserConfigDirectory . "Application Settings.ini") {
+		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+		theme := getMultiMapValue(settings, "General", "UI Theme", false)
+
+		if (theme = "Dark") {
+			setMultiMapValue(settings, "General", "UI Theme", "Gray")
+
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+		}
+		else if (theme = "Windows") {
+			setMultiMapValue(settings, "General", "UI Theme", "Light")
+
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 		}
 	}
 }
@@ -3144,24 +3203,24 @@ runBuildTargets(&buildProgress) {
 
 						deleteFile(sourceDirectory . "\compile.ahk")
 
-						FileAppend(sourceCode, sourceDirectory . "\compile.ahk")
+						FileAppend(sourceCode, sourceDirectory . "\compile.ahk", "UTF-8")
 
-						result := RunWait(kCompiler . options . " /in `"" . sourceDirectory . "\compile.ahk" . "`"")
+						result := RunWait(kProductionCompiler . options . " /in `"" . sourceDirectory . "\compile.ahk" . "`"")
 
 						deleteFile(sourceDirectory . "\compile.ahk")
 					}
 					else
-						result := RunWait(kCompiler . options . " /in `"" . targetSource . "`"")
+						result := RunWait(kDevelopmentCompiler . options . " /in `"" . targetSource . "`"")
 
 					if !result
 						break
 				}
 			}
 			catch Any as exception {
-				logMessage(kLogCritical, translate("Cannot compile ") . targetSource . translate(" - source file or AHK Compiler (") . kCompiler . translate(") not found"))
+				logMessage(kLogCritical, translate("Cannot compile ") . targetSource . translate(" - source file or AHK Compiler (") . kDevelopmentCompiler . translate(") not found"))
 
-				showMessage(substituteVariables(translate("Cannot compile %targetSource%: Source file or AHK Compiler (%kCompiler%) not found...")
-											  , {targetSource: targetSource, kCompiler: kCompiler})
+				showMessage(substituteVariables(translate("Cannot compile %targetSource%: Source file or AHK Compiler (%compiler%) not found...")
+											  , {targetSource: targetSource, compiler: kDevelopmentCompiler})
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 
 				result := true

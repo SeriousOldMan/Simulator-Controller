@@ -67,7 +67,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		local wizard := this.SetupWizard
 		local assistantActive := false
 		local function, action, ignore, assistant, assistantConfiguration, section, subConfiguration, arguments, voice, actions
-		local speakerBooster, listenerBooster, conversationBooster
+		local speakerBooster, listenerBooster, conversationBooster, agentBooster
 
 		super.saveToConfiguration(configuration)
 
@@ -148,6 +148,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 					speakerBooster := wizard.getModuleValue(assistant, "Speaker Booster", wizard.getModuleValue(assistant, "Booster", false))
 					listenerBooster := wizard.getModuleValue(assistant, "Listener Booster", false)
 					conversationBooster := wizard.getModuleValue(assistant, "Conversation Booster", false)
+					agentBooster := wizard.getModuleValue(assistant, "Agent Booster", false)
 
 					if speakerBooster {
 						speakerBooster := string2Map("|||", "--->>>", speakerBooster)
@@ -227,6 +228,29 @@ class AssistantsStepWizard extends ActionsStepWizard {
 					}
 					else
 						setMultiMapValue(configuration, "Conversation Booster", assistant . ".Conversation", false)
+
+					if agentBooster {
+						agentBooster := string2Map("|||", "--->>>", agentBooster)
+
+						if !agentBooster.Has("Agent")
+							agentBooster["Agent"] := false
+
+						if !agentBooster.Has("AgentTemperature")
+							agentBooster["AgentTemperature"] := 0.5
+
+						if !agentBooster.Has("AgentMaxHistory")
+							agentBooster["AgentMaxHistory"] := 3
+
+						if agentBooster["Agent"]
+							arguments .= ("; raceAssistantAgentBooster: " . assistant)
+
+						setMultiMapValue(configuration, "Agent Booster", assistant . ".Service", agentBooster["Service"])
+						setMultiMapValue(configuration, "Agent Booster", assistant . ".Model", agentBooster["Model"])
+
+						setMultiMapValue(configuration, "Agent Booster", assistant . ".Agent", agentBooster["Agent"])
+					}
+					else
+						setMultiMapValue(configuration, "Agent Booster", assistant . ".Agent", false)
 				}
 				else
 					arguments .= "; raceAssistantSpeaker: Off"
@@ -345,7 +369,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 			widget := window.Add("HTMLViewer", "x" . x . " yp+352 w" . width . " h58 Y:Move(0.66) W:Grow H:Grow(0.33) VactionsInfoText" . page . " Hidden")
 
-			html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+			html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, p, body { color: #" . window.Theme.TextColor . "}</style>" . info . "</body></html>"
 
 			widget.document.write(html)
 

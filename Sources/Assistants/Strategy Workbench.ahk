@@ -1005,14 +1005,14 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("s9 Norm", "Arial")
 
 		workbenchGui.Add("Documentation", "x608 YP+20 w134 Center H:Center", translate("Strategy Workbench")
-					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development")
+					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench")
 
 		workbenchGui.Add("Text", "x8 yp+30 w1350 0x10 W:Grow")
 
 		workbenchGui.SetFont("Norm")
 		workbenchGui.SetFont("s10 Bold", "Arial")
 
-		workbenchGui.Add("Picture", "x16 yp+12 w30 h30 Section", kIconsDirectory . "Sensor.ico")
+		workbenchGui.Add("Picture", "x16 yp+12 w30 h30 Section", workbenchGui.Theme.RecolorizeImage(kIconsDirectory . "Sensor.ico"))
 		workbenchGui.Add("Text", "x50 yp+5 w80 h26", translate("Telemetry"))
 
 		workbenchGui.SetFont("s8 Norm", "Arial")
@@ -1123,7 +1123,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.SetFont("s10 Bold", "Arial")
 
-		workbenchGui.Add("Picture", "x16 yp+10 w30 h30 Section", kIconsDirectory . "Strategy.ico")
+		workbenchGui.Add("Picture", "x16 yp+10 w30 h30 Section", workbenchGui.Theme.RecolorizeImage(kIconsDirectory . "Strategy.ico"))
 		workbenchGui.Add("Text", "x50 yp+5 w80 h26", translate("Strategy"))
 
 		workbenchGui.SetFont("s8 Norm", "Arial")
@@ -1195,11 +1195,11 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w60 h20", translate("Minutes"))
 
 		workbenchGui.Add("Text", "x" . x . " yp+21 w75 h23 +0x200", translate("Formation"))
-		workbenchGui.Add("CheckBox", "x" . x1 . " yp-1 w17 h23 Checked VformationLapCheck")
+		workbenchGui.Add("CheckBox", "x" . x1 . " yp-1 w17 h21 Checked VformationLapCheck")
 		workbenchGui.Add("Text", "x" . x4 . " yp+5 w50 h20", translate("Lap"))
 
 		workbenchGui.Add("Text", "x" . x . " yp+19 w75 h23 +0x200", translate("Post Race"))
-		workbenchGui.Add("CheckBox", "x" . x1 . " yp-1 w17 h23 Checked VpostRaceLapCheck")
+		workbenchGui.Add("CheckBox", "x" . x1 . " yp-1 w17 h21 Checked VpostRaceLapCheck")
 		workbenchGui.Add("Text", "x" . x4 . " yp+5 w50 h20", translate("Lap"))
 
 		workbenchGui.SetFont("Norm", "Arial")
@@ -1677,15 +1677,16 @@ class StrategyWorkbench extends ConfigurationItem {
 				<head>
 					<style>
 						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
-						.rowStyle { font-size: 11px; background-color: #%evenRowBackColor%; }
-						.oddRowStyle { font-size: 11px; background-color: #%oddRowBackColor%; }
+						.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+						.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
 					</style>
 					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 					<script type="text/javascript">
 						google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawChart);
 			)"
 
-			before := substituteVariables(before, {headerBackColor: this.Window.Theme.ListBackColor["Header"]
+			before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
+												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
 
@@ -1699,7 +1700,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			</html>
 			)"
 
-			html := (before . drawChartFunction . substituteVariables(after,  {width: (this.ChartViewer.getWidth() - 4), height: (this.ChartViewer.getHeight() - 4), backColor: this.Window.AltBackColor}))
+			html := (before . drawChartFunction . substituteVariables(after, {width: (this.ChartViewer.getWidth() - 4), height: (this.ChartViewer.getHeight() - 4), backColor: this.Window.AltBackColor}))
 
 			this.ChartViewer.document.write(html)
 		}
@@ -1985,15 +1986,16 @@ class StrategyWorkbench extends ConfigurationItem {
 				<head>
 					<style>
 						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
-						.rowStyle { font-size: 11px; background-color: #%evenRowBackColor%; }
-						.oddRowStyle { font-size: 11px; background-color: #%oddRowBackColor%; }
+						.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+						.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
 					</style>
 					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 					<script type="text/javascript">
 						google.charts.load('current', {'packages':['corechart', 'table']}).then(drawChart);
 			)"
 
-			before := substituteVariables(before, {headerBackColor: this.Window.Theme.ListBackColor["Header"]
+			before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
+												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
 
@@ -2092,7 +2094,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		drawChartFunction .= "`n]);"
 
 		series := "series: {"
-		vAxis := "vAxis: { gridlines: { color: '#" . this.Window.Theme.AlternateBackColor . "' }, "
+		vAxis := "vAxis: { gridlines: { color: '#" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, "
 
 		for ignore, yAxis in yAxises {
 			if (A_Index > 1) {
@@ -2113,7 +2115,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		vAxis .= "}"
 
 		if (this.SelectedChartType = "Scatter") {
-			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: { title: '" . translate(xAxis) . "', gridlines: { color: '" . this.Window.Theme.AlternateBackColor . "' } }, " . series . ", " . vAxis . "};")
+			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: { title: '" . translate(xAxis) . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: { color: '" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, " . series . ", " . vAxis . "};")
 
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.ScatterChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 		}
@@ -2124,16 +2126,16 @@ class StrategyWorkbench extends ConfigurationItem {
 			if (maxValue = kUndefined)
 				maxValue := 0
 
-			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: {minValue: " . minValue . ", maxValue: " . maxValue . "} };")
+			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: { title: '" . translate(xAxis) . "', minValue: " . minValue . ", maxValue: " . maxValue . ", titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: { color: '" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, vAxis: {gridlines: { color: '" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}} };")
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 		}
 		else if (this.SelectedChartType = "Bubble") {
-			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: { title: '" . translate(xAxis) . "', viewWindowMode: 'pretty' }, vAxis: { title: '" . translate(yAxises[1]) . "', viewWindowMode: 'pretty' }, colorAxis: { legend: {position: 'none'}, colors: ['blue', 'red'] }, sizeAxis: { maxSize: 15 } };")
+			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: { title: '" . translate(xAxis) . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: { color: '" . this.Window.Theme.GridColor . "'}, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, viewWindowMode: 'pretty' }, vAxis: { title: '" . translate(yAxises[1]) . "', gridlines: { color: '" . this.Window.Theme.GridColor . "'}, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, viewWindowMode: 'pretty' }, colorAxis: { legend: {position: 'none'}, colors: ['blue', 'red'] }, sizeAxis: { maxSize: 15 } };")
 
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BubbleChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 		}
 		else if (this.SelectedChartType = "Line") {
-			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "' };")
+			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, vAxis: { gridlines: { color: '" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { title: '" . translate(xAxis) . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: { color: '" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "' };")
 
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 		}
@@ -3210,15 +3212,16 @@ class StrategyWorkbench extends ConfigurationItem {
 			<head>
 				<style>
 					.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
-					.rowStyle { font-size: 11px; background-color: #%evenRowBackColor%; }
-					.oddRowStyle { font-size: 11px; background-color: #%oddRowBackColor%; }
+					.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+					.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
 				</style>
 				<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 				<script type="text/javascript">
 					google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawCharts);
 		)"
 
-		before := substituteVariables(before, {headerBackColor: this.Window.Theme.ListBackColor["Header"]
+		before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
+											 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 											 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 											 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
 
@@ -3303,7 +3306,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		drawChartsFunction .= (A_Space . "drawChart(); }`n")
 
-		chart .= ("]);`nvar options = { curveType: 'function', legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . translate("Minute") . "' }, vAxis: { title: '" . translate("Lap") . "', viewWindow: { min: 0 } }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
+		chart .= ("]);`nvar options = { curveType: 'function', legend: { position: 'Right', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . translate("Minute") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, textStyle: { color: '" . this.Window.Theme.TextColor["Disabled"] . "'}, gridlines: { color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} } }, vAxis: { title: '" . translate("Lap") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, textStyle: { color: '" . this.Window.Theme.TextColor["Disabled"] . "'}, gridlines: { color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, viewWindow: { min: 0 } }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
 
 		chart .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }")
 
@@ -3311,7 +3314,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		tableCSS := this.StrategyViewer.getTableCSS()
 
-		html := ("<html>" . before . chart . charts . ";`n" . drawChartsFunction . after . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style>" . tableCSS . "</style><style> #header { font-size: 12px; } </style>" . html . "<br><hr style=`"width: 50%`"><br>" . chartArea . "</body></html>")
+		html := ("<html>" . before . chart . charts . ";`n" . drawChartsFunction . after . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style>" . tableCSS . "</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style>" . html . "<br><hr style=`"width: 50%`"><br>" . chartArea . "</body></html>")
 
 		this.showComparisonChart(html)
 	}

@@ -495,7 +495,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 						showMessage(message . translate(", Set ") . setupTyreSet . translate("; ")
 										    . dryFrontLeft . translate(", ") . dryFrontRight . translate(", ")
-											. dryRearLeft . translate(", ") . dryRearRight, false, "Information.png", 5000)
+											. dryRearLeft . translate(", ") . dryRearRight, false, "Information.ico", 5000)
 					}
 				}
 
@@ -521,7 +521,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 						showMessage(message . translate("; ")
 											. wetFrontLeft . translate(", ") . wetFrontRight . translate(", ")
-											. wetRearLeft . translate(", ") . wetRearRight, false, "Information.png", 5000)
+											. wetRearLeft . translate(", ") . wetRearRight, false, "Information.ico", 5000)
 					}
 				}
 
@@ -1170,19 +1170,19 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		chosen := getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Correction.Temperature", true)
 
 		settingsGui.Add("Text", "x16 yp+24 w105 h20 Section", translate("Correction"))
-		settingsGui.Add("CheckBox", "x126 yp-4 w17 h23 Checked" . chosen . " VtemperatureCorrectionCheck", chosen)
+		settingsGui.Add("CheckBox", "x126 yp-4 w17 h21 Checked" . chosen . " VtemperatureCorrectionCheck", chosen)
 		settingsGui.Add("Text", "x147 yp+4 w200 h20", translate("based on temperature trend"))
 
 		chosen := getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Correction.Setup", false)
 
 		settingsGui.Add("Text", "x16 yp+24 w105 h20 Section", translate("Correction"))
-		settingsGui.Add("CheckBox", "x126 yp-4 w17 h23 Checked" . chosen . " VsetupPressureCompareCheck", chosen)
+		settingsGui.Add("CheckBox", "x126 yp-4 w17 h21 Checked" . chosen . " VsetupPressureCompareCheck", chosen)
 		settingsGui.Add("Text", "x147 yp+4 w200 h20", translate("based on database values"))
 
 		chosen := getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Correction.Pressure", false)
 
 		settingsGui.Add("Text", "x16 yp+24 w105 h20 Section", translate("Correction"))
-		settingsGui.Add("CheckBox", "x126 yp-4 w17 h23 Checked" . chosen . " VpressureLossCorrectionCheck", chosen)
+		settingsGui.Add("CheckBox", "x126 yp-4 w17 h21 Checked" . chosen . " VpressureLossCorrectionCheck", chosen)
 		settingsGui.Add("Text", "x147 yp+4 w200 h20", translate("based on pressure loss"))
 
 		settingsGui.SetFont("Norm", "Arial")
@@ -1255,13 +1255,13 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		chosen := getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.Formation", true)
 
 		settingsGui.Add("Text", "x212 ys w85 h23 +0x200", translate("Formation"))
-		settingsGui.Add("CheckBox", "x292 yp-1 w17 h23 Checked" . chosen . " VformationLapCheck", chosen)
+		settingsGui.Add("CheckBox", "x292 yp-1 w17 h21 Checked" . chosen . " VformationLapCheck", chosen)
 		settingsGui.Add("Text", "x310 yp+4 w90 h20", translate("Lap"))
 
 		chosen := getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.PostRace", true)
 
 		settingsGui.Add("Text", "x212 yp+22 w85 h23 +0x200", translate("Post Race"))
-		settingsGui.Add("CheckBox", "x292 yp-1 w17 h23 Checked" . chosen . " VpostRaceLapCheck", chosen)
+		settingsGui.Add("CheckBox", "x292 yp-1 w17 h21 Checked" . chosen . " VpostRaceLapCheck", chosen)
 		settingsGui.Add("Text", "x310 yp+4 w90 h20", translate("Lap"))
 
 		settingsGui.SetFont("Norm", "Arial")
@@ -1390,7 +1390,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		chosen := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Traffic.Simulation", false)
 
 		settingsGui.Add("Text", "x16 yp+30 w105 h20", translate("Dynamic Traffic"))
-		settingsGui.Add("CheckBox", "x126 yp-4 w17 h23 Checked" . chosen . " VtrafficSimulationCheck", chosen)
+		settingsGui.Add("CheckBox", "x126 yp-4 w17 h21 Checked" . chosen . " VtrafficSimulationCheck", chosen)
 		settingsGui.Add("Text", "x184 yp+2 w290 h20", translate("using Monte Carlo simulation"))
 
 		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Extrapolation.Laps", 3)

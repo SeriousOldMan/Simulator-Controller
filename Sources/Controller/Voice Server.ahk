@@ -1474,7 +1474,7 @@ class VoiceServer extends ConfigurationItem {
 		local descriptor := voiceClient.VoiceCommands[grammar]
 
 		if this.Debug[kDebugRecognitions]
-			showMessage("Command phrase recognized: " . grammar . " => " . values2String(A_Space, words*), false, "Information.png", 5000)
+			showMessage("Command phrase recognized: " . grammar . " => " . values2String(A_Space, words*), false, "Information.ico", 5000)
 
 		messageSend(kFileMessage, "Voice", descriptor[2] . ":" . values2String(";", grammar, descriptor[1], words*), voiceClient.PID)
 	}
@@ -1483,7 +1483,7 @@ class VoiceServer extends ConfigurationItem {
 		local descriptor := voiceClient.VoiceCommands["Text"]
 
 		if this.Debug[kDebugRecognitions]
-			showMessage("Text recognized: " . text, false, "Information.png", 5000)
+			showMessage("Text recognized: " . text, false, "Information.ico", 5000)
 
 		messageSend(kFileMessage, "Voice", descriptor[2] . ":" . values2String(";", "Text", descriptor[1], StrReplace(text, ";", ","))
 								, voiceClient.PID)
@@ -1496,7 +1496,7 @@ class VoiceServer extends ConfigurationItem {
 			descriptor := voiceClient.VoiceCommands["Text"]
 
 			if this.Debug[kDebugRecognitions]
-				showMessage("Text not recognized: " . text, false, "Information.png", 5000)
+				showMessage("Text not recognized: " . text, false, "Information.ico", 5000)
 
 			messageSend(kFileMessage, "Voice", descriptor[2] . ":" . values2String(";", "Text", descriptor[1], StrReplace(text, ";", ","))
 									, voiceClient.PID)

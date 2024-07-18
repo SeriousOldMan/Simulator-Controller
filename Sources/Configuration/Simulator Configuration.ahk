@@ -213,8 +213,8 @@ class GeneralTab extends ConfiguratorPanel {
 		button.OnEvent("Click", openFormatsEditor)
 		setButtonIcon(button, kIconsDirectory . "Locale.ico", 1, "L4 T4 R4 B4")
 
-		window.Add("CheckBox", "x24 y200 w242 h23 Checked" . this.Value["startWithWindows"] . " VstartWithWindowsCheck", translate("Start with Windows"))
-		window.Add("CheckBox", "x24 y224 w242 h23 Checked" . this.Value["silentMode"] . " VsilentModeCheck", translate("Silent mode (no splash screen, no sound)"))
+		window.Add("CheckBox", "x24 y200 w242 h21 Checked" . this.Value["startWithWindows"] . " VstartWithWindowsCheck", translate("Start with Windows"))
+		window.Add("CheckBox", "x24 y224 w242 h21 Checked" . this.Value["silentMode"] . " VsilentModeCheck", translate("Silent mode (no splash screen, no sound)"))
 
 		window.Add("Button", "x333 y224 w130 h23 X:Move", translate("Splash Screens...")).OnEvent("Click", openSplashScreenEditor)
 
@@ -244,7 +244,7 @@ class GeneralTab extends ConfiguratorPanel {
 			window.Add("Button", "x440 y428 w23 h23 X:Move", translate("...")).OnEvent("Click", chooseMSBuildPath)
 
 			window.Add("Text", "x24 y453 w160 h23 +0x200", translate("Debug"))
-			window.Add("CheckBox", "x226 y451 w242 h23 Checked" . this.Value["debugEnabled"] . " vdebugEnabledCheck", translate("Enabled?"))
+			window.Add("CheckBox", "x226 y451 w242 h21 Checked" . this.Value["debugEnabled"] . " vdebugEnabledCheck", translate("Enabled?"))
 
 			window.Add("Text", "x24 y477 w160 h23 +0x200", translate("Log Level"))
 

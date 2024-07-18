@@ -30,6 +30,52 @@
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+class PitstopUpcomingEvent extends AssistantEvent {
+	Asynchronous {
+		Get {
+			return true
+		}
+	}
+
+	createTrigger(event, phrase, arguments) {
+		return ("The next pitstop is upcoming in lap " . arguments[1] . ".")
+	}
+
+	handleEvent(event, arguments*) {
+		if !super.handleEvent(event, arguments*)
+			this.Assistant.reportUpcomingPitstop(arguments*)
+
+		return true
+	}
+}
+
+class WeatherForecastEvent extends AssistantEvent {
+	Asynchronous {
+		Get {
+			return true
+		}
+	}
+
+	createTrigger(event, phrase, arguments) {
+		local trigger := ("The weather will change to " . arguments[1] . " in " . arguments[2] . ".")
+
+		if (arguments.Has(4) && arguments[3])
+			return (trigger . A_Space . " We should plan a pitstop and mount " . arguments[4] . " tyres.")
+		else
+			return (trigger . " A tyre change will not be necessary.")
+	}
+
+	handleEvent(event, arguments*) {
+		if !super.handleEvent(event, arguments*)
+			if (arguments.Has(4) && arguments[3])
+				this.Assistant.requestTyreChange(arguments[1], arguments[2], arguments[4])
+			else
+				this.Assistant.weatherForecast(arguments[1], arguments[2], arguments[3])
+
+		return true
+	}
+}
+
 class RaceStrategist extends GridRaceAssistant {
 	iRaceInfo := false
 	iRaceInfoSaved := false
@@ -785,9 +831,11 @@ class RaceStrategist extends GridRaceAssistant {
 
 	__New(configuration, remoteHandler, name := false, language := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, speakerBooster := false
-		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, muted := false, voiceServer := false) {
+		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, agentBooster := false
+		, muted := false, voiceServer := false) {
 		super.__New(configuration, "Race Strategist", remoteHandler, name, language, synthesizer, speaker, vocalics, speakerBooster
-													, recognizer, listener, listenerBooster, conversationBooster, muted, voiceServer)
+													, recognizer, listener, listenerBooster, conversationBooster, agentBooster
+													, muted, voiceServer)
 
 		this.updateConfigurationValues({Announcements: {WeatherUpdate: true, StrategySummary: true, StrategyUpdate: true, StrategyPitstop: false}})
 
@@ -984,9 +1032,9 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	getKnowledge(options := false) {
+	getKnowledge(type, options := false) {
 		local knowledgeBase := this.KnowledgeBase
-		local knowledge := super.getKnowledge(options)
+		local knowledge := super.getKnowledge(type, options)
 		local strategy, nextPitstop, pitstop, pitstops
 
 		if knowledgeBase {
@@ -3554,12 +3602,12 @@ class RaceStrategist extends GridRaceAssistant {
 		this.recommendStrategy({FullCourseYellow: true})
 	}
 
-	weatherChangeNotification(change, minutes) {
+	weatherForecast(weather, minutes, changeTyres) {
 		if (this.Speaker[false] && (this.Session == kSessionRace) && this.Announcements["WeatherUpdate"])
-			this.getSpeaker().speakPhrase(change ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
+			this.getSpeaker().speakPhrase(changeTyres ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
 	}
 
-	weatherTyreChangeRecommendation(minutes, recommendedCompound) {
+	requestTyreChange(weather, minutes, recommendedCompound) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker, fragments
 
@@ -3600,7 +3648,7 @@ class RaceStrategist extends GridRaceAssistant {
 			}
 	}
 
-	reportUpcomingPitstop(plannedPitstopLap) {
+	reportUpcomingPitstop(plannedPitstopLap, planPitstop := true) {
 		local knowledgeBase := this.KnowledgeBase
 		local fullCourseYellow, speaker, plannedLap, nextPitstop, maxLap
 		local refuel, tyreChange, tyreCompound, tyreCompoundColor
@@ -3645,7 +3693,7 @@ class RaceStrategist extends GridRaceAssistant {
 													   , laps: (plannedPitstopLap - knowledgeBase.getValue("Lap"))})
 				}
 
-				if ProcessExist("Race Engineer.exe")
+				if (ProcessExist("Race Engineer.exe") && planPitstop)
 					if fullCourseYellow {
 						refuel := Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"), 1)
 						tyreChange := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change")
@@ -4165,16 +4213,16 @@ updatePositions(context, futureLap) {
 	return true
 }
 
-weatherChangeNotification(context, change, minutes) {
-	context.KnowledgeBase.RaceAssistant.weatherChangeNotification(change, minutes)
+weatherForecastNotification(context, weather, minutes, change) {
+	context.KnowledgeBase.RaceAssistant.weatherForecast(weather, minutes, change)
 
 	return true
 }
 
-weatherTyreChangeRecommendation(context, minutes, recommendedCompound) {
+requestTyreChange(context, weather, minutes, recommendedCompound) {
 	context.KnowledgeBase.RaceAssistant.clearContinuation()
 
-	context.KnowledgeBase.RaceAssistant.weatherTyreChangeRecommendation(minutes, recommendedCompound)
+	context.KnowledgeBase.RaceAssistant.requestTyreChange(weather, minutes, recommendedCompound)
 
 	return true
 }

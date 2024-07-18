@@ -1,0 +1,21 @@
+[Agent.Events]
+Active=fuel_low,damage_collected,pressure_loss,weather_forecast,rain_started,rain_stopped
+[Agent.Events.Builtin]
+fuel_low=Assistant.Class|FuelLowEvent|FuelLow||2|This event is triggered when the car is running low on fuel.
+damage_collected=Assistant.Class|DamageEvent|Damage||3|This event is triggered when the car collected new damage.
+pressure_loss=Assistant.Class|PressureLossEvent|PressureLoss||2|This event is triggered when a loss of pressure on a given tyre is detected.
+weather_forecast=Assistant.Class|WeatherForecastEvent|WeatherForecast||4|This event is triggered when the weather forecast indicates an upcoming weather change.
+rain_started=Assistant.Rule|Race Assistant.rain_start.rules|RainStart|It just started raining.|0|This event is triggered when it starts raining or will be raining in a few moments.
+rain_stopped=Assistant.Rule|Race Assistant.rain_stop.rules|RainStop|It just stopped raining.|0|This event is triggered when it stopped raining.
+[Agent.Events.Parameters]
+fuel_low.1=remainingFuel|Integer||true|The remaining amount of fuel in liters.
+fuel_low.2=remainingLaps|Integer||true|The maximum number of laps that can be driven with the remaining fuel.
+damage_collected.1=suspensionDamage|Boolean||true|Indicates whether new damage to the suspension occured.
+damage_collected.2=bodyworkDamage|Boolean||true|Indicates whether new damage to the bodywork and aerodynamics occured.
+damage_collected.3=engineDamage|Boolean||true|Indicates whether new damage to the engine occured.
+pressure_loss.1=tyre|String|FL,FR,RL,RR|true|A symbol (FL, FR, ...) indicating the tyre that lost pressure.
+pressure_loss.2=lostPressure|Number||true|The amount of pressure in PSI, that has been lost compared to all other tyres.
+weather_forecast.1=weather|String|Dry,Drizzle,LightRain,MediumRain,HeavyRain,Thunderstorm|true|A symbol that represents the upcoming weather.
+weather_forecast.2=minutes|Integer||true|The time in minutes when the weather will change.
+weather_forecast.3=impactsStrategy|Boolean||true|Indicates that the strategy is impacted and a tyre change might be necessary.
+weather_forecast.4=tyreCompound|String||false|If supplied, indicates tyre compound that should be mounted at the pitstop.

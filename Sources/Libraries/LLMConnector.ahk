@@ -308,13 +308,14 @@ class LLMConnector {
 			throw "Virtual method HTTPConnector.CreateTools must be implemented in a subclass..."
 		}
 
-		ProcessToolCalls(tools, message) {
+		ProcessToolCalls(tools, message, &calls?) {
 			return false
 		}
 
-		Ask(question, instructions := false, tools := false) {
+		Ask(question, instructions := false, tools := false, &calls?) {
 			local headers := this.CreateHeaders(Map("Content-Type", "application/json"))
 			local body := {model: this.Model, max_tokens: this.MaxTokens, temperature: this.Temperature}
+			local toolCall := false
 
 			if !instructions
 				instructions := this.GetInstructions()
@@ -358,7 +359,12 @@ class LLMConnector {
 					if answer.Has("message") {
 						answer := answer["message"]
 
-						if this.ProcessToolCalls(tools, answer) {
+						if isSet(calls)
+							toolCall := this.ProcessToolCalls(tools, answer, &calls)
+						else
+							toolCall := this.ProcessToolCalls(tools, answer)
+
+						if toolCall {
 							if answer.Has("content") {
 								answer := answer["content"]
 
@@ -444,8 +450,18 @@ class LLMConnector {
 			return body
 		}
 
+		FindTool(tools, name) {
+			local ignore, candidate
+
+			for ignore, candidate in tools
+				if (candidate.Name = name)
+					return candidate
+
+			return false
+		}
+
 		CallTool(tools, tool) {
-			local name, arguments, ignore, candidate, argument
+			local name, arguments, argument
 
 			getArguments(function, arguments) {
 				local result := []
@@ -469,29 +485,33 @@ class LLMConnector {
 
 			if tool.Has("function") {
 				tool := tool["function"]
-				name := tool["name"]
+				arguments := tool["arguments"]
 
-				for ignore, candidate in tools
-					if (candidate.Name = name) {
-						arguments := tool["arguments"]
+				tool := this.FindTool(tools, tool["name"])
 
-						if isInstance(arguments, String)
-							arguments := JSON.parse(arguments)
+				if tool {
+					if isInstance(arguments, String)
+						arguments := JSON.parse(arguments)
 
-						arguments := toMap(arguments)
+					arguments := getArguments(tool, toMap(arguments))
 
-						candidate.Callable.Call(getArguments(candidate, arguments)*)
+					tool.Callable.Call(arguments*)
 
-						break
-					}
+					return Array(tool, arguments)
+				}
+				else
+					return false
 			}
 			else
 				throw "Unsupported tool type detected in LLMConnector.APIConnector.CallTool..."
 		}
 
-		ProcessToolCalls(tools, message) {
+		ProcessToolCalls(tools, message, &calls?) {
 			if (message.Has("tool_calls") && isInstance(message["tool_calls"], Array)) {
-				do(message["tool_calls"], ObjBindMethod(this, "CallTool", tools))
+				if isSet(calls)
+					calls := choose(collect(message["tool_calls"], ObjBindMethod(this, "CallTool", tools)), (v) => !!v)
+				else
+					do(message["tool_calls"], ObjBindMethod(this, "CallTool", tools))
 
 				return true
 			}

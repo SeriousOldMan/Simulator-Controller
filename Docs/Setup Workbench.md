@@ -65,7 +65,7 @@ On the second tab "Temperatures" you can specify several thresholds for tyre and
 
 The *Ideal* temperatures are the values you want to target in average over the course of a complete lap, both for the tyres as well as for the brakes. Going over "Max" or going under "Min" will increase the severity of any created temperature related issues. And, last but not least, when the difference between inner and outer tyre temperatures of a given tyre exceeds the given "Max OI Difference" value, a corresponding issue will be generated as well.
 
-Good to know: It is recommended to choose a car before entering the analyzer mode, since then some of the values in this dialog will be initialized with car specific data, depending on the chosen simulator.
+Good to know: It is recommended to choose a car before entering the analyzer mode, since then some of the values in this dialog will be initialized with car specific data, depending on the chosen simulator. Also, all values you have chosen will be saved for the selected car / track combination and will be re-used the next time you will use the analyzer. Last but not least, if you change a setting while track is set to "All", this setting will be used as a default for all tracks, for which no settings have been selected so far.
 
 Once you have dialed your settings, you can click on "Start".
 
@@ -143,7 +143,7 @@ The rules for the recommendations have been compiled from different sources, abo
 
 ## How it works
 
-"Setup Workbench" uses the same rule engine, that is used by the Virtual Race Assistants. A generic set of rules handle the overall computation and the analysis of the problem descriptions given by the driver. Each problem is identified by a descriptor, for example "Understeer.Corner.Exit.Fast" for understeering while accelerating out of fast corners. For each setup option, a descriptor exists as well, for example "Bumpstop.Range.Front.Left" for the length of the bumpstop rubber in the front left spring damper.
+"Setup Workbench" uses the same [Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine), that is used by the Virtual Race Assistants. A generic set of rules handle the overall computation and the analysis of the problem descriptions given by the driver. Each problem is identified by a descriptor, for example "Understeer.Corner.Exit.Fast" for understeering while accelerating out of fast corners. For each setup option, a descriptor exists as well, for example "Bumpstop.Range.Front.Left" for the length of the bumpstop rubber in the front left spring damper.
 
 During the first phase, the rule engine analyses all given problems and their "Importance" and "Severity" settings. A resulting correction value is derived, while handling contradictory requirements. Then a long list of rules are evaluated that look like this:
 

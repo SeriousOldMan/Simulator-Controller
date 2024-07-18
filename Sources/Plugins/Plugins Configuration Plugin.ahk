@@ -10,7 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\Configuration\Libraries\ControllerActionsEditor.ahk"
-#Include "..\Configuration\Libraries\ConversationBoosterEditor.ahk"
+#Include "..\Configuration\Libraries\AssistantBoosterEditor.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -104,7 +104,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 		window.Add("Text", "x16 y335 w86 h23 Y:Move +0x200", translate("Plugin"))
 		window.Add("Edit", "x110 y335 w154 h21 Y:Move W:Grow(0.2) VpluginEdit").OnEvent("Change", (*) => this.updateState())
 
-		window.Add("CheckBox", "x110 y359 w120 h23 Y:Move VpluginActivatedCheck", translate("Activated?"))
+		window.Add("CheckBox", "x110 y359 w120 h21 Y:Move VpluginActivatedCheck", translate("Activated?"))
 
 		window.Add("Text", "x16 y383 w89 h23 Y:Move +0x200", translate("Simulator(s)"))
 		window.Add("Edit", "x110 y383 w339 h21 Y:Move W:Grow(0.2) VpluginSimulatorsEdit")
@@ -141,6 +141,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 		this.iConversationBoosterConfiguration := newMultiMap()
 
 		setMultiMapValues(this.iConversationBoosterConfiguration, "Conversation Booster", getMultiMapValues(configuration, "Conversation Booster"))
+		setMultiMapValues(this.iConversationBoosterConfiguration, "Agent Booster", getMultiMapValues(configuration, "Agent Booster"))
 	}
 
 	saveToConfiguration(configuration) {
@@ -273,8 +274,8 @@ class PluginsConfigurator extends ConfigurationItemList {
 	editBooster() {
 		local assistant := this.Control["pluginEdit"].Text
 		local window := this.Window
-		local configuration, speakerBooster, listenerBooster, conversationBooster, thePlugin
-		local ignore, otherAssistant, key, value
+		local configuration, thePlugin
+		local ignore, otherAssistant, key, value, type
 
 		if !inList(kRaceAssistants, assistant)
 			return
@@ -282,7 +283,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 		window.Block()
 
 		try {
-			configuration := ConversationBoosterEditor(assistant, this.iConversationBoosterConfiguration).editBooster(window)
+			configuration := AssistantBoosterEditor(assistant, this.iConversationBoosterConfiguration).editBooster(window)
 
 			if configuration {
 				thePlugin := this.buildItemFromEditor()
@@ -291,12 +292,14 @@ class PluginsConfigurator extends ConfigurationItemList {
 					thePlugin.removeArgument("raceAssistantSpeakerBooster")
 					thePlugin.removeArgument("raceAssistantListenerBooster")
 					thePlugin.removeArgument("raceAssistantConversationBooster")
+					thePlugin.removeArgument("raceAssistantAgentBooster")
 
 					for ignore, otherAssistant in kRaceAssistants
 						if (otherAssistant != assistant)
-							for key, value in getMultiMapValues(this.iConversationBoosterConfiguration, "Conversation Booster")
-								if (InStr(key, otherAssistant) = 1)
-									setMultiMapValue(configuration, "Conversation Booster", key, value)
+							for ignore, type in ["Conversation Booster", "Agent Booster"]
+								for key, value in getMultiMapValues(this.iConversationBoosterConfiguration, type)
+									if (InStr(key, otherAssistant) = 1)
+										setMultiMapValue(configuration, type, key, value)
 
 					this.iConversationBoosterConfiguration := configuration
 
@@ -308,6 +311,9 @@ class PluginsConfigurator extends ConfigurationItemList {
 
 					if getMultiMapValue(configuration, "Conversation Booster", assistant . ".Conversation", false)
 						thePlugin.setArgumentValue("raceAssistantConversationBooster", assistant)
+
+					if getMultiMapValue(configuration, "Agent Booster", assistant . ".Agent", false)
+						thePlugin.setArgumentValue("raceAssistantAgentBooster", assistant)
 
 					this.loadEditor(thePlugin)
 				}

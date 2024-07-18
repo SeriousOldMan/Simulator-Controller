@@ -156,24 +156,6 @@ class ControllerList extends ConfigurationItemList {
 		setMultiMapValue(configuration, "Controller Layouts", "Stream Decks", values2String("|", sdController*))
 	}
 
-	/*
-	clickEvent(line, count) {
-		local index := false
-		local ignore, candidate
-
-		controllerListBox := ogccontrollerListBox.Text
-
-		for ignore, candidate in this.ItemList
-			if (controllerListBox = candidate[1]) {
-				index := A_Index
-
-				break
-			}
-
-		this.openEditor(index)
-	}
-	*/
-
 	loadList(items) {
 		local controller := []
 		local ignore, item

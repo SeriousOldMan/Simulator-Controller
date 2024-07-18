@@ -1004,9 +1004,11 @@ class RaceSpotter extends GridRaceAssistant {
 
 	__New(configuration, remoteHandler, name := false, language := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, speakerBooster := false
-		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, muted := false, voiceServer := false) {
+		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, agentBooster := false
+		, muted := false, voiceServer := false) {
 		super.__New(configuration, "Race Spotter", remoteHandler, name, language, synthesizer, speaker, vocalics, speakerBooster
-												 , recognizer, listener, listenerBooster, conversationBooster, muted, voiceServer)
+												 , recognizer, listener, listenerBooster, conversationBooster, agentBooster
+												 , muted, voiceServer)
 
 		this.updateConfigurationValues({Announcements: {DeltaInformation: 2, TacticalAdvices: true
 													  , SideProximity: true, RearProximity: true
@@ -1118,6 +1120,8 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	resetDeltasAction() {
+		local ignore, positionInfo
+
 		for ignore, positionInfo in this.PositionInfos {
 			positionInfo.reset(true, true, true)
 			positionInfo.Car.reset(true)
@@ -1125,7 +1129,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 		this.DriverCar.reset(true)
 
-		if Speaker[true]
+		if this.Speaker[true]
 			this.getSpeaker().speakPhrase("Okay")
 	}
 

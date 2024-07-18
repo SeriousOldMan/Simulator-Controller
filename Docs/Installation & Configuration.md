@@ -377,167 +377,11 @@ Note: You can use the [Trigger Detector Tool](https://github.com/SeriousOldMan/S
 
 The voice recognition for all Assistants except the Driving Coach is normally pattern-based. [Here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(EN)), for example, you can find a documentation for the definition of the recognized commands of the Race Engineer and similar documentation is available for the other Assistants as well. The speech output of all Assistants is also preprogrammed with several different phrases for each message, to create at least a little variation.
 
-Said this, it is clear, that the interaction with the Assistants, although already impressive, will not feel absolutely natural in many cases. But using the latest development in AI with LLMs (aka large language model) it became possible to improve the conversation capabilities of the Assistants even further. Whenever you see a small button with an icon which looks like a launching space rocket, you can configure AI pre- and post-processing for voice recognition, speech output and general conversation.
+Said this, it is clear, that the interaction with the Assistants, although already impressive, will not feel absolutely natural in many cases. But using the latest development in AI with LLMs (aka large language models) it became possible to improve the conversational capabilities of the Assistants even further. Whenever you see a small button with an icon which looks like a launching space rocket, you can configure AI pre- and post-processing for voice recognition, speech output and general conversation.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20Speech%20Improvement.JPG)
 
-IMPORTANT: All this is optional. The Race Assistants will do their job really good even without being connected to an LLM. Therefore I recommend to use this feature not before everything else has been configured and is fully functional.
-
-Please take a look at the documentation for the [Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#installation) for a description of the different providers and LLMs which can be configured here.
-
-Several boosters are available at the moment:
-
-  1. More variations in the speech output of the Assistants will be created, if *Rephrasing* is activated. This is done by using a GPT to rephrase one of the predefined phrases. The *Activation* setting defines the probability, with which the rephrasing happens (and thereby how many calls to the GPT service will be done) and using the *Creativity* setting, you can define, how *strong* the rephrasing will be. According to my tests, a value of 50% will create some intersting variation without altering the original sense of the message. Please note, that there are messages, especially the urgent alerts of the Spotter, which are time-critical. Those messages will never be send to the AI for rephrasing.
-  
-     A very small context window can be used here, since only the phrase which is to be process plus a couple of instructions are send to the LLM.
-
-  2. If *Understanding* is activated, a GPT is used to semantically analyze your voice commands and match them to any of the pattern-bassed commands defined by the Assistants. This allows you to formulate your commands in any way you like, as long as the meaning the same as for the predefined command. Here is an example:
-	
-	 Grammar: [{Check, Please check} {the brake wear, the brake wear at the moment}, Tell me {the brake wear, the brake wear at the moment}]
-	  
-	 A valid command that will be recognized for the pattern, will be: "Check the brake wear". When using the GPT-based semantically mapping, a command like: "We should check the brakes" will also be understood.
-	 
-	 There are two *Activation* methods available, both with their pros and cons. "Always" means, that the LLM is always asked to interpret the given command, whereas "Unrecognized" means, that it is only used, when the pattern-based voice recognition cannot identify the command. The later will result in less calls to the LLM and therefore will probably reduce costs and - even more important - will be better in terms of responsiveness, if you are already quite familar with the command patterns.
-	 
-	 Note: Using the semantic *Understanding* booster may only be usable in conjunction with voice recognition methods, that are cabable to recognize continuous, unstructured text. This is true for Google and Azure voice recognition, but not for the builtin voice recognition of Windows, which only work reliable for pattern-based recognition.
-	 
-	 A context window of at least 2048 tokens is required for this booster, since all predefined command phrases will be supplied to the LLM for matching.
-
-  3. Normally an Assistant will tell you that he didn't understand you, when none of the defined commands has matched the spoken command. Using the *Conversation* booster a special mode can be activated, that will redirect all non-recognized commands to an LLM for interpretation and processing. This LLM will have full access to the knowledebase of the Assistant and will therefore be able to run a knowledgeable conversation with you. The following table lists the type of knowledge, that will be available to a specific Assistant:
-     
-     | Assistant        | Knowledge (1) |
-     | ---------------- | ------------- |
-	 | Race Engineer    | Telemetry data incl. tyre pressures, tyre temeperatures, tyre wear, brake temperatures, brake wear, fuel level, fuel consumption, damage, and so on. Full pitstop history is included and when a pitstop is planned, the plan is available otherwise a forecast of the next pitstop will be part of the knowledge. |
-	 | Race Strategist  | Basic telemetry data but no detailed information about tyres, brakes and car damage. A reduced pitstop history is available as well as full information about the active strategy. Current position incl. detailed standings with gap and lap time information for all opponents is also available. |
-	 | Race Spotter     | Basic telemetry data and no pitstop information. But current position incl. detailed standings with gap and lap time information for all opponents is also available. |
-	 | Driving Coach    | Beside the [instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-driving-coach) that can be configured for the Driving Coach in general, the full set of telemetry data available to the Race Engineer is available to the Driving Coach as well. |
-
-     (1) Depending on the availabilty of the data by the current simulator.
-	 
-	 Since large parts of the knowledgebase of the Assistants will be supplied to the LLM for matching, a context window of at least 4k tokens is required for this booster. Full standings history isn't possible at the moment, since this will flood the input context area of the LLM, at least for the *smaller* models like GPT 3.5, Mistral 7b, and so on. Time will cure this problem, and I will update the capabilities of the integration, when more capable models become available. For the time being, the position data is available for the most recent laps and also the gaps for the most important opponents are passed to the LLM (for Strategist and Spotter).
-	 
-	 Additionally, you can allow the LLM to call [predefined actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-conversation-actions) as a result of your conversation. For example, if you ask the Strategist whether an undercut might be possible in one of the next laps, the LLM may call the Monte Carlo traffic simulation using an internal action. Which actions will be available to the LLM depends on the current Assistant. See corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#trigger-actions-from-conversation) for the Strategist for an example.
-
-Good to know: Whenever one or more conversation boosters are configured for a Race Assistant, a transcript of every LLM activation is stored in the *Simulator Controller\Logs\Transcripts* folder which is located in your user *Documents* folder.
-
-For each of the above conversation boosters, you can edit the instructions that are send to the LLM by clicking on the button labeled "Instructions...". A new window will open, where you can edit all related instructions for each of the supported languages. Whenever you want to restore the original instruction, you can do this by clicking on the small button with the "Reload" icon.
-
-Below you find all instruction categories and the supported variables:
-
-| Booster        | Instruction (1)   | What              | Description |
-|----------------|-------------------|-------------------|-------------|
-| Rephrasing     | Rephrase          | Scope             | This instruction is used when a given phrase by an Assistant should be rephrased without changing its language. |
-|                |                   | %assistant%       | The type or role of the current Assistant, for example "Race Engineer". |
-|                |                   | %text%            | The text or phrase, which should be rephrased. |
-|                | RephraseTranslate | Scope             | This instruction is used when a given phrase by an Assistant should be rephrased and then translated to a different language. |
-|                |                   | %assistant%       | The type or role of the current Assistant, for example "Race Engineer". |
-|                |                   | %language%        | This variable specifies the target language, for example "French", in which the resulting phrase should be formulated. |
-|                |                   | %text%            | The text or phrase, which should be rephrased and then translated. |
-|                | Translate         | Scope             | This instruction is used when a given phrase by an Assistant should only be translated without changing the wording. |
-|                |                   | %assistant%       | The type or role of the current Assistant, for example "Race Engineer". |
-|                |                   | %language%        | This variable specifies the target language, for example "French", for the resulting phrase. |
-|                |                   | %text%            | The text or phrase, which should be translated. |
-| Understanding  | Recognize         | Scope             | This instruction is used when a voice command has been recognized, which cannot be mapped to one of the predefined command patterns. |
-|                |                   | %assistant%       | The type or role of the current Assistant, for example "Race Engineer". |
-|                |                   | %commands%        | A table of examples for all predefined commands, so that the LLM can match the unrecognized command to one of those examples. Each line consist of a command name followed by an equal sign and a number of examples for the command. Example: "Yes=Yes thank you, Yes of course, Yes please". The LLM should the return the name of the command or "Unknown", if no match was possible. |
-|                |                   | %text%            | The text of the command that should be identified. |
-| Conversation   | Character         | Scope             | This instruction is used when a voice command has been recognized, which cannot be mapped to one of the predefined command patterns, even after using the LLM to map the command semantically. It is assumed that the user wants a free conversation with the LLM. This instruction then defines the profession and the personality of the Assistant. You can also include general instructions like "Keep your answers short and precise", and so on. |
-|                |                   | %assistant%       | The type or role of the current Assistant, for example "Race Engineer". |
-|                |                   | %name%            | Specifies the name of the Assistant. |
-|                | Knowledge         | Scope             | This instruction is used to supply the current content of the knowledgebase to the LLM. The content of the knowledgebase depends on the type of the Assistant. |
-|                |                   | %knowledge%       | This variable is substituted with the content of the knowledgebase in a self-explaining JSON format. |
-
-###### Notes
-
-(1) Each phrase is available in different languages, for example "Rephrase (DE)" for the German version.
-
-Important: Using a GPT service like OpenAI may create some costs, and running an LLM locally on your PC will require a very powerful system, especially when doing this while on the track. As already said, extending the capabilities of the Assistants with an LLM is fully optional.
-
-Disclaimer: Large Language Models, although incredible impressive, are still under heavy development. Therefore it depends on the quality and capabilities of the model, whether the Assistant will react like expected. And in most cases, the support for non-English languages is quite limited. I recommend to use the conversation booster only for English-speaking Assistants for the time being. Beside that, you will get good results for the *Rephrasing* booster with almost any model, whereas for the *Conversation* booster you will need one of the big boys like GPT 3.5 and above for decent results. The requirements in terms of language understanding is somewhat in between for the *Recognition* booster. You will have to invest some time experimenting with different models, but that is part of the the fun.
-
-##### Managing conversation actions
-
-A special editor is provided to manage the conversation actions for a given Assistant. A conversation action allows the LLM not only to react with a message to your request, but also to trigger some predefined functions. There are several builtin actions available for the different assistants, but you can also define your own ones.
-
-To open this editor, click on the small button with the "Pencil" icon on the right of the "Actions" drop down menu.
-
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20Speech%20Actions.JPG)
-
-You can enable or disable individual predefined actions using the checkbox on the left of the action name. And you can define your own actions with a click on the "+" button. But this requires a very detailed understanding of the architecture and inner workings of Simulator Controller and the Assistants as well as an excellent understanding of LLMs and how they call tools and functions. This is far beyond the scope of this documentation, but I try to give a brief introduction.
-
-1. When an LLM is activated, it is possible to provide a list of function descriptions to the LLM. *OpenAI* has defined the quasi-standard for the function description in JSON format as part of their API:
-
-	   {
-		   "type": "function",
-		   "function": {
-			   "name": "get_current_temperature",
-			   "description": "Get the current temperature for a specific location",
-			   "parameters": {
-				   "type": "object",
-				   "properties": {
-					   "location": {
-						   "type": "string",
-						   "description": "The city and state, e.g., San Francisco, CA"
-					   },
-					   "unit": {
-						   "type": "string",
-						   "enum": ["Celsius", "Fahrenheit"],
-						   "description": "The temperature unit to use. Infer this from the user's location."
-					   }
-				   },
-				   "required": ["location", "unit"]
-			   }
-		   }
-	   }
-
-   This format is used by many other GPT service providers as well. Every LLM, that *understands* this type of function description, will be able to trigger conversation actions, when used as a conversation booster. The editor for the conversation actions shown above is for the most part a graphical user interface for this type of function definitions. But it also let you define how to react to a *function call* by the LLM (see next item).
-   
-   Additionally to all the information required by the LLM function definition you can specify whether the corresponding action will be available during the learning phase of the Assistant and whether the Assistant will acknowledge your request like it is done with the builtin voice command. This should be enabled for all conversation actions you want to trigger by a corresponding question or command and should be disabled for all functions you expect the LLM to call automatically whenever needed.
-   
-   Note: The description of a function and each of their parameters is very important, since these are used by the LLM to *understand* when and how to invoke the function. It may require several iterations and different formulations until the LLM reacts as desired. 
-
-2. When the LLM decides to call such a function, it returns a special response which indicates the function(s) to be called together with values for at least all required parameters. You can now decide what to do, when the logical function is called by the LLM. Five different types of actions are available:
-
-   | Action Type | Description |
-   |-------------|-------------|
-   | Assistant Method | A method of the corresponding object which represents the given Race Assistant is called. The *method* can either simply be the name of the method or it can have the format of a function call with a fixed number of predefined arguments (Example: *requestInformation("Position")*). Additional arguments will be appended, if defined for the action. You can also name several methods to be called located on multiple lines. |
-   | Assistant Rule | The supplied rules are loaded into the rule engine of the given Race Assistant. These rules have full access to the knowledge base and all other rules of this Assistant.<br><br>All arguments supplied by the LLM are created as facts in the knowledge base for the time of the execution. Please use enclosing percentage signs to reference the arguments. Example: %location%<br><br>A special fact named %activation% will be set as well, which can be used to trigger rules, when no other fact is suitable. |
-   | Controller Method | A method of the single instance of the *SimulatorController* class is called in the process "Simulator Controller.exe". The *method* can either simply be the name of the method or it can have the format of a function call with a fixed number of predefined arguments (Example: *setMode("Launch")*). Additional arguments will be appended, if defined for the action. You can also name several methods to be called located on multiple lines, by a vertical bar or by a new line. |
-   | Controller Function | A global function is called in the process "Simulator Controller.exe". The *function* can either simply be the name of the function to be called or it can have the format of a function call with a fixed number of predefined arguments (Example: *trigger("!w")*). Additional arguments will be appended, if defined for the action. You can also name several functions to be called located on multiple lines.<br><br>Good candidates are the controller action functions, which are provided by the different plugins. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for a complete overview. |
-
-3. The most versatile *Action Type* is obviously the "Assistant Rule", since it allows you to do almost anything, but it requires very good programming skills in the area of logical programming languages like Prolog and forward chaining production rule systems. Simulator Controller comes with a builtin hybrid rule engine, which has been created exclusivly with the requirements of intelligent agents in mind. The Race Assistants have been implemented using this rule engine, but other applications of Simulator Controller are using it as well. You may take a look at the rule sets of the Race Assistants to learn the language. They can be found in the *Resources\Rules* folder in the program folder of Simulator Controller. Start with "Race Engineer.rules".
-
-   When defining your rules, you can use the following predicates to connect to the given Assistant or even the "Simulator Controller.exe" process:
-   
-   - Assistant.Call(method, p1, p2, ...)
-   
-     Invokes the *method* on the instance of the Race Assistant class with some arguments. Up to 6 arguments are supported.
-	 
-   - Assistant.Speak(phrase)
-   
-	 Outputs the given phrase using the voice of the given Race Assistant. *phrase* can be the label of a predefined phrase from the grammar definition of the Assistant.
-	 
-   - Assistant.Ask(question)
-   
-     Asks the given Race Assistant a question or give a command. The result will be the same, as if the question or the command has been given by voice input.
-	 
-   - Controller.Call(method, p1, p2, ...)
-   
-     Invokes the *method* on the instance of the *SimulatorController* class in the process "Simulator Controller.exe". with some arguments. Up to 6 arguments are supported.
-	 
-   - Function.Call(function, p1, p2, ...)
-   
-     Invokes the global *function* in the process "Simulator Controller.exe". with some arguments. Up to 6 arguments are supported.
-
-   You use this predicates in backward chaining rules directly. Example:
-   
-	   estimateTrackWetness() <= calculateTrackWetness(), Assistant.Speak("It will be too wet. I will come up with a new strategy."), Assistant.Call(planPitstop)
-	   
-   In forward chaining rules, the syntax is a bit different:
-   
-	   [?Track.Grip = Wet] => (Call: Assistant.Speak("It will be too wet. I will come up with a new strategy.")), (Call: Assistant.Call(planPitstop))
-
-As you can see, defining individual conversation actions is really an expert topic and therefore nothing for the casual user. If you want use this feature, I can offer a personal introduction and coaching as part of the Patreon membership.
+Improving and extending the Assistants using an LLM requires quite some dedication and knowledge, therefore I recmmend to start without it. Once everything is running as expected and you think you are ready for this, take a look at the documentation on [Customizing Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants).
 
 #### Tab *Plugins*
 
@@ -547,7 +391,7 @@ In this tab you can configure the plugins currently in use by the Simulator Cont
 
 Beside temporarily deactivating a plugin and all its modes, you can define a comma separated list of simulator names. This will restrict the modes of the plugin to only be available, when these simulators are running. The most important field here is the *Arguments* field. Here you can supply values for all the configuration parameters of the given plugin. The format is like this: "parameter1: value11, value12, value13; parameter2: value21, value22; ...". Please take a look at the [plugin reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) for an in depth explanation of all the parameters of the bundled plugins.
 
-A special editor is available by clicking on the small button with the launching rocket icon, when you have selected a plugin for one of the Race Assistants. This editor allows you to link a GPT service to this Assistant which can dramatically improve the conversation experience with the Assistant. Please see the separate [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for more information about the conversation booster.
+A special editor is available by clicking on the small button with the launching rocket icon, when you have selected a plugin for one of the Race Assistants. This editor allows you to link a GPT service to this Assistant which can dramatically improve the conversation experience with the Assistant. Please see the separate [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) for more information about the Assistant Booster.
 
 Last but not least, you will find an "Edit Labels & Icons..." button in the lower left corner of this tab. Pressing this button will open a special editor, which allows you to configure the language specific labels and icons for all controller actions. You will find more information on this in the [chapter on controller layout configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons).
 
@@ -638,6 +482,8 @@ Although you may call any globally defined function, you should use only the fol
 | switchToggle | type, number, state | Builtin | Virtually switches the toggle switch with the given number. *state* must be one of "On" or "Off" for 2-way toggle switches and "On" for 1-way toggle switches. The type of the toggle switch must be passed as *type*, one of "1WayToggle" and "2WayToggle". |
 | callCustom | number | Builtin | Calls the custom controller action with the given number. |
 | setMode | plugin, mode | Builtin | Switches the currently active mode for the hardware controller. See the [plugin reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) for an in depth explanation of all available modes. Instead of supplying the name of a plugin and mode, you can omit the second argument and supply "Increase" or "Deacrease" for the first parameter. In this case the controller will activate the next mode like in a carousel. |
+| speak | message | System | Speaks the supplied *message* using the default voice synthesizer configuration. |
+| play | fileName | System | *fileName* must a supported sound file, which is then played. |
 | execute | command | System | Execute any command, which can be an executable or a script with an extension accepted by the system. The *command* string can name additional arguments for parameters accepted by the command, and you can use global variables enclosed in percent signs, like %ComSpec%. Example: execute(D:\Programme\Nircmd.exe changeappvolume ACC.exe -0.1) - reduces the sound volume of *Assetto Corsa Compeitizione* by 10 percent.|
 | trigger | hotkey(s), [Optional] method | System | Triggers one or more hotkeys. This can be used to send keyboard commands to your simulator, for example. Each keyboard command is a [keyboard command hotkey](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#hotkeys). Use the vertical bar to separate between the individual commands, if there are more than one command. The optional argument for method specifies the communication method to send the keyboard commands. These are named "Event", Input", "Play", "Raw" and "Default". For whatever reason, there is not the one method, which works for every Windows installation. For me, "Event" works best and is therefore the standard, if you don't supply the argument. |
 | mouse | button, x, y, [Optional] count, [Optional] window | System | Clicks the specified mouse button (one of "Left", "Right" or "Middle") at the given location. You can supply the number of clicks using *count* and you can supply a target window using the optional parameter *window*. Coordinates are relative to the upper left corner of the *window*, if supplied, otherwise relative to the uper left corner of the screen. |
@@ -740,13 +586,13 @@ The conversations you have with your coach, will be transcribed to text files. Y
 
 #### Tab *Race Engineer*
 
-With the settings on this tab, the dynamic behaviour of the [Virtual Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer) and its integration with the [session database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database) can be customized. All options can be chosen independently for each configured simulation game.
+With the settings on this tab, the dynamic behaviour of the [Virtual Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer) and its integration with the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) can be customized. All options can be chosen independently for each configured simulation game.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%208.JPG)
 
 Choose the simulator with the topmost dropdown menu, before you change one of the settings beneath. In the first two groups, you can choose how the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) for a new session and how the cold tyre pressures reference values will be initialized, and whether the settings and the updated cold tyre pressures will be saved by the end of the session. If you choose to save the settings, selected information from your session (for example the fuel capacity, the best lap time and the average fuel consumption) will be used to update the session settings maintained by the *Race Settings* tool, either at the default location in the *Simulator Controller\Config* folder in you user *Documents* folder or in the corresponding settings information in the session database (depending on the origin of the settings as configured in the first group). If the settings had been loaded from the session database at the start of the session, these settings will be associated with the current simulator / car / track / weather combination, so that they will only be used in a similar situation.
 
-When initializing the settings for a session, you have two methods. The simple one "Load from previous session" uses all values as entered lately in the ["Race Settings" application](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race). But since this is a time consuming and partly recurring task, you can store a lot of default values in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database), which are used to initialize the settings when the second method "Load from Database" is selected. All values not found there will be loaded with the "Load from previous session" method as a fallback.
+When initializing the settings for a session, you have two methods. The simple one "Load from previous session" uses all values as entered lately in the ["Race Settings" application](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race). But since this is a time consuming and partly recurring task, you can store a lot of default values in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database), which are used to initialize the settings when the second method "Load from Database" is selected. All values not found there will be loaded with the "Load from previous session" method as a fallback.
 
 Please see the following table for an explanation of the different methods for initializing tyre pressures:
 
@@ -767,7 +613,7 @@ Similar as with the tab for the *Race Engineer*, the dynamic behaviour of the [V
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%209.JPG)
 
-In the first field, you can select a folder, where the *Race Strategist* will save the race data for after race analysis using the ["Race Reports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports) tool. Whether a report for a specific race will be saved, can be selected with "Save Race Report" setting further down below, which is specific for a given simulator. Choose this simulator with the "Simulator" dropdown menu, before you change one of the settings beneath. Then you can customize some parts of the statistical algorithms of Cato, the Virtual Race Strategist. The first field defines the number of laps, Cato uses to populate its data collection. During this period, most of the functions of Cato are not available, but the predictions of dynamic values will be much more precise afterwards. The second field, *Statistical Window*, is also quite important. It defines the number of recent laps, which are used for each and every statistical calculation, for example the standard deviation of lap times. If you set this to **0**, almost all statistical calculations will fail, what e.g. means that over- or undercut scenarios cannot be evaluated. The next field, *Damping Factor*, can be used to influence the calculation weight for each of those recent laps. If you want all laps to be considered with equal weight, set this to *0*, whereas a value o *0.2* will weigh each lap with *20%* less than the more recent lap before.
+In the first field, you can select a folder, where the *Race Strategist* will save the race data for after race analysis using the ["Race Reports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports) tool. Whether a report for a specific race will be saved, can be selected with "Save Race Report" setting further down below, which is specific for a given simulator. Choose this simulator with the "Simulator" dropdown menu, before you change one of the settings beneath. Then you can customize some parts of the statistical algorithms of Cato, the Virtual Race Strategist. The first field defines the number of laps, Cato uses to populate its data collection. During this period, most of the functions of Cato are not available, but the predictions of dynamic values will be much more precise afterwards. The second field, *Statistical Window*, is also quite important. It defines the number of recent laps, which are used for each and every statistical calculation, for example the standard deviation of lap times. If you set this to **0**, almost all statistical calculations will fail, what e.g. means that over- or undercut scenarios cannot be evaluated. The next field, *Damping Factor*, can be used to influence the calculation weight for each of those recent laps. If you want all laps to be considered with equal weight, set this to *0*, whereas a value o *0.2* will weigh each lap with *20%* less than the more recent lap before.
 With the "Save Telemetry" setting you specify, whether the telemetry data of the last session will be saved for further analysis in the "Strategy Workbench" tool. Although possible, I do not recommend to use “Ask” here, since it might interfere with a similar question by the Race Engineer to save your tyre pressures. Last, but not least, the "Race Review" drop down allows you to enable or disable a spoken review issued by the Race Strategist, when you have finished your race.
 
 Note: The settings for loading and saving the *Race Settings* specified on *Race Engineer* tab apply for the Virtual Race Strategist as well, as long as no other Assistants are active.
@@ -790,7 +636,7 @@ Good to know: The little button on the right side of the Simulator dropdown menu
 
 #### Going deeper into the rabbit hole
 
-After creating the general configuration using "Simulator Setup" or "Simulator Configuration", Simulator Controller will be already ready to race. But there are many more settings to customize the behaviour of Simulator Controller available in the [session database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database). These settings can be created for specific combinations of a simulator and a car and even track, thereby giving you great flexibility for the best possible experience. But there is a downside, you have to learn all these settings. Don't worry, all settings have a reasonable default, so you can start right away. Here is the documentation about all [available Race Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings).
+After creating the general configuration using "Simulator Setup" or "Simulator Configuration", Simulator Controller will be already ready to race. But there are many more settings to customize the behaviour of Simulator Controller available in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database). These settings can be created for specific combinations of a simulator and a car and even track, thereby giving you great flexibility for the best possible experience. But there is a downside, you have to learn all these settings. Don't worry, all settings have a reasonable default, so you can start right away. Here is the documentation about all [available Race Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings).
 
 #### Special configuration options for optimizing overall performance
 

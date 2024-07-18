@@ -109,13 +109,13 @@ class StrategySimulation {
 		this.iTelemetryDatabase := telemetryDatabase
 	}
 
-	createKnowledgeBase(productions, reductions, facts := false) {
-		local engine := RuleEngine(productions, reductions, facts)
+	createKnowledgeBase(productions, reductions, facts := false, includes := false) {
+		local engine := RuleEngine(productions, reductions, facts, includes)
 
 		return KnowledgeBase(engine, engine.createFacts(), engine.createRules())
 	}
 
-	loadRules(compiler, validator, &productions, &reductions) {
+	loadRules(compiler, validator, &productions, &reductions, &includes) {
 		local rules, message, title
 
 		rules := FileRead(kResourcesDirectory . "Strategy\Rules\Strategy Validation.rules")
@@ -123,13 +123,13 @@ class StrategySimulation {
 		productions := false
 		reductions := false
 
-		compiler.compileRules(rules, &productions, &reductions)
+		compiler.compileRules(rules, &productions, &reductions, &includes)
 
 		try {
 			rules := FileRead(getFileName(validator . ".rules", kUserHomeDirectory . "Validators\", kResourcesDirectory . "Strategy\Validators\"))
 
 			if (rules != "")
-				compiler.compileRules(rules, &productions, &reductions)
+				compiler.compileRules(rules, &productions, &reductions, &includes)
 		}
 		catch Any as exception {
 			message := (isObject(exception) ? exception.Message : exception)
@@ -168,7 +168,7 @@ class StrategySimulation {
 
 	scenarioValid(strategy, validator) {
 		local knowledgeBase, rules, rule, resultSet, ignore, pitstop
-		local number, tyreCompound, tyreCompoundColor, tyreSet, productions, reductions
+		local number, tyreCompound, tyreCompoundColor, tyreSet, productions, reductions, includes
 
 		if !strategy.isValid()
 			return false
@@ -185,10 +185,11 @@ class StrategySimulation {
 			if (validator != lastValidator) {
 				productions := false
 				reductions := false
+				includes := false
 
-				this.loadRules(compiler, validator, &productions, &reductions)
+				this.loadRules(compiler, validator, &productions, &reductions, &includes)
 
-				knowledgeBase := this.createKnowledgeBase(productions, reductions)
+				knowledgeBase := this.createKnowledgeBase(productions, reductions, false, includes)
 				rules := knowledgeBase.Rules
 			}
 			else {

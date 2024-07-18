@@ -42,13 +42,24 @@ If you click on then button "Controller Automation...", a new dialog will open u
 
 You can choose the context with the first two dropdown menus, for example 1. when no simulation is running or 2. when you are in a given simulator and there in a practice session. Then you select the *Modes* (see the documentation for [Plugins & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) for more information), which will be automatically activated for this context. Please note, that more than one mode will only make sense, if you have more than one hardware controller connected, and when each mode only use one of these hardware controllers exclusively.
 
-### Theme and Splash Screen configuration
+### Themes & Colors
 
-In the lower part of the settings dialog, you can choose one of the color schemes to be used for all applications and you can select one of the [splash screens](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#splash-screen-editor), which will be used for your entertainment during the startup process. Please see the [installation guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#using-your-own-pictures-videos-and-sounds-for-all-the-splash-screens) on how to install your own media files in a special location in your *Documents* folder and hot to use the splash screen editor. If you decide to play a song while starting your Simulator Controller applications and even your favorite simulation game, the song will keep playing until you press the left mouse button or the Escape key, even if *Simulator Startup* has exited already.
+In the lower part of the settings dialog, you can choose one of the color schemes (see below) to be used for all applications and you can select one of the [splash screens](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#splash-screen-editor), which will be used for your entertainment during the startup process. Please see the [installation guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#using-your-own-pictures-videos-and-sounds-for-all-the-splash-screens) on how to install your own media files in a special location in your *Documents* folder and hot to use the splash screen editor. If you decide to play a song while starting your Simulator Controller applications and even your favorite simulation game, the song will keep playing until you press the left mouse button or the Escape key, even if *Simulator Startup* has exited already.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Splash%20Screen.JPG)
 
 Last, but not least, you can choose a simulation game from your list of Simulators and start it automatically, after all other startup tasks have finished.
+
+#### Color Schemes
+
+Four different color schemes are available:
+
+| Scheme     | Description                                                                    | Example |
+|------------|--------------------------------------------------------------------------------|---------|
+| Classic    | This is the default and original color scheme with a light gray background.    | ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Theme%20Classic.JPG) |
+| Gray       | Quite similar to *Classic*, but with darker gray tones.                        | ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Theme%20Gray.JPG) |
+| Light      | A very bright color scheme using the default colors of Windows 10 / 11.        | ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Theme%20Light.JPG) |
+| Dark       | Fully Inverted color scheme based on the dark color scheme of Windows 10 / 11. | ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Theme%20Dark.JPG) |
 
 ### More Settings & Configurations
 
@@ -176,7 +187,7 @@ In many cases all drivers in a given team want to share the same configuration. 
 
 4. *Exports from the "Session Database"*
 
-   You can prepare any number of exports from your session database you want to share with your team mates. Normally you want to use the Control key while exporting the settings from your "Session Database", so that everythig is included. You can also export telemetry data, track maps and other stuff from the [administration page](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#administration) of the "Session Database". Put all the export folders into the folder of the team package.
+   You can prepare any number of exports from your session database you want to share with your team mates. Normally you want to use the Control key while exporting the settings from your "Session Database", so that everythig is included. You can also export telemetry data, track maps and other stuff from the [administration page](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#administration) of the "Session Database". Put all the export folders into the folder of the team package.
    
 The content of a typical folder of common team settings should look like this:
 
@@ -212,7 +223,7 @@ Please don't forget to press the *Push-To-Talk* button at the end of your speech
 	
 Both, the Virtual Race Engineer and the Virtual Race Strategist will start up and will listen to your commands (Jona will be a german personality, while Cato will use English to talk with you). Please note, that if you configured [*Push-To-Talk*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) in the configuration, you need to hold the respective button, while talking. Since no simulation will be running during your test, the functionality of Jona und Cato will be quite restricted, but you may switch between those Assistants using the activation phrase and you may ask some questions like "Is rain ahead?" or "Wird es regnen?". You may also start the Virtual Race Spotter here, but this will be of no big use, since the Spotter does not answer many questions.
 
-Good to know: When you start the test mode, the Assistants will use the values from the current configuration, i.e. language, configured voices, and so on. Normally, the configured conversation boosters will not be activated, since this won't add any value, when testing the *Push-To-Talk* functionality. If you hold down the Control key when clicking the "Play" button, however, any configured conversation boosters will be started up as well.
+Good to know: When you start the test mode, the Assistants will use the values from the current configuration, i.e. language, configured voices, and so on. Normally, the configured Assistant Boosters will not be activated, since this won't add any value, when testing the *Push-To-Talk* functionality. If you hold down the Control key when clicking the "Play" button, however, any configured Assistant Boosters will be started up as well.
 
 *Important*: When using the voice test, depending on the chosen recognizer, it might necessary to use the double-press for activation commands (see [above](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#activation-commands-vs-normal-commands)). If there is only *one* dialog partner configured, this will be activated for listen mode by default. In this situation, no activation command is necesssary.
 

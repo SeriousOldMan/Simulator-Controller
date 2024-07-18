@@ -804,7 +804,7 @@ class AssettoCorsaCarMetas extends DownloadablePreset {
 		if (Trim(url) != "") {
 			updateTask := PeriodicTask(updateProgress, 50, kInterruptPriority)
 
-			showProgress({title: translate("Downloading Components"), message: translate("Downloading...")})
+			showProgress({color: "Blue", title: translate("Downloading Components"), message: translate("Downloading...")})
 
 			updateTask.start()
 
@@ -812,7 +812,7 @@ class AssettoCorsaCarMetas extends DownloadablePreset {
 
 			DirCreate(A_Temp . "\Simulator Controller DLC")
 
-			showProgress({message: translate("Extracting...")})
+			showProgress({color: "Green", message: translate("Extracting...")})
 
 			RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Simulator Controller DLC.zip' -DestinationPath '" . A_Temp . "\Simulator Controller DLC' -Force", , "Hide")
 
@@ -950,7 +950,7 @@ class SplashMedia extends DownloadablePreset {
 		if (Trim(url) != "") {
 			updateTask := PeriodicTask(updateProgress, 50, kInterruptPriority)
 
-			showProgress({title: translate("Downloading Components"), message: translate("Downloading...")})
+			showProgress({color: "Blue", title: translate("Downloading Components"), message: translate("Downloading...")})
 
 			updateTask.start()
 
@@ -958,7 +958,7 @@ class SplashMedia extends DownloadablePreset {
 
 			DirCreate(A_Temp . "\Simulator Controller DLC")
 
-			showProgress({message: translate("Extracting...")})
+			showProgress({color: "Green", message: translate("Extracting...")})
 
 			RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Simulator Controller DLC.zip' -DestinationPath '" . A_Temp . "\Simulator Controller DLC' -Force", , "Hide")
 
@@ -1073,7 +1073,7 @@ class SettingsImport extends NamedPreset {
 				OnMessage(0x44, translator, 0)
 
 				if (folder != "") {
-					showProgress({title: translate("Importing settings")})
+					showProgress({color: "Green", title: translate("Importing settings")})
 
 					this.importSettings(folder, &progress)
 
@@ -1279,11 +1279,11 @@ class ModulesStepWizard extends StepWizard {
 
 			widget1 := window.Add("Picture", "x" . x . " y" . y . " w30 h30 Y:Move(" . factor . ") Hidden", kResourcesDirectory . "Setup\Images\Module.png")
 			widget2 := window.Add("Text", "x" . labelX . " y" . labelY . " w" . labelWidth . " h26 Y:Move(" . factor . ") Hidden", label)
-			widget3 := window.Add("CheckBox", "Checked" . selected . " x" . checkX . " y" . labelY . " w23 h23 X:Move Y:Move(" . factor . ") Hidden")
+			widget3 := window.Add("CheckBox", "Checked" . selected . " x" . checkX . " y" . labelY . " w23 h21 X:Move Y:Move(" . factor . ") Hidden")
 			widget3.OnEvent("Click", updateSelectedModules)
 			widget4 := window.Add("HTMLViewer", "x" . x . " yp+26 w" . width . " h120 Y:Move(" . factor . ") W:Grow H:Grow(0.33) Hidden")
 
-			html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+			html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, p, body { color: #" . window.Theme.TextColor . "}</style>" . info . "</body></html>"
 
 			widget4.document.write(html)
 
@@ -1336,7 +1336,7 @@ class ModulesStepWizard extends StepWizard {
 
 		widget7 := window.Add("HTMLViewer", "x" . x . " ys+229 w" . width . " h210 Y:Move(0.7) W:Grow H:Grow(0.3) VpresetsInfoText Hidden")
 
-		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, p, body { color: #" . window.Theme.TextColor . "}</style>" . info . "</body></html>"
 
 		widget7.document.write(html)
 
@@ -1521,7 +1521,7 @@ class ModulesStepWizard extends StepWizard {
 
 		info := "<div style='font-family: Arial, Helvetica, sans-serif; font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
-		html := "<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+		html := "<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, p, body { color: #" . this.Window.Theme.TextColor . "}</style>" . info . "</body></html>"
 
 		this.Control["presetsInfoText"].document.open()
 		this.Control["presetsInfoText"].document.write(html)

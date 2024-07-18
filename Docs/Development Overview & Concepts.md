@@ -153,6 +153,10 @@ The *ACCPlugin* is aware of "Assetto Corsa Competizione", as you can see by the 
 
 Note: With the introduction of Release 2.0, the *ACC* plugin has become much more capable. The above example shows only a fraction of the functionality of this plugin for didactical reasons.
 
+## Rule Engine
+
+A very important part of many applications of Simulator Controller, especially the Virtual Race Assistants, is the builtin Hybrid Rule Engine. This has been created exclusively for Simulator Controller and requires therefore its own documentation. You can find that documentation in a [separate chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine).
+
 ## Debugging
 
 As capable, as the AutoHotkey language is, as bad is it, when it comes to avoiding code errors. I like dynamically typed languages, as long as they support the developer good enough to understand the errors introduced by mixing types of variables and values. AutoHotkey is different. Since everything is build around key/value structured objects and a reference to an unknown key simply yields an empty value, the following expression will execute without error, even if the *myObject* is not of the right type or even *false* itself.
@@ -372,11 +376,15 @@ The instructions are used to provide the LLM of the Driving Coach with informati
 
 where *LC* stands for the language code.
 
-### Instructions for the GPT-based Conversation Boosters
+### Instructions for the GPT-based Assistant Boosters
 
-Very much like the Driving Coach, a GPT service can be used to extend the conversational capabilities fo the *normal* Race Assistants. In those cases, instructions are also used to create a setting for the LLM to behave like an Engineer, for example, and also to provide additional data about the current session, the state of the car, and so on, to the LLM. All instructions are used as defaults in the configuration and can be altered by the user here as well. The language specific default instructions can be found in *Resources\Translations* in the programm installation folder. They are named 
+Very much like the Driving Coach, a GPT service can be used to extend the conversational and behavioral capabilities fo the *normal* Race Assistants. In those cases, instructions are also used to create a setting for the LLM to behave like an Engineer, for example, and also to provide additional data about the current session, the state of the car, and so on, to the LLM. All instructions are used as defaults in the configuration and can be altered by the user here as well. The language specific default instructions can be found in *Resources\Translations* in the programm installation folder. They are named 
 
 	Conversation Booster.instructions.LC
+	
+	and
+	
+	Agent Booster.instructions.LC
 
 where *LC* stands for the language code.
 

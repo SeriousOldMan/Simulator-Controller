@@ -293,8 +293,8 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		setButtonIcon(widget6, kIconsDirectory . "Locale.ico", 1, "L4 T4 R4 B4")
 		widget7 := window.Add("DropDownList", "xp+24 yp w96 VuiLanguageDropDown Hidden", choices)
 
-		widget8 := window.Add("CheckBox", "x" . x . " yp+30 w242 h23 Checked1 VstartWithWindowsCheck Hidden", translate("Start with Windows"))
-		widget9 := window.Add("CheckBox", "x" . x . " yp+24 w242 h23 Checked0 VsilentModeCheck Hidden", translate("Silent mode (no splash screen, no sound)"))
+		widget8 := window.Add("CheckBox", "x" . x . " yp+30 w242 h21 Checked1 VstartWithWindowsCheck Hidden", translate("Start with Windows"))
+		widget9 := window.Add("CheckBox", "x" . x . " yp+24 w242 h21 Checked0 VsilentModeCheck Hidden", translate("Silent mode (no splash screen, no sound)"))
 
 		window.SetFont("Bold", "Arial")
 
@@ -317,7 +317,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 
 		widget16 := window.Add("HTMLViewer", "x" . x . " yp+118 w" . width . " h94 Y:Move(0.5) H:Grow(0.5) W:Grow Hidden")
 
-		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, p, body { color: #" . window.Theme.TextColor . "}</style>" . info . "</body></html>"
 
 		widget16.document.write(html)
 

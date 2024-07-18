@@ -61,8 +61,11 @@ global vPitstopRepairEngine := kNotInitialized
 
 class TestRaceEngineer extends RaceEngineer {
 	__New(configuration, settings, remoteHandler := false, name := false, language := kUndefined, synthesizer := false, speaker := false, vocalics := false, speakerBooster := false
-		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, muted := false, voiceServer := false) {
-		super.__New(configuration, remoteHandler, name, language, synthesizer, speaker, vocalics, speakerBooster, recognizer, listener, listenerBooster, conversationBooster, muted, voiceServer)
+		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, agentBooster := false
+		, muted := false, voiceServer := false) {
+		super.__New(configuration, remoteHandler, name, language, synthesizer, speaker, vocalics, speakerBooster
+				  , recognizer, listener, listenerBooster, conversationBooster, agentBooster
+				  , muted, voiceServer)
 
 		this.updateConfigurationValues({Settings: settings})
 
@@ -90,8 +93,8 @@ class TestRaceEngineer extends RaceEngineer {
 			this.updateConfigurationValues({Announcements: {FuelWarning: true, DamageReporting: true, DamageAnalysis: true, PressureReporting: true, WeatherUpdate: true}})
 	}
 
-	lowFuelWarning(remainingLaps) {
-		super.lowFuelWarning(remainingLaps)
+	lowFuelWarning(remainingFuel, remainingLaps) {
+		super.lowFuelWarning(remainingFuel, remainingLaps)
 
 		if isDebug()
 			showMessage("Low fuel warning - " . remainingLaps . " lap left")
@@ -1056,7 +1059,7 @@ else {
 	raceNr := (GetKeyState("Alt") ? 18 : ((GetKeyState("Shift") ? 2 : 1)))
 
 	engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer.settings")
-							   , TestPitStopHandler(), "Tina", "EN", true, true, false, true, true, true, true, true)
+							   , TestPitStopHandler(), "Tina", "EN", true, true, false, true, true, true, true, true, true)
 
 	engineer.VoiceManager.setDebug(kDebugGrammars, false)
 
@@ -1422,7 +1425,7 @@ else {
 }
 
 show(context, args*) {
-	showMessage(values2string(A_Space, args*), "Race Engineer Test", "Information.png", 2500)
+	showMessage(values2string(A_Space, args*), "Race Engineer Test", "Information.ico", 2500)
 
 	return true
 }

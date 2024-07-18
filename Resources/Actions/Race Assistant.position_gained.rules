@@ -1,0 +1,5 @@
+; The rules below will raise an event, if one or more positions has been gained.
+
+{None: [?Position.Last]} => (Set: Position.Last, !Position)
+
+{All: [?Position < ?Position.Last]} => (Set: Position.Last, ?Position), (Call: Assistant.Raise(PositionGained))

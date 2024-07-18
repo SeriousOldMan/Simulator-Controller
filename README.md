@@ -39,7 +39,7 @@ An automated update mechanism for local configuration databases exists since Rel
 
 [5.7.9.0-release](https://cutt.ly/eefkWlXJ) (Changes: Initialize from Session now takes stint plan first in "Race Center", Adding and removing stints from the stint plan now runs a full plan update in "Race Center", Team Management tab in "Simulator Configuration" removed, Removed retired cars from Spotter observation, Better support for late join in "Practice Center".)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-579) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-579) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.8.0.0-beta](https://cutt.ly/WejkMA6C) (Changes: Full implementation of an Agent framwork to include LLMs in the reasoning process of the Race Assistants, Renamed "Conversion Booster" to "Assistant Booster", Added new documention chapter on "Customizing Assistants", New post compilation compression makes binaries much smaller, All new documentation for the rule engine, "Strategy Workbench" has now its own documentation chapter, "Practice Center" has now its own documentation chapter, "Race Reports" has now its own documentation chapter, "Session Database" has now its own documentation chapter, "Race Center" has now its own documentation chapter, New color scheme names, New dark color scheme, "Simulator Tools" ask before a non-release version is installed, Extended knowledge for LLM with historic lap data, New speak controller action function, New play controller action function, "speak" and "play" are available as triggered actions in Track Automations.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-580) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 
@@ -113,7 +115,7 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 26. [Strategy Development Revisited again](https://youtu.be/rCnYFTLX2L4) - This video will take another look at the "Strategy Workbench" and demonstrates a couple of new options, which allow you to create very special strategies.
 
-27. [Connecting Assistants to GPT](https://youtu.be/4tq-2bnEIXE) - We introduce the new GPT-based conversation booster for the Assistants. Using this booster you can create a very life-like communication with the Assistants.
+27. [Connecting Assistants to GPT](https://youtu.be/4tq-2bnEIXE) - We introduce the new GPT-based Conversation Booster for the Assistants. Using this booster you can create a very life-like communication with the Assistants.
 
 This list will be extended from time to time to cover new functionalities.
 
@@ -175,11 +177,11 @@ The Virtual Driving Coach can use LLM runtimes of OpenAI or Azure, but if your P
 
 An AI based Race Engineer with fully dialog capable voice control will guide you through your race, warn you about critical technical issues and will help you with the pitstop, whereas the Race Strategist keeps an eye on the race positions, develops a pitstop strategy, and so on. These smart chat bots are independent applications, but are integreated with the ACC and other simulation game plugins using interprocess communication right now. An integration for a new simulation games requires some effort, especially for the necessary data acquisition from the simulation game, but a knowledged programmer can manage it in about three to four hours.
 
-Based on the data sets, that are acquired during your sessions by the Virtual Race Assistants, a very flexible tool allows you to [analyze your performance](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports) and the performance of your opponents in many different ways.
+Based on the data sets, that are acquired during your sessions by the Virtual Race Assistants, a very flexible tool allows you to [analyze your performance](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports) and the performance of your opponents in many different ways.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Reports%202.JPG)
 
-Another capability of the Virtual Race Strategist is to support you during the [development of a strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-workbench) for an upcoming race using the telemetry data of past sessions on the same track in similar conditions.
+Another capability of the Virtual Race Strategist is to support you during the [development of a strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench) for an upcoming race using the telemetry data of past sessions on the same track in similar conditions.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Workbench.JPG)
 

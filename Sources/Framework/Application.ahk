@@ -298,6 +298,9 @@ checkForUpdates() {
 		}
 
 		if check {
+			if FileExist(kUserConfigDirectory . "VERSION")
+				FileSetTime(A_Now, kUserConfigDirectory . "VERSION")
+
 			release := readMultiMap(kUserConfigDirectory . "VERSION")
 			version := getMultiMapValue(release, "Release", "Version", getMultiMapValue(release, "Version", "Release", false))
 
@@ -335,8 +338,6 @@ checkForUpdates() {
 
 						ExitApp(0)
 					}
-					else if FileExist(kUserConfigDirectory . "VERSION")
-						FileSetTime(A_Now, kUserConfigDirectory . "VERSION")
 				}
 			}
 		}
@@ -459,7 +460,7 @@ startupApplication() {
 	guardExit(arguments*) {
 		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
 			return false
-		
+
 		if (isCritical() && kGuardExit && !GetKeyState("Ctrl")) {
 			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgBox, translate("Please wait until all tasks have been finished."), StrSplit(A_ScriptName, ".")[1], 262192)

@@ -2876,7 +2876,7 @@ runUpdateTargets(&buildProgress) {
 
 		Sleep(50)
 
-		progressStep := ((100 / (gTargetsCount + 1)) / target[2].Length)
+		progressStep := (100 / (gTargetsCount + 1))
 
 		for ignore, updateFunction in target[2] {
 			if !kSilentMode {
@@ -2892,10 +2892,8 @@ runUpdateTargets(&buildProgress) {
 
 			Sleep(50)
 
-			buildProgress := Round(buildProgress + progressStep)
+			buildProgress += Ceil(buildProgress + progressStep)
 		}
-
-		buildProgress += (100 / (gTargetsCount + 1))
 
 		if !kSilentMode
 			showProgress({progress: buildProgress})
@@ -2975,7 +2973,7 @@ runCleanTargets(&buildProgress) {
 
 		Sleep(50)
 
-		buildProgress += (100 / (gTargetsCount + 1))
+		buildProgress += Ceil(100 / (gTargetsCount + 1))
 
 		if !kSilentMode
 			showProgress({progress: buildProgress})
@@ -3048,7 +3046,7 @@ runCopyTargets(&buildProgress) {
 
 					Sleep(50)
 
-					buildProgress += (100 / (gTargetsCount + 1))
+					buildProgress += Ceil(100 / (gTargetsCount + 1))
 
 					if !kSilentMode
 						showProgress({progress: buildProgress})
@@ -3121,7 +3119,7 @@ runCopyTargets(&buildProgress) {
 
 				Sleep(50)
 
-				buildProgress += (100 / (gTargetsCount + 1))
+				buildProgress += Ceil(100 / (gTargetsCount + 1))
 
 				if !kSilentMode
 					showProgress({progress: buildProgress})
@@ -3246,7 +3244,7 @@ runBuildTargets(&buildProgress) {
 			}
 		}
 
-		buildProgress += (100 / (gTargetsCount + 1))
+		buildProgress += (Ceil(100 / (gTargetsCount + 1)) * 3)
 
 		if !kSilentMode
 			showProgress({progress: buildProgress})
@@ -3254,7 +3252,7 @@ runBuildTargets(&buildProgress) {
 }
 
 prepareTargets(&buildProgress, updateOnly) {
-	global gUpdateTargets
+	global gUpdateTargets, gTargetsCount
 
 	local counter := 0
 	local targets := readMultiMap(kToolsTargetsFile)
@@ -3285,6 +3283,8 @@ prepareTargets(&buildProgress, updateOnly) {
 				gUpdateTargets.Push(Array(target, string2Values(",", arguments[1]), []))
 			else
 				gUpdateTargets.Push(Array(target, string2Values(",", arguments[2]), string2Values(",", arguments[1])))
+
+			gTargetsCount += 1
 		}
 
 		Sleep(50)
@@ -3308,6 +3308,8 @@ prepareTargets(&buildProgress, updateOnly) {
 				arguments := substituteVariables(arguments)
 
 				gCleanupTargets.Push(Array(target, string2Values(",", arguments)*))
+
+				gTargetsCount += 1
 			}
 
 			Sleep(50)
@@ -3328,6 +3330,8 @@ prepareTargets(&buildProgress, updateOnly) {
 				rule := string2Values("<-", substituteVariables(arguments))
 
 				gCopyTargets.Push(Array(target, rule[2], rule[1]))
+
+				gTargetsCount += 1
 			}
 
 			Sleep(50)
@@ -3353,6 +3357,8 @@ prepareTargets(&buildProgress, updateOnly) {
 
 					gBuildTargets.Push(Array(target, arguments[1], rule[1], string2Values(",", arguments[2])))
 				}
+
+				gTargetsCount += 1
 			}
 
 			Sleep(50)
@@ -3408,13 +3414,17 @@ startupSimulatorTools() {
 
 	buildProgress := 0
 
+	gTargetsCount := 0
+
 	prepareTargets(&buildProgress, updateOnly)
 
-	gTargetsCount := (gUpdateTargets.Length + gCleanupTargets.Length + gCopyTargets.Length + gBuildTargets.Length
-					+ (((kMSBuildDirectory != "") && (gSpecialTargets.Length > 0)) ? getFileNames("*", kSourcesDirectory . "Special\").Length : 0))
+	; gTargetsCount := (gUpdateTargets.Length + gCleanupTargets.Length + gCopyTargets.Length + gBuildTargets.Length
+	; 				+ (((kMSBuildDirectory != "") && (gSpecialTargets.Length > 0)) ? getFileNames("*", kSourcesDirectory . "Special\").Length : 0))
 
 	if !kSilentMode
-		showProgress({message: "", color: "Green", title: translate("Running Targets")})
+		showProgress({message: "", progress: 0, color: "Green", title: translate("Running Targets")})
+
+	buildProgress := 0
 
 	runUpdateTargets(&buildProgress)
 

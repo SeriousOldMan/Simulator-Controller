@@ -1,11 +1,11 @@
-## 5.8.0.0-release 08/02/24 (planned)
+## 5.8.0.0-release 07/19/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Renamed "Conversation Booster" to "Assistant Booster" throughout the documentation.
   4. All documentation regarding the different Assistant Boosters has been collected into a dedicated [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants).
   5. The knowledge made available to the different Assistant Boosters has been extended massively. A full history of recent laps is now included, which allow the LLM (if smart enough) to make very precise decisions.
   6. A new Assistant Booster has been implemented, which let you integrate an LLM into the reasoning process of an Assistant.
-	 - This Agent booster can use a different GPT service and LLM than the other conversation-related Assistant Boosters.
+	 - This *Reasoning* booster can use a different GPT service and LLM than the other conversation-related Assistant Boosters.
      - Events raised by the rule system of an Assistant or by rules defined on your own can be used to create a request to an LLM.
 	 - The LLM then can use any of the predefined actions or actions defined on your own to handle this event or situation.
 	 - Actions triggered this way can raise other events, thereby creating a complex chain of thought for the LLM.

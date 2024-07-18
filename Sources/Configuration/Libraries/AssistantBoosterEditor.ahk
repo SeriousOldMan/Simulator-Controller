@@ -1291,7 +1291,6 @@ class CallbacksEditor {
 				else
 					this.ScriptEditor.Enabled := false
 
-
 				this.CallableField[2].Enabled := false
 
 				this.Control["callbackNameEdit"].Enabled := false
@@ -1346,7 +1345,8 @@ class CallbacksEditor {
 
 			if (this.Control["callbackTypeDropDown"].Value != 0) {
 				if (this.Type = "Agent.Events") {
-					if (this.Control["callbackTypeDropDown"].Text = translate("Event Disabled"))
+					if ((this.SelectedCallback.Disabled)
+					 || (this.Control["callbackTypeDropDown"].Text = translate("Event Disabled")))
 						type := ((this.SelectedCallback.Type = "Assistant.Class") ? "Class" : "Rule")
 					else
 						type := ["Class", "Rule", "Disabled"][this.Control["callbackTypeDropDown"].Value]
@@ -1449,8 +1449,10 @@ class CallbacksEditor {
 				this.Control["callbackTypeDropDown"].Delete()
 
 				if callback.Builtin {
-					if callback.Disabled
+					if callback.Disabled {
 						this.Control["callbackTypeDropDown"].Add(collect(["Event Enabled", "Event Disabled"], translate))
+						this.Control["callbackTypeDropDown"].Choose(2)
+					}
 					else
 						this.Control["callbackTypeDropDown"].Add(collect(["Event Class", "Event Rule", "Event Disabled"], translate))
 				}

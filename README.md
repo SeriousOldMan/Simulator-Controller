@@ -39,7 +39,7 @@ An automated update mechanism for local configuration databases exists since Rel
 
 [5.7.9.0-release](https://cutt.ly/eefkWlXJ) (Changes: Initialize from Session now takes stint plan first in "Race Center", Adding and removing stints from the stint plan now runs a full plan update in "Race Center", Team Management tab in "Simulator Configuration" removed, Removed retired cars from Spotter observation, Better support for late join in "Practice Center".)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-579) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-579) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.8.0.0-beta](https://cutt.ly/WejkMA6C) (Changes: Full implementation of an Agent framwork to include LLMs in the reasoning process of the Race Assistants, Renamed "Conversion Booster" to "Assistant Booster", Added new documention chapter on "Customizing Assistants", New post compilation compression makes binaries much smaller, All new documentation for the rule engine, "Strategy Workbench" has now its own documentation chapter, "Practice Center" has now its own documentation chapter, "Race Reports" has now its own documentation chapter, "Session Database" has now its own documentation chapter, "Race Center" has now its own documentation chapter, New color scheme names, New dark color scheme, "Simulator Tools" ask before a non-release version is installed, Extended knowledge for LLM with historic lap data, New speak controller action function, New play controller action function, "speak" and "play" are available as triggered actions in Track Automations.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-580) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

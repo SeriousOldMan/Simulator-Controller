@@ -377,6 +377,17 @@ Below you find all instruction categories and the supported variables:
 
 (1) Each phrase is available in different languages, for example "Rephrase (DE)" for the German version.
 
+## How it works
+
+Since the control flow between the rule engine and the LLM especially for the *Reasoning* booster is not exactly easy to understand at the beginning - and since, as we all know, a picture is worth a thousand words - here is a picture.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Agent%20Flow.JPG)
+
+1. It all starts with an event, typically signalled by the rule engine. An event will be in most cases a special condition in the state of the car or the session (fuel is running low, weather is changing, and so on). There are many predefined events available, which you can find below and you can define your own events, of course.
+2. The event will generate a command or information phrase for the LLM and this will be passed to the GPT service together with a complete representation of the current knowledge, as show above, and a list of available actions to call.
+3. The LLM can decide to *call* one or more of these actions, which then will be executed in parallel.
+4. An action can do almost anything. Typically it triggers a special behaviour of the Assistant, for example, create a pitstop plan, but it can also call any of the available [action functions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) in Simulator Controller, or it can generate voice output, or ...
+
 ## Managing Actions
 
 A special editor is provided to manage the actions for a given Assistant. An action allows the LLM not only to react with a message to your request, but also to trigger some predefined functions. There are several predefined actions available for the different assistants, but you can also define your own ones.

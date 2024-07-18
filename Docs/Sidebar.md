@@ -242,6 +242,7 @@
     - [Conversation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#conversation-booster)
     - [Reasoning](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster)
   - [Instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#instructions)
+  - [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#how-it-works)
   - [Managing Actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions)
   - [Managing Events](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-events)
   - [Predefined Actions & Events](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#predefined-actions--events)

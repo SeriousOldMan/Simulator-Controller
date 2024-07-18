@@ -31,7 +31,7 @@
   15. [Internal] Implemented a postprocessor for the compiler which compresses the binary files. The applications are much smaller now.
   16. [Internal] Migrated to AHK 2.1-alpha.14 (needed for dark color scheme).
   17. [Developer] A new class library (*LLMAgent*) supports a full recursive round-trip between the rule engine and an associated LLM. Using this architecture, fully autonomous agents can be configured.
-  18. [Developer] A new class library (*CodeEditor*) integrates the "SciTex" editor with an easy to use programmin interface.
+  18. [Developer] A new class library (*CodeEditor*) integrates the "SciTex" editor with an easy to use programming interface.
 
 ## 5.7.9.0-release 07/05/24
   1. Minor bugfixes, as always

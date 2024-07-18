@@ -425,7 +425,7 @@ class LightTheme extends Theme {
 
 class DarkTheme extends Theme {
 	static sDarkColors := CaseInsenseMap("Background", "202020", "AltBackground", "2F2F2F", "Controls", "404040"
-									   , "Font", "E0E0E0", "DsbldFont", "606060", "PssvFont", "404040")
+									   , "Font", "D0D0D0", "DsbldFont", "808080", "PssvFont", "505050")
 	static sTextBackgroundBrush := DllCall("gdi32\CreateSolidBrush", "UInt", DarkTheme.sDarkColors["Background"], "Ptr")
 
 	class DarkCheckBox extends Gui.CheckBox {

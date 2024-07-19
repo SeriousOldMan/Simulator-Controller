@@ -23,6 +23,7 @@
 	  - Gray (formerly named "Dark")
 	  - Light (formerly named "Windows", uses the default Windows colors)
 	  - Dark (new, uses the dark theme colors of Windows 10 / 11)
+	  
 	  See the updated [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#color-schemes) for some examples.
   11. A new [controller action functions "speak"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allows you to output spoken messages from your controller scripts.
   12. A new [controller action functions "play"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allows you to play sound files from your controller scripts.

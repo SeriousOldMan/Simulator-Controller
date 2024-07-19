@@ -478,7 +478,7 @@ Here is a very simple example:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Action%20Definition.JPG)
 
-This action calls the [controller acton]((https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions)) "trigger" with "!w" as an argument in the Simulator Cntroller process. This sends the keyboard command Alt-w to the current simulator, thereby starting the windscreen wiper. This action may be activated by a voice command like "Can you start the windscreen wiper?" when using the *Conversation* booster, or it can be automatically triggered by the *Reasoning* booster, when event is signalled that tells that it just start raining.
+This action calls the [controller acton]((https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions)) "trigger" with "!w" as an argument in the Simulator Cntroller process. This sends the keyboard command Alt-w to the current simulator, thereby starting the windscreen wiper. This action may be activated by a voice command like "Can you start the windscreen wiper?" when using the *Conversation* booster, or it can be automatically triggered by the *Reasoning* booster, when an event is signalled that tells that it just started raining.
 
 ## Managing Events
 

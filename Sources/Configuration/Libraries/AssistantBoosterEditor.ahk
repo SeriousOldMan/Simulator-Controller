@@ -181,7 +181,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		editorGui.SetFont("Norm", "Arial")
 
 		editorGui.Add("Documentation", "x178 YP+20 w128 H:Center Center", translate("Assistant Booster")
-					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm")
+					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#connecting-an-assistant-to-an-llm")
 
 		editorGui.SetFont("Norm", "Arial")
 
@@ -1109,13 +1109,13 @@ class CallbacksEditor {
 
 		if (this.Type = "Conversation.Actions")
 			editorGui.Add("Documentation", "x308 YP+20 w248 H:Center Center", translate("Conversation Actions")
-						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-actions")
+						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions")
 		else if (this.Type = "Agent.Actions")
 			editorGui.Add("Documentation", "x308 YP+20 w248 H:Center Center", translate("Reasoning Actions")
-						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-actions")
+						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions")
 		else
 			editorGui.Add("Documentation", "x308 YP+20 w248 H:Center Center", translate("Reasoning Events")
-						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-events")
+						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-events")
 
 		editorGui.SetFont("Norm", "Arial")
 

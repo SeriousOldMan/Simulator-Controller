@@ -1,6 +1,6 @@
 ## Preamble
 
-Everything presented in this chapter is fully optional and I even recommend to not use it right from the start, since it requires some effort to configure. But, once you have mastered it, it will take the experience with the Assistants to a whole new level. Welcome to the world of GPT and large language models.
+Everything presented in this chapter is fully optional and I even recommend to not use it right from the start, since it requires some effort to configure. But, once you have mastered it, it will take the experience with the Assistants to a whole new level. Welcome to the fascinating world of GPT and large language models (aka LLMs).
 
 ## Introduction
 

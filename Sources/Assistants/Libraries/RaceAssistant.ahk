@@ -1068,7 +1068,10 @@ class RaceAssistant extends ConfigurationItem {
 	getKnowledge(type, options := false) {
 		local knowledgeBase := this.KnowledgeBase
 		local knowledge := Map()
-		local lapNumber, tyreSet, lapNr, laps
+		local simulator := this.SettingsDatabase.getSimulatorName(this.Simulator)
+		local car := this.SettingsDatabase.getCarName(this.Simulator, this.Car)
+		local track := this.SettingsDatabase.getTrackName(this.Simulator, this.Track)
+		local lapNumber, tyreSet, lapNr, laps, tyreSets, tyreCompound
 
 		static sessionTypes
 
@@ -1081,15 +1084,25 @@ class RaceAssistant extends ConfigurationItem {
 		if knowledgeBase {
 			lapNumber := knowledgeBase.getValue("Lap", 0)
 
-			if this.activeTopic(options, "Session")
-				knowledge["Session"] := Map("Simulator", this.SettingsDatabase.getSimulatorName(this.Simulator)
-										  , "Car", this.SettingsDatabase.getCarName(this.Simulator, this.Car)
-										  , "Track", this.SettingsDatabase.getTrackName(this.Simulator, this.Track)
+			if this.activeTopic(options, "Session") {
+				tyreSets := []
+
+				for ignore, tyreCompound in SessionDatabase.getTyreCompounds(simulator, this.Car, this.Track)
+					tyreSets.Push(Map("Compound", tyreCompound, "Sets", 99
+									, "Weather", InStr(tyreCompound, "Dry") ? ["Dry", "Drizzle"]
+																			: (InStr(tyreCompound, "Wet") ? ["LightRain", "MediumRain", "HeavyRain", "Thunderstorm"]
+																										  : ["Drizzle", "LightRain"])))
+
+				knowledge["Session"] := Map("Simulator", simulator
+										  , "Car", car
+										  , "Track", track
 										  , "TrackLength", (this.TrackLength . " Meters")
 										  , "Type", sessionTypes[this.Session]
 										  , "Format", knowledgeBase.getValue("Session.Format", "Time")
 										  , "RemainingLaps", Ceil(knowledgeBase.getValue("Lap.Remaining.Session", 0))
-										  , "RemainingTime", (Round(knowledgeBase.getValue("Session.Time.Remaining") / 1000) . " seconds"))
+										  , "RemainingTime", (Round(knowledgeBase.getValue("Session.Time.Remaining") / 1000) . " seconds")
+										  , "AvailableTyres", tyreSets)
+			}
 
 			if this.activeTopic(options, "Stint")
 				knowledge["Stint"] := Map("Driver", this.DriverFullName

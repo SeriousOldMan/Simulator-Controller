@@ -255,6 +255,18 @@ Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 			"Track": "Barcelona",
 			"TrackLength": "0 Meters",
 			"Type": "Practice"
+			"AvailableTyres": [
+				{
+					"Compound": "Dry (Black)",
+					"Sets": 99,
+					"Weather": [ "Dry", "Drizzle" ]
+				},
+				{
+					"Compound": "Wet (Black)",
+					"Sets": 99,
+					"Weather": [ "LightRain", "MediumRain", "HeavyRain", "Thunderstorm" ]
+				}
+			]
 		},
 		"Stint": {
 			"Driver": "Oliver Doe (JD)",

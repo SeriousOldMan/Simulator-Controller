@@ -1223,7 +1223,11 @@ class CallbacksEditor {
 	}
 
 	setScript(text) {
+		this.ScriptEditor.Loading := true
+
 		this.ScriptEditor.Text := text
+
+		this.ScriptEditor.Loading := false
 	}
 
 	editCallbacks(owner := false) {

@@ -67,13 +67,17 @@ The documentation is devided into the following sections:
 
     The third Assistant, Elisa, will watch your race and will warn you about nearby other cars and will give you general information about the current race situation.
 	
+  - [Customizing Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants)
+
+    This chapter provides a guideline how to extend the Race Assistants by connecting them to a GPT service and how to introduce new events and actions.
+	
   - [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server)
 
     If you are participating in multiplayer team-based endurance races, you use the *Team Server* to share the car state and the knowledge ot the Virtual Race Assistants between all participating drivers. It is also necessary for using the "Race Center" in a team race.
 	
   - [Development Guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts)
 
-    Complete set of information for developers, who want to create their own plugins or even contribute to the further development of Simulator Controller.
+    Complete set of information for developers, who want to create their own plugins or even contribute to the further development of Simulator Controller. Also part of the developer documentation is an introduction and complete reference for the builtin [Hybrid Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine).
 	
   - [Development Backlog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Backlog)
 

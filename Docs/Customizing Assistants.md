@@ -527,7 +527,7 @@ Another example, this time using arguments:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Event%20Definition%201.png)
 
-This simple event signals the start of a new lap. The lap number is supplied as a parameter and the message send to the LLM is "The lap 42 just has been started.", if lap 41 just have been finished).
+This event signals a position change. The previous position and the new position are passed to the LLM for further investigation. Please note the subtle usage of the previous value of *Position.Lost* in the rule actions. Although it will be reset in the first action, the old value will be used in the second action. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#referencing-facts-in-production-rules) for more information about this variable behaviour.
  
 Please also take a look at the other predefined events of the Race Engineer or the other Assistants to learn more about writing event rules. And I recommend to take a look at the knowledge base of a session to learn more about all the facts you canuse in the event rules (and also the action rules). To do this, activate the "Debug Knowledgebase" item in the tray bar menu of a given Assistant applicaton. Then open the corrsponding "*.knowledge" file in the *Simulator Controller\Temp* folder which is located in your user *Documents* folder.
 

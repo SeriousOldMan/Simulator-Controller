@@ -2,4 +2,5 @@
 
 {None: [?Position.Last]} => (Set: Position.Last, !Position)
 
-{All: [?Position > ?Position.Last]} => (Set: Position.Last, ?Position), (Call: Assistant.Raise(PositionLost))
+[?Position > ?Position.Last] => (Set: Position.Last, ?Position),
+								(Call: Assistant.Raise(PositionLost, ?Position.Last, ?Position))

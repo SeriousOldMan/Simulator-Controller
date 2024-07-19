@@ -504,7 +504,7 @@ As you can see, this editor looks very similar to the actions editor discussed a
    | Event Rule | The supplied rules are loaded into the rule engine of the given Race Assistant. These rules have full access to the knowledge base and all other rules of this Assistant.<br><br>The event rules can use the full knowledge to derive whether the event in question should be raised. They then raise the event by *calling* the "Assistant.Raise* predicate, optionally supplying additional arguments to the event, which can be referenced in the event phrase.<br><br>Note: Actually, you don't have to raise an event in the event rules, if you are able to handle the situation directly using the rules. In this case, the LLM is not activated. |
    | Event Disabled | This is a special one, inidcated by a "-" in the "Active" column in the list of events. It declares that the event is consumed, so that the rule engine does not do the default processing for this event. But the event is also processed by the LLM effectively disabling this type of event at all. This makes sense in combination with very smart LLMs, which will trigger actions simply by looking at the data (see the discussion [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#connecting-events--actions). This makes only sense for the builtin events, of course. |
 
-3. When defining the rules for a custom event, you can use all predicates the introduced above for actions. Additionally, you can use:
+3. When defining the rules for a custom event, you can use all the predicates introduced above for actions. Additionally, you can use:
    
    - Assistant.Raise(signal, p1, p2, ...)
    
@@ -523,7 +523,7 @@ Here is an example of a few rules that together detect that it just started rain
 	Rain.Start.updateRain(?fact) <= !Weather.Weather.Now = Drizzle, !, Set(?fact, false)
 	Rain.Start.updateRain(?fact) <= Set(?fact, true)
 
-Another example, this time using an argument:
+Another example, this time using arguments:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Event%20Definition%201.png)
 
@@ -593,8 +593,8 @@ Beside the predefined actions for the different Assistant, which come with the s
 | Weather Update              | 1. [Required] weather<br>2. [Required] minutes<br>3. [Required] impactsStrategy<br>4. [Optional] tyreCompound | Indicates an upcoming weather change. *weather* must be one of "Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain" and "Thunderstorm". *minutes* specify the time, when the new weather will arrive and *impactsStrategy* accepts a *Boolean* that indicates, whether a tyre change might be beneficial. If *tyreCompound* has been supplied, this indicates that a pitstop for tyre change should be planned. |
 | Rain Started                | - | This event is signalled, if rain just started. |
 | Rain Stopped                | - | This event is signalled, if rain just stopped. |
-| Position Lost               | - | This event is signalled, if one or more positions has just been lost. |
-| Position Gained             | - | This event is signalled, if one or more positions has just been gained. |
+| Position Lost               | 1. [Required] previousPosition<br>2. [Required] currentPosition | This event is signalled, if one or more positions has just been lost. *previousPosition* and *currentPosition* inidcate the position before and after the overtake. |
+| Position Gained             | 1. [Required] previousPosition<br>2. [Required] currentPosition | This event is signalled, if one or more positions has just been gained. *previousPosition* and *currentPosition* inidcate the position before and after the overtake. |
 
 ### Race Spotter
 
@@ -609,8 +609,8 @@ Beside the predefined actions for the different Assistant, which come with the s
 
 | Event                       | Parameter(s)      | Description |
 |-----------------------------|-------------------|-------------|
-| Position Lost               | - | This event is signalled, if one or more positions has just been lost. |
-| Position Gained             | - | This event is signalled, if one or more positions has just been gained. |
+| Position Lost               | 1. [Required] previousPosition<br>2. [Required] currentPosition | This event is signalled, if one or more positions has just been lost. *previousPosition* and *currentPosition* inidcate the position before and after the overtake. |
+| Position Gained             | 1. [Required] previousPosition<br>2. [Required] currentPosition | This event is signalled, if one or more positions has just been gained. *previousPosition* and *currentPosition* inidcate the position before and after the overtake. |
 
 ### Connecting Events & Actions
 

@@ -149,7 +149,7 @@ The left hand side of the rule therefore is an expression which repreusents a co
 
 #### Referencing facts in production rules
 
-Facts are referenced in conditions and actions of a production rule by either the **?***fact* notation or by the **!***fact* notation. There is a subtle difference between using a variable, for example **?Lap** or a direct reference, for example **!Lap**.
+Facts are referenced in conditions and actions of a production rule by either the **?fact** notation or by the **!fact** notation. There is a subtle difference between using a variable, for example **?Lap**, or a direct reference, for example **!Lap**.
 
  - Direct reference
  
@@ -157,7 +157,7 @@ Facts are referenced in conditions and actions of a production rule by either th
  
  - Variable reference
 
-   The variable reference of a fact denoted by "?" prefix will store the value of the fact at the time of the first usage of the fact in the condition of the rule and then use this value in all subsequent occurences.
+   The variable reference of a fact denoted by "?" prefix will store the value of the fact at the time of the first usage of the fact in the condition of the rule and then uses this value in all subsequent occurences.
 
 This is a subtle difference, but can be helpful, if one of the actions of the rule modifies the fact.   
 

@@ -1085,12 +1085,11 @@ class SimulatorController extends ConfigurationItem {
 						else
 							throw "Cannot find action for " . function.Descriptor . "[" . trigger . "] in SimulatorController.fireAction..."
 			}
-			else {
-				action := function.Actions[trigger]
 
-				if action
-					action.Call()
-			}
+			action := function.Actions[trigger]
+
+			if action
+				action.Call()
 		}
 	}
 
@@ -2038,6 +2037,12 @@ functionActionCallable(function, trigger, action) {
 }
 
 fireControllerActions(function, trigger, async := true) {
+	if Task.CurrentTask
+		if Task.CurrentTask.HasProp("IsActionFiring")
+			return
+		else
+			Task.CurrentTask.IsActionFiring := true
+
 	if async
 		Task.startTask(fireControllerActions.Bind(function, trigger, false), 0, kLowPriority)
 	else {

@@ -1085,11 +1085,12 @@ class SimulatorController extends ConfigurationItem {
 						else
 							throw "Cannot find action for " . function.Descriptor . "[" . trigger . "] in SimulatorController.fireAction..."
 			}
+			else {
+				action := function.Actions[trigger]
 
-			action := function.Actions[trigger]
-
-			if action
-				action.Call()
+				if action
+					action.Call()
+			}
 		}
 	}
 

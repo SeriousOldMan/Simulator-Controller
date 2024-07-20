@@ -1121,7 +1121,7 @@ class RaceAssistant extends ConfigurationItem {
 					if (A_Index > 5)
 						break
 
-					lapNr := (lapNumber - A_Index + 1)
+					lapNr := (lapNumber - A_Index)
 
 					if knowledgeBase.hasFact("Lap." . lapNr . ".Time")
 						laps.Push(Map("Nr", lapNr

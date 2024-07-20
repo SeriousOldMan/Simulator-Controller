@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net8.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Platforms>AnyCPU;x64</Platforms>
+    <!-- Set IncludeBuiltInRuntimes to false to include your own runtime libraries and not link the defaults -->
+    <IncludeBuiltInRuntimes>true</IncludeBuiltInRuntimes>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	  <LangVersion>12</LangVersion>
+	<NoWarn>1701;1702;8604;SKEXP0001;SKEXP0050;SKEXP0052;SKEXP0003</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="LLamaSharp" Version="0.14.0" />
+    <PackageReference Include="LLamaSharp.Backend.Cpu" Version="0.14.0" />
+    <PackageReference Include="LLamaSharp.Backend.Cuda11" Version="0.14.0" />
+    <PackageReference Include="LLamaSharp.Backend.Cuda12" Version="0.14.0" />
+    <PackageReference Include="LLamaSharp.Backend.OpenCL" Version="0.13.0" />
+    <PackageReference Include="LLamaSharp.Backend.Vulkan" Version="0.14.0" />
+  </ItemGroup>
+
+</Project>

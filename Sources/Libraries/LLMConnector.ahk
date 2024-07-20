@@ -798,12 +798,17 @@ class LLMConnector {
 	__New(manager, model) {
 		this.iManager := manager
 		this.iModel := model
+
+		OnExit((*) => this.Disconnect(), false)
 	}
 
 	static GetDefaults(&serviceURL, &serviceKey, &model) {
 		serviceURL := ""
 		serviceKey := ""
 		model := ((this.Models.Length > 0) ? this.Models[1] : "")
+	}
+
+	Disconnect() {
 	}
 
 	Restart() {

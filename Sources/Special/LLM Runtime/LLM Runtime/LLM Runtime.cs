@@ -122,25 +122,43 @@ static class Program
     {
         Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
 
-        LLMExecutor executor = new LLMExecutor(args[2],
-                                               (args.Length > 3) ? Double.Parse(args[3]) : 0.5,
-                                               (args.Length > 4) ? int.Parse(args[4]) : 2048,
-                                               (args.Length > 5) ? int.Parse(args[5]) : 0);
-
-        while (true)
+        try
         {
-            string prompt = WaitForPrompt(args[0]);
+            LLMExecutor executor = new LLMExecutor(args[2],
+                                                   (args.Length > 3) ? Double.Parse(args[3]) : 0.5,
+                                                   (args.Length > 4) ? int.Parse(args[4]) : 2048,
+                                                   (args.Length > 5) ? int.Parse(args[5]) : 0);
 
-            if (prompt.Trim() == "Exit")
-                break;
+            while (true)
+            {
+                string prompt = WaitForPrompt(args[0]);
 
-            Task<string> answer = executor.Ask(prompt);
+                if (prompt.Trim() == "Exit")
+                    break;
 
-            StreamWriter outStream = new StreamWriter(args[1], false, Encoding.Unicode);
+                try
+                {
+                    Task<string> answer = executor.Ask(prompt);
 
-            outStream.Write(answer.Result);
+                    StreamWriter outStream = new StreamWriter(args[1], false, Encoding.Unicode);
 
-            outStream.Close();
+                    outStream.Write(answer.Result);
+
+                    outStream.Close();
+                }
+                catch (Exception e)
+                {
+                    StreamWriter outStream = new StreamWriter(args[1], false, Encoding.Unicode);
+
+                    outStream.Write("Error");
+
+                    outStream.Close();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            System.Environment.Exit(1);
         }
     }
 }

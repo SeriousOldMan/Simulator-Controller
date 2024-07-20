@@ -11,6 +11,7 @@
 
 #Include "..\Libraries\Task.ahk"
 #Include "..\Libraries\Messages.ahk"
+#Include "..\Libraries\SpeechSynthesizer.ahk"
 #Include "..\Libraries\SpeechRecognizer.ahk"
 
 
@@ -789,6 +790,38 @@ startupExited() {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Controller Action Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+speak(message) {
+	local configuration
+
+	static speaker := kUndefined
+
+	if (speaker == kUndefined)
+		try {
+			configuration := SimulatorController.Instance.Configuration
+
+			speaker := SpeechSynthesizer(getMultiMapValue(configuration, "Voice Control", "Synthesizer")
+									   , getMultiMapValue(configuration, "Voice Control", "Speaker")
+									   , getMultiMapValue(configuration, "Voice Control", "Language"))
+		}
+		catch Any as exception {
+			logError(exception, true)
+
+			speaker := false
+		}
+
+	if speaker
+		speaker.speak(message)
+}
+
+play(soundFileName) {
+	try {
+		SoundPlay(soundFileName)
+	}
+	catch Any as exception {
+		logError(exception, true)
+	}
+}
 
 execute(command) {
 	local thePlugin := false

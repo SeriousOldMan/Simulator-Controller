@@ -334,7 +334,8 @@ checkInstallation() {
 
 	local installLocation := ""
 	local installInfo, quiet, options, msgResult, hasSplash, command, component, source
-	local install, index, options, isNew, packageLocation, ignore, directory, currentDirectory
+	local install, index, options, isNew, packageLocation, packageInfo, packageType, version
+	local ignore, directory, currentDirectory
 
 	installComponents(packageLocation, installLocation, temporary := false) {
 		global gProgressCount
@@ -672,6 +673,27 @@ checkInstallation() {
 					  , StartSetup: isNew, Update: !isNew}
 
 			packageLocation := normalizeDirectoryPath(kHomeDirectory)
+			packageInfo := readMultiMap(packageLocation . "\VERSION")
+			packageType := getMultiMapValue(packageInfo, "Current", "Type")
+			version := getMultiMapValue(packageInfo, packageType, "Version"
+												   , getMultiMapValue(packageInfo, "Version", packageType, false))
+
+			if !InStr(version, "-release") {
+				OnMessage(0x44, translateYesNoButtons)
+				msgResult := withBlockedWindows(MsgBox, substituteVariables(translate("This is a %version% version. Do you really want to install it?")
+																		  , {version: StrTitle(string2Values("-", version)[2])})
+													  , translate("Update"), 262436)
+				OnMessage(0x44, translateYesNoButtons, 0)
+
+				if (msgResult != "Yes") {
+					index := inList(A_Args, "-Start")
+
+					if index
+						Run(A_Args[index + 1])
+
+					ExitApp(0)
+				}
+			}
 
 			if ((!isNew && !options.Verbose) || installOptions(options)) {
 				installLocation := options.InstallLocation
@@ -1348,10 +1370,10 @@ editTargets(command := "", *) {
 
 		if (gCleanupSettings.Count > 0) {
 			for target, setting in gCleanupSettings {
-				option := ""
-
 				if (A_Index == 1)
-					option := option . " YP+20 XP+10"
+					option := " YP+20 XP+10"
+				else
+					option := " YP+20 XP"
 
 				targetsGui.Add("CheckBox", option . " Checked" . setting . " vcleanupVariable" . A_Index, target)
 			}
@@ -1373,10 +1395,10 @@ editTargets(command := "", *) {
 
 		if (gCopySettings.Count > 0) {
 			for target, setting in gCopySettings {
-				option := ""
-
 				if (A_Index == 1)
-					option := option . " YP+20 XP+10"
+					option := " YP+20 XP+10"
+				else
+					option := " YP+20 XP"
 
 				targetsGui.Add("CheckBox", option . " Checked" . setting . " vcopyVariable" . A_Index, target)
 			}
@@ -1398,10 +1420,10 @@ editTargets(command := "", *) {
 
 		if (gBuildSettings.Count > 0) {
 			for target, setting in gBuildSettings {
-				option := ""
-
 				if (A_Index == 1)
-					option := option . " YP+20 XP+10"
+					option := " YP+20 XP+10"
+				else
+					option := " YP+20 XP"
 
 				if (target == "Simulator Tools")
 					option := option . (A_IsCompiled ? " Disabled" : "")
@@ -1688,7 +1710,7 @@ updateInstallationForV500() {
 }
 
 updateConfigurationForV580() {
-	local ignore, assistant, section, actions
+	local ignore, assistant, section, actions, settings, theme
 
 	for ignore, assistant in ["Race Engineer", "Race Strategist", "Race Spotter"]
 		if FileExist(kUserHomeDirectory . "Actions\" . assistant . ".actions") {
@@ -1704,6 +1726,23 @@ updateConfigurationForV580() {
 
 			writeMultiMap(kUserHomeDirectory . "Actions\" . assistant . ".actions", actions)
 		}
+
+	if FileExist(kUserConfigDirectory . "Application Settings.ini") {
+		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+		theme := getMultiMapValue(settings, "General", "UI Theme", false)
+
+		if (theme = "Dark") {
+			setMultiMapValue(settings, "General", "UI Theme", "Gray")
+
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+		}
+		else if (theme = "Windows") {
+			setMultiMapValue(settings, "General", "UI Theme", "Light")
+
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+		}
+	}
 }
 
 updateConfigurationForV575() {
@@ -2837,7 +2876,7 @@ runUpdateTargets(&buildProgress) {
 
 		Sleep(50)
 
-		progressStep := ((100 / (gTargetsCount + 1)) / target[2].Length)
+		progressStep := (100 / (gTargetsCount + 1))
 
 		for ignore, updateFunction in target[2] {
 			if !kSilentMode {
@@ -2853,10 +2892,8 @@ runUpdateTargets(&buildProgress) {
 
 			Sleep(50)
 
-			buildProgress := Round(buildProgress + progressStep)
+			buildProgress += Ceil(buildProgress + progressStep)
 		}
-
-		buildProgress += (100 / (gTargetsCount + 1))
 
 		if !kSilentMode
 			showProgress({progress: buildProgress})
@@ -2936,7 +2973,7 @@ runCleanTargets(&buildProgress) {
 
 		Sleep(50)
 
-		buildProgress += (100 / (gTargetsCount + 1))
+		buildProgress += Ceil(100 / (gTargetsCount + 1))
 
 		if !kSilentMode
 			showProgress({progress: buildProgress})
@@ -3009,7 +3046,7 @@ runCopyTargets(&buildProgress) {
 
 					Sleep(50)
 
-					buildProgress += (100 / (gTargetsCount + 1))
+					buildProgress += Ceil(100 / (gTargetsCount + 1))
 
 					if !kSilentMode
 						showProgress({progress: buildProgress})
@@ -3082,7 +3119,7 @@ runCopyTargets(&buildProgress) {
 
 				Sleep(50)
 
-				buildProgress += (100 / (gTargetsCount + 1))
+				buildProgress += Ceil(100 / (gTargetsCount + 1))
 
 				if !kSilentMode
 					showProgress({progress: buildProgress})
@@ -3164,7 +3201,7 @@ runBuildTargets(&buildProgress) {
 
 						deleteFile(sourceDirectory . "\compile.ahk")
 
-						FileAppend(sourceCode, sourceDirectory . "\compile.ahk")
+						FileAppend(sourceCode, sourceDirectory . "\compile.ahk", "UTF-8")
 
 						result := RunWait(kProductionCompiler . options . " /in `"" . sourceDirectory . "\compile.ahk" . "`"")
 
@@ -3207,7 +3244,7 @@ runBuildTargets(&buildProgress) {
 			}
 		}
 
-		buildProgress += (100 / (gTargetsCount + 1))
+		buildProgress += (Ceil(100 / (gTargetsCount + 1)) * 3)
 
 		if !kSilentMode
 			showProgress({progress: buildProgress})
@@ -3215,7 +3252,7 @@ runBuildTargets(&buildProgress) {
 }
 
 prepareTargets(&buildProgress, updateOnly) {
-	global gUpdateTargets
+	global gUpdateTargets, gTargetsCount
 
 	local counter := 0
 	local targets := readMultiMap(kToolsTargetsFile)
@@ -3246,6 +3283,8 @@ prepareTargets(&buildProgress, updateOnly) {
 				gUpdateTargets.Push(Array(target, string2Values(",", arguments[1]), []))
 			else
 				gUpdateTargets.Push(Array(target, string2Values(",", arguments[2]), string2Values(",", arguments[1])))
+
+			gTargetsCount += 1
 		}
 
 		Sleep(50)
@@ -3269,6 +3308,8 @@ prepareTargets(&buildProgress, updateOnly) {
 				arguments := substituteVariables(arguments)
 
 				gCleanupTargets.Push(Array(target, string2Values(",", arguments)*))
+
+				gTargetsCount += 1
 			}
 
 			Sleep(50)
@@ -3289,6 +3330,8 @@ prepareTargets(&buildProgress, updateOnly) {
 				rule := string2Values("<-", substituteVariables(arguments))
 
 				gCopyTargets.Push(Array(target, rule[2], rule[1]))
+
+				gTargetsCount += 1
 			}
 
 			Sleep(50)
@@ -3314,6 +3357,8 @@ prepareTargets(&buildProgress, updateOnly) {
 
 					gBuildTargets.Push(Array(target, arguments[1], rule[1], string2Values(",", arguments[2])))
 				}
+
+				gTargetsCount += 1
 			}
 
 			Sleep(50)
@@ -3369,13 +3414,17 @@ startupSimulatorTools() {
 
 	buildProgress := 0
 
+	gTargetsCount := 0
+
 	prepareTargets(&buildProgress, updateOnly)
 
-	gTargetsCount := (gUpdateTargets.Length + gCleanupTargets.Length + gCopyTargets.Length + gBuildTargets.Length
-					+ (((kMSBuildDirectory != "") && (gSpecialTargets.Length > 0)) ? getFileNames("*", kSourcesDirectory . "Special\").Length : 0))
+	; gTargetsCount := (gUpdateTargets.Length + gCleanupTargets.Length + gCopyTargets.Length + gBuildTargets.Length
+	; 				+ (((kMSBuildDirectory != "") && (gSpecialTargets.Length > 0)) ? getFileNames("*", kSourcesDirectory . "Special\").Length : 0))
 
 	if !kSilentMode
-		showProgress({message: "", color: "Green", title: translate("Running Targets")})
+		showProgress({message: "", progress: 0, color: "Green", title: translate("Running Targets")})
+
+	buildProgress := 0
 
 	runUpdateTargets(&buildProgress)
 

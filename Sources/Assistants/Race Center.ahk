@@ -1898,7 +1898,7 @@ class RaceCenter extends ConfigurationItem {
 		centerGui.SetFont("Norm")
 		centerGui.SetFont("s10 Bold", "Arial")
 
-		centerGui.Add("Picture", "x16 yp+12 w30 h30 Section", kIconsDirectory . "Report.ico")
+		centerGui.Add("Picture", "x16 yp+12 w30 h30 Section", centerGui.Theme.RecolorizeImage(kIconsDirectory . "Report.ico"))
 		centerGui.Add("Text", "x50 yp+5 w80 h26", translate("Reports"))
 
 		centerGui.SetFont("s8 Norm", "Arial")
@@ -1989,7 +1989,7 @@ class RaceCenter extends ConfigurationItem {
 
 		centerGui.SetFont("s8 Norm", "Arial")
 
-		centerGui.Add("Picture", "x16 yp+10 w30 h30 Section", kIconsDirectory . "Tools BW.ico")
+		centerGui.Add("Picture", "x16 yp+10 w30 h30 Section", centerGui.Theme.RecolorizeImage(kIconsDirectory . "Tools BW.ico"))
 		centerGui.Add("Text", "x50 yp+5 w80 h26", translate("Session"))
 
 		centerGui.Add("Text", "x935 yp+8 w381 0x2 X:Move vmessageField")
@@ -9171,15 +9171,16 @@ class RaceCenter extends ConfigurationItem {
 				<head>
 					<style>
 						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
-						.rowStyle { font-size: 11px; background-color: #%evenRowBackColor%; }
-						.oddRowStyle { font-size: 11px; background-color: #%oddRowBackColor%; }
+						.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+						.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
 					</style>
 					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 					<script type="text/javascript">
 						google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawChart);
 			)"
 
-			before := substituteVariables(before, {headerBackColor: this.Window.Theme.ListBackColor["Header"]
+			before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
+												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
 
@@ -9190,8 +9191,8 @@ class RaceCenter extends ConfigurationItem {
 				<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
 					<style>
 						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
-						.rowStyle { font-size: 11px; background-color: #%evenRowBackColor%; }
-						.oddRowStyle { font-size: 11px; background-color: #%oddRowBackColor%; }
+						.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+						.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
 					</style>
 					<div id="chart_id" style="width: %width%px; height: %height%px"></div>
 				</body>
@@ -9200,6 +9201,7 @@ class RaceCenter extends ConfigurationItem {
 
 			html := (before . drawChartFunction . substituteVariables(after, {width: (this.ChartViewer.getWidth() - 5)
 																			, height: (this.ChartViewer.getHeight() - 5)
+																			, fontColor: this.Window.Theme.TextColor
 																			, backColor: this.Window.AltBackColor
 																			, headerBackColor: this.Window.Theme.ListBackColor["Header"]
 																			, evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
@@ -9286,7 +9288,7 @@ class RaceCenter extends ConfigurationItem {
 		drawChartFunction .= "`n]);"
 
 		series := "series: {"
-		vAxis := "vAxis: { "
+		vAxis := "vAxis: { gridlines: { color: '#" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, "
 
 		for ignore, yAxis in yAxises {
 			if (A_Index > 1) {
@@ -9307,9 +9309,9 @@ class RaceCenter extends ConfigurationItem {
 		vAxis .= "}"
 
 		if (this.SelectedChartType = "Scatter") {
-			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: { title: '" . translate(xAxis) . "' }, " . series . ", " . vAxis . "};")
+			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: { title: '" . translate(xAxis) . "', gridlines: { color: '" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'} }, " . series . ", " . vAxis . "};")
 
-			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.ScatterChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+			drawChartFunction .= "`nvar chart = new google.visualization.ScatterChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 		}
 		else if (this.SelectedChartType = "Bar") {
 			if (minValue == kUndefined)
@@ -9320,19 +9322,19 @@ class RaceCenter extends ConfigurationItem {
 			if (maxValue == kUndefined)
 				maxValue := 0
 
-			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: { viewWindow: {min: " . minValue . ", max: " . maxValue . "} }, vAxis: { viewWindowMode: 'pretty' } };")
+			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: { viewWindow: {min: " . minValue . ", max: " . maxValue . "}, title: '" . translate(xAxis) . "', gridlines: { color: '" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'} }, vAxis: { viewWindowMode: 'pretty', gridlines: { color: '" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'} } };")
 
-			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+			drawChartFunction .= "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 		}
 		else if (this.SelectedChartType = "Bubble") {
-			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: { title: '" . translate(xAxis) . "', viewWindowMode: 'pretty' }, vAxis: { title: '" . translate(yAxises[1]) . "', viewWindowMode: 'pretty' }, colorAxis: { legend: {position: 'none'}, colors: ['blue', 'red'] }, sizeAxis: { maxSize: 15 } };")
+			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: { title: '" . translate(xAxis) . "', gridlines: { color: '" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, viewWindowMode: 'pretty' }, vAxis: { title: '" . translate(yAxises[1]) . "', gridlines: { color: '" . this.Window.Theme.GridColor . "' }, viewWindowMode: 'pretty', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'} }, colorAxis: { legend: {position: 'none'}, colors: ['blue', 'red'] }, sizeAxis: { maxSize: 15 } };")
 
-			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BubbleChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+			drawChartFunction .= "`nvar chart = new google.visualization.BubbleChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 		}
 		else if (this.SelectedChartType = "Line") {
-			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "' };")
+			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, vAxis: { textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { color: '" . this.Window.Theme.GridColor . "' } }, hAxis: { title: '" . translate(xAxis) . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { color: '" . this.Window.Theme.GridColor . "' }, titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "' };")
 
-			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+			drawChartFunction .= "`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 		}
 
 		this.showChart(drawChartFunction)
@@ -9352,8 +9354,8 @@ class RaceCenter extends ConfigurationItem {
 				<head>
 					<style>
 						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
-						.rowStyle { font-size: 11px; background-color: #%evenRowBackColor%; }
-						.oddRowStyle { font-size: 11px; background-color: #%oddRowBackColor%; }
+						.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+						.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
 						%tableCSS%
 					</style>
 					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -9364,6 +9366,7 @@ class RaceCenter extends ConfigurationItem {
 			)"
 
 			script := substituteVariables(script, {tableCSS: this.StrategyViewer.getTableCSS()
+												 , fontColor: this.Window.Theme.TextColor
 												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
@@ -9385,7 +9388,7 @@ class RaceCenter extends ConfigurationItem {
 		else
 			script := ""
 
-		html := ("<html>" . script . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; }</style><div>" . html . "</div></body></html>")
+		html := ("<html>" . script . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> p, div, table { color: " . this.Window.Theme.TextColor . "; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; }</style><div>" . html . "</div></body></html>")
 
 		this.iSelectedDetailHTML := html
 
@@ -10735,7 +10738,7 @@ class RaceCenter extends ConfigurationItem {
 								. "]")
 		}
 
-		drawChartFunction .= ("]);`nvar options = { legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . translate("Lap") . "', gridlines: {count: 0} }, vAxis: { viewWindow: { min: 0 }, gridlines: {count: 0} }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
+		drawChartFunction .= ("]);`nvar options = { legend: { position: 'Right', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . translate("Lap") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: {count: 0} }, vAxis: { viewWindow: { min: 0 }, gridlines: {count: 0} }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
 
 		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
 
@@ -10763,8 +10766,8 @@ class RaceCenter extends ConfigurationItem {
 		minValue := Min(0, stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
 		maxValue := Max(stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
 
-		drawChartFunction := drawChartFunction . "`nvar options = { bars: 'horizontal', legend: 'none', backgroundColor: '" . this.Window.AltBackColor . "', chartArea: { left: '20%', top: '5%', right: '10%', bottom: '10%' }, hAxis: {viewWindowMode: 'explicit', viewWindow: {min: " . minValue . ", max: " . maxValue . "}, gridlines: {count: 0} }, vAxis: {gridlines: {count: 0}} };"
-		drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }"
+		drawChartFunction .= ("`nvar options = { bars: 'horizontal', legend: 'none', backgroundColor: '" . this.Window.AltBackColor . "', chartArea: { left: '20%', top: '5%', right: '10%', bottom: '10%' }, hAxis: {viewWindowMode: 'explicit', viewWindow: {min: " . minValue . ", max: " . maxValue . "}, gridlines: {count: 0}, textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, vAxis: {gridlines: {count: 0}, textStyle: { color: '" . this.Window.Theme.TextColor . "'}} };")
+		drawChartFunction .= ("`nvar chart = new google.visualization.BarChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
 
 		return drawChartFunction
 	}
@@ -10817,9 +10820,9 @@ class RaceCenter extends ConfigurationItem {
 
 		consistency := Round(consistency / ((validTimes.Length = 0) ? 0.01 : validTimes.Length), 2)
 
-		title := ("title: '" . translate("Consistency: ") . consistency . translate(" %") . "', titleTextStyle: {bold: false}, ")
+		title := ("title: '" . translate("Consistency: ") . consistency . translate(" %") . "', titleTextStyle: { bold: false, color: '" . this.Window.Theme.TextColor . "'}, ")
 
-		drawChartFunction .= ("`nvar options = {" . title . "seriesType: 'bars', series: {1: {type: 'line'}, 2: {type: 'line'}, 3: {type: 'line'}}, backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: {" . window . "title: '" . translate("Lap Time") . "', gridlines: {count: 0}}, hAxis: {title: '" . translate("Laps") . "', gridlines: {count: 0}}, chartArea: { left: '20%', top: '15%', right: '15%', bottom: '15%' } };")
+		drawChartFunction .= ("`nvar options = {" . title . "seriesType: 'bars', legend: { textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, series: {1: {type: 'line'}, 2: {type: 'line'}, 3: {type: 'line'}}, backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: {" . window . "title: '" . translate("Lap Time") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: {count: 0}}, hAxis: {title: '" . translate("Lap") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: {count: 0}}, chartArea: { left: '20%', top: '15%', right: '15%', bottom: '15%' } };")
 
 		drawChartFunction .= ("`nvar chart = new google.visualization.ComboChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
 
@@ -11608,7 +11611,7 @@ class RaceCenter extends ConfigurationItem {
 					html .= ("<br>" . this.createPitstopPlanDetails(pitstopNr))
 
 				if (this.SessionStore.query("Pitstop.Tyre.Data", {Where: {Pitstop: pitstopNr}}).Length > 0) {
-					if this.Stints.Has(pitstopData["Stint"] - 1)
+					if (isNumber(pitstopData["Stint"]) && this.Stints.Has(pitstopData["Stint"] - 1))
 						tyreCompound := this.Stints[pitstopData["Stint"] - 1].Compound
 					else
 						tyreCompound := false
@@ -11802,7 +11805,7 @@ class RaceCenter extends ConfigurationItem {
 					if (this.SessionStore.query("Pitstop.Tyre.Data", {Where: {Pitstop: A_Index}}).Length > 0) {
 						pitstopData := this.SessionStore.Tables["Pitstop.Data"][A_Index]
 
-						if this.Stints.Has(pitstopData["Stint"] - 1)
+						if (isNumber(pitstopData["Stint"]) && this.Stints.Has(pitstopData["Stint"] - 1))
 							tyreCompound := this.Stints[pitstopData["Stint"] - 1].Compound
 						else
 							tyreCompound := false
@@ -11970,8 +11973,8 @@ class RaceCenter extends ConfigurationItem {
 
 		text := "
 		(
-			hAxis: { title: '%drivers%', gridlines: {count: 0} },
-			vAxis: { title: '%seconds%', gridlines: {count: 0} },
+			hAxis: { title: '%drivers%', textStyle: { color: '%gridColor%'}, titleTextStyle: { color: '%titleColor%'}, gridlines: {count: 0} },
+			vAxis: { title: '%seconds%', textStyle: { color: '%gridColor%'}, titleTextStyle: { color: '%titleColor%'}, gridlines: {count: 0} },
 			lineWidth: 0,
 			series: [ { 'color': '%backColor%' } ],
 			intervals: { barWidth: 1, boxWidth: 1, lineWidth: 2, style: 'boxes' },
@@ -11982,6 +11985,8 @@ class RaceCenter extends ConfigurationItem {
 		)"
 
 		drawChartFunction .= ("`n" . substituteVariables(text, {drivers: translate("Drivers"), seconds: translate("Seconds")
+															  , titleColor: this.Window.Theme.TextColor
+															  , gridColor: this.Window.Theme.TextColor["Grid"]
 															  , backColor: this.Window.AltBackColor}))
 
 		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
@@ -12021,7 +12026,7 @@ class RaceCenter extends ConfigurationItem {
 		minValue := Min(0, minimum(potentialsData), minimum(raceCraftsData), minimum(speedsData), minimum(consistenciesData), minimum(carControlsData))
 		maxValue := Max(maximum(potentialsData), maximum(raceCraftsData), maximum(speedsData), maximum(consistenciesData), maximum(carControlsData))
 
-		drawChartFunction .= "`nvar options = { bars: 'horizontal', backgroundColor: '" . this.Window.AltBackColor . "', chartArea: { left: '15%', top: '5%', right: '30%', bottom: '10%' }, hAxis: {viewWindowMode: 'explicit', viewWindow: {min: " . minValue . ", max: " . maxValue . "}, gridlines: {count: 0} }, vAxis: {gridlines: {count: 0}} };"
+		drawChartFunction .= "`nvar options = { legend: {textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, bars: 'horizontal', backgroundColor: '" . this.Window.AltBackColor . "', chartArea: { left: '15%', top: '5%', right: '30%', bottom: '10%' }, hAxis: {viewWindowMode: 'explicit', textStyle: { color: '" . this.Window.Theme.TextColor . "'}, viewWindow: {min: " . minValue . ", max: " . maxValue . "}, gridlines: {count: 0} }, vAxis: {gridlines: {count: 0}, textStyle: { color: '" . this.Window.Theme.TextColor . "'}} };"
 		drawChartFunction .= ("`nvar chart = new google.visualization.BarChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
 
 		return drawChartFunction
@@ -12082,7 +12087,7 @@ class RaceCenter extends ConfigurationItem {
 								. "]")
 		}
 
-		drawChartFunction .= ("]);`nvar options = { legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . translate("Lap") . "', gridlines: {count: 0} }, vAxis: { viewWindow: { min: 0 }, gridlines: {count: 0} }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
+		drawChartFunction .= ("]);`nvar options = { legend: { position: 'Right', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . translate("Lap") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: {count: 0} }, vAxis: { viewWindow: { min: 0 }, gridlines: {count: 0} }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
 
 		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
 

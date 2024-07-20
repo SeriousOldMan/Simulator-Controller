@@ -149,7 +149,7 @@ The left hand side of the rule therefore is an expression which repreusents a co
 
 #### Referencing facts in production rules
 
-Facts are referenced in conditions and actions of a production rule by either the **?***fact* notation or by the **!***fact* notation. There is a subtle difference between using a variable, for example **?Lap** or a direct reference, for example **!Lap**.
+Facts are referenced in conditions and actions of a production rule by either the **?fact** notation or by the **!fact** notation. There is a subtle difference between using a variable, for example **?Lap**, or a direct reference, for example **!Lap**.
 
  - Direct reference
  
@@ -157,13 +157,13 @@ Facts are referenced in conditions and actions of a production rule by either th
  
  - Variable reference
 
-   The variable reference of a fact denoted by "?" prefix will store the value of the fact at the time of the first usage of the fact in the condition of the rule and then use this value in all subsequent occurences.
+   The variable reference of a fact denoted by "?" prefix will store the value of the fact at the time of the first usage of the fact in the condition of the rule and then uses this value in all subsequent occurences.
 
 This is a subtle difference, but can be helpful, if one of the actions of the rule modifies the fact.   
 
 #### Conditions
 
-The left-hand side of a production rule is evaluated whenever the knowledge base has been changed, i.e. facts has been added, removed or changed. A condition can be as simple as check, whether a fact exists, but they can be composed and can get as complex as needed. All conditions query the knowledge base for known facts and optionally can store the current value of the fact in a variable for later usage, for example in an action.
+The left-hand side of a production rule is evaluated whenever the knowledge base has been changed, i.e. facts has been added, removed or changed. A condition can be as simple as a check, whether a fact exists, but they can be composed and can get as complex as needed. All conditions query the knowledge base for known facts and optionally can store the current value of the fact in a variable for later usage, for example in an action.
 
   - Predicate
 
@@ -175,7 +175,7 @@ The left-hand side of a production rule is evaluated whenever the knowledge base
 
     Syntax: [?Tyre.Pressure.Front.Left > ?Tyre.Pressure.Front.Ideal] or {Predicate: ...}
 
-    This predicate compares two values. Allowed operators are **>**, **<**, **=**, **==**, **<=**, **>=**, **!=** and **contains**. Both sides can be facts or literal values (numbers, strings).
+    This predicate compares two values. Allowed operators are **>**, **<**, **=**, **==**, **<=**, **>=**, **!=** and **contains**. Both sides can be variables, facts or literal values (numbers, strings).
 
     Notes:
       - The operator **=** compares case-insensitive, wherease the operator **==** is case-sensitive.
@@ -203,7 +203,7 @@ The left-hand side of a production rule is evaluated whenever the knowledge base
 	
   - Prove Quantor
   
-	Snytax: {Prove: goal}
+	Syntax: {Prove: goal}
   
 	Example: {Prove: unbound?(!Driver.Name)}
 	
@@ -272,8 +272,8 @@ Examples:
 	availableTyreCompounds(Dry, M)
 	availableTyreCompounds(Dry, H)
 	
-	updateTyrePressureTarget(?lap, Pressure) <=
-		computePressureCorrections([FL, FR, RL, RR], Pressure, ?corrections),
+	updateTyrePressureTarget(?lap) <=
+		computePressureCorrections([FL, FR, RL, RR], ?corrections),
 		adjustTargetPressures([FL, FR, RL, RR], ?corrections)
 
 Although reduction rules can be seen as and even be used like functions in traditional programming languages, this is only the simple part of the story. In traditional function calls, the caller normally supplies argument values to all parameters of the function. In first-order logic programming languages it is very often the other way around. Let's see it this way:
@@ -285,8 +285,8 @@ Although reduction rules can be seen as and even be used like functions in tradi
 
 And now comes the fancy part:
 
-  5. If more than one rule is available which matches a given goal, the rule engine will follow all alternative paths until the orignal goal has been proven, or no more alternative paths are available. This is called backtracking.
-  6. While following the path of alternatives the rule engine will create bindings for variables used in a *call*. This is called **unification** and is discussed in more detail below. On the other hand, if the rule execution has reached a dead end, but there are more alternatives available higher in the chain of execution, all variable bindings up to this point are undone and the execution continues with the alternative.
+  5. If more than one rule is available which matches a given goal, the rule engine will follow all alternative paths until the orignal goal has been proven, or no more alternative paths are available. If an alternative path is needed, the rule engine will go *back* in execution upt to the point, where an alternative is available. This is called backtracking.
+  6. While following the path of alternatives the rule engine will create bindings for variables used in a *call*. This is called **unification** and is discussed in more detail below. On the other hand, if the rule execution has reached a dead end, but there are more alternatives available higher in the chain of execution, all variable bindings up to this point are undone and the execution continues with the alternative. Backtracking therefore does not only follow alternative path but also reverts all sideeffects created during execution of the first path.
 
 I promised, it is weird. Let's have a look at a concrete implementation of the grandfather *problem*. Let's assume, we have the following rules: 
 
@@ -312,7 +312,7 @@ Nice and quite easy to understand, right? Let's move on to a more complex exampl
 	concat([], ?L, ?L)
 	concat([?H | ?T], ?L, [?H | ?R]) <= concat(?T, ?L, ?R)
 
-These rules can concatenate and revers lists. A list of elements is delimited by the braces "[" and "]" and the "|" seperates the first element of the remaining elements of the list. Let me try to translate the **reverse** rules into natural language:
+These rules can concatenate and reverse lists. A list of elements is delimited by the braces "[" and "]" and the "|" seperates the first element of the remaining elements of the list. Let me try to translate the **reverse** rules into natural language:
 
 1. reverse([], [])
 
@@ -322,7 +322,7 @@ These rules can concatenate and revers lists. A list of elements is delimited by
 
    Any list can be reversed, if you remove the first element, then reverse the rest of the list and the concatenate the first element at the end of that list. Also quite understandable, but that is all.
 
-Can you figure out how **concat** works on your own now?
+Can you figure out on your own now how **concat** works?
 
 The *reverse* rule can now be used in many different ways. Of course, you can *call* it with a given list and you will get the reversed list as result. But you can also *call* it with two lists, and the *call* will only succeed, if one is the reverse ot the other. Or you can *call* it with two unbound variables, and the rule engine will create an infinite stream of lists and their reversed counterparts with anonymous variables as elements. Funny, eh?
 
@@ -385,7 +385,7 @@ Once a question and the corresponding answer has been found in the cache, it is 
 
 Another interesting use is to completely stop the search for a solution and consider the current goal to be unsuccessful.
 
-	historicPressures(?lap, [hot(?hfl, ?hfr, ?hrl, ?hrr), cold(?cfl, ?cfr, ?crl, ?crr)]) <= ?lap < 1, !, Fail
+	historicPressures(?lap, [hot(?hfl, ?hfr, ?hrl, ?hrr), cold(?cfl, ?cfr, ?crl, ?crr)]) <= ?lap < 1, !, fail
 	historicPressures(?lap, [hot(?hfl, ?hfr, ?hrl, ?hrr), cold(?cfl, ?cfr, ?crl, ?crr)]) <= ...
 
 The first rule checks, whether the supplied lap number is invalid (less than 1). If this is the case, the goal completely fails.
@@ -494,7 +494,7 @@ The rule engine has some builtin predicates which can be used when formulating r
 	
 	unbound? can be *called* with a single argument. The *call* succeeds, if the argument is an unbound variable, a fact with no value or an unknown fact. In all other cases, unbound? fails. Creating the reverse predicate is quite simple:
 	
-		bound?(?x) <= unbound?(?x), !, Fail
+		bound?(?x) <= unbound?(?x), !, fail
 		bound?(?x)
 
   - call

@@ -21,6 +21,17 @@
 
 ; [?Lap] => ...
 
+
+;;;-------------------------------------------------------------------------;;;
+;;; This fact is set for each invocation of the rule engine. It can be used ;;;
+;;; to start periodic tasks.                                                ;;;
+;;;-------------------------------------------------------------------------;;;
+
+; [?Update] => ...
+
+priority: -20, [?Update] => (Clear: Update)
+
+
 ;;;-------------------------------------------------------------------------;;;
 ;;; Each sector, after all the lap data has been copied to the knowledge    ;;;
 ;;; base, all target data for race positions and lap times will             ;;;
@@ -410,7 +421,10 @@ updatePitstopLap(?lap) <= Set(Pitstop.1.Lap, ?lap), Set(Pitstop.Last, 1)
 
 updatePitWarningLap(?pitstopLap, ?warningLaps) <= ?warningLap = ?pitstopLap - ?warningLaps, Set(Strategy.Pitstop.Lap.Warning, ?warningLap)
 
-[?Lap >= ?Strategy.Pitstop.Lap.Warning] => (Call: reportUpcomingPitstop(!Strategy.Pitstop.Lap)), (Clear: Strategy.Pitstop.Lap.Warning)
+[?Lap >= ?Strategy.Pitstop.Lap.Warning] => (Clear: Strategy.Pitstop.Lap.Warning), (Prove: reportUpcomingPitstop(!Strategy.Pitstop.Lap))
+
+reportUpcomingPitstop(?lap) <= Call(raiseEvent, PitstopUpcoming, ?lap), !
+reportUpcomingPitstop(?lap) <= Call(reportUpcomingPitstop, ?lap)
 
 [?Pitstop.Lap] => (Prove: pitstopPerformed(?Pitstop.Lap))
 

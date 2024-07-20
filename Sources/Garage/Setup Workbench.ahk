@@ -451,7 +451,7 @@ class SetupWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm")
 		workbenchGui.SetFont("s10 Bold", "Arial")
 
-		workbenchGui.Add("Picture", "x16 yp+12 w30 h30", kIconsDirectory . "Road.ico")
+		workbenchGui.Add("Picture", "x16 yp+12 w30 h30", workbenchGui.Theme.RecolorizeImage(kIconsDirectory . "Road.ico"))
 		workbenchGui.Add("Text", "x50 yp+5 w120 h26", translate("Selection"))
 
 		workbenchGui.SetFont("s8 Norm", "Arial")
@@ -506,7 +506,7 @@ class SetupWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm")
 		workbenchGui.SetFont("s10 Bold", "Arial")
 
-		workbenchGui.Add("Picture", "x16 yp+12 w30 h30", kIconsDirectory . "Report.ico")
+		workbenchGui.Add("Picture", "x16 yp+12 w30 h30", workbenchGui.Theme.RecolorizeImage(kIconsDirectory . "Report.ico"))
 		workbenchGui.Add("Text", "x50 yp+5 w180 h26", translate("Characteristics"))
 
 		workbenchGui.SetFont("s8 Norm")
@@ -527,7 +527,7 @@ class SetupWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm")
 		workbenchGui.SetFont("s10 Bold", "Arial")
 
-		workbenchGui.Add("Picture", "x420 ys+12 w30 h30", kIconsDirectory . "Assistant.ico")
+		workbenchGui.Add("Picture", "x420 ys+12 w30 h30", workbenchGui.Theme.RecolorizeImage(kIconsDirectory . "Assistant.ico"))
 		workbenchGui.Add("Text", "x454 yp+5 w150 h26", translate("Recommendations"))
 
 		workbenchGui.SetFont("s8 Norm", "Arial")
@@ -692,15 +692,16 @@ class SetupWorkbench extends ConfigurationItem {
 						<head>
 							<style>
 								.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
-								.rowStyle { font-size: 11px; background-color: #%evenRowBackColor%; }
-								.oddRowStyle { font-size: 11px; background-color: #%oddRowBackColor%; }
+								.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+								.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
 							</style>
 							<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 							<script type="text/javascript">
 								google.charts.load('current', {'packages':['corechart', 'table', 'bar']}).then(drawChart);
 					)"
 
-					before := substituteVariables(before, {headerBackColor: this.Window.Theme.ListBackColor["Header"]
+					before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
+														 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 														 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 														 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
 
@@ -717,6 +718,7 @@ class SetupWorkbench extends ConfigurationItem {
 							</script>
 						</head>
 						<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
+							<style> table, p, div { color: #%fontColor% } </style>
 							<div id="chart_id" style="width: %width%px; height: %height%px"></div>
 							<div style="width: %iWidth%px; height: %iHeight%px">
 								<p style="font-family: Arial; font-size: 16px; margin: 5px">
@@ -729,7 +731,9 @@ class SetupWorkbench extends ConfigurationItem {
 					</html>
 					)"
 
-					after := substituteVariables(after, {width: width, height: height, iWidth: iWidth, iHeight: iHeight, info: info, backColor: this.Window.AltBackColor})
+					after := substituteVariables(after, {fontColor: this.Window.Theme.TextColor
+													   , width: width, height: height, iWidth: iWidth, iHeight: iHeight
+													   , info: info, backColor: this.Window.AltBackColor})
 
 					this.SettingsViewer.document.write(before . content . after)
 				}
@@ -753,6 +757,7 @@ class SetupWorkbench extends ConfigurationItem {
 						<head>
 						</head>
 						<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
+							<style> table, p, div { color: #%fontColor% } </style>
 							<div style="width: %width%px; height: %height%px; text-align: center">
 								<p style="font-family: Arial; font-size: 16px; height: %height%px; margin: auto">
 									<br>
@@ -766,7 +771,9 @@ class SetupWorkbench extends ConfigurationItem {
 					</html>
 					)"
 
-					this.SettingsViewer.document.write(substituteVariables(document, {width: width, height: height, html: html, backColor: this.Window.AltBackColor}))
+					this.SettingsViewer.document.write(substituteVariables(document, {fontColor: this.Window.Theme.TextColor
+																					, width: width, height: height, html: html
+																					, backColor: this.Window.AltBackColor}))
 				}
 			}
 			else {
@@ -808,27 +815,15 @@ class SetupWorkbench extends ConfigurationItem {
 				for index, value in values
 					values[index] := (value / theMax)
 
-				if false {
-					drawChartFunction .= "`n['" . translate("Setting") . "', '" . translate("Value") . "',  { role: 'annotation' }]"
+				drawChartFunction .= ("`n['" . values2String("', '", names*) . "'],")
 
-					loop names.Length
-						drawChartFunction .= ",`n['" . names[A_Index] . "', " . values[A_Index] . ", '" . names[A_Index] . "']"
+				drawChartFunction .= ("`n[" . values2String(",", values*) . "]")
 
-					drawChartFunction .= "`n]);"
+				drawChartFunction .= "`n]);"
 
-					drawChartFunction := drawChartFunction . "`nvar options = { legend: 'none', vAxis: { textPosition: 'none', baseline: 'none' }, bars: 'horizontal', backgroundColor: '" . this.Window.AltBackColor . "', chartArea: { left: '5%', top: '5%', right: '5%', bottom: '5%' } };"
-				}
-				else {
-					drawChartFunction .= "`n['" . values2String("', '", names*) . "'],"
+				drawChartFunction .= ("`nvar options = { legend: { textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, bar: { groupWidth: " . (settings.Length * 16) . " }, vAxis: { textPosition: 'none', baseline: 'none', gridlines: {count: 0}, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, hAxis: {maxValue: 1, minValue: -1, gridlines: {count: 4, color: '" . this.Window.Theme.GridColor . "'}, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, bars: 'horizontal', backgroundColor: '" . this.Window.AltBackColor . "', chartArea: { left: '5%', top: '5%', right: '40%', bottom: '5%' } };")
 
-					drawChartFunction .= "`n[" . values2String(",", values*) . "]"
-
-					drawChartFunction .= "`n]);"
-
-					drawChartFunction := drawChartFunction . "`nvar options = { bar: { groupWidth: " . (settings.Length * 16) . " }, vAxis: { textPosition: 'none', baseline: 'none' }, hAxis: {maxValue: 1, minValue: -1}, bars: 'horizontal', backgroundColor: '" . this.Window.AltBackColor . "', chartArea: { left: '5%', top: '5%', right: '40%', bottom: '5%' } };"
-				}
-
-				drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+				drawChartFunction .= "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 			}
 			else
 				drawChartFunction := [translate("I can't help you with that."), translate("You are on your own this time.")]
@@ -997,7 +992,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 		productions := false
 		reductions := false
-		
+
 		if !includes
 			includes := []
 
@@ -1407,6 +1402,8 @@ class SetupWorkbench extends ConfigurationItem {
 				this.Control["trackDropDown"].Choose(1)
 
 				this.initializeWorkbench("Loading Car", "Loading Car", "Loading Car", true)
+
+				this.loadTrack(true, true)
 			}
 			finally {
 				this.Window.Unblock()

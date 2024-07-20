@@ -1120,6 +1120,8 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	resetDeltasAction() {
+		local ignore, positionInfo
+
 		for ignore, positionInfo in this.PositionInfos {
 			positionInfo.reset(true, true, true)
 			positionInfo.Car.reset(true)
@@ -1127,7 +1129,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 		this.DriverCar.reset(true)
 
-		if Speaker[true]
+		if this.Speaker[true]
 			this.getSpeaker().speakPhrase("Okay")
 	}
 

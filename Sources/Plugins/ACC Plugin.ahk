@@ -1473,7 +1473,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 		else {
 			if isDebug()
-				showMessage("Labels: " . values2String(", ", labelNames*) . "; Images: " . values2String(", ", fileNames*), "Pitstop MFD Image Search", "Information.png", 5000)
+				showMessage("Labels: " . values2String(", ", labelNames*) . "; Images: " . values2String(", ", fileNames*), "Pitstop MFD Image Search", "Information.ico", 5000)
 
 			return fileNames
 		}
@@ -2002,7 +2002,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 						logMessage(kLogInfo, translate("Complete update of pitstop state took ") . A_TickCount - beginTickCount . translate(" ms"))
 
 					if isDebug()
-						showMessage("Found images: " . values2String(", ", images*), "Pitstop MFD Image Search", "Information.png", 5000)
+						showMessage("Found images: " . values2String(", ", images*), "Pitstop MFD Image Search", "Information.ico", 5000)
 
 					return reload
 				}

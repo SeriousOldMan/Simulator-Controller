@@ -1,24 +1,38 @@
-## 5.8.0.0-release 08/02/24 (planned)
+## 5.8.0.0-release 07/19/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Renamed "Conversation Booster" to "Assistant Booster" throughout the documentation.
   4. All documentation regarding the different Assistant Boosters has been collected into a dedicated [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants).
-  5. A new Assistant Booster has been implemented, which let you integrate an LLM into the reasoning process of an Assistant.
-	 - This Agent booster can use a different GPT service and LLM than the other conversation-related Assistant Boosters.
+  5. The knowledge made available to the different Assistant Boosters has been extended massively. A full history of recent laps is now included, which allow the LLM (if smart enough) to make very precise decisions.
+  6. A new Assistant Booster has been implemented, which let you integrate an LLM into the reasoning process of an Assistant.
+	 - This *Reasoning* booster can use a different GPT service and LLM than the other conversation-related Assistant Boosters.
      - Events raised by the rule system of an Assistant or by rules defined on your own can be used to create a request to an LLM.
 	 - The LLM then can use any of the predefined actions or actions defined on your own to handle this event or situation.
 	 - Actions triggered this way can raise other events, thereby creating a complex chain of thought for the LLM.
-  6. A new syntax-coloring editor for source code has been implemented and is used in the Assistant Booster dialog when rule code is being edited.
-  7. Large parts of the documentation have been revised, updated and restructured:
+  7. A new syntax-coloring editor for source code has been implemented and is used in the Assistant Booster dialog when rules are being edited.
+  8. Large parts of the documentation have been revised, updated and restructured:
      - The documentation for the "Session Database" has been moved to a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database).
      - The documentation for "Strategy Workbench" has been moved to a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench).
      - The documentation for "Practice Center" has been moved to a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Practice-Center).
      - The documentation for "Race Reports" has been moved to a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports).
      - The documentation for "Race Center" has been moved to a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center).
      - All new complete documentation of the builtin [Hybrid Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine).
-  8. The transcript of LLM invocations in any Assistant Booster now includes the events raised and actions invoked. Transcripts of Assistant Boosters are normally stored in the *Simulator Controller\Logs* folder, which is located in the user *Documents* folder.
-  9. [Internal] Implemented a postprocessor for the compiler which compreesses the binary files. The applications are much smaller now.
-  10. [Internal] Migrated to AHK 2.0.18.
+  9. The transcript of LLM invocations in any Assistant Booster now includes the events raised and actions invoked. Transcripts of Assistant Boosters are normally stored in the *Simulator Controller\Logs* folder, which is located in the user *Documents* folder.
+  10. The available color schemes has been revised and a new dark color scheme has been added. Four color schemes ae now available:
+      - Classic (default, the original color scheme of Simulator Controller)
+	  - Gray (formerly named "Dark")
+	  - Light (formerly named "Windows", uses the default Windows colors)
+	  - Dark (new, uses the dark theme colors of Windows 10 / 11)
+	  
+	  See the updated [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#color-schemes) for some examples.
+  11. A new [controller action functions "speak"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allows you to output spoken messages from your controller scripts.
+  12. A new [controller action functions "play"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allows you to play sound files from your controller scripts.
+  13. "speak" and "play" has been added to the [location specific actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#automations) in Track Automation, which let's you put out a spoken message or play a sound file at a given track location. Rally support is coming...
+  14. The automated update procedure now asks before a non-release version is installed.
+  15. [Internal] Implemented a postprocessor for the compiler which compresses the binary files. The applications are much smaller now.
+  16. [Internal] Migrated to AHK 2.1-alpha.14 (needed for dark color scheme).
+  17. [Developer] A new class library (*LLMAgent*) supports a full recursive round-trip between the rule engine and an associated LLM. Using this architecture, fully autonomous agents can be configured.
+  18. [Developer] A new class library (*CodeEditor*) integrates the "SciTex" editor with an easy to use programming interface.
 
 ## 5.7.9.0-release 07/05/24
   1. Minor bugfixes, as always
@@ -57,7 +71,7 @@
 	 - Multiple consecutive function or method calls can now be defined for one single conversation action.
 	 - Hold down the Control key while clicking on "Ok" button will not leave the editor, but instead will show you the API tool definitions in JSON format.
   10. Whenever a Conversation Booster is configured for a Race Assistant, a transcript of every LLM activation is stored in the *Simulator Controller\Logs\Transcripts* folder which is located in your user *Documents* folder.
-  11. The ["Plan Pitstop" conversation action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#trigger-actions-from-conversation) for the Race Engineer now lso allows to call for a driver swap in team races.
+  11. The "Plan Pitstop" conversation action for the Race Engineer now lso allows to call for a driver swap in team races.
   12. Two [predefined conversation actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#trigger-actions-from-conversation) for the Spotter are now available:
       - The LLM can decide to reset and recalculate the delta and lap time history for all cars.
 	  - And you can ask the LLM to reset the reference speed data of all cars around the track, when too many false positives for accidents and slow cars are given.
@@ -68,7 +82,7 @@
   2. Documentation updates here and there, as always
   3. Fixed the lap time comparison information of the Spotter in multiclass races. A bug resulted in a comparison of cars from different classes which resulted in very confusing information.
   4. The default instructions of the Conversation Booster has been updated again to improve conversation quality further. Please see the Update Notes, if you have modified these instructions.
-  5. The LLMs used to boost the conversation capabilities of the Assistants are now allowed to trigger some actions as a result of your interaction. A few actions already have been defined for the [Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#trigger-actions-from-conversation) and the [Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#trigger-actions-from-conversation) with more to come in the next releases. Using actions, it is possible to define new voice commands, but the LLMs are also allowed to trigger the actions based on the current situation and data constellation.
+  5. The LLMs used to boost the conversation capabilities of the Assistants are now allowed to trigger some actions as a result of your interaction. A few [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#predefined-actions--events) already have been defined for the Engineer and the Strategist with more to come in the next releases. Using actions, it is possible to define new voice commands, but the LLMs are also allowed to trigger the actions based on the current situation and data constellation.
   
      Please note, that using *Actions* is not enabled by default, but must be explicitly activated in the configuration.
   6. Action definition files are customizeable in the [Documents]\Simulator Controller\Actions folder.
@@ -1039,7 +1053,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   7. The bounding box for side proximity alerts by the Spotter has been increased from 6 to 8 meters lateral.
   8. The waiting time for unavailable data in "Race Center" has been reduced.
   9. Fixed a couple of bugs, which had been introduced to the Spotter for *Assetto Corsa* and *rFactor 2* by the latest .NET framework update by Microsoft.
-  10. Fixed car coordinates for *rFactor2* (used by the track automation).
+  10. Fixed car coordinates for *rFactor2* (used by the Track Automations).
   11. Fixed race reports and standings data in "Race Center" for *rFactor2*.
   12. Fixed track scanner and mapper for rare cases with special characters in car or track names. Happened especially in *Automobilista 2*.
   13. Fixed a problem with manually locating *iRacing* in a non-standard install location.
@@ -1789,9 +1803,9 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   15. Fixed the identification of the current driver in race reports and post race reviews for *RaceRoom Racing Experience*.
   16. The launch pad of "Simulator Startup" now has a button with which you can close all running applications with one click.
   17. The current version number is displayed in the launch pad window of "Simulator Startup".
-  18. Fixed many errors in track map creation for *Assetto Corsa*, *Automobilista 2*, *Project CARS 2* and *RaceRoom Racing Experience*. All recorded maps so far will be deleted and re-recorded, since either the scaling factor or the coordinate system has changed. Track automations must be recreated as well.
+  18. Fixed many errors in track map creation for *Assetto Corsa*, *Automobilista 2*, *Project CARS 2* and *RaceRoom Racing Experience*. All recorded maps so far will be deleted and re-recorded, since either the scaling factor or the coordinate system has changed. Track Automations must be recreated as well.
   19. Additional tyre meta data has been added for *rFactor 2*, *Automobilista 2* and *RaceRoom Racing Experience*. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds) for more information about tyre meta data.
-  20. Action points can now be dragged with the mouse in the track automation editor.
+  20. Action points can now be dragged with the mouse in the Track Automations editor.
   21. Finally fixed car model detection for *rFactor 2* in certain car classes, for example Formula 2.
   22. Stream Deck icons will be grayed out for disabled actions.
   23. New car models for "Setup Advisor":
@@ -1824,13 +1838,13 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. New options in pitstop rules for always refueling and always changing tyres in strategy simulation.
-  4. Introducing track automation, which let you automate your car settings like TC and ABS depending on track location.
+  4. Introducing Track Automations, which let you automate your car settings like TC and ABS depending on track location.
      - A new page has been added to "Session Database", which allows you to specify [location specific actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#automations) for a specific simulator / car / track combination.
      - Added the ["TrackAutomation" action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) to the "Race Spotter" plugin which let's you enable or disable location specific actions when you are out on the track.
-	 - New ["enableTrackAutomation", "disableTrackAutomations" and "selectTrackAutomation"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#choosing-between-different-track-automations), which let you control the track automationsm while on the track.
+	 - New ["enableTrackAutomation", "disableTrackAutomations" and "selectTrackAutomation"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#choosing-between-different-track-automations), which let you control the Track Automations while on the track.
      - Added a new icon to the Stream Deck icon set for the "TrackAutomation" action.
-	 - Track automations can be exported and imported using the "Session Database" administration tool.
-  5. Track mapping incl. track automations are now supported for *iRacing* as well. But since the algorithm to derive the track layout works without a real coordinate system, there are a [few things to mention](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#special-notes-about-track-mapping-in-iracing).
+	 - Track Automations can be exported and imported using the "Session Database" administration tool.
+  5. Track mapping incl. Track Automations are now supported for *iRacing* as well. But since the algorithm to derive the track layout works without a real coordinate system, there are a [few things to mention](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#special-notes-about-track-mapping-in-iracing).
   6. Pretty track names will be collected for *iRacing* when you visit a track.
   7. Fixed a bug in race reports for *iRacing* when car race numbers contain a **"**.
   8. Fixed general bug in race reports, where no lap times where available in the "Overview" report in special situations. Also improved DNF calculation.

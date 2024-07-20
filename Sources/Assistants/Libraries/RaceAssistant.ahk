@@ -22,10 +22,10 @@
 #Include "..\..\Libraries\LLMConnector.ahk"
 #Include "..\..\Libraries\LLMBooster.ahk"
 #Include "..\..\Libraries\LLMAgent.ahk"
-#Include "VoiceManager.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\..\Database\Libraries\SettingsDatabase.ahk"
 #Include "..\..\Database\Libraries\TyresDatabase.ahk"
+#Include "VoiceManager.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -56,10 +56,14 @@ global kUnknown := false
 class AssistantEvent extends AgentEvent {
 	iAssistant := false
 
+	iBuiltin := false
+
 	iName := false
 	iEvent := false
-	iGoal := false
 
+	iEnabled := true
+
+	iGoal := false
 	iParameters := []
 
 	iOptions := []
@@ -70,6 +74,12 @@ class AssistantEvent extends AgentEvent {
 	Assistant {
 		Get {
 			return this.iAssistant
+		}
+	}
+
+	Builtin {
+		Get {
+			return this.iBuiltin
 		}
 	}
 
@@ -85,9 +95,21 @@ class AssistantEvent extends AgentEvent {
 		}
 	}
 
+	Enabled {
+		Get {
+			return this.iEnabled
+		}
+	}
+
 	Goal {
 		Get {
 			return this.iGoal
+		}
+	}
+
+	Phrase {
+		Get {
+			return "Take a look at the current data and decide what to do."
 		}
 	}
 
@@ -109,10 +131,12 @@ class AssistantEvent extends AgentEvent {
 		}
 	}
 
-	__New(assistant, name, event, parameters, goal := false, options := false) {
+	__New(assistant, builtin, name, enabled, event, parameters, goal := false, options := false) {
 		this.iAssistant := assistant
 
+		this.iBuiltin := builtin
 		this.iName := name
+		this.iEnabled := enabled
 		this.iEvent := event
 		this.iGoal := goal
 
@@ -146,6 +170,19 @@ class AssistantEvent extends AgentEvent {
 	createVariables(event, arguments) {
 		local assistant := this.Assistant
 
+
+		local ticks := A_TickCount
+
+		knowledge := assistant.getKnowledge("Agent")
+
+		ticks := A_TickCount - ticks
+
+		ticks := A_TickCount
+
+		local knowledge := JSON.print(knowledge, "`t")
+
+		ticks := A_TickCount - ticks
+
 		return {assistant: assistant.AssistantType, name: assistant.VoiceManager.Name
 			  , knowledge: JSON.print(assistant.getKnowledge("Agent", this.Options))}
 	}
@@ -163,8 +200,21 @@ class AssistantEvent extends AgentEvent {
 								 , Map("Variables", this.createVariables(event, arguments)))
 		}
 
+		printArguments(arguments) {
+			arguments := arguments.Clone()
+
+			loop arguments.Length
+				if !arguments.Has(A_Index)
+					arguments[A_Index] := ""
+
+			return values2String(", ", arguments*)
+		}
+
 		if (booster && this.handledEvent(event)) {
 			arguments := this.createArguments(event, arguments)
+
+			if isDebug()
+				showMessage("LLM -> " . this.Event . "[" .  printArguments(arguments) . "]")
 
 			if this.Asynchronous {
 				Task.startTask(triggerEvent, 0, (Task.CurrentTask ? Task.CurrentTask.Priority : kNormalPriority))
@@ -188,10 +238,10 @@ class RuleEvent extends AssistantEvent {
 		}
 	}
 
-	__New(assistant, name, event, phrase, parameters, goal := false, options := false) {
+	__New(assistant, builtin, name, enabled, event, phrase, parameters, goal := false, options := false) {
 		this.iPhrase := phrase
 
-		super.__New(assistant, name, event, parameters, goal, options)
+		super.__New(assistant, builtin, name, enabled, event, parameters, goal, options)
 	}
 }
 
@@ -909,7 +959,7 @@ class RaceAssistant extends ConfigurationItem {
 		if (enoughData && !this.hasEnoughData())
 			return false
 
-		if confirm
+		if (confirm && this.Speaker)
 			this.getSpeaker().speakPhrase("Confirm")
 
 		Task.yield()
@@ -1018,7 +1068,10 @@ class RaceAssistant extends ConfigurationItem {
 	getKnowledge(type, options := false) {
 		local knowledgeBase := this.KnowledgeBase
 		local knowledge := Map()
-		local lapNumber, tyreSet, lapNr, laps
+		local simulator := this.SettingsDatabase.getSimulatorName(this.Simulator)
+		local car := this.SettingsDatabase.getCarName(this.Simulator, this.Car)
+		local track := this.SettingsDatabase.getTrackName(this.Simulator, this.Track)
+		local lapNumber, tyreSet, lapNr, laps, tyreSets, tyreCompound
 
 		static sessionTypes
 
@@ -1031,15 +1084,25 @@ class RaceAssistant extends ConfigurationItem {
 		if knowledgeBase {
 			lapNumber := knowledgeBase.getValue("Lap", 0)
 
-			if this.activeTopic(options, "Session")
-				knowledge["Session"] := Map("Simulator", this.SettingsDatabase.getSimulatorName(this.Simulator)
-										  , "Car", this.SettingsDatabase.getCarName(this.Simulator, this.Car)
-										  , "Track", this.SettingsDatabase.getTrackName(this.Simulator, this.Track)
+			if this.activeTopic(options, "Session") {
+				tyreSets := []
+
+				for ignore, tyreCompound in SessionDatabase.getTyreCompounds(simulator, this.Car, this.Track)
+					tyreSets.Push(Map("Compound", tyreCompound, "Sets", 99
+									, "Weather", InStr(tyreCompound, "Dry") ? ["Dry", "Drizzle"]
+																			: (InStr(tyreCompound, "Wet") ? ["LightRain", "MediumRain", "HeavyRain", "Thunderstorm"]
+																										  : ["Drizzle", "LightRain"])))
+
+				knowledge["Session"] := Map("Simulator", simulator
+										  , "Car", car
+										  , "Track", track
 										  , "TrackLength", (this.TrackLength . " Meters")
 										  , "Type", sessionTypes[this.Session]
 										  , "Format", knowledgeBase.getValue("Session.Format", "Time")
 										  , "RemainingLaps", Ceil(knowledgeBase.getValue("Lap.Remaining.Session", 0))
-										  , "RemainingTime", (Round(knowledgeBase.getValue("Session.Time.Remaining") / 1000) . " seconds"))
+										  , "RemainingTime", (Round(knowledgeBase.getValue("Session.Time.Remaining") / 1000) . " seconds")
+										  , "AvailableTyres", tyreSets)
+			}
 
 			if this.activeTopic(options, "Stint")
 				knowledge["Stint"] := Map("Driver", this.DriverFullName
@@ -1055,7 +1118,10 @@ class RaceAssistant extends ConfigurationItem {
 				laps := []
 
 				loop lapNumber {
-					lapNr := (lapNumber - A_Index + 1)
+					if (A_Index > 5)
+						break
+
+					lapNr := (lapNumber - A_Index)
 
 					if knowledgeBase.hasFact("Lap." . lapNr . ".Time")
 						laps.Push(Map("Nr", lapNr
@@ -1077,8 +1143,8 @@ class RaceAssistant extends ConfigurationItem {
 
 			if this.activeTopic(options, "Weather")
 				knowledge["Weather"] := Map("Now", knowledgeBase.getValue("Weather.Weather.Now")
-										  , "10Min", knowledgeBase.getValue("Weather.Weather.10Min")
-										  , "30Min", knowledgeBase.getValue("Weather.Weather.30Min")
+										  , "10 Minutes", knowledgeBase.getValue("Weather.Weather.10Min")
+										  , "30 Minutes", knowledgeBase.getValue("Weather.Weather.30Min")
 										  , "Temperature", (knowledgeBase.getValue("Weather.Temperature.Air") . " Celsius"))
 
 			if this.activeTopic(options, "Track")
@@ -1411,8 +1477,11 @@ class RaceAssistant extends ConfigurationItem {
 
 		if this.AgentBooster
 			for ignore, candidate in this.iEvents
-				if (candidate.handledEvent(event) && candidate.handleEvent(event, arguments*))
-					return true
+				if candidate.handledEvent(event)
+					if !candidate.Enabled
+						return true
+					else if candidate.handleEvent(event, arguments*)
+						return true
 
 		return false
 	}
@@ -1420,61 +1489,64 @@ class RaceAssistant extends ConfigurationItem {
 	createAgentEvents(&productions, &reductions, &includes) {
 		local configuration := readMultiMap(kResourcesDirectory . "Actions\" . this.AssistantType . ".events")
 		local events := []
-		local ignore, event, definition, parameters, parameter, enumeration, required, handler
+		local disabled, ignore, event, definition, parameters, parameter, enumeration, required, handler, type
 
 		addMultiMapValues(configuration, readMultiMap(kUserHomeDirectory . "Actions\" . this.AssistantType . ".events"))
 
-		for ignore, event in string2Values(",", getMultiMapValue(configuration, "Agent.Events", "Active", "")) {
-			definition := getMultiMapValue(configuration, "Agent.Events.Custom", event, false)
+		disabled := string2Values(",", getMultiMapValue(configuration, "Agent.Events", "Disabled", ""))
 
-			if !definition
-				definition := getMultiMapValue(configuration, "Agent.Events.Builtin", event, false)
+		for ignore, type in ["Agent.Events.Custom", "Agent.Events.Builtin"]
+			for ignore, event in string2Values(",", getMultiMapValue(configuration, "Agent.Events", "Active", "")) {
+				definition := getMultiMapValue(configuration, type, event, false)
 
-			try {
-				if definition {
-					definition := string2Values("|", definition)
-					parameters := []
+				if definition
+					try {
+						if definition {
+							definition := string2Values("|", definition)
+							parameters := []
 
-					loop definition[5] {
-						parameter := string2Values("|", getMultiMapValue(configuration, "Agent.Events.Parameters", event . "." . A_Index, ""))
+							loop definition[5] {
+								parameter := string2Values("|", getMultiMapValue(configuration, "Agent.Events.Parameters", event . "." . A_Index, ""))
 
-						if (parameter.Length >= 5) {
-							enumeration := string2Values(",", parameter[3])
+								if (parameter.Length >= 5) {
+									enumeration := string2Values(",", parameter[3])
 
-							if (enumeration.Length = 0)
-								enumeration := false
+									if (enumeration.Length = 0)
+										enumeration := false
 
-							required := ((parameter[4] = kTrue) ? kTrue : ((parameter[4] = kFalse) ? false : parameter[4]))
+									required := ((parameter[4] = kTrue) ? kTrue : ((parameter[4] = kFalse) ? false : parameter[4]))
 
-							parameters.Push(AssistantEvent.Parameter(parameter[1], parameter[5], parameter[2]
-																   , enumeration, required))
+									parameters.Push(AssistantEvent.Parameter(parameter[1], parameter[5], parameter[2]
+																		   , enumeration, required))
+								}
+							}
+
+							switch definition[1], false {
+								case "Assistant.Class":
+									handler := %definition[2]%(this, (type = "Agent.Events.Builtin"), event
+															 , !inList(disabled, event), definition[3], parameters)
+								case "Assistant.Rule":
+									RuleCompiler().compileRules(FileRead(getFileName(definition[2], kUserHomeDirectory . "Actions\"
+																								  , kResourcesDirectory . "Actions\"))
+															  , &productions, &reductions, &includes)
+
+									handler := RuleEvent(this, (type = "Agent.Events.Builtin"), event
+													   , !inList(disabled, event), definition[3], definition[4], parameters)
+								default:
+									throw "Unknown event type (" definition[1] . ") detected in RaceAssistant.createAgentEvents..."
+							}
+
+							this.registerEvent(handler)
+
+							events.Push(handler)
 						}
+						else
+							throw "Unknown event (" event . ") detected in RaceAssistant.createAgentEvents..."
 					}
-
-					switch definition[1], false {
-						case "Assistant.Class":
-							handler := %definition[2]%(this, event, definition[3], parameters)
-						case "Assistant.Rule":
-							RuleCompiler().compileRules(FileRead(getFileName(definition[2], kUserHomeDirectory . "Actions\"
-																						  , kResourcesDirectory . "Actions\"))
-													  , &productions, &reductions, &includes)
-
-							handler := RuleEvent(this, event, definition[3], definition[4], parameters)
-						default:
-							throw "Unknown event type (" definition[1] . ") detected in RaceAssistant.createAgentEvents..."
+					catch Any as exception {
+						logError(exception, true)
 					}
-
-					this.registerEvent(handler)
-
-					events.Push(handler)
-				}
-				else
-					throw "Unknown event (" event . ") detected in RaceAssistant.createAgentEvents..."
 			}
-			catch Any as exception {
-				logError(exception, true)
-			}
-		}
 
 		return events
 	}
@@ -2199,6 +2271,8 @@ class RaceAssistant extends ConfigurationItem {
 		knowledgeBase.addFact("Lap." . lapNumber . ".Temperature.Air", airTemperature)
 		knowledgeBase.addFact("Lap." . lapNumber . ".Temperature.Track", trackTemperature)
 
+		knowledgeBase.setFact("Update", true)
+
 		result := knowledgeBase.produce()
 
 		if (dump && this.Debug[kDebugKnowledgeBase])
@@ -2239,6 +2313,8 @@ class RaceAssistant extends ConfigurationItem {
 		knowledgeBase.setFact("Lap.Valid", lapValid)
 		knowledgeBase.setFact("Lap.Penalty", lapPenalty)
 		knowledgeBase.setFact("Lap.Warnings", getMultiMapValue(data, "Stint Data", "Warnings", 0))
+
+		knowledgeBase.setFact("Update", true)
 
 		result := knowledgeBase.produce()
 
@@ -3745,8 +3821,10 @@ class GridRaceAssistant extends RaceAssistant {
 
 		driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
 
-		this.KnowledgeBase.setFact("Lap." . lapNumber . ".Position.Overall", this.getPosition(false, "Overall", data))
-		this.KnowledgeBase.setFact("Lap." . lapNumber . ".Position.Class", this.getPosition(false, "Class", data))
+		if this.KnowledgeBase {
+			this.KnowledgeBase.setFact("Lap." . lapNumber . ".Position.Overall", this.getPosition(false, "Overall", data))
+			this.KnowledgeBase.setFact("Lap." . lapNumber . ".Position.Class", this.getPosition(false, "Class", data))
+		}
 
 		lapValid := getMultiMapValue(data, "Stint Data", "LapValid", true)
 		lapPenalty := getMultiMapValue(data, "Stint Data", "Penalty", false)
@@ -4025,7 +4103,7 @@ createTools(assistant, type) {
 	callRule(action, ruleFileName, enoughData, confirm, parameters, arguments*) {
 		local knowledgeBase := assistant.KnowledgeBase
 		local index, parameter, names, variables
-		local productions, reductions, includes, ignore, rule
+		local productions, reductions, includes, ignore, rule, rules
 
 		if knowledgeBase {
 			if !runAction(enoughData, confirm)

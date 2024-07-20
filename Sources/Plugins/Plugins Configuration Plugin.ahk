@@ -104,7 +104,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 		window.Add("Text", "x16 y335 w86 h23 Y:Move +0x200", translate("Plugin"))
 		window.Add("Edit", "x110 y335 w154 h21 Y:Move W:Grow(0.2) VpluginEdit").OnEvent("Change", (*) => this.updateState())
 
-		window.Add("CheckBox", "x110 y359 w120 h23 Y:Move VpluginActivatedCheck", translate("Activated?"))
+		window.Add("CheckBox", "x110 y359 w120 h21 Y:Move VpluginActivatedCheck", translate("Activated?"))
 
 		window.Add("Text", "x16 y383 w89 h23 Y:Move +0x200", translate("Simulator(s)"))
 		window.Add("Edit", "x110 y383 w339 h21 Y:Move W:Grow(0.2) VpluginSimulatorsEdit")

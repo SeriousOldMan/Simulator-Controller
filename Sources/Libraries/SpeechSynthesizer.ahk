@@ -325,6 +325,10 @@ class SpeechSynthesizer {
 				SpeechSynthesizer.sAudioDevice := getMultiMapValue(configuration, "Output", this.Routing . ".AudioDevice", false)
 			}
 		}
+
+		this.setVolume(100)
+		this.setRate(0)
+		this.setPitch(0)
 	}
 
 	getVoices() {

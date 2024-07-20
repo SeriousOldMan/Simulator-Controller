@@ -192,7 +192,7 @@ class ButtonBoxPreview extends ControllerPreview {
 						x := horizontal + Round((columnWidth - labelWidth) / 2)
 						y := vertical + rowHeight - labelHeight
 
-						label := buttonBoxGui.Add("Text", "x" . x . " y" . y . " w" . labelWidth . " h" . labelHeight . " -Background +0x1000 +0x1", number)
+						label := buttonBoxGui.Add("Text", "x" . x . " y" . y . " w" . labelWidth . " h" . labelHeight . " +0x1000 +0x1", number)
 						label.OnEvent("Click", controlClick.Bind(buttonBoxGui))
 
 						if !this.iLabels.Has(row)

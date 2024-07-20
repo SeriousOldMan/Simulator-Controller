@@ -734,7 +734,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			throw "Unknown image '" . imageName . "' detected in R3EPlugin.getLabelFileName..."
 		else {
 			if isDebug()
-				showMessage("Labels: " . values2String(", ", imageNames*) . "; Images: " . values2String(", ", fileNames*), "Pitstop MFD Image Search", "Information.png", 5000)
+				showMessage("Labels: " . values2String(", ", imageNames*) . "; Images: " . values2String(", ", fileNames*), "Pitstop MFD Image Search", "Information.ico", 5000)
 
 			return fileNames
 		}

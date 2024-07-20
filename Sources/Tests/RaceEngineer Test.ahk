@@ -93,8 +93,8 @@ class TestRaceEngineer extends RaceEngineer {
 			this.updateConfigurationValues({Announcements: {FuelWarning: true, DamageReporting: true, DamageAnalysis: true, PressureReporting: true, WeatherUpdate: true}})
 	}
 
-	lowFuelWarning(remainingLaps) {
-		super.lowFuelWarning(remainingLaps)
+	lowFuelWarning(remainingFuel, remainingLaps) {
+		super.lowFuelWarning(remainingFuel, remainingLaps)
 
 		if isDebug()
 			showMessage("Low fuel warning - " . remainingLaps . " lap left")
@@ -1425,7 +1425,7 @@ else {
 }
 
 show(context, args*) {
-	showMessage(values2string(A_Space, args*), "Race Engineer Test", "Information.png", 2500)
+	showMessage(values2string(A_Space, args*), "Race Engineer Test", "Information.ico", 2500)
 
 	return true
 }

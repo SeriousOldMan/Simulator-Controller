@@ -40,15 +40,17 @@ class BasicStepWizard extends StepWizard {
 		}
 
 		Set {
+			local window := this.SetupWizard.Window
+
 			this.SetupWizard.BasicSetup := value
 
 			if this.SetupWizard.BasicSetup {
-				this.Control["basicSetupButton"].Value := (kResourcesDirectory . "Setup\Images\Quick Setup.ico")
-				this.Control["customSetupButton"].Value := (kResourcesDirectory . "Setup\Images\Full Setup Gray.ico")
+				this.Control["basicSetupButton"].Value := window.Theme.RecolorizeImage(kResourcesDirectory . "Setup\Images\Quick Setup.ico")
+				this.Control["customSetupButton"].Value := window.Theme.RecolorizeImage(kResourcesDirectory . "Setup\Images\Full Setup Gray.ico")
 			}
 			else {
-				this.Control["basicSetupButton"].Value := (kResourcesDirectory . "Setup\Images\Quick Setup Gray.ico")
-				this.Control["customSetupButton"].Value := (kResourcesDirectory . "Setup\Images\Full Setup.ico")
+				this.Control["basicSetupButton"].Value := window.Theme.RecolorizeImage(kResourcesDirectory . "Setup\Images\Quick Setup Gray.ico")
+				this.Control["customSetupButton"].Value := window.Theme.RecolorizeImage(kResourcesDirectory . "Setup\Images\Full Setup.ico")
 			}
 
 			return value
@@ -222,17 +224,17 @@ class BasicStepWizard extends StepWizard {
 
 		text := "<div style='text-align: center; font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 600'>" . text . "</div>"
 
-		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><br>" . text . "</body></html>"
+		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style> div, p, body { color: #" . window.Theme.TextColor . "}</style><br>" . text . "</body></html>"
 
 		widget1.document.write(html)
 
 		y += 150
 
-		widget2 := window.Add("Picture", "x" . button1X . " y" . y . " w64 h64 vbasicSetupButton Hidden X:Move(0.33)", kResourcesDirectory . (this.BasicSetup ? "Setup\Images\Quick Setup.ico" : "Setup\Images\Quick Setup Gray.ico"))
+		widget2 := window.Add("Picture", "x" . button1X . " y" . y . " w64 h64 vbasicSetupButton Hidden X:Move(0.33)", window.Theme.RecolorizeImage(kResourcesDirectory . (this.BasicSetup ? "Setup\Images\Quick Setup.ico" : "Setup\Images\Quick Setup Gray.ico")))
 		widget2.OnEvent("Click", chooseMethod.Bind("Basic"))
 		widget3 := window.Add("Text", "x" . button1X . " yp+68 w64 Hidden Center X:Move(0.33)", translate("Basic"))
 
-		widget4 := window.Add("Picture", "x" . button2X . " y" . y . " w64 h64 vcustomSetupButton Hidden X:Move(0.66)", kResourcesDirectory . (!this.BasicSetup ? "Setup\Images\Full Setup.ico" : "Setup\Images\Full Setup Gray.ico"))
+		widget4 := window.Add("Picture", "x" . button2X . " y" . y . " w64 h64 vcustomSetupButton Hidden X:Move(0.66)", window.Theme.RecolorizeImage(kResourcesDirectory . (!this.BasicSetup ? "Setup\Images\Full Setup.ico" : "Setup\Images\Full Setup Gray.ico")))
 		widget4.OnEvent("Click", chooseMethod.Bind("Extended"))
 		widget5 := window.Add("Text", "x" . button2X . " yp+68 w64 Hidden Center X:Move(0.66)", translate("Extended"))
 
@@ -244,7 +246,7 @@ class BasicStepWizard extends StepWizard {
 
 		text := "<div style='text-align: center; font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 600'>" . text . "</div>"
 
-		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><br>" . text . "</body></html>"
+		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style> div, p, body { color: #" . window.Theme.TextColor . "}</style><br>" . text . "</body></html>"
 
 		widget6.document.write(html)
 
@@ -316,7 +318,7 @@ class BasicStepWizard extends StepWizard {
 		widget39 := window.Add("Text", "xp+98 yp w96 h23 +0x200 Hidden", translate("Language"))
 		widget40 := window.Add("Text", "xp+98 yp w96 h23 +0x200 Hidden", translate("Voice"))
 
-		widget41 := window.Add("CheckBox", "x" . x . " yp+24 w16 h23 vbasicDCEnabledCheck Hidden" . (wizard.isModuleSelected("Driving Coach") ? " Checked" : ""))
+		widget41 := window.Add("CheckBox", "x" . x . " yp+24 w16 h21 vbasicDCEnabledCheck Hidden" . (wizard.isModuleSelected("Driving Coach") ? " Checked" : ""))
 		widget41.OnEvent("Click", updateAssistant.Bind("Driving Coach"))
 		widget42 := window.Add("Text", "xp+16 yp w86 h23 +0x200 Hidden", translate("Driving Coach"))
 		widget43 := window.Add("Edit", "xp+114 yp w96 VbasicDCNameEdit Hidden", "Aiden")
@@ -330,7 +332,7 @@ class BasicStepWizard extends StepWizard {
 		widget47.OnEvent("Click", editBooster.Bind("Driving Coach"))
 		setButtonIcon(widget47, kIconsDirectory . "Booster.ico", 1, "L4 T4 R4 B4")
 
-		widget14 := window.Add("CheckBox", "x" . x . " yp+24 w16 h23 vbasicREEnabledCheck Hidden" . (wizard.isModuleSelected("Race Engineer") ? " Checked" : ""))
+		widget14 := window.Add("CheckBox", "x" . x . " yp+24 w16 h21 vbasicREEnabledCheck Hidden" . (wizard.isModuleSelected("Race Engineer") ? " Checked" : ""))
 		widget14.OnEvent("Click", updateAssistant.Bind("Race Engineer"))
 		widget15 := window.Add("Text", "xp+16 yp w86 h23 +0x200 Hidden", translate("Race Engineer"))
 		widget16 := window.Add("Edit", "xp+114 yp w96 VbasicRENameEdit Hidden", "Jona")
@@ -344,7 +346,7 @@ class BasicStepWizard extends StepWizard {
 		widget48.OnEvent("Click", editBooster.Bind("Race Engineer"))
 		setButtonIcon(widget48, kIconsDirectory . "Booster.ico", 1, "L4 T4 R4 B4")
 
-		widget20 := window.Add("CheckBox", "x" . x . " yp+24 w16 h23 vbasicRSEnabledCheck Hidden" . (wizard.isModuleSelected("Race Strategist") ? " Checked" : ""))
+		widget20 := window.Add("CheckBox", "x" . x . " yp+24 w16 h21 vbasicRSEnabledCheck Hidden" . (wizard.isModuleSelected("Race Strategist") ? " Checked" : ""))
 		widget20.OnEvent("Click", updateAssistant.Bind("Race Strategist"))
 		widget21 := window.Add("Text", "xp+16 yp w86 h23 +0x200 Hidden", translate("Race Strategist"))
 		widget22 := window.Add("Edit", "xp+114 yp w96 VbasicRSNameEdit Hidden", "Khato")
@@ -358,7 +360,7 @@ class BasicStepWizard extends StepWizard {
 		widget49.OnEvent("Click", editBooster.Bind("Race Strategist"))
 		setButtonIcon(widget49, kIconsDirectory . "Booster.ico", 1, "L4 T4 R4 B4")
 
-		widget26 := window.Add("CheckBox", "x" . x . " yp+24 w16 h23 vbasicRSPEnabledCheck Hidden" . (wizard.isModuleSelected("Race Spotter") ? " Checked" : ""))
+		widget26 := window.Add("CheckBox", "x" . x . " yp+24 w16 h21 vbasicRSPEnabledCheck Hidden" . (wizard.isModuleSelected("Race Spotter") ? " Checked" : ""))
 		widget26.OnEvent("Click", updateAssistant.Bind("Race Spotter"))
 		widget27 := window.Add("Text", "xp+16 yp w86 h23 +0x200 Hidden", translate("Race Spotter"))
 		widget28 := window.Add("Edit", "xp+114 yp w96 VbasicRSPNameEdit Hidden", "Elisa")
@@ -378,12 +380,12 @@ class BasicStepWizard extends StepWizard {
 
 		text := "<div style='text-align: center; font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 600'>" . text . "</div>"
 
-		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><br>" . text . "</body></html>"
+		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style> div, p, body { color: #" . window.Theme.TextColor . "}</style><br>" . text . "</body></html>"
 
 		widget36.document.write(html)
 
 		widget37 := window.Add("Button", "x" . (x + Round((width / 2) - 45)) . " yp+96 w90 h60 X:Move(0.4) W:Grow(0.2) Y:Move(0.8) H:Grow(0.2) Hidden")
-		setButtonIcon(widget37, kResourcesDirectory . "\Setup\Images\Finish Line.png", 1, "w80 h53")
+		setButtonIcon(widget37, kResourcesDirectory . "\Setup\Images\Finish Line.png", 1, "w80 h53", false)
 		widget37.OnEvent("Click", finishSetup)
 
 		loop 51

@@ -106,7 +106,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		chooseVoiceRecognizer(*) {
 			local voiceRecognizerDropDown := this.Control["voiceRecognizerDropDown"]
 			local oldChoice := voiceRecognizerDropDown.LastValue
-			local recognizers, chosen
+			local recognizers, chosen, raceAssistant
 
 			if (oldChoice == 1)
 				this.hideServerRecognizerEditor()
@@ -262,18 +262,17 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 				enIndex := A_Index
 		}
 
-		for ignore, grammarFile in concatenate(getFileNames("Race Engineer.grammars.*", kUserGrammarsDirectory, kGrammarsDirectory)
-											 , getFileNames("Race Strategist.grammars.*", kUserGrammarsDirectory, kGrammarsDirectory)
-											 , getFileNames("Race Spotter.grammars.*", kUserGrammarsDirectory, kGrammarsDirectory)) {
-			SplitPath(grammarFile, , , &code)
+		for ignore, raceAssistant in kRaceAssistants
+			for ignore, grammarFile in getFileNames(raceAssistant . ".grammars.*", kUserGrammarsDirectory, kGrammarsDirectory) {
+				SplitPath(grammarFile, , , &code)
 
-			if !languages.Has(code) {
-				choices.Push(code)
+				if (!languages.Has(code) && !inList(choices, code)) {
+					choices.Push(code)
 
-				if (code = "en")
-					enIndex := choices.Length
+					if (code = "en")
+						enIndex := choices.Length
+				}
 			}
-		}
 
 		this.iLanguages := choices
 

@@ -1214,7 +1214,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x16 yp+12 w30 h30 Section", kIconsDirectory . "Road.ico")
+		editorGui.Add("Picture", "x16 yp+12 w30 h30 Section", this.themeIcon(kIconsDirectory . "Road.ico"))
 		editorGui.Add("Text", "x50 yp+5 w120 h26", translate("Selection"))
 
 		editorGui.SetFont("s8 Norm", "Arial")
@@ -1265,7 +1265,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x280 ys w30 h30 Section", kIconsDirectory . "Report.ico")
+		editorGui.Add("Picture", "x280 ys w30 h30 Section", this.themeIcon(kIconsDirectory . "Report.ico"))
 		editorGui.Add("Text", "xp+34 yp+5 w120 h26 W:Grow", translate("Notes"))
 
 		button := editorGui.Add("Button", "x647 yp w23 h23 X:Move")
@@ -1281,7 +1281,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x16 yp+12 w30 h30 Section vsettingsImg1", kIconsDirectory . "General Settings.ico").OnEvent("Click", chooseTab.Bind("Settings"))
+		editorGui.Add("Picture", "x16 yp+12 w30 h30 Section vsettingsImg1", this.themeIcon(kIconsDirectory . "General Settings.ico")).OnEvent("Click", chooseTab.Bind("Settings"))
 		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab1", translate("Race Settings")).OnEvent("Click", chooseTab.Bind("Settings"))
 
 		editorGui.Add("Text", "x16 yp+32 w267 0x10")
@@ -1289,7 +1289,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg2", kIconsDirectory . "Strategy.ico").OnEvent("Click", chooseTab.Bind("Strategies"))
+		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg2", this.themeIcon(kIconsDirectory . "Strategy.ico")).OnEvent("Click", chooseTab.Bind("Strategies"))
 		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab2", translate("Strategies")).OnEvent("Click", chooseTab.Bind("Strategies"))
 
 		editorGui.Add("Text", "x16 yp+32 w267 0x10")
@@ -1297,7 +1297,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg3", kIconsDirectory . "Tools BW.ico").OnEvent("Click", chooseTab.Bind("Setups"))
+		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg3", this.themeIcon(kIconsDirectory . "Tools BW.ico")).OnEvent("Click", chooseTab.Bind("Setups"))
 		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab3", translate("Setups")).OnEvent("Click", chooseTab.Bind("Setups"))
 
 		editorGui.Add("Text", "x16 yp+32 w267 0x10")
@@ -1305,7 +1305,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg4", kIconsDirectory . "Pressure.ico").OnEvent("Click", chooseTab.Bind("Pressures"))
+		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg4", this.themeIcon(kIconsDirectory . "Pressure.ico")).OnEvent("Click", chooseTab.Bind("Pressures"))
 		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab4", translate("Tyre Pressures")).OnEvent("Click", chooseTab.Bind("Pressures"))
 
 		editorGui.Add("Text", "x16 yp+32 w267 0x10")
@@ -1313,7 +1313,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg5", kIconsDirectory . "Road.ico").OnEvent("Click", chooseTab.Bind("Automation"))
+		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg5", this.themeIcon(kIconsDirectory . "Road.ico")).OnEvent("Click", chooseTab.Bind("Automation"))
 		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab5", translate("Automations")).OnEvent("Click", chooseTab.Bind("Automation"))
 
 		editorGui.Add("Text", "x16 yp+32 w267 0x10")
@@ -1321,7 +1321,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg6", kIconsDirectory . "Sensor.ico").OnEvent("Click", chooseTab.Bind("Data"))
+		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg6", this.themeIcon(kIconsDirectory . "Sensor.ico")).OnEvent("Click", chooseTab.Bind("Data"))
 		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab6", translate("Administration")).OnEvent("Click", chooseTab.Bind("Data"))
 
 		editorGui.Add("Text", "x16 yp+32 w267 0x10")
@@ -1378,7 +1378,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui.Add("Text", "x296 yp w80 h23 Y:Move +0x200", translate("Share"))
 		editorGui.Add("CheckBox", "xp+90 yp+4 w140 Y:Move vshareStrategyWithCommunityCheck", translate("with Community")).OnEvent("Click", updateStrategyAccess)
-		editorGui.Add("CheckBox", "xp yp+24 w140 Y:Move vshareStrategyWithTeamServerCheck", translate("on Team Server")).OnEvent("Click", updateStrategyAccess)
+		editorGui.Add("CheckBox", "x386 yp+24 w140 Y:Move vshareStrategyWithTeamServerCheck", translate("on Team Server")).OnEvent("Click", updateStrategyAccess)
 
 		editorGui["settingsTab"].UseTab(3)
 
@@ -1404,7 +1404,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui.Add("Text", "x296 yp w80 h23 Y:Move +0x200", translate("Share"))
 		editorGui.Add("CheckBox", "xp+90 yp+4 w140 Y:Move vshareSetupWithCommunityCheck", translate("with Community")).OnEvent("Click", updateSetupAccess)
-		editorGui.Add("CheckBox", "xp yp+24 w140 Y:Move vshareSetupWithTeamServerCheck", translate("on Team Server")).OnEvent("Click", updateSetupAccess)
+		editorGui.Add("CheckBox", "x386 yp+24 w140 Y:Move vshareSetupWithTeamServerCheck", translate("on Team Server")).OnEvent("Click", updateSetupAccess)
 
 		editorGui["settingsTab"].UseTab(4)
 
@@ -1498,7 +1498,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui["settingsTab"].UseTab(6)
 
-		editorGui.Add("CheckBox", "Check3 x296 ys+2 w15 h23 vdataSelectCheck").OnEvent("Click", selectAllData)
+		editorGui.Add("CheckBox", "Check3 x296 ys+2 w15 h21 vdataSelectCheck").OnEvent("Click", selectAllData)
 
 		this.iAdministrationListView := editorGui.Add("ListView", "x314 ys w342 h404 W:Grow H:Grow -Multi -LV0x10 Checked AltSubmit", collect(["Type", "Car / Track", "Driver", "#"], translate))
 		this.iAdministrationListView.OnEvent("ItemCheck", selectData)
@@ -1522,12 +1522,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.iDataListView := editorGui.Add("ListView", "x16 ys+301 w244 h151 H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Type", "#"], translate))
 		this.iDataListView.OnEvent("Click", noSelect)
 		this.iDataListView.OnEvent("DoubleClick", noSelect)
-
-		/*
-		editorGui.Add("Text", "x8 y700 w670 0x10 Y:Move W:Grow")
-
-		editorGui.Add("Button", "x304 y708 w80 h23 Y:Move H:Center", translate("Close")).OnEvent("Click", closeSessionDatabaseEditor)
-		*/
 
 		editorGui.Add(SessionDatabaseEditor.EditorResizer(editorGui))
 
@@ -1583,9 +1577,19 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						ToolTip()
 
 						if isObject(currentAction) {
-							actionInfo := translate((currentAction.Type = "Hotkey") ? (InStr(currentAction.Action, "|") ? "Hotkey(s): "
-																														: "Hotkey: ")
-																					: "Command: ")
+							switch currentAction.Type, false {
+								case "Hotkey":
+									actionInfo := translate(InStr(currentAction.Action, "|") ? "Hotkey(s): " : "Hotkey: ")
+								case "Command":
+									actionInfo := translate("Command: ")
+								case "Speech":
+									actionInfo := translate("Speech: ")
+								case "Audio":
+									actionInfo := translate("Audio: ")
+								default:
+									throw "Unknown action type detected in SessionDatabaseEditor.show..."
+							}
+
 							actionInfo := (inList(this.SelectedTrackAutomation.Actions, currentAction) . translate(": ")
 										 . (Round(currentAction.X, 3) . translate(", ") . Round(currentAction.Y, 3))
 										 . translate(" -> ")
@@ -1631,6 +1635,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.selectModule("Settings")
 
 		OnMessage(0x0200, showActionInfo)
+	}
+
+	themeIcon(fileName) {
+		return this.Window.Theme.RecolorizeImage(fileName)
 	}
 
 	getSimulators() {
@@ -1700,67 +1708,67 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		if this.moduleAvailable("Settings") {
 			window["settingsImg1"].Enabled := true
-			window["settingsImg1"].Value := kIconsDirectory . "General Settings.ico"
+			window["settingsImg1"].Value := this.themeIcon(kIconsDirectory . "General Settings.ico")
 			window["settingsTab1"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
 		}
 		else {
 			window["settingsImg1"].Enabled := false
-			window["settingsImg1"].Value := kIconsDirectory . "General Settings Gray.ico"
+			window["settingsImg1"].Value := this.themeIcon(kIconsDirectory . "General Settings Gray.ico")
 			window["settingsTab1"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
 		if this.moduleAvailable("Strategies") {
 			window["settingsImg2"].Enabled := true
-			window["settingsImg2"].Value := kIconsDirectory . "Strategy.ico"
+			window["settingsImg2"].Value := this.themeIcon(kIconsDirectory . "Strategy.ico")
 			window["settingsTab2"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
 		}
 		else {
 			window["settingsImg2"].Enabled := false
-			window["settingsImg2"].Value := kIconsDirectory . "Strategy Gray.ico"
+			window["settingsImg2"].Value := this.themeIcon(kIconsDirectory . "Strategy Gray.ico")
 			window["settingsTab2"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
 		if this.moduleAvailable("Setups") {
 			window["settingsImg3"].Enabled := true
-			window["settingsImg3"].Value := kIconsDirectory . "Tools BW.ico"
+			window["settingsImg3"].Value := this.themeIcon(kIconsDirectory . "Tools BW.ico")
 			window["settingsTab3"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
 		}
 		else {
 			window["settingsImg3"].Enabled := false
-			window["settingsImg3"].Value := kIconsDirectory . "Tools Gray.ico"
+			window["settingsImg3"].Value := this.themeIcon(kIconsDirectory . "Tools Gray.ico")
 			window["settingsTab3"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
 		if this.moduleAvailable("Pressures") {
 			window["settingsImg4"].Enabled := true
-			window["settingsImg4"].Value := kIconsDirectory . "Pressure.ico"
+			window["settingsImg4"].Value := this.themeIcon(kIconsDirectory . "Pressure.ico")
 			window["settingsTab4"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
 		}
 		else {
 			window["settingsImg4"].Enabled := false
-			window["settingsImg4"].Value := kIconsDirectory . "Pressure Gray.ico"
+			window["settingsImg4"].Value := this.themeIcon(kIconsDirectory . "Pressure Gray.ico")
 			window["settingsTab4"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
 		if this.moduleAvailable("Automation") {
 			window["settingsImg5"].Enabled := true
-			window["settingsImg5"].Value := kIconsDirectory . "Road.ico"
+			window["settingsImg5"].Value := this.themeIcon(kIconsDirectory . "Road.ico")
 			window["settingsTab5"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
 		}
 		else {
 			window["settingsImg5"].Enabled := false
-			window["settingsImg5"].Value := kIconsDirectory . "Road Gray.ico"
+			window["settingsImg5"].Value := this.themeIcon(kIconsDirectory . "Road Gray.ico")
 			window["settingsTab5"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
 		if this.moduleAvailable("Data") {
 			window["settingsImg6"].Enabled := true
-			window["settingsImg6"].Value := kIconsDirectory . "Sensor.ico"
+			window["settingsImg6"].Value := this.themeIcon(kIconsDirectory . "Sensor.ico")
 			window["settingsTab6"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
 		}
 		else {
 			window["settingsImg6"].Enabled := false
-			window["settingsImg6"].Value := kIconsDirectory . "Sensor Gray.ico"
+			window["settingsImg6"].Value := this.themeIcon(kIconsDirectory . "Sensor Gray.ico")
 			window["settingsTab6"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
@@ -2851,7 +2859,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		DirCreate(directory)
 
 		this.iTrackMap := trackMap
-		this.iTrackImage := trackImage
+		this.iTrackImage := this.Window.Theme.RecolorizeImage(trackImage)
 
 		this.createTrackMap()
 	}
@@ -4684,20 +4692,21 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 		actionDialog("Update")
 	}
 	else if (xOrCommand = "Update") {
-		actionLabel.Text := translate((actionTypeDropDown.Value = 1) ? "Hotkey(s)" : "Command")
+		actionLabel.Text := translate(["Hotkey(s)", "Command", "Speech", "Audio"][actionTypeDropDown.Value])
 
-		if (actionTypeDropDown.Value = 1)
-			commandChooserButton.Enabled := false
-		else
-			commandChooserButton.Enabled := true
+		commandChooserButton.Enabled := ((actionTypeDropDown.Value = 2) || (actionTypeDropDown.Value = 4))
 	}
-	else if (xOrCommand = "Command") {
+	else if (xOrCommand = "File") {
 		actionDialogGui.Opt("+OwnDialogs")
 
 		translator := translateMsgBoxButtons.Bind(["Select", "Cancel"])
 
 		OnMessage(0x44, translator)
-		fileName := withBlockedWindows(FileSelect, 1, actionEdit.Text, translate("Select executable file..."), "Script (*.*)")
+
+		if (actionTypeDropDown.Value = 2)
+			fileName := withBlockedWindows(FileSelect, 1, actionEdit.Text, translate("Select executable file..."), "Script (*.*)")
+		else
+			fileName := withBlockedWindows(FileSelect, 1, actionEdit.Text, translate("Select Sound File..."), "Audio (*.*)")
 		OnMessage(0x44, translator, 0)
 
 		if fileName
@@ -4713,7 +4722,7 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 		actionDialogGui.Add("Text", "x16 y16 w70 h23 +0x200", translate("Action"))
 
 		if action {
-			chosen := inList(["Hotkey", "Command"], action.Type)
+			chosen := inList(["Hotkey", "Command", "Speech", "Audio"], action.Type)
 
 			actionEdit := action.Action
 		}
@@ -4723,13 +4732,13 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 			actionEdit := ""
 		}
 
-		actionTypeDropDown := actionDialogGui.Add("DropDownList", "x90 yp+1 w180 Choose" . chosen, collect(["Hotkey(s)", "Command"], translate))
+		actionTypeDropDown := actionDialogGui.Add("DropDownList", "x90 yp+1 w180 Choose" . chosen, collect(["Hotkey(s)", "Command", "Speech", "Audio"], translate))
 		actionTypeDropDown.OnEvent("Change", actionDialog.Bind("Type"))
 
 		actionLabel := actionDialogGui.Add("Text", "x16 yp+23 w70 h23 +0x200", translate("Hotkey(s)"))
 		actionEdit := actionDialogGui.Add("Edit", "x90 yp+1 w155 h21", actionEdit)
 		commandChooserButton := actionDialogGui.Add("Button", "x247 yp w23 h23", translate("..."))
-		commandChooserButton.OnEvent("Click", actionDialog.Bind("Command"))
+		commandChooserButton.OnEvent("Click", actionDialog.Bind("File"))
 
 		actionDialogGui.Add("Button", "x16 yp+35 w80 h23 Y:Move", translate("Trigger...")).OnEvent("Click", toggleTriggerDetector)
 		actionDialogGui.Add("Button", "x104 yp w80 h23 Default", translate("Ok")).OnEvent("Click", actionDialog.Bind(kOk))
@@ -4739,6 +4748,8 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 		y := (y - 35)
 
 		actionDialog("Update")
+
+		actionDialogGui.Opt("+Owner" . SessionDatabaseEditor.Instance.Window.Hwnd)
 
 		actionDialogGui.Show("x" . x . " y" . y . " AutoSize")
 
@@ -4758,7 +4769,7 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 				else
 					action := Object()
 
-				action.Type := ["Hotkey", "Command"][actionTypeDropDown.Value]
+				action.Type := ["Hotkey", "Command", "Speech", "Audio"][actionTypeDropDown.Value]
 				action.Action := actionEdit.Text
 
 				return action
@@ -4835,7 +4846,7 @@ selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner :
 
 		importSettingsGui.Add("Text", "x8 yp+30 w410 W:Grow 0x10")
 
-		importSelectCheck := importSettingsGui.Add("CheckBox", "Check3 x16 yp+12 w15 h23 vimportSelectCheck")
+		importSelectCheck := importSettingsGui.Add("CheckBox", "Check3 x16 yp+12 w15 h21 vimportSelectCheck")
 		importSelectCheck.OnEvent("Click", selectAllImportEntries)
 
 		importListView := importSettingsGui.Add("ListView", "x34 yp-2 w375 h400 H:Grow W:Grow -Multi -LV0x10 Checked AltSubmit", collect(["Car", "Track", "Weather", "Setting", "Value"], translate))
@@ -5011,7 +5022,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 
 		importDataGui.Add("Text", "x8 yp+30 w410 W:Grow 0x10")
 
-		importSelectCheck := importDataGui.Add("CheckBox", "Check3 x16 yp+12 w15 h23 vimportSelectCheck")
+		importSelectCheck := importDataGui.Add("CheckBox", "Check3 x16 yp+12 w15 h21 vimportSelectCheck")
 		importSelectCheck.OnEvent("Click", selectAllImportEntries)
 
 		importListView := importDataGui.Add("ListView", "x34 yp-2 w375 h400 H:Grow W:Grow -Multi -LV0x10 Checked AltSubmit", collect(["Type", "Car / Track", "Driver", "#"], translate))
@@ -5601,7 +5612,7 @@ editSettings(editorOrCommand, arguments*) {
 
 		settingsEditorGui.SetFont("Italic", "Arial")
 
-		settingsEditorGui.Add("GroupBox", "x16 yp+30 w388 h216 Section -Theme", translate("Team Data"))
+		settingsEditorGui.Add("GroupBox", "x16 yp+30 w388 h216 Section", translate("Team Data"))
 
 		settingsEditorGui.SetFont("Norm", "Arial")
 

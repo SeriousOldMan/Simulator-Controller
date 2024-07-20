@@ -31,10 +31,26 @@ The documentation is devided into the following sections:
 
     Gives you detailed information, how to configure and manage all available tyre compounds for a specific car in a given simulator.
 
+  - [Session Database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database)
+  
+    All applications of Simulator Controller are data-based. If you are on the track, important data is collected and can be stored into the session database for future usage. Using the "Session Database" application, you can browse this data, share data with your team mates or even the community and you can manage car, track and weather-specific settings for the Race Assistants.
+	
   - [Setup Workbench](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench)
 
     This smart tool gives valuable recommendations on how to change a car setup for a given problem. The tool follows an interview-like approach and can even handle contradictory requirements.
+
+  - [Practice Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Practice-Center)
+  
+    This application helps you in organizing and evaluating your practice runs. You have full access to all relvant telemetry and performance data and you can decide which of the collected data will be stored in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) (see above). The "Practice Center" can also be used in a solo race and offer almost the same functionality as the team-oriented ["Race Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center) (see below).
 	
+  - [Strategy Workbench](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench)
+
+    This sophisticated application allows you to develop and simulate strategies for any type of race, ranging from a 30 minute, solo sprint race with one required pitstop up to full-weekend endurance races with multiple drivers. The strategy simulation is data-based and can even handle weather forecasts. A developed strategy can be handed over to the [Virtuak Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist), which then will keep track of the strategy during the race.
+	
+  - [Race Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center)
+  
+    Using the "Race Center", a complete pitwall application, you can plan the race, prepare a strategy and based on that the stint plan for the race. All team members or even a dedicated engineer can investigate the telemetry data and gather information about the race development in general and can remote control the car, for example to prepare an upcoming pitstop, without any driver interaction. Last, but not least, if you encounter an unforeseen event during the race, you have various tools at hand to adopt the strategy to the new race situation. The "Race Center" requires all drivers to be connected to the ["Team Server"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) (see below).
+  
   - [Virtual Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach)
 
     This a very special chatbot, which behaves as your personal driving coach. Based on text-based GPT technology, it uses a publically available large language model which has been trained with vasts amount of information. Aks anything about racing, car handling and driving techniques and you will probably will get an interesting answer.
@@ -51,13 +67,17 @@ The documentation is devided into the following sections:
 
     The third Assistant, Elisa, will watch your race and will warn you about nearby other cars and will give you general information about the current race situation.
 	
+  - [Customizing Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants)
+
+    This chapter provides a guideline how to extend the Race Assistants by connecting them to a GPT service and how to introduce new events and actions.
+	
   - [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server)
 
-    If you are participating in multiplayer team-based endurance races, you use the *Team Server* to share the car state and the knowledge ot the Virtual Race Assistants between all participating drivers. Using the "Race Center", a complete pitwall application, you can plan the race, prepare a strategy and based on that the stint plan for the race. All team members or even a dedicated engineer can investigate the telemetry data and gather information about the race development in general and can remote control the car, for example to prepare an upcoming pitstop, without any driver interaction. Last, but not least, if you encounter an unforeseen event during the race, you have various tools at hand to adopt the strategy to the new race situation.
+    If you are participating in multiplayer team-based endurance races, you use the *Team Server* to share the car state and the knowledge ot the Virtual Race Assistants between all participating drivers. It is also necessary for using the "Race Center" in a team race.
 	
   - [Development Guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts)
 
-    Complete set of information for developers, who want to create their own plugins or even contribute to the further development of Simulator Controller.
+    Complete set of information for developers, who want to create their own plugins or even contribute to the further development of Simulator Controller. Also part of the developer documentation is an introduction and complete reference for the builtin [Hybrid Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine).
 	
   - [Development Backlog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Backlog)
 

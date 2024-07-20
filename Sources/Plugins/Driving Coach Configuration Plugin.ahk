@@ -477,8 +477,11 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 	loadProviderConfiguration(provider := false) {
 		local configuration
 
-		if provider
+		if provider {
+			this.Control["dcProviderDropDown"].Delete()
+			this.Control["dcProviderDropDown"].Add(this.Providers)
 			this.Control["dcProviderDropDown"].Choose(inList(this.Providers, provider))
+		}
 
 		this.iCurrentProvider := this.Control["dcProviderDropDown"].Text
 

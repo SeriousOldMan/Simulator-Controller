@@ -570,7 +570,7 @@ class LLMRuntime extends NamedPreset {
 				RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\LLM Runtime.zip' -DestinationPath '" . kUserHomeDirectory . "Programs\LLM Runtime" . "' -Force", , "Hide")
 			}
 			finally {
-				wizard.Unblock()
+				wizard.Window.Unblock()
 
 				updateTask.stop()
 

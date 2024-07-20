@@ -1,6 +1,6 @@
 ## Preamble
 
-Everything presented in this chapter is fully optional and I even recommend to not use it right from the start, since it requires some effort to configure. But, once you have mastered it, it will take the experience with the Assistants to a whole new level. Welcome to the fascinating world of GPT and large language models (aka LLMs).
+Everything presented in this chapter is fully optional and I even recommend to not use it right from the start, since it requires some effort to configure and maybe several tests to get it right. But, once you have mastered it, it will take the experience with the Assistants to a whole new level. Welcome to the fascinating world of GPT and large language models (aka LLMs).
 
 ## Introduction
 
@@ -24,7 +24,7 @@ Said this, it is clear, that the interaction with the Assistants, although alrea
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20Speech%20Improvement.JPG)
 
-Please note, that the first three conversation-related boosters all share a GPT service and a single model, whereas you can choose a separate GPT service and model for the Agent booster, which requires strong reasoning skills. This might be helpful to select the best possible model for each task.
+Please note, that the first three conversation-related boosters all share a GPT service and a single model, whereas you can choose a separate GPT service and model for the *Reasoning* booster, which requires strong reasoning skills, but no conversational skills at all. This might be helpful to select the best possible model for each task.
 
 Please take a look at the documentation for the [Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#installation) for a description of the different providers and LLMs which can be configured here.
 
@@ -34,7 +34,7 @@ Disclaimer: Large Language Models, although incredibly impressive, are still und
 
 ## Overview of the different Assistant Boosters
 
-Several boosters are available at the moment. The boosters *Rephrasing* and *Understanding* will not introduce additional capabilities or functionality, but will make the conversation more natural. I recommend to start with these boosters
+Several boosters are available at the moment. The boosters *Rephrasing* and *Understanding* will not introduce additional capabilities or functionality, but will make the conversation more natural. I recommend to start with these boosters.
 
 Good to know: Whenever one or more Assistant Boosters are configured for a Race Assistant, a transcript of every LLM activation is stored in the *Simulator Controller\Logs\Transcripts* folder which is located in your user *Documents* folder.
 
@@ -318,11 +318,11 @@ Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 
 Notes:
 
-- As said, the available data depeneds on the current simulator. If available, information about tyre wear, brake temeperatures and wear and so on are included as well.
+- As said, the available data depeneds on the current simulator. If available, information about tyre wear, brake temperatures and wear and so on are included as well.
 - The number of laps in the lap history is limited to the 5 recent laps.
 - The number of pitstops in the pitstop history is unlimited.
 
-Additionally, you can allow the LLM to call [predefined or custom actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-actions) as a result of your conversation. For example, if you ask the Strategist whether an undercut might be possible in one of the next laps, the LLM may call the Monte Carlo traffic simulation using an internal action. Which actions will be available to the LLM depends on the current Assistant. See corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#trigger-actions-from-conversation) for the Strategist for an example.
+Additionally, you can allow the LLM to *call* [predefined or custom actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-actions) as a result of your conversation. For example, if you ask the Strategist whether an undercut might be possible in one of the next laps, the LLM may call the Monte Carlo traffic simulation using an internal action. Which actions will be available to the LLM depends on the current Assistant. See corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#trigger-actions-from-conversation) for the Strategist for an example.
 
 IMPORTANT: When action handling is enabled, it might be necessary to disable the *Recognition* booster or at least set the "Creativity" to a very low value. Otherwise the "Recognition" booster might detect a command pattern, which will match to a pre-defined voice command, thereby preventing the LLM from creating a custom action plan.
 
@@ -330,7 +330,7 @@ IMPORTANT: When action handling is enabled, it might be necessary to disable the
 
 *Reasoning* is the most complex and most capable booster, since it allows you to alter or extend the behavior of the Assistant. You can use predefined events or even define your own ones in the [Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine) (as shown below), which then result in a request to the LLM (actually you can process events even without using the LLM directly in rule engine, but this is only half of the fun). Similar to the *Conversation* bosster above, the LLM then can decide to activate one or more [predefined or custom actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-booster-actions) to fulfill the request or react to the situation. To support its conclusion, the LLM will have full access to the same knowledge as in the *Conversation* booster.
 
-The *Conversation* booster implements an LLM agent framework architecture also used by famous open-source agent development environments like [LangChain](https://python.langchain.com/). The difference here is the deep integration with the rule engine of the Assistants as the central instance for the LLM activation.
+The *Reasoning* booster implements an LLM agent framework architecture also used by famous open-source agent development environments like [LangChain](https://python.langchain.com/). The difference here is the deep integration with the rule engine of the Assistants as the central instance for the LLM activation.
 
 As already mentioned, you can choose a different LLM for this booster, because here strong reasoning skills are way more important than conversational excellence.
 	 
@@ -342,7 +342,7 @@ The *Reasoning* bosster as well as to some extent the *Conversation* booster rel
 
   - GPT 3.5 and above from *OpenAI*
   - Mistral Small, Mistral Large and Mixtral 8x22b from *Mistral AI*
-  - Claude3 by *Anthropic* (via *OpenRouter*)
+  - Claude3 and above by *Anthropic* (via *OpenRouter*)
   - Command-R+ by *Cohere* (via *OpenRouter*, but not working properly yet)
   - Some Open Source models, such as Open Hermes, also support tools but with a varying degree of reliability
 
@@ -437,7 +437,7 @@ You can enable or disable individual predefined actions using the checkbox on th
 
    This format is used by many other GPT service providers as well. Every LLM, that *understands* this type of function description, will be able to trigger actions, when used as a *Conversation* or *Reasoning* booster. The editor for the *Conversation* or *Reasoning* actions shown above is for the most part a graphical user interface for this type of function definitions. But it also let you define how to react to a *function call* by the LLM (see next section).
    
-   Additionally to all the information required by the LLM function definition you can specify whether the corresponding action will be available during the learning phase of the Assistant and whether the Assistant will acknowledge your request like it is done with many of the builtin voice commands. This should be enabled for all actions you want to trigger by a corresponding question or command and should be disabled for all functions you expect the LLM to call automatically whenever needed.
+   Additionally to all the information required by the LLM function definition you can specify whether the corresponding action will be available during the learning phase of the Assistant and whether the Assistant will acknowledge your request like it is done with many of the builtin voice commands. As a rule of thumb. this should be enabled for all actions you want to trigger by a corresponding question or command and should be disabled for all functions you expect the LLM to call automatically whenever needed.
    
    Note: The description of a function and each of their parameters is very important, since these are used by the LLM to *understand* when and how to invoke the function. It may require several iterations and different formulations until the LLM reacts as desired. 
 
@@ -478,12 +478,14 @@ You can enable or disable individual predefined actions using the checkbox on th
    
 	   estimateTrackWetness() <= calculateTrackWetness(), Assistant.Speak("It will be too wet. I will come up with a new strategy."), Assistant.Call(planPitstop)
 
-   Predicates with a variable number of arguments, up to 6 arguments are supported. If you need to pass more arguments, use the syntax Call(*Function.Call*, *function*, p1, ..., pn) for backward chaining rules.
+   Up to 6 arguments are supported for predicates with a variable number of arguments. If you need to pass more arguments, use the syntax Call(*Assistant.Call*, *function*, p1, ..., pn) for backward chaining rules. Same applies to any other of the above *calls*.
 	   
    In forward chaining rules, the syntax is a bit different:
    
 	   [?Track.Grip = Wet] => (Call: Assistant.Speak("It will be too wet. I will come up with a new strategy.")), (Call: Assistant.Call(planPitstop))
 
+   Here you can use (Call: *Assistant.Call*(function, p1, ..., pn)), if more than 6 arguments should be passed to the function. Same applies to any other of the above *calls*.
+   
 As you can see, defining individual actions is really an expert topic and therefore nothing for the casual user. If you want use this feature, I can offer a personal introduction and coaching as part of the Patreon membership.
 
 Here is a very simple example:

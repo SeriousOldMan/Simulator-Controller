@@ -1,7 +1,7 @@
 [Development]
 Version=5.8.1.0-dev
 Target=5.8.1.0-release
-Date=07/26/2024
+Date=07/21/2024
 Download=
 Changes=Added available tyre compounds to the LLM knowledge, Clarifications in the documentations "Customize Assistants" and "Rule Engine", New LLM Runtime, LLM Runtime is now a downloadable preset
 Components=Media->5.6.1,Configuration->5.8.1,Utilities->5.4.8

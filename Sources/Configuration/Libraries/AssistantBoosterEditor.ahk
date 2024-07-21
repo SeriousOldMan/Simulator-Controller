@@ -113,9 +113,11 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 			this.updateState()
 		}
 
-		validateTokens(*) {
-			local field := this.Control["viConversationMaxTokensEdit"]
-			local value := field.Text
+		validateTokens(field, *) {
+			local value
+
+			field := this.Control[field]
+			value := field.Text
 
 			if (!isInteger(value) || (value < 32)) {
 				field.Text := (field.HasProp("ValidText") ? field.ValidText : "200")
@@ -143,6 +145,21 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 			this.updateState()
 		}
 
+		chooseModelPath(field, *) {
+			local fileName, translator
+
+			editorGui.Opt("+OwnDialogs")
+
+			translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
+
+			OnMessage(0x44, translator)
+			fileName := withBlockedWindows(FileSelect, 1, "", translate("Select model file..."), "GGUF (*.GGUF)")
+			OnMessage(0x44, translator, 0)
+
+			if (fileName != "")
+				editorGui[field].Text := fileName
+		}
+
 		editInstructions(type, title, *) {
 			this.editInstructions(type, title)
 		}
@@ -162,9 +179,10 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 			if provider {
 				configuration := this.iProviderConfigurations[type . "." . provider]
 
-				this.loadModels(type, provider, this.Control["viConversationServiceURLEdit"].Text
-											  , this.Control["viConversationServiceKeyEdit"].Text
-											  , this.Control["viConversationModelDropDown"].Text)
+				this.loadModels(type, provider, this.Control["vi" . type . "ServiceURLEdit"].Text
+											  , this.Control["vi" . type . "ServiceKeyEdit"].Text
+											  , this.Control[(provider = "LLM Runtime") ? ("vi" . type . "ModelEdit")
+																						: ("vi" . type . "ModelDropDown")].Text)
 			}
 			else
 				this.loadModels(type, false)
@@ -212,13 +230,23 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 		editorGui.Add("Edit", "x" . (x1 + 102) . " yp w" . (w1 - 102) . " h23 vviConversationServiceURLEdit").OnEvent("Change", loadModels.Bind("Conversation"))
 
-		editorGui.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200", translate("Service Key"))
+		editorGui.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200 Section vviConversationServiceKeyLabel", translate("Service Key"))
 		editorGui.Add("Edit", "x" . x1 . " yp w" . w1 . " h23 Password vviConversationServiceKeyEdit").OnEvent("Change", loadModels.Bind("Conversation"))
 
-		editorGui.Add("Text", "x" . x0 . " yp+30 w105 h23 +0x200", translate("Model / # Tokens"))
+		editorGui.Add("Text", "x" . x0 . " yp+30 w105 h23 +0x200 vviConversationModelLabel", translate("Model / # Tokens"))
 		editorGui.Add("ComboBox", "x" . x1 . " yp w" . (w1 - 64) . " vviConversationModelDropDown")
-		editorGui.Add("Edit", "x" . (x1 + (w1 - 60)) . " yp-1 w60 h23 Number vviConversationMaxTokensEdit").OnEvent("Change", validateTokens)
-		editorGui.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 Range32-131072")
+		editorGui.Add("Edit", "x" . (x1 + (w1 - 60)) . " yp-1 w60 h23 Number vviConversationMaxTokensEdit").OnEvent("Change", validateTokens.Bind("viConversationMaxTokensEdit"))
+		editorGui.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 Range32-131072 vviConversationMaxTokensRange")
+
+		editorGui.Add("Text", "x" . x0 . " ys w105 h23 +0x200 vviConversationLLMRTModelLabel Hidden", translate("Model"))
+		editorGui.Add("Edit", "x" . x1 . " yp w" . (w1 - 24) . " vviConversationLLMRTModelEdit Hidden")
+		editorGui.Add("Button", "x" . (x1 + (w1 - 23)) . " yp h23 w23 vviConversationLLMRTModelButton Hidden", translate("...")).OnEvent("Click", chooseModelPath.Bind("viConversationLLMRTModelEdit"))
+
+		editorGui.Add("Text", "x" . x0 . " yp+30 w120 h23 +0x200 vviConversationLLMRTTokensLabel Hidden", translate("# Tokens / # GPULayers"))
+		editorGui.Add("Edit", "x" . x1 . " yp-1 w60 h23 Number vviConversationLLMRTMaxTokensEdit Hidden").OnEvent("Change", validateTokens.Bind("viConversationLLMRTMaxTokensEdit"))
+		editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range32-131072 vviConversationLLMRTMaxTokensRange Hidden")
+		editorGui.Add("Edit", "x" . (x1 + 62) . " yp w60 h23 Number Limit2 vviConversationLLMRTGPULayersEdit Hidden")
+		editorGui.Add("UpDown", "x" . (x1 + 62) . " yp w60 h23 Range0-99 vviConversationLLMRTGPULayersRange Hidden")
 
 		editorGui.SetFont("Italic", "Arial")
 		editorGui.Add("Checkbox", "x" . x0 . " yp+36 w105 h21 vviSpeakerCheck", translate("Rephrasing")).OnEvent("Click", (*) => this.updateState())
@@ -285,11 +313,19 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 		editorGui.Add("Edit", "x" . (x1 + 102) . " yp w" . (w1 - 102) . " h23 vviAgentServiceURLEdit").OnEvent("Change", loadModels.Bind("Agent"))
 
-		editorGui.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200", translate("Service Key"))
+		editorGui.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200 Section vviAgentServiceKeyLabel", translate("Service Key"))
 		editorGui.Add("Edit", "x" . x1 . " yp w" . w1 . " h23 Password vviAgentServiceKeyEdit").OnEvent("Change", loadModels.Bind("Agent"))
 
-		editorGui.Add("Text", "x" . x0 . " yp+30 w105 h23 +0x200", translate("Model"))
+		editorGui.Add("Text", "x" . x0 . " yp+30 w105 h23 +0x200 vviAgentModelLabel", translate("Model"))
 		editorGui.Add("ComboBox", "x" . x1 . " yp w" . w1 . " vviAgentModelDropDown")
+
+		editorGui.Add("Text", "x" . x0 . " ys w105 h23 +0x200 vviAgentLLMRTModelLabel Hidden", translate("Model"))
+		editorGui.Add("Edit", "x" . x1 . " yp w" . (w1 - 24) . " vviAgentLLMRTModelEdit Hidden")
+		editorGui.Add("Button", "x" . (x1 + (w1 - 23)) . " yp h23 w23 vviAgentLLMRTModelButton Hidden", translate("...")).OnEvent("Click", chooseModelPath.Bind("viAgentLLMRTModelEdit"))
+
+		editorGui.Add("Text", "x" . x0 . " yp+30 w120 h23 +0x200 vviAgentLLMRTGPULayersLabel Hidden", translate("# GPULayers"))
+		editorGui.Add("Edit", "x" . x1 . " yp-1 w60 h23 Number Limit2 vviAgentLLMRTGPULayersEdit Hidden")
+		editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range0-99 vviAgentLLMRTGPULayersRange Hidden")
 
 		editorGui.Add("Button", "x" . (x + 8) . " yp+30 w100 h23 vviAgentEventsButton", translate("Events...")).OnEvent("Click", editEvents)
 
@@ -306,46 +342,53 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 	loadModels(type, provider, serviceURL := false, serviceKey := false, model := false) {
 		local connector, index, models
 
-		if provider {
-			try {
-				connector := LLMConnector.%StrReplace(provider, A_Space, "")%Connector(this, model)
+		if !model
+			model := ""
 
-				if isInstance(connector, LLMConnector.APIConnector) {
-					connector.Connect(serviceURL, serviceKey)
+		if (provider = "LLM Runtime")
+			this.Control["vi" . type . "LLMRTModelEdit"].Text := model
+		else {
+			if provider {
+				try {
+					connector := LLMConnector.%StrReplace(provider, A_Space, "")%Connector(this, model)
 
-					models := connector.Models
+					if isInstance(connector, LLMConnector.APIConnector) {
+						connector.Connect(serviceURL, serviceKey)
+
+						models := connector.Models
+					}
+					else
+						models := this.Models[provider]
 				}
-				else
+				catch Any as exception {
 					models := this.Models[provider]
+				}
 			}
-			catch Any as exception {
-				models := this.Models[provider]
+			else
+				models := []
+
+			if model {
+				index := inList(models, model)
+
+				if !index {
+					index := inList(models, StrReplace(model, A_Space, "-"))
+
+					if index
+						model := models[index]
+				}
+
+				if !index
+					models := concatenate(models, [model])
 			}
+
+			this.Control["vi" . type . "ModelDropDown"].Delete()
+			this.Control["vi" . type . "ModelDropDown"].Add(models)
+
+			if model
+				this.Control["vi" . type . "ModelDropDown"].Choose(inList(models, model))
+			else
+				this.Control["vi" . type . "ModelDropDown"].Choose((models.Length > 0) ? 1 : 0)
 		}
-		else
-			models := []
-
-		if model {
-			index := inList(models, model)
-
-			if !index {
-				index := inList(models, StrReplace(model, A_Space, "-"))
-
-				if index
-					model := models[index]
-			}
-
-			if !index
-				models := concatenate(models, [model])
-		}
-
-		this.Control["vi" . type . "ModelDropDown"].Delete()
-		this.Control["vi" . type . "ModelDropDown"].Add(models)
-
-		if model
-			this.Control["vi" . type . "ModelDropDown"].Choose(inList(models, model))
-		else
-			this.Control["vi" . type . "ModelDropDown"].Choose((models.Length > 0) ? 1 : 0)
 	}
 
 	normalizeConfiguration(configuration) {
@@ -587,7 +630,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 			if (this.Control["viConversationProviderDropDown"].Value = 1) {
 				this.iCurrentConversationProvider := false
 
-				for ignore, setting in ["ServiceURL", "ServiceKey", "MaxTokens", "GPULayers"]
+				for ignore, setting in ["ServiceURL", "ServiceKey", "MaxTokens", "LLMRTMaxTokens", "LLMRTGPULayers"]
 					this.Control["viConversation" . setting . "Edit"].Text := ""
 
 				for ignore, setting in ["SpeakerProbability", "SpeakerTemperature", "ListenerTemperature", "ConversationMaxHistory", "ConversationTemperature"]
@@ -605,11 +648,15 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 				if this.iProviderConfigurations.Has("Conversation." . this.iCurrentConversationProvider)
 					configuration := this.iProviderConfigurations["Conversation." . this.iCurrentConversationProvider]
 
-				for ignore, setting in ["ServiceURL", "ServiceKey", "MaxTokens"]
+				for ignore, setting in ["ServiceURL", "ServiceKey"]
 					this.Control["viConversation" . setting . "Edit"].Text := configuration[setting]
 
-				if (provider = "LLM Runtime")
-					this.Control["viConversationGPULayersEdit"].Text := configuration["GPULayers"]
+				if (provider = "LLM Runtime") {
+					this.Control["viConversationLLMRTMaxTokensEdit"].Text := configuration["MaxTokens"]
+					this.Control["viConversationLLMRTGPULayersEdit"].Text := configuration["GPULayers"]
+				}
+				else
+					this.Control["viConversationMaxTokensEdit"].Text := configuration["MaxTokens"]
 
 				if ((provider = "GPT4All") && (Trim(this.Control["viConversationServiceKeyEdit"].Text) = ""))
 					this.Control["viConversationServiceKeyEdit"].Text := "Any text will do the job"
@@ -644,7 +691,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 			if (this.Control["viAgentProviderDropDown"].Value = 1) {
 				this.iCurrentAgentProvider := false
 
-				for ignore, setting in ["ServiceURL", "ServiceKey", "GPULayers"]
+				for ignore, setting in ["ServiceURL", "ServiceKey", "LLMRTGPULayers"]
 					this.Control["viAgent" . setting . "Edit"].Text := ""
 			}
 			else {
@@ -657,7 +704,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 					this.Control["viAgent" . setting . "Edit"].Text := configuration[setting]
 
 				if (provider = "LLM Runtime")
-					this.Control["viAgentGPULayersEdit"].Text := configuration["GPULayers"]
+					this.Control["viAgentLLMRTGPULayersEdit"].Text := configuration["GPULayers"]
 
 				if ((provider = "GPT4All") && (Trim(this.Control["viAgentServiceKeyEdit"].Text) = ""))
 					this.Control["viAgentServiceKeyEdit"].Text := "Any text will do the job"
@@ -684,13 +731,20 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 			providerConfiguration["ServiceURL"] := Trim(this.Control["viConversationServiceURLEdit"].Text)
 			providerConfiguration["ServiceKey"] := Trim(this.Control["viConversationServiceKeyEdit"].Text)
 
-			value := this.Control["viConversationModelDropDown"].Text
+			if (this.iCurrentConversationProvider = "LLM Runtime")
+				value := this.Control["viConversationLLMRTModelEdit"].Text
+			else
+				value := this.Control["viConversationModelDropDown"].Text
 
 			providerConfiguration["Model"] := ((Trim(value) != "") ? Trim(value) : false)
-			providerConfiguration["MaxTokens"] := this.Control["viConversationMaxTokensEdit"].Text
+
+			if (this.iCurrentConversationProvider = "LLM Runtime")
+				providerConfiguration["MaxTokens"] := this.Control["viConversationLLMRTMaxTokensEdit"].Text
+			else
+				providerConfiguration["MaxTokens"] := this.Control["viConversationMaxTokensEdit"].Text
 
 			if (this.Control["viConversationProviderDropDown"].Text = "LLM Runtime")
-				providerConfiguration["GPULayers"] := this.Control["viConversationGPULayersEdit"].Text
+				providerConfiguration["GPULayers"] := this.Control["viConversationLLMRTGPULayersEdit"].Text
 
 			if (this.Control["viSpeakerCheck"].Value = 1) {
 				providerConfiguration["Speaker"] := true
@@ -734,12 +788,15 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 			providerConfiguration["ServiceURL"] := Trim(this.Control["viAgentServiceURLEdit"].Text)
 			providerConfiguration["ServiceKey"] := Trim(this.Control["viAgentServiceKeyEdit"].Text)
 
-			value := this.Control["viAgentModelDropDown"].Text
+			if (this.iCurrentAgentProvider = "LLM Runtime")
+				value := this.Control["viAgentLLMRTModelEdit"].Text
+			else
+				value := this.Control["viAgentModelDropDown"].Text
 
 			providerConfiguration["Model"] := ((Trim(value) != "") ? Trim(value) : false)
 
-			if (this.Control["viAgentProviderDropDown"].Text = "LLM Runtime")
-				providerConfiguration["GPULayers"] := this.Control["viAgentGPULayersEdit"].Text
+			if (this.iCurrentAgentProvider = "LLM Runtime")
+				providerConfiguration["GPULayers"] := this.Control["viAgentLLMRTGPULayersEdit"].Text
 
 			providerConfiguration["Agent"] := true
 		}
@@ -792,7 +849,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 	}
 
 	updateState() {
-		local ignore, setting
+		local ignore, setting, llmRuntime
 
 		if this.iCurrentConversationProvider {
 			this.Control["viConversationServiceURLEdit"].Enabled := (this.Control["viConversationProviderDropDown"].Text != "LLM Runtime")
@@ -911,6 +968,32 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 			this.Control["viAgentActionsButton"].Enabled := true
 			this.Control["viAgentInstructionsButton"].Enabled := true
 		}
+
+		llmRuntime := (this.iCurrentConversationProvider = "LLM Runtime")
+
+		for ignore, field in ["viConversationServiceKeyLabel", "viConversationServiceKeyEdit"
+							, "viConversationModelLabel", "viConversationModelDropDown"
+							, "viConversationServiceURLEdit"
+							, "viConversationMaxTokensEdit", "viConversationMaxTokensRange"]
+			this.Control[field].Visible := !llmRuntime
+
+		for ignore, field in ["viConversationLLMRTModelLabel", "viConversationLLMRTModelEdit"
+							, "viConversationLLMRTModelButton"
+							, "viConversationLLMRTTokensLabel"
+							, "viConversationLLMRTMaxTokensEdit", "viConversationLLMRTMaxTokensRange"
+							, "viConversationLLMRTGPULayersEdit", "viConversationLLMRTGPULayersRange"]
+			this.Control[field].Visible := llmRuntime
+
+		llmRuntime := (this.iCurrentAgentProvider = "LLM Runtime")
+
+		for ignore, field in ["viAgentServiceKeyLabel", "viAgentServiceKeyEdit"
+							, "viAgentModelLabel", "viAgentModelDropDown"
+							, "viAgentServiceURLEdit"]
+			this.Control[field].Visible := !llmRuntime
+
+		for ignore, field in ["viAgentLLMRTModelLabel", "viAgentLLMRTModelEdit", "viAgentLLMRTModelButton"
+							, "viAgentLLMRTGPULayersLabel", "viAgentLLMRTGPULayersEdit", "viAgentLLMRTGPULayersRange"]
+			this.Control[field].Visible := llmRuntime
 	}
 
 	getOriginalInstruction(language, type, key) {

@@ -528,18 +528,20 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 	loadProviderConfiguration(provider := false) {
 		local configuration
 
+		this.iCurrentProvider := this.Control["dcProviderDropDown"].Text
+
+		if !this.iProviderConfigurations.Has(this.iCurrentProvider)
+			this.iCurrentProvider := this.Providers[1]
+
+		provider := this.iCurrentProvider
+
 		if provider {
 			this.Control["dcProviderDropDown"].Delete()
 			this.Control["dcProviderDropDown"].Add(this.Providers)
 			this.Control["dcProviderDropDown"].Choose(inList(this.Providers, provider))
 		}
 
-		this.iCurrentProvider := this.Control["dcProviderDropDown"].Text
-
-		provider := this.iCurrentProvider
-
-		if this.iProviderConfigurations.Has(this.iCurrentProvider)
-			configuration := this.iProviderConfigurations[this.iCurrentProvider]
+		configuration := this.iProviderConfigurations[this.iCurrentProvider]
 
 		for ignore, setting in ["ServiceURL", "ServiceKey", "MaxHistory"]
 			this.Control["dc" . setting . "Edit"].Text := configuration[setting]

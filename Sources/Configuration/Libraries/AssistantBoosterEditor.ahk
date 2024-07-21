@@ -366,9 +366,11 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 											, "ConversationMaxTokens", 2048
 											, "Speaker", true, "SpeakerTemperature", 0.5, "SpeakerProbability", 0.5
 											, "Listener", false, "ListenerMode", "Unknown", "ListenerTemperature", 0.5
-											, "Conversation", false, "ConversationMaxHistory", 3, "ConversationTemperature", 0.5
+											, "Conversation", false, "ConversationMaxHistory", 3
+											, "ConversationTemperature", 0.5, "ConversationGPULayers", 0
 											, "ConversationActions", false
-											, "AgentServiceURL", false, "AgentModel", "", "AgentMaxTokens", 2048)
+											, "AgentServiceURL", false, "AgentModel", "", "AgentMaxTokens", 2048
+											, "AgentGPULayers", 0)
 
 		super.loadFromConfiguration(configuration)
 
@@ -399,6 +401,8 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 				if (provider = "LLM Runtime") {
 					providerConfiguration["ServiceURL"] := ""
 					providerConfiguration["ServiceKey"] := ""
+					providerConfiguration["GPULayers"] := getMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".GPULayers", defaults["ConversationGPULayers"])
+
 				}
 				else {
 					providerConfiguration["ServiceURL"] := string2Values("|", service)[2]
@@ -408,6 +412,9 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 			else {
 				for ignore, setting in ["ServiceURL", "ServiceKey", "Model", "MaxTokens"]
 					providerConfiguration[setting] := getMultiMapValue(configuration, "Conversation Booster", provider . "." . setting, defaults[setting])
+
+				if (provider = "LLM Runtime")
+					providerConfiguration["GPULayers"] := getMultiMapValue(configuration, "Conversation Booster", provider . ".GPULayers", defaults["ConversationGPULayers"])
 
 				try {
 					LLMConnector.%StrReplace(provider, A_Space, "")%Connector.GetDefaults(&serviceURL, &serviceKey, &model)
@@ -449,6 +456,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 				if (provider = "LLM Runtime") {
 					providerConfiguration["ServiceURL"] := ""
 					providerConfiguration["ServiceKey"] := ""
+					providerConfiguration["GPULayers"] := getMultiMapValue(configuration, "Agent Booster", this.Assistant . ".GPULayers", defaults["AgentGPULayers"])
 				}
 				else {
 					providerConfiguration["ServiceURL"] := string2Values("|", service)[2]
@@ -458,6 +466,9 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 			else {
 				for ignore, setting in ["ServiceURL", "ServiceKey", "Model"]
 					providerConfiguration[setting] := getMultiMapValue(configuration, "Agent Booster", provider . "." . setting, getMultiMapValue(configuration, "Conversation Booster", provider . "." . setting, defaults[setting]))
+
+				if (provider = "LLM Runtime")
+					providerConfiguration["GPULayers"] := getMultiMapValue(configuration, "Agent Booster", provider . ".GPULayers", defaults["AgentGPULayers"])
 
 				try {
 					LLMConnector.%StrReplace(provider, A_Space, "")%Connector.GetDefaults(&serviceURL, &serviceKey, &model)
@@ -499,6 +510,9 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 			for ignore, setting in ["ServiceURL", "ServiceKey", "Model", "MaxTokens"]
 				setMultiMapValue(configuration, "Conversation Booster", provider . "." . setting, providerConfiguration[setting])
 
+			if (provider = "LLM Runtime")
+				setMultiMapValue(configuration, "Conversation Booster", provider . ".GPULayers", providerConfiguration["GPULayers"])
+
 			for ignore, setting in ["Speaker", "SpeakerProbability", "SpeakerTemperature"
 								  , "Listener", "ListenerMode", "ListenerTemperature"
 								  , "Conversation", "ConversationMaxHistory", "ConversationTemperature", "ConversationActions"] {
@@ -516,6 +530,8 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 			for ignore, setting in ["ServiceURL", "ServiceKey", "Model"]
 				setMultiMapValue(configuration, "Agent Booster", provider . "." . setting, providerConfiguration[setting])
+			if (provider = "LLM Runtime")
+				setMultiMapValue(configuration, "Agent Booster", provider . ".GPULayers", providerConfiguration["GPULayers"])
 		}
 
 		provider := this.iCurrentConversationProvider
@@ -526,8 +542,10 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".Model", providerConfiguration["Model"])
 			setMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".MaxTokens", providerConfiguration["MaxTokens"])
 
-			if (provider = "LLM Runtime")
+			if (provider = "LLM Runtime") {
 				setMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".Service", provider)
+				setMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".GPULayers", providerConfiguration["GPULayers"])
+			}
 			else
 				setMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".Service"
 											  , values2String("|", provider, Trim(providerConfiguration["ServiceURL"])
@@ -545,8 +563,10 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 			setMultiMapValue(configuration, "Agent Booster", this.Assistant . ".Model", providerConfiguration["Model"])
 
-			if (provider = "LLM Runtime")
+			if (provider = "LLM Runtime") {
 				setMultiMapValue(configuration, "Agent Booster", this.Assistant . ".Service", provider)
+				setMultiMapValue(configuration, "Agent Booster", this.Assistant . ".GPULayers", providerConfiguration["GPULayers"])
+			}
 			else
 				setMultiMapValue(configuration, "Agent Booster", this.Assistant . ".Service"
 											  , values2String("|", provider, Trim(providerConfiguration["ServiceURL"])
@@ -567,7 +587,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 			if (this.Control["viConversationProviderDropDown"].Value = 1) {
 				this.iCurrentConversationProvider := false
 
-				for ignore, setting in ["ServiceURL", "ServiceKey", "MaxTokens"]
+				for ignore, setting in ["ServiceURL", "ServiceKey", "MaxTokens", "GPULayers"]
 					this.Control["viConversation" . setting . "Edit"].Text := ""
 
 				for ignore, setting in ["SpeakerProbability", "SpeakerTemperature", "ListenerTemperature", "ConversationMaxHistory", "ConversationTemperature"]
@@ -587,6 +607,9 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 				for ignore, setting in ["ServiceURL", "ServiceKey", "MaxTokens"]
 					this.Control["viConversation" . setting . "Edit"].Text := configuration[setting]
+
+				if (provider = "LLM Runtime")
+					this.Control["viConversationGPULayersEdit"].Text := configuration["GPULayers"]
 
 				if ((provider = "GPT4All") && (Trim(this.Control["viConversationServiceKeyEdit"].Text) = ""))
 					this.Control["viConversationServiceKeyEdit"].Text := "Any text will do the job"
@@ -621,7 +644,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 			if (this.Control["viAgentProviderDropDown"].Value = 1) {
 				this.iCurrentAgentProvider := false
 
-				for ignore, setting in ["ServiceURL", "ServiceKey"]
+				for ignore, setting in ["ServiceURL", "ServiceKey", "GPULayers"]
 					this.Control["viAgent" . setting . "Edit"].Text := ""
 			}
 			else {
@@ -632,6 +655,9 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 				for ignore, setting in ["ServiceURL", "ServiceKey"]
 					this.Control["viAgent" . setting . "Edit"].Text := configuration[setting]
+
+				if (provider = "LLM Runtime")
+					this.Control["viAgentGPULayersEdit"].Text := configuration["GPULayers"]
 
 				if ((provider = "GPT4All") && (Trim(this.Control["viAgentServiceKeyEdit"].Text) = ""))
 					this.Control["viAgentServiceKeyEdit"].Text := "Any text will do the job"
@@ -662,6 +688,9 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 			providerConfiguration["Model"] := ((Trim(value) != "") ? Trim(value) : false)
 			providerConfiguration["MaxTokens"] := this.Control["viConversationMaxTokensEdit"].Text
+
+			if (this.Control["viConversationProviderDropDown"].Text = "LLM Runtime")
+				providerConfiguration["GPULayers"] := this.Control["viConversationGPULayersEdit"].Text
 
 			if (this.Control["viSpeakerCheck"].Value = 1) {
 				providerConfiguration["Speaker"] := true
@@ -708,6 +737,9 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 			value := this.Control["viAgentModelDropDown"].Text
 
 			providerConfiguration["Model"] := ((Trim(value) != "") ? Trim(value) : false)
+
+			if (this.Control["viAgentProviderDropDown"].Text = "LLM Runtime")
+				providerConfiguration["GPULayers"] := this.Control["viAgentGPULayersEdit"].Text
 
 			providerConfiguration["Agent"] := true
 		}

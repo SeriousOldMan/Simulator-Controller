@@ -656,6 +656,7 @@ class LLMConnector {
 
 	class LLMRuntimeConnector extends LLMConnector {
 		iLLMRuntime := false
+		iGPULayers := 0
 
 		LLMRuntime {
 			Get {
@@ -665,11 +666,17 @@ class LLMConnector {
 
 		GPULayers {
 			Get {
-				return 0
+				return this.iGPULayers
+			}
+
+			Set {
+				return (this.iGPULayers := value)
 			}
 		}
 
-		__New(manager, model) {
+		__New(manager, model, gpuLayers := 0) {
+			this.iGPULayers := gpuLayers
+
 			super.__New(manager, model)
 
 			OnExit((*) => this.Disconnect(), false)

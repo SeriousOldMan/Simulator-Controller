@@ -227,6 +227,10 @@ class DrivingCoach extends GridRaceAssistant {
 		options["Driving Coach.Model"] := getMultiMapValue(configuration, "Driving Coach Service", "Model", false)
 		options["Driving Coach.MaxTokens"] := getMultiMapValue(configuration, "Driving Coach Service", "MaxTokens", 2048)
 		options["Driving Coach.Temperature"] := getMultiMapValue(configuration, "Driving Coach Personality", "Temperature", 0.5)
+
+		if (string2Values("|", options["Driving Coach.Service"])[1] = "LLM Runtime")
+			options["Driving Coach.GPULayers"] := getMultiMapValue(configuration, "Driving Coach Service", "GPULayers", 0)
+
 		options["Driving Coach.MaxHistory"] := getMultiMapValue(configuration, "Driving Coach Personality", "MaxHistory", 3)
 		options["Driving Coach.Confirmation"] := getMultiMapValue(configuration, "Driving Coach Personality", "Confirmation", true)
 
@@ -440,7 +444,8 @@ class DrivingCoach extends GridRaceAssistant {
 				throw "Unsupported service detected in DrivingCoach.startConversation..."
 
 			if (service[1] = "LLM Runtime")
-				this.iConnector := LLMConnector.LLMRuntimeConnector(this, this.Options["Driving Coach.Model"])
+				this.iConnector := LLMConnector.LLMRuntimeConnector(this, this.Options["Driving Coach.Model"]
+																		, this.Options["Driving Coach.GPULayers"])
 			else
 				try {
 					this.iConnector := LLMConnector.%StrReplace(service[1], A_Space, "")%Connector(this, this.Options["Driving Coach.Model"])

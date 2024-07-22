@@ -462,7 +462,7 @@ class RaceEngineer extends RaceAssistant {
 		repairs := (isSet(repairs) ? repairs : kUndefined)
 
 		if (knowledgeBase && isSet(tyreCompound)) {
-			tyreCompound := normalizeTyreCompound(tyreCompound)
+			tyreCompound := normalizeCompound(tyreCompound)
 
 			if inList(SessionDatabase.getTyreCompounds(knowledgeBase.getValue("Session.Simulator")
 													 , knowledgeBase.getValue("Session.Car")
@@ -2906,10 +2906,10 @@ class RaceEngineer extends RaceAssistant {
 			lap := SubStr(lap, 2)
 
 			if arguments.Has(6)
-				tyreCompound := argument[6]
+				tyreCompound := arguments[6]
 
 			if arguments.Has(7)
-				tyreCompoundColor := argument[7]
+				tyreCompoundColor := arguments[7]
 
 			forcedLap := lap
 			lastRequest := Array(lap, arguments[1], arguments[2]

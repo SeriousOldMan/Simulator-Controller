@@ -1,9 +1,9 @@
 [Development]
 Version=5.8.1.0-dev
 Target=5.8.1.0-release
-Date=07/21/2024
+Date=07/22/2024
 Download=
-Changes=Added available tyre compounds to the LLM knowledge, Clarifications in the documentations "Customize Assistants" and "Rule Engine", Allow both a predefined action for a controller function together with bound actions from plugins, The LLM action plan_pitstop now accept a tyre compound argument
+Changes=Added available tyre compounds to the LLM knowledge, Clarifications in the documentations "Customize Assistants" and "Rule Engine", Allow both a predefined action for a controller function together with bound actions from plugins, The LLM action plan_pitstop now accept a tyre compound argument, Optimized pressure loss reporting
 Components=Media->5.6.1,Configuration->5.7.5,Utilities->5.4.8
 [Release]
 Version=5.8.0.1-release

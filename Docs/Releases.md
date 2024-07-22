@@ -5,7 +5,8 @@
   4. The [LLM action plan_pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#actions) now accept a tyre compound argument.
   5. Optimized pressure loss reporting by the Race Engineer.
   6. Allow both a predefined action for a controller function together with bound actions from plugins. Using this you can, for example, play a short sound for each button press as a kind of aknowledgement. Use the "play" [controller action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) to do this.
-  6. Many clarifications in the documentations for ["Customize Assistants"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) and the ["Rule Engine"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine).
+  7. Many clarifications in the documentations for ["Customize Assistants"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) and for the ["Rule Engine"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine).
+  8. The code editor for LLM events and actions now allows scrolling and copying also, when the displayed rule text is read-only.
 
 ## 5.8.0.1-release 07/20/24
   1. Fixed a critcal bug for connected hardware controllers (Button Boxes, Stream Decks, ...) that could rapidfire a pressed button.

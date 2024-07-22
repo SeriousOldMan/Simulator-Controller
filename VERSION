@@ -3,7 +3,7 @@ Version=5.8.1.0-dev
 Target=5.8.1.0-release
 Date=07/22/2024
 Download=https://www.dropbox.com/scl/fi/zsigczqankseepygrggos/Simulator-Controller-5.8.1.0-dev.zip?rlkey=tpa93879v1jpd4v8yw4ycujyc&st=nqbx4wi1&dl=1
-Changes=Added available tyre compounds to the LLM knowledge, Clarifications in the documentations "Customize Assistants" and "Rule Engine", Allow both a predefined action for a controller function together with bound actions from plugins, The LLM action plan_pitstop now accept a tyre compound argument, Optimized pressure loss reporting
+Changes=Added available tyre compounds to the LLM knowledge, Clarifications in the documentations "Customize Assistants" and "Rule Engine", Allow both a predefined action for a controller function together with bound actions from plugins, The LLM action plan_pitstop now accept a tyre compound argument, Optimized pressure loss reporting, Disabled code editor allows scrolling and copy
 Components=Media->5.6.1,Configuration->5.7.5,Utilities->5.4.8
 [Release]
 Version=5.8.0.1-release

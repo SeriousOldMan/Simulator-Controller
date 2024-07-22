@@ -3228,7 +3228,7 @@ runBuildTargets(&buildProgress) {
 				SplitPath(targetBinary, &compiledFile, &targetDirectory)
 				SplitPath(targetSource, , &sourceDirectory)
 
-				compiledFile := sourceDirectory . "\" . compiledFile
+				compiledFile := (sourceDirectory . "\" . compiledFile)
 
 				DirCreate(targetDirectory)
 

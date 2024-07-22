@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.8.1.0-dev](https://www.dropbox.com/scl/fi/zsigczqankseepygrggos/Simulator-Controller-5.8.1.0-dev.zip?rlkey=tpa93879v1jpd4v8yw4ycujyc&st=nqbx4wi1&dl=1) (Early build for 5.8.1. Changes: Added available tyre compounds to the LLM knowledge, Clarifications in the documentations "Customize Assistants" and "Rule Engine", Allow both a predefined action for a controller function together with bound actions from plugins, The LLM action plan_pitstop now accept a tyre compound argument, Optimized pressure loss reporting.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-581) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

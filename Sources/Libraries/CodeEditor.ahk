@@ -29,6 +29,8 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class Scintilla extends Gui.Custom {
+    iEditable := true
+
     static p := A_PtrSize
     static u := StrLen(Chr(0xFFFF))
 
@@ -193,6 +195,26 @@ class Scintilla extends Gui.Custom {
                    , "Korean Unified Hangul Code", 949, "Traditional Chinese Big5", 950
                    , "Korean Johab", 1361)
 
+    Editable {
+        Get {
+            return this.iEditable
+        }
+
+        Set {
+            return (this.iEditable := value)
+        }
+    }
+
+    Content[work := false] {
+        Get {
+            return (work ? this.Text : this.iContent)
+        }
+
+        Set {
+            return (work ? (this.Text := this.iContent := value) : (this.iContent := value))
+        }
+    }
+
     static AddScintilla(window, options) {
 		local DefaultOpt := false
 		local SystemTheme := false
@@ -202,6 +224,9 @@ class Scintilla extends Gui.Custom {
 		local ignore, option, ctl, buf, result
 
         refresh() {
+            if (!ctl.Editable && (ctl.Content != ctl.Text))
+                ctl.Text := ctl.Content
+
             if !ctl.Zoombie {
                 try
                     if ctl.HasProp("_wordList")

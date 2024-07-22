@@ -140,12 +140,16 @@ class AgentBooster extends LLMBooster {
 														   , kLogsDirectory . "Transcripts\")
 		local allLanguages, index
 
+		transcripts := normalizeDirectoryPath(transcripts)
+
+		DirCreate(transcripts)
+
 		this.iManager := manager
 
 		this.Options["Descriptor"] := descriptor
 		this.Options["Language"] := language
 
-		this.iTranscript := (normalizeDirectoryPath(transcripts) . "\" . descriptor . " Transcript.txt")
+		this.iTranscript := (transcripts . "\" . descriptor . " Transcript.txt")
 
 		super.__New(configuration)
 

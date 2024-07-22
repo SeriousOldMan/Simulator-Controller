@@ -1,14 +1,14 @@
 [Development]
 Version=5.8.1.0-dev
 Target=5.8.1.0-release
-Date=07/21/2024
+Date=07/22/2024
 Download=
 Changes=Added available tyre compounds to the LLM knowledge, Clarifications in the documentations "Customize Assistants" and "Rule Engine", New LLM Runtime, LLM Runtime is now a downloadable preset, New race setting for track types
 Components=Media->5.6.1,Configuration->5.8.1,Utilities->5.4.8
 [Release]
-Version=5.8.0.0-release
-Date=07/19/2024
-Download=https://cutt.ly/XejWnuyE;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.8.0.0-release.zip
+Version=5.8.0.1-release
+Date=07/20/2024
+Download=https://cutt.ly/XejMu1J3;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.8.0.1-release.zip
 Changes=Full implementation of an Agent framwork to include LLMs in the reasoning process of the Race Assistants, Renamed "Conversion Booster" to "Assistant Booster", Added new documention chapter on "Customizing Assistants", New post compilation compression makes binaries much smaller, All new documentation for the rule engine, "Strategy Workbench" has now its own documentation chapter, "Practice Center" has now its own documentation chapter, "Race Reports" has now its own documentation chapter, "Session Database" has now its own documentation chapter, "Race Center" has now its own documentation chapter, New color scheme names, New dark color scheme, "Simulator Tools" ask before a non-release version is installed, Extended knowledge for LLM with historic lap data, New speak controller action function, New play controller action function, "speak" and "play" are available as triggered actions in Track Automations
 Components=Media->5.6.1,Configuration->5.7.5,Utilities->5.4.8
 [Components]
@@ -28,4 +28,4 @@ Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Ut
 Type=Development
 [Version]
 Development=5.8.1.0-dev
-Release=5.8.0.0-release
+Release=5.8.0.1-release

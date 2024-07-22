@@ -213,10 +213,14 @@ class ConversationBooster extends LLMBooster {
 														   , kLogsDirectory . "Transcripts\")
 		local allLanguages, index
 
+		transcripts := normalizeDirectoryPath(transcripts)
+
+		DirCreate(transcripts)
+
 		this.Options["Descriptor"] := descriptor
 		this.Options["Language"] := language
 
-		this.iTranscript := (normalizeDirectoryPath(transcripts) . "\" . descriptor . " Transcript.txt")
+		this.iTranscript := (transcripts . "\" . descriptor . " Transcript.txt")
 
 		super.__New(configuration)
 
@@ -234,8 +238,6 @@ class ConversationBooster extends LLMBooster {
 		}
 		else
 			this.Options["Code"] := false
-
-		DirCreate(kLogsDirectory . "Transcripts\")
 	}
 
 	loadFromConfiguration(configuration) {

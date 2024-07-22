@@ -455,19 +455,36 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
-	planPitstopAction(targetLap?, refuelAmount?, changeTyres?, repairs?, driverSwap?) {
+	planPitstopAction(targetLap?, refuelAmount?, changeTyres?, tyreCompound?, repairs?, driverSwap?) {
+		local knowledgeBase := this.Knowledgebase
+		local tyreCompoundColor := kUndefined
+
 		repairs := (isSet(repairs) ? repairs : kUndefined)
+
+		if (knowledgeBase && isSet(tyreCompound)) {
+			tyreCompound := normalizeCompound(tyreCompound)
+
+			if inList(SessionDatabase.getTyreCompounds(knowledgeBase.getValue("Session.Simulator")
+													 , knowledgeBase.getValue("Session.Car")
+													 , knowledgeBase.getValue("Session.Track"))
+					 , tyreCompound)
+				splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
+			else
+				tyreCompound := kUndefined
+		}
+		else
+			tyreCompound := kUndefined
 
 		if (isSet(driverSwap) && driverSwap)
 			this.planDriverSwap("?" . (isSet(targetLap) ? targetLap : false)
 							  , isSet(refuelAmount) ? refuelAmount : kUndefined
 							  , isSet(changeTyres) ? changeTyres : kUndefined
-							  , repairs, repairs, repairs)
+							  , repairs, repairs, repairs, tyreCompound, tyreCompoundColor)
 		else
 			this.planPitstop(isSet(targetLap) ? targetLap : kUndefined
 						   , isSet(refuelAmount) ? ("!" . refuelAmount) : kUndefined
 						   , isSet(changeTyres) ? ("!" . changeTyres) : kUndefined
-						   , kUndefined, kUndefined, kUndefined, kUndefined
+						   , kUndefined, tyreCompound, tyreCompoundColor, kUndefined
 						   , repairs, repairs, repairs)
 	}
 
@@ -2813,6 +2830,8 @@ class RaceEngineer extends RaceAssistant {
 
 	planDriverSwap(lap := kUndefined, arguments*) {
 		local knowledgeBase := this.KnowledgeBase
+		local tyreCompound := kUndefined
+		local tyreCompoundColor := kUndefined
 		local repairBodywork, repairSuspension, repairEngine, speaker
 
 		static lastRequest := []
@@ -2886,9 +2905,15 @@ class RaceEngineer extends RaceAssistant {
 		else if (InStr(lap, "?") = 1) {
 			lap := SubStr(lap, 2)
 
+			if arguments.Has(6)
+				tyreCompound := arguments[6]
+
+			if arguments.Has(7)
+				tyreCompoundColor := arguments[7]
+
 			forcedLap := lap
 			lastRequest := Array(lap, arguments[1], arguments[2]
-							   , kUndefined, kUndefined, kUndefined, kUndefined
+							   , kUndefined, tyreCompound, tyreCompoundColor, kUndefined
 							   , arguments[3], arguments[4], arguments[5])
 
 			if this.RemoteHandler

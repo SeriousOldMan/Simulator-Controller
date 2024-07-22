@@ -2027,7 +2027,7 @@ setHotkeyEnabled(function, trigger, enabled) {
 }
 
 functionActionCallable(function, trigger, action) {
-	local handler := (action ? action : fireControllerActions.Bind(function, trigger))
+	local handler := (action ? action : fireControllerActions.Bind(function, trigger, false))
 
 	actionCallable(*) {
 		handler.Call()
@@ -2040,6 +2040,12 @@ fireControllerActions(function, trigger, async := true) {
 	if async
 		Task.startTask(fireControllerActions.Bind(function, trigger, false), 0, kLowPriority)
 	else {
+		if Task.CurrentTask
+			if Task.CurrentTask.HasProp("IsActionFiring")
+				return
+			else
+				Task.CurrentTask.IsActionFiring := true
+
 		function.Controller.fireActions(function, trigger)
 
 		return false

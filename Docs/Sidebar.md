@@ -39,7 +39,7 @@
 	- [Customizing Controller Notifications](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#customizing-controller-notifications)
 	- [Controller Mode Automation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#configuration-of-the-controller-mode-automation)
 	- [Themes & Colors](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#themes--colors)
-	  - [Color Scheme](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#color-schemes)
+	  - [Color Schemes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#color-schemes)
 	- [More Settings & Configurations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#more-settings--configurations)
   - [Using Simulator Controller](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#using-simulator-controller)
     - [Startup profiles](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles)

@@ -194,7 +194,7 @@ nextDryTyreSet(?set, ?nextSet) <= ?nextSet = ?set + 1
 ;;;                         Pressure loss calculation                       ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-{All: [?Lap < 5], {Prove: unbound?(!Tyre.Pressure.Reference.Lap)}} => (Prove: clearPressureLossCalibration(?Lap))
+{All: [?Lap], {None: [?Tyre.Pressure.Reference.Lap]}} => (Prove: clearPressureLossCalibration(?Lap))
 
 clearPressureLossCalibration(?lap) <= ?calibrationLap = ?lap + !Session.Settings.Lap.Learning.Laps,
 									  Set(Tyre.Pressure.Reference.Lap, ?calibrationLap),
@@ -236,6 +236,7 @@ computePressureLoss(?lap, [?tyreType | ?tyreTypes], [?loss | ?losses]) <=
 		?loss = ?refPressure - ?curPressure, ?loss > 0, !,
 		computePressureLoss(?lap, ?tyreTypes, ?losses)
 computePressureLoss(?lap, [? | ?tyreTypes], [0 | ?losses]) <= computePressureLoss(?lap, ?tyreTypes, ?losses)
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;            Target pressure calculation without compound change          ;;;
@@ -309,6 +310,7 @@ updateTargetPressure(?compound, ?tyreType, ?delta) <= lastPressure(?compound, ?t
 lastPressure(?compound, ?tyreType, ?pressure) <= lastPitstopTyrePressure(?compound, ?tyreType, ?pressure), !
 lastPressure(?compound, ?tyreType, ?pressure) <= setupTyrePressure(?compound, ?tyreType, ?pressure)
 
+
 ;;;-------------------------------------------------------------------------;;;
 ;;;              Target pressure calculation with compound change           ;;;
 ;;;-------------------------------------------------------------------------;;;
@@ -339,6 +341,7 @@ updateTargetPressures([?tyreType | ?tyreTypes], [?pressure | ?pressures],
 					  [?deviation | ?deviations], ?correction, [?targetPressure | ?targetPressures]) <=
 		?delta = ?correction - ?deviation, ?targetPressure = ?pressure + ?delta, Set(Tyre.Pressure.Target, ?tyreType, ?targetPressure),
 		updateTargetPressures(?tyreTypes, ?pressures, ?deviations, ?correction, ?targetPressures)
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Target pressure increment calculation                 ;;;
@@ -1021,9 +1024,11 @@ priority: -10, [?Pitstop.Lap] => (Set: Pitstop.Clear, ?Pitstop.Lap)
 					(Clear: Pitstop.Planned.Time),
 					(Clear: Pitstop.Planned.Time.Pitlane), (Clear: Pitstop.Planned.Time.Box),
 					(Clear: Pitstop.Planned.Time.Service), (Clear: Pitstop.Planned.Time.Repairs),
-					(Clear: Pitstop.Clear), (Clear: Pitstop.Lap), (Clear: Pitstop.Planned), (Clear: Pitstop.Prepared),
+					(Clear: Pitstop.Lap), (Clear: Pitstop.Planned), (Clear: Pitstop.Prepared),
 					(Clear: Pitstop.Planned.Nr), (Clear: Pitstop.Planned.Adjusted)
-				  
+
+priority: -20, [?Pitstop.Clear] => (Clear: Pitstop.Clear)
+
 updateDamageReported(?lap) <= ?lastLap = ?lap - 1, Set(Damage.Reported, ?lastLap), Set(Damage.Analysis.Reported, ?lap)
 
 pitstopPerformed(?lap) <= unbound?(!Pitstop.Prepared), !, unpreparedPitstopPerformed(?lap), fail

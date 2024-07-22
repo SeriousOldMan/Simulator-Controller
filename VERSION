@@ -1,10 +1,10 @@
 [Development]
-Version=5.8.1.0-dev
-Target=5.8.1.0-release
+Version=5.8.2.0-dev
+Target=5.8.2.0-release
 Date=07/22/2024
 Download=
-Changes=Added available tyre compounds to the LLM knowledge, Clarifications in the documentations "Customize Assistants" and "Rule Engine", New LLM Runtime, LLM Runtime is now a downloadable preset, New race setting for track types
-Components=Media->5.6.1,Configuration->5.8.1,Utilities->5.4.8
+Changes=New LLM Runtime, LLM Runtime is now a downloadable preset, New race setting for track types
+Components=Media->5.6.1,Configuration->5.8.2,Utilities->5.4.8
 [Release]
 Version=5.8.0.1-release
 Date=07/20/2024
@@ -18,14 +18,14 @@ Media.5.6.1.Download=https://www.dropbox.com/scl/fi/3c56fjdvdd4od5t7rsuc9/Media-
 Configuration.5.7.5.Path=Resources
 Configuration.5.7.5.Content=Setup
 Configuration.5.7.5.Download=https://www.dropbox.com/scl/fi/l382lwe5ev6tzp3u0dyey/Configuration-5.7.5.zip?rlkey=vvej8tvno3eih7319fft2nae3&st=ficbsxr8&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+5.7.5.zip
-Configuration.5.8.1.Path=Resources
-Configuration.5.8.1.Content=Setup
-Configuration.5.8.1.Download=https://www.dropbox.com/scl/fi/0cjmq72y71clcz80874rv/Configuration-5.8.1.zip?rlkey=2p7yq2yq6rj03p6xzez665ms4&st=ro4u9eic&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+5.8.1.zip
+Configuration.5.8.2.Path=Resources
+Configuration.5.8.2.Content=Setup
+Configuration.5.8.2.Download=https://www.dropbox.com/scl/fi/2t29pj1thb9lxgpek54bt/Configuration-5.8.2.zip?rlkey=apix2huy4bl2lrdbywdxao6zu&st=q8l8uxzw&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+5.8.2.zip
 Utilities.5.4.8.Path=.
 Utilities.5.4.8.Content=Utilities
 Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Utilities-5.4.8.zip?rlkey=alrj8l2z205dd2vm9cu6hbsot&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.4.8.zip
 [Current]
 Type=Development
 [Version]
-Development=5.8.1.0-dev
+Development=5.8.2.0-dev
 Release=5.8.0.1-release

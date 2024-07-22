@@ -1,3 +1,12 @@
+## 5.8.2.0-release 08/03/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. A new LLM Runtime has been implemented.
+     - Supports execution of parts of the LLM on the graphics card.
+	 - Since this runtime is quite large (> 200 MB), it is provided as a downloadable component. Run "Simulator Setup", go to the presets page and install the "Local runtime for LLMs" preset.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-582), if you have configured the Conversation Booster for the Assistants.
+
 ## 5.8.1.0-release 07/26/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

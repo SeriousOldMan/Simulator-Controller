@@ -533,12 +533,6 @@ class DownloadablePreset extends NamedPreset {
 		}
 	}
 
-	Installable {
-		Get {
-			return true
-		}
-	}
-
 	URL {
 		Get {
 			return this.iURL
@@ -1308,14 +1302,14 @@ class ModulesStepWizard extends StepWizard {
 
 		window.SetFont("s8 Norm", "Arial")
 
-		widget3 := window.Add("ListView", "x" . x . " yp+30 w" . listWidth . " h224 X:Move(0.5) H:Grow(0.7) AltSubmit -Multi -LV0x10 NoSort NoSortHdr Hidden Section", collect(["Available Presets"], translate))
+		widget3 := window.Add("ListView", "x" . x . " yp+30 w" . listWidth . " h94 X:Move(0.5) H:Grow(0.3) AltSubmit -Multi -LV0x10 NoSort NoSortHdr Hidden Section", collect(["Available Presets"], translate))
 		widget3.OnEvent("Click", chooseAvailablePreset)
 		widget3.OnEvent("DoubleClick", compose(chooseAvailablePreset, installPreset))
 		widget3.OnEvent("ItemSelect", selectAvailablePreset)
 
 		this.iAvailablePresetsListView := widget3
 
-		widget4 := window.Add("ListView", "x" . x2 . " ys w" . listWidth . " h224 X:Move(0.5) H:Grow(0.7) AltSubmit -Multi -LV0x10 NoSort NoSortHdr Hidden", collect(["Selected Presets"], translate))
+		widget4 := window.Add("ListView", "x" . x2 . " ys w" . listWidth . " h94 X:Move(0.5) H:Grow(0.3) AltSubmit -Multi -LV0x10 NoSort NoSortHdr Hidden", collect(["Selected Presets"], translate))
 		widget4.OnEvent("Click", chooseSelectedPreset)
 		widget4.OnEvent("DoubleClick", compose(chooseSelectedPreset, editSelectedPreset))
 		widget4.OnEvent("ItemSelect", selectSelectedPreset)
@@ -1324,9 +1318,9 @@ class ModulesStepWizard extends StepWizard {
 
 		window.SetFont("s10 Bold", "Arial")
 
-		widget5 := window.Add("Button", "x" . x3 . " ys+95 w" . buttonWidth . " X:Move(0.5) Y:Move(0.35) vinstallPresetButton  Hidden", ">")
+		widget5 := window.Add("Button", "x" . x3 . " ys+20 w" . buttonWidth . " X:Move(0.5) Y:Move(0.15) vinstallPresetButton  Hidden", ">")
 		widget5.OnEvent("Click", installPreset)
-		widget6 := window.Add("Button", "x" . x3 . " yp+30 w" . buttonWidth . " X:Move(0.5) Y:Move(0.35) vuninstallPresetButton  Hidden", "<")
+		widget6 := window.Add("Button", "x" . x3 . " yp+30 w" . buttonWidth . " X:Move(0.5) Y:Move(0.15) vuninstallPresetButton  Hidden", "<")
 		widget6.OnEvent("Click", uninstallPreset)
 
 		window.SetFont("s8 Norm", "Arial")
@@ -1334,7 +1328,7 @@ class ModulesStepWizard extends StepWizard {
 		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif; font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
-		widget7 := window.Add("HTMLViewer", "x" . x . " ys+229 w" . width . " h210 Y:Move(0.7) W:Grow H:Grow(0.3) VpresetsInfoText Hidden")
+		widget7 := window.Add("HTMLViewer", "x" . x . " ys+99 w" . width . " h340 Y:Move(0.3) W:Grow H:Grow(0.7) VpresetsInfoText Hidden")
 
 		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, p, body { color: #" . window.Theme.TextColor . "}</style>" . info . "</body></html>"
 

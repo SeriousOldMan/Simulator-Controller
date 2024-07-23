@@ -7,6 +7,8 @@
   6. Allow both a predefined action for a controller function together with bound actions from plugins. Using this you can, for example, play a short sound for each button press as a kind of acknowledgement. Use the "play" [controller action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) to do this.
   7. Many clarifications in the documentations for ["Customize Assistants"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) and for the ["Rule Engine"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine).
   8. The code editor for LLM events and actions now allows scrolling and copying even if the displayed rule text is read-only.
+  9. The fields for unchangeable builtin events and actions are now shown as read-only and no longer as disabled.
+  10. LLM events and actions can now be cloned using a "Copy" button.
 
 ## 5.8.0.1-release 07/20/24
   1. Fixed a critcal bug for connected hardware controllers (Button Boxes, Stream Decks, ...) that could rapidfire a pressed button.

@@ -1127,8 +1127,10 @@ class CallbacksEditor {
 		this.iCallbacksListView.OnEvent("Click", chooseCallback)
 		this.iCallbacksListView.OnEvent("DoubleClick", chooseCallback)
 
-		editorGui.Add("Button", "x800 yp+142 w23 h23 Center +0x200 X:Move Y:Move(0.25) vaddCallbackButton").OnEvent("Click", (*) => this.addCallback())
+		editorGui.Add("Button", "x776 yp+142 w23 h23 Center +0x200 X:Move Y:Move(0.25) vaddCallbackButton").OnEvent("Click", (*) => this.addCallback())
 		setButtonIcon(editorGui["addCallbackButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		editorGui.Add("Button", "x800 yp w23 h23 Center +0x200 X:Move Y:Move(0.25) vcopyCallbackButton").OnEvent("Click", (*) => this.copyCallback())
+		setButtonIcon(editorGui["copyCallbackButton"], kIconsDirectory . "Copy.ico", 1, "L4 T4 R4 B4")
 		editorGui.Add("Button", "x824 yp w23 h23 Center +0x200 X:Move Y:Move(0.25) vdeleteCallbackButton").OnEvent("Click", (*) => this.deleteCallback())
 		setButtonIcon(editorGui["deleteCallbackButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
@@ -1282,6 +1284,7 @@ class CallbacksEditor {
 		this.Control["addCallbackButton"].Enabled := true
 
 		if this.SelectedCallback {
+			this.Control["copyCallbackButton"].Enabled := true
 			this.Control["callbackActiveCheck"].Enabled := true
 
 			if this.SelectedCallback.Builtin {
@@ -1290,10 +1293,10 @@ class CallbacksEditor {
 
 				this.Control["deleteCallbackButton"].Enabled := false
 
-				this.CallableField[2].Enabled := false
+				this.CallableField[2].Opt("+ReadOnly")
 
-				this.Control["callbackNameEdit"].Enabled := false
-				this.Control["callbackDescriptionEdit"].Enabled := false
+				this.Control["callbackNameEdit"].Opt("+ReadOnly")
+				this.Control["callbackDescriptionEdit"].Opt("+ReadOnly")
 
 				if (this.Type = "Agent.Events") {
 					this.Control["callbackTypeDropDown"].Enabled := true
@@ -1316,8 +1319,8 @@ class CallbacksEditor {
 				else
 					this.Control["callbackTypeDropDown"].Enabled := false
 
-				this.Control["callbackEventEdit"].Enabled := false
-				this.PhraseField[2].Enabled := false
+				this.Control["callbackEventEdit"].Opt("+ReadOnly")
+				this.PhraseField[2].Opt("+ReadOnly")
 				this.Control["callbackInitializationDropDown"].Enabled := false
 				this.Control["callbackConfirmationDropDown"].Enabled := false
 			}
@@ -1326,13 +1329,13 @@ class CallbacksEditor {
 				this.Control["addParameterButton"].Enabled := true
 				this.Control["deleteParameterButton"].Enabled := (this.SelectedParameter != false)
 
-				this.CallableField[2].Enabled := true
+				this.CallableField[2].Opt("-ReadOnly")
 
-				this.Control["callbackNameEdit"].Enabled := true
-				this.Control["callbackDescriptionEdit"].Enabled := true
+				this.Control["callbackNameEdit"].Opt("-ReadOnly")
+				this.Control["callbackDescriptionEdit"].Opt("-ReadOnly")
 				this.Control["callbackTypeDropDown"].Enabled := true
-				this.Control["callbackEventEdit"].Enabled := true
-				this.PhraseField[2].Enabled := true
+				this.Control["callbackEventEdit"].Opt("-ReadOnly")
+				this.PhraseField[2].Opt("-ReadOnly")
 				this.Control["callbackInitializationDropDown"].Enabled := true
 				this.Control["callbackConfirmationDropDown"].Enabled := true
 			}
@@ -1369,6 +1372,7 @@ class CallbacksEditor {
 			}
 		}
 		else {
+			this.Control["copyCallbackButton"].Enabled := false
 			this.Control["deleteCallbackButton"].Enabled := false
 			this.Control["addParameterButton"].Enabled := false
 			this.Control["deleteParameterButton"].Enabled := false
@@ -1387,26 +1391,26 @@ class CallbacksEditor {
 			this.ScriptEditor.Visible := true
 			this.CallableField[1].Visible := false
 			this.CallableField[2].Visible := false
-			this.Control["callbackNameEdit"].Enabled := false
-			this.Control["callbackDescriptionEdit"].Enabled := false
+			this.Control["callbackNameEdit"].Opt("+ReadOnly")
+			this.Control["callbackDescriptionEdit"].Opt("+ReadOnly")
 			this.Control["callbackActiveCheck"].Enabled := false
 			this.Control["callbackTypeDropDown"].Enabled := false
-			this.Control["callbackEventEdit"].Enabled := false
-			this.PhraseField[2].Enabled := false
+			this.Control["callbackEventEdit"].Opt("+ReadOnly")
+			this.PhraseField[2].Opt("+ReadOnly")
 			this.Control["callbackInitializationDropDown"].Enabled := false
 			this.Control["callbackConfirmationDropDown"].Enabled := false
 		}
 
 		if this.SelectedParameter {
 			if this.SelectedCallback.Builtin {
-				this.Control["parameterNameEdit"].Enabled := false
-				this.Control["parameterDescriptionEdit"].Enabled := false
+				this.Control["parameterNameEdit"].Opt("+ReadOnly")
+				this.Control["parameterDescriptionEdit"].Opt("+ReadOnly")
 				this.Control["parameterTypeDropDown"].Enabled := false
 				this.Control["parameterOptionalDropDown"].Enabled := false
 			}
 			else {
-				this.Control["parameterNameEdit"].Enabled := true
-				this.Control["parameterDescriptionEdit"].Enabled := true
+				this.Control["parameterNameEdit"].Opt("-ReadOnly")
+				this.Control["parameterDescriptionEdit"].Opt("-ReadOnly")
 				this.Control["parameterTypeDropDown"].Enabled := true
 				this.Control["parameterOptionalDropDown"].Enabled := true
 			}
@@ -1417,8 +1421,8 @@ class CallbacksEditor {
 			this.Control["parameterTypeDropDown"].Choose(0)
 			this.Control["parameterOptionalDropDown"].Choose(0)
 
-			this.Control["parameterNameEdit"].Enabled := false
-			this.Control["parameterDescriptionEdit"].Enabled := false
+			this.Control["parameterNameEdit"].Opt("+ReadOnly")
+			this.Control["parameterDescriptionEdit"].Opt("+ReadOnly")
 			this.Control["parameterTypeDropDown"].Enabled := false
 			this.Control["parameterOptionalDropDown"].Enabled := false
 		}
@@ -1500,6 +1504,31 @@ class CallbacksEditor {
 		this.Callbacks.Push(callback)
 
 		this.CallbacksListView.Add("", "", translate("x"), "")
+
+		this.selectCallback(callback, true, false)
+	}
+
+	copyCallback() {
+		local callback
+
+		if this.SelectedCallback
+			if !this.saveCallback(this.SelectedCallback) {
+				this.CallbacksListView.Modify(inList(this.Callbacks, this.SelectedCallback), "Select Vis")
+
+				return
+			}
+
+		callback := this.SelectedCallback.Clone()
+
+		callback.Builtin := false
+		callback.Disabled := false
+		callback.Active := true
+
+		callback.Name .= "_copy"
+
+		this.Callbacks.Push(callback)
+
+		this.CallbacksListView.Add("", callback.Name, translate("x"), callback.Description)
 
 		this.selectCallback(callback, true, false)
 	}

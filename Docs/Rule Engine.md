@@ -133,9 +133,9 @@ Another special expression is the *Compound*:
 
 	grandfather(Paul, Peter)
 
-It looks like a function call, but it is a structured object in the first place. Said that, terms are used extensively in reduction roals to represent goals and subgoals and therefore can be treated like a function call in that particular case. More on that later down below.
+It looks like a function call, but it is a structured object in the first place. Said that, compounds are used extensively in reduction roals to represent goals and subgoals and therefore can be treated like a function call in that particular case. More on that later down below.
 
-The name of the structured object, *grandfather* in this case, is called a functor. The number of elements in the structure is called the arity. This will become important if we take a look at unification in reduction rules.
+The name of the structured object, *grandfather* in this case, is called a functor. The number of elements in the structure is called the arity. This will become important when we take a look at unification in reduction rules.
 
 ### Production Rules (forward chaining)
 

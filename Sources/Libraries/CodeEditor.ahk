@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Assistant Booster Editor        ;;;
+;;;   Modular Simulator Controller System - Syntax coloring Code Editor     ;;;
 ;;;                                                                         ;;;
 ;;;   Based on the great work of the TheArkive and Scintilla.org.           ;;;
 ;;;   See https://github.com/TheArkive/scintilla_ahk2 for more information  ;;;
@@ -28,7 +28,7 @@
 ;;;                         Private Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class Scintilla extends Gui.Custom {
+class CodeEditor extends Gui.Custom {
     iEditable := true
 
     static p := A_PtrSize
@@ -215,7 +215,7 @@ class Scintilla extends Gui.Custom {
         }
     }
 
-    static AddScintilla(window, options) {
+    static AddCodeEditor(window, options) {
 		local DefaultOpt := false
 		local SystemTheme := false
         local DefaultTheme := false
@@ -224,10 +224,10 @@ class Scintilla extends Gui.Custom {
 		local ignore, option, ctl, buf, result
 
         refresh() {
-            if (!ctl.Editable && (ctl.Content != ctl.Text))
-                ctl.Text := ctl.Content
+            if !ctl.Zombie {
+                if (!ctl.Editable && (ctl.Content != ctl.Text))
+                    ctl.Text := ctl.Content
 
-            if !ctl.Zoombie {
                 try
                     if ctl.HasProp("_wordList")
                         DllCall("CustomLexer\ChunkColoring", "UPtr", ctl.all_data().ptr, "Int", ctl.Loading
@@ -254,8 +254,8 @@ class Scintilla extends Gui.Custom {
                 newOptions .= ((newOptions ? A_Space : "") . option)
 
         ctl := window.Add("Custom", "ClassScintilla " . newOptions)
-        ctl.Base := Scintilla.Prototype
-        ctl.Zoombie := false
+        ctl.Base := CodeEditor.Prototype
+        ctl.Zombie := false
 
         buf := Buffer(8, 0)
 
@@ -306,7 +306,7 @@ class Scintilla extends Gui.Custom {
         if LightTheme
             ctl.LightTheme()
 
-        ctl.Destroy := (*) => ctl.Zoombie := true
+        ctl.Destroy := (*) => ctl.Zombie := true
 
         Task.startTask(refresh, 2000, kInterruptPriority)
 
@@ -314,26 +314,26 @@ class Scintilla extends Gui.Custom {
     }
 
     InitClasses() {
-        this.Brace := Scintilla.Brace(this)
-        this.Caret := Scintilla.Caret(this)
-        this.Doc := Scintilla.Doc(this)
-        this.Edge := Scintilla.Edge(this)
-        this.EOLAnn := Scintilla.EOLAnn(this)
-        this.HotSpot := Scintilla.Hotspot(this)
-        this.LineEnding := Scintilla.LineEnding(this)
-        this.Macro := Scintilla.Macro(this)
-        this.Margin := Scintilla.Margin(this)
-        this.Marker := Scintilla.Marker(this)
-        this.Punct := Scintilla.Punct(this)
-        this.Selection := Scintilla.Selection(this)
-        this.Style := Scintilla.Style(this)
-        this.Styling := Scintilla.Styling(this)
-        this.Tab := Scintilla.Tab(this)
-        this.Target := Scintilla.Target(this)
-        this.WhiteSpace := Scintilla.WhiteSpace(this)
-        this.Word := Scintilla.Word(this)
-        this.Wrap := Scintilla.Wrap(this)
-        this.Cust := Scintilla.Cust(this)
+        this.Brace := CodeEditor.Brace(this)
+        this.Caret := CodeEditor.Caret(this)
+        this.Doc := CodeEditor.Doc(this)
+        this.Edge := CodeEditor.Edge(this)
+        this.EOLAnn := CodeEditor.EOLAnn(this)
+        this.HotSpot := CodeEditor.Hotspot(this)
+        this.LineEnding := CodeEditor.LineEnding(this)
+        this.Macro := CodeEditor.Macro(this)
+        this.Margin := CodeEditor.Margin(this)
+        this.Marker := CodeEditor.Marker(this)
+        this.Punct := CodeEditor.Punct(this)
+        this.Selection := CodeEditor.Selection(this)
+        this.Style := CodeEditor.Style(this)
+        this.Styling := CodeEditor.Styling(this)
+        this.Tab := CodeEditor.Tab(this)
+        this.Target := CodeEditor.Target(this)
+        this.WhiteSpace := CodeEditor.WhiteSpace(this)
+        this.Word := CodeEditor.Word(this)
+        this.Wrap := CodeEditor.Wrap(this)
+        this.Cust := CodeEditor.Cust(this)
 
         this.kw1 := "", this.kw1_utf8 := Buffer(1, 0), this.kw5 := "", this.kw5_utf8 := Buffer(1, 0)
         this.kw2 := "", this.kw2_utf8 := Buffer(1, 0), this.kw6 := "", this.kw6_utf8 := Buffer(1, 0)
@@ -355,7 +355,7 @@ class Scintilla extends Gui.Custom {
         local result := ""
 		local property, candidate
 
-        for property, candidate in Scintilla.%member%.OwnProps()
+        for property, candidate in CodeEditor.%member%.OwnProps()
             if (candidate & value)
                 result .= ((result ? A_Space : "") . property)
 
@@ -365,19 +365,20 @@ class Scintilla extends Gui.Custom {
     static RGB(R, G, B) => Format("0x{:06X}", (R << 16) | (G << 8) | B)
 
     WM_Messages(wParam, lParam, msg, hwnd) {
-		local scn := Scintilla.SCNotification(lParam)
+		local scn := CodeEditor.SCNotification(lParam)
 		local event, msg_num, data, ticks
 
-        static modType := Scintilla.sc_modType
+        static modType := CodeEditor.sc_modType
 
-        if (this.Zoombie || !this.Enabled || !this.Visible || !this.HasProp("_wordList"))
+        if (this.Zombie || !this.Editable || !this.Enabled
+         || this.ReadOnly || !this.Visible || !this.HasProp("_wordList"))
             return
 
         try {
             scn.LineBeforeInsert := this.CurLine
             scn.LinesBeforeInsert := this.Lines
 
-            event := scn.wmmsg_txt := Scintilla.Lookup("WM_Notify", (msg_num := scn.wmmsg))
+            event := scn.wmmsg_txt := CodeEditor.Lookup("WM_Notify", (msg_num := scn.wmmsg))
 
             if this.AutoSizeNumberMargin
                 this.MarginWidth(0, 33, scn)
@@ -410,7 +411,7 @@ class Scintilla extends Gui.Custom {
     MarginWidth(margin := 0, style := 33, scn := "") {
 		local min_width, width
 
-        static modType := Scintilla.sc_modType
+        static modType := CodeEditor.sc_modType
 
         if (!scn || !((scn.wmmsg_txt = "Modified") && ((scn.modType & modType.DeleteText) || (scn.modType & modType.InsertText))))
             return
@@ -774,24 +775,24 @@ class Scintilla extends Gui.Custom {
 
     class Cust {
         __New(sup) {
-            this.Number := Scintilla.Cust.subItem(sup, 45)
-            this.Comment1 := Scintilla.Cust.subItem(sup, 44)
-            this.Comment2 := Scintilla.Cust.subItem(sup, 47)
-            this.String1 := Scintilla.Cust.subItem(sup, 43)
-            this.String2 := Scintilla.Cust.subItem(sup, 46)
-            this.Punct := Scintilla.Cust.subItem(sup, 42)
-            this.BraceH := Scintilla.Cust.subItem(sup, 34)
-            this.BraceHBad := Scintilla.Cust.subItem(sup, 41)
-            this.Brace := Scintilla.Cust.subItem(sup, 40)
+            this.Number := CodeEditor.Cust.subItem(sup, 45)
+            this.Comment1 := CodeEditor.Cust.subItem(sup, 44)
+            this.Comment2 := CodeEditor.Cust.subItem(sup, 47)
+            this.String1 := CodeEditor.Cust.subItem(sup, 43)
+            this.String2 := CodeEditor.Cust.subItem(sup, 46)
+            this.Punct := CodeEditor.Cust.subItem(sup, 42)
+            this.BraceH := CodeEditor.Cust.subItem(sup, 34)
+            this.BraceHBad := CodeEditor.Cust.subItem(sup, 41)
+            this.Brace := CodeEditor.Cust.subItem(sup, 40)
             this.Selection := sup.Selection
             this.Caret := sup.Caret
-            this.Margin := Scintilla.Cust.subItem(sup, 33)
-            this.Editor := Scintilla.Cust.subItem(sup, 32)
+            this.Margin := CodeEditor.Cust.subItem(sup, 33)
+            this.Editor := CodeEditor.Cust.subItem(sup, 32)
 
-            this.kw1 := Scintilla.Cust.subItem(sup, 64), this.kw5 := Scintilla.Cust.subItem(sup, 68)
-            this.kw2 := Scintilla.Cust.subItem(sup, 65), this.kw6 := Scintilla.Cust.subItem(sup, 69)
-            this.kw3 := Scintilla.Cust.subItem(sup, 66), this.kw7 := Scintilla.Cust.subItem(sup, 70)
-            this.kw4 := Scintilla.Cust.subItem(sup, 67), this.kw8 := Scintilla.Cust.subItem(sup, 71)
+            this.kw1 := CodeEditor.Cust.subItem(sup, 64), this.kw5 := CodeEditor.Cust.subItem(sup, 68)
+            this.kw2 := CodeEditor.Cust.subItem(sup, 65), this.kw6 := CodeEditor.Cust.subItem(sup, 69)
+            this.kw3 := CodeEditor.Cust.subItem(sup, 66), this.kw7 := CodeEditor.Cust.subItem(sup, 70)
+            this.kw4 := CodeEditor.Cust.subItem(sup, 67), this.kw8 := CodeEditor.Cust.subItem(sup, 71)
         }
 
         class subItem {
@@ -860,7 +861,7 @@ class Scintilla extends Gui.Custom {
     GetTextRange(start, end) {
 		local tr
 
-        this._sms(0x872, 0, (tr := Scintilla.TextRange( , start, end)).ptr)
+        this._sms(0x872, 0, (tr := CodeEditor.TextRange( , start, end)).ptr)
 
 		return StrGet(tr.buf, "UTF-8")
     }
@@ -1129,11 +1130,11 @@ class Scintilla extends Gui.Custom {
         Set => this._sms(0x943, (this._UsePopup := value))
     }
 
-    DirectFunc => Scintilla.DirectFunc
+    DirectFunc => CodeEditor.DirectFunc
 
     DirectPtr => this._DirectPtr
 
-    DirectStatusFunc => Scintilla.DirectStatusFunc
+    DirectStatusFunc => CodeEditor.DirectStatusFunc
 
     CharacterPointer => this._sms(0x9D8)
 
@@ -1144,11 +1145,11 @@ class Scintilla extends Gui.Custom {
     UseDirect {
         Get => this._UseDirect
         Set {
-            if (!Scintilla.DirectFunc And (value = true))
-                Scintilla.DirectFunc := SendMessage(0x888, 0, 0, this.Hwnd)
+            if (!CodeEditor.DirectFunc And (value = true))
+                CodeEditor.DirectFunc := SendMessage(0x888, 0, 0, this.Hwnd)
 
-            if (!Scintilla.DirectStatusFunc And (value = true))
-                Scintilla.DirectStatusFunc := SendMessage(0xAD4, 0, 0, this.Hwnd)
+            if (!CodeEditor.DirectStatusFunc And (value = true))
+                CodeEditor.DirectStatusFunc := SendMessage(0xAD4, 0, 0, this.Hwnd)
 
             if (!this.DirectPtr And (value = true))
                 this._DirectPtr  := SendMessage(0x889, 0, 0, this.Hwnd)
@@ -1157,7 +1158,7 @@ class Scintilla extends Gui.Custom {
         }
     }
 
-    class Brace extends Scintilla.scint_base {
+    class Brace extends CodeEditor.scint_base {
         Chars := "[]{}()<>"
 
         BadColor {
@@ -1209,7 +1210,7 @@ class Scintilla extends Gui.Custom {
         }
     }
 
-    class Caret extends Scintilla.scint_base {
+    class Caret extends CodeEditor.scint_base {
         Blink {
             Get => this._sms(0x81B)
             Set => this._sms(0x81C, value)
@@ -1305,7 +1306,7 @@ class Scintilla extends Gui.Custom {
         }
     }
 
-    class Doc extends Scintilla.scint_base {
+    class Doc extends CodeEditor.scint_base {
         AddRef(doc_ptr) {
             return this._sms(0x948, 0, doc_ptr)
         }
@@ -1328,10 +1329,10 @@ class Scintilla extends Gui.Custom {
         }
     }
 
-    class Edge extends Scintilla.scint_base {
+    class Edge extends CodeEditor.scint_base {
         __New(ctl) {
             this.ctl := ctl
-            this.Multi := Scintilla.Edge.Multi(ctl)
+            this.Multi := CodeEditor.Edge.Multi(ctl)
         }
 
         Add(column, color) {
@@ -1361,7 +1362,7 @@ class Scintilla extends Gui.Custom {
             Set => this._sms(0x93B, value)
         }
 
-        class Multi extends Scintilla.scint_base {
+        class Multi extends CodeEditor.scint_base {
             Add(pos, color) {
                 return this._sms(0xA86, pos, this._RGB_BGR(color))
             }
@@ -1376,7 +1377,7 @@ class Scintilla extends Gui.Custom {
         }
     }
 
-    class EOLAnn extends Scintilla.scint_base {
+    class EOLAnn extends CodeEditor.scint_base {
         Line := 0
 
         ClearAll() {
@@ -1404,7 +1405,7 @@ class Scintilla extends Gui.Custom {
         }
     }
 
-    class Hotspot extends Scintilla.scint_base {
+    class Hotspot extends CodeEditor.scint_base {
         _BackColor := 0xFFFFFF
         _BackEnabled := true
         _ForeColor := 0x000000
@@ -1455,7 +1456,7 @@ class Scintilla extends Gui.Custom {
         }
     }
 
-    class LineEnding extends Scintilla.scint_base {
+    class LineEnding extends CodeEditor.scint_base {
         Convert(mode) {
             return this._sms(0x7ED, mode)
         }
@@ -1484,7 +1485,7 @@ class Scintilla extends Gui.Custom {
         }
     }
 
-    class Macro extends Scintilla.scint_base {
+    class Macro extends CodeEditor.scint_base {
         Start() {
             return this._sms(0xBB9)
         }
@@ -1494,7 +1495,7 @@ class Scintilla extends Gui.Custom {
         }
     }
 
-    class Margin extends Scintilla.scint_base {
+    class Margin extends CodeEditor.scint_base {
         ID := 0
         _MinWidth := Map()
         _FoldColorEnabled := false
@@ -1601,7 +1602,7 @@ class Scintilla extends Gui.Custom {
         }
     }
 
-    class Marker extends Scintilla.scint_base {
+    class Marker extends CodeEditor.scint_base {
         num := 0
         _width := 0
         _height := 0
@@ -1735,14 +1736,14 @@ class Scintilla extends Gui.Custom {
         }
     }
 
-    class Punct extends Scintilla.scint_base {
+    class Punct extends CodeEditor.scint_base {
         Chars {
             Get => this._GetStr(0xA59,,true)
             Set => this._PutStr(0xA58,,value)
         }
     }
 
-    class Selection extends Scintilla.scint_base {
+    class Selection extends CodeEditor.scint_base {
         _BackColor := 0xFFFFFF
         _BackEnabled := true
         _ForeColor := 0x000000
@@ -1851,7 +1852,7 @@ class Scintilla extends Gui.Custom {
         }
 
         Get(sel_num := 0) {
-            local tr := Scintilla.TextRange()
+            local tr := CodeEditor.TextRange()
 
             tr.cpMin := this.ctl.Selection.Start( , sel_num)
             tr.cpMax := this.ctl.Selection.End( , sel_num)
@@ -1993,7 +1994,7 @@ class Scintilla extends Gui.Custom {
         }
     }
 
-    class Style extends Scintilla.scint_base {
+    class Style extends CodeEditor.scint_base {
         ID := 32
 
         Back {
@@ -2026,11 +2027,11 @@ class Scintilla extends Gui.Custom {
                 local cs := "8859_15`r`nANSI`r`nArabic`r`nBaltic`r`nChineseBig5`r`nCyrillic`r`nDefault`r`nEastEurope`r`nGB2312`r`nGreek`r`nHangul`r`n"
                           . "Hebrew`r`nJohab`r`nMAC`r`nOEM`r`nOEM866`r`nRussian`r`nShiftJIS`r`nSymbol`r`nThai`r`nTurkish`r`nVietnamese"
 
-                if (!Scintilla.charset.Has(value) And !isInteger(value))
-                    throw "Invalid charset detected in Scintilla.Style.EOLFilled..."
+                if (!CodeEditor.charset.Has(value) And !isInteger(value))
+                    throw "Invalid charset detected in CodeEditor.Style.EOLFilled..."
 
-                if (Scintilla.charset.Has(value))
-                    value := Scintilla.charset.%value%
+                if (CodeEditor.charset.Has(value))
+                    value := CodeEditor.charset.%value%
                 else
                     value := ""
 
@@ -2083,7 +2084,7 @@ class Scintilla extends Gui.Custom {
         }
     }
 
-    class Styling extends Scintilla.scint_base {
+    class Styling extends CodeEditor.scint_base {
         Clear() {
             return this._sms(0x7D5)
         }
@@ -2121,7 +2122,7 @@ class Scintilla extends Gui.Custom {
         }
     }
 
-    class Tab extends Scintilla.scint_base {
+    class Tab extends CodeEditor.scint_base {
         Add(line, pixels) {
             return this._sms(0xA74, line, pixels)
         }
@@ -2186,7 +2187,7 @@ class Scintilla extends Gui.Custom {
         }
     }
 
-    class Target extends Scintilla.scint_base {
+    class Target extends CodeEditor.scint_base {
         All() {
             return this._sms(0xA82)
         }
@@ -2261,7 +2262,7 @@ class Scintilla extends Gui.Custom {
         }
     }
 
-    class WhiteSpace extends Scintilla.scint_base {
+    class WhiteSpace extends CodeEditor.scint_base {
         _BackColor := 0xFFFFFF
         _BackEnabled := true
         _ForeColor := 0x000000
@@ -2332,7 +2333,7 @@ class Scintilla extends Gui.Custom {
         }
     }
 
-    class Word extends Scintilla.scint_base {
+    class Word extends CodeEditor.scint_base {
         CharCatOpt {
             Get => this._sms(0xAA1)
             Set => this._sms(0xAA0, value)
@@ -2360,7 +2361,7 @@ class Scintilla extends Gui.Custom {
         }
     }
 
-    class Wrap extends Scintilla.scint_base {
+    class Wrap extends CodeEditor.scint_base {
         Count(line) {
             return this._sms(0x8BB, line)
         }
@@ -2451,7 +2452,7 @@ class Scintilla extends Gui.Custom {
         }
 
         _sms(msg, wParam := 0, lParam := 0) {
-            local obj := ((this.__Class = "Scintilla") ? this : this.ctl)
+            local obj := ((this.__Class = "CodeEditor") ? this : this.ctl)
             local r, status
 
             if obj.Hwnd {
@@ -2478,7 +2479,7 @@ class Scintilla extends Gui.Custom {
 
         _SetRect(value, _ptr, offset := 0) {
             if ((Type(value) != "Array") Or (value.Length != 4))
-                throw "Inalid property type detected in Scintilla.scint_base._SetRect..."
+                throw "Inalid property type detected in CodeEditor.scint_base._SetRect..."
 
             loop 4
                 NumPut("UInt", value[A_Index], _ptr, offset + ((A_Index - 1) * 4))
@@ -2517,31 +2518,31 @@ class Scintilla extends Gui.Custom {
         __New(ptr := 0) => (this.ptr := ptr)
 
         hwnd => NumGet(this.ptr, 0, "UPtr")
-        id => NumGet(this.ptr, Scintilla.scn_id, "UPtr")
-        wmmsg => NumGet(this.ptr, Scintilla.scn_wmmsg, "UInt")
-        pos => NumGet(this.ptr, Scintilla.scn_pos, "Int")
-        ch => NumGet(this.ptr, Scintilla.scn_ch, "Int")
-        mod => NumGet(this.ptr, Scintilla.scn_mod, "Int")
-        modType => NumGet(this.ptr, Scintilla.scn_modType, "Int")
-        text => ((ptr := NumGet(this.ptr, Scintilla.scn_text, "UPtr")) ? StrGet(ptr, this.length, "UTF-8") : "")
-        textPtr => NumGet(this.ptr, Scintilla.scn_text, "UPtr")
-        length => NumGet(this.ptr, Scintilla.scn_length, "Int")
-        linesAdded => NumGet(this.ptr, Scintilla.scn_linesAdded, "Int")
-        message => NumGet(this.ptr, Scintilla.scn_message, "Int")
-        wParam => NumGet(this.ptr, Scintilla.scn_wParam, "UPtr")
-        lParam => NumGet(this.ptr, Scintilla.scn_lParam, "Ptr")
-        line => NumGet(this.ptr, Scintilla.scn_line, "Int")
-        foldLevelNow => NumGet(this.ptr, Scintilla.scn_foldLevelNow, "Int")
-        foldLevelPrev => NumGet(this.ptr, Scintilla.scn_foldLevelPrev, "Int")
-        margin => NumGet(this.ptr, Scintilla.scn_margin, "Int")
-        listType => NumGet(this.ptr, Scintilla.scn_listType, "Int")
-        x => NumGet(this.ptr, Scintilla.scn_x, "Int")
-        y => NumGet(this.ptr, Scintilla.scn_y, "Int")
-        token => NumGet(this.ptr, Scintilla.scn_token, "Int")
-        annotationLinesAdded => NumGet(this.ptr, Scintilla.scn_annotationLinesAdded, "Int")
-        updated => NumGet(this.ptr, Scintilla.scn_updated, "Int")
-        listCompletionMethod => NumGet(this.ptr, Scintilla.scn_listCompletionMethod, "Int")
-        characterSource => NumGet(this.ptr, Scintilla.scn_characterSource, "Int")
+        id => NumGet(this.ptr, CodeEditor.scn_id, "UPtr")
+        wmmsg => NumGet(this.ptr, CodeEditor.scn_wmmsg, "UInt")
+        pos => NumGet(this.ptr, CodeEditor.scn_pos, "Int")
+        ch => NumGet(this.ptr, CodeEditor.scn_ch, "Int")
+        mod => NumGet(this.ptr, CodeEditor.scn_mod, "Int")
+        modType => NumGet(this.ptr, CodeEditor.scn_modType, "Int")
+        text => ((ptr := NumGet(this.ptr, CodeEditor.scn_text, "UPtr")) ? StrGet(ptr, this.length, "UTF-8") : "")
+        textPtr => NumGet(this.ptr, CodeEditor.scn_text, "UPtr")
+        length => NumGet(this.ptr, CodeEditor.scn_length, "Int")
+        linesAdded => NumGet(this.ptr, CodeEditor.scn_linesAdded, "Int")
+        message => NumGet(this.ptr, CodeEditor.scn_message, "Int")
+        wParam => NumGet(this.ptr, CodeEditor.scn_wParam, "UPtr")
+        lParam => NumGet(this.ptr, CodeEditor.scn_lParam, "Ptr")
+        line => NumGet(this.ptr, CodeEditor.scn_line, "Int")
+        foldLevelNow => NumGet(this.ptr, CodeEditor.scn_foldLevelNow, "Int")
+        foldLevelPrev => NumGet(this.ptr, CodeEditor.scn_foldLevelPrev, "Int")
+        margin => NumGet(this.ptr, CodeEditor.scn_margin, "Int")
+        listType => NumGet(this.ptr, CodeEditor.scn_listType, "Int")
+        x => NumGet(this.ptr, CodeEditor.scn_x, "Int")
+        y => NumGet(this.ptr, CodeEditor.scn_y, "Int")
+        token => NumGet(this.ptr, CodeEditor.scn_token, "Int")
+        annotationLinesAdded => NumGet(this.ptr, CodeEditor.scn_annotationLinesAdded, "Int")
+        updated => NumGet(this.ptr, CodeEditor.scn_updated, "Int")
+        listCompletionMethod => NumGet(this.ptr, CodeEditor.scn_listCompletionMethod, "Int")
+        characterSource => NumGet(this.ptr, CodeEditor.scn_characterSource, "Int")
     }
 }
 
@@ -2552,18 +2553,18 @@ class Scintilla extends Gui.Custom {
 
 initializeCodeEditor() {
     if !DllCall("LoadLibrary", "Str", kBinariesDirectory . "Code Editor\Scintilla.dll", "UPtr")
-        throw "Scintalla library not found..."
+        throw "Scintilla library not found..."
 
     if !DllCall("LoadLibrary", "Str", kBinariesDirectory . "Code Editor\CustomLexer.dll", "UPtr")
         throw "CustomLexer library not found..."
 
-    Window.Prototype.AddCodeEditor := ObjBindMethod(Scintilla, "AddScintilla")
+    Window.Prototype.AddCodeEditor := ObjBindMethod(CodeEditor, "AddCodeEditor")
 
-    Window.DefineCustomControl("CodeEditor", ObjBindMethod(Scintilla, "AddScintilla"))
+    Window.DefineCustomControl("CodeEditor", ObjBindMethod(CodeEditor, "AddCodeEditor"))
 
-    for prop in Scintilla.scint_base.Prototype.OwnProps() ; attach utility methods to prototype
+    for prop in CodeEditor.scint_base.Prototype.OwnProps() ; attach utility methods to prototype
         if !(SubStr(prop,1,2) = "__") And (SubStr(prop,1,1) = "_")
-            Scintilla.Prototype.%prop% := Scintilla.scint_base.prototype.%prop%
+            CodeEditor.Prototype.%prop% := CodeEditor.scint_base.prototype.%prop%
 }
 
 

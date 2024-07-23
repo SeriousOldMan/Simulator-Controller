@@ -370,7 +370,8 @@ class CodeEditor extends Gui.Custom {
 
         static modType := CodeEditor.sc_modType
 
-        if (this.Zombie || !this.Enabled || this.ReadOnly || !this.Visible || !this.HasProp("_wordList"))
+        if (this.Zombie || !this.Editable || !this.Enabled
+         || this.ReadOnly || !this.Visible || !this.HasProp("_wordList"))
             return
 
         try {

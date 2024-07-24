@@ -255,7 +255,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		widget13.OnEvent("Change", validateTokens.Bind("dcMaxTokensEdit"))
 		widget14 := window.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 Range32-131072 vdcMaxTokensRange Hidden")
 
-		widget36 := window.Add("Text", "x" . x0 . " ys w105 h23 +0x200 vdcLLMRTModelLabel Hidden", translate("Model"))
+		widget38 := window.Add("Text", "x" . x0 . " ys w105 h23 +0x200 vdcLLMRTModelLabel Hidden", translate("Model"))
 		widget31 := window.Add("Edit", "x" . x1 . " yp w" . (w1 - 24) . " vdcLLMRTModelEdit Hidden")
 		widget32 := window.Add("Button", "x" . (x1 + (w1 - 23)) . " yp h23 w23 vdcLLMRTModelButton Hidden", translate("..."))
 		widget32.OnEvent("Click", chooseModelPath)
@@ -265,7 +265,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		widget34.OnEvent("Change", validateTokens.Bind("dcLLMRTMaxTokensEdit"))
 		widget35 := window.Add("UpDown", "x" . x1 . " yp w60 h23 Range32-131072 vdcLLMRTMaxTokensRange Hidden")
 		widget36 := window.Add("Edit", "x" . (x1 + 62) . " yp w60 h23 Number Limit2 vdcLLMRTGPULayersEdit Hidden")
-		widget35 := window.Add("UpDown", "x" . (x1 + 62) . " yp w60 h23 Range0-99 vdcLLMRTGPULayersRange Hidden")
+		widget37 := window.Add("UpDown", "x" . (x1 + 62) . " yp w60 h23 Range0-99 vdcLLMRTGPULayersRange Hidden")
 
 		window.SetFont("Italic", "Arial")
 		widget15 := window.Add("Text", "x" . x0 . " yp+40 w105 h23 Hidden", translate("Personality"))
@@ -303,7 +303,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		widget30.OnEvent("Click", reloadInstructions)
 		setButtonIcon(widget30, kIconsDirectory . "Renew.ico", 1)
 
-		loop 36
+		loop 38
 			editor.registerWidget(this, widget%A_Index%)
 	}
 

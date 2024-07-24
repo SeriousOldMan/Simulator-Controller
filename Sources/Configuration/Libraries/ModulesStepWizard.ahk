@@ -536,6 +536,7 @@ class LLMRuntime extends NamedPreset {
 	}
 
 	install(wizard, edit := true) {
+		local currentDirectory := A_WorkingDir
 		local url := this.URL
 		local counter :=  0
 		local updateTask
@@ -568,6 +569,18 @@ class LLMRuntime extends NamedPreset {
 				showProgress({color: "Green", message: translate("Extracting...")})
 
 				RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\LLM Runtime.zip' -DestinationPath '" . kUserHomeDirectory . "Programs\LLM Runtime" . "' -Force", , "Hide")
+
+				try {
+					SetWorkingDir(kUserHomeDirectory . "Programs\LLM Runtime")
+
+					RunWait("Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File", , "Hide")
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+				finally {
+					SetWorkingDir(currentDirectory)
+				}
 			}
 			finally {
 				wizard.Window.Unblock()

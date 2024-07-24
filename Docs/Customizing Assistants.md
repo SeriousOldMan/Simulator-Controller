@@ -346,7 +346,7 @@ The *Reasoning* bosster as well as to some extent the *Conversation* booster rel
   - Command-R+ by *Cohere* (via *OpenRouter*, but not working properly yet)
   - Some Open Source models, such as Open Hermes, also support tools but with a varying degree of reliability
 
-Please note that calling actions is currently only available when using *OpenAI*, *Mistral AI* or *OpenRouter* are used as GPT service providers.
+Please note that calling actions is currently only available when using *OpenAI*, *Mistral AI* or *OpenRouter* are used as GPT service providers. Especially the local "LLM Runtime" or also "GPT4All" do not support tools yet.
 
 ### Instructions
 

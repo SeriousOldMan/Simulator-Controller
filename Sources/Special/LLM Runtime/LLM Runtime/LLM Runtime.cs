@@ -29,8 +29,7 @@ public class LLMExecutor
             GpuLayerCount = gpuLayers 
         };
         Model = LLamaWeights.LoadFromFile(Parameters);
-        using var context = Model.CreateContext(Parameters);
-        Executor = new InteractiveExecutor(context);
+        Executor = new InteractiveExecutor(Model.CreateContext(Parameters));
     }
 
     public string ParsePrompt(ChatHistory chatHistory, string prompt)
@@ -44,7 +43,7 @@ public class LLMExecutor
         AuthorRole role = AuthorRole.Unknown;
         string message = "";
 
-        foreach (string line in prompt.Split(new string[] { Environment.NewLine }, StringSplitOptions.None))
+        foreach (string line in prompt.Split(new string[] { Environment.NewLine, "\n" }, StringSplitOptions.None))
         {
             string input = line.Trim();
 
@@ -62,19 +61,19 @@ public class LLMExecutor
                     role = AuthorRole.User;
             }
             else
-                message += input;
+                message += (input + Environment.NewLine);
         }
 
         return (role == AuthorRole.User) ? message : "";
     }
 
-    public async Task<string> Ask(string prompt)
+    public async Task<string> AskAsync(string prompt)
     {
         // Add chat histories as prompt to tell AI how to act.
         var chatHistory = new ChatHistory();
 
         string userInput = ParsePrompt(chatHistory, prompt);
-        
+
         ChatSession session = new(Executor, chatHistory);
 
         InferenceParams inferenceParams = new InferenceParams()
@@ -94,6 +93,12 @@ public class LLMExecutor
 
         return result;
     }
+
+    public string Ask(string prompt)
+    {
+
+        return AskAsync(prompt).Result;
+    }
 }
 
 static class Program
@@ -111,6 +116,8 @@ static class Program
                 promptStream.Close();
 
                 File.Delete(fileName);
+
+                return prompt;
             }
 
             Thread.Sleep(100);
@@ -138,11 +145,11 @@ static class Program
 
                 try
                 {
-                    Task<string> answer = executor.Ask(prompt);
-
+                    string answer = executor.Ask(prompt);
                     StreamWriter outStream = new StreamWriter(args[1], false, Encoding.Unicode);
 
-                    outStream.Write(answer.Result);
+                    outStream.Write(answer);
+                    outStream.Flush();
 
                     outStream.Close();
                 }
@@ -151,6 +158,7 @@ static class Program
                     StreamWriter outStream = new StreamWriter(args[1], false, Encoding.Unicode);
 
                     outStream.Write("Error");
+                    outStream.Flush();
 
                     outStream.Close();
                 }

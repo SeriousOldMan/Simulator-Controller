@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "LLM Runtime": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\Users\\juwig\\Documents\\Simulator Controller\\Temp\\LLM.cmd\" \"C:\\Users\\juwig\\Documents\\Simulator Controller\\Temp\\LLM.out\" \"C:\\Users\\juwig\\AppData\\Local\\nomic.ai\\GPT4All\\mistral-7b-openorca.gguf2.Q4_0.gguf\" 0.50 1024 0"
+    }
+  }
+}

@@ -679,7 +679,7 @@ class LLMConnector {
 
 			super.__New(manager, model)
 
-			OnExit((*) => this.Disconnect(), false)
+			OnExit((*) => this.Disconnect())
 		}
 
 		Connect(force := false) {
@@ -691,28 +691,34 @@ class LLMConnector {
 			if (!this.LLMRuntime || force) {
 				this.Disconnect(force)
 
-				exePath := (kUserHomeDirectory . "Programs\LLM Runtime\LLM Runtime.exe")
+				llmRuntime := ProcessExist("LLM Runtime.exe")
 
-				if FileExist(exePath) {
-					deleteFile(kTempDirectory . "LLMRuntime.cmd")
-					deleteFile(kTempDirectory . "LLMRuntime.out")
+				if llmRuntime
+					this.iLLMRuntime := llmRuntime
+				else {
+					exePath := (kUserHomeDirectory . "Programs\LLM Runtime\LLM Runtime.exe")
 
-					options := ("`"" . this.Model . "`" " . this.Temperature . A_Space . this.MaxTokens . A_Space . this.GPULayers)
+					if FileExist(exePath) {
+						deleteFile(kTempDirectory . "LLMRuntime.cmd")
+						deleteFile(kTempDirectory . "LLMRuntime.out")
 
-					Run("`"" . exePath . "`" `"" . kTempDirectory . "LLMRuntime.cmd`" `"" . kTempDirectory . "LLMRuntime.out`" " . options, kBinariesDirectory, "Hide", &llmRuntime)
+						options := ("`"" . this.Model . "`" " . this.Temperature . A_Space . this.MaxTokens . A_Space . this.GPULayers)
 
-					if llmRuntime {
-						Sleep(1000)
+						Run("`"" . exePath . "`" `"" . kTempDirectory . "LLMRuntime.cmd`" `"" . kTempDirectory . "LLMRuntime.out`" " . options, kBinariesDirectory, "Hide", &llmRuntime)
 
-						if ProcessExist(llmRuntime) {
-							this.iLLMRuntime := llmRuntime
+						if llmRuntime {
+							Sleep(1000)
 
-							return true
+							if ProcessExist(llmRuntime) {
+								this.iLLMRuntime := llmRuntime
+
+								return true
+							}
 						}
 					}
-				}
 
-				return false
+					return false
+				}
 			}
 
 			return true
@@ -787,7 +793,7 @@ class LLMConnector {
 			}
 
 			try {
-				prompt := StrReplace(StrReplace(prompt, "`"", "\`""), "`n", "\n")
+				; prompt := StrReplace(StrReplace(prompt, "`"", "\`""), "`n", "\n")
 
 				while !deleteFile(kTempDirectory . "LLMRuntime.cmd")
 					Sleep(50)
@@ -809,8 +815,11 @@ class LLMConnector {
 					}
 
 				loop 60
-					if FileExist(kTempDirectory . "LLMRuntime.out")
+					if FileExist(kTempDirectory . "LLMRuntime.out") {
+						Sleep(500)
+
 						break
+					}
 					else
 						Sleep(1000)
 			}
@@ -830,6 +839,8 @@ class LLMConnector {
 
 				if (Trim(answer) = "Error")
 					throw "Empty answer received..."
+				else
+					answer := Trim(StrReplace(StrReplace(StrReplace(answer, "System:", ""), "Assistant:", ""), "User:", ""))
 
 				if isDebug() {
 					deleteFile(kTempDirectory . "LLM.response")
@@ -921,8 +932,6 @@ class LLMConnector {
 	__New(manager, model) {
 		this.iManager := manager
 		this.iModel := model
-
-		OnExit((*) => this.Disconnect(), false)
 	}
 
 	static GetDefaults(&serviceURL, &serviceKey, &model) {

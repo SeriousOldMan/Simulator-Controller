@@ -238,11 +238,11 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		editorGui.Add("Edit", "x" . (x1 + (w1 - 60)) . " yp-1 w60 h23 Number vviConversationMaxTokensEdit").OnEvent("Change", validateTokens.Bind("viConversationMaxTokensEdit"))
 		editorGui.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 Range32-131072 vviConversationMaxTokensRange")
 
-		editorGui.Add("Text", "x" . x0 . " ys w105 h23 +0x200 vviConversationLLMRTModelLabel Hidden", translate("Model"))
+		editorGui.Add("Text", "x" . x0 . " ys+6 w105 h23 +0x200 vviConversationLLMRTModelLabel Hidden", translate("Model"))
 		editorGui.Add("Edit", "x" . x1 . " yp w" . (w1 - 24) . " vviConversationLLMRTModelEdit Hidden")
 		editorGui.Add("Button", "x" . (x1 + (w1 - 23)) . " yp h23 w23 vviConversationLLMRTModelButton Hidden", translate("...")).OnEvent("Click", chooseModelPath.Bind("viConversationLLMRTModelEdit"))
 
-		editorGui.Add("Text", "x" . x0 . " yp+30 w120 h23 +0x200 vviConversationLLMRTTokensLabel Hidden", translate("# Tokens / # GPULayers"))
+		editorGui.Add("Text", "x" . x0 . " yp+24 w120 h23 +0x200 vviConversationLLMRTTokensLabel Hidden", translate("# Tokens / # GPULayers"))
 		editorGui.Add("Edit", "x" . x1 . " yp-1 w60 h23 Number vviConversationLLMRTMaxTokensEdit Hidden").OnEvent("Change", validateTokens.Bind("viConversationLLMRTMaxTokensEdit"))
 		editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range32-131072 vviConversationLLMRTMaxTokensRange Hidden")
 		editorGui.Add("Edit", "x" . (x1 + 62) . " yp w60 h23 Number Limit2 vviConversationLLMRTGPULayersEdit Hidden")
@@ -319,11 +319,11 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		editorGui.Add("Text", "x" . x0 . " yp+30 w105 h23 +0x200 vviAgentModelLabel", translate("Model"))
 		editorGui.Add("ComboBox", "x" . x1 . " yp w" . w1 . " vviAgentModelDropDown")
 
-		editorGui.Add("Text", "x" . x0 . " ys w105 h23 +0x200 vviAgentLLMRTModelLabel Hidden", translate("Model"))
+		editorGui.Add("Text", "x" . x0 . " ys+6 w105 h23 +0x200 vviAgentLLMRTModelLabel Hidden", translate("Model"))
 		editorGui.Add("Edit", "x" . x1 . " yp w" . (w1 - 24) . " vviAgentLLMRTModelEdit Hidden")
 		editorGui.Add("Button", "x" . (x1 + (w1 - 23)) . " yp h23 w23 vviAgentLLMRTModelButton Hidden", translate("...")).OnEvent("Click", chooseModelPath.Bind("viAgentLLMRTModelEdit"))
 
-		editorGui.Add("Text", "x" . x0 . " yp+30 w120 h23 +0x200 vviAgentLLMRTGPULayersLabel Hidden", translate("# GPULayers"))
+		editorGui.Add("Text", "x" . x0 . " yp+24 w120 h23 +0x200 vviAgentLLMRTGPULayersLabel Hidden", translate("# GPULayers"))
 		editorGui.Add("Edit", "x" . x1 . " yp-1 w60 h23 Number Limit2 vviAgentLLMRTGPULayersEdit Hidden")
 		editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range0-99 vviAgentLLMRTGPULayersRange Hidden")
 

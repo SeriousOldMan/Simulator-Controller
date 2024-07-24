@@ -255,12 +255,12 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		widget13.OnEvent("Change", validateTokens.Bind("dcMaxTokensEdit"))
 		widget14 := window.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 Range32-131072 vdcMaxTokensRange Hidden")
 
-		widget38 := window.Add("Text", "x" . x0 . " ys w105 h23 +0x200 vdcLLMRTModelLabel Hidden", translate("Model"))
+		widget38 := window.Add("Text", "x" . x0 . " ys+6 w105 h23 +0x200 vdcLLMRTModelLabel Hidden", translate("Model"))
 		widget31 := window.Add("Edit", "x" . x1 . " yp w" . (w1 - 24) . " vdcLLMRTModelEdit Hidden")
 		widget32 := window.Add("Button", "x" . (x1 + (w1 - 23)) . " yp h23 w23 vdcLLMRTModelButton Hidden", translate("..."))
 		widget32.OnEvent("Click", chooseModelPath)
 
-		widget33 := window.Add("Text", "x" . x0 . " yp+30 w120 h23 +0x200 vdcLLMRTTokensLabel Hidden", translate("# Tokens / # GPULayers"))
+		widget33 := window.Add("Text", "x" . x0 . " yp+24 w120 h23 +0x200 vdcLLMRTTokensLabel Hidden", translate("# Tokens / # GPULayers"))
 		widget34 := window.Add("Edit", "x" . x1 . " yp-1 w60 h23 Number vdcLLMRTMaxTokensEdit Hidden")
 		widget34.OnEvent("Change", validateTokens.Bind("dcLLMRTMaxTokensEdit"))
 		widget35 := window.Add("UpDown", "x" . x1 . " yp w60 h23 Range32-131072 vdcLLMRTMaxTokensRange Hidden")

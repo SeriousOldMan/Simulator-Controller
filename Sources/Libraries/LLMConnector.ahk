@@ -323,12 +323,6 @@ class LLMConnector {
 			if !tools
 				tools := this.GetTools()
 
-			/*
-			if InStr(this.Model, "Claude")
-				if (tools.Length > 0)
-					body.tool_choice := {type: "auto"}
-			*/
-
 			if isDebug()
 				body := JSON.print(this.CreatePrompt(body, instructions, tools, question), "  ")
 			else
@@ -337,7 +331,8 @@ class LLMConnector {
 			if isDebug() {
 				deleteFile(kTempDirectory . "LLM.request")
 
-				FileAppend(body, kTempDirectory . "LLM.request")
+				try
+					FileAppend(body, kTempDirectory . "LLM.request")
 			}
 
 			answer := WinHttpRequest({Timeouts: [0, 60000, 30000, 60000]}).POST(this.CreateServiceURL(this.Server), body, headers, {Object: true, Encoding: "UTF-8"})
@@ -350,7 +345,8 @@ class LLMConnector {
 				if isDebug() {
 					deleteFile(kTempDirectory . "LLM.response")
 
-					FileAppend(JSON.print(answer), kTempDirectory . "LLM.response")
+					try
+						FileAppend(JSON.print(answer, "  "), kTempDirectory . "LLM.response")
 				}
 
 				try {
@@ -730,7 +726,8 @@ class LLMConnector {
 					try {
 						deleteFile(kTempDirectory . "LLMRuntime.cmd")
 
-						FileAppend("Exit`n", kTempDirectory . "LLMRuntime.cmd")
+						try
+							FileAppend("Exit`n", kTempDirectory . "LLMRuntime.cmd")
 					}
 					catch Any as exception {
 						if (A_Index = 5)
@@ -774,10 +771,15 @@ class LLMConnector {
 			return prompt
 		}
 
-		Ask(question, instructions := false, tools := false) {
+		ProcessToolCalls(tools, message, &calls?) {
+			return false
+		}
+
+		Ask(question, instructions := false, tools := false, &calls?) {
 			local prompt := this.CreatePrompt(instructions ? instructions : this.GetInstructions()
 											, tools ? tools : this.GetTools()
 											, question)
+			local toolCall := false
 			local command, answer
 
 			if !this.Connect() {
@@ -789,7 +791,8 @@ class LLMConnector {
 			if isDebug() {
 				deleteFile(kTempDirectory . "LLM.request")
 
-				FileAppend(prompt, kTempDirectory . "LLM.request")
+				try
+					FileAppend(prompt, kTempDirectory . "LLM.request")
 			}
 
 			try {
@@ -814,14 +817,15 @@ class LLMConnector {
 							Sleep(10)
 					}
 
-				loop 60
-					if FileExist(kTempDirectory . "LLMRuntime.out") {
-						Sleep(500)
+				loop 120
+					try
+						if FileExist(kTempDirectory . "LLMRuntime.out") {
+							Sleep(500)
 
-						break
-					}
-					else
-						Sleep(1000)
+							break
+						}
+						else
+							Sleep(1000)
 			}
 			catch Any as exception {
 				this.Manager.connectorState("Error", "Connection")
@@ -830,29 +834,50 @@ class LLMConnector {
 			}
 
 			try {
+				if !FileExist(kTempDirectory . "LLMRuntime.out") {
+					this.Manager.connectorState("Error", "Answer")
+
+					return false
+				}
+
 				answer := Trim(FileRead(kTempDirectory . "LLMRuntime.out", "`n"))
 
 				while ((StrLen(answer) > 0) && (SubStr(answer, 1, 1) = "`n"))
 					answer := SubStr(answer, 2)
 
-				deleteFile(kTempDirectory . "LLMRuntime.out")
-
 				if (Trim(answer) = "Error")
-					throw "Empty answer received..."
-				else
-					answer := Trim(StrReplace(StrReplace(StrReplace(answer, "System:", ""), "Assistant:", ""), "User:", ""))
+					answer := false
+				else {
+					this.Manager.connectorState("Active")
 
-				if isDebug() {
-					deleteFile(kTempDirectory . "LLM.response")
+					if isSet(calls)
+						toolCall := this.ProcessToolCalls(tools, answer, &calls)
+					else
+						toolCall := this.ProcessToolCalls(tools, answer)
 
-					FileAppend(answer, kTempDirectory . "LLM.response")
+					deleteFile(kTempDirectory . "LLMRuntime.out")
+
+					if toolCall
+						return true
+					else {
+						answer := Trim(StrReplace(StrReplace(StrReplace(answer, "System:", ""), "Assistant:", ""), "User:", ""))
+
+						if isDebug() {
+							deleteFile(kTempDirectory . "LLM.response")
+
+							try
+								FileAppend(answer, kTempDirectory . "LLM.response")
+						}
+
+						this.AddConversation(question, answer)
+
+						return answer
+					}
 				}
-
-				this.AddConversation(question, answer)
-
-				return answer
 			}
 			catch Any as exception {
+				logError(exception, true)
+
 				this.Manager.connectorState("Error", "Answer")
 
 				return false

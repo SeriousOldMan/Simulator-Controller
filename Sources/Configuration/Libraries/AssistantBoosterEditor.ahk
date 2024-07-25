@@ -1127,7 +1127,10 @@ class CallbacksEditor {
 		this.iCallbacksListView.OnEvent("Click", chooseCallback)
 		this.iCallbacksListView.OnEvent("DoubleClick", chooseCallback)
 
-		editorGui.Add("Button", "x776 yp+142 w23 h23 Center +0x200 X:Move Y:Move(0.25) vaddCallbackButton").OnEvent("Click", (*) => this.addCallback())
+		editorGui.Add("Text", "x16 yp+146 w90 h23 +0x200 Y:Move(0.25) Hidden", translate("Assistant"))
+		editorGui.Add("Text", "x113 yp w200 h23 +0x200 Y:Move(0.25) Hidden", translate(this.Editor.Assistant))
+
+		editorGui.Add("Button", "x776 yp-4 w23 h23 Center +0x200 X:Move Y:Move(0.25) vaddCallbackButton").OnEvent("Click", (*) => this.addCallback())
 		setButtonIcon(editorGui["addCallbackButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
 		editorGui.Add("Button", "x800 yp w23 h23 Center +0x200 X:Move Y:Move(0.25) vcopyCallbackButton").OnEvent("Click", (*) => this.copyCallback())
 		setButtonIcon(editorGui["copyCallbackButton"], kIconsDirectory . "Copy.ico", 1, "L4 T4 R4 B4")

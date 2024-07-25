@@ -1,4 +1,4 @@
-## 5.8.1.0-release 07/26/24 (planned)
+## 5.8.1.0-release 07/26/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Added available tyre compounds to the knowledge passed to the LLM in several Assistant Boosters.

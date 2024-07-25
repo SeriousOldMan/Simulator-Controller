@@ -1,15 +1,15 @@
 [Development]
-Version=5.8.1.0-dev
+Version=5.8.1.0-release
 Target=5.8.1.0-release
-Date=07/22/2024
-Download=https://www.dropbox.com/scl/fi/zsigczqankseepygrggos/Simulator-Controller-5.8.1.0-dev.zip?rlkey=tpa93879v1jpd4v8yw4ycujyc&st=nqbx4wi1&dl=1
+Date=07/26/2024
+Download=https://cutt.ly/VekVFNWQ;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.8.1.0-release.zip
 Changes=Added available tyre compounds to the LLM knowledge, Clarifications in the documentations "Customize Assistants" and "Rule Engine", Allow both a predefined action for a controller function together with bound actions from plugins, The LLM action plan_pitstop now accept a tyre compound argument, Optimized pressure loss reporting, Disabled code editor allows scrolling and copy
 Components=Media->5.6.1,Configuration->5.7.5,Utilities->5.4.8
 [Release]
-Version=5.8.0.1-release
-Date=07/20/2024
-Download=https://cutt.ly/XejMu1J3;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.8.0.1-release.zip
-Changes=Full implementation of an Agent framwork to include LLMs in the reasoning process of the Race Assistants, Renamed "Conversion Booster" to "Assistant Booster", Added new documention chapter on "Customizing Assistants", New post compilation compression makes binaries much smaller, All new documentation for the rule engine, "Strategy Workbench" has now its own documentation chapter, "Practice Center" has now its own documentation chapter, "Race Reports" has now its own documentation chapter, "Session Database" has now its own documentation chapter, "Race Center" has now its own documentation chapter, New color scheme names, New dark color scheme, "Simulator Tools" ask before a non-release version is installed, Extended knowledge for LLM with historic lap data, New speak controller action function, New play controller action function, "speak" and "play" are available as triggered actions in Track Automations
+Version=5.8.1.0-release
+Date=07/26/2024
+Download=https://cutt.ly/VekVFNWQ;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.8.1.0-release.zip
+Changes=Added available tyre compounds to the LLM knowledge, Clarifications in the documentations "Customize Assistants" and "Rule Engine", Allow both a predefined action for a controller function together with bound actions from plugins, The LLM action plan_pitstop now accept a tyre compound argument, Optimized pressure loss reporting, Disabled code editor allows scrolling and copy
 Components=Media->5.6.1,Configuration->5.7.5,Utilities->5.4.8
 [Components]
 Media.5.6.1.Path=Resources
@@ -22,7 +22,7 @@ Utilities.5.4.8.Path=.
 Utilities.5.4.8.Content=Utilities
 Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Utilities-5.4.8.zip?rlkey=alrj8l2z205dd2vm9cu6hbsot&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.4.8.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=5.8.1.0-dev
-Release=5.8.0.1-release
+Development=5.8.1.0-release
+Release=5.8.1.0-release

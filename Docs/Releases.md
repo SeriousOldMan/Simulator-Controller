@@ -19,6 +19,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   8. The code editor for LLM events and actions now allows scrolling and copying even if the displayed rule text is read-only.
   9. The fields for unchangeable builtin events and actions are now shown as read-only and no longer as disabled.
   10. LLM events and actions can now be cloned using a "Copy" button.
+  11. The colors of diagrams and graphs has been optimized for the dark color scheme. 
 
 ## 5.8.0.1-release 07/20/24
   1. Fixed a critcal bug for connected hardware controllers (Button Boxes, Stream Decks, ...) that could rapidfire a pressed button.

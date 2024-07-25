@@ -1090,6 +1090,43 @@ class CallbacksEditor {
 	iSelectedCallback := false
 	iSelectedParameter := false
 
+	class CallbacksEditorWindow extends Window {
+		iCallbacksEditor := false
+
+		CallbacksEditor {
+			Get {
+				return this.iCallbacksEditor
+			}
+		}
+
+		__New(editor) {
+			this.iCallbacksEditor := editor
+
+			super.__New({Descriptor: (editor.Type . " Editor"), Closeable: true, Resizeable: true, Options: "0x400000"})
+		}
+
+		Close(*) {
+			local translator
+
+			if this.Closeable {
+				translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
+
+				OnMessage(0x44, translator)
+				msgResult := withBlockedWindows(MsgBox, translate("Do you want to save your changes?"), translate("Close"), 262179)
+				OnMessage(0x44, translator, 0)
+
+				if (msgResult = "Yes")
+					this.CallbacksEditor.iResult := kOk
+				else if (msgResult = "No")
+					this.CallbacksEditor.iResult := kCancel
+				else if (msgResult = "Cancel")
+					return true
+			}
+			else
+				return true
+		}
+	}
+
 	Editor {
 		Get {
 			return this.iEditor
@@ -1212,7 +1249,9 @@ class CallbacksEditor {
 			this.updateState()
 		}
 
-		editorGui := Window({Descriptor: (this.Type . " Editor"), Resizeable: true, Options: "0x400000"})
+		; editorGui := Window({Descriptor: (this.Type . " Editor"), Resizeable: true, Options: "0x400000"})
+
+		editorGui := CallbacksEditor.CallbacksEditorWindow(this)
 
 		this.iWindow := editorGui
 

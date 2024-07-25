@@ -319,7 +319,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		editorGui.Add("Text", "x" . x0 . " yp+30 w105 h23 +0x200 vviAgentModelLabel", translate("Model"))
 		editorGui.Add("ComboBox", "x" . x1 . " yp w" . w1 . " vviAgentModelDropDown")
 
-		editorGui.Add("Text", "x" . x0 . " ys+6 w105 h23 +0x200 vviAgentLLMRTModelLabel Hidden", translate("Model"))
+		editorGui.Add("Text", "x" . x0 . " ys+5 w105 h23 +0x200 vviAgentLLMRTModelLabel Hidden", translate("Model"))
 		editorGui.Add("Edit", "x" . x1 . " yp w" . (w1 - 24) . " vviAgentLLMRTModelEdit Hidden")
 		editorGui.Add("Button", "x" . (x1 + (w1 - 23)) . " yp h23 w23 vviAgentLLMRTModelButton Hidden", translate("...")).OnEvent("Click", chooseModelPath.Bind("viAgentLLMRTModelEdit"))
 

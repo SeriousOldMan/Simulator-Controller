@@ -255,7 +255,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		widget13.OnEvent("Change", validateTokens.Bind("dcMaxTokensEdit"))
 		widget14 := window.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 Range32-131072 vdcMaxTokensRange Hidden")
 
-		widget38 := window.Add("Text", "x" . x0 . " ys+6 w105 h23 +0x200 vdcLLMRTModelLabel Hidden", translate("Model"))
+		widget38 := window.Add("Text", "x" . x0 . " ys+5 w105 h23 +0x200 vdcLLMRTModelLabel Hidden", translate("Model"))
 		widget31 := window.Add("Edit", "x" . x1 . " yp w" . (w1 - 24) . " vdcLLMRTModelEdit Hidden")
 		widget32 := window.Add("Button", "x" . (x1 + (w1 - 23)) . " yp h23 w23 vdcLLMRTModelButton Hidden", translate("..."))
 		widget32.OnEvent("Click", chooseModelPath)

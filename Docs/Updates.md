@@ -41,6 +41,12 @@ The configuration of the *LLM Runtime* has changed and it is now a downloadable 
 
 ***
 
+## Release 5.8.1
+
+No actions required.
+
+***
+
 ## Release 5.8.0
 
 No manual changes necessary.

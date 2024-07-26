@@ -101,16 +101,17 @@ Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 		},
 		"Laps": [
 			{
-				"AirTemperature": 25,
 				"BodyworkDamage": 0.0,
 				"EngineDamage": 0.0,
 				"FuelConsumption": "2 Liters",
 				"FuelRemaining": "9 Liters",
-				"Grip": "Green",
 				"Nr": 2,
 				"SuspensionDamage": 0.0,
 				"Time": "110 Seconds",
-				"TrackTemperature": 32,
+				"Track": {
+					"Temperature": 32,
+					"Grip": "Green"
+				},
 				"Tyres": {
 					"Pressures": {
 						"Front.Left": "27.13 PSI",
@@ -126,19 +127,27 @@ Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 					}
 				},
 				"Valid": true,
-				"Weather": "Dry"
+				"Weather": {
+					"Now": "Dry",
+					"Forecast": {
+						"10 Minutes": "Dry",
+						"30 Minutes": "Dry"
+					},
+					"Temperature": 25
+				}
 			},
 			{
-				"AirTemperature": 25,
 				"BodyworkDamage": 0.0,
 				"EngineDamage": 0.0,
 				"FuelConsumption": "3 Liters",
 				"FuelRemaining": "7 Liters",
-				"Grip": "Green",
 				"Nr": 3,
 				"SuspensionDamage": 0.0,
 				"Time": "108 Seconds",
-				"TrackTemperature": 32,
+				"Track": {
+					"Temperature": 32,
+					"Grip": "Green"
+				},
 				"Tyres": {
 					"Pressures": {
 						"Front.Left": "27.22 PSI",
@@ -154,19 +163,27 @@ Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 					}
 				},
 				"Valid": true,
-				"Weather": "Dry"
+				"Weather": {
+					"Now": "Dry",
+					"Forecast": {
+						"10 Minutes": "Dry",
+						"30 Minutes": "Dry"
+					},
+					"Temperature": 25
+				}
 			},
 			{
-				"AirTemperature": 25,
 				"BodyworkDamage": 0.0,
 				"EngineDamage": 0.0,
 				"FuelConsumption": "3 Liters",
 				"FuelRemaining": "4 Liters",
-				"Grip": "Green",
 				"Nr": 4,
 				"SuspensionDamage": 3.099,
 				"Time": "113 Seconds",
-				"TrackTemperature": 32,
+				"Track": {
+					"Temperature": 32,
+					"Grip": "Green"
+				}
 				"Tyres": {
 					"Pressures": {
 						"Front.Left": "27.03 PSI",
@@ -182,7 +199,14 @@ Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 					}
 				},
 				"Valid": true,
-				"Weather": "Dry"
+				"Weather": {
+					"Now": "Dry",
+					"Forecast": {
+						"10 Minutes": "Dry",
+						"30 Minutes": "Dry"
+					},
+					"Temperature": 25
+				}
 			},
 			{
 				"AirTemperature": 25,
@@ -210,7 +234,13 @@ Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 					}
 				},
 				"Valid": true,
-				"Weather": "Dry"
+				"Weather": {
+					"Now": "Dry",
+					"Forecast": {
+						"10 Minutes": "Dry",
+						"30 Minutes": "Dry"
+					}
+				}
 			}
 		],
 		"Pitstop": {
@@ -309,8 +339,10 @@ Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 			}
 		},
 		"Weather": {
-			"10 Minutes": "Dry",
-			"30 Minutes": "Dry",
+			"Forecast": {
+				"10 Minutes": "Dry",
+				"30 Minutes": "Dry"
+			},
 			"Now": "Dry",
 			"Temperature": "25 Celsius"
 		}

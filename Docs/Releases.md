@@ -5,6 +5,7 @@
      - Better support for execution of all or parts of the model on the graphics card.
 	 - Since this runtime is quite large (> 200 MB), it is provided as a downloadable component. Run "Simulator Setup", go to the presets page and install the "Local runtime for LLMs" preset.
 	 - See the completely [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#llm-runtime) for more information.
+  4. The lap history data supplied to the LLMs has been extended.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-582), if you have configured the Conversation Booster for the Assistants.
 

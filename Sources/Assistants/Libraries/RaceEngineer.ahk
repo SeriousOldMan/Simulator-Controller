@@ -464,10 +464,7 @@ class RaceEngineer extends RaceAssistant {
 		if (knowledgeBase && isSet(tyreCompound)) {
 			tyreCompound := normalizeCompound(tyreCompound)
 
-			if inList(SessionDatabase.getTyreCompounds(knowledgeBase.getValue("Session.Simulator")
-													 , knowledgeBase.getValue("Session.Car")
-													 , knowledgeBase.getValue("Session.Track"))
-					 , tyreCompound)
+			if inList(SessionDatabase.getTyreCompounds(this.Simulator, this.Car, this.Track), tyreCompound)
 				splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
 			else
 				tyreCompound := kUndefined

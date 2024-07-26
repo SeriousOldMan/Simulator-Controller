@@ -586,7 +586,14 @@ startupSimulatorConfiguration() {
 
 					editor.Result := false
 
-					saveConfiguration(kSimulatorConfigurationFile, editor)
+					editor.Window.Block()
+
+					try {
+						saveConfiguration(kSimulatorConfigurationFile, editor)
+					}
+					finally {
+						editor.Window.Unblock()
+					}
 				}
 				else if (result == kCancel)
 					done := true
@@ -594,7 +601,12 @@ startupSimulatorConfiguration() {
 					saved := true
 					done := true
 
-					saveConfiguration(kSimulatorConfigurationFile, editor)
+					try {
+						saveConfiguration(kSimulatorConfigurationFile, editor)
+					}
+					finally {
+						editor.Window.Unblock()
+					}
 				}
 			}
 			until done

@@ -1075,6 +1075,8 @@ else {
 			else {
 				engineer.addLap(A_Index, &data)
 
+				engineer.iSimulator := "ACC"
+
 				if (A_Index = 3) {
 					engineer.planPitstop()
 					engineer.preparePitstop()

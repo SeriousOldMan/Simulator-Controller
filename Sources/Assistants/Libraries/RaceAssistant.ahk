@@ -1128,10 +1128,12 @@ class RaceAssistant extends ConfigurationItem {
 									, "Time", (Round(knowledgeBase.getValue("Lap." . lapNr . ".Time") / 1000) . " Seconds")
 									, "FuelConsumption", (Round(knowledgeBase.getValue("Lap." . lapNr . ".Fuel.Consumption")) . " Liters")
 									, "FuelRemaining", (Round(knowledgeBase.getValue("Lap." . lapNr . ".Fuel.Remaining")) . " Liters")
-									, "Weather", knowledgeBase.getValue("Lap." . lapNr . ".Weather")
-									, "AirTemperature", knowledgeBase.getValue("Lap." . lapNr . ".Temperature.Air")
-									, "TrackTemperature", knowledgeBase.getValue("Lap." . lapNr . ".Temperature.Track")
-									, "Grip", knowledgeBase.getValue("Lap." . lapNr . ".Grip")
+									, "Weather", Map("Now", knowledgeBase.getValue("Lap." . lapNr . ".Weather")
+												   , "Forecast", Map("10 Minutes", knowledgeBase.getValue("Lap." . lapNr . ".Weather.10Min")
+																   , "30 Minutes", knowledgeBase.getValue("Lap." . lapNr . ".Weather.30Min"))
+												   , "Temperature", knowledgeBase.getValue("Lap." . lapNr . ".Temperature.Air"))
+									, "Track", Map("Temperature", knowledgeBase.getValue("Lap." . lapNr . ".Temperature.Track")
+												 , "Grip", knowledgeBase.getValue("Lap." . lapNr . ".Grip"))
 									, "Valid", (knowledgeBase.getValue("Lap." . lapNr . ".Valid") ? kTrue : kFalse)))
 					else
 						break
@@ -1143,8 +1145,8 @@ class RaceAssistant extends ConfigurationItem {
 
 			if this.activeTopic(options, "Weather")
 				knowledge["Weather"] := Map("Now", knowledgeBase.getValue("Weather.Weather.Now")
-										  , "10 Minutes", knowledgeBase.getValue("Weather.Weather.10Min")
-										  , "30 Minutes", knowledgeBase.getValue("Weather.Weather.30Min")
+										  , "Forecast", Map("10 Minutes", knowledgeBase.getValue("Weather.Weather.10Min")
+														  , "30 Minutes", knowledgeBase.getValue("Weather.Weather.30Min"))
 										  , "Temperature", (knowledgeBase.getValue("Weather.Temperature.Air") . " Celsius"))
 
 			if this.activeTopic(options, "Track")

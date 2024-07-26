@@ -39,7 +39,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 The configuration of the *LLM Runtime* has changed and it is now a downloadable preset in "Simulator Setup". If you have used the *LLM Runtime* for the "Driving Coach" or one of the Assistant Boosters, open "Simulator Setup" and install the "Local runtime for LLMs" preset, then review your configuration.
 
-The Event "damage_collected" has been renamed to "damage_detected". Additionally there is a new Event and a new Action for the *Reasoning* Booster of the Race Engineer. You may want to update your Events and Actions configuration.
+The event "damage_collected" has been renamed to "damage_detected". Additionally there is a new event and a new action for the *Reasoning* Booster of the Race Engineer. You may want to update your Events and Actions configuration.
 
 ***
 

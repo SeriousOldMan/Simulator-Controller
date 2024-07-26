@@ -5,8 +5,8 @@
      - Better support for execution of all or parts of the model on the graphics card.
 	 - Since this runtime is quite large (> 200 MB), it is provided as a downloadable component. Run "Simulator Setup", go to the presets page and install the "Local runtime for LLMs" preset.
 	 - See the completely [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#llm-runtime) for more information.
-  4. The Race Engineer LLM Event "damage_collected" has been renamed to "damage_detected".
-  5. A new Event and a new Action has been defined for the *Reasoning* booster of the Race Engineer. This pair handles reporting of critical time loss after an incident.
+  4. The Race Engineer LLM event "damage_collected" has been renamed to "damage_detected".
+  5. A new event and a new action has been defined for the *Reasoning* booster of the Race Engineer. This pair handles reporting of critical time loss after an incident.
   6. The lap history data supplied to the LLMs has been extended.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-582), especially if you have used the previous LLM Runtime for the "Driving Coach" or the Assistant Boosters.

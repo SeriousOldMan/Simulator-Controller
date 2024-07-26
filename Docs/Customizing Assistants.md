@@ -366,7 +366,7 @@ The *Reasoning* booster implements an LLM agent framework architecture also used
 
 As already mentioned, you can choose a different LLM for this booster, because here strong reasoning skills are way more important than conversational excellence.
 	 
-Important: This booster directly alters the behavior of the Assistant for the good or for the bad. Even if you don't change or extend the definition of the events and actions, it still depends on the reasoning capabilities of the used language model, whether the Assistant will behave as expected. Therefore, always test everything before using it in an important race.
+Important: This booster directly alters the behavior of the Assistant for the good or for the bad. Even if you don't change or extend the definition of the events and actions, it still depends on the reasoning capabilities of the used large language model, whether the Assistant will behave as expected. Therefore, always test everything before using it in an important race.
 
 ### Using Actions & Events
 

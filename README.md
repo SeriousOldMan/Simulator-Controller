@@ -115,6 +115,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 27. [Connecting Assistants to GPT](https://youtu.be/4tq-2bnEIXE) - We introduce the new GPT-based Conversation Booster for the Assistants. Using this booster you can create a very life-like communication with the Assistants.
 
+28. [Extending and customizing Assistants using GPT](https://youtu.be/IVlF7RrKfoI) - You will learn how to define your own events and actions to be used by an LLM to create custom behaviour or change existing behaviour.
+
 This list will be extended from time to time to cover new functionalities.
 
 ### Discord Community

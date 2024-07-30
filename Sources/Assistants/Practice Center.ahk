@@ -994,12 +994,16 @@ class PracticeCenter extends ConfigurationItem {
 
 	__New(configuration, raceSettings, simulator := false, car := false, track := false) {
 		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+		local sessionsDirectory
 
 		this.iSimulator := simulator
 		this.iCar := car
 		this.iTrack := track
 
-		this.iSessionDirectory := (kTempDirectory . "Sessions\Practice\")
+		sessionsDirectory := getMultiMapValue(configuration, "Team Server", "Session.Folder", kTempDirectory . "Sessions")
+
+		this.iSessionDirectory := (normalizeDirectoryPath(getMultiMapValue(configuration, "Practice Center", "Session.Folder"
+																						, sessionsDirectory . "\Practice")) . "\")
 
 		this.AutoClear := getMultiMapValue(settings, "Practice Center", "AutoClear", false)
 		this.AutoExport := getMultiMapValue(settings, "Practice Center", "AutoExport", false)
@@ -4263,12 +4267,15 @@ class PracticeCenter extends ConfigurationItem {
 			local simulator := this.Simulator
 			local car := this.Car
 			local track := this.Track
-			local info, dirName, directory, translator, fileName, newFileName, folder, session
+			local info, dirName, directory, fileName, newFileName, folder, session
 
 			if this.SessionActive {
 				this.syncSessionStore(true)
 
 				info := newMultiMap()
+
+				setMultiMapValue(info, "Creator", "ID", SessionDatabase.ID)
+				setMultiMapValue(info, "Creator", "Name", SessionDatabase.getUserName())
 
 				setMultiMapValue(info, "Session", "Session", this.Session)
 				setMultiMapValue(info, "Session", "Exported", this.SessionExported)
@@ -4276,8 +4283,6 @@ class PracticeCenter extends ConfigurationItem {
 				setMultiMapValue(info, "Session", "Simulator", simulator)
 				setMultiMapValue(info, "Session", "Car", car)
 				setMultiMapValue(info, "Session", "Track", track)
-				setMultiMapValue(info, "Session", "DriverID", SessionDatabase.ID)
-				setMultiMapValue(info, "Session", "DriverName", SessionDatabase.getUserName())
 
 				setMultiMapValue(info, "Weather", "Weather", this.Weather)
 				setMultiMapValue(info, "Weather", "Weather10Min", this.Weather10Min)
@@ -4306,22 +4311,17 @@ class PracticeCenter extends ConfigurationItem {
 
 				newFileName := (fileName . ".practice")
 
-				loop
-					if FileExist(newFileName)
-						newFileName := (fileName . " (" . A_Index . ")" . ".practice")
-					else
-						break
+				while FileExist(newFileName)
+					newFileName := (fileName . " (" . (A_Index + 1) . ")" . ".practice")
 
 				fileName := newFileName
 
 				if prompt {
 					this.Window.Opt("+OwnDialogs")
 
-					translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
-
-					OnMessage(0x44, translator)
+					OnMessage(0x44, translateSaveCancelButtons)
 					fileName := withBlockedWindows(FileSelect, "S17", fileName, translate("Save Session..."), "Practice Session (*.practice)")
-					OnMessage(0x44, translator, 0)
+					OnMessage(0x44, translateSaveCancelButtons, 0)
 				}
 
 				if (fileName != "")
@@ -4334,6 +4334,15 @@ class PracticeCenter extends ConfigurationItem {
 						RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . folder . "\" . fileName . ".zip'", , "Hide")
 
 						FileCopy(this.SessionDirectory . "Practice.info", folder . "\" . fileName . ".practice", 1)
+
+						info := readMultiMap(folder . "\" . fileName . ".practice")
+
+						if (getMultiMapValue(info, "Creator", "ID", kUndefined) = kUndefined) {
+							setMultiMapValue(info, "Creator", "ID", SessionDatabase.ID)
+							setMultiMapValue(info, "Creator", "Name", SessionDatabase.getUserName())
+
+							writeMultiMap(folder . "\" . fileName . ".practice", info)
+						}
 					}
 					catch Any as exception {
 						logError(exception)
@@ -4622,16 +4631,14 @@ class PracticeCenter extends ConfigurationItem {
 			local car := this.Car
 			local track := this.Track
 			local folder := ((this.SessionMode = "Loaded") ? this.SessionLoaded : this.iSessionDirectory)
-			local dirName, fileName, info, lastLap, currentRun, translator
+			local dirName, fileName, info, lastLap, currentRun
 
 			this.Window.Opt("+OwnDialogs")
 
-			translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
-
 			if import {
-				OnMessage(0x44, translator)
-				folder := withBlockedWindows(DirSelect, "*" . folder, 0, translate("Load session..."))
-				OnMessage(0x44, translator, 0)
+				OnMessage(0x44, translateLoadCancelButtons)
+				folder := withBlockedWindows(FileSelect, "D1", folder, translate("Load session..."))
+				OnMessage(0x44, translateLoadCancelButtons, 0)
 			}
 			else {
 				if (simulator && car && track) {
@@ -4643,9 +4650,9 @@ class PracticeCenter extends ConfigurationItem {
 				else
 					dirName := ""
 
-				OnMessage(0x44, translator)
-				fileName := withBlockedWindows(FileSelect, 1, dirName, translate("Load Practice Session..."), "Practice Session (*.practice)")
-				OnMessage(0x44, translator, 0)
+				OnMessage(0x44, translateLoadCancelButtons)
+				fileName := withBlockedWindows(FileSelect, 1, dirName, translate("Load Session..."), "Practice Session (*.practice)")
+				OnMessage(0x44, translateLoadCancelButtons, 0)
 
 				if (fileName != "") {
 					SplitPath(fileName, , &directory, , &fileName)

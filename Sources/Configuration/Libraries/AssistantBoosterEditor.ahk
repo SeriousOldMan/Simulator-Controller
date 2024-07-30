@@ -1512,6 +1512,9 @@ class CallbacksEditor {
 				type := "Rule"
 
 			if (type = "Rule") {
+				if (this.ScriptEditor.Content[true] = "")
+					this.setScript("; Insert your rules here...`n`n", this.SelectedCallback.Builtin)
+
 				this.ScriptEditor.Visible := true
 				this.CallableField[1].Visible := false
 				this.CallableField[2].Visible := false

@@ -534,11 +534,14 @@ reportLapDelta(?sDelta, ?bDelta, ?eDelta) <=
 		reportDamageAnalysis(?lostTime, ?stintLaps, ?delta)
 
 reportDamageAnalysis(?lostTime, ?stintLaps, ?delta) <= >=(?lostTime, !Session.Settings.Pitstop.Delta),
-													   Call(reportDamageAnalysis, true, ?stintLaps, ?delta),
+													   reportTimeLoss(?stintLaps, ?delta),
 													   Set(Damage.Analysis.Reported, !Lap)
 reportDamageAnalysis(?lostTime, ?stintLaps, ?delta) <= ?lostTime < !Session.Settings.Pitstop.Delta,
 													   Call(reportDamageAnalysis, false, ?stintLaps, ?delta),
 													   Set(Damage.Analysis.Reported, !Lap)
+
+reportTimeLoss(?stintLaps, ?delta) <= Call(raiseEvent, TimeLoss, ?stintLaps, ?delta), !
+reportTimeLoss(?stintLaps, ?delta) <= Call(reportDamageAnalysis, true, ?stintLaps, ?delta)
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -40,7 +40,9 @@ The Team Server connection is based on http and implements a sophisticated retry
 
 #### Session Data Management
 
-All data of an active session is stored on the Team Server. It is therefore possible to start the "Race Center" anytime, even late into the race. The data might be kept for a finished session on Team Server as well, depending on the settings chosen by the server administrator. See the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration) for more information. To secure the session data on your local PC, you can use the "Save a copy..." commands from the "Session" menu at the end of the session and you can load a recently saved session anytime later using the "Load session..." command.
+All data of an active session is stored on the Team Server. It is therefore possible to start the "Race Center" anytime, even late into the race. The data might be kept for a finished session on Team Server as well, depending on the settings chosen by the server administrator. See the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration) for more information. To secure the session data on your local PC, you can use the "Save Session..." commands from the "Session" menu at the end of the session and you can load a recently saved session anytime later using the "Load Session..." command.
+
+IMPORTANT: The data format of locally saved sessions has changed over time. To load a session in the *old* format (before they have been saved to the session database by default), hold down the Control key, while selecting the "Load Session..." command.
 
 #### Test Session
 

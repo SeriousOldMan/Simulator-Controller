@@ -64,18 +64,16 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 		}
 
 		chooseApplicationWorkingDirectoryPath(*) {
-			local directory, translator
+			local directory
 
 			protectionOn()
 
 			try {
 				window.Opt("+OwnDialogs")
 
-				translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
-
-				OnMessage(0x44, translator)
-				directory := withBlockedWindows(DirSelect, "*" . window["applicationWorkingDirectoryPathEdit"].Text, 0, translate("Select working directory..."))
-				OnMessage(0x44, translator, 0)
+				OnMessage(0x44, translateSelectCancelButtons)
+				directory := withBlockedWindows(FileSelect, "D1", window["applicationWorkingDirectoryPathEdit"].Text, translate("Select working directory..."))
+				OnMessage(0x44, translateSelectCancelButtons, 0)
 
 				if (directory != "")
 					window["applicationWorkingDirectoryPathEdit"].Text := directory

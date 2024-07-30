@@ -12,12 +12,13 @@ plan_pitstop.4=tyreCompound|String||false|If a tyre change is requested the comp
 plan_pitstop.5=repairDamage|Boolean||false|Indicates whether all damages should be repaired.
 plan_pitstop.6=swapDriver|Boolean||false|Indicates in a team race whether the next driver according to the stint plan should take the car.
 [Agent.Actions]
-Active=plan_pitstop,cancel_pitstop,report_damage,report_weather_forecast,report_low_fuel,report_pressure_loss
+Active=plan_pitstop,cancel_pitstop,report_damage,report_time_loss,report_weather_forecast,report_low_fuel,report_pressure_loss
 [Agent.Actions.Builtin]
 plan_pitstop=Assistant.Method|planPitstopAction|false|true|6|Creates a plan for the next pitstop.
 cancel_pitstop=Assistant.Rule|Race Engineer.cancel_pitstop.rules|false|false|0|Clears the pitstop plan, if a pitstop is no longer needed.
 report_low_fuel=Assistant.Method|lowFuelWarning|false|false|2|Reports that the car is running low on fuel.
 report_damage=Assistant.Method|damageWarning|false|false|3|Reports recent damage to the car to the driver.
+report_time_loss=Assistant.Method|reportTimeLossAction|false|false|2|Reports a critical time loss after an incident has damaged the car.
 report_pressure_loss=Assistant.Method|pressureLossWarning|false|false|2|Reports that a tyre has lost pressure.
 report_weather_forecast=Assistant.Method|weatherForecast|false|false|3|Reports an upcoming change in the weather conditions.
 [Agent.Actions.Parameters]
@@ -33,6 +34,8 @@ report_low_fuel.2=remainingLaps|Integer||true|The maximum number of laps that ca
 report_damage.1=suspensionDamage|Boolean||true|Indicates whether new damage to the suspension occured.
 report_damage.2=bodyworkDamage|Boolean||true|Indicates whether new damage to the bodywork and aerodynamics occured.
 report_damage.3=engineDamage|Boolean||true|Indicates whether new damage to the engine occured.
+report_time_loss.1=lapsToDrive|Number||true|The number of laps still to drive.
+report_time_loss.2=timeLoss|Number||true|The time lost per lap in seconds.
 report_pressure_loss.1=tyre|String|FL,FR,RL,RR|true|The tyre that lost pressure. FL indicates front left, FR front right and so on.
 report_pressure_loss.2=lostPressure|Number||true|The amount of lost pressure for that tyre.
 report_weather_forecast.1=weather|String|Dry,Drizzle,LightRain,MediumRain,HeavyRain,Thunderstorm|true|A symbol that represents the upcoming weather.

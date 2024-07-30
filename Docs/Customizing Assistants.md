@@ -101,16 +101,17 @@ Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 		},
 		"Laps": [
 			{
-				"AirTemperature": 25,
 				"BodyworkDamage": 0.0,
 				"EngineDamage": 0.0,
 				"FuelConsumption": "2 Liters",
 				"FuelRemaining": "9 Liters",
-				"Grip": "Green",
 				"Nr": 2,
 				"SuspensionDamage": 0.0,
 				"Time": "110 Seconds",
-				"TrackTemperature": 32,
+				"Track": {
+					"Temperature": 32,
+					"Grip": "Green"
+				},
 				"Tyres": {
 					"Pressures": {
 						"Front.Left": "27.13 PSI",
@@ -126,19 +127,27 @@ Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 					}
 				},
 				"Valid": true,
-				"Weather": "Dry"
+				"Weather": {
+					"Now": "Dry",
+					"Forecast": {
+						"10 Minutes": "Dry",
+						"30 Minutes": "Dry"
+					},
+					"Temperature": 25
+				}
 			},
 			{
-				"AirTemperature": 25,
 				"BodyworkDamage": 0.0,
 				"EngineDamage": 0.0,
 				"FuelConsumption": "3 Liters",
 				"FuelRemaining": "7 Liters",
-				"Grip": "Green",
 				"Nr": 3,
 				"SuspensionDamage": 0.0,
 				"Time": "108 Seconds",
-				"TrackTemperature": 32,
+				"Track": {
+					"Temperature": 32,
+					"Grip": "Green"
+				},
 				"Tyres": {
 					"Pressures": {
 						"Front.Left": "27.22 PSI",
@@ -154,19 +163,27 @@ Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 					}
 				},
 				"Valid": true,
-				"Weather": "Dry"
+				"Weather": {
+					"Now": "Dry",
+					"Forecast": {
+						"10 Minutes": "Dry",
+						"30 Minutes": "Dry"
+					},
+					"Temperature": 25
+				}
 			},
 			{
-				"AirTemperature": 25,
 				"BodyworkDamage": 0.0,
 				"EngineDamage": 0.0,
 				"FuelConsumption": "3 Liters",
 				"FuelRemaining": "4 Liters",
-				"Grip": "Green",
 				"Nr": 4,
 				"SuspensionDamage": 3.099,
 				"Time": "113 Seconds",
-				"TrackTemperature": 32,
+				"Track": {
+					"Temperature": 32,
+					"Grip": "Green"
+				}
 				"Tyres": {
 					"Pressures": {
 						"Front.Left": "27.03 PSI",
@@ -182,7 +199,14 @@ Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 					}
 				},
 				"Valid": true,
-				"Weather": "Dry"
+				"Weather": {
+					"Now": "Dry",
+					"Forecast": {
+						"10 Minutes": "Dry",
+						"30 Minutes": "Dry"
+					},
+					"Temperature": 25
+				}
 			},
 			{
 				"AirTemperature": 25,
@@ -210,7 +234,13 @@ Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 					}
 				},
 				"Valid": true,
-				"Weather": "Dry"
+				"Weather": {
+					"Now": "Dry",
+					"Forecast": {
+						"10 Minutes": "Dry",
+						"30 Minutes": "Dry"
+					}
+				}
 			}
 		],
 		"Pitstop": {
@@ -309,8 +339,10 @@ Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 			}
 		},
 		"Weather": {
-			"10 Minutes": "Dry",
-			"30 Minutes": "Dry",
+			"Forecast": {
+				"10 Minutes": "Dry",
+				"30 Minutes": "Dry"
+			},
 			"Now": "Dry",
 			"Temperature": "25 Celsius"
 		}
@@ -328,17 +360,17 @@ IMPORTANT: When action handling is enabled, it might be necessary to disable the
 
 ### Reasoning Booster
 
-*Reasoning* is the most complex and most capable booster, since it allows you to alter or extend the behavior of the Assistant. You can use predefined events or even define your own ones in the [Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine) (as shown below), which then result in a request to the LLM (actually you can process events even without using the LLM directly in rule engine, but this is only half of the fun). Similar to the *Conversation* bosster above, the LLM then can decide to activate one or more [predefined or custom actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-booster-actions) to fulfill the request or react to the situation. To support its conclusion, the LLM will have full access to the same knowledge as in the *Conversation* booster.
+*Reasoning* is the most complex and most capable booster, since it allows you to alter or extend the behavior of the Assistant. You can use predefined events or even define your own ones in the [Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine) (as shown below), which then result in a request to the LLM (actually you can process events even without using the LLM directly in rule engine, but this is only half of the fun). Similar to the *Conversation* booster above, the LLM then can decide to activate one or more [predefined or custom actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-booster-actions) to fulfill the request or react to the situation. To support its conclusion, the LLM will have full access to the same knowledge as in the *Conversation* booster.
 
 The *Reasoning* booster implements an LLM agent framework architecture also used by famous open-source agent development environments like [LangChain](https://python.langchain.com/). The difference here is the deep integration with the rule engine of the Assistants as the central instance for the LLM activation.
 
 As already mentioned, you can choose a different LLM for this booster, because here strong reasoning skills are way more important than conversational excellence.
 	 
-Important: This booster directly alters the behavior of the Assistant for the good or for the bad. Even if you don't change or extend the definition of the events and actions, it still depends on the reasoning capabilities of the used language model, whether the Assistant will behave as expected. Therefore, always test everything before using it in an important race.
+Important: This booster directly alters the behavior of the Assistant for the good or for the bad. Even if you don't change or extend the definition of the events and actions, it still depends on the reasoning capabilities of the used large language model, whether the Assistant will behave as expected. Therefore, always test everything before using it in an important race.
 
 ### Using Actions & Events
 
-The *Reasoning* bosster as well as to some extent the *Conversation* booster rely on the capability of the configured LLM to *call* external functions as part of their reasoning process. This is achieved by the so-called tool interface of the LLM. Tools are supported at the time of this writing by the following models:
+The *Reasoning* booster as well as to some extent the *Conversation* booster rely on the capability of the configured LLM to *call* external functions as part of their reasoning process. This is achieved by the so-called tool interface of the LLM. Tools are supported at the time of this writing by the following models:
 
   - GPT 3.5 and above from *OpenAI*
   - Mistral Small, Mistral Large and Mixtral 8x22b from *Mistral AI*
@@ -564,7 +596,7 @@ Beside the predefined actions for the different Assistant, which come with the s
 | Pitstop Planning            | 1. [Optional] targetLap<br>2. [Optional] refuelAmount<br>3. [Optional] changeTyres<br>4. [Optional] tyreCompound<br>5. [Optional] repairDamage<br>6. [Optional] swapDriver | Yes | Yes | "We must pit for repairs. Can you create a plan without refueling and without tyre change?"<br>*changeTyres*, *repairDamage* and *swapDriver* all indicate using a *Boolean* whether the repsective service will be provided during pitstop. A tyre compound for the new tyres can be supplied with *tyreCompound*, if a tyre change is requested. |
 | Pitstop Clearance           | -                 | Yes | Yes | "I have changed my mind, the pitstop is no longer needed." |
 | Damage Impact Recalculation | -                 | Yes | No | "Can you recalculate the time loss caused by the damage?" |
-| Damage Reporting            | 1. [Required] suspensionDamage<br>2. [Required] bodyworkDamage<br>3. [Required] engineDamage | No | Yes | Typically activated when new damage is detected in the telemetry data. There is an event available, that signals new damage. The parameters accept *Boolean* values to indicate, whether this type of damage is to be reported. |
+| Damage Reporting            | 1. [Required] suspensionDamage<br>2. [Required] bodyworkDamage<br>3. [Required] engineDamage | No | Yes | Time Loss Reporting         | 1. [Required] lapsToDrive<br>2. [Required] timeLoss | No | Yes | Typically activated when it has been detected that the time lost per lap is too high for the remaining laps of the current stint. There is an event available, that signals time loss. *lapsToDrive* is the number of remaining laps in the current stint, *timeLoss* the time lost per lap in seconds. |
 | Pressure Loss Warning     | 1. [Required] tyre<br>2. [Required] lostPressure | No | Yes | Typically activated when a pressure loss has been detected in the telemetry data. There is an event available, that signals pressure loss. *tyre* must be one of "FL", "FR", "RL" and "RR" and *lostPressure* must be the amount of lost pressure in PSI. |
 | Weather Reporting (1)       | 1. [Required] weather<br>2. [Required] minutes<br>3. [Required] impactsStrategy | No | Yes | Typically activated when an upcoming weather change is detected in the telemetry data. There is an event available, that signals a change in the weather forecast. *weather* must be one of "Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain" and "Thunderstorm". *minutes* specify the time, when the new weather will arrive and *impactsStrategy* accepts a *Boolean* that indicates, whether a tyre change might be beneficial. |
 
@@ -578,6 +610,7 @@ Beside the predefined actions for the different Assistant, which come with the s
 |-----------------------------|-------------------|-------------|
 | Fuel Low                    | 1. [Required] remainingFuel<br>2. [Required] remainingLaps | When the car is running low on fuel, this event is signalled. |
 | Damage Collected            | 1. [Required] suspensionDamage<br>2. [Required] bodyworkDamage<br>3. [Required] engineDamage | This event is signalled, if new damage is detected for a part of the car. The parameters accept *Boolean* values to indicate where the damage occured. |
+| Time Loss                   | 1. [Required] lapsToDrive<br>2. [Required] timeLoss | This event is signalled, if an analysis has shown, that the time lost per lap after an incident is too high for the remaining laps of the current stint. *lapsToDrive* is the number of remaining laps in the current stint, *timeLoss* the time lost per lap in seconds. |
 | Pressure Loss               | 1. [Required] tyre<br>2. [Required] lostPressure | This event is signalled, if a loss of ressure has been detected in a tyre. *tyre* will be one of "FL", "FR", "RL" and "RR" and *lostPressure* will be the amount of lost pressure in PSI. |
 | Weather Update (1)          | 1. [Required] weather<br>2. [Required] minutes<br>3. [Required] impactsStrategy<br>4. [Optional] tyreCompound | Indicates an upcoming weather change. *weather* must be one of "Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain" and "Thunderstorm". *minutes* specify the time, when the new weather will arrive and *impactsStrategy* accepts a *Boolean* that indicates, whether a tyre change might be beneficial. If *tyreCompound* has been supplied, this indicates that a pitstop for tyre change should be planned. |
 | Rain Started                | - | This event is signalled, if rain just started. |

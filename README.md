@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.8.2.0-dev](https://www.dropbox.com/scl/fi/32tdi80z2k1a691byhums/Simulator-Controller-5.8.2.0-dev.zip?rlkey=zy9nc72xyiopkzpfuhgeivp55&st=yctjgcg1&dl=1) (Changes: New LLM Runtime, LLM Runtime is now a downloadable preset, New race setting for track types, More detailed lap history for LLMs, New time loss event for the Engineer, New time loss reporting action for Race Engineer, Removed old-fashioned directory selection dialog, Both "Race Center" and "Practice Center" save their sessions to the session database per default, "Practice Center" now supports an auto-save to the session database, Support for practice and race sessions added to "Session Database", Support for import of car setups in "Session Database".)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-582) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 
@@ -114,6 +116,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 26. [Strategy Development Revisited again](https://youtu.be/rCnYFTLX2L4) - This video will take another look at the "Strategy Workbench" and demonstrates a couple of new options, which allow you to create very special strategies.
 
 27. [Connecting Assistants to GPT](https://youtu.be/4tq-2bnEIXE) - We introduce the new GPT-based Conversation Booster for the Assistants. Using this booster you can create a very life-like communication with the Assistants.
+
+28. [Extending and customizing Assistants using GPT](https://youtu.be/IVlF7RrKfoI) - You will learn how to define your own events and actions to be used by an LLM to create custom behaviour or change existing behaviour.
 
 This list will be extended from time to time to cover new functionalities.
 

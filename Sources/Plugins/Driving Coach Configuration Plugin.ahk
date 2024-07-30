@@ -129,15 +129,13 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		}
 
 		chooseConversationsPath(*) {
-			local directory, translator
+			local directory
 
 			window.Opt("+OwnDialogs")
 
-			translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
-
-			OnMessage(0x44, translator)
-			directory := withBlockedWindows(DirSelect, "*" . window["dcConversationsPathEdit"].Text, 0, translate("Select Conversations Folder..."))
-			OnMessage(0x44, translator, 0)
+			OnMessage(0x44, translateSelectCancelButtons)
+			directory := withBlockedWindows(FileSelect, "D1" . window["dcConversationsPathEdit"].Text, translate("Select Conversations Folder..."))
+			OnMessage(0x44, translateSelectCancelButtons, 0)
 
 			if (directory != "")
 				window["dcConversationsPathEdit"].Text := directory
@@ -528,7 +526,10 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 	loadProviderConfiguration(provider := false) {
 		local configuration
 
-		this.iCurrentProvider := this.Control["dcProviderDropDown"].Text
+		if !provider
+			provider := this.Control["dcProviderDropDown"].Text
+
+		this.iCurrentProvider := provider
 
 		if !this.iProviderConfigurations.Has(this.iCurrentProvider)
 			this.iCurrentProvider := this.Providers[1]

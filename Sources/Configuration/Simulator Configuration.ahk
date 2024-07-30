@@ -67,21 +67,19 @@ class GeneralTab extends ConfiguratorPanel {
 		local choices := []
 		local chosen := 0
 		local enIndex := 0
-		local code, language, translator, button
+		local code, language, button
 
 		chooseHomePath(*) {
-			local directory, translator
+			local directory
 
 			protectionOn()
 
 			try {
 				window.Opt("+OwnDialogs")
-
-				translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
-
-				OnMessage(0x44, translator)
-				directory := withBlockedWindows(DirSelect, "*" . window["homePathEdit"].Text, 0, translate("Select Installation folder..."))
-				OnMessage(0x44, translator, 0)
+				
+				OnMessage(0x44, translateSelectCancelButtons)
+				directory := withBlockedWindows(FileSelect, "D1", window["homePathEdit"].Text, translate("Select Installation folder..."))
+				OnMessage(0x44, translateSelectCancelButtons, 0)
 
 				if (directory != "")
 					window["homePathEdit"].Text := directory
@@ -99,11 +97,9 @@ class GeneralTab extends ConfiguratorPanel {
 			try {
 				window.Opt("+OwnDialogs")
 
-				translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
-
-				OnMessage(0x44, translator)
-				directory := withBlockedWindows(DirSelect, "*" . window["nirCmdPathEdit"].Text, 0, translate("Select NirCmd folder..."))
-				OnMessage(0x44, translator, 0)
+				OnMessage(0x44, translateSelectCancelButtons)
+				directory := withBlockedWindows(FileSelect, "D1", window["nirCmdPathEdit"].Text, translate("Select NirCmd folder..."))
+				OnMessage(0x44, translateSelectCancelButtons, 0)
 
 				if (directory != "")
 					window["nirCmdPathEdit"].Text := directory
@@ -114,18 +110,16 @@ class GeneralTab extends ConfiguratorPanel {
 		}
 
 		chooseAHKPath(*) {
-			local directory, translator
+			local directory
 
 			protectionOn()
 
 			try {
 				window.Opt("+OwnDialogs")
 
-				translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
-
-				OnMessage(0x44, translator)
-				directory := withBlockedWindows(DirSelect, "*" . window["ahkPathEdit"].Text, 0, translate("Select AutoHotkey folder..."))
-				OnMessage(0x44, translator, 0)
+				OnMessage(0x44, translateSelectCancelButtons)
+				directory := withBlockedWindows(FileSelect, "D1", window["ahkPathEdit"].Text, translate("Select AutoHotkey folder..."))
+				OnMessage(0x44, translateSelectCancelButtons, 0)
 
 				if (directory != "")
 					window["ahkPathEdit"].Text := directory
@@ -136,18 +130,16 @@ class GeneralTab extends ConfiguratorPanel {
 		}
 
 		chooseMSBuildPath(*) {
-			local directory, translator
+			local directory
 
 			protectionOn()
 
 			try {
 				window.Opt("+OwnDialogs")
 
-				translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
-
-				OnMessage(0x44, translator)
-				directory := withBlockedWindows(DirSelect, "*" . window["msBuildPathEdit"].Text, 0, translate("Select MSBuild Bin folder..."))
-				OnMessage(0x44, translator, 0)
+				OnMessage(0x44, translateSelectCancelButtons)
+				directory := withBlockedWindows(FileSelect, "D1", window["msBuildPathEdit"].Text, translate("Select MSBuild Bin folder..."))
+				OnMessage(0x44, translateSelectCancelButtons, 0)
 
 				if (directory != "")
 					window["msBuildPathEdit"].Text := directory
@@ -586,7 +578,14 @@ startupSimulatorConfiguration() {
 
 					editor.Result := false
 
-					saveConfiguration(kSimulatorConfigurationFile, editor)
+					editor.Window.Block()
+
+					try {
+						saveConfiguration(kSimulatorConfigurationFile, editor)
+					}
+					finally {
+						editor.Window.Unblock()
+					}
 				}
 				else if (result == kCancel)
 					done := true
@@ -594,7 +593,12 @@ startupSimulatorConfiguration() {
 					saved := true
 					done := true
 
-					saveConfiguration(kSimulatorConfigurationFile, editor)
+					try {
+						saveConfiguration(kSimulatorConfigurationFile, editor)
+					}
+					finally {
+						editor.Window.Unblock()
+					}
 				}
 			}
 			until done

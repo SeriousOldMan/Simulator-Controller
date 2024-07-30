@@ -8,6 +8,9 @@
   4. The Race Engineer LLM event "damage_collected" has been renamed to "damage_detected".
   5. A new event and a new action has been defined for the *Reasoning* booster of the Race Engineer. This pair handles reporting of critical time loss after an incident.
   6. The lap history data supplied to the LLMs has been extended.
+  7. The "Practice Center" can now save practice session recordings to the session database.
+  8. An *Auto Save* setting has been added to the "Practice Center".
+  9. UI improvements for directory selection dialogs.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-582), especially if you have used the previous LLM Runtime for the "Driving Coach" or the Assistant Boosters.
 

@@ -994,12 +994,16 @@ class PracticeCenter extends ConfigurationItem {
 
 	__New(configuration, raceSettings, simulator := false, car := false, track := false) {
 		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+		local sessionsDirectory
 
 		this.iSimulator := simulator
 		this.iCar := car
 		this.iTrack := track
 
-		this.iSessionDirectory := (kTempDirectory . "Sessions\Practice\")
+		sessionsDirectory := getMultiMapValue(configuration, "Team Server", "Session.Folder", kTempDirectory . "Sessions")
+
+		this.iSessionDirectory := (normalizeDirectoryPath(getMultiMapValue(configuration, "Practice Center", "Session.Folder"
+																						, sessionsDirectory . "\Practice")) . "\")
 
 		this.AutoClear := getMultiMapValue(settings, "Practice Center", "AutoClear", false)
 		this.AutoExport := getMultiMapValue(settings, "Practice Center", "AutoExport", false)
@@ -4263,7 +4267,7 @@ class PracticeCenter extends ConfigurationItem {
 			local simulator := this.Simulator
 			local car := this.Car
 			local track := this.Track
-			local info, dirName, directory, translator, fileName, newFileName, folder, session
+			local info, dirName, directory, fileName, newFileName, folder, session
 
 			if this.SessionActive {
 				this.syncSessionStore(true)
@@ -4317,11 +4321,9 @@ class PracticeCenter extends ConfigurationItem {
 				if prompt {
 					this.Window.Opt("+OwnDialogs")
 
-					translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
-
-					OnMessage(0x44, translator)
+					OnMessage(0x44, translateSaveCancelButtons)
 					fileName := withBlockedWindows(FileSelect, "S17", fileName, translate("Save Session..."), "Practice Session (*.practice)")
-					OnMessage(0x44, translator, 0)
+					OnMessage(0x44, translateSaveCancelButtons, 0)
 				}
 
 				if (fileName != "")
@@ -4622,16 +4624,14 @@ class PracticeCenter extends ConfigurationItem {
 			local car := this.Car
 			local track := this.Track
 			local folder := ((this.SessionMode = "Loaded") ? this.SessionLoaded : this.iSessionDirectory)
-			local dirName, fileName, info, lastLap, currentRun, translator
+			local dirName, fileName, info, lastLap, currentRun
 
 			this.Window.Opt("+OwnDialogs")
 
-			translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
-
 			if import {
-				OnMessage(0x44, translator)
-				folder := withBlockedWindows(DirSelect, "*" . folder, 0, translate("Load session..."))
-				OnMessage(0x44, translator, 0)
+				OnMessage(0x44, translateLoadCancelButtons)
+				folder := withBlockedWindows(FileSelect, "D1", folder, translate("Load session..."))
+				OnMessage(0x44, translateLoadCancelButtons, 0)
 			}
 			else {
 				if (simulator && car && track) {
@@ -4643,9 +4643,9 @@ class PracticeCenter extends ConfigurationItem {
 				else
 					dirName := ""
 
-				OnMessage(0x44, translator)
-				fileName := withBlockedWindows(FileSelect, 1, dirName, translate("Load Practice Session..."), "Practice Session (*.practice)")
-				OnMessage(0x44, translator, 0)
+				OnMessage(0x44, translateLoadCancelButtons)
+				fileName := withBlockedWindows(FileSelect, 1, dirName, translate("Load Session..."), "Practice Session (*.practice)")
+				OnMessage(0x44, translateLoadCancelButtons, 0)
 
 				if (fileName != "") {
 					SplitPath(fileName, , &directory, , &fileName)

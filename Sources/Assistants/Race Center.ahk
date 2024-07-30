@@ -2990,7 +2990,7 @@ class RaceCenter extends ConfigurationItem {
 		local synchronize := (((this.Synchronize && isNumber(this.Synchronize)) ? translate("[x]") : translate("[  ]")) . A_Space . translate("Synchronize"))
 
 		this.Control["sessionMenuDropDown"].Delete()
-		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", "Connect", "Clear...", "---------------------------------------------", synchronize, "---------------------------------------------", "Select Team...", "---------------------------------------------", "Load Session...", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], translate))
+		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", "Connect", "Clear...", "---------------------------------------------", synchronize, "---------------------------------------------", "Select Team...", "---------------------------------------------", "Load Session...", "Save Session...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], translate))
 
 		this.Control["sessionMenuDropDown"].Choose(1)
 	}
@@ -4574,8 +4574,8 @@ class RaceCenter extends ConfigurationItem {
 			case 8:
 				this.manageTeam()
 			case 10: ; Load Session...
-				this.loadSession()
-			case 11: ; Save Session Copy...
+				this.loadSession(GetKeyState("Ctrl"))
+			case 11: ; Save Session...
 				if this.HasData
 					this.saveSession(true)
 				else {
@@ -8534,9 +8534,12 @@ class RaceCenter extends ConfigurationItem {
 			sessionStore.flush("Plan.Data")
 	}
 
-	saveSession(copy := false) {
+	saveSession(copy := false, prompt := true) {
 		saveSessionAsync(copy := false) {
-			local info, directory, translator, folder, session, configuration
+			local simulator := this.Simulator
+			local car := this.Car
+			local track := this.Track
+			local info, directory, dirName, translator, folder, session, configuration, fileName, newFileName
 
 			this.showMessage(translate("Saving session"))
 
@@ -8549,9 +8552,9 @@ class RaceCenter extends ConfigurationItem {
 				setMultiMapValue(info, "Session", "Session", this.SelectedSession)
 				setMultiMapValue(info, "Session", "Date", this.Date)
 				setMultiMapValue(info, "Session", "Time", this.Time)
-				setMultiMapValue(info, "Session", "Simulator", this.Simulator)
-				setMultiMapValue(info, "Session", "Car", this.Car)
-				setMultiMapValue(info, "Session", "Track", this.Track)
+				setMultiMapValue(info, "Session", "Simulator", simulator)
+				setMultiMapValue(info, "Session", "Car", car)
+				setMultiMapValue(info, "Session", "Track", track)
 
 				setMultiMapValue(info, "Weather", "Weather", this.Weather)
 				setMultiMapValue(info, "Weather", "Weather10Min", this.Weather10Min)
@@ -8579,19 +8582,47 @@ class RaceCenter extends ConfigurationItem {
 			}
 
 			if copy {
+				if (simulator && car && track) {
+					dirName := (SessionDatabase.DatabasePath . "User\" . SessionDatabase.getSimulatorCode(simulator)
+							  . "\" . car . "\" . track . "\Race Sessions")
+
+					DirCreate(dirName)
+				}
+				else
+					dirName := ""
+
 				directory := (this.SessionLoaded ? this.SessionLoaded : this.SessionDirectory)
 
-				this.Window.Opt("+OwnDialogs")
+				fileName := (dirName . "\Race " . FormatTime(this.Date, "yyyy-MMM-dd"))
 
-				translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
+				newFileName := (fileName . ".race")
 
-				OnMessage(0x44, translator)
-				folder := withBlockedWindows(DirSelect, "*" directory, 0, translate("Select target folder..."))
-				OnMessage(0x44, translator, 0)
+				loop
+					if FileExist(newFileName)
+						newFileName := (fileName . " (" . A_Index . ")" . ".race")
+					else
+						break
 
-				if (folder != "")
+				fileName := newFileName
+
+				if prompt {
+					this.Window.Opt("+OwnDialogs")
+
+					OnMessage(0x44, translateSaveCancelButtons)
+					fileName := withBlockedWindows(FileSelect, "S17", fileName, translate("Save Session..."), "Race Session (*.race)")
+					OnMessage(0x44, translateSaveCancelButtons, 0)
+				}
+
+				if (fileName != "")
 					try {
-						DirCopy(directory, folder . "\" . this.SelectedSession, 1)
+						SplitPath(fileName, , &folder, , &fileName)
+
+						DirCreate(folder)
+						deleteFile(folder . "\" . fileName . ".zip")
+
+						RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . folder . "\" . fileName . ".zip'", , "Hide")
+
+						FileCopy(this.SessionDirectory . "Session.info", folder . "\" . fileName . ".race", 1)
 					}
 					catch Any as exception {
 						logError(exception)
@@ -9035,18 +9066,47 @@ class RaceCenter extends ConfigurationItem {
 		this.pushTask(clearSessionAsync)
 	}
 
-	loadSession() {
+	loadSession(import := false) {
 		loadSessionAsync() {
+			local simulator := this.Simulator
+			local car := this.Car
+			local track := this.Track
 			local directory := (this.SessionLoaded ? this.SessionLoaded : this.iSessionDirectory)
-			local folder, info, lastLap, currentStint, translator, configuration, state
+			local folder, dirName, fileName, info, lastLap, currentStint, configuration, state
 
 			this.Window.Opt("+OwnDialogs")
 
-			translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
+			if import {
+				OnMessage(0x44, translateLoadCancelButtons)
+				folder := withBlockedWindows(FileSelect, "D1", directory, translate("Load session..."))
+				OnMessage(0x44, translateLoadCancelButtons, 0)
+			}
+			else {
+				if (simulator && car && track) {
+					dirName := (SessionDatabase.DatabasePath . "User\" . SessionDatabase.getSimulatorCode(simulator)
+							  . "\" . car . "\" . track . "\Race Sessions")
 
-			OnMessage(0x44, translator)
-			folder := withBlockedWindows(DirSelect, "*" . directory, 0, translate("Select Session folder..."))
-			OnMessage(0x44, translator, 0)
+					DirCreate(dirName)
+				}
+				else
+					dirName := (SessionDatabase.DatabasePath . "User\")
+
+				OnMessage(0x44, translateLoadCancelButtons)
+				fileName := withBlockedWindows(FileSelect, 1, dirName, translate("Load Session..."), "Race Session (*.race)")
+				OnMessage(0x44, translateLoadCancelButtons, 0)
+
+				if (fileName != "") {
+					SplitPath(fileName, , &directory, , &fileName)
+
+					folder := (kTempDirectory . "Sessions\Race_" . Round(Random(1, 100000)))
+
+					DirCreate(folder)
+
+					RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . directory . "\" . fileName . ".zip' -DestinationPath '" . folder . "' -Force", , "Hide")
+				}
+				else
+					folder := ""
+			}
 
 			if (folder != "") {
 				folder := (folder . "\")

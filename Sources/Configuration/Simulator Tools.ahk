@@ -116,7 +116,7 @@ installOptions(options, *) {
 		installGui.Opt("+OwnDialogs")
 
 		OnMessage(0x44, translateSelectCancelButtons)
-		directory := withBlockedWindows(DirSelect, "D1", installGui["installLocationPathEdit"].Text, translate("Select Installation folder..."))
+		directory := withBlockedWindows(FileSelect, "D1", installGui["installLocationPathEdit"].Text, translate("Select Installation folder..."))
 		OnMessage(0x44, translateSelectCancelButtons, 0)
 
 		if (directory != "") {

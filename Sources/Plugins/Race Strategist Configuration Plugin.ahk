@@ -58,7 +58,7 @@ class RaceStrategistConfigurator extends ConfiguratorPanel {
 			local directory
 
 			OnMessage(0x44, translateSelectCancelButtons)
-			directory := withBlockedWindows(DirSelect, "D1", window["raceReportsPathEdit"].Text, translate("Select Race Reports Folder..."))
+			directory := withBlockedWindows(FileSelect, "D1", window["raceReportsPathEdit"].Text, translate("Select Race Reports Folder..."))
 			OnMessage(0x44, translateSelectCancelButtons, 0)
 
 			if (directory != "")

@@ -9,8 +9,16 @@
   5. A new event and a new action has been defined for the *Reasoning* booster of the Race Engineer. This pair handles reporting of critical time loss after an incident.
   6. The lap history data supplied to the LLMs has been extended.
   7. The "Practice Center" can now save practice session recordings to the session database.
+     - The file format of sessions has been changed to support this.
+	 - Sessions saved in the *old* format can still be loaded using the "Load Sessions..." command from the "Session" menu. Hold the control key while selecting "Load Session..." to load an *old* session.
+	 - See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Practice-Center#saving-and-loading-sessions) for more information.
+	 - Support to share saved sessions between members in team will be added with the next releases.
   8. An *Auto Save* setting has been added to the "Practice Center".
-  9. UI improvements for directory selection dialogs.
+  9. The default location for saving session locally in the "Race Center" has also changed.
+     - The file format of sessions has also been changed to support this.
+	 - Sessions saved in the *old* format can still be loaded using the "Load Sessions..." command from the "Session" menu. Hold the control key while selecting "Load Session..." to load an *old* session.
+     - See the update [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#session-data-management) for more information.
+  10. UI improvements for directory selection dialogs.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-582), especially if you have used the previous LLM Runtime for the "Driving Coach" or the Assistant Boosters.
 

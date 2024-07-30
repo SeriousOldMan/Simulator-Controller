@@ -217,7 +217,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.Window.Opt("+OwnDialogs")
 
 			OnMessage(0x44, translateSelectCancelButtons)
-			directory := withBlockedWindows(DirSelect, "D1", this.Control["soXPathEdit"].Text, translate("Select SoX folder..."))
+			directory := withBlockedWindows(FileSelect, "D1", this.Control["soXPathEdit"].Text, translate("Select SoX folder..."))
 			OnMessage(0x44, translateSelectCancelButtons, 0)
 
 			if (directory != "") {

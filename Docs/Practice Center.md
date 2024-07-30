@@ -22,6 +22,14 @@ Good to know: The "Practice Center" benefits from a high data update frequency o
 
 The default value for the data update frequency is 10 seconds, but you can can try to go as low as 2 seconds, if your PC is powerful enough.
 
+### Saving and loading sessions
+
+The "Practice Center" allows you to save the complete session data for later inspection by using the "Save Session..." command from the "Session" menu. You can use the "Load Session..." command to retrieve such a session later on and all information will be restored. Saving a session this way does **not** export the telemetry data to the session database, which is a completely different thing and must be triggered seperately. However, the full session information can also be stored in the session database, if needed, to have all information in a central location.
+
+IMPORTANT: The data format of saved sessions has changed over time. To load a session in the *old* format (before they have been saved to the session database by default), hold down the Control key, while selecting the "Load Session..." command.
+
+The "Auto Save" setting in the "Session" mennu allows you to automatically save a session before the window of the "Practice Center" is closed or before a new session will be started. However, doing this will collect a great amount of probably unnecessary data in your session database, therefore choose wisely.
+
 ### Data Analysis
 
 "Practice Center" supplies you with a couple of reports, which you can use to analyse your performance and dig deeper into the telemetry data of the car. Choose one of the reports in the reports list and this report will be shown in the report area on the top right of "Practice Center" window.
@@ -126,4 +134,4 @@ At the end of your session, you can decide which data should be transfered to th
 
 Please note, that this export is possible only once, to prevent duplicate data entries in your database, and cannot be undone. Therefore check your selection carefully beforehand.
 
-You can also store your session for later inspection in any location on your PC using the "Save a copy..." command from the "Session" menu. The mentioned data export can also be initiated from a saved copy - very helpful, if you are exhausted after your session and want to defer the data inspection for later.
+You can also store your session for later inspection in any location on your PC using the "Save Session..." command from the "Session" menu. The mentioned data export can also be initiated from a saved copy - very helpful, if you are exhausted after your session and want to defer the data inspection for later.

@@ -10,7 +10,7 @@ The "Practice Center" looks very similar to the ["Race Center"](https://github.c
 
 Simply start the "Practice Center" **before** starting the session in your simulator. The Race Assistants will automatically connect to the "Practice Center" after the first lap and initiate a session there as well. Once data has been collected in the "Practice Center", it will **not** connect to a new session, before this data has been exported. However, you can use the "Clear..." command from the "Session" menu and you are ready to go for a new session, if you don't want to retain your collected data.
 
-When you start a new session or when you close the window, the "Practice Center" will ask you before any unsaved / unexported data will be overwritten. You can, however, enable "Auto Export" or even "Auto Clear" in the "Session" menu according to your preferences.
+When you start a new session or when you close the window, the "Practice Center" will ask you before any unsaved / unexported data will be overwritten. You can, however, enable "Auto Export", "Auto Save" or even "Auto Clear" in the "Session" menu according to your preferences. "Auto Export" will, as the name suggests, export the telemetry data from valid laps to the session database and "Auto Save" will save the complete session state to the session database. This sessin state can be retrieved later using the "Load session..." command from the "Session" menu.
 
 Do **not** start the "Practice Center" after you have already started your session in the simulator. Although nothing will explode, you will loose your valuable practice data, since it will be send to the "Practice Center", which most likely will not collect it. Also, do not quit the "Practice Center" **before** quiting the session in your simulator. You will also end up with an inconsistent data constellation. Nothing really harmful, since in the end all data is treated with statistical weights and averages, but if possible, do avoid it.
 
@@ -21,6 +21,14 @@ Good to know: The "Practice Center" benefits from a high data update frequency o
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%207.JPG)
 
 The default value for the data update frequency is 10 seconds, but you can can try to go as low as 2 seconds, if your PC is powerful enough.
+
+### Saving and loading sessions
+
+The "Practice Center" allows you to save the complete session data for later inspection by using the "Save Session..." command from the "Session" menu. You can use the "Load Session..." command to retrieve such a session later on and all information will be restored. Saving a session this way does **not** export the telemetry data to the session database, which is a completely different thing and must be triggered seperately. However, the full session information can also be stored in the session database, if needed, to have all information in a central location.
+
+IMPORTANT: The data format of saved sessions has changed over time. To load a session in the *old* format (before they have been saved to the session database by default), hold down the Control key, while selecting the "Load Session..." command.
+
+The "Auto Save" setting in the "Session" mennu allows you to automatically save a session before the window of the "Practice Center" is closed or before a new session will be started. However, doing this will collect a great amount of probably unnecessary data in your session database, therefore choose wisely.
 
 ### Data Analysis
 
@@ -126,4 +134,4 @@ At the end of your session, you can decide which data should be transfered to th
 
 Please note, that this export is possible only once, to prevent duplicate data entries in your database, and cannot be undone. Therefore check your selection carefully beforehand.
 
-You can also store your session for later inspection in any location on your PC using the "Save a copy..." command from the "Session" menu. The mentioned data export can also be initiated from a saved copy - very helpful, if you are exhausted after your session and want to defer the data inspection for later.
+You can also store your session for later inspection in any location on your PC using the "Save Session..." command from the "Session" menu. The mentioned data export can also be initiated from a saved copy - very helpful, if you are exhausted after your session and want to defer the data inspection for later.

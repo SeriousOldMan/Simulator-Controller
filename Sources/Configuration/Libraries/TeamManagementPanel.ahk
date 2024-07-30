@@ -133,15 +133,13 @@ class TeamManagementPanel extends ConfiguratorPanel {
 		local settings, serverURLs, choosen
 
 		chooseSessionStorePath(*) {
-			local directory, translator
+			local directory
 
 			window.Opt("+OwnDialogs")
 
-			translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
-
-			OnMessage(0x44, translator)
-			directory := withBlockedWindows(DirSelect, "*" window["sessionStorePathEdit"].Text, 0, translate("Select local Session Folder..."))
-			OnMessage(0x44, translator, 0)
+			OnMessage(0x44, translateSelectCancelButtons)
+			directory := withBlockedWindows(FileSelect, "D2", window["sessionStorePathEdit"].Text, translate("Select local Session Folder..."))
+			OnMessage(0x44, translateSelectCancelButtons, 0)
 
 			if (directory != "")
 				window["sessionStorePathEdit"].Text := directory

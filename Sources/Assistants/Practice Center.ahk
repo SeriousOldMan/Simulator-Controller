@@ -150,6 +150,7 @@ class PracticeCenter extends ConfigurationItem {
 
 	iAutoClear := false
 	iAutoExport := false
+	iAutoSave := false
 
 	iDate := A_Now
 
@@ -231,10 +232,12 @@ class PracticeCenter extends ConfigurationItem {
 		}
 
 		Close(*) {
-			local translator
+			local save, translator
 
 			if this.Closeable {
 				if (this.PracticeCenter.HasData && !this.PracticeCenter.SessionExported) {
+					save := (this.AutoSave && this.SessionActive)
+
 					if this.PracticeCenter.AutoExport
 						this.PracticeCenter.exportSession(true)
 					else {
@@ -250,6 +253,9 @@ class PracticeCenter extends ConfigurationItem {
 						if (msgResult = "Cancel")
 							return true
 					}
+
+					if save
+						this.saveSession(true, false)
 				}
 
 				return super.Close()
@@ -664,6 +670,16 @@ class PracticeCenter extends ConfigurationItem {
 		}
 	}
 
+	AutoSave {
+		Get {
+			return this.iAutoSave
+		}
+
+		Set {
+			return (this.iAutoSave := value)
+		}
+	}
+
 	SessionExported {
 		Get {
 			return this.iSessionExported
@@ -978,15 +994,20 @@ class PracticeCenter extends ConfigurationItem {
 
 	__New(configuration, raceSettings, simulator := false, car := false, track := false) {
 		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+		local sessionsDirectory
 
 		this.iSimulator := simulator
 		this.iCar := car
 		this.iTrack := track
 
-		this.iSessionDirectory := (kTempDirectory . "Sessions\Practice\")
+		sessionsDirectory := getMultiMapValue(configuration, "Team Server", "Session.Folder", kTempDirectory . "Sessions")
+
+		this.iSessionDirectory := (normalizeDirectoryPath(getMultiMapValue(configuration, "Practice Center", "Session.Folder"
+																						, sessionsDirectory . "\Practice")) . "\")
 
 		this.AutoClear := getMultiMapValue(settings, "Practice Center", "AutoClear", false)
 		this.AutoExport := getMultiMapValue(settings, "Practice Center", "AutoExport", false)
+		this.AutoSave := getMultiMapValue(settings, "Practice Center", "AutoSave", false)
 
 		this.UseSessionData := getMultiMapValue(settings, "Practice Center", "UseSessionData", true)
 		this.UseTelemetryDatabase := getMultiMapValue(settings, "Practice Center", "UseTelemetryDatabase", false)
@@ -2231,9 +2252,10 @@ class PracticeCenter extends ConfigurationItem {
 	updateSessionMenu() {
 		local auto1 := ((this.AutoClear ? translate("[x]") : translate("[  ]")) . A_Space . translate("Auto Clear"))
 		local auto2 := ((this.AutoExport ? translate("[x]") : translate("[  ]")) . A_Space . translate("Auto Export"))
+		local auto3 := ((this.AutoSave ? translate("[x]") : translate("[  ]")) . A_Space . translate("Auto Save"))
 
 		this.Control["sessionMenuDropDown"].Delete()
-		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", auto1, auto2, "---------------------------------------------", "Clear...", "---------------------------------------------", "Load Session...", "Save Session...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Session Summary"], translate))
+		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", auto1, auto2, auto3, "---------------------------------------------", "Clear...", "---------------------------------------------", "Load Session...", "Save Session...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Session Summary"], translate))
 
 		if !this.SessionExported
 			this.Control["sessionMenuDropDown"].Add(collect(["---------------------------------------------", "Export to Database..."], translate))
@@ -2299,7 +2321,11 @@ class PracticeCenter extends ConfigurationItem {
 				this.AutoExport := !this.AutoExport
 
 				updateSetting("AutoExport", this.AutoExport)
-			case 6: ; Clear...
+			case 5: ; Auto Save
+				this.AutoSave := !this.AutoSave
+
+				updateSetting("AutoSave", this.AutoSave)
+			case 7: ; Clear...
 				if this.SessionActive {
 					OnMessage(0x44, translateYesNoButtons)
 					msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete all data from the currently active session? This cannot be undone."), translate("Delete"), 262436)
@@ -2310,9 +2336,9 @@ class PracticeCenter extends ConfigurationItem {
 				}
 				else
 					this.clearSession()
-			case 8: ; Load Session...
-				this.loadSession()
-			case 9: ; Save Session...
+			case 9: ; Load Session...
+				this.loadSession(GetKeyState("Ctrl"))
+			case 10: ; Save Session...
 				if this.HasData
 					this.saveSession(true)
 				else {
@@ -2320,11 +2346,11 @@ class PracticeCenter extends ConfigurationItem {
 					withBlockedWindows(MsgBox, translate("There is no session data to be saved."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
-			case 11: ; Update Statistics
+			case 12: ; Update Statistics
 				this.updateStatistics()
-			case 13: ; Session Summary
+			case 14: ; Session Summary
 				this.showSessionSummary()
-			case 15: ; Export data
+			case 16: ; Export data
 				if (this.HasData && !this.SessionExported) {
 					OnMessage(0x44, translateYesNoButtons)
 					msgResult := withBlockedWindows(MsgBox, translate("Do you want to transfer the selected data to the session database? This is only possible once."), translate("Delete"), 262436)
@@ -4236,21 +4262,27 @@ class PracticeCenter extends ConfigurationItem {
 		this.pushTask(updateStatisticsAsync)
 	}
 
-	saveSession(copy := false) {
+	saveSession(copy := false, prompt := true) {
 		saveSessionAsync(copy := false) {
-			local info, directory, translator, folder, session
+			local simulator := this.Simulator
+			local car := this.Car
+			local track := this.Track
+			local info, dirName, directory, fileName, newFileName, folder, session
 
 			if this.SessionActive {
 				this.syncSessionStore(true)
 
 				info := newMultiMap()
 
+				setMultiMapValue(info, "Creator", "ID", SessionDatabase.ID)
+				setMultiMapValue(info, "Creator", "Name", SessionDatabase.getUserName())
+
 				setMultiMapValue(info, "Session", "Session", this.Session)
 				setMultiMapValue(info, "Session", "Exported", this.SessionExported)
 				setMultiMapValue(info, "Session", "Date", this.Date)
-				setMultiMapValue(info, "Session", "Simulator", this.Simulator)
-				setMultiMapValue(info, "Session", "Car", this.Car)
-				setMultiMapValue(info, "Session", "Track", this.Track)
+				setMultiMapValue(info, "Session", "Simulator", simulator)
+				setMultiMapValue(info, "Session", "Car", car)
+				setMultiMapValue(info, "Session", "Track", track)
 
 				setMultiMapValue(info, "Weather", "Weather", this.Weather)
 				setMultiMapValue(info, "Weather", "Weather10Min", this.Weather10Min)
@@ -4264,23 +4296,53 @@ class PracticeCenter extends ConfigurationItem {
 				this.SessionStore.flush()
 
 			if copy {
+				if (simulator && car && track) {
+					dirName := (SessionDatabase.DatabasePath . "User\" . SessionDatabase.getSimulatorCode(simulator)
+							  . "\" . car . "\" . track . "\Practice Sessions")
+
+					DirCreate(dirName)
+				}
+				else
+					dirName := ""
+
 				directory := ((this.SessionMode = "Loaded") ? this.SessionLoaded : this.SessionDirectory)
 
-				this.Window.Opt("+OwnDialogs")
+				fileName := (dirName . "\Practice " . FormatTime(this.Date, "yyyy-MMM-dd"))
 
-				translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
+				newFileName := (fileName . ".practice")
 
-				OnMessage(0x44, translator)
-				folder := withBlockedWindows(DirSelect, "*" directory, 0, translate("Select target folder..."))
-				OnMessage(0x44, translator, 0)
+				while FileExist(newFileName)
+					newFileName := (fileName . " (" . (A_Index + 1) . ")" . ".practice")
 
-				if (folder != "")
+				fileName := newFileName
+
+				if prompt {
+					this.Window.Opt("+OwnDialogs")
+
+					OnMessage(0x44, translateSaveCancelButtons)
+					fileName := withBlockedWindows(FileSelect, "S17", fileName, translate("Save Session..."), "Practice Session (*.practice)")
+					OnMessage(0x44, translateSaveCancelButtons, 0)
+				}
+
+				if (fileName != "")
 					try {
-						folder := (folder . "\Practice " . FormatTime(this.Date, "yyyy-MMM-dd"))
+						SplitPath(fileName, , &folder, , &fileName)
 
 						DirCreate(folder)
+						deleteFile(folder . "\" . fileName . ".zip")
 
-						DirCopy(directory, folder, 1)
+						RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . folder . "\" . fileName . ".zip'", , "Hide")
+
+						FileCopy(this.SessionDirectory . "Practice.info", folder . "\" . fileName . ".practice", 1)
+
+						info := readMultiMap(folder . "\" . fileName . ".practice")
+
+						if (getMultiMapValue(info, "Creator", "ID", kUndefined) = kUndefined) {
+							setMultiMapValue(info, "Creator", "ID", SessionDatabase.ID)
+							setMultiMapValue(info, "Creator", "Name", SessionDatabase.getUserName())
+
+							writeMultiMap(folder . "\" . fileName . ".practice", info)
+						}
 					}
 					catch Any as exception {
 						logError(exception)
@@ -4563,18 +4625,47 @@ class PracticeCenter extends ConfigurationItem {
 				}
 	}
 
-	loadSession() {
+	loadSession(import := false) {
 		loadSessionAsync() {
-			local directory := ((this.SessionMode = "Loaded") ? this.SessionLoaded : this.iSessionDirectory)
-			local folder, info, lastLap, currentRun, translator
+			local simulator := this.Simulator
+			local car := this.Car
+			local track := this.Track
+			local folder := ((this.SessionMode = "Loaded") ? this.SessionLoaded : this.iSessionDirectory)
+			local dirName, fileName, info, lastLap, currentRun
 
 			this.Window.Opt("+OwnDialogs")
 
-			translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
+			if import {
+				OnMessage(0x44, translateLoadCancelButtons)
+				folder := withBlockedWindows(FileSelect, "D1", folder, translate("Load session..."))
+				OnMessage(0x44, translateLoadCancelButtons, 0)
+			}
+			else {
+				if (simulator && car && track) {
+					dirName := (SessionDatabase.DatabasePath . "User\" . SessionDatabase.getSimulatorCode(simulator)
+							  . "\" . car . "\" . track . "\Practice Sessions")
 
-			OnMessage(0x44, translator)
-			folder := withBlockedWindows(DirSelect, "*" . directory, 0, translate("Select Practice folder..."))
-			OnMessage(0x44, translator, 0)
+					DirCreate(dirName)
+				}
+				else
+					dirName := ""
+
+				OnMessage(0x44, translateLoadCancelButtons)
+				fileName := withBlockedWindows(FileSelect, 1, dirName, translate("Load Session..."), "Practice Session (*.practice)")
+				OnMessage(0x44, translateLoadCancelButtons, 0)
+
+				if (fileName != "") {
+					SplitPath(fileName, , &directory, , &fileName)
+
+					folder := (kTempDirectory . "Sessions\Practice_" . Round(Random(1, 100000)))
+
+					DirCreate(folder)
+
+					RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . directory . "\" . fileName . ".zip' -DestinationPath '" . folder . "' -Force", , "Hide")
+				}
+				else
+					folder := ""
+			}
 
 			if (folder != "") {
 				folder := (folder . "\")
@@ -6962,14 +7053,20 @@ class PracticeCenter extends ConfigurationItem {
 	startSession(fileName, wait := false) {
 		startSessionAsync() {
 			local data := readMultiMap(fileName)
-			local translator
+			local save, translator
 
 			try {
+				save := (this.AutoSave && this.SessionActive)
+
 				if (this.HasData && !this.SessionExported && (this.SessionMode != "Loaded")) {
 					if this.AutoExport
 						this.exportSession(true)
-					else if this.AutoClear
+					else if this.AutoClear {
+						if save
+							this.saveSession(true, false)
+
 						this.clearSession(true)
+					}
 					else {
 						translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
 
@@ -6979,6 +7076,9 @@ class PracticeCenter extends ConfigurationItem {
 
 						if (msgResult = "Yes")
 							this.exportSession(true)
+
+						if save
+							this.saveSession(true, false)
 
 						if (msgResult = "Cancel") {
 							this.iSessionMode := "Finished"

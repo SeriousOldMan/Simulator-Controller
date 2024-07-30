@@ -8548,6 +8548,9 @@ class RaceCenter extends ConfigurationItem {
 
 				info := newMultiMap()
 
+				setMultiMapValue(info, "Creator", "ID", SessionDatabase.ID)
+				setMultiMapValue(info, "Creator", "Name", SessionDatabase.getUserName())
+
 				setMultiMapValue(info, "Session", "Team", this.SelectedTeam)
 				setMultiMapValue(info, "Session", "Session", this.SelectedSession)
 				setMultiMapValue(info, "Session", "Date", this.Date)
@@ -8597,11 +8600,8 @@ class RaceCenter extends ConfigurationItem {
 
 				newFileName := (fileName . ".race")
 
-				loop
-					if FileExist(newFileName)
-						newFileName := (fileName . " (" . A_Index . ")" . ".race")
-					else
-						break
+				while FileExist(newFileName)
+					newFileName := (fileName . " (" . (A_Index + 1) . ")" . ".race")
 
 				fileName := newFileName
 
@@ -8623,6 +8623,15 @@ class RaceCenter extends ConfigurationItem {
 						RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . folder . "\" . fileName . ".zip'", , "Hide")
 
 						FileCopy(this.SessionDirectory . "Session.info", folder . "\" . fileName . ".race", 1)
+
+						info := readMultiMap(folder . "\" . fileName . ".race")
+
+						if (getMultiMapValue(info, "Creator", "ID", kUndefined) = kUndefined) {
+							setMultiMapValue(info, "Creator", "ID", SessionDatabase.ID)
+							setMultiMapValue(info, "Creator", "Name", SessionDatabase.getUserName())
+
+							writeMultiMap(folder . "\" . fileName . ".race", info)
+						}
 					}
 					catch Any as exception {
 						logError(exception)

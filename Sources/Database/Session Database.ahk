@@ -3032,6 +3032,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local simulator, count, row, drivers, schemas, progress, type, data, car, track, driver, id
 		local targetDirectory, sourceDB, targetDB, ignore, type, entry, code, candidate
 		local trackAutomations, info, id, name, schema, fields
+		local type, ext, folder, fileName
 
 		directory := normalizeDirectoryPath(directory)
 
@@ -3117,6 +3118,25 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 						for ignore, entry in sourceDB.query("Tyres.Pressures.Distribution", {Where: {Driver: driver}})
 							targetDB.add("Tyres.Pressures.Distribution", entry, true)
+					case translate("Sessions"):
+						code := this.SessionDatabase.getSimulatorCode(simulator)
+
+						for type, ext in Map("Race Sessions", "race", "Practice Sessions", "practice") {
+							DirCreate(targetDirectory . type)
+
+							loop Files, kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\" . type . "\*." . ext, "F"
+								if (getMultiMapValue(readMultiMap(A_LoopFileFullPath), "Creator", "ID") = driver) {
+									SplitPath(A_LoopFileFullPath, , &folder, , &fileName)
+
+									try {
+										FileCopy(A_LoopFileFullPath, targetDirectory . type . "\" . A_LoopFileName)
+										FileCopy(folder . "\" . fileName . ".zip", targetDirectory . type . "\" . fileName . ".zip")
+									}
+									catch Any as exception {
+										logError(exception)
+									}
+								}
+						}
 					case translate("Strategies"):
 						code := this.SessionDatabase.getSimulatorCode(simulator)
 
@@ -3199,7 +3219,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local info := readMultiMap(directory . "\Export.info")
 		local progressWindow, schemas, schema, fields, id, name, progress, tracks, code, ignore, row, field, type
 		local targetDirectory, car, carName, track, trackName, key, sourceDirectory, drivers, driver, sourceDB, targetDB
-		local tyresDB, data, targetName, name, fileName, automations, automation, trackAutomations, trackName, extension
+		local tyresDB, data, targetName, name, folder, fileName, automations, automation, trackAutomations, trackName, extension
 
 		directory := normalizeDirectoryPath(directory)
 
@@ -3346,6 +3366,52 @@ class SessionDatabaseEditor extends ConfigurationItem {
 								}
 							}
 
+							for type, ext in Map("Race Sessions", "race", "Practice Sessions", "practice") {
+								drivers := selection[key . "Sessions"]
+								code := this.SessionDatabase.getSimulatorCode(simulator)
+
+								targetDirectory := (kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\" . type)
+
+								DirCreate(targetDirectory)
+
+								if (selection.Has(key . "Sessions") && FileExist(sourceDirectory . "\" . type)) {
+									loop Files, sourceDirectory . "\" . type . "\*." . ext, "F"
+										for ignore, driver in drivers
+											if (getMultiMapValue(readMultiMap(A_LoopFileFullPath), "Creator", "ID") = driver) {
+												SplitPath(A_LoopFileFullPath, , &folder, , &fileName)
+
+												targetName := (fileName . "." . ext)
+
+												while FileExist(targetDirectory . "\" . targetName)
+													targetName := (fileName . " (" . (A_Index + 1) . ")." . ext)
+
+												try {
+													FileCopy(A_LoopFilePath, targetDirectory . "\" . targetName)
+												}
+												catch Any as exception {
+													logError(exception)
+												}
+
+												if FileExist(A_LoopFilePath . ".info")
+													try {
+														FileCopy(A_LoopFilePath . ".info", targetDirectory . "\" . targetName ".info")
+													}
+													catch Any as exception {
+														logError(exception)
+													}
+
+												SplitPath(targetName, , , , &targetName)
+
+												try {
+													FileCopy(folder . "\" . fileName . ".zip", targetDirectory . "\" . targetName . ".zip")
+												}
+												catch Any as exception {
+													logError(exception)
+												}
+											}
+								}
+							}
+
 							if (selection.Has(key . "Strategies") && FileExist(sourceDirectory . "\Race Strategies")) {
 								code := this.SessionDatabase.getSimulatorCode(simulator)
 
@@ -3449,7 +3515,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local progressWindow := showProgress({color: "Green", title: translate("Analyzing Data")})
 		local selectedSimulator, selectedCar, selectedTrack, drivers, simulator, progress, tracks, track
 		local car, carName, found, targetDirectory, telemetryDB, ignore, driver, tyresDB, result, number, strategies
-		local automations, trackName, setups, ignore, type, extension
+		local sessions, automations, trackName, setups, ignore, type, extension
 
 		progressWindow.Opt("+Owner" . window.Hwnd)
 		window.Block()
@@ -3534,6 +3600,29 @@ class SessionDatabaseEditor extends ConfigurationItem {
 									if (strategies > 0)
 										this.AdministrationListView.Add("", translate("Strategies"), (carName . " / " . trackName), "-", strategies)
 
+									sessions := CaseInsenseMap()
+
+									loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Race Sessions\*.race", "F" {
+										driver := getMultiMapValue(readMultiMap(A_LoopFileFullPath), "Creator", "ID")
+
+										if sessions.Has(driver)
+											sessions[driver] += 1
+										else
+											sessions[driver] := 1
+									}
+
+									loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Practice Sessions\*.practice", "F" {
+										driver := getMultiMapValue(readMultiMap(A_LoopFileFullPath), "Creator", "ID")
+
+										if sessions.Has(driver)
+											sessions[driver] += 1
+										else
+											sessions[driver] := 1
+									}
+
+									for driver, number in sessions
+										this.AdministrationListView.Add("", translate("Sessions"), (carName . " / " . trackName), this.SessionDatabase.getDriverName(selectedSimulator, driver), number)
+
 									setups := 0
 
 									for ignore, type in kSetupTypes
@@ -3576,7 +3665,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	selectData(load := true) {
 		local ignore, column, selectedSimulator, selectedCar, selectedTrack, drivers, cars, telemetry
-		local pressures, strategies, automations, tracks, simulator, track, car, found, targetDirectory, number
+		local pressures, strategies, sessions, automations, tracks, simulator, track, car, found, targetDirectory, number
 		local ignore, type, extension, setups
 
 		this.DataListView.Delete()
@@ -3597,6 +3686,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			telemetry := 0
 			pressures := 0
 			strategies := 0
+			sessions := 0
 			setups := 0
 			automations := 0
 			tracks := 0
@@ -3644,6 +3734,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 									strategies += 1
 								}
 
+								loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Race Sessions\*.race", "F" {
+									found := true
+
+									sessions += 1
+								}
+
+								loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Practice Sessions\*.practice", "F" {
+									found := true
+
+									sessions += 1
+								}
+
 								for ignore, type in kSetupTypes
 									loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Car Setups\" . type . "\*.*", "F" {
 										SplitPath(A_LoopFileName, , , &extension)
@@ -3676,6 +3778,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.DataListView.Add("", translate("Telemetry"), telemetry)
 			this.DataListView.Add("", translate("Pressures"), pressures)
 			this.DataListView.Add("", translate("Strategies"), strategies)
+			this.DataListView.Add("", translate("Sessions"), sessions)
 			this.DataListView.Add("", translate("Setups"), setups)
 
 			this.DataListView.ModifyCol()
@@ -4954,7 +5057,7 @@ selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner :
 selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := false, *) {
 	local x, y, w, h, editor, simulator, code, info, drivers, id, name, progressWindow, tracks, progress
 	local car, carName, track, trackName, sourceDirectory, found, telemetryDB, tyresDB, driver, driverName, rows
-	local strategies, automations, row, selection, data, type, number, key
+	local strategies, automations, row, selection, data, type, number, key, sessions
 
 	static importDataGui
 	static importSelectCheck
@@ -5105,9 +5208,32 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 							importListView.Add("Check", translate("Pressures"), (carName . " / " . trackName), driverName, number)
 					}
 
+					sessions := CaseInsenseMap()
+
+					loop Files, sourceDirectory . "\Race Sessions\*.race", "F" {
+						driver := getMultiMapValue(readMultiMap(A_LoopFileFullPath), "Creator", "ID")
+
+						if sessions.Has(driver)
+							sessions[driver] += 1
+						else
+							sessions[driver] := 1
+					}
+
+					loop Files, sourceDirectory . "\Practice Sessions\*.practice", "F" {
+						driver := getMultiMapValue(readMultiMap(A_LoopFileFullPath), "Creator", "ID")
+
+						if sessions.Has(driver)
+							sessions[driver] += 1
+						else
+							sessions[driver] := 1
+					}
+
+					for driver, number in sessions
+						importListView.Add("Check", translate("Sessions"), (carName . " / " . trackName), SessionDatabase.getDriverName(simulator, driver), number)
+
 					strategies := 0
 
-					loop Files, sourceDirectory "\Race Strategies\*.*", "F"		; Strategies
+					loop Files, sourceDirectory . "\Race Strategies\*.*", "F"		; Strategies
 						strategies += 1
 
 					if (strategies > 0)
@@ -5193,6 +5319,8 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 						type := "Pressures"
 					case translate("Strategies"):
 						type := "Strategies"
+					case translate("Sessions"):
+						type := "Sessions"
 				}
 
 				if ((car = "-") && (track = "-"))

@@ -2255,7 +2255,7 @@ class PracticeCenter extends ConfigurationItem {
 		local auto3 := ((this.AutoSave ? translate("[x]") : translate("[  ]")) . A_Space . translate("Auto Save"))
 
 		this.Control["sessionMenuDropDown"].Delete()
-		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", auto1, auto2, "---------------------------------------------", "Clear...", "---------------------------------------------", "Load Session...", "Save Session...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Session Summary"], translate))
+		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", auto1, auto2, auto3, "---------------------------------------------", "Clear...", "---------------------------------------------", "Load Session...", "Save Session...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Session Summary"], translate))
 
 		if !this.SessionExported
 			this.Control["sessionMenuDropDown"].Add(collect(["---------------------------------------------", "Export to Database..."], translate))
@@ -4274,14 +4274,15 @@ class PracticeCenter extends ConfigurationItem {
 
 				info := newMultiMap()
 
+				setMultiMapValue(info, "Creator", "ID", SessionDatabase.ID)
+				setMultiMapValue(info, "Creator", "Name", SessionDatabase.getUserName())
+
 				setMultiMapValue(info, "Session", "Session", this.Session)
 				setMultiMapValue(info, "Session", "Exported", this.SessionExported)
 				setMultiMapValue(info, "Session", "Date", this.Date)
 				setMultiMapValue(info, "Session", "Simulator", simulator)
 				setMultiMapValue(info, "Session", "Car", car)
 				setMultiMapValue(info, "Session", "Track", track)
-				setMultiMapValue(info, "Session", "DriverID", SessionDatabase.ID)
-				setMultiMapValue(info, "Session", "DriverName", SessionDatabase.getUserName())
 
 				setMultiMapValue(info, "Weather", "Weather", this.Weather)
 				setMultiMapValue(info, "Weather", "Weather10Min", this.Weather10Min)
@@ -4310,11 +4311,8 @@ class PracticeCenter extends ConfigurationItem {
 
 				newFileName := (fileName . ".practice")
 
-				loop
-					if FileExist(newFileName)
-						newFileName := (fileName . " (" . A_Index . ")" . ".practice")
-					else
-						break
+				while FileExist(newFileName)
+					newFileName := (fileName . " (" . (A_Index + 1) . ")" . ".practice")
 
 				fileName := newFileName
 
@@ -4336,6 +4334,15 @@ class PracticeCenter extends ConfigurationItem {
 						RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . folder . "\" . fileName . ".zip'", , "Hide")
 
 						FileCopy(this.SessionDirectory . "Practice.info", folder . "\" . fileName . ".practice", 1)
+
+						info := readMultiMap(folder . "\" . fileName . ".practice")
+
+						if (getMultiMapValue(info, "Creator", "ID", kUndefined) = kUndefined) {
+							setMultiMapValue(info, "Creator", "ID", SessionDatabase.ID)
+							setMultiMapValue(info, "Creator", "Name", SessionDatabase.getUserName())
+
+							writeMultiMap(folder . "\" . fileName . ".practice", info)
+						}
 					}
 					catch Any as exception {
 						logError(exception)

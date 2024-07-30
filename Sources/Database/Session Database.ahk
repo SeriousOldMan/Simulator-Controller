@@ -3366,15 +3366,15 @@ class SessionDatabaseEditor extends ConfigurationItem {
 								}
 							}
 
-							for type, ext in Map("Race Sessions", "race", "Practice Sessions", "practice") {
-								drivers := selection[key . "Sessions"]
-								code := this.SessionDatabase.getSimulatorCode(simulator)
+							if selection.Has(key . "Sessions")
+								for type, ext in Map("Race Sessions", "race", "Practice Sessions", "practice") {
+									drivers := selection[key . "Sessions"]
+									code := this.SessionDatabase.getSimulatorCode(simulator)
 
-								targetDirectory := (kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\" . type)
+									targetDirectory := (kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\" . type)
 
-								DirCreate(targetDirectory)
+									DirCreate(targetDirectory)
 
-								if (selection.Has(key . "Sessions") && FileExist(sourceDirectory . "\" . type)) {
 									loop Files, sourceDirectory . "\" . type . "\*." . ext, "F"
 										for ignore, driver in drivers
 											if (getMultiMapValue(readMultiMap(A_LoopFileFullPath), "Creator", "ID") = driver) {
@@ -3410,7 +3410,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 												}
 											}
 								}
-							}
 
 							if (selection.Has(key . "Strategies") && FileExist(sourceDirectory . "\Race Strategies")) {
 								code := this.SessionDatabase.getSimulatorCode(simulator)
@@ -5057,7 +5056,7 @@ selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner :
 selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := false, *) {
 	local x, y, w, h, editor, simulator, code, info, drivers, id, name, progressWindow, tracks, progress
 	local car, carName, track, trackName, sourceDirectory, found, telemetryDB, tyresDB, driver, driverName, rows
-	local strategies, automations, row, selection, data, type, number, key, sessions
+	local strategies, setups, automations, row, selection, data, type, number, key, sessions, extension
 
 	static importDataGui
 	static importSelectCheck
@@ -5239,6 +5238,19 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 					if (strategies > 0)
 						importListView.Add("Check", translate("Strategies"), (carName . " / " . trackName), "-", strategies)
 
+					setups := 0
+
+					for ignore, type in kSetupTypes
+						loop Files, sourceDirectory . "\Car Setups\" . type . "\*.*", "F" {		; Setups
+							SplitPath(A_LoopFileName, , , &extension)
+
+							if (extension != "info")
+								setups += 1
+						}
+
+					if (setups > 0)
+						importListView.Add("Check", translate("Setups"), (carName . " / " . trackName), "-", setups)
+
 					if FileExist(sourceDirectory . "\Track.automations") {
 						automations := editor.SessionDatabase.loadTrackAutomations(sourceDirectory . "\Track.automations").Length
 
@@ -5321,6 +5333,8 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 						type := "Strategies"
 					case translate("Sessions"):
 						type := "Sessions"
+					case translate("Setups"):
+						type := "Setups"
 				}
 
 				if ((car = "-") && (track = "-"))

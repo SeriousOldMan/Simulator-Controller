@@ -21,7 +21,8 @@
       - Data can be browsed in the "Administration" tab.
 	  - Full support for Export and Import of session data.
 	  - Support to share saved sessions between members in team will be added with the next releases.
-  11. UI improvements for directory selection dialogs.
+  11. "Session Database" now also supports importing of car setups from export archives.
+  12. UI improvements for directory selection dialogs.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-582), especially if you have used the previous LLM Runtime for the "Driving Coach" or the Assistant Boosters.
 

@@ -35,6 +35,14 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars*, *Simulator Controller\Rules* and other folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on its own. But be sure to make a backup copy of all the files, just for the peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 5.8.2
+
+The configuration of the *LLM Runtime* has changed and it is now a downloadable preset in "Simulator Setup". If you have used the *LLM Runtime* for the "Driving Coach" or one of the Assistant Boosters, open "Simulator Setup" and install the "Local runtime for LLMs" preset, then review your configuration.
+
+The event "damage_collected" has been renamed to "damage_detected". Additionally there is a new event and a new action for the *Reasoning* Booster of the Race Engineer. You may want to update your Events and Actions configuration.
+
+***
+
 ## Release 5.8.1
 
 No actions required.

@@ -81,6 +81,34 @@ class DamageEvent extends AssistantEvent {
 	}
 }
 
+class TimeLossEvent extends AssistantEvent {
+	Asynchronous {
+		Get {
+			return true
+		}
+	}
+
+	createArguments(event, arguments) {
+		local result := []
+
+		loop arguments.Length
+			result.Push(arguments.Has(A_Index) ? arguments[A_Index] : 0)
+
+		return result
+	}
+
+	createTrigger(event, phrase, arguments) {
+		return ("The car is loosing " . arguments[2] . " seconds for the remaining " . arguments[1] . " laps due to damage.")
+	}
+
+	handleEvent(event, arguments*) {
+		if !super.handleEvent(event, arguments*)
+			this.Assistant.reportDamageAnalysis(true, arguments*)
+
+		return true
+	}
+}
+
 class PressureLossEvent extends AssistantEvent {
 	Asynchronous {
 		Get {
@@ -464,10 +492,7 @@ class RaceEngineer extends RaceAssistant {
 		if (knowledgeBase && isSet(tyreCompound)) {
 			tyreCompound := normalizeCompound(tyreCompound)
 
-			if inList(SessionDatabase.getTyreCompounds(knowledgeBase.getValue("Session.Simulator")
-													 , knowledgeBase.getValue("Session.Car")
-													 , knowledgeBase.getValue("Session.Track"))
-					 , tyreCompound)
+			if inList(SessionDatabase.getTyreCompounds(this.Simulator, this.Car, this.Track), tyreCompound)
 				splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
 			else
 				tyreCompound := kUndefined
@@ -486,6 +511,10 @@ class RaceEngineer extends RaceAssistant {
 						   , isSet(changeTyres) ? ("!" . changeTyres) : kUndefined
 						   , kUndefined, tyreCompound, tyreCompoundColor, kUndefined
 						   , repairs, repairs, repairs)
+	}
+
+	reportTimeLossAction(lapsToDrive, delta) {
+		this.reportDamageAnalysis(true, lapsToDrive, delta)
 	}
 
 	getKnowledge(type, options := false) {
@@ -3423,13 +3452,11 @@ class RaceEngineer extends RaceAssistant {
 				if (!knowledgeBase.getValue("InPitlane", false) && !knowledgeBase.getValue("InPit", false)) {
 					speaker := this.getSpeaker()
 
-					stintLaps := Round(stintLaps)
-
 					if repair {
 						speaker.beginTalk()
 
 						try {
-							speaker.speakPhrase("RepairPitstop", {laps: stintLaps, delta: speaker.number2Speech(delta, 1)})
+							speaker.speakPhrase("RepairPitstop", {laps: Round(stintLaps), delta: speaker.number2Speech(delta, 1)})
 
 							if this.supportsPitstop()
 								if this.confirmAction("Pitstop.Repair") {

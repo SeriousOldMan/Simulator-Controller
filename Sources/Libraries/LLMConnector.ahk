@@ -323,12 +323,6 @@ class LLMConnector {
 			if !tools
 				tools := this.GetTools()
 
-			/*
-			if InStr(this.Model, "Claude")
-				if (tools.Length > 0)
-					body.tool_choice := {type: "auto"}
-			*/
-
 			if isDebug()
 				body := JSON.print(this.CreatePrompt(body, instructions, tools, question), "  ")
 			else
@@ -337,7 +331,8 @@ class LLMConnector {
 			if isDebug() {
 				deleteFile(kTempDirectory . "LLM.request")
 
-				FileAppend(body, kTempDirectory . "LLM.request")
+				try
+					FileAppend(body, kTempDirectory . "LLM.request")
 			}
 
 			answer := WinHttpRequest({Timeouts: [0, 60000, 30000, 60000]}).POST(this.CreateServiceURL(this.Server), body, headers, {Object: true, Encoding: "UTF-8"})
@@ -350,7 +345,8 @@ class LLMConnector {
 				if isDebug() {
 					deleteFile(kTempDirectory . "LLM.response")
 
-					FileAppend(JSON.print(answer), kTempDirectory . "LLM.response")
+					try
+						FileAppend(JSON.print(answer, "  "), kTempDirectory . "LLM.response")
 				}
 
 				try {
@@ -655,6 +651,101 @@ class LLMConnector {
 	}
 
 	class LLMRuntimeConnector extends LLMConnector {
+		iLLMRuntime := false
+		iGPULayers := 0
+
+		LLMRuntime {
+			Get {
+				return this.iLLMRuntime
+			}
+		}
+
+		GPULayers {
+			Get {
+				return this.iGPULayers
+			}
+
+			Set {
+				return (this.iGPULayers := value)
+			}
+		}
+
+		__New(manager, model, gpuLayers := 0) {
+			this.iGPULayers := gpuLayers
+
+			super.__New(manager, model)
+
+			OnExit((*) => this.Disconnect())
+		}
+
+		Connect(force := false) {
+			local exePath, options, llmRuntime
+
+			if (!force && this.LLMRuntime && !ProcessExist(this.LLMRuntime))
+				return false
+
+			if (!this.LLMRuntime || force) {
+				this.Disconnect(force)
+
+				llmRuntime := ProcessExist("LLM Runtime.exe")
+
+				if llmRuntime
+					this.iLLMRuntime := llmRuntime
+				else {
+					exePath := (kUserHomeDirectory . "Programs\LLM Runtime\LLM Runtime.exe")
+
+					if FileExist(exePath) {
+						deleteFile(kTempDirectory . "LLMRuntime.cmd")
+						deleteFile(kTempDirectory . "LLMRuntime.out")
+
+						options := ("`"" . this.Model . "`" " . this.Temperature . A_Space . this.MaxTokens . A_Space . this.GPULayers)
+
+						Run("`"" . exePath . "`" `"" . kTempDirectory . "LLMRuntime.cmd`" `"" . kTempDirectory . "LLMRuntime.out`" " . options, kBinariesDirectory, "Hide", &llmRuntime)
+
+						if llmRuntime {
+							Sleep(1000)
+
+							if ProcessExist(llmRuntime) {
+								this.iLLMRuntime := llmRuntime
+
+								return true
+							}
+						}
+					}
+
+					return false
+				}
+			}
+
+			return true
+		}
+
+		Disconnect(force := false) {
+			if ((this.LLMRuntime || force) && ProcessExist("LLM Runtime.exe")) {
+				loop 5 {
+					try {
+						deleteFile(kTempDirectory . "LLMRuntime.cmd")
+
+						try
+							FileAppend("Exit`n", kTempDirectory . "LLMRuntime.cmd")
+					}
+					catch Any as exception {
+						if (A_Index = 5)
+							logError(exception)
+					}
+
+					Sleep(250)
+
+					if !ProcessExist("LLM Runtime.exe")
+						break
+				}
+
+				this.iLLMRuntime := false
+			}
+
+			return false
+		}
+
 		CreatePrompt(instructions, tools, question) {
 			local prompt := ""
 			local ignore, instruction, conversation
@@ -662,7 +753,7 @@ class LLMConnector {
 			addInstruction(instruction) {
 				if (instruction && (Trim(instruction) != "")) {
 					if (prompt = "")
-						prompt .= "### System:`n"
+						prompt .= "<|### System ###|>`n"
 
 					prompt .= (instruction . "`n")
 				}
@@ -671,34 +762,70 @@ class LLMConnector {
 			do(instructions, addInstruction)
 
 			for ignore, conversation in this.History {
-				prompt .= ("### Human:`n" . conversation[1] . "`n")
-				prompt .= ("### Assistant:`n" . conversation[2] . "`n")
+				prompt .= ("<|### User ###|>`n" . conversation[1] . "`n")
+				prompt .= ("<|### Assistant ###|>`n" . conversation[2] . "`n")
 			}
 
-			prompt .= ("### Human:`n" . question . "`n### Assistant:")
+			prompt .= ("<|### User ###|>`n" . question)
 
 			return prompt
 		}
 
-		Ask(question, instructions := false, tools := false) {
+		ProcessToolCalls(tools, message, &calls?) {
+			return false
+		}
+
+		Ask(question, instructions := false, tools := false, &calls?) {
 			local prompt := this.CreatePrompt(instructions ? instructions : this.GetInstructions()
 											, tools ? tools : this.GetTools()
 											, question)
-			local answerFile := temporaryFileName("LLMRuntime", "answer")
+			local toolCall := false
 			local command, answer
+
+			if !this.Connect() {
+				this.Manager.connectorState("Error", "Connection")
+
+				return false
+			}
 
 			if isDebug() {
 				deleteFile(kTempDirectory . "LLM.request")
 
-				FileAppend(prompt, kTempDirectory . "LLM.request")
+				try
+					FileAppend(prompt, kTempDirectory . "LLM.request")
 			}
 
 			try {
-				prompt := StrReplace(StrReplace(prompt, "`"", "\`""), "`n", "\n")
+				; prompt := StrReplace(StrReplace(prompt, "`"", "\`""), "`n", "\n")
 
-				command := (A_ComSpec . " /c `"`"" . kBinariesDirectory . "\LLM Runtime\LLM Runtime.exe`" `"" . this.Model . "`" `"" . prompt . "`" " . this.MaxTokens . A_Space . this.Temperature . " > `"" . answerFile . "`"`"")
+				while !deleteFile(kTempDirectory . "LLMRuntime.cmd")
+					Sleep(50)
 
-				RunWait(command, kBinariesDirectory . "\LLM Runtime", "Hide")
+				while !deleteFile(kTempDirectory . "LLMRuntime.out")
+					Sleep(50)
+
+				loop 5
+					try {
+						FileAppend(prompt, kTempDirectory . "LLMRuntime.cmd")
+
+						break
+					}
+					catch Any as exception {
+						if (A_Index = 5)
+							logError(exception)
+						else
+							Sleep(10)
+					}
+
+				loop 120
+					try
+						if FileExist(kTempDirectory . "LLMRuntime.out") {
+							Sleep(500)
+
+							break
+						}
+						else
+							Sleep(1000)
 			}
 			catch Any as exception {
 				this.Manager.connectorState("Error", "Connection")
@@ -707,27 +834,50 @@ class LLMConnector {
 			}
 
 			try {
-				answer := Trim(FileRead(answerFile, "`n"))
+				if !FileExist(kTempDirectory . "LLMRuntime.out") {
+					this.Manager.connectorState("Error", "Answer")
+
+					return false
+				}
+
+				answer := Trim(FileRead(kTempDirectory . "LLMRuntime.out", "`n"))
 
 				while ((StrLen(answer) > 0) && (SubStr(answer, 1, 1) = "`n"))
 					answer := SubStr(answer, 2)
 
-				deleteFile(answerFile)
+				if (Trim(answer) = "Error")
+					answer := false
+				else {
+					this.Manager.connectorState("Active")
 
-				if (answer = "")
-					throw "Empty answer received..."
+					if isSet(calls)
+						toolCall := this.ProcessToolCalls(tools, answer, &calls)
+					else
+						toolCall := this.ProcessToolCalls(tools, answer)
 
-				if isDebug() {
-					deleteFile(kTempDirectory . "LLM.response")
+					deleteFile(kTempDirectory . "LLMRuntime.out")
 
-					FileAppend(answer, kTempDirectory . "LLM.response")
+					if toolCall
+						return true
+					else {
+						answer := Trim(StrReplace(StrReplace(StrReplace(answer, "System:", ""), "Assistant:", ""), "User:", ""))
+
+						if isDebug() {
+							deleteFile(kTempDirectory . "LLM.response")
+
+							try
+								FileAppend(answer, kTempDirectory . "LLM.response")
+						}
+
+						this.AddConversation(question, answer)
+
+						return answer
+					}
 				}
-
-				this.AddConversation(question, answer)
-
-				return answer
 			}
 			catch Any as exception {
+				logError(exception, true)
+
 				this.Manager.connectorState("Error", "Answer")
 
 				return false
@@ -743,7 +893,10 @@ class LLMConnector {
 
 	static Providers {
 		Get {
-			return ["Generic", "OpenAI", "Mistral AI", "Azure", "OpenRouter", "Ollama", "GPT4All", "LLM Runtime"]
+			if FileExist(kUserHomeDirectory . "Programs\LLM Runtime\LLM Runtime.exe")
+				return ["Generic", "OpenAI", "Mistral AI", "Azure", "OpenRouter", "Ollama", "GPT4All", "LLM Runtime"]
+			else
+				return ["Generic", "OpenAI", "Mistral AI", "Azure", "OpenRouter", "Ollama", "GPT4All"]
 		}
 	}
 

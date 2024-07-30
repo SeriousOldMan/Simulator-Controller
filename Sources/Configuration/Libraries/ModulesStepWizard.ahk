@@ -516,6 +516,87 @@ class SetupPatch extends NamedPreset {
 	}
 }
 
+class LLMRuntime extends NamedPreset {
+	iURL := false
+
+	URL {
+		Get {
+			return this.iURL
+		}
+	}
+
+	__New(name, url) {
+		this.iURL := url
+
+		super.__New(name)
+	}
+
+	getArguments() {
+		return concatenate(super.getArguments(), Array(this.URL))
+	}
+
+	install(wizard, edit := true) {
+		local currentDirectory := A_WorkingDir
+		local url := this.URL
+		local counter :=  0
+		local updateTask
+
+		updateProgress() {
+			counter := Min(counter + 1, 100)
+
+			showProgress({progress: counter})
+
+			if (counter = 100)
+				counter := 1
+		}
+
+		if (Trim(url) != "") {
+			wizard.Window.Block()
+
+			try {
+				updateTask := PeriodicTask(updateProgress, 200, kInterruptPriority)
+
+				showProgress({color: "Blue", title: translate("Downloading Components"), message: translate("Downloading...")})
+
+				updateTask.start()
+
+				deleteFile(A_Temp . "\LLM Runtime.zip")
+
+				Download(url, A_Temp . "\LLM Runtime.zip")
+
+				DirCreate(kUserHomeDirectory . "Programs\LLM Runtime")
+
+				showProgress({color: "Green", message: translate("Extracting...")})
+
+				RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\LLM Runtime.zip' -DestinationPath '" . kUserHomeDirectory . "Programs\LLM Runtime" . "' -Force", , "Hide")
+
+				try {
+					SetWorkingDir(kUserHomeDirectory . "Programs\LLM Runtime")
+
+					RunWait("Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File", , "Hide")
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+				finally {
+					SetWorkingDir(currentDirectory)
+				}
+			}
+			finally {
+				wizard.Window.Unblock()
+
+				updateTask.stop()
+
+				hideProgress()
+			}
+		}
+	}
+
+	uninstall(wizard) {
+		deleteDirectory(kUserHomeDirectory . "Programs\LLM Runtime")
+	}
+}
+
 class DownloadablePreset extends NamedPreset {
 	iWizard := false
 

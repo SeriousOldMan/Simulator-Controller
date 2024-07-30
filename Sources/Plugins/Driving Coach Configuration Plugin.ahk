@@ -112,9 +112,11 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 				field.ValidText := field.Text
 		}
 
-		validateTokens(*) {
-			local field := this.Control["dcMaxTokensEdit"]
-			local value := field.Text
+		validateTokens(field, *) {
+			local value
+
+			field := this.Control[field]
+			value := field.Text
 
 			if (!isInteger(value) || (value < 32)) {
 				field.Text := (field.HasProp("ValidText") ? field.ValidText : "200")
@@ -129,12 +131,29 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		chooseConversationsPath(*) {
 			local directory
 
+			window.Opt("+OwnDialogs")
+
 			OnMessage(0x44, translateSelectCancelButtons)
 			directory := withBlockedWindows(FileSelect, "D1" . window["dcConversationsPathEdit"].Text, translate("Select Conversations Folder..."))
 			OnMessage(0x44, translateSelectCancelButtons, 0)
 
 			if (directory != "")
 				window["dcConversationsPathEdit"].Text := directory
+		}
+
+		chooseModelPath(*) {
+			local fileName, translator
+
+			window.Opt("+OwnDialogs")
+
+			translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
+
+			OnMessage(0x44, translator)
+			fileName := withBlockedWindows(FileSelect, 1, "", translate("Select model file..."), "GGUF (*.GGUF)")
+			OnMessage(0x44, translator, 0)
+
+			if (fileName != "")
+				window["dcLLMRTModelEdit"].Text := fileName
 		}
 
 		chooseProvider(*) {
@@ -166,14 +185,13 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 				this.Value[setting] := ""
 
-				this.initializeInstructions(this.iCurrentProvider, window["dcModelDropDown"].text, setting, true)
+				if (this.iCurrentProvider = "LLM Runtime")
+					this.initializeInstructions(this.iCurrentProvider, window["dcLLMRTModelEdit"].Text, setting, true)
+				else
+					this.initializeInstructions(this.iCurrentProvider, window["dcModelDropDown"].Text, setting, true)
 
 				if (setting = chosenSetting)
 					window["dcInstructionsEdit"].Value := ((this.Value[setting] != false) ? this.Value[setting] : "")
-				/*
-				else
-					this.Value[setting] := oldValue
-				*/
 			}
 		}
 
@@ -186,7 +204,8 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 				this.loadModels(provider, this.Control["dcServiceURLEdit"].Text
 										, this.Control["dcServiceKeyEdit"].Text
-										, this.Control["dcModelDropDown"].Text)
+										, this.Control[(provider = "LLM Runtime") ? "dcLLMRTModelEdit"
+																				  : "dcModelDropDown"].Text)
 			}
 		}
 
@@ -224,15 +243,27 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		widget8 := window.Add("Edit", "x" . (x1 + 102) . " yp w" . (w1 - 102) . " h23 vdcServiceURLEdit Hidden")
 		widget8.OnEvent("Change", loadModels)
 
-		widget9 := window.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200 Hidden", translate("Service Key"))
+		widget9 := window.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200 Section Hidden vdcServiceKeyLabel", translate("Service Key"))
 		widget10 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h23 Password vdcServiceKeyEdit Hidden")
 		widget10.OnEvent("Change", loadModels)
 
-		widget11 := window.Add("Text", "x" . x0 . " yp+30 w105 h23 +0x200 Hidden", translate("Model / # Tokens"))
+		widget11 := window.Add("Text", "x" . x0 . " yp+30 w105 h23 +0x200 vdcModelLabel Hidden", translate("Model / # Tokens"))
 		widget12 := window.Add("ComboBox", "x" . x1 . " yp w" . (w1 - 64) . " vdcModelDropDown Hidden")
 		widget13 := window.Add("Edit", "x" . (x1 + (w1 - 60)) . " yp-1 w60 h23 Number vdcMaxTokensEdit Hidden")
-		widget13.OnEvent("Change", validateTokens)
-		widget14 := window.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 Range32-131072 Hidden")
+		widget13.OnEvent("Change", validateTokens.Bind("dcMaxTokensEdit"))
+		widget14 := window.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 Range32-131072 vdcMaxTokensRange Hidden")
+
+		widget38 := window.Add("Text", "x" . x0 . " ys+5 w105 h23 +0x200 vdcLLMRTModelLabel Hidden", translate("Model"))
+		widget31 := window.Add("Edit", "x" . x1 . " yp w" . (w1 - 24) . " vdcLLMRTModelEdit Hidden")
+		widget32 := window.Add("Button", "x" . (x1 + (w1 - 23)) . " yp h23 w23 vdcLLMRTModelButton Hidden", translate("..."))
+		widget32.OnEvent("Click", chooseModelPath)
+
+		widget33 := window.Add("Text", "x" . x0 . " yp+24 w120 h23 +0x200 vdcLLMRTTokensLabel Hidden", translate("# Tokens / # GPULayers"))
+		widget34 := window.Add("Edit", "x" . x1 . " yp-1 w60 h23 Number vdcLLMRTMaxTokensEdit Hidden")
+		widget34.OnEvent("Change", validateTokens.Bind("dcLLMRTMaxTokensEdit"))
+		widget35 := window.Add("UpDown", "x" . x1 . " yp w60 h23 Range32-131072 vdcLLMRTMaxTokensRange Hidden")
+		widget36 := window.Add("Edit", "x" . (x1 + 62) . " yp w60 h23 Number Limit2 vdcLLMRTGPULayersEdit Hidden")
+		widget37 := window.Add("UpDown", "x" . (x1 + 62) . " yp w60 h23 Range0-99 vdcLLMRTGPULayersRange Hidden")
 
 		window.SetFont("Italic", "Arial")
 		widget15 := window.Add("Text", "x" . x0 . " yp+40 w105 h23 Hidden", translate("Personality"))
@@ -270,53 +301,60 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		widget30.OnEvent("Click", reloadInstructions)
 		setButtonIcon(widget30, kIconsDirectory . "Renew.ico", 1)
 
-		loop 30
+		loop 38
 			editor.registerWidget(this, widget%A_Index%)
 	}
 
 	loadModels(provider, serviceURL, serviceKey, model) {
 		local connector, index, models
 
-		if provider {
-			try {
-				connector := LLMConnector.%StrReplace(provider, A_Space, "")%Connector(this, model)
+		if !model
+			model := ""
 
-				if isInstance(connector, LLMConnector.APIConnector) {
-					connector.Connect(serviceURL, serviceKey)
+		if (provider = "LLM Runtime")
+			this.Control["dcLLMRTModelEdit"].Text := model
+		else {
+			if provider {
+				try {
+					connector := LLMConnector.%StrReplace(provider, A_Space, "")%Connector(this, model)
 
-					models := connector.Models
+					if isInstance(connector, LLMConnector.APIConnector) {
+						connector.Connect(serviceURL, serviceKey)
+
+						models := connector.Models
+					}
+					else
+						models := this.Models[provider]
 				}
-				else
+				catch Any as exception {
 					models := this.Models[provider]
+				}
 			}
-			catch Any as exception {
-				models := this.Models[provider]
+			else
+				models := []
+
+			if model {
+				index := inList(models, model)
+
+				if !index {
+					index := inList(models, StrReplace(model, A_Space, "-"))
+
+					if index
+						model := models[index]
+				}
+
+				if !index
+					models := concatenate(models, [model])
 			}
+
+			this.Control["dcModelDropDown"].Delete()
+			this.Control["dcModelDropDown"].Add(models)
+
+			if model
+				this.Control["dcModelDropDown"].Choose(inList(models, model))
+			else
+				this.Control["dcModelDropDown"].Choose((models.Length > 0) ? 1 : 0)
 		}
-		else
-			models := []
-
-		if model {
-			index := inList(models, model)
-
-			if !index {
-				index := inList(models, StrReplace(model, A_Space, "-"))
-
-				if index
-					model := models[index]
-			}
-
-			if !index
-				models := concatenate(models, [model])
-		}
-
-		this.Control["dcModelDropDown"].Delete()
-		this.Control["dcModelDropDown"].Add(models)
-
-		if model
-			this.Control["dcModelDropDown"].Choose(inList(models, model))
-		else
-			this.Control["dcModelDropDown"].Choose((models.Length > 0) ? 1 : 0)
 	}
 
 	initializeInstructions(provider, model, setting, edit := false) {
@@ -372,8 +410,9 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		local service, ignore, provider, setting, providerConfiguration
 		local serviceURL, serviceKey, model
 
-		static defaults := CaseInsenseWeakMap("ServiceURL", false, "Model", false, "MaxTokens", 2048
-											, "MaxHistory", 5, "Temperature", 0.5, "Confirmation", true)
+		static defaults := CaseInsenseWeakMap("ServiceURL", false, "Model", "", "MaxTokens", 2048
+											, "MaxHistory", 5, "Temperature", 0.5, "Confirmation", true
+											, "GPULayers", 0)
 
 		super.loadFromConfiguration(configuration)
 
@@ -391,6 +430,9 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 			for ignore, setting in ["ServiceURL", "ServiceKey", "Model", "MaxTokens"]
 				providerConfiguration[setting] := getMultiMapValue(configuration, "Driving Coach Service", provider . "." . setting, defaults[setting])
+
+			if (provider = "LLM Runtime")
+				providerConfiguration["GPULayers"] := getMultiMapValue(configuration, "Driving Coach Service", provider . ".GPULayers", defaults["GPULayers"])
 
 			try {
 				LLMConnector.%StrReplace(provider, A_Space, "")%Connector.GetDefaults(&serviceURL, &serviceKey, &model)
@@ -440,6 +482,13 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 			for ignore, setting in ["ServiceURL", "ServiceKey", "Model", "MaxTokens"]
 				setMultiMapValue(configuration, "Driving Coach Service", provider . "." . setting, providerConfiguration[setting])
 
+			if (provider = "LLM Runtime") {
+				setMultiMapValue(configuration, "Driving Coach Service", provider . ".GPULayers", providerConfiguration["GPULayers"])
+
+				if (provider = this.iCurrentProvider)
+					setMultiMapValue(configuration, "Driving Coach Service", "GPULayers", providerConfiguration["GPULayers"])
+			}
+
 			for ignore, setting in ["Temperature", "MaxHistory", "Confirmation"] {
 				setMultiMapValue(configuration, "Driving Coach Personality", provider . "." . setting, providerConfiguration[setting])
 
@@ -462,8 +511,10 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		for ignore, setting in ["Model", "MaxTokens"]
 			setMultiMapValue(configuration, "Driving Coach Service", setting, providerConfiguration[setting])
 
-		if (provider = "LLM Runtime")
+		if (provider = "LLM Runtime") {
 			setMultiMapValue(configuration, "Driving Coach Service", "Service", provider)
+			setMultiMapValue(configuration, "Driving Coach Service", "GPULayers", providerConfiguration["GPULayers"])
+		}
 		else
 			setMultiMapValue(configuration, "Driving Coach Service", "Service"
 										  , values2String("|", provider, Trim(providerConfiguration["ServiceURL"])
@@ -475,16 +526,33 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 	loadProviderConfiguration(provider := false) {
 		local configuration
 
-		if provider
+		if !provider
+			provider := this.Control["dcProviderDropDown"].Text
+
+		this.iCurrentProvider := provider
+
+		if !this.iProviderConfigurations.Has(this.iCurrentProvider)
+			this.iCurrentProvider := this.Providers[1]
+
+		provider := this.iCurrentProvider
+
+		if provider {
+			this.Control["dcProviderDropDown"].Delete()
+			this.Control["dcProviderDropDown"].Add(this.Providers)
 			this.Control["dcProviderDropDown"].Choose(inList(this.Providers, provider))
+		}
 
-		this.iCurrentProvider := this.Control["dcProviderDropDown"].Text
+		configuration := this.iProviderConfigurations[this.iCurrentProvider]
 
-		if this.iProviderConfigurations.Has(this.iCurrentProvider)
-			configuration := this.iProviderConfigurations[this.iCurrentProvider]
-
-		for ignore, setting in ["ServiceURL", "ServiceKey", "MaxTokens", "MaxHistory"]
+		for ignore, setting in ["ServiceURL", "ServiceKey", "MaxHistory"]
 			this.Control["dc" . setting . "Edit"].Text := configuration[setting]
+
+		if (provider = "LLM Runtime") {
+			this.Control["dcLLMRTGPULayersEdit"].Text := configuration["GPULayers"]
+			this.Control["dcLLMRTMaxTokensEdit"].Text := configuration["MaxTokens"]
+		}
+		else
+			this.Control["dcMaxTokensEdit"].Text := configuration["MaxTokens"]
 
 		if ((provider = "GPT4All") && (Trim(this.Control["dcServiceKeyEdit"].Text) = ""))
 			this.Control["dcServiceKeyEdit"].Text := "Any text will do the job"
@@ -514,10 +582,20 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		providerConfiguration["ServiceURL"] := Trim(this.Control["dcServiceURLEdit"].Text)
 		providerConfiguration["ServiceKey"] := Trim(this.Control["dcServiceKeyEdit"].Text)
 
-		value := this.Control["dcModelDropDown"].Text
+		if (this.iCurrentProvider = "LLM Runtime")
+			value := this.Control["dcLLMRTModelEdit"].Text
+		else
+			value := this.Control["dcModelDropDown"].Text
 
 		providerConfiguration["Model"] := ((Trim(value) != "") ? Trim(value) : false)
-		providerConfiguration["MaxTokens"] := this.Control["dcMaxTokensEdit"].Text
+
+		if (this.iCurrentProvider = "LLM Runtime")
+			providerConfiguration["MaxTokens"] := this.Control["dcLLMRTMaxTokensEdit"].Text
+		else
+			providerConfiguration["MaxTokens"] := this.Control["dcMaxTokensEdit"].Text
+
+		if (this.iCurrentProvider = "LLM Runtime")
+			providerConfiguration["GPULayers"] := this.Control["dcLLMRTGPULayersEdit"].Text
 
 		providerConfiguration["Temperature"] := Round(this.Control["dcTemperatureEdit"].Text / 100, 2)
 		providerConfiguration["MaxHistory"] := this.Control["dcMaxHistoryEdit"].Text
@@ -544,8 +622,21 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 	}
 
 	updateState() {
+		local ignore, field, llmRuntime
+
 		this.Control["dcServiceURLEdit"].Enabled := (this.Control["dcProviderDropDown"].Text != "LLM Runtime")
 		this.Control["dcServiceKeyEdit"].Enabled := !inList(["GPT4All", "Ollama", "LLM Runtime"], this.Control["dcProviderDropDown"].Text)
+
+		llmRuntime := (this.iCurrentProvider = "LLM Runtime")
+
+		for ignore, field in ["dcServiceKeyLabel", "dcServiceKeyEdit", "dcModelLabel", "dcModelDropDown"
+							, "dcServiceURLEdit", "dcMaxTokensEdit", "dcMaxTokensRange"]
+			this.Control[field].Visible := !llmRuntime
+
+		for ignore, field in ["dcLLMRTModelLabel", "dcLLMRTModelEdit", "dcLLMRTModelButton"
+							, "dcLLMRTTokensLabel", "dcLLMRTMaxTokensEdit", "dcLLMRTMaxTokensRange"
+							, "dcLLMRTGPULayersEdit", "dcLLMRTGPULayersRange"]
+			this.Control[field].Visible := llmRuntime
 	}
 }
 

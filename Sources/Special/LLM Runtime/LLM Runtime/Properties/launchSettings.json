@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "LLM Runtime": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\Users\\juwig\\Documents\\Simulator Controller\\Temp\\LLM.cmd\" \"C:\\Users\\juwig\\Documents\\Simulator Controller\\Temp\\LLM.out\" \"D:\\Machine Learning\\Models\\WizardLM-2-8x22B.IQ1_M.gguf\" 0.50 1024 0"
+    }
+  }
+}

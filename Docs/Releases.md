@@ -1,4 +1,17 @@
-## 5.8.1.0-release 07/26/24 (planned)
+## 5.8.2.0-release 08/03/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. A new LLM Runtime has been implemented.
+     - Better support for execution of all or parts of the model on the graphics card.
+	 - Since this runtime is quite large (> 200 MB), it is provided as a downloadable component. Run "Simulator Setup", go to the presets page and install the "Local runtime for LLMs" preset.
+	 - See the completely [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#llm-runtime) for more information.
+  4. The Race Engineer LLM event "damage_collected" has been renamed to "damage_detected".
+  5. A new event and a new action has been defined for the *Reasoning* booster of the Race Engineer. This pair handles reporting of critical time loss after an incident.
+  6. The lap history data supplied to the LLMs has been extended.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-582), especially if you have used the previous LLM Runtime for the "Driving Coach" or the Assistant Boosters.
+
+## 5.8.1.0-release 07/26/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Added available tyre compounds to the knowledge passed to the LLM in several Assistant Boosters.
@@ -9,6 +22,7 @@
   8. The code editor for LLM events and actions now allows scrolling and copying even if the displayed rule text is read-only.
   9. The fields for unchangeable builtin events and actions are now shown as read-only and no longer as disabled.
   10. LLM events and actions can now be cloned using a "Copy" button.
+  11. The colors of diagrams and graphs has been optimized for the dark color scheme. 
 
 ## 5.8.0.1-release 07/20/24
   1. Fixed a critcal bug for connected hardware controllers (Button Boxes, Stream Decks, ...) that could rapidfire a pressed button.
@@ -118,7 +132,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   8. Added mounted tyre compound to tyres info component in "System Monitor".
   9. The "Telemetry" instruction has been removed for both the Driving Coach and the Conversation Booster. It has been substituted by the new "Knowledge" instruction. This instruction provides the knowledge of a given Assistant now in JSON format to the LLM, which results in a much better understanding of the state of the car, strategy, standings and other important information by the LLM. The [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) has been updated accordingly.
   10. The Engineer will provide full pitstop history to the LLM. Questions like: "What were the ambient temperatures at the third pitstop and what tyre pressures did we use then?" will be possible now.
-  11. The Spotter now also provides his knowledge about all opponents and the current race situation to the connected LLM, if a "Conversation" bosster has been configured.
+  11. The Spotter now also provides his knowledge about all opponents and the current race situation to the connected LLM, if a "Conversation" booster has been configured.
   12. The Strategist and the Spotter learned a new [voice command](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)). With this you can ask, how often an opponent has been to the pits already.
   13. [Internal] Migrated to AHK 2.0.17.
   14. [Developer] Added mounted tyre compound to the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.

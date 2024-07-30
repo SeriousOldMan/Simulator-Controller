@@ -971,28 +971,26 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		exportData(*) {
-			local translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
 			local folder
 
 			editor.Window.Opt("+OwnDialogs")
 
-			OnMessage(0x44, translator)
-			folder := withBlockedWindows(DirSelect, "*" . kDatabaseDirectory, 0, translate("Select target folder..."))
-			OnMessage(0x44, translator, 0)
+			OnMessage(0x44, translateSelectCancelButtons)
+			folder := withBlockedWindows(FileSelect, "D1", kDatabaseDirectory, translate("Select target folder..."))
+			OnMessage(0x44, translateSelectCancelButtons, 0)
 
 			if (folder != "")
 				editor.exportData(folder . "\Export_" . A_Now)
 		}
 
 		importData(*) {
-			local translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
 			local folder, info, selection
 
 			editorGui.Opt("+OwnDialogs")
 
-			OnMessage(0x44, translator)
-			folder := withBlockedWindows(DirSelect, "*" . kDatabaseDirectory, 0, translate("Select export folder..."))
-			OnMessage(0x44, translator, 0)
+			OnMessage(0x44, translateSelectCancelButtons)
+			folder := withBlockedWindows(FileSelect, "D1", kDatabaseDirectory, translate("Select export folder..."))
+			OnMessage(0x44, translateSelectCancelButtons, 0)
 
 			if (folder != "")
 				if FileExist(folder . "\Export.info") {
@@ -1032,29 +1030,27 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		exportSettings(*) {
-			local translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
 			local full := GetKeyState("Ctrl")
 			local folder
 
 			editor.Window.Opt("+OwnDialogs")
 
-			OnMessage(0x44, translator)
-			folder := withBlockedWindows(DirSelect, "*" . kDatabaseDirectory, 0, translate("Select target folder..."))
-			OnMessage(0x44, translator, 0)
+			OnMessage(0x44, translateSelectCancelButtons)
+			folder := withBlockedWindows(FileSelect, "D1", kDatabaseDirectory, translate("Select target folder..."))
+			OnMessage(0x44, translateSelectCancelButtons, 0)
 
 			if (folder != "")
 				editor.exportSettings(folder . "\Export_" . A_Now, full || GetKeyState("Ctrl"))
 		}
 
 		importSettings(*) {
-			local translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
 			local folder, info, selection
 
 			editorGui.Opt("+OwnDialogs")
 
-			OnMessage(0x44, translator)
-			folder := withBlockedWindows(DirSelect, "*" . kDatabaseDirectory, 0, translate("Select export folder..."))
-			OnMessage(0x44, translator, 0)
+			OnMessage(0x44, translateSelectCancelButtons)
+			folder := withBlockedWindows(FileSelect, "D1", kDatabaseDirectory, translate("Select export folder..."))
+			OnMessage(0x44, translateSelectCancelButtons, 0)
 
 			if (folder != "")
 				if FileExist(folder . "\Export.info") {
@@ -4660,7 +4656,7 @@ copyFiles(source, destination) {
 actionDialog(xOrCommand := false, y := false, action := false, *) {
 	global gActionInfoEnabled
 
-	local fileName, chosen, x, translator
+	local fileName, chosen, x
 
 	static result := false
 
@@ -4699,15 +4695,12 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 	else if (xOrCommand = "File") {
 		actionDialogGui.Opt("+OwnDialogs")
 
-		translator := translateMsgBoxButtons.Bind(["Select", "Cancel"])
-
-		OnMessage(0x44, translator)
-
+		OnMessage(0x44, translateSelectCancelButtons)
 		if (actionTypeDropDown.Value = 2)
 			fileName := withBlockedWindows(FileSelect, 1, actionEdit.Text, translate("Select executable file..."), "Script (*.*)")
 		else
 			fileName := withBlockedWindows(FileSelect, 1, actionEdit.Text, translate("Select Sound File..."), "Audio (*.*)")
-		OnMessage(0x44, translator, 0)
+		OnMessage(0x44, translateSelectCancelButtons, 0)
 
 		if fileName
 			actionEdit.Text := fileName
@@ -5381,11 +5374,9 @@ editSettings(editorOrCommand, arguments*) {
 	else if (editorOrCommand = "DatabaseLocation") {
 		settingsEditorGui.Opt("+OwnDialogs")
 
-		translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
-
-		OnMessage(0x44, translator)
-		directory := withBlockedWindows(DirSelect, "*" kDatabaseDirectory, 0, translate("Select Session Database folder..."))
-		OnMessage(0x44, translator, 0)
+		OnMessage(0x44, translateSelectCancelButtons)
+		directory := withBlockedWindows(FileSelect, "D1", kDatabaseDirectory, translate("Select Session Database folder..."))
+		OnMessage(0x44, translateSelectCancelButtons, 0)
 
 		if (directory != "")
 			databaseLocationEdit.Text := directory

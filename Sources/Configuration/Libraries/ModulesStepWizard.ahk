@@ -1050,7 +1050,7 @@ class SettingsImport extends NamedPreset {
 
 	edit(wizard) {
 		local progress := 0
-		local translator, folder
+		local folder
 
 		this.iWizard := wizard
 
@@ -1060,11 +1060,9 @@ class SettingsImport extends NamedPreset {
 			try {
 				wizard.Window.Opt("+OwnDialogs")
 
-				translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
-
-				OnMessage(0x44, translator)
-				folder := withBlockedWindows(DirSelect, "", 0, translate("Select export folder..."))
-				OnMessage(0x44, translator, 0)
+				OnMessage(0x44, translateSelectCancelButtons)
+				folder := withBlockedWindows(FileSelect, "D2", , translate("Select export folder..."))
+				OnMessage(0x44, translateSelectCancelButtons, 0)
 
 				if (folder != "") {
 					showProgress({color: "Green", title: translate("Importing settings")})

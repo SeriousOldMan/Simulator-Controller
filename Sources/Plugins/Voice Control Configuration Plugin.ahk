@@ -212,15 +212,13 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		}
 
 		chooseSoXPath(*) {
-			local directory, translator
+			local directory
 
 			this.Window.Opt("+OwnDialogs")
 
-			translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
-
-			OnMessage(0x44, translator)
-			directory := withBlockedWindows(DirSelect, "*" . this.Control["soXPathEdit"].Text, 0, translate("Select SoX folder..."))
-			OnMessage(0x44, translator, 0)
+			OnMessage(0x44, translateSelectCancelButtons)
+			directory := withBlockedWindows(DirSelect, "D1", this.Control["soXPathEdit"].Text, translate("Select SoX folder..."))
+			OnMessage(0x44, translateSelectCancelButtons, 0)
 
 			if (directory != "") {
 				this.Control["soXPathEdit"].Text := directory

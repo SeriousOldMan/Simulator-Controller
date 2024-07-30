@@ -2251,7 +2251,7 @@ class PracticeCenter extends ConfigurationItem {
 		local auto3 := ((this.AutoSave ? translate("[x]") : translate("[  ]")) . A_Space . translate("Auto Save"))
 
 		this.Control["sessionMenuDropDown"].Delete()
-		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", auto1, auto2, "---------------------------------------------", "Clear...", "---------------------------------------------", "Load Session...", "Save Session...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Session Summary"], translate))
+		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", auto1, auto2, auto3, "---------------------------------------------", "Clear...", "---------------------------------------------", "Load Session...", "Save Session...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Session Summary"], translate))
 
 		if !this.SessionExported
 			this.Control["sessionMenuDropDown"].Add(collect(["---------------------------------------------", "Export to Database..."], translate))

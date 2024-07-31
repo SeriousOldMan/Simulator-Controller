@@ -19,41 +19,28 @@ decode(text) {
 	return StrReplace(StrReplace(StrReplace(text, "_#_EQ_#_", "="), "_#_AC_#_", "\"), "_#_CR_#_", "`n")
 }
 
-decodeB64(data) {
-	local string
+encodeBinary(buf, size := kUndefined) {
+	local result := ""
 
-	static CRYPT_STRING_BASE64 := 0x00000001
+	if (size == kUndefined)
+		size := buf.Size
 
-	if !DllCall("crypt32\CryptStringToBinaryW", "Str", data, "UInt", 0, "UInt", CRYPT_STRING_BASE64, "Ptr", 0, "UInt*", &Size := 0, "Ptr", 0, "Ptr", 0)
-		throw OSError()
+	VarSetStrCapacity(&result, size * 2)
 
-	string := Buffer(Size)
+	loop size
+		result .= Format("{1:02X}", NumGet(buf, A_Index - 1, "UChar"))
 
-	if !DllCall("crypt32\CryptStringToBinaryW", "Str", data, "UInt", 0, "UInt", CRYPT_STRING_BASE64, "Ptr", String, "UInt*", Size, "Ptr", 0, "Ptr", 0)
-		throw OSError()
-
-	return StrGet(String, "UTF-8")
+	return result
 }
 
-encodeB64(text, encoding := "UTF-8") {
-	local binary := Buffer(StrPut(text, encoding))
-	local size := 0
-	local data
+decodeBinary(string) {
+	local size := (StrLen(string) >> 1)
+	local buf := Buffer(size)
 
-	StrPut(text, binary, encoding)
+	loop size
+		NumPut("UChar", A_Index - 1, buf, Integer("0x" . SubStr(string, (A_Index * 2) - 1, 2)))
 
-	static CRYPT_STRING_BASE64 := 0x00000001
-	static CRYPT_STRING_NOCRLF := 0x40000000
-
-	if !DllCall("crypt32\CryptBinaryToStringW", "Ptr", binary, "UInt", binary.Size - 1, "UInt", (CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF), "Ptr", 0, "UInt*", &size)
-		throw OSError()
-
-	data := Buffer(size << 1, 0)
-
-	if !DllCall("crypt32\CryptBinaryToStringW", "Ptr", binary, "UInt", binary.Size - 1, "UInt", (CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF), "Ptr", data, "UInt*", size)
-		throw OSError()
-
-	return StrGet(data)
+	return buf
 }
 
 substituteString(text, pattern, replacement) {

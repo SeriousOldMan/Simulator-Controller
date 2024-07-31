@@ -2442,7 +2442,7 @@ synchronizeSessions(groups, sessionDB, connector, simulators, timestamp, lastSyn
 										 , getMultiMapValue(info, "Session", "Type")
 										 , getMultiMapValue(info, "Session", "Name")
 										 , connector.GetDataValue("Document", identifier, "Meta")
-										 , connector.GetDataValue("Document", identifier, "Data")
+										 , decodeBinary(connector.GetDataValue("Document", identifier, "Data"))
 										 , getMultiMapValue(info, "Session", "Size")
 										 , getMultiMapValue(info, "Access", "Share")
 										 , getMultiMapValue(info, "Access", "Synchronize")
@@ -2496,7 +2496,7 @@ synchronizeSessions(groups, sessionDB, connector, simulators, timestamp, lastSyn
 											counter += 1
 
 											connector.SetDataValue("Document", identifier, "Meta", printMultiMap(meta))
-											connector.SetDataValue("Document", identifier, "Data", StrGet(session, size, "UTF-8"))
+											connector.SetDataValue("Document", identifier, "Data", encodeBinary(session, size))
 
 											setMultiMapValue(info, "Session", "Synchronized", true)
 
@@ -2556,7 +2556,7 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 					sessionDB.writeSetup(simulator, car, track
 									   , getMultiMapValue(info, "Setup", "Type")
 									   , getMultiMapValue(info, "Setup", "Name")
-									   , setup
+									   , getMultiMapValue(info, "Setup", "Encoded") ? decodeBinary(setup) : setup
 									   , getMultiMapValue(info, "Setup", "Size")
 									   , getMultiMapValue(info, "Access", "Share")
 									   , getMultiMapValue(info, "Access", "Synchronize")
@@ -2609,9 +2609,10 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 
 											counter += 1
 
-											connector.SetDataValue("Document", identifier, "Setup", StrGet(setup, size, "UTF-8"))
+											connector.SetDataValue("Document", identifier, "Setup", encodeBinary(setup, size))
 
 											setMultiMapValue(info, "Setup", "Synchronized", true)
+											setMultiMapValue(info, "Setup", "Encoded", true)
 
 											connector.SetDataValue("Document", identifier, "Info", printMultiMap(info))
 

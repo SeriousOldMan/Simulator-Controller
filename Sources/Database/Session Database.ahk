@@ -2989,6 +2989,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 						loop Files, kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Race Strategies\*.strategy", "F"
 							this.SessionDatabase.removeStrategy(simulator, car, track, A_LoopFileName)
+					case translate("Sessions"):
+						for ignore, type in ["Practice", "Race"]
+							loop Files, this.SessionDatabase.getSessionDirectory(simulator, car, track, type) . "*." . StrLower(type), "F" {
+								SplitPath(A_LoopFileName, , , , &name)
+
+								this.SessionDatabase.removeSession(simulator, car, track, type, name)
+							}
 					case translate("Setups"):
 						code := this.SessionDatabase.getSimulatorCode(simulator)
 
@@ -3130,7 +3137,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 									try {
 										FileCopy(A_LoopFileFullPath, targetDirectory . type . "\" . A_LoopFileName)
-										FileCopy(folder . "\" . fileName . ".zip", targetDirectory . type . "\" . fileName . ".zip")
+										FileCopy(folder . "\" . fileName . ".session", targetDirectory . type . "\" . fileName . ".session")
 									}
 									catch Any as exception {
 										logError(exception)
@@ -3403,7 +3410,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 												SplitPath(targetName, , , , &targetName)
 
 												try {
-													FileCopy(folder . "\" . fileName . ".zip", targetDirectory . "\" . targetName . ".zip")
+													FileCopy(folder . "\" . fileName . ".session", targetDirectory . "\" . targetName . ".session")
 												}
 												catch Any as exception {
 													logError(exception)
@@ -5384,6 +5391,7 @@ editSettings(editorOrCommand, arguments*) {
 	static databaseLocationEdit := ""
 	static synchTelemetryCheck
 	static synchPressuresCheck
+	static synchSessionsCheck
 	static synchSetupsCheck
 	static synchStrategiesCheck
 	static serverIdentifierEdit := ""
@@ -5485,6 +5493,7 @@ editSettings(editorOrCommand, arguments*) {
 
 		synchTelemetryCheck.Value := (inList(groups, "Telemetry") != false)
 		synchPressuresCheck.Value := (inList(groups, "Pressures") != false)
+		synchSessionsCheck.Value := (inList(groups, "Sessions") != false)
 		synchSetupsCheck.Value := (inList(groups, "Setups") != false)
 		synchStrategiesCheck.Value := (inList(groups, "Strategies") != false)
 
@@ -5499,6 +5508,7 @@ editSettings(editorOrCommand, arguments*) {
 			groups := []
 
 			for group, enabled in Map("Telemetry", synchTelemetryCheck.Value, "Pressures", synchPressuresCheck.Value
+									, "Sessions", synchSessionsCheck.Value
 									, "Setups", synchSetupsCheck.Value, "Strategies", synchStrategiesCheck.Value)
 				if enabled
 					groups.Push(group)
@@ -5604,6 +5614,7 @@ editSettings(editorOrCommand, arguments*) {
 			deleteConnectionButton.Enabled := true
 			synchTelemetryCheck.Enabled := true
 			synchPressuresCheck.Enabled := true
+			synchSessionsCheck.Enabled := true
 			synchSetupsCheck.Enabled := true
 			synchStrategiesCheck.Enabled := true
 		}
@@ -5611,11 +5622,13 @@ editSettings(editorOrCommand, arguments*) {
 			deleteConnectionButton.Enabled := false
 			synchTelemetryCheck.Enabled := false
 			synchPressuresCheck.Enabled := false
+			synchSessionsCheck.Enabled := false
 			synchSetupsCheck.Enabled := false
 			synchStrategiesCheck.Enabled := false
 
 			synchTelemetryCheck.Value := 0
 			synchPressuresCheck.Value := 0
+			synchSessionsCheck.Value := 0
 			synchSetupsCheck.Value := 0
 			synchStrategiesCheck.Value := 0
 		}
@@ -5636,13 +5649,15 @@ editSettings(editorOrCommand, arguments*) {
 			previousConnectionButton.Enabled := false
 		}
 
-		if ((connections.Length > 0) && !synchTelemetryCheck && !synchPressuresCheck && !synchSetupsCheck && !synchStrategiesCheck) {
+		if ((connections.Length > 0) && !synchTelemetryCheck && !synchPressuresCheck
+									 && !synchSessionsCheck && !synchSetupsCheck && !synchStrategiesCheck) {
 			synchTelemetryCheck := true
 
 			synchTelemetryCheck.Value := 1
 		}
 
-		if (synchTelemetryCheck.Value || synchPressuresCheck.Value || synchSetupsCheck.Value || synchStrategiesCheck.Value) {
+		if (synchTelemetryCheck.Value || synchPressuresCheck.Value
+		 || synchSessionsCheck.Value || synchSetupsCheck.Value || synchStrategiesCheck.Value) {
 			serverIdentifierEdit.Enabled := true
 			serverURLEdit.Enabled := true
 			serverTokenEdit.Enabled := true
@@ -5691,17 +5706,19 @@ editSettings(editorOrCommand, arguments*) {
 		if (groups.Length > 0) {
 			synchTelemetryCheck := (inList(groups, "Telemetry") != false)
 			synchPressuresCheck := (inList(groups, "Pressures") != false)
+			synchSessionsCheck := (inList(groups, "Sessions") != false)
 			synchSetupsCheck := (inList(groups, "Setups") != false)
 			synchStrategiesCheck := (inList(groups, "Strategies") != false)
 		}
 		else {
 			synchTelemetryCheck := (replication != false)
 			synchPressuresCheck := (replication != false)
+			synchSessionsCheck := (replication != false)
 			synchSetupsCheck := (replication != false)
 			synchStrategiesCheck := (replication != false)
 		}
 
-		if (synchTelemetryCheck || synchPressuresCheck || synchSetupsCheck || synchStrategiesCheck) {
+		if (synchTelemetryCheck || synchPressuresCheck || synchSessionsCheck || synchSetupsCheck || synchStrategiesCheck) {
 			if currentConnection {
 				serverIdentifierEdit := connections[currentConnection][1]
 				serverURLEdit := connections[currentConnection][2]
@@ -5745,11 +5762,11 @@ editSettings(editorOrCommand, arguments*) {
 
 		settingsEditorGui.SetFont("Italic", "Arial")
 
-		settingsEditorGui.Add("GroupBox", "x16 yp+30 w388 h216 Section", translate("Team Data"))
+		settingsEditorGui.Add("GroupBox", "x16 yp+30 w388 h240 Section", translate("Team Data"))
 
 		settingsEditorGui.SetFont("Norm", "Arial")
 
-		values := [synchTelemetryCheck, synchPressuresCheck, synchSetupsCheck, synchStrategiesCheck]
+		values := [synchTelemetryCheck, synchPressuresCheck, synchSessionsCheck, synchSetupsCheck, synchStrategiesCheck]
 
 		settingsEditorGui.Add("Text", "x24 yp+16 w90 h23 +0x200", translate("Synchronization"))
 		synchTelemetryCheck := settingsEditorGui.Add("CheckBox", "x146 yp+2 w120 h21", translate("Telemetry Data"))
@@ -5760,11 +5777,14 @@ editSettings(editorOrCommand, arguments*) {
 		synchPressuresCheck.OnEvent("Click", editSettings.Bind("UpdateState"))
 		synchSetupsCheck := settingsEditorGui.Add("CheckBox", "x266 yp w120 h21", translate("Car Setups"))
 		synchSetupsCheck.OnEvent("Click", editSettings.Bind("UpdateState"))
+		synchSessionsCheck := settingsEditorGui.Add("CheckBox", "x146 yp+24 w120 h21", translate("Sessions"))
+		synchSessionsCheck.OnEvent("Click", editSettings.Bind("UpdateState"))
 
 		synchTelemetryCheck.Value := values[1]
 		synchPressuresCheck.Value := values[2]
-		synchSetupsCheck.Value := values[3]
-		synchStrategiesCheck.Value := values[4]
+		synchSessionsCheck.Value := values[3]
+		synchSetupsCheck.Value := values[4]
+		synchStrategiesCheck.Value := values[5]
 
 		settingsEditorGui.Add("Text", "x24 yp+30 w90 h23 +0x200", translate("Name"))
 		serverIdentifierEdit := settingsEditorGui.Add("Edit", "x146 yp+1 w246", serverIdentifierEdit)
@@ -5784,7 +5804,7 @@ editSettings(editorOrCommand, arguments*) {
 		serverURLEdit := settingsEditorGui.Add("ComboBox", "x146 yp+1 w246 Choose" . chosen, availableServerURLs)
 
 		settingsEditorGui.Add("Text", "x24 yp+23 w90 h23 +0x200", translate("Data Token"))
-		serverTokenEdit := settingsEditorGui.Add("Edit", "x146 yp w246 h21", serverTokenEdit)
+		serverTokenEdit := settingsEditorGui.Add("Edit", "x146 yp w246 h21 Password", serverTokenEdit)
 
 		validateTokenButton := settingsEditorGui.Add("Button", "x122 yp-1 w23 h23 Center +0x200")
 		validateTokenButton.OnEvent("Click", editSettings.Bind("ValidateToken"))
@@ -5816,7 +5836,7 @@ editSettings(editorOrCommand, arguments*) {
 		rebuildButton := settingsEditorGui.Add("Button", "x296 yp w96", translate("Rebuild..."))
 		rebuildButton.OnEvent("Click", rebuildDatabase)
 
-		settingsEditorGui.Add("Button", "x122 ys+224 w80 h23", translate("Ok")).OnEvent("Click", editSettings.Bind(kOk))
+		settingsEditorGui.Add("Button", "x122 ys+248 w80 h23", translate("Ok")).OnEvent("Click", editSettings.Bind(kOk))
 		settingsEditorGui.Add("Button", "x216 yp w80 h23", translate("&Cancel")).OnEvent("Click", editSettings.Bind(kCancel))
 
 		editSettings("UpdateState")

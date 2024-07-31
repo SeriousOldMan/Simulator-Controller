@@ -19,6 +19,30 @@ decode(text) {
 	return StrReplace(StrReplace(StrReplace(text, "_#_EQ_#_", "="), "_#_AC_#_", "\"), "_#_CR_#_", "`n")
 }
 
+encodeBinary(buf, size := kUndefined) {
+	local result := ""
+
+	if (size == kUndefined)
+		size := buf.Size
+
+	VarSetStrCapacity(&result, size * 2)
+
+	loop size
+		result .= Format("{1:02X}", NumGet(buf, A_Index - 1, "UChar"))
+
+	return result
+}
+
+decodeBinary(string) {
+	local size := (StrLen(string) >> 1)
+	local buf := Buffer(size)
+
+	loop size
+		NumPut("UChar", A_Index - 1, buf, Integer("0x" . SubStr(string, (A_Index * 2) - 1, 2)))
+
+	return buf
+}
+
 substituteString(text, pattern, replacement) {
 	local result := text
 

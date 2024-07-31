@@ -112,6 +112,7 @@
   - [Tyre Pressures](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#tyre-pressures)
   - [Automations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#automations)
   - [Administration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#administration)
+  - [Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration)
   
 [Setup Workbench](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench)
 ------

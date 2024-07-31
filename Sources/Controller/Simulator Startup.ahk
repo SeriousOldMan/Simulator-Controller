@@ -1516,26 +1516,25 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 	}
 
 	chooseProfile(listView, line, *) {
-		if (line = selectedProfile)
-			return
+		if (line != selectedProfile) {
+			if (selectedProfile > 1)
+				if !startupProfilesEditor(kEvent, "ProfileSave") {
+					profilesListView.Modify(selectedProfile, "Vis Select")
 
-		if (selectedProfile > 1)
-			if !startupProfilesEditor(kEvent, "ProfileSave") {
-				profilesListView.Modify(selectedProfile, "Vis Select")
+					return
+				}
 
-				return
+			if (line > 1)
+				startupProfilesEditor(kEvent, "ProfileLoad", line)
+			else if (line = 1) {
+				profilesListView.Modify(1, "-Select")
+
+				if selectedProfile
+					profilesListView.Modify(selectedProfile, "Select")
 			}
-
-		if (line > 1)
-			startupProfilesEditor(kEvent, "ProfileLoad", line)
-		else if (line = 1) {
-			profilesListView.Modify(1, "-Select")
-
-			if selectedProfile
-				profilesListView.Modify(selectedProfile, "Select")
+			else
+				selectedProfile := false
 		}
-		else
-			selectedProfile := false
 
 		startupProfilesEditor("Update State")
 	}

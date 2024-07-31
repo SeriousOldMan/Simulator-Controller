@@ -1372,7 +1372,7 @@ class SessionDatabase extends ConfigurationItem {
 
 		if (car && (car != true)) {
 			if (track && (track != true))
-				fileName := (kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Notes.txt")
+				fileName := (kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . this.getTrackCode(simulator, track) . "\Notes.txt")
 			else
 				fileName := (kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\Notes.txt")
 		}
@@ -1410,11 +1410,219 @@ class SessionDatabase extends ConfigurationItem {
 		FileAppend(notes, directory . "\Notes.txt", "UTF-16")
 	}
 
+	getSessionDirectory(simulator, car, track, type) {
+		return (kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\" . this.getCarCode(simulator, car)
+								   . "\" . this.getTrackCode(simulator, track) . "\" . type . " Sessions\")
+	}
+
+	getSessionNames(simulator, car, track, &practiceSessions, &raceSessions) {
+		local name
+
+		if practiceSessions {
+			practiceSessions := []
+
+			loop Files, this.getSessionDirectory(simulator, car, track, "Practice") . "*.practice", "F" {
+				SplitPath(A_LoopFileName, &name)
+
+				practiceSessions.Push(name)
+			}
+		}
+
+		if raceSessions {
+			raceSessions := []
+
+			loop Files, this.getSessionDirectory(simulator, car, track, "Practice") . "*.race", "F" {
+				SplitPath(A_LoopFileName, &name)
+
+				raceSessions.Push(name)
+			}
+		}
+	}
+
+	readSession(simulator, car, track, type, name, &meta, &size) {
+		local simulatorCode := this.getSimulatorCode(simulator)
+		local data, fileName, file
+
+		car := this.getCarCode(simulator, car)
+		track := this.getTrackCode(simulator, track)
+
+		fileName := (this.getSessionDirectory(simulator, car, track, type) . name)
+
+		if !FileExist(fileName . "." . type)
+			fileName := (kDatabaseDirectory . "Community\" . simulatorCode . "\" . car . "\" . track . "\" . type . " Sessions\" . name)
+
+		if FileExist(fileName . "." . type) {
+			file := FileOpen(fileName . ".data", "r-wd")
+
+			if file {
+				size := file.Length
+
+				data := Buffer(size)
+
+				file.RawRead(data, size)
+
+				file.Close()
+
+				meta := readMultiMap(fileName . "." . type)
+
+				return data
+			}
+			else {
+				size := 0
+				meta := false
+
+				return Buffer(0)
+			}
+		}
+		else {
+			size := 0
+
+			return Buffer(0)
+		}
+	}
+
+	readSessionInfo(simulator, car, track, type, name) {
+		local fileName, info
+
+		car := this.getCarCode(simulator, car)
+		track := this.getTrackCode(simulator, track)
+
+		fileName := (this.getSessionDirectory(simulator, car, track, type) . name . ".info")
+
+		if !FileExist(fileName) {
+			if FileExist(this.getSessionDirectory(simulator, car, track, type) . name . "." . StrLower(type)) {
+				info := newMultiMap()
+
+				setMultiMapValue(info, "Origin", "Simulator", this.getSimulatorName(simulator))
+				setMultiMapValue(info, "Origin", "Car", car)
+				setMultiMapValue(info, "Origin", "Track", track)
+				setMultiMapValue(info, "Origin", "Driver", this.ID)
+
+				setMultiMapValue(info, "Session", "Name", name)
+				setMultiMapValue(info, "Session", "Type", type)
+				setMultiMapValue(info, "Session", "Identifier", createGuid())
+				setMultiMapValue(info, "Session", "Synchronized", false)
+
+				setMultiMapValue(info, "Access", "Share", false)
+				setMultiMapValue(info, "Access", "Synchronize", false)
+
+				writeMultiMap(fileName, info)
+
+				return info
+			}
+			else
+				return false
+		}
+		else
+			return readMultiMap(fileName)
+	}
+
+	writeSession(simulator, car, track, type, name, meta, session, size, share, synchronize
+			   , driver := kUndefined, identifier := kUndefined, synchronized := false) {
+		local fileName, file, info
+
+		car := this.getCarCode(simulator, car)
+		track := this.getTrackCode(simulator, track)
+
+		fileName := this.getSessionDirectory(simulator, car, track, type)
+
+		DirCreate(fileName)
+
+		fileName := (fileName . "\" . name)
+
+		deleteFile(fileName . "." . StrLower(type))
+		deleteFile(fileName . ".data")
+
+		file := FileOpen(fileName . ".data", "w")
+
+		if file {
+			file.RawWrite(session, size)
+
+			file.Close()
+
+			writeMultiMap(fileName . "." . StrLower(type), meta)
+
+			if !driver
+				driver := this.ID
+
+			info := this.readSessionInfo(simulator, car, track, type, name)
+
+			if (driver != kUndefined)
+				setMultiMapValue(info, "Origin", "Driver", driver)
+
+			if (identifier != kUndefined)
+				setMultiMapValue(info, "Session", "Identifier", identifier)
+
+			setMultiMapValue(info, "Session", "Synchronized", synchronized)
+
+			setMultiMapValue(info, "Session", "Size", size)
+
+			setMultiMapValue(info, "Access", "Share", share)
+			setMultiMapValue(info, "Access", "Synchronize", synchronize)
+
+			this.writeSessionInfo(simulator, car, track, type, name, info)
+		}
+	}
+
+	writeSessionInfo(simulator, car, track, type, name, info) {
+		writeMultiMap(this.getSessionDirectory(simulator, car, track, type) . name . ".info", info)
+	}
+
+	renameSession(simulator, car, track, type, oldName, newName) {
+		local oldFileName, newFileName, info
+
+		oldFileName := (this.getSessionDirectory(simulator, car, track, type) . oldName)
+		newFileName := (this.getSessionDirectory(simulator, car, track, type) . newName)
+
+		try {
+			FileMove(oldFileName . "." . StrLower(type), newFileName . "." . StrLower(type), 1)
+			FileMove(oldFileName . ".data", newFileName . ".data", 1)
+
+			if FileExist(oldFileName . ".info") {
+				info := readMultiMap(oldFileName . ".info")
+
+				deleteFile(oldFileName . ".info")
+
+				setMultiMapValue(info, "Session", "Name", newName)
+				setMultiMapValue(info, "Session", "Synchronized", false)
+
+				writeMultiMap(newFileName . ".info", info)
+			}
+		}
+		catch Any as exception {
+			logError(exception)
+		}
+	}
+
+	removeSession(simulator, car, track, type, name) {
+		local fileName, info, identifier, ignore, connector
+
+		fileName := (this.getSessionDirectory(simulator, car, track, type) . name)
+
+		info := readMultiMap(fileName . ".info")
+
+		deleteFile(fileName . "." . StrLower(type))
+		deleteFile(fileName . ".data")
+		deleteFile(fileName . ".info")
+
+		identifier := getMultiMapValue(info, "Setup", "Identifier", false)
+
+		if (identifier && (getMultiMapValue(info, "Origin", "Driver", false) = this.ID))
+			for ignore, connector in this.Connectors
+				try {
+					connector.DeleteData("Document", identifier)
+				}
+				catch Any as exception {
+					logError(exception, true)
+				}
+	}
+
 	getSetupNames(simulator, car, track, &userSetups, &communitySetups) {
 		local simulatorCode := this.getSimulatorCode(simulator)
 		local ignore, type, setups, name, extension
 
 		car := this.getCarCode(simulator, car)
+		track := this.getTrackCode(simulator, track)
 
 		if userSetups {
 			userSetups := CaseInsenseMap()
@@ -1456,6 +1664,7 @@ class SessionDatabase extends ConfigurationItem {
 		local data, fileName, file
 
 		car := this.getCarCode(simulator, car)
+		track := this.getTrackCode(simulator, track)
 
 		fileName := kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Car Setups\" . type . "\" . name
 
@@ -1494,6 +1703,7 @@ class SessionDatabase extends ConfigurationItem {
 		local fileName, info
 
 		car := this.getCarCode(simulator, car)
+		track := this.getTrackCode(simulator, track)
 
 		fileName := kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Car Setups\" . type . "\" . name . ".info"
 
@@ -1533,6 +1743,7 @@ class SessionDatabase extends ConfigurationItem {
 		local fileName, file, info
 
 		car := this.getCarCode(simulator, car)
+		track := this.getTrackCode(simulator, track)
 
 		fileName := kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Car Setups\" . type
 
@@ -1576,6 +1787,7 @@ class SessionDatabase extends ConfigurationItem {
 		local fileName
 
 		car := this.getCarCode(simulator, car)
+		track := this.getTrackCode(simulator, track)
 
 		fileName := kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Car Setups\" . type . "\" . name . ".info"
 
@@ -1587,6 +1799,7 @@ class SessionDatabase extends ConfigurationItem {
 		local oldFileName, newFileName, info
 
 		car := this.getCarCode(simulator, car)
+		track := this.getTrackCode(simulator, track)
 
 		oldFileName := kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Car Setups\" . type . "\" . oldName
 		newFileName := kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Car Setups\" . type . "\" . newName
@@ -1615,6 +1828,7 @@ class SessionDatabase extends ConfigurationItem {
 		local fileName, info, identifier, ignore, connector
 
 		car := this.getCarCode(simulator, car)
+		track := this.getTrackCode(simulator, track)
 
 		fileName := kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Car Setups\" . type . "\" . name
 
@@ -1640,6 +1854,7 @@ class SessionDatabase extends ConfigurationItem {
 		local ignore, strategies, name, extension
 
 		car := this.getCarCode(simulator, car)
+		track := this.getTrackCode(simulator, track)
 
 		if userStrategies {
 			userStrategies := []
@@ -1669,6 +1884,7 @@ class SessionDatabase extends ConfigurationItem {
 		local data, fileName
 
 		car := this.getCarCode(simulator, car)
+		track := this.getTrackCode(simulator, track)
 
 		fileName := kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Race Strategies\" . name
 
@@ -1683,6 +1899,7 @@ class SessionDatabase extends ConfigurationItem {
 		local fileName, info
 
 		car := this.getCarCode(simulator, car)
+		track := this.getTrackCode(simulator, track)
 
 		fileName := kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Race Strategies\" . name . ".info"
 
@@ -1721,6 +1938,7 @@ class SessionDatabase extends ConfigurationItem {
 		local fileName, file, info
 
 		car := this.getCarCode(simulator, car)
+		track := this.getTrackCode(simulator, track)
 
 		fileName := kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Race Strategies"
 
@@ -1756,6 +1974,7 @@ class SessionDatabase extends ConfigurationItem {
 		local fileName
 
 		car := this.getCarCode(simulator, car)
+		track := this.getTrackCode(simulator, track)
 
 		fileName := kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Race Strategies\" . name . ".info"
 
@@ -1767,6 +1986,7 @@ class SessionDatabase extends ConfigurationItem {
 		local oldFileName, newFileName, info
 
 		car := this.getCarCode(simulator, car)
+		track := this.getTrackCode(simulator, track)
 
 		oldFileName := kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Race Strategies\" . oldName
 		newFileName := kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Race Strategies\" . newName
@@ -1795,6 +2015,7 @@ class SessionDatabase extends ConfigurationItem {
 		local fileName, info, identifier, ignore, connector
 
 		car := this.getCarCode(simulator, car)
+		track := this.getTrackCode(simulator, track)
 
 		fileName := kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Race Strategies\" . name
 
@@ -2193,6 +2414,119 @@ synchronizeDrivers(groups, sessionDB, connector, simulators, timestamp, lastSync
 	}
 }
 
+synchronizeSessions(groups, sessionDB, connector, simulators, timestamp, lastSynchronization, force, &counter) {
+	local hasError := false
+	local start, lastRun, ignore, identifier, document, name, meta, type, info, simulator, car, track, session, size
+
+	if inList(groups, "Sessions") {
+		lastRun := getMultiMapValue(readMultiMap(kDatabaseDirectory . "SYNCHRONIZE"), "Sessions", "Synchronization", 0)
+		start := A_Now
+
+		for ignore, identifier in string2Values(";", connector.QueryData("Document", "Type = 'Session' And Modified > " . lastSynchronization)) {
+			document := parseData(connector.GetData("Document", identifier))
+
+			simulator := document["Simulator"]
+
+			if inList(simulators, sessionDB.getSimulatorName(simulator)) {
+				info := parseMultiMap(connector.GetDataValue("Document", identifier, "Info"))
+
+				car := document["Car"]
+				track := document["Track"]
+
+				if !sessionDB.readSessionInfo(simulator, car, track
+											, getMultiMapValue(info, "Session", "Type")
+											, getMultiMapValue(info, "Session", "Name")) {
+					counter += 1
+
+					sessionDB.writeSession(simulator, car, track
+										 , getMultiMapValue(info, "Session", "Type")
+										 , getMultiMapValue(info, "Session", "Name")
+										 , connector.GetDataValue("Document", identifier, "Meta")
+										 , connector.GetDataValue("Document", identifier, "Data")
+										 , getMultiMapValue(info, "Session", "Size")
+										 , getMultiMapValue(info, "Access", "Share")
+										 , getMultiMapValue(info, "Access", "Synchronize")
+										 , getMultiMapValue(info, "Origin", "Driver")
+										 , getMultiMapValue(info, "Origin", "Identifier")
+										 , true)
+				}
+			}
+		}
+
+		for ignore, simulator in simulators {
+			simulator := sessionDB.getSimulatorCode(simulator)
+
+			loop Files, kDatabaseDirectory . "User\" . simulator . "\*.*", "D" {
+				car := A_LoopFileName
+
+				loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\*.*", "D" {
+					track := A_LoopFileName
+
+					for ignore, type in ["Practice Sessions", "Race Sessions"]
+						loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\" . type . "\*.info", "F" {
+							lastModified := FileGetTime(A_LoopFilePath, "M")
+
+							if (StrCompare(lastModified, lastRun) > 0) {
+								info := readMultiMap(A_LoopFilePath)
+
+								if ((getMultiMapValue(info, "Origin", "Driver", false) = sessionDB.ID)
+								 && getMultiMapValue(info, "Access", "Synchronize", false)
+								 && !getMultiMapValue(info, "Session", "Synchronized", false)) {
+									session := sessionDB.readSession(simulator, car, track
+																   , getMultiMapValue(info, "Session", "Type")
+																   , getMultiMapValue(info, "Session", "Name")
+																   , &meta, &size)
+									info := sessionDB.readSessionInfo(simulator, car, track
+																	, getMultiMapValue(info, "Session", "Type")
+																	, getMultiMapValue(info, "Session", "Name"))
+
+									if (session && meta && (size > 0)) {
+										identifier := StrLower(getMultiMapValue(info, "Session", "Identifier"))
+
+										try {
+											if (connector.CountData("Document", "Identifier = '" . identifier . "'") = 0)
+												connector.CreateData("Document"
+																   , substituteVariables("Type=Session`n"
+																					   . "Identifier=%Identifier%`nDriver=%Driver%`n"
+																					   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%"
+																					   , {Identifier: identifier
+																						, Driver: getMultiMapValue(info, "Origin", "Driver")
+																						, Simulator: simulator, Car: car, Track: track}))
+
+											counter += 1
+
+											connector.SetDataValue("Document", identifier, "Meta", printMultiMap(meta))
+											connector.SetDataValue("Document", identifier, "Data", StrGet(session, size, "UTF-8"))
+
+											setMultiMapValue(info, "Session", "Synchronized", true)
+
+											connector.SetDataValue("Document", identifier, "Info", printMultiMap(info))
+
+											writeMultiMap(A_LoopFilePath, info)
+										}
+										catch Any as exception {
+											logError(exception)
+
+											hasError := true
+										}
+									}
+								}
+							}
+						}
+				}
+			}
+		}
+
+		if !hasError {
+			info := readMultiMap(kDatabaseDirectory . "SYNCHRONIZE")
+
+			setMultiMapValue(info, "Sessions", "Synchronization", start)
+
+			writeMultiMap(kDatabaseDirectory . "SYNCHRONIZE", info)
+		}
+	}
+}
+
 synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynchronization, force, &counter) {
 	local hasError := false
 	local start, lastRun, ignore, identifier, document, name, type, info, simulator, car, track, setup, size
@@ -2275,7 +2609,7 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 
 											counter += 1
 
-											connector.SetDataValue("Document", identifier, "Setup", StrGet(setup, "UTF-8"))
+											connector.SetDataValue("Document", identifier, "Setup", StrGet(setup, size, "UTF-8"))
 
 											setMultiMapValue(info, "Setup", "Synchronized", true)
 
@@ -2450,6 +2784,7 @@ initializeSessionDatabase() {
 	SessionDatabase()
 
 	SessionDatabase.registerSynchronizer(synchronizeDrivers)
+	SessionDatabase.registerSynchronizer(synchronizeSessions)
 	SessionDatabase.registerSynchronizer(synchronizeSetups)
 	SessionDatabase.registerSynchronizer(synchronizeStrategies)
 }

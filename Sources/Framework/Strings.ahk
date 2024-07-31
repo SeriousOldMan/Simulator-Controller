@@ -19,6 +19,43 @@ decode(text) {
 	return StrReplace(StrReplace(StrReplace(text, "_#_EQ_#_", "="), "_#_AC_#_", "\"), "_#_CR_#_", "`n")
 }
 
+decodeB64(data) {
+	local string
+
+	static CRYPT_STRING_BASE64 := 0x00000001
+
+	if !DllCall("crypt32\CryptStringToBinaryW", "Str", data, "UInt", 0, "UInt", CRYPT_STRING_BASE64, "Ptr", 0, "UInt*", &Size := 0, "Ptr", 0, "Ptr", 0)
+		throw OSError()
+
+	string := Buffer(Size)
+
+	if !DllCall("crypt32\CryptStringToBinaryW", "Str", data, "UInt", 0, "UInt", CRYPT_STRING_BASE64, "Ptr", String, "UInt*", Size, "Ptr", 0, "Ptr", 0)
+		throw OSError()
+
+	return StrGet(String, "UTF-8")
+}
+
+encodeB64(text, encoding := "UTF-8") {
+	local binary := Buffer(StrPut(text, encoding))
+	local size := 0
+	local data
+
+	StrPut(text, binary, encoding)
+
+	static CRYPT_STRING_BASE64 := 0x00000001
+	static CRYPT_STRING_NOCRLF := 0x40000000
+
+	if !DllCall("crypt32\CryptBinaryToStringW", "Ptr", binary, "UInt", binary.Size - 1, "UInt", (CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF), "Ptr", 0, "UInt*", &size)
+		throw OSError()
+
+	data := Buffer(size << 1, 0)
+
+	if !DllCall("crypt32\CryptBinaryToStringW", "Ptr", binary, "UInt", binary.Size - 1, "UInt", (CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF), "Ptr", data, "UInt*", size)
+		throw OSError()
+
+	return StrGet(data)
+}
+
 substituteString(text, pattern, replacement) {
 	local result := text
 

@@ -1296,7 +1296,7 @@ class CallbacksEditor {
 		else
 			editorGui.Add("Text", "x16 yp+28 w70 h23 +0x200 Section Y:Move(0.25)", translate("Action"))
 
-		editorGui.Add("CheckBox", "x90 yp h21 w23 Y:Move(0.25) vcallbackActiveCheck").OnEvent("Click", updateCallbacksList)
+		editorGui.Add("CheckBox", "x87 yp h21 w23 Y:Move(0.25) vcallbackActiveCheck").OnEvent("Click", updateCallbacksList)
 
 		if (this.Type = "Agent.Events")
 			editorGui.Add("DropDownList", "x110 yp w127 Y:Move(0.25) vcallbackTypeDropDown", collect(["Event Class", "Event Rule", "Event Disabled"], translate)).OnEvent("Change", updateCallbacksList)

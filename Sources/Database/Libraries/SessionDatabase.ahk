@@ -1490,9 +1490,7 @@ class SessionDatabase extends ConfigurationItem {
 		fileName := (this.getSessionDirectory(simulator, car, track, type) . name . ".info")
 
 		if !FileExist(fileName) {
-			fileName := (this.getSessionDirectory(simulator, car, track, type) . name . "." . StrLower(type))
-
-			if FileExist(fileName) {
+			if FileExist(this.getSessionDirectory(simulator, car, track, type) . name . "." . StrLower(type)) {
 				info := newMultiMap()
 
 				setMultiMapValue(info, "Origin", "Simulator", this.getSimulatorName(simulator))
@@ -1508,7 +1506,7 @@ class SessionDatabase extends ConfigurationItem {
 				setMultiMapValue(info, "Access", "Share", false)
 				setMultiMapValue(info, "Access", "Synchronize", false)
 
-				writeMultiMap(fileName . ".info", info)
+				writeMultiMap(fileName, info)
 
 				return info
 			}
@@ -2498,7 +2496,7 @@ synchronizeSessions(groups, sessionDB, connector, simulators, timestamp, lastSyn
 											counter += 1
 
 											connector.SetDataValue("Document", identifier, "Meta", printMultiMap(meta))
-											connector.SetDataValue("Document", identifier, "Data", StrGet(session, "UTF-8"))
+											connector.SetDataValue("Document", identifier, "Data", StrGet(session, size, "UTF-8"))
 
 											setMultiMapValue(info, "Session", "Synchronized", true)
 
@@ -2611,7 +2609,7 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 
 											counter += 1
 
-											connector.SetDataValue("Document", identifier, "Setup", StrGet(setup, "UTF-8"))
+											connector.SetDataValue("Document", identifier, "Setup", StrGet(setup, size, "UTF-8"))
 
 											setMultiMapValue(info, "Setup", "Synchronized", true)
 

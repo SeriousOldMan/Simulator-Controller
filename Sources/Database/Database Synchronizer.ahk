@@ -357,16 +357,19 @@ updateSessionDatabase() {
 		usePressures := (inList(A_Args, "-Pressures") != 0)
 		useSetups := (inList(A_Args, "-Setups") != 0)
 		useStrategies := (inList(A_Args, "-Strategies") != 0)
-
+/*
 		id := inList(A_Args, "-ID")
 
 		if id
 			PeriodicTask(synchronizeCommunityDatabase.Bind(A_Args[id + 1], usePressures, useSetups, useStrategies), 10000, kLowPriority).start()
 
 		minutes := inList(A_Args, "-Synchronize")
+*/
+		id := "42812.9640.8993"
+		minutes := 1
 
 		if minutes {
-			minutes := A_Args[minutes + 1]
+			; minutes := A_Args[minutes + 1]
 
 			if (minutes && (minutes != kFalse)) {
 				if ((minutes == true) || (minutes = kTrue))

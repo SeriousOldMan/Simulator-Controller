@@ -2989,6 +2989,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 						loop Files, kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Race Strategies\*.strategy", "F"
 							this.SessionDatabase.removeStrategy(simulator, car, track, A_LoopFileName)
+					case translate("Sessions"):
+						for ignore, type in ["Practice", "Race"]
+							loop Files, this.SessionDatabase.getSessionDirectory(simulator, car, track, type) . "*." . StrLower(type), "F" {
+								SplitPath(A_LoopFileName, , , , &name)
+
+								this.SessionDatabase.removeSession(simulator, car, track, type, name)
+							}
 					case translate("Setups"):
 						code := this.SessionDatabase.getSimulatorCode(simulator)
 

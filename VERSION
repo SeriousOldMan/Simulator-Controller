@@ -1,9 +1,9 @@
 [Development]
 Version=5.8.2.0-dev
 Target=5.8.2.0-release
-Date=07/30/2024
+Date=07/31/2024
 Download=https://www.dropbox.com/scl/fi/32tdi80z2k1a691byhums/Simulator-Controller-5.8.2.0-dev.zip?rlkey=zy9nc72xyiopkzpfuhgeivp55&st=yctjgcg1&dl=1
-Changes=New LLM Runtime, LLM Runtime is now a downloadable preset, New race setting for track types, More detailed lap history for LLMs, New time loss event for the Engineer, New time loss reporting action for Race Engineer, Removed old-fashioned directory selection dialog, Both "Race Center" and "Practice Center" save their sessions to the session database per default, "Practice Center" now supports an auto-save to the session database, Support for practice and race sessions added to "Session Database", Support for import of car setups in "Session Database"
+Changes=New LLM Runtime, LLM Runtime is now a downloadable preset, New race setting for track types, More detailed lap history for LLMs, New time loss event for the Engineer, New time loss reporting action for Race Engineer, Removed old-fashioned directory selection dialog, Both "Race Center" and "Practice Center" save their sessions to the session database per default, "Practice Center" now supports an auto-save to the session database, Support for practice and race sessions added to "Session Database", Support for import of car setups in "Session Database", Synchronization of sessions in the session database
 Components=Media->5.6.1,Configuration->5.8.2,Utilities->5.4.8
 [Release]
 Version=5.8.1.0-release

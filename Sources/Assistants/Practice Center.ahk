@@ -4329,9 +4329,9 @@ class PracticeCenter extends ConfigurationItem {
 						SplitPath(fileName, , &folder, , &fileName)
 
 						DirCreate(folder)
-						deleteFile(folder . "\" . fileName . ".zip")
+						deleteFile(folder . "\" . fileName . ".data")
 
-						RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . folder . "\" . fileName . ".zip'", , "Hide")
+						RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . folder . "\" . fileName . ".data'", , "Hide")
 
 						FileCopy(this.SessionDirectory . "Practice.info", folder . "\" . fileName . ".practice", 1)
 
@@ -4661,7 +4661,7 @@ class PracticeCenter extends ConfigurationItem {
 
 					DirCreate(folder)
 
-					RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . directory . "\" . fileName . ".zip' -DestinationPath '" . folder . "' -Force", , "Hide")
+					RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . directory . "\" . fileName . ".data' -DestinationPath '" . folder . "' -Force", , "Hide")
 				}
 				else
 					folder := ""

@@ -13,7 +13,8 @@
 	 - Sessions saved in the *old* format can still be loaded using the "Load Sessions..." command from the "Session" menu. Hold the control key while selecting "Load Session..." to load an *old* session.
 	 - See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Practice-Center#saving-and-loading-sessions) for more information.
   8. An *Auto Save* setting has been added to the "Practice Center".
-  9. The default location for saving session locally in the "Race Center" has also changed.
+  9. The default location for saving sessions locally has also changed for the "Race Center".
+     - Default location is also the session database.
      - The file format of sessions has also been changed to support this.
 	 - Sessions saved in the *old* format can still be loaded using the "Load Sessions..." command from the "Session" menu. Hold the control key while selecting "Load Session..." to load an *old* session.
      - See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#session-data-management) for more information.

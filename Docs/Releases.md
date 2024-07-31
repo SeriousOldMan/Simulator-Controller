@@ -1,19 +1,19 @@
 ## 5.8.2.0-release 08/03/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. A new LLM Runtime has been implemented.
+  3. Most important, a new LLM Runtime has been implemented.
      - Better support for execution of all or parts of the model on the graphics card.
 	 - Since this runtime is quite large (> 200 MB), it is provided as a downloadable component. Run "Simulator Setup", go to the presets page and install the "Local runtime for LLMs" preset.
 	 - See the completely [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#llm-runtime) for more information.
-  4. The Race Engineer LLM event "damage_collected" has been renamed to "damage_detected".
-  5. A new event and a new action has been defined for the *Reasoning* booster of the Race Engineer. This pair handles reporting of critical time loss after an incident.
+  4. The Race Engineer LLM event "damage_collected" has been renamed to "damage_detected". Revisit your event configuration and include the *updated* event, if necessary.
+  5. A new event and a new action has been defined for the *Reasoning* booster of the Race Engineer. This pair handles reporting of critical time loss after an incident. Revisit your event configuration and include the new event and action, if necessary.
   6. The lap history data supplied to the LLMs has been extended.
   7. The "Practice Center" can now save practice session recordings to the session database.
      - The file format of sessions has been changed to support this.
 	 - Sessions saved in the *old* format can still be loaded using the "Load Sessions..." command from the "Session" menu. Hold the control key while selecting "Load Session..." to load an *old* session.
 	 - See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Practice-Center#saving-and-loading-sessions) for more information.
   8. An *Auto Save* setting has been added to the "Practice Center".
-  9. The default location for saving session locally in the "Race Center" has also changed.
+  9. The default location for saving session locally by the "Race Center" has also changed.
      - The file format of sessions has also been changed to support this.
 	 - Sessions saved in the *old* format can still be loaded using the "Load Sessions..." command from the "Session" menu. Hold the control key while selecting "Load Session..." to load an *old* session.
      - See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#session-data-management) for more information.
@@ -21,7 +21,8 @@
       - Data can be browsed in the "Administration" tab.
 	  - Full support for Export and Import of session data.
 	  - Sessions can be shared within a team using the Team Server. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration) for the "Session Database" configuration.
-  11. "Session Database" now also supports importing of car setups from export archives.
+	  - A special purpose browser for practice and race sessions will be made available with one of the next releases.
+  11. "Session Database" now also supports importing of car setups from exported archives formerly created by the "Session Database".
   12. UI improvements for directory selection dialogs.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-582), especially if you have used the previous LLM Runtime for the "Driving Coach" or the Assistant Boosters.

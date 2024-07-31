@@ -41,6 +41,8 @@ The configuration of the *LLM Runtime* has changed and it is now a downloadable 
 
 The event "damage_collected" has been renamed to "damage_detected". Additionally there is a new event and a new action for the *Reasoning* Booster of the Race Engineer. You may want to update your Events and Actions configuration.
 
+Record practice and team race sessions can now be shared between team members via the Team Server. If you want to use this, run the "Session Database" and include "Sessions" in the replication settings.
+
 ***
 
 ## Release 5.8.1

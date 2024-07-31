@@ -21,7 +21,7 @@
   10. Support for practice and race sessions added to "Session Database".
       - Data can be browsed in the "Administration" tab.
 	  - Full support for Export and Import of session data.
-	  - Sessions can be shared within a team using the Team Server. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration) for the "Session Database" configuration.
+	  - Sessions can be shared within a team using the Team Server. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration) for the "Session Database" configuration. You may want to check your replication settings in the "Session Database".
 	  - A special purpose browser for practice and race sessions will be made available with one of the next releases.
   11. "Session Database" now also supports importing of car setups from exported archives formerly created by the "Session Database".
   12. UI improvements for directory selection dialogs.

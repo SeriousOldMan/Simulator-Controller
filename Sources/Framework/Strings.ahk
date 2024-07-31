@@ -19,7 +19,7 @@ decode(text) {
 	return StrReplace(StrReplace(StrReplace(text, "_#_EQ_#_", "="), "_#_AC_#_", "\"), "_#_CR_#_", "`n")
 }
 
-encodeBinary(buf, size := kUndefined) {
+encodeB16(buf, size := kUndefined) {
 	local result := ""
 
 	if (size == kUndefined)
@@ -33,12 +33,12 @@ encodeBinary(buf, size := kUndefined) {
 	return result
 }
 
-decodeBinary(string) {
+decodeB16(string) {
 	local size := (StrLen(string) >> 1)
 	local buf := Buffer(size)
 
 	loop size
-		NumPut("UChar", A_Index - 1, buf, Integer("0x" . SubStr(string, (A_Index * 2) - 1, 2)))
+		NumPut("UChar", Integer("0x" . SubStr(string, (A_Index * 2) - 1, 2)), buf, A_Index - 1)
 
 	return buf
 }

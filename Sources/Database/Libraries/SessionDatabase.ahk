@@ -2442,7 +2442,7 @@ synchronizeSessions(groups, sessionDB, connector, simulators, timestamp, lastSyn
 										 , getMultiMapValue(info, "Session", "Type")
 										 , getMultiMapValue(info, "Session", "Name")
 										 , connector.GetDataValue("Document", identifier, "Meta")
-										 , decodeBinary(connector.GetDataValue("Document", identifier, "Data"))
+										 , decodeB16(connector.GetDataValue("Document", identifier, "Data"))
 										 , getMultiMapValue(info, "Session", "Size")
 										 , getMultiMapValue(info, "Access", "Share")
 										 , getMultiMapValue(info, "Access", "Synchronize")
@@ -2496,7 +2496,7 @@ synchronizeSessions(groups, sessionDB, connector, simulators, timestamp, lastSyn
 											counter += 1
 
 											connector.SetDataValue("Document", identifier, "Meta", printMultiMap(meta))
-											connector.SetDataValue("Document", identifier, "Data", encodeBinary(session, size))
+											connector.SetDataValue("Document", identifier, "Data", encodeB16(session, size))
 
 											setMultiMapValue(info, "Session", "Synchronized", true)
 
@@ -2556,7 +2556,7 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 					sessionDB.writeSetup(simulator, car, track
 									   , getMultiMapValue(info, "Setup", "Type")
 									   , getMultiMapValue(info, "Setup", "Name")
-									   , getMultiMapValue(info, "Setup", "Encoded") ? decodeBinary(setup) : setup
+									   , getMultiMapValue(info, "Setup", "Encoded") ? decodeB16(setup) : setup
 									   , getMultiMapValue(info, "Setup", "Size")
 									   , getMultiMapValue(info, "Access", "Share")
 									   , getMultiMapValue(info, "Access", "Synchronize")
@@ -2609,7 +2609,7 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 
 											counter += 1
 
-											connector.SetDataValue("Document", identifier, "Setup", encodeBinary(setup, size))
+											connector.SetDataValue("Document", identifier, "Setup", encodeB16(setup, size))
 
 											setMultiMapValue(info, "Setup", "Synchronized", true)
 											setMultiMapValue(info, "Setup", "Encoded", true)

@@ -1410,17 +1410,18 @@ class SessionDatabase extends ConfigurationItem {
 		FileAppend(notes, directory . "\Notes.txt", "UTF-16")
 	}
 
-	getSessionNames(simulator, car, track, &practiceSessions, &raceSessions) {
-		local simulatorCode := this.getSimulatorCode(simulator)
-		local ignore, name, extension
+	getSessionDirectory(simulator, car, track, type) {
+		return (kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\" . this.getCarCode(simulator, car)
+								   . "\" . this.getTrackCode(simulator, track) . "\" . type . " Sessions\")
+	}
 
-		car := this.getCarCode(simulator, car)
-		track := this.getTrackCode(simulator, track)
+	getSessionNames(simulator, car, track, &practiceSessions, &raceSessions) {
+		local name
 
 		if practiceSessions {
 			practiceSessions := []
 
-			loop Files, kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Practice Sessions\*.practice", "F" {
+			loop Files, this.getSessionDirectory(simulator, car, track, "Practice") . "*.practice", "F" {
 				SplitPath(A_LoopFileName, &name)
 
 				practiceSessions.Push(name)
@@ -1430,7 +1431,7 @@ class SessionDatabase extends ConfigurationItem {
 		if raceSessions {
 			raceSessions := []
 
-			loop Files, kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Race Sessions\*.race", "F" {
+			loop Files, this.getSessionDirectory(simulator, car, track, "Practice") . "*.race", "F" {
 				SplitPath(A_LoopFileName, &name)
 
 				raceSessions.Push(name)
@@ -1445,7 +1446,7 @@ class SessionDatabase extends ConfigurationItem {
 		car := this.getCarCode(simulator, car)
 		track := this.getTrackCode(simulator, track)
 
-		fileName := (kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\" . type . " Sessions\" . name)
+		fileName := (this.getSessionDirectory(simulator, car, track, type) . name)
 
 		if !FileExist(fileName . "." . type)
 			fileName := (kDatabaseDirectory . "Community\" . simulatorCode . "\" . car . "\" . track . "\" . type . " Sessions\" . name)
@@ -1481,16 +1482,15 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	readSessionInfo(simulator, car, track, type, name) {
-		local simulatorCode := this.getSimulatorCode(simulator)
 		local fileName, info
 
 		car := this.getCarCode(simulator, car)
 		track := this.getTrackCode(simulator, track)
 
-		fileName := (kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\" . type . " Sessions\" . name . ".info")
+		fileName := (this.getSessionDirectory(simulator, car, track, type) . name . ".info")
 
 		if !FileExist(fileName) {
-			fileName := (kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\" . type . " Sessions\" . name . "." . StrLower(type))
+			fileName := (this.getSessionDirectory(simulator, car, track, type) . name . "." . StrLower(type))
 
 			if FileExist(fileName) {
 				info := newMultiMap()
@@ -1521,13 +1521,12 @@ class SessionDatabase extends ConfigurationItem {
 
 	writeSession(simulator, car, track, type, name, meta, session, size, share, synchronize
 			   , driver := kUndefined, identifier := kUndefined, synchronized := false) {
-		local simulatorCode := this.getSimulatorCode(simulator)
 		local fileName, file, info
 
 		car := this.getCarCode(simulator, car)
 		track := this.getTrackCode(simulator, track)
 
-		fileName := (kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\" . type . " Sessions\")
+		fileName := this.getSessionDirectory(simulator, car, track, type)
 
 		DirCreate(fileName)
 
@@ -1568,21 +1567,14 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	writeSessionInfo(simulator, car, track, type, name, info) {
-		local fileName := (kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\" . this.getCarCode(simulator, car)
-											  . "\" . this.getTrackCode(simulator, track) . "\" . type . " Sessions\" . name . ".info")
-
-		writeMultiMap(fileName, info)
+		writeMultiMap(this.getSessionDirectory(simulator, car, track, type) . name . ".info", info)
 	}
 
 	renameSession(simulator, car, track, type, oldName, newName) {
-		local simulatorCode := this.getSimulatorCode(simulator)
 		local oldFileName, newFileName, info
 
-		car := this.getCarCode(simulator, car)
-		track := this.getTrackCode(simulator, track)
-
-		oldFileName := (kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\" . type . " Sessions\" . oldName)
-		newFileName := (kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\" . type . " Sessions\" . newName)
+		oldFileName := (this.getSessionDirectory(simulator, car, track, type) . oldName)
+		newFileName := (this.getSessionDirectory(simulator, car, track, type) . newName)
 
 		try {
 			FileMove(oldFileName . "." . StrLower(type), newFileName . "." . StrLower(type), 1)
@@ -1605,13 +1597,9 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	removeSession(simulator, car, track, type, name) {
-		local simulatorCode := this.getSimulatorCode(simulator)
 		local fileName, info, identifier, ignore, connector
 
-		car := this.getCarCode(simulator, car)
-		track := this.getTrackCode(simulator, track)
-
-		fileName := (kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\" . type . " Sessions\" . name)
+		fileName := (this.getSessionDirectory(simulator, car, track, type) . name)
 
 		info := readMultiMap(fileName . ".info")
 

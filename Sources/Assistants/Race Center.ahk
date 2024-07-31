@@ -8539,7 +8539,8 @@ class RaceCenter extends ConfigurationItem {
 			local simulator := this.Simulator
 			local car := this.Car
 			local track := this.Track
-			local info, directory, dirName, translator, folder, session, configuration, fileName, newFileName
+			local sessionDB, info, directory, dirName, translator, folder, file, size, dataFile
+			local session, configuration, fileName, newFileName
 
 			this.showMessage(translate("Saving session"))
 
@@ -8615,23 +8616,52 @@ class RaceCenter extends ConfigurationItem {
 
 				if (fileName != "")
 					try {
+						sessionDB := SessionDatabase()
+
 						SplitPath(fileName, , &folder, , &fileName)
 
-						DirCreate(folder)
-						deleteFile(folder . "\" . fileName . ".data")
-
-						RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . folder . "\" . fileName . ".data'", , "Hide")
-
-						FileCopy(this.SessionDirectory . "Session.info", folder . "\" . fileName . ".race", 1)
-
-						info := readMultiMap(folder . "\" . fileName . ".race")
+						info := readMultiMap(this.SessionDirectory . "Session.info")
 
 						if (getMultiMapValue(info, "Creator", "ID", kUndefined) = kUndefined) {
 							setMultiMapValue(info, "Creator", "ID", SessionDatabase.ID)
 							setMultiMapValue(info, "Creator", "Name", SessionDatabase.getUserName())
-
-							writeMultiMap(folder . "\" . fileName . ".race", info)
 						}
+
+						if (normalizeDirectoryPath(folder) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Race"))) {
+							dataFile := temporaryFileName("Race", "zip")
+
+							try {
+								RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
+
+								file := FileOpen(dataFile, "r-wd")
+
+								if file {
+									size := file.Length
+
+									session := Buffer(size)
+
+									file.RawRead(session, size)
+
+									file.Close()
+
+									sessionDB.writeSession(simulator, car, track, "Race", fileName, info, session, size, false, true)
+
+									return
+								}
+							}
+							finally {
+								deleteFile(dataFile)
+							}
+						}
+
+						DirCreate(folder)
+						deleteFile(folder . "\" . fileName . ".zip")
+
+						RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . folder . "\" . fileName . ".zip'", , "Hide")
+
+						FileCopy(this.SessionDirectory . "Session.info", folder . "\" . fileName . ".race", 1)
+
+						writeMultiMap(folder . "\" . fileName . ".race", info)
 					}
 					catch Any as exception {
 						logError(exception)
@@ -9082,6 +9112,7 @@ class RaceCenter extends ConfigurationItem {
 			local track := this.Track
 			local directory := (this.SessionLoaded ? this.SessionLoaded : this.iSessionDirectory)
 			local folder, dirName, fileName, info, lastLap, currentStint, configuration, state
+			local sessionDB, dataFile, data, meta, size, file
 
 			this.Window.Opt("+OwnDialogs")
 
@@ -9105,13 +9136,43 @@ class RaceCenter extends ConfigurationItem {
 				OnMessage(0x44, translateLoadCancelButtons, 0)
 
 				if (fileName != "") {
+					sessionDB := SessionDatabase()
+
 					SplitPath(fileName, , &directory, , &fileName)
 
 					folder := (kTempDirectory . "Sessions\Race_" . Round(Random(1, 100000)))
 
 					DirCreate(folder)
 
-					RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . directory . "\" . fileName . ".data' -DestinationPath '" . folder . "' -Force", , "Hide")
+					if (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Race"))) {
+						dataFile := temporaryFileName("Session", "zip")
+
+						try {
+							session := sessionDB.readSession(simulator, car, track, "Race", fileName, &meta, &size)
+
+							file := FileOpen(dataFile, "w", "")
+
+							if file {
+								file.RawWrite(session, size)
+
+								file.Close()
+
+								RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+							}
+							else
+								folder := ""
+						}
+						catch Any as exception {
+							logError(exception)
+
+							folder := ""
+						}
+						finally {
+							deleteFile(dataFile)
+						}
+					}
+					else
+						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . directory . "\" . fileName . ".zip' -DestinationPath '" . folder . "' -Force", , "Hide")
 				}
 				else
 					folder := ""

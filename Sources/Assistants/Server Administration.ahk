@@ -474,10 +474,14 @@ administrationEditor(configurationOrCommand, arguments*) {
 				contract := ["Expired", "OneTime", "FixedMinutes", "AdditionalMinutes", "Unlimited"][accountContractDropDown]
 
 				if (account == true) {
-					connector.CreateAccount(accountNameEdit, accountEMailEdit, accountPasswordEdit
-										  , accountSessionAccessCheck ? kTrue : kFalse
-										  , accountDataAccessCheck ? kTrue : kFalse
-										  , accountMinutesEdit, contract, accountMinutesEdit)
+					identifier := connector.CreateAccount(accountNameEdit, accountEMailEdit, accountPasswordEdit
+														, accountSessionAccessCheck ? kTrue : kFalse
+														, accountDataAccessCheck ? kTrue : kFalse
+														, accountMinutesEdit, contract, accountMinutesEdit)
+
+					connector.ChangeAccountContract(identifier, contract, accountMinutesEdit)
+					connector.ChangeAccountAccess(identifier, accountSessionAccessCheck ? kTrue : kFalse
+															, accountDataAccessCheck ? kTrue : kFalse)
 				}
 				else {
 					if (accountPasswordEdit != "")

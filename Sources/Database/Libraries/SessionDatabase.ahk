@@ -1415,27 +1415,21 @@ class SessionDatabase extends ConfigurationItem {
 								   . "\" . this.getTrackCode(simulator, track) . "\" . type . " Sessions\")
 	}
 
-	getSessionNames(simulator, car, track, &practiceSessions, &raceSessions) {
+	getSessions(simulator, car, track, type, &names, &infos := false) {
 		local name
 
-		if practiceSessions {
-			practiceSessions := []
+		names := []
 
-			loop Files, this.getSessionDirectory(simulator, car, track, "Practice") . "*.practice", "F" {
-				SplitPath(A_LoopFileName, &name)
+		if infos
+			infos := []
 
-				practiceSessions.Push(name)
-			}
-		}
+		loop Files, this.getSessionDirectory(simulator, car, track, type) . "*." . StrLower(type), "F" {
+			SplitPath(A_LoopFileName, , , , &name)
 
-		if raceSessions {
-			raceSessions := []
+			names.Push(name)
 
-			loop Files, this.getSessionDirectory(simulator, car, track, "Practice") . "*.race", "F" {
-				SplitPath(A_LoopFileName, &name)
-
-				raceSessions.Push(name)
-			}
+			if infos
+				infos.Push(readMultiMap(A_LoopFileFullPath))
 		}
 	}
 

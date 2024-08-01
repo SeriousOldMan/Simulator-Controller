@@ -1367,7 +1367,7 @@ The *Le Mans Ultimate* data API (similar to *rFactor 2*) does not provide a car 
 
 This plugin, which is normally not automatically included and enabled, can export the internal state of Simulator Controller - especially a lot of the knowledge of all Race Assistants and plenty of information about the currently running simulator session - to other applications using a JSON file.
 
-To activate this plugin, add it to the list of active plugins in "Simulator Configuration", or, of you are using the "Simulator Setup" wizard for your configuration work, add the following line to the ["Configuration Patch.ini"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#patching-the-configuration) file:
+To activate this plugin, add it to the list of active plugins in "Simulator Configuration", or, of you are using only the "Simulator Setup" wizard for your configuration work, add the following line to the ["Configuration Patch.ini"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#patching-the-configuration) file:
 
 	[Plugins]
 	Integration=true||

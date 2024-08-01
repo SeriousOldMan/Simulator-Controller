@@ -7371,6 +7371,8 @@ selectPracticeSession(centerOrCommand := false, *) {
 
 		browserGui := Window({Descriptor: "Practice Center.Session Browser", Options: "0x400000"}, translate("Load Session..."))
 
+		browserGui.Opt("+Owner" . centerOrCommand.Window.Hwnd)
+
 		browserGui.Add("ListView", "x8 yp+8 w357 h335 -Multi -LV0x10 AltSubmit vsessionListView", collect(["Session", "Driver", "Date"], translate))
 		browserGui["sessionListView"].OnEvent("DoubleClick", selectPracticeSession.Bind(kOk))
 

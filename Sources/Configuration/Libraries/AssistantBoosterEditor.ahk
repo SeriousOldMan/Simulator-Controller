@@ -224,7 +224,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		editorGui.Add("Text", "x100 yp+7 w" . (width + 8 - 100) . " 0x10 W:Grow")
 		editorGui.SetFont("Norm", "Arial")
 
-		editorGui.Add("Text", "x" . x0 . " yp+20 w105 h23 +0x200", translate("Provider / URL"))
+		editorGui.Add("Text", "x" . x0 . " yp+20 w105 h23 +0x200 vviConversationProviderLabel", translate("Provider / URL"))
 
 		editorGui.Add("DropDownList", "x" . x1 . " yp w100 Choose1 vviConversationProviderDropDown", concatenate([translate("Disabled")], this.Providers)).OnEvent("Change", chooseConversationProvider)
 
@@ -307,7 +307,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		editorGui.Add("Text", "x100 yp+7 w" . (width + 8 - 100) . " 0x10 W:Grow")
 		editorGui.SetFont("Norm", "Arial")
 
-		editorGui.Add("Text", "x" . x0 . " yp+20 w105 h23 +0x200", translate("Provider / URL"))
+		editorGui.Add("Text", "x" . x0 . " yp+20 w105 h23 +0x200 vviAgentProviderLabel", translate("Provider / URL"))
 
 		editorGui.Add("DropDownList", "x" . x1 . " yp w100 Choose1 vviAgentProviderDropDown", concatenate([translate("Disabled")], this.Providers)).OnEvent("Change", chooseAgentProvider)
 
@@ -977,6 +977,8 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 							, "viConversationMaxTokensEdit", "viConversationMaxTokensRange"]
 			this.Control[field].Visible := !llmRuntime
 
+		this.Control["viConversationProviderLabel"].Text := (llmRuntime ? translate("Provider") : translate("Provider / URL"))
+
 		for ignore, field in ["viConversationLLMRTModelLabel", "viConversationLLMRTModelEdit"
 							, "viConversationLLMRTModelButton"
 							, "viConversationLLMRTTokensLabel"
@@ -990,6 +992,8 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 							, "viAgentModelLabel", "viAgentModelDropDown"
 							, "viAgentServiceURLEdit"]
 			this.Control[field].Visible := !llmRuntime
+
+		this.Control["viAgentProviderLabel"].Text := (llmRuntime ? translate("Provider") : translate("Provider / URL"))
 
 		for ignore, field in ["viAgentLLMRTModelLabel", "viAgentLLMRTModelEdit", "viAgentLLMRTModelButton"
 							, "viAgentLLMRTGPULayersLabel", "viAgentLLMRTGPULayersEdit", "viAgentLLMRTGPULayersRange"]

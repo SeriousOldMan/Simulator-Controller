@@ -235,7 +235,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		widget5 := window.Add("Text", "x100 yp+7 w" . (width + 8 - 100) . " 0x10 W:Grow Hidden")
 		window.SetFont("Norm", "Arial")
 
-		widget6 := window.Add("Text", "x" . x0 . " yp+20 w105 h23 +0x200 Hidden", translate("Provider / URL"))
+		widget6 := window.Add("Text", "x" . x0 . " yp+20 w105 h23 +0x200 vdcProviderLabel Hidden", translate("Provider / URL"))
 
 		widget7 := window.Add("DropDownList", "x" . x1 . " yp w100 Choose1 vdcProviderDropDown Hidden", this.Providers)
 		widget7.OnEvent("Change", chooseProvider)
@@ -632,6 +632,8 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		for ignore, field in ["dcServiceKeyLabel", "dcServiceKeyEdit", "dcModelLabel", "dcModelDropDown"
 							, "dcServiceURLEdit", "dcMaxTokensEdit", "dcMaxTokensRange"]
 			this.Control[field].Visible := !llmRuntime
+
+		this.Control["dcProviderLabel"].Text := (llmRuntime ? translate("Provider") : translate("Provider / URL"))
 
 		for ignore, field in ["dcLLMRTModelLabel", "dcLLMRTModelEdit", "dcLLMRTModelButton"
 							, "dcLLMRTTokensLabel", "dcLLMRTMaxTokensEdit", "dcLLMRTMaxTokensRange"

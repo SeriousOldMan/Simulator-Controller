@@ -4574,7 +4574,7 @@ class RaceCenter extends ConfigurationItem {
 			case 8:
 				this.manageTeam()
 			case 10: ; Load Session...
-				this.loadSession(GetKeyState("Ctrl"))
+				this.loadSession(GetKeyState("Ctrl") ? "Import" : (GetKeyState("Shift") ? "Browse" : false))
 			case 11: ; Save Session...
 				if this.HasData
 					this.saveSession(true)
@@ -8655,11 +8655,13 @@ class RaceCenter extends ConfigurationItem {
 						}
 
 						DirCreate(folder)
-						deleteFile(folder . "\" . fileName . ".zip")
+						deleteFile(folder . "\" . fileName . ".data")
 
-						RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . folder . "\" . fileName . ".zip'", , "Hide")
+						dataFile := temporaryFileName("Race", "zip")
 
-						FileCopy(this.SessionDirectory . "Session.info", folder . "\" . fileName . ".race", 1)
+						RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
+
+						FileMove(dataFile, folder . "\" . fileName . ".data", 1)
 
 						writeMultiMap(folder . "\" . fileName . ".race", info)
 					}
@@ -9105,7 +9107,7 @@ class RaceCenter extends ConfigurationItem {
 		this.pushTask(clearSessionAsync)
 	}
 
-	loadSession(import := false) {
+	loadSession(method := false) {
 		loadSessionAsync() {
 			local simulator := this.Simulator
 			local car := this.Car
@@ -9116,28 +9118,32 @@ class RaceCenter extends ConfigurationItem {
 
 			this.Window.Opt("+OwnDialogs")
 
-			if import {
+			if (method = "Import") {
 				OnMessage(0x44, translateLoadCancelButtons)
-				folder := withBlockedWindows(FileSelect, "D1", directory, translate("Load session..."))
+				folder := withBlockedWindows(FileSelect, "D1", directory, translate("Load Session..."))
 				OnMessage(0x44, translateLoadCancelButtons, 0)
 			}
 			else {
-				if (simulator && car && track) {
-					dirName := (SessionDatabase.DatabasePath . "User\" . SessionDatabase.getSimulatorCode(simulator)
-							  . "\" . car . "\" . track . "\Race Sessions")
+				sessionDB := SessionDatabase()
 
-					DirCreate(dirName)
+				if (method = "Browse")
+					fileName := selectRaceSession(this)
+				else {
+					if (simulator && car && track) {
+						dirName := (SessionDatabase.DatabasePath . "User\" . SessionDatabase.getSimulatorCode(simulator)
+								  . "\" . car . "\" . track . "\Race Sessions")
+
+						DirCreate(dirName)
+					}
+					else
+						dirName := (SessionDatabase.DatabasePath . "User\")
+
+					OnMessage(0x44, translateLoadCancelButtons)
+					fileName := withBlockedWindows(FileSelect, 1, dirName, translate("Load Session..."), "Race Session (*.race)")
+					OnMessage(0x44, translateLoadCancelButtons, 0)
 				}
-				else
-					dirName := (SessionDatabase.DatabasePath . "User\")
 
-				OnMessage(0x44, translateLoadCancelButtons)
-				fileName := withBlockedWindows(FileSelect, 1, dirName, translate("Load Session..."), "Race Session (*.race)")
-				OnMessage(0x44, translateLoadCancelButtons, 0)
-
-				if (fileName != "") {
-					sessionDB := SessionDatabase()
-
+				if (fileName && (fileName != "")) {
 					SplitPath(fileName, , &directory, , &fileName)
 
 					folder := (kTempDirectory . "Sessions\Race_" . Round(Random(1, 100000)))
@@ -9171,8 +9177,15 @@ class RaceCenter extends ConfigurationItem {
 							deleteFile(dataFile)
 						}
 					}
-					else
+					else {
+						dataFile := temporaryFileName("Race", "zip")
+
+						FileCopy(directory . "\" . fileName . ".data", dataFile, 1)
+
 						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . directory . "\" . fileName . ".zip' -DestinationPath '" . folder . "' -Force", , "Hide")
+
+						deleteFile(dataFile)
+					}
 				}
 				else
 					folder := ""
@@ -12558,6 +12571,74 @@ convertValue(name, value) {
 		return convertUnit("Volume", value)
 	else
 		return value
+}
+
+selectRaceSession(centerOrCommand := false, *) {
+	local x, y, names, infos, index, name, sessionDB
+
+	static browserGui
+	static result := false
+
+	if ((centerOrCommand == kOk) || (centerOrCommand == kCancel))
+		result := centerOrCommand
+	else {
+		sessionDB := SessionDatabase()
+
+		result := false
+
+		browserGui := Window({Descriptor: "Race Center.Session Browser", Options: "0x400000"}, translate("Load Session..."))
+
+		browserGui.Opt("+Owner" . centerOrCommand.Window.Hwnd)
+
+		browserGui.Add("ListView", "x8 yp+8 w357 h335 -Multi -LV0x10 AltSubmit vsessionListView", collect(["Session", "Driver", "Date"], translate))
+		browserGui["sessionListView"].OnEvent("DoubleClick", selectRaceSession.Bind(kOk))
+
+		sessionDB.getSessions(centerOrCommand.Simulator, centerOrCommand.Car, centerOrCommand.Track, "Race", &names, &infos := true)
+
+		for index, name in names
+			browserGui["sessionListView"].Add("", name, getMultiMapValue(infos[index], "Creator", "Name")
+												, FormatTime(getMultiMapValue(infos[index], "Session", "Date"), "ShortDate") . translate(" - ")
+												. FormatTime(getMultiMapValue(infos[index], "Session", "Date"), "Time"))
+
+		if (names.Length > 1)
+			browserGui["sessionListView"].Modify(1, "Select +Vis")
+
+		browserGui["sessionListView"].ModifyCol()
+
+		loop browserGui["sessionListView"].GetCount("Col")
+			browserGui["sessionListView"].ModifyCol(A_Index, "AutoHdr")
+
+		browserGui.Add("Button", "x105 yp+345 w80 h23 Default", translate("Load")).OnEvent("Click", selectRaceSession.Bind(kOk))
+		browserGui.Add("Button", "x193 yp w80 h23", translate("&Cancel")).OnEvent("Click", selectRaceSession.Bind(kCancel))
+
+		browserGui.Show("AutoSize Center")
+
+		if getWindowPosition("Race Center.Session Browser", &x, &y)
+			browserGui.Show("x" . x . " y" . y)
+		else
+			browserGui.Show()
+
+		try {
+			loop
+				Sleep(100)
+			until result
+
+			if (result = kOk) {
+				index := browserGui["sessionListView"].GetNext()
+
+				if index
+					return (sessionDB.getSessionDirectory(centerOrCommand.Simulator, centerOrCommand.Car, centerOrCommand.Track, "Race")
+						  . browserGui["sessionListView"].GetText(index) . ".race")
+				else
+					return false
+			}
+			else
+				return false
+		}
+		finally {
+			browserGui.Destroy()
+		}
+	}
 }
 
 manageTeam(raceCenterOrCommand, teamDrivers := false, arguments*) {

@@ -46,6 +46,7 @@
 ;;;                   Private Constant Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+global kOk := "Ok"
 global kClose := "Close"
 global kSave := "Save"
 global kEvent := "Event"
@@ -2337,7 +2338,7 @@ class PracticeCenter extends ConfigurationItem {
 				else
 					this.clearSession()
 			case 9: ; Load Session...
-				this.loadSession(GetKeyState("Ctrl"))
+				this.loadSession(GetKeyState("Ctrl") ? "Import" : (GetKeyState("Shift") ? "Browse" : false))
 			case 10: ; Save Session...
 				if this.HasData
 					this.saveSession(true)
@@ -4365,9 +4366,13 @@ class PracticeCenter extends ConfigurationItem {
 						}
 
 						DirCreate(folder)
-						deleteFile(folder . "\" . fileName . ".zip")
+						deleteFile(folder . "\" . fileName . ".data")
 
-						RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . folder . "\" . fileName . ".zip'", , "Hide")
+						dataFile := temporaryFileName("Practice", "zip")
+
+						RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
+
+						FileMove(dataFile, folder . "\" . fileName . ".data", 1)
 
 						writeMultiMap(folder . "\" . fileName . ".practice", info)
 					}
@@ -4652,38 +4657,41 @@ class PracticeCenter extends ConfigurationItem {
 				}
 	}
 
-	loadSession(import := false) {
+	loadSession(method := false) {
 		loadSessionAsync() {
 			local simulator := this.Simulator
 			local car := this.Car
 			local track := this.Track
 			local folder := ((this.SessionMode = "Loaded") ? this.SessionLoaded : this.iSessionDirectory)
-			local sessionDB, dirName, fileName, info, lastLap, currentRun, dataFile, data, meta, size, file
+			local sessionDB, dirName, fileName, info, lastLap, currentRun, dataFile, data, meta, size, file, tempFile
 
 			this.Window.Opt("+OwnDialogs")
 
-			if import {
+			if (method = "Import") {
 				OnMessage(0x44, translateLoadCancelButtons)
 				folder := withBlockedWindows(FileSelect, "D1", folder, translate("Load session..."))
 				OnMessage(0x44, translateLoadCancelButtons, 0)
 			}
 			else {
-				if (simulator && car && track) {
-					dirName := (SessionDatabase.DatabasePath . "User\" . SessionDatabase.getSimulatorCode(simulator)
-							  . "\" . car . "\" . track . "\Practice Sessions")
+				sessionDB := SessionDatabase()
 
-					DirCreate(dirName)
+				if (method = "Browse")
+					fileName := selectPracticeSession(this)
+				else {
+					if (simulator && car && track) {
+						dirName := normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Practice"))
+
+						DirCreate(dirName)
+					}
+					else
+						dirName := ""
+
+					OnMessage(0x44, translateLoadCancelButtons)
+					fileName := withBlockedWindows(FileSelect, 1, dirName, translate("Load Session..."), "Practice Session (*.practice)")
+					OnMessage(0x44, translateLoadCancelButtons, 0)
 				}
-				else
-					dirName := ""
 
-				OnMessage(0x44, translateLoadCancelButtons)
-				fileName := withBlockedWindows(FileSelect, 1, dirName, translate("Load Session..."), "Practice Session (*.practice)")
-				OnMessage(0x44, translateLoadCancelButtons, 0)
-
-				if (fileName != "") {
-					sessionDB := SessionDatabase()
-
+				if (fileName && (fileName != "")) {
 					SplitPath(fileName, , &directory, , &fileName)
 
 					folder := (kTempDirectory . "Sessions\Practice_" . Round(Random(1, 100000)))
@@ -4717,8 +4725,15 @@ class PracticeCenter extends ConfigurationItem {
 							deleteFile(dataFile)
 						}
 					}
-					else
-						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . directory . "\" . fileName . ".zip' -DestinationPath '" . folder . "' -Force", , "Hide")
+					else {
+						dataFile := temporaryFileName("Practice", "zip")
+
+						FileCopy(directory . "\" . fileName . ".data", dataFile, 1)
+
+						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+
+						deleteFile(dataFile)
+					}
 				}
 				else
 					folder := ""
@@ -7351,6 +7366,74 @@ class RecommendationWindow extends Window {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+selectPracticeSession(centerOrCommand := false, *) {
+	local x, y, names, infos, index, name, sessionDB
+
+	static browserGui
+	static result := false
+
+	if ((centerOrCommand == kOk) || (centerOrCommand == kCancel))
+		result := centerOrCommand
+	else {
+		sessionDB := SessionDatabase()
+
+		result := false
+
+		browserGui := Window({Descriptor: "Practice Center.Session Browser", Options: "0x400000"}, translate("Load Session..."))
+
+		browserGui.Opt("+Owner" . centerOrCommand.Window.Hwnd)
+
+		browserGui.Add("ListView", "x8 yp+8 w357 h335 -Multi -LV0x10 AltSubmit vsessionListView", collect(["Session", "Driver", "Date"], translate))
+		browserGui["sessionListView"].OnEvent("DoubleClick", selectPracticeSession.Bind(kOk))
+
+		sessionDB.getSessions(centerOrCommand.Simulator, centerOrCommand.Car, centerOrCommand.Track, "Practice", &names, &infos := true)
+
+		for index, name in names
+			browserGui["sessionListView"].Add("", name, getMultiMapValue(infos[index], "Creator", "Name")
+												, FormatTime(getMultiMapValue(infos[index], "Session", "Date"), "ShortDate") . translate(" - ")
+												. FormatTime(getMultiMapValue(infos[index], "Session", "Date"), "Time"))
+
+		if (names.Length > 1)
+			browserGui["sessionListView"].Modify(1, "Select +Vis")
+
+		browserGui["sessionListView"].ModifyCol()
+
+		loop browserGui["sessionListView"].GetCount("Col")
+			browserGui["sessionListView"].ModifyCol(A_Index, "AutoHdr")
+
+		browserGui.Add("Button", "x105 yp+345 w80 h23 Default", translate("Load")).OnEvent("Click", selectPracticeSession.Bind(kOk))
+		browserGui.Add("Button", "x193 yp w80 h23", translate("&Cancel")).OnEvent("Click", selectPracticeSession.Bind(kCancel))
+
+		browserGui.Show("AutoSize Center")
+
+		if getWindowPosition("Practice Center.Session Browser", &x, &y)
+			browserGui.Show("x" . x . " y" . y)
+		else
+			browserGui.Show()
+
+		try {
+			loop
+				Sleep(100)
+			until result
+
+			if (result = kOk) {
+				index := browserGui["sessionListView"].GetNext()
+
+				if index
+					return (sessionDB.getSessionDirectory(centerOrCommand.Simulator, centerOrCommand.Car, centerOrCommand.Track, "Practice")
+						  . browserGui["sessionListView"].GetText(index) . ".practice")
+				else
+					return false
+			}
+			else
+				return false
+		}
+		finally {
+			browserGui.Destroy()
+		}
+	}
+}
 
 recommendDataRun(centerOrCommand := false, arguments*) {
 	local availableFuelData, availableTyreData

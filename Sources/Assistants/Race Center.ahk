@@ -8655,11 +8655,13 @@ class RaceCenter extends ConfigurationItem {
 						}
 
 						DirCreate(folder)
-						deleteFile(folder . "\" . fileName . ".zip")
+						deleteFile(folder . "\" . fileName . ".data")
 
-						RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . folder . "\" . fileName . ".zip'", , "Hide")
+						dataFile := temporaryFileName("Race", "zip")
 
-						FileCopy(this.SessionDirectory . "Session.info", folder . "\" . fileName . ".race", 1)
+						RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
+
+						FileMove(dataFile, folder . "\" . fileName . ".data", 1)
 
 						writeMultiMap(folder . "\" . fileName . ".race", info)
 					}
@@ -9175,8 +9177,15 @@ class RaceCenter extends ConfigurationItem {
 							deleteFile(dataFile)
 						}
 					}
-					else
+					else {
+						dataFile := temporaryFileName("Race", "zip")
+
+						FileCopy(directory . "\" . fileName . ".data", dataFile, 1)
+
 						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . directory . "\" . fileName . ".zip' -DestinationPath '" . folder . "' -Force", , "Hide")
+
+						deleteFile(dataFile)
+					}
 				}
 				else
 					folder := ""

@@ -4366,9 +4366,13 @@ class PracticeCenter extends ConfigurationItem {
 						}
 
 						DirCreate(folder)
-						deleteFile(folder . "\" . fileName . ".zip")
+						deleteFile(folder . "\" . fileName . ".data")
 
-						RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . folder . "\" . fileName . ".zip'", , "Hide")
+						dataFile := temporaryFileName("Practice", "zip")
+
+						RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
+
+						FileMove(dataFile, folder . "\" . fileName . ".data", 1)
 
 						writeMultiMap(folder . "\" . fileName . ".practice", info)
 					}
@@ -4659,7 +4663,7 @@ class PracticeCenter extends ConfigurationItem {
 			local car := this.Car
 			local track := this.Track
 			local folder := ((this.SessionMode = "Loaded") ? this.SessionLoaded : this.iSessionDirectory)
-			local sessionDB, dirName, fileName, info, lastLap, currentRun, dataFile, data, meta, size, file
+			local sessionDB, dirName, fileName, info, lastLap, currentRun, dataFile, data, meta, size, file, tempFile
 
 			this.Window.Opt("+OwnDialogs")
 
@@ -4721,8 +4725,15 @@ class PracticeCenter extends ConfigurationItem {
 							deleteFile(dataFile)
 						}
 					}
-					else
-						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . directory . "\" . fileName . ".zip' -DestinationPath '" . folder . "' -Force", , "Hide")
+					else {
+						dataFile := temporaryFileName("Practice", "zip")
+
+						FileCopy(directory . "\" . fileName . ".data", dataFile, 1)
+
+						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+
+						deleteFile(dataFile)
+					}
 				}
 				else
 					folder := ""

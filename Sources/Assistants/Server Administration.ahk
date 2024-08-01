@@ -154,8 +154,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 				index := inList(["Expired", "OneTime", "FixedMinutes", "AdditionalMinutes", "Unlimited"], account["Contract"])
 
 				listView.Add("", account["Name"], account["EMail"]
-							   , (account["SessionAccess"] = "true") ? translate("Yes") : translate("No")
-							   , (account["DataAccess"] = "true") ? translate("Yes") : translate("No")
+							   , (account["SessionAccess"] = kTrue) ? translate("Yes") : translate("No")
+							   , (account["DataAccess"] = kTrue) ? translate("Yes") : translate("No")
 							   , translate(["Expired", "One-Time", "Fixed", "Additional", "Unlimited"][index]) . translate(" (") . account["ContractMinutes"] . translate(")")
 							   , account["AvailableMinutes"])
 			}

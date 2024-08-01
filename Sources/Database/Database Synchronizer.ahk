@@ -358,7 +358,6 @@ updateSessionDatabase() {
 		useSetups := (inList(A_Args, "-Setups") != 0)
 		useStrategies := (inList(A_Args, "-Strategies") != 0)
 
-/*
 		id := inList(A_Args, "-ID")
 
 		if id
@@ -368,13 +367,7 @@ updateSessionDatabase() {
 
 		if minutes {
 			minutes := A_Args[minutes + 1]
-*/
 
-		id := "42812.9640.8993"
-
-		minutes := 1
-
-		if true {
 			if (minutes && (minutes != kFalse)) {
 				if ((minutes == true) || (minutes = kTrue))
 					minutes := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Session Database.ini")

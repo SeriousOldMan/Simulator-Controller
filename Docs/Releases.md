@@ -1,4 +1,4 @@
-## 5.8.2.0-release 08/03/24 (planned)
+## 5.8.2.0-release 08/02/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Most important, a new LLM Runtime has been implemented.

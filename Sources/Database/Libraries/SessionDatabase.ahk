@@ -2441,14 +2441,13 @@ synchronizeSessions(groups, sessionDB, connector, simulators, timestamp, lastSyn
 					sessionDB.writeSession(simulator, car, track
 										 , getMultiMapValue(info, "Session", "Type")
 										 , getMultiMapValue(info, "Session", "Name")
-										 , connector.GetDataValue("Document", identifier, "Meta")
+										 , parseMultiMap(connector.GetDataValue("Document", identifier, "Meta"))
 										 , decodeB16(connector.GetDataValue("Document", identifier, "Data"))
 										 , getMultiMapValue(info, "Session", "Size")
 										 , getMultiMapValue(info, "Access", "Share")
 										 , getMultiMapValue(info, "Access", "Synchronize")
 										 , getMultiMapValue(info, "Origin", "Driver")
-										 , getMultiMapValue(info, "Origin", "Identifier")
-										 , true)
+										 , identifier, true)
 				}
 			}
 		}
@@ -2561,8 +2560,7 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 									   , getMultiMapValue(info, "Access", "Share")
 									   , getMultiMapValue(info, "Access", "Synchronize")
 									   , getMultiMapValue(info, "Origin", "Driver")
-									   , getMultiMapValue(info, "Origin", "Identifier")
-									   , true)
+									   , identifier, true)
 				}
 			}
 		}

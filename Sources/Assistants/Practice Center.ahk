@@ -4284,6 +4284,7 @@ class PracticeCenter extends ConfigurationItem {
 				setMultiMapValue(info, "Session", "Simulator", simulator)
 				setMultiMapValue(info, "Session", "Car", car)
 				setMultiMapValue(info, "Session", "Track", track)
+				setMultiMapValue(info, "Session", "Driver", SessionDatabase.ID)
 
 				setMultiMapValue(info, "Weather", "Weather", this.Weather)
 				setMultiMapValue(info, "Weather", "Weather10Min", this.Weather10Min)
@@ -7368,7 +7369,7 @@ class RecommendationWindow extends Window {
 ;;;-------------------------------------------------------------------------;;;
 
 selectPracticeSession(centerOrCommand := false, *) {
-	local x, y, names, infos, index, name, sessionDB
+	local x, y, names, infos, index, name, sessionDB, driverName, simulator
 
 	static browserGui
 	static result := false
@@ -7387,12 +7388,26 @@ selectPracticeSession(centerOrCommand := false, *) {
 		browserGui.Add("ListView", "x8 yp+8 w357 h335 -Multi -LV0x10 AltSubmit vsessionListView", collect(["Session", "Driver", "Date"], translate))
 		browserGui["sessionListView"].OnEvent("DoubleClick", selectPracticeSession.Bind(kOk))
 
-		sessionDB.getSessions(centerOrCommand.Simulator, centerOrCommand.Car, centerOrCommand.Track, "Practice", &names, &infos := true)
+		simulator := centerOrCommand.Simulator
 
-		for index, name in names
-			browserGui["sessionListView"].Add("", name, getMultiMapValue(infos[index], "Creator", "Name")
+		sessionDB.getSessions(simulator, centerOrCommand.Car, centerOrCommand.Track, "Practice", &names, &infos := true)
+
+		for index, name in names {
+			if getMultiMapValue(infos[index], "Session", "Driver", false)
+				driverName := SessionDatabase.getDriverName(simulator, getMultiMapValue(infos[index], "Session", "Driver"))
+			else
+				driverName := false
+
+			if !driverName
+				driverName := getMultiMapValue(infos[index], "Creator", "Name")
+
+			if !driverName
+				driverName := SessionDatabase.getUserName()
+
+			browserGui["sessionListView"].Add("", name, driverName
 												, FormatTime(getMultiMapValue(infos[index], "Session", "Date"), "ShortDate") . translate(" - ")
 												. FormatTime(getMultiMapValue(infos[index], "Session", "Date"), "Time"))
+		}
 
 		if (names.Length > 1)
 			browserGui["sessionListView"].Modify(1, "Select +Vis")

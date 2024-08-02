@@ -18,7 +18,7 @@
      - The file format of sessions has also been changed to support this.
 	 - Sessions saved in the *old* format can still be loaded using the "Load Sessions..." command from the "Session" menu. Hold the control key while selecting "Load Session..." to load an *old* session.
      - See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#session-data-management) for more information.
-  10. Support for practice and race sessions added to "Session Database".
+  10. Support for practice and race sessions has been added to "Session Database".
       - Data can be browsed in the "Administration" tab.
 	  - Full support for Export and Import of session data.
 	  - Sessions can be shared within a team using the Team Server. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration) for the "Session Database" configuration. You may want to check your replication settings in the "Session Database".

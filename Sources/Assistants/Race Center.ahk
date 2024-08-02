@@ -12574,7 +12574,7 @@ convertValue(name, value) {
 }
 
 selectRaceSession(centerOrCommand := false, *) {
-	local x, y, names, infos, index, name, sessionDB
+	local x, y, names, infos, index, name, sessionDB, driverName
 
 	static browserGui
 	static result := false
@@ -12590,15 +12590,21 @@ selectRaceSession(centerOrCommand := false, *) {
 
 		browserGui.Opt("+Owner" . centerOrCommand.Window.Hwnd)
 
-		browserGui.Add("ListView", "x8 yp+8 w357 h335 -Multi -LV0x10 AltSubmit vsessionListView", collect(["Session", "Driver", "Date"], translate))
+		browserGui.Add("ListView", "x8 yp+8 w357 h335 -Multi -LV0x10 AltSubmit vsessionListView", collect(["Session", "Creator", "Date"], translate))
 		browserGui["sessionListView"].OnEvent("DoubleClick", selectRaceSession.Bind(kOk))
 
 		sessionDB.getSessions(centerOrCommand.Simulator, centerOrCommand.Car, centerOrCommand.Track, "Race", &names, &infos := true)
 
-		for index, name in names
-			browserGui["sessionListView"].Add("", name, getMultiMapValue(infos[index], "Creator", "Name")
+		for index, name in names {
+			driverName := getMultiMapValue(infos[index], "Creator", "Name", false)
+
+			if !driverName
+				driverName := SessionDatabase.getUserName()
+
+			browserGui["sessionListView"].Add("", name, driverName
 												, FormatTime(getMultiMapValue(infos[index], "Session", "Date"), "ShortDate") . translate(" - ")
 												. FormatTime(getMultiMapValue(infos[index], "Session", "Date"), "Time"))
+		}
 
 		if (names.Length > 1)
 			browserGui["sessionListView"].Modify(1, "Select +Vis")

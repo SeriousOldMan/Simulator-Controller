@@ -722,12 +722,16 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
-	SessionDirectory {
+	SessionDirectory[qualified := true] {
 		Get {
-			if this.SessionActive
-				return (this.iSessionDirectory . this.iSessionName . "\")
-			else if this.SessionLoaded
-				return this.SessionLoaded
+			if qualified {
+				if this.SessionActive
+					return (this.iSessionDirectory . this.iSessionName . "\")
+				else if this.SessionLoaded
+					return this.SessionLoaded
+				else
+					return this.iSessionDirectory
+			}
 			else
 				return this.iSessionDirectory
 		}
@@ -4574,7 +4578,7 @@ class RaceCenter extends ConfigurationItem {
 			case 8:
 				this.manageTeam()
 			case 10: ; Load Session...
-				this.loadSession(GetKeyState("Ctrl") ? "Import" : (GetKeyState("Shift") ? "Browse" : false))
+				this.loadSession(GetKeyState("Ctrl") ? "Import" : "Browse")
 			case 11: ; Save Session...
 				if this.HasData
 					this.saveSession(true)
@@ -7833,7 +7837,7 @@ class RaceCenter extends ConfigurationItem {
 		static hadLastLap := false
 		static nextPitstopUpdate := false
 
-		if (this.SessionActive && this.Synchronize) {
+		if this.SessionActive {
 			session := this.SelectedSession[true]
 
 			try {
@@ -7885,121 +7889,123 @@ class RaceCenter extends ConfigurationItem {
 				this.syncPlan()
 				this.syncStrategy()
 
-				if sessionActive {
-					newLaps := false
-					newData := false
-
-					selectedLap := this.LapsListView.GetNext()
-
-					if selectedLap
-						selectedLap := (selectedLap == this.LapsListView.GetCount())
-
-					selectedStint := this.StintsListView.GetNext()
-
-					if selectedStint
-						selectedStint := (selectedStint == this.StintsListView.GetCount())
-
-					if lastLap {
-						newLaps := this.syncLaps(lastLap)
-
-						if this.syncRaceReport() {
-							newData := true
-
-							newReports := true
-						}
-						else
-							newReports := false
-
-						if this.syncPitstops(newLaps) {
-							newData := true
-
-							if this.LastLap
-								nextPitstopUpdate := (this.LastLap.Nr + 2)
-						}
-
-						if this.syncTelemetry()
-							newData := true
-
-						if this.syncTyrePressures()
-							newData := true
-
-						this.updatePitstops()
-
-						if initial {
-							try {
-								state := this.Connector.GetSessionValue(session, "Pitstop State")
-
-								if (state && (state != ""))
-									this.loadPitstopState(parseMultiMap(state))
-							}
-							catch Any as exception {
-								logError(exception)
-							}
-						}
-
-						forcePitstopUpdate := (this.LastLap && (this.LastLap.Nr = nextPitstopUpdate))
-
-						if this.syncPitstopsDetails(forcePitstopUpdate || initial)
-							newData := true
-
-						if forcePitstopUpdate
-							nextPitstopUpdate := false
-
-						if (this.LastLap && (this.SelectedReport == "Track"))
-							if this.syncTrackMap()
-								newData := true
-					}
-					else {
+				if this.Synchronize {
+					if sessionActive {
 						newLaps := false
 						newData := false
-						newReports := false
-					}
 
-					if newLaps {
-						this.showMessage(translate("Saving session"))
+						selectedLap := this.LapsListView.GetNext()
 
-						this.syncSessionStore(initial)
-					}
+						if selectedLap
+							selectedLap := (selectedLap == this.LapsListView.GetCount())
 
-					if (newData || newLaps)
-						this.updateReports()
+						selectedStint := this.StintsListView.GetNext()
 
-					if newLaps {
-						if (selectedLap && (this.SelectedDetailReport = "Lap")) {
-							this.LapsListView.Modify(this.LapsListView.GetCount(), "Select Vis")
+						if selectedStint
+							selectedStint := (selectedStint == this.StintsListView.GetCount())
 
-							this.showLapDetails(this.LastLap)
+						if lastLap {
+							newLaps := this.syncLaps(lastLap)
+
+							if this.syncRaceReport() {
+								newData := true
+
+								newReports := true
+							}
+							else
+								newReports := false
+
+							if this.syncPitstops(newLaps) {
+								newData := true
+
+								if this.LastLap
+									nextPitstopUpdate := (this.LastLap.Nr + 2)
+							}
+
+							if this.syncTelemetry()
+								newData := true
+
+							if this.syncTyrePressures()
+								newData := true
+
+							this.updatePitstops()
+
+							if initial {
+								try {
+									state := this.Connector.GetSessionValue(session, "Pitstop State")
+
+									if (state && (state != ""))
+										this.loadPitstopState(parseMultiMap(state))
+								}
+								catch Any as exception {
+									logError(exception)
+								}
+							}
+
+							forcePitstopUpdate := (this.LastLap && (this.LastLap.Nr = nextPitstopUpdate))
+
+							if this.syncPitstopsDetails(forcePitstopUpdate || initial)
+								newData := true
+
+							if forcePitstopUpdate
+								nextPitstopUpdate := false
+
+							if (this.LastLap && (this.SelectedReport == "Track"))
+								if this.syncTrackMap()
+									newData := true
+						}
+						else {
+							newLaps := false
+							newData := false
+							newReports := false
 						}
 
-						if (selectedStint && (this.SelectedDetailReport = "Stint")) {
-							this.StintsListView.Modify(this.StintsListView.GetCount(), "Select Vis")
+						if newLaps {
+							this.showMessage(translate("Saving session"))
 
-							this.showStintDetails(this.CurrentStint)
+							this.syncSessionStore(initial)
 						}
 
-						if (this.SelectedDetailReport = "Plan") {
-							if (currentStint != this.CurrentStint)
-								this.showPlanDetails()
+						if (newData || newLaps)
+							this.updateReports()
+
+						if newLaps {
+							if (selectedLap && (this.SelectedDetailReport = "Lap")) {
+								this.LapsListView.Modify(this.LapsListView.GetCount(), "Select Vis")
+
+								this.showLapDetails(this.LastLap)
+							}
+
+							if (selectedStint && (this.SelectedDetailReport = "Stint")) {
+								this.StintsListView.Modify(this.StintsListView.GetCount(), "Select Vis")
+
+								this.showStintDetails(this.CurrentStint)
+							}
+
+							if (this.SelectedDetailReport = "Plan") {
+								if (currentStint != this.CurrentStint)
+									this.showPlanDetails()
+							}
+							else if (this.SelectedDetailReport = "Session")
+								this.showSessionSummary()
+							else if (this.SelectedDetailReport = "Drivers")
+								this.showDriverStatistics()
 						}
-						else if (this.SelectedDetailReport = "Session")
-							this.showSessionSummary()
-						else if (this.SelectedDetailReport = "Drivers")
-							this.showDriverStatistics()
-					}
-					else if newReports {
-						if (selectedLap && (this.SelectedDetailReport = "Lap")) {
-							this.LapsListView.Modify(this.LapsListView.GetCount(), "Select Vis")
+						else if newReports {
+							if (selectedLap && (this.SelectedDetailReport = "Lap")) {
+								this.LapsListView.Modify(this.LapsListView.GetCount(), "Select Vis")
 
-							this.showLapDetails(this.LastLap)
+								this.showLapDetails(this.LastLap)
+							}
 						}
-					}
-					else if (!newLaps && !this.SessionFinished) {
-						finished := parseObject(this.Connector.GetSession(this.SelectedSession[true])).Finished
+						else if (!newLaps && !this.SessionFinished) {
+							finished := parseObject(this.Connector.GetSession(this.SelectedSession[true])).Finished
 
-						if (finished && (finished = "true")) {
-							this.saveSession()
+							if (finished && (finished = "true")) {
+								this.saveSession()
 
-							this.iSessionFinished := true
+								this.iSessionFinished := true
+							}
 						}
 					}
 				}
@@ -9112,7 +9118,7 @@ class RaceCenter extends ConfigurationItem {
 			local simulator := this.Simulator
 			local car := this.Car
 			local track := this.Track
-			local directory := (this.SessionLoaded ? this.SessionLoaded : this.iSessionDirectory)
+			local directory := (this.SessionLoaded ? this.SessionLoaded : this.SessionDirectory[false])
 			local folder, dirName, fileName, info, lastLap, currentStint, configuration, state
 			local sessionDB, dataFile, data, meta, size, file
 
@@ -9127,7 +9133,7 @@ class RaceCenter extends ConfigurationItem {
 				sessionDB := SessionDatabase()
 
 				if (method = "Browse")
-					fileName := selectRaceSession(this)
+					fileName := selectRaceSession(this, &simulator, &car, &track)
 				else {
 					if (simulator && car && track) {
 						dirName := (SessionDatabase.DatabasePath . "User\" . SessionDatabase.getSimulatorCode(simulator)
@@ -9143,14 +9149,17 @@ class RaceCenter extends ConfigurationItem {
 					OnMessage(0x44, translateLoadCancelButtons, 0)
 				}
 
-				if (fileName && (fileName != "")) {
+				if (fileName && InStr(FileExist(fileName), "D"))
+					folder := fileName
+				else if (fileName && (fileName != "")) {
 					SplitPath(fileName, , &directory, , &fileName)
 
 					folder := (kTempDirectory . "Sessions\Race_" . Round(Random(1, 100000)))
 
 					DirCreate(folder)
-
-					if (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Race"))) {
+msgbox 1
+					if (simulator && car && track
+					 && (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Race")))) {
 						dataFile := temporaryFileName("Session", "zip")
 
 						try {
@@ -9182,7 +9191,7 @@ class RaceCenter extends ConfigurationItem {
 
 						FileCopy(directory . "\" . fileName . ".data", dataFile, 1)
 
-						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . directory . "\" . fileName . ".zip' -DestinationPath '" . folder . "' -Force", , "Hide")
+						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
 
 						deleteFile(dataFile)
 					}
@@ -12573,45 +12582,192 @@ convertValue(name, value) {
 		return value
 }
 
-selectRaceSession(centerOrCommand := false, *) {
-	local x, y, names, infos, index, name, sessionDB
+selectRaceSession(centerOrCommand := false, arguments*) {
+	local x, y, names, infos, index, name
+	local carNames, trackNames, newSimulator, newCar, newTrack, force, dirName
+
+	static sessionDB := false
+
+	static center := false
 
 	static browserGui
 	static result := false
 
+	static simulators := false
+	static cars := false
+	static tracks := false
+
+	static simulator := false
+	static car := false
+	static track := false
+
+	static fileName := false
+
+	selectSimulator(*) {
+		try
+			selectRaceSession("ChooseSimulator", simulators[browserGui["simulatorDropDown"].Value])
+	}
+
+	selectCar(*) {
+		try
+			selectRaceSession("ChooseCar", cars[browserGui["carDropDown"].Value])
+	}
+
+	selectTrack(*) {
+		try
+			selectRaceSession("ChooseTrack", tracks[browserGui["trackDropDown"].Value])
+	}
+
 	if ((centerOrCommand == kOk) || (centerOrCommand == kCancel))
 		result := centerOrCommand
-	else {
-		sessionDB := SessionDatabase()
+	else if (centerOrCommand = "Load") {
+		browserGui.Opt("+OwnDialogs")
 
+		if GetKeyState("Ctrl") {
+			OnMessage(0x44, translateLoadCancelButtons)
+			fileName := withBlockedWindows(FileSelect, "D1", (center.SessionLoaded ? center.SessionLoaded : center.SessionDirectory[false])
+													 , translate("Load session..."))
+			OnMessage(0x44, translateLoadCancelButtons, 0)
+		}
+		else {
+			dirName := (SessionDatabase.DatabasePath . "User\")
+
+			OnMessage(0x44, translateLoadCancelButtons)
+			fileName := withBlockedWindows(FileSelect, 1, dirName, translate("Load Session..."), "Race Session (*.race)")
+			OnMessage(0x44, translateLoadCancelButtons, 0)
+		}
+
+		if (fileName != "")
+			selectRaceSession(kOk)
+		else
+			fileName := false
+	}
+	else if (centerOrCommand = "ChooseSimulator") {
+		newSimulator := arguments[1]
+		force := ((arguments.Length > 1) ? arguments[2] : false)
+
+		if newSimulator
+			newSimulator := sessionDB.getSimulatorName(newSimulator)
+
+		if (force || (newSimulator != simulator)) {
+			if (!newSimulator && (simulators.Length > 1))
+				newSimulator := simulators[1]
+
+			simulator := newSimulator
+
+			if simulator {
+				browserGui["simulatorDropDown"].Choose(inList(simulators, simulator))
+
+				cars := sessionDB.getCars(simulator)
+			}
+			else {
+				simulator := false
+
+				cars := []
+			}
+
+			carNames := cars.Clone()
+
+			for index, car in cars
+				carNames[index] := sessionDB.getCarName(simulator, car)
+
+			browserGui["carDropDown"].Delete()
+			browserGui["carDropDown"].Add(carNames)
+
+			selectRaceSession("ChooseCar", (cars.Length > 0) ? cars[1] : false, true)
+		}
+	}
+	else if (centerOrCommand = "ChooseCar") {
+		newCar := arguments[1]
+		force := ((arguments.Length > 1) ? arguments[2] : false)
+
+		if (force || (newCar != car)) {
+			if (!newCar && (cars.Length > 1))
+				newCar := cars[1]
+
+			car := newCar
+
+			if car {
+				tracks := sessionDB.getTracks(simulator, car)
+
+				browserGui["carDropDown"].Choose(inList(cars, car))
+			}
+			else
+				tracks := []
+
+			browserGui["trackDropDown"].Delete()
+			browserGui["trackDropDown"].Add(collect(tracks, ObjBindMethod(SessionDatabase, "getTrackName", simulator)))
+
+			selectRaceSession("ChooseTrack", (tracks.Length > 0) ? tracks[1] : false, true)
+		}
+	}
+	else if (centerOrCommand = "ChooseTrack") {
+		newTrack := arguments[1]
+		force := ((arguments.Length > 1) ? arguments[2] : false)
+
+		if (force || (newTrack != track)) {
+			if (!newTrack && (tracks.Length > 1))
+				newTrack := tracks[1]
+
+			track := newTrack
+
+			browserGui["sessionListView"].Delete()
+
+			if track {
+				browserGui["trackDropDown"].Choose(inList(tracks, track))
+
+				sessionDB.getSessions(simulator, car, track, "Race", &names, &infos := true)
+
+				for index, name in names
+					browserGui["sessionListView"].Add("", name, getMultiMapValue(infos[index], "Creator", "Name")
+														, FormatTime(getMultiMapValue(infos[index], "Session", "Date"), "ShortDate") . translate(" - ")
+														. FormatTime(getMultiMapValue(infos[index], "Session", "Date"), "Time"))
+
+				if (names.Length > 1)
+					browserGui["sessionListView"].Modify(1, "Select +Vis")
+
+				browserGui["sessionListView"].ModifyCol()
+
+				loop browserGui["sessionListView"].GetCount("Col")
+					browserGui["sessionListView"].ModifyCol(A_Index, "AutoHdr")
+			}
+		}
+	}
+	else {
+		center := centerOrCommand
+
+		sessionDB := SessionDatabase()
+		simulators := sessionDB.getSimulators()
+
+		fileName := false
 		result := false
 
 		browserGui := Window({Descriptor: "Race Center.Session Browser", Options: "0x400000"}, translate("Load Session..."))
 
 		browserGui.Opt("+Owner" . centerOrCommand.Window.Hwnd)
 
-		browserGui.Add("ListView", "x8 yp+8 w357 h335 -Multi -LV0x10 AltSubmit vsessionListView", collect(["Session", "Driver", "Date"], translate))
+		browserGui.Add("Text", "x8 yp+8 w70 h23 +0x200", translate("Simulator"))
+		browserGui.Add("DropDownList", "x90 yp w275 vsimulatorDropDown", simulators).OnEvent("Change", selectSimulator)
+
+		browserGui.Add("Text", "x8 yp+24 w70 h23 +0x200", translate("Car"))
+		browserGui.Add("DropDownList", "x90 yp w275 vcarDropDown").OnEvent("Change", selectCar)
+
+		browserGui.Add("Text", "x8 yp+24 w70 h23 +0x200", translate("Track"))
+		browserGui.Add("DropDownList", "x90 yp w275 vtrackDropDown").OnEvent("Change", selectTrack)
+
+		browserGui.Add("ListView", "x8 yp+30 w357 h335 -Multi -LV0x10 AltSubmit vsessionListView", collect(["Session", "Driver", "Date"], translate))
 		browserGui["sessionListView"].OnEvent("DoubleClick", selectRaceSession.Bind(kOk))
 
-		sessionDB.getSessions(centerOrCommand.Simulator, centerOrCommand.Car, centerOrCommand.Track, "Race", &names, &infos := true)
+		browserGui.Add("Button", "x8 yp+345 w80 h23 vopenButton", translate("Open...")).OnEvent("Click", selectRaceSession.Bind("Load"))
 
-		for index, name in names
-			browserGui["sessionListView"].Add("", name, getMultiMapValue(infos[index], "Creator", "Name")
-												, FormatTime(getMultiMapValue(infos[index], "Session", "Date"), "ShortDate") . translate(" - ")
-												. FormatTime(getMultiMapValue(infos[index], "Session", "Date"), "Time"))
-
-		if (names.Length > 1)
-			browserGui["sessionListView"].Modify(1, "Select +Vis")
-
-		browserGui["sessionListView"].ModifyCol()
-
-		loop browserGui["sessionListView"].GetCount("Col")
-			browserGui["sessionListView"].ModifyCol(A_Index, "AutoHdr")
-
-		browserGui.Add("Button", "x105 yp+345 w80 h23 Default", translate("Load")).OnEvent("Click", selectRaceSession.Bind(kOk))
-		browserGui.Add("Button", "x193 yp w80 h23", translate("&Cancel")).OnEvent("Click", selectRaceSession.Bind(kCancel))
+		browserGui.Add("Button", "x197 yp w80 h23 Default", translate("Load")).OnEvent("Click", selectRaceSession.Bind(kOk))
+		browserGui.Add("Button", "x285 yp w80 h23", translate("&Cancel")).OnEvent("Click", selectRaceSession.Bind(kCancel))
 
 		browserGui.Show("AutoSize Center")
+
+		selectRaceSession("ChooseSimulator", centerOrCommand.Simulator, true)
+		selectRaceSession("ChooseCar", centerOrCommand.Car, true)
+		selectRaceSession("ChooseTrack", centerOrCommand.Track, true)
 
 		if getWindowPosition("Race Center.Session Browser", &x, &y)
 			browserGui.Show("x" . x . " y" . y)
@@ -12619,18 +12775,37 @@ selectRaceSession(centerOrCommand := false, *) {
 			browserGui.Show()
 
 		try {
-			loop
+			loop {
 				Sleep(100)
+
+				if GetKeyState("Ctrl")
+					browserGui["openButton"].Text := translate("Import...")
+				else
+					browserGui["openButton"].Text := translate("Open...")
+			}
 			until result
 
 			if (result = kOk) {
-				index := browserGui["sessionListView"].GetNext()
+				if fileName {
+					%arguments[1]% := false
+					%arguments[2]% := false
+					%arguments[3]% := false
 
-				if index
-					return (sessionDB.getSessionDirectory(centerOrCommand.Simulator, centerOrCommand.Car, centerOrCommand.Track, "Race")
-						  . browserGui["sessionListView"].GetText(index) . ".race")
-				else
-					return false
+					return fileName
+				}
+				else {
+					index := browserGui["sessionListView"].GetNext()
+
+					if index {
+						%arguments[1]% := simulator
+						%arguments[2]% := car
+						%arguments[3]% := track
+
+						return (sessionDB.getSessionDirectory(simulator, car, track, "Race") . browserGui["sessionListView"].GetText(index) . ".race")
+					}
+					else
+						return false
+				}
 			}
 			else
 				return false

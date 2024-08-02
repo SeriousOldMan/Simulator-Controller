@@ -2338,7 +2338,7 @@ class PracticeCenter extends ConfigurationItem {
 				else
 					this.clearSession()
 			case 9: ; Load Session...
-				this.loadSession(GetKeyState("Ctrl") ? "Import" : (GetKeyState("Shift") ? "Browse" : false))
+				this.loadSession(GetKeyState("Ctrl") ? "Import" : "Browse")
 			case 10: ; Save Session...
 				if this.HasData
 					this.saveSession(true)
@@ -4691,7 +4691,9 @@ class PracticeCenter extends ConfigurationItem {
 					OnMessage(0x44, translateLoadCancelButtons, 0)
 				}
 
-				if (fileName && (fileName != "")) {
+				if (fileName && InStr(FileExist(fileName), "D"))
+					folder := fileName
+				else if (fileName && (fileName != "")) {
 					SplitPath(fileName, , &directory, , &fileName)
 
 					folder := (kTempDirectory . "Sessions\Practice_" . Round(Random(1, 100000)))
@@ -7368,14 +7370,43 @@ class RecommendationWindow extends Window {
 ;;;-------------------------------------------------------------------------;;;
 
 selectPracticeSession(centerOrCommand := false, *) {
-	local x, y, names, infos, index, name, sessionDB
+	local x, y, names, infos, index, name, sessionDB, dirName
+
+	static center := false
 
 	static browserGui
+
+	static fileName := false
 	static result := false
 
 	if ((centerOrCommand == kOk) || (centerOrCommand == kCancel))
 		result := centerOrCommand
+	else if (centerOrCommand == "Load") {
+		browserGui.Opt("+OwnDialogs")
+
+		if GetKeyState("Ctrl") {
+			OnMessage(0x44, translateLoadCancelButtons)
+			fileName := withBlockedWindows(FileSelect, "D1", ((center.SessionMode = "Loaded") ? center.SessionLoaded : center.iSessionDirectory)
+													 , translate("Load session..."))
+			OnMessage(0x44, translateLoadCancelButtons, 0)
+		}
+		else {
+			dirName := (SessionDatabase.DatabasePath . "User\")
+
+			OnMessage(0x44, translateLoadCancelButtons)
+			fileName := withBlockedWindows(FileSelect, 1, dirName, translate("Load Session..."), "Practice Session (*.practice)")
+			OnMessage(0x44, translateLoadCancelButtons, 0)
+		}
+
+		if (fileName != "")
+			selectPracticeSession(kOk)
+		else
+			fileName := false
+	}
 	else {
+		center := centerOrCommand
+		fileName := false
+
 		sessionDB := SessionDatabase()
 
 		result := false
@@ -7402,8 +7433,10 @@ selectPracticeSession(centerOrCommand := false, *) {
 		loop browserGui["sessionListView"].GetCount("Col")
 			browserGui["sessionListView"].ModifyCol(A_Index, "AutoHdr")
 
-		browserGui.Add("Button", "x105 yp+345 w80 h23 Default", translate("Load")).OnEvent("Click", selectPracticeSession.Bind(kOk))
-		browserGui.Add("Button", "x193 yp w80 h23", translate("&Cancel")).OnEvent("Click", selectPracticeSession.Bind(kCancel))
+		browserGui.Add("Button", "x8 yp+345 w80 h23 vopenButton", translate("Open...")).OnEvent("Click", selectPracticeSession.Bind("Load"))
+
+		browserGui.Add("Button", "x197 yp w80 h23 Default", translate("Load")).OnEvent("Click", selectPracticeSession.Bind(kOk))
+		browserGui.Add("Button", "x285 yp w80 h23", translate("&Cancel")).OnEvent("Click", selectPracticeSession.Bind(kCancel))
 
 		browserGui.Show("AutoSize Center")
 
@@ -7413,18 +7446,28 @@ selectPracticeSession(centerOrCommand := false, *) {
 			browserGui.Show()
 
 		try {
-			loop
+			loop {
 				Sleep(100)
+
+				if GetKeyState("Ctrl")
+					browserGui["openButton"].Text := translate("Import...")
+				else
+					browserGui["openButton"].Text := translate("Open...")
+			}
 			until result
 
 			if (result = kOk) {
-				index := browserGui["sessionListView"].GetNext()
+				if fileName
+					return fileName
+				else {
+					index := browserGui["sessionListView"].GetNext()
 
-				if index
-					return (sessionDB.getSessionDirectory(centerOrCommand.Simulator, centerOrCommand.Car, centerOrCommand.Track, "Practice")
-						  . browserGui["sessionListView"].GetText(index) . ".practice")
-				else
-					return false
+					if index
+						return (sessionDB.getSessionDirectory(centerOrCommand.Simulator, centerOrCommand.Car, centerOrCommand.Track, "Practice")
+							  . browserGui["sessionListView"].GetText(index) . ".practice")
+					else
+						return false
+				}
 			}
 			else
 				return false

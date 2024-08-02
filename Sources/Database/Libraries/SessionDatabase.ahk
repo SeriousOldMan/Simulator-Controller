@@ -1442,9 +1442,6 @@ class SessionDatabase extends ConfigurationItem {
 
 		fileName := (this.getSessionDirectory(simulator, car, track, type) . name)
 
-		if !FileExist(fileName . "." . type)
-			fileName := (kDatabaseDirectory . "Community\" . simulatorCode . "\" . car . "\" . track . "\" . type . " Sessions\" . name)
-
 		if FileExist(fileName . "." . type) {
 			file := FileOpen(fileName . ".data", "r-wd")
 

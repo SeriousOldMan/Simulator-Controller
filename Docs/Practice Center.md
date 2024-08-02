@@ -26,7 +26,9 @@ The default value for the data update frequency is 10 seconds, but you can can t
 
 The "Practice Center" allows you to save the complete session data for later inspection by using the "Save Session..." command from the "Session" menu. You can use the "Load Session..." command to retrieve such a session later on and all information will be restored. Saving a session this way does **not** export the telemetry data to the session database, which is a completely different thing and must be triggered seperately. However, the full session information can also be stored in the session database, if needed, to have all information in a central location.
 
-IMPORTANT: The data format of saved sessions has changed over time. To load a session in the *old* format (before they have been saved to the session database by default), hold down the Control key, while selecting the "Load Session..." command.
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%2011.JPG)
+
+IMPORTANT: The data format of saved sessions has changed over time. To load a session in the *old* format (before they have been saved to the session database by default), hold down the Control key, once the session browser is open. You will see that the "Load..." button changes to an "Import..." button.
 
 The "Auto Save" setting in the "Session" mennu allows you to automatically save a session before the window of the "Practice Center" is closed or before a new session will be started. However, doing this will collect a great amount of probably unnecessary data in your session database, therefore choose wisely.
 

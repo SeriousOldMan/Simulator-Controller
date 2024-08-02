@@ -1345,7 +1345,7 @@ class Window extends Gui {
 					this.iDescriptor := argument
 
 					if argument
-						Task.startTask(ObjBindMethod(this, "UpdatePosition", argument), 5000, kLowPriority)
+						Task.startTask(ObjBindMethod(this, "UpdatePosition", argument), 5000, kHighPriority)
 				case "Options":
 					options := argument
 			}
@@ -1555,15 +1555,13 @@ class Window extends Gui {
 			x := screen2Window(x)
 			y := screen2Window(y)
 
-			if (x && y) {
-				if ((this.iLastX != x) || (this.iLastY != y)) {
-					settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+			if ((x && y) && ((this.iLastX != x) || (this.iLastY != y))) {
+				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-					setMultiMapValue(settings, "Window Positions", descriptor . ".X", x)
-					setMultiMapValue(settings, "Window Positions", descriptor . ".Y", y)
+				setMultiMapValue(settings, "Window Positions", descriptor . ".X", x)
+				setMultiMapValue(settings, "Window Positions", descriptor . ".Y", y)
 
-					writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
-				}
+				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
 				this.iLastX := x
 				this.iLastY := y

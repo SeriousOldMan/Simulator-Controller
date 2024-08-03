@@ -241,6 +241,7 @@ class RaceCenter extends ConfigurationItem {
 	iSimulator := false
 	iCar := false
 	iTrack := false
+
 	iWeather := false
 	iWeather10Min := false
 	iWeather30Min := false
@@ -1181,7 +1182,7 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
-	__New(configuration, raceSettings) {
+	__New(configuration, raceSettings, simulator, car, track) {
 		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 		local dllFile
 
@@ -1204,6 +1205,10 @@ class RaceCenter extends ConfigurationItem {
 			showMessage(translate("Error while initializing Team Server Connector - please rebuild the applications") . translate("...")
 					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
+
+		this.iSimulator := simulator
+		this.iCar := car
+		this.iTrack := track
 
 		this.iTyrePressureMode := getMultiMapValue(settings, "Race Center", "TyrePressureMode", "Reference")
 		this.iCorrectPressureLoss := getMultiMapValue(settings, "Race Center", "CorrectPressureLoss", false)
@@ -4599,8 +4604,8 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	chooseStrategyMenu(line) {
-		local strategy, simulator, car, track, simulatorCode, dirName, fileName, configuration, fileName, name, msgResult
-		local directory
+		local strategy, simulator, car, track, dirName, fileName, configuration, fileName, name, msgResult
+		local directory, sessionDB
 
 		updateSetting(setting, value) {
 			local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
@@ -4616,10 +4621,11 @@ class RaceCenter extends ConfigurationItem {
 			track := this.Track
 
 			if (car && track) {
-				directory := SessionDatabase.DatabasePath
-				simulatorCode := SessionDatabase.getSimulatorCode(simulator)
+				car := SessionDatabase.getCarCode(simulator, car)
+				track := SessionDatabase.getTrackCode(simulator, track)
 
-				dirName := directory . "User\" . simulatorCode . "\" . car . "\" . track . "\Race Strategies"
+				dirName := (SessionDatabase.DatabasePath . "User\" . SessionDatabase.getSimulatorCode(simulator)
+						  . "\" . car . "\" . track . "\Race Strategies")
 
 				DirCreate(dirName)
 			}
@@ -4634,13 +4640,13 @@ class RaceCenter extends ConfigurationItem {
 				if GetKeyState("Ctrl")
 					this.selectStrategy(false)
 				else {
-					fileName := kUserConfigDirectory . "Race.strategy"
+					fileName := (kUserConfigDirectory . "Race.strategy")
 
 					if FileExist(fileName) {
-						configuration := readMultiMap(fileName)
+						strategy := readMultiMap(fileName)
 
-						if (configuration.Count > 0)
-							this.selectStrategy(this.createStrategy(configuration, false, false), true)
+						if (strategy.Count > 0)
+							this.selectStrategy(this.createStrategy(strategy, false, false), true)
 					}
 					else {
 						OnMessage(0x44, translateOkButton)
@@ -4649,17 +4655,49 @@ class RaceCenter extends ConfigurationItem {
 					}
 				}
 			case 4:
-				this.Window.Opt("+OwnDialogs")
+				if GetKeyState("Ctrl") {
+					this.Window.Opt("+OwnDialogs")
 
-				OnMessage(0x44, translateLoadCancelButtons)
-				fileName := withBlockedWindows(FileSelect, 1, dirName, translate("Load Race Strategy..."), "Strategy (*.strategy)")
-				OnMessage(0x44, translateLoadCancelButtons, 0)
+					OnMessage(0x44, translateLoadCancelButtons)
+					fileName := withBlockedWindows(FileSelect, 1, dirName, translate("Load Race Strategy..."), "Strategy (*.strategy)")
+					OnMessage(0x44, translateLoadCancelButtons, 0)
 
-				if (fileName != "") {
-					configuration := readMultiMap(fileName)
+					if (fileName != "") {
+						strategy := readMultiMap(fileName)
 
-					if (configuration.Count > 0)
-						this.selectStrategy(this.createStrategy(configuration, false, false), true)
+						if (strategy.Count > 0)
+							this.selectStrategy(this.createStrategy(strategy, false, false), true)
+					}
+				}
+				else {
+					sessionDB := SessionDatabase()
+					fileName := browseStrategies(this, &simulator, &car, &track)
+
+					if (fileName && (fileName != "")) {
+						SplitPath(fileName, , &directory, , &fileName)
+
+						if (simulator && car && track
+						 && ((normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getStrategyDirectory(simulator, car, track, "User")))
+						  || (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getStrategyDirectory(simulator, car, track, "Community"))))) {
+							try {
+								strategy := sessionDB.readStrategy(simulator, car, track, fileName)
+
+								if (strategy && (strategy.Count > 0))
+									this.selectStrategy(this.createStrategy(strategy, false, false), true)
+							}
+							catch Any as exception {
+								logError(exception)
+
+								folder := ""
+							}
+						}
+						else {
+							strategy := readMultiMap(fileName)
+
+							if (strategy.Count > 0)
+								this.selectStrategy(this.createStrategy(strategy, false, false), true)
+						}
+					}
 				}
 			case 5: ; "Save Strategy..."
 				if this.Strategy {
@@ -5003,7 +5041,7 @@ class RaceCenter extends ConfigurationItem {
 		this.iStrategy := strategy
 
 		if strategy
-			this.initializeSimulator(strategy.Simulator, strategy.Car, strategy.Track)
+			this.initializeSimulator(strategy.Simulator, strategy.Car, strategy.Track, true)
 
 		if (show || (this.SelectedDetailReport = "Strategy") || !this.SelectedDetailReport)
 			if strategy {
@@ -5915,10 +5953,6 @@ class RaceCenter extends ConfigurationItem {
 		this.iTime := this.Control["sessionTimeEdit"].Value
 		this.iSelectedPlanStint := false
 
-		this.iSimulator := false
-		this.iCar := false
-		this.iTrack := false
-
 		this.iWeather := false
 		this.iWeather10Min := false
 		this.iWeather30Min := false
@@ -5935,7 +5969,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	initializeSimulator(simulator, car, track, force := false) {
-		local row, compound
+		local row, compound, settings
 
 		if (force || !this.Simulator || (this.Simulator != simulator) || (this.Car != car) || (this.Track != track)) {
 			this.iSimulator := simulator
@@ -5949,6 +5983,14 @@ class RaceCenter extends ConfigurationItem {
 			}
 
 			if this.Simulator {
+				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+				setMultiMapValue(settings, "Race Center", "Simulator", simulator)
+				setMultiMapValue(settings, "Race Center", "Car", car)
+				setMultiMapValue(settings, "Race Center", "Track", track)
+
+				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+
 				compounds := SessionDatabase.getTyreCompounds(simulator, car, track)
 
 				this.iTyreCompounds := compounds
@@ -9133,7 +9175,7 @@ class RaceCenter extends ConfigurationItem {
 				sessionDB := SessionDatabase()
 
 				if (method = "Browse")
-					fileName := selectRaceSession(this, &simulator, &car, &track)
+					fileName := browseRaceSessions(this, &simulator, &car, &track)
 				else {
 					if (simulator && car && track) {
 						dirName := (SessionDatabase.DatabasePath . "User\" . SessionDatabase.getSimulatorCode(simulator)
@@ -9157,7 +9199,7 @@ class RaceCenter extends ConfigurationItem {
 					folder := (kTempDirectory . "Sessions\Race_" . Round(Random(1, 100000)))
 
 					DirCreate(folder)
-msgbox 1
+
 					if (simulator && car && track
 					 && (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Race")))) {
 						dataFile := temporaryFileName("Session", "zip")
@@ -12582,7 +12624,7 @@ convertValue(name, value) {
 		return value
 }
 
-selectRaceSession(centerOrCommand := false, arguments*) {
+browseRaceSessions(centerOrCommand := false, arguments*) {
 	local x, y, names, infos, index, name, driverName
 	local carNames, trackNames, newSimulator, newCar, newTrack, force, dirName
 
@@ -12605,17 +12647,17 @@ selectRaceSession(centerOrCommand := false, arguments*) {
 
 	selectSimulator(*) {
 		try
-			selectRaceSession("ChooseSimulator", simulators[browserGui["simulatorDropDown"].Value])
+			browseRaceSessions("ChooseSimulator", simulators[browserGui["simulatorDropDown"].Value])
 	}
 
 	selectCar(*) {
 		try
-			selectRaceSession("ChooseCar", cars[browserGui["carDropDown"].Value])
+			browseRaceSessions("ChooseCar", cars[browserGui["carDropDown"].Value])
 	}
 
 	selectTrack(*) {
 		try
-			selectRaceSession("ChooseTrack", tracks[browserGui["trackDropDown"].Value])
+			browseRaceSessions("ChooseTrack", tracks[browserGui["trackDropDown"].Value])
 	}
 
 	if ((centerOrCommand == kOk) || (centerOrCommand == kCancel))
@@ -12626,7 +12668,7 @@ selectRaceSession(centerOrCommand := false, arguments*) {
 		if GetKeyState("Ctrl") {
 			OnMessage(0x44, translateLoadCancelButtons)
 			fileName := withBlockedWindows(FileSelect, "D1", (center.SessionLoaded ? center.SessionLoaded : center.SessionDirectory[false])
-													 , translate("Load session..."))
+													 , translate("Load Session..."))
 			OnMessage(0x44, translateLoadCancelButtons, 0)
 		}
 		else {
@@ -12638,7 +12680,7 @@ selectRaceSession(centerOrCommand := false, arguments*) {
 		}
 
 		if (fileName != "")
-			selectRaceSession(kOk)
+			browseRaceSessions(kOk)
 		else
 			fileName := false
 	}
@@ -12674,7 +12716,7 @@ selectRaceSession(centerOrCommand := false, arguments*) {
 			browserGui["carDropDown"].Delete()
 			browserGui["carDropDown"].Add(carNames)
 
-			selectRaceSession("ChooseCar", (cars.Length > 0) ? cars[1] : false, true)
+			browseRaceSessions("ChooseCar", (cars.Length > 0) ? cars[1] : false, true)
 		}
 	}
 	else if (centerOrCommand = "ChooseCar") {
@@ -12696,9 +12738,9 @@ selectRaceSession(centerOrCommand := false, arguments*) {
 				tracks := []
 
 			browserGui["trackDropDown"].Delete()
-			browserGui["trackDropDown"].Add(collect(tracks, ObjBindMethod(SessionDatabase, "getTrackName", simulator)))
+			browserGui["trackDropDown"].Add(collect(tracks, ObjBindMethod(sessionDB, "getTrackName", simulator)))
 
-			selectRaceSession("ChooseTrack", (tracks.Length > 0) ? tracks[1] : false, true)
+			browseRaceSessions("ChooseTrack", (tracks.Length > 0) ? tracks[1] : false, true)
 		}
 	}
 	else if (centerOrCommand = "ChooseTrack") {
@@ -12718,16 +12760,10 @@ selectRaceSession(centerOrCommand := false, arguments*) {
 
 				sessionDB.getSessions(simulator, car, track, "Race", &names, &infos := true)
 
-				for index, name in names {
-					driverName := getMultiMapValue(infos[index], "Creator", "Name", false)
-
-					if !driverName
-						driverName := SessionDatabase.getUserName()
-
-					browserGui["sessionListView"].Add("", name, driverName
-														, FormatTime(getMultiMapValue(infos[index], "Session", "Date"), "ShortDate") . translate(" - ")
-														. FormatTime(getMultiMapValue(infos[index], "Session", "Date"), "Time"))
-				}
+				for index, name in names
+					browserGui["sessionListView"].Add("", name
+														, (FormatTime(getMultiMapValue(infos[index], "Session", "Date"), "ShortDate") . translate(" - ")
+														 . FormatTime(getMultiMapValue(infos[index], "Session", "Date"), "Time")))
 
 				if (names.Length > 1)
 					browserGui["sessionListView"].Modify(1, "Select +Vis")
@@ -12761,19 +12797,19 @@ selectRaceSession(centerOrCommand := false, arguments*) {
 		browserGui.Add("Text", "x8 yp+24 w70 h23 +0x200", translate("Track"))
 		browserGui.Add("DropDownList", "x90 yp w275 vtrackDropDown").OnEvent("Change", selectTrack)
 
-		browserGui.Add("ListView", "x8 yp+30 w357 h335 -Multi -LV0x10 AltSubmit vsessionListView", collect(["Session", "Creator", "Date"], translate))
-		browserGui["sessionListView"].OnEvent("DoubleClick", selectRaceSession.Bind(kOk))
+		browserGui.Add("ListView", "x8 yp+30 w357 h335 -Multi -LV0x10 AltSubmit vsessionListView", collect(["Session", "Date"], translate))
+		browserGui["sessionListView"].OnEvent("DoubleClick", browseRaceSessions.Bind(kOk))
 
-		browserGui.Add("Button", "x8 yp+345 w80 h23 vopenButton", translate("Open...")).OnEvent("Click", selectRaceSession.Bind("Load"))
+		browserGui.Add("Button", "x8 yp+345 w80 h23 vopenButton", translate("Open...")).OnEvent("Click", browseRaceSessions.Bind("Load"))
 
-		browserGui.Add("Button", "x197 yp w80 h23 Default", translate("Load")).OnEvent("Click", selectRaceSession.Bind(kOk))
-		browserGui.Add("Button", "x285 yp w80 h23", translate("&Cancel")).OnEvent("Click", selectRaceSession.Bind(kCancel))
+		browserGui.Add("Button", "x197 yp w80 h23 Default", translate("Load")).OnEvent("Click", browseRaceSessions.Bind(kOk))
+		browserGui.Add("Button", "x285 yp w80 h23", translate("&Cancel")).OnEvent("Click", browseRaceSessions.Bind(kCancel))
 
 		browserGui.Show("AutoSize Center")
 
-		selectRaceSession("ChooseSimulator", centerOrCommand.Simulator, true)
-		selectRaceSession("ChooseCar", centerOrCommand.Car, true)
-		selectRaceSession("ChooseTrack", centerOrCommand.Track, true)
+		browseRaceSessions("ChooseSimulator", %arguments[1]%, true)
+		browseRaceSessions("ChooseCar", %arguments[2]%, true)
+		browseRaceSessions("ChooseTrack", %arguments[3]%, true)
 
 		if getWindowPosition("Race Center.Session Browser", &x, &y)
 			browserGui.Show("x" . x . " y" . y)
@@ -12808,6 +12844,239 @@ selectRaceSession(centerOrCommand := false, arguments*) {
 						%arguments[3]% := track
 
 						return (sessionDB.getSessionDirectory(simulator, car, track, "Race") . browserGui["sessionListView"].GetText(index) . ".race")
+					}
+					else
+						return false
+				}
+			}
+			else
+				return false
+		}
+		finally {
+			browserGui.Destroy()
+		}
+	}
+}
+
+browseStrategies(centerOrCommand := false, arguments*) {
+	local x, y, names, infos, index, name, driverName
+	local carNames, trackNames, newSimulator, newCar, newTrack, force, dirName
+	local userStrategies, communityStrategies
+
+	static sessionDB := false
+
+	static center := false
+
+	static browserGui
+	static result := false
+
+	static strategyTypes := []
+
+	static simulators := false
+	static cars := false
+	static tracks := false
+
+	static simulator := false
+	static car := false
+	static track := false
+
+	static fileName := false
+
+	selectSimulator(*) {
+		try
+			browseStrategies("ChooseSimulator", simulators[browserGui["simulatorDropDown"].Value])
+	}
+
+	selectCar(*) {
+		try
+			browseStrategies("ChooseCar", cars[browserGui["carDropDown"].Value])
+	}
+
+	selectTrack(*) {
+		try
+			browseStrategies("ChooseTrack", tracks[browserGui["trackDropDown"].Value])
+	}
+
+	if ((centerOrCommand == kOk) || (centerOrCommand == kCancel))
+		result := centerOrCommand
+	else if (centerOrCommand = "Load") {
+		browserGui.Opt("+OwnDialogs")
+
+		dirName := (SessionDatabase.DatabasePath . "User\")
+
+		OnMessage(0x44, translateLoadCancelButtons)
+		fileName := withBlockedWindows(FileSelect, 1, dirName, translate("Load Strategy..."), "Strategy (*.strategy)")
+		OnMessage(0x44, translateLoadCancelButtons, 0)
+
+		if (fileName != "")
+			browseStrategies(kOk)
+		else
+			fileName := false
+	}
+	else if (centerOrCommand = "ChooseSimulator") {
+		newSimulator := arguments[1]
+		force := ((arguments.Length > 1) ? arguments[2] : false)
+
+		if newSimulator
+			newSimulator := sessionDB.getSimulatorName(newSimulator)
+
+		if (force || (newSimulator != simulator)) {
+			if (!newSimulator && (simulators.Length > 1))
+				newSimulator := simulators[1]
+
+			simulator := newSimulator
+
+			if simulator {
+				browserGui["simulatorDropDown"].Choose(inList(simulators, simulator))
+
+				cars := sessionDB.getCars(simulator)
+			}
+			else {
+				simulator := false
+
+				cars := []
+			}
+
+			carNames := cars.Clone()
+
+			for index, car in cars
+				carNames[index] := sessionDB.getCarName(simulator, car)
+
+			browserGui["carDropDown"].Delete()
+			browserGui["carDropDown"].Add(carNames)
+
+			browseStrategies("ChooseCar", (cars.Length > 0) ? cars[1] : false, true)
+		}
+	}
+	else if (centerOrCommand = "ChooseCar") {
+		newCar := arguments[1]
+		force := ((arguments.Length > 1) ? arguments[2] : false)
+
+		if (force || (newCar != car)) {
+			if (!newCar && (cars.Length > 1))
+				newCar := cars[1]
+
+			car := newCar
+
+			if car {
+				tracks := sessionDB.getTracks(simulator, car)
+
+				browserGui["carDropDown"].Choose(inList(cars, car))
+			}
+			else
+				tracks := []
+
+			browserGui["trackDropDown"].Delete()
+			browserGui["trackDropDown"].Add(collect(tracks, ObjBindMethod(sessionDB, "getTrackName", simulator)))
+
+			browseStrategies("ChooseTrack", (tracks.Length > 0) ? tracks[1] : false, true)
+		}
+	}
+	else if (centerOrCommand = "ChooseTrack") {
+		newTrack := arguments[1]
+		force := ((arguments.Length > 1) ? arguments[2] : false)
+
+		if (force || (newTrack != track)) {
+			if (!newTrack && (tracks.Length > 1))
+				newTrack := tracks[1]
+
+			track := newTrack
+
+			browserGui["strategyListView"].Delete()
+
+			if track {
+				browserGui["trackDropDown"].Choose(inList(tracks, track))
+
+				sessionDB.getStrategyNames(simulator, car, track, &userStrategies := true, &communityStrategies := true)
+
+				names := userStrategies
+				strategyTypes := []
+
+				loop names.Length
+					strategyTypes.Push("User")
+
+				for index, name in communityStrategies
+					if !inList(names, name) {
+						names.Push(name)
+						strategyTypes.Push("Community")
+					}
+
+				for index, name in names
+					browserGui["strategyListView"].Add("", name)
+
+				if (names.Length > 1)
+					browserGui["strategyListView"].Modify(1, "Select +Vis")
+
+				browserGui["strategyListView"].ModifyCol()
+
+				loop browserGui["strategyListView"].GetCount("Col")
+					browserGui["strategyListView"].ModifyCol(A_Index, "AutoHdr")
+			}
+		}
+	}
+	else {
+		center := centerOrCommand
+
+		sessionDB := SessionDatabase()
+		simulators := sessionDB.getSimulators()
+
+		fileName := false
+		result := false
+
+		browserGui := Window({Descriptor: "Race Center.Strategy Browser", Options: "0x400000"}, translate("Load Strategy..."))
+
+		browserGui.Opt("+Owner" . centerOrCommand.Window.Hwnd)
+
+		browserGui.Add("Text", "x8 yp+8 w70 h23 +0x200", translate("Simulator"))
+		browserGui.Add("DropDownList", "x90 yp w275 vsimulatorDropDown", simulators).OnEvent("Change", selectSimulator)
+
+		browserGui.Add("Text", "x8 yp+24 w70 h23 +0x200", translate("Car"))
+		browserGui.Add("DropDownList", "x90 yp w275 vcarDropDown").OnEvent("Change", selectCar)
+
+		browserGui.Add("Text", "x8 yp+24 w70 h23 +0x200", translate("Track"))
+		browserGui.Add("DropDownList", "x90 yp w275 vtrackDropDown").OnEvent("Change", selectTrack)
+
+		browserGui.Add("ListView", "x8 yp+30 w357 h335 -Multi -LV0x10 AltSubmit vstrategyListView", collect(["Strategy"], translate))
+		browserGui["strategyListView"].OnEvent("DoubleClick", browseStrategies.Bind(kOk))
+
+		browserGui.Add("Button", "x8 yp+345 w80 h23 vopenButton", translate("Open...")).OnEvent("Click", browseStrategies.Bind("Load"))
+
+		browserGui.Add("Button", "x197 yp w80 h23 Default", translate("Load")).OnEvent("Click", browseStrategies.Bind(kOk))
+		browserGui.Add("Button", "x285 yp w80 h23", translate("&Cancel")).OnEvent("Click", browseStrategies.Bind(kCancel))
+
+		browserGui.Show("AutoSize Center")
+
+		browseStrategies("ChooseSimulator", %arguments[1]%, true)
+		browseStrategies("ChooseCar", %arguments[2]%, true)
+		browseStrategies("ChooseTrack", %arguments[3]%, true)
+
+		if getWindowPosition("Race Center.Strategy Browser", &x, &y)
+			browserGui.Show("x" . x . " y" . y)
+		else
+			browserGui.Show()
+
+		try {
+			loop
+				Sleep(100)
+			until result
+
+			if (result = kOk) {
+				if fileName {
+					%arguments[1]% := false
+					%arguments[2]% := false
+					%arguments[3]% := false
+
+					return fileName
+				}
+				else {
+					index := browserGui["strategyListView"].GetNext()
+
+					if index {
+						%arguments[1]% := simulator
+						%arguments[2]% := car
+						%arguments[3]% := track
+
+						return (sessionDB.getStrategyDirectory(simulator, car, track, strategyTypes[index]) . browserGui["strategyListView"].GetText(index) . ".strategy")
 					}
 					else
 						return false
@@ -13327,6 +13596,13 @@ loadDrivers(connector, team) {
 }
 
 startupRaceCenter() {
+	local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+	local simulator := getMultiMapValue(settings, "Race Center", "Simulator"
+												, getMultiMapValue(settings, "Strategy Workbench", "Simulator", false))
+	local car := getMultiMapValue(settings, "Race Center", "Car"
+										  , getMultiMapValue(settings, "Strategy Workbench", "Car", false))
+	local track := getMultiMapValue(settings, "Race Center", "Track"
+											, getMultiMapValue(settings, "Strategy Workbench", "Track", false))
 	local raceSettings := readMultiMap(kUserConfigDirectory . "Race.settings")
 	local index := inList(A_Args, "-Startup")
 	local icon := kIconsDirectory . "Console.ico"
@@ -13351,7 +13627,7 @@ startupRaceCenter() {
 																										  , RaceCenter.kInvalidToken)))
 		}
 
-		rCenter := RaceCenter(kSimulatorConfiguration, raceSettings)
+		rCenter := RaceCenter(kSimulatorConfiguration, raceSettings, simulator, car, track)
 
 		if GetKeyState("Ctrl")
 			rCenter.iSynchronize := "Off"

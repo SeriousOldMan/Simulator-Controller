@@ -4677,7 +4677,7 @@ class PracticeCenter extends ConfigurationItem {
 				sessionDB := SessionDatabase()
 
 				if (method = "Browse")
-					fileName := selectPracticeSession(this)
+					fileName := browsePracticeSessions(this, &simulator, &car, &track)
 				else {
 					if (simulator && car && track) {
 						dirName := normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Practice"))
@@ -7370,8 +7370,11 @@ class RecommendationWindow extends Window {
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-selectPracticeSession(centerOrCommand := false, *) {
-	local x, y, names, infos, index, name, sessionDB, dirName, driverName, simulator
+browsePracticeSessions(centerOrCommand := false, arguments*) {
+	local x, y, names, infos, index, name, dirName, driverName
+	local carNames, trackNames, newSimulator, newCar, newTrack, force
+
+	static sessionDB := false
 
 	static center := false
 
@@ -7379,6 +7382,29 @@ selectPracticeSession(centerOrCommand := false, *) {
 
 	static fileName := false
 	static result := false
+
+	static simulators := false
+	static cars := false
+	static tracks := false
+
+	static simulator := false
+	static car := false
+	static track := false
+
+	selectSimulator(*) {
+		try
+			browsePracticeSessions("ChooseSimulator", simulators[browserGui["simulatorDropDown"].Value])
+	}
+
+	selectCar(*) {
+		try
+			browsePracticeSessions("ChooseCar", cars[browserGui["carDropDown"].Value])
+	}
+
+	selectTrack(*) {
+		try
+			browsePracticeSessions("ChooseTrack", tracks[browserGui["trackDropDown"].Value])
+	}
 
 	if ((centerOrCommand == kOk) || (centerOrCommand == kCancel))
 		result := centerOrCommand
@@ -7388,7 +7414,7 @@ selectPracticeSession(centerOrCommand := false, *) {
 		if GetKeyState("Ctrl") {
 			OnMessage(0x44, translateLoadCancelButtons)
 			fileName := withBlockedWindows(FileSelect, "D1", ((center.SessionMode = "Loaded") ? center.SessionLoaded : center.iSessionDirectory)
-													 , translate("Load session..."))
+													 , translate("Load Session..."))
 			OnMessage(0x44, translateLoadCancelButtons, 0)
 		}
 		else {
@@ -7400,15 +7426,119 @@ selectPracticeSession(centerOrCommand := false, *) {
 		}
 
 		if (fileName != "")
-			selectPracticeSession(kOk)
+			browsePracticeSessions(kOk)
 		else
 			fileName := false
+	}
+	else if (centerOrCommand = "ChooseSimulator") {
+		newSimulator := arguments[1]
+		force := ((arguments.Length > 1) ? arguments[2] : false)
+
+		if newSimulator
+			newSimulator := sessionDB.getSimulatorName(newSimulator)
+
+		if (force || (newSimulator != simulator)) {
+			if (!newSimulator && (simulators.Length > 1))
+				newSimulator := simulators[1]
+
+			simulator := newSimulator
+
+			if simulator {
+				browserGui["simulatorDropDown"].Choose(inList(simulators, simulator))
+
+				cars := sessionDB.getCars(simulator)
+			}
+			else {
+				simulator := false
+
+				cars := []
+			}
+
+			carNames := cars.Clone()
+
+			for index, car in cars
+				carNames[index] := sessionDB.getCarName(simulator, car)
+
+			browserGui["carDropDown"].Delete()
+			browserGui["carDropDown"].Add(carNames)
+
+			browsePracticeSessions("ChooseCar", (cars.Length > 0) ? cars[1] : false, true)
+		}
+	}
+	else if (centerOrCommand = "ChooseCar") {
+		newCar := arguments[1]
+		force := ((arguments.Length > 1) ? arguments[2] : false)
+
+		if (force || (newCar != car)) {
+			if (!newCar && (cars.Length > 1))
+				newCar := cars[1]
+
+			car := newCar
+
+			if car {
+				tracks := sessionDB.getTracks(simulator, car)
+
+				browserGui["carDropDown"].Choose(inList(cars, car))
+			}
+			else
+				tracks := []
+
+			browserGui["trackDropDown"].Delete()
+			browserGui["trackDropDown"].Add(collect(tracks, ObjBindMethod(sessionDB, "getTrackName", simulator)))
+
+			browsePracticeSessions("ChooseTrack", (tracks.Length > 0) ? tracks[1] : false, true)
+		}
+	}
+	else if (centerOrCommand = "ChooseTrack") {
+		newTrack := arguments[1]
+		force := ((arguments.Length > 1) ? arguments[2] : false)
+
+		if (force || (newTrack != track)) {
+			if (!newTrack && (tracks.Length > 1))
+				newTrack := tracks[1]
+
+			track := newTrack
+
+			browserGui["sessionListView"].Delete()
+
+			if track {
+				browserGui["trackDropDown"].Choose(inList(tracks, track))
+
+				sessionDB.getSessions(simulator, car, track, "Practice", &names, &infos := true)
+
+				for index, name in names {
+					if getMultiMapValue(infos[index], "Session", "Driver", false)
+						driverName := SessionDatabase.getDriverName(simulator, getMultiMapValue(infos[index], "Session", "Driver"))
+					else
+						driverName := false
+
+					if !driverName
+						driverName := getMultiMapValue(infos[index], "Creator", "Name")
+
+					if !driverName
+						driverName := SessionDatabase.getUserName()
+
+					browserGui["sessionListView"].Add("", name, driverName
+														, FormatTime(getMultiMapValue(infos[index], "Session", "Date"), "ShortDate") . translate(" - ")
+														. FormatTime(getMultiMapValue(infos[index], "Session", "Date"), "Time"))
+				}
+
+				if (names.Length > 1)
+					browserGui["sessionListView"].Modify(1, "Select +Vis")
+
+				browserGui["sessionListView"].ModifyCol()
+
+				loop browserGui["sessionListView"].GetCount("Col")
+					browserGui["sessionListView"].ModifyCol(A_Index, "AutoHdr")
+			}
+		}
 	}
 	else {
 		center := centerOrCommand
 		fileName := false
 
 		sessionDB := SessionDatabase()
+		simulators := sessionDB.getSimulators()
 
 		result := false
 
@@ -7416,44 +7546,28 @@ selectPracticeSession(centerOrCommand := false, *) {
 
 		browserGui.Opt("+Owner" . centerOrCommand.Window.Hwnd)
 
-		browserGui.Add("ListView", "x8 yp+8 w357 h335 -Multi -LV0x10 AltSubmit vsessionListView", collect(["Session", "Driver", "Date"], translate))
-		browserGui["sessionListView"].OnEvent("DoubleClick", selectPracticeSession.Bind(kOk))
+		browserGui.Add("Text", "x8 yp+8 w70 h23 +0x200", translate("Simulator"))
+		browserGui.Add("DropDownList", "x90 yp w275 vsimulatorDropDown", simulators).OnEvent("Change", selectSimulator)
 
-		simulator := centerOrCommand.Simulator
+		browserGui.Add("Text", "x8 yp+24 w70 h23 +0x200", translate("Car"))
+		browserGui.Add("DropDownList", "x90 yp w275 vcarDropDown").OnEvent("Change", selectCar)
 
-		sessionDB.getSessions(simulator, centerOrCommand.Car, centerOrCommand.Track, "Practice", &names, &infos := true)
+		browserGui.Add("Text", "x8 yp+24 w70 h23 +0x200", translate("Track"))
+		browserGui.Add("DropDownList", "x90 yp w275 vtrackDropDown").OnEvent("Change", selectTrack)
 
-		for index, name in names {
-			if getMultiMapValue(infos[index], "Session", "Driver", false)
-				driverName := SessionDatabase.getDriverName(simulator, getMultiMapValue(infos[index], "Session", "Driver"))
-			else
-				driverName := false
+		browserGui.Add("ListView", "x8 yp+30 w357 h335 -Multi -LV0x10 AltSubmit vsessionListView", collect(["Session", "Driver", "Date"], translate))
+		browserGui["sessionListView"].OnEvent("DoubleClick", browsePracticeSessions.Bind(kOk))
 
-			if !driverName
-				driverName := getMultiMapValue(infos[index], "Creator", "Name")
+		browserGui.Add("Button", "x8 yp+345 w80 h23 vopenButton", translate("Open...")).OnEvent("Click", browsePracticeSessions.Bind("Load"))
 
-			if !driverName
-				driverName := SessionDatabase.getUserName()
-
-			browserGui["sessionListView"].Add("", name, driverName
-												, FormatTime(getMultiMapValue(infos[index], "Session", "Date"), "ShortDate") . translate(" - ")
-												. FormatTime(getMultiMapValue(infos[index], "Session", "Date"), "Time"))
-		}
-
-		if (names.Length > 1)
-			browserGui["sessionListView"].Modify(1, "Select +Vis")
-
-		browserGui["sessionListView"].ModifyCol()
-
-		loop browserGui["sessionListView"].GetCount("Col")
-			browserGui["sessionListView"].ModifyCol(A_Index, "AutoHdr")
-
-		browserGui.Add("Button", "x8 yp+345 w80 h23 vopenButton", translate("Open...")).OnEvent("Click", selectPracticeSession.Bind("Load"))
-
-		browserGui.Add("Button", "x197 yp w80 h23 Default", translate("Load")).OnEvent("Click", selectPracticeSession.Bind(kOk))
-		browserGui.Add("Button", "x285 yp w80 h23", translate("&Cancel")).OnEvent("Click", selectPracticeSession.Bind(kCancel))
+		browserGui.Add("Button", "x197 yp w80 h23 Default", translate("Load")).OnEvent("Click", browsePracticeSessions.Bind(kOk))
+		browserGui.Add("Button", "x285 yp w80 h23", translate("&Cancel")).OnEvent("Click", browsePracticeSessions.Bind(kCancel))
 
 		browserGui.Show("AutoSize Center")
+
+		browsePracticeSessions("ChooseSimulator", %arguments[1]%, true)
+		browsePracticeSessions("ChooseCar", %arguments[2]%, true)
+		browsePracticeSessions("ChooseTrack", %arguments[3]%, true)
 
 		if getWindowPosition("Practice Center.Session Browser", &x, &y)
 			browserGui.Show("x" . x . " y" . y)
@@ -7472,14 +7586,24 @@ selectPracticeSession(centerOrCommand := false, *) {
 			until result
 
 			if (result = kOk) {
-				if fileName
+				if fileName {
+					%arguments[1]% := false
+					%arguments[2]% := false
+					%arguments[3]% := false
+
 					return fileName
+				}
 				else {
 					index := browserGui["sessionListView"].GetNext()
 
-					if index
+					if index {
+						%arguments[1]% := simulator
+						%arguments[2]% := car
+						%arguments[3]% := track
+
 						return (sessionDB.getSessionDirectory(centerOrCommand.Simulator, centerOrCommand.Car, centerOrCommand.Track, "Practice")
 							  . browserGui["sessionListView"].GetText(index) . ".practice")
+					}
 					else
 						return false
 				}

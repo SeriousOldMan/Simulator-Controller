@@ -1,9 +1,9 @@
 [Development]
 Version=5.8.3.0-dev
 Target=5.8.3.0-release
-Date=08/02/2024
+Date=08/03/2024
 Download=
-Changes=New session browser for "Practice Center" and "Race Center", Optimized window position handling and memorization
+Changes=New session browser for "Practice Center" and "Race Center", Optimized window position handling and memorization, New race strategy browser
 Components=Media->5.6.1,Configuration->5.8.2,Utilities->5.4.8
 [Release]
 Version=5.8.2.0-release

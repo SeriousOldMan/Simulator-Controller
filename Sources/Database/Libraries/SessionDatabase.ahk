@@ -1840,6 +1840,11 @@ class SessionDatabase extends ConfigurationItem {
 				}
 	}
 
+	getStrategyDirectory(simulator, car, track, type) {
+		return (kDatabaseDirectory . StrTitle(type) . "\" . this.getSimulatorCode(simulator) . "\" . this.getCarCode(simulator, car)
+								   . "\" . this.getTrackCode(simulator, track) . "\Race Strategies\")
+	}
+
 	getStrategyNames(simulator, car, track, &userStrategies, &communityStrategies) {
 		local simulatorCode := this.getSimulatorCode(simulator)
 		local ignore, strategies, name, extension
@@ -1850,7 +1855,7 @@ class SessionDatabase extends ConfigurationItem {
 		if userStrategies {
 			userStrategies := []
 
-			loop Files, kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Race Strategies\*.*", "F" {
+			loop Files, this.getStrategyDirectory(simulator, car, track, "User") . "*.*", "F" {
 				SplitPath(A_LoopFileName, &name, , &extension)
 
 				if (extension != "info")
@@ -1861,7 +1866,7 @@ class SessionDatabase extends ConfigurationItem {
 		if communityStrategies {
 			communityStrategies := []
 
-			loop Files, kDatabaseDirectory . "Community\" . simulatorCode . "\" . car . "\" . track . "\Race Strategies\*.*", "F" {
+			loop Files, this.getStrategyDirectory(simulator, car, track, "Community") . "*.*", "F" {
 				SplitPath(A_LoopFileName, &name, , &extension)
 
 				if (extension != "info")
@@ -1877,10 +1882,10 @@ class SessionDatabase extends ConfigurationItem {
 		car := this.getCarCode(simulator, car)
 		track := this.getTrackCode(simulator, track)
 
-		fileName := kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Race Strategies\" . name
+		fileName := (this.getStrategyDirectory(simulator, car, track, "User") . name)
 
 		if !FileExist(fileName)
-			fileName := kDatabaseDirectory . "Community\" . simulatorCode . "\" . car . "\" . track . "\Race Strategies\" . name
+			fileName := (this.getStrategyDirectory(simulator, car, track, "Community") . name)
 
 		return readMultiMap(fileName)
 	}
@@ -1892,10 +1897,10 @@ class SessionDatabase extends ConfigurationItem {
 		car := this.getCarCode(simulator, car)
 		track := this.getTrackCode(simulator, track)
 
-		fileName := kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Race Strategies\" . name . ".info"
+		fileName := (this.getStrategyDirectory(simulator, car, track, "User") . name . ".info")
 
 		if !FileExist(fileName) {
-			fileName := kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Race Strategies\" . name
+			fileName := (this.getStrategyDirectory(simulator, car, track, "User") . name)
 
 			if FileExist(fileName) {
 				info := newMultiMap()
@@ -1931,7 +1936,7 @@ class SessionDatabase extends ConfigurationItem {
 		car := this.getCarCode(simulator, car)
 		track := this.getTrackCode(simulator, track)
 
-		fileName := kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Race Strategies"
+		fileName := normalizeDirectoryPath(this.getStrategyDirectory(simulator, car, track, "User"))
 
 		DirCreate(fileName)
 
@@ -1967,7 +1972,7 @@ class SessionDatabase extends ConfigurationItem {
 		car := this.getCarCode(simulator, car)
 		track := this.getTrackCode(simulator, track)
 
-		fileName := kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Race Strategies\" . name . ".info"
+		fileName := (this.getStrategyDirectory(simulator, car, track, "User") . name . ".info")
 
 		writeMultiMap(fileName, info)
 	}
@@ -1979,8 +1984,8 @@ class SessionDatabase extends ConfigurationItem {
 		car := this.getCarCode(simulator, car)
 		track := this.getTrackCode(simulator, track)
 
-		oldFileName := kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Race Strategies\" . oldName
-		newFileName := kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Race Strategies\" . newName
+		oldFileName := (this.getStrategyDirectory(simulator, car, track, "User") . oldName)
+		newFileName := (this.getStrategyDirectory(simulator, car, track, "User") . newName)
 
 		try {
 			FileMove(oldFileName, newFileName, 1)
@@ -2008,7 +2013,7 @@ class SessionDatabase extends ConfigurationItem {
 		car := this.getCarCode(simulator, car)
 		track := this.getTrackCode(simulator, track)
 
-		fileName := kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Race Strategies\" . name
+		fileName := (this.getStrategyDirectory(simulator, car, track, "User") . name)
 
 		info := readMultiMap(fileName . ".info")
 

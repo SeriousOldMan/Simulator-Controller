@@ -1645,7 +1645,7 @@ class PracticeCenter extends ConfigurationItem {
 			this.loadTrack(track)
 	}
 
-	show() {
+	show(initialize := true) {
 		local window := this.Window
 		local x, y, w, h
 
@@ -1662,7 +1662,8 @@ class PracticeCenter extends ConfigurationItem {
 		this.showDetails(false, false)
 		this.showChart(false)
 
-		this.initializeSession()
+		if initialize
+			this.initializeSession()
 
 		this.updateState()
 	}
@@ -4659,7 +4660,7 @@ class PracticeCenter extends ConfigurationItem {
 				}
 	}
 
-	loadSession(method := false) {
+	loadSession(method := false, async := true) {
 		loadSessionAsync() {
 			local simulator := this.Simulator
 			local car := this.Car
@@ -4819,7 +4820,10 @@ class PracticeCenter extends ConfigurationItem {
 			}
 		}
 
-		this.pushTask(loadSessionAsync)
+		if async
+			this.pushTask(loadSessionAsync)
+		else
+			loadSessionAsync()
 	}
 
 	showChart(drawChartFunction) {
@@ -7635,10 +7639,10 @@ startupPracticeCenter() {
 
 		pCenter.createGui(pCenter.Configuration)
 
-		pCenter.show()
-
 		if load
-			pCenter.loadSession(load)
+			pCenter.loadSession(load, false)
+
+		pCenter.show(false)
 
 		registerMessageHandler("Practice", methodMessageHandler, pCenter)
 

@@ -4000,7 +4000,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		loop this.DataListView.GetCount("Col")
 			this.DataListView.DeleteCol(1)
 
-		for ignore, column in collect(["Source", "#"], translate)
+		for ignore, column in collect(["Category", "#"], translate)
 			this.DataListView.InsertCol(A_Index, "", column)
 
 		userStrategies := true

@@ -2295,7 +2295,7 @@ class RaceCenter extends ConfigurationItem {
 		centerGui.Add(RaceCenter.RaceCenterResizer(centerGui))
 	}
 
-	show() {
+	show(initialize := true) {
 		local window := this.Window
 		local x, y, w, h
 
@@ -2312,7 +2312,8 @@ class RaceCenter extends ConfigurationItem {
 		this.showDetails(false, false)
 		this.showChart(false)
 
-		this.initializeSession()
+		if initialize
+			this.initializeSession()
 
 		this.updateState()
 	}
@@ -9164,7 +9165,7 @@ class RaceCenter extends ConfigurationItem {
 		this.pushTask(clearSessionAsync)
 	}
 
-	loadSession(method := false) {
+	loadSession(method := false, async := true) {
 		loadSessionAsync() {
 			local simulator := this.Simulator
 			local car := this.Car
@@ -9368,7 +9369,10 @@ class RaceCenter extends ConfigurationItem {
 			}
 		}
 
-		this.pushTask(loadSessionAsync)
+		if async
+			this.pushTask(loadSessionAsync)
+		else
+			loadSessionAsync()
 	}
 
 	showChart(drawChartFunction) {
@@ -13187,11 +13191,12 @@ startupRaceCenter() {
 
 		rCenter.createGui(rCenter.Configuration)
 
-		rCenter.show()
-
 		if load
-			rCenter.loadSession(load)
-		else
+			rCenter.loadSession(load, false)
+
+		rCenter.show(false)
+
+		if !load
 			rCenter.connect(true)
 
 		registerMessageHandler("Setup", functionMessageHandler)

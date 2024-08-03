@@ -3893,14 +3893,14 @@ startupStrategyWorkbench() {
 
 		workbench.createGui(workbench.Configuration)
 
-		workbench.show()
-
 		if load {
 			load := readMultiMap(load)
 
 			if (load.Count > 0)
 				workbench.selectStrategy(workbench.createStrategy(load))
 		}
+
+		workbench.show()
 
 		startupApplication()
 	}

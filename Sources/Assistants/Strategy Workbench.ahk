@@ -33,6 +33,8 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\Libraries\HTMLViewer.ahk"
+#Include "..\Database\Libraries\SessionDatabase.ahk"
+#Include "..\Database\Libraries\SessionDatabaseBrowser.ahk"
 #Include "..\Database\Libraries\SettingsDatabase.ahk"
 #Include "..\Database\Libraries\TelemetryDatabase.ahk"
 #Include "Libraries\Strategy.ahk"
@@ -3046,10 +3048,10 @@ class StrategyWorkbench extends ConfigurationItem {
 				fileName := kUserConfigDirectory . "Race.strategy"
 
 				if FileExist(fileName) {
-					configuration := readMultiMap(fileName)
+					strategy := readMultiMap(fileName)
 
-					if (configuration.Count > 0)
-						this.selectStrategy(this.createStrategy(configuration))
+					if (strategy.Count > 0)
+						this.selectStrategy(this.createStrategy(strategy))
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
@@ -3057,17 +3059,57 @@ class StrategyWorkbench extends ConfigurationItem {
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 4: ; "Load Strategy..."
-				this.Window.Opt("+OwnDialogs")
+				if GetKeyState("Ctrl") {
+					this.Window.Opt("+OwnDialogs")
 
-				OnMessage(0x44, translateLoadCancelButtons)
-				fileName := withBlockedWindows(FileSelect, 1, dirName, translate("Load Race Strategy..."), "Strategy (*.strategy)")
-				OnMessage(0x44, translateLoadCancelButtons, 0)
+					OnMessage(0x44, translateLoadCancelButtons)
+					fileName := withBlockedWindows(FileSelect, 1, dirName, translate("Load Strategy..."), "Strategy (*.strategy)")
+					OnMessage(0x44, translateLoadCancelButtons, 0)
 
-				if (fileName != "") {
-					configuration := readMultiMap(fileName)
+					if (fileName != "") {
+						strategy := readMultiMap(fileName)
 
-					if (configuration.Count > 0)
-						this.selectStrategy(this.createStrategy(configuration))
+						if (strategy.Count > 0)
+							this.selectStrategy(this.createStrategy(strategy))
+					}
+				}
+				else {
+					sessionDB := SessionDatabase()
+
+					this.Window.Block()
+
+					try {
+						fileName := browseStrategies(this.Window, &simulator, &car, &track)
+					}
+					finally {
+						this.Window.Unblock()
+					}
+
+					if (fileName && (fileName != "")) {
+						SplitPath(fileName, , &directory, , &fileName)
+
+						if (simulator && car && track
+						 && ((normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getStrategyDirectory(simulator, car, track, "User")))
+						  || (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getStrategyDirectory(simulator, car, track, "Community"))))) {
+							try {
+								strategy := sessionDB.readStrategy(simulator, car, track, fileName)
+
+								if (strategy && (strategy.Count > 0))
+									this.selectStrategy(this.createStrategy(strategy))
+							}
+							catch Any as exception {
+								logError(exception)
+
+								folder := ""
+							}
+						}
+						else {
+							strategy := readMultiMap(directory . "\" . fileName . ".strategy")
+
+							if (strategy.Count > 0)
+								this.selectStrategy(this.createStrategy(strategy))
+						}
+					}
 				}
 			case 5: ; "Save Strategy..."
 				if this.SelectedStrategy {
@@ -3078,7 +3120,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					this.Window.Opt("+OwnDialogs")
 
 					OnMessage(0x44, translateSaveCancelButtons)
-					fileName := withBlockedWindows(FileSelect, "S17", fileName, translate("Save Race Strategy..."), "Strategy (*.strategy)")
+					fileName := withBlockedWindows(FileSelect, "S17", fileName, translate("Save Strategy..."), "Strategy (*.strategy)")
 					OnMessage(0x44, translateSaveCancelButtons, 0)
 
 					if (fileName != "") {

@@ -1856,7 +1856,7 @@ class SessionDatabase extends ConfigurationItem {
 			userStrategies := []
 
 			loop Files, this.getStrategyDirectory(simulator, car, track, "User") . "*.*", "F" {
-				SplitPath(A_LoopFileName, &name, , &extension)
+				SplitPath(A_LoopFileName, , , &extension, &name)
 
 				if (extension != "info")
 					userStrategies.Push(name)
@@ -1867,7 +1867,7 @@ class SessionDatabase extends ConfigurationItem {
 			communityStrategies := []
 
 			loop Files, this.getStrategyDirectory(simulator, car, track, "Community") . "*.*", "F" {
-				SplitPath(A_LoopFileName, &name, , &extension)
+				SplitPath(A_LoopFileName, , , &extension, &name)
 
 				if (extension != "info")
 					communityStrategies.Push(name)
@@ -1881,6 +1881,9 @@ class SessionDatabase extends ConfigurationItem {
 
 		car := this.getCarCode(simulator, car)
 		track := this.getTrackCode(simulator, track)
+
+		if !InStr(name, ".strategy")
+			name .= ".strategy"
 
 		fileName := (this.getStrategyDirectory(simulator, car, track, "User") . name)
 
@@ -1896,6 +1899,9 @@ class SessionDatabase extends ConfigurationItem {
 
 		car := this.getCarCode(simulator, car)
 		track := this.getTrackCode(simulator, track)
+
+		if !InStr(name, ".strategy")
+			name .= ".strategy"
 
 		fileName := (this.getStrategyDirectory(simulator, car, track, "User") . name . ".info")
 
@@ -1936,6 +1942,9 @@ class SessionDatabase extends ConfigurationItem {
 		car := this.getCarCode(simulator, car)
 		track := this.getTrackCode(simulator, track)
 
+		if !InStr(name, ".strategy")
+			name .= ".strategy"
+
 		fileName := normalizeDirectoryPath(this.getStrategyDirectory(simulator, car, track, "User"))
 
 		DirCreate(fileName)
@@ -1972,6 +1981,9 @@ class SessionDatabase extends ConfigurationItem {
 		car := this.getCarCode(simulator, car)
 		track := this.getTrackCode(simulator, track)
 
+		if !InStr(name, ".strategy")
+			name .= ".strategy"
+
 		fileName := (this.getStrategyDirectory(simulator, car, track, "User") . name . ".info")
 
 		writeMultiMap(fileName, info)
@@ -1983,6 +1995,12 @@ class SessionDatabase extends ConfigurationItem {
 
 		car := this.getCarCode(simulator, car)
 		track := this.getTrackCode(simulator, track)
+
+		if !InStr(oldName, ".strategy")
+			oldName .= ".strategy"
+
+		if !InStr(newName, ".strategy")
+			newName .= ".strategy"
 
 		oldFileName := (this.getStrategyDirectory(simulator, car, track, "User") . oldName)
 		newFileName := (this.getStrategyDirectory(simulator, car, track, "User") . newName)
@@ -2012,6 +2030,9 @@ class SessionDatabase extends ConfigurationItem {
 
 		car := this.getCarCode(simulator, car)
 		track := this.getTrackCode(simulator, track)
+
+		if !InStr(name, ".strategy")
+			name .= ".strategy"
 
 		fileName := (this.getStrategyDirectory(simulator, car, track, "User") . name)
 

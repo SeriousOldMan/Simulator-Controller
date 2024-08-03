@@ -9193,6 +9193,8 @@ class RaceCenter extends ConfigurationItem {
 						this.Window.Unblock()
 					}
 				}
+				else if FileExist(method)
+					fileName := method
 				else {
 					if (simulator && car && track) {
 						dirName := (SessionDatabase.DatabasePath . "User\" . SessionDatabase.getSimulatorCode(simulator)
@@ -13155,7 +13157,8 @@ startupRaceCenter() {
 											, getMultiMapValue(settings, "Strategy Workbench", "Track", false))
 	local raceSettings := readMultiMap(kUserConfigDirectory . "Race.settings")
 	local index := inList(A_Args, "-Startup")
-	local icon := kIconsDirectory . "Console.ico"
+	local icon := (kIconsDirectory . "Console.ico")
+	local load := (inList(A_Args, "-Load") ? A_Args[inList(A_Args, "-Load") + 1] : false)
 	local rCenter, startupSettings, ignore, property
 
 	TraySetIcon(icon, "1")
@@ -13186,7 +13189,10 @@ startupRaceCenter() {
 
 		rCenter.show()
 
-		rCenter.connect(true)
+		if load
+			rCenter.loadSession(load)
+		else
+			rCenter.connect(true)
 
 		registerMessageHandler("Setup", functionMessageHandler)
 

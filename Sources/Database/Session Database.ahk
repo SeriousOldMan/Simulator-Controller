@@ -705,6 +705,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				editor.updateState()
 		}
 
+		openSession(listView, line, *) {
+			if line
+				SessionDatabaseEditor.Instance.selectSession(line, true)
+			else
+				editor.updateState()
+		}
+
 		updateSessionAccess(*) {
 			local sessionDB := editor.SessionDatabase
 			local selected, category, name
@@ -754,6 +761,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		chooseStrategy(listView, line, *) {
 			if line
 				SessionDatabaseEditor.Instance.selectStrategy(line)
+			else
+				editor.updateState()
+		}
+
+		openStrategy(listView, line, *) {
+			if line
+				SessionDatabaseEditor.Instance.selectStrategy(line, true)
 			else
 				editor.updateState()
 		}
@@ -1428,7 +1442,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		this.iSessionListView := editorGui.Add("ListView", "x296 ys w360 h403 H:Grow W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Category", "Name"], translate))
 		this.iSessionListView.OnEvent("Click", chooseSession)
-		this.iSessionListView.OnEvent("DoubleClick", chooseSession)
+		this.iSessionListView.OnEvent("DoubleClick", openSession)
 		this.iSessionListView.OnEvent("ItemSelect", navSession)
 
 		editorGui.Add("Button", "xp+310 yp+410 w23 h23 X:Move Y:Move vrenameSessionButton").OnEvent("Click", renameSession)
@@ -1443,7 +1457,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		this.iStrategyListView := editorGui.Add("ListView", "x296 ys w360 h403 H:Grow W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
 		this.iStrategyListView.OnEvent("Click", chooseStrategy)
-		this.iStrategyListView.OnEvent("DoubleClick", chooseStrategy)
+		this.iStrategyListView.OnEvent("DoubleClick", openStrategy)
 		this.iStrategyListView.OnEvent("ItemSelect", navStrategy)
 
 		editorGui.Add("Button", "xp+260 yp+410 w23 h23 X:Move Y:Move vuploadStrategyButton").OnEvent("Click", uploadStrategy)
@@ -4710,11 +4724,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 	}
 
-	selectSession(row) {
+	selectSession(row, open := false) {
 		local window := this.Window
-		local category := ((this.SessionListView.GetText(row, 2) = translate("Practice")) ? "Practice" : "Race")
+		local name := this.SessionListView.GetText(row, 3)
+		local type := ((this.SessionListView.GetText(row, 2) = translate("Practice")) ? "Practice" : "Race")
 		local info := this.SessionDatabase.readSessionInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack
-														 , category, this.SessionListView.GetText(row, 3))
+														 , type, this.SessionListView.GetText(row, 3))
 
 		if (info && getMultiMapValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID)
 			window["shareSessionWithTeamServerCheck"].Value := getMultiMapValue(info, "Access", "Synchronize", false)
@@ -4722,12 +4737,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			window["shareSessionWithTeamServerCheck"].Value := 0
 
 		this.updateState()
+
+		if open
+			Run("`"" . kBinariesDirectory . type . " Center.exe`" -Load `""
+			  . this.SessionDatabase.getSessionDirectory(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, type)
+			  . name . "." . StrLower(type), kBinariesDirectory)
 	}
 
-	selectStrategy(row) {
+	selectStrategy(row, open := false) {
 		local window := this.Window
-		local info := this.SessionDatabase.readStrategyInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack
-														  , this.StrategyListView.GetText(row, 2))
+		local name := this.StrategyListView.GetText(row, 2)
+		local info := this.SessionDatabase.readStrategyInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name)
+		local fileName
 
 		if (info && getMultiMapValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID) {
 			window["shareStrategyWithCommunityCheck"].Value := getMultiMapValue(info, "Access", "Share", false)
@@ -4739,6 +4760,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		this.updateState()
+
+		if open {
+			fileName := temporaryFileName("Race", "strategy")
+
+			writeMultiMap(fileName, this.SessionDatabase.readStrategy(this.SelectedSimulator, this.SelectedCar
+																	, this.SelectedTrack, name))
+
+			Run("`"" . kBinariesDirectory . "Strategy Workbench.exe`" -Simulator `"" . this.SelectedSimulator . "`""
+																  . " -Car `"" . this.SelectedCar . "`""
+																  . " -Track `"" . this.SelectedTrack . "`""
+																  . " -Load `"" . fileName . "`"", kBinariesDirectory)
+		}
 	}
 
 	selectSetup(row) {

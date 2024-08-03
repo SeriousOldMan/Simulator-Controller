@@ -3842,6 +3842,7 @@ startupStrategyWorkbench() {
 	local compound := "Dry"
 	local compoundColor := "Black"
 	local index := 1
+	local load := false
 	local workbench
 
 	TraySetIcon(icon, "1")
@@ -3873,6 +3874,9 @@ startupStrategyWorkbench() {
 			case "-CompoundColor":
 				compoundColor := A_Args[index + 1]
 				index += 2
+			case "-Load":
+				load := A_Args[index + 1]
+				index += 2
 			default:
 				index += 1
 		}
@@ -3890,6 +3894,13 @@ startupStrategyWorkbench() {
 		workbench.createGui(workbench.Configuration)
 
 		workbench.show()
+
+		if load {
+			load := readMultiMap(load)
+
+			if (load.Count > 0)
+				workbench.selectStrategy(workbench.createStrategy(load))
+		}
 
 		startupApplication()
 	}

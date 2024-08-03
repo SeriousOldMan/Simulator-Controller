@@ -4687,6 +4687,8 @@ class PracticeCenter extends ConfigurationItem {
 						this.Window.Unblock()
 					}
 				}
+				else if FileExist(method)
+					fileName := method
 				else {
 					if (simulator && car && track) {
 						dirName := normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Practice"))
@@ -4806,11 +4808,11 @@ class PracticeCenter extends ConfigurationItem {
 						}
 					}
 
-					this.updateReports()
-
 					this.updateUsedTyreSets()
 
 					this.analyzeTelemetry()
+
+					this.showOverviewReport()
 
 					this.updateState()
 				}
@@ -7602,6 +7604,7 @@ startupPracticeCenter() {
 	local simulator := getMultiMapValue(settings, "Practice Center", "Simulator", false)
 	local car := getMultiMapValue(settings, "Practice Center", "Car", false)
 	local track := getMultiMapValue(settings, "Practice Center", "Track", false)
+	local load := false
 	local index := 1
 	local pCenter
 
@@ -7620,6 +7623,9 @@ startupPracticeCenter() {
 				case "-Track":
 					track := A_Args[index + 1]
 					index += 2
+				case "-Load":
+					load := A_Args[index + 1]
+					index += 2
 				default:
 					index += 1
 			}
@@ -7630,6 +7636,9 @@ startupPracticeCenter() {
 		pCenter.createGui(pCenter.Configuration)
 
 		pCenter.show()
+
+		if load
+			pCenter.loadSession(load)
 
 		registerMessageHandler("Practice", methodMessageHandler, pCenter)
 

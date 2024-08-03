@@ -2688,6 +2688,9 @@ synchronizeStrategies(groups, sessionDB, connector, simulators, timestamp, lastS
 
 						name := getMultiMapValue(info, "Strategy", "Name")
 
+						if !InStr(name, ".strategy")
+							name .= ".strategy"
+
 						writeMultiMap(directory . name, strategy)
 
 						setMultiMapValue(info, "Strategy", "Synchronized", true)

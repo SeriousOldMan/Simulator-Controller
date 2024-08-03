@@ -351,7 +351,7 @@ Important: You all know the phrase "Shit in - shit out". Therefore please check 
 
 ### Strategy
 
-The values in this tab and also the document display on the right side of the tabbed pane describe the currently selected strategy. The *Strategy* drop down menu above allows you to save the current strategy, you can load a strategy from the database and you can compare different strategies. Finally, you can export the current stragey to Cato to be used for the next race or you can clear a previously exported strategy, so that you are on your own on the track.
+The values in this tab and also the document display on the right side of the tabbed pane describe the currently selected strategy. The *Strategy* drop down menu above allows you to save the current strategy, you can load a strategy from the database (or any other location on your PC) and you can compare different strategies. Finally, you can export the current stragey to Cato to be used for the next race or you can clear a previously exported strategy, so that you are on your own on the track.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%204.JPG)
 

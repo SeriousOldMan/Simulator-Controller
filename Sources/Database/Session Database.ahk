@@ -90,6 +90,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	iDataListView := false
 	iSettingsListView := false
+	iSessionListView := false
 	iStrategyListView := false
 	iSetupListView := false
 	iAdministrationListView := false
@@ -266,6 +267,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	SettingsListView {
 		Get {
 			return this.iSettingsListView
+		}
+	}
+
+	SessionListView {
+		Get {
+			return this.iSessionListView
 		}
 	}
 
@@ -686,6 +693,59 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			Task.startTask(changeSettingAsync)
 		}
 
+		navSession(listView, line, selected) {
+			if selected
+				chooseSession(listView, line)
+		}
+
+		chooseSession(listView, line, *) {
+			if line
+				SessionDatabaseEditor.Instance.selectSession(line)
+			else
+				editor.updateState()
+		}
+
+		updateSessionAccess(*) {
+			local sessionDB := editor.SessionDatabase
+			local selected, category, name
+
+			selected := editor.SessionListView.GetNext(0)
+
+			if selected {
+				name := editor.SessionListView.GetText(selected, 3)
+				category := ((editor.SessionListView.GetText(selected, 2) = translate("Practice")) ? "Practice" : "Race")
+
+				info := sessionDB.readSessionInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, category, name)
+
+				setMultiMapValue(info, "Session", "Synchronized", false)
+				setMultiMapValue(info, "Access", "Synchronize", editor.Control["shareSessionWithTeamServerCheck"].Value)
+
+				sessionDB.writeSessionInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, category, name, info)
+			}
+		}
+
+		renameSession(*) {
+			local category := editor.SessionListView.GetText(editor.SessionListView.GetNext(0), 2)
+
+			if (category = translate("Practice"))
+				category := "Practice"
+			else
+				category := "Race"
+
+			editor.renameSession(category, editor.SessionListView.GetText(editor.SessionListView.GetNext(0), 3))
+		}
+
+		deleteSession(*) {
+			local category := editor.SessionListView.GetText(editor.SessionListView.GetNext(0), 2)
+
+			if (category = translate("Practice"))
+				category := "Practice"
+			else
+				category := "Race"
+
+			editor.deleteSession(category, editor.SessionListView.GetText(editor.SessionListView.GetNext(0), 3))
+		}
+
 		navStrategy(listView, line, selected) {
 			if selected
 				chooseStrategy(listView, line)
@@ -700,7 +760,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		updateStrategyAccess(*) {
 			local sessionDB := editor.SessionDatabase
-			local selected, type, name
+			local selected, name
 
 			selected := editor.StrategyListView.GetNext(0)
 
@@ -1285,59 +1345,67 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg2", this.themeIcon(kIconsDirectory . "Strategy.ico")).OnEvent("Click", chooseTab.Bind("Strategies"))
-		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab2", translate("Strategies")).OnEvent("Click", chooseTab.Bind("Strategies"))
+		editorGui.Add("Picture", "x16 yp+12 w30 h30 vsettingsImg2", this.themeIcon(kIconsDirectory . "Sessions.ico")).OnEvent("Click", chooseTab.Bind("Sessions"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab2", translate("Sessions")).OnEvent("Click", chooseTab.Bind("Sessions"))
 
 		editorGui.Add("Text", "x16 yp+32 w267 0x10")
 
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg3", this.themeIcon(kIconsDirectory . "Tools BW.ico")).OnEvent("Click", chooseTab.Bind("Setups"))
-		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab3", translate("Setups")).OnEvent("Click", chooseTab.Bind("Setups"))
+		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg3", this.themeIcon(kIconsDirectory . "Strategy.ico")).OnEvent("Click", chooseTab.Bind("Strategies"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab3", translate("Strategies")).OnEvent("Click", chooseTab.Bind("Strategies"))
 
 		editorGui.Add("Text", "x16 yp+32 w267 0x10")
 
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg4", this.themeIcon(kIconsDirectory . "Pressure.ico")).OnEvent("Click", chooseTab.Bind("Pressures"))
-		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab4", translate("Tyre Pressures")).OnEvent("Click", chooseTab.Bind("Pressures"))
+		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg4", this.themeIcon(kIconsDirectory . "Tools BW.ico")).OnEvent("Click", chooseTab.Bind("Setups"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab4", translate("Setups")).OnEvent("Click", chooseTab.Bind("Setups"))
 
 		editorGui.Add("Text", "x16 yp+32 w267 0x10")
 
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg5", this.themeIcon(kIconsDirectory . "Road.ico")).OnEvent("Click", chooseTab.Bind("Automation"))
-		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab5", translate("Automations")).OnEvent("Click", chooseTab.Bind("Automation"))
+		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg5", this.themeIcon(kIconsDirectory . "Pressure.ico")).OnEvent("Click", chooseTab.Bind("Pressures"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab5", translate("Tyre Pressures")).OnEvent("Click", chooseTab.Bind("Pressures"))
 
 		editorGui.Add("Text", "x16 yp+32 w267 0x10")
 
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg6", this.themeIcon(kIconsDirectory . "Sensor.ico")).OnEvent("Click", chooseTab.Bind("Data"))
-		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab6", translate("Administration")).OnEvent("Click", chooseTab.Bind("Data"))
+		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg6", this.themeIcon(kIconsDirectory . "Road.ico")).OnEvent("Click", chooseTab.Bind("Automation"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab6", translate("Automations")).OnEvent("Click", chooseTab.Bind("Automation"))
+
+		editorGui.Add("Text", "x16 yp+32 w267 0x10")
+
+		editorGui.SetFont("Norm")
+		editorGui.SetFont("s10 Bold", "Arial")
+
+		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg7", this.themeIcon(kIconsDirectory . "Sensor.ico")).OnEvent("Click", chooseTab.Bind("Data"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab7", translate("Administration")).OnEvent("Click", chooseTab.Bind("Data"))
 
 		editorGui.Add("Text", "x16 yp+32 w267 0x10")
 
 		editorGui.SetFont("s8 Norm", "Arial")
 
-		editorGui.Add("Picture", "x280 ys-2 w390 h470 Border W:Grow H:Grow")
+		editorGui.Add("Picture", "x280 ys-2 w390 h524 Border W:Grow H:Grow")
 
-		tabs := collect(["Settings", "Stratgies", "Setups", "Pressures", "Automation", "Data"], translate)
+		tabs := collect(["Settings", "Session", "Stratgies", "Setups", "Pressures", "Automation", "Data"], translate)
 
 		editorGui.Add("Tab2", "x296 ys+16 w0 h0 -Wrap Section vsettingsTab", tabs)
 
 		editorGui["settingsTab"].UseTab(1)
 
-		this.iSettingsListView := editorGui.Add("ListView", "x296 ys w360 h326 H:Grow W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Setting", "Value"], translate))
+		this.iSettingsListView := editorGui.Add("ListView", "x296 ys w360 h383 H:Grow W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Setting", "Value"], translate))
 		this.iSettingsListView.OnEvent("Click", chooseSetting)
 		this.iSettingsListView.OnEvent("DoubleClick", chooseSetting)
 		this.iSettingsListView.OnEvent("ItemSelect", navSetting)
 
-		editorGui.Add("Text", "x296 yp+332 w80 h23 Y:Move +0x200", translate("Setting"))
+		editorGui.Add("Text", "x296 yp+389 w80 h23 Y:Move +0x200", translate("Setting"))
 		editorGui.Add("DropDownList", "xp+90 yp w270 Y:Move W:Grow vsettingDropDown").OnEvent("Change", selectSetting)
 
 		editorGui.Add("Text", "x296 yp+24 w80 h23 Y:Move +0x200", translate("Value"))
@@ -1358,12 +1426,27 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui["settingsTab"].UseTab(2)
 
-		this.iStrategyListView := editorGui.Add("ListView", "x296 ys w360 h326 H:Grow W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
+		this.iSessionListView := editorGui.Add("ListView", "x296 ys w360 h403 H:Grow W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Category", "Name"], translate))
+		this.iSessionListView.OnEvent("Click", chooseSession)
+		this.iSessionListView.OnEvent("DoubleClick", chooseSession)
+		this.iSessionListView.OnEvent("ItemSelect", navSession)
+
+		editorGui.Add("Button", "xp+310 yp+410 w23 h23 X:Move Y:Move vrenameSessionButton").OnEvent("Click", renameSession)
+		editorGui.Add("Button", "xp+25 yp w23 h23 X:Move Y:Move vdeleteSessionButton").OnEvent("Click", deleteSession)
+		setButtonIcon(editorGui["renameSessionButton"], kIconsDirectory . "Pencil.ico", 1)
+		setButtonIcon(editorGui["deleteSessionButton"], kIconsDirectory . "Minus.ico", 1)
+
+		editorGui.Add("Text", "x296 yp w80 h23 Y:Move +0x200", translate("Share"))
+		editorGui.Add("CheckBox", "xp+90 yp+4 w140 Y:Move vshareSessionWithTeamServerCheck", translate("on Team Server")).OnEvent("Click", updateSessionAccess)
+
+		editorGui["settingsTab"].UseTab(3)
+
+		this.iStrategyListView := editorGui.Add("ListView", "x296 ys w360 h403 H:Grow W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
 		this.iStrategyListView.OnEvent("Click", chooseStrategy)
 		this.iStrategyListView.OnEvent("DoubleClick", chooseStrategy)
 		this.iStrategyListView.OnEvent("ItemSelect", navStrategy)
 
-		editorGui.Add("Button", "xp+260 yp+328 w23 h23 X:Move Y:Move vuploadStrategyButton").OnEvent("Click", uploadStrategy)
+		editorGui.Add("Button", "xp+260 yp+410 w23 h23 X:Move Y:Move vuploadStrategyButton").OnEvent("Click", uploadStrategy)
 		editorGui.Add("Button", "xp+25 yp w23 h23 X:Move Y:Move vdownloadStrategyButton").OnEvent("Click", downloadStrategy)
 		editorGui.Add("Button", "xp+25 yp w23 h23 X:Move Y:Move vrenameStrategyButton").OnEvent("Click", renameStrategy)
 		editorGui.Add("Button", "xp+25 yp w23 h23 X:Move Y:Move vdeleteStrategyButton").OnEvent("Click", deleteStrategy)
@@ -1376,20 +1459,20 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.Add("CheckBox", "xp+90 yp+4 w140 Y:Move vshareStrategyWithCommunityCheck", translate("with Community")).OnEvent("Click", updateStrategyAccess)
 		editorGui.Add("CheckBox", "x386 yp+24 w140 Y:Move vshareStrategyWithTeamServerCheck", translate("on Team Server")).OnEvent("Click", updateStrategyAccess)
 
-		editorGui["settingsTab"].UseTab(3)
+		editorGui["settingsTab"].UseTab(4)
 
 		editorGui.Add("Text", "x296 ys w80 h23 +0x200", translate("Purpose"))
 		editorGui.Add("DropDownList", "xp+90 yp w270 W:Grow Choose2 vsetupTypeDropDown"
 					, collect(["Qualifying (Dry)", "Race (Dry)", "Qualifying (Wet)", "Race (Wet)"], translate)).OnEvent("Change", chooseSetupType)
 
-		this.iSetupListView := editorGui.Add("ListView", "x296 yp+24 w360 h302 H:Grow W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
+		this.iSetupListView := editorGui.Add("ListView", "x296 yp+24 w360 h379 H:Grow W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
 		this.iSetupListView.OnEvent("Click", chooseSetup)
 		this.iSetupListView.OnEvent("DoubleClick", chooseSetup)
 		this.iSetupListView.OnEvent("ItemSelect", navSetup)
 
 		this.iSelectedSetupType := kDryRaceSetup
 
-		editorGui.Add("Button", "xp+260 yp+304 w23 h23 Y:Move X:Move vuploadSetupButton").OnEvent("Click", uploadSetup)
+		editorGui.Add("Button", "xp+260 yp+385 w23 h23 Y:Move X:Move vuploadSetupButton").OnEvent("Click", uploadSetup)
 		editorGui.Add("Button", "xp+25 yp w23 h23 Y:Move X:Move vdownloadSetupButton").OnEvent("Click", downloadSetup)
 		editorGui.Add("Button", "xp+25 yp w23 h23 Y:Move X:Move vrenameSetupButton").OnEvent("Click", renameSetup)
 		editorGui.Add("Button", "xp+25 yp w23 h23 Y:Move X:Move vdeleteSetupButton").OnEvent("Click", deleteSetup)
@@ -1402,7 +1485,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.Add("CheckBox", "xp+90 yp+4 w140 Y:Move vshareSetupWithCommunityCheck", translate("with Community")).OnEvent("Click", updateSetupAccess)
 		editorGui.Add("CheckBox", "x386 yp+24 w140 Y:Move vshareSetupWithTeamServerCheck", translate("on Team Server")).OnEvent("Click", updateSetupAccess)
 
-		editorGui["settingsTab"].UseTab(4)
+		editorGui["settingsTab"].UseTab(5)
 
 		editorGui.Add("Text", "x296 ys w85 h23 +0x200", translate("Driver"))
 		editorGui.Add("DropDownList", "x386 yp w100 vdriverDropDown").OnEvent("Change", loadPressures)
@@ -1466,7 +1549,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		if this.RequestorPID
 			editorGui.Add("Button", "x440 yp+50 w80 h23 vtransferPressuresButton", translate("Load")).OnEvent("Click", transferPressures)
 
-		editorGui["settingsTab"].UseTab(5)
+		editorGui["settingsTab"].UseTab(6)
 
 		this.iTrackDisplayArea := [297, 239, 358, 350]
 
@@ -1474,7 +1557,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.iTrackDisplay := editorGui.Add("Picture", "x297 y239 BackgroundTrans vtrackDisplay")
 		this.iTrackDisplay.OnEvent("Click", selectTrackAction)
 
-		this.iTrackAutomationsListView := editorGui.Add("ListView", "x296 y597 w110 h85 Y:Move(0.9) W:Grow(0.3) H:Grow(0.1) -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Name", "#"], translate))
+		this.iTrackAutomationsListView := editorGui.Add("ListView", "x296 y597 w110 h142 Y:Move(0.9) W:Grow(0.3) H:Grow(0.1) -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Name", "#"], translate))
 		this.iTrackAutomationsListView.OnEvent("Click", selectTrackAutomation)
 		this.iTrackAutomationsListView.OnEvent("DoubleClick", selectTrackAutomation)
 		this.iTrackAutomationsListView.OnEvent("ItemSelect", navTrackAutomation)
@@ -1490,32 +1573,32 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		setButtonIcon(editorGui["saveTrackAutomationButton"], kIconsDirectory . "Save.ico", 1, "L5 T5 R5 B5")
 
 		editorGui.Add("Text", "x415 yp+24 w60 h23 Y:Move(0.9) X:Move(0.8) +0x200", translate("Actions"))
-		editorGui.Add("Edit", "xp+60 yp w181 h61 Y:Move(0.9) X:Move(0.8) W:Grow(0.2) H:Grow(0.1) ReadOnly -Wrap vtrackAutomationInfoEdit")
+		editorGui.Add("Edit", "xp+60 yp w181 h118 Y:Move(0.9) X:Move(0.8) W:Grow(0.2) H:Grow(0.1) ReadOnly -Wrap vtrackAutomationInfoEdit")
 
-		editorGui["settingsTab"].UseTab(6)
+		editorGui["settingsTab"].UseTab(7)
 
 		editorGui.Add("CheckBox", "Check3 x296 ys+2 w15 h21 vdataSelectCheck").OnEvent("Click", selectAllData)
 
-		this.iAdministrationListView := editorGui.Add("ListView", "x314 ys w342 h404 W:Grow H:Grow -Multi -LV0x10 Checked AltSubmit", collect(["Type", "Car / Track", "Driver", "#"], translate))
+		this.iAdministrationListView := editorGui.Add("ListView", "x314 ys w342 h461 W:Grow H:Grow -Multi -LV0x10 Checked AltSubmit", collect(["Type", "Car / Track", "Driver", "#"], translate))
 		this.iAdministrationListView.OnEvent("ItemCheck", selectData)
 		this.iAdministrationListView.OnEvent("Click", noSelect)
 		this.iAdministrationListView.OnEvent("DoubleClick", noSelect)
 
-		editorGui.Add("Button", "x314 yp+419 w90 h23 Y:Move vexportDataButton", translate("Export...")).OnEvent("Click", exportData)
+		editorGui.Add("Button", "x314 yp+476 w90 h23 Y:Move vexportDataButton", translate("Export...")).OnEvent("Click", exportData)
 		editorGui.Add("Button", "xp+95 yp w90 h23 Y:Move vimportDataButton", translate("Import...")).OnEvent("Click", importData)
 
 		editorGui.Add("Button", "x566 yp w90 h23 Y:Move X:Move vdeleteDataButton", translate("Delete...")).OnEvent("Click", deleteData)
 
 		editorGui["settingsTab"].UseTab()
 
-		editorGui.Add("Text", "x16 ys+277 w100 h23 +0x200", translate("Available Data"))
+		editorGui.Add("Text", "x16 ys+331 w100 h23 +0x200", translate("Available Data"))
 
 		choices := ["User", "User & Community"]
 		chosen := (this.UseCommunity ? 2 : 1)
 
 		editorGui.Add("DropDownList", "x120 yp w140 Choose" . chosen . " vdatabaseScopeDropDown", collect(choices, translate)).OnEvent("Change", chooseDatabaseScope)
 
-		this.iDataListView := editorGui.Add("ListView", "x16 ys+301 w244 h151 H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Type", "#"], translate))
+		this.iDataListView := editorGui.Add("ListView", "x16 ys+355 w244 h151 H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Type", "#"], translate))
 		this.iDataListView.OnEvent("Click", noSelect)
 		this.iDataListView.OnEvent("DoubleClick", noSelect)
 
@@ -1713,59 +1796,70 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			window["settingsTab1"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
-		if this.moduleAvailable("Strategies") {
+		if this.moduleAvailable("Sessions") {
 			window["settingsImg2"].Enabled := true
-			window["settingsImg2"].Value := this.themeIcon(kIconsDirectory . "Strategy.ico")
+			window["settingsImg2"].Value := this.themeIcon(kIconsDirectory . "Sessions.ico")
 			window["settingsTab2"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
 		}
 		else {
 			window["settingsImg2"].Enabled := false
-			window["settingsImg2"].Value := this.themeIcon(kIconsDirectory . "Strategy Gray.ico")
+			window["settingsImg2"].Value := this.themeIcon(kIconsDirectory . "Sessions Gray.ico")
 			window["settingsTab2"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
-		if this.moduleAvailable("Setups") {
+		if this.moduleAvailable("Strategies") {
 			window["settingsImg3"].Enabled := true
-			window["settingsImg3"].Value := this.themeIcon(kIconsDirectory . "Tools BW.ico")
+			window["settingsImg3"].Value := this.themeIcon(kIconsDirectory . "Strategy.ico")
 			window["settingsTab3"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
 		}
 		else {
 			window["settingsImg3"].Enabled := false
-			window["settingsImg3"].Value := this.themeIcon(kIconsDirectory . "Tools Gray.ico")
+			window["settingsImg3"].Value := this.themeIcon(kIconsDirectory . "Strategy Gray.ico")
 			window["settingsTab3"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
-		if this.moduleAvailable("Pressures") {
+		if this.moduleAvailable("Setups") {
 			window["settingsImg4"].Enabled := true
-			window["settingsImg4"].Value := this.themeIcon(kIconsDirectory . "Pressure.ico")
+			window["settingsImg4"].Value := this.themeIcon(kIconsDirectory . "Tools BW.ico")
 			window["settingsTab4"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
 		}
 		else {
 			window["settingsImg4"].Enabled := false
-			window["settingsImg4"].Value := this.themeIcon(kIconsDirectory . "Pressure Gray.ico")
+			window["settingsImg4"].Value := this.themeIcon(kIconsDirectory . "Tools Gray.ico")
 			window["settingsTab4"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
-		if this.moduleAvailable("Automation") {
+		if this.moduleAvailable("Pressures") {
 			window["settingsImg5"].Enabled := true
-			window["settingsImg5"].Value := this.themeIcon(kIconsDirectory . "Road.ico")
+			window["settingsImg5"].Value := this.themeIcon(kIconsDirectory . "Pressure.ico")
 			window["settingsTab5"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
 		}
 		else {
 			window["settingsImg5"].Enabled := false
-			window["settingsImg5"].Value := this.themeIcon(kIconsDirectory . "Road Gray.ico")
+			window["settingsImg5"].Value := this.themeIcon(kIconsDirectory . "Pressure Gray.ico")
 			window["settingsTab5"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
-		if this.moduleAvailable("Data") {
+		if this.moduleAvailable("Automation") {
 			window["settingsImg6"].Enabled := true
-			window["settingsImg6"].Value := this.themeIcon(kIconsDirectory . "Sensor.ico")
+			window["settingsImg6"].Value := this.themeIcon(kIconsDirectory . "Road.ico")
 			window["settingsTab6"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
 		}
 		else {
 			window["settingsImg6"].Enabled := false
-			window["settingsImg6"].Value := this.themeIcon(kIconsDirectory . "Sensor Gray.ico")
+			window["settingsImg6"].Value := this.themeIcon(kIconsDirectory . "Road Gray.ico")
 			window["settingsTab6"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
+		}
+
+		if this.moduleAvailable("Data") {
+			window["settingsImg7"].Enabled := true
+			window["settingsImg7"].Value := this.themeIcon(kIconsDirectory . "Sensor.ico")
+			window["settingsTab7"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
+		}
+		else {
+			window["settingsImg7"].Enabled := false
+			window["settingsImg7"].Value := this.themeIcon(kIconsDirectory . "Sensor Gray.ico")
+			window["settingsTab7"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
 		switch this.SelectedModule, false {
@@ -1773,18 +1867,22 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				window["settingsTab1"].SetFont("s10 Bold c" . window.Theme.TextColor, "Arial")
 
 				window["settingsTab"].Choose(1)
-			case "Strategies":
+			case "Sessions":
 				window["settingsTab2"].SetFont("s10 Bold c" . window.Theme.TextColor, "Arial")
 
 				window["settingsTab"].Choose(2)
-			case "Setups":
+			case "Strategies":
 				window["settingsTab3"].SetFont("s10 Bold c" . window.Theme.TextColor, "Arial")
 
 				window["settingsTab"].Choose(3)
-			case "Pressures":
+			case "Setups":
 				window["settingsTab4"].SetFont("s10 Bold c" . window.Theme.TextColor, "Arial")
 
 				window["settingsTab"].Choose(4)
+			case "Pressures":
+				window["settingsTab5"].SetFont("s10 Bold c" . window.Theme.TextColor, "Arial")
+
+				window["settingsTab"].Choose(5)
 
 				window["editPressuresButton"].Enabled := false
 
@@ -1797,13 +1895,58 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							break
 						}
 			case "Automation":
-				window["settingsTab5"].SetFont("s10 Bold c" . window.Theme.TextColor, "Arial")
-
-				window["settingsTab"].Choose(5)
-			case "Data":
 				window["settingsTab6"].SetFont("s10 Bold c" . window.Theme.TextColor, "Arial")
 
 				window["settingsTab"].Choose(6)
+			case "Data":
+				window["settingsTab7"].SetFont("s10 Bold c" . window.Theme.TextColor, "Arial")
+
+				window["settingsTab"].Choose(7)
+		}
+
+		selected := this.SessionListView.GetNext(0)
+
+		if selected {
+			type := this.SessionListView.GetText(selected, 1)
+			name := this.SessionListView.GetText(selected, 3)
+
+			if (type != translate("Community")) {
+				type := this.SessionListView.GetText(selected, 2)
+
+				if (type = translate("Practice"))
+					type := "Practice"
+				else
+					type := "Race"
+
+				info := this.SessionDatabase.readSessionInfo(simulator, car, track, type, name)
+
+				window["deleteSessionButton"].Enabled := true
+
+				if (!info || (getMultiMapValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID)) {
+					window["renameSessionButton"].Enabled := true
+					window["shareSessionWithTeamServerCheck"].Enabled := true
+				}
+				else {
+					window["renameSessionButton"].Enabled := false
+					window["shareSessionWithTeamServerCheck"].Enabled := false
+
+					window["shareSessionWithTeamServerCheck"].Value := 0
+				}
+			}
+			else {
+				window["deleteSessionButton"].Enabled := false
+				window["renameSessionButton"].Enabled := false
+				window["shareSessionWithTeamServerCheck"].Enabled := false
+
+				window["shareSessionWithTeamServerCheck"].Value := 0
+			}
+		}
+		else {
+			window["deleteSessionButton"].Enabled := false
+			window["renameSessionButton"].Enabled := false
+			window["shareSessionWithTeamServerCheck"].Enabled := false
+
+			window["shareSessionWithTeamServerCheck"].Value := 0
 		}
 
 		selected := this.StrategyListView.GetNext(0)
@@ -2090,6 +2233,44 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			this.updateModules()
 		}
+	}
+
+	loadSessions(select := false) {
+		local window := this.Window
+		local sessions, infos, index, name, info, origi
+
+		this.SessionListView.Delete()
+
+		for ignore, type in ["Practice", "Race"] {
+			this.SessionDatabase.getSessions(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, type, &sessions, &infos := true)
+
+			for index, name in sessions {
+				origin := getMultiMapValue(infos[index], "Creator", "ID", this.SessionDatabase.ID)
+
+				origin := this.SessionDatabase.getDriverName(this.SelectedSimulator, origin)
+
+				if (select = name) {
+					this.SessionListView.Add("Select Vis", origin, translate(type), name)
+
+					select := this.StrategyListView.GetCount()
+				}
+				else
+					this.SessionListView.Add("", origin, translate(type), name)
+			}
+		}
+
+		this.SessionListView.ModifyCol()
+
+		loop 3
+			this.SessionListView.ModifyCol(A_Index, 10)
+
+		loop 3
+			this.SessionListView.ModifyCol(A_Index, "AutoHdr")
+
+		if select
+			this.selectSession(select)
+		else
+			this.updateState()
 	}
 
 	loadStrategies(select := false) {
@@ -3796,6 +3977,38 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.loadData()
 	}
 
+	selectSessions() {
+		local ignore, column, sessions, infos, type, setups
+		local info, origin
+
+		this.DataListView.Delete()
+
+		loop this.DataListView.GetCount("Col")
+			this.DataListView.DeleteCol(1)
+
+		for ignore, column in collect(["Source", "#"], translate)
+			this.DataListView.InsertCol(A_Index, "", column)
+
+		userStrategies := true
+		communityStrategies := true
+
+		for ignore, type in ["Practice", "Race"] {
+			this.SessionDatabase.getSessions(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, type, &sessions, &infos := true)
+
+			this.DataListView.Add("", translate(type), sessions.Length)
+		}
+
+		this.DataListView.ModifyCol()
+
+		loop 2
+			this.DataListView.ModifyCol(A_Index, 10)
+
+		loop 2
+			this.DataListView.ModifyCol(A_Index, "AutoHdr")
+
+		this.loadSessions()
+	}
+
 	selectStrategies() {
 		local ignore, column, userSetups, communitySetups, type, setups
 		local info, origin
@@ -3913,12 +4126,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.iAvailableModules["Data"] := true
 
 			if ((car && (car != true)) && (track && (track != true))) {
+				this.iAvailableModules["Sessions"] := true
 				this.iAvailableModules["Strategies"] := true
 				this.iAvailableModules["Setups"] := true
 				this.iAvailableModules["Pressures"] := true
 				this.iAvailableModules["Automation"] := this.SessionDatabase.hasTrackMap(simulator, track)
 			}
 			else {
+				this.iAvailableModules["Sessions"] := false
 				this.iAvailableModules["Strategies"] := false
 				this.iAvailableModules["Setups"] := false
 				this.iAvailableModules["Pressures"] := false
@@ -3928,6 +4143,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		else {
 			this.iAvailableModules["Settings"] := false
 			this.iAvailableModules["Data"] := false
+			this.iAvailableModules["Sessions"] := false
 			this.iAvailableModules["Strategies"] := false
 			this.iAvailableModules["Setups"] := false
 			this.iAvailableModules["Pressures"] := false
@@ -3954,6 +4170,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						this.selectSettings()
 					case "Data":
 						this.selectData()
+					case "Sessions":
+						this.selectSessions()
 					case "Strategies":
 						this.selectStrategies()
 					case "Setups":
@@ -4492,6 +4710,20 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 	}
 
+	selectSession(row) {
+		local window := this.Window
+		local category := ((this.SessionListView.GetText(row, 2) = translate("Practice")) ? "Practice" : "Race")
+		local info := this.SessionDatabase.readSessionInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack
+														 , category, this.SessionListView.GetText(row, 3))
+
+		if (info && getMultiMapValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID)
+			window["shareSessionWithTeamServerCheck"].Value := getMultiMapValue(info, "Access", "Synchronize", false)
+		else
+			window["shareSessionWithTeamServerCheck"].Value := 0
+
+		this.updateState()
+	}
+
 	selectStrategy(row) {
 		local window := this.Window
 		local info := this.SessionDatabase.readStrategyInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack
@@ -4528,6 +4760,41 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		this.updateState()
+	}
+
+	deleteSession(category, sessionName) {
+		local msgResult
+
+		OnMessage(0x44, translateYesNoButtons)
+		msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected session?"), translate("Delete"), 262436)
+		OnMessage(0x44, translateYesNoButtons, 0)
+
+		if (msgResult = "Yes") {
+			this.SessionDatabase.removeSession(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack
+											 , category, sessionName)
+
+			this.loadSessions()
+		}
+	}
+
+	renameSession(category, sessionName) {
+		local window := this.Window
+		local result, newName, curExtension, curName
+
+		window.Opt("+OwnDialogs")
+
+		curName := sessionName
+
+		result := withBlockedWindows(InputBox, translate("Please enter the new name for the selected session:"), translate("Rename"), "w300 h200", curName)
+
+		if (result.Result = "Ok") {
+			newName := result.Value
+
+			this.SessionDatabase.renameSession(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack
+											 , category, sessionName, newName)
+
+			this.loadSessions(newName)
+		}
 	}
 
 	uploadStrategy() {

@@ -286,8 +286,28 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			if FileExist(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json") {
 				try {
-					accUdpConfig := JSON.parse(StrReplace(StrGet(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "Raw"))
-														, "`r`n", "`n"))
+					try {
+						try {
+							try {
+								try {
+									accUdpConfig := JSON.parse(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "`n"))
+								}
+								catch Any {
+									accUdpConfig := JSON.parse(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "`n CP0"))
+								}
+							}
+							catch Any {
+								accUdpConfig := JSON.parse(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "`n UTF-8"))
+							}
+						}
+						catch Any {
+							accUdpConfig := accUdpConfig := JSON.parse(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "`n UTF-16"))
+						}
+					}
+					catch Any {
+						accUdpConfig := JSON.parse(StrReplace(StrGet(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "Raw"))
+															, "`r`n", "`n"))
+					}
 				}
 				catch Any as exception {
 					logError(exception, true)
@@ -322,8 +342,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				if !udpConfigValid {
 					logMessage(kLogCritical, translate("The UDP configuration for Assetto Corsa Competizione is not valid - please consult the documentation for the ACC plugin"))
 
-				showMessage(translate("The UDP configuration for Assetto Corsa Competizione is not valid - please consult the documentation for the ACC plugin") . translate("...")
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+					showMessage(translate("The UDP configuration for Assetto Corsa Competizione is not valid - please consult the documentation for the ACC plugin") . translate("...")
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 			}
 
@@ -428,7 +448,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	shutdownUDPClient(force := false, arguments*) {
 		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
 			return false
-		
+
 		if ((this.UDPClient || force) && ProcessExist("ACC UDP Provider.exe")) {
 			loop 5 {
 				try {

@@ -729,7 +729,7 @@ class SetupWizard extends ConfiguratorPanel {
 
 		helpGui.Add("HTMLViewer", "x12 yp+10 w350 h545 W:Grow H:Grow vinfoViewer")
 
-		html := "<html><head><meta http-equiv=`"X-UA-Compatible`" content=`"IE=Edge`"></head><body style='background-color: #" . helpGui.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
+		html := "<html><head><meta http-equiv=`"X-UA-Compatible`" content=`"IE=Edge`"></head><body style='background-color: #" . helpGui.BackColor . "' style='overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'></body></html>"
 
 		helpGui["infoViewer"].document.write(html)
 
@@ -2695,7 +2695,7 @@ class StartStepWizard extends StepWizard {
 			widget4 := window.Add("Button", "x" . x . " yp+380 w260 h30 Y:Move H:Center Hidden", translate("Unblock Applications and DLLs..."))
 			widget4.OnEvent("Click", elevateAndRestart)
 
-			html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style>div, p { color: #" . window.Theme.TextColor . "}</style>" . info . "</body></html>"
+			html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "' style='overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style>div, p { color: #" . window.Theme.TextColor . "}</style>" . info . "</body></html>"
 
 			widget3.document.write(html)
 

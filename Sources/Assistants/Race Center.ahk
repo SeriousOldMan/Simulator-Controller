@@ -123,6 +123,16 @@ kRCTyresSchemas["Tyres.Pressures"] := concatenate(kRCTyresSchemas["Tyres.Pressur
 ;;;-------------------------------------------------------------------------;;;
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; Class                          HTMLWindow                               ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class HTMLWindow extends Window {
+	Close(*) {
+		this.Destroy()
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; Class                        RaceCenterTask                             ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
@@ -319,14 +329,14 @@ class RaceCenter extends ConfigurationItem {
 		__New(arguments*) {
 			super.__New(arguments*)
 
-			Task.startTask(ObjBindMethod(this, "RedrawHTMLViwer"), 500, kLowPriority)
+			Task.startTask(ObjBindMethod(this, "RedrawHTMLViewer"), 500, kLowPriority)
 		}
 
 		Resize(deltaWidth, deltaHeight) {
 			this.iRedraw := true
 		}
 
-		RedrawHTMLViwer() {
+		RedrawHTMLViewer() {
 			if this.iRedraw {
 				local center := RaceCenter.Instance
 				local ignore, button
@@ -344,6 +354,44 @@ class RaceCenter extends ConfigurationItem {
 			}
 
 			return Task.CurrentTask
+		}
+	}
+
+	class HTMLResizer extends Window.Resizer {
+		iHTMLViewer := false
+		iRedraw := false
+
+		__New(htmlViewer, arguments*) {
+			this.iHTMLViewer := htmlViewer
+
+			super.__New(arguments*)
+
+			Task.startTask(ObjBindMethod(this, "RedrawHTMLViewer"), 500, kLowPriority)
+		}
+
+		Resize(deltaWidth, deltaHeight) {
+			this.iRedraw := true
+		}
+
+		RedrawHTMLViewer() {
+			try {
+				if this.iRedraw {
+					local ignore, button
+
+					for ignore, button in ["LButton", "MButton", "RButton"]
+						if GetKeyState(button)
+							return Task.CurrentTask
+
+					this.iRedraw := false
+
+					this.iHTMLViewer.Resized()
+				}
+
+				return Task.CurrentTask
+			}
+			catch Any {
+				return false
+			}
 		}
 	}
 
@@ -1263,7 +1311,7 @@ class RaceCenter extends ConfigurationItem {
 	createGui(configuration) {
 		local center := this
 		local centerGui, centerTab, x, y, width, ignore, report, choices, serverURLs, settings, button, control
-		local menu1, menu2, menus
+		local menu1, menu2, menus, htmlViewer
 
 		validateNumber(field, *) {
 			field := centerGui[field]
@@ -1508,6 +1556,11 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		chooseLap(listView, line, *) {
+			if (line && (this.Mode = "Normal"))
+				center.withExceptionhandler(ObjBindMethod(center, "showLapDetails", center.Laps[listView.GetText(line, 1)]))
+		}
+
+		openLap(listView, line, *) {
 			if line
 				center.withExceptionhandler(ObjBindMethod(center, "showLapDetails", center.Laps[listView.GetText(line, 1)]))
 		}
@@ -2015,7 +2068,7 @@ class RaceCenter extends ConfigurationItem {
 			this.iWaitViewer := centerGui.Add("HTMLViewer", "x1323 yp-8 w30 h30 X:Move vwaitViewer Hidden")
 
 			this.iWaitViewer.document.open()
-			this.iWaitViewer.document.write("<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . (kResourcesDirectory . "Wait.gif") . "' width=28 height=28 border=0 padding=0></body></html>")
+			this.iWaitViewer.document.write("<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><img src='" . (kResourcesDirectory . "Wait.gif") . "' width=28 height=28 border=0 padding=0></body></html>")
 			this.iWaitViewer.document.close()
 
 			centerGui.SetFont("s8 Norm", "Arial")
@@ -2034,7 +2087,7 @@ class RaceCenter extends ConfigurationItem {
 			this.iWaitViewer := centerGui.Add("HTMLViewer", "x580 yp-8 w30 h30 X:Move vwaitViewer Hidden")
 
 			this.iWaitViewer.document.open()
-			this.iWaitViewer.document.write("<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . (kResourcesDirectory . "Wait.gif") . "' width=28 height=28 border=0 padding=0></body></html>")
+			this.iWaitViewer.document.write("<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><img src='" . (kResourcesDirectory . "Wait.gif") . "' width=28 height=28 border=0 padding=0></body></html>")
 			this.iWaitViewer.document.close()
 		}
 
@@ -2116,7 +2169,7 @@ class RaceCenter extends ConfigurationItem {
 
 		this.iLapsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 " . ((this.Mode = "Normal") ? "H:Grow(0.8)" : "H:Grow W:Grow") . " -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Stint", "Driver", "Position", "Weather", "Grip", "Lap Time", "Sector Times", "Consumption", "Remaining", "Pressures", "Invalid", "Accident", "Penalty"], translate))
 		this.iLapsListView.OnEvent("Click", chooseLap)
-		this.iLapsListView.OnEvent("DoubleClick", chooseLap)
+		this.iLapsListView.OnEvent("DoubleClick", openLap)
 		this.iLapsListView.OnEvent("ItemSelect", selectLap)
 
 		if (this.Mode = "Normal") {
@@ -2314,6 +2367,12 @@ class RaceCenter extends ConfigurationItem {
 			centerGui.Add(RaceCenter.RaceCenterResizer(centerGui))
 		}
 		else {
+			htmlViewer := centerGui.Add("HTMLViewer", "x0 y0 w640 h480 Hidden")
+
+			this.iDetailsViewer := htmlViewer
+			this.iReportViewer := RaceReportViewer(centerGui, htmlViewer)
+			this.iStrategyViewer := StrategyViewer(centerGui, htmlViewer)
+
 			menu1 := Menu()
 
 			menu1.Add(translate("Synchronize"), (*) => this.chooseSessionMenu(1))
@@ -5994,8 +6053,7 @@ class RaceCenter extends ConfigurationItem {
 
 			DirCreate(reportDirectory)
 
-			if (this.Mode = "Normal")
-				this.ReportViewer.setReport(reportDirectory)
+			this.ReportViewer.setReport(reportDirectory)
 		}
 
 		pitstopSettings(kClose)
@@ -9521,7 +9579,7 @@ class RaceCenter extends ConfigurationItem {
 				(
 						</script>
 					</head>
-					<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
+					<body style='background-color: #%backColor%' style='overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'>
 						<style>
 							.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
 							.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
@@ -9543,7 +9601,7 @@ class RaceCenter extends ConfigurationItem {
 				this.ChartViewer.document.write(html)
 			}
 			else {
-				html := "<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
+				html := "<html><body style='background-color: #%backColor%' style='overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'></body></html>"
 
 				this.ChartViewer.document.write(substituteVariables(html, {backColor: this.Window.AltBackColor}))
 			}
@@ -9680,58 +9738,79 @@ class RaceCenter extends ConfigurationItem {
 		local chartID := 1
 		local html := (details ? details : "")
 		local script, ignore, chart
+		local x, y, w, h, htmlGui, htmlViewer, title
+
+		this.iSelectedDetailReport := report
+
+		if details {
+			script := "
+			(
+				<meta charset='utf-8'>
+				<head>
+					<style>
+						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+						.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+						.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
+						%tableCSS%
+					</style>
+					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+					<script type="text/javascript">
+						google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawCharts);
+
+						function drawCharts() {
+			)"
+
+			script := substituteVariables(script, {tableCSS: this.StrategyViewer.getTableCSS()
+												 , fontColor: this.Window.Theme.TextColor
+												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
+												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
+												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
+
+			for ignore, chart in charts
+				script .= (A_Space . "drawChart" . chart[1] . "();")
+
+			script .= "}`n"
+
+			for ignore, chart in charts {
+				if (A_Index > 0)
+					script .= "`n"
+
+				script .= chart[2]
+			}
+
+			script .= "</script></head>"
+		}
+		else
+			script := ""
+
+		html := ("<html>" . script . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style> p, div, table { color: " . this.Window.Theme.TextColor . "; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; }</style><div" . ((this.Mode = "Normal") ? "" : "style=leftmargin=5; topmargin=5; rightmargin=5; bottommargin=5'") . ">" . html . "</div></body></html>")
 
 		if (this.Mode = "Normal") {
-			this.iSelectedDetailReport := report
-
-			if details {
-				script := "
-				(
-					<meta charset='utf-8'>
-					<head>
-						<style>
-							.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
-							.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
-							.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
-							%tableCSS%
-						</style>
-						<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-						<script type="text/javascript">
-							google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawCharts);
-
-							function drawCharts() {
-				)"
-
-				script := substituteVariables(script, {tableCSS: this.StrategyViewer.getTableCSS()
-													 , fontColor: this.Window.Theme.TextColor
-													 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
-													 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
-													 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
-
-				for ignore, chart in charts
-					script .= (A_Space . "drawChart" . chart[1] . "();")
-
-				script .= "}`n"
-
-				for ignore, chart in charts {
-					if (A_Index > 0)
-						script .= "`n"
-
-					script .= chart[2]
-				}
-
-				script .= "</script></head>"
-			}
-			else
-				script := ""
-
-			html := ("<html>" . script . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> p, div, table { color: " . this.Window.Theme.TextColor . "; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; }</style><div>" . html . "</div></body></html>")
-
 			this.iSelectedDetailHTML := html
 
 			this.DetailsViewer.document.open()
 			this.DetailsViewer.document.write(html)
 			this.DetailsViewer.document.close()
+		}
+		else if details {
+			title := (translate(report) . A_Space . translate("Report"))
+			htmlGui := HTMLWindow({Descriptor: "Race Center." . title, Closeable: true, Resizeable:  "Deferred"}, title)
+
+			htmlViewer := htmlGui.Add("HTMLViewer", "X0 Y0 W640 H480 W:Grow H:Grow")
+
+			htmlViewer.document.open()
+			htmlViewer.document.write(html)
+			htmlViewer.document.close()
+
+			htmlGui.Add(RaceCenter.HTMLResizer(htmlViewer, htmlGui))
+
+			if getWindowPosition("Race Center." . title, &x, &y)
+				htmlGui.Show("x" . x . " y" . y . " w640 h480")
+			else
+				htmlGui.Show("w640 h480")
+
+			if getWindowSize("Race Center." . title, &w, &h)
+				htmlGui.Resize("Initialize", w, h)
 		}
 	}
 
@@ -10107,14 +10186,14 @@ class RaceCenter extends ConfigurationItem {
 												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
 
-			html := ("<html>" . script . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } </style><div>" . html . "</div></body></html>")
+			html := ("<html>" . script . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } </style><div>" . html . "</div></body></html>")
 
 			this.ChartViewer.document.write(html)
 		}
 		else {
 			this.selectReport(false)
 
-			this.ChartViewer.document.write("<html><body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>")
+			this.ChartViewer.document.write("<html><body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'></body></html>")
 		}
 
 		this.ChartViewer.document.close()
@@ -13091,7 +13170,6 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 				else
 					settingsGui.Show("Hide")
 			}
-
 		}
 	}
 }

@@ -144,7 +144,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 
 		widget8 := window.Add("HTMLViewer", "x" . x . " yp+265 w" . width . " h80 Y:Move(0.66) W:Grow H:Grow(0.33) VpedalCalibrationInfoText Hidden")
 
-		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, p, body { color: #" . window.Theme.TextColor . "}</style>" . info . "</body></html>"
+		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "' style='overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style> div, p, body { color: #" . window.Theme.TextColor . "}</style>" . info . "</body></html>"
 
 		widget8.document.write(html)
 

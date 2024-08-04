@@ -203,6 +203,7 @@ class RaceCenter extends ConfigurationItem {
 	static kInvalidToken := "__Invalid__"
 
 	iWindow := false
+	iMode := "Normal"
 
 	iWorking := 0
 	iSyncTask := false
@@ -712,6 +713,12 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
+	Mode {
+		Get {
+			return this.iMode
+		}
+	}
+
 	Control[name] {
 		Get {
 			return this.Window[name]
@@ -1183,10 +1190,11 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
-	__New(configuration, raceSettings, simulator, car, track) {
+	__New(configuration, raceSettings, simulator, car, track, mode := "Normal") {
 		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 		local dllFile
 
+		this.iMode := mode
 		this.iRaceSettings := raceSettings
 
 		dllFile := (kBinariesDirectory . "Connectors\Team Server Connector.dll")
@@ -1223,12 +1231,6 @@ class RaceCenter extends ConfigurationItem {
 		super.__New(configuration)
 
 		RaceCenter.Instance := this
-
-		this.iSyncTask := SyncSessionTask()
-
-		this.iSyncTask.start()
-
-		PeriodicTask(ObjBindMethod(this, "keepAlive"), 120000, kLowPriority).start()
 	}
 
 	loadFromConfiguration(configuration) {
@@ -1890,353 +1892,358 @@ class RaceCenter extends ConfigurationItem {
 			}
 		}
 
-		centerGui := Window({Descriptor: "Race Center", Closeable: true, Resizeable: "Deferred"})
+		if (this.Mode = "Normal")
+			centerGui := Window({Descriptor: "Race Center", Closeable: true, Resizeable: "Deferred"})
+		else
+			centerGui := Window({Descriptor: "Race Center Lite", Closeable: true, Resizeable: "Deferred"})
 
 		this.iWindow := centerGui
 
-		centerGui.SetFont("s10 Bold", "Arial")
+		if (this.Mode = "Normal") {
+			centerGui.SetFont("s10 Bold", "Arial")
 
-		centerGui.Add("Text", "w1334 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(centerGui, "Race Center"))
+			centerGui.Add("Text", "w1334 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(centerGui, "Race Center"))
 
-		centerGui.SetFont("s9 Norm", "Arial")
+			centerGui.SetFont("s9 Norm", "Arial")
 
-		centerGui.Add("Documentation", "x608 YP+20 w134 H:Center Center", translate("Race Center")
-					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center")
+			centerGui.Add("Documentation", "x608 YP+20 w134 H:Center Center", translate("Race Center")
+						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center")
 
-		centerGui.Add("Text", "x8 yp+30 w1350 W:Grow 0x10")
+			centerGui.Add("Text", "x8 yp+30 w1350 W:Grow 0x10")
 
-		centerGui.SetFont("Norm")
-		centerGui.SetFont("s10 Bold", "Arial")
+			centerGui.SetFont("Norm")
+			centerGui.SetFont("s10 Bold", "Arial")
 
-		centerGui.Add("Picture", "x16 yp+12 w30 h30 Section", centerGui.Theme.RecolorizeImage(kIconsDirectory . "Report.ico"))
-		centerGui.Add("Text", "x50 yp+5 w80 h26", translate("Reports"))
+			centerGui.Add("Picture", "x16 yp+12 w30 h30 Section", centerGui.Theme.RecolorizeImage(kIconsDirectory . "Report.ico"))
+			centerGui.Add("Text", "x50 yp+5 w80 h26", translate("Reports"))
 
-		centerGui.SetFont("s8 Norm", "Arial")
+			centerGui.SetFont("s8 Norm", "Arial")
 
-		x := 16
-		y := 70
-		width := 388
+			x := 16
+			y := 70
+			width := 388
 
-		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-		serverURLs := string2Values(";", getMultiMapValue(settings, "Team Server", "Server URLs", ""))
+			serverURLs := string2Values(";", getMultiMapValue(settings, "Team Server", "Server URLs", ""))
 
-		if (!inList(serverURLs, this.ServerURL) && StrLen(this.ServerURL) > 0)
-			serverURLs.Push(this.ServerURL)
+			if (!inList(serverURLs, this.ServerURL) && StrLen(this.ServerURL) > 0)
+				serverURLs.Push(this.ServerURL)
 
-		chosen := inList(serverURLs, this.ServerURL)
-		if (!chosen && (serverURLs.Length > 0))
-			chosen := 1
+			chosen := inList(serverURLs, this.ServerURL)
+			if (!chosen && (serverURLs.Length > 0))
+				chosen := 1
 
-		centerGui.Add("Text", "x16 yp+30 w90 h23 +0x200", translate("Server URL"))
-		centerGui.Add("ComboBox", "x141 yp+1 w245 Choose" . chosen . " VserverURLEdit", serverURLs)
+			centerGui.Add("Text", "x16 yp+30 w90 h23 +0x200", translate("Server URL"))
+			centerGui.Add("ComboBox", "x141 yp+1 w245 Choose" . chosen . " VserverURLEdit", serverURLs)
 
-		centerGui.Add("Text", "x16 yp+24 w90 h23 +0x200", translate("Session Token"))
-		centerGui.Add("Edit", "x141 yp+1 w245 h21 VserverTokenEdit", this.ServerToken)
+			centerGui.Add("Text", "x16 yp+24 w90 h23 +0x200", translate("Session Token"))
+			centerGui.Add("Edit", "x141 yp+1 w245 h21 VserverTokenEdit", this.ServerToken)
 
-		button := centerGui.Add("Button", "x116 yp-1 w23 h23 Center +0x200")
-		button.OnEvent("Click", connectServer)
-		setButtonIcon(button, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
+			button := centerGui.Add("Button", "x116 yp-1 w23 h23 Center +0x200")
+			button.OnEvent("Click", connectServer)
+			setButtonIcon(button, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
 
-		centerGui.Add("Text", "x16 yp+26 w90 h23 +0x200", translate("Team / Session"))
+			centerGui.Add("Text", "x16 yp+26 w90 h23 +0x200", translate("Team / Session"))
 
-		if this.SelectedTeam[true]
-			centerGui.Add("DropDownList", "x141 yp w120 Choose1 vteamDropDownMenu", [this.SelectedTeam]).OnEvent("Change", chooseTeam)
-		else
-			centerGui.Add("DropDownList", "x141 yp w120 vteamDropDownMenu").OnEvent("Change", chooseTeam)
-
-		if this.SelectedSession[true]
-			centerGui.Add("DropDownList", "x266 yp w120 Choose1 vsessionDropDownMenu", [this.SelectedSession]).OnEvent("Change", chooseSession)
-		else
-			centerGui.Add("DropDownList", "x266 yp w120 Choose0 vsessionDropDownMenu").OnEvent("Change", chooseSession)
-
-		button := centerGui.Add("Button", "x116 yp-1 w23 h23 Center +0x200")
-		button.OnEvent("Click", connectSession)
-		setButtonIcon(button, kIconsDirectory . "Renew.ico", 1, "L4 T4 R4 B4")
-
-		centerGui.Add("Text", "x24 yp+31 w356 0x10")
-
-		this.iReportsListView := centerGui.Add("ListView", "x16 yp+10 w115 h180 H:Grow(0.2) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", [translate("Report")])
-		this.iReportsListView.OnEvent("Click", chooseReport)
-		this.iReportsListView.OnEvent("DoubleClick", chooseReport)
-		this.iReportsListView.OnEvent("ItemSelect", selectReport)
-
-		for ignore, report in kSessionReports
-			if (report = "Drivers")
-				this.iReportsListView.Add("", translate("Driver (Start)"))
+			if this.SelectedTeam[true]
+				centerGui.Add("DropDownList", "x141 yp w120 Choose1 vteamDropDownMenu", [this.SelectedTeam]).OnEvent("Change", chooseTeam)
 			else
-				this.iReportsListView.Add("", translate(report))
+				centerGui.Add("DropDownList", "x141 yp w120 vteamDropDownMenu").OnEvent("Change", chooseTeam)
 
-		this.iReportsListView.ModifyCol(1, "AutoHdr")
+			if this.SelectedSession[true]
+				centerGui.Add("DropDownList", "x266 yp w120 Choose1 vsessionDropDownMenu", [this.SelectedSession]).OnEvent("Change", chooseSession)
+			else
+				centerGui.Add("DropDownList", "x266 yp w120 Choose0 vsessionDropDownMenu").OnEvent("Change", chooseSession)
 
-		centerGui.Add("Text", "x141 yp+2 w70 h23 +0x200", translate("Driver"))
-		centerGui.Add("DropDownList", "x195 yp w191 vdriverDropDown").OnEvent("Change", chooseDriver)
+			button := centerGui.Add("Button", "x116 yp-1 w23 h23 Center +0x200")
+			button.OnEvent("Click", connectSession)
+			setButtonIcon(button, kIconsDirectory . "Renew.ico", 1, "L4 T4 R4 B4")
 
-		centerGui.Add("Text", "x141 yp+24 w70 h23 +0x200", translate("X-Axis"))
+			centerGui.Add("Text", "x24 yp+31 w356 0x10")
 
-		centerGui.Add("DropDownList", "x195 yp w191 vdataXDropDown").OnEvent("Change", chooseAxis)
+			this.iReportsListView := centerGui.Add("ListView", "x16 yp+10 w115 h180 H:Grow(0.2) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", [translate("Report")])
+			this.iReportsListView.OnEvent("Click", chooseReport)
+			this.iReportsListView.OnEvent("DoubleClick", chooseReport)
+			this.iReportsListView.OnEvent("ItemSelect", selectReport)
 
-		centerGui.Add("Text", "x141 yp+24 w70 h23 +0x200", translate("Series"))
+			for ignore, report in kSessionReports
+				if (report = "Drivers")
+					this.iReportsListView.Add("", translate("Driver (Start)"))
+				else
+					this.iReportsListView.Add("", translate(report))
 
-		centerGui.Add("DropDownList", "x195 yp w191 vdataY1DropDown").OnEvent("Change", chooseAxis)
-		centerGui.Add("DropDownList", "x195 yp+24 w191 vdataY2DropDown").OnEvent("Change", chooseAxis)
-		centerGui.Add("DropDownList", "x195 yp+24 w191 vdataY3DropDown").OnEvent("Change", chooseAxis)
-		centerGui.Add("DropDownList", "x195 yp+24 w191 vdataY4DropDown").OnEvent("Change", chooseAxis)
-		centerGui.Add("DropDownList", "x195 yp+24 w191 vdataY5DropDown").OnEvent("Change", chooseAxis)
-		centerGui.Add("DropDownList", "x195 yp+24 w191 vdataY6DropDown").OnEvent("Change", chooseAxis)
+			this.iReportsListView.ModifyCol(1, "AutoHdr")
 
-		centerGui.Add("Text", "x400 ys w40 h23 +0x200", translate("Plot"))
-		centerGui.Add("DropDownList", "x444 yp w80 Choose1 vchartTypeDropDown", collect(["Scatter", "Bar", "Bubble", "Line"], translate)).OnEvent("Change", chooseChartType)
+			centerGui.Add("Text", "x141 yp+2 w70 h23 +0x200", translate("Driver"))
+			centerGui.Add("DropDownList", "x195 yp w191 vdriverDropDown").OnEvent("Change", chooseDriver)
 
-		centerGui.Add("Button", "x1327 yp w23 h23 X:Move vreportSettingsButton").OnEvent("Click", reportSettings)
-		setButtonIcon(centerGui["reportSettingsButton"], kIconsDirectory . "General Settings.ico", 1)
+			centerGui.Add("Text", "x141 yp+24 w70 h23 +0x200", translate("X-Axis"))
 
-		this.iChartViewer := centerGui.Add("HTMLViewer", "x400 yp+24 w950 h293 W:Grow H:Grow(0.2) Border vchartViewer")
+			centerGui.Add("DropDownList", "x195 yp w191 vdataXDropDown").OnEvent("Change", chooseAxis)
 
-		centerGui.Rules := "Y:Move(0.2)"
+			centerGui.Add("Text", "x141 yp+24 w70 h23 +0x200", translate("Series"))
 
-		centerGui.Add("Text", "x8 yp+301 w1350 W:Grow 0x10")
+			centerGui.Add("DropDownList", "x195 yp w191 vdataY1DropDown").OnEvent("Change", chooseAxis)
+			centerGui.Add("DropDownList", "x195 yp+24 w191 vdataY2DropDown").OnEvent("Change", chooseAxis)
+			centerGui.Add("DropDownList", "x195 yp+24 w191 vdataY3DropDown").OnEvent("Change", chooseAxis)
+			centerGui.Add("DropDownList", "x195 yp+24 w191 vdataY4DropDown").OnEvent("Change", chooseAxis)
+			centerGui.Add("DropDownList", "x195 yp+24 w191 vdataY5DropDown").OnEvent("Change", chooseAxis)
+			centerGui.Add("DropDownList", "x195 yp+24 w191 vdataY6DropDown").OnEvent("Change", chooseAxis)
+
+			centerGui.Add("Text", "x400 ys w40 h23 +0x200", translate("Plot"))
+			centerGui.Add("DropDownList", "x444 yp w80 Choose1 vchartTypeDropDown", collect(["Scatter", "Bar", "Bubble", "Line"], translate)).OnEvent("Change", chooseChartType)
+
+			centerGui.Add("Button", "x1327 yp w23 h23 X:Move vreportSettingsButton").OnEvent("Click", reportSettings)
+			setButtonIcon(centerGui["reportSettingsButton"], kIconsDirectory . "General Settings.ico", 1)
+
+			this.iChartViewer := centerGui.Add("HTMLViewer", "x400 yp+24 w950 h293 W:Grow H:Grow(0.2) Border vchartViewer")
+
+			if (this.Mode = "Normal")
+				centerGui.Rules := "Y:Move(0.2)"
+
+			centerGui.Add("Text", "x8 yp+301 w1350 W:Grow 0x10")
+
+			centerGui.SetFont("s8 Norm", "Arial")
+
+			centerGui.Add("Picture", "x16 yp+10 w30 h30 Section", centerGui.Theme.RecolorizeImage(kIconsDirectory . "Tools BW.ico"))
+			centerGui.Add("Text", "x50 yp+5 w80 h26", translate("Session"))
+
+			centerGui.Add("Text", "x935 yp+8 w381 0x2 X:Move vmessageField")
+
+			this.iWaitViewer := centerGui.Add("HTMLViewer", "x1323 yp-8 w30 h30 X:Move vwaitViewer Hidden")
+
+			this.iWaitViewer.document.open()
+			this.iWaitViewer.document.write("<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . (kResourcesDirectory . "Wait.gif") . "' width=28 height=28 border=0 padding=0></body></html>")
+			this.iWaitViewer.document.close()
+
+			centerGui.SetFont("s8 Norm", "Arial")
+
+			centerGui.Add("DropDownList", "x195 yp-2 w180 Choose1 +0x200 vsessionMenuDropDown").OnEvent("Change", sessionMenu)
+
+			centerGui.Add("DropDownList", "x380 yp w180 Choose1 +0x200 vplanMenuDropDown", collect(["Plan", "---------------------------------------------", "Update from Strategy", "Clear Plan...", "---------------------------------------------", "Plan Summary", "---------------------------------------------", "Release Plan"], translate)).OnEvent("Change", planMenu)
+
+			centerGui.Add("DropDownList", "x565 yp w180 Choose1 +0x200 vstrategyMenuDropDown").OnEvent("Change", strategyMenu)
+
+			centerGui.Add("DropDownList", "x750 yp w180 Choose1 +0x200 vpitstopMenuDropDown").OnEvent("Change", pitstopMenu)
+		}
 
 		centerGui.SetFont("s8 Norm", "Arial")
 
-		centerGui.Add("Picture", "x16 yp+10 w30 h30 Section", centerGui.Theme.RecolorizeImage(kIconsDirectory . "Tools BW.ico"))
-		centerGui.Add("Text", "x50 yp+5 w80 h26", translate("Session"))
+		if (this.Mode = "Normal") {
+			centerGui.SetFont("Norm", "Arial")
+			centerGui.SetFont("Italic", "Arial")
 
-		centerGui.Add("Text", "x935 yp+8 w381 0x2 X:Move vmessageField")
+			centerGui.Add("Text", "x619 ys+39 w80 h21", translate("Output"))
+			centerGui.Add("Text", "x700 yp+7 w651 0x10 W:Grow")
 
-		this.iWaitViewer := centerGui.Add("HTMLViewer", "x1323 yp-8 w30 h30 X:Move vwaitViewer Hidden")
+			this.iDetailsViewer := centerGui.Add("HTMLViewer", "x619 yp+14 w732 h293 W:Grow H:Grow(0.8) Border vdetailsViewer")
 
-		this.iWaitViewer.document.open()
-		this.iWaitViewer.document.write("<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . (kResourcesDirectory . "Wait.gif") . "' width=28 height=28 border=0 padding=0></body></html>")
-		this.iWaitViewer.document.close()
-
-		centerGui.SetFont("s8 Norm", "Arial")
-
-		centerGui.Add("DropDownList", "x195 yp-2 w180 Choose1 +0x200 vsessionMenuDropDown").OnEvent("Change", sessionMenu)
-
-		centerGui.Add("DropDownList", "x380 yp w180 Choose1 +0x200 vplanMenuDropDown", collect(["Plan", "---------------------------------------------", "Update from Strategy", "Clear Plan...", "---------------------------------------------", "Plan Summary", "---------------------------------------------", "Release Plan"], translate)).OnEvent("Change", planMenu)
-
-		centerGui.Add("DropDownList", "x565 yp w180 Choose1 +0x200 vstrategyMenuDropDown").OnEvent("Change", strategyMenu)
-
-		centerGui.Add("DropDownList", "x750 yp w180 Choose1 +0x200 vpitstopMenuDropDown").OnEvent("Change", pitstopMenu)
-
-		centerGui.SetFont("s8 Norm", "Arial")
+			this.iStrategyViewer := StrategyViewer(centerGui, this.iDetailsViewer)
+		}
 
 		centerGui.SetFont("Norm", "Arial")
-		centerGui.SetFont("Italic", "Arial")
 
-		centerGui.Add("Text", "x619 ys+39 w80 h21", translate("Output"))
-		centerGui.Add("Text", "x700 yp+7 w651 0x10 W:Grow")
-
-		this.iDetailsViewer := centerGui.Add("HTMLViewer", "x619 yp+14 w732 h293 W:Grow H:Grow(0.8) Border vdetailsViewer")
-
-		this.iStrategyViewer := StrategyViewer(centerGui, this.iDetailsViewer)
-
-		centerGui.SetFont("Norm", "Arial")
-
-		/*
-		centerGui.Rules := ""
-
-		centerGui.Add("Text", "x8 y815 w1350 0x10 Y:Move W:Grow")
-
-		centerGui.Add("Text", "x16 y827 w554 Y:Move Border vmessageField")
-
-		centerGui.Add("Button", "x649 y824 w80 h23 Y:Move H:Center", translate("Close")).OnEvent("Click", closeRaceCenter)
-
-		centerGui.Rules := "Y:Move(0.2)"
-		*/
-
-		centerTab := centerGui.Add("Tab3", "x16 ys+39 w593 h316 H:Grow(0.8) AltSubmit -Wrap Section vraceCenterTabView", collect(["Plan", "Stints", "Laps", "Strategy", "Setups", "Pitstops"], translate))
+		if (this.Mode = "Normal")
+			centerTab := centerGui.Add("Tab3", "x16 ys+39 w593 h316 H:Grow(0.8) AltSubmit -Wrap Section vraceCenterTabView", collect(["Plan", "Stints", "Laps", "Strategy", "Setups", "Pitstops"], translate))
+		else
+			centerTab := centerGui.Add("Tab3", "x16 yp+16 w593 h316 H:Grow W:Grow AltSubmit -Wrap Section vraceCenterTabView", collect(["Plan", "Stints", "Laps", "Setups", "Pitstops"], translate))
 
 		centerTab.UseTab(1)
 
-		centerGui.Add("Text", "x24 ys+33 w90 h23 +0x200", translate("Session"))
-		centerGui.Add("DateTime", "x106 yp w80 h23 vsessionDateCal").OnEvent("Change", updateDate)
-		centerGui.Add("DateTime", "x190 yp w50 h23  vsessionTimeEdit  1", "HH:mm").OnEvent("Change", updateTime)
+		if (this.Mode = "Normal") {
+			centerGui.Add("Text", "x24 ys+33 w90 h23 +0x200", translate("Session"))
+			centerGui.Add("DateTime", "x106 yp w80 h23 vsessionDateCal").OnEvent("Change", updateDate)
+			centerGui.Add("DateTime", "x190 yp w50 h23 vsessionTimeEdit 1", "HH:mm").OnEvent("Change", updateTime)
 
-		this.iPlanListView := centerGui.Add("ListView", "x24 ys+63 w344 h240 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Stint", "Driver", "Time (est.)", "Time (act.)", "Lap (est.)", "Lap (act.)", "Refuel", "Tyre Change"], translate))
-		this.iPlanListView.OnEvent("Click", choosePlan)
-		this.iPlanListView.OnEvent("DoubleClick", choosePlan)
-		this.iPlanListView.OnEvent("ItemSelect", selectPlan)
+			this.iPlanListView := centerGui.Add("ListView", "x24 ys+63 w344 h240 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Stint", "Driver", "Time (est.)", "Time (act.)", "Lap (est.)", "Lap (act.)", "Refuel", "Tyre Change"], translate))
+			this.iPlanListView.OnEvent("Click", choosePlan)
+			this.iPlanListView.OnEvent("DoubleClick", choosePlan)
+			this.iPlanListView.OnEvent("ItemSelect", selectPlan)
 
-		centerGui.Add("Text", "x378 ys+68 w90 h23 +0x200", translate("Driver"))
-		centerGui.Add("DropDownList", "x474 yp w126 vplanDriverDropDownMenu").OnEvent("Change", updatePlan)
+			centerGui.Add("Text", "x378 ys+68 w90 h23 +0x200", translate("Driver"))
+			centerGui.Add("DropDownList", "x474 yp w126 vplanDriverDropDownMenu").OnEvent("Change", updatePlan)
 
-		centerGui.Add("Text", "x378 yp+28 w90 h23 +0x200", translate("Time (est. / act.)"))
-		centerGui.Add("DateTime", "x474 yp w50 h23 vplanTimeEdit  1", "HH:mm").OnEvent("Change", updatePlan)
-		centerGui.Add("DateTime", "x528 yp w50 h23 vactTimeEdit  1", "HH:mm").OnEvent("Change", updatePlan)
+			centerGui.Add("Text", "x378 yp+28 w90 h23 +0x200", translate("Time (est. / act.)"))
+			centerGui.Add("DateTime", "x474 yp w50 h23 vplanTimeEdit  1", "HH:mm").OnEvent("Change", updatePlan)
+			centerGui.Add("DateTime", "x528 yp w50 h23 vactTimeEdit  1", "HH:mm").OnEvent("Change", updatePlan)
 
-		centerGui.Add("Text", "x378 yp+28 w90 h20", translate("Lap (est. / act.)"))
-		centerGui.Add("Edit", "x474 yp-2 w50 h20 Limit3 Number vplanLapEdit").OnEvent("Change", updatePlan)
-		centerGui.Add("UpDown", "x506 yp w18 h20 Range1-999")
-		centerGui.Add("Edit", "x528 yp w50 h20 Limit3 Number vactLapEdit").OnEvent("Change", updatePlan)
-		centerGui.Add("UpDown", "x560 yp w18 h20")
+			centerGui.Add("Text", "x378 yp+28 w90 h20", translate("Lap (est. / act.)"))
+			centerGui.Add("Edit", "x474 yp-2 w50 h20 Limit3 Number vplanLapEdit").OnEvent("Change", updatePlan)
+			centerGui.Add("UpDown", "x506 yp w18 h20 Range1-999")
+			centerGui.Add("Edit", "x528 yp w50 h20 Limit3 Number vactLapEdit").OnEvent("Change", updatePlan)
+			centerGui.Add("UpDown", "x560 yp w18 h20")
 
-		centerGui.Add("Text", "x378 yp+30 w85 h20", translate("Refuel"))
-		centerGui.Add("Edit", "x474 yp-2 w50 h20 Limit3 Number vplanRefuelEdit").OnEvent("Change", updatePlan)
-		centerGui.Add("UpDown", "x506 yp-2 w18 h20 Range1-999")
-		centerGui.Add("Text", "x528 yp+2 w80 h20", getUnit("Volume", true))
+			centerGui.Add("Text", "x378 yp+30 w85 h20", translate("Refuel"))
+			centerGui.Add("Edit", "x474 yp-2 w50 h20 Limit3 Number vplanRefuelEdit").OnEvent("Change", updatePlan)
+			centerGui.Add("UpDown", "x506 yp-2 w18 h20 Range1-999")
+			centerGui.Add("Text", "x528 yp+2 w80 h20", getUnit("Volume", true))
 
-		centerGui.Add("Text", "x378 yp+24 w85 h23 +0x200", translate("Tyre Change"))
+			centerGui.Add("Text", "x378 yp+24 w85 h23 +0x200", translate("Tyre Change"))
 
-		choices := collect(["Yes", "No"], translate)
+			choices := collect(["Yes", "No"], translate)
 
-		centerGui.Add("DropDownList", "x474 yp w50 Choose1 vplanTyreCompoundDropDown", choices).OnEvent("Change", updatePlan)
+			centerGui.Add("DropDownList", "x474 yp w50 Choose1 vplanTyreCompoundDropDown", choices).OnEvent("Change", updatePlan)
 
-		centerGui.Add("Button", "x550 yp+30 w23 h23 Center +0x200 vaddPlanButton").OnEvent("Click", addPlan)
-		setButtonIcon(centerGui["addPlanButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
-		centerGui.Add("Button", "x575 yp w23 h23 Center +0x200 vdeletePlanButton").OnEvent("Click", deletePlan)
-		setButtonIcon(centerGui["deletePlanButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+			centerGui.Add("Button", "x550 yp+30 w23 h23 Center +0x200 vaddPlanButton").OnEvent("Click", addPlan)
+			setButtonIcon(centerGui["addPlanButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+			centerGui.Add("Button", "x575 yp w23 h23 Center +0x200 vdeletePlanButton").OnEvent("Click", deletePlan)
+			setButtonIcon(centerGui["deletePlanButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
-		centerGui.Add("Button", "x408 ys+279 w160 Y:Move(0.8)", translate("Release Plan")).OnEvent("Click", releasePlan)
+			centerGui.Add("Button", "x408 ys+279 w160 Y:Move(0.8)", translate("Release Plan")).OnEvent("Click", releasePlan)
+		}
+		else
+			this.iPlanListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Stint", "Driver", "Time (est.)", "Time (act.)", "Lap (est.)", "Lap (act.)", "Refuel", "Tyre Change"], translate))
 
 		centerTab.UseTab(2)
 
-		this.iStintsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Driver", "Weather", "Compound", "Laps", "Pos. (Start)", "Pos. (End)", "Avg. Lap Time", "Consumption", "Accidents", "Penalties", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], translate))
+		this.iStintsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 " . ((this.Mode = "Normal") ? "H:Grow(0.8)" : "H:Grow W:Grow") . " -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Driver", "Weather", "Compound", "Laps", "Pos. (Start)", "Pos. (End)", "Avg. Lap Time", "Consumption", "Accidents", "Penalties", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], translate))
 		this.iStintsListView.OnEvent("Click", chooseStint)
 		this.iStintsListView.OnEvent("DoubleClick", chooseStint)
 		this.iStintsListView.OnEvent("ItemSelect", selectStint)
 
 		centerTab.UseTab(3)
 
-		this.iLapsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Stint", "Driver", "Position", "Weather", "Grip", "Lap Time", "Sector Times", "Consumption", "Remaining", "Pressures", "Invalid", "Accident", "Penalty"], translate))
+		this.iLapsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 " . ((this.Mode = "Normal") ? "H:Grow(0.8)" : "H:Grow W:Grow") . " -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Stint", "Driver", "Position", "Weather", "Grip", "Lap Time", "Sector Times", "Consumption", "Remaining", "Pressures", "Invalid", "Accident", "Penalty"], translate))
 		this.iLapsListView.OnEvent("Click", chooseLap)
 		this.iLapsListView.OnEvent("DoubleClick", chooseLap)
 		this.iLapsListView.OnEvent("ItemSelect", selectLap)
 
-		centerTab.UseTab(4)
+		if (this.Mode = "Normal") {
+			centerTab.UseTab(4)
 
-		centerGui.SetFont("Norm", "Arial")
-		centerGui.SetFont("Italic", "Arial")
+			centerGui.SetFont("Norm", "Arial")
+			centerGui.SetFont("Italic", "Arial")
 
-		centerGui.Add("GroupBox", "x24 ys+33 w260 h124", translate("Simulation"))
+			centerGui.Add("GroupBox", "x24 ys+33 w260 h124", translate("Simulation"))
 
-		centerGui.SetFont("Norm", "Arial")
+			centerGui.SetFont("Norm", "Arial")
 
-		centerGui.Add("Text", "x32 yp+24 w85 h23 +0x200", translate("Random Factor"))
-		centerGui.Add("Edit", "x170 yp w50 h20 Limit2 Number VrandomFactorEdit", 5)
-		centerGui.Add("UpDown", "x202 yp w18 h20 Range0-99", 5)
-		centerGui.Add("Text", "x228 yp+2 w50 h20", translate("%"))
+			centerGui.Add("Text", "x32 yp+24 w85 h23 +0x200", translate("Random Factor"))
+			centerGui.Add("Edit", "x170 yp w50 h20 Limit2 Number VrandomFactorEdit", 5)
+			centerGui.Add("UpDown", "x202 yp w18 h20 Range0-99", 5)
+			centerGui.Add("Text", "x228 yp+2 w50 h20", translate("%"))
 
-		centerGui.Add("Text", "x32 yp+22 w85 h23 +0x200", translate("# Scenarios"))
-		centerGui.Add("Edit", "x170 yp w50 h20 Limit2 Number VnumScenariosEdit", 20)
-		centerGui.Add("UpDown", "x202 yp w18 h20 Range1-99", 20)
+			centerGui.Add("Text", "x32 yp+22 w85 h23 +0x200", translate("# Scenarios"))
+			centerGui.Add("Edit", "x170 yp w50 h20 Limit2 Number VnumScenariosEdit", 20)
+			centerGui.Add("UpDown", "x202 yp w18 h20 Range1-99", 20)
 
-		centerGui.Add("Text", "x32 yp+24 w85 h23 +0x200", translate("Variation"))
-		centerGui.Add("Text", "x150 yp w18 h23 +0x200", translate("+/-"))
-		centerGui.Add("Edit", "x170 yp w50 h20 Limit2 Number VvariationWindowEdit", 3)
-		centerGui.Add("UpDown", "x202 yp w18 h20 Range1-99", 3)
-		centerGui.Add("Text", "x228 yp+2 w50 h20", translate("laps"))
+			centerGui.Add("Text", "x32 yp+24 w85 h23 +0x200", translate("Variation"))
+			centerGui.Add("Text", "x150 yp w18 h23 +0x200", translate("+/-"))
+			centerGui.Add("Edit", "x170 yp w50 h20 Limit2 Number VvariationWindowEdit", 3)
+			centerGui.Add("UpDown", "x202 yp w18 h20 Range1-99", 3)
+			centerGui.Add("Text", "x228 yp+2 w50 h20", translate("laps"))
 
-		centerGui.SetFont("Norm", "Arial")
-		centerGui.SetFont("Italic", "Arial")
+			centerGui.SetFont("Norm", "Arial")
+			centerGui.SetFont("Italic", "Arial")
 
-		centerGui.Add("GroupBox", "x304 ys+33 w296 h124", translate("Settings"))
+			centerGui.Add("GroupBox", "x304 ys+33 w296 h124", translate("Settings"))
 
-		centerGui.SetFont("Norm", "Arial")
+			centerGui.SetFont("Norm", "Arial")
 
-		centerGui.Add("Text", "x312 yp+24 w160 h23", translate("Use Session Data"))
-		centerGui.Add("DropDownList", "x480 yp-3 w50 Choose1 vuseSessionDataDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
+			centerGui.Add("Text", "x312 yp+24 w160 h23", translate("Use Session Data"))
+			centerGui.Add("DropDownList", "x480 yp-3 w50 Choose1 vuseSessionDataDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
 
-		centerGui.Add("Text", "x312 yp+27 w160 h23", translate("Use Telemetry Database"))
-		centerGui.Add("DropDownList", "x480 yp-3 w50 Choose2 vuseTelemetryDataDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
+			centerGui.Add("Text", "x312 yp+27 w160 h23", translate("Use Telemetry Database"))
+			centerGui.Add("DropDownList", "x480 yp-3 w50 Choose2 vuseTelemetryDataDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
 
-		centerGui.Add("Text", "x312 yp+27 w160 h23", translate("Keep current Map"))
-		centerGui.Add("DropDownList", "x480 yp-3 w50 Choose1 vkeepMapDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
+			centerGui.Add("Text", "x312 yp+27 w160 h23", translate("Keep current Map"))
+			centerGui.Add("DropDownList", "x480 yp-3 w50 Choose1 vkeepMapDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
 
-		centerGui.Add("Text", "x312 yp+27 w160 h23", translate("Analyze Traffic"))
-		centerGui.Add("DropDownList", "x480 yp-3 w50 Choose2 vconsiderTrafficDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
+			centerGui.Add("Text", "x312 yp+27 w160 h23", translate("Analyze Traffic"))
+			centerGui.Add("DropDownList", "x480 yp-3 w50 Choose2 vconsiderTrafficDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
 
-		centerGui.SetFont("Norm", "Arial")
-		centerGui.SetFont("Italic", "Arial")
+			centerGui.SetFont("Norm", "Arial")
+			centerGui.SetFont("Italic", "Arial")
 
-		centerGui.Add("GroupBox", "x24 yp+37 w576 h148", translate("Traffic Analysis (Monte Carlo)"))
+			centerGui.Add("GroupBox", "x24 yp+37 w576 h148", translate("Traffic Analysis (Monte Carlo)"))
 
-		centerGui.SetFont("Norm", "Arial")
+			centerGui.SetFont("Norm", "Arial")
 
-		centerGui.Add("Text", "x32 yp+24 w85 h23 +0x200", translate("Laptime Variation"))
-		centerGui.Add("DropDownList", "x162 yp w50 Choose1 vlapTimeVariationDropDown", collect(["Yes", "No"], translate))
-		centerGui.Add("Text", "x220 yp+2 w290 h20", translate("according to driver consistency"))
+			centerGui.Add("Text", "x32 yp+24 w85 h23 +0x200", translate("Laptime Variation"))
+			centerGui.Add("DropDownList", "x162 yp w50 Choose1 vlapTimeVariationDropDown", collect(["Yes", "No"], translate))
+			centerGui.Add("Text", "x220 yp+2 w290 h20", translate("according to driver consistency"))
 
-		centerGui.Add("Text", "x32 yp+22 w85 h23 +0x200", translate("Driver Errors"))
-		centerGui.Add("DropDownList", "x162 yp w50 Choose1 vdriverErrorsDropDown", collect(["Yes", "No"], translate))
-		centerGui.Add("Text", "x220 yp+2 w290 h20", translate("according to driver car control"))
+			centerGui.Add("Text", "x32 yp+22 w85 h23 +0x200", translate("Driver Errors"))
+			centerGui.Add("DropDownList", "x162 yp w50 Choose1 vdriverErrorsDropDown", collect(["Yes", "No"], translate))
+			centerGui.Add("Text", "x220 yp+2 w290 h20", translate("according to driver car control"))
 
-		centerGui.Add("Text", "x32 yp+22 w85 h23 +0x200", translate("Pitstops"))
-		centerGui.Add("DropDownList", "x162 yp w50 Choose1 vpitstopsDropDown", collect(["Yes", "No"], translate))
-		centerGui.Add("Text", "x220 yp+2 w290 h20", translate("according to random factor"))
+			centerGui.Add("Text", "x32 yp+22 w85 h23 +0x200", translate("Pitstops"))
+			centerGui.Add("DropDownList", "x162 yp w50 Choose1 vpitstopsDropDown", collect(["Yes", "No"], translate))
+			centerGui.Add("Text", "x220 yp+2 w290 h20", translate("according to random factor"))
 
-		centerGui.Add("Text", "x32 yp+24 w85 h23 +0x200", translate("Overtake"))
-		centerGui.Add("Text", "x132 yp w28 h23 +0x200", translate("Abs("))
-		centerGui.Add("Edit", "x162 yp w50 h20 Limit2 Number Limit2 VovertakeDeltaEdit", 1)
-		centerGui.Add("UpDown", "x194 yp-2 w18 h20 Range1-99 0x80", 1)
-		centerGui.Add("Text", "x220 yp+4 w340 h20", translate("/ laptime difference) = additional seconds for each passed car"))
+			centerGui.Add("Text", "x32 yp+24 w85 h23 +0x200", translate("Overtake"))
+			centerGui.Add("Text", "x132 yp w28 h23 +0x200", translate("Abs("))
+			centerGui.Add("Edit", "x162 yp w50 h20 Limit2 Number Limit2 VovertakeDeltaEdit", 1)
+			centerGui.Add("UpDown", "x194 yp-2 w18 h20 Range1-99 0x80", 1)
+			centerGui.Add("Text", "x220 yp+4 w340 h20", translate("/ laptime difference) = additional seconds for each passed car"))
 
-		centerGui.Add("Text", "x32 yp+20 w85 h23 +0x200", translate("Traffic"))
-		centerGui.Add("Edit", "x162 yp w50 h20 Limit2 Number Limit2 VtrafficConsideredEdit", 5)
-		centerGui.Add("UpDown", "x194 yp-2 w18 h20 Range1-99 0x80", 5)
-		centerGui.Add("Text", "x220 yp+4 w290 h20", translate("% track length"))
+			centerGui.Add("Text", "x32 yp+20 w85 h23 +0x200", translate("Traffic"))
+			centerGui.Add("Edit", "x162 yp w50 h20 Limit2 Number Limit2 VtrafficConsideredEdit", 5)
+			centerGui.Add("UpDown", "x194 yp-2 w18 h20 Range1-99 0x80", 5)
+			centerGui.Add("Text", "x220 yp+4 w290 h20", translate("% track length"))
+		}
 
-		centerTab.UseTab(5)
+		centerTab.UseTab(4 + ((this.Mode = "Normal") ? 1 : 0))
 
-		this.iSetupsListView := centerGui.Add("ListView", "x24 ys+33 w344 h270 H:Grow(0.8) -Multi -LV0x10 AltSubmit", collect(["Driver", "Conditions", "Compound", "Pressures", "Notes"], translate))
+		this.iSetupsListView := centerGui.Add("ListView", "x24 ys+33 w344 h270 " . ((this.Mode = "Normal") ? "H:Grow(0.8)" : "H:Grow W:Grow") . " -Multi -LV0x10 AltSubmit", collect(["Driver", "Conditions", "Compound", "Pressures", "Notes"], translate))
 		this.iSetupsListView.OnEvent("Click", chooseSetup)
 		this.iSetupsListView.OnEvent("DoubleClick", chooseSetup)
 		this.iSetupsListView.OnEvent("ItemSelect", selectSetup)
 
-		centerGui.Add("Text", "x378 ys+38 w90 h23 +0x200", translate("Driver"))
-		centerGui.Add("DropDownList", "x474 yp w126 vsetupDriverDropDownMenu").OnEvent("Change", updateSetup)
+		centerGui.Add("Text", "x378 ys+38 w90 h23 +0x200" . ((this.Mode = "Simple") ? " X:Move" : ""), translate("Driver"))
+		centerGui.Add("DropDownList", "x474 yp w126 vsetupDriverDropDownMenu" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Change", updateSetup)
 
-		centerGui.Add("Text", "x378 yp+30 w70 h23 +0x200", translate("Weather"))
+		centerGui.Add("Text", "x378 yp+30 w70 h23 +0x200" . ((this.Mode = "Simple") ? " X:Move" : ""), translate("Weather"))
 
 		choices := collect(kWeatherConditions, translate)
 
-		centerGui.Add("DropDownList", "x474 yp w126 Choose0 vsetupWeatherDropDownMenu", choices).OnEvent("Change", updateSetup)
+		centerGui.Add("DropDownList", "x474 yp w126 Choose0 vsetupWeatherDropDownMenu" . ((this.Mode = "Simple") ? " X:Move" : ""), choices).OnEvent("Change", updateSetup)
 
-		centerGui.Add("Text", "x378 yp+24 w70 h23 +0x200", translate("Temperatures"))
+		centerGui.Add("Text", "x378 yp+24 w70 h23 +0x200" . ((this.Mode = "Simple") ? " X:Move" : ""), translate("Temperatures"))
 
-		centerGui.Add("Edit", "x474 yp w40 Number Limit2 vsetupAirTemperatureEdit", "").OnEvent("Change", updateSetup)
-		centerGui.Add("UpDown", "x476 yp w18 h20 Range0-99")
+		centerGui.Add("Edit", "x474 yp w40 Number Limit2 vsetupAirTemperatureEdit" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Change", updateSetup)
+		centerGui.Add("UpDown", "x476 yp w18 h20 Range0-99" . ((this.Mode = "Simple") ? " X:Move" : ""))
 
-		centerGui.Add("Edit", "x521 yp w40 Number Limit2 vsetupTrackTemperatureEdit", "").OnEvent("Change", updateSetup)
-		centerGui.Add("UpDown", "x523 yp w18 h20 Range0-99")
-		centerGui.Add("Text", "x563 yp w35 h23 +0x200", translate("A / T"))
+		centerGui.Add("Edit", "x521 yp w40 Number Limit2 vsetupTrackTemperatureEdit" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Change", updateSetup)
+		centerGui.Add("UpDown", "x523 yp w18 h20 Range0-99" . ((this.Mode = "Simple") ? " X:Move" : ""))
+		centerGui.Add("Text", "x563 yp w35 h23 +0x200" . ((this.Mode = "Simple") ? " X:Move" : ""), translate("A / T"))
 
 		choices := collect([normalizeCompound("Dry")], translate)
 
-		centerGui.Add("Text", "x378 yp+24 w70 h23 +0x200", translate("Compound"))
-		centerGui.Add("DropDownList", "x474 yp+1 w126 Choose0 vsetupCompoundDropDownMenu", choices).OnEvent("Change", updateSetup)
+		centerGui.Add("Text", "x378 yp+24 w70 h23 +0x200" . ((this.Mode = "Simple") ? " X:Move" : ""), translate("Compound"))
+		centerGui.Add("DropDownList", "x474 yp+1 w126 Choose0 vsetupCompoundDropDownMenu" . ((this.Mode = "Simple") ? " X:Move" : ""), choices).OnEvent("Change", updateSetup)
 
-		centerGui.Add("Text", "x378 yp+30 w90 h23 +0x200", translate("Pressure Front"))
-		centerGui.Add("Edit", "x474 yp+1 w50 h23 vsetupBasePressureFLEdit").OnEvent("Change", updateSetup)
-		centerGui.Add("Edit", "xp+52 yp w50 h23 vsetupBasePressureFREdit").OnEvent("Change", updateSetup)
-		centerGui.Add("Text", "xp+52 yp+3 w30 h20", getUnit("Pressure"))
+		centerGui.Add("Text", "x378 yp+30 w90 h23 +0x200" . ((this.Mode = "Simple") ? " X:Move" : ""), translate("Pressure Front"))
+		centerGui.Add("Edit", "x474 yp+1 w50 h23 vsetupBasePressureFLEdit" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Change", updateSetup)
+		centerGui.Add("Edit", "xp+52 yp w50 h23 vsetupBasePressureFREdit" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Change", updateSetup)
+		centerGui.Add("Text", "xp+52 yp+3 w30 h20" . ((this.Mode = "Simple") ? " X:Move" : ""), getUnit("Pressure"))
 
-		centerGui.Add("Text", "x378 yp+20 w90 h23 +0x200", translate("Pressure Rear"))
-		centerGui.Add("Edit", "x474 yp+1 w50 h23 vsetupBasePressureRLEdit").OnEvent("Change", updateSetup)
-		centerGui.Add("Edit", "xp+52 yp w50 h23 vsetupBasePressureRREdit").OnEvent("Change", updateSetup)
-		centerGui.Add("Text", "xp+52 yp+3 w30 h20", getUnit("Pressure"))
+		centerGui.Add("Text", "x378 yp+20 w90 h23 +0x200" . ((this.Mode = "Simple") ? " X:Move" : ""), translate("Pressure Rear"))
+		centerGui.Add("Edit", "x474 yp+1 w50 h23 vsetupBasePressureRLEdit" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Change", updateSetup)
+		centerGui.Add("Edit", "xp+52 yp w50 h23 vsetupBasePressureRREdit" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Change", updateSetup)
+		centerGui.Add("Text", "xp+52 yp+3 w30 h20" . ((this.Mode = "Simple") ? " X:Move" : ""), getUnit("Pressure"))
 
-		centerGui.Add("Text", "x378 yp+20 w90 h23 +0x200", translate("Notes"))
-		centerGui.Add("Edit", "x474 yp+1 w126 h46 vsetupNotesEdit").OnEvent("Change", updateSetup)
+		centerGui.Add("Text", "x378 yp+20 w90 h23 +0x200" . ((this.Mode = "Simple") ? " X:Move" : ""), translate("Notes"))
+		centerGui.Add("Edit", "x474 yp+1 w126 h46 vsetupNotesEdit" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Change", updateSetup)
 
-		centerGui.Add("Button", "x474 yp+50 w23 h23 Center +0x200 vloadSetupButton").OnEvent("Click", loadSetup)
+		centerGui.Add("Button", "x474 yp+50 w23 h23 Center +0x200 vloadSetupButton" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Click", loadSetup)
 		setButtonIcon(centerGui["loadSetupButton"], kIconsDirectory . "Database.ico", 1, "L4 T4 R4 B4")
 
-		centerGui.Add("Button", "x525 yp w23 h23 Center +0x200 vaddSetupButton").OnEvent("Click", addSetup)
+		centerGui.Add("Button", "x525 yp w23 h23 Center +0x200 vaddSetupButton" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Click", addSetup)
 		setButtonIcon(centerGui["addSetupButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
-		centerGui.Add("Button", "x550 yp w23 h23 Center +0x200 vcopySetupButton").OnEvent("Click", copySetup)
+		centerGui.Add("Button", "x550 yp w23 h23 Center +0x200 vcopySetupButton" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Click", copySetup)
 		setButtonIcon(centerGui["copySetupButton"], kIconsDirectory . "Copy.ico", 1, "L4 T4 R4 B4")
-		centerGui.Add("Button", "x575 yp w23 h23 Center +0x200 vdeleteSetupButton").OnEvent("Click", deleteSetup)
+		centerGui.Add("Button", "x575 yp w23 h23 Center +0x200 vdeleteSetupButton" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Click", deleteSetup)
 		setButtonIcon(centerGui["deleteSetupButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
-		centerGui.Add("Button", "x378 ys+279 w160", translate("Save Setups")).OnEvent("Click", releaseSetups)
-		centerGui.Add("Button", "x553 yp w23 h23 Center +0x200 vuploadSetupsButton").OnEvent("Click", uploadSetups)
+		centerGui.Add("Button", "x378 ys+279 w160" . ((this.Mode = "Simple") ? " X:Move" : ""), translate("Save Setups")).OnEvent("Click", releaseSetups)
+		centerGui.Add("Button", "x553 yp w23 h23 Center +0x200 vuploadSetupsButton" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Click", uploadSetups)
 		setButtonIcon(centerGui["uploadSetupsButton"], kIconsDirectory . "Upload.ico", 1, "L4 T4 R4 B4")
-		centerGui.Add("Button", "xp+24 yp w23 h23 Center +0x200 vdownloadSetupsButton").OnEvent("Click", downloadSetups)
+		centerGui.Add("Button", "xp+24 yp w23 h23 Center +0x200 vdownloadSetupsButton" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Click", downloadSetups)
 		setButtonIcon(centerGui["downloadSetupsButton"], kIconsDirectory . "Download.ico", 1, "L4 T4 R4 B4")
 
-		centerTab.UseTab(6)
+		centerTab.UseTab(5 + ((this.Mode = "Normal") ? 1 : 0))
 
 		centerGui.Add("Text", "x24 ys+36 w85 h20", translate("Lap"))
 		centerGui.Add("Edit", "x106 yp-2 w50 h20 Limit3 Number vpitstopLapEdit")
@@ -2281,30 +2288,33 @@ class RaceCenter extends ConfigurationItem {
 
 		centerGui.Add("DropDownList", "x106 yp w157 Choose5 vpitstopRepairsDropDown", choices)
 
-		centerGui.Add("Button", "x66 ys+279 w160 Y:Move(0.8)", translate("Instruct Engineer")).OnEvent("Click", planPitstop)
+		centerGui.Add("Button", "x66 ys+279 w160 " . ((this.Mode = "Normal") ? "Y:Move(0.8)" : "Y:move"), translate("Instruct Engineer")).OnEvent("Click", planPitstop)
 
-		this.iPitstopsListView := centerGui.Add("ListView", "x270 ys+34 w331 h269 H:Grow(0.8) -Multi -LV0x10 AltSubmit Checked NoSort NoSortHdr", collect(["#", "Lap", "Driver", "Refuel", "Compound", "Set", "Pressures", "Repairs"], translate))
+		this.iPitstopsListView := centerGui.Add("ListView", "x270 ys+34 w331 h269 " . ((this.Mode = "Normal") ? "H:Grow(0.8)" : "H:Grow W:Grow") . " -Multi -LV0x10 AltSubmit Checked NoSort NoSortHdr", collect(["#", "Lap", "Driver", "Refuel", "Compound", "Set", "Pressures", "Repairs"], translate))
 		this.iPitstopsListView.OnEvent("Click", choosePitstop)
 		this.iPitstopsListView.OnEvent("DoubleClick", choosePitstop)
 		this.iPitstopsListView.OnEvent("ItemSelect", selectPitstop)
 
-		centerGui.Rules := ""
+		if (this.Mode = "Normal")
+			centerGui.Rules := ""
 
-		this.iReportViewer := RaceReportViewer(centerGui, this.ChartViewer)
+		if (this.Mode = "Normal") {
+			this.iReportViewer := RaceReportViewer(centerGui, this.ChartViewer)
 
-		centerGui.Add(RaceCenter.RaceCenterResizer(centerGui))
+			centerGui.Add(RaceCenter.RaceCenterResizer(centerGui))
+		}
 	}
 
 	show(initialize := true) {
 		local window := this.Window
 		local x, y, w, h
 
-		if getWindowPosition("Race Center", &x, &y)
+		if getWindowPosition((this.Mode = "Normal") ? "Race Center" : "Race Center Lite", &x, &y)
 			window.Show("AutoSize x" . x . " y" . y)
 		else
 			window.Show("AutoSize")
 
-		if getWindowSize("Race Center", &w, &h)
+		if getWindowSize((this.Mode = "Normal") ? "Race Center" : "Race Center Lite", &w, &h)
 			window.Resize("Initialize", w, h)
 
 		this.startWorking(false)
@@ -2362,7 +2372,8 @@ class RaceCenter extends ConfigurationItem {
 					if token {
 						this.iServerToken := ((token = "") ? RaceCenter.kInvalidToken : token)
 
-						window["serverTokenEdit"].Text := token
+						if (this.Mode = "Normal")
+							window["serverTokenEdit"].Text := token
 					}
 					else
 						return
@@ -2420,7 +2431,8 @@ class RaceCenter extends ConfigurationItem {
 				this.iServerToken := RaceCenter.kInvalidToken
 				this.iConnection := false
 
-				window["serverTokenEdit"].Text := ""
+				if (this.Mode = "Normal")
+					window["serverTokenEdit"].Text := ""
 
 				if !silent {
 					OnMessage(0x44, translateOkButton)
@@ -2433,6 +2445,14 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		this.pushTask(connectAsync.Bind(silent))
+	}
+
+	startSynchronization() {
+		this.iSyncTask := SyncSessionTask()
+
+		this.iSyncTask.start()
+
+		PeriodicTask(ObjBindMethod(this, "keepAlive"), 120000, kLowPriority).start()
 	}
 
 	keepAlive() {
@@ -2456,8 +2476,10 @@ class RaceCenter extends ConfigurationItem {
 
 		this.iTeams := teams
 
-		this.Control["teamDropDownMenu"].Delete()
-		this.Control["teamDropDownMenu"].Add(names)
+		if (this.Mode = "Normal") {
+			this.Control["teamDropDownMenu"].Delete()
+			this.Control["teamDropDownMenu"].Add(names)
+		}
 
 		chosen := inList(identifiers, this.SelectedTeam[true])
 
@@ -2472,7 +2494,8 @@ class RaceCenter extends ConfigurationItem {
 
 		chosen := inList(getValues(this.Teams), identifier)
 
-		this.Control["teamDropDownMenu"].Choose(chosen)
+		if (this.Mode = "Normal")
+			this.Control["teamDropDownMenu"].Choose(chosen)
 
 		names := getKeys(this.Teams)
 
@@ -2500,8 +2523,10 @@ class RaceCenter extends ConfigurationItem {
 		names := getKeys(sessions)
 		identifiers := getValues(sessions)
 
-		this.Control["sessionDropDownMenu"].Delete()
-		this.Control["sessionDropDownMenu"].Add(names)
+		if (this.Mode = "Normal") {
+			this.Control["sessionDropDownMenu"].Delete()
+			this.Control["sessionDropDownMenu"].Add(names)
+		}
 
 		chosen := inList(identifiers, this.SelectedSession[true])
 
@@ -2534,8 +2559,11 @@ class RaceCenter extends ConfigurationItem {
 
 		this.Control["setupDriverDropDownMenu"].Delete()
 		this.Control["setupDriverDropDownMenu"].Add(names)
-		this.Control["planDriverDropDownMenu"].Delete()
-		this.Control["planDriverDropDownMenu"].Add(concatenate([translate("-")], names))
+
+		if (this.Mode = "Normal") {
+			this.Control["planDriverDropDownMenu"].Delete()
+			this.Control["planDriverDropDownMenu"].Add(concatenate([translate("-")], names))
+		}
 	}
 
 	selectSession(identifier) {
@@ -2545,7 +2573,8 @@ class RaceCenter extends ConfigurationItem {
 
 		chosen := inList(getValues(this.Sessions), identifier)
 
-		this.Control["sessionDropDownMenu"].Choose(chosen)
+		if (this.Mode = "Normal")
+			this.Control["sessionDropDownMenu"].Choose(chosen)
 
 		names := getKeys(this.Sessions)
 
@@ -2765,43 +2794,58 @@ class RaceCenter extends ConfigurationItem {
 			window["pitstopPressureRREdit"].Text := ""
 		}
 
-		window["driverDropDown"].Enabled := false
+		if (this.Mode = "Normal") {
+			window["driverDropDown"].Enabled := false
 
-		window["dataXDropDown"].Enabled := false
-		window["dataY1DropDown"].Enabled := false
-		window["dataY2DropDown"].Enabled := false
-		window["dataY3DropDown"].Enabled := false
-		window["dataY4DropDown"].Enabled := false
-		window["dataY5DropDown"].Enabled := false
-		window["dataY6DropDown"].Enabled := false
+			window["dataXDropDown"].Enabled := false
+			window["dataY1DropDown"].Enabled := false
+			window["dataY2DropDown"].Enabled := false
+			window["dataY3DropDown"].Enabled := false
+			window["dataY4DropDown"].Enabled := false
+			window["dataY5DropDown"].Enabled := false
+			window["dataY6DropDown"].Enabled := false
 
-		if this.HasData {
-			if inList(["Overview", "Drivers", "Positions", "Lap Times", "Performance", "Consistency", "Pace", "Pressures", "Brakes", "Temperatures", "Free"], this.SelectedReport)
-				window["reportSettingsButton"].Enabled := true
-			else
-				window["reportSettingsButton"].Enabled := false
+			if this.HasData {
+				if inList(["Overview", "Drivers", "Positions", "Lap Times", "Performance", "Consistency", "Pace", "Pressures", "Brakes", "Temperatures", "Free"], this.SelectedReport)
+					window["reportSettingsButton"].Enabled := true
+				else
+					window["reportSettingsButton"].Enabled := false
 
-			if inList(["Pressures", "Brakes", "Temperatures", "Free"], this.SelectedReport) {
-				window["chartTypeDropDown"].Enabled := true
+				if inList(["Pressures", "Brakes", "Temperatures", "Free"], this.SelectedReport) {
+					window["chartTypeDropDown"].Enabled := true
 
-				window["driverDropDown"].Enabled := true
+					window["driverDropDown"].Enabled := true
 
-				window["dataXDropDown"].Enabled := true
-				window["dataY1DropDown"].Enabled := true
-				window["dataY2DropDown"].Enabled := true
-				window["dataY3DropDown"].Enabled := true
+					window["dataXDropDown"].Enabled := true
+					window["dataY1DropDown"].Enabled := true
+					window["dataY2DropDown"].Enabled := true
+					window["dataY3DropDown"].Enabled := true
 
-				if (this.SelectedChartType != "Bubble") {
-					window["dataY4DropDown"].Enabled := true
-					window["dataY5DropDown"].Enabled := true
-					window["dataY6DropDown"].Enabled := true
+					if (this.SelectedChartType != "Bubble") {
+						window["dataY4DropDown"].Enabled := true
+						window["dataY5DropDown"].Enabled := true
+						window["dataY6DropDown"].Enabled := true
+					}
+				}
+				else {
+					window["chartTypeDropDown"].Enabled := false
+					window["chartTypeDropDown"].Choose(0)
+
+					this.iSelectedChartType := false
+
+					window["driverDropDown"].Choose(0)
+
+					window["dataXDropDown"].Choose(0)
+					window["dataY1DropDown"].Choose(0)
+					window["dataY2DropDown"].Choose(0)
+					window["dataY3DropDown"].Choose(0)
+					window["dataY4DropDown"].Choose(0)
+					window["dataY5DropDown"].Choose(0)
+					window["dataY6DropDown"].Choose(0)
 				}
 			}
 			else {
-				window["chartTypeDropDown"].Enabled := false
-				window["chartTypeDropDown"].Choose(0)
-
-				this.iSelectedChartType := false
+				window["reportSettingsButton"].Enabled := false
 
 				window["driverDropDown"].Choose(0)
 
@@ -2812,31 +2856,20 @@ class RaceCenter extends ConfigurationItem {
 				window["dataY4DropDown"].Choose(0)
 				window["dataY5DropDown"].Choose(0)
 				window["dataY6DropDown"].Choose(0)
+
+				window["chartTypeDropDown"].Enabled := false
+				window["chartTypeDropDown"].Choose(0)
+
+				this.iSelectedChartType := false
 			}
 		}
-		else {
-			window["reportSettingsButton"].Enabled := false
 
-			window["driverDropDown"].Choose(0)
-
-			window["dataXDropDown"].Choose(0)
-			window["dataY1DropDown"].Choose(0)
-			window["dataY2DropDown"].Choose(0)
-			window["dataY3DropDown"].Choose(0)
-			window["dataY4DropDown"].Choose(0)
-			window["dataY5DropDown"].Choose(0)
-			window["dataY6DropDown"].Choose(0)
-
-			window["chartTypeDropDown"].Enabled := false
-			window["chartTypeDropDown"].Choose(0)
-
-			this.iSelectedChartType := false
+		if (this.Mode = "Normal") {
+			this.updateSessionMenu()
+			this.updatePlanMenu()
+			this.updateStrategyMenu()
+			this.updatePitstopMenu()
 		}
-
-		this.updateSessionMenu()
-		this.updatePlanMenu()
-		this.updateStrategyMenu()
-		this.updatePitstopMenu()
 
 		hasPitstops := false
 
@@ -2915,80 +2948,82 @@ class RaceCenter extends ConfigurationItem {
 			window["setupNotesEdit"].Text := ""
 		}
 
-		selected := this.PlanListView.GetNext(0)
+		if (this.Mode = "Normal") {
+			selected := this.PlanListView.GetNext(0)
 
-		if (selected && (selected != this.SelectedPlanStint)) {
-			this.iSelectedPlanStint := false
+			if (selected && (selected != this.SelectedPlanStint)) {
+				this.iSelectedPlanStint := false
 
-			selected := false
+				selected := false
 
-			this.PlanListView.Modify(selected, "-Select")
-		}
+				this.PlanListView.Modify(selected, "-Select")
+			}
 
-		if selected {
-			window["planDriverDropDownMenu"].Enabled := true
-			window["planTimeEdit"].Enabled := true
-			window["actTimeEdit"].Enabled := true
-			window["deletePlanButton"].Enabled := true
+			if selected {
+				window["planDriverDropDownMenu"].Enabled := true
+				window["planTimeEdit"].Enabled := true
+				window["actTimeEdit"].Enabled := true
+				window["deletePlanButton"].Enabled := true
 
-			stint := this.PlanListView.GetText(selected, 1)
+				stint := this.PlanListView.GetText(selected, 1)
 
-			if (stint = 1) {
+				if (stint = 1) {
+					window["planLapEdit"].Enabled := false
+					window["actLapEdit"].Enabled := false
+					window["planRefuelEdit"].Enabled := false
+					window["planTyreCompoundDropDown"].Enabled := false
+
+					window["planLapEdit"].Text := ""
+					window["actLapEdit"].Text := ""
+					window["planRefuelEdit"].Text := ""
+					window["planTyreCompoundDropDown"].Choose(0)
+				}
+				else {
+					window["planLapEdit"].Enabled := true
+					window["actLapEdit"].Enabled := true
+					window["planRefuelEdit"].Enabled := true
+					window["planTyreCompoundDropDown"].Enabled := true
+				}
+			}
+			else {
+				window["planDriverDropDownMenu"].Enabled := false
+				window["planTimeEdit"].Enabled := false
+				window["actTimeEdit"].Enabled := false
 				window["planLapEdit"].Enabled := false
 				window["actLapEdit"].Enabled := false
 				window["planRefuelEdit"].Enabled := false
 				window["planTyreCompoundDropDown"].Enabled := false
+				window["deletePlanButton"].Enabled := false
 
+				window["planDriverDropDownMenu"].Choose(0)
+				window["planTimeEdit"].Value := "20200101000000"
+				window["actTimeEdit"].Value := "20200101000000"
 				window["planLapEdit"].Text := ""
 				window["actLapEdit"].Text := ""
 				window["planRefuelEdit"].Text := ""
 				window["planTyreCompoundDropDown"].Choose(0)
 			}
-			else {
-				window["planLapEdit"].Enabled := true
-				window["actLapEdit"].Enabled := true
-				window["planRefuelEdit"].Enabled := true
-				window["planTyreCompoundDropDown"].Enabled := true
+
+			if this.UseTraffic {
+				window["numScenariosEdit"].Enabled := true
+				window["variationWindowEdit"].Enabled := true
+
+				window["lapTimeVariationDropDown"].Enabled := true
+				window["driverErrorsDropDown"].Enabled := true
+				window["pitstopsDropDown"].Enabled := true
+				window["overtakeDeltaEdit"].Enabled := true
+				window["trafficConsideredEdit"].Enabled := true
 			}
-		}
-		else {
-			window["planDriverDropDownMenu"].Enabled := false
-			window["planTimeEdit"].Enabled := false
-			window["actTimeEdit"].Enabled := false
-			window["planLapEdit"].Enabled := false
-			window["actLapEdit"].Enabled := false
-			window["planRefuelEdit"].Enabled := false
-			window["planTyreCompoundDropDown"].Enabled := false
-			window["deletePlanButton"].Enabled := false
+			else {
+				window["numScenariosEdit"].Enabled := false
+				window["variationWindowEdit"].Enabled := false
 
-			window["planDriverDropDownMenu"].Choose(0)
-			window["planTimeEdit"].Value := "20200101000000"
-			window["actTimeEdit"].Value := "20200101000000"
-			window["planLapEdit"].Text := ""
-			window["actLapEdit"].Text := ""
-			window["planRefuelEdit"].Text := ""
-			window["planTyreCompoundDropDown"].Choose(0)
-		}
-
-		if this.UseTraffic {
-			window["numScenariosEdit"].Enabled := true
-			window["variationWindowEdit"].Enabled := true
-
-			window["lapTimeVariationDropDown"].Enabled := true
-			window["driverErrorsDropDown"].Enabled := true
-			window["pitstopsDropDown"].Enabled := true
-			window["overtakeDeltaEdit"].Enabled := true
-			window["trafficConsideredEdit"].Enabled := true
-		}
-		else {
-			window["numScenariosEdit"].Enabled := false
-			window["variationWindowEdit"].Enabled := false
-
-			window["lapTimeVariationDropDown"].Enabled := false
-			window["driverErrorsDropDown"].Enabled := false
-			window["pitstopsDropDown"].Enabled := false
-			window["overtakeDeltaEdit"].Enabled := false
-			window["trafficConsideredEdit"].Enabled := false
+				window["lapTimeVariationDropDown"].Enabled := false
+				window["driverErrorsDropDown"].Enabled := false
+				window["pitstopsDropDown"].Enabled := false
+				window["overtakeDeltaEdit"].Enabled := false
+				window["trafficConsideredEdit"].Enabled := false
+			}
 		}
 
 		if (this.SessionActive && this.LastLap && InStr(this.LastLap.Telemetry, "[Setup Data]"))
@@ -5825,7 +5860,6 @@ class RaceCenter extends ConfigurationItem {
 
 	startWorking(state := true) {
 		local start := false
-		local document := this.WaitViewer.document
 		local html, curAutoActivate
 
 		if state {
@@ -5848,10 +5882,12 @@ class RaceCenter extends ConfigurationItem {
 		if state {
 			this.Window.Block()
 
-			this.WaitViewer.Show()
+			if (this.Mode = "Normal")
+				this.WaitViewer.Show()
 		}
 		else {
-			this.WaitViewer.Hide()
+			if (this.Mode = "Normal")
+				this.WaitViewer.Hide()
 
 			curAutoActivate := this.Window.AutoActivate
 
@@ -5916,14 +5952,15 @@ class RaceCenter extends ConfigurationItem {
 
 		this.iPitstopStints := []
 
-		this.Control["driverDropDown"].Delete()
+		if (this.Mode = "Normal")
+			this.Control["driverDropDown"].Delete()
 
 		this.iAvailableDrivers := []
 		this.iSelectedDrivers := false
 
 		if this.SessionActive
 			this.loadSessionDrivers()
-		else {
+		else if (this.Mode = "Normal") {
 			this.Control["setupDriverDropDownMenu"].Delete()
 			this.Control["planDriverDropDownMenu"].Delete()
 		}
@@ -5959,8 +5996,16 @@ class RaceCenter extends ConfigurationItem {
 		this.iSelectedSetup := false
 
 		this.iPlanVersion := false
-		this.iDate := this.Control["sessionDateCal"].Value
-		this.iTime := this.Control["sessionTimeEdit"].Value
+
+		if (this.Mode = "Normal") {
+			this.iDate := this.Control["sessionDateCal"].Value
+			this.iTime := this.Control["sessionTimeEdit"].Value
+		}
+		else {
+			this.iDate := A_Now
+			this.iTime := A_Now
+		}
+
 		this.iSelectedPlanStint := false
 
 		this.iWeather := false
@@ -9296,16 +9341,18 @@ class RaceCenter extends ConfigurationItem {
 					this.iAirTemperature := getMultiMapValue(info, "Weather", "AirTemperature", false)
 					this.iTrackTemperature := getMultiMapValue(info, "Weather", "TrackTemperature", false)
 
-					this.Control["sessionDateCal"].Value := this.Date
-					this.Control["sessionTimeEdit"].Value := this.Time
+					if (this.Mode = "Normal") {
+						this.Control["sessionDateCal"].Value := this.Date
+						this.Control["sessionTimeEdit"].Value := this.Time
 
-					this.Control["teamDropDownMenu"].Delete()
-					this.Control["teamDropDownMenu"].Add([this.iTeamName])
-					this.Control["teamDropDownMenu"].Choose(1)
+						this.Control["teamDropDownMenu"].Delete()
+						this.Control["teamDropDownMenu"].Add([this.iTeamName])
+						this.Control["teamDropDownMenu"].Choose(1)
 
-					this.Control["sessionDropDownMenu"].Delete()
-					this.Control["sessionDropDownMenu"].Add([this.iSessionName])
-					this.Control["sessionDropDownMenu"].Choose(1)
+						this.Control["sessionDropDownMenu"].Delete()
+						this.Control["sessionDropDownMenu"].Add([this.iSessionName])
+						this.Control["sessionDropDownMenu"].Choose(1)
+					}
 
 					if FileExist(folder . "Session.strategy") {
 						configuration := readMultiMap(folder . "Session.strategy")
@@ -9378,61 +9425,63 @@ class RaceCenter extends ConfigurationItem {
 	showChart(drawChartFunction) {
 		local before, after, html
 
-		this.ChartViewer.document.open()
+		if (this.Mode = "Normal") {
+			this.ChartViewer.document.open()
 
-		if (drawChartFunction && (drawChartFunction != "")) {
-			before := "
-			(
-			<html>
-			    <meta charset='utf-8'>
-				<head>
-					<style>
-						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
-						.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
-						.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
-					</style>
-					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-					<script type="text/javascript">
-						google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawChart);
-			)"
+			if (drawChartFunction && (drawChartFunction != "")) {
+				before := "
+				(
+				<html>
+					<meta charset='utf-8'>
+					<head>
+						<style>
+							.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+							.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+							.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
+						</style>
+						<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+						<script type="text/javascript">
+							google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawChart);
+				)"
 
-			before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
-												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
-												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
-												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
+				before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
+													 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
+													 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
+													 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
 
-			after := "
-			(
-					</script>
-				</head>
-				<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
-					<style>
-						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
-						.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
-						.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
-					</style>
-					<div id="chart_id" style="width: %width%px; height: %height%px"></div>
-				</body>
-			</html>
-			)"
+				after := "
+				(
+						</script>
+					</head>
+					<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
+						<style>
+							.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+							.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+							.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
+						</style>
+						<div id="chart_id" style="width: %width%px; height: %height%px"></div>
+					</body>
+				</html>
+				)"
 
-			html := (before . drawChartFunction . substituteVariables(after, {width: (this.ChartViewer.getWidth() - 5)
-																			, height: (this.ChartViewer.getHeight() - 5)
-																			, fontColor: this.Window.Theme.TextColor
-																			, backColor: this.Window.AltBackColor
-																			, headerBackColor: this.Window.Theme.ListBackColor["Header"]
-																			, evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
-																			, oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]}))
+				html := (before . drawChartFunction . substituteVariables(after, {width: (this.ChartViewer.getWidth() - 5)
+																				, height: (this.ChartViewer.getHeight() - 5)
+																				, fontColor: this.Window.Theme.TextColor
+																				, backColor: this.Window.AltBackColor
+																				, headerBackColor: this.Window.Theme.ListBackColor["Header"]
+																				, evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
+																				, oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]}))
 
-			this.ChartViewer.document.write(html)
+				this.ChartViewer.document.write(html)
+			}
+			else {
+				html := "<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
+
+				this.ChartViewer.document.write(substituteVariables(html, {backColor: this.Window.AltBackColor}))
+			}
+
+			this.ChartViewer.document.close()
 		}
-		else {
-			html := "<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
-
-			this.ChartViewer.document.write(substituteVariables(html, {backColor: this.Window.AltBackColor}))
-		}
-
-		this.ChartViewer.document.close()
 	}
 
 	showDataPlot(data, xAxis, yAxises) {
@@ -9443,118 +9492,120 @@ class RaceCenter extends ConfigurationItem {
 		local ignore, yAxis, settingsLaps, laps, ignore, lap, first, values, value, minValue, maxValue
 		local series, vAxis, index
 
-		drawChartFunction .= "function drawChart() {"
-		drawChartFunction .= "`nvar data = new google.visualization.DataTable();"
-
-		if (this.SelectedChartType = "Bubble")
-			drawChartFunction .= ("`ndata.addColumn('string', 'ID');")
-
-		drawChartFunction .= ("`ndata.addColumn('number', '" . xAxis . "');")
-
-		for ignore, yAxis in yAxises {
-			drawChartFunction .= ("`ndata.addColumn('number', '" . yAxis . "');")
-		}
-
-		settingsLaps := (this.ReportViewer.Settings.Has("Laps") ? this.ReportViewer.Settings["Laps"] : false)
-		laps := false
-
-		if (settingsLaps && (settingsLaps.Length > 0)) {
-			laps := CaseInsenseWeakMap()
-
-			for ignore, lap in settingsLaps
-				laps[lap] := lap
-		}
-
-		drawChartFunction .= "`ndata.addRows(["
-		first := true
-
-		for ignore, values in data {
-			if (laps && !laps.Has(A_Index))
-				continue
-
-			if !first
-				drawChartFunction .= ",`n"
-
-			first := false
-			value := ((this.SelectedDrivers && !inList(this.SelectedDrivers, this.Stints[values["Stint"]].Driver.ID)) ? kNull : values[xAxis])
-
-			if !isNumber(value)
-				value := kNull
+		if (this.Mode = "Normal") {
+			drawChartFunction .= "function drawChart() {"
+			drawChartFunction .= "`nvar data = new google.visualization.DataTable();"
 
 			if (this.SelectedChartType = "Bubble")
-				drawChartFunction .= ("['', " . convertValue(xAxis, value))
-			else
-				drawChartFunction .= ("[" . convertValue(xAxis, value))
+				drawChartFunction .= ("`ndata.addColumn('string', 'ID');")
+
+			drawChartFunction .= ("`ndata.addColumn('number', '" . xAxis . "');")
 
 			for ignore, yAxis in yAxises {
-				value := values[yAxis]
+				drawChartFunction .= ("`ndata.addColumn('number', '" . yAxis . "');")
+			}
 
-				if isNumber(value) {
-					minValue := ((minValue == kUndefined) ? value : Min(minValue, value))
-					maxValue := ((maxValue == kUndefined) ? value : Max(maxValue, value))
-				}
-				else
+			settingsLaps := (this.ReportViewer.Settings.Has("Laps") ? this.ReportViewer.Settings["Laps"] : false)
+			laps := false
+
+			if (settingsLaps && (settingsLaps.Length > 0)) {
+				laps := CaseInsenseWeakMap()
+
+				for ignore, lap in settingsLaps
+					laps[lap] := lap
+			}
+
+			drawChartFunction .= "`ndata.addRows(["
+			first := true
+
+			for ignore, values in data {
+				if (laps && !laps.Has(A_Index))
+					continue
+
+				if !first
+					drawChartFunction .= ",`n"
+
+				first := false
+				value := ((this.SelectedDrivers && !inList(this.SelectedDrivers, this.Stints[values["Stint"]].Driver.ID)) ? kNull : values[xAxis])
+
+				if !isNumber(value)
 					value := kNull
 
-				drawChartFunction .= (", " . convertValue(yAxis, value))
+				if (this.SelectedChartType = "Bubble")
+					drawChartFunction .= ("['', " . convertValue(xAxis, value))
+				else
+					drawChartFunction .= ("[" . convertValue(xAxis, value))
+
+				for ignore, yAxis in yAxises {
+					value := values[yAxis]
+
+					if isNumber(value) {
+						minValue := ((minValue == kUndefined) ? value : Min(minValue, value))
+						maxValue := ((maxValue == kUndefined) ? value : Max(maxValue, value))
+					}
+					else
+						value := kNull
+
+					drawChartFunction .= (", " . convertValue(yAxis, value))
+				}
+
+				drawChartFunction .= "]"
 			}
 
-			drawChartFunction .= "]"
-		}
+			drawChartFunction .= "`n]);"
 
-		drawChartFunction .= "`n]);"
+			series := "series: {"
+			vAxis := "vAxis: { gridlines: { color: '#" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, "
 
-		series := "series: {"
-		vAxis := "vAxis: { gridlines: { color: '#" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, "
+			for ignore, yAxis in yAxises {
+				if (A_Index > 1) {
+					series .= ", "
+					vAxis .= ", "
+				}
 
-		for ignore, yAxis in yAxises {
-			if (A_Index > 1) {
-				series .= ", "
-				vAxis .= ", "
+				if (A_Index > 2)
+					break
+
+				index := A_Index - 1
+
+				series .= (index . ": {targetAxisIndex: " . index . "}")
+				vAxis .= (index . ": {title: '" . translate(yAxis) . "'}")
 			}
 
-			if (A_Index > 2)
-				break
+			series .= "}"
+			vAxis .= "}"
 
-			index := A_Index - 1
+			if (this.SelectedChartType = "Scatter") {
+				drawChartFunction .= ("`nvar options = { legend: {position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: { title: '" . translate(xAxis) . "', gridlines: { color: '" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'} }, " . series . ", " . vAxis . "};")
 
-			series .= (index . ": {targetAxisIndex: " . index . "}")
-			vAxis .= (index . ": {title: '" . translate(yAxis) . "'}")
+				drawChartFunction .= "`nvar chart = new google.visualization.ScatterChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+			}
+			else if (this.SelectedChartType = "Bar") {
+				if (minValue == kUndefined)
+					minValue := 0
+				else
+					minValue := Min(0, minValue)
+
+				if (maxValue == kUndefined)
+					maxValue := 0
+
+				drawChartFunction .= ("`nvar options = { legend: {position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: { viewWindow: {min: " . minValue . ", max: " . maxValue . "}, title: '" . translate(xAxis) . "', gridlines: { color: '" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'} }, vAxis: { viewWindowMode: 'pretty', gridlines: { color: '" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'} } };")
+
+				drawChartFunction .= "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+			}
+			else if (this.SelectedChartType = "Bubble") {
+				drawChartFunction .= ("`nvar options = { legend: {position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: { title: '" . translate(xAxis) . "', gridlines: { color: '" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, viewWindowMode: 'pretty' }, vAxis: { title: '" . translate(yAxises[1]) . "', gridlines: { color: '" . this.Window.Theme.GridColor . "' }, viewWindowMode: 'pretty', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'} }, colorAxis: { legend: {position: 'none'}, colors: ['blue', 'red'] }, sizeAxis: { maxSize: 15 } };")
+
+				drawChartFunction .= "`nvar chart = new google.visualization.BubbleChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+			}
+			else if (this.SelectedChartType = "Line") {
+				drawChartFunction .= ("`nvar options = { legend: {position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, vAxis: { textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { color: '" . this.Window.Theme.GridColor . "' } }, hAxis: { title: '" . translate(xAxis) . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { color: '" . this.Window.Theme.GridColor . "' }, titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "' };")
+
+				drawChartFunction .= "`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+			}
+
+			this.showChart(drawChartFunction)
 		}
-
-		series .= "}"
-		vAxis .= "}"
-
-		if (this.SelectedChartType = "Scatter") {
-			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: { title: '" . translate(xAxis) . "', gridlines: { color: '" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'} }, " . series . ", " . vAxis . "};")
-
-			drawChartFunction .= "`nvar chart = new google.visualization.ScatterChart(document.getElementById('chart_id')); chart.draw(data, options); }"
-		}
-		else if (this.SelectedChartType = "Bar") {
-			if (minValue == kUndefined)
-				minValue := 0
-			else
-				minValue := Min(0, minValue)
-
-			if (maxValue == kUndefined)
-				maxValue := 0
-
-			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: { viewWindow: {min: " . minValue . ", max: " . maxValue . "}, title: '" . translate(xAxis) . "', gridlines: { color: '" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'} }, vAxis: { viewWindowMode: 'pretty', gridlines: { color: '" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'} } };")
-
-			drawChartFunction .= "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
-		}
-		else if (this.SelectedChartType = "Bubble") {
-			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: { title: '" . translate(xAxis) . "', gridlines: { color: '" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, viewWindowMode: 'pretty' }, vAxis: { title: '" . translate(yAxises[1]) . "', gridlines: { color: '" . this.Window.Theme.GridColor . "' }, viewWindowMode: 'pretty', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'} }, colorAxis: { legend: {position: 'none'}, colors: ['blue', 'red'] }, sizeAxis: { maxSize: 15 } };")
-
-			drawChartFunction .= "`nvar chart = new google.visualization.BubbleChart(document.getElementById('chart_id')); chart.draw(data, options); }"
-		}
-		else if (this.SelectedChartType = "Line") {
-			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, vAxis: { textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { color: '" . this.Window.Theme.GridColor . "' } }, hAxis: { title: '" . translate(xAxis) . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { color: '" . this.Window.Theme.GridColor . "' }, titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "' };")
-
-			drawChartFunction .= "`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"
-		}
-
-		this.showChart(drawChartFunction)
 	}
 
 	showDetails(report, details, charts*) {
@@ -9562,56 +9613,58 @@ class RaceCenter extends ConfigurationItem {
 		local html := (details ? details : "")
 		local script, ignore, chart
 
-		this.iSelectedDetailReport := report
+		if (this.Mode = "Normal") {
+			this.iSelectedDetailReport := report
 
-		if details {
-			script := "
-			(
-				<meta charset='utf-8'>
-				<head>
-					<style>
-						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
-						.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
-						.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
-						%tableCSS%
-					</style>
-					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-					<script type="text/javascript">
-						google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawCharts);
+			if details {
+				script := "
+				(
+					<meta charset='utf-8'>
+					<head>
+						<style>
+							.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+							.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+							.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
+							%tableCSS%
+						</style>
+						<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+						<script type="text/javascript">
+							google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawCharts);
 
-						function drawCharts() {
-			)"
+							function drawCharts() {
+				)"
 
-			script := substituteVariables(script, {tableCSS: this.StrategyViewer.getTableCSS()
-												 , fontColor: this.Window.Theme.TextColor
-												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
-												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
-												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
+				script := substituteVariables(script, {tableCSS: this.StrategyViewer.getTableCSS()
+													 , fontColor: this.Window.Theme.TextColor
+													 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
+													 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
+													 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
 
-			for ignore, chart in charts
-				script .= (A_Space . "drawChart" . chart[1] . "();")
+				for ignore, chart in charts
+					script .= (A_Space . "drawChart" . chart[1] . "();")
 
-			script .= "}`n"
+				script .= "}`n"
 
-			for ignore, chart in charts {
-				if (A_Index > 0)
-					script .= "`n"
+				for ignore, chart in charts {
+					if (A_Index > 0)
+						script .= "`n"
 
-				script .= chart[2]
+					script .= chart[2]
+				}
+
+				script .= "</script></head>"
 			}
+			else
+				script := ""
 
-			script .= "</script></head>"
+			html := ("<html>" . script . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> p, div, table { color: " . this.Window.Theme.TextColor . "; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; }</style><div>" . html . "</div></body></html>")
+
+			this.iSelectedDetailHTML := html
+
+			this.DetailsViewer.document.open()
+			this.DetailsViewer.document.write(html)
+			this.DetailsViewer.document.close()
 		}
-		else
-			script := ""
-
-		html := ("<html>" . script . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> p, div, table { color: " . this.Window.Theme.TextColor . "; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; }</style><div>" . html . "</div></body></html>")
-
-		this.iSelectedDetailHTML := html
-
-		this.DetailsViewer.document.open()
-		this.DetailsViewer.document.write(html)
-		this.DetailsViewer.document.close()
 	}
 
 	selectReport(report) {
@@ -13159,6 +13212,7 @@ startupRaceCenter() {
 										  , getMultiMapValue(settings, "Strategy Workbench", "Car", false))
 	local track := getMultiMapValue(settings, "Race Center", "Track"
 											, getMultiMapValue(settings, "Strategy Workbench", "Track", false))
+	local mode := (inList(A_Args, "-Simple") ? "Simple" : getMultiMapValue(settings, "Race Center", "Mode", "Simple"))
 	local raceSettings := readMultiMap(kUserConfigDirectory . "Race.settings")
 	local index := inList(A_Args, "-Startup")
 	local icon := (kIconsDirectory . "Console.ico")
@@ -13184,7 +13238,7 @@ startupRaceCenter() {
 																										  , RaceCenter.kInvalidToken)))
 		}
 
-		rCenter := RaceCenter(kSimulatorConfiguration, raceSettings, simulator, car, track)
+		rCenter := RaceCenter(kSimulatorConfiguration, raceSettings, simulator, car, track, mode)
 
 		if GetKeyState("Ctrl")
 			rCenter.iSynchronize := "Off"
@@ -13198,6 +13252,8 @@ startupRaceCenter() {
 
 		if !load
 			rCenter.connect(true)
+
+		rCenter.startSynchronization()
 
 		registerMessageHandler("Setup", functionMessageHandler)
 

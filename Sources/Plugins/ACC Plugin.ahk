@@ -264,6 +264,15 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	__New(controller, name, simulator, configuration := false) {
 		local accUdpConfig, udpConfig, udpConfigValid
 
+		parseConfig(config) {
+			config := JSON.parse(config)
+
+			if ((config.Has("udpListenerPort") || config.Has("updListenerPort")) && config.Has("connectionPassword") && config.Has("commandPassword"))
+				return config
+			else
+				throw "Invalid broadcasting configuration..."
+		}
+
 		if !ACCPlugin.kUnknown
 			ACCPlugin.kUnknown := translate("Unknown")
 
@@ -290,23 +299,23 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 						try {
 							try {
 								try {
-									accUdpConfig := JSON.parse(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "`n"))
+									accUdpConfig := parseConfig(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "`n"))
 								}
 								catch Any {
-									accUdpConfig := JSON.parse(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "`n CP0"))
+									accUdpConfig := parseConfig(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "`n CP0"))
 								}
 							}
 							catch Any {
-								accUdpConfig := JSON.parse(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "`n UTF-8"))
+								accUdpConfig := parseConfig(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "`n UTF-8"))
 							}
 						}
 						catch Any {
-							accUdpConfig := accUdpConfig := JSON.parse(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "`n UTF-16"))
+							accUdpConfig := parseConfig(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "`n UTF-16"))
 						}
 					}
 					catch Any {
-						accUdpConfig := JSON.parse(StrReplace(StrGet(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "Raw"))
-															, "`r`n", "`n"))
+						accUdpConfig := parseConfig(StrReplace(StrGet(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "Raw"))
+															 , "`r`n", "`n"))
 					}
 				}
 				catch Any as exception {

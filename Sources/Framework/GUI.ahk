@@ -368,10 +368,10 @@ class GrayTheme extends ClassicTheme {
 	}
 }
 
-class LightTheme extends Theme {
+class BrightTheme extends Theme {
 	Descriptor {
 		Get {
-			return "Light"
+			return "Bright"
 		}
 	}
 
@@ -1748,7 +1748,7 @@ class RecolorizerTask extends PeriodicTask {
 ;;;-------------------------------------------------------------------------;;;
 
 getAllUIThemes(configuration) {
-	return [ClassicTheme(), GrayTheme(), LightTheme(), DarkTheme()]
+	return [ClassicTheme(), GrayTheme(), BrightTheme(), DarkTheme()]
 }
 
 setButtonIcon(buttonHandle, file, index := 1, options := "", theme := true) {
@@ -2056,7 +2056,7 @@ initializeGUI() {
 	try {
 		Theme.CurrentTheme := %getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "General", "UI Theme", "Classic") . "Theme"%()
 	}
-	catch Any as exception {
+	catch Any {
 		Theme.CurrentTheme := ClassicTheme()
 	}
 

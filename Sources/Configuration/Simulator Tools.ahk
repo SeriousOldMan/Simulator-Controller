@@ -1707,6 +1707,20 @@ updateInstallationForV500() {
 	}
 }
 
+updateConfigurationForV583() {
+	if FileExist(kUserConfigDirectory . "Application Settings.ini") {
+		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+		theme := getMultiMapValue(settings, "General", "UI Theme", false)
+
+		if (theme = "Light") {
+			setMultiMapValue(settings, "General", "UI Theme", "Bright")
+
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+		}
+	}
+}
+
 updateConfigurationForV580() {
 	local ignore, assistant, section, actions, settings, theme
 

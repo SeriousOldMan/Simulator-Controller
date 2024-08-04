@@ -1263,6 +1263,7 @@ class RaceCenter extends ConfigurationItem {
 	createGui(configuration) {
 		local center := this
 		local centerGui, centerTab, x, y, width, ignore, report, choices, serverURLs, settings, button, control
+		local menu1, menu2, menus
 
 		validateNumber(field, *) {
 			field := centerGui[field]
@@ -2027,6 +2028,15 @@ class RaceCenter extends ConfigurationItem {
 
 			centerGui.Add("DropDownList", "x750 yp w180 Choose1 +0x200 vpitstopMenuDropDown").OnEvent("Change", pitstopMenu)
 		}
+		else {
+			centerGui.Add("Text", "x" . (580 - 388) . " yp+12 w381 0x2 X:Move vmessageField")
+
+			this.iWaitViewer := centerGui.Add("HTMLViewer", "x580 yp-8 w30 h30 X:Move vwaitViewer Hidden")
+
+			this.iWaitViewer.document.open()
+			this.iWaitViewer.document.write("<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . (kResourcesDirectory . "Wait.gif") . "' width=28 height=28 border=0 padding=0></body></html>")
+			this.iWaitViewer.document.close()
+		}
 
 		centerGui.SetFont("s8 Norm", "Arial")
 
@@ -2302,6 +2312,61 @@ class RaceCenter extends ConfigurationItem {
 			this.iReportViewer := RaceReportViewer(centerGui, this.ChartViewer)
 
 			centerGui.Add(RaceCenter.RaceCenterResizer(centerGui))
+		}
+		else {
+			menu1 := Menu()
+
+			menu1.Add(translate("Synchronize"), (*) => this.chooseSessionMenu(1))
+
+			menu1.Add()
+
+			menu1.Add(translate("Update Statistics"), (*) => this.chooseSessionMenu(2))
+
+			menu1.Add()
+
+			menu1.Add(translate("Race Summary"), (*) => this.chooseSessionMenu(3))
+			menu1.Add(translate("Driver Statistics"), (*) => this.chooseSessionMenu(4))
+
+			menu2 := Menu()
+
+			menu2.Add(translate("Initialize from Session"), (*) => this.choosePitstopMenu(1))
+			menu2.Add(translate("Load from Database..."), (*) => this.choosePitstopMenu(2))
+
+			menu2.Add()
+
+			menu2.Add(translate("Save Setups"), (*) => this.choosePitstopMenu(3))
+			menu2.Add(translate("Clear Setups..."), (*) => this.choosePitstopMenu(4))
+			menu2.Add(translate("Import Setups..."), (*) => this.choosePitstopMenu(5))
+			menu2.Add(translate("Export Setups..."), (*) => this.choosePitstopMenu(6))
+
+			menu2.Add()
+
+			menu2.Add(translate("Setups Summary"), (*) => this.choosePitstopMenu(7))
+			menu2.Add(translate("Pitstops Summary"), (*) => this.choosePitstopMenu(8))
+
+			menu2.Add()
+
+			menu2.Add(translate("Adjust Pressures (Reference)"), (*) => this.choosePitstopMenu(9))
+			if (this.TyrePressureMode = "Reference")
+				menu2.Check(translate("Adjust Pressures (Reference)"))
+
+			menu2.Add(translate("Adjust Pressures (Relative)"), (*) => this.choosePitstopMenu(10))
+			if (this.TyrePressureMode = "Relative")
+				menu2.Check(translate("Adjust Pressures (Relative)"))
+
+			menu2.Add(translate("Correct pressure loss"), (*) => this.choosePitstopMenu(11))
+			if this.CorrectPressureLoss
+				menu2.Check(translate("Correct pressure loss"))
+
+			menu2.Add(translate("Select tyre set"), (*) => this.choosePitstopMenu(12))
+			if this.SelectTyreSet
+				menu2.Check(translate("Select tyre set"))
+
+			menus := MenuBar()
+			menus.Add(translate("Session"), menu1)
+			menus.Add(translate("Pitstop"), menu2)
+
+			centerGui.MenuBar := Menus
 		}
 	}
 
@@ -5089,7 +5154,7 @@ class RaceCenter extends ConfigurationItem {
 			this.initializeSimulator(strategy.Simulator, strategy.Car, strategy.Track, true)
 
 		if (show || (this.SelectedDetailReport = "Strategy") || !this.SelectedDetailReport)
-			if strategy {
+			if (strategy && (this.Mode = "Normal")) {
 				this.StrategyViewer.showStrategyInfo(this.Strategy)
 
 				this.iSelectedDetailReport := "Strategy"
@@ -5882,12 +5947,10 @@ class RaceCenter extends ConfigurationItem {
 		if state {
 			this.Window.Block()
 
-			if (this.Mode = "Normal")
-				this.WaitViewer.Show()
+			this.WaitViewer.Show()
 		}
 		else {
-			if (this.Mode = "Normal")
-				this.WaitViewer.Hide()
+			this.WaitViewer.Hide()
 
 			curAutoActivate := this.Window.AutoActivate
 
@@ -5931,7 +5994,8 @@ class RaceCenter extends ConfigurationItem {
 
 			DirCreate(reportDirectory)
 
-			this.ReportViewer.setReport(reportDirectory)
+			if (this.Mode = "Normal")
+				this.ReportViewer.setReport(reportDirectory)
 		}
 
 		pitstopSettings(kClose)
@@ -8141,47 +8205,49 @@ class RaceCenter extends ConfigurationItem {
 	updateReports(redraw := false) {
 		local selectedLap, selectedStint
 
-		if this.HasData {
-			if !this.SelectedReport
-				this.selectReport("Overview")
+		if (this.Mode = "Normal") {
+			if this.HasData {
+				if !this.SelectedReport
+					this.selectReport("Overview")
 
-			this.showReport(this.SelectedReport, true)
-		}
-		else if redraw
-			this.showChart(false)
+				this.showReport(this.SelectedReport, true)
+			}
+			else if redraw
+				this.showChart(false)
 
-		if (!this.SelectedDetailReport && this.Strategy)
-			this.StrategyViewer.showStrategyInfo(this.Strategy)
-		else if redraw {
-			switch this.SelectedDetailReport, false {
-				case "Plan":
-					this.showPlanDetails()
-				case "Setups":
-					this.showSetupsDetails()
-				case "Session":
-					this.showSessionSummary()
-				case "Drivers":
-					this.showDriverStatistics()
-				case "Pitstops":
-					this.showPitstopsDetails()
-				default:
-					selectedLap := this.LapsListView.GetNext(0)
+			if (!this.SelectedDetailReport && this.Strategy)
+				this.StrategyViewer.showStrategyInfo(this.Strategy)
+			else if redraw {
+				switch this.SelectedDetailReport, false {
+					case "Plan":
+						this.showPlanDetails()
+					case "Setups":
+						this.showSetupsDetails()
+					case "Session":
+						this.showSessionSummary()
+					case "Drivers":
+						this.showDriverStatistics()
+					case "Pitstops":
+						this.showPitstopsDetails()
+					default:
+						selectedLap := this.LapsListView.GetNext(0)
 
-					if (selectedLap && (this.SelectedDetailReport = "Lap"))
-						this.showLapDetails(this.Laps[selectedLap])
-					else {
-						selectedStint := this.StintsListView.GetNext(0)
+						if (selectedLap && (this.SelectedDetailReport = "Lap"))
+							this.showLapDetails(this.Laps[selectedLap])
+						else {
+							selectedStint := this.StintsListView.GetNext(0)
 
-						if (selectedStint && (this.SelectedDetailReport = "Stint"))
-							this.showStintDetails(this.Stints[selectedStint])
-						else if ((this.SelectedDetailReport = "Strategy") && this.Strategy)
-							this.StrategyViewer.showStrategyInfo(this.Strategy)
-						else if (this.SelectedDetailReport && this.iSelectedDetailHTML) {
-							this.DetailsViewer.document.open()
-							this.DetailsViewer.document.write(this.iSelectedDetailHTML)
-							this.DetailsViewer.document.close()
+							if (selectedStint && (this.SelectedDetailReport = "Stint"))
+								this.showStintDetails(this.Stints[selectedStint])
+							else if ((this.SelectedDetailReport = "Strategy") && this.Strategy)
+								this.StrategyViewer.showStrategyInfo(this.Strategy)
+							else if (this.SelectedDetailReport && this.iSelectedDetailHTML) {
+								this.DetailsViewer.document.open()
+								this.DetailsViewer.document.write(this.iSelectedDetailHTML)
+								this.DetailsViewer.document.close()
+							}
 						}
-					}
+				}
 			}
 		}
 	}
@@ -9087,8 +9153,10 @@ class RaceCenter extends ConfigurationItem {
 			this.iDate := getMultiMapValue(info, "Plan", "Date")
 			this.iTime := getMultiMapValue(info, "Plan", "Time")
 
-			this.Control["sessionDateCal"].Value := this.Date
-			this.Control["sessionTimeEdit"].Value := this.Time
+			if (this.Mode = "Normal") {
+				this.Control["sessionDateCal"].Value := this.Date
+				this.Control["sessionTimeEdit"].Value := this.Time
+			}
 		}
 
 		this.PlanListView.Delete()

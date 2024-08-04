@@ -393,7 +393,7 @@ viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 80
 
 	innerWidth := width - 16
 
-	htmlGui := Window({Options: "0x400000"}, translate("News && Updates"))
+	htmlGui := Window({Descriptor: "HTML Viewer", Options: "0x400000"}, translate("News && Updates"))
 
 	htmlGui.SetFont("s10 Bold")
 

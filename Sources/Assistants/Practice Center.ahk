@@ -238,7 +238,7 @@ class PracticeCenter extends ConfigurationItem {
 
 			if this.Closeable {
 				if (this.PracticeCenter.HasData && !this.PracticeCenter.SessionExported) {
-					save := (this.AutoSave && this.SessionActive)
+					save := (this.PracticeCenter.AutoSave && this.PracticeCenter.SessionActive)
 
 					if this.PracticeCenter.AutoExport
 						this.PracticeCenter.exportSession(true)
@@ -273,7 +273,7 @@ class PracticeCenter extends ConfigurationItem {
 		__New(arguments*) {
 			super.__New(arguments*)
 
-			Task.startTask(ObjBindMethod(this, "RedrawHTMLViwer"), 500, kLowPriority)
+			Task.startTask(ObjBindMethod(this, "RedrawHTMLViwer"), 500, kHighPriority)
 		}
 
 		Resize(deltaWidth, deltaHeight) {

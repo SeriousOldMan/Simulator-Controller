@@ -1589,8 +1589,8 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		selectStint(listView, line, selected) {
-			if selected
-				chooseStint(listView, line)
+			if (selected && (this.Mode = "Normal"))
+				center.withExceptionhandler(ObjBindMethod(center, "showStintDetails", center.Stints[listView.GetText(line, 1)], false))
 		}
 
 		chooseStint(listView, line, *) {
@@ -1604,8 +1604,8 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		selectLap(listView, line, selected) {
-			if selected
-				chooseLap(listView, line)
+			if (selected && (this.Mode = "Normal"))
+				center.withExceptionhandler(ObjBindMethod(center, "showLapDetails", center.Laps[listView.GetText(line, 1)], false))
 		}
 
 		chooseLap(listView, line, *) {
@@ -1966,66 +1966,46 @@ class RaceCenter extends ConfigurationItem {
 			center.withExceptionhandler(ObjBindMethod(center, "planPitstop"))
 		}
 
+		pitstopSelected(line, show, viewer?) {
+			local sessionStore := center.SessionStore
+			local pitstops := sessionStore.Tables["Pitstop.Data"]
+			local pitstop
+
+			if line {
+				pitstop := center.PitstopsListView.GetText(line, 1)
+
+				if (pitstops.Has(pitstop) && (pitstops[pitstop]["Status"] = "Planned")) {
+					center.PitstopsListView.Modify(line, "-Check")
+
+					loop center.PitstopsListView.GetCount()
+						center.PitstopsListView.Modify(line, "-Select")
+				}
+				else if (isInteger(pitstop) && pitstops.Has(pitstop)) {
+					center.PitstopsListView.Modify(line, "Check")
+
+					if show
+						center.withExceptionhandler(ObjBindMethod(center, "showPitstopDetails", pitstop, viewer?))
+				}
+				else {
+					center.PitstopsListView.Modify(line, "Check")
+
+					loop center.PitstopsListView.GetCount()
+						center.PitstopsListView.Modify(line, "-Select")
+				}
+			}
+		}
+
 		selectPitstop(listView, line, selected) {
 			if selected
-				choosePitstop(listView, line)
+				pitstopSelected(line, (this.Mode = "Normal"), false)
 		}
 
 		choosePitstop(listView, line, *) {
-			local sessionStore := center.SessionStore
-			local pitstops := sessionStore.Tables["Pitstop.Data"]
-			local pitstop
-
-			if line {
-				pitstop := center.PitstopsListView.GetText(line, 1)
-
-				if (pitstops.Has(pitstop) && (pitstops[pitstop]["Status"] = "Planned")) {
-					center.PitstopsListView.Modify(line, "-Check")
-
-					loop center.PitstopsListView.GetCount()
-						center.PitstopsListView.Modify(line, "-Select")
-				}
-				else if (isInteger(pitstop) && pitstops.Has(pitstop)) {
-					center.PitstopsListView.Modify(line, "Check")
-
-					if (this.Mode = "Normal")
-						center.withExceptionhandler(ObjBindMethod(center, "showPitstopDetails", pitstop))
-				}
-				else {
-					center.PitstopsListView.Modify(line, "Check")
-
-					loop center.PitstopsListView.GetCount()
-						center.PitstopsListView.Modify(line, "-Select")
-				}
-			}
+			pitstopSelected(line, (this.Mode = "Normal"))
 		}
 
 		openPitstop(listView, line, *) {
-			local sessionStore := center.SessionStore
-			local pitstops := sessionStore.Tables["Pitstop.Data"]
-			local pitstop
-
-			if line {
-				pitstop := center.PitstopsListView.GetText(line, 1)
-
-				if (pitstops.Has(pitstop) && (pitstops[pitstop]["Status"] = "Planned")) {
-					center.PitstopsListView.Modify(line, "-Check")
-
-					loop center.PitstopsListView.GetCount()
-						center.PitstopsListView.Modify(line, "-Select")
-				}
-				else if (isInteger(pitstop) && pitstops.Has(pitstop)) {
-					center.PitstopsListView.Modify(line, "Check")
-
-					center.withExceptionhandler(ObjBindMethod(center, "showPitstopDetails", pitstop, true))
-				}
-				else {
-					center.PitstopsListView.Modify(line, "Check")
-
-					loop center.PitstopsListView.GetCount()
-						center.PitstopsListView.Modify(line, "-Select")
-				}
-			}
+			pitstopSelected(line, true, true)
 		}
 
 		if (this.Mode = "Normal")

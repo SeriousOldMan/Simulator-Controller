@@ -123,16 +123,6 @@ kRCTyresSchemas["Tyres.Pressures"] := concatenate(kRCTyresSchemas["Tyres.Pressur
 ;;;-------------------------------------------------------------------------;;;
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; Class                          HTMLWindow                               ;;;
-;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-
-class HTMLWindow extends Window {
-	Close(*) {
-		this.Destroy()
-	}
-}
-
-;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; Class                        RaceCenterTask                             ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
@@ -357,6 +347,12 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
+	class HTMLWindow extends Window {
+		Close(*) {
+			this.Destroy()
+		}
+	}
+
 	class HTMLResizer extends Window.Resizer {
 		iHTMLViewer := false
 		iRedraw := true
@@ -407,6 +403,40 @@ class RaceCenter extends ConfigurationItem {
 			}
 			catch Any {
 				return false
+			}
+		}
+	}
+
+	class RaceCenterStrategyViewer extends StrategyViewer {
+		showStrategyInfo(strategy, title := false) {
+			local html := this.createInfoContent(strategy, title ? 5 : 0)
+			local htmlGui, htmlViewer
+
+			if !title {
+				if this.StrategyViewer {
+					this.StrategyViewer.document.open()
+					this.StrategyViewer.document.write(html)
+					this.StrategyViewer.document.close()
+				}
+			}
+			else if strategy {
+				htmlGui := RaceCenter.HTMLWindow({Descriptor: "Race Center." . title, Closeable: true, Resizeable:  "Deferred"}, title)
+
+				htmlViewer := htmlGui.Add("HTMLViewer", "X0 Y0 W640 H480 W:Grow H:Grow")
+
+				htmlViewer.document.open()
+				htmlViewer.document.write(html)
+				htmlViewer.document.close()
+
+				htmlGui.Add(RaceCenter.HTMLResizer(htmlViewer, html, htmlGui))
+
+				if getWindowPosition("Race Center." . title, &x, &y)
+					htmlGui.Show("x" . x . " y" . y . " w640 h480")
+				else
+					htmlGui.Show("w640 h480")
+
+				if getWindowSize("Race Center." . title, &w, &h)
+					htmlGui.Resize("Initialize", w, h)
 			}
 		}
 	}
@@ -2154,7 +2184,7 @@ class RaceCenter extends ConfigurationItem {
 
 			this.iDetailsViewer := centerGui.Add("HTMLViewer", "x619 yp+14 w732 h293 W:Grow H:Grow(0.8) Border vdetailsViewer")
 
-			this.iStrategyViewer := StrategyViewer(centerGui, this.iDetailsViewer)
+			this.iStrategyViewer := RaceCenter.RaceCenterStrategyViewer(centerGui, this.iDetailsViewer)
 		}
 
 		centerGui.SetFont("Norm", "Arial")
@@ -2162,7 +2192,7 @@ class RaceCenter extends ConfigurationItem {
 		if (this.Mode = "Normal")
 			centerTab := centerGui.Add("Tab3", "x16 ys+39 w593 h316 H:Grow(0.8) AltSubmit -Wrap Section vraceCenterTabView", collect(["Plan", "Stints", "Laps", "Strategy", "Setups", "Pitstops"], translate))
 		else
-			centerTab := centerGui.Add("Tab3", "x16 yp+16 w593 h316 H:Grow W:Grow AltSubmit -Wrap Section vraceCenterTabView", collect(["Plan", "Stints", "Laps", "Setups", "Pitstops"], translate))
+			centerTab := centerGui.Add("Tab3", "x16 yp+12 w593 h316 H:Grow W:Grow AltSubmit -Wrap Section vraceCenterTabView", collect(["Plan", "Stints", "Laps", "Setups", "Pitstops"], translate))
 
 		centerTab.UseTab(1)
 
@@ -2423,7 +2453,7 @@ class RaceCenter extends ConfigurationItem {
 
 			this.iDetailsViewer := htmlViewer
 			this.iReportViewer := RaceReportViewer(centerGui, htmlViewer)
-			this.iStrategyViewer := StrategyViewer(centerGui, htmlViewer)
+			this.iStrategyViewer := RaceCenter.RaceCenterStrategyViewer(centerGui, htmlViewer)
 
 			menu1 := Menu()
 
@@ -5036,9 +5066,12 @@ class RaceCenter extends ConfigurationItem {
 				}
 			case 7: ; Strategy Summary
 				if this.Strategy {
-					this.StrategyViewer.showStrategyInfo(this.Strategy)
+					viewer := GetKeyState("Ctrl")
 
-					this.iSelectedDetailReport := "Strategy"
+					this.StrategyViewer.showStrategyInfo(this.Strategy, viewer ? translate("Strategy Summary") : false)
+
+					if !viewer
+						this.iSelectedDetailReport := "Strategy"
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
@@ -9988,7 +10021,7 @@ class RaceCenter extends ConfigurationItem {
 			this.DetailsViewer.document.close()
 		}
 		else if details {
-			htmlGui := HTMLWindow({Descriptor: "Race Center." . title, Closeable: true, Resizeable:  "Deferred"}, title)
+			htmlGui := RaceCenter.HTMLWindow({Descriptor: "Race Center." . title, Closeable: true, Resizeable:  "Deferred"}, title)
 
 			htmlViewer := htmlGui.Add("HTMLViewer", "X0 Y0 W640 H480 W:Grow H:Grow")
 
@@ -11515,7 +11548,7 @@ class RaceCenter extends ConfigurationItem {
 		return html
 	}
 
-	showStintDetails(stint, viewer := false) {
+	showStintDetails(stint, viewer := GetKeyState("Ctrl")) {
 		showStintDetailsAsync(stint) {
 			local html := ("<div id=`"header`"><b>" . translate("Stint: ") . stint.Nr . "</b></div>")
 			local laps := []
@@ -11897,7 +11930,7 @@ class RaceCenter extends ConfigurationItem {
 		return html
 	}
 
-	showLapDetails(lap, viewer := false) {
+	showLapDetails(lap, viewer := GetKeyState("Ctrl")) {
 		showLapDetailsAsync(lap) {
 			local html := ("<div id=`"header`"><b>" . translate("Lap: ") . lap.Nr . "</b></div>")
 
@@ -12208,7 +12241,7 @@ class RaceCenter extends ConfigurationItem {
 		return html
 	}
 
-	showPitstopDetails(pitstopNr, viewer := false) {
+	showPitstopDetails(pitstopNr, viewer := GetKeyState("Ctrl")) {
 		showPitstopDetailsAsync(pitstopNr) {
 			local pitstopData := this.SessionStore.Tables["Pitstop.Data"][pitstopNr]
 			local html, tyreCompound, tyreCompoundColor, tyreWearDetails

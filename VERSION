@@ -3,7 +3,7 @@ Version=5.8.3.0-dev
 Target=5.8.3.0-release
 Date=08/05/2024
 Download=
-Changes=New session browser for "Practice Center" and "Race Center", Optimized window position handling and memorization, New race strategy browser, Open sessions and strategies from the "Session Database", Introduced multiple methods to read the broadcasting.json file in ACC, New "Race Center Lite"
+Changes=New session browser for "Practice Center" and "Race Center", Optimized window position handling and memorization, New race strategy browser, Open sessions and strategies from the "Session Database", Introduced multiple methods to read the broadcasting.json file in ACC, New "Race Center Lite", Open reports in separate window in "Race Center" with Control key modifier
 Components=Media->5.6.1,Configuration->5.8.2,Utilities->5.4.8
 [Release]
 Version=5.8.2.0-release

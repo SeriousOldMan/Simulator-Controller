@@ -1325,6 +1325,8 @@ class RaceCenter extends ConfigurationItem {
 		super.__New(configuration)
 
 		RaceCenter.Instance := this
+
+		this.iSyncTask := SyncSessionTask()
 	}
 
 	loadFromConfiguration(configuration) {
@@ -2645,8 +2647,6 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	startSynchronization() {
-		this.iSyncTask := SyncSessionTask()
-
 		this.iSyncTask.start()
 
 		PeriodicTask(ObjBindMethod(this, "keepAlive"), 120000, kLowPriority).start()

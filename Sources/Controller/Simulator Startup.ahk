@@ -277,7 +277,10 @@ class SimulatorStartup extends ConfigurationItem {
 
 					for ignore, tool in string2Values(",", getMultiMapValue(readMultiMap(fileName), "Session", "Tools", ""))
 						try {
-							Run(kBinariesDirectory . tool . ".exe" . startup, kBinariesDirectory)
+							if (tool = "Race Center Lite")
+								Run(kBinariesDirectory . "Race Center.exe -Simple" . startup, kBinariesDirectory)
+							else
+								Run(kBinariesDirectory . tool . ".exe" . startup, kBinariesDirectory)
 						}
 						catch Any as exception {
 							logError(exception)
@@ -529,7 +532,7 @@ launchPad(command := false, arguments*) {
 		}
 
 		if configure {
-			if (startupProfilesEditor(launchPadGui) = "Startup") {
+			if (editStartupProfiles(launchPadGui) = "Startup") {
 				startupButton.Text := ("Startup`n" . getStartupProfile())
 
 				launchPad("Startup")
@@ -567,7 +570,7 @@ launchPad(command := false, arguments*) {
 		}
 
 		if configure
-			teamManagerEditor(launchPadGui)
+			manageTeams(launchPadGui)
 		else
 			launchApplication("RaceCenter")
 	}
@@ -1108,7 +1111,7 @@ loadStartupProfiles(target, fileName := false) {
 	return settings
 }
 
-startupProfilesEditor(launchPadOrCommand, arguments*) {
+editStartupProfiles(launchPadOrCommand, arguments*) {
 	local x, y, w, h, width, x0, x1, w1, w2, x2, w4, x4, w3, x3, x4, x5, w5, x6, x7
 	local checkedRows, checked, settingsTab, first
 	local profile, plugin, pluginConfiguration, ignore, lastModified, configuration
@@ -1391,7 +1394,7 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 
 		profilesEditorGui["profileNameEdit"].Text := profile["Name"]
 		profilesEditorGui["profileModeDropDown"].Choose(Max(1, inList(hasTeamServer ? ["Solo", "Team"] : ["Solo"], profile["Mode"])))
-		profilesEditorGui["profilePitwallDropDown"].Choose((1 + inList(hasTeamServer ? ["Practice Center", "Race Center"] : ["Practice Center"], profile["Tools"])))
+		profilesEditorGui["profilePitwallDropDown"].Choose((1 + inList(hasTeamServer ? ["Practice Center", "Race Center", "Race Center Lite"] : ["Practice Center"], profile["Tools"])))
 
 		profilesEditorGui["profileAutonomyDropDown"].Choose(inList(["Yes", "No", "Default"], profile["Assistant.Autonomy"]))
 
@@ -1448,7 +1451,7 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 		else {
 			profile["Name"] := profilesEditorGui["profileNameEdit"].Text
 			profile["Mode"] :=  ["Solo", "Team"][profilesEditorGui["profileModeDropDown"].Value]
-			profile["Tools"] := ["", "Practice Center", "Race Center"][profilesEditorGui["profilePitwallDropDown"].Value]
+			profile["Tools"] := ["", "Practice Center", "Race Center", "Race Center Lite"][profilesEditorGui["profilePitwallDropDown"].Value]
 
 			profile["Assistant.Autonomy"] := ["Yes", "No", "Default"][profilesEditorGui["profileAutonomyDropDown"].Value]
 
@@ -1518,14 +1521,14 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 	chooseProfile(listView, line, *) {
 		if (line != selectedProfile) {
 			if (selectedProfile > 1)
-				if !startupProfilesEditor(kEvent, "ProfileSave") {
+				if !editStartupProfiles(kEvent, "ProfileSave") {
 					profilesListView.Modify(selectedProfile, "Vis Select")
 
 					return
 				}
 
 			if (line > 1)
-				startupProfilesEditor(kEvent, "ProfileLoad", line)
+				editStartupProfiles(kEvent, "ProfileLoad", line)
 			else if (line = 1) {
 				profilesListView.Modify(1, "-Select")
 
@@ -1536,7 +1539,7 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 				selectedProfile := false
 		}
 
-		startupProfilesEditor("Update State")
+		editStartupProfiles("Update State")
 	}
 
 	chooseFunction(listView, line, *) {
@@ -1570,7 +1573,7 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 
 	if (launchPadOrCommand == kSave) {
 		if selectedProfile
-			if !startupProfilesEditor(kEvent, "ProfileSave")
+			if !editStartupProfiles(kEvent, "ProfileSave")
 				return false
 
 		saveProfiles()
@@ -1582,7 +1585,7 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 	else if (launchPadOrCommand == kEvent) {
 		if (arguments[1] = "ProfilesUpload") {
 			if (selectedProfile > 1)
-				if !startupProfilesEditor(kEvent, "ProfileSave")
+				if !editStartupProfiles(kEvent, "ProfileSave")
 					return
 
 			profilesEditorGui.Opt("+OwnDialogs")
@@ -1611,11 +1614,11 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 				else
 					loadProfiles(fileName, false)
 
-			startupProfilesEditor("Update State")
+			editStartupProfiles("Update State")
 		}
 		else if (arguments[1] = "ProfilesDownload") {
 			if (selectedProfile > 1)
-				if !startupProfilesEditor(kEvent, "ProfileSave")
+				if !editStartupProfiles(kEvent, "ProfileSave")
 					return
 
 			profilesEditorGui.Opt("+OwnDialogs")
@@ -1636,11 +1639,11 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 				saveProfiles(fileName, selected ? [profiles[selectedProfile - 1]] : profiles, false)
 			}
 
-			startupProfilesEditor("Update State")
+			editStartupProfiles("Update State")
 		}
 		else if (arguments[1] = "ProfileNew") {
 			if (selectedProfile > 1)
-				if !startupProfilesEditor(kEvent, "ProfileSave")
+				if !editStartupProfiles(kEvent, "ProfileSave")
 					return
 
 			profile := newProfile()
@@ -1651,11 +1654,11 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 
 			profilesListView.Modify(selectedProfile, "Vis Select")
 
-			startupProfilesEditor(kEvent, "ProfileLoad", profiles.Length + 1)
+			editStartupProfiles(kEvent, "ProfileLoad", profiles.Length + 1)
 		}
 		else if (arguments[1] = "ProfileCopy") {
 			if (selectedProfile > 1)
-				if !startupProfilesEditor(kEvent, "ProfileSave")
+				if !editStartupProfiles(kEvent, "ProfileSave")
 					return
 
 			profile := profiles[selectedProfile - 1].Clone()
@@ -1666,7 +1669,7 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 
 			profilesListView.Modify(selectedProfile, "Vis Select")
 
-			startupProfilesEditor(kEvent, "ProfileLoad", profiles.Length + 1)
+			editStartupProfiles(kEvent, "ProfileLoad", profiles.Length + 1)
 		}
 		else if (arguments[1] = "ProfileDelete") {
 			if selectedProfile {
@@ -1677,11 +1680,11 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 				selectedProfile := false
 			}
 
-			startupProfilesEditor("Update State")
+			editStartupProfiles("Update State")
 		}
 		else if (arguments[1] = "ProfileLoad") {
 			if (selectedProfile > 1)
-				if !startupProfilesEditor(kEvent, "ProfileSave")
+				if !editStartupProfiles(kEvent, "ProfileSave")
 					return
 
 			selectedProfile := arguments[2]
@@ -1692,7 +1695,7 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 				profilesListView.Modify(selectedProfile, "Vis Select")
 			}
 
-			startupProfilesEditor("Update State")
+			editStartupProfiles("Update State")
 		}
 		else if (arguments[1] = "ProfileSave") {
 			if (selectedProfile > 1) {
@@ -1709,7 +1712,7 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 			}
 		}
 		else if (arguments[1] = "ManageSession") {
-			if startupProfilesEditor(kEvent, "ProfileSave") {
+			if editStartupProfiles(kEvent, "ProfileSave") {
 				profilesEditorGui.Block()
 
 				try {
@@ -1718,7 +1721,7 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 					else
 						lastModified := false
 
-					teamManagerEditor(profilesEditorGui)
+					manageTeams(profilesEditorGui)
 
 					if (FileExist(kUserConfigDirectory . "Team Server.ini") && (!lastModified || (lastModified != FileGetTime(kUserConfigDirectory . "Team Server.ini", "M")))) {
 						profile := profiles[selectedProfile - 1]
@@ -1741,7 +1744,7 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 							profile := selectedProfile
 							selectedProfile := false
 
-							startupProfilesEditor(kEvent, "ProfileLoad", profile)
+							editStartupProfiles(kEvent, "ProfileLoad", profile)
 						}
 					}
 				}
@@ -1965,7 +1968,7 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 
 						connected := true
 
-						startupProfilesEditor(kEvent, "Update", "Team")
+						editStartupProfiles(kEvent, "Update", "Team")
 
 						showMessage(translate("Successfully connected to the Team Server."))
 					}
@@ -2193,26 +2196,26 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 		profilesListView.OnEvent("ItemCheck", chooseProfile)
 		profilesListView.OnEvent("ItemSelect", selectProfile)
 
-		profilesEditorGui.Add("Button", "x" . (x5 - 52) . " yp+150 w23 h23 Center +0x200 vprofilesUploadButton").OnEvent("Click", startupProfilesEditor.Bind(kEvent, "ProfilesUpload"))
+		profilesEditorGui.Add("Button", "x" . (x5 - 52) . " yp+150 w23 h23 Center +0x200 vprofilesUploadButton").OnEvent("Click", editStartupProfiles.Bind(kEvent, "ProfilesUpload"))
 		setButtonIcon(profilesEditorGui["profilesUploadButton"], kIconsDirectory . "Upload.ico", 1, "L4 T4 R4 B4")
-		profilesEditorGui.Add("Button", "x" . (x5 - 28) . " yp w23 h23 Center +0x200 vprofilesDownloadButton").OnEvent("Click", startupProfilesEditor.Bind(kEvent, "ProfilesDownload"))
+		profilesEditorGui.Add("Button", "x" . (x5 - 28) . " yp w23 h23 Center +0x200 vprofilesDownloadButton").OnEvent("Click", editStartupProfiles.Bind(kEvent, "ProfilesDownload"))
 		setButtonIcon(profilesEditorGui["profilesDownloadButton"], kIconsDirectory . "Download.ico", 1, "L4 T4 R4 B4")
 
-		profilesEditorGui.Add("Button", "x" . x5 . " yp w23 h23 X:Move Y:Move Center +0x200 vaddProfileButton").OnEvent("Click", startupProfilesEditor.Bind(kEvent, "ProfileNew"))
+		profilesEditorGui.Add("Button", "x" . x5 . " yp w23 h23 X:Move Y:Move Center +0x200 vaddProfileButton").OnEvent("Click", editStartupProfiles.Bind(kEvent, "ProfileNew"))
 		setButtonIcon(profilesEditorGui["addProfileButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
-		profilesEditorGui.Add("Button", "x" . x6 . " yp w23 h23 X:Move Y:Move Center +0x200 vcopyProfileButton").OnEvent("Click", startupProfilesEditor.Bind(kEvent, "ProfileCopy"))
+		profilesEditorGui.Add("Button", "x" . x6 . " yp w23 h23 X:Move Y:Move Center +0x200 vcopyProfileButton").OnEvent("Click", editStartupProfiles.Bind(kEvent, "ProfileCopy"))
 		setButtonIcon(profilesEditorGui["copyProfileButton"], kIconsDirectory . "Copy.ico", 1, "L4 T4 R4 B4")
-		profilesEditorGui.Add("Button", "x" . x7 . " yp w23 h23 X:Move Y:Move Center +0x200 vdeleteProfileButton").OnEvent("Click", startupProfilesEditor.Bind(kEvent, "ProfileDelete"))
+		profilesEditorGui.Add("Button", "x" . x7 . " yp w23 h23 X:Move Y:Move Center +0x200 vdeleteProfileButton").OnEvent("Click", editStartupProfiles.Bind(kEvent, "ProfileDelete"))
 		setButtonIcon(profilesEditorGui["deleteProfileButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
 		profilesEditorGui.Add("Text", "x" . x0 . " yp+30 w90 h23 +0x200", translate("Name"))
-		profilesEditorGui.Add("Edit", "x" . x1 . " yp+1 w" . (392 - (x1 - x0)) . " vprofileNameEdit").OnEvent("Change", startupProfilesEditor.Bind("Update State"))
+		profilesEditorGui.Add("Edit", "x" . x1 . " yp+1 w" . (392 - (x1 - x0)) . " vprofileNameEdit").OnEvent("Change", editStartupProfiles.Bind("Update State"))
 
 		profilesEditorGui.Add("Text", "x" . x0 . " yp+24 w90 h23 +0x200", translate("Mode"))
-		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " vprofileModeDropDown", collect(hasTeamServer ? ["Solo", "Team"] : ["Solo"], translate)).OnEvent("Change", startupProfilesEditor.Bind("Update State"))
+		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " vprofileModeDropDown", collect(hasTeamServer ? ["Solo", "Team"] : ["Solo"], translate)).OnEvent("Change", editStartupProfiles.Bind("Update State"))
 
 		profilesEditorGui.Add("Text", "x" . x0 . " yp+23 w90 h23 +0x200", translate("Control Center"))
-		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " vprofilePitwallDropDown", collect(hasTeamServer ? ["None", "Practice Center", "Race Center"] : ["None", "Practice Center"], translate))
+		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " vprofilePitwallDropDown", collect(hasTeamServer ? ["None", "Practice Center", "Race Center", "Race Center Lite"] : ["None", "Practice Center"], translate))
 
 		settingsTab := profilesEditorGui.Add("Tab3", "x" . x0 . " yp+30 w392 h180 Section", collect(hasTeamServer ? ["Assistants", "Team", "Functions"] : ["Assistants", "Functions"], translate))
 
@@ -2237,12 +2240,12 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 			settingsTab.UseTab(2)
 
 			profilesEditorGui.Add("Text", "x" . (x0 + 8) . " ys+36 w90 h23 +0x200", translate("Credentials"))
-			profilesEditorGui.Add("DropDownList", "x" . x1 . " yp w" . w3 . " vprofileCredentialsDropDown", collect(["Load from Profile", "Load from Settings"], translate)).OnEvent("Change", startupProfilesEditor.Bind("Update State"))
+			profilesEditorGui.Add("DropDownList", "x" . x1 . " yp w" . w3 . " vprofileCredentialsDropDown", collect(["Load from Profile", "Load from Settings"], translate)).OnEvent("Change", editStartupProfiles.Bind("Update State"))
 
-			profilesEditorGui.Add("Button", "x" . ((x0 + 8) + 240) . " yp-1 w23 h23 Center +0x200 vprofileTeamButton").OnEvent("Click", startupProfilesEditor.Bind(kEvent, "ManageDriver"))
+			profilesEditorGui.Add("Button", "x" . ((x0 + 8) + 240) . " yp-1 w23 h23 Center +0x200 vprofileTeamButton").OnEvent("Click", editStartupProfiles.Bind(kEvent, "ManageDriver"))
 			setButtonIcon(profilesEditorGui["profileTeamButton"], kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
 
-			profilesEditorGui.Add("Button", "x" . ((x0 + 8) + 286) . " yp w86 h23 Center +0x200 vprofileSessionButton", translate("Manage...")).OnEvent("Click", startupProfilesEditor.Bind(kEvent, "ManageSession"))
+			profilesEditorGui.Add("Button", "x" . ((x0 + 8) + 286) . " yp w86 h23 Center +0x200 vprofileSessionButton", translate("Manage...")).OnEvent("Click", editStartupProfiles.Bind(kEvent, "ManageSession"))
 
 			serverURLs := string2Values(";", getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "Team Server", "Server URLs", ""))
 
@@ -2251,15 +2254,15 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 
 			profilesEditorGui.Add("Text", "x" . (x0 + 8) . " yp+23 w90 h23 +0x200", translate("Session Token"))
 			profilesEditorGui.Add("Edit", "x" . x1 . " yp w256 h21 vprofileServerTokenEdit")
-			profilesEditorGui.Add("Button", "x" . (x1 - 24) . " yp-1 w23 h23 Center +0x200 vprofileConnectButton").OnEvent("Click", startupProfilesEditor.Bind(kEvent, "Connect"))
+			profilesEditorGui.Add("Button", "x" . (x1 - 24) . " yp-1 w23 h23 Center +0x200 vprofileConnectButton").OnEvent("Click", editStartupProfiles.Bind(kEvent, "Connect"))
 			setButtonIcon(profilesEditorGui["profileConnectButton"], kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
 
 			profilesEditorGui.Add("Text", "x" . (x0 + 8) . " yp+30 w90 h23 +0x200", translate("Team / Driver"))
-			profilesEditorGui.Add("DropDownList", "x" . x1 . " yp w" . w3 . " vprofileTeamDropDown").OnEvent("Change", startupProfilesEditor.Bind(kEvent, "Update", "Team"))
-			profilesEditorGui.Add("DropDownList", "x" . ((x0 + 8) + 243) . " yp w" . (w3 + 6) . " vprofileDriverDropDown").OnEvent("Change", startupProfilesEditor.Bind(kEvent, "Update", "Driver"))
+			profilesEditorGui.Add("DropDownList", "x" . x1 . " yp w" . w3 . " vprofileTeamDropDown").OnEvent("Change", editStartupProfiles.Bind(kEvent, "Update", "Team"))
+			profilesEditorGui.Add("DropDownList", "x" . ((x0 + 8) + 243) . " yp w" . (w3 + 6) . " vprofileDriverDropDown").OnEvent("Change", editStartupProfiles.Bind(kEvent, "Update", "Driver"))
 
 			profilesEditorGui.Add("Text", "x" . (x0 + 8) . " yp+24 w90 h23 +0x200", translate("Session"))
-			profilesEditorGui.Add("DropDownList", "x" . x1 . " yp w" . w3 . " vprofileSessionDropDown").OnEvent("Change", startupProfilesEditor.Bind(kEvent, "Update", "Session"))
+			profilesEditorGui.Add("DropDownList", "x" . x1 . " yp w" . w3 . " vprofileSessionDropDown").OnEvent("Change", editStartupProfiles.Bind(kEvent, "Update", "Session"))
 		}
 
 		settingsTab.UseTab(hasTeamServer ? 3 : 2)
@@ -2272,13 +2275,13 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 
 		profilesEditorGui.Add("Text", "x8 ys+190 w408 0x10")
 
-		profilesEditorGui.Add("Button", "Default X130 YP+10 w80 vsaveButton", translate("Save")).OnEvent("Click", startupProfilesEditor.Bind(kSave))
-		profilesEditorGui.Add("Button", "X+10 w80", translate("&Cancel")).OnEvent("Click", startupProfilesEditor.Bind(kCancel))
+		profilesEditorGui.Add("Button", "Default X130 YP+10 w80 vsaveButton", translate("Save")).OnEvent("Click", editStartupProfiles.Bind(kSave))
+		profilesEditorGui.Add("Button", "X+10 w80", translate("&Cancel")).OnEvent("Click", editStartupProfiles.Bind(kCancel))
 
 		loadProfiles()
 		loadFunctions(false)
 
-		startupProfilesEditor("Update State")
+		editStartupProfiles("Update State")
 
 		profilesEditorGui.Opt("+Owner" . launchPadOrCommand.Hwnd)
 
@@ -2313,7 +2316,7 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 	}
 }
 
-teamManagerEditor(ownerOrCommand, arguments*) {
+manageTeams(ownerOrCommand, arguments*) {
 	static done := false
 	static teamManagerGui
 	static teamManagerPanel
@@ -2346,9 +2349,9 @@ teamManagerEditor(ownerOrCommand, arguments*) {
 
 		teamManagerGui.Add("Text", "x8 y545 w508 0x10")
 
-		teamManagerGui.Add("Button", "X220 YP+10 w80", translate("Close")).OnEvent("Click", teamManagerEditor.Bind(kClose))
+		teamManagerGui.Add("Button", "X220 YP+10 w80", translate("Close")).OnEvent("Click", manageTeams.Bind(kClose))
 
-		teamManagerEditor("Update State")
+		manageTeams("Update State")
 
 		teamManagerGui.Opt("+Owner" . ownerOrCommand.Hwnd)
 

@@ -1,3 +1,16 @@
+## 5.8.2.0-release 08/09/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Increased the resilience against invalid "broadcasting.json" files in the *Assetto Corsa Competizione* configuration, especially if a non-standard file encoding is used.
+  4. The "Load Session..." menu command in the "Practice Center" and in the "Race Center" now opens a specialized browser which allows you to search for sessions in the session database. This browser also can open the standard file dialog to load sessions which were stored outside the session database. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Practice-Center#saving-and-loading-sessions) for more information.
+  
+     Note: To load a session that has been saved in the old, directory-based format prior to Release 5.8.1, hold down the Control key and click on the "Import..." button.
+  5. The same browser is now used when loading Strategies, either in the "Strategy Workbench" or in the "Race Center".
+  6. The "Session Database" has a new tab, which allows you to browse the sessions stored in the database.
+  7. Sessions and Strategies can be opened in the "Practice Center", "Race Center" or "Strategy Workbench" respectively by double-clicking on them in the "Session Database".
+  8. A new kind of user interface has been introduced for the "Race Center". This so called [*Lite* mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#normal-vs-simple-user-interface), which is available when starting with a specialized profile from "Simulator Startup" or by holding down the Alt key, when starting "Race Center", presents only the most important information and is therefore suitable for team members in the driver role.
+  9. All reports the "Race Center" presents in the *Output* area in the lower right corner of the main window can now be opened in a separate window, when holding down the Control key when selecting them.
+
 ## 5.8.2.0-release 08/02/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

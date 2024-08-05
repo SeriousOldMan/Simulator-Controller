@@ -16,6 +16,16 @@ Please note, that all the data and graphs shown in the window will be updated dy
 
 Important: "Race Center" displays various graphs using the Google chart library in an embedded web browser. This web browser, which is part of Windows, must be configured for a given application using a setting in the Windows Registry. In most cases, this setting can be configured automatically by the given application, but in rare cases, admin privileges are required to insert the corresponding key in the registry. If you encounter an error, that the Google library can not be loaded, you must run "Race Center" once using administrator privileges.
 
+### Normal vs. Simple user interface
+
+The "Race Center" user interface comes in two flavours. The normal UI as shown in the pictures above targets the expert user, for example a team member, who is in the role of a Race Engineer for the whole team. This UI provides complete access to all information incl. very sophisticated telemetry reports, as well as the possibility to plan and prepare a session, change the strategy and the stint plan because of unplanned events during the session, and so on.
+
+And there is a simplified version available for members of a team, which are in the driver role and only want to get important information and want to prepare a pitstop to get into the car, of course. This so called *Lite* version of the "Race Center", which is available when starting with a specialized profile from "Simulator Startup" (or by holding down the Alt key, when starting "Race Center"), looks like this:
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2026.JPG)
+
+However, if a driver wants to inspect specific data in more detail, for example the state of the tyres after they have been dismounted at a pitstop, this is still possible by double-clicking the corresponding entry in one the lists. Any number of report windows can be opened in this way, which possibly makes it not so simple anymore, but this is optional.
+
 ### Connecting to a Session
 
 To use the "Race Center", you must have a valid connection to a team session. This is normally handled by entering the corresponding Server URL and session token into the ["Race Settings" application](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#preparing-a-team-session), but you can even connect to a team session without being an active driver in the session by entering the session token supplied by your team manager directly into the field at the top of the "Race Center" window. Then either click on the small button with the key on the left of the token field or choose "Connect" from the "Session" menu. As an alternative, you can hold down the Control key, while pressing on the "Key" button or choosing the menu command, which will open a login dialog where you can enter the login credentials of the team manager. Please do not use a refresh cycle smaller than 10 seconds when connected to a managed Team Server, since this will increase the running costs on Azure dramatically.
@@ -132,7 +142,7 @@ Beside all that, you can request several context specific data, which will be sh
 	 
 	  ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2011.JPG)
 	 
-All these report documents are HTML-based and can be saved or printed using the context menu when right-clicking into the output area.
+All these report documents are HTML-based and can be saved or printed using the context menu when right-clicking into the output area. If you want the report to be opened in a separate window, hold down the Control key while requesting it. If the report originates from one of the available lists, you can open the separate window by double-clicking the entry in the list.
 
 ### Strategy Handling
 

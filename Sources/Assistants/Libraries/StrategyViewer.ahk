@@ -266,10 +266,10 @@ class StrategyViewer {
 		return ("<div id=`"chart_" . chartID . "`" style=`"width: " . Round(width - 120) . "px; height: " . Round(height) . "px`"></div>")
 	}
 
-	showStrategyInfo(strategy) {
+	createInfoContent(strategy, margin := 0) {
 		local html := ""
 		local timeSeries, lapSeries, fuelSeries, tyreSeries, drawChartFunction, chartID, width, chartArea
-		local before, after, tableCSS
+		local before, after, tableCSS, margins
 
 		if !this.StrategyViewer
 			strategy := false
@@ -338,7 +338,14 @@ class StrategyViewer {
 
 		tableCSS := this.getTableCSS()
 
-		html := ("<html>" . before . drawChartFunction . after . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style>" . tableCSS . "</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style><div>" . html . "</div><br>" . chartArea . "</body></html>")
+		margins := substituteVariables("style='overflow: auto' leftmargin='%margin%' topmargin='%margin%' rightmargin='%margin%' bottommargin='%margin%'"
+									 , {margin: margin})
+
+		return ("<html>" . before . drawChartFunction . after . "<body style='background-color: #" . this.Window.AltBackColor . "' " . margins . "><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style>" . tableCSS . "</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style><div>" . html . "</div><br>" . chartArea . "</body></html>")
+	}
+
+	showStrategyInfo(strategy) {
+		local html := this.createInfoContent(strategy)
 
 		if this.StrategyViewer {
 			this.StrategyViewer.document.open()

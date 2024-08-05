@@ -114,7 +114,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		__New(arguments*) {
 			super.__New(arguments*)
 
-			Task.startTask(ObjBindMethod(this, "RedrawHTMLViewer"), 500, kLowPriority)
+			Task.startTask(ObjBindMethod(this, "RedrawHTMLViewer"), 500, kHighPriority)
 		}
 
 		Redraw() {

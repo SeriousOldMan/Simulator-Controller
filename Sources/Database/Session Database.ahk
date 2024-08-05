@@ -123,7 +123,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		__New(arguments*) {
 			super.__New(arguments*)
 
-			Task.startTask(ObjBindMethod(this, "RedrawTrackViewer"), 500, kLowPriority)
+			Task.startTask(ObjBindMethod(this, "RedrawTrackViewer"), 500, kHighPriority)
 		}
 
 		Resize(deltaWidth, deltaHeight) {

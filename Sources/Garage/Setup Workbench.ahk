@@ -150,7 +150,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 			super.__New(window, arguments*)
 
-			Task.startTask(ObjBindMethod(this, "RedrawHTMLViwer"), 500, kLowPriority)
+			Task.startTask(ObjBindMethod(this, "RedrawHTMLViwer"), 500, kHighPriority)
 		}
 
 		Redraw() {

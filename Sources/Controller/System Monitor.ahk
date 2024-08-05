@@ -74,7 +74,7 @@ class SystemMonitorResizer extends Window.Resizer {
 
 		super.__New(window)
 
-		Task.startTask(ObjBindMethod(this, "RedrawHTMLViewer"), 500, kLowPriority)
+		Task.startTask(ObjBindMethod(this, "RedrawHTMLViewer"), 500, kHighPriority)
 	}
 
 	Redraw() {

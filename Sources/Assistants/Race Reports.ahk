@@ -75,7 +75,7 @@ class RaceReports extends ConfigurationItem {
 		__New(arguments*) {
 			super.__New(arguments*)
 
-			Task.startTask(ObjBindMethod(this, "RedrawHTMLViwer"), 500, kLowPriority)
+			Task.startTask(ObjBindMethod(this, "RedrawHTMLViwer"), 500, kHighPriority)
 		}
 
 		Redraw() {

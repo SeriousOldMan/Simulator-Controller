@@ -26,6 +26,8 @@ And there is a simplified version available for members of a team, which are in 
 
 However, if a driver wants to inspect specific data in more detail, for example the state of the tyres after they have been dismounted at a pitstop, this is still possible by double-clicking the corresponding entry in one the lists. Any number of report windows can be opened in this way, which possibly makes it not so simple anymore, but this is optional.
 
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2025.JPG)
+
 ### Connecting to a Session
 
 To use the "Race Center", you must have a valid connection to a team session. This is normally handled by entering the corresponding Server URL and session token into the ["Race Settings" application](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#preparing-a-team-session), but you can even connect to a team session without being an active driver in the session by entering the session token supplied by your team manager directly into the field at the top of the "Race Center" window. Then either click on the small button with the key on the left of the token field or choose "Connect" from the "Session" menu. As an alternative, you can hold down the Control key, while pressing on the "Key" button or choosing the menu command, which will open a login dialog where you can enter the login credentials of the team manager. Please do not use a refresh cycle smaller than 10 seconds when connected to a managed Team Server, since this will increase the running costs on Azure dramatically.

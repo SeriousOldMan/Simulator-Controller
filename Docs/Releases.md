@@ -1,4 +1,4 @@
-## 5.8.2.0-release 08/09/24 (planned)
+## 5.8.3.0-release 08/09/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Increased the resilience against invalid "broadcasting.json" files in the *Assetto Corsa Competizione* configuration, especially if a non-standard file encoding is used.

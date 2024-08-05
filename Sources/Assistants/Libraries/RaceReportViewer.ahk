@@ -122,7 +122,7 @@ class RaceReportViewer extends RaceReportReader {
 				(
 						</script>
 					</head>
-					<body style='background-color: #%backColor%' style='overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'>
+					<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
 						<div id="chart_id" style="width: %width%px; height: %height%px"></div>
 					</body>
 				</html>
@@ -135,7 +135,7 @@ class RaceReportViewer extends RaceReportReader {
 				this.ChartViewer.document.write(html)
 			}
 			else {
-				html := "<html><body style='background-color: #%backColor%' style='overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'></body></html>"
+				html := "<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 
 				this.ChartViewer.document.write(substituteVariables(html, {backColor: this.Window.AltBackColor}))
 			}
@@ -179,7 +179,7 @@ class RaceReportViewer extends RaceReportReader {
 																			, backColor: this.Window.AltBackColor}))
 			}
 			else {
-				html := "<html><body style='background-color: #%backColor%' style='overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'></body></html>"
+				html := "<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 
 				this.InfoViewer.document.write(substituteVariables(html, {backColor: this.Window.AltBackColor}))
 			}

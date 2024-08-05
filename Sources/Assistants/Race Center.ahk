@@ -359,18 +359,30 @@ class RaceCenter extends ConfigurationItem {
 
 	class HTMLResizer extends Window.Resizer {
 		iHTMLViewer := false
-		iRedraw := false
+		iRedraw := true
+		iHTML := false
 
-		__New(htmlViewer, arguments*) {
+		__New(htmlViewer, html, arguments*) {
 			this.iHTMLViewer := htmlViewer
+			this.iHTML := html
 
 			super.__New(arguments*)
 
-			Task.startTask(ObjBindMethod(this, "RedrawHTMLViewer"), 500, kLowPriority)
+			Task.startTask(ObjBindMethod(this, "RedrawHTMLViewer"), 500, kHighPriority)
 		}
 
 		Resize(deltaWidth, deltaHeight) {
 			this.iRedraw := true
+		}
+
+		RestrictResize(&deltaWidth, &deltaHeight) {
+			if (deltaWidth != 0) {
+				deltaWidth := 0
+
+				return true
+			}
+			else
+				return false
 		}
 
 		RedrawHTMLViewer() {
@@ -385,6 +397,10 @@ class RaceCenter extends ConfigurationItem {
 					this.iRedraw := false
 
 					this.iHTMLViewer.Resized()
+
+					this.iHTMLViewer.document.open()
+					this.iHTMLViewer.document.write(this.iHTML)
+					this.iHTMLViewer.document.close()
 				}
 
 				return Task.CurrentTask
@@ -1428,17 +1444,19 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		choosePlan(listView, line, *) {
-			if line {
-				center.PlanListView.Modify(line, "Select")
+			if (this.Mode = "Normal") {
+				if line {
+					center.PlanListView.Modify(line, "Select")
 
-				center.iSelectedPlanStint := line
+					center.iSelectedPlanStint := line
 
-				this.loadPlanEditor()
+					this.loadPlanEditor()
+				}
+				else
+					this.iSelectedPlanStint := false
+
+				center.updateState()
 			}
-			else
-				this.iSelectedPlanStint := false
-
-			center.updateState()
 		}
 
 		updatePlan(*) {
@@ -1546,8 +1564,13 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		chooseStint(listView, line, *) {
-			if line
+			if (line && (this.Mode = "Normal"))
 				center.withExceptionhandler(ObjBindMethod(center, "showStintDetails", center.Stints[listView.GetText(line, 1)]))
+		}
+
+		openStint(listView, line, *) {
+			if line
+				center.withExceptionhandler(ObjBindMethod(center, "showStintDetails", center.Stints[listView.GetText(line, 1)], true))
 		}
 
 		selectLap(listView, line, selected) {
@@ -1562,7 +1585,7 @@ class RaceCenter extends ConfigurationItem {
 
 		openLap(listView, line, *) {
 			if line
-				center.withExceptionhandler(ObjBindMethod(center, "showLapDetails", center.Laps[listView.GetText(line, 1)]))
+				center.withExceptionhandler(ObjBindMethod(center, "showLapDetails", center.Laps[listView.GetText(line, 1)], true))
 		}
 
 		chooseSimulationSettings(*) {
@@ -1935,7 +1958,36 @@ class RaceCenter extends ConfigurationItem {
 				else if (isInteger(pitstop) && pitstops.Has(pitstop)) {
 					center.PitstopsListView.Modify(line, "Check")
 
-					center.withExceptionhandler(ObjBindMethod(center, "showPitstopDetails", pitstop))
+					if (this.Mode = "Normal")
+						center.withExceptionhandler(ObjBindMethod(center, "showPitstopDetails", pitstop))
+				}
+				else {
+					center.PitstopsListView.Modify(line, "Check")
+
+					loop center.PitstopsListView.GetCount()
+						center.PitstopsListView.Modify(line, "-Select")
+				}
+			}
+		}
+
+		openPitstop(listView, line, *) {
+			local sessionStore := center.SessionStore
+			local pitstops := sessionStore.Tables["Pitstop.Data"]
+			local pitstop
+
+			if line {
+				pitstop := center.PitstopsListView.GetText(line, 1)
+
+				if (pitstops.Has(pitstop) && (pitstops[pitstop]["Status"] = "Planned")) {
+					center.PitstopsListView.Modify(line, "-Check")
+
+					loop center.PitstopsListView.GetCount()
+						center.PitstopsListView.Modify(line, "-Select")
+				}
+				else if (isInteger(pitstop) && pitstops.Has(pitstop)) {
+					center.PitstopsListView.Modify(line, "Check")
+
+					center.withExceptionhandler(ObjBindMethod(center, "showPitstopDetails", pitstop, true))
 				}
 				else {
 					center.PitstopsListView.Modify(line, "Check")
@@ -2068,7 +2120,7 @@ class RaceCenter extends ConfigurationItem {
 			this.iWaitViewer := centerGui.Add("HTMLViewer", "x1323 yp-8 w30 h30 X:Move vwaitViewer Hidden")
 
 			this.iWaitViewer.document.open()
-			this.iWaitViewer.document.write("<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><img src='" . (kResourcesDirectory . "Wait.gif") . "' width=28 height=28 border=0 padding=0></body></html>")
+			this.iWaitViewer.document.write("<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . (kResourcesDirectory . "Wait.gif") . "' width=28 height=28 border=0 padding=0></body></html>")
 			this.iWaitViewer.document.close()
 
 			centerGui.SetFont("s8 Norm", "Arial")
@@ -2082,12 +2134,12 @@ class RaceCenter extends ConfigurationItem {
 			centerGui.Add("DropDownList", "x750 yp w180 Choose1 +0x200 vpitstopMenuDropDown").OnEvent("Change", pitstopMenu)
 		}
 		else {
-			centerGui.Add("Text", "x" . (580 - 388) . " yp+12 w381 0x2 X:Move vmessageField")
+			centerGui.Add("Text", "x" . (580 - 288) . " yp+12 w281 0x2 X:Move vmessageField")
 
 			this.iWaitViewer := centerGui.Add("HTMLViewer", "x580 yp-8 w30 h30 X:Move vwaitViewer Hidden")
 
 			this.iWaitViewer.document.open()
-			this.iWaitViewer.document.write("<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><img src='" . (kResourcesDirectory . "Wait.gif") . "' width=28 height=28 border=0 padding=0></body></html>")
+			this.iWaitViewer.document.write("<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . (kResourcesDirectory . "Wait.gif") . "' width=28 height=28 border=0 padding=0></body></html>")
 			this.iWaitViewer.document.close()
 		}
 
@@ -2162,7 +2214,7 @@ class RaceCenter extends ConfigurationItem {
 
 		this.iStintsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 " . ((this.Mode = "Normal") ? "H:Grow(0.8)" : "H:Grow W:Grow") . " -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Driver", "Weather", "Compound", "Laps", "Pos. (Start)", "Pos. (End)", "Avg. Lap Time", "Consumption", "Accidents", "Penalties", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], translate))
 		this.iStintsListView.OnEvent("Click", chooseStint)
-		this.iStintsListView.OnEvent("DoubleClick", chooseStint)
+		this.iStintsListView.OnEvent("DoubleClick", openStint)
 		this.iStintsListView.OnEvent("ItemSelect", selectStint)
 
 		centerTab.UseTab(3)
@@ -2355,7 +2407,7 @@ class RaceCenter extends ConfigurationItem {
 
 		this.iPitstopsListView := centerGui.Add("ListView", "x270 ys+34 w331 h269 " . ((this.Mode = "Normal") ? "H:Grow(0.8)" : "H:Grow W:Grow") . " -Multi -LV0x10 AltSubmit Checked NoSort NoSortHdr", collect(["#", "Lap", "Driver", "Refuel", "Compound", "Set", "Pressures", "Repairs"], translate))
 		this.iPitstopsListView.OnEvent("Click", choosePitstop)
-		this.iPitstopsListView.OnEvent("DoubleClick", choosePitstop)
+		this.iPitstopsListView.OnEvent("DoubleClick", openPitstop)
 		this.iPitstopsListView.OnEvent("ItemSelect", selectPitstop)
 
 		if (this.Mode = "Normal")
@@ -2375,6 +2427,8 @@ class RaceCenter extends ConfigurationItem {
 
 			menu1 := Menu()
 
+			this.iSessionMenu := menu1
+
 			menu1.Add(translate("Synchronize"), (*) => this.chooseSessionMenu(1))
 
 			menu1.Add()
@@ -2383,10 +2437,16 @@ class RaceCenter extends ConfigurationItem {
 
 			menu1.Add()
 
-			menu1.Add(translate("Race Summary"), (*) => this.chooseSessionMenu(3))
-			menu1.Add(translate("Driver Statistics"), (*) => this.chooseSessionMenu(4))
+			menu1.Add(translate("Race Summary" . translate("...")), (*) => this.chooseSessionMenu(3))
+			menu1.Add(translate("Driver Statistics" . translate("...")), (*) => this.chooseSessionMenu(4))
+
+			menu1.Add()
+
+			menu1.Add(translate("Session Information" . translate("...")), (*) => this.chooseSessionMenu(5))
 
 			menu2 := Menu()
+
+			this.iPitstopMenu := menu2
 
 			menu2.Add(translate("Initialize from Session"), (*) => this.choosePitstopMenu(1))
 			menu2.Add(translate("Load from Database..."), (*) => this.choosePitstopMenu(2))
@@ -2400,8 +2460,8 @@ class RaceCenter extends ConfigurationItem {
 
 			menu2.Add()
 
-			menu2.Add(translate("Setups Summary"), (*) => this.choosePitstopMenu(7))
-			menu2.Add(translate("Pitstops Summary"), (*) => this.choosePitstopMenu(8))
+			menu2.Add(translate("Setups Summary" . translate("...")), (*) => this.choosePitstopMenu(7))
+			menu2.Add(translate("Pitstops Summary" . translate("...")), (*) => this.choosePitstopMenu(8))
 
 			menu2.Add()
 
@@ -2420,6 +2480,9 @@ class RaceCenter extends ConfigurationItem {
 			menu2.Add(translate("Select tyre set"), (*) => this.choosePitstopMenu(12))
 			if this.SelectTyreSet
 				menu2.Check(translate("Select tyre set"))
+
+			menu2.Add()
+			menu2.Add(translate("Instruct Engineer"), (*) => this.choosePitstopMenu(13))
 
 			menus := MenuBar()
 			menus.Add(translate("Session"), menu1)
@@ -2443,7 +2506,7 @@ class RaceCenter extends ConfigurationItem {
 
 		this.startWorking(false)
 
-		this.showDetails(false, false)
+		this.showDetails(false)
 		this.showChart(false)
 
 		if initialize
@@ -2988,11 +3051,12 @@ class RaceCenter extends ConfigurationItem {
 			}
 		}
 
+		this.updateSessionMenu()
+		this.updatePitstopMenu()
+
 		if (this.Mode = "Normal") {
-			this.updateSessionMenu()
 			this.updatePlanMenu()
 			this.updateStrategyMenu()
-			this.updatePitstopMenu()
 		}
 
 		hasPitstops := false
@@ -3159,10 +3223,18 @@ class RaceCenter extends ConfigurationItem {
 	updateSessionMenu() {
 		local synchronize := (((this.Synchronize && isNumber(this.Synchronize)) ? translate("[x]") : translate("[  ]")) . A_Space . translate("Synchronize"))
 
-		this.Control["sessionMenuDropDown"].Delete()
-		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", "Connect", "Clear...", "---------------------------------------------", synchronize, "---------------------------------------------", "Select Team...", "---------------------------------------------", "Load Session...", "Save Session...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], translate))
+		if (this.Mode = "Normal") {
+			this.Control["sessionMenuDropDown"].Delete()
+			this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", "Connect", "Clear...", "---------------------------------------------", synchronize, "---------------------------------------------", "Select Team...", "---------------------------------------------", "Load Session...", "Save Session...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], translate))
 
-		this.Control["sessionMenuDropDown"].Choose(1)
+			this.Control["sessionMenuDropDown"].Choose(1)
+		}
+		else {
+			if (this.Synchronize && isNumber(this.Synchronize))
+				this.iSessionMenu.Check(translate("Synchronize"))
+			else
+				this.iSessionMenu.Uncheck(translate("Synchronize"))
+		}
 	}
 
 	updatePlanMenu() {
@@ -3192,10 +3264,33 @@ class RaceCenter extends ConfigurationItem {
 		local correct3 := ((this.CorrectPressureLoss ? translate("[x]") : translate("[  ]")) . A_Space . translate("Correct pressure loss"))
 		local correct4 := ((this.SelectTyreSet ? translate("[x]") : translate("[  ]")) . A_Space . translate("Select tyre set"))
 
-		this.Control["pitstopMenuDropDown"].Delete()
-		this.Control["pitstopMenuDropDown"].Add(collect(["Pitstop", "---------------------------------------------", "Select Team...", "---------------------------------------------", "Initialize from Session", "Load from Database...", "---------------------------------------------", "Save Setups", "Clear Setups...", "Import Setups...", "Export Setups...", "---------------------------------------------", "Setups Summary", "Pitstops Summary", "---------------------------------------------", correct1, correct2, correct3, correct4, "---------------------------------------------", "Instruct Engineer"], translate))
+		if (this.Mode = "Normal") {
+			this.Control["pitstopMenuDropDown"].Delete()
+			this.Control["pitstopMenuDropDown"].Add(collect(["Pitstop", "---------------------------------------------", "Select Team...", "---------------------------------------------", "Initialize from Session", "Load from Database...", "---------------------------------------------", "Save Setups", "Clear Setups...", "Import Setups...", "Export Setups...", "---------------------------------------------", "Setups Summary", "Pitstops Summary", "---------------------------------------------", correct1, correct2, correct3, correct4, "---------------------------------------------", "Instruct Engineer"], translate))
 
-		this.Control["pitstopMenuDropDown"].Choose(1)
+			this.Control["pitstopMenuDropDown"].Choose(1)
+		}
+		else {
+			if (this.TyrePressureMode = "Reference")
+				this.iPitstopMenu.Check(translate("Adjust Pressures (Reference)"))
+			else
+				this.iPitstopMenu.Uncheck(translate("Adjust Pressures (Reference)"))
+
+			if (this.TyrePressureMode = "Relative")
+				this.iPitstopMenu.Check(translate("Adjust Pressures (Relative)"))
+			else
+				this.iPitstopMenu.Uncheck(translate("Adjust Pressures (Relative)"))
+
+			if this.CorrectPressureLoss
+				this.iPitstopMenu.Check(translate("Correct pressure loss"))
+			else
+				this.iPitstopMenu.Uncheck(translate("Correct pressure loss"))
+
+			if this.SelectTyreSet
+				this.iPitstopMenu.Check(translate("Select tyre set"))
+			else
+				this.iPitstopMenu.Uncheck(translate("Select tyre set"))
+		}
 	}
 
 	initializeSetup(tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPressure, rrPressure) {
@@ -4688,77 +4783,120 @@ class RaceCenter extends ConfigurationItem {
 	chooseSessionMenu(line) {
 		local msgResult, synchronizeMenu, ignore, seconds
 
-		switch line {
-			case 3: ; Connect...
-				this.iServerURL := this.Control["serverURLEdit"].Text
-				this.iServerToken := ((this.Control["serverTokenEdit"].Text = "") ? RaceCenter.kInvalidToken : this.Control["serverTokenEdit"].Text)
+		setSynchronize(seconds, *) {
+			this.iSynchronize := seconds
+		}
 
-				this.connect()
-			case 4: ; Clear...
-				if this.SessionActive {
-					OnMessage(0x44, translateYesNoButtons)
-					msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete all data from the currently active session? This can take quite a while..."), translate("Delete"), 262436)
-					OnMessage(0x44, translateYesNoButtons, 0)
+		if (this.Mode = "Normal") {
+			switch line {
+				case 3: ; Connect...
+					this.iServerURL := this.Control["serverURLEdit"].Text
+					this.iServerToken := ((this.Control["serverTokenEdit"].Text = "") ? RaceCenter.kInvalidToken : this.Control["serverTokenEdit"].Text)
 
-					if (msgResult = "Yes")
-						this.clearSession()
-				}
-				else {
-					OnMessage(0x44, translateOkButton)
-					withBlockedWindows(MsgBox, translate("You are not connected to an active session."), translate("Information"), 262192)
-					OnMessage(0x44, translateOkButton, 0)
-				}
-			case 6: ; Synchronize
-				if GetKeyState("Ctrl") {
-					synchronizeMenu := Menu()
+					this.connect()
+				case 4: ; Clear...
+					if this.SessionActive {
+						OnMessage(0x44, translateYesNoButtons)
+						msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete all data from the currently active session? This can take quite a while..."), translate("Delete"), 262436)
+						OnMessage(0x44, translateYesNoButtons, 0)
 
-					synchronizeMenu.Add(translate("Synchronize each..."), (*) => {})
-					synchronizeMenu.Disable(translate("Synchronize each..."))
+						if (msgResult = "Yes")
+							this.clearSession()
+					}
+					else {
+						OnMessage(0x44, translateOkButton)
+						withBlockedWindows(MsgBox, translate("You are not connected to an active session."), translate("Information"), 262192)
+						OnMessage(0x44, translateOkButton, 0)
+					}
+				case 6: ; Synchronize
+					if GetKeyState("Ctrl") {
+						synchronizeMenu := Menu()
 
-					synchronizeMenu.Add()
+						synchronizeMenu.Add(translate("Synchronize each..."), (*) => {})
+						synchronizeMenu.Disable(translate("Synchronize each..."))
 
-					synchronizeMenu.Add(translate("Off"), (*) => (this.iSynchronize := false))
+						synchronizeMenu.Add()
 
-					if (!this.Synchronize || (this.Synchronize = "Off"))
-						synchronizeMenu.Check(translate("Off"))
+						synchronizeMenu.Add(translate("Off"), (*) => (this.iSynchronize := false))
 
-					for ignore, seconds in [1, 2, 3, 4, 5, 6, 8, 10, 12, 14, 16, 20, 25, 30, 40, 50, 60] {
-						setSynchronize(seconds, *) {
-							this.iSynchronize := seconds
+						if (!this.Synchronize || (this.Synchronize = "Off"))
+							synchronizeMenu.Check(translate("Off"))
+
+						for ignore, seconds in [1, 2, 3, 4, 5, 6, 8, 10, 12, 14, 16, 20, 25, 30, 40, 50, 60] {
+							synchronizeMenu.Add(seconds . translate(" Seconds"), setSynchronize.Bind(seconds))
+
+							if (seconds = this.Synchronize)
+								synchronizeMenu.Check(seconds . translate(" Seconds"))
 						}
 
-						synchronizeMenu.Add(seconds . translate(" Seconds"), setSynchronize.Bind(seconds))
-
-						if (seconds = this.Synchronize)
-							synchronizeMenu.Check(seconds . translate(" Seconds"))
+						synchronizeMenu.Show()
 					}
+					else if (this.Synchronize && isNumber(this.Synchronize))
+						this.iSynchronize := false
+					else
+						this.iSynchronize := 10
 
-					synchronizeMenu.Show()
-				}
-				else if (this.Synchronize && isNumber(this.Synchronize))
-					this.iSynchronize := false
-				else
-					this.iSynchronize := 10
+					this.updateState()
+				case 8:
+					this.manageTeam()
+				case 10: ; Load Session...
+					this.loadSession(GetKeyState("Ctrl") ? "Import" : "Browse")
+				case 11: ; Save Session...
+					if this.HasData
+						this.saveSession(true)
+					else {
+						OnMessage(0x44, translateOkButton)
+						withBlockedWindows(MsgBox, translate("There is no session data to be saved."), translate("Information"), 262192)
+						OnMessage(0x44, translateOkButton, 0)
+					}
+				case 13: ; Update Statistics
+					this.updateStatistics()
+				case 15: ; Race Summary
+					this.showSessionSummary()
+				case 16: ; Driver Statistics
+					this.showDriverStatistics()
+			}
+		}
+		else {
+			switch line {
+				case 1: ; Synchronize
+					if GetKeyState("Ctrl") {
+						synchronizeMenu := Menu()
 
-				this.updateState()
-			case 8:
-				this.manageTeam()
-			case 10: ; Load Session...
-				this.loadSession(GetKeyState("Ctrl") ? "Import" : "Browse")
-			case 11: ; Save Session...
-				if this.HasData
-					this.saveSession(true)
-				else {
-					OnMessage(0x44, translateOkButton)
-					withBlockedWindows(MsgBox, translate("There is no session data to be saved."), translate("Information"), 262192)
-					OnMessage(0x44, translateOkButton, 0)
-				}
-			case 13: ; Update Statistics
-				this.updateStatistics()
-			case 15: ; Race Summary
-				this.showSessionSummary()
-			case 16: ; Driver Statistics
-				this.showDriverStatistics()
+						synchronizeMenu.Add(translate("Synchronize each..."), (*) => {})
+						synchronizeMenu.Disable(translate("Synchronize each..."))
+
+						synchronizeMenu.Add()
+
+						synchronizeMenu.Add(translate("Off"), (*) => (this.iSynchronize := false))
+
+						if (!this.Synchronize || (this.Synchronize = "Off"))
+							synchronizeMenu.Check(translate("Off"))
+
+						for ignore, seconds in [1, 2, 3, 4, 5, 6, 8, 10, 12, 14, 16, 20, 25, 30, 40, 50, 60] {
+							synchronizeMenu.Add(seconds . translate(" Seconds"), setSynchronize.Bind(seconds))
+
+							if (seconds = this.Synchronize)
+								synchronizeMenu.Check(seconds . translate(" Seconds"))
+						}
+
+						synchronizeMenu.Show()
+					}
+					else if (this.Synchronize && isNumber(this.Synchronize))
+						this.iSynchronize := false
+					else
+						this.iSynchronize := 10
+
+					this.updateState()
+				case 2: ; Update Statistics
+					this.updateStatistics()
+				case 3: ; Race Summary
+					this.showSessionSummary()
+				case 4: ; Driver Statistics
+					this.showDriverStatistics()
+				case 5: ; Session Information
+					Run("`"" . kBinariesDirectory . "System Monitor.exe`" -Show Session", kBinariesDirectory)
+			}
 		}
 
 		this.updateSessionMenu()
@@ -4976,7 +5114,7 @@ class RaceCenter extends ConfigurationItem {
 							this.discardStrategy()
 
 							if (this.SelectedDetailReport = "Strategy")
-								this.showDetails(false, false)
+								this.showDetails(false)
 						}
 					}
 					else {
@@ -5019,8 +5157,6 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	choosePitstopMenu(line) {
-		local exePath, options, simulator
-
 		updateSetting(setting, value) {
 			local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
@@ -5085,81 +5221,134 @@ class RaceCenter extends ConfigurationItem {
 			}
 		}
 
-		switch line {
-			case 3: ; Manage Team
-				this.manageTeam()
-			case 5:
-				this.initializePitstopFromSession()
-			case 6:
-				exePath := kBinariesDirectory . "Session Database.exe"
+		loadFromDatabase() {
+			local exePath := (kBinariesDirectory . "Session Database.exe")
+			local options, simulator
 
-				this.iPressuresRequest := "Pitstop"
+			this.iPressuresRequest := "Pitstop"
 
-				try {
-					options := ["-Setup", ProcessExist()]
+			try {
+				options := ["-Setup", ProcessExist()]
 
-					if (this.Simulator && this.Car && this.Track) {
-						simulator := SessionDatabase.getSimulatorName(this.Simulator)
+				if (this.Simulator && this.Car && this.Track) {
+					simulator := SessionDatabase.getSimulatorName(this.Simulator)
 
-						options := concatenate(options, ["-Simulator", "`"" . simulator . "`"", "-Car", "`"" . this.Car . "`"", "-Track", "`"" . this.Track . "`""
-													   , "-Weather", this.Weather
-													   , "-AirTemperature", Round(this.AirTemperature), "-TrackTemperature", Round(this.TrackTemperature)])
-					}
-
-					options := values2String(A_Space, options*)
-
-					Run("`"" . exePath . "`" " . options, kBinariesDirectory)
+					options := concatenate(options, ["-Simulator", "`"" . simulator . "`"", "-Car", "`"" . this.Car . "`"", "-Track", "`"" . this.Track . "`""
+												   , "-Weather", this.Weather
+												   , "-AirTemperature", Round(this.AirTemperature), "-TrackTemperature", Round(this.TrackTemperature)])
 				}
-				catch Any as exception {
-					logError(exception, true)
 
-					logMessage(kLogCritical, translate("Cannot start the Session Database tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+				options := values2String(A_Space, options*)
 
-					showMessage(substituteVariables(translate("Cannot start the Session Database tool (%exePath%) - please check the configuration..."), {exePath: exePath})
-							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-				}
-			case 8:
-				this.pushTask(ObjBindMethod(this, "releaseSetups"))
-			case 9:
-				this.pushTask(ObjBindMethod(this, "clearSetups"))
-			case 10:
-				this.pushTask(uploadSetups)
-			case 11:
-				this.pushTask(downloadSetups)
-			case 13:
-				this.showSetupsDetails()
+				Run("`"" . exePath . "`" " . options, kBinariesDirectory)
+			}
+			catch Any as exception {
+				logError(exception, true)
 
-				this.iSelectedDetailReport := "Setups"
-			case 14:
-				this.showPitstopsDetails()
+				logMessage(kLogCritical, translate("Cannot start the Session Database tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
-				this.iSelectedDetailReport := "Pitstops"
-			case 16:
-				this.iTyrePressureMode := ((this.TyrePressureMode = "Reference") ? false : "Reference")
+				showMessage(substituteVariables(translate("Cannot start the Session Database tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			}
+		}
 
-				updateSetting("TyrePressureMode", this.TyrePressureMode)
+		if (this.Mode = "Normal") {
+			switch line {
+				case 3: ; Manage Team
+					this.manageTeam()
+				case 5:
+					this.initializePitstopFromSession()
+				case 6:
+					loadFromDatabase()
+				case 8:
+					this.pushTask(ObjBindMethod(this, "releaseSetups"))
+				case 9:
+					this.pushTask(ObjBindMethod(this, "clearSetups"))
+				case 10:
+					this.pushTask(uploadSetups)
+				case 11:
+					this.pushTask(downloadSetups)
+				case 13:
+					this.showSetupsDetails()
 
-				this.updateState()
-			case 17:
-				this.iTyrePressureMode := ((this.TyrePressureMode = "Relative") ? false : "Relative")
+					this.iSelectedDetailReport := "Setups"
+				case 14:
+					this.showPitstopsDetails()
 
-				updateSetting("TyrePressureMode", this.TyrePressureMode)
+					this.iSelectedDetailReport := "Pitstops"
+				case 16:
+					this.iTyrePressureMode := ((this.TyrePressureMode = "Reference") ? false : "Reference")
 
-				this.updateState()
-			case 18:
-				this.iCorrectPressureLoss := !this.CorrectPressureLoss
+					updateSetting("TyrePressureMode", this.TyrePressureMode)
 
-				updateSetting("CorrectPressureLoss", this.CorrectPressureLoss)
+					this.updateState()
+				case 17:
+					this.iTyrePressureMode := ((this.TyrePressureMode = "Relative") ? false : "Relative")
 
-				this.updateState()
-			case 19:
-				this.iSelectTyreSet := !this.SelectTyreSet
+					updateSetting("TyrePressureMode", this.TyrePressureMode)
 
-				updateSetting("SelectTyreSet", this.SelectTyreSet)
+					this.updateState()
+				case 18:
+					this.iCorrectPressureLoss := !this.CorrectPressureLoss
 
-				this.updateState()
-			case 21:
-				this.planPitstop()
+					updateSetting("CorrectPressureLoss", this.CorrectPressureLoss)
+
+					this.updateState()
+				case 19:
+					this.iSelectTyreSet := !this.SelectTyreSet
+
+					updateSetting("SelectTyreSet", this.SelectTyreSet)
+
+					this.updateState()
+				case 21:
+					this.planPitstop()
+			}
+		}
+		else {
+			switch line {
+				case 1:
+					this.initializePitstopFromSession()
+				case 2:
+					loadFromDatabase()
+				case 3:
+					this.pushTask(ObjBindMethod(this, "releaseSetups"))
+				case 4:
+					this.pushTask(ObjBindMethod(this, "clearSetups"))
+				case 5:
+					this.pushTask(uploadSetups)
+				case 6:
+					this.pushTask(downloadSetups)
+				case 7:
+					this.showSetupsDetails()
+				case 8:
+					this.showPitstopsDetails()
+				case 9:
+					this.iTyrePressureMode := ((this.TyrePressureMode = "Reference") ? false : "Reference")
+
+					updateSetting("TyrePressureMode", this.TyrePressureMode)
+
+					this.updateState()
+				case 10:
+					this.iTyrePressureMode := ((this.TyrePressureMode = "Relative") ? false : "Relative")
+
+					updateSetting("TyrePressureMode", this.TyrePressureMode)
+
+					this.updateState()
+				case 11:
+					this.iCorrectPressureLoss := !this.CorrectPressureLoss
+
+					updateSetting("CorrectPressureLoss", this.CorrectPressureLoss)
+
+					this.updateState()
+				case 12:
+					this.iSelectTyreSet := !this.SelectTyreSet
+
+					updateSetting("SelectTyreSet", this.SelectTyreSet)
+
+					this.updateState()
+				case 13:
+					this.planPitstop()
+			}
 		}
 
 		this.updatePitstopMenu()
@@ -5219,7 +5408,7 @@ class RaceCenter extends ConfigurationItem {
 				this.iSelectedDetailReport := "Strategy"
 			}
 			else {
-				this.showDetails(false, false)
+				this.showDetails(false)
 
 				this.iSelectedDetailReport := false
 			}
@@ -6142,7 +6331,7 @@ class RaceCenter extends ConfigurationItem {
 		this.iStrategy := false
 
 		this.showChart(false)
-		this.showDetails(false, false)
+		this.showDetails(false)
 	}
 
 	initializeSimulator(simulator, car, track, force := false) {
@@ -9579,7 +9768,7 @@ class RaceCenter extends ConfigurationItem {
 				(
 						</script>
 					</head>
-					<body style='background-color: #%backColor%' style='overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'>
+					<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
 						<style>
 							.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
 							.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
@@ -9601,7 +9790,7 @@ class RaceCenter extends ConfigurationItem {
 				this.ChartViewer.document.write(html)
 			}
 			else {
-				html := "<html><body style='background-color: #%backColor%' style='overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'></body></html>"
+				html := "<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 
 				this.ChartViewer.document.write(substituteVariables(html, {backColor: this.Window.AltBackColor}))
 			}
@@ -9734,13 +9923,14 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
-	showDetails(report, details, charts*) {
+	showDetails(report, title := false, details := false, charts*) {
 		local chartID := 1
 		local html := (details ? details : "")
 		local script, ignore, chart
-		local x, y, w, h, htmlGui, htmlViewer, title
+		local x, y, w, h, htmlGui, htmlViewer, margins
 
-		this.iSelectedDetailReport := report
+		if !title
+			this.iSelectedDetailReport := report
 
 		if details {
 			script := "
@@ -9783,9 +9973,14 @@ class RaceCenter extends ConfigurationItem {
 		else
 			script := ""
 
-		html := ("<html>" . script . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style> p, div, table { color: " . this.Window.Theme.TextColor . "; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; }</style><div" . ((this.Mode = "Normal") ? "" : "style=leftmargin=5; topmargin=5; rightmargin=5; bottommargin=5'") . ">" . html . "</div></body></html>")
+		if title
+			margins := "style='overflow: auto' leftmargin='5' topmargin='5' rightmargin='5' bottommargin='5'"
+		else
+			margins := "style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'"
 
-		if (this.Mode = "Normal") {
+		html := ("<html>" . script . "<body style='background-color: #" . this.Window.AltBackColor . "' " . margins . "><style> p, div, table { color: " . this.Window.Theme.TextColor . "; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; }</style><div>" . html . "</div></body></html>")
+
+		if !title {
 			this.iSelectedDetailHTML := html
 
 			this.DetailsViewer.document.open()
@@ -9793,7 +9988,6 @@ class RaceCenter extends ConfigurationItem {
 			this.DetailsViewer.document.close()
 		}
 		else if details {
-			title := (translate(report) . A_Space . translate("Report"))
 			htmlGui := HTMLWindow({Descriptor: "Race Center." . title, Closeable: true, Resizeable:  "Deferred"}, title)
 
 			htmlViewer := htmlGui.Add("HTMLViewer", "X0 Y0 W640 H480 W:Grow H:Grow")
@@ -9802,7 +9996,7 @@ class RaceCenter extends ConfigurationItem {
 			htmlViewer.document.write(html)
 			htmlViewer.document.close()
 
-			htmlGui.Add(RaceCenter.HTMLResizer(htmlViewer, htmlGui))
+			htmlGui.Add(RaceCenter.HTMLResizer(htmlViewer, html, htmlGui))
 
 			if getWindowPosition("Race Center." . title, &x, &y)
 				htmlGui.Show("x" . x . " y" . y . " w640 h480")
@@ -10186,14 +10380,14 @@ class RaceCenter extends ConfigurationItem {
 												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
 
-			html := ("<html>" . script . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } </style><div>" . html . "</div></body></html>")
+			html := ("<html>" . script . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } </style><div>" . html . "</div></body></html>")
 
 			this.ChartViewer.document.write(html)
 		}
 		else {
 			this.selectReport(false)
 
-			this.ChartViewer.document.write("<html><body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'></body></html>")
+			this.ChartViewer.document.write("<html><body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>")
 		}
 
 		this.ChartViewer.document.close()
@@ -11321,7 +11515,7 @@ class RaceCenter extends ConfigurationItem {
 		return html
 	}
 
-	showStintDetails(stint) {
+	showStintDetails(stint, viewer := false) {
 		showStintDetailsAsync(stint) {
 			local html := ("<div id=`"header`"><b>" . translate("Stint: ") . stint.Nr . "</b></div>")
 			local laps := []
@@ -11369,7 +11563,8 @@ class RaceCenter extends ConfigurationItem {
 
 			html .= ("<br><div id=`"chart_3`" style=`"width: " . width . "px; height: 248px`"></div>")
 
-			this.showDetails("Stint", html, [1, chart1], [2, chart2], [3, chart3])
+			this.showDetails("Stint", (!viewer && (this.Mode = "Normal")) ? false : (translate("Stint: ") . stint.Nr)
+									, html, [1, chart1], [2, chart2], [3, chart3])
 		}
 
 		this.pushTask(ObjBindMethod(this, "syncSessionStore"))
@@ -11702,7 +11897,7 @@ class RaceCenter extends ConfigurationItem {
 		return html
 	}
 
-	showLapDetails(lap) {
+	showLapDetails(lap, viewer := false) {
 		showLapDetailsAsync(lap) {
 			local html := ("<div id=`"header`"><b>" . translate("Lap: ") . lap.Nr . "</b></div>")
 
@@ -11720,7 +11915,7 @@ class RaceCenter extends ConfigurationItem {
 
 			html .= ("<br>" . this.createLapStandings(lap))
 
-			this.showDetails("Lap", html)
+			this.showDetails("Lap", (!viewer && (this.Mode = "Normal")) ? false : (translate("Lap: ") . lap.Nr), html)
 		}
 
 		this.pushTask(ObjBindMethod(this, "syncSessionStore"))
@@ -12013,7 +12208,7 @@ class RaceCenter extends ConfigurationItem {
 		return html
 	}
 
-	showPitstopDetails(pitstopNr) {
+	showPitstopDetails(pitstopNr, viewer := false) {
 		showPitstopDetailsAsync(pitstopNr) {
 			local pitstopData := this.SessionStore.Tables["Pitstop.Data"][pitstopNr]
 			local html, tyreCompound, tyreCompoundColor, tyreWearDetails
@@ -12039,7 +12234,7 @@ class RaceCenter extends ConfigurationItem {
 						html .= ("<br><br><div id=`"header`"><i>" . translate("Tyre Wear") . "</i></div><br>" . tyreWearDetails)
 				}
 
-				this.showDetails("Pitstop", html)
+				this.showDetails("Pitstop", (!viewer && (this.Mode = "Normal")) ? false : (translate("Pitstop: ") . pitstopNr), html)
 			}
 			else
 				loop this.PitstopsListView.GetCount()
@@ -12208,7 +12403,7 @@ class RaceCenter extends ConfigurationItem {
 		return html
 	}
 
-	showPitstopsDetails() {
+	showPitstopsDetails(viewer := GetKeyState("Ctrl")) {
 		showPitstopsDetailsAsync() {
 			local html := ("<div id=`"header`"><b>" . translate("Pitstops Summary") . "</b></div>")
 			local pitstopData, tyreCompound, tyreWearDetails
@@ -12234,7 +12429,7 @@ class RaceCenter extends ConfigurationItem {
 																	  . "</i></div><br>" . tyreWearDetails)
 					}
 
-			this.showDetails("Pitstops", html)
+			this.showDetails("Pitstops", (!viewer && (this.Mode = "Normal")) ? false : translate("Pitstops Summary"), html)
 		}
 
 		this.pushTask(ObjBindMethod(this, "syncSessionStore"))
@@ -12449,7 +12644,7 @@ class RaceCenter extends ConfigurationItem {
 		return drawChartFunction
 	}
 
-	showDriverStatistics() {
+	showDriverStatistics(viewer := GetKeyState("Ctrl")) {
 		local html := ("<div id=`"header`"><b>" . translate("Driver Statistics") . "</b></div>")
 		local ignore, driver, width, chart1, chart2
 
@@ -12474,7 +12669,7 @@ class RaceCenter extends ConfigurationItem {
 
 		html .= ("<br><br><div id=`"chart_2`" style=`"width: " . width . "px; height: 248px`"></div>")
 
-		this.showDetails("Drivers", html, [1, chart1], [2, chart2])
+		this.showDetails("Drivers", (!viewer && (this.Mode = "Normal")) ? false : translate("Driver Statistics"), html, [1, chart1], [2, chart2])
 	}
 
 	createSessionSummaryChart(chartID, width, height, lapSeries, positionSeries, fuelSeries, tyreSeries) {
@@ -12511,7 +12706,7 @@ class RaceCenter extends ConfigurationItem {
 		return drawChartFunction
 	}
 
-	showSessionSummary() {
+	showSessionSummary(viewer := GetKeyState("Ctrl")) {
 		local telemetryDB := this.TelemetryDatabase
 		local html := ("<div id=`"header`"><b>" . translate("Race Summary") . "</b></div>")
 		local stints := []
@@ -12618,7 +12813,7 @@ class RaceCenter extends ConfigurationItem {
 
 		html .= "</table>"
 
-		html .= ("<br><br><div id=`"header`"><i>" . translate("Summary") . "</i></div>")
+		html .= ("<br><br><div id=`"header`"><i>" . translate("Race Summary") . "</i></div>")
 
 		laps := []
 		positions := []
@@ -12643,10 +12838,10 @@ class RaceCenter extends ConfigurationItem {
 
 		html .= ("<br><br><div id=`"chart_1`" style=`"width: " . width . "px; height: 248px`"></div>")
 
-		this.showDetails("Session", html, [1, chart1])
+		this.showDetails("Session", (!viewer && (this.Mode = "Normal")) ? false : translate("Race Summary"), html, [1, chart1])
 	}
 
-	showPlanDetails() {
+	showPlanDetails(viewer := GetKeyState("Ctrl")) {
 		local html := ("<div id=`"header`"><b>" . translate("Plan Summary") . "</b></div>")
 		local telemetryDB := this.TelemetryDatabase
 		local window := this.Window
@@ -12716,10 +12911,10 @@ class RaceCenter extends ConfigurationItem {
 
 		html .= "</table>"
 
-		this.showDetails("Plan", html)
+		this.showDetails("Plan", (!viewer && (this.Mode = "Normal")) ? false : translate("Plan Summary"), html)
 	}
 
-	showSetupsDetails() {
+	showSetupsDetails(viewer := GetKeyState("Ctrl")) {
 		local html := ("<div id=`"header`"><b>" . translate("Setups Summary") . "</b></div>")
 		local window := this.Window
 		local currentListView, driver, conditions, tyreCompound, pressures, notes
@@ -12760,7 +12955,7 @@ class RaceCenter extends ConfigurationItem {
 
 		html .= "</table>"
 
-		this.showDetails("Setups", html)
+		this.showDetails("Setups", (!viewer && (this.Mode = "Normal")) ? false : translate("Setups Summary"), html)
 	}
 
 	computeCarStatistics(car, laps, &lapTime, &potential, &raceCraft, &speed, &consistency, &carControl) {
@@ -13358,7 +13553,7 @@ startupRaceCenter() {
 										  , getMultiMapValue(settings, "Strategy Workbench", "Car", false))
 	local track := getMultiMapValue(settings, "Race Center", "Track"
 											, getMultiMapValue(settings, "Strategy Workbench", "Track", false))
-	local mode := (inList(A_Args, "-Simple") ? "Simple" : getMultiMapValue(settings, "Race Center", "Mode", "Simple"))
+	local mode := (inList(A_Args, "-Simple") ? "Simple" : getMultiMapValue(settings, "Race Center", "Mode", "Normal"))
 	local raceSettings := readMultiMap(kUserConfigDirectory . "Race.settings")
 	local index := inList(A_Args, "-Startup")
 	local icon := (kIconsDirectory . "Console.ico")
@@ -13367,6 +13562,9 @@ startupRaceCenter() {
 
 	TraySetIcon(icon, "1")
 	A_IconTip := "Race Center"
+
+	if ((mode = "Normal") && GetKeyState("Alt"))
+		mode := "Simple"
 
 	try {
 		if index {

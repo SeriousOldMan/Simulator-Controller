@@ -338,7 +338,7 @@ class StrategyViewer {
 
 		tableCSS := this.getTableCSS()
 
-		html := ("<html>" . before . drawChartFunction . after . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style>" . tableCSS . "</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style><div>" . html . "</div><br>" . chartArea . "</body></html>")
+		html := ("<html>" . before . drawChartFunction . after . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style>" . tableCSS . "</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style><div>" . html . "</div><br>" . chartArea . "</body></html>")
 
 		if this.StrategyViewer {
 			this.StrategyViewer.document.open()

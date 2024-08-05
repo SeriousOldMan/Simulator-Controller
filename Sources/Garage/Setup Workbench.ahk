@@ -717,7 +717,7 @@ class SetupWorkbench extends ConfigurationItem {
 					(
 							</script>
 						</head>
-						<body style='background-color: #%backColor%' style='overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'>
+						<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
 							<style> table, p, div { color: #%fontColor% } </style>
 							<div id="chart_id" style="width: %width%px; height: %height%px"></div>
 							<div style="width: %iWidth%px; height: %iHeight%px">
@@ -756,7 +756,7 @@ class SetupWorkbench extends ConfigurationItem {
 						<meta charset='utf-8'>
 						<head>
 						</head>
-						<body style='background-color: #%backColor%' style='overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'>
+						<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
 							<style> table, p, div { color: #%fontColor% } </style>
 							<div style="width: %width%px; height: %height%px; text-align: center">
 								<p style="font-family: Arial; font-size: 16px; height: %height%px; margin: auto">
@@ -777,7 +777,7 @@ class SetupWorkbench extends ConfigurationItem {
 				}
 			}
 			else {
-				html := "<html><body style='background-color: #%backColor' style='overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'></body></html>"
+				html := "<html><body style='background-color: #%backColor' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 
 				this.SettingsViewer.document.write(substituteVariables(html, {backColor: this.Window.AltBackColor}))
 			}

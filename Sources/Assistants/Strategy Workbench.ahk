@@ -996,7 +996,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		this.iWindow := workbenchGui
 
-		this.iTelemetryChartHTML := substituteVariables("<html><body style='background-color: #%backColor%' style='overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'></body></html>", {backColor: workbenchGui.AltBackColor})
+		this.iTelemetryChartHTML := substituteVariables("<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>", {backColor: workbenchGui.AltBackColor})
 		this.iStrategyChartHTML := this.iTelemetryChartHTML
 		this.iComparisonChartHTML := this.iTelemetryChartHTML
 
@@ -1696,7 +1696,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			(
 					</script>
 				</head>
-				<body style='background-color: #%backColor%' style='overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'>
+				<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
 					<div id="chart_id" style="width: %width%px; height: %height%px"></div>
 				</body>
 			</html>
@@ -1707,7 +1707,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			this.ChartViewer.document.write(html)
 		}
 		else {
-			html := "<html><body style='background-color: #%backColor%' style='overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'></body></html>"
+			html := "<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 
 			this.ChartViewer.document.write(substituteVariables(html, {backColor: this.Window.AltBackColor}))
 		}
@@ -2023,12 +2023,12 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			tableCSS := this.StrategyViewer.getTableCSS()
 
-			html := ("<html>" . before . drawChartFunction . "; function drawChart() { drawChart" . chartID . "(); }" . after . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style>" . tableCSS . "</style><style> #header { font-size: 12px; } </style>" . html . "</body></html>")
+			html := ("<html>" . before . drawChartFunction . "; function drawChart() { drawChart" . chartID . "(); }" . after . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style>" . tableCSS . "</style><style> #header { font-size: 12px; } </style>" . html . "</body></html>")
 
 			this.showStrategyChart(html)
 		}
 		else {
-			html := substituteVariables("<html><body style='background-color: #%backColor%' style='overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'></body></html>", {backColor: this.Window.AltBackColor})
+			html := substituteVariables("<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>", {backColor: this.Window.AltBackColor})
 
 			this.showStrategyChart(html)
 		}
@@ -3356,7 +3356,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		tableCSS := this.StrategyViewer.getTableCSS()
 
-		html := ("<html>" . before . chart . charts . ";`n" . drawChartsFunction . after . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style>" . tableCSS . "</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style>" . html . "<br><hr style=`"width: 50%`"><br>" . chartArea . "</body></html>")
+		html := ("<html>" . before . chart . charts . ";`n" . drawChartsFunction . after . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style>" . tableCSS . "</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style>" . html . "<br><hr style=`"width: 50%`"><br>" . chartArea . "</body></html>")
 
 		this.showComparisonChart(html)
 	}

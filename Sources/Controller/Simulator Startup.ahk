@@ -277,7 +277,10 @@ class SimulatorStartup extends ConfigurationItem {
 
 					for ignore, tool in string2Values(",", getMultiMapValue(readMultiMap(fileName), "Session", "Tools", ""))
 						try {
-							Run(kBinariesDirectory . tool . ".exe" . startup, kBinariesDirectory)
+							if (tool = "Race Center Lite")
+								Run(kBinariesDirectory . "Race Center.exe -Simple" . startup, kBinariesDirectory)
+							else
+								Run(kBinariesDirectory . tool . ".exe" . startup, kBinariesDirectory)
 						}
 						catch Any as exception {
 							logError(exception)
@@ -1391,7 +1394,7 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 
 		profilesEditorGui["profileNameEdit"].Text := profile["Name"]
 		profilesEditorGui["profileModeDropDown"].Choose(Max(1, inList(hasTeamServer ? ["Solo", "Team"] : ["Solo"], profile["Mode"])))
-		profilesEditorGui["profilePitwallDropDown"].Choose((1 + inList(hasTeamServer ? ["Practice Center", "Race Center"] : ["Practice Center"], profile["Tools"])))
+		profilesEditorGui["profilePitwallDropDown"].Choose((1 + inList(hasTeamServer ? ["Practice Center", "Race Center", "Race Center Lite"] : ["Practice Center"], profile["Tools"])))
 
 		profilesEditorGui["profileAutonomyDropDown"].Choose(inList(["Yes", "No", "Default"], profile["Assistant.Autonomy"]))
 
@@ -1448,7 +1451,7 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 		else {
 			profile["Name"] := profilesEditorGui["profileNameEdit"].Text
 			profile["Mode"] :=  ["Solo", "Team"][profilesEditorGui["profileModeDropDown"].Value]
-			profile["Tools"] := ["", "Practice Center", "Race Center"][profilesEditorGui["profilePitwallDropDown"].Value]
+			profile["Tools"] := ["", "Practice Center", "Race Center", "Race Center Lite"][profilesEditorGui["profilePitwallDropDown"].Value]
 
 			profile["Assistant.Autonomy"] := ["Yes", "No", "Default"][profilesEditorGui["profileAutonomyDropDown"].Value]
 
@@ -2212,7 +2215,7 @@ startupProfilesEditor(launchPadOrCommand, arguments*) {
 		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " vprofileModeDropDown", collect(hasTeamServer ? ["Solo", "Team"] : ["Solo"], translate)).OnEvent("Change", startupProfilesEditor.Bind("Update State"))
 
 		profilesEditorGui.Add("Text", "x" . x0 . " yp+23 w90 h23 +0x200", translate("Control Center"))
-		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " vprofilePitwallDropDown", collect(hasTeamServer ? ["None", "Practice Center", "Race Center"] : ["None", "Practice Center"], translate))
+		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " vprofilePitwallDropDown", collect(hasTeamServer ? ["None", "Practice Center", "Race Center", "Race Center Lite"] : ["None", "Practice Center"], translate))
 
 		settingsTab := profilesEditorGui.Add("Tab3", "x" . x0 . " yp+30 w392 h180 Section", collect(hasTeamServer ? ["Assistants", "Team", "Functions"] : ["Assistants", "Functions"], translate))
 

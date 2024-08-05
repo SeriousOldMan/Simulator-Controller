@@ -155,7 +155,7 @@ Simulator Controller comes with a set of virtual Assistants to guide you through
 
 #### AI powered Virtual Race Assistants
 
-Simulator Controller offers a virtual pit crew based on an AI powered chatbot engine. At the heart of this engine is hybrid rule engine coupled with voice recognition and voice synthesis. A rule engine is very suitable for the tasks of a typical pit crew, since all actions are event based and use big amounts of data.
+Simulator Controller offers a virtual pit crew based on an AI powered chatbot engine. At the heart of this engine is hybrid rule engine coupled with voice recognition and voice synthesis. A rule engine is very suitable for the tasks of a typical pit crew, since all actions are event based and use large amounts of data.
 
 You can communicate with the crew members using voice and natural language. Voice commands are pattern-based but you can connect each pit crew member (called Race Assistant in Simulator Controller) optionally to a GPT service and use the natural language capabilities of an LLM (aka large language model) to boost the conversational expertise of the crew members.
 
@@ -173,7 +173,7 @@ Click on the picture to hear an actual conversation with the Driving Coach:
 
 [![](https://img.youtube.com/vi/LBtLk_md1IE/0.jpg)](https://youtu.be/LBtLk_md1IE)
 
-The Virtual Driving Coach can use LLM runtimes of OpenAI or Azure, but if your PC is powerful enough, you can also use an integrated runtime for a variety of LLM architectures, like Llama, Falcon, Mistral, GPT, and so on, as long as they are available in [GGUF format](https://github.com/ggerganov/ggml/pull/302).
+The Virtual Driving Coach can use LLM runtimes of OpenAI, Mistral and alike, but if your PC is powerful enough, you can also use an integrated runtime for a variety of LLM architectures, like Llama, Falcon, Mistral, GPT, and so on, as long as they are available in [GGUF format](https://github.com/ggerganov/ggml/pull/302).
 
 ##### Race Engineer & Race Strategist
 

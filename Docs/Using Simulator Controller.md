@@ -109,7 +109,7 @@ If you want to create a startup profile, click on the button with the small "+" 
 
 Good to know: If you hold down the Control key when clicking on the "Download" button, only the currently selected profile will be exported, otherwise all your profiles will be in the export file.
 
-You can choose whether a profile will start a solo or a team session and you can decide whether you want to run the "Practice Center" or the "Race Center" automatically during startup. Please note, that running the "Race Center" is only useful in a team session.
+You can choose whether a profile will start a solo or a team session and you can decide whether you want to run the ["Practice Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Practice-Center), ["Race Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center) or ["Race Center Lite"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#normal-vs-simple-user-interface) (a simplified version of "Race Center") automatically during startup. Please note, that running the "Race Center" is only useful in a team session.
 
 You can choose furthermore, which Assistants will be available and whether they will talk and listen to you.
 

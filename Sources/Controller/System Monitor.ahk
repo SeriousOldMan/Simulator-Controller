@@ -110,7 +110,7 @@ updateDashboard(window, viewer, html := "") {
 	if (html == false)
 		html := " "
 
-	html := ("<html><meta charset='utf-8'><body style='background-color: #" . window.BackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style> p, div, table { color: #" . window.Theme.TextColor . "; font-family: Arial, Helvetica, sans-serif; font-size: 10px }</style><style> #header { font-size: 12px; } </style><div>" . html . "</div></body></html>")
+	html := ("<html><meta charset='utf-8'><body style='background-color: #" . window.BackColor . "; overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> p, div, table { color: #" . window.Theme.TextColor . "; font-family: Arial, Helvetica, sans-serif; font-size: 10px }</style><style> #header { font-size: 12px; } </style><div>" . html . "</div></body></html>")
 
 	viewer.document.open()
 	viewer.document.write(html)
@@ -1834,7 +1834,10 @@ systemMonitor(command := false, arguments*) {
 
 		systemMonitorGui.Add("Text", "x8 yp+26 w790 0x10")
 
-		monitorTabView := systemMonitorGui.Add("Tab3", "x16 yp+14 w773 h375 H:Grow AltSubmit -Wrap Section", collect(["Dashboard", "Session", "Team", "Modules", "Logs"], translate))
+		if (command = "Tab")
+			monitorTabView := systemMonitorGui.Add("Tab3", "x16 yp+14 w773 h375 H:Grow Choose" . inList(["Dashboard", "Session", "Team", "Modules", "Logs"], arguments[1]) . " AltSubmit -Wrap Section", collect(["Dashboard", "Session", "Team", "Modules", "Logs"], translate))
+		else
+			monitorTabView := systemMonitorGui.Add("Tab3", "x16 yp+14 w773 h375 H:Grow AltSubmit -Wrap Section", collect(["Dashboard", "Session", "Team", "Modules", "Logs"], translate))
 
 		monitorTabView.UseTab(1)
 
@@ -2069,7 +2072,10 @@ startupSystemMonitor() {
 
 		startupApplication()
 
-		systemMonitor()
+		if inList(A_Args, "-Show")
+			systemMonitor("Tab", A_Args[inList(A_Args, "-Show") + 1])
+		else
+			systemMonitor()
 	}
 	catch Any as exception {
 		logError(exception, true)

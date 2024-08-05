@@ -224,7 +224,7 @@ class BasicStepWizard extends StepWizard {
 
 		text := "<div style='text-align: center; font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 600'>" . text . "</div>"
 
-		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style> div, p, body { color: #" . window.Theme.TextColor . "}</style><br>" . text . "</body></html>"
+		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "; overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, p, body { color: #" . window.Theme.TextColor . "}</style><br>" . text . "</body></html>"
 
 		widget1.document.write(html)
 
@@ -246,7 +246,7 @@ class BasicStepWizard extends StepWizard {
 
 		text := "<div style='text-align: center; font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 600'>" . text . "</div>"
 
-		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style> div, p, body { color: #" . window.Theme.TextColor . "}</style><br>" . text . "</body></html>"
+		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "; overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, p, body { color: #" . window.Theme.TextColor . "}</style><br>" . text . "</body></html>"
 
 		widget6.document.write(html)
 
@@ -380,7 +380,7 @@ class BasicStepWizard extends StepWizard {
 
 		text := "<div style='text-align: center; font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 600'>" . text . "</div>"
 
-		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style> div, p, body { color: #" . window.Theme.TextColor . "}</style><br>" . text . "</body></html>"
+		html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "; overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, p, body { color: #" . window.Theme.TextColor . "}</style><br>" . text . "</body></html>"
 
 		widget36.document.write(html)
 

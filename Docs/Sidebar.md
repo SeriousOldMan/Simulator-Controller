@@ -159,6 +159,7 @@
 [Race Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center)
 ------
   - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#introduction)
+  - [Normal vs. Lite UI](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#normal-vs-simple-user-interface)
   - [Connecting to a session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#connecting-to-a-session)
   - [Data Analysis](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#data-analysis)
   - [Strategy Handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#strategy-handling)

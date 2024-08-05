@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.8.3.0-dev]() (Early build for 5.8.3. Changes: New session browser for "Practice Center" and "Race Center", Optimized window position handling and memorization, New race strategy browser, Open sessions and strategies from the "Session Database", Introduced multiple methods to read the broadcasting.json file in ACC, New "Race Center Lite", Open reports in separate window in "Race Center" with Control key modifier, Open reports in separate window in "Race Center" by double-clicking.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-583) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

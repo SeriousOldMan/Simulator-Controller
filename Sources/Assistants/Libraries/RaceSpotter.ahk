@@ -38,6 +38,30 @@ global kDeltaMethodBoth := 3
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+class AheadGapUpdateEvent extends AssistantEvent {
+	Asynchronous {
+		Get {
+			return true
+		}
+	}
+
+	createTrigger(event, phrase, arguments) {
+		return ("The gap to the car number " . Round(arguments[1]) . " ahead got " . (arguments[3] ? "smaller" : "larger") . " It is now " . Round(arguments[2], 1) . " seconds.")
+	}
+}
+
+class BehindGapUpdateEvent extends AssistantEvent {
+	Asynchronous {
+		Get {
+			return true
+		}
+	}
+
+	createTrigger(event, phrase, arguments) {
+		return ("The gap to the car number " . Round(arguments[1]) . " behind got " . (arguments[3] ? "smaller" : "larger") . " It is now " . Round(arguments[2], 1) . " seconds.")
+	}
+}
+
 class AttackImminentEvent extends AssistantEvent {
 	Asynchronous {
 		Get {
@@ -2524,6 +2548,8 @@ class RaceSpotter extends GridRaceAssistant {
 								else
 									speaker.speakPhrase("CantDoIt")
 
+							this.handleEvent("AheadGapUpdate", standingsAhead.Car.Nr, Round(delta, 1), true)
+
 							informed := true
 
 							standingsAhead.reset(sector, false, true)
@@ -2536,6 +2562,8 @@ class RaceSpotter extends GridRaceAssistant {
 															, lapTime: speaker.number2Speech(lapTimeDifference, 1)
 															, deltaLaps: lapDifference
 															, laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]})
+
+							this.handleEvent("AheadGapUpdate", standingsAhead.Car.Nr, Round(delta, 1), false)
 
 							standingsAhead.reset(sector, true, true)
 
@@ -2616,6 +2644,8 @@ class RaceSpotter extends GridRaceAssistant {
 							if !informed
 								speaker.speakPhrase("Focus")
 
+							this.handleEvent("BehindGapUpdate", standingsBehind.Car.Nr, Round(delta, 1), true)
+
 							standingsBehind.reset(sector, false, true)
 
 							spoken := true
@@ -2626,6 +2656,8 @@ class RaceSpotter extends GridRaceAssistant {
 															   , lapTime: speaker.number2Speech(lapTimeDifference, 1)
 															   , deltaLaps: lapDifference
 															   , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]})
+
+							this.handleEvent("BehindGapUpdate", standingsBehind.Car.Nr, Round(delta, 1), false)
 
 							standingsBehind.reset(sector, true, true)
 

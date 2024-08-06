@@ -590,7 +590,7 @@ class SessionDatabase extends ConfigurationItem {
 					knownDrivers[key] := true
 				}
 				catch Any as exception {
-					logError(exception)
+					logError(exception, true)
 				}
 			}
 		}
@@ -613,25 +613,30 @@ class SessionDatabase extends ConfigurationItem {
 	static getDriverIDs(simulator, name, sessionDB := false) {
 		local forName, surName, nickName, ids, ignore, entry
 
-		if (simulator && name) {
-			forName := false
-			surName := false
-			nickName := false
+		try {
+			if (simulator && name) {
+				forName := false
+				surName := false
+				nickName := false
 
-			parseDriverName(name, &forName, &surName, &nickName)
+				parseDriverName(name, &forName, &surName, &nickName)
 
-			if !sessionDB
-				sessionDB := Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
+				if !sessionDB
+					sessionDB := Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
 
-			ids := []
+				ids := []
 
-			for ignore, entry in sessionDB.query("Drivers", {Where: {Forname: forName, Surname: surName}})
-				ids.Push(entry["ID"])
+				for ignore, entry in sessionDB.query("Drivers", {Where: {Forname: forName, Surname: surName}})
+					ids.Push(entry["ID"])
 
-			return ids
+				return ids
+			}
 		}
-		else
-			return false
+		catch Any as exception {
+			logError(exception, true)
+		}
+
+		return false
 	}
 
 	getDriverIDs(simulator, name, sessionDB := false) {
@@ -641,29 +646,32 @@ class SessionDatabase extends ConfigurationItem {
 	static getDriverNames(simulator, id, sessionDB := false) {
 		local drivers, ignore, driver
 
-		if (simulator && id) {
-			if !sessionDB
-				sessionDB := Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
+		try {
+			if (simulator && id) {
+				if !sessionDB
+					sessionDB := Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
 
-			drivers := []
-
-			for ignore, driver in sessionDB.query("Drivers", {Where: {ID: id}})
-				drivers.Push(driverName(driver["Forname"], driver["Surname"], driver["Nickname"]))
-
-			return ((drivers.Length = 0) ? ["John Doe (JD)"] : drivers)
-		}
-		else if id {
-			for ignore, simulator in SessionDatabase.getSimulators() {
-				sessionDB := Database(kDatabaseDirectory . "User\" . SessionDatabase.getSimulatorCode(simulator) . "\", kSessionSchemas)
+				drivers := []
 
 				for ignore, driver in sessionDB.query("Drivers", {Where: {ID: id}})
-					return Array(driverName(driver["Forname"], driver["Surname"], driver["Nickname"]))
-			}
+					drivers.Push(driverName(driver["Forname"], driver["Surname"], driver["Nickname"]))
 
-			return ["John Doe (JD)"]
+				return ((drivers.Length = 0) ? ["John Doe (JD)"] : drivers)
+			}
+			else if id {
+				for ignore, simulator in SessionDatabase.getSimulators() {
+					sessionDB := Database(kDatabaseDirectory . "User\" . SessionDatabase.getSimulatorCode(simulator) . "\", kSessionSchemas)
+
+					for ignore, driver in sessionDB.query("Drivers", {Where: {ID: id}})
+						return Array(driverName(driver["Forname"], driver["Surname"], driver["Nickname"]))
+				}
+			}
 		}
-		else
-			return ["John Doe (JD)"]
+		catch Any as exception {
+			logError(exception, true)
+		}
+
+		return ["John Doe (JD)"]
 	}
 
 	getDriverNames(simulator, id, sessionDB := false) {
@@ -1192,50 +1200,62 @@ class SessionDatabase extends ConfigurationItem {
 			if !settingsDB
 				settingsDB := SettingsDatabase()
 
-			compounds := settingsDB.readSettingValue(simulator, car, track, "*"
-												   , "Session Settings", "Tyre.Compound.Choices"
-												   , kUndefined)
-			data := SessionDatabase.loadData(SessionDatabase.sTyreData, code, "Tyre Data.ini")
-
-			if ((compounds == kUndefined) || (compounds = "")) {
-				compounds := getMultiMapValue(data, "Cars", car . ";" . track, kUndefined)
-
-				if (compounds == kUndefined)
-					compounds := getMultiMapValue(data, "Cars", car . ";*", kUndefined)
-
-				if (compounds == kUndefined)
-					compounds := getMultiMapValue(data, "Cars", "*;" . track, kUndefined)
-
-				if (compounds == kUndefined)
-					compounds := getMultiMapValue(data, "Cars", "*;*", kUndefined)
-			}
-
-			if (compounds == kUndefined) {
-				if (code = "ACC")
-					compounds := "Dry->Dry;Wet->Wet"
-				else
-					compounds := "*->Dry"
-			}
-			else {
-				candidate := getMultiMapValue(data, "Compounds", compounds, false)
-
-				if candidate
-					compounds := candidate
-			}
-
 			cds := []
 			nms := []
 
-			if InStr(compounds, ";")
-				compounds := string2Values(";", compounds)
-			else
-				compounds := string2Values(",", compounds)
+			try {
+				compounds := settingsDB.readSettingValue(simulator, car, track, "*"
+													   , "Session Settings", "Tyre.Compound.Choices"
+													   , kUndefined)
+				data := SessionDatabase.loadData(SessionDatabase.sTyreData, code, "Tyre Data.ini")
 
-			for ignore, compound in compounds {
-				compound := string2Values("->", compound)
+				if ((compounds == kUndefined) || (compounds = "")) {
+					compounds := getMultiMapValue(data, "Cars", car . ";" . track, kUndefined)
 
-				cds.Push(compound[1])
-				nms.Push(normalizeCompound(compound[2]))
+					if (compounds == kUndefined)
+						compounds := getMultiMapValue(data, "Cars", car . ";*", kUndefined)
+
+					if (compounds == kUndefined)
+						compounds := getMultiMapValue(data, "Cars", "*;" . track, kUndefined)
+
+					if (compounds == kUndefined)
+						compounds := getMultiMapValue(data, "Cars", "*;*", kUndefined)
+				}
+
+				if (compounds == kUndefined) {
+					if (code = "ACC")
+						compounds := "Dry->Dry;Wet->Wet"
+					else
+						compounds := "*->Dry"
+				}
+				else {
+					candidate := getMultiMapValue(data, "Compounds", compounds, false)
+
+					if candidate
+						compounds := candidate
+				}
+
+				if InStr(compounds, ";")
+					compounds := string2Values(";", compounds)
+				else
+					compounds := string2Values(",", compounds)
+
+				for ignore, compound in compounds {
+					compound := string2Values("->", compound)
+
+					if (compound.Length = 2) {
+						cds.Push(compound[1])
+						nms.Push(normalizeCompound(compound[2]))
+					}
+				}
+			}
+			catch Any as exception {
+				logError(exception, true)
+			}
+
+			if (cds.Length = 0) {
+				cds.Push((code = "ACC") ? "Dry" : "*")
+				nms.Push("Dry (Black)")
 			}
 
 			if codes

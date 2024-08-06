@@ -14,7 +14,7 @@
      Note: To load a session that has been saved in the old, directory-based format prior to Release 5.8.1, hold down the Control key and click on the "Import..." button.
   8. The same browser is now used when loading Strategies, either in the "Strategy Workbench" or in the "Race Center".
   9. The "Session Database" has a new tab, which allows you to browse the sessions stored in the database.
-  10. Sessions and Strategies can be opened in the "Practice Center", "Race Center" or "Strategy Workbench" respectively by double-clicking on them in the "Session Database".
+  10. Sessions and Strategies can be opened for viewing them in the "Practice Center", "Race Center" or "Strategy Workbench" respectively by double-clicking on them in the "Session Database".
   11. A new kind of user interface has been introduced for the "Race Center". This so called [*Lite* mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#normal-vs-simple-user-interface), which is available when starting with a specialized profile from "Simulator Startup" or by holding down the Alt key, when starting "Race Center", presents only the most important information and is therefore suitable for team members in the driver role.
   12. All reports the "Race Center" presents in the *Output* area in the lower right corner of the main window can now be opened in a separate window, when holding down the Control key when selecting them.
 

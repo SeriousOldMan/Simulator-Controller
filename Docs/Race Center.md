@@ -28,6 +28,8 @@ However, if a driver wants to inspect specific data in more detail, for example 
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2025.JPG)
 
+IMPORTANT: This simplified interface use the Team Server credentials as configured for the driver in the ["Team" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#preparing-a-team-session) of the "Race Settings" application. There is no option to load a previous session stored in the "Session Database", and so on. Therefore, the Lite mode can only be used while participating as a driver in a team race.
+
 ### Connecting to a Session
 
 To use the "Race Center", you must have a valid connection to a team session. This is normally handled by entering the corresponding Server URL and session token into the ["Race Settings" application](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#preparing-a-team-session), but you can even connect to a team session without being an active driver in the session by entering the session token supplied by your team manager directly into the field at the top of the "Race Center" window. Then either click on the small button with the key on the left of the token field or choose "Connect" from the "Session" menu. As an alternative, you can hold down the Control key, while pressing on the "Key" button or choosing the menu command, which will open a login dialog where you can enter the login credentials of the team manager. Please do not use a refresh cycle smaller than 10 seconds when connected to a managed Team Server, since this will increase the running costs on Azure dramatically.

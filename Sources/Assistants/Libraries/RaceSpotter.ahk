@@ -38,37 +38,27 @@ global kDeltaMethodBoth := 3
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class AheadGapUpdateEvent extends AssistantEvent {
+class SpotterEvent extends AssistantEvent {
 	Asynchronous {
 		Get {
 			return true
 		}
 	}
+}
 
+class AheadGapUpdateEvent extends SpotterEvent {
 	createTrigger(event, phrase, arguments) {
 		return ("The gap to the car number " . Round(arguments[1]) . " ahead got " . (arguments[3] ? "smaller" : "larger") . " It is now " . Round(arguments[2], 1) . " seconds.")
 	}
 }
 
-class BehindGapUpdateEvent extends AssistantEvent {
-	Asynchronous {
-		Get {
-			return true
-		}
-	}
-
+class BehindGapUpdateEvent extends SpotterEvent {
 	createTrigger(event, phrase, arguments) {
 		return ("The gap to the car number " . Round(arguments[1]) . " behind got " . (arguments[3] ? "smaller" : "larger") . " It is now " . Round(arguments[2], 1) . " seconds.")
 	}
 }
 
-class AttackImminentEvent extends AssistantEvent {
-	Asynchronous {
-		Get {
-			return true
-		}
-	}
-
+class AttackImminentEvent extends SpotterEvent {
 	createTrigger(event, phrase, arguments) {
 		return ("An opponent has closed in and an attack might happen soon. The gap to car number " . Round(arguments[1]) . " is only " . Round(arguments[2], 1) . " seconds.")
 	}

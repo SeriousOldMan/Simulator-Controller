@@ -30,13 +30,16 @@
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class PitstopUpcomingEvent extends AssistantEvent {
+
+class StrategistEvent extends AssistantEvent {
 	Asynchronous {
 		Get {
 			return true
 		}
 	}
+}
 
+class PitstopUpcomingEvent extends StrategistEvent {
 	createTrigger(event, phrase, arguments) {
 		return ("The next pitstop is upcoming in lap " . arguments[1] . ".")
 	}
@@ -49,13 +52,7 @@ class PitstopUpcomingEvent extends AssistantEvent {
 	}
 }
 
-class WeatherForecastEvent extends AssistantEvent {
-	Asynchronous {
-		Get {
-			return true
-		}
-	}
-
+class WeatherForecastEvent extends StrategistEvent {
 	createTrigger(event, phrase, arguments) {
 		local trigger := ("The weather will change to " . arguments[1] . " in " . arguments[2] . ".")
 

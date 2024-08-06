@@ -27,13 +27,15 @@
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class FuelLowEvent extends AssistantEvent {
+class EngineerEvent extends AssistantEvent {
 	Asynchronous {
 		Get {
 			return true
 		}
 	}
+}
 
+class FuelLowEvent extends EngineerEvent {
 	createTrigger(event, phrase, arguments) {
 		return ("Fuel is running low. " . Round(arguments[1], 1) . " Liters remaining which are good for " . Floor(arguments[2]) . " more laps.")
 	}
@@ -46,13 +48,7 @@ class FuelLowEvent extends AssistantEvent {
 	}
 }
 
-class DamageEvent extends AssistantEvent {
-	Asynchronous {
-		Get {
-			return true
-		}
-	}
-
+class DamageEvent extends EngineerEvent {
 	createArguments(event, arguments) {
 		local result := []
 
@@ -81,13 +77,7 @@ class DamageEvent extends AssistantEvent {
 	}
 }
 
-class TimeLossEvent extends AssistantEvent {
-	Asynchronous {
-		Get {
-			return true
-		}
-	}
-
+class TimeLossEvent extends EngineerEvent {
 	createArguments(event, arguments) {
 		local result := []
 
@@ -109,13 +99,7 @@ class TimeLossEvent extends AssistantEvent {
 	}
 }
 
-class PressureLossEvent extends AssistantEvent {
-	Asynchronous {
-		Get {
-			return true
-		}
-	}
-
+class PressureLossEvent extends EngineerEvent {
 	createTrigger(event, phrase, arguments) {
 		static tyres := CaseInsenseMap("FL", "front left", "FR", "front right", "RL", "rear left", "RR", "rear right")
 
@@ -130,13 +114,7 @@ class PressureLossEvent extends AssistantEvent {
 	}
 }
 
-class WeatherForecastEvent extends AssistantEvent {
-	Asynchronous {
-		Get {
-			return true
-		}
-	}
-
+class WeatherForecastEvent extends EngineerEvent {
 	createTrigger(event, phrase, arguments) {
 		local trigger := ("The weather will change to " . arguments[1] . " in " . arguments[2] . ".")
 

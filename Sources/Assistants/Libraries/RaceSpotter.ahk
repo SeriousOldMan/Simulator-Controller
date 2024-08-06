@@ -70,7 +70,7 @@ class AttackImminentEvent extends AssistantEvent {
 	}
 
 	createTrigger(event, phrase, arguments) {
-		return ("An opponent is closing in and an attack might happen soon. The gap to car number " . Round(arguments[1]) . " is only " . Round(arguments[2], 1) . " seconds.")
+		return ("An opponent has closed in and an attack might happen soon. The gap to car number " . Round(arguments[1]) . " is only " . Round(arguments[2], 1) . " seconds.")
 	}
 }
 

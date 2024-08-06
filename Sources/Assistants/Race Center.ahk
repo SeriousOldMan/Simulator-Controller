@@ -2146,6 +2146,17 @@ class RaceCenter extends ConfigurationItem {
 			centerGui.Add("DropDownList", "x750 yp w180 Choose1 +0x200 vpitstopMenuDropDown").OnEvent("Change", pitstopMenu)
 		}
 		else {
+			centerGui.SetFont("s10 Bold", "Arial")
+
+			centerGui.Add("Text", "w601 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(centerGui, "Race Center Lite"))
+
+			centerGui.SetFont("s9 Norm", "Arial")
+
+			centerGui.Add("Documentation", "x292 YP+20 w134 H:Center Center", translate("Race Center")
+						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center")
+
+			centerGui.Add("Text", "x8 yp+30 w601 W:Grow 0x10")
+
 			centerGui.Add("Text", "x" . (580 - 288) . " yp+12 w281 0x2 X:Move vmessageField")
 
 			this.iWaitViewer := centerGui.Add("HTMLViewer", "x580 yp-8 w30 h30 X:Move vwaitViewer Hidden")

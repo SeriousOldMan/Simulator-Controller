@@ -1,3 +1,8 @@
 #include Position.events
 [Agent.Events]
-Active=position_lost,position_gained
+Active=position_lost,position_gained,attack_imminent
+[Agent.Events.Builtin]
+attack_imminent=Assistant.Class|AttackImminentEvent|AttackImminent||2|Signals that an opponent is closing in and an attack will happen soon.
+[Agent.Events.Parameters]
+attack_imminent.1=carNumber|Integer||true|The race or car number of the car closing in.
+attack_imminent.2=delta|Number||true|The gap in seconds to the car behind.

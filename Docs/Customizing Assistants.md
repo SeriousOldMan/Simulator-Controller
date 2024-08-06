@@ -658,6 +658,7 @@ Beside the predefined actions for the different Assistant, which come with the s
 |-----------------------------|-------------------|-------------|
 | Position Lost               | 1. [Required] previousPosition<br>2. [Required] currentPosition | This event is signalled, if one or more positions has just been lost. *previousPosition* and *currentPosition* inidcate the position before and after the overtake. |
 | Position Gained             | 1. [Required] previousPosition<br>2. [Required] currentPosition | This event is signalled, if one or more positions has just been gained. *previousPosition* and *currentPosition* inidcate the position before and after the overtake. |
+| Attack Imminent             | 1. [Required] carNumber<br>2. [Required] gelta | This event is signalled, when an opponent is closing in and an attack might happen soon. *carNumber* is the car or race number of the car closing in and *delta* is the current gap in seconds. |
 
 ### Connecting Events & Actions
 

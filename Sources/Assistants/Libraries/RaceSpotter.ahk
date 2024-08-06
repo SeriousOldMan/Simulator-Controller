@@ -38,6 +38,18 @@ global kDeltaMethodBoth := 3
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+class AttackImminentEvent extends AssistantEvent {
+	Asynchronous {
+		Get {
+			return true
+		}
+	}
+
+	createTrigger(event, phrase, arguments) {
+		return ("An opponent is closing in and an attack might happen soon. The gap to car number " . Round(arguments[1]) . " is only " . Round(arguments[2], 1) . " seconds.")
+	}
+}
+
 class CarInfo {
 	iSpotter := false
 
@@ -2565,6 +2577,8 @@ class RaceSpotter extends GridRaceAssistant {
 					car := standingsBehind.Car
 
 					this.informSectorDifference(car, "Behind")
+
+					this.handleEvent("AttackImminent", standingsBehind.Car.Nr, Round(delta, 1))
 
 					unsafe := true
 

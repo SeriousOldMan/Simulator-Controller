@@ -2826,53 +2826,54 @@ runSpecialTargets(&buildProgress) {
 	local mode := ((gTargetConfiguration = "Development") ? "Debug" : "Release")
 	local index, directory, file, success, solution, text, ignore, result
 
-	try {
-		for index, directory in getFileNames("*", kSourcesDirectory . "Special\") {
-			SetWorkingDir(directory)
+	if (StrLen(Trim(kMSBuildDirectory)) > 0)
+		try {
+			for index, directory in getFileNames("*", kSourcesDirectory . "Special\") {
+				SetWorkingDir(directory)
 
-			for ignore, file in getFileNames("*.sln", directory . "\") {
-				success := true
-
-				SplitPath(file, , , , &solution)
-
-				if !kSilentMode
-					showProgress({progress: ++buildProgress, message: translate("Compiling ") . solution . translate("...")})
-
-				try {
-					if (InStr(solution, "Microsoft Speech") || InStr(solution, "AC UDP Provider"))
-						result := RunWait(A_ComSpec . " /c `"`"" . msBuild . "`" `"" . file . "`" /p:BuildMode=Release /p:Configuration=Release /p:Platform=`"x64`" > `"" . kTempDirectory . "Special Build.out`"`"", , "Hide")
-					else
-						result := RunWait(A_ComSpec . " /c `"`"" . msBuild .  "`" `"" . file . "`" /p:BuildMode=Release /p:Configuration=Release > `"" . kTempDirectory . "Special Build.out`"`"", , "Hide")
-
-					if result {
-						success := false
-
-						text := FileRead(kTempDirectory . "Special Build.out")
-
-						if (StrLen(Trim(text)) == 0)
-							throw "Error while compiling..."
-					}
-				}
-				catch Any as exception {
-					logMessage(kLogCritical, translate("Cannot compile ") . solution . translate(" - Solution or MSBuild (") . msBuild . translate(") not found"))
-
-					showMessage(substituteVariables(translate("Cannot compile %solution%: Solution or MSBuild (%msBuild%) not found..."), {solution: solution, msBuild: msBuild})
-							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-
+				for ignore, file in getFileNames("*.sln", directory . "\") {
 					success := true
+
+					SplitPath(file, , , , &solution)
+
+					if !kSilentMode
+						showProgress({progress: ++buildProgress, message: translate("Compiling ") . solution . translate("...")})
+
+					try {
+						if (InStr(solution, "Microsoft Speech") || InStr(solution, "AC UDP Provider"))
+							result := RunWait(A_ComSpec . " /c `"`"" . msBuild . "`" `"" . file . "`" /p:BuildMode=Release /p:Configuration=Release /p:Platform=`"x64`" > `"" . kTempDirectory . "Special Build.out`"`"", , "Hide")
+						else
+							result := RunWait(A_ComSpec . " /c `"`"" . msBuild .  "`" `"" . file . "`" /p:BuildMode=Release /p:Configuration=Release > `"" . kTempDirectory . "Special Build.out`"`"", , "Hide")
+
+						if result {
+							success := false
+
+							text := FileRead(kTempDirectory . "Special Build.out")
+
+							if (StrLen(Trim(text)) == 0)
+								throw "Error while compiling..."
+						}
+					}
+					catch Any as exception {
+						logMessage(kLogCritical, translate("Cannot compile ") . solution . translate(" - Solution or MSBuild (") . msBuild . translate(") not found"))
+
+						showMessage(substituteVariables(translate("Cannot compile %solution%: Solution or MSBuild (%msBuild%) not found..."), {solution: solution, msBuild: msBuild})
+								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+
+						success := true
+					}
+
+					if !success
+						viewBuildLog(kTempDirectory . "Special Build.out", translate("Error while compiling ") . solution, "Left", "Top", 800, 600)
+
+					if FileExist(kTempDirectory . "Special Build.out")
+						deleteFile(kTempDirectory . "Special Build.out")
 				}
-
-				if !success
-					viewBuildLog(kTempDirectory . "Special Build.out", translate("Error while compiling ") . solution, "Left", "Top", 800, 600)
-
-				if FileExist(kTempDirectory . "Special Build.out")
-					deleteFile(kTempDirectory . "Special Build.out")
 			}
 		}
-	}
-	finally {
-		SetWorkingDir(currentDirectory)
-	}
+		finally {
+			SetWorkingDir(currentDirectory)
+		}
 }
 
 runUpdateTargets(&buildProgress) {

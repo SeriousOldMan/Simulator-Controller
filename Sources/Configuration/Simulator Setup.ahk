@@ -2701,7 +2701,7 @@ class StartStepWizard extends StepWizard {
 
 			this.registerWidgets(2, widget1, widget2, widget3, widget4)
 		}
-		else
+		else {
 			for ignore, directory in [kBinariesDirectory, kResourcesDirectory . "Setup\Installer\"
 									, kResourcesDirectory . "Setup\Windows Runtimes\", kResourcesDirectory . "Setup\Plugins\"] {
 				currentDirectory := A_WorkingDir
@@ -2718,6 +2718,16 @@ class StartStepWizard extends StepWizard {
 					SetWorkingDir(currentDirectory)
 				}
 			}
+
+			fixIE(11, "Session Database.exe")
+			fixIE(11, "Setup Workbench.exe")
+			fixIE(11, "Race Reports.exe")
+			fixIE(11, "Strategy Workbench.exe")
+			fixIE(11, "Practice Center.exe")
+			fixIE(11, "Race Center.exe")
+			fixIE(10, "Simulator Setup.exe")
+			fixIE(11, "System Monitor.exe")
+		}
 	}
 
 	reset() {

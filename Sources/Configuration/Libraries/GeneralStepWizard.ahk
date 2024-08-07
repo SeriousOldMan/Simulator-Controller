@@ -83,6 +83,16 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		if wizard.isModuleSelected("Voice Control") {
 			voiceControlConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Voice Control Configuration.ini")
 
+			if (Trim(getMultiMapValue(voiceControlConfiguration, "Voice Control", "SoX Path", "")) = "") {
+				path := wizard.softwarePath("SoX")
+
+				if path {
+					SplitPath(path, , &directory)
+
+					setMultiMapValue(voiceControlConfiguration, "Voice Control", "SoX Path", directory)
+				}
+			}
+
 			for ignore, section in ["Voice Control"] {
 				subConfiguration := getMultiMapValues(voiceControlConfiguration, section, false)
 
@@ -435,7 +445,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 
 			first := false
 
-			if (getMultiMapValue(configuration, "Voice Control", "SoX Path", "") = "") {
+			if (Trim(getMultiMapValue(configuration, "Voice Control", "SoX Path", "")) = "") {
 				path := wizard.softwarePath("SoX")
 
 				if path {

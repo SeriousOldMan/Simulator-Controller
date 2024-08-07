@@ -58,7 +58,7 @@ Four different color schemes are available:
 |------------|--------------------------------------------------------------------------------|---------|
 | Classic    | This is the default and original color scheme with a light gray background.    | ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Theme%20Classic.JPG) |
 | Gray       | Quite similar to *Classic*, but with darker gray tones.                        | ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Theme%20Gray.JPG) |
-| Light      | A very bright color scheme using the default colors of Windows 10 / 11.        | ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Theme%20Light.JPG) |
+| Bright     | A very bright color scheme using the default colors of Windows 10 / 11.        | ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Theme%20Light.JPG) |
 | Dark       | Fully inverted color scheme based on the dark color scheme of Windows 10 / 11. | ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Theme%20Dark.JPG) |
 
 ### More Settings & Configurations

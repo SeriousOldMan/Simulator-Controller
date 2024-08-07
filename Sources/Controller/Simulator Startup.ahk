@@ -2531,6 +2531,15 @@ startSimulator() {
 
 					Run("Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File", , "Hide", &pid)
 
+					fixIE(11, "Session Database.exe")
+					fixIE(11, "Setup Workbench.exe")
+					fixIE(11, "Race Reports.exe")
+					fixIE(11, "Strategy Workbench.exe")
+					fixIE(11, "Practice Center.exe")
+					fixIE(11, "Race Center.exe")
+					fixIE(10, "Simulator Setup.exe")
+					fixIE(11, "System Monitor.exe")
+
 					while ProcessExist(pid) {
 						showProgress({progress: Min(100, progress++)})
 

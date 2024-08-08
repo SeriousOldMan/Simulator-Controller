@@ -18,8 +18,7 @@
   11. Sessions and Strategies can be opened for viewing them in the "Practice Center", "Race Center" or "Strategy Workbench" respectively by double-clicking on them in the "Session Database".
   12. A new kind of user interface has been introduced for the "Race Center". This so called [*Lite* mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#normal-vs-simple-user-interface), which is available when starting with a specialized profile from "Simulator Startup" or by holding down the Alt key, when starting "Race Center", presents only the most important information and is therefore suitable for team members in the driver role.
   13. All reports the "Race Center" presents in the *Output* area in the lower right corner of the main window can now be opened in a separate window, when holding down the Control key when selecting them.
-  14. The color scheme "Light" has been renamed to "Bright".
-  15. "Simulator Startup" removes assets specific to the Team Server from the UI, if no Team Server is configured.
+  14. "Simulator Startup" removes assets specific to the Team Server from the UI, if no Team Server is configured.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-583), if you are using Assistant Boosters.
 

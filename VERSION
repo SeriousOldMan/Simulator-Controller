@@ -1,8 +1,8 @@
 [Development]
-Version=5.8.3.0-dev
+Version=5.8.3.0-beta
 Target=5.8.3.0-release
-Date=08/06/2024
-Download=https://www.dropbox.com/scl/fi/3h8mtetgih7j2lcvyiv88/Simulator-Controller-5.8.3.0-dev.zip?rlkey=1f2x5rpynmb5plsxtdcdonub5&st=ptfyctwu&dl=1
+Date=08/08/2024
+Download=https://www.dropbox.com/scl/fi/fvjay5zbhaxjeit9cgb6c/Simulator-Controller-5.8.3.0-beta.zip?rlkey=4gutqiqyc5j6v0rjrbf0qth3f&st=xj9t6j2k&dl=1
 Changes=New session browser for "Practice Center" and "Race Center", Optimized window position handling and memorization, New race strategy browser, Open sessions and strategies from the "Session Database", Introduced multiple methods to read the broadcasting.json file in ACC, New "Race Center Lite", Open reports in separate window in "Race Center" with Control key modifier, Open reports in separate window in "Race Center" by double-clicking, New events "ahead_gap_update", "behind_gap_update" and "attack_imminent" for the Race Spotter LLM integration
 Components=Media->5.6.1,Configuration->5.8.2,Utilities->5.4.8
 [Release]
@@ -24,5 +24,5 @@ Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Ut
 [Current]
 Type=Development
 [Version]
-Development=5.8.3.0-dev
+Development=5.8.3.0-beta
 Release=5.8.2.0-release

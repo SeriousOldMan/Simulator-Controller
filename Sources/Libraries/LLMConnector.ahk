@@ -817,7 +817,7 @@ class LLMConnector {
 							Sleep(10)
 					}
 
-				loop 120
+				loop (isDebug() ? (60 * 60 * 24) : 120)
 					try
 						if FileExist(kTempDirectory . "LLMRuntime.out") {
 							Sleep(500)

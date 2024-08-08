@@ -638,6 +638,32 @@ launchPad(command := false, arguments*) {
 		}
 	}
 
+	disabledIcon(fileName) {
+		return modifiedIcon(fileName, "Dsbld", (graphics, bitmap) {
+			local x, y, value, red, green, blue, gray
+
+			loop Gdip_GetImageHeight(bitmap) {
+				y := A_Index - 1
+
+				loop Gdip_GetImageWidth(bitmap) {
+					x := A_Index - 1
+
+					value := Gdip_GetPixel(bitmap, x, y)
+
+					red := (0x00FF0000 & value)
+					red := (red >> 16)
+					blue := (0x0000FF00 & value)
+					blue := (blue >> 8)
+					green := (0x000000FF & value)
+
+					gray := Round((0.299 * red) + (0.587 * green) + (0.114 * blue))
+
+					Gdip_SetPixel(bitmap, x, y, ((value & 0xFF000000) + (gray << 16) + (gray << 8) + gray))
+				}
+			}
+		})
+	}
+
 	if (command = kClose) {
 		if ((arguments.Length > 0) && arguments[1])
 			launchPad("Close All")
@@ -747,7 +773,9 @@ launchPad(command := false, arguments*) {
 		toolTips["StrategyWorkbench"] := "Strategy Workbench: Find the best strategy for an upcoming race."
 		toolTips["PracticeCenter"] := "Practice Center: Make the most out of your practice sessions."
 		toolTips["RaceCenter"] := "Race Center: Manage your team and control the race during an event using the Team Server."
-		toolTips["ServerAdministration"] := "Server Administration: Manage accounts and access rights on your Team Server. Only needed, when you run your own Team Server."
+
+		if hasTeamServer
+			toolTips["ServerAdministration"] := "Server Administration: Manage accounts and access rights on your Team Server. Only needed, when you run your own Team Server."
 
 		toolTips["SimulatorSetup"] := "Setup & Configuration: Describe and generate the configuration of Simulator Controller using a simple point and click wizard. Suitable for beginners."
 		toolTips["SimulatorConfiguration"] := "Configuration: Directly edit the configuration of Simulator Controller. Requires profund knowledge of the internals of the various plugins."
@@ -762,7 +790,10 @@ launchPad(command := false, arguments*) {
 		executables["StrategyWorkbench"] := "Strategy Workbench.exe"
 		executables["PracticeCenter"] := "Practice Center.exe"
 		executables["RaceCenter"] := "Race Center.exe"
-		executables["ServerAdministration"] := "Server Administration.exe"
+
+		if hasTeamServer
+			executables["ServerAdministration"] := "Server Administration.exe"
+
 		executables["SimulatorSetup"] := "Simulator Setup.exe"
 		executables["SimulatorConfiguration"] := "Simulator Configuration.exe"
 		executables["SimulatorDownload"] := "Simulator Download.exe"
@@ -772,20 +803,25 @@ launchPad(command := false, arguments*) {
 		executables["SetupWorkbench"] := "Setup Workbench.exe"
 		executables["SystemMonitor"] := "System Monitor.exe"
 
-		icons["Startup"] := kIconsDirectory . "Startup.ico"
-		icons["RaceReports"] := kIconsDirectory . "Chart.ico"
-		icons["StrategyWorkbench"] := kIconsDirectory . "Workbench.ico"
-		icons["PracticeCenter"] := kIconsDirectory . "Practice.ico"
-		icons["RaceCenter"] := kIconsDirectory . "Console.ico"
-		icons["ServerAdministration"] := kIconsDirectory . "Server Administration.ico"
-		icons["SimulatorSetup"] := kIconsDirectory . "Configuration Wand.ico"
-		icons["SimulatorConfiguration"] := kIconsDirectory . "Configuration.ico"
-		icons["SimulatorDownload"] := kIconsDirectory . "Installer.ico"
-		icons["SimulatorSettings"] := kIconsDirectory . "Settings.ico"
-		icons["RaceSettings"] := kIconsDirectory . "Race Settings.ico"
-		icons["SessionDatabase"] := kIconsDirectory . "Session Database.ico"
-		icons["SetupWorkbench"] := kIconsDirectory . "Setup.ico"
-		icons["SystemMonitor"] := kIconsDirectory . "Monitoring.ico"
+		icons["Startup"] := (kIconsDirectory . "Startup.ico")
+		icons["RaceReports"] := (kIconsDirectory . "Chart.ico")
+		icons["StrategyWorkbench"] := (kIconsDirectory . "Workbench.ico")
+		icons["PracticeCenter"] := (kIconsDirectory . "Practice.ico")
+		icons["RaceCenter"] := (kIconsDirectory . "Console.ico")
+
+		if hasTeamServer
+			icons["ServerAdministration"] := (kIconsDirectory . "Server Administration.ico")
+		else
+			icons["ServerAdministration"] := disabledIcon(kIconsDirectory . "Server Administration.ico")
+
+		icons["SimulatorSetup"] := (kIconsDirectory . "Configuration Wand.ico")
+		icons["SimulatorConfiguration"] := (kIconsDirectory . "Configuration.ico")
+		icons["SimulatorDownload"] := (kIconsDirectory . "Installer.ico")
+		icons["SimulatorSettings"] := (kIconsDirectory . "Settings.ico")
+		icons["RaceSettings"] := (kIconsDirectory . "Race Settings.ico")
+		icons["SessionDatabase"] := (kIconsDirectory . "Session Database.ico")
+		icons["SetupWorkbench"] := (kIconsDirectory . "Setup.ico")
+		icons["SystemMonitor"] := (kIconsDirectory . "Monitoring.ico")
 
 		launchPadGui := StartupWindow()
 
@@ -819,17 +855,17 @@ launchPad(command := false, arguments*) {
 
 		launchPadGui.SetFont("s7 Norm", "Arial")
 
-		launchPadGui.Add("Picture", "x16 yp+24 w60 h60 Section vStartup", kIconsDirectory . "Startup.ico").OnEvent("Click", launchStartup.Bind(false))
+		launchPadGui.Add("Picture", "x16 yp+24 w60 h60 Section vStartup", icons["Startup"]).OnEvent("Click", launchStartup.Bind(false))
 		widget := launchPadGui.Add("Picture", "x59 yp+43 w14 h14 BackgroundTrans vlaunchProfilesButton", kIconsDirectory . "General Settings White.ico")
 		widget.OnEvent("Click", launchStartup.Bind(true))
 
-		launchPadGui.Add("Picture", "xp+47 ys w60 h60 vRaceSettings", kIconsDirectory . "Race Settings.ico").OnEvent("Click", launchApplication.Bind("RaceSettings"))
-		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vSessionDatabase", kIconsDirectory . "Session Database.ico").OnEvent("Click", launchApplication.Bind("SessionDatabase"))
+		launchPadGui.Add("Picture", "xp+47 ys w60 h60 vRaceSettings", icons["RaceSettings"]).OnEvent("Click", launchApplication.Bind("RaceSettings"))
+		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vSessionDatabase", icons["SessionDatabase"]).OnEvent("Click", launchApplication.Bind("SessionDatabase"))
 
-		launchPadGui.Add("Picture", "xp+90 yp w60 h60 vPracticeCenter", kIconsDirectory . "Practice.ico").OnEvent("Click", launchApplication.Bind("PracticeCenter"))
-		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vStrategyWorkbench", kIconsDirectory . "Workbench.ico").OnEvent("Click", launchApplication.Bind("StrategyWorkbench"))
+		launchPadGui.Add("Picture", "xp+90 yp w60 h60 vPracticeCenter", icons["PracticeCenter"]).OnEvent("Click", launchApplication.Bind("PracticeCenter"))
+		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vStrategyWorkbench", icons["StrategyWorkbench"]).OnEvent("Click", launchApplication.Bind("StrategyWorkbench"))
 
-		widget := launchPadGui.Add("Picture", "xp+74 yp w60 h60 vRaceCenter", kIconsDirectory . "Console.ico")
+		widget := launchPadGui.Add("Picture", "xp+74 yp w60 h60 vRaceCenter", icons["RaceCenter"])
 
 		if hasTeamServer {
 			widget.OnEvent("Click", teamManager.Bind(false))
@@ -837,15 +873,13 @@ launchPad(command := false, arguments*) {
 			widget := launchPadGui.Add("Picture", "xp+4 yp+43 w14 h14 BackgroundTrans vteamManagerButton", kIconsDirectory . "General Settings White.ico")
 			widget.OnEvent("Click", teamManager.Bind(true))
 
-			launchPadGui.Add("Picture", "xp+86 yp-43 w60 h60 vRaceReports", kIconsDirectory . "Chart.ico").OnEvent("Click", launchApplication.Bind("RaceReports"))
+			launchPadGui.Add("Picture", "xp+86 yp-43 w60 h60 vRaceReports", icons["RaceReports"]).OnEvent("Click", launchApplication.Bind("RaceReports"))
 		}
 		else {
 			widget.OnEvent("Click", launchApplication.Bind("RaceCenter"))
 
-			launchPadGui.Add("Picture", "xp+90 yp w60 h60 vRaceReports", kIconsDirectory . "Chart.ico").OnEvent("Click", launchApplication.Bind("RaceReports"))
+			launchPadGui.Add("Picture", "xp+90 yp w60 h60 vRaceReports", icons["RaceReports"]).OnEvent("Click", launchApplication.Bind("RaceReports"))
 		}
-
-		; launchPadGui.Add("Picture", "xp+184 yp w60 h60 vSystemMonitor", kIconsDirectory . "Monitoring.ico").OnEvent("Click", launchApplication.Bind("SystemMonitor"))
 
 		startupButton := launchPadGui.Add("Text", "x16 yp+64 w60 h23 Center", "Startup")
 
@@ -856,21 +890,32 @@ launchPad(command := false, arguments*) {
 		launchPadGui.Add("Text", "xp+74 yp w60 h40 Center", "Race Center")
 		launchPadGui.Add("Text", "xp+90 yp w60 h40 Center", "Race Reports")
 
-		launchPadGui.Add("Picture", "x16 ys+104 w60 h60 vSystemMonitor", kIconsDirectory . "Monitoring.ico").OnEvent("Click", launchApplication.Bind("SystemMonitor"))
-		launchPadGui.Add("Picture", "xp+126 ys+104 w60 h60 vSetupWorkbench", kIconsDirectory . "Setup.ico").OnEvent("Click", launchApplication.Bind("SetupWorkbench"))
+		launchPadGui.Add("Picture", "x16 ys+104 w60 h60 vSystemMonitor", icons["SystemMonitor"]).OnEvent("Click", launchApplication.Bind("SystemMonitor"))
+		launchPadGui.Add("Picture", "xp+126 ys+104 w60 h60 vSetupWorkbench", icons["SetupWorkbench"]).OnEvent("Click", launchApplication.Bind("SetupWorkbench"))
 
-		launchPadGui.Add("Picture", "xp+128 yp w60 h60 vSimulatorSetup", kIconsDirectory . "Configuration Wand.ico").OnEvent("Click", launchApplication.Bind("SimulatorSetup"))
-		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vSimulatorConfiguration", kIconsDirectory . "Configuration.ico").OnEvent("Click", launchApplication.Bind("SimulatorConfiguration"))
-		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vServerAdministration", kIconsDirectory . "Server Administration.ico").OnEvent("Click", launchApplication.Bind("ServerAdministration"))
+		launchPadGui.Add("Picture", "xp+128 yp w60 h60 vSimulatorSetup", icons["SimulatorSetup"]).OnEvent("Click", launchApplication.Bind("SimulatorSetup"))
+		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vSimulatorConfiguration", icons["SimulatorConfiguration"]).OnEvent("Click", launchApplication.Bind("SimulatorConfiguration"))
 
-		launchPadGui.Add("Picture", "xp+90 yp w60 h60 vSimulatorDownload", kIconsDirectory . "Installer.ico").OnEvent("Click", launchSimulatorDownload.Bind("SimulatorDownload"))
+		if hasTeamServer {
+			launchPadGui.Add("Picture", "xp+74 yp w60 h60 vServerAdministration", icons["ServerAdministration"]).OnEvent("Click", launchApplication.Bind("ServerAdministration"))
+
+			launchPadGui.Add("Picture", "xp+90 yp w60 h60 vSimulatorDownload", icons["SimulatorDownload"]).OnEvent("Click", launchSimulatorDownload.Bind("SimulatorDownload"))
+		}
+		else
+			launchPadGui.Add("Picture", "xp+164 yp w60 h60 vSimulatorDownload", icons["SimulatorDownload"]).OnEvent("Click", launchSimulatorDownload.Bind("SimulatorDownload"))
 
 		launchPadGui.Add("Text", "x16 yp+64 w60 h40 Center", "System Monitor")
 		launchPadGui.Add("Text", "xp+126 yp w60 h40 Center", "Setup Workbench")
 		launchPadGui.Add("Text", "xp+128 yp w60 h40 Center", "Simulator Setup")
 		launchPadGui.Add("Text", "xp+74 yp w60 h40 Center", "Simulator Configuration")
-		launchPadGui.Add("Text", "xp+74 yp w60 h40 Center", "Server Administration")
-		launchPadGui.Add("Text", "xp+90 yp w60 h40 Center", "Simulator Download")
+
+		if hasTeamServer {
+			launchPadGui.Add("Text", "xp+74 yp w60 h40 Center", "Server Administration")
+
+			launchPadGui.Add("Text", "xp+90 yp w60 h40 Center", "Simulator Download")
+		}
+		else
+			launchPadGui.Add("Text", "xp+164 yp w60 h40 Center", "Simulator Download")
 
 		launchPadGui.SetFont("s8 Norm", "Arial")
 

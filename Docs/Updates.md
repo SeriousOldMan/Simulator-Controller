@@ -37,7 +37,8 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 5.8.3
 
-New builtin LLM Events has been defined for the Race Spotter. As always, you may want to revisit your *Reasoning* booster configuration.
+1. New builtin LLM Events has been defined for the Race Spotter. As always, you may want to revisit your *Reasoning* booster configuration.
+2. This release introduces a new version of the optional local LLM Runtime. If you are using the LLM Runtime, open "Simulator Setup", go to the presets page and remove the preset for the runtime. Then add it again to trigger a new download.
 
 ***
 

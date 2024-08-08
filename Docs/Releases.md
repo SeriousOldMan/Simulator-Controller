@@ -1,24 +1,25 @@
 ## 5.8.3.0-release 08/09/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. Increased the resilience against invalid "broadcasting.json" files in the *Assetto Corsa Competizione* configuration, especially if a non-standard file encoding is used.
-  4. Increased resilience against invalid tyre compound rules entered in the settings in the "Session Database".
-  5. Increased resposiveness of HTML redrawing after window resizing.
-  6. Fixed a bug in the new "Auto Save" setting for the "Practice Center", that was ignored when closing the window.
-  7. New event has been defined for the *Reasoning* booster of the Race Spooter. Revisit your event configuration, include the new events and define actions (for example flash a red light in your dashboard using SimHub, for example), if necessary.
+  3. Fixed a critical bug, that caused an endless chain of action triggers for virtual Button Boxes that are triggered by keyboard commands.
+  4. Increased the resilience against invalid "broadcasting.json" files in the *Assetto Corsa Competizione* configuration, especially if a non-standard file encoding is used.
+  5. Increased resilience against invalid tyre compound rules entered in the settings in the "Session Database".
+  6. Increased resposiveness of HTML redrawing after window resizing.
+  7. Fixed a bug in the new "Auto Save" setting for the "Practice Center", that was ignored when closing the window.
+  8. New event has been defined for the *Reasoning* booster of the Race Spooter. Revisit your event configuration, include the new events and define actions (for example flash a red light in your dashboard using SimHub, for example), if necessary.
      - "ahead_gap_update" and "behind_gap_update" are signalled whenever the gap to the car behind or ahead changed by a given amount (according to the configration in the "Session Database").
 	 - "attack_imminent" is signalled when an opponent has closed in and an attack might happen soon.
 	 
 	 The corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#events-2) has been updated.
-  8. The "Load Session..." menu command in the "Practice Center" and in the "Race Center" now opens a specialized browser which allows you to search for sessions in the session database. This browser also can open the standard file dialog to load sessions which were stored outside the session database. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Practice-Center#saving-and-loading-sessions) for more information.
+  9. The "Load Session..." menu command in the "Practice Center" and in the "Race Center" now opens a specialized browser which allows you to search for sessions in the session database. This browser also can open the standard file dialog to load sessions which were stored outside the session database. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Practice-Center#saving-and-loading-sessions) for more information.
   
      Note: To load a session that has been saved in the old, directory-based format prior to Release 5.8.1, hold down the Control key and click on the "Import..." button.
-  9. The same browser is now used when loading Strategies, either in the "Strategy Workbench" or in the "Race Center".
-  10. The "Session Database" has a new tab, which allows you to browse the sessions stored in the database.
-  11. Sessions and Strategies can be opened for viewing them in the "Practice Center", "Race Center" or "Strategy Workbench" respectively by double-clicking on them in the "Session Database".
-  12. A new kind of user interface has been introduced for the "Race Center". This so called [*Lite* mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#normal-vs-simple-user-interface), which is available when starting with a specialized profile from "Simulator Startup" or by holding down the Alt key, when starting "Race Center", presents only the most important information and is therefore suitable for team members in the driver role.
-  13. All reports the "Race Center" presents in the *Output* area in the lower right corner of the main window can now be opened in a separate window, when holding down the Control key when selecting them.
-  14. The color scheme "Light" has been renamed to "Bright".
+  10. The same browser is now used when loading Strategies, either in the "Strategy Workbench" or in the "Race Center".
+  11. The "Session Database" has a new tab, which allows you to browse the sessions stored in the database.
+  12. Sessions and Strategies can be opened for viewing them in the "Practice Center", "Race Center" or "Strategy Workbench" respectively by double-clicking on them in the "Session Database".
+  13. A new kind of user interface has been introduced for the "Race Center". This so called [*Lite* mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#normal-vs-simple-user-interface), which is available when starting with a specialized profile from "Simulator Startup" or by holding down the Alt key, when starting "Race Center", presents only the most important information and is therefore suitable for team members in the driver role.
+  14. All reports the "Race Center" presents in the *Output* area in the lower right corner of the main window can now be opened in a separate window, when holding down the Control key when selecting them.
+  15. The color scheme "Light" has been renamed to "Bright".
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-583), if you are using Assistant Boosters.
 

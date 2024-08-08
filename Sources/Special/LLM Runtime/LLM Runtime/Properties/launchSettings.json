@@ -2,7 +2,7 @@
   "profiles": {
     "LLM Runtime": {
       "commandName": "Project",
-      "commandLineArgs": "\"D:\\Dateien\\Dokumente\\Simulator Controller\\Temp\\LLM.cmd\" \"D:\\Dateien\\Dokumente\\Simulator Controller\\Temp\\LLM.out\" \"D:\\Machine Learning\\Models\\WizardLM-2-8x22B.IQ1_M.gguf\" 0.50 1024 0"
+      "commandLineArgs": "\"C:\\Users\\Developer\\Documents\\Simulator Controller\\Temp\\LLM.cmd\" \"C:\\Users\\Developer\\Documents\\Simulator Controller\\Temp\\LLM.out\" \"C:\\Users\\Developer\\AppData\\Local\\nomic.ai\\GPT4All\\Phi-3-mini-4k-instruct.Q4_0.gguf\" 0.50 1024 4"
     }
   }
 }

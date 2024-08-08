@@ -10012,7 +10012,7 @@ class RaceCenter extends ConfigurationItem {
 			this.DetailsViewer.document.close()
 		}
 		else if details {
-			htmlGui := RaceCenter.HTMLWindow({Descriptor: "Race Center." . StrTitle(report) . " Report", Closeable: true, Resizeable:  "Deferred"}, title)
+			htmlGui := RaceCenter.HTMLWindow({Descriptor: "Race Center." . StrTitle(report) . " Report Viewer", Closeable: true, Resizeable:  "Deferred"}, title)
 
 			htmlViewer := htmlGui.Add("HTMLViewer", "X0 Y0 W640 H480 W:Grow H:Grow")
 
@@ -10022,12 +10022,12 @@ class RaceCenter extends ConfigurationItem {
 
 			htmlGui.Add(RaceCenter.HTMLResizer(htmlViewer, html, htmlGui))
 
-			if getWindowPosition("Race Center." . StrTitle(report) . " Report", &x, &y)
+			if getWindowPosition("Race Center." . StrTitle(report) . " Report Viewer", &x, &y)
 				htmlGui.Show("x" . x . " y" . y . " w640 h480")
 			else
 				htmlGui.Show("w640 h480")
 
-			if getWindowSize("Race Center." . StrTitle(report) . " Report", &w, &h)
+			if getWindowSize("Race Center." . StrTitle(report) . " Report Viewer", &w, &h)
 				htmlGui.Resize("Initialize", w, h)
 		}
 	}

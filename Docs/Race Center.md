@@ -24,9 +24,11 @@ And there is a simplified version available for members of a team, which are in 
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2026.JPG)
 
-However, if a driver wants to inspect specific data in more detail, for example the state of the tyres after they have been dismounted at a pitstop, this is still possible by double-clicking the corresponding entry in one the lists. Any number of report windows can be opened in this way, which possibly makes it not so simple anymore, but this is optional.
+This version of the "Race Center" does not display any reports, only the most important information about the driven laps, recent pitstops and so on. However, if a driver wants to inspect specific data in more detail, for example the state of the tyres after they have been dismounted at a pitstop, this is still possible by double-clicking the corresponding entry in one the lists. Any number of report windows can be opened in this way, which possibly makes it not so simple anymore, but this is optional.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2025.JPG)
+
+Good to know: Since the *Lite* version does not display live reports or no reports at all, this version also consumes a lot less resources and is therefore also a good alternative for middle-class PCs.
 
 IMPORTANT: This simplified interface use the Team Server credentials as configured for the driver in the ["Team" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#preparing-a-team-session) of the "Race Settings" application. There is no option to load a previous session stored in the "Session Database", and so on. Therefore, the Lite mode can only be used while participating as a driver in a team race.
 

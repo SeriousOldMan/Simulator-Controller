@@ -368,10 +368,10 @@ class GrayTheme extends ClassicTheme {
 	}
 }
 
-class BrightTheme extends Theme {
+class LightTheme extends Theme {
 	Descriptor {
 		Get {
-			return "Bright"
+			return "Light"
 		}
 	}
 
@@ -1748,7 +1748,7 @@ class RecolorizerTask extends PeriodicTask {
 ;;;-------------------------------------------------------------------------;;;
 
 getAllUIThemes(configuration) {
-	return [ClassicTheme(), GrayTheme(), BrightTheme(), DarkTheme()]
+	return [ClassicTheme(), GrayTheme(), LightTheme(), DarkTheme()]
 }
 
 setButtonIcon(buttonHandle, file, index := 1, options := "", theme := true) {

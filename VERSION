@@ -1,15 +1,15 @@
 [Development]
-Version=5.8.3.0-dev
+Version=5.8.3.0-release
 Target=5.8.3.0-release
-Date=08/06/2024
-Download=https://www.dropbox.com/scl/fi/3h8mtetgih7j2lcvyiv88/Simulator-Controller-5.8.3.0-dev.zip?rlkey=1f2x5rpynmb5plsxtdcdonub5&st=ptfyctwu&dl=1
+Date=08/09/2024
+Download=https://cutt.ly/qex4muvA;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.8.3.0-release.zip
 Changes=New session browser for "Practice Center" and "Race Center", Optimized window position handling and memorization, New race strategy browser, Open sessions and strategies from the "Session Database", Introduced multiple methods to read the broadcasting.json file in ACC, New "Race Center Lite", Open reports in separate window in "Race Center" with Control key modifier, Open reports in separate window in "Race Center" by double-clicking, New events "ahead_gap_update", "behind_gap_update" and "attack_imminent" for the Race Spotter LLM integration
 Components=Media->5.6.1,Configuration->5.8.2,Utilities->5.4.8
 [Release]
-Version=5.8.2.0-release
-Date=08/02/2024
-Download=https://cutt.ly/4ezxuMiI;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.8.2.0-release.zip
-Changes=New LLM Runtime, LLM Runtime is now a downloadable preset, New race setting for track types, More detailed lap history for LLMs, New time loss event for the Engineer, New time loss reporting action for Race Engineer, Removed old-fashioned directory selection dialog, Both "Race Center" and "Practice Center" save their sessions to the session database per default, "Practice Center" now supports an auto-save to the session database, Support for practice and race sessions added to "Session Database", Support for import of car setups in "Session Database", Synchronization of sessions in the session database
+Version=5.8.3.0-release
+Date=08/09/2024
+Download=https://cutt.ly/qex4muvA;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.8.3.0-release.zip
+Changes=New session browser for "Practice Center" and "Race Center", Optimized window position handling and memorization, New race strategy browser, Open sessions and strategies from the "Session Database", Introduced multiple methods to read the broadcasting.json file in ACC, New "Race Center Lite", Open reports in separate window in "Race Center" with Control key modifier, Open reports in separate window in "Race Center" by double-clicking, New events "ahead_gap_update", "behind_gap_update" and "attack_imminent" for the Race Spotter LLM integration
 Components=Media->5.6.1,Configuration->5.8.2,Utilities->5.4.8
 [Components]
 Media.5.6.1.Path=Resources
@@ -22,7 +22,7 @@ Utilities.5.4.8.Path=.
 Utilities.5.4.8.Content=Utilities
 Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Utilities-5.4.8.zip?rlkey=alrj8l2z205dd2vm9cu6hbsot&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.4.8.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=5.8.3.0-dev
-Release=5.8.2.0-release
+Development=5.8.3.0-release
+Release=5.8.3.0-release

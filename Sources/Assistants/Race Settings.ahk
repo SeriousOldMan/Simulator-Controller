@@ -1570,7 +1570,7 @@ showRaceSettingsEditor() {
 
 	local message := "Export"
 	local icon := kIconsDirectory . "Race Settings.ico"
-	local index, fileName, settings
+	local index, fileName, settings, hasTeamServer
 
 	TraySetIcon(icon, "1")
 	A_IconTip := "Race Settings"
@@ -1643,8 +1643,19 @@ showRaceSettingsEditor() {
 
 	if inList(A_Args, "-NoTeam")
 		gTeamMode := false
-	else if inList(A_Args, "-Team")
-		gTeamMode := "Team"
+	else {
+		hasTeamServer := getMultiMapValue(kSimulatorConfiguration, "Plugins", "Team Server", false)
+
+		if hasTeamServer
+			hasTeamServer := string2Values("|", hasTeamServer)[1]
+
+		if hasTeamServer {
+			if inList(A_Args, "-Team")
+				gTeamMode := "Team"
+		}
+		else
+			gTeamMode := false
+	}
 
 	if inList(A_Args, "-Test")
 		gTestMode := true

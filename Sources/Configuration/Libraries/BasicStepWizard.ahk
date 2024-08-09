@@ -1610,6 +1610,8 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 
 		this.showControls(this.iOtherWidgets)
 
+		this.Control["basicWindowsSettingsButton"].Enabled := false
+
 		this.iSynthesizerMode := "Google"
 	}
 
@@ -1624,6 +1626,8 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 			this.transposeControls(this.iOtherWidgets, -24 * this.iGoogleSynthesizerWidgets.Length, this.Window.TitleBarHeight)
 		else if (this.iSynthesizerMode != "Init")
 			throw "Internal error detected in VoiceControlConfigurator.hideWindowsSynthesizerEditor..."
+
+		this.Control["basicWindowsSettingsButton"].Enabled := false
 
 		this.iSynthesizerMode := false
 	}

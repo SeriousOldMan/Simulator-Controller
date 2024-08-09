@@ -451,11 +451,7 @@ class Task {
 			}
 		}
 		finally {
-			; schedule := ObjBindMethod(Task, "schedule", priority)
-
 			SetTimer(() => Task.schedule(priority), timings[priority])
-
-			; SetTimer(schedule, ((priority == kInterruptPriority) ? Task.sInterrupt : ((priority == kHighPriority) ? Task.sHigh : ((priority == kNormalPriority) ? Task.sNormal : Task.sLow))))
 
 			if unprotect
 				protectionOff(true)

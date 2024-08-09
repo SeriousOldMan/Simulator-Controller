@@ -4334,7 +4334,7 @@ class PracticeCenter extends ConfigurationItem {
 
 						SplitPath(fileName, , &folder, , &fileName)
 
-						info := readMultiMap(this.SessionDirectory . "Practice.info")
+						info := readMultiMap(directory . "\Practice.info")
 
 						if (getMultiMapValue(info, "Creator", "ID", kUndefined) = kUndefined) {
 							setMultiMapValue(info, "Creator", "ID", SessionDatabase.ID)
@@ -4727,6 +4727,9 @@ class PracticeCenter extends ConfigurationItem {
 								file.Close()
 
 								RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+
+								if !FileExist(folder . "\Practice.info")
+									FileCopy(directory . "\" . fileName . ".practice", folder . "\Practice.info")
 							}
 							else
 								folder := ""
@@ -4746,6 +4749,9 @@ class PracticeCenter extends ConfigurationItem {
 						FileCopy(directory . "\" . fileName . ".data", dataFile, 1)
 
 						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+
+						if !FileExist(folder . "\Practice.info")
+							FileCopy(directory . "\" . fileName . ".practice", folder . "\Practice.info")
 
 						deleteFile(dataFile)
 					}

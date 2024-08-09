@@ -1,3 +1,6 @@
+## 5.8.3.1-release 08/09/24
+  1. Fixed a critical bug when sessions aree saved to the session database.
+
 ## 5.8.3.0-release 08/09/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

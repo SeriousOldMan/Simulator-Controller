@@ -9060,7 +9060,7 @@ class RaceCenter extends ConfigurationItem {
 
 						SplitPath(fileName, , &folder, , &fileName)
 
-						info := readMultiMap(this.SessionDirectory . "Session.info")
+						info := readMultiMap(directory . "\Session.info")
 
 						if (getMultiMapValue(info, "Creator", "ID", kUndefined) = kUndefined) {
 							setMultiMapValue(info, "Creator", "ID", SessionDatabase.ID)
@@ -9619,6 +9619,9 @@ class RaceCenter extends ConfigurationItem {
 								file.Close()
 
 								RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+
+								if !FileExist(folder . "\Session.info")
+									FileCopy(directory . "\" . fileName . ".race", folder . "\Session.info")
 							}
 							else
 								folder := ""
@@ -9638,6 +9641,9 @@ class RaceCenter extends ConfigurationItem {
 						FileCopy(directory . "\" . fileName . ".data", dataFile, 1)
 
 						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+
+						if !FileExist(folder . "\Session.info")
+							FileCopy(directory . "\" . fileName . ".race", folder . "\Session.info")
 
 						deleteFile(dataFile)
 					}

@@ -405,6 +405,7 @@ class Task {
 		local next, worked, oldScheduling, visited, schedule
 		local unprotect := true
 
+		static priorities := [Task.sLow, Task.sNormal, Task.sHigh, Task.sInterrupt]
 		static scheduling := false
 
 		protectionOn(true)
@@ -450,9 +451,11 @@ class Task {
 			}
 		}
 		finally {
-			schedule := ObjBindMethod(Task, "schedule", priority)
+			; schedule := ObjBindMethod(Task, "schedule", priority)
 
-			SetTimer(schedule, ((priority == kInterruptPriority) ? Task.sInterrupt : ((priority == kHighPriority) ? Task.sHigh : ((priority == kNormalPriority) ? Task.sNormal : Task.sLow))))
+			SetTimer(() => Task.schedule(priority), priorities[priority])
+
+			; SetTimer(schedule, ((priority == kInterruptPriority) ? Task.sInterrupt : ((priority == kHighPriority) ? Task.sHigh : ((priority == kNormalPriority) ? Task.sNormal : Task.sLow))))
 
 			if unprotect
 				protectionOff(true)

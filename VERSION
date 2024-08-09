@@ -1,14 +1,14 @@
 [Development]
-Version=5.8.3.0-release
-Target=5.8.3.0-release
+Version=5.8.3.1-release
+Target=5.8.3.1-release
 Date=08/09/2024
-Download=https://cutt.ly/qex4muvA;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.8.3.0-release.zip
+Download=https://cutt.ly/0echJ07w;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.8.3.1-release.zip
 Changes=New session browser for "Practice Center" and "Race Center", Optimized window position handling and memorization, New race strategy browser, Open sessions and strategies from the "Session Database", Introduced multiple methods to read the broadcasting.json file in ACC, New "Race Center Lite", Open reports in separate window in "Race Center" with Control key modifier, Open reports in separate window in "Race Center" by double-clicking, New events "ahead_gap_update", "behind_gap_update" and "attack_imminent" for the Race Spotter LLM integration
 Components=Media->5.6.1,Configuration->5.8.2,Utilities->5.4.8
 [Release]
-Version=5.8.3.0-release
+Version=5.8.3.1-release
 Date=08/09/2024
-Download=https://cutt.ly/qex4muvA;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.8.3.0-release.zip
+Download=https://cutt.ly/0echJ07w;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.8.3.1-release.zip
 Changes=New session browser for "Practice Center" and "Race Center", Optimized window position handling and memorization, New race strategy browser, Open sessions and strategies from the "Session Database", Introduced multiple methods to read the broadcasting.json file in ACC, New "Race Center Lite", Open reports in separate window in "Race Center" with Control key modifier, Open reports in separate window in "Race Center" by double-clicking, New events "ahead_gap_update", "behind_gap_update" and "attack_imminent" for the Race Spotter LLM integration
 Components=Media->5.6.1,Configuration->5.8.2,Utilities->5.4.8
 [Components]
@@ -24,5 +24,5 @@ Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Ut
 [Current]
 Type=Release
 [Version]
-Development=5.8.3.0-release
-Release=5.8.3.0-release
+Development=5.8.3.1-release
+Release=5.8.3.1-release

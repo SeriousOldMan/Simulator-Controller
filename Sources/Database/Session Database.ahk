@@ -1285,7 +1285,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("s10 Bold", "Arial")
 
 		editorGui.Add("Picture", "x16 yp+12 w30 h30 Section", this.themeIcon(kIconsDirectory . "Road.ico"))
-		editorGui.Add("Text", "x50 yp+5 w120 h26", translate("Selection"))
+		editorGui.Add("Text", "x50 yp+5 w180 h26", translate("Selection"))
 
 		editorGui.SetFont("s8 Norm", "Arial")
 
@@ -1336,7 +1336,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("s10 Bold", "Arial")
 
 		editorGui.Add("Picture", "x280 ys w30 h30 Section", this.themeIcon(kIconsDirectory . "Report.ico"))
-		editorGui.Add("Text", "xp+34 yp+5 w120 h26 W:Grow", translate("Notes"))
+		editorGui.Add("Text", "xp+34 yp+5 w180 h26 W:Grow", translate("Notes"))
 
 		button := editorGui.Add("Button", "x647 yp w23 h23 X:Move")
 		button.OnEvent("Click", showSettings)

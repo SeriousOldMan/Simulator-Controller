@@ -85,20 +85,20 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 
 		window.Add("ListView", "x16 y80 w457 h245 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VapplicationsListView", collect(["Type", "Name", "Executable", "Window Title", "Working Directory"], translate))
 
-		window.Add("Text", "x16 y335 w141 h23 Y:Move +0x200", translate("Name"))
+		window.Add("Text", "x16 y335 w160 h23 Y:Move +0x200", translate("Name"))
 		window.Add("Edit", "x180 y335 w268 h21 Y:Move W:Grow VapplicationNameEdit")
 
-		window.Add("Text", "x16 y359 w138 h23 Y:Move +0x200", translate("Executable"))
+		window.Add("Text", "x16 y359 w160 h23 Y:Move +0x200", translate("Executable"))
 		window.Add("Edit", "x180 y359 w268 h21 Y:Move W:Grow VapplicationExePathEdit")
 		window.Add("Button", "x451 y358 w23 h23 Y:Move X:Move", translate("...")).OnEvent("Click", chooseApplicationExePath)
 
-		window.Add("Text", "x16 y383 w138 h23 Y:Move +0x200", translate("Working Directory (optional)"))
+		window.Add("Text", "x16 y383 w160 h23 Y:Move +0x200", translate("Working Directory (optional)"))
 		window.Add("Edit", "x180 y383 w268 h21 Y:Move W:Grow VapplicationWorkingDirectoryPathEdit")
 		window.Add("Button", "x451 y382 w23 h23 X:Move Y:Move", translate("...")).OnEvent("Click", chooseApplicationWorkingDirectoryPath)
 
-		window.Add("Text", "x16 y407 w140 h23 Y:Move +0x200", translate("Window Title (optional)"))
+		window.Add("Text", "x16 y407 w160 h23 Y:Move +0x200", translate("Window Title (optional)"))
 
-		window.Add("Text", "x24 y425 w133 h23 Y:Move c" . window.Theme.TextColor["Disabled"], translate("(Use AHK WinTitle Syntax)"))
+		window.Add("Text", "x24 y425 w155 h23 Y:Move c" . window.Theme.TextColor["Disabled"], translate("(Use AHK WinTitle Syntax)"))
 
 		window.SetFont()
 

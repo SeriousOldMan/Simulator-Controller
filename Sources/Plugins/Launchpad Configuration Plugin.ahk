@@ -27,15 +27,15 @@ class LaunchpadConfigurator extends ConfigurationItemList {
 
 		window.Add("ListView", "x16 y80 w457 h245 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VlaunchpadListView", collect(["#", "Label", "Application"], translate))
 
-		window.Add("Text", "x16 y335 w86 h23 Y:Move +0x200", translate("Button"))
-		window.Add("Text", "x95 y335 w23 h23 Y:Move +0x200", translate("#"))
+		window.Add("Text", "x16 y335 w81 h23 Y:Move +0x200", translate("Button"))
+		window.Add("Text", "x98 y335 w12 h23 Y:Move +0x200", translate("#"))
 		window.Add("Edit", "x110 y335 w40 h21 Y:Move Number Limit3 VlaunchpadNumberEdit")
 		window.Add("UpDown", "Range1-999 x150 y335 w17 h21 Y:Move")
 
-		window.Add("Text", "x16 y359 w86 h23 Y:Move +0x200", translate("Label"))
+		window.Add("Text", "x16 y359 w90 h23 Y:Move +0x200", translate("Label"))
 		window.Add("Edit", "x110 y359 w80 h21 Y:Move W:Grow(0.2) VlaunchpadLabelEdit")
 
-		window.Add("Text", "x16 y383 w86 h23 Y:Move +0x200", translate("Application"))
+		window.Add("Text", "x16 y383 w90 h23 Y:Move +0x200", translate("Application"))
 		window.Add("DropDownList", "x110 y383 w363 h21 R10 Y:Move W:Grow VlaunchpadApplicationDropDown")
 
 		window.Add("Button", "x264 y530 w46 h23 Y:Move X:Move VlaunchpadAddButton", translate("Add"))

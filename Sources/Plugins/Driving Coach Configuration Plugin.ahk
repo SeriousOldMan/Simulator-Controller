@@ -225,17 +225,17 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		w4 := w1 - 24
 		x6 := x1 + w4 + 1
 
-		widget1 := window.Add("Text", "x" . x0 . " y" . y . " w160 h23 +0x200 Hidden", translate("Conversations Folder"))
+		widget1 := window.Add("Text", "x" . x0 . " y" . y . " w120 h23 +0x200 Hidden", translate("Conversations Folder"))
 		widget2 := window.Add("Edit", "x" . x1 . " yp w" . w2 . " h21 W:Grow VdcConversationsPathEdit Hidden")
 		widget3 := window.Add("Button", "x" . x4 . " yp-1 w23 h23 X:Move Hidden", translate("..."))
 		widget3.OnEvent("Click", chooseConversationsPath)
 
 		window.SetFont("Italic", "Arial")
-		widget4 := window.Add("Text", "x" . x0 . " yp+40 w105 h23 Hidden", translate("Service "))
-		widget5 := window.Add("Text", "x100 yp+7 w" . (width + 8 - 100) . " 0x10 W:Grow Hidden")
+		widget4 := window.Add("Text", "x" . x0 . " yp+40 w80 h23 Hidden", translate("Service "))
+		widget5 := window.Add("Text", "x105 yp+7 w" . (width + 8 - 105) . " 0x10 W:Grow Hidden")
 		window.SetFont("Norm", "Arial")
 
-		widget6 := window.Add("Text", "x" . x0 . " yp+20 w105 h23 +0x200 vdcProviderLabel Hidden", translate("Provider / URL"))
+		widget6 := window.Add("Text", "x" . x0 . " yp+20 w120 h23 +0x200 vdcProviderLabel Hidden", translate("Provider / URL"))
 
 		widget7 := window.Add("DropDownList", "x" . x1 . " yp w100 Choose1 vdcProviderDropDown Hidden", this.Providers)
 		widget7.OnEvent("Change", chooseProvider)
@@ -243,17 +243,17 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		widget8 := window.Add("Edit", "x" . (x1 + 102) . " yp w" . (w1 - 102) . " h23 vdcServiceURLEdit Hidden")
 		widget8.OnEvent("Change", loadModels)
 
-		widget9 := window.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200 Section Hidden vdcServiceKeyLabel", translate("Service Key"))
+		widget9 := window.Add("Text", "x" . x0 . " yp+24 w120 h23 +0x200 Section Hidden vdcServiceKeyLabel", translate("Service Key"))
 		widget10 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h23 Password vdcServiceKeyEdit Hidden")
 		widget10.OnEvent("Change", loadModels)
 
-		widget11 := window.Add("Text", "x" . x0 . " yp+30 w105 h23 +0x200 vdcModelLabel Hidden", translate("Model / # Tokens"))
+		widget11 := window.Add("Text", "x" . x0 . " yp+30 w120 h23 +0x200 vdcModelLabel Hidden", translate("Model / # Tokens"))
 		widget12 := window.Add("ComboBox", "x" . x1 . " yp w" . (w1 - 64) . " vdcModelDropDown Hidden")
 		widget13 := window.Add("Edit", "x" . (x1 + (w1 - 60)) . " yp-1 w60 h23 Number vdcMaxTokensEdit Hidden")
 		widget13.OnEvent("Change", validateTokens.Bind("dcMaxTokensEdit"))
 		widget14 := window.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 Range32-131072 vdcMaxTokensRange Hidden")
 
-		widget38 := window.Add("Text", "x" . x0 . " ys+5 w105 h23 +0x200 vdcLLMRTModelLabel Hidden", translate("Model"))
+		widget38 := window.Add("Text", "x" . x0 . " ys+5 w120 h23 +0x200 vdcLLMRTModelLabel Hidden", translate("Model"))
 		widget31 := window.Add("Edit", "x" . x1 . " yp w" . (w1 - 24) . " vdcLLMRTModelEdit Hidden")
 		widget32 := window.Add("Button", "x" . (x1 + (w1 - 23)) . " yp h23 w23 vdcLLMRTModelButton Hidden", translate("..."))
 		widget32.OnEvent("Click", chooseModelPath)
@@ -266,25 +266,25 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		widget37 := window.Add("UpDown", "x" . (x1 + 62) . " yp w60 h23 Range0-99 vdcLLMRTGPULayersRange Hidden")
 
 		window.SetFont("Italic", "Arial")
-		widget15 := window.Add("Text", "x" . x0 . " yp+40 w105 h23 Hidden", translate("Personality"))
-		widget16 := window.Add("Text", "x100 yp+7 w" . (width + 8 - 100) . " 0x10 W:Grow Hidden")
+		widget15 := window.Add("Text", "x" . x0 . " yp+40 w80 h23 Hidden", translate("Personality"))
+		widget16 := window.Add("Text", "x105 yp+7 w" . (width + 8 - 105) . " 0x10 W:Grow Hidden")
 		window.SetFont("Norm", "Arial")
 
-		widget17 := window.Add("Text", "x" . x0 . " yp+20 w105 h23 +0x200 Hidden", translate("Creativity"))
+		widget17 := window.Add("Text", "x" . x0 . " yp+20 w120 h23 +0x200 Hidden", translate("Creativity"))
 		widget18 := window.Add("Edit", "x" . x1 . " yp w60 Number Limit3 vdcTemperatureEdit Hidden")
 		widget18.OnEvent("Change", validateTemperature)
 		widget19 := window.Add("UpDown", "x" . x1 . " yp w60 h23 Range0-100 Hidden")
 		widget20 := window.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200 Hidden", translate("%"))
 
-		widget21 := window.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200 Hidden", translate("Memory"))
+		widget21 := window.Add("Text", "x" . x0 . " yp+24 w120 h23 +0x200 Hidden", translate("Memory"))
 		widget22 := window.Add("Edit", "x" . x1 . " yp w60 h23 Number Limit2 vdcMaxHistoryEdit Hidden")
 		widget23 := window.Add("UpDown", "x" . x1 . " yp w60 h23 Range1-10 Hidden")
 		widget24 := window.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200 Hidden", translate("Conversations"))
 
-		widget25 := window.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200 Hidden", translate("Confirmation"))
+		widget25 := window.Add("Text", "x" . x0 . " yp+24 w120 h23 +0x200 Hidden", translate("Confirmation"))
 		widget26 := window.Add("DropDownList", "x" . x1 . " yp w60 Choose1 vdcConfirmationDropDown Hidden", collect(["Yes", "No"], translate))
 
-		widget27 := window.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200 Hidden", translate("Instructions"))
+		widget27 := window.Add("Text", "x" . x0 . " yp+24 w120 h23 +0x200 Hidden", translate("Instructions"))
 
 		widget28 := window.Add("DropDownList", "x" . x1 . " yp w120 vdcInstructionsDropDown Hidden", collect(this.Instructions[false], translate))
 		widget28.OnEvent("Change", chooseInstructions)

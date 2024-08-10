@@ -76,7 +76,7 @@ class GeneralTab extends ConfiguratorPanel {
 
 			try {
 				window.Opt("+OwnDialogs")
-				
+
 				OnMessage(0x44, translateSelectCancelButtons)
 				directory := withBlockedWindows(FileSelect, "D1", window["homePathEdit"].Text, translate("Select Installation folder..."))
 				OnMessage(0x44, translateSelectCancelButtons, 0)
@@ -170,11 +170,11 @@ class GeneralTab extends ConfiguratorPanel {
 
 		window.SetFont("Norm", "Arial")
 
-		window.Add("Text", "x24 y97 w160 h23 +0x200", translate("Installation Folder (optional)"))
+		window.Add("Text", "x24 y97 w190 h23 +0x200", translate("Installation Folder (optional)"))
 		window.Add("Edit", "x224 y97 w214 h21 W:Grow vhomePathEdit", this.Value["homePath"])
 		window.Add("Button", "x440 y96 w23 h23 X:Move", translate("...")).OnEvent("Click", chooseHomePath)
 
-		window.Add("Text", "x24 y121 w160 h23 +0x200", translate("NirCmd Folder (optional)"))
+		window.Add("Text", "x24 y121 w190 h23 +0x200", translate("NirCmd Folder (optional)"))
 		window.Add("Edit", "x224 y121 w214 h21 W:Grow VnirCmdPathEdit", this.Value["nirCmdPath"])
 		window.Add("Button", "x440 y120 w23 h23 X:Move", translate("...")).OnEvent("Click", chooseNirCmdPath)
 
@@ -198,15 +198,15 @@ class GeneralTab extends ConfiguratorPanel {
 		if (chosen == 0)
 			chosen := enIndex
 
-		window.Add("Text", "x24 y176 w86 h23 +0x200", translate("Localization"))
+		window.Add("Text", "x24 y176 w126 h23 +0x200", translate("Localization"))
 		window.Add("DropDownList", "x250 y176 w188 W:Grow Choose" . chosen . " vlanguageDropDown", choices)
 		window.Add("Button", "x440 y175 w23 h23 X:Move", translate("...")).OnEvent("Click", openTranslationsEditor)
 		button := window.Add("Button", "x224 y175 w23 h23")
 		button.OnEvent("Click", openFormatsEditor)
 		setButtonIcon(button, kIconsDirectory . "Locale.ico", 1, "L4 T4 R4 B4")
 
-		window.Add("CheckBox", "x24 y200 w242 h21 Checked" . this.Value["startWithWindows"] . " VstartWithWindowsCheck", translate("Start with Windows"))
-		window.Add("CheckBox", "x24 y224 w242 h21 Checked" . this.Value["silentMode"] . " VsilentModeCheck", translate("Silent mode (no splash screen, no sound)"))
+		window.Add("CheckBox", "x24 y200 w302 h21 Checked" . this.Value["startWithWindows"] . " VstartWithWindowsCheck", translate("Start with Windows"))
+		window.Add("CheckBox", "x24 y224 w302 h21 Checked" . this.Value["silentMode"] . " VsilentModeCheck", translate("Silent mode (no splash screen, no sound)"))
 
 		window.Add("Button", "x333 y224 w130 h23 X:Move", translate("Splash Screens...")).OnEvent("Click", openSplashScreenEditor)
 
@@ -227,18 +227,18 @@ class GeneralTab extends ConfiguratorPanel {
 
 			window.SetFont("Norm", "Arial")
 
-			window.Add("Text", "x24 y405 w160 h23 +0x200", translate("AutoHotkey Folder"))
+			window.Add("Text", "x24 y405 w190 h23 +0x200", translate("AutoHotkey Folder"))
 			window.Add("Edit", "x224 y406 w214 h21 W:Grow VahkPathEdit", this.Value["ahkPath"])
 			window.Add("Button", "x440 y404 w23 h23 X:Move", translate("...")).OnEvent("Click", chooseAHKPath)
 
-			window.Add("Text", "x24 y429 w160 h23 +0x200", translate("MSBuild Bin Folder"))
+			window.Add("Text", "x24 y429 w190 h23 +0x200", translate("MSBuild Bin Folder"))
 			window.Add("Edit", "x224 y429 w214 h21 W:Grow VmsBuildPathEdit", this.Value["msBuildPath"])
 			window.Add("Button", "x440 y428 w23 h23 X:Move", translate("...")).OnEvent("Click", chooseMSBuildPath)
 
-			window.Add("Text", "x24 y453 w160 h23 +0x200", translate("Debug"))
+			window.Add("Text", "x24 y453 w190 h23 +0x200", translate("Debug"))
 			window.Add("CheckBox", "x226 y451 w242 h21 Checked" . this.Value["debugEnabled"] . " vdebugEnabledCheck", translate("Enabled?"))
 
-			window.Add("Text", "x24 y477 w160 h23 +0x200", translate("Log Level"))
+			window.Add("Text", "x24 y477 w190 h23 +0x200", translate("Log Level"))
 
 			choices := kLogLevelNames
 

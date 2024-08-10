@@ -53,7 +53,7 @@ The Race Assistants use several values from the race settings to calculate how m
 |------------------------------------------|------------------------------------|
 | ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%208.jpg) | ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%209.jpg) |
 
-Below you find the order, in which the different combinations will be loaded. As you can see, setting values from a more concrete combination of car / track / weather will be *overwriten* those from a less specific combination.
+Below you find the order, in which the different combinations will be loaded. As you can see, setting values for a more concrete combination of car / track / weather will have precedence over those of a less specific combination.
 
 | Car      | Track    | Weather  |
 |----------|----------|----------|

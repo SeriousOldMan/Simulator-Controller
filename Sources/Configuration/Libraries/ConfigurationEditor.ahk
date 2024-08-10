@@ -256,7 +256,7 @@ class ConfigurationEditor extends ConfigurationItem {
 		chosen := inList(choices, this.iSaveMode)
 
 		editorGui.Add("Text", "x8 y573 w55 h23 Y:Move +0x200", translate("Save"))
-		editorGui.Add("DropDownList", "x63 y573 w75 Y:Move Choose" . chosen . "  vsaveModeDropDown", collect(choices, translate)).OnEvent("Change", updateSaveMode)
+		editorGui.Add("DropDownList", "x65 y573 w75 Y:Move Choose" . chosen . "  vsaveModeDropDown", collect(choices, translate)).OnEvent("Change", updateSaveMode)
 
 		labels := []
 

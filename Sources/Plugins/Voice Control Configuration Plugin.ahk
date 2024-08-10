@@ -286,14 +286,14 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		w4 := width - (x4 - x) - 24
 		x5 := x3 + 24
 
-		widget1 := window.Add("Text", "x" . x . " y" . y . " w110 h23 +0x200 Hidden", translate("Language"))
+		widget1 := window.Add("Text", "x" . x . " y" . y . " w112 h23 +0x200 Hidden", translate("Language"))
 		widget2 := window.Add("DropDownList", "x" . x1 . " yp w160 W:Grow(0.3) Choose" . chosen . " VvoiceLanguageDropDown Hidden", choices)
 		widget2.OnEvent("Change", updateLanguage)
 
 		choices := ["Windows (Win32)", "Windows (.NET)", "Azure Cognitive Services", "Google Speech Services"]
 		chosen := 0
 
-		widget3 := window.Add("Text", "x" . x . " yp+32 w110 h23 +0x200 Section Hidden", translate("Speech Synthesizer"))
+		widget3 := window.Add("Text", "x" . x . " yp+32 w112 h23 +0x200 Section Hidden", translate("Speech Synthesizer"))
 		widget4 := window.Add("DropDownList", "x" . x1 . " yp w160 W:Grow(0.3) Choose" . chosen . "  VvoiceSynthesizerDropDown Hidden", choices)
 		widget4.LastValue := chosen
 		widget4.OnEvent("Change", chooseVoiceSynthesizer)
@@ -302,25 +302,25 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		voices := [translate("Random"), translate("Deactivated")]
 
-		widget5 := window.Add("Text", "x" . x . " ys+24 w110 h23 +0x200 VwindowsSpeakerLabel Hidden", translate("Voice"))
+		widget5 := window.Add("Text", "x" . x . " ys+24 w112 h23 +0x200 VwindowsSpeakerLabel Hidden", translate("Voice"))
 		widget6 := window.Add("DropDownList", "x" . (x1 + 24) . " yp w" . (w1 - 24) . " W:Grow VwindowsSpeakerDropDown Hidden", voices)
 
 		widget32 := window.Add("Button", "x" . x1 . " yp w23 h23 Default Hidden")
 		widget32.OnEvent("Click", (*) => this.testSpeaker())
 		setButtonIcon(widget32, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
 
-		widget7 := window.Add("Text", "x" . x . " ys+24 w110 h23 +0x200 VwindowsSpeakerVolumeLabel Hidden", translate("Level"))
+		widget7 := window.Add("Text", "x" . x . " ys+24 w112 h23 +0x200 VwindowsSpeakerVolumeLabel Hidden", translate("Level"))
 		widget8 := window.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w160 W:Grow(0.3) 0x10 Range0-100 ToolTip VspeakerVolumeSlider Hidden")
 
-		widget9 := window.Add("Text", "x" . x . " yp+22 w110 h23 +0x200 VwindowsSpeakerPitchLabel Hidden", translate("Pitch"))
+		widget9 := window.Add("Text", "x" . x . " yp+22 w112 h23 +0x200 VwindowsSpeakerPitchLabel Hidden", translate("Pitch"))
 		widget10 := window.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w160 W:Grow(0.3) 0x10 Range-10-10 ToolTip VspeakerPitchSlider Hidden")
 
-		widget11 := window.Add("Text", "x" . x . " yp+22 w110 h23 +0x200 VwindowsSpeakerSpeedLabel Hidden", translate("Speed"))
+		widget11 := window.Add("Text", "x" . x . " yp+22 w112 h23 +0x200 VwindowsSpeakerSpeedLabel Hidden", translate("Speed"))
 		widget12 := window.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w160 W:Grow(0.3) 0x10 Range-10-10 ToolTip VspeakerSpeedSlider Hidden")
 
 		this.iWindowsSynthesizerWidgets := [[window["windowsSpeakerLabel"], window["windowsSpeakerDropDown"], widget32]]
 
-		widget13 := window.Add("Text", "x" . x . " yp+26 w110 h23 +0x200 VsoXPathLabel1 Hidden", translate("SoX Folder (optional)"))
+		widget13 := window.Add("Text", "x" . x . " yp+26 w112 h23 +0x200 VsoXPathLabel1 Hidden", translate("SoX Folder (optional)"))
 
 		window.SetFont("s8")
 
@@ -342,7 +342,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		choices := ["Windows (Server)", "Windows (Desktop)", "Azure Cognitive Services", "Google Speech Services"]
 		chosen := 0
 
-		widget18 := window.Add("Text", "x" . x . " yp+42 w110 h23 +0x200 vvoiceRecognizerLabel Hidden", translate("Speech Recognizer"))
+		widget18 := window.Add("Text", "x" . x . " yp+42 w112 h23 +0x200 vvoiceRecognizerLabel Hidden", translate("Speech Recognizer"))
 		widget19 := window.Add("DropDownList", "x" . x1 . " yp w160 W:Grow(0.3) Choose" . chosen . "  VvoiceRecognizerDropDown Hidden", choices)
 		widget19.LastValue := chosen
 		widget19.OnEvent("Change", chooseVoiceRecognizer)
@@ -356,10 +356,10 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		this.iRecognizers := recognizers
 
-		widget20 := window.Add("Text", "x" . x . " yp+24 w110 h23 +0x200 VlistenerLabel Hidden", translate("Recognizer Engine"))
+		widget20 := window.Add("Text", "x" . x . " yp+24 w112 h23 +0x200 VlistenerLabel Hidden", translate("Recognizer Engine"))
 		widget21 := window.Add("DropDownList", "x" . x1 . " yp w" . w1 . " W:Grow Choose" . chosen . " VlistenerDropDown Hidden", recognizers)
 
-		widget22 := window.Add("Text", "x" . x . " yp+24 w110 h23 +0x200 VpushToTalkLabel Hidden", translate("P2T / Activation"))
+		widget22 := window.Add("Text", "x" . x . " yp+24 w112 h23 +0x200 VpushToTalkLabel Hidden", translate("P2T / Activation"))
 		widget34 := window.Add("DropDownList", "x" . x1 . " yp w96 Choose1 VpushToTalkModeDropDown Hidden", collect(["Hold & Talk", "Press & Talk", "Custom"], translate))
 		widget34.OnEvent("Change", updateP2T)
 		widget24 := window.Add("Button", "xp+98 yp-1 w23 h23 VpushToTalkButton Hidden")
@@ -386,17 +386,17 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 							  , window["pushToTalkEdit"], window["pushToTalkButton"], window["pushToTalkTestButton"]
 							  , window["activationCommandEdit"]]]
 
-		widget26 := window.Add("Text", "x" . x . " ys+24 w140 h23 +0x200 VazureSubscriptionKeyLabel Hidden", translate("Subscription Key"))
+		widget26 := window.Add("Text", "x" . x . " ys+24 w112 h23 +0x200 VazureSubscriptionKeyLabel Hidden", translate("Subscription Key"))
 		widget27 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 Password W:Grow VazureSubscriptionKeyEdit Hidden")
 		widget27.OnEvent("Change", updateAzureVoices)
 
-		widget28 := window.Add("Text", "x" . x . " yp+24 w140 h23 +0x200 VazureTokenIssuerLabel Hidden", translate("Token Issuer Endpoint"))
+		widget28 := window.Add("Text", "x" . x . " yp+24 w112 h23 +0x200 VazureTokenIssuerLabel Hidden", translate("Token Issuer Endpoint"))
 		widget29 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 W:Grow VazureTokenIssuerEdit Hidden")
 		widget29.OnEvent("Change", updateAzureVoices)
 
 		voices := [translate("Random"), translate("Deactivated")]
 
-		widget30 := window.Add("Text", "x" . x . " yp+24 w110 h23 +0x200 VazureSpeakerLabel Hidden", translate("Voice"))
+		widget30 := window.Add("Text", "x" . x . " yp+24 w112 h23 +0x200 VazureSpeakerLabel Hidden", translate("Voice"))
 		widget31 := window.Add("DropDownList", "x" . (x1 + 24) . " yp w" . (w1 - 24) . " W:Grow VazureSpeakerDropDown Hidden", voices)
 
 		widget33 := window.Add("Button", "x" . x1 . " yp w23 h23 Default Hidden")
@@ -418,7 +418,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		voices := [translate("Random"), translate("Deactivated")]
 
-		widget38 := window.Add("Text", "x" . x . " yp+24 w110 h23 +0x200 VgoogleSpeakerLabel Hidden", translate("Voice"))
+		widget38 := window.Add("Text", "x" . x . " yp+24 w112 h23 +0x200 VgoogleSpeakerLabel Hidden", translate("Voice"))
 		widget39 := window.Add("DropDownList", "x" . (x1 + 24) . " yp w" . (w1 - 24) . " W:Grow VgoogleSpeakerDropDown Hidden", voices)
 
 		widget40 := window.Add("Button", "x" . x1 . " yp w23 h23 Default Hidden")

@@ -46,7 +46,7 @@ class RaceStrategistConfigurator extends ConfiguratorPanel {
 
 			if !isNumber(internalValue("Float", field.Text)) {
 				field.Text := (field.HasProp("ValidText") ? field.ValidText : "")
-				
+
 				loop 10
 					SendInput("{Right}")
 			}
@@ -86,7 +86,7 @@ class RaceStrategistConfigurator extends ConfiguratorPanel {
 		w4 := w1 - 24
 		x6 := x1 + w4 + 1
 
-		widget1 := window.Add("Text", "x" . x0 . " y" . y . " w160 h23 +0x200 Hidden", translate("Race Reports Folder"))
+		widget1 := window.Add("Text", "x" . x0 . " y" . y . " w120 h23 +0x200 Hidden", translate("Race Reports Folder"))
 		widget2 := window.Add("Edit", "x" . x1 . " yp w" . w2 . " h21 W:Grow VraceReportsPathEdit Hidden", this.Value["raceReportsPath"])
 		widget3 := window.Add("Button", "x" . x4 . " yp-1 w23 h23 X:Move Hidden", translate("..."))
 		widget3.OnEvent("Click", chooseRaceReportsPath)
@@ -96,7 +96,7 @@ class RaceStrategistConfigurator extends ConfiguratorPanel {
 
 		widget4 := window.Add("Text", "x" . lineX . " yp+30 w" . lineW . " 0x10 W:Grow Hidden")
 
-		widget5 := window.Add("Text", "x" . x0 . " yp+10 w105 h23 +0x200 Hidden", translate("Simulator"))
+		widget5 := window.Add("Text", "x" . x0 . " yp+10 w120 h23 +0x200 Hidden", translate("Simulator"))
 
 		if (this.Simulators.Length = 0)
 			this.iSimulators := this.getSimulators()
@@ -118,17 +118,17 @@ class RaceStrategistConfigurator extends ConfiguratorPanel {
 
 		window.SetFont("Norm", "Arial")
 
-		widget9 := window.Add("Text", "x" . x0 . " yp+17 w80 h23 +0x200 Hidden", translate("Learn for"))
+		widget9 := window.Add("Text", "x" . x0 . " yp+17 w120 h23 +0x200 Hidden", translate("Learn for"))
 		widget10 := window.Add("Edit", "x" . x1 . " yp w40 h21 Number Limit1 vrsLearningLapsEdit Hidden")
 		widget11 := window.Add("UpDown", "x" . x2 . " yp w17 h21 Range1-9 Hidden", 2)
 		widget12 := window.Add("Text", "x" . x3 . " yp w" . w3 . " h23 +0x200 Hidden", translate("Laps after Start or Pitstop"))
 
-		widget13 := window.Add("Text", "x" . x0 . " yp+26 w105 h20 Section Hidden", translate("Statistical Window"))
+		widget13 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Statistical Window"))
 		widget14 := window.Add("Edit", "x" . x1 . " yp-2 w40 h21 Number Limit1 vrsLapsConsideredEdit Hidden", 5)
 		widget15 := window.Add("UpDown", "x" . x2 . " yp w17 h21 Range1-9 Hidden", 5)
 		widget16 := window.Add("Text", "x" . x3 . " yp+2 w80 h20 Hidden", translate("Laps"))
 
-		widget17 := window.Add("Text", "x" . x0 . " ys+24 w105 h20 Section Hidden", translate("Damping Factor"))
+		widget17 := window.Add("Text", "x" . x0 . " ys+24 w120 h20 Section Hidden", translate("Damping Factor"))
 		widget18 := window.Add("Edit", "x" . x1 . " yp-2 w40 h21 vrsDampingFactorEdit Hidden", displayValue("Float", 0.2, 1))
 		widget18.OnEvent("Change", validateRSDampingFactor)
 		widget19 := window.Add("Text", "x" . x3 . " yp+2 w80 h20 Hidden", translate("p. Lap"))
@@ -141,7 +141,7 @@ class RaceStrategistConfigurator extends ConfiguratorPanel {
 		window.SetFont("Norm", "Arial")
 
 		choices := collect(["Ask", "Always save", "No action"], translate)
-		widget21 := window.Add("Text", "x" . x0 . " yp+17 w105 h23 +0x200 Hidden", translate("Save Race Report"))
+		widget21 := window.Add("Text", "x" . x0 . " yp+17 w120 h23 +0x200 Hidden", translate("Save Race Report"))
 		widget22 := window.Add("DropDownList", "x" . x1 . " yp w110 W:Grow(0.3) vrsSaveRaceReportDropDown Hidden", choices)
 
 		x5 := x1 + 114
@@ -149,13 +149,13 @@ class RaceStrategistConfigurator extends ConfiguratorPanel {
 		widget23 := window.Add("Text", "x" . x5 . " yp+3 w110 h20 X:Move(0.3) Hidden", translate("@ Session End"))
 
 		choices := collect(["Ask", "Always save", "No action"], translate)
-		widget24 := window.Add("Text", "x" . x0 . " yp+21 w105 h23 +0x200 Hidden", translate("Save Telemetry"))
+		widget24 := window.Add("Text", "x" . x0 . " yp+21 w120 h23 +0x200 Hidden", translate("Save Telemetry"))
 		widget25 := window.Add("DropDownList", "x" . x1 . " yp w110 W:Grow(0.3) vrsSaveTelemetryDropDown Hidden", choices)
 
 		widget26 := window.Add("Text", "x" . x5 . " yp+3 w110 h20 X:Move(0.3) Hidden", translate("@ Session End"))
 
 		choices := collect(["No", "Yes"], translate)
-		widget27 := window.Add("Text", "x" . x0 . " yp+21 w105 h23 +0x200 Hidden", translate("Race Review"))
+		widget27 := window.Add("Text", "x" . x0 . " yp+21 w120 h23 +0x200 Hidden", translate("Race Review"))
 		widget28 := window.Add("DropDownList", "x" . x1 . " yp w110 W:Grow(0.3) vrsRaceReviewDropDown Hidden", choices)
 
 		widget29 := window.Add("Text", "x" . x5 . " yp+3 w110 h20 X:Move(0.3) Hidden", translate("@ Session End"))

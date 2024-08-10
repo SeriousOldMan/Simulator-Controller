@@ -1429,6 +1429,9 @@ class Window extends Gui {
 		if control
 			return control
 
+		if isDevelopment()
+			options .= " Border"
+
 		if type is Window.Resizer
 			return this.AddResizer(type)
 		else {

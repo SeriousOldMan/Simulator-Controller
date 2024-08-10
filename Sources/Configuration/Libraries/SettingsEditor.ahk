@@ -450,7 +450,7 @@ editSettings(&settingsOrCommand, owner := false, withContinue := false, fromSetu
 
 		settingsEditorGui.SetFont("Norm", "Arial")
 
-		settingsEditorGui.Add("Documentation", "x68 YP+20 w100 Center", translate("Settings")
+		settingsEditorGui.Add("Documentation", "x58 YP+20 w120 Center", translate("Settings")
 							, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings")
 
 		coreSettings := [["Simulator Controller", true, false], ["System Monitor", getMultiMapValue(settingsOrCommand, "Core", "System Monitor", false), true]]

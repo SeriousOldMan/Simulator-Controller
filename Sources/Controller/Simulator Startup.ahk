@@ -842,7 +842,7 @@ launchPad(command := false, arguments*) {
 
 		launchPadGui.SetFont("s9 Norm", "Arial")
 
-		launchPadGui.Add("Documentation", "x233 YS+20 w140 Center", translate("Applications")
+		launchPadGui.Add("Documentation", "x213 YS+20 w180 Center", translate("Applications")
 					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller")
 
 		launchPadGui.SetFont("s8 Norm", "Arial")
@@ -921,7 +921,7 @@ launchPad(command := false, arguments*) {
 
 		launchPadGui.Add("Text", "x8 yp+40 w574 0x10")
 
-		closeCheckBox := launchPadGui.Add("CheckBox", "x16 yp+10 w120 h21 Checked" . getMultiMapValue(startupConfig, "Simulator Startup", "CloseLaunchPad", false), translate("Close on Startup"))
+		closeCheckBox := launchPadGui.Add("CheckBox", "x16 yp+10 w150 h21 Checked" . getMultiMapValue(startupConfig, "Simulator Startup", "CloseLaunchPad", false), translate("Close on Startup"))
 		closeCheckBox.OnEvent("Click", closeOnStartup)
 
 		launchPadGui.Add("Button", "x259 yp w80 h23 Default", translate("Close")).OnEvent("Click", closeLaunchPad)

@@ -1823,7 +1823,7 @@ systemMonitor(command := false, arguments*) {
 
 		systemMonitorGui.SetFont("s9 Norm", "Arial")
 
-		systemMonitorGui.Add("Documentation", "x333 YP+20 w140 Center", translate("Monitoring")
+		systemMonitorGui.Add("Documentation", "x313 YP+20 w180 Center", translate("Monitoring")
 						   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities")
 
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
@@ -1910,20 +1910,20 @@ systemMonitor(command := false, arguments*) {
 
 		systemMonitorGui.SetFont("Norm", "Arial")
 
-		systemMonitorGui.Add("Text", "x413 yp+21 w120", translate("Server URL"))
-		serverURL := systemMonitorGui.Add("Text", "x528 yp w230")
+		systemMonitorGui.Add("Text", "x413 yp+21 w112", translate("Server URL"))
+		serverURL := systemMonitorGui.Add("Text", "x528 yp w245")
 
-		systemMonitorGui.Add("Text", "x413 yp+24 w120", translate("Session Token"))
-		serverToken := systemMonitorGui.Add("Text", "x528 yp w230")
+		systemMonitorGui.Add("Text", "x413 yp+24 w112", translate("Session Token"))
+		serverToken := systemMonitorGui.Add("Text", "x528 yp w245")
 
-		systemMonitorGui.Add("Text", "x413 yp+28 w120", translate("Team"))
-		serverTeam := systemMonitorGui.Add("Text", "x528 yp w230")
+		systemMonitorGui.Add("Text", "x413 yp+28 w112", translate("Team"))
+		serverTeam := systemMonitorGui.Add("Text", "x528 yp w245")
 
-		systemMonitorGui.Add("Text", "x413 yp+24 w120", translate("Driver"))
-		serverDriver := systemMonitorGui.Add("Text", "x528 yp w230")
+		systemMonitorGui.Add("Text", "x413 yp+24 w112", translate("Driver"))
+		serverDriver := systemMonitorGui.Add("Text", "x528 yp w245")
 
-		systemMonitorGui.Add("Text", "x413 yp+24 w120", translate("Session"))
-		serverSession := systemMonitorGui.Add("Text", "x528 yp w230")
+		systemMonitorGui.Add("Text", "x413 yp+24 w112", translate("Session"))
+		serverSession := systemMonitorGui.Add("Text", "x528 yp w245")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
 
@@ -1941,14 +1941,14 @@ systemMonitor(command := false, arguments*) {
 
 		systemMonitorGui.SetFont("Norm", "Arial")
 
-		systemMonitorGui.Add("Text", "x413 yp+28 w120", translate("Stint"))
-		stintNr := systemMonitorGui.Add("Text", "x528 yp w230")
+		systemMonitorGui.Add("Text", "x413 yp+28 w112", translate("Stint"))
+		stintNr := systemMonitorGui.Add("Text", "x528 yp w245")
 
-		systemMonitorGui.Add("Text", "x413 yp+24 w120", translate("Laps"))
-		stintLap := systemMonitorGui.Add("Text", "x528 yp w230")
+		systemMonitorGui.Add("Text", "x413 yp+24 w112", translate("Laps"))
+		stintLap := systemMonitorGui.Add("Text", "x528 yp w245")
 
-		systemMonitorGui.Add("Text", "x413 yp+24 w120", translate("Driver"))
-		stintDriver := systemMonitorGui.Add("Text", "x528 yp w230")
+		systemMonitorGui.Add("Text", "x413 yp+24 w112", translate("Driver"))
+		stintDriver := systemMonitorGui.Add("Text", "x528 yp w245")
 
 		monitorTabView.UseTab(4)
 

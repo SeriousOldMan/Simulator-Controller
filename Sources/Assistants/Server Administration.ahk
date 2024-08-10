@@ -728,7 +728,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 		administrationGui.SetFont("Norm", "Arial")
 
-		administrationGui.Add("Documentation", "x118 YP+20 w168 Center H:Center", translate("Server Administration")
+		administrationGui.Add("Documentation", "x98 YP+20 w208 Center H:Center", translate("Server Administration")
 							, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration")
 
 		administrationGui.SetFont("Norm", "Arial")
@@ -768,10 +768,10 @@ administrationEditor(configurationOrCommand, arguments*) {
 		if (!chosen && (serverURLs.Length > 0))
 			chosen := 1
 
-		administrationGui.Add("Text", "x" . x0 . " y" . y . " w90 h23 +0x200", translate("Server URL"))
+		administrationGui.Add("Text", "x" . x0 . " y" . y . " w120 h23 +0x200", translate("Server URL"))
 		administrationGui.Add("ComboBox", "x" . x1 . " yp+1 w" . w4 . " W:Grow Choose" . chosen . " VteamServerURLEdit", serverURLs)
 
-		administrationGui.Add("Text", "x" . x0 . " yp+23 w90 h23 +0x200", translate("Login Credentials"))
+		administrationGui.Add("Text", "x" . x0 . " yp+23 w95 h23 +0x200", translate("Login Credentials"))
 		administrationGui.Add("Edit", "x" . x1 . " yp+1 w" . w3 . " h21 W:Grow(0.5) VteamServerNameEdit", getMultiMapValue(administrationConfig, "Server Administration", "Login", ""))
 		administrationGui.Add("Edit", "x" . x3 . " yp w" . w3 . " h21 X:Move(0.5) W:Grow(0.5) Password VteamServerPasswordEdit", "")
 
@@ -794,27 +794,27 @@ administrationEditor(configurationOrCommand, arguments*) {
 		accountsListView.OnEvent("DoubleClick", chooseAccount)
 		accountsListView.OnEvent("ItemSelect", selectAccount)
 
-		administrationGui.Add("Text", "x" . x0 . " yp+150 w90 h23 Y:Move +0x200", translate("Name"))
+		administrationGui.Add("Text", "x" . x0 . " yp+150 w120 h23 Y:Move +0x200", translate("Name"))
 		administrationGui.Add("Edit", "x" . x1 . " yp+1 w" . w3 . " W:Grow(0.5) Y:Move vaccountNameEdit")
 
-		administrationGui.Add("Text", "x" . x0 . " yp+24 w90 h23 Y:Move +0x200", translate("Password"))
+		administrationGui.Add("Text", "x" . x0 . " yp+24 w95 h23 Y:Move +0x200", translate("Password"))
 		administrationGui.Add("Edit", "x" . x1 . " yp+1 w" . w4 . " W:Grow Y:Move ReadOnly Password vaccountPasswordEdit")
 		administrationGui.Add("Button", "x" . x2 . " yp-1 w23 h23 Y:Move Center +0x200 vcreatePasswordButton").OnEvent("Click", administrationEditor.Bind(kEvent, "PasswordCreate"))
 		setButtonIcon(administrationGui["createPasswordButton"], kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
 		administrationGui.Add("Button", "x" . x5 . " yp w23 h23 X:Move Y:Move Center +0x200 vcopyPasswordButton").OnEvent("Click", administrationEditor.Bind(kEvent, "PasswordCopy"))
 		setButtonIcon(administrationGui["copyPasswordButton"], kIconsDirectory . "Copy.ico", 1, "L4 T4 R4 B4")
 
-		administrationGui.Add("Text", "x" . x0 . " yp+24 w90 h23 Y:Move +0x200", translate("E-Mail"))
+		administrationGui.Add("Text", "x" . x0 . " yp+24 w120 h23 Y:Move +0x200", translate("E-Mail"))
 		administrationGui.Add("Edit", "x" . x1 . " yp+1 w" . w4 . " W:Grow Y:Move vaccountEMailEdit")
 
-		administrationGui.Add("Text", "x" . x0 . " yp+24 w90 h23 Y:Move +0x200", translate("Session / Data"))
+		administrationGui.Add("Text", "x" . x0 . " yp+24 w120 h23 Y:Move +0x200", translate("Session / Data"))
 		administrationGui.Add("CheckBox", "x" . x1 . " yp+3 w23 Y:Move vaccountSessionAccessCheck")
 		administrationGui.Add("CheckBox", "xp+24 yp w23 Y:Move vaccountDataAccessCheck")
 
-		administrationGui.Add("Text", "x" . x0 . " yp+22 w90 h23 Y:Move +0x200", translate("Contingent"))
+		administrationGui.Add("Text", "x" . x0 . " yp+22 w95 h23 Y:Move +0x200", translate("Contingent"))
 		administrationGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " W:Grow Y:Move Choose2 vaccountContractDropDown", collect(["Expired", "One-Time", "Fixed", "Additional", "Unlimited"], translate)).OnEvent("Change", administrationEditor.Bind(kEvent, "UpdateState"))
 		administrationGui.Add("Edit", "x" . x3 . " yp w60 h21 X:Move Y:Move Number vaccountMinutesEdit")
-		administrationGui.Add("Text", "x" . x4 . " yp w90 h23 X:Move Y:Move +0x200", translate("Minutes"))
+		administrationGui.Add("Text", "x" . x4 . " yp w70 h23 X:Move Y:Move +0x200", translate("Minutes"))
 		administrationGui.Add("Button", "x" . x2 . " yp-1 w23 h23 Y:Move Center +0x200 vavailableMinutesButton").OnEvent("Click", administrationEditor.Bind(kEvent, "UpdateAvailableMinutes"))
 		setButtonIcon(administrationGui["availableMinutesButton"], kIconsDirectory . "Watch.ico", 1, "L4 T4 R4 B4")
 

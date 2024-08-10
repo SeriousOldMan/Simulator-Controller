@@ -265,7 +265,7 @@ class RaceReports extends ConfigurationItem {
 
 		raceReportsGui.SetFont("s9 Norm", "Arial")
 
-		raceReportsGui.Add("Documentation", "x508 YP+20 w184 Center H:Center", translate("Race Reports")
+		raceReportsGui.Add("Documentation", "x488 YP+20 w224 Center H:Center", translate("Race Reports")
 						 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports")
 
 		raceReportsGui.Add("Text", "x8 yp+30 w1200 0x10 W:Grow")

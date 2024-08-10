@@ -2122,10 +2122,12 @@ class RaceCenter extends ConfigurationItem {
 
 			centerGui.Add("Text", "x8 yp+301 w1350 W:Grow 0x10")
 
-			centerGui.SetFont("s8 Norm", "Arial")
+			centerGui.SetFont("s10 Bold", "Arial")
 
 			centerGui.Add("Picture", "x16 yp+10 w30 h30 Section", centerGui.Theme.RecolorizeImage(kIconsDirectory . "Tools BW.ico"))
 			centerGui.Add("Text", "x50 yp+5 w80 h26", translate("Session"))
+
+			centerGui.SetFont("s8 Norm", "Arial")
 
 			centerGui.Add("Text", "x935 yp+8 w381 0x2 X:Move vmessageField")
 

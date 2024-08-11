@@ -198,7 +198,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 		editorGui.SetFont("Norm", "Arial")
 
-		editorGui.Add("Documentation", "x178 YP+20 w128 H:Center Center", translate("Assistant Booster")
+		editorGui.Add("Documentation", "x158 YP+20 w168 H:Center Center", translate("Assistant Booster")
 					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#connecting-an-assistant-to-an-llm")
 
 		editorGui.SetFont("Norm", "Arial")
@@ -219,26 +219,26 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		w4 := w1 - 24
 		x6 := x1 + w4 + 1
 
-		editorGui.SetFont("Italic", "Arial")
-		editorGui.Add("Text", "x" . (x + 8) . " yp+10 w105 h23", translate("Conversation"))
-		editorGui.Add("Text", "x100 yp+7 w" . (width + 8 - 100) . " 0x10 W:Grow")
+		editorGui.SetFont("Italic Bold", "Arial")
+		editorGui.Add("Text", "x" . (x + 8) . " yp+10 w100 h23", translate("Conversation"))
+		editorGui.Add("Text", "x120 yp+7 w" . (width + 8 - 120) . " 0x10 W:Grow")
 		editorGui.SetFont("Norm", "Arial")
 
-		editorGui.Add("Text", "x" . x0 . " yp+20 w105 h23 +0x200 vviConversationProviderLabel", translate("Provider / URL"))
+		editorGui.Add("Text", "x" . x0 . " yp+20 w110 h23 +0x200 vviConversationProviderLabel", translate("Provider / URL"))
 
 		editorGui.Add("DropDownList", "x" . x1 . " yp w100 Choose1 vviConversationProviderDropDown", concatenate([translate("Disabled")], this.Providers)).OnEvent("Change", chooseConversationProvider)
 
 		editorGui.Add("Edit", "x" . (x1 + 102) . " yp w" . (w1 - 102) . " h23 vviConversationServiceURLEdit").OnEvent("Change", loadModels.Bind("Conversation"))
 
-		editorGui.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200 Section vviConversationServiceKeyLabel", translate("Service Key"))
+		editorGui.Add("Text", "x" . x0 . " yp+24 w110 h23 +0x200 Section vviConversationServiceKeyLabel", translate("Service Key"))
 		editorGui.Add("Edit", "x" . x1 . " yp w" . w1 . " h23 Password vviConversationServiceKeyEdit").OnEvent("Change", loadModels.Bind("Conversation"))
 
-		editorGui.Add("Text", "x" . x0 . " yp+30 w105 h23 +0x200 vviConversationModelLabel", translate("Model / # Tokens"))
+		editorGui.Add("Text", "x" . x0 . " yp+30 w110 h23 +0x200 vviConversationModelLabel", translate("Model / # Tokens"))
 		editorGui.Add("ComboBox", "x" . x1 . " yp w" . (w1 - 64) . " vviConversationModelDropDown")
 		editorGui.Add("Edit", "x" . (x1 + (w1 - 60)) . " yp-1 w60 h23 Number vviConversationMaxTokensEdit").OnEvent("Change", validateTokens.Bind("viConversationMaxTokensEdit"))
 		editorGui.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 Range32-131072 vviConversationMaxTokensRange")
 
-		editorGui.Add("Text", "x" . x0 . " ys+6 w105 h23 +0x200 vviConversationLLMRTModelLabel Hidden", translate("Model"))
+		editorGui.Add("Text", "x" . x0 . " ys+6 w110 h23 +0x200 vviConversationLLMRTModelLabel Hidden", translate("Model"))
 		editorGui.Add("Edit", "x" . x1 . " yp w" . (w1 - 24) . " vviConversationLLMRTModelEdit Hidden")
 		editorGui.Add("Button", "x" . (x1 + (w1 - 23)) . " yp h23 w23 vviConversationLLMRTModelButton Hidden", translate("...")).OnEvent("Click", chooseModelPath.Bind("viConversationLLMRTModelEdit"))
 
@@ -249,77 +249,77 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		editorGui.Add("UpDown", "x" . (x1 + 62) . " yp w60 h23 Range0-99 vviConversationLLMRTGPULayersRange Hidden")
 
 		editorGui.SetFont("Italic", "Arial")
-		editorGui.Add("Checkbox", "x" . x0 . " yp+36 w105 h21 vviSpeakerCheck", translate("Rephrasing")).OnEvent("Click", (*) => this.updateState())
-		editorGui.Add("Text", "x100 yp+11 w" . (width + 8 - 100) . " 0x10 W:Grow")
+		editorGui.Add("Checkbox", "x" . x0 . " yp+36 w100 h21 vviSpeakerCheck", translate("Rephrasing")).OnEvent("Click", (*) => this.updateState())
+		editorGui.Add("Text", "x127 yp+11 w" . (width + 8 - 127) . " 0x10 W:Grow")
 		editorGui.SetFont("Norm", "Arial")
 
-		editorGui.Add("Text", "x" . x0 . " yp+20 w105 h23 +0x200", translate("Activation"))
+		editorGui.Add("Text", "x" . x0 . " yp+20 w110 h23 +0x200", translate("Activation"))
 		editorGui.Add("Edit", "x" . x1 . " yp w60 Number Limit3 vviSpeakerProbabilityEdit").OnEvent("Change", validatePercentage.Bind("viSpeakerProbabilityEdit"))
 		editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range0-100")
 		editorGui.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200", translate("%"))
 
 		editorGui.Add("Button", "x" . (width - 100) . " yp w100 h23 X:Move vviSpeakerInstructionsButton", translate("Instructions...")).OnEvent("Click", editInstructions.Bind("Speaker", translate("Rephrasing")))
 
-		editorGui.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200", translate("Creativity"))
+		editorGui.Add("Text", "x" . x0 . " yp+24 w110 h23 +0x200", translate("Creativity"))
 		editorGui.Add("Edit", "x" . x1 . " yp w60 Number Limit3 vviSpeakerTemperatureEdit").OnEvent("Change", validatePercentage.Bind("viSpeakerTemperatureEdit"))
 		editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range0-100")
 		editorGui.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200", translate("%"))
 
 		editorGui.SetFont("Italic", "Arial")
-		editorGui.Add("Checkbox", "x" . x0 . " yp+36 w105 h21 vviListenerCheck", translate("Understanding")).OnEvent("Click", (*) => this.updateState())
-		editorGui.Add("Text", "x100 yp+11 w" . (width + 8 - 100) . " 0x10 W:Grow")
+		editorGui.Add("Checkbox", "x" . x0 . " yp+36 w100 h21 vviListenerCheck", translate("Understanding")).OnEvent("Click", (*) => this.updateState())
+		editorGui.Add("Text", "x127 yp+11 w" . (width + 8 - 127) . " 0x10 W:Grow")
 		editorGui.SetFont("Norm", "Arial")
 
-		editorGui.Add("Text", "x" . x0 . " yp+20 w105 h23 +0x200", translate("Activation"))
+		editorGui.Add("Text", "x" . x0 . " yp+20 w110 h23 +0x200", translate("Activation"))
 		editorGui.Add("DropDownList", "x" . x1 . " yp w100 Choose1 vviListenerModeDropDown", collect(["Always", "Unrecognized"], translate)).OnEvent("Change", (*) => this.updateState())
 
 		editorGui.Add("Button", "x" . (width - 100) . " yp w100 h23 X:Move vviListenerInstructionsButton", translate("Instructions...")).OnEvent("Click", editInstructions.Bind("Listener", translate("Understanding")))
 
-		editorGui.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200", translate("Creativity"))
+		editorGui.Add("Text", "x" . x0 . " yp+24 w110 h23 +0x200", translate("Creativity"))
 		editorGui.Add("Edit", "x" . x1 . " yp w60 Number Limit3 vviListenerTemperatureEdit").OnEvent("Change", validatePercentage.Bind("viListenerTemperatureEdit"))
 		editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range0-100")
 		editorGui.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200", translate("%"))
 
 		editorGui.SetFont("Italic", "Arial")
-		editorGui.Add("Checkbox", "x" . x0 . " yp+36 w105 h21 vviConversationCheck", translate("Conversation")).OnEvent("Click", (*) => this.updateState())
-		editorGui.Add("Text", "x100 yp+11 w" . (width + 8 - 100) . " 0x10 W:Grow")
+		editorGui.Add("Checkbox", "x" . x0 . " yp+36 w100 h21 vviConversationCheck", translate("Conversation")).OnEvent("Click", (*) => this.updateState())
+		editorGui.Add("Text", "x127 yp+11 w" . (width + 8 - 127) . " 0x10 W:Grow")
 		editorGui.SetFont("Norm", "Arial")
 
-		editorGui.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200", translate("Memory"))
+		editorGui.Add("Text", "x" . x0 . " yp+24 w110 h23 +0x200", translate("Memory"))
 		editorGui.Add("Edit", "x" . x1 . " yp w60 h23 Number Limit2 vviConversationMaxHistoryEdit")
 		editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range1-10")
 		editorGui.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200", translate("Conversations"))
 
 		editorGui.Add("Button", "x" . (width - 100) . " yp w100 h23 X:Move vviConversationInstructionsButton", translate("Instructions...")).OnEvent("Click", editInstructions.Bind("Conversation", translate("Conversation")))
 
-		editorGui.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200", translate("Creativity"))
+		editorGui.Add("Text", "x" . x0 . " yp+24 w110 h23 +0x200", translate("Creativity"))
 		editorGui.Add("Edit", "x" . x1 . " yp w60 Number Limit3 vviConversationTemperatureEdit").OnEvent("Change", validatePercentage.Bind("viConversationTemperatureEdit"))
 		editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range0-100")
 		editorGui.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200", translate("%"))
 
-		editorGui.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200", translate("Actions"))
+		editorGui.Add("Text", "x" . x0 . " yp+24 w110 h23 +0x200", translate("Actions"))
 		editorGui.Add("DropDownList", "x" . x1 . " yp w60 vviConversationActionsDropdown", collect(["Yes", "No"], translate)).OnEvent("Change", (*) => this.updateState())
 		editorGui.Add("Button", "x" . (x1 + 61) . " yp-1 w23 h23 X:Move Center +0x200 vviConversationEditActionsButton").OnEvent("Click", editActions.Bind("Conversation.Actions"))
 		setButtonIcon(editorGui["viConversationEditActionsButton"], kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
 
-		editorGui.SetFont("Italic", "Arial")
-		editorGui.Add("Text", "x" . (x + 8) . " yp+30 w105 h23", translate("Reasoning"))
-		editorGui.Add("Text", "x100 yp+7 w" . (width + 8 - 100) . " 0x10 W:Grow")
+		editorGui.SetFont("Italic Bold", "Arial")
+		editorGui.Add("Text", "x" . (x + 8) . " yp+30 w100 h23", translate("Reasoning"))
+		editorGui.Add("Text", "x120 yp+7 w" . (width + 8 - 120) . " 0x10 W:Grow")
 		editorGui.SetFont("Norm", "Arial")
 
-		editorGui.Add("Text", "x" . x0 . " yp+20 w105 h23 +0x200 vviAgentProviderLabel", translate("Provider / URL"))
+		editorGui.Add("Text", "x" . x0 . " yp+20 w110 h23 +0x200 vviAgentProviderLabel", translate("Provider / URL"))
 
 		editorGui.Add("DropDownList", "x" . x1 . " yp w100 Choose1 vviAgentProviderDropDown", concatenate([translate("Disabled")], this.Providers)).OnEvent("Change", chooseAgentProvider)
 
 		editorGui.Add("Edit", "x" . (x1 + 102) . " yp w" . (w1 - 102) . " h23 vviAgentServiceURLEdit").OnEvent("Change", loadModels.Bind("Agent"))
 
-		editorGui.Add("Text", "x" . x0 . " yp+24 w105 h23 +0x200 Section vviAgentServiceKeyLabel", translate("Service Key"))
+		editorGui.Add("Text", "x" . x0 . " yp+24 w110 h23 +0x200 Section vviAgentServiceKeyLabel", translate("Service Key"))
 		editorGui.Add("Edit", "x" . x1 . " yp w" . w1 . " h23 Password vviAgentServiceKeyEdit").OnEvent("Change", loadModels.Bind("Agent"))
 
-		editorGui.Add("Text", "x" . x0 . " yp+30 w105 h23 +0x200 vviAgentModelLabel", translate("Model"))
+		editorGui.Add("Text", "x" . x0 . " yp+30 w110 h23 +0x200 vviAgentModelLabel", translate("Model"))
 		editorGui.Add("ComboBox", "x" . x1 . " yp w" . w1 . " vviAgentModelDropDown")
 
-		editorGui.Add("Text", "x" . x0 . " ys+5 w105 h23 +0x200 vviAgentLLMRTModelLabel Hidden", translate("Model"))
+		editorGui.Add("Text", "x" . x0 . " ys+5 w110 h23 +0x200 vviAgentLLMRTModelLabel Hidden", translate("Model"))
 		editorGui.Add("Edit", "x" . x1 . " yp w" . (w1 - 24) . " vviAgentLLMRTModelEdit Hidden")
 		editorGui.Add("Button", "x" . (x1 + (w1 - 23)) . " yp h23 w23 vviAgentLLMRTModelButton Hidden", translate("...")).OnEvent("Click", chooseModelPath.Bind("viAgentLLMRTModelEdit"))
 
@@ -1370,12 +1370,12 @@ class CallbacksEditor {
 		editorGui.Add("Button", "x824 yp w23 h23 Center +0x200 X:Move Y:Move(0.25) vdeleteParameterButton").OnEvent("Click", (*) => this.deleteParameter())
 		setButtonIcon(editorGui["deleteParameterButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
-		editorGui.Add("Text", "x430 yp+28 w90 h23 +0x200 X:Move(0.34) Y:Move(0.25)", translate("Name / Type"))
+		editorGui.Add("Text", "x430 yp+28 w100 h23 +0x200 X:Move(0.34) Y:Move(0.25)", translate("Name / Type"))
 		editorGui.Add("Edit", "x536 yp h23 w127 Y:Move(0.25) X:Move(0.34) vparameterNameEdit").OnEvent("Change", updateParametersList)
 		editorGui.Add("DropDownList", "x665 yp w90 Y:Move(0.25) X:Move(0.34) vparameterTypeDropDown", collect(["String", "Integer", "Number", "Boolean"], translate)).OnEvent("Change", updateParametersList)
 		editorGui.Add("DropDownList", "x758 yp w90 Y:Move(0.25) X:Move(0.34) vparameterOptionalDropDown", collect(["Required", "Optional"], translate)).OnEvent("Change", updateParametersList)
 
-		editorGui.Add("Text", "x430 yp+24 w90 h23 +0x200 Y:Move(0.25) X:Move(0.34)", translate("Description"))
+		editorGui.Add("Text", "x430 yp+24 w100 h23 +0x200 Y:Move(0.25) X:Move(0.34)", translate("Description"))
 		editorGui.Add("Edit", "x536 yp h23 w312 Y:Move(0.25) X:Move(0.34) W:Grow(0.66) vparameterDescriptionEdit").OnEvent("Change", updateParametersList)
 
 		this.updateState()

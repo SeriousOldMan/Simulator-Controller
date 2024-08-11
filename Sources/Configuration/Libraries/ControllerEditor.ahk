@@ -178,7 +178,7 @@ class ControllerEditor extends ConfiguratorPanel {
 
 		controllerGui.SetFont("Norm", "Arial")
 
-		controllerGui.Add("Documentation", "x160 YP+20 w112 H:Center Center", translate("Controller Layouts")
+		controllerGui.Add("Documentation", "x130 YP+20 w172 H:Center Center", translate("Controller Layouts")
 						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#controller-layouts")
 
 		this.ControlsList.createGui(this, buttonBoxConfiguration)
@@ -427,15 +427,15 @@ class ControlsList extends ConfigurationItemList {
 
 		window.Add("ListView", "x16 y79 w134 h108 W:Grow(0.2) -Multi -LV0x10 AltSubmit NoSort NoSortHdr VcontrolsListView", collect(["Name", "Function", "Size"], translate))
 
-		window.Add("Text", "x164 y79 w80 h23 X:Move(0.2) +0x200", translate("Name"))
+		window.Add("Text", "x160 y79 w55 h23 X:Move(0.2) +0x200", translate("Name"))
 		window.Add("Edit", "x214 y80 w105 h21 X:Move(0.2) W:Grow(0.3) VcontrolNameEdit")
 		window.Add("DropDownList", "x325 y79 w101 X:Move(0.5) W:Grow(0.5) Choose1 VcontrolTypeDropDown", collect(["1-way Toggle", "2-way Toggle", "Button", "Dial"], translate))
 
-		window.Add("Text", "x164 y103 w80 h23 X:Move(0.2) +0x200", translate("Image"))
+		window.Add("Text", "x160 y103 w55 h23 X:Move(0.2) +0x200", translate("Image"))
 		window.Add("Edit", "x214 y103 w186 h21 X:Move(0.2) W:Grow(0.8) VimageFilePathEdit")
 		window.Add("Button", "x403 y103 w23 h23 X:Move ", translate("...")).OnEvent("Click", chooseImageFilePath)
 
-		window.Add("Text", "x164 y127 w80 h23 X:Move(0.2) +0x200", translate("Size"))
+		window.Add("Text", "x160 y127 w55 h23 X:Move(0.2) +0x200", translate("Size"))
 		window.Add("Edit", "x214 y127 w40 h21 X:Move(0.2) Limit3 Number VimageWidthEdit")
 		window.Add("Text", "x255 y127 w23 h23 X:Move(0.2) +0x200 Center", translate("x"))
 		window.Add("Edit", "x279 y127 w40 h21 X:Move(0.2) Limit3 Number VimageHeightEdit")
@@ -575,10 +575,10 @@ class LabelsList extends ConfigurationItemList {
 
 		window.Add("ListView", "x16 y224 w134 h84 W:Grow(0.2) -Multi -LV0x10 AltSubmit NoSort NoSortHdr VlabelsListView", collect(["Name", "Size"], translate))
 
-		window.Add("Text", "x164 y224 w80 h23 X:Move(0.2) +0x200", translate("Name"))
+		window.Add("Text", "x160 y224 w55 h23 X:Move(0.2) +0x200", translate("Name"))
 		window.Add("Edit", "x214 y225 w105 h21 X:Move(0.2) W:Grow(0.3) VlabelNameEdit")
 
-		window.Add("Text", "x164 y248 w80 h23 X:Move(0.2) +0x200", translate("Size"))
+		window.Add("Text", "x160 y248 w55 h23 X:Move(0.2) +0x200", translate("Size"))
 		window.Add("Edit", "x214 y248 w40 h21 X:Move(0.2) Limit3 Number VlabelWidthEdit")
 		window.Add("Text", "x255 y248 w23 h23 X:Move(0.2) +0x200 Center", translate("x"))
 		window.Add("Edit", "x279 y248 w40 h21 X:Move(0.2) Limit3 Number VlabelHeightEdit")

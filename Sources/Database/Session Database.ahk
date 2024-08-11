@@ -1276,7 +1276,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui.SetFont("s9 Norm", "Arial")
 
-		editorGui.Add("Documentation", "x238 YP+20 w204 H:Center Center", translate("Session Database")
+		editorGui.Add("Documentation", "x228 YP+20 w224 H:Center Center", translate("Session Database")
 					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database")
 
 		editorGui.Add("Text", "x8 yp+30 w670 W:Grow 0x10")

@@ -198,7 +198,7 @@ class GeneralTab extends ConfiguratorPanel {
 		if (chosen == 0)
 			chosen := enIndex
 
-		window.Add("Text", "x24 y176 w126 h23 +0x200", translate("Localization"))
+		window.Add("Text", "x24 y176 w190 h23 +0x200", translate("Localization"))
 		window.Add("DropDownList", "x250 y176 w188 W:Grow Choose" . chosen . " vlanguageDropDown", choices)
 		window.Add("Button", "x440 y175 w23 h23 X:Move", translate("...")).OnEvent("Click", openTranslationsEditor)
 		button := window.Add("Button", "x224 y175 w23 h23")

@@ -670,7 +670,7 @@ class SetupWizard extends ConfiguratorPanel {
 
 		wizardGui.SetFont("s9 Norm", "Arial")
 
-		wizardGui.Add("Documentation", "x258 YP+20 w184 H:Center Center", translate("Setup && Configuration")
+		wizardGui.Add("Documentation", "x248 YP+20 w204 H:Center Center", translate("Setup && Configuration")
 					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#setup")
 
 		wizardGui.Add("Text", "x8 yp+20 w700 0x10 W:Grow")
@@ -702,7 +702,7 @@ class SetupWizard extends ConfiguratorPanel {
 		wizardGui.Add("Text", "x8 yp+34 w700 0x10 Y:Move W:Grow")
 
 		wizardGui.Add("Text", "x16 y580 w85 h23 Y:Move +0x200", translate("Language"))
-		wizardGui.Add("DropDownList", "x100 y580 w75 Y:Move Choose" . chosen . "  VlanguageDropDown", collect(choices, translate)).OnEvent("Change", chooseLanguage)
+		wizardGui.Add("DropDownList", "x105 y580 w75 Y:Move Choose" . chosen . "  VlanguageDropDown", collect(choices, translate)).OnEvent("Change", chooseLanguage)
 
 		wizardGui.Add("DropDownList", "x238 y580 w260 X:Move(0.5) Y:Move VstepDropDown").OnEvent("Change", gotoStep)
 

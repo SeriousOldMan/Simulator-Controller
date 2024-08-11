@@ -142,14 +142,14 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 
 		window.SetFont("s8 Norm", "Arial")
 
-		widget5 := window.Add("Text", "x" . x . " yp+10 w105 h23 +0x200 Hidden", translate("Pedal Effects"))
+		widget5 := window.Add("Text", "x" . x . " yp+10 w125 h23 +0x200 Hidden", translate("Pedal Effects"))
 
 		widget6 := window.Add("Button", "x" . buttonX . " yp w23 h23  Hidden")
 		widget6.OnEvent("Click", changePedalEffects)
 		setButtonIcon(widget6, kResourcesDirectory . "Setup\Images\Pencil.ico", 1, "L2 T2 R2 B2 H16 W16")
 		widget7 := window.Add("ListBox", "x" . secondX . " yp w" . secondWidth . " h60 ReadOnly Disabled Hidden")
 
-		widget8 := window.Add("Text", "x" . x . " yp+65 w105 h23 +0x200 Hidden", translate("Chassis Effects"))
+		widget8 := window.Add("Text", "x" . x . " yp+65 w125 h23 +0x200 Hidden", translate("Chassis Effects"))
 
 		widget9 := window.Add("Button", "x" . buttonX . " yp w23 h23  Hidden")
 		widget9.OnEvent("Click", changeChassisEffects)

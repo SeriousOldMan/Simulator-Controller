@@ -1368,7 +1368,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		centerGui.SetFont("s9 Norm", "Arial")
 
-		centerGui.Add("Documentation", "x608 YP+20 w134 H:Center Center", translate("Practice Center")
+		centerGui.Add("Documentation", "x588 YP+20 w174 H:Center Center", translate("Practice Center")
 					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Practice-Center")
 
 		centerGui.Add("Text", "x8 yp+30 w1350 W:Grow 0x10")
@@ -1377,7 +1377,7 @@ class PracticeCenter extends ConfigurationItem {
 		centerGui.SetFont("s10 Bold", "Arial")
 
 		centerGui.Add("Picture", "x16 yp+12 w30 h30 Section", centerGui.Theme.RecolorizeImage(kIconsDirectory . "Report.ico"))
-		centerGui.Add("Text", "x50 yp+5 w80 h26", translate("Reports"))
+		centerGui.Add("Text", "x50 yp+5 w120 h26", translate("Reports"))
 
 		centerGui.SetFont("s8 Norm", "Arial")
 
@@ -1429,26 +1429,26 @@ class PracticeCenter extends ConfigurationItem {
 		this.iReportsListView.ModifyCol(1, "AutoHdr")
 
 		centerGui.Add("Text", "x141 yp+2 w70 h23 +0x200", translate("Stint"))
-		centerGui.Add("DropDownList", "x195 yp w191 vrunDropDown").OnEvent("Change", chooseRunData)
+		centerGui.Add("DropDownList", "x215 yp w171 vrunDropDown").OnEvent("Change", chooseRunData)
 
 		centerGui.Add("Text", "x141 yp+24 w70 h23 +0x200", translate("Driver"))
-		centerGui.Add("DropDownList", "x195 yp w191 vdriverDropDown").OnEvent("Change", chooseDriverData)
+		centerGui.Add("DropDownList", "x215 yp w171 vdriverDropDown").OnEvent("Change", chooseDriverData)
 
 		centerGui.Add("Text", "x141 yp+24 w70 h23 +0x200", translate("X-Axis"))
 
-		centerGui.Add("DropDownList", "x195 yp w191 vdataXDropDown").OnEvent("Change", chooseAxis)
+		centerGui.Add("DropDownList", "x215 yp w171 vdataXDropDown").OnEvent("Change", chooseAxis)
 
 		centerGui.Add("Text", "x141 yp+24 w70 h23 +0x200", translate("Series"))
 
-		centerGui.Add("DropDownList", "x195 yp w191 vdataY1DropDown").OnEvent("Change", chooseAxis)
-		centerGui.Add("DropDownList", "x195 yp+24 w191 vdataY2DropDown").OnEvent("Change", chooseAxis)
-		centerGui.Add("DropDownList", "x195 yp+24 w191 vdataY3DropDown").OnEvent("Change", chooseAxis)
-		centerGui.Add("DropDownList", "x195 yp+24 w191 vdataY4DropDown").OnEvent("Change", chooseAxis)
-		centerGui.Add("DropDownList", "x195 yp+24 w191 vdataY5DropDown").OnEvent("Change", chooseAxis)
-		centerGui.Add("DropDownList", "x195 yp+24 w191 vdataY6DropDown").OnEvent("Change", chooseAxis)
+		centerGui.Add("DropDownList", "x215 yp w171 vdataY1DropDown").OnEvent("Change", chooseAxis)
+		centerGui.Add("DropDownList", "x215 yp+24 w171 vdataY2DropDown").OnEvent("Change", chooseAxis)
+		centerGui.Add("DropDownList", "x215 yp+24 w171 vdataY3DropDown").OnEvent("Change", chooseAxis)
+		centerGui.Add("DropDownList", "x215 yp+24 w171 vdataY4DropDown").OnEvent("Change", chooseAxis)
+		centerGui.Add("DropDownList", "x215 yp+24 w171 vdataY5DropDown").OnEvent("Change", chooseAxis)
+		centerGui.Add("DropDownList", "x215 yp+24 w171 vdataY6DropDown").OnEvent("Change", chooseAxis)
 
-		centerGui.Add("Text", "x400 ys w40 h23 +0x200", translate("Plot"))
-		centerGui.Add("DropDownList", "x444 yp w80 Choose1 vchartTypeDropDown", collect(["Scatter", "Bar", "Bubble", "Line"], translate)).OnEvent("Change", chooseChartType)
+		centerGui.Add("Text", "x400 ys w60 h23 +0x200", translate("Plot"))
+		centerGui.Add("DropDownList", "x464 yp w80 Choose1 vchartTypeDropDown", collect(["Scatter", "Bar", "Bubble", "Line"], translate)).OnEvent("Change", chooseChartType)
 
 		centerGui.Add("Button", "x1327 yp w23 h23 X:Move vreportSettingsButton").OnEvent("Click", reportSettings)
 		setButtonIcon(centerGui["reportSettingsButton"], kIconsDirectory . "General Settings.ico", 1)
@@ -1463,7 +1463,7 @@ class PracticeCenter extends ConfigurationItem {
 		centerGui.SetFont("s10 Bold", "Arial")
 
 		centerGui.Add("Picture", "x16 yp+10 w30 h30 Section", centerGui.Theme.RecolorizeImage(kIconsDirectory . "Watch.ico"))
-		centerGui.Add("Text", "x50 yp+5 w80 h26", translate("Session"))
+		centerGui.Add("Text", "x50 yp+5 w120 h26", translate("Session"))
 
 		centerGui.SetFont("s8 Norm", "Arial")
 
@@ -1514,34 +1514,23 @@ class PracticeCenter extends ConfigurationItem {
 
 		centerGui.SetFont("Norm", "Arial")
 
-		centerGui.Add("Text", "x" . x . " yp+21 w75 h23 +0x200", translate("Mode"))
+		centerGui.Add("Text", "x" . x . " yp+21 w83 h23 +0x200", translate("Mode"))
 		centerGui.Add("DropDownList", "x" . x1 . " yp w110 Choose2 vrunModeDropDown", collect(["Manual", "Auto"], translate)).OnEvent("Change", updateState)
-
-		/*
-		centerGui.Add("Text", "x" . (x + 8) . " yp+35 w175 0x10")
-
-		centerGui.SetFont("Norm", "Arial")
-		centerGui.SetFont("Italic", "Arial")
-
-		centerGui.Add("Text", "x" . (x + 8) . " yp+10 w175 h23 +0x200 Center", translate("Tyres"))
-
-		centerGui.SetFont("Norm", "Arial")
-		*/
 
 		choices := collect(["No change", "Auto", normalizeCompound("Dry")], translate)
 		chosen := 2
 
-		centerGui.Add("Text", "x" . x . " yp+24 w75 h23 +0x200", translate("Compound"))
+		centerGui.Add("Text", "x" . x . " yp+24 w83 h23 +0x200", translate("Compound"))
 		centerGui.Add("DropDownList", "x" . x1 . " yp w86 Choose" . chosen . " vtyreCompoundDropDown", choices).OnEvent("Change", updateState)
 
 		centerGui.Add("Button", "x" . xb . " yp w23 h23 Center +0x200 vimportPressuresButton").OnEvent("Click", importPressures)
 		setButtonIcon(centerGui["importPressuresButton"], kIconsDirectory . "Copy.ico", 1, "")
 
-		centerGui.Add("Text", "x" . x . " yp+28 w75 h20", translate("Set"))
+		centerGui.Add("Text", "x" . x . " yp+28 w83 h20", translate("Set"))
 		centerGui.Add("Edit", "x" . x1 . " yp-4 w50 h20 Limit2 Number vtyreSetEdit").OnEvent("Change", updateState)
 		centerGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99")
 
-		centerGui.Add("Text", "x" . x . " yp+28 w85 h40", translate("Pressures") . translate(" (") . getUnit("Pressure") . translate(")"))
+		centerGui.Add("Text", "x" . x . " yp+28 w83 h40", translate("Pressures") . translate(" (") . getUnit("Pressure") . translate(")"))
 
 		centerGui.Add("Edit", "x" . x1 . " yp-2 w50 h20 Limit4 vtyrePressureFLEdit").OnEvent("Change", validateNumber.Bind("tyrePressureFLEdit"))
 		centerGui.Add("Edit", "x" . (x1 + 58) . " yp w50 h20 Limit4 vtyrePressureFREdit").OnEvent("Change", validateNumber.Bind("tyrePressureFREdit"))
@@ -1610,7 +1599,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		centerTab.UseTab(4)
 
-		centerGui.Add("Text", "x24 ys+40 w80 h21", translate("Fuel Level"))
+		centerGui.Add("Text", "x24 ys+40 w95 h21", translate("Fuel Level"))
 
 		columns := collect(kFuelBuckets, convertUnit.Bind("Volume"))
 
@@ -1621,7 +1610,7 @@ class PracticeCenter extends ConfigurationItem {
 		this.iFuelDataListView.OnEvent("Click", noSelect)
 		this.iFuelDataListView.OnEvent("DoubleClick", noSelect)
 
-		centerGui.Add("Text", "x24 ys+178 w80 h21 Y:Move(0.4)", translate("Tyre Usage"))
+		centerGui.Add("Text", "x24 ys+178 w95 h21 Y:Move(0.4)", translate("Tyre Usage"))
 
 		this.iTyreDataListView := centerGui.Add("ListView", "x124 ys+171 w477 h132 Y:Move(0.5) H:Grow(0.5) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", concatenate([translate("Fuel")], kTyreLapsBuckets))
 		this.iTyreDataListView.OnEvent("Click", noSelect)

@@ -112,12 +112,26 @@ class ControllerList extends ConfigurationItemList {
 		window.Add("DropDownList", "x330 y99 w108 X:Move(0.7) W:Grow(0.3) Choose" . chosen . " VcontrollerLayoutDropDown", choices)
 		window.Add("Button", "x440 y98 w23 h23 X:Move VopenControllerEditorButton", translate("...")).OnEvent("Click", openControllerEditor)
 
+		/*
 		window.Add("Button", "x385 y124 w38 h23 X:Move Disabled VcontrollerUpButton", translate("Up"))
 		window.Add("Button", "x425 y124 w38 h23 X:Move Disabled VcontrollerDownButton", translate("Down"))
 
 		window.Add("Button", "x265 y164 w46 h23 X:Move VcontrollerAddButton", translate("Add"))
 		window.Add("Button", "x313 y164 w50 h23 X:Move Disabled VcontrollerDeleteButton", translate("Delete"))
 		window.Add("Button", "x409 y164 w55 h23 X:Move Disabled VcontrollerUpdateButton", translate("Save"))
+		*/
+
+		window.Add("Button", "x416 y124 w23 h23 X:Move Disabled VcontrollerUpButton")
+		setButtonIcon(window["controllerUpButton"], kIconsDirectory . "Up Arrow.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x440 y124 w23 h23 X:Move Disabled VcontrollerDownButton")
+		setButtonIcon(window["controllerDownButton"], kIconsDirectory . "Down Arrow.ico", 1, "L4 T4 R4 B4")
+
+		window.Add("Button", "x386 y164 w23 h23 X:Move VcontrollerAddButton")
+		setButtonIcon(window["controllerAddButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x410 y164 w23 h23 X:Move Disabled VcontrollerDeleteButton")
+		setButtonIcon(window["controllerDeleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x440 y164 w23 h23 X:Move Disabled VcontrollerUpdateButton")
+		setButtonIcon(window["controllerUpdateButton"], kIconsDirectory . "Save.ico", 1, "L4 T4 R4 B4")
 
 		this.initializeList(editor, window["controllerListBox"], window["controllerAddButton"], window["controllerDeleteButton"], window["controllerUpdateButton"]
 								  , window["controllerUpButton"], window["controllerDownButton"])
@@ -327,9 +341,18 @@ class FunctionsList extends ConfigurationItemList {
 		window.Add("Edit", "x124 y484 w160 h21 Y:Move W:Grow(0.5) VfunctionOnActionEdit")
 		window.Add("Edit", "x303 y484 w160 h21 Y:Move X:Move(0.5) W:Grow(0.5) VfunctionOffActionEdit")
 
+		/*
 		window.Add("Button", "x264 y530 w46 h23 Y:Move X:Move VfunctionAddButton", translate("Add"))
 		window.Add("Button", "x312 y530 w50 h23 Y:Move X:Move Disabled VfunctionDeleteButton", translate("Delete"))
 		window.Add("Button", "x418 y530 w55 h23 Y:Move X:Move Disabled VfunctionUpdateButton", translate("&Save"))
+		*/
+
+		window.Add("Button", "x396 y530 w23 h23 X:Move Y:Move VfunctionAddButton")
+		setButtonIcon(window["functionAddButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x420 y530 w23 h23 X:Move Y:Move Disabled VfunctionDeleteButton")
+		setButtonIcon(window["functionDeleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x450 y530 w23 h23 X:Move Y:Move Disabled VfunctionUpdateButton")
+		setButtonIcon(window["functionUpdateButton"], kIconsDirectory . "Save.ico", 1, "L4 T4 R4 B4")
 
 		this.initializeList(editor, window["functionsListView"], window["functionAddButton"], window["functionDeleteButton"], window["functionUpdateButton"])
 	}

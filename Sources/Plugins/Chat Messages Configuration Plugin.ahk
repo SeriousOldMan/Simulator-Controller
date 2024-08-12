@@ -39,9 +39,18 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 		window.Add("Text", "x16 y383 w90 h23 Y:Move +0x200", translate("Message"))
 		window.Add("Edit", "x110 y383 w363 h21 Y:Move W:Grow VchatMessageMessageEdit")
 
+		/*
 		window.Add("Button", "x264 y530 w46 h23 Y:Move X:Move VchatMessageAddButton", translate("Add"))
 		window.Add("Button", "x312 y530 w50 h23 Y:Move X:Move Disabled VchatMessageDeleteButton", translate("Delete"))
 		window.Add("Button", "x418 y530 w55 h23 Y:Move X:Move Disabled VchatMessageUpdateButton", translate("&Save"))
+		*/
+
+		window.Add("Button", "x396 y530 w23 h23 X:Move Y:Move VchatMessageAddButton")
+		setButtonIcon(window["chatMessageAddButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x420 y530 w23 h23 X:Move Y:Move Disabled VchatMessageDeleteButton")
+		setButtonIcon(window["chatMessageDeleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x450 y530 w23 h23 X:Move Y:Move Disabled VchatMessageUpdateButton")
+		setButtonIcon(window["chatMessageUpdateButton"], kIconsDirectory . "Save.ico", 1, "L4 T4 R4 B4")
 
 		this.initializeList(editor, window["chatMessagesListView"], window["chatMessageAddButton"], window["chatMessageDeleteButton"], window["chatMessageUpdateButton"])
 	}

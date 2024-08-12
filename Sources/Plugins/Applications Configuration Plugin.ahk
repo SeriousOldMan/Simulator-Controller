@@ -120,9 +120,18 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 		window.Add("Text", "x334 y467 w136 h23 Y:Move X:Move(0.84) +0x200 +Center", translate("Running?"))
 		window.Add("Edit", "x334 y491 w136 h21 Y:Move X:Move(0.66) W:Grow(0.34) VapplicationIsRunningEdit")
 
+		/*
 		window.Add("Button", "x264 y530 w46 h23 Y:Move X:Move VapplicationAddButton", translate("Add"))
 		window.Add("Button", "x312 y530 w50 h23 Y:Move X:Move Disabled VapplicationDeleteButton", translate("Delete"))
 		window.Add("Button", "x418 y530 w55 h23 Y:Move X:Move Disabled VapplicationUpdateButton", translate("&Save"))
+		*/
+
+		window.Add("Button", "x396 y530 w23 h23 X:Move Y:Move VapplicationAddButton")
+		setButtonIcon(window["applicationAddButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x420 y530 w23 h23 X:Move Y:Move Disabled VapplicationDeleteButton")
+		setButtonIcon(window["applicationDeleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x450 y530 w23 h23 X:Move Y:Move Disabled VapplicationUpdateButton")
+		setButtonIcon(window["applicationUpdateButton"], kIconsDirectory . "Save.ico", 1, "L4 T4 R4 B4")
 
 		this.initializeList(editor, window["applicationsListView"], window["applicationAddButton"], window["applicationDeleteButton"], window["applicationUpdateButton"])
 	}

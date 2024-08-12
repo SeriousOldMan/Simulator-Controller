@@ -338,9 +338,18 @@ class SplashScreensList extends ConfigurationItemList {
 
 		window.Add("Text", "x154 yp+3 w40 h23 Y:Move VpicturesDurationPostfix", translate("ms"))
 
+		/*
 		window.Add("Button", "x184 yp+31 w46 h23 Y:Move X:Move VsplashScreenAddButton", translate("Add"))
 		window.Add("Button", "x232 yp w50 h23 Y:Move X:Move Disabled VsplashScreenDeleteButton", translate("Delete"))
 		window.Add("Button", "x340 yp w55 h23 Y:Move X:Move Disabled VsplashScreenUpdateButton", translate("&Save"))
+		*/
+
+		window.Add("Button", "x318 y530 w23 h23 X:Move Y:Move VsplashScreenAddButton")
+		setButtonIcon(window["splashScreenAddButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x342 y530 w23 h23 X:Move Y:Move Disabled VsplashScreenDeleteButton")
+		setButtonIcon(window["splashScreenDeleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x372 y530 w23 h23 X:Move Y:Move Disabled VsplashScreenUpdateButton")
+		setButtonIcon(window["splashScreenUpdateButton"], kIconsDirectory . "Save.ico", 1, "L4 T4 R4 B4")
 
 		this.initializeList(editor, window["splashScreensListView"], window["splashScreenAddButton"], window["splashScreenDeleteButton"], window["splashScreenUpdateButton"])
 	}

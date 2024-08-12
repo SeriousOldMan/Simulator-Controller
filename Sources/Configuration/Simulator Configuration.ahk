@@ -415,12 +415,26 @@ class SimulatorsList extends ConfigurationItemList {
 
 		window.Add("Edit", "x224 y284 w239 h21 W:Grow VsimulatorEdit")
 
+		/*
 		window.Add("Button", "x385 y309 w38 h23 X:Move Disabled VsimulatorUpButton", translate("Up"))
 		window.Add("Button", "x425 y309 w38 h23 X:Move Disabled VsimulatorDownButton", translate("Down"))
 
 		window.Add("Button", "x264 y349 w46 h23 X:Move VsimulatorAddButton", translate("Add"))
 		window.Add("Button", "x312 y349 w50 h23 X:Move Disabled VsimulatorDeleteButton", translate("Delete"))
 		window.Add("Button", "x408 y349 w55 h23 X:Move Disabled VsimulatorUpdateButton", translate("&Save"))
+		*/
+
+		window.Add("Button", "x416 y309 w23 h23 X:Move Disabled VsimulatorUpButton")
+		setButtonIcon(window["simulatorUpButton"], kIconsDirectory . "Up Arrow.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x440 y309 w23 h23 X:Move Disabled VsimulatorDownButton")
+		setButtonIcon(window["simulatorDownButton"], kIconsDirectory . "Down Arrow.ico", 1, "L4 T4 R4 B4")
+
+		window.Add("Button", "x386 y349 w23 h23 X:Move VsimulatorAddButton")
+		setButtonIcon(window["simulatorAddButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x410 y349 w23 h23 X:Move Disabled VsimulatorDeleteButton")
+		setButtonIcon(window["simulatorDeleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x440 y349 w23 h23 X:Move Disabled VsimulatorUpdateButton")
+		setButtonIcon(window["simulatorUpdateButton"], kIconsDirectory . "Save.ico", 1, "L4 T4 R4 B4")
 
 		this.initializeList(editor, window["simulatorsListBox"], window["simulatorAddButton"], window["simulatorDeleteButton"], window["simulatorUpdateButton"]
 								  , window["simulatorUpButton"], window["simulatorDownButton"])

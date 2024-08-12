@@ -38,9 +38,18 @@ class LaunchpadConfigurator extends ConfigurationItemList {
 		window.Add("Text", "x16 y383 w90 h23 Y:Move +0x200", translate("Application"))
 		window.Add("DropDownList", "x110 y383 w363 h21 R10 Y:Move W:Grow VlaunchpadApplicationDropDown")
 
+		/*
 		window.Add("Button", "x264 y530 w46 h23 Y:Move X:Move VlaunchpadAddButton", translate("Add"))
 		window.Add("Button", "x312 y530 w50 h23 Y:Move X:Move Disabled VlaunchpadDeleteButton", translate("Delete"))
 		window.Add("Button", "x418 y530 w55 h23 Y:Move X:Move Disabled VlaunchpadUpdateButton", translate("&Save"))
+		*/
+
+		window.Add("Button", "x396 y530 w23 h23 X:Move Y:Move VlaunchpadAddButton")
+		setButtonIcon(window["launchpadAddButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x420 y530 w23 h23 X:Move Y:Move Disabled VlaunchpadDeleteButton")
+		setButtonIcon(window["launchpadDeleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x450 y530 w23 h23 X:Move Y:Move Disabled VlaunchpadUpdateButton")
+		setButtonIcon(window["launchpadUpdateButton"], kIconsDirectory . "Save.ico", 1, "L4 T4 R4 B4")
 
 		this.initializeList(editor, window["launchpadListView"], window["launchpadAddButton"], window["launchpadDeleteButton"], window["launchpadUpdateButton"])
 

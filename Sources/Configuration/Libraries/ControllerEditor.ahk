@@ -440,9 +440,18 @@ class ControlsList extends ConfigurationItemList {
 		window.Add("Text", "x255 y127 w23 h23 X:Move(0.2) +0x200 Center", translate("x"))
 		window.Add("Edit", "x279 y127 w40 h21 X:Move(0.2) Limit3 Number VimageHeightEdit")
 
+		/*
 		window.Add("Button", "x226 y164 w46 h23 X:Move VcontrolAddButton", translate("Add"))
 		window.Add("Button", "x275 y164 w50 h23 X:Move Disabled VcontrolDeleteButton", translate("Delete"))
 		window.Add("Button", "x371 y164 w55 h23 X:Move Disabled VcontrolUpdateButton", translate("Save"))
+		*/
+
+		window.Add("Button", "x349 y164 w23 h23 X:Move VcontrolAddButton")
+		setButtonIcon(window["controlAddButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x373 y164 w23 h23 X:Move Disabled VcontrolDeleteButton")
+		setButtonIcon(window["controlDeleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x403 y164 w23 h23 X:Move Disabled VcontrolUpdateButton")
+		setButtonIcon(window["controlUpdateButton"], kIconsDirectory . "Save.ico", 1, "L4 T4 R4 B4")
 
 		this.initializeList(editor, window["controlsListView"], window["controlAddButton"], window["controlDeleteButton"], window["controlUpdateButton"])
 
@@ -583,9 +592,18 @@ class LabelsList extends ConfigurationItemList {
 		window.Add("Text", "x255 y248 w23 h23 X:Move(0.2) +0x200 Center", translate("x"))
 		window.Add("Edit", "x279 y248 w40 h21 X:Move(0.2) Limit3 Number VlabelHeightEdit")
 
+		/*
 		window.Add("Button", "x226 y285 w46 h23 X:Move VlabelAddButton", translate("Add"))
 		window.Add("Button", "x275 y285 w50 h23 X:Move Disabled VlabelDeleteButton", translate("Delete"))
 		window.Add("Button", "x371 y285 w55 h23 X:Move Disabled VlabelUpdateButton", translate("Save"))
+		*/
+
+		window.Add("Button", "x349 y285 w23 h23 X:Move VlabelAddButton")
+		setButtonIcon(window["labelAddButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x373 y285 w23 h23 X:Move Disabled VlabelDeleteButton")
+		setButtonIcon(window["labelDeleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x403 y285 w23 h23 X:Move Disabled VlabelUpdateButton")
+		setButtonIcon(window["labelUpdateButton"], kIconsDirectory . "Save.ico", 1, "L4 T4 R4 B4")
 
 		this.initializeList(editor, window["labelsListView"], window["labelAddButton"], window["labelDeleteButton"], window["labelUpdateButton"])
 
@@ -814,9 +832,18 @@ class LayoutsList extends ConfigurationItemList {
 		loop 3
 			this.iStreamDeckWidgets.Push(sdWidget%A_Index%)
 
+		/*
 		window.Add("Button", "x223 y589 w46 h23 X:Move VlayoutAddButton", translate("Add"))
 		window.Add("Button", "x271 y589 w50 h23 X:Move Disabled VlayoutDeleteButton", translate("Delete"))
 		window.Add("Button", "x377 y589 w55 h23 X:Move Disabled VlayoutUpdateButton", translate("&Save"))
+		*/
+
+		window.Add("Button", "x355 y589 w23 h23 X:Move VlayoutAddButton")
+		setButtonIcon(window["layoutAddButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x379 y589 w23 h23 X:Move Disabled VlayoutDeleteButton")
+		setButtonIcon(window["layoutDeleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x409 y589 w23 h23 X:Move Disabled VlayoutUpdateButton")
+		setButtonIcon(window["layoutUpdateButton"], kIconsDirectory . "Save.ico", 1, "L4 T4 R4 B4")
 
 		this.initializeList(editor, window["layoutsListView"], window["layoutAddButton"], window["layoutDeleteButton"], window["layoutUpdateButton"])
 
@@ -1984,9 +2011,18 @@ class DisplayRulesList extends ConfigurationItemList {
 		window.Add("Edit", "x90 yp w211 h21 Y:Move W:Grow ViconFilePathEdit")
 		window.Add("Button", "x303 yp-1 w23 h23 Y:Move X:Move", translate("...")).OnEvent("Click", chooseIconFilePath)
 
+		/*
 		window.Add("Button", "x126 yp+40 w46 h23 Y:Move X:Move VdisplayRuleAddButton", translate("Add"))
 		window.Add("Button", "x175 yp w50 h23 Y:Move X:Move Disabled VdisplayRuleDeleteButton", translate("Delete"))
 		window.Add("Button", "x271 yp w55 h23 Y:Move X:Move Disabled VdisplayRuleUpdateButton", translate("Save"))
+		*/
+
+		window.Add("Button", "x249 yp+40 w23 h23 X:Move Y:Move VdisplayRuleAddButton")
+		setButtonIcon(window["displayRuleAddButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x273 yp w23 h23 X:Move Y:Move Disabled VdisplayRuleDeleteButton")
+		setButtonIcon(window["displayRuleDeleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x303 yp w23 h23 X:Move Y:Move Disabled VdisplayRuleUpdateButton")
+		setButtonIcon(window["displayRuleUpdateButton"], kIconsDirectory . "Save.ico", 1, "L4 T4 R4 B4")
 
 		this.initializeList(editor, window["displayRulesListView"], window["displayRuleAddButton"], window["displayRuleDeleteButton"], window["displayRuleUpdateButton"])
 

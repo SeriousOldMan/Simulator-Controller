@@ -1,3 +1,11 @@
+## 5.8.4.0-release 08/16/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Updated many controls for longer text labels to improve UI for languages other than English or German.
+  4. Replaced all buttons labeled Add/Delete/Save with buttons with graphical icons.
+  5. Export of telemetry data is no longer possible for practice sessions, which has been saved to the session database.
+  6. Many updates for the French translation.
+
 ## 5.8.3.1-release 08/09/24
   1. Fixed a critical bug when sessions aree saved to the session database.
 

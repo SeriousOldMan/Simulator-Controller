@@ -123,6 +123,41 @@ kRCTyresSchemas["Tyres.Pressures"] := concatenate(kRCTyresSchemas["Tyres.Pressur
 ;;;-------------------------------------------------------------------------;;;
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; Class                           WorkingTask                             ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class WorkingTask extends PeriodicTask {
+	iTitle := ""
+	iProgressWindow := false
+
+	iStart := A_TickCount
+	iProgress := false
+
+	__New(title := "") {
+		this.iTitle := title
+
+		super.__New(false, 200, kInterruptPriority)
+	}
+
+	run() {
+		if (A_TickCount > (this.iStart + 250))
+			if !this.iProgress
+				this.iProgressWindow := ProgressWindow.showProgress({progress: this.iProgress++, color: "Blue", title: this.iTitle})
+			else if (this.iProgress != "Stop")
+				this.iProgressWindow.updateProgress({progress: Min(100, this.iProgress++)})
+	}
+
+	stop() {
+		this.iProgress := "Stop"
+
+		if this.iProgressWindow
+			this.iProgressWindow.hideProgress()
+
+		super.stop()
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; Class                        RaceCenterTask                             ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
@@ -9057,59 +9092,61 @@ class RaceCenter extends ConfigurationItem {
 				}
 
 				if (fileName != "")
-					try {
-						sessionDB := SessionDatabase()
+					withTask(WorkingTask(StrReplace(translate("Save Session..."), "...", "")), () {
+						try {
+							sessionDB := SessionDatabase()
 
-						SplitPath(fileName, , &folder, , &fileName)
+							SplitPath(fileName, , &folder, , &fileName)
 
-						info := readMultiMap(directory . "\Session.info")
+							info := readMultiMap(directory . "\Session.info")
 
-						if (getMultiMapValue(info, "Creator", "ID", kUndefined) = kUndefined) {
-							setMultiMapValue(info, "Creator", "ID", SessionDatabase.ID)
-							setMultiMapValue(info, "Creator", "Name", SessionDatabase.getUserName())
-						}
+							if (getMultiMapValue(info, "Creator", "ID", kUndefined) = kUndefined) {
+								setMultiMapValue(info, "Creator", "ID", SessionDatabase.ID)
+								setMultiMapValue(info, "Creator", "Name", SessionDatabase.getUserName())
+							}
 
-						if (normalizeDirectoryPath(folder) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Race"))) {
-							dataFile := temporaryFileName("Race", "zip")
+							if (normalizeDirectoryPath(folder) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Race"))) {
+								dataFile := temporaryFileName("Race", "zip")
 
-							try {
-								RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
+								try {
+									RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
 
-								file := FileOpen(dataFile, "r-wd")
+									file := FileOpen(dataFile, "r-wd")
 
-								if file {
-									size := file.Length
+									if file {
+										size := file.Length
 
-									session := Buffer(size)
+										session := Buffer(size)
 
-									file.RawRead(session, size)
+										file.RawRead(session, size)
 
-									file.Close()
+										file.Close()
 
-									sessionDB.writeSession(simulator, car, track, "Race", fileName, info, session, size, false, true)
+										sessionDB.writeSession(simulator, car, track, "Race", fileName, info, session, size, false, true)
 
-									return
+										return
+									}
+								}
+								finally {
+									deleteFile(dataFile)
 								}
 							}
-							finally {
-								deleteFile(dataFile)
-							}
+
+							DirCreate(folder)
+							deleteFile(folder . "\" . fileName . ".data")
+
+							dataFile := temporaryFileName("Race", "zip")
+
+							RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
+
+							FileMove(dataFile, folder . "\" . fileName . ".data", 1)
+
+							writeMultiMap(folder . "\" . fileName . ".race", info)
 						}
-
-						DirCreate(folder)
-						deleteFile(folder . "\" . fileName . ".data")
-
-						dataFile := temporaryFileName("Race", "zip")
-
-						RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
-
-						FileMove(dataFile, folder . "\" . fileName . ".data", 1)
-
-						writeMultiMap(folder . "\" . fileName . ".race", info)
-					}
-					catch Any as exception {
-						logError(exception)
-					}
+						catch Any as exception {
+							logError(exception)
+						}
+					})
 			}
 
 			this.showMessage(false)
@@ -9665,100 +9702,102 @@ class RaceCenter extends ConfigurationItem {
 					OnMessage(0x44, translateOkButton, 0)
 				}
 				else {
-					this.iSyncTask.pause()
+					withTask(WorkingTask(StrReplace(translate("Load Session..."), "...", "")), () {
+						this.iSyncTask.pause()
 
-					this.iConnection := false
+						this.iConnection := false
 
-					this.initializeSession()
+						this.initializeSession()
 
-					this.iSessionLoaded := folder
+						this.iSessionLoaded := folder
 
-					this.iTeamName := getMultiMapValue(info, "Session", "Team")
-					this.iTeamIdentifier := false
+						this.iTeamName := getMultiMapValue(info, "Session", "Team")
+						this.iTeamIdentifier := false
 
-					this.iSessionName := getMultiMapValue(info, "Session", "Session")
-					this.iSessionIdentifier := false
+						this.iSessionName := getMultiMapValue(info, "Session", "Session")
+						this.iSessionIdentifier := false
 
-					this.iDate := getMultiMapValue(info, "Session", "Date", A_Now)
-					this.iTime := getMultiMapValue(info, "Session", "Time", A_Now)
+						this.iDate := getMultiMapValue(info, "Session", "Date", A_Now)
+						this.iTime := getMultiMapValue(info, "Session", "Time", A_Now)
 
-					this.iWeather := getMultiMapValue(info, "Weather", "Weather", false)
-					this.iWeather10Min := getMultiMapValue(info, "Weather", "Weather10Min", false)
-					this.iWeather30Min := getMultiMapValue(info, "Weather", "Weather30Min", false)
-					this.iAirTemperature := getMultiMapValue(info, "Weather", "AirTemperature", false)
-					this.iTrackTemperature := getMultiMapValue(info, "Weather", "TrackTemperature", false)
+						this.iWeather := getMultiMapValue(info, "Weather", "Weather", false)
+						this.iWeather10Min := getMultiMapValue(info, "Weather", "Weather10Min", false)
+						this.iWeather30Min := getMultiMapValue(info, "Weather", "Weather30Min", false)
+						this.iAirTemperature := getMultiMapValue(info, "Weather", "AirTemperature", false)
+						this.iTrackTemperature := getMultiMapValue(info, "Weather", "TrackTemperature", false)
 
-					if (this.Mode = "Normal") {
-						this.Control["sessionDateCal"].Value := this.Date
-						this.Control["sessionTimeEdit"].Value := this.Time
+						if (this.Mode = "Normal") {
+							this.Control["sessionDateCal"].Value := this.Date
+							this.Control["sessionTimeEdit"].Value := this.Time
 
-						this.Control["teamDropDownMenu"].Delete()
-						this.Control["teamDropDownMenu"].Add([this.iTeamName])
-						this.Control["teamDropDownMenu"].Choose(1)
+							this.Control["teamDropDownMenu"].Delete()
+							this.Control["teamDropDownMenu"].Add([this.iTeamName])
+							this.Control["teamDropDownMenu"].Choose(1)
 
-						this.Control["sessionDropDownMenu"].Delete()
-						this.Control["sessionDropDownMenu"].Add([this.iSessionName])
-						this.Control["sessionDropDownMenu"].Choose(1)
-					}
+							this.Control["sessionDropDownMenu"].Delete()
+							this.Control["sessionDropDownMenu"].Add([this.iSessionName])
+							this.Control["sessionDropDownMenu"].Choose(1)
+						}
 
-					if FileExist(folder . "Session.strategy") {
-						configuration := readMultiMap(folder . "Session.strategy")
+						if FileExist(folder . "Session.strategy") {
+							configuration := readMultiMap(folder . "Session.strategy")
 
-						if (configuration.Count > 0)
-							this.selectStrategy(this.createStrategy(configuration, false, false), true)
-					}
+							if (configuration.Count > 0)
+								this.selectStrategy(this.createStrategy(configuration, false, false), true)
+						}
 
-					this.loadDrivers()
-					this.loadSessionDrivers()
-					this.loadSetups()
-					this.loadPlan()
-					this.loadLaps()
-					this.loadStints()
-					this.loadPitstops()
+						this.loadDrivers()
+						this.loadSessionDrivers()
+						this.loadSetups()
+						this.loadPlan()
+						this.loadLaps()
+						this.loadStints()
+						this.loadPitstops()
 
-					state := readMultiMap(folder . "Pitstop.state")
+						state := readMultiMap(folder . "Pitstop.state")
 
-					if (state.Count > 0)
-						this.loadPitstopState(state)
+						if (state.Count > 0)
+							this.loadPitstopState(state)
 
-					this.syncTelemetry(true)
-					this.syncTyrePressures(true)
+						this.syncTelemetry(true)
+						this.syncTyrePressures(true)
 
-					this.ReportViewer.setReport(folder . "Race Report")
+						this.ReportViewer.setReport(folder . "Race Report")
 
-					this.initializeReports()
+						this.initializeReports()
 
-					if !this.Weather {
-						lastLap := this.LastLap
+						if !this.Weather {
+							lastLap := this.LastLap
 
-						if lastLap {
-							this.iWeather := lastLap.Weather
-							this.iAirTemperature := lastLap.AirTemperature
-							this.iTrackTemperature := lastLap.TrackTemperature
+							if lastLap {
+								this.iWeather := lastLap.Weather
+								this.iAirTemperature := lastLap.AirTemperature
+								this.iTrackTemperature := lastLap.TrackTemperature
 
-							if lastLap.HasProp("Weather10Min") {
-								this.iWeather10Min := lastLap.Weather10Min
-								this.iWeather30Min := lastLap.Weather30Min
-							}
-							else {
-								this.iWeather10Min := lastLap.Weather
-								this.iWeather30Min := lastLap.Weather
+								if lastLap.HasProp("Weather10Min") {
+									this.iWeather10Min := lastLap.Weather10Min
+									this.iWeather30Min := lastLap.Weather30Min
+								}
+								else {
+									this.iWeather10Min := lastLap.Weather
+									this.iWeather30Min := lastLap.Weather
+								}
 							}
 						}
-					}
 
-					if !this.TyreCompound {
-						currentStint := this.CurrentStint
+						if !this.TyreCompound {
+							currentStint := this.CurrentStint
 
-						if currentStint {
-							this.iTyreCompound := compound(currentStint.Compound)
-							this.iTyreCompoundColor := compoundColor(currentStint.Compound)
+							if currentStint {
+								this.iTyreCompound := compound(currentStint.Compound)
+								this.iTyreCompoundColor := compoundColor(currentStint.Compound)
+							}
 						}
-					}
 
-					this.updateReports()
+						this.updateReports()
 
-					this.updateState()
+						this.updateState()
+					})
 				}
 			}
 		}

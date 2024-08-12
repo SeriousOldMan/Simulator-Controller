@@ -1,9 +1,9 @@
 [Development]
-Version=5.8.3.1-release
-Target=5.8.3.1-release
-Date=08/09/2024
-Download=https://cutt.ly/0echJ07w;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.8.3.1-release.zip
-Changes=New session browser for "Practice Center" and "Race Center", Optimized window position handling and memorization, New race strategy browser, Open sessions and strategies from the "Session Database", Introduced multiple methods to read the broadcasting.json file in ACC, New "Race Center Lite", Open reports in separate window in "Race Center" with Control key modifier, Open reports in separate window in "Race Center" by double-clicking, New events "ahead_gap_update", "behind_gap_update" and "attack_imminent" for the Race Spotter LLM integration
+Version=5.8.4.0-dev
+Target=5.8.4.0-release
+Date=08/12/2024
+Download=
+Changes=Several UI changes (new Add/Delete/Save buttons, field size changes, and so on), Updates for the French translation, Saved sessions can no longer be exported to the session database in "Practice Center"
 Components=Media->5.6.1,Configuration->5.8.2,Utilities->5.4.8
 [Release]
 Version=5.8.3.1-release
@@ -22,7 +22,7 @@ Utilities.5.4.8.Path=.
 Utilities.5.4.8.Content=Utilities
 Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Utilities-5.4.8.zip?rlkey=alrj8l2z205dd2vm9cu6hbsot&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.4.8.zip
 [Current]
-Type=Release
+Type=Development
 [Version]
-Development=5.8.3.1-release
+Development=5.8.4.0-dev
 Release=5.8.3.1-release

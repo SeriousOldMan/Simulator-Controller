@@ -263,7 +263,7 @@ class BasicStepWizard extends StepWizard {
 
 		window.SetFont("Bold", "Arial")
 
-		widget3 := window.Add("Text", "x" . x . " yp+30 w110 h23 +0x200 Hidden Section", translate("General"))
+		widget3 := window.Add("Text", "x" . x . " yp+30 w140 h23 +0x200 Hidden Section", translate("General"))
 		widget4 := window.Add("Text", "yp+20 x" . x . " w" . col1Width . " 0x10 Hidden")
 
 		window.SetFont("Norm", "Arial")
@@ -273,13 +273,13 @@ class BasicStepWizard extends StepWizard {
 		for code, language in languages
 			choices.Push(language)
 
-		widget5 := window.Add("Text", "x" . x . " yp+10 w86 h23 +0x200 Hidden", translate("Localization"))
+		widget5 := window.Add("Text", "x" . x . " yp+10 w100 h23 +0x200 Hidden", translate("Localization"))
 		widget6 := window.Add("Button", "xp+106 yp w23 h23 Hidden")
 		widget6.OnEvent("Click", openFormatsEditor)
 		setButtonIcon(widget6, kIconsDirectory . "Locale.ico", 1, "L4 T4 R4 B4")
 		widget7 := window.Add("DropDownList", "xp+24 yp w96 VbasicUILanguageDropDown Hidden", choices)
 
-		widget8 := window.Add("Text", "x" . x . " yp+24 w86 h23 +0x200 Hidden", translate("Push-To-Talk"))
+		widget8 := window.Add("Text", "x" . x . " yp+24 w100 h23 +0x200 Hidden", translate("Push-To-Talk"))
 		widget9 := window.Add("Button", "xp+106 yp-1 w23 h23 VbasicPushToTalkButton Hidden")
 		widget9.OnEvent("Click", getPTTHotkey)
 		setButtonIcon(widget9, kIconsDirectory . "Key.ico", 1)
@@ -292,7 +292,7 @@ class BasicStepWizard extends StepWizard {
 
 		window.SetFont("Bold", "Arial")
 
-		widget32 := window.Add("Text", "x" . col2X . " ys w110 h23 +0x200 Hidden Section", translate("Simulators"))
+		widget32 := window.Add("Text", "x" . col2X . " ys w140 h23 +0x200 Hidden Section", translate("Simulators"))
 		widget33 := window.Add("Text", "yp+20 xp w" . col2Width . " W:Grow 0x10 Hidden")
 
 		window.SetFont("Norm", "Arial")
@@ -309,7 +309,7 @@ class BasicStepWizard extends StepWizard {
 
 		window.SetFont("Bold", "Arial")
 
-		widget12 := window.Add("Text", "x" . x . " yp+20 w110 h23 +0x200 Hidden Section", translate("Assistants"))
+		widget12 := window.Add("Text", "x" . x . " yp+20 w140 h23 +0x200 Hidden Section", translate("Assistants"))
 		widget13 := window.Add("Text", "yp+20 xp w" . width . " W:Grow 0x10 Hidden")
 
 		window.SetFont("Norm", "Arial")
@@ -320,7 +320,7 @@ class BasicStepWizard extends StepWizard {
 
 		widget41 := window.Add("CheckBox", "x" . x . " yp+24 w16 h21 vbasicDCEnabledCheck Hidden" . (wizard.isModuleSelected("Driving Coach") ? " Checked" : ""))
 		widget41.OnEvent("Click", updateAssistant.Bind("Driving Coach"))
-		widget42 := window.Add("Text", "xp+16 yp w86 h23 +0x200 Hidden", translate("Driving Coach"))
+		widget42 := window.Add("Text", "xp+16 yp w110 h23 +0x200 Hidden", translate("Driving Coach"))
 		widget43 := window.Add("Edit", "xp+114 yp w96 VbasicDCNameEdit Hidden", "Aiden")
 		widget44 := window.Add("DropDownList", "xp+98 yp w96 VbasicDCLanguageDropDown Hidden")
 		widget44.OnEvent("Change", loadVoice.Bind("Driving Coach"))
@@ -334,7 +334,7 @@ class BasicStepWizard extends StepWizard {
 
 		widget14 := window.Add("CheckBox", "x" . x . " yp+24 w16 h21 vbasicREEnabledCheck Hidden" . (wizard.isModuleSelected("Race Engineer") ? " Checked" : ""))
 		widget14.OnEvent("Click", updateAssistant.Bind("Race Engineer"))
-		widget15 := window.Add("Text", "xp+16 yp w86 h23 +0x200 Hidden", translate("Race Engineer"))
+		widget15 := window.Add("Text", "xp+16 yp w110 h23 +0x200 Hidden", translate("Race Engineer"))
 		widget16 := window.Add("Edit", "xp+114 yp w96 VbasicRENameEdit Hidden", "Jona")
 		widget17 := window.Add("DropDownList", "xp+98 yp w96 VbasicRELanguageDropDown Hidden")
 		widget17.OnEvent("Change", loadVoice.Bind("Race Engineer"))
@@ -348,7 +348,7 @@ class BasicStepWizard extends StepWizard {
 
 		widget20 := window.Add("CheckBox", "x" . x . " yp+24 w16 h21 vbasicRSEnabledCheck Hidden" . (wizard.isModuleSelected("Race Strategist") ? " Checked" : ""))
 		widget20.OnEvent("Click", updateAssistant.Bind("Race Strategist"))
-		widget21 := window.Add("Text", "xp+16 yp w86 h23 +0x200 Hidden", translate("Race Strategist"))
+		widget21 := window.Add("Text", "xp+16 yp w110 h23 +0x200 Hidden", translate("Race Strategist"))
 		widget22 := window.Add("Edit", "xp+114 yp w96 VbasicRSNameEdit Hidden", "Khato")
 		widget23 := window.Add("DropDownList", "xp+98 yp w96 VbasicRSLanguageDropDown Hidden")
 		widget23.OnEvent("Change", loadVoice.Bind("Race Strategist"))
@@ -362,7 +362,7 @@ class BasicStepWizard extends StepWizard {
 
 		widget26 := window.Add("CheckBox", "x" . x . " yp+24 w16 h21 vbasicRSPEnabledCheck Hidden" . (wizard.isModuleSelected("Race Spotter") ? " Checked" : ""))
 		widget26.OnEvent("Click", updateAssistant.Bind("Race Spotter"))
-		widget27 := window.Add("Text", "xp+16 yp w86 h23 +0x200 Hidden", translate("Race Spotter"))
+		widget27 := window.Add("Text", "xp+16 yp w110 h23 +0x200 Hidden", translate("Race Spotter"))
 		widget28 := window.Add("Edit", "xp+114 yp w96 VbasicRSPNameEdit Hidden", "Elisa")
 		widget29 := window.Add("DropDownList", "xp+98 yp w96 VbasicRSPLanguageDropDown Hidden")
 		widget29.OnEvent("Change", loadVoice.Bind("Race Spotter"))
@@ -1610,6 +1610,8 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 
 		this.showControls(this.iOtherWidgets)
 
+		this.Control["basicWindowsSettingsButton"].Enabled := false
+
 		this.iSynthesizerMode := "Google"
 	}
 
@@ -1624,6 +1626,8 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 			this.transposeControls(this.iOtherWidgets, -24 * this.iGoogleSynthesizerWidgets.Length, this.Window.TitleBarHeight)
 		else if (this.iSynthesizerMode != "Init")
 			throw "Internal error detected in VoiceControlConfigurator.hideWindowsSynthesizerEditor..."
+
+		this.Control["basicWindowsSettingsButton"].Enabled := false
 
 		this.iSynthesizerMode := false
 	}

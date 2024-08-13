@@ -152,7 +152,7 @@ class ControllerActionsEditor extends ConfiguratorPanel {
 
 		actionsGui.SetFont("Norm", "Arial")
 
-		actionsGui.Add("Documentation", "x128 YP+20 w148 H:Center Center", translate("Labels && Icons")
+		actionsGui.Add("Documentation", "x118 YP+20 w168 H:Center Center", translate("Labels && Icons")
 					 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#plugin-actions-editor")
 
 		actionsGui.SetFont("Norm", "Arial")
@@ -169,7 +169,7 @@ class ControllerActionsEditor extends ConfiguratorPanel {
 			choices.Push(language)
 		}
 
-		actionsGui.Add("Text", "x16 yp+10 w86 h23 +0x200", translate("Language"))
+		actionsGui.Add("Text", "x16 yp+10 w90 h23 +0x200", translate("Language"))
 		actionsGui.Add("DropDownList", "x110 yp w120 Choose" . chosen . " VcaLanguageDropDown", choices).OnEvent("Change", chooseCALanguage)
 
 		choices := []
@@ -177,7 +177,7 @@ class ControllerActionsEditor extends ConfiguratorPanel {
 		for ignore, thePlugin in this.Plugins
 			choices.Push(thePlugin)
 
-		actionsGui.Add("Text", "x16 yp+24 w86 h23 +0x200", translate("Plugin"))
+		actionsGui.Add("Text", "x16 yp+24 w90 h23 +0x200", translate("Plugin"))
 		actionsGui.Add("DropDownList", "x110 yp w120 Choose1 VcaPluginDropDown", choices).OnEvent("Change", chooseCAPlugin)
 
 		this.iActionsList := PluginActionsList(this, configuration)
@@ -471,7 +471,7 @@ class PluginActionsList extends ConfigurationItemList {
 
 		window.Add("ListView", "x16 y120 w377 h240 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VpluginActionsListView", collect(["Action", "Trigger", "Label", "Icon"], translate))
 
-		window.Add("Text", "x16 y370 w76 Y:Move", translate("Label && Icon"))
+		window.Add("Text", "x16 y370 w90 Y:Move", translate("Label && Icon"))
 		window.Add("Edit", "x106 yp w110 h45 Y:Move W:Grow(0.2) VlabelEdit")
 		window.Add("Picture", "Border x221 yp w45 h45 Y:Move X:Move(0.2) ViconEdit").OnEvent("Click", clickIcon)
 

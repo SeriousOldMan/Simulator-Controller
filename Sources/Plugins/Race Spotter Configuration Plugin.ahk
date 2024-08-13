@@ -97,7 +97,7 @@ class RaceSpotterConfigurator extends ConfiguratorPanel {
 
 		window.SetFont("Norm", "Arial")
 
-		widget5 := window.Add("Text", "x" . x0 . " yp+17 w80 h23 +0x200 Hidden", translate("Learn for"))
+		widget5 := window.Add("Text", "x" . x0 . " yp+17 w120 h23 +0x200 Hidden", translate("Learn for"))
 		widget6 := window.Add("Edit", "x" . x1 . " yp w40 h21 Number Limit1 vrspLearningLapsEdit Hidden")
 		widget7 := window.Add("UpDown", "x" . x2 . " yp w17 h21 Range1-9 Hidden", 2)
 		widget8 := window.Add("Text", "x" . x3 . " yp w" . w3 . " h23 +0x200 Hidden", translate("Laps after Start or Pitstop"))
@@ -148,7 +148,7 @@ class RaceSpotterConfigurator extends ConfiguratorPanel {
 
 		window.SetFont("Norm", "Arial")
 
-		widget43 := window.Add("Text", "x" . x0 . " yp+17 w80 h23 +0x200 Hidden", translate("Frequency"))
+		widget43 := window.Add("Text", "x" . x0 . " yp+17 w120 h23 +0x200 Hidden", translate("Frequency"))
 		widget44 := window.Add("Edit", "x" . x1 . " yp w40 h21 Number Limit3 vrspDriverUpdateTimeEdit Hidden")
 		widget45 := window.Add("UpDown", "x" . x2 . " yp w17 h21 Range10-999 Hidden", 2)
 		widget46 := window.Add("Text", "x" . x3 . " yp w" . w3 . " h23 +0x200 Hidden", translate("seconds at least between callouts"))

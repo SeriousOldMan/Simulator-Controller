@@ -1107,10 +1107,10 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 					   , getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Suspension.Repair", "Always"))
 
 		settingsGui.Add("DropDownList", "x126 yp w110 Choose" . chosen . " VrepairSuspensionDropDown", choices).OnEvent("Change", updateRepairSuspensionState)
-		settingsGui.Add("Text", "x245 yp+2 w20 h20 VrepairSuspensionGreaterLabel", translate(">"))
+		settingsGui.Add("Text", "x245 yp+2 w14 h20 VrepairSuspensionGreaterLabel", translate(">"))
 		settingsGui.Add("Edit", "x260 yp-2 w50 h20 VrepairSuspensionThresholdEdit"
 							  , displayValue("Float", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Suspension.Repair.Threshold", 0), 1)).OnEvent("Change", validateNumber.Bind("repairSuspensionThresholdEdit"))
-		settingsGui.Add("Text", "x318 yp+2 w90 h20 VrepairSuspensionThresholdLabel", translate("Sec. p. Lap"))
+		settingsGui.Add("Text", "x318 yp+2 w70 h20 VrepairSuspensionThresholdLabel", translate("Sec. p. Lap"))
 
 		updateRepairSuspensionState()
 
@@ -1121,10 +1121,10 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 					   , getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Bodywork.Repair", "Impact"))
 
 		settingsGui.Add("DropDownList", "x126 yp w110 Choose" . chosen . " VrepairBodyworkDropDown", choices).OnEvent("Change", updateRepairBodyworkState)
-		settingsGui.Add("Text", "x245 yp+2 w20 h20 VrepairBodyworkGreaterLabel", translate(">"))
+		settingsGui.Add("Text", "x245 yp+2 w14 h20 VrepairBodyworkGreaterLabel", translate(">"))
 		settingsGui.Add("Edit", "x260 yp-2 w50 h20 VrepairBodyworkThresholdEdit"
 							  , displayValue("Float", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Bodywork.Repair.Threshold", 1), 1)).OnEvent("Change", validateNumber.Bind("repairBodyworkThresholdEdit"))
-		settingsGui.Add("Text", "x318 yp+2 w90 h20 VrepairBodyworkThresholdLabel", translate("Sec. p. Lap"))
+		settingsGui.Add("Text", "x318 yp+2 w70 h20 VrepairBodyworkThresholdLabel", translate("Sec. p. Lap"))
 
 		updateRepairBodyworkState()
 
@@ -1134,10 +1134,10 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		chosen := inList(["Never", "Always", "Threshold", "Impact"], getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Engine.Repair", "Impact"))
 
 		settingsGui.Add("DropDownList", "x126 yp w110 Choose" . chosen . " VrepairEngineDropDown", choices).OnEvent("Change", updateRepairEngineState)
-		settingsGui.Add("Text", "x245 yp+2 w20 h20 VrepairEngineGreaterLabel", translate(">"))
+		settingsGui.Add("Text", "x245 yp+2 w14 h20 VrepairEngineGreaterLabel", translate(">"))
 		settingsGui.Add("Edit", "x260 yp-2 w50 h20 VrepairEngineThresholdEdit"
 							  , displayValue("Float", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Engine.Repair.Threshold", 1), 1)).OnEvent("Change", validateNumber.Bind("repairEngineThresholdEdit"))
-		settingsGui.Add("Text", "x318 yp+2 w90 h20 VrepairEngineThresholdLabel", translate("Sec. p. Lap"))
+		settingsGui.Add("Text", "x318 yp+2 w70 h20 VrepairEngineThresholdLabel", translate("Sec. p. Lap"))
 
 		updateRepairEngineState()
 
@@ -1147,7 +1147,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		chosen := inList(["Never", "Temperature", "Weather"], getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Compound.Change", "Never"))
 
 		settingsGui.Add("DropDownList", "x126 yp w110 Choose" . chosen . " VchangeTyreDropDown", choices).OnEvent("Change", updateChangeTyreState)
-		settingsGui.Add("Text", "x245 yp+2 w20 h20 VchangeTyreGreaterLabel", translate(">"))
+		settingsGui.Add("Text", "x245 yp+2 w14 h20 VchangeTyreGreaterLabel", translate(">"))
 		settingsGui.Add("Edit", "x260 yp-2 w50 h20 VchangeTyreThresholdEdit"
 							  , displayValue("Float", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Compound.Change.Threshold", 0), 1))
 		settingsGui.Add("Text", "x318 yp+2 w90 h20 VchangeTyreThresholdLabel", translate("Degrees"))
@@ -1171,19 +1171,19 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.Add("Text", "x16 yp+24 w105 h20 Section", translate("Correction"))
 		settingsGui.Add("CheckBox", "x126 yp-4 w17 h21 Checked" . chosen . " VtemperatureCorrectionCheck", chosen)
-		settingsGui.Add("Text", "x147 yp+4 w200 h20", translate("based on temperature trend"))
+		settingsGui.Add("Text", "x147 yp+4 w240 h20", translate("based on temperature trend"))
 
 		chosen := getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Correction.Setup", false)
 
 		settingsGui.Add("Text", "x16 yp+24 w105 h20 Section", translate("Correction"))
 		settingsGui.Add("CheckBox", "x126 yp-4 w17 h21 Checked" . chosen . " VsetupPressureCompareCheck", chosen)
-		settingsGui.Add("Text", "x147 yp+4 w200 h20", translate("based on database values"))
+		settingsGui.Add("Text", "x147 yp+4 w240 h20", translate("based on database values"))
 
 		chosen := getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Correction.Pressure", false)
 
 		settingsGui.Add("Text", "x16 yp+24 w105 h20 Section", translate("Correction"))
 		settingsGui.Add("CheckBox", "x126 yp-4 w17 h21 Checked" . chosen . " VpressureLossCorrectionCheck", chosen)
-		settingsGui.Add("Text", "x147 yp+4 w200 h20", translate("based on pressure loss"))
+		settingsGui.Add("Text", "x147 yp+4 w240 h20", translate("based on pressure loss"))
 
 		settingsGui.SetFont("Norm", "Arial")
 		settingsGui.SetFont("Italic", "Arial")
@@ -1243,26 +1243,26 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		value := getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.AvgTime", 120)
 
-		settingsGui.Add("Text", "x16 y82 w85 h23 +0x200 Section", translate("Avg. Lap Time"))
+		settingsGui.Add("Text", "x16 y82 w88 h23 +0x200 Section", translate("Avg. Lap Time"))
 		settingsGui.Add("Edit", "x106 yp w50 h20 Limit3 Number VavgLaptimeEdit", value)
 		settingsGui.Add("UpDown", "x138 yp-2 w18 h20 Range1-999 0x80", value)
-		settingsGui.Add("Text", "x164 yp+4 w90 h20", translate("Sec."))
+		settingsGui.Add("Text", "x164 yp+4 w45 h20", translate("Sec."))
 
-		settingsGui.Add("Text", "x16 yp+22 w85 h20 +0x200", translate("Fuel Consumption"))
+		settingsGui.Add("Text", "x16 yp+22 w88 h20 +0x200", translate("Fuel Consumption"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 VfuelConsumptionEdit", displayValue("Float", convertUnit("Volume", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Fuel.AvgConsumption", 3.0)))).OnEvent("Change", validateNumber.Bind("fuelConsumptionEdit"))
-		settingsGui.Add("Text", "x164 yp+4 w90 h20", getUnit("Volume", true))
+		settingsGui.Add("Text", "x164 yp+4 w45 h20", getUnit("Volume", true))
 
 		chosen := getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.Formation", true)
 
-		settingsGui.Add("Text", "x212 ys w85 h23 +0x200", translate("Formation"))
+		settingsGui.Add("Text", "x212 ys w78 h23 +0x200", translate("Formation"))
 		settingsGui.Add("CheckBox", "x292 yp-1 w17 h21 Checked" . chosen . " VformationLapCheck", chosen)
-		settingsGui.Add("Text", "x310 yp+4 w90 h20", translate("Lap"))
+		settingsGui.Add("Text", "x310 yp+4 w80 h20", translate("Lap"))
 
 		chosen := getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.PostRace", true)
 
-		settingsGui.Add("Text", "x212 yp+22 w85 h23 +0x200", translate("Post Race"))
+		settingsGui.Add("Text", "x212 yp+22 w78 h23 +0x200", translate("Post Race"))
 		settingsGui.Add("CheckBox", "x292 yp-1 w17 h21 Checked" . chosen . " VpostRaceLapCheck", chosen)
-		settingsGui.Add("Text", "x310 yp+4 w90 h20", translate("Lap"))
+		settingsGui.Add("Text", "x310 yp+4 w80 h20", translate("Lap"))
 
 		settingsGui.SetFont("Norm", "Arial")
 		settingsGui.SetFont("Bold Italic", "Arial")
@@ -1272,7 +1272,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.SetFont("Norm", "Arial")
 
-		settingsGui.Add("Text", "x16 yp+30 w85 h23 +0x200", translate("Tyre Compound"))
+		settingsGui.Add("Text", "x16 yp+30 w88 h23 +0x200", translate("Tyre Compound"))
 
 		readTyreSetup(settingsOrCommand)
 
@@ -1284,11 +1284,11 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.Add("DropDownList", "x106 yp w110 Choose" . chosen . " VspSetupTyreCompoundDropDown", choices)
 
-		settingsGui.Add("Text", "x16 yp+26 w90 h20", translate("Start Tyre Set"))
+		settingsGui.Add("Text", "x16 yp+26 w88 h20", translate("Start Tyre Set"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit2 VspSetupTyreSetEdit").OnEvent("Change", updateTyreSet.Bind("spSetupTyreSetEdit"))
 		settingsGui.Add("UpDown", "x138 yp-2 w18 h20 Range0-99")
 
-		settingsGui.Add("Text", "x16 yp+24 w95 h20", translate("Pitstop Tyre Set"))
+		settingsGui.Add("Text", "x16 yp+24 w88 h20", translate("Pitstop Tyre Set"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit2 VspPitstopTyreSetEdit").OnEvent("Change", updateTyreSet.Bind("spPitstopTyreSetEdit"))
 		settingsGui.Add("UpDown", "x138 yp-2 w18 h20 Range0-99")
 
@@ -1321,19 +1321,19 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.SetFont("Norm", "Arial")
 
-		settingsGui.Add("Text", "x26 yp+24 w75 h20", translate("Front Left"))
+		settingsGui.Add("Text", "x26 yp+24 w78 h20", translate("Front Left"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VspDryFrontLeftEdit", dryFrontLeft).OnEvent("Change", validateNumber.Bind("spDryFrontLeftEdit"))
 		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure"))
 
-		settingsGui.Add("Text", "x26 yp+24 w75 h20", translate("Front Right"))
+		settingsGui.Add("Text", "x26 yp+24 w78 h20", translate("Front Right"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VspDryFrontRightEdit", dryFrontRight).OnEvent("Change", validateNumber.Bind("spDryFrontRightEdit"))
 		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure"))
 
-		settingsGui.Add("Text", "x26 yp+24 w75 h20", translate("Rear Left"))
+		settingsGui.Add("Text", "x26 yp+24 w78 h20", translate("Rear Left"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VspDryRearLeftEdit", dryRearLeft).OnEvent("Change", validateNumber.Bind("spDryRearLeftEdit"))
 		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure"))
 
-		settingsGui.Add("Text", "x26 yp+24 w75 h20", translate("Rear Right"))
+		settingsGui.Add("Text", "x26 yp+24 w78 h20", translate("Rear Right"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VspDryRearRightEdit", dryRearRight).OnEvent("Change", validateNumber.Bind("spDryRearRightEdit"))
 		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure"))
 
@@ -1344,19 +1344,19 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.SetFont("Norm", "Arial")
 
-		settingsGui.Add("Text", "x212 yp+24 w75 h20", translate("Front Left"))
+		settingsGui.Add("Text", "x212 yp+24 w78 h20", translate("Front Left"))
 		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VspWetFrontLeftEdit", wetFrontLeft).OnEvent("Change", validateNumber.Bind("spWetFrontLeftEdit"))
 		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure"))
 
-		settingsGui.Add("Text", "x212 yp+24 w75 h20", translate("Front Right"))
+		settingsGui.Add("Text", "x212 yp+24 w78 h20", translate("Front Right"))
 		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VspWetFrontRightEdit", wetFrontRight).OnEvent("Change", validateNumber.Bind("spWetFrontRightEdit"))
 		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure"))
 
-		settingsGui.Add("Text", "x212 yp+24 w75 h20", translate("Rear Left"))
+		settingsGui.Add("Text", "x212 yp+24 w78 h20", translate("Rear Left"))
 		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VspWetRearLeftEdit", wetRearLeft).OnEvent("Change", validateNumber.Bind("spWetRearLeftEdit"))
 		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure"))
 
-		settingsGui.Add("Text", "x212 yp+24 w75 h20", translate("Rear Right"))
+		settingsGui.Add("Text", "x212 yp+24 w78 h20", translate("Rear Right"))
 		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VspWetRearRightEdit", wetRearRight).OnEvent("Change", validateNumber.Bind("spWetRearRightEdit"))
 		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure"))
 
@@ -1364,7 +1364,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		chosen := inList(["Yes", "No", "Custom"], getMultiMapValue(settingsOrCommand, "Assistant", "Assistant.Autonomy", "Custom"))
 
-		settingsGui.Add("Text", "x16 y82 w110 h23", translate("Autonomous Mode"))
+		settingsGui.Add("Text", "x16 y82 w108 h23", translate("Autonomous Mode"))
 		settingsGui.Add("DropDownList", "x126 yp-3 w100 Choose" . chosen . " vstrategyAutonomyDropDown", collect(["Yes", "No", "Custom"], translate))
 
 		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Strategy.Update.Laps", false)
@@ -1372,7 +1372,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.Add("CheckBox", "x16 YP+30 w108 Checked" . (value > 0) . " VstrategyUpdateLapsCheck", translate("Revise every")).OnEvent("Click", updateStrategyLaps.Bind("Check"))
 		settingsGui.Add("Edit", "x126 yp-3 w50 h20 Limit2 Number VstrategyUpdateLapsEdit", value ? value : 1).OnEvent("Change", updateStrategyLaps.Bind("Edit"))
 		settingsGui.Add("UpDown", "x158 yp w18 h20 Range1-99 0x80", value ? value : 1)
-		settingsGui.Add("Text", "x184 yp+2 w290 h20", translate("Laps"))
+		settingsGui.Add("Text", "x184 yp+2 w205 h20", translate("Laps"))
 
 		if !value
 			settingsGui["strategyUpdateLapsEdit"].Enabled := false
@@ -1382,61 +1382,61 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.Add("CheckBox", "x16 YP+25 w108 Checked" . (value > 0) . " VstrategyUpdatePitstopCheck", translate("Revise if")).OnEvent("Click", updateStrategyPitstop.Bind("Check"))
 		settingsGui.Add("Edit", "x126 yp-3 w50 h20 Limit1 Number VstrategyUpdatePitstopEdit", value ? value : 4).OnEvent("Change", updateStrategyPitstop.Bind("Edit"))
 		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range1-9 0x80", value ? value : 4)
-		settingsGui.Add("Text", "x184 yp+2 w290 h20", translate("Laps difference to Strategy"))
+		settingsGui.Add("Text", "x184 yp+2 w205 h20", translate("Laps difference to Strategy"))
 
 		if !value
 			settingsGui["strategyUpdatePitstopEdit"].Enabled := false
 
 		chosen := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Traffic.Simulation", false)
 
-		settingsGui.Add("Text", "x16 yp+30 w105 h20", translate("Dynamic Traffic"))
+		settingsGui.Add("Text", "x16 yp+30 w108 h20", translate("Dynamic Traffic"))
 		settingsGui.Add("CheckBox", "x126 yp-4 w17 h21 Checked" . chosen . " VtrafficSimulationCheck", chosen)
-		settingsGui.Add("Text", "x184 yp+2 w290 h20", translate("using Monte Carlo simulation"))
+		settingsGui.Add("Text", "x184 yp+2 w205 h20", translate("using Monte Carlo simulation"))
 
 		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Extrapolation.Laps", 3)
 
-		settingsGui.Add("Text", "x16 yp+30 w105 h20 Section", translate("Race positions"))
+		settingsGui.Add("Text", "x16 yp+30 w108 h20 Section", translate("Race positions"))
 		settingsGui.Add("Edit", "x126 yp-2 w50 h20 Limit1 Number VextrapolationLapsEdit", value)
 		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range1-9", value)
-		settingsGui.Add("Text", "x184 yp+2 w290 h20", translate("simulated future laps"))
+		settingsGui.Add("Text", "x184 yp+2 w205 h20", translate("simulated future laps"))
 
 		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Overtake.Delta", 1)
 
-		settingsGui.Add("Text", "x16 yp+20 w85 h23 +0x200", translate("Overtake"))
+		settingsGui.Add("Text", "x16 yp+20 w82 h23 +0x200", translate("Overtake"))
 		settingsGui.Add("Text", "x100 yp w28 h23 +0x200", translate("Abs("))
 		settingsGui.Add("Edit", "x126 yp w50 h20 Limit2 Number VovertakeDeltaEdit", value)
 		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range1-99 0x80", value)
-		settingsGui.Add("Text", "x184 yp+4 w290 h20", translate("/ laptime difference) Seconds"))
+		settingsGui.Add("Text", "x184 yp+4 w205 h20", translate("/ laptime difference) Seconds"))
 
 		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Traffic.Considered", 5)
 
-		settingsGui.Add("Text", "x16 yp+20 w85 h23 +0x200", translate("Traffic"))
+		settingsGui.Add("Text", "x16 yp+20 w108 h23 +0x200", translate("Traffic"))
 		settingsGui.Add("Edit", "x126 yp w50 h20 Limit3 Number VtrafficConsideredEdit", value)
 		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range1-100 0x80", value)
-		settingsGui.Add("Text", "x184 yp+4 w290 h20", translate("% track length"))
+		settingsGui.Add("Text", "x184 yp+4 w205 h20", translate("% track length"))
 
 		settingsGui.Add("Text", "x66 yp+28 w270 0x10")
 
 		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Strategy.Window.Considered", 3)
 
-		settingsGui.Add("Text", "x16 yp+15 w105 h23 +0x200", translate("Pitstop Window"))
+		settingsGui.Add("Text", "x16 yp+15 w108 h23 +0x200", translate("Pitstop Window"))
 		settingsGui.Add("Edit", "x126 yp w50 h20 Limit1 Number VpitstopStrategyWindowEdit", value)
 		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range1-9 0x80", value)
-		settingsGui.Add("Text", "x184 yp+4 w290 h20", translate("Laps +/- around optimal lap"))
+		settingsGui.Add("Text", "x184 yp+4 w205 h20", translate("Laps +/- around optimal lap"))
 
 		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Pitstop.Delta", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Pitstop.Delta", 60))
 
-		settingsGui.Add("Text", "x16 yp+22 w105 h20 +0x200", translate("Pitlane Delta"))
+		settingsGui.Add("Text", "x16 yp+22 w108 h20 +0x200", translate("Pitlane Delta"))
 		settingsGui.Add("Edit", "x126 yp-2 w50 h20 Limit2 Number VpitstopDeltaEdit", value)
 		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 0x80 Range0-99", value)
-		settingsGui.Add("Text", "x184 yp+4 w290 h20", translate("Seconds (Drive through - Drive by)"))
+		settingsGui.Add("Text", "x184 yp+4 w205 h20", translate("Seconds (Drive through - Drive by)"))
 
 		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Service.Tyres", 30)
 
-		settingsGui.Add("Text", "x16 yp+22 w85 h20 +0x200", translate("Tyre Service"))
+		settingsGui.Add("Text", "x16 yp+22 w108 h20 +0x200", translate("Tyre Service"))
 		settingsGui.Add("Edit", "x126 yp-2 w50 h20 Limit2 Number VpitstopTyreServiceEdit", value)
 		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 0x80 Range0-99", value)
-		settingsGui.Add("Text", "x184 yp+4 w290 h20", translate("Seconds (Change four tyres)"))
+		settingsGui.Add("Text", "x184 yp+4 w205 h20", translate("Seconds (Change four tyres)"))
 
 		chosen := inList(["Fixed", "Dynamic"], getMultiMapValue(settingsOrCommand, "Strategy Settings", "Service.Refuel.Rule", "Dynamic"))
 
@@ -1444,16 +1444,16 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.Add("Edit", "x126 yp w50 h20 VpitstopRefuelServiceEdit"
 							  , displayValue("Float", getMultiMapValue(settingsOrCommand, "Strategy Settings", "Service.Refuel", 1.8), 1)).OnEvent("Change", validateNumber.Bind("pitstopRefuelServiceEdit"))
-		settingsGui.Add("Text", "x184 yp+4 w290 h20 VpitstopRefuelServiceLabel", translate(["Seconds", "Seconds (Refuel of 10 liters)"][settingsGui["pitstopRefuelServiceRuleDropdown"].Value]))
+		settingsGui.Add("Text", "x184 yp+4 w205 h20 VpitstopRefuelServiceLabel", translate(["Seconds", "Seconds (Refuel of 10 liters)"][settingsGui["pitstopRefuelServiceRuleDropdown"].Value]))
 
 		chosen := ((getMultiMapValue(settingsOrCommand, "Strategy Settings", "Service.Order", "Simultaneous") = "Simultaneous") ? 1 : 2)
 
-		settingsGui.Add("Text", "x16 yp+24 w85 h23", translate("Service"))
+		settingsGui.Add("Text", "x16 yp+24 w108 h23", translate("Service"))
 		settingsGui.Add("DropDownList", "x126 yp-3 w100 Choose" . chosen . " vpitstopServiceDropDown", collect(["Simultaneous", "Sequential"], translate))
 
 		value := displayValue("Float", convertUnit("Volume", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Fuel.SafetyMargin", 4)), 0)
 
-		settingsGui.Add("Text", "x16 yp+27 w85 h23 +0x200", translate("Safety Fuel"))
+		settingsGui.Add("Text", "x16 yp+27 w108 h23 +0x200", translate("Safety Fuel"))
 		settingsGui.Add("Edit", "x126 yp w50 h20 Number Limit2 VsafetyFuelEdit", value)
 		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range0-99", value)
 		settingsGui.Add("Text", "x184 yp+2 w90 h20", getUnit("Volume", true))

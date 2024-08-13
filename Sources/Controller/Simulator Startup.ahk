@@ -842,7 +842,7 @@ launchPad(command := false, arguments*) {
 
 		launchPadGui.SetFont("s9 Norm", "Arial")
 
-		launchPadGui.Add("Documentation", "x233 YS+20 w140 Center", translate("Applications")
+		launchPadGui.Add("Documentation", "x213 YS+20 w180 Center", translate("Applications")
 					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller")
 
 		launchPadGui.SetFont("s8 Norm", "Arial")
@@ -921,7 +921,7 @@ launchPad(command := false, arguments*) {
 
 		launchPadGui.Add("Text", "x8 yp+40 w574 0x10")
 
-		closeCheckBox := launchPadGui.Add("CheckBox", "x16 yp+10 w120 h21 Checked" . getMultiMapValue(startupConfig, "Simulator Startup", "CloseLaunchPad", false), translate("Close on Startup"))
+		closeCheckBox := launchPadGui.Add("CheckBox", "x16 yp+10 w150 h21 Checked" . getMultiMapValue(startupConfig, "Simulator Startup", "CloseLaunchPad", false), translate("Close on Startup"))
 		closeCheckBox.OnEvent("Click", closeOnStartup)
 
 		launchPadGui.Add("Button", "x259 yp w80 h23 Default", translate("Close")).OnEvent("Click", closeLaunchPad)
@@ -2253,20 +2253,20 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 		profilesEditorGui.Add("Button", "x" . x7 . " yp w23 h23 X:Move Y:Move Center +0x200 vdeleteProfileButton").OnEvent("Click", editStartupProfiles.Bind(kEvent, "ProfileDelete"))
 		setButtonIcon(profilesEditorGui["deleteProfileButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
-		profilesEditorGui.Add("Text", "x" . x0 . " yp+30 w90 h23 +0x200", translate("Name"))
+		profilesEditorGui.Add("Text", "x" . x0 . " yp+30 w120 h23 +0x200", translate("Name"))
 		profilesEditorGui.Add("Edit", "x" . x1 . " yp+1 w" . (392 - (x1 - x0)) . " vprofileNameEdit").OnEvent("Change", editStartupProfiles.Bind("Update State"))
 
-		profilesEditorGui.Add("Text", "x" . x0 . " yp+24 w90 h23 +0x200", translate("Mode"))
+		profilesEditorGui.Add("Text", "x" . x0 . " yp+24 w120 h23 +0x200", translate("Mode"))
 		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " vprofileModeDropDown", collect(hasTeamServer ? ["Solo", "Team"] : ["Solo"], translate)).OnEvent("Change", editStartupProfiles.Bind("Update State"))
 
-		profilesEditorGui.Add("Text", "x" . x0 . " yp+23 w90 h23 +0x200", translate("Control Center"))
+		profilesEditorGui.Add("Text", "x" . x0 . " yp+23 w120 h23 +0x200", translate("Control Center"))
 		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " vprofilePitwallDropDown", collect(hasTeamServer ? ["None", "Practice Center", "Race Center", "Race Center Lite"] : ["None", "Practice Center"], translate))
 
 		settingsTab := profilesEditorGui.Add("Tab3", "x" . x0 . " yp+30 w392 h180 Section", collect(hasTeamServer ? ["Assistants", "Team", "Functions"] : ["Assistants", "Functions"], translate))
 
 		settingsTab.UseTab(1)
 
-		profilesEditorGui.Add("Text", "x" . (x0 + 8) . " ys+36 w110 h23", translate("Autonomous Mode"))
+		profilesEditorGui.Add("Text", "x" . (x0 + 8) . " ys+36 w112 h23", translate("Autonomous Mode"))
 		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp-3 w" . w3 . " Choose3 vprofileAutonomyDropDown", collect(["Yes", "No", "Default"], translate))
 
 		first := true
@@ -2274,7 +2274,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 		for plugin, pluginConfiguration in getMultiMapValues(configuration, "Plugins")
 			if inList(kRaceAssistants, plugin)
 				if string2Values("|", pluginConfiguration)[1] {
-					profilesEditorGui.Add("Text", "x" . (x0 + 8) . (first ? " yp+32" : " yp+27") . " w110 h23", translate(plugin))
+					profilesEditorGui.Add("Text", "x" . (x0 + 8) . (first ? " yp+32" : " yp+27") . " w112 h23", translate(plugin))
 
 					first := false
 
@@ -2284,7 +2284,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 		if hasTeamServer {
 			settingsTab.UseTab(2)
 
-			profilesEditorGui.Add("Text", "x" . (x0 + 8) . " ys+36 w90 h23 +0x200", translate("Credentials"))
+			profilesEditorGui.Add("Text", "x" . (x0 + 8) . " ys+36 w112 h23 +0x200", translate("Credentials"))
 			profilesEditorGui.Add("DropDownList", "x" . x1 . " yp w" . w3 . " vprofileCredentialsDropDown", collect(["Load from Profile", "Load from Settings"], translate)).OnEvent("Change", editStartupProfiles.Bind("Update State"))
 
 			profilesEditorGui.Add("Button", "x" . ((x0 + 8) + 240) . " yp-1 w23 h23 Center +0x200 vprofileTeamButton").OnEvent("Click", editStartupProfiles.Bind(kEvent, "ManageDriver"))
@@ -2294,7 +2294,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 
 			serverURLs := string2Values(";", getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "Team Server", "Server URLs", ""))
 
-			profilesEditorGui.Add("Text", "x" . (x0 + 8) . " yp+30 w90 h23 +0x200", translate("Server URL"))
+			profilesEditorGui.Add("Text", "x" . (x0 + 8) . " yp+30 w112 h23 +0x200", translate("Server URL"))
 			profilesEditorGui.Add("ComboBox", "x" . x1 . " yp+1 w256 vprofileServerURLEdit", serverURLs)
 
 			profilesEditorGui.Add("Text", "x" . (x0 + 8) . " yp+23 w90 h23 +0x200", translate("Session Token"))
@@ -2302,11 +2302,11 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 			profilesEditorGui.Add("Button", "x" . (x1 - 24) . " yp-1 w23 h23 Center +0x200 vprofileConnectButton").OnEvent("Click", editStartupProfiles.Bind(kEvent, "Connect"))
 			setButtonIcon(profilesEditorGui["profileConnectButton"], kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
 
-			profilesEditorGui.Add("Text", "x" . (x0 + 8) . " yp+30 w90 h23 +0x200", translate("Team / Driver"))
+			profilesEditorGui.Add("Text", "x" . (x0 + 8) . " yp+30 w112 h23 +0x200", translate("Team / Driver"))
 			profilesEditorGui.Add("DropDownList", "x" . x1 . " yp w" . w3 . " vprofileTeamDropDown").OnEvent("Change", editStartupProfiles.Bind(kEvent, "Update", "Team"))
 			profilesEditorGui.Add("DropDownList", "x" . ((x0 + 8) + 243) . " yp w" . (w3 + 6) . " vprofileDriverDropDown").OnEvent("Change", editStartupProfiles.Bind(kEvent, "Update", "Driver"))
 
-			profilesEditorGui.Add("Text", "x" . (x0 + 8) . " yp+24 w90 h23 +0x200", translate("Session"))
+			profilesEditorGui.Add("Text", "x" . (x0 + 8) . " yp+24 w112 h23 +0x200", translate("Session"))
 			profilesEditorGui.Add("DropDownList", "x" . x1 . " yp w" . w3 . " vprofileSessionDropDown").OnEvent("Change", editStartupProfiles.Bind(kEvent, "Update", "Session"))
 		}
 

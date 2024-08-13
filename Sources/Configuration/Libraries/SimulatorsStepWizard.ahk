@@ -154,7 +154,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 
 		window.SetFont("s8 Norm", "Arial")
 
-		widget3 := window.Add("Text", "x" . x . " yp+30 w105 h23 +0x200 Hidden", translate("Simulator"))
+		widget3 := window.Add("Text", "x" . x . " yp+30 w80 h23 +0x200 Hidden", translate("Simulator"))
 		widget4 := window.Add("DropDownList", "x" . secondX . " yp w" . secondWidth . "  vsimulatorDropDown Hidden")
 		widget4.OnEvent("Change", chooseSimulator)
 

@@ -1276,7 +1276,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui.SetFont("s9 Norm", "Arial")
 
-		editorGui.Add("Documentation", "x258 YP+20 w164 H:Center Center", translate("Session Database")
+		editorGui.Add("Documentation", "x228 YP+20 w224 H:Center Center", translate("Session Database")
 					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database")
 
 		editorGui.Add("Text", "x8 yp+30 w670 W:Grow 0x10")
@@ -1285,7 +1285,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("s10 Bold", "Arial")
 
 		editorGui.Add("Picture", "x16 yp+12 w30 h30 Section", this.themeIcon(kIconsDirectory . "Road.ico"))
-		editorGui.Add("Text", "x50 yp+5 w120 h26", translate("Selection"))
+		editorGui.Add("Text", "x50 yp+5 w180 h26", translate("Selection"))
 
 		editorGui.SetFont("s8 Norm", "Arial")
 
@@ -1336,7 +1336,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("s10 Bold", "Arial")
 
 		editorGui.Add("Picture", "x280 ys w30 h30 Section", this.themeIcon(kIconsDirectory . "Report.ico"))
-		editorGui.Add("Text", "xp+34 yp+5 w120 h26 W:Grow", translate("Notes"))
+		editorGui.Add("Text", "xp+34 yp+5 w180 h26 W:Grow", translate("Notes"))
 
 		button := editorGui.Add("Button", "x647 yp w23 h23 X:Move")
 		button.OnEvent("Click", showSettings)
@@ -6051,12 +6051,12 @@ editSettings(editorOrCommand, arguments*) {
 
 		settingsEditorGui.SetFont("s9 Norm", "Arial")
 
-		settingsEditorGui.Add("Documentation", "x133 YP+20 w144 Center", translate("Database Settings")
+		settingsEditorGui.Add("Documentation", "x103 YP+20 w204 Center", translate("Database Settings")
 							, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration")
 
 		settingsEditorGui.SetFont("s8 Norm", "Arial")
 
-		settingsEditorGui.Add("Text", "x16 y60 w90 h23 +0x200", translate("Database Folder"))
+		settingsEditorGui.Add("Text", "x16 y60 w125 h23 +0x200", translate("Database Folder"))
 		databaseLocationEdit := settingsEditorGui.Add("Edit", "x146 yp w234 h21", databaseLocationEdit)
 		settingsEditorGui.Add("Button", "x382 yp-1 w23 h23", translate("...")).OnEvent("Click", editSettings.Bind("DatabaseLocation"))
 
@@ -6068,7 +6068,7 @@ editSettings(editorOrCommand, arguments*) {
 
 		values := [synchTelemetryCheck, synchPressuresCheck, synchSessionsCheck, synchSetupsCheck, synchStrategiesCheck]
 
-		settingsEditorGui.Add("Text", "x24 yp+16 w90 h23 +0x200", translate("Synchronization"))
+		settingsEditorGui.Add("Text", "x24 yp+16 w117 h23 +0x200", translate("Synchronization"))
 		synchTelemetryCheck := settingsEditorGui.Add("CheckBox", "x146 yp+2 w120 h21", translate("Telemetry Data"))
 		synchTelemetryCheck.OnEvent("Click", editSettings.Bind("UpdateState"))
 		synchStrategiesCheck := settingsEditorGui.Add("CheckBox", "x266 yp w120 h21", translate("Race Strategies"))
@@ -6086,7 +6086,7 @@ editSettings(editorOrCommand, arguments*) {
 		synchSetupsCheck.Value := values[4]
 		synchStrategiesCheck.Value := values[5]
 
-		settingsEditorGui.Add("Text", "x24 yp+30 w90 h23 +0x200", translate("Name"))
+		settingsEditorGui.Add("Text", "x24 yp+30 w117 h23 +0x200", translate("Name"))
 		serverIdentifierEdit := settingsEditorGui.Add("Edit", "x146 yp+1 w246", serverIdentifierEdit)
 
 		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
@@ -6100,10 +6100,10 @@ editSettings(editorOrCommand, arguments*) {
 		if (!chosen && (availableServerURLs.Length > 0))
 			chosen := 1
 
-		settingsEditorGui.Add("Text", "x24 yp+30 w90 h23 +0x200", translate("Server URL"))
+		settingsEditorGui.Add("Text", "x24 yp+30 w117 h23 +0x200", translate("Server URL"))
 		serverURLEdit := settingsEditorGui.Add("ComboBox", "x146 yp+1 w246 Choose" . chosen, availableServerURLs)
 
-		settingsEditorGui.Add("Text", "x24 yp+23 w90 h23 +0x200", translate("Data Token"))
+		settingsEditorGui.Add("Text", "x24 yp+23 w93 h23 +0x200", translate("Data Token"))
 		serverTokenEdit := settingsEditorGui.Add("Edit", "x146 yp w246 h21 Password", serverTokenEdit)
 
 		validateTokenButton := settingsEditorGui.Add("Button", "x122 yp-1 w23 h23 Center +0x200")
@@ -6128,7 +6128,7 @@ editSettings(editorOrCommand, arguments*) {
 
 		values := serverUpdateEdit
 
-		settingsEditorGui.Add("Text", "x24 yp+30 w110 h23 +0x200", translate("Synchronize each"))
+		settingsEditorGui.Add("Text", "x24 yp+30 w117 h23 +0x200", translate("Synchronize each"))
 		serverUpdateEdit := settingsEditorGui.Add("Edit", "x146 yp w40 Number Limit2", values)
 		settingsEditorGui.Add("UpDown", "xp+32 yp-2 w18 h20 Range10-90", values)
 		settingsEditorGui.Add("Text", "x190 yp w90 h23 +0x200", translate("Minutes"))

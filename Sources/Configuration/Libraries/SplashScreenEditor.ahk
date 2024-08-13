@@ -89,17 +89,17 @@ class SplashScreenEditor extends ConfiguratorPanel {
 
 		splashScreensGui.SetFont("Norm", "Arial")
 
-		splashScreensGui.Add("Documentation", "x158 YP+20 w88 H:Center Center", translate("Splash Screens")
+		splashScreensGui.Add("Documentation", "x138 YP+20 w128 H:Center Center", translate("Splash Screens")
 						   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#splash-screen-editor")
 
 		splashScreensGui.Add("Text", "x50 yp+30 w310 W:Grow 0x10")
 
 		splashScreensGui.SetFont("Norm", "Arial")
 
-		splashScreensGui.Add("Text", "x16 yp+10 w160 h23 +0x200", translate("Upper Title"))
+		splashScreensGui.Add("Text", "x16 yp+10 w90 h23 +0x200", translate("Upper Title"))
 		splashScreensGui.Add("Edit", "x110 yp w284 h21 W:Grow VwindowTitleEdit", this.Value["windowTitle"])
 
-		splashScreensGui.Add("Text", "x16 yp+24 w160 h23 +0x200", translate("Lower Title"))
+		splashScreensGui.Add("Text", "x16 yp+24 w90 h23 +0x200", translate("Lower Title"))
 		splashScreensGui.Add("Edit", "x110 yp w284 h21 W:Grow VwindowSubtitleEdit", this.Value["windowSubtitle"])
 
 		splashScreensGui.Add("Text", "x50 yp+30 w310 W:Grow 0x10")
@@ -307,23 +307,23 @@ class SplashScreensList extends ConfigurationItemList {
 		}
 
 		window.Add("ListView", "x16 yp+24 w377 h140 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VsplashScreensListView", collect(["Splash Screen", "Media", "Sound File"], translate))
-		window.Add("Text", "x16 yp+150 w86 h23 +0x200 Y:Move", translate("Splash Screen"))
+		window.Add("Text", "x16 yp+150 w90 h23 +0x200 Y:Move", translate("Splash Screen"))
 		window.Add("Edit", "x110 yp w140 h21 Y:Move W:Grow(0.5) VsplashScreenNameEdit")
 
-		window.Add("Text", "x16 yp+24 w86 h23 +0x200 Y:Move", translate("Type"))
+		window.Add("Text", "x16 yp+24 w90 h23 +0x200 Y:Move", translate("Type"))
 		window.Add("DropDownList", "x110 yp w140 Y:Move W:Grow(0.5) VsplashScreenTypeDropDown", [translate("Picture Carousel"), translate("Video")]).OnEvent("Change", updateSplashScreenEditorState)
 
-		window.Add("Text", "x16 yp+24 w160 h23 Y:Move +0x200", translate("Sound File"))
+		window.Add("Text", "x16 yp+24 w65 h23 Y:Move +0x200", translate("Sound File"))
 		window.Add("Button", "x85 yp-1 w23 h23 Y:Move vplaySoundFileButton").OnEvent("Click", togglePlaySoundFile)
 		setButtonIcon(window["playSoundFileButton"], kIconsDirectory . "Start.ico", 1, "L2 T2 R2 B2")
 		window.Add("Edit", "x110 yp+1 w259 h21 Y:Move W:Grow VsoundFilePathEdit")
 		window.Add("Button", "x371 yp-1 w23 h23 Y:Move X:Move", translate("...")).OnEvent("Click", chooseSoundFilePath)
 
-		window.Add("Text", "x16 yp+25 w80 h23 +0x200 Y:Move VvideoFilePathLabel", translate("Video"))
+		window.Add("Text", "x16 yp+25 w65 h23 +0x200 Y:Move VvideoFilePathLabel", translate("Video"))
 		window.Add("Edit", "x110 yp w259 h21 Y:Move W:Grow VvideoFilePathEdit")
 		window.Add("Button", "x371 yp-1 w23 h23 Y:Move X:Move VvideoFilePathButton", translate("...")).OnEvent("Click", chooseVideoFilePath)
 
-		window.Add("Text", "x16 yp+1 w80 h23 +0x200 Y:Move VpicturesListLabel", translate("Pictures"))
+		window.Add("Text", "x16 yp+1 w75 h23 +0x200 Y:Move VpicturesListLabel", translate("Pictures"))
 		window.Add("Button", "x85 yp w23 h23 Y:Move VaddPictureButton").OnEvent("Click", addSplashScreenPicture)
 		setButtonIcon(window["addPictureButton"], kIconsDirectory . "Plus.ico", 1)
 
@@ -331,16 +331,25 @@ class SplashScreensList extends ConfigurationItemList {
 		window["picturesListView"].OnEvent("Click", noSelect)
 		window["picturesListView"].OnEvent("DoubleClick", noSelect)
 
-		window.Add("Text", "x16 yp+114 w80 h23 +0x200 Y:Move VpicturesDurationLabel", translate("Display Duration"))
+		window.Add("Text", "x16 yp+114 w90 h23 +0x200 Y:Move VpicturesDurationLabel", translate("Display Duration"))
 		window.Add("Edit", "x110 yp w40 h21 Y:Move Limit5 Number VpicturesDurationEdit")
 
 		window.SetFont("Norm", "Arial")
 
 		window.Add("Text", "x154 yp+3 w40 h23 Y:Move VpicturesDurationPostfix", translate("ms"))
 
+		/*
 		window.Add("Button", "x184 yp+31 w46 h23 Y:Move X:Move VsplashScreenAddButton", translate("Add"))
 		window.Add("Button", "x232 yp w50 h23 Y:Move X:Move Disabled VsplashScreenDeleteButton", translate("Delete"))
 		window.Add("Button", "x340 yp w55 h23 Y:Move X:Move Disabled VsplashScreenUpdateButton", translate("&Save"))
+		*/
+
+		window.Add("Button", "x318 y530 w23 h23 X:Move Y:Move VsplashScreenAddButton")
+		setButtonIcon(window["splashScreenAddButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x342 y530 w23 h23 X:Move Y:Move Disabled VsplashScreenDeleteButton")
+		setButtonIcon(window["splashScreenDeleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x372 y530 w23 h23 X:Move Y:Move Disabled VsplashScreenUpdateButton")
+		setButtonIcon(window["splashScreenUpdateButton"], kIconsDirectory . "Save.ico", 1, "L4 T4 R4 B4")
 
 		this.initializeList(editor, window["splashScreensListView"], window["splashScreenAddButton"], window["splashScreenDeleteButton"], window["splashScreenUpdateButton"])
 	}

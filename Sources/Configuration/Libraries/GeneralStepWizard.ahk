@@ -297,7 +297,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		for code, language in availableLanguages()
 			choices.Push(language)
 
-		widget5 := window.Add("Text", "x" . x . " yp+10 w86 h23 +0x200 Hidden", translate("Localization"))
+		widget5 := window.Add("Text", "x" . x . " yp+10 w100 h23 +0x200 Hidden", translate("Localization"))
 		widget6 := window.Add("Button", "x" . secondX . " yp w23 h23 Hidden")
 		widget6.OnEvent("Click", openFormatsEditor)
 		setButtonIcon(widget6, kIconsDirectory . "Locale.ico", 1, "L4 T4 R4 B4")
@@ -315,6 +315,8 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 
 		widget12 := window.Add("Text", "x" . x . " yp+10 w105 h23 +0x200 Hidden", translate("Mode Selector"))
 		widget13 := window.Add("ListBox", "x" . secondX . " yp w120 h60 Disabled ReadOnly Hidden")
+
+		window.SetFont("Bold", "Arial")
 
 		widget14 := window.Add("Text", "x" . x . " yp+60 w140 h23 +0x200 Hidden", translate("Launchpad Mode"))
 		widget15 := window.Add("ListView", "x" . x . " yp+24 w" . col1Width . " h112 H:Grow(0.5) AltSubmit -Multi -LV0x10 NoSort NoSortHdr Hidden", collect(["Application", "Label", "Function"], translate))

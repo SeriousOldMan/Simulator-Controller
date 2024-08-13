@@ -115,11 +115,11 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 
 			checked := (inList(pedals, pedal) ? "Checked" : "")
 
-			widget := window.Add("Text", "x" . x . " " . yOption . " w105 h23 +0x200 Hidden", translate(pedal))
+			widget := window.Add("Text", "x" . x . " " . yOption . " w90 h23 +0x200 Hidden", translate(pedal))
 
 			pedalWidgets.Push(widget)
 
-			widget := window.Add("CheckBox", "x" . secondX . " yp w24 h21 +0x200 " . checked . " Hidden")
+			widget := window.Add("CheckBox", "x" . (secondX + 15) . " yp w24 h21 +0x200 " . checked . " Hidden")
 			widget.OnEvent("Click", updatePedals)
 
 			pedalWidgets.Push(widget)

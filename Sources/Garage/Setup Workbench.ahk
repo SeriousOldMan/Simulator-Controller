@@ -443,7 +443,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 		workbenchGui.SetFont("s9 Norm", "Arial")
 
-		workbenchGui.Add("Documentation", "x508 YP+20 w184 Center H:Center", translate("Setup Workbench")
+		workbenchGui.Add("Documentation", "x488 YP+20 w224 Center H:Center", translate("Setup Workbench")
 					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench")
 
 		workbenchGui.Add("Text", "x8 yp+30 w1200 W:Grow 0x10 Section")
@@ -1505,15 +1505,15 @@ class SetupWorkbench extends ConfigurationItem {
 			x := x + 8
 			y := y + 26
 
-			label2 := window.Add("Text", "x" . X . " y" . Y . " w115", translate("Importance / Severity"))
+			label2 := window.Add("Text", "x" . X . " y" . Y . " w139", translate("Importance / Severity"))
 
-			x := x + 120
+			x := x + 144
 
-			slider1 := window.Add("Slider", "Center Thick15 x" . x . " yp-2 w118 0x10 Range0-100 ToolTip", 0)
+			slider1 := window.Add("Slider", "Center Thick15 x" . x . " yp-2 w106 0x10 Range0-100 ToolTip", 0)
 
-			x := x + 123
+			x := x + 109
 
-			slider2 := window.Add("Slider", "Center Thick15 x" . x . " yp w118 0x10 Range0-100 ToolTip", 0)
+			slider2 := window.Add("Slider", "Center Thick15 x" . x . " yp w106 0x10 Range0-100 ToolTip", 0)
 
 			callback := updateSlider.Bind(characteristic, slider1, slider2)
 

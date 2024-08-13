@@ -2607,22 +2607,29 @@ class GridRaceAssistant extends RaceAssistant {
 		local positions, position, classPosition, car
 
 		getCar(car, type?) {
-			local carData := Map("Nr", this.getNr(car)
-							   , "Class", this.getClass(car)
-							   , "Laps", knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0))
-							   , "OverallPosition", this.getPosition(car, "Overall")
-							   , "ClassPosition", this.getPosition(car, "Class")
-							   , "DistanceIntoTrack", (Round(this.getRunning(car) * this.TrackLength) . " Meters")
-							   , "LapTime", (Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1) . " Seconds")
-							   , "NumPitstops", this.Pitstops[knowledgeBase.getValue("Car." . car . ".ID")].Length
-							   , "InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false)) ? kTrue : kFalse)
+			local carData
 
-			if isSet(type)
-				carData["Delta"] := (Round(knowledgeBase.getValue("Position.Standings.Class." . type . ".Delta", 0) / 1000, 1) . " Seconds")
-			else
-				carData["Delta"] := (Round(this.getDelta(car) / 1000, 1) . " Seconds")
+			try {
+				carData := Map("Nr", this.getNr(car)
+							 , "Class", this.getClass(car)
+							 , "Laps", knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0))
+							 , "OverallPosition", this.getPosition(car, "Overall")
+							 , "ClassPosition", this.getPosition(car, "Class")
+							 , "DistanceIntoTrack", (Round(this.getRunning(car) * this.TrackLength) . " Meters")
+							 , "LapTime", (Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1) . " Seconds")
+							 , "NumPitstops", this.Pitstops[knowledgeBase.getValue("Car." . car . ".ID")].Length
+							 , "InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false)) ? kTrue : kFalse)
 
-			return carData
+				if isSet(type)
+					carData["Delta"] := (Round(knowledgeBase.getValue("Position.Standings.Class." . type . ".Delta", 0) / 1000, 1) . " Seconds")
+				else
+					carData["Delta"] := (Round(this.getDelta(car) / 1000, 1) . " Seconds")
+
+				return carData
+			}
+			catch Any as exception {
+				return false
+			}
 		}
 
 		if knowledgeBase {
@@ -2642,20 +2649,20 @@ class GridRaceAssistant extends RaceAssistant {
 				if (classPosition != 1) {
 					car := knowledgeBase.getValue("Position.Standings.Class.Leader.Car", 0)
 
-					if car
-						positions["Leader"] := getCar(car, "Leader")
+					if (car && (car := getCar(car, "Leader")))
+						positions["Leader"] := car
 
 					car := knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", false)
 
-					if car
-						positions["Ahead"] := getCar(car, "Ahead")
+					if (car && (car := getCar(car, "Ahead")))
+						positions["Ahead"] := car
 				}
 
 				if (this.getPosition(false, "Class") != this.getCars("Class").Length) {
 					car := knowledgeBase.getValue("Position.Standings.Class.Behind.Car")
 
-					if car
-						positions["Behind"] := getCar(car, "Behind")
+					if (car && (car := getCar(car, "Behind")))
+						positions["Behind"] := car
 				}
 			}
 		}
@@ -2675,7 +2682,8 @@ class GridRaceAssistant extends RaceAssistant {
 
 				carData := getCar(car)
 
-				standingsData[carData["OverallPosition"]] := carData
+				if carData
+					standingsData[carData["OverallPosition"]] := carData
 			}
 
 			loop standingsData.Count

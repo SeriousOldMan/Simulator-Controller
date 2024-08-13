@@ -28,20 +28,29 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 
 		window.Add("ListView", "x16 y80 w457 h245 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VchatMessagesListView", collect(["#", "Label", "Message"], translate))
 
-		window.Add("Text", "x16 y335 w86 h23 Y:Move +0x200", translate("Button"))
-		window.Add("Text", "x95 y335 w23 h23 Y:Move +0x200", translate("#"))
+		window.Add("Text", "x16 y335 w81 h23 Y:Move +0x200", translate("Button"))
+		window.Add("Text", "x98 y335 w12 h23 Y:Move +0x200", translate("#"))
 		window.Add("Edit", "x110 y335 w40 h21 Y:Move Number Limit3 VchatMessageNumberEdit")
 		window.Add("UpDown", "x150 y335 w17 h21 Y:Move Range1-999")
 
-		window.Add("Text", "x16 y359 w86 h23 Y:Move +0x200", translate("Label"))
+		window.Add("Text", "x16 y359 w90 h23 Y:Move +0x200", translate("Label"))
 		window.Add("Edit", "x110 y359 w80 h21 Y:Move W:Grow(0.2) VchatMessageLabelEdit")
 
-		window.Add("Text", "x16 y383 w86 h23 Y:Move +0x200", translate("Message"))
+		window.Add("Text", "x16 y383 w90 h23 Y:Move +0x200", translate("Message"))
 		window.Add("Edit", "x110 y383 w363 h21 Y:Move W:Grow VchatMessageMessageEdit")
 
+		/*
 		window.Add("Button", "x264 y530 w46 h23 Y:Move X:Move VchatMessageAddButton", translate("Add"))
 		window.Add("Button", "x312 y530 w50 h23 Y:Move X:Move Disabled VchatMessageDeleteButton", translate("Delete"))
 		window.Add("Button", "x418 y530 w55 h23 Y:Move X:Move Disabled VchatMessageUpdateButton", translate("&Save"))
+		*/
+
+		window.Add("Button", "x396 y530 w23 h23 X:Move Y:Move VchatMessageAddButton")
+		setButtonIcon(window["chatMessageAddButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x420 y530 w23 h23 X:Move Y:Move Disabled VchatMessageDeleteButton")
+		setButtonIcon(window["chatMessageDeleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x450 y530 w23 h23 X:Move Y:Move Disabled VchatMessageUpdateButton")
+		setButtonIcon(window["chatMessageUpdateButton"], kIconsDirectory . "Save.ico", 1, "L4 T4 R4 B4")
 
 		this.initializeList(editor, window["chatMessagesListView"], window["chatMessageAddButton"], window["chatMessageDeleteButton"], window["chatMessageUpdateButton"])
 	}

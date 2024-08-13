@@ -101,12 +101,12 @@ class PluginsConfigurator extends ConfigurationItemList {
 
 		window.Add("ListView", "x16 y80 w457 h245 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VpluginsListView", collect(["Active?", "Plugin", "Simulator(s)", "Arguments"], translate))
 
-		window.Add("Text", "x16 y335 w86 h23 Y:Move +0x200", translate("Plugin"))
+		window.Add("Text", "x16 y335 w90 h23 Y:Move +0x200", translate("Plugin"))
 		window.Add("Edit", "x110 y335 w154 h21 Y:Move W:Grow(0.2) VpluginEdit").OnEvent("Change", (*) => this.updateState())
 
 		window.Add("CheckBox", "x110 y359 w120 h21 Y:Move VpluginActivatedCheck", translate("Activated?"))
 
-		window.Add("Text", "x16 y383 w89 h23 Y:Move +0x200", translate("Simulator(s)"))
+		window.Add("Text", "x16 y383 w90 h23 Y:Move +0x200", translate("Simulator(s)"))
 		window.Add("Edit", "x110 y383 w339 h21 Y:Move W:Grow(0.2) VpluginSimulatorsEdit")
 
 		widget1 := window.Add("Button", "x450 y383 w23 h23 X:Move Y:Move vpluginBoosterButton")
@@ -115,7 +115,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 
 		window.SetFont("Underline", "Arial")
 
-		window.Add("Text", "x16 y408 w80 h23 +0x200 Y:Move c" . window.Theme.LinkColor, translate("Arguments")).OnEvent("Click", openPluginsModesDocumentation)
+		window.Add("Text", "x16 y408 w90 h23 +0x200 Y:Move c" . window.Theme.LinkColor, translate("Arguments")).OnEvent("Click", openPluginsModesDocumentation)
 
 		window.SetFont("Norm", "Arial")
 
@@ -123,9 +123,18 @@ class PluginsConfigurator extends ConfigurationItemList {
 
 		window.Add("Button", "x16 y530 w140 h23 Y:Move ", translate("Edit Labels && Icons...")).OnEvent("Click", openActionsEditor)
 
+		/*
 		window.Add("Button", "x264 y530 w46 h23 Y:Move X:Move VpluginAddButton", translate("Add"))
 		window.Add("Button", "x312 y530 w50 h23 Y:Move X:Move Disabled VpluginDeleteButton", translate("Delete"))
 		window.Add("Button", "x418 y530 w55 h23 Y:Move X:Move Disabled VpluginUpdateButton", translate("&Save"))
+		*/
+
+		window.Add("Button", "x396 y530 w23 h23 X:Move Y:Move VpluginAddButton")
+		setButtonIcon(window["pluginAddButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x420 y530 w23 h23 X:Move Y:Move Disabled VpluginDeleteButton")
+		setButtonIcon(window["pluginDeleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x450 y530 w23 h23 X:Move Y:Move Disabled VpluginUpdateButton")
+		setButtonIcon(window["pluginUpdateButton"], kIconsDirectory . "Save.ico", 1, "L4 T4 R4 B4")
 
 		this.initializeList(editor, window["pluginsListView"], window["pluginAddButton"], window["pluginDeleteButton"], window["pluginUpdateButton"])
 	}

@@ -117,7 +117,7 @@ class TranslationsEditor extends ConfiguratorPanel {
 
 		translationGui.SetFont("Norm", "Arial")
 
-		translationGui.Add("Documentation", "x158 YP+20 w88 H:Center Center", translate("Translations")
+		translationGui.Add("Documentation", "x143 YP+20 w118 H:Center Center", translate("Translations")
 						 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#translations-editor")
 
 		translationGui.SetFont("Norm", "Arial")
@@ -350,7 +350,7 @@ class TranslationsList extends ConfigurationItemList {
 		window.Add("Text", "x16 w86 h23 Y:Move +0x200", translate("Original"))
 		window.Add("Edit", "x110 yp w283 h80 Y:Move W:Grow Disabled voriginalTextEdit")
 
-		window.Add("Text", "x16 w86 h23 Y:Move +0x200", translate("Translation"))
+		window.Add("Text", "x16 w65 h23 Y:Move +0x200", translate("Translation"))
 
 		option := (this.iLanguageCode = "en") ? "Disabled" : ""
 

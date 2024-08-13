@@ -1006,7 +1006,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.SetFont("s9 Norm", "Arial")
 
-		workbenchGui.Add("Documentation", "x608 YP+20 w134 Center H:Center", translate("Strategy Workbench")
+		workbenchGui.Add("Documentation", "x588 YP+20 w174 Center H:Center", translate("Strategy Workbench")
 					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench")
 
 		workbenchGui.Add("Text", "x8 yp+30 w1350 0x10 W:Grow")
@@ -1015,7 +1015,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("s10 Bold", "Arial")
 
 		workbenchGui.Add("Picture", "x16 yp+12 w30 h30 Section", workbenchGui.Theme.RecolorizeImage(kIconsDirectory . "Sensor.ico"))
-		workbenchGui.Add("Text", "x50 yp+5 w80 h26", translate("Telemetry"))
+		workbenchGui.Add("Text", "x50 yp+5 w120 h26", translate("Telemetry"))
 
 		workbenchGui.SetFont("s8 Norm", "Arial")
 
@@ -1079,7 +1079,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.iDataListView.OnEvent("Click", noSelect)
 		this.iDataListView.OnEvent("DoubleClick", noSelect)
 
-		workbenchGui.Add("Text", "x195 yp w70 h23 X:Move(0.1) +0x200", translate("Driver"))
+		workbenchGui.Add("Text", "x190 yp w62 h23 X:Move(0.1) +0x200", translate("Driver"))
 		workbenchGui.Add("DropDownList", "x250 yp w130 X:Move(0.1) vdriverDropDown").OnEvent("Change", chooseDriver)
 
 		compound := this.SelectedCompound[true]
@@ -1091,10 +1091,10 @@ class StrategyWorkbench extends ConfigurationItem {
 			chosen := 1
 		}
 
-		workbenchGui.Add("Text", "x195 yp+24 w70 h23 X:Move(0.1) +0x200", translate("Compound"))
+		workbenchGui.Add("Text", "x190 yp+24 w62 h23 X:Move(0.1) +0x200", translate("Compound"))
 		workbenchGui.Add("DropDownList", "x250 yp w130 X:Move(0.1) Choose" . chosen . "  vcompoundDropDown", choices).OnEvent("Change", chooseCompound)
 
-		workbenchGui.Add("Text", "x195 yp+28 w70 h23 X:Move(0.1) +0x200", translate("X-Axis"))
+		workbenchGui.Add("Text", "x190 yp+28 w62 h23 X:Move(0.1) +0x200", translate("X-Axis"))
 
 		schema := filterSchema(TelemetryDatabase().getSchema("Electronics", true))
 
@@ -1102,7 +1102,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("DropDownList", "x250 yp w130 X:Move(0.1) Choose" . chosen . " vdataXDropDown", schema).OnEvent("Change", chooseAxis)
 
-		workbenchGui.Add("Text", "x195 yp+24 w70 h23 X:Move(0.1) +0x200", translate("Series"))
+		workbenchGui.Add("Text", "x190 yp+24 w62 h23 X:Move(0.1) +0x200", translate("Series"))
 
 		chosen := inList(schema, "Fuel.Consumption")
 
@@ -1113,9 +1113,9 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("DropDownList", "x250 yp+24 w130 X:Move(0.1) Choose1 vdataY2DropDown", schema).OnEvent("Change", chooseAxis)
 		workbenchGui.Add("DropDownList", "x250 yp+24 w130 X:Move(0.1) Choose1 vdataY3DropDown", schema).OnEvent("Change", chooseAxis)
 
-		workbenchGui.Add("Text", "x400 ys w40 h23 X:Move(0.1) +0x200", translate("Chart"))
-		workbenchGui.Add("DropDownList", "x444 yp w80 X:Move(0.1) Choose1 +0x200 vchartSourceDropDown", collect(["Telemetry", "Strategy", "Comparison"], translate)).OnEvent("Change", chooseChartSource)
-		workbenchGui.Add("DropDownList", "x529 yp w80 X:Move(0.1) Choose1 vchartTypeDropDown", collect(["Scatter", "Bar", "Bubble", "Line"], translate)).OnEvent("Change", chooseChartType)
+		workbenchGui.Add("Text", "x400 ys w60 h23 X:Move(0.1) +0x200", translate("Chart"))
+		workbenchGui.Add("DropDownList", "x464 yp w80 X:Move(0.1) Choose1 +0x200 vchartSourceDropDown", collect(["Telemetry", "Strategy", "Comparison"], translate)).OnEvent("Change", chooseChartSource)
+		workbenchGui.Add("DropDownList", "x549 yp w80 X:Move(0.1) Choose1 vchartTypeDropDown", collect(["Scatter", "Bar", "Bubble", "Line"], translate)).OnEvent("Change", chooseChartType)
 
 		this.iChartViewer := workbenchGui.Add("HTMLViewer", "x400 yp+24 w950 h350 Border vchartViewer X:Move(0.1) W:Grow(0.9) H:Grow(0.2)")
 
@@ -1126,7 +1126,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("s10 Bold", "Arial")
 
 		workbenchGui.Add("Picture", "x16 yp+10 w30 h30 Section", workbenchGui.Theme.RecolorizeImage(kIconsDirectory . "Strategy.ico"))
-		workbenchGui.Add("Text", "x50 yp+5 w80 h26", translate("Strategy"))
+		workbenchGui.Add("Text", "x50 yp+5 w120 h26", translate("Strategy"))
 
 		workbenchGui.SetFont("s8 Norm", "Arial")
 
@@ -1267,12 +1267,12 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.SetFont("Norm", "Arial")
 
-		workbenchGui.Add("Text", "x" . x . " yp+21 w105 h20 +0x200", translate("Pitlane Delta"))
+		workbenchGui.Add("Text", "x" . x . " yp+21 w110 h20 +0x200", translate("Pitlane Delta"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w50 h20 Limit2 Number VpitstopDeltaEdit", 60)
 		workbenchGui.Add("UpDown", "x" . x2 . " yp w18 h20 0x80 Range0-99", 60)
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w220 h20", translate("Seconds (Drive through - Drive by)"))
 
-		workbenchGui.Add("Text", "x" . x . " yp+21 w85 h20 +0x200", translate("Tyre Service"))
+		workbenchGui.Add("Text", "x" . x . " yp+21 w110 h20 +0x200", translate("Tyre Service"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w50 h20 Limit2 Number VpitstopTyreServiceEdit", 30)
 		workbenchGui.Add("UpDown", "x" . x2 . " yp w18 h20 0x80 Range0-99", 30)
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w220 h20", translate("Seconds (Change four tyres)"))
@@ -1282,17 +1282,17 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Edit", "x" . x1 . " yp w50 h20 VpitstopFuelServiceEdit", displayValue("Float", 1.8)).OnEvent("Change", validatePitstopFuelService)
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w220 h20 VpitstopFuelServiceLabel", translate("Seconds (Refuel of 10 liters)"))
 
-		workbenchGui.Add("Text", "x" . x . " yp+24 w160 h23", translate("Service"))
+		workbenchGui.Add("Text", "x" . x . " yp+24 w110 h23", translate("Service"))
 		workbenchGui.Add("DropDownList", "x" . x1 . " yp-3 w100 Choose1 vpitstopServiceDropDown", collect(["Simultaneous", "Sequential"], translate))
 
-		workbenchGui.Add("Text", "x" . x . " yp+27 w85 h20 +0x200", translate("Fuel Capacity"))
+		workbenchGui.Add("Text", "x" . x . " yp+27 w110 h20 +0x200", translate("Fuel Capacity"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w50 h20 VfuelCapacityEdit", displayValue("Float", convertUnit("Volume", 125))).OnEvent("Change", validateFuelCapacity)
-		workbenchGui.Add("Text", "x" . x3 . " yp+4 w220 h20", getUnit("Volume", true))
+		workbenchGui.Add("Text", "x" . x3 . " yp+4 w90 h20", getUnit("Volume", true))
 
-		workbenchGui.Add("Text", "x" . x . " yp+19 w85 h23 +0x200", translate("Safety Fuel"))
+		workbenchGui.Add("Text", "x" . x . " yp+19 w110 h23 +0x200", translate("Safety Fuel"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp+1 w50 h20 Number Limit2 VsafetyFuelEdit", displayValue("Float", convertUnit("Volume", 5), 0))
 		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99", displayValue("Float", convertUnit("Volume", 5), 0))
-		workbenchGui.Add("Text", "x" . x3 . " yp+2 w130 h20", getUnit("Volume", true))
+		workbenchGui.Add("Text", "x" . x3 . " yp+2 w90 h20", getUnit("Volume", true))
 
 		workbenchTab.UseTab(3)
 
@@ -1308,22 +1308,22 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.iFixedPitstopsListView.OnEvent("DoubleClick", chooseSimFixedPitstop)
 		this.iFixedPitstopsListView.OnEvent("ItemSelect", selectSimFixedPitstop)
 
-		workbenchGui.Add("Text", "x" . x2 . " ys+34 w90 h23 +0x200", translate("Pitstop"))
+		workbenchGui.Add("Text", "x" . x2 . " ys+34 w100 h23 +0x200", translate("Pitstop"))
 		workbenchGui.Add("Edit", "x" . x3 . " yp-1 w50 Limit3 Number vsimFixedPitstopEdit").OnEvent("Change", updateSimFixedPitstop)
 		workbenchGui.Add("UpDown", "x138 yp-2 w18 Range1-999")
 
-		workbenchGui.Add("Text", "x" . x2 . " yp+25 w90 h23 +0x200", translate("Lap"))
+		workbenchGui.Add("Text", "x" . x2 . " yp+25 w100 h23 +0x200", translate("Lap"))
 		workbenchGui.Add("Edit", "x" . x3 . " yp-1 w50 Limit3 Number vsimFixedPitstopLapEdit").OnEvent("Change", updateSimFixedPitstop)
 		workbenchGui.Add("UpDown", "x138 yp-2 w18 Range1-999")
 
 		if kFixedPitstopRefuel {
-			workbenchGui.Add("Text", "x" . x2 . " yp+27 w90 +0x200", translate("Refuel"))
+			workbenchGui.Add("Text", "x" . x2 . " yp+27 w100 h23 +0x200", translate("Refuel"))
 			workbenchGui.Add("Edit", "x" . x3 . " yp-3 w50 Limit3 Number vsimFixedPitstopRefuelEdit").OnEvent("Change", updateSimFixedPitstop)
 			workbenchGui.Add("UpDown", "xp yp-2 w18 Range1-999")
 			workbenchGui.Add("Text", "x" . (x3 + 55) . " yp+3 w80 h20", getUnit("Volume", true))
 		}
 
-		workbenchGui.Add("Text", "x" . x2 . " yp+25 w90 h23 +0x200", translate("Tyres"))
+		workbenchGui.Add("Text", "x" . x2 . " yp+25 w100 h23 +0x200", translate("Tyres"))
 
 		compound := this.SelectedCompound[true]
 		choices := [translate(normalizeCompound("Dry"))]
@@ -1414,7 +1414,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.SetFont("Norm", "Arial")
 
-		workbenchGui.Add("Text", "x" . x . " yp+21 w85 h23 +0x200", translate("Compound"))
+		workbenchGui.Add("Text", "x" . x . " yp+21 w72 h23 +0x200", translate("Compound"))
 
 		compound := this.SelectedCompound[true]
 		choices := [translate(normalizeCompound("Dry"))]
@@ -1427,25 +1427,25 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("DropDownList", "x" . x1 . " yp w84 Choose" . chosen . " VsimCompoundDropDown", choices)
 
-		workbenchGui.Add("Text", "x" . x . " yp+25 w70 h20 +0x200", translate("Tyre Usage"))
+		workbenchGui.Add("Text", "x" . x . " yp+25 w72 h20 +0x200", translate("Tyre Usage"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w45 h20 Number Limit3 VsimMaxTyreLapsEdit", 40).OnEvent("Change", validateSimMaxTyreLaps)
 		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range1-999", 40)
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w45 h20", translate("Laps"))
 
-		workbenchGui.Add("Text", "x" . x . " yp+21 w70 h20 +0x200", translate("Initial Fuel"))
+		workbenchGui.Add("Text", "x" . x . " yp+21 w72 h20 +0x200", translate("Initial Fuel"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w45 h20 Number Limit3 VsimInitialFuelAmountEdit", displayValue("Float", convertUnit("Volume", 90), 0)).OnEvent("Change", validateSimInitialFuelAmount)
 		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-999", displayValue("Float", convertUnit("Volume", 90), 0))
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w45 r1", getUnit("Volume", true))
 
-		workbenchGui.Add("Text", "x" . x . " yp+21 w70 h20 +0x200", translate("Map"))
+		workbenchGui.Add("Text", "x" . x . " yp+21 w72 h20 +0x200", translate("Map"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w45 h20 Number Limit2 VsimMapEdit", 1)
 		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99", 1)
 
-		workbenchGui.Add("Text", "x" . x . " yp+23 w85 h23 +0x200", translate("Avg. Lap Time"))
+		workbenchGui.Add("Text", "x" . x . " yp+23 w72 h23 +0x200", translate("Avg. Lap Time"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp w45 h20 VsimAvgLapTimeEdit", displayValue("Float", 120.0)).OnEvent("Change", validateSimAvgLapTime)
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w30 h20", translate("Sec."))
 
-		workbenchGui.Add("Text", "x" . x . " yp+21 w85 h20 +0x200", translate("Consumption"))
+		workbenchGui.Add("Text", "x" . x . " yp+21 w72 h20 +0x200", translate("Consumption"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp-2 w45 h20 VsimFuelConsumptionEdit", displayValue("Float", convertUnit("Volume", 3.8))).OnEvent("Change", validateSimFuelConsumption)
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w45 r1", getUnit("Volume", true))
 
@@ -1469,24 +1469,11 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Text", "x" . x . " yp+22 w100 h20 +0x200", translate("Refuel"))
 		workbenchGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w60 0x10 Range0-100 ToolTip VsimRefuelVariation", 0)
 
-		; workbenchGui.Add("Text", "x" . x . " yp+22 w100 h20 +0x200", translate("Consumption"))
-		; workbenchGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w60 0x10 Range0-10 ToolTip VsimConsumptionVariation", 0)
-
 		workbenchGui.Add("Text", "x" . x . " yp+22 w100 h20 +0x200", translate("Tyre Usage"))
 		workbenchGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w60 0x10 Range0-100 ToolTip VsimTyreUsageVariation", 0)
 
 		workbenchGui.Add("Text", "x" . x . " yp+22 w100 h20 +0x200", translate("Tyre Compound"))
 		workbenchGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w60 0x10 Range0-100 ToolTip VsimTyreCompoundVariation", 0)
-
-		/*
-		workbenchGui.Add("Text", "x214 yp+30 w40 h23 +0x200", translate("Use"))
-
-		choices := collect(["Initial Conditions", "Telemetry Data", "Initial Cond. + Telemetry"], translate)
-
-		workbenchGui.Add("DropDownList", "x250 yp w138 Choose2 VsimInputDropDown", choices).OnEvent("Change", (*) => this.updateState())
-
-		workbenchGui.Add("Button", "x214 yp+26 w174 h20", translate("Simulate!")).OnEvent("Click", runSimulation)
-		*/
 
 		workbenchGui.Add("Text", "x" . x . " yp+35 w100 h20 +0x200", translate("First Stint"))
 		workbenchGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w60 0x10 Range-100-100 ToolTip VsimFirstStintWeight", 0)
@@ -1507,31 +1494,25 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.SetFont("Norm", "Arial")
 
-		workbenchGui.Add("Text", "x" . x . " yp+21 w90 h20 +0x200", translate("# Pitstops"))
+		workbenchGui.Add("Text", "x" . x . " yp+21 w88 h20 +0x200", translate("# Pitstops"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp+1 w40 h20 Disabled VsimNumPitstopResult")
 
-		workbenchGui.Add("Text", "x" . x . " yp+23 w90 h20 +0x200", translate("# Tyre Changes"))
+		workbenchGui.Add("Text", "x" . x . " yp+23 w88 h20 +0x200", translate("# Tyre Changes"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp+1 w40 h20 Disabled VsimNumTyreChangeResult")
 
-		/*
-		workbenchGui.Add("Text", "x" . x . " yp+23 w90 h20 +0x200", translate("Consumed Fuel"))
-		workbenchGui.Add("Edit", "x" . x1 . " yp+1 w40 h20 Disabled VsimConsumedFuelResult")
-		workbenchGui.Add("Text", "x" . x3 . " yp+2 w45 r1", getUnit("Volume", true))
-		*/
-
-		workbenchGui.Add("Text", "x" . x . " yp+21 w90 h20 +0x200", translate("@ Pitlane"))
+		workbenchGui.Add("Text", "x" . x . " yp+21 w88 h20 +0x200", translate("@ Pitlane"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp+1 w40 h20 Disabled VsimPitlaneSecondsResult")
 		workbenchGui.Add("Text", "x" . x3 . " yp+2 w50 h20", translate("Seconds"))
 
-		workbenchGui.Add("Text", "x" . x . " yp+21 w90 h20 +0x200", translate("@ Finish"))
+		workbenchGui.Add("Text", "x" . x . " yp+21 w88 h20 +0x200", translate("@ Finish"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp+1 w40 h20 Disabled VsimSessionResultResult")
 		workbenchGui.Add("Text", "x" . x3 . " yp+2 w50 h20 VsimSessionResultLabel", translate("Laps"))
 
-		workbenchGui.Add("Text", "x399 yp+39 w40 h23 +0x200", translate("Use"))
+		workbenchGui.Add("Text", "x399 yp+39 w60 h23 +0x200", translate("Use"))
 
 		choices := collect(["Initial Conditions", "Telemetry Data", "Initial Cond. + Telemetry"], translate)
 
-		workbenchGui.Add("DropDownList", "x435 yp w161 Choose2 VsimInputDropDown", choices).OnEvent("Change", (*) => this.updateState())
+		workbenchGui.Add("DropDownList", "x460 yp w136 Choose2 VsimInputDropDown", choices).OnEvent("Change", (*) => this.updateState())
 
 		workbenchGui.Add("Button", "x399 yp+26 w197 h20", translate("Simulate!")).OnEvent("Click", runSimulation)
 
@@ -1563,15 +1544,15 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("Text", "x" . x . " yp+21 w70 h20 +0x200", translate("Map"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w50 h20 Number Limit2 VstrategyStartMapEdit Disabled", 1)
-		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99 Disabled", 1)
+		; workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99 Disabled", 1)
 
 		workbenchGui.Add("Text", "x" . x . " yp+25 w70 h20 +0x200", translate("TC"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w50 h20 Number Limit2 VstrategyStartTCEdit Disabled", 1)
-		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99 Disabled", 1)
+		; workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99 Disabled", 1)
 
 		workbenchGui.Add("Text", "x" . x . " yp+25 w70 h20 +0x200", translate("ABS"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w50 h20 Number Limit2 VstrategyStartABSEdit Disabled", 2)
-		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99 Disabled", 2)
+		; workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99 Disabled", 2)
 
 		x := 186
 		x0 := x + 50

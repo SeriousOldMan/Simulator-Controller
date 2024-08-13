@@ -112,12 +112,26 @@ class ControllerList extends ConfigurationItemList {
 		window.Add("DropDownList", "x330 y99 w108 X:Move(0.7) W:Grow(0.3) Choose" . chosen . " VcontrollerLayoutDropDown", choices)
 		window.Add("Button", "x440 y98 w23 h23 X:Move VopenControllerEditorButton", translate("...")).OnEvent("Click", openControllerEditor)
 
+		/*
 		window.Add("Button", "x385 y124 w38 h23 X:Move Disabled VcontrollerUpButton", translate("Up"))
 		window.Add("Button", "x425 y124 w38 h23 X:Move Disabled VcontrollerDownButton", translate("Down"))
 
 		window.Add("Button", "x265 y164 w46 h23 X:Move VcontrollerAddButton", translate("Add"))
 		window.Add("Button", "x313 y164 w50 h23 X:Move Disabled VcontrollerDeleteButton", translate("Delete"))
 		window.Add("Button", "x409 y164 w55 h23 X:Move Disabled VcontrollerUpdateButton", translate("Save"))
+		*/
+
+		window.Add("Button", "x416 y124 w23 h23 X:Move Disabled VcontrollerUpButton")
+		setButtonIcon(window["controllerUpButton"], kIconsDirectory . "Up Arrow.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x440 y124 w23 h23 X:Move Disabled VcontrollerDownButton")
+		setButtonIcon(window["controllerDownButton"], kIconsDirectory . "Down Arrow.ico", 1, "L4 T4 R4 B4")
+
+		window.Add("Button", "x386 y164 w23 h23 X:Move VcontrollerAddButton")
+		setButtonIcon(window["controllerAddButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x410 y164 w23 h23 X:Move Disabled VcontrollerDeleteButton")
+		setButtonIcon(window["controllerDeleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x440 y164 w23 h23 X:Move Disabled VcontrollerUpdateButton")
+		setButtonIcon(window["controllerUpdateButton"], kIconsDirectory . "Save.ico", 1, "L4 T4 R4 B4")
 
 		this.initializeList(editor, window["controllerListBox"], window["controllerAddButton"], window["controllerDeleteButton"], window["controllerUpdateButton"]
 								  , window["controllerUpButton"], window["controllerDownButton"])
@@ -294,7 +308,7 @@ class FunctionsList extends ConfigurationItemList {
 
 		window.Add("ListView", "x16 y200 w457 h186 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VfunctionsListView", collect(["Function", "Number", "Hotkey(s) & Action(s)"], translate))
 
-		window.Add("Text", "x16 y396 w86 h23 Y:Move +0x200", translate("Function"))
+		window.Add("Text", "x16 y396 w105 h23 Y:Move +0x200", translate("Function"))
 		window.Add("DropDownList", "x124 y396 w91 Y:Move Choose1 VfunctionTypeDropDown", collect(["1-way Toggle", "2-way Toggle", "Button", "Rotary", "Custom"], translate)).OnEvent("Change", updateFunctionEditorState)
 		window.Add("Edit", "x220 y396 w40 h21 Y:Move Number Limit3 VfunctionNumberEdit")
 		window.Add("UpDown", "Range1-999 x260 y396 w17 h21 Y:Move", 1)
@@ -306,12 +320,12 @@ class FunctionsList extends ConfigurationItemList {
 
 		window.SetFont("Norm", "Arial")
 
-		window.Add("Text", "x124 y437 w160 h22 Y:Move X:Move(0.25) +0x200 +Center", translate("On or Increase"))
-		window.Add("Text", "x303 y437 w160 h22 Y:Move X:Move(0.75) +0x200 +Center", translate("Off or Decrease"))
+		window.Add("Text", "x124 y438 w160 h22 Y:Move X:Move(0.25) +0x200 +Center", translate("On or Increase"))
+		window.Add("Text", "x303 y438 w160 h22 Y:Move X:Move(0.75) +0x200 +Center", translate("Off or Decrease"))
 
 		window.SetFont("Underline", "Arial")
 
-		window.Add("Text", "x24 y460 w83 h23 Y:Move +0x200 c" . window.Theme.LinkColor, translate("Hotkey(s)")).OnEvent("Click", openHotkeysDocumentation)
+		window.Add("Text", "x24 y460 w97 h23 Y:Move +0x200 c" . window.Theme.LinkColor, translate("Hotkey(s)")).OnEvent("Click", openHotkeysDocumentation)
 
 		window.SetFont("Norm", "Arial")
 
@@ -320,16 +334,25 @@ class FunctionsList extends ConfigurationItemList {
 
 		window.SetFont("Underline", "Arial")
 
-		window.Add("Text", "x24 y488 w95 h27 Y:Move c" . window.Theme.LinkColor, translate("Action(s) (optional)")).OnEvent("Click", openActionsDocumentation)
+		window.Add("Text", "x24 y488 w97 h27 Y:Move c" . window.Theme.LinkColor, translate("Action(s) (optional)")).OnEvent("Click", openActionsDocumentation)
 
 		window.SetFont("Norm", "Arial")
 
 		window.Add("Edit", "x124 y484 w160 h21 Y:Move W:Grow(0.5) VfunctionOnActionEdit")
 		window.Add("Edit", "x303 y484 w160 h21 Y:Move X:Move(0.5) W:Grow(0.5) VfunctionOffActionEdit")
 
+		/*
 		window.Add("Button", "x264 y530 w46 h23 Y:Move X:Move VfunctionAddButton", translate("Add"))
 		window.Add("Button", "x312 y530 w50 h23 Y:Move X:Move Disabled VfunctionDeleteButton", translate("Delete"))
 		window.Add("Button", "x418 y530 w55 h23 Y:Move X:Move Disabled VfunctionUpdateButton", translate("&Save"))
+		*/
+
+		window.Add("Button", "x396 y530 w23 h23 X:Move Y:Move VfunctionAddButton")
+		setButtonIcon(window["functionAddButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x420 y530 w23 h23 X:Move Y:Move Disabled VfunctionDeleteButton")
+		setButtonIcon(window["functionDeleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+		window.Add("Button", "x450 y530 w23 h23 X:Move Y:Move Disabled VfunctionUpdateButton")
+		setButtonIcon(window["functionUpdateButton"], kIconsDirectory . "Save.ico", 1, "L4 T4 R4 B4")
 
 		this.initializeList(editor, window["functionsListView"], window["functionAddButton"], window["functionDeleteButton"], window["functionUpdateButton"])
 	}

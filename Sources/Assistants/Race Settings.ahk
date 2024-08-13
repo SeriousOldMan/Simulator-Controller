@@ -1110,7 +1110,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.Add("Text", "x245 yp+2 w14 h20 VrepairSuspensionGreaterLabel", translate(">"))
 		settingsGui.Add("Edit", "x260 yp-2 w50 h20 VrepairSuspensionThresholdEdit"
 							  , displayValue("Float", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Suspension.Repair.Threshold", 0), 1)).OnEvent("Change", validateNumber.Bind("repairSuspensionThresholdEdit"))
-		settingsGui.Add("Text", "x318 yp+2 w90 h20 VrepairSuspensionThresholdLabel", translate("Sec. p. Lap"))
+		settingsGui.Add("Text", "x318 yp+2 w70 h20 VrepairSuspensionThresholdLabel", translate("Sec. p. Lap"))
 
 		updateRepairSuspensionState()
 
@@ -1124,7 +1124,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.Add("Text", "x245 yp+2 w14 h20 VrepairBodyworkGreaterLabel", translate(">"))
 		settingsGui.Add("Edit", "x260 yp-2 w50 h20 VrepairBodyworkThresholdEdit"
 							  , displayValue("Float", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Bodywork.Repair.Threshold", 1), 1)).OnEvent("Change", validateNumber.Bind("repairBodyworkThresholdEdit"))
-		settingsGui.Add("Text", "x318 yp+2 w90 h20 VrepairBodyworkThresholdLabel", translate("Sec. p. Lap"))
+		settingsGui.Add("Text", "x318 yp+2 w70 h20 VrepairBodyworkThresholdLabel", translate("Sec. p. Lap"))
 
 		updateRepairBodyworkState()
 
@@ -1137,7 +1137,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.Add("Text", "x245 yp+2 w14 h20 VrepairEngineGreaterLabel", translate(">"))
 		settingsGui.Add("Edit", "x260 yp-2 w50 h20 VrepairEngineThresholdEdit"
 							  , displayValue("Float", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Engine.Repair.Threshold", 1), 1)).OnEvent("Change", validateNumber.Bind("repairEngineThresholdEdit"))
-		settingsGui.Add("Text", "x318 yp+2 w90 h20 VrepairEngineThresholdLabel", translate("Sec. p. Lap"))
+		settingsGui.Add("Text", "x318 yp+2 w70 h20 VrepairEngineThresholdLabel", translate("Sec. p. Lap"))
 
 		updateRepairEngineState()
 
@@ -1171,19 +1171,19 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.Add("Text", "x16 yp+24 w105 h20 Section", translate("Correction"))
 		settingsGui.Add("CheckBox", "x126 yp-4 w17 h21 Checked" . chosen . " VtemperatureCorrectionCheck", chosen)
-		settingsGui.Add("Text", "x147 yp+4 w200 h20", translate("based on temperature trend"))
+		settingsGui.Add("Text", "x147 yp+4 w240 h20", translate("based on temperature trend"))
 
 		chosen := getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Correction.Setup", false)
 
 		settingsGui.Add("Text", "x16 yp+24 w105 h20 Section", translate("Correction"))
 		settingsGui.Add("CheckBox", "x126 yp-4 w17 h21 Checked" . chosen . " VsetupPressureCompareCheck", chosen)
-		settingsGui.Add("Text", "x147 yp+4 w200 h20", translate("based on database values"))
+		settingsGui.Add("Text", "x147 yp+4 w240 h20", translate("based on database values"))
 
 		chosen := getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Correction.Pressure", false)
 
 		settingsGui.Add("Text", "x16 yp+24 w105 h20 Section", translate("Correction"))
 		settingsGui.Add("CheckBox", "x126 yp-4 w17 h21 Checked" . chosen . " VpressureLossCorrectionCheck", chosen)
-		settingsGui.Add("Text", "x147 yp+4 w200 h20", translate("based on pressure loss"))
+		settingsGui.Add("Text", "x147 yp+4 w240 h20", translate("based on pressure loss"))
 
 		settingsGui.SetFont("Norm", "Arial")
 		settingsGui.SetFont("Italic", "Arial")

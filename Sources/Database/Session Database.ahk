@@ -6051,7 +6051,7 @@ editSettings(editorOrCommand, arguments*) {
 
 		settingsEditorGui.SetFont("s9 Norm", "Arial")
 
-		settingsEditorGui.Add("Documentation", "x113 YP+20 w184 Center", translate("Database Settings")
+		settingsEditorGui.Add("Documentation", "x103 YP+20 w204 Center", translate("Database Settings")
 							, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration")
 
 		settingsEditorGui.SetFont("s8 Norm", "Arial")

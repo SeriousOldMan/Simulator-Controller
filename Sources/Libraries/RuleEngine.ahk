@@ -5007,7 +5007,14 @@ builtin0(choicePoint, function, operand1) {
 	if isInstance(function, Term)
 		function := function.toString(resultSet)
 
-	return resultSet.unify(choicePoint, Literal(%function%()), operand1.getValue(resultSet, operand1))
+	try {
+		return resultSet.unify(choicePoint, Literal(%function%()), operand1.getValue(resultSet, operand1))
+	}
+	catch Any as exception {
+		logError(exception, true)
+
+		return false
+	}
 }
 
 builtin1(choicePoint, function, operand1, operand2) {
@@ -5022,7 +5029,14 @@ builtin1(choicePoint, function, operand1, operand2) {
 	if (isInstance(operand1, Variable) || operand1.isUnbound(resultSet))
 		return false
 	else
-		return resultSet.unify(choicePoint, Literal(%function%(operand1.toString(resultSet))), operand2)
+		try {
+			return resultSet.unify(choicePoint, Literal(%function%(operand1.toString(resultSet))), operand2)
+		}
+		catch Any as exception {
+			logError(exception, true)
+
+			return false
+		}
 }
 
 unbound(choicePoint, operand1) {

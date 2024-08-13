@@ -1,9 +1,9 @@
 [Development]
-Version=5.8.4.0-dev
-Target=5.8.4.0-release
-Date=08/12/2024
+Version=5.8.3.2-dev
+Target=5.8.3.2-release
+Date=08/13/2024
 Download=
-Changes=Several UI changes (new Add/Delete/Save buttons, field size changes, and so on), Updates for the French translation, Saved sessions can no longer be exported to the session database in "Practice Center"
+Changes=Several UI changes (new Add/Delete/Save buttons, field size changes, and so on), Updates for the French translation, Saved sessions can no longer be exported to the session database in "Practice Center", Improved resilience of rule engine against defective foreign functions
 Components=Media->5.6.1,Configuration->5.8.2,Utilities->5.4.8
 [Release]
 Version=5.8.3.1-release
@@ -24,5 +24,5 @@ Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Ut
 [Current]
 Type=Development
 [Version]
-Development=5.8.4.0-dev
+Development=5.8.3.2-dev
 Release=5.8.3.1-release

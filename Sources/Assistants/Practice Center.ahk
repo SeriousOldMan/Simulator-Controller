@@ -52,7 +52,7 @@ global kClose := "Close"
 global kSave := "Save"
 global kEvent := "Event"
 
-global kSessionReports := concatenate(kRaceReports, ["Running", "Pressures", "Temperatures", "Brakes", "Free"])
+global kSessionReports := concatenate(kRaceReports, ["Running", "Pressures", "Temperatures", "Brakes", "Custom"])
 global kDetailReports := ["Run", "Lap", "Session", "Drivers"]
 
 global kSessionDataSchemas := CaseInsenseMap("Run.Data", ["Nr", "Lap", "Driver.Forname", "Driver.Surname", "Driver.Nickname", "Driver.ID"
@@ -2202,12 +2202,12 @@ class PracticeCenter extends ConfigurationItem {
 		}
 
 		if this.HasData {
-			if inList(["Overview", "Drivers", "Positions", "Lap Times", "Performance", "Consistency", "Pace", "Pressures", "Brakes", "Temperatures", "Free"], this.SelectedReport)
+			if inList(["Overview", "Drivers", "Positions", "Lap Times", "Performance", "Consistency", "Pace", "Pressures", "Brakes", "Temperatures", "Custom"], this.SelectedReport)
 				window["reportSettingsButton"].Enabled := true
 			else
 				window["reportSettingsButton"].Enabled := false
 
-			if inList(["Running", "Pressures", "Brakes", "Temperatures", "Free"], this.SelectedReport) {
+			if inList(["Running", "Pressures", "Brakes", "Temperatures", "Custom"], this.SelectedReport) {
 				window["chartTypeDropDown"].Enabled := true
 
 				if (this.SelectedReport != "Running") {
@@ -5522,7 +5522,7 @@ class PracticeCenter extends ConfigurationItem {
 	}
 
 	showCustomReport() {
-		this.selectReport("Free")
+		this.selectReport("Custom")
 
 		this.showTelemetryReport()
 
@@ -5638,7 +5638,7 @@ class PracticeCenter extends ConfigurationItem {
 				y5Choices := y1Choices
 				y6Choices := y1Choices
 			}
-			else if (report = "Free") {
+			else if (report = "Custom") {
 				xChoices := ["Run", "Lap", "Lap.Time", "Lap.Valid", "Tyre.Laps", "Map", "TC", "ABS", "Temperature.Air", "Temperature.Track", "Tyre.Wear.Average", "Brake.Wear.Average"]
 
 				y1Choices := ["Temperature.Air", "Temperature.Track", "Fuel.Initial", "Fuel.Remaining", "Fuel.Consumption"
@@ -5781,7 +5781,7 @@ class PracticeCenter extends ConfigurationItem {
 					dataY5Choice := 1
 					dataY6Choice := 1
 				}
-				else if (report = "Free") {
+				else if (report = "Custom") {
 					window["chartTypeDropDown"].Choose(4)
 
 					this.iSelectedChartType := "Line"
@@ -6090,7 +6090,7 @@ class PracticeCenter extends ConfigurationItem {
 			case "Temperatures":
 				if this.editTemperaturesReportSettings()
 					this.showTemperaturesReport()
-			case "Free":
+			case "Custom":
 				if this.editCustomReportSettings()
 					this.showCustomReport()
 		}
@@ -6112,7 +6112,7 @@ class PracticeCenter extends ConfigurationItem {
 				this.showBrakesReport()
 			else if (report = "Temperatures")
 				this.showTemperaturesReport()
-			else if (report = "Free")
+			else if (report = "Custom")
 				this.showCustomReport()
 			else {
 				this.selectReport(false)

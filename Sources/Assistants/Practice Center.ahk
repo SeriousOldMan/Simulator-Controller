@@ -272,27 +272,30 @@ class PracticeCenter extends ConfigurationItem {
 			local save, translator
 
 			if this.Closeable {
-				if (this.PracticeCenter.HasData && !this.PracticeCenter.SessionExported) {
-					save := (this.PracticeCenter.AutoSave && this.PracticeCenter.SessionActive)
+				save := (this.PracticeCenter.AutoSave && this.PracticeCenter.SessionActive)
 
-					if this.PracticeCenter.AutoExport
-						this.PracticeCenter.exportSession(true)
-					else {
-						translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
-
-						OnMessage(0x44, translator)
-						msgResult := withBlockedWindows(MsgBox, translate("Do you want to transfer your data to the session database before closing?"), translate("Export"), 262179)
-						OnMessage(0x44, translator, 0)
-
-						if (msgResult = "Yes")
+				try {
+					if (this.PracticeCenter.HasData && !this.PracticeCenter.SessionExported) {
+						if this.PracticeCenter.AutoExport
 							this.PracticeCenter.exportSession(true)
+						else {
+							translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
 
-						if (msgResult = "Cancel")
-							return true
+							OnMessage(0x44, translator)
+							msgResult := withBlockedWindows(MsgBox, translate("Do you want to transfer your data to the session database before closing?"), translate("Export"), 262179)
+							OnMessage(0x44, translator, 0)
+
+							if (msgResult = "Yes")
+								this.PracticeCenter.exportSession(true)
+
+							if (msgResult = "Cancel")
+								return true
+						}
 					}
-
+				}
+				finally {
 					if save
-						this.saveSession(true, false)
+						this.PracticeCenter.saveSession(true, false, false)
 				}
 
 				return super.Close()
@@ -4289,7 +4292,7 @@ class PracticeCenter extends ConfigurationItem {
 		this.pushTask(updateStatisticsAsync)
 	}
 
-	saveSession(copy := false, prompt := true) {
+	saveSession(copy := false, prompt := true, async := true) {
 		saveSessionAsync(copy := false) {
 			local simulator := this.Simulator
 			local car := this.Car
@@ -4417,7 +4420,10 @@ class PracticeCenter extends ConfigurationItem {
 			}
 		}
 
-		this.pushTask(saveSessionAsync.Bind(copy))
+		if async
+			this.pushTask(saveSessionAsync.Bind(copy))
+		else
+			saveSessionAsync(copy)
 	}
 
 	clearSession(wait := false) {
@@ -7193,7 +7199,7 @@ class PracticeCenter extends ConfigurationItem {
 						this.exportSession(true)
 					else if this.AutoClear {
 						if save
-							this.saveSession(true, false)
+							this.saveSession(true, false, false)
 
 						this.clearSession(true)
 					}
@@ -7208,7 +7214,7 @@ class PracticeCenter extends ConfigurationItem {
 							this.exportSession(true)
 
 						if save
-							this.saveSession(true, false)
+							this.saveSession(true, false, false)
 
 						if (msgResult = "Cancel") {
 							this.iSessionMode := "Finished"

@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.8.3.2-dev](https://www.dropbox.com/scl/fi/qbvr0u27qcgnmsx2kldbf/Simulator-Controller-5.8.3.2-dev.zip?rlkey=4d4lpsxj0kx8d57ekmmqon9ec&st=pvdhg00i&dl=1) (Early build for 5.8.3.2. Changes: Several UI changes (new Add/Delete/Save buttons, field size changes, and so on), Updates for the French translation, Saved sessions can no longer be exported to the session database in "Practice Center", Improved resilience of rule engine against defective foreign functions.)
+[5.8.3.2-beta](https://www.dropbox.com/scl/fi/v8ij5ot7z4ly75blcaepi/Simulator-Controller-5.8.3.2-beta.zip?rlkey=fcbilljqy7tczl5t93eoje7jx&st=mijfi7hy&dl=1) (Test build for 5.8.3.2. Changes: Several UI changes (new Add/Delete/Save buttons, field size changes, and so on), Updates for the French translation, Saved sessions can no longer be exported to the session database in "Practice Center", Improved resilience of rule engine against defective foreign functions.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-583) of this version and all the versions you might have skipped, before installing and using this version.
 

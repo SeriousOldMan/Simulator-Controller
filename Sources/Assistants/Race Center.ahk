@@ -2316,17 +2316,17 @@ class RaceCenter extends ConfigurationItem {
 
 			centerGui.SetFont("Norm", "Arial")
 
-			centerGui.Add("Text", "x312 yp+24 w185 h23", translate("Use Session Data"))
-			centerGui.Add("DropDownList", "x500 yp-3 w50 Choose1 vuseSessionDataDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
+			centerGui.Add("Text", "x312 yp+24 w205 h23", translate("Use Session Data"))
+			centerGui.Add("DropDownList", "x520 yp-3 w50 Choose1 vuseSessionDataDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
 
-			centerGui.Add("Text", "x312 yp+27 w185 h23", translate("Use Telemetry Database"))
-			centerGui.Add("DropDownList", "x500 yp-3 w50 Choose2 vuseTelemetryDataDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
+			centerGui.Add("Text", "x312 yp+27 w205 h23", translate("Use Telemetry Database"))
+			centerGui.Add("DropDownList", "x520 yp-3 w50 Choose2 vuseTelemetryDataDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
 
-			centerGui.Add("Text", "x312 yp+27 w185 h23", translate("Keep current Map"))
-			centerGui.Add("DropDownList", "x500 yp-3 w50 Choose1 vkeepMapDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
+			centerGui.Add("Text", "x312 yp+27 w205 h23", translate("Keep current Map"))
+			centerGui.Add("DropDownList", "x520 yp-3 w50 Choose1 vkeepMapDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
 
-			centerGui.Add("Text", "x312 yp+27 w185 h23", translate("Analyze Traffic"))
-			centerGui.Add("DropDownList", "x500 yp-3 w50 Choose2 vconsiderTrafficDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
+			centerGui.Add("Text", "x312 yp+27 w205 h23", translate("Analyze Traffic"))
+			centerGui.Add("DropDownList", "x520 yp-3 w50 Choose2 vconsiderTrafficDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
 
 			centerGui.SetFont("Norm", "Arial")
 			centerGui.SetFont("Italic", "Arial")

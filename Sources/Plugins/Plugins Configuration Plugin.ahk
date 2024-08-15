@@ -121,7 +121,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 
 		window.Add("Edit", "x110 y408 w363 h113 Y:Move W:Grow VpluginArgumentsEdit")
 
-		window.Add("Button", "x16 y530 w140 h23 Y:Move ", translate("Edit Labels && Icons...")).OnEvent("Click", openActionsEditor)
+		window.Add("Button", "x16 y530 w160 h23 Y:Move ", translate("Edit Labels && Icons...")).OnEvent("Click", openActionsEditor)
 
 		/*
 		window.Add("Button", "x264 y530 w46 h23 Y:Move X:Move VpluginAddButton", translate("Add"))

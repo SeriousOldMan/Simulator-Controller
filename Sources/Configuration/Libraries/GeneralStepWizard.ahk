@@ -304,7 +304,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		widget7 := window.Add("DropDownList", "xp+24 yp w96 VuiLanguageDropDown Hidden", choices)
 
 		widget8 := window.Add("CheckBox", "x" . x . " yp+30 w242 h21 Checked1 VstartWithWindowsCheck Hidden", translate("Start with Windows"))
-		widget9 := window.Add("CheckBox", "x" . x . " yp+24 w242 h21 Checked0 VsilentModeCheck Hidden", translate("Silent mode (no splash screen, no sound)"))
+		widget9 := window.Add("CheckBox", "x" . x . " yp+24 w242 Checked0 VsilentModeCheck Hidden", translate("Silent mode (no splash screen, no sound)"))
 
 		window.SetFont("Bold", "Arial")
 

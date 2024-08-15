@@ -1634,20 +1634,20 @@ class PracticeCenter extends ConfigurationItem {
 
 		centerTab.UseTab(4)
 
-		centerGui.Add("Text", "x24 ys+40 w95 h21", translate("Fuel Level"))
+		centerGui.Add("Text", "x24 ys+40 w105 h21", translate("Fuel Level"))
 
 		columns := collect(kFuelBuckets, convertUnit.Bind("Volume"))
 
 		loop columns.Length
 			columns[A_Index] := (columns[A_Index] . A_Space . SubStr(getUnit("Volume"), 1, 1))
 
-		this.iFuelDataListView := centerGui.Add("ListView", "x124 ys+33 w477 h132 H:Grow(0.5) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", concatenate([translate("Map")], columns))
+		this.iFuelDataListView := centerGui.Add("ListView", "x134 ys+33 w467 h132 H:Grow(0.5) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", concatenate([translate("Map")], columns))
 		this.iFuelDataListView.OnEvent("Click", noSelect)
 		this.iFuelDataListView.OnEvent("DoubleClick", noSelect)
 
-		centerGui.Add("Text", "x24 ys+178 w95 h21 Y:Move(0.4)", translate("Tyre Usage"))
+		centerGui.Add("Text", "x24 ys+178 w105 h21 Y:Move(0.4)", translate("Tyre Usage"))
 
-		this.iTyreDataListView := centerGui.Add("ListView", "x124 ys+171 w477 h132 Y:Move(0.5) H:Grow(0.5) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", concatenate([translate("Fuel")], kTyreLapsBuckets))
+		this.iTyreDataListView := centerGui.Add("ListView", "x134 ys+171 w467 h132 Y:Move(0.5) H:Grow(0.5) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", concatenate([translate("Fuel")], kTyreLapsBuckets))
 		this.iTyreDataListView.OnEvent("Click", noSelect)
 		this.iTyreDataListView.OnEvent("DoubleClick", noSelect)
 

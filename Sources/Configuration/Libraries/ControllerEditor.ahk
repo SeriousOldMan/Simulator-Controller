@@ -188,7 +188,7 @@ class ControllerEditor extends ConfiguratorPanel {
 		if saveAndCancel {
 			controllerGui.Add("Text", "x8 y620 w424 0x10 Y:Move W:Grow")
 
-			controllerGui.Add("Button", "x8 yp+10 w140 h23 Y:Move", translate("Edit Labels && Icons...")).OnEvent("Click", openControllerActionsEditor)
+			controllerGui.Add("Button", "x8 yp+10 w160 h23 Y:Move", translate("Edit Labels && Icons...")).OnEvent("Click", openControllerActionsEditor)
 
 			controllerGui.Add("Button", "x260 yp w80 h23 Y:Move X:Move Default", translate("Save")).OnEvent("Click", saveControllerEditor)
 			controllerGui.Add("Button", "x352 yp w80 h23 Y:Move X:Move", translate("Cancel")).OnEvent("Click", cancelControllerEditor)

@@ -1,4 +1,4 @@
-## 5.8.3.2-release 08/16/24 (planned)
+## 5.8.3.2-release 08/16/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Updated many controls for longer text labels to improve UI for languages other than English or German.

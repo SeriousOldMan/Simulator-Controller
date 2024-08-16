@@ -450,7 +450,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 
 		chooseAxis(*) {
-			workbench.loadChart(workbench.SelectedChartType)
+			workbench.loadChart(workbench.SelectedChartType, true)
 		}
 
 		chooseChartSource(*) {
@@ -476,7 +476,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 
 		chooseChartType(*) {
-			workbench.loadChart(["Scatter", "Bar", "Bubble", "Line"][workbenchGui["chartTypeDropDown"].Value])
+			workbench.loadChart(["Scatter", "Bar", "Bubble", "Line"][workbenchGui["chartTypeDropDown"].Value], true)
 		}
 
 		settingsMenu(*) {
@@ -2246,7 +2246,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 	loadDataType(dataType, force := false) {
 		local tyreCompound, telemetryDB, ignore, column, categories, field, category, value
-		local driverNames, index, names, schema, availableCompounds
+		local driverNames, index, names, schema, availableCompounds, settings, axis, value
 
 		if (force || (this.SelectedDataType != dataType)) {
 			this.showTelemetryChart(false)
@@ -2324,19 +2324,35 @@ class StrategyWorkbench extends ConfigurationItem {
 				this.Control["dataY2DropDown"].Add(Array(translate("None"), schema*))
 				this.Control["dataY3DropDown"].Add(Array(translate("None"), schema*))
 
-				if (dataType = "Electronics") {
+				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+				value := getMultiMapValue(settings, "Strategy Workbench", "Chart." . dataType . ".Type", kUndefined)
+
+				if (value != kUndefined) {
+					this.Control["chartTypeDropDown"].Choose(inList(["Scatter", "Bar", "Bubble", "Line"], value))
+
+					this.iSelectedChartType := value
+
+					this.Control["dataXDropDown"].Choose(inList(schema, getMultiMapValue(settings, "Strategy Workbench", "Chart." . dataType . ".X-Axis")))
+
+					loop 3
+						this.Control["dataY" . A_Index . "DropDown"].Choose(1)
+
+					for axis, value in string2Values(";", getMultiMapValue(settings, "Strategy Workbench", "Chart." . dataType . ".Y-Axises"))
+						this.Control["dataY" . axis . "DropDown"].Choose(inList(schema, value) + ((axis = 1) ? 0 : 1))
+				}
+				else if (dataType = "Electronics") {
 					this.Control["dataXDropDown"].Choose(inList(schema, "Map"))
 					this.Control["dataY1DropDown"].Choose(inList(schema, "Fuel.Consumption"))
-
 					this.Control["dataY2DropDown"].Choose(1)
+					this.Control["dataY3DropDown"].Choose(1)
 				}
 				else if (dataType = "Tyres") {
 					this.Control["dataXDropDown"].Choose(inList(schema, "Tyre.Laps"))
 					this.Control["dataY1DropDown"].Choose(inList(schema, "Tyre.Pressure"))
 					this.Control["dataY2DropDown"].Choose(inList(schema, "Tyre.Temperature") + 1)
+					this.Control["dataY3DropDown"].Choose(1)
 				}
-
-				this.Control["dataY3DropDown"].Choose(1)
 			}
 
 			this.loadCompound((availableCompounds.Length > 0) ? availableCompounds[1] : false, true)
@@ -2433,10 +2449,9 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 	}
 
-	loadChart(chartType) {
+	loadChart(chartType, save := false) {
 		local telemetryDB, records, schema, xAxis, yAxises
-
-		local compound
+		local report, compound
 
 		this.iSelectedChartType := chartType
 
@@ -2463,6 +2478,17 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			if (this.Control["dataY3DropDown"].Value > 1)
 				yAxises.Push(schema[this.Control["dataY3DropDown"].Value - 1])
+
+			if save {
+				report := this.SelectedDataType
+				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+				setMultiMapValue(settings, "Strategy Workbench", "Chart." . report . ".Type", chartType)
+				setMultiMapValue(settings, "Strategy Workbench", "Chart." . report . ".X-Axis", xAxis)
+				setMultiMapValue(settings, "Strategy Workbench", "Chart." . report . ".Y-Axises", values2String(";", yAxises*))
+
+				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+			}
 
 			this.showDataPlot(records, xAxis, yAxises)
 		}

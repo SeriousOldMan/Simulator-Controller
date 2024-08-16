@@ -52,7 +52,7 @@ global kClose := "Close"
 global kSave := "Save"
 global kEvent := "Event"
 
-global kSessionReports := concatenate(kRaceReports, ["Running", "Pressures", "Temperatures", "Brakes", "Free"])
+global kSessionReports := concatenate(kRaceReports, ["Running", "Pressures", "Temperatures", "Brakes", "Custom"])
 global kDetailReports := ["Run", "Lap", "Session", "Drivers"]
 
 global kSessionDataSchemas := CaseInsenseMap("Run.Data", ["Nr", "Lap", "Driver.Forname", "Driver.Surname", "Driver.Nickname", "Driver.ID"
@@ -272,27 +272,30 @@ class PracticeCenter extends ConfigurationItem {
 			local save, translator
 
 			if this.Closeable {
-				if (this.PracticeCenter.HasData && !this.PracticeCenter.SessionExported) {
-					save := (this.PracticeCenter.AutoSave && this.PracticeCenter.SessionActive)
+				save := (this.PracticeCenter.AutoSave && this.PracticeCenter.SessionActive)
 
-					if this.PracticeCenter.AutoExport
-						this.PracticeCenter.exportSession(true)
-					else {
-						translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
-
-						OnMessage(0x44, translator)
-						msgResult := withBlockedWindows(MsgBox, translate("Do you want to transfer your data to the session database before closing?"), translate("Export"), 262179)
-						OnMessage(0x44, translator, 0)
-
-						if (msgResult = "Yes")
+				try {
+					if (this.PracticeCenter.HasData && !this.PracticeCenter.SessionExported) {
+						if this.PracticeCenter.AutoExport
 							this.PracticeCenter.exportSession(true)
+						else {
+							translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
 
-						if (msgResult = "Cancel")
-							return true
+							OnMessage(0x44, translator)
+							msgResult := withBlockedWindows(MsgBox, translate("Do you want to transfer your data to the session database before closing?"), translate("Export"), 262179)
+							OnMessage(0x44, translator, 0)
+
+							if (msgResult = "Yes")
+								this.PracticeCenter.exportSession(true)
+
+							if (msgResult = "Cancel")
+								return true
+						}
 					}
-
+				}
+				finally {
 					if save
-						this.saveSession(true, false)
+						this.PracticeCenter.saveSession(true, false, false)
 				}
 
 				return super.Close()
@@ -1634,20 +1637,20 @@ class PracticeCenter extends ConfigurationItem {
 
 		centerTab.UseTab(4)
 
-		centerGui.Add("Text", "x24 ys+40 w95 h21", translate("Fuel Level"))
+		centerGui.Add("Text", "x24 ys+40 w105 h21", translate("Fuel Level"))
 
 		columns := collect(kFuelBuckets, convertUnit.Bind("Volume"))
 
 		loop columns.Length
 			columns[A_Index] := (columns[A_Index] . A_Space . SubStr(getUnit("Volume"), 1, 1))
 
-		this.iFuelDataListView := centerGui.Add("ListView", "x124 ys+33 w477 h132 H:Grow(0.5) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", concatenate([translate("Map")], columns))
+		this.iFuelDataListView := centerGui.Add("ListView", "x134 ys+33 w467 h132 H:Grow(0.5) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", concatenate([translate("Map")], columns))
 		this.iFuelDataListView.OnEvent("Click", noSelect)
 		this.iFuelDataListView.OnEvent("DoubleClick", noSelect)
 
-		centerGui.Add("Text", "x24 ys+178 w95 h21 Y:Move(0.4)", translate("Tyre Usage"))
+		centerGui.Add("Text", "x24 ys+178 w105 h21 Y:Move(0.4)", translate("Tyre Usage"))
 
-		this.iTyreDataListView := centerGui.Add("ListView", "x124 ys+171 w477 h132 Y:Move(0.5) H:Grow(0.5) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", concatenate([translate("Fuel")], kTyreLapsBuckets))
+		this.iTyreDataListView := centerGui.Add("ListView", "x134 ys+171 w467 h132 Y:Move(0.5) H:Grow(0.5) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", concatenate([translate("Fuel")], kTyreLapsBuckets))
 		this.iTyreDataListView.OnEvent("Click", noSelect)
 		this.iTyreDataListView.OnEvent("DoubleClick", noSelect)
 
@@ -2202,12 +2205,12 @@ class PracticeCenter extends ConfigurationItem {
 		}
 
 		if this.HasData {
-			if inList(["Overview", "Drivers", "Positions", "Lap Times", "Performance", "Consistency", "Pace", "Pressures", "Brakes", "Temperatures", "Free"], this.SelectedReport)
+			if inList(["Overview", "Drivers", "Positions", "Lap Times", "Performance", "Consistency", "Pace", "Pressures", "Brakes", "Temperatures", "Custom"], this.SelectedReport)
 				window["reportSettingsButton"].Enabled := true
 			else
 				window["reportSettingsButton"].Enabled := false
 
-			if inList(["Running", "Pressures", "Brakes", "Temperatures", "Free"], this.SelectedReport) {
+			if inList(["Running", "Pressures", "Brakes", "Temperatures", "Custom"], this.SelectedReport) {
 				window["chartTypeDropDown"].Enabled := true
 
 				if (this.SelectedReport != "Running") {
@@ -4289,7 +4292,7 @@ class PracticeCenter extends ConfigurationItem {
 		this.pushTask(updateStatisticsAsync)
 	}
 
-	saveSession(copy := false, prompt := true) {
+	saveSession(copy := false, prompt := true, async := true) {
 		saveSessionAsync(copy := false) {
 			local simulator := this.Simulator
 			local car := this.Car
@@ -4417,7 +4420,10 @@ class PracticeCenter extends ConfigurationItem {
 			}
 		}
 
-		this.pushTask(saveSessionAsync.Bind(copy))
+		if async
+			this.pushTask(saveSessionAsync.Bind(copy))
+		else
+			saveSessionAsync(copy)
 	}
 
 	clearSession(wait := false) {
@@ -5522,7 +5528,7 @@ class PracticeCenter extends ConfigurationItem {
 	}
 
 	showCustomReport() {
-		this.selectReport("Free")
+		this.selectReport("Custom")
 
 		this.showTelemetryReport()
 
@@ -5638,7 +5644,7 @@ class PracticeCenter extends ConfigurationItem {
 				y5Choices := y1Choices
 				y6Choices := y1Choices
 			}
-			else if (report = "Free") {
+			else if (report = "Custom") {
 				xChoices := ["Run", "Lap", "Lap.Time", "Lap.Valid", "Tyre.Laps", "Map", "TC", "ABS", "Temperature.Air", "Temperature.Track", "Tyre.Wear.Average", "Brake.Wear.Average"]
 
 				y1Choices := ["Temperature.Air", "Temperature.Track", "Fuel.Initial", "Fuel.Remaining", "Fuel.Consumption"
@@ -5781,7 +5787,7 @@ class PracticeCenter extends ConfigurationItem {
 					dataY5Choice := 1
 					dataY6Choice := 1
 				}
-				else if (report = "Free") {
+				else if (report = "Custom") {
 					window["chartTypeDropDown"].Choose(4)
 
 					this.iSelectedChartType := "Line"
@@ -6090,7 +6096,7 @@ class PracticeCenter extends ConfigurationItem {
 			case "Temperatures":
 				if this.editTemperaturesReportSettings()
 					this.showTemperaturesReport()
-			case "Free":
+			case "Custom":
 				if this.editCustomReportSettings()
 					this.showCustomReport()
 		}
@@ -6112,7 +6118,7 @@ class PracticeCenter extends ConfigurationItem {
 				this.showBrakesReport()
 			else if (report = "Temperatures")
 				this.showTemperaturesReport()
-			else if (report = "Free")
+			else if (report = "Custom")
 				this.showCustomReport()
 			else {
 				this.selectReport(false)
@@ -7193,7 +7199,7 @@ class PracticeCenter extends ConfigurationItem {
 						this.exportSession(true)
 					else if this.AutoClear {
 						if save
-							this.saveSession(true, false)
+							this.saveSession(true, false, false)
 
 						this.clearSession(true)
 					}
@@ -7208,7 +7214,7 @@ class PracticeCenter extends ConfigurationItem {
 							this.exportSession(true)
 
 						if save
-							this.saveSession(true, false)
+							this.saveSession(true, false, false)
 
 						if (msgResult = "Cancel") {
 							this.iSessionMode := "Finished"

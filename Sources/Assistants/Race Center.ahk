@@ -55,7 +55,7 @@ global kClose := "Close"
 global kConnect := "Connect"
 global kEvent := "Event"
 
-global kSessionReports := concatenate(["Track"], kRaceReports, ["Pressures", "Temperatures", "Brakes", "Free"])
+global kSessionReports := concatenate(["Track"], kRaceReports, ["Pressures", "Temperatures", "Brakes", "Custom"])
 global kDetailReports := ["Plan", "Stint", "Lap", "Session", "Drivers", "Strategy", "Pitstop", "Pitstops", "Setups"]
 
 global kSessionDataSchemas := CaseInsenseMap("Stint.Data", ["Nr", "Lap", "Driver.Forname", "Driver.Surname", "Driver.Nickname"
@@ -2316,17 +2316,17 @@ class RaceCenter extends ConfigurationItem {
 
 			centerGui.SetFont("Norm", "Arial")
 
-			centerGui.Add("Text", "x312 yp+24 w185 h23", translate("Use Session Data"))
-			centerGui.Add("DropDownList", "x500 yp-3 w50 Choose1 vuseSessionDataDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
+			centerGui.Add("Text", "x312 yp+24 w205 h23", translate("Use Session Data"))
+			centerGui.Add("DropDownList", "x520 yp-3 w50 Choose1 vuseSessionDataDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
 
-			centerGui.Add("Text", "x312 yp+27 w185 h23", translate("Use Telemetry Database"))
-			centerGui.Add("DropDownList", "x500 yp-3 w50 Choose2 vuseTelemetryDataDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
+			centerGui.Add("Text", "x312 yp+27 w205 h23", translate("Use Telemetry Database"))
+			centerGui.Add("DropDownList", "x520 yp-3 w50 Choose2 vuseTelemetryDataDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
 
-			centerGui.Add("Text", "x312 yp+27 w185 h23", translate("Keep current Map"))
-			centerGui.Add("DropDownList", "x500 yp-3 w50 Choose1 vkeepMapDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
+			centerGui.Add("Text", "x312 yp+27 w205 h23", translate("Keep current Map"))
+			centerGui.Add("DropDownList", "x520 yp-3 w50 Choose1 vkeepMapDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
 
-			centerGui.Add("Text", "x312 yp+27 w185 h23", translate("Analyze Traffic"))
-			centerGui.Add("DropDownList", "x500 yp-3 w50 Choose2 vconsiderTrafficDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
+			centerGui.Add("Text", "x312 yp+27 w205 h23", translate("Analyze Traffic"))
+			centerGui.Add("DropDownList", "x520 yp-3 w50 Choose2 vconsiderTrafficDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
 
 			centerGui.SetFont("Norm", "Arial")
 			centerGui.SetFont("Italic", "Arial")
@@ -3051,12 +3051,12 @@ class RaceCenter extends ConfigurationItem {
 			window["dataY6DropDown"].Enabled := false
 
 			if this.HasData {
-				if inList(["Overview", "Drivers", "Positions", "Lap Times", "Performance", "Consistency", "Pace", "Pressures", "Brakes", "Temperatures", "Free"], this.SelectedReport)
+				if inList(["Overview", "Drivers", "Positions", "Lap Times", "Performance", "Consistency", "Pace", "Pressures", "Brakes", "Temperatures", "Custom"], this.SelectedReport)
 					window["reportSettingsButton"].Enabled := true
 				else
 					window["reportSettingsButton"].Enabled := false
 
-				if inList(["Pressures", "Brakes", "Temperatures", "Free"], this.SelectedReport) {
+				if inList(["Pressures", "Brakes", "Temperatures", "Custom"], this.SelectedReport) {
 					window["chartTypeDropDown"].Enabled := true
 
 					window["driverDropDown"].Enabled := true
@@ -10621,7 +10621,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	showCustomReport() {
-		this.selectReport("Free")
+		this.selectReport("Custom")
 
 		this.showTelemetryReport()
 
@@ -10709,7 +10709,7 @@ class RaceCenter extends ConfigurationItem {
 				y5Choices := y1Choices
 				y6Choices := y1Choices
 			}
-			else if (report = "Free") {
+			else if (report = "Custom") {
 				xChoices := ["Stint", "Lap", "Lap.Time", "Tyre.Laps", "Map", "TC", "ABS", "Temperature.Air", "Temperature.Track", "Tyre.Wear.Average", "Brake.Wear.Average"]
 
 				y1Choices := ["Temperature.Air", "Temperature.Track", "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Tyre.Laps", "Map", "TC", "ABS"
@@ -10838,7 +10838,7 @@ class RaceCenter extends ConfigurationItem {
 					dataY5Choice := 1
 					dataY6Choice := 1
 				}
-				else if (report = "Free") {
+				else if (report = "Custom") {
 					window["chartTypeDropDown"].Choose(4)
 
 					this.iSelectedChartType := "Line"
@@ -11304,7 +11304,7 @@ class RaceCenter extends ConfigurationItem {
 			case "Temperatures":
 				if this.editTemperaturesReportSettings()
 					this.showTemperaturesReport()
-			case "Free":
+			case "Custom":
 				if this.editCustomReportSettings()
 					this.showCustomReport()
 		}
@@ -11324,7 +11324,7 @@ class RaceCenter extends ConfigurationItem {
 				this.showBrakesReport()
 			else if (report = "Temperatures")
 				this.showTemperaturesReport()
-			else if (report = "Free")
+			else if (report = "Custom")
 				this.showCustomReport()
 			else {
 				this.selectReport(false)

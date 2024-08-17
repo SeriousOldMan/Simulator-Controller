@@ -1429,7 +1429,7 @@ class Window extends Gui {
 		if control
 			return control
 
-		if isDevelopment()
+		if (isDevelopment() && (Strsplit(A_ScriptName, ".")[1] != "Simulator Tools"))
 			options .= " Border"
 
 		if type is Window.Resizer

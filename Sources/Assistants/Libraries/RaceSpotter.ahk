@@ -3263,7 +3263,8 @@ class RaceSpotter extends GridRaceAssistant {
 														  , track: displayValue("Float", convertUnit("Temperature", trackTemperature), 0)
 														  , unit: fragments[getUnit("Temperature")]})
 
-					if ((this.Session = kSessionRace) && (getMultiMapValue(data, "Position Data", "Car.Count", 0) > 0)) {
+					if ((this.Session = kSessionRace) && (getMultiMapValue(data, "Position Data", "Car.Count", 0) > 0)
+													  && (this.TrackType = "Circuit")) {
 						driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
 						position := this.getPosition(driver, "Overall", data)
 

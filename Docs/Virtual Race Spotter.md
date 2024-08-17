@@ -247,9 +247,9 @@ Track maps are used by the "Race Center" which provide a [live view](https://git
 
 ### Track Types
 
-The track mapper can handle closed tracks, like a typical race circuit, but it can also handle open tracks, for example a Rallye stage. You must specify the the track format ("Rally", "Hill", "Street") in the "Session Database" for each track that is not closed ("Circuit" is the default). After a non-closed track has been mapped, track automations can be used on this track very much like for closed tracks. You can use, for example, the "Speak" action to create some pace notes. A track automation for a non-closed track will be started right away, in contrast to track automations for closed tracks which will be started after the end of the first lap.
+The track mapper can handle closed tracks, like a typical race circuit, but it can also handle open tracks, for example a Rallye stage. You must specify a track type ("Rally", "Hill" or "Street") in the "Session Database" for each track that is not a typical "Circuit" (which is the default). After a non-closed track has been mapped, track automations can be used on this track very much like for closed tracks. You can use, for example, the "Speak" action to create some pace notes on a Rally track. A track automation for a non-closed track will be started right away, in contrast to track automations for closed tracks which will be started after the end of the first lap.
 
-Please note, that this is only supported for simulators which can handle non-closed tracks.
+Please note, that all this is only supported for simulators which can handle non-closed tracks.
 
 ### Special notes about Track Mapping in *iRacing*
 

@@ -215,6 +215,8 @@ class Theme {
 					options .= (" Background" . this.ButtonBackColor)
 				case "Text", "Picture", "GroupBox", "CheckBox", "Radio", "Slider", "Link", "ComboBox":
 					options .= (" Background" . this.WindowBackColor)
+				case "Tab3", "Tab2", "Tab":
+					options .= (" 0x8000")
 			}
 		}
 

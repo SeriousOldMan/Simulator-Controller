@@ -401,7 +401,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 
 		createTrackMap() {
 			local pid := this.iMapperPID
-			local fileSize, simulator, mapperState
+			local fileSize
 
 			finalizeTrackMap() {
 				deleteFile(kTempDirectory . "Track Mapper.state")
@@ -459,11 +459,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 				hasTrackMap := true
 			else if this.iMapperPID
 				hasTrackMap := false
-			else {
-				track := getMultiMapValue(data, "Session Data", "Track", false)
-
-				hasTrackMap := sessionDB.hasTrackMap(simulator, track)
-			}
+			else
+				hasTrackMap := sessionDB.hasTrackMap(simulator, this.Simulator.Track)
 
 			if hasTrackMap {
 				this.iHasTrackMap := true
@@ -474,8 +471,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 			else if !this.iMapperPID {
 				simulatorName := sessionDB.getSimulatorName(simulator)
 				simulatorCode := sessionDB.getSimulatorCode(simulator)
-				track := getMultiMapValue(data, "Session Data", "Track", false)
-				dataFile := temporaryFileName(code . " Track Mapper", "data")
+				track := this.Simulator.Track
+				dataFile := temporaryFileName(simulatorCode . " Track Mapper", "data")
 				exePath := (kBinariesDirectory . "Providers\" . simulatorCode . " SHM Spotter.exe")
 
 				try {
@@ -547,13 +544,13 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 		return false
 	}
 
-	startSession(settings, data) {
+	prepareSession(settings, data) {
 		local trackType
 
-		super.startSession(settings, data)
+		super.prepareSession(settings, data)
 
 		if (this.RaceAssistant && this.Simulator) {
-			trackType := getMultiMapValue(settings, "Simulator." . SessionDatabase.getSimulatorName(this.Simulator), "Track.Type", "Circuit")
+			trackType := getMultiMapValue(settings, "Simulator." . SessionDatabase.getSimulatorName(this.Simulator.Simulator[true]), "Track.Type", "Circuit")
 
 			if (trackType != "Circuit")
 				this.startupTrackMapper(trackType)
@@ -575,9 +572,9 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 	}
 
 	addLap(lap, running, data) {
-		local trackType := SettingsDatabse().readSettingValue(this.Simulator, this.Car, this.Track, "*"
-															, "Simulator." . SessionDatabase.getSimulatorName(this.Simulator)
-															, "Track.Type", "Circuit")
+		local trackType := SettingsDatabase().readSettingValue(this.Simulator.Simulator[true], this.Car, this.Track, "*"
+															 , "Simulator." . SessionDatabase.getSimulatorName(this.Simulator.Simulator[true])
+															 , "Track.Type", "Circuit")
 
 		super.addLap(lap, running, data)
 

@@ -8,7 +8,6 @@ namespace ACSHMSpotter {
         static void Main(string[] args) {
             Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
 
-
             SHMSpotter spotter = new SHMSpotter();
 
             if (args.Length > 0 && args[0] == "-Trigger")
@@ -30,7 +29,12 @@ namespace ACSHMSpotter {
                 spotter.Run(false, false, true);
             }
             else if (args.Length > 0 && args[0] == "-Map")
-                new SHMSpotter().Run(true, false, false);
+            {
+                if (args.Length > 1)
+                    spotter.initializeMapper(args[1]);
+
+                spotter.Run(true, false, false);
+            }
             else
             {
                 spotter.initializeSpotter(args);

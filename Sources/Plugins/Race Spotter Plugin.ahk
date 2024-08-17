@@ -12,6 +12,7 @@
 #Include "..\Libraries\Task.ahk"
 #Include "Libraries\RaceAssistantPlugin.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
+#Include "..\Database\Libraries\SettingsDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -393,28 +394,14 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 		return false
 	}
 
-	joinSession(settings, data) {
-		if getMultiMapValue(settings, "Assistant.Spotter", "Join.Late", true)
-			this.startSession(settings, data)
-	}
-
-	finishSession(arguments*) {
-		this.iHasTrackMap := false
-
-		this.shutdownTrackMapper(true)
-		this.shutdownTrackAutomation(true)
-
-		super.finishSession(arguments*)
-	}
-
-	addLap(lap, running, data) {
-		local simulator, simulatorName, hasTrackMap, track, code, exePath, pid, dataFile, mapperState
+	startupTrackMapper(trackType) {
+		local simulator, simulatorName, simulatorCode, hasTrackMap, track, exePath, pid, dataFile, mapperState
 
 		static sessionDB := false
 
 		createTrackMap() {
 			local pid := this.iMapperPID
-			local fileSize
+			local fileSize, simulator, mapperState
 
 			finalizeTrackMap() {
 				deleteFile(kTempDirectory . "Track Mapper.state")
@@ -425,6 +412,11 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 
 			if pid {
 				if ProcessExist(pid) {
+					setMultiMapValue(mapperState, "Track Mapper", "State", "Active")
+					setMultiMapValue(mapperState, "Track Mapper", "Simulator", simulatorName)
+					setMultiMapValue(mapperState, "Track Mapper", "Track", sessionDB.getTrackName(simulator, track))
+					setMultiMapValue(mapperState, "Track Mapper", "Action", "Scanning")
+
 					try {
 						fileSize := FileGetSize(dataFile)
 
@@ -460,8 +452,6 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 		if !sessionDB
 			sessionDB := SessionDatabase()
 
-		super.addLap(lap, running, data)
-
 		if (this.RaceAssistant && this.Simulator) {
 			simulator := this.Simulator.Simulator[true]
 
@@ -483,85 +473,40 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 			}
 			else if !this.iMapperPID {
 				simulatorName := sessionDB.getSimulatorName(simulator)
+				simulatorCode := sessionDB.getSimulatorCode(simulator)
+				track := getMultiMapValue(data, "Session Data", "Track", false)
+				dataFile := temporaryFileName(code . " Track Mapper", "data")
+				exePath := (kBinariesDirectory . "Providers\" . simulatorCode . " SHM Spotter.exe")
 
-				if true { ; (lap > getMultiMapValue(this.Configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)) {
-					track := getMultiMapValue(data, "Session Data", "Track", false)
+				try {
+					if !FileExist(exePath)
+						throw "File not found..."
 
-					code := sessionDB.getSimulatorCode(simulator)
-					dataFile := temporaryFileName(code . " Track Mapper", "data")
+					this.iMapperPhase := "Collect"
 
-					exePath := (kBinariesDirectory . "Providers\" . code . " SHM Spotter.exe")
+					Run(A_ComSpec . " /c `"`"" . exePath . "`" -Map `"" . trackType . "`" > `"" . dataFile . "`"`"", kBinariesDirectory, "Hide", &pid)
 
-					try {
-						if !FileExist(exePath)
-							throw "File not found..."
-
-						this.iMapperPhase := "Collect"
-
-						Run(A_ComSpec . " /c `"`"" . exePath . "`" -Map > `"" . dataFile . "`"`"", kBinariesDirectory, "Hide", &pid)
-
-						this.iMapperPID := pid
-					}
-					catch Any as exception {
-						logError(exception, true)
-
-						logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
-																   , {simulator: code, protocol: "SHM"})
-											   . exePath . translate(") - please rebuild the applications in the binaries folder (")
-											   . kBinariesDirectory . translate(")"))
-
-						showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
-													  , {exePath: exePath, simulator: code, protocol: "SHM"})
-								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-					}
-
-					if this.iMapperPID {
-						mapperState := newMultiMap()
-
-						setMultiMapValue(mapperState, "Track Mapper", "State", "Active")
-						setMultiMapValue(mapperState, "Track Mapper", "Simulator", simulatorName)
-						setMultiMapValue(mapperState, "Track Mapper", "Track", sessionDB.getTrackName(simulator, track))
-						setMultiMapValue(mapperState, "Track Mapper", "Action", "Scanning")
-						setMultiMapValue(mapperState, "Track Mapper", "Information", translate("Message: ") . translate("Scanning track..."))
-
-						writeMultiMap(kTempDirectory . "Track Mapper.state", mapperState)
-
-						Task.startTask(createTrackMap, 0, kLowPriority)
-					}
+					this.iMapperPID := pid
 				}
-				else {
-					this.iMapperPhase := "Wait"
+				catch Any as exception {
+					logError(exception, true)
 
+					logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
+															   , {simulator: simulatorCode, protocol: "SHM"})
+										   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+										   . kBinariesDirectory . translate(")"))
+
+					showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
+												  , {exePath: exePath, simulator: simulatorCode, protocol: "SHM"})
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				}
+
+				if this.iMapperPID {
 					mapperState := newMultiMap()
 
-					setMultiMapValue(mapperState, "Track Mapper", "State", "Passive")
-					setMultiMapValue(mapperState, "Track Mapper", "Simulator", simulatorName)
-					setMultiMapValue(mapperState, "Track Mapper", "Track", sessionDB.getTrackName(simulator, track))
-					setMultiMapValue(mapperState, "Track Mapper", "Action", "Waiting")
-					setMultiMapValue(mapperState, "Track Mapper", "Information", translate("Message: ") . translate("Waiting for track scanner..."))
-
-					writeMultiMap(kTempDirectory . "Track Mapper.state", mapperState)
+					Task.startTask(createTrackMap, 0, kLowPriority)
 				}
 			}
-		}
-	}
-
-	updateLap(lap, update, data) {
-		local simulator, mapperState
-
-		super.updateLap(lap, update, data)
-
-		if (this.iMapperPhase = "Wait") {
-			simulator := this.Simulator.Simulator[true]
-			mapperState := newMultiMap()
-
-			setMultiMapValue(mapperState, "Track Mapper", "State", "Passive")
-			setMultiMapValue(mapperState, "Track Mapper", "Simulator", SessionDatabase.getSimulatorName(this.Simulator.Simulator[true]))
-			setMultiMapValue(mapperState, "Track Mapper", "Track", SessionDatabase.getTrackName(simulator, getMultiMapValue(data, "Session Data", "Track", false)))
-			setMultiMapValue(mapperState, "Track Mapper", "Action", "Waiting")
-			setMultiMapValue(mapperState, "Track Mapper", "Information", translate("Message: ") . translate("Waiting for track scanner..."))
-
-			writeMultiMap(kTempDirectory . "Track Mapper.state", mapperState)
 		}
 	}
 
@@ -600,6 +545,44 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 		}
 
 		return false
+	}
+
+	startSession(settings, data) {
+		local trackType
+
+		super.startSession(settings, data)
+
+		if (this.RaceAssistant && this.Simulator) {
+			trackType := getMultiMapValue(settings, "Simulator." . SessionDatabase.getSimulatorName(this.Simulator), "Track.Type", "Circuit")
+
+			if (trackType != "Circuit")
+				this.startupTrackMapper(trackType)
+		}
+	}
+
+	joinSession(settings, data) {
+		if getMultiMapValue(settings, "Assistant.Spotter", "Join.Late", true)
+			this.startSession(settings, data)
+	}
+
+	finishSession(arguments*) {
+		this.iHasTrackMap := false
+
+		this.shutdownTrackMapper(true)
+		this.shutdownTrackAutomation(true)
+
+		super.finishSession(arguments*)
+	}
+
+	addLap(lap, running, data) {
+		local trackType := SettingsDatabse().readSettingValue(this.Simulator, this.Car, this.Track, "*"
+															, "Simulator." . SessionDatabase.getSimulatorName(this.Simulator)
+															, "Track.Type", "Circuit")
+
+		super.addLap(lap, running, data)
+
+		if (this.RaceAssistant && this.Simulator && (trackType = "Circuit"))
+			this.startupTrackMapper(trackType)
 	}
 
 	positionTrigger(actionNr, positionX, positionY) {

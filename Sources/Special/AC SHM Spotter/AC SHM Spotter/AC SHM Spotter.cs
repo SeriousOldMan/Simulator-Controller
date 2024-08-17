@@ -1539,6 +1539,8 @@ namespace ACSHMSpotter {
 		float initialY = 0.0f;
 		int coordCount = 0;
 
+		bool started = false;
+
 		bool writeCoordinates() {
 			double velocityX = physics.LocalVelocity[0];
 			double velocityY = physics.LocalVelocity[2];
@@ -1551,6 +1553,8 @@ namespace ACSHMSpotter {
 				float coordinateX = cars.cars[carID].worldPosition.x;
 				float coordinateY = cars.cars[carID].worldPosition.z;
 
+				started = true;
+
 				if ((coordinateX != 0) || (coordinateY != 0))
 				{
 					Console.WriteLine(coordinateX + "," + coordinateY);
@@ -1560,12 +1564,14 @@ namespace ACSHMSpotter {
 						initialX = coordinateX;
 						initialY = coordinateY;
 					}
-					else if (coordCount > 100 && Math.Abs(coordinateX - initialX) < 10.0 && Math.Abs(coordinateY - initialY) < 10.0)
+					else if (circuit && coordCount > 100 && Math.Abs(coordinateX - initialX) < 10.0 && Math.Abs(coordinateY - initialY) < 10.0)
 						return false;
 
 					coordCount += 1;
 				}
 			}
+			else if (started && circuit)
+				return false;
 
 			return true;
 		}
@@ -1616,6 +1622,13 @@ namespace ACSHMSpotter {
                 numCoordinates += 1;
             }
         }
+
+		bool circuit = true;
+
+		public void initializeMapper(string trackType)
+		{
+			circuit = (trackType == "Circuit");
+		}
 
         string soundsDirectory = "";
         string audioDevice = "";

@@ -2,7 +2,7 @@
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. The last choices for the configuration of the various graphs are now remembered by the "Strategy Workbench".
-  4. Using a new setting in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) you can specify in the "Session Database" for *Assetto Corsa* the type of a track (Circuit, Rallye, Hill, Street). When set to other than "Circuit", track mapping will handle non-closed tracks. Mapping will start, if the car moves for the first time and will stop, if the car is stopped.
+  4. Using a new setting in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) you can specify in the "Session Database" for *Assetto Corsa* the type of a track (Circuit, Rallye, Hill, Street). When set to other than "Circuit", track mapping will create a non-closed track. Mapping will start, if the car moves for the first time and will stop, if the car is stopped. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-types) for more information.
 
 ## 5.8.3.2-release 08/16/24
   1. Minor bugfixes, as always

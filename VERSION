@@ -1,7 +1,7 @@
 [Development]
 Version=5.8.4.0-dev
 Target=5.8.4.0-release
-Date=08/16/2024
+Date=08/17/2024
 Download=
 Changes="Strategy Workbench" remembers chart settings, Track mapping for open tracks
 Components=Media->5.6.1,Configuration->5.8.3,Utilities->5.4.8

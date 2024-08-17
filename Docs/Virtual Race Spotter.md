@@ -245,9 +245,9 @@ The track maps are recorded using a 20 Hz resolution, which is comparable to the
 
 Track maps are used by the "Race Center" which provide a [live view](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#data-analysis) of the current race situation. And using the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database), you can associate actions with specific locations on the track map. This actions can change settings in the current simulator by issuing keyboard commands or they can even lauch a Windows script or application, when you arrive at this location. See the section below for a detailed discussion of Track Automation.
 
-### Track Formats
+### Track Types
 
-The track mapper can handle closed tracks, like a typical race circuit, but it can also handle open tracks, for example a Rallye stage. You must specify the the track format ("Rally", "Hill", "Street") in the "Session Database" for each track that is not closed ("Circuit" is the default).
+The track mapper can handle closed tracks, like a typical race circuit, but it can also handle open tracks, for example a Rallye stage. You must specify the the track format ("Rally", "Hill", "Street") in the "Session Database" for each track that is not closed ("Circuit" is the default). After a non-closed track has been mapped, track automations can be used on this track very much like for closed tracks. You can use, for example, the "Speak" action to create some pace notes. A track automation for a non-closed track will be started right away, in contrast to track automations for closed tracks which will be started after the end of the first lap.
 
 Please note, that this is only supported for simulators which can handle non-closed tracks.
 

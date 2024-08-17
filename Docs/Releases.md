@@ -1,6 +1,12 @@
 ## 5.8.3.2-release 08/16/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
+  3. The last choices for the configuration of the various graphs are now remembered by the "Strategy Workbench".
+  4. Using a new setting in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) you can specify in the "Session Database" for *Assetto Corsa* the type of a track (Circuit, Rallye, Hill, Street). When set to other than "Circuit", track mapping will handle non-closed tracks. Mapping will start, if the car moves for the first time and will stop, if the car is stopped.
+
+## 5.8.3.2-release 08/16/24
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
   3. Fixed a bug, which prevented auto-saving a session in the "Practice Center", when the window was closed using the close box in the windows title bar.
   4. Updated many controls for longer text labels to improve UI for languages other than English or German.
   5. Replaced all buttons labeled Add/Delete/Save with buttons with graphical icons.
@@ -112,7 +118,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	  See the updated [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#color-schemes) for some examples.
   11. A new [controller action functions "speak"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allows you to output spoken messages from your controller scripts.
   12. A new [controller action functions "play"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allows you to play sound files from your controller scripts.
-  13. "speak" and "play" has been added to the [location specific actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#automations) in Track Automation, which let's you put out a spoken message or play a sound file at a given track location. Rally support is coming...
+  13. "speak" and "play" has been added to the [location specific actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#automations) in Track Automation, which let's you put out a spoken message or play a sound file at a given track location. Rallye support is coming...
   14. The automated update procedure now asks before a non-release version is installed.
   15. [Internal] Implemented a postprocessor for the compiler which compresses the binary files. The applications are much smaller now.
   16. [Internal] Migrated to AHK 2.1-alpha.14 (needed for dark color scheme).

@@ -218,6 +218,7 @@ Using the positions of the cars on the track, Elisa is able to create a map of a
 	[General]
 	Simulator=Assetto Corsa Competizione
 	Track=Circuit Zandvoort
+	TrackType=Circuit
 	[Map]
 	Height=828
 	Offset.X=394.799000
@@ -243,6 +244,12 @@ The second file, which is generated using the way points from the meta data file
 The track maps are recorded using a 20 Hz resolution, which is comparable to the resolution of high end GPS-based track mapping devices. Therefore the resolution of the generated maps is very good. But since the maps are created, while you are driving on a track, it may be possible that the generated map is not perfect, because you had an offtrack or even an accident. If you face such a situation, simply delete the track in question using the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) tool and the track map will be regenerated during your next visit on this track.
 
 Track maps are used by the "Race Center" which provide a [live view](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#data-analysis) of the current race situation. And using the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database), you can associate actions with specific locations on the track map. This actions can change settings in the current simulator by issuing keyboard commands or they can even lauch a Windows script or application, when you arrive at this location. See the section below for a detailed discussion of Track Automation.
+
+### Track Formats
+
+The track mapper can handle closed tracks, like a typical race circuit, but it can also handle open tracks, for example a Rallye stage. You must specify the the track format ("Rally", "Hill", "Street") in the "Session Database" for each track that is not closed ("Circuit" is the default).
+
+Please note, that this is only supported for simulators which can handle non-closed tracks.
 
 ### Special notes about Track Mapping in *iRacing*
 

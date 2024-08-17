@@ -160,7 +160,7 @@ The following settings are only available, if you have selected the correspondin
 |            | Repair duration for bodywork damage      | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the bodywork at a pitstop. |
 |            | Repair duration for suspension damage    | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the suspension at a pitstop. |
 |            | Repair duration for engine damage        | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the engine at a pitstop. |
-| Track      | Format                                   | Circuit, Rally | Circuit                  | Defines the type of the specific track. ALl closed tracks are of type *Circuit*, all open tracks are of type *Rally*. |
+| Track      | Format                                   | Circuit, Rally, Hill, Street | Circuit    | Defines the type of the specific track. ALl closed tracks are of type *Circuit*, all open tracks are of type *Rally*. |
 
 2. *Assetto Corsa Competizione*
 

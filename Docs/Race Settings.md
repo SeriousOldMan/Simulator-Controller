@@ -181,7 +181,7 @@ The following settings are only available, if you have selected the correspondin
 |            | Repair duration for suspension damage    | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the suspension at a pitstop. |
 |            | Repair duration for engine damage        | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the engine at a pitstop. |
 
-4. *iRacing*
+4. *Automobilista 2* and *iRacing*
 
 | Category   | Setting                                  | Type    | Default                         | Description  |
 |------------|------------------------------------------|---------|---------------------------------|--------------|
@@ -191,7 +191,7 @@ The following settings are only available, if you have selected the correspondin
 |            | Repair duration for engine damage        | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the engine at a pitstop. |
 | Track      | Type                                     | Circuit, Rally, Hill, Street | Circuit    | Defines the type of the specific track. ALl closed tracks are of type *Circuit*, all open tracks are of type *Rally*. |
 
-5. *Automobilista 2*, *Project Cars 2* and *RaceRoom Racing Experience*
+5. *Project Cars 2* and *RaceRoom Racing Experience*
 
 | Category   | Setting                                  | Type    | Default                         | Description  |
 |------------|------------------------------------------|---------|---------------------------------|--------------|

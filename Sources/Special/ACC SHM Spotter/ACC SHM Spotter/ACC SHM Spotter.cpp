@@ -1952,12 +1952,12 @@ bool writeCoordinates() {
 			initialX = coordinateX;
 			initialY = coordinateY;
 		}
-		else if (coordCount > 100 && fabs(coordinateX - initialX) < 10.0 && fabs(coordinateY - initialY) < 10.0)
+		else if (circuit && coordCount > 100 && fabs(coordinateX - initialX) < 10.0 && fabs(coordinateY - initialY) < 10.0)
 			return false;
 
 		coordCount += 1;
 	}
-	else if (mapStarted && circuit)
+	else if (mapStarted && !circuit)
 		return false;
 
 	return true;

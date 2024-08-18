@@ -3223,7 +3223,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 			this.initializeAnnouncements()
 
-			if (formationLap && this.Speaker) {
+			if (formationLap && this.Speaker && (this.TrackType = "Circuit")) {
 				speaker := this.getSpeaker()
 				fragments := speaker.Fragments
 
@@ -3263,8 +3263,7 @@ class RaceSpotter extends GridRaceAssistant {
 														  , track: displayValue("Float", convertUnit("Temperature", trackTemperature), 0)
 														  , unit: fragments[getUnit("Temperature")]})
 
-					if ((this.Session = kSessionRace) && (getMultiMapValue(data, "Position Data", "Car.Count", 0) > 0)
-													  && (this.TrackType = "Circuit")) {
+					if ((this.Session = kSessionRace) && (getMultiMapValue(data, "Position Data", "Car.Count", 0) > 0)) {
 						driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
 						position := this.getPosition(driver, "Overall", data)
 

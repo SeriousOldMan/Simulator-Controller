@@ -1988,7 +1988,7 @@ modifiedIcon(fileName, postFix, modifier) {
 }
 
 modifiedImage(fileName, postFix, modifier, cache := "Images") {
-	local extension, name, modifiedFileName, token, bitmap, graphics
+	local extension, name, modifiedFileName, token, bitmap, graphics, create
 
 	SplitPath(fileName, , , &extension, &name)
 
@@ -1997,7 +1997,12 @@ modifiedImage(fileName, postFix, modifier, cache := "Images") {
 
 	modifiedFileName := (kTempDirectory . cache . "\" . name . "_" . postFix . "." . extension)
 
-	if !FileExist(modifiedFileName) {
+	create := !FileExist(modifiedFileName)
+
+	if !create
+		create := (FileGetTime(modifiedFileName, "M") != FileGetTime(fileName, "M"))
+
+	if create {
 		DirCreate(kTempDirectory . cache)
 
 		token := Gdip_Startup()

@@ -243,18 +243,35 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 	}
 
 	enableTrackAutomation(label := false, force := false) {
+		local simulator, simulatorName, car, track, trackType
+
 		if (!this.TrackAutomationEnabled || force) {
 			if !label
 				label := this.getLabel("TrackAutomation.Toggle")
 
 			trayMessage(label, translate("State: On"))
 
-			if this.Simulator
-				this.Simulator.resetTrackAutomation()
-
 			this.iTrackAutomationEnabled := true
 
 			this.updateAutomationTrayLabel(label, true)
+
+			simulator := this.Simulator
+
+			if simulator {
+				simulator.resetTrackAutomation()
+
+				car := simulator.Car
+				track := simulator.Track
+
+				simulator := simulator.Simulator[true]
+
+				trackType := SettingsDatabase().readSettingValue(simulator, car, track, "*"
+															   , "Simulator." . SessionDatabase.getSimulatorName(this.Simulator.Simulator[true])
+															   , "Track.Type", "Circuit")
+
+				if (trackType != "Circuit")
+					this.startupTrackAutomation()
+			}
 		}
 	}
 
@@ -572,7 +589,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 	}
 
 	addLap(lap, running, data) {
-		local trackType := SettingsDatabase().readSettingValue(this.Simulator.Simulator[true], this.Car, this.Track, "*"
+		local trackType := SettingsDatabase().readSettingValue(this.Simulator.Simulator[true], this.Simulator.Car, this.Simulator.Track, "*"
 															 , "Simulator." . SessionDatabase.getSimulatorName(this.Simulator.Simulator[true])
 															 , "Track.Type", "Circuit")
 

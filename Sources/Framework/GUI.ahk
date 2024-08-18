@@ -2003,6 +2003,8 @@ modifiedImage(fileName, postFix, modifier, cache := "Images") {
 		create := (FileGetTime(modifiedFileName, "M") != FileGetTime(fileName, "M"))
 
 	if create {
+		deleteFile(modifiedFileName)
+
 		DirCreate(kTempDirectory . cache)
 
 		token := Gdip_Startup()

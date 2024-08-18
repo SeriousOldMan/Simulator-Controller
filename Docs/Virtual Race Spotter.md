@@ -247,7 +247,7 @@ Track maps are used by the "Race Center" which provide a [live view](https://git
 
 ### Track Types
 
-The track mapper can handle closed tracks, like a typical race circuit, but it can also handle open tracks, for example a Rallye stage. You must specify the the track format ("Rally", "Hill", "Street") in the "Session Database" for each track that is not closed ("Circuit" is the default). After a non-closed track has been mapped, track automations can be used on this track very much like for closed tracks. You can use, for example, the "Speak" action to create some pace notes. A track automation for a non-closed track will be started right away, in contrast to track automations for closed tracks which will be started after the end of the first lap.
+The track mapper can handle closed tracks, like a typical race circuit, but it can also handle open tracks, for example a Rallye stage. You must specify the the track format ("Rally", "Hill", "Street") in the "Session Database" for each track that is not closed ("Circuit" is the default). After a non-closed track has been mapped, track automations can be used on this track very much like for closed tracks. You can use, for example, the "Speech" action to create some pace notes. A track automation for a non-closed track will be started right away, in contrast to track automations for closed tracks which will be started after the end of the first lap.
 
 Please note, that this is only supported for simulators which can handle non-closed tracks.
 
@@ -292,6 +292,14 @@ Here you define, what should happen, when you arrive at this specific location o
 2. Command
 
    In this case, you can selected every script or application, which is executable by Windows. Use the "..." button to locate the executable.
+
+3. Speech
+
+   In this case, you define a phrase, which should be spoken at the given point on the track. The Speech uses the [default voice synthesizer configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control).
+   
+4. Audio
+
+   Plays a sound file (WAV, MP3, ...) at the given point on the track.
    
 You can reopen the action dialog anytime, by clicking again at the automation location. And you can move actions around whith the left mouse button pressed and you can delete an action by holding down the "Control" key, while clicking on it.
 

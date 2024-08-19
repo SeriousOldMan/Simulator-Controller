@@ -2000,7 +2000,7 @@ modifiedImage(fileName, postFix, modifier, cache := "Images") {
 	create := !FileExist(modifiedFileName)
 
 	if !create
-		create := (FileGetTime(modifiedFileName, "M") != FileGetTime(fileName, "M"))
+		create := (FileGetTime(modifiedFileName, "M") < FileGetTime(fileName, "M"))
 
 	if create {
 		deleteFile(modifiedFileName)
@@ -2017,8 +2017,6 @@ modifiedImage(fileName, postFix, modifier, cache := "Images") {
 
 		try {
 			Gdip_SaveBitmapToFile(bitmap, modifiedFileName)
-
-			return modifiedFileName
 		}
 		catch Any as exception {
 			if !FileExist(modifiedFileName) {
@@ -2026,8 +2024,6 @@ modifiedImage(fileName, postFix, modifier, cache := "Images") {
 
 				return fileName
 			}
-			else
-				return modifiedFileName
 		}
 		finally {
 			Gdip_DisposeImage(bitmap)
@@ -2037,6 +2033,8 @@ modifiedImage(fileName, postFix, modifier, cache := "Images") {
 			Gdip_Shutdown(token)
 		}
 	}
+
+	return modifiedFileName
 }
 
 

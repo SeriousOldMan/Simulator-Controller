@@ -1,11 +1,12 @@
 ## 5.8.4.0-release 08/23/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. The last choices for the configuration of the various graphs are now remembered by the "Strategy Workbench".
-  4. Using a new setting in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) you can specify in the "Session Database" for *Assetto Corsa*, *iRacing* and *Automobilista 2* the type of a track (Circuit, Rally, Hill, Street). When set to other than "Circuit", track mapping will create a non-closed track. In this case, mapping of the track will start immediately, when the car moves for the first time and will stop, when the car stops. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-types) for more information.
-  5. The documentation for [Track Automations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-automations) has been extended to reflect the new "Speech" and "Audio" actions, which can be used to create pace notes and other acoustical hints for open tracks.
-  6. The key combination to request an unblocking of all executables in "Simulator Startup" has changed from Ctrl-Shift to Ctrl-Alt.
-  7. New LLM event has been defined for the *Reasoning* booster of the Race Spotter. "blue_flag_alert" will be signalled, once a faster car appears in the mirror, that is at least one lap ahead. Revisit your event configuration, include the new events and define actions (for example flash a red light in your dashboard using SimHub, for example), if necessary.
+  3. Significant performance improvement for the "Dark" UI theme.
+  4. The last choices for the configuration of the various graphs are now remembered by the "Strategy Workbench".
+  5. Using a new setting in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) you can specify in the "Session Database" for *Assetto Corsa*, *iRacing* and *Automobilista 2* the type of a track (Circuit, Rally, Hill, Street). When set to other than "Circuit", track mapping will create a non-closed track. In this case, mapping of the track will start immediately, when the car moves for the first time and will stop, when the car stops. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-types) for more information.
+  6. The documentation for [Track Automations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-automations) has been extended to reflect the new "Speech" and "Audio" actions, which can be used to create pace notes and other acoustical hints for open tracks.
+  7. The key combination to request an unblocking of all executables in "Simulator Startup" has changed from Ctrl-Shift to Ctrl-Alt.
+  8. New LLM event has been defined for the *Reasoning* booster of the Race Spotter. "blue_flag_alert" will be signalled, once a faster car appears in the mirror, that is at least one lap ahead. Revisit your event configuration, include the new events and define actions (for example flash a red light in your dashboard using SimHub, for example), if necessary.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-584), if you are using Assistant Boosters or the local LLM Runtime.
 

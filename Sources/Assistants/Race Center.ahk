@@ -2189,7 +2189,7 @@ class RaceCenter extends ConfigurationItem {
 
 			centerGui.SetFont("s9 Norm", "Arial")
 
-			centerGui.Add("Documentation", "x292 YP+20 w134 H:Center Center", translate("Race Center")
+			centerGui.Add("Documentation", "x242 YP+20 w134 H:Center Center", translate("Race Center")
 						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center")
 
 			centerGui.Add("Text", "x8 yp+30 w601 W:Grow 0x10")

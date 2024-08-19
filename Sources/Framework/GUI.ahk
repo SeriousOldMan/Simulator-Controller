@@ -2015,16 +2015,26 @@ modifiedImage(fileName, postFix, modifier, cache := "Images") {
 
 		modifier(graphics, bitmap)
 
-		Gdip_SaveBitmapToFile(bitmap, modifiedFileName)
+		try {
+			Gdip_SaveBitmapToFile(bitmap, modifiedFileName)
 
-		Gdip_DisposeImage(bitmap)
+			return modifiedFileName
+		}
+		catch Any as exception {
+			if !FileExist(modifiedFileName) {
+				logError(exception, true)
 
-		Gdip_DeleteGraphics(graphics)
+				return fileName
+			}
+		}
+		finally {
+			Gdip_DisposeImage(bitmap)
 
-		Gdip_Shutdown(token)
+			Gdip_DeleteGraphics(graphics)
+
+			Gdip_Shutdown(token)
+		}
 	}
-
-	return modifiedFileName
 }
 
 

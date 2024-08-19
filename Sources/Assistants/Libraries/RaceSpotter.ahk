@@ -64,6 +64,12 @@ class AttackImminentEvent extends SpotterEvent {
 	}
 }
 
+class BlueFlagAlertEvent extends SpotterEvent {
+	createTrigger(event, phrase, arguments) {
+		return ("The blue flag is shown, because an opponent is closing in who is at least one lap ahead.")
+	}
+}
+
 class CarInfo {
 	iSpotter := false
 
@@ -3028,7 +3034,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local delta
 
-		if (this.Announcements["BlueFlags"] && this.Speaker[false] && this.Running)
+		if (this.Announcements["BlueFlags"] && this.Speaker[false] && this.Running) {
 			if ((this.Session = kSessionRace) && positions.Has("StandingsBehind") && positions.Has(positions["StandingsBehind"])) {
 				delta := Abs(positions[positions["StandingsBehind"]][10])
 
@@ -3039,6 +3045,9 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 			else
 				this.pushAlert("Blue", false, false, "Blue")
+
+			this.handleEvent("BlueFlagAlert")
+		}
 	}
 
 	pitWindow(state) {

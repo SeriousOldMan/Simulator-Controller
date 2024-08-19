@@ -230,7 +230,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   5. The cold target tyre pressure information in the pitstop component on the session info page in "System Monitor" has been fixed. This bug was introduced with the 5.7.2.
   6. The announcement of chosen tyre pressures by the Engineer in team sessions has been fixed. This bug was introduced with the 5.7.2.
   7. Fixed unwanted automatic re-enabling of simulators and applications by "Simulator Setup" when using the Basic configuration step.
-  8. Fixed unwanted automatic re-enabling of "Start with WIndows" by "Simulator Setup" when using the Basic configuration step.
+  8. Fixed unwanted automatic re-enabling of "Start with Windows" by "Simulator Setup" when using the Basic configuration step.
   9. Fixed an edge case in "Race Center", where pitstop settings initialization failed after an unplanned pitstop had become necessary after a start incident.
   10. The handling of remote server timeouts has been improved in team sessions. The applications like "Race Center" do not wait anymore in cases of non-important data.
   11. Pressing *Push-To-Talk* without saying anything no longer triggers an "I don't understand, please repeat" answer by the Assistants, as long as you are using Azure or Google for voice recognition.

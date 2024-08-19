@@ -1,6 +1,6 @@
 #include Position.events
 [Agent.Events]
-Active=position_lost,position_gained,attack_imminent,blue_flag_alert
+Active=
 [Agent.Events.Builtin]
 ahead_gap_update=Assistant.Class|AheadGapUpdateEvent|AheadGapUpdate||3|Periodically signalled to update the gap to the car ahead.
 behind_gap_update=Assistant.Class|BehindGapUpdateEvent|BehindGapUpdate||3|Periodically signalled to update the gap to the car behind.

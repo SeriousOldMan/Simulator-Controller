@@ -1,6 +1,6 @@
 #include Weather.events
 [Agent.Events]
-Active=fuel_low,damage_detected,damage_time_loss,pressure_loss,weather_forecast,rain_started,rain_stopped
+Active=fuel_low,damage_detected,damage_time_loss,pressure_loss,weather_forecast
 [Agent.Events.Builtin]
 fuel_low=Assistant.Class|FuelLowEvent|FuelLow||2|This event is triggered when the car is running low on fuel.
 damage_detected=Assistant.Class|DamageEvent|Damage||3|This event is triggered when new damage has been detected on the car.

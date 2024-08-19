@@ -1,7 +1,7 @@
 #include Position.events
 #include Weather.events
 [Agent.Events]
-Active=pitstop_upcoming,weather_forecast,rain_started,rain_stopped,position_lost,position_gained
+Active=pitstop_upcoming,weather_forecast
 [Agent.Events.Builtin]
 pitstop_upcoming=Assistant.Class|PitstopUpcomingEvent|PitstopUpcoming||1|This event is triggered when the next pitstop according to the currently active strategy is upcoming.
 [Agent.Events.Parameters]

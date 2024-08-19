@@ -2026,6 +2026,8 @@ modifiedImage(fileName, postFix, modifier, cache := "Images") {
 
 				return fileName
 			}
+			else
+				return modifiedFileName
 		}
 		finally {
 			Gdip_DisposeImage(bitmap)

@@ -1,10 +1,11 @@
 #include Position.events
 [Agent.Events]
-Active=position_lost,position_gained,attack_imminent
+Active=
 [Agent.Events.Builtin]
 ahead_gap_update=Assistant.Class|AheadGapUpdateEvent|AheadGapUpdate||3|Periodically signalled to update the gap to the car ahead.
 behind_gap_update=Assistant.Class|BehindGapUpdateEvent|BehindGapUpdate||3|Periodically signalled to update the gap to the car behind.
 attack_imminent=Assistant.Class|AttackImminentEvent|AttackImminent||2|Signals that an opponent is closing in and an attack will happen soon.
+blue_flag_alert=Assistant.Class|BlueFlagAlertEvent|BlueFlagAlert||0|Signals that the blue flag is being shown, because an opponent is closing in who is at least one lap ahead.
 [Agent.Events.Parameters]
 ahead_gap_update.1=carNumber|Integer||true|The race or car number of the car ahead.
 ahead_gap_update.2=delta|Number||true|The new gap in seconds to the car ahead.

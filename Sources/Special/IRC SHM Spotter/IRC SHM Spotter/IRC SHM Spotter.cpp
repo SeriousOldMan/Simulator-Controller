@@ -1671,6 +1671,9 @@ int lastLap = 0;
 float lastRunning = 0.0;
 bool recording = false;
 
+bool circuit = true;
+bool mapStarted = false;
+
 bool writeCoordinates(const irsdk_header* header, const char* data) {
 	char buffer[60];
 
@@ -1724,12 +1727,18 @@ bool writeCoordinates(const irsdk_header* header, const char* data) {
 		float dx = velocityX * sin(yaw);
 		float dy = velocityX * cos(yaw);
 
-		lastX += dx;
-		lastY += dy;
+		if (dx > 0 || dy > 0) {
+			mapStarted = true;
 
-		printf("%f,%f,%f\n", running, lastX, lastY);
+			lastX += dx;
+			lastY += dy;
 
-		if (fabs(lastX - initialX) < 10.0 && fabs(lastY - initialY) < 10.0)
+			printf("%f,%f,%f\n", running, lastX, lastY);
+
+			if (circuit && fabs(lastX - initialX) < 10.0 && fabs(lastY - initialY) < 10.0)
+				return false;
+		}
+		else if (mapStarted && !circuit)
 			return false;
 	}
 
@@ -1888,6 +1897,9 @@ int main(int argc, char* argv[])
 		analyzeTelemetry = calibrateTelemetry || (strcmp(argv[1], "-Analyze") == 0);
 		mapTrack = (strcmp(argv[1], "-Map") == 0);
 		positionTrigger = (strcmp(argv[1], "-Trigger") == 0);
+
+		if (mapTrack && argc > 2)
+			circuit = (strcmp(argv[2], "Circuit") == 0);
 
 		if (analyzeTelemetry) {
 			dataFile = argv[2];

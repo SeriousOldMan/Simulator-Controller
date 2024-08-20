@@ -1570,7 +1570,7 @@ namespace ACSHMSpotter {
 					coordCount += 1;
 				}
 			}
-			else if (started && circuit)
+			else if (started && !circuit)
 				return false;
 
 			return true;

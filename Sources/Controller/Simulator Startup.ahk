@@ -2625,7 +2625,7 @@ startSimulator() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Simulator Startup"
 
-	if (inList(A_Args, "-Unblock") || (GetKeyState("Ctrl") && GetKeyState("Shift")))
+	if (inList(A_Args, "-Unblock") || (GetKeyState("Ctrl") && GetKeyState("Alt")))
 		unblockExecutables()
 
 	startup := inList(A_Args, "-Startup")

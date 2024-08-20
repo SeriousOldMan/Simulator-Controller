@@ -64,6 +64,12 @@ class AttackImminentEvent extends SpotterEvent {
 	}
 }
 
+class BlueFlagAlertEvent extends SpotterEvent {
+	createTrigger(event, phrase, arguments) {
+		return ("The blue flag is shown, because an opponent is closing in who is at least one lap ahead.")
+	}
+}
+
 class CarInfo {
 	iSpotter := false
 
@@ -3028,7 +3034,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local delta
 
-		if (this.Announcements["BlueFlags"] && this.Speaker[false] && this.Running)
+		if (this.Announcements["BlueFlags"] && this.Speaker[false] && this.Running) {
 			if ((this.Session = kSessionRace) && positions.Has("StandingsBehind") && positions.Has(positions["StandingsBehind"])) {
 				delta := Abs(positions[positions["StandingsBehind"]][10])
 
@@ -3039,6 +3045,9 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 			else
 				this.pushAlert("Blue", false, false, "Blue")
+
+			this.handleEvent("BlueFlagAlert")
+		}
 	}
 
 	pitWindow(state) {
@@ -3223,7 +3232,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 			this.initializeAnnouncements()
 
-			if (formationLap && this.Speaker) {
+			if (formationLap && this.Speaker && (this.TrackType = "Circuit")) {
 				speaker := this.getSpeaker()
 				fragments := speaker.Fragments
 
@@ -3263,8 +3272,7 @@ class RaceSpotter extends GridRaceAssistant {
 														  , track: displayValue("Float", convertUnit("Temperature", trackTemperature), 0)
 														  , unit: fragments[getUnit("Temperature")]})
 
-					if ((this.Session = kSessionRace) && (getMultiMapValue(data, "Position Data", "Car.Count", 0) > 0)
-													  && (this.TrackType = "Circuit")) {
+					if ((this.Session = kSessionRace) && (getMultiMapValue(data, "Position Data", "Car.Count", 0) > 0)) {
 						driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
 						position := this.getPosition(driver, "Overall", data)
 

@@ -1828,16 +1828,16 @@ systemMonitor(command := false, arguments*) {
 
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
-		settingsButton := systemMonitorGui.Add("Button", "x773 yp+4 w23 h23 Disabled")
+		systemMonitorGui.Add("Text", "x8 yp+26 w790 0x10")
+
+		settingsButton := systemMonitorGui.Add("Button", "x766 yp+10 w23 h23 Disabled")
 		settingsButton.OnEvent("Click", modifySettings.Bind(systemMonitorGui))
 		setButtonIcon(settingsButton, kIconsDirectory . "General Settings.ico", 1)
 
-		systemMonitorGui.Add("Text", "x8 yp+26 w790 0x10")
-
 		if (command = "Tab")
-			monitorTabView := systemMonitorGui.Add("Tab3", "x16 yp+14 w773 h375 H:Grow Choose" . inList(["Dashboard", "Session", "Team", "Modules", "Logs"], arguments[1]) . " AltSubmit -Wrap Section", collect(["Dashboard", "Session", "Team", "Modules", "Logs"], translate))
+			monitorTabView := systemMonitorGui.Add("Tab3", "x16 yp+4 w773 h375 H:Grow Choose" . inList(["Dashboard", "Session", "Team", "Modules", "Logs"], arguments[1]) . " AltSubmit -Wrap Section", collect(["Dashboard", "Session", "Team", "Modules", "Logs"], translate))
 		else
-			monitorTabView := systemMonitorGui.Add("Tab3", "x16 yp+14 w773 h375 H:Grow AltSubmit -Wrap Section", collect(["Dashboard", "Session", "Team", "Modules", "Logs"], translate))
+			monitorTabView := systemMonitorGui.Add("Tab3", "x16 yp+4 w773 h375 H:Grow AltSubmit -Wrap Section", collect(["Dashboard", "Session", "Team", "Modules", "Logs"], translate))
 
 		monitorTabView.UseTab(1)
 

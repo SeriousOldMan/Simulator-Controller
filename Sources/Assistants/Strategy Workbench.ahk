@@ -1182,19 +1182,19 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm", "Arial")
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("GroupBox", "x24 ys+34 w209 h181", translate("Race"))
+		workbenchGui.Add("GroupBox", "x24 ys+34 w199 h181", translate("Race"))
 
 		workbenchGui.SetFont("Norm", "Arial")
 
 		workbenchGui.Add("DropDownList", "x" . x0 . " yp+21 w70 Choose1  VsessionTypeDropDown", collect(["Duration", "Laps"], translate)).OnEvent("Change", chooseSessionType)
 		workbenchGui.Add("Edit", "x" . x1 . " yp w50 h20 Limit4 Number VsessionLengthEdit", 60)
 		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range1-9999 0x80", 60)
-		workbenchGui.Add("Text", "x" . x3 . " yp+4 w60 h20 VsessionLengthLabel", translate("Minutes"))
+		workbenchGui.Add("Text", "x" . x3 . " yp+4 w50 h20 VsessionLengthLabel", translate("Minutes"))
 
 		workbenchGui.Add("Text", "x" . x . " yp+21 w75 h23 +0x200", translate("Max. Stint"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp w50 h20 Limit4 Number VstintLengthEdit", 70)
 		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range1-9999 0x80", 70)
-		workbenchGui.Add("Text", "x" . x3 . " yp+4 w60 h20", translate("Minutes"))
+		workbenchGui.Add("Text", "x" . x3 . " yp+4 w50 h20", translate("Minutes"))
 
 		workbenchGui.Add("Text", "x" . x . " yp+21 w75 h23 +0x200", translate("Formation"))
 		workbenchGui.Add("CheckBox", "x" . x1 . " yp-1 w17 h21 Checked VformationLapCheck")
@@ -1207,27 +1207,27 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm", "Arial")
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("GroupBox", "x243 ys+34 w354 h181", translate("Pitstop"))
+		workbenchGui.Add("GroupBox", "x233 ys+34 w364 h181", translate("Pitstop"))
 
 		workbenchGui.SetFont("Norm", "Arial")
 
-		workbenchGui.Add("Text", "x" . x5 . " yp+23 w75 h20", translate("Pitstop"))
+		workbenchGui.Add("Text", "x" . (x5 - 10) . " yp+23 w85 h20 +0x200", translate("Pitstop"))
 		workbenchGui.Add("DropDownList", "x" . x7 . " yp-4 w80 Choose1 VpitstopRuleDropDown", collect(["Optional", "Required"], translate)).OnEvent("Change", choosePitstopRule)
 		workbenchGui.Add("Edit", "x" . x11 . " yp+1 w50 h20 Number Limit2 VpitstopRuleEdit", 1).OnEvent("Change", updatePitstopRule)
 		workbenchGui.Add("UpDown", "x" . x11 . " yp+1 w50 h20 Range0-99 VpitstopRuleUpDown")
 
-		workbenchGui.Add("Text", "x" . x5 . " yp+28 w75 h20", translate("Regular"))
+		workbenchGui.Add("Text", "x" . (x5 - 10) . " yp+28 w85 h20 +0x200", translate("Regular"))
 		workbenchGui.Add("DropDownList", "x" . x7 . " yp-4 w80 Choose1  VpitstopWindowDropDown", collect(["Always", "Window"], translate)).OnEvent("Change", choosePitstopWindow)
 		workbenchGui.Add("Edit", "x" . x11 . " yp+1 w50 h20 VpitstopWindowEdit", "25 - 35").OnEvent("Change", updatePitstopWindow)
 		workbenchGui.Add("Text", "x" . x12 . " yp+3 w120 h20 VpitstopWindowLabel", translate("Minute (From - To)"))
 
-		workbenchGui.Add("Text", "x" . x5 . " yp+22 w75 h23 +0x200 VrefuelRequirementsLabel", translate("Refuel"))
+		workbenchGui.Add("Text", "x" . (x5 - 10) . " yp+22 w85 h23 +0x200 VrefuelRequirementsLabel", translate("Refuel"))
 		workbenchGui.Add("DropDownList", "x" . x7 . " yp w80 Choose1 VrefuelRequirementsDropDown", collect(["Optional", "Required", "Always", "Disallowed"], translate))
 
-		workbenchGui.Add("Text", "x" . x5 . " yp+26 w75 h23 +0x200 VtyreChangeRequirementsLabel", translate("Tyre Change"))
+		workbenchGui.Add("Text", "x" . (x5 - 10) . " yp+26 w85 h23 +0x200 VtyreChangeRequirementsLabel", translate("Tyre Change"))
 		workbenchGui.Add("DropDownList", "x" . x7 . " yp w80 Choose1 VtyreChangeRequirementsDropDown", collect(["Optional", "Required", "Always", "Disallowed"], translate))
 
-		workbenchGui.Add("Text", "x" . x5 . " yp+26 w75 h23 +0x200", translate("Tyre Sets"))
+		workbenchGui.Add("Text", "x" . (x5 - 10) . " yp+26 w85 h23 +0x200", translate("Tyre Sets"))
 
 		w12 := (x11 + 50 - x7)
 

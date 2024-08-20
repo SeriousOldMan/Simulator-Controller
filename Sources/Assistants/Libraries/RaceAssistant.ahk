@@ -279,6 +279,7 @@ class RaceAssistant extends ConfigurationItem {
 	iPrepared := false
 	iKnowledgeBase := false
 
+	iTrackType := 0
 	iTrackLength := 0
 
 	iSessionDuration := 0
@@ -644,6 +645,12 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
+	TrackType {
+		Get {
+			return this.iTrackType
+		}
+	}
+
 	TrackLength {
 		Get {
 			return this.iTrackLength
@@ -874,6 +881,9 @@ class RaceAssistant extends ConfigurationItem {
 		if values.HasProp("TrackLength")
 			this.iTrackLength := values.TrackLength
 
+		if values.HasProp("TrackType")
+			this.iTrackType := values.TrackType
+
 		if values.HasProp("SessionDuration")
 			this.iSessionDuration := values.SessionDuration
 
@@ -907,6 +917,7 @@ class RaceAssistant extends ConfigurationItem {
 			if (this.Session == kSessionFinished) {
 				this.iTeamSession := false
 
+				this.iTrackType := "Circuit"
 				this.iTrackLength := 0
 				this.iSessionDuration := 0
 				this.iSessionLaps := 0
@@ -1096,6 +1107,7 @@ class RaceAssistant extends ConfigurationItem {
 				knowledge["Session"] := Map("Simulator", simulator
 										  , "Car", car
 										  , "Track", track
+										  , "TrackType", this.TrackType
 										  , "TrackLength", (this.TrackLength . " Meters")
 										  , "Type", sessionTypes[this.Session]
 										  , "Format", knowledgeBase.getValue("Session.Format", "Time")
@@ -1743,6 +1755,8 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	initializeSessionFormat(facts, settings, data, lapTime := 0, update := true) {
+		local simulator := getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
+		local simulatorName := this.SettingsDatabase.getSimulatorName(simulator)
 		local sessionFormat := getMultiMapValue(data, "Session Data", "SessionFormat", "Time")
 		local sessionTimeRemaining := getDeprecatedValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
 		local sessionLapsRemaining := getDeprecatedValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0)
@@ -1781,7 +1795,8 @@ class RaceAssistant extends ConfigurationItem {
 			}
 
 		if update
-			this.updateSessionValues({TrackLength: getMultiMapValue(data, "Track Data", "Length", 0)
+			this.updateSessionValues({TrackType: getMultiMapValue(settings, ("Simulator." . simulatorName), "Track.Type", "Circuit")
+									, TrackLength: getMultiMapValue(data, "Track Data", "Length", 0)
 									, SessionDuration: duration * 1000, SessionLaps: laps, TeamSession: (getMultiMapValue(data, "Session Data", "Mode", "Solo") = "Team")})
 	}
 
@@ -1839,6 +1854,7 @@ class RaceAssistant extends ConfigurationItem {
 									   , getMultiMapValue(data, "Session Data", "Car", "")
 									   , getMultiMapValue(data, "Session Data", "Track", ""), &settings)
 					 , CaseInsenseMap("Session.Type", this.Session
+									, "Session.Track.Type", getMultiMapValue(settings, ("Simulator." . simulatorName), "Track.Type", "Circuit")
 									, "Session.Track.Length", getMultiMapValue(data, "Track Data", "Length", 0)
 									, "Session.Time.Remaining", getDeprecatedValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
 									, "Session.Lap.Remaining", getDeprecatedValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0)
@@ -1917,7 +1933,8 @@ class RaceAssistant extends ConfigurationItem {
 
 		knowledgeBase.Facts.Facts := getMultiMapValues(state, "Session State")
 
-		this.updateSessionValues({TrackLength: knowledgeBase.getValue("Session.Track.Length")
+		this.updateSessionValues({TrackType: knowledgeBase.getValue("Session.Track.Type")
+								, TrackLength: knowledgeBase.getValue("Session.Track.Length")
 								, SessionDuration: knowledgeBase.getValue("Session.Duration") * 1000
 								, SessionLaps: knowledgeBase.getValue("Session.Laps")})
 		this.updateDynamicValues({LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})

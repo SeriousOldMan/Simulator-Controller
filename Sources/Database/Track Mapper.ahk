@@ -33,6 +33,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\Database\Libraries\SessionDatabase.ahk"
+#Include "..\Database\Libraries\SettingsDatabase.ahk"
 #Include "..\Libraries\GDIP.ahk"
 #Include "..\Libraries\Task.ahk"
 
@@ -91,7 +92,8 @@ createTrackImage(trackMap) {
 		Sleep(1)
 	}
 
-	Gdip_DrawLine(graphics, pen, lastX, lastY, firstX, firstY)
+	if (getMultiMapValue(trackMap, "General", "TrackType", "Circuit") = "Circuit")
+		Gdip_DrawLine(graphics, pen, lastX, lastY, firstX, firstY)
 
 	Gdip_DeletePen(pen)
 
@@ -108,6 +110,8 @@ createTrackImage(trackMap) {
 
 createTrackMap(simulator, track, fileName) {
 	local sessionDB := SessionDatabase()
+	local settingsDB := SettingsDatabase()
+	local simulatorName := sessionDB.getSimulatorName(simulator)
 	local trackMapperState := newMultiMap()
 	local trackMap := newMultiMap()
 	local coordinates := []
@@ -116,9 +120,11 @@ createTrackMap(simulator, track, fileName) {
 
 	setMultiMapValue(trackMap, "General", "Simulator", simulator)
 	setMultiMapValue(trackMap, "General", "Track", track)
+	setMultiMapValue(trackMap, "General", "TrackType"
+				   , settingsDB.readSettingValue(simulator, "*", track, "*", ("Simulator." . simulatorName), "Track.Type", "Circuit"))
 
 	setMultiMapValue(trackMapperState, "Track Mapper", "State", "Active")
-	setMultiMapValue(trackMapperState, "Track Mapper", "Simulator", sessionDB.getSimulatorName(simulator))
+	setMultiMapValue(trackMapperState, "Track Mapper", "Simulator", simulatorName)
 	setMultiMapValue(trackMapperState, "Track Mapper", "Track", sessionDB.getTrackName(simulator, track))
 	setMultiMapValue(trackMapperState, "Track Mapper", "Information", translate("Message: ") . translate("Creating track map..."))
 	setMultiMapValue(trackMapperState, "Track Mapper", "Action", "Reading")

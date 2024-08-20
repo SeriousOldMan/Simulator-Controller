@@ -1920,6 +1920,9 @@ float initialX = 0.0;
 float initialY = 0.0;
 int coordCount = 0;
 
+bool circuit = true;
+bool mapStarted = false;
+
 bool writeCoordinates() {
 	SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
@@ -1931,6 +1934,8 @@ bool writeCoordinates() {
 	if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
 		int carID = gf->playerCarID;
 
+		mapStarted = true;
+
 		for (int i = 0; i < gf->activeCars; i++)
 			if (gf->carID[i] == carID) {
 				carID = i;
@@ -1940,18 +1945,20 @@ bool writeCoordinates() {
 
 		float coordinateX = gf->carCoordinates[carID][0];
 		float coordinateY = gf->carCoordinates[carID][2];
-		
+
 		cout << coordinateX << "," << coordinateY << endl;
 
 		if (coordCount == 0) {
 			initialX = coordinateX;
 			initialY = coordinateY;
 		}
-		else if (coordCount > 100 && fabs(coordinateX - initialX) < 10.0 && fabs(coordinateY - initialY) < 10.0)
+		else if (circuit && coordCount > 100 && fabs(coordinateX - initialX) < 10.0 && fabs(coordinateY - initialY) < 10.0)
 			return false;
-		
+
 		coordCount += 1;
 	}
+	else if (mapStarted && !circuit)
+		return false;
 
 	return true;
 }
@@ -2046,6 +2053,9 @@ int main(int argc, char* argv[])
 		analyzeTelemetry = calibrateTelemetry || (strcmp(argv[1], "-Analyze") == 0);
 		mapTrack = (strcmp(argv[1], "-Map") == 0);
 		positionTrigger = (strcmp(argv[1], "-Trigger") == 0);
+
+		if (mapTrack && argc >  2)
+			circuit = (strcmp(argv[2], "Circuit") == 0);
 
 		if (analyzeTelemetry) {
 			dataFile = argv[2];

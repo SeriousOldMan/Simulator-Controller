@@ -3026,16 +3026,27 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	updateTrackAutomationInfo() {
 		local info := ""
-		local index, action
+		local index, action, actionInfo
 
 		if this.SelectedTrackAutomation {
 			for index, action in this.SelectedTrackAutomation.Actions {
 				if (index > 1)
 					info .= "`n"
 
-				info .= (index . translate(" -> ")
-					   . translate((action.Type = "Hotkey") ? (InStr(action.Action, "|") ? "Hotkey(s): " : "Hotkey: ") : "Command: ")
-					   . action.Action)
+				switch action.Type, false {
+					case "Hotkey":
+						actionInfo := translate(InStr(action.Action, "|") ? "Hotkey(s): " : "Hotkey: ")
+					case "Command":
+						actionInfo := translate("Command: ")
+					case "Speech":
+						actionInfo := translate("Speech: ")
+					case "Audio":
+						actionInfo := translate("Audio: ")
+					default:
+						throw "Unknown action type detected in SessionDatabaseEditor.show..."
+				}
+
+				info .= (index . translate(" -> ") . actionInfo . action.Action)
 			}
 
 			this.Control["trackAutomationInfoEdit"].Value := info

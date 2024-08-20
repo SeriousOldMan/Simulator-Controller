@@ -12,6 +12,7 @@
 #Include "..\Libraries\Task.ahk"
 #Include "Libraries\RaceAssistantPlugin.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
+#Include "..\Database\Libraries\SettingsDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -242,18 +243,35 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 	}
 
 	enableTrackAutomation(label := false, force := false) {
+		local simulator, simulatorName, car, track, trackType
+
 		if (!this.TrackAutomationEnabled || force) {
 			if !label
 				label := this.getLabel("TrackAutomation.Toggle")
 
 			trayMessage(label, translate("State: On"))
 
-			if this.Simulator
-				this.Simulator.resetTrackAutomation()
-
 			this.iTrackAutomationEnabled := true
 
 			this.updateAutomationTrayLabel(label, true)
+
+			simulator := this.Simulator
+
+			if simulator {
+				simulator.resetTrackAutomation()
+
+				car := simulator.Car
+				track := simulator.Track
+
+				simulator := simulator.Simulator[true]
+
+				trackType := SettingsDatabase().readSettingValue(simulator, car, track, "*"
+															   , "Simulator." . SessionDatabase.getSimulatorName(this.Simulator.Simulator[true])
+															   , "Track.Type", "Circuit")
+
+				if (trackType != "Circuit")
+					this.startupTrackAutomation()
+			}
 		}
 	}
 
@@ -393,22 +411,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 		return false
 	}
 
-	joinSession(settings, data) {
-		if getMultiMapValue(settings, "Assistant.Spotter", "Join.Late", true)
-			this.startSession(settings, data)
-	}
-
-	finishSession(arguments*) {
-		this.iHasTrackMap := false
-
-		this.shutdownTrackMapper(true)
-		this.shutdownTrackAutomation(true)
-
-		super.finishSession(arguments*)
-	}
-
-	addLap(lap, running, data) {
-		local simulator, simulatorName, hasTrackMap, track, code, exePath, pid, dataFile, mapperState
+	startupTrackMapper(trackType) {
+		local simulator, simulatorName, simulatorCode, hasTrackMap, track, exePath, pid, dataFile, mapperState
 
 		static sessionDB := false
 
@@ -425,6 +429,11 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 
 			if pid {
 				if ProcessExist(pid) {
+					setMultiMapValue(mapperState, "Track Mapper", "State", "Active")
+					setMultiMapValue(mapperState, "Track Mapper", "Simulator", simulatorName)
+					setMultiMapValue(mapperState, "Track Mapper", "Track", sessionDB.getTrackName(simulator, track))
+					setMultiMapValue(mapperState, "Track Mapper", "Action", "Scanning")
+
 					try {
 						fileSize := FileGetSize(dataFile)
 
@@ -460,8 +469,6 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 		if !sessionDB
 			sessionDB := SessionDatabase()
 
-		super.addLap(lap, running, data)
-
 		if (this.RaceAssistant && this.Simulator) {
 			simulator := this.Simulator.Simulator[true]
 
@@ -469,11 +476,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 				hasTrackMap := true
 			else if this.iMapperPID
 				hasTrackMap := false
-			else {
-				track := getMultiMapValue(data, "Session Data", "Track", false)
-
-				hasTrackMap := sessionDB.hasTrackMap(simulator, track)
-			}
+			else
+				hasTrackMap := sessionDB.hasTrackMap(simulator, this.Simulator.Track)
 
 			if hasTrackMap {
 				this.iHasTrackMap := true
@@ -483,85 +487,40 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 			}
 			else if !this.iMapperPID {
 				simulatorName := sessionDB.getSimulatorName(simulator)
+				simulatorCode := sessionDB.getSimulatorCode(simulator)
+				track := this.Simulator.Track
+				dataFile := temporaryFileName(simulatorCode . " Track Mapper", "data")
+				exePath := (kBinariesDirectory . "Providers\" . simulatorCode . " SHM Spotter.exe")
 
-				if true { ; (lap > getMultiMapValue(this.Configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)) {
-					track := getMultiMapValue(data, "Session Data", "Track", false)
+				try {
+					if !FileExist(exePath)
+						throw "File not found..."
 
-					code := sessionDB.getSimulatorCode(simulator)
-					dataFile := temporaryFileName(code . " Track Mapper", "data")
+					this.iMapperPhase := "Collect"
 
-					exePath := (kBinariesDirectory . "Providers\" . code . " SHM Spotter.exe")
+					Run(A_ComSpec . " /c `"`"" . exePath . "`" -Map `"" . trackType . "`" > `"" . dataFile . "`"`"", kBinariesDirectory, "Hide", &pid)
 
-					try {
-						if !FileExist(exePath)
-							throw "File not found..."
-
-						this.iMapperPhase := "Collect"
-
-						Run(A_ComSpec . " /c `"`"" . exePath . "`" -Map > `"" . dataFile . "`"`"", kBinariesDirectory, "Hide", &pid)
-
-						this.iMapperPID := pid
-					}
-					catch Any as exception {
-						logError(exception, true)
-
-						logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
-																   , {simulator: code, protocol: "SHM"})
-											   . exePath . translate(") - please rebuild the applications in the binaries folder (")
-											   . kBinariesDirectory . translate(")"))
-
-						showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
-													  , {exePath: exePath, simulator: code, protocol: "SHM"})
-								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-					}
-
-					if this.iMapperPID {
-						mapperState := newMultiMap()
-
-						setMultiMapValue(mapperState, "Track Mapper", "State", "Active")
-						setMultiMapValue(mapperState, "Track Mapper", "Simulator", simulatorName)
-						setMultiMapValue(mapperState, "Track Mapper", "Track", sessionDB.getTrackName(simulator, track))
-						setMultiMapValue(mapperState, "Track Mapper", "Action", "Scanning")
-						setMultiMapValue(mapperState, "Track Mapper", "Information", translate("Message: ") . translate("Scanning track..."))
-
-						writeMultiMap(kTempDirectory . "Track Mapper.state", mapperState)
-
-						Task.startTask(createTrackMap, 0, kLowPriority)
-					}
+					this.iMapperPID := pid
 				}
-				else {
-					this.iMapperPhase := "Wait"
+				catch Any as exception {
+					logError(exception, true)
 
+					logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
+															   , {simulator: simulatorCode, protocol: "SHM"})
+										   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+										   . kBinariesDirectory . translate(")"))
+
+					showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
+												  , {exePath: exePath, simulator: simulatorCode, protocol: "SHM"})
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				}
+
+				if this.iMapperPID {
 					mapperState := newMultiMap()
 
-					setMultiMapValue(mapperState, "Track Mapper", "State", "Passive")
-					setMultiMapValue(mapperState, "Track Mapper", "Simulator", simulatorName)
-					setMultiMapValue(mapperState, "Track Mapper", "Track", sessionDB.getTrackName(simulator, track))
-					setMultiMapValue(mapperState, "Track Mapper", "Action", "Waiting")
-					setMultiMapValue(mapperState, "Track Mapper", "Information", translate("Message: ") . translate("Waiting for track scanner..."))
-
-					writeMultiMap(kTempDirectory . "Track Mapper.state", mapperState)
+					Task.startTask(createTrackMap, 0, kLowPriority)
 				}
 			}
-		}
-	}
-
-	updateLap(lap, update, data) {
-		local simulator, mapperState
-
-		super.updateLap(lap, update, data)
-
-		if (this.iMapperPhase = "Wait") {
-			simulator := this.Simulator.Simulator[true]
-			mapperState := newMultiMap()
-
-			setMultiMapValue(mapperState, "Track Mapper", "State", "Passive")
-			setMultiMapValue(mapperState, "Track Mapper", "Simulator", SessionDatabase.getSimulatorName(this.Simulator.Simulator[true]))
-			setMultiMapValue(mapperState, "Track Mapper", "Track", SessionDatabase.getTrackName(simulator, getMultiMapValue(data, "Session Data", "Track", false)))
-			setMultiMapValue(mapperState, "Track Mapper", "Action", "Waiting")
-			setMultiMapValue(mapperState, "Track Mapper", "Information", translate("Message: ") . translate("Waiting for track scanner..."))
-
-			writeMultiMap(kTempDirectory . "Track Mapper.state", mapperState)
 		}
 	}
 
@@ -600,6 +559,44 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 		}
 
 		return false
+	}
+
+	prepareSession(settings, data) {
+		local trackType
+
+		super.prepareSession(settings, data)
+
+		if (this.RaceAssistant && this.Simulator) {
+			trackType := getMultiMapValue(settings, "Simulator." . SessionDatabase.getSimulatorName(this.Simulator.Simulator[true]), "Track.Type", "Circuit")
+
+			if (trackType != "Circuit")
+				this.startupTrackMapper(trackType)
+		}
+	}
+
+	joinSession(settings, data) {
+		if getMultiMapValue(settings, "Assistant.Spotter", "Join.Late", true)
+			this.startSession(settings, data)
+	}
+
+	finishSession(arguments*) {
+		this.iHasTrackMap := false
+
+		this.shutdownTrackMapper(true)
+		this.shutdownTrackAutomation(true)
+
+		super.finishSession(arguments*)
+	}
+
+	addLap(lap, running, data) {
+		local trackType := SettingsDatabase().readSettingValue(this.Simulator.Simulator[true], this.Simulator.Car, this.Simulator.Track, "*"
+															 , "Simulator." . SessionDatabase.getSimulatorName(this.Simulator.Simulator[true])
+															 , "Track.Type", "Circuit")
+
+		super.addLap(lap, running, data)
+
+		if (this.RaceAssistant && this.Simulator && (trackType = "Circuit"))
+			this.startupTrackMapper(trackType)
 	}
 
 	positionTrigger(actionNr, positionX, positionY) {

@@ -1,9 +1,9 @@
 [Development]
 Version=5.8.4.0-dev
 Target=5.8.4.0-release
-Date=08/16/2024
-Download=
-Changes="Strategy Workbench" remembers chart settings
+Date=08/18/2024
+Download=https://www.dropbox.com/scl/fi/zkccvifticiobs7l4ytaf/Simulator-Controller-5.8.4.0-dev.zip?rlkey=q9hneqcuy415mppeso1th3kx1&st=3u8j18r4&dl=1
+Changes="Strategy Workbench" remembers chart settings, Track mapping and track automations for open tracks, Changed unblock modifiers in "Simulator Startup", New LLM event for the Spotter
 Components=Media->5.6.1,Configuration->5.8.3,Utilities->5.4.8
 [Release]
 Version=5.8.3.2-release

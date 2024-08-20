@@ -215,6 +215,8 @@ class Theme {
 					options .= (" Background" . this.ButtonBackColor)
 				case "Text", "Picture", "GroupBox", "CheckBox", "Radio", "Slider", "Link", "ComboBox":
 					options .= (" Background" . this.WindowBackColor)
+				case "Tab3", "Tab2", "Tab":
+					options .= (" 0x8000")
 			}
 		}
 
@@ -1429,7 +1431,7 @@ class Window extends Gui {
 		if control
 			return control
 
-		if isDevelopment()
+		if (isDevelopment() && (Strsplit(A_ScriptName, ".")[1] != "Simulator Tools"))
 			options .= " Border"
 
 		if type is Window.Resizer
@@ -1986,7 +1988,7 @@ modifiedIcon(fileName, postFix, modifier) {
 }
 
 modifiedImage(fileName, postFix, modifier, cache := "Images") {
-	local extension, name, modifiedFileName, token, bitmap, graphics
+	local extension, name, modifiedFileName, token, bitmap, graphics, create
 
 	SplitPath(fileName, , , &extension, &name)
 
@@ -1995,7 +1997,14 @@ modifiedImage(fileName, postFix, modifier, cache := "Images") {
 
 	modifiedFileName := (kTempDirectory . cache . "\" . name . "_" . postFix . "." . extension)
 
-	if !FileExist(modifiedFileName) {
+	create := !FileExist(modifiedFileName)
+
+	if !create
+		create := (FileGetTime(modifiedFileName, "M") < FileGetTime(fileName, "M"))
+
+	if create {
+		deleteFile(modifiedFileName)
+
 		DirCreate(kTempDirectory . cache)
 
 		token := Gdip_Startup()
@@ -2006,13 +2015,23 @@ modifiedImage(fileName, postFix, modifier, cache := "Images") {
 
 		modifier(graphics, bitmap)
 
-		Gdip_SaveBitmapToFile(bitmap, modifiedFileName)
+		try {
+			Gdip_SaveBitmapToFile(bitmap, modifiedFileName)
+		}
+		catch Any as exception {
+			if !FileExist(modifiedFileName) {
+				logError(exception, true)
 
-		Gdip_DisposeImage(bitmap)
+				return fileName
+			}
+		}
+		finally {
+			Gdip_DisposeImage(bitmap)
 
-		Gdip_DeleteGraphics(graphics)
+			Gdip_DeleteGraphics(graphics)
 
-		Gdip_Shutdown(token)
+			Gdip_Shutdown(token)
+		}
 	}
 
 	return modifiedFileName

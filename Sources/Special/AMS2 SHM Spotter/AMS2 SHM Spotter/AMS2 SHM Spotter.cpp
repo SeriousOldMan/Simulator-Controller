@@ -1355,6 +1355,9 @@ float initialX = 0.0;
 float initialY = 0.0;
 int coordCount = 0;
 
+bool circuit = true;
+bool mapStarted = false;
+
 bool writeCoordinates(const SharedMemory* sharedData) {
 	float velocityX = sharedData->mWorldVelocity[VEC_X];
 	float velocityY = sharedData->mWorldVelocity[VEC_Z];
@@ -1364,7 +1367,9 @@ bool writeCoordinates(const SharedMemory* sharedData) {
 		int carID = sharedData->mViewedParticipantIndex;
 
 		float coordinateX = sharedData->mParticipantInfo[carID].mWorldPosition[VEC_X];
-		float coordinateY = - sharedData->mParticipantInfo[carID].mWorldPosition[VEC_Z];
+		float coordinateY = -sharedData->mParticipantInfo[carID].mWorldPosition[VEC_Z];
+
+		mapStarted = true;
 
 		printf("%f,%f\n", coordinateX, coordinateY);
 
@@ -1372,11 +1377,13 @@ bool writeCoordinates(const SharedMemory* sharedData) {
 			initialX = coordinateX;
 			initialY = coordinateY;
 		}
-		else if (coordCount > 100 && fabs(coordinateX - initialX) < 10.0 && fabs(coordinateY - initialY) < 10.0)
+		else if (circuit && coordCount > 100 && fabs(coordinateX - initialX) < 10.0 && fabs(coordinateY - initialY) < 10.0)
 			return false;
-		
+
 		coordCount += 1;
 	}
+	else if (mapStarted && !circuit)
+		return false;
 
 	return true;
 }
@@ -1458,6 +1465,9 @@ int main(int argc, char* argv[]) {
 		analyzeTelemetry = calibrateTelemetry || (strcmp(argv[1], "-Analyze") == 0);
 		mapTrack = (strcmp(argv[1], "-Map") == 0);
 		positionTrigger = (strcmp(argv[1], "-Trigger") == 0);
+
+		if (mapTrack && argc > 2)
+			circuit = (strcmp(argv[2], "Circuit") == 0);
 
 		if (analyzeTelemetry) {
 			dataFile = argv[2];

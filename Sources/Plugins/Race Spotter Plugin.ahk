@@ -27,6 +27,7 @@ global kRaceSpotterPlugin := "Race Spotter"
 ;;;-------------------------------------------------------------------------;;;
 
 class RaceSpotterPlugin extends RaceAssistantPlugin {
+	iTrackMappingEnabled := true
 	iTrackAutomationEnabled := false
 	iAutomationPID := false
 
@@ -79,6 +80,12 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 		}
 	}
 
+	TrackMappingEnabled {
+		Get {
+			return this.iTrackMappingEnabled
+		}
+	}
+
 	TrackAutomationEnabled {
 		Get {
 			return this.iTrackAutomationEnabled
@@ -86,11 +93,30 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 	}
 
 	__New(controller, name, configuration := false) {
-		local trackAutomation, arguments
+		local trackMapping, trackAutomation, arguments
 
 		super.__New(controller, name, configuration)
 
 		if (this.Active || (isDebug() && isDevelopment())) {
+			trackMapping := this.getArgumentValue("trackMapping", false)
+
+			if trackMapping {
+				arguments := string2Values(A_Space, trackMapping)
+
+				if (arguments.Length == 0)
+					arguments := ["On"]
+
+				if ((arguments.Length == 1) && !inList(["On", "Off"], arguments[1]))
+					arguments.InsertAt(1, "Off")
+
+				this.iTrackMappingEnabled := (arguments[1] = "On")
+
+				if (arguments.Length > 1)
+					this.createRaceAssistantAction(controller, "TrackMapping", arguments[2])
+			}
+			else
+				this.iTrackMappingEnabled := true
+
 			trackAutomation := this.getArgumentValue("trackAutomation", false)
 
 			if trackAutomation {
@@ -110,13 +136,21 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 			else
 				this.iTrackAutomationEnabled := false
 
+			if (this.StartupSettings && (getMultiMapValue(this.StartupSettings, "Functions", "Track Mapping", kUndefined) != kUndefined))
+				this.iTrackMappingEnabled := getMultiMapValue(this.StartupSettings, "Functions", "Track Mapping")
+
 			if (this.StartupSettings && (getMultiMapValue(this.StartupSettings, "Functions", "Track Automation", kUndefined) != kUndefined))
 				this.iTrackAutomationEnabled := getMultiMapValue(this.StartupSettings, "Functions", "Track Automation")
 
 			OnExit(ObjBindMethod(this, "shutdownTrackAutomation", true))
 			OnExit(ObjBindMethod(this, "shutdownTrackMapper", true))
 
-			if this.iTrackAutomationEnabled
+			if this.TrackMappingEnabled
+				this.enableTrackMapping(false, true)
+			else
+				this.disableTrackMapping(false, true)
+
+			if this.TrackAutomationEnabled
 				this.enableTrackAutomation(false, true)
 			else
 				this.disableTrackAutomation(false, true)
@@ -128,7 +162,12 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 
 		function := controller.findFunction(actionFunction)
 
-		if ((function != false) && (action = "TrackAutomation")) {
+		if ((function != false) && (action = "TrackMapping")) {
+			descriptor := ConfigurationItem.descriptor(action, "Toggle")
+
+			this.registerAction(RaceSpotterPlugin.TrackMappingToggleAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
+		}
+		else if ((function != false) && (action = "TrackAutomation")) {
 			descriptor := ConfigurationItem.descriptor(action, "Toggle")
 
 			this.registerAction(RaceSpotterPlugin.TrackAutomationToggleAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
@@ -193,13 +232,21 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 
 		super.updateActions(session)
 
-		for ignore, theAction in this.Actions
+		for ignore, theAction in this.Actions {
+			if isInstance(theAction, RaceSpotterPlugin.TrackMappingToggleAction) {
+				theAction.Function.setLabel(this.actionLabel(theAction), this.TrackMappingEnabled ? "Green" : "Black")
+				theAction.Function.setIcon(this.actionIcon(theAction), this.TrackMappingEnabled ? "Activated" : "Deactivated")
+
+				theAction.Function.enable(kAllTrigger, theAction)
+			}
+
 			if isInstance(theAction, RaceSpotterPlugin.TrackAutomationToggleAction) {
 				theAction.Function.setLabel(this.actionLabel(theAction), this.TrackAutomationEnabled ? "Green" : "Black")
 				theAction.Function.setIcon(this.actionIcon(theAction), this.TrackAutomationEnabled ? "Activated" : "Deactivated")
 
 				theAction.Function.enable(kAllTrigger, theAction)
 			}
+		}
 	}
 
 	requestInformation(arguments*) {
@@ -215,6 +262,59 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 		}
 		else
 			return false
+	}
+
+	toggleTrackAutomation() {
+		if this.TrackMappingEnabled
+			this.disableTrackMapping()
+		else
+			this.enableTrackMapping()
+	}
+
+	updateMappingTrayLabel(label, enabled) {
+		static hasTrayMenu := false
+
+		label := StrReplace(StrReplace(label, "`n", A_Space), "`r", "")
+
+		if !hasTrayMenu {
+			A_TrayMenu.Insert("1&")
+			A_TrayMenu.Insert("1&", label, (*) => this.toggleTrackMapping())
+
+			hasTrayMenu := true
+		}
+
+		if enabled
+			A_TrayMenu.Check(label)
+		else
+			A_TrayMenu.Uncheck(label)
+	}
+
+	enableTrackMapping(label := false, force := false) {
+		if (!this.TrackMappingEnabled || force) {
+			if !label
+				label := this.getLabel("TrackMapping.Toggle")
+
+			trayMessage(label, translate("State: On"))
+
+			this.iTrackMappingEnabled := true
+
+			this.updateMappingTrayLabel(label, true)
+		}
+	}
+
+	disableTrackMapping(label := false, force := false) {
+		if (this.TrackMappingEnabled || force) {
+			if !label
+				label := this.getLabel("TrackMapping.Toggle")
+
+			trayMessage(label, translate("State: Off"))
+
+			this.iTrackMappingEnabled := false
+
+			this.shutdownTrackMapper()
+
+			this.updateMappingTrayLabel(label, false)
+		}
 	}
 
 	toggleTrackAutomation() {

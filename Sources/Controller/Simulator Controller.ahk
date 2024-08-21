@@ -1029,7 +1029,8 @@ class SimulatorController extends ConfigurationItem {
 		if !this.iFunctionActions.Has(function)
 			this.iFunctionActions[function] := Array()
 
-		this.iFunctionActions[function].Push(action)
+		if !inList(this.iFunctionActions[function], action)
+			this.iFunctionActions[function].Push(action)
 
 		for ignore, fnController in this.FunctionController
 			if fnController.hasFunction(function)

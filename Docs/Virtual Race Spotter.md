@@ -253,7 +253,7 @@ Here is an example, the famous Trento - Bondone hill climb:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Track%20Map%202.png)
 
-Mapping non-closed tracks can be a little bit tricky, because the starting procedure can vary between simulators and even between track types. Normally, the mapping will start when the car moves for the first time and will stop when the car stops again. But this can be wrong, if you have to move to the starting spot when preparing for the stage. Therefore, you can disable / enable track mapping by using a controller function or by using the tray menu of Simulator Controller.
+Mapping non-closed tracks can be a little bit tricky, because the starting procedure can vary between simulators and even between track types. Normally, the mapping will start when the car moves for the first time and will stop when the car stops again. But this can be wrong, if you have to move to the starting spot when preparing for the stage. Therefore, you can disable / enable track mapping by using a controller function or by using the tray menu of Simulator Controller. And it is also possible that a fully stopped car is not detected correctly, since a simulator will still report micro-moving events. In this case, simply leave the session and the track map will be created.
 
 Please note, that all this is only supported for simulators which can handle non-closed tracks.
 

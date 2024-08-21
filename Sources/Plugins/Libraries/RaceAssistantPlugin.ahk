@@ -1247,12 +1247,12 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	static prepareAssistantsSession(data, count) {
 		local ignore, assistant, settings
 
-		if !RaceAssistantPlugin.Simulator.hasPrepared(settings, data, count)
-			RaceAssistantPlugin.Simulator.prepareSession(settings, data)
-
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if assistant.requireRaceAssistant() {
 				settings := RaceAssistantPlugin.getSettings(assistant, data)
+
+				if !RaceAssistantPlugin.Simulator.hasPrepared(settings, data, count)
+					RaceAssistantPlugin.Simulator.prepareSession(settings, data)
 
 				if !assistant.hasPrepared(settings, data, count)
 					assistant.prepareSession(settings, data)
@@ -1673,7 +1673,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 		this.updateActions(kSessionFinished)
 	}
-	
+
 	updateFunctions() {
 		this.updateActions(kSessionFinished)
 	}

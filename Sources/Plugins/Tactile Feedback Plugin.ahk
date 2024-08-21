@@ -462,6 +462,10 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 
 		return StrReplace(StrReplace(label, "Increase", translate("Increase")), "Decrease", translate("Decrease"))
 	}
+	
+	updateFunctions() {
+		this.updateActions()
+	}
 
 	updateActions() {
 		local isRunning := this.Application.isRunning()

@@ -576,6 +576,22 @@ class SimulatorPlugin extends ControllerPlugin {
 			SimulatorPlugin.sActiveSimulation := false
 		}
 	}
+	
+	updateFunctions() {
+		this.updateActions(kSessionFinished)
+	}
+	
+	updateActions(session) {
+		local mode := this.findMode(kPitstopMode)
+
+		if (mode && inList(this.Controller.ActiveModes, mode))
+			mode.updateActions(session)
+
+		mode := this.findMode(kAssistantMode)
+
+		if (mode && inList(this.Controller.ActiveModes, mode))
+			mode.updateActions(session)
+	}
 
 	updateSession(session, force := false) {
 		local mode
@@ -593,15 +609,7 @@ class SimulatorPlugin extends ControllerPlugin {
 				this.Controller.setModes(this.Simulator.Application, ["Other", "Practice", "Qualification", "Race"][session])
 		}
 
-		mode := this.findMode(kPitstopMode)
-
-		if (mode && inList(this.Controller.ActiveModes, mode))
-			mode.updateActions(session)
-
-		mode := this.findMode(kAssistantMode)
-
-		if (mode && inList(this.Controller.ActiveModes, mode))
-			mode.updateActions(session)
+		this.updateActions(session)
 	}
 
 	updatePitstopOption(option, action, steps := 1) {

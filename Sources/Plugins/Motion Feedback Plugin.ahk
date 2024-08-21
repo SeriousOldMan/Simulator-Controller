@@ -689,6 +689,10 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 		super.deactivate()
 	}
+	
+	updateFunctions() {
+		this.updateActions()
+	}
 
 	updateActions() {
 		local action := this.findAction(this.getLabel(ConfigurationItem.descriptor("Motion", "Toggle"), "Motion"))

@@ -37,7 +37,8 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 5.8.4
 
-New builtin LLM Events has been defined for the Race Spotter. As always, you may want to revisit your *Reasoning* booster configuration.
+1. New builtin LLM Events has been defined for the Race Spotter. As always, you may want to revisit your *Reasoning* booster configuration.
+2. The local LLM Runtime now also supports a Vulkan driver for non-Nvidia GPUs. If you are using the LLM Runtime, open "Simulator Setup", remove the "Local Runtime..." preset and reinstall it. This is not necessary, if you are already running a CUDA setup. But: If you have a Nvidia GPU and perform the update, you may encounter conflicts with the CUDA driver as described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#llm-runtime). If this is the case, remove the "vulkan" folder from the *Simulator Controller\Programs\LLM Runtime\runtimes\win-x64\native* folder in your user *Documents* folder and continue using CUDA.
 
 ***
 

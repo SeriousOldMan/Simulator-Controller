@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.8.4.0-dev](https://www.dropbox.com/scl/fi/zkccvifticiobs7l4ytaf/Simulator-Controller-5.8.4.0-dev.zip?rlkey=q9hneqcuy415mppeso1th3kx1&st=3u8j18r4&dl=1) (Early build for 5.8.4. Changes: "Strategy Workbench" remembers chart settings, Track mapping and track automations for open tracks, Changed unblock modifiers in "Simulator Startup", New LLM event for the Spotter, New controller action "TrackMapping" for Race Spotter, New icon for "TrackMapping" controller action, New "trackMapping" parameter for the "Race Spotter" plugin.)
+[5.8.4.0-alpha]() (Test build for 5.8.4. Changes: "Strategy Workbench" remembers chart settings, Track mapping and track automations for open tracks, Changed unblock modifiers in "Simulator Startup", New LLM event for the Spotter, New controller action "TrackMapping" for Race Spotter, New icon for "TrackMapping" controller action, New "trackMapping" parameter for the "Race Spotter" plugin.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-584) of this version and all the versions you might have skipped, before installing and using this version.
 

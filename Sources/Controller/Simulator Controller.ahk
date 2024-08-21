@@ -759,6 +759,10 @@ class SimulatorController extends ConfigurationItem {
 			if function.Label
 				function.setLabel(function.Label)
 
+		for ignore, plugin in this.Plugins
+			if this.isActive(plugin)
+				plugin.updateFunctions()
+
 		for ignore, fnController in this.FunctionController[GuiFunctionController]
 			if fnController.VisibleDuration >= 9999
 				fnController.show()
@@ -1417,9 +1421,6 @@ class ControllerFunction {
 
 		this.Label := text
 
-		if InStr(text, "Kartogr") && color = "Black"
-			MsgBox "Here"
-
 		for ignore, fnController in this.Controller.FunctionController
 			if fnController.hasFunction(this)
 				fnController.setControlLabel(this, text, color, overlay)
@@ -1774,6 +1775,9 @@ class ControllerPlugin extends Plugin {
 
 		for ignore, theAction in this.Actions
 			controller.disconnectAction(this, theAction.Function, theAction)
+	}
+
+	updateFunctions() {
 	}
 
 	runningSimulator(active := false) {

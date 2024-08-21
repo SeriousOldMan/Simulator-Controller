@@ -5,12 +5,13 @@
   4. The last choices for the configuration of the various graphs are now remembered by the "Strategy Workbench".
   5. Using a new setting in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) you can specify in the "Session Database" for *Assetto Corsa*, *iRacing* and *Automobilista 2* the type of a track (Circuit, Rally, Hill, Street). When set to other than "Circuit", track mapping will create a non-closed track. In this case, mapping of the track will start immediately, when the car moves for the first time and will stop, when the car stops. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-types) for more information.
   6. The documentation for [Track Automations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-automations) has been extended to reflect the new "Speech" and "Audio" actions, which can be used to create pace notes and other acoustical hints for open tracks.
-  7. Track mapping can now be enabled or disabled from the Tray menu of the "Simulator Controller" background process. This is helpful, if the starting procedure of a non-circuit track requires to roll forward into the starting box.
+  7. Automatic track mapping can now be enabled or disabled from the Tray menu of the "Simulator Controller" background process. Default is "On" as before, but this is helpful, if the starting procedure of a non-circuit track requires to roll forward into the starting box.
      - New controller action ["TrackMapping"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) for the Race Spotter plugin, which toggles the track mapping on / off.
 	  - New icon in the Stream Deck icon set for the "TrackMapping" action.
-  7. The key combination to request an unblocking of all executables in "Simulator Startup" has changed from Ctrl-Shift to Ctrl-Alt.
-  8. New LLM event has been defined for the *Reasoning* booster of the Race Spotter. "blue_flag_alert" will be signalled, once a faster car appears in the mirror, that is at least one lap ahead. Revisit your event configuration, include the new events and define actions (for example flash a red light in your dashboard using SimHub, for example), if necessary.
-  9. Several updates for the Spanish translation.
+  8. The key combination to request an unblocking of all executables in "Simulator Startup" has changed from Ctrl-Shift to Ctrl-Alt.
+  9. A new LLM event has been defined for the *Reasoning* booster of the Race Spotter. "blue_flag_alert" will be signalled, once a faster car appears in the mirror, that is at least one lap ahead. Revisit your event configuration, include the new events and define actions (for example flash a red light in your dashboard using SimHub, for example), if necessary.
+  10. Vulkan driver support for non-Nvidia GPUs has been added to the local LLM Runtime. Please take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-584) for more information, since a conflict with CUDA drivers on Nvidia GPUs is possible.
+  11. Several updates for the Spanish translation.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-584), if you are using Assistant Boosters or the local LLM Runtime.
 

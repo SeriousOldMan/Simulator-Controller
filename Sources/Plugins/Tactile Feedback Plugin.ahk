@@ -628,6 +628,8 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		if (!this.PedalVibrationEnabled || force)
 			if this.enableFX(label, "PedalVibration", "togglePedalVibration", call)
 				this.iPedalVibrationEnabled := true
+
+		this.updateActions()
 	}
 
 	disablePedalVibration(label := false, force := false, call := true) {
@@ -637,6 +639,8 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		if (this.PedalVibrationEnabled || force)
 			if this.disableFX(label, "PedalVibration", "togglePedalVibration", call)
 				this.iPedalVibrationEnabled := false
+
+		this.updateActions()
 	}
 
 	enableFrontVibration(label := false, force := false, call := true) {
@@ -646,6 +650,8 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		if (!this.FrontVibrationEnabled || force)
 			if this.enableFX(label, "FrontVibration", "toggleFrontChassisVibration", call)
 				this.iFrontVibrationEnabled := true
+
+		this.updateActions()
 	}
 
 	disableFrontVibration(label := false, force := false, call := true) {
@@ -655,6 +661,8 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		if (this.FrontVibrationEnabled || force)
 			if this.disableFX(label, "FrontVibration", "toggleFrontChassisVibration", call)
 				this.iFrontVibrationEnabled := false
+
+		this.updateActions()
 	}
 
 	enableRearVibration(label := false, force := false, call := true) {
@@ -664,6 +672,8 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		if (!this.RearVibrationEnabled || force)
 			if this.enableFX(label, "RearVibration", "toggleRearChassisVibration", call)
 				this.iRearVibrationEnabled := true
+
+		this.updateActions()
 	}
 
 	disableRearVibration(label := false, force := false, call := true) {
@@ -673,6 +683,8 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		if (this.RearVibrationEnabled || force)
 			if this.disableFX(label, "RearVibration", "toggleRearChassisVibration", call)
 				this.iRearVibrationEnabled := false
+
+		this.updateActions()
 	}
 
 	updateVibrationState() {

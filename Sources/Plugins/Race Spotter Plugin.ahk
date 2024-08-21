@@ -41,6 +41,39 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 		}
 	}
 
+	class TrackMappingToggleAction extends ControllerAction {
+		iPlugin := false
+
+		Plugin {
+			Get {
+				return this.iPlugin
+			}
+		}
+
+		__New(plugin, function, label, icon) {
+			this.iPlugin := plugin
+
+			super.__New(function, label, icon)
+		}
+
+		fireAction(function, trigger) {
+			local plugin := this.Plugin
+
+			if (plugin.TrackMappingEnabled && ((trigger = "On") || (trigger = "Off") || (trigger == "Push"))) {
+				plugin.disableTrackMapping(plugin.actionLabel(this))
+
+				function.setLabel(plugin.actionLabel(this), "Black")
+				function.setIcon(plugin.actionIcon(this), "Deactivated")
+			}
+			else if (!plugin.TrackMappingEnabled && ((trigger = "On") || (trigger == "Push"))) {
+				plugin.enableTrackMapping(plugin.actionLabel(this))
+
+				function.setLabel(plugin.actionLabel(this), "Green")
+				function.setIcon(plugin.actionIcon(this), "Activated")
+			}
+		}
+	}
+
 	class TrackAutomationToggleAction extends ControllerAction {
 		iPlugin := false
 
@@ -92,7 +125,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 		}
 	}
 
-	__New(controller, name, configuration := false) {
+	__New(controller, name, configuration := false, register := true) {
 		local trackMapping, trackAutomation, arguments
 
 		super.__New(controller, name, configuration)
@@ -145,15 +178,18 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 			OnExit(ObjBindMethod(this, "shutdownTrackAutomation", true))
 			OnExit(ObjBindMethod(this, "shutdownTrackMapper", true))
 
+			if this.TrackAutomationEnabled
+				this.enableTrackAutomation(false, true)
+			else
+				this.disableTrackAutomation(false, true)
+
 			if this.TrackMappingEnabled
 				this.enableTrackMapping(false, true)
 			else
 				this.disableTrackMapping(false, true)
 
-			if this.TrackAutomationEnabled
-				this.enableTrackAutomation(false, true)
-			else
-				this.disableTrackAutomation(false, true)
+			if register
+				controller.registerPlugin(this)
 		}
 	}
 
@@ -264,7 +300,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 			return false
 	}
 
-	toggleTrackAutomation() {
+	toggleTrackMapping() {
 		if this.TrackMappingEnabled
 			this.disableTrackMapping()
 		else
@@ -277,7 +313,6 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 		label := StrReplace(StrReplace(label, "`n", A_Space), "`r", "")
 
 		if !hasTrayMenu {
-			A_TrayMenu.Insert("1&")
 			A_TrayMenu.Insert("1&", label, (*) => this.toggleTrackMapping())
 
 			hasTrayMenu := true
@@ -290,6 +325,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 	}
 
 	enableTrackMapping(label := false, force := false) {
+		local simulator, car, track, trackType
+
 		if (!this.TrackMappingEnabled || force) {
 			if !label
 				label := this.getLabel("TrackMapping.Toggle")
@@ -299,6 +336,28 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 			this.iTrackMappingEnabled := true
 
 			this.updateMappingTrayLabel(label, true)
+
+			simulator := this.Simulator
+
+			if simulator {
+				simulator.resetTrackAutomation()
+
+				car := simulator.Car
+				track := simulator.Track
+
+				if (car && track) {
+					simulator := simulator.Simulator[true]
+
+					trackType := SettingsDatabase().readSettingValue(simulator, car, track, "*"
+																   , "Simulator." . SessionDatabase.getSimulatorName(this.Simulator.Simulator[true])
+																   , "Track.Type", "Circuit")
+
+					if (trackType != "Circuit")
+						this.startupTrackMapper(trackType)
+				}
+			}
+
+			this.updateActions(kSessionFinished)
 		}
 	}
 
@@ -314,6 +373,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 			this.shutdownTrackMapper()
 
 			this.updateMappingTrayLabel(label, false)
+
+			this.updateActions(kSessionFinished)
 		}
 	}
 
@@ -343,7 +404,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 	}
 
 	enableTrackAutomation(label := false, force := false) {
-		local simulator, simulatorName, car, track, trackType
+		local simulator, car, track, trackType
 
 		if (!this.TrackAutomationEnabled || force) {
 			if !label
@@ -363,15 +424,19 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 				car := simulator.Car
 				track := simulator.Track
 
-				simulator := simulator.Simulator[true]
+				if (car && track) {
+					simulator := simulator.Simulator[true]
 
-				trackType := SettingsDatabase().readSettingValue(simulator, car, track, "*"
-															   , "Simulator." . SessionDatabase.getSimulatorName(this.Simulator.Simulator[true])
-															   , "Track.Type", "Circuit")
+					trackType := SettingsDatabase().readSettingValue(simulator, car, track, "*"
+																   , "Simulator." . SessionDatabase.getSimulatorName(this.Simulator.Simulator[true])
+																   , "Track.Type", "Circuit")
 
-				if (trackType != "Circuit")
-					this.startupTrackAutomation()
+					if (trackType != "Circuit")
+						this.startupTrackAutomation()
+				}
 			}
+
+			this.updateActions(kSessionFinished)
 		}
 	}
 
@@ -390,6 +455,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 
 			if this.Simulator
 				this.Simulator.resetTrackAutomation()
+
+			this.updateActions(kSessionFinished)
 		}
 	}
 
@@ -669,7 +736,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 		if (this.RaceAssistant && this.Simulator) {
 			trackType := getMultiMapValue(settings, "Simulator." . SessionDatabase.getSimulatorName(this.Simulator.Simulator[true]), "Track.Type", "Circuit")
 
-			if (trackType != "Circuit")
+			if ((trackType != "Circuit") && this.TrackMappingEnabled)
 				this.startupTrackMapper(trackType)
 		}
 	}
@@ -695,7 +762,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 
 		super.addLap(lap, running, data)
 
-		if (this.RaceAssistant && this.Simulator && (trackType = "Circuit"))
+		if (this.RaceAssistant && this.Simulator && (trackType = "Circuit") && this.TrackMappingEnabled)
 			this.startupTrackMapper(trackType)
 	}
 
@@ -720,6 +787,36 @@ initializeRaceSpotterPlugin() {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Controller Action Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+enableTrackMapping() {
+	local controller := SimulatorController.Instance
+	local plugin := controller.findPlugin(kRaceSpotterPlugin)
+
+	protectionOn()
+
+	try {
+		if (plugin && controller.isActive(plugin))
+			plugin.enableTrackMapping()
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+disableTrackMapping() {
+	local controller := SimulatorController.Instance
+	local plugin := controller.findPlugin(kRaceSpotterPlugin)
+
+	protectionOn()
+
+	try {
+		if (plugin && controller.isActive(plugin))
+			plugin.disableTrackMapping()
+	}
+	finally {
+		protectionOff()
+	}
+}
 
 enableTrackAutomation() {
 	local controller := SimulatorController.Instance

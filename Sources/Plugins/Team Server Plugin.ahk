@@ -599,6 +599,8 @@ class TeamServerPlugin extends ControllerPlugin {
 			this.updateActions(kSessionFinished)
 
 			this.updateTrayLabel(label, true)
+
+			this.updateActions(kSessionFinished)
 		}
 	}
 
@@ -618,6 +620,8 @@ class TeamServerPlugin extends ControllerPlugin {
 			this.updateActions(kSessionFinished)
 
 			this.updateTrayLabel(label, false)
+
+			this.updateActions(kSessionFinished)
 		}
 	}
 
@@ -1550,7 +1554,7 @@ class TeamServerPlugin extends ControllerPlugin {
 														   , driverName(this.DriverForName[true]
 																	  , this.DriverSurName[true]
 																	  , this.DriverNickName[true])
-														   , "Driver", this.Session)
+														   , "Driver", this.Session ? this.Session : "")
 
 					this.State["ServerURL"] := this.ServerURL
 					this.State["SessionToken"] := this.ServerToken

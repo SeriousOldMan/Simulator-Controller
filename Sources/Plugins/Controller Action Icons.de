@@ -679,6 +679,7 @@ Reject.Activate=
 Mute.Activate=
 Unmute.Activate=
 RaceAssistant.Toggle=
+TrackMapping.Toggle=
 TrackAutomation.Toggle=
 Time.Activate=
 Position.Activate=

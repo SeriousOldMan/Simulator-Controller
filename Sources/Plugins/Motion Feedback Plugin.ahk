@@ -671,12 +671,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 		isRunning := this.Application.isRunning()
 
-		action := this.findAction(this.getLabel(ConfigurationItem.descriptor("Motion", "Toggle"), "Motion"))
-
-		if action {
-			action.Function.setLabel(this.actionLabel(action), isRunning ? (action.Active ? "Green" : "Black") : "Silver")
-			action.Function.setIcon(this.actionIcon(action), isRunning ? (action.Active ? "Activated" : "Deactivated") : "Disabled")
-		}
+		this.updateActions()
 
 		if !this.iUpdateMotionStateTask {
 			this.iUpdateMotionStateTask := PeriodicTask(ObjBindMethod(this, "updateMotionState"), 30000, kLowPriority)
@@ -693,6 +688,16 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		}
 
 		super.deactivate()
+	}
+
+	updateActions() {
+		local action := this.findAction(this.getLabel(ConfigurationItem.descriptor("Motion", "Toggle"), "Motion"))
+		local isRunning := this.Application.isRunning()
+
+		if action {
+			action.Function.setLabel(this.actionLabel(action), isRunning ? (action.Active ? "Green" : "Black") : "Silver")
+			action.Function.setIcon(this.actionIcon(action), isRunning ? (action.Active ? "Activated" : "Deactivated") : "Disabled")
+		}
 	}
 
 	actionLabel(action) {
@@ -1072,16 +1077,15 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 			this.updateTrayLabel(label, this.MotionActive)
 
-			action.Function.setLabel(label, "Green")
+			this.updateActions()
 		}
 	}
 
 	stopMotion(label := false, force := false, stop := true) {
-		local actionLabel, action, wasHidden, motionMode
+		local actionLabel, wasHidden, motionMode
 
 		if (this.MotionActive || force) {
 			actionLabel := this.getLabel(ConfigurationItem.descriptor("Motion", "Toggle"), "Motion")
-			action := this.findAction(actionLabel)
 
 			if !label
 				label := actionLabel
@@ -1127,8 +1131,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 			this.updateTrayLabel(label, this.MotionActive)
 
-			if action
-				action.Function.setLabel(label, "Gray")
+			this.updateActions()
 		}
 	}
 

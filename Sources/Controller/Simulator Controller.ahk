@@ -1417,6 +1417,9 @@ class ControllerFunction {
 
 		this.Label := text
 
+		if InStr(text, "Kartogr") && color = "Black"
+			MsgBox "Here"
+
 		for ignore, fnController in this.Controller.FunctionController
 			if fnController.hasFunction(this)
 				fnController.setControlLabel(this, text, color, overlay)

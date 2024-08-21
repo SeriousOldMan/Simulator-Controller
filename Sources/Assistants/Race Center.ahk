@@ -2642,7 +2642,7 @@ class RaceCenter extends ConfigurationItem {
 
 				this.loadTeams()
 
-				connection := this.Connector.Connect(this.ServerToken, SessionDatabase.ID, SessionDatabase.getUserName(), "Internal", this.SelectedSession[true])
+				connection := this.Connector.Connect(this.ServerToken, SessionDatabase.ID, SessionDatabase.getUserName(), "Internal", this.SelectedSession[false])
 
 				if connection {
 					this.iConnection := connection
@@ -2709,7 +2709,7 @@ class RaceCenter extends ConfigurationItem {
 		}
 		catch Any as exception {
 			try
-				this.iConnection := this.Connector.Connect(this.ServerToken, SessionDatabase.ID, SessionDatabase.getUserName(), "Internal", this.SelectedSession[true])
+				this.iConnection := this.Connector.Connect(this.ServerToken, SessionDatabase.ID, SessionDatabase.getUserName(), "Internal", this.SelectedSession[false])
 		}
 	}
 

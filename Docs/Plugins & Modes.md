@@ -459,6 +459,7 @@ The "Race Spotter" plugin handles the interaction of the currently active simula
 	raceAssistantConversationBooster: *conversationBooster*;
 	raceAssistantAgentBooster: *agentBooster*;
 	raceAssistentMuted: true | false;
+	trackMapping: [*initialState*] *onOffFunction*;
 	trackAutomation: [*initialState*] *onOffFunction*
 	
 For Elisa to be generally available, you must supply an argument for the *raceAssistantName* parameter, for example "Elias". You can define a function on your hardware controller with the parameter *raceAssistant*, to enable or disable the Virtual Race Spotter dynamically. The *onOffFunction* may be ommited, if you only want to enable or disable the Assistant for all your sessions. The also optional *initialState* must be either "On" or "Off" (default is "On") and for *onOffFunction* unary and binary functions are supported. The function will be bound to a plugin action.
@@ -475,7 +476,7 @@ With *raceAssistantSpeaker* and *raceAssistantListener* you can customize the na
 
 All Race Assistants can be temporarily instructed with a couple of voice commands to be quite. If you want Elisa to start muted, you can request that by supplying *true* for the *raceAssistantMuted* parameter. If you want Elisa to become active again later on, you can request this using the voice command "You can talk again." or the "Unmute" trigger below.
 
-With *trackAutomation* you can supply a function to enable or disable [location dependend actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-automations) for your current session. The *onOffFunction* may be ommited, if you only want to enable or disable location dependend actions for all your sessions. The also optional *initialState* must be either "On" or "Off" (default is "Off") and for *onOffFunction* unary and binary functions are supported. The function will be bound to a plugin action.
+With *trackAutomation* you can supply a function to enable or disable [location dependend actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-automations) for your current session. The *onOffFunction* may be ommited, if you only want to enable or disable location dependend actions for all your sessions. The also optional *initialState* must be either "On" or "Off" (default is "Off") and for *onOffFunction* unary and binary functions are supported. The function will be bound to a plugin action. Very similar is the parameter *trackMapping* which lets you enable or disable track mapping. Default is *On* here. Using a controller function to manually handle this might be very useful when mapping non-closed tracks like Rally stages or hill climb tracks.
 
 Similar as for Cato, you can use the following parameters to trigger some of Elisas service without using voice commands:
 

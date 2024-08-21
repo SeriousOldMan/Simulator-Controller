@@ -907,7 +907,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 					}
 				}
 			}
-					
+
 			this.iRaceAssistantAgentBooster := this.getArgumentValue("raceAssistantAgentBooster", false)
 
 			this.iRaceAssistantMuted := this.getArgumentValue("raceAssistantMuted", false)
@@ -1245,8 +1245,10 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	}
 
 	static prepareAssistantsSession(data, count) {
-		local first := true
 		local ignore, assistant, settings
+
+		if !RaceAssistantPlugin.Simulator.hasPrepared(settings, data, count)
+			RaceAssistantPlugin.Simulator.prepareSession(settings, data)
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if assistant.requireRaceAssistant() {
@@ -1254,13 +1256,6 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 				if !assistant.hasPrepared(settings, data, count)
 					assistant.prepareSession(settings, data)
-
-				if first {
-					first := false
-
-					if !RaceAssistantPlugin.Simulator.hasPrepared(settings, data, count)
-						RaceAssistantPlugin.Simulator.prepareSession(settings, data)
-				}
 			}
 	}
 
@@ -1787,6 +1782,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 				this.updateTrayLabel(label, true)
 			}
+
+			this.updateActions(kSessionFinished)
 		}
 	}
 
@@ -1810,6 +1807,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 					return
 
 			RaceAssistantPlugin.finishAssistantsSession()
+
+			this.updateActions(kSessionFinished)
 		}
 	}
 

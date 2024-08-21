@@ -195,7 +195,7 @@ namespace TeamServer {
 		{
 			string connection;
 				
-			if (session != "")
+			if ((session != "") && (session.Trim() != "0"))
                 connection = Get("login/connect/session", new Parameters() { { "token", token },
 																			 { "client", client }, { "name", name },
 																			 { "type", type }, { "session", session } });

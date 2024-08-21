@@ -2608,7 +2608,7 @@ class RaceCenter extends ConfigurationItem {
 
 		connectAsync(silent) {
 			local window := this.Window
-			local token, connection, serverURLs, settings, chosen
+			local token, connection, identifier, serverURLs, settings, chosen
 
 			if (!silent && GetKeyState("Ctrl")) {
 				window.Block()
@@ -2642,7 +2642,12 @@ class RaceCenter extends ConfigurationItem {
 
 				this.loadTeams()
 
-				connection := this.Connector.Connect(this.ServerToken, SessionDatabase.ID, SessionDatabase.getUserName(), "Internal", this.SelectedSession[false])
+				identifier := this.SelectedSession[true]
+
+				if !identifier
+					identifier := ""
+
+				connection := this.Connector.Connect(this.ServerToken, SessionDatabase.ID, SessionDatabase.getUserName(), "Internal", identifier)
 
 				if connection {
 					this.iConnection := connection
@@ -2702,14 +2707,21 @@ class RaceCenter extends ConfigurationItem {
 
 	keepAlive() {
 		local connection := this.Connection
+		local identifier
 
 		try {
 			if (connection && !this.Connector.KeepAlive(connection))
 				throw "Detected dead connection..."
 		}
 		catch Any as exception {
-			try
-				this.iConnection := this.Connector.Connect(this.ServerToken, SessionDatabase.ID, SessionDatabase.getUserName(), "Internal", this.SelectedSession[false])
+			try {
+				identifier := this.SelectedSession[true]
+
+				if !identifier
+					identifier := ""
+
+				this.iConnection := this.Connector.Connect(this.ServerToken, SessionDatabase.ID, SessionDatabase.getUserName(), "Internal", identifier)
+			}
 		}
 	}
 

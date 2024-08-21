@@ -249,6 +249,10 @@ Track maps are used by the "Race Center" which provide a [live view](https://git
 
 The track mapper can handle closed tracks, like a typical race circuit, but it can also handle open tracks, for example a Rallye stage. You must specify a track type ("Rally", "Hill" or "Street") in the "Session Database" for each track that is not a typical "Circuit" (which is the default). After a non-closed track has been mapped, track automations can be used on this track very much like for closed tracks. You can use, for example, the "Speak" action to create some pace notes on a Rally track. A track automation for a non-closed track will be started right away, in contrast to track automations for closed tracks which will be started after the end of the first lap.
 
+Here is an example, the famous Trento - Bondone hill climb:
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Track%20Map%202.png)
+
 Mapping non-closed tracks can be a little bit tricky, because the starting procedure can vary between simulators and even between track types. Normally, the mapping will start when the car moves for the first time and will stop when the car stops again. But this can be wrong, if you have to move to the starting spot when preparing for the stage. Therefore, you can disable / enable track mapping by using a controller function or by using the tray menu of Simulator Controller.
 
 Please note, that all this is only supported for simulators which can handle non-closed tracks.

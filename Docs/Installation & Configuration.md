@@ -469,7 +469,7 @@ Note: The handling of voice hotkeys follow the general rules of voice commands. 
 
 An action is simply a textual representation of a call to a function in the scripting language. It simply looks like this: "setMode(Pedal Vibration)", which means, that the "Pedal Vibration" mode should be selected as the active layer for your hardware controller. You can provide zero or more arguments to the function call. All arguments will be passed as strings to the function with the exception of *true* and *false*, which will be passed as literal values (1 and 0).
 
-Although you may call any globally defined function, you should use only the following functions for your actions, since they are specially prepared to be called from an external source:
+Although you may call any globally defined function, you should use only the following functions for your actions, since they are specially prepared to be called from an external source. Many of these functions are particular useful in combination with a [*Conversation* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#conversation-booster).
 
 | Function | Parameter(s) | Plugin | Description |
 | ------ | ------ | ------ | ------ |
@@ -526,6 +526,8 @@ Although you may call any globally defined function, you should use only the fol
 | openRaceCenter | - | Race Engineer, Race Strategist, Team Server | Opens the "Race Center" tool, with which you can analyze the telemetry data of a running team session, plan and control pitstops and change race strategy on the fly. |
 | enableRaceAssistant | name | Race Engineer, Race Strategist, Race Spotter | Enables the Race Assistant with the given *name*, which must be one of : Race Engineer, Race Strategist or Race Spotter. |
 | disableRaceAssistant | name | Race Engineer, Race Strategist, Race Spotter | Disables the Race Assistant with the given *name*, which must be one of : Race Engineer, Race Strategist or Race Spotter. |
+| enableTrackMapping | - | Race Spotter | Enables track mapping. If the track is not a circuit, track mapping will start immediately, otherwise it will start at the beginning of the next lap. |
+| disableTrackMapping | - | Race Spotter | Disables track mapping. If the track track scanner has been active, a track map will be created in the next step. |
 | enableTrackAutomation | - | Race Spotter | Enables the track automation. Can be called anytime, the automation will be activated at the beginning of the next lap. |
 | disableTrackAutomation | - | Race Spotter | Disables the track automation. No further actions will be executed. |
 | selectTrackAutomation | [Optional] name | Race Spotter | Selects one of the configured track automations by its *name* and loads it. If *name* is omitted, the automation marked as the active one, will be loaded. If track automation is currently enabled, the execution of actions will start with the next lap. |

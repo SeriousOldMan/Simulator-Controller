@@ -1,8 +1,8 @@
 [Development]
-Version=5.8.4.0-alpha
+Version=5.8.4.0-beta
 Target=5.8.4.0-release
 Date=08/22/2024
-Download=https://www.dropbox.com/scl/fi/1eqd5u49n5zkqzuc535el/Simulator-Controller-5.8.4.0-alpha.zip?rlkey=k4bunsuc8gk7bm2enfrbwbuh7&st=d9uod4j5&dl=1
+Download=https://www.dropbox.com/scl/fi/79zmf45kjz7r51zog9sxw/Simulator-Controller-5.8.4.0-beta.zip?rlkey=5wrck456l967h6v3lkmxfdefj&st=cilyevlf&dl=1
 Changes="Strategy Workbench" remembers chart settings, Track mapping and track automations for open tracks, Changed unblock modifiers in "Simulator Startup", New LLM event for the Spotter, New controller action "TrackMapping" for Race Spotter, New icon for "TrackMapping" controller action, New "trackMapping" parameter for the "Race Spotter" plugin, New controller action functions "enableTrackMapping" and "disableTrackMapping", New LLM actions for the Conversation booster of the Race Spotter
 Components=Media->5.6.1,Configuration->5.8.4,Utilities->5.4.8
 [Release]
@@ -15,9 +15,6 @@ Components=Media->5.6.1,Configuration->5.8.3,Utilities->5.4.8
 Media.5.6.1.Path=Resources
 Media.5.6.1.Content=Splash Media
 Media.5.6.1.Download=https://www.dropbox.com/scl/fi/3c56fjdvdd4od5t7rsuc9/Media-5.6.1.zip?rlkey=x0icl05jy05nn886due4dsblv&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Media+5.6.1.zip
-Configuration.5.8.2.Path=Resources
-Configuration.5.8.2.Content=Setup
-Configuration.5.8.2.Download=https://www.dropbox.com/scl/fi/2t29pj1thb9lxgpek54bt/Configuration-5.8.2.zip?rlkey=apix2huy4bl2lrdbywdxao6zu&st=q8l8uxzw&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+5.8.2.zip
 Configuration.5.8.3.Path=Resources
 Configuration.5.8.3.Content=Setup
 Configuration.5.8.3.Download=https://www.dropbox.com/scl/fi/0kggprnyrmsrtvru2xahl/Configuration-5.8.3.zip?rlkey=7n4dhdl2ccwpbgyduxua6523o&st=q67tdw4j&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+5.8.3.zip
@@ -30,5 +27,5 @@ Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Ut
 [Current]
 Type=Development
 [Version]
-Development=5.8.4.0-alpha
+Development=5.8.4.0-beta
 Release=5.8.3.2-release

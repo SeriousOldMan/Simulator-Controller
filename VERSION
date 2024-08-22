@@ -3,7 +3,7 @@ Version=5.8.4.0-release
 Target=5.8.4.0-release
 Date=08/23/2024
 Download=https://cutt.ly/VenfCYnA;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.8.4.0-release.zip
-Changes="Strategy Workbench" remembers chart settings, Track mapping and track automations for open tracks, Changed unblock modifiers in "Simulator Startup", New LLM events for the Spotter, New controller action "TrackMapping" for Race Spotter, New icon for "TrackMapping" controller action, New "trackMapping" parameter for the "Race Spotter" plugin, New controller action functions "enableTrackMapping" and "disableTrackMapping", New LLM actions for the Conversation booster of the Race Spotter
+Changes="Strategy Workbench" remembers chart settings, Track mapping and track automations for open tracks, Changed unblock modifiers in "Simulator Startup", New LLM events for the Spotter, New controller action "TrackMapping" for Race Spotter, New icon for "TrackMapping" controller action, New "trackMapping" parameter for the "Race Spotter" plugin, New controller action functions "enableTrackMapping" and "disableTrackMapping", New LLM actions for the Conversation booster of the Race Spotter, Track mapping function in Startup Profiles
 Components=Media->5.6.1,Configuration->5.8.4,Utilities->5.4.8
 [Release]
 Version=5.8.4.0-release

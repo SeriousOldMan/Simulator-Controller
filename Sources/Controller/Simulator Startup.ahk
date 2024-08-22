@@ -1018,8 +1018,10 @@ availableFunctions(configuration, &hasTeamServer := false
 		functions.Push(Array("Driving Coach", "Handling Analysis"))
 	}
 
-	if hasRaceSpotter
+	if hasRaceSpotter {
+		functions.Push(Array("Race Spotter", "Track Mapping"))
 		functions.Push(Array("Race Spotter", "Track Automation"))
+	}
 
 	if hasRaceStrategist {
 		functions.Push(Array("Race Strategist", "Telemetry Collection"))

@@ -651,6 +651,8 @@ Beside the predefined actions for the different Assistant, which come with the s
 |--------------------------|--------------|--------------|-----------|--------------------------|
 | Reset Deltas             | -            | Yes | No | "Can you reset the delta information for all cars?" |
 | Reset Accident Detection | -            | Yes | No | "There are false positives for accidents and slow cars on the track. Please correct that." |
+| Start Track Mapping      | -            | Yes | No | "Can you start the track mapping?" |
+| Stop Track Mapping       | -            | Yes | No | "Please stop mapping the track." |
 
 #### Events
 

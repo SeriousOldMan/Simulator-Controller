@@ -2497,12 +2497,12 @@ class RaceCenter extends ConfigurationItem {
 
 			menu1.Add()
 
-			menu1.Add(translate("Race Summary" . translate("...")), (*) => this.chooseSessionMenu(3))
-			menu1.Add(translate("Driver Statistics" . translate("...")), (*) => this.chooseSessionMenu(4))
+			menu1.Add(translate("Session Summary") . translate("..."), (*) => this.chooseSessionMenu(3))
+			menu1.Add(translate("Driver Statistics") . translate("..."), (*) => this.chooseSessionMenu(4))
 
 			menu1.Add()
 
-			menu1.Add(translate("Session Information" . translate("...")), (*) => this.chooseSessionMenu(5))
+			menu1.Add(translate("Session Information") . translate("..."), (*) => this.chooseSessionMenu(5))
 
 			menu2 := Menu()
 
@@ -2520,8 +2520,8 @@ class RaceCenter extends ConfigurationItem {
 
 			menu2.Add()
 
-			menu2.Add(translate("Setups Summary" . translate("...")), (*) => this.choosePitstopMenu(7))
-			menu2.Add(translate("Pitstops Summary" . translate("...")), (*) => this.choosePitstopMenu(8))
+			menu2.Add(translate("Setups Summary") . translate("..."), (*) => this.choosePitstopMenu(7))
+			menu2.Add(translate("Pitstops Summary") . translate("..."), (*) => this.choosePitstopMenu(8))
 
 			menu2.Add()
 
@@ -3295,7 +3295,7 @@ class RaceCenter extends ConfigurationItem {
 
 		if (this.Mode = "Normal") {
 			this.Control["sessionMenuDropDown"].Delete()
-			this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", "Connect", "Clear...", "---------------------------------------------", synchronize, "---------------------------------------------", "Select Team...", "---------------------------------------------", "Load Session...", "Save Session...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], translate))
+			this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", "Connect", "Clear...", "---------------------------------------------", synchronize, "---------------------------------------------", "Select Team...", "---------------------------------------------", "Load Session...", "Save Session...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Session Summary", "Driver Statistics"], translate))
 
 			this.Control["sessionMenuDropDown"].Choose(1)
 		}
@@ -12791,7 +12791,7 @@ class RaceCenter extends ConfigurationItem {
 
 	showSessionSummary(viewer := GetKeyState("Ctrl")) {
 		local telemetryDB := this.TelemetryDatabase
-		local html := ("<div id=`"header`"><b>" . translate("Race Summary") . "</b></div>")
+		local html := ("<div id=`"header`"><b>" . translate("Session Summary") . "</b></div>")
 		local stints := []
 		local drivers := []
 		local laps := []
@@ -12896,7 +12896,7 @@ class RaceCenter extends ConfigurationItem {
 
 		html .= "</table>"
 
-		html .= ("<br><br><div id=`"header`"><i>" . translate("Race Summary") . "</i></div>")
+		html .= ("<br><br><div id=`"header`"><i>" . translate("Session Summary") . "</i></div>")
 
 		laps := []
 		positions := []
@@ -12921,7 +12921,7 @@ class RaceCenter extends ConfigurationItem {
 
 		html .= ("<br><br><div id=`"chart_1`" style=`"width: " . width . "px; height: 248px`"></div>")
 
-		this.showDetails("Session", (!viewer && (this.Mode = "Normal")) ? false : translate("Race Summary"), html, [1, chart1])
+		this.showDetails("Session", (!viewer && (this.Mode = "Normal")) ? false : translate("Session Summary"), html, [1, chart1])
 	}
 
 	showPlanDetails(viewer := GetKeyState("Ctrl")) {

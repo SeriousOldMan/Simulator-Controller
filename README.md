@@ -37,22 +37,19 @@ Here is a short video which shows how to configure Simulator Controller for the 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[5.8.3.2-release](https://cutt.ly/cevAFRtT) (Changes: Several UI changes (new Add/Delete/Save buttons, field size changes, and so on), Updates for the French translation, Saved sessions can no longer be exported to the session database in "Practice Center", Improved resilience of rule engine against defective foreign functions.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-5832) of this version and all the versions you might have skipped, before installing and using this version.
-
-##### Earlier release builds
-
-[5.8.3.1-release](https://cutt.ly/0echJ07w) (Changes: New session browser for "Practice Center" and "Race Center", Optimized window position handling and memorization, New race strategy browser, Open sessions and strategies from the "Session Database", Introduced multiple methods to read the broadcasting.json file in ACC, New "Race Center Lite", Open reports in separate window in "Race Center" with Control key modifier, Open reports in separate window in "Race Center" by double-clicking, New events "ahead_gap_update", "behind_gap_update" and "attack_imminent" for the Race Spotter LLM integration.)
-
-[5.8.2.0-release](https://cutt.ly/4ezxuMiI) (Changes: New LLM Runtime, LLM Runtime is now a downloadable preset, New race setting for track types, More detailed lap history for LLMs, New time loss event for the Engineer, New time loss reporting action for Race Engineer, Removed old-fashioned directory selection dialog, Both "Race Center" and "Practice Center" save their sessions to the session database per default, "Practice Center" now supports an auto-save to the session database, Support for practice and race sessions added to "Session Database", Support for import of car setups in "Session Database", Synchronization of sessions in the session database.)
-
-#### Latest development build
-
-[5.8.4.0-beta](https://www.dropbox.com/scl/fi/79zmf45kjz7r51zog9sxw/Simulator-Controller-5.8.4.0-beta.zip?rlkey=5wrck456l967h6v3lkmxfdefj&st=cilyevlf&dl=1) (Test build for 5.8.4. Changes: "Strategy Workbench" remembers chart settings, Track mapping and track automations for open tracks, Changed unblock modifiers in "Simulator Startup", New LLM events for the Spotter, New controller action "TrackMapping" for Race Spotter, New icon for "TrackMapping" controller action, New "trackMapping" parameter for the "Race Spotter" plugin, New controller action functions "enableTrackMapping" and "disableTrackMapping", New LLM actions for the *Conversation* booster of the Race Spotter.)
+[5.8.4.0-release](https://cutt.ly/VenfCYnA) (Changes: "Strategy Workbench" remembers chart settings, Track mapping and track automations for open tracks, Changed unblock modifiers in "Simulator Startup", New LLM events for the Spotter, New controller action "TrackMapping" for Race Spotter, New icon for "TrackMapping" controller action, New "trackMapping" parameter for the "Race Spotter" plugin, New controller action functions "enableTrackMapping" and "disableTrackMapping", New LLM actions for the *Conversation* booster of the Race Spotter.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-584) of this version and all the versions you might have skipped, before installing and using this version.
 
+##### Earlier release builds
+
+[5.8.3.2-release](https://cutt.ly/cevAFRtT) (Changes: Several UI changes (new Add/Delete/Save buttons, field size changes, and so on), Updates for the French translation, Saved sessions can no longer be exported to the session database in "Practice Center", Improved resilience of rule engine against defective foreign functions.)
+
+[5.8.3.1-release](https://cutt.ly/0echJ07w) (Changes: New session browser for "Practice Center" and "Race Center", Optimized window position handling and memorization, New race strategy browser, Open sessions and strategies from the "Session Database", Introduced multiple methods to read the broadcasting.json file in ACC, New "Race Center Lite", Open reports in separate window in "Race Center" with Control key modifier, Open reports in separate window in "Race Center" by double-clicking, New events "ahead_gap_update", "behind_gap_update" and "attack_imminent" for the Race Spotter LLM integration.)
+
+#### Latest development build
+
+None for the moment...
 
 ### Documentation
 

@@ -66,7 +66,19 @@ class AttackImminentEvent extends SpotterEvent {
 
 class BlueFlagAlertEvent extends SpotterEvent {
 	createTrigger(event, phrase, arguments) {
-		return ("The blue flag is shown, because an opponent is closing in who is at least one lap ahead.")
+		return "The blue flag is shown, because an opponent is closing in who is at least one lap ahead."
+	}
+}
+
+class LastLapEvent extends SpotterEvent {
+	createTrigger(event, phrase, arguments) {
+		return "The car is on the last lap of the session."
+	}
+}
+
+class SessionOverEvent extends SpotterEvent {
+	createTrigger(event, phrase, arguments) {
+		return "The car has seen the checkered flag and the session is over."
 	}
 }
 
@@ -1597,6 +1609,8 @@ class RaceSpotter extends GridRaceAssistant {
 
 				if !this.SessionInfos.Has(situation) {
 					this.SessionInfos[situation] := true
+
+					this.handleEvent("LastLap")
 
 					if (knowledgeBase.getValue("Session.Format") = "Time") {
 						if (this.getPosition() = 1) {
@@ -3515,6 +3529,9 @@ class RaceSpotter extends GridRaceAssistant {
 
 		if (lastPitstop && (Abs(lapNumber - lastPitstop) <= 2))
 			this.initializeHistory(false)
+
+		if this.SessionInfos.Has("LastLap")
+			this.handleEvent("SessionOver")
 
 		if this.Speaker[false]
 			if (!this.Announcements["PenaltyInformation"] || !this.penaltyInformation(lapNumber, getMultiMapValue(data, "Stint Data", "Sector", 0), lastPenalty))

@@ -1,0 +1,3 @@
+; Will raise an event when a pitstop is being performed.
+
+priority: -10, [?Pitstop.Lap] => (Call: Assistant.Raise(PitstopPerformed, !Pitstop.Last, ?Pitstop.Lap))

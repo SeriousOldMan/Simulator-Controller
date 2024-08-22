@@ -8,11 +8,13 @@
   7. Automatic track mapping can now be enabled or disabled from the Tray menu of the "Simulator Controller" background process. Default is "On" as before, but this is helpful, if the starting procedure of a non-circuit track requires to roll forward into the starting box.
      - New controller action ["TrackMapping"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) for the Race Spotter plugin, which toggles the track mapping on / off.
 	 - New [controller action functions *enableTrackMapping* and *disableTrackMapping*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions), which can be used to automate the track mapping.
+	 - The *Conversation* booster for the Race Spotter supports starting and stopping the track mapper by voice command (see below).
 	 - New icon in the Stream Deck icon set for the "TrackMapping" action.
   8. The key combination to request an unblocking of all executables in "Simulator Startup" has changed from Ctrl-Shift to Ctrl-Alt.
   9. A new LLM event has been defined for the *Reasoning* booster of the Race Spotter. "blue_flag_alert" will be signalled, once a faster car appears in the mirror, that is at least one lap ahead. Revisit your event configuration, include the new events and define actions (for example flash a red light in your dashboard using SimHub, for example), if necessary.
-  10. Vulkan driver support for non-Nvidia GPUs has been added to the local LLM Runtime. Please take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-584) for more information, since a conflict with CUDA drivers on Nvidia GPUs is possible.
-  11. Several updates for the Spanish translation.
+  10. Two new [*Conversation* booster actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-spotter) have been defined, that can start and stop the track mapping by voice command.
+  11. Vulkan driver support for non-Nvidia GPUs has been added to the local LLM Runtime. Please take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-584) for more information, since a conflict with CUDA drivers on Nvidia GPUs is possible.
+  12. Several updates for the Spanish translation.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-584), if you are using Assistant Boosters or the local LLM Runtime.
 

@@ -1,5 +1,7 @@
 [Conversation.Actions]
-Active=reset_deltas,reset_accident_detection
+Active=reset_deltas,reset_accident_detection,start_track_mapping,stop_track_mapping
 [Conversation.Actions.Builtin]
 reset_deltas=Assistant.Method|resetDeltasAction|true|false|0|Reset the lap times, sector times and delta history for all cars on the track.
 reset_accident_detection=Assistant.Rule|Race Spotter.reset_accident_detection.rules|true|false|0|Resets the accident and slow car detection by clearing and recalculating the reference speeds around the track.
+start_track_mapping=Controller.Function|enableTrackMapping|false|true|0|Start the track recorder and create a map of the track.
+stop_track_mapping=Controller.Function|disableTrackMapping|false|true|0|Finish mapping the track and stop the track recorder.

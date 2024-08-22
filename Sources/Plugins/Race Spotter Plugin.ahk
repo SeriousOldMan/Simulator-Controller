@@ -701,11 +701,12 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 			pid := this.iMapperPID
 
 			if (force || pid) {
-				ProcessClose(pid)
+				if pid
+					ProcessClose(pid)
 
 				Sleep(500)
 
-				if (force && ProcessExist(pid)) {
+				if (force && (!pid || ProcessExist(pid))) {
 					processName := (SessionDatabase().getSimulatorCode(this.Simulator.Simulator[true]) . " SHM Spotter.exe")
 
 					tries := 5

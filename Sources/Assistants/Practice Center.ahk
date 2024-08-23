@@ -1672,7 +1672,7 @@ class PracticeCenter extends ConfigurationItem {
 			this.loadTrack(track)
 	}
 
-	show(initialize := true) {
+	show(initialize := true, clear := true) {
 		local window := this.Window
 		local x, y, w, h
 
@@ -1686,8 +1686,10 @@ class PracticeCenter extends ConfigurationItem {
 
 		this.startWorking(false)
 
-		this.showDetails(false, false)
-		this.showChart(false)
+		if clear {
+			this.showDetails(false, false)
+			this.showChart(false)
+		}
 
 		if initialize
 			this.initializeSession()
@@ -7713,7 +7715,7 @@ startupPracticeCenter() {
 		if load
 			pCenter.loadSession(load, false)
 
-		pCenter.show(false)
+		pCenter.show(false, !load)
 
 		registerMessageHandler("Practice", methodMessageHandler, pCenter)
 

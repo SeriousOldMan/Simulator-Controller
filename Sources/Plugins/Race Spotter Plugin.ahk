@@ -554,7 +554,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 
 			Sleep(500)
 
-			if (force && ProcessExist(pid)) {
+			if (force && ProcessExist(pid) && this.Simulator) {
 				processName := (SessionDatabase().getSimulatorCode(this.Simulator.Simulator[true]) . " SHM Spotter.exe")
 
 				tries := 5
@@ -706,7 +706,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 
 				Sleep(500)
 
-				if (force && (!pid || ProcessExist(pid))) {
+				if (force && (!pid || ProcessExist(pid)) && this.Simulator) {
 					processName := (SessionDatabase().getSimulatorCode(this.Simulator.Simulator[true]) . " SHM Spotter.exe")
 
 					tries := 5

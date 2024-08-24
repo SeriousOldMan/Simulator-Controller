@@ -1,3 +1,6 @@
+## 5.8.4.1-release 08/24/24
+  1. Fixed a critical bug that caused the Spotter to get silent after the first lap.
+  
 ## 5.8.4.0-release 08/23/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

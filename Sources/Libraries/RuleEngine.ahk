@@ -779,8 +779,6 @@ class CallAction extends Action {
 		else
 			function := this.Function[facts]
 
-		function := StrReplace(function, ".", "_")
-
 		arguments := []
 
 		for ignore, argument in this.Arguments
@@ -793,9 +791,11 @@ class CallAction extends Action {
 			knowledgeBase.RuleEngine.trace(kTraceMedium, "Call " . function . "(" . values2String(", ", arguments*) . ")")
 
 		try {
-			%function%(knowledgeBase, arguments*)
+			%StrReplace(function, ".", "_")%(knowledgeBase, arguments*)
 		}
 		catch Any as exception {
+			logMessage(kLogCritical, "Error while calling function " . function . "...")
+
 			logError(exception, true)
 		}
 	}
@@ -2467,7 +2467,7 @@ class CallChoicePoint extends ChoicePoint {
 
 	foreignCall() {
 		local resultSet := this.ResultSet
-		local function, values, builtin, index, theTerm, value, newValues
+		local function, values, builtin, index, theTerm, value, newValues, callable
 
 		values := []
 		builtin := false
@@ -2502,13 +2502,15 @@ class CallChoicePoint extends ChoicePoint {
 
 		try {
 			if builtin
-				function := kBuiltinFunctions[inList(kBuiltinFunctors, function)]
+				callable := kBuiltinFunctions[inList(kBuiltinFunctors, function)]
 			else
-				function := %StrReplace(function, ".", "_")%
+				callable := %StrReplace(function, ".", "_")%
 
-			return function.Call(this, values*)
+			return callable.Call(this, values*)
 		}
 		catch Any as exception {
+			logMessage(kLogCritical, "Error while calling function " . function . "...")
+
 			logError(exception, true)
 
 			return false
@@ -2537,6 +2539,8 @@ class CallChoicePoint extends ChoicePoint {
 			return kBuiltinFunctions[inList(kBuiltinFunctors, function)].Call(this, values*)
 		}
 		catch Any as exception {
+			logMessage(kLogCritical, "Error while calling function " . function . "...")
+
 			logError(exception, true)
 
 			return false
@@ -5011,6 +5015,8 @@ builtin0(choicePoint, function, operand1) {
 		return resultSet.unify(choicePoint, Literal(%function%()), operand1.getValue(resultSet, operand1))
 	}
 	catch Any as exception {
+		logMessage(kLogCritical, "Error while calling function " . function . "...")
+
 		logError(exception, true)
 
 		return false
@@ -5033,6 +5039,8 @@ builtin1(choicePoint, function, operand1, operand2) {
 			return resultSet.unify(choicePoint, Literal(%function%(operand1.toString(resultSet))), operand2)
 		}
 		catch Any as exception {
+			logMessage(kLogCritical, "Error while calling function " . function . "...")
+
 			logError(exception, true)
 
 			return false

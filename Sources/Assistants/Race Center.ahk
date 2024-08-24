@@ -2552,7 +2552,7 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
-	show(initialize := true) {
+	show(initialize := true, clear := true) {
 		local window := this.Window
 		local x, y, w, h
 
@@ -2566,8 +2566,10 @@ class RaceCenter extends ConfigurationItem {
 
 		this.startWorking(false)
 
-		this.showDetails(false)
-		this.showChart(false)
+		if clear {
+			this.showDetails(false)
+			this.showChart(false)
+		}
 
 		if initialize
 			this.initializeSession()
@@ -13675,7 +13677,7 @@ startupRaceCenter() {
 		if load
 			rCenter.loadSession(load, false)
 
-		rCenter.show(false)
+		rCenter.show(false, !load)
 
 		if !load
 			rCenter.connect(true)

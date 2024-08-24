@@ -1672,7 +1672,7 @@ class PracticeCenter extends ConfigurationItem {
 			this.loadTrack(track)
 	}
 
-	show(initialize := true) {
+	show(initialize := true, clear := true) {
 		local window := this.Window
 		local x, y, w, h
 
@@ -1686,8 +1686,10 @@ class PracticeCenter extends ConfigurationItem {
 
 		this.startWorking(false)
 
-		this.showDetails(false, false)
-		this.showChart(false)
+		if clear {
+			this.showDetails(false, false)
+			this.showChart(false)
+		}
 
 		if initialize
 			this.initializeSession()
@@ -2709,9 +2711,9 @@ class PracticeCenter extends ConfigurationItem {
 	}
 
 	updateUsedTyreSets() {
-		local tyreSets := WeakMap()
+		local tyreSets := []
 		local currentRun := this.CurrentRun
-		local ignore, tyreSet, run
+		local ignore, tyreSet, run, lastTyreSet, found
 
 		this.UsedTyreSetsListView.Delete()
 
@@ -2723,7 +2725,31 @@ class PracticeCenter extends ConfigurationItem {
 					if isDebug()
 						logMessage(kLogDebug, "updateUsedTyreSets - Run: " . run.Nr . "; TyreSet: " . run.TyreSet . "; TyreLaps: " . (run.TyreLaps + run.Laps.Length))
 
-					tyreSets[run.Compound . "." . run.TyreSet] := {Nr: run.TyreSet, Compound: run.Compound, Laps: (run.TyreLaps + run.Laps.Length)}
+					found := false
+
+					if (A_Index > 1) {
+						lastTyreSet := tyreSets[tyreSets.Length]
+
+						if (!isNumber(run.TyreSet) && !isNumber(lastTyreSet.Nr) && (run.Compound = lastTyreSet.Compound)
+												   && (lastTyreSet.Laps <= run.TyreLaps)) {
+							lastTyreSet.Laps += run.Laps.Length
+
+							found := true
+						}
+
+						if !found
+							for ignore, lastTyreSet in tyreSets
+								if ((lastTyreSet.Compound = run.Compound) && isNumber(lastTyreSet.Nr) && (lastTyreSet.Nr = run.TyreSet)) {
+									lastTyreSet.Laps += run.Laps.Length
+
+									found := true
+
+									break
+								}
+					}
+
+					if !found
+						tyreSets.Push({Nr: run.TyreSet, Compound: run.Compound, Laps: (run.TyreLaps + run.Laps.Length)})
 				}
 			}
 
@@ -4522,7 +4548,8 @@ class PracticeCenter extends ConfigurationItem {
 
 			newRun := {Nr: run["Nr"], Lap: run["Lap"], Driver: driver, Weather: run["Weather"]
 					 , FuelInitial: run["Fuel.Initial"], FuelConsumption: run["Fuel.Consumption"]
-					 , Compound: compound(run["Tyre.Compound"], run["Tyre.Compound.Color"]), TyreSet: run["Tyre.Set"], TyreLaps: run["Tyre.Laps"]
+					 , Compound: compound(run["Tyre.Compound"], run["Tyre.Compound.Color"])
+					 , TyreSet: run["Tyre.Set"], TyreLaps: run["Tyre.Laps"]
 					 , AvgLapTime: run["Lap.Time.Average"], BestLapTime: run["Lap.Time.Best"]
 					 , Accidents: run["Accidents"], StartPosition: run["Position.Start"], EndPosition: run["Position.End"]
 					 , StartTime: run["Time.Start"], EndTime: run["Time.End"], Notes: decode(run["Notes"])}
@@ -7688,7 +7715,7 @@ startupPracticeCenter() {
 		if load
 			pCenter.loadSession(load, false)
 
-		pCenter.show(false)
+		pCenter.show(false, !load)
 
 		registerMessageHandler("Practice", methodMessageHandler, pCenter)
 

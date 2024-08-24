@@ -351,8 +351,8 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 
 			size_t length = strcspn(name, " ");
 
-			substring((char*)name, forName, 0, length);
-			substring((char*)name, surName, length + 1, strlen((char*)name) - length - 1);
+			substring(name, forName, 0, length);
+			substring(name, surName, length + 1, strlen(name) - length - 1);
 			nickName[0] = forName[0], nickName[1] = surName[0], nickName[2] = '\0';
 
 			printLine(&output, "DriverForname=", forName);

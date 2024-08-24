@@ -1,0 +1,4 @@
+; Disables track mapping by the Race Spotter. If a track is currently scanned,
+; the track map will be created afterwards.
+
+[?%activation%] => (Call: Function.Call(disableTrackMapping)), (Call: Assistant.Speak("Roger"))

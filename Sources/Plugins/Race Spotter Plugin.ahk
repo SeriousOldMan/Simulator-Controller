@@ -544,7 +544,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 
 	shutdownTrackAutomation(force := false, arguments*) {
 		local pid := this.iAutomationPID
-		local processName, tries
+		local tries
 
 		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
 			return false
@@ -554,13 +554,11 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 
 			Sleep(500)
 
-			if (force && ProcessExist(pid) && this.Simulator) {
-				processName := (SessionDatabase().getSimulatorCode(this.Simulator.Simulator[true]) . " SHM Spotter.exe")
-
+			if (force && ProcessExist(pid)) {
 				tries := 5
 
 				while (tries-- > 0) {
-					pid := ProcessExist(processName)
+					pid := ProcessExist(pid)
 
 					if pid {
 						ProcessClose(pid)
@@ -692,7 +690,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 	}
 
 	shutdownTrackMapper(force := false, arguments*) {
-		local pid, processName, tries
+		local pid, tries
 
 		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
 			return false
@@ -700,19 +698,16 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 		if (force || (this.iMapperPID && (this.iMapperPhase = "Collect"))) {
 			pid := this.iMapperPID
 
-			if (force || pid) {
-				if pid
-					ProcessClose(pid)
+			if pid {
+				ProcessClose(pid)
 
 				Sleep(500)
 
-				if (force && (!pid || ProcessExist(pid)) && this.Simulator) {
-					processName := (SessionDatabase().getSimulatorCode(this.Simulator.Simulator[true]) . " SHM Spotter.exe")
-
+				if (force && ProcessExist(pid)) {
 					tries := 5
 
 					while (tries-- > 0) {
-						pid := ProcessExist(processName)
+						pid := ProcessExist(pid)
 
 						if pid {
 							ProcessClose(pid)

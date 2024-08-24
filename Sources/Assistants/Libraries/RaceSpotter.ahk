@@ -3140,7 +3140,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 	shutdownSpotter(force := false, arguments*) {
 		local pid := this.iSpotterPID
-		local processName, tries
+		local tries
 
 		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
 			return false
@@ -3151,12 +3151,10 @@ class RaceSpotter extends GridRaceAssistant {
 			Sleep(500)
 
 			if (force && ProcessExist(pid)) {
-				processName := (this.SettingsDatabase.getSimulatorCode(this.Simulator) . " SHM Spotter.exe")
-
 				tries := 5
 
 				while (tries-- > 0) {
-					pid := ProcessExist(processName)
+					pid := ProcessExist(pid)
 
 					if pid {
 						ProcessClose(pid)

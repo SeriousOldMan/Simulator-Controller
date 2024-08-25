@@ -339,6 +339,66 @@ class PracticeCenter extends ConfigurationItem {
 		}
 	}
 
+	class HTMLWindow extends Window {
+		Close(*) {
+			this.Destroy()
+		}
+	}
+
+	class HTMLResizer extends Window.Resizer {
+		iHTMLViewer := false
+		iRedraw := true
+		iHTML := false
+
+		__New(htmlViewer, html, arguments*) {
+			this.iHTMLViewer := htmlViewer
+			this.iHTML := html
+
+			super.__New(arguments*)
+
+			Task.startTask(ObjBindMethod(this, "RedrawHTMLViewer"), 500, kHighPriority)
+		}
+
+		Resize(deltaWidth, deltaHeight) {
+			this.iRedraw := true
+		}
+
+		RestrictResize(&deltaWidth, &deltaHeight) {
+			if (deltaWidth != 0) {
+				deltaWidth := 0
+
+				return true
+			}
+			else
+				return false
+		}
+
+		RedrawHTMLViewer() {
+			try {
+				if this.iRedraw {
+					local ignore, button
+
+					for ignore, button in ["LButton", "MButton", "RButton"]
+						if GetKeyState(button)
+							return Task.CurrentTask
+
+					this.iRedraw := false
+
+					this.iHTMLViewer.Resized()
+
+					this.iHTMLViewer.document.open()
+					this.iHTMLViewer.document.write(this.iHTML)
+					this.iHTMLViewer.document.close()
+				}
+
+				return Task.CurrentTask
+			}
+			catch Any {
+				return false
+			}
+		}
+	}
+
 	class SessionTelemetryDatabase extends TelemetryDatabase {
 		iPracticeCenter := false
 		iTelemetryDatabase := false
@@ -1207,6 +1267,36 @@ class PracticeCenter extends ConfigurationItem {
 			}
 		}
 
+		openRun(listView, line, *) {
+			local run
+
+			if line {
+				run := center.Runs[listView.GetText(line, 1)]
+
+				if (run.Laps.Length = 0) {
+					listView.Modify(line, "-Select")
+
+					return
+				}
+				else if center.SessionExported
+					listView.Modify(line, "-Check")
+				else if (listView.GetNext(line - 1, "C") = line) {
+					for ignore, lap in run.Laps
+						if ((lap.State = "Valid") && isNumber(lap.LapTime))
+							center.LapsListView.Modify(lap.Row, "Check")
+				}
+				else
+					for ignore, lap in run.Laps
+						center.LapsListView.Modify(lap.Row, "-Check")
+
+				center.withExceptionhandler(ObjBindMethod(center, "showRunDetails", run, true))
+
+				centerGui["runNotesEdit"].Text := run.Notes
+
+				center.updateState()
+			}
+		}
+
 		selectLap(listView, line, selected) {
 			if selected
 				chooseLap(listView, line)
@@ -1228,6 +1318,15 @@ class PracticeCenter extends ConfigurationItem {
 					listView.Modify(line, "-Check")
 
 				center.withExceptionhandler(ObjBindMethod(center, "showLapDetails", center.Laps[listView.GetText(line, 1)]))
+			}
+		}
+
+		openLap(listView, line, *) {
+			if line {
+				if center.SessionExported
+					listView.Modify(line, "-Check")
+
+				center.withExceptionhandler(ObjBindMethod(center, "showLapDetails", center.Laps[listView.GetText(line, 1)], true))
 			}
 		}
 
@@ -1621,7 +1720,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		this.iRunsListView := centerGui.Add("ListView", "x24 ys+33 w577 h175 H:Grow(0.5) Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Driver", "Weather", "Compound", "Set", "Laps", "Initial Fuel", "Consumed Fuel", "Avg. Lap Time", "Accidents", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], translate))
 		this.iRunsListView.OnEvent("Click", chooseRun)
-		this.iRunsListView.OnEvent("DoubleClick", chooseRun)
+		this.iRunsListView.OnEvent("DoubleClick", openRun)
 		this.iRunsListView.OnEvent("ItemSelect", selectRun)
 
 		centerGui.Add("Text", "x24 yp+180 w80 h23 Y:Move(0.5)", translate("Notes"))
@@ -1631,7 +1730,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		this.iLapsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Stint", "Weather", "Grip", "Lap Time", "Sector Times", "Consumption", "Remaining", "Pressures", "Invalid", "Accident"], translate))
 		this.iLapsListView.OnEvent("Click", chooseLap)
-		this.iLapsListView.OnEvent("DoubleClick", chooseLap)
+		this.iLapsListView.OnEvent("DoubleClick", openLap)
 		this.iLapsListView.OnEvent("ItemSelect", selectLap)
 		this.iLapsListView.OnEvent("ItemCheck", checkLap)
 
@@ -1687,7 +1786,7 @@ class PracticeCenter extends ConfigurationItem {
 		this.startWorking(false)
 
 		if clear {
-			this.showDetails(false, false)
+			this.showDetails(false)
 			this.showChart(false)
 		}
 
@@ -2646,7 +2745,7 @@ class PracticeCenter extends ConfigurationItem {
 		this.iSelectedRun := false
 
 		this.showChart(false)
-		this.showDetails(false, false)
+		this.showDetails(false)
 	}
 
 	initializeSimulator(simulator, car, track, force := false) {
@@ -5096,10 +5195,11 @@ class PracticeCenter extends ConfigurationItem {
 		this.showChart(drawChartFunction)
 	}
 
-	showDetails(report, details, charts*) {
+	showDetails(report, title := false, details := false, charts*) {
 		local chartID := 1
 		local html := (details ? details : "")
-		local script, ignore, chart
+		local script, ignore, chart, margins
+		local htmlGui, htmlViewer, x, y, w, h
 
 		getTableCSS() {
 			local script
@@ -5169,7 +5269,8 @@ class PracticeCenter extends ConfigurationItem {
 											  , headerBackColor: this.Window.Theme.TableColor["Header"], frameColor: this.Window.Theme.TableColor["Frame"]})
 		}
 
-		this.iSelectedDetailReport := report
+		if !title
+			this.iSelectedDetailReport := report
 
 		if details {
 			script := "
@@ -5212,13 +5313,39 @@ class PracticeCenter extends ConfigurationItem {
 		else
 			script := ""
 
-		html := ("<html>" . script . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> p, div, table { color: " . this.Window.Theme.TextColor . "; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; }</style><div>" . html . "</div></body></html>")
+		if title
+			margins := "style='overflow: auto' leftmargin='5' topmargin='5' rightmargin='5' bottommargin='5'"
+		else
+			margins := "style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'"
 
-		this.iSelectedDetailHTML := html
+		html := ("<html>" . script . "<body style='background-color: #" . this.Window.AltBackColor . "' " . margins . "><style> p, div, table { color: " . this.Window.Theme.TextColor . "; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; }</style><div>" . html . "</div></body></html>")
 
-		this.DetailsViewer.document.open()
-		this.DetailsViewer.document.write(html)
-		this.DetailsViewer.document.close()
+		if !title {
+			this.iSelectedDetailHTML := html
+
+			this.DetailsViewer.document.open()
+			this.DetailsViewer.document.write(html)
+			this.DetailsViewer.document.close()
+		}
+		else {
+			htmlGui := PracticeCenter.HTMLWindow({Descriptor: "Practice Center." . StrTitle(report) . " Report Viewer", Closeable: true, Resizeable:  "Deferred"}, title)
+
+			htmlViewer := htmlGui.Add("HTMLViewer", "X0 Y0 W640 H480 W:Grow H:Grow")
+
+			htmlViewer.document.open()
+			htmlViewer.document.write(html)
+			htmlViewer.document.close()
+
+			htmlGui.Add(PracticeCenter.HTMLResizer(htmlViewer, html, htmlGui))
+
+			if getWindowPosition("Practice Center." . StrTitle(report) . " Report Viewer", &x, &y)
+				htmlGui.Show("x" . x . " y" . y . " w640 h480")
+			else
+				htmlGui.Show("w640 h480")
+
+			if getWindowSize("Practice Center." . StrTitle(report) . " Report Viewer", &w, &h)
+				htmlGui.Resize("Initialize", w, h)
+		}
 	}
 
 	selectReport(report) {
@@ -6207,7 +6334,7 @@ class PracticeCenter extends ConfigurationItem {
 		return drawChartFunction
 	}
 
-	showDataSummary() {
+	showDataSummary(viewer := GetKeyState("Ctrl")) {
 		local telemetryDB := this.TelemetryDatabase
 		local html := ("<div id=`"header`"><b>" . translate("Data Summary") . "</b></div>")
 		local simulator := this.Simulator
@@ -6316,12 +6443,12 @@ class PracticeCenter extends ConfigurationItem {
 				}
 			}
 
-		this.showDetails("Data", html)
+		this.showDetails("Data", !viewer ? false : translate("Data Summary"), html)
 	}
 
-	showSessionSummary() {
+	showSessionSummary(viewer := GetKeyState("Ctrl")) {
 		local telemetryDB := this.TelemetryDatabase
-		local html := ("<div id=`"header`"><b>" . translate("Stints Summary") . "</b></div>")
+		local html := ("<div id=`"header`"><b>" . translate("Session Summary") . "</b></div>")
 		local runs := []
 		local drivers := []
 		local laps := []
@@ -6448,10 +6575,10 @@ class PracticeCenter extends ConfigurationItem {
 
 		html .= ("<br><br><div id=`"chart_1`" style=`"width: " . width . "px; height: 248px`"></div>")
 
-		this.showDetails("Session", html, [1, chart1])
+		this.showDetails("Session", !viewer ? false : translate("Stints Summary"), html, [1, chart1])
 	}
 
-	showRunsSummary() {
+	showRunsSummary(viewer := GetKeyState("Ctrl")) {
 		local telemetryDB := this.TelemetryDatabase
 		local html := ("<div id=`"header`"><b>" . translate("Stints Summary") . "</b></div>")
 		local runs := []
@@ -6617,7 +6744,7 @@ class PracticeCenter extends ConfigurationItem {
 				html .= ("<br><div id=`"chart_" . charts.Length . "`" style=`"width: " . width . "px; height: 248px`"></div>")
 			}
 
-		this.showDetails("Runs", html, charts*)
+		this.showDetails("Runs", !viewer ? false : translate("Stints Summary"), html, charts*)
 	}
 
 	createRunHeader(run) {
@@ -6836,7 +6963,7 @@ class PracticeCenter extends ConfigurationItem {
 		return html
 	}
 
-	showRunDetails(run) {
+	showRunDetails(run, viewer := GetKeyState("Ctrl")) {
 		showRunDetailsAsync(run) {
 			local html := ("<div id=`"header`"><b>" . translate("Stint: ") . run.Nr . "</b></div>")
 			local laps := []
@@ -6884,7 +7011,7 @@ class PracticeCenter extends ConfigurationItem {
 
 			html .= ("<br><div id=`"chart_3`" style=`"width: " . width . "px; height: 248px`"></div>")
 
-			this.showDetails("Run", html, [1, chart1], [2, chart2], [3, chart3])
+			this.showDetails("Run", !viewer ? false : (translate("Stint: ") . run.Nr), html, [1, chart1], [2, chart2], [3, chart3])
 		}
 
 		this.pushTask(ObjBindMethod(this, "syncSessionStore"))
@@ -7185,7 +7312,7 @@ class PracticeCenter extends ConfigurationItem {
 		return html
 	}
 
-	showLapDetails(lap) {
+	showLapDetails(lap, viewer := GetKeyState("Ctrl")) {
 		showLapDetailsAsync(lap) {
 			local html := ("<div id=`"header`"><b>" . translate("Lap: ") . lap.Nr . "</b></div>")
 
@@ -7205,7 +7332,7 @@ class PracticeCenter extends ConfigurationItem {
 
 			html .= ("<br>" . this.createLapStandings(lap))
 
-			this.showDetails("Lap", html)
+			this.showDetails("Lap", !viewer ? false : (translate("Lap: ") . lap.Nr), html)
 		}
 
 		this.pushTask(ObjBindMethod(this, "syncSessionStore"))

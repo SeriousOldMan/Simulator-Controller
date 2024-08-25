@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.8.5.0-release]() (Early build for 5.8.5. Changes: Optimized handling of unidentified tyre sets (like Wets) in the "Practice Center", Fixed weather related tyre change handling of Engineer and Strategist, External report windows for "Practice Center".)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-585) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

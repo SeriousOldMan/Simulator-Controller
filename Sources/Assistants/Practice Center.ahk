@@ -1120,6 +1120,7 @@ class PracticeCenter extends ConfigurationItem {
 
 	createGui(configuration) {
 		local center := this
+		local wasDouble := false
 		local centerGui, centerTab, x, y, width, ignore, report, choices, serverURLs, settings, button, control
 		local simulator, car, track
 		local x, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, xB
@@ -1234,36 +1235,42 @@ class PracticeCenter extends ConfigurationItem {
 
 		selectRun(listView, line, selected) {
 			if selected
-				chooseRun(listView, line)
+				chooseRun(true, listView, line)
 		}
 
-		chooseRun(listView, line, *) {
-			local run
-
+		chooseRun(selected, listView, line, *) {
 			if line {
-				run := center.Runs[listView.GetText(line, 1)]
+				wasDouble := false
 
-				if (run.Laps.Length = 0) {
-					listView.Modify(line, "-Select")
+				Task.startTask(() {
+					local run
 
-					return
-				}
-				else if center.SessionExported
-					listView.Modify(line, "-Check")
-				else if (listView.GetNext(line - 1, "C") = line) {
-					for ignore, lap in run.Laps
-						if ((lap.State = "Valid") && isNumber(lap.LapTime))
-							center.LapsListView.Modify(lap.Row, "Check")
-				}
-				else
-					for ignore, lap in run.Laps
-						center.LapsListView.Modify(lap.Row, "-Check")
+					if !wasDouble {
+						run := center.Runs[listView.GetText(line, 1)]
 
-				center.withExceptionhandler(ObjBindMethod(center, "showRunDetails", run))
+						if (run.Laps.Length = 0) {
+							listView.Modify(line, "-Select")
 
-				centerGui["runNotesEdit"].Text := run.Notes
+							return
+						}
+						else if center.SessionExported
+							listView.Modify(line, "-Check")
+						else if (listView.GetNext(line - 1, "C") = line) {
+							for ignore, lap in run.Laps
+								if ((lap.State = "Valid") && isNumber(lap.LapTime))
+									center.LapsListView.Modify(lap.Row, "Check")
+						}
+						else
+							for ignore, lap in run.Laps
+								center.LapsListView.Modify(lap.Row, "-Check")
 
-				center.updateState()
+						center.withExceptionhandler(ObjBindMethod(center, "showRunDetails", run, selected ? false : unset))
+
+						centerGui["runNotesEdit"].Text := run.Notes
+
+						center.updateState()
+					}
+				}, 200)
 			}
 		}
 
@@ -1271,6 +1278,8 @@ class PracticeCenter extends ConfigurationItem {
 			local run
 
 			if line {
+				wasDouble := true
+
 				run := center.Runs[listView.GetText(line, 1)]
 
 				if (run.Laps.Length = 0) {
@@ -1299,7 +1308,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		selectLap(listView, line, selected) {
 			if selected
-				chooseLap(listView, line)
+				chooseLap(true, listView, line)
 		}
 
 		checkLap(listView, line, selected) {
@@ -1312,17 +1321,25 @@ class PracticeCenter extends ConfigurationItem {
 			}
 		}
 
-		chooseLap(listView, line, *) {
+		chooseLap(selected, listView, line, *) {
 			if line {
-				if center.SessionExported
-					listView.Modify(line, "-Check")
+				wasDouble := false
 
-				center.withExceptionhandler(ObjBindMethod(center, "showLapDetails", center.Laps[listView.GetText(line, 1)]))
+				Task.startTask(() {
+					if !wasDouble {
+						if center.SessionExported
+							listView.Modify(line, "-Check")
+
+						center.withExceptionhandler(ObjBindMethod(center, "showLapDetails", center.Laps[listView.GetText(line, 1)], selected ? false : unset))
+					}
+				}, 200)
 			}
 		}
 
 		openLap(listView, line, *) {
 			if line {
+				wasDouble := true
+
 				if center.SessionExported
 					listView.Modify(line, "-Check")
 
@@ -1719,7 +1736,7 @@ class PracticeCenter extends ConfigurationItem {
 		centerTab.UseTab(2)
 
 		this.iRunsListView := centerGui.Add("ListView", "x24 ys+33 w577 h175 H:Grow(0.5) Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Driver", "Weather", "Compound", "Set", "Laps", "Initial Fuel", "Consumed Fuel", "Avg. Lap Time", "Accidents", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], translate))
-		this.iRunsListView.OnEvent("Click", chooseRun)
+		this.iRunsListView.OnEvent("Click", chooseRun.Bind(false))
 		this.iRunsListView.OnEvent("DoubleClick", openRun)
 		this.iRunsListView.OnEvent("ItemSelect", selectRun)
 
@@ -1729,7 +1746,7 @@ class PracticeCenter extends ConfigurationItem {
 		centerTab.UseTab(3)
 
 		this.iLapsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Stint", "Weather", "Grip", "Lap Time", "Sector Times", "Consumption", "Remaining", "Pressures", "Invalid", "Accident"], translate))
-		this.iLapsListView.OnEvent("Click", chooseLap)
+		this.iLapsListView.OnEvent("Click", chooseLap.Bind(false))
 		this.iLapsListView.OnEvent("DoubleClick", openLap)
 		this.iLapsListView.OnEvent("ItemSelect", selectLap)
 		this.iLapsListView.OnEvent("ItemCheck", checkLap)

@@ -1393,6 +1393,7 @@ class RaceCenter extends ConfigurationItem {
 
 	createGui(configuration) {
 		local center := this
+		local wasDouble := false
 		local centerGui, centerTab, x, y, width, ignore, report, choices, serverURLs, settings, button, control
 		local menu1, menu2, menus, htmlViewer
 
@@ -1626,33 +1627,51 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		selectStint(listView, line, selected) {
-			if (selected && (this.Mode = "Normal"))
-				center.withExceptionhandler(ObjBindMethod(center, "showStintDetails", center.Stints[listView.GetText(line, 1)], false))
+			if selected
+				chooseStint(true, listView, line)
 		}
 
-		chooseStint(listView, line, *) {
-			if (line && (this.Mode = "Normal"))
-				center.withExceptionhandler(ObjBindMethod(center, "showStintDetails", center.Stints[listView.GetText(line, 1)]))
+		chooseStint(selected, listView, line, *) {
+			if (line && (this.Mode = "Normal")) {
+				wasDouble := false
+
+				Task.startTask(() {
+					if !wasDouble
+						center.withExceptionhandler(ObjBindMethod(center, "showStintDetails", center.Stints[listView.GetText(line, 1)], selected ? false : unset))
+				}, 200)
+			}
 		}
 
 		openStint(listView, line, *) {
-			if line
+			if line {
+				wasDouble := true
+
 				center.withExceptionhandler(ObjBindMethod(center, "showStintDetails", center.Stints[listView.GetText(line, 1)], true))
+			}
 		}
 
 		selectLap(listView, line, selected) {
-			if (selected && (this.Mode = "Normal"))
-				center.withExceptionhandler(ObjBindMethod(center, "showLapDetails", center.Laps[listView.GetText(line, 1)], false))
+			if selected
+				chooseLap(true, listView, line)
 		}
 
-		chooseLap(listView, line, *) {
-			if (line && (this.Mode = "Normal"))
-				center.withExceptionhandler(ObjBindMethod(center, "showLapDetails", center.Laps[listView.GetText(line, 1)]))
+		chooseLap(selected, listView, line, *) {
+			if (line && (this.Mode = "Normal")) {
+				wasDouble := false
+
+				Task.startTask(() {
+					if !wasDouble
+						center.withExceptionhandler(ObjBindMethod(center, "showLapDetails", center.Laps[listView.GetText(line, 1)], selected ? false : unset))
+				}, 200)
+			}
 		}
 
 		openLap(listView, line, *) {
-			if line
+			if line {
+				wasDouble := true
+
 				center.withExceptionhandler(ObjBindMethod(center, "showLapDetails", center.Laps[listView.GetText(line, 1)], true))
+			}
 		}
 
 		chooseSimulationSettings(*) {
@@ -2034,14 +2053,21 @@ class RaceCenter extends ConfigurationItem {
 
 		selectPitstop(listView, line, selected) {
 			if selected
-				pitstopSelected(line, (this.Mode = "Normal"), false)
+				choosePitstop(true, listView, line)
 		}
 
-		choosePitstop(listView, line, *) {
-			pitstopSelected(line, (this.Mode = "Normal"))
+		choosePitstop(selected, listView, line, *) {
+			wasDouble := false
+
+			Task.startTask(() {
+				if !wasDouble
+					pitstopSelected(line, (this.Mode = "Normal"), selected ? false : unset)
+			}, 200)
 		}
 
 		openPitstop(listView, line, *) {
+			wasDouble := true
+
 			pitstopSelected(line, true, true)
 		}
 
@@ -2273,14 +2299,14 @@ class RaceCenter extends ConfigurationItem {
 		centerTab.UseTab(2)
 
 		this.iStintsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 " . ((this.Mode = "Normal") ? "H:Grow(0.8)" : "H:Grow W:Grow") . " -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Driver", "Weather", "Compound", "Laps", "Pos. (Start)", "Pos. (End)", "Avg. Lap Time", "Consumption", "Accidents", "Penalties", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], translate))
-		this.iStintsListView.OnEvent("Click", chooseStint)
+		this.iStintsListView.OnEvent("Click", chooseStint.Bind(false))
 		this.iStintsListView.OnEvent("DoubleClick", openStint)
 		this.iStintsListView.OnEvent("ItemSelect", selectStint)
 
 		centerTab.UseTab(3)
 
 		this.iLapsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 " . ((this.Mode = "Normal") ? "H:Grow(0.8)" : "H:Grow W:Grow") . " -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Stint", "Driver", "Position", "Weather", "Grip", "Lap Time", "Sector Times", "Consumption", "Remaining", "Pressures", "Invalid", "Accident", "Penalty"], translate))
-		this.iLapsListView.OnEvent("Click", chooseLap)
+		this.iLapsListView.OnEvent("Click", chooseLap.Bind(false))
 		this.iLapsListView.OnEvent("DoubleClick", openLap)
 		this.iLapsListView.OnEvent("ItemSelect", selectLap)
 
@@ -2466,7 +2492,7 @@ class RaceCenter extends ConfigurationItem {
 		centerGui.Add("Button", "x66 ys+279 w160 " . ((this.Mode = "Normal") ? "Y:Move(0.8)" : "Y:move"), translate("Instruct Engineer")).OnEvent("Click", planPitstop)
 
 		this.iPitstopsListView := centerGui.Add("ListView", "x270 ys+34 w331 h269 " . ((this.Mode = "Normal") ? "H:Grow(0.8)" : "H:Grow W:Grow") . " -Multi -LV0x10 AltSubmit Checked NoSort NoSortHdr", collect(["#", "Lap", "Driver", "Refuel", "Compound", "Set", "Pressures", "Repairs"], translate))
-		this.iPitstopsListView.OnEvent("Click", choosePitstop)
+		this.iPitstopsListView.OnEvent("Click", choosePitstop.Bind(false))
 		this.iPitstopsListView.OnEvent("DoubleClick", openPitstop)
 		this.iPitstopsListView.OnEvent("ItemSelect", selectPitstop)
 

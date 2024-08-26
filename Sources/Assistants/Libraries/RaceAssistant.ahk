@@ -1610,6 +1610,13 @@ class RaceAssistant extends ConfigurationItem {
 			this.createAgentEvents(&productions, &reductions, &includes)
 		}
 
+		if InStr(FileExist(kUserRulesDirectory . "Extensions\" . this.AssistantType), "D")
+			loop Files, kUserRulesDirectory . "Extensions\" . this.AssistantType . "\*.rules" {
+				rules := FileRead(A_LoopFilePath)
+
+				compiler.compileRules(rules, &productions, &reductions, &includes)
+			}
+
 		engine := RuleEngine(productions, reductions, facts, includes)
 
 		knowledgeBase := RaceAssistant.RaceKnowledgeBase(this, engine, engine.createFacts(), engine.createRules())
@@ -1623,7 +1630,6 @@ class RaceAssistant extends ConfigurationItem {
 
 			knowledgeBase.addRule(compiler.compileRule("availableTyreCompound(" . compound . "," . compoundColor . ")"))
 		}
-
 		if this.Debug[kDebugRules]
 			this.dumpRules(knowledgeBase)
 

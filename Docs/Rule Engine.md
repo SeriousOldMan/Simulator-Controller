@@ -528,6 +528,12 @@ This is exactly the approach, how the rule sets for the Race Assistants has been
 
 ## Customizing the Assistant rules
 
-The rule sets for the Race Assistants can be found in the *Resources\Rules* directory in the installation folder of Simulator Controller. But as with most of the configuration files of Simulator Controller, they can be locally customized or extended. Simply make a copy of one of the rule files and place it in the *Simulator Controller\Rules* directory, which can be found in your user *Documents* folder.
+The rule sets for the Assistants can be found in the *Resources\Rules* directory in the installation folder of Simulator Controller. But as with most of the configuration files of Simulator Controller, they can be locally customized. Simply make a copy of one of the rule files and place it in the *Simulator Controller\Rules* directory, which can be found in your user *Documents* folder. I strongly advise against doing this, since this will prevent future updates for the rules being used as intended. You have to integrate your changes over and over again with each release.
 
-You can also extend the reasoning process of a Race Assistant by connecting the rule engine to a GPT-based large language model. Please see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster) for more information.
+If you only want to add some rules, there is a much better way. You can create an *Extensions* folder in the *Simulator Controller\Rules* directory, which can be found in your user *Documents* folder and place your additional rules there. There is one set of possible extensions for each Assistant, which must be named like *Race Engineer*, *Race Strategist*, and so on. For example, the folder path for the Race Engineer will be like this:
+
+	[Documents]\Simulator Controller\Rules\Extensions\Race Engineer
+	
+You can place any number of "*.rules" files in this folder and they will be loaded typically in alphapbetical order.
+
+Last but not lest, you can extend the reasoning process of a Race Assistant by connecting the rule engine to a GPT-based large language model. Please see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster) for more information.

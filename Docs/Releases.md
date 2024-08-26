@@ -6,7 +6,8 @@
   5. The "Practice Center" now handles unnumbered tyre sets like Wet tyres, for example, correctly in terms of tyre usage.
   6. "Practice Center" now also can open every report in a separate window, similar to the "Race Center" behaviour introduced with Release 5.8.3. To open a report in a separate window, hold down the Control key while choosing the report.
   7. The team management editor in "Simulator Startup" has become a resizeable window.
-  8. [Experts] A new method has been introduced to customize the Assistant rules by placing rule snippets in an extension folder. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#customizing-the-assistant-rules) for more information.
+  8. Removed minimize controls from several modal windows.
+  9. [Experts] A new method has been introduced to customize the Assistant rules by placing rule snippets in an extension folder. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#customizing-the-assistant-rules) for more information.
 
 ## 5.8.4.1-release 08/24/24
   1. Fixed a critical bug that caused the Spotter to get silent after the first lap.

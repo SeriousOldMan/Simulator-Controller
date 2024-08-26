@@ -2382,7 +2382,8 @@ manageTeams(ownerOrCommand, arguments*) {
 		done := false
 
 		teamManagerGui := TeamManagerWindow({Descriptor: "Simulator Startup.Team Management"
-										   , Closeable: true, Resizeable: true, Options: "-MaximizeBox"}, translate("Team Management"))
+										   , Closeable: true, Resizeable: true, Options: "-MaximizeBox -MinimizeBox"}
+										   , translate("Team Management"))
 
 		teamManagerGui.SetFont("Bold", "Arial")
 

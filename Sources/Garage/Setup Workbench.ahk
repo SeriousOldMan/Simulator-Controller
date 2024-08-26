@@ -2843,7 +2843,8 @@ class SetupComparator extends ConfigurationItem {
 		__New(comparator) {
 			this.iComparator := comparator
 
-			super.__New({Descriptor: "Setup Workbench.Setup Comparator", Resizeable: true, Closeable: true, Options: "-MaximizeBox"}, "Setup Editor")
+			super.__New({Descriptor: "Setup Workbench.Setup Comparator"
+					  , Resizeable: true, Closeable: true, Options: "-MaximizeBox -MinimizeBox"}, translate("Setup Editor"))
 		}
 
 		Close(*) {

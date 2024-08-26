@@ -38,7 +38,7 @@ class SplashScreenEditor extends ConfiguratorPanel {
 		__New(editor) {
 			this.iEditor := editor
 
-			super.__New({Descriptor: "Splash Screens Editor", Closeable: true, Resizeable: true, Options: "-MaximizeBox"})
+			super.__New({Descriptor: "Splash Screens Editor", Closeable: true, Resizeable: true, Options: "-MaximizeBox -MinimizeBox"})
 		}
 
 		Close(*) {

@@ -5244,7 +5244,9 @@ selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner :
 	else {
 		result := false
 
-		importSettingsGui := Window({Descriptor: "Session Database.ImportSettings", Resizeable: true, Options: "-MaximizeBox"}, translate("Import"))
+		importSettingsGui := Window({Descriptor: "Session Database.ImportSettings"
+								  , Resizeable: true, Options: "-MaximizeBox -MinimizeBox"}
+								  , translate("Import"))
 
 		importSettingsGui.SetFont("s10 Bold", "Arial")
 
@@ -5420,7 +5422,9 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 	else {
 		result := false
 
-		importDataGui := Window({Descriptor: "Session Database.ImportData", Resizeable: true, Options: "-MaximizeBox"}, translate("Import"))
+		importDataGui := Window({Descriptor: "Session Database.ImportData"
+							  , Resizeable: true, Options: "-MaximizeBox -MinimizeBox"}
+							  , translate("Import"))
 
 		importDataGui.SetFont("s10 Bold", "Arial")
 

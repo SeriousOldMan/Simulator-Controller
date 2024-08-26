@@ -492,7 +492,7 @@ You can enable or disable individual predefined actions using the checkbox on th
 	 
    - Assistant.Speak(phrase)
    
-	 Outputs the given phrase using the voice of the given Race Assistant. *phrase* can be the label of a predefined phrase from the grammar definition of the Assistant.
+	 Outputs the given phrase using the voice of the given Race Assistant. *phrase* can be the label of a predefined phrase from the grammar definition of the Assistant. If phrase is not one of the predefined phrases it will be spoken as is.
 	 
    - Assistant.Ask(question)
    
@@ -506,7 +506,7 @@ You can enable or disable individual predefined actions using the checkbox on th
    
      Invokes the global *function* in the process "Simulator Controller.exe". with some arguments. A variable number of arguments are supported.
 
-   You can use this predicates in backward chaining rules directly. Example:
+   You can use these predicates in backward chaining rules directly. Example:
    
 	   estimateTrackWetness() <= calculateTrackWetness(), Assistant.Speak("It will be too wet. I will come up with a new strategy."), Assistant.Call(planPitstop)
 

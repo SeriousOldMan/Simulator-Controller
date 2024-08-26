@@ -1,3 +1,13 @@
+## 5.8.5.0-release 08/30/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Fixed the request of a weather related tyre change by the Strategist or the Engineer (if the Strategist is disabled).
+  4. The "Practice Center" now handles unnumbered tyre sets like Wet tyres, for example, correctly in terms of tyre usage.
+  5. "Practice Center" now also can open every report in a separate window, similar to the "Race Center" behaviour introduced with Release 5.8.3. To open a report in a separate window, hold down the Control key while chossing the report.
+
+## 5.8.4.1-release 08/24/24
+  1. Fixed a critical bug that caused the Spotter to get silent after the first lap.
+  
 ## 5.8.4.0-release 08/23/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

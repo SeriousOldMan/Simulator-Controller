@@ -2470,21 +2470,26 @@ synchronizeSessions(groups, sessionDB, connector, simulators, timestamp, lastSyn
 				car := document["Car"]
 				track := document["Track"]
 
-				if !sessionDB.readSessionInfo(simulator, car, track
-											, getMultiMapValue(info, "Session", "Type")
-											, getMultiMapValue(info, "Session", "Name")) {
-					counter += 1
+				try {
+					if !sessionDB.readSessionInfo(simulator, car, track
+												, getMultiMapValue(info, "Session", "Type")
+												, getMultiMapValue(info, "Session", "Name")) {
+						counter += 1
 
-					sessionDB.writeSession(simulator, car, track
-										 , getMultiMapValue(info, "Session", "Type")
-										 , getMultiMapValue(info, "Session", "Name")
-										 , parseMultiMap(connector.GetDataValue("Document", identifier, "Meta"))
-										 , decodeB16(connector.GetDataValue("Document", identifier, "Data"))
-										 , getMultiMapValue(info, "Session", "Size")
-										 , getMultiMapValue(info, "Access", "Share")
-										 , getMultiMapValue(info, "Access", "Synchronize")
-										 , getMultiMapValue(info, "Origin", "Driver")
-										 , identifier, true)
+						sessionDB.writeSession(simulator, car, track
+											 , getMultiMapValue(info, "Session", "Type")
+											 , getMultiMapValue(info, "Session", "Name")
+											 , parseMultiMap(connector.GetDataValue("Document", identifier, "Meta"))
+											 , decodeB16(connector.GetDataValue("Document", identifier, "Data"))
+											 , getMultiMapValue(info, "Session", "Size")
+											 , getMultiMapValue(info, "Access", "Share")
+											 , getMultiMapValue(info, "Access", "Synchronize")
+											 , getMultiMapValue(info, "Origin", "Driver")
+											 , identifier, true)
+					}
+				}
+				catch Any as exception {
+					logError(exception)
 				}
 			}
 		}
@@ -2582,22 +2587,27 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 				car := document["Car"]
 				track := document["Track"]
 
-				if !sessionDB.readSetupInfo(simulator, car, track
-										  , getMultiMapValue(info, "Setup", "Type")
-										  , getMultiMapValue(info, "Setup", "Name")) {
-					setup := connector.GetDataValue("Document", identifier, "Setup")
+				try {
+					if !sessionDB.readSetupInfo(simulator, car, track
+											  , getMultiMapValue(info, "Setup", "Type")
+											  , getMultiMapValue(info, "Setup", "Name")) {
+						setup := connector.GetDataValue("Document", identifier, "Setup")
 
-					counter += 1
+						counter += 1
 
-					sessionDB.writeSetup(simulator, car, track
-									   , getMultiMapValue(info, "Setup", "Type")
-									   , getMultiMapValue(info, "Setup", "Name")
-									   , getMultiMapValue(info, "Setup", "Encoded") ? decodeB16(setup) : setup
-									   , getMultiMapValue(info, "Setup", "Size")
-									   , getMultiMapValue(info, "Access", "Share")
-									   , getMultiMapValue(info, "Access", "Synchronize")
-									   , getMultiMapValue(info, "Origin", "Driver")
-									   , identifier, true)
+						sessionDB.writeSetup(simulator, car, track
+										   , getMultiMapValue(info, "Setup", "Type")
+										   , getMultiMapValue(info, "Setup", "Name")
+										   , getMultiMapValue(info, "Setup", "Encoded") ? decodeB16(setup) : setup
+										   , getMultiMapValue(info, "Setup", "Size")
+										   , getMultiMapValue(info, "Access", "Share")
+										   , getMultiMapValue(info, "Access", "Synchronize")
+										   , getMultiMapValue(info, "Origin", "Driver")
+										   , identifier, true)
+					}
+				}
+				catch Any as exception {
+					logError(exception)
 				}
 			}
 		}

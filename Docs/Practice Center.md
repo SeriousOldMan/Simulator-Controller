@@ -88,7 +88,13 @@ Last but not least, using the small button with the cog wheel icon, you can choo
   
      This report combines the output of the stint report (see above) for all stints into one document.
 	 
-All these report documents are HTML-based and can be saved or printed using the context menu when right-clicking into the output area.
+All these report documents are HTML-based and can be saved or printed using the context menu when right-clicking on a free space in the output area.
+
+##### Notes
+
+- The report shown in the output area will be updated live, whenever new data arrives. A special case is the report for the lap details. If the chosen report is for the last lap, the report will automatically switch to the next lap, when this lap has been finished.
+
+- If you want the report to be opened in a separate window, hold down the Control key while requesting it. If the report originates from one of the available lists, you can open the separate window by double-clicking the entry in this list. In this case, the report is frozen and will **not** be updated automatically when new data arrives.
 
 ### Managing tyres and planning practice stints
 

@@ -1,0 +1,3 @@
+; Enables track mapping by the Race Spotter.
+
+[?%activation%] => (Call: Function.Call(enableTrackMapping)), (Call: Assistant.Speak("Roger"))

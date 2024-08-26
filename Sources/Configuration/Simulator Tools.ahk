@@ -1436,7 +1436,7 @@ editTargets(command := "", *) {
 
 		chosen := inList(["Development", "Production"], gTargetConfiguration)
 
-		targetsGui.Add("Text", "X10 Y" . yPos, translate("Target"))
+		targetsGui.Add("Text", "X10 Y" . yPos, translate("Targets"))
 		targetsGui.Add("DropDownList", "X110 YP-5 w310 Choose" . chosen . " vtargetConfiguration", collect(["Development", "Production"], translate))
 
 		splashScreens := getAllSplashScreens()

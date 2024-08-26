@@ -631,7 +631,8 @@ class DrivingCoach extends GridRaceAssistant {
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledgeBase(this.KnowledgeBase)
 
-		this.startTelemetryAnalyzer()
+		if this.Announcements["HandlingInformation"]
+			this.startTelemetryAnalyzer()
 	}
 
 	finishSession(shutdown := true) {

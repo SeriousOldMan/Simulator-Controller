@@ -98,6 +98,12 @@ class StartupWindow extends Window {
 	}
 }
 
+class TeamManagerWindow extends Window {
+	Close(*) {
+		manageTeams(kClose)
+	}
+}
+
 class SimulatorStartup extends ConfigurationItem {
 	static Instance := false
 
@@ -2365,7 +2371,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 
 manageTeams(ownerOrCommand, arguments*) {
 	static done := false
-	static teamManagerGui
+	static teamManagerGui, x, y, w, h
 	static teamManagerPanel
 
 	if (ownerOrCommand == kClose)
@@ -2375,7 +2381,8 @@ manageTeams(ownerOrCommand, arguments*) {
 	else {
 		done := false
 
-		teamManagerGui := Window({Descriptor: "Simulator Startup.Team Management", Options: "ToolWindow 0x400000"})
+		teamManagerGui := TeamManagerWindow({Descriptor: "Simulator Startup.Team Management"
+										   , Closeable: true, Resizeable: true, Options: "-MaximizeBox"}, translate("Team Management"))
 
 		teamManagerGui.SetFont("Bold", "Arial")
 
@@ -2394,10 +2401,6 @@ manageTeams(ownerOrCommand, arguments*) {
 
 		Task.startTask(() => teamManagerPanel.connect(true, true), 2000, kLowPriority)
 
-		teamManagerGui.Add("Text", "x8 y545 w508 0x10")
-
-		teamManagerGui.Add("Button", "X220 YP+10 w80", translate("Close")).OnEvent("Click", manageTeams.Bind(kClose))
-
 		manageTeams("Update State")
 
 		teamManagerGui.Opt("+Owner" . ownerOrCommand.Hwnd)
@@ -2409,6 +2412,9 @@ manageTeams(ownerOrCommand, arguments*) {
 				teamManagerGui.Show("x" . x . " y" . y)
 			else
 				teamManagerGui.Show()
+
+			if getWindowSize("Simulator Startup.Team Management", &w, &h)
+				teamManagerGui.Resize("Initialize", w, h)
 
 			loop
 				Sleep(200)

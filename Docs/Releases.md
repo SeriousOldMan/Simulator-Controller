@@ -4,8 +4,9 @@
   3. Fixed the request of a weather related tyre change by the Strategist or the Engineer (if the Strategist is disabled).
   4. Potentially fixed a bug that created corrupted driver names in *Automobilista 2* and *Project CARS 2*.
   5. The "Practice Center" now handles unnumbered tyre sets like Wet tyres, for example, correctly in terms of tyre usage.
-  6. "Practice Center" now also can open every report in a separate window, similar to the "Race Center" behaviour introduced with Release 5.8.3. To open a report in a separate window, hold down the Control key while chossing the report.
-  7. [Experts] A new method has been introduced to customize the Assistant rules by placing rule snippets in an extension folder. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#customizing-the-assistant-rules) for more information.
+  6. "Practice Center" now also can open every report in a separate window, similar to the "Race Center" behaviour introduced with Release 5.8.3. To open a report in a separate window, hold down the Control key while choosing the report.
+  7. The team management editor in "Simulator Startup" has become a resizeable window.
+  8. [Experts] A new method has been introduced to customize the Assistant rules by placing rule snippets in an extension folder. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#customizing-the-assistant-rules) for more information.
 
 ## 5.8.4.1-release 08/24/24
   1. Fixed a critical bug that caused the Spotter to get silent after the first lap.

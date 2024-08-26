@@ -1610,12 +1610,11 @@ class RaceAssistant extends ConfigurationItem {
 			this.createAgentEvents(&productions, &reductions, &includes)
 		}
 
-		if InStr(FileExist(kUserRulesDirectory . "Extensions\" . this.AssistantType), "D")
-			loop Files, kUserRulesDirectory . "Extensions\" . this.AssistantType . "\*.rules" {
-				rules := FileRead(A_LoopFilePath)
+		loop Files, kUserRulesDirectory . "Extensions\" . this.AssistantType . "\*.rules" {
+			rules := FileRead(A_LoopFilePath)
 
-				compiler.compileRules(rules, &productions, &reductions, &includes)
-			}
+			compiler.compileRules(rules, &productions, &reductions, &includes)
+		}
 
 		engine := RuleEngine(productions, reductions, facts, includes)
 

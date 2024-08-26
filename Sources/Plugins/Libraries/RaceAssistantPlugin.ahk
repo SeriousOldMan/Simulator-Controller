@@ -2390,7 +2390,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				splitTime := A_TickCount
 			}
 
-			if (RaceAssistantPlugin.runningSession(data) && (lastLap == 0))
+			if (RaceAssistantPlugin.runningSession(data) && (lastLap == 0) && (dataLastLap == 1))
 				prepareSessionDatabase(data)
 
 			if (false && isDebug()) {

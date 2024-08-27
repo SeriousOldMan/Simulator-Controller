@@ -2374,8 +2374,11 @@ class RaceStrategist extends GridRaceAssistant {
 		this.iStrategy := false
 	}
 
-	checkPitstop(lap) {
-		this.recommendStrategy({Pitstop: lap, Request: "Pitstop"})
+	recommendStrategyAction(lap := false) {
+		if lap
+			this.recommendStrategy({Pitstop: lap, Request: "Pitstop", Silent: true, Confirm: true})
+		else
+			this.recommendStrategy({Request: "Pitstop", Silent: true, Confirm: true})
 	}
 
 	recommendStrategy(options := {}) {

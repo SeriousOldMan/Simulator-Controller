@@ -8,18 +8,17 @@ update_strategy=Assistant.Method|recommendStrategy|true|true|0|Trigger a recalcu
 plan_pitstop.1=targetLap|Integer||false|The planned lap for the car to come to the pit.
 simulate_pitstop.1=targetLap|Integer||false|The planned lap for the car to come to the pit.
 [Agent.Actions]
-Active=plan_pitstop,simulate_pitstop,announce_upcoming_pitstop,update_strategy,report_weather_forecast,check_pitstop
+Active=plan_pitstop,simulate_pitstop,announce_upcoming_pitstop,check_strategy,report_weather_forecast
 [Agent.Actions.Builtin]
 plan_pitstop=Assistant.Method|planPitstop|false|false|1|Ask the Engineer to plan a pitstop.
 simulate_pitstop=Assistant.Method|recommendPitstop|false|false|1|Simulates the outcome of an upcoming pitstop. The traffic situation after the pitstop will be evaluated and the target lap will be optimized, if an undercut is possible.
 announce_upcoming_pitstop=Assistant.Method|reportUpcomingPitstop|false|false|1|Announces an upcoming pitstop according to the currently active strategy.
-update_strategy=Assistant.Method|recommendStrategy|false|false|0|Trigger a recalculation of the current race strategy.
-check_pitstop=Assistant.Method|checkPitstop|false|false|1|Check whether a pitstop at a given lap might be beneficial and is also allowed for the currently active strategy.
+check_strategy=Assistant.Method|recommendStrategyAction|false|false|1|Trigger a recalculation of the current race strategy. A concrete lap for the next pitstop can be supplied to check whether this will result in a valid strategy.
 report_weather_forecast=Assistant.Method|weatherForecast|false|false|3|Reports an upcoming change in the weather conditions.
 [Agent.Actions.Parameters]
 plan_pitstop.1=targetLap|Integer||false|The planned lap for the car to come to the pit.
 simulate_pitstop.1=targetLap|Integer||false|The planned lap for the car to come to the pit.
-check_pitstop.1=targetLap|Integer||true|This is the lap to check whether it is compliant with the current strategy and might create an advantage.
+check_strategy.1=targetLap|Integer||false|An optional lap number for the next pitstop to check whether it is compliant with the current strategy and possibly might create an advantage.
 announce_upcoming_pitstop.1=plannedLap|Integer||true|The lap, when the pitstop is planned according to the strategy.
 report_weather_forecast.1=weather|String|Dry,Drizzle,LightRain,MediumRain,HeavyRain,Thunderstorm|true|A symbol that represents the upcoming weather.
 report_weather_forecast.2=minutes|Integer||true|The time in minutes when the weather will change.

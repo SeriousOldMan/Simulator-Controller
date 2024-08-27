@@ -14,7 +14,7 @@ plan_pitstop.6=swapDriver|Boolean||false|Indicates in a team race whether the ne
 [Agent.Actions]
 Active=plan_pitstop,cancel_pitstop,report_damage,report_time_loss,report_weather_forecast,report_low_fuel,report_pressure_loss
 [Agent.Actions.Builtin]
-plan_pitstop=Assistant.Method|planPitstopAction|false|true|6|Creates a plan for the next pitstop.
+plan_pitstop=Assistant.Method|planPitstopAction|false|false|6|Creates a plan for the next pitstop.
 cancel_pitstop=Assistant.Rule|Race Engineer.cancel_pitstop.rules|false|false|0|Clears the pitstop plan, if a pitstop is no longer needed.
 report_low_fuel=Assistant.Method|lowFuelWarning|false|false|2|Reports that the car is running low on fuel.
 report_damage=Assistant.Method|damageWarning|false|false|3|Reports recent damage to the car to the driver.

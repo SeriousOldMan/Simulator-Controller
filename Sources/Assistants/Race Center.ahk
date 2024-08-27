@@ -136,7 +136,7 @@ class WorkingTask extends PeriodicTask {
 	__New(title := "") {
 		this.iTitle := title
 
-		super.__New(false, 200, kInterruptPriority)
+		super.__New(false, 50, kInterruptPriority)
 	}
 
 	run() {

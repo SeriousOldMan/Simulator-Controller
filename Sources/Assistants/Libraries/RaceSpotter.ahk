@@ -82,6 +82,18 @@ class SessionOverEvent extends SpotterEvent {
 	}
 }
 
+class OpponentPittingEvent extends SpotterEvent {
+	createTrigger(event, phrase, arguments) {
+		if (arguments.Length > 0)
+			if (arguments[1] = "Ahead")
+				return "The opponent ahead is pitting."
+			else if (arguments[1] = "Behind")
+				return "The opponent behind is pitting."
+
+		return "An opponent is pitting."
+	}
+}
+
 class CarInfo {
 	iSpotter := false
 
@@ -2012,6 +2024,8 @@ class RaceSpotter extends GridRaceAssistant {
 
 					speaker.speakPhrase("AheadPitting")
 
+					this.handleEvent("OpponentPitting", "Ahead")
+
 					return true
 				}
 			}
@@ -2035,6 +2049,8 @@ class RaceSpotter extends GridRaceAssistant {
 					this.TacticalAdvices[situation] := true
 
 					speaker.speakPhrase("BehindPitting")
+
+					this.handleEvent("OpponentPitting", "Behind")
 
 					return true
 				}

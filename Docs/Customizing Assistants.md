@@ -430,7 +430,7 @@ Since the control flow between the rule engine and the LLM especially for the *R
 1. It all starts with an event, typically signalled by the rule engine. An event will be in most cases a special condition in the state of the car or the session (fuel is running low, weather is changing, and so on). There are many predefined events available, which you can find below and you can define your own events, of course.
 2. The event will generate a command or information phrase for the LLM and this will be passed to the GPT service together with a complete representation of the current knowledge, as show above, and a list of available actions to call.
 3. The LLM can decide to *call* one or more of these actions, which then will be executed in parallel.
-4. An action can do almost anything. Typically it triggers a special behaviour of the Assistant, for example, create a pitstop plan, but it can also call any of the available [action functions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) in Simulator Controller, or it can generate voice output, or ...
+4. An action can do almost anything. Typically it triggers a special behaviour of the Assistant, for example, create a pitstop plan, but it can also call any of the available [action functions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) in Simulator Controller, or it can generate voice output, and so on. Using *Assistant.Raise* (see below for [more information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-events)), it can also raise additional events, even for other Assistants. These enables the LLM to create a complex chain of thought or collaborate with other Assistants.
 
 ## Managing Actions
 
@@ -555,6 +555,12 @@ As you can see, this editor looks very similar to the actions editor discussed a
    - Assistant.Raise(signal, p1, p2, ...)
    
      Raises the given *signal*, thereby identifying the event to be processed by the LLM.
+	 
+   *Assistant.Raise* also comes in a different flavour. When the first argument is the type of an Assistant (like "Race Engineer", "Race Strategist" and so on), the second argument must be the signal and this signal is raised for the supplied Assistant.
+   
+   - Assistant.Raise(assistant, signal, p1, p2, ...)
+   
+     Raises the given *signal* for the given *assistant*, thereby identifying the event to be processed by the LLM.
 
 Here is an example of a few rules that together detect that it just started raining. Then the event "RainStart" is signalled to the LLM, which then can react and switch on the wiper, for example.
 
@@ -664,6 +670,7 @@ Beside the predefined actions for the different Assistant, which come with the s
 | Behind Gap Update           | 1. [Required] carNumber<br>2. [Required] delta<br>3. [Required] closingIn | This event is signalled periodically, when the gap to the opponent behind has changed for a given amount, which can be configured in the "Session Database". *carNumber* is the car or race number of the car ahead and *delta* is the current gap in seconds. *closingIn* is a boolean, which indicates whether the gap got smaller. |
 | Attack Imminent             | 1. [Required] carNumber<br>2. [Required] delta | This event is signalled, when an opponent has closed in and an attack might happen soon. *carNumber* is the car or race number of the car closing in and *delta* is the current gap in seconds. |
 | Blue Flag Alert             | | Signalled, when a blue flag is being shown, because an opponent is closing in who is at least one lap ahead. |
+| Opponent Pitting            | 1. [Optional] opponentPosition | Informs about an opponent going to the pits. If this is a direct opponent, *opponentPosition* can be supplied and must be one of "Ahead" or "Behind". |
 | Pitstop Performed           | 1. [Required] pitstopNumber<br>2. [Required] pitstopLap | Signalled when the car just pitted. *pitstopNumber* and *pitstopLap* must be supplied with the number of the pitstop and the current lap. |
 | Last Lap                    | | This event is signalled for the last lap of the session. |
 | Session Over                | | This event is signalled when the session is over. |

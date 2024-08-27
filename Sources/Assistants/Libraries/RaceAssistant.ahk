@@ -170,19 +170,6 @@ class AssistantEvent extends AgentEvent {
 	createVariables(event, arguments) {
 		local assistant := this.Assistant
 
-
-		local ticks := A_TickCount
-
-		knowledge := assistant.getKnowledge("Agent")
-
-		ticks := A_TickCount - ticks
-
-		ticks := A_TickCount
-
-		local knowledge := JSON.print(knowledge, "`t")
-
-		ticks := A_TickCount - ticks
-
 		return {assistant: assistant.AssistantType, name: assistant.VoiceManager.Name
 			  , knowledge: JSON.print(assistant.getKnowledge("Agent", this.Options))}
 	}
@@ -4028,8 +4015,31 @@ speakAssistant(context, message) {
 Assistant_Speak := speakAssistant
 
 raiseEvent(context, event, arguments*) {
+	local assistant, pid
+
 	try {
-		return context.KnowledgeBase.RaceAssistant.handleEvent(normalizeArguments(Array(event, arguments*))*)
+		if inList(kRaceAssistants, event) {
+			assistant := event
+			event := arguments.RemoveAt(1)
+
+			if (assistant = this.AssistantType)
+				return context.KnowledgeBase.RaceAssistant.handleEvent(normalizeArguments(Array(event, arguments*))*)
+			else {
+				pid := ProcessExist(assistant . ".exe")
+
+				if pid {
+					messageSend(kFileMessage, assistant
+											, event . ((arguments.Length > 0) ? (":" . values2String(";", normalizeArguments(arguments, true)*)) : "")
+											, pid)
+
+					return true
+				}
+				else
+					return false
+			}
+		}
+		else
+			return context.KnowledgeBase.RaceAssistant.handleEvent(normalizeArguments(Array(event, arguments*))*)
 	}
 	catch Any as exception {
 		logError(exception, true)
@@ -4306,7 +4316,7 @@ normalizeArguments(arguments, remote := false) {
 	local ignore, argument
 
 	for ignore, argument in arguments
-		if (argument = kNotInitialized)
+		if ((argument = kNotInitialized) || (argument = kUndefined))
 			result.Push(remote ? kUndefined : unset)
 		else
 			try {

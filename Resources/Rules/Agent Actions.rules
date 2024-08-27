@@ -11,10 +11,11 @@
 
 #Include %kResourcesDirectory%Rules\Action Callbacks.rules
 
-Assistant.Raise(?event) <= Call(raiseEvent, ?event)
-Assistant.Raise(?event, ?p1) <= Call(raiseEvent, ?event, ?p1)
-Assistant.Raise(?event, ?p1, ?p2) <= Call(raiseEvent, ?event, ?p1, ?p2)
-Assistant.Raise(?event, ?p1, ?p2, ?p3) <= Call(raiseEvent, ?event, ?p1, ?p2, ?p3)
-Assistant.Raise(?event, ?p1, ?p2, ?p3, ?p4) <= Call(raiseEvent, ?event, ?p1, ?p2, ?p3, ?p4)
-Assistant.Raise(?event, ?p1, ?p2, ?p3, ?p4, ?p5) <= Call(raiseEvent, ?event, ?p1, ?p2, ?p3, ?p4, ?p5)
-Assistant.Raise(?event, ?p1, ?p2, ?p3, ?p4, ?p5, ?p6) <= Call(raiseEvent, ?event, ?p1, ?p2, ?p3, ?p4, ?p5, ?p6)
+Assistant.Raise(?p0) <= Call(raiseEvent, ?p0)
+Assistant.Raise(?p0, ?p1) <= Call(raiseEvent, ?p0, ?p1)
+Assistant.Raise(?p0, ?p1, ?p2) <= Call(raiseEvent, ?p0, ?p1, ?p2)
+Assistant.Raise(?p0, ?p1, ?p2, ?p3) <= Call(raiseEvent, ?p0, ?p1, ?p2, ?p3)
+Assistant.Raise(?p0, ?p1, ?p2, ?p3, ?p4) <= Call(raiseEvent, ?p0, ?p1, ?p2, ?p3, ?p4)
+Assistant.Raise(?p0, ?p1, ?p2, ?p3, ?p4, ?p5) <= Call(raiseEvent, ?p0, ?p1, ?p2, ?p3, ?p4, ?p5)
+Assistant.Raise(?p0, ?p1, ?p2, ?p3, ?p4, ?p5, ?p6) <= Call(raiseEvent, ?p0, ?p1, ?p2, ?p3, ?p4, ?p5, ?p6)
+Assistant.Raise(?p0, ?p1, ?p2, ?p3, ?p4, ?p5, ?p6, ?p7) <= Call(raiseEvent, ?p0, ?p1, ?p2, ?p3, ?p4, ?p5, ?p6, ?p7)

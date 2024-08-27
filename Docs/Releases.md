@@ -8,7 +8,7 @@
   7. The team management editor in "Simulator Startup" has become a resizeable window.
   8. Removed minimize controls from several modal windows.
   9. A new LLM event has been defined for the [*Reasoning* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-spotter) of the Race Spotter. "opponent_pitting" will be signalled, if the direct opponent ahead or behind is going to the pits.
-  11. Events for the *Reasoning* booster can now be raised for other Assistants. This opens up complete new possibilities, so that the Assistants can collaborate on a given task, thereby creating complex chain of thoughts. See the [updated documentation for *Assistant.Raise*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-events).
+  11. [Experts] Events for the *Reasoning* booster can now also be raised for other Assistants. This opens up complete new possibilities, so that the Assistants can collaborate on a given task thereby creating complex chain of thoughts. See the updated information about *Assistant.Raise* in the [documentation for event management](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-events).
   12. [Experts] A new method has been introduced to customize the Assistant rules by placing rule snippets in an extension folder. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#customizing-the-assistant-rules) for more information.
 
 ## 5.8.4.1-release 08/24/24

@@ -4015,16 +4015,20 @@ speakAssistant(context, message) {
 Assistant_Speak := speakAssistant
 
 raiseEvent(context, event, arguments*) {
-	local assistant, pid
+	local assistant := context.KnowledgeBase.RaceAssistant
+	local pid
 
 	try {
 		if inList(kRaceAssistants, event) {
-			assistant := event
-			event := arguments.RemoveAt(1)
+			if (event = assistant.AssistantType) {
+				event := arguments.RemoveAt(1)
 
-			if (assistant = this.AssistantType)
-				return context.KnowledgeBase.RaceAssistant.handleEvent(normalizeArguments(Array(event, arguments*))*)
+				return assistant.handleEvent(normalizeArguments(Array(event, arguments*))*)
+			}
 			else {
+				assistant := event
+				event := arguments.RemoveAt(1)
+
 				pid := ProcessExist(assistant . ".exe")
 
 				if pid {
@@ -4039,7 +4043,7 @@ raiseEvent(context, event, arguments*) {
 			}
 		}
 		else
-			return context.KnowledgeBase.RaceAssistant.handleEvent(normalizeArguments(Array(event, arguments*))*)
+			return assistant.handleEvent(normalizeArguments(Array(event, arguments*))*)
 	}
 	catch Any as exception {
 		logError(exception, true)

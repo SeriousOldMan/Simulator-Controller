@@ -14,7 +14,7 @@ plan_pitstop=Assistant.Method|planPitstop|false|false|1|Ask the Engineer to plan
 simulate_pitstop=Assistant.Method|recommendPitstop|false|false|1|Simulates the outcome of an upcoming pitstop. The traffic situation after the pitstop will be evaluated and the target lap will be optimized, if an undercut is possible.
 announce_upcoming_pitstop=Assistant.Method|reportUpcomingPitstop|false|false|1|Announces an upcoming pitstop according to the currently active strategy.
 update_strategy=Assistant.Method|recommendStrategy|false|false|0|Trigger a recalculation of the current race strategy.
-check_pitstop=Assistant.Method|checkPitstop|false|false|1|Check whether a pitstop at a given lap might be beneficial or even possible in the current strategy settings.
+check_pitstop=Assistant.Method|checkPitstop|false|false|1|Check whether a pitstop at a given lap might be beneficial and is also allowed for the currently active strategy.
 report_weather_forecast=Assistant.Method|weatherForecast|false|false|3|Reports an upcoming change in the weather conditions.
 [Agent.Actions.Parameters]
 plan_pitstop.1=targetLap|Integer||false|The planned lap for the car to come to the pit.

@@ -2691,9 +2691,11 @@ class RaceCenter extends ConfigurationItem {
 
 						writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
-						window["serverURLEdit"].Delete()
-						window["serverURLEdit"].Add(serverURLs)
-						window["serverURLEdit"].Choose(inList(serverURLs, this.ServerURL))
+						if (this.Mode = "Normal") {
+							window["serverURLEdit"].Delete()
+							window["serverURLEdit"].Add(serverURLs)
+							window["serverURLEdit"].Choose(inList(serverURLs, this.ServerURL))
+						}
 					}
 
 					showMessage(translate("Successfully connected to the Team Server."))

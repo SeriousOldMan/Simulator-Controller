@@ -3,7 +3,7 @@ Version=5.8.5.0-alpha
 Target=5.8.5.0-release
 Date=08/28/2024
 Download=https://www.dropbox.com/scl/fi/oe00d2wunq5xxy2b6jras/Simulator-Controller-5.8.5.0-alpha.zip?rlkey=doat2ymabtrcoho2w7jkpj5oy&st=mmhion6r&dl=1
-Changes=Optimized handling of unidentified tyre sets (like Wets) in the "Practice Center", Fixed weather related tyre change handling of Engineer and Strategist, External report windows for "Practice Center", Extensions folder for Assistant rules, Potentially fixed a bug with corrupt driver names in AMS2 and PCARS 2, Resizeable window for team manager in "Simulator Setup", Removed minimize control for modal windows, New LLM event for opponents pitting, LLM events can be raised for other Assistants, Extended LLM action "update_strategy" for the Strategist
+Changes=Optimized handling of unidentified tyre sets (like Wets) in the "Practice Center", Fixed weather related tyre change handling of Engineer and Strategist, External report windows for "Practice Center", Extensions folder for Assistant rules, Potentially fixed a bug with corrupt driver names in AMS2 and PCARS 2, Resizeable window for team manager in "Simulator Setup", Removed minimize control for modal windows, New LLM event for opponents pitting, LLM events can be raised for other Assistants, Extended LLM action "update_strategy" for the Strategist, Fixed session loading in "Race Center Lite"
 Components=Media->5.6.1,Configuration->5.8.4,Utilities->5.4.8
 [Release]
 Version=5.8.4.1-release

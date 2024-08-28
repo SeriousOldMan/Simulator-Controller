@@ -635,9 +635,14 @@ Beside the predefined actions for the different Assistant, which come with the s
 | Pitstop Simulation     | [Optional] lap    | Yes | No | "What do you think? Can we go for an undercut in lap 7?" or "Can we get some clean air when we pit earlier?" |
 | Pitstop Planning       | [Optional] lap    | Yes | Yes | "Can you ask the Engineer to create a pitstop plan for the next lap?" |
 | Pitstop Announcement   | [Required] lap    | No  | Yes | Announces an upcoming pitstop according to the currently active strategy. |
-| Strategy Recalculation | -                 | Yes | No | "Can you check whether we can skip the last pitstop, if we use a fuel saving map from now on?" |
-| Strategy Check         | [Optional] lap    | No | Yes | Recalculates the current strategy. If the optional lap number for the next pitstop is supplied, the Strategist will check whether a pitstop at a given lap might be beneficial and is also allowed for the currently active strategy. |
+| Strategy Update (1)    | -                 | Yes | No | "Can you check whether we can skip the last pitstop, if we use a fuel saving map from now on?" |
+| Strategy Update (2)    | [Optional] lap    | No | Yes | Recalculates the current strategy. If the optional lap number for the next pitstop is supplied, the Strategist will check whether a pitstop at a given lap might be beneficial and is also allowed for the currently active strategy. |
 | Weather Reporting      | 1. [Required] weather<br>2. [Required] minutes<br>3. [Required] impactsStrategy | No | Yes | Typically activated when an upcoming weather change is detected in the telemetry data. There is an event available, that signals a change in the weather forecast. *weather* must be one of "Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain" and "Thunderstorm". *minutes* specify the time, when the new weather will arrive and *impactsStrategy* accepts a *Boolean* that indicates, whether a tyre change might be beneficial. |
+
+##### Notes
+
+1. This action is available in the *Conversation* booster. It will recalculate the strategy according to the current race situation and environmental conditions. Will show the same result as the [plugin action "StrategRecommend"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) and the corresponding voice command.
+2. This version of "Strategy Update" is available in the *Reasoning* booster. It will check whether a pitstop in the next lap is valid in the context of the current strategy and might create some benefit. Therefore it might be triggered, when the Spotter detected, that a direct opponent has entered the pit.
 
 #### Events
 

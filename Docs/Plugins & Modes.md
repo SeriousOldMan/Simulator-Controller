@@ -623,6 +623,7 @@ See the following table for the supported Assistant commands.
 | ------ | ------ |
 | InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your Race Assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
 | PitstopRecommend | Asks the Virtual Race Strategist for a recommendation for the next pitstop. |
+| StrategyRecommend | Asks the Virtual Race Strategist to [recalculate and adjust the strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) based on the currently active strategy and the current race situation. Very useful after an unplanned pitstop. |
 | StrategyCancel | Asks the Virtual Race Strategist to drop the currently active strategy. |
 | PitstopPlan | Requests a pitstop plan from the Virtual Race Engineer. |
 | DriverSwapPlan | Requests a pitstop plan for the next driver in a team session from the Virtual Race Engineer. |
@@ -744,6 +745,7 @@ See the following table for the supported Assistant commands.
 | ------ | ------ |
 | InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your Race Assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
 | PitstopRecommend | Asks the Virtual Race Strategist for a recommendation for the next pitstop. |
+| StrategyRecommend | Asks the Virtual Race Strategist to [recalculate and adjust the strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) based on the currently active strategy and the current race situation. Very useful after an unplanned pitstop. |
 | StrategyCancel | Asks the Virtual Race Strategist to drop the currently active strategy. |
 | PitstopPlan | Requests a pitstop plan from the Virtual Race Engineer. |
 | DriverSwapPlan | Requests a pitstop plan for the next driver in a team session from the Virtual Race Engineer. |
@@ -839,7 +841,7 @@ Note: Be careful, when you change pitstop settings while Jona is active, the Rac
 
 With the plugin parameter *assistantCommands* you can supply a list of the commands you want to trigger, when the "Assistant" mode is active. Only unary controller functions are allowed here.
 
-	assistantCommands: PitstopRecommend *function*,   *function*,
+	assistantCommands: PitstopRecommend *function*, StrategyCancel *function*,
 					   PitstopPlan *function*, PitstopPrepare *function*,
 					   Accept *acceptFunction*, Reject *rejectFunction*,
 					   InformationRequest *requestFunction* *command* [*arguments*], ...
@@ -850,6 +852,7 @@ See the following table for the supported Assistant commands.
 | ------ | ------ |
 | InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your Race Assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
 | PitstopRecommend | Asks the virtual Eace Strategist for a recommendation for the next pitstop. |
+| StrategyRecommend | Asks the Virtual Race Strategist to [recalculate and adjust the strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) based on the currently active strategy and the current race situation. Very useful after an unplanned pitstop. |
 | StrategyCancel | Asks the Virtual Race Strategist to drop the currently active strategy. |
 | PitstopPlan | Requests a pitstop plan from the Virtual Race Engineer. |
 | DriverSwapPlan | Requests a pitstop plan for the next driver in a team session from the Virtual Race Engineer. |
@@ -942,6 +945,7 @@ See the following table for the supported Assistant commands.
 | ------ | ------ |
 | InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your Race Assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
 | PitstopRecommend | Asks the Virtual Race Strategist for a recommendation for the next pitstop. |
+| StrategyRecommend | Asks the Virtual Race Strategist to [recalculate and adjust the strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) based on the currently active strategy and the current race situation. Very useful after an unplanned pitstop. |
 | StrategyCancel | Asks the Virtual Race Strategist to drop the currently active strategy. |
 | PitstopPlan | Requests a pitstop plan from the Virtual Race Engineer. |
 | DriverSwapPlan | Requests a pitstop plan for the next driver in a team session from the Virtual Race Engineer. |
@@ -1042,6 +1046,7 @@ See the following table for the supported Assistant commands.
 | ------ | ------ |
 | InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your Race Assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
 | PitstopRecommend | Asks the Virtual Race Strategist for a recommendation for the next pitstop. |
+| StrategyRecommend | Asks the Virtual Race Strategist to [recalculate and adjust the strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) based on the currently active strategy and the current race situation. Very useful after an unplanned pitstop. |
 | StrategyCancel | Asks the Virtual Race Strategist to drop the currently active strategy. |
 | PitstopPlan | Requests a pitstop plan from the Virtual Race Engineer. |
 | DriverSwapPlan | Requests a pitstop plan for the next driver in a team session from the Virtual Race Engineer. |
@@ -1148,6 +1153,7 @@ See the following table for the supported Assistant commands.
 | ------ | ------ |
 | InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your Race Assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
 | PitstopRecommend | Asks the Virtual Race Strategist for a recommendation for the next pitstop. |
+| StrategyRecommend | Asks the Virtual Race Strategist to [recalculate and adjust the strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) based on the currently active strategy and the current race situation. Very useful after an unplanned pitstop. |
 | StrategyCancel | Asks the Virtual Race Strategist to drop the currently active strategy. |
 | PitstopPlan | Requests a pitstop plan from the Virtual Race Engineer. |
 | DriverSwapPlan | Requests a pitstop plan for the next driver in a team session from the Virtual Race Engineer. |
@@ -1244,7 +1250,7 @@ See the following table for the supported assistant commands.
 | ------ | ------ |
 | InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your race assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
 | PitstopRecommend | Asks the virtual race strategist for a recommendation for the next pitstop. This commadn is most useful, when no strategy is currently active. |
-| StrategyRecommend | Asks the virtual race strategist to [recalculate and adjust the strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) based on the currently active strategy and the current race situation. Very useful after an unplanned pitstop. |
+| StrategyRecommend | Asks the Virtual Race Strategist to [recalculate and adjust the strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) based on the currently active strategy and the current race situation. Very useful after an unplanned pitstop. |
 | StrategyCancel | Asks the virtual race strategist to drop the currently active strategy. |
 | PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
 | DriverSwapPlan | Requests a pitstop plan for the next driver in a team session from the Virtual Race Engineer. |
@@ -1345,6 +1351,7 @@ See the following table for the supported Assistant commands.
 | ------ | ------ |
 | InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your Race Assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
 | PitstopRecommend | Asks the Virtual Race Strategist for a recommendation for the next pitstop. |
+| StrategyRecommend | Asks the Virtual Race Strategist to [recalculate and adjust the strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) based on the currently active strategy and the current race situation. Very useful after an unplanned pitstop. |
 | StrategyCancel | Asks the Virtual Race Strategist to drop the currently active strategy. |
 | PitstopPlan | Requests a pitstop plan from the Virtual Race Engineer. |
 | DriverSwapPlan | Requests a pitstop plan for the next driver in a team session from the Virtual Race Engineer. |

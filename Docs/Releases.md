@@ -2,7 +2,7 @@
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed the request of a weather related tyre change by the Strategist or the Engineer (if the Strategist is disabled).
-  4. Fixed a bug in "Race Center Lite", that prevented loading of a session, if a connection to the particular server has never been established before.
+  4. Fixed a critical bug in "Race Center Lite", that prevented loading of a session, if a connection to the particular server has never been established before.
   5. Potentially fixed a bug that created corrupted driver names in *Automobilista 2* and *Project CARS 2*.
   6. The "Practice Center" now handles unnumbered tyre sets like Wet tyres, for example, correctly in terms of tyre usage.
   7. "Practice Center" now also can [open every report in a separate window](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Practice-Center#notes), similar to the "Race Center" behaviour introduced with Release 5.8.3. To open a report in a separate window, hold down the Control key while choosing the report.

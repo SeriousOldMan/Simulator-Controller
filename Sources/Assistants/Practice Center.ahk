@@ -872,18 +872,20 @@ class PracticeCenter extends ConfigurationItem {
 
 	UsedTyreSets[compound?, tyreSet?] {
 		Get {
-			local ignore, tyreInfo
+			local ignore, tyreInfo, found
 
 			if isSet(compound) {
+				found := false
+
 				for ignore, tyreInfo in this.iUsedTyreSets
 					if (tyreInfo.Compound = compound) {
 						if (isSet(tyreSet) && (tyreInfo.Nr != tyreSet))
 							continue
 
-						return tyreInfo
+						found := tyreInfo
 					}
 
-				return false
+				return found
 			}
 			else
 				return this.iUsedTyreSets
@@ -3381,12 +3383,17 @@ class PracticeCenter extends ConfigurationItem {
 
 			this.showLapDetails(this.LastLap)
 		}
-
-		if (selectedRun && (this.SelectedDetailReport = "Run")) {
+		else if (selectedRun && (this.SelectedDetailReport = "Run")) {
 			this.RunsListView.Modify(this.RunsListView.GetCount(), "Select Vis")
 
 			this.showRunDetails(this.CurrentRun)
 		}
+		else if (this.SelectedDetailReport = "Data")
+			this.showDataSummary()
+		else if (this.SelectedDetailReport = "Session")
+			this.showSessionSummary()
+		else if (this.SelectedDetailReport = "Runs")
+			this.showRunsSummary()
 
 		this.updatePitstops(lap, data)
 
@@ -6612,7 +6619,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		html .= ("<br><br><div id=`"chart_1`" style=`"width: " . width . "px; height: 248px`"></div>")
 
-		this.showDetails("Session", !viewer ? false : translate("Stints Summary"), html, [1, chart1])
+		this.showDetails("Session", !viewer ? false : translate("Session Summary"), html, [1, chart1])
 	}
 
 	showRunsSummary(viewer := GetKeyState("Ctrl")) {

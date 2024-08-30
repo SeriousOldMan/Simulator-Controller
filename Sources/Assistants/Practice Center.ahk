@@ -3250,20 +3250,22 @@ class PracticeCenter extends ConfigurationItem {
 		local tyreCompound := compound(getMultiMapValue(data, "Car Data", "TyreCompound")
 									 , getMultiMapValue(data, "Car Data", "TyreCompoundColor"))
 		local tyreSet := getMultiMapValue(data, "Car Data", "TyreSet", "-")
+		local currentLap := (this.LastLap ? this.LastLap : false)
+		local currentRun := (currentLap ? currentLap.Run : false)
 		local lap, selectedLap, selectedRun, damage, pLap, fuelConsumption, car, run, sectorTimes
 
 		if ((tyreCompound = "Wet") && (SessionDatabase.getSimulatorCode(this.Simulator) = "ACC"))
 			tyreSet := "-"
 
-		if (this.LastLap && ((this.LastLap.Compound != tyreCompound) || (this.LastLap.TyreSet != tyreSet)
-																	 || (this.LastLap.Driver != driver))) {
+		if (currentLap && ((currentLap.Compound != tyreCompound) || (currentLap.TyreSet != tyreSet)
+																 || (currentLap.Driver != driver))) {
 			this.newRun(lapNumber)
 
 			if isDebug()
-				logMessage(kLogDebug, "addLap(Pitstop) - Lap: " . lapNumber . "; Run: " . (this.CurrentRun ? this.CurrentRun.Nr : 1))
+				logMessage(kLogDebug, "addLap(Pitstop) - Lap: " . lapNumber . "; Run: " . (currentRun ? currentRun.Nr : 1))
 		}
 		else if isDebug()
-			logMessage(kLogDebug, "addLap - Lap: " . lapNumber . "; Run: " . (this.CurrentRun ? this.CurrentRun.Nr : 1))
+			logMessage(kLogDebug, "addLap - Lap: " . lapNumber . "; Run: " . (currentRun ? currentRun.Nr : 1))
 
 		lap := this.requireLap(lapNumber)
 

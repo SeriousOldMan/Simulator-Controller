@@ -3250,15 +3250,14 @@ class PracticeCenter extends ConfigurationItem {
 		local tyreCompound := compound(getMultiMapValue(data, "Car Data", "TyreCompound")
 									 , getMultiMapValue(data, "Car Data", "TyreCompoundColor"))
 		local tyreSet := getMultiMapValue(data, "Car Data", "TyreSet", "-")
-		local currentLap := (this.LastLap ? this.LastLap : false)
-		local currentRun := (currentLap ? currentLap.Run : false)
+		local lastLap := (this.LastLap ? this.LastLap : false)
+		local currentRun := (lastLap ? lastLap.Run : false)
 		local lap, selectedLap, selectedRun, damage, pLap, fuelConsumption, car, run, sectorTimes
 
 		if ((tyreCompound = "Wet") && (SessionDatabase.getSimulatorCode(this.Simulator) = "ACC"))
 			tyreSet := "-"
 
-		if (currentLap && ((currentLap.Compound != tyreCompound) || (currentLap.TyreSet != tyreSet)
-																 || (currentLap.Driver != driver))) {
+		if (lastLap && ((lastLap.Compound != tyreCompound) || (lastLap.TyreSet != tyreSet) || (lastLap.Driver != driver))) {
 			this.newRun(lapNumber)
 
 			if isDebug()

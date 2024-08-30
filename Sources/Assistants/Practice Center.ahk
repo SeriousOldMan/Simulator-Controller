@@ -3395,24 +3395,9 @@ class PracticeCenter extends ConfigurationItem {
 
 		this.syncSessionStore()
 
-		if (selectedLap && (this.SelectedDetailReport = "Lap")) {
-			this.LapsListView.Modify(this.LapsListView.GetCount(), "Select Vis")
-
-			this.showLapDetails(this.LastLap)
-		}
-		else if (selectedRun && (this.SelectedDetailReport = "Run")) {
-			this.RunsListView.Modify(this.RunsListView.GetCount(), "Select Vis")
-
-			this.showRunDetails(this.CurrentRun)
-		}
-		else if (this.SelectedDetailReport = "Data")
-			this.showDataSummary()
-		else if (this.SelectedDetailReport = "Session")
-			this.showSessionSummary()
-		else if (this.SelectedDetailReport = "Runs")
-			this.showRunsSummary()
-
 		this.updatePitstops(lap, data)
+
+		this.refreshReports(selectedLap, selectedRun)
 
 		this.updateState()
 	}
@@ -3756,6 +3741,10 @@ class PracticeCenter extends ConfigurationItem {
 		this.modifyLap(lap)
 		this.modifyRun(lap.Run)
 
+		this.syncSessionStore()
+
+		this.refreshReports()
+
 		this.updateState()
 	}
 
@@ -3814,6 +3803,10 @@ class PracticeCenter extends ConfigurationItem {
 
 			this.modifyLap(lap)
 			this.modifyRun(lap.Run)
+
+			this.syncSessionStore()
+
+			this.refreshReports()
 
 			this.updateState()
 		}
@@ -4093,12 +4086,12 @@ class PracticeCenter extends ConfigurationItem {
 			selectedLap := this.LapsListView.GetNext(0)
 
 			if (selectedLap && (this.SelectedDetailReport = "Lap"))
-				this.showLapDetails(this.Laps[selectedLap])
+				this.showLapDetails(this.Laps[selectedLap], false)
 			else {
 				selectedRun := this.RunsListView.GetNext(0)
 
 				if (selectedRun && (this.SelectedDetailReport = "Run"))
-					this.showRunDetails(this.Runs[selectedRun])
+					this.showRunDetails(this.Runs[selectedRun], false)
 				else if (this.SelectedDetailReport && this.iSelectedDetailHTML) {
 					this.DetailsViewer.document.open()
 					this.DetailsViewer.document.write(this.iSelectedDetailHTML)
@@ -4106,6 +4099,37 @@ class PracticeCenter extends ConfigurationItem {
 				}
 			}
 		}
+	}
+
+	refreshReports(selectLap := false, selectRun := false, async := true) {
+		refreshReportsAsync() {
+			if this.SelectedReport
+				this.showReport(this.SelectedReport, true)
+
+			if (selectLap && (this.SelectedDetailReport = "Lap")) {
+				this.LapsListView.Modify(this.LapsListView.GetCount(), "Select Vis")
+
+				this.showLapDetails(this.LastLap, false)
+			}
+			else if (selectRun && (this.SelectedDetailReport = "Run")) {
+				this.RunsListView.Modify(this.RunsListView.GetCount(), "Select Vis")
+
+				this.showRunDetails(this.CurrentRun, false)
+			}
+			else {
+				if (this.SelectedDetailReport = "Data")
+					this.showDataSummary(false)
+				else if (this.SelectedDetailReport = "Session")
+					this.showSessionSummary(false)
+				else if (this.SelectedDetailReport = "Runs")
+					this.showRunsSummary(false)
+			}
+		}
+
+		if async
+			this.pushTask(refreshReportsAsync)
+		else
+			refreshReportsAsync()
 	}
 
 	getCar(lap, carID, &car, &carNumber, &carName, &driverForname, &driverSurname, &driverNickname) {
@@ -6071,14 +6095,153 @@ class PracticeCenter extends ConfigurationItem {
 	syncSessionStore(forSave := false) {
 		local sessionStore := this.SessionStore
 		local lastLap := this.LastLap
-		local pressuresTable, tyresTable, newLap, lap, lapData, pressures, tyres
-		local pressureFL, pressureFR, pressureRL, pressureRR
-		local pressureLossFL, pressureLossFR, pressureLossRL, pressureLossRR
-		local temperatureFL, temperatureFR, temperatureRL, temperatureRR
-		local wearFL, wearFR, wearRL, wearRR
-		local telemetry, brakeTemperatures, ignore, table, field, brakeWears
-		local currentListView, lapPressures, entry, standingsData, prefix, driver, category
-		local currentRun, run, runData, tries, carIDs, positions
+		local pressuresTable, tyresTable, newLap, baseLap, lap, lapData
+		local currentRun, run, runData
+
+		updateLap(lap, lapData) {
+			local lapNr := lap.Nr
+			local ignore, field, value, pressures, tyres
+			local pressureFL, pressureFR, pressureRL, pressureRR
+			local pressureLossFL, pressureLossFR, pressureLossRL, pressureLossRR
+			local temperatureFL, temperatureFR, temperatureRL, temperatureRR
+			local wearFL, wearFR, wearRL, wearRR
+			local telemetry, brakeTemperatures, brakeWears
+
+			for field, value in Map("Nr", lapNr, "Lap", lapNr, "Run", lap.Run.Nr, "Lap.Time", null(lap.LapTime)
+								  , "Sectors.Time", values2String(",", collect(lap.SectorsTime, null)*), "Position", null(lap.Position)
+								  , "Damage", lap.Damage, "EngineDamage", lap.EngineDamage, "Accident", lap.Accident
+								  , "Fuel.Initial", null(lap.Run.FuelInitial), "Fuel.Consumption", null(lap.FuelConsumption)
+								  , "Fuel.Remaining", null(lap.FuelRemaining), "Lap.State", lap.State, "Lap.Valid", (lap.State != "Invalid")
+								  , "Weather", lap.Weather, "Temperature.Air", null(lap.AirTemperature), "Temperature.Track", null(lap.TrackTemperature)
+								  , "Grip", lap.Grip, "Map", null(lap.Map), "TC", null(lap.TC), "ABS", null(lap.ABS)
+								  , "Tyre.Compound", compound(lap.Compound), "Tyre.Compound.Color", compoundColor(lap.Compound), "Tyre.Set", lap.TyreSet
+								  , "Data.Telemetry", lap.TelemetryData, "Data.Pressures", lap.PressuresData)
+				lapData[field] := value
+
+			pressures := pressuresTable[this.PressuresDatabase.Laps[lapNr]]
+			tyres := tyresTable[this.TelemetryDatabase.Laps[lapNr]]
+
+			pressureFL := pressures["Tyre.Pressure.Cold.Front.Left"]
+			pressureFR := pressures["Tyre.Pressure.Cold.Front.Right"]
+			pressureRL := pressures["Tyre.Pressure.Cold.Rear.Left"]
+			pressureRR := pressures["Tyre.Pressure.Cold.Rear.Right"]
+
+			lapData["Tyre.Pressure.Cold.Front.Left"] := null(pressureFL)
+			lapData["Tyre.Pressure.Cold.Front.Right"] := null(pressureFR)
+			lapData["Tyre.Pressure.Cold.Rear.Left"] := null(pressureRL)
+			lapData["Tyre.Pressure.Cold.Rear.Right"] := null(pressureRR)
+			lapData["Tyre.Pressure.Cold.Average"] := null(average([pressureFL, pressureFR, pressureRL, pressureRR]))
+			lapData["Tyre.Pressure.Cold.Front.Average"] := null(average([pressureFL, pressureFR]))
+			lapData["Tyre.Pressure.Cold.Rear.Average"] := null(average([pressureRL, pressureRR]))
+
+			pressureFL := pressures["Tyre.Pressure.Hot.Front.Left"]
+			pressureFR := pressures["Tyre.Pressure.Hot.Front.Right"]
+			pressureRL := pressures["Tyre.Pressure.Hot.Rear.Left"]
+			pressureRR := pressures["Tyre.Pressure.Hot.Rear.Right"]
+
+			if isNull(pressureFL)
+				pressureFL := tyres["Tyre.Pressure.Front.Left"]
+			if isNull(pressureFR)
+				pressureFR := tyres["Tyre.Pressure.Front.Right"]
+			if isNull(pressureRL)
+				pressureRL := tyres["Tyre.Pressure.Rear.Left"]
+			if isNull(pressureRR)
+				pressureRR := tyres["Tyre.Pressure.Rear.Right"]
+
+			lapData["Tyre.Pressure.Hot.Front.Left"] := null(pressureFL)
+			lapData["Tyre.Pressure.Hot.Front.Right"] := null(pressureFR)
+			lapData["Tyre.Pressure.Hot.Rear.Left"] := null(pressureRL)
+			lapData["Tyre.Pressure.Hot.Rear.Right"] := null(pressureRR)
+			lapData["Tyre.Pressure.Hot.Average"] := null(average([pressureFL, pressureFR, pressureRL, pressureRR]))
+			lapData["Tyre.Pressure.Hot.Front.Average"] := null(average([pressureFL, pressureFR]))
+			lapData["Tyre.Pressure.Hot.Rear.Average"] := null(average([pressureRL, pressureRR]))
+
+			pressureLossFL := pressures["Tyre.Pressure.Loss.Front.Left"]
+			pressureLossFR := pressures["Tyre.Pressure.Loss.Front.Right"]
+			pressureLossRL := pressures["Tyre.Pressure.Loss.Rear.Left"]
+			pressureLossRR := pressures["Tyre.Pressure.Loss.Rear.Right"]
+
+			lapData["Tyre.Pressure.Loss.Front.Left"] := null(pressureLossFL)
+			lapData["Tyre.Pressure.Loss.Front.Right"] := null(pressureLossFR)
+			lapData["Tyre.Pressure.Loss.Rear.Left"] := null(pressureLossRL)
+			lapData["Tyre.Pressure.Loss.Rear.Right"] := null(pressureLossRR)
+
+			lapData["Tyre.Laps"] := null(tyres["Tyre.Laps"])
+
+			temperatureFL := tyres["Tyre.Temperature.Front.Left"]
+			temperatureFR := tyres["Tyre.Temperature.Front.Right"]
+			temperatureRL := tyres["Tyre.Temperature.Rear.Left"]
+			temperatureRR := tyres["Tyre.Temperature.Rear.Right"]
+
+			lapData["Tyre.Temperature.Front.Left"] := null(temperatureFL)
+			lapData["Tyre.Temperature.Front.Right"] := null(temperatureFR)
+			lapData["Tyre.Temperature.Rear.Left"] := null(temperatureRL)
+			lapData["Tyre.Temperature.Rear.Right"] := null(temperatureRR)
+			lapData["Tyre.Temperature.Average"] := null(average([temperatureFL, temperatureFR, temperatureRL, temperatureRR]))
+			lapData["Tyre.Temperature.Front.Average"] := null(average([temperatureFL, temperatureFR]))
+			lapData["Tyre.Temperature.Rear.Average"] := null(average([temperatureRL, temperatureRR]))
+
+			wearFL := tyres["Tyre.Wear.Front.Left"]
+			wearFR := tyres["Tyre.Wear.Front.Right"]
+			wearRL := tyres["Tyre.Wear.Rear.Left"]
+			wearRR := tyres["Tyre.Wear.Rear.Right"]
+
+			lapData["Tyre.Wear.Front.Left"] := null(wearFL)
+			lapData["Tyre.Wear.Front.Right"] := null(wearFR)
+			lapData["Tyre.Wear.Rear.Left"] := null(wearRL)
+			lapData["Tyre.Wear.Rear.Right"] := null(wearRR)
+			lapData["Tyre.Wear.Average"] := ((wearFL = kNull) ? kNull : null(average([wearFL, wearFR, wearRL, wearRR])))
+			lapData["Tyre.Wear.Front.Average"] := ((wearFL = kNull) ? kNull : null(average([wearFL, wearFR])))
+			lapData["Tyre.Wear.Rear.Average"] := ((wearFL = kNull) ? kNull : null(average([wearRL, wearRR])))
+
+			if lap.HasProp("Data") {
+				telemetry := lap.Data
+
+				if (telemetry.Count > 0) {
+					brakeTemperatures := string2Values(",", getMultiMapValue(telemetry, "Car Data", "BrakeTemperature", ""))
+
+					if (brakeTemperatures.Length = 4) {
+						temperatureFL := brakeTemperatures[1]
+						temperatureFR := brakeTemperatures[2]
+						temperatureRL := brakeTemperatures[3]
+						temperatureRR := brakeTemperatures[4]
+
+						lapData["Brake.Temperature.Front.Left"] := null(temperatureFL)
+						lapData["Brake.Temperature.Front.Right"] := null(temperatureFR)
+						lapData["Brake.Temperature.Rear.Left"] := null(temperatureRL)
+						lapData["Brake.Temperature.Rear.Right"] := null(temperatureRR)
+						lapData["Brake.Temperature.Average"] := null(average([temperatureFL, temperatureFR, temperatureRL, temperatureRR]))
+						lapData["Brake.Temperature.Front.Average"] := null(average([temperatureFL, temperatureFR]))
+						lapData["Brake.Temperature.Rear.Average"] := null(average([temperatureRL, temperatureRR]))
+					}
+					else
+						for ignore, field in ["Brake.Temperature.Front.Left", "Brake.Temperature.Front.Right", "Brake.Temperature.Rear.Left", "Brake.Temperature.Rear.Right"
+											, "Brake.Temperature.Average", "Brake.Temperature.Front.Average", "Brake.Temperature.Rear.Average"]
+							lapData[field] := kNull
+
+					brakeWears := string2Values(",", getMultiMapValue(telemetry, "Car Data", "BrakeWear", ""))
+
+					if (brakeWears.Length = 4) {
+						wearFL := brakeWears[1]
+						wearFR := brakeWears[2]
+						wearRL := brakeWears[3]
+						wearRR := brakeWears[4]
+
+						lapData["Brake.Wear.Front.Left"] := null(wearFL)
+						lapData["Brake.Wear.Front.Right"] := null(wearFR)
+						lapData["Brake.Wear.Rear.Left"] := null(wearRL)
+						lapData["Brake.Wear.Rear.Right"] := null(wearRR)
+						lapData["Brake.Wear.Average"] := ((wearFL = kNull) ? kNull : null(average([wearFL, wearFR, wearRL, wearRR])))
+						lapData["Brake.Wear.Front.Average"] := ((wearFL = kNull) ? kNull : null(average([wearFL, wearFR])))
+						lapData["Brake.Wear.Rear.Average"] := ((wearFL = kNull) ? kNull : null(average([wearRL, wearRR])))
+					}
+					else
+						for ignore, field in ["Brake.Wear.Front.Left", "Brake.Wear.Front.Right", "Brake.Wear.Rear.Left", "Brake.Wear.Rear.Right"
+											, "Brake.Wear.Average", "Brake.Wear.Front.Average", "Brake.Wear.Rear.Average"]
+							lapData[field] := kNull
+				}
+			}
+		}
 
 		if lastLap
 			lastLap := lastLap.Nr
@@ -6087,160 +6250,51 @@ class PracticeCenter extends ConfigurationItem {
 			pressuresTable := this.PressuresDatabase.Database.Tables["Tyres.Pressures"]
 			tyresTable := this.TelemetryDatabase.Database.Tables["Tyres"]
 
-			newLap := (sessionStore.Tables["Lap.Data"].Length + 1)
+			baseLap := sessionStore.Tables["Lap.Data"].Length
+			newLap := (baseLap + 1)
 
-			while (newLap <= lastLap) {
-				if !this.Laps.Has(newLap) {
-					newLap += 1
+			loop {
+				if (A_Index <= baseLap) {
+					/*
+					if this.Laps.Has(A_Index) {
+						lap := this.Laps[A_Index]
 
-					continue
+						if (this.TelemetryDatabase.Laps.Has(A_Index) && this.PressuresDatabase.Laps.Has(A_Index) && lap.HasProp("TelemetryData"))
+							for ignore, lapData in sessionStore.Tables["Lap.Data"]
+								if (lapData["Nr"] = A_Index) {
+									updateLap(lap, lapData)
+
+									sessionStore.Changed("Lap.Data")
+
+									break
+								}
+					}
+					*/
 				}
+				else {
+					if (newLap > lastLap)
+						break
 
-				lap := this.Laps[newLap]
+					if !this.Laps.Has(newLap) {
+						newLap += 1
 
-				if (this.TelemetryDatabase.Laps.Has(newLap) && this.PressuresDatabase.Laps.Has(newLap) && lap.HasProp("TelemetryData")) {
-					lapData := Database.Row("Nr", newLap, "Lap", newLap, "Run", lap.Run.Nr, "Lap.Time", null(lap.LapTime)
-										  , "Sectors.Time", values2String(",", collect(lap.SectorsTime, null)*), "Position", null(lap.Position)
-										  , "Damage", lap.Damage, "EngineDamage", lap.EngineDamage, "Accident", lap.Accident
-										  , "Fuel.Initial", null(lap.Run.FuelInitial), "Fuel.Consumption", null(lap.FuelConsumption)
-										  , "Fuel.Remaining", null(lap.FuelRemaining), "Lap.State", lap.State, "Lap.Valid", (lap.State != "Invalid")
-										  , "Weather", lap.Weather, "Temperature.Air", null(lap.AirTemperature), "Temperature.Track", null(lap.TrackTemperature)
-										  , "Grip", lap.Grip, "Map", null(lap.Map), "TC", null(lap.TC), "ABS", null(lap.ABS)
-										  , "Tyre.Compound", compound(lap.Compound), "Tyre.Compound.Color", compoundColor(lap.Compound), "Tyre.Set", lap.TyreSet
-										  , "Data.Telemetry", lap.TelemetryData, "Data.Pressures", lap.PressuresData)
-
-					pressures := pressuresTable[this.PressuresDatabase.Laps[newLap]]
-					tyres := tyresTable[this.TelemetryDatabase.Laps[newLap]]
-
-					pressureFL := pressures["Tyre.Pressure.Cold.Front.Left"]
-					pressureFR := pressures["Tyre.Pressure.Cold.Front.Right"]
-					pressureRL := pressures["Tyre.Pressure.Cold.Rear.Left"]
-					pressureRR := pressures["Tyre.Pressure.Cold.Rear.Right"]
-
-					lapData["Tyre.Pressure.Cold.Front.Left"] := null(pressureFL)
-					lapData["Tyre.Pressure.Cold.Front.Right"] := null(pressureFR)
-					lapData["Tyre.Pressure.Cold.Rear.Left"] := null(pressureRL)
-					lapData["Tyre.Pressure.Cold.Rear.Right"] := null(pressureRR)
-					lapData["Tyre.Pressure.Cold.Average"] := null(average([pressureFL, pressureFR, pressureRL, pressureRR]))
-					lapData["Tyre.Pressure.Cold.Front.Average"] := null(average([pressureFL, pressureFR]))
-					lapData["Tyre.Pressure.Cold.Rear.Average"] := null(average([pressureRL, pressureRR]))
-
-					pressureFL := pressures["Tyre.Pressure.Hot.Front.Left"]
-					pressureFR := pressures["Tyre.Pressure.Hot.Front.Right"]
-					pressureRL := pressures["Tyre.Pressure.Hot.Rear.Left"]
-					pressureRR := pressures["Tyre.Pressure.Hot.Rear.Right"]
-
-					if isNull(pressureFL)
-						pressureFL := tyres["Tyre.Pressure.Front.Left"]
-					if isNull(pressureFR)
-						pressureFR := tyres["Tyre.Pressure.Front.Right"]
-					if isNull(pressureRL)
-						pressureRL := tyres["Tyre.Pressure.Rear.Left"]
-					if isNull(pressureRR)
-						pressureRR := tyres["Tyre.Pressure.Rear.Right"]
-
-					lapData["Tyre.Pressure.Hot.Front.Left"] := null(pressureFL)
-					lapData["Tyre.Pressure.Hot.Front.Right"] := null(pressureFR)
-					lapData["Tyre.Pressure.Hot.Rear.Left"] := null(pressureRL)
-					lapData["Tyre.Pressure.Hot.Rear.Right"] := null(pressureRR)
-					lapData["Tyre.Pressure.Hot.Average"] := null(average([pressureFL, pressureFR, pressureRL, pressureRR]))
-					lapData["Tyre.Pressure.Hot.Front.Average"] := null(average([pressureFL, pressureFR]))
-					lapData["Tyre.Pressure.Hot.Rear.Average"] := null(average([pressureRL, pressureRR]))
-
-					pressureLossFL := pressures["Tyre.Pressure.Loss.Front.Left"]
-					pressureLossFR := pressures["Tyre.Pressure.Loss.Front.Right"]
-					pressureLossRL := pressures["Tyre.Pressure.Loss.Rear.Left"]
-					pressureLossRR := pressures["Tyre.Pressure.Loss.Rear.Right"]
-
-					lapData["Tyre.Pressure.Loss.Front.Left"] := null(pressureLossFL)
-					lapData["Tyre.Pressure.Loss.Front.Right"] := null(pressureLossFR)
-					lapData["Tyre.Pressure.Loss.Rear.Left"] := null(pressureLossRL)
-					lapData["Tyre.Pressure.Loss.Rear.Right"] := null(pressureLossRR)
-
-					tyres := tyresTable[newLap]
-
-					lapData["Tyre.Laps"] := null(tyres["Tyre.Laps"])
-
-					temperatureFL := tyres["Tyre.Temperature.Front.Left"]
-					temperatureFR := tyres["Tyre.Temperature.Front.Right"]
-					temperatureRL := tyres["Tyre.Temperature.Rear.Left"]
-					temperatureRR := tyres["Tyre.Temperature.Rear.Right"]
-
-					lapData["Tyre.Temperature.Front.Left"] := null(temperatureFL)
-					lapData["Tyre.Temperature.Front.Right"] := null(temperatureFR)
-					lapData["Tyre.Temperature.Rear.Left"] := null(temperatureRL)
-					lapData["Tyre.Temperature.Rear.Right"] := null(temperatureRR)
-					lapData["Tyre.Temperature.Average"] := null(average([temperatureFL, temperatureFR, temperatureRL, temperatureRR]))
-					lapData["Tyre.Temperature.Front.Average"] := null(average([temperatureFL, temperatureFR]))
-					lapData["Tyre.Temperature.Rear.Average"] := null(average([temperatureRL, temperatureRR]))
-
-					wearFL := tyres["Tyre.Wear.Front.Left"]
-					wearFR := tyres["Tyre.Wear.Front.Right"]
-					wearRL := tyres["Tyre.Wear.Rear.Left"]
-					wearRR := tyres["Tyre.Wear.Rear.Right"]
-
-					lapData["Tyre.Wear.Front.Left"] := null(wearFL)
-					lapData["Tyre.Wear.Front.Right"] := null(wearFR)
-					lapData["Tyre.Wear.Rear.Left"] := null(wearRL)
-					lapData["Tyre.Wear.Rear.Right"] := null(wearRR)
-					lapData["Tyre.Wear.Average"] := ((wearFL = kNull) ? kNull : null(average([wearFL, wearFR, wearRL, wearRR])))
-					lapData["Tyre.Wear.Front.Average"] := ((wearFL = kNull) ? kNull : null(average([wearFL, wearFR])))
-					lapData["Tyre.Wear.Rear.Average"] := ((wearFL = kNull) ? kNull : null(average([wearRL, wearRR])))
-
-					if lap.HasProp("Data") {
-						telemetry := lap.Data
-
-						if (telemetry.Count > 0) {
-							brakeTemperatures := string2Values(",", getMultiMapValue(telemetry, "Car Data", "BrakeTemperature", ""))
-
-							if (brakeTemperatures.Length = 4) {
-								temperatureFL := brakeTemperatures[1]
-								temperatureFR := brakeTemperatures[2]
-								temperatureRL := brakeTemperatures[3]
-								temperatureRR := brakeTemperatures[4]
-
-								lapData["Brake.Temperature.Front.Left"] := null(temperatureFL)
-								lapData["Brake.Temperature.Front.Right"] := null(temperatureFR)
-								lapData["Brake.Temperature.Rear.Left"] := null(temperatureRL)
-								lapData["Brake.Temperature.Rear.Right"] := null(temperatureRR)
-								lapData["Brake.Temperature.Average"] := null(average([temperatureFL, temperatureFR, temperatureRL, temperatureRR]))
-								lapData["Brake.Temperature.Front.Average"] := null(average([temperatureFL, temperatureFR]))
-								lapData["Brake.Temperature.Rear.Average"] := null(average([temperatureRL, temperatureRR]))
-							}
-							else
-								for ignore, field in ["Brake.Temperature.Front.Left", "Brake.Temperature.Front.Right", "Brake.Temperature.Rear.Left", "Brake.Temperature.Rear.Right"
-													, "Brake.Temperature.Average", "Brake.Temperature.Front.Average", "Brake.Temperature.Rear.Average"]
-									lapData[field] := kNull
-
-							brakeWears := string2Values(",", getMultiMapValue(telemetry, "Car Data", "BrakeWear", ""))
-
-							if (brakeWears.Length = 4) {
-								wearFL := brakeWears[1]
-								wearFR := brakeWears[2]
-								wearRL := brakeWears[3]
-								wearRR := brakeWears[4]
-
-								lapData["Brake.Wear.Front.Left"] := null(wearFL)
-								lapData["Brake.Wear.Front.Right"] := null(wearFR)
-								lapData["Brake.Wear.Rear.Left"] := null(wearRL)
-								lapData["Brake.Wear.Rear.Right"] := null(wearRR)
-								lapData["Brake.Wear.Average"] := ((wearFL = kNull) ? kNull : null(average([wearFL, wearFR, wearRL, wearRR])))
-								lapData["Brake.Wear.Front.Average"] := ((wearFL = kNull) ? kNull : null(average([wearFL, wearFR])))
-								lapData["Brake.Wear.Rear.Average"] := ((wearFL = kNull) ? kNull : null(average([wearRL, wearRR])))
-							}
-							else
-								for ignore, field in ["Brake.Wear.Front.Left", "Brake.Wear.Front.Right", "Brake.Wear.Rear.Left", "Brake.Wear.Rear.Right"
-													, "Brake.Wear.Average", "Brake.Wear.Front.Average", "Brake.Wear.Rear.Average"]
-									lapData[field] := kNull
-						}
+						continue
 					}
 
-					sessionStore.add("Lap.Data", lapData)
-				}
-				else if !forSave
-					return
+					lap := this.Laps[newLap]
 
-				newLap += 1
+					if (this.TelemetryDatabase.Laps.Has(newLap) && this.PressuresDatabase.Laps.Has(newLap) && lap.HasProp("TelemetryData")) {
+						lapData := Database.Row()
+
+						updateLap(lap, lapData)
+
+						sessionStore.add("Lap.Data", lapData)
+					}
+					else if !forSave
+						return
+
+					newLap += 1
+				}
 			}
 		}
 

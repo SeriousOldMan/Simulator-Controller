@@ -1,15 +1,15 @@
 [Development]
-Version=5.8.5.0-dev
+Version=5.8.5.0-release
 Target=5.8.5.0-release
-Date=08/27/2024
-Download=https://www.dropbox.com/scl/fi/30781ecunolaewpbudgr5/Simulator-Controller-5.8.5.0-dev.zip?rlkey=m7zugey9pc3k7wa1712tsbib2&st=pc797974&dl=1
-Changes=Optimized handling of unidentified tyre sets (like Wets) in the "Practice Center", Fixed weather related tyre change handling of Engineer and Strategist, External report windows for "Practice Center", Extensions folder for Assistant rules, Potentially fixed a bug with corrupt driver names in AMS2 and PCARS 2, Resizeable window for team manager in "Simulator Setup", Removed minimize control for modal windows, New LLM event for opponents pitting, LLM events can be raised for other Assistants, New LLM action "check_pitstop" for the Strategist
+Date=08/30/2024
+Download=https://cutt.ly/4eQe6qop;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.8.5.0-release.zip
+Changes=Optimized handling of unidentified tyre sets (like Wets) in the "Practice Center", Fixed weather related tyre change handling of Engineer and Strategist, External report windows for "Practice Center", Extensions folder for Assistant rules, Potentially fixed a bug with corrupt driver names in AMS2 and PCARS 2, Resizeable window for team manager in "Simulator Setup", Removed minimize control for modal windows, New LLM event for opponents pitting, LLM events can be raised for other Assistants, Extended LLM action "update_strategy" for the Strategist, Fixed session loading in "Race Center Lite"
 Components=Media->5.6.1,Configuration->5.8.4,Utilities->5.4.8
 [Release]
-Version=5.8.4.1-release
-Date=08/24/2024
-Download=https://cutt.ly/7enL4yn0;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.8.4.1.release.zip
-Changes="Strategy Workbench" remembers chart settings, Track mapping and track automations for open tracks, Changed unblock modifiers in "Simulator Startup", New LLM events for the Spotter, New controller action "TrackMapping" for Race Spotter, New icon for "TrackMapping" controller action, New "trackMapping" parameter for the "Race Spotter" plugin, New controller action functions "enableTrackMapping" and "disableTrackMapping", New LLM actions for the Conversation booster of the Race Spotter
+Version=5.8.5.0-release
+Date=08/30/2024
+Download=https://cutt.ly/4eQe6qop;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.8.5.0-release.zip
+Changes=Optimized handling of unidentified tyre sets (like Wets) in the "Practice Center", Fixed weather related tyre change handling of Engineer and Strategist, External report windows for "Practice Center", Extensions folder for Assistant rules, Potentially fixed a bug with corrupt driver names in AMS2 and PCARS 2, Resizeable window for team manager in "Simulator Setup", Removed minimize control for modal windows, New LLM event for opponents pitting, LLM events can be raised for other Assistants, Extended LLM action "update_strategy" for the Strategist, Fixed session loading in "Race Center Lite"
 Components=Media->5.6.1,Configuration->5.8.4,Utilities->5.4.8
 [Components]
 Media.5.6.1.Path=Resources
@@ -22,7 +22,7 @@ Utilities.5.4.8.Path=.
 Utilities.5.4.8.Content=Utilities
 Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Utilities-5.4.8.zip?rlkey=alrj8l2z205dd2vm9cu6hbsot&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.4.8.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=5.8.5.0-dev
-Release=5.8.4.1-release
+Development=5.8.5.0-release
+Release=5.8.5.0-release

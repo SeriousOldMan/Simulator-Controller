@@ -634,10 +634,15 @@ Beside the predefined actions for the different Assistant, which come with the s
 |------------------------|-------------------|--------------|-----------|--------------------------|
 | Pitstop Simulation     | [Optional] lap    | Yes | No | "What do you think? Can we go for an undercut in lap 7?" or "Can we get some clean air when we pit earlier?" |
 | Pitstop Planning       | [Optional] lap    | Yes | Yes | "Can you ask the Engineer to create a pitstop plan for the next lap?" |
-| Pitstop Check          | [Required] lap    | No  | Yes | Checks whether a pitstop at a given lap might be beneficial and is also allowed for the currently active strategy. |
 | Pitstop Announcement   | [Required] lap    | No  | Yes | Announces an upcoming pitstop according to the currently active strategy. |
-| Strategy Recalculation | -                 | Yes | No | "Can you check whether we can skip the last pitstop, if we use a fuel saving map from now on?" |
+| Strategy Update (1)    | -                 | Yes | No | "Can you check whether we can skip the last pitstop, if we use a fuel saving map from now on?" |
+| Strategy Update (2)    | [Optional] lap    | No | Yes | Recalculates the current strategy. If the optional lap number for the next pitstop is supplied, the Strategist will check whether a pitstop at a given lap might be beneficial and is also allowed for the currently active strategy. |
 | Weather Reporting      | 1. [Required] weather<br>2. [Required] minutes<br>3. [Required] impactsStrategy | No | Yes | Typically activated when an upcoming weather change is detected in the telemetry data. There is an event available, that signals a change in the weather forecast. *weather* must be one of "Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain" and "Thunderstorm". *minutes* specify the time, when the new weather will arrive and *impactsStrategy* accepts a *Boolean* that indicates, whether a tyre change might be beneficial. |
+
+##### Notes
+
+1. This action is available in the *Conversation* booster. It will recalculate the strategy according to the current race situation and environmental conditions. Will show the same result as the [plugin action "StrategRecommend"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) and the corresponding voice command.
+2. This version of "Strategy Update" is available in the *Reasoning* booster. It will check whether a pitstop in the next lap is valid in the context of the current strategy and might create some benefit. Therefore it might be triggered, when the Spotter detected, that a direct opponent has entered the pit.
 
 #### Events
 
@@ -670,11 +675,11 @@ Beside the predefined actions for the different Assistant, which come with the s
 | Ahead Gap Update            | 1. [Required] carNumber<br>2. [Required] delta<br>3. [Required] closingIn | This event is signalled periodically, when the gap to the opponent ahead has changed for a given amount, which can be configured in the "Session Database". *carNumber* is the car or race number of the car ahead and *delta* is the current gap in seconds. *closingIn* is a boolean, which indicates whether the gap got smaller. |
 | Behind Gap Update           | 1. [Required] carNumber<br>2. [Required] delta<br>3. [Required] closingIn | This event is signalled periodically, when the gap to the opponent behind has changed for a given amount, which can be configured in the "Session Database". *carNumber* is the car or race number of the car ahead and *delta* is the current gap in seconds. *closingIn* is a boolean, which indicates whether the gap got smaller. |
 | Attack Imminent             | 1. [Required] carNumber<br>2. [Required] delta | This event is signalled, when an opponent has closed in and an attack might happen soon. *carNumber* is the car or race number of the car closing in and *delta* is the current gap in seconds. |
-| Blue Flag Alert             | | Signalled, when a blue flag is being shown, because an opponent is closing in who is at least one lap ahead. |
+| Blue Flag Alert             | - | Signalled, when a blue flag is being shown, because an opponent is closing in who is at least one lap ahead. |
 | Opponent Pitting            | 1. [Optional] opponentPosition | Informs about an opponent going to the pits. If this is a direct opponent, *opponentPosition* can be supplied and must be one of "Ahead" or "Behind". |
 | Pitstop Performed           | 1. [Required] pitstopNumber<br>2. [Required] pitstopLap | Signalled when the car just pitted. *pitstopNumber* and *pitstopLap* must be supplied with the number of the pitstop and the current lap. |
-| Last Lap                    | | This event is signalled for the last lap of the session. |
-| Session Over                | | This event is signalled when the session is over. |
+| Last Lap                    | - | This event is signalled for the last lap of the session. |
+| Session Over                | - | This event is signalled when the session is over. |
 
 ### Connecting Events & Actions
 

@@ -870,9 +870,23 @@ class PracticeCenter extends ConfigurationItem {
 		}
 	}
 
-	UsedTyreSets[key?] {
+	UsedTyreSets[compound?, tyreSet?] {
 		Get {
-			return (isSet(key) ? this.iUsedTyreSets[key] : this.iUsedTyreSets)
+			local ignore, tyreInfo
+
+			if isSet(compound) {
+				for ignore, tyreInfo in this.iUsedTyreSets
+					if (tyreInfo.Compound = compound) {
+						if (isSet(tyreSet) && (tyreInfo.Nr != tyreSet))
+							continue
+
+						return tyreInfo
+					}
+
+				return false
+			}
+			else
+				return this.iUsedTyreSets
 		}
 	}
 
@@ -2921,7 +2935,7 @@ class PracticeCenter extends ConfigurationItem {
 		local tyreSet := false
 		local driver := false
 		local laps, numLaps, lapTimes, airTemperatures, trackTemperatures
-		local ignore, lap, consumption, weather, fuelAmount
+		local ignore, lap, consumption, weather, fuelAmount, tyreInfo
 
 		run.FuelConsumption := 0.0
 		run.Accidents := 0
@@ -2979,8 +2993,10 @@ class PracticeCenter extends ConfigurationItem {
 			if (tyreSet && (run.TyreSet = "-") && (run.TyreSet != tyreSet)) {
 				run.TyreSet := tyreSet
 
-				if this.UsedTyreSets.Has(tyreCompound . "." . tyreSet)
-					run.TyreLaps := this.UsedTyreSets[tyreCompound . "." . tyreSet].Laps
+				tyreInfo := this.UsedTyreSets[tyreCompound, tyreSet]
+
+				if tyreInfo
+					run.TyreLaps := tyreInfo.Laps
 				else
 					run.TyreLaps := 0
 
@@ -3027,7 +3043,7 @@ class PracticeCenter extends ConfigurationItem {
 		local currentRun := this.CurrentRun
 		local tyreCompound := "-"
 		local tyreSet := "-"
-		local newRun, engineerPID, tyrePressures, tyre, tyreCompound, tyreCompoundColor
+		local newRun, engineerPID, tyrePressures, tyre, tyreCompound, tyreCompoundColor, tyreInfo
 
 		if !isSet(newTyres)
 			newTyres := (this.Control["tyreCompoundDropDown"].Value > 1)
@@ -3108,8 +3124,12 @@ class PracticeCenter extends ConfigurationItem {
 
 							if (tyreSet = "-")
 								tyreSet := false
-							else if this.UsedTyreSets.Has(newRun.Compound . "." . tyreSet)
-								newRun.TyreLaps := this.UsedTyreSets[newRun.Compound . "." . tyreSet].Laps
+							else {
+								tyreInfo := this.UsedTyreSets[newRun.Compound, tyreSet]
+
+								if tyreInfo
+									newRun.TyreLaps := tyreInfo.Laps
+							}
 
 							if isDebug()
 								logMessage(kLogDebug, "newRun(1) - Run: " . newRun.Nr . "; TyreSet: " . tyreSet . "; TyreLaps: " . newRun.TyreLaps)

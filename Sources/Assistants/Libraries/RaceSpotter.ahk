@@ -1814,7 +1814,8 @@ class RaceSpotter extends GridRaceAssistant {
 					else
 						lapTime := false
 				}
-				else if (focused && focused.hasBestLapTime()) {
+
+				if (focused && !lapTime && focused.hasBestLapTime()) {
 					lapTime := focused.BestLapTime[true]
 
 					if (lapTime = focused.LastLapTime) {
@@ -1825,7 +1826,8 @@ class RaceSpotter extends GridRaceAssistant {
 					else
 						lapTime := false
 				}
-				else if (standingsBehind && standingsBehind.hasBestLapTime()) {
+
+				if (!lapTime && standingsBehind && standingsBehind.hasBestLapTime()) {
 					lapTime := standingsBehind.BestLapTime[true]
 
 					if (lapTime = standingsBehind.LastLapTime)
@@ -1833,7 +1835,8 @@ class RaceSpotter extends GridRaceAssistant {
 					else
 						lapTime := false
 				}
-				else if (leader && leader.hasBestLapTime()) {
+
+				if (!lapTime && leader && leader.hasBestLapTime()) {
 					lapTime := leader.BestLapTime[true]
 
 					if (lapTime = leader.LastLapTime)

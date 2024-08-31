@@ -2842,8 +2842,8 @@ class RaceSpotter extends GridRaceAssistant {
 												   , this.Announcements["DeltaInformationMethod"])
 				}
 
-				if this.Announcements["SessionInformation"] {
-					hadInfo := this.sessionInformation(lastLap, sector, positions, sessionInfo && !hadInfo)
+				if (sessionInfo && this.Announcements["SessionInformation"]) {
+					hadInfo := this.sessionInformation(lastLap, sector, positions, !hadInfo)
 
 					if hadInfo
 						sessionInfo := false

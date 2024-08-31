@@ -378,6 +378,8 @@ class SpeechSynthesizer {
 	}
 
 	setPlayerLevel(level) {
+		global kNirCmd
+		
 		local pid := this.iSoundPlayer
 
 		this.iSoundPlayerLevel := level
@@ -389,6 +391,8 @@ class SpeechSynthesizer {
 				}
 				catch Any as exception {
 					logError(exception, true)
+					
+					kNirCmd := false
 
 					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
@@ -426,6 +430,8 @@ class SpeechSynthesizer {
 	}
 
 	playSound(soundFile, wait := true) {
+		global kNirCmd
+		
 		local callback, pid, level
 
 		callback := this.SpeechStatusCallback
@@ -449,6 +455,8 @@ class SpeechSynthesizer {
 				}
 				catch Any as exception {
 					logError(exception, true)
+					
+					kNirCmd := false
 
 					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 												  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
@@ -511,6 +519,8 @@ class SpeechSynthesizer {
 	}
 
 	speak(text, wait := true, cache := false, options := false) {
+		global kSox
+	
 		local cacheFileName, tempName, temp1Name, temp2Name, callback, volume
 		local overdriveGain, overdriveColor, filterHighpass, filterLowpass, noiseVolume, clickVolume
 
@@ -643,6 +653,8 @@ class SpeechSynthesizer {
 				}
 				catch Any as exception {
 					logError(exception, true)
+					
+					kSox := false
 
 					showMessage(substituteVariables(translate("Cannot start SoX (%kSoX%) - please check the configuration..."))
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)

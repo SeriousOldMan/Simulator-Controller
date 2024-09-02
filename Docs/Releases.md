@@ -3,9 +3,12 @@
   2. Documentation updates here and there, as always
   3. All graphs and reports are now redrawn live in "Practice Center".
   4. And yet another fix for the handling of used tyre sets in "Practice Center".
-  5. Fixed Spotter to give opponent lap times again.
-  6. The initial position of the first stint is now displayed as the real startposition and not the position at the end of the first lap.
-  7. [Internal] Reporting of configured but missing optional components like SoX and NirCmd has been optimized.
+  5. Fixed a regression for the Spotter which prevented information about opponent lap times.
+  6. The initial position of the first stint is now displayed as the real starting position and not the position at the end of the first lap.
+  7. A new version of the local LLM Runtime is available.
+  8. [Internal] Reporting of configured but missing optional components like SoX and NirCmd has been optimized.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-585), if you are using the local LLM Runtime.
 
 ## 5.8.5.0-release 08/30/24
   1. Minor bugfixes, as always

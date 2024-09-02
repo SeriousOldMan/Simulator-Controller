@@ -37,7 +37,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 5.8.6
 
-No actions required.
+The local LLM Runtime has been updated. If you are using the LLM Runtime, open "Simulator Setup", remove the "Local Runtime..." preset and reinstall it.
 
 ***
 

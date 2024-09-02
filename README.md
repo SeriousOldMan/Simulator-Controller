@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.8.6.0-release]() (Early build for 5.8.5. Changes: Fixed live graph redrawing in "Practice Center", Fixed tyre laps handling in "Practice Center", Fixed Spotter to give opponent lap times again, Fixed error reporting for missing SoX and NirCmd, New version of local LLM runtime.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-586) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

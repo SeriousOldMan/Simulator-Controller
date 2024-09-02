@@ -6909,7 +6909,7 @@ class RaceCenter extends ConfigurationItem {
 
 	updateStint(stint) {
 		local laps, numLaps, lapTimes, airTemperatures, trackTemperatures
-		local ignore, lap, consumption, weather, row
+		local ignore, lap, consumption, weather, row, raceData
 
 		stint.FuelConsumption := 0.0
 		stint.Accidents := 0
@@ -6946,7 +6946,17 @@ class RaceCenter extends ConfigurationItem {
 			if (A_Index == 1) {
 				stint.Compound := lap.Compound
 				stint.TyreSet := lap.TyreSet
-				stint.StartPosition := lap.Position
+
+				if (stint.Nr = 1) {
+					this.ReportViewer.loadReportData(false, &raceData := true, &ignore := false, &ignore := false, &ignore := false)
+
+					stint.StartPosition := getMultiMapValue(raceData, "Cars", "Car." . getMultiMapValue(raceData, "Cars", "Driver", false) . ".Position", kNull)
+
+					if (stint.StartPosition = kNull)
+						stint.StartPosition := lap.Position
+				}
+				else
+					stint.StartPosition := lap.Position
 			}
 			else if (A_Index == numLaps)
 				stint.EndPosition := lap.Position
@@ -7133,7 +7143,7 @@ class RaceCenter extends ConfigurationItem {
 	syncRaceReport() {
 		local lastLap := this.LastLap
 		local directory, data, lap, message, raceInfo, pitstops, newData, missingLaps, lapData, key, value
-		local times, positions, laps, drivers
+		local times, positions, laps, drivers, startPosition
 		local mTimes, mPositions, mLaps, mDrivers, newLine, line, fileName
 
 		if lastLap
@@ -7151,8 +7161,19 @@ class RaceCenter extends ConfigurationItem {
 
 		if (data.Count == 0)
 			lap := 1
-		else
+		else {
 			lap := (getMultiMapValue(data, "Laps", "Count") + 1)
+
+			if this.Stints.Has(1) {
+				startPosition := getMultiMapValue(data, "Cars", "Car." . getMultiMapValue(data, "Cars", "Driver", false) . ".Position", kNull)
+
+				if ((startPosition != kNull) && (this.Stints[1].StartPosition != startPosition)) {
+					this.Stints[1].StartPosition := startPosition
+
+					this.StintsListView.Modify(this.Stints[1].Row, "Col6", startPosition)
+				}
+			}
+		}
 
 		if (lap == 1) {
 			try {
@@ -9788,6 +9809,8 @@ class RaceCenter extends ConfigurationItem {
 								this.selectStrategy(this.createStrategy(configuration, false, false), true)
 						}
 
+						this.ReportViewer.setReport(folder . "Race Report")
+
 						this.loadDrivers()
 						this.loadSessionDrivers()
 						this.loadSetups()
@@ -9803,8 +9826,6 @@ class RaceCenter extends ConfigurationItem {
 
 						this.syncTelemetry(true)
 						this.syncTyrePressures(true)
-
-						this.ReportViewer.setReport(folder . "Race Report")
 
 						this.initializeReports()
 

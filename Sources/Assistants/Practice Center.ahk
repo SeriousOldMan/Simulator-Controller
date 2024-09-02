@@ -2842,7 +2842,7 @@ class PracticeCenter extends ConfigurationItem {
 	updateUsedTyreSets() {
 		local tyreSets := []
 		local currentRun := this.CurrentRun
-		local ignore, tyreSet, run, lastTyreSet, found
+		local ignore, tyreSet, run, lap, lastTyreSet, found
 
 		this.UsedTyreSetsListView.Delete()
 
@@ -2850,35 +2850,39 @@ class PracticeCenter extends ConfigurationItem {
 			loop currentRun.Nr {
 				run := this.Runs[A_Index]
 
-				if (run.Compound != "-") {
-					if isDebug()
-						logMessage(kLogDebug, "updateUsedTyreSets - Run: " . run.Nr . "; TyreSet: " . run.TyreSet . "; TyreLaps: " . (run.TyreLaps + run.Laps.Length))
+				if (run.Laps.Length > 0) {
+					lap := run.Laps[1]
 
-					found := false
+					if (lap.Compound != "-") {
+						if isDebug()
+							logMessage(kLogDebug, "updateUsedTyreSets - Run: " . run.Nr . "; TyreSet: " . run.TyreSet . "; TyreLaps: " . (run.TyreLaps + run.Laps.Length))
 
-					if (A_Index > 1) {
-						lastTyreSet := tyreSets[tyreSets.Length]
+						found := false
 
-						if (!isNumber(run.TyreSet) && !isNumber(lastTyreSet.Nr) && (run.Compound = lastTyreSet.Compound)
-												   && (lastTyreSet.Laps <= run.TyreLaps)) {
-							lastTyreSet.Laps += run.Laps.Length
+						if (A_Index > 1) {
+							lastTyreSet := tyreSets[tyreSets.Length]
 
-							found := true
+							if (!isNumber(lap.TyreSet) && !isNumber(lastTyreSet.Nr) && (lap.Compound = lastTyreSet.Compound)
+													   && (lastTyreSet.Laps <= run.TyreLaps)) {
+								lastTyreSet.Laps += run.Laps.Length
+
+								found := true
+							}
+
+							if !found
+								for ignore, lastTyreSet in tyreSets
+									if ((lastTyreSet.Compound = lap.Compound) && isNumber(lastTyreSet.Nr) && (lastTyreSet.Nr = lap.TyreSet)) {
+										lastTyreSet.Laps += run.Laps.Length
+
+										found := true
+
+										break
+									}
 						}
 
 						if !found
-							for ignore, lastTyreSet in tyreSets
-								if ((lastTyreSet.Compound = run.Compound) && isNumber(lastTyreSet.Nr) && (lastTyreSet.Nr = run.TyreSet)) {
-									lastTyreSet.Laps += run.Laps.Length
-
-									found := true
-
-									break
-								}
+							tyreSets.Push({Nr: run.TyreSet, Compound: run.Compound, Laps: (run.TyreLaps + run.Laps.Length)})
 					}
-
-					if !found
-						tyreSets.Push({Nr: run.TyreSet, Compound: run.Compound, Laps: (run.TyreLaps + run.Laps.Length)})
 				}
 			}
 
@@ -2990,7 +2994,13 @@ class PracticeCenter extends ConfigurationItem {
 				run.Compound := tyreCompound
 
 			if (tyreSet && (run.TyreSet = "-") && (run.TyreSet != tyreSet) && (run.Laps.Length > 1)) {
+				run.Compound := tyreCompound
 				run.TyreSet := tyreSet
+
+				run.Laps[1].Compound := tyreCompound
+				run.Laps[1].TyreSet := tyreSet
+
+				this.updateUsedTyreSets()
 
 				tyreInfo := this.UsedTyreSets[tyreCompound, tyreSet]
 
@@ -4834,6 +4844,9 @@ class PracticeCenter extends ConfigurationItem {
 				if this.Laps.Has(A_Index) {
 					lap := this.Laps[A_Index]
 					lap.Row := (this.LapsListView.GetCount() + 1)
+
+					lap.Compound := run.Compound
+					lap.TyreSet := run.TyreSet
 
 					remainingFuel := lap.FuelRemaining
 

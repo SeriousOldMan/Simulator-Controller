@@ -1,3 +1,11 @@
+## 5.8.6.0-release 09/06/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. All graphs and reports are now redrawn live in "Practice Center".
+  4. And yet another fix for the handling of used tyre sets in "Practice Center".
+  5. Fixed Spotter to give opponent lap times again.
+  6. [Internal] Reporting of configured but missing optional components like SoX and NirCmd has been optimized.
+
 ## 5.8.5.0-release 08/30/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

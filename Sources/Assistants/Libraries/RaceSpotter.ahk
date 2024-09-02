@@ -1848,7 +1848,7 @@ class RaceSpotter extends GridRaceAssistant {
 				if (!lapTime && (this.Session == kSessionRace)) {
 					rnd := Random(1, 10)
 
-					if (rnd > 6) {
+					if (rnd > 7) {
 						rnd := Random(1, focused ? 133 : 100)
 
 						if ((rnd <= 33) && standingsAhead) {

@@ -878,12 +878,9 @@ class PracticeCenter extends ConfigurationItem {
 				found := false
 
 				for ignore, tyreInfo in this.iUsedTyreSets
-					if (tyreInfo.Compound = compound) {
-						if (isSet(tyreSet) && (tyreInfo.Nr != tyreSet))
-							continue
-
-						found := tyreInfo
-					}
+					if (tyreInfo.Compound = compound)
+						if (!isSet(tyreSet) || (tyreInfo.Nr = tyreSet))
+							found := tyreInfo
 
 				return found
 			}
@@ -2896,21 +2893,6 @@ class PracticeCenter extends ConfigurationItem {
 			this.UsedTyreSetsListView.ModifyCol(A_Index, "AutoHdr")
 	}
 
-	updateTyreCompound(run) {
-		local tyreInfo
-
-		if ((run.Compound = "-") && (this.iUsedTyreSets.Length > 0)) {
-			tyreInfo := this.iUsedTyreSets[this.iUsedTyreSets.Length]
-
-			run.Compound := tyreInfo.Compound
-			run.TyreSet := tyreInfo.Nr
-			run.TyreLaps := tyreInfo.Laps
-
-			if isDebug()
-				logMessage(kLogDebug, "updateTyreCompound - Run: " . run.Nr . "; Compound: " . tyreInfo.Compound . "; TyreSet: " . tyreInfo.Nr . "; TyreLaps: " . tyreInfo.Laps)
-		}
-	}
-
 	createRun(lapNumber) {
 		local newRun := {Nr: (this.CurrentRun ? (this.CurrentRun.Nr + 1) : 1), Lap: lapNumber, StartTime: A_Now, TyreLaps: 0
 					   , Driver: "-", FuelInitial: "-", FuelConsumption: 0.0, Accidents: 0, Weather: "-", Compound: "-", TyreSet: "-"
@@ -3007,7 +2989,7 @@ class PracticeCenter extends ConfigurationItem {
 			if (tyreCompound && (run.Compound = "-") && (run.Compound != tyreCompound))
 				run.Compound := tyreCompound
 
-			if (tyreSet && (run.TyreSet = "-") && (run.TyreSet != tyreSet)) {
+			if (tyreSet && (run.TyreSet = "-") && (run.TyreSet != tyreSet) && (run.Laps.Length > 1)) {
 				run.TyreSet := tyreSet
 
 				tyreInfo := this.UsedTyreSets[tyreCompound, tyreSet]
@@ -3265,20 +3247,21 @@ class PracticeCenter extends ConfigurationItem {
 		local tyreCompound := compound(getMultiMapValue(data, "Car Data", "TyreCompound")
 									 , getMultiMapValue(data, "Car Data", "TyreCompoundColor"))
 		local tyreSet := getMultiMapValue(data, "Car Data", "TyreSet", "-")
+		local lastLap := (this.LastLap ? this.LastLap : false)
+		local currentRun := (lastLap ? lastLap.Run : false)
 		local lap, selectedLap, selectedRun, damage, pLap, fuelConsumption, car, run, sectorTimes
 
 		if ((tyreCompound = "Wet") && (SessionDatabase.getSimulatorCode(this.Simulator) = "ACC"))
 			tyreSet := "-"
 
-		if (this.LastLap && ((this.LastLap.Compound != tyreCompound) || (this.LastLap.TyreSet != tyreSet)
-																	 || (this.LastLap.Driver != driver))) {
-			this.newRun(lapNumber, false, ((this.LastLap.Compound != tyreCompound) || (this.LastLap.TyreSet != tyreSet)) ? true : unset)
+		if (lastLap && ((lastLap.Compound != tyreCompound) || (lastLap.TyreSet != tyreSet) || (lastLap.Driver != driver))) {
+			this.newRun(lapNumber)
 
 			if isDebug()
-				logMessage(kLogDebug, "addLap(Pitstop) - Lap: " . lapNumber . "; Run: " . (this.CurrentRun ? this.CurrentRun.Nr : 1))
+				logMessage(kLogDebug, "addLap(Pitstop) - Lap: " . lapNumber . "; Run: " . (currentRun ? currentRun.Nr : 1))
 		}
 		else if isDebug()
-			logMessage(kLogDebug, "addLap - Lap: " . lapNumber . "; Run: " . (this.CurrentRun ? this.CurrentRun.Nr : 1))
+			logMessage(kLogDebug, "addLap - Lap: " . lapNumber . "; Run: " . (currentRun ? currentRun.Nr : 1))
 
 		lap := this.requireLap(lapNumber)
 
@@ -3644,11 +3627,6 @@ class PracticeCenter extends ConfigurationItem {
 			this.newRun(lap.Nr, true)
 		}
 
-		this.updateUsedTyreSets()
-
-		if this.CurrentRun
-			this.updateTyreCompound(this.CurrentRun)
-
 		if (lap.Pressures = "-,-,-,-")
 			lap.Pressures := pressures
 
@@ -3742,6 +3720,8 @@ class PracticeCenter extends ConfigurationItem {
 		this.modifyRun(lap.Run)
 
 		this.syncSessionStore()
+
+		this.updateUsedTyreSets()
 
 		this.refreshReports()
 
@@ -4738,6 +4718,13 @@ class PracticeCenter extends ConfigurationItem {
 					 , AvgLapTime: run["Lap.Time.Average"], BestLapTime: run["Lap.Time.Best"]
 					 , Accidents: run["Accidents"], StartPosition: run["Position.Start"], EndPosition: run["Position.End"]
 					 , StartTime: run["Time.Start"], EndTime: run["Time.End"], Notes: decode(run["Notes"])}
+
+			if (isNull(newRun.TyreLaps) || (newRun.TyreLaps == 0))
+				if (this.CurrentRun && isNumber(this.CurrentRun.TyreSet) && (this.CurrentRun.Compound = newRun.Compound)
+									&& (this.CurrentRun.TyreSet = newRun.TyreSet))
+					newRun.TyreLaps := (this.CurrentRun.TyreLaps + this.CurrentRun.Laps.Length)
+				else
+					newRun.TyreLaps := 1
 
 			if isNull(newRun.StartTime)
 				newRun.StartTime := false
@@ -6679,17 +6666,17 @@ class PracticeCenter extends ConfigurationItem {
 				positions.Push(lap.Position)
 				remainingFuels.Push(lap.FuelRemaining)
 
-				/*
-				if lapDataTable.Has(A_Index)
+				if lap.Run.TyreLaps
 					tyreLaps.Push(lap.Run.TyreLaps + (lap.Nr - lap.Run.Lap))
 				else
 					tyreLaps.Push(kNull)
-				*/
 
+				/*
 				if lapDataTable.Has(A_Index)
 					tyreLaps.Push(lapDataTable[A_Index]["Tyre.Laps"])
 				else
 					tyreLaps.Push(kNull)
+				*/
 			}
 
 		width := (this.DetailsViewer.getWidth() - 20)

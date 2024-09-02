@@ -59,7 +59,14 @@ playSound(player, wavFile, options := false) {
 		if !options
 			options := ""
 
-		Run("`"" . player . "`" `"" . wavFile . "`" -t waveaudio " . options, workingDirectory, "HIDE", &pid)
+		try {
+			Run("`"" . player . "`" `"" . wavFile . "`" -t waveaudio " . options, workingDirectory, "HIDE", &pid)
+		}
+		catch Any as exception {
+			logError(exception)
+			
+			pid := false
+		}
 
 		return pid
 	}

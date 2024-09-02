@@ -1814,7 +1814,8 @@ class RaceSpotter extends GridRaceAssistant {
 					else
 						lapTime := false
 				}
-				else if (focused && focused.hasBestLapTime()) {
+
+				if (focused && !lapTime && focused.hasBestLapTime()) {
 					lapTime := focused.BestLapTime[true]
 
 					if (lapTime = focused.LastLapTime) {
@@ -1825,7 +1826,8 @@ class RaceSpotter extends GridRaceAssistant {
 					else
 						lapTime := false
 				}
-				else if (standingsBehind && standingsBehind.hasBestLapTime()) {
+
+				if (!lapTime && standingsBehind && standingsBehind.hasBestLapTime()) {
 					lapTime := standingsBehind.BestLapTime[true]
 
 					if (lapTime = standingsBehind.LastLapTime)
@@ -1833,7 +1835,8 @@ class RaceSpotter extends GridRaceAssistant {
 					else
 						lapTime := false
 				}
-				else if (leader && leader.hasBestLapTime()) {
+
+				if (!lapTime && leader && leader.hasBestLapTime()) {
 					lapTime := leader.BestLapTime[true]
 
 					if (lapTime = leader.LastLapTime)
@@ -1845,8 +1848,8 @@ class RaceSpotter extends GridRaceAssistant {
 				if (!lapTime && (this.Session == kSessionRace)) {
 					rnd := Random(1, 10)
 
-					if (rnd > 8) {
-						rnd := Random(1, focused ? 100 : 133)
+					if (rnd > 6) {
+						rnd := Random(1, focused ? 133 : 100)
 
 						if ((rnd <= 33) && standingsAhead) {
 							lapTime := standingsAhead.LastLapTime
@@ -2842,8 +2845,8 @@ class RaceSpotter extends GridRaceAssistant {
 												   , this.Announcements["DeltaInformationMethod"])
 				}
 
-				if this.Announcements["SessionInformation"] {
-					hadInfo := this.sessionInformation(lastLap, sector, positions, sessionInfo && !hadInfo)
+				if (sessionInfo && this.Announcements["SessionInformation"]) {
+					hadInfo := this.sessionInformation(lastLap, sector, positions, !hadInfo)
 
 					if hadInfo
 						sessionInfo := false

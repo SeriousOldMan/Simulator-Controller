@@ -261,6 +261,8 @@ class SpeechRecognizer {
 	}
 
 	__New(engine, recognizer := false, language := false, silent := false, mode := "Grammar") {
+		global kNirCmd
+		
 		local dllName := ((InStr(engine, "Google|") = 1) ? "Google.Speech.Recognizer.dll" : "Microsoft.Speech.Recognizer.dll")
 		local dllFile := (kBinariesDirectory . ((InStr(engine, "Google|") = 1) ? "Google\" : "Microsoft\") . dllName)
 		local instance, choices, found, ignore, recognizerDescriptor, configuration, audioDevice
@@ -294,6 +296,8 @@ class SpeechRecognizer {
 				}
 				catch Any as exception {
 					logError(exception, true)
+					
+					kNirCmd := false
 
 					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
@@ -448,6 +452,8 @@ class SpeechRecognizer {
 				}
 				catch Any as exception {
 					logError(exception, true)
+					
+					kNirCmd := false
 
 					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
@@ -528,6 +534,8 @@ class SpeechRecognizer {
 	}
 
 	startRecognizer() {
+		global kNirCmd
+		
 		local audioDevice := SpeechRecognizer.sRecognizerAudioDevice
 
 		if (audioDevice && kNirCmd) {
@@ -536,6 +544,8 @@ class SpeechRecognizer {
 			}
 			catch Any as exception {
 				logError(exception, true)
+				
+				kNirCmd := false
 
 				showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
@@ -556,6 +566,8 @@ class SpeechRecognizer {
 	}
 
 	stopRecognizer() {
+		global kNirCmd
+		
 		local audioDevice := SpeechRecognizer.sDefaultAudioDevice
 
 		try {
@@ -583,6 +595,8 @@ class SpeechRecognizer {
 				}
 				catch Any as exception {
 					logError(exception, true)
+					
+					kNirCmd := false
 
 					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)

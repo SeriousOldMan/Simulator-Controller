@@ -9697,61 +9697,63 @@ class RaceCenter extends ConfigurationItem {
 					OnMessage(0x44, translateLoadCancelButtons, 0)
 				}
 
-				if (fileName && InStr(FileExist(fileName), "D"))
-					folder := fileName
-				else if (fileName && (fileName != "")) {
-					SplitPath(fileName, , &directory, , &fileName)
+				withTask(WorkingTask(StrReplace(translate("Extracting ") . translate("Session") . translate("..."), "...", "")), () {
+					if (fileName && InStr(FileExist(fileName), "D"))
+						folder := fileName
+					else if (fileName && (fileName != "")) {
+						SplitPath(fileName, , &directory, , &fileName)
 
-					folder := (kTempDirectory . "Sessions\Race_" . Round(Random(1, 100000)))
+						folder := (kTempDirectory . "Sessions\Race_" . Round(Random(1, 100000)))
 
-					DirCreate(folder)
+						DirCreate(folder)
 
-					if (simulator && car && track
-					 && (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Race")))) {
-						dataFile := temporaryFileName("Session", "zip")
+						if (simulator && car && track
+						 && (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Race")))) {
+							dataFile := temporaryFileName("Session", "zip")
 
-						try {
-							session := sessionDB.readSession(simulator, car, track, "Race", fileName, &meta, &size)
+							try {
+								session := sessionDB.readSession(simulator, car, track, "Race", fileName, &meta, &size)
 
-							file := FileOpen(dataFile, "w", "")
+								file := FileOpen(dataFile, "w", "")
 
-							if file {
-								file.RawWrite(session, size)
+								if file {
+									file.RawWrite(session, size)
 
-								file.Close()
+									file.Close()
 
-								RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+									RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
 
-								if !FileExist(folder . "\Session.info")
-									FileCopy(directory . "\" . fileName . ".race", folder . "\Session.info")
+									if !FileExist(folder . "\Session.info")
+										FileCopy(directory . "\" . fileName . ".race", folder . "\Session.info")
+								}
+								else
+									folder := ""
 							}
-							else
-								folder := ""
-						}
-						catch Any as exception {
-							logError(exception)
+							catch Any as exception {
+								logError(exception)
 
-							folder := ""
+								folder := ""
+							}
+							finally {
+								deleteFile(dataFile)
+							}
 						}
-						finally {
+						else {
+							dataFile := temporaryFileName("Race", "zip")
+
+							FileCopy(directory . "\" . fileName . ".data", dataFile, 1)
+
+							RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+
+							if !FileExist(folder . "\Session.info")
+								FileCopy(directory . "\" . fileName . ".race", folder . "\Session.info")
+
 							deleteFile(dataFile)
 						}
 					}
-					else {
-						dataFile := temporaryFileName("Race", "zip")
-
-						FileCopy(directory . "\" . fileName . ".data", dataFile, 1)
-
-						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
-
-						if !FileExist(folder . "\Session.info")
-							FileCopy(directory . "\" . fileName . ".race", folder . "\Session.info")
-
-						deleteFile(dataFile)
-					}
-				}
-				else
-					folder := ""
+					else
+						folder := ""
+				})
 			}
 
 			if (folder != "") {

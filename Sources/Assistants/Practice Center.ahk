@@ -4984,60 +4984,62 @@ class PracticeCenter extends ConfigurationItem {
 					OnMessage(0x44, translateLoadCancelButtons, 0)
 				}
 
-				if (fileName && InStr(FileExist(fileName), "D"))
-					folder := fileName
-				else if (fileName && (fileName != "")) {
-					SplitPath(fileName, , &directory, , &fileName)
+				withTask(WorkingTask(StrReplace(translate("Extracting ") . translate("Session") . translate("..."), "...", "")), () {
+					if (fileName && InStr(FileExist(fileName), "D"))
+						folder := fileName
+					else if (fileName && (fileName != "")) {
+						SplitPath(fileName, , &directory, , &fileName)
 
-					folder := (kTempDirectory . "Sessions\Practice_" . Round(Random(1, 100000)))
+						folder := (kTempDirectory . "Sessions\Practice_" . Round(Random(1, 100000)))
 
-					DirCreate(folder)
+						DirCreate(folder)
 
-					if (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Practice"))) {
-						dataFile := temporaryFileName("Session", "zip")
+						if (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Practice"))) {
+							dataFile := temporaryFileName("Session", "zip")
 
-						try {
-							session := sessionDB.readSession(simulator, car, track, "Practice", fileName, &meta, &size)
+							try {
+								session := sessionDB.readSession(simulator, car, track, "Practice", fileName, &meta, &size)
 
-							file := FileOpen(dataFile, "w", "")
+								file := FileOpen(dataFile, "w", "")
 
-							if file {
-								file.RawWrite(session, size)
+								if file {
+									file.RawWrite(session, size)
 
-								file.Close()
+									file.Close()
 
-								RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+									RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
 
-								if !FileExist(folder . "\Practice.info")
-									FileCopy(directory . "\" . fileName . ".practice", folder . "\Practice.info")
+									if !FileExist(folder . "\Practice.info")
+										FileCopy(directory . "\" . fileName . ".practice", folder . "\Practice.info")
+								}
+								else
+									folder := ""
 							}
-							else
-								folder := ""
-						}
-						catch Any as exception {
-							logError(exception)
+							catch Any as exception {
+								logError(exception)
 
-							folder := ""
+								folder := ""
+							}
+							finally {
+								deleteFile(dataFile)
+							}
 						}
-						finally {
+						else {
+							dataFile := temporaryFileName("Practice", "zip")
+
+							FileCopy(directory . "\" . fileName . ".data", dataFile, 1)
+
+							RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+
+							if !FileExist(folder . "\Practice.info")
+								FileCopy(directory . "\" . fileName . ".practice", folder . "\Practice.info")
+
 							deleteFile(dataFile)
 						}
 					}
-					else {
-						dataFile := temporaryFileName("Practice", "zip")
-
-						FileCopy(directory . "\" . fileName . ".data", dataFile, 1)
-
-						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
-
-						if !FileExist(folder . "\Practice.info")
-							FileCopy(directory . "\" . fileName . ".practice", folder . "\Practice.info")
-
-						deleteFile(dataFile)
-					}
-				}
-				else
-					folder := ""
+					else
+						folder := ""
+				})
 			}
 
 			if (folder != "") {

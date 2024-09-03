@@ -185,6 +185,8 @@ class PracticeCenter extends ConfigurationItem {
 	iSessionMode := false
 	iSessionExported := false
 
+	iSessionLoading := false
+
 	iAutoClear := false
 	iAutoExport := false
 	iAutoSave := false
@@ -789,6 +791,12 @@ class PracticeCenter extends ConfigurationItem {
 	SessionLoaded {
 		Get {
 			return ((this.SessionMode = "Loaded") ? this.iSessionLoaded : false)
+		}
+	}
+
+	SessionLoading {
+		Get {
+			return this.iSessionLoading
 		}
 	}
 
@@ -2839,6 +2847,10 @@ class PracticeCenter extends ConfigurationItem {
 		return false
 	}
 
+	getTyreLaps(run) {
+		return (run.TyreLaps + run.Laps.Length)
+	}
+
 	updateUsedTyreSets() {
 		local tyreSets := []
 		local currentRun := this.CurrentRun
@@ -2855,7 +2867,7 @@ class PracticeCenter extends ConfigurationItem {
 
 					if (lap.Compound != "-") {
 						if isDebug()
-							logMessage(kLogDebug, "updateUsedTyreSets - Run: " . run.Nr . "; TyreSet: " . run.TyreSet . "; TyreLaps: " . (run.TyreLaps + run.Laps.Length))
+							logMessage(kLogDebug, "updateUsedTyreSets - Run: " . run.Nr . "; TyreSet: " . run.TyreSet . "; TyreLaps: " . this.getTyreLaps(run))
 
 						found := false
 
@@ -2881,7 +2893,7 @@ class PracticeCenter extends ConfigurationItem {
 						}
 
 						if !found
-							tyreSets.Push({Nr: run.TyreSet, Compound: run.Compound, Laps: (run.TyreLaps + run.Laps.Length)})
+							tyreSets.Push({Nr: run.TyreSet, Compound: run.Compound, Laps: this.getTyreLaps(run)})
 					}
 				}
 			}
@@ -2934,11 +2946,12 @@ class PracticeCenter extends ConfigurationItem {
 	}
 
 	modifyRun(run) {
+		local sessionStore := this.SessionStore
 		local tyreCompound := false
 		local tyreSet := false
 		local driver := false
 		local laps, numLaps, lapTimes, airTemperatures, trackTemperatures
-		local ignore, lap, consumption, weather, fuelAmount, tyreInfo
+		local ignore, lap, consumption, weather, fuelAmount, tyreInfo, row
 
 		run.FuelConsumption := 0.0
 		run.Accidents := 0
@@ -2993,7 +3006,7 @@ class PracticeCenter extends ConfigurationItem {
 			if (tyreCompound && (run.Compound = "-") && (run.Compound != tyreCompound))
 				run.Compound := tyreCompound
 
-			if (tyreSet && (run.TyreSet = "-") && (run.TyreSet != tyreSet) && (run.Laps.Length > 1)) {
+			if (tyreSet && (run.TyreSet = "-") && (run.TyreSet != tyreSet) && (run.Laps.Length > 1)) { ; hier isNull nach vorne
 				run.Compound := tyreCompound
 				run.TyreSet := tyreSet
 
@@ -3004,8 +3017,23 @@ class PracticeCenter extends ConfigurationItem {
 
 				tyreInfo := this.UsedTyreSets[tyreCompound, tyreSet]
 
-				if tyreInfo
+				if tyreInfo {
 					run.TyreLaps := tyreInfo.Laps
+
+					for ignore, lap in run.Laps {
+						row := sessionStore.query("Lap.Data", {Where: {Lap: lap.Nr}})
+
+						if (row.Length > 0) {
+							row := row[1]
+
+							if (row["Tyre.Laps"] != (run.TyreLaps + A_Index)) {
+								row["Tyre.Laps"] := (run.TyreLaps + A_Index)
+
+								sessionStore.changed("Lap.Data")
+							}
+						}
+					}
+				}
 				else
 					run.TyreLaps := 0
 
@@ -3159,7 +3187,7 @@ class PracticeCenter extends ConfigurationItem {
 
 			newRun.Compound := currentRun.Compound
 			newRun.TyreSet := currentRun.TyreSet
-			newRun.TyreLaps := (currentRun.TyreLaps + currentRun.Laps.Length)
+			newRun.TyreLaps := this.getTyreLaps(currentRun)
 
 			if isDebug()
 				logMessage(kLogDebug, "newRun(2) - Run: " . newRun.Nr . "; TyreSet: " . newRun.TyreSet . "; TyreLaps: " . newRun.TyreLaps)
@@ -3233,7 +3261,7 @@ class PracticeCenter extends ConfigurationItem {
 			sessionStore.changed("Lap.Data")
 		}
 
-		this.LapsListView.Modify(lap.Row, (lap.State != "Valid") ? "-Check" : ""
+		this.LapsListView.Modify(lap.Row, ((lap.State != "Valid") ? "-Check" : "")
 										, lap.Nr, lap.Run.Nr, translate(lap.Weather), translate(lap.Grip)
 										, lapTimeDisplayValue(lap.LapTime)
 										, values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*)
@@ -3729,11 +3757,12 @@ class PracticeCenter extends ConfigurationItem {
 		this.modifyLap(lap)
 		this.modifyRun(lap.Run)
 
-		this.syncSessionStore()
-
 		this.updateUsedTyreSets()
 
-		this.refreshReports()
+		this.syncSessionStore()
+
+		if !this.SessionLoading
+			this.refreshReports()
 
 		this.updateState()
 	}
@@ -3796,7 +3825,8 @@ class PracticeCenter extends ConfigurationItem {
 
 			this.syncSessionStore()
 
-			this.refreshReports()
+			if !this.SessionLoading
+				this.refreshReports()
 
 			this.updateState()
 		}
@@ -4732,7 +4762,7 @@ class PracticeCenter extends ConfigurationItem {
 			if (isNull(newRun.TyreLaps) || (newRun.TyreLaps == 0))
 				if (this.CurrentRun && isNumber(this.CurrentRun.TyreSet) && (this.CurrentRun.Compound = newRun.Compound)
 									&& (this.CurrentRun.TyreSet = newRun.TyreSet))
-					newRun.TyreLaps := (this.CurrentRun.TyreLaps + this.CurrentRun.Laps.Length)
+					newRun.TyreLaps := this.getTyreLaps(this.CurrentRun)
 				else
 					newRun.TyreLaps := 1
 
@@ -5022,57 +5052,72 @@ class PracticeCenter extends ConfigurationItem {
 						OnMessage(0x44, translateOkButton, 0)
 					}
 					else {
-						this.initializeSession(getMultiMapValue(info, "Session", "Session", "Practice"))
+						this.UsedTyreSetsListView.Opt("-Redraw")
+						this.RunsListView.Opt("-Redraw")
+						this.LapsListView.Opt("-Redraw")
 
-						this.iSessionMode := "Loaded"
-						this.iSessionLoaded := folder
+						this.iSessionLoading := true
 
-						this.iSessionExported := getMultiMapValue(info, "Session", "Exported", true)
-						this.iDate := getMultiMapValue(info, "Session", "Date", A_Now)
-						this.iWeather := getMultiMapValue(info, "Weather", "Weather", false)
-						this.iWeather10Min := getMultiMapValue(info, "Weather", "Weather10Min", false)
-						this.iWeather30Min := getMultiMapValue(info, "Weather", "Weather30Min", false)
-						this.iAirTemperature := getMultiMapValue(info, "Weather", "AirTemperature", false)
-						this.iTrackTemperature := getMultiMapValue(info, "Weather", "TrackTemperature", false)
+						try {
+							this.initializeSession(getMultiMapValue(info, "Session", "Session", "Practice"))
 
-						this.loadDrivers()
-						this.loadLaps()
-						this.loadRuns()
-						this.loadTelemetry()
-						this.loadPressures()
+							this.iSessionMode := "Loaded"
+							this.iSessionLoaded := folder
 
-						this.ReportViewer.setReport(folder . "Race Report")
+							this.iSessionExported := getMultiMapValue(info, "Session", "Exported", true)
+							this.iDate := getMultiMapValue(info, "Session", "Date", A_Now)
+							this.iWeather := getMultiMapValue(info, "Weather", "Weather", false)
+							this.iWeather10Min := getMultiMapValue(info, "Weather", "Weather10Min", false)
+							this.iWeather30Min := getMultiMapValue(info, "Weather", "Weather30Min", false)
+							this.iAirTemperature := getMultiMapValue(info, "Weather", "AirTemperature", false)
+							this.iTrackTemperature := getMultiMapValue(info, "Weather", "TrackTemperature", false)
 
-						this.initializeReports()
+							this.loadDrivers()
+							this.loadLaps()
+							this.loadRuns()
+							this.loadTelemetry()
+							this.loadPressures()
 
-						if !this.Weather {
-							lastLap := this.LastLap
+							this.ReportViewer.setReport(folder . "Race Report")
 
-							if lastLap {
-								this.iWeather := lastLap.Weather
-								this.iAirTemperature := lastLap.AirTemperature
-								this.iTrackTemperature := lastLap.TrackTemperature
-								this.iWeather10Min := lastLap.Weather10Min
-								this.iWeather30Min := lastLap.Weather30Min
+							this.initializeReports()
+
+							if !this.Weather {
+								lastLap := this.LastLap
+
+								if lastLap {
+									this.iWeather := lastLap.Weather
+									this.iAirTemperature := lastLap.AirTemperature
+									this.iTrackTemperature := lastLap.TrackTemperature
+									this.iWeather10Min := lastLap.Weather10Min
+									this.iWeather30Min := lastLap.Weather30Min
+								}
 							}
-						}
 
-						if !this.TyreCompound {
-							currentRun := this.CurrentRun
+							if !this.TyreCompound {
+								currentRun := this.CurrentRun
 
-							if currentRun {
-								this.iTyreCompound := compound(currentRun.Compound)
-								this.iTyreCompoundColor := compoundColor(currentRun.Compound)
+								if currentRun {
+									this.iTyreCompound := compound(currentRun.Compound)
+									this.iTyreCompoundColor := compoundColor(currentRun.Compound)
+								}
 							}
+
+							this.updateUsedTyreSets()
+
+							this.analyzeTelemetry()
+
+							this.showOverviewReport()
+
+							this.updateState()
 						}
+						finally {
+							this.iSessionLoading := false
 
-						this.updateUsedTyreSets()
-
-						this.analyzeTelemetry()
-
-						this.showOverviewReport()
-
-						this.updateState()
+							this.UsedTyreSetsListView.Opt("+Redraw")
+							this.RunsListView.Opt("+Redraw")
+							this.LapsListView.Opt("+Redraw")
+						}
 					}
 				})
 			}

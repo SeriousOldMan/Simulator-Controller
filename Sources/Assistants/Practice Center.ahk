@@ -3018,7 +3018,7 @@ class PracticeCenter extends ConfigurationItem {
 				tyreInfo := this.UsedTyreSets[tyreCompound, tyreSet]
 
 				if tyreInfo {
-					run.TyreLaps := tyreInfo.Laps
+					run.TyreLaps := (tyreInfo.Laps - run.Laps.Length)
 
 					for ignore, lap in run.Laps {
 						row := sessionStore.query("Lap.Data", {Where: {Lap: lap.Nr}})

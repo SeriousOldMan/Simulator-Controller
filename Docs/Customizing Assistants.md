@@ -676,8 +676,9 @@ Beside the predefined actions for the different Assistant, which come with the s
 | Behind Gap Update           | 1. [Required] carNumber<br>2. [Required] delta<br>3. [Required] closingIn | This event is signalled periodically, when the gap to the opponent behind has changed for a given amount, which can be configured in the "Session Database". *carNumber* is the car or race number of the car ahead and *delta* is the current gap in seconds. *closingIn* is a boolean, which indicates whether the gap got smaller. |
 | Attack Imminent             | 1. [Required] carNumber<br>2. [Required] delta | This event is signalled, when an opponent has closed in and an attack might happen soon. *carNumber* is the car or race number of the car closing in and *delta* is the current gap in seconds. |
 | Blue Flag Alert             | - | Signalled, when a blue flag is being shown, because an opponent is closing in who is at least one lap ahead. |
-| Opponent Pitting            | 1. [Optional] opponentPosition | Informs about an opponent going to the pits. If this is a direct opponent, *opponentPosition* can be supplied and must be one of "Ahead" or "Behind". |
+| Opponent Pitting            | [Optional] opponentPosition | Informs about an opponent going to the pits. If this is a direct opponent, *opponentPosition* can be supplied and must be one of "Ahead" or "Behind". |
 | Pitstop Performed           | 1. [Required] pitstopNumber<br>2. [Required] pitstopLap | Signalled when the car just pitted. *pitstopNumber* and *pitstopLap* must be supplied with the number of the pitstop and the current lap. |
+| Stint Ending                | [Optional] remainingLaps | Triggered when the current stint is almost over. |
 | Last Lap                    | - | This event is signalled for the last lap of the session. |
 | Session Over                | - | This event is signalled when the session is over. |
 

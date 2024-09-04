@@ -8,6 +8,7 @@ attack_imminent=Assistant.Class|AttackImminentEvent|AttackImminent||2|Signals th
 blue_flag_alert=Assistant.Class|BlueFlagAlertEvent|BlueFlagAlert||0|Signals that the blue flag is being shown, because an opponent is closing in who is at least one lap ahead.
 pitstop_performed=Assistant.Rule|Race Spotter.pitstop_detection.rules|PitstopPerformed|Pitstop number %pitstopNumber% has been performed in lap %pitstopLap%.|2|This event is triggered when the car just pitted.
 last_lap=Assistant.Class|LastLapEvent|LastLap||0|Signals the last lap of the session.
+stint_ending=Assistant.Class|StintEndingEvent|StintEnding||1|Triggered when the current stint is almost over.
 session_over=Assistant.Class|SessionOverEvent|SessionOver||0|Signals that the session is over.
 opponent_pitting=Assistant.Class|OpponentPittingEvent|OpponentPitting||1|Informs about a direct opponent ahead or behind going to the pits.
 [Agent.Events.Parameters]
@@ -21,4 +22,5 @@ attack_imminent.1=carNumber|Integer||true|The race or car number of the car clos
 attack_imminent.2=delta|Number||true|The gap in seconds to the car behind.
 pitstop_performed.1=pitstopNumber|Integer||true|The number of the pitstop.
 pitstop_performed.2=pitstopLap|Integer||true|The lap number of the pitstop.
+stint_ending.1=remainingLaps|Integer||false|The number of laps remaining for the current stint.
 opponent_pitting.1=opponentPosition|String|Ahead,Behind|false|The relative position of the opponent (must be one of "Ahead" or "Behind"), if available.

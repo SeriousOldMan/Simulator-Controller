@@ -70,6 +70,15 @@ class BlueFlagAlertEvent extends SpotterEvent {
 	}
 }
 
+class StintEndingEvent extends SpotterEvent {
+	createTrigger(event, phrase, arguments) {
+		if (arguments.Length > 0)
+			return ("The current stint is ending in " . arguments[1] . " laps.")
+		else
+			return "The current stint is ending in a few laps."
+	}
+}
+
 class LastLapEvent extends SpotterEvent {
 	createTrigger(event, phrase, arguments) {
 		return "The car is on the last lap of the session."
@@ -1729,6 +1738,8 @@ class RaceSpotter extends GridRaceAssistant {
 						this.SessionInfos[situation] := true
 
 						speaker.speakPhrase("StintEnding", {laps: stintLaps})
+
+						this.handleEvent("StintEnding", stintLaps)
 
 						return true
 					}

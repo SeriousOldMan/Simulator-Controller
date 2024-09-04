@@ -3261,7 +3261,7 @@ class PracticeCenter extends ConfigurationItem {
 			sessionStore.changed("Lap.Data")
 		}
 
-		this.LapsListView.Modify(lap.Row, ((lap.State != "Valid") ? "-Check" : "")
+		this.LapsListView.Modify(lap.Row, ((lap.State != "Valid") ? "-Check" : "Check")
 										, lap.Nr, lap.Run.Nr, translate(lap.Weather), translate(lap.Grip)
 										, lapTimeDisplayValue(lap.LapTime)
 										, values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*)

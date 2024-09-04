@@ -6,9 +6,10 @@
   5. Fixed a regression for the Spotter which prevented information about opponent lap times.
   6. The initial position of the first stint is now displayed as the real starting position and not the position at the end of the first lap.
   7. A new version of the local LLM Runtime is available.
-  8. [Internal] Reporting of configured but missing optional components like SoX and NirCmd has been optimized.
+  8. A new LLM event "stint_ending" has been defined for the [*Reasoning* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-spotter) of the Race Spotter, which is triggerd, when the current stint will end soon.
+  9. [Internal] Reporting of configured but missing optional components like SoX and NirCmd has been optimized.
 
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-585), if you are using the local LLM Runtime.
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-585), if you are using the *Reasoning* booster or the local LLM Runtime.
 
 ## 5.8.5.0-release 08/30/24
   1. Minor bugfixes, as always

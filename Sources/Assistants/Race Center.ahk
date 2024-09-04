@@ -6909,7 +6909,7 @@ class RaceCenter extends ConfigurationItem {
 
 	updateStint(stint) {
 		local laps, numLaps, lapTimes, airTemperatures, trackTemperatures
-		local ignore, lap, consumption, weather, row
+		local ignore, lap, consumption, weather, row, raceData
 
 		stint.FuelConsumption := 0.0
 		stint.Accidents := 0
@@ -6946,7 +6946,17 @@ class RaceCenter extends ConfigurationItem {
 			if (A_Index == 1) {
 				stint.Compound := lap.Compound
 				stint.TyreSet := lap.TyreSet
-				stint.StartPosition := lap.Position
+
+				if (stint.Nr = 1) {
+					this.ReportViewer.loadReportData(false, &raceData := true, &ignore := false, &ignore := false, &ignore := false)
+
+					stint.StartPosition := getMultiMapValue(raceData, "Cars", "Car." . getMultiMapValue(raceData, "Cars", "Driver", false) . ".Position", kNull)
+
+					if (stint.StartPosition = kNull)
+						stint.StartPosition := lap.Position
+				}
+				else
+					stint.StartPosition := lap.Position
 			}
 			else if (A_Index == numLaps)
 				stint.EndPosition := lap.Position
@@ -7133,7 +7143,7 @@ class RaceCenter extends ConfigurationItem {
 	syncRaceReport() {
 		local lastLap := this.LastLap
 		local directory, data, lap, message, raceInfo, pitstops, newData, missingLaps, lapData, key, value
-		local times, positions, laps, drivers
+		local times, positions, laps, drivers, startPosition
 		local mTimes, mPositions, mLaps, mDrivers, newLine, line, fileName
 
 		if lastLap
@@ -7151,8 +7161,19 @@ class RaceCenter extends ConfigurationItem {
 
 		if (data.Count == 0)
 			lap := 1
-		else
+		else {
 			lap := (getMultiMapValue(data, "Laps", "Count") + 1)
+
+			if this.Stints.Has(1) {
+				startPosition := getMultiMapValue(data, "Cars", "Car." . getMultiMapValue(data, "Cars", "Driver", false) . ".Position", kNull)
+
+				if ((startPosition != kNull) && (this.Stints[1].StartPosition != startPosition)) {
+					this.Stints[1].StartPosition := startPosition
+
+					this.StintsListView.Modify(this.Stints[1].Row, "Col6", startPosition)
+				}
+			}
+		}
 
 		if (lap == 1) {
 			try {
@@ -9676,61 +9697,63 @@ class RaceCenter extends ConfigurationItem {
 					OnMessage(0x44, translateLoadCancelButtons, 0)
 				}
 
-				if (fileName && InStr(FileExist(fileName), "D"))
-					folder := fileName
-				else if (fileName && (fileName != "")) {
-					SplitPath(fileName, , &directory, , &fileName)
+				withTask(WorkingTask(StrReplace(translate("Extracting ") . translate("Session") . translate("..."), "...", "")), () {
+					if (fileName && InStr(FileExist(fileName), "D"))
+						folder := fileName
+					else if (fileName && (fileName != "")) {
+						SplitPath(fileName, , &directory, , &fileName)
 
-					folder := (kTempDirectory . "Sessions\Race_" . Round(Random(1, 100000)))
+						folder := (kTempDirectory . "Sessions\Race_" . Round(Random(1, 100000)))
 
-					DirCreate(folder)
+						DirCreate(folder)
 
-					if (simulator && car && track
-					 && (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Race")))) {
-						dataFile := temporaryFileName("Session", "zip")
+						if (simulator && car && track
+						 && (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Race")))) {
+							dataFile := temporaryFileName("Session", "zip")
 
-						try {
-							session := sessionDB.readSession(simulator, car, track, "Race", fileName, &meta, &size)
+							try {
+								session := sessionDB.readSession(simulator, car, track, "Race", fileName, &meta, &size)
 
-							file := FileOpen(dataFile, "w", "")
+								file := FileOpen(dataFile, "w", "")
 
-							if file {
-								file.RawWrite(session, size)
+								if file {
+									file.RawWrite(session, size)
 
-								file.Close()
+									file.Close()
 
-								RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+									RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
 
-								if !FileExist(folder . "\Session.info")
-									FileCopy(directory . "\" . fileName . ".race", folder . "\Session.info")
+									if !FileExist(folder . "\Session.info")
+										FileCopy(directory . "\" . fileName . ".race", folder . "\Session.info")
+								}
+								else
+									folder := ""
 							}
-							else
-								folder := ""
-						}
-						catch Any as exception {
-							logError(exception)
+							catch Any as exception {
+								logError(exception)
 
-							folder := ""
+								folder := ""
+							}
+							finally {
+								deleteFile(dataFile)
+							}
 						}
-						finally {
+						else {
+							dataFile := temporaryFileName("Race", "zip")
+
+							FileCopy(directory . "\" . fileName . ".data", dataFile, 1)
+
+							RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+
+							if !FileExist(folder . "\Session.info")
+								FileCopy(directory . "\" . fileName . ".race", folder . "\Session.info")
+
 							deleteFile(dataFile)
 						}
 					}
-					else {
-						dataFile := temporaryFileName("Race", "zip")
-
-						FileCopy(directory . "\" . fileName . ".data", dataFile, 1)
-
-						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
-
-						if !FileExist(folder . "\Session.info")
-							FileCopy(directory . "\" . fileName . ".race", folder . "\Session.info")
-
-						deleteFile(dataFile)
-					}
-				}
-				else
-					folder := ""
+					else
+						folder := ""
+				})
 			}
 
 			if (folder != "") {
@@ -9788,6 +9811,8 @@ class RaceCenter extends ConfigurationItem {
 								this.selectStrategy(this.createStrategy(configuration, false, false), true)
 						}
 
+						this.ReportViewer.setReport(folder . "Race Report")
+
 						this.loadDrivers()
 						this.loadSessionDrivers()
 						this.loadSetups()
@@ -9803,8 +9828,6 @@ class RaceCenter extends ConfigurationItem {
 
 						this.syncTelemetry(true)
 						this.syncTyrePressures(true)
-
-						this.ReportViewer.setReport(folder . "Race Report")
 
 						this.initializeReports()
 

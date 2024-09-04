@@ -3209,7 +3209,7 @@ class PracticeCenter extends ConfigurationItem {
 
 	createLap(run, lapNumber) {
 		local newLap := {Run: run, Nr: lapNumber, Weather: "-", Grip: "-", LapTime: "-", FuelConsumption: "-", FuelRemaining: "-"
-					   , Compound: "-", TyreSet: kNull, Pressures: "-,-,-,-", Temperatures: "-,-,-,-", State: "Valid", Accident: ""
+					   , Compound: "-", TyreSet: kNull, Pressures: "-,-,-,-", Temperatures: "-,-,-,-", State: "Unknown", Accident: ""
 					   , Electronics: false, Tyres: false
 					   , HotPressures: false, ColdPressures: false, PressureLosses: false}
 

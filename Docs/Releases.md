@@ -11,7 +11,7 @@
   10. A new LLM event "stint_ending" has been defined for the [*Reasoning* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-spotter) of the Race Spotter, which is triggerd, when the current stint will end soon.
   11. [Internal] Reporting of configured but missing optional components like SoX and NirCmd has been optimized.
 
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-585), if you are using the *Reasoning* booster or the local LLM Runtime.
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-586), if you are using the *Reasoning* booster or the local LLM Runtime.
 
 ## 5.8.5.0-release 08/30/24
   1. Minor bugfixes, as always
@@ -28,6 +28,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   12. The LLM action "update_strategy" for the [*Reasoning* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-strategist) of the Race Strategist has been extended. If the new optional lap number is supplied, the Strategist checks whether a pitstop at a given lap might be beneficial and is also allowed for the currently active strategy.
   13. [Experts] Events for the *Reasoning* booster can now also be raised for other Assistants. This opens up complete new possibilities, so that the Assistants can collaborate on a given task thereby creating complex chain of thoughts. See the updated information about *Assistant.Raise* in the [documentation for event management](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-events).
   14. [Experts] A new method has been introduced to customize the Assistant rules by placing rule snippets in an extension folder. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#customizing-the-assistant-rules) for more information.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-585), if you are using the *Reasoning* booster for the Spotter.
 
 ## 5.8.4.1-release 08/24/24
   1. Fixed a critical bug that caused the Spotter to get silent after the first lap.

@@ -4,12 +4,13 @@
   3. All graphs and reports are now redrawn live in "Practice Center".
   4. And yet another fix for the handling of used tyre sets in "Practice Center".
   5. Fixed a regression for the Spotter which prevented information about opponent lap times.
-  6. Laps in "Practice Center" are now deselected by default, if the Strategist did not send any data for this lap. This is the case during qualification by default, but can be changed with a setting in the "Session Database".
-  7. Optimized timeout handling of tooltips in "Simulator Startup".
-  8. The initial position of the first stint is now displayed as the real starting position and not the position at the end of the first lap.
-  9. A new version of the local LLM Runtime is available.
-  10. A new LLM event "stint_ending" has been defined for the [*Reasoning* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-spotter) of the Race Spotter, which is triggerd, when the current stint will end soon.
-  11. [Internal] Reporting of configured but missing optional components like SoX and NirCmd has been optimized.
+  6. Check box labels now also react to clicks in dark mode.
+  7. Laps in "Practice Center" are now deselected by default, if the Strategist did not send any data for this lap. This is the case during qualification by default, but can be changed with a setting in the "Session Database".
+  8. Optimized timeout handling of tooltips in "Simulator Startup".
+  9. The initial position of the first stint is now displayed as the real starting position and not the position at the end of the first lap.
+  10. A new version of the local LLM Runtime is available.
+  11. A new LLM event "stint_ending" has been defined for the [*Reasoning* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-spotter) of the Race Spotter, which is triggerd, when the current stint will end soon.
+  12. [Internal] Reporting of configured but missing optional components like SoX and NirCmd has been optimized.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-586), if you are using the *Reasoning* booster or the local LLM Runtime.
 

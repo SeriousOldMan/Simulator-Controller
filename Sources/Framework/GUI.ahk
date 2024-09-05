@@ -553,6 +553,19 @@ class DarkTheme extends Theme {
 
 			return Array(options, arguments*)
 		}
+
+		OnEvent(event, function) {
+			handler(arguments*) {
+				this.Value := !this.Value
+
+				function(arguments*)
+			}
+
+			if (this.Label && (event = "Click"))
+				this.Label.OnEvent(event, handler)
+
+			return super.OnEvent(event, function)
+		}
 	}
 
 	class DarkListView extends Gui.ListView {

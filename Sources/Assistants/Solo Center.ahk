@@ -1274,7 +1274,7 @@ class SoloCenter extends ConfigurationItem {
 
 							return
 						}
-						else if center.SessionExported
+						else if (center.SessionExported || center.SessionLoaded)
 							listView.Modify(line, "-Check")
 						else if (listView.GetNext(line - 1, "C") = line) {
 							for ignore, lap in run.Laps
@@ -1308,7 +1308,7 @@ class SoloCenter extends ConfigurationItem {
 
 					return
 				}
-				else if center.SessionExported
+				else if (center.SessionExported || center.SessionLoaded)
 					listView.Modify(line, "-Check")
 				else if (listView.GetNext(line - 1, "C") = line) {
 					for ignore, lap in run.Laps
@@ -1334,7 +1334,7 @@ class SoloCenter extends ConfigurationItem {
 
 		checkLap(listView, line, selected) {
 			if line {
-				if center.SessionExported
+				if (center.SessionExported || center.SessionLoaded)
 					listView.Modify(line, "-Check")
 
 				if !isNumber(center.Laps[listView.GetText(line, 1)].LapTime)
@@ -1348,7 +1348,7 @@ class SoloCenter extends ConfigurationItem {
 
 				Task.startTask(() {
 					if !wasDouble {
-						if center.SessionExported
+						if (center.SessionExported || center.SessionLoaded)
 							listView.Modify(line, "-Check")
 
 						center.withExceptionhandler(ObjBindMethod(center, "showLapDetails", center.Laps[listView.GetText(line, 1)], selected ? false : unset))
@@ -1361,7 +1361,7 @@ class SoloCenter extends ConfigurationItem {
 			if line {
 				wasDouble := true
 
-				if center.SessionExported
+				if (center.SessionExported || center.SessionLoaded)
 					listView.Modify(line, "-Check")
 
 				center.withExceptionhandler(ObjBindMethod(center, "showLapDetails", center.Laps[listView.GetText(line, 1)], true))
@@ -5104,6 +5104,12 @@ class SoloCenter extends ConfigurationItem {
 									this.iTyreCompoundColor := compoundColor(currentRun.Compound)
 								}
 							}
+
+							loop this.RunsListView.GetCount()
+								this.RunsListView.Modify(A_Index, "-Check")
+
+							loop this.LapsListView.GetCount()
+								this.LapsListView.Modify(A_Index, "-Check")
 
 							this.updateUsedTyreSets()
 

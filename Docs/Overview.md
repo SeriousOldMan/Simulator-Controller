@@ -49,7 +49,7 @@ The documentation is devided into the following sections:
 	
   - [Team Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center)
   
-    Using the "Team Center", a complete pitwall application, you can plan the race, prepare a strategy and based on that the stint plan for the race. All team members or even a dedicated engineer can investigate the telemetry data and gather information about the race development in general and can remote control the car, for example to prepare an upcoming pitstop, without any driver interaction. Last, but not least, if you encounter an unforeseen event during the race, you have various tools at hand to adopt the strategy to the new race situation. The "Team Center" requires all drivers to be connected to the ["Team Server"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) (see below).
+    Using the "Team Center", a complete pitwall application, you can plan the race, prepare a strategy and based on the strategy, the stint plan for the race. All team members or even a dedicated engineer can investigate the telemetry data and gather information about the race development in general. The car can be remotely controlled, for example to prepare an upcoming pitstop without any driver interaction. Last, but not least, if you encounter an unforeseen event during the race, you have various tools at hand to adopt the strategy to the new race situation. The "Team Center" requires all drivers to be connected to the ["Team Server"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) (see below).
   
   - [Virtual Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach)
 

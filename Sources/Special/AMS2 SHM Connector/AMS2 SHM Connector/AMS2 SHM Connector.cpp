@@ -236,10 +236,11 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		printLine(&output, "Active=true");
 		printLine(&output, "Paused=", ((localCopy->mGameState == GAME_INGAME_PLAYING) || (localCopy->mGameState == GAME_INGAME_INMENU_TIME_TICKING)) ? "false" : "true");
 
-		if (localCopy->mSessionState != SESSION_PRACTICE && localCopy->mLapsInEvent > 0 &&
+		/* if (localCopy->mSessionState != SESSION_PRACTICE && localCopy->mLapsInEvent > 0 &&
 			(localCopy->mLapsInEvent - localCopy->mParticipantInfo[localCopy->mViewedParticipantIndex].mLapsCompleted) <= 0)
 			printLine(&output, "Session=Finished");
-		else if ((localCopy->mSessionState == SESSION_FORMATION_LAP) || (localCopy->mSessionState == SESSION_RACE))
+		else */
+		if ((localCopy->mSessionState == SESSION_FORMATION_LAP) || (localCopy->mSessionState == SESSION_RACE))
 			printLine(&output, "Session=Race");
 		else if (localCopy->mSessionState == SESSION_QUALIFY)
 			printLine(&output, "Session=Qualification");

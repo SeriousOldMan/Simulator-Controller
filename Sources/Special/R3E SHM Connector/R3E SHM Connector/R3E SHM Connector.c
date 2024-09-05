@@ -308,10 +308,11 @@ extern __declspec(dllexport) int __stdcall call(char* request, char* result, int
 		if (mapped_r3e) {
 			writeStringOption(result, "Paused=", map_buffer->game_paused ? "true" : "false", &pos);
 			
+			/*
 			if (map_buffer->session_type != R3E_SESSION_PRACTICE && map_buffer->session_length_format == R3E_SESSION_LENGTH_LAP_BASED &&
 				map_buffer->race_session_laps[map_buffer->session_iteration - 1] - normalize(map_buffer->completed_laps) <= 0)
 				writeString(result, "Session=Finished\n", &pos);
-			else if (map_buffer->session_type == R3E_SESSION_QUALIFY)
+			else */ if (map_buffer->session_type == R3E_SESSION_QUALIFY)
 				writeString(result, "Session=Qualification\n", &pos);
 			else if (map_buffer->session_type == R3E_SESSION_RACE)
 				writeString(result, "Session=Race\n", &pos);

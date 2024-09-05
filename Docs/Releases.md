@@ -1,4 +1,4 @@
-## 5.8.6.0-release 09/06/24 (planned)
+## 5.8.6.0-release 09/06/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. All graphs and reports are now redrawn live in "Solo Center".

@@ -39,17 +39,17 @@ The documentation is devided into the following sections:
 
     This smart tool gives valuable recommendations on how to change a car setup for a given problem. The tool follows an interview-like approach and can even handle contradictory requirements.
 
-  - [Practice Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Practice-Center)
+  - [Solo Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center)
   
-    This application helps you in organizing and evaluating your practice runs. You have full access to all relvant telemetry and performance data and you can decide which of the collected data will be stored in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) (see above). The "Practice Center" can also be used in a solo race and offer almost the same functionality as the team-oriented ["Race Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center) (see below).
+    This application helps you in organizing and evaluating your practice runs. You have full access to all relvant telemetry and performance data and you can decide which of the collected data will be stored in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) (see above). The "Solo Center" can also be used in a solo race and offer almost the same functionality as the team-oriented ["Team Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center) (see below).
 	
   - [Strategy Workbench](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench)
 
     This sophisticated application allows you to develop and simulate strategies for any type of race, ranging from a 30 minute, solo sprint race with one required pitstop up to full-weekend endurance races with multiple drivers. The strategy simulation is data-based and can even handle weather forecasts. A developed strategy can be handed over to the [Virtuak Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist), which then will keep track of the strategy during the race.
 	
-  - [Race Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center)
+  - [Team Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center)
   
-    Using the "Race Center", a complete pitwall application, you can plan the race, prepare a strategy and based on that the stint plan for the race. All team members or even a dedicated engineer can investigate the telemetry data and gather information about the race development in general and can remote control the car, for example to prepare an upcoming pitstop, without any driver interaction. Last, but not least, if you encounter an unforeseen event during the race, you have various tools at hand to adopt the strategy to the new race situation. The "Race Center" requires all drivers to be connected to the ["Team Server"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) (see below).
+    Using the "Team Center", a complete pitwall application, you can plan the race, prepare a strategy and based on that the stint plan for the race. All team members or even a dedicated engineer can investigate the telemetry data and gather information about the race development in general and can remote control the car, for example to prepare an upcoming pitstop, without any driver interaction. Last, but not least, if you encounter an unforeseen event during the race, you have various tools at hand to adopt the strategy to the new race situation. The "Team Center" requires all drivers to be connected to the ["Team Server"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) (see below).
   
   - [Virtual Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach)
 
@@ -73,7 +73,7 @@ The documentation is devided into the following sections:
 	
   - [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server)
 
-    If you are participating in multiplayer team-based endurance races, you use the *Team Server* to share the car state and the knowledge ot the Virtual Race Assistants between all participating drivers. It is also necessary for using the "Race Center" in a team race.
+    If you are participating in multiplayer team-based endurance races, you use the *Team Server* to share the car state and the knowledge ot the Virtual Race Assistants between all participating drivers. It is also necessary for using the "Team Center" in a team race.
 	
   - [Development Guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts)
 

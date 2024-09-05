@@ -773,8 +773,8 @@ checkInstallation() {
 					fixIE(11, "Setup Workbench.exe")
 					fixIE(11, "Race Reports.exe")
 					fixIE(11, "Strategy Workbench.exe")
-					fixIE(11, "Practice Center.exe")
-					fixIE(11, "Race Center.exe")
+					fixIE(11, "Solo Center.exe")
+					fixIE(11, "Team Center.exe")
 					fixIE(10, "Simulator Setup.exe")
 					fixIE(11, "System Monitor.exe")
 
@@ -1088,8 +1088,8 @@ writeAppPaths(installLocation) {
 	RegWrite(installLocation . "\Binaries\Session Database.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SessionDatabase.exe")
 	RegWrite(installLocation . "\Binaries\Race Reports.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceReports.exe")
 	RegWrite(installLocation . "\Binaries\Strategy Workbench.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\StrategyWorkbench.exe")
-	RegWrite(installLocation . "\Binaries\Practice Center.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\PracticeCenter.exe")
-	RegWrite(installLocation . "\Binaries\Race Center.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceCenter.exe")
+	RegWrite(installLocation . "\Binaries\Solo Center.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SoloCenter.exe")
+	RegWrite(installLocation . "\Binaries\Team Center.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\TeamCenter.exe")
 	RegWrite(installLocation . "\Binaries\Server Administration.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\ServerAdministration.exe")
 	RegWrite(installLocation . "\Binaries\SetupWorkbench.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupWorkbench.exe")
 }
@@ -1113,8 +1113,8 @@ deleteAppPaths() {
 	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SessionDatabase.exe")
 	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceReports.exe")
 	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\StrategyWorkbench.exe")
-	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\PracticeCenter.exe")
-	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceCenter.exe")
+	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SoloCenter.exe")
+	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\TeamCenter.exe")
 	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\ServerAdministration.exe")
 	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupWorkbench.exe")
 }
@@ -1668,7 +1668,7 @@ updateInstallationForV541() {
 		installLocation := getMultiMapValue(installInfo, "Install", "Location")
 
 		try {
-			FileCreateShortcut(installLocation . "\Binaries\Practice Center.exe", A_StartMenu . "\Simulator Controller\Practice Center.lnk", installLocation . "\Binaries")
+			FileCreateShortcut(installLocation . "\Binaries\Solo Center.exe", A_StartMenu . "\Simulator Controller\Solo Center.lnk", installLocation . "\Binaries")
 		}
 		catch Any as exception {
 			logError(exception)

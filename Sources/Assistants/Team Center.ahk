@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Race Center Tool                ;;;
+;;;   Modular Simulator Controller System - Team Center Tool                ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
@@ -18,7 +18,7 @@
 ;@SC-EndIf
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Console.ico
-;@Ahk2Exe-ExeName Race Center.exe
+;@Ahk2Exe-ExeName Team Center.exe
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -158,27 +158,27 @@ class WorkingTask extends PeriodicTask {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; Class                        RaceCenterTask                             ;;;
+;;; Class                        TeamCenterTask                             ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class RaceCenterTask extends Task {
+class TeamCenterTask extends Task {
 	Window {
 		Get {
-			return RaceCenter.Instance.Window
+			return TeamCenter.Instance.Window
 		}
 	}
 
 	run() {
-		local rCenter := RaceCenter.Instance
+		local tCenter := TeamCenter.Instance
 
-		if rCenter.startWorking() {
+		if tCenter.startWorking() {
 			try {
 				super.run()
 
 				return false
 			}
 			finally {
-				rCenter.finishWorking()
+				tCenter.finishWorking()
 			}
 		}
 		else
@@ -187,10 +187,10 @@ class RaceCenterTask extends Task {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; Class                        RaceCenterSimulationTask                   ;;;
+;;; Class                        TeamCenterSimulationTask                   ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class RaceCenterSimulationTask extends RaceCenterTask {
+class TeamCenterSimulationTask extends TeamCenterTask {
 	iSimulation := false
 
 	Simulation {
@@ -208,9 +208,9 @@ class RaceCenterSimulationTask extends RaceCenterTask {
 ;;; Class                       SyncSessionTask                             ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class SyncSessionTask extends RaceCenterTask {
+class SyncSessionTask extends TeamCenterTask {
 	__New() {
-		super.__New(ObjBindMethod(RaceCenter.Instance, "syncSession"), 10000)
+		super.__New(ObjBindMethod(TeamCenter.Instance, "syncSession"), 10000)
 
 		this.Runnable := false
 	}
@@ -218,7 +218,7 @@ class SyncSessionTask extends RaceCenterTask {
 	run() {
 		super.run()
 
-		this.Sleep := ((RaceCenter.Instance.Synchronize && isNumber(RaceCenter.Instance.Synchronize)) ? (RaceCenter.Instance.Synchronize * 1000) : 10000)
+		this.Sleep := ((TeamCenter.Instance.Synchronize && isNumber(TeamCenter.Instance.Synchronize)) ? (TeamCenter.Instance.Synchronize * 1000) : 10000)
 
 		return this
 	}
@@ -231,10 +231,10 @@ class SyncSessionTask extends RaceCenterTask {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; Class                          RaceCenter                               ;;;
+;;; Class                          TeamCenter                               ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class RaceCenter extends ConfigurationItem {
+class TeamCenter extends ConfigurationItem {
 	static kInvalidToken := "__Invalid__"
 
 	iWindow := false
@@ -250,7 +250,7 @@ class RaceCenter extends ConfigurationItem {
 	iConnection := false
 
 	iServerURL := ""
-	iServerToken := RaceCenter.kInvalidToken
+	iServerToken := TeamCenter.kInvalidToken
 
 	iTeams := CaseInsenseMap()
 	iSessions := CaseInsenseMap()
@@ -348,7 +348,7 @@ class RaceCenter extends ConfigurationItem {
 
 	iPressuresRequest := false
 
-	class RaceCenterResizer extends Window.Resizer {
+	class TeamCenterResizer extends Window.Resizer {
 		iRedraw := false
 
 		__New(arguments*) {
@@ -363,7 +363,7 @@ class RaceCenter extends ConfigurationItem {
 
 		RedrawHTMLViewer() {
 			if this.iRedraw {
-				local center := RaceCenter.Instance
+				local center := TeamCenter.Instance
 				local ignore, button
 
 				for ignore, button in ["LButton", "MButton", "RButton"]
@@ -375,7 +375,7 @@ class RaceCenter extends ConfigurationItem {
 				center.ChartViewer.Resized()
 				center.DetailsViewer.Resized()
 
-				center.pushTask(ObjBindMethod(RaceCenter.Instance, "updateReports", true))
+				center.pushTask(ObjBindMethod(TeamCenter.Instance, "updateReports", true))
 			}
 
 			return Task.CurrentTask
@@ -442,7 +442,7 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
-	class RaceCenterStrategyViewer extends StrategyViewer {
+	class TeamCenterStrategyViewer extends StrategyViewer {
 		showStrategyInfo(strategy, title := false) {
 			local html := this.createInfoContent(strategy, title ? 5 : 0)
 			local htmlGui, htmlViewer
@@ -455,7 +455,7 @@ class RaceCenter extends ConfigurationItem {
 				}
 			}
 			else if strategy {
-				htmlGui := RaceCenter.HTMLWindow({Descriptor: "Race Center.Strategy Viewer", Closeable: true, Resizeable:  "Deferred"}, title)
+				htmlGui := TeamCenter.HTMLWindow({Descriptor: "Team Center.Strategy Viewer", Closeable: true, Resizeable:  "Deferred"}, title)
 
 				htmlViewer := htmlGui.Add("HTMLViewer", "X0 Y0 W640 H480 W:Grow H:Grow")
 
@@ -463,37 +463,37 @@ class RaceCenter extends ConfigurationItem {
 				htmlViewer.document.write(html)
 				htmlViewer.document.close()
 
-				htmlGui.Add(RaceCenter.HTMLResizer(htmlViewer, html, htmlGui))
+				htmlGui.Add(TeamCenter.HTMLResizer(htmlViewer, html, htmlGui))
 
-				if getWindowPosition("Race Center.Strategy Viewer", &x, &y)
+				if getWindowPosition("Team Center.Strategy Viewer", &x, &y)
 					htmlGui.Show("x" . x . " y" . y . " w640 h480")
 				else
 					htmlGui.Show("w640 h480")
 
-				if getWindowSize("Race Center." . title, &w, &h)
+				if getWindowSize("Team Center." . title, &w, &h)
 					htmlGui.Resize("Initialize", w, h)
 			}
 		}
 	}
 
-	class RaceCenterTelemetryDatabase extends TelemetryDatabase {
-		iRaceCenter := false
+	class TeamCenterTelemetryDatabase extends TelemetryDatabase {
+		iTeamCenter := false
 		iTelemetryDatabase := false
 
-		class SessionTelemetryDatabase extends RaceCenter.RaceCenterTelemetryDatabase {
+		class SessionTelemetryDatabase extends TeamCenter.TeamCenterTelemetryDatabase {
 			Drivers {
 				Get {
-					return this.RaceCenter.SelectedDrivers
+					return this.TeamCenter.SelectedDrivers
 				}
 			}
 		}
 
-		class SimulationTelemetryDatabase extends RaceCenter.RaceCenterTelemetryDatabase {
+		class SimulationTelemetryDatabase extends TeamCenter.TeamCenterTelemetryDatabase {
 		}
 
-		RaceCenter {
+		TeamCenter {
 			Get {
-				return this.iRaceCenter
+				return this.iTeamCenter
 			}
 		}
 
@@ -503,14 +503,14 @@ class RaceCenter extends ConfigurationItem {
 			}
 		}
 
-		__New(raceCenter, simulator := false, car := false, track := false) {
-			this.iRaceCenter := raceCenter
+		__New(teamCenter, simulator := false, car := false, track := false) {
+			this.iTeamCenter := teamCenter
 
 			super.__New()
 
 			this.Shared := false
 
-			this.setDatabase(Database(raceCenter.SessionDirectory, kTelemetrySchemas))
+			this.setDatabase(Database(teamCenter.SessionDirectory, kTelemetrySchemas))
 
 			if simulator
 				this.iTelemetryDatabase := TelemetryDatabase(simulator, car, track)
@@ -527,12 +527,12 @@ class RaceCenter extends ConfigurationItem {
 			local entries := []
 			local newEntries, ignore, entry, ignore, entry, found, candidate, lastLap, result
 
-			if this.RaceCenter.UseSessionData
+			if this.TeamCenter.UseSessionData
 				for ignore, entry in super.getMapData(weather, tyreCompound, tyreCompoundColor)
 					if ((entry["Fuel.Consumption"] > 0) && (entry["Lap.Time"] > 0))
 						entries.Push(entry)
 
-			if (this.RaceCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
+			if (this.TeamCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
 				newEntries := []
 
 				for ignore, entry in this.TelemetryDatabase.getMapData(weather, tyreCompound, tyreCompoundColor) {
@@ -556,8 +556,8 @@ class RaceCenter extends ConfigurationItem {
 					entries.Push(entry)
 			}
 
-			if this.RaceCenter.UseCurrentMap {
-				lastLap := this.iRaceCenter.LastLap
+			if this.TeamCenter.UseCurrentMap {
+				lastLap := this.iTeamCenter.LastLap
 
 				if lastLap {
 					result := []
@@ -577,12 +577,12 @@ class RaceCenter extends ConfigurationItem {
 			local entries := []
 			local newEntries, ignore, entry, found, candidate
 
-			if this.RaceCenter.UseSessionData
+			if this.TeamCenter.UseSessionData
 				for ignore, entry in super.getTyreData(weather, tyreCompound, tyreCompoundColor)
 					if (entry["Lap.Time"] > 0)
 						entries.Push(entry)
 
-			if (this.RaceCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
+			if (this.TeamCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
 				newEntries := []
 
 				for ignore, entry in this.TelemetryDatabase.getTyreData(weather, tyreCompound, tyreCompoundColor) {
@@ -612,12 +612,12 @@ class RaceCenter extends ConfigurationItem {
 			local entries := []
 			local newEntries, ignore, entry, found, candidate, lastLap, result
 
-			if this.RaceCenter.UseSessionData
+			if this.TeamCenter.UseSessionData
 				for ignore, entry in super.getMapLapTimes(weather, tyreCompound, tyreCompoundColor)
 					if (entry["Lap.Time"] > 0)
 						entries.Push(entry)
 
-			if (this.RaceCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
+			if (this.TeamCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
 				newEntries := []
 
 				for ignore, entry in this.TelemetryDatabase.getMapLapTimes(weather, tyreCompound, tyreCompoundColor) {
@@ -641,8 +641,8 @@ class RaceCenter extends ConfigurationItem {
 					entries.Push(entry)
 			}
 
-			if this.iRaceCenter.UseCurrentMap {
-				lastLap := this.iRaceCenter.LastLap
+			if this.iTeamCenter.UseCurrentMap {
+				lastLap := this.iTeamCenter.LastLap
 
 				if lastLap {
 					result := []
@@ -662,12 +662,12 @@ class RaceCenter extends ConfigurationItem {
 			local entries := []
 			local newEntries, ignore, entry, found, candidate
 
-			if this.RaceCenter.UseSessionData
+			if this.TeamCenter.UseSessionData
 				for ignore, entry in super.getTyreLapTimes(weather, tyreCompound, tyreCompoundColor)
 					if (entry["Lap.Time"] > 0)
 						entries.Push(entry)
 
-			if (this.RaceCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
+			if (this.TeamCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
 				newEntries := []
 
 				for ignore, entry in this.TelemetryDatabase.getTyreLapTimes(weather, tyreCompound, tyreCompoundColor) {
@@ -703,8 +703,8 @@ class RaceCenter extends ConfigurationItem {
 			}
 		}
 
-		__New(rCenter) {
-			this.iDatabase := Database(rCenter.SessionDirectory, kRCTyresSchemas)
+		__New(tCenter) {
+			this.iDatabase := Database(tCenter.SessionDirectory, kRCTyresSchemas)
 		}
 
 		updatePressures(weather, airTemperature, trackTemperature, tyreCompound, tyreCompoundColor, coldPressures, hotPressures, pressuresLosses, driver, flush) {
@@ -768,28 +768,28 @@ class RaceCenter extends ConfigurationItem {
 	class SessionStrategy extends Strategy {
 		CompletedPitstops {
 			Get {
-				return RaceCenter.Instance.getCompletedPitstops()
+				return TeamCenter.Instance.getCompletedPitstops()
 			}
 		}
 
 		initializeTyreSets() {
 			super.initializeTyreSets()
 
-			RaceCenter.Instance.initializeTyreSets(this)
+			TeamCenter.Instance.initializeTyreSets(this)
 		}
 	}
 
 	class SessionTrafficStrategy extends TrafficStrategy {
 		CompletedPitstops {
 			Get {
-				return RaceCenter.Instance.getCompletedPitstops()
+				return TeamCenter.Instance.getCompletedPitstops()
 			}
 		}
 
 		initializeTyreSets() {
 			super.initializeTyreSets()
 
-			RaceCenter.Instance.initializeTyreSets(this)
+			TeamCenter.Instance.initializeTyreSets(this)
 		}
 	}
 
@@ -1232,7 +1232,7 @@ class RaceCenter extends ConfigurationItem {
 	TelemetryDatabase {
 		Get {
 			if !this.iTelemetryDatabase
-				this.iTelemetryDatabase := RaceCenter.RaceCenterTelemetryDatabase.SessionTelemetryDatabase(this)
+				this.iTelemetryDatabase := TeamCenter.TeamCenterTelemetryDatabase.SessionTelemetryDatabase(this)
 
 			return this.iTelemetryDatabase
 		}
@@ -1247,7 +1247,7 @@ class RaceCenter extends ConfigurationItem {
 	PressuresDatabase {
 		Get {
 			if !this.iPressuresDatabase
-				this.iPressuresDatabase := RaceCenter.SessionPressuresDatabase(this)
+				this.iPressuresDatabase := TeamCenter.SessionPressuresDatabase(this)
 
 			return this.iPressuresDatabase
 		}
@@ -1348,18 +1348,18 @@ class RaceCenter extends ConfigurationItem {
 		this.iCar := car
 		this.iTrack := track
 
-		this.iTyrePressureMode := getMultiMapValue(settings, "Race Center", "TyrePressureMode", "Reference")
-		this.iCorrectPressureLoss := getMultiMapValue(settings, "Race Center", "CorrectPressureLoss", false)
-		this.iSelectTyreSet := getMultiMapValue(settings, "Race Center", "SelectTyreSet", true)
+		this.iTyrePressureMode := getMultiMapValue(settings, "Team Center", "TyrePressureMode", "Reference")
+		this.iCorrectPressureLoss := getMultiMapValue(settings, "Team Center", "CorrectPressureLoss", false)
+		this.iSelectTyreSet := getMultiMapValue(settings, "Team Center", "SelectTyreSet", true)
 
-		this.iUseSessionData := getMultiMapValue(settings, "Race Center", "UseSessionData", true)
-		this.iUseTelemetryDatabase := getMultiMapValue(settings, "Race Center", "UseTelemetryDatabase", false)
-		this.iUseCurrentMap := getMultiMapValue(settings, "Race Center", "UseCurrentMap", true)
-		this.iUseTraffic := getMultiMapValue(settings, "Race Center", "UseTraffic", false)
+		this.iUseSessionData := getMultiMapValue(settings, "Team Center", "UseSessionData", true)
+		this.iUseTelemetryDatabase := getMultiMapValue(settings, "Team Center", "UseTelemetryDatabase", false)
+		this.iUseCurrentMap := getMultiMapValue(settings, "Team Center", "UseCurrentMap", true)
+		this.iUseTraffic := getMultiMapValue(settings, "Team Center", "UseTraffic", false)
 
 		super.__New(configuration)
 
-		RaceCenter.Instance := this
+		TeamCenter.Instance := this
 
 		this.iSyncTask := SyncSessionTask()
 	}
@@ -1384,7 +1384,7 @@ class RaceCenter extends ConfigurationItem {
 		this.iServerURL := getMultiMapValue(settings, "Team Settings", "Server.URL"
 										  , getMultiMapValue(configuration, "Team Server", "Server.URL", ""))
 		this.iServerToken := getMultiMapValue(settings, "Team Settings", "Server.Token"
-											, getMultiMapValue(configuration, "Team Server", "Server.Token", RaceCenter.kInvalidToken))
+											, getMultiMapValue(configuration, "Team Server", "Server.Token", TeamCenter.kInvalidToken))
 		this.iTeamName := getMultiMapValue(settings, "Team Settings", "Team.Name", "")
 		this.iTeamIdentifier := getMultiMapValue(settings, "Team Settings", "Team.Identifier", false)
 		this.iSessionName := getMultiMapValue(settings, "Team Settings", "Session.Name", "")
@@ -1410,13 +1410,13 @@ class RaceCenter extends ConfigurationItem {
 				field.ValidText := field.Text
 		}
 
-		closeRaceCenter(*) {
+		closeTeamCenter(*) {
 			ExitApp(0)
 		}
 
 		connectServer(*) {
 			center.iServerURL := centerGui["serverURLEdit"].Text
-			center.iServerToken := ((centerGui["serverTokenEdit"].Text = "") ? RaceCenter.kInvalidToken : centerGui["serverTokenEdit"].Text)
+			center.iServerToken := ((centerGui["serverTokenEdit"].Text = "") ? TeamCenter.kInvalidToken : centerGui["serverTokenEdit"].Text)
 
 			center.connect()
 		}
@@ -2072,21 +2072,21 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		if (this.Mode = "Normal")
-			centerGui := Window({Descriptor: "Race Center", Closeable: true, Resizeable: "Deferred"}, translate("Race Center"))
+			centerGui := Window({Descriptor: "Team Center", Closeable: true, Resizeable: "Deferred"}, translate("Team Center"))
 		else
-			centerGui := Window({Descriptor: "Race Center Lite", Closeable: true, Resizeable: "Deferred"}, translate("Race Center Lite"))
+			centerGui := Window({Descriptor: "Team Center Lite", Closeable: true, Resizeable: "Deferred"}, translate("Team Center Lite"))
 
 		this.iWindow := centerGui
 
 		if (this.Mode = "Normal") {
 			centerGui.SetFont("s10 Bold", "Arial")
 
-			centerGui.Add("Text", "w1334 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(centerGui, "Race Center"))
+			centerGui.Add("Text", "w1334 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(centerGui, "Team Center"))
 
 			centerGui.SetFont("s9 Norm", "Arial")
 
-			centerGui.Add("Documentation", "x588 YP+20 w174 H:Center Center", translate("Race Center")
-						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center")
+			centerGui.Add("Documentation", "x588 YP+20 w174 H:Center Center", translate("Team Center")
+						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center")
 
 			centerGui.Add("Text", "x8 yp+30 w1350 W:Grow 0x10")
 
@@ -2211,12 +2211,12 @@ class RaceCenter extends ConfigurationItem {
 		else {
 			centerGui.SetFont("s10 Bold", "Arial")
 
-			centerGui.Add("Text", "w601 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(centerGui, "Race Center Lite"))
+			centerGui.Add("Text", "w601 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(centerGui, "Team Center Lite"))
 
 			centerGui.SetFont("s9 Norm", "Arial")
 
-			centerGui.Add("Documentation", "x242 YP+20 w134 H:Center Center", translate("Race Center")
-						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center")
+			centerGui.Add("Documentation", "x242 YP+20 w134 H:Center Center", translate("Team Center")
+						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center")
 
 			centerGui.Add("Text", "x8 yp+30 w601 W:Grow 0x10")
 
@@ -2240,7 +2240,7 @@ class RaceCenter extends ConfigurationItem {
 
 			this.iDetailsViewer := centerGui.Add("HTMLViewer", "x619 yp+14 w732 h293 W:Grow H:Grow(0.8) Border vdetailsViewer")
 
-			this.iStrategyViewer := RaceCenter.RaceCenterStrategyViewer(centerGui, this.iDetailsViewer)
+			this.iStrategyViewer := TeamCenter.TeamCenterStrategyViewer(centerGui, this.iDetailsViewer)
 		}
 
 		centerGui.SetFont("Norm", "Arial")
@@ -2502,14 +2502,14 @@ class RaceCenter extends ConfigurationItem {
 		if (this.Mode = "Normal") {
 			this.iReportViewer := RaceReportViewer(centerGui, this.ChartViewer)
 
-			centerGui.Add(RaceCenter.RaceCenterResizer(centerGui))
+			centerGui.Add(TeamCenter.TeamCenterResizer(centerGui))
 		}
 		else {
 			htmlViewer := centerGui.Add("HTMLViewer", "x0 y0 w640 h480 Hidden")
 
 			this.iDetailsViewer := htmlViewer
 			this.iReportViewer := RaceReportViewer(centerGui, htmlViewer)
-			this.iStrategyViewer := RaceCenter.RaceCenterStrategyViewer(centerGui, htmlViewer)
+			this.iStrategyViewer := TeamCenter.TeamCenterStrategyViewer(centerGui, htmlViewer)
 
 			menu1 := Menu()
 
@@ -2582,12 +2582,12 @@ class RaceCenter extends ConfigurationItem {
 		local window := this.Window
 		local x, y, w, h
 
-		if getWindowPosition((this.Mode = "Normal") ? "Race Center" : "Race Center Lite", &x, &y)
+		if getWindowPosition((this.Mode = "Normal") ? "Team Center" : "Team Center Lite", &x, &y)
 			window.Show("AutoSize x" . x . " y" . y)
 		else
 			window.Show("AutoSize")
 
-		if getWindowSize((this.Mode = "Normal") ? "Race Center" : "Race Center Lite", &w, &h)
+		if getWindowSize((this.Mode = "Normal") ? "Team Center" : "Team Center Lite", &w, &h)
 			window.Resize("Initialize", w, h)
 
 		this.startWorking(false)
@@ -2645,7 +2645,7 @@ class RaceCenter extends ConfigurationItem {
 					token := loginDialog(this.Connector, this.ServerURL, window)
 
 					if token {
-						this.iServerToken := ((token = "") ? RaceCenter.kInvalidToken : token)
+						this.iServerToken := ((token = "") ? TeamCenter.kInvalidToken : token)
 
 						if (this.Mode = "Normal")
 							window["serverTokenEdit"].Text := token
@@ -2710,7 +2710,7 @@ class RaceCenter extends ConfigurationItem {
 			catch Any as exception {
 				logError(exception, true)
 
-				this.iServerToken := RaceCenter.kInvalidToken
+				this.iServerToken := TeamCenter.kInvalidToken
 				this.iConnection := false
 
 				if (this.Mode = "Normal")
@@ -4415,7 +4415,7 @@ class RaceCenter extends ConfigurationItem {
 				}
 			}
 			else
-				throw "Unknown tyre pressure mode detected in RaceCenter.adjustPitstopTyrePressures..."
+				throw "Unknown tyre pressure mode detected in TeamCenter.adjustPitstopTyrePressures..."
 		}
 	}
 
@@ -4526,7 +4526,7 @@ class RaceCenter extends ConfigurationItem {
 				if instruct {
 					this.Connector.SetSessionValue(session, "Race Strategy Update", strategy)
 					this.Connector.SetSessionValue(session, "Race Strategy Update Version", this.Strategy.Version)
-					this.Connector.SetSessionValue(session, "Race Strategy Update Origin", "Race Center")
+					this.Connector.SetSessionValue(session, "Race Strategy Update Origin", "Team Center")
 
 					if verbose
 						showMessage(translate("Race Strategist will be instructed as fast as possible."))
@@ -4553,7 +4553,7 @@ class RaceCenter extends ConfigurationItem {
 
 				this.Connector.SetSessionValue(session, "Race Strategy Update", "CANCEL")
 				this.Connector.SetSessionValue(session, "Race Strategy Update Version", A_Now)
-				this.Connector.SetSessionValue(session, "Race Strategy Update Origin", "Race Center")
+				this.Connector.SetSessionValue(session, "Race Strategy Update Origin", "Team Center")
 
 				showMessage(translate("Race Strategist will be instructed as fast as possible."))
 			}
@@ -4891,7 +4891,7 @@ class RaceCenter extends ConfigurationItem {
 			switch line {
 				case 3: ; Connect...
 					this.iServerURL := this.Control["serverURLEdit"].Text
-					this.iServerToken := ((this.Control["serverTokenEdit"].Text = "") ? RaceCenter.kInvalidToken : this.Control["serverTokenEdit"].Text)
+					this.iServerToken := ((this.Control["serverTokenEdit"].Text = "") ? TeamCenter.kInvalidToken : this.Control["serverTokenEdit"].Text)
 
 					this.connect()
 				case 4: ; Clear...
@@ -5009,7 +5009,7 @@ class RaceCenter extends ConfigurationItem {
 		updateSetting(setting, value) {
 			local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-			setMultiMapValue(settings, "Race Center", setting, value)
+			setMultiMapValue(settings, "Team Center", setting, value)
 
 			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 		}
@@ -5263,7 +5263,7 @@ class RaceCenter extends ConfigurationItem {
 		updateSetting(setting, value) {
 			local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-			setMultiMapValue(settings, "Race Center", setting, value)
+			setMultiMapValue(settings, "Team Center", setting, value)
 
 			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 		}
@@ -5474,7 +5474,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	pushTask(theTask) {
-		RaceCenterTask(theTask).start()
+		TeamCenterTask(theTask).start()
 	}
 
 	createStrategy(nameOrConfiguration, driver := false, simulation := true) {
@@ -5484,8 +5484,8 @@ class RaceCenter extends ConfigurationItem {
 		if !isObject(nameOrConfiguration)
 			nameOrConfiguration := false
 
-		theStrategy := ((simulation && this.UseTraffic) ? RaceCenter.SessionTrafficStrategy(this, nameOrConfiguration, driver)
-														: RaceCenter.SessionStrategy(this, nameOrConfiguration, driver))
+		theStrategy := ((simulation && this.UseTraffic) ? TeamCenter.SessionTrafficStrategy(this, nameOrConfiguration, driver)
+														: TeamCenter.SessionStrategy(this, nameOrConfiguration, driver))
 
 		if (name && !isObject(name))
 			theStrategy.setName(name)
@@ -5545,7 +5545,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	runSimulation(sessionType) {
-		RaceCenterSimulationTask(ObjBindMethod(this, "runSimulationAsync", sessionType)).start()
+		TeamCenterSimulationTask(ObjBindMethod(this, "runSimulationAsync", sessionType)).start()
 	}
 
 	runSimulationAsync(sessionType) {
@@ -5557,7 +5557,7 @@ class RaceCenter extends ConfigurationItem {
 
 		this.showMessage(translate("Running simulation"))
 
-		telemetryDB := RaceCenter.RaceCenterTelemetryDatabase.SimulationTelemetryDatabase(this, this.Simulator, this.Car, this.Track)
+		telemetryDB := TeamCenter.TeamCenterTelemetryDatabase.SimulationTelemetryDatabase(this, this.Simulator, this.Car, this.Track)
 
 		this.iSimulationTelemetryDatabase := telemetryDB
 
@@ -6454,9 +6454,9 @@ class RaceCenter extends ConfigurationItem {
 			if this.Simulator {
 				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-				setMultiMapValue(settings, "Race Center", "Simulator", simulator)
-				setMultiMapValue(settings, "Race Center", "Car", car)
-				setMultiMapValue(settings, "Race Center", "Track", track)
+				setMultiMapValue(settings, "Team Center", "Simulator", simulator)
+				setMultiMapValue(settings, "Team Center", "Car", car)
+				setMultiMapValue(settings, "Team Center", "Track", track)
 
 				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
@@ -6895,14 +6895,14 @@ class RaceCenter extends ConfigurationItem {
 				pitstops := this.Pitstops[carID]
 
 				if (pitstops.Length = 0)
-					pitstops.Push(RaceCenter.Pitstop(carID, this.iLastPitstopUpdate, lap.Nr))
+					pitstops.Push(TeamCenter.Pitstop(carID, this.iLastPitstopUpdate, lap.Nr))
 				else {
 					pitstop := pitstops[pitstops.Length]
 
 					if ((pitstop.Time - pitstop.Duration - (delta + 20)) < this.iLastPitstopUpdate)
 						pitstop.Duration := (pitstop.Duration + delta)
 					else
-						pitstops.Push(RaceCenter.Pitstop(carID, this.iLastPitstopUpdate, lap.Nr))
+						pitstops.Push(TeamCenter.Pitstop(carID, this.iLastPitstopUpdate, lap.Nr))
 				}
 			}
 	}
@@ -9467,7 +9467,7 @@ class RaceCenter extends ConfigurationItem {
 			pitstops := this.Pitstops[carID]
 
 			loop getMultiMapValue(state, "Pitstop State", "Pitstop." . carID . ".Count", 0)
-				pitstops.Push(RaceCenter.Pitstop(carID, string2Values(";", getMultiMapValue(state, "Pitstop State", "Pitstop." . carID . "." . A_Index))*))
+				pitstops.Push(TeamCenter.Pitstop(carID, string2Values(";", getMultiMapValue(state, "Pitstop State", "Pitstop." . carID . "." . A_Index))*))
 		}
 	}
 
@@ -10124,7 +10124,7 @@ class RaceCenter extends ConfigurationItem {
 			this.DetailsViewer.document.close()
 		}
 		else if details {
-			htmlGui := RaceCenter.HTMLWindow({Descriptor: "Race Center." . StrTitle(report) . " Report Viewer", Closeable: true, Resizeable:  "Deferred"}, title)
+			htmlGui := TeamCenter.HTMLWindow({Descriptor: "Team Center." . StrTitle(report) . " Report Viewer", Closeable: true, Resizeable:  "Deferred"}, title)
 
 			htmlViewer := htmlGui.Add("HTMLViewer", "X0 Y0 W640 H480 W:Grow H:Grow")
 
@@ -10132,14 +10132,14 @@ class RaceCenter extends ConfigurationItem {
 			htmlViewer.document.write(html)
 			htmlViewer.document.close()
 
-			htmlGui.Add(RaceCenter.HTMLResizer(htmlViewer, html, htmlGui))
+			htmlGui.Add(TeamCenter.HTMLResizer(htmlViewer, html, htmlGui))
 
-			if getWindowPosition("Race Center." . StrTitle(report) . " Report Viewer", &x, &y)
+			if getWindowPosition("Team Center." . StrTitle(report) . " Report Viewer", &x, &y)
 				htmlGui.Show("x" . x . " y" . y . " w640 h480")
 			else
 				htmlGui.Show("w640 h480")
 
-			if getWindowSize("Race Center." . StrTitle(report) . " Report Viewer", &w, &h)
+			if getWindowSize("Team Center." . StrTitle(report) . " Report Viewer", &w, &h)
 				htmlGui.Resize("Initialize", w, h)
 		}
 	}
@@ -10608,9 +10608,9 @@ class RaceCenter extends ConfigurationItem {
 			report := this.SelectedReport
 			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-			setMultiMapValue(settings, "Race Center", "Chart." . report . ".Plot", ["Scatter", "Bar", "Bubble", "Line"][this.Control["chartTypeDropDown"].Value])
-			setMultiMapValue(settings, "Race Center", "Chart." . report . ".X-Axis", xAxis)
-			setMultiMapValue(settings, "Race Center", "Chart." . report . ".Y-Axises", values2String(";", yAxises*))
+			setMultiMapValue(settings, "Team Center", "Chart." . report . ".Plot", ["Scatter", "Bar", "Bubble", "Line"][this.Control["chartTypeDropDown"].Value])
+			setMultiMapValue(settings, "Team Center", "Chart." . report . ".X-Axis", xAxis)
+			setMultiMapValue(settings, "Team Center", "Chart." . report . ".Y-Axises", values2String(";", yAxises*))
 
 			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
@@ -10849,19 +10849,19 @@ class RaceCenter extends ConfigurationItem {
 			else {
 				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-				value := getMultiMapValue(settings, "Race Center", "Chart." . report . ".Plot", kUndefined)
+				value := getMultiMapValue(settings, "Team Center", "Chart." . report . ".Plot", kUndefined)
 
 				if (value != kUndefined) {
 					this.Control["chartTypeDropDown"].Choose(inList(["Scatter", "Bar", "Bubble", "Line"], value))
 
 					this.iSelectedChartType := value
 
-					dataXChoice := inList(xChoices, getMultiMapValue(settings, "Race Center", "Chart." . report . ".X-Axis"))
+					dataXChoice := inList(xChoices, getMultiMapValue(settings, "Team Center", "Chart." . report . ".X-Axis"))
 
 					loop 6
 						%"dataY" . A_Index . "Choice"% := 1
 
-					for axis, value in string2Values(";", getMultiMapValue(settings, "Race Center", "Chart." . report . ".Y-Axises"))
+					for axis, value in string2Values(";", getMultiMapValue(settings, "Team Center", "Chart." . report . ".Y-Axises"))
 						%"dataY" . axis . "Choice"% := (inList(%"y" . axis . "Choices"%, value) + ((axis = 1) ? 0 : 1))
 				}
 				else if (report = "Pressures") {
@@ -13271,18 +13271,18 @@ manageTeam(raceCenterOrCommand, teamDrivers := false, arguments*) {
 	else {
 		result := false
 
-		teamGui := Window({Descriptor: "Race Center.Team Manager", Options: "0x400000"})
+		teamGui := Window({Descriptor: "Team Center.Team Manager", Options: "0x400000"})
 
 		teamGui.Opt("+Owner" . raceCenterOrCommand.Window.Hwnd)
 
 		teamGui.SetFont("s10 Bold", "Arial")
 
-		teamGui.Add("Text", "w392 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(teamGui, "Race Center.Team Manager"))
+		teamGui.Add("Text", "w392 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(teamGui, "Team Center.Team Manager"))
 
 		teamGui.SetFont("s9 Norm", "Arial")
 
 		teamGui.Add("Documentation", "x148 YP+20 w112 Center", translate("Team Selection")
-				  , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#session--stint-planning")
+				  , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#session--stint-planning")
 
 		teamGui.SetFont("s8 Norm", "Arial")
 
@@ -13346,7 +13346,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false, arguments*) {
 		teamGui.Add("Button", "x120 yp+10 w80 h23 Default", translate("Ok")).OnEvent("Click", manageTeam.Bind(kOk))
 		teamGui.Add("Button", "x208 yp w80 h23", translate("&Cancel")).OnEvent("Click", manageTeam.Bind(kCancel))
 
-		if getWindowPosition("Race Center.Team Manager", &x, &y)
+		if getWindowPosition("Team Center.Team Manager", &x, &y)
 			teamGui.Show("x" . x . " y" . y)
 		else
 			teamGui.Show()
@@ -13375,7 +13375,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false, arguments*) {
 pitstopSettings(raceCenterOrCommand := false, arguments*) {
 	local tyreChange := false
 
-	static rCenter := false
+	static tCenter := false
 	static isOpen := false
 
 	static settingsGui := false
@@ -13387,8 +13387,8 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 			settingsListView.Modify(A_Index, "-Select")
 	}
 
-	if !rCenter
-		rCenter := RaceCenter.Instance
+	if !tCenter
+		tCenter := TeamCenter.Instance
 
 	try {
 		if (raceCenterOrCommand = "Visible")
@@ -13410,7 +13410,7 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 				if arguments[1].Has("FuelAmount")
 					settingsListView.Add("", translate("Refuel"), displayValue("Float", convertUnit("Volume", arguments[1]["FuelAmount"])) . A_Space . getUnit("Volume", true))
 
-				if inList(["ACC", "Assetto Corsa Competizione"], rCenter.Simulator) && arguments[1].Has("Pitstop.Planned.Tyre.Compound") {
+				if inList(["ACC", "Assetto Corsa Competizione"], tCenter.Simulator) && arguments[1].Has("Pitstop.Planned.Tyre.Compound") {
 					settingsListView.Add("", translate("Tyre Compound")
 										   , (arguments[1]["Pitstop.Planned.Tyre.Compound"] ? compound(arguments[1]["Pitstop.Planned.Tyre.Compound"]
 																									 , arguments[1]["Pitstop.Planned.Tyre.Compound.Color"])
@@ -13439,7 +13439,7 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 				}
 
 				if (arguments[1].Has("RepairBodywork") || arguments[1].Has("RepairSuspension") || arguments[1].Has("RepairEngine"))
-					settingsListView.Add("", translate("Repairs"), rCenter.computeRepairs(arguments[1].Has("RepairBodywork") ? arguments[1]["RepairBodywork"] : false
+					settingsListView.Add("", translate("Repairs"), tCenter.computeRepairs(arguments[1].Has("RepairBodywork") ? arguments[1]["RepairBodywork"] : false
 																						, arguments[1].Has("RepairSuspension") ? arguments[1]["RepairSuspension"] : false
 																						, arguments[1].Has("RepairEngine") ? arguments[1]["RepairEngine"] : false))
 
@@ -13468,11 +13468,11 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 				WinActivate(settingsGui)
 		}
 		else {
-			settingsGui := Window({Descriptor: "Race Center.Pitstop Settings", Options: "0x400000"})
+			settingsGui := Window({Descriptor: "Team Center.Pitstop Settings", Options: "0x400000"})
 
 			settingsGui.SetFont("s10 Bold", "Arial")
 
-			settingsGui.Add("Text", "w292 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(settingsGui, "Race Center.Pitstop Settings"))
+			settingsGui.Add("Text", "w292 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(settingsGui, "Team Center.Pitstop Settings"))
 
 			settingsGui.SetFont("s9 Norm", "Arial")
 
@@ -13488,7 +13488,7 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 			settingsGui.Add("Button", "x120 yp+200 w80 h23 Default", translate("Close")).OnEvent("Click", pitstopSettings.Bind(kClose))
 
 			if ((arguments.Length = 0) || arguments[1]) {
-				if getWindowPosition("Race Center.Pitstop Settings", &x, &y)
+				if getWindowPosition("Team Center.Pitstop Settings", &x, &y)
 					settingsGui.Show("x" . x . " y" . y)
 				else
 					settingsGui.Show()
@@ -13496,7 +13496,7 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 				isOpen := true
 			}
 			else {
-				if getWindowPosition("Race Center.Pitstop Settings", &x, &y)
+				if getWindowPosition("Team Center.Pitstop Settings", &x, &y)
 					settingsGui.Show("x" . x . " y" . y . " Hide")
 				else
 					settingsGui.Show("Hide")
@@ -13681,23 +13681,23 @@ loadDrivers(connector, team) {
 	return drivers
 }
 
-startupRaceCenter() {
+startupTeamCenter() {
 	local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-	local simulator := getMultiMapValue(settings, "Race Center", "Simulator"
+	local simulator := getMultiMapValue(settings, "Team Center", "Simulator"
 												, getMultiMapValue(settings, "Strategy Workbench", "Simulator", false))
-	local car := getMultiMapValue(settings, "Race Center", "Car"
+	local car := getMultiMapValue(settings, "Team Center", "Car"
 										  , getMultiMapValue(settings, "Strategy Workbench", "Car", false))
-	local track := getMultiMapValue(settings, "Race Center", "Track"
+	local track := getMultiMapValue(settings, "Team Center", "Track"
 											, getMultiMapValue(settings, "Strategy Workbench", "Track", false))
-	local mode := (inList(A_Args, "-Simple") ? "Simple" : getMultiMapValue(settings, "Race Center", "Mode", "Normal"))
+	local mode := (inList(A_Args, "-Simple") ? "Simple" : getMultiMapValue(settings, "Team Center", "Mode", "Normal"))
 	local raceSettings := readMultiMap(kUserConfigDirectory . "Race.settings")
 	local index := inList(A_Args, "-Startup")
 	local icon := (kIconsDirectory . "Console.ico")
 	local load := (inList(A_Args, "-Load") ? A_Args[inList(A_Args, "-Load") + 1] : false)
-	local rCenter, startupSettings, ignore, property
+	local tCenter, startupSettings, ignore, property
 
 	TraySetIcon(icon, "1")
-	A_IconTip := "Race Center"
+	A_IconTip := "Team Center"
 
 	if ((mode = "Normal") && GetKeyState("Alt"))
 		mode := "Simple"
@@ -13715,25 +13715,25 @@ startupRaceCenter() {
 			setMultiMapValue(raceSettings, "Team Settings", "Server.Token"
 										 , getMultiMapValue(startupSettings, "Team Session", "Server.Token"
 																		   , getMultiMapValue(raceSettings, "Team Settings", "Server.Token"
-																										  , RaceCenter.kInvalidToken)))
+																										  , TeamCenter.kInvalidToken)))
 		}
 
-		rCenter := RaceCenter(kSimulatorConfiguration, raceSettings, simulator, car, track, mode)
+		tCenter := TeamCenter(kSimulatorConfiguration, raceSettings, simulator, car, track, mode)
 
 		if GetKeyState("Ctrl")
-			rCenter.iSynchronize := "Off"
+			tCenter.iSynchronize := "Off"
 
-		rCenter.createGui(rCenter.Configuration)
+		tCenter.createGui(tCenter.Configuration)
 
 		if load
-			rCenter.loadSession(load, false)
+			tCenter.loadSession(load, false)
 
-		rCenter.show(false, !load)
+		tCenter.show(false, !load)
 
 		if !load
-			rCenter.connect(true)
+			tCenter.connect(true)
 
-		rCenter.startSynchronization()
+		tCenter.startSynchronization()
 
 		registerMessageHandler("Setup", functionMessageHandler)
 
@@ -13743,7 +13743,7 @@ startupRaceCenter() {
 		logError(exception, true)
 
 		OnMessage(0x44, translateOkButton)
-		withBlockedWindows(MsgBox, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Race Center"}), translate("Error"), 262160)
+		withBlockedWindows(MsgBox, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Team Center"}), translate("Error"), 262160)
 		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)
@@ -13756,17 +13756,17 @@ startupRaceCenter() {
 ;;;-------------------------------------------------------------------------;;;
 
 setTyrePressures(tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPressure, rrPressure) {
-	local rCenter := RaceCenter.Instance
+	local tCenter := TeamCenter.Instance
 	local tyreSet
 
-	if (rCenter.iPressuresRequest = "Pitstop")
-		rCenter.withExceptionhandler(ObjBindMethod(rCenter, "initializePitstopTyreSetup", &tyreCompound, &tyreCompoundColor
+	if (tCenter.iPressuresRequest = "Pitstop")
+		tCenter.withExceptionhandler(ObjBindMethod(tCenter, "initializePitstopTyreSetup", &tyreCompound, &tyreCompoundColor
 																						, &tyreSet := false
 																						, &flPressure, &frPressure
 																						, &rlPressure, &rrPressure, false, false))
 	else
-		if (rCenter.SetupsListView.GetNext(0) = rCenter.iPressuresRequest)
-			rCenter.withExceptionhandler(ObjBindMethod(rCenter, "initializeSetup", tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPressure, rrPressure))
+		if (tCenter.SetupsListView.GetNext(0) = tCenter.iPressuresRequest)
+			tCenter.withExceptionhandler(ObjBindMethod(tCenter, "initializeSetup", tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPressure, rrPressure))
 
 	return false
 }
@@ -13776,4 +13776,4 @@ setTyrePressures(tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPres
 ;;;                          Initialization Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startupRaceCenter()
+startupTeamCenter()

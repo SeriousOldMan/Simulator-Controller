@@ -307,7 +307,7 @@ No manual updates necessary.
 
 If you have used the "Threshold" choice for repair settings either in the "Race Settings" or as default value in the "Session Database", you may have to change this value. The "Threshold" is now labeled as seconds need to repair the given damage. The calculation uses [conversion factors](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) to derive the repair time needed from the internal damage value of the given simulator. For *Assetto Corsa Competizione*, the conversion factor are already known, for the other simulators they will be added with the next releases. If, you derive a conversion factor on your own, let me know, so that I can add them to the defaults.
 
-You can, however, use your old threshold values, if you set the conversion factor to **1** for each damage type (bodywork, suspension, engine). However, in this case, the unit of the threshold is not "Seconds", which does no harm in the repair calculations, but will result in wrong values for pitstop duration calaculations in "System Monitor" and "Race Center".
+You can, however, use your old threshold values, if you set the conversion factor to **1** for each damage type (bodywork, suspension, engine). However, in this case, the unit of the threshold is not "Seconds", which does no harm in the repair calculations, but will result in wrong values for pitstop duration calaculations in "System Monitor" and "Team Center".
 
 Another change regards the time need for refueling. The default value is now 1.8 seconds per 10 liter rather than 1.5 seconds. Since this value is persistents, once you have used "Race Settings" (and you don't have set your own default value in "Session Database", you might want to change it to make the pitstop duration calculation more precise.
 
@@ -878,13 +878,13 @@ The Team Server backend has been extended. If you are hosting an own installatio
 
 ## Release 3.7.8
 
-The file storage format for Strategies has been heavily extended. Although old strategy files should load without error, I strongly recommend to recreate any strategy that will be used in conjunction with the new dynamic, situation aware strategy adjustment feature of the "Race Center" tool.
+The file storage format for Strategies has been heavily extended. Although old strategy files should load without error, I strongly recommend to recreate any strategy that will be used in conjunction with the new dynamic, situation aware strategy adjustment feature of the "Team Center" tool.
 
 ***
 
 ## Release 3.7.6
 
-Many changes in the Team Server internals. If you are hosting an own installation, you have to redeploy the server. Data will be preserved and updated to the new format. All other changes in this release are handled automatically, although you might want to checkout the new [*openRaceCenter* plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) parameter of the "Race Engineer" and "Race Strategist" plugins.
+Many changes in the Team Server internals. If you are hosting an own installation, you have to redeploy the server. Data will be preserved and updated to the new format. All other changes in this release are handled automatically, although you might want to checkout the new [*openTeamCenter* plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) parameter of the "Race Engineer" and "Race Strategist" plugins.
 
 Attention: The automatic update handling for versions older than 3.0 has been removed. If you haven't updated Simulator Controller for such a long time, you have to remove your *Simulator Controller* folder in your user *Documents* folder (make a backup copy) and start with a fresh installation. You can restore your changes, if any, later on.
 

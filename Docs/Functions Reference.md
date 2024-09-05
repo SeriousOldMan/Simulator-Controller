@@ -516,11 +516,11 @@ Opens the tool for the session database, with which you can get the tyre pressur
 #### *openStrategyWorkbench()*
 Opens the "Strategy Workbench" tool, with which you can explore the telemetry data for past session, as long as they have been saved by the Race Strategist, and with which you can create a strategy for an upcoming race. If a simulation is currently running, several selections (car, track, and so on) will already be prefilled.
 
-#### *openPracticeCenter()*
-Opens the "Practice Center" tool, with which you can optimize your practice sessions and collect the most relevant data.
+#### *openSoloCenter()*
+Opens the "Solo Center" tool, with which you can optimize your practice sessions and collect the most relevant data.
 
-#### *openRaceCenter()*
-Opens the "Race Center" tool, with which you can analyze the telemetry data of a running team session, plan and control pitstops and change race strategy on the fly.
+#### *openTeamCenter()*
+Opens the "Team Center" tool, with which you can analyze the telemetry data of a running team session, plan and control pitstops and change race strategy on the fly.
 
 #### execute(command :: String)*
 Execute any command, which can be an executable or a script with an extension accepted by the system. The *command* string can name additional arguments for parameters accepted by the command, and you can use global variables enclosed in percent signs, like %ComSpec%.

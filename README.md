@@ -37,7 +37,7 @@ Here is a short video which shows how to configure Simulator Controller for the 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[5.8.5.0-release](https://cutt.ly/4eQe6qop) (Changes: Optimized handling of unidentified tyre sets (like Wets) in the "Practice Center", Fixed weather related tyre change handling of Engineer and Strategist, External report windows for "Practice Center", Extensions folder for Assistant rules, Potentially fixed a bug with corrupt driver names in AMS2 and PCARS 2, Resizeable window for team manager in "Simulator Setup", Removed minimize control for modal windows, New LLM event for opponents pitting, LLM events can be raised for other Assistants, Extended LLM action "update_strategy" for the Strategist, Fixed session loading in "Race Center Lite".)
+[5.8.5.0-release](https://cutt.ly/4eQe6qop) (Changes: Optimized handling of unidentified tyre sets (like Wets) in the "Solo Center", Fixed weather related tyre change handling of Engineer and Strategist, External report windows for "Solo Center", Extensions folder for Assistant rules, Potentially fixed a bug with corrupt driver names in AMS2 and PCARS 2, Resizeable window for team manager in "Simulator Setup", Removed minimize control for modal windows, New LLM event for opponents pitting, LLM events can be raised for other Assistants, Extended LLM action "update_strategy" for the Strategist, Fixed session loading in "Team Center Lite".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-585) of this version and all the versions you might have skipped, before installing and using this version.
 
@@ -45,11 +45,11 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 [5.8.4.1-release](https://cutt.ly/7enL4yn0) (Changes: "Strategy Workbench" remembers chart settings, Track mapping and track automations for open tracks, Changed unblock modifiers in "Simulator Startup", New LLM events for the Spotter, New controller action "TrackMapping" for Race Spotter, New icon for "TrackMapping" controller action, New "trackMapping" parameter for the "Race Spotter" plugin, New controller action functions "enableTrackMapping" and "disableTrackMapping", New LLM actions for the *Conversation* booster of the Race Spotter, Track mapping function in Startup Profiles.)
 
-[5.8.3.2-release](https://cutt.ly/cevAFRtT) (Changes: Several UI changes (new Add/Delete/Save buttons, field size changes, and so on), Updates for the French translation, Saved sessions can no longer be exported to the session database in "Practice Center", Improved resilience of rule engine against defective foreign functions.)
+[5.8.3.2-release](https://cutt.ly/cevAFRtT) (Changes: Several UI changes (new Add/Delete/Save buttons, field size changes, and so on), Updates for the French translation, Saved sessions can no longer be exported to the session database in "Solo Center", Improved resilience of rule engine against defective foreign functions.)
 
 #### Latest development build
 
-[5.8.6.0-release](https://www.dropbox.com/scl/fi/e2022lafjjou7itrfe6aa/Simulator-Controller-5.8.6.0-dev.zip?rlkey=ia015qt90xc3sh0vba8255tih&st=kf511mj5&dl=1) (Early build for 5.8.6. Changes: Fixed live graph redrawing in "Practice Center", Fixed tyre laps handling in "Practice Center", Fixed Spotter to give opponent lap times again, Fixed error reporting for missing SoX and NirCmd, New version of local LLM runtime, New LLM event for Race Spotter, Fixed tooltip timeouts in "Simlator Startup", "Practice Center" filters laps without telemetry data.)
+[5.8.6.0-release](https://www.dropbox.com/scl/fi/e2022lafjjou7itrfe6aa/Simulator-Controller-5.8.6.0-dev.zip?rlkey=ia015qt90xc3sh0vba8255tih&st=kf511mj5&dl=1) (Early build for 5.8.6. Changes: Fixed live graph redrawing in "Solo Center", Fixed tyre laps handling in "Solo Center", Fixed Spotter to give opponent lap times again, Fixed error reporting for missing SoX and NirCmd, New version of local LLM runtime, New LLM event for Race Spotter, Fixed tooltip timeouts in "Simlator Startup", "Solo Center" filters laps without telemetry data.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-586) of this version and all the versions you might have skipped, before installing and using this version.
 
@@ -75,7 +75,7 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 6. [Managing Settings](https://youtu.be/Pdwpbfadd5g) - This video gives an introduction into the settings used by the Virtual Race Assistants and how to manage these settings in the most efficient way.
 
-7. [Using Strategy Workbench](https://youtu.be/rDlMWS5mbOM) - In this video we take a walk in "Strategy Workbench", the premium fuel calculator of the Simulator Controller suite. You will also learn, how to use the created strategies in "Race Center" and using the Virtual Race Assistents.
+7. [Using Strategy Workbench](https://youtu.be/rDlMWS5mbOM) - In this video we take a walk in "Strategy Workbench", the premium fuel calculator of the Simulator Controller suite. You will also learn, how to use the created strategies in "Team Center" and using the Virtual Race Assistents.
 
 8. [Introduction to Team Races](https://youtu.be/R-6mRwMv81I) - In this video, all the functionality of the Simulator Controller suite come together to manage and control your team races. You will learn how to setup everything, how to use the services of the Race Assistants during a team race and how to remote control the pitstop settings for the currently driving team mate.
 
@@ -103,7 +103,7 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 20. [Defining custom Button Box Modes](https://youtu.be/CqXcjTRoLpE) - This video demonstrates how you can define your own Button Box layers with custom commands.
 
-21. [Unboxing Practice Center](https://www.youtube.com/watch?v=Qx3I0B8AvhQ) - We are taking a detailed look at the "Practice Center", which lets you organize your practice sessions and solo races, as well as the data collected during those sessions.
+21. [Unboxing Solo Center](https://www.youtube.com/watch?v=Qx3I0B8AvhQ) - We are taking a detailed look at the "Solo Center", which lets you organize your practice sessions and solo races, as well as the data collected during those sessions.
 
 22. [Updating your configuration to 5.3](https://youtu.be/f4HuUjSW-3k) - This video shows you how to update your configuration to use the new capabilities of "Simulator Setup", which simplify many configuration tasks significantly.
 
@@ -189,7 +189,7 @@ Another capability of the Virtual Race Strategist is to support you during the [
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Workbench.JPG)
 
-You can even use all these functionalities during multiplayer team races using the [*Team Server*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server), which handles the state and knowledge of the Race Assistants and share this information between all participating drivers. The Team Server is the backend for the so called "Race Center", a console, which can be used by any team member (even if not an active driver) to gather all kind of session data and remote control various aspects of the session, for example the settings for an upcoming pitstop.
+You can even use all these functionalities during multiplayer team races using the [*Team Server*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server), which handles the state and knowledge of the Race Assistants and share this information between all participating drivers. The Team Server is the backend for the so called "Team Center", a console, which can be used by any team member (even if not an active driver) to gather all kind of session data and remote control various aspects of the session, for example the settings for an upcoming pitstop.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%201.JPG)
 

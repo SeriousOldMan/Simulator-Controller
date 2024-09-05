@@ -504,7 +504,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 								 , values2String(";", simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
 								 , coldPressures, hotPressures, pressuresLosses))
 		else {
-			pid := ProcessExist("Practice Center.exe")
+			pid := ProcessExist("Solo Center.exe")
 
 			if pid
 				messageSend(kFileMessage, "Practice", "updatePressures:" . values2String(";", lapNumber, simulator, car, track, weather

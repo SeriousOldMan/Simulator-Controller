@@ -276,10 +276,10 @@ class AssistantsStepWizard extends ActionsStepWizard {
 									arguments .= ("; openRaceReports: " . values2String(A_Space, function*))
 								case "StrategyWorkbenchOpen":
 									arguments .= ("; openStrategyWorkbench: " . values2String(A_Space, function*))
-								case "PracticeCenterOpen":
-									arguments .= ("; openPracticeCenter: " . values2String(A_Space, function*))
-								case "RaceCenterOpen":
-									arguments .= ("; openRaceCenter: " . values2String(A_Space, function*))
+								case "PracticeCenterOpen", "SoloCenterOpen":
+									arguments .= ("; openSoloCenter: " . values2String(A_Space, function*))
+								case "RaceCenterOpen", "TeamCenterOpen":
+									arguments .= ("; openTeamCenter: " . values2String(A_Space, function*))
 								case "SetupWorkbenchOpen":
 									arguments .= ("; openSetupWorkbench: " . values2String(A_Space, function*))
 								case "SetupImport":

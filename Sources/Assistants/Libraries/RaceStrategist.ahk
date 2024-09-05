@@ -1694,7 +1694,7 @@ class RaceStrategist extends GridRaceAssistant {
 				asked := true
 
 				if this.Speaker {
-					if ProcessExist("Practice Center.exe") {
+					if ProcessExist("Solo Center.exe") {
 						if (((this.SaveSettings = kAsk) && (this.Session == kSessionRace))
 						 && ((this.SaveRaceReport = kAsk) && (this.Session == kSessionRace)))
 							this.getSpeaker().speakPhrase("ConfirmSaveSettingsAndRaceReport", false, true)
@@ -1797,7 +1797,7 @@ class RaceStrategist extends GridRaceAssistant {
 				}
 
 			if (((phase = "After") && (this.SaveTelemetry = kAsk) && confirmed) || ((phase = "Before") && (this.SaveTelemetry = kAlways)))
-				if (this.HasTelemetryData && this.CollectTelemetry && !ProcessExist("Practice Center.exe"))
+				if (this.HasTelemetryData && this.CollectTelemetry && !ProcessExist("Solo Center.exe"))
 					this.updateTelemetryDatabase()
 		}
 		finally {

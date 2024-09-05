@@ -125,14 +125,14 @@
   - [Managing Car Setups](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#managing-car-setups)
   - [Extending and Customizing](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#extending-and-cutomizing-setup-workbench)
 
-[Practice Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Practice-Center)
+[Solo Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center)
 ------
-  - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Practice-Center#introduction)
-  - [Starting a session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Practice-Center#starting-a-session)
-  - [Data Analysis](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Practice-Center#data-analysis)
-  - [Planning and managing practice stints](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Practice-Center#managing-tyres-and-planning-practice-stints)
-  - [Exploring data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Practice-Center#exploring-data)
-  - [Exporting data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Practice-Center#exporting-data-to-the-session-database)
+  - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#introduction)
+  - [Starting a session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#starting-a-session)
+  - [Data Analysis](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#data-analysis)
+  - [Planning and managing practice stints](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#managing-tyres-and-planning-practice-stints)
+  - [Exploring data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#exploring-data)
+  - [Exporting data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#exporting-data-to-the-session-database)
 	
 [Strategy Workbench](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench)
 ------
@@ -156,19 +156,19 @@
   - [Consistency Report](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports#cosistency-report)
   - [Pace Report](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports#pace-report)
 
-[Race Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center)
+[Team Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center)
 ------
-  - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#introduction)
-  - [Normal vs. Lite UI](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#normal-vs-simple-user-interface)
-  - [Connecting to a session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#connecting-to-a-session)
-  - [Data Analysis](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#data-analysis)
-  - [Strategy Handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#strategy-handling)
-  - [Session & Stint Planning](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#session--stint-planning)
-  - [Driver specific tyre pressures](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#managing-driver-specific-tyre-pressures)
-  - [Planning a Pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#planning-a-pitstop)
-    - [Selecting the next Driver](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#automatically-select-the-next-driver)
-    - [Initiating a pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#initiating-a-pitstop-for-the-current-driver)
-    - [Using the Race Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#planning-and-preparing-pitstops-in-a-team-race-using-the-race-assistants)
+  - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#introduction)
+  - [Normal vs. Lite UI](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#normal-vs-simple-user-interface)
+  - [Connecting to a session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#connecting-to-a-session)
+  - [Data Analysis](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#data-analysis)
+  - [Strategy Handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#strategy-handling)
+  - [Session & Stint Planning](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#session--stint-planning)
+  - [Driver specific tyre pressures](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#managing-driver-specific-tyre-pressures)
+  - [Planning a Pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#planning-a-pitstop)
+    - [Selecting the next Driver](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#automatically-select-the-next-driver)
+    - [Initiating a pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#initiating-a-pitstop-for-the-current-driver)
+    - [Using the Race Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#planning-and-preparing-pitstops-in-a-team-race-using-the-race-assistants)
   
 [Virtual Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach)
 ------

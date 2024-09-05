@@ -128,7 +128,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 
-	class RaceCenterAction extends ControllerAction {
+	class TeamCenterAction extends ControllerAction {
 		iPlugin := false
 
 		Plugin {
@@ -144,7 +144,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 
 		fireAction(function, trigger) {
-			local exePath := kBinariesDirectory . "Race Center.exe"
+			local exePath := kBinariesDirectory . "Team Center.exe"
 
 			try {
 				Run("`"" . exePath . "`"", kBinariesDirectory)
@@ -152,10 +152,10 @@ class TeamServerPlugin extends ControllerPlugin {
 			catch Any as exception {
 				logError(exception, true)
 
-				logMessage(kLogCritical, translate("Cannot start the Race Center tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (")
+				logMessage(kLogCritical, translate("Cannot start the Team Center tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (")
 									   . kBinariesDirectory . translate(")"))
 
-				showMessage(substituteVariables(translate("Cannot start the Race Center tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+				showMessage(substituteVariables(translate("Cannot start the Team Center tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 		}
@@ -302,7 +302,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 	__New(controller, name, configuration := false, register := true) {
 		local dllFile := (kBinariesDirectory . "Connectors\Team Server Connector.dll")
-		local teamServerToggle, arguments, openRaceSettings, openRaceCenter
+		local teamServerToggle, arguments, openRaceSettings, openTeamCenter
 
 		try {
 			if (!FileExist(dllFile)) {
@@ -352,10 +352,10 @@ class TeamServerPlugin extends ControllerPlugin {
 			if openRaceSettings
 				this.createTeamServerAction(controller, "RaceSettingsOpen", openRaceSettings)
 
-			openRaceCenter := this.getArgumentValue("openRaceCenter", false)
+			openTeamCenter := this.getArgumentValue("openTeamCenter", false)
 
-			if openRaceCenter
-				this.createTeamServerAction(controller, "RaceCenterOpen", openRaceCenter)
+			if openTeamCenter
+				this.createTeamServerAction(controller, "TeamCenterOpen", openTeamCenter)
 
 			if register
 				controller.registerPlugin(this)
@@ -389,7 +389,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			else if (action = "RaceSettingsOpen") {
 				descriptor := ConfigurationItem.descriptor(action, "Activate")
 
-				this.registerAction(TeamServerPlugin.RaceCenterAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
+				this.registerAction(TeamServerPlugin.TeamCenterAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
 			}
 			else
 				logMessage(kLogWarn, translate("Action `"") . action . translate("`" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))

@@ -277,7 +277,7 @@ Enter the number of the pitstop that should be fixed at the specified lap, the a
 
 Important: The strategy simulation tries to compensate for the intervention as best as possible. But there are limits. For example, it is not checked whether the available fuel in the stint before a fixed pitstop is sufficient to extent this stint up to the fixed lap. Also, any additional restrictions like stint timers, tyre life, pitstop rules, and so on, might be ignored as well. Therefore it is possible that the simulation will come up with an invalid strategy, which, even worse, might not be detected correctly.
 
-Good to know: When a strategy, that originally was created using fixed pitstops, is adjusted in the "Race Center" or is revised by the Strategist, the fixed pitstops will not be taken into account. There is a reason, why the strategy needs a revison, isn't it?
+Good to know: When a strategy, that originally was created using fixed pitstops, is adjusted in the "Team Center" or is revised by the Strategist, the fixed pitstops will not be taken into account. There is a reason, why the strategy needs a revison, isn't it?
 
 ### Drivers
 
@@ -285,7 +285,7 @@ Using this tab, you can create a kind of a stint plan for the simulated session.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%205.JPG)
 
-Note: If you import the strategy into the "Race Center", the driver information may be used to populate the stint plan for the session in "Race Center".
+Note: If you import the strategy into the "Team Center", the driver information may be used to populate the stint plan for the session in "Team Center".
 
 ### Weather
 
@@ -295,7 +295,7 @@ Here you can configure a time dependent weather forecast for the strategy simula
 
 Depending on the forecast, appropriate pitstops with tyre changes will be planned just before the weather change. If you use this feature, make sure to have sufficient telemetry data for all applicable tyre compounds available. Otherwise, the simulation will fail or yield false results.
 
-Note: This information will be only used during the initial simulation of the strategy. If you later on recalculate the strategy using the Race Strategist or the "Race Center", the actual current weather or the weather outlook (if available by the simulator) will be used instead.
+Note: This information will be only used during the initial simulation of the strategy. If you later on recalculate the strategy using the Race Strategist or the "Team Center", the actual current weather or the weather outlook (if available by the simulator) will be used instead.
 
 ### Simulation
 

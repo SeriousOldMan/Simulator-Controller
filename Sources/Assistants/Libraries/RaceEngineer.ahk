@@ -2007,7 +2007,7 @@ class RaceEngineer extends RaceAssistant {
 			if (shutdown && (knowledgeBase.getValue("Lap", 0) > this.LearningLaps)) {
 				this.shutdownSession("Before")
 
-				if ProcessExist("Practice Center.exe") {
+				if ProcessExist("Solo Center.exe") {
 					if (this.SaveSettings = kAsk) {
 						if this.Speaker {
 							this.getSpeaker().speakPhrase("ConfirmDataUpdate", false, true)
@@ -2070,7 +2070,7 @@ class RaceEngineer extends RaceAssistant {
 					this.saveSessionSettings()
 
 			if (((phase = "After") && (this.SaveTyrePressures = kAsk) && confirmed) || ((phase = "Before") && (this.SaveTyrePressures = kAlways)))
-				if (this.HasPressureData && this.CollectTyrePressures && !ProcessExist("Practice Center.exe")) {
+				if (this.HasPressureData && this.CollectTyrePressures && !ProcessExist("Solo Center.exe")) {
 					this.updateTyresDatabase()
 
 					pressuresSaved := true

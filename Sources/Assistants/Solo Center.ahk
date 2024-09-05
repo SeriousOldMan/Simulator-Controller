@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Practice Center Tool            ;;;
+;;;   Modular Simulator Controller System - Solo Center Tool            ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
@@ -18,7 +18,7 @@
 ;@SC-EndIf
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Practice.ico
-;@Ahk2Exe-ExeName Practice Center.exe
+;@Ahk2Exe-ExeName Solo Center.exe
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -142,27 +142,27 @@ class WorkingTask extends PeriodicTask {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; Class                        PracticeCenterTask                         ;;;
+;;; Class                          SoloCenterTask                           ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class PracticeCenterTask extends Task {
+class SoloCenterTask extends Task {
 	Window {
 		Get {
-			return PracticeCenter.Instance.Window
+			return SoloCenter.Instance.Window
 		}
 	}
 
 	run() {
-		local pCenter := PracticeCenter.Instance
+		local sCenter := SoloCenter.Instance
 
-		if pCenter.startWorking() {
+		if sCenter.startWorking() {
 			try {
 				super.run()
 
 				return false
 			}
 			finally {
-				pCenter.finishWorking()
+				sCenter.finishWorking()
 			}
 		}
 		else
@@ -171,10 +171,10 @@ class PracticeCenterTask extends Task {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; Class                          PracticeCenter                           ;;;
+;;; Class                            SoloCenter                             ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class PracticeCenter extends ConfigurationItem {
+class SoloCenter extends ConfigurationItem {
 	iWindow := false
 
 	iWorking := 0
@@ -255,31 +255,31 @@ class PracticeCenter extends ConfigurationItem {
 	iSelectedDetailReport := false
 	iSelectedDetailHTML := false
 
-	class PracticeCenterWindow extends Window {
-		iPracticeCenter := false
+	class SoloCenterWindow extends Window {
+		iSoloCenter := false
 
-		PracticeCenter {
+		SoloCenter {
 			Get {
-				return this.iPracticeCenter
+				return this.iSoloCenter
 			}
 		}
 
 		__New(center) {
-			this.iPracticeCenter := center
+			this.iSoloCenter := center
 
-			super.__New({Descriptor: "Practice Center", Closeable: true, Resizeable: "Deferred"})
+			super.__New({Descriptor: "Solo Center", Closeable: true, Resizeable: "Deferred"})
 		}
 
 		Close(*) {
 			local save, translator
 
 			if this.Closeable {
-				save := (this.PracticeCenter.AutoSave && this.PracticeCenter.SessionActive)
+				save := (this.SoloCenter.AutoSave && this.SoloCenter.SessionActive)
 
 				try {
-					if (this.PracticeCenter.HasData && !this.PracticeCenter.SessionExported) {
-						if this.PracticeCenter.AutoExport
-							this.PracticeCenter.exportSession(true)
+					if (this.SoloCenter.HasData && !this.SoloCenter.SessionExported) {
+						if this.SoloCenter.AutoExport
+							this.SoloCenter.exportSession(true)
 						else {
 							translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
 
@@ -288,7 +288,7 @@ class PracticeCenter extends ConfigurationItem {
 							OnMessage(0x44, translator, 0)
 
 							if (msgResult = "Yes")
-								this.PracticeCenter.exportSession(true)
+								this.SoloCenter.exportSession(true)
 
 							if (msgResult = "Cancel")
 								return true
@@ -297,7 +297,7 @@ class PracticeCenter extends ConfigurationItem {
 				}
 				finally {
 					if save
-						this.PracticeCenter.saveSession(true, false, false)
+						this.SoloCenter.saveSession(true, false, false)
 				}
 
 				return super.Close()
@@ -307,7 +307,7 @@ class PracticeCenter extends ConfigurationItem {
 		}
 	}
 
-	class PracticeCenterResizer extends Window.Resizer {
+	class SoloCenterResizer extends Window.Resizer {
 		iRedraw := false
 
 		__New(arguments*) {
@@ -322,7 +322,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		RedrawHTMLViwer() {
 			if this.iRedraw {
-				local center := PracticeCenter.Instance
+				local center := SoloCenter.Instance
 				local ignore, button
 
 				for ignore, button in ["LButton", "MButton", "RButton"]
@@ -334,7 +334,7 @@ class PracticeCenter extends ConfigurationItem {
 				center.ChartViewer.Resized()
 				center.DetailsViewer.Resized()
 
-				center.pushTask(ObjBindMethod(PracticeCenter.Instance, "updateReports", true))
+				center.pushTask(ObjBindMethod(SoloCenter.Instance, "updateReports", true))
 			}
 
 			return Task.CurrentTask
@@ -402,14 +402,14 @@ class PracticeCenter extends ConfigurationItem {
 	}
 
 	class SessionTelemetryDatabase extends TelemetryDatabase {
-		iPracticeCenter := false
+		iSoloCenter := false
 		iTelemetryDatabase := false
 
 		iLaps := CaseInsenseWeakMap()
 
-		PracticeCenter {
+		SoloCenter {
 			Get {
-				return this.iPracticeCenter
+				return this.iSoloCenter
 			}
 		}
 
@@ -429,14 +429,14 @@ class PracticeCenter extends ConfigurationItem {
 			}
 		}
 
-		__New(practiceCenter, simulator := false, car := false, track := false) {
-			this.iPracticeCenter := practiceCenter
+		__New(soloCenter, simulator := false, car := false, track := false) {
+			this.iSoloCenter := soloCenter
 
 			super.__New()
 
 			this.Shared := false
 
-			this.setDatabase(Database(practiceCenter.SessionDirectory, kTelemetrySchemas))
+			this.setDatabase(Database(soloCenter.SessionDirectory, kTelemetrySchemas))
 
 			if simulator
 				this.iTelemetryDatabase := TelemetryDatabase(simulator, car, track)
@@ -453,12 +453,12 @@ class PracticeCenter extends ConfigurationItem {
 			local entries := []
 			local newEntries, ignore, entry, ignore, entry, found, candidate, lastLap, result
 
-			if this.PracticeCenter.UseSessionData
+			if this.SoloCenter.UseSessionData
 				for ignore, entry in super.getMapData(weather, tyreCompound, tyreCompoundColor)
 					if ((entry["Fuel.Consumption"] > 0) && (entry["Lap.Time"] > 0))
 						entries.Push(entry)
 
-			if (this.PracticeCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
+			if (this.SoloCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
 				newEntries := []
 
 				for ignore, entry in this.TelemetryDatabase.getMapData(weather, tyreCompound, tyreCompoundColor) {
@@ -489,12 +489,12 @@ class PracticeCenter extends ConfigurationItem {
 			local entries := []
 			local newEntries, ignore, entry, found, candidate
 
-			if this.PracticeCenter.UseSessionData
+			if this.SoloCenter.UseSessionData
 				for ignore, entry in super.getTyreData(weather, tyreCompound, tyreCompoundColor)
 					if (entry["Lap.Time"] > 0)
 						entries.Push(entry)
 
-			if (this.PracticeCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
+			if (this.SoloCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
 				newEntries := []
 
 				for ignore, entry in this.TelemetryDatabase.getTyreData(weather, tyreCompound, tyreCompoundColor) {
@@ -524,12 +524,12 @@ class PracticeCenter extends ConfigurationItem {
 			local entries := []
 			local newEntries, ignore, entry, found, candidate, lastLap, result
 
-			if this.PracticeCenter.UseSessionData
+			if this.SoloCenter.UseSessionData
 				for ignore, entry in super.getMapLapTimes(weather, tyreCompound, tyreCompoundColor)
 					if (entry["Lap.Time"] > 0)
 						entries.Push(entry)
 
-			if (this.PracticeCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
+			if (this.SoloCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
 				newEntries := []
 
 				for ignore, entry in this.TelemetryDatabase.getMapLapTimes(weather, tyreCompound, tyreCompoundColor) {
@@ -560,12 +560,12 @@ class PracticeCenter extends ConfigurationItem {
 			local entries := []
 			local newEntries, ignore, entry, found, candidate
 
-			if this.PracticeCenter.UseSessionData
+			if this.SoloCenter.UseSessionData
 				for ignore, entry in super.getTyreLapTimes(weather, tyreCompound, tyreCompoundColor, withFuel)
 					if (entry["Lap.Time"] > 0)
 						entries.Push(entry)
 
-			if (this.PracticeCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
+			if (this.SoloCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
 				newEntries := []
 
 				for ignore, entry in this.TelemetryDatabase.getTyreLapTimes(weather, tyreCompound, tyreCompoundColor, withFuel) {
@@ -613,8 +613,8 @@ class PracticeCenter extends ConfigurationItem {
 			}
 		}
 
-		__New(pCenter) {
-			this.iDatabase := Database(pCenter.SessionDirectory, kPCTyresSchemas)
+		__New(sCenter) {
+			this.iDatabase := Database(sCenter.SessionDirectory, kPCTyresSchemas)
 		}
 
 		updatePressures(weather, airTemperature, trackTemperature, tyreCompound, tyreCompoundColor, coldPressures, hotPressures, pressuresLosses, driver) {
@@ -1044,7 +1044,7 @@ class PracticeCenter extends ConfigurationItem {
 	TelemetryDatabase {
 		Get {
 			if !this.iTelemetryDatabase
-				this.iTelemetryDatabase := PracticeCenter.SessionTelemetryDatabase(this, this.Simulator, this.Car, this.Track)
+				this.iTelemetryDatabase := SoloCenter.SessionTelemetryDatabase(this, this.Simulator, this.Car, this.Track)
 
 			return this.iTelemetryDatabase
 		}
@@ -1053,7 +1053,7 @@ class PracticeCenter extends ConfigurationItem {
 	PressuresDatabase {
 		Get {
 			if !this.iPressuresDatabase
-				this.iPressuresDatabase := PracticeCenter.SessionPressuresDatabase(this)
+				this.iPressuresDatabase := SoloCenter.SessionPressuresDatabase(this)
 
 			return this.iPressuresDatabase
 		}
@@ -1123,20 +1123,20 @@ class PracticeCenter extends ConfigurationItem {
 
 		sessionsDirectory := getMultiMapValue(configuration, "Team Server", "Session.Folder", kTempDirectory . "Sessions")
 
-		this.iSessionDirectory := (normalizeDirectoryPath(getMultiMapValue(configuration, "Practice Center", "Session.Folder"
+		this.iSessionDirectory := (normalizeDirectoryPath(getMultiMapValue(configuration, "Solo Center", "Session.Folder"
 																						, sessionsDirectory . "\Practice")) . "\")
 
-		this.AutoClear := getMultiMapValue(settings, "Practice Center", "AutoClear", false)
-		this.AutoExport := getMultiMapValue(settings, "Practice Center", "AutoExport", false)
-		this.AutoSave := getMultiMapValue(settings, "Practice Center", "AutoSave", false)
+		this.AutoClear := getMultiMapValue(settings, "Solo Center", "AutoClear", false)
+		this.AutoExport := getMultiMapValue(settings, "Solo Center", "AutoExport", false)
+		this.AutoSave := getMultiMapValue(settings, "Solo Center", "AutoSave", false)
 
-		this.UseSessionData := getMultiMapValue(settings, "Practice Center", "UseSessionData", true)
-		this.UseTelemetryDatabase := getMultiMapValue(settings, "Practice Center", "UseTelemetryDatabase", false)
-		this.iDataWeather := getMultiMapValue(settings, "Practice Center", "Weather", "Dry")
+		this.UseSessionData := getMultiMapValue(settings, "Solo Center", "UseSessionData", true)
+		this.UseTelemetryDatabase := getMultiMapValue(settings, "Solo Center", "UseTelemetryDatabase", false)
+		this.iDataWeather := getMultiMapValue(settings, "Solo Center", "Weather", "Dry")
 
 		super.__New(configuration)
 
-		PracticeCenter.Instance := this
+		SoloCenter.Instance := this
 	}
 
 	createGui(configuration) {
@@ -1165,7 +1165,7 @@ class PracticeCenter extends ConfigurationItem {
 				field.ValidText := field.Text
 		}
 
-		closePracticeCenter(*) {
+		closeSoloCenter(*) {
 			ExitApp(0)
 		}
 
@@ -1533,18 +1533,18 @@ class PracticeCenter extends ConfigurationItem {
 				this.Runs[center.RunsListView.GetText(row, 1)].Notes := centerGui["runNotesEdit"].Value
 		}
 
-		centerGui := PracticeCenter.PracticeCenterWindow(this)
+		centerGui := SoloCenter.SoloCenterWindow(this)
 
 		this.iWindow := centerGui
 
 		centerGui.SetFont("s10 Bold", "Arial")
 
-		centerGui.Add("Text", "w1334 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(centerGui, "Practice Center"))
+		centerGui.Add("Text", "w1334 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(centerGui, "Solo Center"))
 
 		centerGui.SetFont("s9 Norm", "Arial")
 
-		centerGui.Add("Documentation", "x588 YP+20 w174 H:Center Center", translate("Practice Center")
-					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Practice-Center")
+		centerGui.Add("Documentation", "x588 YP+20 w174 H:Center Center", translate("Solo Center")
+					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center")
 
 		centerGui.Add("Text", "x8 yp+30 w1350 W:Grow 0x10")
 
@@ -1795,7 +1795,7 @@ class PracticeCenter extends ConfigurationItem {
 
 		this.iReportViewer := RaceReportViewer(centerGui, this.ChartViewer)
 
-		centerGui.Add(PracticeCenter.PracticeCenterResizer(centerGui))
+		centerGui.Add(SoloCenter.SoloCenterResizer(centerGui))
 
 		car := this.Car
 		track := this.Track
@@ -1813,12 +1813,12 @@ class PracticeCenter extends ConfigurationItem {
 		local window := this.Window
 		local x, y, w, h
 
-		if getWindowPosition("Practice Center", &x, &y)
+		if getWindowPosition("Solo Center", &x, &y)
 			window.Show("AutoSize x" . x . " y" . y)
 		else
 			window.Show("AutoSize")
 
-		if getWindowSize("Practice Center", &w, &h)
+		if getWindowSize("Solo Center", &w, &h)
 			window.Resize("Initialize", w, h)
 
 		this.startWorking(false)
@@ -1872,7 +1872,7 @@ class PracticeCenter extends ConfigurationItem {
 
 			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-			setMultiMapValue(settings, "Practice Center", "Simulator", simulator)
+			setMultiMapValue(settings, "Solo Center", "Simulator", simulator)
 
 			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
@@ -1925,7 +1925,7 @@ class PracticeCenter extends ConfigurationItem {
 
 			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-			setMultiMapValue(settings, "Practice Center", "Car", car)
+			setMultiMapValue(settings, "Solo Center", "Car", car)
 
 			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
@@ -1972,7 +1972,7 @@ class PracticeCenter extends ConfigurationItem {
 
 			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-			setMultiMapValue(settings, "Practice Center", "Track", track)
+			setMultiMapValue(settings, "Solo Center", "Track", track)
 
 			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
@@ -2476,7 +2476,7 @@ class PracticeCenter extends ConfigurationItem {
 		updateSetting(setting, value) {
 			local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-			setMultiMapValue(settings, "Practice Center", setting, value)
+			setMultiMapValue(settings, "Solo Center", setting, value)
 
 			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 		}
@@ -2544,7 +2544,7 @@ class PracticeCenter extends ConfigurationItem {
 		updateSetting(setting, value) {
 			local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-			setMultiMapValue(settings, "Practice Center", setting, value)
+			setMultiMapValue(settings, "Solo Center", setting, value)
 
 			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 		}
@@ -2634,7 +2634,7 @@ class PracticeCenter extends ConfigurationItem {
 	}
 
 	pushTask(theTask) {
-		PracticeCenterTask(theTask).start()
+		SoloCenterTask(theTask).start()
 	}
 
 	startWorking(state := true) {
@@ -3445,14 +3445,14 @@ class PracticeCenter extends ConfigurationItem {
 				pitstops := this.Pitstops[carID]
 
 				if (pitstops.Length = 0)
-					pitstops.Push(PracticeCenter.Pitstop(carID, this.iLastPitstopUpdate, lap.Nr))
+					pitstops.Push(SoloCenter.Pitstop(carID, this.iLastPitstopUpdate, lap.Nr))
 				else {
 					pitstop := pitstops[pitstops.Length]
 
 					if ((pitstop.Time - pitstop.Duration - (delta + 20)) < this.iLastPitstopUpdate)
 						pitstop.Duration := (pitstop.Duration + delta)
 					else
-						pitstops.Push(PracticeCenter.Pitstop(carID, this.iLastPitstopUpdate, lap.Nr))
+						pitstops.Push(SoloCenter.Pitstop(carID, this.iLastPitstopUpdate, lap.Nr))
 				}
 			}
 	}
@@ -5461,7 +5461,7 @@ class PracticeCenter extends ConfigurationItem {
 			this.DetailsViewer.document.close()
 		}
 		else {
-			htmlGui := PracticeCenter.HTMLWindow({Descriptor: "Practice Center." . StrTitle(report) . " Report Viewer", Closeable: true, Resizeable:  "Deferred"}, title)
+			htmlGui := SoloCenter.HTMLWindow({Descriptor: "Solo Center." . StrTitle(report) . " Report Viewer", Closeable: true, Resizeable:  "Deferred"}, title)
 
 			htmlViewer := htmlGui.Add("HTMLViewer", "X0 Y0 W640 H480 W:Grow H:Grow")
 
@@ -5469,14 +5469,14 @@ class PracticeCenter extends ConfigurationItem {
 			htmlViewer.document.write(html)
 			htmlViewer.document.close()
 
-			htmlGui.Add(PracticeCenter.HTMLResizer(htmlViewer, html, htmlGui))
+			htmlGui.Add(SoloCenter.HTMLResizer(htmlViewer, html, htmlGui))
 
-			if getWindowPosition("Practice Center." . StrTitle(report) . " Report Viewer", &x, &y)
+			if getWindowPosition("Solo Center." . StrTitle(report) . " Report Viewer", &x, &y)
 				htmlGui.Show("x" . x . " y" . y . " w640 h480")
 			else
 				htmlGui.Show("w640 h480")
 
-			if getWindowSize("Practice Center." . StrTitle(report) . " Report Viewer", &w, &h)
+			if getWindowSize("Solo Center." . StrTitle(report) . " Report Viewer", &w, &h)
 				htmlGui.Resize("Initialize", w, h)
 		}
 	}
@@ -5713,9 +5713,9 @@ class PracticeCenter extends ConfigurationItem {
 			report := this.SelectedReport
 			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-			setMultiMapValue(settings, "Practice Center", "Chart." . report . ".Type", ["Scatter", "Bar", "Bubble", "Line"][this.Control["chartTypeDropDown"].Value])
-			setMultiMapValue(settings, "Practice Center", "Chart." . report . ".X-Axis", xAxis)
-			setMultiMapValue(settings, "Practice Center", "Chart." . report . ".Y-Axises", values2String(";", yAxises*))
+			setMultiMapValue(settings, "Solo Center", "Chart." . report . ".Type", ["Scatter", "Bar", "Bubble", "Line"][this.Control["chartTypeDropDown"].Value])
+			setMultiMapValue(settings, "Solo Center", "Chart." . report . ".X-Axis", xAxis)
+			setMultiMapValue(settings, "Solo Center", "Chart." . report . ".Y-Axises", values2String(";", yAxises*))
 
 			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
@@ -6007,19 +6007,19 @@ class PracticeCenter extends ConfigurationItem {
 			else {
 				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-				value := getMultiMapValue(settings, "Practice Center", "Chart." . report . ".Type", kUndefined)
+				value := getMultiMapValue(settings, "Solo Center", "Chart." . report . ".Type", kUndefined)
 
 				if (value != kUndefined) {
 					this.Control["chartTypeDropDown"].Choose(inList(["Scatter", "Bar", "Bubble", "Line"], value))
 
 					this.iSelectedChartType := value
 
-					dataXChoice := inList(xChoices, getMultiMapValue(settings, "Practice Center", "Chart." . report . ".X-Axis"))
+					dataXChoice := inList(xChoices, getMultiMapValue(settings, "Solo Center", "Chart." . report . ".X-Axis"))
 
 					loop 6
 						%"dataY" . A_Index . "Choice"% := 1
 
-					for axis, value in string2Values(";", getMultiMapValue(settings, "Practice Center", "Chart." . report . ".Y-Axises"))
+					for axis, value in string2Values(";", getMultiMapValue(settings, "Solo Center", "Chart." . report . ".Y-Axises"))
 						%"dataY" . axis . "Choice"% := (inList(%"y" . axis . "Choices"%, value) + ((axis = 1) ? 0 : 1))
 				}
 				else if (report = "Running") {
@@ -7740,7 +7740,7 @@ class PracticeCenter extends ConfigurationItem {
 
 class RecommendationWindow extends Window {
 	__New() {
-		super.__New({Descriptor: "Practice Center.Recommendation", Closeable: true, Options: "+SysMenu +Caption"})
+		super.__New({Descriptor: "Solo Center.Recommendation", Closeable: true, Options: "+SysMenu +Caption"})
 	}
 
 	Close(*) {
@@ -7875,7 +7875,7 @@ recommendDataRun(centerOrCommand := false, arguments*) {
 
 			recoGui.SetFont("s10 Bold", "Arial")
 
-			recoGui.Add("Text", "w351 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(recoGui, "Practice Center.Recommendation"))
+			recoGui.Add("Text", "w351 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(recoGui, "Solo Center.Recommendation"))
 
 			recoGui.SetFont("s9 Norm", "Arial")
 
@@ -7908,7 +7908,7 @@ recommendDataRun(centerOrCommand := false, arguments*) {
 
 			recoGui.Show("AutoSize Center")
 
-			if getWindowPosition("Practice Center.Recommendation", &x, &y)
+			if getWindowPosition("Solo Center.Recommendation", &x, &y)
 				recoGui.Show("x" . x . " y" . y)
 			else
 				recoGui.Show()
@@ -7970,18 +7970,18 @@ null(value) {
 	return (((value == 0) || (value == "-") || (value = "n/a")) ? kNull : valueOrNull(value))
 }
 
-startupPracticeCenter() {
+startupSoloCenter() {
 	local icon := kIconsDirectory . "Practice.ico"
 	local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-	local simulator := getMultiMapValue(settings, "Practice Center", "Simulator", false)
-	local car := getMultiMapValue(settings, "Practice Center", "Car", false)
-	local track := getMultiMapValue(settings, "Practice Center", "Track", false)
+	local simulator := getMultiMapValue(settings, "Solo Center", "Simulator", false)
+	local car := getMultiMapValue(settings, "Solo Center", "Car", false)
+	local track := getMultiMapValue(settings, "Solo Center", "Track", false)
 	local load := false
 	local index := 1
-	local pCenter
+	local sCenter
 
 	TraySetIcon(icon, "1")
-	A_IconTip := "Practice Center"
+	A_IconTip := "Solo Center"
 
 	try {
 		while (index < A_Args.Length) {
@@ -8003,16 +8003,16 @@ startupPracticeCenter() {
 			}
 		}
 
-		pCenter := PracticeCenter(kSimulatorConfiguration, readMultiMap(kUserConfigDirectory . "Race.settings"), simulator, car, track)
+		sCenter := SoloCenter(kSimulatorConfiguration, readMultiMap(kUserConfigDirectory . "Race.settings"), simulator, car, track)
 
-		pCenter.createGui(pCenter.Configuration)
+		sCenter.createGui(sCenter.Configuration)
 
 		if load
-			pCenter.loadSession(load, false)
+			sCenter.loadSession(load, false)
 
-		pCenter.show(false, !load)
+		sCenter.show(false, !load)
 
-		registerMessageHandler("Practice", methodMessageHandler, pCenter)
+		registerMessageHandler("Practice", methodMessageHandler, sCenter)
 
 		startupApplication()
 	}
@@ -8020,7 +8020,7 @@ startupPracticeCenter() {
 		logError(exception, true)
 
 		OnMessage(0x44, translateOkButton)
-		withBlockedWindows(MsgBox, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Practice Center"}), translate("Error"), 262160)
+		withBlockedWindows(MsgBox, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Solo Center"}), translate("Error"), 262160)
 		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)
@@ -8032,4 +8032,4 @@ startupPracticeCenter() {
 ;;;                          Initialization Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startupPracticeCenter()
+startupSoloCenter()

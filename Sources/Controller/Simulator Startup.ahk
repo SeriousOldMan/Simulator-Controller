@@ -283,8 +283,8 @@ class SimulatorStartup extends ConfigurationItem {
 
 					for ignore, tool in string2Values(",", getMultiMapValue(readMultiMap(fileName), "Session", "Tools", ""))
 						try {
-							if (tool = "Race Center Lite")
-								Run(kBinariesDirectory . "Race Center.exe -Simple" . startup, kBinariesDirectory)
+							if (tool = "Team Center Lite")
+								Run(kBinariesDirectory . "Team Center.exe -Simple" . startup, kBinariesDirectory)
 							else
 								Run(kBinariesDirectory . tool . ".exe" . startup, kBinariesDirectory)
 						}
@@ -578,7 +578,7 @@ launchPad(command := false, arguments*) {
 		if configure
 			manageTeams(launchPadGui)
 		else
-			launchApplication("RaceCenter")
+			launchApplication("TeamCenter")
 	}
 
 	launchApplication(application, *) {
@@ -783,8 +783,8 @@ launchPad(command := false, arguments*) {
 
 		toolTips["RaceReports"] := "Race Reports: Analyze your recent races."
 		toolTips["StrategyWorkbench"] := "Strategy Workbench: Find the best strategy for an upcoming race."
-		toolTips["PracticeCenter"] := "Practice Center: Make the most out of your practice sessions."
-		toolTips["RaceCenter"] := "Race Center: Manage your team and control the race during an event using the Team Server."
+		toolTips["SoloCenter"] := "Solo Center: Make the most out of your practice sessions."
+		toolTips["TeamCenter"] := "Team Center: Manage your team and control the race during an event using the Team Server."
 
 		if hasTeamServer
 			toolTips["ServerAdministration"] := "Server Administration: Manage accounts and access rights on your Team Server. Only needed, when you run your own Team Server."
@@ -800,8 +800,8 @@ launchPad(command := false, arguments*) {
 
 		executables["RaceReports"] := "Race Reports.exe"
 		executables["StrategyWorkbench"] := "Strategy Workbench.exe"
-		executables["PracticeCenter"] := "Practice Center.exe"
-		executables["RaceCenter"] := "Race Center.exe"
+		executables["SoloCenter"] := "Solo Center.exe"
+		executables["TeamCenter"] := "Team Center.exe"
 
 		if hasTeamServer
 			executables["ServerAdministration"] := "Server Administration.exe"
@@ -818,8 +818,8 @@ launchPad(command := false, arguments*) {
 		icons["Startup"] := (kIconsDirectory . "Startup.ico")
 		icons["RaceReports"] := (kIconsDirectory . "Chart.ico")
 		icons["StrategyWorkbench"] := (kIconsDirectory . "Workbench.ico")
-		icons["PracticeCenter"] := (kIconsDirectory . "Practice.ico")
-		icons["RaceCenter"] := (kIconsDirectory . "Console.ico")
+		icons["SoloCenter"] := (kIconsDirectory . "Practice.ico")
+		icons["TeamCenter"] := (kIconsDirectory . "Console.ico")
 
 		if hasTeamServer
 			icons["ServerAdministration"] := (kIconsDirectory . "Server Administration.ico")
@@ -874,10 +874,10 @@ launchPad(command := false, arguments*) {
 		launchPadGui.Add("Picture", "xp+47 ys w60 h60 vRaceSettings", icons["RaceSettings"]).OnEvent("Click", launchApplication.Bind("RaceSettings"))
 		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vSessionDatabase", icons["SessionDatabase"]).OnEvent("Click", launchApplication.Bind("SessionDatabase"))
 
-		launchPadGui.Add("Picture", "xp+90 yp w60 h60 vPracticeCenter", icons["PracticeCenter"]).OnEvent("Click", launchApplication.Bind("PracticeCenter"))
+		launchPadGui.Add("Picture", "xp+90 yp w60 h60 vSoloCenter", icons["SoloCenter"]).OnEvent("Click", launchApplication.Bind("SoloCenter"))
 		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vStrategyWorkbench", icons["StrategyWorkbench"]).OnEvent("Click", launchApplication.Bind("StrategyWorkbench"))
 
-		widget := launchPadGui.Add("Picture", "xp+74 yp w60 h60 vRaceCenter", icons["RaceCenter"])
+		widget := launchPadGui.Add("Picture", "xp+74 yp w60 h60 vTeamCenter", icons["TeamCenter"])
 
 		if hasTeamServer {
 			widget.OnEvent("Click", teamManager.Bind(false))
@@ -888,7 +888,7 @@ launchPad(command := false, arguments*) {
 			launchPadGui.Add("Picture", "xp+86 yp-43 w60 h60 vRaceReports", icons["RaceReports"]).OnEvent("Click", launchApplication.Bind("RaceReports"))
 		}
 		else {
-			widget.OnEvent("Click", launchApplication.Bind("RaceCenter"))
+			widget.OnEvent("Click", launchApplication.Bind("TeamCenter"))
 
 			launchPadGui.Add("Picture", "xp+90 yp w60 h60 vRaceReports", icons["RaceReports"]).OnEvent("Click", launchApplication.Bind("RaceReports"))
 		}
@@ -897,9 +897,9 @@ launchPad(command := false, arguments*) {
 
 		launchPadGui.Add("Text", "xp+90 yp w60 h40 Center", "Race Settings")
 		launchPadGui.Add("Text", "xp+74 yp w60 h40 Center", "Session Database")
-		launchPadGui.Add("Text", "xp+90 yp w60 h40 Center", "Practice Center")
+		launchPadGui.Add("Text", "xp+90 yp w60 h40 Center", "Solo Center")
 		launchPadGui.Add("Text", "xp+74 yp w60 h40 Center", "Strategy Workbench")
-		launchPadGui.Add("Text", "xp+74 yp w60 h40 Center", "Race Center")
+		launchPadGui.Add("Text", "xp+74 yp w60 h40 Center", "Team Center")
 		launchPadGui.Add("Text", "xp+90 yp w60 h40 Center", "Race Reports")
 
 		launchPadGui.Add("Picture", "x16 ys+104 w60 h60 vSystemMonitor", icons["SystemMonitor"]).OnEvent("Click", launchApplication.Bind("SystemMonitor"))
@@ -1072,12 +1072,25 @@ loadStartupProfiles(target, fileName := false) {
 	local profiles := []
 	local selected := false
 	local activeProfiles := []
-	local ignore, profile, name, assistant, property, function
+	local ignore, profile, name, assistant, property, function, tools
 
 	for ignore, name in string2Values(";|;", getMultiMapValue(settings, "Profiles", "Profiles", "")) {
+		tools := []
+
+		for ignore, tool in string2Values(",", getMultiMapValue(settings, "Profiles", name . ".Tools", "")) {
+			if (tool = "Practice Center")
+				tool := "Solo Center"
+			else if (tool = "Race Center")
+				tool := "Team Center"
+			else if (tool = "Race Center Lite")
+				tool := "Team Center Lite"
+
+			tools.Push(tool)
+		}
+
 		profile := CaseInsenseMap("Name", name
 								, "Mode", hasTeamServer ? getMultiMapValue(settings, "Profiles", name . ".Mode", "Solo") : false
-								, "Tools", getMultiMapValue(settings, "Profiles", name . ".Tools", ""))
+								, "Tools", values2String(",", tools*))
 
 		for ignore, assistant in kRaceAssistants
 			profile[assistant] := getMultiMapValue(settings, "Profiles", name . "." . assistant, "Default")
@@ -1296,15 +1309,28 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 
 	loadProfiles(fileName := false, delete := true) {
 		local settings := readMultiMap(fileName ? fileName : (kUserConfigDirectory . "Startup.settings"))
-		local ignore, profile, name, assistant, property, function
+		local ignore, profile, name, assistant, property, function, tools
 
 		if delete
 			profiles := []
 
 		for ignore, name in string2Values(";|;", getMultiMapValue(settings, "Profiles", "Profiles", "")) {
+			tools := []
+
+			for ignore, tool in string2Values(",", getMultiMapValue(settings, "Profiles", name . ".Tools", "")) {
+				if (tool = "Practice Center")
+					tool := "Solo Center"
+				else if (tool = "Race Center")
+					tool := "Team Center"
+				else if (tool = "Race Center Lite")
+					tool := "Team Center Lite"
+
+				tools.Push(tool)
+			}
+
 			profile := CaseInsenseMap("Name", name
 									, "Mode", hasTeamServer ? getMultiMapValue(settings, "Profiles", name . ".Mode", "Solo") : false
-									, "Tools", getMultiMapValue(settings, "Profiles", name . ".Tools", ""))
+									, "Tools", values2String(",", tools*))
 
 			for ignore, assistant in kRaceAssistants
 				profile[assistant] := getMultiMapValue(settings, "Profiles", name . "." . assistant, "Default")
@@ -1453,7 +1479,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 
 		profilesEditorGui["profileNameEdit"].Text := profile["Name"]
 		profilesEditorGui["profileModeDropDown"].Choose(Max(1, inList(hasTeamServer ? ["Solo", "Team"] : ["Solo"], profile["Mode"])))
-		profilesEditorGui["profilePitwallDropDown"].Choose((1 + inList(hasTeamServer ? ["Practice Center", "Race Center", "Race Center Lite"] : ["Practice Center"], profile["Tools"])))
+		profilesEditorGui["profilePitwallDropDown"].Choose((1 + inList(hasTeamServer ? ["Solo Center", "Team Center", "Team Center Lite"] : ["Solo Center"], profile["Tools"])))
 
 		profilesEditorGui["profileAutonomyDropDown"].Choose(inList(["Yes", "No", "Default"], profile["Assistant.Autonomy"]))
 
@@ -1510,7 +1536,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 		else {
 			profile["Name"] := profilesEditorGui["profileNameEdit"].Text
 			profile["Mode"] :=  ["Solo", "Team"][profilesEditorGui["profileModeDropDown"].Value]
-			profile["Tools"] := ["", "Practice Center", "Race Center", "Race Center Lite"][profilesEditorGui["profilePitwallDropDown"].Value]
+			profile["Tools"] := ["", "Solo Center", "Team Center", "Team Center Lite"][profilesEditorGui["profilePitwallDropDown"].Value]
 
 			profile["Assistant.Autonomy"] := ["Yes", "No", "Default"][profilesEditorGui["profileAutonomyDropDown"].Value]
 
@@ -2274,7 +2300,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " vprofileModeDropDown", collect(hasTeamServer ? ["Solo", "Team"] : ["Solo"], translate)).OnEvent("Change", editStartupProfiles.Bind("Update State"))
 
 		profilesEditorGui.Add("Text", "x" . x0 . " yp+23 w120 h23 +0x200", translate("Control Center"))
-		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " vprofilePitwallDropDown", collect(hasTeamServer ? ["None", "Practice Center", "Race Center", "Race Center Lite"] : ["None", "Practice Center"], translate))
+		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " vprofilePitwallDropDown", collect(hasTeamServer ? ["None", "Solo Center", "Team Center", "Team Center Lite"] : ["None", "Solo Center"], translate))
 
 		settingsTab := profilesEditorGui.Add("Tab3", "x" . x0 . " yp+30 w392 h180 Section", collect(hasTeamServer ? ["Assistants", "Team", "Functions"] : ["Assistants", "Functions"], translate))
 
@@ -2595,8 +2621,8 @@ startSimulator() {
 					fixIE(11, "Setup Workbench.exe")
 					fixIE(11, "Race Reports.exe")
 					fixIE(11, "Strategy Workbench.exe")
-					fixIE(11, "Practice Center.exe")
-					fixIE(11, "Race Center.exe")
+					fixIE(11, "Solo Center.exe")
+					fixIE(11, "Team Center.exe")
 					fixIE(10, "Simulator Setup.exe")
 					fixIE(11, "System Monitor.exe")
 

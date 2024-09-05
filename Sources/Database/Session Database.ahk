@@ -720,7 +720,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			if selected {
 				name := editor.SessionListView.GetText(selected, 3)
-				category := ((editor.SessionListView.GetText(selected, 2) = translate("Practice")) ? "Practice" : "Race")
+				category := ((editor.SessionListView.GetText(selected, 2) = translate("Solo")) ? "Solo" : "Team")
 
 				info := sessionDB.readSessionInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, category, name)
 
@@ -734,10 +734,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		renameSession(*) {
 			local category := editor.SessionListView.GetText(editor.SessionListView.GetNext(0), 2)
 
-			if (category = translate("Practice"))
-				category := "Practice"
+			if (category = translate("Solo"))
+				category := "Solo"
 			else
-				category := "Race"
+				category := "Team"
 
 			editor.renameSession(category, editor.SessionListView.GetText(editor.SessionListView.GetNext(0), 3))
 		}
@@ -745,10 +745,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		deleteSession(*) {
 			local category := editor.SessionListView.GetText(editor.SessionListView.GetNext(0), 2)
 
-			if (category = translate("Practice"))
-				category := "Practice"
+			if (category = translate("Solo"))
+				category := "Solo"
 			else
-				category := "Race"
+				category := "Team"
 
 			editor.deleteSession(category, editor.SessionListView.GetText(editor.SessionListView.GetNext(0), 3))
 		}
@@ -1927,10 +1927,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			if (type != translate("Community")) {
 				type := this.SessionListView.GetText(selected, 2)
 
-				if (type = translate("Practice"))
-					type := "Practice"
+				if (type = translate("Solo"))
+					type := "Solo"
 				else
-					type := "Race"
+					type := "Team"
 
 				info := this.SessionDatabase.readSessionInfo(simulator, car, track, type, name)
 
@@ -2255,7 +2255,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		this.SessionListView.Delete()
 
-		for ignore, type in ["Practice", "Race"] {
+		for ignore, type in ["Solo", "Team"] {
 			this.SessionDatabase.getSessions(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, type, &sessions, &infos := true)
 
 			for index, name in sessions {
@@ -3196,7 +3196,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						loop Files, kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Race Strategies\*.strategy", "F"
 							this.SessionDatabase.removeStrategy(simulator, car, track, A_LoopFileName)
 					case translate("Sessions"):
-						for ignore, type in ["Practice", "Race"]
+						for ignore, type in ["Solo", "Team"]
 							loop Files, this.SessionDatabase.getSessionDirectory(simulator, car, track, type) . "*." . StrLower(type), "F" {
 								SplitPath(A_LoopFileName, , , , &name)
 
@@ -3334,7 +3334,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					case translate("Sessions"):
 						code := this.SessionDatabase.getSimulatorCode(simulator)
 
-						for type, ext in Map("Race Sessions", "race", "Practice Sessions", "practice") {
+						for type, ext in Map("Team Sessions", "team", "Solo Sessions", "solo") {
 							DirCreate(targetDirectory . type)
 
 							loop Files, kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\" . type . "\*." . ext, "F"
@@ -3580,7 +3580,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							}
 
 							if selection.Has(key . "Sessions")
-								for type, ext in Map("Race Sessions", "race", "Practice Sessions", "practice") {
+								for type, ext in Map("Team Sessions", "team", "Solo Sessions", "solo") {
 									drivers := selection[key . "Sessions"]
 									code := this.SessionDatabase.getSimulatorCode(simulator)
 
@@ -3814,7 +3814,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 									sessions := CaseInsenseMap()
 
-									loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Race Sessions\*.race", "F" {
+									loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Team Sessions\*.team", "F" {
 										driver := getMultiMapValue(readMultiMap(A_LoopFileFullPath), "Creator", "ID")
 
 										if sessions.Has(driver)
@@ -3823,7 +3823,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 											sessions[driver] := 1
 									}
 
-									loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Practice Sessions\*.practice", "F" {
+									loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Solo Sessions\*.solo", "F" {
 										driver := getMultiMapValue(readMultiMap(A_LoopFileFullPath), "Creator", "ID")
 
 										if sessions.Has(driver)
@@ -3946,13 +3946,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 									strategies += 1
 								}
 
-								loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Race Sessions\*.race", "F" {
+								loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Team Sessions\*.team", "F" {
 									found := true
 
 									sessions += 1
 								}
 
-								loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Practice Sessions\*.practice", "F" {
+								loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Solo Sessions\*.solo", "F" {
 									found := true
 
 									sessions += 1
@@ -4017,7 +4017,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		userStrategies := true
 		communityStrategies := true
 
-		for ignore, type in ["Practice", "Race"] {
+		for ignore, type in ["Solo", "Team"] {
 			this.SessionDatabase.getSessions(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, type, &sessions, &infos := true)
 
 			this.DataListView.Add("", translate(type), sessions.Length)
@@ -4738,7 +4738,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	selectSession(row, open := false) {
 		local window := this.Window
 		local name := this.SessionListView.GetText(row, 3)
-		local type := ((this.SessionListView.GetText(row, 2) = translate("Practice")) ? "Practice" : "Race")
+		local type := ((this.SessionListView.GetText(row, 2) = translate("Solo")) ? "Solo" : "Team")
 		local info := this.SessionDatabase.readSessionInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack
 														 , type, this.SessionListView.GetText(row, 3))
 
@@ -5531,7 +5531,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 
 					sessions := CaseInsenseMap()
 
-					loop Files, sourceDirectory . "\Race Sessions\*.race", "F" {
+					loop Files, sourceDirectory . "\Team Sessions\*.team", "F" {
 						driver := getMultiMapValue(readMultiMap(A_LoopFileFullPath), "Creator", "ID")
 
 						if sessions.Has(driver)
@@ -5540,7 +5540,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 							sessions[driver] := 1
 					}
 
-					loop Files, sourceDirectory . "\Practice Sessions\*.practice", "F" {
+					loop Files, sourceDirectory . "\Solo Sessions\*.solo", "F" {
 						driver := getMultiMapValue(readMultiMap(A_LoopFileFullPath), "Creator", "ID")
 
 						if sessions.Has(driver)

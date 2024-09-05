@@ -773,8 +773,8 @@ checkInstallation() {
 					fixIE(11, "Setup Workbench.exe")
 					fixIE(11, "Race Reports.exe")
 					fixIE(11, "Strategy Workbench.exe")
-					fixIE(11, "Practice Center.exe")
-					fixIE(11, "Race Center.exe")
+					fixIE(11, "Solo Center.exe")
+					fixIE(11, "Team Center.exe")
 					fixIE(10, "Simulator Setup.exe")
 					fixIE(11, "System Monitor.exe")
 
@@ -1088,8 +1088,8 @@ writeAppPaths(installLocation) {
 	RegWrite(installLocation . "\Binaries\Session Database.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SessionDatabase.exe")
 	RegWrite(installLocation . "\Binaries\Race Reports.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceReports.exe")
 	RegWrite(installLocation . "\Binaries\Strategy Workbench.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\StrategyWorkbench.exe")
-	RegWrite(installLocation . "\Binaries\Practice Center.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\PracticeCenter.exe")
-	RegWrite(installLocation . "\Binaries\Race Center.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceCenter.exe")
+	RegWrite(installLocation . "\Binaries\Solo Center.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SoloCenter.exe")
+	RegWrite(installLocation . "\Binaries\Team Center.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\TeamCenter.exe")
 	RegWrite(installLocation . "\Binaries\Server Administration.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\ServerAdministration.exe")
 	RegWrite(installLocation . "\Binaries\SetupWorkbench.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupWorkbench.exe")
 }
@@ -1113,8 +1113,8 @@ deleteAppPaths() {
 	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SessionDatabase.exe")
 	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceReports.exe")
 	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\StrategyWorkbench.exe")
-	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\PracticeCenter.exe")
-	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceCenter.exe")
+	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SoloCenter.exe")
+	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\TeamCenter.exe")
 	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\ServerAdministration.exe")
 	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupWorkbench.exe")
 }
@@ -1660,6 +1660,46 @@ renewConsent() {
 	}
 }
 
+updateInstallationForV586() {
+	local installInfo := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
+	local installLocation := getMultiMapValue(installInfo, "Install", "Location")
+
+	if (getMultiMapValue(installInfo, "Shortcuts", "StartMenu", false)) {
+		installLocation := getMultiMapValue(installInfo, "Install", "Location")
+
+		deleteFile(installLocation . "\Binaries\Race Center.exe")
+		deleteFile(installLocation . "\Binaries\Practice Center.exe")
+
+		deleteFile(A_StartMenu . "\Simulator Controller\Race Center.lnk")
+		deleteFile(A_StartMenu . "\Simulator Controller\Practice Center.lnk")
+		deleteFile(A_StartMenu . "\Simulator Controller\Setup Advisor.lnk")
+
+		try {
+			FileCreateShortcut(installLocation . "\Binaries\Team Center.exe", A_StartMenu . "\Simulator Controller\Team Center.lnk", installLocation . "\Binaries")
+			FileCreateShortcut(installLocation . "\Binaries\Solo Center.exe", A_StartMenu . "\Simulator Controller\Solo Center.lnk", installLocation . "\Binaries")
+		}
+		catch Any as exception {
+			logError(exception)
+		}
+	}
+
+	if (getMultiMapValue(installInfo, "Install", "Type", false) = "Registry") {
+		try {
+			RegWrite(installLocation . "\Binaries\Team Center.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\TeamCenter.exe")
+			RegWrite(installLocation . "\Binaries\Solo Center.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SoloCenter.exe")
+
+			RegDelete("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceCenter.exe")
+			RegDelete("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\PracticeCenter.exe")
+		}
+		catch Any as exception {
+			logError(exception)
+		}
+	}
+
+	fixIE(11, "Solo Center.exe")
+	fixIE(11, "Team Center.exe")
+}
+
 updateInstallationForV541() {
 	local installInfo := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
 	local installLocation := getMultiMapValue(installInfo, "Install", "Location")
@@ -1703,6 +1743,97 @@ updateInstallationForV500() {
 		}
 		catch Any as exception {
 			logError(exception)
+		}
+	}
+}
+
+updateConfigurationForV586() {
+	local ignore, simulator, car, track, fileName, text
+
+	if FileExist(kUserConfigDirectory . "Application Settings.ini") {
+		text := FileRead(kUserConfigDirectory . "Application Settings.ini", "`n")
+
+		text := StrReplace(text, "Race Center", "Team Center")
+		text := StrReplace(text, "Practice Center", "Solo Center")
+
+		deleteFile(kUserConfigDirectory . "Application Settings.ini")
+
+		FileAppend(text, kUserConfigDirectory . "Application Settings.ini")
+	}
+
+	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
+		text := FileRead(kUserHomeDirectory . "Setup\Setup.data", "`n")
+
+		text := StrReplace(text, "RaceCenter", "TeamCenter")
+		text := StrReplace(text, "Race Center", "Team Center")
+		text := StrReplace(text, "PracticeCenter", "SoloCenter")
+		text := StrReplace(text, "Practice Center", "Solo Center")
+
+		deleteFile(kUserHomeDirectory . "Setup\Setup.data")
+
+		FileAppend(text, kUserHomeDirectory . "Setup\Setup.data", "UTF-16")
+	}
+
+	if FileExist(kUserConfigDirectory . "Startup.settings") {
+		text := FileRead(kUserConfigDirectory . "Startup.settings", "`n")
+
+		text := StrReplace(text, "Race Center", "Team Center")
+		text := StrReplace(text, "Practice Center", "Solo Center")
+
+		deleteFile(kUserConfigDirectory . "Startup.settings")
+
+		FileAppend(text, kUserConfigDirectory . "Startup.settings", "UTF-16")
+	}
+
+	loop Files, kDatabaseDirectory . "User\*.*", "D" {
+		simulator := A_LoopFileName
+
+		loop Files, kDatabaseDirectory . "User\" . simulator . "\*.*", "D" {
+			car := A_LoopFileName
+
+			loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car "\*.*", "D" {
+				track := A_LoopFileName
+
+				fileName := (kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\")
+
+				if InStr(FileExist(fileName . "Race Sessions"), "D")
+					try {
+						DirMove(fileName . "Race Sessions", fileName . "Team Sessions", "R")
+					}
+					catch Any as exception {
+						logError(exception, true)
+					}
+
+				loop Files, fileName . "Team Sessions\*.race", "F" {
+					SplitPath(A_LoopFileName, , , , &name)
+
+					try {
+						FileMove(A_LoopFileFullPath, fileName . "Team Sessions\" . name . ".team")
+					}
+					catch Any as exception {
+						logError(exception, true)
+					}
+				}
+
+				if InStr(FileExist(fileName . "Practice Sessions"), "D")
+					try {
+						DirMove(fileName . "Practice Sessions", fileName . "Solo Sessions", "R")
+					}
+					catch Any as exception {
+						logError(exception, true)
+					}
+
+					try {
+						loop Files, fileName . "Solo Sessions\*.practice", "F" {
+							SplitPath(A_LoopFileName, , , , &name)
+
+							FileMove(A_LoopFileFullPath, fileName . "Solo Sessions\" . name . ".solo")
+						}
+					}
+					catch Any as exception {
+						logError(exception, true)
+					}
+			}
 		}
 	}
 }

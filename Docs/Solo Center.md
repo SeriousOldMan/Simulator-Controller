@@ -1,22 +1,22 @@
 ## Introduction
 
-The "Practice Center" is an application, which you can run alongside your practice sessions or even while running a solo race. When the Race Assistants detect that the "Practice Center" is running, they transfer all collected data to this application and do not store the data in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) tool at the end of the session. Instead you can use the "Practice Center" after your session to investigate the data and select the data that should be stored permanently in the session database, if any at all. You can also use the "Practice Center" to plan your practice session, review the car telemetry data and compare your performance to other drivers participating in the same session. In this sense, "Race Center" is a kind of pitwall application.
+The "Solo Center" is an application, which you can run alongside your practice sessions or even while running a solo race. When the Race Assistants detect that the "Solo Center" is running, they transfer all collected data to this application and do not store the data in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) tool at the end of the session. Instead you can use the "Solo Center" after your session to investigate the data and select the data that should be stored permanently in the session database, if any at all. You can also use the "Solo Center" to plan your practice session, review the car telemetry data and compare your performance to other drivers participating in the same session. In this sense, "Team Center" is a kind of pitwall application.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center.JPG)
 
-The "Practice Center" looks very similar to the ["Race Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center), a tool typically used to manage team endurance races. Both tools share common concepts, reports and data views by intention, but there are also many differences, of course.
+The "Solo Center" looks very similar to the ["Team Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center), a tool typically used to manage team endurance races. Both tools share common concepts, reports and data views by intention, but there are also many differences, of course.
 
 ### Starting a session
 
-Simply start the "Practice Center" **before** starting the session in your simulator. The Race Assistants will automatically connect to the "Practice Center" after the first lap and initiate a session there as well. Once data has been collected in the "Practice Center", it will **not** connect to a new session, before this data has been exported. However, you can use the "Clear..." command from the "Session" menu and you are ready to go for a new session, if you don't want to retain your collected data.
+Simply start the "Solo Center" **before** starting the session in your simulator. The Race Assistants will automatically connect to the "Solo Center" after the first lap and initiate a session there as well. Once data has been collected in the "Solo Center", it will **not** connect to a new session, before this data has been exported. However, you can use the "Clear..." command from the "Session" menu and you are ready to go for a new session, if you don't want to retain your collected data.
 
-When you start a new session or when you close the window, the "Practice Center" will ask you before any unsaved / unexported data will be overwritten. You can, however, enable "Auto Export", "Auto Save" or even "Auto Clear" in the "Session" menu according to your preferences. "Auto Export" will, as the name suggests, export the telemetry data from valid laps to the session database and "Auto Save" will save the complete session state to the session database. This sessin state can be retrieved later using the "Load session..." command from the "Session" menu.
+When you start a new session or when you close the window, the "Solo Center" will ask you before any unsaved / unexported data will be overwritten. You can, however, enable "Auto Export", "Auto Save" or even "Auto Clear" in the "Session" menu according to your preferences. "Auto Export" will, as the name suggests, export the telemetry data from valid laps to the session database and "Auto Save" will save the complete session state to the session database. This sessin state can be retrieved later using the "Load session..." command from the "Session" menu.
 
-Do **not** start the "Practice Center" after you have already started your session in the simulator. Although nothing will explode, you will loose your valuable practice data, since it will be send to the "Practice Center", which most likely will not collect it. Also, do not quit the "Practice Center" **before** quiting the session in your simulator. You will also end up with an inconsistent data constellation. Nothing really harmful, since in the end all data is treated with statistical weights and averages, but if possible, do avoid it.
+Do **not** start the "Solo Center" after you have already started your session in the simulator. Although nothing will explode, you will loose your valuable practice data, since it will be send to the "Solo Center", which most likely will not collect it. Also, do not quit the "Solo Center" **before** quiting the session in your simulator. You will also end up with an inconsistent data constellation. Nothing really harmful, since in the end all data is treated with statistical weights and averages, but if possible, do avoid it.
 
-Note: If you are [running a team session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#running-a-team-session), the "Practice Center" cannot be used (it will simply ignore the running session), since all data duties are handled by the Team Server in this case. But you may want to use the "Race Center" to control your race in this case anyway.
+Note: If you are [running a team session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#running-a-team-session), the "Solo Center" cannot be used (it will simply ignore the running session), since all data duties are handled by the Team Server in this case. But you may want to use the "Team Center" to control your race in this case anyway.
 
-Good to know: The "Practice Center" benefits from a high data update frequency of the Race Assistants. Therefore, if your PC is powerful enough, you can lower this value in the settings of the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database):
+Good to know: The "Solo Center" benefits from a high data update frequency of the Race Assistants. Therefore, if your PC is powerful enough, you can lower this value in the settings of the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database):
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%207.JPG)
 
@@ -24,17 +24,17 @@ The default value for the data update frequency is 10 seconds, but you can can t
 
 ### Saving and loading sessions
 
-The "Practice Center" allows you to save the complete session data for later inspection by using the "Save Session..." command from the "Session" menu. You can use the "Load Session..." command to retrieve such a session later on and all information will be restored. Saving a session this way does **not** export the telemetry data to the session database, which is a completely different thing and must be triggered seperately. However, the full session information can also be stored in the session database, if needed, to have all information in a central location.
+The "Solo Center" allows you to save the complete session data for later inspection by using the "Save Session..." command from the "Session" menu. You can use the "Load Session..." command to retrieve such a session later on and all information will be restored. Saving a session this way does **not** export the telemetry data to the session database, which is a completely different thing and must be triggered seperately. However, the full session information can also be stored in the session database, if needed, to have all information in a central location.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%2011.JPG)
 
 IMPORTANT: The data format of saved sessions has changed over time. To load a session in the *old* format (before they have been saved to the session database by default), hold down the Control key, once the session browser is open. You will see that the "Load..." button changes to an "Import..." button.
 
-The "Auto Save" setting in the "Session" mennu allows you to automatically save a session before the window of the "Practice Center" is closed or before a new session will be started. However, doing this will collect a great amount of probably unnecessary data in your session database, therefore choose wisely.
+The "Auto Save" setting in the "Session" mennu allows you to automatically save a session before the window of the "Solo Center" is closed or before a new session will be started. However, doing this will collect a great amount of probably unnecessary data in your session database, therefore choose wisely.
 
 ### Data Analysis
 
-"Practice Center" supplies you with a couple of reports, which you can use to analyse your performance and dig deeper into the telemetry data of the car. Choose one of the reports in the reports list and this report will be shown in the report area on the top right of "Practice Center" window.
+"Solo Center" supplies you with a couple of reports, which you can use to analyse your performance and dig deeper into the telemetry data of the car. Choose one of the reports in the reports list and this report will be shown in the report area on the top right of "Solo Center" window.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%201.JPG)
 
@@ -98,7 +98,7 @@ All these report documents are HTML-based and can be saved or printed using the 
 
 ### Managing tyres and planning practice stints
 
-The first tab "Tyres" in the lower left corner allows you to manage your tyre sets during your practice runs. In many cases, you can let the "Practice Center" decide automatically, when to create a new stint and when a tyre change happened (at least for *Assetto Corsa Competizione*, *rFactor 2* and *Le Mans Ultimate*). But not all simulators provide access to the mounted tyres in their data API, so it is also possible to create a new stint with your individual tyre setup manually.
+The first tab "Tyres" in the lower left corner allows you to manage your tyre sets during your practice runs. In many cases, you can let the "Solo Center" decide automatically, when to create a new stint and when a tyre change happened (at least for *Assetto Corsa Competizione*, *rFactor 2* and *Le Mans Ultimate*). But not all simulators provide access to the mounted tyres in their data API, so it is also possible to create a new stint with your individual tyre setup manually.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%206.JPG)
 
@@ -106,7 +106,7 @@ To create a new stint manually while you are standing in the pit, follow these s
 
 1. Select "Manual" from the "Mode" drop down menu.
 2. Select whether you want to change tyres and possibly a specific tyre compound using the "Compound" drop down menu. You can also use the small button beside the drop down menu to query the simulator for the currently mounted tyre compound and tyre set, if this data is provided.
-3. Select the number of the mounted tyre set. This is important, so that the "Practice Center" can manage the number of laps driven with this specific tyre set.
+3. Select the number of the mounted tyre set. This is important, so that the "Solo Center" can manage the number of laps driven with this specific tyre set.
 4. Enter the cold pressures, you have chosen for the new tyres. This is particular important, otherwise the cold pressures derived by the Race Engineer will be wrong.
 5. Finally click on the button "New Stint" or choose the corresponding command from the "Stints" menu.
 
@@ -114,11 +114,11 @@ It is recommended to use the "Auto" mode in races, since then the pitstops are r
 
 #### Using the Run Sheet
 
-The "Practice Center" can give you hints for worthy practice runs, which will create data for specific car configurations, for which currently no data is available in the database. This is somewhat the inverse approach as taken by the data explorer described in the next section, since the "Run Sheet" will show you data, that is *missing*
+The "Solo Center" can give you hints for worthy practice runs, which will create data for specific car configurations, for which currently no data is available in the database. This is somewhat the inverse approach as taken by the data explorer described in the next section, since the "Run Sheet" will show you data, that is *missing*
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%2010.JPG)
 
-You can open the "Run Sheet" by choosing the corresponding command in the "Data" menu and the window can stay open, while you are working in other areas of the "Practice Center". The data shown, will always reflect your current selection of car and track and the chosen data setting in the "Data" menu.
+You can open the "Run Sheet" by choosing the corresponding command in the "Data" menu and the window can stay open, while you are working in other areas of the "Solo Center". The data shown, will always reflect your current selection of car and track and the chosen data setting in the "Data" menu.
 
 In the upper list, you will see entries for missing data which relate your lap times to the combination of chosen engine map (if available in your simulator) and the amount of fuel currently in the tank (thereby determining the car weight and balance). The lower list show missing data correlations between fuel level (car weight) and the number of laps you have already driven with a given tyre set.
 
@@ -134,11 +134,11 @@ The "Data" tab will give you an overview of what data you have collected during 
 
 Using the "Data" menu, you can choose between the different weather conditions and available tyre compounds, thereby identifying possible gaps in your data collection that need to be filled with a specific practice run.
 
-The choices (except tyre compounds) will be remembered between different runs of "Practice Center".
+The choices (except tyre compounds) will be remembered between different runs of "Solo Center".
 
 ### Exporting data to the session database
 
-At the end of your session, you can decide which data should be transfered to the session database by clicking the small check marks for each lap in the list of driven laps. "Practice Center" will already have selected by default all valid laps for your convenience. Then choose the command "Export to Database" from the "Session" menu.
+At the end of your session, you can decide which data should be transfered to the session database by clicking the small check marks for each lap in the list of driven laps. "Solo Center" will already have selected by default all valid laps for your convenience. Then choose the command "Export to Database" from the "Session" menu.
 
 Please note, that this export is possible only once, to prevent duplicate data entries in your database, and cannot be undone. Therefore check your selection carefully beforehand.
 

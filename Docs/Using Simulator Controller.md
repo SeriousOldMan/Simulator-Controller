@@ -109,7 +109,7 @@ If you want to create a startup profile, click on the button with the small "+" 
 
 Good to know: If you hold down the Control key when clicking on the "Download" button, only the currently selected profile will be exported, otherwise all your profiles will be in the export file.
 
-You can choose whether a profile will start a solo or a team session and you can decide whether you want to run the ["Practice Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Practice-Center), ["Race Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center) or ["Race Center Lite"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Center#normal-vs-simple-user-interface) (a simplified version of "Race Center") automatically during startup. Please note, that running the "Race Center" is only useful in a team session.
+You can choose whether a profile will start a solo or a team session and you can decide whether you want to run the ["Solo Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center), ["Team Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center) or ["Team Center Lite"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#normal-vs-simple-user-interface) (a simplified version of "Team Center") automatically during startup. Please note, that running the "Team Center" is only useful in a team session.
 
 You can choose furthermore, which Assistants will be available and whether they will talk and listen to you.
 
@@ -144,7 +144,7 @@ The checkbox for each function has three states - selected, deselected and indet
 | Race Spotter     | Track Mapping                         | Controller Action | Enables or disables track mapping for the given session. This can be especially useful when mapping non-circuit tracks that require a roll-forward to the start line. |
 |                  | Track Automation                      | Controller Action | Enables or disables the Track Automation for the given session. |
 | Race Strategist  | Telemetry Collection                  | Setting           | If enabled, general telemetry data is collected by the Strategist during the given session. |
-|                  | Traffic Analysis                      | Setting           | If this setting is enabled, the Strategist will use a Monte Carlo simulation model to create a probability distribution for the further race development, thereby finding the best possible lap for the next pitstop (see this [Wikipedia](https://en.wikipedia.org/wiki/Monte_Carlo_method) entry for an introduction to Monte Carlo methods). WARNING: This will consume lots of CPU cycles and can take quite some time. It is strongly advised, to let this setting disabled, unless you own a really powerful PC. In team races, it is possible to run the Monte Carlo simulation in the "Race Center", thereby offloading the computational load from the drivers PC. |
+|                  | Traffic Analysis                      | Setting           | If this setting is enabled, the Strategist will use a Monte Carlo simulation model to create a probability distribution for the further race development, thereby finding the best possible lap for the next pitstop (see this [Wikipedia](https://en.wikipedia.org/wiki/Monte_Carlo_method) entry for an introduction to Monte Carlo methods). WARNING: This will consume lots of CPU cycles and can take quite some time. It is strongly advised, to let this setting disabled, unless you own a really powerful PC. In team races, it is possible to run the Monte Carlo simulation in the "Team Center", thereby offloading the computational load from the drivers PC. |
 | Race Engineer    | Pressure Collection                   | Setting           | If enabled, pressures (hot and cold) are collected by the Engineer during the given session. |
 |                  | Fuel Warning                          | Setting           | If enabled, the Engineer will issue fuel warnings during the given session. |
 |                  | Damage Warning                        | Setting           | If enabled, the Engineer will issue damage warnings during the given session. |
@@ -164,7 +164,7 @@ Note: If you want "Simulator Startup" to use a specific startup profile independ
 
 ### Team Management
 
-When the Team Server has been included in the configuration a small cog wheel icon will appear in the lower left corner of the "Race Center" application button. You can open a special window for the team manager by either exactly hitting the small cog wheel icon in the "Race Center" button or by holding down the Control key while clicking on the "Race Center" button. The following window appears:
+When the Team Server has been included in the configuration a small cog wheel icon will appear in the lower left corner of the "Team Center" application button. You can open a special window for the team manager by either exactly hitting the small cog wheel icon in the "Team Center" button or by holding down the Control key while clicking on the "Team Center" button. The following window appears:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Team%20Management.JPG)
 
@@ -240,7 +240,7 @@ Beside the *builtin* voice recognition capabilities, you can still use specializ
 
 #### Non-standard voice configurations
 
-Normally you will use a standard configuration for voice control, which means, that voice output is enabled for the Assistants and voice input is enabled to issue commands to the Assistants. In this case, you can give your commands and answer questions of the Assistants with "Yes" or "No", dpending on the situation. But all other combinations are also possible, even using the Assistants fully silent will work, for example in a Team Race, where everything is controller by the "Race Center". Below you find a detailed description for all non-standard configurations.
+Normally you will use a standard configuration for voice control, which means, that voice output is enabled for the Assistants and voice input is enabled to issue commands to the Assistants. In this case, you can give your commands and answer questions of the Assistants with "Yes" or "No", dpending on the situation. But all other combinations are also possible, even using the Assistants fully silent will work, for example in a Team Race, where everything is controller by the "Team Center". Below you find a detailed description for all non-standard configurations.
 
   1. Muted Assistant(s)
   
@@ -248,7 +248,7 @@ Normally you will use a standard configuration for voice control, which means, t
 
   2. Silent Assistant(s)
   
-     For this purpose, "Simulator Setup" also provides a corresponding preset. Using this will completely disable voice output and input for the given Assistant. Commands issued by a Button Box or Stream Deck will still work and especially the remote control of the "Race Center" will work as well.
+     For this purpose, "Simulator Setup" also provides a corresponding preset. Using this will completely disable voice output and input for the given Assistant. Commands issued by a Button Box or Stream Deck will still work and especially the remote control of the "Team Center" will work as well.
 
   3. No voice control for one or more Assistant(s)
   
@@ -261,7 +261,7 @@ Normally you will use a standard configuration for voice control, which means, t
 	 | Setting Value | Description |
 	 |---------------|-------------|
 	 | Never         | The Assistant will not ask you for confirmation, but will directly perform the task, as if you have answered with "Yes". This choice is very helpful, if you have fully disabled voice control and want the Assistants to be as autonomous as possible. |
-	 | Listening     | This choice will let the Assistant ask for confirmation if, and only if voice input is enabled. If this is not the case, the corresponding task is NOT performed. This is a good setting, if you want to use the Assistants only for information purposes or if the car is fully remote controlled by the "Race Center". |
+	 | Listening     | This choice will let the Assistant ask for confirmation if, and only if voice input is enabled. If this is not the case, the corresponding task is NOT performed. This is a good setting, if you want to use the Assistants only for information purposes or if the car is fully remote controlled by the "Team Center". |
 	 | Always        | This is the default for all confirmation settings. "Always" means, that the Assistant will ask for confirmation, even if voice input is disabled. In this case, you can either ignore the question (the task is not performed by the Assistant), or you can answer using the "Accept" or "Reject" actions on your Button Box or Stream Deck. |
 
 #### Jona, the Virtual Race Engineer

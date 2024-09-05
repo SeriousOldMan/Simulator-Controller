@@ -228,7 +228,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 	}
 
 	prepareSession(settings, data) {
-		local pid := ProcessExist("Practice Center.exe")
+		local pid := ProcessExist("Solo Center.exe")
 		local dataFile
 
 		super.prepareSession(settings, data)
@@ -244,7 +244,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 
 	addLap(lap, running, data) {
 		local teamServer := this.TeamServer
-		local pid := ProcessExist("Practice Center.exe")
+		local pid := ProcessExist("Solo Center.exe")
 		local fileName
 
 		if (pid && (!teamServer || !teamServer.SessionActive)) {
@@ -262,7 +262,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 
 	updateLap(lap, running, data) {
 		local teamServer := this.TeamServer
-		local pid := ProcessExist("Practice Center.exe")
+		local pid := ProcessExist("Solo Center.exe")
 		local fileName
 
 		super.updateLap(lap, running, data)
@@ -349,7 +349,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 												    , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
 												    , compound, compoundColor, pressures, temperatures, wear, createGUID(), createGUID(), lapState))
 		else {
-			pid := ProcessExist("Practice Center.exe")
+			pid := ProcessExist("Solo Center.exe")
 
 			if pid
 				messageSend(kFileMessage, "Practice", "updateTelemetry:" . values2String(";", lapNumber, simulator, car, track, weather
@@ -514,7 +514,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 			deleteFile(fileName)
 		}
 		else {
-			pid := ProcessExist("Practice Center.exe")
+			pid := ProcessExist("Solo Center.exe")
 
 			if pid
 				messageSend(kFileMessage, "Practice", "updateStandings:" . values2String(";", lapNumber, fileName), pid)
@@ -533,7 +533,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 			deleteFile(fileName)
 		}
 		else {
-			pid := ProcessExist("Practice Center.exe")
+			pid := ProcessExist("Solo Center.exe")
 
 			DirCreate(kTempDirectory . "Race Report")
 
@@ -565,7 +565,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 			deleteFile(fileName)
 		}
 		else {
-			pid := ProcessExist("Practice Center.exe")
+			pid := ProcessExist("Solo Center.exe")
 
 			deleteDirectory(kTempDirectory . "Race Report")
 

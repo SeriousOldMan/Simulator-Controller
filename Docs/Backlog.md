@@ -16,7 +16,7 @@
   3. Controller action and voice command to enable/disable data collection
   4. Better answers by the Strategist, when a pitstop cannot be recommended
 
-#### Race Center
+#### Team Center
   1. Change hot target pressures for the next pitstop.
 
 #### Setup Workbench

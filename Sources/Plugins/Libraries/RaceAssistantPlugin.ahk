@@ -254,10 +254,10 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				openRaceSettings(false, false, this.Plugin)
 			else if (this.Action = "SetupImport")
 				openRaceSettings(true, false, this.Plugin)
-			else if (this.Action = "PracticeCenterOpen")
-				openPracticeCenter(this.Plugin)
-			else if (this.Action = "RaceCenterOpen")
-				openRaceCenter(this.Plugin)
+			else if (this.Action = "SoloCenterOpen")
+				openSoloCenter(this.Plugin)
+			else if (this.Action = "TeamCenterOpen")
+				openTeamCenter(this.Plugin)
 			else if (this.Action = "RaceReportsOpen")
 				openRaceReports(this.Plugin)
 			else if (this.Action = "SessionDatabaseOpen")
@@ -748,7 +748,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	__New(controller, name, configuration := false, register := true) {
 		local teamServer, raceAssistantToggle, teamServerToggle, arguments, ignore, theAction, assistant
 		local openRaceSettings, openRaceReports, openSessionDatabase, openSetupWorkbench
-		local openPracticeCenter, openRaceCenter, openStrategyWorkbench, importSetup
+		local openSoloCenter, openTeamCenter, openStrategyWorkbench, importSetup
 		local assistantSpeaker, assistantListener, first, index
 
 		super.__New(controller, name, configuration, register)
@@ -861,15 +861,15 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			if openStrategyWorkbench
 				this.createRaceAssistantAction(controller, "StrategyWorkbenchOpen", openStrategyWorkbench)
 
-			openPracticeCenter := this.getArgumentValue("openPracticeCenter", false)
+			openSoloCenter := this.getArgumentValue("openSoloCenter", false)
 
-			if openPracticeCenter
-				this.createRaceAssistantAction(controller, "PracticeCenterOpen", openPracticeCenter)
+			if openSoloCenter
+				this.createRaceAssistantAction(controller, "SoloCenterOpen", openSoloCenter)
 
-			openRaceCenter := this.getArgumentValue("openRaceCenter", false)
+			openTeamCenter := this.getArgumentValue("openTeamCenter", false)
 
-			if openRaceCenter
-				this.createRaceAssistantAction(controller, "RaceCenterOpen", openRaceCenter)
+			if openTeamCenter
+				this.createRaceAssistantAction(controller, "TeamCenterOpen", openTeamCenter)
 
 			for ignore, theAction in string2Values(",", this.getArgumentValue("assistantCommands", ""))
 				this.createRaceAssistantAction(controller, string2Values(A_Space, substituteString(theAction, "  ", A_Space))*)
@@ -978,7 +978,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			}
 			else if ((action = "RaceSettingsOpen") || (action = "SetupImport")
 				  || (action = "RaceReportsOpen") || (action = "SessionDatabaseOpen") || (action = "SetupWorkbenchOpen")
-				  || (action = "StrategyWorkbenchOpen") || (action = "PracticeCenterOpen") || (action = "RaceCenterOpen")) {
+				  || (action = "StrategyWorkbenchOpen") || (action = "SoloCenterOpen") || (action = "TeamCenterOpen")) {
 				descriptor := ConfigurationItem.descriptor(action, "Activate")
 
 				this.registerAction(RaceAssistantPlugin.RaceSettingsAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), action))
@@ -1708,8 +1708,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			else if isInstance(theAction, RaceAssistantPlugin.RaceSettingsAction) {
 				if ((theAction.Action = "RaceSettingsOpen") || (theAction.Action = "RaceReportsOpen")
 				 || (theAction.Action = "SessionDatabaseOpen") || (theAction.Action = "SetupWorkbenchOpen")
-				 || (theAction.Action = "StrategyWorkbenchOpen") || (theAction.Action = "PracticeCenterOpen")
-				 || (theAction.Action = "RaceCenterOpen")) {
+				 || (theAction.Action = "StrategyWorkbenchOpen") || (theAction.Action = "SoloCenterOpen")
+				 || (theAction.Action = "TeamCenterOpen")) {
 					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setLabel(this.actionLabel(theAction))
 					theAction.Function.setIcon(this.actionIcon(theAction))
@@ -2927,8 +2927,8 @@ openStrategyWorkbench(plugin := false) {
 	}
 }
 
-openPracticeCenter(plugin := false) {
-	local exePath := kBinariesDirectory . "Practice Center.exe"
+openSoloCenter(plugin := false) {
+	local exePath := kBinariesDirectory . "Solo Center.exe"
 	local options
 
 	try {
@@ -2939,15 +2939,15 @@ openPracticeCenter(plugin := false) {
 	catch Any as exception {
 		logError(exception, true)
 
-		logMessage(kLogCritical, translate("Cannot start the Practice Center tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+		logMessage(kLogCritical, translate("Cannot start the Solo Center tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
-		showMessage(substituteVariables(translate("Cannot start the Practice Center tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+		showMessage(substituteVariables(translate("Cannot start the Solo Center tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
 }
 
-openRaceCenter(plugin := false) {
-	local exePath := kBinariesDirectory . "Race Center.exe"
+openTeamCenter(plugin := false) {
+	local exePath := kBinariesDirectory . "Team Center.exe"
 	local options
 
 	try {
@@ -2958,9 +2958,9 @@ openRaceCenter(plugin := false) {
 	catch Any as exception {
 		logError(exception, true)
 
-		logMessage(kLogCritical, translate("Cannot start the Race Center tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+		logMessage(kLogCritical, translate("Cannot start the Team Center tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
-		showMessage(substituteVariables(translate("Cannot start the Race Center tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+		showMessage(substituteVariables(translate("Cannot start the Team Center tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
 }

@@ -2723,8 +2723,8 @@ class StartStepWizard extends StepWizard {
 			fixIE(11, "Setup Workbench.exe")
 			fixIE(11, "Race Reports.exe")
 			fixIE(11, "Strategy Workbench.exe")
-			fixIE(11, "Practice Center.exe")
-			fixIE(11, "Race Center.exe")
+			fixIE(11, "Solo Center.exe")
+			fixIE(11, "Team Center.exe")
 			fixIE(10, "Simulator Setup.exe")
 			fixIE(11, "System Monitor.exe")
 		}

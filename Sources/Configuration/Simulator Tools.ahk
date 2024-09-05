@@ -1664,12 +1664,10 @@ updateInstallationForV586() {
 	local installInfo := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
 	local installLocation := getMultiMapValue(installInfo, "Install", "Location")
 
+	deleteFile(installLocation . "\Binaries\Race Center.exe")
+	deleteFile(installLocation . "\Binaries\Practice Center.exe")
+
 	if (getMultiMapValue(installInfo, "Shortcuts", "StartMenu", false)) {
-		installLocation := getMultiMapValue(installInfo, "Install", "Location")
-
-		deleteFile(installLocation . "\Binaries\Race Center.exe")
-		deleteFile(installLocation . "\Binaries\Practice Center.exe")
-
 		deleteFile(A_StartMenu . "\Simulator Controller\Race Center.lnk")
 		deleteFile(A_StartMenu . "\Simulator Controller\Practice Center.lnk")
 		deleteFile(A_StartMenu . "\Simulator Controller\Setup Advisor.lnk")

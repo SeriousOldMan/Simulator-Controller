@@ -324,14 +324,13 @@ namespace ACSHMProvider
             {
                 Console.Write("Paused="); Console.WriteLine((graphics.Status == AC_STATUS.AC_REPLAY || graphics.Status == AC_STATUS.AC_PAUSE) ? "true" : "false");
 
+                /*
                 if (GetSession(graphics.Session) != "Practice" && staticInfo.IsTimedRace == 0 &&
                     (graphics.NumberOfLaps - graphics.CompletedLaps) <= 0)
                     session = "Finished";
-                /*
                 else if (graphics.Flag == AC_FLAG_TYPE.AC_CHECKERED_FLAG)
                     session = "Finished";
-                */
-                else
+                else */
                     session = GetSession(graphics.Session);
 
                 Console.Write("Session="); Console.WriteLine(session);

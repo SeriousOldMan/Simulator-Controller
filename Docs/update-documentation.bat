@@ -22,10 +22,10 @@ copy "Virtual Race Spotter.md" ..\..\Controller.Wiki\Virtual-Race-Spotter.md
 copy "Customizing Assistants.md" ..\..\Controller.Wiki\Customizing-Assistants.md
 copy "Team Server.md" ..\..\Controller.Wiki\Team-Server.md
 copy "Setup Workbench.md" ..\..\Controller.Wiki\Setup-Workbench.md
-copy "Practice Center.md" ..\..\Controller.Wiki\Practice-Center.md
+copy "Solo Center.md" ..\..\Controller.Wiki\Solo-Center.md
 copy "Strategy Workbench.md" ..\..\Controller.Wiki\Strategy-Workbench.md
 copy "Race Reports.md" ..\..\Controller.Wiki\Race-Reports.md
-copy "Race Center.md" ..\..\Controller.Wiki\Race-Center.md
+copy "Team Center.md" ..\..\Controller.Wiki\Team-Center.md
 copy "Session Database.md" ..\..\Controller.Wiki\Session-Database.md
 copy "Driving Coach Commands (EN).md" ..\..\Controller.Wiki\Driving-Coach-Commands-(EN).md
 copy "Race Engineer Commands (EN).md" ..\..\Controller.Wiki\Race-Engineer-Commands-(EN).md

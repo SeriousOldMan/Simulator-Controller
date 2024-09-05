@@ -4582,7 +4582,7 @@ class SoloCenter extends ConfigurationItem {
 					this.Window.Opt("+OwnDialogs")
 
 					OnMessage(0x44, translateSaveCancelButtons)
-					fileName := withBlockedWindows(FileSelect, "S17", fileName, translate("Save Session..."), "Practice Session (*.practice)")
+					fileName := withBlockedWindows(FileSelect, "S17", fileName, translate("Save Session..."), "Solo Session (*.solo)")
 					OnMessage(0x44, translateSaveCancelButtons, 0)
 				}
 
@@ -4980,7 +4980,7 @@ class SoloCenter extends ConfigurationItem {
 						dirName := ""
 
 					OnMessage(0x44, translateLoadCancelButtons)
-					fileName := withBlockedWindows(FileSelect, 1, dirName, translate("Load Session..."), "Practice Session (*.practice)")
+					fileName := withBlockedWindows(FileSelect, 1, dirName, translate("Load Session..."), "Solo Session (*.solo)")
 					OnMessage(0x44, translateLoadCancelButtons, 0)
 				}
 

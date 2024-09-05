@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.8.6.0-release](https://www.dropbox.com/scl/fi/e2022lafjjou7itrfe6aa/Simulator-Controller-5.8.6.0-dev.zip?rlkey=ia015qt90xc3sh0vba8255tih&st=kf511mj5&dl=1) (Early build for 5.8.6. Changes: Fixed live graph redrawing in "Solo Center", Fixed tyre laps handling in "Solo Center", Fixed Spotter to give opponent lap times again, Fixed error reporting for missing SoX and NirCmd, New version of local LLM runtime, New LLM event for Race Spotter, Fixed tooltip timeouts in "Simlator Startup", "Solo Center" filters laps without telemetry data.)
+[5.8.6.0-release](https://www.dropbox.com/scl/fi/e2022lafjjou7itrfe6aa/Simulator-Controller-5.8.6.0-dev.zip?rlkey=ia015qt90xc3sh0vba8255tih&st=kf511mj5&dl=1) (Early build for 5.8.6. Changes: Fixed live graph redrawing in "Solo Center", Fixed tyre laps handling in "Solo Center", Fixed Spotter to give opponent lap times again, Fixed error reporting for missing SoX and NirCmd, New version of local LLM runtime, New LLM event for Race Spotter, Fixed tooltip timeouts in "Simlator Startup", "Solo Center" filters laps without telemetry data, Renamed "Practice Center" to "Solo Center", Renamed "Race Center" to "Team Center", Fixed end of race detection for races with fixed laps in R3E.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-586) of this version and all the versions you might have skipped, before installing and using this version.
 

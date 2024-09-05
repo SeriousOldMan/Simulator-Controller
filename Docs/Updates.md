@@ -39,6 +39,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 1. A new builtin LLM Event has been defined for the Race Spotter. As always, you may want to revisit your *Reasoning* booster configuration.
 2. The local LLM Runtime has been updated. If you are using the LLM Runtime, open "Simulator Setup", remove the "Local Runtime..." preset and reinstall it.
+3. If you have used the controller action functions "openRaceCenter" or "openPracticeCenter" in your custom configuration, you have to change them to "openTeamCenter" and "openSoloCenter" respectively.
 
 ***
 

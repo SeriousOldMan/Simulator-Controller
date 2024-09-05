@@ -9128,7 +9128,7 @@ class TeamCenter extends ConfigurationItem {
 			if copy {
 				if (simulator && car && track) {
 					dirName := (SessionDatabase.DatabasePath . "User\" . SessionDatabase.getSimulatorCode(simulator)
-							  . "\" . car . "\" . track . "\Race Sessions")
+							  . "\" . car . "\" . track . "\Team Sessions")
 
 					DirCreate(dirName)
 				}
@@ -9150,7 +9150,7 @@ class TeamCenter extends ConfigurationItem {
 					this.Window.Opt("+OwnDialogs")
 
 					OnMessage(0x44, translateSaveCancelButtons)
-					fileName := withBlockedWindows(FileSelect, "S17", fileName, translate("Save Session..."), "Race Session (*.race)")
+					fileName := withBlockedWindows(FileSelect, "S17", fileName, translate("Save Session..."), "Team Session (*.team)")
 					OnMessage(0x44, translateSaveCancelButtons, 0)
 				}
 
@@ -9685,7 +9685,7 @@ class TeamCenter extends ConfigurationItem {
 				else {
 					if (simulator && car && track) {
 						dirName := (SessionDatabase.DatabasePath . "User\" . SessionDatabase.getSimulatorCode(simulator)
-								  . "\" . car . "\" . track . "\Race Sessions")
+								  . "\" . car . "\" . track . "\Team Sessions")
 
 						DirCreate(dirName)
 					}
@@ -9693,7 +9693,7 @@ class TeamCenter extends ConfigurationItem {
 						dirName := (SessionDatabase.DatabasePath . "User\")
 
 					OnMessage(0x44, translateLoadCancelButtons)
-					fileName := withBlockedWindows(FileSelect, 1, dirName, translate("Load Session..."), "Race Session (*.race)")
+					fileName := withBlockedWindows(FileSelect, 1, dirName, translate("Load Session..."), "Team Session (*.team)")
 					OnMessage(0x44, translateLoadCancelButtons, 0)
 				}
 

@@ -1072,12 +1072,25 @@ loadStartupProfiles(target, fileName := false) {
 	local profiles := []
 	local selected := false
 	local activeProfiles := []
-	local ignore, profile, name, assistant, property, function
+	local ignore, profile, name, assistant, property, function, tools
 
 	for ignore, name in string2Values(";|;", getMultiMapValue(settings, "Profiles", "Profiles", "")) {
+		tools := []
+
+		for ignore, tool in string2Values(",", getMultiMapValue(settings, "Profiles", name . ".Tools", "")) {
+			if (tool = "Practice Center")
+				tool := "Solo Center"
+			else if (tool = "Race Center")
+				tool := "Team Center"
+			else if (tool = "Race Center Lite")
+				tool := "Team Center Lite"
+
+			tools.Push(tool)
+		}
+
 		profile := CaseInsenseMap("Name", name
 								, "Mode", hasTeamServer ? getMultiMapValue(settings, "Profiles", name . ".Mode", "Solo") : false
-								, "Tools", getMultiMapValue(settings, "Profiles", name . ".Tools", ""))
+								, "Tools", values2String(",", tools*))
 
 		for ignore, assistant in kRaceAssistants
 			profile[assistant] := getMultiMapValue(settings, "Profiles", name . "." . assistant, "Default")
@@ -1296,15 +1309,28 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 
 	loadProfiles(fileName := false, delete := true) {
 		local settings := readMultiMap(fileName ? fileName : (kUserConfigDirectory . "Startup.settings"))
-		local ignore, profile, name, assistant, property, function
+		local ignore, profile, name, assistant, property, function, tools
 
 		if delete
 			profiles := []
 
 		for ignore, name in string2Values(";|;", getMultiMapValue(settings, "Profiles", "Profiles", "")) {
+			tools := []
+
+			for ignore, tool in string2Values(",", getMultiMapValue(settings, "Profiles", name . ".Tools", "")) {
+				if (tool = "Practice Center")
+					tool := "Solo Center"
+				else if (tool = "Race Center")
+					tool := "Team Center"
+				else if (tool = "Race Center Lite")
+					tool := "Team Center Lite"
+
+				tools.Push(tool)
+			}
+
 			profile := CaseInsenseMap("Name", name
 									, "Mode", hasTeamServer ? getMultiMapValue(settings, "Profiles", name . ".Mode", "Solo") : false
-									, "Tools", getMultiMapValue(settings, "Profiles", name . ".Tools", ""))
+									, "Tools", values2String(",", tools*))
 
 			for ignore, assistant in kRaceAssistants
 				profile[assistant] := getMultiMapValue(settings, "Profiles", name . "." . assistant, "Default")

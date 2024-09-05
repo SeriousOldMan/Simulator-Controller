@@ -72,7 +72,7 @@ browsePracticeSessions(ownerOrCommand := false, arguments*) {
 			dirName := (SessionDatabase.DatabasePath . "User\")
 
 			OnMessage(0x44, translateLoadCancelButtons)
-			fileName := withBlockedWindows(FileSelect, 1, dirName, translate("Load Session..."), "Practice Session (*.practice)")
+			fileName := withBlockedWindows(FileSelect, 1, dirName, translate("Load Session..."), "Solo Session (*.solo)")
 			OnMessage(0x44, translateLoadCancelButtons, 0)
 		}
 
@@ -316,7 +316,7 @@ browseRaceSessions(ownerOrCommand := false, arguments*) {
 			dirName := (SessionDatabase.DatabasePath . "User\")
 
 			OnMessage(0x44, translateLoadCancelButtons)
-			fileName := withBlockedWindows(FileSelect, 1, dirName, translate("Load Session..."), "Race Session (*.race)")
+			fileName := withBlockedWindows(FileSelect, 1, dirName, translate("Load Session..."), "Team Session (*.team)")
 			OnMessage(0x44, translateLoadCancelButtons, 0)
 		}
 

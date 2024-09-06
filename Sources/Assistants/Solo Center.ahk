@@ -1269,6 +1269,11 @@ class SoloCenter extends ConfigurationItem {
 				chooseRun(true, listView, line)
 		}
 
+		checkRun(listView, line, selected) {
+			if (line && (center.SessionExported || center.SessionLoaded))
+				listView.Modify(line, "-Check")
+		}
+
 		chooseRun(selected, listView, line, *) {
 			if line {
 				wasDouble := false
@@ -1770,6 +1775,7 @@ class SoloCenter extends ConfigurationItem {
 		this.iRunsListView.OnEvent("Click", chooseRun.Bind(false))
 		this.iRunsListView.OnEvent("DoubleClick", openRun)
 		this.iRunsListView.OnEvent("ItemSelect", selectRun)
+		this.iRunsListView.OnEvent("ItemCheck", checkRun)
 
 		centerGui.Add("Text", "x24 yp+180 w80 h23 Y:Move(0.5)", translate("Notes"))
 		centerGui.Add("Edit", "x104 yp w497 h90 Y:Move(0.5) H:Grow(0.5) vrunNotesEdit").OnEvent("Change", updateNotes)

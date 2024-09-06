@@ -2496,13 +2496,12 @@ updateConfigurationForV424() {
 						targetDB.add("Tyres.Pressures", data, true)
 					}
 
-					for ignore, row in sourceDB.Tables["Tyres.Pressures.Distribution"] {
+					for ignore, row in sourceDB.Tables["Tyres.Pressures.Distribution"]
 						tyresDB.updatePressure(simulator, car, track
 											 , row["Weather"], row["Temperature.Air"], row["Temperature.Track"]
 											 , row["Compound"], row["Compound.Color"]
 											 , row["Type"], row["Tyre"], row["Pressure"], row["Count"]
 											 , false, true, "User", row["Driver"])
-					}
 
 					tyresDB.flush()
 

@@ -1715,8 +1715,9 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 		}
 
-		if (enoughData && (lastLap > (this.BaseLap + 2))) {
-			if ((remainingSessionLaps <= 3) && (Floor(remainingSessionLaps) > 1) && (this.Session = kSessionRace)) {
+		if (enoughData && (lastLap > (this.BaseLap + 2)) && !this.SessionInfos.Has("LastLap")) {
+			if ((remainingSessionLaps <= 4) && (Floor(remainingSessionLaps) > 2) && (this.Session = kSessionRace)
+											&& (remainingSessionTime < 10)) {
 				situation := "FinalLaps"
 
 				if !this.SessionInfos.Has(situation) {

@@ -313,29 +313,36 @@ class SoloCenter extends ConfigurationItem {
 		__New(arguments*) {
 			super.__New(arguments*)
 
-			Task.startTask(ObjBindMethod(this, "RedrawHTMLViwer"), 500, kHighPriority)
+			Task.startTask(ObjBindMethod(this, "RedrawHTMLViewer"), 500, kHighPriority)
 		}
 
 		Resize(deltaWidth, deltaHeight) {
 			this.iRedraw := true
 		}
 
-		RedrawHTMLViwer() {
-			if this.iRedraw {
-				local center := SoloCenter.Instance
-				local ignore, button
+		RedrawHTMLViewer() {
+			if this.iRedraw
+				try {
+					local center := SoloCenter.Instance
+					local ignore, button
 
-				for ignore, button in ["LButton", "MButton", "RButton"]
-					if GetKeyState(button)
-						return Task.CurrentTask
+					for ignore, button in ["LButton", "MButton", "RButton"]
+						if GetKeyState(button)
+							return Task.CurrentTask
 
-				this.iRedraw := false
+					this.iRedraw := false
 
-				center.ChartViewer.Resized()
-				center.DetailsViewer.Resized()
+					center.ChartViewer.Resized()
+					center.DetailsViewer.Resized()
 
-				center.pushTask(ObjBindMethod(SoloCenter.Instance, "updateReports", true))
-			}
+					center.pushTask(ObjBindMethod(SoloCenter.Instance, "updateReports", true))
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+				finally {
+					this.iRedraw := false
+				}
 
 			return Task.CurrentTask
 		}
@@ -376,8 +383,8 @@ class SoloCenter extends ConfigurationItem {
 		}
 
 		RedrawHTMLViewer() {
-			try {
-				if this.iRedraw {
+			if this.iRedraw
+				try {
 					local ignore, button
 
 					for ignore, button in ["LButton", "MButton", "RButton"]
@@ -392,12 +399,14 @@ class SoloCenter extends ConfigurationItem {
 					this.iHTMLViewer.document.write(this.iHTML)
 					this.iHTMLViewer.document.close()
 				}
+				catch Any as exception {
+					logError(exception)
+				}
+				finally {
+					this.iRedraw := false
+				}
 
-				return Task.CurrentTask
-			}
-			catch Any {
-				return false
-			}
+			return Task.CurrentTask
 		}
 	}
 

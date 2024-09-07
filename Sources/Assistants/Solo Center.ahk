@@ -4596,10 +4596,10 @@ class SoloCenter extends ConfigurationItem {
 
 				fileName := (dirName . "\Practice " . FormatTime(this.Date, "yyyy-MMM-dd"))
 
-				newFileName := (fileName . ".practice")
+				newFileName := (fileName . ".solo")
 
 				while FileExist(newFileName)
-					newFileName := (fileName . " (" . (A_Index + 1) . ")" . ".practice")
+					newFileName := (fileName . " (" . (A_Index + 1) . ")" . ".solo")
 
 				fileName := newFileName
 
@@ -4667,7 +4667,7 @@ class SoloCenter extends ConfigurationItem {
 
 							FileMove(dataFile, folder . "\" . fileName . ".data", 1)
 
-							writeMultiMap(folder . "\" . fileName . ".practice", info)
+							writeMultiMap(folder . "\" . fileName . ".solo", info)
 						}
 						catch Any as exception {
 							logError(exception)
@@ -5035,7 +5035,7 @@ class SoloCenter extends ConfigurationItem {
 									RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
 
 									if !FileExist(folder . "\Practice.info")
-										FileCopy(directory . "\" . fileName . ".practice", folder . "\Practice.info")
+										FileCopy(directory . "\" . fileName . ".solo", folder . "\Practice.info")
 								}
 								else
 									folder := ""
@@ -5057,7 +5057,7 @@ class SoloCenter extends ConfigurationItem {
 							RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
 
 							if !FileExist(folder . "\Practice.info")
-								FileCopy(directory . "\" . fileName . ".practice", folder . "\Practice.info")
+								FileCopy(directory . "\" . fileName . ".solo", folder . "\Practice.info")
 
 							deleteFile(dataFile)
 						}

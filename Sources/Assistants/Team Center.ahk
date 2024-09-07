@@ -9161,10 +9161,10 @@ class TeamCenter extends ConfigurationItem {
 
 				fileName := (dirName . "\Race " . FormatTime(this.Date, "yyyy-MMM-dd"))
 
-				newFileName := (fileName . ".race")
+				newFileName := (fileName . ".team")
 
 				while FileExist(newFileName)
-					newFileName := (fileName . " (" . (A_Index + 1) . ")" . ".race")
+					newFileName := (fileName . " (" . (A_Index + 1) . ")" . ".team")
 
 				fileName := newFileName
 
@@ -9226,7 +9226,7 @@ class TeamCenter extends ConfigurationItem {
 
 							FileMove(dataFile, folder . "\" . fileName . ".data", 1)
 
-							writeMultiMap(folder . "\" . fileName . ".race", info)
+							writeMultiMap(folder . "\" . fileName . ".team", info)
 						}
 						catch Any as exception {
 							logError(exception)
@@ -9746,7 +9746,7 @@ class TeamCenter extends ConfigurationItem {
 									RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
 
 									if !FileExist(folder . "\Session.info")
-										FileCopy(directory . "\" . fileName . ".race", folder . "\Session.info")
+										FileCopy(directory . "\" . fileName . ".team", folder . "\Session.info")
 								}
 								else
 									folder := ""
@@ -9768,7 +9768,7 @@ class TeamCenter extends ConfigurationItem {
 							RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
 
 							if !FileExist(folder . "\Session.info")
-								FileCopy(directory . "\" . fileName . ".race", folder . "\Session.info")
+								FileCopy(directory . "\" . fileName . ".team", folder . "\Session.info")
 
 							deleteFile(dataFile)
 						}

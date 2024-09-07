@@ -206,10 +206,11 @@ int main(int argc, char* argv[])
 				wprintf_s(L"Car.%d.Laps=%d\n", i, vehicle.completed_laps);
 				wprintf_s(L"Car.%d.Lap.Running=%f\n", i, (float)((double)(vehicle.lap_distance / map_buffer->lap_distance) * map_buffer->lap_distance_fraction));
 				wprintf_s(L"Car.%d.Lap.Running.Valid=%s\n", i, vehicle.current_lap_valid ? L"true" : L"false");
+				wprintf_s(L"Car.%d.Lap.Running.Time=%ld\n", i, (long)(vehicle.lap_time_current_self * 1000));
 
-				long sector1Time = ((long)vehicle.sector_time_previous_self[0] * 1000);
-				long sector2Time = ((long)vehicle.sector_time_previous_self[1] * 1000);
-				long sector3Time = ((long)vehicle.sector_time_previous_self[2] * 1000);
+				long sector1Time = (long)(vehicle.sector_time_previous_self[0] * 1000);
+				long sector2Time = (long)(vehicle.sector_time_previous_self[1] * 1000);
+				long sector3Time = (long)(vehicle.sector_time_previous_self[2] * 1000);
 
 				wprintf_s(L"Car.%d.Time=%ld\n", i, sector1Time + sector2Time + sector3Time);
 				wprintf_s(L"Car.%d.Time.Sectors=%ld,%ld,%ld\n", i, sector1Time, sector2Time, sector3Time);

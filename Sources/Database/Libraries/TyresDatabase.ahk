@@ -433,32 +433,38 @@ class TyresDatabase extends SessionDatabase {
 
 		db := ((this.Shared && flush) ? this.lock(simulator, car, track) : this.requireDatabase(simulator, car, track))
 
-		db.add("Tyres.Pressures", Database.Row("Driver", driver, "Weather", weather
-											 , "Temperature.Air", Round(airTemperature), "Temperature.Track", Round(trackTemperature)
-											 , "Compound", compound, "Compound.Color", compoundColor
-											 , "Tyre.Pressure.Cold.Front.Left", valueOrNull(coldPressures[1])
-											 , "Tyre.Pressure.Cold.Front.Right", valueOrNull(coldPressures[2])
-											 , "Tyre.Pressure.Cold.Rear.Left", valueOrNull(coldPressures[3])
-											 , "Tyre.Pressure.Cold.Rear.Right", valueOrNull(coldPressures[4])
-											 , "Tyre.Pressure.Hot.Front.Left", valueOrNull(hotPressures[1])
-											 , "Tyre.Pressure.Hot.Front.Right", valueOrNull(hotPressures[2])
-											 , "Tyre.Pressure.Hot.Rear.Left", valueOrNull(hotPressures[3])
-											 , "Tyre.Pressure.Hot.Rear.Right", valueOrNull(hotPressures[4]))
-									  , flush)
+		try {
+			db.add("Tyres.Pressures", Database.Row("Driver", driver, "Weather", weather
+												 , "Temperature.Air", Round(airTemperature), "Temperature.Track", Round(trackTemperature)
+												 , "Compound", compound, "Compound.Color", compoundColor
+												 , "Tyre.Pressure.Cold.Front.Left", valueOrNull(coldPressures[1])
+												 , "Tyre.Pressure.Cold.Front.Right", valueOrNull(coldPressures[2])
+												 , "Tyre.Pressure.Cold.Rear.Left", valueOrNull(coldPressures[3])
+												 , "Tyre.Pressure.Cold.Rear.Right", valueOrNull(coldPressures[4])
+												 , "Tyre.Pressure.Hot.Front.Left", valueOrNull(hotPressures[1])
+												 , "Tyre.Pressure.Hot.Front.Right", valueOrNull(hotPressures[2])
+												 , "Tyre.Pressure.Hot.Rear.Left", valueOrNull(hotPressures[3])
+												 , "Tyre.Pressure.Hot.Rear.Right", valueOrNull(hotPressures[4]))
+										  , flush)
 
-		tyres := ["FL", "FR", "RL", "RR"]
-		types := ["Cold", "Hot"]
+			tyres := ["FL", "FR", "RL", "RR"]
+			types := ["Cold", "Hot"]
 
-		for typeIndex, tPressures in [coldPressures, hotPressures]
-			for tyreIndex, pressure in tPressures
-				this.updatePressure(simulator, car, track, weather, Round(airTemperature), Round(trackTemperature), compound, compoundColor
-								  , types[typeIndex], tyres[tyreIndex], pressure, 1, false, false, "User", driver)
-
-		if flush
-			if this.Shared
-				this.unlock()
-			else
-				this.flush()
+			for typeIndex, tPressures in [coldPressures, hotPressures]
+				for tyreIndex, pressure in tPressures
+					this.updatePressure(simulator, car, track, weather, Round(airTemperature), Round(trackTemperature), compound, compoundColor
+									  , types[typeIndex], tyres[tyreIndex], pressure, 1, false, false, "User", driver)
+		}
+		catch Any as exception {
+			logError(exception, true)
+		}
+		finally {
+			if flush
+				if this.Shared
+					this.unlock()
+				else
+					this.flush()
+		}
 	}
 
 	updatePressure(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
@@ -512,7 +518,7 @@ class TyresDatabase extends SessionDatabase {
 								  , "Type", type, "Tyre", tyre, "Pressure", pressure, "Count", count))
 			}
 			catch Any as exception {
-				logError(exception)
+				logError(exception, true)
 			}
 	}
 

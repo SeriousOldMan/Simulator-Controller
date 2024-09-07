@@ -623,22 +623,27 @@ class SoloCenter extends ConfigurationItem {
 			if (!tyreCompoundColor || (tyreCompoundColor = ""))
 				tyreCompoundColor := "Black"
 
-			this.Database.add("Tyres.Pressures",
-							  Database.Row("Weather", weather, "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
-										 , "Compound", tyreCompound, "Compound.Color", tyreCompoundColor, "Driver", driver
-										 , "Tyre.Pressure.Cold.Front.Left", null(coldPressures[1])
-										 , "Tyre.Pressure.Cold.Front.Right", null(coldPressures[2])
-										 , "Tyre.Pressure.Cold.Rear.Left", null(coldPressures[3])
-										 , "Tyre.Pressure.Cold.Rear.Right", null(coldPressures[4])
-										 , "Tyre.Pressure.Hot.Front.Left", null(hotPressures[1])
-										 , "Tyre.Pressure.Hot.Front.Right", null(hotPressures[2])
-										 , "Tyre.Pressure.Hot.Rear.Left", null(hotPressures[3])
-										 , "Tyre.Pressure.Hot.Rear.Right", null(hotPressures[4])
-										 , "Tyre.Pressure.Loss.Front.Left", null(pressuresLosses[1])
-										 , "Tyre.Pressure.Loss.Front.Right", null(pressuresLosses[2])
-										 , "Tyre.Pressure.Loss.Rear.Left", null(pressuresLosses[3])
-										 , "Tyre.Pressure.Loss.Rear.Right", null(pressuresLosses[4]))
-							, true)
+			try {
+				this.Database.add("Tyres.Pressures",
+								  Database.Row("Weather", weather, "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
+											 , "Compound", tyreCompound, "Compound.Color", tyreCompoundColor, "Driver", driver
+											 , "Tyre.Pressure.Cold.Front.Left", null(coldPressures[1])
+											 , "Tyre.Pressure.Cold.Front.Right", null(coldPressures[2])
+											 , "Tyre.Pressure.Cold.Rear.Left", null(coldPressures[3])
+											 , "Tyre.Pressure.Cold.Rear.Right", null(coldPressures[4])
+											 , "Tyre.Pressure.Hot.Front.Left", null(hotPressures[1])
+											 , "Tyre.Pressure.Hot.Front.Right", null(hotPressures[2])
+											 , "Tyre.Pressure.Hot.Rear.Left", null(hotPressures[3])
+											 , "Tyre.Pressure.Hot.Rear.Right", null(hotPressures[4])
+											 , "Tyre.Pressure.Loss.Front.Left", null(pressuresLosses[1])
+											 , "Tyre.Pressure.Loss.Front.Right", null(pressuresLosses[2])
+											 , "Tyre.Pressure.Loss.Rear.Left", null(pressuresLosses[3])
+											 , "Tyre.Pressure.Loss.Rear.Right", null(pressuresLosses[4]))
+								, true)
+			}
+			catch Any as exception {
+				logError(exception, true)
+			}
 
 			tyres := ["FL", "FR", "RL", "RR"]
 			types := ["Cold", "Hot"]
@@ -667,11 +672,16 @@ class SoloCenter extends ConfigurationItem {
 			if (rows.Length > 0)
 				rows[1]["Count"] := rows[1]["Count"] + count
 			else
-				this.Database.add("Tyres.Pressures.Distribution"
-								, Database.Row("Weather", weather, "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
-											 , "Driver", driver, "Compound", tyreCompound, "Compound.Color", tyreCompoundColor
-											 , "Type", type, "Tyre", tyre, "Pressure", pressure, "Count", count)
-								, flush)
+				try {
+					this.Database.add("Tyres.Pressures.Distribution"
+									, Database.Row("Weather", weather, "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
+												 , "Driver", driver, "Compound", tyreCompound, "Compound.Color", tyreCompoundColor
+												 , "Type", type, "Tyre", tyre, "Pressure", pressure, "Count", count)
+									, flush)
+				}
+				catch Any as exception {
+					logError(exception, true)
+				}
 		}
 	}
 
@@ -1259,6 +1269,11 @@ class SoloCenter extends ConfigurationItem {
 				chooseRun(true, listView, line)
 		}
 
+		checkRun(listView, line, selected) {
+			if (line && (center.SessionExported || center.SessionLoaded))
+				listView.Modify(line, "-Check")
+		}
+
 		chooseRun(selected, listView, line, *) {
 			if line {
 				wasDouble := false
@@ -1760,6 +1775,7 @@ class SoloCenter extends ConfigurationItem {
 		this.iRunsListView.OnEvent("Click", chooseRun.Bind(false))
 		this.iRunsListView.OnEvent("DoubleClick", openRun)
 		this.iRunsListView.OnEvent("ItemSelect", selectRun)
+		this.iRunsListView.OnEvent("ItemCheck", checkRun)
 
 		centerGui.Add("Text", "x24 yp+180 w80 h23 Y:Move(0.5)", translate("Notes"))
 		centerGui.Add("Edit", "x104 yp w497 h90 Y:Move(0.5) H:Grow(0.5) vrunNotesEdit").OnEvent("Change", updateNotes)

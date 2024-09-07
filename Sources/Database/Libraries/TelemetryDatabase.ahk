@@ -342,6 +342,9 @@ class TelemetryDatabase extends SessionDatabase {
 											     , "Identifier", identifier ? identifier : kNull)
 										  , true)
 			}
+			catch Any as exception {
+				logError(exception, true)
+			}
 			finally {
 				if this.Shared
 					db.unlock("Electronics")
@@ -381,6 +384,9 @@ class TelemetryDatabase extends SessionDatabase {
 										   , "Tyre.Wear.Rear.Right", valueOrNull(wearRR)
 										   , "Identifier", identifier ? identifier : kNull)
 								, true)
+			}
+			catch Any as exception {
+				logError(exception, true)
 			}
 			finally {
 				if this.Shared

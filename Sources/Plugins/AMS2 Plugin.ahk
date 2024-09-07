@@ -213,7 +213,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 
 	changePitstopOption(option, action := "Increase", steps := 1) {
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			if inList(["Strategy", "Refuel", "Swap Driver"], option) {
+			if inList(["Strategy", "Refuel", "Swap Driver", "Request Pitstop"], option) {
 				this.dialPitstopOption(option, action, steps)
 
 				this.deselectPitstopOption(option)
@@ -318,11 +318,8 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 		super.finishPitstopSetup(pitstopNumber)
 
 		if this.requirePitstopMFD()
-			if this.selectPitstopOption("Request Pitstop") {
-				this.dialPitstopOption("Request Pitstop")
-
-				this.deselectPitstopOption("Request Pitstop")
-			}
+			if this.selectPitstopOption("Request Pitstop")
+				this.changePitstopOption("Request Pitstop")
 	}
 
 	updateSession(session, force := false) {

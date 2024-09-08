@@ -266,7 +266,7 @@ class EventBooster extends AgentBooster {
 						Task.startTask(() {
 							local directory
 							
-							SplitPath(this.Transacript, , &directory)
+							SplitPath(this.Transcript, , &directory)
 							
 							DirCreate(directory)
 							

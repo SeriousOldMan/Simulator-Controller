@@ -3993,7 +3993,7 @@ askAssistant(context, question) {
 
 Assistant_Ask := askAssistant
 
-speakAssistant(context, message. force := false) {
+speakAssistant(context, message, force := false) {
 	local assistant := context.KnowledgeBase.RaceAssistant
 	local speaker, ignore, part
 

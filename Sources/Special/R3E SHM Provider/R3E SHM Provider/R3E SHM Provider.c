@@ -100,8 +100,11 @@ long getRemainingTime() {
         return 0;
 
     if (map_buffer->session_type == R3E_SESSION_PRACTICE || map_buffer->session_length_format != R3E_SESSION_LENGTH_LAP_BASED) {
-        long time = (long)((map_buffer->race_session_minutes[map_buffer->session_iteration - 1] * 60) -
-						   (normalize(map_buffer->lap_time_best_self) * normalize(map_buffer->completed_laps)));
+		long time = (long)map_buffer->session_time_remaining;
+		
+		if (time < 0)
+			time = (long)((map_buffer->race_session_minutes[map_buffer->session_iteration - 1] * 60) -
+						  (normalize(map_buffer->lap_time_best_self) * normalize(map_buffer->completed_laps)));
 
 		if (time > 0)
 			return time * 1000;

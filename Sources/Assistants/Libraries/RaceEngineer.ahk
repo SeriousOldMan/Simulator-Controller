@@ -1,4 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - AI Race Engineer                ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -1955,7 +1956,7 @@ class RaceEngineer extends RaceAssistant {
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts), HasPressureData: false
 								, BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
 
-		if this.Speaker {
+		if this.Speaker[false] {
 			speaker := this.getSpeaker()
 
 			speaker.beginTalk()
@@ -2001,7 +2002,7 @@ class RaceEngineer extends RaceAssistant {
 				if ProcessExist("Race Strategist.exe")
 					Sleep(5000)
 
-			if (shutdown && this.Speaker)
+			if (shutdown && this.Speaker[false])
 				this.getSpeaker().speakPhrase("Bye")
 
 			if (shutdown && (knowledgeBase.getValue("Lap", 0) > this.LearningLaps)) {
@@ -2009,7 +2010,7 @@ class RaceEngineer extends RaceAssistant {
 
 				if ProcessExist("Solo Center.exe") {
 					if (this.SaveSettings = kAsk) {
-						if this.Speaker {
+						if this.Speaker[false] {
 							this.getSpeaker().speakPhrase("ConfirmDataUpdate", false, true)
 
 							this.setContinuation(ObjBindMethod(this, "shutdownSession", "After", true))
@@ -2022,7 +2023,7 @@ class RaceEngineer extends RaceAssistant {
 				}
 				else {
 					if (((this.SaveTyrePressures = kAsk) && this.CollectTyrePressures && this.HasPressureData) || (this.SaveSettings = kAsk)) {
-						if this.Speaker {
+						if this.Speaker[false] {
 							this.getSpeaker().speakPhrase("ConfirmDataUpdate", false, true)
 
 							this.setContinuation(ObjBindMethod(this, "shutdownSession", "After", true))
@@ -2081,7 +2082,7 @@ class RaceEngineer extends RaceAssistant {
 		}
 
 		if (phase = "After") {
-			if (this.Speaker && pressuresSaved)
+			if (this.Speaker[false] && pressuresSaved)
 				this.getSpeaker().speakPhrase("DataUpdated")
 
 			this.updateDynamicValues({KnowledgeBase: false})
@@ -2251,7 +2252,7 @@ class RaceEngineer extends RaceAssistant {
 		else if ((lastLap == 0) && (lapNumber > 1))
 			lastLap := (lapNumber - 1)
 
-		if (knowledgeBase && this.Speaker && (lapNumber > 1)) {
+		if (knowledgeBase && (lapNumber > 1)) {
 			driverForname := knowledgeBase.getValue("Driver.Forname", "John")
 			driverSurname := knowledgeBase.getValue("Driver.Surname", "Doe")
 			driverNickname := knowledgeBase.getValue("Driver.Nickname", "JD")
@@ -2288,7 +2289,7 @@ class RaceEngineer extends RaceAssistant {
 		if ((lastLap < (lapNumber - 2)) && (driverName(driverForname, driverSurname, driverNickname) != this.DriverFullName)) {
 			this.iPitstopAdjustments := false
 
-			if this.Speaker
+			if this.Speaker[false]
 				this.getSpeaker().speakPhrase("WelcomeBack")
 		}
 
@@ -3520,7 +3521,7 @@ class RaceEngineer extends RaceAssistant {
 
 			this.RemoteHandler.pitstopPrepared(pitstopNumber)
 
-			if this.Speaker
+			if this.Speaker[false]
 				Task.startTask(() => this.getSpeaker().speakPhrase("CallToPit"), 10000)
 		}
 	}

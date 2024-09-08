@@ -1661,7 +1661,7 @@ class RaceStrategist extends GridRaceAssistant {
 								, BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0
 								, EnoughData: false, StrategyReported: (getMultiMapValue(data, "Stint Data", "Laps", 0) > 1)})
 
-		if (this.Speaker && !raceEngineer)
+		if (this.Speaker[false] && !raceEngineer)
 			this.getSpeaker().speakPhrase("Greeting")
 
 		if this.Debug[kDebugKnowledgeBase]
@@ -1685,7 +1685,7 @@ class RaceStrategist extends GridRaceAssistant {
 			else
 				review := false
 
-			if (shutdown && !review && !ProcessExist("Race Engineer.exe") && this.Speaker)
+			if (shutdown && !review && !ProcessExist("Race Engineer.exe") && this.Speaker[false])
 				this.getSpeaker().speakPhrase("Bye")
 
 			if (shutdown && (lastLap > this.LearningLaps)) {
@@ -1693,7 +1693,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 				asked := true
 
-				if this.Speaker {
+				if this.Speaker[false] {
 					if ProcessExist("Solo Center.exe") {
 						if (((this.SaveSettings = kAsk) && (this.Session == kSessionRace))
 						 && ((this.SaveRaceReport = kAsk) && (this.Session == kSessionRace)))
@@ -1805,7 +1805,7 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 
 		if (phase = "After") {
-			if (this.Speaker && reportSaved)
+			if (this.Speaker[false] && reportSaved)
 				this.getSpeaker().speakPhrase("RaceReportSaved")
 
 			this.updateDynamicValues({KnowledgeBase: false, HasTelemetryData: false})
@@ -1932,15 +1932,15 @@ class RaceStrategist extends GridRaceAssistant {
 
 		knowledgeBase := this.KnowledgeBase
 
-		if (this.Speaker && (lapNumber > 1)) {
+		if (lapNumber > 1) {
 			driverForname := knowledgeBase.getValue("Driver.Forname", "John")
 			driverSurname := knowledgeBase.getValue("Driver.Surname", "Doe")
 			driverNickname := knowledgeBase.getValue("Driver.Nickname", "JD")
 		}
 
-		if (this.Speaker && (lastLap < (lapNumber - 2))
-		 && (driverName(driverForname, driverSurname, driverNickname) != this.DriverFullName))
-			this.getSpeaker().speakPhrase(ProcessExist("Race Engineer.exe") ? "" : "WelcomeBack")
+		if ((lastLap < (lapNumber - 2)) && (driverName(driverForname, driverSurname, driverNickname) != this.DriverFullName))
+			if this.Speaker[false]
+				this.getSpeaker().speakPhrase(ProcessExist("Race Engineer.exe") ? "" : "WelcomeBack")
 
 		lastLap := lapNumber
 
@@ -2153,7 +2153,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local activeStrategy, activePitstop, strategyName, nextPitstop, lap, refuel, tyreChange, map
 		local speaker, fragments
 
-		if this.Speaker {
+		if this.Speaker[false] {
 			speaker := this.getSpeaker()
 
 			if strategy {
@@ -3254,7 +3254,7 @@ class RaceStrategist extends GridRaceAssistant {
 								this.reportStrategy({Strategy: false, FullCourseYellow: fullCourseYellow, ForcedPitstop: forcedPitstop
 												   , NextPitstop: false, TyreChange: true, Refuel: true}, scenario)
 
-								if this.Speaker {
+								if this.Speaker[false] {
 									if this.confirmAction("Strategy.Update") {
 										speaker.speakPhrase("ConfirmUpdateStrategy", false, true)
 
@@ -3278,7 +3278,7 @@ class RaceStrategist extends GridRaceAssistant {
 							if ((this.Strategy != this.Strategy[true]) || isDebug())
 								this.explainStrategyRecommendation(scenario)
 
-							if this.Speaker {
+							if this.Speaker[false] {
 								if this.confirmAction("Strategy.Update") {
 									speaker.speakPhrase("ConfirmUpdateStrategy", false, true)
 
@@ -3306,7 +3306,7 @@ class RaceStrategist extends GridRaceAssistant {
 							else if ((this.Strategy != this.Strategy[true]) && !this.betterScenario(this.Strategy, scenario, &report))
 								return
 
-						if (report && this.Speaker) {
+						if (report && this.Speaker[false]) {
 							if this.Announcements["StrategyUpdate"] {
 								speaker.speakPhrase("StrategyUpdate")
 

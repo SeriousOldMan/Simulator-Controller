@@ -343,7 +343,7 @@ class SpeechBooster extends ConversationBooster {
 						Task.startTask(() {
 							local directory
 							
-							SplitPath(this.Transacript, , &directory)
+							SplitPath(this.Transcript, , &directory)
 							
 							DirCreate(directory)
 							
@@ -511,7 +511,7 @@ class RecognitionBooster extends ConversationBooster {
 						Task.startTask(() {
 							local directory
 							
-							SplitPath(this.Transacript, , &directory)
+							SplitPath(this.Transcript, , &directory)
 							
 							DirCreate(directory)
 							
@@ -640,7 +640,7 @@ class ChatBooster extends ConversationBooster {
 						Task.startTask(() {
 							local directory
 							
-							SplitPath(this.Transacript, , &directory)
+							SplitPath(this.Transcript, , &directory)
 							
 							DirCreate(directory)
 							

@@ -1167,7 +1167,11 @@ Note: For convenience, all commands available for the *assistantCommands* parame
 
 ### Special requirements when using the Pitstop automation
 
-It is very important, that you do not use the *Automobilista 2* ICM on your own, when you want to control the pitstop settings using the "Pitstop" mode, or if you want Jona to control the pitstop settings. Before the first usage the ICM must be set to the Pitstop page of the ICM and the selection must be set to the bottom line. Furthermore, you must leave *all* repairs selected in the default pitstop strategy and select *no tyre change* in the default pitstop strategy as well. Not complying with this requirements will give you funny results at least.
+It is very important, that you do not use the *Automobilista 2* ICM on your own, when you want to control the pitstop settings using the "Pitstop" mode, or if you want Jona to control the pitstop settings. Before the first usage the ICM must be set to the Pitstop page of the ICM and the selection must be set to the bottom line. Furthermore, you must leave *all* repairs selected in the default pitstop strategy and select *no tyre change* in the default pitstop strategy as well. You must also choose the following settings in the *Automobilista 2* configuration:
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/AMS2%20Settings.png)
+
+Not complying with this requirements will give you funny results at least.
 
 ## Plugin *PCARS2*
 

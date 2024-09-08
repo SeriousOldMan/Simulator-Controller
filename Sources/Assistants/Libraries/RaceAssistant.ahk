@@ -3993,11 +3993,11 @@ askAssistant(context, question) {
 
 Assistant_Ask := askAssistant
 
-speakAssistant(context, message) {
+speakAssistant(context, message. force := false) {
 	local assistant := context.KnowledgeBase.RaceAssistant
 	local speaker, ignore, part
 
-	if assistant.Speaker {
+	if assistant.Speaker[force] {
 		speaker := assistant.getSpeaker()
 
 		if speaker.Phrases.Has(message)

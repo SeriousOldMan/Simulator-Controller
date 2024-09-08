@@ -102,6 +102,8 @@ To reactivate the Assistant use:
 
 These commands are also available as "Mute" and "Unmute" plugin actions, which can be configured for a Button Box or a Stream Deck, for example.
 
+Good to know: Even if Cato is muted, you can interact with the Strategist, for example to ask for a undercut simulation. If a chain of conversation is initiated by you, the driver, Cato will react normally. The Strategist will also communicate normally with regards to all strategy related topics, if a strategy is active for the current race.
+
 ## Racing with Cato
 
 Cato will be active during practice and race sessions by default, although the Assistant will be of not much help in a practice session, since it only collects data for future race strategy development purposes. You can configure the sessions, where Cato collects telemetry data using the settings in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database). 

@@ -1,5 +1,4 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - AI Race Engineer                ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -3521,7 +3520,7 @@ class RaceEngineer extends RaceAssistant {
 
 			this.RemoteHandler.pitstopPrepared(pitstopNumber)
 
-			if this.Speaker[false]
+			if this.Speaker
 				Task.startTask(() => this.getSpeaker().speakPhrase("CallToPit"), 10000)
 		}
 	}

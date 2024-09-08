@@ -2153,7 +2153,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local activeStrategy, activePitstop, strategyName, nextPitstop, lap, refuel, tyreChange, map
 		local speaker, fragments
 
-		if this.Speaker[false] {
+		if this.Speaker {
 			speaker := this.getSpeaker()
 
 			if strategy {
@@ -3254,7 +3254,7 @@ class RaceStrategist extends GridRaceAssistant {
 								this.reportStrategy({Strategy: false, FullCourseYellow: fullCourseYellow, ForcedPitstop: forcedPitstop
 												   , NextPitstop: false, TyreChange: true, Refuel: true}, scenario)
 
-								if this.Speaker[false] {
+								if this.Speaker {
 									if this.confirmAction("Strategy.Update") {
 										speaker.speakPhrase("ConfirmUpdateStrategy", false, true)
 
@@ -3278,7 +3278,7 @@ class RaceStrategist extends GridRaceAssistant {
 							if ((this.Strategy != this.Strategy[true]) || isDebug())
 								this.explainStrategyRecommendation(scenario)
 
-							if this.Speaker[false] {
+							if this.Speaker {
 								if this.confirmAction("Strategy.Update") {
 									speaker.speakPhrase("ConfirmUpdateStrategy", false, true)
 
@@ -3306,7 +3306,7 @@ class RaceStrategist extends GridRaceAssistant {
 							else if ((this.Strategy != this.Strategy[true]) && !this.betterScenario(this.Strategy, scenario, &report))
 								return
 
-						if (report && this.Speaker[false]) {
+						if (report && this.Speaker) {
 							if this.Announcements["StrategyUpdate"] {
 								speaker.speakPhrase("StrategyUpdate")
 
@@ -3601,7 +3601,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local nextPitstop, result, map
 
-		if (this.Strategy && this.Speaker[false])
+		if this.Strategy
 			nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next", false)
 		else
 			nextPitstop := false
@@ -3617,7 +3617,8 @@ class RaceStrategist extends GridRaceAssistant {
 				map := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Map", "n/a")
 
 				if ((map != "n/a") && (map != knowledgeBase.getValue("Lap." . knowledgeBase.getValue("Lap") . ".Map", "n/a")))
-					this.getSpeaker().speakPhrase("StintMap", {map: map})
+					if this.Speaker[false]
+						this.getSpeaker().speakPhrase("StintMap", {map: map})
 			}
 			else if getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Update.Pitstop", false)
 				knowledgeBase.setFact("Strategy.Recalculate", "Pitstop")
@@ -3704,7 +3705,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local fullCourseYellow, forcedPitstop, speaker, plannedLap, nextPitstop, maxLap
 		local refuel, tyreChange, tyreCompound, tyreCompoundColor
 
-		if (this.Speaker[false]) {
+		if this.Speaker {
 			speaker := this.getSpeaker()
 
 			nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next")

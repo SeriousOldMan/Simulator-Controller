@@ -490,9 +490,9 @@ You can enable or disable individual predefined actions using the checkbox on th
    
      Invokes the *method* on the instance of the Race Assistant class with some arguments. A variable number of arguments are supported.
 	 
-   - Assistant.Speak(phrase)
+   - Assistant.Speak(phrase, [force])
    
-	 Outputs the given phrase using the voice of the given Race Assistant. *phrase* can be the label of a predefined phrase from the grammar definition of the Assistant. If phrase is not one of the predefined phrases it will be spoken as is.
+	 Outputs the given phrase using the voice of the given Race Assistant. *phrase* can be the label of a predefined phrase from the grammar definition of the Assistant. If *phrase* is not one of the predefined phrases it will be spoken as is. The *phrase* will not be spoken, if the Assistant is muted, unless you supply *true* for the optional parameter *force*.
 	 
    - Assistant.Ask(question)
    

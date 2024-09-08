@@ -21,6 +21,7 @@ Release 5.7.5=Release 5.7.4 -> updateConfigurationForV575
 Release 5.8.0=Release 5.7.5 -> updateConfigurationForV580
 Release 5.8.4=Release 5.8.0 -> updateStreamDeckIconPreset, updateActionLabels, updateActionIcons
 Release 5.8.6=Release 5.8.4 -> updateConfigurationForV586, updateInstallationForV586, updateActionLabels, updateActionIcons
+Release 5.8.7=Release 5.8.6 -> updateConfigurationForV587
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

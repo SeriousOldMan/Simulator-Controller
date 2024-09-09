@@ -4585,7 +4585,7 @@ class SoloCenter extends ConfigurationItem {
 			if copy {
 				if (simulator && car && track) {
 					dirName := (SessionDatabase.DatabasePath . "User\" . SessionDatabase.getSimulatorCode(simulator)
-							  . "\" . car . "\" . track . "\Practice Sessions")
+							  . "\" . car . "\" . track . "\Solo Sessions")
 
 					DirCreate(dirName)
 				}

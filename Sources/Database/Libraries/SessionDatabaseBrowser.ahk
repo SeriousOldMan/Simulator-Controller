@@ -24,7 +24,7 @@
 ;;;                   Public Function Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-browsePracticeSessions(ownerOrCommand := false, arguments*) {
+browseSoloSessions(ownerOrCommand := false, arguments*) {
 	local x, y, names, infos, index, name, dirName, driverName
 	local carNames, trackNames, newSimulator, newCar, newTrack, force
 
@@ -45,17 +45,17 @@ browsePracticeSessions(ownerOrCommand := false, arguments*) {
 
 	selectSimulator(*) {
 		try
-			browsePracticeSessions("ChooseSimulator", simulators[browserGui["simulatorDropDown"].Value])
+			browseSoloSessions("ChooseSimulator", simulators[browserGui["simulatorDropDown"].Value])
 	}
 
 	selectCar(*) {
 		try
-			browsePracticeSessions("ChooseCar", cars[browserGui["carDropDown"].Value])
+			browseSoloSessions("ChooseCar", cars[browserGui["carDropDown"].Value])
 	}
 
 	selectTrack(*) {
 		try
-			browsePracticeSessions("ChooseTrack", tracks[browserGui["trackDropDown"].Value])
+			browseSoloSessions("ChooseTrack", tracks[browserGui["trackDropDown"].Value])
 	}
 
 	if ((ownerOrCommand == kOk) || (ownerOrCommand == kCancel))
@@ -77,7 +77,7 @@ browsePracticeSessions(ownerOrCommand := false, arguments*) {
 		}
 
 		if (fileName != "")
-			browsePracticeSessions(kOk)
+			browseSoloSessions(kOk)
 		else
 			fileName := false
 	}
@@ -113,7 +113,7 @@ browsePracticeSessions(ownerOrCommand := false, arguments*) {
 			browserGui["carDropDown"].Delete()
 			browserGui["carDropDown"].Add(carNames)
 
-			browsePracticeSessions("ChooseCar", (cars.Length > 0) ? cars[1] : false, true)
+			browseSoloSessions("ChooseCar", (cars.Length > 0) ? cars[1] : false, true)
 		}
 	}
 	else if (ownerOrCommand = "ChooseCar") {
@@ -137,7 +137,7 @@ browsePracticeSessions(ownerOrCommand := false, arguments*) {
 			browserGui["trackDropDown"].Delete()
 			browserGui["trackDropDown"].Add(collect(tracks, ObjBindMethod(sessionDB, "getTrackName", simulator)))
 
-			browsePracticeSessions("ChooseTrack", (tracks.Length > 0) ? tracks[1] : false, true)
+			browseSoloSessions("ChooseTrack", (tracks.Length > 0) ? tracks[1] : false, true)
 		}
 	}
 	else if (ownerOrCommand = "ChooseTrack") {
@@ -155,7 +155,7 @@ browsePracticeSessions(ownerOrCommand := false, arguments*) {
 			if track {
 				browserGui["trackDropDown"].Choose(inList(tracks, track))
 
-				sessionDB.getSessions(simulator, car, track, "Practice", &names, &infos := true)
+				sessionDB.getSessions(simulator, car, track, "Solo", &names, &infos := true)
 
 				for index, name in names {
 					if getMultiMapValue(infos[index], "Session", "Driver", false)
@@ -207,18 +207,18 @@ browsePracticeSessions(ownerOrCommand := false, arguments*) {
 		browserGui.Add("DropDownList", "x90 yp w275 vtrackDropDown").OnEvent("Change", selectTrack)
 
 		browserGui.Add("ListView", "x8 yp+30 w357 h335 -Multi -LV0x10 AltSubmit vsessionListView", collect(["Session", "Driver", "Date"], translate))
-		browserGui["sessionListView"].OnEvent("DoubleClick", browsePracticeSessions.Bind(kOk))
+		browserGui["sessionListView"].OnEvent("DoubleClick", browseSoloSessions.Bind(kOk))
 
-		browserGui.Add("Button", "x8 yp+345 w80 h23 vopenButton", translate("Open...")).OnEvent("Click", browsePracticeSessions.Bind("Load"))
+		browserGui.Add("Button", "x8 yp+345 w80 h23 vopenButton", translate("Open...")).OnEvent("Click", browseSoloSessions.Bind("Load"))
 
-		browserGui.Add("Button", "x197 yp w80 h23 Default", translate("Load")).OnEvent("Click", browsePracticeSessions.Bind(kOk))
-		browserGui.Add("Button", "x285 yp w80 h23", translate("&Cancel")).OnEvent("Click", browsePracticeSessions.Bind(kCancel))
+		browserGui.Add("Button", "x197 yp w80 h23 Default", translate("Load")).OnEvent("Click", browseSoloSessions.Bind(kOk))
+		browserGui.Add("Button", "x285 yp w80 h23", translate("&Cancel")).OnEvent("Click", browseSoloSessions.Bind(kCancel))
 
 		browserGui.Show("AutoSize Center")
 
-		browsePracticeSessions("ChooseSimulator", %arguments[1]%, true)
-		browsePracticeSessions("ChooseCar", %arguments[2]%, true)
-		browsePracticeSessions("ChooseTrack", %arguments[3]%, true)
+		browseSoloSessions("ChooseSimulator", %arguments[1]%, true)
+		browseSoloSessions("ChooseCar", %arguments[2]%, true)
+		browseSoloSessions("ChooseTrack", %arguments[3]%, true)
 
 		if getWindowPosition("Practice Session Browser", &x, &y)
 			browserGui.Show("x" . x . " y" . y)
@@ -252,8 +252,8 @@ browsePracticeSessions(ownerOrCommand := false, arguments*) {
 						%arguments[2]% := car
 						%arguments[3]% := track
 
-						return (sessionDB.getSessionDirectory(simulator, car, track, "Practice")
-							  . browserGui["sessionListView"].GetText(index) . ".practice")
+						return (sessionDB.getSessionDirectory(simulator, car, track, "Solo")
+							  . browserGui["sessionListView"].GetText(index) . ".solo")
 					}
 					else
 						return false
@@ -268,7 +268,7 @@ browsePracticeSessions(ownerOrCommand := false, arguments*) {
 	}
 }
 
-browseRaceSessions(ownerOrCommand := false, arguments*) {
+browseTeamSessions(ownerOrCommand := false, arguments*) {
 	local x, y, names, infos, index, name, driverName
 	local carNames, trackNames, newSimulator, newCar, newTrack, force, dirName
 
@@ -289,17 +289,17 @@ browseRaceSessions(ownerOrCommand := false, arguments*) {
 
 	selectSimulator(*) {
 		try
-			browseRaceSessions("ChooseSimulator", simulators[browserGui["simulatorDropDown"].Value])
+			browseTeamSessions("ChooseSimulator", simulators[browserGui["simulatorDropDown"].Value])
 	}
 
 	selectCar(*) {
 		try
-			browseRaceSessions("ChooseCar", cars[browserGui["carDropDown"].Value])
+			browseTeamSessions("ChooseCar", cars[browserGui["carDropDown"].Value])
 	}
 
 	selectTrack(*) {
 		try
-			browseRaceSessions("ChooseTrack", tracks[browserGui["trackDropDown"].Value])
+			browseTeamSessions("ChooseTrack", tracks[browserGui["trackDropDown"].Value])
 	}
 
 	if ((ownerOrCommand == kOk) || (ownerOrCommand == kCancel))
@@ -321,7 +321,7 @@ browseRaceSessions(ownerOrCommand := false, arguments*) {
 		}
 
 		if (fileName != "")
-			browseRaceSessions(kOk)
+			browseTeamSessions(kOk)
 		else
 			fileName := false
 	}
@@ -357,7 +357,7 @@ browseRaceSessions(ownerOrCommand := false, arguments*) {
 			browserGui["carDropDown"].Delete()
 			browserGui["carDropDown"].Add(carNames)
 
-			browseRaceSessions("ChooseCar", (cars.Length > 0) ? cars[1] : false, true)
+			browseTeamSessions("ChooseCar", (cars.Length > 0) ? cars[1] : false, true)
 		}
 	}
 	else if (ownerOrCommand = "ChooseCar") {
@@ -381,7 +381,7 @@ browseRaceSessions(ownerOrCommand := false, arguments*) {
 			browserGui["trackDropDown"].Delete()
 			browserGui["trackDropDown"].Add(collect(tracks, ObjBindMethod(sessionDB, "getTrackName", simulator)))
 
-			browseRaceSessions("ChooseTrack", (tracks.Length > 0) ? tracks[1] : false, true)
+			browseTeamSessions("ChooseTrack", (tracks.Length > 0) ? tracks[1] : false, true)
 		}
 	}
 	else if (ownerOrCommand = "ChooseTrack") {
@@ -399,7 +399,7 @@ browseRaceSessions(ownerOrCommand := false, arguments*) {
 			if track {
 				browserGui["trackDropDown"].Choose(inList(tracks, track))
 
-				sessionDB.getSessions(simulator, car, track, "Race", &names, &infos := true)
+				sessionDB.getSessions(simulator, car, track, "Team", &names, &infos := true)
 
 				for index, name in names
 					browserGui["sessionListView"].Add("", name
@@ -438,18 +438,18 @@ browseRaceSessions(ownerOrCommand := false, arguments*) {
 		browserGui.Add("DropDownList", "x90 yp w275 vtrackDropDown").OnEvent("Change", selectTrack)
 
 		browserGui.Add("ListView", "x8 yp+30 w357 h335 -Multi -LV0x10 AltSubmit vsessionListView", collect(["Session", "Date"], translate))
-		browserGui["sessionListView"].OnEvent("DoubleClick", browseRaceSessions.Bind(kOk))
+		browserGui["sessionListView"].OnEvent("DoubleClick", browseTeamSessions.Bind(kOk))
 
-		browserGui.Add("Button", "x8 yp+345 w80 h23 vopenButton", translate("Open...")).OnEvent("Click", browseRaceSessions.Bind("Load"))
+		browserGui.Add("Button", "x8 yp+345 w80 h23 vopenButton", translate("Open...")).OnEvent("Click", browseTeamSessions.Bind("Load"))
 
-		browserGui.Add("Button", "x197 yp w80 h23 Default", translate("Load")).OnEvent("Click", browseRaceSessions.Bind(kOk))
-		browserGui.Add("Button", "x285 yp w80 h23", translate("&Cancel")).OnEvent("Click", browseRaceSessions.Bind(kCancel))
+		browserGui.Add("Button", "x197 yp w80 h23 Default", translate("Load")).OnEvent("Click", browseTeamSessions.Bind(kOk))
+		browserGui.Add("Button", "x285 yp w80 h23", translate("&Cancel")).OnEvent("Click", browseTeamSessions.Bind(kCancel))
 
 		browserGui.Show("AutoSize Center")
 
-		browseRaceSessions("ChooseSimulator", %arguments[1]%, true)
-		browseRaceSessions("ChooseCar", %arguments[2]%, true)
-		browseRaceSessions("ChooseTrack", %arguments[3]%, true)
+		browseTeamSessions("ChooseSimulator", %arguments[1]%, true)
+		browseTeamSessions("ChooseCar", %arguments[2]%, true)
+		browseTeamSessions("ChooseTrack", %arguments[3]%, true)
 
 		if getWindowPosition("Race Session Browser", &x, &y)
 			browserGui.Show("x" . x . " y" . y)
@@ -483,7 +483,7 @@ browseRaceSessions(ownerOrCommand := false, arguments*) {
 						%arguments[2]% := car
 						%arguments[3]% := track
 
-						return (sessionDB.getSessionDirectory(simulator, car, track, "Race") . browserGui["sessionListView"].GetText(index) . ".race")
+						return (sessionDB.getSessionDirectory(simulator, car, track, "Team") . browserGui["sessionListView"].GetText(index) . ".team")
 					}
 					else
 						return false

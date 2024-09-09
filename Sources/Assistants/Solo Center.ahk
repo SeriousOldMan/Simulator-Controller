@@ -4648,7 +4648,7 @@ class SoloCenter extends ConfigurationItem {
 
 										file.Close()
 
-										sessionDB.writeSession(simulator, car, track, "Practice", fileName, info, session, size, false, true)
+										sessionDB.writeSession(simulator, car, track, "Solo", fileName, info, session, size, false, true)
 
 										return
 									}
@@ -4987,7 +4987,7 @@ class SoloCenter extends ConfigurationItem {
 					this.Window.Block()
 
 					try {
-						fileName := browsePracticeSessions(this.Window, &simulator, &car, &track)
+						fileName := browseSoloSessions(this.Window, &simulator, &car, &track)
 					}
 					finally {
 						this.Window.Unblock()
@@ -4997,7 +4997,7 @@ class SoloCenter extends ConfigurationItem {
 					fileName := method
 				else {
 					if (simulator && car && track) {
-						dirName := normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Practice"))
+						dirName := normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Solo"))
 
 						DirCreate(dirName)
 					}
@@ -5019,11 +5019,11 @@ class SoloCenter extends ConfigurationItem {
 
 						DirCreate(folder)
 
-						if (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Practice"))) {
+						if (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Solo"))) {
 							dataFile := temporaryFileName("Session", "zip")
 
 							try {
-								session := sessionDB.readSession(simulator, car, track, "Practice", fileName, &meta, &size)
+								session := sessionDB.readSession(simulator, car, track, "Solo", fileName, &meta, &size)
 
 								file := FileOpen(dataFile, "w", "")
 
@@ -8043,7 +8043,7 @@ startupSoloCenter() {
 
 		sCenter.show(false, !load)
 
-		registerMessageHandler("Practice", methodMessageHandler, sCenter)
+		registerMessageHandler("Solo Center", methodMessageHandler, sCenter)
 
 		startupApplication()
 	}

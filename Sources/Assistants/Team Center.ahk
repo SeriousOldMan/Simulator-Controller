@@ -9190,7 +9190,7 @@ class TeamCenter extends ConfigurationItem {
 								setMultiMapValue(info, "Creator", "Name", SessionDatabase.getUserName())
 							}
 
-							if (normalizeDirectoryPath(folder) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Race"))) {
+							if (normalizeDirectoryPath(folder) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Team"))) {
 								dataFile := temporaryFileName("Race", "zip")
 
 								try {
@@ -9207,7 +9207,7 @@ class TeamCenter extends ConfigurationItem {
 
 										file.Close()
 
-										sessionDB.writeSession(simulator, car, track, "Race", fileName, info, session, size, false, true)
+										sessionDB.writeSession(simulator, car, track, "Team", fileName, info, session, size, false, true)
 
 										return
 									}
@@ -9696,7 +9696,7 @@ class TeamCenter extends ConfigurationItem {
 					this.Window.Block()
 
 					try {
-						fileName := browseRaceSessions(this.Window, &simulator, &car, &track)
+						fileName := browseTeamSessions(this.Window, &simulator, &car, &track)
 					}
 					finally {
 						this.Window.Unblock()
@@ -9730,11 +9730,11 @@ class TeamCenter extends ConfigurationItem {
 						DirCreate(folder)
 
 						if (simulator && car && track
-						 && (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Race")))) {
+						 && (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Team")))) {
 							dataFile := temporaryFileName("Session", "zip")
 
 							try {
-								session := sessionDB.readSession(simulator, car, track, "Race", fileName, &meta, &size)
+								session := sessionDB.readSession(simulator, car, track, "Team", fileName, &meta, &size)
 
 								file := FileOpen(dataFile, "w", "")
 

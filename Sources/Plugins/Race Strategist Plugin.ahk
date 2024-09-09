@@ -238,7 +238,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 
 			writeMultiMap(dataFile, data)
 
-			messageSend(kFileMessage, "Practice", "startSession:" . dataFile, pid)
+			messageSend(kFileMessage, "Solo Center", "startSession:" . dataFile, pid)
 		}
 	}
 
@@ -252,7 +252,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 
 			writeMultiMap(fileName, data)
 
-			messageSend(kFileMessage, "Practice", "updateLap:" . values2String(";", lap, fileName), pid)
+			messageSend(kFileMessage, "Solo Center", "updateLap:" . values2String(";", lap, fileName), pid)
 		}
 
 		super.addLap(lap, running, data)
@@ -272,7 +272,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 
 			writeMultiMap(fileName, data)
 
-			messageSend(kFileMessage, "Practice", "updateLap:" . values2String(";", lap, fileName, true), pid)
+			messageSend(kFileMessage, "Solo Center", "updateLap:" . values2String(";", lap, fileName, true), pid)
 		}
 
 		this.checkStrategy()
@@ -352,10 +352,13 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 			pid := ProcessExist("Solo Center.exe")
 
 			if pid
-				messageSend(kFileMessage, "Practice", "updateTelemetry:" . values2String(";", lapNumber, simulator, car, track, weather
-																							, airTemperature, trackTemperature
-																							, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
-																							, compound, compoundColor, pressures, temperatures, wear, lapState), pid)
+				messageSend(kFileMessage, "Solo Center", "updateTelemetry:" . values2String(";", lapNumber, simulator, car, track, weather
+																							   , airTemperature, trackTemperature
+																							   , fuelConsumption, fuelRemaining, lapTime, pitstop
+																							   , map, tc, abs
+																							   , compound, compoundColor, pressures, temperatures
+																							   , wear, lapState)
+										, pid)
 
 			this.LapDatabase.add("Telemetry", Database.Row("Lap", lapNumber, "Simulator", simulator, "Car", car, "Track", track
 														 , "Weather", weather, "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
@@ -517,7 +520,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 			pid := ProcessExist("Solo Center.exe")
 
 			if pid
-				messageSend(kFileMessage, "Practice", "updateStandings:" . values2String(";", lapNumber, fileName), pid)
+				messageSend(kFileMessage, "Solo Center", "updateStandings:" . values2String(";", lapNumber, fileName), pid)
 			else
 				deleteFile(fileName)
 		}
@@ -540,7 +543,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 			FileCopy(fileName, kTempDirectory . "Race Report\Lap." . lapNumber, 1)
 
 			if pid
-				messageSend(kFileMessage, "Practice", "updateReportLap:" . values2String(";", lapNumber, fileName), pid)
+				messageSend(kFileMessage, "Solo Center", "updateReportLap:" . values2String(";", lapNumber, fileName), pid)
 			else
 				deleteFile(fileName)
 
@@ -574,7 +577,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 			if pid {
 				FileCopy(fileName, kTempDirectory . "Race Report\Race.data")
 
-				messageSend(kFileMessage, "Practice", "updateReportData:" . values2String(";", lapNumber, fileName), pid)
+				messageSend(kFileMessage, "Solo Center", "updateReportData:" . values2String(";", lapNumber, fileName), pid)
 			}
 			else
 				FileMove(fileName, kTempDirectory . "Race Report\Race.data")

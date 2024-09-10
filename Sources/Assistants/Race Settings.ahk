@@ -1649,6 +1649,11 @@ showRaceSettingsEditor() {
 		if hasTeamServer
 			hasTeamServer := string2Values("|", hasTeamServer)[1]
 
+		if (hasTeamServer = kTrue)
+			hasTeamServer := true
+		else if (hasTeamServer = kFalse)
+			hasTeamServer := false
+
 		if hasTeamServer {
 			if inList(A_Args, "-Team")
 				gTeamMode := "Team"

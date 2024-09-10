@@ -1,3 +1,14 @@
+## 5.8.7.0-release 09/13/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Fixed automatic pitbox request for *Automobilista 2* when a pitstop is prepared by the Engineer.
+  4. Fixed invalid lap handling and reporting in *RaceRoom Racing Experience*.
+  5. Fixed remaining session time for *RaceRoom Racing Experience*.
+  6. Fixed preselected extensions (".solo" and ".team") when saving sessions in "Solo Center" and "Team Center". Session that already have been saved using the wrong extension will be fixed by the automatic update procedure.
+  7. Full rework of the muted mode of the Assistants. The Assistants will follow a conversation, which originally has been initiated by the you, the driver, even in muted mode. And they will communicate for very important stuff like strategy adjustment by the Strategist, and so on.
+  8. The [*Assistant.Speak*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions) predicate for LLM event and action rules now supports an optional argument that lets you specify that a phrase will also be spoken in muted mode.
+  9. [Internal] Optimization for concurrent access to the session database.
+
 ## 5.8.6.0-release 09/06/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

@@ -362,21 +362,28 @@ class TeamCenter extends ConfigurationItem {
 		}
 
 		RedrawHTMLViewer() {
-			if this.iRedraw {
-				local center := TeamCenter.Instance
-				local ignore, button
+			if this.iRedraw
+				try {
+					local center := TeamCenter.Instance
+					local ignore, button
 
-				for ignore, button in ["LButton", "MButton", "RButton"]
-					if GetKeyState(button)
-						return Task.CurrentTask
+					for ignore, button in ["LButton", "MButton", "RButton"]
+						if GetKeyState(button)
+							return Task.CurrentTask
 
-				this.iRedraw := false
+					this.iRedraw := false
 
-				center.ChartViewer.Resized()
-				center.DetailsViewer.Resized()
+					center.ChartViewer.Resized()
+					center.DetailsViewer.Resized()
 
-				center.pushTask(ObjBindMethod(TeamCenter.Instance, "updateReports", true))
-			}
+					center.pushTask(ObjBindMethod(TeamCenter.Instance, "updateReports", true))
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+				finally {
+					this.iRedraw := false
+				}
 
 			return Task.CurrentTask
 		}
@@ -417,8 +424,8 @@ class TeamCenter extends ConfigurationItem {
 		}
 
 		RedrawHTMLViewer() {
-			try {
-				if this.iRedraw {
+			if this.iRedraw
+				try {
 					local ignore, button
 
 					for ignore, button in ["LButton", "MButton", "RButton"]
@@ -433,12 +440,14 @@ class TeamCenter extends ConfigurationItem {
 					this.iHTMLViewer.document.write(this.iHTML)
 					this.iHTMLViewer.document.close()
 				}
+				catch Any as exception {
+					logError(exception)
+				}
+				finally {
+					this.iRedraw := false
+				}
 
-				return Task.CurrentTask
-			}
-			catch Any {
-				return false
-			}
+			return Task.CurrentTask
 		}
 	}
 
@@ -713,22 +722,27 @@ class TeamCenter extends ConfigurationItem {
 			if (!tyreCompoundColor || (tyreCompoundColor = ""))
 				tyreCompoundColor := "Black"
 
-			this.Database.add("Tyres.Pressures",
-							  Database.Row("Weather", weather, "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
-										 , "Compound", tyreCompound, "Compound.Color", tyreCompoundColor, "Driver", driver
-										 , "Tyre.Pressure.Cold.Front.Left", null(coldPressures[1])
-										 , "Tyre.Pressure.Cold.Front.Right", null(coldPressures[2])
-										 , "Tyre.Pressure.Cold.Rear.Left", null(coldPressures[3])
-										 , "Tyre.Pressure.Cold.Rear.Right", null(coldPressures[4])
-										 , "Tyre.Pressure.Hot.Front.Left", null(hotPressures[1])
-										 , "Tyre.Pressure.Hot.Front.Right", null(hotPressures[2])
-										 , "Tyre.Pressure.Hot.Rear.Left", null(hotPressures[3])
-										 , "Tyre.Pressure.Hot.Rear.Right", null(hotPressures[4])
-										 , "Tyre.Pressure.Loss.Front.Left", null(pressuresLosses[1])
-										 , "Tyre.Pressure.Loss.Front.Right", null(pressuresLosses[2])
-										 , "Tyre.Pressure.Loss.Rear.Left", null(pressuresLosses[3])
-										 , "Tyre.Pressure.Loss.Rear.Right", null(pressuresLosses[4]))
-							, flush)
+			try {
+				this.Database.add("Tyres.Pressures",
+								  Database.Row("Weather", weather, "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
+											 , "Compound", tyreCompound, "Compound.Color", tyreCompoundColor, "Driver", driver
+											 , "Tyre.Pressure.Cold.Front.Left", null(coldPressures[1])
+											 , "Tyre.Pressure.Cold.Front.Right", null(coldPressures[2])
+											 , "Tyre.Pressure.Cold.Rear.Left", null(coldPressures[3])
+											 , "Tyre.Pressure.Cold.Rear.Right", null(coldPressures[4])
+											 , "Tyre.Pressure.Hot.Front.Left", null(hotPressures[1])
+											 , "Tyre.Pressure.Hot.Front.Right", null(hotPressures[2])
+											 , "Tyre.Pressure.Hot.Rear.Left", null(hotPressures[3])
+											 , "Tyre.Pressure.Hot.Rear.Right", null(hotPressures[4])
+											 , "Tyre.Pressure.Loss.Front.Left", null(pressuresLosses[1])
+											 , "Tyre.Pressure.Loss.Front.Right", null(pressuresLosses[2])
+											 , "Tyre.Pressure.Loss.Rear.Left", null(pressuresLosses[3])
+											 , "Tyre.Pressure.Loss.Rear.Right", null(pressuresLosses[4]))
+								, flush)
+			}
+			catch Any as exception {
+				logError(exception, true)
+			}
 
 			tyres := ["FL", "FR", "RL", "RR"]
 			types := ["Cold", "Hot"]
@@ -757,11 +771,16 @@ class TeamCenter extends ConfigurationItem {
 			if (rows.Length > 0)
 				rows[1]["Count"] := rows[1]["Count"] + count
 			else
-				this.Database.add("Tyres.Pressures.Distribution"
-								, Database.Row("Weather", weather, "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
-											 , "Driver", driver, "Compound", tyreCompound, "Compound.Color", tyreCompoundColor
-											 , "Type", type, "Tyre", tyre, "Pressure", pressure, "Count", count)
-								, flush)
+				try {
+					this.Database.add("Tyres.Pressures.Distribution"
+									, Database.Row("Weather", weather, "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
+												 , "Driver", driver, "Compound", tyreCompound, "Compound.Color", tyreCompoundColor
+												 , "Type", type, "Tyre", tyre, "Pressure", pressure, "Count", count)
+									, flush)
+				}
+				catch Any as exception {
+					logError(exception, true)
+				}
 		}
 	}
 
@@ -2625,6 +2644,9 @@ class TeamCenter extends ConfigurationItem {
 							for ignore, lap in string2Values(";", connector.GetStintLaps(stint)) {
 								if (Mod(count, 10) = 0)
 									connector.GetLap(lap)
+
+								if (this.Synchronize = "Off")
+									return
 
 								count += 1
 							}
@@ -4917,7 +4939,7 @@ class TeamCenter extends ConfigurationItem {
 
 						synchronizeMenu.Add()
 
-						synchronizeMenu.Add(translate("Off"), (*) => (this.iSynchronize := false))
+						synchronizeMenu.Add(translate("Off"), (*) => (this.iSynchronize := "Off"))
 
 						if (!this.Synchronize || (this.Synchronize = "Off"))
 							synchronizeMenu.Check(translate("Off"))
@@ -4932,7 +4954,7 @@ class TeamCenter extends ConfigurationItem {
 						synchronizeMenu.Show()
 					}
 					else if (this.Synchronize && isNumber(this.Synchronize))
-						this.iSynchronize := false
+						this.iSynchronize := "Off"
 					else
 						this.iSynchronize := 10
 
@@ -4968,7 +4990,7 @@ class TeamCenter extends ConfigurationItem {
 
 						synchronizeMenu.Add()
 
-						synchronizeMenu.Add(translate("Off"), (*) => (this.iSynchronize := false))
+						synchronizeMenu.Add(translate("Off"), (*) => (this.iSynchronize := "Off"))
 
 						if (!this.Synchronize || (this.Synchronize = "Off"))
 							synchronizeMenu.Check(translate("Off"))
@@ -4983,7 +5005,7 @@ class TeamCenter extends ConfigurationItem {
 						synchronizeMenu.Show()
 					}
 					else if (this.Synchronize && isNumber(this.Synchronize))
-						this.iSynchronize := false
+						this.iSynchronize := "Off"
 					else
 						this.iSynchronize := 10
 
@@ -8364,7 +8386,7 @@ class TeamCenter extends ConfigurationItem {
 	syncSession() {
 		local initial := !this.LastLap
 		local strategy, session, lastLap, simulator, car, track, newLaps, newData, newReports, finished, message, forcePitstopUpdate
-		local selectedLap, selectedStint, currentStint, driverSwapRequest, sessionActive, state
+		local selectedLap, selectedStint, currentStint, driverSwapRequest, synchronize, state
 
 		static hadLastLap := false
 		static nextPitstopUpdate := false
@@ -8373,14 +8395,14 @@ class TeamCenter extends ConfigurationItem {
 			session := this.SelectedSession[true]
 
 			try {
-				sessionActive := isNumber(this.Synchronize)
+				synchronize := isNumber(this.Synchronize)
 
 				this.showMessage(translate("Syncing session"))
 
 				if isLogLevel(kLogInfo)
 					logMessage(kLogInfo, translate("Syncing session"))
 
-				if sessionActive {
+				if synchronize {
 					lastLap := this.Connector.GetSessionLastLap(session)
 
 					if lastLap {
@@ -8391,7 +8413,7 @@ class TeamCenter extends ConfigurationItem {
 				else
 					lastLap := false
 
-				if (hadLastLap && !lastLap) {
+				if (synchronize && hadLastLap && !lastLap) {
 					this.initializeSession()
 
 					hadLastLap := false
@@ -8405,139 +8427,139 @@ class TeamCenter extends ConfigurationItem {
 				currentStint := this.CurrentStint
 
 				simulator := this.Connector.GetSessionValue(session, "Simulator")
-				car := this.Connector.GetSessionValue(session, "Car")
-				track := this.Connector.GetSessionValue(session, "Track")
 
-				if (simulator && (simulator != ""))
+				if (simulator && (simulator != "")) {
+					car := this.Connector.GetSessionValue(session, "Car")
+					track := this.Connector.GetSessionValue(session, "Track")
+
 					try {
 						this.initializeSimulator(simulator, car, track)
 					}
 					catch Any as exception {
 						logError(exception)
 					}
+				}
 
 				this.syncSetups()
 				this.syncTeamDrivers()
 				this.syncPlan()
 				this.syncStrategy()
 
-				if this.Synchronize {
-					if sessionActive {
+				if synchronize {
+					newLaps := false
+					newData := false
+
+					selectedLap := this.LapsListView.GetNext()
+
+					if selectedLap
+						selectedLap := (selectedLap == this.LapsListView.GetCount())
+
+					selectedStint := this.StintsListView.GetNext()
+
+					if selectedStint
+						selectedStint := (selectedStint == this.StintsListView.GetCount())
+
+					if lastLap {
+						newLaps := this.syncLaps(lastLap)
+
+						if this.syncRaceReport() {
+							newData := true
+
+							newReports := true
+						}
+						else
+							newReports := false
+
+						if this.syncPitstops(newLaps) {
+							newData := true
+
+							if this.LastLap
+								nextPitstopUpdate := (this.LastLap.Nr + 2)
+						}
+
+						if this.syncTelemetry()
+							newData := true
+
+						if this.syncTyrePressures()
+							newData := true
+
+						this.updatePitstops()
+
+						if initial {
+							try {
+								state := this.Connector.GetSessionValue(session, "Pitstop State")
+
+								if (state && (state != ""))
+									this.loadPitstopState(parseMultiMap(state))
+							}
+							catch Any as exception {
+								logError(exception)
+							}
+						}
+
+						forcePitstopUpdate := (this.LastLap && (this.LastLap.Nr = nextPitstopUpdate))
+
+						if this.syncPitstopsDetails(forcePitstopUpdate || initial)
+							newData := true
+
+						if forcePitstopUpdate
+							nextPitstopUpdate := false
+
+						if (this.LastLap && (this.SelectedReport == "Track"))
+							if this.syncTrackMap()
+								newData := true
+					}
+					else {
 						newLaps := false
 						newData := false
+						newReports := false
+					}
 
-						selectedLap := this.LapsListView.GetNext()
+					if newLaps {
+						this.showMessage(translate("Saving session"))
 
-						if selectedLap
-							selectedLap := (selectedLap == this.LapsListView.GetCount())
+						this.syncSessionStore(initial)
+					}
 
-						selectedStint := this.StintsListView.GetNext()
+					if (newData || newLaps)
+						this.updateReports()
 
-						if selectedStint
-							selectedStint := (selectedStint == this.StintsListView.GetCount())
+					if newLaps {
+						if (selectedLap && (this.SelectedDetailReport = "Lap")) {
+							this.LapsListView.Modify(this.LapsListView.GetCount(), "Select Vis")
 
-						if lastLap {
-							newLaps := this.syncLaps(lastLap)
-
-							if this.syncRaceReport() {
-								newData := true
-
-								newReports := true
-							}
-							else
-								newReports := false
-
-							if this.syncPitstops(newLaps) {
-								newData := true
-
-								if this.LastLap
-									nextPitstopUpdate := (this.LastLap.Nr + 2)
-							}
-
-							if this.syncTelemetry()
-								newData := true
-
-							if this.syncTyrePressures()
-								newData := true
-
-							this.updatePitstops()
-
-							if initial {
-								try {
-									state := this.Connector.GetSessionValue(session, "Pitstop State")
-
-									if (state && (state != ""))
-										this.loadPitstopState(parseMultiMap(state))
-								}
-								catch Any as exception {
-									logError(exception)
-								}
-							}
-
-							forcePitstopUpdate := (this.LastLap && (this.LastLap.Nr = nextPitstopUpdate))
-
-							if this.syncPitstopsDetails(forcePitstopUpdate || initial)
-								newData := true
-
-							if forcePitstopUpdate
-								nextPitstopUpdate := false
-
-							if (this.LastLap && (this.SelectedReport == "Track"))
-								if this.syncTrackMap()
-									newData := true
-						}
-						else {
-							newLaps := false
-							newData := false
-							newReports := false
+							this.showLapDetails(this.LastLap)
 						}
 
-						if newLaps {
-							this.showMessage(translate("Saving session"))
+						if (selectedStint && (this.SelectedDetailReport = "Stint")) {
+							this.StintsListView.Modify(this.StintsListView.GetCount(), "Select Vis")
 
-							this.syncSessionStore(initial)
+							this.showStintDetails(this.CurrentStint)
 						}
 
-						if (newData || newLaps)
-							this.updateReports()
-
-						if newLaps {
-							if (selectedLap && (this.SelectedDetailReport = "Lap")) {
-								this.LapsListView.Modify(this.LapsListView.GetCount(), "Select Vis")
-
-								this.showLapDetails(this.LastLap)
-							}
-
-							if (selectedStint && (this.SelectedDetailReport = "Stint")) {
-								this.StintsListView.Modify(this.StintsListView.GetCount(), "Select Vis")
-
-								this.showStintDetails(this.CurrentStint)
-							}
-
-							if (this.SelectedDetailReport = "Plan") {
-								if (currentStint != this.CurrentStint)
-									this.showPlanDetails()
-							}
-							else if (this.SelectedDetailReport = "Session")
-								this.showSessionSummary()
-							else if (this.SelectedDetailReport = "Drivers")
-								this.showDriverStatistics()
+						if (this.SelectedDetailReport = "Plan") {
+							if (currentStint != this.CurrentStint)
+								this.showPlanDetails()
 						}
-						else if newReports {
-							if (selectedLap && (this.SelectedDetailReport = "Lap")) {
-								this.LapsListView.Modify(this.LapsListView.GetCount(), "Select Vis")
+						else if (this.SelectedDetailReport = "Session")
+							this.showSessionSummary()
+						else if (this.SelectedDetailReport = "Drivers")
+							this.showDriverStatistics()
+					}
+					else if newReports {
+						if (selectedLap && (this.SelectedDetailReport = "Lap")) {
+							this.LapsListView.Modify(this.LapsListView.GetCount(), "Select Vis")
 
-								this.showLapDetails(this.LastLap)
-							}
+							this.showLapDetails(this.LastLap)
 						}
-						else if (!newLaps && !this.SessionFinished) {
-							finished := parseObject(this.Connector.GetSession(this.SelectedSession[true])).Finished
+					}
+					else if (!newLaps && !this.SessionFinished) {
+						finished := parseObject(this.Connector.GetSession(this.SelectedSession[true])).Finished
 
-							if (finished && (finished = "true")) {
-								this.saveSession()
+						if (finished && (finished = "true")) {
+							this.saveSession()
 
-								this.iSessionFinished := true
-							}
+							this.iSessionFinished := true
 						}
 					}
 				}
@@ -8555,7 +8577,7 @@ class TeamCenter extends ConfigurationItem {
 				Sleep(2000)
 			}
 
-			if sessionActive
+			if synchronize
 				try {
 					driverSwapRequest := this.Connector.GetSessionValue(session, "Race Engineer Driver Swap Request")
 
@@ -9139,10 +9161,10 @@ class TeamCenter extends ConfigurationItem {
 
 				fileName := (dirName . "\Race " . FormatTime(this.Date, "yyyy-MMM-dd"))
 
-				newFileName := (fileName . ".race")
+				newFileName := (fileName . ".team")
 
 				while FileExist(newFileName)
-					newFileName := (fileName . " (" . (A_Index + 1) . ")" . ".race")
+					newFileName := (fileName . " (" . (A_Index + 1) . ")" . ".team")
 
 				fileName := newFileName
 
@@ -9168,7 +9190,7 @@ class TeamCenter extends ConfigurationItem {
 								setMultiMapValue(info, "Creator", "Name", SessionDatabase.getUserName())
 							}
 
-							if (normalizeDirectoryPath(folder) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Race"))) {
+							if (normalizeDirectoryPath(folder) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Team"))) {
 								dataFile := temporaryFileName("Race", "zip")
 
 								try {
@@ -9185,7 +9207,7 @@ class TeamCenter extends ConfigurationItem {
 
 										file.Close()
 
-										sessionDB.writeSession(simulator, car, track, "Race", fileName, info, session, size, false, true)
+										sessionDB.writeSession(simulator, car, track, "Team", fileName, info, session, size, false, true)
 
 										return
 									}
@@ -9204,7 +9226,7 @@ class TeamCenter extends ConfigurationItem {
 
 							FileMove(dataFile, folder . "\" . fileName . ".data", 1)
 
-							writeMultiMap(folder . "\" . fileName . ".race", info)
+							writeMultiMap(folder . "\" . fileName . ".team", info)
 						}
 						catch Any as exception {
 							logError(exception)
@@ -9674,7 +9696,7 @@ class TeamCenter extends ConfigurationItem {
 					this.Window.Block()
 
 					try {
-						fileName := browseRaceSessions(this.Window, &simulator, &car, &track)
+						fileName := browseTeamSessions(this.Window, &simulator, &car, &track)
 					}
 					finally {
 						this.Window.Unblock()
@@ -9708,11 +9730,11 @@ class TeamCenter extends ConfigurationItem {
 						DirCreate(folder)
 
 						if (simulator && car && track
-						 && (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Race")))) {
+						 && (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Team")))) {
 							dataFile := temporaryFileName("Session", "zip")
 
 							try {
-								session := sessionDB.readSession(simulator, car, track, "Race", fileName, &meta, &size)
+								session := sessionDB.readSession(simulator, car, track, "Team", fileName, &meta, &size)
 
 								file := FileOpen(dataFile, "w", "")
 
@@ -9724,7 +9746,7 @@ class TeamCenter extends ConfigurationItem {
 									RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
 
 									if !FileExist(folder . "\Session.info")
-										FileCopy(directory . "\" . fileName . ".race", folder . "\Session.info")
+										FileCopy(directory . "\" . fileName . ".team", folder . "\Session.info")
 								}
 								else
 									folder := ""
@@ -9746,7 +9768,7 @@ class TeamCenter extends ConfigurationItem {
 							RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
 
 							if !FileExist(folder . "\Session.info")
-								FileCopy(directory . "\" . fileName . ".race", folder . "\Session.info")
+								FileCopy(directory . "\" . fileName . ".team", folder . "\Session.info")
 
 							deleteFile(dataFile)
 						}

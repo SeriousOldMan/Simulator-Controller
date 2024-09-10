@@ -99,9 +99,12 @@ long getRemainingTime() {
     if (map_buffer->session_iteration < 1)
         return 0;
 
-    if (map_buffer->session_type == R3E_SESSION_PRACTICE || map_buffer->session_length_format != R3E_SESSION_LENGTH_LAP_BASED) {
-        long time = (long)((map_buffer->race_session_minutes[map_buffer->session_iteration - 1] * 60) -
-						   (normalize(map_buffer->lap_time_best_self) * normalize(map_buffer->completed_laps)));
+	if (map_buffer->session_type == R3E_SESSION_PRACTICE || map_buffer->session_length_format != R3E_SESSION_LENGTH_LAP_BASED) {
+		long time = (long)map_buffer->session_time_remaining;
+		
+		if (time < 0)
+			time = (long)((map_buffer->race_session_minutes[map_buffer->session_iteration - 1] * 60) -
+						  (normalize(map_buffer->lap_time_best_self) * normalize(map_buffer->completed_laps)));
 
 		if (time > 0)
 			return time * 1000;
@@ -258,11 +261,12 @@ extern __declspec(dllexport) int __stdcall call(char* request, char* result, int
 				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeIntOption(result, ".Position=", position, &pos);
 				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeIntOption(result, ".Laps=", vehicle.completed_laps, &pos);
 				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeFloatOption(result, ".Lap.Running=", (float)((double)(vehicle.lap_distance / map_buffer->lap_distance) * map_buffer->lap_distance_fraction), &pos);
-				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeString(result, vehicle.current_lap_valid ? "true\n" : "false\n", &pos);
+				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeStringOption(result, ".Lap.Running.Valid=", vehicle.current_lap_valid ? "true\n" : "false\n", &pos);
+				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeIntOption(result, ".Lap.Running.Time=", (long)(vehicle.lap_time_current_self * 1000), &pos);
 
-				long sector1Time = ((long)vehicle.sector_time_previous_self[0] * 1000);
-				long sector2Time = ((long)vehicle.sector_time_previous_self[1] * 1000);
-				long sector3Time = ((long)vehicle.sector_time_previous_self[2] * 1000);
+				long sector1Time = (long)(vehicle.sector_time_previous_self[0] * 1000);
+				long sector2Time = (long)(vehicle.sector_time_previous_self[1] * 1000);
+				long sector3Time = (long)(vehicle.sector_time_previous_self[2] * 1000);
 
 				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeIntOption(result, ".Time=", sector1Time + sector2Time + sector3Time, &pos);
 				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeString(result, ".Time.Sectors=", &pos);

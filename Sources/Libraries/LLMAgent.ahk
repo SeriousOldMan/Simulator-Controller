@@ -263,7 +263,15 @@ class EventBooster extends AgentBooster {
 											   , false, &calls := [])
 
 					if (calls.Length > 0) {
-						Task.startTask(() => FileAppend(translate("-- Event --------") . "`n`n" . ((event.Name . ":" . event.Event) . " -> " . trigger) . "`n`n" . translate("-- " . translate("Reasoning") . " ---------") . "`n`n" . values2String("`n", collect(calls, printCall)*) . "`n`n", this.Transcript, "UTF-16"), 0, kLowPriority)
+						Task.startTask(() {
+							local directory
+							
+							SplitPath(this.Transcript, , &directory)
+							
+							DirCreate(directory)
+							
+							FileAppend(translate("-- Event --------") . "`n`n" . ((event.Name . ":" . event.Event) . " -> " . trigger) . "`n`n" . translate("-- " . translate("Reasoning") . " ---------") . "`n`n" . values2String("`n", collect(calls, printCall)*) . "`n`n", this.Transcript, "UTF-16")
+						}, 0, kLowPriority)
 
 						return true
 					}

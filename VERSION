@@ -2,7 +2,7 @@
 Version=5.8.7.0-dev
 Target=5.8.7.0-release
 Date=09/10/2024
-Download=
+Download=https://www.dropbox.com/scl/fi/psnrh88mshyfs75euvnah/SImulator-Controller-5.8.7.0-dev.zip?rlkey=v8cg74br5l30wtqmxkfzbmchy&st=8lk4ovjf&dl=1
 Changes=Fixed pitstop request for AMS2, Fixed valid lap handling in RaceRoom Racing Experience, Fixed extension for session saving "Solo Center" and "Team Center", Fixed muted mode of the Assistants, Muted support for Assistant.Speak, Fixed remaining session time for R3E, Better handling of database concurrent access
 Components=Media->5.6.1,Configuration->5.8.6,Utilities->5.4.8
 [Release]

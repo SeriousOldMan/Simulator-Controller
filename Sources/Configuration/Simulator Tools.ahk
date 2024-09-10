@@ -1745,43 +1745,8 @@ updateInstallationForV500() {
 	}
 }
 
-updateConfigurationForV586() {
-	local ignore, simulator, car, track, fileName, text
-
-	if FileExist(kUserConfigDirectory . "Application Settings.ini") {
-		text := FileRead(kUserConfigDirectory . "Application Settings.ini", "`n")
-
-		text := StrReplace(text, "Race Center", "Team Center")
-		text := StrReplace(text, "Practice Center", "Solo Center")
-
-		deleteFile(kUserConfigDirectory . "Application Settings.ini")
-
-		FileAppend(text, kUserConfigDirectory . "Application Settings.ini")
-	}
-
-	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
-		text := FileRead(kUserHomeDirectory . "Setup\Setup.data", "`n")
-
-		text := StrReplace(text, "RaceCenter", "TeamCenter")
-		text := StrReplace(text, "Race Center", "Team Center")
-		text := StrReplace(text, "PracticeCenter", "SoloCenter")
-		text := StrReplace(text, "Practice Center", "Solo Center")
-
-		deleteFile(kUserHomeDirectory . "Setup\Setup.data")
-
-		FileAppend(text, kUserHomeDirectory . "Setup\Setup.data", "UTF-16")
-	}
-
-	if FileExist(kUserConfigDirectory . "Startup.settings") {
-		text := FileRead(kUserConfigDirectory . "Startup.settings", "`n")
-
-		text := StrReplace(text, "Race Center", "Team Center")
-		text := StrReplace(text, "Practice Center", "Solo Center")
-
-		deleteFile(kUserConfigDirectory . "Startup.settings")
-
-		FileAppend(text, kUserConfigDirectory . "Startup.settings", "UTF-16")
-	}
+renameSessionExtensions() {
+	local simulator, car, track, fileName, name
 
 	loop Files, kDatabaseDirectory . "User\*.*", "D" {
 		simulator := A_LoopFileName
@@ -1821,19 +1786,64 @@ updateConfigurationForV586() {
 						logError(exception, true)
 					}
 
-					try {
-						loop Files, fileName . "Solo Sessions\*.practice", "F" {
-							SplitPath(A_LoopFileName, , , , &name)
+				loop Files, fileName . "Solo Sessions\*.practice", "F" {
+					SplitPath(A_LoopFileName, , , , &name)
 
-							FileMove(A_LoopFileFullPath, fileName . "Solo Sessions\" . name . ".solo")
-						}
+					try {
+						FileMove(A_LoopFileFullPath, fileName . "Solo Sessions\" . name . ".solo")
 					}
 					catch Any as exception {
 						logError(exception, true)
 					}
+				}
 			}
 		}
 	}
+}
+
+updateConfigurationForV587() {
+	renameSessionExtensions()
+}
+
+updateConfigurationForV586() {
+	local ignore, text
+
+	if FileExist(kUserConfigDirectory . "Application Settings.ini") {
+		text := FileRead(kUserConfigDirectory . "Application Settings.ini", "`n")
+
+		text := StrReplace(text, "Race Center", "Team Center")
+		text := StrReplace(text, "Practice Center", "Solo Center")
+
+		deleteFile(kUserConfigDirectory . "Application Settings.ini")
+
+		FileAppend(text, kUserConfigDirectory . "Application Settings.ini")
+	}
+
+	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
+		text := FileRead(kUserHomeDirectory . "Setup\Setup.data", "`n")
+
+		text := StrReplace(text, "RaceCenter", "TeamCenter")
+		text := StrReplace(text, "Race Center", "Team Center")
+		text := StrReplace(text, "PracticeCenter", "SoloCenter")
+		text := StrReplace(text, "Practice Center", "Solo Center")
+
+		deleteFile(kUserHomeDirectory . "Setup\Setup.data")
+
+		FileAppend(text, kUserHomeDirectory . "Setup\Setup.data", "UTF-16")
+	}
+
+	if FileExist(kUserConfigDirectory . "Startup.settings") {
+		text := FileRead(kUserConfigDirectory . "Startup.settings", "`n")
+
+		text := StrReplace(text, "Race Center", "Team Center")
+		text := StrReplace(text, "Practice Center", "Solo Center")
+
+		deleteFile(kUserConfigDirectory . "Startup.settings")
+
+		FileAppend(text, kUserConfigDirectory . "Startup.settings", "UTF-16")
+	}
+
+	renameSessionExtensions()
 }
 
 updateConfigurationForV580() {

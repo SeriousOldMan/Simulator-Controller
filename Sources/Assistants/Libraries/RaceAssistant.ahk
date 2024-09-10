@@ -506,7 +506,7 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	Speaker[force := false] {
+	Speaker[force := true] {
 		Get {
 			return this.VoiceManager.Speaker[force]
 		}
@@ -776,7 +776,7 @@ class RaceAssistant extends ConfigurationItem {
 
 		configuration := newMultiMap()
 
-		setMultiMapValue(configuration, "Voice", "Speaker", this.Speaker[true])
+		setMultiMapValue(configuration, "Voice", "Speaker", this.Speaker)
 		setMultiMapValue(configuration, "Voice", "Listener", this.Listener)
 		setMultiMapValue(configuration, "Voice", "Muted", this.Muted)
 
@@ -3993,11 +3993,11 @@ askAssistant(context, question) {
 
 Assistant_Ask := askAssistant
 
-speakAssistant(context, message) {
+speakAssistant(context, message, force := false) {
 	local assistant := context.KnowledgeBase.RaceAssistant
 	local speaker, ignore, part
 
-	if assistant.Speaker[true] {
+	if assistant.Speaker[force] {
 		speaker := assistant.getSpeaker()
 
 		if speaker.Phrases.Has(message)

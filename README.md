@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.8.7.0-dev](https://www.dropbox.com/scl/fi/psnrh88mshyfs75euvnah/SImulator-Controller-5.8.7.0-dev.zip?rlkey=v8cg74br5l30wtqmxkfzbmchy&st=8lk4ovjf&dl=1) (Early Build for 5.8.7. Changes: Fixed pitstop request for AMS2, Fixed valid lap handling in RaceRoom Racing Experience, Fixed extension for session saving "Solo Center" and "Team Center", Fixed muted mode of the Assistants, Muted support for Assistant.Speak, Fixed remaining session time for R3E, Better handling of database concurrent access, "Strategy Workbench" remembers selected data type.)
+[5.8.7.0-beta](https://www.dropbox.com/scl/fi/2ilep67asaag0ixwwbf8f/Simulator-Controller-5.8.7.0-beta.zip?rlkey=t8ocrar9p4wagtasbn07d2mtn&st=xxwsuozk&dl=1) (Test Build for 5.8.7. Changes: Fixed pitstop request for AMS2, Fixed valid lap handling in RaceRoom Racing Experience, Fixed extension for session saving "Solo Center" and "Team Center", Fixed muted mode of the Assistants, Muted support for Assistant.Speak, Fixed remaining session time for R3E, Better handling of database concurrent access, "Strategy Workbench" remembers selected data type.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-587) of this version and all the versions you might have skipped, before installing and using this version.
 

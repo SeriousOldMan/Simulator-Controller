@@ -34,8 +34,8 @@
 
 #Include "..\Libraries\HTMLViewer.ahk"
 #Include "..\Libraries\Task.ahk"
-#Include "Libraries\RaceReportViewer.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
+#Include "Libraries\RaceReportViewer.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

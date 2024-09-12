@@ -367,7 +367,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 	createGui(configuration) {
 		local workbench := this
-		local compound, simulators, simulator, car, track, weather, choices, chosen, schema
+		local compound, simulators, simulator, car, track, weather, choices, chosen, schema, settings
 		local x, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, w12, w3
 		local airTemperature, trackTemperature
 		local workbenchGui, workbenchTab
@@ -1073,7 +1073,13 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.SetFont("Norm", "Arial")
 
-		workbenchGui.Add("DropDownList", "x12 yp+28 w76 Choose1 vdataTypeDropDown  +0x200", collect(["Electronics", "Tyres", "-----------------", "Cleanup Data"], translate)).OnEvent("Change", chooseDataType)
+		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+		this.iSelectedDataType := getMultiMapValue(settings, "Strategy Workbench", "Data Type", "Electronics")
+
+		chosen := inList(["Electronics", "Tyres"], this.SelectedDataType)
+
+		workbenchGui.Add("DropDownList", "x12 yp+28 w76 Choose" . chosen . " vdataTypeDropDown  +0x200", collect(["Electronics", "Tyres", "-----------------", "Cleanup Data"], translate)).OnEvent("Change", chooseDataType)
 
 		this.iDataListView := workbenchGui.Add("ListView", "x12 yp+24 w170 h172 W:Grow(0.1) H:Grow(0.2) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "Map", "#"], translate))
 		this.iDataListView.OnEvent("Click", noSelect)
@@ -2245,7 +2251,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	loadDataType(dataType, force := false) {
-		local tyreCompound, telemetryDB, ignore, column, categories, field, category, value
+		local tyreCompound, telemetryDB, ignore, column, categories, field, category, value, settings
 		local driverNames, index, names, schema, availableCompounds, settings, axis, value
 
 		if (force || (this.SelectedDataType != dataType)) {
@@ -2253,6 +2259,12 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			this.iSelectedDataType := dataType
 			this.iSelectedDrivers := false
+
+			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+			setMultiMapValue(settings, "Strategy Workbench", "Data Type", dataType)
+
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
 			telemetryDB := TelemetryDatabase(this.SelectedSimulator, this.SelectedCar
 										   , this.SelectedTrack, this.SelectedDrivers)

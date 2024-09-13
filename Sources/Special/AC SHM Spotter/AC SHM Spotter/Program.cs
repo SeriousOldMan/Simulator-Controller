@@ -35,6 +35,8 @@ namespace ACSHMSpotter {
 
                 spotter.Run(true, false, false);
             }
+            else if (args.Length > 0 && args[0] == "-Telemetry")
+                spotter.Run(true, false, false, args[2]);
             else
             {
                 spotter.initializeSpotter(args);

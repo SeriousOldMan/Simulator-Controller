@@ -6,6 +6,7 @@ Small parts original by: The Iron Wolf (vleonavicius@hotmail.com; thecrewchief.o
 using RF2SHMSpotter.rFactor2Data;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
@@ -1778,6 +1779,40 @@ namespace RF2SHMSpotter {
             if (args.Length > 4)
                 semFileName = args[4];
         }
+		
+        string telemetryDirectory = "";
+
+        void collectCarTelemetry(ref rF2VehicleScoring playerScoring) {
+			int playerID = playerScoring.mID;
+			StreamWriter output = null;
+
+            try {
+				output = new StreamWriter(telemetryDirectory + "\\Lap " + (playerScoring.mTotalLaps + 1) + ".tlm", true);
+
+				output.Write(playerScoring.mLapDist + ";");
+				output.Write((float)telemetry.mVehicles[playerID].mFilteredThrottle + ";");
+				output.Write((float)telemetry.mVehicles[playerID].mFilteredBrake + ";");
+				output.Write((float)telemetry.mVehicles[playerID].mFilteredSteering + ";");
+				output.Write((float)telemetry.mVehicles[playerID].mGear + ";");
+				output.Write((float)telemetry.mVehicles[playerID].mEngineRPM + ";");
+				output.Write(vehicleSpeed(ref playerScoring) + ";");
+
+                output.Write("n/a;");
+                output.WriteLine("n/a");
+
+				output.Close();
+			}
+			catch (Exception) {
+				try {
+					if (output != null)
+						output.Close();
+				}
+				catch (Exception) {
+				}
+
+				// retry next round...
+			}
+		}
 
         bool started = false;
 
@@ -1793,10 +1828,13 @@ namespace RF2SHMSpotter {
 			return true;
 		}
 
-		public void Run(bool mapTrack, bool positionTrigger, bool analyzeTelemetry) {
+		public void Run(bool mapTrack, bool positionTrigger, bool analyzeTelemetry, string telemetryFolder = "") {
             bool running = false;
 			int countdown = 4000;
 			long counter = 0;
+			bool carTelemetry = (telemetryFolder.Length > 0);
+
+			telemetryDirectory = telemetryFolder;
 
             while (true) {
 				counter++;
@@ -1843,10 +1881,10 @@ namespace RF2SHMSpotter {
 						{
 							bool startGo = (scoring.mScoringInfo.mGamePhase == (byte)rF2GamePhase.GreenFlag);
 
-                            if (!greenFlagReported && (counter > 8000))
-                            	greenFlagReported = true;
+							if (!greenFlagReported && (counter > 8000))
+								greenFlagReported = true;
 
-                            if (!running)
+							if (!running)
 							{
 								countdown -= 1;
 
@@ -1856,30 +1894,35 @@ namespace RF2SHMSpotter {
 
 							if (running)
 							{
-								if (extended.mSessionStarted != 0 && scoring.mScoringInfo.mGamePhase < (byte)SessionStopped &&
-									playerScoring.mPitState < (byte)Entering)
-								{
-									updateTopSpeed(ref playerScoring);
+                                if (carTelemetry)
+                                    collectCarTelemetry(ref playerScoring);
+                                else
+                                {
+                                    if (extended.mSessionStarted != 0 && scoring.mScoringInfo.mGamePhase < (byte)SessionStopped &&
+										playerScoring.mPitState < (byte)Entering)
+									{
+										updateTopSpeed(ref playerScoring);
 
-									cycle += 1;
+										cycle += 1;
 
-									if (!startGo || !greenFlag())
-                                        if (checkAccident(ref playerScoring))
-                                            wait = false;
-										else if(checkFlagState(ref playerScoring) || checkPositions(ref playerScoring))
-											wait = false;
-										else
-											wait = !checkPitWindow(ref playerScoring);
-								}
-								else
-								{
-									longitudinalRearDistance = 5;
+										if (!startGo || !greenFlag())
+											if (checkAccident(ref playerScoring))
+												wait = false;
+											else if (checkFlagState(ref playerScoring) || checkPositions(ref playerScoring))
+												wait = false;
+											else
+												wait = !checkPitWindow(ref playerScoring);
+									}
+									else
+									{
+										longitudinalRearDistance = 5;
 
-									lastSituation = CLEAR;
-									carBehind = false;
-									carBehindReported = false;
+										lastSituation = CLEAR;
+										carBehind = false;
+										carBehindReported = false;
 
-									lastFlagState = 0;
+										lastFlagState = 0;
+									}
 								}
                             }
                             else
@@ -1888,9 +1931,7 @@ namespace RF2SHMSpotter {
                         else
                             wait = true;
 
-                        if (analyzeTelemetry)
-                            Thread.Sleep(10);
-                        else if (positionTrigger)
+                        if (analyzeTelemetry || positionTrigger || carTelemetry)
                             Thread.Sleep(10);
                         else if (wait)
 							Thread.Sleep(50);

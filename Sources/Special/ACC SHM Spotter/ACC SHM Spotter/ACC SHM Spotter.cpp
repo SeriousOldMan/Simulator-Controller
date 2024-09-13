@@ -2016,6 +2016,59 @@ void checkCoordinates() {
 	}
 }
 
+string telemetryDirectory = "";
+
+void collectCarTelemetry() {
+	if (trackSplineReady) {
+		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+		int carID = gf->playerCarID;
+
+		for (int i = 0; i < gf->activeCars; i++)
+			if (gf->carID[i] == carID) {
+				carID = i;
+
+				break;
+			}
+
+		ofstream output;
+
+		if (trackSplineBuilding)
+			updateTrackSpline();
+		else
+			startTrackSplineBuilder(carID);
+
+		float driverRunning = getRunning(carID);
+
+		if (driverRunning >= 0)
+			try {
+				SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
+			
+				output.open(telemetryDirectory + "\\Lap " + to_string(gf->completedLaps + 1) + ".tlm", ios::out | ios::app);
+				
+				output << (driverRunning * trackLength) << ";"
+					   << (pf->gas >= 0 ? pf->gas : 0) << ";"
+					   << (pf->brake >= 0 ? pf->brake : 0) << ";"
+					   << (pf->steerAngle >= 0 ? pf->steerAngle : 0) << ";"
+					   << pf->gear << ";"
+					   << pf->rpms << ";"
+					   << pf->speedKmh << ";"
+					   << pf->tc << ";"
+					   << pf->abs << endl;
+
+				output.close();
+			}
+			catch (...) {
+				try {
+					output.close();
+				}
+				catch (...) {
+				}
+
+				// retry next round...
+			}
+	}
+}
+
 bool started = false;
 
 inline const bool active() {
@@ -2044,6 +2097,7 @@ int main(int argc, char* argv[])
 	bool calibrateTelemetry = false;
 	bool analyzeTelemetry = false;
 	bool positionTrigger = false;
+	bool carTelemetry = false;
 
 	char* soundsDirectory = 0;
 	char* audioDevice = 0;
@@ -2053,6 +2107,7 @@ int main(int argc, char* argv[])
 		analyzeTelemetry = calibrateTelemetry || (strcmp(argv[1], "-Analyze") == 0);
 		mapTrack = (strcmp(argv[1], "-Map") == 0);
 		positionTrigger = (strcmp(argv[1], "-Trigger") == 0);
+		carTelemetry = (strcmp(argv[1], "-Telemetry") == 0);
 
 		if (mapTrack && argc >  2)
 			circuit = (strcmp(argv[2], "Circuit") == 0);
@@ -2095,6 +2150,10 @@ int main(int argc, char* argv[])
 
 				numCoordinates += 1;
 			}
+		}
+		else if (carTelemetry) {
+			trackLength = atof(argv[2]);
+			telemetryDirectory = argv[3];
 		}
 		else {
 			if (argc > 1)
@@ -2171,32 +2230,36 @@ int main(int argc, char* argv[])
 			}
 
 			if (running) {
-				if ((sessionDuration == 0) && (gf->sessionTimeLeft > 0))
-					sessionDuration = gf->sessionTimeLeft;
-
-				if ((gf->status == AC_LIVE) && !gf->isInPit && !gf->isInPitLane) {
-					updateTopSpeed();
-
-					cycle += 1;
-
-					if (!startGo || !greenFlag())
-						if (checkAccident())
-							wait = false;
-						else if (checkFlagState() || checkPositions())
-							wait = false;
-						else
-							wait = !checkPitWindow();
-				}
+				if (carTelemetry)
+					collectCarTelemetry();
 				else {
-					longitudinalRearDistance = 5;
+					if ((sessionDuration == 0) && (gf->sessionTimeLeft > 0))
+						sessionDuration = gf->sessionTimeLeft;
 
-					lastSituation = CLEAR;
-					carBehind = false;
-					carBehindLeft = false;
-					carBehindRight = false;
-					carBehindReported = false;
+					if ((gf->status == AC_LIVE) && !gf->isInPit && !gf->isInPitLane) {
+						updateTopSpeed();
 
-					lastFlagState = 0;
+						cycle += 1;
+
+						if (!startGo || !greenFlag())
+							if (checkAccident())
+								wait = false;
+							else if (checkFlagState() || checkPositions())
+								wait = false;
+							else
+								wait = !checkPitWindow();
+					}
+					else {
+						longitudinalRearDistance = 5;
+
+						lastSituation = CLEAR;
+						carBehind = false;
+						carBehindLeft = false;
+						carBehindRight = false;
+						carBehindReported = false;
+
+						lastFlagState = 0;
+					}
 				}
 			}
 			else
@@ -2205,9 +2268,7 @@ int main(int argc, char* argv[])
 		else
 			wait = true;
 		
-		if (analyzeTelemetry)
-			Sleep(10);
-		else if (positionTrigger)
+		if (analyzeTelemetry || positionTrigger || carTelemetry)
 			Sleep(10);
 		else if (wait)
 			Sleep(50);

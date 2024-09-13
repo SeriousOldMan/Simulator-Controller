@@ -1431,6 +1431,39 @@ void checkCoordinates(const SharedMemory* sharedData) {
 	}
 }
 
+std::string telemetryDirectory = "";
+
+void collectCarTelemetry(const SharedMemory* sharedData) {
+	ParticipantInfo vehicle = sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex];
+	std::ofstream output;
+
+	try {
+		output.open(telemetryDirectory + "\\Lap " + std::to_string(vehicle.mLapsCompleted + 1) + ".tlm",
+					std::ios::out | std::ios::app);
+
+		output << vehicle.mCurrentLapDistance << ";"
+			   << sharedData->mThrottle << ";"
+			   << sharedData->mBrake << ";"
+			   << sharedData->mSteering << ";"
+			   << (sharedData->mGear * 3.6) << ";"
+			   << (sharedData->mRpm * 3.6) << ";"
+			   << (sharedData->mSpeed * 3.6) << ";"
+			   << "n/a" << ";"
+			   << "n/a" << std::endl;
+
+		output.close();
+	}
+	catch (...) {
+		try {
+			output.close();
+		}
+		catch (...) {
+		}
+
+		// retry next round...
+	}
+}
+
 bool started = false;
 
 inline const bool active(SharedMemory* shm) {
@@ -1456,6 +1489,7 @@ int main(int argc, char* argv[]) {
 	bool positionTrigger = false;
 	bool calibrateTelemetry = false;
 	bool analyzeTelemetry = false;
+	bool carTelemetry = false;
 
 	char* soundsDirectory = "";
 	char* audioDevice = "";
@@ -1465,6 +1499,7 @@ int main(int argc, char* argv[]) {
 		analyzeTelemetry = calibrateTelemetry || (strcmp(argv[1], "-Analyze") == 0);
 		mapTrack = (strcmp(argv[1], "-Map") == 0);
 		positionTrigger = (strcmp(argv[1], "-Trigger") == 0);
+		carTelemetry = (strcmp(argv[1], "-Telemetry") == 0);
 
 		if (mapTrack && argc > 2)
 			circuit = (strcmp(argv[2], "Circuit") == 0);
@@ -1507,6 +1542,11 @@ int main(int argc, char* argv[]) {
 
 				numCoordinates += 1;
 			}
+		}
+		else if (carTelemetry) {
+			char* trackLength = argv[2];
+
+			telemetryDirectory = argv[3];
 		}
 		else {
 			if (argc > 1)
@@ -1589,7 +1629,7 @@ int main(int argc, char* argv[]) {
 
 				if (!greenFlagReported && (counter > 8000))
 					greenFlagReported = true;
-				
+
 				if (!running) {
 					countdown -= 1;
 
@@ -1597,29 +1637,33 @@ int main(int argc, char* argv[]) {
 				}
 
 				if (running) {
-					if (localCopy->mGameState != GAME_INGAME_PAUSED && localCopy->mPitMode == PIT_MODE_NONE) {
-						updateTopSpeed(localCopy);
-
-						cycle += 1;
-
-						if (!startGo || !greenFlag(localCopy))
-							if (checkAccident(localCopy))
-								wait = false;
-							else if (checkFlagState(localCopy) || checkPositions(localCopy))
-								wait = false;
-							else
-								wait = !checkPitWindow(localCopy);
-					}
+					if (carTelemetry)
+						collectCarTelemetry(sharedData);
 					else {
-						longitudinalRearDistance = 5;
+						if (localCopy->mGameState != GAME_INGAME_PAUSED && localCopy->mPitMode == PIT_MODE_NONE) {
+							updateTopSpeed(localCopy);
 
-						lastSituation = CLEAR;
-						carBehind = false;
-						carBehindLeft = false;
-						carBehindRight = false;
-						carBehindReported = false;
+							cycle += 1;
 
-						lastFlagState = 0;
+							if (!startGo || !greenFlag(localCopy))
+								if (checkAccident(localCopy))
+									wait = false;
+								else if (checkFlagState(localCopy) || checkPositions(localCopy))
+									wait = false;
+								else
+									wait = !checkPitWindow(localCopy);
+						}
+						else {
+							longitudinalRearDistance = 5;
+
+							lastSituation = CLEAR;
+							carBehind = false;
+							carBehindLeft = false;
+							carBehindRight = false;
+							carBehindReported = false;
+
+							lastFlagState = 0;
+						}
 					}
 				}
 				else
@@ -1628,9 +1672,7 @@ int main(int argc, char* argv[]) {
 			else
 				wait = true;
 
-			if (analyzeTelemetry)
-				Sleep(10);
-			else if (positionTrigger)
+			if (analyzeTelemetry || positionTrigger || carTelemetry)
 				Sleep(10);
 			else if (wait)
 				Sleep(50);

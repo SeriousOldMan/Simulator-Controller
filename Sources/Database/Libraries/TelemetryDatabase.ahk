@@ -38,6 +38,7 @@ global kTelemetrySchemas := CaseInsenseMap("Electronics", ["Weather", "Temperatu
 												   , "Tyre.Wear.Rear.Left", "Tyre.Wear.Rear.Right", "Driver"
 												   , "Identifier", "Synchronized"])
 
+
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
@@ -342,6 +343,9 @@ class TelemetryDatabase extends SessionDatabase {
 											     , "Identifier", identifier ? identifier : kNull)
 										  , true)
 			}
+			catch Any as exception {
+				logError(exception, true)
+			}
 			finally {
 				if this.Shared
 					db.unlock("Electronics")
@@ -381,6 +385,9 @@ class TelemetryDatabase extends SessionDatabase {
 										   , "Tyre.Wear.Rear.Right", valueOrNull(wearRR)
 										   , "Identifier", identifier ? identifier : kNull)
 								, true)
+			}
+			catch Any as exception {
+				logError(exception, true)
 			}
 			finally {
 				if this.Shared

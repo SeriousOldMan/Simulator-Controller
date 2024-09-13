@@ -313,29 +313,36 @@ class SoloCenter extends ConfigurationItem {
 		__New(arguments*) {
 			super.__New(arguments*)
 
-			Task.startTask(ObjBindMethod(this, "RedrawHTMLViwer"), 500, kHighPriority)
+			Task.startTask(ObjBindMethod(this, "RedrawHTMLViewer"), 500, kHighPriority)
 		}
 
 		Resize(deltaWidth, deltaHeight) {
 			this.iRedraw := true
 		}
 
-		RedrawHTMLViwer() {
-			if this.iRedraw {
-				local center := SoloCenter.Instance
-				local ignore, button
+		RedrawHTMLViewer() {
+			if this.iRedraw
+				try {
+					local center := SoloCenter.Instance
+					local ignore, button
 
-				for ignore, button in ["LButton", "MButton", "RButton"]
-					if GetKeyState(button)
-						return Task.CurrentTask
+					for ignore, button in ["LButton", "MButton", "RButton"]
+						if GetKeyState(button)
+							return Task.CurrentTask
 
-				this.iRedraw := false
+					this.iRedraw := false
 
-				center.ChartViewer.Resized()
-				center.DetailsViewer.Resized()
+					center.ChartViewer.Resized()
+					center.DetailsViewer.Resized()
 
-				center.pushTask(ObjBindMethod(SoloCenter.Instance, "updateReports", true))
-			}
+					center.pushTask(ObjBindMethod(SoloCenter.Instance, "updateReports", true))
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+				finally {
+					this.iRedraw := false
+				}
 
 			return Task.CurrentTask
 		}
@@ -376,8 +383,8 @@ class SoloCenter extends ConfigurationItem {
 		}
 
 		RedrawHTMLViewer() {
-			try {
-				if this.iRedraw {
+			if this.iRedraw
+				try {
 					local ignore, button
 
 					for ignore, button in ["LButton", "MButton", "RButton"]
@@ -392,12 +399,14 @@ class SoloCenter extends ConfigurationItem {
 					this.iHTMLViewer.document.write(this.iHTML)
 					this.iHTMLViewer.document.close()
 				}
+				catch Any as exception {
+					logError(exception)
+				}
+				finally {
+					this.iRedraw := false
+				}
 
-				return Task.CurrentTask
-			}
-			catch Any {
-				return false
-			}
+			return Task.CurrentTask
 		}
 	}
 
@@ -623,22 +632,27 @@ class SoloCenter extends ConfigurationItem {
 			if (!tyreCompoundColor || (tyreCompoundColor = ""))
 				tyreCompoundColor := "Black"
 
-			this.Database.add("Tyres.Pressures",
-							  Database.Row("Weather", weather, "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
-										 , "Compound", tyreCompound, "Compound.Color", tyreCompoundColor, "Driver", driver
-										 , "Tyre.Pressure.Cold.Front.Left", null(coldPressures[1])
-										 , "Tyre.Pressure.Cold.Front.Right", null(coldPressures[2])
-										 , "Tyre.Pressure.Cold.Rear.Left", null(coldPressures[3])
-										 , "Tyre.Pressure.Cold.Rear.Right", null(coldPressures[4])
-										 , "Tyre.Pressure.Hot.Front.Left", null(hotPressures[1])
-										 , "Tyre.Pressure.Hot.Front.Right", null(hotPressures[2])
-										 , "Tyre.Pressure.Hot.Rear.Left", null(hotPressures[3])
-										 , "Tyre.Pressure.Hot.Rear.Right", null(hotPressures[4])
-										 , "Tyre.Pressure.Loss.Front.Left", null(pressuresLosses[1])
-										 , "Tyre.Pressure.Loss.Front.Right", null(pressuresLosses[2])
-										 , "Tyre.Pressure.Loss.Rear.Left", null(pressuresLosses[3])
-										 , "Tyre.Pressure.Loss.Rear.Right", null(pressuresLosses[4]))
-							, true)
+			try {
+				this.Database.add("Tyres.Pressures",
+								  Database.Row("Weather", weather, "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
+											 , "Compound", tyreCompound, "Compound.Color", tyreCompoundColor, "Driver", driver
+											 , "Tyre.Pressure.Cold.Front.Left", null(coldPressures[1])
+											 , "Tyre.Pressure.Cold.Front.Right", null(coldPressures[2])
+											 , "Tyre.Pressure.Cold.Rear.Left", null(coldPressures[3])
+											 , "Tyre.Pressure.Cold.Rear.Right", null(coldPressures[4])
+											 , "Tyre.Pressure.Hot.Front.Left", null(hotPressures[1])
+											 , "Tyre.Pressure.Hot.Front.Right", null(hotPressures[2])
+											 , "Tyre.Pressure.Hot.Rear.Left", null(hotPressures[3])
+											 , "Tyre.Pressure.Hot.Rear.Right", null(hotPressures[4])
+											 , "Tyre.Pressure.Loss.Front.Left", null(pressuresLosses[1])
+											 , "Tyre.Pressure.Loss.Front.Right", null(pressuresLosses[2])
+											 , "Tyre.Pressure.Loss.Rear.Left", null(pressuresLosses[3])
+											 , "Tyre.Pressure.Loss.Rear.Right", null(pressuresLosses[4]))
+								, true)
+			}
+			catch Any as exception {
+				logError(exception, true)
+			}
 
 			tyres := ["FL", "FR", "RL", "RR"]
 			types := ["Cold", "Hot"]
@@ -667,11 +681,16 @@ class SoloCenter extends ConfigurationItem {
 			if (rows.Length > 0)
 				rows[1]["Count"] := rows[1]["Count"] + count
 			else
-				this.Database.add("Tyres.Pressures.Distribution"
-								, Database.Row("Weather", weather, "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
-											 , "Driver", driver, "Compound", tyreCompound, "Compound.Color", tyreCompoundColor
-											 , "Type", type, "Tyre", tyre, "Pressure", pressure, "Count", count)
-								, flush)
+				try {
+					this.Database.add("Tyres.Pressures.Distribution"
+									, Database.Row("Weather", weather, "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
+												 , "Driver", driver, "Compound", tyreCompound, "Compound.Color", tyreCompoundColor
+												 , "Type", type, "Tyre", tyre, "Pressure", pressure, "Count", count)
+									, flush)
+				}
+				catch Any as exception {
+					logError(exception, true)
+				}
 		}
 	}
 
@@ -1259,6 +1278,11 @@ class SoloCenter extends ConfigurationItem {
 				chooseRun(true, listView, line)
 		}
 
+		checkRun(listView, line, selected) {
+			if (line && (center.SessionExported || center.SessionLoaded))
+				listView.Modify(line, "-Check")
+		}
+
 		chooseRun(selected, listView, line, *) {
 			if line {
 				wasDouble := false
@@ -1760,6 +1784,7 @@ class SoloCenter extends ConfigurationItem {
 		this.iRunsListView.OnEvent("Click", chooseRun.Bind(false))
 		this.iRunsListView.OnEvent("DoubleClick", openRun)
 		this.iRunsListView.OnEvent("ItemSelect", selectRun)
+		this.iRunsListView.OnEvent("ItemCheck", checkRun)
 
 		centerGui.Add("Text", "x24 yp+180 w80 h23 Y:Move(0.5)", translate("Notes"))
 		centerGui.Add("Edit", "x104 yp w497 h90 Y:Move(0.5) H:Grow(0.5) vrunNotesEdit").OnEvent("Change", updateNotes)
@@ -4560,7 +4585,7 @@ class SoloCenter extends ConfigurationItem {
 			if copy {
 				if (simulator && car && track) {
 					dirName := (SessionDatabase.DatabasePath . "User\" . SessionDatabase.getSimulatorCode(simulator)
-							  . "\" . car . "\" . track . "\Practice Sessions")
+							  . "\" . car . "\" . track . "\Solo Sessions")
 
 					DirCreate(dirName)
 				}
@@ -4571,10 +4596,10 @@ class SoloCenter extends ConfigurationItem {
 
 				fileName := (dirName . "\Practice " . FormatTime(this.Date, "yyyy-MMM-dd"))
 
-				newFileName := (fileName . ".practice")
+				newFileName := (fileName . ".solo")
 
 				while FileExist(newFileName)
-					newFileName := (fileName . " (" . (A_Index + 1) . ")" . ".practice")
+					newFileName := (fileName . " (" . (A_Index + 1) . ")" . ".solo")
 
 				fileName := newFileName
 
@@ -4623,7 +4648,7 @@ class SoloCenter extends ConfigurationItem {
 
 										file.Close()
 
-										sessionDB.writeSession(simulator, car, track, "Practice", fileName, info, session, size, false, true)
+										sessionDB.writeSession(simulator, car, track, "Solo", fileName, info, session, size, false, true)
 
 										return
 									}
@@ -4642,7 +4667,7 @@ class SoloCenter extends ConfigurationItem {
 
 							FileMove(dataFile, folder . "\" . fileName . ".data", 1)
 
-							writeMultiMap(folder . "\" . fileName . ".practice", info)
+							writeMultiMap(folder . "\" . fileName . ".solo", info)
 						}
 						catch Any as exception {
 							logError(exception)
@@ -4962,7 +4987,7 @@ class SoloCenter extends ConfigurationItem {
 					this.Window.Block()
 
 					try {
-						fileName := browsePracticeSessions(this.Window, &simulator, &car, &track)
+						fileName := browseSoloSessions(this.Window, &simulator, &car, &track)
 					}
 					finally {
 						this.Window.Unblock()
@@ -4972,7 +4997,7 @@ class SoloCenter extends ConfigurationItem {
 					fileName := method
 				else {
 					if (simulator && car && track) {
-						dirName := normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Practice"))
+						dirName := normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Solo"))
 
 						DirCreate(dirName)
 					}
@@ -4994,11 +5019,11 @@ class SoloCenter extends ConfigurationItem {
 
 						DirCreate(folder)
 
-						if (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Practice"))) {
+						if (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Solo"))) {
 							dataFile := temporaryFileName("Session", "zip")
 
 							try {
-								session := sessionDB.readSession(simulator, car, track, "Practice", fileName, &meta, &size)
+								session := sessionDB.readSession(simulator, car, track, "Solo", fileName, &meta, &size)
 
 								file := FileOpen(dataFile, "w", "")
 
@@ -5010,7 +5035,7 @@ class SoloCenter extends ConfigurationItem {
 									RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
 
 									if !FileExist(folder . "\Practice.info")
-										FileCopy(directory . "\" . fileName . ".practice", folder . "\Practice.info")
+										FileCopy(directory . "\" . fileName . ".solo", folder . "\Practice.info")
 								}
 								else
 									folder := ""
@@ -5032,7 +5057,7 @@ class SoloCenter extends ConfigurationItem {
 							RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
 
 							if !FileExist(folder . "\Practice.info")
-								FileCopy(directory . "\" . fileName . ".practice", folder . "\Practice.info")
+								FileCopy(directory . "\" . fileName . ".solo", folder . "\Practice.info")
 
 							deleteFile(dataFile)
 						}
@@ -8018,7 +8043,7 @@ startupSoloCenter() {
 
 		sCenter.show(false, !load)
 
-		registerMessageHandler("Practice", methodMessageHandler, sCenter)
+		registerMessageHandler("Solo Center", methodMessageHandler, sCenter)
 
 		startupApplication()
 	}

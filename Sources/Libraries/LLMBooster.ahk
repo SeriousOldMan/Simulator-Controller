@@ -340,7 +340,15 @@ class SpeechBooster extends ConversationBooster {
 						answer := this.normalizeAnswer(answer)
 
 					if (answer && (answer != "")) {
-						Task.startTask(() => FileAppend(translate("-- User --------") . "`n`n" . text . "`n`n" . translate("-- " . translate("Rephrasing") . " ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16"), 0, kLowPriority)
+						Task.startTask(() {
+							local directory
+							
+							SplitPath(this.Transcript, , &directory)
+							
+							DirCreate(directory)
+							
+							FileAppend(translate("-- User --------") . "`n`n" . text . "`n`n" . translate("-- " . translate("Rephrasing") . " ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16")
+						}, 0, kLowPriority)
 
 						return answer
 					}
@@ -500,7 +508,15 @@ class RecognitionBooster extends ConversationBooster {
 					else {
 						answer := string2Values("->", answer)[2]
 
-						Task.startTask(() => FileAppend(translate("-- User --------") . "`n`n" . text . "`n`n" . translate("-- " . translate("Understanding") . " ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16"), 0, kLowPriority)
+						Task.startTask(() {
+							local directory
+							
+							SplitPath(this.Transcript, , &directory)
+							
+							DirCreate(directory)
+							
+							FileAppend(translate("-- User --------") . "`n`n" . text . "`n`n" . translate("-- " . translate("Understanding") . " ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16")
+						}, 0, kLowPriority)
 
 						return answer
 					}
@@ -621,10 +637,18 @@ class ChatBooster extends ConversationBooster {
 						answer := this.normalizeAnswer(answer)
 
 					if (answer && (answer != "")) {
-						if (answer = true)
-							Task.startTask(() => FileAppend(translate("-- User --------") . "`n`n" . question . "`n`n" . translate("-- " . translate("Conversation") . " ---------") . "`n`n" . values2String("`n", collect(calls, printCall)*) . "`n`n", this.Transcript, "UTF-16"), 0, kLowPriority)
-						else
-							Task.startTask(() => FileAppend(translate("-- User --------") . "`n`n" . question . "`n`n" . translate("-- " . translate("Conversation") . " ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16"), 0, kLowPriority)
+						Task.startTask(() {
+							local directory
+							
+							SplitPath(this.Transcript, , &directory)
+							
+							DirCreate(directory)
+							
+							if (answer = true)
+								FileAppend(translate("-- User --------") . "`n`n" . question . "`n`n" . translate("-- " . translate("Conversation") . " ---------") . "`n`n" . values2String("`n", collect(calls, printCall)*) . "`n`n", this.Transcript, "UTF-16")
+							else
+								FileAppend(translate("-- User --------") . "`n`n" . question . "`n`n" . translate("-- " . translate("Conversation") . " ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16")
+						}, 0, kLowPriority)
 
 						return answer
 					}

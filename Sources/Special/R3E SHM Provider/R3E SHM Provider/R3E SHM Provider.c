@@ -100,8 +100,11 @@ long getRemainingTime() {
         return 0;
 
     if (map_buffer->session_type == R3E_SESSION_PRACTICE || map_buffer->session_length_format != R3E_SESSION_LENGTH_LAP_BASED) {
-        long time = (long)((map_buffer->race_session_minutes[map_buffer->session_iteration - 1] * 60) -
-						   (normalize(map_buffer->lap_time_best_self) * normalize(map_buffer->completed_laps)));
+		long time = (long)map_buffer->session_time_remaining;
+		
+		if (time < 0)
+			time = (long)((map_buffer->race_session_minutes[map_buffer->session_iteration - 1] * 60) -
+						  (normalize(map_buffer->lap_time_best_self) * normalize(map_buffer->completed_laps)));
 
 		if (time > 0)
 			return time * 1000;
@@ -206,10 +209,11 @@ int main(int argc, char* argv[])
 				wprintf_s(L"Car.%d.Laps=%d\n", i, vehicle.completed_laps);
 				wprintf_s(L"Car.%d.Lap.Running=%f\n", i, (float)((double)(vehicle.lap_distance / map_buffer->lap_distance) * map_buffer->lap_distance_fraction));
 				wprintf_s(L"Car.%d.Lap.Running.Valid=%s\n", i, vehicle.current_lap_valid ? L"true" : L"false");
+				wprintf_s(L"Car.%d.Lap.Running.Time=%ld\n", i, (long)(vehicle.lap_time_current_self * 1000));
 
-				long sector1Time = ((long)vehicle.sector_time_previous_self[0] * 1000);
-				long sector2Time = ((long)vehicle.sector_time_previous_self[1] * 1000);
-				long sector3Time = ((long)vehicle.sector_time_previous_self[2] * 1000);
+				long sector1Time = (long)(vehicle.sector_time_previous_self[0] * 1000);
+				long sector2Time = (long)(vehicle.sector_time_previous_self[1] * 1000);
+				long sector3Time = (long)(vehicle.sector_time_previous_self[2] * 1000);
 
 				wprintf_s(L"Car.%d.Time=%ld\n", i, sector1Time + sector2Time + sector3Time);
 				wprintf_s(L"Car.%d.Time.Sectors=%ld,%ld,%ld\n", i, sector1Time, sector2Time, sector3Time);

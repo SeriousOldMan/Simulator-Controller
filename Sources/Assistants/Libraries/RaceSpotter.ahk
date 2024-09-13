@@ -1194,7 +1194,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 		this.DriverCar.reset(true)
 
-		if this.Speaker[true]
+		if this.Speaker
 			this.getSpeaker().speakPhrase("Okay")
 	}
 
@@ -1715,8 +1715,9 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 		}
 
-		if (enoughData && (lastLap > (this.BaseLap + 2))) {
-			if ((remainingSessionLaps <= 3) && (Floor(remainingSessionLaps) > 1) && (this.Session = kSessionRace)) {
+		if (enoughData && (lastLap > (this.BaseLap + 2)) && !this.SessionInfos.Has("LastLap")) {
+			if ((remainingSessionLaps <= 4) && (Floor(remainingSessionLaps) > 2) && (this.Session = kSessionRace)
+											&& (remainingSessionTime < 10)) {
 				situation := "FinalLaps"
 
 				if !this.SessionInfos.Has(situation) {
@@ -3274,7 +3275,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 			this.initializeAnnouncements()
 
-			if (formationLap && this.Speaker && (this.TrackType = "Circuit")) {
+			if (formationLap && this.Speaker[false] && (this.TrackType = "Circuit")) {
 				speaker := this.getSpeaker()
 				fragments := speaker.Fragments
 
@@ -3366,7 +3367,7 @@ class RaceSpotter extends GridRaceAssistant {
 		if this.Debug[kDebugPositions]
 			deleteFile(kTempDirectory . "Race Spotter.positions")
 
-		if (joined && this.Speaker)
+		if (joined && this.Speaker[false])
 			this.getSpeaker().speakPhrase("GreetingIntro")
 
 		simulatorName := this.Simulator
@@ -3410,7 +3411,7 @@ class RaceSpotter extends GridRaceAssistant {
 				this.shutdownSession("Before")
 
 				if ((this.SaveSettings == kAsk) && (this.Session == kSessionRace)) {
-					if this.Speaker {
+					if this.Speaker[false] {
 						this.getSpeaker().speakPhrase("ConfirmSaveSettings", false, true)
 
 						this.setContinuation(ObjBindMethod(this, "shutdownSession", "After", true))

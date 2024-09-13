@@ -35,13 +35,17 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars*, *Simulator Controller\Rules* and other folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on its own. But be sure to make a backup copy of all the files, just for the peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 5.8.7
+
+No actions required.
+
+***
+
 ## Release 5.8.6
 
 1. A new builtin LLM Event has been defined for the Race Spotter. As always, you may want to revisit your *Reasoning* booster configuration.
 2. The local LLM Runtime has been updated. If you are using the LLM Runtime, open "Simulator Setup", remove the "Local Runtime..." preset and reinstall it.
 3. If you have used the controller action functions "openRaceCenter" or "openPracticeCenter" in your custom configuration, you have to change them to "openTeamCenter" and "openSoloCenter" respectively.
-
-***
 
 ## Release 5.8.5
 

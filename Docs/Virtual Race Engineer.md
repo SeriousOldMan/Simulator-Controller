@@ -218,6 +218,8 @@ To reactivate the Assistant use:
 
 These commands are also available as "Mute" and "Unmute" plugin actions, which can be configured for a Button Box or a Stream Deck, for example.
 
+Good to know: Even if Jona is muted, you can interact with the Engineer, for example to plan and prepare a pitstop. If a chain of conversation is initiated by you, the driver, Jona will react normally.
+
 ## Racing with Jona
 
 Racing with Jona is easy, just begin your session and wait until Jona will contact you. This will be a few seconds after you crossed the start finish line after your first complete lap. Jona will be available in Practice, Qualifying and Race sessions, but the amount of support you can expect from Jona will vary between those session types. Pitstops, for example, will only be handled during race sessions, unless you enable them for other session types in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) tool.

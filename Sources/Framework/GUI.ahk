@@ -434,6 +434,8 @@ class DarkTheme extends Theme {
 		static kCheckWidth := 23
 		static kCheckShift := 1
 
+		iClickHandlers := []
+
 		Enabled {
 			Get {
 				return super.Enabled
@@ -554,15 +556,23 @@ class DarkTheme extends Theme {
 			return Array(options, arguments*)
 		}
 
-		OnEvent(event, function) {
-			handler(arguments*) {
+		HandleLabelClick(arguments*) {
+			local ignore, handler
+
+			if this.Enabled {
 				this.Value := !this.Value
 
-				function(arguments*)
+				for ignore, handler in this.iClickHandlers
+					handler(arguments*)
 			}
+		}
 
-			if (this.Label && (event = "Click"))
-				this.Label.OnEvent(event, handler)
+		OnEvent(event, function := false) {
+			if function
+				if !this.HasProp("iClickHandlers")
+					this.iClickHandlers := Array(function)
+				else
+					this.iClickHandlers.Push(function)
 
 			return super.OnEvent(event, function)
 		}
@@ -866,6 +876,8 @@ class DarkTheme extends Theme {
 		if ((type = "CheckBox") && DarkTheme.DarkCheckBox.IsLabeled(options, arguments)) {
 			label := window.Add("Text", DarkTheme.DarkCheckBox.GetLabelArguments(options, arguments)*)
 			checkBox := window.Add("DarkCheckBox", DarkTheme.DarkCheckBox.GetCheckBoxArguments(options, arguments)*)
+
+			label.OnEvent("Click", (arguments*) => checkBox.HandleLabelClick(arguments*))
 
 			checkBox.GetPos( , &y)
 			label.Move( , y + 2)

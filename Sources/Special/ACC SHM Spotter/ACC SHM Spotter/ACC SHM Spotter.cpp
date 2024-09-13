@@ -2019,23 +2019,23 @@ void checkCoordinates() {
 string telemetryDirectory = "";
 
 void collectCarTelemetry() {
+	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+	int carID = gf->playerCarID;
+
+	for (int i = 0; i < gf->activeCars; i++)
+		if (gf->carID[i] == carID) {
+			carID = i;
+
+			break;
+		}
+
+	if (trackSplineBuilding)
+		updateTrackSpline();
+	else
+		startTrackSplineBuilder(carID);
+
 	if (trackSplineReady) {
-		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
-		int carID = gf->playerCarID;
-
-		for (int i = 0; i < gf->activeCars; i++)
-			if (gf->carID[i] == carID) {
-				carID = i;
-
-				break;
-			}
-
 		ofstream output;
-
-		if (trackSplineBuilding)
-			updateTrackSpline();
-		else
-			startTrackSplineBuilder(carID);
 
 		float driverRunning = getRunning(carID);
 

@@ -1,15 +1,15 @@
 [Development]
-Version=5.8.7.0-dev
+Version=5.8.7.0-release
 Target=5.8.7.0-release
-Date=09/11/2024
-Download=https://www.dropbox.com/scl/fi/psnrh88mshyfs75euvnah/SImulator-Controller-5.8.7.0-dev.zip?rlkey=v8cg74br5l30wtqmxkfzbmchy&st=8lk4ovjf&dl=1
+Date=09/13/2024
+Download=https://cutt.ly/SeRW3xBl;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.8.7.0-release.zip
 Changes=Fixed pitstop request for AMS2, Fixed valid lap handling in RaceRoom Racing Experience, Fixed extension for session saving "Solo Center" and "Team Center", Fixed muted mode of the Assistants, Muted support for Assistant.Speak, Fixed remaining session time for R3E, Better handling of database concurrent access, "Strategy Workbench" remembers selected data type
 Components=Media->5.6.1,Configuration->5.8.6,Utilities->5.4.8
 [Release]
-Version=5.8.6.0-release
-Date=09/06/2024
-Download=https://cutt.ly/5eWZoqvn;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.8.6.0-release.zip
-Changes=Fixed live graph redrawing in "Practice Center", Fixed tyre laps handling in "Practice Center", Fixed Spotter to give opponent lap times again, Fixed error reporting for missing SoX and NirCmd, New version of local LLM runtime, New LLM event for Race Spotter, Fixed tooltip timeouts in "Simlator Startup", "Practice Center" filters laps without telemetry data, Renamed "Practice Center" to "Solo Center", Renamed "Race Center" to "Team Center", Fixed end of race detection for races with fixed laps in R3E
+Version=5.8.7.0-release
+Date=09/13/2024
+Download=https://cutt.ly/SeRW3xBl;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.8.7.0-release.zip
+Changes=Fixed pitstop request for AMS2, Fixed valid lap handling in RaceRoom Racing Experience, Fixed extension for session saving "Solo Center" and "Team Center", Fixed muted mode of the Assistants, Muted support for Assistant.Speak, Fixed remaining session time for R3E, Better handling of database concurrent access, "Strategy Workbench" remembers selected data type
 Components=Media->5.6.1,Configuration->5.8.6,Utilities->5.4.8
 [Components]
 Media.5.6.1.Path=Resources
@@ -22,7 +22,7 @@ Utilities.5.4.8.Path=.
 Utilities.5.4.8.Content=Utilities
 Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Utilities-5.4.8.zip?rlkey=alrj8l2z205dd2vm9cu6hbsot&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.4.8.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=5.8.7.0-dev
-Release=5.8.6.0-release
+Development=5.8.7.0-release
+Release=5.8.7.0-release

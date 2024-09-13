@@ -38,6 +38,7 @@ global kTelemetrySchemas := CaseInsenseMap("Electronics", ["Weather", "Temperatu
 												   , "Tyre.Wear.Rear.Left", "Tyre.Wear.Rear.Right", "Driver"
 												   , "Identifier", "Synchronized"])
 
+
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;

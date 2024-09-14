@@ -1455,8 +1455,8 @@ void collectCarTelemetry(const SharedMemory* sharedData) {
 					  << sharedData->mThrottle << ";"
 					  << sharedData->mBrake << ";"
 					  << sharedData->mSteering << ";"
-					  << (sharedData->mGear * 3.6) << ";"
-					  << (sharedData->mRpm * 3.6) << ";"
+					  << sharedData->mGear << ";"
+					  << sharedData->mRpm << ";"
 					  << (sharedData->mSpeed * 3.6) << ";"
 					  << "n/a" << ";"
 					  << "n/a" << std::endl;
@@ -1680,7 +1680,9 @@ int main(int argc, char* argv[]) {
 			else
 				wait = true;
 
-			if (analyzeTelemetry || positionTrigger || carTelemetry)
+			if (carTelemetry)
+				Sleep(20);
+			else if (analyzeTelemetry || positionTrigger)
 				Sleep(10);
 			else if (wait)
 				Sleep(50);

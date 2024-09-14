@@ -1838,7 +1838,9 @@ namespace ACSHMSpotter {
 					}
 				}
 
-                if (analyzeTelemetry || positionTrigger || carTelemetry)
+				if (carTelemetry)
+                    Thread.Sleep(20);
+                else if (analyzeTelemetry || positionTrigger)
                     Thread.Sleep(10);
                 else if (wait)
 					Thread.Sleep(50);

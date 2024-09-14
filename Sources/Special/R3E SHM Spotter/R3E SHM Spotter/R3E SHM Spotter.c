@@ -1604,6 +1604,54 @@ void checkCoordinates(int playerID) {
 	}
 }
 
+char* telemetryDirectory = "";
+FILE* telemetryFile = 0;
+int telemetryLap = -1;
+
+void collectCarTelemetry(int playerID) {
+	char buffer[60] = "";
+
+	int carLaps = map_buffer->completed_laps;
+
+	if ((carLaps + 1) != telemetryLap) {
+		if (telemetryFile)
+			fclose(telemetryFile);
+			
+		telemetryLap = (carLaps + 1);
+
+		sprintf_s(buffer, 60, "%d", telemetryLap);
+
+		char fileName[512];
+
+		strcpy_s(fileName, 512, telemetryDirectory);
+
+		int offset = strlen(telemetryDirectory);
+
+		strcpy_s(fileName + offset, 512 - offset, "\\Lap ");
+
+		offset += strlen("\\Lap ");
+
+		strcpy_s(fileName + offset, 512 - offset, buffer);
+
+		offset += strlen(buffer);
+
+		strcpy_s(fileName + offset, 512 - offset, ".telemetry");
+
+		if (fopen_s(&telemetryFile, fileName, "a")) {
+			telemetryFile = 0;
+
+			return;
+		}
+	}
+
+	double carDistance = map_buffer->all_drivers_data_1[playerID].lap_distance;
+	float running = (float)max(0, min(1, fabs(carDistance / map_buffer->layout_length)));
+
+	fprintf(telemetryFile, "%f;%f;%f;%f;%d;%d;%f;%d;%d\n", running, map_buffer->throttle, map_buffer->brake, map_buffer->steer_input_raw,
+														   map_buffer->gear, (int)round(map_buffer->engine_rps), map_buffer->car_speed * 3.6f,
+														   (map_buffer->aid_settings.tc == 5) ? 1 : 0, (map_buffer->aid_settings.abs == 5) ? 1 : 0);
+}
+
 BOOL started = FALSE;
 
 inline const BOOL active() {
@@ -1627,6 +1675,7 @@ int main(int argc, char* argv[])
 	BOOL positionTrigger = FALSE;
 	BOOL calibrateTelemetry = FALSE;
 	BOOL analyzeTelemetry = FALSE;
+	BOOL carTelemetry = FALSE;
 	long counter = 0;
 
 	char* soundsDirectory = "";
@@ -1637,6 +1686,7 @@ int main(int argc, char* argv[])
 		calibrateTelemetry = (strcmp(argv[1], "-Calibrate") == 0);
 		analyzeTelemetry = calibrateTelemetry || (strcmp(argv[1], "-Analyze") == 0);
 		positionTrigger = (strcmp(argv[1], "-Trigger") == 0);
+		carTelemetry = (strcmp(argv[1], "-Telemetry") == 0);
 
 		if (analyzeTelemetry) {
 			strcpy_s(dataFile, 512, argv[2]);
@@ -1672,6 +1722,11 @@ int main(int argc, char* argv[])
 
 				numCoordinates += 1;
 			}
+		}
+		else if (carTelemetry) {
+			// char* trackLength = argv[2];
+
+			telemetryDirectory = argv[3];
 		}
 		else {
 			if (argc > 1) {
@@ -1733,17 +1788,21 @@ int main(int argc, char* argv[])
 
 				if (running) {
 					if (mapped_r3e && (map_buffer->completed_laps >= 0) && !map_buffer->game_paused) {
-						updateTopSpeed();
+						if (carTelemetry)
+							collectCarTelemetry(playerID);
+						else {
+							updateTopSpeed();
 
-						cycle += 1;
+							cycle += 1;
 
-						if (!startGo || !greenFlag())
-							if (checkAccident())
-								wait = FALSE;
-							else if (checkFlagState() || checkPositions(playerID))
-								wait = FALSE;
-							else
-								wait = !checkPitWindow();
+							if (!startGo || !greenFlag())
+								if (checkAccident())
+									wait = FALSE;
+								else if (checkFlagState() || checkPositions(playerID))
+									wait = FALSE;
+								else
+									wait = !checkPitWindow();
+						}
 					}
 					else {
 						longitudinalRearDistance = 5;
@@ -1764,9 +1823,9 @@ int main(int argc, char* argv[])
 				wait = TRUE;
 		}
         
-		if (analyzeTelemetry)
+		if (carTelemetry)
 			Sleep(10);
-		else if (positionTrigger)
+		else if (analyzeTelemetry || positionTrigger)
 			Sleep(10);
 		else if (wait)
 			Sleep(50);

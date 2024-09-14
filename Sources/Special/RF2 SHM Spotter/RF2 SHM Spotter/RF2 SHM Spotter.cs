@@ -1710,9 +1710,63 @@ namespace RF2SHMSpotter {
 					}
 				}
 			}
-		}
+        }
 
-		public void initializeTrigger(string[] args)
+        string telemetryDirectory = "";
+        StreamWriter telemetryFile = null;
+        int telemetryLap = -1;
+
+        void collectCarTelemetry(ref rF2VehicleScoring playerScoring)
+        {
+            int playerID = playerScoring.mID;
+
+            try
+            {
+                if ((playerScoring.mTotalLaps + 1) != telemetryLap)
+                {
+                    try
+                    {
+                        if (telemetryFile != null)
+                            telemetryFile.Close();
+                    }
+                    catch (Exception)
+                    {
+                    }
+
+                    telemetryLap = (playerScoring.mTotalLaps + 1);
+
+                    telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".telemetry", true);
+                }
+
+                telemetryFile.Write(playerScoring.mLapDist + ";");
+                telemetryFile.Write((float)telemetry.mVehicles[playerID].mFilteredThrottle + ";");
+                telemetryFile.Write((float)telemetry.mVehicles[playerID].mFilteredBrake + ";");
+                telemetryFile.Write((float)telemetry.mVehicles[playerID].mFilteredSteering + ";");
+                telemetryFile.Write((float)telemetry.mVehicles[playerID].mGear + ";");
+                telemetryFile.Write((float)telemetry.mVehicles[playerID].mEngineRPM + ";");
+                telemetryFile.Write(vehicleSpeed(ref playerScoring) + ";");
+
+                telemetryFile.Write("n/a;");
+                telemetryFile.WriteLine("n/a");
+
+                telemetryFile.Close();
+            }
+            catch (Exception)
+            {
+                try
+                {
+                    if (telemetryFile != null)
+                        telemetryFile.Close();
+                }
+                catch (Exception)
+                {
+                }
+
+                // retry next round...
+            }
+        }
+
+        public void initializeTrigger(string[] args)
         {
 			for (int i = 1; i < (args.Length - 1); i += 2)
 			{
@@ -1780,54 +1834,6 @@ namespace RF2SHMSpotter {
             if (args.Length > 4)
                 semFileName = args[4];
         }
-		
-        string telemetryDirectory = "";
-        StreamWriter telemetryFile = null;
-        int telemetryLap = -1;
-
-        void collectCarTelemetry(ref rF2VehicleScoring playerScoring) {
-			int playerID = playerScoring.mID;
-			
-            try {
-                if ((playerScoring.mTotalLaps + 1) != telemetryLap)
-                {
-                    try
-                    {
-                        if (telemetryFile != null)
-							telemetryFile.Close();
-                    }
-                    catch (Exception) {
-                    }
-
-                    telemetryLap = (playerScoring.mTotalLaps + 1);
-
-                    telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".tlm", true);
-                }
-
-				telemetryFile.Write(playerScoring.mLapDist + ";");
-				telemetryFile.Write((float)telemetry.mVehicles[playerID].mFilteredThrottle + ";");
-				telemetryFile.Write((float)telemetry.mVehicles[playerID].mFilteredBrake + ";");
-				telemetryFile.Write((float)telemetry.mVehicles[playerID].mFilteredSteering + ";");
-				telemetryFile.Write((float)telemetry.mVehicles[playerID].mGear + ";");
-				telemetryFile.Write((float)telemetry.mVehicles[playerID].mEngineRPM + ";");
-				telemetryFile.Write(vehicleSpeed(ref playerScoring) + ";");
-
-                telemetryFile.Write("n/a;");
-                telemetryFile.WriteLine("n/a");
-
-				telemetryFile.Close();
-			}
-			catch (Exception) {
-				try {
-					if (telemetryFile != null)
-                        telemetryFile.Close();
-				}
-				catch (Exception) {
-				}
-
-				// retry next round...
-			}
-		}
 
         bool started = false;
 

@@ -1448,7 +1448,7 @@ void collectCarTelemetry(const SharedMemory* sharedData) {
 
 			telemetryLap = (vehicle.mLapsCompleted + 1);
 
-			telemetryFile.open(telemetryDirectory + "\\Lap " + std::to_string(telemetryLap) + ".tlm", std::ios::out | std::ios::app);
+			telemetryFile.open(telemetryDirectory + "\\Lap " + std::to_string(telemetryLap) + ".telemetry", std::ios::out | std::ios::app);
 		}
 
 		telemetryFile << vehicle.mCurrentLapDistance << ";"

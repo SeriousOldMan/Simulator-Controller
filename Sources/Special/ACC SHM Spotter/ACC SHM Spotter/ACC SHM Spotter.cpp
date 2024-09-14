@@ -2052,7 +2052,7 @@ void collectCarTelemetry() {
 
 					telemetryLap = (gf->completedLaps + 1);
 
-					telemetryFile.open(telemetryDirectory + "\\Lap " + to_string(telemetryLap) + ".tlm", ios::out | ios::app);
+					telemetryFile.open(telemetryDirectory + "\\Lap " + to_string(telemetryLap) + ".telemetry", ios::out | ios::app);
 				}
 				
 				telemetryFile << (driverRunning * trackLength) << ";"

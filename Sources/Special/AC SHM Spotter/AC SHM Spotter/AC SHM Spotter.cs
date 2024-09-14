@@ -1635,7 +1635,7 @@ namespace ACSHMSpotter {
 
                     telemetryLap = (graphics.CompletedLaps + 1);
 
-                    telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".tlm", true);
+                    telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".telemetry", true);
                 }
 
                 telemetryFile.Write(Math.Max(0, Math.Min(1, driver.splinePosition)) + staticInfo.TrackSPlineLength + ";");

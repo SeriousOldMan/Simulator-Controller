@@ -11,6 +11,7 @@ using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -1781,31 +1782,45 @@ namespace RF2SHMSpotter {
         }
 		
         string telemetryDirectory = "";
+        StreamWriter telemetryFile = null;
+        int telemetryLap = -1;
 
         void collectCarTelemetry(ref rF2VehicleScoring playerScoring) {
 			int playerID = playerScoring.mID;
-			StreamWriter output = null;
-
+			
             try {
-				output = new StreamWriter(telemetryDirectory + "\\Lap " + (playerScoring.mTotalLaps + 1) + ".tlm", true);
+                if ((playerScoring.mTotalLaps + 1) != telemetryLap)
+                {
+                    try
+                    {
+                        if (telemetryFile != null)
+							telemetryFile.Close();
+                    }
+                    catch (Exception) {
+                    }
 
-				output.Write(playerScoring.mLapDist + ";");
-				output.Write((float)telemetry.mVehicles[playerID].mFilteredThrottle + ";");
-				output.Write((float)telemetry.mVehicles[playerID].mFilteredBrake + ";");
-				output.Write((float)telemetry.mVehicles[playerID].mFilteredSteering + ";");
-				output.Write((float)telemetry.mVehicles[playerID].mGear + ";");
-				output.Write((float)telemetry.mVehicles[playerID].mEngineRPM + ";");
-				output.Write(vehicleSpeed(ref playerScoring) + ";");
+                    telemetryLap = (playerScoring.mTotalLaps + 1);
 
-                output.Write("n/a;");
-                output.WriteLine("n/a");
+                    telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".tlm", true);
+                }
 
-				output.Close();
+				telemetryFile.Write(playerScoring.mLapDist + ";");
+				telemetryFile.Write((float)telemetry.mVehicles[playerID].mFilteredThrottle + ";");
+				telemetryFile.Write((float)telemetry.mVehicles[playerID].mFilteredBrake + ";");
+				telemetryFile.Write((float)telemetry.mVehicles[playerID].mFilteredSteering + ";");
+				telemetryFile.Write((float)telemetry.mVehicles[playerID].mGear + ";");
+				telemetryFile.Write((float)telemetry.mVehicles[playerID].mEngineRPM + ";");
+				telemetryFile.Write(vehicleSpeed(ref playerScoring) + ";");
+
+                telemetryFile.Write("n/a;");
+                telemetryFile.WriteLine("n/a");
+
+				telemetryFile.Close();
 			}
 			catch (Exception) {
 				try {
-					if (output != null)
-						output.Close();
+					if (telemetryFile != null)
+                        telemetryFile.Close();
 				}
 				catch (Exception) {
 				}

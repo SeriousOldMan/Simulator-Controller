@@ -2017,6 +2017,8 @@ void checkCoordinates() {
 }
 
 string telemetryDirectory = "";
+ofstream telemetryFile;
+int telemetryLap = -1;
 
 void collectCarTelemetry() {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
@@ -2035,31 +2037,37 @@ void collectCarTelemetry() {
 		startTrackSplineBuilder(carID);
 
 	if (trackSplineReady) {
-		ofstream output;
-
 		float driverRunning = getRunning(carID);
 
 		if (driverRunning >= 0)
 			try {
 				SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
 			
-				output.open(telemetryDirectory + "\\Lap " + to_string(gf->completedLaps + 1) + ".tlm", ios::out | ios::app);
-				
-				output << (driverRunning * trackLength) << ";"
-					   << (pf->gas >= 0 ? pf->gas : 0) << ";"
-					   << (pf->brake >= 0 ? pf->brake : 0) << ";"
-					   << (pf->steerAngle >= 0 ? pf->steerAngle : 0) << ";"
-					   << pf->gear << ";"
-					   << pf->rpms << ";"
-					   << pf->speedKmh << ";"
-					   << pf->tc << ";"
-					   << pf->abs << endl;
+				if ((gf->completedLaps + 1) != telemetryLap) {
+					try {
+						telemetryFile.close();
+					}
+					catch (...) {
+					}
 
-				output.close();
+					telemetryLap = (gf->completedLaps + 1);
+
+					telemetryFile.open(telemetryDirectory + "\\Lap " + to_string(telemetryLap) + ".tlm", ios::out | ios::app);
+				}
+				
+				telemetryFile << (driverRunning * trackLength) << ";"
+							  << (pf->gas >= 0 ? pf->gas : 0) << ";"
+							  << (pf->brake >= 0 ? pf->brake : 0) << ";"
+							  << (pf->steerAngle >= 0 ? pf->steerAngle : 0) << ";"
+							  << pf->gear << ";"
+							  << pf->rpms << ";"
+							  << pf->speedKmh << ";"
+							  << pf->tc << ";"
+							  << pf->abs << endl;
 			}
 			catch (...) {
 				try {
-					output.close();
+					telemetryFile.close();
 				}
 				catch (...) {
 				}

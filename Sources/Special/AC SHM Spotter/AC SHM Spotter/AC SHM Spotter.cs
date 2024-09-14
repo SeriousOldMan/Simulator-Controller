@@ -1613,35 +1613,50 @@ namespace ACSHMSpotter {
         }
 
         string telemetryDirectory = "";
+        StreamWriter telemetryFile = null;
+        int telemetryLap = -1;
 
         void collectCarTelemetry()
         {
             ref AcCarInfo driver = ref cars.cars[0];
-            StreamWriter output = null;
-
+            
             try
             {
-                output = new StreamWriter(telemetryDirectory + "\\Lap " + (graphics.CompletedLaps + 1) + ".tlm", true);
+                if ((graphics.CompletedLaps + 1) != telemetryLap)
+                {
+                    try
+                    {
+                        if (telemetryFile != null)
+                            telemetryFile.Close();
+                    }
+                    catch (Exception)
+                    {
+                    }
 
-                output.Write(Math.Max(0, Math.Min(1, driver.splinePosition)) + staticInfo.TrackSPlineLength + ";");
-                output.Write(physics.Gas + ";");
-                output.Write(physics.Brake + ";");
-                output.Write(physics.SteerAngle + ";");
-                output.Write(physics.Gear + ";");
-                output.Write(physics.Rpms + ";");
-                output.Write(physics.SpeedKmh + ";");
+                    telemetryLap = (graphics.CompletedLaps + 1);
 
-                output.Write(physics.TC + ";");
-                output.WriteLine(physics.Abs);
+                    telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".tlm", true);
+                }
 
-                output.Close();
+                telemetryFile.Write(Math.Max(0, Math.Min(1, driver.splinePosition)) + staticInfo.TrackSPlineLength + ";");
+                telemetryFile.Write(physics.Gas + ";");
+                telemetryFile.Write(physics.Brake + ";");
+                telemetryFile.Write(physics.SteerAngle + ";");
+                telemetryFile.Write(physics.Gear + ";");
+                telemetryFile.Write(physics.Rpms + ";");
+                telemetryFile.Write(physics.SpeedKmh + ";");
+
+                telemetryFile.Write(physics.TC + ";");
+                telemetryFile.WriteLine(physics.Abs);
+
+                telemetryFile.Close();
             }
             catch (Exception)
             {
                 try
                 {
-                    if (output != null)
-                        output.Close();
+                    if (telemetryFile != null)
+                        telemetryFile.Close();
                 }
                 catch (Exception)
                 {

@@ -1432,30 +1432,38 @@ void checkCoordinates(const SharedMemory* sharedData) {
 }
 
 std::string telemetryDirectory = "";
+std::ofstream telemetryFile;
+int telemetryLap = -1;
 
 void collectCarTelemetry(const SharedMemory* sharedData) {
 	ParticipantInfo vehicle = sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex];
-	std::ofstream output;
-
+	
 	try {
-		output.open(telemetryDirectory + "\\Lap " + std::to_string(vehicle.mLapsCompleted + 1) + ".tlm",
-					std::ios::out | std::ios::app);
+		if ((vehicle.mLapsCompleted + 1) != telemetryLap) {
+			try {
+				telemetryFile.close();
+			}
+			catch (...) {
+			}
 
-		output << vehicle.mCurrentLapDistance << ";"
-			   << sharedData->mThrottle << ";"
-			   << sharedData->mBrake << ";"
-			   << sharedData->mSteering << ";"
-			   << (sharedData->mGear * 3.6) << ";"
-			   << (sharedData->mRpm * 3.6) << ";"
-			   << (sharedData->mSpeed * 3.6) << ";"
-			   << "n/a" << ";"
-			   << "n/a" << std::endl;
+			telemetryLap = (vehicle.mLapsCompleted + 1);
 
-		output.close();
+			telemetryFile.open(telemetryDirectory + "\\Lap " + std::to_string(telemetryLap) + ".tlm", std::ios::out | std::ios::app);
+		}
+
+		telemetryFile << vehicle.mCurrentLapDistance << ";"
+					  << sharedData->mThrottle << ";"
+					  << sharedData->mBrake << ";"
+					  << sharedData->mSteering << ";"
+					  << (sharedData->mGear * 3.6) << ";"
+					  << (sharedData->mRpm * 3.6) << ";"
+					  << (sharedData->mSpeed * 3.6) << ";"
+					  << "n/a" << ";"
+					  << "n/a" << std::endl;
 	}
 	catch (...) {
 		try {
-			output.close();
+			telemetryFile.close();
 		}
 		catch (...) {
 		}

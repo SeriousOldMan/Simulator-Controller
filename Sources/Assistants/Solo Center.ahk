@@ -256,6 +256,8 @@ class SoloCenter extends ConfigurationItem {
 	iSelectedDetailReport := false
 	iSelectedDetailHTML := false
 
+	iTelemetryBrowser := false
+
 	class SoloCenterWindow extends Window {
 		iSoloCenter := false
 
@@ -1860,6 +1862,36 @@ class SoloCenter extends ConfigurationItem {
 		this.updateState()
 	}
 
+	getSimulator() {
+		return this.Simulator
+	}
+
+	openTelemetryBrowser() {
+		if this.iTelemetryBrowser
+			WinActivate(this.iTelemetryBrowser.Window)
+		else if true || this.SessionActive {
+			DirCreate(this.SessionDirectory . "Telemetry")
+
+			this.iTelemetryBrowser := TelemetryBrowser(this, this.SessionDirectory . "Telemetry", true)
+
+			this.iTelemetryBrowser.show()
+		}
+		else if FileExist(this.SessionDirectory . "Telemetry") {
+			this.iTelemetryBrowser := TelemetryBrowser(this, this.SessionDirectory . "Telemetry", false)
+
+			this.iTelemetryBrowser.show()
+		}
+		else {
+			OnMessage(0x44, translateOkButton)
+			withBlockedWindows(MsgBox, translate("You are not connected to an active session."), translate("Information"), 262192)
+			OnMessage(0x44, translateOkButton, 0)
+		}
+	}
+
+	closedTelemetryBrowser() {
+		this.iTelemetryBrowser := false
+	}
+
 	getAvailableSimulators() {
 		return SessionDatabase.getSimulators()
 	}
@@ -2450,7 +2482,7 @@ class SoloCenter extends ConfigurationItem {
 		local auto3 := ((this.AutoSave ? translate("[x]") : translate("[  ]")) . A_Space . translate("Auto Save"))
 
 		this.Control["sessionMenuDropDown"].Delete()
-		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", auto1, auto2, auto3, "---------------------------------------------", "Clear...", "---------------------------------------------", "Load Session...", "Save Session...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Session Summary"], translate))
+		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", auto1, auto2, auto3, "---------------------------------------------", "Clear...", "---------------------------------------------", "Load Session...", "Save Session...", "---------------------------------------------", "Telemetry Browser...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Session Summary"], translate))
 
 		if !this.SessionExported
 			this.Control["sessionMenuDropDown"].Add(collect(["---------------------------------------------", "Export to Database..."], translate))
@@ -2541,11 +2573,13 @@ class SoloCenter extends ConfigurationItem {
 					withBlockedWindows(MsgBox, translate("There is no session data to be saved."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
-			case 12: ; Update Statistics
+			case 12: ; Telemetry Browser
+				this.openTelemetryBrowser()
+			case 14: ; Update Statistics
 				this.updateStatistics()
-			case 14: ; Session Summary
+			case 16: ; Session Summary
 				this.showSessionSummary()
-			case 16: ; Export data
+			case 18: ; Export data
 				if (this.HasData && !this.SessionExported) {
 					OnMessage(0x44, translateYesNoButtons)
 					msgResult := withBlockedWindows(MsgBox, translate("Do you want to transfer the selected data to the session database? This is only possible once."), translate("Delete"), 262436)

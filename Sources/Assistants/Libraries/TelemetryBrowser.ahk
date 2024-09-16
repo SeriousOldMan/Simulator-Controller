@@ -307,6 +307,7 @@ class TelemetryBrowser {
 	iManager := false
 
 	iTelemetryDirectory := false
+	iTelemetryCollectorPID := false
 
 	iWindow := false
 	iTelemetryChart := false
@@ -315,6 +316,8 @@ class TelemetryBrowser {
 
 	iLap := false
 	iReferenceLap := false
+
+	iCollectorTask := false
 
 	class TelemetryBrowserWindow extends Window {
 		iBrowser := false
@@ -384,6 +387,12 @@ class TelemetryBrowser {
 		}
 	}
 
+	ReadOnly {
+		Get {
+			return !this.iCollectorTask
+		}
+	}
+
 	Window {
 		Get {
 			return this.iWindow
@@ -412,9 +421,11 @@ class TelemetryBrowser {
 		}
 	}
 
-	SelectedLap[path := true] {
+	SelectedLap[path := false] {
 		Get {
-			return (this.iLap ? (path ? (this.TelemetryDirectory . this.iLap . ".telemetry") : this.iLap) : false)
+			return (this.iLap ? (path ? (this.TelemetryDirectory . "Lap " . this.iLap . ".telemetry")
+									  : this.iLap)
+							  : false)
 		}
 
 		Set {
@@ -426,9 +437,11 @@ class TelemetryBrowser {
 		}
 	}
 
-	SelectedReferenceLap[path := true] {
+	SelectedReferenceLap[path := false] {
 		Get {
-			return (this.iReferenceLap ? (path ? (this.TelemetryDirectory . this.iReferenceLap . ".telemetry") : this.iLap) : false)
+			return (this.iReferenceLap ? (path ? (this.TelemetryDirectory . "Lap " . this.iReferenceLap . ".telemetry")
+											   : this.iLap)
+									   : false)
 		}
 
 		Set {
@@ -440,7 +453,7 @@ class TelemetryBrowser {
 		}
 	}
 
-	__New(manager, directory) {
+	__New(manager, directory, collect := true) {
 		local laps := []
 		local name
 
@@ -450,10 +463,18 @@ class TelemetryBrowser {
 		loop Files, this.TelemetryDirectory . "*.telemetry" {
 			SplitPath(A_LoopFileName, , , , &name)
 
-			laps.Push(name)
+			laps.Push(Integer(StrReplace(name, "Lap ", "")))
 		}
 
+		bubbleSort(&laps)
+
 		this.iLaps := laps
+
+		if collect {
+			this.startupTelemetryCollector()
+
+			OnExit(ObjBindMethod(this, "shutdownTelemetryCollector", true))
+		}
 	}
 
 	createGui() {
@@ -487,16 +508,18 @@ class TelemetryBrowser {
 
 		browserGui.Add("Text", "x8 yp+30 w656 W:Grow 0x10")
 
+		browserGui.SetFont("s8 Norm", "Arial")
+
 		browserGui.Add("Text", "x16 yp+10 w80", translate("Lap"))
 		browserGui.Add("DropDownList", "x98 yp-2 w296 vlapDropDown", this.Laps).OnEvent("Change", chooseLap)
 
 		browserGui.Add("Text", "x16 yp+26 w80", translate("Reference"))
 		browserGui.Add("DropDownList", "x98 yp-2 w296 Choose1 vreferenceLapDropDown", concatenate([translate("None")], this.Laps)).OnEvent("Change", chooseReferenceLap)
 
-		browserGui.Add("Text", "x468 yp+2 w80 X:Move", translate("Zoom"))
+		browserGui.Add("Text", "x468 yp-2 w80 X:Move", translate("Zoom"))
 		browserGui.Add("Slider", "Center Thick15 x556 yp X:Move w100 0x10 Range100-400 ToolTip vzoomSlider", 100).OnEvent("Change", changeZoom)
 
-		telemetryViewer := browserGui.Add("HTMLViewer", "x16 yp+24 w640 h480 W:Grow H:Grow Border")
+		telemetryViewer := browserGui.Add("HTMLViewer", "x16 yp+26 w640 h480 W:Grow H:Grow Border")
 
 		telemetryViewer.document.open()
 		telemetryViewer.document.write("")
@@ -527,6 +550,10 @@ class TelemetryBrowser {
 	}
 
 	close() {
+		this.shutdownTelemetryCollector(true)
+
+		this.Manager.closedTelemetryBrowser()
+
 		this.Window.Destroy()
 	}
 
@@ -542,15 +569,139 @@ class TelemetryBrowser {
 		if (lap = translate("None"))
 			lap := false
 
-		if (force || (lap != this.SelectedLap)) {
+		if (force || (lap != this.SelectedReferenceLap)) {
 			this.SelectedReferenceLap := lap
 
 			this.Control["referenceLapDropDown"].Choose(lap ? (inList(this.Laps, lap) + 1) : 1)
 		}
 	}
 
+	startupTelemetryCollector() {
+		local simulator := this.Manager.getSimulator()
+		local code, exePath, pid
+
+		if this.iTelemetryCollectorPID
+			this.shutdownTelemetryCollector(true)
+
+		code := SessionDatabase.getSimulatorCode(simulator)
+		exePath := (kBinariesDirectory . "Providers\" . code . " SHM Spotter.exe")
+		pid := false
+
+		try {
+			if !FileExist(exePath)
+				throw "File not found..."
+
+			Run("`"" . exePath . "`" -Telemetry `"" . normalizeDirectoryPath(this.TelemetryDirectory) . "`""
+			  , kBinariesDirectory, "Hide", &pid)
+		}
+		catch Any as exception {
+			logError(exception, true)
+
+			logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
+													   , {simulator: code, protocol: "SHM"})
+								   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+								   . kBinariesDirectory . translate(")"))
+
+			showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
+										  , {exePath: exePath, simulator: code, protocol: "SHM"})
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+		}
+
+		if pid {
+			this.iTelemetryCollectorPID := pid
+
+			this.iCollectorTask := PeriodicTask(ObjBindMethod(this, "collectTelemetry"), 10000, kLowPriority)
+
+			this.iCollectorTask.start()
+		}
+	}
+
+	shutdownTelemetryCollector(force := false, arguments*) {
+		local pid := this.iTelemetryCollectorPID
+		local tries
+
+		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
+			return false
+
+		if pid {
+			ProcessClose(pid)
+
+			Sleep(500)
+
+			if (force && ProcessExist(pid)) {
+				tries := 5
+
+				while (tries-- > 0) {
+					pid := ProcessExist(pid)
+
+					if pid {
+						ProcessClose(pid)
+
+						Sleep(500)
+					}
+					else
+						break
+				}
+			}
+
+			this.iTelemetryCollectorPID := false
+
+			if this.iCollectorTask {
+				this.iCollectorTask.stop()
+
+				this.iCollectorTask := false
+			}
+		}
+
+		return false
+	}
+
+	collectTelemetry() {
+		local laps := []
+		local ignore, lap
+
+		newLap(lap) {
+			local file
+
+			if !inList(this.Laps, lap) {
+				try {
+					file := FileOpen(this.TelemetryDirectory . "Lap " . lap . ".telemetry", "r-wd")
+
+					if file {
+						file.Close()
+
+						return true
+					}
+					else
+						return false
+				}
+				catch Any {
+					return false
+				}
+			}
+			else
+				return false
+		}
+
+		loop Files, this.TelemetryDirectory . "*.telemetry" {
+			SplitPath(A_LoopFileName, , , , &name)
+
+			laps.Push(Integer(StrReplace(name, "Lap ", "")))
+		}
+
+		newLaps := choose(bubbleSort(&laps), newLap)
+
+		this.Laps := laps
+
+		this.Control["lapDropDown"].Add(newLaps)
+		this.Control["referenceLapDropDown"].Add(newLaps)
+
+		if (!this.SelectedLap && (newLaps.Length > 0))
+			this.selectlap(newLaps[1])
+	}
+
 	updateTelemetryChart(redraw := false) {
 		if (this.TelemetryChart && redraw)
-			this.TelemetryChart.showLapTelemetry(this.SelectedLap, this.SelectedReferenceLap)
+			this.TelemetryChart.showLapTelemetry(this.SelectedLap[true], this.SelectedReferenceLap[true])
 	}
 }

@@ -1869,7 +1869,7 @@ class SoloCenter extends ConfigurationItem {
 	openTelemetryBrowser() {
 		if this.iTelemetryBrowser
 			WinActivate(this.iTelemetryBrowser.Window)
-		else if true || this.SessionActive {
+		else if this.SessionActive {
 			DirCreate(this.SessionDirectory . "Telemetry")
 
 			this.iTelemetryBrowser := TelemetryBrowser(this, this.SessionDirectory . "Telemetry", true)
@@ -2482,7 +2482,7 @@ class SoloCenter extends ConfigurationItem {
 		local auto3 := ((this.AutoSave ? translate("[x]") : translate("[  ]")) . A_Space . translate("Auto Save"))
 
 		this.Control["sessionMenuDropDown"].Delete()
-		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", auto1, auto2, auto3, "---------------------------------------------", "Clear...", "---------------------------------------------", "Load Session...", "Save Session...", "---------------------------------------------", "Telemetry Browser...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Session Summary"], translate))
+		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", auto1, auto2, auto3, "---------------------------------------------", "Clear...", "---------------------------------------------", "Load Session...", "Save Session...", "---------------------------------------------", "Telemetry...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Session Summary"], translate))
 
 		if !this.SessionExported
 			this.Control["sessionMenuDropDown"].Add(collect(["---------------------------------------------", "Export to Database..."], translate))

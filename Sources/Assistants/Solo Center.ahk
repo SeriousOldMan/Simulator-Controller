@@ -1869,7 +1869,10 @@ class SoloCenter extends ConfigurationItem {
 	openTelemetryBrowser() {
 		if this.iTelemetryBrowser
 			WinActivate(this.iTelemetryBrowser.Window)
-		else if this.SessionActive {
+		else if !this.SessionLoaded {
+			if !this.SessionMode
+				deleteDirectory(this.SessionDirectory . "Telemetry")
+
 			DirCreate(this.SessionDirectory . "Telemetry")
 
 			this.iTelemetryBrowser := TelemetryBrowser(this, this.SessionDirectory . "Telemetry", true)
@@ -2746,16 +2749,21 @@ class SoloCenter extends ConfigurationItem {
 	initializeSession(session := "Practice", full := true) {
 		local directory, reportDirectory
 
+		if this.iTelemetryBrowser {
+			this.iTelemetryBrowser.shutdown()
+
+			this.iTelemetryBrowser.clear()
+		}
+
 		if (!this.SessionMode || this.SessionActive) {
 			directory := this.SessionDirectory
 
 			deleteDirectory(directory)
 
 			DirCreate(directory)
+			DirCreate(directory . "Telemetry")
 
 			reportDirectory := (directory . "Race Report")
-
-			deleteDirectory(reportDirectory)
 
 			DirCreate(reportDirectory)
 
@@ -4589,6 +4597,9 @@ class SoloCenter extends ConfigurationItem {
 			local car := this.Car
 			local track := this.Track
 			local sessionDB, info, dirName, directory, fileName, newFileName, folder, session, file, size, dataFile
+
+			if this.iTelemetryBrowser
+				this.iTelemetryBrowser.shutdown()
 
 			if this.SessionActive {
 				this.syncSessionStore(true)
@@ -7640,6 +7651,9 @@ class SoloCenter extends ConfigurationItem {
 			try {
 				if (!this.LastLap && !update)
 					this.startSession(fileName, true)
+
+				if this.iTelemetryBrowser
+					this.iTelemetryBrowser.startup(this.Simulator, getMultiMapValue(data, "Track Data", "Length", 0))
 
 				if update {
 					if (this.SessionActive && (this.LastLap.Nr = lapNumber))

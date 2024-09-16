@@ -470,11 +470,8 @@ class TelemetryBrowser {
 
 		this.iLaps := laps
 
-		if collect {
-			this.startupTelemetryCollector()
-
+		if collect
 			OnExit(ObjBindMethod(this, "shutdownTelemetryCollector", true))
-		}
 	}
 
 	createGui() {
@@ -511,13 +508,13 @@ class TelemetryBrowser {
 		browserGui.SetFont("s8 Norm", "Arial")
 
 		browserGui.Add("Text", "x16 yp+10 w80", translate("Lap"))
-		browserGui.Add("DropDownList", "x98 yp-2 w296 vlapDropDown", this.Laps).OnEvent("Change", chooseLap)
+		browserGui.Add("DropDownList", "x98 yp-4 w296 vlapDropDown", this.Laps).OnEvent("Change", chooseLap)
 
-		browserGui.Add("Text", "x16 yp+26 w80", translate("Reference"))
-		browserGui.Add("DropDownList", "x98 yp-2 w296 Choose1 vreferenceLapDropDown", concatenate([translate("None")], this.Laps)).OnEvent("Change", chooseReferenceLap)
+		browserGui.Add("Text", "x16 yp+28 w80", translate("Reference"))
+		browserGui.Add("DropDownList", "x98 yp-4 w296 Choose1 vreferenceLapDropDown", concatenate([translate("None")], this.Laps)).OnEvent("Change", chooseReferenceLap)
 
-		browserGui.Add("Text", "x468 yp-2 w80 X:Move", translate("Zoom"))
-		browserGui.Add("Slider", "Center Thick15 x556 yp X:Move w100 0x10 Range100-400 ToolTip vzoomSlider", 100).OnEvent("Change", changeZoom)
+		browserGui.Add("Text", "x468 yp+4 w80 X:Move", translate("Zoom"))
+		browserGui.Add("Slider", "Center Thick15 x556 yp-2 X:Move w100 0x10 Range100-400 ToolTip vzoomSlider", 100).OnEvent("Change", changeZoom)
 
 		telemetryViewer := browserGui.Add("HTMLViewer", "x16 yp+26 w640 h480 W:Grow H:Grow Border")
 
@@ -549,6 +546,22 @@ class TelemetryBrowser {
 		this.updateTelemetryChart(true)
 	}
 
+	startup(simulator, trackLength) {
+		if !this.iTelemetryCollectorPID
+			this.startupTelemetryCollector(simulator, trackLength)
+	}
+
+	shutdown() {
+		this.shutdownTelemetryCollector()
+	}
+
+	clear() {
+		this.selectLap(false, true)
+		this.selectReferenceLap(false, true)
+
+		this.Laps := []
+	}
+
 	close() {
 		this.shutdownTelemetryCollector(true)
 
@@ -576,8 +589,7 @@ class TelemetryBrowser {
 		}
 	}
 
-	startupTelemetryCollector() {
-		local simulator := this.Manager.getSimulator()
+	startupTelemetryCollector(simulator, trackLength) {
 		local code, exePath, pid
 
 		if this.iTelemetryCollectorPID
@@ -591,7 +603,7 @@ class TelemetryBrowser {
 			if !FileExist(exePath)
 				throw "File not found..."
 
-			Run("`"" . exePath . "`" -Telemetry `"" . normalizeDirectoryPath(this.TelemetryDirectory) . "`""
+			Run("`"" . exePath . "`" -Telemetry " . trackLength . " `"" . normalizeDirectoryPath(this.TelemetryDirectory) . "`""
 			  , kBinariesDirectory, "Hide", &pid)
 		}
 		catch Any as exception {
@@ -658,7 +670,7 @@ class TelemetryBrowser {
 
 	collectTelemetry() {
 		local laps := []
-		local ignore, lap
+		local lap, name
 
 		newLap(lap) {
 			local file
@@ -686,18 +698,21 @@ class TelemetryBrowser {
 		loop Files, this.TelemetryDirectory . "*.telemetry" {
 			SplitPath(A_LoopFileName, , , , &name)
 
-			laps.Push(Integer(StrReplace(name, "Lap ", "")))
+			lap := Integer(StrReplace(name, "Lap ", ""))
+
+			if newLap(lap)
+				laps.Push(lap)
 		}
 
-		newLaps := choose(bubbleSort(&laps), newLap)
+		laps := bubbleSort(&laps)
 
-		this.Laps := laps
+		this.Laps := concatenate(this.Laps, laps)
 
-		this.Control["lapDropDown"].Add(newLaps)
-		this.Control["referenceLapDropDown"].Add(newLaps)
+		this.Control["lapDropDown"].Add(laps)
+		this.Control["referenceLapDropDown"].Add(laps)
 
-		if (!this.SelectedLap && (newLaps.Length > 0))
-			this.selectlap(newLaps[1])
+		if (!this.SelectedLap && (laps.Length > 0))
+			this.selectlap(laps[1])
 	}
 
 	updateTelemetryChart(redraw := false) {

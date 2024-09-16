@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Solo Center Tool            ;;;
+;;;   Modular Simulator Controller System - Solo Center Tool                ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
@@ -41,6 +41,7 @@
 #Include "..\Database\Libraries\TyresDatabase.ahk"
 #Include "..\Database\Libraries\TelemetryDatabase.ahk"
 #Include "Libraries\RaceReportViewer.ahk"
+#Include "Libraries\TelemetryBrowser.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -335,7 +336,7 @@ class SoloCenter extends ConfigurationItem {
 					center.ChartViewer.Resized()
 					center.DetailsViewer.Resized()
 
-					center.pushTask(ObjBindMethod(SoloCenter.Instance, "updateReports", true))
+					center.pushTask(ObjBindMethod(center, "updateReports", true))
 				}
 				catch Any as exception {
 					logError(exception)

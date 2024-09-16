@@ -2031,11 +2031,6 @@ void collectCarTelemetry() {
 			break;
 		}
 
-	if (trackSplineBuilding)
-		updateTrackSpline();
-	else
-		startTrackSplineBuilder(carID);
-
 	if (trackSplineReady) {
 		float driverRunning = getRunning(carID);
 
@@ -2075,6 +2070,10 @@ void collectCarTelemetry() {
 				// retry next round...
 			}
 	}
+	else if (trackSplineBuilding)
+		updateTrackSpline();
+	else
+		startTrackSplineBuilder(carID);
 }
 
 bool started = false;

@@ -376,7 +376,7 @@ class TeamCenter extends ConfigurationItem {
 					center.ChartViewer.Resized()
 					center.DetailsViewer.Resized()
 
-					center.pushTask(ObjBindMethod(TeamCenter.Instance, "updateReports", true))
+					center.pushTask(ObjBindMethod(center, "updateReports", true))
 				}
 				catch Any as exception {
 					logError(exception)

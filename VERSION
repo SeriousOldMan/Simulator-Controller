@@ -1,9 +1,9 @@
 [Development]
 Version=5.8.8.0-dev
 Target=5.8.8.0-release
-Date=09/15/2024
+Date=09/16/2024
 Download=
-Changes=Fixed lap times and sector times in RaceRoom Racing Experience
+Changes=Fixed lap times and sector times in RaceRoom Racing Experience, Removed brake ducts for R3E from "Setup Workbench"
 Components=Media->5.6.1,Configuration->5.8.6,Utilities->5.4.8
 [Release]
 Version=5.8.7.0-release

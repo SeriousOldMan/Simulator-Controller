@@ -209,11 +209,11 @@ class Theme {
 			switch type, false {
 				case "ListView", "ListBox":
 					options .= (" Background" . this.ListBackColor["Background"])
-				case "Edit":
+				case "Edit", "ComboBox":
 					options .= (" Background" . this.FieldBackColor)
 				case "Button":
 					options .= (" Background" . this.ButtonBackColor)
-				case "Text", "Picture", "GroupBox", "CheckBox", "Radio", "Slider", "Link", "ComboBox":
+				case "Text", "Picture", "GroupBox", "CheckBox", "Radio", "Slider", "Link":
 					options .= (" Background" . this.WindowBackColor)
 				case "Tab3", "Tab2", "Tab":
 					options .= (" 0x8000")
@@ -419,9 +419,6 @@ class LightTheme extends Theme {
 		Get {
 			return "BFBFBF"
 		}
-	}
-
-	InitializeWindow(window) {
 	}
 }
 

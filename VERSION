@@ -3,7 +3,7 @@ Version=5.9.0.0-dev
 Target=5.9.0.0-release
 Date=09/17/2024
 Download=https://www.dropbox.com/scl/fi/83slo33ywxem2nzhwtxg7/Simulator-Controller-5.9.0.0-dev.zip?rlkey=rkg04bkxhm16qgcxzzwfzi6bt&st=zw4xpjsq&dl=1
-Changes=Fixed lap times and sector times in RaceRoom Racing Experience, Removed brake ducts for R3E from "Setup Workbench", New browser for real time car telemetry
+Changes=Fixed lap times and sector times in RaceRoom Racing Experience, Removed brake ducts for R3E from "Setup Workbench", New browser for real time car telemetry, Updated "Light" theme colors
 Components=Media->5.6.1,Configuration->5.8.6,Utilities->5.4.8
 [Release]
 Version=5.8.7.0-release

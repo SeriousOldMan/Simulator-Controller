@@ -620,6 +620,12 @@ class TelemetryBrowser {
 
 		this.iTelemetryDirectory := (normalizeDirectoryPath(directory) . "\")
 
+		this.Control["lapDropDown"].Delete()
+		this.Control["referenceLapDropDown"].Delete()
+
+		this.Control["referenceLapDropDown"].Add([translate("None")])
+		this.Control["referenceLapDropDown"].Choose(1)
+
 		if collect
 			OnExit(ObjBindMethod(this, "shutdownTelemetryCollector", true))
 	}

@@ -4856,7 +4856,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			SplitPath(fileName, &fileName)
 
-			this.SessionDatabase.writeStrategy(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, fileName, strategy, false, true)
+			this.SessionDatabase.writeStrategy(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, fileName, strategy
+											 , false, true, this.SessionDatabase.ID)
 
 			this.loadStrategies(fileName)
 		}
@@ -4939,7 +4940,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				SplitPath(fileName, &fileName)
 
-				this.SessionDatabase.writeSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, fileName, setup, size, false, true)
+				this.SessionDatabase.writeSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, fileName, setup, size
+											  , false, true, this.SessionDatabase.ID)
 
 				this.loadSetups(this.SelectedSetupType, true, fileName)
 			}

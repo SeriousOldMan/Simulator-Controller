@@ -1656,7 +1656,7 @@ class SessionDatabase extends ConfigurationItem {
 		deleteFile(fileName . ".data")
 		deleteFile(fileName . ".info")
 
-		identifier := getMultiMapValue(info, "Setup", "Identifier", false)
+		identifier := getMultiMapValue(info, "Session", "Identifier", false)
 
 		if (identifier && (getMultiMapValue(info, "Origin", "Driver", false) = this.ID))
 			for ignore, connector in this.Connectors

@@ -2041,13 +2041,18 @@ void collectCarTelemetry() {
 				if ((gf->completedLaps + 1) != telemetryLap) {
 					try {
 						telemetryFile.close();
+
+						remove((telemetryDirectory + "\\Lap " + to_string(telemetryLap) + ".telemetry").c_str());
+
+						rename((telemetryDirectory + "\\Lap " + to_string(telemetryLap) + ".tmp").c_str(),
+							   (telemetryDirectory + "\\Lap " + to_string(telemetryLap) + ".telemetry").c_str());
 					}
 					catch (...) {
 					}
 
 					telemetryLap = (gf->completedLaps + 1);
 
-					telemetryFile.open(telemetryDirectory + "\\Lap " + to_string(telemetryLap) + ".telemetry", ios::out | ios::app);
+					telemetryFile.open(telemetryDirectory + "\\Lap " + to_string(telemetryLap) + ".tmp", ios::out | ios::trunc);
 				}
 				
 				telemetryFile << (driverRunning * trackLength) << ";"

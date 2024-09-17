@@ -1626,8 +1626,18 @@ namespace ACSHMSpotter {
                 {
                     try
                     {
-                        if (telemetryFile != null)
-                            telemetryFile.Close();
+						if (telemetryFile != null)
+						{
+							telemetryFile.Close();
+
+							FileInfo info = new FileInfo(telemetryDirectory + "\\Lap " + telemetryLap + ".telemetry");
+
+							info.Delete();
+
+							info = new FileInfo(telemetryDirectory + "\\Lap " + telemetryLap + ".tmp");
+
+							info.MoveTo(telemetryDirectory + "\\Lap " + telemetryLap + ".telemetry");
+						}
                     }
                     catch (Exception)
                     {
@@ -1635,7 +1645,7 @@ namespace ACSHMSpotter {
 
                     telemetryLap = (graphics.CompletedLaps + 1);
 
-                    telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".telemetry", true);
+                    telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".tmp", false);
                 }
 
                 telemetryFile.Write(Math.Max(0, Math.Min(1, driver.splinePosition)) + staticInfo.TrackSPlineLength + ";");

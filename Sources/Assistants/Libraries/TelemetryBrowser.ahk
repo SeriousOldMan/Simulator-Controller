@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\..\Libraries\HTMLViewer.ahk"
+#Include "RaceReportViewer.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -24,6 +25,8 @@ class TelemetryChart {
 	static sChartID := 1
 
 	iWindow := false
+
+	iInfoViewer := false
 	iTelemetryViewer := false
 
 	iZoom := 100
@@ -31,6 +34,12 @@ class TelemetryChart {
 	Window {
 		Get {
 			return this.iWindow
+		}
+	}
+
+	InfoViewer {
+		Get {
+			return this.iInfoViewer
 		}
 	}
 
@@ -50,20 +59,64 @@ class TelemetryChart {
 		}
 	}
 
-	__New(window, telemetryViewer := false) {
+	__New(window, infoViewer := false, telemetryViewer := false) {
 		this.iWindow := window
+		this.iInfoViewer := infoViewer
 		this.iTelemetryViewer := telemetryViewer
 	}
 
-	showLapTelemetry(lapFileName, referenceLapFileName := false) {
+	showTelemetryInfo(lapDriver, lapLapTime := false, lapSectorTimes := false
+					, referenceDriver := false, referenceLapTime := false, referenceSectorTimes := false) {
+		local infoText, html
+
+		lapTimeDisplayValue(lapTime) {
+			if ((lapTime = "-") || isNull(lapTime))
+				return "-"
+			else
+				return RaceReportViewer.lapTimeDisplayValue(lapTime)
+		}
+
+		if this.InfoViewer {
+			this.InfoViewer.document.open()
+
+			if lapDriver {
+				infoText := "<table>"
+				infoText .= ("<tr><td>" . lapDriver . "</td>")
+				infoText .= ("<td>   </td><td>" . lapTimeDisplayValue(lapLapTime) . "</td>")
+				infoText .= ("<td>(" . values2String(", ", collect(lapSectorTimes, lapTimeDisplayValue)*) . ")</td><tr/>")
+
+				if referenceDriver {
+					infoText .= ("<tr><td>" . referenceDriver . "</td>")
+					infoText .= ("<td>   </td><td>" . lapTimeDisplayValue(referenceLapTime) . "</td>")
+					infoText .= ("<td>(" . values2String(", ", collect(referenceSectorTimes, lapTimeDisplayValue)*) . ")</td><tr/>")
+				}
+
+				infoText .= "</table>"
+
+				infoText := "<html><style> tr td { padding-top: 3px; padding-bottom:1px }</style><body style='background-color: #%backColor%' style='overflow: auto' leftmargin=3 topmargin=3 rightmargin=3 bottommargin=0><style> table, p { color: #%fontColor%; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><p>" . infoText . "</p></body></html>"
+
+				this.InfoViewer.document.write(substituteVariables(infoText, {fontColor: this.Window.Theme.TextColor
+																			, backColor: this.Window.BackColor}))
+			}
+			else {
+				html := "<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
+
+				this.InfoViewer.document.write(substituteVariables(html, {backColor: this.Window.BackColor}))
+			}
+
+			this.InfoViewer.document.close()
+		}
+	}
+
+	showTelemetryChart(lapFileName, referenceLapFileName := false) {
 		if this.TelemetryViewer {
 			this.TelemetryViewer.document.open()
-			this.TelemetryViewer.document.write(this.createTelemetryContent(lapFileName, referenceLapFileName))
+			this.TelemetryViewer.document.write(this.createTelemetryChart(lapFileName, referenceLapFileName))
 			this.TelemetryViewer.document.close()
 		}
 	}
 
-	createTelemetryContent(lapFileName, referenceLapFileName := false, margin := 0) {
+	createTelemetryChart(lapFileName, referenceLapFileName := false, margin := 0) {
 		local lapTelemetry := []
 		local referenceLapTelemetry := false
 		local html := ""
@@ -155,10 +208,10 @@ class TelemetryChart {
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Distance") . "');")
 
 		if referenceLapTelemetry {
-			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Speed (Reference)") . "');")
-			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Throttle (Reference)") . "');")
-			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Brake (Reference)") . "');")
-			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Steering (Reference)") . "');")
+			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Speed") . translate(" (Reference)") . "');")
+			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Throttle") . translate(" (Reference)") . "');")
+			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Brake") . translate(" (Reference)") . "');")
+			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Steering") . translate(" (Reference)") . "');")
 		}
 
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Speed") . "');")
@@ -235,13 +288,13 @@ class TelemetryChart {
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Distance") . "');")
 
 		if referenceLapTelemetry {
-			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("RPMS (Reference)") . "');")
-			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Gear (Reference)") . "');")
-			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("TC (Reference)") . "');")
-			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("ABS (Reference)") . "');")
+			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("RPM") . translate(" (Reference)") . "');")
+			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Gear") . translate(" (Reference)") . "');")
+			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("TC") . translate(" (Reference)") . "');")
+			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("ABS") . translate(" (Reference)") . "');")
 		}
 
-		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("RPMS") . "');")
+		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("RPM") . "');")
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Gear") . "');")
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("TC") . "');")
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("ABS") . "');")
@@ -310,6 +363,7 @@ class TelemetryBrowser {
 	iTelemetryCollectorPID := false
 
 	iWindow := false
+
 	iTelemetryChart := false
 
 	iLaps := []
@@ -360,6 +414,7 @@ class TelemetryBrowser {
 
 					this.iRedraw := false
 
+					this.iTelemetryBrowser.TelemetryChart.InfoViewer.Resized()
 					this.iTelemetryBrowser.TelemetryChart.TelemetryViewer.Resized()
 
 					Task.startTask(ObjBindMethod(this.iTelemetryBrowser, "updateTelemetryChart", true))
@@ -440,7 +495,7 @@ class TelemetryBrowser {
 	SelectedReferenceLap[path := false] {
 		Get {
 			return (this.iReferenceLap ? (path ? (this.TelemetryDirectory . "Lap " . this.iReferenceLap . ".telemetry")
-											   : this.iLap)
+											   : this.iReferenceLap)
 									   : false)
 		}
 
@@ -475,8 +530,8 @@ class TelemetryBrowser {
 	}
 
 	createGui() {
-		local browserGui := TelemetryBrowser.TelemetryBrowserWindow(this, {Descriptor: "Telemetry Browser", Closeable: true, Resizeable:  "Deferred"}, translate("Telemetry"))
-		local telemetryViewer
+		local browserGui := TelemetryBrowser.TelemetryBrowserWindow(this, {Descriptor: "Telemetry Browser", Closeable: true, Resizeable:  "Deferred"})
+		local infoViewer, telemetryViewer
 
 		changeZoom(*) {
 			this.TelemetryChart.Zoom := browserGui["zoomSlider"].Value
@@ -507,22 +562,24 @@ class TelemetryBrowser {
 
 		browserGui.SetFont("s8 Norm", "Arial")
 
-		browserGui.Add("Text", "x16 yp+10 w80", translate("Lap"))
-		browserGui.Add("DropDownList", "x98 yp-4 w296 vlapDropDown", this.Laps).OnEvent("Change", chooseLap)
+		infoViewer := browserGui.Add("HTMLViewer", "x165 yp+6 w300 h58 W:Grow")
+
+		browserGui.Add("Text", "x16 yp+8 w80", translate("Lap"))
+		browserGui.Add("DropDownList", "x98 yp-4 w60 vlapDropDown", this.Laps).OnEvent("Change", chooseLap)
 
 		browserGui.Add("Text", "x16 yp+28 w80", translate("Reference"))
-		browserGui.Add("DropDownList", "x98 yp-4 w296 Choose1 vreferenceLapDropDown", concatenate([translate("None")], this.Laps)).OnEvent("Change", chooseReferenceLap)
+		browserGui.Add("DropDownList", "x98 yp-4 w60 Choose1 vreferenceLapDropDown", concatenate([translate("None")], this.Laps)).OnEvent("Change", chooseReferenceLap)
 
 		browserGui.Add("Text", "x468 yp+4 w80 X:Move", translate("Zoom"))
 		browserGui.Add("Slider", "Center Thick15 x556 yp-2 X:Move w100 0x10 Range100-400 ToolTip vzoomSlider", 100).OnEvent("Change", changeZoom)
 
-		telemetryViewer := browserGui.Add("HTMLViewer", "x16 yp+26 w640 h480 W:Grow H:Grow Border")
+		telemetryViewer := browserGui.Add("HTMLViewer", "x16 yp+28 w640 h480 W:Grow H:Grow Border")
 
 		telemetryViewer.document.open()
 		telemetryViewer.document.write("")
 		telemetryViewer.document.close()
 
-		this.iTelemetryChart := TelemetryChart(browserGui, telemetryViewer)
+		this.iTelemetryChart := TelemetryChart(browserGui, infoViewer, telemetryViewer)
 
 		browserGui.Add(TelemetryBrowser.TelemetryBrowserResizer(this, telemetryViewer))
 
@@ -555,11 +612,16 @@ class TelemetryBrowser {
 		this.shutdownTelemetryCollector()
 	}
 
-	clear() {
+	restart(directory, collect := true) {
 		this.selectLap(false, true)
 		this.selectReferenceLap(false, true)
 
 		this.Laps := []
+
+		this.iTelemetryDirectory := (normalizeDirectoryPath(directory) . "\")
+
+		if collect
+			OnExit(ObjBindMethod(this, "shutdownTelemetryCollector", true))
 	}
 
 	close() {
@@ -716,7 +778,23 @@ class TelemetryBrowser {
 	}
 
 	updateTelemetryChart(redraw := false) {
-		if (this.TelemetryChart && redraw)
-			this.TelemetryChart.showLapTelemetry(this.SelectedLap[true], this.SelectedReferenceLap[true])
+		local lapDriver := false
+		local referenceDriver := false
+		local lapLapTime := false
+		local lapSectorTimes := false
+		local referenceLapTime := false
+		local referenceSectorTimes := false
+
+		if (this.TelemetryChart && redraw) {
+			if this.SelectedLap
+				this.Manager.getLapInformation(this.SelectedLap, &lapDriver, &lapLapTime, &lapSectorTimes)
+
+			if this.SelectedReferenceLap
+				this.Manager.getLapInformation(this.SelectedReferenceLap, &referenceDriver, &referenceLapTime, &referenceSectorTimes)
+
+			this.TelemetryChart.showTelemetryInfo(lapDriver, lapLapTime, lapSectorTimes
+												, referenceDriver, referenceLapTime, referenceSectorTimes)
+			this.TelemetryChart.showTelemetryChart(this.SelectedLap[true], this.SelectedReferenceLap[true])
+		}
 	}
 }

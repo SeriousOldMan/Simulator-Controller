@@ -1609,35 +1609,57 @@ FILE* telemetryFile = 0;
 int telemetryLap = -1;
 
 void collectCarTelemetry(int playerID) {
+	char telemetryFileName[512] = "";
+	char tmpFileName[512] = "";
 	char buffer[60] = "";
 
 	int carLaps = map_buffer->completed_laps;
 
 	if ((carLaps + 1) != telemetryLap) {
-		if (telemetryFile)
+
+		if (telemetryFile) {
 			fclose(telemetryFile);
+
+			int offset = strlen(telemetryDirectory);
+
+			sprintf_s(buffer, 60, "%d", telemetryLap);
+
+			strcpy_s(tmpFileName, 512, telemetryDirectory);
+			strcpy_s(tmpFileName + offset, 512 - offset, "\\Lap ");
+			offset += strlen("\\Lap ");
+			strcpy_s(tmpFileName + offset, 512 - offset, buffer);
+			offset += strlen(buffer);
+			strcpy_s(tmpFileName + offset, 512 - offset, ".tmp");
+
+			offset = strlen(telemetryDirectory);
+
+			strcpy_s(telemetryFileName, 512, telemetryDirectory);
+			offset = strlen(telemetryDirectory);
+			strcpy_s(telemetryFileName + offset, 512 - offset, "\\Lap ");
+			offset += strlen("\\Lap ");
+			strcpy_s(telemetryFileName + offset, 512 - offset, buffer);
+			offset += strlen(buffer);
+			strcpy_s(telemetryFileName + offset, 512 - offset, ".tmp");
+
+			remove(telemetryFileName);
+
+			rename(tmpFileName, telemetryFileName);
+		}
 			
 		telemetryLap = (carLaps + 1);
 
-		sprintf_s(buffer, 60, "%d", telemetryLap);
-
-		char fileName[512];
-
-		strcpy_s(fileName, 512, telemetryDirectory);
-
 		int offset = strlen(telemetryDirectory);
 
-		strcpy_s(fileName + offset, 512 - offset, "\\Lap ");
+		sprintf_s(buffer, 60, "%d", telemetryLap);
 
+		strcpy_s(tmpFileName, 512, telemetryDirectory);
+		strcpy_s(tmpFileName + offset, 512 - offset, "\\Lap ");
 		offset += strlen("\\Lap ");
-
-		strcpy_s(fileName + offset, 512 - offset, buffer);
-
+		strcpy_s(tmpFileName + offset, 512 - offset, buffer);
 		offset += strlen(buffer);
+		strcpy_s(tmpFileName + offset, 512 - offset, ".tmp");
 
-		strcpy_s(fileName + offset, 512 - offset, ".telemetry");
-
-		if (fopen_s(&telemetryFile, fileName, "a")) {
+		if (fopen_s(&telemetryFile, tmpFileName, "w")) {
 			telemetryFile = 0;
 
 			return;

@@ -1851,6 +1851,13 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 		if ((carLaps + 1) != telemetryLap) {
 			try {
 				telemetryFile.close();
+
+				sprintf_s(buffer, "%d", telemetryLap);
+
+				remove((telemetryDirectory + "\\Lap " + buffer + ".telemetry").c_str());
+
+				rename((telemetryDirectory + "\\Lap " + buffer + ".tmp").c_str(),
+					   (telemetryDirectory + "\\Lap " + buffer + ".telemetry").c_str());
 			}
 			catch (...) {
 			}
@@ -1859,7 +1866,7 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 
 			sprintf_s(buffer, "%d", telemetryLap);
 
-			telemetryFile.open(telemetryDirectory + "\\Lap " + buffer + ".telemetry", std::ios::out | std::ios::app);
+			telemetryFile.open(telemetryDirectory + "\\Lap " + buffer + ".tmp", std::ios::out | std::ios::trunc);
 		}
 
 		char* trackPositions;

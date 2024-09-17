@@ -1726,8 +1726,17 @@ namespace RF2SHMSpotter {
                 {
                     try
                     {
-                        if (telemetryFile != null)
+                        if (telemetryFile != null) {
                             telemetryFile.Close();
+
+                            FileInfo info = new FileInfo(telemetryDirectory + "\\Lap " + telemetryLap + ".telemetry");
+
+                            info.Delete();
+
+                            info = new FileInfo(telemetryDirectory + "\\Lap " + telemetryLap + ".tmp");
+
+                            info.MoveTo(telemetryDirectory + "\\Lap " + telemetryLap + ".telemetry");
+                        }
                     }
                     catch (Exception)
                     {
@@ -1735,7 +1744,7 @@ namespace RF2SHMSpotter {
 
                     telemetryLap = (playerScoring.mTotalLaps + 1);
 
-                    telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".telemetry", true);
+                    telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".tmp", false);
                 }
 
                 telemetryFile.Write(playerScoring.mLapDist + ";");

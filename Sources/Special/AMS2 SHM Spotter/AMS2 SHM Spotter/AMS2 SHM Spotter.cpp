@@ -1442,13 +1442,18 @@ void collectCarTelemetry(const SharedMemory* sharedData) {
 		if ((vehicle.mLapsCompleted + 1) != telemetryLap) {
 			try {
 				telemetryFile.close();
+
+				remove((telemetryDirectory + "\\Lap " + std::to_string(telemetryLap) + ".telemetry").c_str());
+
+				rename((telemetryDirectory + "\\Lap " + std::to_string(telemetryLap) + ".tmp").c_str(),
+					   (telemetryDirectory + "\\Lap " + std::to_string(telemetryLap) + ".telemetry").c_str());
 			}
 			catch (...) {
 			}
 
 			telemetryLap = (vehicle.mLapsCompleted + 1);
 
-			telemetryFile.open(telemetryDirectory + "\\Lap " + std::to_string(telemetryLap) + ".telemetry", std::ios::out | std::ios::app);
+			telemetryFile.open(telemetryDirectory + "\\Lap " + std::to_string(telemetryLap) + ".tmp", std::ios::out | std::ios::trunc);
 		}
 
 		telemetryFile << vehicle.mCurrentLapDistance << ";"

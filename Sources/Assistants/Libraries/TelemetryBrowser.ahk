@@ -484,6 +484,9 @@ class TelemetryBrowser {
 			this.selectReferenceLap(string2Values(":", browserGui["referenceLapDropDown"].Text)[1])
 		}
 
+		deleteLap(*) {
+		}
+
 		this.iWindow := browserGui
 
 		browserGui.SetFont("s10 Bold", "Arial")
@@ -501,6 +504,9 @@ class TelemetryBrowser {
 
 		browserGui.Add("Text", "x16 yp+10 w80", translate("Lap"))
 		browserGui.Add("DropDownList", "x98 yp-4 w280 vlapDropDown", collect(this.Laps, (l) => this.lapLabel(l))).OnEvent("Change", chooseLap)
+
+		browserGui.Add("Button", "x380 yp w23 h23 Center +0x200 vdeleteButton").OnEvent("Click", deleteLap)
+		setButtonIcon(browserGui["deleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
 		browserGui.Add("Text", "x16 yp+28 w80", translate("Reference"))
 		browserGui.Add("DropDownList", "x98 yp-4 w280 Choose1 vreferenceLapDropDown", concatenate([translate("None")], collect(this.Laps, (l) => this.lapLabel(l)))).OnEvent("Change", chooseReferenceLap)
@@ -538,6 +544,13 @@ class TelemetryBrowser {
 		this.updateTelemetryChart(true)
 	}
 
+	updateState() {
+		if this.SelectedLap
+			this.Control["deleteButton"].Enabled := true
+		else
+			this.Control["deleteButton"].Enabled := false
+	}
+
 	startup(simulator, trackLength) {
 		if !this.iTelemetryCollectorPID
 			this.startupTelemetryCollector(simulator, trackLength)
@@ -555,11 +568,15 @@ class TelemetryBrowser {
 
 		this.iTelemetryDirectory := (normalizeDirectoryPath(directory) . "\")
 
-		this.Control["lapDropDown"].Delete()
-		this.Control["referenceLapDropDown"].Delete()
+		if this.Window {
+			this.Control["lapDropDown"].Delete()
+			this.Control["referenceLapDropDown"].Delete()
 
-		this.Control["referenceLapDropDown"].Add([translate("None")])
-		this.Control["referenceLapDropDown"].Choose(1)
+			this.Control["referenceLapDropDown"].Add([translate("None")])
+			this.Control["referenceLapDropDown"].Choose(1)
+
+			this.updateState()
+		}
 
 		if collect
 			OnExit(ObjBindMethod(this, "shutdownTelemetryCollector", true))
@@ -577,7 +594,11 @@ class TelemetryBrowser {
 		if (force || (lap != this.SelectedLap)) {
 			this.SelectedLap := lap
 
-			this.Control["lapDropDown"].Choose(inList(this.Laps, lap))
+			if this.Window {
+				this.Control["lapDropDown"].Choose(inList(this.Laps, lap))
+
+				this.updateState()
+			}
 		}
 	}
 
@@ -588,7 +609,11 @@ class TelemetryBrowser {
 		if (force || (lap != this.SelectedReferenceLap)) {
 			this.SelectedReferenceLap := lap
 
-			this.Control["referenceLapDropDown"].Choose(lap ? (inList(this.Laps, lap) + 1) : 1)
+			if this.Window {
+				this.Control["referenceLapDropDown"].Choose(lap ? (inList(this.Laps, lap) + 1) : 1)
+
+				this.updateState()
+			}
 		}
 	}
 
@@ -734,6 +759,8 @@ class TelemetryBrowser {
 
 			if (!this.SelectedLap && (laps.Length > 0))
 				this.selectlap(string2Values(":", laps[1])[1])
+
+			this.updateState()
 		}
 	}
 

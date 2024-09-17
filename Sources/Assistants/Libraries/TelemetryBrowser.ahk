@@ -683,7 +683,10 @@ class TelemetryBrowser {
 
 		this.Manager.getLapInformation(lap, &driver, &lapTime, &sectorTimes)
 
-		return (lap . translate(":") . A_Space driver . translate(" - ") . lapTimeDisplayValue(lapTime) . A_Space . translate("[") . values2String(", ", collect(sectorTimes, lapTimeDisplayValue)*) . translate("]"))
+		if (!InStr(driver, "John Doe") && (lapTime != "-"))
+			return (lap . translate(":") . A_Space driver . translate(" - ") . lapTimeDisplayValue(lapTime) . A_Space . translate("[") . values2String(", ", collect(sectorTimes, lapTimeDisplayValue)*) . translate("]"))
+		else
+			return lap
 	}
 
 	loadTelemetry() {
@@ -726,14 +729,24 @@ class TelemetryBrowser {
 
 		this.Laps := concatenate(this.Laps, laps)
 
-		laps := collect(laps, (l) => this.lapLabel(l))
-
 		if this.Window {
-			this.Control["lapDropDown"].Add(laps)
-			this.Control["referenceLapDropDown"].Add(laps)
+			laps := collect(this.Laps, (l) => this.lapLabel(l))
 
-			if (!this.SelectedLap && (laps.Length > 0))
-				this.selectlap(string2Values(":", laps[1])[1])
+			this.Control["lapDropDown"].Delete()
+			this.Control["referenceLapDropDown"].Delete()
+
+			this.Control["lapDropDown"].Add(laps)
+			this.Control["referenceLapDropDown"].Add(concatenate([translate("None")], laps))
+
+			if (!this.SelectedLap && (laps.Length > 0)) {
+				this.selectlap(this.Laps[1])
+
+				this.Control["referenceLapDropDown"].Choose(1)
+			}
+			else {
+				this.Control["lapDropDown"].Choose(inList(this.Laps, this.SelectedLap))
+				this.Control["referenceLapDropDown"].Choose(1 + inList(this.Laps, this.SelectedReferenceLap))
+			}
 		}
 	}
 

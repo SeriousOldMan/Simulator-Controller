@@ -376,7 +376,7 @@ class TeamCenter extends ConfigurationItem {
 					center.ChartViewer.Resized()
 					center.DetailsViewer.Resized()
 
-					center.pushTask(ObjBindMethod(TeamCenter.Instance, "updateReports", true))
+					center.pushTask(ObjBindMethod(center, "updateReports", true))
 				}
 				catch Any as exception {
 					logError(exception)
@@ -9183,7 +9183,7 @@ class TeamCenter extends ConfigurationItem {
 
 							SplitPath(fileName, , &folder, , &fileName)
 
-							info := readMultiMap(directory . "\Session.info")
+							info := readMultiMap(directory . "Session.info")
 
 							if (getMultiMapValue(info, "Creator", "ID", kUndefined) = kUndefined) {
 								setMultiMapValue(info, "Creator", "ID", SessionDatabase.ID)
@@ -9194,7 +9194,7 @@ class TeamCenter extends ConfigurationItem {
 								dataFile := temporaryFileName("Race", "zip")
 
 								try {
-									RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
+									RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
 
 									file := FileOpen(dataFile, "r-wd")
 
@@ -9207,7 +9207,8 @@ class TeamCenter extends ConfigurationItem {
 
 										file.Close()
 
-										sessionDB.writeSession(simulator, car, track, "Team", fileName, info, session, size, false, true)
+										sessionDB.writeSession(simulator, car, track, "Team", fileName, info, session, size
+															 , false, !FileExist(directory . "Telemetry\*.telemetry"), SessionDatabase.ID)
 
 										return
 									}
@@ -9222,7 +9223,7 @@ class TeamCenter extends ConfigurationItem {
 
 							dataFile := temporaryFileName("Race", "zip")
 
-							RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
+							RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
 
 							FileMove(dataFile, folder . "\" . fileName . ".data", 1)
 

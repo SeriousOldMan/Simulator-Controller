@@ -1612,6 +1612,70 @@ namespace ACSHMSpotter {
 			}
         }
 
+        string telemetryDirectory = "";
+        StreamWriter telemetryFile = null;
+        int telemetryLap = -1;
+
+        void collectCarTelemetry()
+        {
+            ref AcCarInfo driver = ref cars.cars[0];
+            
+            try
+            {
+                if ((graphics.CompletedLaps + 1) != telemetryLap)
+                {
+                    try
+                    {
+						if (telemetryFile != null)
+						{
+							telemetryFile.Close();
+
+							FileInfo info = new FileInfo(telemetryDirectory + "\\Lap " + telemetryLap + ".telemetry");
+
+							info.Delete();
+
+							info = new FileInfo(telemetryDirectory + "\\Lap " + telemetryLap + ".tmp");
+
+							info.MoveTo(telemetryDirectory + "\\Lap " + telemetryLap + ".telemetry");
+						}
+                    }
+                    catch (Exception)
+                    {
+                    }
+
+                    telemetryLap = (graphics.CompletedLaps + 1);
+
+                    telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".tmp", false);
+                }
+
+                telemetryFile.Write(Math.Max(0, Math.Min(1, driver.splinePosition)) + staticInfo.TrackSPlineLength + ";");
+                telemetryFile.Write(physics.Gas + ";");
+                telemetryFile.Write(physics.Brake + ";");
+                telemetryFile.Write(physics.SteerAngle + ";");
+                telemetryFile.Write(physics.Gear + ";");
+                telemetryFile.Write(physics.Rpms + ";");
+                telemetryFile.Write(physics.SpeedKmh + ";");
+
+                telemetryFile.Write(physics.TC + ";");
+                telemetryFile.WriteLine(physics.Abs);
+
+                telemetryFile.Close();
+            }
+            catch (Exception)
+            {
+                try
+                {
+                    if (telemetryFile != null)
+                        telemetryFile.Close();
+                }
+                catch (Exception)
+                {
+                }
+
+                // retry next round...
+            }
+        }
+
         public void initializeTrigger(string[] args)
         {
             for (int i = 1; i < (args.Length - 1); i += 2)
@@ -1688,7 +1752,7 @@ namespace ACSHMSpotter {
                 semFileName = args[4];
         }
 
-        public void Run(bool mapTrack, bool positionTrigger, bool analyzeTelemetry)
+        public void Run(bool mapTrack, bool positionTrigger, bool analyzeTelemetry, string telemetryFolder = "")
 		{
 			bool running = false;
 
@@ -1698,7 +1762,11 @@ namespace ACSHMSpotter {
 
 			float lastTime = graphics.SessionTimeLeft;
 
-			while (true)
+            bool carTelemetry = (telemetryFolder.Length > 0);
+
+            telemetryDirectory = telemetryFolder;
+
+            while (true)
 			{
 				counter++;
 
@@ -1747,37 +1815,42 @@ namespace ACSHMSpotter {
 
 					if (running)
 					{
-						if ((graphics.Status == AC_STATUS.AC_LIVE) && (graphics.IsInPit == 0) && (graphics.IsInPitLane == 0))
-						{
-							updateTopSpeed();
-
-							cycle += 1;
-
-							if (checkAccident())
-                                wait = false;
-                            else if (checkFlagState() || checkPositions())
-                                wait = false;
-                            else 
-								wait = !checkPitWindow();
-                        }
+						if (carTelemetry)
+							collectCarTelemetry();
 						else
 						{
-							longitudinalRearDistance = 5;
-					
-							lastSituation = CLEAR;
-							carBehind = false;
-							carBehindLeft = false;
-							carBehindRight = false;
-							carBehindReported = false;
+							if ((graphics.Status == AC_STATUS.AC_LIVE) && (graphics.IsInPit == 0) && (graphics.IsInPitLane == 0))
+							{
+								updateTopSpeed();
 
-							lastFlagState = 0;
+								cycle += 1;
+
+								if (checkAccident())
+									wait = false;
+								else if (checkFlagState() || checkPositions())
+									wait = false;
+								else
+									wait = !checkPitWindow();
+							}
+							else
+							{
+								longitudinalRearDistance = 5;
+
+								lastSituation = CLEAR;
+								carBehind = false;
+								carBehindLeft = false;
+								carBehindRight = false;
+								carBehindReported = false;
+
+								lastFlagState = 0;
+							}
 						}
 					}
 				}
 
-                if (analyzeTelemetry)
-                    Thread.Sleep(10);
-                else if (positionTrigger)
+				if (carTelemetry)
+                    Thread.Sleep(20);
+                else if (analyzeTelemetry || positionTrigger)
                     Thread.Sleep(10);
                 else if (wait)
 					Thread.Sleep(50);

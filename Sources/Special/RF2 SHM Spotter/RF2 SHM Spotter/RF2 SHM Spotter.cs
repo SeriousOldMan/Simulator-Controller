@@ -6,10 +6,12 @@ Small parts original by: The Iron Wolf (vleonavicius@hotmail.com; thecrewchief.o
 using RF2SHMSpotter.rFactor2Data;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -1708,9 +1710,72 @@ namespace RF2SHMSpotter {
 					}
 				}
 			}
-		}
+        }
 
-		public void initializeTrigger(string[] args)
+        string telemetryDirectory = "";
+        StreamWriter telemetryFile = null;
+        int telemetryLap = -1;
+
+        void collectCarTelemetry(ref rF2VehicleScoring playerScoring)
+        {
+            int playerID = playerScoring.mID;
+
+            try
+            {
+                if ((playerScoring.mTotalLaps + 1) != telemetryLap)
+                {
+                    try
+                    {
+                        if (telemetryFile != null) {
+                            telemetryFile.Close();
+
+                            FileInfo info = new FileInfo(telemetryDirectory + "\\Lap " + telemetryLap + ".telemetry");
+
+                            info.Delete();
+
+                            info = new FileInfo(telemetryDirectory + "\\Lap " + telemetryLap + ".tmp");
+
+                            info.MoveTo(telemetryDirectory + "\\Lap " + telemetryLap + ".telemetry");
+                        }
+                    }
+                    catch (Exception)
+                    {
+                    }
+
+                    telemetryLap = (playerScoring.mTotalLaps + 1);
+
+                    telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".tmp", false);
+                }
+
+                telemetryFile.Write(playerScoring.mLapDist + ";");
+                telemetryFile.Write((float)telemetry.mVehicles[playerID].mFilteredThrottle + ";");
+                telemetryFile.Write((float)telemetry.mVehicles[playerID].mFilteredBrake + ";");
+                telemetryFile.Write((float)telemetry.mVehicles[playerID].mFilteredSteering + ";");
+                telemetryFile.Write((float)telemetry.mVehicles[playerID].mGear + ";");
+                telemetryFile.Write((float)telemetry.mVehicles[playerID].mEngineRPM + ";");
+                telemetryFile.Write(vehicleSpeed(ref playerScoring) + ";");
+
+                telemetryFile.Write("n/a;");
+                telemetryFile.WriteLine("n/a");
+
+                telemetryFile.Close();
+            }
+            catch (Exception)
+            {
+                try
+                {
+                    if (telemetryFile != null)
+                        telemetryFile.Close();
+                }
+                catch (Exception)
+                {
+                }
+
+                // retry next round...
+            }
+        }
+
+        public void initializeTrigger(string[] args)
         {
 			for (int i = 1; i < (args.Length - 1); i += 2)
 			{
@@ -1793,10 +1858,13 @@ namespace RF2SHMSpotter {
 			return true;
 		}
 
-		public void Run(bool mapTrack, bool positionTrigger, bool analyzeTelemetry) {
+		public void Run(bool mapTrack, bool positionTrigger, bool analyzeTelemetry, string telemetryFolder = "") {
             bool running = false;
 			int countdown = 4000;
 			long counter = 0;
+			bool carTelemetry = (telemetryFolder.Length > 0);
+
+			telemetryDirectory = telemetryFolder;
 
             while (true) {
 				counter++;
@@ -1843,10 +1911,10 @@ namespace RF2SHMSpotter {
 						{
 							bool startGo = (scoring.mScoringInfo.mGamePhase == (byte)rF2GamePhase.GreenFlag);
 
-                            if (!greenFlagReported && (counter > 8000))
-                            	greenFlagReported = true;
+							if (!greenFlagReported && (counter > 8000))
+								greenFlagReported = true;
 
-                            if (!running)
+							if (!running)
 							{
 								countdown -= 1;
 
@@ -1856,30 +1924,35 @@ namespace RF2SHMSpotter {
 
 							if (running)
 							{
-								if (extended.mSessionStarted != 0 && scoring.mScoringInfo.mGamePhase < (byte)SessionStopped &&
-									playerScoring.mPitState < (byte)Entering)
-								{
-									updateTopSpeed(ref playerScoring);
+                                if (carTelemetry)
+                                    collectCarTelemetry(ref playerScoring);
+                                else
+                                {
+                                    if (extended.mSessionStarted != 0 && scoring.mScoringInfo.mGamePhase < (byte)SessionStopped &&
+										playerScoring.mPitState < (byte)Entering)
+									{
+										updateTopSpeed(ref playerScoring);
 
-									cycle += 1;
+										cycle += 1;
 
-									if (!startGo || !greenFlag())
-                                        if (checkAccident(ref playerScoring))
-                                            wait = false;
-										else if(checkFlagState(ref playerScoring) || checkPositions(ref playerScoring))
-											wait = false;
-										else
-											wait = !checkPitWindow(ref playerScoring);
-								}
-								else
-								{
-									longitudinalRearDistance = 5;
+										if (!startGo || !greenFlag())
+											if (checkAccident(ref playerScoring))
+												wait = false;
+											else if (checkFlagState(ref playerScoring) || checkPositions(ref playerScoring))
+												wait = false;
+											else
+												wait = !checkPitWindow(ref playerScoring);
+									}
+									else
+									{
+										longitudinalRearDistance = 5;
 
-									lastSituation = CLEAR;
-									carBehind = false;
-									carBehindReported = false;
+										lastSituation = CLEAR;
+										carBehind = false;
+										carBehindReported = false;
 
-									lastFlagState = 0;
+										lastFlagState = 0;
+									}
 								}
                             }
                             else
@@ -1888,9 +1961,9 @@ namespace RF2SHMSpotter {
                         else
                             wait = true;
 
-                        if (analyzeTelemetry)
-                            Thread.Sleep(10);
-                        else if (positionTrigger)
+						if (carTelemetry)
+                            Thread.Sleep(20);
+                        else if (analyzeTelemetry || positionTrigger)
                             Thread.Sleep(10);
                         else if (wait)
 							Thread.Sleep(50);

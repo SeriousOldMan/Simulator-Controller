@@ -1835,6 +1835,96 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 	}
 }
 
+std::string telemetryDirectory = "";
+std::ofstream telemetryFile;
+int telemetryLap = -1;
+
+void collectCarTelemetry(const irsdk_header* header, const char* data, const int playerCarIndex, float trackLength) {
+	char buffer[60] = "";
+	char* rawValue;
+
+	getRawDataValue(rawValue, header, data, "Lap");
+
+	int carLaps = *((int*)rawValue);
+
+	try {
+		if ((carLaps + 1) != telemetryLap) {
+			try {
+				telemetryFile.close();
+
+				sprintf_s(buffer, "%d", telemetryLap);
+
+				remove((telemetryDirectory + "\\Lap " + buffer + ".telemetry").c_str());
+
+				rename((telemetryDirectory + "\\Lap " + buffer + ".tmp").c_str(),
+					   (telemetryDirectory + "\\Lap " + buffer + ".telemetry").c_str());
+			}
+			catch (...) {
+			}
+
+			telemetryLap = (carLaps + 1);
+
+			sprintf_s(buffer, "%d", telemetryLap);
+
+			telemetryFile.open(telemetryDirectory + "\\Lap " + buffer + ".tmp", std::ios::out | std::ios::trunc);
+		}
+
+		char* trackPositions;
+		char* pitLaneStates;
+		float playerRunning = 0.0;
+		float speed = 0.0;
+		float throttle = 0.0;
+		float brake = 0.0;
+		float steerAngle = 0.0;
+		int gear = 0;
+		int rpms = 0;
+
+		if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
+			playerRunning = ((float*)trackPositions)[playerCarIndex];
+
+		if (getRawDataValue(rawValue, header, data, "Speed"))
+			speed = *((float*)rawValue) * 3.6;
+
+		if (getRawDataValue(rawValue, header, data, "Throttle"))
+			throttle = *(float*)rawValue;
+
+		if (getRawDataValue(rawValue, header, data, "Brake"))
+			brake = *(float*)rawValue;
+
+		if (getRawDataValue(rawValue, header, data, "SteeringWheelAngleMax")) {
+			float maxSteerAngle = *((float*)rawValue);
+
+			if (getRawDataValue(rawValue, header, data, "SteeringWheelAngle"))
+				steerAngle = *((float*)rawValue) / maxSteerAngle;
+		}
+
+		if (getRawDataValue(rawValue, header, data, "Gear"))
+			gear = *(int*)rawValue;
+
+		if (getRawDataValue(rawValue, header, data, "RPM"))
+			rpms = *(int*)rawValue;
+
+			telemetryFile << (playerRunning * trackLength) << ";"
+						  << throttle << ";"
+						  << brake << ";"
+						  << steerAngle << ";"
+						  << gear << ";"
+						  << rpms << ";"
+						  << speed << ";"
+						  << "n/a" << ";"
+						  << "n/a" << std::endl;
+	}
+	catch (...) {
+		try {
+			telemetryFile.close();
+		}
+		catch (...) {
+		}
+
+		// retry next round...
+	}
+}
+
 bool started = false;
 
 inline const bool active(const irsdk_header* header, const char* data) {
@@ -1888,6 +1978,7 @@ int main(int argc, char* argv[])
 	bool positionTrigger = false;
 	bool calibrateTelemetry = false;
 	bool analyzeTelemetry = false;
+	bool carTelemetry = false;
 
 	char* soundsDirectory = "";
 	char* audioDevice = "";
@@ -1897,6 +1988,7 @@ int main(int argc, char* argv[])
 		analyzeTelemetry = calibrateTelemetry || (strcmp(argv[1], "-Analyze") == 0);
 		mapTrack = (strcmp(argv[1], "-Map") == 0);
 		positionTrigger = (strcmp(argv[1], "-Trigger") == 0);
+		carTelemetry = (strcmp(argv[1], "-Telemetry") == 0);
 
 		if (mapTrack && argc > 2)
 			circuit = (strcmp(argv[2], "Circuit") == 0);
@@ -1963,6 +2055,11 @@ int main(int argc, char* argv[])
 			if (numCoordinates == 0)
 				positionTrigger = false;
 		}
+		else if (carTelemetry) {
+			char* trackLength = argv[2];
+
+			telemetryDirectory = argv[3];
+		}
 		else {
 			for (int i = 0; i < 512; ++i)
 				lastRunnings[i] = 0;
@@ -1997,6 +2094,7 @@ int main(int argc, char* argv[])
 	float trackLength = 0.0;
 	bool done = false;
 	long counter = 0;
+	int playerCarIndex = -1;
 
 	while (!done) {
 		g_data = NULL;
@@ -2064,70 +2162,75 @@ int main(int argc, char* argv[])
 
 						if (running) {
 							char* rawValue;
-							bool onTrack = true;
 
-							getDataValue(result, pHeader, g_data, "IsInGarage");
-							if (atoi(result))
-								onTrack = false;
+							if (playerCarIndex == -1) {
+								char playerCarIdx[10] = "";
 
-							getDataValue(result, pHeader, g_data, "IsReplayPlaying");
-							if (atoi(result))
-								onTrack = false;
+								getYamlValue(playerCarIdx, irsdk_getSessionInfoStr(), "DriverInfo:DriverCarIdx:");
 
-							getRawDataValue(rawValue, pHeader, g_data, "IsOnTrack");
-							if (!*(bool*)rawValue)
-								onTrack = false;
-
-							getRawDataValue(rawValue, pHeader, g_data, "IsOnTrackCar");
-							if (!*(bool*)rawValue)
-								onTrack = false;
-
-							bool inPit = false;
-
-							char playerCarIdx[10] = "";
-
-							getYamlValue(playerCarIdx, irsdk_getSessionInfoStr(), "DriverInfo:DriverCarIdx:");
-
-							int playerCarIndex = atoi(playerCarIdx);
-
-							getRawDataValue(rawValue, pHeader, g_data, "CarIdxOnPitRoad");
-
-							if (((bool*)rawValue)[playerCarIndex])
-								inPit = true;
-							/*
-							else {
-								getRawDataValue(rawValue, pHeader, g_data, "CarIdxTrackSurface");
-
-								irsdk_TrkLoc trkLoc = ((irsdk_TrkLoc*)rawValue)[atoi(playerCarIdx)];
-
-								inPit = (trkLoc & irsdk_InPitStall);
+								playerCarIndex = atoi(playerCarIdx);
 							}
-							*/
 
-							if (onTrack && !inPit) {
-								updateTopSpeed(pHeader, g_data);
-
-								cycle += 1;
-
-								if (greenFlag(pHeader, g_data))
-									wait = false;
-								else if (checkAccident(pHeader, g_data, playerCarIndex, trackLength))
-									wait = false;
-								else if (checkFlagState(pHeader, g_data) || checkPositions(pHeader, g_data, playerCarIndex, trackLength))
-									wait = false;
-								else
-									wait = !checkPitWindow(pHeader, g_data);
-
-								continue;
-							}
+							if (carTelemetry)
+								collectCarTelemetry(pHeader, g_data, playerCarIndex, trackLength);
 							else {
-								lastSituation = CLEAR;
-								carBehind = false;
-								carBehindReported = false;
+								bool onTrack = true;
 
-								lastFlagState = 0;
+								getDataValue(result, pHeader, g_data, "IsInGarage");
+								if (atoi(result))
+									onTrack = false;
 
-								Sleep(1000);
+								getDataValue(result, pHeader, g_data, "IsReplayPlaying");
+								if (atoi(result))
+									onTrack = false;
+
+								getRawDataValue(rawValue, pHeader, g_data, "IsOnTrack");
+								if (!*(bool*)rawValue)
+									onTrack = false;
+
+								getRawDataValue(rawValue, pHeader, g_data, "IsOnTrackCar");
+								if (!*(bool*)rawValue)
+									onTrack = false;
+
+								bool inPit = false;
+
+								if (((bool*)rawValue)[playerCarIndex])
+									inPit = true;
+								/*
+								else {
+									getRawDataValue(rawValue, pHeader, g_data, "CarIdxTrackSurface");
+
+									irsdk_TrkLoc trkLoc = ((irsdk_TrkLoc*)rawValue)[atoi(playerCarIdx)];
+
+									inPit = (trkLoc & irsdk_InPitStall);
+								}
+								*/
+
+								if (onTrack && !inPit) {
+									updateTopSpeed(pHeader, g_data);
+
+									cycle += 1;
+
+									if (greenFlag(pHeader, g_data))
+										wait = false;
+									else if (checkAccident(pHeader, g_data, playerCarIndex, trackLength))
+										wait = false;
+									else if (checkFlagState(pHeader, g_data) || checkPositions(pHeader, g_data, playerCarIndex, trackLength))
+										wait = false;
+									else
+										wait = !checkPitWindow(pHeader, g_data);
+
+									continue;
+								}
+								else {
+									lastSituation = CLEAR;
+									carBehind = false;
+									carBehindReported = false;
+
+									lastFlagState = 0;
+
+									Sleep(1000);
+								}
 							}
 						}
 						else
@@ -2144,7 +2247,9 @@ int main(int argc, char* argv[])
 				delete g_data;
 		}
 
-		if (analyzeTelemetry)
+		if (carTelemetry)
+			Sleep(20);
+		else if (analyzeTelemetry)
 			Sleep(10);
 		else if (mapTrack)
 			Sleep(1);

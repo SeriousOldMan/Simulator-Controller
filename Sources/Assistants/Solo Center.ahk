@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Solo Center Tool            ;;;
+;;;   Modular Simulator Controller System - Solo Center Tool                ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
@@ -41,6 +41,7 @@
 #Include "..\Database\Libraries\TyresDatabase.ahk"
 #Include "..\Database\Libraries\TelemetryDatabase.ahk"
 #Include "Libraries\RaceReportViewer.ahk"
+#Include "Libraries\TelemetryBrowser.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -255,6 +256,8 @@ class SoloCenter extends ConfigurationItem {
 	iSelectedDetailReport := false
 	iSelectedDetailHTML := false
 
+	iTelemetryBrowser := false
+
 	class SoloCenterWindow extends Window {
 		iSoloCenter := false
 
@@ -335,7 +338,7 @@ class SoloCenter extends ConfigurationItem {
 					center.ChartViewer.Resized()
 					center.DetailsViewer.Resized()
 
-					center.pushTask(ObjBindMethod(SoloCenter.Instance, "updateReports", true))
+					center.pushTask(ObjBindMethod(center, "updateReports", true))
 				}
 				catch Any as exception {
 					logError(exception)
@@ -1132,6 +1135,12 @@ class SoloCenter extends ConfigurationItem {
 		}
 	}
 
+	TelemetryBrowser {
+		Get {
+			return this.iTelemetryBrowser
+		}
+	}
+
 	__New(configuration, raceSettings, simulator := false, car := false, track := false) {
 		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 		local sessionsDirectory
@@ -1726,10 +1735,10 @@ class SoloCenter extends ConfigurationItem {
 		setButtonIcon(centerGui["importPressuresButton"], kIconsDirectory . "Copy.ico", 1, "")
 
 		centerGui.Add("Text", "x" . x . " yp+28 w83 h20", translate("Set"))
-		centerGui.Add("Edit", "x" . x1 . " yp-4 w50 h20 Limit2 Number vtyreSetEdit").OnEvent("Change", updateState)
+		centerGui.Add("Edit", "x" . x1 . " yp-2 w50 h20 Limit2 Number vtyreSetEdit").OnEvent("Change", updateState)
 		centerGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99")
 
-		centerGui.Add("Text", "x" . x . " yp+28 w83 h40", translate("Pressures") . translate(" (") . getUnit("Pressure") . translate(")"))
+		centerGui.Add("Text", "x" . x . " yp+26 w83 h40", translate("Pressures") . translate(" (") . getUnit("Pressure") . translate(")"))
 
 		centerGui.Add("Edit", "x" . x1 . " yp-2 w50 h20 Limit4 vtyrePressureFLEdit").OnEvent("Change", validateNumber.Bind("tyrePressureFLEdit"))
 		centerGui.Add("Edit", "x" . (x1 + 58) . " yp w50 h20 Limit4 vtyrePressureFREdit").OnEvent("Change", validateNumber.Bind("tyrePressureFREdit"))
@@ -1857,6 +1866,58 @@ class SoloCenter extends ConfigurationItem {
 			this.initializeSession()
 
 		this.updateState()
+	}
+
+	getSimulator() {
+		return this.Simulator
+	}
+
+	openTelemetryBrowser() {
+		if this.TelemetryBrowser
+			WinActivate(this.TelemetryBrowser.Window)
+		else if !this.SessionLoaded {
+			if !this.SessionMode
+				deleteDirectory(this.SessionDirectory . "Telemetry")
+
+			DirCreate(this.SessionDirectory . "Telemetry")
+
+			this.iTelemetryBrowser := TelemetryBrowser(this, this.SessionDirectory . "Telemetry", true)
+
+			this.TelemetryBrowser.show()
+		}
+		else if FileExist(this.SessionDirectory . "Telemetry") {
+			this.iTelemetryBrowser := TelemetryBrowser(this, this.SessionDirectory . "Telemetry", false)
+
+			this.TelemetryBrowser.show()
+		}
+		else {
+			OnMessage(0x44, translateOkButton)
+			withBlockedWindows(MsgBox, translate("You are not connected to an active session."), translate("Information"), 262192)
+			OnMessage(0x44, translateOkButton, 0)
+		}
+	}
+
+	closedTelemetryBrowser() {
+		this.iTelemetryBrowser := false
+	}
+
+	getLapInformation(lapNumber, &driver, &lapTime, &sectorTimes) {
+		local lap
+
+		driver := "John Doe (JD)"
+
+		if this.Laps.Has(lapNumber) {
+			lap := this.Laps[lapNumber]
+
+			driver := lap.Run.Driver.FullName
+
+			lapTime := lap.LapTime
+			sectorTimes := lap.SectorsTime
+		}
+		else {
+			lapTime := "-"
+			sectorTimes := "-"
+		}
 	}
 
 	getAvailableSimulators() {
@@ -2449,7 +2510,7 @@ class SoloCenter extends ConfigurationItem {
 		local auto3 := ((this.AutoSave ? translate("[x]") : translate("[  ]")) . A_Space . translate("Auto Save"))
 
 		this.Control["sessionMenuDropDown"].Delete()
-		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", auto1, auto2, auto3, "---------------------------------------------", "Clear...", "---------------------------------------------", "Load Session...", "Save Session...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Session Summary"], translate))
+		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", auto1, auto2, auto3, "---------------------------------------------", "Clear...", "---------------------------------------------", "Load Session...", "Save Session...", "---------------------------------------------", "Telemetry...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Session Summary"], translate))
 
 		if !this.SessionExported
 			this.Control["sessionMenuDropDown"].Add(collect(["---------------------------------------------", "Export to Database..."], translate))
@@ -2540,11 +2601,13 @@ class SoloCenter extends ConfigurationItem {
 					withBlockedWindows(MsgBox, translate("There is no session data to be saved."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
-			case 12: ; Update Statistics
+			case 12: ; Telemetry Browser
+				this.openTelemetryBrowser()
+			case 14: ; Update Statistics
 				this.updateStatistics()
-			case 14: ; Session Summary
+			case 16: ; Session Summary
 				this.showSessionSummary()
-			case 16: ; Export data
+			case 18: ; Export data
 				if (this.HasData && !this.SessionExported) {
 					OnMessage(0x44, translateYesNoButtons)
 					msgResult := withBlockedWindows(MsgBox, translate("Do you want to transfer the selected data to the session database? This is only possible once."), translate("Delete"), 262436)
@@ -2708,19 +2771,24 @@ class SoloCenter extends ConfigurationItem {
 		return (this.iWorking > 0)
 	}
 
-	initializeSession(session := "Practice", full := true) {
+	initializeSession(session := "Practice", full := true, active := true) {
 		local directory, reportDirectory
 
 		if (!this.SessionMode || this.SessionActive) {
+			if this.TelemetryBrowser {
+				this.TelemetryBrowser.shutdown()
+
+				this.TelemetryBrowser.restart(this.SessionDirectory . "Telemetry", active)
+			}
+
 			directory := this.SessionDirectory
 
 			deleteDirectory(directory)
 
 			DirCreate(directory)
+			DirCreate(directory . "Telemetry")
 
 			reportDirectory := (directory . "Race Report")
-
-			deleteDirectory(reportDirectory)
 
 			DirCreate(reportDirectory)
 
@@ -2730,7 +2798,7 @@ class SoloCenter extends ConfigurationItem {
 			this.iSessionMode := false
 			this.iSessionLoaded := false
 
-			this.initializeSession(session, full)
+			this.initializeSession(session, full, active)
 
 			return
 		}
@@ -4555,6 +4623,9 @@ class SoloCenter extends ConfigurationItem {
 			local track := this.Track
 			local sessionDB, info, dirName, directory, fileName, newFileName, folder, session, file, size, dataFile
 
+			if this.TelemetryBrowser
+				this.TelemetryBrowser.shutdown()
+
 			if this.SessionActive {
 				this.syncSessionStore(true)
 
@@ -4592,7 +4663,7 @@ class SoloCenter extends ConfigurationItem {
 				else
 					dirName := ""
 
-				directory := ((this.SessionMode = "Loaded") ? this.SessionLoaded : this.SessionDirectory)
+				directory := this.SessionDirectory
 
 				fileName := (dirName . "\Practice " . FormatTime(this.Date, "yyyy-MMM-dd"))
 
@@ -4618,11 +4689,11 @@ class SoloCenter extends ConfigurationItem {
 
 							SplitPath(fileName, , &folder, , &fileName)
 
-							info := readMultiMap(directory . "\Practice.info")
+							info := readMultiMap(directory . "Practice.info")
 
 							setMultiMapValue(info, "Session", "Exported", true)
 
-							writeMultiMap(directory . "\Practice.info", info)
+							writeMultiMap(directory . "Practice.info", info)
 
 							if (getMultiMapValue(info, "Creator", "ID", kUndefined) = kUndefined) {
 								setMultiMapValue(info, "Creator", "ID", SessionDatabase.ID)
@@ -4635,7 +4706,7 @@ class SoloCenter extends ConfigurationItem {
 								dataFile := temporaryFileName("Practice", "zip")
 
 								try {
-									RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
+									RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
 
 									file := FileOpen(dataFile, "r-wd")
 
@@ -4648,7 +4719,9 @@ class SoloCenter extends ConfigurationItem {
 
 										file.Close()
 
-										sessionDB.writeSession(simulator, car, track, "Solo", fileName, info, session, size, false, true)
+										sessionDB.writeSession(simulator, car, track, "Solo", fileName, info, session, size
+															 , false, !FileExist(directory . "Telemetry\*.telemetry")
+															 , SessionDatabase.ID)
 
 										return
 									}
@@ -4663,7 +4736,7 @@ class SoloCenter extends ConfigurationItem {
 
 							dataFile := temporaryFileName("Practice", "zip")
 
-							RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
+							RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
 
 							FileMove(dataFile, folder . "\" . fileName . ".data", 1)
 
@@ -4970,7 +5043,7 @@ class SoloCenter extends ConfigurationItem {
 			local simulator := this.Simulator
 			local car := this.Car
 			local track := this.Track
-			local folder := ((this.SessionMode = "Loaded") ? this.SessionLoaded : this.iSessionDirectory)
+			local folder := this.SessionDirectory
 			local sessionDB, dirName, fileName, info, lastLap, currentRun, dataFile, data, meta, size, file, tempFile
 
 			this.Window.Opt("+OwnDialogs")
@@ -5086,10 +5159,13 @@ class SoloCenter extends ConfigurationItem {
 						this.iSessionLoading := true
 
 						try {
-							this.initializeSession(getMultiMapValue(info, "Session", "Session", "Practice"))
+							this.initializeSession(getMultiMapValue(info, "Session", "Session", "Practice"), true, false)
 
 							this.iSessionMode := "Loaded"
 							this.iSessionLoaded := folder
+
+							if this.TelemetryBrowser
+								this.TelemetryBrowser.restart(folder . "Telemetry", false)
 
 							this.iSessionExported := getMultiMapValue(info, "Session", "Exported", true)
 							this.iDate := getMultiMapValue(info, "Session", "Date", A_Now)
@@ -5143,6 +5219,9 @@ class SoloCenter extends ConfigurationItem {
 							this.showOverviewReport()
 
 							this.updateState()
+
+							if this.TelemetryBrowser
+								this.TelemetryBrowser.collectTelemetry()
 						}
 						finally {
 							this.iSessionLoading := false
@@ -7605,6 +7684,9 @@ class SoloCenter extends ConfigurationItem {
 			try {
 				if (!this.LastLap && !update)
 					this.startSession(fileName, true)
+
+				if this.TelemetryBrowser
+					this.TelemetryBrowser.startup(this.Simulator, getMultiMapValue(data, "Track Data", "Length", 0))
 
 				if update {
 					if (this.SessionActive && (this.LastLap.Nr = lapNumber))

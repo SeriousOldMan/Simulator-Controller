@@ -96,6 +96,18 @@ All these report documents are HTML-based and can be saved or printed using the 
 
 - If you want the report to be opened in a separate window, hold down the Control key while requesting it. If the report originates from one of the available lists, you can open the separate window by double-clicking the entry in this list. In this case, the report is frozen and will **not** be updated automatically when new data arrives.
 
+### Telemetry Browser
+
+A valuable tool to improve your lap times is the integrated Telemetry Browser, which can be opened and activated by choosing the "Telemetry..." command from the "Session" menu.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Telemetry%20Browser.JPG)
+
+While you are in an active session and the Telemetry Browser is open, car telemtry data will be collected lap by lap in the background and stored in the session. You can use the browser to load the telemetry for a given lap and you can choose a reference lap for comparison.
+
+When looking for areas of improvement take a close look to your application of throttle and brakes and the activation of TC and ABS. Trailing off the brakes and the transition back to full throttle is the most important skill to master for fast lap times. This does not mean, that sometimes coasting around a corner is not necessary. Use the Telemetry Browser to compare your laps with the fastest lap of a given session and learn what exactly made you faster there.
+
+Important: Session that are saved with telemetry data will NOT be synchronized with the Team Server automatically, since the amount of data is quite large and will put a lot of stress on the Team Server. You can still activate the synchronization for a particular session in the "Session Database", but I strongly recommend to not do it.
+
 ### Managing tyres and planning practice stints
 
 The first tab "Tyres" in the lower left corner allows you to manage your tyre sets during your practice runs. In many cases, you can let the "Solo Center" decide automatically, when to create a new stint and when a tyre change happened (at least for *Assetto Corsa Competizione*, *rFactor 2* and *Le Mans Ultimate*). But not all simulators provide access to the mounted tyres in their data API, so it is also possible to create a new stint with your individual tyre setup manually.

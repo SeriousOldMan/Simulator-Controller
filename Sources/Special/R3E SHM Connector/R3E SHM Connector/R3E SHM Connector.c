@@ -264,9 +264,10 @@ extern __declspec(dllexport) int __stdcall call(char* request, char* result, int
 				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeStringOption(result, ".Lap.Running.Valid=", vehicle.current_lap_valid ? "true\n" : "false\n", &pos);
 				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeIntOption(result, ".Lap.Running.Time=", (long)(vehicle.lap_time_current_self * 1000), &pos);
 
+
 				long sector1Time = (long)(vehicle.sector_time_previous_self[0] * 1000);
-				long sector2Time = (long)(vehicle.sector_time_previous_self[1] * 1000);
-				long sector3Time = (long)(vehicle.sector_time_previous_self[2] * 1000);
+				long sector2Time = (long)(vehicle.sector_time_previous_self[1] * 1000) - sector1Time;
+				long sector3Time = (long)(vehicle.sector_time_previous_self[2] * 1000) - sector1Time - sector2Time;
 
 				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeIntOption(result, ".Time=", sector1Time + sector2Time + sector3Time, &pos);
 				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeString(result, ".Time.Sectors=", &pos);

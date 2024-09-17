@@ -26,7 +26,6 @@ class TelemetryChart {
 
 	iWindow := false
 
-	iInfoViewer := false
 	iTelemetryViewer := false
 
 	iZoom := 100
@@ -34,12 +33,6 @@ class TelemetryChart {
 	Window {
 		Get {
 			return this.iWindow
-		}
-	}
-
-	InfoViewer {
-		Get {
-			return this.iInfoViewer
 		}
 	}
 
@@ -59,53 +52,9 @@ class TelemetryChart {
 		}
 	}
 
-	__New(window, infoViewer := false, telemetryViewer := false) {
+	__New(window, telemetryViewer := false) {
 		this.iWindow := window
-		this.iInfoViewer := infoViewer
 		this.iTelemetryViewer := telemetryViewer
-	}
-
-	showTelemetryInfo(lapDriver, lapLapTime := false, lapSectorTimes := false
-					, referenceDriver := false, referenceLapTime := false, referenceSectorTimes := false) {
-		local infoText, html
-
-		lapTimeDisplayValue(lapTime) {
-			if ((lapTime = "-") || isNull(lapTime))
-				return "-"
-			else
-				return RaceReportViewer.lapTimeDisplayValue(lapTime)
-		}
-
-		if this.InfoViewer {
-			this.InfoViewer.document.open()
-
-			if lapDriver {
-				infoText := "<table>"
-				infoText .= ("<tr><td>" . lapDriver . "</td>")
-				infoText .= ("<td>   </td><td>" . lapTimeDisplayValue(lapLapTime) . "</td>")
-				infoText .= ("<td>(" . values2String(", ", collect(lapSectorTimes, lapTimeDisplayValue)*) . ")</td><tr/>")
-
-				if referenceDriver {
-					infoText .= ("<tr><td>" . referenceDriver . "</td>")
-					infoText .= ("<td>   </td><td>" . lapTimeDisplayValue(referenceLapTime) . "</td>")
-					infoText .= ("<td>(" . values2String(", ", collect(referenceSectorTimes, lapTimeDisplayValue)*) . ")</td><tr/>")
-				}
-
-				infoText .= "</table>"
-
-				infoText := "<html><style> tr td { padding-top: 3px; padding-bottom:1px }</style><body style='background-color: #%backColor%' style='overflow: auto' leftmargin=3 topmargin=3 rightmargin=3 bottommargin=0><style> table, p { color: #%fontColor%; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><p>" . infoText . "</p></body></html>"
-
-				this.InfoViewer.document.write(substituteVariables(infoText, {fontColor: this.Window.Theme.TextColor
-																			, backColor: this.Window.BackColor}))
-			}
-			else {
-				html := "<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
-
-				this.InfoViewer.document.write(substituteVariables(html, {backColor: this.Window.BackColor}))
-			}
-
-			this.InfoViewer.document.close()
-		}
 	}
 
 	showTelemetryChart(lapFileName, referenceLapFileName := false) {
@@ -414,7 +363,6 @@ class TelemetryBrowser {
 
 					this.iRedraw := false
 
-					this.iTelemetryBrowser.TelemetryChart.InfoViewer.Resized()
 					this.iTelemetryBrowser.TelemetryChart.TelemetryViewer.Resized()
 
 					Task.startTask(ObjBindMethod(this.iTelemetryBrowser, "updateTelemetryChart", true))
@@ -509,21 +457,10 @@ class TelemetryBrowser {
 	}
 
 	__New(manager, directory, collect := true) {
-		local laps := []
-		local name
-
 		this.iManager := manager
 		this.iTelemetryDirectory := (normalizeDirectoryPath(directory) . "\")
 
-		loop Files, this.TelemetryDirectory . "*.telemetry" {
-			SplitPath(A_LoopFileName, , , , &name)
-
-			laps.Push(Integer(StrReplace(name, "Lap ", "")))
-		}
-
-		bubbleSort(&laps)
-
-		this.iLaps := laps
+		this.loadTelemetry()
 
 		if collect
 			OnExit(ObjBindMethod(this, "shutdownTelemetryCollector", true))
@@ -531,7 +468,7 @@ class TelemetryBrowser {
 
 	createGui() {
 		local browserGui := TelemetryBrowser.TelemetryBrowserWindow(this, {Descriptor: "Telemetry Browser", Closeable: true, Resizeable:  "Deferred"})
-		local infoViewer, telemetryViewer
+		local telemetryViewer
 
 		changeZoom(*) {
 			this.TelemetryChart.Zoom := browserGui["zoomSlider"].Value
@@ -540,11 +477,11 @@ class TelemetryBrowser {
 		}
 
 		chooseLap(*) {
-			this.selectLap(browserGui["lapDropDown"].Text)
+			this.selectLap(string2Values(":", browserGui["lapDropDown"].Text)[1])
 		}
 
 		chooseReferenceLap(*) {
-			this.selectReferenceLap(browserGui["referenceLapDropDown"].Text)
+			this.selectReferenceLap(string2Values(":", browserGui["referenceLapDropDown"].Text)[1])
 		}
 
 		this.iWindow := browserGui
@@ -562,24 +499,22 @@ class TelemetryBrowser {
 
 		browserGui.SetFont("s8 Norm", "Arial")
 
-		infoViewer := browserGui.Add("HTMLViewer", "x165 yp+6 w300 h58 W:Grow")
-
-		browserGui.Add("Text", "x16 yp+8 w80", translate("Lap"))
-		browserGui.Add("DropDownList", "x98 yp-4 w60 vlapDropDown", this.Laps).OnEvent("Change", chooseLap)
+		browserGui.Add("Text", "x16 yp+10 w80", translate("Lap"))
+		browserGui.Add("DropDownList", "x98 yp-4 w280 vlapDropDown", collect(this.Laps, (l) => this.lapLabel(l))).OnEvent("Change", chooseLap)
 
 		browserGui.Add("Text", "x16 yp+28 w80", translate("Reference"))
-		browserGui.Add("DropDownList", "x98 yp-4 w60 Choose1 vreferenceLapDropDown", concatenate([translate("None")], this.Laps)).OnEvent("Change", chooseReferenceLap)
+		browserGui.Add("DropDownList", "x98 yp-4 w280 Choose1 vreferenceLapDropDown", concatenate([translate("None")], collect(this.Laps, (l) => this.lapLabel(l)))).OnEvent("Change", chooseReferenceLap)
 
 		browserGui.Add("Text", "x468 yp+4 w80 X:Move", translate("Zoom"))
 		browserGui.Add("Slider", "Center Thick15 x556 yp-2 X:Move w100 0x10 Range100-400 ToolTip vzoomSlider", 100).OnEvent("Change", changeZoom)
 
-		telemetryViewer := browserGui.Add("HTMLViewer", "x16 yp+28 w640 h480 W:Grow H:Grow Border")
+		telemetryViewer := browserGui.Add("HTMLViewer", "x16 yp+24 w640 h480 W:Grow H:Grow Border")
 
 		telemetryViewer.document.open()
 		telemetryViewer.document.write("")
 		telemetryViewer.document.close()
 
-		this.iTelemetryChart := TelemetryChart(browserGui, infoViewer, telemetryViewer)
+		this.iTelemetryChart := TelemetryChart(browserGui, telemetryViewer)
 
 		browserGui.Add(TelemetryBrowser.TelemetryBrowserResizer(this, telemetryViewer))
 
@@ -690,7 +625,7 @@ class TelemetryBrowser {
 		if pid {
 			this.iTelemetryCollectorPID := pid
 
-			this.iCollectorTask := PeriodicTask(ObjBindMethod(this, "collectTelemetry"), 10000, kLowPriority)
+			this.iCollectorTask := PeriodicTask(ObjBindMethod(this, "loadTelemetry"), 10000, kLowPriority)
 
 			this.iCollectorTask.start()
 		}
@@ -736,7 +671,22 @@ class TelemetryBrowser {
 		return false
 	}
 
-	collectTelemetry() {
+	lapLabel(lap) {
+		local driver, lapTime, sectorTimes
+
+		lapTimeDisplayValue(lapTime) {
+			if ((lapTime = "-") || isNull(lapTime))
+				return "-"
+			else
+				return RaceReportViewer.lapTimeDisplayValue(lapTime)
+		}
+
+		this.Manager.getLapInformation(lap, &driver, &lapTime, &sectorTimes)
+
+		return (lap . translate(":") . A_Space driver . translate(" - ") . lapTimeDisplayValue(lapTime) . A_Space . translate("[") . values2String(", ", collect(sectorTimes, lapTimeDisplayValue)*) . translate("]"))
+	}
+
+	loadTelemetry() {
 		local laps := []
 		local lap, name
 
@@ -776,31 +726,19 @@ class TelemetryBrowser {
 
 		this.Laps := concatenate(this.Laps, laps)
 
-		this.Control["lapDropDown"].Add(laps)
-		this.Control["referenceLapDropDown"].Add(laps)
+		laps := collect(laps, (l) => this.lapLabel(l))
 
-		if (!this.SelectedLap && (laps.Length > 0))
-			this.selectlap(laps[1])
+		if this.Window {
+			this.Control["lapDropDown"].Add(laps)
+			this.Control["referenceLapDropDown"].Add(laps)
+
+			if (!this.SelectedLap && (laps.Length > 0))
+				this.selectlap(string2Values(":", laps[1])[1])
+		}
 	}
 
 	updateTelemetryChart(redraw := false) {
-		local lapDriver := false
-		local referenceDriver := false
-		local lapLapTime := false
-		local lapSectorTimes := false
-		local referenceLapTime := false
-		local referenceSectorTimes := false
-
-		if (this.TelemetryChart && redraw) {
-			if this.SelectedLap
-				this.Manager.getLapInformation(this.SelectedLap, &lapDriver, &lapLapTime, &lapSectorTimes)
-
-			if this.SelectedReferenceLap
-				this.Manager.getLapInformation(this.SelectedReferenceLap, &referenceDriver, &referenceLapTime, &referenceSectorTimes)
-
-			this.TelemetryChart.showTelemetryInfo(lapDriver, lapLapTime, lapSectorTimes
-												, referenceDriver, referenceLapTime, referenceSectorTimes)
+		if (this.TelemetryChart && redraw)
 			this.TelemetryChart.showTelemetryChart(this.SelectedLap[true], this.SelectedReferenceLap[true])
-		}
 	}
 }

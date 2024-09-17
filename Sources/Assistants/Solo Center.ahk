@@ -1916,7 +1916,7 @@ class SoloCenter extends ConfigurationItem {
 		}
 		else {
 			lapTime := "-"
-			sectorTimes := "-"
+			sectorTimes := ["-"]
 		}
 	}
 
@@ -5221,7 +5221,7 @@ class SoloCenter extends ConfigurationItem {
 							this.updateState()
 
 							if this.TelemetryBrowser
-								this.TelemetryBrowser.collectTelemetry()
+								this.TelemetryBrowser.loadTelemetry()
 						}
 						finally {
 							this.iSessionLoading := false

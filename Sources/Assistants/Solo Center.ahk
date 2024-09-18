@@ -4708,7 +4708,7 @@ class SoloCenter extends ConfigurationItem {
 
 							setMultiMapValue(info, "Session", "Exported", true)
 
-							if (normalizeDirectoryPath(folder) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Practice"))) {
+							if (normalizeDirectoryPath(folder) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Solo"))) {
 								dataFile := temporaryFileName("Practice", "zip")
 
 								try {

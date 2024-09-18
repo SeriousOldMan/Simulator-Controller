@@ -114,6 +114,12 @@ Important: Session that are saved with telemetry data will NOT be synchronized w
 2. A special method is used for *Assetto Corsa Competizione*, which unfortunately does not supply the distance of the car into the track in the shared memory API (it is available in the UDP interface, though, but this interface does not provide telemetry data). Because of that, the track layout must be learned, before telemetry data can be correlated to the track position. Be sure to drive clean during the first laps.
 3. The telemetry recorder is only running, while the Telemetry Browsr is open. Therefore, you can restart the learning process for *Assetto Corsa Competizione*, if necessary, by closing the browser and re-open it.
 4. The currently selected lap can be deleted by using the "-" button to the right of the drop down menu of all laps. If you hold down the Control key, all laps can be deleted at once.
+5. You can save and load telemetry data for a given lap for later usage:
+   - Typically used for reference laps, even from other drivers.
+   - Use the small button with the "Disc" icon to save a telemetry lap to the session database or any other location.
+   - Use the small button with the "Folder" icon to load a telemetry lap from the session database or any other location.
+   - Telemetry data, which has been *imported* this way will not become part of the current session.
+   *Imported* telemetry data can be removed by using the *delete* button. This will not remove it from its original location.
 
 ### Managing tyres and planning practice stints
 

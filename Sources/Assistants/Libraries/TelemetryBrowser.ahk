@@ -318,6 +318,7 @@ class TelemetryBrowser {
 	iTelemetryChart := false
 
 	iLaps := []
+	iImportedLaps := []
 
 	iLap := false
 	iReferenceLap := false
@@ -426,11 +427,24 @@ class TelemetryBrowser {
 		}
 	}
 
+	ImportedLaps {
+		Get {
+			return this.iImportedLaps
+		}
+
+		Set {
+			return (this.iImportedLaps := value)
+		}
+	}
+
 	SelectedLap[path := false] {
 		Get {
-			return (this.iLap ? (path ? (this.TelemetryDirectory . "Lap " . this.iLap . ".telemetry")
-									  : this.iLap)
-							  : false)
+			if isNumber(this.iLap)
+				return (this.iLap ? (path ? (this.TelemetryDirectory . "Lap " . this.iLap . ".telemetry")
+										  : this.iLap)
+								  : false)
+			else
+				return (path ? this.iLap[3] : this.iLap)
 		}
 
 		Set {
@@ -444,9 +458,12 @@ class TelemetryBrowser {
 
 	SelectedReferenceLap[path := false] {
 		Get {
-			return (this.iReferenceLap ? (path ? (this.TelemetryDirectory . "Lap " . this.iReferenceLap . ".telemetry")
-											   : this.iReferenceLap)
-									   : false)
+			if isNumber(this.iReferenceLap)
+				return (this.iReferenceLap ? (path ? (this.TelemetryDirectory . "Lap " . this.iReferenceLap . ".telemetry")
+												   : this.iReferenceLap)
+										   : false)
+			else
+				return (path ? this.iReferenceLap[3] : this.iReferenceLap[1])
 		}
 
 		Set {
@@ -479,11 +496,40 @@ class TelemetryBrowser {
 		}
 
 		chooseLap(*) {
-			this.selectLap(string2Values(":", browserGui["lapDropDown"].Text)[1])
+			local lap := browserGui["lapDropDown"].Text
+			local chosen
+
+			if (lap != translate("---------------------------------------------") . translate("---------------------------------------------"))
+				if (browserGui["lapDropDown"].Value <= this.Laps.Length)
+					this.selectLap(string2Values(":", lap)[1])
+				else {
+					chosen := browserGui["lapDropDown"].Value
+
+					if (this.Laps.Length > 0)
+						chosen -= (this.Laps.Length + 1)
+
+					this.selectLap(this.ImportedLaps[chosen])
+				}
 		}
 
 		chooseReferenceLap(*) {
-			this.selectReferenceLap(string2Values(":", browserGui["referenceLapDropDown"].Text)[1])
+			local chosen := browserGui["referenceLapDropDown"].Value
+			local lap := browserGui["referenceLapDropDown"].Text
+
+			if (chosen = 1)
+				this.selectReferenceLap(false)
+			else if (lap != translate("---------------------------------------------") . translate("---------------------------------------------")) {
+				chosen -= 1
+
+				if (chosen <= this.Laps.Length)
+					this.selectReferenceLap(string2Values(":", lap)[1])
+				else {
+					if (this.Laps.Length > 0)
+						chosen -= (1 + this.Laps.Length)
+
+					this.selectReferenceLap(this.ImportedLaps[chosen])
+				}
+			}
 		}
 
 		deleteLap(*) {
@@ -506,7 +552,7 @@ class TelemetryBrowser {
 		}
 
 		saveLap(*) {
-			this.saveLap(this.SelectedLap)
+			this.saveLap()
 		}
 
 		this.iWindow := browserGui
@@ -588,7 +634,7 @@ class TelemetryBrowser {
 		else
 			this.Control["deleteButton"].Enabled := false
 
-		if this.SelectedLap
+		if (this.SelectedLap && isNumber(this.SelectedLap))
 			this.Control["saveButton"].Enabled := true
 		else
 			this.Control["saveButton"].Enabled := false
@@ -608,6 +654,7 @@ class TelemetryBrowser {
 		this.selectReferenceLap(false, true)
 
 		this.Laps := []
+		this.ImportedLaps := []
 
 		this.iTelemetryDirectory := (normalizeDirectoryPath(directory) . "\")
 
@@ -630,6 +677,7 @@ class TelemetryBrowser {
 		this.selectReferenceLap(false, true)
 
 		this.Laps := []
+		this.ImportedLaps := []
 
 		loop Files, this.TelemetryDirectory . "*.telemetry"
 			deleteFile(A_LoopFileFullPath)
@@ -642,7 +690,7 @@ class TelemetryBrowser {
 		local telemetry := false
 		local info := false
 		local simulator, car, track
-		local sessionDB, directory, fileName, dataFile, file, size
+		local sessionDB, directory, fileName, dataFile, file, size, lap
 
 		this.Manager.getSessionInformation(&simulator, &car, &track)
 
@@ -696,15 +744,84 @@ class TelemetryBrowser {
 		}
 
 		if telemetry {
-			this.ImportedTelemetries.Push([name, telemetry, info])
+			lap := [name, SessionDatabase.getDriverName(simulator, getMultiMapValue(info, "Telemetry", "Driver"))
+				  , telemetry, info]
 
-			this.loadTelemetry()
+			this.ImportedLaps.Push(lap)
+
+			this.loadTelemetry(lap)
 		}
 	}
 
-	saveLap(lap := false) {
+	saveLap(lap := false, prompt := true) {
+		local simulator, car, track
+		local sessionDB, dirName, fileName, newFileName, file, folder, telemetry
+
+		this.Manager.getSessionInformation(&simulator, &car, &track)
+
 		if !lap
 			lap := this.SelectedLap
+
+		if (lap && isNumber(lap)) {
+			if (simulator && car && track) {
+				dirName := (SessionDatabase.DatabasePath . "User\" . SessionDatabase.getSimulatorCode(simulator)
+						  . "\" . car . "\" . track . "\Lap Telemetries")
+
+				DirCreate(dirName)
+			}
+			else
+				dirName := ""
+
+			fileName := (dirName . "\Lap " . lap)
+
+			newFileName := (fileName . ".telemetry")
+
+			while FileExist(newFileName)
+				newFileName := (fileName . " (" . (A_Index + 1) . ")" . ".telemetry")
+
+			fileName := newFileName
+
+			if prompt {
+				this.Window.Opt("+OwnDialogs")
+
+				OnMessage(0x44, translateSaveCancelButtons)
+				fileName := withBlockedWindows(FileSelect, "S17", fileName, translate("Save Telemetry..."), "Lap Telemetry (*.telemetry)")
+				OnMessage(0x44, translateSaveCancelButtons, 0)
+			}
+
+			if (fileName != "")
+				try {
+					sessionDB := SessionDatabase()
+
+					SplitPath(fileName, , &folder, , &fileName)
+
+					if (normalizeDirectoryPath(folder) = normalizeDirectoryPath(sessionDB.getTelemetryDirectory(simulator, car, track))) {
+						file := FileOpen((this.TelemetryDirectory . "Lap " . lap . ".telemetry"), "r-wd")
+
+						if file {
+							size := file.Length
+
+							telemetry := Buffer(size)
+
+							file.RawRead(telemetry, size)
+
+							file.Close()
+
+							sessionDB.writeTelemetry(simulator, car, track, fileName, telemetry, size
+												   , false, true, SessionDatabase.ID)
+
+							return
+						}
+					}
+
+					DirCreate(folder)
+					FileCopy(this.TelemetryDirectory . "Lap " . lap . ".telemetry"
+						   , folder . "\" . fileName . ".telemetry", 1)
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+		}
 	}
 
 	deleteLap(lap := false) {
@@ -720,25 +837,40 @@ class TelemetryBrowser {
 		if (lap = selectedReferenceLap)
 			this.selectReferenceLap(false, true)
 
-		deleteFile(this.TelemetryDirectory . "Lap " . lap . ".telemetry")
+		if isNumber(lap) {
+			deleteFile(this.TelemetryDirectory . "Lap " . lap . ".telemetry")
 
-		this.Laps := remove(this.Laps, lap)
+			this.Laps := remove(this.Laps, lap)
+		}
+		else
+			this.ImportedLaps := remove(this.ImportedLaps, lap)
 
 		this.loadTelemetry()
 
-		if (selectedLap && inList(this.Laps, selectedLap))
+		if (selectedLap && (inList(this.Laps, selectedLap) || inList(this.ImportedLaps, selectedLap)))
 			this.selectLap(selectedLap, true)
 
-		if (selectedReferenceLap && inList(this.Laps, selectedReferenceLap))
+		if (selectedReferenceLap && (inList(this.Laps, selectedReferenceLap) || inList(this.ImportedLaps, selectedReferenceLap)))
 			this.selectReferenceLap(selectedReferenceLap, true)
 	}
 
 	selectLap(lap, force := false) {
+		local index := 0
+
 		if (force || (lap != this.SelectedLap)) {
 			this.SelectedLap := lap
 
 			if this.Window {
-				this.Control["lapDropDown"].Choose(inList(this.Laps, lap))
+				index := inList(this.Laps, lap)
+
+				if !index {
+					index := inList(this.ImportedLaps, lap)
+
+					if (index && (this.Laps.Length > 0))
+						index += (this.Laps.Length + 1)
+				}
+
+				this.Control["lapDropDown"].Choose(index)
 
 				this.updateState()
 			}
@@ -746,6 +878,8 @@ class TelemetryBrowser {
 	}
 
 	selectReferenceLap(lap, force := false) {
+		local index := 0
+
 		if (lap = translate("None"))
 			lap := false
 
@@ -753,7 +887,16 @@ class TelemetryBrowser {
 			this.SelectedReferenceLap := lap
 
 			if this.Window {
-				this.Control["referenceLapDropDown"].Choose(lap ? (inList(this.Laps, lap) + 1) : 1)
+				index := inList(this.Laps, lap)
+
+				if !index {
+					index := inList(this.ImportedLaps, lap)
+
+					if (index && (this.Laps.Length > 0))
+						index += (this.Laps.Length + 1)
+				}
+
+				this.Control["referenceLapDropDown"].Choose(index + 1)
 
 				this.updateState()
 			}
@@ -849,15 +992,19 @@ class TelemetryBrowser {
 				return RaceReportViewer.lapTimeDisplayValue(lapTime)
 		}
 
-		this.Manager.getLapInformation(lap, &driver, &lapTime, &sectorTimes)
+		if isNumber(lap) {
+			this.Manager.getLapInformation(lap, &driver, &lapTime, &sectorTimes)
 
-		if (!InStr(driver, "John Doe") && (lapTime != "-"))
-			return (lap . translate(":") . A_Space driver . translate(" - ") . lapTimeDisplayValue(lapTime) . A_Space . translate("[") . values2String(", ", collect(sectorTimes, lapTimeDisplayValue)*) . translate("]"))
+			if (!InStr(driver, "John Doe") && (lapTime != "-"))
+				return (lap . translate(":") . A_Space . driver . translate(" - ") . lapTimeDisplayValue(lapTime) . A_Space . translate("[") . values2String(", ", collect(sectorTimes, lapTimeDisplayValue)*) . translate("]"))
+			else
+				return lap
+		}
 		else
-			return lap
+			return (lap[1] . translate(":") . A_Space . lap[2])
 	}
 
-	loadTelemetry() {
+	loadTelemetry(select := false) {
 		local laps := []
 		local lap, name
 
@@ -906,10 +1053,27 @@ class TelemetryBrowser {
 			this.Control["lapDropDown"].Add(laps)
 			this.Control["referenceLapDropDown"].Add(concatenate([translate("None")], laps))
 
-			if (!this.SelectedLap && (laps.Length > 0)) {
-				this.selectlap(this.Laps[1])
+			if (this.ImportedLaps.Length > 0) {
+				if (laps.Length > 0) {
+					this.Control["lapDropDown"].Add([translate("---------------------------------------------") . translate("---------------------------------------------")])
+					this.Control["referenceLapDropDown"].Add([translate("---------------------------------------------") . translate("---------------------------------------------")])
+				}
 
-				this.Control["referenceLapDropDown"].Choose(1)
+				this.Control["lapDropDown"].Add(collect(this.ImportedLaps, (d) => this.lapLabel(d)))
+				this.Control["referenceLapDropDown"].Add(collect(this.ImportedLaps, (d) => this.lapLabel(d)))
+			}
+
+			if select {
+				this.selectLap(select, true)
+				this.selectReferenceLap(false, true)
+			}
+			else if (!this.SelectedLap && (laps.Length > 0)) {
+				this.selectLap(this.Laps[1])
+				this.selectReferenceLap(false, true)
+			}
+			else if (!this.SelectedLap && (this.ImportedLaps.Length > 0)) {
+				this.selectLap(this.ImportedLaps[1])
+				this.selectReferenceLap(false, true)
 			}
 			else {
 				this.Control["lapDropDown"].Choose(inList(this.Laps, this.SelectedLap))

@@ -536,15 +536,23 @@ class TelemetryBrowser {
 			local all := GetKeyState("Ctrl")
 			local msgResult
 
-			OnMessage(0x44, translateYesNoButtons)
-			msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected data?"), translate("Delete"), 262436)
-			OnMessage(0x44, translateYesNoButtons, 0)
+			if this.SelectedLap {
+				if isNumber(this.SelectedLap) {
+					OnMessage(0x44, translateYesNoButtons)
+					msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected data?"), translate("Delete"), 262436)
+					OnMessage(0x44, translateYesNoButtons, 0)
 
-			if (msgResult = "Yes")
-				if all
+					if (msgResult = "Yes")
+						if all
+							this.clear()
+						else
+							this.deleteLap()
+				}
+				else if all
 					this.clear()
 				else
 					this.deleteLap()
+			}
 		}
 
 		loadLap(*) {

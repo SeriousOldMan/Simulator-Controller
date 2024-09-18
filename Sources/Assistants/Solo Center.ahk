@@ -1901,6 +1901,12 @@ class SoloCenter extends ConfigurationItem {
 		this.iTelemetryBrowser := false
 	}
 
+	getSessionInformation(&simulator, &car, &track) {
+		simulator := this.Simulator
+		car := this.Car
+		track := this.Track
+	}
+
 	getLapInformation(lapNumber, &driver, &lapTime, &sectorTimes) {
 		local lap
 
@@ -1916,7 +1922,7 @@ class SoloCenter extends ConfigurationItem {
 		}
 		else {
 			lapTime := "-"
-			sectorTimes := "-"
+			sectorTimes := ["-"]
 		}
 	}
 
@@ -4702,7 +4708,7 @@ class SoloCenter extends ConfigurationItem {
 
 							setMultiMapValue(info, "Session", "Exported", true)
 
-							if (normalizeDirectoryPath(folder) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Practice"))) {
+							if (normalizeDirectoryPath(folder) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Solo"))) {
 								dataFile := temporaryFileName("Practice", "zip")
 
 								try {
@@ -5221,7 +5227,7 @@ class SoloCenter extends ConfigurationItem {
 							this.updateState()
 
 							if this.TelemetryBrowser
-								this.TelemetryBrowser.collectTelemetry()
+								this.TelemetryBrowser.loadTelemetry()
 						}
 						finally {
 							this.iSessionLoading := false

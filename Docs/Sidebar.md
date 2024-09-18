@@ -130,6 +130,7 @@
   - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#introduction)
   - [Starting a session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#starting-a-session)
   - [Data Analysis](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#data-analysis)
+  - [Telemetry Browser](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#Telemetry-Browser)
   - [Planning and managing practice stints](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#managing-tyres-and-planning-practice-stints)
   - [Exploring data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#exploring-data)
   - [Exporting data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#exporting-data-to-the-session-database)

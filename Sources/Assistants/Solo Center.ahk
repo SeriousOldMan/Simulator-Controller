@@ -1901,6 +1901,12 @@ class SoloCenter extends ConfigurationItem {
 		this.iTelemetryBrowser := false
 	}
 
+	getSessionInformation(&simulator, &car, &track) {
+		simulator := this.Simulator
+		car := this.Car
+		track := this.Track
+	}
+
 	getLapInformation(lapNumber, &driver, &lapTime, &sectorTimes) {
 		local lap
 

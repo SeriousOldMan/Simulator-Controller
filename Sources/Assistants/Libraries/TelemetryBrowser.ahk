@@ -10,6 +10,8 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\..\Libraries\HTMLViewer.ahk"
+#Include "..\..\Database\Libraries\SessionDatabase.ahk"
+#Include "..\..\Database\Libraries\SessionDatabaseBrowser.ahk"
 #Include "RaceReportViewer.ahk"
 
 
@@ -496,7 +498,15 @@ class TelemetryBrowser {
 				if all
 					this.clear()
 				else
-					this.deleteSelectedLap()
+					this.deleteLap()
+		}
+
+		loadLap(*) {
+			this.loadLap()
+		}
+
+		saveLap(*) {
+			this.saveLap(this.SelectedLap)
 		}
 
 		this.iWindow := browserGui
@@ -517,16 +527,15 @@ class TelemetryBrowser {
 		browserGui.Add("Text", "x16 yp+10 w80", translate("Lap"))
 		browserGui.Add("DropDownList", "x98 yp-4 w280 vlapDropDown", collect(this.Laps, (l) => this.lapLabel(l))).OnEvent("Change", chooseLap)
 
-		browserGui.Add("Button", "x380 yp w23 h23 Center +0x200 vdeleteButton").OnEvent("Click", deleteLap)
+		browserGui.Add("Button", "x380 yp w23 h23 Center +0x200 Disabled vloadButton").OnEvent("Click", loadLap)
+		setButtonIcon(browserGui["loadButton"], kIconsDirectory . "Load.ico", 1, "L4 T4 R4 B4")
+		browserGui.Add("Button", "x404 yp w23 h23 Center +0x200 Disabled vsaveButton").OnEvent("Click", saveLap)
+		setButtonIcon(browserGui["saveButton"], kIconsDirectory . "Save.ico", 1, "L4 T4 R4 B4")
+		browserGui.Add("Button", "x430 yp w23 h23 Center +0x200 vdeleteButton").OnEvent("Click", deleteLap)
 		setButtonIcon(browserGui["deleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
 		browserGui.Add("Text", "x16 yp+28 w80", translate("Reference"))
 		browserGui.Add("DropDownList", "x98 yp-4 w280 Choose1 vreferenceLapDropDown", concatenate([translate("None")], collect(this.Laps, (l) => this.lapLabel(l)))).OnEvent("Change", chooseReferenceLap)
-
-		browserGui.Add("Button", "x380 yp w23 h23 Center +0x200 Disabled vloadButton")
-		setButtonIcon(browserGui["loadButton"], kIconsDirectory . "Load.ico", 1, "L4 T4 R4 B4")
-		browserGui.Add("Button", "x404 yp w23 h23 Center +0x200 Disabled vsaveButton")
-		setButtonIcon(browserGui["saveButton"], kIconsDirectory . "Save.ico", 1, "L4 T4 R4 B4")
 
 		browserGui.Add("Text", "x468 yp+4 w80 X:Move", translate("Zoom"))
 		browserGui.Add("Slider", "Center Thick15 x556 yp-2 X:Move w100 0x10 Range100-400 ToolTip vzoomSlider", 100).OnEvent("Change", changeZoom)
@@ -572,10 +581,17 @@ class TelemetryBrowser {
 	}
 
 	updateState() {
+		this.Control["loadButton"].Enabled := true
+
 		if this.SelectedLap
 			this.Control["deleteButton"].Enabled := true
 		else
 			this.Control["deleteButton"].Enabled := false
+
+		if this.SelectedLap
+			this.Control["saveButton"].Enabled := true
+		else
+			this.Control["saveButton"].Enabled := false
 	}
 
 	startup(simulator, trackLength) {
@@ -621,7 +637,186 @@ class TelemetryBrowser {
 		this.loadTelemetry()
 	}
 
-	deleteSelectedLap(lap := false) {
+	loadLap() {
+		local simulator, car, track
+		local sessionDB, fileName
+
+		this.Manager.getSessionInformation(&simulator, &car, &track)
+
+		this.Window.Opt("+OwnDialogs")
+
+		sessionDB := SessionDatabase()
+
+		this.Window.Block()
+
+		try {
+			fileName := browseLapTelemetries(this.Window, &simulator, &car, &track)
+		}
+		finally {
+			this.Window.Unblock()
+		}
+
+		/*
+		withTask(WorkingTask(StrReplace(translate("Extracting ") . translate("Session") . translate("..."), "...", "")), () {
+			if (fileName && InStr(FileExist(fileName), "D"))
+				folder := fileName
+			else if (fileName && (fileName != "")) {
+				SplitPath(fileName, , &directory, , &fileName)
+
+				folder := (kTempDirectory . "Sessions\Practice_" . Round(Random(1, 100000)))
+
+				DirCreate(folder)
+
+				if (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Solo"))) {
+					dataFile := temporaryFileName("Session", "zip")
+
+					try {
+						session := sessionDB.readSession(simulator, car, track, "Solo", fileName, &meta, &size)
+
+						file := FileOpen(dataFile, "w", "")
+
+						if file {
+							file.RawWrite(session, size)
+
+							file.Close()
+
+							RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+
+							if !FileExist(folder . "\Practice.info")
+								FileCopy(directory . "\" . fileName . ".solo", folder . "\Practice.info")
+						}
+						else
+							folder := ""
+					}
+					catch Any as exception {
+						logError(exception)
+
+						folder := ""
+					}
+					finally {
+						deleteFile(dataFile)
+					}
+				}
+				else {
+					dataFile := temporaryFileName("Practice", "zip")
+
+					FileCopy(directory . "\" . fileName . ".data", dataFile, 1)
+
+					RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+
+					if !FileExist(folder . "\Practice.info")
+						FileCopy(directory . "\" . fileName . ".solo", folder . "\Practice.info")
+
+					deleteFile(dataFile)
+				}
+			}
+			else
+				folder := ""
+		})
+	}
+
+	if (folder != "") {
+			withTask(WorkingTask(StrReplace(translate("Load Session..."), "...", "")), () {
+				folder := (folder . "\")
+
+				info := readMultiMap(folder . "Practice.info")
+
+				if (info.Count == 0) {
+					OnMessage(0x44, translateOkButton)
+					withBlockedWindows(MsgBox, translate("This is not a valid folder with a saved session."), translate("Error"), 262160)
+					OnMessage(0x44, translateOkButton, 0)
+				}
+				else {
+					this.UsedTyreSetsListView.Opt("-Redraw")
+					this.RunsListView.Opt("-Redraw")
+					this.LapsListView.Opt("-Redraw")
+
+					this.iSessionLoading := true
+
+					try {
+						this.initializeSession(getMultiMapValue(info, "Session", "Session", "Practice"), true, false)
+
+						this.iSessionMode := "Loaded"
+						this.iSessionLoaded := folder
+
+						if this.TelemetryBrowser
+							this.TelemetryBrowser.restart(folder . "Telemetry", false)
+
+						this.iSessionExported := getMultiMapValue(info, "Session", "Exported", true)
+						this.iDate := getMultiMapValue(info, "Session", "Date", A_Now)
+						this.iWeather := getMultiMapValue(info, "Weather", "Weather", false)
+						this.iWeather10Min := getMultiMapValue(info, "Weather", "Weather10Min", false)
+						this.iWeather30Min := getMultiMapValue(info, "Weather", "Weather30Min", false)
+						this.iAirTemperature := getMultiMapValue(info, "Weather", "AirTemperature", false)
+						this.iTrackTemperature := getMultiMapValue(info, "Weather", "TrackTemperature", false)
+
+						this.loadDrivers()
+						this.loadLaps()
+						this.loadRuns()
+						this.loadTelemetry()
+						this.loadPressures()
+
+						this.ReportViewer.setReport(folder . "Race Report")
+
+						this.initializeReports()
+
+						if !this.Weather {
+							lastLap := this.LastLap
+
+							if lastLap {
+								this.iWeather := lastLap.Weather
+								this.iAirTemperature := lastLap.AirTemperature
+								this.iTrackTemperature := lastLap.TrackTemperature
+								this.iWeather10Min := lastLap.Weather10Min
+								this.iWeather30Min := lastLap.Weather30Min
+							}
+						}
+
+						if !this.TyreCompound {
+							currentRun := this.CurrentRun
+
+							if currentRun {
+								this.iTyreCompound := compound(currentRun.Compound)
+								this.iTyreCompoundColor := compoundColor(currentRun.Compound)
+							}
+						}
+
+						loop this.RunsListView.GetCount()
+							this.RunsListView.Modify(A_Index, "-Check")
+
+						loop this.LapsListView.GetCount()
+							this.LapsListView.Modify(A_Index, "-Check")
+
+						this.updateUsedTyreSets()
+
+						this.analyzeTelemetry()
+
+						this.showOverviewReport()
+
+						this.updateState()
+
+						if this.TelemetryBrowser
+							this.TelemetryBrowser.loadTelemetry()
+					}
+					finally {
+						this.iSessionLoading := false
+
+						this.UsedTyreSetsListView.Opt("+Redraw")
+						this.RunsListView.Opt("+Redraw")
+						this.LapsListView.Opt("+Redraw")
+					}
+				}
+			})
+		}
+		*/
+	}
+
+	saveLap(lap := false) {
+		if !lap
+			lap := this.SelectedLap
+	}
+
+	deleteLap(lap := false) {
 		local selectedLap := this.SelectedLap
 		local selectedReferenceLap := this.SelectedReferenceLap
 

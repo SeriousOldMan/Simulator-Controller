@@ -485,6 +485,18 @@ class TelemetryBrowser {
 		}
 
 		deleteLap(*) {
+			local all := GetKeyState("Ctrl")
+			local msgResult
+
+			OnMessage(0x44, translateYesNoButtons)
+			msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected data?"), translate("Delete"), 262436)
+			OnMessage(0x44, translateYesNoButtons, 0)
+
+			if (msgResult = "Yes")
+				if all
+					this.clear()
+				else
+					this.deleteSelectedLap()
 		}
 
 		this.iWindow := browserGui
@@ -546,6 +558,14 @@ class TelemetryBrowser {
 		this.updateTelemetryChart(true)
 	}
 
+	close() {
+		this.shutdownTelemetryCollector(true)
+
+		this.Manager.closedTelemetryBrowser()
+
+		this.Window.Destroy()
+	}
+
 	updateState() {
 		if this.SelectedLap
 			this.Control["deleteButton"].Enabled := true
@@ -584,12 +604,42 @@ class TelemetryBrowser {
 			OnExit(ObjBindMethod(this, "shutdownTelemetryCollector", true))
 	}
 
-	close() {
-		this.shutdownTelemetryCollector(true)
+	clear() {
+		this.selectLap(false, true)
+		this.selectReferenceLap(false, true)
 
-		this.Manager.closedTelemetryBrowser()
+		this.Laps := []
 
-		this.Window.Destroy()
+		loop Files, this.TelemetryDirectory . "*.telemetry"
+			deleteFile(A_LoopFileFullPath)
+
+		this.loadTelemetry()
+	}
+
+	deleteSelectedLap(lap := false) {
+		local selectedLap := this.SelectedLap
+		local selectedReferenceLap := this.SelectedReferenceLap
+
+		if !lap
+			lap := selectedLap
+
+		if (lap = selectedLap)
+			this.selectLap(false, true)
+
+		if (lap = selectedReferenceLap)
+			this.selectReferenceLap(false, true)
+
+		deleteFile(this.TelemetryDirectory . "Lap " . lap . ".telemetry")
+
+		this.Laps := remove(this.Laps, lap)
+
+		this.loadTelemetry()
+
+		if (selectedLap && inList(this.Laps, selectedLap))
+			this.selectLap(selectedLap, true)
+
+		if (selectedReferenceLap && inList(this.Laps, selectedReferenceLap))
+			this.selectReferenceLap(selectedReferenceLap, true)
 	}
 
 	selectLap(lap, force := false) {

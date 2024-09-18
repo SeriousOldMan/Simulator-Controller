@@ -24,6 +24,251 @@
 ;;;                   Public Function Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+
+browseLapTelemetries(ownerOrCommand := false, arguments*) {
+	local x, y, names, infos, index, name, dirName, driverName
+	local carNames, trackNames, newSimulator, newCar, newTrack, force
+
+	static sessionDB := false
+
+	static browserGui
+
+	static fileName := false
+	static result := false
+
+	static simulators := false
+	static cars := false
+	static tracks := false
+
+	static simulator := false
+	static car := false
+	static track := false
+
+	selectSimulator(*) {
+		try
+			browseLapTelemetries("ChooseSimulator", simulators[browserGui["simulatorDropDown"].Value])
+	}
+
+	selectCar(*) {
+		try
+			browseLapTelemetries("ChooseCar", cars[browserGui["carDropDown"].Value])
+	}
+
+	selectTrack(*) {
+		try
+			browseLapTelemetries("ChooseTrack", tracks[browserGui["trackDropDown"].Value])
+	}
+
+	if ((ownerOrCommand == kOk) || (ownerOrCommand == kCancel))
+		result := ownerOrCommand
+	else if (ownerOrCommand == "Load") {
+		browserGui.Opt("+OwnDialogs")
+
+		if GetKeyState("Ctrl") {
+			OnMessage(0x44, translateLoadCancelButtons)
+			fileName := withBlockedWindows(FileSelect, "D1", kDatabaseDirectory, translate("Load Telemetry..."))
+			OnMessage(0x44, translateLoadCancelButtons, 0)
+		}
+		else {
+			dirName := (SessionDatabase.DatabasePath . "User\")
+
+			OnMessage(0x44, translateLoadCancelButtons)
+			fileName := withBlockedWindows(FileSelect, 1, dirName, translate("Load Telemetry..."), "Lap Telemetry (*.telemetry)")
+			OnMessage(0x44, translateLoadCancelButtons, 0)
+		}
+
+		if (fileName != "")
+			browseLapTelemetries(kOk)
+		else
+			fileName := false
+	}
+	else if (ownerOrCommand = "ChooseSimulator") {
+		newSimulator := arguments[1]
+		force := ((arguments.Length > 1) ? arguments[2] : false)
+
+		if newSimulator
+			newSimulator := sessionDB.getSimulatorName(newSimulator)
+
+		if (force || (newSimulator != simulator)) {
+			if (!newSimulator && (simulators.Length > 1))
+				newSimulator := simulators[1]
+
+			simulator := newSimulator
+
+			if simulator {
+				browserGui["simulatorDropDown"].Choose(inList(simulators, simulator))
+
+				cars := sessionDB.getCars(simulator)
+			}
+			else {
+				simulator := false
+
+				cars := []
+			}
+
+			carNames := cars.Clone()
+
+			for index, car in cars
+				carNames[index] := sessionDB.getCarName(simulator, car)
+
+			browserGui["carDropDown"].Delete()
+			browserGui["carDropDown"].Add(carNames)
+
+			browseLapTelemetries("ChooseCar", (cars.Length > 0) ? cars[1] : false, true)
+		}
+	}
+	else if (ownerOrCommand = "ChooseCar") {
+		newCar := arguments[1]
+		force := ((arguments.Length > 1) ? arguments[2] : false)
+
+		if (force || (newCar != car)) {
+			if (!newCar && (cars.Length > 1))
+				newCar := cars[1]
+
+			car := newCar
+
+			if car {
+				tracks := sessionDB.getTracks(simulator, car)
+
+				browserGui["carDropDown"].Choose(inList(cars, car))
+			}
+			else
+				tracks := []
+
+			browserGui["trackDropDown"].Delete()
+			browserGui["trackDropDown"].Add(collect(tracks, ObjBindMethod(sessionDB, "getTrackName", simulator)))
+
+			browseLapTelemetries("ChooseTrack", (tracks.Length > 0) ? tracks[1] : false, true)
+		}
+	}
+	else if (ownerOrCommand = "ChooseTrack") {
+		newTrack := arguments[1]
+		force := ((arguments.Length > 1) ? arguments[2] : false)
+
+		if (force || (newTrack != track)) {
+			if (!newTrack && (tracks.Length > 1))
+				newTrack := tracks[1]
+
+			track := newTrack
+
+			browserGui["telemetryListView"].Delete()
+
+			if track {
+				browserGui["trackDropDown"].Choose(inList(tracks, track))
+
+				sessionDB.getTelemetries(simulator, car, track, &names, &infos := true)
+
+				for index, name in names {
+					if getMultiMapValue(infos[index], "Telemetry", "Driver", false)
+						driverName := SessionDatabase.getDriverName(simulator, getMultiMapValue(infos[index], "Telemetry", "Driver"))
+					else
+						driverName := false
+
+					if !driverName
+						driverName := getMultiMapValue(infos[index], "Telemetry", "Driver")
+
+					if !driverName
+						driverName := SessionDatabase.getUserName()
+
+					browserGui["telemetryListView"].Add("", name, driverName
+														  , FormatTime(getMultiMapValue(infos[index], "Telemetry", "Date"), "ShortDate") . translate(" - ")
+														  . FormatTime(getMultiMapValue(infos[index], "Telemetry", "Date"), "Time"))
+				}
+
+				if (names.Length > 1)
+					browserGui["telemetryListView"].Modify(1, "Select +Vis")
+
+				browserGui["telemetryListView"].ModifyCol()
+
+				loop browserGui["telemetryListView"].GetCount("Col")
+					browserGui["telemetryListView"].ModifyCol(A_Index, "AutoHdr")
+			}
+		}
+	}
+	else {
+		fileName := false
+
+		sessionDB := SessionDatabase()
+		simulators := sessionDB.getSimulators()
+
+		result := false
+
+		browserGui := Window({Descriptor: "Lap Telemetry Browser", Options: "0x400000"}, translate("Load Telemetry..."))
+
+		if ownerOrCommand
+			browserGui.Opt("+Owner" . ownerOrCommand.Hwnd)
+
+		browserGui.Add("Text", "x8 yp+8 w70 h23 +0x200", translate("Simulator"))
+		browserGui.Add("DropDownList", "x90 yp w275 vsimulatorDropDown", simulators).OnEvent("Change", selectSimulator)
+
+		browserGui.Add("Text", "x8 yp+24 w70 h23 +0x200", translate("Car"))
+		browserGui.Add("DropDownList", "x90 yp w275 vcarDropDown").OnEvent("Change", selectCar)
+
+		browserGui.Add("Text", "x8 yp+24 w70 h23 +0x200", translate("Track"))
+		browserGui.Add("DropDownList", "x90 yp w275 vtrackDropDown").OnEvent("Change", selectTrack)
+
+		browserGui.Add("ListView", "x8 yp+30 w357 h335 -Multi -LV0x10 AltSubmit vtelemetryListView", collect(["Telemetry", "Driver", "Date"], translate))
+		browserGui["telemetryListView"].OnEvent("DoubleClick", browseLapTelemetries.Bind(kOk))
+
+		browserGui.Add("Button", "x8 yp+345 w80 h23 vopenButton", translate("Open...")).OnEvent("Click", browseLapTelemetries.Bind("Load"))
+
+		browserGui.Add("Button", "x197 yp w80 h23 Default", translate("Load")).OnEvent("Click", browseLapTelemetries.Bind(kOk))
+		browserGui.Add("Button", "x285 yp w80 h23", translate("&Cancel")).OnEvent("Click", browseLapTelemetries.Bind(kCancel))
+
+		browserGui.Show("AutoSize Center")
+
+		browseLapTelemetries("ChooseSimulator", %arguments[1]%, true)
+		browseLapTelemetries("ChooseCar", %arguments[2]%, true)
+		browseLapTelemetries("ChooseTrack", %arguments[3]%, true)
+
+		if getWindowPosition("Lap Telemetry Browser", &x, &y)
+			browserGui.Show("x" . x . " y" . y)
+		else
+			browserGui.Show()
+
+		try {
+			loop {
+				Sleep(100)
+
+				if GetKeyState("Ctrl")
+					browserGui["openButton"].Text := translate("Import...")
+				else
+					browserGui["openButton"].Text := translate("Open...")
+			}
+			until result
+
+			if (result = kOk) {
+				if fileName {
+					%arguments[1]% := false
+					%arguments[2]% := false
+					%arguments[3]% := false
+
+					return fileName
+				}
+				else {
+					index := browserGui["telemetryListView"].GetNext()
+
+					if index {
+						%arguments[1]% := simulator
+						%arguments[2]% := car
+						%arguments[3]% := track
+
+						return (sessionDB.getTelemetryDirectory(simulator, car, track)
+							  . browserGui["telemetryListView"].GetText(index) . ".telemetry")
+					}
+					else
+						return false
+				}
+			}
+			else
+				return false
+		}
+		finally {
+			browserGui.Destroy()
+		}
+	}
+}
+
 browseSoloSessions(ownerOrCommand := false, arguments*) {
 	local x, y, names, infos, index, name, dirName, driverName
 	local carNames, trackNames, newSimulator, newCar, newTrack, force

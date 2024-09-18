@@ -638,8 +638,11 @@ class TelemetryBrowser {
 	}
 
 	loadLap() {
+		local name := false
+		local telemetry := false
+		local info := false
 		local simulator, car, track
-		local sessionDB, fileName
+		local sessionDB, directory, fileName, dataFile, file, size
 
 		this.Manager.getSessionInformation(&simulator, &car, &track)
 
@@ -656,159 +659,47 @@ class TelemetryBrowser {
 			this.Window.Unblock()
 		}
 
-		/*
-		withTask(WorkingTask(StrReplace(translate("Extracting ") . translate("Session") . translate("..."), "...", "")), () {
-			if (fileName && InStr(FileExist(fileName), "D"))
-				folder := fileName
-			else if (fileName && (fileName != "")) {
-				SplitPath(fileName, , &directory, , &fileName)
+		if (fileName && (fileName != "")) {
+			SplitPath(fileName, , &directory, , &fileName)
 
-				folder := (kTempDirectory . "Sessions\Practice_" . Round(Random(1, 100000)))
+			if (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getTelemetryDirectory(simulator, car, track))) {
+				dataFile := temporaryFileName("Lap Telemetry", "telemetry")
 
-				DirCreate(folder)
+				try {
+					telemetry := sessionDB.readTelemetry(simulator, car, track, fileName, &size)
 
-				if (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Solo"))) {
-					dataFile := temporaryFileName("Session", "zip")
+					file := FileOpen(dataFile, "w", "")
 
-					try {
-						session := sessionDB.readSession(simulator, car, track, "Solo", fileName, &meta, &size)
+					if file {
+						file.RawWrite(telemetry, size)
 
-						file := FileOpen(dataFile, "w", "")
+						file.Close()
 
-						if file {
-							file.RawWrite(session, size)
-
-							file.Close()
-
-							RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
-
-							if !FileExist(folder . "\Practice.info")
-								FileCopy(directory . "\" . fileName . ".solo", folder . "\Practice.info")
-						}
-						else
-							folder := ""
+						name := fileName
+						telemetry := dataFile
+						info := sessionDB.readTelemetryInfo(simulator, car, track, fileName)
 					}
-					catch Any as exception {
-						logError(exception)
-
-						folder := ""
-					}
-					finally {
-						deleteFile(dataFile)
-					}
+					else
+						telemetry := false
 				}
-				else {
-					dataFile := temporaryFileName("Practice", "zip")
+				catch Any as exception {
+					logError(exception)
 
-					FileCopy(directory . "\" . fileName . ".data", dataFile, 1)
-
-					RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
-
-					if !FileExist(folder . "\Practice.info")
-						FileCopy(directory . "\" . fileName . ".solo", folder . "\Practice.info")
-
-					deleteFile(dataFile)
+					telemetry := false
 				}
 			}
-			else
-				folder := ""
-		})
-	}
-
-	if (folder != "") {
-			withTask(WorkingTask(StrReplace(translate("Load Session..."), "...", "")), () {
-				folder := (folder . "\")
-
-				info := readMultiMap(folder . "Practice.info")
-
-				if (info.Count == 0) {
-					OnMessage(0x44, translateOkButton)
-					withBlockedWindows(MsgBox, translate("This is not a valid folder with a saved session."), translate("Error"), 262160)
-					OnMessage(0x44, translateOkButton, 0)
-				}
-				else {
-					this.UsedTyreSetsListView.Opt("-Redraw")
-					this.RunsListView.Opt("-Redraw")
-					this.LapsListView.Opt("-Redraw")
-
-					this.iSessionLoading := true
-
-					try {
-						this.initializeSession(getMultiMapValue(info, "Session", "Session", "Practice"), true, false)
-
-						this.iSessionMode := "Loaded"
-						this.iSessionLoaded := folder
-
-						if this.TelemetryBrowser
-							this.TelemetryBrowser.restart(folder . "Telemetry", false)
-
-						this.iSessionExported := getMultiMapValue(info, "Session", "Exported", true)
-						this.iDate := getMultiMapValue(info, "Session", "Date", A_Now)
-						this.iWeather := getMultiMapValue(info, "Weather", "Weather", false)
-						this.iWeather10Min := getMultiMapValue(info, "Weather", "Weather10Min", false)
-						this.iWeather30Min := getMultiMapValue(info, "Weather", "Weather30Min", false)
-						this.iAirTemperature := getMultiMapValue(info, "Weather", "AirTemperature", false)
-						this.iTrackTemperature := getMultiMapValue(info, "Weather", "TrackTemperature", false)
-
-						this.loadDrivers()
-						this.loadLaps()
-						this.loadRuns()
-						this.loadTelemetry()
-						this.loadPressures()
-
-						this.ReportViewer.setReport(folder . "Race Report")
-
-						this.initializeReports()
-
-						if !this.Weather {
-							lastLap := this.LastLap
-
-							if lastLap {
-								this.iWeather := lastLap.Weather
-								this.iAirTemperature := lastLap.AirTemperature
-								this.iTrackTemperature := lastLap.TrackTemperature
-								this.iWeather10Min := lastLap.Weather10Min
-								this.iWeather30Min := lastLap.Weather30Min
-							}
-						}
-
-						if !this.TyreCompound {
-							currentRun := this.CurrentRun
-
-							if currentRun {
-								this.iTyreCompound := compound(currentRun.Compound)
-								this.iTyreCompoundColor := compoundColor(currentRun.Compound)
-							}
-						}
-
-						loop this.RunsListView.GetCount()
-							this.RunsListView.Modify(A_Index, "-Check")
-
-						loop this.LapsListView.GetCount()
-							this.LapsListView.Modify(A_Index, "-Check")
-
-						this.updateUsedTyreSets()
-
-						this.analyzeTelemetry()
-
-						this.showOverviewReport()
-
-						this.updateState()
-
-						if this.TelemetryBrowser
-							this.TelemetryBrowser.loadTelemetry()
-					}
-					finally {
-						this.iSessionLoading := false
-
-						this.UsedTyreSetsListView.Opt("+Redraw")
-						this.RunsListView.Opt("+Redraw")
-						this.LapsListView.Opt("+Redraw")
-					}
-				}
-			})
+			else {
+				name := fileName
+				telemetry := (directory . "\" . fileName . ".telemetry")
+				info := newMultiMap()
+			}
 		}
-		*/
+
+		if telemetry {
+			this.ImportedTelemetries.Push([name, telemetry, info])
+
+			this.loadTelemetry()
+		}
 	}
 
 	saveLap(lap := false) {

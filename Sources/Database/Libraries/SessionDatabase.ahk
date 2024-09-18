@@ -1430,6 +1430,188 @@ class SessionDatabase extends ConfigurationItem {
 		FileAppend(notes, directory . "\Notes.txt", "UTF-16")
 	}
 
+	getTelemetryDirectory(simulator, car, track) {
+		return (kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\" . this.getCarCode(simulator, car)
+								   . "\" . this.getTrackCode(simulator, track) . "\Lap Telemetries\")
+	}
+
+	getTelemetries(simulator, car, track, &names, &infos := false) {
+		local directory := this.getTelemetryDirectory(simulator, car, track)
+		local name
+
+		names := []
+
+		if infos
+			infos := []
+
+		loop Files, directory . "*.telemetry", "F" {
+			SplitPath(A_LoopFileName, , , , &name)
+
+			names.Push(name)
+
+			if infos
+				infos.Push(this.readTelemetryInfo(simulator, car, track, name))
+		}
+	}
+
+	readTelemetry(simulator, car, track, name, &size) {
+		local simulatorCode := this.getSimulatorCode(simulator)
+		local data, fileName, file
+
+		car := this.getCarCode(simulator, car)
+		track := this.getTrackCode(simulator, track)
+
+		fileName := (this.getTelemetryDirectory(simulator, car, track) . name)
+
+		if FileExist(fileName . ".telemetry") {
+			file := FileOpen(fileName . ".telemetry", "r-wd")
+
+			if file {
+				size := file.Length
+
+				data := Buffer(size)
+
+				file.RawRead(data, size)
+
+				file.Close()
+
+				return data
+			}
+		}
+
+		size := 0
+
+		return Buffer(0)
+	}
+
+	readTelemetryInfo(simulator, car, track, name) {
+		local fileName, info
+
+		car := this.getCarCode(simulator, car)
+		track := this.getTrackCode(simulator, track)
+
+		fileName := (this.getTelemetryDirectory(simulator, car, track) . name)
+
+		if !FileExist(fileName . ".info") {
+			info := newMultiMap()
+
+			setMultiMapValue(info, "Origin", "Simulator", this.getSimulatorName(simulator))
+			setMultiMapValue(info, "Origin", "Car", car)
+			setMultiMapValue(info, "Origin", "Track", track)
+			setMultiMapValue(info, "Origin", "Driver", this.ID)
+
+			setMultiMapValue(info, "Telemetry", "Name", name)
+			setMultiMapValue(info, "Telemetry", "Driver", this.ID)
+			setMultiMapValue(info, "Telemetry", "Date", FileGetTime(fileName . ".telemetry", "C"))
+			setMultiMapValue(info, "Telemetry", "Identifier", createGuid())
+			setMultiMapValue(info, "Telemetry", "Synchronized", false)
+
+			setMultiMapValue(info, "Access", "Share", false)
+			setMultiMapValue(info, "Access", "Synchronize", false)
+
+			writeMultiMap(fileName . ".info", info)
+
+			return info
+		}
+		else
+			return readMultiMap(fileName . ".info")
+	}
+
+	writeTelemetry(simulator, car, track, name, telemetry, size, share, synchronize
+				 , driver := kUndefined, identifier := kUndefined, synchronized := false) {
+		local fileName, file, info
+
+		car := this.getCarCode(simulator, car)
+		track := this.getTrackCode(simulator, track)
+
+		fileName := this.getTelemetryDirectory(simulator, car, track)
+
+		DirCreate(fileName)
+
+		fileName := (fileName . "\" . name)
+
+		deleteFile(fileName . ".telemetry")
+
+		file := FileOpen(fileName . ".telemetry", "w")
+
+		if file {
+			file.RawWrite(telemetry, size)
+
+			file.Close()
+
+			if !driver
+				driver := this.ID
+
+			info := this.readTelemetryInfo(simulator, car, track, name)
+
+			if (driver != kUndefined)
+				setMultiMapValue(info, "Origin", "Driver", driver)
+
+			if (identifier != kUndefined)
+				setMultiMapValue(info, "Telemetry", "Identifier", identifier)
+
+			setMultiMapValue(info, "Telemetry", "Synchronized", synchronized)
+
+			setMultiMapValue(info, "Telemetry", "Size", size)
+
+			setMultiMapValue(info, "Access", "Share", share)
+			setMultiMapValue(info, "Access", "Synchronize", synchronize)
+
+			this.writeTelemetryInfo(simulator, car, track, name, info)
+		}
+	}
+
+	writeTelemetryInfo(simulator, car, track, name, info) {
+		writeMultiMap(this.getTelemetryDirectory(simulator, car, track) . name . ".info", info)
+	}
+
+	renameTelemetry(simulator, car, track, oldName, newName) {
+		local oldFileName, newFileName, info
+
+		oldFileName := (this.getTelemetryDirectory(simulator, car, track) . oldName)
+		newFileName := (this.getTelemetryDirectory(simulator, car, track) . newName)
+
+		try {
+			FileMove(oldFileName . ".telemetry", newFileName . ".telemetry", 1)
+
+			if FileExist(oldFileName . ".info") {
+				info := readMultiMap(oldFileName . ".info")
+
+				deleteFile(oldFileName . ".info")
+
+				setMultiMapValue(info, "Telemetry", "Name", newName)
+				setMultiMapValue(info, "Telemetry", "Synchronized", false)
+
+				writeMultiMap(newFileName . ".info", info)
+			}
+		}
+		catch Any as exception {
+			logError(exception)
+		}
+	}
+
+	removeTelemetry(simulator, car, track, name) {
+		local fileName, info, identifier, ignore, connector
+
+		fileName := (this.getTelemetryDirectory(simulator, car, track) . name)
+
+		info := readMultiMap(fileName . ".info")
+
+		deleteFile(fileName . ".telemetry")
+		deleteFile(fileName . ".info")
+
+		identifier := getMultiMapValue(info, "Telemetry", "Identifier", false)
+
+		if (identifier && (getMultiMapValue(info, "Origin", "Driver", false) = this.ID))
+			for ignore, connector in this.Connectors
+				try {
+					connector.DeleteData("Document", identifier)
+				}
+				catch Any as exception {
+					logError(exception, true)
+				}
+	}
+
 	getSessionDirectory(simulator, car, track, type) {
 		if (type = "Practice")
 			type := "Solo"
@@ -1493,18 +1675,12 @@ class SessionDatabase extends ConfigurationItem {
 
 				return data
 			}
-			else {
-				size := 0
-				meta := false
-
-				return Buffer(0)
-			}
 		}
-		else {
-			size := 0
 
-			return Buffer(0)
-		}
+		size := 0
+		meta := false
+
+		return Buffer(0)
 	}
 
 	readSessionInfo(simulator, car, track, type, name) {
@@ -1736,17 +1912,11 @@ class SessionDatabase extends ConfigurationItem {
 
 				return data
 			}
-			else {
-				size := 0
-
-				return Buffer(0)
-			}
 		}
-		else {
-			size := 0
 
-			return Buffer(0)
-		}
+		size := 0
+
+		return Buffer(0)
 	}
 
 	readSetupInfo(simulator, car, track, type, name) {

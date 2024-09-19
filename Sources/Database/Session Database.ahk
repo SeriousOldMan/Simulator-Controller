@@ -91,6 +91,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	iDataListView := false
 	iSettingsListView := false
 	iSessionListView := false
+	iTelemetryListView := false
 	iStrategyListView := false
 	iSetupListView := false
 	iAdministrationListView := false
@@ -273,6 +274,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	SessionListView {
 		Get {
 			return this.iSessionListView
+		}
+	}
+
+	TelemetryListView {
+		Get {
+			return this.iTelemetryListView
 		}
 	}
 
@@ -751,6 +758,53 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				category := "Team"
 
 			editor.deleteSession(category, editor.SessionListView.GetText(editor.SessionListView.GetNext(0), 3))
+		}
+
+		navTelemetry(listView, line, selected) {
+			if selected
+				chooseTelemetry(listView, line)
+		}
+
+		chooseTelemetry(listView, line, *) {
+			if line
+				SessionDatabaseEditor.Instance.selectTelemetry(line)
+			else
+				editor.updateState()
+		}
+
+		updateTelemetryAccess(*) {
+			local sessionDB := editor.SessionDatabase
+			local selected, name
+
+			selected := editor.TelemetryListView.GetNext(0)
+
+			if selected {
+				name := editor.TelemetryListView.GetText(selected, 2)
+
+				info := sessionDB.readTelemetryInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, name)
+
+				setMultiMapValue(info, "Telemetry", "Synchronized", false)
+				setMultiMapValue(info, "Access", "Share", editor.Control["shareTelemetryWithCommunityCheck"].Value)
+				setMultiMapValue(info, "Access", "Synchronize", editor.Control["shareTelemetryWithTeamServerCheck"].Value)
+
+				sessionDB.writeTelemetryInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, name, info)
+			}
+		}
+
+		uploadTelemetry(*) {
+			editor.uploadTelemetry()
+		}
+
+		downloadTelemetry(*) {
+			editor.downloadTelemetry(editor.TelemetryListView.GetText(editor.TelemetryListView.GetNext(0), 2))
+		}
+
+		renameTelemetry(*) {
+			editor.renameTelemetry(editor.TelemetryListView.GetText(editor.TelemetryListView.GetNext(0), 2))
+		}
+
+		deleteTelemetry(*) {
+			editor.deleteTelemetry(editor.TelemetryListView.GetText(editor.TelemetryListView.GetNext(0), 2))
 		}
 
 		navStrategy(listView, line, selected) {
@@ -1367,40 +1421,48 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg3", this.themeIcon(kIconsDirectory . "Strategy.ico")).OnEvent("Click", chooseTab.Bind("Strategies"))
-		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab3", translate("Strategies")).OnEvent("Click", chooseTab.Bind("Strategies"))
+		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg3", this.themeIcon(kIconsDirectory . "Tacho.ico")).OnEvent("Click", chooseTab.Bind("Telemetries"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab3", translate("Telemetries")).OnEvent("Click", chooseTab.Bind("Telemetries"))
 
 		editorGui.Add("Text", "x16 yp+32 w267 0x10")
 
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg4", this.themeIcon(kIconsDirectory . "Tools BW.ico")).OnEvent("Click", chooseTab.Bind("Setups"))
-		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab4", translate("Setups")).OnEvent("Click", chooseTab.Bind("Setups"))
+		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg4", this.themeIcon(kIconsDirectory . "Strategy.ico")).OnEvent("Click", chooseTab.Bind("Strategies"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab4", translate("Strategies")).OnEvent("Click", chooseTab.Bind("Strategies"))
 
 		editorGui.Add("Text", "x16 yp+32 w267 0x10")
 
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg5", this.themeIcon(kIconsDirectory . "Pressure.ico")).OnEvent("Click", chooseTab.Bind("Pressures"))
-		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab5", translate("Tyre Pressures")).OnEvent("Click", chooseTab.Bind("Pressures"))
+		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg5", this.themeIcon(kIconsDirectory . "Tools BW.ico")).OnEvent("Click", chooseTab.Bind("Setups"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab5", translate("Setups")).OnEvent("Click", chooseTab.Bind("Setups"))
 
 		editorGui.Add("Text", "x16 yp+32 w267 0x10")
 
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg6", this.themeIcon(kIconsDirectory . "Road.ico")).OnEvent("Click", chooseTab.Bind("Automation"))
-		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab6", translate("Automations")).OnEvent("Click", chooseTab.Bind("Automation"))
+		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg6", this.themeIcon(kIconsDirectory . "Pressure.ico")).OnEvent("Click", chooseTab.Bind("Pressures"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab6", translate("Tyre Pressures")).OnEvent("Click", chooseTab.Bind("Pressures"))
 
 		editorGui.Add("Text", "x16 yp+32 w267 0x10")
 
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg7", this.themeIcon(kIconsDirectory . "Sensor.ico")).OnEvent("Click", chooseTab.Bind("Data"))
-		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab7", translate("Administration")).OnEvent("Click", chooseTab.Bind("Data"))
+		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg7", this.themeIcon(kIconsDirectory . "Road.ico")).OnEvent("Click", chooseTab.Bind("Automation"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab7", translate("Automations")).OnEvent("Click", chooseTab.Bind("Automation"))
+
+		editorGui.Add("Text", "x16 yp+32 w267 0x10")
+
+		editorGui.SetFont("Norm")
+		editorGui.SetFont("s10 Bold", "Arial")
+
+		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg8", this.themeIcon(kIconsDirectory . "Sensor.ico")).OnEvent("Click", chooseTab.Bind("Data"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab8", translate("Administration")).OnEvent("Click", chooseTab.Bind("Data"))
 
 		editorGui.Add("Text", "x16 yp+32 w267 0x10")
 
@@ -1408,7 +1470,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui.Add("Picture", "x280 ys-2 w390 h524 Border W:Grow H:Grow")
 
-		tabs := collect(["Settings", "Session", "Stratgies", "Setups", "Pressures", "Automation", "Data"], translate)
+		tabs := collect(["Settings", "Session", "Telemetries", "Stratgies", "Setups", "Pressures", "Automation", "Data"], translate)
 
 		editorGui.Add("Tab2", "x296 ys+16 w0 h0 -Wrap Section vsettingsTab", tabs)
 
@@ -1795,7 +1857,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		if simulator {
 			if !((car && (car != true)) && (track && (track != true)))
-				if ((this.SelectedModule = "Strategies") || (this.SelectedModule = "Setups") || (this.SelectedModule = "Pressures"))
+				if ((this.SelectedModule = "Sessions") || (this.SelectedModule = "Telemetries") || (this.SelectedModule = "Strategies") || (this.SelectedModule = "Setups") || (this.SelectedModule = "Pressures"))
 					this.selectModule("Settings")
 		}
 
@@ -1821,59 +1883,70 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			window["settingsTab2"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
-		if this.moduleAvailable("Strategies") {
+		if this.moduleAvailable("Telemetries") {
 			window["settingsImg3"].Enabled := true
-			window["settingsImg3"].Value := this.themeIcon(kIconsDirectory . "Strategy.ico")
+			window["settingsImg3"].Value := this.themeIcon(kIconsDirectory . "Tacho.ico")
 			window["settingsTab3"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
 		}
 		else {
 			window["settingsImg3"].Enabled := false
-			window["settingsImg3"].Value := this.themeIcon(kIconsDirectory . "Strategy Gray.ico")
+			window["settingsImg3"].Value := this.themeIcon(kIconsDirectory . "Tacho Gray.ico")
 			window["settingsTab3"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
-		if this.moduleAvailable("Setups") {
+		if this.moduleAvailable("Strategies") {
 			window["settingsImg4"].Enabled := true
-			window["settingsImg4"].Value := this.themeIcon(kIconsDirectory . "Tools BW.ico")
+			window["settingsImg4"].Value := this.themeIcon(kIconsDirectory . "Strategy.ico")
 			window["settingsTab4"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
 		}
 		else {
 			window["settingsImg4"].Enabled := false
-			window["settingsImg4"].Value := this.themeIcon(kIconsDirectory . "Tools Gray.ico")
+			window["settingsImg4"].Value := this.themeIcon(kIconsDirectory . "Strategy Gray.ico")
 			window["settingsTab4"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
-		if this.moduleAvailable("Pressures") {
+		if this.moduleAvailable("Setups") {
 			window["settingsImg5"].Enabled := true
-			window["settingsImg5"].Value := this.themeIcon(kIconsDirectory . "Pressure.ico")
+			window["settingsImg5"].Value := this.themeIcon(kIconsDirectory . "Tools BW.ico")
 			window["settingsTab5"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
 		}
 		else {
 			window["settingsImg5"].Enabled := false
-			window["settingsImg5"].Value := this.themeIcon(kIconsDirectory . "Pressure Gray.ico")
+			window["settingsImg5"].Value := this.themeIcon(kIconsDirectory . "Tools Gray.ico")
 			window["settingsTab5"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
-		if this.moduleAvailable("Automation") {
+		if this.moduleAvailable("Pressures") {
 			window["settingsImg6"].Enabled := true
-			window["settingsImg6"].Value := this.themeIcon(kIconsDirectory . "Road.ico")
+			window["settingsImg6"].Value := this.themeIcon(kIconsDirectory . "Pressure.ico")
 			window["settingsTab6"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
 		}
 		else {
 			window["settingsImg6"].Enabled := false
-			window["settingsImg6"].Value := this.themeIcon(kIconsDirectory . "Road Gray.ico")
+			window["settingsImg6"].Value := this.themeIcon(kIconsDirectory . "Pressure Gray.ico")
 			window["settingsTab6"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
-		if this.moduleAvailable("Data") {
+		if this.moduleAvailable("Automation") {
 			window["settingsImg7"].Enabled := true
-			window["settingsImg7"].Value := this.themeIcon(kIconsDirectory . "Sensor.ico")
+			window["settingsImg7"].Value := this.themeIcon(kIconsDirectory . "Road.ico")
 			window["settingsTab7"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
 		}
 		else {
 			window["settingsImg7"].Enabled := false
-			window["settingsImg7"].Value := this.themeIcon(kIconsDirectory . "Sensor Gray.ico")
+			window["settingsImg7"].Value := this.themeIcon(kIconsDirectory . "Road Gray.ico")
 			window["settingsTab7"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
+		}
+
+		if this.moduleAvailable("Data") {
+			window["settingsImg8"].Enabled := true
+			window["settingsImg8"].Value := this.themeIcon(kIconsDirectory . "Sensor.ico")
+			window["settingsTab8"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
+		}
+		else {
+			window["settingsImg8"].Enabled := false
+			window["settingsImg8"].Value := this.themeIcon(kIconsDirectory . "Sensor Gray.ico")
+			window["settingsTab8"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
 		switch this.SelectedModule, false {
@@ -1885,18 +1958,22 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				window["settingsTab2"].SetFont("s10 Bold c" . window.Theme.TextColor, "Arial")
 
 				window["settingsTab"].Choose(2)
-			case "Strategies":
+			case "Telemetries":
 				window["settingsTab3"].SetFont("s10 Bold c" . window.Theme.TextColor, "Arial")
 
 				window["settingsTab"].Choose(3)
-			case "Setups":
+			case "Strategies":
 				window["settingsTab4"].SetFont("s10 Bold c" . window.Theme.TextColor, "Arial")
 
 				window["settingsTab"].Choose(4)
-			case "Pressures":
+			case "Setups":
 				window["settingsTab5"].SetFont("s10 Bold c" . window.Theme.TextColor, "Arial")
 
 				window["settingsTab"].Choose(5)
+			case "Pressures":
+				window["settingsTab6"].SetFont("s10 Bold c" . window.Theme.TextColor, "Arial")
+
+				window["settingsTab"].Choose(6)
 
 				window["editPressuresButton"].Enabled := false
 
@@ -1909,13 +1986,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							break
 						}
 			case "Automation":
-				window["settingsTab6"].SetFont("s10 Bold c" . window.Theme.TextColor, "Arial")
-
-				window["settingsTab"].Choose(6)
-			case "Data":
 				window["settingsTab7"].SetFont("s10 Bold c" . window.Theme.TextColor, "Arial")
 
 				window["settingsTab"].Choose(7)
+			case "Data":
+				window["settingsTab8"].SetFont("s10 Bold c" . window.Theme.TextColor, "Arial")
+
+				window["settingsTab"].Choose(8)
 		}
 
 		selected := this.SessionListView.GetNext(0)
@@ -2283,6 +2360,57 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		if select
 			this.selectSession(select)
+		else
+			this.updateState()
+	}
+
+	loadTelemetries(select := false) {
+		local window, userTelemetries, communityTelemetries, ignore, name, info, origin
+
+		window := this.Window
+
+		this.TelemetryListView.Delete()
+
+		userTelemetries := true
+		communityTelemetries := this.UseCommunity
+
+		this.SessionDatabase.getTelemetryNames(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, &userTelemetries, &communityTelemetries)
+
+		for ignore, name in userTelemetries {
+			info := this.SessionDatabase.readTelemetryInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name)
+
+			if !info
+				origin := translate("User")
+			else {
+				origin := getMultiMapValue(info, "Origin", "Driver", this.SessionDatabase.ID)
+
+				origin := this.SessionDatabase.getDriverName(this.SelectedSimulator, origin)
+			}
+
+			if (select = name) {
+				this.TelemetryListView.Add("Select Vis", origin, name)
+
+				select := this.TelemetryListView.GetCount()
+			}
+			else
+				this.TelemetryListView.Add("", origin, name)
+		}
+
+		if communityTelemetries
+			for ignore, name in communityTelemetries
+				if !inList(userTelemetries, name)
+					this.TelemetryListView.Add("", translate("Community"), name)
+
+		this.TelemetryListView.ModifyCol()
+
+		loop 2
+			this.TelemetryListView.ModifyCol(A_Index, 10)
+
+		loop 2
+			this.TelemetryListView.ModifyCol(A_Index, "AutoHdr")
+
+		if select
+			this.selectTelemetry(select)
 		else
 			this.updateState()
 	}
@@ -3202,6 +3330,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 								this.SessionDatabase.removeSession(simulator, car, track, type, name)
 							}
+					case translate("Telemetries"):
+						code := this.SessionDatabase.getSimulatorCode(simulator)
+
+						loop Files, kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Lap Telemetries\*.strategy", "F"
+							this.SessionDatabase.removeTelemetry(simulator, car, track, A_LoopFileName)
 					case translate("Setups"):
 						code := this.SessionDatabase.getSimulatorCode(simulator)
 
@@ -4152,6 +4285,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			if ((car && (car != true)) && (track && (track != true))) {
 				this.iAvailableModules["Sessions"] := true
+				this.iAvailableModules["Telemetries"] := true
 				this.iAvailableModules["Strategies"] := true
 				this.iAvailableModules["Setups"] := true
 				this.iAvailableModules["Pressures"] := true
@@ -4159,6 +4293,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			}
 			else {
 				this.iAvailableModules["Sessions"] := false
+				this.iAvailableModules["Telemetries"] := false
 				this.iAvailableModules["Strategies"] := false
 				this.iAvailableModules["Setups"] := false
 				this.iAvailableModules["Pressures"] := false
@@ -4169,6 +4304,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.iAvailableModules["Settings"] := false
 			this.iAvailableModules["Data"] := false
 			this.iAvailableModules["Sessions"] := false
+			this.iAvailableModules["Telemetries"] := false
 			this.iAvailableModules["Strategies"] := false
 			this.iAvailableModules["Setups"] := false
 			this.iAvailableModules["Pressures"] := false
@@ -4753,6 +4889,24 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			Run("`"" . kBinariesDirectory . type . " Center.exe`" -Load `""
 			  . this.SessionDatabase.getSessionDirectory(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, type)
 			  . name . "." . StrLower(type), kBinariesDirectory)
+	}
+
+	selectTelemetry(row) {
+		local window := this.Window
+		local name := this.TelemetryListView.GetText(row, 2)
+		local info := this.SessionDatabase.readTelemetryInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name)
+		local fileName
+
+		if (info && getMultiMapValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID) {
+			window["shareTelemetryWithCommunityCheck"].Value := getMultiMapValue(info, "Access", "Share", false)
+			window["shareTelemetryWithTeamServerCheck"].Value := getMultiMapValue(info, "Access", "Synchronize", false)
+		}
+		else {
+			window["shareTelemetryWithCommunityCheck"].Value := 0
+			window["shareTelemetryWithTeamServerCheck"].Value := 0
+		}
+
+		this.updateState()
 	}
 
 	selectStrategy(row, open := false) {

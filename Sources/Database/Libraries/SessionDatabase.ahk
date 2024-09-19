@@ -1430,9 +1430,39 @@ class SessionDatabase extends ConfigurationItem {
 		FileAppend(notes, directory . "\Notes.txt", "UTF-16")
 	}
 
-	getTelemetryDirectory(simulator, car, track) {
-		return (kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\" . this.getCarCode(simulator, car)
+	getTelemetryDirectory(simulator, car, track, type) {
+		return (kDatabaseDirectory . StrTitle(type) . "\" . this.getSimulatorCode(simulator) . "\" . this.getCarCode(simulator, car)
 								   . "\" . this.getTrackCode(simulator, track) . "\Lap Telemetries\")
+	}
+
+	getTelemetryNames(simulator, car, track, &userTelemetries, &communityTelemetries) {
+		local simulatorCode := this.getSimulatorCode(simulator)
+		local ignore, name, extension
+
+		car := this.getCarCode(simulator, car)
+		track := this.getTrackCode(simulator, track)
+
+		if userTelemetries {
+			userTelemetries := []
+
+			loop Files, this.getTelemetryDirectory(simulator, car, track, "User") . *.*", "F" {
+				SplitPath(A_LoopFileName, &name, , &extension)
+
+				if (extension != "info")
+					userTelemetries.Push(name)
+			}
+		}
+
+		if communityTelemetries {
+			communityTelemetries := []
+
+			loop Files, this.getTelemetryDirectory(simulator, car, track, "Community") . "*.*", "F" {
+				SplitPath(A_LoopFileName, &name, , &extension)
+
+				if (extension != "info")
+					communityTelemetries.Push(name)
+			}
+		}
 	}
 
 	getTelemetries(simulator, car, track, &names, &infos := false) {
@@ -1592,6 +1622,9 @@ class SessionDatabase extends ConfigurationItem {
 
 	removeTelemetry(simulator, car, track, name) {
 		local fileName, info, identifier, ignore, connector
+
+		if !InStr(name, ".telemetry")
+			name .= ".telemetry"
 
 		fileName := (this.getTelemetryDirectory(simulator, car, track) . name)
 
@@ -2079,9 +2112,6 @@ class SessionDatabase extends ConfigurationItem {
 		local simulatorCode := this.getSimulatorCode(simulator)
 		local ignore, strategies, name, extension
 
-		car := this.getCarCode(simulator, car)
-		track := this.getTrackCode(simulator, track)
-
 		if userStrategies {
 			userStrategies := []
 
@@ -2109,9 +2139,6 @@ class SessionDatabase extends ConfigurationItem {
 		local simulatorCode := this.getSimulatorCode(simulator)
 		local data, fileName
 
-		car := this.getCarCode(simulator, car)
-		track := this.getTrackCode(simulator, track)
-
 		if !InStr(name, ".strategy")
 			name .= ".strategy"
 
@@ -2126,9 +2153,6 @@ class SessionDatabase extends ConfigurationItem {
 	readStrategyInfo(simulator, car, track, name) {
 		local simulatorCode := this.getSimulatorCode(simulator)
 		local fileName, info
-
-		car := this.getCarCode(simulator, car)
-		track := this.getTrackCode(simulator, track)
 
 		if !InStr(name, ".strategy")
 			name .= ".strategy"
@@ -2169,9 +2193,6 @@ class SessionDatabase extends ConfigurationItem {
 		local simulatorCode := this.getSimulatorCode(simulator)
 		local fileName, file, info
 
-		car := this.getCarCode(simulator, car)
-		track := this.getTrackCode(simulator, track)
-
 		if !InStr(name, ".strategy")
 			name .= ".strategy"
 
@@ -2208,9 +2229,6 @@ class SessionDatabase extends ConfigurationItem {
 		local simulatorCode := this.getSimulatorCode(simulator)
 		local fileName
 
-		car := this.getCarCode(simulator, car)
-		track := this.getTrackCode(simulator, track)
-
 		if !InStr(name, ".strategy")
 			name .= ".strategy"
 
@@ -2222,9 +2240,6 @@ class SessionDatabase extends ConfigurationItem {
 	renameStrategy(simulator, car, track, oldName, newName) {
 		local simulatorCode := this.getSimulatorCode(simulator)
 		local oldFileName, newFileName, info
-
-		car := this.getCarCode(simulator, car)
-		track := this.getTrackCode(simulator, track)
 
 		if !InStr(oldName, ".strategy")
 			oldName .= ".strategy"
@@ -2257,9 +2272,6 @@ class SessionDatabase extends ConfigurationItem {
 	removeStrategy(simulator, car, track, name) {
 		local simulatorCode := this.getSimulatorCode(simulator)
 		local fileName, info, identifier, ignore, connector
-
-		car := this.getCarCode(simulator, car)
-		track := this.getTrackCode(simulator, track)
 
 		if !InStr(name, ".strategy")
 			name .= ".strategy"

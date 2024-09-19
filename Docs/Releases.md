@@ -10,7 +10,7 @@
 	 - Telemetry data can uploaded, downloaded, renamed and deleted.
 	 - Export and Import support telemetry data as well.
 	 - Sharing of telemetry with the Community and/or on the Team Server is supported.
-	 - The consent for sharing data will be requested again to allow you to include sharing of telemetry data.
+	 - **The consent for sharing data will be requested again to allow you to include sharing of telemetry data**.
 
 ## 5.8.7.0-release 09/13/24
   1. Minor bugfixes, as always

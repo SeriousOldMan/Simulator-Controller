@@ -94,13 +94,13 @@ consentDialog(id, consent := false, *) {
 	consentGui.Add("Text", "x8 y372 w450 h23 +0x200", translate("Do you want to share your lap telemetry data?"))
 
 	chosen := inList(["Yes", "No", "Undecided"], getMultiMapValue(consent, "Consent", "Share Lap Telemetries", "Undecided"))
-	lapTelemetriesConsentDropDown := consentGui.Add("DropDownList", "x460 y300 w332 Choose" . chosen, collect(["Yes", "No", "Ask again later..."], translate))
+	lapTelemetriesConsentDropDown := consentGui.Add("DropDownList", "x460 y372 w332 Choose" . chosen, collect(["Yes", "No", "Ask again later..."], translate))
 
 	consentGui.Add("Text", "x8 y412 w784 h60 -VScroll +Wrap ReadOnly", StrReplace(StrReplace(getMultiMapValue(texts, "Consent", "Information"), "``n", "`n"), "\<>", "="))
 
 	consentGui.Add("Link", "x8 y482 w784 h60 cRed -VScroll +Wrap ReadOnly", StrReplace(StrReplace(getMultiMapValue(texts, "Consent", "Warning"), "``n", "`n"), "\<>", "="))
 
-	consentGui.Add("Button", "x392 y514 w80 h23 Default", translate("Save")).OnEvent("Click", consentDialog.Bind("Close"))
+	consentGui.Add("Button", "x392 y538 w80 h23 Default", translate("Save")).OnEvent("Click", consentDialog.Bind("Close"))
 
 	consentGui.Opt("+AlwaysOnTop")
 

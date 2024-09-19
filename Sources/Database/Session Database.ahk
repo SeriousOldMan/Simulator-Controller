@@ -4196,13 +4196,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 									pressures += 1
 								}
 
-								loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Race Strategies\*.*", "F" {
+								loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Race Strategies\*.strategy", "F" {
 									found := true
 
 									strategies += 1
 								}
 
-								loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Lap Telemetries\*.*", "F" {
+								loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Lap Telemetries\*.telemetry", "F" {
 									found := true
 
 									telemetries += 1

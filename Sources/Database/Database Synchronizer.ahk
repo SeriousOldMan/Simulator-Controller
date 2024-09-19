@@ -43,7 +43,7 @@
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies) {
+uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploadTelemetries) {
 	local sessionDB := SessionDatabase()
 	local sessionDBPath := sessionDB.DatabasePath
 	local uploadTimeStamp := sessionDBPath . "UPLOAD"
@@ -183,6 +183,34 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies) {
 										logError(exception)
 									}
 								}
+
+								if uploadTelemetries {
+									try {
+										directory := sessionDBPath . "User\" . simulator . "\" . car . "\" . track . "\Lap Telemetries"
+
+										if FileExist(directory)
+											DirCopy(directory, kTempDirectory . "Shared Database\Community\" . simulator . "\" . car . "\" . track . "\Lap Telemetries")
+
+											directory := kTempDirectory . "Shared Database\Community\" . simulator . "\" . car . "\" . track . "\Lap Telemetries\"
+
+											loop Files, directory . "*.info", "F" {
+												SplitPath(A_LoopFileName, , , , &name)
+
+												info := sessionDB.readTelemetryInfo(simulator, car, track, name)
+
+												if ((getMultiMapValue(info, "Origin", "Driver", false) != sessionDB.ID)
+												 || !getMultiMapValue(info, "Access", "Share", false))
+													deleteFile(directory . getMultiMapValue(info, "Telemetry", "Name"))
+
+												deleteFile(A_LoopFilePath)
+
+												Sleep(1)
+											}
+									}
+									catch Any as exception {
+										logError(exception)
+									}
+								}
 							}
 						}
 					}
@@ -218,7 +246,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies) {
 	}
 }
 
-downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategies) {
+downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategies, downloadTelemetries) {
 	local sessionDBPath := SessionDatabase.DatabasePath
 	local downloadTimeStamp := sessionDBPath . "DOWNLOAD"
 	local ignore, fileName, type, databaseDirectory, configuration
@@ -254,7 +282,7 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 
 			type := StrSplit(Trim(fileName), ".", "", 2)[1]
 
-			if ((type = (downloadPressures . downloadSetups . downloadStrategies)) || (type = (downloadPressures . downloadSetups))) {
+			if ((type = (downloadPressures . downloadSetups . downloadStrategies . downloadTelemetries)) || (type = (downloadPressures . downloadSetups))) {
 				if (SessionDatabase.DatabaseVersion != databaseDirectory) {
 					ftpDownload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads/" . fileName, kTempDirectory . fileName)
 
@@ -306,14 +334,14 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 	}
 }
 
-synchronizeCommunityDatabase(id, usePressures, useSetups, useStrategies) {
+synchronizeCommunityDatabase(id, usePressures, useSetups, useStrategies, useTelemetries) {
 	synchronizeDatabase("Stop")
 
 	Task.CurrentTask.Critical := true
 
 	try {
-		uploadSessionDatabase(id, usePressures, useSetups, useStrategies)
-		downloadSessionDatabase(id, usePressures, useSetups, useStrategies)
+		uploadSessionDatabase(id, usePressures, useSetups, useStrategies, useTelemetries)
+		downloadSessionDatabase(id, usePressures, useSetups, useStrategies, useTelemetries)
 	}
 	finally {
 		Task.CurrentTask.Critical := false
@@ -346,7 +374,7 @@ synchronizeSessionDatabase(minutes) {
 
 updateSessionDatabase() {
 	local icon := kIconsDirectory . "Database Update.ico"
-	local usePressures, useSetups, useStrategies, id, minutes
+	local usePressures, useSetups, useStrategies, useTelemetries, id, minutes
 
 	TraySetIcon(icon, "1")
 	A_IconTip := "Database Synchronizer"
@@ -357,11 +385,12 @@ updateSessionDatabase() {
 		usePressures := (inList(A_Args, "-Pressures") != 0)
 		useSetups := (inList(A_Args, "-Setups") != 0)
 		useStrategies := (inList(A_Args, "-Strategies") != 0)
+		useTelemetries := (inList(A_Args, "-Telemetries") != 0)
 
 		id := inList(A_Args, "-ID")
 
 		if id
-			PeriodicTask(synchronizeCommunityDatabase.Bind(A_Args[id + 1], usePressures, useSetups, useStrategies), 10000, kLowPriority).start()
+			PeriodicTask(synchronizeCommunityDatabase.Bind(A_Args[id + 1], usePressures, useSetups, useStrategies, useTelemetries), 10000, kLowPriority).start()
 
 		minutes := inList(A_Args, "-Synchronize")
 

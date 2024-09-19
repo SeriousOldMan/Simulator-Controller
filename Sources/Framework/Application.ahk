@@ -37,6 +37,7 @@ consentDialog(id, consent := false, *) {
 	static tyrePressuresConsentDropDown
 	static carSetupsConsentDropDown
 	static raceStrategiesConsentDropDown
+	static lapTelemetriesConsentDropDown
 	static closed
 
 	if (id = "Close") {
@@ -90,11 +91,16 @@ consentDialog(id, consent := false, *) {
 	chosen := inList(["Yes", "No", "Undecided"], getMultiMapValue(consent, "Consent", "Share Race Strategies", "Undecided"))
 	raceStrategiesConsentDropDown := consentGui.Add("DropDownList", "x460 y348 w332 Choose" . chosen, collect(["Yes", "No", "Ask again later..."], translate))
 
-	consentGui.Add("Text", "x8 y388 w784 h60 -VScroll +Wrap ReadOnly", StrReplace(StrReplace(getMultiMapValue(texts, "Consent", "Information"), "``n", "`n"), "\<>", "="))
+	consentGui.Add("Text", "x8 y372 w450 h23 +0x200", translate("Do you want to share your lap telemetry data?"))
 
-	consentGui.Add("Link", "x8 y458 w784 h60 cRed -VScroll +Wrap ReadOnly", StrReplace(StrReplace(getMultiMapValue(texts, "Consent", "Warning"), "``n", "`n"), "\<>", "="))
+	chosen := inList(["Yes", "No", "Undecided"], getMultiMapValue(consent, "Consent", "Share Lap Telemetries", "Undecided"))
+	lapTelemetriesConsentDropDown := consentGui.Add("DropDownList", "x460 y300 w332 Choose" . chosen, collect(["Yes", "No", "Ask again later..."], translate))
 
-	consentGui.Add("Button", "x368 y514 w80 h23 Default", translate("Save")).OnEvent("Click", consentDialog.Bind("Close"))
+	consentGui.Add("Text", "x8 y412 w784 h60 -VScroll +Wrap ReadOnly", StrReplace(StrReplace(getMultiMapValue(texts, "Consent", "Information"), "``n", "`n"), "\<>", "="))
+
+	consentGui.Add("Link", "x8 y482 w784 h60 cRed -VScroll +Wrap ReadOnly", StrReplace(StrReplace(getMultiMapValue(texts, "Consent", "Warning"), "``n", "`n"), "\<>", "="))
+
+	consentGui.Add("Button", "x392 y514 w80 h23 Default", translate("Save")).OnEvent("Click", consentDialog.Bind("Close"))
 
 	consentGui.Opt("+AlwaysOnTop")
 
@@ -110,7 +116,8 @@ consentDialog(id, consent := false, *) {
 	try {
 		return Map("TyrePressures", ["Yes", "No", "Retry"][tyrePressuresConsentDropDown.Value]
 				 , "CarSetups", ["Yes", "No", "Retry"][carSetupsConsentDropDown.Value]
-				 , "RaceStrategies", ["Yes", "No", "Retry"][raceStrategiesConsentDropDown.Value])
+				 , "RaceStrategies", ["Yes", "No", "Retry"][raceStrategiesConsentDropDown.Value]
+				 , "LapTelemetries", ["Yes", "No", "Retry"][lapTelemetriesConsentDropDown.Value])
 	}
 	finally
 		consentGui.Destroy()
@@ -157,9 +164,10 @@ requestShareSessionDatabaseConsent() {
 					result["TyrePressures"] := "Retry"
 					result["RaceStrategies"] := "Retry"
 					result["CarSetups"] := "Retry"
+					result["LapTelemetries"] := "Retry"
 				}
 
-				for type, key in Map("TyrePressures", "Share Tyre Pressures", "RaceStrategies", "Share Race Strategies", "CarSetups", "Share Car Setups")
+				for type, key in Map("TyrePressures", "Share Tyre Pressures", "RaceStrategies", "Share Race Strategies", "CarSetups", "Share Car Setups", "LapTelemetries", "Share Lap Telemetries")
 					switch result[type], false {
 						case "Yes":
 							setMultiMapValue(newConsent, "Consent", key, "Yes")
@@ -221,7 +229,8 @@ checkForNews() {
 }
 
 startDatabaseSynchronizer() {
-	local idFileName, ID, dbIDFileName, dbID, shareTyrePressures, shareCarSetups, shareRaceStrategies, options, consent
+	local idFileName, ID, dbIDFileName, dbID
+	local shareTyrePressures, shareCarSetups, shareRaceStrategies, shareLapTelemetries, options, consent
 
 	if (!ProcessExist("Database Synchronizer.exe") && inList(kForegroundApps, StrSplit(A_ScriptName, ".")[1]) && isProperInstallation()) {
 		idFileName := kUserConfigDirectory . "ID"
@@ -245,6 +254,7 @@ startDatabaseSynchronizer() {
 			shareTyrePressures := (getMultiMapValue(consent, "Consent", "Share Tyre Pressures", "No") = "Yes")
 			shareCarSetups := (getMultiMapValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
 			shareRaceStrategies := (getMultiMapValue(consent, "Consent", "Share Race Strategies", "No") = "Yes")
+			shareLapTelemetries := (getMultiMapValue(consent, "Consent", "Share Lap Telemetries", "No") = "Yes")
 
 			options := ("-ID `"" . ID . "`" -Synchronize " . true)
 
@@ -256,6 +266,9 @@ startDatabaseSynchronizer() {
 
 			if shareRaceStrategies
 				options .= " -Strategies"
+
+			if shareLapTelemetries
+				options .= " -Telemetries"
 
 			try {
 				Run(kBinariesDirectory . "Database Synchronizer.exe " . options)

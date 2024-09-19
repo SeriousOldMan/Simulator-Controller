@@ -1421,8 +1421,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg3", this.themeIcon(kIconsDirectory . "Tacho.ico")).OnEvent("Click", chooseTab.Bind("Telemetries"))
-		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab3", translate("Telemetries")).OnEvent("Click", chooseTab.Bind("Telemetries"))
+		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg3", this.themeIcon(kIconsDirectory . "Tacho.ico")).OnEvent("Click", chooseTab.Bind("Laps"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab3", translate("Laps")).OnEvent("Click", chooseTab.Bind("Laps"))
 
 		editorGui.Add("Text", "x16 yp+32 w267 0x10")
 
@@ -1468,20 +1468,20 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui.SetFont("s8 Norm", "Arial")
 
-		editorGui.Add("Picture", "x280 ys-2 w390 h524 Border W:Grow H:Grow")
+		editorGui.Add("Picture", "x280 ys-2 w390 h554 Border W:Grow H:Grow")
 
-		tabs := collect(["Settings", "Session", "Telemetries", "Stratgies", "Setups", "Pressures", "Automation", "Data"], translate)
+		tabs := collect(["Settings", "Session", "Laps", "Stratgies", "Setups", "Pressures", "Automation", "Data"], translate)
 
 		editorGui.Add("Tab2", "x296 ys+16 w0 h0 -Wrap Section vsettingsTab", tabs)
 
 		editorGui["settingsTab"].UseTab(1)
 
-		this.iSettingsListView := editorGui.Add("ListView", "x296 ys w360 h383 H:Grow W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Setting", "Value"], translate))
+		this.iSettingsListView := editorGui.Add("ListView", "x296 ys w360 h413 H:Grow W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Setting", "Value"], translate))
 		this.iSettingsListView.OnEvent("Click", chooseSetting)
 		this.iSettingsListView.OnEvent("DoubleClick", chooseSetting)
 		this.iSettingsListView.OnEvent("ItemSelect", navSetting)
 
-		editorGui.Add("Text", "x296 yp+389 w80 h23 Y:Move +0x200", translate("Setting"))
+		editorGui.Add("Text", "x296 yp+419 w80 h23 Y:Move +0x200", translate("Setting"))
 		editorGui.Add("DropDownList", "xp+90 yp w270 Y:Move W:Grow vsettingDropDown").OnEvent("Change", selectSetting)
 
 		editorGui.Add("Text", "x296 yp+24 w80 h23 Y:Move +0x200", translate("Value"))
@@ -1502,12 +1502,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui["settingsTab"].UseTab(2)
 
-		this.iSessionListView := editorGui.Add("ListView", "x296 ys w360 h403 H:Grow W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Category", "Name"], translate))
+		this.iSessionListView := editorGui.Add("ListView", "x296 ys w360 h433 H:Grow W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Category", "Name"], translate))
 		this.iSessionListView.OnEvent("Click", chooseSession)
 		this.iSessionListView.OnEvent("DoubleClick", openSession)
 		this.iSessionListView.OnEvent("ItemSelect", navSession)
 
-		editorGui.Add("Button", "xp+310 yp+410 w23 h23 X:Move Y:Move vrenameSessionButton").OnEvent("Click", renameSession)
+		editorGui.Add("Button", "xp+310 yp+440 w23 h23 X:Move Y:Move vrenameSessionButton").OnEvent("Click", renameSession)
 		editorGui.Add("Button", "xp+25 yp w23 h23 X:Move Y:Move vdeleteSessionButton").OnEvent("Click", deleteSession)
 		setButtonIcon(editorGui["renameSessionButton"], kIconsDirectory . "Pencil.ico", 1)
 		setButtonIcon(editorGui["deleteSessionButton"], kIconsDirectory . "Minus.ico", 1)
@@ -1517,12 +1517,32 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui["settingsTab"].UseTab(3)
 
-		this.iStrategyListView := editorGui.Add("ListView", "x296 ys w360 h403 H:Grow W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
+		this.iTelemetryListView := editorGui.Add("ListView", "x296 ys w360 h433 H:Grow W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
+		this.iTelemetryListView.OnEvent("Click", chooseTelemetry)
+		this.iTelemetryListView.OnEvent("DoubleClick", chooseTelemetry)
+		this.iTelemetryListView.OnEvent("ItemSelect", navTelemetry)
+
+		editorGui.Add("Button", "xp+260 yp+440 w23 h23 X:Move Y:Move vuploadTelemetryButton").OnEvent("Click", uploadTelemetry)
+		editorGui.Add("Button", "xp+25 yp w23 h23 X:Move Y:Move vdownloadTelemetryButton").OnEvent("Click", downloadTelemetry)
+		editorGui.Add("Button", "xp+25 yp w23 h23 X:Move Y:Move vrenameTelemetryButton").OnEvent("Click", renameTelemetry)
+		editorGui.Add("Button", "xp+25 yp w23 h23 X:Move Y:Move vdeleteTelemetryButton").OnEvent("Click", deleteTelemetry)
+		setButtonIcon(editorGui["uploadTelemetryButton"], kIconsDirectory . "Upload.ico", 1)
+		setButtonIcon(editorGui["downloadTelemetryButton"], kIconsDirectory . "Download.ico", 1)
+		setButtonIcon(editorGui["renameTelemetryButton"], kIconsDirectory . "Pencil.ico", 1)
+		setButtonIcon(editorGui["deleteTelemetryButton"], kIconsDirectory . "Minus.ico", 1)
+
+		editorGui.Add("Text", "x296 yp w80 h23 Y:Move +0x200", translate("Share"))
+		editorGui.Add("CheckBox", "xp+90 yp+4 w140 Y:Move vshareTelemetryWithCommunityCheck", translate("with Community")).OnEvent("Click", updateTelemetryAccess)
+		editorGui.Add("CheckBox", "x386 yp+24 w140 Y:Move vshareTelemetryWithTeamServerCheck", translate("on Team Server")).OnEvent("Click", updateTelemetryAccess)
+
+		editorGui["settingsTab"].UseTab(4)
+
+		this.iStrategyListView := editorGui.Add("ListView", "x296 ys w360 h433 H:Grow W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
 		this.iStrategyListView.OnEvent("Click", chooseStrategy)
 		this.iStrategyListView.OnEvent("DoubleClick", openStrategy)
 		this.iStrategyListView.OnEvent("ItemSelect", navStrategy)
 
-		editorGui.Add("Button", "xp+260 yp+410 w23 h23 X:Move Y:Move vuploadStrategyButton").OnEvent("Click", uploadStrategy)
+		editorGui.Add("Button", "xp+260 yp+440 w23 h23 X:Move Y:Move vuploadStrategyButton").OnEvent("Click", uploadStrategy)
 		editorGui.Add("Button", "xp+25 yp w23 h23 X:Move Y:Move vdownloadStrategyButton").OnEvent("Click", downloadStrategy)
 		editorGui.Add("Button", "xp+25 yp w23 h23 X:Move Y:Move vrenameStrategyButton").OnEvent("Click", renameStrategy)
 		editorGui.Add("Button", "xp+25 yp w23 h23 X:Move Y:Move vdeleteStrategyButton").OnEvent("Click", deleteStrategy)
@@ -1535,20 +1555,20 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.Add("CheckBox", "xp+90 yp+4 w140 Y:Move vshareStrategyWithCommunityCheck", translate("with Community")).OnEvent("Click", updateStrategyAccess)
 		editorGui.Add("CheckBox", "x386 yp+24 w140 Y:Move vshareStrategyWithTeamServerCheck", translate("on Team Server")).OnEvent("Click", updateStrategyAccess)
 
-		editorGui["settingsTab"].UseTab(4)
+		editorGui["settingsTab"].UseTab(5)
 
 		editorGui.Add("Text", "x296 ys w80 h23 +0x200", translate("Purpose"))
 		editorGui.Add("DropDownList", "xp+90 yp w270 W:Grow Choose2 vsetupTypeDropDown"
 					, collect(["Qualifying (Dry)", "Race (Dry)", "Qualifying (Wet)", "Race (Wet)"], translate)).OnEvent("Change", chooseSetupType)
 
-		this.iSetupListView := editorGui.Add("ListView", "x296 yp+24 w360 h379 H:Grow W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
+		this.iSetupListView := editorGui.Add("ListView", "x296 yp+24 w360 h409 H:Grow W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
 		this.iSetupListView.OnEvent("Click", chooseSetup)
 		this.iSetupListView.OnEvent("DoubleClick", chooseSetup)
 		this.iSetupListView.OnEvent("ItemSelect", navSetup)
 
 		this.iSelectedSetupType := kDryRaceSetup
 
-		editorGui.Add("Button", "xp+260 yp+385 w23 h23 Y:Move X:Move vuploadSetupButton").OnEvent("Click", uploadSetup)
+		editorGui.Add("Button", "xp+260 yp+415 w23 h23 Y:Move X:Move vuploadSetupButton").OnEvent("Click", uploadSetup)
 		editorGui.Add("Button", "xp+25 yp w23 h23 Y:Move X:Move vdownloadSetupButton").OnEvent("Click", downloadSetup)
 		editorGui.Add("Button", "xp+25 yp w23 h23 Y:Move X:Move vrenameSetupButton").OnEvent("Click", renameSetup)
 		editorGui.Add("Button", "xp+25 yp w23 h23 Y:Move X:Move vdeleteSetupButton").OnEvent("Click", deleteSetup)
@@ -1561,7 +1581,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.Add("CheckBox", "xp+90 yp+4 w140 Y:Move vshareSetupWithCommunityCheck", translate("with Community")).OnEvent("Click", updateSetupAccess)
 		editorGui.Add("CheckBox", "x386 yp+24 w140 Y:Move vshareSetupWithTeamServerCheck", translate("on Team Server")).OnEvent("Click", updateSetupAccess)
 
-		editorGui["settingsTab"].UseTab(5)
+		editorGui["settingsTab"].UseTab(6)
 
 		editorGui.Add("Text", "x296 ys w85 h23 +0x200", translate("Driver"))
 		editorGui.Add("DropDownList", "x386 yp w100 vdriverDropDown").OnEvent("Change", loadPressures)
@@ -1625,15 +1645,15 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		if this.RequestorPID
 			editorGui.Add("Button", "x440 yp+50 w80 h23 vtransferPressuresButton", translate("Load")).OnEvent("Click", transferPressures)
 
-		editorGui["settingsTab"].UseTab(6)
+		editorGui["settingsTab"].UseTab(7)
 
 		this.iTrackDisplayArea := [297, 239, 358, 350]
 
-		editorGui.Add("Picture", "x296 y238 w360 h352 W:Grow H:Grow(0.9) Border vtrackDisplayArea")
+		editorGui.Add("Picture", "x296 y238 w360 h382 W:Grow H:Grow(0.9) Border vtrackDisplayArea")
 		this.iTrackDisplay := editorGui.Add("Picture", "x297 y239 BackgroundTrans vtrackDisplay")
 		this.iTrackDisplay.OnEvent("Click", selectTrackAction)
 
-		this.iTrackAutomationsListView := editorGui.Add("ListView", "x296 y597 w110 h142 Y:Move(0.9) W:Grow(0.3) H:Grow(0.1) -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Name", "#"], translate))
+		this.iTrackAutomationsListView := editorGui.Add("ListView", "x296 y627 w110 h142 Y:Move(0.9) W:Grow(0.3) H:Grow(0.1) -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Name", "#"], translate))
 		this.iTrackAutomationsListView.OnEvent("Click", selectTrackAutomation)
 		this.iTrackAutomationsListView.OnEvent("DoubleClick", selectTrackAutomation)
 		this.iTrackAutomationsListView.OnEvent("ItemSelect", navTrackAutomation)
@@ -1651,30 +1671,30 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.Add("Text", "x415 yp+24 w60 h23 Y:Move(0.9) X:Move(0.8) +0x200", translate("Actions"))
 		editorGui.Add("Edit", "xp+60 yp w181 h118 Y:Move(0.9) X:Move(0.8) W:Grow(0.2) H:Grow(0.1) ReadOnly -Wrap vtrackAutomationInfoEdit")
 
-		editorGui["settingsTab"].UseTab(7)
+		editorGui["settingsTab"].UseTab(8)
 
 		editorGui.Add("CheckBox", "Check3 x296 ys+2 w15 h21 vdataSelectCheck").OnEvent("Click", selectAllData)
 
-		this.iAdministrationListView := editorGui.Add("ListView", "x314 ys w342 h461 W:Grow H:Grow -Multi -LV0x10 Checked AltSubmit", collect(["Type", "Car / Track", "Driver", "#"], translate))
+		this.iAdministrationListView := editorGui.Add("ListView", "x314 ys w342 h491 W:Grow H:Grow -Multi -LV0x10 Checked AltSubmit", collect(["Type", "Car / Track", "Driver", "#"], translate))
 		this.iAdministrationListView.OnEvent("ItemCheck", selectData)
 		this.iAdministrationListView.OnEvent("Click", noSelect)
 		this.iAdministrationListView.OnEvent("DoubleClick", noSelect)
 
-		editorGui.Add("Button", "x314 yp+476 w90 h23 Y:Move vexportDataButton", translate("Export...")).OnEvent("Click", exportData)
+		editorGui.Add("Button", "x314 yp+506 w90 h23 Y:Move vexportDataButton", translate("Export...")).OnEvent("Click", exportData)
 		editorGui.Add("Button", "xp+95 yp w90 h23 Y:Move vimportDataButton", translate("Import...")).OnEvent("Click", importData)
 
 		editorGui.Add("Button", "x566 yp w90 h23 Y:Move X:Move vdeleteDataButton", translate("Delete...")).OnEvent("Click", deleteData)
 
 		editorGui["settingsTab"].UseTab()
 
-		editorGui.Add("Text", "x16 ys+331 w100 h23 +0x200", translate("Available Data"))
+		editorGui.Add("Text", "x16 ys+361 w100 h23 +0x200", translate("Available Data"))
 
 		choices := ["User", "User & Community"]
 		chosen := (this.UseCommunity ? 2 : 1)
 
 		editorGui.Add("DropDownList", "x120 yp w140 Choose" . chosen . " vdatabaseScopeDropDown", collect(choices, translate)).OnEvent("Change", chooseDatabaseScope)
 
-		this.iDataListView := editorGui.Add("ListView", "x16 ys+355 w244 h151 H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Type", "#"], translate))
+		this.iDataListView := editorGui.Add("ListView", "x16 ys+385 w244 h151 H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Type", "#"], translate))
 		this.iDataListView.OnEvent("Click", noSelect)
 		this.iDataListView.OnEvent("DoubleClick", noSelect)
 
@@ -1857,7 +1877,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		if simulator {
 			if !((car && (car != true)) && (track && (track != true)))
-				if ((this.SelectedModule = "Sessions") || (this.SelectedModule = "Telemetries") || (this.SelectedModule = "Strategies") || (this.SelectedModule = "Setups") || (this.SelectedModule = "Pressures"))
+				if ((this.SelectedModule = "Sessions") || (this.SelectedModule = "Laps") || (this.SelectedModule = "Strategies") || (this.SelectedModule = "Setups") || (this.SelectedModule = "Pressures"))
 					this.selectModule("Settings")
 		}
 
@@ -1883,7 +1903,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			window["settingsTab2"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
-		if this.moduleAvailable("Telemetries") {
+		if this.moduleAvailable("Laps") {
 			window["settingsImg3"].Enabled := true
 			window["settingsImg3"].Value := this.themeIcon(kIconsDirectory . "Tacho.ico")
 			window["settingsTab3"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
@@ -1958,7 +1978,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				window["settingsTab2"].SetFont("s10 Bold c" . window.Theme.TextColor, "Arial")
 
 				window["settingsTab"].Choose(2)
-			case "Telemetries":
+			case "Laps":
 				window["settingsTab3"].SetFont("s10 Bold c" . window.Theme.TextColor, "Arial")
 
 				window["settingsTab"].Choose(3)
@@ -2038,6 +2058,54 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			window["shareSessionWithTeamServerCheck"].Enabled := false
 
 			window["shareSessionWithTeamServerCheck"].Value := 0
+		}
+
+		selected := this.TelemetryListView.GetNext(0)
+
+		if selected {
+			type := this.TelemetryListView.GetText(selected, 1)
+			name := this.TelemetryListView.GetText(selected, 2)
+
+			window["downloadTelemetryButton"].Enabled := true
+
+			if (type != translate("Community")) {
+				info := this.SessionDatabase.readTelemetryInfo(simulator, car, track, name)
+
+				window["deleteTelemetryButton"].Enabled := true
+
+				if (!info || (getMultiMapValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID)) {
+					window["renameTelemetryButton"].Enabled := true
+					window["shareTelemetryWithCommunityCheck"].Enabled := true
+					window["shareTelemetryWithTeamServerCheck"].Enabled := true
+				}
+				else {
+					window["renameTelemetryButton"].Enabled := false
+					window["shareTelemetryWithCommunityCheck"].Enabled := false
+					window["shareTelemetryWithTeamServerCheck"].Enabled := false
+
+					window["shareTelemetryWithCommunityCheck"].Value := 0
+					window["shareTelemetryWithTeamServerCheck"].Value := 0
+				}
+			}
+			else {
+				window["deleteTelemetryButton"].Enabled := false
+				window["renameTelemetryButton"].Enabled := false
+				window["shareTelemetryWithCommunityCheck"].Enabled := false
+				window["shareTelemetryWithTeamServerCheck"].Enabled := false
+
+				window["shareTelemetryWithCommunityCheck"].Value := 0
+				window["shareTelemetryWithTeamServerCheck"].Value := 0
+			}
+		}
+		else {
+			window["downloadTelemetryButton"].Enabled := false
+			window["deleteTelemetryButton"].Enabled := false
+			window["renameTelemetryButton"].Enabled := false
+			window["shareTelemetryWithCommunityCheck"].Enabled := false
+			window["shareTelemetryWithTeamServerCheck"].Enabled := false
+
+			window["shareTelemetryWithCommunityCheck"].Value := 0
+			window["shareTelemetryWithTeamServerCheck"].Value := 0
 		}
 
 		selected := this.StrategyListView.GetNext(0)
@@ -3330,10 +3398,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 								this.SessionDatabase.removeSession(simulator, car, track, type, name)
 							}
-					case translate("Telemetries"):
+					case translate("Laps"):
 						code := this.SessionDatabase.getSimulatorCode(simulator)
 
-						loop Files, kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Lap Telemetries\*.strategy", "F"
+						loop Files, kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Lap Telemetries\*.telemetry", "F"
 							this.SessionDatabase.removeTelemetry(simulator, car, track, A_LoopFileName)
 					case translate("Setups"):
 						code := this.SessionDatabase.getSimulatorCode(simulator)
@@ -3483,6 +3551,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 									}
 								}
 						}
+					case translate("Laps"):
+						code := this.SessionDatabase.getSimulatorCode(simulator)
+
+						DirCreate(targetDirectory . "Lap Telemetries")
+
+						loop Files, kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Lap Telemetries\*.*", "F"
+							try {
+								FileCopy(A_LoopFileFullPath, targetDirectory . "Lap Telemetries\" . A_LoopFileName)
+							}
+							catch Any as exception {
+								logError(exception)
+							}
 					case translate("Strategies"):
 						code := this.SessionDatabase.getSimulatorCode(simulator)
 
@@ -3757,6 +3837,40 @@ class SessionDatabaseEditor extends ConfigurationItem {
 											}
 								}
 
+							if (selection.Has(key . "Telemetries") && FileExist(sourceDirectory . "\Lap Telemetries")) {
+								code := this.SessionDatabase.getSimulatorCode(simulator)
+
+								targetDirectory := (kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Lap Telemetries")
+
+								DirCreate(targetDirectory)
+
+								loop Files, sourceDirectory . "\Lap Telemetries\*.telemetry", "F" {
+									fileName := A_LoopFileName
+									targetName := fileName
+
+									while FileExist(targetDirectory . "\" . targetName) {
+										SplitPath(fileName, , , , &name)
+
+										targetName := (name . " (" . (A_Index + 1) . ").telemetry")
+									}
+
+									try {
+										FileCopy(A_LoopFilePath, targetDirectory . "\" . targetName)
+									}
+									catch Any as exception {
+										logError(exception)
+									}
+
+									if FileExist(A_LoopFilePath . ".info")
+										try {
+											FileCopy(A_LoopFilePath . ".info", targetDirectory . "\" . targetName ".info")
+										}
+										catch Any as exception {
+											logError(exception)
+										}
+								}
+							}
+
 							if (selection.Has(key . "Strategies") && FileExist(sourceDirectory . "\Race Strategies")) {
 								code := this.SessionDatabase.getSimulatorCode(simulator)
 
@@ -3860,7 +3974,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local progressWindow := showProgress({color: "Green", title: translate("Analyzing Data")})
 		local selectedSimulator, selectedCar, selectedTrack, drivers, simulator, progress, tracks, track
 		local car, carName, found, targetDirectory, telemetryDB, ignore, driver, tyresDB, result, number, strategies
-		local sessions, automations, trackName, setups, ignore, type, extension
+		local sessions, telemetries, automations, trackName, setups, ignore, type, extension
 
 		progressWindow.Opt("+Owner" . window.Hwnd)
 		window.Block()
@@ -3945,6 +4059,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 									if (strategies > 0)
 										this.AdministrationListView.Add("", translate("Strategies"), (carName . " / " . trackName), "-", strategies)
 
+									telemetries := 0
+
+									loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Lap Telemetries\*.telemetry", "F"
+										telemetries += 1
+
+									if (telemetries > 0)
+										this.AdministrationListView.Add("", translate("Laps"), (carName . " / " . trackName), "-", telemetries)
+
 									sessions := CaseInsenseMap()
 
 									loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Team Sessions\*.team", "F" {
@@ -4010,7 +4132,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	selectData(load := true) {
 		local ignore, column, selectedSimulator, selectedCar, selectedTrack, drivers, cars, telemetry
-		local pressures, strategies, sessions, automations, tracks, simulator, track, car, found, targetDirectory, number
+		local pressures, strategies, sessions, telemetries, automations, tracks, simulator, track, car, found, targetDirectory, number
 		local ignore, type, extension, setups
 
 		this.DataListView.Delete()
@@ -4031,6 +4153,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			telemetry := 0
 			pressures := 0
 			strategies := 0
+			telemetries := 0
 			sessions := 0
 			setups := 0
 			automations := 0
@@ -4079,6 +4202,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 									strategies += 1
 								}
 
+								loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Lap Telemetries\*.*", "F" {
+									found := true
+
+									telemetries += 1
+								}
+
 								loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Team Sessions\*.team", "F" {
 									found := true
 
@@ -4122,8 +4251,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.DataListView.Add("", translate("Cars"), cars.Length)
 			this.DataListView.Add("", translate("Telemetry"), telemetry)
 			this.DataListView.Add("", translate("Pressures"), pressures)
-			this.DataListView.Add("", translate("Strategies"), strategies)
 			this.DataListView.Add("", translate("Sessions"), sessions)
+			this.DataListView.Add("", translate("Laps"), telemetries)
+			this.DataListView.Add("", translate("Strategies"), strategies)
 			this.DataListView.Add("", translate("Setups"), setups)
 
 			this.DataListView.ModifyCol()
@@ -4167,8 +4297,40 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.loadSessions()
 	}
 
+	selectTelemetries() {
+		local ignore, column, userTelemetries, communityTelemetries
+		local info, origin
+
+		this.DataListView.Delete()
+
+		loop this.DataListView.GetCount("Col")
+			this.DataListView.DeleteCol(1)
+
+		for ignore, column in collect(["Source", "#"], translate)
+			this.DataListView.InsertCol(A_Index, "", column)
+
+		userTelemetries := true
+		communityTelemetries := true
+
+		this.SessionDatabase.getTelemetryNames(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, &userTelemetries, &communityTelemetries)
+
+		this.DataListView.Add("", translate("User"), userTelemetries.Length)
+
+		this.DataListView.Add("", translate("Community"), communityTelemetries.Length)
+
+		this.DataListView.ModifyCol()
+
+		loop 2
+			this.DataListView.ModifyCol(A_Index, 10)
+
+		loop 2
+			this.DataListView.ModifyCol(A_Index, "AutoHdr")
+
+		this.loadTelemetries()
+	}
+
 	selectStrategies() {
-		local ignore, column, userSetups, communitySetups, type, setups
+		local ignore, column, userStrategies, communityStrategies
 		local info, origin
 
 		this.DataListView.Delete()
@@ -4285,7 +4447,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			if ((car && (car != true)) && (track && (track != true))) {
 				this.iAvailableModules["Sessions"] := true
-				this.iAvailableModules["Telemetries"] := true
+				this.iAvailableModules["Laps"] := true
 				this.iAvailableModules["Strategies"] := true
 				this.iAvailableModules["Setups"] := true
 				this.iAvailableModules["Pressures"] := true
@@ -4293,7 +4455,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			}
 			else {
 				this.iAvailableModules["Sessions"] := false
-				this.iAvailableModules["Telemetries"] := false
+				this.iAvailableModules["Laps"] := false
 				this.iAvailableModules["Strategies"] := false
 				this.iAvailableModules["Setups"] := false
 				this.iAvailableModules["Pressures"] := false
@@ -4304,7 +4466,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.iAvailableModules["Settings"] := false
 			this.iAvailableModules["Data"] := false
 			this.iAvailableModules["Sessions"] := false
-			this.iAvailableModules["Telemetries"] := false
+			this.iAvailableModules["Laps"] := false
 			this.iAvailableModules["Strategies"] := false
 			this.iAvailableModules["Setups"] := false
 			this.iAvailableModules["Pressures"] := false
@@ -4333,6 +4495,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						this.selectData()
 					case "Sessions":
 						this.selectSessions()
+					case "Laps":
+						this.selectTelemetries()
 					case "Strategies":
 						this.selectStrategies()
 					case "Setups":
@@ -4995,6 +5159,103 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 	}
 
+	uploadTelemetry() {
+		local window := this.Window
+		local fileName, telemetry, file, size
+
+		window.Opt("+OwnDialogs")
+
+		OnMessage(0x44, translateLoadCancelButtons)
+		fileName := withBlockedWindows(FileSelect, 1, "", translate("Upload Telemetry File..."), "Lap Telemetry (*.telemetry)")
+		OnMessage(0x44, translateLoadCancelButtons, 0)
+
+		if (fileName != "") {
+			file := FileOpen(fileName, "r-wd")
+
+			if file {
+				size := file.Length
+
+				telemetry := Buffer(size)
+
+				file.RawRead(telemetry, size)
+
+				file.Close()
+
+				SplitPath(fileName, &fileName)
+
+				this.SessionDatabase.writeTelemetry(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, fileName, telemetry, size, false, true, this.SessionDatabase.ID)
+			}
+
+			this.loadTelemetries(StrReplace(fileName, ".telemetry", ""))
+		}
+	}
+
+	downloadTelemetry(telemetryName) {
+		local window := this.Window
+		local fileName, telemetryData, file, size
+
+		window.Opt("+OwnDialogs")
+
+		OnMessage(0x44, translateSaveCancelButtons)
+		fileName := withBlockedWindows(FileSelect, "S16", telemetryName, translate("Download Telemetry File..."), "Lap Telemetry (*.telemetry)")
+		OnMessage(0x44, translateSaveCancelButtons, 0)
+
+		if (fileName != "") {
+			if !InStr(fileName, ".telemetry")
+				fileName .= ".telemetry"
+
+			size := false
+
+			telemetryData := this.SessionDatabase.readTelemetry(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, telemetryName, &size)
+
+			deleteFile(fileName)
+
+			file := FileOpen(fileName, "w", "")
+
+			if file {
+				file.RawWrite(telemetryData, size)
+
+				file.Close()
+			}
+		}
+	}
+
+	deleteTelemetry(telemetryName) {
+		local msgResult
+
+		OnMessage(0x44, translateYesNoButtons)
+		msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected lap telemetry?"), translate("Delete"), 262436)
+		OnMessage(0x44, translateYesNoButtons, 0)
+
+		if (msgResult = "Yes") {
+			this.SessionDatabase.removeTelemetry(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, telemetryName)
+
+			this.loadTelemetries()
+		}
+	}
+
+	renameTelemetry(telemetryName) {
+		local window := this.Window
+		local result, newName, curExtension, curName
+
+		window.Opt("+OwnDialogs")
+
+		SplitPath(telemetryName, , , &curExtension, &curName)
+
+		result := withBlockedWindows(InputBox, translate("Please enter the new name for the selected lap telemetry:"), translate("Rename"), "w300 h200", curName)
+
+		if (result.Result = "Ok") {
+			newName := result.Value
+
+			if (StrLen(curExtension) > 0)
+				newName .= ("." . curExtension)
+
+			this.SessionDatabase.renameTelemetry(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, telemetryName, newName)
+
+			this.loadTelemetries(newName)
+		}
+	}
+
 	uploadStrategy() {
 		local window := this.Window
 		local fileName, strategy
@@ -5002,7 +5263,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		window.Opt("+OwnDialogs")
 
 		OnMessage(0x44, translateLoadCancelButtons)
-		fileName := withBlockedWindows(FileSelect, 1, "", translate("Upload Strategy File..."))
+		fileName := withBlockedWindows(FileSelect, 1, "", translate("Upload Strategy File..."), "Strategy (*.strategy)")
 		OnMessage(0x44, translateLoadCancelButtons, 0)
 
 		if (fileName != "") {
@@ -5013,7 +5274,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.SessionDatabase.writeStrategy(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, fileName, strategy
 											 , false, true, this.SessionDatabase.ID)
 
-			this.loadStrategies(fileName)
+			this.loadStrategies(StrReplace(fileName, ".strategy", ""))
 		}
 	}
 
@@ -5028,6 +5289,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		OnMessage(0x44, translateSaveCancelButtons, 0)
 
 		if (fileName != "") {
+			if !InStr(fileName, ".strategy")
+				fileName .= ".strategy"
+
 			deleteFile(fileName)
 
 			writeMultiMap(fileName, this.SessionDatabase.readStrategy(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, strategyName))
@@ -5532,7 +5796,7 @@ selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner :
 selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := false, *) {
 	local x, y, w, h, editor, simulator, code, info, drivers, id, name, progressWindow, tracks, progress
 	local car, carName, track, trackName, sourceDirectory, found, telemetryDB, tyresDB, driver, driverName, rows
-	local strategies, setups, automations, row, selection, data, type, number, key, sessions, extension
+	local strategies, telemetries, setups, automations, row, selection, data, type, number, key, sessions, extension
 
 	static importDataGui
 	static importSelectCheck
@@ -5708,9 +5972,17 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 					for driver, number in sessions
 						importListView.Add("Check", translate("Sessions"), (carName . " / " . trackName), SessionDatabase.getDriverName(simulator, driver), number)
 
+					telemetries := 0
+
+					loop Files, sourceDirectory . "\Lap Telemetries\*.telemetry", "F"
+						telemetries += 1
+
+					if (telemetries > 0)
+						importListView.Add("Check", translate("Laps"), (carName . " / " . trackName), "-", telemetries)
+
 					strategies := 0
 
-					loop Files, sourceDirectory . "\Race Strategies\*.*", "F"		; Strategies
+					loop Files, sourceDirectory . "\Race Strategies\*.strategy", "F"		; Strategies
 						strategies += 1
 
 					if (strategies > 0)
@@ -5809,6 +6081,8 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 						type := "Pressures"
 					case translate("Strategies"):
 						type := "Strategies"
+					case translate("Laps"):
+						type := "Telemetries"
 					case translate("Sessions"):
 						type := "Sessions"
 					case translate("Setups"):
@@ -5865,6 +6139,7 @@ editSettings(editorOrCommand, arguments*) {
 	static synchSessionsCheck
 	static synchSetupsCheck
 	static synchStrategiesCheck
+	static synchTelemetriesCheck
 	static serverIdentifierEdit := ""
 	static serverURLEdit := ""
 	static serverTokenEdit := ""
@@ -5967,6 +6242,7 @@ editSettings(editorOrCommand, arguments*) {
 		synchSessionsCheck.Value := (inList(groups, "Sessions") != false)
 		synchSetupsCheck.Value := (inList(groups, "Setups") != false)
 		synchStrategiesCheck.Value := (inList(groups, "Strategies") != false)
+		synchTelemetriesCheck.Value := (inList(groups, "Laps") != false)
 
 		editSettings("UpdateState")
 	}
@@ -5980,7 +6256,8 @@ editSettings(editorOrCommand, arguments*) {
 
 			for group, enabled in Map("Telemetry", synchTelemetryCheck.Value, "Pressures", synchPressuresCheck.Value
 									, "Sessions", synchSessionsCheck.Value
-									, "Setups", synchSetupsCheck.Value, "Strategies", synchStrategiesCheck.Value)
+									, "Setups", synchSetupsCheck.Value, "Strategies", synchStrategiesCheck.Value
+									, "Laps", synchTelemetriesCheck.Value)
 				if enabled
 					groups.Push(group)
 
@@ -6088,6 +6365,7 @@ editSettings(editorOrCommand, arguments*) {
 			synchSessionsCheck.Enabled := true
 			synchSetupsCheck.Enabled := true
 			synchStrategiesCheck.Enabled := true
+			synchTelemetriesCheck.Enabled := true
 		}
 		else {
 			deleteConnectionButton.Enabled := false
@@ -6096,12 +6374,14 @@ editSettings(editorOrCommand, arguments*) {
 			synchSessionsCheck.Enabled := false
 			synchSetupsCheck.Enabled := false
 			synchStrategiesCheck.Enabled := false
+			synchTelemetriesCheck.Enabled := false
 
 			synchTelemetryCheck.Value := 0
 			synchPressuresCheck.Value := 0
 			synchSessionsCheck.Value := 0
 			synchSetupsCheck.Value := 0
 			synchStrategiesCheck.Value := 0
+			synchTelemetriesCheck.Value := 0
 		}
 
 		if (connections.Length > 1) {
@@ -6121,14 +6401,16 @@ editSettings(editorOrCommand, arguments*) {
 		}
 
 		if ((connections.Length > 0) && !synchTelemetryCheck && !synchPressuresCheck
-									 && !synchSessionsCheck && !synchSetupsCheck && !synchStrategiesCheck) {
+									 && !synchSessionsCheck && !synchSetupsCheck && !synchStrategiesCheck
+									 && !synchTelemetriesCheck) {
 			synchTelemetryCheck := true
 
 			synchTelemetryCheck.Value := 1
 		}
 
 		if (synchTelemetryCheck.Value || synchPressuresCheck.Value
-		 || synchSessionsCheck.Value || synchSetupsCheck.Value || synchStrategiesCheck.Value) {
+		 || synchSessionsCheck.Value || synchSetupsCheck.Value || synchStrategiesCheck.Value
+		 || synchTelemetriesCheck.Value) {
 			serverIdentifierEdit.Enabled := true
 			serverURLEdit.Enabled := true
 			serverTokenEdit.Enabled := true
@@ -6180,6 +6462,7 @@ editSettings(editorOrCommand, arguments*) {
 			synchSessionsCheck := (inList(groups, "Sessions") != false)
 			synchSetupsCheck := (inList(groups, "Setups") != false)
 			synchStrategiesCheck := (inList(groups, "Strategies") != false)
+			synchTelemetriesCheck := (inList(groups, "Laps") != false)
 		}
 		else {
 			synchTelemetryCheck := (replication != false)
@@ -6187,9 +6470,11 @@ editSettings(editorOrCommand, arguments*) {
 			synchSessionsCheck := (replication != false)
 			synchSetupsCheck := (replication != false)
 			synchStrategiesCheck := (replication != false)
+			synchTelemetriesCheck := (replication != false)
 		}
 
-		if (synchTelemetryCheck || synchPressuresCheck || synchSessionsCheck || synchSetupsCheck || synchStrategiesCheck) {
+		if (synchTelemetryCheck || synchPressuresCheck || synchSessionsCheck
+		 || synchSetupsCheck || synchStrategiesCheck || synchTelemetriesCheck) {
 			if currentConnection {
 				serverIdentifierEdit := connections[currentConnection][1]
 				serverURLEdit := connections[currentConnection][2]
@@ -6237,7 +6522,7 @@ editSettings(editorOrCommand, arguments*) {
 
 		settingsEditorGui.SetFont("Norm", "Arial")
 
-		values := [synchTelemetryCheck, synchPressuresCheck, synchSessionsCheck, synchSetupsCheck, synchStrategiesCheck]
+		values := [synchTelemetryCheck, synchPressuresCheck, synchSessionsCheck, synchSetupsCheck, synchStrategiesCheck, synchTelemetriesCheck]
 
 		settingsEditorGui.Add("Text", "x24 yp+16 w117 h23 +0x200", translate("Synchronization"))
 		synchTelemetryCheck := settingsEditorGui.Add("CheckBox", "x146 yp+2 w120 h21", translate("Telemetry Data"))
@@ -6250,12 +6535,15 @@ editSettings(editorOrCommand, arguments*) {
 		synchSetupsCheck.OnEvent("Click", editSettings.Bind("UpdateState"))
 		synchSessionsCheck := settingsEditorGui.Add("CheckBox", "x146 yp+24 w120 h21", translate("Sessions"))
 		synchSessionsCheck.OnEvent("Click", editSettings.Bind("UpdateState"))
+		synchTelemetriesCheck := settingsEditorGui.Add("CheckBox", "x266 yp w120 h21", translate("Laps"))
+		synchTelemetriesCheck.OnEvent("Click", editSettings.Bind("UpdateState"))
 
 		synchTelemetryCheck.Value := values[1]
 		synchPressuresCheck.Value := values[2]
 		synchSessionsCheck.Value := values[3]
 		synchSetupsCheck.Value := values[4]
 		synchStrategiesCheck.Value := values[5]
+		synchTelemetriesCheck.Value := values[6]
 
 		settingsEditorGui.Add("Text", "x24 yp+30 w117 h23 +0x200", translate("Name"))
 		serverIdentifierEdit := settingsEditorGui.Add("Edit", "x146 yp+1 w246", serverIdentifierEdit)

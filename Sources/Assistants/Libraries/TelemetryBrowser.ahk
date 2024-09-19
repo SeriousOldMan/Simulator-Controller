@@ -718,7 +718,7 @@ class TelemetryBrowser {
 		if (fileName && (fileName != "")) {
 			SplitPath(fileName, , &directory, , &fileName)
 
-			if (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getTelemetryDirectory(simulator, car, track))) {
+			if (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getTelemetryDirectory(simulator, car, track, "User"))) {
 				dataFile := temporaryFileName("Lap Telemetry", "telemetry")
 
 				try {
@@ -747,13 +747,16 @@ class TelemetryBrowser {
 			else {
 				name := fileName
 				telemetry := (directory . "\" . fileName . ".telemetry")
-				info := newMultiMap()
+				info := false
 			}
 		}
 
 		if telemetry {
-			lap := [name, SessionDatabase.getDriverName(simulator, getMultiMapValue(info, "Telemetry", "Driver"))
-				  , telemetry, info]
+			if info
+				lap := [name, SessionDatabase.getDriverName(simulator, getMultiMapValue(info, "Telemetry", "Driver"))
+					  , telemetry]
+			else
+				lap := [name, "John Doe (JD)", telemetry]
 
 			this.ImportedLaps.Push(lap)
 
@@ -803,7 +806,7 @@ class TelemetryBrowser {
 
 					SplitPath(fileName, , &folder, , &fileName)
 
-					if (normalizeDirectoryPath(folder) = normalizeDirectoryPath(sessionDB.getTelemetryDirectory(simulator, car, track))) {
+					if (normalizeDirectoryPath(folder) = normalizeDirectoryPath(sessionDB.getTelemetryDirectory(simulator, car, track, "User"))) {
 						file := FileOpen((this.TelemetryDirectory . "Lap " . lap . ".telemetry"), "r-wd")
 
 						if file {

@@ -27,7 +27,7 @@
 browseLapTelemetries(ownerOrCommand := false, arguments*) {
 	local x, y, names, ignore, infos, index, name, dirName, driverName
 	local carNames, trackNames, newSimulator, newCar, newTrack, force
-	local userTelemetries, communityTelemetries
+	local userTelemetries, communityTelemetries, info
 
 	static sessionDB := false
 
@@ -163,7 +163,7 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 					info := sessionDB.readTelemetryInfo(simulator, car, track, name)
 
 					if getMultiMapValue(info, "Telemetry", "Driver", false)
-						driverName := SessionDatabase.getDriverName(simulator, getMultiMapValue(infos[index], "Telemetry", "Driver"))
+						driverName := SessionDatabase.getDriverName(simulator, getMultiMapValue(info, "Telemetry", "Driver"))
 					else
 						driverName := false
 
@@ -180,7 +180,7 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 
 				if sessionDB.UseCommunity
 					for ignore, name in communityTelemetries
-						if !inList(userTelemetries, name) {
+						if !inList(userTelemetries, name)
 							browserGui["telemetryListView"].Add("", name, translate("Community"), translate("-"))
 
 				if (browserGui["telemetryListView"].GetCount() > 1)

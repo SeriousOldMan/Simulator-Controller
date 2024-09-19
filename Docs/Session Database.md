@@ -90,13 +90,21 @@ You can use the buttons below the list to rename or delete a session. You will h
 
 Good to know: Sessions can be opened in the corresponding *Center* by double-clicking them.
 
+#### Laps
+
+Telemetry data for individual laps can be stored in the session database, for example to use them as reference for future comparisons. Note: Lap telemetry data can be recorded in the ["Solo Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center), for example, and can then be stored in the session database.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2019.jpg)
+
+You can use the buttons below the list to upload, download, rename or delete lap telemetry data, but in most cases you will use the ["Solo Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center) to record the telemetry data and store it in the database. Once you have selected telemetry data in the list above, you can decide whether you want to share it potentially with the community (if you have given consent to share telemetry data - see the information about community data at the end of this chapter) and/or whether you want to synchronize the lap telemetry with any of the [connected Team Servers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration) (see below).
+
 #### Strategies
 
-This tab shows you a list of race stratagies, which are stored in the database. Note: Race strategies can be created and stored in the session database using the "Strategy Workbench".
+This tab shows you a list of race stratagies, which are stored in the database. Note: Race strategies can be created and stored in the session database using the ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench).
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2015.jpg)
 
-You can use the buttons below the list to upload, download, rename or delete a strategy, but in most cases you will use the "Strategy Workbench" to create a strategy and store it in the database. Once you have selected a strategy in the list above, you can decide whether you want to share this strategy potentially with the community (if you have given consent to share strategies - see the information about community data at the end of this chapter) and/or whether you want to synchronize the strategy with any of the [connected Team Servers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration) (see below).
+You can use the buttons below the list to upload, download, rename or delete a strategy, but in most cases you will use the ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench) to create a strategy and store it in the database. Once you have selected a strategy in the list above, you can decide whether you want to share this strategy potentially with the community (if you have given consent to share strategies - see the information about community data at the end of this chapter) and/or whether you want to synchronize the strategy with any of the [connected Team Servers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration) (see below).
 
 Good to know: Strategies can be opened in the "Strategy Workbench" by double-clicking them.
 

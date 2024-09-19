@@ -1439,14 +1439,11 @@ class SessionDatabase extends ConfigurationItem {
 		local simulatorCode := this.getSimulatorCode(simulator)
 		local ignore, name, extension
 
-		car := this.getCarCode(simulator, car)
-		track := this.getTrackCode(simulator, track)
-
 		if userTelemetries {
 			userTelemetries := []
 
-			loop Files, this.getTelemetryDirectory(simulator, car, track, "User") . *.*", "F" {
-				SplitPath(A_LoopFileName, &name, , &extension)
+			loop Files, this.getTelemetryDirectory(simulator, car, track, "User") . "*.*", "F" {
+				SplitPath(A_LoopFileName, , , &extension, &name)
 
 				if (extension != "info")
 					userTelemetries.Push(name)
@@ -1457,7 +1454,7 @@ class SessionDatabase extends ConfigurationItem {
 			communityTelemetries := []
 
 			loop Files, this.getTelemetryDirectory(simulator, car, track, "Community") . "*.*", "F" {
-				SplitPath(A_LoopFileName, &name, , &extension)
+				SplitPath(A_LoopFileName, , , &extension, &name)
 
 				if (extension != "info")
 					communityTelemetries.Push(name)
@@ -1465,36 +1462,20 @@ class SessionDatabase extends ConfigurationItem {
 		}
 	}
 
-	getTelemetries(simulator, car, track, &names, &infos := false) {
-		local directory := this.getTelemetryDirectory(simulator, car, track)
-		local name
-
-		names := []
-
-		if infos
-			infos := []
-
-		loop Files, directory . "*.telemetry", "F" {
-			SplitPath(A_LoopFileName, , , , &name)
-
-			names.Push(name)
-
-			if infos
-				infos.Push(this.readTelemetryInfo(simulator, car, track, name))
-		}
-	}
-
 	readTelemetry(simulator, car, track, name, &size) {
 		local simulatorCode := this.getSimulatorCode(simulator)
 		local data, fileName, file
 
-		car := this.getCarCode(simulator, car)
-		track := this.getTrackCode(simulator, track)
+		if !InStr(name, ".telemetry")
+			name .= ".telemetry"
 
-		fileName := (this.getTelemetryDirectory(simulator, car, track) . name)
+		fileName := (this.getTelemetryDirectory(simulator, car, track, "User") . name)
 
-		if FileExist(fileName . ".telemetry") {
-			file := FileOpen(fileName . ".telemetry", "r-wd")
+		if !FileExist(fileName)
+			fileName := (this.getTelemetryDirectory(simulator, car, track, "Community") . name)
+
+		if FileExist(fileName) {
+			file := FileOpen(fileName, "r-wd")
 
 			if file {
 				size := file.Length
@@ -1517,52 +1498,58 @@ class SessionDatabase extends ConfigurationItem {
 	readTelemetryInfo(simulator, car, track, name) {
 		local fileName, info
 
-		car := this.getCarCode(simulator, car)
-		track := this.getTrackCode(simulator, track)
+		if !InStr(name, ".telemetry")
+			name .= ".telemetry"
 
-		fileName := (this.getTelemetryDirectory(simulator, car, track) . name)
+		fileName := (this.getTelemetryDirectory(simulator, car, track, "User") . name . ".info")
 
-		if !FileExist(fileName . ".info") {
-			info := newMultiMap()
+		if !FileExist(fileName) {
+			fileName := (this.getTelemetryDirectory(simulator, car, track, "User") . name)
 
-			setMultiMapValue(info, "Origin", "Simulator", this.getSimulatorName(simulator))
-			setMultiMapValue(info, "Origin", "Car", car)
-			setMultiMapValue(info, "Origin", "Track", track)
-			setMultiMapValue(info, "Origin", "Driver", this.ID)
+			if FileExist(fileName) {
+				info := newMultiMap()
 
-			setMultiMapValue(info, "Telemetry", "Name", name)
-			setMultiMapValue(info, "Telemetry", "Driver", this.ID)
-			setMultiMapValue(info, "Telemetry", "Date", FileGetTime(fileName . ".telemetry", "C"))
-			setMultiMapValue(info, "Telemetry", "Identifier", createGuid())
-			setMultiMapValue(info, "Telemetry", "Synchronized", false)
+				setMultiMapValue(info, "Origin", "Simulator", this.getSimulatorName(simulator))
+				setMultiMapValue(info, "Origin", "Car", car)
+				setMultiMapValue(info, "Origin", "Track", track)
+				setMultiMapValue(info, "Origin", "Driver", this.ID)
 
-			setMultiMapValue(info, "Access", "Share", false)
-			setMultiMapValue(info, "Access", "Synchronize", false)
+				setMultiMapValue(info, "Telemetry", "Name", name)
+				setMultiMapValue(info, "Telemetry", "Driver", this.ID)
+				setMultiMapValue(info, "Telemetry", "Date", FileGetTime(fileName, "C"))
+				setMultiMapValue(info, "Telemetry", "Identifier", createGuid())
+				setMultiMapValue(info, "Telemetry", "Synchronized", false)
 
-			writeMultiMap(fileName . ".info", info)
+				setMultiMapValue(info, "Access", "Share", false)
+				setMultiMapValue(info, "Access", "Synchronize", true)
 
-			return info
+				writeMultiMap(fileName . ".info", info)
+
+				return info
+			}
+			else
+				return false
 		}
 		else
-			return readMultiMap(fileName . ".info")
+			return readMultiMap(fileName)
 	}
 
 	writeTelemetry(simulator, car, track, name, telemetry, size, share, synchronize
 				 , driver := kUndefined, identifier := kUndefined, synchronized := false) {
 		local fileName, file, info
 
-		car := this.getCarCode(simulator, car)
-		track := this.getTrackCode(simulator, track)
+		if !InStr(name, ".telemetry")
+			name .= ".telemetry"
 
-		fileName := this.getTelemetryDirectory(simulator, car, track)
+		fileName := normalizeDirectoryPath(this.getTelemetryDirectory(simulator, car, track, "User"))
 
 		DirCreate(fileName)
 
 		fileName := (fileName . "\" . name)
 
-		deleteFile(fileName . ".telemetry")
+		deleteFile(fileName)
 
-		file := FileOpen(fileName . ".telemetry", "w")
+		file := FileOpen(fileName, "w")
 
 		if file {
 			file.RawWrite(telemetry, size)
@@ -1592,17 +1579,26 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	writeTelemetryInfo(simulator, car, track, name, info) {
-		writeMultiMap(this.getTelemetryDirectory(simulator, car, track) . name . ".info", info)
+		if !InStr(name, ".telemetry")
+			name .= ".telemetry"
+
+		writeMultiMap(this.getTelemetryDirectory(simulator, car, track, "User") . name . ".info", info)
 	}
 
 	renameTelemetry(simulator, car, track, oldName, newName) {
 		local oldFileName, newFileName, info
 
-		oldFileName := (this.getTelemetryDirectory(simulator, car, track) . oldName)
-		newFileName := (this.getTelemetryDirectory(simulator, car, track) . newName)
+		if !InStr(oldName, ".telemetry")
+			oldName .= ".telemetry"
+
+		if !InStr(newName, ".telemetry")
+			newName .= ".telemetry"
+
+		oldFileName := (this.getTelemetryDirectory(simulator, car, track, "User") . oldName)
+		newFileName := (this.getTelemetryDirectory(simulator, car, track, "User") . newName)
 
 		try {
-			FileMove(oldFileName . ".telemetry", newFileName . ".telemetry", 1)
+			FileMove(oldFileName, newFileName, 1)
 
 			if FileExist(oldFileName . ".info") {
 				info := readMultiMap(oldFileName . ".info")
@@ -1626,11 +1622,11 @@ class SessionDatabase extends ConfigurationItem {
 		if !InStr(name, ".telemetry")
 			name .= ".telemetry"
 
-		fileName := (this.getTelemetryDirectory(simulator, car, track) . name)
+		fileName := (this.getTelemetryDirectory(simulator, car, track, "User") . name)
 
 		info := readMultiMap(fileName . ".info")
 
-		deleteFile(fileName . ".telemetry")
+		deleteFile(fileName)
 		deleteFile(fileName . ".info")
 
 		identifier := getMultiMapValue(info, "Telemetry", "Identifier", false)
@@ -1679,7 +1675,6 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	readSession(simulator, car, track, type, name, &meta, &size) {
-		local simulatorCode := this.getSimulatorCode(simulator)
 		local data, fileName, file
 
 		if (type = "Practice")
@@ -2109,7 +2104,6 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getStrategyNames(simulator, car, track, &userStrategies, &communityStrategies) {
-		local simulatorCode := this.getSimulatorCode(simulator)
 		local ignore, strategies, name, extension
 
 		if userStrategies {
@@ -2136,7 +2130,6 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	readStrategy(simulator, car, track, name) {
-		local simulatorCode := this.getSimulatorCode(simulator)
 		local data, fileName
 
 		if !InStr(name, ".strategy")
@@ -2151,7 +2144,6 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	readStrategyInfo(simulator, car, track, name) {
-		local simulatorCode := this.getSimulatorCode(simulator)
 		local fileName, info
 
 		if !InStr(name, ".strategy")
@@ -2190,7 +2182,6 @@ class SessionDatabase extends ConfigurationItem {
 
 	writeStrategy(simulator, car, track, name, strategy, share, synchronize
 				, driver := kUndefined, identifier := kUndefined, synchronized := false) {
-		local simulatorCode := this.getSimulatorCode(simulator)
 		local fileName, file, info
 
 		if !InStr(name, ".strategy")
@@ -2226,19 +2217,13 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	writeStrategyInfo(simulator, car, track, name, info) {
-		local simulatorCode := this.getSimulatorCode(simulator)
-		local fileName
-
 		if !InStr(name, ".strategy")
 			name .= ".strategy"
 
-		fileName := (this.getStrategyDirectory(simulator, car, track, "User") . name . ".info")
-
-		writeMultiMap(fileName, info)
+		writeMultiMap(this.getStrategyDirectory(simulator, car, track, "User") . name . ".info", info)
 	}
 
 	renameStrategy(simulator, car, track, oldName, newName) {
-		local simulatorCode := this.getSimulatorCode(simulator)
 		local oldFileName, newFileName, info
 
 		if !InStr(oldName, ".strategy")
@@ -2270,7 +2255,6 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	removeStrategy(simulator, car, track, name) {
-		local simulatorCode := this.getSimulatorCode(simulator)
 		local fileName, info, identifier, ignore, connector
 
 		if !InStr(name, ".strategy")
@@ -2908,6 +2892,116 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 	}
 }
 
+synchronizeTelemetries(groups, sessionDB, connector, simulators, timestamp, lastSynchronization, force, &counter) {
+	local hasError := false
+	local start, lastRun, ignore, identifier, document, name, type, info, simulator, car, track, telemetry
+	local directory, extension
+
+	if inList(groups, "Laps") {
+		lastRun := getMultiMapValue(readMultiMap(kDatabaseDirectory . "SYNCHRONIZE"), "Laps", "Synchronization", "")
+		start := A_Now
+
+		try {
+			for ignore, identifier in string2Values(";", connector.QueryData("Document", "Type = 'Telemetry' And Modified > " . lastSynchronization)) {
+				document := parseData(connector.GetData("Document", identifier))
+
+				simulator := document["Simulator"]
+
+				if inList(simulators, sessionDB.getSimulatorName(simulator)) {
+					info := parseMultiMap(connector.GetDataValue("Document", identifier, "Info"))
+
+					car := document["Car"]
+					track := document["Track"]
+
+					if !sessionDB.readTelemetryInfo(simulator, car, track, getMultiMapValue(info, "Telemetry", "Name")) {
+						telemetry := connector.GetDataValue("Document", identifier, "Telemetry")
+
+						counter += 1
+
+						sessionDB.writeTelemetry(simulator, car, track
+											   , getMultiMapValue(info, "Telemetry", "Name")
+											   , getMultiMapValue(info, "Telemetry", "Encoded") ? decodeB16(telemetry) : telemetry
+											   , getMultiMapValue(info, "Telemetry", "Size")
+											   , getMultiMapValue(info, "Access", "Share")
+											   , getMultiMapValue(info, "Access", "Synchronize")
+											   , getMultiMapValue(info, "Origin", "Driver")
+											   , identifier, true)
+					}
+				}
+			}
+
+			for ignore, simulator in simulators {
+				simulator := sessionDB.getSimulatorCode(simulator)
+
+				loop Files, kDatabaseDirectory . "User\" . simulator . "\*.*", "D" {
+					car := A_LoopFileName
+
+					loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\*.*", "D" {
+						track := A_LoopFileName
+
+						loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Lap Telemetries\*.info", "F" {
+							lastModified := FileGetTime(A_LoopFilePath, "M")
+
+							if (StrCompare(lastModified, lastRun) > 0) {
+								info := readMultiMap(A_LoopFilePath)
+
+								if ((getMultiMapValue(info, "Origin", "Driver", false) = sessionDB.ID)
+								 && getMultiMapValue(info, "Access", "Synchronize", false)
+								 && !getMultiMapValue(info, "Telemetry", "Synchronized", false)) {
+									telemetry := sessionDB.readTelemetry(simulator, car, track
+																	   , getMultiMapValue(info, "Telemetry", "Name")
+																	   , &size)
+									info := sessionDB.readTelemetryInfo(simulator, car, track
+																	  , getMultiMapValue(info, "Telemetry", "Name"))
+
+									if (telemetry && (size > 0)) {
+										identifier := StrLower(getMultiMapValue(info, "Telemetry", "Identifier"))
+
+										try {
+											if (connector.CountData("Document", "Identifier = '" . identifier . "'") = 0)
+												connector.CreateData("Document"
+																   , substituteVariables("Type=Telemetry`n"
+																					   . "Identifier=%Identifier%`nDriver=%Driver%`n"
+																					   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%"
+																					   , {Identifier: identifier
+																						, Driver: getMultiMapValue(info, "Origin", "Driver")
+																						, Simulator: simulator, Car: car, Track: track}))
+
+											counter += 1
+
+											connector.SetDataValue("Document", identifier, "Telemetry", encodeB16(telemetry, size))
+
+											setMultiMapValue(info, "Telemetry", "Synchronized", true)
+											setMultiMapValue(info, "Telemetry", "Encoded", true)
+
+											connector.SetDataValue("Document", identifier, "Info", printMultiMap(info))
+
+											writeMultiMap(A_LoopFilePath, info)
+										}
+										catch Any as exception {
+											logError(exception)
+
+											hasError := true
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if !hasError {
+			info := readMultiMap(kDatabaseDirectory . "SYNCHRONIZE")
+
+			setMultiMapValue(info, "Laps", "Synchronization", start)
+
+			writeMultiMap(kDatabaseDirectory . "SYNCHRONIZE", info)
+		}
+	}
+}
+
 synchronizeStrategies(groups, sessionDB, connector, simulators, timestamp, lastSynchronization, force, &counter) {
 	local hasError := false
 	local start, lastRun, ignore, identifier, document, name, type, info, simulator, car, track, strategy
@@ -3056,6 +3150,7 @@ initializeSessionDatabase() {
 
 	SessionDatabase.registerSynchronizer(synchronizeDrivers)
 	SessionDatabase.registerSynchronizer(synchronizeSessions)
+	SessionDatabase.registerSynchronizer(synchronizeTelemetries)
 	SessionDatabase.registerSynchronizer(synchronizeSetups)
 	SessionDatabase.registerSynchronizer(synchronizeStrategies)
 }

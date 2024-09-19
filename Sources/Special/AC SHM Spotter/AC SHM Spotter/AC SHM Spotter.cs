@@ -1658,8 +1658,6 @@ namespace ACSHMSpotter {
 
                 telemetryFile.Write(physics.TC + ";");
                 telemetryFile.WriteLine(physics.Abs);
-
-                telemetryFile.Close();
             }
             catch (Exception)
             {

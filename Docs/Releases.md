@@ -1,4 +1,4 @@
-## 5.9.0.0-release 09/20/24 (planned)
+## 5.9.0.0-release 09/20/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Brake ducts have been removed for *RaceRoom Racing Experience* in the meta data of "Setup Workbench", because these are not available in this simulator.

@@ -282,7 +282,7 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 
 			type := StrSplit(Trim(fileName), ".", "", 2)[1]
 
-			if ((type = (downloadPressures . downloadSetups . downloadStrategies . downloadTelemetries)) || (type = (downloadPressures . downloadSetups))) {
+			if (type = (downloadPressures . downloadSetups . downloadStrategies . downloadTelemetries)) {
 				if (SessionDatabase.DatabaseVersion != databaseDirectory) {
 					ftpDownload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads/" . fileName, kTempDirectory . fileName)
 

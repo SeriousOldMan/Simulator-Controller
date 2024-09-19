@@ -2749,7 +2749,10 @@ synchronizeSessions(groups, sessionDB, connector, simulators, timestamp, lastSyn
 
 											connector.SetDataValue("Document", identifier, "Info", printMultiMap(info))
 
-											writeMultiMap(A_LoopFilePath, info)
+											sessionDB.writeSessionInfo(simulator, car, track
+																	 , getMultiMapValue(info, "Session", "Type")
+																	 , getMultiMapValue(info, "Session", "Name")
+																	 , info)
 										}
 										catch Any as exception {
 											logError(exception)
@@ -2867,7 +2870,10 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 
 											connector.SetDataValue("Document", identifier, "Info", printMultiMap(info))
 
-											writeMultiMap(A_LoopFilePath, info)
+											sessionDB.writeSetupInfo(simulator, car, track
+																   , getMultiMapValue(info, "Setup", "Type")
+																   , getMultiMapValue(info, "Setup", "Name")
+																   , info)
 										}
 										catch Any as exception {
 											logError(exception)
@@ -2976,7 +2982,7 @@ synchronizeTelemetries(groups, sessionDB, connector, simulators, timestamp, last
 
 											connector.SetDataValue("Document", identifier, "Info", printMultiMap(info))
 
-											writeMultiMap(A_LoopFilePath, info)
+											sessionDB.writeTelemetryInfo(simulator, car, track, getMultiMapValue(info, "Telemetry", "Name", info))
 										}
 										catch Any as exception {
 											logError(exception)
@@ -3096,7 +3102,7 @@ synchronizeStrategies(groups, sessionDB, connector, simulators, timestamp, lastS
 
 											connector.SetDataValue("Document", identifier, "Info", printMultiMap(info))
 
-											writeMultiMap(A_LoopFilePath, info)
+											sessionDB.writeStrategyInfo(simulator, car, track, name, info)
 										}
 										catch Any as exception {
 											logError(exception)

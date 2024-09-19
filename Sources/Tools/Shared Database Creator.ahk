@@ -368,7 +368,6 @@ createDatabases(inputDirectory, outputDirectory) {
 				if (pressuresEnabled || setupsEnabled || strategiesEnabled) {
 					updateProgress("Assembling [" . strategiesLabel . " | " . setupsLabel . " | " . pressuresLabel . "]...")
 
-
 					type := (pressuresEnabled . setupsEnabled . strategiesEnabled)
 
 					database := (outputDirectory . type . "." . version1 . "." . version2)
@@ -386,8 +385,6 @@ createDatabases(inputDirectory, outputDirectory) {
 							DirCopy(outputDirectory . strategiesLabel, database, 1)
 
 					RunWait("PowerShell.exe -Command Compress-Archive -LiteralPath '" . database . "\Community' -CompressionLevel Optimal -DestinationPath '" . database . ".zip'", , "Hide")
-
-
 
 					if FileExist(database . ".zip")
 						archives.Push(database . ".zip")

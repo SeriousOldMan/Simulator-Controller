@@ -24,7 +24,6 @@
 ;;;                   Public Function Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-
 browseLapTelemetries(ownerOrCommand := false, arguments*) {
 	local x, y, names, ignore, infos, index, name, dirName, driverName
 	local carNames, trackNames, newSimulator, newCar, newTrack, force

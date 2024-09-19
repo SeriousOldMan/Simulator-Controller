@@ -10,6 +10,8 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\..\Libraries\HTMLViewer.ahk"
+#Include "..\..\Database\Libraries\SessionDatabase.ahk"
+#Include "..\..\Database\Libraries\SessionDatabaseBrowser.ahk"
 #Include "RaceReportViewer.ahk"
 
 
@@ -26,7 +28,6 @@ class TelemetryChart {
 
 	iWindow := false
 
-	iInfoViewer := false
 	iTelemetryViewer := false
 
 	iZoom := 100
@@ -34,12 +35,6 @@ class TelemetryChart {
 	Window {
 		Get {
 			return this.iWindow
-		}
-	}
-
-	InfoViewer {
-		Get {
-			return this.iInfoViewer
 		}
 	}
 
@@ -59,53 +54,9 @@ class TelemetryChart {
 		}
 	}
 
-	__New(window, infoViewer := false, telemetryViewer := false) {
+	__New(window, telemetryViewer := false) {
 		this.iWindow := window
-		this.iInfoViewer := infoViewer
 		this.iTelemetryViewer := telemetryViewer
-	}
-
-	showTelemetryInfo(lapDriver, lapLapTime := false, lapSectorTimes := false
-					, referenceDriver := false, referenceLapTime := false, referenceSectorTimes := false) {
-		local infoText, html
-
-		lapTimeDisplayValue(lapTime) {
-			if ((lapTime = "-") || isNull(lapTime))
-				return "-"
-			else
-				return RaceReportViewer.lapTimeDisplayValue(lapTime)
-		}
-
-		if this.InfoViewer {
-			this.InfoViewer.document.open()
-
-			if lapDriver {
-				infoText := "<table>"
-				infoText .= ("<tr><td>" . lapDriver . "</td>")
-				infoText .= ("<td>   </td><td>" . lapTimeDisplayValue(lapLapTime) . "</td>")
-				infoText .= ("<td>(" . values2String(", ", collect(lapSectorTimes, lapTimeDisplayValue)*) . ")</td><tr/>")
-
-				if referenceDriver {
-					infoText .= ("<tr><td>" . referenceDriver . "</td>")
-					infoText .= ("<td>   </td><td>" . lapTimeDisplayValue(referenceLapTime) . "</td>")
-					infoText .= ("<td>(" . values2String(", ", collect(referenceSectorTimes, lapTimeDisplayValue)*) . ")</td><tr/>")
-				}
-
-				infoText .= "</table>"
-
-				infoText := "<html><style> tr td { padding-top: 3px; padding-bottom:1px }</style><body style='background-color: #%backColor%' style='overflow: auto' leftmargin=3 topmargin=3 rightmargin=3 bottommargin=0><style> table, p { color: #%fontColor%; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><p>" . infoText . "</p></body></html>"
-
-				this.InfoViewer.document.write(substituteVariables(infoText, {fontColor: this.Window.Theme.TextColor
-																			, backColor: this.Window.BackColor}))
-			}
-			else {
-				html := "<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
-
-				this.InfoViewer.document.write(substituteVariables(html, {backColor: this.Window.BackColor}))
-			}
-
-			this.InfoViewer.document.close()
-		}
 	}
 
 	showTelemetryChart(lapFileName, referenceLapFileName := false) {
@@ -263,11 +214,11 @@ class TelemetryChart {
 			color := this.Window.Theme.TextColor["Disabled"]
 
 			axes := "series: { 0: {targetAxisIndex: 0, color: '" . color . "'}, 1: {targetAxisIndex: 1, color: '" . color . "'}, 2: {targetAxisIndex: 2, color: '" . color . "'}, 3: {targetAxisIndex: 3, color: '" . color . "'}, 4: {targetAxisIndex: 4}, 5: {targetAxisIndex: 5}, 6: {targetAxisIndex: 6}, 7: {targetAxisIndex: 7} },`n"
-			axes .= "hAxes: {gridlines: {count: 0}, ticks: []}, vAxes: { 0: { gridlines: {count: 0}, ticks: [], minValue: " . (speedMax - ((speedMax - speedMin) * 3)) . " }, 1: { gridlines: {count: 0}, ticks: [], minValue : -2, maxValue: 5 }, 2: { gridlines: {count: 0}, ticks: [], minValue: -2, maxValue: 5 }, 3: { gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 }, 4: { gridlines: {count: 0}, ticks: [], minValue: " . (speedMax - ((speedMax - speedMin) * 3)) . " }, 5: { gridlines: {count: 0}, ticks: [], minValue : -2, maxValue: 5 }, 6: { gridlines: {count: 0}, ticks: [], minValue: -2, maxValue: 5 },  7: { gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 } }"
+			axes .= "hAxes: {gridlines: {count: 0}, ticks: []}, vAxes: { 0: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . (speedMax - ((speedMax - speedMin) * 3)) . " }, 1: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue : -2, maxValue: 5 }, 2: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: -2, maxValue: 5 }, 3: { gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 }, 4: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . (speedMax - ((speedMax - speedMin) * 3)) . " }, 5: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue : -2, maxValue: 5 }, 6: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: -2, maxValue: 5 },  7: { gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 } }"
 		}
 		else {
 			axes := "series: { 0: {targetAxisIndex: 0}, 1: {targetAxisIndex: 1}, 2: {targetAxisIndex: 2}, 3: {targetAxisIndex: 3} },`n"
-			axes .= "hAxes: {gridlines: {count: 0}, ticks: []}, vAxes: { 0: { gridlines: {count: 0}, ticks: [], minValue: " . (speedMax - ((speedMax - speedMin) * 3)) . " }, 1: { gridlines: {count: 0}, ticks: [], minValue : -2, maxValue: 5 }, 2: { gridlines: {count: 0}, ticks: [], minValue: -2, maxValue: 5 }, 3: { gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 } }"
+			axes .= "hAxes: {gridlines: {count: 0}, ticks: []}, vAxes: { 0: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . (speedMax - ((speedMax - speedMin) * 3)) . " }, 1: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue : -2, maxValue: 5 }, 2: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: -2, maxValue: 5 }, 3: { gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 } }"
 		}
 
 		drawChartFunction .= ("]);`nvar options = { " . axes . ", legend: { position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '2%', top: '5%', right: '2%', bottom: '20%' }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
@@ -341,11 +292,11 @@ class TelemetryChart {
 			color := this.Window.Theme.TextColor["Disabled"]
 
 			axes := "series: { 0: {targetAxisIndex: 0, color: '" . color . "'}, 1: {targetAxisIndex: 1, color: '" . color . "'}, 2: {targetAxisIndex: 2, color: '" . color . "'}, 3: {targetAxisIndex: 3, color: '" . color . "'}, 4: {targetAxisIndex: 4}, 5: {targetAxisIndex: 5}, 6: {targetAxisIndex: 6}, 7: {targetAxisIndex: 7} },`n"
-			axes .= "hAxes: {gridlines: {count: 0}, ticks: []}, vAxes: { 0: { gridlines: {count: 0}, ticks: [], minValue: " . (rpmsMax - ((rpmsMax - rpmsMin) * 3)) . " }, 1: { gridlines: {count: 0}, ticks: [], minValue : -2, maxValue: 10 }, 2: { gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 }, 3: { gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 }, 4: { gridlines: {count: 0}, ticks: [], minValue: " . (rpmsMax - ((rpmsMax - rpmsMin) * 3)) . " }, 5: { gridlines: {count: 0}, ticks: [], minValue : -2, maxValue: 10 }, 6: { gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 },  7: { gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 } }"
+			axes .= "hAxes: {gridlines: {count: 0}, ticks: []}, vAxes: { 0: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . (rpmsMax - ((rpmsMax - rpmsMin) * 3)) . " }, 1: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue : -2, maxValue: 10 }, 2: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 }, 3: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 }, 4: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . (rpmsMax - ((rpmsMax - rpmsMin) * 3)) . " }, 5: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue : -2, maxValue: 10 }, 6: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 },  7: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 } }"
 		}
 		else {
 			axes := "series: { 0: {targetAxisIndex: 0}, 1: {targetAxisIndex: 1}, 2: {targetAxisIndex: 2}, 3: {targetAxisIndex: 3} },`n"
-			axes .= "hAxes: {gridlines: {count: 0}, ticks: []}, vAxes: { 0: { gridlines: {count: 0}, ticks: [], minValue: " . (rpmsMax - ((rpmsMax - rpmsMin) * 3)) . " }, 1: { gridlines: {count: 0}, ticks: [], minValue : -2, maxValue: 10 }, 2: { gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 }, 3: { gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 } }"
+			axes .= "hAxes: {gridlines: {count: 0}, ticks: []}, vAxes: { 0: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . (rpmsMax - ((rpmsMax - rpmsMin) * 3)) . " }, 1: { baselineColor: '" . this.Window.AltBackColor . "', baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue : -2, maxValue: 10 }, 2: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 }, 3: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 } }"
 		}
 
 		drawChartFunction .= ("]);`nvar options = { " . axes . ", legend: { position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '2%', top: '5%', right: '2%', bottom: '20%' }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
@@ -367,6 +318,7 @@ class TelemetryBrowser {
 	iTelemetryChart := false
 
 	iLaps := []
+	iImportedLaps := []
 
 	iLap := false
 	iReferenceLap := false
@@ -414,7 +366,6 @@ class TelemetryBrowser {
 
 					this.iRedraw := false
 
-					this.iTelemetryBrowser.TelemetryChart.InfoViewer.Resized()
 					this.iTelemetryBrowser.TelemetryChart.TelemetryViewer.Resized()
 
 					Task.startTask(ObjBindMethod(this.iTelemetryBrowser, "updateTelemetryChart", true))
@@ -476,11 +427,24 @@ class TelemetryBrowser {
 		}
 	}
 
+	ImportedLaps {
+		Get {
+			return this.iImportedLaps
+		}
+
+		Set {
+			return (this.iImportedLaps := value)
+		}
+	}
+
 	SelectedLap[path := false] {
 		Get {
-			return (this.iLap ? (path ? (this.TelemetryDirectory . "Lap " . this.iLap . ".telemetry")
-									  : this.iLap)
-							  : false)
+			if isNumber(this.iLap)
+				return (this.iLap ? (path ? (this.TelemetryDirectory . "Lap " . this.iLap . ".telemetry")
+										  : this.iLap)
+								  : false)
+			else
+				return (path ? this.iLap[3] : this.iLap)
 		}
 
 		Set {
@@ -494,9 +458,12 @@ class TelemetryBrowser {
 
 	SelectedReferenceLap[path := false] {
 		Get {
-			return (this.iReferenceLap ? (path ? (this.TelemetryDirectory . "Lap " . this.iReferenceLap . ".telemetry")
-											   : this.iReferenceLap)
-									   : false)
+			if isNumber(this.iReferenceLap)
+				return (this.iReferenceLap ? (path ? (this.TelemetryDirectory . "Lap " . this.iReferenceLap . ".telemetry")
+												   : this.iReferenceLap)
+										   : false)
+			else
+				return (path ? this.iReferenceLap[3] : this.iReferenceLap[1])
 		}
 
 		Set {
@@ -509,21 +476,10 @@ class TelemetryBrowser {
 	}
 
 	__New(manager, directory, collect := true) {
-		local laps := []
-		local name
-
 		this.iManager := manager
 		this.iTelemetryDirectory := (normalizeDirectoryPath(directory) . "\")
 
-		loop Files, this.TelemetryDirectory . "*.telemetry" {
-			SplitPath(A_LoopFileName, , , , &name)
-
-			laps.Push(Integer(StrReplace(name, "Lap ", "")))
-		}
-
-		bubbleSort(&laps)
-
-		this.iLaps := laps
+		this.loadTelemetry()
 
 		if collect
 			OnExit(ObjBindMethod(this, "shutdownTelemetryCollector", true))
@@ -531,7 +487,7 @@ class TelemetryBrowser {
 
 	createGui() {
 		local browserGui := TelemetryBrowser.TelemetryBrowserWindow(this, {Descriptor: "Telemetry Browser", Closeable: true, Resizeable:  "Deferred"})
-		local infoViewer, telemetryViewer
+		local telemetryViewer
 
 		changeZoom(*) {
 			this.TelemetryChart.Zoom := browserGui["zoomSlider"].Value
@@ -540,11 +496,71 @@ class TelemetryBrowser {
 		}
 
 		chooseLap(*) {
-			this.selectLap(browserGui["lapDropDown"].Text)
+			local lap := browserGui["lapDropDown"].Text
+			local chosen
+
+			if (lap != translate("---------------------------------------------") . translate("---------------------------------------------"))
+				if (browserGui["lapDropDown"].Value <= this.Laps.Length)
+					this.selectLap(string2Values(":", lap)[1])
+				else {
+					chosen := browserGui["lapDropDown"].Value
+
+					if (this.Laps.Length > 0)
+						chosen -= (this.Laps.Length + 1)
+
+					this.selectLap(this.ImportedLaps[chosen])
+				}
 		}
 
 		chooseReferenceLap(*) {
-			this.selectReferenceLap(browserGui["referenceLapDropDown"].Text)
+			local chosen := browserGui["referenceLapDropDown"].Value
+			local lap := browserGui["referenceLapDropDown"].Text
+
+			if (chosen = 1)
+				this.selectReferenceLap(false)
+			else if (lap != translate("---------------------------------------------") . translate("---------------------------------------------")) {
+				chosen -= 1
+
+				if (chosen <= this.Laps.Length)
+					this.selectReferenceLap(string2Values(":", lap)[1])
+				else {
+					if (this.Laps.Length > 0)
+						chosen -= (1 + this.Laps.Length)
+
+					this.selectReferenceLap(this.ImportedLaps[chosen])
+				}
+			}
+		}
+
+		deleteLap(*) {
+			local all := GetKeyState("Ctrl")
+			local msgResult
+
+			if this.SelectedLap {
+				if isNumber(this.SelectedLap) {
+					OnMessage(0x44, translateYesNoButtons)
+					msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected data?"), translate("Delete"), 262436)
+					OnMessage(0x44, translateYesNoButtons, 0)
+
+					if (msgResult = "Yes")
+						if all
+							this.clear()
+						else
+							this.deleteLap()
+				}
+				else if all
+					this.clear()
+				else
+					this.deleteLap()
+			}
+		}
+
+		loadLap(*) {
+			this.loadLap()
+		}
+
+		saveLap(*) {
+			this.saveLap()
 		}
 
 		this.iWindow := browserGui
@@ -562,29 +578,36 @@ class TelemetryBrowser {
 
 		browserGui.SetFont("s8 Norm", "Arial")
 
-		infoViewer := browserGui.Add("HTMLViewer", "x165 yp+6 w300 h58 W:Grow")
+		browserGui.Add("Text", "x16 yp+10 w80", translate("Lap"))
+		browserGui.Add("DropDownList", "x98 yp-4 w280 vlapDropDown", collect(this.Laps, (l) => this.lapLabel(l))).OnEvent("Change", chooseLap)
 
-		browserGui.Add("Text", "x16 yp+8 w80", translate("Lap"))
-		browserGui.Add("DropDownList", "x98 yp-4 w60 vlapDropDown", this.Laps).OnEvent("Change", chooseLap)
+		browserGui.Add("Button", "x380 yp w23 h23 Center +0x200 Disabled vloadButton").OnEvent("Click", loadLap)
+		setButtonIcon(browserGui["loadButton"], kIconsDirectory . "Load.ico", 1, "L4 T4 R4 B4")
+		browserGui.Add("Button", "x404 yp w23 h23 Center +0x200 Disabled vsaveButton").OnEvent("Click", saveLap)
+		setButtonIcon(browserGui["saveButton"], kIconsDirectory . "Save.ico", 1, "L4 T4 R4 B4")
+		browserGui.Add("Button", "x430 yp w23 h23 Center +0x200 vdeleteButton").OnEvent("Click", deleteLap)
+		setButtonIcon(browserGui["deleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
 		browserGui.Add("Text", "x16 yp+28 w80", translate("Reference"))
-		browserGui.Add("DropDownList", "x98 yp-4 w60 Choose1 vreferenceLapDropDown", concatenate([translate("None")], this.Laps)).OnEvent("Change", chooseReferenceLap)
+		browserGui.Add("DropDownList", "x98 yp-4 w280 Choose1 vreferenceLapDropDown", concatenate([translate("None")], collect(this.Laps, (l) => this.lapLabel(l)))).OnEvent("Change", chooseReferenceLap)
 
 		browserGui.Add("Text", "x468 yp+4 w80 X:Move", translate("Zoom"))
 		browserGui.Add("Slider", "Center Thick15 x556 yp-2 X:Move w100 0x10 Range100-400 ToolTip vzoomSlider", 100).OnEvent("Change", changeZoom)
 
-		telemetryViewer := browserGui.Add("HTMLViewer", "x16 yp+28 w640 h480 W:Grow H:Grow Border")
+		telemetryViewer := browserGui.Add("HTMLViewer", "x16 yp+24 w640 h480 W:Grow H:Grow Border")
 
 		telemetryViewer.document.open()
 		telemetryViewer.document.write("")
 		telemetryViewer.document.close()
 
-		this.iTelemetryChart := TelemetryChart(browserGui, infoViewer, telemetryViewer)
+		this.iTelemetryChart := TelemetryChart(browserGui, telemetryViewer)
 
 		browserGui.Add(TelemetryBrowser.TelemetryBrowserResizer(this, telemetryViewer))
 
 		if (this.Laps.Length > 0)
 			this.selectLap(this.Laps[1])
+		else
+			this.updateState()
 	}
 
 	show() {
@@ -603,6 +626,28 @@ class TelemetryBrowser {
 		this.updateTelemetryChart(true)
 	}
 
+	close() {
+		this.shutdownTelemetryCollector(true)
+
+		this.Manager.closedTelemetryBrowser()
+
+		this.Window.Destroy()
+	}
+
+	updateState() {
+		this.Control["loadButton"].Enabled := true
+
+		if this.SelectedLap
+			this.Control["deleteButton"].Enabled := true
+		else
+			this.Control["deleteButton"].Enabled := false
+
+		if (this.SelectedLap && isNumber(this.SelectedLap))
+			this.Control["saveButton"].Enabled := true
+		else
+			this.Control["saveButton"].Enabled := false
+	}
+
 	startup(simulator, trackLength) {
 		if !this.iTelemetryCollectorPID
 			this.startupTelemetryCollector(simulator, trackLength)
@@ -617,37 +662,252 @@ class TelemetryBrowser {
 		this.selectReferenceLap(false, true)
 
 		this.Laps := []
+		this.ImportedLaps := []
 
 		this.iTelemetryDirectory := (normalizeDirectoryPath(directory) . "\")
+
+		if this.Window {
+			this.Control["lapDropDown"].Delete()
+			this.Control["referenceLapDropDown"].Delete()
+
+			this.Control["referenceLapDropDown"].Add([translate("None")])
+			this.Control["referenceLapDropDown"].Choose(1)
+
+			this.updateState()
+		}
 
 		if collect
 			OnExit(ObjBindMethod(this, "shutdownTelemetryCollector", true))
 	}
 
-	close() {
-		this.shutdownTelemetryCollector(true)
+	clear() {
+		this.selectLap(false, true)
+		this.selectReferenceLap(false, true)
 
-		this.Manager.closedTelemetryBrowser()
+		this.Laps := []
+		this.ImportedLaps := []
 
-		this.Window.Destroy()
+		loop Files, this.TelemetryDirectory . "*.telemetry"
+			deleteFile(A_LoopFileFullPath)
+
+		this.loadTelemetry()
+	}
+
+	loadLap() {
+		local name := false
+		local telemetry := false
+		local info := false
+		local simulator, car, track
+		local sessionDB, directory, fileName, dataFile, file, size, lap
+
+		this.Manager.getSessionInformation(&simulator, &car, &track)
+
+		this.Window.Opt("+OwnDialogs")
+
+		sessionDB := SessionDatabase()
+
+		this.Window.Block()
+
+		try {
+			fileName := browseLapTelemetries(this.Window, &simulator, &car, &track)
+		}
+		finally {
+			this.Window.Unblock()
+		}
+
+		if (fileName && (fileName != "")) {
+			SplitPath(fileName, , &directory, , &fileName)
+
+			if (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getTelemetryDirectory(simulator, car, track))) {
+				dataFile := temporaryFileName("Lap Telemetry", "telemetry")
+
+				try {
+					telemetry := sessionDB.readTelemetry(simulator, car, track, fileName, &size)
+
+					file := FileOpen(dataFile, "w", "")
+
+					if file {
+						file.RawWrite(telemetry, size)
+
+						file.Close()
+
+						name := fileName
+						telemetry := dataFile
+						info := sessionDB.readTelemetryInfo(simulator, car, track, fileName)
+					}
+					else
+						telemetry := false
+				}
+				catch Any as exception {
+					logError(exception)
+
+					telemetry := false
+				}
+			}
+			else {
+				name := fileName
+				telemetry := (directory . "\" . fileName . ".telemetry")
+				info := newMultiMap()
+			}
+		}
+
+		if telemetry {
+			lap := [name, SessionDatabase.getDriverName(simulator, getMultiMapValue(info, "Telemetry", "Driver"))
+				  , telemetry, info]
+
+			this.ImportedLaps.Push(lap)
+
+			this.loadTelemetry(lap)
+		}
+	}
+
+	saveLap(lap := false, prompt := true) {
+		local simulator, car, track
+		local sessionDB, dirName, fileName, newFileName, file, folder, telemetry
+
+		this.Manager.getSessionInformation(&simulator, &car, &track)
+
+		if !lap
+			lap := this.SelectedLap
+
+		if (lap && isNumber(lap)) {
+			if (simulator && car && track) {
+				dirName := (SessionDatabase.DatabasePath . "User\" . SessionDatabase.getSimulatorCode(simulator)
+						  . "\" . car . "\" . track . "\Lap Telemetries")
+
+				DirCreate(dirName)
+			}
+			else
+				dirName := ""
+
+			fileName := (dirName . "\Lap " . lap)
+
+			newFileName := (fileName . ".telemetry")
+
+			while FileExist(newFileName)
+				newFileName := (fileName . " (" . (A_Index + 1) . ")" . ".telemetry")
+
+			fileName := newFileName
+
+			if prompt {
+				this.Window.Opt("+OwnDialogs")
+
+				OnMessage(0x44, translateSaveCancelButtons)
+				fileName := withBlockedWindows(FileSelect, "S17", fileName, translate("Save Telemetry..."), "Lap Telemetry (*.telemetry)")
+				OnMessage(0x44, translateSaveCancelButtons, 0)
+			}
+
+			if (fileName != "")
+				try {
+					sessionDB := SessionDatabase()
+
+					SplitPath(fileName, , &folder, , &fileName)
+
+					if (normalizeDirectoryPath(folder) = normalizeDirectoryPath(sessionDB.getTelemetryDirectory(simulator, car, track))) {
+						file := FileOpen((this.TelemetryDirectory . "Lap " . lap . ".telemetry"), "r-wd")
+
+						if file {
+							size := file.Length
+
+							telemetry := Buffer(size)
+
+							file.RawRead(telemetry, size)
+
+							file.Close()
+
+							sessionDB.writeTelemetry(simulator, car, track, fileName, telemetry, size
+												   , false, true, SessionDatabase.ID)
+
+							return
+						}
+					}
+
+					DirCreate(folder)
+					FileCopy(this.TelemetryDirectory . "Lap " . lap . ".telemetry"
+						   , folder . "\" . fileName . ".telemetry", 1)
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+		}
+	}
+
+	deleteLap(lap := false) {
+		local selectedLap := this.SelectedLap
+		local selectedReferenceLap := this.SelectedReferenceLap
+
+		if !lap
+			lap := selectedLap
+
+		if (lap = selectedLap)
+			this.selectLap(false, true)
+
+		if (lap = selectedReferenceLap)
+			this.selectReferenceLap(false, true)
+
+		if isNumber(lap) {
+			deleteFile(this.TelemetryDirectory . "Lap " . lap . ".telemetry")
+
+			this.Laps := remove(this.Laps, lap)
+		}
+		else
+			this.ImportedLaps := remove(this.ImportedLaps, lap)
+
+		this.loadTelemetry()
+
+		if (selectedLap && (inList(this.Laps, selectedLap) || inList(this.ImportedLaps, selectedLap)))
+			this.selectLap(selectedLap, true)
+
+		if (selectedReferenceLap && (inList(this.Laps, selectedReferenceLap) || inList(this.ImportedLaps, selectedReferenceLap)))
+			this.selectReferenceLap(selectedReferenceLap, true)
 	}
 
 	selectLap(lap, force := false) {
+		local index := 0
+
 		if (force || (lap != this.SelectedLap)) {
 			this.SelectedLap := lap
 
-			this.Control["lapDropDown"].Choose(inList(this.Laps, lap))
+			if this.Window {
+				index := inList(this.Laps, lap)
+
+				if !index {
+					index := inList(this.ImportedLaps, lap)
+
+					if (index && (this.Laps.Length > 0))
+						index += (this.Laps.Length + 1)
+				}
+
+				this.Control["lapDropDown"].Choose(index)
+
+				this.updateState()
+			}
 		}
 	}
 
 	selectReferenceLap(lap, force := false) {
+		local index := 0
+
 		if (lap = translate("None"))
 			lap := false
 
 		if (force || (lap != this.SelectedReferenceLap)) {
 			this.SelectedReferenceLap := lap
 
-			this.Control["referenceLapDropDown"].Choose(lap ? (inList(this.Laps, lap) + 1) : 1)
+			if this.Window {
+				index := inList(this.Laps, lap)
+
+				if !index {
+					index := inList(this.ImportedLaps, lap)
+
+					if (index && (this.Laps.Length > 0))
+						index += (this.Laps.Length + 1)
+				}
+
+				this.Control["referenceLapDropDown"].Choose(index + 1)
+
+				this.updateState()
+			}
 		}
 	}
 
@@ -684,7 +944,7 @@ class TelemetryBrowser {
 		if pid {
 			this.iTelemetryCollectorPID := pid
 
-			this.iCollectorTask := PeriodicTask(ObjBindMethod(this, "collectTelemetry"), 10000, kLowPriority)
+			this.iCollectorTask := PeriodicTask(ObjBindMethod(this, "loadTelemetry"), 10000, kLowPriority)
 
 			this.iCollectorTask.start()
 		}
@@ -730,7 +990,29 @@ class TelemetryBrowser {
 		return false
 	}
 
-	collectTelemetry() {
+	lapLabel(lap) {
+		local driver, lapTime, sectorTimes
+
+		lapTimeDisplayValue(lapTime) {
+			if ((lapTime = "-") || isNull(lapTime))
+				return "-"
+			else
+				return RaceReportViewer.lapTimeDisplayValue(lapTime)
+		}
+
+		if isNumber(lap) {
+			this.Manager.getLapInformation(lap, &driver, &lapTime, &sectorTimes)
+
+			if (!InStr(driver, "John Doe") && (lapTime != "-"))
+				return (lap . translate(":") . A_Space . driver . translate(" - ") . lapTimeDisplayValue(lapTime) . A_Space . translate("[") . values2String(", ", collect(sectorTimes, lapTimeDisplayValue)*) . translate("]"))
+			else
+				return lap
+		}
+		else
+			return (lap[1] . translate(":") . A_Space . lap[2])
+	}
+
+	loadTelemetry(select := false) {
 		local laps := []
 		local lap, name
 
@@ -770,31 +1052,48 @@ class TelemetryBrowser {
 
 		this.Laps := concatenate(this.Laps, laps)
 
-		this.Control["lapDropDown"].Add(laps)
-		this.Control["referenceLapDropDown"].Add(laps)
+		if this.Window {
+			laps := collect(this.Laps, (l) => this.lapLabel(l))
 
-		if (!this.SelectedLap && (laps.Length > 0))
-			this.selectlap(laps[1])
+			this.Control["lapDropDown"].Delete()
+			this.Control["referenceLapDropDown"].Delete()
+
+			this.Control["lapDropDown"].Add(laps)
+			this.Control["referenceLapDropDown"].Add(concatenate([translate("None")], laps))
+
+			if (this.ImportedLaps.Length > 0) {
+				if (laps.Length > 0) {
+					this.Control["lapDropDown"].Add([translate("---------------------------------------------") . translate("---------------------------------------------")])
+					this.Control["referenceLapDropDown"].Add([translate("---------------------------------------------") . translate("---------------------------------------------")])
+				}
+
+				this.Control["lapDropDown"].Add(collect(this.ImportedLaps, (d) => this.lapLabel(d)))
+				this.Control["referenceLapDropDown"].Add(collect(this.ImportedLaps, (d) => this.lapLabel(d)))
+			}
+
+			if select {
+				this.selectLap(select, true)
+				this.selectReferenceLap(false, true)
+			}
+			else if (!this.SelectedLap && (laps.Length > 0)) {
+				this.selectLap(this.Laps[1])
+				this.selectReferenceLap(false, true)
+			}
+			else if (!this.SelectedLap && (this.ImportedLaps.Length > 0)) {
+				this.selectLap(this.ImportedLaps[1])
+				this.selectReferenceLap(false, true)
+			}
+			else {
+				this.Control["lapDropDown"].Choose(inList(this.Laps, this.SelectedLap))
+				this.Control["referenceLapDropDown"].Choose(1 + inList(this.Laps, this.SelectedReferenceLap))
+			}
+
+			this.updateState()
+		}
 	}
 
 	updateTelemetryChart(redraw := false) {
-		local lapDriver := false
-		local referenceDriver := false
-		local lapLapTime := false
-		local lapSectorTimes := false
-		local referenceLapTime := false
-		local referenceSectorTimes := false
-
-		if (this.TelemetryChart && redraw) {
-			if this.SelectedLap
-				this.Manager.getLapInformation(this.SelectedLap, &lapDriver, &lapLapTime, &lapSectorTimes)
-
-			if this.SelectedReferenceLap
-				this.Manager.getLapInformation(this.SelectedReferenceLap, &referenceDriver, &referenceLapTime, &referenceSectorTimes)
-
-			this.TelemetryChart.showTelemetryInfo(lapDriver, lapLapTime, lapSectorTimes
-												, referenceDriver, referenceLapTime, referenceSectorTimes)
+		if (this.TelemetryChart && redraw)
 			this.TelemetryChart.showTelemetryChart(this.SelectedLap[true], this.SelectedReferenceLap[true])
-		}
 	}
 }

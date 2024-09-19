@@ -3,9 +3,14 @@
   2. Documentation updates here and there, as always
   3. Brake ducts have been removed for *RaceRoom Racing Experience* in the meta data of "Setup Workbench", because these are not available in this simulator.
   4. Fixed the calculation of lap times and sector times for *RaceRoom Racing Experience* in all applications.
-  5. Added a complete new data category for low level car telemetry incl. a graphical browser. This is initially supported in the "Solo Center", but will be integrated into all other applications as well. The future goal is to make the AI aware of this data category as well. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#Telemetry-Browser) for more information.
-  6. Lap telemetry data can be saved to and retrieved from the session database. An interface in the "Session Database" as well as replication using the Team Server will follow with the next release.
-  7. Optimized colors for the "Light" UI theme.
+  5. Optimized colors for the "Light" UI theme.
+  6. Added a complete new data category for low level car telemetry incl. a graphical browser. This is initially supported in the "Solo Center", but will be integrated into the "Team Center" as well. The future goal is to make the AI aware of this data category as well. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#Telemetry-Browser) for more information.
+  7. Lap telemetry data can be saved to and retrieved from the session database.
+  8. The ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) has been extended with a section for lap telemetry data:
+	 - Telemetry data can uploaded, downloaded, renamed and deleted.
+	 - Export and Import support telemetry data as well.
+	 - Sharing of telemetry with the Community and/or on the Team Server is supported.
+	 - The consent for sharing data will be requested again to allow you to include sharing of telemetry data.
 
 ## 5.8.7.0-release 09/13/24
   1. Minor bugfixes, as always

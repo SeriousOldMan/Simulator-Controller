@@ -58,6 +58,7 @@ class DatabaseCreator {
 
 	iIncludePressures := false
 	iIncludeStrategies := false
+	iIncludeTelemetries := false
 	iIncludeSetups := false
 
 	iTyresDatabase := false
@@ -80,6 +81,12 @@ class DatabaseCreator {
 		}
 	}
 
+	IncludeTelemetries {
+		Get {
+			return this.iIncludeTelemetries
+		}
+	}
+
 	IncludeStrategies {
 		Get {
 			return this.iIncludeStrategies
@@ -98,12 +105,13 @@ class DatabaseCreator {
 		}
 	}
 
-	__New(sourceDirectory, targetDirectory, includePressures, includeSetups, includeStrategies) {
+	__New(sourceDirectory, targetDirectory, includePressures, includeSetups, includeStrategies, includeTelemetries) {
 		this.iSourceDirectory := sourceDirectory
 		this.iTargetDirectory := targetDirectory
 		this.iIncludePressures := includePressures
 		this.iIncludeSetups := includeSetups
 		this.iIncludeStrategies := includeStrategies
+		this.iIncludeTelemetries := includeTelemetries
 	}
 
 	createDatabase() {
@@ -149,6 +157,9 @@ class DatabaseCreator {
 								if FileExist(directory . "Tyres.Pressures.Distribution.CSV")
 									this.loadPressures(simulator, car, track, Database(directory, kTyresSchemas))
 
+								loop Files, databaseDirectory . simulator . "\" . car . "\" . track . "\Lap Telemetries\*.*"
+									this.loadLapTelemetry(simulator, car, track, A_LoopFilePath)
+
 								loop Files, databaseDirectory . simulator . "\" . car . "\" . track . "\Race Strategies\*.*"
 									this.loadRaceStrategy(simulator, car, track, A_LoopFilePath)
 
@@ -185,6 +196,18 @@ class DatabaseCreator {
 			}
 
 			this.TyresDatabase.flush()
+		}
+	}
+
+	loadLapTelemetry(simulator, car, track, telemetryFile) {
+		local directory := this.TargetDirectory
+
+		if this.IncludeTelemetries {
+			updateProgress("Telemetries: " . simulator . " / " . car . " / " . track . "...")
+
+			DirCreate(directory . "Community\" . simulator . "\" . car . "\" . track . "\Lap Telemetries")
+
+			FileCopy(telemetryFile, directory . "Community\" . simulator . "\" . car . "\" . track . "\Lap Telemetries", 1)
 		}
 	}
 
@@ -292,21 +315,59 @@ createDatabases(inputDirectory, outputDirectory) {
 
 	updateProgress("Processing [Pressures]...")
 
-	DatabaseCreator(inputDirectory, outputDirectory . "Pressures\", true, false, false).createDatabase()
+	DatabaseCreator(inputDirectory, outputDirectory . "Pressures\", true, false, false, false).createDatabase()
 
 	updateProgress("Processing [Setups]...")
 
-	DatabaseCreator(inputDirectory, outputDirectory . "Setups\", false, true, false).createDatabase()
+	DatabaseCreator(inputDirectory, outputDirectory . "Setups\", false, true, false, false).createDatabase()
 
 	updateProgress("Processing [Strategies]...")
 
-	DatabaseCreator(inputDirectory, outputDirectory . "Strategies\", false, false, true).createDatabase()
+	DatabaseCreator(inputDirectory, outputDirectory . "Strategies\", false, false, true, false).createDatabase()
+
+	updateProgress("Processing [Telemetries]...")
+
+	DatabaseCreator(inputDirectory, outputDirectory . "Telemetries\", false, false, false, true).createDatabase()
+
+	for strategiesLabel, strategiesEnabled in Map("Strategies", true, "No Strategies", false)
+		for setupsLabel, setupsEnabled in Map("Setups", true, "No Setups", false)
+			for pressuresLabel, pressuresEnabled in Map("Pressures", true, "No Pressures", false)
+				for telemetriesLabel, telemetriesEnabled in Map("Telemetries", true, "No Telemetries", false)
+					if (pressuresEnabled || setupsEnabled || strategiesEnabled || telemetriesEnabled) {
+						updateProgress("Assembling [" . strategiesLabel . " | " . setupsLabel . " | " . pressuresLabel . " | " . telemetriesLabel . "]...")
+
+						type := (pressuresEnabled . setupsEnabled . strategiesEnabled . telemetriesEnabled)
+
+						database := (outputDirectory . type . "." . version1 . "." . version2)
+
+						if pressuresEnabled
+							if FileExist(outputDirectory . pressuresLabel)
+								DirCopy(outputDirectory . pressuresLabel, database, 1)
+
+						if setupsEnabled
+							if FileExist(outputDirectory . setupsLabel)
+								DirCopy(outputDirectory . setupsLabel, database, 1)
+
+						if strategiesEnabled
+							if FileExist(outputDirectory . strategiesLabel)
+								DirCopy(outputDirectory . strategiesLabel, database, 1)
+
+						if telemetriesEnabled
+							if FileExist(outputDirectory . telemetriesLabel)
+								DirCopy(outputDirectory . telemetriesLabel, database, 1)
+
+						RunWait("PowerShell.exe -Command Compress-Archive -LiteralPath '" . database . "\Community' -CompressionLevel Optimal -DestinationPath '" . database . ".zip'", , "Hide")
+
+						if FileExist(database . ".zip")
+							archives.Push(database . ".zip")
+					}
 
 	for strategiesLabel, strategiesEnabled in Map("Strategies", true, "No Strategies", false)
 		for setupsLabel, setupsEnabled in Map("Setups", true, "No Setups", false)
 			for pressuresLabel, pressuresEnabled in Map("Pressures", true, "No Pressures", false)
 				if (pressuresEnabled || setupsEnabled || strategiesEnabled) {
 					updateProgress("Assembling [" . strategiesLabel . " | " . setupsLabel . " | " . pressuresLabel . "]...")
+
 
 					type := (pressuresEnabled . setupsEnabled . strategiesEnabled)
 
@@ -325,6 +386,8 @@ createDatabases(inputDirectory, outputDirectory) {
 							DirCopy(outputDirectory . strategiesLabel, database, 1)
 
 					RunWait("PowerShell.exe -Command Compress-Archive -LiteralPath '" . database . "\Community' -CompressionLevel Optimal -DestinationPath '" . database . ".zip'", , "Hide")
+
+
 
 					if FileExist(database . ".zip")
 						archives.Push(database . ".zip")

@@ -25,8 +25,9 @@
 ;;;-------------------------------------------------------------------------;;;
 
 browseLapTelemetries(ownerOrCommand := false, arguments*) {
-	local x, y, names, infos, index, name, dirName, driverName
+	local x, y, names, ignore, infos, index, name, dirName, driverName
 	local carNames, trackNames, newSimulator, newCar, newTrack, force
+	local userTelemetries, communityTelemetries, info
 
 	static sessionDB := false
 
@@ -155,26 +156,34 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 			if track {
 				browserGui["trackDropDown"].Choose(inList(tracks, track))
 
-				sessionDB.getTelemetries(simulator, car, track, &names, &infos := true)
+				sessionDB.getTelemetryNames(simulator, car, track, &userTelemetries := true
+																 , &communityTelemetries := sessionDB.UseCommunity)
 
-				for index, name in names {
-					if getMultiMapValue(infos[index], "Telemetry", "Driver", false)
-						driverName := SessionDatabase.getDriverName(simulator, getMultiMapValue(infos[index], "Telemetry", "Driver"))
+				for ignore, name in userTelemetries {
+					info := sessionDB.readTelemetryInfo(simulator, car, track, name)
+
+					if getMultiMapValue(info, "Telemetry", "Driver", false)
+						driverName := SessionDatabase.getDriverName(simulator, getMultiMapValue(info, "Telemetry", "Driver"))
 					else
 						driverName := false
 
 					if !driverName
-						driverName := getMultiMapValue(infos[index], "Telemetry", "Driver")
+						driverName := getMultiMapValue(info, "Telemetry", "Driver")
 
 					if !driverName
 						driverName := SessionDatabase.getUserName()
 
 					browserGui["telemetryListView"].Add("", name, driverName
-														  , FormatTime(getMultiMapValue(infos[index], "Telemetry", "Date"), "ShortDate") . translate(" - ")
-														  . FormatTime(getMultiMapValue(infos[index], "Telemetry", "Date"), "Time"))
+														  , FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "ShortDate") . translate(" - ")
+														  . FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "Time"))
 				}
 
-				if (names.Length > 1)
+				if sessionDB.UseCommunity
+					for ignore, name in communityTelemetries
+						if !inList(userTelemetries, name)
+							browserGui["telemetryListView"].Add("", name, translate("Community"), translate("-"))
+
+				if (browserGui["telemetryListView"].GetCount() > 1)
 					browserGui["telemetryListView"].Modify(1, "Select +Vis")
 
 				browserGui["telemetryListView"].ModifyCol()
@@ -252,8 +261,13 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 						%arguments[2]% := car
 						%arguments[3]% := track
 
-						return (sessionDB.getTelemetryDirectory(simulator, car, track)
-							  . browserGui["telemetryListView"].GetText(index) . ".telemetry")
+						if FileExist(sessionDB.getTelemetryDirectory(simulator, car, track, "User")
+								   . browserGui["telemetryListView"].GetText(index) . ".telemetry")
+							return (sessionDB.getTelemetryDirectory(simulator, car, track, "User")
+								  . browserGui["telemetryListView"].GetText(index) . ".telemetry")
+						else
+							return (sessionDB.getTelemetryDirectory(simulator, car, track, "Community")
+								  . browserGui["telemetryListView"].GetText(index) . ".telemetry")
 					}
 					else
 						return false

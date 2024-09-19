@@ -2,7 +2,7 @@
 Version=5.9.0.0-beta
 Target=5.9.0.0-release
 Date=09/19/2024
-Download=
+Download=https://www.dropbox.com/scl/fi/7pdyqohe1uv4p23ww5fg7/Simulator-Controller-5.9.0.0-beta.zip?rlkey=p8gq0yth8kc7m5vbvq681ubj2&st=0dlfttgo&dl=1
 Changes=Fixed lap times and sector times in RaceRoom Racing Experience, Removed brake ducts for R3E from "Setup Workbench", New browser for real time car telemetry, Updated "Light" theme colors, Telemetry laps can be stored in the session database
 Components=Media->5.6.1,Configuration->5.8.6,Utilities->5.4.8
 [Release]

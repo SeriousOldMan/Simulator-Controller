@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.9.0.0-beta]() (Test build for 5.9.0. Changes: Fixed lap times and sector times in RaceRoom Racing Experience, Removed brake ducts for R3E from "Setup Workbench", New browser for real time car telemetry, Updated "Light" theme colors, Telemetry laps can be stored in the session database.)
+[5.9.0.0-beta](https://www.dropbox.com/scl/fi/7pdyqohe1uv4p23ww5fg7/Simulator-Controller-5.9.0.0-beta.zip?rlkey=p8gq0yth8kc7m5vbvq681ubj2&st=0dlfttgo&dl=1) (Test build for 5.9.0. Changes: Fixed lap times and sector times in RaceRoom Racing Experience, Removed brake ducts for R3E from "Setup Workbench", New browser for real time car telemetry, Updated "Light" theme colors, Telemetry laps can be stored in the session database.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-590) of this version and all the versions you might have skipped, before installing and using this version.
 

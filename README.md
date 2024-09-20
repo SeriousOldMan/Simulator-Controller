@@ -37,21 +37,19 @@ Here is a short video which shows how to configure Simulator Controller for the 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[5.8.7.0-release](https://cutt.ly/SeRW3xBl) (Changes: Fixed pitstop request for AMS2, Fixed valid lap handling in RaceRoom Racing Experience, Fixed extension for session saving "Solo Center" and "Team Center", Fixed muted mode of the Assistants, Muted support for Assistant.Speak, Fixed remaining session time for R3E, Better handling of database concurrent access, "Strategy Workbench" remembers selected data type.)
+[5.9.0.0-release](https://cutt.ly/0eYe5aUs) (Changes: Fixed lap times and sector times in RaceRoom Racing Experience, Removed brake ducts for R3E from "Setup Workbench", New browser for real time car telemetry, Updated "Light" theme colors, Telemetry laps can be stored in the session database.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-587) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-590) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[5.8.6.0-release](https://cutt.ly/5eWZoqvn) (Changes: Fixed live graph redrawing in "Solo Center", Fixed tyre laps handling in "Solo Center", Fixed Spotter to give opponent lap times again, Fixed error reporting for missing SoX and NirCmd, New version of local LLM runtime, New LLM event for Race Spotter, Fixed tooltip timeouts in "Simlator Startup", "Solo Center" filters laps without telemetry data, Renamed "Practice Center" to "Solo Center", Renamed "Race Center" to "Team Center", Fixed end of race detection for races with fixed laps in R3E.)
+[5.8.7.0-release](https://cutt.ly/SeRW3xBl) (Changes: Fixed pitstop request for AMS2, Fixed valid lap handling in RaceRoom Racing Experience, Fixed extension for session saving "Solo Center" and "Team Center", Fixed muted mode of the Assistants, Muted support for Assistant.Speak, Fixed remaining session time for R3E, Better handling of database concurrent access, "Strategy Workbench" remembers selected data type.)
 
-[5.8.5.0-release](https://cutt.ly/4eQe6qop) (Changes: Optimized handling of unidentified tyre sets (like Wets) in the "Solo Center", Fixed weather related tyre change handling of Engineer and Strategist, External report windows for "Solo Center", Extensions folder for Assistant rules, Potentially fixed a bug with corrupt driver names in AMS2 and PCARS 2, Resizeable window for team manager in "Simulator Setup", Removed minimize control for modal windows, New LLM event for opponents pitting, LLM events can be raised for other Assistants, Extended LLM action "update_strategy" for the Strategist, Fixed session loading in "Team Center Lite".)
+[5.8.6.0-release](https://cutt.ly/5eWZoqvn) (Changes: Fixed live graph redrawing in "Solo Center", Fixed tyre laps handling in "Solo Center", Fixed Spotter to give opponent lap times again, Fixed error reporting for missing SoX and NirCmd, New version of local LLM runtime, New LLM event for Race Spotter, Fixed tooltip timeouts in "Simlator Startup", "Solo Center" filters laps without telemetry data, Renamed "Practice Center" to "Solo Center", Renamed "Race Center" to "Team Center", Fixed end of race detection for races with fixed laps in R3E.)
 
 #### Latest development build
 
-[5.9.0.0-beta](https://www.dropbox.com/scl/fi/7pdyqohe1uv4p23ww5fg7/Simulator-Controller-5.9.0.0-beta.zip?rlkey=p8gq0yth8kc7m5vbvq681ubj2&st=0dlfttgo&dl=1) (Test build for 5.9.0. Changes: Fixed lap times and sector times in RaceRoom Racing Experience, Removed brake ducts for R3E from "Setup Workbench", New browser for real time car telemetry, Updated "Light" theme colors, Telemetry laps can be stored in the session database.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-590) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 

@@ -10,9 +10,8 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\..\Libraries\HTMLViewer.ahk"
-#Include "..\..\Database\Libraries\SessionDatabase.ahk"
-#Include "..\..\Database\Libraries\SessionDatabaseBrowser.ahk"
-#Include "RaceReportViewer.ahk"
+#Include "SessionDatabase.ahk"
+#Include "SessionDatabaseBrowser.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -479,8 +478,6 @@ class TelemetryBrowser {
 		this.iManager := manager
 		this.iTelemetryDirectory := (normalizeDirectoryPath(directory) . "\")
 
-		this.loadTelemetry()
-
 		if collect
 			OnExit(ObjBindMethod(this, "shutdownTelemetryCollector", true))
 	}
@@ -533,7 +530,7 @@ class TelemetryBrowser {
 		}
 
 		deleteLap(*) {
-			local all := GetKeyState("Ctrl")
+			local all := (!this.ReadOnly && GetKeyState("Ctrl"))
 			local msgResult
 
 			if this.SelectedLap {
@@ -623,6 +620,8 @@ class TelemetryBrowser {
 		if getWindowSize("Telemetry Browser", &w, &h)
 			this.Window.Resize("Initialize", w, h)
 
+		this.loadTelemetry()
+
 		this.updateTelemetryChart(true)
 	}
 
@@ -693,26 +692,28 @@ class TelemetryBrowser {
 		this.loadTelemetry()
 	}
 
-	loadLap() {
+	loadLap(fileName := false) {
 		local name := false
 		local telemetry := false
 		local info := false
 		local simulator, car, track
-		local sessionDB, directory, fileName, dataFile, file, size, lap
+		local sessionDB, directory, dataFile, file, size, lap
 
 		this.Manager.getSessionInformation(&simulator, &car, &track)
 
-		this.Window.Opt("+OwnDialogs")
-
 		sessionDB := SessionDatabase()
 
-		this.Window.Block()
+		if !fileName {
+			this.Window.Opt("+OwnDialogs")
 
-		try {
-			fileName := browseLapTelemetries(this.Window, &simulator, &car, &track)
-		}
-		finally {
-			this.Window.Unblock()
+			this.Window.Block()
+
+			try {
+				fileName := browseLapTelemetries(this.Window, &simulator, &car, &track)
+			}
+			finally {
+				this.Window.Unblock()
+			}
 		}
 
 		if (fileName && (fileName != "")) {
@@ -997,10 +998,14 @@ class TelemetryBrowser {
 		local driver, lapTime, sectorTimes
 
 		lapTimeDisplayValue(lapTime) {
+			local seconds, fraction, minutes
+
 			if ((lapTime = "-") || isNull(lapTime))
 				return "-"
+			else if isNumber(lapTime)
+				return displayValue("Time", lapTime)
 			else
-				return RaceReportViewer.lapTimeDisplayValue(lapTime)
+				return lapTime
 		}
 
 		if isNumber(lap) {

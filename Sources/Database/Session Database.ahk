@@ -39,6 +39,7 @@
 #Include "Libraries\TelemetryDatabase.ahk"
 #Include "Libraries\TyresDatabase.ahk"
 #Include "Libraries\PressuresEditor.ahk"
+#Include "Libraries\TelemetryBrowser.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -109,6 +110,29 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	iSettings := []
 
 	iSelectedValue := false
+
+	class TelemetryManager {
+		iSessionDatabase := false
+
+		__New(sessionDatabase) {
+			this.iSessionDatabase := sessionDatabase
+		}
+
+		closedTelemetryBrowser() {
+		}
+
+		getSessionInformation(&simulator, &car, &track) {
+			simulator := this.iSessionDatabase.SelectedSimulator
+			car := this.iSessionDatabase.SelectedCar
+			track := this.iSessionDatabase.SelectedTrack
+		}
+
+		getLapInformation(lapNumber, &driver, &lapTime, &sectorTimes) {
+			driver := "John Doe (JD)"
+			lapTime := "-"
+			sectorTimes := ["-"]
+		}
+	}
 
 	class EditorTyresDatabase extends TyresDatabase {
 		__New(controllerState := false) {
@@ -768,6 +792,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		chooseTelemetry(listView, line, *) {
 			if line
 				SessionDatabaseEditor.Instance.selectTelemetry(line)
+			else
+				editor.updateState()
+		}
+
+		openTelemetry(listView, line, *) {
+			if line
+				SessionDatabaseEditor.Instance.selectTelemetry(line, true)
 			else
 				editor.updateState()
 		}
@@ -1519,7 +1550,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		this.iTelemetryListView := editorGui.Add("ListView", "x296 ys w360 h433 H:Grow W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
 		this.iTelemetryListView.OnEvent("Click", chooseTelemetry)
-		this.iTelemetryListView.OnEvent("DoubleClick", chooseTelemetry)
+		this.iTelemetryListView.OnEvent("DoubleClick", openTelemetry)
 		this.iTelemetryListView.OnEvent("ItemSelect", navTelemetry)
 
 		editorGui.Add("Button", "xp+260 yp+440 w23 h23 X:Move Y:Move vuploadTelemetryButton").OnEvent("Click", uploadTelemetry)
@@ -5055,11 +5086,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			  . name . "." . StrLower(type), kBinariesDirectory)
 	}
 
-	selectTelemetry(row) {
+	selectTelemetry(row, open := false) {
 		local window := this.Window
 		local name := this.TelemetryListView.GetText(row, 2)
 		local info := this.SessionDatabase.readTelemetryInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name)
-		local fileName
+		local browser, telemetryData, size
 
 		if (info && getMultiMapValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID) {
 			window["shareTelemetryWithCommunityCheck"].Value := getMultiMapValue(info, "Access", "Share", false)
@@ -5071,6 +5102,32 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		this.updateState()
+
+		if open {
+			telemetryData := this.SessionDatabase.readTelemetry(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name, &size)
+
+			DirCreate(kTempDirectory . "Telemetry")
+
+			deleteDirectory(kTempDirectory . "Telemetry", false, false)
+
+			DirCreate(kTempDirectory . "Telemetry\Import")
+
+			fileName := (kTempDirectory . "Telemetry\Import\" . name . ".telemetry")
+
+			file := FileOpen(fileName, "w", "")
+
+			if file {
+				file.RawWrite(telemetryData, size)
+
+				file.Close()
+			}
+
+			browser := TelemetryBrowser(SessionDatabaseEditor.TelemetryManager(this), kTempDirectory . "Telemetry", false)
+
+			browser.loadLap(fileName)
+
+			browser.show()
+		}
 	}
 
 	selectStrategy(row, open := false) {

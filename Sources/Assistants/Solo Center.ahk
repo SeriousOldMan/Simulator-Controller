@@ -40,8 +40,8 @@
 #Include "..\Database\Libraries\SettingsDatabase.ahk"
 #Include "..\Database\Libraries\TyresDatabase.ahk"
 #Include "..\Database\Libraries\TelemetryDatabase.ahk"
+#Include "..\Database\Libraries\TelemetryBrowser.ahk"
 #Include "Libraries\RaceReportViewer.ahk"
-#Include "Libraries\TelemetryBrowser.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1866,10 +1866,6 @@ class SoloCenter extends ConfigurationItem {
 			this.initializeSession()
 
 		this.updateState()
-	}
-
-	getSimulator() {
-		return this.Simulator
 	}
 
 	openTelemetryBrowser() {

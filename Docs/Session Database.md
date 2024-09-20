@@ -98,6 +98,12 @@ Telemetry data for individual laps can be stored in the session database, for ex
 
 You can use the buttons below the list to upload, download, rename or delete lap telemetry data, but in most cases you will use the ["Solo Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center) to record the telemetry data and store it in the database. Once you have selected telemetry data in the list above, you can decide whether you want to share it potentially with the community (if you have given consent to share telemetry data - see the information about community data at the end of this chapter) and/or whether you want to synchronize the lap telemetry with any of the [connected Team Servers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration) (see below).
 
+If a lap is double clicked, the Telemetry Browser will open up and let you examine the given telemetry data. The Telemetry Browser is also available in the "Solo Center" or the "Team Center", where the telemetry is recorded.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Telemetry%20Browser.JPG)
+
+You can load additional laps from the session database or any other location for comparison using the small button with the "Folder" icon. Please note, that deleting a lap from the Telemetry Browser using the *delete* button (the one with the "-" icon) will not remove it from its original location.
+
 #### Strategies
 
 This tab shows you a list of race stratagies, which are stored in the database. Note: Race strategies can be created and stored in the session database using the ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench).

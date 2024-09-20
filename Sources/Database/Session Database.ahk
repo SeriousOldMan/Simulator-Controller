@@ -118,7 +118,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.iSessionDatabase := sessionDatabase
 		}
 
-		closedTelemetryBrowser() {
+		closedTelemetryViewer() {
 		}
 
 		getSessionInformation(&simulator, &car, &track) {
@@ -5090,7 +5090,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local window := this.Window
 		local name := this.TelemetryListView.GetText(row, 2)
 		local info := this.SessionDatabase.readTelemetryInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name)
-		local browser, telemetryData, size
+		local viewer, telemetryData, size
 
 		if (info && getMultiMapValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID) {
 			window["shareTelemetryWithCommunityCheck"].Value := getMultiMapValue(info, "Access", "Share", false)
@@ -5122,11 +5122,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				file.Close()
 			}
 
-			browser := TelemetryBrowser(SessionDatabaseEditor.TelemetryManager(this), kTempDirectory . "Telemetry", false)
+			viewer := TelemetryViewer(SessionDatabaseEditor.TelemetryManager(this), kTempDirectory . "Telemetry", false)
 
-			browser.loadLap(fileName)
+			viewer.loadLap(fileName)
 
-			browser.show()
+			viewer.show()
 		}
 	}
 

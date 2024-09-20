@@ -39,7 +39,7 @@
 #Include "Libraries\TelemetryDatabase.ahk"
 #Include "Libraries\TyresDatabase.ahk"
 #Include "Libraries\PressuresEditor.ahk"
-#Include "Libraries\TelemetryBrowser.ahk"
+#Include "Libraries\TelemetryViewer.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

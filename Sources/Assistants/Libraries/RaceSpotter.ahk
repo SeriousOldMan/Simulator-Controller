@@ -3179,9 +3179,9 @@ class RaceSpotter extends GridRaceAssistant {
 		if pid {
 			ProcessClose(pid)
 
-			Sleep(500)
-
 			if (force && ProcessExist(pid)) {
+				Sleep(500)
+			
 				tries := 5
 
 				while (tries-- > 0) {

@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Telemetry Browser               ;;;
+;;;   Modular Simulator Controller System - Telemetry Viewer                ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
@@ -306,11 +306,120 @@ class TelemetryChart {
 	}
 }
 
-class TelemetryBrowser {
-	iManager := false
+class TelemetryCollector {
+	iSimulator := false
+	iTrackLength := false
 
 	iTelemetryDirectory := false
 	iTelemetryCollectorPID := false
+
+	Simulator {
+		Get {
+			return this.iSimulator
+		}
+	}
+
+	TrackLength {
+		Get {
+			return this.iTrackLength
+		}
+	}
+
+	TelemetryDirectory {
+		Get {
+			return this.iTelemetryDirectory
+		}
+	}
+
+	__New(telemetryDirectory, simulator, trackLength) {
+		this.iTelemetryDirectory := telemetryDirectory
+
+		OnExit(ObjBindMethod(this, "shutdown", true))
+	}
+
+	startup(force := false) {
+		local code, exePath, pid
+
+		if (this.iTelemetryCollectorPID && force)
+			this.shutdown(true)
+
+		if !this.iTelemetryCollectorPID {
+			code := SessionDatabase.getSimulatorCode(this.iSimulator)
+			exePath := (kBinariesDirectory . "Providers\" . code . " SHM Spotter.exe")
+			pid := false
+
+			try {
+				if !FileExist(exePath)
+					throw "File not found..."
+
+				Run("`"" . exePath . "`" -Telemetry " . this.iTrackLength . " `"" . normalizeDirectoryPath(this.TelemetryDirectory) . "`""
+				  , kBinariesDirectory, "Hide", &pid)
+			}
+			catch Any as exception {
+				logError(exception, true)
+
+				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
+														   , {simulator: code, protocol: "SHM"})
+									   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+									   . kBinariesDirectory . translate(")"))
+
+				showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
+											  , {exePath: exePath, simulator: code, protocol: "SHM"})
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			}
+
+			if pid {
+				this.iTelemetryCollectorPID := pid
+
+				return true
+			}
+			else
+				return false
+		}
+		else
+			return true
+	}
+
+	shutdown(force := false, arguments*) {
+		local pid := this.iTelemetryCollectorPID
+		local tries
+
+		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
+			return false
+
+		if pid {
+			ProcessClose(pid)
+
+			if (force && ProcessExist(pid)) {
+				Sleep(500)
+
+				tries := 5
+
+				while (tries-- > 0) {
+					pid := ProcessExist(pid)
+
+					if pid {
+						ProcessClose(pid)
+
+						Sleep(500)
+					}
+					else
+						break
+				}
+			}
+
+			this.iTelemetryCollectorPID := false
+		}
+
+		return false
+	}
+}
+
+class TelemetryViewer {
+	iManager := false
+
+	iTelemetryDirectory := false
+	iTelemetryCollector := false
 
 	iWindow := false
 
@@ -324,26 +433,28 @@ class TelemetryBrowser {
 
 	iCollectorTask := false
 
-	class TelemetryBrowserWindow extends Window {
-		iBrowser := false
+	iCollect := false
 
-		__New(browser, arguments*) {
-			this.iBrowser := browser
+	class TelemetryViewerWindow extends Window {
+		iViewer := false
+
+		__New(viewer, arguments*) {
+			this.iViewer := viewer
 
 			super.__New(arguments*)
 		}
 
 		Close(*) {
-			this.iBrowser.Close()
+			this.iViewer.Close()
 		}
 	}
 
-	class TelemetryBrowserResizer extends Window.Resizer {
-		iTelemetryBrowser := false
+	class TelemetryViewerResizer extends Window.Resizer {
+		iTelemetryViewer := false
 		iRedraw := false
 
-		__New(telemetryBrowser, arguments*) {
-			this.iTelemetryBrowser := telemetryBrowser
+		__New(telemetryViewer, arguments*) {
+			this.iTelemetryViewer := telemetryViewer
 
 			super.__New(arguments*)
 
@@ -365,9 +476,9 @@ class TelemetryBrowser {
 
 					this.iRedraw := false
 
-					this.iTelemetryBrowser.TelemetryChart.TelemetryViewer.Resized()
+					this.iTelemetryViewer.TelemetryChart.TelemetryViewer.Resized()
 
-					Task.startTask(ObjBindMethod(this.iTelemetryBrowser, "updateTelemetryChart", true))
+					Task.startTask(ObjBindMethod(this.iTelemetryViewer, "updateTelemetryChart", true))
 				}
 				catch Any as exception {
 					logError(exception)
@@ -389,6 +500,12 @@ class TelemetryBrowser {
 	TelemetryDirectory {
 		Get {
 			return this.iTelemetryDirectory
+		}
+	}
+
+	TelemetryCollector {
+		Get {
+			return this.iTelemetryCollector
 		}
 	}
 
@@ -474,33 +591,38 @@ class TelemetryBrowser {
 		}
 	}
 
+	Collect {
+		Get {
+			return this.iCollect
+		}
+	}
+
 	__New(manager, directory, collect := true) {
 		this.iManager := manager
 		this.iTelemetryDirectory := (normalizeDirectoryPath(directory) . "\")
 
-		if collect
-			OnExit(ObjBindMethod(this, "shutdownTelemetryCollector", true))
+		this.iCollect := collect
 	}
 
 	createGui() {
-		local browserGui := TelemetryBrowser.TelemetryBrowserWindow(this, {Descriptor: "Telemetry Browser", Closeable: true, Resizeable:  "Deferred"})
-		local telemetryViewer
+		local viewerGui := TelemetryViewer.TelemetryViewerWindow(this, {Descriptor: "Telemetry Browser", Closeable: true, Resizeable:  "Deferred"})
+		local viewerControl
 
 		changeZoom(*) {
-			this.TelemetryChart.Zoom := browserGui["zoomSlider"].Value
+			this.TelemetryChart.Zoom := viewerGui["zoomSlider"].Value
 
 			this.updateTelemetryChart(true)
 		}
 
 		chooseLap(*) {
-			local lap := browserGui["lapDropDown"].Text
+			local lap := viewerGui["lapDropDown"].Text
 			local chosen
 
 			if (lap != translate("---------------------------------------------") . translate("---------------------------------------------"))
-				if (browserGui["lapDropDown"].Value <= this.Laps.Length)
+				if (viewerGui["lapDropDown"].Value <= this.Laps.Length)
 					this.selectLap(string2Values(":", lap)[1])
 				else {
-					chosen := browserGui["lapDropDown"].Value
+					chosen := viewerGui["lapDropDown"].Value
 
 					if (this.Laps.Length > 0)
 						chosen -= (this.Laps.Length + 1)
@@ -510,8 +632,8 @@ class TelemetryBrowser {
 		}
 
 		chooseReferenceLap(*) {
-			local chosen := browserGui["referenceLapDropDown"].Value
-			local lap := browserGui["referenceLapDropDown"].Text
+			local chosen := viewerGui["referenceLapDropDown"].Value
+			local lap := viewerGui["referenceLapDropDown"].Text
 
 			if (chosen = 1)
 				this.selectReferenceLap(false)
@@ -560,46 +682,46 @@ class TelemetryBrowser {
 			this.saveLap()
 		}
 
-		this.iWindow := browserGui
+		this.iWindow := viewerGui
 
-		browserGui.SetFont("s10 Bold", "Arial")
+		viewerGui.SetFont("s10 Bold", "Arial")
 
-		browserGui.Add("Text", "w656 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(browserGui, "Telemetry Browser"))
+		viewerGui.Add("Text", "w656 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(viewerGui, "Telemetry Browser"))
 
-		browserGui.SetFont("s9 Norm", "Arial")
+		viewerGui.SetFont("s9 Norm", "Arial")
 
-		browserGui.Add("Documentation", "x176 YP+20 w336 H:Center Center", translate("Telemetry Browser")
+		viewerGui.Add("Documentation", "x176 YP+20 w336 H:Center Center", translate("Telemetry Browser")
 					 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#Telemetry-Browser")
 
-		browserGui.Add("Text", "x8 yp+30 w656 W:Grow 0x10")
+		viewerGui.Add("Text", "x8 yp+30 w656 W:Grow 0x10")
 
-		browserGui.SetFont("s8 Norm", "Arial")
+		viewerGui.SetFont("s8 Norm", "Arial")
 
-		browserGui.Add("Text", "x16 yp+10 w80", translate("Lap"))
-		browserGui.Add("DropDownList", "x98 yp-4 w280 vlapDropDown", collect(this.Laps, (l) => this.lapLabel(l))).OnEvent("Change", chooseLap)
+		viewerGui.Add("Text", "x16 yp+10 w80", translate("Lap"))
+		viewerGui.Add("DropDownList", "x98 yp-4 w280 vlapDropDown", collect(this.Laps, (l) => this.lapLabel(l))).OnEvent("Change", chooseLap)
 
-		browserGui.Add("Button", "x380 yp w23 h23 Center +0x200 Disabled vloadButton").OnEvent("Click", loadLap)
-		setButtonIcon(browserGui["loadButton"], kIconsDirectory . "Load.ico", 1, "L4 T4 R4 B4")
-		browserGui.Add("Button", "x404 yp w23 h23 Center +0x200 Disabled vsaveButton").OnEvent("Click", saveLap)
-		setButtonIcon(browserGui["saveButton"], kIconsDirectory . "Save.ico", 1, "L4 T4 R4 B4")
-		browserGui.Add("Button", "x430 yp w23 h23 Center +0x200 vdeleteButton").OnEvent("Click", deleteLap)
-		setButtonIcon(browserGui["deleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+		viewerGui.Add("Button", "x380 yp w23 h23 Center +0x200 Disabled vloadButton").OnEvent("Click", loadLap)
+		setButtonIcon(viewerGui["loadButton"], kIconsDirectory . "Load.ico", 1, "L4 T4 R4 B4")
+		viewerGui.Add("Button", "x404 yp w23 h23 Center +0x200 Disabled vsaveButton").OnEvent("Click", saveLap)
+		setButtonIcon(viewerGui["saveButton"], kIconsDirectory . "Save.ico", 1, "L4 T4 R4 B4")
+		viewerGui.Add("Button", "x430 yp w23 h23 Center +0x200 vdeleteButton").OnEvent("Click", deleteLap)
+		setButtonIcon(viewerGui["deleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
-		browserGui.Add("Text", "x16 yp+28 w80", translate("Reference"))
-		browserGui.Add("DropDownList", "x98 yp-4 w280 Choose1 vreferenceLapDropDown", concatenate([translate("None")], collect(this.Laps, (l) => this.lapLabel(l)))).OnEvent("Change", chooseReferenceLap)
+		viewerGui.Add("Text", "x16 yp+28 w80", translate("Reference"))
+		viewerGui.Add("DropDownList", "x98 yp-4 w280 Choose1 vreferenceLapDropDown", concatenate([translate("None")], collect(this.Laps, (l) => this.lapLabel(l)))).OnEvent("Change", chooseReferenceLap)
 
-		browserGui.Add("Text", "x468 yp+4 w80 X:Move", translate("Zoom"))
-		browserGui.Add("Slider", "Center Thick15 x556 yp-2 X:Move w100 0x10 Range100-400 ToolTip vzoomSlider", 100).OnEvent("Change", changeZoom)
+		viewerGui.Add("Text", "x468 yp+4 w80 X:Move", translate("Zoom"))
+		viewerGui.Add("Slider", "Center Thick15 x556 yp-2 X:Move w100 0x10 Range100-400 ToolTip vzoomSlider", 100).OnEvent("Change", changeZoom)
 
-		telemetryViewer := browserGui.Add("HTMLViewer", "x16 yp+24 w640 h480 W:Grow H:Grow Border")
+		viewerControl := viewerGui.Add("HTMLViewer", "x16 yp+24 w640 h480 W:Grow H:Grow Border")
 
-		telemetryViewer.document.open()
-		telemetryViewer.document.write("")
-		telemetryViewer.document.close()
+		viewerControl.document.open()
+		viewerControl.document.write("")
+		viewerControl.document.close()
 
-		this.iTelemetryChart := TelemetryChart(browserGui, telemetryViewer)
+		this.iTelemetryChart := TelemetryChart(viewerGui, viewerControl)
 
-		browserGui.Add(TelemetryBrowser.TelemetryBrowserResizer(this, telemetryViewer))
+		viewerGui.Add(TelemetryViewer.TelemetryViewerResizer(this, viewerControl))
 
 		if (this.Laps.Length > 0)
 			this.selectLap(this.Laps[1])
@@ -623,12 +745,27 @@ class TelemetryBrowser {
 		this.loadTelemetry()
 
 		this.updateTelemetryChart(true)
+
+		if this.Collect {
+			if this.iCollectorTask
+				this.iCollectorTask.stop()
+
+			this.iCollectorTask := PeriodicTask(ObjBindMethod(this, "loadTelemetry"), 10000, kLowPriority)
+
+			this.iCollectorTask.start()
+		}
 	}
 
 	close() {
-		this.shutdownTelemetryCollector(true)
+		this.shutdownCollector()
 
-		this.Manager.closedTelemetryBrowser()
+		if this.iCollectorTask {
+			this.iCollectorTask.stop()
+
+			this.iCollectorTask := false
+		}
+
+		this.Manager.closedTelemetryViewer()
 
 		this.Window.Destroy()
 	}
@@ -647,13 +784,20 @@ class TelemetryBrowser {
 			this.Control["saveButton"].Enabled := false
 	}
 
-	startup(simulator, trackLength) {
-		if !this.iTelemetryCollectorPID
-			this.startupTelemetryCollector(simulator, trackLength)
+	startupCollector(simulator, trackLength) {
+		if !this.TelemetryCollector {
+			this.iTelemetryCollector := TelemetryCollector(this.TelemetryDirectory, simulator, trackLength)
+
+			this.iTelemetryCollector.startup()
+		}
 	}
 
-	shutdown() {
-		this.shutdownTelemetryCollector()
+	shutdownCollector() {
+		if this.TelemetryCollector {
+			this.TelemetryCollector.shutdown()
+
+			this.iTelemetryCollector := false
+		}
 	}
 
 	restart(directory, collect := true) {
@@ -913,85 +1057,6 @@ class TelemetryBrowser {
 				this.updateState()
 			}
 		}
-	}
-
-	startupTelemetryCollector(simulator, trackLength) {
-		local code, exePath, pid
-
-		if this.iTelemetryCollectorPID
-			this.shutdownTelemetryCollector(true)
-
-		code := SessionDatabase.getSimulatorCode(simulator)
-		exePath := (kBinariesDirectory . "Providers\" . code . " SHM Spotter.exe")
-		pid := false
-
-		try {
-			if !FileExist(exePath)
-				throw "File not found..."
-
-			Run("`"" . exePath . "`" -Telemetry " . trackLength . " `"" . normalizeDirectoryPath(this.TelemetryDirectory) . "`""
-			  , kBinariesDirectory, "Hide", &pid)
-		}
-		catch Any as exception {
-			logError(exception, true)
-
-			logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
-													   , {simulator: code, protocol: "SHM"})
-								   . exePath . translate(") - please rebuild the applications in the binaries folder (")
-								   . kBinariesDirectory . translate(")"))
-
-			showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
-										  , {exePath: exePath, simulator: code, protocol: "SHM"})
-					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-		}
-
-		if pid {
-			this.iTelemetryCollectorPID := pid
-
-			this.iCollectorTask := PeriodicTask(ObjBindMethod(this, "loadTelemetry"), 10000, kLowPriority)
-
-			this.iCollectorTask.start()
-		}
-	}
-
-	shutdownTelemetryCollector(force := false, arguments*) {
-		local pid := this.iTelemetryCollectorPID
-		local tries
-
-		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
-			return false
-
-		if pid {
-			ProcessClose(pid)
-
-			Sleep(500)
-
-			if (force && ProcessExist(pid)) {
-				tries := 5
-
-				while (tries-- > 0) {
-					pid := ProcessExist(pid)
-
-					if pid {
-						ProcessClose(pid)
-
-						Sleep(500)
-					}
-					else
-						break
-				}
-			}
-
-			this.iTelemetryCollectorPID := false
-
-			if this.iCollectorTask {
-				this.iCollectorTask.stop()
-
-				this.iCollectorTask := false
-			}
-		}
-
-		return false
 	}
 
 	lapLabel(lap) {

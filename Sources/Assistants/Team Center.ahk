@@ -42,6 +42,7 @@
 #Include "..\Database\Libraries\SettingsDatabase.ahk"
 #Include "..\Database\Libraries\TyresDatabase.ahk"
 #Include "..\Database\Libraries\TelemetryDatabase.ahk"
+#Include "..\Database\Libraries\TelemetryCollector.ahk"
 #Include "..\Database\Libraries\TelemetryViewer.ahk"
 #Include "Libraries\RaceReportViewer.ahk"
 #Include "Libraries\Strategy.ahk"

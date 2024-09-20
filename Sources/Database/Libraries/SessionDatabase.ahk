@@ -1739,7 +1739,7 @@ class SessionDatabase extends ConfigurationItem {
 				setMultiMapValue(info, "Session", "Synchronized", false)
 
 				setMultiMapValue(info, "Access", "Share", false)
-				setMultiMapValue(info, "Access", "Synchronize", false)
+				setMultiMapValue(info, "Access", "Synchronize", true)
 
 				writeMultiMap(fileName, info)
 
@@ -1973,7 +1973,7 @@ class SessionDatabase extends ConfigurationItem {
 				setMultiMapValue(info, "Setup", "Synchronized", false)
 
 				setMultiMapValue(info, "Access", "Share", false)
-				setMultiMapValue(info, "Access", "Synchronize", false)
+				setMultiMapValue(info, "Access", "Synchronize", true)
 
 				writeMultiMap(fileName . ".info", info)
 

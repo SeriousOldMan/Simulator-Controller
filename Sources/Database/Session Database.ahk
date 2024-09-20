@@ -5329,7 +5329,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			SplitPath(fileName, &fileName)
 
 			this.SessionDatabase.writeStrategy(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, fileName, strategy
-											 , false, true, this.SessionDatabase.ID)
+											 , true, true, this.SessionDatabase.ID)
 
 			this.loadStrategies(StrReplace(fileName, ".strategy", ""))
 		}

@@ -1457,9 +1457,7 @@ class TeamServerPlugin extends ControllerPlugin {
 					lastLap := newLaps[newLaps.Length]
 
 					for ignore, lap in newLaps {
-						loadedLaps[lap] := true
-
-						if (lap > (lastLap - 4))
+						if (lap > (lastLap - 4)) {
 							try {
 								if !hasTelemetry {
 									hasTelemetry := true
@@ -1468,13 +1466,24 @@ class TeamServerPlugin extends ControllerPlugin {
 								}
 
 								this.setLapValue(lap, "Lap Telemetry", FileRead(this.TelemetryDirectory . "\Lap " . lap . ".telemetry"))
+
+								loadedLaps[lap] := true
 							}
 							catch Any as exception {
 								logError(exception)
 							}
+						}
+						else
+							loadedLaps[lap] := true
 					}
 
-					this.setLapValue(lastLap - 4, "Lap Telemetry", false)
+					try {
+						if (lastLap > 4)
+							this.setLapValue(lastLap - 4, "Lap Telemetry", false)
+					}
+					catch Any as exception {
+						logError(exception)
+					}
 				}
 			}
 		}

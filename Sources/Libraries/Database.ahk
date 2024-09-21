@@ -76,7 +76,7 @@ class Database {
 		Get {
 			local tries := 100
 			local schema, data, row, values, length, ignore, column
-			local file, line
+			local file, line, text
 
 			if name {
 				if !this.iTables.Has(name) {
@@ -89,12 +89,12 @@ class Database {
 						if file {
 							file.Pos := 0
 
-							while !file.AtEOF {
-								line := Trim(file.ReadLine(), " `t`n`r")
+							text := file.Read()
 
+							loop Parse, text, "`n", "`r" {
 								row := Database.Row()
 
-								values := string2Values(";", line)
+								values := string2Values(";", A_LoopField)
 								length := values.Length
 
 								for ignore, column in schema
@@ -109,10 +109,12 @@ class Database {
 						else if FileExist(this.Directory . name . ".CSV")
 							loop {
 								try {
-									loop Read, (this.Directory . name . ".CSV") {
+									text := FileRead(this.Directory . name . ".CSV")
+
+									loop Parse, text, "`n", "`r" {
 										row := Database.Row()
 
-										values := string2Values(";", A_LoopReadLine)
+										values := string2Values(";", A_LoopField)
 										length := values.Length
 
 										for ignore, column in schema

@@ -62,6 +62,8 @@ class TelemetryCollector {
 				if !FileExist(exePath)
 					throw "File not found..."
 
+				DirCreate(this.TelemetryDirectory)
+
 				Run("`"" . exePath . "`" -Telemetry " . this.iTrackLength . " `"" . normalizeDirectoryPath(this.TelemetryDirectory) . "`""
 				  , kBinariesDirectory, "Hide", &pid)
 			}

@@ -543,7 +543,7 @@ class TeamManagementPanel extends ConfiguratorPanel {
 
 		setMultiMapValue(configuration, "Team Server", "Session.Folder", this.Control["sessionStorePathEdit"].Text)
 
-		tsConfiguration := newMultiMap()
+		tsConfiguration := readMultiMap(kUserConfigDirectory . "Team Server.ini")
 
 		setMultiMapValues(tsConfiguration, "Team Server", getMultiMapValues(configuration, "Team Server"))
 

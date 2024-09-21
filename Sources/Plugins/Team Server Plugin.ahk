@@ -1445,7 +1445,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 			if this.SessionActive {
 				loop Files, this.TelemetryDirectory . "\*.telemetry" {
-					lap := StrReplace(StrReplace(, "Lap ", ""), ".telemetry", "")
+					lap := StrReplace(StrReplace(A_LoopFileName, "Lap ", ""), ".telemetry", "")
 
 					if !loadedLaps.Has(lap)
 						newLaps.Push(lap)
@@ -1454,7 +1454,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				if (newLaps.Length > 0) {
 					bubbleSort(&newLaps)
 
-					lastLap := newLaps[newLaps.Length].Nr
+					lastLap := newLaps[newLaps.Length]
 
 					for ignore, lap in newLaps {
 						loadedLaps[lap] := true
@@ -1467,7 +1467,7 @@ class TeamServerPlugin extends ControllerPlugin {
 									this.setSessionValue("HasTelemetry", true)
 								}
 
-								this.setLapValue(lap, "Lap Telemetry", FileRead(this.TelemetryDirectory . "\Lap " . lap . "*.telemetry"))
+								this.setLapValue(lap, "Lap Telemetry", FileRead(this.TelemetryDirectory . "\Lap " . lap . ".telemetry"))
 							}
 							catch Any as exception {
 								logError(exception)
@@ -1486,6 +1486,8 @@ class TeamServerPlugin extends ControllerPlugin {
 			DirCreate(this.TelemetryDirectory)
 
 			this.iTelemetryCollector := TelemetryCollector(this.TelemetryDirectory, this.Simulator, this.TrackLength)
+
+			this.iTelemetryCollector.startup()
 
 			this.iCollectorTask := PeriodicTask(updateTelemetry, 20000, kLowPriority)
 

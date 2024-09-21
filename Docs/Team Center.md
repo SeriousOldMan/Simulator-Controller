@@ -38,7 +38,7 @@ To use the "Team Center", you must have a valid connection to a team session. Th
 
 Once you are connected to an active session on the Team Server, all the data in "Team Center" will be updated every 10 seconds. During this time the user interface is locked to ensure the integrity of the data. This can be somewhat annoying. Therefore you can disable the synchronization temporarily using the corresponding command from the "Session" menu. Furthermore, you can select the update frequency by holding down the control key, when selecting the "Synchronize" menu item.
 
-Using "Collect Telemetry" you can choose whether your lap telemetry data will be collected and will be available to you and your team mates for inspection. See [below](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#Telemetry-Browser) for more information.
+Using "Telemetry" you can choose whether your lap telemetry data will be collected and will be available to you and your team mates for inspection. See [below](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#Telemetry-Browser) for more information.
 
 It can happen that some data is not available when requested by the "Team Center". Most of the time, the data will be available after a few seconds, because it simply wasn't yet ready at he time when it was requested. Therefore, the "Team Center" will be waiting some time when requesting any kind of data. It will eventually give up, if the data is not available at all for some reason, but you can use the Escape key to terminate the waiting prematurely. In general you should do this only, if you are sure that the data is not available at all, for example while the current driver has encountered a disconnection.
 
@@ -164,7 +164,7 @@ A valuable tool to improve your lap times is the integrated Telemetry Browser, w
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Telemetry%20Browser.JPG)
 
-While you are in an active session, lap telemetry data will be collected lap by lap for those drivers that have enabled "Collect Telemetry" in the "Session" menu. The telemetry data for the last few laps will be stored on the Team Server and will be replicated to the currently running "Team Center" for inspection and comparison with other laps.
+While you are in an active session, lap telemetry data will be collected lap by lap for those drivers that have enabled "Telemetry" in the "Session" menu. The telemetry data for the last few laps will be stored on the Team Server and will be replicated to the currently running "Team Center" for inspection and comparison with other laps.
 
 When looking for areas of improvement take a close look to the application of throttle and brakes and the activation of TC and ABS. Trailing off the brakes and the transition back to full throttle is the most important skill to master for fast lap times. This does not mean, that sometimes coasting around a corner is not necessary. Use the Telemetry Browser to compare your laps with the fastest lap of a given session and learn what exactly made you faster there.
 

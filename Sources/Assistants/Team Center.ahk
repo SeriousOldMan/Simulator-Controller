@@ -1002,6 +1002,12 @@ class TeamCenter extends ConfigurationItem {
 		}
 	}
 
+	HasTelemetry {
+		Get {
+			return FileExist(this.SessionDirectory . "Telemetry\*.telemetry")
+		}
+	}
+
 	SetupsVersion {
 		Get {
 			return this.iSetupsVersion
@@ -2559,7 +2565,7 @@ class TeamCenter extends ConfigurationItem {
 			this.iSessionMenu := menu1
 
 			menu1.Add(translate("Synchronize"), (*) => this.chooseSessionMenu(1))
-			menu1.Add(translate("Collect Telemetry"), (*) => this.chooseSessionMenu(2))
+			menu1.Add(translate("Telemetry"), (*) => this.chooseSessionMenu(2))
 
 			menu1.Add()
 
@@ -2904,8 +2910,6 @@ class TeamCenter extends ConfigurationItem {
 		if this.TelemetryViewer
 			WinActivate(this.TelemetryViewer.Window)
 		else if !this.SessionLoaded {
-			deleteDirectory(this.SessionDirectory . "Telemetry")
-
 			DirCreate(this.SessionDirectory . "Telemetry")
 
 			this.iTelemetryViewer := TelemetryViewer(this, this.SessionDirectory . "Telemetry", true)
@@ -3421,7 +3425,7 @@ class TeamCenter extends ConfigurationItem {
 	}
 
 	updateSessionMenu() {
-		local telemetry := ((this.CollectTelemetry ? translate("[x]") : translate("[  ]")) . A_Space . translate("Collect Telemetry"))
+		local telemetry := ((this.CollectTelemetry ? translate("[x]") : translate("[  ]")) . A_Space . translate("Telemetry"))
 		local synchronize := (((this.Synchronize && isNumber(this.Synchronize)) ? translate("[x]") : translate("[  ]")) . A_Space . translate("Synchronize"))
 
 		if (this.Mode = "Normal") {
@@ -3437,9 +3441,9 @@ class TeamCenter extends ConfigurationItem {
 				this.iSessionMenu.Uncheck(translate("Synchronize"))
 
 			if this.CollectTelemetry
-				this.iSessionMenu.Check(translate("Collect Telemetry"))
+				this.iSessionMenu.Check(translate("Telemetry"))
 			else
-				this.iSessionMenu.Uncheck(translate("Collect Telemetry"))
+				this.iSessionMenu.Uncheck(translate("Telemetry"))
 		}
 	}
 
@@ -5061,7 +5065,7 @@ class TeamCenter extends ConfigurationItem {
 						this.iSynchronize := 10
 
 					this.updateState()
-				case 7: ; Collect Telemetry
+				case 7: ; Telemetry
 					this.iCollectTelemetry := !this.CollectTelemetry
 
 					updateTelemetrySetting(this.CollectTelemetry)
@@ -5120,7 +5124,7 @@ class TeamCenter extends ConfigurationItem {
 						this.iSynchronize := 10
 
 					this.updateState()
-				case 2: ; Collect Telemetry
+				case 2: ; Telemetry
 					this.iCollectTelemetry := !this.CollectTelemetry
 
 					updateTelemetrySetting(this.CollectTelemetry)
@@ -6490,6 +6494,9 @@ class TeamCenter extends ConfigurationItem {
 			DirCreate(reportDirectory)
 
 			this.ReportViewer.setReport(reportDirectory)
+
+			if this.CollectTelemetry
+				DirCreate(directory . "Telemetry")
 		}
 
 		pitstopSettings(kClose)
@@ -9377,7 +9384,7 @@ class TeamCenter extends ConfigurationItem {
 										file.Close()
 
 										sessionDB.writeSession(simulator, car, track, "Team", fileName, info, session, size
-															 , false, !FileExist(directory . "Telemetry\*.telemetry"), SessionDatabase.ID)
+															 , false, !this.HasTelemetry, SessionDatabase.ID)
 
 										return
 									}

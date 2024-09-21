@@ -42,6 +42,7 @@
 #Include "..\Database\Libraries\SettingsDatabase.ahk"
 #Include "..\Database\Libraries\TyresDatabase.ahk"
 #Include "..\Database\Libraries\TelemetryDatabase.ahk"
+#Include "..\Database\Libraries\TelemetryViewer.ahk"
 #Include "Libraries\RaceReportViewer.ahk"
 #Include "Libraries\Strategy.ahk"
 #Include "Libraries\StrategyViewer.ahk"
@@ -264,6 +265,7 @@ class TeamCenter extends ConfigurationItem {
 	iSessionName := false
 
 	iSynchronize := 10
+	iCollectTelemetry := false
 
 	iSessionLoaded := false
 	iSessionFinished := false
@@ -347,6 +349,10 @@ class TeamCenter extends ConfigurationItem {
 	iStrategyViewer := false
 
 	iPressuresRequest := false
+
+	iTelemetryViewer := false
+
+	iHasTelemetry := false
 
 	class TeamCenterResizer extends Window.Resizer {
 		iRedraw := false
@@ -966,6 +972,12 @@ class TeamCenter extends ConfigurationItem {
 		}
 	}
 
+	CollectTelemetry {
+		Get {
+			return this.iCollectTelemetry
+		}
+	}
+
 	SessionActive {
 		Get {
 			return (this.Connected && this.SelectedTeam[true] && this.SelectedSession[true])
@@ -1338,8 +1350,13 @@ class TeamCenter extends ConfigurationItem {
 		}
 	}
 
+	TelemetryViewer {
+		Get {
+			return this.iTelemetryViewer
+		}
+	}
+
 	__New(configuration, raceSettings, simulator, car, track, mode := "Normal") {
-		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 		local dllFile
 
 		this.iMode := mode
@@ -1367,15 +1384,6 @@ class TeamCenter extends ConfigurationItem {
 		this.iCar := car
 		this.iTrack := track
 
-		this.iTyrePressureMode := getMultiMapValue(settings, "Team Center", "TyrePressureMode", "Reference")
-		this.iCorrectPressureLoss := getMultiMapValue(settings, "Team Center", "CorrectPressureLoss", false)
-		this.iSelectTyreSet := getMultiMapValue(settings, "Team Center", "SelectTyreSet", true)
-
-		this.iUseSessionData := getMultiMapValue(settings, "Team Center", "UseSessionData", true)
-		this.iUseTelemetryDatabase := getMultiMapValue(settings, "Team Center", "UseTelemetryDatabase", false)
-		this.iUseCurrentMap := getMultiMapValue(settings, "Team Center", "UseCurrentMap", true)
-		this.iUseTraffic := getMultiMapValue(settings, "Team Center", "UseTraffic", false)
-
 		super.__New(configuration)
 
 		TeamCenter.Instance := this
@@ -1384,12 +1392,19 @@ class TeamCenter extends ConfigurationItem {
 	}
 
 	loadFromConfiguration(configuration) {
+		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 		local directory, settings
 
 		super.loadFromConfiguration(configuration)
 
 		if FileExist(kUserConfigDirectory . "Team Server.ini")
 			configuration := readMultiMap(kUserConfigDirectory . "Team Server.ini")
+
+		this.iCollectTelemetry := getMultiMapValue(configuration, "Telemetry", "Collect", false)
+
+		setMultiMapValue(configuration, "Telemetry", "Directory", false)
+
+		writeMultiMap(kUserConfigDirectory . "Team Server.ini", configuration)
 
 		directory := getMultiMapValue(configuration, "Team Server", "Session.Folder", kTempDirectory . "Sessions")
 
@@ -1408,6 +1423,15 @@ class TeamCenter extends ConfigurationItem {
 		this.iTeamIdentifier := getMultiMapValue(settings, "Team Settings", "Team.Identifier", false)
 		this.iSessionName := getMultiMapValue(settings, "Team Settings", "Session.Name", "")
 		this.iSessionIdentifier := getMultiMapValue(settings, "Team Settings", "Session.Identifier", false)
+
+		this.iTyrePressureMode := getMultiMapValue(settings, "Team Center", "TyrePressureMode", "Reference")
+		this.iCorrectPressureLoss := getMultiMapValue(settings, "Team Center", "CorrectPressureLoss", false)
+		this.iSelectTyreSet := getMultiMapValue(settings, "Team Center", "SelectTyreSet", true)
+
+		this.iUseSessionData := getMultiMapValue(settings, "Team Center", "UseSessionData", true)
+		this.iUseTelemetryDatabase := getMultiMapValue(settings, "Team Center", "UseTelemetryDatabase", false)
+		this.iUseCurrentMap := getMultiMapValue(settings, "Team Center", "UseCurrentMap", true)
+		this.iUseTraffic := getMultiMapValue(settings, "Team Center", "UseTraffic", false)
 	}
 
 	createGui(configuration) {
@@ -2535,19 +2559,20 @@ class TeamCenter extends ConfigurationItem {
 			this.iSessionMenu := menu1
 
 			menu1.Add(translate("Synchronize"), (*) => this.chooseSessionMenu(1))
+			menu1.Add(translate("Collect Telemetry"), (*) => this.chooseSessionMenu(2))
 
 			menu1.Add()
 
-			menu1.Add(translate("Update Statistics"), (*) => this.chooseSessionMenu(2))
+			menu1.Add(translate("Update Statistics"), (*) => this.chooseSessionMenu(3))
 
 			menu1.Add()
 
-			menu1.Add(translate("Session Summary") . translate("..."), (*) => this.chooseSessionMenu(3))
-			menu1.Add(translate("Driver Statistics") . translate("..."), (*) => this.chooseSessionMenu(4))
+			menu1.Add(translate("Session Summary") . translate("..."), (*) => this.chooseSessionMenu(4))
+			menu1.Add(translate("Driver Statistics") . translate("..."), (*) => this.chooseSessionMenu(5))
 
 			menu1.Add()
 
-			menu1.Add(translate("Session Information") . translate("..."), (*) => this.chooseSessionMenu(5))
+			menu1.Add(translate("Session Information") . translate("..."), (*) => this.chooseSessionMenu(6))
 
 			menu2 := Menu()
 
@@ -2872,6 +2897,59 @@ class TeamCenter extends ConfigurationItem {
 		if (this.Mode = "Normal") {
 			this.Control["planDriverDropDownMenu"].Delete()
 			this.Control["planDriverDropDownMenu"].Add(concatenate([translate("-")], names))
+		}
+	}
+
+	openTelemetryViewer() {
+		if this.TelemetryViewer
+			WinActivate(this.TelemetryViewer.Window)
+		else if !this.SessionLoaded {
+			deleteDirectory(this.SessionDirectory . "Telemetry")
+
+			DirCreate(this.SessionDirectory . "Telemetry")
+
+			this.iTelemetryViewer := TelemetryViewer(this, this.SessionDirectory . "Telemetry", true)
+
+			this.TelemetryViewer.show()
+		}
+		else if FileExist(this.SessionDirectory . "Telemetry") {
+			this.iTelemetryViewer := TelemetryViewer(this, this.SessionDirectory . "Telemetry", false)
+
+			this.TelemetryViewer.show()
+		}
+		else {
+			OnMessage(0x44, translateOkButton)
+			withBlockedWindows(MsgBox, translate("You are not connected to an active session."), translate("Information"), 262192)
+			OnMessage(0x44, translateOkButton, 0)
+		}
+	}
+
+	closedTelemetryViewer() {
+		this.iTelemetryViewer := false
+	}
+
+	getSessionInformation(&simulator, &car, &track) {
+		simulator := this.Simulator
+		car := this.Car
+		track := this.Track
+	}
+
+	getLapInformation(lapNumber, &driver, &lapTime, &sectorTimes) {
+		local lap
+
+		driver := "John Doe (JD)"
+
+		if this.Laps.Has(lapNumber) {
+			lap := this.Laps[lapNumber]
+
+			driver := lap.Stint.Driver.FullName
+
+			lapTime := lap.LapTime
+			sectorTimes := lap.SectorsTime
+		}
+		else {
+			lapTime := "-"
+			sectorTimes := ["-"]
 		}
 	}
 
@@ -3343,11 +3421,12 @@ class TeamCenter extends ConfigurationItem {
 	}
 
 	updateSessionMenu() {
+		local telemetry := ((this.CollectTelemetry ? translate("[x]") : translate("[  ]")) . A_Space . translate("Collect Telemetry"))
 		local synchronize := (((this.Synchronize && isNumber(this.Synchronize)) ? translate("[x]") : translate("[  ]")) . A_Space . translate("Synchronize"))
 
 		if (this.Mode = "Normal") {
 			this.Control["sessionMenuDropDown"].Delete()
-			this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", "Connect", "Clear...", "---------------------------------------------", synchronize, "---------------------------------------------", "Select Team...", "---------------------------------------------", "Load Session...", "Save Session...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Session Summary", "Driver Statistics"], translate))
+			this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", "Connect", "Clear...", "---------------------------------------------", synchronize, telemetry, "---------------------------------------------", "Select Team...", "---------------------------------------------", "Load Session...", "Save Session...", "---------------------------------------------", "Telemetry...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Session Summary", "Driver Statistics"], translate))
 
 			this.Control["sessionMenuDropDown"].Choose(1)
 		}
@@ -3356,6 +3435,11 @@ class TeamCenter extends ConfigurationItem {
 				this.iSessionMenu.Check(translate("Synchronize"))
 			else
 				this.iSessionMenu.Uncheck(translate("Synchronize"))
+
+			if this.CollectTelemetry
+				this.iSessionMenu.Check(translate("Collect Telemetry"))
+			else
+				this.iSessionMenu.Uncheck(translate("Collect Telemetry"))
 		}
 	}
 
@@ -4909,6 +4993,24 @@ class TeamCenter extends ConfigurationItem {
 			this.iSynchronize := seconds
 		}
 
+		updateSetting(setting, value) {
+			local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+			setMultiMapValue(settings, "Team Center", setting, value)
+
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+		}
+
+		updateTelemetrySetting(enabled) {
+			local configuration := readMultiMap(kUserConfigDirectory . "Team Server.ini")
+
+			setMultiMapValue(configuration, "Telemetry", "Collect", enabled)
+
+			setMultiMapValue(configuration, "Telemetry", "Directory", enabled ? (this.SessionDirectory . "Telemetry") : false)
+
+			writeMultiMap(kUserConfigDirectory . "Team Server.ini", configuration)
+		}
+
 		if (this.Mode = "Normal") {
 			switch line {
 				case 3: ; Connect...
@@ -4959,11 +5061,17 @@ class TeamCenter extends ConfigurationItem {
 						this.iSynchronize := 10
 
 					this.updateState()
-				case 8:
+				case 7: ; Collect Telemetry
+					this.iCollectTelemetry := !this.CollectTelemetry
+
+					updateTelemetrySetting(this.CollectTelemetry)
+
+					this.updateState()
+				case 9:
 					this.manageTeam()
-				case 10: ; Load Session...
+				case 11: ; Load Session...
 					this.loadSession(GetKeyState("Ctrl") ? "Import" : "Browse")
-				case 11: ; Save Session...
+				case 12: ; Save Session...
 					if this.HasData
 						this.saveSession(true)
 					else {
@@ -4971,11 +5079,13 @@ class TeamCenter extends ConfigurationItem {
 						withBlockedWindows(MsgBox, translate("There is no session data to be saved."), translate("Information"), 262192)
 						OnMessage(0x44, translateOkButton, 0)
 					}
-				case 13: ; Update Statistics
+				case 14: ; Telemetry Viewer
+					this.openTelemetryViewer()
+				case 15: ; Update Statistics
 					this.updateStatistics()
-				case 15: ; Race Summary
+				case 18: ; Race Summary
 					this.showSessionSummary()
-				case 16: ; Driver Statistics
+				case 19: ; Driver Statistics
 					this.showDriverStatistics()
 			}
 		}
@@ -5010,13 +5120,19 @@ class TeamCenter extends ConfigurationItem {
 						this.iSynchronize := 10
 
 					this.updateState()
-				case 2: ; Update Statistics
+				case 2: ; Collect Telemetry
+					this.iCollectTelemetry := !this.CollectTelemetry
+
+					updateTelemetrySetting(this.CollectTelemetry)
+
+					this.updateState()
+				case 3: ; Update Statistics
 					this.updateStatistics()
-				case 3: ; Race Summary
+				case 4: ; Race Summary
 					this.showSessionSummary()
-				case 4: ; Driver Statistics
+				case 5: ; Driver Statistics
 					this.showDriverStatistics()
-				case 5: ; Session Information
+				case 6: ; Session Information
 					Run("`"" . kBinariesDirectory . "System Monitor.exe`" -Show Session", kBinariesDirectory)
 			}
 		}
@@ -6349,10 +6465,18 @@ class TeamCenter extends ConfigurationItem {
 	}
 
 	initializeSession() {
-		local directory, reportDirectory
+		local directory, reportDirectory, telemetryDirectory
+
+		this.iHasTelemetry := false
 
 		this.iSessionFinished := false
 		this.iSessionLoaded := false
+
+		if this.TelemetryViewer {
+			this.TelemetryViewer.close()
+
+			this.iTelemetryViewer := false
+		}
 
 		if this.SessionActive {
 			directory := this.SessionDirectory
@@ -6362,8 +6486,6 @@ class TeamCenter extends ConfigurationItem {
 			DirCreate(directory)
 
 			reportDirectory := (directory . "Race Report")
-
-			deleteDirectory(reportDirectory)
 
 			DirCreate(reportDirectory)
 
@@ -7353,6 +7475,37 @@ class TeamCenter extends ConfigurationItem {
 		}
 
 		return false
+	}
+
+	syncCarTelemetry() {
+		local lastLap := this.LastLap
+		local telemetry, fileName, lap
+
+		if (lastLap && (this.iHasTelemetry || this.Connector.GetSessionValue(this.SelectedSession[true], "HasTelemetry"))) {
+			this.iHasTelemetry := true
+
+			loop 2
+				if this.Laps.Has(lastLap.Nr - A_Index + 1) {
+					lap := this.Laps[lastLap.Nr - A_Index + 1]
+
+					fileName := ("Lap " . lap.Nr . ".telemetry")
+
+					if !FileExist(this.SessionDirectory . "Telemetry\" . fileName) {
+						try {
+							telemetry := this.Connector.GetLapValue(lap.Identifier, "Lap Telemetry")
+
+							if (telemetry && (telemetry != "")) {
+								DirCreate(this.SessionDirectory . "Telemetry")
+
+								FileAppend(telemetry, this.SessionDirectory . "Telemetry\" . fileName)
+							}
+						}
+						catch Any as exception {
+							logError(exception)
+						}
+					}
+				}
+		}
 	}
 
 	syncTelemetry(load := false) {
@@ -8387,6 +8540,7 @@ class TeamCenter extends ConfigurationItem {
 		local initial := !this.LastLap
 		local strategy, session, lastLap, simulator, car, track, newLaps, newData, newReports, finished, message, forcePitstopUpdate
 		local selectedLap, selectedStint, currentStint, driverSwapRequest, synchronize, state
+		local teamServerConfig
 
 		static hadLastLap := false
 		static nextPitstopUpdate := false
@@ -8518,11 +8672,26 @@ class TeamCenter extends ConfigurationItem {
 					if newLaps {
 						this.showMessage(translate("Saving session"))
 
+						if this.CollectTelemetry {
+							teamServerConfig := readMultiMap(kUserConfigDirectory . "Team Server.ini")
+
+							if (!getMultiMapValue(teamServerConfig, "Telemetry", "Collect")
+							 || (getMultiMapValue(teamServerConfig, "Telemetry", "Directory") != (this.SessionDirectory . "Telemetry"))) {
+								setMultiMapValue(teamServerConfig, "Telemetry", "Collect", true)
+								setMultiMapValue(teamServerConfig, "Telemetry", "Directory", this.SessionDirectory . "Telemetry")
+
+								writeMultiMap(kUserConfigDirectory . "Team Server.ini", teamServerConfig)
+							}
+						}
+
 						this.syncSessionStore(initial)
 					}
 
-					if (newData || newLaps)
+					if (newData || newLaps) {
+						this.syncCarTelemetry()
+
 						this.updateReports()
+					}
 
 					if newLaps {
 						if (selectedLap && (this.SelectedDetailReport = "Lap")) {
@@ -9157,7 +9326,7 @@ class TeamCenter extends ConfigurationItem {
 				else
 					dirName := ""
 
-				directory := (this.SessionLoaded ? this.SessionLoaded : this.SessionDirectory)
+				directory := this.SessionDirectory
 
 				fileName := (dirName . "\Race " . FormatTime(this.Date, "yyyy-MMM-dd"))
 
@@ -13754,7 +13923,7 @@ startupTeamCenter() {
 		tCenter.show(false, !load)
 
 		if !load
-			tCenter.connect(true)
+			tCenter.connect((tCenter.Mode = "Normal") ? true : false)
 
 		tCenter.startSynchronization()
 

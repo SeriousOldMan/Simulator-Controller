@@ -1757,8 +1757,6 @@ namespace RF2SHMSpotter {
 
                 telemetryFile.Write("n/a;");
                 telemetryFile.WriteLine("n/a");
-
-                telemetryFile.Close();
             }
             catch (Exception)
             {

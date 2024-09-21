@@ -2240,6 +2240,9 @@ int main(int argc, char* argv[])
 				running = true;
 				safety = 200;
 			}
+			
+			if ((gf->status == AC_PAUSE) || (gf->status == AC_REPLAY))
+				running  = false;
 
 			if (running) {
 				if (carTelemetry)

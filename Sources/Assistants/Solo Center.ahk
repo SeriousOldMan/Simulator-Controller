@@ -40,8 +40,8 @@
 #Include "..\Database\Libraries\SettingsDatabase.ahk"
 #Include "..\Database\Libraries\TyresDatabase.ahk"
 #Include "..\Database\Libraries\TelemetryDatabase.ahk"
+#Include "..\Database\Libraries\TelemetryViewer.ahk"
 #Include "Libraries\RaceReportViewer.ahk"
-#Include "Libraries\TelemetryBrowser.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -256,7 +256,7 @@ class SoloCenter extends ConfigurationItem {
 	iSelectedDetailReport := false
 	iSelectedDetailHTML := false
 
-	iTelemetryBrowser := false
+	iTelemetryViewer := false
 
 	class SoloCenterWindow extends Window {
 		iSoloCenter := false
@@ -1135,9 +1135,9 @@ class SoloCenter extends ConfigurationItem {
 		}
 	}
 
-	TelemetryBrowser {
+	TelemetryViewer {
 		Get {
-			return this.iTelemetryBrowser
+			return this.iTelemetryViewer
 		}
 	}
 
@@ -1868,27 +1868,23 @@ class SoloCenter extends ConfigurationItem {
 		this.updateState()
 	}
 
-	getSimulator() {
-		return this.Simulator
-	}
-
-	openTelemetryBrowser() {
-		if this.TelemetryBrowser
-			WinActivate(this.TelemetryBrowser.Window)
+	openTelemetryViewer() {
+		if this.TelemetryViewer
+			WinActivate(this.TelemetryViewer.Window)
 		else if !this.SessionLoaded {
 			if !this.SessionMode
 				deleteDirectory(this.SessionDirectory . "Telemetry")
 
 			DirCreate(this.SessionDirectory . "Telemetry")
 
-			this.iTelemetryBrowser := TelemetryBrowser(this, this.SessionDirectory . "Telemetry", true)
+			this.iTelemetryViewer := TelemetryViewer(this, this.SessionDirectory . "Telemetry", true)
 
-			this.TelemetryBrowser.show()
+			this.TelemetryViewer.show()
 		}
 		else if FileExist(this.SessionDirectory . "Telemetry") {
-			this.iTelemetryBrowser := TelemetryBrowser(this, this.SessionDirectory . "Telemetry", false)
+			this.iTelemetryViewer := TelemetryViewer(this, this.SessionDirectory . "Telemetry", false)
 
-			this.TelemetryBrowser.show()
+			this.TelemetryViewer.show()
 		}
 		else {
 			OnMessage(0x44, translateOkButton)
@@ -1897,8 +1893,8 @@ class SoloCenter extends ConfigurationItem {
 		}
 	}
 
-	closedTelemetryBrowser() {
-		this.iTelemetryBrowser := false
+	closedTelemetryViewer() {
+		this.iTelemetryViewer := false
 	}
 
 	getSessionInformation(&simulator, &car, &track) {
@@ -2607,8 +2603,8 @@ class SoloCenter extends ConfigurationItem {
 					withBlockedWindows(MsgBox, translate("There is no session data to be saved."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
-			case 12: ; Telemetry Browser
-				this.openTelemetryBrowser()
+			case 12: ; Telemetry Viewer
+				this.openTelemetryViewer()
 			case 14: ; Update Statistics
 				this.updateStatistics()
 			case 16: ; Session Summary
@@ -2781,10 +2777,10 @@ class SoloCenter extends ConfigurationItem {
 		local directory, reportDirectory
 
 		if (!this.SessionMode || this.SessionActive) {
-			if this.TelemetryBrowser {
-				this.TelemetryBrowser.shutdown()
+			if this.TelemetryViewer {
+				this.TelemetryViewer.shutdownCollector()
 
-				this.TelemetryBrowser.restart(this.SessionDirectory . "Telemetry", active)
+				this.TelemetryViewer.restart(this.SessionDirectory . "Telemetry", active)
 			}
 
 			directory := this.SessionDirectory
@@ -4629,8 +4625,8 @@ class SoloCenter extends ConfigurationItem {
 			local track := this.Track
 			local sessionDB, info, dirName, directory, fileName, newFileName, folder, session, file, size, dataFile
 
-			if this.TelemetryBrowser
-				this.TelemetryBrowser.shutdown()
+			if this.TelemetryViewer
+				this.TelemetryViewer.shutdown()
 
 			if this.SessionActive {
 				this.syncSessionStore(true)
@@ -5170,8 +5166,8 @@ class SoloCenter extends ConfigurationItem {
 							this.iSessionMode := "Loaded"
 							this.iSessionLoaded := folder
 
-							if this.TelemetryBrowser
-								this.TelemetryBrowser.restart(folder . "Telemetry", false)
+							if this.TelemetryViewer
+								this.TelemetryViewer.restart(folder . "Telemetry", false)
 
 							this.iSessionExported := getMultiMapValue(info, "Session", "Exported", true)
 							this.iDate := getMultiMapValue(info, "Session", "Date", A_Now)
@@ -5226,8 +5222,8 @@ class SoloCenter extends ConfigurationItem {
 
 							this.updateState()
 
-							if this.TelemetryBrowser
-								this.TelemetryBrowser.loadTelemetry()
+							if this.TelemetryViewer
+								this.TelemetryViewer.loadTelemetry()
 						}
 						finally {
 							this.iSessionLoading := false
@@ -7691,8 +7687,8 @@ class SoloCenter extends ConfigurationItem {
 				if (!this.LastLap && !update)
 					this.startSession(fileName, true)
 
-				if this.TelemetryBrowser
-					this.TelemetryBrowser.startup(this.Simulator, getMultiMapValue(data, "Track Data", "Length", 0))
+				if this.TelemetryViewer
+					this.TelemetryViewer.startupCollector(this.Simulator, getMultiMapValue(data, "Track Data", "Length", 0))
 
 				if update {
 					if (this.SessionActive && (this.LastLap.Nr = lapNumber))

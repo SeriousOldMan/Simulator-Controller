@@ -12,6 +12,7 @@
 #Include "..\Libraries\Task.ahk"
 #Include "..\Libraries\CLR.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
+#Include "..\Database\Libraries\TelemetryCollector.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -44,6 +45,10 @@ class TeamServerPlugin extends ControllerPlugin {
 	iState := CaseInsenseMap()
 
 	iSimulator := false
+	iCar := false
+	iTrack := false
+	iTrackLength := false
+
 	iTeam := false
 	iTeamName := ""
 	iDriver := false
@@ -61,6 +66,11 @@ class TeamServerPlugin extends ControllerPlugin {
 
 	iSessionActive := false
 	iLapData := CaseInsenseMap("Telemetry", CaseInsenseMap(), "Positions", CaseInsenseMap())
+
+	iTelemetryCollector := false
+	iTelemetryDirectory := false
+
+	iCollectorTask := false
 
 	class TeamServerToggleAction extends ControllerAction {
 		iPlugin := false
@@ -226,6 +236,36 @@ class TeamServerPlugin extends ControllerPlugin {
 	Simulator {
 		Get {
 			return this.iSimulator
+		}
+	}
+
+	Car {
+		Get {
+			return this.iCar
+		}
+	}
+
+	Track {
+		Get {
+			return this.iTrack
+		}
+	}
+
+	TrackLength {
+		Get {
+			return this.iTrackLength
+		}
+	}
+
+	TelemetryDirectory {
+		Get {
+			return this.iTelemetryDirectory
+		}
+	}
+
+	TelemetryCollector {
+		Get {
+			return this.iTelemetryCollector
 		}
 	}
 
@@ -544,7 +584,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		this.updateActions(kSessionFinished)
 	}
-	
+
 	updateFunctions() {
 		this.updateActions(kSessionFinished)
 	}
@@ -826,6 +866,8 @@ class TeamServerPlugin extends ControllerPlugin {
 			try {
 				this.iLapData := CaseInsenseMap("Telemetry", CaseInsenseMap(), "Positions", CaseInsenseMap())
 				this.iSimulator := simulator
+				this.iCar := car
+				this.iTrack := track
 
 				loop retries
 					try {
@@ -871,6 +913,9 @@ class TeamServerPlugin extends ControllerPlugin {
 			return false
 
 		if this.TeamServerActive {
+			if this.TelemetryCollector
+				this.shutdownTelemetryCollector()
+
 			try {
 				if this.DriverActive {
 					if (isDebug() && isLogLevel(kLogDebug))
@@ -897,6 +942,9 @@ class TeamServerPlugin extends ControllerPlugin {
 		this.iLapData := CaseInsenseMap("Telemetry", CaseInsenseMap(), "Positions", CaseInsenseMap())
 		this.iSessionActive := false
 		this.iSimulator := false
+		this.iCar := false
+		this.iTrack := false
+		this.iTrackLength := false
 
 		return false
 	}
@@ -917,6 +965,8 @@ class TeamServerPlugin extends ControllerPlugin {
 					this.iLapData := CaseInsenseMap("Telemetry", CaseInsenseMap(), "Positions", CaseInsenseMap())
 					this.iSessionActive := true
 					this.iSimulator := simulator
+					this.iCar := car
+					this.iTrack := track
 				}
 
 				if this.SessionActive {
@@ -932,6 +982,9 @@ class TeamServerPlugin extends ControllerPlugin {
 	}
 
 	leaveSession() {
+		if this.TelemetryCollector
+			this.shutdownTelemetryCollector()
+
 		if this.DriverActive {
 			if (isDebug() && isLogLevel(kLogDebug))
 				showMessage("Leaving team session")
@@ -945,6 +998,9 @@ class TeamServerPlugin extends ControllerPlugin {
 			this.iLapData := CaseInsenseMap("Telemetry", CaseInsenseMap(), "Positions", CaseInsenseMap())
 			this.iSessionActive := false
 			this.iSimulator := false
+			this.iCar := false
+			this.iTrack := false
+			this.iTrackLength := false
 		}
 	}
 
@@ -1379,6 +1435,74 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 
+	startupTelemetryCollector(directory := false) {
+		updateTelemetry() {
+			local newLaps := []
+			local ignore, candidate, lap, lastLap
+
+			static loadedLaps := CaseInsenseMap()
+			static hasTelemetry := false
+
+			if this.SessionActive {
+				loop Files, this.TelemetryDirectory . "\*.telemetry" {
+					lap := StrReplace(StrReplace(A_LoopFileName, "Lap ", ""), ".telemetry", "")
+
+					if !loadedLaps.Has(lap)
+						newLaps.Push(lap)
+				}
+
+				if (newLaps.Length > 0) {
+					bubbleSort(&newLaps)
+
+					lastLap := newLaps[newLaps.Length].Nr
+
+					for ignore, lap in newLaps
+						if (lap > (lastLap - 4))
+							try {
+								if !hasTelemetry {
+									hasTelemetry := true
+
+									this.setSessionValue("HasTelemetry", true)
+								}
+
+								this.setLapValue(lap, "Lap Telemetry", FileRead(this.TelemetryDirectory . "\Lap " . lap . "*.telemetry"))
+
+								loadLaps[lap] := true
+							}
+							catch Any as exception {
+								logError(exception)
+							}
+
+					this.setLapValue(lastLap - 4, "Lap Telemetry", false)
+				}
+			}
+		}
+
+		if directory
+			this.iTelemetryDirectory := normalizeDirectoryPath(directory)
+
+		if (this.TelemetryDirectory && !this.TelemetryCollector && (this.TrackLength > 0)) {
+			DirCreate(this.TelemetryDirectory)
+
+			this.iTelemetryCollector := TelemetryCollector(this.TelemetryDirectory, this.Simulator, this.TrackLength)
+
+			this.iCollectorTask := PeriodicTask(updateTelemetry, 20000, kLowPriority)
+
+			this.iCollectorTask.start()
+		}
+	}
+
+	shutdownTelemetryCollector() {
+		if this.TelemetryCollector
+			this.TelemetryCollector.shutdown()
+
+		if this.iCollectorTask
+			this.iCollectorTask.stop()
+
+		this.iTelemetryCollector := false
+		this.iCollectorTask := false
+	}
+
 	addStint(lapNumber, retries := 20, wait := 500) {
 		local waitUntil := (A_TickCount + (wait * retries))
 		local stint
@@ -1425,6 +1549,7 @@ class TeamServerPlugin extends ControllerPlugin {
 	addLap(lapNumber, telemetryData, positionsData, retries := 10, wait := 500) {
 		local waitUntil := (A_TickCount + (wait * retries))
 		local driverForName, driverSurName, driverNickName, stint, simulator, car, track, lap
+		local teamServerConfig, telemetryDirectory
 
 		if this.TeamServerActive {
 			try {
@@ -1460,6 +1585,9 @@ class TeamServerPlugin extends ControllerPlugin {
 						if !stint
 							throw "No stint started..."
 
+						this.iTrackLength := getMultiMapValue(telemetryData, "Track Data", "Length"
+															, getMultiMapValue(positionsData, "Track Data", "Length", 0))
+
 						lap := this.Connector.CreateLap(stint, lapNumber)
 
 						if (telemetryData && (telemetryData.Count > 0) && !this.iLapData["Telemetry"].Has(lapNumber)) {
@@ -1492,6 +1620,20 @@ class TeamServerPlugin extends ControllerPlugin {
 
 					this.iLapData["Positions"][lapNumber] := true
 				}
+
+				teamServerConfig := readMultiMap(kUserConfigDirectory . "Team Server.ini")
+
+				if getMultiMapValue(teamServerConfig, "Telemetry", "Collect") {
+					telemetryDirectory := getMultiMapValue(teamServerConfig, "Telemetry", "Directory", false)
+
+					if telemetryDirectory {
+						if (!this.TelemetryCollector || (normalizeDirectoryPath(telemetryDirectory) != this.TelemetryDirectory))
+							this.startupTelemetryCollector(normalizeDirectoryPath(telemetryDirectory))
+					else if this.TelemetryCollector
+						this.shutdownTelemetryCollector()
+				}
+				else if this.TelemetryCollector
+					this.shutdownTelemetryCollector()
 			}
 			catch Any as exception {
 				this.LastMessage := (translate("Error while updating a lap (Session: ") . this.Session . translate(", Lap: ") . lapNumber

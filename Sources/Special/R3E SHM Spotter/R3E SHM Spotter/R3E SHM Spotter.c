@@ -1612,12 +1612,22 @@ void collectCarTelemetry(int playerID) {
 	char telemetryFileName[512] = "";
 	char tmpFileName[512] = "";
 	char buffer[60] = "";
+	int index = -1;
+
+	for (int id = 0; id < map_buffer->num_cars; id++)
+		if (map_buffer->all_drivers_data_1[id].driver_info.user_id == playerID) {
+			index = id;
+			break;
+		}
+
+	if (index == -1)
+		return;
 
 	int carLaps = map_buffer->completed_laps;
 
 	if ((carLaps + 1) != telemetryLap) {
-
 		if (telemetryFile) {
+			fflush(telemetryFile);
 			fclose(telemetryFile);
 
 			int offset = strlen(telemetryDirectory);
@@ -1639,7 +1649,7 @@ void collectCarTelemetry(int playerID) {
 			offset += strlen("\\Lap ");
 			strcpy_s(telemetryFileName + offset, 512 - offset, buffer);
 			offset += strlen(buffer);
-			strcpy_s(telemetryFileName + offset, 512 - offset, ".tmp");
+			strcpy_s(telemetryFileName + offset, 512 - offset, ".telemetry");
 
 			remove(telemetryFileName);
 
@@ -1666,7 +1676,7 @@ void collectCarTelemetry(int playerID) {
 		}
 	}
 
-	double carDistance = map_buffer->all_drivers_data_1[playerID].lap_distance;
+	double carDistance = map_buffer->all_drivers_data_1[index].lap_distance;
 	float running = (float)max(0, min(1, fabs(carDistance / map_buffer->layout_length)));
 
 	fprintf(telemetryFile, "%f;%f;%f;%f;%d;%d;%f;%d;%d\n", running, map_buffer->throttle, map_buffer->brake, map_buffer->steer_input_raw,

@@ -38,6 +38,8 @@ To use the "Team Center", you must have a valid connection to a team session. Th
 
 Once you are connected to an active session on the Team Server, all the data in "Team Center" will be updated every 10 seconds. During this time the user interface is locked to ensure the integrity of the data. This can be somewhat annoying. Therefore you can disable the synchronization temporarily using the corresponding command from the "Session" menu. Furthermore, you can select the update frequency by holding down the control key, when selecting the "Synchronize" menu item.
 
+Using "Collect Telemetry" you can choose whether your lap telemetry data will be collected and will be available to you and your team mates for inspection. See [below](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#Telemetry-Browser) for more information.
+
 It can happen that some data is not available when requested by the "Team Center". Most of the time, the data will be available after a few seconds, because it simply wasn't yet ready at he time when it was requested. Therefore, the "Team Center" will be waiting some time when requesting any kind of data. It will eventually give up, if the data is not available at all for some reason, but you can use the Escape key to terminate the waiting prematurely. In general you should do this only, if you are sure that the data is not available at all, for example while the current driver has encountered a disconnection.
 
 You can reload the data stored on the server for the currently selected session by clicking on the small button with the "Reload" icon. This can be helpful, when data seems to be missin, or when you have made changes, you want to discard.
@@ -155,6 +157,30 @@ All these report documents are HTML-based and can be saved or printed using the 
 - The report shown in the output area will be updated live, whenever new data arrives on the Team Server. A special case is the report for the lap details. If the chosen report is for the last lap, the report will automatically switch to the next lap, when this lap has been finished.
 
 - If you want the report to be opened in a separate window, hold down the Control key while requesting it. If the report originates from one of the available lists, you can open the separate window by double-clicking the entry in this list. In this case, the report is frozen and will **not** be updated automatically when new data arrives.
+
+### Telemetry Browser
+
+A valuable tool to improve your lap times is the integrated Telemetry Browser, which can be opened and activated by choosing the "Telemetry..." command from the "Session" menu.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Telemetry%20Browser.JPG)
+
+While you are in an active session, lap telemetry data will be collected lap by lap for those drivers that have enabled "Collect Telemetry" in the "Session" menu. The telemetry data for the last few laps will be stored on the Team Server and will be replicated to the currently running "Team Center" for inspection and comparison with other laps.
+
+When looking for areas of improvement take a close look to the application of throttle and brakes and the activation of TC and ABS. Trailing off the brakes and the transition back to full throttle is the most important skill to master for fast lap times. This does not mean, that sometimes coasting around a corner is not necessary. Use the Telemetry Browser to compare your laps with the fastest lap of a given session and learn what exactly made you faster there.
+
+Important: Sessions that are saved with telemetry data to the session database will NOT be synchronized with the Team Server by default, since the amount of data is quite large and will put a lot of stress on the Team Server. You can still activate the synchronization for a particular session in the "Session Database", but I strongly advise against it.
+
+##### Notes
+
+1. It can take a few laps before the first telemetry data gets recorded.
+2. A special method is used for *Assetto Corsa Competizione*, which unfortunately does not supply the distance of the car into the track in the shared memory API (it is available in the UDP interface, though, but this interface does not provide telemetry data). Because of that, the track layout must be learned, before telemetry data can be correlated to the track position. Be sure to drive clean during the first laps.
+5. The currently selected lap can be deleted by using the "-" button to the right of the drop down menu of all laps. If you hold down the Control key, all laps can be deleted at once. This is done only locally, it does NOT delete any laps on the Team Server.
+5. You can save and load telemetry data for a given lap for later usage:
+   - Typically used for reference laps, even from other drivers.
+   - Use the small button with the "Disc" icon to save a telemetry lap to the session database or any other location.
+   - Use the small button with the "Folder" icon to load a telemetry lap from the session database or any other location.
+   - Telemetry data, which has been *imported* this way will not become part of the current session.
+   *Imported* telemetry data can be removed by using the *delete* button. This will not remove it from its original location.
 
 ### Strategy Handling
 

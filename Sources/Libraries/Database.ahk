@@ -449,13 +449,15 @@ class Database {
 
 	flush(name := false, backup := false) {
 		local bakFile := false
-		local directory, fileName, schema, ignore, row, values, column, file
+		local directory, fileName, schema, ignore, row, values, column, file, data
 
 		if (name && (name != true)) {
 			if (this.Tables.Has(name) && this.iTableChanged.Has(name)) {
 				directory := this.Directory
 				fileName := (directory . name . ".CSV")
 				file := this.Files[name]
+
+				data := ""
 
 				if file {
 					if backup
@@ -487,8 +489,10 @@ class Database {
 						for ignore, column in schema
 							values.Push(row.Has(column) ? this.encode(row[column]) : kNull)
 
-						file.WriteLine(values2String(";", values*))
+						data .= (values2String(";", values*) . "`n")
 					}
+
+					file.Write(data)
 				}
 				else {
 					directory := this.Directory
@@ -506,10 +510,10 @@ class Database {
 						for ignore, column in schema
 							values.Push(row.Has(column) ? this.encode(row[column]) : kNull)
 
-						row := (values2String(";", values*) . "`n")
-
-						FileAppend(row, fileName)
+						data .= (values2String(";", values*) . "`n")
 					}
+
+					FileAppend(data, fileName)
 				}
 
 				this.iTableChanged.Delete(name)

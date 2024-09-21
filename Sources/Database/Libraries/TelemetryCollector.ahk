@@ -42,6 +42,8 @@ class TelemetryCollector {
 	}
 
 	__New(telemetryDirectory, simulator, trackLength) {
+		this.iSimulator := simulator
+		this.iTrackLength := trackLength
 		this.iTelemetryDirectory := telemetryDirectory
 
 		OnExit(ObjBindMethod(this, "shutdown", true))

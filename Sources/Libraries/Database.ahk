@@ -92,18 +92,20 @@ class Database {
 							text := file.Read()
 
 							loop Parse, text, "`n", "`r" {
-								row := Database.Row()
+								if (Trim(A_LoopField) != "") {
+									row := Database.Row()
 
-								values := string2Values(";", A_LoopField)
-								length := values.Length
+									values := string2Values(";", A_LoopField)
+									length := values.Length
 
-								for ignore, column in schema
-									if (length >= A_Index)
-										row[column] := this.decode(values[A_Index])
-									else
-										row[column] := kNull
+									for ignore, column in schema
+										if (length >= A_Index)
+											row[column] := this.decode(values[A_Index])
+										else
+											row[column] := kNull
 
-								data.Push(row)
+									data.Push(row)
+								}
 							}
 						}
 						else if FileExist(this.Directory . name . ".CSV")
@@ -112,18 +114,20 @@ class Database {
 									text := FileRead(this.Directory . name . ".CSV")
 
 									loop Parse, text, "`n", "`r" {
-										row := Database.Row()
+										if (Trim(A_LoopField) != "") {
+											row := Database.Row()
 
-										values := string2Values(";", A_LoopField)
-										length := values.Length
+											values := string2Values(";", A_LoopField)
+											length := values.Length
 
-										for ignore, column in schema
-											if (length >= A_Index)
-												row[column] := this.decode(values[A_Index])
-											else
-												row[column] := kNull
+											for ignore, column in schema
+												if (length >= A_Index)
+													row[column] := this.decode(values[A_Index])
+												else
+													row[column] := kNull
 
-										data.Push(row)
+											data.Push(row)
+										}
 									}
 
 									break

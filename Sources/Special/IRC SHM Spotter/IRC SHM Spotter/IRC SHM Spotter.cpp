@@ -2161,6 +2161,35 @@ int main(int argc, char* argv[])
 						}
 
 						if (running) {
+							getDataValue(result, pHeader, g_data, "IsOnTrack");
+							if (!atoi(result))
+								running = false;
+
+							if (running) {
+								getDataValue(result, pHeader, g_data, "IsOnTrackCar");
+								if (!atoi(result))
+									running = false;
+							}
+
+							if (running) {
+								getDataValue(result, pHeader, g_data, "IsInGarage");
+								if (atoi(result))
+									running = false;
+							}
+
+							if (running) {
+								getDataValue(result, pHeader, g_data, "IsReplayPlaying");
+
+								if (atoi(result))
+									running = false;
+
+								if (getYamlValue(result, irsdk_getSessionInfoStr(), "WeekendInfo:SimMode:"))
+									if (strcmp(result, "full") != 0)
+										running = false;
+							}
+						}
+
+						if (running) {
 							char* rawValue;
 
 							if (playerCarIndex == -1) {

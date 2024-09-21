@@ -1813,7 +1813,10 @@ namespace ACSHMSpotter {
 						safety = 200;
 					}
 
-					if (running)
+					if (graphics.Status == AC_STATUS.AC_REPLAY || graphics.Status == AC_STATUS.AC_PAUSE)
+						running = false;
+
+                    if (running)
 					{
 						if (carTelemetry)
 							collectCarTelemetry();

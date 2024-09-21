@@ -1649,6 +1649,9 @@ int main(int argc, char* argv[]) {
 					running = (startGo || (countdown <= 0));
 				}
 
+				if (running)
+					running = ((localCopy->mGameState == GAME_INGAME_PLAYING) || (localCopy->mGameState == GAME_INGAME_INMENU_TIME_TICKING));
+
 				if (running) {
 					if (carTelemetry)
 						collectCarTelemetry(sharedData);

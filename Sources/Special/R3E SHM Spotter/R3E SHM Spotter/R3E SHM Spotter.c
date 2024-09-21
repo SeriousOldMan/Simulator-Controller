@@ -1808,6 +1808,9 @@ int main(int argc, char* argv[])
 					running = (startGo || (countdown <= 0));
 				}
 
+				if (map_buffer->game_paused)
+					running = FALSE;
+
 				if (running) {
 					if (mapped_r3e && (map_buffer->completed_laps >= 0) && !map_buffer->game_paused) {
 						if (carTelemetry)

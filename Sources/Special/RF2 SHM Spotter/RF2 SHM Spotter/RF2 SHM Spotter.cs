@@ -1922,7 +1922,10 @@ namespace RF2SHMSpotter {
 									running = true;
 							}
 
-							if (running)
+							if (scoring.mScoringInfo.mGamePhase <= (byte)GridWalk || scoring.mScoringInfo.mGamePhase == (byte)PausedOrHeartbeat)
+								running = false;
+
+                            if (running)
 							{
                                 if (carTelemetry)
                                     collectCarTelemetry(ref playerScoring);

@@ -7484,20 +7484,20 @@ class TeamCenter extends ConfigurationItem {
 		if (lastLap && (this.iHasTelemetry || this.Connector.GetSessionValue(this.SelectedSession[true], "HasTelemetry"))) {
 			this.iHasTelemetry := true
 
-			loop 2
+			loop 3
 				if this.Laps.Has(lastLap.Nr - A_Index + 1) {
 					lap := this.Laps[lastLap.Nr - A_Index + 1]
 
-					fileName := ("Lap " . lap.Nr . ".telemetry")
+					fileName := (this.SessionDirectory . "Telemetry\Lap " . lap.Nr . ".telemetry")
 
-					if !FileExist(this.SessionDirectory . "Telemetry\" . fileName) {
+					if !FileExist(fileName) {
 						try {
 							telemetry := this.Connector.GetLapValue(lap.Identifier, "Lap Telemetry")
 
 							if (telemetry && (telemetry != "")) {
 								DirCreate(this.SessionDirectory . "Telemetry")
 
-								FileAppend(telemetry, this.SessionDirectory . "Telemetry\" . fileName)
+								FileAppend(telemetry, fileName)
 							}
 						}
 						catch Any as exception {

@@ -1436,16 +1436,16 @@ class TeamServerPlugin extends ControllerPlugin {
 	}
 
 	startupTelemetryCollector(directory := false) {
+		local loadedLaps := CaseInsenseMap()
+		local hasTelemetry := false
+
 		updateTelemetry() {
 			local newLaps := []
 			local ignore, candidate, lap, lastLap
 
-			static loadedLaps := CaseInsenseMap()
-			static hasTelemetry := false
-
 			if this.SessionActive {
 				loop Files, this.TelemetryDirectory . "\*.telemetry" {
-					lap := StrReplace(StrReplace(A_LoopFileName, "Lap ", ""), ".telemetry", "")
+					lap := StrReplace(StrReplace(, "Lap ", ""), ".telemetry", "")
 
 					if !loadedLaps.Has(lap)
 						newLaps.Push(lap)
@@ -1456,7 +1456,9 @@ class TeamServerPlugin extends ControllerPlugin {
 
 					lastLap := newLaps[newLaps.Length].Nr
 
-					for ignore, lap in newLaps
+					for ignore, lap in newLaps {
+						loadedLaps[lap] := true
+
 						if (lap > (lastLap - 4))
 							try {
 								if !hasTelemetry {
@@ -1466,12 +1468,11 @@ class TeamServerPlugin extends ControllerPlugin {
 								}
 
 								this.setLapValue(lap, "Lap Telemetry", FileRead(this.TelemetryDirectory . "\Lap " . lap . "*.telemetry"))
-
-								loadLaps[lap] := true
 							}
 							catch Any as exception {
 								logError(exception)
 							}
+					}
 
 					this.setLapValue(lastLap - 4, "Lap Telemetry", false)
 				}
@@ -1585,8 +1586,9 @@ class TeamServerPlugin extends ControllerPlugin {
 						if !stint
 							throw "No stint started..."
 
-						this.iTrackLength := getMultiMapValue(telemetryData, "Track Data", "Length"
-															, getMultiMapValue(positionsData, "Track Data", "Length", 0))
+						if !this.TrackLength
+							this.iTrackLength := getMultiMapValue(telemetryData, "Track Data", "Length"
+																, getMultiMapValue(positionsData, "Track Data", "Length", 0))
 
 						lap := this.Connector.CreateLap(stint, lapNumber)
 
@@ -1627,8 +1629,13 @@ class TeamServerPlugin extends ControllerPlugin {
 					telemetryDirectory := getMultiMapValue(teamServerConfig, "Telemetry", "Directory", false)
 
 					if telemetryDirectory {
-						if (!this.TelemetryCollector || (normalizeDirectoryPath(telemetryDirectory) != this.TelemetryDirectory))
+						if (!this.TelemetryCollector || (normalizeDirectoryPath(telemetryDirectory) != this.TelemetryDirectory)) {
+							if this.TelemetryCollector
+								this.shutdownTelemetryCollector()
+
 							this.startupTelemetryCollector(normalizeDirectoryPath(telemetryDirectory))
+						}
+					}
 					else if this.TelemetryCollector
 						this.shutdownTelemetryCollector()
 				}

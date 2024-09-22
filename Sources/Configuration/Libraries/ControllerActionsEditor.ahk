@@ -223,10 +223,10 @@ class ControllerActionsEditor extends ConfiguratorPanel {
 
 			fileName := ("Controller Action Icons." . language)
 
-			if !FileExist(getFileName(fileName, kUserTranslationsDirectory, kTranslationsDirectory, kResourcesDirectory . "Templates\"))
+			if !FileExist(getFileName(fileName, ekUserTranslationsDirectory, kTranslationsDirectory, kResourcesDirectory . "Templates\"))
 				fileName := "Controller Action Icons.EN"
 
-			icons := readMultiMap(getFileName(fileName, kTranslationsDirectory, kResourcesDirectory . "Templates\"))
+			icons := readMultiMap(kTranslationsDirectory . fileName)
 
 			for section, values in readMultiMap(kUserTranslationsDirectory . fileName)
 				for key, value in values

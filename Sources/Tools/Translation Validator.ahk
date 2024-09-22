@@ -301,4 +301,4 @@ runValidator(code, language, folder) {
 ;;;                          Initialization Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-runValidator("DE", "Deutsch", "C:\Users\olive\Desktop\")
+runValidator("IT", "Italiano", "C:\Users\olive\Desktop\")

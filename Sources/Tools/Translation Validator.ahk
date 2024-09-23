@@ -139,7 +139,7 @@ class AbstractTranslations {
 			for ignore, translation in translations {
 				showProgress({Progress: progress++})
 
-				text .= (translation.Original . "=>" . translation.Translation . "`n")
+				text .= (StrReplace(translation.Original, "`n", "\n") . "=>" . StrReplace(translation.Translation, "`n", "\n") . "`n")
 
 				if (progress >= 100)
 					progress := 0
@@ -204,7 +204,7 @@ class AbstractTranslations {
 					found := false
 
 					for ignore, trans in translated.Translations[key]
-						if (trans.Original = candidate.Original) {
+						if ((trans.Original = candidate.Original) && (Trim(trans.Translation) != "")) {
 							found := true
 
 							break
@@ -299,6 +299,6 @@ runValidator(code, language, folder) {
 ;;;                          Initialization Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-runValidator("it", "Italiano", "C:\Users\juwig\Desktop\Translation\")
+runValidator("fr", "French", "C:\Users\juwig\Desktop\Translation\")
 
 ExitApp()

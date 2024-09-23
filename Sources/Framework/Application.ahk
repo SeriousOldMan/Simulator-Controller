@@ -100,7 +100,7 @@ consentDialog(id, consent := false, *) {
 
 	consentGui.Add("Link", "x8 y482 w784 h60 cRed -VScroll +Wrap ReadOnly", StrReplace(StrReplace(getMultiMapValue(texts, "Consent", "Warning"), "``n", "`n"), "\<>", "="))
 
-	consentGui.Add("Button", "x392 y538 w80 h23 Default", translate("Save")).OnEvent("Click", consentDialog.Bind("Close"))
+	consentGui.Add("Button", "x372 y538 w80 h23 Default", translate("Save")).OnEvent("Click", consentDialog.Bind("Close"))
 
 	consentGui.Opt("+AlwaysOnTop")
 

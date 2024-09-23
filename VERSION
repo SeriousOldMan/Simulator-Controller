@@ -4,7 +4,7 @@ Target=5.9.1.0-release
 Date=09/22/2024
 Download=
 Changes=Open telemetry in the "Session Database", Telemetry Browser for "Team Center", Optimized database performance, Full translation for the Italian language
-Components=Media->5.6.1,Configuration->5.8.6,Utilities->5.4.8
+Components=Media->5.6.1,Configuration->5.8.6,Utilities->5.9.1
 [Release]
 Version=5.9.0.0-release
 Date=09/20/2024
@@ -21,6 +21,9 @@ Configuration.5.8.6.Download=https://www.dropbox.com/scl/fi/p7f3f1f8hwn04cu790ne
 Utilities.5.4.8.Path=.
 Utilities.5.4.8.Content=Utilities
 Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Utilities-5.4.8.zip?rlkey=alrj8l2z205dd2vm9cu6hbsot&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.4.8.zip
+Utilities.5.9.1.Path=.
+Utilities.5.9.1.Content=Utilities
+Utilities.5.9.1.Download=
 [Current]
 Type=Development
 [Version]

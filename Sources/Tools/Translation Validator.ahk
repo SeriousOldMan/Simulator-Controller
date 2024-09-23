@@ -145,7 +145,7 @@ class AbstractTranslations {
 					progress := 0
 			}
 
-		FileAppend(text, fileName)
+		FileAppend(text, fileName, "UTF-16")
 
 		hideProgress()
 	}
@@ -291,9 +291,7 @@ runValidator(code, language, folder) {
 	trans.save(folder . "Translations." . code . ".new")
 
 	deleteFile(folder . "Translation Validation.report")
-	FileAppend(report, folder . "Translation Validation.report")
-
-	ExitApp()
+	FileAppend(report, folder . "Translation Validation.report", "UTF-16")
 }
 
 
@@ -301,4 +299,10 @@ runValidator(code, language, folder) {
 ;;;                          Initialization Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-runValidator("IT", "Italiano", "C:\Users\olive\Desktop\")
+runValidator("EN", "English", "C:\Users\juwig\Desktop\Translation\")
+runValidator("DE", "Deutsch", "C:\Users\juwig\Desktop\Translation\")
+runValidator("FR", "Français", "C:\Users\juwig\Desktop\Translation\")
+runValidator("IT", "Italiano", "C:\Users\juwig\Desktop\Translation\")
+runValidator("ES", "Español", "C:\Users\juwig\Desktop\Translation\")
+
+ExitApp()

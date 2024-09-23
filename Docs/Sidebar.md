@@ -164,6 +164,7 @@
   - [Normal vs. Lite UI](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#normal-vs-simple-user-interface)
   - [Connecting to a session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#connecting-to-a-session)
   - [Data Analysis](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#data-analysis)
+  - [Telemetry Browser](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#Telemetry-Browser)
   - [Strategy Handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#strategy-handling)
   - [Session & Stint Planning](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#session--stint-planning)
   - [Driver specific tyre pressures](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#managing-driver-specific-tyre-pressures)

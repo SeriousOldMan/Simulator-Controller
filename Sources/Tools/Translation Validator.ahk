@@ -211,7 +211,7 @@ class AbstractTranslations {
 						}
 
 					if !found
-						stream .= "Missing translation for " . candidate.Original . "...`n"
+						stream .= "Missing translation for " . candidate.Original . "`n"
 				}
 	}
 }
@@ -299,6 +299,6 @@ runValidator(code, language, folder) {
 ;;;                          Initialization Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-runValidator("fr", "French", "C:\Users\juwig\Desktop\Translation\")
+runValidator("it", "Italiano", "C:\Users\juwig\Desktop\Translation\")
 
 ExitApp()

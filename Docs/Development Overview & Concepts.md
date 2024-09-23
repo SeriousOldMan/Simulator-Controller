@@ -242,6 +242,10 @@ For most files used in the translation process, Simulator Controller provides a 
 
 IMPORTANT: If you want to work on translation files, be sure to use a Unicode-capable text editor, like notepad++, and be sure to save all files containing language specific texts in the "UTF-16" format with little endian byte order. You can use *\n* to represent a new line in a given text and you must use *\\* to create a backslash, of course.
 
+All translation files are located somewhere inside the *Resources* directory in the distribution package. The specific locations are mentioned for each of the different files in the sections below. You can make copies of the these files and compare it always to the original file whenever you have installed a new release, so that you will be informed about any additions or changes in the original file. Once you are done with the translation, you can send me the translated files, and I will make a quality check and integrate everything into the standard distribution.
+
+If you are a seasoned developer you can also create a translation branch of the "Development" branch of the [Simulator Controller project on GitHub](https://github.com/SeriousOldMan/Simulator-Controller) and create a Pull reuqest, once you are done with the translations. BUT: In this case, always translate the original files located in the *Sources* folder, because all files in the *Resources* folder of the distribution package are only copies of the original files from the *Sources* folder, which are created during the build process.
+
 ### Translation of the user interface
 
 The translation of the user interface elements uses a couple of different files for different purposes. Below you will find an introduction for each type of translation file.

@@ -316,8 +316,6 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		widget12 := window.Add("Text", "x" . x . " yp+10 w105 h23 +0x200 Hidden", translate("Mode Selector"))
 		widget13 := window.Add("ListBox", "x" . secondX . " yp w120 h60 Disabled ReadOnly Hidden")
 
-		window.SetFont("Bold", "Arial")
-
 		widget14 := window.Add("Text", "x" . x . " yp+60 w140 h23 +0x200 Hidden", translate("Launchpad Mode"))
 		widget15 := window.Add("ListView", "x" . x . " yp+24 w" . col1Width . " h112 H:Grow(0.5) AltSubmit -Multi -LV0x10 NoSort NoSortHdr Hidden", collect(["Application", "Label", "Function"], translate))
 		widget15.OnEvent("Click", applicationFunctionSelect)

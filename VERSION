@@ -1,10 +1,10 @@
 [Development]
 Version=5.9.1.0-dev
 Target=5.9.1.0-release
-Date=09/22/2024
+Date=09/23/2024
 Download=
 Changes=Open telemetry in the "Session Database", Telemetry Browser for "Team Center", Optimized database performance, Full translation for the Italian language
-Components=Media->5.6.1,Configuration->5.8.6,Utilities->5.9.1
+Components=Media->5.6.1,Configuration->5.9.1,Utilities->5.9.1
 [Release]
 Version=5.9.0.0-release
 Date=09/20/2024
@@ -17,13 +17,16 @@ Media.5.6.1.Content=Splash Media
 Media.5.6.1.Download=https://www.dropbox.com/scl/fi/3c56fjdvdd4od5t7rsuc9/Media-5.6.1.zip?rlkey=x0icl05jy05nn886due4dsblv&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Media+5.6.1.zip
 Configuration.5.8.6.Path=Resources
 Configuration.5.8.6.Content=Setup
-Configuration.5.8.6.Download=https://www.dropbox.com/scl/fi/p7f3f1f8hwn04cu790nel/Configuration-5.8.6.zip?rlkey=flg0xrsq1qky03n99jvezqmi4&st=bpkkmbhc&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+5.8.6.zip
+Configuration.5.8.6.Download=https://www.dropbox.com/scl/fi/p7f3f1f8hwn04cu790nel/Configuration-5.8.6.zip?rlkey=flg0xrsq1qky03n99jvezqmi4&st=ds6fr2dd&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+5.8.6.zip
+Configuration.5.9.1.Path=Resources
+Configuration.5.9.1.Content=Setup
+Configuration.5.9.1.Download=https://www.dropbox.com/scl/fi/m9n4pwph45b5md8kgcc4u/Configuration-5.9.1.zip?rlkey=cji8tptxk1cuaraq1ltwijhih&st=1uq2hxfh&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+5.9.1.zip
 Utilities.5.4.8.Path=.
 Utilities.5.4.8.Content=Utilities
 Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Utilities-5.4.8.zip?rlkey=alrj8l2z205dd2vm9cu6hbsot&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.4.8.zip
 Utilities.5.9.1.Path=.
 Utilities.5.9.1.Content=Utilities
-Utilities.5.9.1.Download=
+Utilities.5.9.1.Download=https://www.dropbox.com/scl/fi/n3n5gajdhb1swegw46bp6/Utilities-5.9.1.zip?rlkey=sl8dbbf0gndpaqyj8g66by8o5&st=3ullp93q&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.9.1.zip
 [Current]
 Type=Development
 [Version]

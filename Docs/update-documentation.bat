@@ -6,6 +6,7 @@ copy "Development Overview & Concepts.md" "..\..\Controller.Wiki\Development-Ove
 copy "Rule Engine.md" "..\..\Controller.Wiki\Rule-Engine.md"
 copy "Footer.md" ..\..\Controller.Wiki\_Footer.md
 copy "Home.md" ..\..\Controller.Wiki\Home.md
+copy "Credits.md" ..\..\Controller.Wiki\Credits.md
 copy "Quick Start Guide.md" "..\..\Controller.Wiki\Quick-Start-Guide.md"
 copy "Installation & Configuration.md" "..\..\Controller.Wiki\Installation-&-Configuration.md"
 copy "Overview.md" ..\..\Controller.Wiki\Overview.md

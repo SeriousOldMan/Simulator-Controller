@@ -3490,6 +3490,8 @@ class RuleEngine {
 
 	TraceLevel {
 		Get {
+			; return (isCritical() ? Min(kTraceLight, this.iTraceLevel) : this.iTraceLevel)
+
 			return this.iTraceLevel
 		}
 	}
@@ -3539,7 +3541,7 @@ class RuleEngine {
 	}
 
 	trace(traceLevel, message) {
-		if (this.iTraceLevel <= traceLevel)
+		if (this.TraceLevel <= traceLevel)
 			logMessage(kLogOff, "RuleEngine: " . message)
 	}
 }

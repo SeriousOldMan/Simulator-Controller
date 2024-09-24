@@ -1,10 +1,12 @@
 ## 5.9.1.0-release 09/27/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. Optimized performance of the builtin database engine for large tables.
-  4. Lap telemetry entries in the "Session Database" can now be opened in the Telemetry Browser by double-clicking on them.
-  5. Recording of lap telemetry data is now also supported in the "Team Center". See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#Telemetry-Browser) for more information.
-  6. Thanks to our community member @Diego Falcone Dev_Dk HawkOne we now have a full translation for the Italian language.
+  3. Fixed a critical memory runaway bug in certain changing weather conditions.
+  4. Optimized performance of the builtin database engine for large tables.
+  5. Lap telemetry entries in the "Session Database" can now be opened in the Telemetry Browser by double-clicking on them.
+  6. Recording of lap telemetry data is now also supported in the "Team Center". See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#Telemetry-Browser) for more information.
+  7. Thanks to our community member @Diego Falcone Dev_Dk HawkOne we now have a full translation for the Italian language.
+  8. [Internal] A new component observes all other processes and immediately kills them in case of malfunction. One type of malfunction is too much memory consumption, for which the threshold could be defined in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration).
 
 ## 5.9.0.0-release 09/20/24
   1. Minor bugfixes, as always

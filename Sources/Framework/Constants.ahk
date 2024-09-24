@@ -64,7 +64,7 @@ global kSilentMode := false
 global kNirCmd := false
 global kSoX := false
 
-global kBackgroundApps := ["Simulator Tools", "Simulator Download", "Database Synchronizer", "Simulator Controller", "Voice Server", "Driving Coach", "Race Engineer", "Race Strategist", "Race Spotter", "Race Settings", "Team Server"]
+global kBackgroundApps := ["Simulator Tools", "Simulator Download", "Database Synchronizer", "Simulator Controller", "Voice Server", "Driving Coach", "Race Engineer", "Race Strategist", "Race Spotter", "Race Settings", "Team Server", "Process Manager"]
 
 global kForegroundApps := ["Simulator Startup", "System Monitor", "Simulator Setup", "Simulator Configuration", "Simulator Settings", "Server Administration", "Session Database", "Race Reports", "Race Settings", "Solo Center", "Team Center", "Strategy Workbench", "Setup Workbench"]
 

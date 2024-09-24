@@ -465,6 +465,8 @@ viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 80
 ;;;-------------------------------------------------------------------------;;;
 
 startupApplication() {
+	global kLogStartup
+
 	local isCritical := Task.CriticalHandler
 
 	if kLogStartup
@@ -493,6 +495,8 @@ startupApplication() {
 		logMessage(kLogOff, "Starting message handler...")
 
 	MessageManager.resume()
+
+	kLogStartup := false
 }
 
 

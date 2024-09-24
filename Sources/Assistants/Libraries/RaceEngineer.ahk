@@ -3593,7 +3593,7 @@ pressureLossWarning(context, tyre, lostPressure) {
 	return true
 }
 
-weatherForecastNotification(context, weather, minutes, change) {
+notifyWeatherForecast(context, weather, minutes, change) {
 	context.KnowledgeBase.RaceAssistant.weatherForecast(weather, minutes, change)
 
 	return true

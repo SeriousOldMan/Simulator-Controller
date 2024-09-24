@@ -6,7 +6,7 @@
   5. Lap telemetry entries in the "Session Database" can now be opened in the Telemetry Browser by double-clicking on them.
   6. Recording of lap telemetry data is now also supported in the "Team Center". See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#Telemetry-Browser) for more information.
   7. Thanks to our community member @Diego Falcone Dev_Dk HawkOne we now have a full translation for the Italian language.
-  8. [Internal] A new component observes all other processes and immediately kills them in case of malfunction. One type of malfunction is too much memory consumption, for which the threshold could be defined in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration).
+  8. [Internal] A new system process observes all user processes and immediately kills them in case of malfunction. The most important and malicious type of malfunction is too much memory consumption, for which the threshold could be defined in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration).
 
 ## 5.9.0.0-release 09/20/24
   1. Minor bugfixes, as always

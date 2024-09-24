@@ -2336,8 +2336,8 @@ class SetupEditor extends ConfigurationItem {
 
 		editorGui.Add("Text", "x8 yp+30 w800 0x10 W:Grow Section")
 
-		editorGui.Add("Button", "x16 ys+10 w60", translate("Setup:")).OnEvent("Click", chooseSetupFile)
-		editorGui.Add("Text", "x85 ys+14 w293 vsetupNameViewer")
+		editorGui.Add("Button", "x16 ys+10 w100", translate("Setup:")).OnEvent("Click", chooseSetupFile)
+		editorGui.Add("Text", "x120 ys+14 w250 vsetupNameViewer")
 		editorGui.Add("Button", "x380 ys+10 w80 X:Move(0.5) vresetSetupButton", translate("&Reset")).OnEvent("Click", resetSetup)
 
 		this.iSettingsListView := editorGui.Add("ListView", "x16 ys+40 w444 h320 H:Grow W:Grow(0.5) -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Category", "Setting", "Value", "Unit"], translate))
@@ -3015,10 +3015,10 @@ class SetupComparator extends ConfigurationItem {
 
 		comparatorGui.Add("Text", "x8 yp+30 w800 0x10 W:Grow Section")
 
-		comparatorGui.Add("Button", "x16 ys+10 w60", translate("Setup A:")).OnEvent("Click", chooseSetupAFile)
-		comparatorGui.Add("Text", "x85 ys+14 w193 vsetupNameAViewer")
-		comparatorGui.Add("Button", "x16 ys+34 w60", translate("Setup B:")).OnEvent("Click", chooseSetupBFile)
-		comparatorGui.Add("Text", "x85 ys+38 w193 vsetupNameBViewer")
+		comparatorGui.Add("Button", "x16 ys+10 w100", translate("Setup A:")).OnEvent("Click", chooseSetupAFile)
+		comparatorGui.Add("Text", "x120 ys+14 w250 vsetupNameAViewer")
+		comparatorGui.Add("Button", "x16 ys+34 w100", translate("Setup B:")).OnEvent("Click", chooseSetupBFile)
+		comparatorGui.Add("Text", "x120 ys+38 w250 vsetupNameBViewer")
 
 		this.iSettingsListView := comparatorGui.Add("ListView", "x16 ys+64 w784 h350 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Category", "Setting", "Value (A)", "Value (B)", "Value (A/B)", "Unit"], translate))
 		this.iSettingsListView.OnEvent("Click", selectABSetting)
@@ -3029,8 +3029,8 @@ class SetupComparator extends ConfigurationItem {
 		comparatorGui.Add("Button", "x720 yp w80 Disabled X:Move Y:Move vincreaseABSettingButton", translate("Increase")).OnEvent("Click", increaseABSetting)
 
 		comparatorGui.Add("Slider", "x316 yp w200 0x10 Range-100-100 Y:Move X:Move(0.5) ToolTip vapplyMixSlider", 0).OnEvent("Change", mixSetups)
-		comparatorGui.Add("Text", "x251 yp+3 w50 Y:Move X:Move(0.5) ", translate("Setup A"))
-		comparatorGui.Add("Text", "x529 yp w50 X:Move(0.5) Y:Move", translate("Setup B"))
+		comparatorGui.Add("Text", "x201 yp+3 w100 Y:Move X:Move(0.5) Right", translate("Setup A"))
+		comparatorGui.Add("Text", "x529 yp w100 X:Move(0.5) Y:Move", translate("Setup B"))
 
 		comparatorGui.Add("Text", "x8 y506 w800 0x10 Y:Move W:Grow")
 

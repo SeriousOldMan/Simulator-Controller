@@ -3,7 +3,7 @@ Version=5.9.1.0-dev
 Target=5.9.1.0-release
 Date=09/23/2024
 Download=https://www.dropbox.com/scl/fi/awv4ti5wh7d2fgxbt7r4k/Simulator-Controller-5.9.1.0-dev.zip?rlkey=9ljkxpitc6it4qy0isn1cd2z8&st=zvoheyey&dl=1
-Changes=Open telemetry in the "Session Database", Telemetry Browser for "Team Center", Optimized database performance, Full translation for the Italian language, Fixed memory runaway in changing weather, Added a credits page in the documentation
+Changes=Open telemetry in the "Session Database", Telemetry Browser for "Team Center", Optimized database performance, Full translation for the Italian language, Fixed memory runaway in changing weather, Added a credits page in the documentation, Support for language mixing in speech generation
 Components=Media->5.6.1,Configuration->5.9.1,Utilities->5.9.1
 [Release]
 Version=5.9.0.0-release

@@ -19,6 +19,10 @@ Simulator Controller today supports multiple different languages for the user in
 
 And I want to thank Jordan Moss (@Mossi) for his great plugin, which provides all Simulator Controller state information to SimHub to support building dashboards and overlays.
 
+Then we have the contributors to the car meta data, especially Chris Matthews and Mirko Lesko, which provided many car definitions for *Assetto Corsa*, *Automobilista 2* and *RaceRoom Racing Experience*.
+
+A very special thanks goes to @Keith M, who has supported me numerous times with testing.
+
 ### Supporters
 
-And last, but for sure not least, I want to thank all my supporters, who bought me a coffee, paid my Azure bills or otherwise helped in developing Simulator Controller. Many thanks to all my patrons on Patreon, especially to Robert Deutsch (@iEnki), who was my first supporter, and still is. I also want to mention Peter Kasbergen, who is also a supporter on Patreon, but additionally is also my favorite bug hunter. And to @Keith M, who has supported me numerous times with testing. And so on, the list is very long.
+And last, but for sure not least, I want to thank all my supporters, who bought me a coffee, paid my Azure bills or otherwise helped in developing Simulator Controller. Many thanks to all my patrons on Patreon, especially to Robert Deutsch (@iEnki), who was my first supporter, and still is. I also want to mention Peter Kasbergen, who is also a supporter on Patreon, but additionally is also my favorite bug hunter. And there are so many more: Ashton Smith, Chris Matthews, Lars Gutsch, Michael Ischen, Stephane Rouche, and so on, the list is very long.

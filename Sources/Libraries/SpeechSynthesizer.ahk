@@ -795,6 +795,8 @@ class SpeechSynthesizer {
 				this.speak("Extraño pan de col y kiwi se quemó bajo fugaz vaho")
 			case "FR":
 				this.speak("Portez ce vieux whisky au juge blond qui fume")
+			case "IT":
+				this.speak("Che tempi brevi zio, quando solfeggi")
 			default:
 				this.speak("The quick brown fox jumps over the lazy dog")
 		}

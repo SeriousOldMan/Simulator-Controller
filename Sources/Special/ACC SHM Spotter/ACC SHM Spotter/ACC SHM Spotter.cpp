@@ -2067,7 +2067,6 @@ void collectCarTelemetry() {
 
 					rotateBy(&longG, &latG, angle);
 
-
 					telemetryFile << (driverRunning * trackLength) << ";"
 								  << (pf->gas >= 0 ? pf->gas : 0) << ";"
 						          << (pf->brake >= 0 ? pf->brake : 0) << ";"

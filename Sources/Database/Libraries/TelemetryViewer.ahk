@@ -380,8 +380,8 @@ class TelemetryChart {
 
 			absG := Abs(latG)
 
-			if (absG > 0.2) {
-				curvature := - (((speed / 3.6) ** 2) / ((absG = 0) ? 0.00001 : absG))
+			if (absG > 0.1) {
+				curvature := - Ln(((speed / 3.6) ** 2) / ((absG = 0) ? 0.00001 : absG))
 
 				if (curvMin = kUndefined) {
 					curvMin := curvature

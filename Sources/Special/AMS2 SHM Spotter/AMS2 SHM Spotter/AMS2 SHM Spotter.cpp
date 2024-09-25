@@ -1464,7 +1464,9 @@ void collectCarTelemetry(const SharedMemory* sharedData) {
 					  << sharedData->mRpm << ";"
 					  << (sharedData->mSpeed * 3.6) << ";"
 					  << "n/a" << ";"
-					  << "n/a" << std::endl;
+					  << "n/a" << ";"
+					  << sharedData->mLocalAcceleration[VEC_X] << ";"
+					  << sharedData->mLocalAcceleration[VEC_Z] << std::endl;
 	}
 	catch (...) {
 		try {

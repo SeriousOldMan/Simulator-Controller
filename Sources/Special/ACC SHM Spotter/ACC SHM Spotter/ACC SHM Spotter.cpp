@@ -2054,16 +2054,31 @@ void collectCarTelemetry() {
 
 					telemetryFile.open(telemetryDirectory + "\\Lap " + to_string(telemetryLap) + ".tmp", ios::out | ios::trunc);
 				}
-				
-				telemetryFile << (driverRunning * trackLength) << ";"
-							  << (pf->gas >= 0 ? pf->gas : 0) << ";"
-							  << (pf->brake >= 0 ? pf->brake : 0) << ";"
-							  << pf->steerAngle << ";"
-							  << pf->gear << ";"
-							  << pf->rpms << ";"
-							  << pf->speedKmh << ";"
-							  << pf->tc << ";"
-							  << pf->abs << endl;
+
+				float velocityX = pf->velocity[0];
+				float velocityY = pf->velocity[2];
+				float velocityZ = pf->velocity[1];
+
+				if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
+					float angle = vectorAngle(velocityX, velocityY);
+
+					float longG = pf->accG[0];
+					float latG = pf->accG[2];
+
+					rotateBy(&longG, &latG, angle);
+
+
+					telemetryFile << (driverRunning * trackLength) << ";"
+								  << (pf->gas >= 0 ? pf->gas : 0) << ";"
+						          << (pf->brake >= 0 ? pf->brake : 0) << ";"
+						          << pf->steerAngle << ";"
+						          << pf->gear << ";"
+						          << pf->rpms << ";"
+						          << pf->speedKmh << ";"
+						          << pf->tc << ";"
+						          << pf->abs << ";"
+						          << longG << ";" << latG << endl;
+				}
 			}
 			catch (...) {
 				try {

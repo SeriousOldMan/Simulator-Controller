@@ -1648,16 +1648,35 @@ namespace ACSHMSpotter {
                     telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".tmp", false);
                 }
 
-                telemetryFile.Write(Math.Max(0, Math.Min(1, driver.splinePosition)) + staticInfo.TrackSPlineLength + ";");
-                telemetryFile.Write(physics.Gas + ";");
-                telemetryFile.Write(physics.Brake + ";");
-                telemetryFile.Write(physics.SteerAngle + ";");
-                telemetryFile.Write(physics.Gear + ";");
-                telemetryFile.Write(physics.Rpms + ";");
-                telemetryFile.Write(physics.SpeedKmh + ";");
+                double velocityX = physics.LocalVelocity[0];
+                double velocityY = physics.LocalVelocity[2];
+                double velocityZ = physics.LocalVelocity[1];
 
-                telemetryFile.Write(physics.TC + ";");
-                telemetryFile.WriteLine(physics.Abs);
+                if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
+                {
+                    float playerRotation = physics.Heading;
+                    if (playerRotation < 0)
+                    {
+                        playerRotation = (float)(2 * Math.PI) + playerRotation;
+                    }
+                    double angle = 360 * ((2 * Math.PI) - playerRotation) / (2 * Math.PI);
+
+                    float longG = physics.AccG[0];
+                    float latG = physics.AccG[2]; 
+					
+					telemetryFile.Write(Math.Max(0, Math.Min(1, driver.splinePosition)) + staticInfo.TrackSPlineLength + ";");
+					telemetryFile.Write(physics.Gas + ";");
+					telemetryFile.Write(physics.Brake + ";");
+					telemetryFile.Write(physics.SteerAngle + ";");
+					telemetryFile.Write(physics.Gear + ";");
+					telemetryFile.Write(physics.Rpms + ";");
+					telemetryFile.Write(physics.SpeedKmh + ";");
+
+					telemetryFile.Write(physics.TC + ";");
+					telemetryFile.Write(physics.Abs + ";");
+
+					telemetryFile.Write(longG + ";");
+					telemetryFile.WriteLine(latG);
             }
             catch (Exception)
             {

@@ -1756,7 +1756,10 @@ namespace RF2SHMSpotter {
                 telemetryFile.Write(vehicleSpeed(ref playerScoring) + ";");
 
                 telemetryFile.Write("n/a;");
-                telemetryFile.WriteLine("n/a");
+                telemetryFile.Write("n/a;");
+
+                telemetryFile.Write(playerScoring.mLocalAccel.x + ";");
+                telemetryFile.WriteLine(playerScoring.mLocalAccel.y);
             }
             catch (Exception)
             {

@@ -1878,6 +1878,8 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 		float steerAngle = 0.0;
 		int gear = 0;
 		int rpms = 0;
+		float longG = 0.0;
+		float latG = 0.0;
 
 		if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
 			playerRunning = ((float*)trackPositions)[playerCarIndex];
@@ -1904,15 +1906,22 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 		if (getRawDataValue(rawValue, header, data, "RPM"))
 			rpms = *(int*)rawValue;
 
-			telemetryFile << (playerRunning * trackLength) << ";"
-						  << throttle << ";"
-						  << brake << ";"
-						  << steerAngle << ";"
-						  << gear << ";"
-						  << rpms << ";"
-						  << speed << ";"
-						  << "n/a" << ";"
-						  << "n/a" << std::endl;
+		if (getRawDataValue(rawValue, header, data, "LongAccel"))
+			longG = *(int*)rawValue;
+
+		if (getRawDataValue(rawValue, header, data, "LatAccel"))
+			latG = *(int*)rawValue;
+
+		telemetryFile << (playerRunning * trackLength) << ";"
+					  << throttle << ";"
+					  << brake << ";"
+					  << steerAngle << ";"
+					  << gear << ";"
+					  << rpms << ";"
+					  << speed << ";"
+					  << "n/a" << ";"
+					  << "n/a" << ";"
+					  << longG << ";" << latG << std::endl;
 	}
 	catch (...) {
 		try {

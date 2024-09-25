@@ -232,6 +232,10 @@ class SimulatorStartup extends ConfigurationItem {
 		try {
 			logMessage(kLogInfo, translate("Starting ") . translate("Simulator Controller"))
 
+			exePath := (kBinariesDirectory . "Process Manager.exe")
+
+			Run(exePath, kBinariesDirectory)
+
 			if getMultiMapValue(this.Settings, "Core", "System Monitor", false) {
 				if !ProcessExist("System Monitor.exe") {
 					exePath := (kBinariesDirectory . "System Monitor.exe")
@@ -465,7 +469,8 @@ closeApplication(application) {
 launchPad(command := false, arguments*) {
 	global kSimulatorConfiguration
 
-	local ignore, application, startupConfig, x, y, settingsButton, name, options, lastModified, hasTeamServer, restart
+	local ignore, application, startupConfig, x, y, infoButton, settingsButton
+	local name, options, lastModified, hasTeamServer, restart
 
 	static result := false
 
@@ -859,7 +864,11 @@ launchPad(command := false, arguments*) {
 
 		launchPadGui.SetFont("s8 Norm", "Arial")
 
-		settingsButton := launchPadGui.Add("Button", "x556 yp+4 w23 h23")
+		infoButton := launchPadGui.Add("Button", "x8 yp+4 w23 h23")
+		infoButton.OnEvent("Click", (*) => Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Credits"))
+		setButtonIcon(infoButton, kIconsDirectory . "Team.ico", 1)
+
+		settingsButton := launchPadGui.Add("Button", "x556 yp w23 h23")
 		settingsButton.OnEvent("Click", modifySettings.Bind(launchPadGui))
 		setButtonIcon(settingsButton, kIconsDirectory . "General Settings.ico", 1)
 

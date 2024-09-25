@@ -355,3 +355,6 @@
 
 [Backlog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Backlog)
 ------
+
+[Credits](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Credits)
+------

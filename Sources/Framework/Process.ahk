@@ -22,6 +22,8 @@
 ;;;-------------------------------------------------------------------------;;;
 
 startupProcess() {
+	global kLogStartup
+
 	local isCritical := Task.CriticalHandler
 
 	if kLogStartup
@@ -30,7 +32,7 @@ startupProcess() {
 	guardExit(arguments*) {
 		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
 			return false
-		
+
 		if (isCritical() && kGuardExit && !GetKeyState("Ctrl")) {
 			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgBox, translate("Please wait until all tasks have been finished."), StrSplit(A_ScriptName, ".")[1], 262192)
@@ -50,6 +52,8 @@ startupProcess() {
 		logMessage(kLogOff, "Starting message handler...")
 
 	MessageManager.resume()
+
+	kLogStartup := false
 }
 
 

@@ -124,14 +124,14 @@ clearWeatherTyreChangeNotification(?lap) <= ?temp = ?lap + 2, ?clearLap = ?temp 
 priority: -10, [?Weather.Tyre.Change.Clear = ?Lap] => (Clear: Weather.Tyre.Change.Recommended)
 
 weatherForecastNotification(?lap, ?weather, ?minutes) <= remainingStintTime(?lap, ?stintTime), ?remainingMinutes = ?stintTime / 60000,
-														 ?remainingMinutes > ?minutes, weatherForecastNotification(?weather, ?minutes, true),
-													   weatherIndex(?weather, ?index), Set(Weather.Change.Notified, ?index)
+														 ?remainingMinutes > ?minutes, notifyWeatherForecast(?weather, ?minutes, true),
+														 weatherIndex(?weather, ?index), Set(Weather.Change.Notified, ?index)
 weatherForecastNotification(?lap, ?weather, ?minutes) <= remainingStintTime(?lap, ?stintTime), ?remainingMinutes = ?stintTime / 60000,
-														 =<(?remainingMinutes, ?minutes), weatherForecastNotification(?weather, ?minutes, false),
+														 =<(?remainingMinutes, ?minutes), notifyWeatherForecast(?weather, ?minutes, false),
 														 weatherIndex(?weather, ?index), Set(Weather.Change.Notified, ?index)
 
-weatherForecastNotification(?weather, ?minutes, ?change) <= Call(raiseEvent, WeatherForecast, ?weather, ?minutes,  ?change), !
-weatherForecastNotification(?weather, ?minutes, ?change) <= Call(weatherForecastNotification, ?weather, ?minutes, ?change)
+notifyWeatherForecast(?weather, ?minutes, ?change) <= Call(raiseEvent, WeatherForecast, ?weather, ?minutes,  ?change), !
+notifyWeatherForecast(?weather, ?minutes, ?change) <= Call(notifyWeatherForecast, ?weather, ?minutes, ?change)
 
 weatherTyreChangeRecommendation(?lap, ?weather, ?minutes, ?compound) <=
 		remainingStintTime(?lap, ?stintTime), ?remainingMinutes = ?stintTime / 60000, ?remainingMinutes > ?minutes,
@@ -140,7 +140,7 @@ weatherTyreChangeRecommendation(?lap, ?weather, ?minutes, ?compound) <=
 		Set(Weather.Tyre.Compound.Target, ?compound), tyreCompoundColor(?compound, ?color), Set(Weather.Tyre.Compound.Color.Target, ?color)
 weatherTyreChangeRecommendation(?lap, ?weather, ?minutes, ?compound) <=
 		remainingStintTime(?lap, ?stintTime), ?remainingMinutes = ?stintTime / 60000, =<(?remainingMinutes, ?minutes),
-		weatherForecastNotification(?weather, ?minutes, false),
+		notifyWeatherForecast(?weather, ?minutes, false),
 		updateWeatherNotified(?compound, ?weather), updateTyreChangeRecommended(?lap, ?weather)
 
 requestTyreChange(?weather, ?minutes, ?compound) <= Call(raiseEvent, WeatherForecast, ?weather, ?minutes, true, ?compound), !

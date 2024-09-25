@@ -11,6 +11,11 @@ Let's start with the configuration settings for the task processing engine. Four
 
 | Category | Setting | Default | Description |
 |----------|---------|---------|-------------|
+| Process  | Memory.Max | 1024 | The max memory in MB a process may consume, before it get killed automatically. |
+| Process  | Memory.Critical | 80 | The percentage of max memory usage, when memory reporting starts and special debug code is activated. |
+
+| Category | Setting | Default | Description |
+|----------|---------|---------|-------------|
 | Task     | Schedule.Interrupt | 50 | The number of milliseconds to wait between each schedule of tasks at interrupt level. Interrupt tasks are very important for the repsonsiveness of the user interface, but if the value is too low on a slower PC, tasks with lower priority might get no time at all. Example: Polling the Push-To-Talk button on the steering wheel is running at interrupt priority. |
 |     | Schedule.High | 200 | The number of milliseconds to wait between each schedule of tasks with high priority. These tasks are very important stuff which can not wait until normal operations complete. Example: Detecting that one Assistant wants to issue an urgent notification to the driver thereby interrupting the speech of another Assistant. |
 |     | Schedule.Normal | 500 | The number of milliseconds to wait between each schedule of tasks with normal priority. The majority of all internal tasks are running at this priority level. Example: Processing a message received by another proces. |

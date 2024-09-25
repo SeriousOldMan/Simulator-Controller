@@ -69,6 +69,7 @@ class TelemetryChart {
 		local html := ""
 		local width, height
 		local drawChartFunction1, chartID1, chartArea1, drawChartFunction2, chartID2, chartArea2
+		local drawChartFunction3, chartID3, chartArea3
 		local before, after, margins
 		local entry, index, field, running
 
@@ -95,7 +96,7 @@ class TelemetryChart {
 					if !isNumber(value)
 						entry[index] := kNull
 					else if (index = 1)
-						running := entry[index] := (Round(entry[index] / 10) * 10)
+						running := entry[index] := (Round(entry[index] / 5) * 5)
 
 				referenceLapTelemetry[running] := entry
 			}
@@ -107,27 +108,47 @@ class TelemetryChart {
 
 			chartArea1 := this.createSpeedChart(width, height / 3 * 2, lapTelemetry, referenceLapTelemetry, &drawChartFunction1, &chartID1)
 			chartArea2 := this.createElectronicsChart(width, height / 3, lapTelemetry, referenceLapTelemetry, &drawChartFunction2, &chartID2)
+			chartArea3 := this.createAccelerationChart(width, height / 3, lapTelemetry, referenceLapTelemetry, &drawChartFunction3, &chartID3)
 
-			before := "
-			(
-				<meta charset='utf-8'>
-				<head>
-					<style>
-						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
-						.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
-						.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
-					</style>
-					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-					<script type="text/javascript">function drawCharts() { drawChart%chartID1%(); drawChart%chartID2%() }</script>
-					<script type="text/javascript">
-						google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawCharts);
-			)"
+			if chartArea3
+				before := "
+				(
+					<meta charset='utf-8'>
+					<head>
+						<style>
+							.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+							.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+							.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
+						</style>
+						<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+						<script type="text/javascript">function drawCharts() { drawChart%chartID1%(); drawChart%chartID2%(); drawChart%chartID3%() }</script>
+						<script type="text/javascript">
+							google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawCharts);
+				)"
+			else {
+				before := "
+				(
+					<meta charset='utf-8'>
+					<head>
+						<style>
+							.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+							.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+							.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
+						</style>
+						<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+						<script type="text/javascript">function drawCharts() { drawChart%chartID1%(); drawChart%chartID2%() }</script>
+						<script type="text/javascript">
+							google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawCharts);
+				)"
+
+				chartID3 := false
+			}
 
 			before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
 												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]
-												 , chartID1: chartID1, chartID2: chartID2})
+												 , chartID1: chartID1, chartID2: chartID2, chartID3: chartID3})
 
 			after := "
 			(
@@ -138,7 +159,7 @@ class TelemetryChart {
 			margins := substituteVariables("style='overflow: auto' leftmargin='%margin%' topmargin='%margin%' rightmargin='%margin%' bottommargin='%margin%'"
 										 , {margin: margin})
 
-			return ("<html>" . before . drawChartFunction1 . "`n" . drawChartFunction2 . after . "<body style='background-color: #" . this.Window.AltBackColor . "' " . margins . "><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style>" . chartArea1 . chartArea2 . "</body></html>")
+			return ("<html>" . before . drawChartFunction1 . "`n" . drawChartFunction2 . (chartArea3 ? ("`n" . drawChartFunction3) : "") . after . "<body style='background-color: #" . this.Window.AltBackColor . "' " . margins . "><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style>" . chartArea1 . chartArea2 . (chartArea3 ? chartArea3 : "") . "</body></html>")
 		}
 		else
 			return "<html></html>"
@@ -147,7 +168,7 @@ class TelemetryChart {
 	createSpeedChart(width, height, lapTelemetry, referenceLapTelemetry, &drawChartFunction, &chartID) {
 		local speedMin := 9999
 		local speedMax := 0
-		local ignore, data, refData, axes, speed, refSpeed, color, running
+		local ignore, data, refData, axes, speed, refSpeed, color, running, refRunning
 
 		chartID := TelemetryChart.sChartID++
 		drawChartFunction := ("function drawChart" . chartID . "() {`nvar data = new google.visualization.DataTable();")
@@ -187,10 +208,10 @@ class TelemetryChart {
 				speed := kNull
 
 			if referenceLapTelemetry {
-				running := (Round(running / 10) * 10)
+				refRunning := (Round(running / 5) * 5)
 
-				if referenceLapTelemetry.Has(running) {
-					refData := referenceLapTelemetry[running]
+				if referenceLapTelemetry.Has(refRunning) {
+					refData := referenceLapTelemetry[refRunning]
 
 					refSpeed := refData[7]
 
@@ -227,7 +248,7 @@ class TelemetryChart {
 	createElectronicsChart(width, height, lapTelemetry, referenceLapTelemetry, &drawChartFunction, &chartID) {
 		local rpmsMin := 99999
 		local rpmsMax := 0
-		local ignore, data, refData, rpms, refRpms, rpmsMin, rpmsMax, axes, color, running
+		local ignore, data, refData, rpms, refRpms, axes, color, running, refRunning
 
 		chartID := TelemetryChart.sChartID++
 		drawChartFunction := ("function drawChart" . chartID . "() {`nvar data = new google.visualization.DataTable();")
@@ -265,10 +286,10 @@ class TelemetryChart {
 				rpms := kNull
 
 			if referenceLapTelemetry {
-				running := (Round(running / 10) * 10)
+				refRunning := (Round(running / 5) * 5)
 
-				if referenceLapTelemetry.Has(running) {
-					refData := referenceLapTelemetry[running]
+				if referenceLapTelemetry.Has(refRunning) {
+					refData := referenceLapTelemetry[refRunning]
 
 					refRpms := refData[6]
 
@@ -293,6 +314,137 @@ class TelemetryChart {
 		else {
 			axes := "series: { 0: {targetAxisIndex: 0}, 1: {targetAxisIndex: 1}, 2: {targetAxisIndex: 2}, 3: {targetAxisIndex: 3} },`n"
 			axes .= "hAxes: {gridlines: {count: 0}, ticks: []}, vAxes: { 0: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . (rpmsMax - ((rpmsMax - rpmsMin) * 3)) . " }, 1: { baselineColor: '" . this.Window.AltBackColor . "', baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue : -2, maxValue: 10 }, 2: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 }, 3: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 } }"
+		}
+
+		drawChartFunction .= ("]);`nvar options = { " . axes . ", legend: { position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '2%', top: '5%', right: '2%', bottom: '20%' }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
+
+		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
+
+		return ("<div id=`"chart_" . chartID . "`" style=`"width: " . Round(width) . "px; height: " . Round(height) . "px`"></div>")
+	}
+
+	createAccelerationChart(width, height, lapTelemetry, referenceLapTelemetry, &drawChartFunction, &chartID) {
+		local accelMin := kUndefined
+		local accelMax := kUndefined
+		local curvMin := kUndefined
+		local curvMax := kUndefined
+		local ignore, data, refData, longG, latG, refLongG, refLatG, axes, color, running, refRunning, curvature, speed, absG
+
+		chartID := TelemetryChart.sChartID++
+		drawChartFunction := ("function drawChart" . chartID . "() {`nvar data = new google.visualization.DataTable();")
+
+		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Distance") . "');")
+
+		if referenceLapTelemetry {
+			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Long G") . translate(" (Reference)") . "');")
+			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Lat G") . translate(" (Reference)") . "');")
+		}
+
+		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Long G") . "');")
+		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Lat G") . "');")
+
+		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Curvature") . "');")
+
+		drawChartFunction .= "`ndata.addRows(["
+
+		if (lapTelemetry.Length = 0)
+			return false
+
+		for ignore, data in lapTelemetry {
+			if (data.Length < 10)
+				return false
+
+			if (A_Index = 1)
+				continue
+			else if (A_Index > 2)
+				drawChartFunction .= ", "
+
+			running := data[1]
+
+			longG := data[10]
+			latG := data[11]
+
+			if (accelMin = kUndefined) {
+				accelMin := longG
+				accelMax := longG
+			}
+			else {
+				accelMin := Min(accelMin, longG)
+				accelMax := Max(accelMax, longG)
+			}
+
+			accelMin := Min(accelMin, latG)
+			accelMax := Max(accelMax, latG)
+
+			speed := data[7]
+
+			absG := Abs(latG)
+
+			if (absG > 0.2) {
+				curvature := - (((speed / 3.6) ** 2) / ((absG = 0) ? 0.00001 : absG))
+
+				if (curvMin = kUndefined) {
+					curvMin := curvature
+					curvMax := curvature
+				}
+				else {
+					curvMin := Min(curvMin, curvature)
+					curvMax := Max(curvMax, curvature)
+				}
+			}
+			else
+				curvature := kNull
+
+			if referenceLapTelemetry {
+				refRunning := (Round(running / 5) * 5)
+
+				if referenceLapTelemetry.Has(refRunning) {
+					refData := referenceLapTelemetry[refRunning]
+
+					if (refData.Length >= 10) {
+						refLongG := refData[10]
+						refLatG := refData[11]
+
+						accelMin := Min(accelMin, refLongG)
+						accelMax := Max(accelMax, refLongG)
+						accelMin := Min(accelMin, refLatG)
+						accelMax := Max(accelMax, refLatG)
+
+						drawChartFunction .= ("[" . running . ", " . refLongG . ", " . refLatG . ", " . longG . ", " . latG . ", " . curvature . "]")
+					}
+					else
+						drawChartFunction .= ("[" . running . ", null, null, " . longG . ", " . latG . ", " . curvature . "]")
+				}
+				else
+					drawChartFunction .= ("[" . running . ", null, null, " . longG . ", " . latG . ", " . curvature . "]")
+			}
+			else
+				drawChartFunction .= ("[" . running . ", " . longG . ", " . latG . ", " . curvature . "]")
+		}
+
+		if (accelMin = kUndefined) {
+			accelMin := 0
+			accelMax := 0
+		}
+		else
+			accelMin := (accelMax - ((accelMax - accelMin) * 2))
+
+		if (curvMin = kUndefined) {
+			curvMin := 0
+			curvMax := 0
+		}
+		else
+			curvMax := (curvMax + ((curvMax - curvMin) * 2))
+
+		if referenceLapTelemetry {
+			color := this.Window.Theme.TextColor["Disabled"]
+
+			axes := "series: { 0: {targetAxisIndex: 0, color: '" . color . "'}, 1: {targetAxisIndex: 1, color: '" . color . "'}, 2: {targetAxisIndex: 2, color: '" . color . "'}, 3: {targetAxisIndex: 3, color: '" . color . "'}, 4: {targetAxisIndex: 4, color: '" . color . "'} },`n"
+			axes .= "hAxes: {gridlines: {count: 0}, ticks: [], minValue: " . accelMin . ", maxValue: " . accelMax . " }, vAxes: { 0: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . accelMin . ", maxValue: " . accelMax . " }, 1: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . accelMin . ", maxValue: " . accelMax . " }, 2: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [] }, 3: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . accelMin . ", maxValue: " . accelMax . " }, 4: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . curvMin . ", maxValue: " . curvMax . " } }"
+		}
+		else {
+			axes := "series: { 0: {targetAxisIndex: 0}, 1: {targetAxisIndex: 1}, 2: {targetAxisIndex: 2} },`n"
+			axes .= "hAxes: {gridlines: {count: 0}, ticks: []}, vAxes: { 0: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . accelMin . ", maxValue: " . accelMax . " }, 1: { baselineColor: '" . this.Window.AltBackColor . "', baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . accelMin . ", maxValue: " . accelMax . " }, 2: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . curvMin . ", maxValue: " . curvMax . " } }"
 		}
 
 		drawChartFunction .= ("]);`nvar options = { " . axes . ", legend: { position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '2%', top: '5%', right: '2%', bottom: '20%' }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")

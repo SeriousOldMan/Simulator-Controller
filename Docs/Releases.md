@@ -4,11 +4,12 @@
   3. Fixed a critical memory runaway bug in certain changing weather conditions.
   4. Optimized performance of the builtin database engine for large tables.
   5. Lap telemetry entries in the "Session Database" can now be opened in the Telemetry Browser by double-clicking on them.
-  6. Recording of lap telemetry data is now also supported in the "Team Center". See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#Telemetry-Browser) for more information.
-  7. Thanks to our community member @Diego Falcone Dev_Dk HawkOne we now have a full translation for the Italian language.
-  8. It is now possible ot use a voice which was trained for a specific language for another language. The results are mediocre for the speech synthesizer built into Windows, but very usable for voices supplied by Azure or Google. It is kind of cool to hear an Italian speak English.
-  9. [Internal] A new system process observes all user processes and immediately kills them in case of malfunction. The most important and malicious type of malfunction is too much memory consumption, for which the threshold could be defined in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration).
-  10. [Internal] Added a [credits page](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Credits) to the documentation.
+  6. Significantly reduced Jitter in telemetry charts.
+  7. Recording of lap telemetry data is now also supported in the "Team Center". See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#Telemetry-Browser) for more information.
+  8. Thanks to our community member @Diego Falcone Dev_Dk HawkOne we now have a full translation for the Italian language.
+  9. It is now possible ot use a voice which was trained for a specific language for another language. The results are mediocre for the speech synthesizer built into Windows, but very usable for voices supplied by Azure or Google. It is kind of cool to hear an Italian speak English.
+  10. [Internal] A new system process observes all user processes and immediately kills them in case of malfunction. The most important and malicious type of malfunction is too much memory consumption, for which the threshold could be defined in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration).
+  11. [Internal] Added a [credits page](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Credits) to the documentation.
 
 ## 5.9.0.0-release 09/20/24
   1. Minor bugfixes, as always

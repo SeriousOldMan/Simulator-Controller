@@ -232,7 +232,7 @@ class SimulatorStartup extends ConfigurationItem {
 		try {
 			logMessage(kLogInfo, translate("Starting ") . translate("Simulator Controller"))
 
-			exePath := (kBinariesDirectory . "System Manager.exe")
+			exePath := (kBinariesDirectory . "Process Manager.exe")
 
 			Run(exePath, kBinariesDirectory)
 

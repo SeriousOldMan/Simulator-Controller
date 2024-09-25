@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.9.1.0-alpha]() (Test build for 5.9.1. Changes: Open telemetry in the "Session Database", Telemetry Browser for "Team Center", Optimized database performance, Full translation for the Italian language, Fixed memory runaway in changing weather, Added a credits page in the documentation, Support for language mixing in speech generation.)
+[5.9.1.0-alpha](https://www.dropbox.com/scl/fi/a6zy75az37h9efc1smwrd/Simulator-Controller-5.9.1.0-alpha.zip?rlkey=jwkbdkqzezcpnnjesmpzksgt0&st=vzoj59uk&dl=1) (Test build for 5.9.1. Changes: Open telemetry in the "Session Database", Telemetry Browser for "Team Center", Optimized database performance, Full translation for the Italian language, Fixed memory runaway in changing weather, Added a credits page in the documentation, Support for language mixing in speech generation, Reduced Jitter in telemetry chart, Fixed saving session w telemetry in "Solo Center".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-591) of this version and all the versions you might have skipped, before installing and using this version.
 

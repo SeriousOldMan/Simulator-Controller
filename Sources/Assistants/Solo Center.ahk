@@ -4626,7 +4626,7 @@ class SoloCenter extends ConfigurationItem {
 			local sessionDB, info, dirName, directory, fileName, newFileName, folder, session, file, size, dataFile
 
 			if this.TelemetryViewer
-				this.TelemetryViewer.shutdown()
+				this.TelemetryViewer.shutdownCollector()
 
 			if this.SessionActive {
 				this.syncSessionStore(true)

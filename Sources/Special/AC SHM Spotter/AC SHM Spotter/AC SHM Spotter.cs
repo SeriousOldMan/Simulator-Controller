@@ -1652,18 +1652,18 @@ namespace ACSHMSpotter {
                 double velocityY = physics.LocalVelocity[2];
                 double velocityZ = physics.LocalVelocity[1];
 
-                if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
-                {
-                    float playerRotation = physics.Heading;
-                    if (playerRotation < 0)
-                    {
-                        playerRotation = (float)(2 * Math.PI) + playerRotation;
-                    }
-                    double angle = 360 * ((2 * Math.PI) - playerRotation) / (2 * Math.PI);
+				if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
+				{
+					float playerRotation = physics.Heading;
+					if (playerRotation < 0)
+					{
+						playerRotation = (float)(2 * Math.PI) + playerRotation;
+					}
+					double angle = 360 * ((2 * Math.PI) - playerRotation) / (2 * Math.PI);
 
-                    float longG = physics.AccG[0];
-                    float latG = physics.AccG[2]; 
-					
+					float longG = physics.AccG[0];
+					float latG = physics.AccG[2];
+
 					telemetryFile.Write(Math.Max(0, Math.Min(1, driver.splinePosition)) + staticInfo.TrackSPlineLength + ";");
 					telemetryFile.Write(physics.Gas + ";");
 					telemetryFile.Write(physics.Brake + ";");
@@ -1677,6 +1677,7 @@ namespace ACSHMSpotter {
 
 					telemetryFile.Write(longG + ";");
 					telemetryFile.WriteLine(latG);
+				}
             }
             catch (Exception)
             {

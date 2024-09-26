@@ -139,7 +139,7 @@ class AbstractTranslations {
 			for ignore, translation in translations {
 				showProgress({Progress: progress++})
 
-				text .= (StrReplace(translation.Original, "`n", "\n") . "=>" . StrReplace(translation.Translation, "`n", "\n") . "`n")
+				text .= (encode(translation.Original) . "=>" . encode(translation.Translation) . "`n")
 
 				if (progress >= 100)
 					progress := 0
@@ -165,7 +165,7 @@ class AbstractTranslations {
 					found := false
 
 					for ignore, trans in translated.Translations[key]
-						if (trans.Original = candidate.Original) {
+						if ((trans.Original = candidate.Original) && (Trim(trans.Translation) != "")) {
 							translations.Push(AbstractTranslations.Translation(candidate.Original
 																			 , candidate.adjustTranslation(trans.Translation)))
 
@@ -211,7 +211,7 @@ class AbstractTranslations {
 						}
 
 					if !found
-						stream .= "Missing translation for " . candidate.Original . "`n"
+						stream .= "Missing translation for " . candidate.Original . "...`n"
 				}
 	}
 }
@@ -290,8 +290,10 @@ runValidator(code, language, folder) {
 
 	trans.save(folder . "Translations." . code . ".new")
 
-	deleteFile(folder . "Translation." . code . " Validation.report")
-	FileAppend(report, folder . "Translation." . code . " Validation.report", "UTF-16")
+	deleteFile(folder . "Translation Validation.report")
+	FileAppend(report, folder . "Translation Validation.report", "UTF-16")
+
+	ExitApp()
 }
 
 
@@ -299,6 +301,4 @@ runValidator(code, language, folder) {
 ;;;                          Initialization Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-runValidator("it", "Italiano", "C:\Users\juwig\Desktop\Translation\")
-
-ExitApp()
+runValidator("IT", "Italiano", "C:\Users\olive\Desktop\Translation")

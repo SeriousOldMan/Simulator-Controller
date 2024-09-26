@@ -876,7 +876,7 @@ class TelemetryViewer {
 		this.loadTelemetry()
 	}
 
-	loadLap(fileName := false) {
+	loadLap(fileName := false, driver := false) {
 		local name := false
 		local telemetry := false
 		local info := false
@@ -938,10 +938,11 @@ class TelemetryViewer {
 
 		if telemetry {
 			if info
-				lap := [name, SessionDatabase.getDriverName(simulator, getMultiMapValue(info, "Telemetry", "Driver"))
+				lap := [name, driver ? driver
+									 : SessionDatabase.getDriverName(simulator, getMultiMapValue(info, "Telemetry", "Driver"))
 					  , telemetry]
 			else
-				lap := [name, "John Doe (JD)", telemetry]
+				lap := [name, driver ? driver : "John Doe (JD)", telemetry]
 
 			this.ImportedLaps.Push(lap)
 

@@ -37,21 +37,19 @@ Here is a short video which shows how to configure Simulator Controller for the 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[5.9.0.0-release](https://cutt.ly/0eYe5aUs) (Changes: Fixed lap times and sector times in RaceRoom Racing Experience, Removed brake ducts for R3E from "Setup Workbench", New browser for real time car telemetry, Updated "Light" theme colors, Telemetry laps can be stored in the session database.)
+[5.9.1.0-release](https://cutt.ly/9eUEySX3) (Changes: Open telemetry in the "Session Database", Telemetry Browser for "Team Center", Optimized database performance, Full translation for the Italian language, Fixed memory runaway in changing weather, Added a credits page in the documentation, Support for language mixing in speech generation, Reduced Jitter in telemetry chart, Fixed saving session w telemetry in "Solo Center".)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-590) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-591) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[5.8.7.0-release](https://cutt.ly/SeRW3xBl) (Changes: Fixed pitstop request for AMS2, Fixed valid lap handling in RaceRoom Racing Experience, Fixed extension for session saving "Solo Center" and "Team Center", Fixed muted mode of the Assistants, Muted support for Assistant.Speak, Fixed remaining session time for R3E, Better handling of database concurrent access, "Strategy Workbench" remembers selected data type.)
+[5.9.0.0-release](https://cutt.ly/0eYe5aUs) (Changes: Fixed lap times and sector times in RaceRoom Racing Experience, Removed brake ducts for R3E from "Setup Workbench", New browser for real time car telemetry, Updated "Light" theme colors, Telemetry laps can be stored in the session database.)
 
-[5.8.6.0-release](https://cutt.ly/5eWZoqvn) (Changes: Fixed live graph redrawing in "Solo Center", Fixed tyre laps handling in "Solo Center", Fixed Spotter to give opponent lap times again, Fixed error reporting for missing SoX and NirCmd, New version of local LLM runtime, New LLM event for Race Spotter, Fixed tooltip timeouts in "Simlator Startup", "Solo Center" filters laps without telemetry data, Renamed "Practice Center" to "Solo Center", Renamed "Race Center" to "Team Center", Fixed end of race detection for races with fixed laps in R3E.)
+[5.8.7.0-release](https://cutt.ly/SeRW3xBl) (Changes: Fixed pitstop request for AMS2, Fixed valid lap handling in RaceRoom Racing Experience, Fixed extension for session saving "Solo Center" and "Team Center", Fixed muted mode of the Assistants, Muted support for Assistant.Speak, Fixed remaining session time for R3E, Better handling of database concurrent access, "Strategy Workbench" remembers selected data type.)
 
 #### Latest development build
 
-[5.9.1.0-dev](https://www.dropbox.com/scl/fi/awv4ti5wh7d2fgxbt7r4k/Simulator-Controller-5.9.1.0-dev.zip?rlkey=9ljkxpitc6it4qy0isn1cd2z8&st=jsv3br2l&dl=1) (Early build for 5.9.1. Changes: Open telemetry in the "Session Database", Telemetry Browser for "Team Center", Optimized database performance, Full translation for the Italian language, Fixed memory runaway in changing weather.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-591) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 

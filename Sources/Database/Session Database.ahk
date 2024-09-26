@@ -5124,7 +5124,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			viewer := TelemetryViewer(SessionDatabaseEditor.TelemetryManager(this), kTempDirectory . "Telemetry", false)
 
-			viewer.loadLap(fileName)
+			viewer.loadLap(fileName, this.TelemetryListView.GetText(row, 1))
 
 			viewer.show()
 		}

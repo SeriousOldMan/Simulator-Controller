@@ -379,7 +379,7 @@ class SpeechSynthesizer {
 
 	setPlayerLevel(level) {
 		global kNirCmd
-		
+
 		local pid := this.iSoundPlayer
 
 		this.iSoundPlayerLevel := level
@@ -391,7 +391,7 @@ class SpeechSynthesizer {
 				}
 				catch Any as exception {
 					logError(exception, true)
-					
+
 					kNirCmd := false
 
 					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
@@ -431,7 +431,7 @@ class SpeechSynthesizer {
 
 	playSound(soundFile, wait := true) {
 		global kNirCmd
-		
+
 		local callback, pid, level
 
 		callback := this.SpeechStatusCallback
@@ -455,7 +455,7 @@ class SpeechSynthesizer {
 				}
 				catch Any as exception {
 					logError(exception, true)
-					
+
 					kNirCmd := false
 
 					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
@@ -520,7 +520,7 @@ class SpeechSynthesizer {
 
 	speak(text, wait := true, cache := false, options := false) {
 		global kSox
-	
+
 		local cacheFileName, tempName, temp1Name, temp2Name, callback, volume
 		local overdriveGain, overdriveColor, filterHighpass, filterLowpass, noiseVolume, clickVolume
 
@@ -653,7 +653,7 @@ class SpeechSynthesizer {
 				}
 				catch Any as exception {
 					logError(exception, true)
-					
+
 					kSox := false
 
 					showMessage(substituteVariables(translate("Cannot start SoX (%kSoX%) - please check the configuration..."))
@@ -795,6 +795,8 @@ class SpeechSynthesizer {
 				this.speak("Extraño pan de col y kiwi se quemó bajo fugaz vaho")
 			case "FR":
 				this.speak("Portez ce vieux whisky au juge blond qui fume")
+			case "IT":
+				this.speak("Che tempi brevi zio, quando solfeggi")
 			default:
 				this.speak("The quick brown fox jumps over the lazy dog")
 		}
@@ -902,6 +904,9 @@ class SpeechSynthesizer {
 		local availableVoices := []
 		local voices := this.Voices
 		local count, locale, ignore, candidate
+
+		if inList(voices, voice)
+			return voice
 
 		if InStr(voice, "(") {
 			locale := StrReplace(string2Values("(", voice)[2], ")", "")

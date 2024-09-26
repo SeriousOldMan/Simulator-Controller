@@ -82,5 +82,9 @@ The documentation is devided into the following sections:
   - [Development Backlog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Backlog)
 
     You may also want to take a look at the backlog of upcoming features.
+	
+  - [Credits](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Credits)
+
+    Simulator Controller would not have been possible without the support or the contribution of many. Please check out the credits.
   
 If you have any questions that have not been answered here, please feel free to contact me, but please be sure to have read anything related in the documentation in advance. If you want to report a bug, please open an issue. And last, but not least, if you want to contribute, feel free to contact me as well.

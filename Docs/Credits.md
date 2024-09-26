@@ -21,6 +21,8 @@ And I want to thank Jordan Moss (@Mossi) for his great plugin, which provides th
 
 Then we have the contributors to the car meta data, especially Chris Matthews and Mirko Lesko, which provided many car definitions for *Assetto Corsa*, *Automobilista 2* and *RaceRoom Racing Experience*.
 
+And I don't want to forget Matus Celko (@winzarten), who was so kind to provide a special export format for telemetry data in his "Second Monitor" app.
+
 A very special thanks goes to @Keith M, who has supported me numerous times with testing.
 
 ### Supporters

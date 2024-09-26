@@ -232,6 +232,10 @@ class SimulatorStartup extends ConfigurationItem {
 		try {
 			logMessage(kLogInfo, translate("Starting ") . translate("Simulator Controller"))
 
+			exePath := (kBinariesDirectory . "System Manager.exe")
+
+			Run(exePath, kBinariesDirectory)
+
 			if getMultiMapValue(this.Settings, "Core", "System Monitor", false) {
 				if !ProcessExist("System Monitor.exe") {
 					exePath := (kBinariesDirectory . "System Monitor.exe")

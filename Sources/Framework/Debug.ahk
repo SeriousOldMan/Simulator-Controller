@@ -36,6 +36,7 @@ global LogMenu := Menu()
 #Include "Message.ahk"
 #Include "MultiMap.ahk"
 #Include "..\Libraries\Messages.ahk"
+#Include "..\Libraries\Task.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -58,8 +59,35 @@ global kLogStartup := getMultiMapValue(readMultiMap(getFileName("Core Settings.i
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                    Private Variables Declaration Section                ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global gHighMemoryUsage := false
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+reportHighMemoryUsage(threshold) {
+	global gHighMemoryUsage
+
+	local used := getMemoryUsage(ProcessExist())
+
+	if (used > threshold) {
+		gHighMemoryUsage := true
+
+		try {
+			throw Error(translate("High memory warning: ") . Round((used / (1024 * 1024)), 1) . translate(" MB"))
+		}
+		catch Any as exception {
+			logMessage(kLogCritical, exception.Message)
+
+			if exception.HasProp("Stack")
+				logMessage(kLogCritical, "Stack:`n`n" . exception.Stack, false)
+		}
+	}
+}
 
 reportNonObjectUsage(reference, p1 := "", p2 := "", p3 := "", p4 := "") {
 	if isDebug() {
@@ -75,6 +103,9 @@ reportNonObjectUsage(reference, p1 := "", p2 := "", p3 := "", p4 := "") {
 }
 
 initializeDebugging() {
+	local settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+	local criticalMemory := ((getMultiMapValue(settings, "Process", "Memory.Max", 1024) / 100)
+						   * getMultiMapValue(settings, "Process", "Memory.Critical", 80) * 1024 * 1024)
 	local pid
 
 	if kLogStartup {
@@ -93,6 +124,8 @@ initializeDebugging() {
 	Number.__Set := reportNonObjectUsage
 
 	OnError(logUnhandledError)
+
+	PeriodicTask(reportHighMemoryUsage.Bind(criticalMemory), 1000, kInterruptPriority).start()
 
 	if kLogStartup
 		logMessage(kLogOff, "Debugger initialized...")
@@ -121,6 +154,12 @@ isDevelopment() {
 	global kBuildConfiguration
 
 	return (kBuildConfiguration = "Development")
+}
+
+isCritical() {
+	global gHighMemoryUsage
+
+	return gHighMemoryUsage
 }
 
 getLogLevel() {
@@ -231,6 +270,31 @@ logError(exception, unhandled := false, report := true) {
 		return (A_IsCompiled ? -1 : false)
 	else
 		return -1
+}
+
+getMemoryUsage(pid) {
+	local size := (8 + A_PtrSize * 9)
+	local PMC_EX := Buffer(size, 0)
+	local hProcess := DllCall("OpenProcess", "uint", 0x1000, "int", 0, "uint", pid)
+	local sucess := false
+
+	if hProcess {
+		NumPut("uint", size, PMC_EX)
+
+		try
+			if DllCall("GetProcessMemoryInfo", "ptr", hProcess, "ptr", PMC_EX, "uint", size)
+				sucess := true
+
+		try
+			if DllCall("psapi\GetProcessMemoryInfo", "ptr", hProcess, "ptr", PMC_EX, "uint", size)
+				success := true
+
+		DllCall("CloseHandle", "ptr", hProcess)
+
+		return (success ? NumGet(PMC_EX, 8 + A_PtrSize * 8, "uptr") : false)
+	}
+
+	return false
 }
 
 

@@ -2,7 +2,7 @@
   "profiles": {
     "Second Monitor Reader": {
       "commandName": "Project",
-      "commandLineArgs": "\"C:\\Users\\juwig\\Desktop\\24-09-25-11-53-Watkins Glen International-Race-98bcf191-0700-472b-8621-ee517243f1f9\\Oliver Juwig-3--fdd509f0-499d-4b66-9b86-3a1072888d10.json\" \"C:\\Users\\juwig\\Desktop\\24-09-25-11-53-Watkins Glen International-Race-98bcf191-0700-472b-8621-ee517243f1f9\\structure.json\""
+      "commandLineArgs": "\"C:\\Users\\Developer\\Desktop\\Test\\Oliver Juwig-3--fdd509f0-499d-4b66-9b86-3a1072888d10.json\" \"C:\\Users\\Developer\\Desktop\\Test\\Import.telemetry\""
     }
   }
 }

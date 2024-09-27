@@ -1,34 +1,28 @@
 [Development]
-Version=5.9.1.0-alpha
+Version=5.9.1.0-release
 Target=5.9.1.0-release
-Date=09/25/2024
-Download=https://www.dropbox.com/scl/fi/a6zy75az37h9efc1smwrd/Simulator-Controller-5.9.1.0-alpha.zip?rlkey=jwkbdkqzezcpnnjesmpzksgt0&st=vzoj59uk&dl=1
+Date=09/27/2024
+Download=https://cutt.ly/9eUEySX3;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.9.1.0-release.zip
 Changes=Open telemetry in the "Session Database", Telemetry Browser for "Team Center", Optimized database performance, Full translation for the Italian language, Fixed memory runaway in changing weather, Added a credits page in the documentation, Support for language mixing in speech generation, Reduced Jitter in telemetry chart, Fixed saving session w telemetry in "Solo Center"
 Components=Media->5.6.1,Configuration->5.9.1,Utilities->5.9.1
 [Release]
-Version=5.9.0.0-release
-Date=09/20/2024
-Download=https://cutt.ly/0eYe5aUs;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.9.0.0-release.zip
-Changes=Fixed lap times and sector times in RaceRoom Racing Experience, Removed brake ducts for R3E from "Setup Workbench", New browser for real time car telemetry, Updated "Light" theme colors, Telemetry laps can be stored in the session database
-Components=Media->5.6.1,Configuration->5.8.6,Utilities->5.4.8
+Version=5.9.1.0-release
+Date=09/27/2024
+Download=https://cutt.ly/9eUEySX3;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.9.1.0-release.zip
+Changes=Open telemetry in the "Session Database", Telemetry Browser for "Team Center", Optimized database performance, Full translation for the Italian language, Fixed memory runaway in changing weather, Added a credits page in the documentation, Support for language mixing in speech generation, Reduced Jitter in telemetry chart, Fixed saving session w telemetry in "Solo Center"
+Components=Media->5.6.1,Configuration->5.9.1,Utilities->5.9.1
 [Components]
 Media.5.6.1.Path=Resources
 Media.5.6.1.Content=Splash Media
-Media.5.6.1.Download=https://www.dropbox.com/scl/fi/3c56fjdvdd4od5t7rsuc9/Media-5.6.1.zip?rlkey=x0icl05jy05nn886due4dsblv&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Media+5.6.1.zip
-Configuration.5.8.6.Path=Resources
-Configuration.5.8.6.Content=Setup
-Configuration.5.8.6.Download=https://www.dropbox.com/scl/fi/p7f3f1f8hwn04cu790nel/Configuration-5.8.6.zip?rlkey=flg0xrsq1qky03n99jvezqmi4&st=ds6fr2dd&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+5.8.6.zip
+Media.5.6.1.Download=https://www.dropbox.com/scl/fi/3c56fjdvdd4od5t7rsuc9/Media-5.6.1.zip?rlkey=x0icl05jy05nn886due4dsblv&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Media+5.6.1.zipp7f3f1f8hwn04cu790nel/Configuration-5.8.6.zip?rlkey=flg0xrsq1qky03n99jvezqmi4&st=ds6fr2dd&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+5.8.6.zip
 Configuration.5.9.1.Path=Resources
 Configuration.5.9.1.Content=Setup
 Configuration.5.9.1.Download=https://www.dropbox.com/scl/fi/m9n4pwph45b5md8kgcc4u/Configuration-5.9.1.zip?rlkey=cji8tptxk1cuaraq1ltwijhih&st=1uq2hxfh&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+5.9.1.zip
-Utilities.5.4.8.Path=.
-Utilities.5.4.8.Content=Utilities
-Utilities.5.4.8.Download=https://www.dropbox.com/scl/fi/5nduffajjm3x6rhsxr1nk/Utilities-5.4.8.zip?rlkey=alrj8l2z205dd2vm9cu6hbsot&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.4.8.zip
 Utilities.5.9.1.Path=.
 Utilities.5.9.1.Content=Utilities
 Utilities.5.9.1.Download=https://www.dropbox.com/scl/fi/n3n5gajdhb1swegw46bp6/Utilities-5.9.1.zip?rlkey=sl8dbbf0gndpaqyj8g66by8o5&st=3ullp93q&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.9.1.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=5.9.1.0-alpha
-Release=5.9.0.0-release
+Development=5.9.1.0-release
+Release=5.9.1.0-release

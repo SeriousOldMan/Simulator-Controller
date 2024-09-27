@@ -28,6 +28,7 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 	local x, y, names, ignore, infos, index, name, dirName, driverName
 	local carNames, trackNames, newSimulator, newCar, newTrack, force
 	local userTelemetries, communityTelemetries, info
+	local command, importFileName, pid, count
 
 	static sessionDB := false
 
@@ -73,12 +74,42 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 			dirName := (SessionDatabase.DatabasePath . "User\")
 
 			OnMessage(0x44, translateLoadCancelButtons)
-			fileName := withBlockedWindows(FileSelect, 1, dirName, translate("Load Telemetry..."), "Lap Telemetry (*.telemetry)")
+			fileName := withBlockedWindows(FileSelect, 1, dirName, translate("Load Telemetry..."), "Lap Telemetry (*.telemetry; *.json)")
 			OnMessage(0x44, translateLoadCancelButtons, 0)
 		}
 
-		if (fileName != "")
-			browseLapTelemetries(kOk)
+		if (fileName != "") {
+			if InStr(fileName, ".json") {
+				withTask(WorkingTask(translate("Extracting ") . translate("Telemetry")), () {
+					try {
+						importFileName := temporaryFileName("Import", "telemetry")
+						command := ("`"" . kBinariesDirectory . "Connectors\Second Monitor Reader\Second Monitor Reader.exe`" `"" . fileName . "`" `"" . importFileName . "`" `"" . (importFileName . ".info") . "`"")
+
+						Run(command, , "Hide", &pid)
+
+						Sleep(500)
+
+						count := 0
+
+						while (ProcessExist(pid) && (count++ < 100))
+							Sleep(100)
+
+						if FileExist(importFileName)
+							fileName := [importFileName, importFileName . ".info"]
+						else
+							fileName := false
+					}
+					catch Any as exception {
+						logError(exception)
+
+						fileName := false
+					}
+				})
+			}
+
+			if fileName
+				browseLapTelemetries(kOk)
+		}
 		else
 			fileName := false
 	}
@@ -246,12 +277,22 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 			until result
 
 			if (result = kOk) {
+				if (arguments.Length > 3)
+					%arguments[4]% := false
+
 				if fileName {
 					%arguments[1]% := false
 					%arguments[2]% := false
 					%arguments[3]% := false
 
-					return fileName
+					if isObject(fileName) {
+						if (arguments.Length > 3)
+							%arguments[4]% := fileName[2]
+
+						return fileName[1]
+					}
+					else
+						return fileName
 				}
 				else {
 					index := browserGui["telemetryListView"].GetNext()

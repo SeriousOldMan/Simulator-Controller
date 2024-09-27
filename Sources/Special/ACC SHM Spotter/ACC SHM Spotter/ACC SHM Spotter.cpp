@@ -2019,6 +2019,7 @@ void checkCoordinates() {
 string telemetryDirectory = "";
 ofstream telemetryFile;
 int telemetryLap = -1;
+float lastRunning = -1;
 
 void collectCarTelemetry() {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
@@ -2046,6 +2047,8 @@ void collectCarTelemetry() {
 
 						rename((telemetryDirectory + "\\Lap " + to_string(telemetryLap) + ".tmp").c_str(),
 							   (telemetryDirectory + "\\Lap " + to_string(telemetryLap) + ".telemetry").c_str());
+
+						lastRunning = -1;
 					}
 					catch (...) {
 					}
@@ -2067,16 +2070,20 @@ void collectCarTelemetry() {
 
 					rotateBy(&longG, &latG, angle);
 
-					telemetryFile << (driverRunning * trackLength) << ";"
-								  << (pf->gas >= 0 ? pf->gas : 0) << ";"
-						          << (pf->brake >= 0 ? pf->brake : 0) << ";"
-						          << pf->steerAngle << ";"
-						          << pf->gear << ";"
-						          << pf->rpms << ";"
-						          << pf->speedKmh << ";"
-						          << pf->tc << ";"
-						          << pf->abs << ";"
-						          << longG << ";" << latG << endl;
+					if (driverRunning > lastRunning) {
+						telemetryFile << (driverRunning * trackLength) << ";"
+							<< (pf->gas >= 0 ? pf->gas : 0) << ";"
+							<< (pf->brake >= 0 ? pf->brake : 0) << ";"
+							<< pf->steerAngle << ";"
+							<< pf->gear << ";"
+							<< pf->rpms << ";"
+							<< pf->speedKmh << ";"
+							<< pf->tc << ";"
+							<< pf->abs << ";"
+							<< longG << ";" << latG << endl;
+
+						lastRunning = driverRunning;
+					}
 				}
 			}
 			catch (...) {

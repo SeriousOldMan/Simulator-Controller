@@ -1,9 +1,12 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Globalization;
 
 static class Program
 {
     static StreamWriter outStream = null;
+
+    static float lastRunning = -1;
 
     static float running = 0.0f;
     static float speed = 0.0f;
@@ -16,6 +19,10 @@ static class Program
     static int abs = 0;
     static float longG = 0.0f;
     static float latG = 0.0f;
+
+    static string driver = "John Doe (JD)";
+    static int lapNumber = 0;
+    static float lapTime = 0.0f;
 
     static void skipObject(JsonTextReader reader)
     {
@@ -37,6 +44,40 @@ static class Program
                 skipObject(reader);
             else if (reader.TokenType == JsonToken.StartArray)
                 skipArray(reader);
+    }
+
+    static void readSummary(JsonTextReader reader)
+    {
+        reader.Read();
+
+        while (reader.Read())
+            if (reader.TokenType == JsonToken.EndObject)
+                break;
+            else if (reader.TokenType == JsonToken.StartObject)
+                skipObject(reader);
+            else if (reader.TokenType == JsonToken.StartArray)
+                skipArray(reader);
+            else if (reader.Value != null)
+                switch (reader.Value.ToString())
+                {
+                    case "DriverName":
+                        reader.Read();
+                        driver = reader.Value.ToString();
+                        break;
+                    case "LapNumber":
+                        reader.Read();
+                        lapNumber = int.Parse(reader.Value.ToString());
+                        break;
+                    case "LapTime":
+                        reader.Read();
+
+                        TimeSpan time = TimeSpan.Parse(reader.Value.ToString());
+
+                        lapTime = (float)time.TotalSeconds;
+
+                        break;
+                }
+
     }
 
     static void readPoints(JsonTextReader reader)
@@ -84,17 +125,22 @@ static class Program
                 }
         }
 
-        outStream.Write(running + ";");
-        outStream.Write(throttle + ";");
-        outStream.Write(brake + ";");
-        outStream.Write(steering + ";");
-        outStream.Write(gear + ";");
-        outStream.Write(rpms + ";");
-        outStream.Write(speed + ";");
-        outStream.Write(tc + ";");
-        outStream.Write(abs + ";");
-        outStream.Write(longG + ";");
-        outStream.WriteLine(latG);
+        if (running > lastRunning)
+        {
+            outStream.Write(running + ";");
+            outStream.Write(throttle + ";");
+            outStream.Write(brake + ";");
+            outStream.Write(steering + ";");
+            outStream.Write(gear + ";");
+            outStream.Write(rpms + ";");
+            outStream.Write(speed + ";");
+            outStream.Write(tc + ";");
+            outStream.Write(abs + ";");
+            outStream.Write(longG + ";");
+            outStream.WriteLine(latG);
+
+            lastRunning = running;
+        }
     }
 
     static void readDriverInput(JsonTextReader reader)
@@ -168,8 +214,12 @@ static class Program
 
                         string value = reader.Value.ToString();
 
-                        if (value == "N")
+                        
+                        if (String.Compare(value, "N", comparisonType: StringComparison.OrdinalIgnoreCase) == 0)
                             value = "0";
+
+                        if (String.Compare(value, "R", comparisonType: StringComparison.OrdinalIgnoreCase) == 0)
+                            value = "-1";
 
                         gear = int.Parse(value);
                         break;
@@ -218,11 +268,11 @@ static class Program
                 {
                     case "XinMs":
                         reader.Read();
-                        longG = float.Parse(reader.Value.ToString());
+                        latG = float.Parse(reader.Value.ToString());
                         break;
                     case "ZinMs":
                         reader.Read();
-                        latG = float.Parse(reader.Value.ToString());
+                        longG = float.Parse(reader.Value.ToString());
                         break;
                 }
     }
@@ -239,7 +289,7 @@ static class Program
                 {
                     case "IsActive":
                         reader.Read();
-                        abs = (reader.Value.ToString() == "true" ? 1 : 0);
+                        abs = (String.Compare(reader.Value.ToString(), "true", comparisonType: StringComparison.OrdinalIgnoreCase) == 0 ? 1 : 0);
                         break;
                 }
     }
@@ -256,7 +306,7 @@ static class Program
                 {
                     case "IsActive":
                         reader.Read();
-                        tc = (reader.Value.ToString() == "true" ? 1 : 0);
+                        tc = (String.Compare(reader.Value.ToString(), "true", comparisonType: StringComparison.OrdinalIgnoreCase) == 0 ? 1 : 0);
                         break;
                 }
     }
@@ -279,13 +329,38 @@ static class Program
         
         JsonTextReader reader = new JsonTextReader(new StreamReader(input));
 
-        while (reader.Read())
-            if (reader.Value != null && reader.Value.ToString() == "DataPoints") {
-                readPoints(reader);
+        reader.Read();
 
+        while (reader.Read())
+            if (reader.TokenType == JsonToken.EndObject)
                 break;
-            }
+            else if (reader.TokenType == JsonToken.StartObject)
+                skipObject(reader);
+            else if (reader.TokenType == JsonToken.StartArray)
+                skipArray(reader);
+            else if (reader.Value != null)
+                switch (reader.Value.ToString())
+                {
+                    case "DataPoints":
+                        readPoints(reader);
+                        break;
+                    case "LapSummary":
+                        readSummary(reader);
+                        break;
+                }
 
         outStream.Close();
+
+        if (args.Length > 2)
+        {
+            outStream = new StreamWriter(args[2]);
+
+            outStream.WriteLine("[Info]");
+            outStream.Write("Driver="); outStream.WriteLine(driver);
+            outStream.Write("Lap="); outStream.WriteLine(lapNumber);
+            outStream.Write("LapTime="); outStream.WriteLine(lapTime);
+
+            outStream.Close();
+        }
     }
 }

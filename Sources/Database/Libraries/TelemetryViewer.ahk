@@ -619,7 +619,7 @@ class TelemetryViewer {
 												   : this.iReferenceLap)
 										   : false)
 			else
-				return (path ? this.iReferenceLap[3] : this.iReferenceLap[1])
+				return (path ? this.iReferenceLap[3] : this.iReferenceLap)
 		}
 
 		Set {
@@ -811,6 +811,8 @@ class TelemetryViewer {
 	}
 
 	updateState() {
+		local simulator, car, track, descriptor
+
 		this.Control["loadButton"].Enabled := true
 
 		if this.SelectedLap
@@ -818,8 +820,17 @@ class TelemetryViewer {
 		else
 			this.Control["deleteButton"].Enabled := false
 
-		if (this.SelectedLap && isNumber(this.SelectedLap))
-			this.Control["saveButton"].Enabled := true
+		if this.SelectedLap {
+			if isNumber(this.SelectedLap)
+				this.Control["saveButton"].Enabled := true
+			else {
+				this.Manager.getSessionInformation(&simulator, &car, &track)
+
+				descriptor := this.SelectedLap
+
+				this.Control["saveButton"].Enabled := !SessionDatabase().hasTelemetry(simulator, car, track, true, false, descriptor[1])
+			}
+		}
 		else
 			this.Control["saveButton"].Enabled := false
 	}
@@ -880,7 +891,7 @@ class TelemetryViewer {
 		local name := false
 		local telemetry := false
 		local info := false
-		local simulator, car, track
+		local simulator, car, track, info
 		local sessionDB, directory, dataFile, file, size, lap
 
 		this.Manager.getSessionInformation(&simulator, &car, &track)
@@ -893,7 +904,20 @@ class TelemetryViewer {
 			this.Window.Block()
 
 			try {
-				fileName := browseLapTelemetries(this.Window, &simulator, &car, &track)
+				fileName := browseLapTelemetries(this.Window, &simulator, &car, &track, &info)
+
+				if ((fileName && (fileName != "")) && info) {
+					info := readMultiMap(info)
+
+					if !driver
+						driver := getMultiMapValue(info, "Info", "Driver")
+
+					DirCreate(this.TelemetryDirectory . "Imported")
+
+					FileCopy(fileName, this.TelemetryDirectory . "Imported\Lap " . getMultiMapValue(info, "Info", "Lap") . ".telemetry", 1)
+
+					fileName := (this.TelemetryDirectory . "Imported\Lap " . getMultiMapValue(info, "Info", "Lap") . ".telemetry")
+				}
 			}
 			finally {
 				this.Window.Unblock()
@@ -952,14 +976,14 @@ class TelemetryViewer {
 
 	saveLap(lap := false, prompt := true) {
 		local simulator, car, track
-		local sessionDB, dirName, fileName, newFileName, file, folder, telemetry
+		local sessionDB, dirName, fileName, newFileName, file, folder, telemetry, driver
 
 		this.Manager.getSessionInformation(&simulator, &car, &track)
 
 		if !lap
 			lap := this.SelectedLap
 
-		if (lap && isNumber(lap)) {
+		if lap {
 			if (simulator && car && track) {
 				dirName := (SessionDatabase.DatabasePath . "User\" . SessionDatabase.getSimulatorCode(simulator)
 						  . "\" . car . "\" . track . "\Lap Telemetries")
@@ -969,7 +993,10 @@ class TelemetryViewer {
 			else
 				dirName := ""
 
-			fileName := (dirName . "\Lap " . lap)
+			if isNumber(lap)
+				fileName := (dirName . "\Lap " . lap)
+			else
+				fileName := (lap[1] . translate(" (") . lap[2] . translate(")"))
 
 			newFileName := (fileName . ".telemetry")
 
@@ -993,7 +1020,10 @@ class TelemetryViewer {
 					SplitPath(fileName, , &folder, , &fileName)
 
 					if (normalizeDirectoryPath(folder) = normalizeDirectoryPath(sessionDB.getTelemetryDirectory(simulator, car, track, "User"))) {
-						file := FileOpen((this.TelemetryDirectory . "Lap " . lap . ".telemetry"), "r-wd")
+						if isNumber(lap)
+							file := FileOpen((this.TelemetryDirectory . "Lap " . lap . ".telemetry"), "r-wd")
+						else
+							file := FileOpen(lap[3], "r-wd")
 
 						if file {
 							size := file.Length
@@ -1004,8 +1034,17 @@ class TelemetryViewer {
 
 							file.Close()
 
+							if isNumber(lap)
+								driver := SessionDatabase.ID
+							else {
+								driver := SessionDatabase.getDriverID(simulator, car, track, lap[2])
+
+								if !driver
+									driver := SessionDatabase.ID
+							}
+
 							sessionDB.writeTelemetry(simulator, car, track, fileName, telemetry, size
-												   , false, true, SessionDatabase.ID)
+												   , false, true, driver)
 
 							return
 						}
@@ -1128,7 +1167,7 @@ class TelemetryViewer {
 
 	loadTelemetry(select := false) {
 		local laps := []
-		local lap, name
+		local lap, name, index
 
 		newLap(lap) {
 			local file
@@ -1198,8 +1237,27 @@ class TelemetryViewer {
 				this.selectReferenceLap(false, true)
 			}
 			else {
-				this.Control["lapDropDown"].Choose(inList(this.Laps, this.SelectedLap))
-				this.Control["referenceLapDropDown"].Choose(1 + inList(this.Laps, this.SelectedReferenceLap))
+				index := inList(this.Laps, this.SelectedLap)
+
+				if !index {
+					index := inList(this.ImportedLaps, this.SelectedLap)
+
+					if (index && (this.Laps.Length > 0))
+						index += (this.Laps.Length + 1)
+				}
+
+				this.Control["lapDropDown"].Choose(index)
+
+				index := inList(this.Laps, this.SelectedReferenceLap)
+
+				if !index {
+					index := inList(this.ImportedLaps, this.SelectedReferenceLap)
+
+					if (index && (this.Laps.Length > 0))
+						index += (this.Laps.Length + 1)
+				}
+
+				this.Control["referenceLapDropDown"].Choose(1 + index)
 			}
 
 			this.updateState()

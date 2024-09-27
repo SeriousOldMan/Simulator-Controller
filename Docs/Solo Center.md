@@ -121,6 +121,8 @@ Important: Session that are saved with telemetry data will NOT be synchronized w
    - Telemetry data, which has been *imported* this way will not become part of the current session.
    *Imported* telemetry data can be removed by using the *delete* button. This will not remove it from its original location.
 
+Good to know: If you use the "Open..." button in the dialog, which let's you browse the available telemetry data, you can import telemetry data from ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), as long as it has been saved as JSON file, which can be activated in the settings of "Second Monitor".
+
 ### Managing tyres and planning practice stints
 
 The first tab "Tyres" in the lower left corner allows you to manage your tyre sets during your practice runs. In many cases, you can let the "Solo Center" decide automatically, when to create a new stint and when a tyre change happened (at least for *Assetto Corsa Competizione*, *rFactor 2* and *Le Mans Ultimate*). But not all simulators provide access to the mounted tyres in their data API, so it is also possible to create a new stint with your individual tyre setup manually.

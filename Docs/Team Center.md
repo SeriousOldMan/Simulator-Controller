@@ -180,6 +180,8 @@ Important: Sessions that are saved with telemetry data to the session database w
    - Telemetry data, which has been *imported* this way will not become part of the current session.
    *Imported* telemetry data can be removed by using the *delete* button. This will not remove it from its original location.
 
+Good to know: If you use the "Open..." button in the dialog, which let's you browse the available telemetry data, you can import telemetry data from ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), as long as it has been saved as JSON file, which can be activated in the settings of "Second Monitor".
+
 ### Strategy Handling
 
 If you are running a race based on a predefined strategy developed using the ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench), you can adopt this strategy when necessary after important race events, for example after an accident, or after or just before significant weather changes.

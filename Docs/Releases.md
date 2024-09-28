@@ -1,9 +1,10 @@
 ## 5.9.2.0-release 10/04/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. Lap telemetry data opened from a source other than the current session, will also show the driver name, if available.
-  4. A third graph has been added to the telemetry viewer, which show longitudinal and lateral G-Forces and also an information about the curvature of the current corner.
-  5. Lap telemetry data can now be imported from Second Monitor. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#laps) for more information.
+  3. Fixed a critical bug for iRacing, which makes the Spotter non-functional. Was introduced with the telemetry support 2 weeks ago.
+  4. Lap telemetry data opened from a source other than the current session, will also show the driver name, if available.
+  5. A third graph has been added to the telemetry viewer, which show longitudinal and lateral G-Forces and also an information about the curvature of the current corner.
+  6. Lap telemetry data can now be imported from Second Monitor. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#laps) for more information.
 
 ## 5.9.1.0-release 09/27/24
   1. Minor bugfixes, as always

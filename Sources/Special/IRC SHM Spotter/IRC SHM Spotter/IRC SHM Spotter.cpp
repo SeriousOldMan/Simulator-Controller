@@ -1921,7 +1921,7 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 					  << speed << ";"
 					  << "n/a" << ";"
 					  << "n/a" << ";"
-					  << longG << ";" << latG << std::endl;
+					  << longG << ";" << - latG << std::endl;
 	}
 	catch (...) {
 		try {
@@ -2231,6 +2231,8 @@ int main(int argc, char* argv[])
 									onTrack = false;
 
 								bool inPit = false;
+
+								getRawDataValue(rawValue, pHeader, g_data, "CarIdxOnPitRoad");
 
 								if (((bool*)rawValue)[playerCarIndex])
 									inPit = true;

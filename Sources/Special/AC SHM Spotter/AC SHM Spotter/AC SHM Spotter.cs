@@ -1661,10 +1661,14 @@ namespace ACSHMSpotter {
 					}
 					double angle = 360 * ((2 * Math.PI) - playerRotation) / (2 * Math.PI);
 
-					float longG = physics.AccG[0];
-					float latG = - physics.AccG[2];
+                    double latG = physics.AccG[0];
+					double longG = physics.AccG[2];
 
-					telemetryFile.Write(Math.Max(0, Math.Min(1, driver.splinePosition)) + staticInfo.TrackSPlineLength + ";");
+                    // rotateBy(ref longG, ref latG, angle);
+
+                    // latG *= -1;
+
+                    telemetryFile.Write(Math.Max(0, Math.Min(1, driver.splinePosition)) + staticInfo.TrackSPlineLength + ";");
 					telemetryFile.Write(physics.Gas + ";");
 					telemetryFile.Write(physics.Brake + ";");
 					telemetryFile.Write(physics.SteerAngle + ";");

@@ -2065,10 +2065,12 @@ void collectCarTelemetry() {
 				if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
 					float angle = vectorAngle(velocityX, velocityY);
 
-					float longG = pf->accG[0];
-					float latG = - pf->accG[2];
+					float latG = pf->accG[0];
+					float longG = pf->accG[2];
 
-					rotateBy(&longG, &latG, angle);
+					// rotateBy(&longG, &latG, angle);
+
+					// latG *= -1;
 
 					if (driverRunning > lastRunning) {
 						telemetryFile << (driverRunning * trackLength) << ";"

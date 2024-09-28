@@ -77,7 +77,9 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 
 			for ignore, fileName in isObject(fileName) ? fileName : [fileName]
 				if InStr(fileName, ".json") {
-					withTask(WorkingTask(translate("Extracting ") . translate("Telemetry")), () {
+					SplitPath(fileName, , , , &name)
+
+					withTask(WorkingTask(translate("Extracting ") . name), () {
 						try {
 							importFileName := temporaryFileName("Import", "telemetry")
 
@@ -91,7 +93,8 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 								Sleep(100)
 
 							if FileExist(importFileName)
-								fileNames.Push([importFileName, importFileName . ".info"])
+								fileNames.Push(importFileName)
+								infos.Push(importFileName . ".info")
 						}
 						catch Any as exception {
 							logError(exception)
@@ -100,7 +103,7 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 				}
 
 			if (fileNames.Length > 0) {
-				fileName := fileNames
+				fileName := [fileNames, infos]
 
 				browseLapTelemetries(kOk)
 			}

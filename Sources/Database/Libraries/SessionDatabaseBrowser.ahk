@@ -101,6 +101,10 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 						}
 					})
 				}
+				else {
+					fileNames.Push(fileName)
+					infos.Push(false)
+				}
 
 			if (fileNames.Length > 0) {
 				fileName := [fileNames, infos]

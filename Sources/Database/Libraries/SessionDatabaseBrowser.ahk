@@ -28,7 +28,7 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 	local x, y, names, ignore, infos, index, name, dirName, driverName
 	local carNames, trackNames, newSimulator, newCar, newTrack, force
 	local userTelemetries, communityTelemetries, info
-	local command, importFileName, pid, count
+	local command, importFileName, pid, count, fileNames
 
 	static sessionDB := false
 
@@ -65,50 +65,47 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 	else if (ownerOrCommand == "Load") {
 		browserGui.Opt("+OwnDialogs")
 
-		if GetKeyState("Ctrl") {
-			OnMessage(0x44, translateLoadCancelButtons)
-			fileName := withBlockedWindows(FileSelect, "D1", kDatabaseDirectory, translate("Load Telemetry..."))
-			OnMessage(0x44, translateLoadCancelButtons, 0)
-		}
-		else {
-			dirName := (SessionDatabase.DatabasePath . "User\")
+		dirName := (SessionDatabase.DatabasePath . "User\")
 
-			OnMessage(0x44, translateLoadCancelButtons)
-			fileName := withBlockedWindows(FileSelect, 1, dirName, translate("Load Telemetry..."), "Lap Telemetry (*.telemetry; *.json)")
-			OnMessage(0x44, translateLoadCancelButtons, 0)
-		}
+		OnMessage(0x44, translateLoadCancelButtons)
+		fileName := withBlockedWindows(FileSelect, "M1", dirName, translate("Load Telemetry..."), "Lap Telemetry (*.telemetry; *.json)")
+		OnMessage(0x44, translateLoadCancelButtons, 0)
 
-		if (fileName != "") {
-			if InStr(fileName, ".json") {
-				withTask(WorkingTask(translate("Extracting ") . translate("Telemetry")), () {
-					try {
-						importFileName := temporaryFileName("Import", "telemetry")
-						command := ("`"" . kBinariesDirectory . "Connectors\Second Monitor Reader\Second Monitor Reader.exe`" `"" . fileName . "`" `"" . importFileName . "`" `"" . (importFileName . ".info") . "`"")
+		if ((fileName != "") || (isObject(fileName) && (fileName.Length > 0))) {
+			fileNames := []
+			infos := []
 
-						Run(command, , "Hide", &pid)
+			for ignore, fileName in isObject(fileName) ? fileName : [fileName]
+				if InStr(fileName, ".json") {
+					withTask(WorkingTask(translate("Extracting ") . translate("Telemetry")), () {
+						try {
+							importFileName := temporaryFileName("Import", "telemetry")
 
-						Sleep(500)
+							Run("`"" . kBinariesDirectory . "Connectors\Second Monitor Reader\Second Monitor Reader.exe`" `"" . fileName . "`" `"" . importFileName . "`" `"" . (importFileName . ".info") . "`"", , "Hide", &pid)
 
-						count := 0
+							Sleep(500)
 
-						while (ProcessExist(pid) && (count++ < 100))
-							Sleep(100)
+							count := 0
 
-						if FileExist(importFileName)
-							fileName := [importFileName, importFileName . ".info"]
-						else
-							fileName := false
-					}
-					catch Any as exception {
-						logError(exception)
+							while (ProcessExist(pid) && (count++ < 100))
+								Sleep(100)
 
-						fileName := false
-					}
-				})
-			}
+							if FileExist(importFileName)
+								fileNames.Push([importFileName, importFileName . ".info"])
+						}
+						catch Any as exception {
+							logError(exception)
+						}
+					})
+				}
 
-			if fileName
+			if (fileNames.Length > 0) {
+				fileName := fileNames
+
 				browseLapTelemetries(kOk)
+			}
+			else
+				fileName := false
 		}
 		else
 			fileName := false
@@ -246,7 +243,7 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 		browserGui.Add("Text", "x8 yp+24 w70 h23 +0x200", translate("Track"))
 		browserGui.Add("DropDownList", "x90 yp w275 vtrackDropDown").OnEvent("Change", selectTrack)
 
-		browserGui.Add("ListView", "x8 yp+30 w357 h335 -Multi -LV0x10 AltSubmit vtelemetryListView", collect(["Telemetry", "Driver", "Date"], translate))
+		browserGui.Add("ListView", "x8 yp+30 w357 h335 +Multi -LV0x10 AltSubmit vtelemetryListView", collect(["Telemetry", "Driver", "Date"], translate))
 		browserGui["telemetryListView"].OnEvent("DoubleClick", browseLapTelemetries.Bind(kOk))
 
 		browserGui.Add("Button", "x8 yp+345 w80 h23 vopenButton", translate("Open...")).OnEvent("Click", browseLapTelemetries.Bind("Load"))
@@ -295,20 +292,26 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 						return fileName
 				}
 				else {
-					index := browserGui["telemetryListView"].GetNext()
+					fileNames := []
 
-					if index {
+					index := 0
+
+					while (index := browserGui["telemetryListView"].GetNext(index)) {
+						if FileExist(sessionDB.getTelemetryDirectory(simulator, car, track, "User")
+								   . browserGui["telemetryListView"].GetText(index) . ".telemetry")
+							fileNames.Push(sessionDB.getTelemetryDirectory(simulator, car, track, "User")
+										 . browserGui["telemetryListView"].GetText(index) . ".telemetry")
+						else
+							fileNames.Push(sessionDB.getTelemetryDirectory(simulator, car, track, "Community")
+										 . browserGui["telemetryListView"].GetText(index) . ".telemetry")
+					}
+
+					if (fileNames.Length > 0) {
 						%arguments[1]% := simulator
 						%arguments[2]% := car
 						%arguments[3]% := track
 
-						if FileExist(sessionDB.getTelemetryDirectory(simulator, car, track, "User")
-								   . browserGui["telemetryListView"].GetText(index) . ".telemetry")
-							return (sessionDB.getTelemetryDirectory(simulator, car, track, "User")
-								  . browserGui["telemetryListView"].GetText(index) . ".telemetry")
-						else
-							return (sessionDB.getTelemetryDirectory(simulator, car, track, "Community")
-								  . browserGui["telemetryListView"].GetText(index) . ".telemetry")
+						return fileNames
 					}
 					else
 						return false

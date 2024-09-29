@@ -96,7 +96,7 @@ class TelemetryChart {
 					if !isNumber(value)
 						entry[index] := kNull
 					else if (index = 1)
-						running := entry[index] := (Round(entry[index] / 5) * 5)
+						running := entry[index] := (Round(entry[index] / 7.5) * 7.5)
 
 				referenceLapTelemetry[running] := entry
 			}
@@ -208,7 +208,7 @@ class TelemetryChart {
 				speed := kNull
 
 			if referenceLapTelemetry {
-				refRunning := (Round(running / 5) * 5)
+				refRunning := (Round(running / 7.5) * 7.5)
 
 				if referenceLapTelemetry.Has(refRunning) {
 					refData := referenceLapTelemetry[refRunning]
@@ -286,7 +286,7 @@ class TelemetryChart {
 				rpms := kNull
 
 			if referenceLapTelemetry {
-				refRunning := (Round(running / 5) * 5)
+				refRunning := (Round(running / 7.5) * 7.5)
 
 				if referenceLapTelemetry.Has(refRunning) {
 					refData := referenceLapTelemetry[refRunning]
@@ -396,7 +396,7 @@ class TelemetryChart {
 				curvature := kNull
 
 			if referenceLapTelemetry {
-				refRunning := (Round(running / 5) * 5)
+				refRunning := (Round(running / 7.5) * 7.5)
 
 				if referenceLapTelemetry.Has(refRunning) {
 					refData := referenceLapTelemetry[refRunning]

@@ -56,10 +56,15 @@ class TelemetryChart {
 	}
 
 	showTelemetryChart(lapFileName, referenceLapFileName := false) {
+		eventHandler(event, arguments*) {
+		}
+
 		if this.TelemetryViewer {
 			this.TelemetryViewer.document.open()
 			this.TelemetryViewer.document.write(this.createTelemetryChart(lapFileName, referenceLapFileName))
 			this.TelemetryViewer.document.close()
+
+			this.TelemetryViewer.document.parentWindow.eventHandler := eventHandler
 		}
 	}
 
@@ -240,7 +245,9 @@ class TelemetryChart {
 
 		drawChartFunction .= ("]);`nvar options = { " . axes . ", legend: { position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '2%', top: '5%', right: '2%', bottom: '20%' }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
 
-		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
+		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options);")
+		drawChartFunction .= "`nfunction selectHandler(e) { var cSelection = chart.getSelection(); var selection = ''; for (var i = 0; i < cSelection.length; i++) { var item = cSelection[i]; if (i > 0) selection += ';'; selection += (item.row + '|' + item.column); } eventHandler('Select', selection); }"
+		drawChartFunction .= "`ngoogle.visualization.events.addListener(chart, 'select', selectHandler); }"
 
 		return ("<div id=`"chart_" . chartID . "`" style=`"width: " . Round(width) . "px; height: " . Round(height) . "px`"></div>")
 	}
@@ -781,6 +788,8 @@ class TelemetryViewer {
 
 		if getWindowSize("Telemetry Browser", &w, &h)
 			this.Window.Resize("Initialize", w, h)
+
+		this.Window.Opt("+OwnDialogs")
 
 		this.loadTelemetry()
 

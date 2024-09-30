@@ -7653,7 +7653,8 @@ class SoloCenter extends ConfigurationItem {
 					this.startSession(fileName, true)
 
 				if this.TelemetryViewer
-					this.TelemetryViewer.startupCollector(this.Simulator, getMultiMapValue(data, "Track Data", "Length", 0))
+					this.TelemetryViewer.startupCollector(this.Simulator, getMultiMapValue(data, "Session Data", "Track", "Unknown")
+																		, getMultiMapValue(data, "Track Data", "Length", 0))
 
 				if update {
 					if (this.SessionActive && (this.LastLap.Nr = lapNumber))

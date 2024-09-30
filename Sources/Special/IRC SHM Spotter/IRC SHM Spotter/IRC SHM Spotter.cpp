@@ -1921,7 +1921,15 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 					  << speed << ";"
 					  << "n/a" << ";"
 					  << "n/a" << ";"
-					  << longG << ";" << latG << std::endl;
+					  << longG << ";" << latG;
+
+		float coordinateX;
+		float coordinateY;
+
+		if (getCarCoordinates(header, data, playerCarIndex, coordinateX, coordinateY))
+			telemetryFile << ";" << coordinateX << ";" << coordinateY << std::endl;
+		else
+			telemetryFile << std::endl;
 	}
 	catch (...) {
 		try {
@@ -2068,6 +2076,12 @@ int main(int argc, char* argv[])
 			char* trackLength = argv[2];
 
 			telemetryDirectory = argv[3];
+
+			if (argc > 3) {
+				loadTrackCoordinates(argv[4]);
+
+				hasTrackCoordinates = true;
+			}
 		}
 		else {
 			for (int i = 0; i < 512; ++i)

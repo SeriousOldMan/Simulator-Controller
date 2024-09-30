@@ -1494,7 +1494,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		if (this.TelemetryDirectory && !this.TelemetryCollector && (this.TrackLength > 0)) {
 			DirCreate(this.TelemetryDirectory)
 
-			this.iTelemetryCollector := TelemetryCollector(this.TelemetryDirectory, this.Simulator, this.TrackLength)
+			this.iTelemetryCollector := TelemetryCollector(this.TelemetryDirectory, this.Simulator, this.Track, this.TrackLength)
 
 			this.iTelemetryCollector.startup()
 

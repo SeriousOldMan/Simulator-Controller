@@ -1759,7 +1759,10 @@ namespace RF2SHMSpotter {
                 telemetryFile.Write("n/a;");
 
                 telemetryFile.Write(playerScoring.mLocalAccel.x + ";");
-                telemetryFile.WriteLine(playerScoring.mLocalAccel.y);
+                telemetryFile.Write(playerScoring.mLocalAccel.y + ";");
+
+                telemetryFile.Write(playerScoring.mPos.x + ";");
+                telemetryFile.WriteLine(- playerScoring.mPos.z);
             }
             catch (Exception)
             {

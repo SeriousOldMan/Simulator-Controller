@@ -1654,7 +1654,9 @@ namespace ACSHMSpotter {
 
 				if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
 				{
-					float playerRotation = physics.Heading;
+                    int carID = 0;
+
+                    float playerRotation = physics.Heading;
 					if (playerRotation < 0)
 					{
 						playerRotation = (float)(2 * Math.PI) + playerRotation;
@@ -1675,9 +1677,12 @@ namespace ACSHMSpotter {
 					telemetryFile.Write(physics.TC + ";");
 					telemetryFile.Write(physics.Abs + ";");
 
-					telemetryFile.Write(longG + ";");
-					telemetryFile.WriteLine(latG);
-				}
+                    telemetryFile.Write(longG + ";");
+                    telemetryFile.Write(latG + ";");
+
+                    telemetryFile.Write(cars.cars[carID].worldPosition.x + ";");
+                    telemetryFile.WriteLine(cars.cars[carID].worldPosition.z);
+                }
             }
             catch (Exception)
             {

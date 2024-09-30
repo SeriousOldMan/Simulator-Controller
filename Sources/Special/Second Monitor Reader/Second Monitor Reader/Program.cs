@@ -19,6 +19,8 @@ static class Program
     static int abs = 0;
     static float longG = 0.0f;
     static float latG = 0.0f;
+    static float posX = 0.0f;
+    static float posY = 0.0f;
 
     static string driver = "John Doe (JD)";
     static int lapNumber = 0;
@@ -139,6 +141,12 @@ static class Program
             outStream.Write(longG + ";");
             outStream.WriteLine(latG);
 
+            /*
+            outStream.Write(latG + ";");
+            outStream.Write(posX + ";");
+            outStream.WriteLine(posY);
+            */
+
             lastRunning = running;
         }
     }
@@ -191,6 +199,9 @@ static class Program
                         break;
                     case "CarInfo":
                         readCarData(reader);
+                        break;
+                    case "WorldPosition":
+                        readPosition(reader);
                         break;
                 }
     }
@@ -252,6 +263,37 @@ static class Program
                     case "InMs":
                         reader.Read();
                         speed = float.Parse(reader.Value.ToString()) * 3.6f;
+                        break;
+                }
+    }
+
+    static void readPosition(JsonTextReader reader)
+    {
+        reader.Read();
+
+        while (reader.Read())
+            if (reader.TokenType == JsonToken.EndObject)
+                break;
+            else if (reader.TokenType == JsonToken.StartObject)
+                skipObject(reader);
+            else if (reader.TokenType == JsonToken.StartArray)
+                skipArray(reader);
+            else if (reader.Value != null)
+                switch (reader.Value.ToString())
+                {
+                    case "X":
+                        reader.Read();
+                        reader.Read();
+                        reader.Read();
+                        posX = float.Parse(reader.Value.ToString());
+                        reader.Read();
+                        break;
+                    case "Z":
+                        reader.Read();
+                        reader.Read();
+                        reader.Read();
+                        posY = float.Parse(reader.Value.ToString());
+                        reader.Read();
                         break;
                 }
     }

@@ -3242,7 +3242,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		ControlMove(x, y, w, h, this.iTrackDisplay)
 
-		this.iTrackDisplay.Value := "*w" . imgWidth . " *h" . imgHeight . A_Space . trackImage
+		this.iTrackDisplay.Value := ("*w" . imgWidth . " *h" . imgHeight . A_Space . trackImage)
 
 		this.iTrackDisplay.Opt("+Redraw")
 	}

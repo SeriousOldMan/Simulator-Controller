@@ -68,18 +68,27 @@ class TelemetryChart {
 			local row := false
 			local data
 
-			if (event = "Select") {
-				row := string2Values(";", arguments[1])
+			if telemetryViewer.TrackMap {
+				; this.ChartArea.stop()
 
-				if (StrLen(Trim(row[1])) > 0) {
-					row := (string2Values("|", row[1])[1] + 1)
+				try {
+					if (event = "Select") {
+						row := string2Values(";", arguments[1])
 
-					if (isNumber(row) && telemetryViewer.Data.Has(telemetryViewer.SelectedLap[true])) {
-						data := telemetryViewer.Data[telemetryViewer.SelectedLap[true]]
+						if (StrLen(Trim(row[1])) > 0) {
+							row := (string2Values("|", row[1])[1] + 1)
 
-						if (data.Has(row) && data[row].Length > 11)
-							telemetryViewer.TrackMap.updateTrackPosition(data[row][12], data[row][13])
+							if (isNumber(row) && telemetryViewer.Data.Has(telemetryViewer.SelectedLap[true])) {
+								data := telemetryViewer.Data[telemetryViewer.SelectedLap[true]]
+
+								if (data.Has(row) && data[row].Length > 11)
+									telemetryViewer.TrackMap.updateTrackPosition(data[row][12], data[row][13])
+							}
+						}
 					}
+				}
+				catch Any as exception {
+					logError(exception)
 				}
 			}
 		}
@@ -1589,6 +1598,9 @@ class TrackMap {
 	}
 
 	updateTrackPosition(posX, posY) {
+		if isDebug()
+			showMessage(posX . ", " . posY)
+
 		this.createTrackMap(posX, posY)
 	}
 

@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\..\Libraries\HTMLViewer.ahk"
+#Include "..\..\Libraries\GDIP.ahk"
 #Include "SessionDatabase.ahk"
 #Include "SessionDatabaseBrowser.ahk"
 #Include "TelemetryCollector.ahk"
@@ -482,6 +483,8 @@ class TelemetryViewer {
 
 	iCollect := false
 
+	iTrackMap := false
+
 	class TelemetryViewerWindow extends Window {
 		iViewer := false
 
@@ -503,7 +506,7 @@ class TelemetryViewer {
 		__New(telemetryViewer, arguments*) {
 			this.iTelemetryViewer := telemetryViewer
 
-			super.__New(arguments*)
+			super.__New(telemetryViewer.Window, arguments*)
 
 			Task.startTask(ObjBindMethod(this, "RedrawHTMLViewer"), 500, kHighPriority)
 		}
@@ -644,6 +647,12 @@ class TelemetryViewer {
 		}
 	}
 
+	TrackMap {
+		Get {
+			return this.iTrackMap
+		}
+	}
+
 	__New(manager, directory, collect := true) {
 		this.iManager := manager
 		this.iTelemetryDirectory := (normalizeDirectoryPath(directory) . "\")
@@ -729,6 +738,10 @@ class TelemetryViewer {
 			this.saveLap()
 		}
 
+		openTrackMap(*) {
+			this.openTrackMap()
+		}
+
 		this.iWindow := viewerGui
 
 		viewerGui.SetFont("s10 Bold", "Arial")
@@ -757,6 +770,8 @@ class TelemetryViewer {
 		viewerGui.Add("Text", "x16 yp+28 w80", translate("Reference"))
 		viewerGui.Add("DropDownList", "x98 yp-4 w280 Choose1 vreferenceLapDropDown", concatenate([translate("None")], collect(this.Laps, (l) => this.lapLabel(l)))).OnEvent("Change", chooseReferenceLap)
 
+		viewerGui.Add("Button", "x380 yp w73 h23 vtrackButton", translate("Map...")).OnEvent("Click", openTrackMap)
+
 		viewerGui.Add("Text", "x468 yp+4 w80 X:Move", translate("Zoom"))
 		viewerGui.Add("Slider", "Center Thick15 x556 yp-2 X:Move w100 0x10 Range100-400 ToolTip vzoomSlider", 100).OnEvent("Change", changeZoom)
 
@@ -768,7 +783,7 @@ class TelemetryViewer {
 
 		this.iTelemetryChart := TelemetryChart(viewerGui, viewerControl)
 
-		viewerGui.Add(TelemetryViewer.TelemetryViewerResizer(this, viewerControl))
+		viewerGui.Add(TelemetryViewer.TelemetryViewerResizer(this))
 
 		if (this.Laps.Length > 0)
 			this.selectLap(this.Laps[1])
@@ -816,11 +831,16 @@ class TelemetryViewer {
 
 		this.Manager.closedTelemetryViewer()
 
+		if this.TrackMap
+			this.closeTrackMap()
+
 		this.Window.Destroy()
 	}
 
 	updateState() {
 		local simulator, car, track, descriptor
+
+		static sessionDB := SessionDatabase()
 
 		this.Control["loadButton"].Enabled := true
 
@@ -829,12 +849,12 @@ class TelemetryViewer {
 		else
 			this.Control["deleteButton"].Enabled := false
 
+		this.Manager.getSessionInformation(&simulator, &car, &track)
+
 		if this.SelectedLap {
 			if isNumber(this.SelectedLap)
 				this.Control["saveButton"].Enabled := true
 			else {
-				this.Manager.getSessionInformation(&simulator, &car, &track)
-
 				descriptor := this.SelectedLap
 
 				this.Control["saveButton"].Enabled := !SessionDatabase().hasTelemetry(simulator, car, track, true, false, descriptor[1])
@@ -842,6 +862,8 @@ class TelemetryViewer {
 		}
 		else
 			this.Control["saveButton"].Enabled := false
+
+		this.Control["trackButton"].Enabled := sessionDB.hasTrackMap(simulator, track)
 	}
 
 	startupCollector(simulator, trackLength) {
@@ -852,7 +874,7 @@ class TelemetryViewer {
 		}
 	}
 
-	shutdownCollector() {
+	shutdownCollector(*) {
 		if this.TelemetryCollector {
 			this.TelemetryCollector.shutdown()
 
@@ -860,7 +882,34 @@ class TelemetryViewer {
 		}
 	}
 
+	openTrackMap() {
+		local simulator, car, track
+
+		if this.TrackMap
+			this.TrackMap.close()
+
+		this.Manager.getSessionInformation(&simulator, &car, &track)
+
+		this.iTrackMap := TrackMap(this, simulator, track)
+
+		this.TrackMap.show()
+	}
+
+	closeTrackMap() {
+		if this.TrackMap {
+			this.TrackMap.close()
+
+			this.iTrackMap := false
+		}
+	}
+
+	closedTrackMap() {
+		this.iTrackMap := false
+	}
+
 	restart(directory, collect := true) {
+		local simulator, car, track
+
 		this.selectLap(false, true)
 		this.selectReferenceLap(false, true)
 
@@ -879,8 +928,17 @@ class TelemetryViewer {
 			this.updateState()
 		}
 
+		if this.TrackMap {
+			this.Manager.getSessionInformation(&simulator, &car, &track)
+
+			if SessionDatabase().hasTrackMap(simulator, track)
+				this.TrackMap.updateTrackMap(simulator, track)
+			else
+				this.closeTrackMap()
+		}
+
 		if collect
-			OnExit(ObjBindMethod(this, "shutdownTelemetryCollector", true))
+			OnExit(ObjBindMethod(this, "shutdownCollector", true))
 	}
 
 	clear() {
@@ -1276,5 +1334,245 @@ class TelemetryViewer {
 	updateTelemetryChart(redraw := false) {
 		if (this.TelemetryChart && redraw)
 			this.TelemetryChart.showTelemetryChart(this.SelectedLap[true], this.SelectedReferenceLap[true])
+	}
+}
+
+class TrackMap {
+	iTelemetryViewer := false
+
+	iWindow := false
+
+	iSimulator := false
+	iTrack := false
+
+	iTrackDisplay := false
+
+	iTrackMap := false
+	iTrackImage := false
+
+	class TrackMapWindow extends Window {
+		iMap := false
+
+		__New(map, arguments*) {
+			this.iMap := map
+
+			super.__New(arguments*)
+		}
+
+		Close(*) {
+			this.iMap.Close()
+		}
+	}
+
+	class TrackMapResizer extends Window.Resizer {
+		iTrackMap := false
+		iRedraw := false
+
+		__New(trackMap, arguments*) {
+			this.iTrackMap := trackMap
+
+			super.__New(trackMap.Window, arguments*)
+
+			Task.startTask(ObjBindMethod(this, "RedrawTrackMap"), 500, kHighPriority)
+		}
+
+		Resize(deltaWidth, deltaHeight) {
+			this.iRedraw := true
+		}
+
+		RedrawTrackMap() {
+			local ignore, button
+
+			if this.iRedraw {
+				for ignore, button in ["LButton", "MButton", "RButton"]
+					if GetKeyState(button)
+						return Task.CurrentTask
+
+				this.iRedraw := false
+
+				this.iTrackMap.updateTrackMap()
+
+				WinRedraw(this.iTrackMap.Window)
+			}
+
+			return Task.CurrentTask
+		}
+	}
+
+	TelemetryViewer {
+		Get {
+			return this.iTelemetryViewer
+		}
+	}
+
+	Window {
+		Get {
+			return this.iWindow
+		}
+	}
+
+	Control[name] {
+		Get {
+			return this.Window[name]
+		}
+	}
+
+	Simulator {
+		Get {
+			return this.iSimulator
+		}
+	}
+
+	Track {
+		Get {
+			return this.iTrack
+		}
+	}
+
+	TrackMap {
+		Get {
+			return this.iTrackMap
+		}
+	}
+
+	TrackImage {
+		Get {
+			return this.iTrackImage
+		}
+	}
+
+	__New(telemetryViewer, simulator, track) {
+		this.iTelemetryViewer := telemetryViewer
+
+		this.iSimulator := simulator
+		this.iTrack := track
+	}
+
+	createGui() {
+		local mapGui := TrackMap.TrackMapWindow(this, {Descriptor: "Track Map", Closeable: true, Resizeable:  "Deferred"})
+
+		this.iWindow := mapGui
+
+		this.iTrackDisplayArea := [480, 480, 480, 480]
+
+		mapGui.Add("Picture", "x0 y0 w479 h479 W:Grow H:Grow vtrackDisplayArea")
+
+		this.iTrackDisplay := mapGui.Add("Picture", "x479 y479 BackgroundTrans vtrackDisplay")
+
+		mapGui.Add(TrackMap.TrackMapResizer(this))
+	}
+
+	show() {
+		local sessionDB := SessionDatabase()
+		local x, y, w, h
+
+		this.createGui()
+
+		if getWindowPosition("Track Map", &x, &y)
+			this.Window.Show("x" . x . " y" . y)
+		else
+			this.Window.Show()
+
+		if getWindowSize("Track Map", &w, &h)
+			this.Window.Resize("Initialize", w, h)
+
+		this.loadTrackMap(sessionDB.getTrackMap(this.Simulator, this.Track)
+						, sessionDB.getTrackImage(this.Simulator, this.Track))
+	}
+
+	close() {
+		this.TelemetryViewer.closedTrackMap()
+
+		this.Window.Destroy()
+	}
+
+	loadTrackMap(trackMap, trackImage) {
+		local directory := kTempDirectory . "Track Images"
+
+		deleteDirectory(directory)
+
+		DirCreate(directory)
+
+		this.iTrackMap := trackMap
+		this.iTrackImage := this.Window.Theme.RecolorizeImage(trackImage)
+
+		this.createTrackMap()
+	}
+
+	unloadTrackMap() {
+		this.iTrackDisplay.Value := (kIconsDirectory . "Empty.png")
+
+		this.iTrackMap := false
+		this.iTrackImage := false
+	}
+
+	updateTrackMap(simulator := false, track := false) {
+		local load := false
+		local sessionDB
+
+		if simulator {
+			this.iSimulator := simulator
+
+			load := true
+		}
+
+		if track {
+			this.iTrack := track
+
+			load := true
+		}
+
+		if load {
+			sessionDB := SessionDatabase()
+
+			this.unloadTrackMap()
+
+			this.loadTrackMap(sessionDB.getTrackMap(this.Simulator, this.Track)
+							, sessionDB.getTrackImage(this.Simulator, this.Track))
+		}
+
+		this.createTrackMap()
+	}
+
+	createTrackMap() {
+		local trackMap := this.TrackMap
+		local trackImage := this.TrackImage
+		local scale := getMultiMapValue(trackMap, "Map", "Scale")
+		local offsetX := getMultiMapValue(trackMap, "Map", "Offset.X")
+		local offsetY := getMultiMapValue(trackMap, "Map", "Offset.Y")
+		local marginX := getMultiMapValue(trackMap, "Map", "Margin.X")
+		local marginY := getMultiMapValue(trackMap, "Map", "Margin.Y")
+		local imgWidth := ((getMultiMapValue(trackMap, "Map", "Width") + (2 * marginX)) * scale)
+		local imgHeight := ((getMultiMapValue(trackMap, "Map", "Height") + (2 * marginY)) * scale)
+		local x, y, w, h, imgScale, deltaX, deltaY
+		local token, bitmap, graphics, brushHotkey, brushCommand, r, ignore, action, imgX, imgY, trackImage
+
+		ControlGetPos(&x, &y, &w, &h, this.Control["trackDisplayArea"])
+
+		x += 2
+		y += 2
+		w -= 4
+		h -= 4
+
+		imgScale := Min(w / imgWidth, h / imgHeight)
+
+		imgWidth *= imgScale
+		imgHeight *= imgScale
+
+		deltaX := ((w - imgWidth) / 2)
+		deltaY := ((h - imgHeight) / 2)
+
+		x := Round(x + deltaX)
+		y := Round(y + deltaY)
+
+		this.iTrackDisplayArea := [x, y, w, h, deltaX, deltaY]
+
+		this.iTrackDisplay.Opt("-Redraw")
+
+		ControlMove(x, y, w, h, this.iTrackDisplay)
+
+		this.iTrackDisplay.Value := ("*w" . imgWidth . " *h" . imgHeight . A_Space . trackImage)
+
+		this.iTrackDisplay.Opt("+Redraw")
 	}
 }

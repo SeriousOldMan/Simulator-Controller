@@ -1959,7 +1959,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	}
 
 	prepareSession(settings, data) {
-		local dataFile, settingsFile
+		local dataFile, settingsFile, ignore
 
 		if this.RaceAssistant {
 			dataFile := kTempDirectory . this.Plugin . " Lap 0.0.data"
@@ -1971,11 +1971,13 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			writeMultiMap(settingsFile, settings)
 
 			this.RaceAssistant.prepareSession(settingsFile, dataFile)
+
+			this.updateActions(getDataSession(data, &ignore))
 		}
 	}
 
 	startSession(settings, data) {
-		local code, assistant, settingsFile, dataFile
+		local code, assistant, settingsFile, dataFile, ignore
 
 		if this.Simulator {
 			code := this.Simulator.Code
@@ -2002,6 +2004,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 				this.RaceAssistantActive := true
 			}
+
+			this.updateActions(getDataSession(data, &ignore))
 		}
 	}
 

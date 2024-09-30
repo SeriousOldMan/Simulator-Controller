@@ -101,7 +101,11 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 			else if (!plugin.TrackAutomationEnabled && ((trigger = "On") || (trigger == "Push"))) {
 				plugin.enableTrackAutomation(plugin.actionLabel(this))
 
-				function.setLabel(plugin.actionLabel(this), "Green")
+				if (plugin.Simulator && plugin.Simulator.TrackAutomation)
+					function.setLabel(plugin.actionLabel(theAction), "Green")
+				else
+					function.setLabel(plugin.actionLabel(theAction), "Gray")
+
 				function.setIcon(plugin.actionIcon(this), "Activated")
 			}
 		}
@@ -277,7 +281,14 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 			}
 
 			if isInstance(theAction, RaceSpotterPlugin.TrackAutomationToggleAction) {
-				theAction.Function.setLabel(this.actionLabel(theAction), this.TrackAutomationEnabled ? "Green" : "Black")
+				if this.TrackAutomationEnabled {
+					if (this.Simulator && this.Simulator.TrackAutomation)
+						theAction.Function.setLabel(this.actionLabel(theAction), "Green")
+					else
+						theAction.Function.setLabel(this.actionLabel(theAction), "Gray")
+				}
+				else
+					theAction.Function.setLabel(this.actionLabel(theAction), "Black")
 				theAction.Function.setIcon(this.actionIcon(theAction), this.TrackAutomationEnabled ? "Activated" : "Deactivated")
 
 				theAction.Function.enable(kAllTrigger, theAction)
@@ -554,7 +565,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 
 			if (force && ProcessExist(pid)) {
 				Sleep(500)
-			
+
 				tries := 5
 
 				while (tries-- > 0) {
@@ -703,7 +714,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 
 				if (force && ProcessExist(pid)) {
 					Sleep(500)
-				
+
 					tries := 5
 
 					while (tries-- > 0) {

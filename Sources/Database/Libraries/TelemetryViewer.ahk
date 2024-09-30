@@ -23,21 +23,27 @@
 class TelemetryChart {
 	static sChartID := 1
 
-	iWindow := false
-
 	iTelemetryViewer := false
 
-	iZoom := 100
+	iChartArea := false
 
-	Window {
-		Get {
-			return this.iWindow
-		}
-	}
+	iZoom := 100
 
 	TelemetryViewer {
 		Get {
 			return this.iTelemetryViewer
+		}
+	}
+
+	Window {
+		Get {
+			return this.TelemetryViewer.Window
+		}
+	}
+
+	ChartArea {
+		Get {
+			return this.iChartArea
 		}
 	}
 
@@ -51,21 +57,39 @@ class TelemetryChart {
 		}
 	}
 
-	__New(window, telemetryViewer := false) {
-		this.iWindow := window
+	__New(telemetryViewer, chartArea := false) {
 		this.iTelemetryViewer := telemetryViewer
+		this.iChartArea := chartArea
 	}
 
 	showTelemetryChart(lapFileName, referenceLapFileName := false) {
 		eventHandler(event, arguments*) {
+			local telemetryViewer := this.TelemetryViewer
+			local row := false
+			local data
+
+			if (event = "Select") {
+				row := string2Values(";", arguments[1])
+
+				if (StrLen(Trim(row[1])) > 0) {
+					row := (string2Values("|", row[1])[1] + 1)
+
+					if (isNumber(row) && telemetryViewer.Data.Has(telemetryViewer.SelectedLap[true])) {
+						data := telemetryViewer.Data[telemetryViewer.SelectedLap[true]]
+
+						if (data.Has(row) && data[row].Length > 11)
+							telemetryViewer.TrackMap.updateTrackPosition(data[row][12], data[row][13])
+					}
+				}
+			}
 		}
 
-		if this.TelemetryViewer {
-			this.TelemetryViewer.document.open()
-			this.TelemetryViewer.document.write(this.createTelemetryChart(lapFileName, referenceLapFileName))
-			this.TelemetryViewer.document.close()
+		if this.ChartArea {
+			this.ChartArea.document.open()
+			this.ChartArea.document.write(this.createTelemetryChart(lapFileName, referenceLapFileName))
+			this.ChartArea.document.close()
 
-			this.TelemetryViewer.document.parentWindow.eventHandler := eventHandler
+			this.ChartArea.document.parentWindow.eventHandler := eventHandler
 		}
 	}
 
@@ -80,15 +104,7 @@ class TelemetryChart {
 		local entry, index, field, running
 
 		if lapFileName
-			loop Read, lapFileName {
-				entry := string2Values(";", A_LoopReadLine)
-
-				for index, value in entry
-					if !isNumber(value)
-						entry[index] := kNull
-
-				lapTelemetry.Push(entry)
-			}
+			lapTelemetry := this.TelemetryViewer.loadData(lapFileName)
 
 		if referenceLapFileName {
 			referenceLapTelemetry := Map()
@@ -108,9 +124,9 @@ class TelemetryChart {
 			}
 		}
 
-		if this.TelemetryViewer {
-			width := ((this.TelemetryViewer.getWidth() - 4) / 100 * this.Zoom)
-			height := (this.TelemetryViewer.getHeight() - 4)
+		if this.ChartArea {
+			width := ((this.ChartArea.getWidth() - 4) / 100 * this.Zoom)
+			height := (this.ChartArea.getHeight() - 4)
 
 			chartArea1 := this.createSpeedChart(width, height / 3 * 2, lapTelemetry, referenceLapTelemetry, &drawChartFunction1, &chartID1)
 			chartArea2 := this.createElectronicsChart(width, height / 3, lapTelemetry, referenceLapTelemetry, &drawChartFunction2, &chartID2)
@@ -485,6 +501,8 @@ class TelemetryViewer {
 
 	iTrackMap := false
 
+	iData := CaseInsenseMap()
+
 	class TelemetryViewerWindow extends Window {
 		iViewer := false
 
@@ -526,7 +544,7 @@ class TelemetryViewer {
 
 					this.iRedraw := false
 
-					this.iTelemetryViewer.TelemetryChart.TelemetryViewer.Resized()
+					this.iTelemetryViewer.TelemetryChart.ChartArea.Resized()
 
 					Task.startTask(ObjBindMethod(this.iTelemetryViewer, "updateTelemetryChart", true))
 				}
@@ -650,6 +668,16 @@ class TelemetryViewer {
 	TrackMap {
 		Get {
 			return this.iTrackMap
+		}
+	}
+
+	Data[key?] {
+		Get {
+			return (isSet(key) ? this.iData[key] : this.iData)
+		}
+
+		Set {
+			return (isSet(key) ? (this.iData[key] := value) : (this.iData := value))
 		}
 	}
 
@@ -781,7 +809,7 @@ class TelemetryViewer {
 		viewerControl.document.write("")
 		viewerControl.document.close()
 
-		this.iTelemetryChart := TelemetryChart(viewerGui, viewerControl)
+		this.iTelemetryChart := TelemetryChart(this, viewerControl)
 
 		viewerGui.Add(TelemetryViewer.TelemetryViewerResizer(this))
 
@@ -916,6 +944,8 @@ class TelemetryViewer {
 		this.Laps := []
 		this.ImportedLaps := []
 
+		this.Data := CaseInsenseMap()
+
 		this.iTelemetryDirectory := (normalizeDirectoryPath(directory) . "\")
 
 		if this.Window {
@@ -952,6 +982,30 @@ class TelemetryViewer {
 			deleteFile(A_LoopFileFullPath)
 
 		this.loadTelemetry()
+	}
+
+	loadData(fileName) {
+		local data, entry
+
+		if this.Data.Has(fileName)
+			return this.Data[fileName]
+		else {
+			data := []
+
+			loop Read, fileName {
+				entry := string2Values(";", A_LoopReadLine)
+
+				for index, value in entry
+					if !isNumber(value)
+						entry[index] := kNull
+
+				data.Push(entry)
+			}
+
+			this.Data[fileName] := data
+
+			return data
+		}
 	}
 
 	loadLap(fileName := false, driver := false) {
@@ -1534,7 +1588,11 @@ class TrackMap {
 		this.createTrackMap()
 	}
 
-	createTrackMap() {
+	updateTrackPosition(posX, posY) {
+		this.createTrackMap(posX, posY)
+	}
+
+	createTrackMap(posX?, posY?) {
 		local trackMap := this.TrackMap
 		local trackImage := this.TrackImage
 		local scale := getMultiMapValue(trackMap, "Map", "Scale")
@@ -1545,7 +1603,7 @@ class TrackMap {
 		local imgWidth := ((getMultiMapValue(trackMap, "Map", "Width") + (2 * marginX)) * scale)
 		local imgHeight := ((getMultiMapValue(trackMap, "Map", "Height") + (2 * marginY)) * scale)
 		local x, y, w, h, imgScale, deltaX, deltaY
-		local token, bitmap, graphics, brushHotkey, brushCommand, r, ignore, action, imgX, imgY, trackImage
+		local token, bitmap, graphics, brush, r, imgX, imgY, trackImage
 
 		ControlGetPos(&x, &y, &w, &h, this.Control["trackDisplayArea"])
 
@@ -1555,6 +1613,37 @@ class TrackMap {
 		h -= 4
 
 		imgScale := Min(w / imgWidth, h / imgHeight)
+
+		if (isSet(posX) && isSet(posY)) {
+			token := Gdip_Startup()
+
+			bitmap := Gdip_CreateBitmapFromFile(trackImage)
+
+			graphics := Gdip_GraphicsFromImage(bitmap)
+
+			Gdip_SetSmoothingMode(graphics, 4)
+
+			brush := Gdip_BrushCreateSolid(0xff00ff00)
+
+			r := Round(15 / (imgScale * 3))
+
+			imgX := Round((marginX + offsetX + posX) * scale)
+			imgY := Round((marginX + offsetY + posY) * scale)
+
+			Gdip_FillEllipse(graphics, brush, imgX - r, imgY - r, r * 2, r * 2)
+
+			Gdip_DeleteBrush(brush)
+
+			trackImage := temporaryFileName("Track Images\TrackMap", "png")
+
+			Gdip_SaveBitmapToFile(bitmap, trackImage)
+
+			Gdip_DisposeImage(bitmap)
+
+			Gdip_DeleteGraphics(graphics)
+
+			Gdip_Shutdown(token)
+		}
 
 		imgWidth *= imgScale
 		imgHeight *= imgScale

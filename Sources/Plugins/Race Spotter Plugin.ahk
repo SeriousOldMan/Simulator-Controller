@@ -102,9 +102,9 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 				plugin.enableTrackAutomation(plugin.actionLabel(this))
 
 				if (plugin.Simulator && plugin.Simulator.TrackAutomation)
-					function.setLabel(plugin.actionLabel(theAction), "Green")
+					function.setLabel(plugin.actionLabel(this), "Green")
 				else
-					function.setLabel(plugin.actionLabel(theAction), "Gray")
+					function.setLabel(plugin.actionLabel(this), "Gray")
 
 				function.setIcon(plugin.actionIcon(this), "Activated")
 			}

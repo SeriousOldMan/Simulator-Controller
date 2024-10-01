@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.9.2.0-dev]() (Early build for 5.9.2. Changes: Lap telemetry opened from "Session Database" show the driver name, New telemetry fields LatG, LongG and Curvature, Support to import telemetry data from "Second Monitor", Fixed iRacing Spotter, Multiple telemetry selection support when loading telemetries, Colorized Track Automation state display on Button Box, Telemetry Viewer usable in "Setup Workbench", Renamed "Telemetry Analyzer" to "Issue Analyzer", Renamed "Telemetry Browser" to "Telemetry Viewer", Track map support in Telemetry Viewer, Select position on track by clicking in telemetry graph.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-592) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

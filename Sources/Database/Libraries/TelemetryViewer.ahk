@@ -1321,6 +1321,9 @@ class TelemetryViewer {
 
 				this.Control["lapDropDown"].Choose(index)
 
+				if this.TrackMap
+					this.TrackMap.updateTrackPosition()
+
 				this.updateState()
 			}
 		}
@@ -1346,6 +1349,9 @@ class TelemetryViewer {
 				}
 
 				this.Control["referenceLapDropDown"].Choose(index + 1)
+
+				if this.TrackMap
+					this.TrackMap.this.updateTrackPosition()
 
 				this.updateState()
 			}
@@ -1496,6 +1502,8 @@ class TrackMap {
 
 	iTrackMap := false
 	iTrackImage := false
+
+	iLastTrackPosition := false
 
 	class TrackMapWindow extends Window {
 		iMap := false
@@ -1698,14 +1706,23 @@ class TrackMap {
 							, sessionDB.getTrackImage(this.Simulator, this.Track))
 		}
 
-		this.createTrackMap()
+		if this.iLastTrackPosition
+			this.createTrackMap(this.iLastTrackPosition[1], this.iLastTrackPosition[2])
+		else
+			this.createTrackMap()
 	}
 
-	updateTrackPosition(posX, posY) {
-		if isDebug()
-			showMessage(posX . ", " . posY)
+	updateTrackPosition(posX?, posY?) {
+		if isSet(posX) {
+			this.iLastTrackPosition := [posX, posY]
 
-		this.createTrackMap(posX, posY)
+			this.createTrackMap(posX, posY)
+		}
+		else {
+			this.iLastTrackPosition := false
+
+			this.createTrackMap()
+		}
 	}
 
 	findTrackCoordinate(x, y, &coordinateX, &coordinateY, threshold := 40) {

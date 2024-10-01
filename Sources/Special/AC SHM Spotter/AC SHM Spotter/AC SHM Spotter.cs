@@ -1615,6 +1615,7 @@ namespace ACSHMSpotter {
         string telemetryDirectory = "";
         StreamWriter telemetryFile = null;
         int telemetryLap = -1;
+		float lastRunning = -1;
 
         void collectCarTelemetry()
         {
@@ -1646,6 +1647,8 @@ namespace ACSHMSpotter {
                     telemetryLap = (graphics.CompletedLaps + 1);
 
                     telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".tmp", false);
+
+					lastRunning = -1;
                 }
 
                 double velocityX = physics.LocalVelocity[0];
@@ -1661,22 +1664,33 @@ namespace ACSHMSpotter {
 					}
 					double angle = 360 * ((2 * Math.PI) - playerRotation) / (2 * Math.PI);
 
-					float longG = physics.AccG[0];
-					float latG = physics.AccG[2];
+                    double latG = physics.AccG[0];
+					double longG = physics.AccG[2];
 
-					telemetryFile.Write(Math.Max(0, Math.Min(1, driver.splinePosition)) + staticInfo.TrackSPlineLength + ";");
-					telemetryFile.Write(physics.Gas + ";");
-					telemetryFile.Write(physics.Brake + ";");
-					telemetryFile.Write(physics.SteerAngle + ";");
-					telemetryFile.Write(physics.Gear + ";");
-					telemetryFile.Write(physics.Rpms + ";");
-					telemetryFile.Write(physics.SpeedKmh + ";");
+					// rotateBy(ref longG, ref latG, angle);
 
-					telemetryFile.Write(physics.TC + ";");
-					telemetryFile.Write(physics.Abs + ";");
+					// latG *= -1;
 
-					telemetryFile.Write(longG + ";");
-					telemetryFile.WriteLine(latG);
+					float running = Math.Max(0, Math.Min(1, driver.splinePosition)) * staticInfo.TrackSPlineLength;
+
+					if (running > lastRunning)
+					{
+						lastRunning = running;
+
+						telemetryFile.Write(running + ";");
+						telemetryFile.Write(physics.Gas + ";");
+						telemetryFile.Write(physics.Brake + ";");
+						telemetryFile.Write(physics.SteerAngle + ";");
+						telemetryFile.Write(physics.Gear + ";");
+						telemetryFile.Write(physics.Rpms + ";");
+						telemetryFile.Write(physics.SpeedKmh + ";");
+
+						telemetryFile.Write(physics.TC + ";");
+						telemetryFile.Write(physics.Abs + ";");
+
+						telemetryFile.Write(longG + ";");
+						telemetryFile.WriteLine(latG);
+					}
 				}
             }
             catch (Exception)

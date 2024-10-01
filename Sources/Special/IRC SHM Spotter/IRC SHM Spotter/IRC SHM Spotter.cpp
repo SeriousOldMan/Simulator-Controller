@@ -1907,10 +1907,10 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 			rpms = *(int*)rawValue;
 
 		if (getRawDataValue(rawValue, header, data, "LongAccel"))
-			longG = *(int*)rawValue;
+			longG = (*(float*)rawValue) / 9.807;
 
 		if (getRawDataValue(rawValue, header, data, "LatAccel"))
-			latG = *(int*)rawValue;
+			latG = (*(float*)rawValue) / 9.807;
 
 		telemetryFile << (playerRunning * trackLength) << ";"
 					  << throttle << ";"
@@ -1921,7 +1921,7 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 					  << speed << ";"
 					  << "n/a" << ";"
 					  << "n/a" << ";"
-					  << longG << ";" << latG << std::endl;
+					  << longG << ";" << - latG << std::endl;
 	}
 	catch (...) {
 		try {
@@ -2231,6 +2231,8 @@ int main(int argc, char* argv[])
 									onTrack = false;
 
 								bool inPit = false;
+
+								getRawDataValue(rawValue, pHeader, g_data, "CarIdxOnPitRoad");
 
 								if (((bool*)rawValue)[playerCarIndex])
 									inPit = true;

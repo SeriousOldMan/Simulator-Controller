@@ -96,7 +96,7 @@ class TelemetryChart {
 					if !isNumber(value)
 						entry[index] := kNull
 					else if (index = 1)
-						running := entry[index] := (Round(entry[index] / 5) * 5)
+						running := entry[index] := (Round(entry[index] / 7.5) * 7.5)
 
 				referenceLapTelemetry[running] := entry
 			}
@@ -208,7 +208,7 @@ class TelemetryChart {
 				speed := kNull
 
 			if referenceLapTelemetry {
-				refRunning := (Round(running / 5) * 5)
+				refRunning := (Round(running / 7.5) * 7.5)
 
 				if referenceLapTelemetry.Has(refRunning) {
 					refData := referenceLapTelemetry[refRunning]
@@ -286,7 +286,7 @@ class TelemetryChart {
 				rpms := kNull
 
 			if referenceLapTelemetry {
-				refRunning := (Round(running / 5) * 5)
+				refRunning := (Round(running / 7.5) * 7.5)
 
 				if referenceLapTelemetry.Has(refRunning) {
 					refData := referenceLapTelemetry[refRunning]
@@ -396,7 +396,7 @@ class TelemetryChart {
 				curvature := kNull
 
 			if referenceLapTelemetry {
-				refRunning := (Round(running / 5) * 5)
+				refRunning := (Round(running / 7.5) * 7.5)
 
 				if referenceLapTelemetry.Has(refRunning) {
 					refData := referenceLapTelemetry[refRunning]
@@ -888,15 +888,84 @@ class TelemetryViewer {
 	}
 
 	loadLap(fileName := false, driver := false) {
-		local name := false
-		local telemetry := false
 		local info := false
-		local simulator, car, track, info
-		local sessionDB, directory, dataFile, file, size, lap
+		local lap := false
+		local sessionDB := SessionDatabase()
+		local simulator, car, track
+
+		processFile(fileName, info) {
+			local theDriver := driver
+			local telemetry := false
+			local name, directory, dataFile, file, size, lap
+
+			if info {
+				info := readMultiMap(info)
+
+				if driver
+					theDriver := driver
+				else
+					theDriver := getMultiMapValue(info, "Info", "Driver")
+
+				DirCreate(this.TelemetryDirectory . "Imported")
+
+				FileCopy(fileName, this.TelemetryDirectory . "Imported\Lap " . getMultiMapValue(info, "Info", "Lap") . ".telemetry", 1)
+
+				fileName := (this.TelemetryDirectory . "Imported\Lap " . getMultiMapValue(info, "Info", "Lap") . ".telemetry")
+			}
+
+			if (fileName && (fileName != "")) {
+				SplitPath(fileName, , &directory, , &fileName)
+
+				if (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getTelemetryDirectory(simulator, car, track, "User"))) {
+					dataFile := temporaryFileName("Lap Telemetry", "telemetry")
+
+					try {
+						telemetry := sessionDB.readTelemetry(simulator, car, track, fileName, &size)
+
+						file := FileOpen(dataFile, "w", "")
+
+						if file {
+							file.RawWrite(telemetry, size)
+
+							file.Close()
+
+							name := fileName
+							telemetry := dataFile
+							info := sessionDB.readTelemetryInfo(simulator, car, track, fileName)
+						}
+						else
+							telemetry := false
+					}
+					catch Any as exception {
+						logError(exception)
+
+						telemetry := false
+					}
+				}
+				else {
+					name := fileName
+					telemetry := (directory . "\" . fileName . ".telemetry")
+					info := false
+				}
+			}
+
+			if telemetry {
+				if info
+					lap := [name, theDriver ? theDriver
+										 : SessionDatabase.getDriverName(simulator, getMultiMapValue(info, "Telemetry", "Driver"))
+						  , telemetry]
+				else
+					lap := [name, theDriver ? theDriver : "John Doe (JD)", telemetry]
+
+				this.ImportedLaps.Push(lap)
+
+				return lap
+			}
+			else
+				return false
+		}
 
 		this.Manager.getSessionInformation(&simulator, &car, &track)
-
-		sessionDB := SessionDatabase()
 
 		if !fileName {
 			this.Window.Opt("+OwnDialogs")
@@ -905,70 +974,21 @@ class TelemetryViewer {
 
 			try {
 				fileName := browseLapTelemetries(this.Window, &simulator, &car, &track, &info)
-
-				if ((fileName && (fileName != "")) && info) {
-					info := readMultiMap(info)
-
-					if !driver
-						driver := getMultiMapValue(info, "Info", "Driver")
-
-					DirCreate(this.TelemetryDirectory . "Imported")
-
-					FileCopy(fileName, this.TelemetryDirectory . "Imported\Lap " . getMultiMapValue(info, "Info", "Lap") . ".telemetry", 1)
-
-					fileName := (this.TelemetryDirectory . "Imported\Lap " . getMultiMapValue(info, "Info", "Lap") . ".telemetry")
-				}
 			}
 			finally {
 				this.Window.Unblock()
 			}
 		}
+		else
+			info := false
 
 		if (fileName && (fileName != "")) {
-			SplitPath(fileName, , &directory, , &fileName)
-
-			if (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getTelemetryDirectory(simulator, car, track, "User"))) {
-				dataFile := temporaryFileName("Lap Telemetry", "telemetry")
-
-				try {
-					telemetry := sessionDB.readTelemetry(simulator, car, track, fileName, &size)
-
-					file := FileOpen(dataFile, "w", "")
-
-					if file {
-						file.RawWrite(telemetry, size)
-
-						file.Close()
-
-						name := fileName
-						telemetry := dataFile
-						info := sessionDB.readTelemetryInfo(simulator, car, track, fileName)
-					}
-					else
-						telemetry := false
-				}
-				catch Any as exception {
-					logError(exception)
-
-					telemetry := false
-				}
+			if isObject(fileName) {
+				loop fileName.Length
+					lap := (processFile(fileName[A_Index], info ? info[A_Index] : false) || lap)
 			}
-			else {
-				name := fileName
-				telemetry := (directory . "\" . fileName . ".telemetry")
-				info := false
-			}
-		}
-
-		if telemetry {
-			if info
-				lap := [name, driver ? driver
-									 : SessionDatabase.getDriverName(simulator, getMultiMapValue(info, "Telemetry", "Driver"))
-					  , telemetry]
 			else
-				lap := [name, driver ? driver : "John Doe (JD)", telemetry]
-
-			this.ImportedLaps.Push(lap)
+				lap := (processFile(fileName, info) || lap)
 
 			this.loadTelemetry(lap)
 		}

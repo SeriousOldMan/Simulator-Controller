@@ -104,7 +104,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 				if (!plugin.Simulator || !plugin.Simulator.Track)
 					function.setLabel(plugin.actionLabel(this), "Gray")
 				else if !plugin.Simulator.TrackAutomation
-					function.setLabel(plugin.actionLabel(this), "Gold")
+					function.setLabel(plugin.actionLabel(this), "FFD700")
 				else
 					function.setLabel(plugin.actionLabel(this), "Green")
 
@@ -284,12 +284,12 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 
 			if isInstance(theAction, RaceSpotterPlugin.TrackAutomationToggleAction) {
 				if this.TrackAutomationEnabled {
-					if (!plugin.Simulator || !plugin.Simulator.Track)
-						theAction.Function.setLabel(plugin.actionLabel(theAction), "Gray")
-					else if !plugin.Simulator.TrackAutomation
-						theAction.Function.setLabel(plugin.actionLabel(theAction), "Gold")
+					if (!this.Simulator || !this.Simulator.Track)
+						theAction.Function.setLabel(this.actionLabel(theAction), "Gray")
+					else if !this.Simulator.TrackAutomation
+						theAction.Function.setLabel(this.actionLabel(theAction), "FFD700")
 					else
-						theAction.Function.setLabel(plugin.actionLabel(theAction), "Green")
+						theAction.Function.setLabel(this.actionLabel(theAction), "Green")
 				}
 				else
 					theAction.Function.setLabel(this.actionLabel(theAction), "Black")

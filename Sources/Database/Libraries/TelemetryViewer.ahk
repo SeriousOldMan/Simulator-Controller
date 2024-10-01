@@ -1774,6 +1774,8 @@ class TrackMap {
 
 	trackClicked(coordinateX, coordinateY) {
 		this.TelemetryViewer.TelemetryChart.selectPosition(coordinateX, coordinateY)
+
+		this.updateTrackPosition(coordinateX, coordinateY)
 	}
 
 	createTrackMap(posX?, posY?) {

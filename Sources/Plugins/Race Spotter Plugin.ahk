@@ -101,10 +101,12 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 			else if (!plugin.TrackAutomationEnabled && ((trigger = "On") || (trigger == "Push"))) {
 				plugin.enableTrackAutomation(plugin.actionLabel(this))
 
-				if (plugin.Simulator && plugin.Simulator.TrackAutomation)
-					function.setLabel(plugin.actionLabel(this), "Green")
-				else
+				if (!plugin.Simulator || !plugin.Simulator.Track)
 					function.setLabel(plugin.actionLabel(this), "Gray")
+				else if !plugin.Simulator.TrackAutomation
+					function.setLabel(plugin.actionLabel(this), "Gold")
+				else
+					function.setLabel(plugin.actionLabel(this), "Green")
 
 				function.setIcon(plugin.actionIcon(this), "Activated")
 			}
@@ -282,10 +284,12 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 
 			if isInstance(theAction, RaceSpotterPlugin.TrackAutomationToggleAction) {
 				if this.TrackAutomationEnabled {
-					if (this.Simulator && this.Simulator.TrackAutomation)
-						theAction.Function.setLabel(this.actionLabel(theAction), "Green")
+					if (!plugin.Simulator || !plugin.Simulator.Track)
+						theAction.Function.setLabel(plugin.actionLabel(theAction), "Gray")
+					else if !plugin.Simulator.TrackAutomation
+						theAction.Function.setLabel(plugin.actionLabel(theAction), "Gold")
 					else
-						theAction.Function.setLabel(this.actionLabel(theAction), "Gray")
+						theAction.Function.setLabel(plugin.actionLabel(theAction), "Green")
 				}
 				else
 					theAction.Function.setLabel(this.actionLabel(theAction), "Black")

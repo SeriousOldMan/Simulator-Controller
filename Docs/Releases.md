@@ -6,7 +6,7 @@
   5. The selection dialog for telemetries now supports opening multiple lap telemetries at once by shift-clicking in the list. The file selection dialog opened by the "Open..." button also supports multi-selection.
   6. A third graph has been added to the telemetry viewer, which shows longitudinal and lateral G-Forces and also an information about the curvature of the current corner.
   7. Lap telemetry data can now be imported from Second Monitor, sophisticated tool developed by Matus Celko (@winzarten). See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#laps) for more information.
-  8. The Track Automation is now grayed out on the Button Box, if it is enabled but no Automation has been defined for the given track.
+  8. The Track Automation state is now displayed with color coding on a Button Box. Gray if it is enabled but not yet available, and yellow if no Automation has been defined for the given track.
 
 ## 5.9.1.0-release 09/27/24
   1. Minor bugfixes, as always

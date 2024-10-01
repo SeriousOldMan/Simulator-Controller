@@ -830,6 +830,20 @@ class SessionDatabase extends ConfigurationItem {
 			return false
 	}
 
+	hasTrackAutomation(simulator, car, track, name := false) {
+		local ignore, trackAutomation
+
+		if this.hasTrackMap(simulator, track)
+			if !name
+				return this.hasTrackAutomations(simulator, car, track)
+			else
+				for ignore, trackAutomation in this.getTrackAutomations(simulator, car, track)
+					if (trackAutomation.Name = name)
+						return true
+
+		return false
+	}
+
 	hasTrackAutomations(simulator, car, track) {
 		local code := this.getSimulatorCode(simulator)
 

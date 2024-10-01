@@ -2019,6 +2019,7 @@ void checkCoordinates() {
 string telemetryDirectory = "";
 ofstream telemetryFile;
 int telemetryLap = -1;
+float lastRunning = -1;
 
 void collectCarTelemetry() {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
@@ -2046,6 +2047,8 @@ void collectCarTelemetry() {
 
 						rename((telemetryDirectory + "\\Lap " + to_string(telemetryLap) + ".tmp").c_str(),
 							   (telemetryDirectory + "\\Lap " + to_string(telemetryLap) + ".telemetry").c_str());
+
+						lastRunning = -1;
 					}
 					catch (...) {
 					}
@@ -2054,16 +2057,37 @@ void collectCarTelemetry() {
 
 					telemetryFile.open(telemetryDirectory + "\\Lap " + to_string(telemetryLap) + ".tmp", ios::out | ios::trunc);
 				}
-				
-				telemetryFile << (driverRunning * trackLength) << ";"
-							  << (pf->gas >= 0 ? pf->gas : 0) << ";"
-							  << (pf->brake >= 0 ? pf->brake : 0) << ";"
-							  << pf->steerAngle << ";"
-							  << pf->gear << ";"
-							  << pf->rpms << ";"
-							  << pf->speedKmh << ";"
-							  << pf->tc << ";"
-							  << pf->abs << endl;
+
+				float velocityX = pf->velocity[0];
+				float velocityY = pf->velocity[2];
+				float velocityZ = pf->velocity[1];
+
+				if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
+					float angle = vectorAngle(velocityX, velocityY);
+
+					float latG = pf->accG[0];
+					float longG = pf->accG[2];
+
+					// rotateBy(&longG, &latG, angle);
+
+					// latG *= -1;
+
+					if (driverRunning > lastRunning) {
+						telemetryFile << (driverRunning * trackLength) << ";"
+							<< (pf->gas >= 0 ? pf->gas : 0) << ";"
+							<< (pf->brake >= 0 ? pf->brake : 0) << ";"
+							<< pf->steerAngle << ";"
+							<< pf->gear << ";"
+							<< pf->rpms << ";"
+							<< pf->speedKmh << ";"
+							<< pf->tc << ";"
+							<< pf->abs << ";"
+							<< longG << ";" << latG << ";"
+							<< gf->carCoordinates[carID][0] << ";" << gf->carCoordinates[carID][2] << endl;
+
+						lastRunning = driverRunning;
+					}
+				}
 			}
 			catch (...) {
 				try {

@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Generic Telemetry Analyzer      ;;;
+;;;   Modular Simulator Controller System - Generic Issue Analyzer          ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
@@ -13,7 +13,7 @@
 #Include "..\..\Libraries\Messages.ahk"
 #Include "..\..\Libraries\Math.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
-#Include "TelemetryCollector.ahk"
+#Include "IssueCollector.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -31,10 +31,10 @@ global kMaxThreshold := 180
 ;;;-------------------------------------------------------------------------;;;
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; GenericTelemetryAnalyzer                                                ;;;
+;;; GenericIssueAnalyzer                                                    ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
+class GenericIssueAnalyzer extends IssueAnalyzer {
 	iCar := false
 	iTrack := false
 
@@ -59,7 +59,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 	iAcousticFeedback := true
 	static sAudioDevice := false
 
-	iTelemetryCollector := false
+	iIssueCollector := false
 	iLastHandling := false
 	iLastTemperatures := false
 
@@ -77,7 +77,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 
 	CollectorClass {
 		Get {
-			return "TelemetryCollector"
+			return "IssueCollector"
 		}
 	}
 
@@ -293,20 +293,20 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 
 	static AudioDevice {
 		Get {
-			return GenericTelemetryAnalyzer.sAudioDevice
+			return GenericIssueAnalyzer.sAudioDevice
 		}
 	}
 
 	AudioDevice {
 		Get {
-			return GenericTelemetryAnalyzer.AudioDevice
+			return GenericIssueAnalyzer.AudioDevice
 		}
 	}
 
 	Handling {
 		Get {
-			if this.iTelemetryCollector
-				return (this.iLastHandling := this.iTelemetryCollector.Handling)
+			if this.iIssueCollector
+				return (this.iLastHandling := this.iIssueCollector.Handling)
 			else if !this.iLastHandling {
 				this.iLastHandling := CaseInsenseMap()
 				this.iLastHandling.Default := []
@@ -318,8 +318,8 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 
 	Temperatures {
 		Get {
-			if this.iTelemetryCollector
-				this.iLastTemperatures := this.iTelemetryCollector.Temperatures
+			if this.iIssueCollector
+				this.iLastTemperatures := this.iIssueCollector.Temperatures
 			else if !this.iLastTemperatures
 				this.iLastTemperatures := []
 
@@ -428,12 +428,12 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 
 		super.__New(workbench, simulator)
 
-		OnExit(ObjBindMethod(this, "stopTelemetryAnalyzer"))
+		OnExit(ObjBindMethod(this, "stopIssueAnalyzer"))
 
 		if first {
-			GenericTelemetryAnalyzer.sAudioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Analyzer.AudioDevice", false)
+			GenericIssueAnalyzer.sAudioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Analyzer.AudioDevice", false)
 
-			registerMessageHandler("Analyzer", methodMessageHandler, GenericTelemetryAnalyzer)
+			registerMessageHandler("Analyzer", methodMessageHandler, GenericIssueAnalyzer)
 
 			first := false
 		}
@@ -568,13 +568,13 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		}
 	}
 
-	startTelemetryAnalyzer(calibrate := false) {
+	startIssueAnalyzer(calibrate := false) {
 		local settings := {Handling: true, Temperatures: true, Frequency: 2000}
 		local ignore, setting
 
-		this.stopTelemetryAnalyzer()
+		this.stopIssueAnalyzer()
 
-		if !this.iTelemetryCollector {
+		if !this.iIssueCollector {
 			if !calibrate
 				for ignore, setting in ["UndersteerThresholds", "OversteerThresholds"]
 					if this.settingAvailable(setting)
@@ -584,27 +584,27 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 				if this.settingAvailable(setting)
 					settings.%setting% := this.%setting%
 
-			this.iTelemetryCollector := %this.CollectorClass%(this.Simulator, this.Car, this.Track, settings, this.AcousticFeedback)
+			this.iIssueCollector := %this.CollectorClass%(this.Simulator, this.Car, this.Track, settings, this.AcousticFeedback)
 
-			this.iTelemetryCollector.startTelemetryCollector(calibrate)
+			this.iIssueCollector.startIssueCollector(calibrate)
 		}
 
-		return this.iTelemetryCollector
+		return this.iIssueCollector
 	}
 
-	stopTelemetryAnalyzer(arguments*) {
-		local collector := this.iTelemetryCollector
-		
+	stopIssueAnalyzer(arguments*) {
+		local collector := this.iIssueCollector
+
 		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
 			return false
-		
+
 		if collector {
 			this.iLastHandling := collector.Handling
 
-			collector.stopTelemetryCollector()
+			collector.stopIssueCollector()
 		}
 
-		this.iTelemetryCollector := false
+		this.iIssueCollector := false
 	}
 
 	computeTemperatures(samples) {
@@ -902,7 +902,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		if updateTask
 			updateTask.stop()
 
-		analyzer.stopTelemetryAnalyzer()
+		analyzer.stopIssueAnalyzer()
 
 		result := kCancel
 	}
@@ -996,7 +996,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		state := "Run"
 
-		analyzer.startTelemetryAnalyzer()
+		analyzer.startIssueAnalyzer()
 
 		updateTask := PeriodicTask(runAnalyzer.Bind("UpdateSamples"), 5000)
 
@@ -1007,7 +1007,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		updateTask := false
 
-		analyzer.stopTelemetryAnalyzer()
+		analyzer.stopIssueAnalyzer()
 
 		for ignore, widget in runWidgets {
 			widget.Enabled := false
@@ -1223,8 +1223,8 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		analyzerGui.SetFont("s9 Norm", "Arial")
 
-		analyzerGui.Add("Documentation", "x86 YP+20 w192 Center", translate("Telemetry Analyzer")
-					  , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-telemetry-analyzer")
+		analyzerGui.Add("Documentation", "x86 YP+20 w192 Center", translate("Issue Analyzer")
+					  , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-issue-analyzer")
 
 		analyzerGui.SetFont("s8 Norm", "Arial")
 
@@ -1508,7 +1508,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 			updateTask := false
 
-			analyzer.stopTelemetryAnalyzer()
+			analyzer.stopIssueAnalyzer()
 		}
 
 		analyzerGui.Destroy()
@@ -1537,7 +1537,7 @@ runCalibrator(commandOrAnalyzer, *) {
 	static overValues := CaseInsenseMap()
 
 	if (commandOrAnalyzer == kCancel) {
-		analyzer.stopTelemetryAnalyzer()
+		analyzer.stopIssueAnalyzer()
 
 		result := kCancel
 	}
@@ -1547,24 +1547,24 @@ runCalibrator(commandOrAnalyzer, *) {
 
 		state := "Clean"
 
-		analyzer.startTelemetryAnalyzer(true)
+		analyzer.startIssueAnalyzer(true)
 	}
 	else if ((commandOrAnalyzer == "Activate") && (state = "Clean")) {
 		cleanValues := analyzer.Handling
 
-		analyzer.stopTelemetryAnalyzer()
+		analyzer.stopIssueAnalyzer()
 
 		infoText.Text := translate("Drive at least two consecutive hard laps and provoke under- and oversteering to the max but stay on the track. Then press `"Finish`".")
 		activateButton.Text := translate("Finish")
 
 		state := "Push"
 
-		analyzer.startTelemetryAnalyzer(true)
+		analyzer.startIssueAnalyzer(true)
 	}
 	else if ((commandOrAnalyzer == "Activate") && (state = "Push")) {
 		overValues := analyzer.Handling
 
-		analyzer.stopTelemetryAnalyzer()
+		analyzer.stopIssueAnalyzer()
 
 		result := [cleanValues, overValues]
 	}
@@ -1585,8 +1585,8 @@ runCalibrator(commandOrAnalyzer, *) {
 
 		calibratorGui.SetFont("s9 Norm", "Arial")
 
-		calibratorGui.Add("Documentation", "x78 YP+20 w184 Center", translate("Telemetry Analyzer")
-						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-telemetry-analyzer")
+		calibratorGui.Add("Documentation", "x78 YP+20 w184 Center", translate("Issue Analyzer")
+						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-issue-analyzer")
 
 		calibratorGui.SetFont("Norm s14", "Arial")
 
@@ -1608,7 +1608,7 @@ runCalibrator(commandOrAnalyzer, *) {
 				Sleep(100)
 		}
 		finally {
-			analyzer.stopTelemetryAnalyzer()
+			analyzer.stopIssueAnalyzer()
 		}
 
 		calibratorGui.Destroy()

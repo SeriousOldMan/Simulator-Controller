@@ -37,6 +37,7 @@
 #Include "..\Libraries\Math.ahk"
 #Include "..\Libraries\RuleEngine.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
+#Include "..\Database\Libraries\TelemetryViewer.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -113,6 +114,8 @@ class SetupWorkbench extends ConfigurationItem {
 	iSelectedCharacteristicsWidgets := CaseInsenseMap()
 
 	iSettingsViewer := false
+
+	iTelemetryViewer := false
 
 	iSetup := false
 
@@ -330,6 +333,12 @@ class SetupWorkbench extends ConfigurationItem {
 		}
 	}
 
+	TelemetryViewer {
+		Get {
+			return this.iTelemetryViewer
+		}
+	}
+
 	KnowledgeBase {
 		Get {
 			return this.iKnowledgeBase
@@ -514,7 +523,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 		this.iCharacteristicsArea := {X: 16, Y: 262, Width: 382, W: 482, Height: 439, H: 439}
 
-		workbenchGui.Add("Button", "x208 yp-32 w70 h23 vanalyzerButton Hidden", translate("Analyzer...")).OnEvent("Click", (*) => this.startTelemetryAnalyzer())
+		workbenchGui.Add("Button", "x208 yp-32 w70 h23 vanalyzerButton Hidden", translate("Analyzer...")).OnEvent("Click", (*) => this.startIssueAnalyzer())
 
 		workbenchGui.Add("Button", "x280 yp w70 h23 vcharacteristicsButton", translate("Issue...")).OnEvent("Click", chooseCharacteristic)
 		button := workbenchGui.Add("Button", "x352 yp w23 h23")
@@ -1447,7 +1456,7 @@ class SetupWorkbench extends ConfigurationItem {
 	loadWeather(weather, force := false) {
 	}
 
-	startTelemetryAnalyzer() {
+	startIssueAnalyzer() {
 		local analyzerClass := getMultiMapValue(this.SimulatorDefinition, "Simulator", "Analyzer", false)
 
 		if analyzerClass {
@@ -1460,6 +1469,88 @@ class SetupWorkbench extends ConfigurationItem {
 				this.Window.Unblock()
 			}
 		}
+	}
+
+	openTelemetryViewer() {
+		local lastSimulator := false
+		local lastTrack := false
+
+		static hasTask := false
+
+		startupCollector() {
+			local simulator := this.SelectedSimulator[false]
+			local track := this.SelectedTrack[false]
+
+			if (this.TelemetryViewer && simulator && (simulator != true) && track && (track != true)) {
+				if ((simulator != lastSimulator) || (track != lastTrack)) {
+					lastSimulator := simulator
+					lastTrack := track
+
+					this.TelemetryViewer.shutdownCollector()
+
+					deleteDirectory(kTempDirectory . "Garage\Telemetry", false)
+
+					this.TelemetryViewer.restart(kTempDirectory . "Garage\Telemetry", true)
+
+					this.TelemetryViewer.startupCollector(simulator, track
+														, getMultiMapValue(callSimulator(SessionDatabase.getSimulatorCode(simulator))
+																		 , "Track Data", "Length", 0))
+				}
+			}
+			else {
+				if this.TelemetryViewer {
+					this.TelemetryViewer.shutdownCollector()
+
+					if (!track || (track == true)) {
+						this.TelemetryViewer.close()
+
+						this.iTelemetryViewer := false
+					}
+				}
+
+				lastSimulator := false
+				lastTrack := false
+			}
+		}
+
+		if this.TelemetryViewer
+			WinActivate(this.TelemetryViewer.Window)
+		else {
+			DirCreate(kTempDirectory . "Garage")
+
+			deleteDirectory(kTempDirectory . "Garage\Telemetry")
+
+			DirCreate(kTempDirectory . "Garage\Telemetry")
+
+			this.iTelemetryViewer := TelemetryViewer(this, kTempDirectory . "Garage\Telemetry", true)
+
+			this.TelemetryViewer.show()
+
+			if !hasTask {
+				hasTask := true
+
+				PeriodicTask(startupCollector, 1000, kLowPriority).start()
+			}
+		}
+	}
+
+	closedTelemetryViewer() {
+		this.iTelemetryViewer := false
+	}
+
+	getSessionInformation(&simulator, &car, &track) {
+		simulator := this.SelectedSimulator
+		car := SessionDatabase.getCarCode(simulator, this.SelectedCar)
+		track := SessionDatabase.getTrackCode(simulator, this.SelectedTrack)
+	}
+
+	getLapInformation(lapNumber, &driver, &lapTime, &sectorTimes) {
+		local lap
+
+		driver := SessionDatabase.getUserName()
+
+		lapTime := "-"
+		sectorTimes := ["-"]
 	}
 
 	clearCharacteristics() {
@@ -1640,7 +1731,14 @@ class SetupWorkbench extends ConfigurationItem {
 
 		label := translate("Analyzer...")
 
-		characteristicsMenu.Add(label, (*) => this.startTelemetryAnalyzer())
+		characteristicsMenu.Add(label, (*) => this.startIssueAnalyzer())
+
+		label := translate("Telemetry...")
+
+		characteristicsMenu.Add(label, (*) => this.openTelemetryViewer())
+
+		if (!this.SelectedTrack[false] || (this.SelectedTrack[false] == true))
+			characteristicsMenu.Disable(label)
 
 		if (!this.SimulatorDefinition || !getMultiMapValue(this.SimulatorDefinition, "Simulator", "Analyzer", false)
 									  || !inList(getKeys(getMultiMapValues(getControllerState(), "Simulators")), this.SelectedSimulator))
@@ -1722,10 +1820,10 @@ class SetupWorkbench extends ConfigurationItem {
 
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; TelemetryAnalyzer                                                       ;;;
+;;; IssueAnalyzer                                                           ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class TelemetryAnalyzer {
+class IssueAnalyzer {
 	iWorkbench := false
 	iSimulator := false
 
@@ -1747,7 +1845,7 @@ class TelemetryAnalyzer {
 	}
 
 	createCharacteristics() {
-		throw "Virtual method TelemetryAnalyzer.createCharacteristics must be implemented in a subclass..."
+		throw "Virtual method IssueAnalyzer.createCharacteristics must be implemented in a subclass..."
 	}
 }
 
@@ -3538,9 +3636,9 @@ startupSetupWorkbench() {
 ;;;                          Editor Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "Libraries\GenericTelemetryAnalyzer.ahk"
-#Include "Libraries\IRCTelemetryAnalyzer.ahk"
-#Include "Libraries\R3ETelemetryAnalyzer.ahk"
+#Include "Libraries\GenericIssueAnalyzer.ahk"
+#Include "Libraries\IRCIssueAnalyzer.ahk"
+#Include "Libraries\R3EIssueAnalyzer.ahk"
 #Include "Libraries\ACCSetupEditor.ahk"
 #Include "Libraries\ACSetupEditor.ahk"
 

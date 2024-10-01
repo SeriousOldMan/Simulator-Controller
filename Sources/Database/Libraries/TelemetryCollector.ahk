@@ -18,6 +18,7 @@
 
 class TelemetryCollector {
 	iSimulator := false
+	iTrack := false
 	iTrackLength := false
 
 	iTelemetryDirectory := false
@@ -26,6 +27,12 @@ class TelemetryCollector {
 	Simulator {
 		Get {
 			return this.iSimulator
+		}
+	}
+
+	Track {
+		Get {
+			return this.iTrack
 		}
 	}
 
@@ -41,8 +48,9 @@ class TelemetryCollector {
 		}
 	}
 
-	__New(telemetryDirectory, simulator, trackLength) {
+	__New(telemetryDirectory, simulator, track, trackLength) {
 		this.iSimulator := simulator
+		this.iTrack := track
 		this.iTrackLength := trackLength
 		this.iTelemetryDirectory := telemetryDirectory
 
@@ -50,13 +58,14 @@ class TelemetryCollector {
 	}
 
 	startup(force := false) {
-		local code, exePath, pid
+		local sessionDB := SessionDatabase()
+		local code, exePath, pid, trackData
 
 		if (this.iTelemetryCollectorPID && force)
 			this.shutdown(true)
 
 		if !this.iTelemetryCollectorPID {
-			code := SessionDatabase.getSimulatorCode(this.iSimulator)
+			code := sessionDB.getSimulatorCode(this.iSimulator)
 			exePath := (kBinariesDirectory . "Providers\" . code . " SHM Spotter.exe")
 			pid := false
 
@@ -66,7 +75,10 @@ class TelemetryCollector {
 
 				DirCreate(this.TelemetryDirectory)
 
-				Run("`"" . exePath . "`" -Telemetry " . this.iTrackLength . " `"" . normalizeDirectoryPath(this.TelemetryDirectory) . "`""
+				trackData := sessionDB.getTrackData(code, this.Track)
+
+				Run("`"" . exePath . "`" -Telemetry " . this.iTrackLength
+				  . " `"" . normalizeDirectoryPath(this.TelemetryDirectory) . "`"" . (trackData ? (" `"" . trackData . "`"") : "")
 				  , kBinariesDirectory, "Hide", &pid)
 			}
 			catch Any as exception {

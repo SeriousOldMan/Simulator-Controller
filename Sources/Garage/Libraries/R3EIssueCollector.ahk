@@ -10,10 +10,10 @@
 ;;;-------------------------------------------------------------------------;;;
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; R3ETelemetryCollector                                                   ;;;
+;;; R3EIssueCollector                                                       ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class R3ETelemetryCollector extends TelemetryCollector {
+class R3EIssueCollector extends IssueCollector {
 	settingAvailable(setting, force := false) {
 		if ((setting = "SteerLock") || (setting = "SteerRatio"))
 			return false

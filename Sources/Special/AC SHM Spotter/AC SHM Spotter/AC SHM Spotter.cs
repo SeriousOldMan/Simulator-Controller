@@ -1615,6 +1615,7 @@ namespace ACSHMSpotter {
         string telemetryDirectory = "";
         StreamWriter telemetryFile = null;
         int telemetryLap = -1;
+		float lastRunning = -1;
 
         void collectCarTelemetry()
         {
@@ -1646,18 +1647,55 @@ namespace ACSHMSpotter {
                     telemetryLap = (graphics.CompletedLaps + 1);
 
                     telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".tmp", false);
+
+					lastRunning = -1;
                 }
 
-                telemetryFile.Write(Math.Max(0, Math.Min(1, driver.splinePosition)) + staticInfo.TrackSPlineLength + ";");
-                telemetryFile.Write(physics.Gas + ";");
-                telemetryFile.Write(physics.Brake + ";");
-                telemetryFile.Write(physics.SteerAngle + ";");
-                telemetryFile.Write(physics.Gear + ";");
-                telemetryFile.Write(physics.Rpms + ";");
-                telemetryFile.Write(physics.SpeedKmh + ";");
+                double velocityX = physics.LocalVelocity[0];
+                double velocityY = physics.LocalVelocity[2];
+                double velocityZ = physics.LocalVelocity[1];
 
-                telemetryFile.Write(physics.TC + ";");
-                telemetryFile.WriteLine(physics.Abs);
+				if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
+				{
+                    int carID = 0;
+
+                    float playerRotation = physics.Heading;
+					if (playerRotation < 0)
+					{
+						playerRotation = (float)(2 * Math.PI) + playerRotation;
+					}
+					double angle = 360 * ((2 * Math.PI) - playerRotation) / (2 * Math.PI);
+
+                    double latG = physics.AccG[0];
+					double longG = physics.AccG[2];
+
+					// rotateBy(ref longG, ref latG, angle);
+
+					// latG *= -1;
+
+					float running = Math.Max(0, Math.Min(1, driver.splinePosition)) * staticInfo.TrackSPlineLength;
+
+					if (running > lastRunning)
+					{
+						lastRunning = running;
+
+						telemetryFile.Write(running + ";");
+						telemetryFile.Write(physics.Gas + ";");
+						telemetryFile.Write(physics.Brake + ";");
+						telemetryFile.Write(physics.SteerAngle + ";");
+						telemetryFile.Write(physics.Gear + ";");
+						telemetryFile.Write(physics.Rpms + ";");
+						telemetryFile.Write(physics.SpeedKmh + ";");
+
+						telemetryFile.Write(physics.TC + ";");
+						telemetryFile.Write(physics.Abs + ";");
+						telemetryFile.Write(longG + ";");
+						telemetryFile.Write(latG + ";");
+
+						telemetryFile.Write(cars.cars[carID].worldPosition.x + ";");
+						telemetryFile.WriteLine(cars.cars[carID].worldPosition.z);
+					}
+				}
             }
             catch (Exception)
             {

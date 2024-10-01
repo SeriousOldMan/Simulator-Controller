@@ -108,41 +108,6 @@ global kTyreLapsBucketSize := 5
 ;;;-------------------------------------------------------------------------;;;
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; Class                           WorkingTask                             ;;;
-;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-
-class WorkingTask extends PeriodicTask {
-	iTitle := ""
-	iProgressWindow := false
-
-	iStart := A_TickCount
-	iProgress := false
-
-	__New(title := "") {
-		this.iTitle := title
-
-		super.__New(false, 50, kInterruptPriority)
-	}
-
-	run() {
-		if (A_TickCount > (this.iStart + 250))
-			if !this.iProgress
-				this.iProgressWindow := ProgressWindow.showProgress({progress: this.iProgress++, color: "Blue", title: this.iTitle})
-			else if (this.iProgress != "Stop")
-				this.iProgressWindow.updateProgress({progress: Min(100, this.iProgress++)})
-	}
-
-	stop() {
-		this.iProgress := "Stop"
-
-		if this.iProgressWindow
-			this.iProgressWindow.hideProgress()
-
-		super.stop()
-	}
-}
-
-;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; Class                          SoloCenterTask                           ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
@@ -7688,7 +7653,8 @@ class SoloCenter extends ConfigurationItem {
 					this.startSession(fileName, true)
 
 				if this.TelemetryViewer
-					this.TelemetryViewer.startupCollector(this.Simulator, getMultiMapValue(data, "Track Data", "Length", 0))
+					this.TelemetryViewer.startupCollector(this.Simulator, getMultiMapValue(data, "Session Data", "Track", "Unknown")
+																		, getMultiMapValue(data, "Track Data", "Length", 0))
 
 				if update {
 					if (this.SessionActive && (this.LastLap.Nr = lapNumber))

@@ -1878,6 +1878,8 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 		float steerAngle = 0.0;
 		int gear = 0;
 		int rpms = 0;
+		float longG = 0.0;
+		float latG = 0.0;
 
 		if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
 			playerRunning = ((float*)trackPositions)[playerCarIndex];
@@ -1904,15 +1906,30 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 		if (getRawDataValue(rawValue, header, data, "RPM"))
 			rpms = *(int*)rawValue;
 
-			telemetryFile << (playerRunning * trackLength) << ";"
-						  << throttle << ";"
-						  << brake << ";"
-						  << steerAngle << ";"
-						  << gear << ";"
-						  << rpms << ";"
-						  << speed << ";"
-						  << "n/a" << ";"
-						  << "n/a" << std::endl;
+		if (getRawDataValue(rawValue, header, data, "LongAccel"))
+			longG = (*(float*)rawValue) / 9.807;
+
+		if (getRawDataValue(rawValue, header, data, "LatAccel"))
+			latG = (*(float*)rawValue) / 9.807;
+
+		telemetryFile << (playerRunning * trackLength) << ";"
+					  << throttle << ";"
+					  << brake << ";"
+					  << steerAngle << ";"
+					  << gear << ";"
+					  << rpms << ";"
+					  << speed << ";"
+					  << "n/a" << ";"
+					  << "n/a" << ";"
+					  << longG << ";" << - latG;
+
+		float coordinateX;
+		float coordinateY;
+
+		if (getCarCoordinates(header, data, playerCarIndex, coordinateX, coordinateY))
+			telemetryFile << ";" << coordinateX << ";" << coordinateY << std::endl;
+		else
+			telemetryFile << std::endl;
 	}
 	catch (...) {
 		try {
@@ -2059,6 +2076,12 @@ int main(int argc, char* argv[])
 			char* trackLength = argv[2];
 
 			telemetryDirectory = argv[3];
+
+			if (argc > 3) {
+				loadTrackCoordinates(argv[4]);
+
+				hasTrackCoordinates = true;
+			}
 		}
 		else {
 			for (int i = 0; i < 512; ++i)
@@ -2222,6 +2245,8 @@ int main(int argc, char* argv[])
 									onTrack = false;
 
 								bool inPit = false;
+
+								getRawDataValue(rawValue, pHeader, g_data, "CarIdxOnPitRoad");
 
 								if (((bool*)rawValue)[playerCarIndex])
 									inPit = true;

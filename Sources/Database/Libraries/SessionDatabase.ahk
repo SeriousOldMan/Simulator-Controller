@@ -830,6 +830,20 @@ class SessionDatabase extends ConfigurationItem {
 			return false
 	}
 
+	hasTrackAutomation(simulator, car, track, name := false) {
+		local ignore, trackAutomation
+
+		if this.hasTrackMap(simulator, track)
+			if !name
+				return this.hasTrackAutomations(simulator, car, track)
+			else
+				for ignore, trackAutomation in this.getTrackAutomations(simulator, car, track)
+					if (trackAutomation.Name = name)
+						return true
+
+		return false
+	}
+
 	hasTrackAutomations(simulator, car, track) {
 		local code := this.getSimulatorCode(simulator)
 
@@ -1430,9 +1444,21 @@ class SessionDatabase extends ConfigurationItem {
 		FileAppend(notes, directory . "\Notes.txt", "UTF-16")
 	}
 
-	getTelemetryDirectory(simulator, car, track, type) {
-		return (kDatabaseDirectory . StrTitle(type) . "\" . this.getSimulatorCode(simulator) . "\" . this.getCarCode(simulator, car)
+	getTelemetryDirectory(simulator, car, track, origin) {
+		return (kDatabaseDirectory . StrTitle(origin) . "\" . this.getSimulatorCode(simulator) . "\" . this.getCarCode(simulator, car)
 								   . "\" . this.getTrackCode(simulator, track) . "\Lap Telemetries\")
+	}
+
+	hasTelemetry(simulator, car, track, user, community, name := false) {
+		local found := false
+
+		if user
+			found := FileExist(this.getTelemetryDirectory(simulator, car, track, "User") . (name ? (name . ".telemetry") : "\*.telemetry"))
+
+		if (!found && community)
+			found := FileExist(this.getTelemetryDirectory(simulator, car, track, "Community") . (name ? (name . ".telemetry") : "\*.telemetry"))
+
+		return found
 	}
 
 	getTelemetryNames(simulator, car, track, &userTelemetries, &communityTelemetries) {
@@ -1651,6 +1677,18 @@ class SessionDatabase extends ConfigurationItem {
 								   . "\" . this.getTrackCode(simulator, track) . "\" . type . " Sessions\")
 	}
 
+	hasSession(simulator, car, track, type, name := false) {
+		if (type = "Practice")
+			type := "Solo"
+		else if (type = "Race")
+			type := "Team"
+
+		if name
+			return FileExist(this.getSessionDirectory(simulator, car, track, type) . name . "." . type)
+		else
+			return FileExist(this.getSessionDirectory(simulator, car, track, type) . "*." . type)
+	}
+
 	getSessions(simulator, car, track, type, &names, &infos := false) {
 		local name
 
@@ -1681,9 +1719,6 @@ class SessionDatabase extends ConfigurationItem {
 			type := "Solo"
 		else if (type = "Race")
 			type := "Team"
-
-		car := this.getCarCode(simulator, car)
-		track := this.getTrackCode(simulator, track)
 
 		fileName := (this.getSessionDirectory(simulator, car, track, type) . name)
 
@@ -1718,9 +1753,6 @@ class SessionDatabase extends ConfigurationItem {
 			type := "Solo"
 		else if (type = "Race")
 			type := "Team"
-
-		car := this.getCarCode(simulator, car)
-		track := this.getTrackCode(simulator, track)
 
 		fileName := (this.getSessionDirectory(simulator, car, track, type) . name . ".info")
 
@@ -1760,9 +1792,6 @@ class SessionDatabase extends ConfigurationItem {
 			type := "Solo"
 		else if (type = "Race")
 			type := "Team"
-
-		car := this.getCarCode(simulator, car)
-		track := this.getTrackCode(simulator, track)
 
 		fileName := this.getSessionDirectory(simulator, car, track, type)
 
@@ -1870,6 +1899,24 @@ class SessionDatabase extends ConfigurationItem {
 				catch Any as exception {
 					logError(exception, true)
 				}
+	}
+
+	hasSetup(simulator, car, track, type, user, community, name := false) {
+		local simulatorCode := this.getSimulatorCode(simulator)
+		local found := false
+
+		car := this.getCarCode(simulator, car)
+		track := this.getTrackCode(simulator, track)
+
+		if user
+			found := FileExist(kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Car Setups\"
+												  . type . (name ? (name . ".*") : "\*.*"))
+
+		if (!found && community)
+			found := FileExist(kDatabaseDirectory . "Community\" . simulatorCode . "\" . car . "\" . track . "\Car Setups\"
+												  . type . (name ? (name . ".*") : "\*.*"))
+
+		return found
 	}
 
 	getSetupNames(simulator, car, track, &userSetups, &communitySetups) {
@@ -2098,9 +2145,21 @@ class SessionDatabase extends ConfigurationItem {
 				}
 	}
 
-	getStrategyDirectory(simulator, car, track, type) {
-		return (kDatabaseDirectory . StrTitle(type) . "\" . this.getSimulatorCode(simulator) . "\" . this.getCarCode(simulator, car)
+	getStrategyDirectory(simulator, car, track, origin) {
+		return (kDatabaseDirectory . StrTitle(origin) . "\" . this.getSimulatorCode(simulator) . "\" . this.getCarCode(simulator, car)
 								   . "\" . this.getTrackCode(simulator, track) . "\Race Strategies\")
+	}
+
+	hasStrategy(simulator, car, track, user, community, name := false) {
+		local found := false
+
+		if user
+			found := FileExist(this.getStrategyDirectory(simulator, car, track, "User") . (name ? (name . ".strategy") : "\*.strategy"))
+
+		if (!found && community)
+			found := FileExist(this.getStrategyDirectory(simulator, car, track, "Community") . (name ? (name . ".strategy") : "\*.strategy"))
+
+		return found
 	}
 
 	getStrategyNames(simulator, car, track, &userStrategies, &communityStrategies) {

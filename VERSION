@@ -1,9 +1,9 @@
 [Development]
-Version=5.9.1.0-release
-Target=5.9.1.0-release
-Date=09/27/2024
-Download=https://cutt.ly/9eUEySX3;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.9.1.0-release.zip
-Changes=Open telemetry in the "Session Database", Telemetry Browser for "Team Center", Optimized database performance, Full translation for the Italian language, Fixed memory runaway in changing weather, Added a credits page in the documentation, Support for language mixing in speech generation, Reduced Jitter in telemetry chart, Fixed saving session w telemetry in "Solo Center"
+Version=5.9.2.0-dev
+Target=5.9.2.0-release
+Date=10/01/2024
+Download=https://www.dropbox.com/scl/fi/0hha4zj2gu8y87o1qwybe/Simulator-Controller-5.9.2.0-dev.zip?rlkey=llkz4s9u978v1ffi39ot0kp0c&st=qcqxplhk&dl=1
+Changes=Lap telemetry opened from "Session Database" show the driver name, New telemetry fields LatG, LongG and Curvature, Support to import telemetry data from "Second Monitor", Fixed iRacing Spotter, Multiple telemetry selection support when loading telemetries, Colorized Track Automation state display on Button Box, Telemetry Viewer usable in "Setup Workbench", Renamed "Telemetry Analyzer" to "Issue Analyzer", Renamed "Telemetry Browser" to "Telemetry Viewer", Track map support in Telemetry Viewer, Select position on track by clicking in telemetry graph
 Components=Media->5.6.1,Configuration->5.9.1,Utilities->5.9.1
 [Release]
 Version=5.9.1.0-release
@@ -22,7 +22,7 @@ Utilities.5.9.1.Path=.
 Utilities.5.9.1.Content=Utilities
 Utilities.5.9.1.Download=https://www.dropbox.com/scl/fi/n3n5gajdhb1swegw46bp6/Utilities-5.9.1.zip?rlkey=sl8dbbf0gndpaqyj8g66by8o5&st=3ullp93q&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.9.1.zip
 [Current]
-Type=Release
+Type=Development
 [Version]
-Development=5.9.1.0-release
+Development=5.9.2.0-dev
 Release=5.9.1.0-release

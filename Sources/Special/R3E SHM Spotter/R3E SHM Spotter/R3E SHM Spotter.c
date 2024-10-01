@@ -1679,9 +1679,14 @@ void collectCarTelemetry(int playerID) {
 	double carDistance = map_buffer->all_drivers_data_1[index].lap_distance;
 	float running = (float)max(0, min(1, fabs(carDistance / map_buffer->layout_length)));
 
-	fprintf(telemetryFile, "%f;%f;%f;%f;%d;%d;%f;%d;%d\n", running, map_buffer->throttle, map_buffer->brake, map_buffer->steer_input_raw,
-														   map_buffer->gear, (int)round(map_buffer->engine_rps), map_buffer->car_speed * 3.6f,
-														   (map_buffer->aid_settings.tc == 5) ? 1 : 0, (map_buffer->aid_settings.abs == 5) ? 1 : 0);
+	fprintf(telemetryFile, "%f;%f;%f;%f;%d;%d;%f;%d;%d;%f;%f;%f;%f\n",
+						   running, map_buffer->throttle, map_buffer->brake, map_buffer->steer_input_raw,
+						   map_buffer->gear, (int)round(map_buffer->engine_rps), map_buffer->car_speed * 3.6f,
+						   (map_buffer->aid_settings.tc == 5) ? 1 : 0, (map_buffer->aid_settings.abs == 5) ? 1 : 0,
+						   -(map_buffer->local_acceleration.z / 9.807),
+						   (map_buffer->local_acceleration.x / 9.807),
+						   map_buffer->all_drivers_data_1[index].position.x,
+						   -map_buffer->all_drivers_data_1[index].position.z);
 }
 
 BOOL started = FALSE;

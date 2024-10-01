@@ -9,7 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "IRCTelemetryCollector.ahk"
+#Include "IRCIssueCollector.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -17,13 +17,13 @@
 ;;;-------------------------------------------------------------------------;;;
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; IRCTelemetryAnalyzer                                                    ;;;
+;;; IRCIssueAnalyzer                                                        ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class IRCTelemetryAnalyzer extends GenericTelemetryAnalyzer {
+class IRCIssueAnalyzer extends GenericIssueAnalyzer {
 	CollectorClass {
 		Get {
-			return "IRCTelemetryCollector"
+			return "IRCIssueCollector"
 		}
 	}
 

@@ -2208,6 +2208,8 @@ initializeHTMLViewer() {
 		control.HTMLViewer := viewer
 		control.Document := viewer
 
+		viewer.parentWindow := (*) => viewer.Controller().parentWindow
+
 		show() {
 			control.Visible := true
 			viewer.Show()
@@ -2276,6 +2278,7 @@ initializeHTMLViewer() {
 		control.Resized := (*) => viewer.Resized()
 		control.getWidth := (*) => width()
 		control.getHeight := (*) => height()
+		control.stop := (*) => viewer.stop()
 
 		return control
 	}

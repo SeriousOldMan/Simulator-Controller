@@ -19,10 +19,10 @@
 ;;;-------------------------------------------------------------------------;;;
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; TelemetryCollector                                                      ;;;
+;;; IssueCollector                                                          ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class TelemetryCollector {
+class IssueCollector {
 	iSimulator := false
 	iCar := false
 	iTrack := false
@@ -131,13 +131,13 @@ class TelemetryCollector {
 
 	static AudioDevice {
 		Get {
-			return TelemetryCollector.sAudioDevice
+			return IssueCollector.sAudioDevice
 		}
 	}
 
 	AudioDevice {
 		Get {
-			return TelemetryCollector.AudioDevice
+			return IssueCollector.AudioDevice
 		}
 	}
 
@@ -161,7 +161,7 @@ class TelemetryCollector {
 				this.i%setting% := value
 
 		if first {
-			TelemetryCollector.sAudioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Analyzer.AudioDevice", false)
+			IssueCollector.sAudioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Analyzer.AudioDevice", false)
 
 			first := false
 		}
@@ -234,7 +234,7 @@ class TelemetryCollector {
 		this.iTemperatureSamples := []
 	}
 
-	startTelemetryCollector(calibrate := false) {
+	startIssueCollector(calibrate := false) {
 		local dataFile := temporaryFileName("Telemetry", "data")
 		local pid, options, code, message
 
@@ -244,7 +244,7 @@ class TelemetryCollector {
 			Task.CurrentTask.Sleep := this.iSampleFrequency
 		}
 
-		this.stopTelemetryCollector()
+		this.stopIssueCollector()
 		this.deleteSamples()
 
 		if (!this.iCollectorPID && inList(this.iCategories, "Handling")) {
@@ -304,7 +304,7 @@ class TelemetryCollector {
 			if pid {
 				this.iCollectorPID := pid
 
-				OnExit(ObjBindMethod(this, "stopTelemetryCollector"))
+				OnExit(ObjBindMethod(this, "stopIssueCollector"))
 			}
 
 			if (!calibrate && this.iSampleFrequency) {
@@ -315,13 +315,13 @@ class TelemetryCollector {
 		}
 	}
 
-	stopTelemetryCollector(arguments*) {
+	stopIssueCollector(arguments*) {
 		local pid := this.iCollectorPID
 		local tries
 
 		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
 			return false
-		
+
 		if pid {
 			tries := 5
 
@@ -347,7 +347,7 @@ class TelemetryCollector {
 	}
 
 	static acousticFeedback(soundFile) {
-		playSound("SWSoundPlayer.exe", soundFile, (TelemetryCollector.AudioDevice ? TelemetryCollector.AudioDevice : "") . " echos 1 1 1 1")
+		playSound("SWSoundPlayer.exe", soundFile, (IssueCollector.AudioDevice ? IssueCollector.AudioDevice : "") . " echos 1 1 1 1")
 	}
 
 	getHandling() {

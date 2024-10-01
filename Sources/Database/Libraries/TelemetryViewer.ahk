@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\..\Libraries\HTMLViewer.ahk"
+#Include "..\..\Libraries\GDIP.ahk"
 #Include "SessionDatabase.ahk"
 #Include "SessionDatabaseBrowser.ahk"
 #Include "TelemetryCollector.ahk"
@@ -20,23 +21,27 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class TelemetryChart {
-	static sChartID := 1
-
-	iWindow := false
-
 	iTelemetryViewer := false
 
-	iZoom := 100
+	iChartArea := false
 
-	Window {
-		Get {
-			return this.iWindow
-		}
-	}
+	iZoom := 100
 
 	TelemetryViewer {
 		Get {
 			return this.iTelemetryViewer
+		}
+	}
+
+	Window {
+		Get {
+			return this.TelemetryViewer.Window
+		}
+	}
+
+	ChartArea {
+		Get {
+			return this.iChartArea
 		}
 	}
 
@@ -50,16 +55,53 @@ class TelemetryChart {
 		}
 	}
 
-	__New(window, telemetryViewer := false) {
-		this.iWindow := window
+	__New(telemetryViewer, chartArea := false) {
 		this.iTelemetryViewer := telemetryViewer
+		this.iChartArea := chartArea
 	}
 
 	showTelemetryChart(lapFileName, referenceLapFileName := false) {
-		if this.TelemetryViewer {
-			this.TelemetryViewer.document.open()
-			this.TelemetryViewer.document.write(this.createTelemetryChart(lapFileName, referenceLapFileName))
-			this.TelemetryViewer.document.close()
+		eventHandler(event, arguments*) {
+			local telemetryViewer := this.TelemetryViewer
+			local row := false
+			local data
+
+			; this.ChartArea.stop()
+
+			try {
+				if (event = "Select") {
+					row := string2Values(";", arguments[1])
+
+					if ((row.Length > 0) && (StrLen(Trim(row[1])) > 0)) {
+						row := string2Values("|", row[1])[1]
+
+						if isNumber(row) {
+							row := (row + 1)
+
+							if telemetryViewer.Data.Has(telemetryViewer.SelectedLap[true]) {
+								this.selectRow(row)
+
+								data := telemetryViewer.Data[telemetryViewer.SelectedLap[true]]
+
+								if (data.Has(row) && data[row].Length > 11)
+									if telemetryViewer.TrackMap
+										telemetryViewer.TrackMap.updateTrackPosition(data[row][12], data[row][13])
+							}
+						}
+					}
+				}
+			}
+			catch Any as exception {
+				logError(exception)
+			}
+		}
+
+		if this.ChartArea {
+			this.ChartArea.document.open()
+			this.ChartArea.document.write(this.createTelemetryChart(lapFileName, referenceLapFileName))
+			this.ChartArea.document.close()
+
+			this.ChartArea.document.parentWindow.eventHandler := eventHandler
 		}
 	}
 
@@ -68,21 +110,12 @@ class TelemetryChart {
 		local referenceLapTelemetry := false
 		local html := ""
 		local width, height
-		local drawChartFunction1, chartID1, chartArea1, drawChartFunction2, chartID2, chartArea2
-		local drawChartFunction3, chartID3, chartArea3
+		local drawChartFunction1, chartArea1, drawChartFunction2, chartArea2, drawChartFunction3, chartArea3
 		local before, after, margins
 		local entry, index, field, running
 
 		if lapFileName
-			loop Read, lapFileName {
-				entry := string2Values(";", A_LoopReadLine)
-
-				for index, value in entry
-					if !isNumber(value)
-						entry[index] := kNull
-
-				lapTelemetry.Push(entry)
-			}
+			lapTelemetry := this.TelemetryViewer.loadData(lapFileName)
 
 		if referenceLapFileName {
 			referenceLapTelemetry := Map()
@@ -96,19 +129,19 @@ class TelemetryChart {
 					if !isNumber(value)
 						entry[index] := kNull
 					else if (index = 1)
-						running := entry[index] := (Round(entry[index] / 5) * 5)
+						running := entry[index] := (Round(entry[index] / 7.5) * 7.5)
 
 				referenceLapTelemetry[running] := entry
 			}
 		}
 
-		if this.TelemetryViewer {
-			width := ((this.TelemetryViewer.getWidth() - 4) / 100 * this.Zoom)
-			height := (this.TelemetryViewer.getHeight() - 4)
+		if this.ChartArea {
+			width := ((this.ChartArea.getWidth() - 4) / 100 * this.Zoom)
+			height := (this.ChartArea.getHeight() - 4)
 
-			chartArea1 := this.createSpeedChart(width, height / 3 * 2, lapTelemetry, referenceLapTelemetry, &drawChartFunction1, &chartID1)
-			chartArea2 := this.createElectronicsChart(width, height / 3, lapTelemetry, referenceLapTelemetry, &drawChartFunction2, &chartID2)
-			chartArea3 := this.createAccelerationChart(width, height / 3, lapTelemetry, referenceLapTelemetry, &drawChartFunction3, &chartID3)
+			chartArea1 := this.createSpeedChart(width, height / 3 * 2, lapTelemetry, referenceLapTelemetry, &drawChartFunction1)
+			chartArea2 := this.createElectronicsChart(width, height / 3, lapTelemetry, referenceLapTelemetry, &drawChartFunction2)
+			chartArea3 := this.createAccelerationChart(width, height / 3, lapTelemetry, referenceLapTelemetry, &drawChartFunction3)
 
 			if chartArea3
 				before := "
@@ -121,11 +154,11 @@ class TelemetryChart {
 							.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
 						</style>
 						<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-						<script type="text/javascript">function drawCharts() { drawChart%chartID1%(); drawChart%chartID2%(); drawChart%chartID3%() }</script>
+						<script type="text/javascript">function drawCharts() { drawSpeedChart(); drawElectronicsChart(); drawAccelerationChart() }</script>
 						<script type="text/javascript">
 							google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawCharts);
 				)"
-			else {
+			else
 				before := "
 				(
 					<meta charset='utf-8'>
@@ -136,19 +169,15 @@ class TelemetryChart {
 							.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
 						</style>
 						<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-						<script type="text/javascript">function drawCharts() { drawChart%chartID1%(); drawChart%chartID2%() }</script>
+						<script type="text/javascript">function drawCharts() { drawSpeedChart(); drawElectronicsChart() }</script>
 						<script type="text/javascript">
 							google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawCharts);
 				)"
 
-				chartID3 := false
-			}
-
 			before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
 												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
-												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]
-												 , chartID1: chartID1, chartID2: chartID2, chartID3: chartID3})
+												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
 
 			after := "
 			(
@@ -165,13 +194,12 @@ class TelemetryChart {
 			return "<html></html>"
 	}
 
-	createSpeedChart(width, height, lapTelemetry, referenceLapTelemetry, &drawChartFunction, &chartID) {
+	createSpeedChart(width, height, lapTelemetry, referenceLapTelemetry, &drawChartFunction) {
 		local speedMin := 9999
 		local speedMax := 0
 		local ignore, data, refData, axes, speed, refSpeed, color, running, refRunning
 
-		chartID := TelemetryChart.sChartID++
-		drawChartFunction := ("function drawChart" . chartID . "() {`nvar data = new google.visualization.DataTable();")
+		drawChartFunction := ("function drawSpeedChart() {`nvar data = new google.visualization.DataTable();")
 
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Distance") . "');")
 
@@ -208,7 +236,7 @@ class TelemetryChart {
 				speed := kNull
 
 			if referenceLapTelemetry {
-				refRunning := (Round(running / 5) * 5)
+				refRunning := (Round(running / 7.5) * 7.5)
 
 				if referenceLapTelemetry.Has(refRunning) {
 					refData := referenceLapTelemetry[refRunning]
@@ -240,18 +268,22 @@ class TelemetryChart {
 
 		drawChartFunction .= ("]);`nvar options = { " . axes . ", legend: { position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '2%', top: '5%', right: '2%', bottom: '20%' }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
 
-		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
+		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_speed')); chart.draw(data, options); document.speed_chart = chart;")
+		drawChartFunction .= "`nfunction selectHandler(e) { var cSelection = chart.getSelection(); var selection = ''; for (var i = 0; i < cSelection.length; i++) { var item = cSelection[i]; if (i > 0) selection += ';'; selection += (item.row + '|' + item.column); } try { eventHandler('Select', selection); } catch(e) {} }"
 
-		return ("<div id=`"chart_" . chartID . "`" style=`"width: " . Round(width) . "px; height: " . Round(height) . "px`"></div>")
+		drawChartFunction .= "`ngoogle.visualization.events.addListener(chart, 'select', selectHandler); }"
+
+		drawChartFunction .= ("`nfunction selectSpeed(row) {`ndocument.speed_chart.setSelection([{row: row, column: null}]); }")
+
+		return ("<div id=`"chart_speed`" style=`"width: " . Round(width) . "px; height: " . Round(height) . "px`"></div>")
 	}
 
-	createElectronicsChart(width, height, lapTelemetry, referenceLapTelemetry, &drawChartFunction, &chartID) {
+	createElectronicsChart(width, height, lapTelemetry, referenceLapTelemetry, &drawChartFunction) {
 		local rpmsMin := 99999
 		local rpmsMax := 0
 		local ignore, data, refData, rpms, refRpms, axes, color, running, refRunning
 
-		chartID := TelemetryChart.sChartID++
-		drawChartFunction := ("function drawChart" . chartID . "() {`nvar data = new google.visualization.DataTable();")
+		drawChartFunction := ("function drawElectronicsChart() {`nvar data = new google.visualization.DataTable();")
 
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Distance") . "');")
 
@@ -286,7 +318,7 @@ class TelemetryChart {
 				rpms := kNull
 
 			if referenceLapTelemetry {
-				refRunning := (Round(running / 5) * 5)
+				refRunning := (Round(running / 7.5) * 7.5)
 
 				if referenceLapTelemetry.Has(refRunning) {
 					refData := referenceLapTelemetry[refRunning]
@@ -318,20 +350,24 @@ class TelemetryChart {
 
 		drawChartFunction .= ("]);`nvar options = { " . axes . ", legend: { position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '2%', top: '5%', right: '2%', bottom: '20%' }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
 
-		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
+		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_electronics')); chart.draw(data, options); document.electronics_chart = chart;")
+		drawChartFunction .= "`nfunction selectHandler(e) { var cSelection = chart.getSelection(); var selection = ''; for (var i = 0; i < cSelection.length; i++) { var item = cSelection[i]; if (i > 0) selection += ';'; selection += (item.row + '|' + item.column); } try { eventHandler('Select', selection); } catch(e) {} }"
 
-		return ("<div id=`"chart_" . chartID . "`" style=`"width: " . Round(width) . "px; height: " . Round(height) . "px`"></div>")
+		drawChartFunction .= "`ngoogle.visualization.events.addListener(chart, 'select', selectHandler); }"
+
+		drawChartFunction .= ("`nfunction selectElectronics(row) {`ndocument.electronics_chart.setSelection([{row: row, column: null}]); }")
+
+		return ("<div id=`"chart_electronics`" style=`"width: " . Round(width) . "px; height: " . Round(height) . "px`"></div>")
 	}
 
-	createAccelerationChart(width, height, lapTelemetry, referenceLapTelemetry, &drawChartFunction, &chartID) {
+	createAccelerationChart(width, height, lapTelemetry, referenceLapTelemetry, &drawChartFunction) {
 		local accelMin := kUndefined
 		local accelMax := kUndefined
 		local curvMin := kUndefined
 		local curvMax := kUndefined
 		local ignore, data, refData, longG, latG, refLongG, refLatG, axes, color, running, refRunning, curvature, speed, absG
 
-		chartID := TelemetryChart.sChartID++
-		drawChartFunction := ("function drawChart" . chartID . "() {`nvar data = new google.visualization.DataTable();")
+		drawChartFunction := ("function drawAccelerationChart() {`nvar data = new google.visualization.DataTable();")
 
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Distance") . "');")
 
@@ -380,8 +416,8 @@ class TelemetryChart {
 
 			absG := Abs(latG)
 
-			if (absG > 0.2) {
-				curvature := - (((speed / 3.6) ** 2) / ((absG = 0) ? 0.00001 : absG))
+			if (absG > 0.1) {
+				curvature := - Log(((speed / 3.6) ** 2) / ((absG = 0) ? 0.00001 : absG))
 
 				if (curvMin = kUndefined) {
 					curvMin := curvature
@@ -396,7 +432,7 @@ class TelemetryChart {
 				curvature := kNull
 
 			if referenceLapTelemetry {
-				refRunning := (Round(running / 5) * 5)
+				refRunning := (Round(running / 7.5) * 7.5)
 
 				if referenceLapTelemetry.Has(refRunning) {
 					refData := referenceLapTelemetry[refRunning]
@@ -439,8 +475,8 @@ class TelemetryChart {
 		if referenceLapTelemetry {
 			color := this.Window.Theme.TextColor["Disabled"]
 
-			axes := "series: { 0: {targetAxisIndex: 0, color: '" . color . "'}, 1: {targetAxisIndex: 1, color: '" . color . "'}, 2: {targetAxisIndex: 2, color: '" . color . "'}, 3: {targetAxisIndex: 3, color: '" . color . "'}, 4: {targetAxisIndex: 4, color: '" . color . "'} },`n"
-			axes .= "hAxes: {gridlines: {count: 0}, ticks: [], minValue: " . accelMin . ", maxValue: " . accelMax . " }, vAxes: { 0: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . accelMin . ", maxValue: " . accelMax . " }, 1: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . accelMin . ", maxValue: " . accelMax . " }, 2: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [] }, 3: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . accelMin . ", maxValue: " . accelMax . " }, 4: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . curvMin . ", maxValue: " . curvMax . " } }"
+			axes := "series: { 0: {targetAxisIndex: 0, color: '" . color . "'}, 1: {targetAxisIndex: 1, color: '" . color . "'}, 2: {targetAxisIndex: 2}, 3: {targetAxisIndex: 3}, 4: {targetAxisIndex: 4} },`n"
+			axes .= "hAxes: {gridlines: {count: 0}, ticks: [] }, vAxes: { 0: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . accelMin . ", maxValue: " . accelMax . " }, 1: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . accelMin . ", maxValue: " . accelMax . " }, 2: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . accelMin . ", maxValue: " . accelMax . " }, 3: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . accelMin . ", maxValue: " . accelMax . " }, 4: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . curvMin . ", maxValue: " . curvMax . " } }"
 		}
 		else {
 			axes := "series: { 0: {targetAxisIndex: 0}, 1: {targetAxisIndex: 1}, 2: {targetAxisIndex: 2} },`n"
@@ -449,9 +485,69 @@ class TelemetryChart {
 
 		drawChartFunction .= ("]);`nvar options = { " . axes . ", legend: { position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '2%', top: '5%', right: '2%', bottom: '20%' }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
 
-		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
+		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_acceleration')); chart.draw(data, options); document.acceleration_chart = chart;")
+		drawChartFunction .= "`nfunction selectHandler(e) { var cSelection = chart.getSelection(); var selection = ''; for (var i = 0; i < cSelection.length; i++) { var item = cSelection[i]; if (i > 0) selection += ';'; selection += (item.row + '|' + item.column); } try { eventHandler('Select', selection); } catch(e) {} }"
 
-		return ("<div id=`"chart_" . chartID . "`" style=`"width: " . Round(width) . "px; height: " . Round(height) . "px`"></div>")
+		drawChartFunction .= "`ngoogle.visualization.events.addListener(chart, 'select', selectHandler); }"
+
+		drawChartFunction .= ("`nfunction selectAcceleration(row) {`ndocument.acceleration_chart.setSelection([{row: row, column: null}]); }")
+
+		return ("<div id=`"chart_acceleration`" style=`"width: " . Round(width) . "px; height: " . Round(height) . "px`"></div>")
+	}
+
+	selectRow(row) {
+		local environment
+
+		static htmlViewer := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "HTML", "Viewer", "IE11")
+
+		if (false && (htmlViewer = "WebView2")) {
+			environment := this.ChartArea.HTMLViewer.WebView2.Core()
+
+			environment.ExecuteScript("selectSpeed(" . row . ")", false)
+			environment.ExecuteScript("selectElectronics(" . row . ")", false)
+
+			try
+				environment.ExecuteScript("selectAcceleration(" . row . ")", false)
+		}
+		else {
+			environment := this.ChartArea.document.parentWindow
+
+			environment.selectSpeed(row)
+			environment.selectElectronics(row)
+
+			try
+				environment.selectAcceleration(row)
+		}
+	}
+
+	selectPosition(posX, posY, threshold := 40) {
+		local data := this.TelemetryViewer.Data[this.TelemetryViewer.SelectedLap[true]]
+		local lastX := kUndefined
+		local lastY := kUndefined
+		local row := false
+		local coordX, coordY, dx, dy, deltaX, deltaY, row
+
+		if ((data.Length > 0) && data[1].Length > 11) {
+			loop data.Length {
+				coordX := data[A_Index][12]
+				coordY := data[A_Index][13]
+
+				dX := Abs(coordX - posX)
+				dY := Abs(coordY - posY)
+
+				if ((dX <= threshold) && (dY <= threshold) && ((lastX == kUndefined) || ((dx + dy) < (deltaX + deltaY)))) {
+					lastX := coordX
+					lastY := coordY
+					deltaX := dX
+					deltaY := dY
+
+					row := A_Index
+				}
+			}
+
+			if row
+				this.selectRow(row - 1)
+		}
 	}
 }
 
@@ -475,6 +571,10 @@ class TelemetryViewer {
 
 	iCollect := false
 
+	iTrackMap := false
+
+	iData := CaseInsenseMap()
+
 	class TelemetryViewerWindow extends Window {
 		iViewer := false
 
@@ -496,7 +596,7 @@ class TelemetryViewer {
 		__New(telemetryViewer, arguments*) {
 			this.iTelemetryViewer := telemetryViewer
 
-			super.__New(arguments*)
+			super.__New(telemetryViewer.Window, arguments*)
 
 			Task.startTask(ObjBindMethod(this, "RedrawHTMLViewer"), 500, kHighPriority)
 		}
@@ -516,7 +616,7 @@ class TelemetryViewer {
 
 					this.iRedraw := false
 
-					this.iTelemetryViewer.TelemetryChart.TelemetryViewer.Resized()
+					this.iTelemetryViewer.TelemetryChart.ChartArea.Resized()
 
 					Task.startTask(ObjBindMethod(this.iTelemetryViewer, "updateTelemetryChart", true))
 				}
@@ -619,7 +719,7 @@ class TelemetryViewer {
 												   : this.iReferenceLap)
 										   : false)
 			else
-				return (path ? this.iReferenceLap[3] : this.iReferenceLap[1])
+				return (path ? this.iReferenceLap[3] : this.iReferenceLap)
 		}
 
 		Set {
@@ -634,6 +734,22 @@ class TelemetryViewer {
 	Collect {
 		Get {
 			return this.iCollect
+		}
+	}
+
+	TrackMap {
+		Get {
+			return this.iTrackMap
+		}
+	}
+
+	Data[key?] {
+		Get {
+			return (isSet(key) ? this.iData[key] : this.iData)
+		}
+
+		Set {
+			return (isSet(key) ? (this.iData[key] := value) : (this.iData := value))
 		}
 	}
 
@@ -722,6 +838,10 @@ class TelemetryViewer {
 			this.saveLap()
 		}
 
+		openTrackMap(*) {
+			this.openTrackMap()
+		}
+
 		this.iWindow := viewerGui
 
 		viewerGui.SetFont("s10 Bold", "Arial")
@@ -730,8 +850,8 @@ class TelemetryViewer {
 
 		viewerGui.SetFont("s9 Norm", "Arial")
 
-		viewerGui.Add("Documentation", "x176 YP+20 w336 H:Center Center", translate("Telemetry Browser")
-					 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#Telemetry-Browser")
+		viewerGui.Add("Documentation", "x176 YP+20 w336 H:Center Center", translate("Telemetry Viewer")
+					 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#Telemetry-Viewer")
 
 		viewerGui.Add("Text", "x8 yp+30 w656 W:Grow 0x10")
 
@@ -750,6 +870,8 @@ class TelemetryViewer {
 		viewerGui.Add("Text", "x16 yp+28 w80", translate("Reference"))
 		viewerGui.Add("DropDownList", "x98 yp-4 w280 Choose1 vreferenceLapDropDown", concatenate([translate("None")], collect(this.Laps, (l) => this.lapLabel(l)))).OnEvent("Change", chooseReferenceLap)
 
+		viewerGui.Add("Button", "x380 yp w73 h23 vtrackButton", translate("Map...")).OnEvent("Click", openTrackMap)
+
 		viewerGui.Add("Text", "x468 yp+4 w80 X:Move", translate("Zoom"))
 		viewerGui.Add("Slider", "Center Thick15 x556 yp-2 X:Move w100 0x10 Range100-400 ToolTip vzoomSlider", 100).OnEvent("Change", changeZoom)
 
@@ -759,9 +881,9 @@ class TelemetryViewer {
 		viewerControl.document.write("")
 		viewerControl.document.close()
 
-		this.iTelemetryChart := TelemetryChart(viewerGui, viewerControl)
+		this.iTelemetryChart := TelemetryChart(this, viewerControl)
 
-		viewerGui.Add(TelemetryViewer.TelemetryViewerResizer(this, viewerControl))
+		viewerGui.Add(TelemetryViewer.TelemetryViewerResizer(this))
 
 		if (this.Laps.Length > 0)
 			this.selectLap(this.Laps[1])
@@ -781,6 +903,8 @@ class TelemetryViewer {
 
 		if getWindowSize("Telemetry Browser", &w, &h)
 			this.Window.Resize("Initialize", w, h)
+
+		this.Window.Opt("+OwnDialogs")
 
 		this.loadTelemetry()
 
@@ -807,10 +931,17 @@ class TelemetryViewer {
 
 		this.Manager.closedTelemetryViewer()
 
+		if this.TrackMap
+			this.closeTrackMap()
+
 		this.Window.Destroy()
 	}
 
 	updateState() {
+		local simulator, car, track, descriptor
+
+		static sessionDB := SessionDatabase()
+
 		this.Control["loadButton"].Enabled := true
 
 		if this.SelectedLap
@@ -818,21 +949,32 @@ class TelemetryViewer {
 		else
 			this.Control["deleteButton"].Enabled := false
 
-		if (this.SelectedLap && isNumber(this.SelectedLap))
-			this.Control["saveButton"].Enabled := true
+		this.Manager.getSessionInformation(&simulator, &car, &track)
+
+		if this.SelectedLap {
+			if isNumber(this.SelectedLap)
+				this.Control["saveButton"].Enabled := true
+			else {
+				descriptor := this.SelectedLap
+
+				this.Control["saveButton"].Enabled := !SessionDatabase().hasTelemetry(simulator, car, track, true, false, descriptor[1])
+			}
+		}
 		else
 			this.Control["saveButton"].Enabled := false
+
+		this.Control["trackButton"].Enabled := sessionDB.hasTrackMap(simulator, track)
 	}
 
-	startupCollector(simulator, trackLength) {
+	startupCollector(simulator, track, trackLength) {
 		if !this.TelemetryCollector {
-			this.iTelemetryCollector := TelemetryCollector(this.TelemetryDirectory, simulator, trackLength)
+			this.iTelemetryCollector := TelemetryCollector(this.TelemetryDirectory, simulator, track, trackLength)
 
 			this.iTelemetryCollector.startup()
 		}
 	}
 
-	shutdownCollector() {
+	shutdownCollector(*) {
 		if this.TelemetryCollector {
 			this.TelemetryCollector.shutdown()
 
@@ -840,12 +982,41 @@ class TelemetryViewer {
 		}
 	}
 
+	openTrackMap() {
+		local simulator, car, track
+
+		if this.TrackMap
+			this.TrackMap.close()
+
+		this.Manager.getSessionInformation(&simulator, &car, &track)
+
+		this.iTrackMap := TrackMap(this, simulator, track)
+
+		this.TrackMap.show()
+	}
+
+	closeTrackMap() {
+		if this.TrackMap {
+			this.TrackMap.close()
+
+			this.iTrackMap := false
+		}
+	}
+
+	closedTrackMap() {
+		this.iTrackMap := false
+	}
+
 	restart(directory, collect := true) {
+		local simulator, car, track
+
 		this.selectLap(false, true)
 		this.selectReferenceLap(false, true)
 
 		this.Laps := []
 		this.ImportedLaps := []
+
+		this.Data := CaseInsenseMap()
 
 		this.iTelemetryDirectory := (normalizeDirectoryPath(directory) . "\")
 
@@ -859,8 +1030,17 @@ class TelemetryViewer {
 			this.updateState()
 		}
 
+		if this.TrackMap {
+			this.Manager.getSessionInformation(&simulator, &car, &track)
+
+			if SessionDatabase().hasTrackMap(simulator, track)
+				this.TrackMap.updateTrackMap(simulator, track)
+			else
+				this.closeTrackMap()
+		}
+
 		if collect
-			OnExit(ObjBindMethod(this, "shutdownTelemetryCollector", true))
+			OnExit(ObjBindMethod(this, "shutdownCollector", true))
 	}
 
 	clear() {
@@ -876,16 +1056,109 @@ class TelemetryViewer {
 		this.loadTelemetry()
 	}
 
+	loadData(fileName) {
+		local data, entry
+
+		if this.Data.Has(fileName)
+			return this.Data[fileName]
+		else {
+			data := []
+
+			loop Read, fileName {
+				entry := string2Values(";", A_LoopReadLine)
+
+				for index, value in entry
+					if !isNumber(value)
+						entry[index] := kNull
+
+				data.Push(entry)
+			}
+
+			this.Data[fileName] := data
+
+			return data
+		}
+	}
+
 	loadLap(fileName := false, driver := false) {
-		local name := false
-		local telemetry := false
 		local info := false
+		local lap := false
+		local sessionDB := SessionDatabase()
 		local simulator, car, track
-		local sessionDB, directory, dataFile, file, size, lap
+
+		processFile(fileName, info) {
+			local theDriver := driver
+			local telemetry := false
+			local name, directory, dataFile, file, size, lap
+
+			if info {
+				info := readMultiMap(info)
+
+				if driver
+					theDriver := driver
+				else
+					theDriver := getMultiMapValue(info, "Info", "Driver")
+
+				DirCreate(this.TelemetryDirectory . "Imported")
+
+				FileCopy(fileName, this.TelemetryDirectory . "Imported\Lap " . getMultiMapValue(info, "Info", "Lap") . ".telemetry", 1)
+
+				fileName := (this.TelemetryDirectory . "Imported\Lap " . getMultiMapValue(info, "Info", "Lap") . ".telemetry")
+			}
+
+			if (fileName && (fileName != "")) {
+				SplitPath(fileName, , &directory, , &fileName)
+
+				if (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getTelemetryDirectory(simulator, car, track, "User"))) {
+					dataFile := temporaryFileName("Lap Telemetry", "telemetry")
+
+					try {
+						telemetry := sessionDB.readTelemetry(simulator, car, track, fileName, &size)
+
+						file := FileOpen(dataFile, "w", "")
+
+						if file {
+							file.RawWrite(telemetry, size)
+
+							file.Close()
+
+							name := fileName
+							telemetry := dataFile
+							info := sessionDB.readTelemetryInfo(simulator, car, track, fileName)
+						}
+						else
+							telemetry := false
+					}
+					catch Any as exception {
+						logError(exception)
+
+						telemetry := false
+					}
+				}
+				else {
+					name := fileName
+					telemetry := (directory . "\" . fileName . ".telemetry")
+					info := false
+				}
+			}
+
+			if telemetry {
+				if info
+					lap := [name, theDriver ? theDriver
+										 : SessionDatabase.getDriverName(simulator, getMultiMapValue(info, "Telemetry", "Driver"))
+						  , telemetry]
+				else
+					lap := [name, theDriver ? theDriver : "John Doe (JD)", telemetry]
+
+				this.ImportedLaps.Push(lap)
+
+				return lap
+			}
+			else
+				return false
+		}
 
 		this.Manager.getSessionInformation(&simulator, &car, &track)
-
-		sessionDB := SessionDatabase()
 
 		if !fileName {
 			this.Window.Opt("+OwnDialogs")
@@ -893,58 +1166,22 @@ class TelemetryViewer {
 			this.Window.Block()
 
 			try {
-				fileName := browseLapTelemetries(this.Window, &simulator, &car, &track)
+				fileName := browseLapTelemetries(this.Window, &simulator, &car, &track, &info)
 			}
 			finally {
 				this.Window.Unblock()
 			}
 		}
+		else
+			info := false
 
 		if (fileName && (fileName != "")) {
-			SplitPath(fileName, , &directory, , &fileName)
-
-			if (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getTelemetryDirectory(simulator, car, track, "User"))) {
-				dataFile := temporaryFileName("Lap Telemetry", "telemetry")
-
-				try {
-					telemetry := sessionDB.readTelemetry(simulator, car, track, fileName, &size)
-
-					file := FileOpen(dataFile, "w", "")
-
-					if file {
-						file.RawWrite(telemetry, size)
-
-						file.Close()
-
-						name := fileName
-						telemetry := dataFile
-						info := sessionDB.readTelemetryInfo(simulator, car, track, fileName)
-					}
-					else
-						telemetry := false
-				}
-				catch Any as exception {
-					logError(exception)
-
-					telemetry := false
-				}
+			if isObject(fileName) {
+				loop fileName.Length
+					lap := (processFile(fileName[A_Index], info ? info[A_Index] : false) || lap)
 			}
-			else {
-				name := fileName
-				telemetry := (directory . "\" . fileName . ".telemetry")
-				info := false
-			}
-		}
-
-		if telemetry {
-			if info
-				lap := [name, driver ? driver
-									 : SessionDatabase.getDriverName(simulator, getMultiMapValue(info, "Telemetry", "Driver"))
-					  , telemetry]
 			else
-				lap := [name, driver ? driver : "John Doe (JD)", telemetry]
-
-			this.ImportedLaps.Push(lap)
+				lap := (processFile(fileName, info) || lap)
 
 			this.loadTelemetry(lap)
 		}
@@ -952,14 +1189,14 @@ class TelemetryViewer {
 
 	saveLap(lap := false, prompt := true) {
 		local simulator, car, track
-		local sessionDB, dirName, fileName, newFileName, file, folder, telemetry
+		local sessionDB, dirName, fileName, newFileName, file, folder, telemetry, driver
 
 		this.Manager.getSessionInformation(&simulator, &car, &track)
 
 		if !lap
 			lap := this.SelectedLap
 
-		if (lap && isNumber(lap)) {
+		if lap {
 			if (simulator && car && track) {
 				dirName := (SessionDatabase.DatabasePath . "User\" . SessionDatabase.getSimulatorCode(simulator)
 						  . "\" . car . "\" . track . "\Lap Telemetries")
@@ -969,7 +1206,10 @@ class TelemetryViewer {
 			else
 				dirName := ""
 
-			fileName := (dirName . "\Lap " . lap)
+			if isNumber(lap)
+				fileName := (dirName . "\Lap " . lap)
+			else
+				fileName := (lap[1] . translate(" (") . lap[2] . translate(")"))
 
 			newFileName := (fileName . ".telemetry")
 
@@ -993,7 +1233,10 @@ class TelemetryViewer {
 					SplitPath(fileName, , &folder, , &fileName)
 
 					if (normalizeDirectoryPath(folder) = normalizeDirectoryPath(sessionDB.getTelemetryDirectory(simulator, car, track, "User"))) {
-						file := FileOpen((this.TelemetryDirectory . "Lap " . lap . ".telemetry"), "r-wd")
+						if isNumber(lap)
+							file := FileOpen((this.TelemetryDirectory . "Lap " . lap . ".telemetry"), "r-wd")
+						else
+							file := FileOpen(lap[3], "r-wd")
 
 						if file {
 							size := file.Length
@@ -1004,8 +1247,17 @@ class TelemetryViewer {
 
 							file.Close()
 
+							if isNumber(lap)
+								driver := SessionDatabase.ID
+							else {
+								driver := SessionDatabase.getDriverID(simulator, car, track, lap[2])
+
+								if !driver
+									driver := SessionDatabase.ID
+							}
+
 							sessionDB.writeTelemetry(simulator, car, track, fileName, telemetry, size
-												   , false, true, SessionDatabase.ID)
+												   , false, true, driver)
 
 							return
 						}
@@ -1128,7 +1380,7 @@ class TelemetryViewer {
 
 	loadTelemetry(select := false) {
 		local laps := []
-		local lap, name
+		local lap, name, index
 
 		newLap(lap) {
 			local file
@@ -1198,8 +1450,27 @@ class TelemetryViewer {
 				this.selectReferenceLap(false, true)
 			}
 			else {
-				this.Control["lapDropDown"].Choose(inList(this.Laps, this.SelectedLap))
-				this.Control["referenceLapDropDown"].Choose(1 + inList(this.Laps, this.SelectedReferenceLap))
+				index := inList(this.Laps, this.SelectedLap)
+
+				if !index {
+					index := inList(this.ImportedLaps, this.SelectedLap)
+
+					if (index && (this.Laps.Length > 0))
+						index += (this.Laps.Length + 1)
+				}
+
+				this.Control["lapDropDown"].Choose(index)
+
+				index := inList(this.Laps, this.SelectedReferenceLap)
+
+				if !index {
+					index := inList(this.ImportedLaps, this.SelectedReferenceLap)
+
+					if (index && (this.Laps.Length > 0))
+						index += (this.Laps.Length + 1)
+				}
+
+				this.Control["referenceLapDropDown"].Choose(1 + index)
 			}
 
 			this.updateState()
@@ -1209,5 +1480,374 @@ class TelemetryViewer {
 	updateTelemetryChart(redraw := false) {
 		if (this.TelemetryChart && redraw)
 			this.TelemetryChart.showTelemetryChart(this.SelectedLap[true], this.SelectedReferenceLap[true])
+	}
+}
+
+class TrackMap {
+	iTelemetryViewer := false
+
+	iWindow := false
+
+	iSimulator := false
+	iTrack := false
+
+	iTrackDisplay := false
+	iTrackDisplayArea := false
+
+	iTrackMap := false
+	iTrackImage := false
+
+	class TrackMapWindow extends Window {
+		iMap := false
+
+		__New(map, arguments*) {
+			this.iMap := map
+
+			super.__New(arguments*)
+		}
+
+		Close(*) {
+			this.iMap.Close()
+		}
+	}
+
+	class TrackMapResizer extends Window.Resizer {
+		iTrackMap := false
+		iRedraw := false
+
+		__New(trackMap, arguments*) {
+			this.iTrackMap := trackMap
+
+			super.__New(trackMap.Window, arguments*)
+
+			Task.startTask(ObjBindMethod(this, "RedrawTrackMap"), 500, kHighPriority)
+		}
+
+		Resize(deltaWidth, deltaHeight) {
+			this.iRedraw := true
+		}
+
+		RedrawTrackMap() {
+			local ignore, button
+
+			if this.iRedraw {
+				for ignore, button in ["LButton", "MButton", "RButton"]
+					if GetKeyState(button)
+						return Task.CurrentTask
+
+				this.iRedraw := false
+
+				this.iTrackMap.updateTrackMap()
+
+				WinRedraw(this.iTrackMap.Window)
+			}
+
+			return Task.CurrentTask
+		}
+	}
+
+	TelemetryViewer {
+		Get {
+			return this.iTelemetryViewer
+		}
+	}
+
+	Window {
+		Get {
+			return this.iWindow
+		}
+	}
+
+	Control[name] {
+		Get {
+			return this.Window[name]
+		}
+	}
+
+	Simulator {
+		Get {
+			return this.iSimulator
+		}
+	}
+
+	Track {
+		Get {
+			return this.iTrack
+		}
+	}
+
+	TrackMap {
+		Get {
+			return this.iTrackMap
+		}
+	}
+
+	TrackImage {
+		Get {
+			return this.iTrackImage
+		}
+	}
+
+	__New(telemetryViewer, simulator, track) {
+		this.iTelemetryViewer := telemetryViewer
+
+		this.iSimulator := simulator
+		this.iTrack := track
+	}
+
+	createGui() {
+		selectTrackPosition(*) {
+			local coordinateX := false
+			local coordinateY := false
+			local x, y
+
+			MouseGetPos(&x, &y)
+
+			x := screen2Window(x)
+			y := screen2Window(y)
+
+			if this.findTrackCoordinate(x - this.iTrackDisplayArea[1], y - this.iTrackDisplayArea[2], &coordinateX, &coordinateY)
+				this.trackClicked(coordinateX, coordinateY)
+		}
+
+		local mapGui := TrackMap.TrackMapWindow(this, {Descriptor: "Track Map", Closeable: true, Resizeable:  "Deferred"})
+
+		this.iWindow := mapGui
+
+		this.iTrackDisplayArea := [480, 480, 480, 380]
+
+		mapGui.Add("Text", "x8 y2 w466 H:Center Center vtrackNameDisplay")
+
+		mapGui.Add("Picture", "x0 y20 w479 h379 W:Grow H:Grow vtrackDisplayArea")
+
+		this.iTrackDisplay := mapGui.Add("Picture", "x479 y379 BackgroundTrans vtrackDisplay")
+		this.iTrackDisplay.OnEvent("Click", selectTrackPosition)
+
+		mapGui.Add(TrackMap.TrackMapResizer(this))
+	}
+
+	show() {
+		local sessionDB := SessionDatabase()
+		local x, y, w, h
+
+		this.createGui()
+
+		if getWindowPosition("Track Map", &x, &y)
+			this.Window.Show("x" . x . " y" . y)
+		else
+			this.Window.Show()
+
+		if getWindowSize("Track Map", &w, &h)
+			this.Window.Resize("Initialize", w, h)
+
+		this.loadTrackMap(sessionDB.getTrackMap(this.Simulator, this.Track)
+						, sessionDB.getTrackImage(this.Simulator, this.Track))
+	}
+
+	close() {
+		this.TelemetryViewer.closedTrackMap()
+
+		this.Window.Destroy()
+	}
+
+	loadTrackMap(trackMap, trackImage) {
+		local directory := kTempDirectory . "Track Images"
+
+		deleteDirectory(directory)
+
+		DirCreate(directory)
+
+		this.iTrackMap := trackMap
+		this.iTrackImage := this.Window.Theme.RecolorizeImage(trackImage)
+
+		this.Control["trackNameDisplay"].Text := SessionDatabase.getTrackName(this.Simulator
+																			, getMultiMapValue(trackMap, "General", "Track", ""))
+
+		this.createTrackMap()
+	}
+
+	unloadTrackMap() {
+		this.iTrackDisplay.Value := (kIconsDirectory . "Empty.png")
+
+		this.iTrackMap := false
+		this.iTrackImage := false
+	}
+
+	updateTrackMap(simulator := false, track := false) {
+		local load := false
+		local sessionDB
+
+		if simulator {
+			this.iSimulator := simulator
+
+			load := true
+		}
+
+		if track {
+			this.iTrack := track
+
+			load := true
+		}
+
+		if load {
+			sessionDB := SessionDatabase()
+
+			this.unloadTrackMap()
+
+			this.loadTrackMap(sessionDB.getTrackMap(this.Simulator, this.Track)
+							, sessionDB.getTrackImage(this.Simulator, this.Track))
+		}
+
+		this.createTrackMap()
+	}
+
+	updateTrackPosition(posX, posY) {
+		if isDebug()
+			showMessage(posX . ", " . posY)
+
+		this.createTrackMap(posX, posY)
+	}
+
+	findTrackCoordinate(x, y, &coordinateX, &coordinateY, threshold := 40) {
+		local trackMap := this.TrackMap
+		local trackImage := this.TrackImage
+		local scale, offsetX, offsetY, marginX, marginY, width, height, imgWidth, imgHeight, imgScale
+		local candidateX, candidateY, deltaX, deltaY, coordX, coordY, dX, dY
+
+		if (trackMap && trackImage) {
+			scale := getMultiMapValue(trackMap, "Map", "Scale")
+
+			offsetX := getMultiMapValue(trackMap, "Map", "Offset.X")
+			offsetY := getMultiMapValue(trackMap, "Map", "Offset.Y")
+
+			marginX := getMultiMapValue(trackMap, "Map", "Margin.X")
+			marginY := getMultiMapValue(trackMap, "Map", "Margin.Y")
+
+			width := this.iTrackDisplayArea[3]
+			height := this.iTrackDisplayArea[4]
+
+			imgWidth := ((getMultiMapValue(trackMap, "Map", "Width") + (2 * marginX)) * scale)
+			imgHeight := ((getMultiMapValue(trackMap, "Map", "Height") + (2 * marginY)) * scale)
+
+			imgScale := Min(width / imgWidth, height / imgHeight)
+
+			x := (x / imgScale)
+			y := (y / imgScale)
+
+			x := ((x / scale) - offsetX - marginX)
+			y := ((y / scale) - offsetY - marginY)
+
+			candidateX := kUndefined
+			candidateY := false
+			deltaX := false
+			deltaY := false
+
+			threshold := (threshold / scale)
+
+			loop getMultiMapValue(trackMap, "Map", "Points") {
+				coordX := getMultiMapValue(trackMap, "Points", A_Index . ".X")
+				coordY := getMultiMapValue(trackMap, "Points", A_Index . ".Y")
+
+				dX := Abs(coordX - x)
+				dY := Abs(coordY - y)
+
+				if ((dX <= threshold) && (dY <= threshold) && ((candidateX == kUndefined) || ((dx + dy) < (deltaX + deltaY)))) {
+					candidateX := coordX
+					candidateY := coordY
+					deltaX := dX
+					deltaY := dY
+				}
+			}
+
+			if (candidateX != kUndefined) {
+				coordinateX := candidateX
+				coordinateY := candidateY
+
+				return true
+			}
+			else
+				return false
+		}
+		else
+			return false
+	}
+
+	trackClicked(coordinateX, coordinateY) {
+		this.TelemetryViewer.TelemetryChart.selectPosition(coordinateX, coordinateY)
+
+		this.updateTrackPosition(coordinateX, coordinateY)
+	}
+
+	createTrackMap(posX?, posY?) {
+		local trackMap := this.TrackMap
+		local trackImage := this.TrackImage
+		local scale := getMultiMapValue(trackMap, "Map", "Scale")
+		local offsetX := getMultiMapValue(trackMap, "Map", "Offset.X")
+		local offsetY := getMultiMapValue(trackMap, "Map", "Offset.Y")
+		local marginX := getMultiMapValue(trackMap, "Map", "Margin.X")
+		local marginY := getMultiMapValue(trackMap, "Map", "Margin.Y")
+		local imgWidth := ((getMultiMapValue(trackMap, "Map", "Width") + (2 * marginX)) * scale)
+		local imgHeight := ((getMultiMapValue(trackMap, "Map", "Height") + (2 * marginY)) * scale)
+		local x, y, w, h, imgScale, deltaX, deltaY
+		local token, bitmap, graphics, brush, r, imgX, imgY, trackImage
+
+		ControlGetPos(&x, &y, &w, &h, this.Control["trackDisplayArea"])
+
+		x += 2
+		y += 2
+		w -= 4
+		h -= 4
+
+		imgScale := Min(w / imgWidth, h / imgHeight)
+
+		if (isSet(posX) && isSet(posY)) {
+			token := Gdip_Startup()
+
+			bitmap := Gdip_CreateBitmapFromFile(trackImage)
+
+			graphics := Gdip_GraphicsFromImage(bitmap)
+
+			Gdip_SetSmoothingMode(graphics, 4)
+
+			brush := Gdip_BrushCreateSolid(0xff00ff00)
+
+			r := Round(15 / (imgScale * 3))
+
+			imgX := Round((marginX + offsetX + posX) * scale)
+			imgY := Round((marginX + offsetY + posY) * scale)
+
+			Gdip_FillEllipse(graphics, brush, imgX - r, imgY - r, r * 2, r * 2)
+
+			Gdip_DeleteBrush(brush)
+
+			trackImage := temporaryFileName("Track Images\TrackMap", "png")
+
+			Gdip_SaveBitmapToFile(bitmap, trackImage)
+
+			Gdip_DisposeImage(bitmap)
+
+			Gdip_DeleteGraphics(graphics)
+
+			Gdip_Shutdown(token)
+		}
+
+		imgWidth *= imgScale
+		imgHeight *= imgScale
+
+		deltaX := ((w - imgWidth) / 2)
+		deltaY := ((h - imgHeight) / 2)
+
+		x := Round(x + deltaX)
+		y := Round(y + deltaY)
+
+		this.iTrackDisplayArea := [x, y, w, h, deltaX, deltaY]
+
+		this.iTrackDisplay.Opt("-Redraw")
+
+		ControlMove(x, y, w, h, this.iTrackDisplay)
+
+		this.iTrackDisplay.Value := ("*w" . imgWidth . " *h" . imgHeight . A_Space . trackImage)
+
+		this.iTrackDisplay.Opt("+Redraw")
 	}
 }

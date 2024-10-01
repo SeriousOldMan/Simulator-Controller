@@ -20,9 +20,9 @@
 #Include "..\..\Libraries\HTTP.ahk"
 #Include "..\..\Libraries\LLMConnector.ahk"
 #Include "RaceAssistant.ahk"
-#Include "..\..\Garage\Libraries\TelemetryCollector.ahk"
-#Include "..\..\Garage\Libraries\IRCTelemetryCollector.ahk"
-#Include "..\..\Garage\Libraries\R3ETelemetryCollector.ahk"
+#Include "..\..\Garage\Libraries\IssueCollector.ahk"
+#Include "..\..\Garage\Libraries\IRCIssueCollector.ahk"
+#Include "..\..\Garage\Libraries\R3EIssueCollector.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -42,7 +42,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 	iStandings := []
 
-	iTelemetryCollector := false
+	iIssueCollector := false
 
 	iTranscript := false
 
@@ -71,11 +71,11 @@ class DrivingCoach extends GridRaceAssistant {
 		Get {
 			switch SessionDatabase.getSimulatorCode(this.Simulator), false {
 				case "IRC":
-					return "IRCTelemetryCollector"
+					return "IRCIssueCollector"
 				case "R3E":
-					return "R3ETelemetryCollector"
+					return "R3EIssueCollector"
 				default:
-					return "TelemetryCollector"
+					return "IssueCollector"
 			}
 		}
 	}
@@ -208,7 +208,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		DirCreate(this.Options["Driving Coach.Archive"])
 
-		OnExit(ObjBindMethod(this, "stopTelemetryCollector"))
+		OnExit(ObjBindMethod(this, "stopIssueCollector"))
 	}
 
 	loadFromConfiguration(configuration) {
@@ -392,7 +392,7 @@ class DrivingCoach extends GridRaceAssistant {
 					return substituteVariables(this.Instructions["Knowledge"], {knowledge: JSON.print(this.getKnowledge("Conversation"))})
 			case "Handling":
 				if (knowledgeBase && this.Announcements["HandlingInformation"]) {
-					collector := this.iTelemetryCollector
+					collector := this.iIssueCollector
 
 					if collector {
 						issues := collector.Handling
@@ -538,41 +538,41 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
-	stopTelemetryCollector(arguments*) {
+	stopIssueCollector(arguments*) {
 		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
 			return false
 
-		this.stopTelemetryAnalyzer()
+		this.stopIssueAnalyzer()
 
-		if this.iTelemetryCollector {
-			this.iTelemetryCollector.deleteSamples()
+		if this.iIssueCollector {
+			this.iIssueCollector.deleteSamples()
 
-			this.iTelemetryCollector := false
+			this.iIssueCollector := false
 		}
 
 		return false
 	}
 
-	startTelemetryAnalyzer() {
+	startIssueAnalyzer() {
 		local knowledgeBase := this.KnowledgeBase
 
-		this.stopTelemetryCollector()
+		this.stopIssueCollector()
 
 		if knowledgeBase {
-			this.iTelemetryCollector := %this.CollectorClass%(this.Simulator, knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")
+			this.iIssueCollector := %this.CollectorClass%(this.Simulator, knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")
 															, {Handling: true, Frequency: 5000})
 
-			this.iTelemetryCollector.loadFromSettings()
+			this.iIssueCollector.loadFromSettings()
 
-			this.iTelemetryCollector.startTelemetryCollector()
+			this.iIssueCollector.startIssueCollector()
 		}
 
-		return this.iTelemetryCollector
+		return this.iIssueCollector
 	}
 
-	stopTelemetryAnalyzer() {
-		if this.iTelemetryCollector
-			this.iTelemetryCollector.stopTelemetryCollector()
+	stopIssueAnalyzer() {
+		if this.iIssueCollector
+			this.iIssueCollector.stopIssueCollector()
 	}
 
 	prepareSession(&settings, &data, formationLap := true) {
@@ -632,11 +632,11 @@ class DrivingCoach extends GridRaceAssistant {
 			this.dumpKnowledgeBase(this.KnowledgeBase)
 
 		if this.Announcements["HandlingInformation"]
-			this.startTelemetryAnalyzer()
+			this.startIssueAnalyzer()
 	}
 
 	finishSession(shutdown := true) {
-		this.stopTelemetryAnalyzer()
+		this.stopIssueAnalyzer()
 		this.updateDynamicValues({Prepared: false})
 	}
 

@@ -96,15 +96,15 @@ All these report documents are HTML-based and can be saved or printed using the 
 
 - If you want the report to be opened in a separate window, hold down the Control key while requesting it. If the report originates from one of the available lists, you can open the separate window by double-clicking the entry in this list. In this case, the report is frozen and will **not** be updated automatically when new data arrives.
 
-### Telemetry Browser
+### Telemetry Viewer
 
-A valuable tool to improve your lap times is the integrated Telemetry Browser, which can be opened and activated by choosing the "Telemetry..." command from the "Session" menu.
+A valuable tool to improve your lap times is the integrated Telemetry Viewer, which can be opened and activated by choosing the "Telemetry..." command from the "Session" menu.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Telemetry%20Browser.JPG)
 
-While you are in an active session and the Telemetry Browser is open, car telemtry data will be collected lap by lap in the background and stored in the session. You can use the browser to load the telemetry for a given lap and you can choose a reference lap for comparison.
+While you are in an active session and the Telemetry Viewer is open, car telemtry data will be collected lap by lap in the background and stored in the session. You can use the browser to load the telemetry for a given lap and you can choose a reference lap for comparison.
 
-When looking for areas of improvement take a close look to your application of throttle and brakes and the activation of TC and ABS. Trailing off the brakes and the transition back to full throttle is the most important skill to master for fast lap times. This does not mean, that sometimes coasting around a corner is not necessary. Use the Telemetry Browser to compare your laps with the fastest lap of a given session and learn what exactly made you faster there.
+When looking for areas of improvement take a close look to your application of throttle and brakes and the activation of TC and ABS. Trailing off the brakes and the transition back to full throttle is the most important skill to master for fast lap times. This does not mean, that sometimes coasting around a corner is not necessary. Use the Telemetry Viewer to compare your laps with the fastest lap of a given session and learn what exactly made you faster there.
 
 Important: Session that are saved with telemetry data will NOT be synchronized with the Team Server by default, since the amount of data is quite large and will put a lot of stress on the Team Server. You can still activate the synchronization for a particular session in the "Session Database", but I strongly recommend advise against it.
 
@@ -112,7 +112,7 @@ Important: Session that are saved with telemetry data will NOT be synchronized w
 
 1. It can take a few laps before the first telemetry data gets recorded.
 2. A special method is used for *Assetto Corsa Competizione*, which unfortunately does not supply the distance of the car into the track in the shared memory API (it is available in the UDP interface, though, but this interface does not provide telemetry data). Because of that, the track layout must be learned, before telemetry data can be correlated to the track position. Be sure to drive clean during the first laps.
-3. The telemetry recorder is only running, while the Telemetry Browsr is open. Therefore, you can restart the learning process for *Assetto Corsa Competizione*, if necessary, by closing the browser and re-open it.
+3. The telemetry recorder is only running, while the Telemetry Viewer is open. Therefore, you can restart the learning process for *Assetto Corsa Competizione*, if necessary, by closing the browser and re-open it.
 4. The currently selected lap can be deleted by using the "-" button to the right of the drop down menu of all laps. If you hold down the Control key, all laps can be deleted at once.
 5. You can save and load telemetry data for a given lap for later usage:
    - Typically used for reference laps, even from other drivers.

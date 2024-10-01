@@ -2,11 +2,16 @@
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a critical bug for iRacing, which disabled the Spotter proximity alerts and flag warnings. Was *introduced* with the telemetry support 2 weeks ago.
-  4. Lap telemetry data opened from a source other than the current session, will now also show the driver name, if available.
-  5. The selection dialog for telemetries now supports opening multiple lap telemetries at once by shift-clicking in the list. The file selection dialog opened by the "Open..." button also supports multi-selection.
-  6. A third graph has been added to the telemetry viewer, which shows longitudinal and lateral G-Forces and also an information about the curvature of the current corner.
-  7. Lap telemetry data can now be imported from Second Monitor, sophisticated tool developed by Matus Celko (@winzarten). See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#laps) for more information.
-  8. The Track Automation state is now displayed with color coding on a Button Box. Gray if it is enabled but not yet available, and yellow if no Automation has been defined for the given track.
+  4. Resolved some documentation conflicts:
+     - Renamed the "Telemetry Analyzer" in "Setup Workbench" to "Issue Analyzer".
+     - Renamed the "Telemetry Browser" everywhere to "Telemetry Viewer".
+  5. Lap telemetry data opened in the Telemetry Viewer from a source other than the current session, will now also show the driver name, if available.
+  6. A third graph has been added to the Telemetry Viewer, which shows longitudinal and lateral G-Forces and also an information about the curvature of the current corner.
+  7. Lap telemetry data can now be imported from "Second Monitor", a sophisticated tool developed by Matus Celko (@winzarten). See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetry-viewer) for more information.
+  8. The selection dialog for telemetry data now supports opening multiple lap telemetries at once by shift-clicking in the list. The file selection dialog opened by the "Open..." button also supports multi-selection.
+  9. The Telemetry Viewer now can open a track map. You can click in the graph to show the corresponding location on the track map and vice versa. Only telemetry data collected with 5.9.2 and later will support this and the *WebView2* HTML plugin is not yet supported. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetry-viewer) for more information.
+  10. "Setup Workbench" now also supports collecting lap telemtry data. See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#telemetry-viewer) for more information.
+  11. The Track Automation state is now displayed with color coding on a Button Box. Gray if it is enabled but not yet available, and yellow if no Automation has been defined for the given track and Green, if enabled and active.
 
 ## 5.9.1.0-release 09/27/24
   1. Minor bugfixes, as always
@@ -16,7 +21,7 @@
   5. Optimized performance of the builtin database engine for large tables.
   6. Lap telemetry entries in the "Session Database" can now be opened in the Telemetry Browser by double-clicking on them.
   7. Significantly reduced Jitter in telemetry charts.
-  8. Recording of lap telemetry data is now also supported in the "Team Center". See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#Telemetry-Browser) for more information.
+  8. Recording of lap telemetry data is now also supported in the "Team Center". See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#Telemetry-Viewer) for more information.
   9. Thanks to our community member @Diego Falcone Dev_Dk HawkOne we now have a full translation for the Italian language.
   10. It is now possible ot use a voice which was trained for a specific language for another language. The results are mediocre for the speech synthesizer built into Windows, but very usable for voices supplied by Azure or Google. It is kind of cool to hear an Italian speak English.
   11. [Internal] A new system process observes all user processes and immediately kills them in case of malfunction. The most important and malicious type of malfunction is too much memory consumption, for which the threshold could be defined in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration).
@@ -28,7 +33,7 @@
   3. Brake ducts have been removed for *RaceRoom Racing Experience* in the meta data of "Setup Workbench", because these are not available in this simulator.
   4. Fixed the calculation of lap times and sector times for *RaceRoom Racing Experience* in all applications.
   5. Optimized colors for the "Light" UI theme.
-  6. Added a complete new data category for low level car telemetry incl. a graphical browser. This is initially supported in the "Solo Center", but will be integrated into the "Team Center" as well. The future goal is to make the AI aware of this data category as well. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#Telemetry-Browser) for more information.
+  6. Added a complete new data category for low level car telemetry incl. a graphical browser. This is initially supported in the "Solo Center", but will be integrated into the "Team Center" as well. The future goal is to make the AI aware of this data category as well. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#Telemetry-Viewer) for more information.
   7. Lap telemetry data can be saved to and retrieved from the session database.
   8. The ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) has been extended with a section for lap telemetry data:
 	 - Telemetry data can uploaded, downloaded, renamed and deleted.
@@ -981,7 +986,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	 - Extensive [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#instructions) has been added which describes in detail how to use instructions to customize the behaviour and personality of the Driving Coach to your personal taste.
 	 
 	 Please note, that it might be necessary to use a larger model like GPT 3.5 16k or GPT 4 to handle the full size of the input area, when all new instructions are active.
-  5. New data categories in the Telemetry Analyzer of "Setup Workbench". See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-telemetry-analyzer) for more information.
+  5. New data categories in the Telemetry Analyzer of "Setup Workbench". See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-issue-analyzer) for more information.
      - Issues for tyre temperatures outside a predefined range can be generated.
 	 - Issues can be generated when the temperature difference of the outer and the inner part of the tyre is higher than a given threshold.
 	 - Issues for brake temperatures outside a predefined range can be generated.
@@ -1223,7 +1228,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 ## 5.1.1.0-release 07/14/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. You can now enable an acoustic feedback for Audible feedback in the Telemetry Analyzer. Whenever a handling event is registered (over- or understeering) a short beep of varying pitch and intensity will give you some feedback. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-telemetry-analyzer) for more information.
+  3. You can now enable an acoustic feedback for Audible feedback in the Telemetry Analyzer. Whenever a handling event is registered (over- or understeering) a short beep of varying pitch and intensity will give you some feedback. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-issue-analyzer) for more information.
   4. [Experts only] It is now possible to define your own modes and layers for Button Boxes. This allows any function of your sim or other applications on your PC to be triggered by the Button Box, not only the actions supplied by the plugins. Please see the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-of-custom-modes) for more information.
   5. A new controller action function "mouse" is available, which allows you to send virtual mouse clicks to any application by a button press on your controller.
   6. [Experts only] A new controller action function "call" let's you invoke internal methods for any plugin or the Controller itself.
@@ -1689,7 +1694,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   2. Documentation updates, as always
   3. *iRacing* is now supported for the telemetry analyzer of "Setup Advisor".
   4. The oversteer calculation has been revised for the telemetry analyzer. You may have to adjust your thresholds to higher values.
-  5. The telemetry analyzer in the "Setup Advisor" now supports an auto calibration mode. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#real-time-telemetry-analyzer) for more information.
+  5. The telemetry analyzer in the "Setup Advisor" now supports an auto calibration mode. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#real-time-issue-analyzer) for more information.
   6. Handling of tyre pressures has been optimized in the "Session Database" in cases where pressure data from multiple drivers are present in your database.
   7. Ideal tyre pressures are now supported for dry and wet tyres in the car specific meta data. If this information is present, it is used rather and will supersede the information entered in "Race Settings". You may however still overwrite it in the "Session Database".
   8. Tyre pressure setups can [now be initialized](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#planning-a-pitstop) from data in the "Session Database" in "Race Center".
@@ -1718,7 +1723,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 ## 4.5.0.0-release 12/06/22
   1. Minor bugfixes, as always
   2. Documentation updates, as always
-  3. The "Setup Advisor" now supports a telemetry data analyzer, which derives handling issue entries from actual over- or understeering, while you are driving. See the all new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#real-time-telemetry-analyzer) for more information.
+  3. The "Setup Advisor" now supports a telemetry data analyzer, which derives handling issue entries from actual over- or understeering, while you are driving. See the all new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#real-time-issue-analyzer) for more information.
   4. Introduced new "Release Strategy" command in "Race Center" which saves the current strategy to the Team Server without instructing the Race Strategist at the same time.
   5. Valid Team Server URLs are remembered in all applications, so that you can choose them from a list instead of retyping them all the time.
   5. Creating teams, drivers and sessions for the Team Server with "empty" names is no longer possible. Old "zombies" will be deleted automatically.

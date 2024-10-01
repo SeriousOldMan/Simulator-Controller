@@ -98,13 +98,27 @@ Telemetry data for individual laps can be stored in the session database, for ex
 
 You can use the buttons below the list to upload, download, rename or delete lap telemetry data, but in most cases you will use the ["Solo Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center) to record the telemetry data and store it in the database. Once you have selected telemetry data in the list above, you can decide whether you want to share it potentially with the community (if you have given consent to share telemetry data - see the information about community data at the end of this chapter) and/or whether you want to synchronize the lap telemetry with any of the [connected Team Servers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration) (see below).
 
-If a lap is double clicked, the Telemetry Browser will open up and let you examine the given telemetry data. The Telemetry Browser is also available in the "Solo Center" or the "Team Center", where the telemetry is recorded.
+##### Telemetry Viewer
+
+If a lap is double clicked, the Telemetry Viewer will open up and let you examine the given telemetry data.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Telemetry%20Browser.JPG)
 
-You can load additional laps from the session database or any other location for comparison using the small button with the "Folder" icon. Please note, that deleting a lap from the Telemetry Browser using the *delete* button (the one with the "-" icon) will not remove it from its original location.
+You can load additional laps from the session database or any other location for comparison using the small button with the "Folder" icon. Please note, that deleting a lap from the Telemetry Viewer using the *delete* button (the one with the "-" icon) will not remove it from its original location. Different rules may apply, when the Telemetry Viewer had been opened from one of the application listed below.
 
 Good to know: If you use the "Open..." button in the dialog, which let's you browse the available telemetry data, you can import telemetry data from ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), as long as it has been saved as JSON file, which can be activated in the settings of "Second Monitor".
+
+The Telemetry Viewer is available in the following applications to collect lap telemetry data, where additional documentation is available:
+
+- [Setup Workbench](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#Telemetry-Viewer)
+- [Solo Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#Telemetry-Viewer)
+- [Team Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#Telemetry-Viewer)
+
+If available, a map for the current track can be opened with the "Map..." button. You can click on a location of the track map and the corresponding data points will be highlighted in the telemetry graph. It is also possible to click on a data point in the graph and the corresponding location will be selected in the track map.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Telemetry%20Browser%20Track%20Map.JPG)
+
+Important: This functionality may not be available when using *WebView2* as the HTML browser.
 
 #### Strategies
 

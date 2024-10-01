@@ -3,7 +3,7 @@ Version=5.9.2.0-dev
 Target=5.9.2.0-release
 Date=10/01/2024
 Download=
-Changes=Lap telemetry opened from "Session Database" show the driver name, New telemetry fields LatG, LongG and Curvature, Support to import telemetry data from "Second Monitor", Fixed iRacing Spotter, Multiple telemetry selection support when loading telemetries, Colorized Track Automation state display on Button Box
+Changes=Lap telemetry opened from "Session Database" show the driver name, New telemetry fields LatG, LongG and Curvature, Support to import telemetry data from "Second Monitor", Fixed iRacing Spotter, Multiple telemetry selection support when loading telemetries, Colorized Track Automation state display on Button Box, Telemetry Viewer usable in "Setup Workbench", Renamed "Telemetry Analyzer" to "Issue Analyzer", Renamed "Telemetry Browser" to "Telemetry Viewer", Track map support in Telemetry Viewer, Select position on track by clicking in telemetry graph
 Components=Media->5.6.1,Configuration->5.9.1,Utilities->5.9.1
 [Release]
 Version=5.9.1.0-release

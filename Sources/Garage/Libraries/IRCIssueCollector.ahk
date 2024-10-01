@@ -1,36 +1,20 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - R3E Telemetry Analyzer          ;;;
+;;;   Modular Simulator Controller System - IRC Telemetry Collector         ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                         Local Include Section                           ;;;
-;;;-------------------------------------------------------------------------;;;
-
-#Include "R3ETelemetryCollector.ahk"
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; R3ETelemetryAnalyzer                                                    ;;;
+;;; IRCIssueCollector                                                       ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class R3ETelemetryAnalyzer extends GenericTelemetryAnalyzer {
-	CollectorClass {
-		Get {
-			return "R3ETelemetryCollector"
-		}
-	}
-
-	settingAvailable(setting) {
-		if ((setting = "SteerLock") || (setting = "SteerRatio"))
-			return false
-		else
-			return super.settingAvailable(setting)
+class IRCIssueCollector extends IssueCollector {
+	settingAvailable(setting, force := false) {
+		return ((setting = "SteerLock") ? false : super.settingAvailable(setting, force))
 	}
 }

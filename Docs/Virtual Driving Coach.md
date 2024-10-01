@@ -221,7 +221,7 @@ The above list are only few of the rules to follow, though the most important on
 
 ### Detecting and discussing handling problems
 
-The Driving Coach will try to detect possible handling problems using the same mechanism used by the "Setup Workbench". In fact, Aiden uses the same [Telemetry Analyzer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-telemetry-analyzer) as the "Setup Workbench" and will use the same settings and thresholds you have selected for the same car and track last time. Therefore, if you want to discuss your handling issues with Aiden, be sure to have created a valid or even calibrated configuration in the Telemetry Analyzer for the given car and track.
+The Driving Coach will try to detect possible handling problems using the same mechanism used by the "Setup Workbench". In fact, Aiden uses the same [Telemetry Analyzer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-issue-analyzer) as the "Setup Workbench" and will use the same settings and thresholds you have selected for the same car and track last time. Therefore, if you want to discuss your handling issues with Aiden, be sure to have created a valid or even calibrated configuration in the Telemetry Analyzer for the given car and track.
 
 When at least one handling issue had been detected, the "Handling" instruction will be used to describe the handling issues to the Driving Coach. Each issue will be described on a single line in the instructions. Example:
  

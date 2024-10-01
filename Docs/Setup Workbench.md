@@ -20,7 +20,7 @@ Please note, that it is possible to describe and edit several issues at once. "S
 
 Using the "Load..." and "Save..." buttons in the lower left corner of the window, you can store and retrieve your current selection of issues to your hard drive. The current state will also be stored, when you hold down the Control key, while exiting "Setup Workbench". This state can be retrieved again, when you hold down the Control key, while starting "Setup Workbench". Last, but not least, when you load a set of saved issues, you suppress the deletion of all present issues by holding down the Control key as well. But be aware, that there is a restriction for the overall number of issues.
 
-### Real-time Telemetry Analyzer
+### Real-time Issue Analyzer
 
 "Setup Workbench" provides a special tool, which analyzes the telemetry data while you are driving to detect over- or understeering corner by corner. Handling issues can then be autmatically generated from this information. To start the analyzer, choose the "Analyzer..." item from the "Problem..." menu. The following window appears:
 
@@ -106,6 +106,31 @@ Please, note that all of this also applies to the Virtual Race Assistants, but y
   3. *Automobilista 2* and *Project CARS 2*
   
      You have to enable Shared Memory access in the game settings. Please use the PCars 2 mode.
+
+### Telemetry Viewer
+
+Another valuable tool to improve your lap times is the integrated Telemetry Viewer, which can be opened and activated by choosing the "Telemetry..." command from the "Session" menu.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Telemetry%20Browser.JPG)
+
+As long as the Telemetry Viewer is open, car telemtry data will be collected lap by lap in the background while you are driving. You can use the browser to load the telemetry for a given lap and you can choose a reference lap for comparison.
+
+When looking for areas of improvement take a close look to your application of throttle and brakes and the activation of TC and ABS. Trailing off the brakes and the transition back to full throttle is the most important skill to master for fast lap times. This does not mean, that sometimes coasting around a corner is not necessary. Use the Telemetry Viewer to compare your laps with the fastest lap of a given session and learn what exactly made you faster there.
+
+##### Notes
+
+1. It can take a few laps before the first telemetry data gets recorded.
+2. A special method is used for *Assetto Corsa Competizione*, which unfortunately does not supply the distance of the car into the track in the shared memory API (it is available in the UDP interface, though, but this interface does not provide telemetry data). Because of that, the track layout must be learned, before telemetry data can be correlated to the track position. Be sure to drive clean during the first laps.
+3. The telemetry recorder is only running, while the Telemetry Viewer is open. Therefore, you can restart the learning process for *Assetto Corsa Competizione*, if necessary, by closing the browser and re-open it.
+4. The currently selected lap can be deleted by using the "-" button to the right of the drop down menu of all laps. If you hold down the Control key, all laps can be deleted at once.
+5. You can save and load telemetry data for a given lap for later usage:
+   - Typically used for reference laps, even from other drivers.
+   - Use the small button with the "Disc" icon to save a telemetry lap to the session database or any other location.
+   - Use the small button with the "Folder" icon to load a telemetry lap from the session database or any other location.
+   - Telemetry data, which has been *imported* this way will not become part of the current session.
+   *Imported* telemetry data can be removed by using the *delete* button. This will not remove it from its original location.
+
+Good to know: If you use the "Open..." button in the dialog, which let's you browse the available telemetry data, you can import telemetry data from ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), as long as it has been saved as JSON file, which can be activated in the settings of "Second Monitor".
 
 ## Understanding the Recommendations
 

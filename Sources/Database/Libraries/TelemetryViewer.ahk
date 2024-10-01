@@ -21,8 +21,6 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class TelemetryChart {
-	static sChartID := 1
-
 	iTelemetryViewer := false
 
 	iChartArea := false
@@ -68,28 +66,33 @@ class TelemetryChart {
 			local row := false
 			local data
 
-			if telemetryViewer.TrackMap {
-				; this.ChartArea.stop()
+			; this.ChartArea.stop()
 
-				try {
-					if (event = "Select") {
-						row := string2Values(";", arguments[1])
+			try {
+				if (event = "Select") {
+					row := string2Values(";", arguments[1])
 
-						if (StrLen(Trim(row[1])) > 0) {
-							row := (string2Values("|", row[1])[1] + 1)
+					if ((row.Length > 0) && (StrLen(Trim(row[1])) > 0)) {
+						row := string2Values("|", row[1])[1]
 
-							if (isNumber(row) && telemetryViewer.Data.Has(telemetryViewer.SelectedLap[true])) {
+						if isNumber(row) {
+							row := (row + 1)
+
+							if telemetryViewer.Data.Has(telemetryViewer.SelectedLap[true]) {
+								this.selectRow(row)
+
 								data := telemetryViewer.Data[telemetryViewer.SelectedLap[true]]
 
 								if (data.Has(row) && data[row].Length > 11)
-									telemetryViewer.TrackMap.updateTrackPosition(data[row][12], data[row][13])
+									if telemetryViewer.TrackMap
+										telemetryViewer.TrackMap.updateTrackPosition(data[row][12], data[row][13])
 							}
 						}
 					}
 				}
-				catch Any as exception {
-					logError(exception)
-				}
+			}
+			catch Any as exception {
+				logError(exception)
 			}
 		}
 
@@ -107,8 +110,7 @@ class TelemetryChart {
 		local referenceLapTelemetry := false
 		local html := ""
 		local width, height
-		local drawChartFunction1, chartID1, chartArea1, drawChartFunction2, chartID2, chartArea2
-		local drawChartFunction3, chartID3, chartArea3
+		local drawChartFunction1, chartArea1, drawChartFunction2, chartArea2, drawChartFunction3, chartArea3
 		local before, after, margins
 		local entry, index, field, running
 
@@ -137,9 +139,9 @@ class TelemetryChart {
 			width := ((this.ChartArea.getWidth() - 4) / 100 * this.Zoom)
 			height := (this.ChartArea.getHeight() - 4)
 
-			chartArea1 := this.createSpeedChart(width, height / 3 * 2, lapTelemetry, referenceLapTelemetry, &drawChartFunction1, &chartID1)
-			chartArea2 := this.createElectronicsChart(width, height / 3, lapTelemetry, referenceLapTelemetry, &drawChartFunction2, &chartID2)
-			chartArea3 := this.createAccelerationChart(width, height / 3, lapTelemetry, referenceLapTelemetry, &drawChartFunction3, &chartID3)
+			chartArea1 := this.createSpeedChart(width, height / 3 * 2, lapTelemetry, referenceLapTelemetry, &drawChartFunction1)
+			chartArea2 := this.createElectronicsChart(width, height / 3, lapTelemetry, referenceLapTelemetry, &drawChartFunction2)
+			chartArea3 := this.createAccelerationChart(width, height / 3, lapTelemetry, referenceLapTelemetry, &drawChartFunction3)
 
 			if chartArea3
 				before := "
@@ -152,11 +154,11 @@ class TelemetryChart {
 							.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
 						</style>
 						<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-						<script type="text/javascript">function drawCharts() { drawChart%chartID1%(); drawChart%chartID2%(); drawChart%chartID3%() }</script>
+						<script type="text/javascript">function drawCharts() { drawSpeedChart(); drawElectronicsChart(); drawAccelerationChart() }</script>
 						<script type="text/javascript">
 							google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawCharts);
 				)"
-			else {
+			else
 				before := "
 				(
 					<meta charset='utf-8'>
@@ -167,19 +169,15 @@ class TelemetryChart {
 							.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
 						</style>
 						<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-						<script type="text/javascript">function drawCharts() { drawChart%chartID1%(); drawChart%chartID2%() }</script>
+						<script type="text/javascript">function drawCharts() { drawSpeedChart(); drawElectronicsChart() }</script>
 						<script type="text/javascript">
 							google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawCharts);
 				)"
 
-				chartID3 := false
-			}
-
 			before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
 												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
-												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]
-												 , chartID1: chartID1, chartID2: chartID2, chartID3: chartID3})
+												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
 
 			after := "
 			(
@@ -196,13 +194,12 @@ class TelemetryChart {
 			return "<html></html>"
 	}
 
-	createSpeedChart(width, height, lapTelemetry, referenceLapTelemetry, &drawChartFunction, &chartID) {
+	createSpeedChart(width, height, lapTelemetry, referenceLapTelemetry, &drawChartFunction) {
 		local speedMin := 9999
 		local speedMax := 0
 		local ignore, data, refData, axes, speed, refSpeed, color, running, refRunning
 
-		chartID := TelemetryChart.sChartID++
-		drawChartFunction := ("function drawChart" . chartID . "() {`nvar data = new google.visualization.DataTable();")
+		drawChartFunction := ("function drawSpeedChart() {`nvar data = new google.visualization.DataTable();")
 
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Distance") . "');")
 
@@ -271,20 +268,22 @@ class TelemetryChart {
 
 		drawChartFunction .= ("]);`nvar options = { " . axes . ", legend: { position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '2%', top: '5%', right: '2%', bottom: '20%' }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
 
-		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options);")
-		drawChartFunction .= "`nfunction selectHandler(e) { var cSelection = chart.getSelection(); var selection = ''; for (var i = 0; i < cSelection.length; i++) { var item = cSelection[i]; if (i > 0) selection += ';'; selection += (item.row + '|' + item.column); } eventHandler('Select', selection); }"
+		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_speed')); chart.draw(data, options); document.speed_chart = chart;")
+		drawChartFunction .= "`nfunction selectHandler(e) { var cSelection = chart.getSelection(); var selection = ''; for (var i = 0; i < cSelection.length; i++) { var item = cSelection[i]; if (i > 0) selection += ';'; selection += (item.row + '|' + item.column); } try { eventHandler('Select', selection); } catch(e) {} }"
+
 		drawChartFunction .= "`ngoogle.visualization.events.addListener(chart, 'select', selectHandler); }"
 
-		return ("<div id=`"chart_" . chartID . "`" style=`"width: " . Round(width) . "px; height: " . Round(height) . "px`"></div>")
+		drawChartFunction .= ("`nfunction selectSpeed(row) {`ndocument.speed_chart.setSelection([{row: row, column: null}]); }")
+
+		return ("<div id=`"chart_speed`" style=`"width: " . Round(width) . "px; height: " . Round(height) . "px`"></div>")
 	}
 
-	createElectronicsChart(width, height, lapTelemetry, referenceLapTelemetry, &drawChartFunction, &chartID) {
+	createElectronicsChart(width, height, lapTelemetry, referenceLapTelemetry, &drawChartFunction) {
 		local rpmsMin := 99999
 		local rpmsMax := 0
 		local ignore, data, refData, rpms, refRpms, axes, color, running, refRunning
 
-		chartID := TelemetryChart.sChartID++
-		drawChartFunction := ("function drawChart" . chartID . "() {`nvar data = new google.visualization.DataTable();")
+		drawChartFunction := ("function drawElectronicsChart() {`nvar data = new google.visualization.DataTable();")
 
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Distance") . "');")
 
@@ -351,20 +350,24 @@ class TelemetryChart {
 
 		drawChartFunction .= ("]);`nvar options = { " . axes . ", legend: { position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '2%', top: '5%', right: '2%', bottom: '20%' }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
 
-		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
+		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_electronics')); chart.draw(data, options); document.electronics_chart = chart;")
+		drawChartFunction .= "`nfunction selectHandler(e) { var cSelection = chart.getSelection(); var selection = ''; for (var i = 0; i < cSelection.length; i++) { var item = cSelection[i]; if (i > 0) selection += ';'; selection += (item.row + '|' + item.column); } try { eventHandler('Select', selection); } catch(e) {} }"
 
-		return ("<div id=`"chart_" . chartID . "`" style=`"width: " . Round(width) . "px; height: " . Round(height) . "px`"></div>")
+		drawChartFunction .= "`ngoogle.visualization.events.addListener(chart, 'select', selectHandler); }"
+
+		drawChartFunction .= ("`nfunction selectElectronics(row) {`ndocument.electronics_chart.setSelection([{row: row, column: null}]); }")
+
+		return ("<div id=`"chart_electronics`" style=`"width: " . Round(width) . "px; height: " . Round(height) . "px`"></div>")
 	}
 
-	createAccelerationChart(width, height, lapTelemetry, referenceLapTelemetry, &drawChartFunction, &chartID) {
+	createAccelerationChart(width, height, lapTelemetry, referenceLapTelemetry, &drawChartFunction) {
 		local accelMin := kUndefined
 		local accelMax := kUndefined
 		local curvMin := kUndefined
 		local curvMax := kUndefined
 		local ignore, data, refData, longG, latG, refLongG, refLatG, axes, color, running, refRunning, curvature, speed, absG
 
-		chartID := TelemetryChart.sChartID++
-		drawChartFunction := ("function drawChart" . chartID . "() {`nvar data = new google.visualization.DataTable();")
+		drawChartFunction := ("function drawAccelerationChart() {`nvar data = new google.visualization.DataTable();")
 
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Distance") . "');")
 
@@ -482,9 +485,69 @@ class TelemetryChart {
 
 		drawChartFunction .= ("]);`nvar options = { " . axes . ", legend: { position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '2%', top: '5%', right: '2%', bottom: '20%' }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
 
-		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
+		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_acceleration')); chart.draw(data, options); document.acceleration_chart = chart;")
+		drawChartFunction .= "`nfunction selectHandler(e) { var cSelection = chart.getSelection(); var selection = ''; for (var i = 0; i < cSelection.length; i++) { var item = cSelection[i]; if (i > 0) selection += ';'; selection += (item.row + '|' + item.column); } try { eventHandler('Select', selection); } catch(e) {} }"
 
-		return ("<div id=`"chart_" . chartID . "`" style=`"width: " . Round(width) . "px; height: " . Round(height) . "px`"></div>")
+		drawChartFunction .= "`ngoogle.visualization.events.addListener(chart, 'select', selectHandler); }"
+
+		drawChartFunction .= ("`nfunction selectAcceleration(row) {`ndocument.acceleration_chart.setSelection([{row: row, column: null}]); }")
+
+		return ("<div id=`"chart_acceleration`" style=`"width: " . Round(width) . "px; height: " . Round(height) . "px`"></div>")
+	}
+
+	selectRow(row) {
+		local environment
+
+		static htmlViewer := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "HTML", "Viewer", "IE11")
+
+		if (false && (htmlViewer = "WebView2")) {
+			environment := this.ChartArea.HTMLViewer.WebView2.Core()
+
+			environment.ExecuteScript("selectSpeed(" . row . ")", false)
+			environment.ExecuteScript("selectElectronics(" . row . ")", false)
+
+			try
+				environment.ExecuteScript("selectAcceleration(" . row . ")", false)
+		}
+		else {
+			environment := this.ChartArea.document.parentWindow
+
+			environment.selectSpeed(row)
+			environment.selectElectronics(row)
+
+			try
+				environment.selectAcceleration(row)
+		}
+	}
+
+	selectPosition(posX, posY, threshold := 40) {
+		local data := this.TelemetryViewer.Data[this.TelemetryViewer.SelectedLap[true]]
+		local lastX := kUndefined
+		local lastY := kUndefined
+		local row := false
+		local coordX, coordY, dx, dy, deltaX, deltaY, row
+
+		if ((data.Length > 0) && data[1].Length > 11) {
+			loop data.Length {
+				coordX := data[A_Index][12]
+				coordY := data[A_Index][13]
+
+				dX := Abs(coordX - posX)
+				dY := Abs(coordY - posY)
+
+				if ((dX <= threshold) && (dY <= threshold) && ((lastX == kUndefined) || ((dx + dy) < (deltaX + deltaY)))) {
+					lastX := coordX
+					lastY := coordY
+					deltaX := dX
+					deltaY := dY
+
+					row := A_Index
+				}
+			}
+
+			if row
+				this.selectRow(row - 1)
+		}
 	}
 }
 
@@ -787,8 +850,8 @@ class TelemetryViewer {
 
 		viewerGui.SetFont("s9 Norm", "Arial")
 
-		viewerGui.Add("Documentation", "x176 YP+20 w336 H:Center Center", translate("Telemetry Browser")
-					 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#Telemetry-Browser")
+		viewerGui.Add("Documentation", "x176 YP+20 w336 H:Center Center", translate("Telemetry Viewer")
+					 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#Telemetry-Viewer")
 
 		viewerGui.Add("Text", "x8 yp+30 w656 W:Grow 0x10")
 
@@ -1429,6 +1492,7 @@ class TrackMap {
 	iTrack := false
 
 	iTrackDisplay := false
+	iTrackDisplayArea := false
 
 	iTrackMap := false
 	iTrackImage := false
@@ -1532,6 +1596,20 @@ class TrackMap {
 	}
 
 	createGui() {
+		selectTrackPosition(*) {
+			local coordinateX := false
+			local coordinateY := false
+			local x, y
+
+			MouseGetPos(&x, &y)
+
+			x := screen2Window(x)
+			y := screen2Window(y)
+
+			if this.findTrackCoordinate(x - this.iTrackDisplayArea[1], y - this.iTrackDisplayArea[2], &coordinateX, &coordinateY)
+				this.trackClicked(coordinateX, coordinateY)
+		}
+
 		local mapGui := TrackMap.TrackMapWindow(this, {Descriptor: "Track Map", Closeable: true, Resizeable:  "Deferred"})
 
 		this.iWindow := mapGui
@@ -1541,6 +1619,7 @@ class TrackMap {
 		mapGui.Add("Picture", "x0 y0 w479 h479 W:Grow H:Grow vtrackDisplayArea")
 
 		this.iTrackDisplay := mapGui.Add("Picture", "x479 y479 BackgroundTrans vtrackDisplay")
+		this.iTrackDisplay.OnEvent("Click", selectTrackPosition)
 
 		mapGui.Add(TrackMap.TrackMapResizer(this))
 	}
@@ -1622,6 +1701,74 @@ class TrackMap {
 			showMessage(posX . ", " . posY)
 
 		this.createTrackMap(posX, posY)
+	}
+
+	findTrackCoordinate(x, y, &coordinateX, &coordinateY, threshold := 40) {
+		local trackMap := this.TrackMap
+		local trackImage := this.TrackImage
+		local scale, offsetX, offsetY, marginX, marginY, width, height, imgWidth, imgHeight, imgScale
+		local candidateX, candidateY, deltaX, deltaY, coordX, coordY, dX, dY
+
+		if (trackMap && trackImage) {
+			scale := getMultiMapValue(trackMap, "Map", "Scale")
+
+			offsetX := getMultiMapValue(trackMap, "Map", "Offset.X")
+			offsetY := getMultiMapValue(trackMap, "Map", "Offset.Y")
+
+			marginX := getMultiMapValue(trackMap, "Map", "Margin.X")
+			marginY := getMultiMapValue(trackMap, "Map", "Margin.Y")
+
+			width := this.iTrackDisplayArea[3]
+			height := this.iTrackDisplayArea[4]
+
+			imgWidth := ((getMultiMapValue(trackMap, "Map", "Width") + (2 * marginX)) * scale)
+			imgHeight := ((getMultiMapValue(trackMap, "Map", "Height") + (2 * marginY)) * scale)
+
+			imgScale := Min(width / imgWidth, height / imgHeight)
+
+			x := (x / imgScale)
+			y := (y / imgScale)
+
+			x := ((x / scale) - offsetX - marginX)
+			y := ((y / scale) - offsetY - marginY)
+
+			candidateX := kUndefined
+			candidateY := false
+			deltaX := false
+			deltaY := false
+
+			threshold := (threshold / scale)
+
+			loop getMultiMapValue(trackMap, "Map", "Points") {
+				coordX := getMultiMapValue(trackMap, "Points", A_Index . ".X")
+				coordY := getMultiMapValue(trackMap, "Points", A_Index . ".Y")
+
+				dX := Abs(coordX - x)
+				dY := Abs(coordY - y)
+
+				if ((dX <= threshold) && (dY <= threshold) && ((candidateX == kUndefined) || ((dx + dy) < (deltaX + deltaY)))) {
+					candidateX := coordX
+					candidateY := coordY
+					deltaX := dX
+					deltaY := dY
+				}
+			}
+
+			if (candidateX != kUndefined) {
+				coordinateX := candidateX
+				coordinateY := candidateY
+
+				return true
+			}
+			else
+				return false
+		}
+		else
+			return false
+	}
+
+	trackClicked(coordinateX, coordinateY) {
+		this.TelemetryViewer.TelemetryChart.selectPosition(coordinateX, coordinateY)
 	}
 
 	createTrackMap(posX?, posY?) {

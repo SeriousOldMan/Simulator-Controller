@@ -156,15 +156,15 @@ All these report documents are HTML-based and can be saved or printed using the 
 
 - If you want the report to be opened in a separate window, hold down the Control key while requesting it. If the report originates from one of the available lists, you can open the separate window by double-clicking the entry in this list. In this case, the report is frozen and will **not** be updated automatically when new data arrives.
 
-### Telemetry Browser
+### Telemetry Viewer
 
-A valuable tool to analyze your lap times and those of your team mates is the integrated Telemetry Browser, which can be opened and activated by choosing the "Telemetry..." command from the "Session" menu.
+A valuable tool to analyze your lap times and those of your team mates is the integrated Telemetry Viewer, which can be opened and activated by choosing the "Telemetry..." command from the "Session" menu.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Telemetry%20Browser.JPG)
 
 While you are in an active session, lap telemetry data will be collected lap by lap for those drivers that have enabled "Telemetry" in the "Session" menu (below the "Synchronize" command). The telemetry data for the last few laps of every driver, who has checked the "Telemetry" item in the "Session" menu, will be stored on the Team Server and will be replicated to all currently running "Team Center" for inspection and comparison with other laps.
 
-When looking for areas of improvement take a close look to the application of throttle and brakes and the activation of TC and ABS. Trailing off the brakes and the transition back to full throttle is the most important skill to master for fast lap times. This does not mean, that sometimes coasting around a corner is not necessary. Use the Telemetry Browser to compare your laps with the fastest lap of a given session and learn what exactly made you faster there.
+When looking for areas of improvement take a close look to the application of throttle and brakes and the activation of TC and ABS. Trailing off the brakes and the transition back to full throttle is the most important skill to master for fast lap times. This does not mean, that sometimes coasting around a corner is not necessary. Use the Telemetry Viewer to compare your laps with the fastest lap of a given session and learn what exactly made you faster there.
 
 Important: Sessions that are saved with telemetry data to the session database will NOT be synchronized with the Team Server by default, since the amount of data is quite large and will put a lot of stress on the Team Server. You can still activate the synchronization for a particular session in the "Session Database", but I strongly advise against it.
 

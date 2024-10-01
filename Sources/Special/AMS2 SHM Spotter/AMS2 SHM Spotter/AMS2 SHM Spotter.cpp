@@ -1457,20 +1457,18 @@ void collectCarTelemetry(const SharedMemory* sharedData) {
 		}
 
 		telemetryFile << vehicle.mCurrentLapDistance << ";"
-			<< sharedData->mThrottle << ";"
-			<< sharedData->mBrake << ";"
-			<< sharedData->mSteering << ";"
-			<< sharedData->mGear << ";"
-			<< sharedData->mRpm << ";"
-			<< (sharedData->mSpeed * 3.6) << ";"
-			<< "n/a" << ";"
-			<< "n/a" << ";"
-			<< sharedData->mLocalAcceleration[VEC_X] << ";"
-			<< sharedData->mLocalAcceleration[VEC_Z] << ";"
-			<< sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mWorldPosition[VEC_X] << ";"
-			<< -sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mWorldPosition[VEC_Z] << std::endl;
-
-		
+					  << sharedData->mThrottle << ";"
+					  << sharedData->mBrake << ";"
+					  << sharedData->mSteering << ";"
+					  << sharedData->mGear << ";"
+					  << sharedData->mRpm << ";"
+					  << (sharedData->mSpeed * 3.6) << ";"
+					  << "n/a" << ";"
+					  << "n/a" << ";"
+					  << - sharedData->mLocalAcceleration[VEC_Z] / 9.807f << ";"
+					  << sharedData->mLocalAcceleration[VEC_X] / 9.807f << ";"
+					  << sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mWorldPosition[VEC_X] << ";"
+					  << -sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mWorldPosition[VEC_Z] << std::endl;
 	}
 	catch (...) {
 		try {

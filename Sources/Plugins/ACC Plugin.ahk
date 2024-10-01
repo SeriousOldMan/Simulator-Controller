@@ -267,7 +267,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		parseConfig(config) {
 			config := JSON.parse(config)
 
-			if ((config.Has("udpListenerPort") || config.Has("updListenerPort")) && config.Has("connectionPassword") && config.Has("commandPassword"))
+			if ((config.Has("udpListenerPort") || config.Has("updListenerPort")) && config.Has("connectionPassword"))
 				return config
 			else
 				throw "Invalid broadcasting configuration..."
@@ -339,7 +339,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 					if (!accUdpConfig.Has("connectionPassword") || (accUdpConfig["connectionPassword"] != udpConfig[3]))
 						udpConfigValid := false
-					else if (!accUdpConfig.Has("commandPassword") || (accUdpConfig["commandPassword"] != udpConfig[4]))
+					else if (accUdpConfig.Has("commandPassword") && (accUdpConfig["commandPassword"] != udpConfig[4]))
 						udpConfigValid := false
 				}
 				catch Any as exception {

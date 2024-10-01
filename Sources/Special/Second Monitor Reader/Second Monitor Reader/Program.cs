@@ -310,11 +310,11 @@ static class Program
                 {
                     case "XinMs":
                         reader.Read();
-                        latG = float.Parse(reader.Value.ToString());
+                        latG = float.Parse(reader.Value.ToString()) / 9.807f;
                         break;
                     case "ZinMs":
                         reader.Read();
-                        longG = float.Parse(reader.Value.ToString());
+                        longG = float.Parse(reader.Value.ToString()) / 9.807f;
                         break;
                 }
     }

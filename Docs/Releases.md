@@ -1,4 +1,14 @@
-## 5.9.1.0-release 09/27/24 (planned)
+## 5.9.2.0-release 10/04/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Fixed a critical bug for iRacing, which disabled the Spotter proximity alerts and flag warnings. Was *introduced* with the telemetry support 2 weeks ago.
+  4. Lap telemetry data opened from a source other than the current session, will now also show the driver name, if available.
+  5. The selection dialog for telemetries now supports opening multiple lap telemetries at once by shift-clicking in the list. The file selection dialog opened by the "Open..." button also supports multi-selection.
+  6. A third graph has been added to the telemetry viewer, which shows longitudinal and lateral G-Forces and also an information about the curvature of the current corner.
+  7. Lap telemetry data can now be imported from Second Monitor, sophisticated tool developed by Matus Celko (@winzarten). See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#laps) for more information.
+  8. The Track Automation state is now displayed with color coding on a Button Box. Gray if it is enabled but not yet available, and yellow if no Automation has been defined for the given track.
+
+## 5.9.1.0-release 09/27/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a critical memory runaway bug in certain changing weather conditions.

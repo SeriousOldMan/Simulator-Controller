@@ -91,7 +91,7 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 14. [Team Data Replication](https://youtu.be/KgZ86YIBMOQ) - This video shows you how to share telemetry and other data in your team using the Team Server. This data can then be used to create team strategies or lookup tyre pressures for an unplanned pitstop in a team race and so on.
 
-15. [Analyzing Driving Style and Handling Issues](https://youtu.be/UmXMKMpGOkk) - This video shows you how to use the all new telemetry analyzer, which will automatically detect handling issues of your setup (or your driving style) while you are driving. The handling issues can then be transferred to the Setup Workbench to create a modification of the car setup.
+15. [Analyzing Driving Style and Handling Issues](https://youtu.be/UmXMKMpGOkk) - This video shows you how to use the all new issue analyzer, which will automatically detect handling issues of your setup (or your driving style) while you are driving. The handling issues can then be transferred to the Setup Workbench to create a modification of the car setup.
 
 16. [Expert guide to race settings](https://youtu.be/UeD397KFEhg) - This video will give you a complete overview over all the settings used by the Race Assistants, for example all the stuff needed by the Race Engineer to handle a successful pitstop in even the worst conditions.
 

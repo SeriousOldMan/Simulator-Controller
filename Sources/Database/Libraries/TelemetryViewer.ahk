@@ -1614,11 +1614,13 @@ class TrackMap {
 
 		this.iWindow := mapGui
 
-		this.iTrackDisplayArea := [480, 480, 480, 480]
+		this.iTrackDisplayArea := [480, 480, 480, 380]
 
-		mapGui.Add("Picture", "x0 y0 w479 h479 W:Grow H:Grow vtrackDisplayArea")
+		mapGui.Add("Text", "x8 y2 w466 H:Center Center vtrackNameDisplay")
 
-		this.iTrackDisplay := mapGui.Add("Picture", "x479 y479 BackgroundTrans vtrackDisplay")
+		mapGui.Add("Picture", "x0 y20 w479 h379 W:Grow H:Grow vtrackDisplayArea")
+
+		this.iTrackDisplay := mapGui.Add("Picture", "x479 y379 BackgroundTrans vtrackDisplay")
 		this.iTrackDisplay.OnEvent("Click", selectTrackPosition)
 
 		mapGui.Add(TrackMap.TrackMapResizer(this))
@@ -1657,6 +1659,9 @@ class TrackMap {
 
 		this.iTrackMap := trackMap
 		this.iTrackImage := this.Window.Theme.RecolorizeImage(trackImage)
+
+		this.Control["trackNameDisplay"].Text := SessionDatabase.getTrackName(this.Simulator
+																			, getMultiMapValue(trackMap, "General", "Track", ""))
 
 		this.createTrackMap()
 	}

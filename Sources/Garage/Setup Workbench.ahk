@@ -1540,8 +1540,8 @@ class SetupWorkbench extends ConfigurationItem {
 
 	getSessionInformation(&simulator, &car, &track) {
 		simulator := this.SelectedSimulator
-		car := this.SelectedCar
-		track := this.SelectedTrack
+		car := SessionDatabase.getCarCode(simulator, this.SelectedCar)
+		track := SessionDatabase.getTrackCode(simulator, this.SelectedTrack)
 	}
 
 	getLapInformation(lapNumber, &driver, &lapTime, &sectorTimes) {

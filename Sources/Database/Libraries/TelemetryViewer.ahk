@@ -557,6 +557,8 @@ class TelemetryViewer {
 	iTelemetryDirectory := false
 	iTelemetryCollector := false
 
+	iCollectingNotifier := false
+
 	iWindow := false
 
 	iTelemetryChart := false
@@ -658,6 +660,18 @@ class TelemetryViewer {
 	Window {
 		Get {
 			return this.iWindow
+		}
+	}
+
+	CollectorTask {
+		Get {
+			return this.iCollectorTask
+		}
+	}
+
+	CollectingNotifier {
+		Get {
+			return this.iCollectingNotifier
 		}
 	}
 
@@ -858,19 +872,25 @@ class TelemetryViewer {
 		viewerGui.SetFont("s8 Norm", "Arial")
 
 		viewerGui.Add("Text", "x16 yp+10 w80", translate("Lap"))
-		viewerGui.Add("DropDownList", "x98 yp-4 w280 vlapDropDown", collect(this.Laps, (l) => this.lapLabel(l))).OnEvent("Change", chooseLap)
+		viewerGui.Add("DropDownList", "x98 yp-4 w250 vlapDropDown", collect(this.Laps, (l) => this.lapLabel(l))).OnEvent("Change", chooseLap)
 
-		viewerGui.Add("Button", "x380 yp w23 h23 Center +0x200 Disabled vloadButton").OnEvent("Click", loadLap)
+		viewerGui.Add("Button", "x350 yp w23 h23 Center +0x200 Disabled vloadButton").OnEvent("Click", loadLap)
 		setButtonIcon(viewerGui["loadButton"], kIconsDirectory . "Load.ico", 1, "L4 T4 R4 B4")
-		viewerGui.Add("Button", "x404 yp w23 h23 Center +0x200 Disabled vsaveButton").OnEvent("Click", saveLap)
+		viewerGui.Add("Button", "x374 yp w23 h23 Center +0x200 Disabled vsaveButton").OnEvent("Click", saveLap)
 		setButtonIcon(viewerGui["saveButton"], kIconsDirectory . "Save.ico", 1, "L4 T4 R4 B4")
-		viewerGui.Add("Button", "x430 yp w23 h23 Center +0x200 vdeleteButton").OnEvent("Click", deleteLap)
+		viewerGui.Add("Button", "x400 yp w23 h23 Center +0x200 vdeleteButton").OnEvent("Click", deleteLap)
 		setButtonIcon(viewerGui["deleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
-		viewerGui.Add("Text", "x16 yp+28 w80", translate("Reference"))
-		viewerGui.Add("DropDownList", "x98 yp-4 w280 Choose1 vreferenceLapDropDown", concatenate([translate("None")], collect(this.Laps, (l) => this.lapLabel(l)))).OnEvent("Change", chooseReferenceLap)
+		this.iCollectingNotifier := viewerGui.Add("HTMLViewer", "x426 yp+9 w30 h30 vcollectingNotifier Hidden")
 
-		viewerGui.Add("Button", "x380 yp w73 h23 vtrackButton", translate("Map...")).OnEvent("Click", openTrackMap)
+		this.iCollectingNotifier.document.open()
+		this.iCollectingNotifier.document.write("<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . (kResourcesDirectory . "Wait.gif") . "' width=28 height=28 border=0 padding=0></body></html>")
+		this.iCollectingNotifier.document.close()
+
+		viewerGui.Add("Text", "x16 yp+19 w80", translate("Reference"))
+		viewerGui.Add("DropDownList", "x98 yp-4 w250 Choose1 vreferenceLapDropDown", concatenate([translate("None")], collect(this.Laps, (l) => this.lapLabel(l)))).OnEvent("Change", chooseReferenceLap)
+
+		viewerGui.Add("Button", "x350 yp w73 h23 vtrackButton", translate("Map...")).OnEvent("Click", openTrackMap)
 
 		viewerGui.Add("Text", "x468 yp+4 w80 X:Move", translate("Zoom"))
 		viewerGui.Add("Slider", "Center Thick15 x556 yp-2 X:Move w100 0x10 Range100-400 ToolTip vzoomSlider", 100).OnEvent("Change", changeZoom)
@@ -911,20 +931,20 @@ class TelemetryViewer {
 		this.updateTelemetryChart(true)
 
 		if this.Collect {
-			if this.iCollectorTask
-				this.iCollectorTask.stop()
+			if this.CollectorTask
+				this.CollectorTask.stop()
 
 			this.iCollectorTask := PeriodicTask(ObjBindMethod(this, "loadTelemetry"), 10000, kLowPriority)
 
-			this.iCollectorTask.start()
+			this.CollectorTask.start()
 		}
 	}
 
 	close() {
 		this.shutdownCollector()
 
-		if this.iCollectorTask {
-			this.iCollectorTask.stop()
+		if this.CollectorTask {
+			this.CollectorTask.stop()
 
 			this.iCollectorTask := false
 		}
@@ -971,6 +991,8 @@ class TelemetryViewer {
 			this.iTelemetryCollector := TelemetryCollector(this.TelemetryDirectory, simulator, track, trackLength)
 
 			this.iTelemetryCollector.startup()
+
+			this.CollectingNotifier.show()
 		}
 	}
 
@@ -979,6 +1001,8 @@ class TelemetryViewer {
 			this.TelemetryCollector.shutdown()
 
 			this.iTelemetryCollector := false
+
+			this.CollectingNotifier.hide()
 		}
 	}
 

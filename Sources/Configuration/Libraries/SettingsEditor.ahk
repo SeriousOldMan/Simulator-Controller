@@ -272,9 +272,6 @@ editSettings(&settingsOrCommand, owner := false, withContinue := false, fromSetu
 	static buttonBoxSimulationCheck
 	static buttonBoxSimulationDurationInput
 
-	static startup
-	static startupOption
-
 	static splashScreen
 	static uiTheme
 
@@ -398,8 +395,6 @@ editSettings(&settingsOrCommand, owner := false, withContinue := false, fromSetu
 
 					break
 				}
-
-			setMultiMapValue(newSettings, "Startup", "Simulator", (startup.Value ? startupOption.Text : false))
 
 			settingsEditorGui.Destroy()
 
@@ -609,20 +604,6 @@ editSettings(&settingsOrCommand, owner := false, withContinue := false, fromSetu
 
 		settingsEditorGui.Add("Text", "X10", translate("Splash Screen"))
 		splashScreen := settingsEditorGui.Add("DropDownList", "X90 YP-5 w140 Choose" . chosen, splashScreens)
-
-		startupOption := getMultiMapValue(settingsOrCommand, "Startup", "Simulator", false)
-		startup := (startupOption != false)
-
-		startup := settingsEditorGui.Add("CheckBox", "X10 Checked" . startup, translate("Start"))
-
-		simulators := string2Values("|", getMultiMapValue(configuration, "Configuration", "Simulators", ""))
-
-		chosen := inList(simulators, startupOption)
-
-		if ((chosen == 0) && (simulators.Length > 0))
-			chosen := 1
-
-		startupOption := settingsEditorGui.Add("DropDownList", "X90 YP-5 w140 Choose" . chosen, simulators)
 
 		if !fromSetup {
 			settingsEditorGui.Add("Button", "X10 Y+20 w220", translate("Configuration...")).OnEvent("Click", startConfiguration)

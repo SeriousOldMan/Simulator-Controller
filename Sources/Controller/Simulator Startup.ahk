@@ -114,7 +114,6 @@ class SimulatorStartup extends ConfigurationItem {
 	iSettings := false
 	iSimulators := false
 	iSplashScreen := false
-	iStartupOption := false
 
 	iFinished := false
 	iCanceled := false
@@ -172,7 +171,6 @@ class SimulatorStartup extends ConfigurationItem {
 
 		this.iSimulators := string2Values("|", getMultiMapValue(configuration, "Configuration", "Simulators", ""))
 		this.iSplashScreen := getMultiMapValue(this.Settings, "Startup", "Splash Screen", false)
-		this.iStartupOption := getMultiMapValue(this.Settings, "Startup", "Simulator", false)
 
 		this.iCoreComponents := []
 		this.iFeedbackComponents := []
@@ -225,9 +223,11 @@ class SimulatorStartup extends ConfigurationItem {
 		return true
 	}
 
-	startSimulatorController() {
+	startSimulatorController(&simulator) {
 		local fileName := (kUserConfigDirectory . "Startup.settings")
-		local title, exePath, pid, ignore, tool, startup, profiles, profile
+		local title, exePath, pid, ignore, tool, startup, profiles, profile, configuration
+
+		simulator := false
 
 		try {
 			logMessage(kLogInfo, translate("Starting ") . translate("Simulator Controller"))
@@ -283,9 +283,11 @@ class SimulatorStartup extends ConfigurationItem {
 						Sleep 50
 					}
 
+					configuration := readMultiMap(fileName)
+
 					startup := (" -Startup `"" . fileName . "`"")
 
-					for ignore, tool in string2Values(",", getMultiMapValue(readMultiMap(fileName), "Session", "Tools", ""))
+					for ignore, tool in string2Values(",", getMultiMapValue(configuration, "Session", "Tools", ""))
 						try {
 							if (tool = "Team Center Lite")
 								Run(kBinariesDirectory . "Team Center.exe -Simple" . startup, kBinariesDirectory)
@@ -295,6 +297,8 @@ class SimulatorStartup extends ConfigurationItem {
 						catch Any as exception {
 							logError(exception)
 						}
+
+					simulator := getMultiMapValue(configuration, "Session", "Simulator", false)
 				}
 				else
 					startup := ""
@@ -355,19 +359,19 @@ class SimulatorStartup extends ConfigurationItem {
 		}
 	}
 
-	startSimulator() {
+	startSimulator(simulator := false) {
 		if this.Canceled
 			return
 
-		if (!this.iStartupOption && (this.iSimulators.Length > 0))
-			this.iStartupOption := this.iSimulators[1]
+		if (!simulator && (this.iSimulators.Length > 0))
+			simulator := this.iSimulators[1]
 
-		if this.iStartupOption
-			messageSend(kFileMessage, "Startup", "startupSimulator:" . this.iStartupOption, this.ControllerPID)
+		if simulator
+			messageSend(kFileMessage, "Startup", "startupSimulator:" . simulator, this.ControllerPID)
 	}
 
 	startup() {
-		local startSimulator, runningIndex, hidden, hasSplashScreen
+		local startSimulator, runningIndex, hidden, hasSplashScreen, simulator
 
 		playSong(songFile) {
 			if (songFile && FileExist(getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory)))
@@ -375,9 +379,9 @@ class SimulatorStartup extends ConfigurationItem {
 		}
 
 		if this.prepareConfiguration() {
-			startSimulator := ((this.iStartupOption != false) || GetKeyState("MButton"))
+			this.iControllerPID := this.startSimulatorController(&simulator)
 
-			this.iControllerPID := this.startSimulatorController()
+			startSimulator := ((simulator != false) || GetKeyState("MButton"))
 
 			if (this.ControllerPID == 0)
 				exitStartup(true)
@@ -420,7 +424,7 @@ class SimulatorStartup extends ConfigurationItem {
 					hidden := true
 				}
 
-				this.startSimulator()
+				this.startSimulator(simulator)
 			}
 
 			if !kSilentMode
@@ -1099,7 +1103,8 @@ loadStartupProfiles(target, fileName := false) {
 
 		profile := CaseInsenseMap("Name", name
 								, "Mode", hasTeamServer ? getMultiMapValue(settings, "Profiles", name . ".Mode", "Solo") : false
-								, "Tools", values2String(",", tools*))
+								, "Tools", values2String(",", tools*)
+								, "Simulator", getMultiMapValue(settings, "Profiles", name . ".Simulator", false))
 
 		for ignore, assistant in kRaceAssistants
 			profile[assistant] := getMultiMapValue(settings, "Profiles", name . "." . assistant, "Default")
@@ -1138,6 +1143,7 @@ loadStartupProfiles(target, fileName := false) {
 
 		setMultiMapValue(settings, "Profiles", name . ".Mode", profile["Mode"])
 		setMultiMapValue(settings, "Profiles", name . ".Tools", profile["Tools"])
+		setMultiMapValue(settings, "Profiles", name . ".Simulator", profile["Simulator"])
 
 		for ignore, assistant in kRaceAssistants
 			if (profile[assistant] != "Default")
@@ -1167,6 +1173,7 @@ loadStartupProfiles(target, fileName := false) {
 
 		setMultiMapValue(settings, "Session", "Mode", selected["Mode"])
 		setMultiMapValue(settings, "Session", "Tools", selected["Tools"])
+		setMultiMapValue(settings, "Session", "Simulator", selected.Has("Simulator") ? selected["Simulator"] : false)
 
 		for ignore, assistant in kRaceAssistants
 			if (selected[assistant] != "Default") {
@@ -1194,12 +1201,14 @@ loadStartupProfiles(target, fileName := false) {
 
 editStartupProfiles(launchPadOrCommand, arguments*) {
 	local x, y, w, h, width, x0, x1, w1, w2, x2, w4, x4, w3, x3, x4, x5, w5, x6, x7
-	local checkedRows, checked, settingsTab, first
-	local profile, plugin, pluginConfiguration, ignore, lastModified, configuration
+	local checkedRows, checked, settingsTab, first, configuration
+	local profile, plugin, pluginConfiguration, ignore, lastModified
 	local dllFile, connection
 	local names, exception, chosen, fileName, selected, translator, msgResult
 
 	static done := false
+
+	static controllerConfiguration := false
 
 	static hasTeamServer := false
 	static hasDrivingCoach := false
@@ -1339,7 +1348,8 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 
 			profile := CaseInsenseMap("Name", name
 									, "Mode", hasTeamServer ? getMultiMapValue(settings, "Profiles", name . ".Mode", "Solo") : false
-									, "Tools", values2String(",", tools*))
+									, "Tools", values2String(",", tools*)
+									, "Simulator", getMultiMapValue(settings, "Profiles", name . ".Simulator", false))
 
 			for ignore, assistant in kRaceAssistants
 				profile[assistant] := getMultiMapValue(settings, "Profiles", name . "." . assistant, "Default")
@@ -1401,6 +1411,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 
 			setMultiMapValue(settings, "Profiles", name . ".Mode", profile["Mode"])
 			setMultiMapValue(settings, "Profiles", name . ".Tools", profile["Tools"])
+			setMultiMapValue(settings, "Profiles", name . ".Simulator", profile["Simulator"])
 
 			for ignore, assistant in kRaceAssistants
 				if (profile[assistant] != "Default")
@@ -1432,6 +1443,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 
 			setMultiMapValue(settings, "Session", "Mode", profile["Mode"])
 			setMultiMapValue(settings, "Session", "Tools", profile["Tools"])
+			setMultiMapValue(settings, "Session", "Simulator", profile["Simulator"])
 
 			for ignore, assistant in kRaceAssistants
 				if (profile[assistant] != "Default") {
@@ -1460,7 +1472,8 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 	newProfile() {
 		local index, function
 
-		profile := CaseInsenseMap("Name", "", "Mode", "Solo", "Tools", "", "Assistant.Autonomy", "Default")
+		profile := CaseInsenseMap("Name", "", "Mode", "Solo", "Tools", ""
+								, "Simulator", false, "Assistant.Autonomy", "Default")
 
 		for ignore, assistant in kRaceAssistants
 			profile[assistant] := "Default"
@@ -1488,7 +1501,8 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 
 		profilesEditorGui["profileNameEdit"].Text := profile["Name"]
 		profilesEditorGui["profileModeDropDown"].Choose(Max(1, inList(hasTeamServer ? ["Solo", "Team"] : ["Solo"], profile["Mode"])))
-		profilesEditorGui["profilePitwallDropDown"].Choose((1 + inList(hasTeamServer ? ["Solo Center", "Team Center", "Team Center Lite"] : ["Solo Center"], profile["Tools"])))
+		profilesEditorGui["profilePitwallDropDown"].Choose(1 + inList(hasTeamServer ? ["Solo Center", "Team Center", "Team Center Lite"] : ["Solo Center"], profile["Tools"]))
+		profilesEditorGui["profileSimulatorDropDown"].Choose(1 + inList(string2Values("|", getMultiMapValue(kSimulatorConfiguration, "Configuration", "Simulators", "")), profile["Simulator"]))
 
 		profilesEditorGui["profileAutonomyDropDown"].Choose(inList(["Yes", "No", "Default"], profile["Assistant.Autonomy"]))
 
@@ -1546,6 +1560,11 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 			profile["Name"] := profilesEditorGui["profileNameEdit"].Text
 			profile["Mode"] :=  ["Solo", "Team"][profilesEditorGui["profileModeDropDown"].Value]
 			profile["Tools"] := ["", "Solo Center", "Team Center", "Team Center Lite"][profilesEditorGui["profilePitwallDropDown"].Value]
+
+			if (profilesEditorGui["profileSimulatorDropDown"].Text = translate("None"))
+				profile["Simulator"] := false
+			else
+				profile["Simulator"] := profilesEditorGui["profileSimulatorDropDown"].Text
 
 			profile["Assistant.Autonomy"] := ["Yes", "No", "Default"][profilesEditorGui["profileAutonomyDropDown"].Value]
 
@@ -2125,6 +2144,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 			profilesEditorGui["profileNameEdit"].Enabled := true
 			profilesEditorGui["profileModeDropDown"].Enabled := true
 			profilesEditorGui["profilePitwallDropDown"].Enabled := true
+			profilesEditorGui["profileSimulatorDropDown"].Enabled := true
 
 			profilesEditorGui["profileAutonomyDropDown"].Enabled := true
 
@@ -2168,6 +2188,8 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 			profilesEditorGui["profileModeDropDown"].Choose(0)
 			profilesEditorGui["profilePitwallDropDown"].Enabled := false
 			profilesEditorGui["profilePitwallDropDown"].Choose(0)
+			profilesEditorGui["profileSimulatorDropDown"].Enabled := false
+			profilesEditorGui["profileSimulatorDropDown"].Choose(0)
 
 			profilesEditorGui["profileAutonomyDropDown"].Enabled := false
 			profilesEditorGui["profileAutonomyDropDown"].Choose(0)
@@ -2216,10 +2238,11 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 		functions := []
 		activeAssistants := []
 
-		configuration := getControllerState(true, true)
+		controllerConfiguration := getControllerState(true, true)
 
-		functions := availableFunctions(configuration, &hasTeamServer, &hasDrivingCoach, &hasRaceSpotter, &hasRaceStrategist, &hasRaceEngineer
-													 , &hasMotionFeedback, &hasChassisVibration, &hasPedalVibration)
+		functions := availableFunctions(controllerConfiguration
+									  , &hasTeamServer, &hasDrivingCoach, &hasRaceSpotter, &hasRaceStrategist, &hasRaceEngineer
+									  , &hasMotionFeedback, &hasChassisVibration, &hasPedalVibration)
 
 		if hasTeamServer {
 			connector := false
@@ -2311,6 +2334,9 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 		profilesEditorGui.Add("Text", "x" . x0 . " yp+23 w120 h23 +0x200", translate("Control Center"))
 		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " vprofilePitwallDropDown", collect(hasTeamServer ? ["None", "Solo Center", "Team Center", "Team Center Lite"] : ["None", "Solo Center"], translate))
 
+		profilesEditorGui.Add("Text", "x" . x0 . " yp+23 w120 h23 +0x200", translate("Simulator"))
+		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp+1 w" . (392 - (x1 - x0)) . " vprofileSimulatorDropDown", concatenate([translate("None")], string2Values("|", getMultiMapValue(kSimulatorConfiguration, "Configuration", "Simulators", ""))))
+
 		settingsTab := profilesEditorGui.Add("Tab3", "x" . x0 . " yp+30 w392 h180 Section", collect(hasTeamServer ? ["Assistants", "Team", "Functions"] : ["Assistants", "Functions"], translate))
 
 		settingsTab.UseTab(1)
@@ -2320,7 +2346,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 
 		first := true
 
-		for plugin, pluginConfiguration in getMultiMapValues(configuration, "Plugins")
+		for plugin, pluginConfiguration in getMultiMapValues(controllerConfiguration, "Plugins")
 			if inList(kRaceAssistants, plugin)
 				if string2Values("|", pluginConfiguration)[1] {
 					profilesEditorGui.Add("Text", "x" . (x0 + 8) . (first ? " yp+32" : " yp+27") . " w112 h23", translate(plugin))
@@ -2347,7 +2373,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 			profilesEditorGui.Add("ComboBox", "x" . x1 . " yp+1 w256 vprofileServerURLEdit", serverURLs)
 
 			profilesEditorGui.Add("Text", "x" . (x0 + 8) . " yp+23 w90 h23 +0x200", translate("Session Token"))
-			profilesEditorGui.Add("Edit", "x" . x1 . " yp w256 h21 vprofileServerTokenEdit")
+			profilesEditorGui.Add("Edit", "x" . x1 . " yp w256 h21 Password vprofileServerTokenEdit")
 			profilesEditorGui.Add("Button", "x" . (x1 - 24) . " yp-1 w23 h23 Center +0x200 vprofileConnectButton").OnEvent("Click", editStartupProfiles.Bind(kEvent, "Connect"))
 			setButtonIcon(profilesEditorGui["profileConnectButton"], kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
 

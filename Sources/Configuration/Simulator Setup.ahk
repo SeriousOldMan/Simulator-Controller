@@ -975,7 +975,8 @@ class SetupWizard extends ConfiguratorPanel {
 					configuration := this.getSimulatorConfiguration()
 
 					if FileExist(kUserConfigDirectory . "Simulator Configuration.ini")
-						FileMove(kUserConfigDirectory "Simulator Configuration.ini", kUserConfigDirectory "Simulator Configuration.ini.bak", 1)
+						FileMove(kUserConfigDirectory "Simulator Configuration.ini"
+							   , kUserConfigDirectory "Simulator Configuration.ini.bak", 1)
 
 					if FileExist(kUserConfigDirectory . "Simulator Settings.ini") {
 						if this.Initialize
@@ -2351,6 +2352,9 @@ class SetupWizard extends ConfiguratorPanel {
 
 		setMultiMapValues(savedKnowledgeBase, "Setup", this.KnowledgeBase.Facts.Facts)
 
+		if FileExist(kUserHomeDirectory . "Setup\Setup.data")
+			FileMove(kUserHomeDirectory . "Setup\Setup.data", kUserHomeDirectory . "Setup\Setup.data.bak", 1)
+
 		writeMultiMap(kUserHomeDirectory . "Setup\Setup.data", savedKnowledgeBase)
 	}
 
@@ -2633,8 +2637,8 @@ class StartStepWizard extends StepWizard {
 				}
 
 				try {
-					if this.SetupWizard.Initialize
-						deleteFile(kUserHomeDirectory . "Setup\Setup.data")
+					if (this.SetupWizard.Initialize && FileExist(kUserHomeDirectory . "Setup\Setup.data"))
+						FileMove(kUserHomeDirectory . "Setup\Setup.data", kUserHomeDirectory . "Setup\Setup.data.bak", 1)
 
 					if A_IsCompiled
 						Run((!A_IsAdmin ? "*RunAs `"" : "`"") . A_ScriptFullPath . "`" /restart")

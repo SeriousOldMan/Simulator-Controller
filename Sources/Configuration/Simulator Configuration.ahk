@@ -552,6 +552,9 @@ startupSimulatorConfiguration() {
 		local configuration := editor.getSimulatorConfiguration()
 		local startupLink, startupExe
 
+		if FileExist(configurationFile)
+			FileMove(configurationFile, configurationFile . ".bak", 1)
+
 		writeMultiMap(configurationFile, configuration)
 
 		deleteFile(kTempDirectory . "Simulator Controller.state")

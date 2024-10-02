@@ -120,7 +120,7 @@
 ------
   - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introduction)
   - [Describing Setup Issues](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#describing-setup-issues)
-    - [Telemetry Analyzer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-issue-analyzer)
+    - [Issue Analyzer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-issue-analyzer)
     - [Telemetry Viewer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#Telemetry-Viewer)
   - [Understanding the Recommendations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#understanding-the-recommendations)
   - [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#how-it-works)

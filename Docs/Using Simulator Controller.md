@@ -328,7 +328,7 @@ Supported output routes are:
 | Race Engineer   | All voice output by the Race Engineer.                                                                               |
 | Race Strategist | All voice output by the Race Strategist.                                                                             |
 | Controller      | The short acknowledge sound, when the Controller itself received a voice command or was activated for voice control. |
-| Analyzer        | The feedback sound of the Telemetry Analyzer for over- or understeer handling events.                                |
+| Analyzer        | The feedback sound of the Issue Analyzer for over- or understeer handling events.                                    |
 
 *Headphone* is only an example for any configured audio device which is named "Headphone" in the standard Windows settings. You only have to enter those lines, where you want to configure a non-default audio device. If nothing is configured here, the currently in the Windows settings selected default audio device will be used.
 

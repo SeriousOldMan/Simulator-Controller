@@ -116,9 +116,9 @@ The Telemetry Viewer is available in the following applications to collect lap t
 
 If available, a map for the current track can be opened with the "Map..." button. You can click on a location of the track map and the corresponding data points will be highlighted in the telemetry graph. It is also possible to click on a data point in the graph and the corresponding location will be selected in the track map.
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Telemetry%20Browser%20Track%20Map.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Telemetry%20Browser%20Track%20Map.jpg)
 
-Important: This functionality may not be available when using *WebView2* as the HTML browser.
+Important: This functionality may not be available when using *WebView2* as the HTML viewer.
 
 #### Strategies
 

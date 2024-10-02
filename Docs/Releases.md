@@ -13,6 +13,7 @@
   10. A rotating ball is now displayed, when the Telemetry Viewer is collecting lap telemetry data.
   11. "Setup Workbench" now also supports collecting lap telemtry data. See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#telemetry-viewer) for more information.
   12. The Track Automation state is now displayed with color coding on a Button Box. Gray if it is enabled but not yet available, and yellow if no Automation has been defined for the given track and Green, if enabled and active.
+  13. The setting to startup a simulation together with Simulator Controller has been moved from the global settings of "Simulator Startup" to the Startup Profiles. Veeery useful...
 
 ## 5.9.1.0-release 09/27/24
   1. Minor bugfixes, as always

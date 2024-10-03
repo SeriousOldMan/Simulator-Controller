@@ -38,6 +38,7 @@
 #Include "..\Libraries\RuleEngine.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Database\Libraries\TelemetryViewer.ahk"
+#Include "..\Plugins\Libraries\ACCUDPProvider.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1480,7 +1481,7 @@ class SetupWorkbench extends ConfigurationItem {
 		startupCollector() {
 			local simulator := this.SelectedSimulator[false]
 			local track := this.SelectedTrack[false]
-			local trackLength
+			local simmulatorCode, trackLength, provider
 
 			if (this.TelemetryViewer && simulator && (simulator != true) && track && (track != true)) {
 				if ((simulator != lastSimulator) || (track != lastTrack)) {
@@ -1492,8 +1493,23 @@ class SetupWorkbench extends ConfigurationItem {
 						this.TelemetryViewer.restart(kTempDirectory . "Garage\Telemetry", true)
 					}
 
-					trackLength := getMultiMapValue(callSimulator(SessionDatabase.getSimulatorCode(simulator))
-												  , "Track Data", "Length", 0)
+					simulatorCode := SessionDatabase.getSimulatorCode(simulator)
+
+					if (simulatorCode = "ACC") {
+						provider := ACCUDPProvider()
+
+						try {
+							if !ProcessExist("Simulator Controller.exe")
+								provider.startup(true)
+
+							trackLength := getMultiMapValue(provider.getPositionsDataFuture().PositionsData, "Track Data", "Length", 0)
+						}
+						finally {
+							provider.shutdown()
+						}
+					}
+					else
+						trackLength := getMultiMapValue(callSimulator(simulatorCode), "Track Data", "Length", 0)
 
 					if (trackLength > 0) {
 						lastSimulator := simulator

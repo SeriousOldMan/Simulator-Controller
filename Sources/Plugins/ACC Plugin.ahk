@@ -13,6 +13,7 @@
 #Include "..\Libraries\JSON.ahk"
 #Include "..\Libraries\Math.ahk"
 #Include "Libraries\SimulatorPlugin.ahk"
+#Include "Libraries\ACCUDPProvider.ahk"
 #Include "..\Database\Libraries\SettingsDatabase.ahk"
 
 
@@ -40,8 +41,7 @@ global kPSMutatingOptions := ["Strategy", "Change Tyres", "Tyre Compound", "Chan
 class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	static kUnknown := false
 
-	iUDPClient := false
-	iUDPConnection := false
+	iUDPProvider := false
 
 	iSessionID := 0
 
@@ -84,103 +84,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	iPositionsDataFuture := false
 
 	static sCarData := false
-
-	class PositionsDataFuture extends Task {
-		iSimulator := false
-
-		iRestart := false
-		iRequested := false
-		iTries := 0
-
-		iPositionsData := kUndefined
-
-		PositionsData {
-			Get {
-				local positionsData := this.iPositionsData
-
-				while (positionsData == kUndefined) {
-					Task.yield(false)
-
-					positionsData := this.iPositionsData
-				}
-
-				return positionsData
-			}
-		}
-
-		__New(simulator, restart := false) {
-			this.iSimulator := simulator
-			this.iRestart := false
-
-			super.__New(false, 0, kInterruptPriority)
-
-			Task.startTask(this)
-		}
-
-		requestPositionsData() {
-			loop 5
-				try {
-					FileAppend("Read`n", kTempDirectory . "ACCUDP.cmd")
-
-					break
-				}
-				catch Any as exception {
-					if (A_Index = 5)
-						logError(exception)
-					else
-						Sleep(10)
-				}
-		}
-
-		readPositionsData() {
-			local fileName, positionsData
-
-			if FileExist(kTempDirectory . "ACCUDP.cmd")
-				return false
-			else {
-				fileName := (kTempDirectory . "ACCUDP.out")
-
-				if !FileExist(fileName)
-					return false
-				else {
-					positionsData := readMultiMap(fileName)
-
-					deleteFile(fileName)
-
-					return positionsData
-				}
-			}
-		}
-
-		run() {
-			local positionsData
-
-			if !this.iRequested {
-				this.iSimulator.requireUDPClient(this.iRestart)
-
-				this.requestPositionsData()
-
-				this.iRequested := true
-
-				return Task.CurrentTask
-			}
-			else {
-				if (this.iTries++ <= 40) {
-					positionsData := this.readPositionsData()
-
-					if positionsData
-						this.iPositionsData := positionsData
-					else {
-						Task.CurrentTask.Sleep := 50
-
-						return Task.CurrentTask
-					}
-				}
-				else
-					this.iPositionsData := false
-			}
-		}
-	}
 
 	class ChatMode extends ControllerMode {
 		Mode {
@@ -249,29 +152,14 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	UDPConnection {
+	UDPProvider {
 		Get {
-			return this.iUDPConnection
-		}
-	}
-
-	UDPClient {
-		Get {
-			return this.iUDPClient
+			return this.iUDPProvider
 		}
 	}
 
 	__New(controller, name, simulator, configuration := false) {
 		local accUdpConfig, udpConfig, udpConfigValid
-
-		parseConfig(config) {
-			config := JSON.parse(config)
-
-			if ((config.Has("udpListenerPort") || config.Has("updListenerPort")) && config.Has("connectionPassword"))
-				return config
-			else
-				throw "Invalid broadcasting configuration..."
-		}
 
 		if !ACCPlugin.kUnknown
 			ACCPlugin.kUnknown := translate("Unknown")
@@ -291,74 +179,9 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
 
-			this.iUDPConnection := this.getArgumentValue("udpConnection", false)
-
-			if FileExist(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json") {
-				try {
-					try {
-						try {
-							try {
-								try {
-									accUdpConfig := parseConfig(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "`n"))
-								}
-								catch Any {
-									accUdpConfig := parseConfig(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "`n CP0"))
-								}
-							}
-							catch Any {
-								accUdpConfig := parseConfig(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "`n UTF-8"))
-							}
-						}
-						catch Any {
-							accUdpConfig := parseConfig(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "`n UTF-16"))
-						}
-					}
-					catch Any {
-						accUdpConfig := parseConfig(StrReplace(StrGet(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "Raw"))
-															 , "`r`n", "`n"))
-					}
-				}
-				catch Any as exception {
-					logError(exception, true)
-
-					accUdpConfig := CaseInsenseMap()
-				}
-
-				try {
-					udpConfig := (this.iUDPConnection ? string2Values(",", this.iUDPConnection) : ["127.0.0.1", 9000, "asd", ""])
-
-					if (udpConfig.Length = 3)
-						udpConfig.Push("")
-
-					if (accUdpConfig.Has("udpListenerPort") && (accUdpConfig["udpListenerPort"] = udpConfig[2]))
-						udpConfigValid := true
-					else if (accUdpConfig.Has("updListenerPort") && (accUdpConfig["updListenerPort"] = udpConfig[2]))
-						udpConfigValid := true
-					else
-						udpConfigValid := false
-
-					if (!accUdpConfig.Has("connectionPassword") || (accUdpConfig["connectionPassword"] != udpConfig[3]))
-						udpConfigValid := false
-					else if (accUdpConfig.Has("commandPassword") && (accUdpConfig["commandPassword"] != udpConfig[4]))
-						udpConfigValid := false
-				}
-				catch Any as exception {
-					logError(exception, true)
-
-					udpConfigValid := false
-				}
-
-				if !udpConfigValid {
-					logMessage(kLogCritical, translate("The UDP configuration for Assetto Corsa Competizione is not valid - please consult the documentation for the ACC plugin"))
-
-					showMessage(translate("The UDP configuration for Assetto Corsa Competizione is not valid - please consult the documentation for the ACC plugin") . translate("...")
-							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-				}
-			}
+			this.iUDPProvider := ACCUDPProvider(this.getArgumentValue("udpConnection", false))
 
 			controller.registerPlugin(this)
-
-			OnExit(ObjBindMethod(this, "shutdownUDPClient", true))
 		}
 	}
 
@@ -414,79 +237,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		super.simulatorStartup(simulator)
 	}
 
-	startupUDPClient(force := false) {
-		local exePath, options, udpClient
-
-		if (!this.UDPClient || force) {
-			this.shutdownUDPClient(force)
-
-			exePath := kBinariesDirectory . "Providers\ACC UDP Provider.exe"
-
-			try {
-				if FileExist(kTempDirectory . "ACCUDP.cmd")
-					deleteFile(kTempDirectory . "ACCUDP.cmd")
-
-				if FileExist(kTempDirectory . "ACCUDP.out")
-					deleteFile(kTempDirectory . "ACCUDP.out")
-
-				options := ""
-
-				if this.UDPConnection
-					options := ("-Connect " . this.UDPConnection)
-
-				Run("`"" . exePath . "`" `"" . kTempDirectory . "ACCUDP.cmd`" `"" . kTempDirectory . "ACCUDP.out`" " . options, kBinariesDirectory, "Hide", &udpClient)
-
-				this.iUDPClient := udpClient
-			}
-			catch Any as exception {
-				logError(exception, true)
-
-				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: "ACC", protocol: "UDP"})
-									   . exePath . translate(") - please rebuild the applications in the binaries folder (")
-									   . kBinariesDirectory . translate(")"))
-
-				showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
-											  , {exePath: exePath, simulator: "ACC", protocol: "UDP"})
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-
-				this.iUDPClient := false
-			}
-		}
-	}
-
-	shutdownUDPClient(force := false, arguments*) {
-		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
-			return false
-
-		if ((this.UDPClient || force) && ProcessExist("ACC UDP Provider.exe")) {
-			loop 5 {
-				try {
-					FileAppend("Exit`n", kTempDirectory . "ACCUDP.cmd")
-				}
-				catch Any as exception {
-					if (A_Index = 5)
-						logError(exception)
-				}
-
-				Sleep(250)
-
-				if !ProcessExist("ACC UDP Provider.exe")
-					break
-			}
-
-			this.iUDPClient := false
-		}
-
-		return false
-	}
-
-	requireUDPClient(restart := false) {
-		if !ProcessExist("ACC UDP Provider.exe")
-			this.iUDPClient := false
-
-		this.startupUDPClient(restart)
-	}
-
 	driverActive(data, driverForName, driverSurName) {
 		return this.sessionActive(data)
 	}
@@ -505,8 +255,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if (inList(activeModes, this.iPitstopMode))
 			this.iPitstopMode.updateActions(session)
 
-		if (session == kSessionRace)
-			this.requireUDPClient((lastSession != kSessionRace) && (lastSession != kSessionPaused))
+		if (session > kSessionOther)
+			this.UDPProvider.startup((lastSession != session) && (lastSession != kSessionPaused))
 		else {
 			if (session == kSessionFinished) {
 				this.iRepairSuspensionChosen := true
@@ -516,7 +266,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 
 			if (session != kSessionPaused)
-				this.shutdownUDPClient(true)
+				this.UDPProvider.shutdown(true)
 		}
 	}
 
@@ -533,7 +283,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 	acquireSessionData(&telemetryData, &positionsData, finished := false) {
 		if !this.iPositionsDataFuture
-			this.iPositionsDataFuture := ACCPlugin.PositionsDataFuture(this)
+			this.iPositionsDataFuture := ACCUDPProvider.getPositionsDataFuture()
 
 		super.acquireSessionData(&telemetryData, &positionsData, finished)
 	}
@@ -570,7 +320,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		lastLap := lap
 
 		if (restart || !this.iPositionsDataFuture)
-			this.iPositionsDataFuture := ACCPlugin.PositionsDataFuture(this, restart)
+			this.iPositionsDataFuture := ACCUDPProvider.getPositionsDataFuture(restart)
 
 		try {
 			positionsData := this.iPositionsDataFuture.PositionsData
@@ -652,7 +402,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			return (finished ? positionsData : this.correctPositionsData(positionsData))
 		}
 		else {
-			this.shutdownUDPClient(true)
+			this.UDPProvider.shutdown(true)
 
 			return newMultiMap()
 		}

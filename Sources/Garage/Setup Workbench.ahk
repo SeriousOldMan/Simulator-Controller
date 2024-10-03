@@ -374,6 +374,11 @@ class SetupWorkbench extends ConfigurationItem {
 		super.__New(kSimulatorConfiguration)
 
 		SetupWorkbench.Instance := this
+
+		OnExit((*) {
+			if this.TelemetryViewer
+				this.TelemetryViewer.shutdownCollector()
+		})
 	}
 
 	createGui(configuration) {

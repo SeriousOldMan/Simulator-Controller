@@ -1398,6 +1398,8 @@ class TelemetryViewer {
 
 			if (!InStr(driver, "John Doe") && (lapTime != "-"))
 				return (lap . translate(":") . A_Space . driver . translate(" - ") . lapTimeDisplayValue(lapTime) . A_Space . translate("[") . values2String(", ", collect(sectorTimes, lapTimeDisplayValue)*) . translate("]"))
+			else if !InStr(driver, "John Doe")
+				return (lap . translate(":") . A_Space . driver)
 			else
 				return lap
 		}

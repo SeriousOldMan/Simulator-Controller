@@ -1130,6 +1130,11 @@ class SoloCenter extends ConfigurationItem {
 		super.__New(configuration)
 
 		SoloCenter.Instance := this
+
+		OnExit((*) {
+			if this.TelemetryViewer
+				this.TelemetryViewer.shutdownCollector()
+		})
 	}
 
 	createGui(configuration) {

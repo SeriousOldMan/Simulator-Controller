@@ -63,6 +63,8 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 	iLastHandling := false
 	iLastTemperatures := false
 
+	iExitCallback := false
+
 	Car {
 		Get {
 			return this.iCar
@@ -428,7 +430,11 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 
 		super.__New(workbench, simulator)
 
-		OnExit(ObjBindMethod(this, "stopIssueAnalyzer"))
+		if !this.iExitCallback {
+			this.iExitCallback := ObjBindMethod(this, "stopIssueAnalyzer")
+
+			OnExit(this.iExitCallback)
+		}
 
 		if first {
 			GenericIssueAnalyzer.sAudioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Analyzer.AudioDevice", false)

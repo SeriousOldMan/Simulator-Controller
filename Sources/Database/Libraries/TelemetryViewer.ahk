@@ -996,7 +996,7 @@ class TelemetryViewer {
 		}
 	}
 
-	shutdownCollector(*) {
+	shutdownCollector() {
 		if this.TelemetryCollector {
 			this.TelemetryCollector.shutdown()
 
@@ -1062,9 +1062,6 @@ class TelemetryViewer {
 			else
 				this.closeTrackMap()
 		}
-
-		if collect
-			OnExit(ObjBindMethod(this, "shutdownCollector", true))
 	}
 
 	clear() {

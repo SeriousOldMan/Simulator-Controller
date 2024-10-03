@@ -51,6 +51,8 @@ class IssueCollector {
 
 	iTemperatureSamples := []
 
+	iExitCallback := false
+	
 	Simulator {
 		Get {
 			return this.iSimulator
@@ -304,7 +306,11 @@ class IssueCollector {
 			if pid {
 				this.iCollectorPID := pid
 
-				OnExit(ObjBindMethod(this, "stopIssueCollector"))
+				if !this.iExitCallback {
+					this.iExitCallback := ObjBindMethod(this, "stopIssueCollector")
+					
+					OnExit(this.iExitCallback)
+				}
 			}
 
 			if (!calibrate && this.iSampleFrequency) {

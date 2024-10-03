@@ -24,6 +24,8 @@ class TelemetryCollector {
 	iTelemetryDirectory := false
 	iTelemetryCollectorPID := false
 
+	iExitCallback := false
+
 	Simulator {
 		Get {
 			return this.iSimulator
@@ -53,8 +55,6 @@ class TelemetryCollector {
 		this.iTrack := track
 		this.iTrackLength := trackLength
 		this.iTelemetryDirectory := telemetryDirectory
-
-		OnExit(ObjBindMethod(this, "shutdown", true))
 	}
 
 	startup(force := false) {
@@ -96,6 +96,12 @@ class TelemetryCollector {
 
 			if pid {
 				this.iTelemetryCollectorPID := pid
+
+				if !this.iExitCallback {
+					this.iExitCallback := ObjBindMethod(this, "shutdown", true)
+
+					OnExit(this.iExitCallback)
+				}
 
 				return true
 			}

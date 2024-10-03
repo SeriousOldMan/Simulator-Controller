@@ -733,8 +733,11 @@ class VoiceManager extends ConfigurationItem {
 		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
 			return false
 
-		if (this.VoiceServer && this.iSpeechSynthesizer)
+		if (this.VoiceServer && this.iSpeechSynthesizer) {
 			messageSend(kFileMessage, "Voice", "unregisterVoiceClient:" . values2String(";", this.Name, ProcessExist()), this.VoiceServer)
+			
+			Sleep(2000)
+		}
 
 		return false
 	}

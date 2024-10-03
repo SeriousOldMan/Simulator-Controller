@@ -1480,21 +1480,31 @@ class SetupWorkbench extends ConfigurationItem {
 		startupCollector() {
 			local simulator := this.SelectedSimulator[false]
 			local track := this.SelectedTrack[false]
+			local trackLength
 
 			if (this.TelemetryViewer && simulator && (simulator != true) && track && (track != true)) {
 				if ((simulator != lastSimulator) || (track != lastTrack)) {
-					lastSimulator := simulator
-					lastTrack := track
-
 					this.TelemetryViewer.shutdownCollector()
 
-					deleteDirectory(kTempDirectory . "Garage\Telemetry", false)
+					if (lastSimulator || lastTrack) {
+						deleteDirectory(kTempDirectory . "Garage\Telemetry", false)
 
-					this.TelemetryViewer.restart(kTempDirectory . "Garage\Telemetry", true)
+						this.TelemetryViewer.restart(kTempDirectory . "Garage\Telemetry", true)
+					}
 
-					this.TelemetryViewer.startupCollector(simulator, track
-														, getMultiMapValue(callSimulator(SessionDatabase.getSimulatorCode(simulator))
-																		 , "Track Data", "Length", 0))
+					trackLength := getMultiMapValue(callSimulator(SessionDatabase.getSimulatorCode(simulator))
+												  , "Track Data", "Length", 0)
+
+					if (trackLength > 0) {
+						lastSimulator := simulator
+						lastTrack := track
+
+						this.TelemetryViewer.startupCollector(simulator, track, trackLength)
+					}
+					else {
+						lastSimulator := false
+						lastTrack := false
+					}
 				}
 			}
 			else {
@@ -1529,7 +1539,7 @@ class SetupWorkbench extends ConfigurationItem {
 			if !hasTask {
 				hasTask := true
 
-				PeriodicTask(startupCollector, 1000, kLowPriority).start()
+				PeriodicTask(startupCollector, 2000, kLowPriority).start()
 			}
 		}
 	}

@@ -1,4 +1,4 @@
-## 5.9.2.0-release 10/04/24 (planned)
+## 5.9.2.0-release 10/04/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a critical bug for iRacing, which disabled the Spotter proximity alerts and flag warnings. Was *introduced* with the telemetry support 2 weeks ago.

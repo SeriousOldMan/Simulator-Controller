@@ -249,6 +249,8 @@ initializeGIFViewer() {
 		control.Start := (*) => viewer.GIF.Play()
 		control.Stop := (*) => viewer.GIF.Pause()
 		control.Reset := (*) => viewer.GIF.Reset()
+		control.Show := (*) => control.Visible := true
+		control.Hide := (*) => control.Visible := false
 
 		return control
 	}

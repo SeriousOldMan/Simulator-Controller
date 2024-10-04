@@ -2209,7 +2209,7 @@ class TeamCenter extends ConfigurationItem {
 			this.iWaitViewer := centerGui.Add("HTMLViewer", "x1323 yp-8 w30 h30 X:Move vwaitViewer Hidden")
 
 			this.iWaitViewer.document.open()
-			this.iWaitViewer.document.write("<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . (kResourcesDirectory . "Wait.gif") . "' width=28 height=28 border=0 padding=0></body></html>")
+			this.iWaitViewer.document.write("<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . (kResourcesDirectory . "Wait.gif" . Random(1, 10000)) . "' width=28 height=28 border=0 padding=0></body></html>")
 			this.iWaitViewer.document.close()
 
 			centerGui.SetFont("s8 Norm", "Arial")
@@ -2239,7 +2239,7 @@ class TeamCenter extends ConfigurationItem {
 			this.iWaitViewer := centerGui.Add("HTMLViewer", "x580 yp-8 w30 h30 X:Move vwaitViewer Hidden")
 
 			this.iWaitViewer.document.open()
-			this.iWaitViewer.document.write("<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . (kResourcesDirectory . "Wait.gif") . "' width=28 height=28 border=0 padding=0></body></html>")
+			this.iWaitViewer.document.write("<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . (kResourcesDirectory . "Wait.gif?" . Random(1, 10000)) . "' width=28 height=28 border=0 padding=0></body></html>")
 			this.iWaitViewer.document.close()
 		}
 

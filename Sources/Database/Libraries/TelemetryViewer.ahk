@@ -883,9 +883,9 @@ class TelemetryViewer {
 
 		this.iCollectingNotifier := viewerGui.Add("HTMLViewer", "x426 yp+9 w30 h30 vcollectingNotifier Hidden")
 
-		this.iCollectingNotifier.document.open()
-		this.iCollectingNotifier.document.write("<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . (kResourcesDirectory . "Wait.gif") . "' width=28 height=28 border=0 padding=0></body></html>")
-		this.iCollectingNotifier.document.close()
+		this.CollectingNotifier.document.open()
+		this.CollectingNotifier.document.write("<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'> </body></html>")
+		this.CollectingNotifier.document.close()
 
 		viewerGui.Add("Text", "x16 yp+19 w80", translate("Reference"))
 		viewerGui.Add("DropDownList", "x98 yp-4 w250 Choose1 vreferenceLapDropDown", concatenate([translate("None")], collect(this.Laps, (l) => this.lapLabel(l)))).OnEvent("Change", chooseReferenceLap)
@@ -993,6 +993,10 @@ class TelemetryViewer {
 			this.iTelemetryCollector.startup()
 
 			this.CollectingNotifier.show()
+
+			this.CollectingNotifier.document.open()
+			this.CollectingNotifier.document.write("<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . (kResourcesDirectory . "Wait.gif?" . Random(1, 10000)) . "' width=28 height=28 border=0 padding=0></body></html>")
+			this.CollectingNotifier.document.close()
 		}
 	}
 

@@ -1481,6 +1481,9 @@ class SetupWorkbench extends ConfigurationItem {
 		local lastSimulator := false
 		local lastTrack := false
 
+		static lastActiveSimulator := false
+		static lastActiveTrack := false
+
 		static hasTask := false
 
 		startupCollector() {
@@ -1493,7 +1496,8 @@ class SetupWorkbench extends ConfigurationItem {
 					this.TelemetryViewer.shutdownCollector()
 
 					if (lastSimulator || lastTrack) {
-						deleteDirectory(kTempDirectory . "Garage\Telemetry", false)
+						if ((lastActiveSimulator != simulator) || (lastActiveTrack != track))
+							deleteDirectory(kTempDirectory . "Garage\Telemetry", false)
 
 						this.TelemetryViewer.restart(kTempDirectory . "Garage\Telemetry", true)
 					}
@@ -1519,6 +1523,8 @@ class SetupWorkbench extends ConfigurationItem {
 					if (trackLength > 0) {
 						lastSimulator := simulator
 						lastTrack := track
+						lastActiveSimulator := simulator
+						lastActiveTrack := track
 
 						this.TelemetryViewer.startupCollector(simulator, track, trackLength)
 					}
@@ -1547,11 +1553,13 @@ class SetupWorkbench extends ConfigurationItem {
 		if this.TelemetryViewer
 			WinActivate(this.TelemetryViewer.Window)
 		else {
-			DirCreate(kTempDirectory . "Garage")
+			if ((lastActiveSimulator != this.SelectedSimulator[false]) || (lastActiveTrack != this.SelectedTrack[false])) {
+				DirCreate(kTempDirectory . "Garage")
 
-			deleteDirectory(kTempDirectory . "Garage\Telemetry")
+				deleteDirectory(kTempDirectory . "Garage\Telemetry")
 
-			DirCreate(kTempDirectory . "Garage\Telemetry")
+				DirCreate(kTempDirectory . "Garage\Telemetry")
+			}
 
 			this.iTelemetryViewer := TelemetryViewer(this, kTempDirectory . "Garage\Telemetry", true)
 

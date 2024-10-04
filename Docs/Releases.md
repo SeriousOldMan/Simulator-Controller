@@ -1,3 +1,6 @@
+## 5.9.2.2-release 10/04/24
+  1. Fixed a critical bug which prevented the Strategist to announce an upcoming weather change.
+
 ## 5.9.2.1-release 10/04/24
   1. Fixed a critical bug which prevented the acquisition of standings data from the simulator.
 

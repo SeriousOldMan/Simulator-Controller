@@ -320,7 +320,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		lastLap := lap
 
 		if (restart || !this.iPositionsDataFuture)
-			this.iPositionsDataFuture := ACCUDPProvider.getPositionsDataFuture(restart)
+			this.iPositionsDataFuture := this.UDPProvider.getPositionsDataFuture(restart)
 
 		try {
 			positionsData := this.iPositionsDataFuture.PositionsData

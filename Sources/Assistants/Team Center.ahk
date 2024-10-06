@@ -1937,10 +1937,12 @@ class TeamCenter extends ConfigurationItem {
 
 			copyPressure(driver, compound, pressures, *) {
 				local chosen := inList(collect(concatenate(["No Tyre Change"], center.TyreCompounds), translate), compound)
+kkk
+				if chosen
+					centerGui["pitstopTyreCompoundDropDown"].Choose(chosen)
 
 				pressures := string2Values(",", pressures)
 
-				centerGui["pitstopTyreCompoundDropDown"].Choose((chosen == 0) ? 1 : chosen)
 				centerGui["pitstopPressureFLEdit"].Text := pressures[1]
 				centerGui["pitstopPressureFREdit"].Text := pressures[2]
 				centerGui["pitstopPressureRLEdit"].Text := pressures[3]
@@ -7025,7 +7027,7 @@ class TeamCenter extends ConfigurationItem {
 
 	updateStint(stint) {
 		local laps, numLaps, lapTimes, airTemperatures, trackTemperatures
-		local ignore, lap, consumption, weather, row, raceData
+		local ignore, lap, consumption, weather, row, raceData, theLap
 
 		stint.FuelConsumption := 0.0
 		stint.Accidents := 0
@@ -7059,10 +7061,17 @@ class TeamCenter extends ConfigurationItem {
 			airTemperatures.Push(lap.AirTemperature)
 			trackTemperatures.Push(lap.TrackTemperature)
 
-			if (A_Index == 1) {
+			if (stint.Compund != lap.Compound) {
 				stint.Compound := lap.Compound
 				stint.TyreSet := lap.TyreSet
 
+				for ignore, theLap in stint.Laps {
+					theLap.Compound := lap.Compound
+					theLap.TyreSet := lap.TyreSet
+				}
+			}
+
+			if (A_Index == 1) {
 				if (stint.Nr = 1) {
 					this.ReportViewer.loadReportData(false, &raceData := true, &ignore := false, &ignore := false, &ignore := false)
 

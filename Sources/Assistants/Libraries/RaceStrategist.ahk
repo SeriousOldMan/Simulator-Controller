@@ -3068,7 +3068,7 @@ class RaceStrategist extends GridRaceAssistant {
 	betterScenario(strategy, scenario, &report := true, extended := true) {
 		local knowledgeBase := this.KnowledgeBase
 		local sPitstops, cPitstops, sLaps, cLaps, sDuration, cDuration, sFuel, cFuel, sPLaps, cPLaps, sTLaps, cTLaps, sTSets, cTSets
-		local result
+		local result, ignore, pitstop, nextPitstop, maxLap
 
 		pitstopLaps(strategy, skip := 0) {
 			local laps := 0
@@ -3159,8 +3159,17 @@ class RaceStrategist extends GridRaceAssistant {
 			logMessage(kLogDebug, "Candidate Pitstop Laps: " . cPLaps)
 		}
 
-		if (cPitstops && sPitstops && !knowledgeBase.getValue("Pitstop.Last", false) && (strategy.Pitstops[1] > scenario.strategy.Pitstops[1]))
-			return true
+		if (cPitstops && sPitstops) {
+			; Current strategy exceeds stint timer
+
+			nextPitstop := (knowledgeBase.getValue("Pitstop.Last", 0) + 1)
+			maxLap := (knowledgeBase.getValue("Lap") + Floor(((strategy.StintLength * 60) - scenario.StintStartTime) / scenario.AvgLapTime))
+
+			for ignore, pitstop in strategy.Pitstops
+				if (nextPitstop = pitstop.Nr)
+					if ((pitstop.Lap >= maxLap) && (scenario.Pitstops[1].Lap < pitstop.Lap))
+						return true
+		}
 
 		; Negative => Better, Positive => Worse
 

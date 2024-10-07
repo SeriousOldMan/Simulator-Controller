@@ -1641,7 +1641,7 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 
 		this.updateConfigurationValues({LearningLaps: getMultiMapValue(configuration, "Race Strategist Analysis", this.Simulator . ".LearningLaps", 1)
-									  , SessionReportsDatabase: getMultiMapValue(configuration, "Race Strategist Reports", "Database", false)
+									  , SessionReportsDatabase: normalizeDirectoryPath(getMultiMapValue(configuration, "Race Strategist Reports", "Database", false))
 									  , CollectTelemetry: this.collectTelemetryData()
 									  , SaveTelemetry: getMultiMapValue(configuration, "Race Strategist Shutdown", this.Simulator . ".SaveTelemetry", kAlways)
 									  , SaveRaceReport: getMultiMapValue(configuration, "Race Strategist Shutdown", this.Simulator . ".SaveRaceReport", kNever)
@@ -2708,7 +2708,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if strategy {
 			initialStint := (Task.CurrentTask.Pitstops.Length + 1)
 			initialLap := Task.CurrentTask.Lap
-			initialStintTime := Ceil(strategy.StintLength - (knowledgeBase.getValue("Driver.Time.Stint.Remaining") / 60000))
+			initialStintTime := Ceil((strategy.StintLength * 60) - (knowledgeBase.getValue("Driver.Time.Stint.Remaining") / 1000))
 
 			telemetryDB := Task.CurrentTask.TelemetryDatabase
 
@@ -3158,6 +3158,9 @@ class RaceStrategist extends GridRaceAssistant {
 			logMessage(kLogDebug, "Candidate Tyre Sets: " . cTSets)
 			logMessage(kLogDebug, "Candidate Pitstop Laps: " . cPLaps)
 		}
+
+		if (cPitstops && sPitstops && !knowledgeBase.getValue("Pitstop.Last", false) && (strategy.Pitstops[1] > scenario.strategy.Pitstops[1]))
+			return true
 
 		; Negative => Better, Positive => Worse
 

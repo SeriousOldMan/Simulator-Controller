@@ -1,9 +1,9 @@
 [Development]
 Version=5.9.3.0-dev
 Target=5.9.3.0-release
-Date=10/06/2024
+Date=10/07/2024
 Download=
-Changes=Updated car meta data for R3E, Fixed selection of start stint pressures in "Team Center"
+Changes=Updated car meta data for R3E, Fixed selection of start stint pressures in "Team Center", Fixed an error in strategy simulation which did not respect the stint timer
 Components=Media->5.6.1,Configuration->5.9.1,Utilities->5.9.1
 [Release]
 Version=5.9.2.2-release

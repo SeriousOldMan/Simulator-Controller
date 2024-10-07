@@ -1937,7 +1937,7 @@ class TeamCenter extends ConfigurationItem {
 
 			copyPressure(driver, compound, pressures, *) {
 				local chosen := inList(collect(concatenate(["No Tyre Change"], center.TyreCompounds), translate), compound)
-kkk
+
 				if chosen
 					centerGui["pitstopTyreCompoundDropDown"].Choose(chosen)
 
@@ -7061,7 +7061,7 @@ kkk
 			airTemperatures.Push(lap.AirTemperature)
 			trackTemperatures.Push(lap.TrackTemperature)
 
-			if (stint.Compund != lap.Compound) {
+			if (stint.Compound != lap.Compound) {
 				stint.Compound := lap.Compound
 				stint.TyreSet := lap.TyreSet
 

@@ -917,7 +917,7 @@ startupRaceReports() {
 	local simulator := getMultiMapValue(settings, "Race Reports", "Simulator", false)
 	local car := getMultiMapValue(settings, "Race Reports", "Car", false)
 	local track := getMultiMapValue(settings, "Race Reports", "Track", false)
-	local reportsDirectory := getMultiMapValue(kSimulatorConfiguration, "Race Strategist Reports", "Database", false)
+	local reportsDirectory := normalizeDirectoryPath(getMultiMapValue(kSimulatorConfiguration, "Race Strategist Reports", "Database", false))
 	local index := 1
 	local reports, simulators, cars, tracks, msgResult
 

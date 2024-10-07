@@ -617,7 +617,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 	}
 
 	createRaceReport(targetDirectory := false) {
-		local reportsDirectory := getMultiMapValue(this.Configuration, "Race Strategist Reports", "Database", false)
+		local reportsDirectory := normalizeDirectoryPath(getMultiMapValue(this.Configuration, "Race Strategist Reports", "Database", false))
 		local teamServer, session, runningLap, raceInfo, count, pitstops, lapData, data, key, value
 		local times, positions, laps, drivers, newLine, line, fileName, directory
 		local simulatorCode, carCode, trackCode

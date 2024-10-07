@@ -82,7 +82,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 	local task, ignore, identifier, type, which, contract
 	local dllFile, sessionDB, connection, administrationConfig
 	local x, y, w, h, width, x0, x1, w1, w2, x2, w4, x4, w3, x3, x4, x5, w5, x6, x7
-	local button, administrationTab, progress, compacting
+	local button, administrationTab, compacting
 	local serverURLs, chosen
 
 	static administrationGui
@@ -656,41 +656,23 @@ administrationEditor(configurationOrCommand, arguments*) {
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "Yes")
-					try {
-						progress := 0
-
-						showProgress({color: "Green", title: translate("Compacting Database")})
-
+					withTask(WorkingTask(translate("Compacting Database")), () {
 						try {
 							connector.CompactDatabase()
 
 							loop {
 								Sleep(1000)
 
-								showProgress({progress: progress++})
-
-								if (progress > 100)
-									progress := 0
-
 								compacting := connector.CompactingDatabase()
 							}
 							until (!compacting || (compacting = kFalse))
-
-							while (progress < 100) {
-								showProgress({progress: progress++})
-
-								Sleep(100)
-							}
 						}
-						finally {
-							hideProgress()
+						catch Any as exception {
+							logError(exception, true)
 						}
-					}
-					catch Any as exception {
-						logError(exception, true)
-					}
 
-				loadObjects(connector, objectsListView)
+						loadObjects(connector, objectsListView)
+					})
 			}
 		}
 		catch Any as exception {

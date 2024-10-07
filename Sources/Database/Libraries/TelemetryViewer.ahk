@@ -1233,8 +1233,11 @@ class TelemetryViewer {
 
 			if isNumber(lap)
 				fileName := (dirName . "\Lap " . lap)
-			else
-				fileName := (lap[1] . translate(" (") . lap[2] . translate(")"))
+			else {
+				SplitPath(lap[1], , , , &newFileName)
+
+				fileName := (dirName . "\" . newFileName . translate(" (") . lap[2] . translate(")"))
+			}
 
 			newFileName := (fileName . ".telemetry")
 
@@ -1275,7 +1278,7 @@ class TelemetryViewer {
 							if isNumber(lap)
 								driver := SessionDatabase.ID
 							else {
-								driver := SessionDatabase.getDriverID(simulator, car, track, lap[2])
+								driver := SessionDatabase.getDriverID(simulator, lap[2])
 
 								if !driver
 									driver := SessionDatabase.ID

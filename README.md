@@ -117,6 +117,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 28. [Extending and customizing Assistants using GPT](https://youtu.be/IVlF7RrKfoI) - You will learn how to define your own events and actions to be used by an LLM to create custom behavior or change existing behavior.
 
+29. [Managing telemetry data](https://youtu.be/h_WOf4mpWiA) - This video demonstrates the telemetry data system and shows how the different applications collect telemetry and what you can do with it.
+
 This list will be extended from time to time to cover new functionalities.
 
 ### Discord Community

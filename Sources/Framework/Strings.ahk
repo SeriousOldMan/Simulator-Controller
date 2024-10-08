@@ -80,15 +80,24 @@ substituteVariables(text, values := false) {
 					else if isObject
 						value := (values && values.HasProp(variable)) ? values.%variable% : %variable%
 					else
-						value := %variable%
+						try {
+							value := %variable%
+						}
+						catch Any as exception {
+							logMessage(kLogCritical, "Variable " . variable . " not found in `"" . text . "`"")
+
+							logError(exception, true)
+
+							value := ""
+						}
 
 					result := StrReplace(result, "%" . variable . "%", value)
 				}
 				else
-					throw "Second % not found while scanning (" . text . ") for variables in substituteVariables..."
+					throw "Second % not found while scanning `"" . text . "`" for variables in substituteVariables..."
 			}
 			catch Any as exception {
-				logError(exception)
+				logError(exception, true)
 			}
 		}
 		else

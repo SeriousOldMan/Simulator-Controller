@@ -176,11 +176,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				this.iRedraw := false
 
-				if (editor.SelectedModule = "Automation") {
+				if (editor.SelectedModule = "Automation")
 					editor.updateTrackMap()
 
-					WinRedraw(this.Window)
-				}
+				WinRedraw(this.Window)
 			}
 
 			return Task.CurrentTask
@@ -1391,7 +1390,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				simulator := 1
 		}
 
-		editorGui.Add("DropDownList", "x100 yp w170 vsimulatorDropDown Choose" . simulator, simulators).OnEvent("Change", chooseSimulator)
+		editorGui.Add("DropDownList", "x100 yp w170 W:Grow(0.2) vsimulatorDropDown Choose" . simulator, simulators).OnEvent("Change", chooseSimulator)
 
 		if (simulator > 0)
 			simulator := simulators[simulator]
@@ -1399,10 +1398,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			simulator := false
 
 		editorGui.Add("Text", "x16 yp+24 w80 h23 +0x200", translate("Car"))
-		editorGui.Add("DropDownList", "x100 yp w170 vcarDropDown Choose1", [translate("All")]).OnEvent("Change", chooseCar)
+		editorGui.Add("DropDownList", "x100 yp w170 W:Grow(0.2) vcarDropDown Choose1", [translate("All")]).OnEvent("Change", chooseCar)
 
 		editorGui.Add("Text", "x16 yp+24 w80 h23 +0x200", translate("Track"))
-		editorGui.Add("DropDownList", "x100 yp w170 vtrackDropDown Choose1", [translate("All")]).OnEvent("Change", chooseTrack)
+		editorGui.Add("DropDownList", "x100 yp w170 W:Grow(0.2) vtrackDropDown Choose1", [translate("All")]).OnEvent("Change", chooseTrack)
 
 		editorGui.Add("Text", "x16 yp+24 w80 h23 +0x200", translate("Weather"))
 
@@ -1415,13 +1414,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			chosen := 1
 		}
 
-		editorGui.Add("DropDownList", "x100 yp w170 vweatherDropDown Choose" . chosen, choices).OnEvent("Change", chooseWeather)
+		editorGui.Add("DropDownList", "x100 yp w170 W:Grow(0.2) vweatherDropDown Choose" . chosen, choices).OnEvent("Change", chooseWeather)
 
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x280 ys w30 h30 Section", this.themeIcon(kIconsDirectory . "Report.ico"))
-		editorGui.Add("Text", "xp+34 yp+5 w180 h26 W:Grow", translate("Notes"))
+		editorGui.Add("Picture", "x280 ys w30 h30 X:Move(0.2) Section", this.themeIcon(kIconsDirectory . "Report.ico"))
+		editorGui.Add("Text", "xp+34 yp+5 w180 h26 X:Move(0.2) W:Grow(0.8)", translate("Notes"))
 
 		button := editorGui.Add("Button", "x647 yp w23 h23 X:Move")
 		button.OnEvent("Click", showSettings)
@@ -1429,7 +1428,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui.SetFont("s8 Norm", "Arial")
 
-		editorGui.Add("Edit", "x280 yp+32 w390 h94 W:Grow vnotesEdit").OnEvent("Change", updateNotes)
+		editorGui.Add("Edit", "x280 yp+32 w390 h94 X:Move(0.2) W:Grow(0.8) vnotesEdit").OnEvent("Change", updateNotes)
 
 		editorGui.Add("Text", "x16 yp+104 w654 W:Grow 0x10")
 
@@ -1437,69 +1436,69 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("s10 Bold", "Arial")
 
 		editorGui.Add("Picture", "x16 yp+12 w30 h30 Section vsettingsImg1", this.themeIcon(kIconsDirectory . "General Settings.ico")).OnEvent("Click", chooseTab.Bind("Settings"))
-		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab1", translate("Race Settings")).OnEvent("Click", chooseTab.Bind("Settings"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 W:Grow(0.2) vsettingsTab1", translate("Race Settings")).OnEvent("Click", chooseTab.Bind("Settings"))
 
-		editorGui.Add("Text", "x16 yp+32 w267 0x10")
+		editorGui.Add("Text", "x16 yp+32 w267 W:Grow(0.2) 0x10")
 
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
 		editorGui.Add("Picture", "x16 yp+12 w30 h30 vsettingsImg2", this.themeIcon(kIconsDirectory . "Sessions.ico")).OnEvent("Click", chooseTab.Bind("Sessions"))
-		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab2", translate("Sessions")).OnEvent("Click", chooseTab.Bind("Sessions"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 W:Grow(0.2) vsettingsTab2", translate("Sessions")).OnEvent("Click", chooseTab.Bind("Sessions"))
 
-		editorGui.Add("Text", "x16 yp+32 w267 0x10")
+		editorGui.Add("Text", "x16 yp+32 w267 W:Grow(0.2) 0x10")
 
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
 		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg3", this.themeIcon(kIconsDirectory . "Tacho.ico")).OnEvent("Click", chooseTab.Bind("Laps"))
-		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab3", translate("Laps")).OnEvent("Click", chooseTab.Bind("Laps"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 W:Grow(0.2) vsettingsTab3", translate("Laps")).OnEvent("Click", chooseTab.Bind("Laps"))
 
-		editorGui.Add("Text", "x16 yp+32 w267 0x10")
+		editorGui.Add("Text", "x16 yp+32 w267 W:Grow(0.2) 0x10")
 
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
 		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg4", this.themeIcon(kIconsDirectory . "Strategy.ico")).OnEvent("Click", chooseTab.Bind("Strategies"))
-		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab4", translate("Strategies")).OnEvent("Click", chooseTab.Bind("Strategies"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 W:Grow(0.2) vsettingsTab4", translate("Strategies")).OnEvent("Click", chooseTab.Bind("Strategies"))
 
-		editorGui.Add("Text", "x16 yp+32 w267 0x10")
+		editorGui.Add("Text", "x16 yp+32 w267 W:Grow(0.2) 0x10")
 
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
 		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg5", this.themeIcon(kIconsDirectory . "Tools BW.ico")).OnEvent("Click", chooseTab.Bind("Setups"))
-		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab5", translate("Setups")).OnEvent("Click", chooseTab.Bind("Setups"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 W:Grow(0.2) vsettingsTab5", translate("Setups")).OnEvent("Click", chooseTab.Bind("Setups"))
 
-		editorGui.Add("Text", "x16 yp+32 w267 0x10")
+		editorGui.Add("Text", "x16 yp+32 w267 W:Grow(0.2) 0x10")
 
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
 		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg6", this.themeIcon(kIconsDirectory . "Pressure.ico")).OnEvent("Click", chooseTab.Bind("Pressures"))
-		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab6", translate("Tyre Pressures")).OnEvent("Click", chooseTab.Bind("Pressures"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 W:Grow(0.2) vsettingsTab6", translate("Tyre Pressures")).OnEvent("Click", chooseTab.Bind("Pressures"))
 
-		editorGui.Add("Text", "x16 yp+32 w267 0x10")
+		editorGui.Add("Text", "x16 yp+32 w267 W:Grow(0.2) 0x10")
 
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
 		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg7", this.themeIcon(kIconsDirectory . "Road.ico")).OnEvent("Click", chooseTab.Bind("Automation"))
-		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab7", translate("Automations")).OnEvent("Click", chooseTab.Bind("Automation"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 W:Grow(0.2) vsettingsTab7", translate("Automations")).OnEvent("Click", chooseTab.Bind("Automation"))
 
-		editorGui.Add("Text", "x16 yp+32 w267 0x10")
+		editorGui.Add("Text", "x16 yp+32 w267 W:Grow(0.2) 0x10")
 
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
 		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg8", this.themeIcon(kIconsDirectory . "Sensor.ico")).OnEvent("Click", chooseTab.Bind("Data"))
-		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab8", translate("Administration")).OnEvent("Click", chooseTab.Bind("Data"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 W:Grow(0.2) vsettingsTab8", translate("Administration")).OnEvent("Click", chooseTab.Bind("Data"))
 
-		editorGui.Add("Text", "x16 yp+32 w267 0x10")
+		editorGui.Add("Text", "x16 yp+32 w267 W:Grow(0.2) 0x10")
 
 		editorGui.SetFont("s8 Norm", "Arial")
 
-		editorGui.Add("Picture", "x280 ys-2 w390 h554 Border W:Grow H:Grow")
+		editorGui.Add("Picture", "x280 ys-2 w390 h554 Border X:Move(0.2) W:Grow(0.8) H:Grow")
 
 		tabs := collect(["Settings", "Session", "Laps", "Stratgies", "Setups", "Pressures", "Automation", "Data"], translate)
 
@@ -1507,18 +1506,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui["settingsTab"].UseTab(1)
 
-		this.iSettingsListView := editorGui.Add("ListView", "x296 ys w360 h413 H:Grow W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Setting", "Value"], translate))
+		this.iSettingsListView := editorGui.Add("ListView", "x296 ys w360 h413 H:Grow X:Move(0.2) W:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Setting", "Value"], translate))
 		this.iSettingsListView.OnEvent("Click", chooseSetting)
 		this.iSettingsListView.OnEvent("DoubleClick", chooseSetting)
 		this.iSettingsListView.OnEvent("ItemSelect", navSetting)
 
-		editorGui.Add("Text", "x296 yp+419 w80 h23 Y:Move +0x200", translate("Setting"))
-		editorGui.Add("DropDownList", "xp+90 yp w270 Y:Move W:Grow vsettingDropDown").OnEvent("Change", selectSetting)
+		editorGui.Add("Text", "x296 yp+419 w80 h23 X:Move(0.2) Y:Move +0x200", translate("Setting"))
+		editorGui.Add("DropDownList", "xp+90 yp w270 Y:Move X:Move(0.2) W:Grow(0.8) vsettingDropDown").OnEvent("Change", selectSetting)
 
-		editorGui.Add("Text", "x296 yp+24 w80 h23 Y:Move +0x200", translate("Value"))
+		editorGui.Add("Text", "x296 yp+24 w80 h23 X:Move(0.2) Y:Move +0x200", translate("Value"))
 		editorGui.Add("DropDownList", "xp+90 yp w180 Y:Move vsettingValueDropDown").OnEvent("Change", changeSetting)
-		editorGui.Add("Edit", "xp yp w50 Y:Move vsettingValueEdit").OnEvent("Change", changeSetting)
-		editorGui.Add("Edit", "xp yp w210 h57 Y:Move W:Grow vsettingValueText").OnEvent("Change", changeSetting)
+		editorGui.Add("Edit", "xp yp w50 X:Move(0.2) Y:Move vsettingValueEdit").OnEvent("Change", changeSetting)
+		editorGui.Add("Edit", "xp yp w210 h57 Y:Move X:Move(0.2) W:Grow(0.8) vsettingValueText").OnEvent("Change", changeSetting)
 		editorGui.Add("CheckBox", "xp yp+4 Y:Move vsettingValueCheck").OnEvent("Click", changeSetting)
 
 		editorGui.Add("Button", "x606 yp+30 w23 h23 X:Move Y:Move vaddSettingButton").OnEvent("Click", addSetting)
@@ -1526,14 +1525,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		setButtonIcon(editorGui["addSettingButton"], kIconsDirectory . "Plus.ico", 1)
 		setButtonIcon(editorGui["deleteSettingButton"], kIconsDirectory . "Minus.ico", 1)
 
-		editorGui.Add("Button", "x296 yp+30 w90 h23 Y:Move vexportSettingsButton", translate("Export...")).OnEvent("Click", exportSettings)
-		editorGui.Add("Button", "xp+95 yp w90 h23 Y:Move vimportSettingsButton", translate("Import...")).OnEvent("Click", importSettings)
+		editorGui.Add("Button", "x296 yp+30 w90 h23 X:Move(0.2) Y:Move vexportSettingsButton", translate("Export...")).OnEvent("Click", exportSettings)
+		editorGui.Add("Button", "xp+95 yp w90 h23 X:Move(0.2) Y:Move vimportSettingsButton", translate("Import...")).OnEvent("Click", importSettings)
 
 		editorGui.Add("Button", "x574 yp w80 h23 Y:Move X:Move", translate("Test...")).OnEvent("Click", testSettings)
 
 		editorGui["settingsTab"].UseTab(2)
 
-		this.iSessionListView := editorGui.Add("ListView", "x296 ys w360 h433 H:Grow W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Category", "Name"], translate))
+		this.iSessionListView := editorGui.Add("ListView", "x296 ys w360 h433 H:Grow X:Move(0.2) W:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Category", "Name"], translate))
 		this.iSessionListView.OnEvent("Click", chooseSession)
 		this.iSessionListView.OnEvent("DoubleClick", openSession)
 		this.iSessionListView.OnEvent("ItemSelect", navSession)
@@ -1543,12 +1542,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		setButtonIcon(editorGui["renameSessionButton"], kIconsDirectory . "Pencil.ico", 1)
 		setButtonIcon(editorGui["deleteSessionButton"], kIconsDirectory . "Minus.ico", 1)
 
-		editorGui.Add("Text", "x296 yp w80 h23 Y:Move +0x200", translate("Share"))
-		editorGui.Add("CheckBox", "xp+90 yp+4 w140 Y:Move vshareSessionWithTeamServerCheck", translate("on Team Server")).OnEvent("Click", updateSessionAccess)
+		editorGui.Add("Text", "x296 yp w80 h23 X:Move(0.2) Y:Move +0x200", translate("Share"))
+		editorGui.Add("CheckBox", "xp+90 yp+4 w140 X:Move(0.2) Y:Move vshareSessionWithTeamServerCheck", translate("on Team Server")).OnEvent("Click", updateSessionAccess)
 
 		editorGui["settingsTab"].UseTab(3)
 
-		this.iTelemetryListView := editorGui.Add("ListView", "x296 ys w360 h433 H:Grow W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
+		this.iTelemetryListView := editorGui.Add("ListView", "x296 ys w360 h433 H:Grow X:Move(0.2) W:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
 		this.iTelemetryListView.OnEvent("Click", chooseTelemetry)
 		this.iTelemetryListView.OnEvent("DoubleClick", openTelemetry)
 		this.iTelemetryListView.OnEvent("ItemSelect", navTelemetry)
@@ -1562,13 +1561,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		setButtonIcon(editorGui["renameTelemetryButton"], kIconsDirectory . "Pencil.ico", 1)
 		setButtonIcon(editorGui["deleteTelemetryButton"], kIconsDirectory . "Minus.ico", 1)
 
-		editorGui.Add("Text", "x296 yp w80 h23 Y:Move +0x200", translate("Share"))
-		editorGui.Add("CheckBox", "xp+90 yp+4 w140 Y:Move vshareTelemetryWithCommunityCheck", translate("with Community")).OnEvent("Click", updateTelemetryAccess)
-		editorGui.Add("CheckBox", "x386 yp+24 w140 Y:Move vshareTelemetryWithTeamServerCheck", translate("on Team Server")).OnEvent("Click", updateTelemetryAccess)
+		editorGui.Add("Text", "x296 yp w80 h23 X:Move(0.2) Y:Move +0x200", translate("Share"))
+		editorGui.Add("CheckBox", "xp+90 yp+4 w140 X:Move(0.2) Y:Move vshareTelemetryWithCommunityCheck", translate("with Community")).OnEvent("Click", updateTelemetryAccess)
+		editorGui.Add("CheckBox", "x386 yp+24 w140 X:Move(0.2) Y:Move vshareTelemetryWithTeamServerCheck", translate("on Team Server")).OnEvent("Click", updateTelemetryAccess)
 
 		editorGui["settingsTab"].UseTab(4)
 
-		this.iStrategyListView := editorGui.Add("ListView", "x296 ys w360 h433 H:Grow W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
+		this.iStrategyListView := editorGui.Add("ListView", "x296 ys w360 h433 H:Grow X:Move(0.2) W:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
 		this.iStrategyListView.OnEvent("Click", chooseStrategy)
 		this.iStrategyListView.OnEvent("DoubleClick", openStrategy)
 		this.iStrategyListView.OnEvent("ItemSelect", navStrategy)
@@ -1582,17 +1581,17 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		setButtonIcon(editorGui["renameStrategyButton"], kIconsDirectory . "Pencil.ico", 1)
 		setButtonIcon(editorGui["deleteStrategyButton"], kIconsDirectory . "Minus.ico", 1)
 
-		editorGui.Add("Text", "x296 yp w80 h23 Y:Move +0x200", translate("Share"))
-		editorGui.Add("CheckBox", "xp+90 yp+4 w140 Y:Move vshareStrategyWithCommunityCheck", translate("with Community")).OnEvent("Click", updateStrategyAccess)
-		editorGui.Add("CheckBox", "x386 yp+24 w140 Y:Move vshareStrategyWithTeamServerCheck", translate("on Team Server")).OnEvent("Click", updateStrategyAccess)
+		editorGui.Add("Text", "x296 yp w80 h23 X:Move(0.2) Y:Move +0x200", translate("Share"))
+		editorGui.Add("CheckBox", "xp+90 yp+4 w140 X:Move(0.2) Y:Move vshareStrategyWithCommunityCheck", translate("with Community")).OnEvent("Click", updateStrategyAccess)
+		editorGui.Add("CheckBox", "x386 yp+24 w140 X:Move(0.2) Y:Move vshareStrategyWithTeamServerCheck", translate("on Team Server")).OnEvent("Click", updateStrategyAccess)
 
 		editorGui["settingsTab"].UseTab(5)
 
-		editorGui.Add("Text", "x296 ys w80 h23 +0x200", translate("Purpose"))
-		editorGui.Add("DropDownList", "xp+90 yp w270 W:Grow Choose2 vsetupTypeDropDown"
+		editorGui.Add("Text", "x296 ys w80 h23 +0x200 X:Move(0.2)", translate("Purpose"))
+		editorGui.Add("DropDownList", "xp+90 yp w270 X:Move(0.2) W:Grow(0.8) Choose2 vsetupTypeDropDown"
 					, collect(["Qualifying (Dry)", "Race (Dry)", "Qualifying (Wet)", "Race (Wet)"], translate)).OnEvent("Change", chooseSetupType)
 
-		this.iSetupListView := editorGui.Add("ListView", "x296 yp+24 w360 h409 H:Grow W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
+		this.iSetupListView := editorGui.Add("ListView", "x296 yp+24 w360 h409 H:Grow X:Move(0.2) W:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
 		this.iSetupListView.OnEvent("Click", chooseSetup)
 		this.iSetupListView.OnEvent("DoubleClick", chooseSetup)
 		this.iSetupListView.OnEvent("ItemSelect", navSetup)
@@ -1608,83 +1607,83 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		setButtonIcon(editorGui["renameSetupButton"], kIconsDirectory . "Pencil.ico", 1)
 		setButtonIcon(editorGui["deleteSetupButton"], kIconsDirectory . "Minus.ico", 1)
 
-		editorGui.Add("Text", "x296 yp w80 h23 Y:Move +0x200", translate("Share"))
-		editorGui.Add("CheckBox", "xp+90 yp+4 w140 Y:Move vshareSetupWithCommunityCheck", translate("with Community")).OnEvent("Click", updateSetupAccess)
-		editorGui.Add("CheckBox", "x386 yp+24 w140 Y:Move vshareSetupWithTeamServerCheck", translate("on Team Server")).OnEvent("Click", updateSetupAccess)
+		editorGui.Add("Text", "x296 yp w80 h23 X:Move(0.2) Y:Move +0x200", translate("Share"))
+		editorGui.Add("CheckBox", "xp+90 yp+4 w140 X:Move(0.2) Y:Move vshareSetupWithCommunityCheck", translate("with Community")).OnEvent("Click", updateSetupAccess)
+		editorGui.Add("CheckBox", "x386 yp+24 w140 X:Move(0.2) Y:Move vshareSetupWithTeamServerCheck", translate("on Team Server")).OnEvent("Click", updateSetupAccess)
 
 		editorGui["settingsTab"].UseTab(6)
 
-		editorGui.Add("Text", "x296 ys w85 h23 +0x200", translate("Driver"))
-		editorGui.Add("DropDownList", "x386 yp w100 vdriverDropDown").OnEvent("Change", loadPressures)
+		editorGui.Add("Text", "x296 ys w85 h23 +0x200 X:Move(0.2)", translate("Driver"))
+		editorGui.Add("DropDownList", "x386 yp w100 X:Move(0.2) vdriverDropDown").OnEvent("Change", loadPressures)
 
-		editorGui.Add("Button", "x494 yp w22 h22 veditPressuresButton").OnEvent("Click", editPressures)
+		editorGui.Add("Button", "x494 yp w22 h22 X:Move(0.2) veditPressuresButton").OnEvent("Click", editPressures)
 		setButtonIcon(editorGui["editPressuresButton"], kIconsDirectory . "Pencil.ico", 1, "L2 T2 R2 B2")
 
-		editorGui.Add("Text", "x296 yp+24 w85 h23 +0x200", translate("Compound"))
-		editorGui.Add("DropDownList", "x386 yp w100 vtyreCompoundDropDown").OnEvent("Change", loadPressures)
+		editorGui.Add("Text", "x296 yp+24 w85 h23 +0x200 X:Move(0.2)", translate("Compound"))
+		editorGui.Add("DropDownList", "x386 yp w100 X:Move(0.2) vtyreCompoundDropDown").OnEvent("Change", loadPressures)
 
-		editorGui.Add("Edit", "x494 yp w40 -Background Number Limit2 vairTemperatureEdit"
+		editorGui.Add("Edit", "x494 yp w40 X:Move(0.2) -Background Number Limit2 vairTemperatureEdit"
 					, Round(convertUnit("Temperature", this.iAirTemperature))).OnEvent("Change", loadPressures)
-		editorGui.Add("UpDown", "xp+32 yp-2 w18 h20 Range0-99", Round(convertUnit("Temperature", this.iAirTemperature)))
-		editorGui.Add("Text", "xp+42 yp+2 w120 h23 +0x200", substituteVariables(translate("Temp. Air (%unit%)"), {unit: getUnit("Temperature", true)}))
+		editorGui.Add("UpDown", "xp+32 yp-2 w18 h20 X:Move(0.2) Range0-99", Round(convertUnit("Temperature", this.iAirTemperature)))
+		editorGui.Add("Text", "xp+42 yp+2 w120 h23 X:Move(0.2) +0x200", substituteVariables(translate("Temp. Air (%unit%)"), {unit: getUnit("Temperature", true)}))
 
-		editorGui.Add("Edit", "x494 yp+24 w40 -Background Number Limit2 vtrackTemperatureEdit"
+		editorGui.Add("Edit", "x494 yp+24 w40 X:Move(0.2) -Background Number Limit2 vtrackTemperatureEdit"
 					, Round(convertUnit("Temperature", this.iTrackTemperature))).OnEvent("Change", loadPressures)
-		editorGui.Add("UpDown", "xp+32 yp-2 w18 h20 Range0-99", Round(convertUnit("Temperature", this.iTrackTemperature)))
-		editorGui.Add("Text", "xp+42 yp+2 w120 h23 +0x200", substituteVariables(translate("Temp. Track (%unit%)"), {unit: getUnit("Temperature", true)}))
+		editorGui.Add("UpDown", "xp+32 yp-2 w18 h20 X:Move(0.2) Range0-99", Round(convertUnit("Temperature", this.iTrackTemperature)))
+		editorGui.Add("Text", "xp+42 yp+2 w120 h23 +0x200 X:Move(0.2)", substituteVariables(translate("Temp. Track (%unit%)"), {unit: getUnit("Temperature", true)}))
 
 		editorGui.SetFont("Norm", "Arial")
 		editorGui.SetFont("Bold Italic", "Arial")
 
-		editorGui.Add("Text", "x342 yp+30 w267 0x10")
-		editorGui.Add("Text", "x296 yp+10 w370 h20 Center BackgroundTrans", substituteVariables(translate("Pressures (%unit%)"), {unit: getUnit("Pressure")}))
+		editorGui.Add("Text", "x342 yp+30 w267 0x10 X:Move(0.2)")
+		editorGui.Add("Text", "x296 yp+10 w370 h20 X:Move(0.2) Center BackgroundTrans", substituteVariables(translate("Pressures (%unit%)"), {unit: getUnit("Pressure")}))
 
 		editorGui.SetFont("Norm", "Arial")
 
-		editorGui.Add("Text", "x296 yp+30 w85 h23 +0x200", translate("Front Left"))
-		editorGui.Add("Edit", "xp+90 yp w50 Disabled Center vflPressure1", displayValue("Float", 0.0))
-		editorGui.Add("Edit", "xp+54 yp w50 Disabled Center vflPressure2", displayValue("Float", 0.0))
-		editorGui.Add("Edit", "xp+54 yp w50 Center +Background vflPressure3", displayValue("Float", 0.0))
-		editorGui.Add("Edit", "xp+54 yp w50 Disabled Center vflPressure4", displayValue("Float", 0.0))
-		editorGui.Add("Edit", "xp+54 yp w50 Disabled Center vflPressure5", displayValue("Float", 0.0))
+		editorGui.Add("Text", "x296 yp+30 w85 h23 X:Move(0.2) +0x200", translate("Front Left"))
+		editorGui.Add("Edit", "xp+90 yp w50 X:Move(0.2) Disabled Center vflPressure1", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 X:Move(0.2) Disabled Center vflPressure2", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 X:Move(0.2) Center +Background vflPressure3", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 X:Move(0.2) Disabled Center vflPressure4", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 X:Move(0.2) Disabled Center vflPressure5", displayValue("Float", 0.0))
 
-		editorGui.Add("Text", "x296 yp+30 w85 h23 +0x200", translate("Front Right"))
-		editorGui.Add("Edit", "xp+90 yp w50 Disabled Center vfrPressure1", displayValue("Float", 0.0))
-		editorGui.Add("Edit", "xp+54 yp w50 Disabled Center vfrPressure2", displayValue("Float", 0.0))
-		editorGui.Add("Edit", "xp+54 yp w50 Center +Background vfrPressure3", displayValue("Float", 0.0))
-		editorGui.Add("Edit", "xp+54 yp w50 Disabled Center vfrPressure4", displayValue("Float", 0.0))
-		editorGui.Add("Edit", "xp+54 yp w50 Disabled Center vfrPressure5", displayValue("Float", 0.0))
+		editorGui.Add("Text", "x296 yp+30 w85 h23 +0x200 X:Move(0.2)", translate("Front Right"))
+		editorGui.Add("Edit", "xp+90 yp w50 X:Move(0.2) Disabled Center vfrPressure1", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 X:Move(0.2) Disabled Center vfrPressure2", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 X:Move(0.2) Center +Background vfrPressure3", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 X:Move(0.2) Disabled Center vfrPressure4", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 X:Move(0.2) Disabled Center vfrPressure5", displayValue("Float", 0.0))
 
-		editorGui.Add("Text", "x296 yp+30 w85 h23 +0x200", translate("Rear Left"))
-		editorGui.Add("Edit", "xp+90 yp w50 Disabled Center vrlPressure1", displayValue("Float", 0.0))
-		editorGui.Add("Edit", "xp+54 yp w50 Disabled Center vrlPressure2", displayValue("Float", 0.0))
-		editorGui.Add("Edit", "xp+54 yp w50 Center +Background vrlPressure3", displayValue("Float", 0.0))
-		editorGui.Add("Edit", "xp+54 yp w50 Disabled Center vrlPressure4", displayValue("Float", 0.0))
-		editorGui.Add("Edit", "xp+54 yp w50 Disabled Center vrlPressure5", displayValue("Float", 0.0))
+		editorGui.Add("Text", "x296 yp+30 w85 h23 +0x200 X:Move(0.2)", translate("Rear Left"))
+		editorGui.Add("Edit", "xp+90 yp w50 X:Move(0.2) Disabled Center vrlPressure1", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 X:Move(0.2) Disabled Center vrlPressure2", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 X:Move(0.2) Center +Background vrlPressure3", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 X:Move(0.2) Disabled Center vrlPressure4", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 X:Move(0.2) Disabled Center vrlPressure5", displayValue("Float", 0.0))
 
-		editorGui.Add("Text", "x296 yp+30 w85 h23 +0x200", translate("Rear Right"))
-		editorGui.Add("Edit", "xp+90 yp w50 Disabled Center vrrPressure1", displayValue("Float", 0.0))
-		editorGui.Add("Edit", "xp+54 yp w50 Disabled Center vrrPressure2", displayValue("Float", 0.0))
-		editorGui.Add("Edit", "xp+54 yp w50 Center +Background vrrPressure3", displayValue("Float", 0.0))
-		editorGui.Add("Edit", "xp+54 yp w50 Disabled Center vrrPressure4", displayValue("Float", 0.0))
-		editorGui.Add("Edit", "xp+54 yp w50 Disabled Center vrrPressure5", displayValue("Float", 0.0))
+		editorGui.Add("Text", "x296 yp+30 w85 h23 +0x200 X:Move(0.2)", translate("Rear Right"))
+		editorGui.Add("Edit", "xp+90 yp w50 X:Move(0.2) Disabled Center vrrPressure1", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 X:Move(0.2) Disabled Center vrrPressure2", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 X:Move(0.2) Center +Background vrrPressure3", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 X:Move(0.2) Disabled Center vrrPressure4", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 X:Move(0.2) Disabled Center vrrPressure5", displayValue("Float", 0.0))
 
-		editorGui.Add("Picture", "x440 yp+40 w158 h8 Center", kResourcesDirectory . "Icons\Pressures.png")
-		editorGui.Add("Text", "x440 yp+10 w80 h23 Left", translate("Exact"))
-		editorGui.Add("Text", "x518 yp w80 h23 Right", translate("Estimated"))
+		editorGui.Add("Picture", "x440 yp+40 w158 h8 X:Move(0.2) Center", kResourcesDirectory . "Icons\Pressures.png")
+		editorGui.Add("Text", "x440 yp+10 w80 h23 X:Move(0.2) Left", translate("Exact"))
+		editorGui.Add("Text", "x518 yp w80 h23 X:Move(0.2) Right", translate("Estimated"))
 
 		if this.RequestorPID
-			editorGui.Add("Button", "x440 yp+50 w80 h23 vtransferPressuresButton", translate("Load")).OnEvent("Click", transferPressures)
+			editorGui.Add("Button", "x440 yp+50 w80 h23 X:Move(0.2) vtransferPressuresButton", translate("Load")).OnEvent("Click", transferPressures)
 
 		editorGui["settingsTab"].UseTab(7)
 
 		this.iTrackDisplayArea := [297, 239, 358, 350]
 
-		editorGui.Add("Picture", "x296 y238 w360 h382 W:Grow H:Grow(0.9) Border vtrackDisplayArea")
+		editorGui.Add("Picture", "x296 y238 w360 h382 X:Move(0.2) W:Grow(0.8) H:Grow(0.9) Border vtrackDisplayArea")
 		this.iTrackDisplay := editorGui.Add("Picture", "x297 y239 BackgroundTrans vtrackDisplay")
 		this.iTrackDisplay.OnEvent("Click", selectTrackAction)
 
-		this.iTrackAutomationsListView := editorGui.Add("ListView", "x296 y627 w110 h142 Y:Move(0.9) W:Grow(0.3) H:Grow(0.1) -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Name", "#"], translate))
+		this.iTrackAutomationsListView := editorGui.Add("ListView", "x296 y627 w110 h142 Y:Move(0.9) X:Move(0.2) W:Grow(0.2) H:Grow(0.1) -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Name", "#"], translate))
 		this.iTrackAutomationsListView.OnEvent("Click", selectTrackAutomation)
 		this.iTrackAutomationsListView.OnEvent("DoubleClick", selectTrackAutomation)
 		this.iTrackAutomationsListView.OnEvent("ItemSelect", navTrackAutomation)
@@ -1704,15 +1703,15 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui["settingsTab"].UseTab(8)
 
-		editorGui.Add("CheckBox", "Check3 x296 ys+2 w15 h21 vdataSelectCheck").OnEvent("Click", selectAllData)
+		editorGui.Add("CheckBox", "Check3 x296 ys+2 w15 h21 X:Move(0.2) vdataSelectCheck").OnEvent("Click", selectAllData)
 
-		this.iAdministrationListView := editorGui.Add("ListView", "x314 ys w342 h491 W:Grow H:Grow -Multi -LV0x10 Checked AltSubmit", collect(["Type", "Car / Track", "Driver", "#"], translate))
+		this.iAdministrationListView := editorGui.Add("ListView", "x314 ys w342 h491 X:Move(0.2) W:Grow(0.8) H:Grow -Multi -LV0x10 Checked AltSubmit", collect(["Type", "Car / Track", "Driver", "#"], translate))
 		this.iAdministrationListView.OnEvent("ItemCheck", selectData)
 		this.iAdministrationListView.OnEvent("Click", noSelect)
 		this.iAdministrationListView.OnEvent("DoubleClick", noSelect)
 
-		editorGui.Add("Button", "x314 yp+506 w90 h23 Y:Move vexportDataButton", translate("Export...")).OnEvent("Click", exportData)
-		editorGui.Add("Button", "xp+95 yp w90 h23 Y:Move vimportDataButton", translate("Import...")).OnEvent("Click", importData)
+		editorGui.Add("Button", "x314 yp+506 w90 h23 X:Move(0.2) Y:Move vexportDataButton", translate("Export...")).OnEvent("Click", exportData)
+		editorGui.Add("Button", "xp+95 yp w90 h23 X:Move(0.2) Y:Move vimportDataButton", translate("Import...")).OnEvent("Click", importData)
 
 		editorGui.Add("Button", "x566 yp w90 h23 Y:Move X:Move vdeleteDataButton", translate("Delete...")).OnEvent("Click", deleteData)
 
@@ -1723,9 +1722,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		choices := ["User", "User & Community"]
 		chosen := (this.UseCommunity ? 2 : 1)
 
-		editorGui.Add("DropDownList", "x120 yp w140 Choose" . chosen . " vdatabaseScopeDropDown", collect(choices, translate)).OnEvent("Change", chooseDatabaseScope)
+		editorGui.Add("DropDownList", "x120 yp w140 W:Grow(0.2) Choose" . chosen . " vdatabaseScopeDropDown", collect(choices, translate)).OnEvent("Change", chooseDatabaseScope)
 
-		this.iDataListView := editorGui.Add("ListView", "x16 ys+385 w244 h151 H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Type", "#"], translate))
+		this.iDataListView := editorGui.Add("ListView", "x16 ys+385 w244 h151 W:Grow(0.2) H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Type", "#"], translate))
 		this.iDataListView.OnEvent("Click", noSelect)
 		this.iDataListView.OnEvent("DoubleClick", noSelect)
 
@@ -5736,12 +5735,12 @@ selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner :
 
 		importSettingsGui.SetFont("s8 Norm", "Arial")
 
-		importSettingsGui.Add("Text", "x8 yp+30 w410 W:Grow 0x10")
+		importSettingsGui.Add("Text", "x8 yp+30 w410 X:Move(0.2) W:Grow(0.8) 0x10")
 
 		importSelectCheck := importSettingsGui.Add("CheckBox", "Check3 x16 yp+12 w15 h21 vimportSelectCheck")
 		importSelectCheck.OnEvent("Click", selectAllImportEntries)
 
-		importListView := importSettingsGui.Add("ListView", "x34 yp-2 w375 h400 H:Grow W:Grow -Multi -LV0x10 Checked AltSubmit", collect(["Car", "Track", "Weather", "Setting", "Value"], translate))
+		importListView := importSettingsGui.Add("ListView", "x34 yp-2 w375 h400 H:Grow X:Move(0.2) W:Grow(0.8) -Multi -LV0x10 Checked AltSubmit", collect(["Car", "Track", "Weather", "Setting", "Value"], translate))
 		importListView.OnEvent("Click", noSelect)
 		importListView.OnEvent("DoubleClick", noSelect)
 		importListView.OnEvent("ItemCheck", selectImportEntry)
@@ -5811,7 +5810,7 @@ selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner :
 
 		importSettingsGui.SetFont("s8 Norm", "Arial")
 
-		importSettingsGui.Add("Text", "x8 yp+410 w410 W:Grow Y:Move 0x10")
+		importSettingsGui.Add("Text", "x8 yp+410 w410 X:Move(0.2) W:Grow(0.8) Y:Move 0x10")
 
 		importSettingsGui.Add("Button", "x123 yp+10 w80 h23 Y:Move X:Move(0.5) Default", translate("Ok")).OnEvent("Click", selectImportSettings.Bind(kOk))
 		importSettingsGui.Add("Button", "x226 yp w80 h23 Y:Move X:Move(0.5)", translate("&Cancel")).OnEvent("Click", selectImportSettings.Bind(kCancel))
@@ -5914,12 +5913,12 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 
 		importDataGui.SetFont("s8 Norm", "Arial")
 
-		importDataGui.Add("Text", "x8 yp+30 w410 W:Grow 0x10")
+		importDataGui.Add("Text", "x8 yp+30 w410 X:Move(0.2) W:Grow(0.8) 0x10")
 
 		importSelectCheck := importDataGui.Add("CheckBox", "Check3 x16 yp+12 w15 h21 vimportSelectCheck")
 		importSelectCheck.OnEvent("Click", selectAllImportEntries)
 
-		importListView := importDataGui.Add("ListView", "x34 yp-2 w375 h400 H:Grow W:Grow -Multi -LV0x10 Checked AltSubmit", collect(["Type", "Car / Track", "Driver", "#"], translate))
+		importListView := importDataGui.Add("ListView", "x34 yp-2 w375 h400 H:Grow X:Move(0.2) W:Grow(0.8) -Multi -LV0x10 Checked AltSubmit", collect(["Type", "Car / Track", "Driver", "#"], translate))
 		importListView.OnEvent("Click", noSelect)
 		importListView.OnEvent("DoubleClick", noSelect)
 		importListView.OnEvent("ItemCheck", selectImportEntry)
@@ -6083,7 +6082,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 
 		importDataGui.SetFont("s8 Norm", "Arial")
 
-		importDataGui.Add("Text", "x8 yp+410 w410 W:Grow Y:Move 0x10")
+		importDataGui.Add("Text", "x8 yp+410 w410 X:Move(0.2) W:Grow(0.8) Y:Move 0x10")
 
 		importDataGui.Add("Button", "x123 yp+10 w80 h23 Y:Move X:Move(0.5) Default", translate("Ok")).OnEvent("Click", selectImportData.Bind(kOk))
 		importDataGui.Add("Button", "x226 yp w80 h23 Y:Move X:Move(0.5)", translate("&Cancel")).OnEvent("Click", selectImportData.Bind(kCancel))

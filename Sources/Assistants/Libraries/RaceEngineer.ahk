@@ -125,13 +125,17 @@ class WeatherForecastEvent extends EngineerEvent {
 	}
 
 	handleEvent(event, arguments*) {
-		if !super.handleEvent(event, arguments*)
-			if (arguments.Has(4) && arguments[3])
-				this.Assistant.requestTyreChange(arguments[1], arguments[2], arguments[4])
-			else
-				this.Assistant.weatherForecast(arguments[1], arguments[2], arguments[3])
+		if !ProcessExist("Race Strategist.exe") {
+			if !super.handleEvent(event, arguments*)
+				if (arguments.Has(4) && arguments[3])
+					this.Assistant.requestTyreChange(arguments[1], arguments[2], arguments[4])
+				else
+					this.Assistant.weatherForecast(arguments[1], arguments[2], arguments[3])
 
-		return true
+			return true
+		}
+		else
+			return false
 	}
 }
 

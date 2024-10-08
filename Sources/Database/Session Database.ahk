@@ -1391,7 +1391,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				simulator := 1
 		}
 
-		editorGui.Add("DropDownList", "x100 yp w160 vsimulatorDropDown Choose" . simulator, simulators).OnEvent("Change", chooseSimulator)
+		editorGui.Add("DropDownList", "x100 yp w170 vsimulatorDropDown Choose" . simulator, simulators).OnEvent("Change", chooseSimulator)
 
 		if (simulator > 0)
 			simulator := simulators[simulator]
@@ -1399,10 +1399,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			simulator := false
 
 		editorGui.Add("Text", "x16 yp+24 w80 h23 +0x200", translate("Car"))
-		editorGui.Add("DropDownList", "x100 yp w160 vcarDropDown Choose1", [translate("All")]).OnEvent("Change", chooseCar)
+		editorGui.Add("DropDownList", "x100 yp w170 vcarDropDown Choose1", [translate("All")]).OnEvent("Change", chooseCar)
 
 		editorGui.Add("Text", "x16 yp+24 w80 h23 +0x200", translate("Track"))
-		editorGui.Add("DropDownList", "x100 yp w160 vtrackDropDown Choose1", [translate("All")]).OnEvent("Change", chooseTrack)
+		editorGui.Add("DropDownList", "x100 yp w170 vtrackDropDown Choose1", [translate("All")]).OnEvent("Change", chooseTrack)
 
 		editorGui.Add("Text", "x16 yp+24 w80 h23 +0x200", translate("Weather"))
 
@@ -1415,7 +1415,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			chosen := 1
 		}
 
-		editorGui.Add("DropDownList", "x100 yp w160 vweatherDropDown Choose" . chosen, choices).OnEvent("Change", chooseWeather)
+		editorGui.Add("DropDownList", "x100 yp w170 vweatherDropDown Choose" . chosen, choices).OnEvent("Change", chooseWeather)
 
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")

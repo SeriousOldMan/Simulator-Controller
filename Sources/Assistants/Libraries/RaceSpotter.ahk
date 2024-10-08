@@ -1596,7 +1596,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local position := false
 		local number := false
 		local situation, sessionDuration, lapTime, sessionEnding, minute, lastTemperature, stintLaps
-		local minute, rnd, phrase, bestLapTime, lastTopSpeed, ignore
+		local minute, rnd, phrase, bestLapTime, lastTopSpeed, ignore, delta
 
 		if isDebug()
 			logMessage(kLogDebug, "SessionInformation: " . lastLap . ", " . regular . " Positions: " . (positions != false) . " Remaining: " . remainingSessionLaps . ", " . remainingStintLaps)
@@ -1857,10 +1857,10 @@ class RaceSpotter extends GridRaceAssistant {
 						lapTime := false
 				}
 
-				if (!lapTime && (this.Session == kSessionRace)) {
+				if (regular && !lapTime && (this.Session == kSessionRace)) {
 					rnd := Random(1, 10)
 
-					if (rnd > 7) {
+					if (rnd > 5) {
 						rnd := Random(1, focused ? 133 : 100)
 
 						if ((rnd <= 33) && standingsAhead) {
@@ -1875,7 +1875,7 @@ class RaceSpotter extends GridRaceAssistant {
 							if focused {
 								if ((rnd > 66) && (rnd <= 100)) {
 									lapTime := focused.LastLapTime
-									phrase := "FocusLapTime"
+									phrase := "FocusCarLapTime"
 									position := focused.Car.Position["Class"]
 									number := focused.Car.Nr
 								}
@@ -1895,9 +1895,13 @@ class RaceSpotter extends GridRaceAssistant {
 				if lapTime {
 					minute := Floor(lapTime / 60)
 
+					delta := (lapTime - this.DriverCar.LapTime)
+
 					speaker.speakPhrase(phrase, {time: speaker.number2Speech(lapTime, 1), minute: minute
 											   , seconds: speaker.number2Speech(lapTime - (minute * 60), 1)
-											   , indicator: this.getCarIndicatorFragment(speaker, number, position)})
+											   , indicator: this.getCarIndicatorFragment(speaker, number, position)
+											   , delta: speaker.number2Speech(Round(Abs(delta), 1))
+											   , relative: fragments[(delta >= 0) ? "Faster" : "Slower"]})
 
 					return true
 				}
@@ -3181,7 +3185,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 			if (force && ProcessExist(pid)) {
 				Sleep(500)
-			
+
 				tries := 5
 
 				while (tries-- > 0) {

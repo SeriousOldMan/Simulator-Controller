@@ -1857,10 +1857,8 @@ class RaceSpotter extends GridRaceAssistant {
 						lapTime := false
 				}
 
-				if (regular && !lapTime && (this.Session == kSessionRace)) {
-					rnd := Random(1, 10)
-
-					if (rnd > 5) {
+				if (!lapTime && regular && (this.Session == kSessionRace))
+					if (Random(1, 10) > 7) {
 						rnd := Random(1, focused ? 133 : 100)
 
 						if ((rnd <= 33) && standingsAhead) {
@@ -1890,7 +1888,6 @@ class RaceSpotter extends GridRaceAssistant {
 							}
 						}
 					}
-				}
 
 				if lapTime {
 					minute := Floor(lapTime / 60)

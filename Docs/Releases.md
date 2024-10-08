@@ -4,8 +4,9 @@
   3. Fixed a rare bug, which prevented the selection of start stint pressures in "Team Center".
   4. Fixed an error in strategy simulation which did not respect the stint timer, when running an autonomous Strategist.
   5. Fixed saving of telemetry data imported from "Second Monitor".
-  6. The Spotter now compares the drivers lap time to that of the opponents when announcing recent lap times.
-  7. The window resizing has been optimized for "Session Database".
+  6. Fixed a bug, that causes action definitions and settings to get lost in the Assistant Booster configuration.
+  7. The Spotter now compares the drivers lap time to that of the opponents when announcing recent lap times.
+  8. The window resizing has been optimized for "Session Database".
 
 ## 5.9.2.2-release 10/04/24
   1. Fixed a critical bug which prevented the Strategist to announce an upcoming weather change.

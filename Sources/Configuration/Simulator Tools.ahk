@@ -1745,6 +1745,32 @@ updateInstallationForV500() {
 	}
 }
 
+updateConfigurationForV593() {
+	local ignore, assistant, extension, type, fileName, configuration, name, definition
+
+	for ignore, assistant in ["Race Engineer", "Race Strategist", "Race Spotter"]
+		for ignore, extension in [".events", ".actions"] {
+			fileName := (kUserHomeDirectory . "Actions\" . assistant . extension)
+
+			if FileExist(fileName) {
+				configuration := readMultiMap(fileName)
+
+				for ignore, type in ["Conversation.Actions", "Agent.Actions", "Agent.Events"] {
+					for name, definition in getMultiMapValues(configuration, type . ".Builtin")
+						loop
+							if getMultiMapValue(configuration, type . ".Parameters", name . "." . A_Index)
+								removeMultiMapValue(configuration, type . ".Parameters", name . "." . A_Index)
+							else
+								break
+
+					removeMultiMapValues(configuration, type . ".Builtin")
+				}
+
+				writeMultiMap(fileName, configuration)
+			}
+		}
+}
+
 renameSessionExtensions() {
 	local simulator, car, track, fileName, name
 

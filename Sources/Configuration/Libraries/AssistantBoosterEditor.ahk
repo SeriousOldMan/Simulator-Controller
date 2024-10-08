@@ -2034,6 +2034,7 @@ class CallbacksEditor {
 	}
 
 	saveCallbacks(save := true) {
+		local extension := ((this.Type = "Agent.Events") ? ".events" : ".actions")
 		local active := []
 		local disabled := []
 		local configuration, ignore, callback, index, parameter
@@ -2045,7 +2046,7 @@ class CallbacksEditor {
 				return false
 			}
 
-		configuration := newMultiMap()
+		configuration := readMultiMap(kUserHomeDirectory . "Actions\" . this.Assistant . extension)
 
 		for ignore, callback in this.Callbacks {
 			if callback.Active
@@ -2084,8 +2085,7 @@ class CallbacksEditor {
 		setMultiMapValue(configuration, this.Type, "Disabled", values2String(",", disabled*))
 
 		if save
-			writeMultiMap(kUserHomeDirectory . "Actions\" . this.Assistant . ((this.Type = "Agent.Events") ? ".events" : ".actions")
-						, configuration)
+			writeMultiMap(kUserHomeDirectory . "Actions\" . this.Assistant . extension, configuration)
 
 		return configuration
 	}

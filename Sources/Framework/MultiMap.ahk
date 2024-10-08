@@ -138,7 +138,7 @@ readMultiMap(multiMapFile, class?) {
 				if (tries-- <= 0) {
 					if isDevelopment()
 						logMessage(kLogWarn, "Waiting for file `"" . multiMapFile . "`"...")
-					
+
 					return isSet(class) ? class() : newMultiMap()
 				}
 				else
@@ -236,7 +236,7 @@ writeMultiMap(multiMapFile, multiMap, symbolic := true) {
 			if (tries-- <= 0) {
 				if isDevelopment()
 					logMessage(kLogWarn, "Waiting for file `"" . multiMapFile . "`"...")
-											
+
 				break
 			}
 		}
@@ -246,17 +246,18 @@ printMultiMap(multiMap, symbolic := true) {
 	local result := ""
 	local pairs
 
-	for section, keyValues in multiMap {
-		pairs := ""
+	for section, keyValues in multiMap
+		if (keyValues.Count > 0) {
+			pairs := ""
 
-		for key, value in keyValues {
-			value := encode(value)
+			for key, value in keyValues {
+				value := encode(value)
 
-			pairs .= ("`n" . key . "=" . (symbolic ? ((value == true) ? kTrue : ((value == false) ? kFalse : value)) : value))
+				pairs .= ("`n" . key . "=" . (symbolic ? ((value == true) ? kTrue : ((value == false) ? kFalse : value)) : value))
+			}
+
+			result .= ("[" . section . "]" . pairs . "`n")
 		}
-
-		result .= ("[" . section . "]" . pairs . "`n")
-	}
 
 	return result
 }

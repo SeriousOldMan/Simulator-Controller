@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.9.3.0-dev](https://www.dropbox.com/scl/fi/demho4f24n7tbwurqu9bt/Simulator-Controller-5.9.3.0-dev.zip?rlkey=qrpk3m5giioakrbeax5aszaqq&st=mg33rgll&dl=1) (Early build for 5.9.3. Changes: Updated car meta data for R3E, Fixed selection of start stint pressures in "Team Center", Fixed an error in strategy simulation which did not respect the stint timer, Fixed saving of imported telemetry data, Spotter now compares lap time to that of the opponents, Optimized window resizing for "Session Database", Fixed configuration of booster actions.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-593) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 
@@ -116,6 +118,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 27. [Connecting Assistants to GPT](https://youtu.be/4tq-2bnEIXE) - We introduce the new GPT-based Conversation Booster for the Assistants. Using this booster you can create a very life-like communication with the Assistants.
 
 28. [Extending and customizing Assistants using GPT](https://youtu.be/IVlF7RrKfoI) - You will learn how to define your own events and actions to be used by an LLM to create custom behavior or change existing behavior.
+
+29. [Managing telemetry data](https://youtu.be/h_WOf4mpWiA) - This video demonstrates the telemetry data system and shows how the different applications collect telemetry and what you can do with it.
 
 This list will be extended from time to time to cover new functionalities.
 

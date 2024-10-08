@@ -1598,7 +1598,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		this.iSelectedSetupType := kDryRaceSetup
 
-		editorGui.Add("Button", "xp+260 yp+415 w23 h23 Y:Move X:Move vuploadSetupButton").OnEvent("Click", uploadSetup)
+		editorGui.Add("Button", "xp+260 yp+416 w23 h23 Y:Move X:Move vuploadSetupButton").OnEvent("Click", uploadSetup)
 		editorGui.Add("Button", "xp+25 yp w23 h23 Y:Move X:Move vdownloadSetupButton").OnEvent("Click", downloadSetup)
 		editorGui.Add("Button", "xp+25 yp w23 h23 Y:Move X:Move vrenameSetupButton").OnEvent("Click", renameSetup)
 		editorGui.Add("Button", "xp+25 yp w23 h23 Y:Move X:Move vdeleteSetupButton").OnEvent("Click", deleteSetup)

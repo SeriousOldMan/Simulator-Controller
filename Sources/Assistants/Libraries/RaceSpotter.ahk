@@ -1873,7 +1873,7 @@ class RaceSpotter extends GridRaceAssistant {
 							if focused {
 								if ((rnd > 66) && (rnd <= 100)) {
 									lapTime := focused.LastLapTime
-									phrase := "FocusCarLapTime"
+									phrase := "FocusLapTime"
 									position := focused.Car.Position["Class"]
 									number := focused.Car.Nr
 								}
@@ -1891,14 +1891,22 @@ class RaceSpotter extends GridRaceAssistant {
 
 				if lapTime {
 					minute := Floor(lapTime / 60)
-
 					delta := (lapTime - this.DriverCar.LapTime)
 
-					speaker.speakPhrase(phrase, {time: speaker.number2Speech(lapTime, 1), minute: minute
-											   , seconds: speaker.number2Speech(lapTime - (minute * 60), 1)
-											   , indicator: this.getCarIndicatorFragment(speaker, number, position)
-											   , delta: speaker.number2Speech(Round(Abs(delta), 1))
-											   , relative: fragments[(delta >= 0) ? "Faster" : "Slower"]})
+					speaker.beginTalk()
+
+					try {
+						speaker.speakPhrase(phrase, {time: speaker.number2Speech(lapTime, 1), minute: minute
+												   , seconds: speaker.number2Speech(lapTime - (minute * 60), 1)
+												   , indicator: this.getCarIndicatorFragment(speaker, number, position)})
+
+
+						speaker.speakPhrase("LapTimeDelta", {delta: speaker.number2Speech(Round(Abs(delta), 1))
+														   , relative: fragments[(delta >= 0) ? "Faster" : "Slower"]})
+					}
+					finally {
+						speaker.endTalk()
+					}
 
 					return true
 				}

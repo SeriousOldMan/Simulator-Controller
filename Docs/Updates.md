@@ -37,7 +37,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 5.9.3
 
-No actions required.
+A bug has been fixed in "Simulator Setup", that created inconsistent configurations for the *Reasoning* booster. If you are using this booster, disable and enable it again for each Assistant and generate a new configuration.
 
 ***
 

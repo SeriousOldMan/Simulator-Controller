@@ -1722,9 +1722,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		choices := ["User", "User & Community"]
 		chosen := (this.UseCommunity ? 2 : 1)
 
-		editorGui.Add("DropDownList", "x120 yp w140 W:Grow(0.2) Choose" . chosen . " vdatabaseScopeDropDown", collect(choices, translate)).OnEvent("Change", chooseDatabaseScope)
+		editorGui.Add("DropDownList", "x120 yp w150 W:Grow(0.2) Choose" . chosen . " vdatabaseScopeDropDown", collect(choices, translate)).OnEvent("Change", chooseDatabaseScope)
 
-		this.iDataListView := editorGui.Add("ListView", "x16 ys+385 w244 h151 W:Grow(0.2) H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Type", "#"], translate))
+		this.iDataListView := editorGui.Add("ListView", "x16 ys+385 w254 h151 W:Grow(0.2) H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Type", "#"], translate))
 		this.iDataListView.OnEvent("Click", noSelect)
 		this.iDataListView.OnEvent("DoubleClick", noSelect)
 
@@ -5786,8 +5786,8 @@ selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner :
 						else
 							value := displayValue("Float", value)
 
-						importListView.Add("Check", (car = "*") ? translate("All") : SessionDatabase.getCarName(simulator, car)
-												  , (track = "*") ? translate("All") : SessionDatabase.getTrackName(simulator, track, false)
+						importListView.Add("Check", (car = "*") ? translate("All") : editor.getCarName(simulator, car)
+												  , (track = "*") ? translate("All") : editor.getTrackName(simulator, track)
 												  , (weather = "*") ? translate("All") : weather
 												  , editor.getSettingLabel(section, key), value)
 					}

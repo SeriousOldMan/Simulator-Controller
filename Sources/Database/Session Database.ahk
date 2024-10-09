@@ -1518,7 +1518,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.Add("DropDownList", "xp+90 yp w180 Y:Move vsettingValueDropDown").OnEvent("Change", changeSetting)
 		editorGui.Add("Edit", "xp yp w50 X:Move(0.2) Y:Move vsettingValueEdit").OnEvent("Change", changeSetting)
 		editorGui.Add("Edit", "xp yp w210 h57 Y:Move X:Move(0.2) W:Grow(0.8) vsettingValueText").OnEvent("Change", changeSetting)
-		editorGui.Add("CheckBox", "xp yp+4 Y:Move vsettingValueCheck").OnEvent("Click", changeSetting)
+		editorGui.Add("CheckBox", "xp yp+4 X:Move(0.2) Y:Move vsettingValueCheck").OnEvent("Click", changeSetting)
 
 		editorGui.Add("Button", "x606 yp+30 w23 h23 X:Move Y:Move vaddSettingButton").OnEvent("Click", addSetting)
 		editorGui.Add("Button", "xp+25 yp w23 h23 X:Move Y:Move vdeleteSettingButton").OnEvent("Click", deleteSetting)

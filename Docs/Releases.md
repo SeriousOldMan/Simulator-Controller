@@ -1,4 +1,4 @@
-## 5.9.3.0-release 10/11/24
+## 5.9.3.0-release 10/11/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a rare bug, which prevented the selection of start stint pressures in "Team Center".
@@ -9,6 +9,7 @@
   8. The Spotter now compares the drivers lap time to that of the opponents when announcing recent lap times.
   9. The window resizing has been optimized for "Session Database".
   10. Weather-specific personal best lap times retrieved from the session database are now passed to the LLM of the *Reasoning* booster for decision support.
+  11. Using new settings in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) you can specify the ideal tyre temperatures for the different tyre compounds. They can be used to trigger tyre temperature related pitstop recommendations.
 
 IMPORTANT: Please take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-593), if you have configured the *Reasoning* booster for any of the Assistants.
 

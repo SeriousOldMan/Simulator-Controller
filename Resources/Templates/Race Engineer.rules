@@ -110,7 +110,7 @@ priority: 5, {All: [?Lap], [?Session.Settings.Tyre.Compound.Change = Temperature
 
 updateTyreTemperatureWindow(?lap, Immediate) <= updateTyreTemperatureWindow(?lap, Wet)
 updateTyreTemperatureWindow(?lap, ?compound) <=
-		lapTyreTemperature(?lap, ?lapTemperature), Get(Session.Settings.Tyre.Temperature, ?compound, Ideal, ?ideal),
+		lapTyreTemperature(?lap, ?lapTemperature), Get(Session.Settings.Tyre, ?compound, Temperature.Ideal, ?ideal),
 		?temp = ?ideal - ?lapTemperature, abs(?temp, ?delta),
 		?delta < !Session.Settings.Tyre.Compound.Change.Threshold, Set(Tyre.Temperature.Window, true)
 updateTyreTemperatureWindow(?, ?) <= Set(Tyre.Temperature.Window, false)

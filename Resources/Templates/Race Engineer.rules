@@ -108,14 +108,11 @@ currentTyreSet() <= currentTyreSet(?tyreSet), Set(Tyre.Set, ?tyreSet)
 
 priority: 5, {All: [?Lap], [?Session.Settings.Tyre.Compound.Change = Temperature]} => (Prove: updateTyreTemperatureWindow(?Lap, !Tyre.Compound))
 
-updateTyreTemperatureWindow(?lap, Dry) <= lapTyreTemperature(?lap, ?lapTemperature),
-										  Get(Session.Settings.Tyre.Compound.Change.Threshold, ?threshold),
-										  ?temperature = ?lapTemperature + ?threshold, ?temperature > 70,
-										  Set(Tyre.Temperature.Window, true)
-updateTyreTemperatureWindow(?lap, Wet) <= lapTyreTemperature(?lap, ?lapTemperature),
-										  Get(Session.Settings.Tyre.Compound.Change.Threshold, ?threshold),
-										  ?temperature = ?lapTemperature - ?threshold, ?temperature < 55,
-										  Set(Tyre.Temperature.Window, true)
+updateTyreTemperatureWindow(?lap, Immediate) <= updateTyreTemperatureWindow(?lap, Wet)
+updateTyreTemperatureWindow(?lap, ?compound) <=
+		lapTyreTemperature(?lap, ?lapTemperature), Get(Session.Settings.Tyre.Temperature, ?compound, Ideal, ?ideal),
+		?temp = ?ideal - ?lapTemperature, abs(?temp, ?delta),
+		?delta < !Session.Settings.Tyre.Compound.Change.Threshold, Set(Tyre.Temperature.Window, true)
 updateTyreTemperatureWindow(?, ?) <= Set(Tyre.Temperature.Window, false)
 		  
 priority: 5,

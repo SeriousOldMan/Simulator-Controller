@@ -1842,6 +1842,10 @@ class RaceEngineer extends RaceAssistant {
 																										  , "Tyre.Compound.Change", "Never")
 									, "Session.Settings.Tyre.Compound.Change.Threshold", getDeprecatedValue(settings, "Session Settings", "Race Settings"
 																													, "Tyre.Compound.Change.Threshold", 0)
+									, "Session.Settings.Tyre.Temperature.Dry.Ideal", getMultiMapValue(settings, "Session Settings"
+																														, "Tyre.Temperature.Dry.Ideal", 90)
+									, "Session.Settings.Tyre.Temperature.Wet.Ideal", getMultiMapValue(settings, "Session Settings"
+																														, "Tyre.Temperature.Wet.Ideal", 55)
 									, "Session.Settings.Tyre.Pressure.Correction.Temperature", getMultiMapValue(settings, "Session Settings"
 																														, "Tyre.Pressure.Correction.Temperature", true)
 									, "Session.Settings.Tyre.Pressure.Correction.Setup", getMultiMapValue(settings, "Session Settings"

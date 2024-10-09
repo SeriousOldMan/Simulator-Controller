@@ -1489,7 +1489,7 @@ class SetupWorkbench extends ConfigurationItem {
 		startupCollector() {
 			local simulator := this.SelectedSimulator[false]
 			local track := this.SelectedTrack[false]
-			local simmulatorCode, trackLength, provider
+			local simmulatorCode, trackLength, provider, fileName
 
 			if (this.TelemetryViewer && simulator && (simulator != true) && track && (track != true)) {
 				if ((simulator != lastSimulator) || (track != lastTrack)) {
@@ -1504,19 +1504,8 @@ class SetupWorkbench extends ConfigurationItem {
 
 					simulatorCode := SessionDatabase.getSimulatorCode(simulator)
 
-					if (simulatorCode = "ACC") {
-						provider := ACCUDPProvider()
-
-						try {
-							if !ProcessExist("Simulator Controller.exe")
-								provider.startup(true)
-
-							trackLength := getMultiMapValue(provider.getPositionsDataFuture().PositionsData, "Track Data", "Length", 0)
-						}
-						finally {
-							provider.shutdown()
-						}
-					}
+					if (simulatorCode = "ACC")
+						trackLength := getMultiMapValue(ACCUDPProvider().acquire(), "Track Data", "Length", 0)
 					else
 						trackLength := getMultiMapValue(callSimulator(simulatorCode), "Track Data", "Length", 0)
 

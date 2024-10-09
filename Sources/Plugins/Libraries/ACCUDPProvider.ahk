@@ -208,55 +208,91 @@ class ACCUDPProvider {
 		}
 	}
 
+	acquire() {
+		local exePath := (kBinariesDirectory . "Providers\ACC UDP Provider.exe")
+		local fileName := temporaryFileName("Positions", "data")
+		local options
+
+		try {
+			deleteFile(fileName)
+
+			options := ""
+
+			if this.UDPConnection
+				options := ("-Connect " . this.UDPConnection)
+
+			Run("`"" . exePath . "`" -Collect `"" . fileName . "`" " . options, kBinariesDirectory, "Hide", &udpClient)
+
+			if udpClient {
+				while ProcessExist(udpClient)
+					Sleep(100)
+
+				return readMultiMap(fileName)
+			}
+		}
+		catch Any as exception {
+			logError(exception, true)
+
+			logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: "ACC", protocol: "UDP"})
+								   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+								   . kBinariesDirectory . translate(")"))
+
+			showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
+										  , {exePath: exePath, simulator: "ACC", protocol: "UDP"})
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+		}
+		finally {
+			deleteFile(fileName)
+		}
+	}
+
 	startup(force := false) {
 		local exePath, options, udpClient
 
 		if (!this.UDPClient || !ProcessExist("ACC UDP Provider.exe") || force) {
-			if (force && ProcessExist("ACC UDP Provider.exe"))
+			if force
 				this.shutdown(force)
 
-			if !ProcessExist("ACC UDP Provider.exe") {
-				this.iUDPClient := false
+			this.iUDPClient := false
 
-				exePath := kBinariesDirectory . "Providers\ACC UDP Provider.exe"
+			exePath := (kBinariesDirectory . "Providers\ACC UDP Provider.exe")
 
-				try {
-					if FileExist(kTempDirectory . "ACCUDP.cmd")
-						deleteFile(kTempDirectory . "ACCUDP.cmd")
+			try {
+				if FileExist(kTempDirectory . "ACCUDP.cmd")
+					deleteFile(kTempDirectory . "ACCUDP.cmd")
 
-					if FileExist(kTempDirectory . "ACCUDP.out")
-						deleteFile(kTempDirectory . "ACCUDP.out")
+				if FileExist(kTempDirectory . "ACCUDP.out")
+					deleteFile(kTempDirectory . "ACCUDP.out")
 
-					options := ""
+				options := ""
 
-					if this.UDPConnection
-						options := ("-Connect " . this.UDPConnection)
+				if this.UDPConnection
+					options := ("-Connect " . this.UDPConnection)
 
-					Run("`"" . exePath . "`" `"" . kTempDirectory . "ACCUDP.cmd`" `"" . kTempDirectory . "ACCUDP.out`" " . options, kBinariesDirectory, "Hide", &udpClient)
+				Run("`"" . exePath . "`" -Persistent `"" . kTempDirectory . "ACCUDP.cmd`" `"" . kTempDirectory . "ACCUDP.out`" " . options, kBinariesDirectory, "Hide", &udpClient)
 
-					if (force && udpClient) {
-						this.iUDPClient := udpClient
+				if udpClient {
+					this.iUDPClient := udpClient
 
-						if !this.iExitCallback {
-							this.iExitCallback := ObjBindMethod(this, "shutdown", true)
+					if !this.iExitCallback {
+						this.iExitCallback := ObjBindMethod(this, "shutdown", true)
 
-							OnExit(this.iExitCallback)
-						}
+						OnExit(this.iExitCallback)
 					}
 				}
-				catch Any as exception {
-					logError(exception, true)
+			}
+			catch Any as exception {
+				logError(exception, true)
 
-					logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: "ACC", protocol: "UDP"})
-										   . exePath . translate(") - please rebuild the applications in the binaries folder (")
-										   . kBinariesDirectory . translate(")"))
+				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: "ACC", protocol: "UDP"})
+									   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+									   . kBinariesDirectory . translate(")"))
 
-					showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
-												  , {exePath: exePath, simulator: "ACC", protocol: "UDP"})
-							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
+											  , {exePath: exePath, simulator: "ACC", protocol: "UDP"})
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 
-					this.iUDPClient := false
-				}
+				this.iUDPClient := false
 			}
 		}
 	}

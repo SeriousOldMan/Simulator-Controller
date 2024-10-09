@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.9.3.0-dev](https://www.dropbox.com/scl/fi/demho4f24n7tbwurqu9bt/Simulator-Controller-5.9.3.0-dev.zip?rlkey=qrpk3m5giioakrbeax5aszaqq&st=mg33rgll&dl=1) (Early build for 5.9.3. Changes: Updated car meta data for R3E, Fixed selection of start stint pressures in "Team Center", Fixed an error in strategy simulation which did not respect the stint timer, Fixed saving of imported telemetry data, Spotter now compares lap time to that of the opponents, Optimized window resizing for "Session Database", Fixed configuration of booster actions.)
+[5.9.3.0-dev](https://www.dropbox.com/scl/fi/demho4f24n7tbwurqu9bt/Simulator-Controller-5.9.3.0-dev.zip?rlkey=qrpk3m5giioakrbeax5aszaqq&st=mg33rgll&dl=1) (Early build for 5.9.3. Changes: Updated car meta data for R3E, Fixed selection of start stint pressures in "Team Center", Fixed an error in strategy simulation which did not respect the stint timer, Fixed saving of imported telemetry data, Spotter now compares lap time to that of the opponents, Optimized window resizing for "Session Database", Fixed configuration of booster actions, Weather-specific best lap times are now passed to the LLM of the Reasoning booster to work with.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-593) of this version and all the versions you might have skipped, before installing and using this version.
 

@@ -7,6 +7,7 @@
   6. Fixed a bug, that causes action definitions and settings to get lost in the Assistant Booster configuration.
   7. The Spotter now compares the drivers lap time to that of the opponents when announcing recent lap times.
   8. The window resizing has been optimized for "Session Database".
+  9. Weather-specific personal best lap times retrieved from the session database are now passed to the LLM of the *Reasoning* booster for decision support.
 
 ## 5.9.2.2-release 10/04/24
   1. Fixed a critical bug which prevented the Strategist to announce an upcoming weather change.

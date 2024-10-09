@@ -279,6 +279,8 @@ class RaceAssistant extends ConfigurationItem {
 	iInitialFuelAmount := 0
 	iAvgFuelConsumption := 0
 
+	iWeather := false
+
 	iEnoughData := false
 
 	iTyresDatabase := false
@@ -698,6 +700,12 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
+	Weather {
+		Get {
+			return this.iWeather
+		}
+	}
+
 	SaveSettings {
 		Get {
 			return this.iSaveSettings
@@ -912,6 +920,8 @@ class RaceAssistant extends ConfigurationItem {
 				this.iBaseLap := false
 				this.iInitialFuelAmount := 0
 
+				this.iWeather := false
+
 				this.iAutonomy := "Custom"
 
 				this.updateConfigurationValues({Settings: newMultiMap()})
@@ -946,6 +956,9 @@ class RaceAssistant extends ConfigurationItem {
 
 		if values.HasProp("AvgFuelConsumption")
 			this.iAvgFuelConsumption := values.AvgFuelConsumption
+
+		if values.HasProp("Weather")
+			this.iWeather := values.Weather
 
 		if values.HasProp("EnoughData")
 			this.iEnoughData := values.EnoughData
@@ -1069,9 +1082,24 @@ class RaceAssistant extends ConfigurationItem {
 		local simulator := this.SettingsDatabase.getSimulatorName(this.Simulator)
 		local car := this.SettingsDatabase.getCarName(this.Simulator, this.Car)
 		local track := this.SettingsDatabase.getTrackName(this.Simulator, this.Track)
-		local lapNumber, tyreSet, lapNr, laps, tyreSets, tyreCompound
+		local lapNumber, tyreSet, lapNr, laps, tyreSets, tyreCompound, weather, bestLapTime, stint
 
 		static sessionTypes
+
+		getBestLapTime(weather) {
+			local lookup := values2String(";", simulator, car, track, weather)
+
+			static lastLookup := false
+			static lapTime := false
+
+			if (lookup != lastLookup) {
+				lastLookup := lookup
+
+				lapTime := SettingsDatabase().readSettingValue(simulator, car, track, weather, "Session Settings", "Lap.AvgTime", false)
+			}
+
+			return lapTime
+		}
 
 		if !isSet(sessionTypes) {
 			sessionTypes := Map(kSessionPractice, "Practice", kSessionQualification, "Qualification", kSessionRace, "Race", kSessionOther, "Other")
@@ -1081,6 +1109,7 @@ class RaceAssistant extends ConfigurationItem {
 
 		if knowledgeBase {
 			lapNumber := knowledgeBase.getValue("Lap", 0)
+			weather := knowledgeBase.getValue("Weather.Weather.Now")
 
 			if this.activeTopic(options, "Session") {
 				tyreSets := []
@@ -1103,10 +1132,19 @@ class RaceAssistant extends ConfigurationItem {
 										  , "AvailableTyres", tyreSets)
 			}
 
-			if this.activeTopic(options, "Stint")
+			if this.activeTopic(options, "Stint") {
 				knowledge["Stint"] := Map("Driver", this.DriverFullName
 										, "Lap", (lapNumber + 1)
+										, "LastLapTime", (Round(knowledgeBase.getValue("Lap." . lapNumber . ".Time") / 1000, 1) . " Seconds")
 										, "RemainingTime", (Round(Min(knowledgeBase.getValue("Driver.Time.Remaining"), knowledgeBase.getValue("Driver.Time.Stint.Remaining")) / 1000) . " Seconds"))
+
+				if (lapNumber > (this.BaseLap + 1)) {
+					bestLapTime := getBestLapTime(weather)
+
+					if bestLapTime
+						knowledge["Stint"]["BestLapTime"] := (Round(bestLapTime, 1) . " Seconds")
+				}
+			}
 
 			if this.activeTopic(options, "Fuel")
 				knowledge["Fuel"] := Map("Capacity", (knowledgeBase.getValue("Session.Settings.Fuel.Max") . " Liter")
@@ -1124,14 +1162,14 @@ class RaceAssistant extends ConfigurationItem {
 
 					if knowledgeBase.hasFact("Lap." . lapNr . ".Time")
 						laps.Push(Map("Nr", lapNr
-									, "Time", (Round(knowledgeBase.getValue("Lap." . lapNr . ".Time") / 1000) . " Seconds")
+									, "LapTime", (Round(knowledgeBase.getValue("Lap." . lapNr . ".Time") / 1000, 1) . " Seconds")
 									, "FuelConsumption", (Round(knowledgeBase.getValue("Lap." . lapNr . ".Fuel.Consumption")) . " Liters")
 									, "FuelRemaining", (Round(knowledgeBase.getValue("Lap." . lapNr . ".Fuel.Remaining")) . " Liters")
 									, "Weather", Map("Now", knowledgeBase.getValue("Lap." . lapNr . ".Weather")
 												   , "Forecast", Map("10 Minutes", knowledgeBase.getValue("Lap." . lapNr . ".Weather.10Min")
 																   , "30 Minutes", knowledgeBase.getValue("Lap." . lapNr . ".Weather.30Min"))
 												   , "Temperature", knowledgeBase.getValue("Lap." . lapNr . ".Temperature.Air"))
-									, "Track", Map("Temperature", knowledgeBase.getValue("Lap." . lapNr . ".Temperature.Track")
+									, "Track", Map("Temperature", (knowledgeBase.getValue("Lap." . lapNr . ".Temperature.Track") . " Celsius")
 												 , "Grip", knowledgeBase.getValue("Lap." . lapNr . ".Grip"))
 									, "Valid", (knowledgeBase.getValue("Lap." . lapNr . ".Valid") ? kTrue : kFalse)))
 					else
@@ -1143,7 +1181,7 @@ class RaceAssistant extends ConfigurationItem {
 			}
 
 			if this.activeTopic(options, "Weather")
-				knowledge["Weather"] := Map("Now", knowledgeBase.getValue("Weather.Weather.Now")
+				knowledge["Weather"] := Map("Now", weather
 										  , "Forecast", Map("10 Minutes", knowledgeBase.getValue("Weather.Weather.10Min")
 														  , "30 Minutes", knowledgeBase.getValue("Weather.Weather.30Min"))
 										  , "Temperature", (knowledgeBase.getValue("Weather.Temperature.Air") . " Celsius"))
@@ -2137,6 +2175,9 @@ class RaceAssistant extends ConfigurationItem {
 		weather10Min := getMultiMapValue(data, "Weather Data", "Weather10Min", "Dry")
 		weather30Min := getMultiMapValue(data, "Weather Data", "Weather30Min", "Dry")
 
+		if !this.Weather
+			this.updateDynamicValues({Weather: weatherNow})
+
 		knowledgeBase.setFact("Weather.Temperature.Air", airTemperature)
 		knowledgeBase.setFact("Weather.Temperature.Track", trackTemperature)
 		knowledgeBase.setFact("Weather.Weather.Now", weatherNow)
@@ -2194,8 +2235,15 @@ class RaceAssistant extends ConfigurationItem {
 		values := {OverallTime: overallTime}
 
 		if (lapTime > 0) {
-			if ((lapNumber > this.LearningLaps) && lapValid && !adjustedLapTime)
-				values.BestLapTime := (this.BestLapTime = 0) ? lapTime : Min(this.BestLapTime, lapTime)
+			if ((lapNumber > this.LearningLaps) && lapValid && !adjustedLapTime) {
+				if (this.Weather != weatherNow) {
+					values.Weather := weatherNow
+
+					values.BestLapTime := 0
+				}
+				else
+					values.BestLapTime := (this.BestLapTime = 0) ? lapTime : Min(this.BestLapTime, lapTime)
+			}
 
 			this.updateDynamicValues(values)
 		}

@@ -107,7 +107,7 @@ Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 				"FuelRemaining": "9 Liters",
 				"Nr": 2,
 				"SuspensionDamage": 0.0,
-				"Time": "110 Seconds",
+				"LapTime": "110.1 Seconds",
 				"Track": {
 					"Temperature": 32,
 					"Grip": "Green"
@@ -143,7 +143,7 @@ Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 				"FuelRemaining": "7 Liters",
 				"Nr": 3,
 				"SuspensionDamage": 0.0,
-				"Time": "108 Seconds",
+				"LapTime": "108.4 Seconds",
 				"Track": {
 					"Temperature": 32,
 					"Grip": "Green"
@@ -179,7 +179,7 @@ Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 				"FuelRemaining": "4 Liters",
 				"Nr": 4,
 				"SuspensionDamage": 3.099,
-				"Time": "113 Seconds",
+				"LapTime": "113.7 Seconds",
 				"Track": {
 					"Temperature": 32,
 					"Grip": "Green"
@@ -217,7 +217,7 @@ Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 				"Grip": "Green",
 				"Nr": 5,
 				"SuspensionDamage": 4.399,
-				"Time": "107 Seconds",
+				"LapTime": "107.3 Seconds",
 				"TrackTemperature": 32,
 				"Tyres": {
 					"Pressures": {
@@ -301,7 +301,9 @@ Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 		"Stint": {
 			"Driver": "Oliver Doe (JD)",
 			"Lap": 6,
-			"RemainingTime": "2140 Seconds"
+			"RemainingTime": "2140 Seconds",
+			"LastLapTime": "107.3 Seconds",
+			"BestLapTime": "105.1 Seconds"
 		},
 		"Track": {
 			"Grip": "Green",

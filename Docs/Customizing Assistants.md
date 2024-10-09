@@ -540,7 +540,7 @@ As you can see, this editor looks very similar to the actions editor discussed a
 
 1. You have to supply a "Signal" name which uniquely identifies the event. When an event is raised by code, you have to supply exactly this identifier.
 
-2. You have to supply a phrase which decribes the event to the LLM. Example: "It just started raining." If your event has defined parameters, you can reference the values of the arguments to the event in the phrase by enclosing them in "%". Example: "We started lap %lapNumber%."
+2. You have to supply a phrase which decribes the event to the LLM. Example: "It just started raining." If your event has defined parameters, you can reference the values of the arguments to the event in the phrase by enclosing them in "%". Example: "We started lap %lapNumber%." Since the "%" has therefore a special meaning, you must escape it when it is used alone. Preceed the percentage character with a backquote (`) or a backslash to do that.
 
    ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20Reasoning%20Event%20Arguments.JPG)
 

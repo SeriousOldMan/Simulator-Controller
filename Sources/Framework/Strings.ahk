@@ -59,15 +59,26 @@ substituteString(text, pattern, replacement) {
 substituteVariables(text, values := false) {
 	local result := text
 	local startPos := 1
+	local hasPercent := false
 	local isMap := isInstance(values, Map)
 	local isObject := isInstance(values, Object)
-	local variable, startPos, endPos, value
+	local variable, startPos, endPos, value, pChar
 
 	loop {
 		startPos := InStr(result, "%", false, startPos)
 
 		if startPos {
 			startPos += 1
+
+			if (startPos > 2) {
+				pChar := SubStr(result, startPos - 2, 1)
+
+				if ((pChar = "``") || (pChar = "\")) {
+					hasPercent := true
+
+					continue
+				}
+			}
 
 			try {
 				endPos := InStr(result, "%", false, startPos)
@@ -104,7 +115,7 @@ substituteVariables(text, values := false) {
 			break
 	}
 
-	return result
+	return (hasPercent ? StrReplace(result, "``%", "%") : result)
 }
 
 string2Values(delimiter, text, count := false, class := Array) {

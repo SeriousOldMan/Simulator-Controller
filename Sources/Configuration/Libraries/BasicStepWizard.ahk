@@ -1093,7 +1093,7 @@ class BasicStepWizard extends StepWizard {
 								  , "Model", getMultiMapValue(configuration, "Agent Booster", assistant . ".Model")
 								  , "Agent", getMultiMapValue(configuration, "Agent Booster", assistant . ".Agent"))
 
-				wizard.setModuleValue(assistant, "Conversation Booster", map2String("|||", "--->>>", conversationBooster))
+				wizard.setModuleValue(assistant, "Agent Booster", map2String("|||", "--->>>", agentBooster))
 
 				this.loadAssistant(assistant)
 			}

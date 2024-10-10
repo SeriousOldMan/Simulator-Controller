@@ -1,4 +1,14 @@
 ## 5.9.3.0-release 10/11/24 (planned)
+
+IMPORTANT READ: A nasty bug had been introduced with the last release, which for some user broke the telemetry / issue analyzer in "Setup Workbench". A very early version of "Setup Workbench" stored files in *[Documents]\Simulator Controller\Garage\Definitions* for personal modification. This was no longer necessary with a later release, but the files were left in place. They now collide with the latest version of "Setup Workbench".
+
+What does that all mean for you:
+
+1. If you have never modified those files, you are fine. Everything is back to normal again.
+2. If you have modified at least one of those files, for example to introduce a new setting for a simulator, you will find your files now in *[Documents]\Simulator Controller\Garage\Definitions\Backup* where they do no harm. Please read the documentation about [extending the "Setup Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#extending-and-cutomizing-setup-workbench) for information how to bring your changes back in.
+
+And now back to the usual Release Notes:
+
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a rare bug, which prevented the selection of start stint pressures in "Team Center".
@@ -6,10 +16,11 @@
   5. Fixed saving of telemetry data imported from "Second Monitor".
   6. Fixed a bug, that causes action definitions and settings to get lost in the Assistant Booster configuration.
   7. Fixed enabling and disabling of *Reasoning* booster in "Simulator Setup".
-  8. The Spotter now compares the drivers lap time to that of the opponents when announcing recent lap times.
-  9. The window resizing has been optimized for "Session Database".
-  10. Weather-specific personal best lap times retrieved from the session database are now passed to the LLM of the *Reasoning* booster for decision support.
-  11. Using new settings in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) you can specify the ideal tyre temperatures for the different tyre compounds. They can be used to trigger tyre temperature related pitstop recommendations.
+  8. Fixed telemetry / issue analyzer for "Setup Workbench" (see above).
+  9. The Spotter now compares the drivers lap time to that of the opponents when announcing recent lap times.
+  10. The window resizing has been optimized for "Session Database".
+  11. Weather-specific personal best lap times retrieved from the session database are now passed to the LLM of the *Reasoning* booster for decision support.
+  12. Using new settings in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) you can specify the ideal tyre temperatures for the different tyre compounds. They can be used to trigger tyre temperature related pitstop recommendations.
 
 IMPORTANT: Please take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-593), if you have configured the *Reasoning* booster for any of the Assistants.
 

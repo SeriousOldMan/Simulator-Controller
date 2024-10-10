@@ -1,4 +1,4 @@
-## 5.9.3.0-release 10/11/24 (planned)
+## 5.9.3.0-release 10/11/24
 
 IMPORTANT READ: A nasty bug had been introduced with the last release, which for some user broke the telemetry / issue analyzer in "Setup Workbench". A very early version of "Setup Workbench" stored files in *[Documents]\Simulator Controller\Garage\Definitions* for personal modification. This was no longer necessary with a later release, but the files were left in place. They now collide with the latest version of "Setup Workbench".
 

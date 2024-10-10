@@ -39,6 +39,8 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 A bug has been fixed in "Simulator Setup", that created inconsistent configurations for the *Reasoning* booster. If you are using this booster, disable and enable it again for each Assistant and generate a new configuration.
 
+And be sure to check your changes to the definition files in *[Documents]\Simulator Controller\Garage\Definitions* as mentioned in the Release Notes, if you have made custom additions to the "Setup Workbench".
+
 ***
 
 ## Release 5.9.2

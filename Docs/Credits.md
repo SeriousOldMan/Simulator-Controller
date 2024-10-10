@@ -25,6 +25,8 @@ And I don't want to forget Matus Celko (@winzarten), who was so kind to provide 
 
 A very special thanks goes to @Keith M, who has supported me numerous times with testing.
 
+And I don't want forget to mention Martin Moser, who contributed the marvelous icon set for Stream Deck.
+
 ### Supporters
 
 And last, but for sure not least, I want to thank all my supporters, who bought me a coffee, paid my Azure bills or otherwise helped in developing Simulator Controller. Many thanks to all my patrons on Patreon, especially to Robert Deutsch (@iEnki), who was my first supporter, and still is. I also want to mention Peter Kasbergen, who is also a supporter on Patreon, but additionally is also my favorite bug hunter. And there are so many more: Ashton Smith, Chris Matthews, Lars Gutsch, Michael Ischen, Stephane Rouche, and so on, the list is very long.

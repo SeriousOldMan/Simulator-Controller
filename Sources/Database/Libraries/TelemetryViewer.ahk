@@ -1690,13 +1690,16 @@ class TrackMap {
 
 	loadTrackMap(trackMap, trackImage) {
 		local directory := kTempDirectory . "Track Images"
+		local image
 
 		deleteDirectory(directory)
 
 		DirCreate(directory)
 
+		image := this.Window.Theme.RecolorizeImage(trackImage)
+
 		this.iTrackMap := trackMap
-		this.iTrackImage := this.Window.Theme.RecolorizeImage(trackImage)
+		this.iTrackImage := image
 
 		this.Control["trackNameDisplay"].Text := SessionDatabase.getTrackName(this.Simulator
 																			, getMultiMapValue(trackMap, "General", "Track", ""))
@@ -1736,10 +1739,11 @@ class TrackMap {
 							, sessionDB.getTrackImage(this.Simulator, this.Track))
 		}
 
-		if this.iLastTrackPosition
-			this.createTrackMap(this.iLastTrackPosition[1], this.iLastTrackPosition[2])
-		else
-			this.createTrackMap()
+		if (this.TrackMap && this.TrackImage)
+			if this.iLastTrackPosition
+				this.createTrackMap(this.iLastTrackPosition[1], this.iLastTrackPosition[2])
+			else
+				this.createTrackMap()
 	}
 
 	updateTrackPosition(posX?, posY?) {

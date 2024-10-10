@@ -3,7 +3,7 @@ Version=5.9.3.0-beta
 Target=5.9.3.0-release
 Date=10/10/2024
 Download=https://www.dropbox.com/scl/fi/6d95jbyn4bjj5o0pxn865/Simulator-Controller-5.9.3.0-beta.zip?rlkey=bpm1d37ayb0ras3g8vtdsryvk&st=dskamjyj&dl=1
-Changes=Updated car meta data for R3E, Fixed selection of start stint pressures in "Team Center", Fixed an error in strategy simulation which did not respect the stint timer, Fixed saving of imported telemetry data, Spotter now compares lap time to that of the opponents, Optimized window resizing for "Session Database", Fixed configuration of booster actions, Fixed configuration of Reasoning Booster in "Simulator Setup", Weather-specific best lap times are now passed to the LLM of the Reasoning booster to work with, New race settings for ideal tyre temperature
+Changes=Updated car meta data for R3E, Fixed selection of start stint pressures in "Team Center", Fixed an error in strategy simulation which did not respect the stint timer, Fixed saving of imported telemetry data, Spotter now compares lap time to that of the opponents, Optimized window resizing for "Session Database", Fixed configuration of booster actions, Fixed configuration of Reasoning Booster in "Simulator Setup", Weather-specific best lap times are now passed to the LLM of the Reasoning booster to work with, New race settings for ideal tyre temperature, Updated car meta data for R3E
 Components=Media->5.6.1,Configuration->5.9.1,Utilities->5.9.1
 [Release]
 Version=5.9.2.2-release

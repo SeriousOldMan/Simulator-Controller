@@ -21,6 +21,7 @@ And now back to the usual Release Notes:
   10. The window resizing has been optimized for "Session Database".
   11. Weather-specific personal best lap times retrieved from the session database are now passed to the LLM of the *Reasoning* booster for decision support.
   12. Using new settings in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) you can specify the ideal tyre temperatures for the different tyre compounds. They can be used to trigger tyre temperature related pitstop recommendations.
+  13. Updated car meta data for *RaceRoom Racing Experience* to the latest version.
 
 IMPORTANT: Please take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-593), if you have configured the *Reasoning* booster for any of the Assistants.
 

@@ -57,8 +57,8 @@ This settings are generally available, although you can and have to define them 
 |            | Tyre Compound Choices                    | Text  |                                   | No  | Using this setting the available tyre compounds for a given car can be defined. See the [explanation of compound rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#creating-own-compound-rules) for more information. |
 |            | Fresh Tyre Set                           | Integer | 2                               | Yes | Specifies the first fresh tyre set to use during a pitstop. Typically not entered into the "Session Database", but into "Race Settings" just before the start of a session. |
 |            | Threshold for Target Pressure Deviation  | Float | 0.2                               | Yes | This value specifies the deviation from the ideal hot pressure, which must be detected, before the Engineer considers altering the cold setup pressure for this tyre. |
-|            | Dry Ideal Tyre Temperature               | Integer | 90                              | No | The ideal hot temperature for dry compound. |
-|            | Wet Ideal Tyre Temperature               | Integer | 55                              | No | The ideal hot temperature for wet compound. |
+|            | Dry Ideal Tyre Temperature               | Integer | 85                              | No | The ideal hot temperature for dry compound. |
+|            | Wet Ideal Tyre Temperature               | Integer | 50                              | No | The ideal hot temperature for wet compound. |
 |            | Dry Target Pressure Front Left           | Float | 26.5                              | Yes | The ideal hot pressure for the front left tyre with dry compound. |
 |            | Dry Target Pressure Front Right          | Float | 26.5                              | Yes | The ideal hot pressure for the front right tyre with dry compound. |
 |            | Dry Target Pressure Rear Left            | Float | 26.5                              | Yes | The ideal hot pressure for the rear left tyre with dry compound. |

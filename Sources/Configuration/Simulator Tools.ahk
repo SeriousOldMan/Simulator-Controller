@@ -1769,6 +1769,26 @@ updateConfigurationForV593() {
 				writeMultiMap(fileName, configuration)
 			}
 		}
+
+	loop Files, kUserHomeDirectory . "Garage\Definitions\*.ini", "F"
+		try {
+			DirCreate(kUserHomeDirectory . "Garage\Definitions\Backup")
+
+			FileMove(A_LoopFileFullPath, kUserHomeDirectory . "Garage\Definitions\Backup")
+		}
+
+	loop Files, kUserHomeDirectory . "Garage\Definitions\Backup\*.*", "F"
+		try {
+			definition := readMultiMap(A_LoopFileFullPath)
+
+			if getMultiMapValue(definition, "Simulator", "Analyzer", false) {
+				setMultiMapValue(definition, "Simulator", "Analyzer"
+							   , StrReplace(getMultiMapValue(definition, "Simulator", "Analyzer")
+										  , "Telemetry", "Issue"))
+
+				writeMultiMap(A_LoopFileFullPath, definition)
+			}
+		}
 }
 
 renameSessionExtensions() {

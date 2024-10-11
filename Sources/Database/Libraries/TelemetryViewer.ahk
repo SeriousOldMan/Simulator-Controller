@@ -20,14 +20,13 @@
 ;;;                       Private Constants Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kDataSeries := [{Name: "Distance", Indices: [1], Series: ["Distance"]}
-					 , {Name: "Throttle", Indices: [2], Series: ["Throttle"]}
+global kDataSeries := [{Name: "Throttle", Indices: [2], Series: ["Throttle"]}
 					 , {Name: "Brake", Indices: [3], Series: ["Brake"]}
 					 , {Name: "Throttle/Brake", Indices: [2, 3], Series: ["Throttle", "Brake"]}
 					 , {Name: "Steering", Indices: [4], Series: ["Steering"]}
 					 , {Name: "Gear", Indices: [5], Series: ["Gear"]}
 					 , {Name: "RPM", Indices: [6], Series: ["RPM"]}
-					 , {Name: "Speed", Indices: [7], Series: ["Speed"]}
+					 , {Name: "Speed", Indices: [7], Series: ["Speed"], Units: ["Speed"]}
 					 , {Name: "TC", Indices: [8], Series: ["TC"]}
 					 , {Name: "ABS", Indices: [9], Series: ["ABS"]}
 					 , {Name: "TC/ABS", Indices: [8, 9], Series: ["TC", "ABS"]}
@@ -513,6 +512,89 @@ class TelemetryChart {
 
 		return ("<div id=`"chart_acceleration`" style=`"width: " . Round(width) . "px; height: " . Round(height) . "px`"></div>")
 	}
+
+	/*
+	createTelemetryChart(width, height, lapTelemetry, referenceLapTelemetry, &drawChartFunction, series, hScale := 1, wScale := 1) {
+		local speedMin := 9999
+		local speedMax := 0
+		local ignore, data, refData, axes, speed, refSpeed, color, running, refRunning
+		local theSeries, theName
+
+		drawChartFunction := ("function drawSpeedChart() {`nvar data = new google.visualization.DataTable();")
+
+		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Distance") . "');")
+
+		for ignore, theSeries in series
+			for ignore, theName in series.Names {
+				if referenceLapTelemetry
+					drawChartFunction .= ("`ndata.addColumn('number', '" . translate(theName) . translate(" (Reference)") . "');")
+
+				drawChartFunction .= ("`ndata.addColumn('number', '" . translate(theName) . "');")
+			}
+
+		drawChartFunction .= "`ndata.addRows(["
+
+		for ignore, data in lapTelemetry {
+			if (A_Index = 1)
+				continue
+			else if (A_Index > 2)
+				drawChartFunction .= ", "
+
+			running := data[1]
+			speed := data[7]
+
+			if (speed > 0) {
+				speed := convertUnit("Speed", speed)
+
+				speedMin := Min(speedMin, speed)
+				speedMax := Max(speedMax, speed)
+			}
+			else
+				speed := kNull
+
+			if referenceLapTelemetry {
+				refRunning := (Round(running / 7.5) * 7.5)
+
+				if referenceLapTelemetry.Has(refRunning) {
+					refData := referenceLapTelemetry[refRunning]
+
+					refSpeed := refData[7]
+
+					if (refSpeed = 0)
+						refSpeed := kNull
+
+					drawChartFunction .= ("[" . running . ", " . refSpeed . ", " . refData[2] . ", " . refData[3] . ", " . refData[4] . ", " . speed . ", " . data[2] . ", " . data[3] . ", " . data[4] . "]")
+				}
+				else
+					drawChartFunction .= ("[" . running . ", null, null, null, null, " . speed . ", " . data[2] . ", " . data[3] . ", " . data[4] . "]")
+			}
+			else
+				drawChartFunction .= ("[" . running . ", " . speed . ", " . data[2] . ", " . data[3] . ", " . data[4] . "]")
+		}
+
+		if referenceLapTelemetry {
+			color := this.Window.Theme.TextColor["Disabled"]
+
+			axes := "series: { 0: {targetAxisIndex: 0, color: '" . color . "'}, 1: {targetAxisIndex: 1, color: '" . color . "'}, 2: {targetAxisIndex: 2, color: '" . color . "'}, 3: {targetAxisIndex: 3, color: '" . color . "'}, 4: {targetAxisIndex: 4}, 5: {targetAxisIndex: 5}, 6: {targetAxisIndex: 6}, 7: {targetAxisIndex: 7} },`n"
+			axes .= "hAxes: {gridlines: {count: 0}, ticks: []}, vAxes: { 0: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . (speedMax - ((speedMax - speedMin) * 3)) . " }, 1: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue : -2, maxValue: 5 }, 2: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: -2, maxValue: 5 }, 3: { gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 }, 4: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . (speedMax - ((speedMax - speedMin) * 3)) . " }, 5: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue : -2, maxValue: 5 }, 6: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: -2, maxValue: 5 },  7: { gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 } }"
+		}
+		else {
+			axes := "series: { 0: {targetAxisIndex: 0}, 1: {targetAxisIndex: 1}, 2: {targetAxisIndex: 2}, 3: {targetAxisIndex: 3} },`n"
+			axes .= "hAxes: {gridlines: {count: 0}, ticks: []}, vAxes: { 0: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . (speedMax - ((speedMax - speedMin) * 3)) . " }, 1: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue : -2, maxValue: 5 }, 2: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: -2, maxValue: 5 }, 3: { gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 } }"
+		}
+
+		drawChartFunction .= ("]);`nvar options = { " . axes . ", legend: { position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '2%', top: '5%', right: '2%', bottom: '20%' }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
+
+		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_speed')); chart.draw(data, options); document.speed_chart = chart;")
+		drawChartFunction .= "`nfunction selectHandler(e) { var cSelection = chart.getSelection(); var selection = ''; for (var i = 0; i < cSelection.length; i++) { var item = cSelection[i]; if (i > 0) selection += ';'; selection += (item.row + '|' + item.column); } try { eventHandler('Select', selection); } catch(e) {} }"
+
+		drawChartFunction .= "`ngoogle.visualization.events.addListener(chart, 'select', selectHandler); }"
+
+		drawChartFunction .= ("`nfunction selectSpeed(row) {`ndocument.speed_chart.setSelection([{row: row, column: null}]); }")
+
+		return ("<div id=`"chart_speed`" style=`"width: " . Round(width) . "px; height: " . Round(height) . "px`"></div>")
+	}
+	*/
 
 	selectRow(row) {
 		local environment

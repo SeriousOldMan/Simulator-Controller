@@ -17,6 +17,27 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                       Private Constants Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global kDataSeries := [{Name: "Distance", Indices: [1], Series: ["Distance"]}
+					 , {Name: "Throttle", Indices: [2], Series: ["Throttle"]}
+					 , {Name: "Brake", Indices: [3], Series: ["Brake"]}
+					 , {Name: "Throttle/Brake", Indices: [2, 3], Series: ["Throttle", "Brake"]}
+					 , {Name: "Steering", Indices: [4], Series: ["Steering"]}
+					 , {Name: "Gear", Indices: [5], Series: ["Gear"]}
+					 , {Name: "RPM", Indices: [6], Series: ["RPM"]}
+					 , {Name: "Speed", Indices: [7], Series: ["Speed"]}
+					 , {Name: "TC", Indices: [8], Series: ["TC"]}
+					 , {Name: "ABS", Indices: [9], Series: ["ABS"]}
+					 , {Name: "TC/ABS", Indices: [8, 9], Series: ["TC", "ABS"]}
+					 , {Name: "Long G", Indices: [10], Series: ["Long G"]}
+					 , {Name: "Lat G", Indices: [11], Series: ["Lat G"]}
+					 , {Name: "Long G/Lat G", Indices: [10, 11], Series: ["Long G", "Lat G"]}
+					 , {Name: "Curvature", Indices: [12], Series: ["Curvature"]}]
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -856,22 +877,27 @@ class TelemetryViewer {
 			this.openTrackMap()
 		}
 
+		editLayouts(*) {
+			editLayoutSettings(this, CaseInsenseMap("All", kDataSeries
+												  , "Distance", [kDataSeries[1]]))
+		}
+
 		this.iWindow := viewerGui
 
 		viewerGui.SetFont("s10 Bold", "Arial")
 
-		viewerGui.Add("Text", "w656 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(viewerGui, "Telemetry Browser"))
+		viewerGui.Add("Text", "w666 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(viewerGui, "Telemetry Browser"))
 
 		viewerGui.SetFont("s9 Norm", "Arial")
 
-		viewerGui.Add("Documentation", "x176 YP+20 w336 H:Center Center", translate("Telemetry Viewer")
+		viewerGui.Add("Documentation", "x186 YP+20 w336 H:Center Center", translate("Telemetry Viewer")
 					 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#Telemetry-Viewer")
 
-		viewerGui.Add("Text", "x8 yp+30 w656 W:Grow 0x10")
+		viewerGui.Add("Text", "x8 yp+30 w676 W:Grow 0x10")
 
 		viewerGui.SetFont("s8 Norm", "Arial")
 
-		viewerGui.Add("Text", "x16 yp+10 w80", translate("Lap"))
+		viewerGui.Add("Text", "x16 yp+20 w80", translate("Lap"))
 		viewerGui.Add("DropDownList", "x98 yp-4 w250 vlapDropDown", collect(this.Laps, (l) => this.lapLabel(l))).OnEvent("Change", chooseLap)
 
 		viewerGui.Add("Button", "x350 yp w23 h23 Center +0x200 Disabled vloadButton").OnEvent("Click", loadLap)
@@ -880,6 +906,11 @@ class TelemetryViewer {
 		setButtonIcon(viewerGui["saveButton"], kIconsDirectory . "Save.ico", 1, "L4 T4 R4 B4")
 		viewerGui.Add("Button", "x400 yp w23 h23 Center +0x200 vdeleteButton").OnEvent("Click", deleteLap)
 		setButtonIcon(viewerGui["deleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+
+		viewerGui.Add("Text", "x468 yp+4 w80 X:Move", translate("Layout"))
+		viewerGui.Add("DropDownList", "x556 yp-4 w96 X:Move vlayoutDropDown")
+
+		viewerGui.Add("Button", "x653 yp w23 h23 +0x200 Center X:Move vlayoutButton", translate("...")).OnEvent("Click", editLayouts)
 
 		this.iCollectingNotifier := viewerGui.Add("HTMLViewer", "x426 yp+9 w30 h30 vcollectingNotifier Hidden")
 
@@ -893,9 +924,9 @@ class TelemetryViewer {
 		viewerGui.Add("Button", "x350 yp w73 h23 vtrackButton", translate("Map...")).OnEvent("Click", openTrackMap)
 
 		viewerGui.Add("Text", "x468 yp+4 w80 X:Move", translate("Zoom"))
-		viewerGui.Add("Slider", "Center Thick15 x556 yp-2 X:Move w100 0x10 Range100-400 ToolTip vzoomSlider", 100).OnEvent("Change", changeZoom)
+		viewerGui.Add("Slider", "Center Thick15 x556 yp-2 X:Move w120 0x10 Range100-400 ToolTip vzoomSlider", 100).OnEvent("Change", changeZoom)
 
-		viewerControl := viewerGui.Add("HTMLViewer", "x16 yp+24 w640 h480 W:Grow H:Grow Border")
+		viewerControl := viewerGui.Add("HTMLViewer", "x16 yp+24 w660 h480 W:Grow H:Grow Border")
 
 		viewerControl.document.open()
 		viewerControl.document.write("")
@@ -1900,5 +1931,229 @@ class TrackMap {
 		this.iTrackDisplay.Value := ("*w" . imgWidth . " *h" . imgHeight . A_Space . trackImage)
 
 		this.iTrackDisplay.Opt("+Redraw")
+	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                    Private Function Declaration Section                 ;;;
+;;;-------------------------------------------------------------------------;;;
+
+editLayoutSettings(telemetryViewerOrCommand, arguments*) {
+	local name, names, x, y, ignore, series, selected, tempLayout, checked1, checked2
+
+	static layoutsGui
+
+	static telemetryViewer := false
+	static result := false
+
+	static seriesListView := false
+
+	static layouts := []
+	static layout := false
+
+	checked(row) {
+		local index := 0
+
+		while (index := seriesListView.GetNext(index, "C"))
+			if (index = row)
+				return true
+
+		return false
+	}
+
+	if (telemetryViewerOrCommand = kCancel)
+		result := kCancel
+	else if (telemetryViewerOrCommand = kOk) {
+		if layout
+			editLayoutSettings("LayoutSave")
+
+		result := kOk
+	}
+	else if (telemetryViewerOrCommand = "SeriesUp") {
+		selected := seriesListView.GetNext()
+
+		if selected {
+			series := seriesListView.GetText(selected)
+
+			checked1 := checked(selected)
+			checked2 := checked(selected - 1)
+
+			seriesListView.Modify(selected, checked2 ? "Check" : "-Check", seriesListView.GetText(selected - 1))
+			seriesListView.Modify(selected - 1, (checked1 ? "Check " : "-Check ") . "Select Vis", series)
+
+			editLayoutSettings("UpdateState")
+		}
+	}
+	else if (telemetryViewerOrCommand = "SeriesDown") {
+		selected := seriesListView.GetNext()
+
+		if selected {
+			series := seriesListView.GetText(selected)
+
+			checked1 := checked(selected)
+			checked2 := checked(selected + 1)
+
+			seriesListView.Modify(selected, checked2 ? "Check" : "-Check", seriesListView.GetText(selected + 1))
+			seriesListView.Modify(selected + 1, (checked1 ? "Check " : "-Check ") . "Select Vis", series)
+
+			editLayoutSettings("UpdateState")
+		}
+	}
+	else if (telemetryViewerOrCommand = "SeriesSelect")
+		editLayoutSettings("UpdateState")
+	else if (telemetryViewerOrCommand = "LayoutNew") {
+
+
+		editLayoutSettings("UpdateState")
+	}
+	else if (telemetryViewerOrCommand = "LayoutDelete") {
+
+		editLayoutSettings("UpdateState")
+	}
+	else if (telemetryViewerOrCommand = "LayoutSave") {
+
+	}
+	else if (telemetryViewerOrCommand = "LayoutSelect")
+		editLayoutSettings("LayoutLoad", layoutsGui["layoutDropDown"].Text, layouts[layoutsGui["layoutDropDown"].Text])
+	else if (telemetryViewerOrCommand = "LayoutLoad") {
+		if layout
+			editLayoutSettings("LayoutSave")
+
+		layout := [arguments[1], arguments[2]]
+
+		layoutsGui["layoutDropDown"].Choose(inList(getKeys(layouts), layout[1]))
+
+		seriesListView.Delete()
+
+		if layout {
+			names := []
+
+			for ignore, series in layout[2] {
+				names.Push(series.Name)
+
+				seriesListView.Add("Check", series.Name)
+			}
+
+			for ignore, series in kDataSeries
+				if !inList(names, series.Name)
+					seriesListView.Add("", series.Name)
+		}
+
+		seriesListView.ModifyCol()
+		seriesListView.ModifyCol(1, "AutoHdr")
+
+		editLayoutSettings("UpdateState")
+	}
+	else if (telemetryViewerOrCommand = "LayoutsLoad") {
+		layouts := arguments[1]
+
+		names := []
+
+		for name, ignore in layouts
+			names.Push(name)
+
+		layoutsGui["layoutDropDown"].Delete()
+		layoutsGui["layoutDropDown"].Add(names)
+
+		if (names.Length > 0)
+			editLayoutSettings("LayoutLoad", names[1], layouts[names[1]])
+		else
+			editLayoutSettings("UpdateState")
+	}
+	else if (telemetryViewerOrCommand = "UpdateState") {
+		if ((layouts.Count <= 1) || !layout)
+			layoutsGui["deleteButton"].Enabled := false
+		else
+			layoutsGui["deleteButton"].Enabled := true
+
+		selected := seriesListView.GetNext()
+
+		if selected {
+			if (selected = 1) {
+				layoutsGui["upButton"].Enabled := false
+				layoutsGui["downButton"].Enabled := true
+			}
+			else if (selected = seriesListView.GetCount()) {
+				layoutsGui["upButton"].Enabled := true
+				layoutsGui["downButton"].Enabled := false
+			}
+			else {
+				layoutsGui["upButton"].Enabled := true
+				layoutsGui["downButton"].Enabled := true
+			}
+		}
+		else {
+			layoutsGui["upButton"].Enabled := false
+			layoutsGui["downButton"].Enabled := false
+		}
+	}
+	else {
+		telemetryViewer := telemetryViewerOrCommand
+		result := false
+
+		layouts := []
+		layout := false
+
+		layoutsGui := Window({Options: "0x400000"}, translate("Layouts"))
+
+		layoutsGui.Opt("+Owner" . telemetryViewer.Window.Hwnd)
+
+		layoutsGui.SetFont("s10 Bold", "Arial")
+
+		layoutsGui.Add("Text", "w291 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(layoutsGui, "Telemetry Browser.Layouts"))
+
+		layoutsGui.SetFont("s9 Norm", "Arial")
+
+		layoutsGui.Add("Documentation", "x76 YP+20 w164 Center", translate("Telemetry Layouts")
+					 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetry-viewer")
+
+		layoutsGui.SetFont("s8 Norm", "Arial")
+
+		layoutsGui.Add("Text", "x8 yp+30 w300 0x10")
+
+		layoutsGui.Add("Text", "x16 yp+10 w80", translate("Layout"))
+		layoutsGui.Add("DropDownList", "x98 yp-4 w120 vlayoutDropDown").OnEvent("Change", editLayoutSettings.Bind("LayoutSelect"))
+
+		layoutsGui.Add("Button", "x219 yp w23 h23 Center +0x200 vnewButton").OnEvent("Click", editLayoutSettings.Bind("LayoutNew"))
+		setButtonIcon(layoutsGui["newButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		layoutsGui.Add("Button", "x243 yp w23 h23 Center +0x200 Disabled vdeleteButton").OnEvent("Click", editLayoutSettings.Bind("LayoutDelete"))
+		setButtonIcon(layoutsGui["deleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+
+		seriesListView := layoutsGui.Add("ListView", "x16 yp+30 w284 h300 AltSubmit -Multi -LV0x10 Checked NoSort NoSortHdr", collect(["Series"], translate))
+		seriesListView.OnEvent("Click", editLayoutSettings.Bind("SeriesSelect"))
+		seriesListView.OnEvent("DoubleClick", editLayoutSettings.Bind("SeriesSelect"))
+		seriesListView.OnEvent("ItemSelect", editLayoutSettings.Bind("SeriesSelect"))
+
+		layoutsGui.Add("Button", "x252 yp+302 w23 h23 Center +0x200 vupButton").OnEvent("Click", editLayoutSettings.Bind("SeriesUp"))
+		setButtonIcon(layoutsGui["upButton"], kIconsDirectory . "Up Arrow.ico", 1, "L4 T4 R4 B4")
+		layoutsGui.Add("Button", "x277 yp w23 h23 Center +0x200 Disabled vdownButton").OnEvent("Click", editLayoutSettings.Bind("SeriesDown"))
+		setButtonIcon(layoutsGui["downButton"], kIconsDirectory . "Down Arrow.ico", 1, "L4 T4 R4 B4")
+
+		layoutsGui.Add("Text", "x8 yp+30 w300 0x10")
+
+		layoutsGui.Add("Button", "x78 yp+10 w80 h23 Default", translate("Ok")).OnEvent("Click", editLayoutSettings.Bind(kOk))
+		layoutsGui.Add("Button", "x166 yp w80 h23", translate("&Cancel")).OnEvent("Click", editLayoutSettings.Bind(kCancel))
+
+		editLayoutSettings("LayoutsLoad", arguments[1])
+
+		if getWindowPosition("Telemetry Browser.Layouts", &x, &y)
+			layoutsGui.Show("x" . x . " y" . y)
+		else
+			layoutsGui.Show()
+
+		loop
+			Sleep(100)
+		until result
+
+		if (result = kOk) {
+			result := layouts
+		}
+		else
+			result := false
+
+		layoutsGui.Destroy()
+
+		return result
 	}
 }

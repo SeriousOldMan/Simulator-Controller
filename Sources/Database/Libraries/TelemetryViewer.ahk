@@ -26,7 +26,7 @@ global kDataSeries := [{Name: "Throttle", Indices: [2], Series: ["Throttle"]}
 					 , {Name: "Steering", Indices: [4], Series: ["Steering"]}
 					 , {Name: "Gear", Indices: [5], Series: ["Gear"]}
 					 , {Name: "RPM", Indices: [6], Series: ["RPM"]}
-					 , {Name: "Speed", Indices: [7], Series: ["Speed"], Units: ["Speed"]}
+					 , {Name: "Speed", Indices: [7], Series: ["Speed"], Converter: [(s) => s ? convertUnit("Speed", s) : kNull]}
 					 , {Name: "TC", Indices: [8], Series: ["TC"]}
 					 , {Name: "ABS", Indices: [9], Series: ["ABS"]}
 					 , {Name: "TC/ABS", Indices: [8, 9], Series: ["TC", "ABS"]}
@@ -80,7 +80,7 @@ class TelemetryChart {
 		this.iChartArea := chartArea
 	}
 
-	showTelemetryChart(lapFileName, referenceLapFileName := false, distanceCorrection := 0) {
+	showTelemetryChart(series, lapFileName, referenceLapFileName := false, distanceCorrection := 0) {
 		eventHandler(event, arguments*) {
 			local telemetryViewer := this.TelemetryViewer
 			local row := false
@@ -116,14 +116,15 @@ class TelemetryChart {
 
 		if this.ChartArea {
 			this.ChartArea.document.open()
-			this.ChartArea.document.write(this.createTelemetryChart(lapFileName, referenceLapFileName, distanceCorrection))
+			this.ChartArea.document.write(this.createTelemetryChart(series, lapFileName, referenceLapFileName, distanceCorrection))
 			this.ChartArea.document.close()
 
 			this.ChartArea.document.parentWindow.eventHandler := eventHandler
 		}
 	}
 
-	createTelemetryChart(lapFileName, referenceLapFileName := false, distanceCorrection := 0, margin := 0) {
+	/*
+	createTelemetryChart(lapFileName, referenceLapFileName := false, distanceCorrection := 0, margin := 0, hScale := 1, wScale := 1) {
 		local lapTelemetry := []
 		local referenceLapTelemetry := false
 		local html := ""
@@ -154,8 +155,8 @@ class TelemetryChart {
 		}
 
 		if this.ChartArea {
-			width := ((this.ChartArea.getWidth() - 4) / 100 * this.Zoom)
-			height := (this.ChartArea.getHeight() - 4)
+			width := ((this.ChartArea.getWidth() - 4) / 100 * this.Zoom * wScale)
+			height := ((this.ChartArea.getHeight() - 4) * hScale)
 
 			chartArea1 := this.createSpeedChart(width, height / 3 * 2, lapTelemetry, referenceLapTelemetry, &drawChartFunction1)
 			chartArea2 := this.createElectronicsChart(width, height / 3, lapTelemetry, referenceLapTelemetry, &drawChartFunction2)
@@ -512,25 +513,110 @@ class TelemetryChart {
 
 		return ("<div id=`"chart_acceleration`" style=`"width: " . Round(width) . "px; height: " . Round(height) . "px`"></div>")
 	}
+	*/
 
-	/*
-	createTelemetryChart(width, height, lapTelemetry, referenceLapTelemetry, &drawChartFunction, series, hScale := 1, wScale := 1) {
-		local speedMin := 9999
-		local speedMax := 0
-		local ignore, data, refData, axes, speed, refSpeed, color, running, refRunning
-		local theSeries, theName
+	createTelemetryChart(series, lapFileName, referenceLapFileName := false, distanceCorrection := 0, margin := 0, hScale := 1, wScale := 1) {
+		local lapTelemetry := []
+		local referenceLapTelemetry := false
+		local html := ""
+		local width, height
+		local drawChartFunction, chartArea
+		local before, after, margins
+		local entry, index, field, running
 
-		drawChartFunction := ("function drawSpeedChart() {`nvar data = new google.visualization.DataTable();")
+		if lapFileName
+			lapTelemetry := this.TelemetryViewer.loadData(lapFileName)
+
+		if referenceLapFileName {
+			referenceLapTelemetry := Map()
+
+			loop Read, referenceLapFileName {
+				entry := string2Values(";", A_LoopReadLine)
+
+				running := kNull
+
+				for index, value in entry
+					if !isNumber(value)
+						entry[index] := kNull
+					else if (index = 1)
+						running := entry[index] := (Round((entry[index] + distanceCorrection) / 7.5) * 7.5)
+
+				referenceLapTelemetry[running] := entry
+			}
+		}
+
+		if this.ChartArea {
+			width := ((this.ChartArea.getWidth() - 4) / 100 * this.Zoom * wScale)
+			height := ((this.ChartArea.getHeight() - 4) * hScale)
+
+			chartArea:= this.createSeriesChart(width, height, series, lapTelemetry, referenceLapTelemetry, &drawChartFunction)
+
+			before := "
+			(
+				<meta charset='utf-8'>
+				<head>
+					<style>
+						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+						.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+						.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
+					</style>
+					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+					<script type="text/javascript">
+						google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawChart);
+			)"
+
+			before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
+												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
+												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
+												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
+
+			after := "
+			(
+					</script>
+				</head>
+			)"
+
+			margins := substituteVariables("style='overflow: auto' leftmargin='%margin%' topmargin='%margin%' rightmargin='%margin%' bottommargin='%margin%'"
+										 , {margin: margin})
+
+			return ("<html>" . before . drawChartFunction . after . "<body style='background-color: #" . this.Window.AltBackColor . "' " . margins . "><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style>" . chartArea . "</body></html>")
+		}
+		else
+			return "<html></html>"
+	}
+
+	createSeriesChart(width, height, series, lapTelemetry, referenceLapTelemetry, &drawChartFunction) {
+		local seriesCount := series.Length
+		local axisCount := 0
+		local ignore, index, offset, data, refData, axes, color, running, refRunning, values
+		local theSeries, theName, theIndex, theValue, theConverter, theMinValue, minValue, maxValue, spread, absG
+
+		series := collect(series, (s) {
+			local minValues := []
+			local maxValues := []
+
+			s := s.Clone()
+
+			s.MinValue := kUndefined
+			s.MaxValue := kUndefined
+
+			axisCount += s.Indices.Length
+
+			return s
+		})
+
+		drawChartFunction := ("function drawChart() {`nvar data = new google.visualization.DataTable();")
 
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Distance") . "');")
 
-		for ignore, theSeries in series
-			for ignore, theName in series.Names {
-				if referenceLapTelemetry
+		if referenceLapTelemetry
+			for ignore, theSeries in series
+				for ignore, theName in theSeries.Series
 					drawChartFunction .= ("`ndata.addColumn('number', '" . translate(theName) . translate(" (Reference)") . "');")
 
+		for ignore, theSeries in series
+			for ignore, theName in theSeries.Series
 				drawChartFunction .= ("`ndata.addColumn('number', '" . translate(theName) . "');")
-			}
 
 		drawChartFunction .= "`ndata.addRows(["
 
@@ -541,60 +627,214 @@ class TelemetryChart {
 				drawChartFunction .= ", "
 
 			running := data[1]
-			speed := data[7]
-
-			if (speed > 0) {
-				speed := convertUnit("Speed", speed)
-
-				speedMin := Min(speedMin, speed)
-				speedMax := Max(speedMax, speed)
-			}
-			else
-				speed := kNull
+			refRunning := kNull
 
 			if referenceLapTelemetry {
 				refRunning := (Round(running / 7.5) * 7.5)
 
-				if referenceLapTelemetry.Has(refRunning) {
-					refData := referenceLapTelemetry[refRunning]
+				if !referenceLapTelemetry.Has(refRunning)
+					refRunning := kNull
+			}
 
-					refSpeed := refData[7]
+			values := []
 
-					if (refSpeed = 0)
-						refSpeed := kNull
+			if (refRunning != kNull) {
+				refData := referenceLapTelemetry[refRunning]
 
-					drawChartFunction .= ("[" . running . ", " . refSpeed . ", " . refData[2] . ", " . refData[3] . ", " . refData[4] . ", " . speed . ", " . data[2] . ", " . data[3] . ", " . data[4] . "]")
+				for ignore, theSeries in series
+					if (theSeries.Name = "Curvature") {
+						if refData.Has(11) {
+							absG := Abs(refData[11])
+
+							if (absG > 0.1) {
+								theValue := - Log(((refData[7] / 3.6) ** 2) / ((absG = 0) ? 0.00001 : absG))
+
+								if (theSeries.MinValue = kUndefined) {
+									theSeries.MinValue := theValue
+									theSeries.MaxValue := theValue
+								}
+								else {
+									theSeries.MinValue := Min(theSeries.MinValue, theValue)
+									theSeries.MaxValue := Max(theSeries.MaxValue, theValue)
+								}
+							}
+							else
+								theValue := kNull
+
+							values.Push(theValue)
+						}
+					}
+					else
+						for ignore, theIndex in theSeries.Indices
+							if refData.Has(theIndex) {
+								if theSeries.HasProp("Converter")
+									theValue := theSeries.Converter[A_Index](refData[theIndex])
+								else
+									theValue := refData[theIndex]
+
+								if (theSeries.MinValue = kUndefined) {
+									theSeries.MinValue := theValue
+									theSeries.MaxValue := theValue
+								}
+								else {
+									theSeries.MinValue := Min(theSeries.MinValue, theValue)
+									theSeries.MaxValue := Max(theSeries.MaxValue, theValue)
+								}
+
+								values.Push(theValue)
+							}
+							else
+								values.Push(kNull)
+			}
+			else if referenceLapTelemetry
+				loop series.Length
+					loop series[A_Index].Indices.Length
+						values.Push(kNull)
+
+			for ignore, theSeries in series
+				if (theSeries.Name = "Curvature") {
+					if data.Has(11) {
+						absG := Abs(data[11])
+
+						if (absG > 0.1) {
+							theValue := - Log(((data[7] / 3.6) ** 2) / ((absG = 0) ? 0.00001 : absG))
+
+							if (theSeries.MinValue = kUndefined) {
+								theSeries.MinValue := theValue
+								theSeries.MaxValue := theValue
+							}
+							else {
+								theSeries.MinValue := Min(theSeries.MinValue, theValue)
+								theSeries.MaxValue := Max(theSeries.MaxValue, theValue)
+							}
+						}
+						else
+							theValue := kNull
+
+						values.Push(theValue)
+					}
 				}
 				else
-					drawChartFunction .= ("[" . running . ", null, null, null, null, " . speed . ", " . data[2] . ", " . data[3] . ", " . data[4] . "]")
-			}
-			else
-				drawChartFunction .= ("[" . running . ", " . speed . ", " . data[2] . ", " . data[3] . ", " . data[4] . "]")
+					for ignore, theIndex in theSeries.Indices
+						if data.Has(theIndex) {
+							if theSeries.HasProp("Converter")
+								theValue := theSeries.Converter[A_Index](data[theIndex])
+							else
+								theValue := data[theIndex]
+
+							if (theSeries.MinValue = kUndefined) {
+								theSeries.MinValue := theValue
+								theSeries.MaxValue := theValue
+							}
+							else {
+								theSeries.MinValue := Min(theSeries.MinValue, theValue)
+								theSeries.MaxValue := Max(theSeries.MaxValue, theValue)
+							}
+
+							values.Push(theValue)
+						}
+						else
+							values.Push(kNull)
+
+			drawChartFunction .= ("[" . running . ", " . values2String(", ", values*) . "]")
 		}
+
+		axes := "series: { "
+
+		index := 0
 
 		if referenceLapTelemetry {
 			color := this.Window.Theme.TextColor["Disabled"]
 
-			axes := "series: { 0: {targetAxisIndex: 0, color: '" . color . "'}, 1: {targetAxisIndex: 1, color: '" . color . "'}, 2: {targetAxisIndex: 2, color: '" . color . "'}, 3: {targetAxisIndex: 3, color: '" . color . "'}, 4: {targetAxisIndex: 4}, 5: {targetAxisIndex: 5}, 6: {targetAxisIndex: 6}, 7: {targetAxisIndex: 7} },`n"
-			axes .= "hAxes: {gridlines: {count: 0}, ticks: []}, vAxes: { 0: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . (speedMax - ((speedMax - speedMin) * 3)) . " }, 1: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue : -2, maxValue: 5 }, 2: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: -2, maxValue: 5 }, 3: { gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 }, 4: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . (speedMax - ((speedMax - speedMin) * 3)) . " }, 5: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue : -2, maxValue: 5 }, 6: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: -2, maxValue: 5 },  7: { gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 } }"
+			loop axisCount {
+				if (index > 0)
+					axes .= ", "
+
+				axes .= (index . ": {targetAxisIndex: " . (A_Index - 1) . ", color: '" . color . "'}")
+			}
+
+			if (axisCount > 0)
+				axes .= ", "
+
+			index += 1
 		}
-		else {
-			axes := "series: { 0: {targetAxisIndex: 0}, 1: {targetAxisIndex: 1}, 2: {targetAxisIndex: 2}, 3: {targetAxisIndex: 3} },`n"
-			axes .= "hAxes: {gridlines: {count: 0}, ticks: []}, vAxes: { 0: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . (speedMax - ((speedMax - speedMin) * 3)) . " }, 1: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue : -2, maxValue: 5 }, 2: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: -2, maxValue: 5 }, 3: { gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 } }"
+
+		loop axisCount {
+			if (index > 0)
+				axes .= ", "
+
+			axes .= (index . ": {targetAxisIndex: " . (A_Index - 1) . "}")
+
+			index += 1
 		}
+
+		axes .= " },`nhAxes: {gridlines: {count: 0}, ticks: []}, vAxes: { "
+
+		index := 0
+
+		if referenceLapTelemetry {
+			for ignore, theSeries in series {
+				offset := (A_Index - 1)
+
+				minValue := theSeries.MinValue
+
+				loop theSeries.Indices.Length {
+					if (index > 0)
+						axes .= ", "
+
+					axes .= (index . ": { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: []")
+
+					if (minValue != kUndefined) {
+						maxValue := theSeries.MaxValue
+						spread := (maxValue - minValue)
+
+						axes .= (", minValue: " . (minValue - ((seriesCount - offset) * spread)) . ", maxValue: " . (maxValue + (offset * spread)))
+					}
+
+					axes .= " }"
+
+					index += 1
+				}
+			}
+		}
+
+		for ignore, theSeries in series {
+			offset := (A_Index - 1)
+
+			minValue := theSeries.MinValue
+
+			loop theSeries.Indices.Length {
+				if (index > 0)
+					axes .= ", "
+
+				axes .= (index . ": { gridlines: {count: 0}, ticks: []")
+
+				if (minValue != kUndefined) {
+					maxValue := theSeries.MaxValue
+					spread := (maxValue - minValue)
+
+					axes .= (", minValue: " . (minValue - ((seriesCount * 0.9 - offset) * spread)) . ", maxValue: " . (maxValue + (offset * spread)))
+				}
+
+				axes .= " }"
+
+				index += 1
+			}
+		}
+
+		axes .= " }"
 
 		drawChartFunction .= ("]);`nvar options = { " . axes . ", legend: { position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '2%', top: '5%', right: '2%', bottom: '20%' }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
 
-		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_speed')); chart.draw(data, options); document.speed_chart = chart;")
+		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart')); chart.draw(data, options); document.telemetryChart = chart;")
 		drawChartFunction .= "`nfunction selectHandler(e) { var cSelection = chart.getSelection(); var selection = ''; for (var i = 0; i < cSelection.length; i++) { var item = cSelection[i]; if (i > 0) selection += ';'; selection += (item.row + '|' + item.column); } try { eventHandler('Select', selection); } catch(e) {} }"
 
 		drawChartFunction .= "`ngoogle.visualization.events.addListener(chart, 'select', selectHandler); }"
 
-		drawChartFunction .= ("`nfunction selectSpeed(row) {`ndocument.speed_chart.setSelection([{row: row, column: null}]); }")
+		drawChartFunction .= ("`nfunction selectTelemetry(row) {`ndocument.telemetryChart.setSelection([{row: row, column: null}]); }")
 
-		return ("<div id=`"chart_speed`" style=`"width: " . Round(width) . "px; height: " . Round(height) . "px`"></div>")
+		return ("<div id=`"chart`" style=`"width: " . Round(width) . "px; height: " . Round(height) . "px`"></div>")
 	}
-	*/
 
 	selectRow(row) {
 		local environment
@@ -1733,7 +1973,7 @@ class TelemetryViewer {
 
 	updateTelemetryChart(redraw := false) {
 		if (this.TelemetryChart && redraw) {
-			this.TelemetryChart.showTelemetryChart(this.SelectedLap[true], this.SelectedReferenceLap[true], this.DistanceCorrection)
+			this.TelemetryChart.showTelemetryChart(this.Layouts[this.SelectedLayout], this.SelectedLap[true], this.SelectedReferenceLap[true], this.DistanceCorrection)
 
 			this.updateState()
 		}

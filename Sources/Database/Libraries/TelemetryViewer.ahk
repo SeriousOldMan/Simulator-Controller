@@ -81,13 +81,11 @@ class TelemetryChart {
 		this.iChartArea := chartArea
 	}
 
-	showTelemetryChart(lapFileName, referenceLapFileName := false) {
+	showTelemetryChart(lapFileName, referenceLapFileName := false, distanceCorrection := 0) {
 		eventHandler(event, arguments*) {
 			local telemetryViewer := this.TelemetryViewer
 			local row := false
 			local data
-
-			; this.ChartArea.stop()
 
 			try {
 				if (event = "Select") {
@@ -119,14 +117,14 @@ class TelemetryChart {
 
 		if this.ChartArea {
 			this.ChartArea.document.open()
-			this.ChartArea.document.write(this.createTelemetryChart(lapFileName, referenceLapFileName))
+			this.ChartArea.document.write(this.createTelemetryChart(lapFileName, referenceLapFileName, distanceCorrection))
 			this.ChartArea.document.close()
 
 			this.ChartArea.document.parentWindow.eventHandler := eventHandler
 		}
 	}
 
-	createTelemetryChart(lapFileName, referenceLapFileName := false, margin := 0) {
+	createTelemetryChart(lapFileName, referenceLapFileName := false, distanceCorrection := 0, margin := 0) {
 		local lapTelemetry := []
 		local referenceLapTelemetry := false
 		local html := ""
@@ -150,7 +148,7 @@ class TelemetryChart {
 					if !isNumber(value)
 						entry[index] := kNull
 					else if (index = 1)
-						running := entry[index] := (Round(entry[index] / 7.5) * 7.5)
+						running := entry[index] := (Round((entry[index] + distanceCorrection) / 7.5) * 7.5)
 
 				referenceLapTelemetry[running] := entry
 			}
@@ -590,6 +588,8 @@ class TelemetryViewer {
 	iLap := false
 	iReferenceLap := false
 
+	iDistanceCorrection := 0
+
 	iCollectorTask := false
 
 	iCollect := false
@@ -597,6 +597,9 @@ class TelemetryViewer {
 	iTrackMap := false
 
 	iData := CaseInsenseMap()
+
+	iLayouts := CaseInsenseMap()
+	iSelectedLayout := false
 
 	class TelemetryViewerWindow extends Window {
 		iViewer := false
@@ -766,6 +769,12 @@ class TelemetryViewer {
 		}
 	}
 
+	DistanceCorrection {
+		Get {
+			return this.iDistanceCorrection
+		}
+	}
+
 	Collect {
 		Get {
 			return this.iCollect
@@ -775,6 +784,18 @@ class TelemetryViewer {
 	TrackMap {
 		Get {
 			return this.iTrackMap
+		}
+	}
+
+	Layouts {
+		Get {
+			return this.iLayouts
+		}
+	}
+
+	SelectedLayout {
+		Get {
+			return this.iSelectedLayout
 		}
 	}
 
@@ -793,6 +814,44 @@ class TelemetryViewer {
 		this.iTelemetryDirectory := (normalizeDirectoryPath(directory) . "\")
 
 		this.iCollect := collect
+
+		this.loadLayouts()
+	}
+
+	loadLayouts() {
+		local configuration := readMultiMap(kUserConfigDirectory . "Telemetry.layouts")
+		local layouts, name, definition, ignore
+
+		if (configuration.Count = 0) {
+			this.iLayouts := CaseInsenseMap(translate("Standard")
+										  , choose(kDataSeries, (s) => !inList(["Throttle", "Brake", "TC", "ABS"
+																			  , "Long G", "Lat G"], s.Name)))
+
+			this.iSelectedLayout := translate("Standard")
+		}
+		else {
+			layouts := CaseInsenseMap()
+
+			for name, definition in getMultiMapValues(configuration, "Layouts")
+				layouts[name] := collect(string2Values(",", definition), (name) {
+					return choose(kDataSeries, (s) => s.Name = name)[1]
+				})
+
+			this.iLayouts := layouts
+			this.iSelectedLayout := getMultiMapValue(configuration, "Selected", "Layout")
+		}
+	}
+
+	saveLayouts() {
+		local configuration := newMultiMap()
+		local name, series
+
+		for name, series in this.Layouts
+			setMultiMapValue(configuration, "Layouts", name, values2String(",", collect(series, (s) => s.Name)*))
+
+		setMultiMapValue(configuration, "Selected", "Layout", this.SelectedLayout)
+
+		writeMultiMap(kUserConfigDirectory . "Telemetry.layouts", configuration)
 	}
 
 	createGui() {
@@ -877,9 +936,41 @@ class TelemetryViewer {
 			this.openTrackMap()
 		}
 
+		selectLayout(*) {
+			this.iSelectedLayout := viewerGui["layoutDropDown"].Text
+
+			this.updateTelemetryChart(true)
+		}
+
 		editLayouts(*) {
-			editLayoutSettings(this, CaseInsenseMap("All", kDataSeries
-												  , "Distance", [kDataSeries[1]]))
+			local newLayouts := editLayoutSettings(this, this.Layouts, this.SelectedLayout)
+
+			if newLayouts {
+				this.iLayouts := newLayouts
+
+				viewerGui["layoutDropDown"].Delete()
+				viewerGui["layoutDropDown"].Add(getKeys(newLayouts))
+
+				newLayouts := getKeys(newLayouts)
+
+				this.iSelectedLayout := newLayouts[inList(newLayouts, this.SelectedLayout) || inList(newLayouts, translate("Standard")) || 1]
+
+				viewerGui["layoutDropDown"].Choose(inList(newLayouts, this.SelectedLayout))
+
+				this.saveLayouts()
+
+				this.updateTelemetryChart(true)
+			}
+		}
+
+		shiftLeft(*) {
+			this.iDistanceCorrection -= (GetKeyState("Ctrl") ? (GetKeyState("Shift") ? 50 : 10) : 1)
+		}
+
+		shiftRight(*) {
+			this.iDistanceCorrection += (GetKeyState("Ctrl") ? (GetKeyState("Shift") ? 50 : 10) : 1)
+
+			this.updateTelemetryChart(true)
 		}
 
 		this.iWindow := viewerGui
@@ -908,7 +999,7 @@ class TelemetryViewer {
 		setButtonIcon(viewerGui["deleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
 		viewerGui.Add("Text", "x468 yp+4 w80 X:Move", translate("Layout"))
-		viewerGui.Add("DropDownList", "x556 yp-4 w96 X:Move vlayoutDropDown")
+		viewerGui.Add("DropDownList", "x556 yp-4 w96 Choose" . inList(getKeys(this.Layouts), this.SelectedLayout) . " X:Move vlayoutDropDown", getKeys(this.Layouts)).OnEvent("Change", selectLayout)
 
 		viewerGui.Add("Button", "x653 yp w23 h23 +0x200 Center X:Move vlayoutButton", translate("...")).OnEvent("Click", editLayouts)
 
@@ -919,7 +1010,12 @@ class TelemetryViewer {
 		this.CollectingNotifier.document.close()
 
 		viewerGui.Add("Text", "x16 yp+19 w80", translate("Reference"))
-		viewerGui.Add("DropDownList", "x98 yp-4 w250 Choose1 vreferenceLapDropDown", concatenate([translate("None")], collect(this.Laps, (l) => this.lapLabel(l)))).OnEvent("Change", chooseReferenceLap)
+		viewerGui.Add("DropDownList", "x98 yp-4 w225 Choose1 vreferenceLapDropDown", concatenate([translate("None")], collect(this.Laps, (l) => this.lapLabel(l)))).OnEvent("Change", chooseReferenceLap)
+
+		viewerGui.Add("Button", "x324 yp w12 h23 Center +0x200 Disabled vleftShiftButton").OnEvent("Click", shiftLeft)
+		setButtonIcon(viewerGui["leftShiftButton"], kIconsDirectory . "Previous.ico", 1, "L4 T4 R4 B4")
+		viewerGui.Add("Button", "x337 yp w12 h23 Center +0x200 Disabled vrightShiftButton").OnEvent("Click", shiftRight)
+		setButtonIcon(viewerGui["rightShiftButton"], kIconsDirectory . "Next.ico", 1, "L4 T4 R4 B4")
 
 		viewerGui.Add("Button", "x350 yp w73 h23 vtrackButton", translate("Map...")).OnEvent("Click", openTrackMap)
 
@@ -1013,6 +1109,15 @@ class TelemetryViewer {
 		}
 		else
 			this.Control["saveButton"].Enabled := false
+
+		if this.SelectedReferenceLap {
+			this.Control["leftShiftButton"].Enabled := true
+			this.Control["rightShiftButton"].Enabled := true
+		}
+		else {
+			this.Control["leftShiftButton"].Enabled := false
+			this.Control["rightShiftButton"].Enabled := false
+		}
 
 		this.Control["trackButton"].Enabled := sessionDB.hasTrackMap(simulator, track)
 	}
@@ -1545,8 +1650,11 @@ class TelemetryViewer {
 	}
 
 	updateTelemetryChart(redraw := false) {
-		if (this.TelemetryChart && redraw)
-			this.TelemetryChart.showTelemetryChart(this.SelectedLap[true], this.SelectedReferenceLap[true])
+		if (this.TelemetryChart && redraw) {
+			this.TelemetryChart.showTelemetryChart(this.SelectedLap[true], this.SelectedReferenceLap[true], this.DistanceCorrection)
+
+			this.updateState()
+		}
 	}
 }
 
@@ -1940,7 +2048,7 @@ class TrackMap {
 ;;;-------------------------------------------------------------------------;;;
 
 editLayoutSettings(telemetryViewerOrCommand, arguments*) {
-	local name, names, x, y, ignore, series, selected, tempLayout, checked1, checked2
+	local name, names, x, y, ignore, series, selected, tempLayout, checked1, checked2, inputResult
 
 	static layoutsGui
 
@@ -2003,16 +2111,45 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 	else if (telemetryViewerOrCommand = "SeriesSelect")
 		editLayoutSettings("UpdateState")
 	else if (telemetryViewerOrCommand = "LayoutNew") {
+		inputResult := withBlockedWindows(InputBox, translate("Please enter the name of the new layout:"), translate("Telemetry Layouts"), "w300 h120")
 
+		if (inputResult.Result = "Ok") {
+			name := inputResult.Value
+			newName := name
 
-		editLayoutSettings("UpdateState")
+			while layouts.Has(newName)
+				newName := (name . translate(" (") . A_Index . translate(")"))
+
+			layouts[newName] := []
+
+			editLayoutSettings("LayoutsLoad", layouts)
+			editLayoutSettings("LayoutLoad", newName, layouts[newName])
+		}
 	}
 	else if (telemetryViewerOrCommand = "LayoutDelete") {
+		if layout {
+			layouts.Delete(layout[1])
 
-		editLayoutSettings("UpdateState")
+			layout := false
+
+			editLayoutSettings("LayoutsLoad", layouts)
+		}
 	}
 	else if (telemetryViewerOrCommand = "LayoutSave") {
+		if layout {
+			series := []
+			selected := 0
 
+			while (selected := seriesListView.GetNext(selected, "C")) {
+				name := seriesListView.GetText(selected)
+
+				series.Push(choose(kDataSeries, (s) => translate(s.Name) = name)[1])
+			}
+
+			layout[2] := series
+
+			layouts[layout[1]] := layout[2]
+		}
 	}
 	else if (telemetryViewerOrCommand = "LayoutSelect")
 		editLayoutSettings("LayoutLoad", layoutsGui["layoutDropDown"].Text, layouts[layoutsGui["layoutDropDown"].Text])
@@ -2032,12 +2169,12 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 			for ignore, series in layout[2] {
 				names.Push(series.Name)
 
-				seriesListView.Add("Check", series.Name)
+				seriesListView.Add("Check", translate(series.Name))
 			}
 
 			for ignore, series in kDataSeries
 				if !inList(names, series.Name)
-					seriesListView.Add("", series.Name)
+					seriesListView.Add("", translate(series.Name))
 		}
 
 		seriesListView.ModifyCol()
@@ -2135,24 +2272,32 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 		layoutsGui.Add("Button", "x78 yp+10 w80 h23 Default", translate("Ok")).OnEvent("Click", editLayoutSettings.Bind(kOk))
 		layoutsGui.Add("Button", "x166 yp w80 h23", translate("&Cancel")).OnEvent("Click", editLayoutSettings.Bind(kCancel))
 
-		editLayoutSettings("LayoutsLoad", arguments[1])
+		editLayoutSettings("LayoutsLoad", arguments[1].Clone())
+		editLayoutSettings("LayoutLoad", arguments[2], arguments[1][arguments[2]])
 
-		if getWindowPosition("Telemetry Browser.Layouts", &x, &y)
-			layoutsGui.Show("x" . x . " y" . y)
-		else
-			layoutsGui.Show()
+		telemetryViewer.Window.Block()
 
-		loop
-			Sleep(100)
-		until result
+		try {
+			if getWindowPosition("Telemetry Browser.Layouts", &x, &y)
+				layoutsGui.Show("x" . x . " y" . y)
+			else
+				layoutsGui.Show()
 
-		if (result = kOk) {
-			result := layouts
+			loop
+				Sleep(100)
+			until result
+
+			if (result = kOk) {
+				result := layouts
+			}
+			else
+				result := false
+
+			layoutsGui.Destroy()
 		}
-		else
-			result := false
-
-		layoutsGui.Destroy()
+		finally {
+			telemetryViewer.Window.Unblock()
+		}
 
 		return result
 	}

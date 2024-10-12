@@ -2842,6 +2842,8 @@ class RaceSpotter extends GridRaceAssistant {
 			minute := Floor(lapTime / 60)
 			delta := (lapTime - this.DriverCar.LapTime)
 
+			speaker := this.getSpeaker()
+
 			speaker.beginTalk()
 
 			try {

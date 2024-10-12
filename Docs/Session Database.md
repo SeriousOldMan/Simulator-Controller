@@ -108,17 +108,25 @@ You can load additional laps from the session database or any other location for
 
 Good to know: If you use the "Open..." button in the dialog, which let's you browse the available telemetry data, you can import telemetry data from ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), as long as it has been saved as JSON file, which can be activated in the settings of "Second Monitor".
 
-The Telemetry Viewer is available in the following applications to collect lap telemetry data, where additional documentation is available:
+When a reference lap is loaded, it can be shifted horizontally to align it perfectly with the other lap telemetry data. This is especially useful, when comparing laps from different simulators or when data is used, that has been imported from other sources like "Second Monitor".
 
-- [Setup Workbench](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#Telemetry-Viewer)
-- [Solo Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#Telemetry-Viewer)
-- [Team Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#Telemetry-Viewer)
+With the controls in the upper right, you can change the zoom factor in both dimensions and you can define and use different layouts for the graph. Click on the small button with the "..." to open a dialog to define and change layouts.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Telemetry%20Browser%20Settings.JPG)
+
+Select the channels you want to display in the telemetry graph and move them up and down as you like.
 
 If available, a map for the current track can be opened with the "Map..." button. You can click on a location of the track map and the corresponding data points will be highlighted in the telemetry graph. It is also possible to click on a data point in the graph and the corresponding location will be selected in the track map.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Telemetry%20Browser%20Track%20Map.jpg)
 
 Important: This functionality may not be available when using *WebView2* as the HTML viewer.
+
+The Telemetry Viewer is available in the following applications to collect lap telemetry data, where additional documentation is available:
+
+- [Setup Workbench](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#Telemetry-Viewer)
+- [Solo Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#Telemetry-Viewer)
+- [Team Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#Telemetry-Viewer)
 
 #### Strategies
 

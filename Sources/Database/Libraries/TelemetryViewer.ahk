@@ -20,7 +20,7 @@
 ;;;                       Private Constants Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kDataSeries := [{Name: "Speed", Indices: [7], Size: 2, Series: ["Speed"], Converter: [(s) => s ? convertUnit("Speed", s) : kNull]}
+global kDataSeries := [{Name: "Speed", Indices: [7], Size: 1, Series: ["Speed"], Converter: [(s) => s ? convertUnit("Speed", s) : kNull]}
 					 , {Name: "Throttle", Indices: [2], Size: 0.5, Series: ["Throttle"]}
 					 , {Name: "Brake", Indices: [3], Size: 0.5, Series: ["Brake"]}
 					 , {Name: "Throttle/Brake", Indices: [2, 3], Size: 0.5, Series: ["Throttle", "Brake"]}
@@ -45,7 +45,8 @@ class TelemetryChart {
 
 	iChartArea := false
 
-	iZoom := 100
+	iWidthZoom := 100
+	iHeightZoom := 100
 
 	TelemetryViewer {
 		Get {
@@ -65,13 +66,23 @@ class TelemetryChart {
 		}
 	}
 
-	Zoom {
+	WidthZoom {
 		Get {
-			return this.iZoom
+			return this.iWidthZoom
 		}
 
 		Set {
-			return (this.iZoom := value)
+			return (this.iWidthZoom := value)
+		}
+	}
+
+	HeightZoom {
+		Get {
+			return this.iHeightZoom
+		}
+
+		Set {
+			return (this.iHeightZoom := value)
 		}
 	}
 
@@ -154,8 +165,8 @@ class TelemetryChart {
 		}
 
 		if this.ChartArea {
-			width := ((this.ChartArea.getWidth() - 4) / 100 * this.Zoom * wScale)
-			height := ((this.ChartArea.getHeight() - 4) * hScale)
+			width := ((this.ChartArea.getWidth() - 4) / 100 * this.WidthZoom * wScale)
+			height := ((this.ChartArea.getHeight() - 4) / 100 * this.HeightZoom * hScale)
 
 			chartArea:= this.createSeriesChart(width, height, series, lapTelemetry, referenceLapTelemetry, &drawChartFunction)
 
@@ -274,6 +285,8 @@ class TelemetryChart {
 
 							values.Push(theValue)
 						}
+						else
+							values.Push(kNull)
 					}
 					else
 						for ignore, theIndex in theSeries.Indices
@@ -324,6 +337,8 @@ class TelemetryChart {
 
 						values.Push(theValue)
 					}
+					else
+						values.Push(kNull)
 				}
 				else
 					for ignore, theIndex in theSeries.Indices
@@ -740,8 +755,10 @@ class TelemetryViewer {
 
 		if (configuration.Count = 0) {
 			this.iLayouts := CaseInsenseMap(translate("Standard")
-										  , choose(kDataSeries, (s) => !inList(["Throttle", "Brake", "TC", "ABS"
-																			  , "Long G", "Lat G"], s.Name)))
+										  , {Name: translate("Standard")
+										   , WidthZoom: 100, HeightZoom: 100
+										   , Series: choose(kDataSeries, (s) => !inList(["Throttle", "Brake", "TC", "ABS"
+																					   , "Long G", "Lat G"], s.Name))})
 
 			this.iSelectedLayout := translate("Standard")
 		}
@@ -749,9 +766,12 @@ class TelemetryViewer {
 			layouts := CaseInsenseMap()
 
 			for name, definition in getMultiMapValues(configuration, "Layouts")
-				layouts[name] := collect(string2Values(",", definition), (name) {
-					return choose(kDataSeries, (s) => s.Name = name)[1]
-				})
+				layouts[name] := {Name: name
+								, WidthZoom: getMultiMapValue(configuration, "Zoom", name . ".Width", 100)
+								, HeightZoom: getMultiMapValue(configuration, "Zoom", name . ".Height", 100)
+								, Series: collect(string2Values(",", definition), (name) {
+											  return choose(kDataSeries, (s) => s.Name = name)[1]
+										  })}
 
 			this.iLayouts := layouts
 			this.iSelectedLayout := getMultiMapValue(configuration, "Selected", "Layout")
@@ -760,10 +780,14 @@ class TelemetryViewer {
 
 	saveLayouts() {
 		local configuration := newMultiMap()
-		local name, series
+		local name, layout
 
-		for name, series in this.Layouts
-			setMultiMapValue(configuration, "Layouts", name, values2String(",", collect(series, (s) => s.Name)*))
+		for name, layout in this.Layouts {
+			setMultiMapValue(configuration, "Layouts", name, values2String(",", collect(layout.Series, (s) => s.Name)*))
+
+			setMultiMapValue(configuration, "Zoom", name . ".Width", layout.WidthZoom)
+			setMultiMapValue(configuration, "Zoom", name . ".Height", layout.HeightZoom)
+		}
 
 		setMultiMapValue(configuration, "Selected", "Layout", this.SelectedLayout)
 
@@ -774,8 +798,14 @@ class TelemetryViewer {
 		local viewerGui := TelemetryViewer.TelemetryViewerWindow(this, {Descriptor: "Telemetry Browser", Closeable: true, Resizeable:  "Deferred"})
 		local viewerControl
 
-		changeZoom(*) {
-			this.TelemetryChart.Zoom := viewerGui["zoomSlider"].Value
+		changeWidthZoom(*) {
+			this.TelemetryChart.WidthZoom := viewerGui["zoomWSlider"].Value
+
+			this.updateTelemetryChart(true)
+		}
+
+		changeHeightZoom(*) {
+			this.TelemetryChart.HeightZoom := viewerGui["zoomHSlider"].Value
 
 			this.updateTelemetryChart(true)
 		}
@@ -855,14 +885,22 @@ class TelemetryViewer {
 		selectLayout(*) {
 			this.iSelectedLayout := viewerGui["layoutDropDown"].Text
 
+			this.TelemetryChart.WidthZoom := this.Layouts[this.SelectedLayout].WidthZoom
+			this.TelemetryChart.HeightZoom := this.Layouts[this.SelectedLayout].HeightZoom
+
+			this.Window["zoomWSlider"].Value := this.TelemetryChart.WidthZoom
+			this.Window["zoomHSlider"].Value := this.TelemetryChart.HeightZoom
+
 			this.updateTelemetryChart(true)
 		}
 
 		editLayouts(*) {
-			local newLayouts := editLayoutSettings(this, this.Layouts, this.SelectedLayout)
+			local selectedLayout := this.SelectedLayout
+			local newLayouts := editLayoutSettings(this, this.Layouts, &selectedLayout)
 
 			if newLayouts {
 				this.iLayouts := newLayouts
+				this.iSelectedLayout := selectedLayout
 
 				viewerGui["layoutDropDown"].Delete()
 				viewerGui["layoutDropDown"].Add(getKeys(newLayouts))
@@ -870,6 +908,12 @@ class TelemetryViewer {
 				newLayouts := getKeys(newLayouts)
 
 				this.iSelectedLayout := newLayouts[inList(newLayouts, this.SelectedLayout) || inList(newLayouts, translate("Standard")) || 1]
+
+				this.TelemetryChart.WidthZoom := this.Layouts[this.SelectedLayout].WidthZoom
+				this.TelemetryChart.HeightZoom := this.Layouts[this.SelectedLayout].HeightZoom
+
+				viewerGui["zoomWSlider"].Value := this.TelemetryChart.WidthZoom
+				viewerGui["zoomHSlider"].Value := this.TelemetryChart.HeightZoom
 
 				viewerGui["layoutDropDown"].Choose(inList(newLayouts, this.SelectedLayout))
 
@@ -938,7 +982,8 @@ class TelemetryViewer {
 		viewerGui.Add("Button", "x350 yp w73 h23 vtrackButton", translate("Map...")).OnEvent("Click", openTrackMap)
 
 		viewerGui.Add("Text", "x468 yp+4 w80 X:Move", translate("Zoom"))
-		viewerGui.Add("Slider", "Center Thick15 x556 yp-2 X:Move w120 0x10 Range100-400 ToolTip vzoomSlider", 100).OnEvent("Change", changeZoom)
+		viewerGui.Add("Slider", "Center Thick15 x556 yp-2 X:Move w59 0x10 Range100-400 ToolTip vzoomWSlider", 100).OnEvent("Change", changeWidthZoom)
+		viewerGui.Add("Slider", "Center Thick15 x617 yp X:Move w59 0x10 Range100-400 ToolTip vzoomHSlider", 100).OnEvent("Change", changeHeightZoom)
 
 		viewerControl := viewerGui.Add("HTMLViewer", "x16 yp+24 w660 h480 W:Grow H:Grow Border")
 
@@ -972,6 +1017,14 @@ class TelemetryViewer {
 		this.Window.Opt("+OwnDialogs")
 
 		this.loadTelemetry()
+
+		if this.SelectedLayout {
+			this.TelemetryChart.WidthZoom := this.Layouts[this.SelectedLayout].WidthZoom
+			this.TelemetryChart.HeightZoom := this.Layouts[this.SelectedLayout].HeightZoom
+
+			this.Window["zoomWSlider"].Value := this.TelemetryChart.WidthZoom
+			this.Window["zoomHSlider"].Value := this.TelemetryChart.HeightZoom
+		}
 
 		this.updateTelemetryChart(true)
 
@@ -1569,7 +1622,7 @@ class TelemetryViewer {
 
 	updateTelemetryChart(redraw := false) {
 		if (this.TelemetryChart && redraw) {
-			this.TelemetryChart.showTelemetryChart(this.Layouts[this.SelectedLayout], this.SelectedLap[true], this.SelectedReferenceLap[true], this.DistanceCorrection)
+			this.TelemetryChart.showTelemetryChart(this.Layouts[this.SelectedLayout].Series, this.SelectedLap[true], this.SelectedReferenceLap[true], this.DistanceCorrection)
 
 			this.updateState()
 		}
@@ -2028,6 +2081,10 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 	}
 	else if (telemetryViewerOrCommand = "SeriesSelect")
 		editLayoutSettings("UpdateState")
+	else if (telemetryViewerOrCommand = "SeriesCheck") {
+		if (!arguments[3] && !seriesListView.GetNext(0, "C"))
+			seriesListView.Modify(arguments[2], "Check")
+	}
 	else if (telemetryViewerOrCommand = "LayoutNew") {
 		inputResult := withBlockedWindows(InputBox, translate("Please enter the name of the new layout:"), translate("Telemetry Layouts"), "w300 h120")
 
@@ -2038,7 +2095,7 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 			while layouts.Has(newName)
 				newName := (name . translate(" (") . A_Index . translate(")"))
 
-			layouts[newName] := []
+			layouts[newName] := {Name: newName, WidthZoom: 100, HeightZoom: 100, Series: []}
 
 			editLayoutSettings("LayoutsLoad", layouts)
 			editLayoutSettings("LayoutLoad", newName, layouts[newName])
@@ -2046,7 +2103,7 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 	}
 	else if (telemetryViewerOrCommand = "LayoutDelete") {
 		if layout {
-			layouts.Delete(layout[1])
+			layouts.Delete(layout.Name)
 
 			layout := false
 
@@ -2064,27 +2121,28 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 				series.Push(choose(kDataSeries, (s) => translate(s.Name) = name)[1])
 			}
 
-			layout[2] := series
-
-			layouts[layout[1]] := layout[2]
+			layouts[layout.Name] := {Name: layout.Name
+								   , WidthZoom: layoutsGui["zoomWSlider"].Value
+								   , HeightZoom: layoutsGui["zoomHSlider"].Value
+								   , Series: series}
 		}
 	}
 	else if (telemetryViewerOrCommand = "LayoutSelect")
-		editLayoutSettings("LayoutLoad", layoutsGui["layoutDropDown"].Text, layouts[layoutsGui["layoutDropDown"].Text])
+		editLayoutSettings("LayoutLoad", layouts[layoutsGui["layoutDropDown"].Text])
 	else if (telemetryViewerOrCommand = "LayoutLoad") {
 		if layout
 			editLayoutSettings("LayoutSave")
 
-		layout := [arguments[1], arguments[2]]
+		layout := arguments[1]
 
-		layoutsGui["layoutDropDown"].Choose(inList(getKeys(layouts), layout[1]))
+		layoutsGui["layoutDropDown"].Choose(inList(getKeys(layouts), layout.Name))
 
 		seriesListView.Delete()
 
 		if layout {
 			names := []
 
-			for ignore, series in layout[2] {
+			for ignore, series in layout.Series {
 				names.Push(series.Name)
 
 				seriesListView.Add("Check", translate(series.Name))
@@ -2093,6 +2151,9 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 			for ignore, series in kDataSeries
 				if !inList(names, series.Name)
 					seriesListView.Add("", translate(series.Name))
+
+			layoutsGui["zoomWSlider"].Value := layout.WidthZoom
+			layoutsGui["zoomHSlider"].Value := layout.HeightZoom
 		}
 
 		seriesListView.ModifyCol()
@@ -2112,7 +2173,7 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 		layoutsGui["layoutDropDown"].Add(names)
 
 		if (names.Length > 0)
-			editLayoutSettings("LayoutLoad", names[1], layouts[names[1]])
+			editLayoutSettings("LayoutLoad", layouts[names[1]])
 		else
 			editLayoutSettings("UpdateState")
 	}
@@ -2179,11 +2240,16 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 		seriesListView.OnEvent("Click", editLayoutSettings.Bind("SeriesSelect"))
 		seriesListView.OnEvent("DoubleClick", editLayoutSettings.Bind("SeriesSelect"))
 		seriesListView.OnEvent("ItemSelect", editLayoutSettings.Bind("SeriesSelect"))
+		seriesListView.OnEvent("ItemCheck", editLayoutSettings.Bind("SeriesCheck"))
 
 		layoutsGui.Add("Button", "x252 yp+302 w23 h23 Center +0x200 vupButton").OnEvent("Click", editLayoutSettings.Bind("SeriesUp"))
 		setButtonIcon(layoutsGui["upButton"], kIconsDirectory . "Up Arrow.ico", 1, "L4 T4 R4 B4")
 		layoutsGui.Add("Button", "x277 yp w23 h23 Center +0x200 Disabled vdownButton").OnEvent("Click", editLayoutSettings.Bind("SeriesDown"))
 		setButtonIcon(layoutsGui["downButton"], kIconsDirectory . "Down Arrow.ico", 1, "L4 T4 R4 B4")
+
+		layoutsGui.Add("Text", "x16 yp+5 w80 X:Move", translate("Zoom"))
+		layoutsGui.Add("Slider", "Center Thick15 x104 yp-2 X:Move w59 0x10 Range100-400 ToolTip vzoomWSlider", 100)
+		layoutsGui.Add("Slider", "Center Thick15 x" . (617 - 452) . " yp X:Move w59 0x10 Range100-400 ToolTip vzoomHSlider", 100)
 
 		layoutsGui.Add("Text", "x8 yp+30 w300 0x10")
 
@@ -2191,7 +2257,7 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 		layoutsGui.Add("Button", "x166 yp w80 h23", translate("&Cancel")).OnEvent("Click", editLayoutSettings.Bind(kCancel))
 
 		editLayoutSettings("LayoutsLoad", arguments[1].Clone())
-		editLayoutSettings("LayoutLoad", arguments[2], arguments[1][arguments[2]])
+		editLayoutSettings("LayoutLoad", arguments[1][%arguments[2]%])
 
 		telemetryViewer.Window.Block()
 
@@ -2207,6 +2273,8 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 
 			if (result = kOk) {
 				result := layouts
+
+				%arguments[2]% := layout.Name
 			}
 			else
 				result := false

@@ -801,11 +801,19 @@ class TelemetryViewer {
 		changeWidthZoom(*) {
 			this.TelemetryChart.WidthZoom := viewerGui["zoomWSlider"].Value
 
+			this.Layouts[this.SelectedLayout].WidthZoom := this.TelemetryChart.WidthZoom
+
+			this.saveLayouts()
+
 			this.updateTelemetryChart(true)
 		}
 
 		changeHeightZoom(*) {
 			this.TelemetryChart.HeightZoom := viewerGui["zoomHSlider"].Value
+
+			this.Layouts[this.SelectedLayout].HeightZoom := this.TelemetryChart.HeightZoom
+
+			this.saveLayouts()
 
 			this.updateTelemetryChart(true)
 		}

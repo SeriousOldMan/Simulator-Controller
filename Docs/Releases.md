@@ -6,7 +6,8 @@
   5. A complete new layout system has been introduced for the Telemetry Viewer. You now can select the channels, you are interested in and arrange them according to your preferences. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetry-viewer) for more information.
   6. Telemetry graphs can now be shifted horizontally to match track position of telemetry data from different sources.
   7. Zooming of telemetry graph is now possible both horizontally and vertically.
-  8. The announcement of the last lap times of the cars around you by the Spotter has been moved from the "Session Information" group to the "Opponent Information" group and can be enabled/disabled together with ´gap and delta information in the configuration.
+  8. Selected zoom factor will now be stored for telemetry graphs.
+  9. The announcement of the last lap times of the cars around you by the Spotter has been moved from the "Session Information" group to the "Opponent Information" group and can be enabled/disabled together with ´gap and delta information in the configuration.
   
 ## 5.9.3.0-release 10/11/24
 

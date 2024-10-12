@@ -1857,41 +1857,9 @@ class RaceSpotter extends GridRaceAssistant {
 						lapTime := false
 				}
 
-				if (!lapTime && regular && (this.Session == kSessionRace))
-					if (Random(1, 10) > 7) {
-						rnd := Random(1, focused ? 133 : 100)
-
-						if ((rnd <= 33) && standingsAhead) {
-							lapTime := standingsAhead.LastLapTime
-							phrase := "AheadLapTime"
-						}
-						else if ((rnd > 33) && (rnd <= 66) && standingsBehind) {
-							lapTime := standingsBehind.LastLapTime
-							phrase := "BehindLapTime"
-						}
-						else {
-							if focused {
-								if ((rnd > 66) && (rnd <= 100)) {
-									lapTime := focused.LastLapTime
-									phrase := "FocusLapTime"
-									position := focused.Car.Position["Class"]
-									number := focused.Car.Nr
-								}
-								else if ((rnd > 100) && leader) {
-									lapTime := leader.LastLapTime
-									phrase := "LeaderLapTime"
-								}
-							}
-							else if ((rnd > 66) && leader) {
-								lapTime := leader.LastLapTime
-								phrase := "LeaderLapTime"
-							}
-						}
-					}
-
 				if lapTime {
 					minute := Floor(lapTime / 60)
-					delta := (lapTime - this.DriverCar.LapTime)
+					delta := (lapTime - this.DriverCar.BestLapTime)
 
 					speaker.beginTalk()
 
@@ -1902,7 +1870,8 @@ class RaceSpotter extends GridRaceAssistant {
 
 
 						speaker.speakPhrase("LapTimeDelta", {delta: speaker.number2Speech(Round(Abs(delta), 1))
-														   , relative: fragments[(delta >= 0) ? "Faster" : "Slower"]})
+														   , relativeYou: fragments[(delta >= 0) ? "Faster" : "Slower"]
+														   , relativeOther: fragments[(delta < 0) ? "Faster" : "Slower"]})
 					}
 					finally {
 						speaker.endTalk()
@@ -2431,10 +2400,19 @@ class RaceSpotter extends GridRaceAssistant {
 
 	deltaInformation(lastLap, sector, positions, regular, method) {
 		local knowledgeBase := this.KnowledgeBase
+		local speaker := this.getSpeaker(true)
 		local spoken := false
-		local standingsAhead, standingsBehind, trackAhead, trackBehind, leader, focused, info, informed, settings
-		local opponentType, delta, deltaDifference, lapDifference, lapTimeDifference, car, remaining, speaker, rnd
-		local unsafe, driverPitstops, carPitstops, number, indicator, position
+		local informed := false
+		local standingsAhead := false
+		local standingsBehind := false
+		local trackAhead := false
+		local trackBehind := false
+		local leader := false
+		local focused := false
+		local lapTime := false
+		local info, settings, rnd, phrase, position, minute
+		local opponentType, delta, deltaDifference, lapDifference, lapTimeDifference, car, remaining, rnd
+		local unsafe, driverPitstops, carPitstops, number, indicator
 
 		static lapUpRangeThreshold := kUndefined
 		static lapDownRangeThreshold := false
@@ -2468,13 +2446,6 @@ class RaceSpotter extends GridRaceAssistant {
 			behindGapMax := getMultiMapValue(settings, "Assistant.Spotter", "Behind.Observe.Range.Max", 3600)
 		}
 
-		standingsAhead := false
-		standingsBehind := false
-		trackAhead := false
-		trackBehind := false
-		leader := false
-		focused := false
-
 		this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, &focused)
 
 		if this.Debug[kDebugPositions] {
@@ -2482,10 +2453,6 @@ class RaceSpotter extends GridRaceAssistant {
 
 			FileAppend(info, kTempDirectory . "Race Spotter.positions")
 		}
-
-		speaker := this.getSpeaker(true)
-
-		informed := false
 
 		speaker.beginTalk()
 
@@ -2835,6 +2802,61 @@ class RaceSpotter extends GridRaceAssistant {
 				else if (focused && (rnd > 10))
 					spoken := this.focusGap()
 			}
+		}
+
+		if (!spoken && (this.Session == kSessionRace))
+			if (Random(1, 10) > 8) {
+				rnd := Random(1, focused ? 133 : 100)
+
+				if ((rnd <= 33) && standingsAhead) {
+					lapTime := standingsAhead.LastLapTime
+					phrase := "AheadLapTime"
+				}
+				else if ((rnd > 33) && (rnd <= 66) && standingsBehind) {
+					lapTime := standingsBehind.LastLapTime
+					phrase := "BehindLapTime"
+				}
+				else {
+					if focused {
+						if ((rnd > 66) && (rnd <= 100)) {
+							lapTime := focused.LastLapTime
+							phrase := "FocusLapTime"
+							position := focused.Car.Position["Class"]
+							number := focused.Car.Nr
+						}
+						else if ((rnd > 100) && leader) {
+							lapTime := leader.LastLapTime
+							phrase := "LeaderLapTime"
+						}
+					}
+					else if ((rnd > 66) && leader) {
+						lapTime := leader.LastLapTime
+						phrase := "LeaderLapTime"
+					}
+				}
+			}
+
+		if lapTime {
+			minute := Floor(lapTime / 60)
+			delta := (lapTime - this.DriverCar.LapTime)
+
+			speaker.beginTalk()
+
+			try {
+				speaker.speakPhrase(phrase, {time: speaker.number2Speech(lapTime, 1), minute: minute
+										   , seconds: speaker.number2Speech(lapTime - (minute * 60), 1)
+										   , indicator: this.getCarIndicatorFragment(speaker, number, position)})
+
+
+				speaker.speakPhrase("LapTimeDelta", {delta: speaker.number2Speech(Round(Abs(delta), 1))
+												   , relativeYou: fragments[(delta >= 0) ? "Faster" : "Slower"]
+												   , relativeOther: fragments[(delta < 0) ? "Faster" : "Slower"]})
+			}
+			finally {
+				speaker.endTalk()
+			}
+
+			spoken := true
 		}
 
 		return spoken

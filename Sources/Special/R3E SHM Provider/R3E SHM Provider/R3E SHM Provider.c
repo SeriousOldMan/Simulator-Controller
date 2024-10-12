@@ -86,7 +86,7 @@ long getRemainingLaps() {
         return (long)(map_buffer->race_session_laps[map_buffer->session_iteration - 1] - normalize(map_buffer->completed_laps));
     }
     else {
-        long time = (map_buffer->session_type != R3E_SESSION_PRACTICE) ? (long)map_buffer->lap_time_previous_self * 1000 : (long)map_buffer->lap_time_best_self * 1000;
+        long time = (map_buffer->session_type != R3E_SESSION_PRACTICE) ? (long)normalize(map_buffer->lap_time_previous_self) * 1000 : (long)normalize(map_buffer->lap_time_best_self) * 1000;
 
         if (time > 0)
             return (long)(getRemainingTime() / time);
@@ -112,7 +112,7 @@ long getRemainingTime() {
 			return 0;
     }
     else {
-        return (long)(getRemainingLaps() * map_buffer->lap_time_previous_self) * 1000;
+        return (long)(getRemainingLaps() * normalize(map_buffer->lap_time_previous_self)) * 1000;
     }
 }
 
@@ -195,32 +195,33 @@ int main(int argc, char* argv[])
 		}
 		else {
 			wprintf_s(L"Car.Count=%d\n", map_buffer->num_cars);
-			wprintf_s(L"Driver.Car=%d\n", getPlayerCarID() + 1);
+			wprintf_s(L"Driver.Car=%d\n", map_buffer->all_drivers_data_1[getPlayerCarID()].driver_info.slot_id + 1);
 			
 			for (int i = 1; i <= map_buffer->num_cars; ++i) {
 				r3e_driver_data vehicle = map_buffer->all_drivers_data_1[i - 1];
 
 				int position = vehicle.place;
+				int id = vehicle.driver_info.slot_id + 1;
 
-				wprintf_s(L"Car.%d.ID=%d\n", i, vehicle.driver_info.slot_id);
-				wprintf_s(L"Car.%d.Nr=%d\n", i, vehicle.driver_info.car_number);
-				wprintf_s(L"Car.%d.Class=%d\n", i, vehicle.driver_info.class_id);
-				wprintf_s(L"Car.%d.Position=%d\n", i, position);
-				wprintf_s(L"Car.%d.Laps=%d\n", i, vehicle.completed_laps);
-				wprintf_s(L"Car.%d.Lap.Running=%f\n", i, (float)((double)(vehicle.lap_distance / map_buffer->lap_distance) * map_buffer->lap_distance_fraction));
-				wprintf_s(L"Car.%d.Lap.Running.Valid=%s\n", i, vehicle.current_lap_valid ? L"true" : L"false");
-				wprintf_s(L"Car.%d.Lap.Running.Time=%ld\n", i, (long)(vehicle.lap_time_current_self * 1000));
+				wprintf_s(L"Car.%d.ID=%d\n", id, vehicle.driver_info.slot_id);
+				wprintf_s(L"Car.%d.Nr=%d\n", id, vehicle.driver_info.car_number);
+				wprintf_s(L"Car.%d.Class=%d\n", id, vehicle.driver_info.class_id);
+				wprintf_s(L"Car.%d.Position=%d\n", id, position);
+				wprintf_s(L"Car.%d.Laps=%d\n", id, vehicle.completed_laps);
+				wprintf_s(L"Car.%d.Lap.Running=%f\n", id, (float)((double)(vehicle.lap_distance / map_buffer->lap_distance) * map_buffer->lap_distance_fraction));
+				wprintf_s(L"Car.%d.Lap.Running.Valid=%s\n", id, vehicle.current_lap_valid ? L"true" : L"false");
+				wprintf_s(L"Car.%d.Lap.Running.Time=%ld\n", id, (long)(normalize(vehicle.lap_time_current_self) * 1000));
 
-				long sector1Time = (long)(vehicle.sector_time_previous_self[0] * 1000);
-				long sector2Time = (long)(vehicle.sector_time_previous_self[1] * 1000) - sector1Time;
-				long sector3Time = (long)(vehicle.sector_time_previous_self[2] * 1000) - sector1Time - sector2Time;
+				long sector1Time = (long)(normalize(vehicle.sector_time_previous_self[0]) * 1000);
+				long sector2Time = (long)(normalize(vehicle.sector_time_previous_self[1]) * 1000) - sector1Time;
+				long sector3Time = (long)(normalize(vehicle.sector_time_previous_self[2]) * 1000) - sector1Time - sector2Time;
 
-				wprintf_s(L"Car.%d.Time=%ld\n", i, sector1Time + sector2Time + sector3Time);
-				wprintf_s(L"Car.%d.Time.Sectors=%ld,%ld,%ld\n", i, sector1Time, sector2Time, sector3Time);
+				wprintf_s(L"Car.%d.Time=%ld\n", id, sector1Time + sector2Time + sector3Time);
+				wprintf_s(L"Car.%d.Time.Sectors=%ld,%ld,%ld\n", id, sector1Time, sector2Time, sector3Time);
 
 				_itoa_s(vehicle.driver_info.model_id, buffer, 32, 10);
 
-				wprintf_s(L"Car.%d.Car=%S\n", i, buffer);
+				wprintf_s(L"Car.%d.Car=%S\n", id, buffer);
 				
 				char* name = (char*)vehicle.driver_info.name;
 				
@@ -235,17 +236,17 @@ int main(int argc, char* argv[])
 					substring(name, surName, length + 1, strlen(name) - length - 1);
 					nickName[0] = forName[0], nickName[1] = surName[0], nickName[2] = '\0';
 
-					wprintf_s(L"Car.%d.Driver.Forname=%S\n", i, forName);
-					wprintf_s(L"Car.%d.Driver.Surname=%S\n", i, surName);
-					wprintf_s(L"Car.%d.Driver.Nickname=%S\n", i, nickName);
+					wprintf_s(L"Car.%d.Driver.Forname=%S\n", id, forName);
+					wprintf_s(L"Car.%d.Driver.Surname=%S\n", id, surName);
+					wprintf_s(L"Car.%d.Driver.Nickname=%S\n", id, nickName);
 				}
 				else {
-					wprintf_s(L"Car.%d.Driver.Forname=%S\n", i, name);
-					wprintf_s(L"Car.%d.Driver.Surname=%S\n", i, "");
-					wprintf_s(L"Car.%d.Driver.Nickname=%S\n", i, "");
+					wprintf_s(L"Car.%d.Driver.Forname=%S\n", id, name);
+					wprintf_s(L"Car.%d.Driver.Surname=%S\n", id, "");
+					wprintf_s(L"Car.%d.Driver.Nickname=%S\n", id, "");
 				}
 
-				wprintf_s(L"Car.%d.InPitLane=%S\n", i, vehicle.in_pitlane ? "true" : "false");
+				wprintf_s(L"Car.%d.InPitLane=%S\n", id, vehicle.in_pitlane ? "true" : "false");
 			}
 		}
 	}

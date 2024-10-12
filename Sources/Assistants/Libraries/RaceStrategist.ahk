@@ -3895,6 +3895,9 @@ class RaceStrategist extends GridRaceAssistant {
 					slots.Delete(idKey)
 			}
 
+		raceInfo["HasNr"] := !duplicateNr
+		raceInfo["HasID"] := !duplicateID
+
 		raceInfo["Grid"] := grid
 		raceInfo["Classes"] := classes
 		raceInfo["Categories"] := categories
@@ -4082,7 +4085,16 @@ class RaceStrategist extends GridRaceAssistant {
 			if raceInfo {
 				slots := raceInfo["Slots"]
 
-				carCount := (slots ? Floor(slots.Count / 2) : raceInfo["Cars"])
+				if slots {
+					if (raceInfo["HasNr"] && raceInfo["HasID"])
+						carCount := Floor(slots.Count / 2)
+					else if (raceInfo["HasNr"] || raceInfo["HasID"])
+						carCount := slots.Count
+					else
+						carCount := raceInfo["Cars"]
+				}
+				else
+					carCount := raceInfo["Cars"]
 			}
 			else
 				raceInfo := CaseInsenseMap()
@@ -4139,7 +4151,7 @@ class RaceStrategist extends GridRaceAssistant {
 				if !carIndex
 					carIndex := A_Index
 
-				if (carIndex && times.Has(carIndex)) {
+				if times.Has(carIndex) {
 					times[carIndex] := knowledgeBase.getValue(carPrefix . ".Time", "-")
 					positions[carIndex] := knowledgeBase.getValue(carPrefix . ".Position", "-")
 					laps[carIndex] := (isNumber(knowledgeBase.getValue(carPrefix . ".Laps", "-")) ? Floor(knowledgeBase.getValue(carPrefix . ".Laps")) : "-")

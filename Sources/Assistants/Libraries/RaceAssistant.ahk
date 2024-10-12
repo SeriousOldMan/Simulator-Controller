@@ -2045,9 +2045,13 @@ class RaceAssistant extends ConfigurationItem {
 			setMultiMapValue(sessionInfo, "Track", "Temperature", Round(getMultiMapValue(data, "Track Data", "Temperature", 0), 1))
 			setMultiMapValue(sessionInfo, "Track", "Grip", getMultiMapValue(data, "Track Data", "Grip", "Optimum"))
 
-			setMultiMapValue(sessionInfo, "Tyres", "Compound"
-										, compound(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound")
-												 , knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color")))
+			if knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound", false)
+				setMultiMapValue(sessionInfo, "Tyres", "Compound"
+											, compound(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound")
+													 , knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color")))
+			else
+				setMultiMapValue(sessionInfo, "Tyres", "Compound", "-")
+
 			setMultiMapValue(sessionInfo, "Tyres", "Set", getMultiMapValue(data, "Car Data", "TyreSet", false))
 			setMultiMapValue(sessionInfo, "Tyres", "Pressures", getMultiMapValue(data, "Car Data", "TyrePressure", ""))
 			setMultiMapValue(sessionInfo, "Tyres", "Pressures.Hot", getMultiMapValue(data, "Car Data", "TyrePressure", ""))

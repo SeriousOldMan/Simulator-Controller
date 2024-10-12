@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[5.9.4.0-dev]() (Early build for 5.9.4. Changes: Layout settings for telemetry viewer, Fixed standings with duplicate race numbers, Fixed grid size and positions for R3E, Moved Spotter lap time announcement to Opponent Information group, Horizontal shifting of telemetry graphs, Save selected zoom factor for telemetry graphs, Independent horizontal and vertical zooming for telemetry graphs.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-594) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

@@ -430,7 +430,7 @@ class TelemetryChart {
 				if (index > 0)
 					axes .= ", "
 
-				axes .= (index . ": { gridlines: {count: 0}, viewWindowMode: 'maximized', ticks: []")
+				axes .= (index . ": { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, viewWindowMode: 'maximized', ticks: []")
 
 				if (minValue != kUndefined) {
 					maxValue := theSeries.MaxValue
@@ -2244,7 +2244,7 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 		layoutsGui.Add("Button", "x243 yp w23 h23 Center +0x200 Disabled vdeleteButton").OnEvent("Click", editLayoutSettings.Bind("LayoutDelete"))
 		setButtonIcon(layoutsGui["deleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
-		seriesListView := layoutsGui.Add("ListView", "x16 yp+30 w284 h300 AltSubmit -Multi -LV0x10 Checked NoSort NoSortHdr", collect(["Series"], translate))
+		seriesListView := layoutsGui.Add("ListView", "x16 yp+30 w284 h300 AltSubmit -Multi -LV0x10 Checked NoSort NoSortHdr", collect(["Channel"], translate))
 		seriesListView.OnEvent("Click", editLayoutSettings.Bind("SeriesSelect"))
 		seriesListView.OnEvent("DoubleClick", editLayoutSettings.Bind("SeriesSelect"))
 		seriesListView.OnEvent("ItemSelect", editLayoutSettings.Bind("SeriesSelect"))

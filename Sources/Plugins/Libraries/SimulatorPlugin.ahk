@@ -576,11 +576,11 @@ class SimulatorPlugin extends ControllerPlugin {
 			SimulatorPlugin.sActiveSimulation := false
 		}
 	}
-	
+
 	updateFunctions() {
 		this.updateActions(kSessionFinished)
 	}
-	
+
 	updateActions(session) {
 		local mode := this.findMode(kPitstopMode)
 
@@ -1247,22 +1247,22 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		}
 	}
 
-	correctPositionsData(positionsData) {
+	correctPositionsData(positionsData, needCorrection := false) {
 		local positions := Map()
-		local needCorrection := false
 		local cars := []
 		local count, position
 
 		count := getMultiMapValue(positionsData, "Position Data", "Car.Count", 0)
 
-		loop count {
-			position := (getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Position", 0) + 0)
+		if !needCorrection
+			loop count {
+				position := (getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Position", 0) + 0)
 
-			if positions.Has(position)
-				needCorrection := true
-			else
-				positions[position] := true
-		}
+				if positions.Has(position)
+					needCorrection := true
+				else
+					positions[position] := true
+			}
 
 		if needCorrection {
 			loop count

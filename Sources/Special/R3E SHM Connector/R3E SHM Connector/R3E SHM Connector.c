@@ -86,7 +86,7 @@ long getRemainingLaps() {
         return (long)(map_buffer->race_session_laps[map_buffer->session_iteration - 1] - normalize(map_buffer->completed_laps));
     }
     else {
-        long time = (map_buffer->session_type != R3E_SESSION_PRACTICE) ? (long)map_buffer->lap_time_previous_self * 1000 : (long)map_buffer->lap_time_best_self * 1000;
+        long time = (map_buffer->session_type != R3E_SESSION_PRACTICE) ? (long)normalize(map_buffer->lap_time_previous_self) * 1000 : (long)normalize(map_buffer->lap_time_best_self) * 1000;
 
         if (time > 0)
             return (long)(getRemainingTime() / time);
@@ -112,7 +112,7 @@ long getRemainingTime() {
 			return 0;
     }
     else {
-        return (long)(getRemainingLaps() * map_buffer->lap_time_previous_self) * 1000;
+        return (long)(getRemainingLaps() * normalize(map_buffer->lap_time_previous_self)) * 1000;
     }
 }
 
@@ -248,34 +248,34 @@ extern __declspec(dllexport) int __stdcall call(char* request, char* result, int
 		}
 		else {
 			writeIntOption(result, "Car.Count=", map_buffer->num_cars, &pos);
-			writeIntOption(result, "Driver.Car=", getPlayerCarID() + 1, &pos);
+			writeIntOption(result, "Driver.Car=", map_buffer->all_drivers_data_1[getPlayerCarID()].driver_info.slot_id + 1, &pos);
 
 			for (int i = 1; i <= map_buffer->num_cars; ++i) {
 				r3e_driver_data vehicle = map_buffer->all_drivers_data_1[i - 1];
 
 				int position = vehicle.place;
+				int id = vehicle.driver_info.slot_id + 1;
 
-				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeIntOption(result, ".ID=", vehicle.driver_info.slot_id, &pos);
-				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeIntOption(result, ".Nr=", vehicle.driver_info.car_number, &pos);
-				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeIntOption(result, ".Class=", vehicle.driver_info.class_id, &pos);
-				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeIntOption(result, ".Position=", position, &pos);
-				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeIntOption(result, ".Laps=", vehicle.completed_laps, &pos);
-				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeFloatOption(result, ".Lap.Running=", (float)((double)(vehicle.lap_distance / map_buffer->lap_distance) * map_buffer->lap_distance_fraction), &pos);
-				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeStringOption(result, ".Lap.Running.Valid=", vehicle.current_lap_valid ? "true\n" : "false\n", &pos);
-				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeIntOption(result, ".Lap.Running.Time=", (long)(vehicle.lap_time_current_self * 1000), &pos);
+				writeString(result, "Car.", &pos); writeInt(result, id, &pos); writeIntOption(result, ".ID=", vehicle.driver_info.slot_id, &pos);
+				writeString(result, "Car.", &pos); writeInt(result, id, &pos); writeIntOption(result, ".Nr=", vehicle.driver_info.car_number, &pos);
+				writeString(result, "Car.", &pos); writeInt(result, id, &pos); writeIntOption(result, ".Class=", vehicle.driver_info.class_id, &pos);
+				writeString(result, "Car.", &pos); writeInt(result, id, &pos); writeIntOption(result, ".Position=", position, &pos);
+				writeString(result, "Car.", &pos); writeInt(result, id, &pos); writeIntOption(result, ".Laps=", vehicle.completed_laps, &pos);
+				writeString(result, "Car.", &pos); writeInt(result, id, &pos); writeFloatOption(result, ".Lap.Running=", (float)((double)(vehicle.lap_distance / map_buffer->lap_distance) * map_buffer->lap_distance_fraction), &pos);
+				writeString(result, "Car.", &pos); writeInt(result, id, &pos); writeStringOption(result, ".Lap.Running.Valid=", vehicle.current_lap_valid ? "true\n" : "false\n", &pos);
+				writeString(result, "Car.", &pos); writeInt(result, id, &pos); writeIntOption(result, ".Lap.Running.Time=", (long)(normalize(vehicle.lap_time_current_self) * 1000), &pos);
 
+				long sector1Time = (long)(normalize(vehicle.sector_time_previous_self[0]) * 1000);
+				long sector2Time = (long)(normalize(vehicle.sector_time_previous_self[1]) * 1000) - sector1Time;
+				long sector3Time = (long)(normalize(vehicle.sector_time_previous_self[2]) * 1000) - sector1Time - sector2Time;
 
-				long sector1Time = (long)(vehicle.sector_time_previous_self[0] * 1000);
-				long sector2Time = (long)(vehicle.sector_time_previous_self[1] * 1000) - sector1Time;
-				long sector3Time = (long)(vehicle.sector_time_previous_self[2] * 1000) - sector1Time - sector2Time;
-
-				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeIntOption(result, ".Time=", sector1Time + sector2Time + sector3Time, &pos);
-				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeString(result, ".Time.Sectors=", &pos);
+				writeString(result, "Car.", &pos); writeInt(result, id, &pos); writeIntOption(result, ".Time=", sector1Time + sector2Time + sector3Time, &pos);
+				writeString(result, "Car.", &pos); writeInt(result, id, &pos); writeString(result, ".Time.Sectors=", &pos);
 				writeInt(result, sector1Time, &pos); writeString(result, ",", &pos);
 				writeInt(result, sector2Time, &pos); writeString(result, ",", &pos);
 				writeInt(result, sector3Time, &pos); writeLine(result, &pos);
 
-				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeIntOption(result, ".Car=", vehicle.driver_info.model_id, &pos);
+				writeString(result, "Car.", &pos); writeInt(result, id, &pos); writeIntOption(result, ".Car=", vehicle.driver_info.model_id, &pos);
 				
 				char* name = (char*)vehicle.driver_info.name;
 
@@ -290,17 +290,17 @@ extern __declspec(dllexport) int __stdcall call(char* request, char* result, int
 					substring(name, surName, length + 1, strlen(name) - length - 1);
 					nickName[0] = forName[0], nickName[1] = surName[0], nickName[2] = '\0';
 
-					writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeStringOption(result, ".Driver.Forname=", forName, &pos);
-					writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeStringOption(result, ".Driver.Surname=", surName, &pos);
-					writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeStringOption(result, ".Driver.Nickname=", nickName, &pos);
+					writeString(result, "Car.", &pos); writeInt(result, id, &pos); writeStringOption(result, ".Driver.Forname=", forName, &pos);
+					writeString(result, "Car.", &pos); writeInt(result, id, &pos); writeStringOption(result, ".Driver.Surname=", surName, &pos);
+					writeString(result, "Car.", &pos); writeInt(result, id, &pos); writeStringOption(result, ".Driver.Nickname=", nickName, &pos);
 				}
 				else {
-					writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeStringOption(result, ".Driver.Forname=", name, &pos);
-					writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeStringOption(result, ".Driver.Surname=", "", &pos);
-					writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeStringOption(result, ".Driver.Nickname=", "", &pos);
+					writeString(result, "Car.", &pos); writeInt(result, id, &pos); writeStringOption(result, ".Driver.Forname=", name, &pos);
+					writeString(result, "Car.", &pos); writeInt(result, id, &pos); writeStringOption(result, ".Driver.Surname=", "", &pos);
+					writeString(result, "Car.", &pos); writeInt(result, id, &pos); writeStringOption(result, ".Driver.Nickname=", "", &pos);
 				}
 
-				writeString(result, "Car.", &pos); writeInt(result, i, &pos); writeStringOption(result, ".InPitLane=", vehicle.in_pitlane ? "true" : "false", &pos);
+				writeString(result, "Car.", &pos); writeInt(result, id, &pos); writeStringOption(result, ".InPitLane=", vehicle.in_pitlane ? "true" : "false", &pos);
 			}
 		}
 	}

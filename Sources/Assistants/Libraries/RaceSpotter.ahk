@@ -2410,9 +2410,11 @@ class RaceSpotter extends GridRaceAssistant {
 		local leader := false
 		local focused := false
 		local lapTime := false
-		local info, settings, rnd, phrase, position, minute
+		local position := false
+		local number := false
+		local info, settings, rnd, phrase, minute
 		local opponentType, delta, deltaDifference, lapDifference, lapTimeDifference, car, remaining, rnd
-		local unsafe, driverPitstops, carPitstops, number, indicator
+		local unsafe, driverPitstops, carPitstops, indicator
 
 		static lapUpRangeThreshold := kUndefined
 		static lapDownRangeThreshold := false

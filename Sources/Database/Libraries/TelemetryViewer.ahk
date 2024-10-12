@@ -2219,7 +2219,7 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 		layouts := []
 		layout := false
 
-		layoutsGui := Window({Options: "0x400000"}, translate("Layouts"))
+		layoutsGui := Window({Options: "0x400000"})
 
 		layoutsGui.Opt("+Owner" . telemetryViewer.Window.Hwnd)
 

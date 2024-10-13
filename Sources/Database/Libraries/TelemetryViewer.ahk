@@ -669,7 +669,7 @@ class TelemetryViewer {
 										  : this.iLap)
 								  : false)
 			else
-				return (path ? this.iLap[3] : this.iLap)
+				return (path ? this.iLap[4] : this.iLap)
 		}
 
 		Set {
@@ -688,7 +688,7 @@ class TelemetryViewer {
 												   : this.iReferenceLap)
 										   : false)
 			else
-				return (path ? this.iReferenceLap[3] : this.iReferenceLap)
+				return (path ? this.iReferenceLap[4] : this.iReferenceLap)
 		}
 
 		Set {
@@ -1228,6 +1228,7 @@ class TelemetryViewer {
 
 		processFile(fileName, info) {
 			local theDriver := driver
+			local theLapTime := false
 			local telemetry := false
 			local name, directory, dataFile, file, size, lap
 
@@ -1238,6 +1239,8 @@ class TelemetryViewer {
 					theDriver := driver
 				else
 					theDriver := getMultiMapValue(info, "Info", "Driver")
+
+				theLapTime := getMultiMapValue(info, "Info", "LapTime")
 
 				DirCreate(this.TelemetryDirectory . "Imported")
 
@@ -1285,10 +1288,11 @@ class TelemetryViewer {
 			if telemetry {
 				if info
 					lap := [name, theDriver ? theDriver
-										 : SessionDatabase.getDriverName(simulator, getMultiMapValue(info, "Telemetry", "Driver"))
+											: SessionDatabase.getDriverName(simulator, getMultiMapValue(info, "Telemetry", "Driver"))
+						  , theLapTime ? theLapTime : "-"
 						  , telemetry]
 				else
-					lap := [name, theDriver ? theDriver : "John Doe (JD)", telemetry]
+					lap := [name, theDriver ? theDriver : "John Doe (JD)", theLapTime ? theLapTime : "-", telemetry]
 
 				this.ImportedLaps.Push(lap)
 
@@ -1351,7 +1355,7 @@ class TelemetryViewer {
 			else {
 				SplitPath(lap[1], , , , &newFileName)
 
-				fileName := (dirName . "\" . newFileName . translate(" (") . lap[2] . translate(")"))
+				fileName := (dirName . "\" . newFileName . translate(" (") . lap[2] . ((lap[3] != "-") ? (" - " . lap[3]) : "") . translate(")"))
 			}
 
 			newFileName := (fileName . ".telemetry")
@@ -1379,7 +1383,7 @@ class TelemetryViewer {
 						if isNumber(lap)
 							file := FileOpen((this.TelemetryDirectory . "Lap " . lap . ".telemetry"), "r-wd")
 						else
-							file := FileOpen(lap[3], "r-wd")
+							file := FileOpen(lap[4], "r-wd")
 
 						if file {
 							size := file.Length
@@ -1525,8 +1529,17 @@ class TelemetryViewer {
 			else
 				return lap
 		}
-		else
-			return (lap[1] . translate(":") . A_Space . lap[2])
+		else {
+			lapTime := lap[3]
+			driver := lap[2]
+
+			if (!InStr(driver, "John Doe") && (lapTime != "-"))
+				return (lap[1] . translate(":") . A_Space . driver . translate(" - ") . lapTimeDisplayValue(lapTime))
+			else if !InStr(driver, "John Doe")
+				return (lap[1] . translate(":") . A_Space . driver)
+			else
+				return lap[1]
+		}
 	}
 
 	loadTelemetry(select := false) {

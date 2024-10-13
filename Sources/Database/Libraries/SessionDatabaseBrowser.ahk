@@ -68,7 +68,7 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 		dirName := (SessionDatabase.DatabasePath . "User\")
 
 		OnMessage(0x44, translateLoadCancelButtons)
-		fileName := withBlockedWindows(FileSelect, "M1", dirName, translate("Load Telemetry..."), "Lap Telemetry (*.telemetry; *.json)")
+		fileName := withBlockedWindows(FileSelect, "M1", dirName, translate("Load Telemetry..."), "Lap Telemetry (*.telemetry; *.json; *.CSV)")
 		OnMessage(0x44, translateLoadCancelButtons, 0)
 
 		if ((fileName != "") || (isObject(fileName) && (fileName.Length > 0))) {
@@ -92,9 +92,98 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 							while (ProcessExist(pid) && (count++ < 100))
 								Sleep(100)
 
-							if FileExist(importFileName)
+							if FileExist(importFileName) {
 								fileNames.Push(importFileName)
 								infos.Push(importFileName . ".info")
+							}
+						}
+						catch Any as exception {
+							logError(exception)
+						}
+					})
+				}
+				else if InStr(fileName, ".CSV") {
+					SplitPath(fileName, , , , &name)
+
+					withTask(WorkingTask(translate("Extracting ") . name), () {
+						local channels := false
+						local skipNext := false
+						local entry, ignore, channel, info
+
+						try {
+							importFileName := temporaryFileName("Import", "telemetry")
+
+							deleteFile(importFileName)
+
+							info := newMultiMap()
+
+							loop Read, fileName {
+								if ((A_Index = 1) && !InStr(A_LoopReadLine, "MoTeC CSV File"))
+									return
+
+								if skipNext {
+									skipNext := false
+
+									continue
+								}
+
+								if (Trim(A_LoopReadLine) != "") {
+									entry := collect(string2Values(",", A_LoopReadLine), (f) => StrReplace(f, "`"", ""))
+
+									if (entry[1] = "Venue")
+										setMultiMapValue(info, "Info", "Track", entry[2])
+									else if (entry[1] = "Duration")
+										setMultiMapValue(info, "Info", "LapTime", entry[2])
+									else if ((entry[1] = "Driver") && (Trim(entry[2]) != ""))
+										setMultiMapValue(info, "Info", "Driver", Trim(entry[2]))
+									else if (entry[1] = "Range")
+										setMultiMapValue(info, "Info", "Lap", Trim(StrReplace(entry[2], "Lap", "")))
+									else if !channels {
+										if (entry[1] = "Distance") {
+											channels := []
+
+											for ignore, channel in ["Distance", "THROTTLE", "BRAKE"
+																  , "STEERANGLE", "GEAR", "RPMS", "SPEED"
+																  , "TC", "ABS", "G_LON", "G_LAT"]
+												channels.Push([channel, inList(entry, channel)])
+
+											skipNext := true
+										}
+									}
+									else {
+										line := []
+
+										for ignore, channel in channels
+											if channel[2] {
+												value := entry[channel[2]]
+
+												switch channel[1], false {
+													case "THROTTLE", "BRAKE":
+														value := value / 100
+												}
+
+												line.Push(isNumber(value) ? value : kNull)
+											}
+											else
+												line.Push("n/a")
+
+										FileAppend(values2String(";", line*) . "`n", importFileName)
+									}
+								}
+							}
+
+							if !getMultiMapValue(info, "Info", "Driver", false)
+								setMultiMapValue(info, "Info", "Driver", SessionDatabase.getUserName())
+
+							if FileExist(importFileName) {
+								fileNames.Push(importFileName)
+
+								importFileName := temporaryFileName("Import", "info")
+
+								writeMultiMap(importFileName, info)
+
+								infos.Push(importFileName)
+							}
 						}
 						catch Any as exception {
 							logError(exception)

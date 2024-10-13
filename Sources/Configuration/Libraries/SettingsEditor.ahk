@@ -533,22 +533,22 @@ editSettings(&settingsOrCommand, owner := false, withContinue := false, fromSetu
 
 		settingsEditorGui.SetFont("Norm", "Arial")
 
-		trayTipCheck := settingsEditorGui.Add("CheckBox", "X20 YP+20 h18 w160 Checked" . trayTipCheck . " Section", translate("Tray Tips"))
+		trayTipCheck := settingsEditorGui.Add("CheckBox", "X20 YP+20 h18 w139 Checked" . trayTipCheck . " Section", translate("Tray Tips"))
 		trayTipCheck.OnEvent("Click", checkTrayTipDuration)
 		trayTipDurationInput := settingsEditorGui.Add("Edit", "X160 YP-5 w40 h20 Limit5 Number " . (!trayTipCheck.Value ? "Disabled" : ""), trayTipDurationInput)
 		settingsEditorGui.Add("Text", "X205 YP+5", translate("ms"))
 
-		trayTipSimulationCheck := settingsEditorGui.Add("CheckBox", "X20 YP+20 h18 w160 Checked" . trayTipSimulationCheck, translate("Tray Tips (Simulation)"))
+		trayTipSimulationCheck := settingsEditorGui.Add("CheckBox", "X20 YP+20 h18 w139 Checked" . trayTipSimulationCheck, translate("Tray Tips (Simulation)"))
 		trayTipSimulationCheck.OnEvent("Click", checkTrayTipSimulationDuration)
 		trayTipSimulationDurationInput := settingsEditorGui.Add("Edit", "X160 YP-5 w40 h20 Limit5 Number " . (!trayTipSimulationCheck.Value ? "Disabled" : ""), trayTipSimulationDurationInput)
 		settingsEditorGui.Add("Text", "X205 YP+5", translate("ms"))
 
-		buttonBoxCheck := settingsEditorGui.Add("CheckBox", "X20 YP+20 h18 w160 Checked" . buttonBoxCheck, translate("Button Box"))
+		buttonBoxCheck := settingsEditorGui.Add("CheckBox", "X20 YP+20 h18 w139 Checked" . buttonBoxCheck, translate("Button Box"))
 		buttonBoxCheck.OnEvent("Click", checkButtonBoxDuration)
 		buttonBoxDurationInput := settingsEditorGui.Add("Edit", "X160 YP-5 w40 h20 Limit5 Number " . (!buttonBoxCheck.Value ? "Disabled" : ""), buttonBoxDurationInput)
 		settingsEditorGui.Add("Text", "X205 YP+5", translate("ms"))
 
-		buttonBoxSimulationCheck := settingsEditorGui.Add("CheckBox", "X20 YP+20 h18 w160 Checked" . buttonBoxSimulationCheck, translate("Button Box (Simulation)"))
+		buttonBoxSimulationCheck := settingsEditorGui.Add("CheckBox", "X20 YP+20 h18 w139 Checked" . buttonBoxSimulationCheck, translate("Button Box (Simulation)"))
 		buttonBoxSimulationCheck.OnEvent("Click", checkButtonBoxSimulationDuration)
 		buttonBoxSimulationDurationInput := settingsEditorGui.Add("Edit", "X160 YP-5 w40 h20 Limit5 Number " . (!buttonBoxSimulationCheck.Value ? "Disabled" : ""), buttonBoxSimulationDurationInput)
 		settingsEditorGui.Add("Text", "X205 YP+5", translate("ms"))

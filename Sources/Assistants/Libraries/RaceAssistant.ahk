@@ -1915,35 +1915,45 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	restoreSessionState(settingsFile, stateFile) {
+		local tries := 10
 		local sessionState, sessionSettings
 
-		if isDebug()
+		restoreState() {
+			if this.KnowledgeBase {
+				if isDebug() {
+					logMessage(kLogCritical, "Restoring session state for " . this.AssistantType . "...")
 
-		if isDebug() {
-			logMessage(kLogCritical, "Restoring session state for " . this.AssistantType . "...")
+					if (!settingsFile || (readMultiMap(settingsFile).Count = 0))
+						logMessage(kLogCritical, "Session settings are empty for " . this.AssistantType . "...")
 
-			if (!settingsFile || (readMultiMap(settingsFile).Count = 0))
-				logMessage(kLogCritical, "Session settings are empty for " . this.AssistantType . "...")
+					if (!stateFile || (readMultiMap(stateFile).Count = 0))
+						logMessage(kLogCritical, "Session state is empty for " . this.AssistantType . "...")
+				}
 
-			if (!stateFile || (readMultiMap(stateFile).Count = 0))
-				logMessage(kLogCritical, "Session state is empty for " . this.AssistantType . "...")
+				if stateFile {
+					sessionState := readMultiMap(stateFile)
+
+					deleteFile(stateFile)
+
+					this.loadSessionState(sessionState)
+				}
+
+				if settingsFile {
+					sessionSettings := readMultiMap(settingsFile)
+
+					deleteFile(settingsFile)
+
+					this.loadSessionSettings(sessionSettings)
+				}
+			}
+			else if (tries-- > 0)
+				return Task.CurrentTask
 		}
 
-		if stateFile {
-			sessionState := readMultiMap(stateFile)
-
-			deleteFile(stateFile)
-
-			this.loadSessionState(sessionState)
-		}
-
-		if settingsFile {
-			sessionSettings := readMultiMap(settingsFile)
-
-			deleteFile(settingsFile)
-
-			this.loadSessionSettings(sessionSettings)
-		}
+		if this.KnowledgeBase
+			restoreState()
+		else
+			Task.startTask(restoreState, 20000)
 	}
 
 	createSessionState() {

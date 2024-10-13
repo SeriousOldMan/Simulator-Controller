@@ -3,7 +3,7 @@ Version=5.9.4.0-dev
 Target=5.9.4.0-release
 Date=10/12/2024
 Download=
-Changes=Layout settings for telemetry viewer, Fixed standings with duplicate race numbers, Fixed grid size and positions for R3E, Moved Spotter lap time announcement to Opponent Information group, Horizontal shifting of telemetry graphs, Save selected zoom factor for telemetry graphs, Independent horizontal and vertical zooming for telemetry graphs, Lap telemetry importer for MoTeC
+Changes=Layout settings for telemetry viewer, Fixed standings with duplicate race numbers, Fixed grid size and positions for R3E, Moved Spotter lap time announcement to Opponent Information group, Horizontal shifting of telemetry graphs, Save selected zoom factor for telemetry graphs, Independent horizontal and vertical zooming for telemetry graphs, Lap telemetry importer for MoTeC, Multi upload in session database, Upload telemetry can import from MoTeC and alike
 Components=Media->5.6.1,Configuration->5.9.1,Utilities->5.9.1
 [Release]
 Version=5.9.3.0-release

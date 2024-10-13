@@ -537,8 +537,12 @@ class WorkingTask extends PeriodicTask {
 		if (A_TickCount > (this.iStart + 250))
 			if !this.iProgress
 				this.iProgressWindow := ProgressWindow.showProgress({progress: this.iProgress++, color: "Blue", title: this.iTitle})
-			else if (this.iProgress != "Stop")
-				this.iProgressWindow.updateProgress({progress: Min(100, this.iProgress++)})
+			else if (this.iProgress != "Stop") {
+				if (this.iProgress > 100)
+					this.iProgress := 0
+
+				this.iProgressWindow.updateProgress({progress: this.iProgress++})
+			}
 	}
 
 	stop() {

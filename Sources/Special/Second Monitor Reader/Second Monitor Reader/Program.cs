@@ -398,6 +398,7 @@ static class Program
             outStream = new StreamWriter(args[2]);
 
             outStream.WriteLine("[Info]");
+            outStream.WriteLine("Source=Second Monitor");
             outStream.Write("Driver="); outStream.WriteLine(driver);
             outStream.Write("Lap="); outStream.WriteLine(lapNumber);
             outStream.Write("LapTime="); outStream.WriteLine(lapTime);

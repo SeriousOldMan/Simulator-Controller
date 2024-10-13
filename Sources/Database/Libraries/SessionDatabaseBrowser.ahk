@@ -28,7 +28,7 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 	local x, y, names, ignore, infos, index, name, dirName, driverName
 	local carNames, trackNames, newSimulator, newCar, newTrack, force
 	local userTelemetries, communityTelemetries, info
-	local command, importFileName, pid, count, fileNames
+	local command, fileNames
 
 	static sessionDB := false
 
@@ -68,43 +68,21 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 		dirName := (SessionDatabase.DatabasePath . "User\")
 
 		OnMessage(0x44, translateLoadCancelButtons)
-		fileName := withBlockedWindows(FileSelect, "M1", dirName, translate("Load Telemetry..."), "Lap Telemetry (*.telemetry; *.json)")
+		fileName := withBlockedWindows(FileSelect, "M1", dirName, translate("Load Telemetry..."), "Lap Telemetry (*.telemetry; *.json; *.CSV)")
 		OnMessage(0x44, translateLoadCancelButtons, 0)
 
 		if ((fileName != "") || (isObject(fileName) && (fileName.Length > 0))) {
 			fileNames := []
 			infos := []
 
-			for ignore, fileName in isObject(fileName) ? fileName : [fileName]
-				if InStr(fileName, ".json") {
-					SplitPath(fileName, , , , &name)
+			for ignore, fileName in isObject(fileName) ? fileName : [fileName] {
+				fileName := sessionDB.importTelemetry(simulator, car, track, fileName, &info)
 
-					withTask(WorkingTask(translate("Extracting ") . name), () {
-						try {
-							importFileName := temporaryFileName("Import", "telemetry")
-
-							Run("`"" . kBinariesDirectory . "Connectors\Second Monitor Reader\Second Monitor Reader.exe`" `"" . fileName . "`" `"" . importFileName . "`" `"" . (importFileName . ".info") . "`"", , "Hide", &pid)
-
-							Sleep(500)
-
-							count := 0
-
-							while (ProcessExist(pid) && (count++ < 100))
-								Sleep(100)
-
-							if FileExist(importFileName)
-								fileNames.Push(importFileName)
-								infos.Push(importFileName . ".info")
-						}
-						catch Any as exception {
-							logError(exception)
-						}
-					})
-				}
-				else {
+				if fileName {
 					fileNames.Push(fileName)
-					infos.Push(false)
+					infos.Push(info)
 				}
+			}
 
 			if (fileNames.Length > 0) {
 				fileName := [fileNames, infos]

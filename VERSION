@@ -1,9 +1,9 @@
 [Development]
-Version=5.9.3.0-release
-Target=5.9.3.0-release
-Date=10/11/2024
-Download=https://cutt.ly/KeAwuUcY;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.9.3.0-release.zip
-Changes=Updated car meta data for R3E, Fixed selection of start stint pressures in "Team Center", Fixed an error in strategy simulation which did not respect the stint timer, Fixed saving of imported telemetry data, Spotter now compares lap time to that of the opponents, Optimized window resizing for "Session Database", Fixed configuration of booster actions, Fixed configuration of Reasoning Booster in "Simulator Setup", Weather-specific best lap times are now passed to the LLM of the Reasoning booster to work with, New race settings for ideal tyre temperature
+Version=5.9.4.0-dev
+Target=5.9.4.0-release
+Date=10/12/2024
+Download=https://www.dropbox.com/scl/fi/h3kmxdr4ctw00ewyx3lae/Simulator-Controller-5.9.4.0-dev.zip?rlkey=xjjzghald2ihz33zr9thctyc9&st=exfk8lvl&dl=1
+Changes=Layout settings for telemetry viewer, Fixed standings with duplicate race numbers, Fixed grid size and positions for R3E, Moved Spotter lap time announcement to Opponent Information group, Horizontal shifting of telemetry graphs, Save selected zoom factor for telemetry graphs, Independent horizontal and vertical zooming for telemetry graphs, Lap telemetry importer for MoTeC, Multi upload in session database, Upload telemetry can import from MoTeC and alike
 Components=Media->5.6.1,Configuration->5.9.1,Utilities->5.9.1
 [Release]
 Version=5.9.3.0-release
@@ -23,7 +23,7 @@ Utilities.5.9.1.Path=.
 Utilities.5.9.1.Content=Utilities
 Utilities.5.9.1.Download=https://www.dropbox.com/scl/fi/n3n5gajdhb1swegw46bp6/Utilities-5.9.1.zip?rlkey=sl8dbbf0gndpaqyj8g66by8o5&st=3ullp93q&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.9.1.zip
 [Current]
-Type=Release
+Type=Development
 [Version]
-Development=5.9.3.0-release
+Development=5.9.4.0-dev
 Release=5.9.3.0-release

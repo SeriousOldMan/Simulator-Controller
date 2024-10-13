@@ -1915,35 +1915,45 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	restoreSessionState(settingsFile, stateFile) {
+		local tries := 10
 		local sessionState, sessionSettings
 
-		if isDebug()
+		restoreState() {
+			if this.KnowledgeBase {
+				if isDebug() {
+					logMessage(kLogCritical, "Restoring session state for " . this.AssistantType . "...")
 
-		if isDebug() {
-			logMessage(kLogCritical, "Restoring session state for " . this.AssistantType . "...")
+					if (!settingsFile || (readMultiMap(settingsFile).Count = 0))
+						logMessage(kLogCritical, "Session settings are empty for " . this.AssistantType . "...")
 
-			if (!settingsFile || (readMultiMap(settingsFile).Count = 0))
-				logMessage(kLogCritical, "Session settings are empty for " . this.AssistantType . "...")
+					if (!stateFile || (readMultiMap(stateFile).Count = 0))
+						logMessage(kLogCritical, "Session state is empty for " . this.AssistantType . "...")
+				}
 
-			if (!stateFile || (readMultiMap(stateFile).Count = 0))
-				logMessage(kLogCritical, "Session state is empty for " . this.AssistantType . "...")
+				if stateFile {
+					sessionState := readMultiMap(stateFile)
+
+					deleteFile(stateFile)
+
+					this.loadSessionState(sessionState)
+				}
+
+				if settingsFile {
+					sessionSettings := readMultiMap(settingsFile)
+
+					deleteFile(settingsFile)
+
+					this.loadSessionSettings(sessionSettings)
+				}
+			}
+			else if (tries-- > 0)
+				return Task.CurrentTask
 		}
 
-		if stateFile {
-			sessionState := readMultiMap(stateFile)
-
-			deleteFile(stateFile)
-
-			this.loadSessionState(sessionState)
-		}
-
-		if settingsFile {
-			sessionSettings := readMultiMap(settingsFile)
-
-			deleteFile(settingsFile)
-
-			this.loadSessionSettings(sessionSettings)
-		}
+		if this.KnowledgeBase
+			restoreState()
+		else
+			Task.startTask(restoreState, 20000)
 	}
 
 	createSessionState() {
@@ -2045,9 +2055,13 @@ class RaceAssistant extends ConfigurationItem {
 			setMultiMapValue(sessionInfo, "Track", "Temperature", Round(getMultiMapValue(data, "Track Data", "Temperature", 0), 1))
 			setMultiMapValue(sessionInfo, "Track", "Grip", getMultiMapValue(data, "Track Data", "Grip", "Optimum"))
 
-			setMultiMapValue(sessionInfo, "Tyres", "Compound"
-										, compound(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound")
-												 , knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color")))
+			if knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound", false)
+				setMultiMapValue(sessionInfo, "Tyres", "Compound"
+											, compound(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound")
+													 , knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color")))
+			else
+				setMultiMapValue(sessionInfo, "Tyres", "Compound", "-")
+
 			setMultiMapValue(sessionInfo, "Tyres", "Set", getMultiMapValue(data, "Car Data", "TyreSet", false))
 			setMultiMapValue(sessionInfo, "Tyres", "Pressures", getMultiMapValue(data, "Car Data", "TyrePressure", ""))
 			setMultiMapValue(sessionInfo, "Tyres", "Pressures.Hot", getMultiMapValue(data, "Car Data", "TyrePressure", ""))

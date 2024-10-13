@@ -2507,7 +2507,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		loop 2
 			this.TelemetryListView.ModifyCol(A_Index, "AutoHdr")
 
-		if select
+		if isNumber(select)
 			this.selectTelemetry(select)
 		else
 			this.updateState()
@@ -2557,7 +2557,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		loop 2
 			this.StrategyListView.ModifyCol(A_Index, "AutoHdr")
 
-		if select
+		if isNumber(select)
 			this.selectStrategy(select)
 		else
 			this.updateState()
@@ -2615,7 +2615,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			loop 2
 				this.SetupListView.ModifyCol(A_Index, "AutoHdr")
 
-			if select
+			if isNumber(select)
 				this.selectSetup(select)
 			else
 				this.updateState()
@@ -5217,32 +5217,55 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	uploadTelemetry() {
 		local window := this.Window
-		local fileName, telemetry, file, size
+		local fileName, telemetry, file, size, info, driver, name, ignore
 
 		window.Opt("+OwnDialogs")
 
 		OnMessage(0x44, translateLoadCancelButtons)
-		fileName := withBlockedWindows(FileSelect, 1, "", translate("Upload Telemetry File..."), "Lap Telemetry (*.telemetry)")
+		fileName := withBlockedWindows(FileSelect, "M1", "", translate("Upload Telemetry File..."), "Lap Telemetry (*.telemetry; *.JSON; *.CSV)")
 		OnMessage(0x44, translateLoadCancelButtons, 0)
 
-		if (fileName != "") {
-			file := FileOpen(fileName, "r-wd")
+		if ((fileName != "") || (isObject(fileName) && (fileName.Length > 0))) {
+			for ignore, fileName in isObject(fileName) ? fileName : [fileName] {
+				SplitPath(fileName, , , , &name)
 
-			if file {
-				size := file.Length
+				fileName := this.SessionDatabase.importTelemetry(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack
+															   , fileName, &info)
 
-				telemetry := Buffer(size)
+				if (fileName && (fileName != "")) {
+					file := FileOpen(fileName, "r-wd")
 
-				file.RawRead(telemetry, size)
+					if file {
+						size := file.Length
 
-				file.Close()
+						telemetry := Buffer(size)
 
-				SplitPath(fileName, &fileName)
+						file.RawRead(telemetry, size)
 
-				this.SessionDatabase.writeTelemetry(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, fileName, telemetry, size, false, true, this.SessionDatabase.ID)
+						file.Close()
+
+						if info
+							driver := this.SessionDatabase.getDriverID(this.SelectedSimulator
+																	 , getMultiMapValue(readMultiMap(info), "Info", "Driver"
+																					  , this.SessionDatabase.getUserName()))
+						else
+							driver := this.SessionDatabase.ID
+
+						this.SessionDatabase.writeTelemetry(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name, telemetry, size, false, true, driver)
+					}
+				}
 			}
 
-			this.loadTelemetries(StrReplace(fileName, ".telemetry", ""))
+			if isObject(fileName)
+				if (fileName.Length = 1)
+					SplitPath(fileName[1], &fileName)
+				else
+					fileName := false
+
+			if fileName
+				SplitPath(fileName, , , , &fileName)
+
+			this.loadTelemetries(fileName)
 		}
 	}
 
@@ -5319,18 +5342,27 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		window.Opt("+OwnDialogs")
 
 		OnMessage(0x44, translateLoadCancelButtons)
-		fileName := withBlockedWindows(FileSelect, 1, "", translate("Upload Strategy File..."), "Strategy (*.strategy)")
+		fileName := withBlockedWindows(FileSelect, "M1", "", translate("Upload Strategy File..."), "Strategy (*.strategy)")
 		OnMessage(0x44, translateLoadCancelButtons, 0)
 
-		if (fileName != "") {
-			strategy := readMultiMap(fileName)
+		if ((fileName != "") || (isObject(fileName) && (fileName.Length > 0))) {
+			for ignore, fileName in isObject(fileName) ? fileName : [fileName]
+				if (fileName && (fileName != "")) {
+					strategy := readMultiMap(fileName)
 
-			SplitPath(fileName, &fileName)
+					SplitPath(fileName, &fileName)
 
-			this.SessionDatabase.writeStrategy(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, fileName, strategy
-											 , true, true, this.SessionDatabase.ID)
+					this.SessionDatabase.writeStrategy(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, fileName, strategy
+													 , true, true, this.SessionDatabase.ID)
+				}
 
-			this.loadStrategies(StrReplace(fileName, ".strategy", ""))
+			if isObject(fileName)
+				if (fileName.Length = 1)
+					SplitPath(fileName[1], &fileName)
+				else
+					fileName := false
+
+			this.loadStrategies(fileName ? StrReplace(fileName, ".strategy", "") : false)
 		}
 	}
 
@@ -5392,33 +5424,42 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	uploadSetup(setupType) {
 		local window := this.Window
-		local fileName, file, size, setup
+		local fileName, file, size, setup, ignore
 
 		window.Opt("+OwnDialogs")
 
 		OnMessage(0x44, translateLoadCancelButtons)
-		fileName := withBlockedWindows(FileSelect, 1, "", translate("Upload Setup File..."))
+		fileName := withBlockedWindows(FileSelect, "M1", "", translate("Upload Setup File..."))
 		OnMessage(0x44, translateLoadCancelButtons, 0)
 
-		if (fileName != "") {
-			file := FileOpen(fileName, "r-wd")
+		if ((fileName != "") || (isObject(fileName) && (fileName.Length > 0))) {
+			for ignore, fileName in isObject(fileName) ? fileName : [fileName]
+				if (fileName && (fileName != "")) {
+					file := FileOpen(fileName, "r-wd")
 
-			if file {
-				size := file.Length
+					if file {
+						size := file.Length
 
-				setup := Buffer(size)
+						setup := Buffer(size)
 
-				file.RawRead(setup, size)
+						file.RawRead(setup, size)
 
-				file.Close()
+						file.Close()
 
-				SplitPath(fileName, &fileName)
+						SplitPath(fileName, &fileName)
 
-				this.SessionDatabase.writeSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, fileName, setup, size
-											  , false, true, this.SessionDatabase.ID)
+						this.SessionDatabase.writeSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, fileName, setup, size
+													  , false, true, this.SessionDatabase.ID)
+					}
+				}
 
-				this.loadSetups(this.SelectedSetupType, true, fileName)
-			}
+			if isObject(fileName)
+				if (fileName.Length = 1)
+					SplitPath(fileName[1], &fileName)
+				else
+					fileName := false
+
+			this.loadSetups(this.SelectedSetupType, true, fileName)
 		}
 	}
 

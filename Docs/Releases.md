@@ -1,3 +1,17 @@
+## 5.9.4.0-release 10/18/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Fixed standings handling and reace reports for grids where cars with duplicate race numbers are present. This can happen in *RaceRoom Racing Experience*, for example.
+  4. Fixed a rare bug, which resulted in incorrect position information announced by the Spotter for *RaceRoom Racing Experience*.
+  5. A complete new layout system has been introduced for the Telemetry Viewer. You now can select the channels, you are interested in and arrange them according to your preferences. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetry-viewer) for more information.
+  6. Telemetry graphs can now be shifted horizontally to match track position of telemetry data from different sources.
+  7. Zooming of telemetry graph is now possible both horizontally and vertically.
+  8. Selected zoom factor will now be stored for telemetry graphs.
+  9. Lap telemetry data can now also be imported from MoTeC. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetry-viewer) for more information.
+  10. Multiple lap telemetry data, setups or strategies can be uploaded at once in "Session Database".
+  11. Uploading telemetry data in the "Session Database" can also read MoTeC and Second Monitor files.
+  12. The announcement of the last lap times of the cars around you by the Spotter has been moved from the "Session Information" group to the "Opponent Information" group and can be enabled/disabled together with ´gap and delta information in the configuration.
+  
 ## 5.9.3.0-release 10/11/24
 
 IMPORTANT READ: A nasty bug had been introduced with the last release, which for some user broke the telemetry / issue analyzer in "Setup Workbench". A very early version of "Setup Workbench" stored files in *[Documents]\Simulator Controller\Garage\Definitions* for personal modification. This was no longer necessary with a later release, but the files were left in place. They now collide with the latest version of "Setup Workbench".

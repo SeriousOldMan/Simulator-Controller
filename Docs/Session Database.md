@@ -96,7 +96,7 @@ Telemetry data for individual laps can be stored in the session database, for ex
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2019.jpg)
 
-You can use the buttons below the list to upload, download, rename or delete lap telemetry data, but in most cases you will use the ["Solo Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center) to record the telemetry data and store it in the database. Once you have selected telemetry data in the list above, you can decide whether you want to share it potentially with the community (if you have given consent to share telemetry data - see the information about community data at the end of this chapter) and/or whether you want to synchronize the lap telemetry with any of the [connected Team Servers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration) (see below).
+You can use the buttons below the list to upload, download, rename or delete lap telemetry data, but in most cases you will use the ["Solo Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center), the ["Team Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center) or the ["Setup Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench) to record the telemetry data and store it in the database. Once you have selected telemetry data in the list above, you can decide whether you want to share it potentially with the community (if you have given consent to share telemetry data - see the information about community data at the end of this chapter) and/or whether you want to synchronize the lap telemetry with any of the [connected Team Servers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration) (see below).
 
 ##### Telemetry Viewer
 
@@ -106,7 +106,21 @@ If a lap is double clicked, the Telemetry Viewer will open up and let you examin
 
 You can load additional laps from the session database or any other location for comparison using the small button with the "Folder" icon. Please note, that deleting a lap from the Telemetry Viewer using the *delete* button (the one with the "-" icon) will not remove it from its original location. Different rules may apply, when the Telemetry Viewer had been opened from one of the application listed below.
 
-Good to know: If you use the "Open..." button in the dialog, which let's you browse the available telemetry data, you can import telemetry data from ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), as long as it has been saved as JSON file, which can be activated in the settings of "Second Monitor".
+Good to know: If you use the "Open..." button in the dialog, which let's you browse the available telemetry data, you can import telemetry data from ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), as long as it has been saved as JSON file, which can be activated in the settings of "Second Monitor". And you can import telemetry files from "MoTec". They must be exported as "CSV" files and the "Distance" field must be included.
+
+When a reference lap is loaded, it can be shifted horizontally to align it perfectly with the other lap telemetry data. This is especially useful, when comparing laps from different simulators or when data is used, that has been imported from other sources like "Second Monitor".
+
+With the controls in the upper right, you can change the zoom factor in both dimensions and you can define and use different layouts for the graph. Click on the small button with the "..." to open a dialog to define and change layouts.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Telemetry%20Browser%20Settings.JPG)
+
+Select the channels you want to display in the telemetry graph and move them up and down as you like.
+
+If available, a map for the current track can be opened with the "Map..." button. You can click on a location of the track map and the corresponding data points will be highlighted in the telemetry graph. It is also possible to click on a data point in the graph and the corresponding location will be selected in the track map.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Telemetry%20Browser%20Track%20Map.jpg)
+
+Important: This functionality may not be available when using *WebView2* as the HTML viewer.
 
 The Telemetry Viewer is available in the following applications to collect lap telemetry data, where additional documentation is available:
 
@@ -114,11 +128,13 @@ The Telemetry Viewer is available in the following applications to collect lap t
 - [Solo Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#Telemetry-Viewer)
 - [Team Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#Telemetry-Viewer)
 
-If available, a map for the current track can be opened with the "Map..." button. You can click on a location of the track map and the corresponding data points will be highlighted in the telemetry graph. It is also possible to click on a data point in the graph and the corresponding location will be selected in the track map.
+##### Special notes for *Assetto Corsa Competizione*
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Telemetry%20Browser%20Track%20Map.jpg)
+For unknown (and maybe historical) reasons *Assetto Corsa Competizione* supplies two different APIs, one of which comes with a very low refresh rate. The first is the so called shared memory API which provides a complete set of car telemetry data, but unfortunately not the current distance into the track spline. This information is provided in the so called UDP interface, which is network based and uses a low refresh rate. Long story short, collecting position dependent telemetry data for *Assetto Corsa Competizione* is complicated and unprecise to say the least.
 
-Important: This functionality may not be available when using *WebView2* as the HTML viewer.
+To get high precision samples with a resolution of at least 20 Hz, the telemetry collector implements a special method. This method first learns the layout of the track in the same manner as [track mapping for *iRacing*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#special-notes-about-track-mapping-in-iracing) is implemented, before telemetry data can be correlated to the track position. Therefore be sure to drive clean during the first laps.
+
+A drawback of this method is, that telemetry data can be reliably compared to each other only within one single session. The Telemetry Viewer provides the possibility to shift lap data *horizontally*, but there also may be subtle differences in track position between sessions. Be aware of that when comparing lap telemetry data of different sessions.
 
 #### Strategies
 

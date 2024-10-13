@@ -20,21 +20,20 @@
 ;;;                       Private Constants Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kDataSeries := [{Name: "Distance", Indices: [1], Series: ["Distance"]}
-					 , {Name: "Throttle", Indices: [2], Series: ["Throttle"]}
-					 , {Name: "Brake", Indices: [3], Series: ["Brake"]}
-					 , {Name: "Throttle/Brake", Indices: [2, 3], Series: ["Throttle", "Brake"]}
-					 , {Name: "Steering", Indices: [4], Series: ["Steering"]}
-					 , {Name: "Gear", Indices: [5], Series: ["Gear"]}
-					 , {Name: "RPM", Indices: [6], Series: ["RPM"]}
-					 , {Name: "Speed", Indices: [7], Series: ["Speed"]}
-					 , {Name: "TC", Indices: [8], Series: ["TC"]}
-					 , {Name: "ABS", Indices: [9], Series: ["ABS"]}
-					 , {Name: "TC/ABS", Indices: [8, 9], Series: ["TC", "ABS"]}
-					 , {Name: "Long G", Indices: [10], Series: ["Long G"]}
-					 , {Name: "Lat G", Indices: [11], Series: ["Lat G"]}
-					 , {Name: "Long G/Lat G", Indices: [10, 11], Series: ["Long G", "Lat G"]}
-					 , {Name: "Curvature", Indices: [12], Series: ["Curvature"]}]
+global kDataSeries := [{Name: "Speed", Indices: [7], Size: 1, Series: ["Speed"], Converter: [(s) => s ? convertUnit("Speed", s) : kNull]}
+					 , {Name: "Throttle", Indices: [2], Size: 0.5, Series: ["Throttle"]}
+					 , {Name: "Brake", Indices: [3], Size: 0.5, Series: ["Brake"]}
+					 , {Name: "Throttle/Brake", Indices: [2, 3], Size: 0.5, Series: ["Throttle", "Brake"]}
+					 , {Name: "Steering", Indices: [4], Size: 0.8, Series: ["Steering"]}
+					 , {Name: "TC", Indices: [8], Size: 0.3, Series: ["TC"]}
+					 , {Name: "ABS", Indices: [9], Size: 0.3, Series: ["ABS"]}
+					 , {Name: "TC/ABS", Indices: [8, 9], Size: 0.3, Series: ["TC", "ABS"]}
+					 , {Name: "RPM", Indices: [6], Size: 0.5, Series: ["RPM"]}
+					 , {Name: "Gear", Indices: [5], Size: 0.5, Series: ["Gear"]}
+					 , {Name: "Long G", Indices: [10], Size: 1, Series: ["Long G"]}
+					 , {Name: "Lat G", Indices: [11], Size: 1, Series: ["Lat G"]}
+					 , {Name: "Long G/Lat G", Indices: [10, 11], Size: 1, Series: ["Long G", "Lat G"]}
+					 , {Name: "Curvature", Indices: [12], Size: 1, Series: ["Curvature"]}]
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -46,7 +45,8 @@ class TelemetryChart {
 
 	iChartArea := false
 
-	iZoom := 100
+	iWidthZoom := 100
+	iHeightZoom := 100
 
 	TelemetryViewer {
 		Get {
@@ -66,13 +66,23 @@ class TelemetryChart {
 		}
 	}
 
-	Zoom {
+	WidthZoom {
 		Get {
-			return this.iZoom
+			return this.iWidthZoom
 		}
 
 		Set {
-			return (this.iZoom := value)
+			return (this.iWidthZoom := value)
+		}
+	}
+
+	HeightZoom {
+		Get {
+			return this.iHeightZoom
+		}
+
+		Set {
+			return (this.iHeightZoom := value)
 		}
 	}
 
@@ -81,13 +91,11 @@ class TelemetryChart {
 		this.iChartArea := chartArea
 	}
 
-	showTelemetryChart(lapFileName, referenceLapFileName := false) {
+	showTelemetryChart(series, lapFileName, referenceLapFileName := false, distanceCorrection := 0) {
 		eventHandler(event, arguments*) {
 			local telemetryViewer := this.TelemetryViewer
 			local row := false
 			local data
-
-			; this.ChartArea.stop()
 
 			try {
 				if (event = "Select") {
@@ -119,19 +127,19 @@ class TelemetryChart {
 
 		if this.ChartArea {
 			this.ChartArea.document.open()
-			this.ChartArea.document.write(this.createTelemetryChart(lapFileName, referenceLapFileName))
+			this.ChartArea.document.write(this.createTelemetryChart(series, lapFileName, referenceLapFileName, distanceCorrection))
 			this.ChartArea.document.close()
 
 			this.ChartArea.document.parentWindow.eventHandler := eventHandler
 		}
 	}
 
-	createTelemetryChart(lapFileName, referenceLapFileName := false, margin := 0) {
+	createTelemetryChart(series, lapFileName, referenceLapFileName := false, distanceCorrection := 0, margin := 0, hScale := 1, wScale := 1) {
 		local lapTelemetry := []
 		local referenceLapTelemetry := false
 		local html := ""
 		local width, height
-		local drawChartFunction1, chartArea1, drawChartFunction2, chartArea2, drawChartFunction3, chartArea3
+		local drawChartFunction, chartArea
 		local before, after, margins
 		local entry, index, field, running
 
@@ -150,50 +158,31 @@ class TelemetryChart {
 					if !isNumber(value)
 						entry[index] := kNull
 					else if (index = 1)
-						running := entry[index] := (Round(entry[index] / 7.5) * 7.5)
+						running := entry[index] := (Round((entry[index] + distanceCorrection) / 7.5) * 7.5)
 
 				referenceLapTelemetry[running] := entry
 			}
 		}
 
 		if this.ChartArea {
-			width := ((this.ChartArea.getWidth() - 4) / 100 * this.Zoom)
-			height := (this.ChartArea.getHeight() - 4)
+			width := ((this.ChartArea.getWidth() - 4) / 100 * this.WidthZoom * wScale)
+			height := ((this.ChartArea.getHeight() - 4) / 100 * this.HeightZoom * hScale)
 
-			chartArea1 := this.createSpeedChart(width, height / 3 * 2, lapTelemetry, referenceLapTelemetry, &drawChartFunction1)
-			chartArea2 := this.createElectronicsChart(width, height / 3, lapTelemetry, referenceLapTelemetry, &drawChartFunction2)
-			chartArea3 := this.createAccelerationChart(width, height / 3, lapTelemetry, referenceLapTelemetry, &drawChartFunction3)
+			chartArea:= this.createSeriesChart(width, height, series, lapTelemetry, referenceLapTelemetry, &drawChartFunction)
 
-			if chartArea3
-				before := "
-				(
-					<meta charset='utf-8'>
-					<head>
-						<style>
-							.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
-							.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
-							.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
-						</style>
-						<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-						<script type="text/javascript">function drawCharts() { drawSpeedChart(); drawElectronicsChart(); drawAccelerationChart() }</script>
-						<script type="text/javascript">
-							google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawCharts);
-				)"
-			else
-				before := "
-				(
-					<meta charset='utf-8'>
-					<head>
-						<style>
-							.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
-							.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
-							.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
-						</style>
-						<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-						<script type="text/javascript">function drawCharts() { drawSpeedChart(); drawElectronicsChart() }</script>
-						<script type="text/javascript">
-							google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawCharts);
-				)"
+			before := "
+			(
+				<meta charset='utf-8'>
+				<head>
+					<style>
+						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+						.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+						.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
+					</style>
+					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+					<script type="text/javascript">
+						google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawChart);
+			)"
 
 			before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
 												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
@@ -209,32 +198,47 @@ class TelemetryChart {
 			margins := substituteVariables("style='overflow: auto' leftmargin='%margin%' topmargin='%margin%' rightmargin='%margin%' bottommargin='%margin%'"
 										 , {margin: margin})
 
-			return ("<html>" . before . drawChartFunction1 . "`n" . drawChartFunction2 . (chartArea3 ? ("`n" . drawChartFunction3) : "") . after . "<body style='background-color: #" . this.Window.AltBackColor . "' " . margins . "><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style>" . chartArea1 . chartArea2 . (chartArea3 ? chartArea3 : "") . "</body></html>")
+			return ("<html>" . before . drawChartFunction . after . "<body style='background-color: #" . this.Window.AltBackColor . "' " . margins . "><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style>" . chartArea . "</body></html>")
 		}
 		else
 			return "<html></html>"
 	}
 
-	createSpeedChart(width, height, lapTelemetry, referenceLapTelemetry, &drawChartFunction) {
-		local speedMin := 9999
-		local speedMax := 0
-		local ignore, data, refData, axes, speed, refSpeed, color, running, refRunning
+	createSeriesChart(width, height, series, lapTelemetry, referenceLapTelemetry, &drawChartFunction) {
+		local seriesCount := series.Length
+		local seriesEstate := 0
+		local axisCount := 0
+		local ignore, index, offset, data, refData, axes, color, running, refRunning, values
+		local theSeries, theName, theIndex, theValue, theConverter, theMinValue, minValue, maxValue, spread, absG
 
-		drawChartFunction := ("function drawSpeedChart() {`nvar data = new google.visualization.DataTable();")
+		series := collect(series, (s) {
+			local minValues := []
+			local maxValues := []
+
+			s := s.Clone()
+
+			seriesEstate += s.Size
+
+			s.MinValue := kUndefined
+			s.MaxValue := kUndefined
+
+			axisCount += s.Indices.Length
+
+			return s
+		})
+
+		drawChartFunction := ("function drawChart() {`nvar data = new google.visualization.DataTable();")
 
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Distance") . "');")
 
-		if referenceLapTelemetry {
-			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Speed") . translate(" (Reference)") . "');")
-			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Throttle") . translate(" (Reference)") . "');")
-			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Brake") . translate(" (Reference)") . "');")
-			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Steering") . translate(" (Reference)") . "');")
-		}
+		if referenceLapTelemetry
+			for ignore, theSeries in series
+				for ignore, theName in theSeries.Series
+					drawChartFunction .= ("`ndata.addColumn('number', '" . translate(theName) . translate(" (Reference)") . "');")
 
-		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Speed") . "');")
-		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Throttle") . "');")
-		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Brake") . "');")
-		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Steering") . "');")
+		for ignore, theSeries in series
+			for ignore, theName in theSeries.Series
+				drawChartFunction .= ("`ndata.addColumn('number', '" . translate(theName) . "');")
 
 		drawChartFunction .= "`ndata.addRows(["
 
@@ -245,275 +249,214 @@ class TelemetryChart {
 				drawChartFunction .= ", "
 
 			running := data[1]
-			speed := data[7]
-
-			if (speed > 0) {
-				speed := convertUnit("Speed", speed)
-
-				speedMin := Min(speedMin, speed)
-				speedMax := Max(speedMax, speed)
-			}
-			else
-				speed := kNull
+			refRunning := kNull
 
 			if referenceLapTelemetry {
 				refRunning := (Round(running / 7.5) * 7.5)
 
-				if referenceLapTelemetry.Has(refRunning) {
-					refData := referenceLapTelemetry[refRunning]
-
-					refSpeed := refData[7]
-
-					if (refSpeed = 0)
-						refSpeed := kNull
-
-					drawChartFunction .= ("[" . running . ", " . refSpeed . ", " . refData[2] . ", " . refData[3] . ", " . refData[4] . ", " . speed . ", " . data[2] . ", " . data[3] . ", " . data[4] . "]")
-				}
-				else
-					drawChartFunction .= ("[" . running . ", null, null, null, null, " . speed . ", " . data[2] . ", " . data[3] . ", " . data[4] . "]")
-			}
-			else
-				drawChartFunction .= ("[" . running . ", " . speed . ", " . data[2] . ", " . data[3] . ", " . data[4] . "]")
-		}
-
-		if referenceLapTelemetry {
-			color := this.Window.Theme.TextColor["Disabled"]
-
-			axes := "series: { 0: {targetAxisIndex: 0, color: '" . color . "'}, 1: {targetAxisIndex: 1, color: '" . color . "'}, 2: {targetAxisIndex: 2, color: '" . color . "'}, 3: {targetAxisIndex: 3, color: '" . color . "'}, 4: {targetAxisIndex: 4}, 5: {targetAxisIndex: 5}, 6: {targetAxisIndex: 6}, 7: {targetAxisIndex: 7} },`n"
-			axes .= "hAxes: {gridlines: {count: 0}, ticks: []}, vAxes: { 0: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . (speedMax - ((speedMax - speedMin) * 3)) . " }, 1: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue : -2, maxValue: 5 }, 2: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: -2, maxValue: 5 }, 3: { gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 }, 4: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . (speedMax - ((speedMax - speedMin) * 3)) . " }, 5: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue : -2, maxValue: 5 }, 6: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: -2, maxValue: 5 },  7: { gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 } }"
-		}
-		else {
-			axes := "series: { 0: {targetAxisIndex: 0}, 1: {targetAxisIndex: 1}, 2: {targetAxisIndex: 2}, 3: {targetAxisIndex: 3} },`n"
-			axes .= "hAxes: {gridlines: {count: 0}, ticks: []}, vAxes: { 0: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . (speedMax - ((speedMax - speedMin) * 3)) . " }, 1: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue : -2, maxValue: 5 }, 2: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: -2, maxValue: 5 }, 3: { gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 } }"
-		}
-
-		drawChartFunction .= ("]);`nvar options = { " . axes . ", legend: { position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '2%', top: '5%', right: '2%', bottom: '20%' }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
-
-		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_speed')); chart.draw(data, options); document.speed_chart = chart;")
-		drawChartFunction .= "`nfunction selectHandler(e) { var cSelection = chart.getSelection(); var selection = ''; for (var i = 0; i < cSelection.length; i++) { var item = cSelection[i]; if (i > 0) selection += ';'; selection += (item.row + '|' + item.column); } try { eventHandler('Select', selection); } catch(e) {} }"
-
-		drawChartFunction .= "`ngoogle.visualization.events.addListener(chart, 'select', selectHandler); }"
-
-		drawChartFunction .= ("`nfunction selectSpeed(row) {`ndocument.speed_chart.setSelection([{row: row, column: null}]); }")
-
-		return ("<div id=`"chart_speed`" style=`"width: " . Round(width) . "px; height: " . Round(height) . "px`"></div>")
-	}
-
-	createElectronicsChart(width, height, lapTelemetry, referenceLapTelemetry, &drawChartFunction) {
-		local rpmsMin := 99999
-		local rpmsMax := 0
-		local ignore, data, refData, rpms, refRpms, axes, color, running, refRunning
-
-		drawChartFunction := ("function drawElectronicsChart() {`nvar data = new google.visualization.DataTable();")
-
-		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Distance") . "');")
-
-		if referenceLapTelemetry {
-			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("RPM") . translate(" (Reference)") . "');")
-			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Gear") . translate(" (Reference)") . "');")
-			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("TC") . translate(" (Reference)") . "');")
-			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("ABS") . translate(" (Reference)") . "');")
-		}
-
-		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("RPM") . "');")
-		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Gear") . "');")
-		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("TC") . "');")
-		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("ABS") . "');")
-
-		drawChartFunction .= "`ndata.addRows(["
-
-		for ignore, data in lapTelemetry {
-			if (A_Index = 1)
-				continue
-			else if (A_Index > 2)
-				drawChartFunction .= ", "
-
-			running := data[1]
-			rpms := data[6]
-
-			if (rpms > 0) {
-				rpmsMin := Min(rpmsMin, rpms)
-				rpmsMax := Max(rpmsMax, rpms)
-			}
-			else
-				rpms := kNull
-
-			if referenceLapTelemetry {
-				refRunning := (Round(running / 7.5) * 7.5)
-
-				if referenceLapTelemetry.Has(refRunning) {
-					refData := referenceLapTelemetry[refRunning]
-
-					refRpms := refData[6]
-
-					if (refRpms = 0)
-						refRpms := kNull
-
-					drawChartFunction .= ("[" . running . ", " . refRpms . ", " . refData[5] . ", " . refData[8] . ", " . refData[9] . ", " . rpms . ", " . data[5] . ", " . data[8] . ", " . data[9] . "]")
-				}
-				else
-					drawChartFunction .= ("[" . running . ", null, null, null, null, " . rpms . ", " . data[5] . ", " . data[8] . ", " . data[9] . "]")
-			}
-			else
-				drawChartFunction .= ("[" . running . ", " . rpms . ", " . data[5] . ", " . data[8] . ", " . data[9] . "]")
-		}
-
-		if referenceLapTelemetry {
-			color := this.Window.Theme.TextColor["Disabled"]
-
-			axes := "series: { 0: {targetAxisIndex: 0, color: '" . color . "'}, 1: {targetAxisIndex: 1, color: '" . color . "'}, 2: {targetAxisIndex: 2, color: '" . color . "'}, 3: {targetAxisIndex: 3, color: '" . color . "'}, 4: {targetAxisIndex: 4}, 5: {targetAxisIndex: 5}, 6: {targetAxisIndex: 6}, 7: {targetAxisIndex: 7} },`n"
-			axes .= "hAxes: {gridlines: {count: 0}, ticks: []}, vAxes: { 0: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . (rpmsMax - ((rpmsMax - rpmsMin) * 3)) . " }, 1: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue : -2, maxValue: 10 }, 2: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 }, 3: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 }, 4: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . (rpmsMax - ((rpmsMax - rpmsMin) * 3)) . " }, 5: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue : -2, maxValue: 10 }, 6: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 },  7: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 } }"
-		}
-		else {
-			axes := "series: { 0: {targetAxisIndex: 0}, 1: {targetAxisIndex: 1}, 2: {targetAxisIndex: 2}, 3: {targetAxisIndex: 3} },`n"
-			axes .= "hAxes: {gridlines: {count: 0}, ticks: []}, vAxes: { 0: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . (rpmsMax - ((rpmsMax - rpmsMin) * 3)) . " }, 1: { baselineColor: '" . this.Window.AltBackColor . "', baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue : -2, maxValue: 10 }, 2: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 }, 3: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: -1, maxValue: 5 } }"
-		}
-
-		drawChartFunction .= ("]);`nvar options = { " . axes . ", legend: { position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '2%', top: '5%', right: '2%', bottom: '20%' }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
-
-		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_electronics')); chart.draw(data, options); document.electronics_chart = chart;")
-		drawChartFunction .= "`nfunction selectHandler(e) { var cSelection = chart.getSelection(); var selection = ''; for (var i = 0; i < cSelection.length; i++) { var item = cSelection[i]; if (i > 0) selection += ';'; selection += (item.row + '|' + item.column); } try { eventHandler('Select', selection); } catch(e) {} }"
-
-		drawChartFunction .= "`ngoogle.visualization.events.addListener(chart, 'select', selectHandler); }"
-
-		drawChartFunction .= ("`nfunction selectElectronics(row) {`ndocument.electronics_chart.setSelection([{row: row, column: null}]); }")
-
-		return ("<div id=`"chart_electronics`" style=`"width: " . Round(width) . "px; height: " . Round(height) . "px`"></div>")
-	}
-
-	createAccelerationChart(width, height, lapTelemetry, referenceLapTelemetry, &drawChartFunction) {
-		local accelMin := kUndefined
-		local accelMax := kUndefined
-		local curvMin := kUndefined
-		local curvMax := kUndefined
-		local ignore, data, refData, longG, latG, refLongG, refLatG, axes, color, running, refRunning, curvature, speed, absG
-
-		drawChartFunction := ("function drawAccelerationChart() {`nvar data = new google.visualization.DataTable();")
-
-		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Distance") . "');")
-
-		if referenceLapTelemetry {
-			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Long G") . translate(" (Reference)") . "');")
-			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Lat G") . translate(" (Reference)") . "');")
-		}
-
-		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Long G") . "');")
-		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Lat G") . "');")
-
-		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Curvature") . "');")
-
-		drawChartFunction .= "`ndata.addRows(["
-
-		if (lapTelemetry.Length = 0)
-			return false
-
-		for ignore, data in lapTelemetry {
-			if (data.Length < 10)
-				return false
-
-			if (A_Index = 1)
-				continue
-			else if (A_Index > 2)
-				drawChartFunction .= ", "
-
-			running := data[1]
-
-			longG := data[10]
-			latG := data[11]
-
-			if (accelMin = kUndefined) {
-				accelMin := longG
-				accelMax := longG
-			}
-			else {
-				accelMin := Min(accelMin, longG)
-				accelMax := Max(accelMax, longG)
+				if !referenceLapTelemetry.Has(refRunning)
+					refRunning := kNull
 			}
 
-			accelMin := Min(accelMin, latG)
-			accelMax := Max(accelMax, latG)
+			values := []
 
-			speed := data[7]
+			if (refRunning != kNull) {
+				refData := referenceLapTelemetry[refRunning]
 
-			absG := Abs(latG)
+				for ignore, theSeries in series
+					if (theSeries.Name = "Curvature") {
+						if refData.Has(11) {
+							absG := Abs(refData[11])
 
-			if (absG > 0.1) {
-				curvature := - Log(((speed / 3.6) ** 2) / ((absG = 0) ? 0.00001 : absG))
+							if (absG > 0.1) {
+								theValue := - Log(((refData[7] / 3.6) ** 2) / ((absG = 0) ? 0.00001 : absG))
 
-				if (curvMin = kUndefined) {
-					curvMin := curvature
-					curvMax := curvature
-				}
-				else {
-					curvMin := Min(curvMin, curvature)
-					curvMax := Max(curvMax, curvature)
-				}
-			}
-			else
-				curvature := kNull
+								if (theSeries.MinValue = kUndefined) {
+									theSeries.MinValue := theValue
+									theSeries.MaxValue := theValue
+								}
+								else {
+									theSeries.MinValue := Min(theSeries.MinValue, theValue)
+									theSeries.MaxValue := Max(theSeries.MaxValue, theValue)
+								}
+							}
+							else
+								theValue := kNull
 
-			if referenceLapTelemetry {
-				refRunning := (Round(running / 7.5) * 7.5)
-
-				if referenceLapTelemetry.Has(refRunning) {
-					refData := referenceLapTelemetry[refRunning]
-
-					if (refData.Length >= 10) {
-						refLongG := refData[10]
-						refLatG := refData[11]
-
-						accelMin := Min(accelMin, refLongG)
-						accelMax := Max(accelMax, refLongG)
-						accelMin := Min(accelMin, refLatG)
-						accelMax := Max(accelMax, refLatG)
-
-						drawChartFunction .= ("[" . running . ", " . refLongG . ", " . refLatG . ", " . longG . ", " . latG . ", " . curvature . "]")
+							values.Push(theValue)
+						}
+						else
+							values.Push(kNull)
 					}
 					else
-						drawChartFunction .= ("[" . running . ", null, null, " . longG . ", " . latG . ", " . curvature . "]")
+						for ignore, theIndex in theSeries.Indices
+							if refData.Has(theIndex) {
+								if theSeries.HasProp("Converter")
+									theValue := theSeries.Converter[A_Index](refData[theIndex])
+								else
+									theValue := refData[theIndex]
+
+								if (theSeries.MinValue = kUndefined) {
+									theSeries.MinValue := theValue
+									theSeries.MaxValue := theValue
+								}
+								else {
+									theSeries.MinValue := Min(theSeries.MinValue, theValue)
+									theSeries.MaxValue := Max(theSeries.MaxValue, theValue)
+								}
+
+								values.Push(theValue)
+							}
+							else
+								values.Push(kNull)
+			}
+			else if referenceLapTelemetry
+				loop series.Length
+					loop series[A_Index].Indices.Length
+						values.Push(kNull)
+
+			for ignore, theSeries in series
+				if (theSeries.Name = "Curvature") {
+					if data.Has(11) {
+						absG := Abs(data[11])
+
+						if (absG > 0.1) {
+							theValue := - Log(((data[7] / 3.6) ** 2) / ((absG = 0) ? 0.00001 : absG))
+
+							if (theSeries.MinValue = kUndefined) {
+								theSeries.MinValue := theValue
+								theSeries.MaxValue := theValue
+							}
+							else {
+								theSeries.MinValue := Min(theSeries.MinValue, theValue)
+								theSeries.MaxValue := Max(theSeries.MaxValue, theValue)
+							}
+						}
+						else
+							theValue := kNull
+
+						values.Push(theValue)
+					}
+					else
+						values.Push(kNull)
 				}
 				else
-					drawChartFunction .= ("[" . running . ", null, null, " . longG . ", " . latG . ", " . curvature . "]")
-			}
-			else
-				drawChartFunction .= ("[" . running . ", " . longG . ", " . latG . ", " . curvature . "]")
+					for ignore, theIndex in theSeries.Indices
+						if data.Has(theIndex) {
+							if theSeries.HasProp("Converter")
+								theValue := theSeries.Converter[A_Index](data[theIndex])
+							else
+								theValue := data[theIndex]
+
+							if (theSeries.MinValue = kUndefined) {
+								theSeries.MinValue := theValue
+								theSeries.MaxValue := theValue
+							}
+							else {
+								theSeries.MinValue := Min(theSeries.MinValue, theValue)
+								theSeries.MaxValue := Max(theSeries.MaxValue, theValue)
+							}
+
+							values.Push(theValue)
+						}
+						else
+							values.Push(kNull)
+
+			drawChartFunction .= ("[" . running . ", " . values2String(", ", values*) . "]")
 		}
 
-		if (accelMin = kUndefined) {
-			accelMin := 0
-			accelMax := 0
-		}
-		else
-			accelMin := (accelMax - ((accelMax - accelMin) * 2))
+		axes := "series: { "
 
-		if (curvMin = kUndefined) {
-			curvMin := 0
-			curvMax := 0
-		}
-		else
-			curvMax := (curvMax + ((curvMax - curvMin) * 2))
+		index := 0
 
 		if referenceLapTelemetry {
 			color := this.Window.Theme.TextColor["Disabled"]
 
-			axes := "series: { 0: {targetAxisIndex: 0, color: '" . color . "'}, 1: {targetAxisIndex: 1, color: '" . color . "'}, 2: {targetAxisIndex: 2}, 3: {targetAxisIndex: 3}, 4: {targetAxisIndex: 4} },`n"
-			axes .= "hAxes: {gridlines: {count: 0}, ticks: [] }, vAxes: { 0: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . accelMin . ", maxValue: " . accelMax . " }, 1: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . accelMin . ", maxValue: " . accelMax . " }, 2: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . accelMin . ", maxValue: " . accelMax . " }, 3: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . accelMin . ", maxValue: " . accelMax . " }, 4: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . curvMin . ", maxValue: " . curvMax . " } }"
-		}
-		else {
-			axes := "series: { 0: {targetAxisIndex: 0}, 1: {targetAxisIndex: 1}, 2: {targetAxisIndex: 2} },`n"
-			axes .= "hAxes: {gridlines: {count: 0}, ticks: []}, vAxes: { 0: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . accelMin . ", maxValue: " . accelMax . " }, 1: { baselineColor: '" . this.Window.AltBackColor . "', baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . accelMin . ", maxValue: " . accelMax . " }, 2: { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, ticks: [], minValue: " . curvMin . ", maxValue: " . curvMax . " } }"
+			loop axisCount {
+				if (index > 0)
+					axes .= ", "
+
+				axes .= (index . ": {targetAxisIndex: " . (A_Index - 1) . ", color: '" . color . "'}")
+
+				index += 1
+			}
 		}
 
-		drawChartFunction .= ("]);`nvar options = { " . axes . ", legend: { position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '2%', top: '5%', right: '2%', bottom: '20%' }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
+		loop axisCount {
+			if (index > 0)
+				axes .= ", "
 
-		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_acceleration')); chart.draw(data, options); document.acceleration_chart = chart;")
+			axes .= (index . ": {targetAxisIndex: " . (A_Index - 1) . "}")
+
+			index += 1
+		}
+
+		axes .= " },`nhAxes: {gridlines: {count: 0}, ticks: []}, vAxes: { "
+
+		index := 0
+
+		if referenceLapTelemetry {
+			for ignore, theSeries in series {
+				offset := (A_Index - 1)
+
+				minValue := theSeries.MinValue
+
+				loop theSeries.Indices.Length {
+					if (index > 0)
+						axes .= ", "
+
+					axes .= (index . ": { baselineColor: '" . this.Window.AltBackColor . "', viewWindowMode: 'maximized', gridlines: {count: 0}, ticks: []")
+
+					if (minValue != kUndefined) {
+						maxValue := theSeries.MaxValue
+						spread := (maxValue - minValue)
+
+						axes .= (", minValue: " . (minValue - ((seriesCount - offset) * spread / theSeries.Size)) . ", maxValue: " . (maxValue + (offset * spread / theSeries.Size)))
+					}
+
+					axes .= " }"
+
+					index += 1
+				}
+			}
+		}
+
+		for ignore, theSeries in series {
+			offset := (A_Index - 1)
+
+			minValue := theSeries.MinValue
+
+			loop theSeries.Indices.Length {
+				if (index > 0)
+					axes .= ", "
+
+				axes .= (index . ": { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, viewWindowMode: 'maximized', ticks: []")
+
+				if (minValue != kUndefined) {
+					maxValue := theSeries.MaxValue
+					spread := (maxValue - minValue)
+
+					axes .= (", minValue: " . (minValue - ((seriesCount - offset) * spread / theSeries.Size)) . ", maxValue: " . (maxValue + (offset * spread / theSeries.Size)))
+				}
+
+				axes .= " }"
+
+				index += 1
+			}
+		}
+
+		axes .= " }"
+
+		drawChartFunction .= ("]);`nvar options = { " . axes . ", legend: { position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '2%', top: '5%', right: '2%', bottom: '10%' }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
+
+		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart')); chart.draw(data, options); document.telemetryChart = chart;")
 		drawChartFunction .= "`nfunction selectHandler(e) { var cSelection = chart.getSelection(); var selection = ''; for (var i = 0; i < cSelection.length; i++) { var item = cSelection[i]; if (i > 0) selection += ';'; selection += (item.row + '|' + item.column); } try { eventHandler('Select', selection); } catch(e) {} }"
 
 		drawChartFunction .= "`ngoogle.visualization.events.addListener(chart, 'select', selectHandler); }"
 
-		drawChartFunction .= ("`nfunction selectAcceleration(row) {`ndocument.acceleration_chart.setSelection([{row: row, column: null}]); }")
+		drawChartFunction .= ("`nfunction selectTelemetry(row) {`ndocument.telemetryChart.setSelection([{row: row, column: null}]); }")
 
-		return ("<div id=`"chart_acceleration`" style=`"width: " . Round(width) . "px; height: " . Round(height) . "px`"></div>")
+		return ("<div id=`"chart`" style=`"width: " . Round(width) . "px; height: " . Round(height) . "px`"></div>")
 	}
 
 	selectRow(row) {
@@ -521,24 +464,10 @@ class TelemetryChart {
 
 		static htmlViewer := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "HTML", "Viewer", "IE11")
 
-		if (false && (htmlViewer = "WebView2")) {
-			environment := this.ChartArea.HTMLViewer.WebView2.Core()
-
-			environment.ExecuteScript("selectSpeed(" . row . ")", false)
-			environment.ExecuteScript("selectElectronics(" . row . ")", false)
-
-			try
-				environment.ExecuteScript("selectAcceleration(" . row . ")", false)
-		}
-		else {
-			environment := this.ChartArea.document.parentWindow
-
-			environment.selectSpeed(row)
-			environment.selectElectronics(row)
-
-			try
-				environment.selectAcceleration(row)
-		}
+		if (false && (htmlViewer = "WebView2"))
+			this.ChartArea.HTMLViewer.WebView2.Core().ExecuteScript("selectTelemetry(" . row . ")", false)
+		else
+			this.ChartArea.document.parentWindow.selectTelemetry(row)
 	}
 
 	selectPosition(posX, posY, threshold := 40) {
@@ -590,6 +519,8 @@ class TelemetryViewer {
 	iLap := false
 	iReferenceLap := false
 
+	iDistanceCorrection := 0
+
 	iCollectorTask := false
 
 	iCollect := false
@@ -597,6 +528,9 @@ class TelemetryViewer {
 	iTrackMap := false
 
 	iData := CaseInsenseMap()
+
+	iLayouts := CaseInsenseMap()
+	iSelectedLayout := false
 
 	class TelemetryViewerWindow extends Window {
 		iViewer := false
@@ -735,7 +669,7 @@ class TelemetryViewer {
 										  : this.iLap)
 								  : false)
 			else
-				return (path ? this.iLap[3] : this.iLap)
+				return (path ? this.iLap[4] : this.iLap)
 		}
 
 		Set {
@@ -754,7 +688,7 @@ class TelemetryViewer {
 												   : this.iReferenceLap)
 										   : false)
 			else
-				return (path ? this.iReferenceLap[3] : this.iReferenceLap)
+				return (path ? this.iReferenceLap[4] : this.iReferenceLap)
 		}
 
 		Set {
@@ -763,6 +697,12 @@ class TelemetryViewer {
 			this.updateTelemetryChart(true)
 
 			return value
+		}
+	}
+
+	DistanceCorrection {
+		Get {
+			return this.iDistanceCorrection
 		}
 	}
 
@@ -775,6 +715,18 @@ class TelemetryViewer {
 	TrackMap {
 		Get {
 			return this.iTrackMap
+		}
+	}
+
+	Layouts {
+		Get {
+			return this.iLayouts
+		}
+	}
+
+	SelectedLayout {
+		Get {
+			return this.iSelectedLayout
 		}
 	}
 
@@ -793,14 +745,75 @@ class TelemetryViewer {
 		this.iTelemetryDirectory := (normalizeDirectoryPath(directory) . "\")
 
 		this.iCollect := collect
+
+		this.loadLayouts()
+	}
+
+	loadLayouts() {
+		local configuration := readMultiMap(kUserConfigDirectory . "Telemetry.layouts")
+		local layouts, name, definition, ignore
+
+		if (configuration.Count = 0) {
+			this.iLayouts := CaseInsenseMap(translate("Standard")
+										  , {Name: translate("Standard")
+										   , WidthZoom: 100, HeightZoom: 100
+										   , Series: choose(kDataSeries, (s) => !inList(["Throttle", "Brake", "TC", "ABS"
+																					   , "Long G", "Lat G"], s.Name))})
+
+			this.iSelectedLayout := translate("Standard")
+		}
+		else {
+			layouts := CaseInsenseMap()
+
+			for name, definition in getMultiMapValues(configuration, "Layouts")
+				layouts[name] := {Name: name
+								, WidthZoom: getMultiMapValue(configuration, "Zoom", name . ".Width", 100)
+								, HeightZoom: getMultiMapValue(configuration, "Zoom", name . ".Height", 100)
+								, Series: collect(string2Values(",", definition), (name) {
+											  return choose(kDataSeries, (s) => s.Name = name)[1]
+										  })}
+
+			this.iLayouts := layouts
+			this.iSelectedLayout := getMultiMapValue(configuration, "Selected", "Layout")
+		}
+	}
+
+	saveLayouts() {
+		local configuration := newMultiMap()
+		local name, layout
+
+		for name, layout in this.Layouts {
+			setMultiMapValue(configuration, "Layouts", name, values2String(",", collect(layout.Series, (s) => s.Name)*))
+
+			setMultiMapValue(configuration, "Zoom", name . ".Width", layout.WidthZoom)
+			setMultiMapValue(configuration, "Zoom", name . ".Height", layout.HeightZoom)
+		}
+
+		setMultiMapValue(configuration, "Selected", "Layout", this.SelectedLayout)
+
+		writeMultiMap(kUserConfigDirectory . "Telemetry.layouts", configuration)
 	}
 
 	createGui() {
 		local viewerGui := TelemetryViewer.TelemetryViewerWindow(this, {Descriptor: "Telemetry Browser", Closeable: true, Resizeable:  "Deferred"})
 		local viewerControl
 
-		changeZoom(*) {
-			this.TelemetryChart.Zoom := viewerGui["zoomSlider"].Value
+		changeWidthZoom(*) {
+			this.TelemetryChart.WidthZoom := viewerGui["zoomWSlider"].Value
+
+			this.Layouts[this.SelectedLayout].WidthZoom := this.TelemetryChart.WidthZoom
+
+			this.saveLayouts()
+
+			this.updateTelemetryChart(true)
+		}
+
+		changeHeightZoom(*) {
+			this.TelemetryChart.HeightZoom := viewerGui["zoomHSlider"].Value
+
+			this.Layouts[this.SelectedLayout].HeightZoom := this.TelemetryChart.HeightZoom
+
+			this.saveLayouts()
 
 			this.updateTelemetryChart(true)
 		}
@@ -877,9 +890,57 @@ class TelemetryViewer {
 			this.openTrackMap()
 		}
 
+		selectLayout(*) {
+			this.iSelectedLayout := viewerGui["layoutDropDown"].Text
+
+			this.TelemetryChart.WidthZoom := this.Layouts[this.SelectedLayout].WidthZoom
+			this.TelemetryChart.HeightZoom := this.Layouts[this.SelectedLayout].HeightZoom
+
+			this.Window["zoomWSlider"].Value := this.TelemetryChart.WidthZoom
+			this.Window["zoomHSlider"].Value := this.TelemetryChart.HeightZoom
+
+			this.updateTelemetryChart(true)
+		}
+
 		editLayouts(*) {
-			editLayoutSettings(this, CaseInsenseMap("All", kDataSeries
-												  , "Distance", [kDataSeries[1]]))
+			local selectedLayout := this.SelectedLayout
+			local newLayouts := editLayoutSettings(this, this.Layouts, &selectedLayout)
+
+			if newLayouts {
+				this.iLayouts := newLayouts
+				this.iSelectedLayout := selectedLayout
+
+				viewerGui["layoutDropDown"].Delete()
+				viewerGui["layoutDropDown"].Add(getKeys(newLayouts))
+
+				newLayouts := getKeys(newLayouts)
+
+				this.iSelectedLayout := newLayouts[inList(newLayouts, this.SelectedLayout) || inList(newLayouts, translate("Standard")) || 1]
+
+				this.TelemetryChart.WidthZoom := this.Layouts[this.SelectedLayout].WidthZoom
+				this.TelemetryChart.HeightZoom := this.Layouts[this.SelectedLayout].HeightZoom
+
+				viewerGui["zoomWSlider"].Value := this.TelemetryChart.WidthZoom
+				viewerGui["zoomHSlider"].Value := this.TelemetryChart.HeightZoom
+
+				viewerGui["layoutDropDown"].Choose(inList(newLayouts, this.SelectedLayout))
+
+				this.saveLayouts()
+
+				this.updateTelemetryChart(true)
+			}
+		}
+
+		shiftLeft(*) {
+			this.iDistanceCorrection -= (GetKeyState("Ctrl") ? (GetKeyState("Shift") ? 50 : 10) : 1)
+
+			this.updateTelemetryChart(true)
+		}
+
+		shiftRight(*) {
+			this.iDistanceCorrection += (GetKeyState("Ctrl") ? (GetKeyState("Shift") ? 50 : 10) : 1)
+
+			this.updateTelemetryChart(true)
 		}
 
 		this.iWindow := viewerGui
@@ -908,7 +969,7 @@ class TelemetryViewer {
 		setButtonIcon(viewerGui["deleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
 		viewerGui.Add("Text", "x468 yp+4 w80 X:Move", translate("Layout"))
-		viewerGui.Add("DropDownList", "x556 yp-4 w96 X:Move vlayoutDropDown")
+		viewerGui.Add("DropDownList", "x556 yp-4 w96 Choose" . inList(getKeys(this.Layouts), this.SelectedLayout) . " X:Move vlayoutDropDown", getKeys(this.Layouts)).OnEvent("Change", selectLayout)
 
 		viewerGui.Add("Button", "x653 yp w23 h23 +0x200 Center X:Move vlayoutButton", translate("...")).OnEvent("Click", editLayouts)
 
@@ -919,12 +980,18 @@ class TelemetryViewer {
 		this.CollectingNotifier.document.close()
 
 		viewerGui.Add("Text", "x16 yp+19 w80", translate("Reference"))
-		viewerGui.Add("DropDownList", "x98 yp-4 w250 Choose1 vreferenceLapDropDown", concatenate([translate("None")], collect(this.Laps, (l) => this.lapLabel(l)))).OnEvent("Change", chooseReferenceLap)
+		viewerGui.Add("DropDownList", "x98 yp-4 w225 Choose1 vreferenceLapDropDown", concatenate([translate("None")], collect(this.Laps, (l) => this.lapLabel(l)))).OnEvent("Change", chooseReferenceLap)
+
+		viewerGui.Add("Button", "x324 yp w12 h23 Center +0x200 Disabled vleftShiftButton").OnEvent("Click", shiftLeft)
+		setButtonIcon(viewerGui["leftShiftButton"], kIconsDirectory . "Previous.ico", 1, "L4 T4 R4 B4")
+		viewerGui.Add("Button", "x337 yp w12 h23 Center +0x200 Disabled vrightShiftButton").OnEvent("Click", shiftRight)
+		setButtonIcon(viewerGui["rightShiftButton"], kIconsDirectory . "Next.ico", 1, "L4 T4 R4 B4")
 
 		viewerGui.Add("Button", "x350 yp w73 h23 vtrackButton", translate("Map...")).OnEvent("Click", openTrackMap)
 
 		viewerGui.Add("Text", "x468 yp+4 w80 X:Move", translate("Zoom"))
-		viewerGui.Add("Slider", "Center Thick15 x556 yp-2 X:Move w120 0x10 Range100-400 ToolTip vzoomSlider", 100).OnEvent("Change", changeZoom)
+		viewerGui.Add("Slider", "Center Thick15 x556 yp-2 X:Move w59 0x10 Range100-400 ToolTip vzoomWSlider", 100).OnEvent("Change", changeWidthZoom)
+		viewerGui.Add("Slider", "Center Thick15 x617 yp X:Move w59 0x10 Range100-400 ToolTip vzoomHSlider", 100).OnEvent("Change", changeHeightZoom)
 
 		viewerControl := viewerGui.Add("HTMLViewer", "x16 yp+24 w660 h480 W:Grow H:Grow Border")
 
@@ -958,6 +1025,14 @@ class TelemetryViewer {
 		this.Window.Opt("+OwnDialogs")
 
 		this.loadTelemetry()
+
+		if this.SelectedLayout {
+			this.TelemetryChart.WidthZoom := this.Layouts[this.SelectedLayout].WidthZoom
+			this.TelemetryChart.HeightZoom := this.Layouts[this.SelectedLayout].HeightZoom
+
+			this.Window["zoomWSlider"].Value := this.TelemetryChart.WidthZoom
+			this.Window["zoomHSlider"].Value := this.TelemetryChart.HeightZoom
+		}
 
 		this.updateTelemetryChart(true)
 
@@ -1013,6 +1088,15 @@ class TelemetryViewer {
 		}
 		else
 			this.Control["saveButton"].Enabled := false
+
+		if this.SelectedReferenceLap {
+			this.Control["leftShiftButton"].Enabled := true
+			this.Control["rightShiftButton"].Enabled := true
+		}
+		else {
+			this.Control["leftShiftButton"].Enabled := false
+			this.Control["rightShiftButton"].Enabled := false
+		}
 
 		this.Control["trackButton"].Enabled := sessionDB.hasTrackMap(simulator, track)
 	}
@@ -1144,6 +1228,7 @@ class TelemetryViewer {
 
 		processFile(fileName, info) {
 			local theDriver := driver
+			local theLapTime := false
 			local telemetry := false
 			local name, directory, dataFile, file, size, lap
 
@@ -1154,6 +1239,8 @@ class TelemetryViewer {
 					theDriver := driver
 				else
 					theDriver := getMultiMapValue(info, "Info", "Driver")
+
+				theLapTime := getMultiMapValue(info, "Info", "LapTime")
 
 				DirCreate(this.TelemetryDirectory . "Imported")
 
@@ -1201,10 +1288,11 @@ class TelemetryViewer {
 			if telemetry {
 				if info
 					lap := [name, theDriver ? theDriver
-										 : SessionDatabase.getDriverName(simulator, getMultiMapValue(info, "Telemetry", "Driver"))
+											: SessionDatabase.getDriverName(simulator, getMultiMapValue(info, "Telemetry", "Driver"))
+						  , theLapTime ? theLapTime : "-"
 						  , telemetry]
 				else
-					lap := [name, theDriver ? theDriver : "John Doe (JD)", telemetry]
+					lap := [name, theDriver ? theDriver : "John Doe (JD)", theLapTime ? theLapTime : "-", telemetry]
 
 				this.ImportedLaps.Push(lap)
 
@@ -1267,7 +1355,7 @@ class TelemetryViewer {
 			else {
 				SplitPath(lap[1], , , , &newFileName)
 
-				fileName := (dirName . "\" . newFileName . translate(" (") . lap[2] . translate(")"))
+				fileName := (dirName . "\" . newFileName . translate(" (") . lap[2] . ((lap[3] != "-") ? (" - " . lap[3]) : "") . translate(")"))
 			}
 
 			newFileName := (fileName . ".telemetry")
@@ -1295,7 +1383,7 @@ class TelemetryViewer {
 						if isNumber(lap)
 							file := FileOpen((this.TelemetryDirectory . "Lap " . lap . ".telemetry"), "r-wd")
 						else
-							file := FileOpen(lap[3], "r-wd")
+							file := FileOpen(lap[4], "r-wd")
 
 						if file {
 							size := file.Length
@@ -1441,8 +1529,17 @@ class TelemetryViewer {
 			else
 				return lap
 		}
-		else
-			return (lap[1] . translate(":") . A_Space . lap[2])
+		else {
+			lapTime := lap[3]
+			driver := lap[2]
+
+			if (!InStr(driver, "John Doe") && (lapTime != "-"))
+				return (lap[1] . translate(":") . A_Space . driver . translate(" - ") . lapTimeDisplayValue(lapTime))
+			else if !InStr(driver, "John Doe")
+				return (lap[1] . translate(":") . A_Space . driver)
+			else
+				return lap[1]
+		}
 	}
 
 	loadTelemetry(select := false) {
@@ -1545,8 +1642,11 @@ class TelemetryViewer {
 	}
 
 	updateTelemetryChart(redraw := false) {
-		if (this.TelemetryChart && redraw)
-			this.TelemetryChart.showTelemetryChart(this.SelectedLap[true], this.SelectedReferenceLap[true])
+		if (this.TelemetryChart && redraw) {
+			this.TelemetryChart.showTelemetryChart(this.Layouts[this.SelectedLayout].Series, this.SelectedLap[true], this.SelectedReferenceLap[true], this.DistanceCorrection)
+
+			this.updateState()
+		}
 	}
 }
 
@@ -1940,7 +2040,7 @@ class TrackMap {
 ;;;-------------------------------------------------------------------------;;;
 
 editLayoutSettings(telemetryViewerOrCommand, arguments*) {
-	local name, names, x, y, ignore, series, selected, tempLayout, checked1, checked2
+	local name, names, x, y, ignore, series, selected, tempLayout, checked1, checked2, inputResult
 
 	static layoutsGui
 
@@ -2002,42 +2102,79 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 	}
 	else if (telemetryViewerOrCommand = "SeriesSelect")
 		editLayoutSettings("UpdateState")
+	else if (telemetryViewerOrCommand = "SeriesCheck") {
+		if (!arguments[3] && !seriesListView.GetNext(0, "C"))
+			seriesListView.Modify(arguments[2], "Check")
+	}
 	else if (telemetryViewerOrCommand = "LayoutNew") {
+		inputResult := withBlockedWindows(InputBox, translate("Please enter the name of the new layout:"), translate("Telemetry Layouts"), "w300 h120")
 
+		if (inputResult.Result = "Ok") {
+			name := inputResult.Value
+			newName := name
 
-		editLayoutSettings("UpdateState")
+			while layouts.Has(newName)
+				newName := (name . translate(" (") . A_Index . translate(")"))
+
+			layouts[newName] := {Name: newName, WidthZoom: 100, HeightZoom: 100, Series: []}
+
+			editLayoutSettings("LayoutsLoad", layouts)
+			editLayoutSettings("LayoutLoad", newName, layouts[newName])
+		}
 	}
 	else if (telemetryViewerOrCommand = "LayoutDelete") {
+		if layout {
+			layouts.Delete(layout.Name)
 
-		editLayoutSettings("UpdateState")
+			layout := false
+
+			editLayoutSettings("LayoutsLoad", layouts)
+		}
 	}
 	else if (telemetryViewerOrCommand = "LayoutSave") {
+		if layout {
+			series := []
+			selected := 0
 
+			while (selected := seriesListView.GetNext(selected, "C")) {
+				name := seriesListView.GetText(selected)
+
+				series.Push(choose(kDataSeries, (s) => translate(s.Name) = name)[1])
+			}
+
+			layouts[layout.Name] := {Name: layout.Name
+								   , WidthZoom: layoutsGui["zoomWSlider"].Value
+								   , HeightZoom: layoutsGui["zoomHSlider"].Value
+								   , Series: series}
+		}
 	}
 	else if (telemetryViewerOrCommand = "LayoutSelect")
-		editLayoutSettings("LayoutLoad", layoutsGui["layoutDropDown"].Text, layouts[layoutsGui["layoutDropDown"].Text])
+		editLayoutSettings("LayoutLoad", layouts[layoutsGui["layoutDropDown"].Text])
 	else if (telemetryViewerOrCommand = "LayoutLoad") {
 		if layout
 			editLayoutSettings("LayoutSave")
 
-		layout := [arguments[1], arguments[2]]
+		layout := arguments[1]
 
-		layoutsGui["layoutDropDown"].Choose(inList(getKeys(layouts), layout[1]))
+		layoutsGui["layoutDropDown"].Choose(inList(getKeys(layouts), layout.Name))
 
 		seriesListView.Delete()
 
 		if layout {
 			names := []
 
-			for ignore, series in layout[2] {
+			for ignore, series in layout.Series {
 				names.Push(series.Name)
 
-				seriesListView.Add("Check", series.Name)
+				seriesListView.Add("Check", translate(series.Name))
 			}
 
 			for ignore, series in kDataSeries
 				if !inList(names, series.Name)
-					seriesListView.Add("", series.Name)
+					seriesListView.Add("", translate(series.Name))
+
+			layoutsGui["zoomWSlider"].Value := layout.WidthZoom
+			layoutsGui["zoomHSlider"].Value := layout.HeightZoom
 		}
 
 		seriesListView.ModifyCol()
@@ -2057,7 +2194,7 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 		layoutsGui["layoutDropDown"].Add(names)
 
 		if (names.Length > 0)
-			editLayoutSettings("LayoutLoad", names[1], layouts[names[1]])
+			editLayoutSettings("LayoutLoad", layouts[names[1]])
 		else
 			editLayoutSettings("UpdateState")
 	}
@@ -2095,7 +2232,7 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 		layouts := []
 		layout := false
 
-		layoutsGui := Window({Options: "0x400000"}, translate("Layouts"))
+		layoutsGui := Window({Options: "0x400000"})
 
 		layoutsGui.Opt("+Owner" . telemetryViewer.Window.Hwnd)
 
@@ -2120,39 +2257,54 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 		layoutsGui.Add("Button", "x243 yp w23 h23 Center +0x200 Disabled vdeleteButton").OnEvent("Click", editLayoutSettings.Bind("LayoutDelete"))
 		setButtonIcon(layoutsGui["deleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
-		seriesListView := layoutsGui.Add("ListView", "x16 yp+30 w284 h300 AltSubmit -Multi -LV0x10 Checked NoSort NoSortHdr", collect(["Series"], translate))
+		seriesListView := layoutsGui.Add("ListView", "x16 yp+30 w284 h300 AltSubmit -Multi -LV0x10 Checked NoSort NoSortHdr", collect(["Channel"], translate))
 		seriesListView.OnEvent("Click", editLayoutSettings.Bind("SeriesSelect"))
 		seriesListView.OnEvent("DoubleClick", editLayoutSettings.Bind("SeriesSelect"))
 		seriesListView.OnEvent("ItemSelect", editLayoutSettings.Bind("SeriesSelect"))
+		seriesListView.OnEvent("ItemCheck", editLayoutSettings.Bind("SeriesCheck"))
 
 		layoutsGui.Add("Button", "x252 yp+302 w23 h23 Center +0x200 vupButton").OnEvent("Click", editLayoutSettings.Bind("SeriesUp"))
 		setButtonIcon(layoutsGui["upButton"], kIconsDirectory . "Up Arrow.ico", 1, "L4 T4 R4 B4")
 		layoutsGui.Add("Button", "x277 yp w23 h23 Center +0x200 Disabled vdownButton").OnEvent("Click", editLayoutSettings.Bind("SeriesDown"))
 		setButtonIcon(layoutsGui["downButton"], kIconsDirectory . "Down Arrow.ico", 1, "L4 T4 R4 B4")
 
+		layoutsGui.Add("Text", "x16 yp+5 w80 X:Move", translate("Zoom"))
+		layoutsGui.Add("Slider", "Center Thick15 x104 yp-2 X:Move w59 0x10 Range100-400 ToolTip vzoomWSlider", 100)
+		layoutsGui.Add("Slider", "Center Thick15 x" . (617 - 452) . " yp X:Move w59 0x10 Range100-400 ToolTip vzoomHSlider", 100)
+
 		layoutsGui.Add("Text", "x8 yp+30 w300 0x10")
 
 		layoutsGui.Add("Button", "x78 yp+10 w80 h23 Default", translate("Ok")).OnEvent("Click", editLayoutSettings.Bind(kOk))
 		layoutsGui.Add("Button", "x166 yp w80 h23", translate("&Cancel")).OnEvent("Click", editLayoutSettings.Bind(kCancel))
 
-		editLayoutSettings("LayoutsLoad", arguments[1])
+		editLayoutSettings("LayoutsLoad", arguments[1].Clone())
+		editLayoutSettings("LayoutLoad", arguments[1][%arguments[2]%])
 
-		if getWindowPosition("Telemetry Browser.Layouts", &x, &y)
-			layoutsGui.Show("x" . x . " y" . y)
-		else
-			layoutsGui.Show()
+		telemetryViewer.Window.Block()
 
-		loop
-			Sleep(100)
-		until result
+		try {
+			if getWindowPosition("Telemetry Browser.Layouts", &x, &y)
+				layoutsGui.Show("x" . x . " y" . y)
+			else
+				layoutsGui.Show()
 
-		if (result = kOk) {
-			result := layouts
+			loop
+				Sleep(100)
+			until result
+
+			if (result = kOk) {
+				result := layouts
+
+				%arguments[2]% := layout.Name
+			}
+			else
+				result := false
+
+			layoutsGui.Destroy()
 		}
-		else
-			result := false
-
-		layoutsGui.Destroy()
+		finally {
+			telemetryViewer.Window.Unblock()
+		}
 
 		return result
 	}

@@ -21,6 +21,7 @@
 #Include "..\..\Libraries\Task.ahk"
 #Include "..\..\Libraries\Database.ahk"
 #Include "SettingsDatabase.ahk"
+#Include "..\..\Garage\Libraries\CarInformation.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1136,6 +1137,29 @@ class SessionDatabase extends ConfigurationItem {
 		return SessionDatabase.getCarCode(simulator, car)
 	}
 
+	getCarSteerLock(simulator, car, track) {
+		local key := (this.getSimulatorCode(simulator) . "." this.getCarCode(simulator, car))
+		local steerLock
+
+		static settingsDB := false
+		static steerLocks := CaseInsenseMap()
+
+		if steerLocks.Has(key)
+			return steerLocks[key]
+
+		if !settingsDB
+			settingsDB := SettingsDatabase()
+
+		steerLock := settingsDB.readSettingValue(simulator, car, track, "*", "Session Settings", "Car.SteerLock", kUndefined)
+
+		if (steerLock == kUndefined)
+			steerLock := getCarSteerLock(simulator, car)
+
+		steerLocks[key] := steerLock
+
+		return steerLock
+	}
+
 	static registerTrack(simulator, car, track, shortName, longName) {
 		local simulatorCode := SessionDatabase.getSimulatorCode(simulator)
 		local carCode := SessionDatabase.getCarCode(simulator, car)
@@ -1520,6 +1544,7 @@ class SessionDatabase extends ConfigurationItem {
 		}
 
 		importFromMoTeC(&info) {
+			local steerLock := this.getCarSteerLock(simulator, car, track)
 			local channels := false
 			local skipNext := false
 			local entry, ignore, channel, importFileName
@@ -1573,7 +1598,12 @@ class SessionDatabase extends ConfigurationItem {
 
 									switch channel[1], false {
 										case "THROTTLE", "BRAKE":
-											value := value / 100
+											value := (value / 100)
+										case "STEERANGLE":
+											if steerLock
+												value := (- value / steerLock)
+											else
+												value := (- value)
 									}
 
 									line.Push(isNumber(value) ? value : kNull)

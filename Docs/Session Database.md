@@ -106,8 +106,6 @@ If a lap is double clicked, the Telemetry Viewer will open up and let you examin
 
 You can load additional laps from the session database or any other location for comparison using the small button with the "Folder" icon. Please note, that deleting a lap from the Telemetry Viewer using the *delete* button (the one with the "-" icon) will not remove it from its original location. Different rules may apply, when the Telemetry Viewer had been opened from one of the application listed below.
 
-Good to know: If you use the "Open..." button in the dialog, which let's you browse the available telemetry data, you can import telemetry data from ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), as long as it has been saved as JSON file, which can be activated in the settings of "Second Monitor". And you can import telemetry files from "MoTec". They must be exported as "CSV" files and the "Distance" field must be included.
-
 When a reference lap is loaded, it can be shifted horizontally to align it perfectly with the other lap telemetry data. This is especially useful, when comparing laps from different simulators or when data is used, that has been imported from other sources like "Second Monitor".
 
 With the controls in the upper right, you can change the zoom factor in both dimensions and you can define and use different layouts for the graph. Click on the small button with the "..." to open a dialog to define and change layouts.
@@ -128,7 +126,17 @@ The Telemetry Viewer is available in the following applications to collect lap t
 - [Solo Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#Telemetry-Viewer)
 - [Team Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#Telemetry-Viewer)
 
-##### Special notes for *Assetto Corsa Competizione*
+###### Importing telemetry data
+
+If you use the "Open..." button in the dialog, which let's you browse the available telemetry data, you can load telemetry data that has not been stored in the session database.
+
+- You can load telemetry files from Simulator Controller, for example a file that has been sent to you by a team mate.
+- You can import telemetery data from ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), as long as it has been saved as JSON file, which can be activated in the settings of "Second Monitor".
+- And you can import telemetry files from "MoTec". They must be exported as "CSV" files and the "Distance" field must be included. Since "MoTeC" uses the absolute angle for the steering information, it is beneficial to divide this value to the steer lock of the car, to make the information comparable to that of other lap telemetry data. The importer will use the information available in the "Setup Workbench" about the different cars, or you can define the [corresponding setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#race-settings) in the "Session Database".
+
+Good to know: When importing lap telemetry data directly in the "Laps" tab of "Session Database", the same applies.
+
+###### Special notes for *Assetto Corsa Competizione*
 
 For unknown (and maybe historical) reasons *Assetto Corsa Competizione* supplies two different APIs, one of which comes with a very low refresh rate. The first is the so called shared memory API which provides a complete set of car telemetry data, but unfortunately not the current distance into the track spline. This information is provided in the so called UDP interface, which is network based and uses a low refresh rate. Long story short, collecting position dependent telemetry data for *Assetto Corsa Competizione* is complicated and unprecise to say the least.
 

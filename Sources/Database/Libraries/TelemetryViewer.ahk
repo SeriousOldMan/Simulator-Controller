@@ -2116,10 +2116,10 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 			while layouts.Has(newName)
 				newName := (name . translate(" (") . A_Index . translate(")"))
 
-			layouts[newName] := {Name: newName, WidthZoom: 100, HeightZoom: 100, Series: []}
+			layouts[newName] := {Name: newName, WidthZoom: 100, HeightZoom: 100, Series: [kDataSeries[1]]}
 
 			editLayoutSettings("LayoutsLoad", layouts)
-			editLayoutSettings("LayoutLoad", newName, layouts[newName])
+			editLayoutSettings("LayoutLoad", layouts[newName])
 		}
 	}
 	else if (telemetryViewerOrCommand = "LayoutDelete") {

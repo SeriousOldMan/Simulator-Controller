@@ -46,6 +46,8 @@ class DrivingCoach extends GridRaceAssistant {
 
 	iTranscript := false
 
+	iCoachingActive := false
+
 	class CoachVoiceManager extends RaceAssistant.RaceVoiceManager {
 	}
 
@@ -193,6 +195,12 @@ class DrivingCoach extends GridRaceAssistant {
 
 		Set {
 			return (isSet(position) ? (this.iStandings[position] := value) : (this.iStandings := value))
+		}
+	}
+
+	CoachingActive {
+		Get {
+			return this.iCoachingActive
 		}
 	}
 
@@ -480,6 +488,45 @@ class DrivingCoach extends GridRaceAssistant {
 	restartConversation() {
 		if this.Connector
 			this.Connector.Restart()
+	}
+
+	handleVoiceCommand(grammar, words) {
+		switch grammar, false {
+			case "CoachingRequest":
+				this.coachingRequestRecognized(words)
+			case "FocusCorner":
+				if this.CoachingActive
+					this.focusCornerRecognized(words)
+				else
+					this.handleVoiceText("TEXT", values2String(A_Space, words*))
+			case "GeneralAdvice":
+				if this.CoachingActive
+					this.generalAdviceRecognized(words)
+				else
+					this.handleVoiceText("TEXT", values2String(A_Space, words*))
+			default:
+				super.handleVoiceCommand(grammar, words)
+		}
+	}
+
+	coachingRequestRecognized(words) {
+		local speaker := this.getSpeaker()
+
+		speaker.speakPhrase("ConfirmCoaching")
+
+		this.iCoachingActive := true
+	}
+
+	focusCornerRecognized(words) {
+		local speaker := this.getSpeaker()
+
+		speaker.speakPhrase("Roger")
+	}
+
+	generalAdviceRecognized(words) {
+		local speaker := this.getSpeaker()
+
+		speaker.speakPhrase("Later")
 	}
 
 	handleVoiceText(grammar, text) {

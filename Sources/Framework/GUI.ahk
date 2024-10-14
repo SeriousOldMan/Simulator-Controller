@@ -1972,7 +1972,8 @@ withBlockedWindows(function, arguments*) {
 		theWindow := GuiFromHwnd(Hwnd)
 
 		if (isObject(theWindow) && isInstance(theWindow, Window)) {
-			theWindow.Opt("+OwnDialogs")
+			if WinActive(theWindow)
+				theWindow.Opt("+OwnDialogs")
 
 			windows.Push(theWindow)
 		}

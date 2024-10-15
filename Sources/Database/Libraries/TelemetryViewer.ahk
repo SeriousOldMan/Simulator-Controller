@@ -411,7 +411,7 @@ class TelemetryChart {
 						maxValue := theSeries.MaxValue
 						spread := (maxValue - minValue)
 
-						axes .= (", minValue: " . (minValue - ((seriesCount - offset) * spread / theSeries.Size)) . ", maxValue: " . (maxValue + (offset * spread / theSeries.Size)))
+						axes .= (", minValue: " . (minValue - ((seriesCount - offset - 1) * spread / theSeries.Size)) . ", maxValue: " . (maxValue + (offset * spread / theSeries.Size)))
 					}
 
 					axes .= " }"
@@ -436,7 +436,7 @@ class TelemetryChart {
 					maxValue := theSeries.MaxValue
 					spread := (maxValue - minValue)
 
-					axes .= (", minValue: " . (minValue - ((seriesCount - offset) * spread / theSeries.Size)) . ", maxValue: " . (maxValue + (offset * spread / theSeries.Size)))
+					axes .= (", minValue: " . (minValue - ((seriesCount - offset - 1) * spread / theSeries.Size)) . ", maxValue: " . (maxValue + (offset * spread / theSeries.Size)))
 				}
 
 				axes .= " }"

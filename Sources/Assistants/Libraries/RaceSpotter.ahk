@@ -2853,8 +2853,8 @@ class RaceSpotter extends GridRaceAssistant {
 
 
 				speaker.speakPhrase("LapTimeDelta", {delta: speaker.number2Speech(Round(Abs(delta), 1))
-												   , relativeYou: fragments[(delta >= 0) ? "Faster" : "Slower"]
-												   , relativeOther: fragments[(delta < 0) ? "Faster" : "Slower"]})
+												   , relativeYou: speaker.Fragments[(delta >= 0) ? "Faster" : "Slower"]
+												   , relativeOther: speaker.Fragments[(delta < 0) ? "Faster" : "Slower"]})
 			}
 			finally {
 				speaker.endTalk()

@@ -3,15 +3,16 @@
   2. Documentation updates here and there, as always
   3. Fixed standings handling and race reports for grids where cars with duplicate race numbers are present. This can happen in *RaceRoom Racing Experience*, for example.
   4. Fixed a rare bug, which resulted in incorrect position information announced by the Spotter for *RaceRoom Racing Experience*.
-  5. A complete new layout system has been implemented for the Telemetry Viewer. You now can select the channels, you are interested in and arrange them according to your preferences. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetry-viewer) for more information.
-  6. Telemetry graphs can now be shifted horizontally to match track position of telemetry data from different sources.
-  7. Zooming of telemetry graph is now possible both horizontally and vertically.
-  8. Selected zoom factor will now be stored for telemetry graphs.
-  9. Lap telemetry data can now also be imported from MoTeC. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetry-viewer) for more information.
-  10. Multiple lap telemetry data, setups or strategies can be uploaded at once in "Session Database"
-  11. Uploading telemetry data in the "Session Database" can also read MoTeC and Second Monitor files.
-  12. A new setting for the steer lock of a car has been integrated in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings). This is used to normalize the steering angle when importing telemetry data from MoTeC, for example. If this setting is not set, the latest value used in the "Setup Workbench" for this car will be used.
-  13. The announcement of the last lap times of the cars around you by the Spotter has been moved from the "Session Information" group to the "Opponent Information" group and can be enabled/disabled together with ´gap and delta information in the configuration.
+  5. Fixed a bug, that let the Spotter to report on a focused car although no car was focused. This could happen for cars with the race number **0** (weird to use **0** as race number, isn't it?).
+  6. A complete new layout system has been implemented for the Telemetry Viewer. You now can select the channels, you are interested in and arrange them according to your preferences. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetry-viewer) for more information.
+  7. Telemetry graphs can now be shifted horizontally to match track position of telemetry data from different sources.
+  8. Zooming of telemetry graph is now possible both horizontally and vertically.
+  9. Selected zoom factor will now be stored for telemetry graphs.
+  10. Lap telemetry data can now also be imported from MoTeC. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetry-viewer) for more information.
+  11. Multiple lap telemetry data, setups or strategies can be uploaded at once in "Session Database"
+  12. Uploading telemetry data in the "Session Database" can also read MoTeC and Second Monitor files.
+  13. A new setting for the steer lock of a car has been integrated in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings). This is used to normalize the steering angle when importing telemetry data from MoTeC, for example. If this setting is not set, the latest value used in the "Setup Workbench" for this car will be used.
+  14. The announcement of the last lap times of the cars around you by the Spotter has been moved from the "Session Information" group to the "Opponent Information" group and can be enabled/disabled together with ´gap and delta information in the configuration.
   
 ## 5.9.3.0-release 10/11/24
 

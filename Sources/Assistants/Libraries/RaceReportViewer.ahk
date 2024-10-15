@@ -158,7 +158,7 @@ class RaceReportViewer extends RaceReportReader {
 				infoText .= ("<tr><td>" . translate("# Cars: ") . "</td><td>" . getMultiMapValue(raceData, "Cars", "Count") . "</td></tr>")
 				infoText .= ("<tr><td>" . translate("# Laps: ") . "</td><td>" . getMultiMapValue(raceData, "Laps", "Count") . "</td></tr>")
 				infoText .= "<tr/>"
-				infoText .= ("<tr><td>" . translate("My Car: ") . "</td><td>" . translate("#") . getMultiMapValue(raceData, "Cars", "Car." . getMultiMapValue(raceData, "Cars", "Driver") . ".Nr") . "</td></tr>")
+				infoText .= ("<tr><td>" . translate("My Car: ") . "</td><td>" . translate("#") . getMultiMapValue(raceData, "Cars", "Car." . getMultiMapValue(raceData, "Cars", "Driver") . ".Nr", "-") . "</td></tr>")
 				infoText .= "<tr/>"
 
 				conditions := CaseInsenseMap()
@@ -330,7 +330,7 @@ class RaceReportViewer extends RaceReportReader {
 						valid := false
 
 				if valid
-					cars.Push(Array(getMultiMapValue(raceData, "Cars", "Car." . car . ".Nr"), getMultiMapValue(raceData, "Cars", "Car." . car . ".Car")))
+					cars.Push(Array(getMultiMapValue(raceData, "Cars", "Car." . car . ".Nr", "-"), getMultiMapValue(raceData, "Cars", "Car." . car . ".Car")))
 				else
 					for ignore, lap in this.getReportLaps(raceData, true) {
 						if (drivers.Length >= lap) {
@@ -717,7 +717,7 @@ class RaceReportViewer extends RaceReportReader {
 
 						carIndices.Push(car)
 
-						cars.Push("'#" . getMultiMapValue(raceData, "Cars", "Car." . car . ".Nr") . A_Space
+						cars.Push("'#" . getMultiMapValue(raceData, "Cars", "Car." . car . ".Nr", "-") . A_Space
 									   . StrReplace(SessionDatabase.getCarName(simulator, getMultiMapValue(raceData, "Cars", "Car." . car . ".Car")), "'", "\'") . "'")
 					}
 				}
@@ -843,7 +843,7 @@ class RaceReportViewer extends RaceReportReader {
 			drawChartFunction .= "`ndata.addColumn('number', '" . translate("Lap") . "');"
 
 			for ignore, car in selectedCars
-				drawChartFunction .= "`ndata.addColumn('string', '#" . getMultiMapValue(raceData, "Cars", "Car." . car . ".Nr") . "');"
+				drawChartFunction .= "`ndata.addColumn('string', '#" . getMultiMapValue(raceData, "Cars", "Car." . car . ".Nr", "-") . "');"
 
 			drawChartFunction .= ("`ndata.addRows([" . values2String(", ", rows*) . "]);")
 
@@ -950,7 +950,7 @@ class RaceReportViewer extends RaceReportReader {
 						offset += 1
 					}
 					else
-						cars.Push("#" . getMultiMapValue(raceData, "Cars", "Car." . car . ".Nr"))
+						cars.Push("#" . getMultiMapValue(raceData, "Cars", "Car." . car . ".Nr", "-"))
 
 			singleCar := (cars.Length = 1)
 
@@ -1074,7 +1074,7 @@ class RaceReportViewer extends RaceReportReader {
 			for index, car in selectedCars
 				if inList(selectedClasses, this.getClass(raceData, car))
 					if driverTimes.Has(car) {
-						carTimes := Array("'#" . getMultiMapValue(raceData, "Cars", "Car." . car . ".Nr") . "'")
+						carTimes := Array("'#" . getMultiMapValue(raceData, "Cars", "Car." . car . ".Nr", "-") . "'")
 
 						for dIndex, time in driverTimes[car]
 							if (dIndex > length)
@@ -1199,7 +1199,7 @@ class RaceReportViewer extends RaceReportReader {
 			for index, car in selectedCars
 				if inList(selectedClasses, this.getClass(raceData, car))
 					if driverTimes.Has(car) {
-						columns.Push("'#" . getMultiMapValue(raceData, "Cars", "Car." . car . ".Nr") . A_Space
+						columns.Push("'#" . getMultiMapValue(raceData, "Cars", "Car." . car . ".Nr", "-") . A_Space
 										  . StrReplace(SessionDatabase.getCarName(simulator, getMultiMapValue(raceData, "Cars", "Car." . car . ".Car")), "'", "\'") . "'")
 
 						carTimes := []
@@ -1484,7 +1484,7 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 				if (!selectedClass || (selectedClass = reportViewer.getClass(raceData, A_Index, categories)))
 					if (getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Car", kNotInitialized) != kNotInitialized) {
 						if inList(options, "Cars")
-							column1 := getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Nr")
+							column1 := getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Nr", "-")
 						else
 							column1 := driver
 
@@ -1777,7 +1777,7 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 
 				for ignore, driver in allDrivers
 					if (!selectedClass || (selectedClass = raceReport.getClass(raceData, A_Index, categories)))
-						selectedDrivers[inList(options, "Cars") ? getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Nr") : driver] := A_Index
+						selectedDrivers[inList(options, "Cars") ? getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Nr", "-") : driver] := A_Index
 
 				newDrivers := []
 

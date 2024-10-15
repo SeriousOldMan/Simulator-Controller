@@ -601,8 +601,8 @@ class SoloCenter extends ConfigurationItem {
 				tyreCompoundColor := "Black"
 
 			try {
-				this.Database.add("Tyres.Pressures",
-								  Database.Row("Weather", weather, "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
+				this.Database.add("Tyres.Pressures"
+							   ,  Database.Row("Weather", weather, "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
 											 , "Compound", tyreCompound, "Compound.Color", tyreCompoundColor, "Driver", driver
 											 , "Tyre.Pressure.Cold.Front.Left", null(coldPressures[1])
 											 , "Tyre.Pressure.Cold.Front.Right", null(coldPressures[2])
@@ -616,10 +616,10 @@ class SoloCenter extends ConfigurationItem {
 											 , "Tyre.Pressure.Loss.Front.Right", null(pressuresLosses[2])
 											 , "Tyre.Pressure.Loss.Rear.Left", null(pressuresLosses[3])
 											 , "Tyre.Pressure.Loss.Rear.Right", null(pressuresLosses[4]))
-								, true)
+								, true, false)
 			}
 			catch Any as exception {
-				logError(exception, true)
+				logError(exception)
 			}
 
 			tyres := ["FL", "FR", "RL", "RR"]
@@ -654,10 +654,10 @@ class SoloCenter extends ConfigurationItem {
 									, Database.Row("Weather", weather, "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
 												 , "Driver", driver, "Compound", tyreCompound, "Compound.Color", tyreCompoundColor
 												 , "Type", type, "Tyre", tyre, "Pressure", pressure, "Count", count)
-									, flush)
+									, flush, false)
 				}
 				catch Any as exception {
-					logError(exception, true)
+					logError(exception)
 				}
 		}
 	}
@@ -3862,12 +3862,12 @@ class SoloCenter extends ConfigurationItem {
 
 				this.Laps[recentLap].PressuresData := values2String("|||", pressuresData*)
 
-				this.PressuresDatabase.updatePressures(pressuresData[4], pressuresData[5], pressuresData[6]
-													 , pressuresData[7], pressuresData[8]
-													 , collect(string2Values(",",  pressuresData[9]), null)
-													 , collect(string2Values(",",  pressuresData[10]), null)
-													 , collect(string2Values(",",  pressuresData[11]), null)
-													 , driverID)
+				pressuresDB.updatePressures(pressuresData[4], pressuresData[5], pressuresData[6]
+										  , pressuresData[7], pressuresData[8]
+										  , collect(string2Values(",",  pressuresData[9]), null)
+										  , collect(string2Values(",",  pressuresData[10]), null)
+										  , collect(string2Values(",",  pressuresData[11]), null)
+										  , driverID)
 			}
 		}
 

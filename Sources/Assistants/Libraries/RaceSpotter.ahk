@@ -2325,7 +2325,7 @@ class RaceSpotter extends GridRaceAssistant {
 					car := false
 
 					for ignore, candidate in this.getCars()
-						if (knowledgeBase.getValue("Car." . candidate . ".Nr", false) = number) {
+						if (knowledgeBase.getValue("Car." . candidate . ".Nr", "-") = number) {
 							car := candidate
 
 							break
@@ -3814,7 +3814,7 @@ class RaceSpotter extends GridRaceAssistant {
 					else
 						sectorTimes := false
 
-					positions[carIndex] := Array(getMultiMapValue(data, "Position Data", prefix . ".Nr", carIndex)
+					positions[carIndex] := Array(getMultiMapValue(data, "Position Data", prefix . ".Nr", "-")
 											   , getMultiMapValue(data, "Position Data", prefix . ".Car", "Unknown")
 											   , this.getClass(carIndex, data)
 											   , driverName(getMultiMapValue(data, "Position Data", prefix . ".Driver.Forname", "John")

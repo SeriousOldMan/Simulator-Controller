@@ -438,7 +438,7 @@ class IntegrationPlugin extends ControllerPlugin {
 
 		for ignore, opponent in ["Leader", "Ahead", "Behind", "Focus"]
 			if (getMultiMapValue(sessionInfo, "Standings", opponent . ".Lap.Time", kUndefined) != kUndefined) {
-				nr := getMultiMapValue(sessionInfo, "Standings", opponent . ".Nr")
+				nr := getMultiMapValue(sessionInfo, "Standings", opponent . ".Nr", false)
 
 				state[opponent] := Map("Laps", getMultiMapValue(sessionInfo, "Standings", opponent . ".Laps")
 									 , "Delta", displayValue("Time", getMultiMapValue(sessionInfo, "Standings", opponent . ".Delta"))

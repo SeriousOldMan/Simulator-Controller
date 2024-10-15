@@ -1211,57 +1211,59 @@ class VoiceServer extends ConfigurationItem {
 
 		this.VoiceClients[descriptor] := client
 
-		client.registerRecognitionHandler(ObjBindMethod(this, "handleActivationCommand"))
+		if listener {
+			client.registerRecognitionHandler(ObjBindMethod(this, "handleActivationCommand"))
 
-		if (activationCommand && (StrLen(Trim(activationCommand)) > 0) && listener) {
-			recognizer := this.SpeechRecognizer[true]
+			if (activationCommand && (StrLen(Trim(activationCommand)) > 0) && listener) {
+				recognizer := this.SpeechRecognizer[true]
 
-			grammar := ConfigurationItem.descriptor(descriptor, counter++)
+				grammar := ConfigurationItem.descriptor(descriptor, counter++)
 
-			if this.Debug[kDebugGrammars] {
-				nextCharIndex := 1
+				if this.Debug[kDebugGrammars] {
+					nextCharIndex := 1
 
-				showMessage("Register activation phrase: " . GrammarCompiler(recognizer).readGrammar(&activationCommand, &nextCharIndex).toString())
-			}
-
-			try {
-				for ignore, voiceClient in this.VoiceClients
-					if (voiceClient.Listener && (voiceClient.RecognizerMode = "Grammar")) {
-						clientRecognizer := voiceClient.SpeechRecognizer[true]
-
-						if ((clientRecognizer.Method = "Pattern") && (voiceClient != client))
-							if !clientRecognizer.loadGrammar(ConfigurationItem.descriptor(descriptor, counter++)
-														   , clientRecognizer.compileGrammar(activationCommand)
-														   , ObjBindMethod(this, "recognizeActivationCommand", client))
-								throw "Recognizer not running..."
-					}
-
-				if (client.RecognizerMode = "Grammar") {
-					clientRecognizer := client.SpeechRecognizer[true]
-
-					if (clientRecognizer.Method = "Pattern")
-						for ignore, activationGrammer in this.ActivationGrammars
-							if !clientRecognizer.loadGrammar(ConfigurationItem.descriptor(ConfigurationItem.splitDescriptor(activationGrammer.Descriptor)[1], counter++)
-														   , clientRecognizer.compileGrammar(activationGrammer.Command)
-														   , ObjBindMethod(this, "recognizeActivationCommand", activationGrammer.Client))
-								throw "Recognizer not running..."
+					showMessage("Register activation phrase: " . GrammarCompiler(recognizer).readGrammar(&activationCommand, &nextCharIndex).toString())
 				}
 
-				this.ActivationGrammars.Push({Descriptor: grammar, Client: client
-											, Grammar: compiler.compileGrammar(activationCommand)
-											, Command: activationCommand})
+				try {
+					for ignore, voiceClient in this.VoiceClients
+						if (voiceClient.Listener && (voiceClient.RecognizerMode = "Grammar")) {
+							clientRecognizer := voiceClient.SpeechRecognizer[true]
+
+							if ((clientRecognizer.Method = "Pattern") && (voiceClient != client))
+								if !clientRecognizer.loadGrammar(ConfigurationItem.descriptor(descriptor, counter++)
+															   , clientRecognizer.compileGrammar(activationCommand)
+															   , ObjBindMethod(this, "recognizeActivationCommand", client))
+									throw "Recognizer not running..."
+						}
+
+					if (client.RecognizerMode = "Grammar") {
+						clientRecognizer := client.SpeechRecognizer[true]
+
+						if (clientRecognizer.Method = "Pattern")
+							for ignore, activationGrammer in this.ActivationGrammars
+								if !clientRecognizer.loadGrammar(ConfigurationItem.descriptor(ConfigurationItem.splitDescriptor(activationGrammer.Descriptor)[1], counter++)
+															   , clientRecognizer.compileGrammar(activationGrammer.Command)
+															   , ObjBindMethod(this, "recognizeActivationCommand", activationGrammer.Client))
+									throw "Recognizer not running..."
+					}
+
+					this.ActivationGrammars.Push({Descriptor: grammar, Client: client
+												, Grammar: compiler.compileGrammar(activationCommand)
+												, Command: activationCommand})
 
 
-				if !recognizer.loadGrammar(grammar, recognizer.compileGrammar(activationCommand), ObjBindMethod(this, "recognizeActivationCommand", client))
-					throw "Recognizer not running..."
-			}
-			catch Any as exception {
-				logError(exception, true)
+					if !recognizer.loadGrammar(grammar, recognizer.compileGrammar(activationCommand), ObjBindMethod(this, "recognizeActivationCommand", client))
+						throw "Recognizer not running..."
+				}
+				catch Any as exception {
+					logError(exception, true)
 
-				logMessage(kLogCritical, translate("Error while registering voice command `"") . activationCommand . translate("`" - please check the configuration"))
+					logMessage(kLogCritical, translate("Error while registering voice command `"") . activationCommand . translate("`" - please check the configuration"))
 
-				showMessage(substituteVariables(translate("Cannot register voice command `"%command%`" - please check the configuration..."), {command: activationCommand})
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+					showMessage(substituteVariables(translate("Cannot register voice command `"%command%`" - please check the configuration..."), {command: activationCommand})
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				}
 			}
 		}
 

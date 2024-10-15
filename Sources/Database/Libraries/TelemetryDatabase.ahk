@@ -325,7 +325,7 @@ class TelemetryDatabase extends SessionDatabase {
 
 	addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor
 					 , map, tc, abs, fuelConsumption, fuelRemaining, lapTime
-					 , driver := false, identifier := false) {
+					 , driver := false, identifier := false, retry := 100) {
 		local db := this.Database
 
 		if !driver
@@ -341,10 +341,13 @@ class TelemetryDatabase extends SessionDatabase {
 											     , "Lap.Time", valueOrNull(lapTime)
 											     , "Map", map, "TC", tc, "ABS", abs
 											     , "Identifier", identifier ? identifier : kNull)
-										  , true)
+									, true, retry)
 			}
 			catch Any as exception {
-				logError(exception, true)
+				if retry
+					logError(exception, true)
+				else
+					throw exception
 			}
 			finally {
 				if this.Shared
@@ -356,7 +359,7 @@ class TelemetryDatabase extends SessionDatabase {
 			   , pressureFL, pressureFR, pressureRL, pressureRR
 			   , temperatureFL, temperatureFR, temperatureRL, temperatureRR
 			   , wearFL, wearFR, wearRL, wearRR, fuelConsumption, fuelRemaining, lapTime
-			   , driver := false, identifier := false) {
+			   , driver := false, identifier := false, retry := 100) {
 		local db := this.Database
 
 		if !driver
@@ -384,10 +387,13 @@ class TelemetryDatabase extends SessionDatabase {
 										   , "Tyre.Wear.Rear.Left", valueOrNull(wearRL)
 										   , "Tyre.Wear.Rear.Right", valueOrNull(wearRR)
 										   , "Identifier", identifier ? identifier : kNull)
-								, true)
+							  , true, retry)
 			}
 			catch Any as exception {
-				logError(exception, true)
+				if retry
+					logError(exception, true)
+				else
+					throw exception
 			}
 			finally {
 				if this.Shared

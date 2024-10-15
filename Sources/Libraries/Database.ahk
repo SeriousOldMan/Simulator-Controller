@@ -347,8 +347,8 @@ class Database {
 			this.iTables.Delete(name)
 	}
 
-	add(name, values, flush := false) {
-		local tries := 100
+	add(name, values, flush := false, retry := 100) {
+		local tries := retry
 		local row, directory, fileName, ignore, column, value, newValues, file
 
 		if !isInstance(values, Database.Row)

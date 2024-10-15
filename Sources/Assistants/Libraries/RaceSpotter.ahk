@@ -2689,7 +2689,7 @@ class RaceSpotter extends GridRaceAssistant {
 			if ((focused = standingsAhead) || (focused = standingsBehind))
 				focused := false
 
-			if focused {
+			if (focused && (method >= kDeltaMethodDynamic)) {
 				position := focused.Car.Position["Class"]
 				number := focused.Car.Nr
 				delta := focused.Delta[false, true, 1]
@@ -2806,10 +2806,10 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 		}
 
-		if (!spoken && (this.Session == kSessionRace))
-			if (true || Random(1, 10) > 8) {
+		if (!spoken && (this.Session == kSessionRace) && ((method = kDeltaMethodStatic) || (method = kDeltaMethodBoth)))
+			if (Random(1, 10) > 8) {
 				rnd := Random(1, focused ? 133 : 100)
-				rnd := 35
+
 				if ((rnd <= 33) && standingsAhead) {
 					lapTime := standingsAhead.LastLapTime
 					phrase := "AheadLapTime"

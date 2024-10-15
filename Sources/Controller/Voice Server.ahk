@@ -1214,7 +1214,7 @@ class VoiceServer extends ConfigurationItem {
 		if listener {
 			client.registerRecognitionHandler(ObjBindMethod(this, "handleActivationCommand"))
 
-			if (activationCommand && (StrLen(Trim(activationCommand)) > 0) && listener) {
+			if (activationCommand && (StrLen(Trim(activationCommand)) > 0)) {
 				recognizer := this.SpeechRecognizer[true]
 
 				grammar := ConfigurationItem.descriptor(descriptor, counter++)

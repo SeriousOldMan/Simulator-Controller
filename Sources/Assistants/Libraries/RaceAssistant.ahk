@@ -171,7 +171,7 @@ class AssistantEvent extends AgentEvent {
 		local assistant := this.Assistant
 
 		return {assistant: assistant.AssistantType, name: assistant.VoiceManager.Name
-			  , knowledge: JSON.print(assistant.getKnowledge("Agent", this.Options))}
+			  , knowledge: StrReplace(JSON.print(assistant.getKnowledge("Agent", this.Options)), "%", "\%")}
 	}
 
 	handledEvent(event) {
@@ -1211,7 +1211,7 @@ class RaceAssistant extends ConfigurationItem {
 			if this.ConversationBooster {
 				text := this.ConversationBooster.ask(text
 												   , Map("Variables", {assistant: this.AssistantType, name: this.VoiceManager.Name
-																	 , knowledge: JSON.print(this.getKnowledge("Conversation"))}))
+																	 , knowledge: StrReplace(JSON.print(this.getKnowledge("Conversation")), "%", "\%")}))
 
 				if text {
 					if (text != true)

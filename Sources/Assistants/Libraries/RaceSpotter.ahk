@@ -837,7 +837,7 @@ class RaceSpotter extends GridRaceAssistant {
 	iOtherCars := CaseInsenseMap()
 	iPositions := CaseInsenseWeakMap()
 
-	iFocusedCar := false
+	iFocusedCar := kUndefined
 
 	iPendingAlerts := []
 	iAlertProcessing := false
@@ -999,7 +999,7 @@ class RaceSpotter extends GridRaceAssistant {
 			else {
 				for ignore, candidate in this.PositionInfos
 					if (candidate.Car.Nr = this.iFocusedCar) {
-						this.iFocusedCar := candidate
+						this.FocusedCar := candidate
 
 						return (position ? candidate : candidate.Car.Nr)
 					}
@@ -1258,7 +1258,7 @@ class RaceSpotter extends GridRaceAssistant {
 	noFocusCarRecognized(words) {
 		this.getSpeaker().speakPhrase("Roger")
 
-		this.FocusedCar := false
+		this.FocusedCar := kUndefined
 	}
 
 	updateFocusCar(number) {
@@ -2807,9 +2807,9 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 
 		if (!spoken && (this.Session == kSessionRace))
-			if (Random(1, 10) > 8) {
+			if (true || Random(1, 10) > 8) {
 				rnd := Random(1, focused ? 133 : 100)
-
+				rnd := 35
 				if ((rnd <= 33) && standingsAhead) {
 					lapTime := standingsAhead.LastLapTime
 					phrase := "AheadLapTime"
@@ -2853,8 +2853,8 @@ class RaceSpotter extends GridRaceAssistant {
 
 
 				speaker.speakPhrase("LapTimeDelta", {delta: speaker.number2Speech(Round(Abs(delta), 1))
-												   , relativeYou: fragments[(delta >= 0) ? "Faster" : "Slower"]
-												   , relativeOther: fragments[(delta < 0) ? "Faster" : "Slower"]})
+												   , relativeYou: speaker.Fragments[(delta >= 0) ? "Faster" : "Slower"]
+												   , relativeOther: speaker.Fragments[(delta < 0) ? "Faster" : "Slower"]})
 			}
 			finally {
 				speaker.endTalk()

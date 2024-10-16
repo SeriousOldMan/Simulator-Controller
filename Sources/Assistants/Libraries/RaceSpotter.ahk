@@ -898,14 +898,20 @@ class RaceSpotter extends GridRaceAssistant {
 			speakPhrase(phrase, arguments*) {
 				local assistant := this.VoiceManager.RaceAssistant
 
-				if assistant.skipAlert(phrase)
+				if assistant.skipAlert(phrase) {
+					assistant.cleanupAlerts(phrase)
+
 					return
+				}
 
 				if this.Awaitable {
 					this.wait()
 
-					if assistant.skipAlert(phrase)
+					if assistant.skipAlert(phrase) {
+						assistant.cleanupAlerts(phrase)
+
 						return
+					}
 				}
 
 				super.speakPhrase(phrase, arguments*)
@@ -2966,8 +2972,31 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
+	cleanupAlerts(alert) {
+		local nextAlert := this.nextAlert()
+
+		switch alert, false {
+			case "Left":
+				if (nextAlert = "ClearLeft")
+					this.popAlert()
+			case "ClearLeft":
+				if (nextAlert = "Left")
+					this.popAlert()
+			case "Right":
+				if (nextAlert = "ClearRight")
+					this.popAlert()
+			case "ClearRight":
+				if (nextAlert = "Right")
+					this.popAlert()
+		}
+	}
+
 	superfluousAlert(alert) {
 		return (InStr(alert, "AccidentBehind") && this.pendingAlerts(["Behind", "Left", "Right", "Three", "Clear"], true))
+	}
+
+	nextAlert() {
+		return ((this.iPendingAlerts.Length > 0) ? this.iPendingAlerts[1] : false)
 	}
 
 	pushAlert(alert, arguments*) {
@@ -2978,9 +3007,13 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
+	popAlert() {
+		return ((this.iPendingAlerts.Length > 0) ? this.iPendingAlerts.RemoveAt(1) : false)
+	}
+
 	processAlerts(async := true) {
 		local speaker := this.getSpeaker(true)
-		local type, oldPriority, oldAlertProcessing
+		local type, oldPriority, oldAlertProcessing, alert
 
 		if (this.iAlertProcessing || speaker.Speaking)
 			if (this.iPendingAlerts.Length > 0) {
@@ -3006,8 +3039,8 @@ class RaceSpotter extends GridRaceAssistant {
 		speaker.Speaking := true
 
 		try {
-			while (this.iPendingAlerts.Length > 0)
-				speaker.speakPhrase(this.iPendingAlerts.RemoveAt(1)*)
+			while (alert := this.popAlert())
+				speaker.speakPhrase(alert*)
 		}
 		finally {
 			speaker.Speaking := false

@@ -13,6 +13,7 @@
   12. Uploading telemetry data in the "Session Database" can also read MoTeC and Second Monitor files.
   13. A new setting for the steer lock of a car has been integrated in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings). This is used to normalize the steering angle when importing telemetry data from MoTeC, for example. If this setting is not set, the latest value used in the "Setup Workbench" for this car will be used.
   14. The announcement of the last lap times of the cars around you by the Spotter has been moved from the "Session Information" group to the "Opponent Information" group and can be enabled/disabled together with ´gap and delta information in the configuration.
+  15. Reduced frequency of superfluous proximity alerts by the Spotter.
   
 ## 5.9.3.0-release 10/11/24
 

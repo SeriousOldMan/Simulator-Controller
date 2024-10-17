@@ -1,4 +1,4 @@
-## 5.9.4.0-release 10/18/24 (planned)
+## 5.9.4.0-release 10/18/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed standings handling and race reports for grids where cars with duplicate race numbers are present. This can happen in *RaceRoom Racing Experience*, for example.

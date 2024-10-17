@@ -1,8 +1,8 @@
 [Development]
-Version=5.9.4.0-dev
+Version=5.9.4.0-beta
 Target=5.9.4.0-release
 Date=10/16/2024
-Download=https://www.dropbox.com/scl/fi/h3kmxdr4ctw00ewyx3lae/Simulator-Controller-5.9.4.0-dev.zip?rlkey=xjjzghald2ihz33zr9thctyc9&st=exfk8lvl&dl=1
+Download=
 Changes=Layout settings for telemetry viewer, Fixed standings with duplicate race numbers, Fixed grid size and positions for R3E, Moved Spotter lap time announcement to Opponent Information group, Horizontal shifting of telemetry graphs, Save selected zoom factor for telemetry graphs, Independent horizontal and vertical zooming for telemetry graphs, Lap telemetry importer for MoTeC, Multi upload in session database, Upload telemetry can import from MoTeC and alike, New steer lock setting in "Session Database", Fixed occasional unwanted focused car messages in R3E, Optimized Spotter proximity alerts
 Components=Media->5.6.1,Configuration->5.9.1,Utilities->5.9.1
 [Release]
@@ -25,5 +25,5 @@ Utilities.5.9.1.Download=https://www.dropbox.com/scl/fi/n3n5gajdhb1swegw46bp6/Ut
 [Current]
 Type=Development
 [Version]
-Development=5.9.4.0-dev
+Development=5.9.4.0-beta
 Release=5.9.3.0-release

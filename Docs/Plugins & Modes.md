@@ -263,6 +263,7 @@ The "Driving Coach" plugin handles the interaction with the Virtual Driving Coac
 	raceAssistantSpeakerVocalics: *volume* , *pitch* , *rate*;
 	raceAssistantRecognizer: Desktop | Azure|tokenIssuerEndpoint|subscriptionKey;
 	raceAssistantListener: On | Off | *Microsoft Speech Recognition Engine*;
+	coaching: *onOffFunction*;
 	openSetupWorkbench: *workbenchFunction*
 
 For Aiden to be generally available, you must supply an argument for the *raceAssistantName* parameter, for example "Aiden". You can define a function on your hardware controller with the parameter *raceAssistant*, to enable or disable the Virtual Driving Coach dynamically. The *onOffFunction* may be ommited, if you only want to enable or disable the Assistant generally. The also optional *initialState* must be either "On" or "Off" (default is "On") and for *onOffFunction* unary and binary functions are supported. The function will be bound to a plugin action.
@@ -277,6 +278,8 @@ With *raceAssistantRecognizer* you specify the engine used for voice recognition
 Please note, that the voice recognizer *Server* cannot be used for the driving coach, since this recognition engine does not support the conversion of free speech to text.
 
 With *raceAssistantSpeaker* and *raceAssistantListener* you can customize the natural language interface (or the personality) of Aiden. If you simply supply "On" (or *true*) as arguments, a voice and the corresponding recognition engine will be choosen based on the currently configured language. If you prefer a specific voice and / or a specific language, you can supply the name for this voice and language instead (Example: "Microsoft David Desktop" is a male US-English voice). Using the parameter *raceAssistantSpeakerVocalics*, you can supply individual values for the voice volume, voice pitch and speech rate. *volume* must be a number between 0 and 100. For *pitch* and *rate*, you can supply values from -10 to 10. Additionally, you can supply a "*" for each of the three values. In this case, the corresponding setting in the voice control configuration is used. If an argument for the paramter *raceAssistantSpeakerVocalics* is not supplied at all, the values from the general voice control configuration will be taken as default as well. For more information about Aiden, see the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach). With *raceAssistantLanguage* you can overwrite the default language, which has been configured in the [voice tab of the configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control).
+
+With *coaching* you can supply a function to enable or disable active coaching for your current session. Unary and binary functions are supported for *onOffFunction*. The function will be bound to a plugin action. See the [documentation about active coaching](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#Active-Coaching) for more information.
 
 ## Plugin *Race Engineer*
 

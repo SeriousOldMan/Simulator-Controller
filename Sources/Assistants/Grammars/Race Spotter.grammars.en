@@ -6,10 +6,10 @@
 [Configuration]
 Recognizer=Grammar
 [Fragments]
-GreetingDry=it is dry
-GreetingDry2Wet=it is still dry
-GreetingWet=it is wet
-GreetingWet2Dry=it is still wet
+GreetingDry=It is dry
+GreetingDry2Wet=It is still dry
+GreetingWet=It is wet
+GreetingWet2Dry=It is still wet
 DeltaInformation=delta information
 CutWarnings=cut warnings
 PenaltyInformation=penalty information
@@ -42,7 +42,7 @@ GreetingPosition.2=You have qualified for P %position% %overall%.
 GreetingPosition.3=You are in P %position% %overall%.
 GreetingDuration.1=The race will last %minutes% minutes. It's about to go green.
 GreetingDuration.2=There are %minutes% exciting minutes ahead. The race start is near.
-GreetingDuration.3= There are %minutes% minutes ahead of us. Get ready.
+GreetingDuration.3=There are %minutes% minutes ahead of us. Get ready.
 GreetingLaps.1=The race of today is over %laps% laps. It's about to go green.
 GreetingLaps.2=There are %laps% laps ahead. The race start is near.
 Later.1=Too early to say this.

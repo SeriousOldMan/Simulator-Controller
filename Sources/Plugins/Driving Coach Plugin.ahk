@@ -27,9 +27,44 @@ global kDrivingCoachPlugin := "Driving Coach"
 class DrivingCoachPlugin extends RaceAssistantPlugin {
 	iServiceState := "Available"
 
+	iCoachingActive := false
+
 	class RemoteDrivingCoach extends RaceAssistantPlugin.RemoteRaceAssistant {
 		__New(plugin, remotePID) {
 			super.__New(plugin, "Driving Coach", remotePID)
+		}
+	}
+
+	class CoachingToggleAction extends ControllerAction {
+		iPlugin := false
+
+		Plugin {
+			Get {
+				return this.iPlugin
+			}
+		}
+
+		__New(plugin, function, label, icon) {
+			this.iPlugin := plugin
+
+			super.__New(function, label, icon)
+		}
+
+		fireAction(function, trigger) {
+			local plugin := this.Plugin
+
+			if (plugin.CoachingActive && ((trigger = "On") || (trigger = "Off") || (trigger == "Push"))) {
+				plugin.finishCoaching()
+
+				function.setLabel(plugin.actionLabel(this), "Black")
+				function.setIcon(plugin.actionIcon(this), "Deactivated")
+			}
+			else if (!plugin.CoachingActive && ((trigger = "On") || (trigger == "Push"))) {
+				plugin.startCoaching()
+
+				function.setLabel(plugin.actionLabel(this), "Green")
+				function.setIcon(plugin.actionIcon(this), "Activated")
+			}
 		}
 	}
 
@@ -45,9 +80,35 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 		}
 	}
 
+	CoachingActive {
+		Get {
+			return this.iCoachingActive
+		}
+	}
+
+	__New(controller, name, configuration := false, register := true) {
+		local coaching
+
+		super.__New(controller, name, configuration)
+
+		if (this.Active || (isDebug() && isDevelopment())) {
+			coaching := this.getArgumentValue("coaching", false)
+
+			if coaching
+				this.createRaceAssistantAction(controller, "Coaching", coaching)
+		}
+	}
+
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {
+		local descriptor
+
 		if (inList(["RaceAssistant", "Call", "SetupWorkbenchOpen"], action))
 			super.createRaceAssistantAction(controller, action, actionFunction, arguments*)
+		else if (action = "Coaching") {
+			descriptor := ConfigurationItem.descriptor(action, "Toggle")
+
+			this.registerAction(DrivingCoachPlugin.CoachingToggleAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
+		}
 		else
 			logMessage(kLogWarn, translate("Action `"") . action . translate("`" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 	}
@@ -78,6 +139,21 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 		}
 
 		return settings
+	}
+
+	updateActions(session) {
+		local ignore, theAction
+
+		super.updateActions(session)
+
+		for ignore, theAction in this.Actions {
+			if isInstance(theAction, DrivingCoachPlugin.CoachingToggleAction) {
+				theAction.Function.setLabel(this.actionLabel(theAction), this.CoachingActive ? "Green" : "Black")
+				theAction.Function.setIcon(this.actionIcon(theAction), this.CoachingActive ? "Activated" : "Deactivated")
+
+				theAction.Function.enable(kAllTrigger, theAction)
+			}
+		}
 	}
 
 	serviceState(health) {
@@ -147,6 +223,53 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 
 	joinSession(settings, data) {
 		this.startSession(settings, data)
+	}
+
+	startCoaching() {
+		this.iCoachingActive := true
+
+		this.updateActions(kSessionFinished)
+	}
+
+	finishCoaching() {
+		this.iCoachingActive := false
+
+		this.updateActions(kSessionFinished)
+	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                        Controller Action Section                        ;;;
+;;;-------------------------------------------------------------------------;;;
+
+startCoaching() {
+	local controller := SimulatorController.Instance
+	local plugin := controller.findPlugin(kDrivingCoachPlugin)
+
+	protectionOn()
+
+	try {
+		if (plugin && controller.isActive(plugin))
+			plugin.startCoaching()
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+finishCoaching() {
+	local controller := SimulatorController.Instance
+	local plugin := controller.findPlugin(kDrivingCoachPlugin)
+
+	protectionOn()
+
+	try {
+		if (plugin && controller.isActive(plugin))
+			plugin.finishCoaching()
+	}
+	finally {
+		protectionOff()
 	}
 }
 

@@ -96,7 +96,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	iStrategyListView := false
 	iSetupListView := false
 	iAdministrationListView := false
+	iTrackSectionsListView := false
 	iTrackAutomationsListView := false
+
+	iTrackEditorMode := "Automations"
+
+	iTrackSectionsWidgets := []
+	iTrackAutomationsWidgets := []
 
 	iTrackAutomations := []
 	iSelectedTrackAutomation := false
@@ -176,7 +182,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				this.iRedraw := false
 
-				if (editor.SelectedModule = "Automation")
+				if (editor.SelectedModule = "Track")
 					editor.updateTrackMap()
 
 				WinRedraw(this.Window)
@@ -349,6 +355,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	TrackImage {
 		Get {
 			return this.iTrackImage
+		}
+	}
+
+	TrackEditorMode {
+		Get {
+			return this.iTrackEditorMode
+		}
+	}
+
+	TrackSectionsListView {
+		Get {
+			return this.iTrackSectionsListView
 		}
 	}
 
@@ -1312,6 +1330,15 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			messageSend(kFileMessage, "Setup", "setTyrePressures:" . values2String(";", compound, compoundColor, tyrePressures*), editor.RequestorPID)
 		}
 
+		chooseTrackEditorType(*) {
+			if (editorGui["trackEditorTypeDropDown"].Value = 2)
+				this.iTrackEditorMode := "Automations"
+			else
+				this.iTrackEditorMode := "Sections"
+
+			this.updateState()
+		}
+
 		testSettings(*) {
 			local exePath := kBinariesDirectory . "Race Settings.exe"
 			local fileName := kTempDirectory . "Temp.settings"
@@ -1368,7 +1395,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x16 yp+12 w30 h30 Section", this.themeIcon(kIconsDirectory . "Automation.ico"))
+		editorGui.Add("Picture", "x16 yp+12 w30 h30 Section", this.themeIcon(kIconsDirectory . "Road.ico"))
 		editorGui.Add("Text", "x50 yp+5 w180 h26", translate("Selection"))
 
 		editorGui.SetFont("s8 Norm", "Arial")
@@ -1443,6 +1470,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
+		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg7", this.themeIcon(kIconsDirectory . "Automation.ico")).OnEvent("Click", chooseTab.Bind("Track"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 W:Grow(0.2) vsettingsTab7", translate("Track && Automations")).OnEvent("Click", chooseTab.Bind("Track"))
+
+		editorGui.Add("Text", "x16 yp+32 w267 W:Grow(0.2) 0x10")
+
+		editorGui.SetFont("Norm")
+		editorGui.SetFont("s10 Bold", "Arial")
+
 		editorGui.Add("Picture", "x16 yp+12 w30 h30 vsettingsImg2", this.themeIcon(kIconsDirectory . "Sessions.ico")).OnEvent("Click", chooseTab.Bind("Sessions"))
 		editorGui.Add("Text", "x50 yp+5 w220 h26 W:Grow(0.2) vsettingsTab2", translate("Sessions")).OnEvent("Click", chooseTab.Bind("Sessions"))
 
@@ -1483,14 +1518,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg7", this.themeIcon(kIconsDirectory . "Automation.ico")).OnEvent("Click", chooseTab.Bind("Automation"))
-		editorGui.Add("Text", "x50 yp+5 w220 h26 W:Grow(0.2) vsettingsTab7", translate("Automations")).OnEvent("Click", chooseTab.Bind("Automation"))
-
-		editorGui.Add("Text", "x16 yp+32 w267 W:Grow(0.2) 0x10")
-
-		editorGui.SetFont("Norm")
-		editorGui.SetFont("s10 Bold", "Arial")
-
 		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg8", this.themeIcon(kIconsDirectory . "Sensor.ico")).OnEvent("Click", chooseTab.Bind("Data"))
 		editorGui.Add("Text", "x50 yp+5 w220 h26 W:Grow(0.2) vsettingsTab8", translate("Administration")).OnEvent("Click", chooseTab.Bind("Data"))
 
@@ -1500,7 +1527,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui.Add("Picture", "x280 ys-2 w390 h554 Border X:Move(0.2) W:Grow(0.8) H:Grow")
 
-		tabs := collect(["Settings", "Session", "Laps", "Stratgies", "Setups", "Pressures", "Automation", "Data"], translate)
+		tabs := collect(["Settings", "Track", "Session", "Laps", "Stratgies", "Setups", "Pressures", "Data"], translate)
 
 		editorGui.Add("Tab2", "x296 ys+16 w0 h0 -Wrap Section vsettingsTab", tabs)
 
@@ -1677,9 +1704,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui["settingsTab"].UseTab(7)
 
-		this.iTrackDisplayArea := [297, 239, 358, 350]
+		editorGui.Add("Text", "x296 ys w80 h23 +0x200 X:Move(0.2)", translate("Edit"))
+		editorGui.Add("DropDownList", "xp+90 yp w270 X:Move(0.2) W:Grow(0.8) Choose2 vtrackEditorTypeDropDown"
+					, collect(["Sections", "Automations"], translate)).OnEvent("Change", chooseTrackEditorType)
 
-		editorGui.Add("Picture", "x296 y238 w360 h382 X:Move(0.2) W:Grow(0.8) H:Grow(0.9) Border vtrackDisplayArea")
+		this.iTrackDisplayArea := [297, 263, 358, 326]
+
+		editorGui.Add("Picture", "x296 yp+24 w360 h358 X:Move(0.2) W:Grow(0.8) H:Grow(0.9) Border vtrackDisplayArea")
 		this.iTrackDisplay := editorGui.Add("Picture", "x297 y239 BackgroundTrans vtrackDisplay")
 		this.iTrackDisplay.OnEvent("Click", selectTrackAction)
 
@@ -1688,18 +1719,26 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.iTrackAutomationsListView.OnEvent("DoubleClick", selectTrackAutomation)
 		this.iTrackAutomationsListView.OnEvent("ItemSelect", navTrackAutomation)
 
-		editorGui.Add("Text", "x415 yp w60 h23 Y:Move(0.9) X:Move(0.8) +0x200", translate("Name"))
-		editorGui.Add("Edit", "xp+60 yp w109 Y:Move(0.9) X:Move(0.8) W:Grow(0.2) vtrackAutomationNameEdit")
+		this.iTrackSectionsListView := editorGui.Add("ListView", "xp yp w360 h142 Y:Move(0.9) X:Move(0.2) W:Grow(0.2) H:Grow(0.1) Hidden -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Section", "Length"], translate))
 
-		editorGui.Add("Button", "x584 yp w23 h23 Y:Move(0.9) X:Move vaddTrackAutomationButton").OnEvent("Click", addTrackAutomation)
-		editorGui.Add("Button", "xp+25 yp w23 h23 Y:Move(0.9) X:Move vdeleteTrackAutomationButton").OnEvent("Click", deleteTrackAutomation)
-		editorGui.Add("Button", "xp+25 yp w23 h23 Y:Move(0.9) X:Move Center +0x200 vsaveTrackAutomationButton").OnEvent("Click", saveTrackAutomation)
+		widget1 := editorGui.Add("Text", "x415 yp w60 h23 Y:Move(0.9) X:Move(0.8) +0x200", translate("Name"))
+		widget2 := editorGui.Add("Edit", "xp+60 yp w109 Y:Move(0.9) X:Move(0.8) W:Grow(0.2) vtrackAutomationNameEdit")
+
+		widget3 := editorGui.Add("Button", "x584 yp w23 h23 Y:Move(0.9) X:Move vaddTrackAutomationButton")
+		widget3.OnEvent("Click", addTrackAutomation)
+		widget4 := editorGui.Add("Button", "xp+25 yp w23 h23 Y:Move(0.9) X:Move vdeleteTrackAutomationButton")
+		widget4.OnEvent("Click", deleteTrackAutomation)
+		widget5 := editorGui.Add("Button", "xp+25 yp w23 h23 Y:Move(0.9) X:Move Center +0x200 vsaveTrackAutomationButton")
+		widget5.OnEvent("Click", saveTrackAutomation)
 		setButtonIcon(editorGui["addTrackAutomationButton"], kIconsDirectory . "Plus.ico", 1)
 		setButtonIcon(editorGui["deleteTrackAutomationButton"], kIconsDirectory . "Minus.ico", 1)
 		setButtonIcon(editorGui["saveTrackAutomationButton"], kIconsDirectory . "Save.ico", 1, "L5 T5 R5 B5")
 
-		editorGui.Add("Text", "x415 yp+24 w60 h23 Y:Move(0.9) X:Move(0.8) +0x200", translate("Actions"))
-		editorGui.Add("Edit", "xp+60 yp w181 h118 Y:Move(0.9) X:Move(0.8) W:Grow(0.2) H:Grow(0.1) ReadOnly -Wrap vtrackAutomationInfoEdit")
+		widget6 := editorGui.Add("Text", "x415 yp+24 w60 h23 Y:Move(0.9) X:Move(0.8) +0x200", translate("Actions"))
+		widget7 := editorGui.Add("Edit", "xp+60 yp w181 h118 Y:Move(0.9) X:Move(0.8) W:Grow(0.2) H:Grow(0.1) ReadOnly -Wrap vtrackAutomationInfoEdit")
+
+		this.iTrackAutomationsWidgets := [this.TrackAutomationsListView, widget1, widget2, widget3, widget4, widget5, widget6, widget7]
+		this.iTrackSectionsWidgets := [this.TrackSectionsListView]
 
 		editorGui["settingsTab"].UseTab(8)
 
@@ -1763,7 +1802,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				ToolTip()
 			}
 
-			if ((this.SelectedModule = "Automation") && gActionInfoEnabled) {
+			if ((this.SelectedModule = "Track") && gActionInfoEnabled) {
 				MouseGetPos(&x, &y)
 
 				x := screen2Window(x)
@@ -1899,7 +1938,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local window := this.Window
 		local sessionDB := this.SessionDatabase
 		local simulator, car, track, selected, selectedEntries, row, type
-		local name, info, index, driver
+		local name, info, index, driver, ignore, widget
 
 		simulator := this.SelectedSimulator
 		car := this.SelectedCar
@@ -1920,6 +1959,17 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			window["settingsImg1"].Enabled := false
 			window["settingsImg1"].Value := this.themeIcon(kIconsDirectory . "General Settings Gray.ico")
 			window["settingsTab1"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
+		}
+
+		if this.moduleAvailable("Track") {
+			window["settingsImg7"].Enabled := true
+			window["settingsImg7"].Value := this.themeIcon(kIconsDirectory . "Automation.ico")
+			window["settingsTab7"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
+		}
+		else {
+			window["settingsImg7"].Enabled := false
+			window["settingsImg7"].Value := this.themeIcon(kIconsDirectory . "Automation Gray.ico")
+			window["settingsTab7"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
 		if this.moduleAvailable("Sessions") {
@@ -1977,17 +2027,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			window["settingsTab6"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
-		if this.moduleAvailable("Automation") {
-			window["settingsImg7"].Enabled := true
-			window["settingsImg7"].Value := this.themeIcon(kIconsDirectory . "Automation.ico")
-			window["settingsTab7"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
-		}
-		else {
-			window["settingsImg7"].Enabled := false
-			window["settingsImg7"].Value := this.themeIcon(kIconsDirectory . "Automation Gray.ico")
-			window["settingsTab7"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
-		}
-
 		if this.moduleAvailable("Data") {
 			window["settingsImg8"].Enabled := true
 			window["settingsImg8"].Value := this.themeIcon(kIconsDirectory . "Sensor.ico")
@@ -2035,7 +2074,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 							break
 						}
-			case "Automation":
+			case "Track":
 				window["settingsTab7"].SetFont("s10 Bold c" . window.Theme.TextColor, "Arial")
 
 				window["settingsTab"].Choose(7)
@@ -2299,6 +2338,21 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			window["dataSelectCheck"].Value := 0
 
 		window["addTrackAutomationButton"].Enabled := true
+
+		if (this.TrackEditorMode = "Automations") {
+			for ignore, widget in this.iTrackAutomationsWidgets
+				widget.Visible := true
+
+			for ignore, widget in this.iTrackSectionsWidgets
+				widget.Visible := false
+		}
+		else {
+			for ignore, widget in this.iTrackAutomationsWidgets
+				widget.Visible := false
+
+			for ignore, widget in this.iTrackSectionsWidgets
+				widget.Visible := true
+		}
 
 		if this.SelectedTrackAutomation {
 			window["trackAutomationNameEdit"].Enabled := true
@@ -4481,7 +4535,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				this.iAvailableModules["Strategies"] := true
 				this.iAvailableModules["Setups"] := true
 				this.iAvailableModules["Pressures"] := true
-				this.iAvailableModules["Automation"] := this.SessionDatabase.hasTrackMap(simulator, track)
+				this.iAvailableModules["Track"] := this.SessionDatabase.hasTrackMap(simulator, track)
 			}
 			else {
 				this.iAvailableModules["Sessions"] := false
@@ -4489,7 +4543,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				this.iAvailableModules["Strategies"] := false
 				this.iAvailableModules["Setups"] := false
 				this.iAvailableModules["Pressures"] := false
-				this.iAvailableModules["Automation"] := false
+				this.iAvailableModules["Track"] := false
 			}
 		}
 		else {
@@ -4500,7 +4554,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.iAvailableModules["Strategies"] := false
 			this.iAvailableModules["Setups"] := false
 			this.iAvailableModules["Pressures"] := false
-			this.iAvailableModules["Automation"] := false
+			this.iAvailableModules["Track"] := false
 		}
 
 		return this.iAvailableModules[module]
@@ -4515,7 +4569,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				window := this.Window
 
-				if ((module != "Automation") && this.TrackMap)
+				if ((module != "Track") && this.TrackMap)
 					this.unloadTrackMap()
 
 				switch module, false {
@@ -4531,7 +4585,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						this.selectStrategies()
 					case "Setups":
 						this.selectSetups()
-					case "Automation":
+					case "Track":
 						this.selectAutomation()
 					case "Pressures":
 						this.selectPressures()

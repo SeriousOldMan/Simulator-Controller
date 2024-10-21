@@ -1,15 +1,41 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Telemetry                       ;;;
+;;;   Modular Simulator Controller System - Telemetry Analysis              ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include "..\..\Libraries\JSON.ahk"
+#Include "..\..\Libraries\Math.ahk"
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 class Section {
+	Type {
+		Get {
+			throw "Virtual property Section.Type must be implemented in a subclass..."
+		}
+	}
+
+	Length {
+		Get {
+			throw "Virtual property Section.Length must be implemented in a subclass..."
+		}
+	}
+
+	Duration {
+		Get {
+			throw "Virtual property Section.Duration must be implemented in a subclass..."
+		}
+	}
+
 	MinG {
 		Get {
 			throw "Virtual property Section.MinG must be implemented in a subclass..."
@@ -45,15 +71,29 @@ class Section {
 			throw "Virtual property Section.AvgSpeed must be implemented in a subclass..."
 		}
 	}
+
+	Descriptor {
+		Get {
+			return {Type: this.Type, Length: this.Length, Duration: this.Duration
+				  , MinG: this.MinG, MaxG: this.MaxG, AvgG: this.AvgG
+				  , MinSpeed: this.MinSpeed, MaxSpeed: this.MaxSpeed, AvgSpeed: this.AvgSpeed}
+	}
+
+	JSON {Get {
+			return JSON.print(this.Descriptor, "  ")
+		}
+	}
 }
 
 class Corner extends Section {
 	iNr := 0							; Number of the corner counting from start/finish
-	iDuration := 0						; Seconds used from Start to Start + Length
-	iStart := 0							; Distance into the track where corner starts
 
 	iDirection := "Left"				; OneOf("Left", "Right")
 	iCurvature := 0.0					; Higher values -> sharper corner
+
+	iBrakingDuration := 0				; Duration of the braking phase in meters
+	iRollingDuration := 0				; Duration of the rolling phase in meters
+	iAcceleratingDuration := 0			; Duration of the acceleration phase in meters
 
 	iBrakingLength := 0					; Length of the braking phase in meters
 	iRollingLength := 0					; Length of the rolling phase in meters
@@ -69,9 +109,15 @@ class Corner extends Section {
 	iTCActivations := 0					; # of TC activations (each meter is one tick)
 	iABSActivations := 0				; # of ABS activations (each meter is one tick)
 
-	iCounterSteerings := 0				; # of counter steering events during the corner
+	iSteeringSmoothness := 0			; Percentage
 	iThrottleSmoothness := 0			; Percentage
 	iBrakeSmoothness := 0				; Percentage
+
+	Type {
+		Get {
+			return "Corner"
+		}
+	}
 
 	Nr {
 		Get {
@@ -79,15 +125,30 @@ class Corner extends Section {
 		}
 	}
 
-	Duration {
+	Direction {
 		Get {
-			return this.iDuration
+			return this.iDirection
 		}
 	}
 
-	Start {
+	Curvature {
 		Get {
-			return this.iStart
+			return this.iCurvature
+		}
+	}
+
+	Duration[part := "Overall"] {
+		Get {
+			if (part = "Overall")
+				return (this.iBrakingDuration + this.iRollingDuration + this.iAcceleratingDuration)
+			else if ((part = "Entry") || (part = "Braking"))
+				return this.iBrakingDuration
+			else if ((part = "Apex") || (part = "Rolling"))
+				return this.iRollingDuration
+			else if ((part = "Exit") || (part = "Accelerating"))
+				return this.iAcceleratingDuration
+			else
+				return 0
 		}
 	}
 
@@ -103,18 +164,6 @@ class Corner extends Section {
 				return this.iAcceleratingLength
 			else
 				return 0
-		}
-	}
-
-	Direction {
-		Get {
-			return this.iDirection
-		}
-	}
-
-	Curvature {
-		Get {
-			return this.iCurvature
 		}
 	}
 
@@ -166,9 +215,9 @@ class Corner extends Section {
 		}
 	}
 
-	CounterSteerings {
+	SteeringSmoothness {
 		Get {
-			return this.iCounterSteerings
+			return this.iSteeringSmoothness
 		}
 	}
 
@@ -183,17 +232,61 @@ class Corner extends Section {
 			return this.iBrakeSmoothness
 		}
 	}
+
+	Descriptor {
+		Get {
+			local descriptor := super.Descriptor
+
+			descriptor.Nr := this.Nr
+			descriptor.Direction := this.Direction
+			descriptor.Curvature := this.Curvature
+
+			descriptor.BrakingDuration := this.Duration["Braking"]
+			descriptor.BrakingLength := this.Length["Braking"]
+
+			descriptor.RollingDuration := this.Duration["Rolling"]
+			descriptor.RollingLength := this.Length["Rolling"]
+
+			descriptor.AcceleratingDuration := this.Duration["Accelerating"]
+			descriptor.AcceleratingLength := this.Length["Accelerating"]
+
+			descriptor.TCActivations := this.TCActivations
+			descriptor.ABSActivations := this.ABSActivations
+
+			descriptor.SteeringSmoothness := this.SteeringSmoothness
+			descriptor.ThrottleSmoothness := this.ThrottleSmoothness
+			descriptor.BrakingSmoothness := this.BrakingSmoothness
+
+			return descriptor
+	}
+
+	static fromTelemetry(telemetry, start) {
+	}
 }
 
 class Straight extends Section {
 	iLength := 0
+	iDuration := 0
+
 	iMinSpeed := 0
 	iMaxSpeed := 0
 	iAvgSpeed := 0
 
+	Type {
+		Get {
+			return "Straight"
+		}
+	}
+
 	Length {
 		Get {
 			return this.iLength
+		}
+	}
+
+	Duration {
+		Get {
+			return this.iDuration
 		}
 	}
 
@@ -231,6 +324,50 @@ class Straight extends Section {
 		Get {
 			return this.iAvgSpeed
 		}
+	}
+
+	__New(length, duration, minSpeed, maxSpeed, avgSpeed) {
+		this.iLength := length
+		this.iDuration := duration
+
+		this.iMinSpeed := minSpeed
+		this.iMaxSpeed := maxSpeed
+		this.iAvgSpeed := avgSpeed
+	}
+
+	static fromTelemetry(telemetry, &index) {
+		local speeds
+		local startDistance, startTime, endDistance, endTime, brake, throttle
+		local minSpeed, maxSpeed
+
+		telemetry.getData(index, "Distance", &startDistance)
+		telemetry.getData(index, "Time", &startTime)
+		telemetry.getData(index, "Speed", &speed)
+
+		minSpeed := speed
+		maxSpeed := speed
+		speeds.Push(speed)
+
+		while telemetry.getData(index, "Brake", &brake) {
+			telemetry.getData(index, "Throttle", &brake)
+
+			if ((brake = 0) && (throttle = 100)) {
+				telemetry.getData(index, "Speed", &speed)
+
+				minSpeed := Min(speed, minSpeed)
+				maxSpeed := Max(speed, maxSpeed)
+				speeds.Push(speed)
+
+				index += 1
+			}
+			else
+				break
+		}
+
+		telemetry.getData(index - 1, "Distance", &endDistance)
+		telemetry.getData(index - 1, "Time", &endTime)
+
+		return Straight(endDistance - startDistance, endTime - startTime, minSpeed, maxSpeed, average(speeds))
 	}
 }
 

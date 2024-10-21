@@ -1787,7 +1787,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.iTrackAutomationsListView.OnEvent("DoubleClick", selectTrackAutomation)
 		this.iTrackAutomationsListView.OnEvent("ItemSelect", navTrackAutomation)
 
-		this.iTrackSectionsListView := editorGui.Add("ListView", "xp yp w360 h142 Y:Move(0.9) X:Move(0.2) W:Grow(0.8) H:Grow(0.1) Hidden -Multi -LV0x10 AltSubmit NoSort NoSortHdr", [translate("Section"), translate("Length") . translate(" (") . translate(getUnit("Length")) . translate(")"), translate("X"), translate("Y")])
+		this.iTrackSectionsListView := editorGui.Add("ListView", "xp yp w360 h142 Y:Move(0.9) X:Move(0.2) W:Grow(0.8) H:Grow(0.1) Hidden -Multi -LV0x10 AltSubmit NoSort NoSortHdr", [translate("Nr."), translate("Section"), translate("Length") . translate(" (") . translate(getUnit("Length")) . translate(")"), translate("X"), translate("Y")])
 
 		widget1 := editorGui.Add("Text", "x415 yp w60 h23 Y:Move(0.9) X:Move(0.8) +0x200", translate("Name"))
 		widget2 := editorGui.Add("Edit", "xp+60 yp w109 Y:Move(0.9) X:Move(0.8) W:Grow(0.2) vtrackAutomationNameEdit")
@@ -3312,6 +3312,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	updateTrackSections(save := true) {
+		local straights := 0
+		local corners := 0
 		local sections, index, section
 
 		computeLength(index) {
@@ -3350,10 +3352,20 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			return Round(convertUnit("Length", distance))
 		}
 
+		sections := this.TrackSections
+
 		this.TrackSectionsListView.Delete()
 
-		for index, section in this.TrackSections
-			this.TrackSectionsListView.Add("", translate(section.Type), computeLength(index), Round(section.X), Round(section.Y))
+		for index, section in sections
+			section.Index := this.getTrackCoordinateIndex(section.X, section.Y)
+
+		bubbleSort(&sections,  (a, b) => (a.Index > b.Index))
+
+		for index, section in this.TrackSections {
+			section.Nr := ((section.Type = "Corner") ? ++corners : ++straights)
+
+			this.TrackSectionsListView.Add("", section.Nr, translate(section.Type), computeLength(index), Round(section.X), Round(section.Y))
+		}
 
 		this.TrackSectionsListView.ModifyCol()
 		loop 4
@@ -3370,7 +3382,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				setMultiMapValue(this.TrackMap, "Sections", "Count", this.TrackSections.Length)
 
 				for index, section in sections {
+					setMultiMapValue(this.TrackMap, "Sections", index . ".Nr", section.Nr)
 					setMultiMapValue(this.TrackMap, "Sections", index . ".Type", section.Type)
+					setMultiMapValue(this.TrackMap, "Sections", index . ".Index", section.Index)
 					setMultiMapValue(this.TrackMap, "Sections", index . ".X", section.X)
 					setMultiMapValue(this.TrackMap, "Sections", index . ".Y", section.Y)
 				}
@@ -3546,7 +3560,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local imgWidth := ((getMultiMapValue(trackMap, "Map", "Width") + (2 * marginX)) * scale)
 		local imgHeight := ((getMultiMapValue(trackMap, "Map", "Height") + (2 * marginY)) * scale)
 		local x, y, w, h, imgScale, deltaX, deltaY
-		local token, bitmap, graphics, brushHotkey, brushCommand, brushSection, r
+		local token, bitmap, graphics, brushHotkey, brushCommand, brushCorner, brushStraight, r
 		local ignore, action, section, imgX, imgY, trackImage
 
 		ControlGetPos(&x, &y, &w, &h, this.Control["trackDisplayArea"])
@@ -3605,16 +3619,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			r := Round(15 / (imgScale * 3))
 
-			brushSection := Gdip_BrushCreateSolid(0xffA0A0A0)
+			brushCorner := Gdip_BrushCreateSolid(0xffFF0000)
+			brushStraight := Gdip_BrushCreateSolid(0xff00FF00)
 
 			for ignore, section in this.TrackSections {
 				imgX := Round((marginX + offsetX + section.X) * scale)
 				imgY := Round((marginX + offsetY + section.Y) * scale)
 
-				Gdip_FillEllipse(graphics, brushSection, imgX - r, imgY - r, r * 2, r * 2)
+				Gdip_FillEllipse(graphics, (section.Type = "Corner") ? brushCorner : brushStraight, imgX - r, imgY - r, r * 2, r * 2)
 			}
 
-			Gdip_DeleteBrush(brushSection)
+			Gdip_DeleteBrush(brushCorner)
+			Gdip_DeleteBrush(brushStraight)
 
 			trackImage := temporaryFileName("Track Images\TrackMap", "png")
 

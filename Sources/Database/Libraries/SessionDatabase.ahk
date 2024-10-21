@@ -782,15 +782,17 @@ class SessionDatabase extends ConfigurationItem {
 		return tracks
 	}
 
-	updateTrackMap(simulator, track, map, imageFileName, dataFileName := false) {
+	updateTrackMap(simulator, track, map, imageFileName := false, dataFileName := false) {
 		local prefix := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . this.getTrackCode(simulator, track))
 		local extension
 
 		writeMultiMap(prefix . ".map", map)
 
-		SplitPath(imageFileName, , , &extension)
+		if imageFileName {
+			SplitPath(imageFileName, , , &extension)
 
-		FileCopy(imageFileName, prefix . "." . extension, 1)
+			FileCopy(imageFileName, prefix . "." . extension, 1)
+		}
 
 		if dataFileName
 			FileCopy(dataFileName, prefix . ".data", 1)

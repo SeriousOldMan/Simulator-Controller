@@ -1719,7 +1719,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.iTrackAutomationsListView.OnEvent("DoubleClick", selectTrackAutomation)
 		this.iTrackAutomationsListView.OnEvent("ItemSelect", navTrackAutomation)
 
-		this.iTrackSectionsListView := editorGui.Add("ListView", "xp yp w360 h142 Y:Move(0.9) X:Move(0.2) W:Grow(0.2) H:Grow(0.1) Hidden -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Section", "Length"], translate))
+		this.iTrackSectionsListView := editorGui.Add("ListView", "xp yp w360 h142 Y:Move(0.9) X:Move(0.2) W:Grow(0.8) H:Grow(0.1) Hidden -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Section", "Length"], translate))
 
 		widget1 := editorGui.Add("Text", "x415 yp w60 h23 Y:Move(0.9) X:Move(0.8) +0x200", translate("Name"))
 		widget2 := editorGui.Add("Edit", "xp+60 yp w109 Y:Move(0.9) X:Move(0.8) W:Grow(0.2) vtrackAutomationNameEdit")

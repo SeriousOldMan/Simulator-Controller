@@ -2977,13 +2977,13 @@ class RaceSpotter extends GridRaceAssistant {
 
 		switch alert, false {
 			case "Left":
-				if (nextAlert = "ClearLeft")
+				if ((nextAlert = "ClearLeft") || (nextAlert = "ClearAll"))
 					this.popAlert()
 			case "ClearLeft":
 				if (nextAlert = "Left")
 					this.popAlert()
 			case "Right":
-				if (nextAlert = "ClearRight")
+				if ((nextAlert = "ClearRight") || (nextAlert = "ClearAll"))
 					this.popAlert()
 			case "ClearRight":
 				if (nextAlert = "Right")

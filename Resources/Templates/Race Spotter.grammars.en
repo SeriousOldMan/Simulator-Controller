@@ -6,10 +6,10 @@
 [Configuration]
 Recognizer=Grammar
 [Fragments]
-GreetingDry=it is dry
-GreetingDry2Wet=it is still dry
-GreetingWet=it is wet
-GreetingWet2Dry=it is still wet
+GreetingDry=It is dry
+GreetingDry2Wet=It is still dry
+GreetingWet=It is wet
+GreetingWet2Dry=It is still wet
 DeltaInformation=delta information
 CutWarnings=cut warnings
 PenaltyInformation=penalty information

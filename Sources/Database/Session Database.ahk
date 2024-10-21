@@ -1368,7 +1368,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x16 yp+12 w30 h30 Section", this.themeIcon(kIconsDirectory . "Road.ico"))
+		editorGui.Add("Picture", "x16 yp+12 w30 h30 Section", this.themeIcon(kIconsDirectory . "Automation.ico"))
 		editorGui.Add("Text", "x50 yp+5 w180 h26", translate("Selection"))
 
 		editorGui.SetFont("s8 Norm", "Arial")
@@ -1483,7 +1483,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg7", this.themeIcon(kIconsDirectory . "Road.ico")).OnEvent("Click", chooseTab.Bind("Automation"))
+		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg7", this.themeIcon(kIconsDirectory . "Automation.ico")).OnEvent("Click", chooseTab.Bind("Automation"))
 		editorGui.Add("Text", "x50 yp+5 w220 h26 W:Grow(0.2) vsettingsTab7", translate("Automations")).OnEvent("Click", chooseTab.Bind("Automation"))
 
 		editorGui.Add("Text", "x16 yp+32 w267 W:Grow(0.2) 0x10")
@@ -1979,12 +1979,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		if this.moduleAvailable("Automation") {
 			window["settingsImg7"].Enabled := true
-			window["settingsImg7"].Value := this.themeIcon(kIconsDirectory . "Road.ico")
+			window["settingsImg7"].Value := this.themeIcon(kIconsDirectory . "Automation.ico")
 			window["settingsTab7"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
 		}
 		else {
 			window["settingsImg7"].Enabled := false
-			window["settingsImg7"].Value := this.themeIcon(kIconsDirectory . "Road Gray.ico")
+			window["settingsImg7"].Value := this.themeIcon(kIconsDirectory . "Automation Gray.ico")
 			window["settingsTab7"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 

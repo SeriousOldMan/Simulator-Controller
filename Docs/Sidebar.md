@@ -107,7 +107,7 @@
   - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#introduction)
   - [Race Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#race-settings)
     - [Settings Overview](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings)
-  - [Automations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track-&-automation)
+  - [Track & Automation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track-&-automation)
   - [Sessions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#sessions)
   - [Laps](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#laps)
   - [Strategies](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#strategies)

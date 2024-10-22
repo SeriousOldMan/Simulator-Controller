@@ -80,6 +80,18 @@ When clicking on "Import...", you can select a folder with recently exported set
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2017.jpg)
 
+#### Track & Automation
+
+This page offers two different editors. The first one allows you to divide the track into different sections, thereby creating a sequence of corners and straights. This information is used by the Driving Coach to understand the track layout.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2020.jpg)
+
+To start a new section, simply click on a position on the track and choose in the small dialog that pops up whether the following section is considered a corner or a straight. You can also move section starting points around using the mouse. If you want to delete a section starting point, hold down the control key and click on the corresponding starting point.
+
+With the second editor you can define automatic actions for specific locations at the track. Since this is a very extensive functionality and observing your car and its position on the track is the duty of the Race Spotter, there is a [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-automations) in the documentation of the Virtual Race Spotter, which shows how to setup and use track automations.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2013.jpg)
+
 #### Sessions
 
 All practice and race sessions, which have been stored in the database are shown here. Practice sessions can be recorded and saved using the ["Solo Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center), which can collect data from all solo sessions, therefore also solo races. The name "Solo Center" is therfore somewhat misleading. Race session on the other hand are created by the ["Team Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center), which collects data for a team race on a central server, the [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server). Normally, the sessions run this way are team races with multiple drivers.
@@ -106,13 +118,13 @@ If a lap is double clicked, the Telemetry Viewer will open up and let you examin
 
 You can load additional laps from the session database or any other location for comparison using the small button with the "Folder" icon. Please note, that deleting a lap from the Telemetry Viewer using the *delete* button (the one with the "-" icon) will not remove it from its original location. Different rules may apply, when the Telemetry Viewer had been opened from one of the application listed below.
 
-When a reference lap is loaded, it can be shifted horizontally to align it perfectly with the other lap telemetry data. This is especially useful, when comparing laps from different simulators or when data is used, that has been imported from other sources like "Second Monitor".
+When a reference lap is loaded, it can be shifted horizontally to align it perfectly with the other lap telemetry data. This is especially useful, when comparing laps from different simulators or when data is used, that has been imported from other sources like "Second Monitor", but because of the inherent nature of discrete data sampling there might still be differences which can restrict comparison of data that has been acquired from different sources.
 
 With the controls in the upper right, you can change the zoom factor in both dimensions and you can define and use different layouts for the graph. Click on the small button with the "..." to open a dialog to define and change layouts.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Telemetry%20Browser%20Settings.JPG)
 
-Select the channels you want to display in the telemetry graph and move them up and down as you like.
+Select the channels you want to display in the telemetry graph and move them up and down as you like. Please note, that not every channel is available for every simulator or for data imported from external sources. Additionally, only telemetry data from the same source may be really comparable.
 
 If available, a map for the current track can be opened with the "Map..." button. You can click on a location of the track map and the corresponding data points will be highlighted in the telemetry graph. It is also possible to click on a data point in the graph and the corresponding location will be selected in the track map.
 
@@ -195,12 +207,6 @@ A tool is available to investigate the tyre pressure data collected in the past 
 Here you can select one of the tyre compounds, you have used in that specific weather condition, and the temperatures (air / track) for which pressure data is available. In the list in the lower part of the window you will see all recorded data points. Select one of the entries, and you can increase or decrease the count and thereby the weight of this data point, or you can delete it alltogether. The graph in the upper area shows you the data distribution. The narrower the box, the more accurate the cold tyre pressure recommendation.
 
 Please note, that **all** changes will only be saved, if you close the tool using the "Save" button.
-
-#### Automations
-
-At this page, you can define automatic actions for specific locations at the track. Since this is a very extensive functionality and observing your car and its position on the track is the duty of the Race Spotter, there is a [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-automations) in the documentation of the Virtual Race Spotter, which shows how to setup and use track automations.
-
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2013.jpg)
 
 #### Administration
 

@@ -1357,15 +1357,24 @@ int coordCount = 0;
 
 bool circuit = true;
 bool mapStarted = false;
+int mapLap = -1;
 
 bool writeCoordinates(const SharedMemory* sharedData) {
 	float velocityX = sharedData->mWorldVelocity[VEC_X];
 	float velocityY = sharedData->mWorldVelocity[VEC_Z];
 	float velocityZ = sharedData->mWorldVelocity[VEC_Y];
+	int carID = sharedData->mViewedParticipantIndex;
+
+	if (!mapStarted)
+		if (mapLap == -1) {
+			mapLap = sharedData->mParticipantInfo[carID].mLapsCompleted;
+
+			return true;
+		}
+		else if (sharedData->mParticipantInfo[carID].mLapsCompleted == mapLap)
+			return true;
 
 	if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
-		int carID = sharedData->mViewedParticipantIndex;
-
 		float coordinateX = sharedData->mParticipantInfo[carID].mWorldPosition[VEC_X];
 		float coordinateY = -sharedData->mParticipantInfo[carID].mWorldPosition[VEC_Z];
 

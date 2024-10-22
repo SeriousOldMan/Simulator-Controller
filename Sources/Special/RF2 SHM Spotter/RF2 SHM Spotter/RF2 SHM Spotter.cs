@@ -1595,6 +1595,8 @@ namespace RF2SHMSpotter {
         double initialX = 0.0d;
 		double initialY = 0.0d;
 		int coordCount = 0;
+		bool mapStarted = false;
+		int mapLap = -1;
 
 		bool writeCoordinates(ref rF2VehicleScoring playerScoring)
 		{
@@ -1602,7 +1604,17 @@ namespace RF2SHMSpotter {
 			double lVelocityY = playerScoring.mLocalVel.y;
 			double lVelocityZ = playerScoring.mLocalVel.z;
 
-			int carID = 0;
+            if (!mapStarted)
+                if (mapLap == -1)
+                {
+                    mapLap = playerScoring.mTotalLaps;
+
+                    return true;
+                }
+                else if (playerScoring.mTotalLaps == mapLap)
+                    return true;
+
+            int carID = 0;
 
 			for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
 				if (scoring.mVehicles[i].mIsPlayer != 0)
@@ -1623,6 +1635,7 @@ namespace RF2SHMSpotter {
 				double coordinateX = playerScoring.mPos.x;
 				double coordinateY = (-playerScoring.mPos.z);
 
+				mapStarted = true;
 
                 Console.WriteLine(coordinateX + ", " + coordinateY);
 

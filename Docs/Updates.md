@@ -37,7 +37,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 5.9.5
 
-Nothing to do.
+This release introduces track sections in preparation for the upcoming telemetry based live coaching. To ensure, that corner numbers are correct, the track maps must be rebuild. You can do this with the "Session Database". Select "All" cars and "All" tracks, then open the "Administration" tab. There select all tracks and delete them. They will get rebuild automatically.
 
 ***
 

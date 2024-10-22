@@ -1922,6 +1922,7 @@ int coordCount = 0;
 
 bool circuit = true;
 bool mapStarted = false;
+int mapLap = -1;
 
 bool writeCoordinates() {
 	SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
@@ -1930,6 +1931,15 @@ bool writeCoordinates() {
 	float velocityX = pf->velocity[0];
 	float velocityY = pf->velocity[2];
 	float velocityZ = pf->velocity[1];
+
+	if (!mapStarted)
+		if (mapLap == -1) {
+			mapLap = gf->completedLaps;
+		
+			return true;
+		}
+		else if (gf->completedLaps == mapLap)
+			return true;
 
 	if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
 		int carID = gf->playerCarID;

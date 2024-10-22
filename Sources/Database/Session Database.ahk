@@ -3560,7 +3560,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local imgWidth := ((getMultiMapValue(trackMap, "Map", "Width") + (2 * marginX)) * scale)
 		local imgHeight := ((getMultiMapValue(trackMap, "Map", "Height") + (2 * marginY)) * scale)
 		local x, y, w, h, imgScale, deltaX, deltaY
-		local token, bitmap, graphics, brushHotkey, brushCommand, brushCorner, brushStraight, r
+		local token, bitmap, graphics, brushHotkey, brushCommand, brishStart, brushCorner, brushStraight, r
 		local ignore, action, section, imgX, imgY, trackImage
 
 		ControlGetPos(&x, &y, &w, &h, this.Control["trackDisplayArea"])
@@ -3619,8 +3619,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			r := Round(15 / (imgScale * 3))
 
+			brushStart := Gdip_BrushCreateSolid(0xff808080)
 			brushCorner := Gdip_BrushCreateSolid(0xffFF0000)
 			brushStraight := Gdip_BrushCreateSolid(0xff00FF00)
+
+			imgX := Round((marginX + offsetX + getMultiMapValue(trackMap, "Points", "1.X")) * scale)
+			imgY := Round((marginX + offsetY + getMultiMapValue(trackMap, "Points", "1.Y")) * scale)
+
+			Gdip_FillEllipse(graphics, brushStart, imgX - r, imgY - r, r * 2, r * 2)
 
 			for ignore, section in this.TrackSections {
 				imgX := Round((marginX + offsetX + section.X) * scale)
@@ -3629,6 +3635,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				Gdip_FillEllipse(graphics, (section.Type = "Corner") ? brushCorner : brushStraight, imgX - r, imgY - r, r * 2, r * 2)
 			}
 
+			Gdip_DeleteBrush(brushStart)
 			Gdip_DeleteBrush(brushCorner)
 			Gdip_DeleteBrush(brushStraight)
 

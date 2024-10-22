@@ -1520,14 +1520,27 @@ void writeTelemetry(BOOL calibrate) {
 float initialX = 0.0;
 float initialY = 0.0;
 int coordCount = 0;
+BOOL mapStarted = FALSE;
+int mapLap = -1;
 
 BOOL writeCoordinates(int playerID) {
 	r3e_float64 velocityX = map_buffer->player.velocity.x;
 	r3e_float64 velocityY = map_buffer->player.velocity.z;
 	r3e_float64 velocityZ = map_buffer->player.velocity.y;
 
+	if (!mapStarted)
+		if (mapLap == -1) {
+			mapLap = map_buffer->completed_laps;
+
+			return TRUE;
+		}
+		else if (map_buffer->completed_laps == mapLap)
+			return TRUE;
+
 	if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
 		int index = 0;
+
+		mapStarted = TRUE;
 
 		for (int id = 0; id < map_buffer->num_cars; id++)
 			if (map_buffer->all_drivers_data_1[id].driver_info.user_id == playerID) {

@@ -1673,9 +1673,24 @@ bool recording = false;
 
 bool circuit = true;
 bool mapStarted = false;
+int mapLap = -1;
 
 bool writeCoordinates(const irsdk_header* header, const char* data) {
 	char buffer[60];
+	char* rawValue;
+
+	getRawDataValue(rawValue, header, data, "Lap");
+
+	int carLaps = *((int*)rawValue);
+
+	if (!mapStarted)
+		if (mapLap == -1) {
+			mapLap = carLaps;
+
+			return true;
+		}
+		else if (carLaps == mapLap)
+			return true;
 
 	const char* sessionInfo = irsdk_getSessionInfoStr();
 	char playerCarIdx[10] = "";

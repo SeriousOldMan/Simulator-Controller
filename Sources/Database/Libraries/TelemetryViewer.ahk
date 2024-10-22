@@ -33,7 +33,7 @@ global kDataSeries := [{Name: "Speed", Indices: [7], Size: 1, Series: ["Speed"],
 					 , {Name: "Long G", Indices: [10], Size: 1, Series: ["Long G"]}
 					 , {Name: "Lat G", Indices: [11], Size: 1, Series: ["Lat G"]}
 					 , {Name: "Long G/Lat G", Indices: [10, 11], Size: 1, Series: ["Long G", "Lat G"]}
-					 , {Name: "Curvature", Special: true, Size: 1, Series: ["Curvature"]}
+					 , {Name: "Curvature", Special: true, Indices: [false], Size: 1, Series: ["Curvature"]}
 					 , {Name: "Time", Indices: [14], Size: 1, Series: ["Time"], Converter: [(t) => isNumber(t) ? t / 1000 : kNull]}]
 
 

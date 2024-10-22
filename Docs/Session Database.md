@@ -86,7 +86,7 @@ This page offers two different editors. The first one allows you to divide the t
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2020.jpg)
 
-To start a new section, simply click on a position on the track and choose in the small dialog that pops up whether the following section is considered a corner or a straight. You can also move section starting points around using the mouse. If you want to delete a section starting point, hold down the control key and click on the corresponding starting point.
+To start a new section, simply click on a position on the track and choose in the small dialog that pops up whether the following section is considered a corner or a straight. You can also move section starting points around using the mouse. If you want to delete a section starting point, hold down the control key and click on the corresponding starting point. By the way, the small gray dot marks the start/finish line as recorded by the track mapper.
 
 With the second editor you can define automatic actions for specific locations at the track. Since this is a very extensive functionality and observing your car and its position on the track is the duty of the Race Spotter, there is a [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-automations) in the documentation of the Virtual Race Spotter, which shows how to setup and use track automations.
 

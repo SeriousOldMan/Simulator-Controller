@@ -1,3 +1,10 @@
+## 5.9.5.0-release 10/25/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. A couple of fixes in the different Assistant grammars.
+  4. A channel for the elapsed time since start of the lap has been added to the telemetry system.
+  5. A section editor has been added to the track map viewer in the "Session Database" (on the way to telemetry based live coaching). The arrangement of the different tabs in the "Session Database" has changed a bit in the course of this change. Please see the [updated documentation](*) for more information.
+
 ## 5.9.4.0-release 10/18/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
@@ -282,7 +289,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	  See the updated [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#color-schemes) for some examples.
   11. A new [controller action functions "speak"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allows you to output spoken messages from your controller scripts.
   12. A new [controller action functions "play"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allows you to play sound files from your controller scripts.
-  13. "speak" and "play" has been added to the [location specific actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#automations) in Track Automation, which let's you put out a spoken message or play a sound file at a given track location. Rally support is coming...
+  13. "speak" and "play" has been added to the [location specific actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track-&-automation) in Track Automation, which let's you put out a spoken message or play a sound file at a given track location. Rally support is coming...
   14. The automated update procedure now asks before a non-release version is installed.
   15. [Internal] Implemented a postprocessor for the compiler which compresses the binary files. The applications are much smaller now.
   16. [Internal] Migrated to AHK 2.1-alpha.14 (needed for dark color scheme).
@@ -2094,7 +2101,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   2. Documentation updates, as always
   3. New options in pitstop rules for always refueling and always changing tyres in strategy simulation.
   4. Introducing Track Automations, which let you automate your car settings like TC and ABS depending on track location.
-     - A new page has been added to "Session Database", which allows you to specify [location specific actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#automations) for a specific simulator / car / track combination.
+     - A new page has been added to "Session Database", which allows you to specify [location specific actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track-&-automation) for a specific simulator / car / track combination.
      - Added the ["TrackAutomation" action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) to the "Race Spotter" plugin which let's you enable or disable location specific actions when you are out on the track.
 	 - New ["enableTrackAutomation", "disableTrackAutomations" and "selectTrackAutomation"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#choosing-between-different-track-automations), which let you control the Track Automations while on the track.
      - Added a new icon to the Stream Deck icon set for the "TrackAutomation" action.

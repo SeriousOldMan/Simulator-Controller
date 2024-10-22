@@ -1585,7 +1585,7 @@ class SessionDatabase extends ConfigurationItem {
 
 								for ignore, channel in ["Distance", "THROTTLE", "BRAKE"
 													  , "STEERANGLE", "GEAR", "RPMS", "SPEED"
-													  , "TC", "ABS", "G_LON", "G_LAT"]
+													  , "TC", "ABS", "G_LON", "G_LAT", "UNKNOWN (PosX)", "UNKNOWN (PosY)", "TIME"]
 									channels.Push([channel, inList(entry, channel)])
 
 								skipNext := true
@@ -1598,17 +1598,23 @@ class SessionDatabase extends ConfigurationItem {
 								if channel[2] {
 									value := entry[channel[2]]
 
-									switch channel[1], false {
-										case "THROTTLE", "BRAKE":
-											value := (value / 100)
-										case "STEERANGLE":
-											if steerLock
-												value := (- value / steerLock)
-											else
-												value := (- value)
-									}
+									if isNumber(value) {
+										switch channel[1], false {
+											case "THROTTLE", "BRAKE":
+												value := (value / 100)
+											case "STEERANGLE":
+												if steerLock
+													value := (- value / steerLock)
+												else
+													value := (- value)
+											case "TIME":
+												value *= 1000
+										}
 
-									line.Push(isNumber(value) ? value : kNull)
+										line.Push(value)
+									}
+									else
+										line.Push(kNull)
 								}
 								else
 									line.Push("n/a")

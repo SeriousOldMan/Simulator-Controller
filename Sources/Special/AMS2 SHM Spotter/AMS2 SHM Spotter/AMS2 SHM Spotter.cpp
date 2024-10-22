@@ -1468,7 +1468,8 @@ void collectCarTelemetry(const SharedMemory* sharedData) {
 					  << - sharedData->mLocalAcceleration[VEC_Z] / 9.807f << ";"
 					  << sharedData->mLocalAcceleration[VEC_X] / 9.807f << ";"
 					  << sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mWorldPosition[VEC_X] << ";"
-					  << -sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mWorldPosition[VEC_Z] << std::endl;
+					  << -sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mWorldPosition[VEC_Z] << ";"
+					  << round(sharedData->mCurrentTime * 1000) << std::endl;
 	}
 	catch (...) {
 		try {

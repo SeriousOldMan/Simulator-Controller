@@ -20,7 +20,7 @@
 ;;;                       Private Constants Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kDataSeries := [{Name: "Speed", Indices: [7], Size: 1, Series: ["Speed"], Converter: [(s) => s ? convertUnit("Speed", s) : kNull]}
+global kDataSeries := [{Name: "Speed", Indices: [7], Size: 1, Series: ["Speed"], Converter: [(s) => isNumber(s) ? convertUnit("Speed", s) : kNull]}
 					 , {Name: "Throttle", Indices: [2], Size: 0.5, Series: ["Throttle"]}
 					 , {Name: "Brake", Indices: [3], Size: 0.5, Series: ["Brake"]}
 					 , {Name: "Throttle/Brake", Indices: [2, 3], Size: 0.5, Series: ["Throttle", "Brake"]}
@@ -33,7 +33,8 @@ global kDataSeries := [{Name: "Speed", Indices: [7], Size: 1, Series: ["Speed"],
 					 , {Name: "Long G", Indices: [10], Size: 1, Series: ["Long G"]}
 					 , {Name: "Lat G", Indices: [11], Size: 1, Series: ["Lat G"]}
 					 , {Name: "Long G/Lat G", Indices: [10, 11], Size: 1, Series: ["Long G", "Lat G"]}
-					 , {Name: "Curvature", Indices: [12], Size: 1, Series: ["Curvature"]}]
+					 , {Name: "Curvature", Special: true, Size: 1, Series: ["Curvature"]}
+					 , {Name: "Time", Indices: [14], Size: 1, Series: ["Time"], Converter: [(t) => isNumber(t) ? t / 1000 : kNull]}]
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -95,7 +96,7 @@ class TelemetryChart {
 		eventHandler(event, arguments*) {
 			local telemetryViewer := this.TelemetryViewer
 			local row := false
-			local data
+			local data, posX
 
 			try {
 				if (event = "Select") {
@@ -112,9 +113,12 @@ class TelemetryChart {
 
 								data := telemetryViewer.Data[telemetryViewer.SelectedLap[true]]
 
-								if (data.Has(row) && data[row].Length > 11)
-									if telemetryViewer.TrackMap
-										telemetryViewer.TrackMap.updateTrackPosition(data[row][12], data[row][13])
+								if (data.Has(row) && (data[row].Length > 11)) {
+									posX := data[row][12]
+
+									if (telemetryViewer.TrackMap && isNumber(posX))
+										telemetryViewer.TrackMap.updateTrackPosition(posX, data[row][13])
+								}
 							}
 						}
 					}
@@ -296,14 +300,15 @@ class TelemetryChart {
 								else
 									theValue := refData[theIndex]
 
-								if (theSeries.MinValue = kUndefined) {
-									theSeries.MinValue := theValue
-									theSeries.MaxValue := theValue
-								}
-								else {
-									theSeries.MinValue := Min(theSeries.MinValue, theValue)
-									theSeries.MaxValue := Max(theSeries.MaxValue, theValue)
-								}
+								if isNumber(theValue)
+									if (theSeries.MinValue = kUndefined) {
+										theSeries.MinValue := theValue
+										theSeries.MaxValue := theValue
+									}
+									else {
+										theSeries.MinValue := Min(theSeries.MinValue, theValue)
+										theSeries.MaxValue := Max(theSeries.MaxValue, theValue)
+									}
 
 								values.Push(theValue)
 							}
@@ -323,14 +328,15 @@ class TelemetryChart {
 						if (absG > 0.1) {
 							theValue := - Log(((data[7] / 3.6) ** 2) / ((absG = 0) ? 0.00001 : absG))
 
-							if (theSeries.MinValue = kUndefined) {
-								theSeries.MinValue := theValue
-								theSeries.MaxValue := theValue
-							}
-							else {
-								theSeries.MinValue := Min(theSeries.MinValue, theValue)
-								theSeries.MaxValue := Max(theSeries.MaxValue, theValue)
-							}
+							if isNumber(theValue)
+								if (theSeries.MinValue = kUndefined) {
+									theSeries.MinValue := theValue
+									theSeries.MaxValue := theValue
+								}
+								else {
+									theSeries.MinValue := Min(theSeries.MinValue, theValue)
+									theSeries.MaxValue := Max(theSeries.MaxValue, theValue)
+								}
 						}
 						else
 							theValue := kNull
@@ -348,14 +354,15 @@ class TelemetryChart {
 							else
 								theValue := data[theIndex]
 
-							if (theSeries.MinValue = kUndefined) {
-								theSeries.MinValue := theValue
-								theSeries.MaxValue := theValue
-							}
-							else {
-								theSeries.MinValue := Min(theSeries.MinValue, theValue)
-								theSeries.MaxValue := Max(theSeries.MaxValue, theValue)
-							}
+							if isNumber(theValue)
+								if (theSeries.MinValue = kUndefined) {
+									theSeries.MinValue := theValue
+									theSeries.MaxValue := theValue
+								}
+								else {
+									theSeries.MinValue := Min(theSeries.MinValue, theValue)
+									theSeries.MaxValue := Max(theSeries.MaxValue, theValue)
+								}
 
 							values.Push(theValue)
 						}
@@ -1498,7 +1505,7 @@ class TelemetryViewer {
 				this.Control["referenceLapDropDown"].Choose(index + 1)
 
 				if this.TrackMap
-					this.TrackMap.this.updateTrackPosition()
+					this.TrackMap.updateTrackPosition()
 
 				this.updateState()
 			}
@@ -1878,15 +1885,17 @@ class TrackMap {
 	}
 
 	updateTrackPosition(posX?, posY?) {
-		if isSet(posX) {
+		if (isSet(posX) && isNumber(posX)) {
 			this.iLastTrackPosition := [posX, posY]
 
-			this.createTrackMap(posX, posY)
+			if this.TrackMap
+				this.createTrackMap(posX, posY)
 		}
 		else {
 			this.iLastTrackPosition := false
 
-			this.createTrackMap()
+			if this.TrackMap
+				this.createTrackMap()
 		}
 	}
 

@@ -3,7 +3,7 @@ Version=5.9.5.0-dev
 Target=5.9.5.0-release
 Date=10/19/2024
 Download=
-Changes=Grammar fixes
+Changes=Grammar fixes, Fixed RF2 telemetry file format, Section editor for track maps, New telemetry channel "Time"
 Components=Media->5.6.1,Configuration->5.9.1,Utilities->5.9.1
 [Release]
 Version=5.9.4.0-release

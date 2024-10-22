@@ -106,6 +106,7 @@ static class Program
         abs = 0;
         longG = 0.0f;
         latG = 0.0f;
+        int time = 0;
 
         while (reader.Read())
         {
@@ -124,6 +125,10 @@ static class Program
                     case "PlayerData":
                         readData(reader);
                         break;
+                    case "LapTimeSeconds":
+                        reader.Read();
+                        time = (int)Math.Round(float.Parse(reader.Value.ToString()) * 1000);
+                        break;
                 }
         }
 
@@ -139,13 +144,10 @@ static class Program
             outStream.Write(tc + ";");
             outStream.Write(abs + ";");
             outStream.Write(longG + ";");
-            outStream.WriteLine(latG);
-
-            /*
             outStream.Write(latG + ";");
-            outStream.Write(posX + ";");
-            outStream.WriteLine(posY);
-            */
+            outStream.Write("n/a" + ";");
+            outStream.Write("n/a" + ";");
+            outStream.WriteLine(time);
 
             lastRunning = running;
         }

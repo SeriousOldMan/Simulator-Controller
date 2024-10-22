@@ -2083,7 +2083,8 @@ void collectCarTelemetry() {
 							<< pf->tc << ";"
 							<< pf->abs << ";"
 							<< longG << ";" << latG << ";"
-							<< gf->carCoordinates[carID][0] << ";" << gf->carCoordinates[carID][2] << endl;
+							<< gf->carCoordinates[carID][0] << ";" << gf->carCoordinates[carID][2] << ";"
+							<< gf->iCurrentTime << endl;
 
 						lastRunning = driverRunning;
 					}

@@ -1693,8 +1693,9 @@ namespace ACSHMSpotter {
 						telemetryFile.Write(latG + ";");
 
 						telemetryFile.Write(cars.cars[carID].worldPosition.x + ";");
-						telemetryFile.WriteLine(cars.cars[carID].worldPosition.z);
-					}
+                        telemetryFile.Write(cars.cars[carID].worldPosition.z + ";");
+                        telemetryFile.WriteLine(graphics.iCurrentTime);
+                    }
 				}
             }
             catch (Exception)

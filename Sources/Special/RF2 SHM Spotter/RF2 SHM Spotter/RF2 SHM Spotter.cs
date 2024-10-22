@@ -49,20 +49,15 @@ namespace RF2SHMSpotter {
 			return nullIdx >= 0 ? Encoding.Default.GetString(bytes, 0, nullIdx) : Encoding.Default.GetString(bytes);
 		}
 
-		public static rF2VehicleTelemetry GetPlayerTelemetry(int id, ref rF2Telemetry telemetry) {
-			var playerVehTelemetry = new rF2VehicleTelemetry();
+		static rF2VehicleTelemetry noTelemetry = new rF2VehicleTelemetry();
 
+        public static ref rF2VehicleTelemetry GetPlayerTelemetry(int id, ref rF2Telemetry telemetry) {
 			for (int i = 0; i < telemetry.mNumVehicles; ++i) {
-				var vehicle = telemetry.mVehicles[i];
-
-				if (vehicle.mID == id) {
-					playerVehTelemetry = vehicle;
-
-					break;
-				}
+				if (telemetry.mVehicles[i].mID == id)
+					return ref telemetry.mVehicles[i];
 			}
 
-			return playerVehTelemetry;
+			return ref noTelemetry;
 		}
 
 		private void Connect() {
@@ -91,36 +86,18 @@ namespace RF2SHMSpotter {
 
         static rF2VehicleScoring noPlayer = new rF2VehicleScoring();
 
-        public static rF2VehicleScoring GetPlayerScoring(ref rF2Scoring scoring)
-		{
-			for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
-			{
-				var vehicle = scoring.mVehicles[i];
+        public static ref rF2VehicleScoring GetPlayerScoring(ref rF2Scoring scoring)
+        {
+            for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
+            {
+                if (scoring.mVehicles[i].mIsPlayer == 1)
+                    return ref scoring.mVehicles[i];
+            }
 
-				/*
-				switch ((rFactor2Constants.rF2Control)vehicle.mControl)
-				{
-					case rFactor2Constants.rF2Control.AI:
-					case rFactor2Constants.rF2Control.Player:
-					case rFactor2Constants.rF2Control.Remote:
-						if (vehicle.mIsPlayer == 1)
-							return vehicle;
+            return ref noPlayer;
+        }
 
-						continue;
-
-					default:
-						continue;
-				}
-				*/
-
-				if (vehicle.mIsPlayer == 1)
-					return vehicle;
-			}
-
-			return noPlayer;
-		}
-
-		const int WM_COPYDATA = 0x004A;
+        const int WM_COPYDATA = 0x004A;
 
 		public struct COPYDATASTRUCT
 		{
@@ -1242,7 +1219,7 @@ namespace RF2SHMSpotter {
                     break;
                 }
 
-            rF2VehicleScoring playerScoring = GetPlayerScoring(ref scoring);
+            ref rF2VehicleScoring playerScoring = ref GetPlayerScoring(ref scoring);
 
             if (extended.mSessionStarted == 0 || scoring.mScoringInfo.mGamePhase >= (byte)SessionStopped && playerScoring.mPitState >= (byte)Entering)
                 return true;
@@ -1759,10 +1736,14 @@ namespace RF2SHMSpotter {
                 telemetryFile.Write("n/a;");
 
                 telemetryFile.Write((-playerScoring.mLocalAccel.z / 9.807f) + ";");
-                telemetryFile.WriteLine((playerScoring.mLocalAccel.x / 9.807f) + ";");
+                telemetryFile.Write((playerScoring.mLocalAccel.x / 9.807f) + ";");
 
                 telemetryFile.Write(playerScoring.mPos.x + ";");
-                telemetryFile.WriteLine(- playerScoring.mPos.z);
+                telemetryFile.Write(-playerScoring.mPos.z + ";");
+
+				ref rF2VehicleTelemetry vehicle = ref GetPlayerTelemetry(playerID, ref telemetry);
+
+                telemetryFile.WriteLine((vehicle.mElapsedTime - vehicle.mLapStartET) * 1000);
             }
             catch (Exception)
             {
@@ -1892,7 +1873,7 @@ namespace RF2SHMSpotter {
 					if (connected) {
 						bool wait = true;
 
-						rF2VehicleScoring playerScoring = GetPlayerScoring(ref scoring);
+						ref rF2VehicleScoring playerScoring = ref GetPlayerScoring(ref scoring);
 
                         if (analyzeTelemetry)
                         {

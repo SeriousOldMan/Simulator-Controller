@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Telemetry Analysis              ;;;
+;;;   Modular Simulator Controller System - Telemetry Analyzer              ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
@@ -11,6 +11,7 @@
 
 #Include "..\..\Libraries\JSON.ahk"
 #Include "..\..\Libraries\Math.ahk"
+#Include "..\..\Database\Libaries\TelemetryCollector.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -260,7 +261,7 @@ class Corner extends Section {
 			return descriptor
 	}
 
-	static fromTelemetry(telemetry, start) {
+	static fromTelemetry(telemetry, startIndex, endIndex) {
 	}
 }
 
@@ -335,49 +336,48 @@ class Straight extends Section {
 		this.iAvgSpeed := avgSpeed
 	}
 
-	static fromTelemetry(telemetry, &index) {
-		local speeds
-		local startDistance, startTime, endDistance, endTime, brake, throttle
-		local minSpeed, maxSpeed
+	static fromTelemetry(telemetry, startIndex, endIndex) {
+		local index := startIndex
+		local speeds, startDistance, startTime, minSpeed, maxSpeed
 
-		telemetry.getData(index, "Distance", &startDistance)
-		telemetry.getData(index, "Time", &startTime)
-		telemetry.getData(index, "Speed", &speed)
+		startDistance := telemetry.getValue(index, "Distance")
+		startTime := telemetry.getValue(index, "Time")
+		speed := telemetry.getValue(index, "Speed")
 
 		minSpeed := speed
 		maxSpeed := speed
 		speeds.Push(speed)
 
-		while telemetry.getData(index, "Brake", &brake) {
-			telemetry.getData(index, "Throttle", &brake)
+		while (index <= endIndex) {
+			speed := telemetry.getValue(index, "Speed")
 
-			if ((brake = 0) && (throttle = 100)) {
-				telemetry.getData(index, "Speed", &speed)
+			minSpeed := Min(speed, minSpeed)
+			maxSpeed := Max(speed, maxSpeed)
+			speeds.Push(speed)
 
-				minSpeed := Min(speed, minSpeed)
-				maxSpeed := Max(speed, maxSpeed)
-				speeds.Push(speed)
-
-				index += 1
-			}
-			else
-				break
+			index += 1
 		}
 
-		telemetry.getData(index - 1, "Distance", &endDistance)
-		telemetry.getData(index - 1, "Time", &endTime)
-
-		return Straight(endDistance - startDistance, endTime - startTime, minSpeed, maxSpeed, average(speeds))
+		return Straight(telemetry.getValue(index - 1, "Distance") - startDistance
+					  , telemetry.getValue(index - 1, "Time") - startTime
+					  , minSpeed, maxSpeed, average(speeds))
 	}
 }
 
 class Telemetry {
+	iTelemetryAnalyzer := false
 	iData := []
 
 	iSections := []
 
 	iMaxG := 0
 	iMaxSpeed := 0
+
+	TelemetryAnalyzer {
+		Get {
+			return this.iTelemetryAnalyzer
+		}
+	}
 
 	Data {
 		Get {
@@ -403,26 +403,200 @@ class Telemetry {
 		}
 	}
 
-	__New(fileName) {
+	__New(analyzer, data) {
 		local maxG := kUndefined
 		local maxSpeed := kUndefined
 		local ignore, corner
 
-		this.iData := this.read(fileName)
+		this.iTelemetryAnalyzer := analyzer
+		this.iData := data
 
 		this.iSections := this.createSections(this.Data)
 
 		for ignore, corner this.Sections {
 			if (maxG == kUndefined)
-				section.iMaxG := section.MaxG
+				maxG := section.MaxG
 			else
-				section.iMaxG := Max(section.MaxG, maxG)
+				maxG := Max(section.MaxG, maxG)
 
 			if (maxSpeed == kUndefined)
-				section.iMaxSpeed := section.MaxSpeed
+				maxSpeed := section.MaxSpeed
 			else
-				section.iMaxSpeed := Max(section.MaxSpeed, maxSpeed)
+				maxSpeed := Max(section.MaxSpeed, maxSpeed)
 		}
+
+		if (maxG != kUndefined) {
+			this.iMaxG := maxG
+			this.iMaxSpeed := maxSpeed
+		}
+	}
+
+	createSections(data) {
+	}
+
+	betterCorner(corner, reference) {
+	}
+
+	areasOfImprovement(corner, reference := false) {
+	}
+}
+
+class TelemetryAnalyzer {
+	static sSchema := false
+
+	iSimulator := false
+	iTrack := false
+
+	iTrackMap := false
+	iTrackSections :=[]
+
+	static Schema {
+		Get {
+			return TelemetryAnalyzer.sSchema
+		}
+	}
+
+	Schema {
+		Get {
+			return TelemetryAnalyzer.Schema
+		}
+	}
+
+	Simulator {
+		Get {
+			return this.iSimulator
+		}
+	}
+
+	Track {
+		Get {
+			return this.iTrack
+		}
+	}
+
+	TrackMap {
+		Get {
+			return this.iTrackMap
+		}
+	}
+
+	TrackSections {
+		Get {
+			return this.iTrackSections
+		}
+	}
+
+	__New(simulator, track) {
+		local sessionDB := SessionDatabase()
+
+		this.iSimulator := simulator
+		this.iTrack := track
+		this.iTrackMap := sessionDB.getTrackMap(simulator, track)
+
+		if this.TrackMap
+			this.loadTrackSections()
+
+		if !this.Schema
+			TelemetryAnalyzer.createTelemetrySchema()
+	}
+
+	loadTrackSections() {
+		local trackMap := this.TrackMap
+		local straights := 0
+		local corners := 0
+		local sections := []
+		local index, section
+
+		getTrackCoordinateIndex(x, y, threshold := 5) {
+			local index := false
+			local candidateX, candidateY, deltaX, deltaY, coordX, coordY, dX, dY
+
+			if trackMap {
+				candidateX := kUndefined
+				candidateY := false
+				deltaX := false
+				deltaY := false
+
+				loop getMultiMapValue(trackMap, "Map", "Points") {
+					coordX := getMultiMapValue(trackMap, "Points", A_Index . ".X")
+					coordY := getMultiMapValue(trackMap, "Points", A_Index . ".Y")
+
+					dX := Abs(coordX - x)
+					dY := Abs(coordY - y)
+
+					if ((dX <= threshold) && (dY <= threshold) && ((candidateX == kUndefined) || ((dx + dy) < (deltaX + deltaY)))) {
+						candidateX := coordX
+						candidateY := coordY
+						deltaX := dX
+						deltaY := dY
+
+						index := A_Index
+					}
+				}
+
+				return index
+			}
+			else
+				return false
+		}
+
+		computeLength(index) {
+			local next := ((index = this.TrackSections.Length) ? 1 : (index + 1))
+			local distance := 0
+			local count := getMultiMapValue(trackMap, "Map", "Points", 0)
+			local lastX, lastY, nextX, nextY
+
+			index := this.getTrackCoordinateIndex(this.TrackSections[index].X, this.TrackSections[index].Y)
+			next := this.getTrackCoordinateIndex(this.TrackSections[next].X, this.TrackSections[next].Y)
+
+			if (index && next) {
+				lastX := getMultiMapValue(trackMap, "Points", index . ".X", 0)
+				lastY := getMultiMapValue(trackMap, "Points", index . ".Y", 0)
+
+				index += 1
+
+				loop
+					if (index = next)
+						break
+					else if (index > count)
+						index := 1
+					else {
+						nextX := getMultiMapValue(trackMap, "Points", index . ".X", 0)
+						nextY := getMultiMapValue(trackMap, "Points", index . ".Y", 0)
+
+						distance += Sqrt(((nextX - lastX) ** 2) + ((nextY - lastY) ** 2))
+
+						lastX := nextX
+						lastY := nextY
+
+						index += 1
+					}
+				}
+
+			return Round(convertUnit("Length", distance))
+		}
+
+		loop getMultiMapValue(trackMap, "Sections", "Count") {
+			sections.Push({Nr: getMultiMapValue(trackMap, "Sections", A_Index . ".Nr")
+						 , Type: getMultiMapValue(trackMap, "Sections", index . ".Type")
+						 , Index: getMultiMapValue(trackMap, "Sections", index . ".Index")
+						 , X: getMultiMapValue(trackMap, "Sections", index . ".X")
+						 , Y: getMultiMapValue(trackMap, "Sections", index . ".Y")})
+
+		for index, section in sections
+			section.Length := computeLength(index)
+
+		this.iTrackSections := sections
+
+		return (sections.Length > 0)
+	}
+
+	static createTelemetrySchema() {
+		local ignore, channel
+
+		for ignore, channel in kTelemetryChannels {
+			if (channel.Indices.Length = 1)
+				TelemetryAnalyzer.Schema[channel.Name] := channel
 	}
 
 	readData(fileName) {
@@ -442,12 +616,19 @@ class Telemetry {
 		return data
 	}
 
-	createSections(data) {
+	static getValue(data, name) {
+		local channel = TelemetryAnalyzer.Schema[Name]
+		local index
+
+		if channel.Function
+			return channel.Function(data)
+		else {
+			index := channel.Indices[1]
+
+			return (data.Has(index) ? data[index] : kNull)
+		}
 	}
 
-	betterCorner(corner, reference) {
-	}
-
-	areasOfImprovement(corner, reference := false) {
+	analyze(fileName) {
 	}
 }

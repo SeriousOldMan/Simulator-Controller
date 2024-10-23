@@ -17,27 +17,6 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                       Private Constants Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global kDataSeries := [{Name: "Speed", Indices: [7], Size: 1, Series: ["Speed"], Converter: [(s) => isNumber(s) ? convertUnit("Speed", s) : kNull]}
-					 , {Name: "Throttle", Indices: [2], Size: 0.5, Series: ["Throttle"]}
-					 , {Name: "Brake", Indices: [3], Size: 0.5, Series: ["Brake"]}
-					 , {Name: "Throttle/Brake", Indices: [2, 3], Size: 0.5, Series: ["Throttle", "Brake"]}
-					 , {Name: "Steering", Indices: [4], Size: 0.8, Series: ["Steering"]}
-					 , {Name: "TC", Indices: [8], Size: 0.3, Series: ["TC"]}
-					 , {Name: "ABS", Indices: [9], Size: 0.3, Series: ["ABS"]}
-					 , {Name: "TC/ABS", Indices: [8, 9], Size: 0.3, Series: ["TC", "ABS"]}
-					 , {Name: "RPM", Indices: [6], Size: 0.5, Series: ["RPM"]}
-					 , {Name: "Gear", Indices: [5], Size: 0.5, Series: ["Gear"]}
-					 , {Name: "Long G", Indices: [10], Size: 1, Series: ["Long G"]}
-					 , {Name: "Lat G", Indices: [11], Size: 1, Series: ["Lat G"]}
-					 , {Name: "Long G/Lat G", Indices: [10, 11], Size: 1, Series: ["Long G", "Lat G"]}
-					 , {Name: "Curvature", Special: true, Indices: [false], Size: 1, Series: ["Curvature"]}
-					 , {Name: "Time", Indices: [14], Size: 1, Series: ["Time"], Converter: [(t) => isNumber(t) ? t / 1000 : kNull]}]
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -92,7 +71,7 @@ class TelemetryChart {
 		this.iChartArea := chartArea
 	}
 
-	showTelemetryChart(series, lapFileName, referenceLapFileName := false, distanceCorrection := 0) {
+	showTelemetryChart(channels, lapFileName, referenceLapFileName := false, distanceCorrection := 0) {
 		eventHandler(event, arguments*) {
 			local telemetryViewer := this.TelemetryViewer
 			local row := false
@@ -131,14 +110,14 @@ class TelemetryChart {
 
 		if this.ChartArea {
 			this.ChartArea.document.open()
-			this.ChartArea.document.write(this.createTelemetryChart(series, lapFileName, referenceLapFileName, distanceCorrection))
+			this.ChartArea.document.write(this.createTelemetryChart(channels, lapFileName, referenceLapFileName, distanceCorrection))
 			this.ChartArea.document.close()
 
 			this.ChartArea.document.parentWindow.eventHandler := eventHandler
 		}
 	}
 
-	createTelemetryChart(series, lapFileName, referenceLapFileName := false, distanceCorrection := 0, margin := 0, hScale := 1, wScale := 1) {
+	createTelemetryChart(channels, lapFileName, referenceLapFileName := false, distanceCorrection := 0, margin := 0, hScale := 1, wScale := 1) {
 		local lapTelemetry := []
 		local referenceLapTelemetry := false
 		local html := ""
@@ -172,7 +151,7 @@ class TelemetryChart {
 			width := ((this.ChartArea.getWidth() - 4) / 100 * this.WidthZoom * wScale)
 			height := ((this.ChartArea.getHeight() - 4) / 100 * this.HeightZoom * hScale)
 
-			chartArea:= this.createSeriesChart(width, height, series, lapTelemetry, referenceLapTelemetry, &drawChartFunction)
+			chartArea:= this.createChannelChart(width, height, channels, lapTelemetry, referenceLapTelemetry, &drawChartFunction)
 
 			before := "
 			(
@@ -208,20 +187,20 @@ class TelemetryChart {
 			return "<html></html>"
 	}
 
-	createSeriesChart(width, height, series, lapTelemetry, referenceLapTelemetry, &drawChartFunction) {
-		local seriesCount := series.Length
-		local seriesEstate := 0
+	createChannelChart(width, height, channels, lapTelemetry, referenceLapTelemetry, &drawChartFunction) {
+		local channelsCount := channels.Length
+		local channelsEstate := 0
 		local axisCount := 0
 		local ignore, index, offset, data, refData, axes, color, running, refRunning, values
-		local theSeries, theName, theIndex, theValue, theConverter, theMinValue, minValue, maxValue, spread, absG
+		local theChannel, theName, theIndex, theValue, theConverter, theMinValue, minValue, maxValue, spread
 
-		series := collect(series, (s) {
+		channels := collect(channels, (s) {
 			local minValues := []
 			local maxValues := []
 
 			s := s.Clone()
 
-			seriesEstate += s.Size
+			channelsEstate += s.Size
 
 			s.MinValue := kUndefined
 			s.MaxValue := kUndefined
@@ -236,12 +215,12 @@ class TelemetryChart {
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Distance") . "');")
 
 		if referenceLapTelemetry
-			for ignore, theSeries in series
-				for ignore, theName in theSeries.Series
+			for ignore, theChannel in channels
+				for ignore, theName in theChannel.Channels
 					drawChartFunction .= ("`ndata.addColumn('number', '" . translate(theName) . translate(" (Reference)") . "');")
 
-		for ignore, theSeries in series
-			for ignore, theName in theSeries.Series
+		for ignore, theChannel in channels
+			for ignore, theName in theChannel.Channels
 				drawChartFunction .= ("`ndata.addColumn('number', '" . translate(theName) . "');")
 
 		drawChartFunction .= "`ndata.addRows(["
@@ -267,47 +246,38 @@ class TelemetryChart {
 			if (refRunning != kNull) {
 				refData := referenceLapTelemetry[refRunning]
 
-				for ignore, theSeries in series
-					if (theSeries.Name = "Curvature") {
-						if refData.Has(11) {
-							absG := Abs(refData[11])
+				for ignore, theChannel in channels
+					if theChannel.Function {
+						theValue := theChannel.Function(refData)
 
-							if (absG > 0.1) {
-								theValue := - Log(((refData[7] / 3.6) ** 2) / ((absG = 0) ? 0.00001 : absG))
-
-								if (theSeries.MinValue = kUndefined) {
-									theSeries.MinValue := theValue
-									theSeries.MaxValue := theValue
-								}
-								else {
-									theSeries.MinValue := Min(theSeries.MinValue, theValue)
-									theSeries.MaxValue := Max(theSeries.MaxValue, theValue)
-								}
+						if isNumber(value)
+							if (theChannel.MinValue = kUndefined) {
+								theChannel.MinValue := theValue
+								theChannel.MaxValue := theValue
 							}
-							else
-								theValue := kNull
+							else {
+								theChannel.MinValue := Min(theChannel.MinValue, theValue)
+								theChannel.MaxValue := Max(theChannel.MaxValue, theValue)
+							}
 
-							values.Push(theValue)
-						}
-						else
-							values.Push(kNull)
+						values.Push(theValue)
 					}
 					else
-						for ignore, theIndex in theSeries.Indices
+						for ignore, theIndex in theChannel.Indices
 							if refData.Has(theIndex) {
-								if theSeries.HasProp("Converter")
-									theValue := theSeries.Converter[A_Index](refData[theIndex])
+								if theChannel.HasProp("Converter")
+									theValue := theChannel.Converter[A_Index](refData[theIndex])
 								else
 									theValue := refData[theIndex]
 
 								if isNumber(theValue)
-									if (theSeries.MinValue = kUndefined) {
-										theSeries.MinValue := theValue
-										theSeries.MaxValue := theValue
+									if (theChannel.MinValue = kUndefined) {
+										theChannel.MinValue := theValue
+										theChannel.MaxValue := theValue
 									}
 									else {
-										theSeries.MinValue := Min(theSeries.MinValue, theValue)
-										theSeries.MaxValue := Max(theSeries.MaxValue, theValue)
+										theChannel.MinValue := Min(theChannel.MinValue, theValue)
+										theChannel.MaxValue := Max(theChannel.MaxValue, theValue)
 									}
 
 								values.Push(theValue)
@@ -316,52 +286,42 @@ class TelemetryChart {
 								values.Push(kNull)
 			}
 			else if referenceLapTelemetry
-				loop series.Length
-					loop series[A_Index].Indices.Length
+				loop channels.Length
+					loop channels[A_Index].Indices.Length
 						values.Push(kNull)
 
-			for ignore, theSeries in series
-				if (theSeries.Name = "Curvature") {
-					if data.Has(11) {
-						absG := Abs(data[11])
+			for ignore, theChannel in channels
+				if theChannel.Function {
+					theValue := theChannel.Function(refData)
 
-						if (absG > 0.1) {
-							theValue := - Log(((data[7] / 3.6) ** 2) / ((absG = 0) ? 0.00001 : absG))
-
-							if isNumber(theValue)
-								if (theSeries.MinValue = kUndefined) {
-									theSeries.MinValue := theValue
-									theSeries.MaxValue := theValue
-								}
-								else {
-									theSeries.MinValue := Min(theSeries.MinValue, theValue)
-									theSeries.MaxValue := Max(theSeries.MaxValue, theValue)
-								}
+					if isNumber(value)
+						if (theChannel.MinValue = kUndefined) {
+							theChannel.MinValue := theValue
+							theChannel.MaxValue := theValue
 						}
-						else
-							theValue := kNull
+						else {
+							theChannel.MinValue := Min(theChannel.MinValue, theValue)
+							theChannel.MaxValue := Max(theChannel.MaxValue, theValue)
+						}
 
-						values.Push(theValue)
-					}
-					else
-						values.Push(kNull)
+					values.Push(theValue)
 				}
 				else
-					for ignore, theIndex in theSeries.Indices
+					for ignore, theIndex in theChannel.Indices
 						if data.Has(theIndex) {
-							if theSeries.HasProp("Converter")
-								theValue := theSeries.Converter[A_Index](data[theIndex])
+							if theChannel.HasProp("Converter")
+								theValue := theChannel.Converter[A_Index](data[theIndex])
 							else
 								theValue := data[theIndex]
 
 							if isNumber(theValue)
-								if (theSeries.MinValue = kUndefined) {
-									theSeries.MinValue := theValue
-									theSeries.MaxValue := theValue
+								if (theChannel.MinValue = kUndefined) {
+									theChannel.MinValue := theValue
+									theChannel.MaxValue := theValue
 								}
 								else {
-									theSeries.MinValue := Min(theSeries.MinValue, theValue)
-									theSeries.MaxValue := Max(theSeries.MaxValue, theValue)
+									theChannel.MinValue := Min(theChannel.MinValue, theValue)
+									theChannel.MaxValue := Max(theChannel.MaxValue, theValue)
 								}
 
 							values.Push(theValue)
@@ -403,22 +363,22 @@ class TelemetryChart {
 		index := 0
 
 		if referenceLapTelemetry {
-			for ignore, theSeries in series {
+			for ignore, theChannel in channels {
 				offset := (A_Index - 1)
 
-				minValue := theSeries.MinValue
+				minValue := theChannel.MinValue
 
-				loop theSeries.Indices.Length {
+				loop theChannel.Indices.Length {
 					if (index > 0)
 						axes .= ", "
 
 					axes .= (index . ": { baselineColor: '" . this.Window.AltBackColor . "', viewWindowMode: 'maximized', gridlines: {count: 0}, ticks: []")
 
 					if (minValue != kUndefined) {
-						maxValue := theSeries.MaxValue
+						maxValue := theChannel.MaxValue
 						spread := (maxValue - minValue)
 
-						axes .= (", minValue: " . (minValue - ((seriesCount - offset - 1) * spread / theSeries.Size)) . ", maxValue: " . (maxValue + (offset * spread / theSeries.Size)))
+						axes .= (", minValue: " . (minValue - ((channelsCount - offset - 1) * spread / theChannel.Size)) . ", maxValue: " . (maxValue + (offset * spread / theChannel.Size)))
 					}
 
 					axes .= " }"
@@ -428,22 +388,22 @@ class TelemetryChart {
 			}
 		}
 
-		for ignore, theSeries in series {
+		for ignore, theChannel in channels {
 			offset := (A_Index - 1)
 
-			minValue := theSeries.MinValue
+			minValue := theChannel.MinValue
 
-			loop theSeries.Indices.Length {
+			loop theChannel.Indices.Length {
 				if (index > 0)
 					axes .= ", "
 
 				axes .= (index . ": { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, viewWindowMode: 'maximized', ticks: []")
 
 				if (minValue != kUndefined) {
-					maxValue := theSeries.MaxValue
+					maxValue := theChannel.MaxValue
 					spread := (maxValue - minValue)
 
-					axes .= (", minValue: " . (minValue - ((seriesCount - offset - 1) * spread / theSeries.Size)) . ", maxValue: " . (maxValue + (offset * spread / theSeries.Size)))
+					axes .= (", minValue: " . (minValue - ((channelsCount - offset - 1) * spread / theChannel.Size)) . ", maxValue: " . (maxValue + (offset * spread / theChannel.Size)))
 				}
 
 				axes .= " }"
@@ -764,8 +724,9 @@ class TelemetryViewer {
 			this.iLayouts := CaseInsenseMap(translate("Standard")
 										  , {Name: translate("Standard")
 										   , WidthZoom: 100, HeightZoom: 100
-										   , Series: choose(kDataSeries, (s) => !inList(["Throttle", "Brake", "TC", "ABS"
-																					   , "Long G", "Lat G"], s.Name))})
+										   , Channels: choose(kTelemetryChannels
+															, (s) => !inList(["Speed", "Throttle", "Brake", "TC", "ABS"
+																			, "Long G", "Lat G"], s.Name))})
 
 			this.iSelectedLayout := translate("Standard")
 		}
@@ -776,9 +737,9 @@ class TelemetryViewer {
 				layouts[name] := {Name: name
 								, WidthZoom: getMultiMapValue(configuration, "Zoom", name . ".Width", 100)
 								, HeightZoom: getMultiMapValue(configuration, "Zoom", name . ".Height", 100)
-								, Series: collect(string2Values(",", definition), (name) {
-											  return choose(kDataSeries, (s) => s.Name = name)[1]
-										  })}
+								, Channels: collect(string2Values(",", definition), (name) {
+												return choose(kTelemetryChannels, (s) => s.Name = name)[1]
+											})}
 
 			this.iLayouts := layouts
 			this.iSelectedLayout := getMultiMapValue(configuration, "Selected", "Layout")
@@ -790,7 +751,7 @@ class TelemetryViewer {
 		local name, layout
 
 		for name, layout in this.Layouts {
-			setMultiMapValue(configuration, "Layouts", name, values2String(",", collect(layout.Series, (s) => s.Name)*))
+			setMultiMapValue(configuration, "Layouts", name, values2String(",", collect(layout.Channels, (s) => s.Name)*))
 
 			setMultiMapValue(configuration, "Zoom", name . ".Width", layout.WidthZoom)
 			setMultiMapValue(configuration, "Zoom", name . ".Height", layout.HeightZoom)
@@ -1652,7 +1613,7 @@ class TelemetryViewer {
 
 	updateTelemetryChart(redraw := false) {
 		if (this.TelemetryChart && redraw) {
-			this.TelemetryChart.showTelemetryChart(this.Layouts[this.SelectedLayout].Series, this.SelectedLap[true], this.SelectedReferenceLap[true], this.DistanceCorrection)
+			this.TelemetryChart.showTelemetryChart(this.Layouts[this.SelectedLayout].Channels, this.SelectedLap[true], this.SelectedReferenceLap[true], this.DistanceCorrection)
 
 			this.updateState()
 		}
@@ -2051,14 +2012,14 @@ class TrackMap {
 ;;;-------------------------------------------------------------------------;;;
 
 editLayoutSettings(telemetryViewerOrCommand, arguments*) {
-	local name, names, x, y, ignore, series, selected, tempLayout, checked1, checked2, inputResult
+	local name, names, x, y, ignore, channel, selected, tempLayout, checked1, checked2, inputResult
 
 	static layoutsGui
 
 	static telemetryViewer := false
 	static result := false
 
-	static seriesListView := false
+	static channelsListView := false
 
 	static layouts := []
 	static layout := false
@@ -2066,7 +2027,7 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 	checked(row) {
 		local index := 0
 
-		while (index := seriesListView.GetNext(index, "C"))
+		while (index := channelsListView.GetNext(index, "C"))
 			if (index = row)
 				return true
 
@@ -2081,41 +2042,41 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 
 		result := kOk
 	}
-	else if (telemetryViewerOrCommand = "SeriesUp") {
-		selected := seriesListView.GetNext()
+	else if (telemetryViewerOrCommand = "ChannelUp") {
+		selected := channelsListView.GetNext()
 
 		if selected {
-			series := seriesListView.GetText(selected)
+			channel := channelsListView.GetText(selected)
 
 			checked1 := checked(selected)
 			checked2 := checked(selected - 1)
 
-			seriesListView.Modify(selected, checked2 ? "Check" : "-Check", seriesListView.GetText(selected - 1))
-			seriesListView.Modify(selected - 1, (checked1 ? "Check " : "-Check ") . "Select Vis", series)
+			channelsListView.Modify(selected, checked2 ? "Check" : "-Check", channelsListView.GetText(selected - 1))
+			channelsListView.Modify(selected - 1, (checked1 ? "Check " : "-Check ") . "Select Vis", channel)
 
 			editLayoutSettings("UpdateState")
 		}
 	}
-	else if (telemetryViewerOrCommand = "SeriesDown") {
-		selected := seriesListView.GetNext()
+	else if (telemetryViewerOrCommand = "ChannelDown") {
+		selected := channelsListView.GetNext()
 
 		if selected {
-			series := seriesListView.GetText(selected)
+			channel := channelsListView.GetText(selected)
 
 			checked1 := checked(selected)
 			checked2 := checked(selected + 1)
 
-			seriesListView.Modify(selected, checked2 ? "Check" : "-Check", seriesListView.GetText(selected + 1))
-			seriesListView.Modify(selected + 1, (checked1 ? "Check " : "-Check ") . "Select Vis", series)
+			channelsListView.Modify(selected, checked2 ? "Check" : "-Check", channelsListView.GetText(selected + 1))
+			channelsListView.Modify(selected + 1, (checked1 ? "Check " : "-Check ") . "Select Vis", channel)
 
 			editLayoutSettings("UpdateState")
 		}
 	}
-	else if (telemetryViewerOrCommand = "SeriesSelect")
+	else if (telemetryViewerOrCommand = "ChannelSelect")
 		editLayoutSettings("UpdateState")
-	else if (telemetryViewerOrCommand = "SeriesCheck") {
-		if (!arguments[3] && !seriesListView.GetNext(0, "C"))
-			seriesListView.Modify(arguments[2], "Check")
+	else if (telemetryViewerOrCommand = "ChannelCheck") {
+		if (!arguments[3] && !channelsListView.GetNext(0, "C"))
+			channelsListView.Modify(arguments[2], "Check")
 	}
 	else if (telemetryViewerOrCommand = "LayoutNew") {
 		inputResult := withBlockedWindows(InputBox, translate("Please enter the name of the new layout:"), translate("Telemetry Layouts"), "w300 h120")
@@ -2127,7 +2088,7 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 			while layouts.Has(newName)
 				newName := (name . translate(" (") . A_Index . translate(")"))
 
-			layouts[newName] := {Name: newName, WidthZoom: 100, HeightZoom: 100, Series: [kDataSeries[1]]}
+			layouts[newName] := {Name: newName, WidthZoom: 100, HeightZoom: 100, Channels: [kTelemetryChannels[1]]}
 
 			editLayoutSettings("LayoutsLoad", layouts)
 			editLayoutSettings("LayoutLoad", layouts[newName])
@@ -2144,19 +2105,19 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 	}
 	else if (telemetryViewerOrCommand = "LayoutSave") {
 		if layout {
-			series := []
+			channels := []
 			selected := 0
 
-			while (selected := seriesListView.GetNext(selected, "C")) {
-				name := seriesListView.GetText(selected)
+			while (selected := channelsListView.GetNext(selected, "C")) {
+				name := channelsListView.GetText(selected)
 
-				series.Push(choose(kDataSeries, (s) => translate(s.Name) = name)[1])
+				channels.Push(choose(kTelemetryChannels, (s) => translate(s.Name) = name)[1])
 			}
 
 			layouts[layout.Name] := {Name: layout.Name
 								   , WidthZoom: layoutsGui["zoomWSlider"].Value
 								   , HeightZoom: layoutsGui["zoomHSlider"].Value
-								   , Series: series}
+								   , Channels: channels}
 		}
 	}
 	else if (telemetryViewerOrCommand = "LayoutSelect")
@@ -2169,27 +2130,27 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 
 		layoutsGui["layoutDropDown"].Choose(inList(getKeys(layouts), layout.Name))
 
-		seriesListView.Delete()
+		channelsListView.Delete()
 
 		if layout {
 			names := []
 
-			for ignore, series in layout.Series {
-				names.Push(series.Name)
+			for ignore, channel in layout.Channels {
+				names.Push(channel.Name)
 
-				seriesListView.Add("Check", translate(series.Name))
+				channelsListView.Add("Check", translate(channel.Name))
 			}
 
-			for ignore, series in kDataSeries
-				if !inList(names, series.Name)
-					seriesListView.Add("", translate(series.Name))
+			for ignore, channel in kTelemetryChannels
+				if !inList(names, channel.Name)
+					channelsListView.Add("", translate(channel.Name))
 
 			layoutsGui["zoomWSlider"].Value := layout.WidthZoom
 			layoutsGui["zoomHSlider"].Value := layout.HeightZoom
 		}
 
-		seriesListView.ModifyCol()
-		seriesListView.ModifyCol(1, "AutoHdr")
+		channelsListView.ModifyCol()
+		channelsListView.ModifyCol(1, "AutoHdr")
 
 		editLayoutSettings("UpdateState")
 	}
@@ -2215,14 +2176,14 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 		else
 			layoutsGui["deleteButton"].Enabled := true
 
-		selected := seriesListView.GetNext()
+		selected := channelsListView.GetNext()
 
 		if selected {
 			if (selected = 1) {
 				layoutsGui["upButton"].Enabled := false
 				layoutsGui["downButton"].Enabled := true
 			}
-			else if (selected = seriesListView.GetCount()) {
+			else if (selected = channelsListView.GetCount()) {
 				layoutsGui["upButton"].Enabled := true
 				layoutsGui["downButton"].Enabled := false
 			}
@@ -2268,15 +2229,15 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 		layoutsGui.Add("Button", "x243 yp w23 h23 Center +0x200 Disabled vdeleteButton").OnEvent("Click", editLayoutSettings.Bind("LayoutDelete"))
 		setButtonIcon(layoutsGui["deleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
-		seriesListView := layoutsGui.Add("ListView", "x16 yp+30 w284 h300 AltSubmit -Multi -LV0x10 Checked NoSort NoSortHdr", collect(["Channel"], translate))
-		seriesListView.OnEvent("Click", editLayoutSettings.Bind("SeriesSelect"))
-		seriesListView.OnEvent("DoubleClick", editLayoutSettings.Bind("SeriesSelect"))
-		seriesListView.OnEvent("ItemSelect", editLayoutSettings.Bind("SeriesSelect"))
-		seriesListView.OnEvent("ItemCheck", editLayoutSettings.Bind("SeriesCheck"))
+		channelsListView := layoutsGui.Add("ListView", "x16 yp+30 w284 h300 AltSubmit -Multi -LV0x10 Checked NoSort NoSortHdr", collect(["Channel"], translate))
+		channelsListView.OnEvent("Click", editLayoutSettings.Bind("ChannelSelect"))
+		channelsListView.OnEvent("DoubleClick", editLayoutSettings.Bind("ChannelSelect"))
+		channelsListView.OnEvent("ItemSelect", editLayoutSettings.Bind("ChannelSelect"))
+		channelsListView.OnEvent("ItemCheck", editLayoutSettings.Bind("ChannelCheck"))
 
-		layoutsGui.Add("Button", "x252 yp+302 w23 h23 Center +0x200 vupButton").OnEvent("Click", editLayoutSettings.Bind("SeriesUp"))
+		layoutsGui.Add("Button", "x252 yp+302 w23 h23 Center +0x200 vupButton").OnEvent("Click", editLayoutSettings.Bind("ChannelUp"))
 		setButtonIcon(layoutsGui["upButton"], kIconsDirectory . "Up Arrow.ico", 1, "L4 T4 R4 B4")
-		layoutsGui.Add("Button", "x277 yp w23 h23 Center +0x200 Disabled vdownButton").OnEvent("Click", editLayoutSettings.Bind("SeriesDown"))
+		layoutsGui.Add("Button", "x277 yp w23 h23 Center +0x200 Disabled vdownButton").OnEvent("Click", editLayoutSettings.Bind("ChannelDown"))
 		setButtonIcon(layoutsGui["downButton"], kIconsDirectory . "Down Arrow.ico", 1, "L4 T4 R4 B4")
 
 		layoutsGui.Add("Text", "x16 yp+5 w80 X:Move", translate("Zoom"))

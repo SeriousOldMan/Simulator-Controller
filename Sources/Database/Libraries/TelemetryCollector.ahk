@@ -13,6 +13,27 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                       Public Constants Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global kTelemetryChannels := [{Name: "Speed", Indices: [7], Size: 1, Channels: ["Speed"], Converter: [(s) => isNumber(s) ? convertUnit("Speed", s) : kNull]}
+							, {Name: "Throttle", Indices: [2], Size: 0.5, Channels: ["Throttle"]}
+							, {Name: "Brake", Indices: [3], Size: 0.5, Channels: ["Brake"]}
+							, {Name: "Throttle/Brake", Indices: [2, 3], Size: 0.5, Channels: ["Throttle", "Brake"]}
+							, {Name: "Steering", Indices: [4], Size: 0.8, Channels: ["Steering"]}
+							, {Name: "TC", Indices: [8], Size: 0.3, Channels: ["TC"]}
+							, {Name: "ABS", Indices: [9], Size: 0.3, Channels: ["ABS"]}
+							, {Name: "TC/ABS", Indices: [8, 9], Size: 0.3, Channels: ["TC", "ABS"]}
+							, {Name: "RPM", Indices: [6], Size: 0.5, Channels: ["RPM"]}
+							, {Name: "Gear", Indices: [5], Size: 0.5, Channels: ["Gear"]}
+							, {Name: "Long G", Indices: [10], Size: 1, Channels: ["Long G"]}
+							, {Name: "Lat G", Indices: [11], Size: 1, Channels: ["Lat G"]}
+							, {Name: "Long G/Lat G", Indices: [10, 11], Size: 1, Channels: ["Long G", "Lat G"]}
+							, {Name: "Curvature", Function: computeCurvature, Indices: [false], Size: 1, Channels: ["Curvature"]}
+							, {Name: "Time", Indices: [14], Size: 1, Channels: ["Time"], Converter: [(t) => isNumber(t) ? t / 1000 : kNull]}]
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -148,4 +169,24 @@ class TelemetryCollector {
 
 		return false
 	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                      Private Functions Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+computeCurvature(data) {
+	local absG
+
+	if data.Has(11) {
+		absG := Abs(data[11])
+
+		if (absG > 0.1)
+			return - Log(((data[7] / 3.6) ** 2) / ((absG = 0) ? 0.00001 : absG))
+		else
+			return kNull
+	}
+	else
+		return kNull
 }

@@ -1443,6 +1443,7 @@ void checkCoordinates(const SharedMemory* sharedData) {
 std::string telemetryDirectory = "";
 std::ofstream telemetryFile;
 int telemetryLap = -1;
+double lastRunning = -1;
 
 void collectCarTelemetry(const SharedMemory* sharedData) {
 	ParticipantInfo vehicle = sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex];
@@ -1463,22 +1464,28 @@ void collectCarTelemetry(const SharedMemory* sharedData) {
 			telemetryLap = (vehicle.mLapsCompleted + 1);
 
 			telemetryFile.open(telemetryDirectory + "\\Lap " + std::to_string(telemetryLap) + ".tmp", std::ios::out | std::ios::trunc);
+			
+			lastRunning = -1;
 		}
 
-		telemetryFile << vehicle.mCurrentLapDistance << ";"
-					  << sharedData->mThrottle << ";"
-					  << sharedData->mBrake << ";"
-					  << sharedData->mSteering << ";"
-					  << sharedData->mGear << ";"
-					  << sharedData->mRpm << ";"
-					  << (sharedData->mSpeed * 3.6) << ";"
-					  << "n/a" << ";"
-					  << "n/a" << ";"
-					  << - sharedData->mLocalAcceleration[VEC_Z] / 9.807f << ";"
-					  << sharedData->mLocalAcceleration[VEC_X] / 9.807f << ";"
-					  << sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mWorldPosition[VEC_X] << ";"
-					  << -sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mWorldPosition[VEC_Z] << ";"
-					  << round(sharedData->mCurrentTime * 1000) << std::endl;
+		if (vehicle.mCurrentLapDistance > lastRunning) {
+			lastRunning = vehicle.mCurrentLapDistance;
+			
+			telemetryFile << vehicle.mCurrentLapDistance << ";"
+						  << sharedData->mThrottle << ";"
+						  << sharedData->mBrake << ";"
+						  << sharedData->mSteering << ";"
+						  << sharedData->mGear << ";"
+						  << sharedData->mRpm << ";"
+						  << (sharedData->mSpeed * 3.6) << ";"
+						  << "n/a" << ";"
+						  << "n/a" << ";"
+						  << - sharedData->mLocalAcceleration[VEC_Z] / 9.807f << ";"
+						  << sharedData->mLocalAcceleration[VEC_X] / 9.807f << ";"
+						  << sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mWorldPosition[VEC_X] << ";"
+						  << -sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mWorldPosition[VEC_Z] << ";"
+						  << round(sharedData->mCurrentTime * 1000) << std::endl;
+		}
 	}
 	catch (...) {
 		try {

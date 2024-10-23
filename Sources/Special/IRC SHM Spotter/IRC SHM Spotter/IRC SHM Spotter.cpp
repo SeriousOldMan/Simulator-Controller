@@ -1853,6 +1853,7 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 std::string telemetryDirectory = "";
 std::ofstream telemetryFile;
 int telemetryLap = -1;
+double lastTelemetryRunning = -1;
 
 void collectCarTelemetry(const irsdk_header* header, const char* data, const int playerCarIndex, float trackLength) {
 	char buffer[60] = "";
@@ -1882,6 +1883,8 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 			sprintf_s(buffer, "%d", telemetryLap);
 
 			telemetryFile.open(telemetryDirectory + "\\Lap " + buffer + ".tmp", std::ios::out | std::ios::trunc);
+			
+			lastTelemetryRunning = -1;
 		}
 
 		char* trackPositions;
@@ -1899,52 +1902,56 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 		if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
 			playerRunning = ((float*)trackPositions)[playerCarIndex];
 
-		if (getRawDataValue(rawValue, header, data, "Speed"))
-			speed = *((float*)rawValue) * 3.6;
+		if (playerRunning > lastTelemetryRunning) {
+			lastTelemetryRunning = playerRunning;
+			
+			if (getRawDataValue(rawValue, header, data, "Speed"))
+				speed = *((float*)rawValue) * 3.6;
 
-		if (getRawDataValue(rawValue, header, data, "Throttle"))
-			throttle = *(float*)rawValue;
+			if (getRawDataValue(rawValue, header, data, "Throttle"))
+				throttle = *(float*)rawValue;
 
-		if (getRawDataValue(rawValue, header, data, "Brake"))
-			brake = *(float*)rawValue;
+			if (getRawDataValue(rawValue, header, data, "Brake"))
+				brake = *(float*)rawValue;
 
-		if (getRawDataValue(rawValue, header, data, "SteeringWheelAngleMax")) {
-			float maxSteerAngle = *((float*)rawValue);
+			if (getRawDataValue(rawValue, header, data, "SteeringWheelAngleMax")) {
+				float maxSteerAngle = *((float*)rawValue);
 
-			if (getRawDataValue(rawValue, header, data, "SteeringWheelAngle"))
-				steerAngle = *((float*)rawValue) / maxSteerAngle;
+				if (getRawDataValue(rawValue, header, data, "SteeringWheelAngle"))
+					steerAngle = *((float*)rawValue) / maxSteerAngle;
+			}
+
+			if (getRawDataValue(rawValue, header, data, "Gear"))
+				gear = *(int*)rawValue;
+
+			if (getRawDataValue(rawValue, header, data, "RPM"))
+				rpms = *(int*)rawValue;
+
+			if (getRawDataValue(rawValue, header, data, "LongAccel"))
+				longG = (*(float*)rawValue) / 9.807;
+
+			if (getRawDataValue(rawValue, header, data, "LatAccel"))
+				latG = (*(float*)rawValue) / 9.807;
+			
+			telemetryFile << (playerRunning * trackLength) << ";"
+						  << throttle << ";"
+						  << brake << ";"
+						  << steerAngle << ";"
+						  << gear << ";"
+						  << rpms << ";"
+						  << speed << ";"
+						  << "n/a" << ";"
+						  << "n/a" << ";"
+						  << longG << ";" << - latG;
+
+			float coordinateX;
+			float coordinateY;
+
+			if (getCarCoordinates(header, data, playerCarIndex, coordinateX, coordinateY))
+				telemetryFile << ";" << coordinateX << ";" << coordinateY << std::endl;
+			else
+				telemetryFile << std::endl;
 		}
-
-		if (getRawDataValue(rawValue, header, data, "Gear"))
-			gear = *(int*)rawValue;
-
-		if (getRawDataValue(rawValue, header, data, "RPM"))
-			rpms = *(int*)rawValue;
-
-		if (getRawDataValue(rawValue, header, data, "LongAccel"))
-			longG = (*(float*)rawValue) / 9.807;
-
-		if (getRawDataValue(rawValue, header, data, "LatAccel"))
-			latG = (*(float*)rawValue) / 9.807;
-
-		telemetryFile << (playerRunning * trackLength) << ";"
-					  << throttle << ";"
-					  << brake << ";"
-					  << steerAngle << ";"
-					  << gear << ";"
-					  << rpms << ";"
-					  << speed << ";"
-					  << "n/a" << ";"
-					  << "n/a" << ";"
-					  << longG << ";" << - latG;
-
-		float coordinateX;
-		float coordinateY;
-
-		if (getCarCoordinates(header, data, playerCarIndex, coordinateX, coordinateY))
-			telemetryFile << ";" << coordinateX << ";" << coordinateY << std::endl;
-		else
-			telemetryFile << std::endl;
 	}
 	catch (...) {
 		try {

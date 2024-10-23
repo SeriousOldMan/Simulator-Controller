@@ -1,9 +1,9 @@
 [Development]
 Version=5.9.5.0-dev
 Target=5.9.5.0-release
-Date=10/22/2024
+Date=10/23/2024
 Download=https://www.dropbox.com/scl/fi/uhzij0zmvlfvyjb7un5tz/Simulator-Controller-5.9.5.0-dev.zip?rlkey=h5a1mhbnxpzmemzw35ba3yo7q&st=qb5pwzq6&dl=1
-Changes=Several grammar fixes, Fixed RF2 telemetry file format, Section editor for track maps, New telemetry channel "Time"
+Changes=Several grammar fixes, Fixed RF2 telemetry file format, Section editor for track maps, New telemetry channel "Time", Telemetry smoothing
 Components=Media->5.6.1,Configuration->5.9.1,Utilities->5.9.1
 [Release]
 Version=5.9.4.0-release

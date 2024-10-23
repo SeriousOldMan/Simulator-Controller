@@ -6,6 +6,7 @@
   5. A section editor has been added to the track map viewer in the "Session Database" (on the way to telemetry based live coaching). The arrangement of the different tabs in the "Session Database" has changed a bit in the course of this change. Please see the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation) for more information.
   
      It is strongly recommended with this version to rebuild all tracks, so that the track starting point is as close as possible to the real start/finish line. Thias was not important in the past and the track recording started anywhere. Please see the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-595) to see what to do.
+  6. A new filter smoothes out inconsistent telemetry values reported by some simulators.
 
 IMPORTANT: Please take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-595), for information how to rebuild the track database.
 

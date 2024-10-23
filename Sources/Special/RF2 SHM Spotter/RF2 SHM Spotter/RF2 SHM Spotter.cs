@@ -1705,6 +1705,7 @@ namespace RF2SHMSpotter {
         string telemetryDirectory = "";
         StreamWriter telemetryFile = null;
         int telemetryLap = -1;
+		double lastRunning = -1;
 
         void collectCarTelemetry(ref rF2VehicleScoring playerScoring)
         {
@@ -1735,28 +1736,34 @@ namespace RF2SHMSpotter {
                     telemetryLap = (playerScoring.mTotalLaps + 1);
 
                     telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".tmp", false);
+					
+					lastRunning = -1;
                 }
 
-                telemetryFile.Write(playerScoring.mLapDist + ";");
-                telemetryFile.Write((float)telemetry.mVehicles[playerID].mFilteredThrottle + ";");
-                telemetryFile.Write((float)telemetry.mVehicles[playerID].mFilteredBrake + ";");
-                telemetryFile.Write((float)telemetry.mVehicles[playerID].mFilteredSteering + ";");
-                telemetryFile.Write((float)telemetry.mVehicles[playerID].mGear + ";");
-                telemetryFile.Write((float)telemetry.mVehicles[playerID].mEngineRPM + ";");
-                telemetryFile.Write(vehicleSpeed(ref playerScoring) + ";");
+				if (playerScoring.mLapDist > lastRunning) {
+					lastRunning = playerScoring.mLapDist;
+					
+					telemetryFile.Write(playerScoring.mLapDist + ";");
+					telemetryFile.Write((float)telemetry.mVehicles[playerID].mFilteredThrottle + ";");
+					telemetryFile.Write((float)telemetry.mVehicles[playerID].mFilteredBrake + ";");
+					telemetryFile.Write((float)telemetry.mVehicles[playerID].mFilteredSteering + ";");
+					telemetryFile.Write((float)telemetry.mVehicles[playerID].mGear + ";");
+					telemetryFile.Write((float)telemetry.mVehicles[playerID].mEngineRPM + ";");
+					telemetryFile.Write(vehicleSpeed(ref playerScoring) + ";");
 
-                telemetryFile.Write("n/a;");
-                telemetryFile.Write("n/a;");
+					telemetryFile.Write("n/a;");
+					telemetryFile.Write("n/a;");
 
-                telemetryFile.Write((-playerScoring.mLocalAccel.z / 9.807f) + ";");
-                telemetryFile.Write((playerScoring.mLocalAccel.x / 9.807f) + ";");
+					telemetryFile.Write((-playerScoring.mLocalAccel.z / 9.807f) + ";");
+					telemetryFile.Write((playerScoring.mLocalAccel.x / 9.807f) + ";");
 
-                telemetryFile.Write(playerScoring.mPos.x + ";");
-                telemetryFile.Write(-playerScoring.mPos.z + ";");
+					telemetryFile.Write(playerScoring.mPos.x + ";");
+					telemetryFile.Write(-playerScoring.mPos.z + ";");
 
-				ref rF2VehicleTelemetry vehicle = ref GetPlayerTelemetry(playerID, ref telemetry);
+					ref rF2VehicleTelemetry vehicle = ref GetPlayerTelemetry(playerID, ref telemetry);
 
-                telemetryFile.WriteLine((vehicle.mElapsedTime - vehicle.mLapStartET) * 1000);
+					telemetryFile.WriteLine((vehicle.mElapsedTime - vehicle.mLapStartET) * 1000);
+				}
             }
             catch (Exception)
             {

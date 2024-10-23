@@ -147,7 +147,7 @@ namespace RF2SHMProvider {
 
         public void ReadStandings()
         {
-            rF2VehicleScoring playerVehicle = GetPlayerScoring(ref scoring);
+            ref rF2VehicleScoring playerVehicle = ref GetPlayerScoring(ref scoring);
 
             Console.WriteLine("[Position Data]");
 
@@ -199,8 +199,8 @@ namespace RF2SHMProvider {
 		}
 
 		public void ReadData() {
-			rF2VehicleScoring playerScoring = GetPlayerScoring(ref scoring);
-			rF2VehicleTelemetry playerTelemetry = GetPlayerTelemetry(playerScoring.mID, ref telemetry);
+			ref rF2VehicleScoring playerScoring = ref GetPlayerScoring(ref scoring);
+			ref rF2VehicleTelemetry playerTelemetry = ref GetPlayerTelemetry(playerScoring.mID, ref telemetry);
 
 			string session = "";
 
@@ -473,52 +473,31 @@ namespace RF2SHMProvider {
 
         static rF2VehicleScoring noPlayer = new rF2VehicleScoring();
 
-        public static rF2VehicleScoring GetPlayerScoring(ref rF2Scoring scoring)
+        public static ref rF2VehicleScoring GetPlayerScoring(ref rF2Scoring scoring)
         {
             for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
             {
-                ref rF2VehicleScoring vehicle = ref scoring.mVehicles[i];
-
-				/*
-                switch ((rFactor2Constants.rF2Control)vehicle.mControl)
-                {
-                    case rFactor2Constants.rF2Control.AI:
-                    case rFactor2Constants.rF2Control.Player:
-                    case rFactor2Constants.rF2Control.Remote:
-                        if (vehicle.mIsPlayer == 1)
-                            return vehicle;
-
-                        continue;
-
-                    default:
-                        continue;
-                }
-				*/
-
-                if (vehicle.mIsPlayer == 1)
-                    return vehicle;
+                if (scoring.mVehicles[i].mIsPlayer == 1)
+                    return ref scoring.mVehicles[i];
             }
 
-            return noPlayer;
+            return ref noPlayer;
         }
 
-        public static rF2VehicleTelemetry GetPlayerTelemetry(int id, ref rF2Telemetry telemetry) {
-			var playerVehTelemetry = new rF2VehicleTelemetry();
+        static rF2VehicleTelemetry noTelemetry = new rF2VehicleTelemetry();
 
-			for (int i = 0; i < telemetry.mNumVehicles; ++i) {
-                ref rF2VehicleTelemetry vehicle = ref telemetry.mVehicles[i];
+        public static ref rF2VehicleTelemetry GetPlayerTelemetry(int id, ref rF2Telemetry telemetry)
+        {
+            for (int i = 0; i < telemetry.mNumVehicles; ++i)
+            {
+                if (telemetry.mVehicles[i].mID == id)
+                    return ref telemetry.mVehicles[i];
+            }
 
-				if (vehicle.mID == id) {
-					playerVehTelemetry = vehicle;
+            return ref noTelemetry;
+        }
 
-					break;
-				}
-			}
-
-			return playerVehTelemetry;
-		}
-
-		private void Connect() {
+        private void Connect() {
 			if (!this.connected) {
 				try {
 					// Extended buffer is the last one constructed, so it is an indicator RF2SM is ready.

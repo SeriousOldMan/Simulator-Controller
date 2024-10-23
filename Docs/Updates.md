@@ -35,6 +35,12 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars*, *Simulator Controller\Rules* and other folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on its own. But be sure to make a backup copy of all the files, just for the peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 5.9.5
+
+This release introduces track sections in preparation for the upcoming telemetry based live coaching. To ensure, that corner numbers are correct, the track maps must be rebuild. You can do this with the "Session Database". Select "All" cars and "All" tracks, then open the "Administration" tab. There select all tracks and delete them. They will get rebuild automatically.
+
+***
+
 ## Release 5.9.4
 
 Everything handled automatically.

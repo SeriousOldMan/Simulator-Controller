@@ -62,7 +62,7 @@ class AbstractTranslations {
 			this.TrailingSpaces := (StrLen(original) - StrLen(RTrim(original)))
 		}
 
-		adjustTranslation(translation) {
+		adjustTranslation(translation, spaces := true) {
 			createSpaces(count) {
 				local spaces := ""
 
@@ -72,7 +72,10 @@ class AbstractTranslations {
 				return spaces
 			}
 
-			return (createSpaces(this.LeadingSpaces) . Trim(translation) . createSpaces(this.TrailingSpaces))
+			if spaces
+				return (createSpaces(this.LeadingSpaces) . Trim(translation) . createSpaces(this.TrailingSpaces))
+			else
+				return Trim(translation)
 		}
 	}
 
@@ -167,7 +170,8 @@ class AbstractTranslations {
 					for ignore, trans in translated.Translations[key]
 						if ((trans.Original = candidate.Original) && (Trim(trans.Translation) != "")) {
 							translations.Push(AbstractTranslations.Translation(candidate.Original
-																			 , candidate.adjustTranslation(trans.Translation)))
+																			 , candidate.adjustTranslation(trans.Translation
+																										 , this.Code != "EN")))
 
 							found := true
 

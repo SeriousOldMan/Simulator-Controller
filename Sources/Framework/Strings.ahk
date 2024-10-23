@@ -81,15 +81,17 @@ substituteVariables(text, values := false) {
 			}
 
 			try {
+				variable := false
+
 				endPos := InStr(result, "%", false, startPos)
 
 				if endPos {
 					variable := Trim(SubStr(result, startPos, endPos - startPos))
 
-					if isMap
-						value := (values && values.Has(variable)) ? values[variable] : %variable%
-					else if isObject
-						value := (values && values.HasProp(variable)) ? values.%variable% : %variable%
+					if (isMap && values && values.Has(variable))
+						value := values[variable]
+					else if (isObject && values && values.HasProp(variable))
+						value := values.%variable%
 					else
 						try {
 							value := %variable%
@@ -103,6 +105,8 @@ substituteVariables(text, values := false) {
 						}
 
 					result := StrReplace(result, "%" . variable . "%", value)
+
+					startPos -= 1
 				}
 				else
 					throw "Second % not found while scanning `"" . text . "`" for variables in substituteVariables..."

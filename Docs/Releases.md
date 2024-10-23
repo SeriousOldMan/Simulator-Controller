@@ -6,20 +6,34 @@
 	 - A controller action "Coaching" has been defined for the [Driving Coach plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-driving-coach) to start / finish a coaching session from your Button Box or Stream Deck.
 	 - A new icon for the "Coaching" action has been added to the Stream Deck icon set.
 
-## 5.9.4.0-release 10/18/24 (planned)
+## 5.9.5.0-release 10/25/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. Fixed standings handling and reace reports for grids where cars with duplicate race numbers are present. This can happen in *RaceRoom Racing Experience*, for example.
+  3. A couple of fixes in the different Assistant grammars.
+  4. A channel for the elapsed time since start of the lap has been added to the telemetry system.
+  5. A section editor has been added to the track map viewer in the "Session Database" (on the way to telemetry based live coaching). The arrangement of the different tabs in the "Session Database" has changed a bit in the course of this change. Please see the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation) for more information.
+  
+     It is strongly recommended with this version to rebuild all tracks, so that the track starting point is as close as possible to the real start/finish line. Thias was not important in the past and the track recording started anywhere. Please see the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-595) to see what to do.
+  6. A new filter smoothes out inconsistent telemetry values reported by some simulators.
+
+IMPORTANT: Please take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-595), for information how to rebuild the track database.
+
+## 5.9.4.0-release 10/18/24
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Fixed standings handling and race reports for grids where cars with duplicate race numbers are present. This can happen in *RaceRoom Racing Experience*, for example.
   4. Fixed a rare bug, which resulted in incorrect position information announced by the Spotter for *RaceRoom Racing Experience*.
-  5. A complete new layout system has been introduced for the Telemetry Viewer. You now can select the channels, you are interested in and arrange them according to your preferences. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetry-viewer) for more information.
-  6. Telemetry graphs can now be shifted horizontally to match track position of telemetry data from different sources.
-  7. Zooming of telemetry graph is now possible both horizontally and vertically.
-  8. Selected zoom factor will now be stored for telemetry graphs.
-  9. Lap telemetry data can now also be imported from MoTeC. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetry-viewer) for more information.
-  10. Multiple lap telemetry data, setups or strategies can be uploaded at once in "Session Database"
-  11. Uploading telemetry data in the "Session Database" can also read MoTeC and Second Monitor files.
-  12. A new setting for the steer lock of a car has been integrated in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings). This is used to normalize the steering angle when importing telemetry data from MoTeC, for example. If this setting is not set, the latest value used in the "Setup Workbench" for this car will be used.
-  13. The announcement of the last lap times of the cars around you by the Spotter has been moved from the "Session Information" group to the "Opponent Information" group and can be enabled/disabled together with ´gap and delta information in the configuration.
+  5. Fixed a bug, that let the Spotter to report on a focused car although no car was focused. This could happen for cars with the race number **0** (weird to use **0** as race number, isn't it?).
+  6. A complete new layout system has been implemented for the Telemetry Viewer. You now can select the channels, you are interested in and arrange them according to your preferences. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetry-viewer) for more information.
+  7. Telemetry graphs can now be shifted horizontally to match track position of telemetry data from different sources.
+  8. Zooming of telemetry graph is now possible both horizontally and vertically.
+  9. Selected zoom factor will now be stored for telemetry graphs.
+  10. Lap telemetry data can now also be imported from MoTeC. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetry-viewer) for more information.
+  11. Multiple lap telemetry data, setups or strategies can be uploaded at once in "Session Database"
+  12. Uploading telemetry data in the "Session Database" can also read MoTeC and Second Monitor files.
+  13. A new setting for the steer lock of a car has been integrated in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings). This is used to normalize the steering angle when importing telemetry data from MoTeC, for example. If this setting is not set, the latest value used in the "Setup Workbench" for this car will be used.
+  14. The announcement of the last lap times of the cars around you by the Spotter has been moved from the "Session Information" group to the "Opponent Information" group and can be enabled/disabled together with ´gap and delta information in the configuration.
+  15. Reduced frequency of superfluous proximity alerts by the Spotter.
   
 ## 5.9.3.0-release 10/11/24
 
@@ -288,7 +302,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	  See the updated [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#color-schemes) for some examples.
   11. A new [controller action functions "speak"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allows you to output spoken messages from your controller scripts.
   12. A new [controller action functions "play"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allows you to play sound files from your controller scripts.
-  13. "speak" and "play" has been added to the [location specific actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#automations) in Track Automation, which let's you put out a spoken message or play a sound file at a given track location. Rally support is coming...
+  13. "speak" and "play" has been added to the [location specific actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track-&-automation) in Track Automation, which let's you put out a spoken message or play a sound file at a given track location. Rally support is coming...
   14. The automated update procedure now asks before a non-release version is installed.
   15. [Internal] Implemented a postprocessor for the compiler which compresses the binary files. The applications are much smaller now.
   16. [Internal] Migrated to AHK 2.1-alpha.14 (needed for dark color scheme).
@@ -2100,7 +2114,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   2. Documentation updates, as always
   3. New options in pitstop rules for always refueling and always changing tyres in strategy simulation.
   4. Introducing Track Automations, which let you automate your car settings like TC and ABS depending on track location.
-     - A new page has been added to "Session Database", which allows you to specify [location specific actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#automations) for a specific simulator / car / track combination.
+     - A new page has been added to "Session Database", which allows you to specify [location specific actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track-&-automation) for a specific simulator / car / track combination.
      - Added the ["TrackAutomation" action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) to the "Race Spotter" plugin which let's you enable or disable location specific actions when you are out on the track.
 	 - New ["enableTrackAutomation", "disableTrackAutomations" and "selectTrackAutomation"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#choosing-between-different-track-automations), which let you control the Track Automations while on the track.
      - Added a new icon to the Stream Deck icon set for the "TrackAutomation" action.

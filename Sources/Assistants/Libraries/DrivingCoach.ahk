@@ -397,7 +397,7 @@ class DrivingCoach extends GridRaceAssistant {
 				}
 			case "Knowledge":
 				if knowledgeBase
-					return substituteVariables(this.Instructions["Knowledge"], {knowledge: JSON.print(this.getKnowledge("Conversation"))})
+					return substituteVariables(this.Instructions["Knowledge"], {knowledge: StrReplace(JSON.print(this.getKnowledge("Conversation")), "%", "\%")})
 			case "Handling":
 				if (knowledgeBase && this.Announcements["HandlingInformation"]) {
 					collector := this.iIssueCollector

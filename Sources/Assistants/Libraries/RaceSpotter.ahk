@@ -837,7 +837,7 @@ class RaceSpotter extends GridRaceAssistant {
 	iOtherCars := CaseInsenseMap()
 	iPositions := CaseInsenseWeakMap()
 
-	iFocusedCar := false
+	iFocusedCar := kUndefined
 
 	iPendingAlerts := []
 	iAlertProcessing := false
@@ -898,14 +898,20 @@ class RaceSpotter extends GridRaceAssistant {
 			speakPhrase(phrase, arguments*) {
 				local assistant := this.VoiceManager.RaceAssistant
 
-				if assistant.skipAlert(phrase)
+				if assistant.skipAlert(phrase) {
+					assistant.cleanupAlerts(phrase)
+
 					return
+				}
 
 				if this.Awaitable {
 					this.wait()
 
-					if assistant.skipAlert(phrase)
+					if assistant.skipAlert(phrase) {
+						assistant.cleanupAlerts(phrase)
+
 						return
+					}
 				}
 
 				super.speakPhrase(phrase, arguments*)
@@ -999,7 +1005,7 @@ class RaceSpotter extends GridRaceAssistant {
 			else {
 				for ignore, candidate in this.PositionInfos
 					if (candidate.Car.Nr = this.iFocusedCar) {
-						this.iFocusedCar := candidate
+						this.FocusedCar := candidate
 
 						return (position ? candidate : candidate.Car.Nr)
 					}
@@ -1258,7 +1264,7 @@ class RaceSpotter extends GridRaceAssistant {
 	noFocusCarRecognized(words) {
 		this.getSpeaker().speakPhrase("Roger")
 
-		this.FocusedCar := false
+		this.FocusedCar := kUndefined
 	}
 
 	updateFocusCar(number) {
@@ -2325,7 +2331,7 @@ class RaceSpotter extends GridRaceAssistant {
 					car := false
 
 					for ignore, candidate in this.getCars()
-						if (knowledgeBase.getValue("Car." . candidate . ".Nr", false) = number) {
+						if (knowledgeBase.getValue("Car." . candidate . ".Nr", "-") = number) {
 							car := candidate
 
 							break
@@ -2689,7 +2695,7 @@ class RaceSpotter extends GridRaceAssistant {
 			if ((focused = standingsAhead) || (focused = standingsBehind))
 				focused := false
 
-			if focused {
+			if (focused && (method >= kDeltaMethodDynamic)) {
 				position := focused.Car.Position["Class"]
 				number := focused.Car.Nr
 				delta := focused.Delta[false, true, 1]
@@ -2806,7 +2812,7 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 		}
 
-		if (!spoken && (this.Session == kSessionRace))
+		if (!spoken && (this.Session == kSessionRace) && ((method = kDeltaMethodStatic) || (method = kDeltaMethodBoth)))
 			if (Random(1, 10) > 8) {
 				rnd := Random(1, focused ? 133 : 100)
 
@@ -2853,8 +2859,8 @@ class RaceSpotter extends GridRaceAssistant {
 
 
 				speaker.speakPhrase("LapTimeDelta", {delta: speaker.number2Speech(Round(Abs(delta), 1))
-												   , relativeYou: fragments[(delta >= 0) ? "Faster" : "Slower"]
-												   , relativeOther: fragments[(delta < 0) ? "Faster" : "Slower"]})
+												   , relativeYou: speaker.Fragments[(delta >= 0) ? "Faster" : "Slower"]
+												   , relativeOther: speaker.Fragments[(delta < 0) ? "Faster" : "Slower"]})
 			}
 			finally {
 				speaker.endTalk()
@@ -2966,8 +2972,31 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
+	cleanupAlerts(alert) {
+		local nextAlert := this.nextAlert()
+
+		switch alert, false {
+			case "Left":
+				if ((nextAlert = "ClearLeft") || (nextAlert = "ClearAll"))
+					this.popAlert()
+			case "ClearLeft":
+				if (nextAlert = "Left")
+					this.popAlert()
+			case "Right":
+				if ((nextAlert = "ClearRight") || (nextAlert = "ClearAll"))
+					this.popAlert()
+			case "ClearRight":
+				if (nextAlert = "Right")
+					this.popAlert()
+		}
+	}
+
 	superfluousAlert(alert) {
 		return (InStr(alert, "AccidentBehind") && this.pendingAlerts(["Behind", "Left", "Right", "Three", "Clear"], true))
+	}
+
+	nextAlert() {
+		return ((this.iPendingAlerts.Length > 0) ? this.iPendingAlerts[1] : false)
 	}
 
 	pushAlert(alert, arguments*) {
@@ -2978,9 +3007,13 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
+	popAlert() {
+		return ((this.iPendingAlerts.Length > 0) ? this.iPendingAlerts.RemoveAt(1) : false)
+	}
+
 	processAlerts(async := true) {
 		local speaker := this.getSpeaker(true)
-		local type, oldPriority, oldAlertProcessing
+		local type, oldPriority, oldAlertProcessing, alert
 
 		if (this.iAlertProcessing || speaker.Speaking)
 			if (this.iPendingAlerts.Length > 0) {
@@ -3006,8 +3039,8 @@ class RaceSpotter extends GridRaceAssistant {
 		speaker.Speaking := true
 
 		try {
-			while (this.iPendingAlerts.Length > 0)
-				speaker.speakPhrase(this.iPendingAlerts.RemoveAt(1)*)
+			while (alert := this.popAlert())
+				speaker.speakPhrase(alert*)
 		}
 		finally {
 			speaker.Speaking := false
@@ -3814,7 +3847,7 @@ class RaceSpotter extends GridRaceAssistant {
 					else
 						sectorTimes := false
 
-					positions[carIndex] := Array(getMultiMapValue(data, "Position Data", prefix . ".Nr", carIndex)
+					positions[carIndex] := Array(getMultiMapValue(data, "Position Data", prefix . ".Nr", "-")
 											   , getMultiMapValue(data, "Position Data", prefix . ".Car", "Unknown")
 											   , this.getClass(carIndex, data)
 											   , driverName(getMultiMapValue(data, "Position Data", prefix . ".Driver.Forname", "John")

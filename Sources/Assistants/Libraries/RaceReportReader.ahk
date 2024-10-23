@@ -232,7 +232,7 @@ class RaceReportReader {
 							classes[carClass].Push(Array(A_Index, position))
 
 						if carNumbers
-							carNumbers.Push(getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Nr"))
+							carNumbers.Push(getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Nr", "-"))
 
 						if carNames
 							carNames.Push(getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Car"))

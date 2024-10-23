@@ -1543,7 +1543,7 @@ class RaceStrategist extends GridRaceAssistant {
 		setMultiMapValue(raceData, "Cars", "Driver", getMultiMapValue(data, "Position Data", "Driver.Car"))
 
 		loop carCount {
-			setMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Nr", getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr"))
+			setMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Nr", getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr", "-"))
 			setMultiMapValue(raceData, "Cars", "Car." . A_Index . ".ID"
 									 , getMultiMapValue(data, "Position Data", "Car." . A_Index . ".ID", A_Index))
 			setMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Position"
@@ -3839,7 +3839,7 @@ class RaceStrategist extends GridRaceAssistant {
 			slots := CaseInsenseMap()
 
 		loop raceInfo["Cars"] {
-			carNr := getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Nr")
+			carNr := getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Nr", "-")
 			carID := getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".ID", A_Index)
 			carPosition := getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Position")
 			carClass := getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Class", "Unknown")
@@ -3875,7 +3875,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 		if duplicateNr
 			loop raceInfo["Cars"] {
-				nrKey := ("#" . getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Nr"))
+				nrKey := ("#" . getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Nr", "-"))
 
 				if raceInfo.Has(nrKey)
 					raceInfo.Delete(nrKey)
@@ -3949,7 +3949,7 @@ class RaceStrategist extends GridRaceAssistant {
 					setMultiMapValue(data, "Cars", "Slots", map2String("|", "->", slots))
 
 				loop carCount {
-					carNr := knowledgeBase.getValue("Car." . A_Index . ".Nr", 0)
+					carNr := knowledgeBase.getValue("Car." . A_Index . ".Nr", "-")
 					carID := knowledgeBase.getValue("Car." . A_Index . ".ID", A_Index)
 
 					carIndex := false
@@ -4118,7 +4118,7 @@ class RaceStrategist extends GridRaceAssistant {
 				if (carID == kUndefined)
 					break
 
-				carNr := knowledgeBase.getValue(carPrefix . ".Nr", kUndefined)
+				carNr := knowledgeBase.getValue(carPrefix . ".Nr", "-")
 
 				carIndex := false
 

@@ -422,7 +422,7 @@ class TyresDatabase extends SessionDatabase {
 	}
 
 	updatePressures(simulator, car, track, weather, airTemperature, trackTemperature
-				  , compound, compoundColor, coldPressures, hotPressures, flush := true, driver := false) {
+				  , compound, compoundColor, coldPressures, hotPressures, flush := true, driver := false, retry := 100) {
 		local db, tyres, types, typeIndex, tPressures, tyreIndex, pressure
 
 		if !driver
@@ -445,7 +445,7 @@ class TyresDatabase extends SessionDatabase {
 												 , "Tyre.Pressure.Hot.Front.Right", valueOrNull(hotPressures[2])
 												 , "Tyre.Pressure.Hot.Rear.Left", valueOrNull(hotPressures[3])
 												 , "Tyre.Pressure.Hot.Rear.Right", valueOrNull(hotPressures[4]))
-										  , flush)
+									, flush, retry)
 
 			tyres := ["FL", "FR", "RL", "RR"]
 			types := ["Cold", "Hot"]
@@ -453,10 +453,13 @@ class TyresDatabase extends SessionDatabase {
 			for typeIndex, tPressures in [coldPressures, hotPressures]
 				for tyreIndex, pressure in tPressures
 					this.updatePressure(simulator, car, track, weather, Round(airTemperature), Round(trackTemperature), compound, compoundColor
-									  , types[typeIndex], tyres[tyreIndex], pressure, 1, false, false, "User", driver)
+									  , types[typeIndex], tyres[tyreIndex], pressure, 1, false, false, "User", driver, retry)
 		}
 		catch Any as exception {
-			logError(exception, true)
+			if retry
+				logError(exception, true)
+			else
+				throw exception
 		}
 		finally {
 			if flush
@@ -468,7 +471,7 @@ class TyresDatabase extends SessionDatabase {
 	}
 
 	updatePressure(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
-				 , type, tyre, pressure, count := 1, flush := true, require := true, scope := "User", driver := false) {
+				 , type, tyre, pressure, count := 1, flush := true, require := true, scope := "User", driver := false, retry := 100) {
 		local db, rows, row
 
 		if (isNull(valueOrNull(pressure)))
@@ -489,10 +492,10 @@ class TyresDatabase extends SessionDatabase {
 		pressure := Round(pressure, 1)
 
 		rows := db.query("Tyres.Pressures.Distribution"
-							 , {Where: Map("Driver", driver, "Weather", weather
-										 , "Temperature.Air", Round(airTemperature), "Temperature.Track", Round(trackTemperature)
-										 , "Compound", compound, "Compound.Color", compoundColor
-										 , "Type", type, "Tyre", tyre, "Pressure", pressure)})
+					   , {Where: Map("Driver", driver, "Weather", weather
+								   , "Temperature.Air", Round(airTemperature), "Temperature.Track", Round(trackTemperature)
+								   , "Compound", compound, "Compound.Color", compoundColor
+								   , "Type", type, "Tyre", tyre, "Pressure", pressure)})
 
 		if (rows.Length > 0) {
 			row := rows[1]
@@ -515,10 +518,14 @@ class TyresDatabase extends SessionDatabase {
 					 , Database.Row("Driver", driver, "Weather", weather
 								  , "Temperature.Air", Round(airTemperature), "Temperature.Track", Round(trackTemperature)
 								  , "Compound", compound, "Compound.Color", compoundColor
-								  , "Type", type, "Tyre", tyre, "Pressure", pressure, "Count", count))
+								  , "Type", type, "Tyre", tyre, "Pressure", pressure, "Count", count)
+					 , false, retry)
 			}
 			catch Any as exception {
-				logError(exception, true)
+				if retry
+					logError(exception, true)
+				else
+					throw exception
 			}
 	}
 

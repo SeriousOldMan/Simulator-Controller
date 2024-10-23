@@ -57,7 +57,7 @@ global kSetupNames := CaseInsenseMap("DQ", "Qualifying (Dry)", "DR", "Race (Dry)
 ;;;                   Private Constant Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global gActionInfoEnabled := true
+global gPositionInfoEnabled := true
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -96,7 +96,15 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	iStrategyListView := false
 	iSetupListView := false
 	iAdministrationListView := false
+	iTrackSectionsListView := false
 	iTrackAutomationsListView := false
+
+	iTrackEditorMode := "Automations"
+
+	iTrackSectionsWidgets := []
+	iTrackAutomationsWidgets := []
+
+	iTrackSections := []
 
 	iTrackAutomations := []
 	iSelectedTrackAutomation := false
@@ -176,7 +184,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				this.iRedraw := false
 
-				if (editor.SelectedModule = "Automation")
+				if (editor.SelectedModule = "Track")
 					editor.updateTrackMap()
 
 				WinRedraw(this.Window)
@@ -324,6 +332,16 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 	}
 
+	TrackSections[key?] {
+		Get {
+			return (isSet(key) ? this.iTrackSections[key] : this.iTrackSections)
+		}
+
+		Set {
+			return (isSet(key) ? (this.iTrackSections[key] := value) : (this.iTrackSections := value))
+		}
+	}
+
 	TrackAutomations[key?] {
 		Get {
 			return (isSet(key) ? this.iTrackAutomations[key] : this.iTrackAutomations)
@@ -349,6 +367,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	TrackImage {
 		Get {
 			return this.iTrackImage
+		}
+	}
+
+	TrackEditorMode {
+		Get {
+			return this.iTrackEditorMode
+		}
+	}
+
+	TrackSectionsListView {
+		Get {
+			return this.iTrackSectionsListView
 		}
 	}
 
@@ -954,10 +984,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				WindowTask(editor.Window, ObjBindMethod(editor, "openPressuresEditor"), 100).start()
 		}
 
-		selectTrackAction(*) {
+		selectTrackPoint(*) {
 			local coordinateX := false
 			local coordinateY := false
 			local action := false
+			local section := false
 			local x, y, originalX, originalY, currentX, currentY, msgResult
 
 			MouseGetPos(&x, &y)
@@ -966,54 +997,108 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			y := screen2Window(y)
 
 			if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1], y - editor.iTrackDisplayArea[2], &coordinateX, &coordinateY) {
-				action := editor.findTrackAction(coordinateX, coordinateY)
+				if (this.TrackEditorMode = "Automations") {
+					action := editor.findTrackAction(coordinateX, coordinateY)
 
-				if action {
-					if GetKeyState("Ctrl") {
-						OnMessage(0x44, translateYesNoButtons)
-						msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected action?"), translate("Delete"), 262436)
-						OnMessage(0x44, translateYesNoButtons, 0)
+					if action {
+						if GetKeyState("Ctrl") {
+							OnMessage(0x44, translateYesNoButtons)
+							msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected action?"), translate("Delete"), 262436)
+							OnMessage(0x44, translateYesNoButtons, 0)
 
-						if (msgResult = "Yes")
-							editor.deleteTrackAction(action)
-					}
-					else {
-						originalX := action.X
-						originalY := action.Y
-
-						while (GetKeyState("LButton")) {
-							MouseGetPos(&x, &y)
-
-							x := screen2Window(x)
-							y := screen2Window(y)
-
-							if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1], y - editor.iTrackDisplayArea[2], &coordinateX, &coordinateY) {
-								action.X := coordinateX
-								action.Y := coordinateY
-
-								editor.updateTrackMap()
-							}
-						}
-
-						currentX := action.X
-						currentY := action.Y
-
-						action.X := originalX
-						action.Y := originalY
-
-						if (editor.findTrackAction(currentX, currentY) == action) {
-							editor.updateTrackMap()
-
-							editor.actionClicked(originalX, originalY, action)
+							if (msgResult = "Yes")
+								editor.deleteTrackAction(action)
 						}
 						else {
-							action.X := currentX
-							action.Y := currentY
+							originalX := action.X
+							originalY := action.Y
+
+							while (GetKeyState("LButton")) {
+								MouseGetPos(&x, &y)
+
+								x := screen2Window(x)
+								y := screen2Window(y)
+
+								if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1], y - editor.iTrackDisplayArea[2], &coordinateX, &coordinateY) {
+									action.X := coordinateX
+									action.Y := coordinateY
+
+									editor.updateTrackMap()
+								}
+							}
+
+							currentX := action.X
+							currentY := action.Y
+
+							action.X := originalX
+							action.Y := originalY
+
+							if (editor.findTrackAction(currentX, currentY) == action) {
+								editor.updateTrackMap()
+
+								editor.actionClicked(originalX, originalY, action)
+							}
+							else {
+								action.X := currentX
+								action.Y := currentY
+							}
 						}
 					}
+					else
+						editor.trackClicked(coordinateX, coordinateY)
 				}
-				else
-					editor.trackClicked(coordinateX, coordinateY)
+				else {
+					section := editor.findTrackSection(coordinateX, coordinateY)
+
+					if section {
+						if GetKeyState("Ctrl") {
+							OnMessage(0x44, translateYesNoButtons)
+							msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected section?"), translate("Delete"), 262436)
+							OnMessage(0x44, translateYesNoButtons, 0)
+
+							if (msgResult = "Yes")
+								editor.deleteTrackSection(section)
+						}
+						else {
+							originalX := section.X
+							originalY := section.Y
+
+							while (GetKeyState("LButton")) {
+								MouseGetPos(&x, &y)
+
+								x := screen2Window(x)
+								y := screen2Window(y)
+
+								if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1], y - editor.iTrackDisplayArea[2], &coordinateX, &coordinateY) {
+									section.X := coordinateX
+									section.Y := coordinateY
+
+									editor.updateTrackMap()
+								}
+							}
+
+							currentX := section.X
+							currentY := section.Y
+
+							section.X := originalX
+							section.Y := originalY
+
+							if (editor.findTrackSection(currentX, currentY) == section) {
+								editor.updateTrackMap()
+
+								editor.sectionClicked(originalX, originalY, section)
+							}
+							else {
+								section.X := currentX
+								section.Y := currentY
+
+								this.updateTrackSections()
+							}
+						}
+					}
+					else
+						editor.trackClicked(coordinateX, coordinateY)
+				}
 			}
 		}
 
@@ -1312,6 +1397,16 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			messageSend(kFileMessage, "Setup", "setTyrePressures:" . values2String(";", compound, compoundColor, tyrePressures*), editor.RequestorPID)
 		}
 
+		chooseTrackEditorMode(*) {
+			if (editorGui["trackEditorTypeDropDown"].Value = 2)
+				this.iTrackEditorMode := "Automations"
+			else
+				this.iTrackEditorMode := "Sections"
+
+			this.updateTrackMap()
+			this.updateState()
+		}
+
 		testSettings(*) {
 			local exePath := kBinariesDirectory . "Race Settings.exe"
 			local fileName := kTempDirectory . "Temp.settings"
@@ -1443,6 +1538,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
+		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg7", this.themeIcon(kIconsDirectory . "Automation.ico")).OnEvent("Click", chooseTab.Bind("Track"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 W:Grow(0.2) vsettingsTab7", translate("Track && Automation")).OnEvent("Click", chooseTab.Bind("Track"))
+
+		editorGui.Add("Text", "x16 yp+32 w267 W:Grow(0.2) 0x10")
+
+		editorGui.SetFont("Norm")
+		editorGui.SetFont("s10 Bold", "Arial")
+
 		editorGui.Add("Picture", "x16 yp+12 w30 h30 vsettingsImg2", this.themeIcon(kIconsDirectory . "Sessions.ico")).OnEvent("Click", chooseTab.Bind("Sessions"))
 		editorGui.Add("Text", "x50 yp+5 w220 h26 W:Grow(0.2) vsettingsTab2", translate("Sessions")).OnEvent("Click", chooseTab.Bind("Sessions"))
 
@@ -1483,14 +1586,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg7", this.themeIcon(kIconsDirectory . "Road.ico")).OnEvent("Click", chooseTab.Bind("Automation"))
-		editorGui.Add("Text", "x50 yp+5 w220 h26 W:Grow(0.2) vsettingsTab7", translate("Automations")).OnEvent("Click", chooseTab.Bind("Automation"))
-
-		editorGui.Add("Text", "x16 yp+32 w267 W:Grow(0.2) 0x10")
-
-		editorGui.SetFont("Norm")
-		editorGui.SetFont("s10 Bold", "Arial")
-
 		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg8", this.themeIcon(kIconsDirectory . "Sensor.ico")).OnEvent("Click", chooseTab.Bind("Data"))
 		editorGui.Add("Text", "x50 yp+5 w220 h26 W:Grow(0.2) vsettingsTab8", translate("Administration")).OnEvent("Click", chooseTab.Bind("Data"))
 
@@ -1500,7 +1595,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui.Add("Picture", "x280 ys-2 w390 h554 Border X:Move(0.2) W:Grow(0.8) H:Grow")
 
-		tabs := collect(["Settings", "Session", "Laps", "Stratgies", "Setups", "Pressures", "Automation", "Data"], translate)
+		tabs := collect(["Settings", "Track", "Session", "Laps", "Stratgies", "Setups", "Pressures", "Data"], translate)
 
 		editorGui.Add("Tab2", "x296 ys+16 w0 h0 -Wrap Section vsettingsTab", tabs)
 
@@ -1677,29 +1772,41 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui["settingsTab"].UseTab(7)
 
-		this.iTrackDisplayArea := [297, 239, 358, 350]
+		editorGui.Add("Text", "x296 ys w80 h23 +0x200 X:Move(0.2)", translate("Edit"))
+		editorGui.Add("DropDownList", "xp+90 yp w270 X:Move(0.2) W:Grow(0.8) Choose2 vtrackEditorTypeDropDown"
+					, collect(["Sections", "Automations"], translate)).OnEvent("Change", chooseTrackEditorMode)
 
-		editorGui.Add("Picture", "x296 y238 w360 h382 X:Move(0.2) W:Grow(0.8) H:Grow(0.9) Border vtrackDisplayArea")
+		this.iTrackDisplayArea := [297, 263, 358, 326]
+
+		editorGui.Add("Picture", "x296 yp+24 w360 h358 X:Move(0.2) W:Grow(0.8) H:Grow(0.9) Border vtrackDisplayArea")
 		this.iTrackDisplay := editorGui.Add("Picture", "x297 y239 BackgroundTrans vtrackDisplay")
-		this.iTrackDisplay.OnEvent("Click", selectTrackAction)
+		this.iTrackDisplay.OnEvent("Click", selectTrackPoint)
 
 		this.iTrackAutomationsListView := editorGui.Add("ListView", "x296 y627 w110 h142 Y:Move(0.9) X:Move(0.2) W:Grow(0.2) H:Grow(0.1) -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Name", "#"], translate))
 		this.iTrackAutomationsListView.OnEvent("Click", selectTrackAutomation)
 		this.iTrackAutomationsListView.OnEvent("DoubleClick", selectTrackAutomation)
 		this.iTrackAutomationsListView.OnEvent("ItemSelect", navTrackAutomation)
 
-		editorGui.Add("Text", "x415 yp w60 h23 Y:Move(0.9) X:Move(0.8) +0x200", translate("Name"))
-		editorGui.Add("Edit", "xp+60 yp w109 Y:Move(0.9) X:Move(0.8) W:Grow(0.2) vtrackAutomationNameEdit")
+		this.iTrackSectionsListView := editorGui.Add("ListView", "xp yp w360 h142 Y:Move(0.9) X:Move(0.2) W:Grow(0.8) H:Grow(0.1) Hidden -Multi -LV0x10 AltSubmit NoSort NoSortHdr", [translate("Nr."), translate("Section"), translate("Length") . translate(" (") . translate(getUnit("Length")) . translate(")"), translate("X"), translate("Y")])
 
-		editorGui.Add("Button", "x584 yp w23 h23 Y:Move(0.9) X:Move vaddTrackAutomationButton").OnEvent("Click", addTrackAutomation)
-		editorGui.Add("Button", "xp+25 yp w23 h23 Y:Move(0.9) X:Move vdeleteTrackAutomationButton").OnEvent("Click", deleteTrackAutomation)
-		editorGui.Add("Button", "xp+25 yp w23 h23 Y:Move(0.9) X:Move Center +0x200 vsaveTrackAutomationButton").OnEvent("Click", saveTrackAutomation)
+		widget1 := editorGui.Add("Text", "x415 yp w60 h23 Y:Move(0.9) X:Move(0.8) +0x200", translate("Name"))
+		widget2 := editorGui.Add("Edit", "xp+60 yp w109 Y:Move(0.9) X:Move(0.8) W:Grow(0.2) vtrackAutomationNameEdit")
+
+		widget3 := editorGui.Add("Button", "x584 yp w23 h23 Y:Move(0.9) X:Move vaddTrackAutomationButton")
+		widget3.OnEvent("Click", addTrackAutomation)
+		widget4 := editorGui.Add("Button", "xp+25 yp w23 h23 Y:Move(0.9) X:Move vdeleteTrackAutomationButton")
+		widget4.OnEvent("Click", deleteTrackAutomation)
+		widget5 := editorGui.Add("Button", "xp+25 yp w23 h23 Y:Move(0.9) X:Move Center +0x200 vsaveTrackAutomationButton")
+		widget5.OnEvent("Click", saveTrackAutomation)
 		setButtonIcon(editorGui["addTrackAutomationButton"], kIconsDirectory . "Plus.ico", 1)
 		setButtonIcon(editorGui["deleteTrackAutomationButton"], kIconsDirectory . "Minus.ico", 1)
 		setButtonIcon(editorGui["saveTrackAutomationButton"], kIconsDirectory . "Save.ico", 1, "L5 T5 R5 B5")
 
-		editorGui.Add("Text", "x415 yp+24 w60 h23 Y:Move(0.9) X:Move(0.8) +0x200", translate("Actions"))
-		editorGui.Add("Edit", "xp+60 yp w181 h118 Y:Move(0.9) X:Move(0.8) W:Grow(0.2) H:Grow(0.1) ReadOnly -Wrap vtrackAutomationInfoEdit")
+		widget6 := editorGui.Add("Text", "x415 yp+24 w60 h23 Y:Move(0.9) X:Move(0.8) +0x200", translate("Actions"))
+		widget7 := editorGui.Add("Edit", "xp+60 yp w181 h118 Y:Move(0.9) X:Move(0.8) W:Grow(0.2) H:Grow(0.1) ReadOnly -Wrap vtrackAutomationInfoEdit")
+
+		this.iTrackAutomationsWidgets := [this.TrackAutomationsListView, widget1, widget2, widget3, widget4, widget5, widget6, widget7]
+		this.iTrackSectionsWidgets := [this.TrackSectionsListView]
 
 		editorGui["settingsTab"].UseTab(8)
 
@@ -1740,19 +1847,21 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local window := this.Window
 		local x, y, w, h
 
-		showActionInfo(*) {
-			global gActionInfoEnabled
+		showPositionInfo(*) {
+			global gPositionInfoEnabled
 
 			local x, y, coordinateX, coordinateY, window
 
 			static currentAction := false
 			static previousAction := false
-			static actionInfo := ""
+			static currentSection := false
+			static previousSection := false
+			static positionInfo := ""
 
 			displayToolTip() {
 				SetTimer(displayToolTip, 0)
 
-				ToolTip(actionInfo)
+				ToolTip(positionInfo)
 
 				SetTimer(removeToolTip, 10000)
 			}
@@ -1763,7 +1872,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				ToolTip()
 			}
 
-			if ((this.SelectedModule = "Automation") && gActionInfoEnabled) {
+			if ((this.SelectedModule = "Track") && gPositionInfoEnabled) {
 				MouseGetPos(&x, &y)
 
 				x := screen2Window(x)
@@ -1773,47 +1882,90 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				coordinateY := false
 
 				if this.findTrackCoordinate(x - this.iTrackDisplayArea[1], y - this.iTrackDisplayArea[2], &coordinateX, &coordinateY) {
-					currentAction := this.findTrackAction(coordinateX, coordinateY)
+					if (this.TrackEditorMode = "Automations") {
+						previousSection := false
 
-					if !currentAction
-						currentAction := (coordinateX . ";" . coordinateY)
+						currentAction := this.findTrackAction(coordinateX, coordinateY)
 
-					if (currentAction && (currentAction != previousAction)) {
-						ToolTip()
+						if !currentAction
+							currentAction := (coordinateX . ";" . coordinateY)
 
-						if isObject(currentAction) {
-							switch currentAction.Type, false {
-								case "Hotkey":
-									actionInfo := translate(InStr(currentAction.Action, "|") ? "Hotkey(s): " : "Hotkey: ")
-								case "Command":
-									actionInfo := translate("Command: ")
-								case "Speech":
-									actionInfo := translate("Speech: ")
-								case "Audio":
-									actionInfo := translate("Audio: ")
-								default:
-									throw "Unknown action type detected in SessionDatabaseEditor.show..."
+						if (currentAction && (currentAction != previousAction)) {
+							ToolTip()
+
+							if isObject(currentAction) {
+								switch currentAction.Type, false {
+									case "Hotkey":
+										positionInfo := translate(InStr(currentAction.Action, "|") ? "Hotkey(s): " : "Hotkey: ")
+									case "Command":
+										positionInfo := translate("Command: ")
+									case "Speech":
+										positionInfo := translate("Speech: ")
+									case "Audio":
+										positionInfo := translate("Audio: ")
+									default:
+										throw "Unknown action type detected in SessionDatabaseEditor.show..."
+								}
+
+								positionInfo := (inList(this.SelectedTrackAutomation.Actions, currentAction) . translate(": ")
+											   . (Round(currentAction.X, 3) . translate(", ") . Round(currentAction.Y, 3))
+											   . translate(" -> ")
+											   . positionInfo . currentAction.Action)
 							}
+							else
+								positionInfo := (Round(string2Values(";", currentAction)[1], 3) . translate(", ") . Round(string2Values(";", currentAction)[2], 3))
 
-							actionInfo := (inList(this.SelectedTrackAutomation.Actions, currentAction) . translate(": ")
-										 . (Round(currentAction.X, 3) . translate(", ") . Round(currentAction.Y, 3))
-										 . translate(" -> ")
-										 . actionInfo . currentAction.Action)
+							SetTimer(removeToolTip, 0)
+							SetTimer(displayToolTip, 1000)
+
+							previousAction := currentAction
 						}
-						else
-							actionInfo := (Round(string2Values(";", currentAction)[1], 3) . translate(", ") . Round(string2Values(";", currentAction)[2], 3))
+						else if !currentAction {
+							ToolTip()
 
-						SetTimer(removeToolTip, 0)
-						SetTimer(displayToolTip, 1000)
+							SetTimer(removeToolTip, 0)
 
-						previousAction := currentAction
+							previousAction := false
+						}
 					}
-					else if !currentAction {
-						ToolTip()
-
-						SetTimer(removeToolTip, 0)
-
+					else {
 						previousAction := false
+
+						currentSection := this.findTrackSection(coordinateX, coordinateY)
+
+						if !currentSection
+							currentSection := (coordinateX . ";" . coordinateY)
+
+						if (currentSection && (currentSection != previousSection)) {
+							ToolTip()
+
+							if isObject(currentSection) {
+								switch currentSection.Type, false {
+									case "Corner":
+										positionInfo := translate("Corner: ")
+									case "Straight":
+										positionInfo := translate("Straight: ")
+									default:
+										throw "Unknown section type detected in SessionDatabaseEditor.show..."
+								}
+
+								positionInfo .= (Round(currentSection.X, 3) . translate(", ") . Round(currentSection.Y, 3))
+							}
+							else
+								positionInfo := (Round(string2Values(";", currentSection)[1], 3) . translate(", ") . Round(string2Values(";", currentSection)[2], 3))
+
+							SetTimer(removeToolTip, 0)
+							SetTimer(displayToolTip, 1000)
+
+							previousSection := currentSection
+						}
+						else if !currentSection {
+							ToolTip()
+
+							SetTimer(removeToolTip, 0)
+
+							previousSection := false
+						}
 					}
 				}
 				else {
@@ -1822,6 +1974,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					SetTimer(removeToolTip, 0)
 
 					previousAction := false
+					previousSection := false
 				}
 			}
 		}
@@ -1839,7 +1992,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		else
 			this.selectModule("Settings")
 
-		OnMessage(0x0200, showActionInfo)
+		OnMessage(0x0200, showPositionInfo)
 	}
 
 	themeIcon(fileName) {
@@ -1899,7 +2052,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local window := this.Window
 		local sessionDB := this.SessionDatabase
 		local simulator, car, track, selected, selectedEntries, row, type
-		local name, info, index, driver
+		local name, info, index, driver, ignore, widget
 
 		simulator := this.SelectedSimulator
 		car := this.SelectedCar
@@ -1920,6 +2073,17 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			window["settingsImg1"].Enabled := false
 			window["settingsImg1"].Value := this.themeIcon(kIconsDirectory . "General Settings Gray.ico")
 			window["settingsTab1"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
+		}
+
+		if this.moduleAvailable("Track") {
+			window["settingsImg7"].Enabled := true
+			window["settingsImg7"].Value := this.themeIcon(kIconsDirectory . "Automation.ico")
+			window["settingsTab7"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
+		}
+		else {
+			window["settingsImg7"].Enabled := false
+			window["settingsImg7"].Value := this.themeIcon(kIconsDirectory . "Automation Gray.ico")
+			window["settingsTab7"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
 		if this.moduleAvailable("Sessions") {
@@ -1977,17 +2141,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			window["settingsTab6"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
 		}
 
-		if this.moduleAvailable("Automation") {
-			window["settingsImg7"].Enabled := true
-			window["settingsImg7"].Value := this.themeIcon(kIconsDirectory . "Road.ico")
-			window["settingsTab7"].SetFont("s10 Bold c" . window.Theme.TextColor["Disabled"], "Arial")
-		}
-		else {
-			window["settingsImg7"].Enabled := false
-			window["settingsImg7"].Value := this.themeIcon(kIconsDirectory . "Road Gray.ico")
-			window["settingsTab7"].SetFont("s10 Bold c" . window.Theme.TextColor["Unavailable"], "Arial")
-		}
-
 		if this.moduleAvailable("Data") {
 			window["settingsImg8"].Enabled := true
 			window["settingsImg8"].Value := this.themeIcon(kIconsDirectory . "Sensor.ico")
@@ -2035,7 +2188,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 							break
 						}
-			case "Automation":
+			case "Track":
 				window["settingsTab7"].SetFont("s10 Bold c" . window.Theme.TextColor, "Arial")
 
 				window["settingsTab"].Choose(7)
@@ -2299,6 +2452,21 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			window["dataSelectCheck"].Value := 0
 
 		window["addTrackAutomationButton"].Enabled := true
+
+		if (this.TrackEditorMode = "Automations") {
+			for ignore, widget in this.iTrackAutomationsWidgets
+				widget.Visible := true
+
+			for ignore, widget in this.iTrackSectionsWidgets
+				widget.Visible := false
+		}
+		else {
+			for ignore, widget in this.iTrackAutomationsWidgets
+				widget.Visible := false
+
+			for ignore, widget in this.iTrackSectionsWidgets
+				widget.Visible := true
+		}
 
 		if this.SelectedTrackAutomation {
 			window["trackAutomationNameEdit"].Enabled := true
@@ -2878,13 +3046,46 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.loadSettings()
 	}
 
+	getTrackCoordinateIndex(x, y, threshold := 5) {
+		local trackMap := this.TrackMap
+		local index := false
+		local candidateX, candidateY, deltaX, deltaY, coordX, coordY, dX, dY
+
+		if trackMap {
+			candidateX := kUndefined
+			candidateY := false
+			deltaX := false
+			deltaY := false
+
+			loop getMultiMapValue(trackMap, "Map", "Points") {
+				coordX := getMultiMapValue(trackMap, "Points", A_Index . ".X")
+				coordY := getMultiMapValue(trackMap, "Points", A_Index . ".Y")
+
+				dX := Abs(coordX - x)
+				dY := Abs(coordY - y)
+
+				if ((dX <= threshold) && (dY <= threshold) && ((candidateX == kUndefined) || ((dx + dy) < (deltaX + deltaY)))) {
+					candidateX := coordX
+					candidateY := coordY
+					deltaX := dX
+					deltaY := dY
+
+					index := A_Index
+				}
+			}
+
+			return index
+		}
+		else
+			return false
+	}
+
 	findTrackCoordinate(x, y, &coordinateX, &coordinateY, threshold := 40) {
 		local trackMap := this.TrackMap
-		local trackImage := this.TrackImage
 		local scale, offsetX, offsetY, marginX, marginY, width, height, imgWidth, imgHeight, imgScale
 		local candidateX, candidateY, deltaX, deltaY, coordX, coordY, dX, dY
 
-		if (this.SelectedTrackAutomation && trackMap && trackImage) {
+		if trackMap {
 			scale := getMultiMapValue(trackMap, "Map", "Scale")
 
 			offsetX := getMultiMapValue(trackMap, "Map", "Offset.X")
@@ -2944,11 +3145,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	findTrackAction(coordinateX, coordinateY, threshold := 40) {
 		local trackMap := this.TrackMap
-		local trackImage := this.TrackImage
 		local candidate, deltaX, deltaY, dX, dY
 		local index, action
 
-		if (this.SelectedTrackAutomation && trackMap && trackImage) {
+		if ((this.TrackEditorMode = "Automations") && this.SelectedTrackAutomation && trackMap) {
 			candidate := false
 			deltaX := false
 			deltaY := false
@@ -2973,9 +3173,39 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			return false
 	}
 
+	findTrackSection(coordinateX, coordinateY, threshold := 40) {
+		local trackMap := this.TrackMap
+		local candidate, deltaX, deltaY, dX, dY
+		local index, section
+
+		if ((this.TrackEditorMode = "Sections") && trackMap) {
+			candidate := false
+			deltaX := false
+			deltaY := false
+
+			threshold := (threshold / getMultiMapValue(trackMap, "Map", "Scale"))
+
+			for index, section in this.TrackSections {
+				dX := Abs(coordinateX - section.X)
+				dY := Abs(coordinateY - section.Y)
+
+				if ((dX <= threshold) && (dY <= threshold) && (!candidate || ((dX + dy) < (deltaX + deltaY)))) {
+					candidate := section
+
+					deltaX := dx
+					deltaY := dy
+				}
+			}
+
+			return candidate
+		}
+		else
+			return false
+	}
+
 	trackClicked(coordinateX, coordinateY) {
 		local oldCoordMode := A_CoordModeMouse
-		local x, y, action
+		local x, y, action, section
 
 		CoordMode("Mouse", "Screen")
 
@@ -2986,13 +3216,25 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		CoordMode("Mouse", oldCoordMode)
 
-		action := actionDialog(x, y)
+		if (this.TrackEditorMode = "Automations") {
+			action := actionDialog(x, y)
 
-		if action {
-			action.X := coordinateX
-			action.Y := coordinateY
+			if action {
+				action.X := coordinateX
+				action.Y := coordinateY
 
-			this.addTrackAction(action)
+				this.addTrackAction(action)
+			}
+		}
+		else {
+			section := sectionDialog(x, y)
+
+			if section {
+				section.X := coordinateX
+				section.Y := coordinateY
+
+				this.addTrackSection(section)
+			}
 		}
 	}
 
@@ -3012,7 +3254,145 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		action := actionDialog(x, y, action)
 
 		if action
-			this.updateTrackAction(action)
+			this.updateTrackSction(action)
+	}
+
+	sectionClicked(coordinateX, coordinateY, section) {
+		local oldCoordMode := A_CoordModeMouse
+		local x, y
+
+		CoordMode("Mouse", "Screen")
+
+		MouseGetPos(&x, &y)
+
+		x := screen2Window(x)
+		y := screen2Window(y)
+
+		CoordMode("Mouse", oldCoordMode)
+
+		section := sectionDialog(x, y, section)
+
+		if section
+			this.updateTrackSection(section)
+	}
+
+	addTrackSection(section) {
+		this.TrackSections.Push(section)
+
+		this.updateTrackSections()
+		this.updateTrackMap()
+	}
+
+	updateTrackSection(section) {
+		local index, candidate
+
+		for index, candidate in this.TrackSections
+			if ((section.X = candidate.X) && (section.Y = candidate.Y)) {
+				this.TrackSections[index] := section
+
+				this.updateTrackSections()
+				this.updateTrackMap()
+
+				break
+			}
+	}
+
+	deleteTrackSection(section) {
+		local index, candidate
+
+		for index, candidate in this.TrackSections
+			if ((section.X = candidate.X) && (section.Y = candidate.Y)) {
+				this.TrackSections.RemoveAt(index)
+
+				this.updateTrackSections()
+				this.updateTrackMap()
+
+				break
+			}
+	}
+
+	updateTrackSections(save := true) {
+		local straights := 0
+		local corners := 0
+		local sections, index, section
+
+		computeLength(index) {
+			local next := ((index = this.TrackSections.Length) ? 1 : (index + 1))
+			local distance := 0
+			local count := getMultiMapValue(this.TrackMap, "Map", "Points", 0)
+			local lastX, lastY, nextX, nextY
+
+			index := this.getTrackCoordinateIndex(this.TrackSections[index].X, this.TrackSections[index].Y)
+			next := this.getTrackCoordinateIndex(this.TrackSections[next].X, this.TrackSections[next].Y)
+
+			if (index && next) {
+				lastX := getMultiMapValue(this.TrackMap, "Points", index . ".X", 0)
+				lastY := getMultiMapValue(this.TrackMap, "Points", index . ".Y", 0)
+
+				index += 1
+
+				loop
+					if (index = next)
+						break
+					else if (index > count)
+						index := 1
+					else {
+						nextX := getMultiMapValue(this.TrackMap, "Points", index . ".X", 0)
+						nextY := getMultiMapValue(this.TrackMap, "Points", index . ".Y", 0)
+
+						distance += Sqrt(((nextX - lastX) ** 2) + ((nextY - lastY) ** 2))
+
+						lastX := nextX
+						lastY := nextY
+
+						index += 1
+					}
+				}
+
+			return Round(convertUnit("Length", distance))
+		}
+
+		sections := this.TrackSections
+
+		this.TrackSectionsListView.Delete()
+
+		for index, section in sections
+			section.Index := this.getTrackCoordinateIndex(section.X, section.Y)
+
+		bubbleSort(&sections,  (a, b) => (a.Index > b.Index))
+
+		for index, section in this.TrackSections {
+			section.Nr := ((section.Type = "Corner") ? ++corners : ++straights)
+
+			this.TrackSectionsListView.Add("", section.Nr, translate(section.Type), computeLength(index), Round(section.X), Round(section.Y))
+		}
+
+		this.TrackSectionsListView.ModifyCol()
+		loop 4
+			this.TrackSectionsListView.ModifyCol(A_Index, "AutoHdr")
+
+		if (save && this.TrackMap) {
+			sections := this.TrackSections.Clone()
+
+			Task.startTask(() {
+				local index, section
+
+				removeMultiMapValues(this.TrackMap, "Sections")
+
+				setMultiMapValue(this.TrackMap, "Sections", "Count", this.TrackSections.Length)
+
+				for index, section in sections {
+					setMultiMapValue(this.TrackMap, "Sections", index . ".Nr", section.Nr)
+					setMultiMapValue(this.TrackMap, "Sections", index . ".Type", section.Type)
+					setMultiMapValue(this.TrackMap, "Sections", index . ".Index", section.Index)
+					setMultiMapValue(this.TrackMap, "Sections", index . ".X", section.X)
+					setMultiMapValue(this.TrackMap, "Sections", index . ".Y", section.Y)
+				}
+
+				this.SessionDatabase.updateTrackMap(this.SelectedSimulator, this.SelectedTrack
+												  , this.TrackMap)
+			}, 0, kLowPriority)
+		}
 	}
 
 	addTrackAction(action) {
@@ -3157,7 +3537,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.TrackAutomationsListView.ModifyCol(A_Index, "AutoHdr")
 
 		this.loadTrackMap(this.SessionDatabase.getTrackMap(this.SelectedSimulator, this.SelectedTrack)
-														 , this.SessionDatabase.getTrackImage(this.SelectedSimulator, this.SelectedTrack))
+						, this.SessionDatabase.getTrackImage(this.SelectedSimulator, this.SelectedTrack))
 
 		this.updateState()
 	}
@@ -3180,7 +3560,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local imgWidth := ((getMultiMapValue(trackMap, "Map", "Width") + (2 * marginX)) * scale)
 		local imgHeight := ((getMultiMapValue(trackMap, "Map", "Height") + (2 * marginY)) * scale)
 		local x, y, w, h, imgScale, deltaX, deltaY
-		local token, bitmap, graphics, brushHotkey, brushCommand, r, ignore, action, imgX, imgY, trackImage
+		local token, bitmap, graphics, brushHotkey, brushCommand, brishStart, brushCorner, brushStraight, r
+		local ignore, action, section, imgX, imgY, trackImage
 
 		ControlGetPos(&x, &y, &w, &h, this.Control["trackDisplayArea"])
 
@@ -3191,7 +3572,43 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		imgScale := Min(w / imgWidth, h / imgHeight)
 
-		if actions {
+		if (this.TrackEditorMode = "Automations") {
+			if actions {
+				token := Gdip_Startup()
+
+				bitmap := Gdip_CreateBitmapFromFile(trackImage)
+
+				graphics := Gdip_GraphicsFromImage(bitmap)
+
+				Gdip_SetSmoothingMode(graphics, 4)
+
+				brushHotkey := Gdip_BrushCreateSolid(0xff00ff00)
+				brushCommand := Gdip_BrushCreateSolid(0xffff0000)
+
+				r := Round(15 / (imgScale * 3))
+
+				for ignore, action in actions {
+					imgX := Round((marginX + offsetX + action.X) * scale)
+					imgY := Round((marginX + offsetY + action.Y) * scale)
+
+					Gdip_FillEllipse(graphics, (action.Type = "Hotkey") ? brushHotkey : brushCommand, imgX - r, imgY - r, r * 2, r * 2)
+				}
+
+				Gdip_DeleteBrush(brushHotkey)
+				Gdip_DeleteBrush(brushCommand)
+
+				trackImage := temporaryFileName("Track Images\TrackMap", "png")
+
+				Gdip_SaveBitmapToFile(bitmap, trackImage)
+
+				Gdip_DisposeImage(bitmap)
+
+				Gdip_DeleteGraphics(graphics)
+
+				Gdip_Shutdown(token)
+			}
+		}
+		else {
 			token := Gdip_Startup()
 
 			bitmap := Gdip_CreateBitmapFromFile(trackImage)
@@ -3200,20 +3617,27 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			Gdip_SetSmoothingMode(graphics, 4)
 
-			brushHotkey := Gdip_BrushCreateSolid(0xff00ff00)
-			brushCommand := Gdip_BrushCreateSolid(0xffff0000)
-
 			r := Round(15 / (imgScale * 3))
 
-			for ignore, action in actions {
-				imgX := Round((marginX + offsetX + action.X) * scale)
-				imgY := Round((marginX + offsetY + action.Y) * scale)
+			brushStart := Gdip_BrushCreateSolid(0xff808080)
+			brushCorner := Gdip_BrushCreateSolid(0xffFF0000)
+			brushStraight := Gdip_BrushCreateSolid(0xff00FF00)
 
-				Gdip_FillEllipse(graphics, (action.Type = "Hotkey") ? brushHotkey : brushCommand, imgX - r, imgY - r, r * 2, r * 2)
+			imgX := Round((marginX + offsetX + getMultiMapValue(trackMap, "Points", "1.X")) * scale)
+			imgY := Round((marginX + offsetY + getMultiMapValue(trackMap, "Points", "1.Y")) * scale)
+
+			Gdip_FillEllipse(graphics, brushStart, imgX - r, imgY - r, r * 2, r * 2)
+
+			for ignore, section in this.TrackSections {
+				imgX := Round((marginX + offsetX + section.X) * scale)
+				imgY := Round((marginX + offsetY + section.Y) * scale)
+
+				Gdip_FillEllipse(graphics, (section.Type = "Corner") ? brushCorner : brushStraight, imgX - r, imgY - r, r * 2, r * 2)
 			}
 
-			Gdip_DeleteBrush(brushHotkey)
-			Gdip_DeleteBrush(brushCommand)
+			Gdip_DeleteBrush(brushStart)
+			Gdip_DeleteBrush(brushCorner)
+			Gdip_DeleteBrush(brushStraight)
 
 			trackImage := temporaryFileName("Track Images\TrackMap", "png")
 
@@ -3280,6 +3704,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	loadTrackMap(trackMap, trackImage) {
+		local sections := []
 		local directory := kTempDirectory . "Track Images"
 
 		deleteDirectory(directory)
@@ -3289,6 +3714,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.iTrackMap := trackMap
 		this.iTrackImage := this.Window.Theme.RecolorizeImage(trackImage)
 
+		loop getMultiMapValue(this.TrackMap, "Sections", "Count")
+			sections.Push({Type: getMultiMapValue(this.TrackMap, "Sections", A_Index ".Type")
+						 , X: getMultiMapValue(this.TrackMap, "Sections", A_Index ".X")
+						 , Y: getMultiMapValue(this.TrackMap, "Sections", A_Index ".Y")})
+
+		this.iTrackSections := sections
+
+		this.updateTrackSections(false)
 		this.createTrackMap()
 	}
 
@@ -3297,6 +3730,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		this.iTrackMap := false
 		this.iTrackImage := false
+		this.iTrackSections := []
 	}
 
 	selectAutomation() {
@@ -4481,7 +4915,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				this.iAvailableModules["Strategies"] := true
 				this.iAvailableModules["Setups"] := true
 				this.iAvailableModules["Pressures"] := true
-				this.iAvailableModules["Automation"] := this.SessionDatabase.hasTrackMap(simulator, track)
+				this.iAvailableModules["Track"] := this.SessionDatabase.hasTrackMap(simulator, track)
 			}
 			else {
 				this.iAvailableModules["Sessions"] := false
@@ -4489,7 +4923,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				this.iAvailableModules["Strategies"] := false
 				this.iAvailableModules["Setups"] := false
 				this.iAvailableModules["Pressures"] := false
-				this.iAvailableModules["Automation"] := false
+				this.iAvailableModules["Track"] := false
 			}
 		}
 		else {
@@ -4500,7 +4934,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.iAvailableModules["Strategies"] := false
 			this.iAvailableModules["Setups"] := false
 			this.iAvailableModules["Pressures"] := false
-			this.iAvailableModules["Automation"] := false
+			this.iAvailableModules["Track"] := false
 		}
 
 		return this.iAvailableModules[module]
@@ -4515,7 +4949,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				window := this.Window
 
-				if ((module != "Automation") && this.TrackMap)
+				if ((module != "Track") && this.TrackMap)
 					this.unloadTrackMap()
 
 				switch module, false {
@@ -4531,7 +4965,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						this.selectStrategies()
 					case "Setups":
 						this.selectSetups()
-					case "Automation":
+					case "Track":
 						this.selectAutomation()
 					case "Pressures":
 						this.selectPressures()
@@ -5590,8 +6024,77 @@ copyFiles(source, destination) {
 	copyDirectory(source, destination, 50 / count, &step)
 }
 
+sectionDialog(xOrCommand := false, y := false, section := false, *) {
+	global gPositionInfoEnabled
+
+	local x
+
+	static result := false
+
+	static sectionTypeDropDown
+	static sectionDialogGui
+
+	if (xOrCommand == kOk)
+		result := kOk
+	else if (xOrCommand == kCancel)
+		result := kCancel
+	else {
+		result := false
+
+		sectionDialogGui := Window({Options: "0x400000"}, translate("Section"))
+
+		sectionDialogGui.SetFont("Norm", "Arial")
+
+		sectionDialogGui.Add("Text", "x16 y16 w70 h23 +0x200", translate("Type"))
+
+		if section
+			chosen := inList(["Straight", "Corner"], section.Type)
+		else
+			chosen := 1
+
+		sectionTypeDropDown := sectionDialogGui.Add("DropDownList", "x90 yp+1 w180 Choose" . chosen, collect(["Straight", "Corner"], translate))
+
+		sectionDialogGui.Add("Button", "x104 yp+30 w80 h23 Default", translate("Ok")).OnEvent("Click", sectionDialog.Bind(kOk))
+		sectionDialogGui.Add("Button", "x190 yp w80 h23", translate("&Cancel")).OnEvent("Click", sectionDialog.Bind(kCancel))
+
+		x := (xOrCommand - 150)
+		y := (y - 35)
+
+		sectionDialogGui.Opt("+Owner" . SessionDatabaseEditor.Instance.Window.Hwnd)
+
+		sectionDialogGui.Show("x" . x . " y" . y . " AutoSize")
+
+		gPositionInfoEnabled := false
+
+		ToolTip()
+
+		while !result
+			Sleep(100)
+
+		try {
+			if (result == kCancel)
+				return false
+			else if (result == kOk) {
+				if section
+					section := section.Clone()
+				else
+					section := Object()
+
+				section.Type := ["Straight", "Corner"][sectionTypeDropDown.Value]
+
+				return section
+			}
+		}
+		finally {
+			sectionDialogGui.Destroy()
+
+			gPositionInfoEnabled := true
+		}
+	}
+}
+
 actionDialog(xOrCommand := false, y := false, action := false, *) {
-	global gActionInfoEnabled
+	global gPositionInfoEnabled
 
 	local fileName, chosen, x
 
@@ -5683,7 +6186,7 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 
 		actionDialogGui.Show("x" . x . " y" . y . " AutoSize")
 
-		gActionInfoEnabled := false
+		gPositionInfoEnabled := false
 
 		ToolTip()
 
@@ -5708,7 +6211,7 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 		finally {
 			actionDialogGui.Destroy()
 
-			gActionInfoEnabled := true
+			gPositionInfoEnabled := true
 		}
 	}
 }

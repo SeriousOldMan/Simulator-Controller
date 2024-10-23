@@ -1520,14 +1520,27 @@ void writeTelemetry(BOOL calibrate) {
 float initialX = 0.0;
 float initialY = 0.0;
 int coordCount = 0;
+BOOL mapStarted = FALSE;
+int mapLap = -1;
 
 BOOL writeCoordinates(int playerID) {
 	r3e_float64 velocityX = map_buffer->player.velocity.x;
 	r3e_float64 velocityY = map_buffer->player.velocity.z;
 	r3e_float64 velocityZ = map_buffer->player.velocity.y;
 
+	if (!mapStarted)
+		if (mapLap == -1) {
+			mapLap = map_buffer->completed_laps;
+
+			return TRUE;
+		}
+		else if (map_buffer->completed_laps == mapLap)
+			return TRUE;
+
 	if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
 		int index = 0;
+
+		mapStarted = TRUE;
 
 		for (int id = 0; id < map_buffer->num_cars; id++)
 			if (map_buffer->all_drivers_data_1[id].driver_info.user_id == playerID) {
@@ -1607,6 +1620,14 @@ void checkCoordinates(int playerID) {
 char* telemetryDirectory = "";
 FILE* telemetryFile = 0;
 int telemetryLap = -1;
+double lastRunning = -1;
+
+inline void printNAValue(float value) {
+	if (value == -1)
+		fprintf(telemetryFile, "n/a;");
+	else
+		fprintf(telemetryFile, "%f;", value);
+}
 
 void collectCarTelemetry(int playerID) {
 	char telemetryFileName[512] = "";
@@ -1674,19 +1695,44 @@ void collectCarTelemetry(int playerID) {
 
 			return;
 		}
+		
+		lastRunning = -1;
 	}
 
 	double carDistance = map_buffer->all_drivers_data_1[index].lap_distance;
 	float running = (float)max(0, min(1, fabs(carDistance / map_buffer->layout_length)));
 
-	fprintf(telemetryFile, "%f;%f;%f;%f;%d;%d;%f;%d;%d;%f;%f;%f;%f\n",
-						   running, map_buffer->throttle, map_buffer->brake, map_buffer->steer_input_raw,
-						   map_buffer->gear, (int)round(map_buffer->engine_rps), map_buffer->car_speed * 3.6f,
-						   (map_buffer->aid_settings.tc == 5) ? 1 : 0, (map_buffer->aid_settings.abs == 5) ? 1 : 0,
-						   -(map_buffer->local_acceleration.z / 9.807),
-						   (map_buffer->local_acceleration.x / 9.807),
-						   map_buffer->all_drivers_data_1[index].position.x,
-						   -map_buffer->all_drivers_data_1[index].position.z);
+	if (running > lastRunning) {
+		lastRunning = running;
+		
+		/*
+		fprintf(telemetryFile, "%f;%f;%f;%f;%d;%d;%f;%d;%d;%f;%f;%f;%f;%d\n",
+							   running, map_buffer->throttle, map_buffer->brake, map_buffer->steer_input_raw,
+							   map_buffer->gear, (int)round(map_buffer->engine_rps), map_buffer->car_speed * 3.6f,
+							   (map_buffer->aid_settings.tc == 5) ? 1 : 0, (map_buffer->aid_settings.abs == 5) ? 1 : 0,
+							   -(map_buffer->local_acceleration.z / 9.807),
+							   (map_buffer->local_acceleration.x / 9.807),
+							   map_buffer->all_drivers_data_1[index].position.x,
+							   -map_buffer->all_drivers_data_1[index].position.z,
+							   (int)round(map_buffer->lap_time_current_self * 1000));
+		*/
+
+		printNAValue(running);
+		printNAValue(map_buffer->throttle);
+		printNAValue(map_buffer->brake);
+		fprintf(telemetryFile, "%f;%d;%d;%f;%d;%d;%f;%f;%f;%f;", map_buffer->steer_input_raw, map_buffer->gear,
+																 (int)round(map_buffer->engine_rps * 2 * PI), map_buffer->car_speed * 3.6f,
+																 (map_buffer->aid_settings.tc == 5) ? 1 : 0, (map_buffer->aid_settings.abs == 5) ? 1 : 0,
+																 - (map_buffer->local_acceleration.z / 9.807),
+																 (map_buffer->local_acceleration.x / 9.807),
+																 map_buffer->all_drivers_data_1[index].position.x,
+																 -map_buffer->all_drivers_data_1[index].position.z);
+
+		if (map_buffer->lap_time_current_self != -1)
+			fprintf(telemetryFile, "%d\n", (long)round(map_buffer->lap_time_current_self * 1000));
+		else
+			fprintf(telemetryFile, "n/a\n");
+	}
 }
 
 BOOL started = FALSE;

@@ -76,7 +76,14 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 			infos := []
 
 			for ignore, fileName in isObject(fileName) ? fileName : [fileName] {
-				fileName := sessionDB.importTelemetry(simulator, car, track, fileName, &info)
+				browserGui.Block()
+
+				try {
+					fileName := sessionDB.importTelemetry(simulator, car, track, fileName, &info)
+				}
+				finally {
+					browserGui.Unblock()
+				}
 
 				if fileName {
 					fileNames.Push(fileName)

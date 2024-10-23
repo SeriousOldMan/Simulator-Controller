@@ -1539,21 +1539,32 @@ namespace ACSHMSpotter {
 		float initialY = 0.0f;
 		int coordCount = 0;
 
-		bool started = false;
+		bool mapStarted = false;
+        int mapLap = -1;
 
-		bool writeCoordinates() {
+        bool writeCoordinates() {
 			double velocityX = physics.LocalVelocity[0];
 			double velocityY = physics.LocalVelocity[2];
 			double velocityZ = physics.LocalVelocity[1];
 
-			if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
+			if (!mapStarted)
+				if (mapLap == -1)
+				{
+					mapLap = graphics.CompletedLaps;
+
+					return true;
+				}
+				else if (graphics.CompletedLaps == mapLap)
+					return true;
+
+            if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
 			{
 				int carID = 0;
 
 				float coordinateX = cars.cars[carID].worldPosition.x;
 				float coordinateY = cars.cars[carID].worldPosition.z;
 
-				started = true;
+				mapStarted = true;
 
 				if ((coordinateX != 0) || (coordinateY != 0))
 				{
@@ -1570,7 +1581,7 @@ namespace ACSHMSpotter {
 					coordCount += 1;
 				}
 			}
-			else if (started && !circuit)
+			else if (mapStarted && !circuit)
 				return false;
 
 			return true;
@@ -1693,8 +1704,9 @@ namespace ACSHMSpotter {
 						telemetryFile.Write(latG + ";");
 
 						telemetryFile.Write(cars.cars[carID].worldPosition.x + ";");
-						telemetryFile.WriteLine(cars.cars[carID].worldPosition.z);
-					}
+                        telemetryFile.Write(cars.cars[carID].worldPosition.z + ";");
+                        telemetryFile.WriteLine(graphics.iCurrentTime);
+                    }
 				}
             }
             catch (Exception)

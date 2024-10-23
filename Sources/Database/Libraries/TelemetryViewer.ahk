@@ -1120,6 +1120,8 @@ class TelemetryViewer {
 			this.CollectingNotifier.document.write("<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . (kResourcesDirectory . "Wait.gif?" . Random(1, 10000)) . "' width=28 height=28 border=0 padding=0></body></html>")
 			this.CollectingNotifier.document.close()
 		}
+		else
+			this.iTelemetryCollector.startup()
 	}
 
 	shutdownCollector() {

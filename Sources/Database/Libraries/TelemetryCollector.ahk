@@ -64,6 +64,9 @@ class TelemetryCollector {
 		if (this.iTelemetryCollectorPID && force)
 			this.shutdown(true)
 
+		if (this.iTelemetryCollectorPID && !ProcessExist(this.iTelemetryCollectorPID))
+			this.iTelemetryCollectorPID := false
+
 		if !this.iTelemetryCollectorPID {
 			code := sessionDB.getSimulatorCode(this.iSimulator)
 			exePath := (kBinariesDirectory . "Providers\" . code . " SHM Spotter.exe")

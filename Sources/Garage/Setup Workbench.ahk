@@ -1483,6 +1483,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 		static lastActiveSimulator := false
 		static lastActiveTrack := false
+		static lastTrackLength := false
 
 		static hasTask := false
 
@@ -1514,6 +1515,7 @@ class SetupWorkbench extends ConfigurationItem {
 						lastTrack := track
 						lastActiveSimulator := simulator
 						lastActiveTrack := track
+						lastTrackLength := trackLength
 
 						this.TelemetryViewer.startupCollector(simulator, track, trackLength)
 					}
@@ -1522,6 +1524,8 @@ class SetupWorkbench extends ConfigurationItem {
 						lastTrack := false
 					}
 				}
+				else
+					this.TelemetryViewer.startupCollector(lastSimulator, lastTrack, lastTrackLength)
 			}
 			else {
 				if this.TelemetryViewer {

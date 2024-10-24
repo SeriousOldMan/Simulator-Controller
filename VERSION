@@ -1,15 +1,15 @@
 [Development]
-Version=5.9.5.0-alpha
+Version=5.9.5.0-release
 Target=5.9.5.0-release
-Date=10/24/2024
-Download=https://www.dropbox.com/scl/fi/lrct7kaigh7tz7lzauogu/Simulator-Controller-5.9.5.0-alpha.zip?rlkey=zkojxnm8r3v76xln79tawmgu1&st=0k84qder&dl=1
+Date=10/25/2024
+Download=https://cutt.ly/KeDSXONh;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.9.5.0-release.zip
 Changes=Several grammar fixes, Fixed RF2 telemetry file format, Section editor for track maps, New telemetry channel "Time", Telemetry smoothing, Telemetry support in "Setup Workbench" without specific car and track
 Components=Media->5.6.1,Configuration->5.9.1,Utilities->5.9.1
 [Release]
-Version=5.9.4.0-release
-Date=10/18/2024
-Download=https://cutt.ly/JeSnLoko;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.9.4.0-release.zip
-Changes=Layout settings for telemetry viewer, Fixed standings with duplicate race numbers, Fixed grid size and positions for R3E, Moved Spotter lap time announcement to Opponent Information group, Horizontal shifting of telemetry graphs, Save selected zoom factor for telemetry graphs, Independent horizontal and vertical zooming for telemetry graphs, Lap telemetry importer for MoTeC, Multi upload in session database, Upload telemetry can import from MoTeC and alike, New steer lock setting in "Session Database", Fixed occasional unwanted focused car messages in R3E, Optimized Spotter proximity alerts
+Version=5.9.5.0-release
+Date=10/25/2024
+Download=https://cutt.ly/KeDSXONh;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.9.5.0-release.zip
+Changes=Several grammar fixes, Fixed RF2 telemetry file format, Section editor for track maps, New telemetry channel "Time", Telemetry smoothing, Telemetry support in "Setup Workbench" without specific car and track
 Components=Media->5.6.1,Configuration->5.9.1,Utilities->5.9.1
 [Components]
 Media.5.6.1.Path=Resources
@@ -22,7 +22,7 @@ Utilities.5.9.1.Path=.
 Utilities.5.9.1.Content=Utilities
 Utilities.5.9.1.Download=https://www.dropbox.com/scl/fi/n3n5gajdhb1swegw46bp6/Utilities-5.9.1.zip?rlkey=sl8dbbf0gndpaqyj8g66by8o5&st=3ullp93q&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.9.1.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=5.9.5.0-alpha
-Release=5.9.4.0-release
+Development=5.9.5.0-release
+Release=5.9.5.0-release

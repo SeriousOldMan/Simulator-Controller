@@ -250,7 +250,7 @@ class TelemetryChart {
 					if theChannel.Function {
 						theValue := theChannel.Function(refData)
 
-						if isNumber(value)
+						if isNumber(theValue)
 							if (theChannel.MinValue = kUndefined) {
 								theChannel.MinValue := theValue
 								theChannel.MaxValue := theValue
@@ -294,7 +294,7 @@ class TelemetryChart {
 				if theChannel.Function {
 					theValue := theChannel.Function(refData)
 
-					if isNumber(value)
+					if isNumber(theValue)
 						if (theChannel.MinValue = kUndefined) {
 							theChannel.MinValue := theValue
 							theChannel.MaxValue := theValue
@@ -2142,7 +2142,7 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 			}
 
 			for ignore, channel in kTelemetryChannels
-				if !inList(names, channel.Name)
+				if (!inList(names, channel.Name) && (channel.Channels.Length > 0))
 					channelsListView.Add("", translate(channel.Name))
 
 			layoutsGui["zoomWSlider"].Value := layout.WidthZoom

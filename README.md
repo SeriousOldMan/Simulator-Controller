@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[5.9.5.0-alpha](https://www.dropbox.com/scl/fi/lrct7kaigh7tz7lzauogu/Simulator-Controller-5.9.5.0-alpha.zip?rlkey=zkojxnm8r3v76xln79tawmgu1&st=0k84qder&dl=1) (Test build for 5.9.5. Changes: Several grammar fixes, Fixed RF2 telemetry file format, Section editor for track maps, New telemetry channel "Time", Telemetry smoothing.)
+[5.9.5.0-alpha](https://www.dropbox.com/scl/fi/lrct7kaigh7tz7lzauogu/Simulator-Controller-5.9.5.0-alpha.zip?rlkey=zkojxnm8r3v76xln79tawmgu1&st=0k84qder&dl=1) (Test build for 5.9.5. Changes: Several grammar fixes, Fixed RF2 telemetry file format, Section editor for track maps, New telemetry channel "Time", Telemetry smoothing, Telemetry support in "Setup Workbench" without specific car and track.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-595) of this version and all the versions you might have skipped, before installing and using this version.
 

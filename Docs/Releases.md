@@ -4,7 +4,8 @@
   3. A couple of fixes in the different Assistant grammars.
   4. A channel for the elapsed time since start of the lap has been added to the telemetry system.
   5. A new filter smoothes out inconsistent telemetry values reported by some simulators.
-  6. A section editor has been added to the track map viewer in the "Session Database" (on the way to telemetry based live coaching). The arrangement of the different tabs in the "Session Database" has changed a bit in the course of this change. Please see the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation) for more information.
+  6. Telemetry collection can now be enabled in the "Setup Workbench" even if no car and/or track has been selected beforehand. The required information about the track will be gathered on the fly, if possible. Please note, that this does not work for *Assetto Corsa Competizione*.
+  7. A section editor has been added to the track map viewer in the "Session Database" (on the way to telemetry based live coaching). The arrangement of the different tabs in the "Session Database" has changed a bit in the course of this change. Please see the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation) for more information.
   
      It is strongly recommended to rebuild all track maps with this version, so that the track starting point is as close as possible to the real start/finish line. Thias was not important in the past and the track recording started anywhere. Please see the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-595) for instructions how to recreate the track maps.
 

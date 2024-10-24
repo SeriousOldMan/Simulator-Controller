@@ -1,9 +1,9 @@
 [Development]
 Version=5.9.5.0-alpha
 Target=5.9.5.0-release
-Date=10/23/2024
+Date=10/24/2024
 Download=https://www.dropbox.com/scl/fi/lrct7kaigh7tz7lzauogu/Simulator-Controller-5.9.5.0-alpha.zip?rlkey=zkojxnm8r3v76xln79tawmgu1&st=0k84qder&dl=1
-Changes=Several grammar fixes, Fixed RF2 telemetry file format, Section editor for track maps, New telemetry channel "Time", Telemetry smoothing
+Changes=Several grammar fixes, Fixed RF2 telemetry file format, Section editor for track maps, New telemetry channel "Time", Telemetry smoothing, Telemetry support in "Setup Workbench" without specific car and track
 Components=Media->5.6.1,Configuration->5.9.1,Utilities->5.9.1
 [Release]
 Version=5.9.4.0-release

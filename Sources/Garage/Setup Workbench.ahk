@@ -827,8 +827,9 @@ class SetupWorkbench extends ConfigurationItem {
 
 				theMax := Max(Abs(maximum(values)), Abs(minimum(values)))
 
-				for index, value in values
-					values[index] := (value / theMax)
+				if (theMax != 0)
+					for index, value in values
+						values[index] := (value / theMax)
 
 				drawChartFunction .= ("`n['" . values2String("', '", names*) . "'],")
 
@@ -1492,7 +1493,7 @@ class SetupWorkbench extends ConfigurationItem {
 			local track := this.SelectedTrack[false]
 			local simmulatorCode, trackLength, provider, fileName
 
-			if (this.TelemetryViewer && simulator && (simulator != true) && track && (track != true)) {
+			if (this.TelemetryViewer && simulator && (simulator != true) && track) {
 				if ((simulator != lastSimulator) || (track != lastTrack)) {
 					this.TelemetryViewer.shutdownCollector()
 
@@ -1572,8 +1573,16 @@ class SetupWorkbench extends ConfigurationItem {
 
 	getSessionInformation(&simulator, &car, &track) {
 		simulator := this.SelectedSimulator
-		car := SessionDatabase.getCarCode(simulator, this.SelectedCar)
-		track := SessionDatabase.getTrackCode(simulator, this.SelectedTrack)
+
+		if (this.SelectedCar[false] && (this.SelectedCar[false] != true))
+			car := SessionDatabase.getCarCode(simulator, this.SelectedCar)
+		else
+			car := false
+
+		if (this.SelectedTrack[false] && (this.SelectedCar[false] != true))
+			track := SessionDatabase.getTrackCode(simulator, this.SelectedTrack)
+		else
+			track := false
 	}
 
 	getLapInformation(lapNumber, &driver, &lapTime, &sectorTimes) {
@@ -1600,6 +1609,12 @@ class SetupWorkbench extends ConfigurationItem {
 		local label1, label2, slider1, slider2, deleteButton
 
 		updateSlider(characteristic, slider1, slider2, *) {
+			if (slider1.Value == 0)
+				slider1.Value := 1
+
+			if (slider2.Value == 0)
+				slider2.Value := 1
+
 			workbench.updateCharacteristic(characteristic, slider1.Value, slider2.Value)
 		}
 
@@ -1769,7 +1784,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 		characteristicsMenu.Add(label, (*) => this.openTelemetryViewer())
 
-		if (!this.SelectedTrack[false] || (this.SelectedTrack[false] == true))
+		if (this.SelectedSimulator[false] == true)
 			characteristicsMenu.Disable(label)
 
 		if (!this.SimulatorDefinition || !getMultiMapValue(this.SimulatorDefinition, "Simulator", "Analyzer", false)

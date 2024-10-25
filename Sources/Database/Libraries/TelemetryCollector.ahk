@@ -16,7 +16,8 @@
 ;;;                       Public Constants Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kTelemetryChannels := [{Name: "Speed", Indices: [7], Size: 1, Channels: ["Speed"], Converter: [(s) => isNumber(s) ? convertUnit("Speed", s) : kNull]}
+global kTelemetryChannels := [{Name: "Distance", Indices: [1], Channels: []}
+							, {Name: "Speed", Indices: [7], Size: 1, Channels: ["Speed"], Converter: [(s) => isNumber(s) ? convertUnit("Speed", s) : kNull]}
 							, {Name: "Throttle", Indices: [2], Size: 0.5, Channels: ["Throttle"]}
 							, {Name: "Brake", Indices: [3], Size: 0.5, Channels: ["Brake"]}
 							, {Name: "Throttle/Brake", Indices: [2, 3], Size: 0.5, Channels: ["Throttle", "Brake"]}

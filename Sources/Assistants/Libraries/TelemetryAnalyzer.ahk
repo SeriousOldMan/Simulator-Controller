@@ -39,9 +39,9 @@ class Section {
 		}
 	}
 
-	Distance {
+	Length {
 		Get {
-			return (this.TrackSection.Distance . " Meter")
+			return this.TrackSection.Length
 		}
 	}
 
@@ -89,9 +89,8 @@ class Section {
 
 	Descriptor {
 		Get {
-			return {Type: this.Type, Distance: (this.Distance . " Meter"), Time: (this.Time . " Seconds")
-				  , MinG: this.MinG, MaxG: this.MaxG, AvgG: this.AvgG
-				  , MinSpeed: (this.MinSpeed . " km/h"), MaxSpeed: (this.MaxSpeed . " km/h"), AvgSpeed: (this.AvgSpeed . " km/h")}
+			return {Type: this.Type, Length: (nullRound(this.Length, 1) . " Meter")
+				  , Time: (nullRound(this.Time, 2) . " Seconds")}
 		}
 	}
 
@@ -114,9 +113,9 @@ class Corner extends Section {
 	iRollingTime := 0					; Time of the rolling phase in meters
 	iAcceleratingTime := 0				; Time of the acceleration phase in meters
 
-	iBrakingDistance := 0				; Distance of the braking phase in meters
-	iRollingDistance := 0				; Distance of the rolling phase in meters
-	iAcceleratingDistance := 0			; Distance of the acceleration phase in meters
+	iBrakingLength := 0					; Length of the braking phase in meters
+	iRollingLength := 0					; Length of the rolling phase in meters
+	iAcceleratingLength := 0			; Length of the acceleration phase in meters
 
 	iMinG := 0							; Min G Force around apex (rolling phase)
 	iMaxG := 0							; Max G Force around apex (rolling phase)
@@ -165,16 +164,16 @@ class Corner extends Section {
 		}
 	}
 
-	Distance[part := "Overall"] {
+	Length[part := "Overall"] {
 		Get {
 			if (part = "Overall")
-				return (this.iBrakingDistance + this.iRollingDistance + this.iAcceleratingDistance)
+				return (this.iBrakingLength + this.iRollingLength + this.iAcceleratingLength)
 			else if ((part = "Entry") || (part = "Braking"))
-				return this.iBrakingDistance
+				return this.iBrakingLength
 			else if ((part = "Apex") || (part = "Rolling"))
-				return this.iRollingDistance
+				return this.iRollingLength
 			else if ((part = "Exit") || (part = "Accelerating"))
-				return this.iAcceleratingDistance
+				return this.iAcceleratingLength
 			else
 				return 0
 		}
@@ -254,39 +253,45 @@ class Corner extends Section {
 			descriptor.Direction := this.Direction
 			descriptor.Curvature := this.Curvature
 
-			descriptor.BrakingTime := (this.Time["Entry"] . " Seconds")
-			descriptor.BrakingDistance := (this.Distance["Entry"] . " Meter")
+			descriptor.ApexG := nullRound(this.AvgG, 2)
+			descriptor.ApexSpeed := (nullRound(this.AvgSpeed) . " km/h")
 
-			descriptor.RollingTime := (this.Time["Apex"] . " Seconds")
-			descriptor.RollingDistance := (this.Distance["Apex"] . " Meter")
+			descriptor.BrakingTime := (nullRound(this.Time["Entry"], 2) . " Seconds")
+			descriptor.BrakingLength := (nullRound(this.Length["Entry"], 1) . " Meter")
 
-			descriptor.AcceleratingTime := (this.Time["Exit"] . " Seconds")
-			descriptor.AcceleratingDistance := (this.Distance["Exit"] . " Meter")
+			descriptor.RollingTime := (nullRound(this.Time["Apex"], 2) . " Seconds")
+			descriptor.RollingLength := (nullRound(this.Length["Apex"], 1) . " Meter")
+
+			descriptor.AcceleratingTime := (nullRound(this.Time["Exit"], 2) . " Seconds")
+			descriptor.AcceleratingLength := (nullRound(this.Length["Exit"], 1) . " Meter")
 
 			descriptor.TCActivations := this.TCActivations
 			descriptor.ABSActivations := this.ABSActivations
 
-			descriptor.SteeringSmoothness := (this.SteeringSmoothness . " Percent")
-			descriptor.ThrottleSmoothness := (this.ThrottleSmoothness . " Percent")
-			descriptor.BrakeSmoothness := (this.BrakeSmoothness . " Percent")
+			descriptor.SteeringSmoothness := (nullRound(this.SteeringSmoothness) . " Percent")
+			descriptor.ThrottleSmoothness := (nullRound(this.ThrottleSmoothness) . " Percent")
+			descriptor.BrakeSmoothness := (nullRound(this.BrakeSmoothness) . " Percent")
 
 			return descriptor
 		}
 	}
 
 	__New(trackSection, direction, curvature
-					  , brakingTime, brakingDistance, rollingTime, rollingDistance, acceleratingTime, acceleratingDistance
+					  , brakingTime, brakingLength, rollingTime, rollingLength, acceleratingTime, acceleratingLength
 					  , minG, maxG, avgG, minSpeed, maxSpeed, avgSpeed, tcActivations, absActivations
 					  , steeringSmoothness, throttleSmoothness, brakeSmoothness) {
 		super.__New(trackSection)
+
+		this.iDirection := direction
+		this.iCurvature := curvature
 
 		this.iBrakingTime := brakingTime
 		this.iRollingTime := rollingTime
 		this.iAcceleratingTime := acceleratingTime
 
-		this.iBrakingDistance := brakingDistance
-		this.iRollingDistance := rollingDistance
-		this.iAcceleratingDistance := acceleratingDistance
+		this.iBrakingLength := brakingLength
+		this.iRollingLength := rollingLength
+		this.iAcceleratingLength := acceleratingLength
 
 		this.iMinG := minG
 		this.iMaxG := maxG
@@ -298,18 +303,18 @@ class Corner extends Section {
 		this.iTCActivations := tcActivations
 		this.iABSActivations := absActivations
 
-		this.SteeringSmoothness := steeringSmoothness
-		this.ThrottleSmoothness := throttleSmoothness
-		this.BrakeSmoothness := brakeSmoothness
+		this.iSteeringSmoothness := steeringSmoothness
+		this.iThrottleSmoothness := throttleSmoothness
+		this.iBrakeSmoothness := brakeSmoothness
 	}
 
 	static fromSection(telemetry, section, startIndex, endIndex) {
 		local index := startIndex
 		local phase := "Approaching"
 		local lastPhase := phase
-		local brakingDistance := 0
-		local rollingDistance := 0
-		local acceleratingDistance := 0
+		local brakingLength := 0
+		local rollingLength := 0
+		local acceleratingLength := 0
 		local brakingTime := 0
 		local rollingTime := 0
 		local acceleratingTime := 0
@@ -317,7 +322,7 @@ class Corner extends Section {
 		local brakingSpeed := kUndefined
 		local acceleratingG := kUndefined
 		local acceleratingSpeed := kUndefined
-		local curvature := telemetry.getValue(index, "Curvature")
+		local curvature := telemetry.getValue(index, "Curvature", 0)
 		local speed := kUndefined
 		local latG := kUndefined
 		local absActivations := 0
@@ -339,11 +344,36 @@ class Corner extends Section {
 		local brake, throttle, steering
 		local startDistance, startTime
 
+		updatePhase(phase, index) {
+			if (phase = "Braking") {
+				brakingLength := (telemetry.getValue(index, "Distance") - startDistance)
+				brakingTime := (telemetry.getValue(index, "Time", 0) - startTime)
+				brakingG := Abs(telemetry.getValue(index, "Lat G"))
+				brakingSpeed := telemetry.getValue(index, "Speed")
+			}
+			else if (phase = "Rolling") {
+				rollingLength := (telemetry.getValue(index, "Distance") - startDistance)
+				rollingTime := (telemetry.getValue(index, "Time", 0) - startTime)
+			}
+			else if (phase = "Accelerating") {
+				acceleratingLength := (telemetry.getValue(index, "Distance") - startDistance)
+				acceleratingTime := (telemetry.getValue(index, "Time", 0) - startTime)
+			}
+		}
+
 		while (index <= endIndex) {
-			curvature := Max(curvature, telemetry.getValue(index, "Curvature"))
+			if (curvature = kNull)
+				curvature := telemetry.getValue(index, "Curvature")
+			else {
+				newCurvature := telemetry.getValue(index, "Curvature")
+
+				if (newCurvature != kNull)
+					curvature := Max(curvature, newCurvature)
+			}
+
 			steering := telemetry.getValue(index, "Steering")
 			brake := telemetry.getValue(index, "Brake")
-			throttle := telemetry.getValue(index, "Trottle")
+			throttle := telemetry.getValue(index, "Throttle")
 
 			sumSteering += steering
 
@@ -367,44 +397,31 @@ class Corner extends Section {
 				phase := "Accelerating"
 			}
 
+			speed := telemetry.getValue(index, "Speed")
+			latG := Abs(telemetry.getValue(index, "Lat G"))
+
 			if (phase != lastPhase) {
 				if (phase = "Rolling") {
-					latG := Abs(telemetry.getValue(index, "Lat G"))
 					minLatG := latG
 					maxLatG := latG
 					latGs := []
 
-					speed := telemetry.getValue(index, "Speed")
 					minSpeed := speed
 					maxSpeed := speed
 					speeds := []
 				}
 				else if (phase = "Accelerating") {
-					acceleratingG := Abs(telemetry.getValue(index, "Lat G"))
-					acceleratingSpeed := telemetry.getValue(index, "Speed")
+					acceleratingG := latG
+					acceleratingSpeed := speed
 				}
 
-				if (lastPhase = "Braking") {
-					brakingDistance := (telemetry.getValue(index, "Distance") - startDistance)
-					brakingTime := (telemetry.getValue(index, "Time", 0) - startTime)
-					brakingG := Abs(telemetry.getValue(index, "Lat G"))
-					brakingSpeed := telemetry.getValue(index, "Speed")
-				}
-				else if (lastPhase = "Rolling") {
-					rollingDistance := (telemetry.getValue(index, "Distance") - startDistance)
-					rollingTime := (telemetry.getValue(index, "Time", 0) - startTime)
-				}
-				else if (lastPhase = "Accelerating") {
-					acceleratingDistance := (telemetry.getValue(index, "Distance") - startDistance)
-					acceleratingTime := (telemetry.getValue(index, "Time", 0) - startTime)
-				}
+				updatePhase(lastPhase, index)
 
 				startDistance := telemetry.getValue(index, "Distance")
-				startTime := telemetry.getValue(index, "Distance", 0)
+				startTime := telemetry.getValue(index, "Time", 0)
 
 				lastPhase := phase
 			}
-
 
 			if (phase = "Braking") {
 				if telemetry.getValue(index, "ABS", false)
@@ -425,8 +442,8 @@ class Corner extends Section {
 				maxLatG := Max(maxLatG, latG)
 				latGs.Push(latG)
 
-				minSpeed := Min(minSpeed, latG)
-				maxSpeed := Max(maxSpeed, latG)
+				minSpeed := Min(minSpeed, speed)
+				maxSpeed := Max(maxSpeed, speed)
 				speeds.Push(speed)
 			}
 			else if (phase = "Accelerating") {
@@ -447,30 +464,32 @@ class Corner extends Section {
 			index += 1
 		}
 
+		updatePhase(phase, index - 1)
+
 		if (speed = kUndefined) {
 			if (brakingG != kUndefined) {
 				latG := brakingG
 				speed := brakingSpeed
 			}
 			else if (acceleratingG != kUndefined) {
-				latG := brakingG
-				speed := brakingSpeed
+				latG := acceleratingG
+				speed := acceleratingSpeed
 			}
 			else {
 				latG := 0
 				speed := 0
 			}
 
-			return Corner(section, (sumSteering > 0) ? "Right" : "Left", curvature
-								 , brakingTime, brakingDistance, rollingTime, rollingDistance, acceleratingTime, acceleratingDistance
+			return Corner(section, (sumSteering > 0) ? "Right" : "Left", (curvature != kNull) ? curvature : 0
+								 , brakingTime, brakingLength, rollingTime, rollingLength, acceleratingTime, acceleratingLength
 								 , latG, latG, latG, speed, speed, speed, tcActivations, absActivations
 								 , 100 - ((steeringChanges / steeringCount) * 100)
 								 , 100 - ((throttleChanges / throttleCount) * 100)
 								 , 100 - ((brakeChanges / brakeCount) * 100))
 		}
 		else
-			return Corner(section, (sumSteering > 0) ? "Right" : "Left", curvature
-								 , brakingTime, brakingDistance, rollingTime, rollingDistance, acceleratingTime, acceleratingDistance
+			return Corner(section, (sumSteering > 0) ? "Right" : "Left", (curvature != kNull) ? curvature : 0
+								 , brakingTime, brakingLength, rollingTime, rollingLength, acceleratingTime, acceleratingLength
 								 , minLatG, maxLatG, average(latGs), minSpeed, maxSpeed, average(speeds), tcActivations, absActivations
 								 , 100 - ((steeringChanges / steeringCount) * 100)
 								 , 100 - ((throttleChanges / throttleCount) * 100)
@@ -530,6 +549,18 @@ class Straight extends Section {
 	AvgSpeed {
 		Get {
 			return this.iAvgSpeed
+		}
+	}
+
+	Descriptor {
+		Get {
+			local descriptor := super.Descriptor
+
+			descriptor.MinSpeed := (nullRound(this.MinSpeed) . " km/h")
+			descriptor.MaxSpeed := (nullRound(this.MaxSpeed) . " km/h")
+			descriptor.AvgSpeed := (nullRound(this.AvgSpeed) . " km/h")
+
+			return descriptor
 		}
 	}
 
@@ -619,14 +650,14 @@ class Telemetry {
 	__New(analyzer, data) {
 		local maxG := kUndefined
 		local maxSpeed := kUndefined
-		local ignore, corner
+		local ignore, section
 
 		this.iTelemetryAnalyzer := analyzer
 		this.iData := data
 
 		this.iSections := this.createSections(this.Data)
 
-		for ignore, corner in this.Sections {
+		for ignore, section in this.Sections {
 			if (maxG == kUndefined)
 				maxG := section.MaxG
 			else
@@ -654,6 +685,9 @@ class Telemetry {
 			startIndex := TelemetryAnalyzer.getTelemetryCoordinateIndex(data, lastSection.X, lastSection.Y)
 
 			for ignore, section in trackSections {
+				if (A_Index = 1)
+					continue
+
 				index := TelemetryAnalyzer.getTelemetryCoordinateIndex(data, section.X, section.Y)
 
 				if index {
@@ -813,11 +847,11 @@ class TelemetryAnalyzer {
 	}
 
 	static getValue(data, name, default := kUndefined) {
-		local channel := TelemetryAnalyzer.Schema[Name]
+		local channel := TelemetryAnalyzer.Schema[name]
 		local index, value
 
 		if channel.HasProp("Function") {
-			value := channel.Function(data)
+			value := channel.Function.Call(data)
 
 			if ((value = kNull) && (default != kUndefined))
 				return default
@@ -920,9 +954,21 @@ class TelemetryAnalyzer {
 	}
 }
 
-analyzer := TelemetryAnalyzer("Assetto Corsa Competizione", "Imola")
 
-telm := analyzer.createTelemetry("C:\Users\juwig\Desktop\Lap 2 (Oliver Juwig - 105.917).telemetry")
+;;;-------------------------------------------------------------------------;;;
+;;;                         Public Function Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+nullRound(value, precision := 0) {
+	if isNumber(value)
+		return Round(value, precision)
+	else
+		return value
+}
+
+analyzer := TelemetryAnalyzer("Assetto Corsa Competizione", "Brands Hatch")
+
+telm := analyzer.createTelemetry("C:\Users\olive\Desktop\Lap 4.telemetry")
 
 js := telm.JSON
 MsgBox js

@@ -90,7 +90,7 @@ class Section {
 	Descriptor {
 		Get {
 			return {Type: this.Type, Length: (nullRound(this.Length, 1) . " Meter")
-				  , Time: (nullRound(this.Time, 2) . " Seconds")}
+				  , Time: (nullRound(this.Time / 1000, 2) . " Seconds")}
 		}
 	}
 
@@ -256,13 +256,13 @@ class Corner extends Section {
 			descriptor.ApexG := nullRound(this.AvgG, 2)
 			descriptor.ApexSpeed := (nullRound(this.AvgSpeed) . " km/h")
 
-			descriptor.BrakingTime := (nullRound(this.Time["Entry"], 2) . " Seconds")
+			descriptor.BrakingTime := (nullRound(this.Time["Entry"] / 1000, 2) . " Seconds")
 			descriptor.BrakingLength := (nullRound(this.Length["Entry"], 1) . " Meter")
 
-			descriptor.RollingTime := (nullRound(this.Time["Apex"], 2) . " Seconds")
+			descriptor.RollingTime := (nullRound(this.Time["Apex"] / 1000, 2) . " Seconds")
 			descriptor.RollingLength := (nullRound(this.Length["Apex"], 1) . " Meter")
 
-			descriptor.AcceleratingTime := (nullRound(this.Time["Exit"], 2) . " Seconds")
+			descriptor.AcceleratingTime := (nullRound(this.Time["Exit"] / 1000, 2) . " Seconds")
 			descriptor.AcceleratingLength := (nullRound(this.Length["Exit"], 1) . " Meter")
 
 			descriptor.TCActivations := this.TCActivations

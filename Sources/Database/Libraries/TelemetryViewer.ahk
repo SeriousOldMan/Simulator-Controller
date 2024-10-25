@@ -247,7 +247,7 @@ class TelemetryChart {
 				refData := referenceLapTelemetry[refRunning]
 
 				for ignore, theChannel in channels
-					if theChannel.Function {
+					if theChannel.HasProp("Function") {
 						theValue := theChannel.Function(refData)
 
 						if isNumber(theValue)
@@ -291,7 +291,7 @@ class TelemetryChart {
 						values.Push(kNull)
 
 			for ignore, theChannel in channels
-				if theChannel.Function {
+				if theChannel.HasProp("Function") {
 					theValue := theChannel.Function(refData)
 
 					if isNumber(theValue)

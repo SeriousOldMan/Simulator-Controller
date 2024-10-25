@@ -23,6 +23,7 @@
 #Include "..\..\Garage\Libraries\IssueCollector.ahk"
 #Include "..\..\Garage\Libraries\IRCIssueCollector.ahk"
 #Include "..\..\Garage\Libraries\R3EIssueCollector.ahk"
+#Include "TelemetryAnalyzer.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

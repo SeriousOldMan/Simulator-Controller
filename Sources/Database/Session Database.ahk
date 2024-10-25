@@ -1939,7 +1939,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						if (currentSection && (currentSection != previousSection)) {
 							ToolTip()
 
-							if isObject(currentSection) {
+							if (isObject(currentSection) && currentSection.HasProp("Nr")) {
 								switch currentSection.Type, false {
 									case "Corner":
 										positionInfo := (translate("Corner") . A_Space . currentSection.Nr . translate(": "))

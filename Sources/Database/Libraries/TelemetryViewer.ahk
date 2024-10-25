@@ -292,7 +292,7 @@ class TelemetryChart {
 
 			for ignore, theChannel in channels
 				if theChannel.HasProp("Function") {
-					theValue := theChannel.Function.Call(refData)
+					theValue := theChannel.Function.Call(data)
 
 					if isNumber(theValue)
 						if (theChannel.MinValue = kUndefined) {

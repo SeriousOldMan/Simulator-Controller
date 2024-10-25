@@ -968,7 +968,7 @@ nullRound(value, precision := 0) {
 
 analyzer := TelemetryAnalyzer("Assetto Corsa Competizione", "Brands Hatch")
 
-telm := analyzer.createTelemetry("C:\Users\olive\Desktop\Lap 4.telemetry")
+telm := analyzer.createTelemetry(FileSelect())
 
 js := telm.JSON
 MsgBox js

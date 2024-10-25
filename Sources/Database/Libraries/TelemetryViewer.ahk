@@ -1084,7 +1084,7 @@ class TelemetryViewer {
 
 		this.Manager.getSessionInformation(&simulator, &car, &track)
 
-		if this.SelectedLap {
+		if (this.SelectedLap && car && track) {
 			if isNumber(this.SelectedLap)
 				this.Control["saveButton"].Enabled := true
 			else {

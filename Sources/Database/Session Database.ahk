@@ -1942,9 +1942,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							if isObject(currentSection) {
 								switch currentSection.Type, false {
 									case "Corner":
-										positionInfo := translate("Corner: ")
+										positionInfo := (translate("Corner") . A_Space . currentSection.Nr . translate(": "))
 									case "Straight":
-										positionInfo := translate("Straight: ")
+										positionInfo := (translate("Straight") . A_Space . currentSection.Nr . translate(": "))
 									default:
 										throw "Unknown section type detected in SessionDatabaseEditor.show..."
 								}

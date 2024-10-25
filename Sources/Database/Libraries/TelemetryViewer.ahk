@@ -1045,7 +1045,7 @@ class TelemetryViewer {
 
 		this.Manager.getSessionInformation(&simulator, &car, &track)
 
-		if this.SelectedLap {
+		if (this.SelectedLap && car && track) {
 			if isNumber(this.SelectedLap)
 				this.Control["saveButton"].Enabled := true
 			else {
@@ -1381,8 +1381,12 @@ class TelemetryViewer {
 					}
 
 					DirCreate(folder)
-					FileCopy(this.TelemetryDirectory . "Lap " . lap . ".telemetry"
-						   , folder . "\" . fileName . ".telemetry", 1)
+
+					if isNumber(lap)
+						FileCopy(this.TelemetryDirectory . "Lap " . lap . ".telemetry"
+							   , folder . "\" . fileName . ".telemetry", 1)
+					else
+						FileCopy(lap[4], folder . "\" . fileName . ".telemetry", 1)
 				}
 				catch Any as exception {
 					logError(exception)

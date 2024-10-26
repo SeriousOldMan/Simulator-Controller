@@ -1,3 +1,9 @@
+## 5.9.6.0-release 11/01/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Fixed a bug, that prevented saving a telemetry imported from *Second Monitor* or *MoTeC* outside the standard database location.
+  4. Fixed track mapping and telemetry collection for very narrow tracks like Zandvoort.
+
 ## 5.9.5.0-release 10/25/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

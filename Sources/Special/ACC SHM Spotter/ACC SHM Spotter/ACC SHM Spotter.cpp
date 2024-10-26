@@ -705,8 +705,17 @@ void updateTrackSpline() {
 			referenceDriverPosX = newPosX;
 			referenceDriverPosY = newPosY;
 
+			bool done = false;
+
+			/*
+			if (trackLength > 0)
+				done = (buildTrackSplineRunning > (trackLength * 0.8) && fabs(newPosX - startPosX) < 25.0 && fabs(newPosY - startPosY) < 25.0);
+			else
+			*/
+				done = (buildTrackSpline->size() > 100 && fabs(newPosX - startPosX) < 25.0 && fabs(newPosY - startPosY) < 25.0);
+
 			if (distance > 0) {
-				if (buildTrackSpline->size() > 100 && fabs(newPosX - startPosX) < 30.0 && fabs(newPosY - startPosY) < 30.0) {
+				if (done) {
 					trackSplineBuilding = false;
 
 					if (!trackSplineReady || ((gf->iLastTime > 0) && ((gf->iLastTime * 1.002) < bestLapTime))) {
@@ -2156,8 +2165,12 @@ int main(int argc, char* argv[])
 		positionTrigger = (strcmp(argv[1], "-Trigger") == 0);
 		carTelemetry = (strcmp(argv[1], "-Telemetry") == 0);
 
-		if (mapTrack && argc >  2)
-			circuit = (strcmp(argv[2], "Circuit") == 0);
+		if (mapTrack) {
+			if (argc > 2)
+				circuit = (strcmp(argv[2], "Circuit") == 0);
+
+			trackLength = (argc > 3) ? atof(argv[3]) : 0;
+		}
 
 		if (analyzeTelemetry) {
 			dataFile = argv[2];
@@ -2202,9 +2215,8 @@ int main(int argc, char* argv[])
 			trackLength = atof(argv[2]);
 			telemetryDirectory = argv[3];
 		}
-		else {
-			if (argc > 1)
-				trackLength = atof(argv[1]);
+		else if (!mapTrack) {
+			trackLength = (argc > 1) ? atof(argv[1]) : 0;
 
 			if (argc > 2)
 				aheadAccidentDistance = atoi(argv[2]);

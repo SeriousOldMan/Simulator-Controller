@@ -242,6 +242,10 @@ class DrivingCoach extends GridRaceAssistant {
 		DirCreate(this.Options["Driving Coach.Archive"])
 
 		OnExit(ObjBindMethod(this, "stopIssueCollector"))
+		OnExit((*) {
+			if this.TelemetryCollector
+				this.TelemetryCollector.shutdown()
+		})
 	}
 
 	loadFromConfiguration(configuration) {
@@ -296,12 +300,13 @@ class DrivingCoach extends GridRaceAssistant {
 		else if values.HasProp("Standings")
 			this.iStandings := values.Standings
 
-		if (values.HasProp("Session") && (values.Session == kSessionFinished)) {
-			if this.CoachingActive
+		if (values.HasProp("Session") && (values.Session == kSessionFinished) && (this.Session != kSessionFinished)) {
+			if this.CoachingActive {
 				this.shutdownCoaching()
 
-			this.iCoachingActive := false
-			this.iAvailableTelemetry := CaseInsenseMap()
+				this.iCoachingActive := false
+				this.iAvailableTelemetry := CaseInsenseMap()
+			}
 		}
 	}
 
@@ -669,7 +674,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local ignore, lap
 
 		if (this.AvailableTelemetry.Count = 0)
-			this.getSpeaker().speak("CoachingReady")
+			this.getSpeaker().speakPhrase("CoachingReady")
 
 		for ignore, lap in laps
 			this.AvailableTelemetry[lap] := true
@@ -685,8 +690,11 @@ class DrivingCoach extends GridRaceAssistant {
 			loop Files, kTempDirectory . "Driving Coach\Telemetry\*.telemetry" {
 				lap := StrReplace(StrReplace(A_LoopFileName, "Lap ", ""), ".telemetry", "")
 
-				if !loadedLaps.Has(lap)
+				if !loadedLaps.Has(lap) {
 					newLaps.Push(lap)
+
+					loadedLaps[lap] := true
+				}
 			}
 
 			if (newLaps.Length > 0) {
@@ -700,13 +708,15 @@ class DrivingCoach extends GridRaceAssistant {
 			DirCreate(kTempDirectory . "Driving Coach")
 			DirCreate(kTempDirectory . "Driving Coach\Telemetry")
 
+			deleteDirectory(kTempDirectory . "Driving Coach\Telemetry")
+
 			this.iTelemetryCollector := TelemetryCollector(kTempDirectory . "Driving Coach\Telemetry", this.Simulator, this.Track, this.TrackLength)
 
 			this.iTelemetryCollector.startup()
 
 			loadedLaps := CaseInsenseMap()
 
-			this.iCollectorTask := PeriodicTask(updateTelemetry, 1000, kLowPriority)
+			this.iCollectorTask := PeriodicTask(updateTelemetry, 10000, kLowPriority)
 
 			this.iCollectorTask.start()
 		}
@@ -759,6 +769,9 @@ class DrivingCoach extends GridRaceAssistant {
 			if announcements
 				this.updateConfigurationValues({Announcements: announcements})
 		}
+
+		if this.CoachingActive
+			this.startupCoaching()
 
 		return facts
 	}

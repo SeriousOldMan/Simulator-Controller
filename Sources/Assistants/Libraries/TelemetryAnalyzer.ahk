@@ -127,6 +127,10 @@ class Corner extends Section {
 	iTCActivations := 0					; # of TC activations (each meter is one tick)
 	iABSActivations := 0				; # of ABS activations (each meter is one tick)
 
+	iSteeringCorrections:= 0			; Count
+	iThrottleCorrections:= 0			; Count
+	iBrakeCorrections:= 0				; Count
+
 	iSteeringSmoothness := 0			; Percentage
 	iThrottleSmoothness := 0			; Percentage
 	iBrakeSmoothness := 0				; Percentage
@@ -233,15 +237,33 @@ class Corner extends Section {
 		}
 	}
 
+	SteeringCorrections {
+		Get {
+			return this.iSteeringCorrections
+		}
+	}
+
 	ThrottleSmoothness {
 		Get {
 			return this.iThrottleSmoothness
 		}
 	}
 
+	ThrottleCorrections {
+		Get {
+			return this.iThrottleCorrections
+		}
+	}
+
 	BrakeSmoothness {
 		Get {
 			return this.iBrakeSmoothness
+		}
+	}
+
+	BrakeCorrections {
+		Get {
+			return this.iBrakeCorrections
 		}
 	}
 
@@ -268,6 +290,10 @@ class Corner extends Section {
 			descriptor.TCActivations := this.TCActivations
 			descriptor.ABSActivations := this.ABSActivations
 
+			descriptor.SteeringCorrections := this.SteeringCorrections
+			descriptor.ThrottleCorrections := this.ThrottleCorrections
+			descriptor.BarkeCorrections := this.BrakeCorrections
+
 			descriptor.SteeringSmoothness := (nullRound(this.SteeringSmoothness) . " Percent")
 			descriptor.ThrottleSmoothness := (nullRound(this.ThrottleSmoothness) . " Percent")
 			descriptor.BrakeSmoothness := (nullRound(this.BrakeSmoothness) . " Percent")
@@ -279,7 +305,9 @@ class Corner extends Section {
 	__New(trackSection, direction, curvature
 					  , brakingTime, brakingLength, rollingTime, rollingLength, acceleratingTime, acceleratingLength
 					  , minG, maxG, avgG, minSpeed, maxSpeed, avgSpeed, tcActivations, absActivations
-					  , steeringSmoothness, throttleSmoothness, brakeSmoothness) {
+					  , steeringCorrections, steeringSmoothness
+					  , throttleCorrections, throttleSmoothness
+					  , brakeCorrections, brakeSmoothness) {
 		super.__New(trackSection)
 
 		this.iDirection := direction
@@ -304,8 +332,11 @@ class Corner extends Section {
 		this.iABSActivations := absActivations
 
 		this.iSteeringSmoothness := steeringSmoothness
+		this.iSteeringCorrections := steeringCorrections
 		this.iThrottleSmoothness := throttleSmoothness
+		this.iThrottleCorrections := throttleCorrections
 		this.iBrakeSmoothness := brakeSmoothness
+		this.iBrakeCorrections := brakeCorrections
 	}
 
 	static fromSection(telemetry, section, startIndex, endIndex) {
@@ -483,17 +514,17 @@ class Corner extends Section {
 			return Corner(section, (sumSteering > 0) ? "Right" : "Left", (curvature != kNull) ? curvature : 0
 								 , brakingTime, brakingLength, rollingTime, rollingLength, acceleratingTime, acceleratingLength
 								 , latG, latG, latG, speed, speed, speed, tcActivations, absActivations
-								 , 100 - ((steeringChanges / steeringCount) * 100)
-								 , 100 - ((throttleChanges / throttleCount) * 100)
-								 , 100 - ((brakeChanges / brakeCount) * 100))
+								 , Max(0, steeringChanges - 1), 100 - ((steeringChanges / steeringCount) * 100)
+								 , Max(0, throttleChanges - 1), 100 - ((throttleChanges / throttleCount) * 100)
+								 , Max(0, brakeChanges - 1), 100 - ((brakeChanges / brakeCount) * 100))
 		}
 		else
 			return Corner(section, (sumSteering > 0) ? "Right" : "Left", (curvature != kNull) ? curvature : 0
 								 , brakingTime, brakingLength, rollingTime, rollingLength, acceleratingTime, acceleratingLength
 								 , minLatG, maxLatG, average(latGs), minSpeed, maxSpeed, average(speeds), tcActivations, absActivations
-								 , 100 - ((steeringChanges / steeringCount) * 100)
-								 , 100 - ((throttleChanges / throttleCount) * 100)
-								 , 100 - ((brakeChanges / brakeCount) * 100))
+								 , Max(0, steeringChanges - 1), 100 - ((steeringChanges / steeringCount) * 100)
+								 , Max(0, throttleChanges - 1), 100 - ((throttleChanges / throttleCount) * 100)
+								 , Max(0, brakeChanges - 1), 100 - ((brakeChanges / brakeCount) * 100))
 	}
 }
 

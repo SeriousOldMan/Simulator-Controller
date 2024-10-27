@@ -16,10 +16,12 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\..\Libraries\Task.ahk"
 #Include "..\..\Libraries\JSON.ahk"
 #Include "..\..\Libraries\HTTP.ahk"
 #Include "..\..\Libraries\LLMConnector.ahk"
 #Include "RaceAssistant.ahk"
+#Include "..\..\Database\Libraries\TelemetryCollector.ahk"
 #Include "..\..\Garage\Libraries\IssueCollector.ahk"
 #Include "..\..\Garage\Libraries\IRCIssueCollector.ahk"
 #Include "..\..\Garage\Libraries\R3EIssueCollector.ahk"
@@ -48,6 +50,10 @@ class DrivingCoach extends GridRaceAssistant {
 	iTranscript := false
 
 	iCoachingActive := false
+	iAvailableTelemetry := CaseInsenseMap()
+
+	iTelemetryCollector := false
+	iCollectorTask := false
 
 	class CoachVoiceManager extends RaceAssistant.RaceVoiceManager {
 	}
@@ -126,7 +132,7 @@ class DrivingCoach extends GridRaceAssistant {
 		Get {
 			if isSet(type) {
 				if (type == true)
-					return ["Character", "Simulation", "Session", "Stint", "Knowledge", "Handling"]
+					return ["Character", "Simulation", "Session", "Stint", "Knowledge", "Handling", "Coaching", "Coaching.Lap", "Coaching.Corner"]
 				else
 					return (this.iInstructions.Has(type) ? this.iInstructions[type] : false)
 			}
@@ -205,6 +211,24 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
+	AvailableTelemetry {
+		Get {
+			return this.iAvailableTelemetry
+		}
+	}
+
+	TelemetryCollector {
+		Get {
+			return this.iTelemetryCollector
+		}
+	}
+
+	CollectorTask {
+		Get {
+			return this.iCollectorTask
+		}
+	}
+
 	__New(configuration, remoteHandler, name := false, language := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, speakerBooster := false
 		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, agentBooster := false
@@ -271,6 +295,14 @@ class DrivingCoach extends GridRaceAssistant {
 			this.iLaps := values.Laps
 		else if values.HasProp("Standings")
 			this.iStandings := values.Standings
+
+		if (values.HasProp("Session") && (values.Session == kSessionFinished)) {
+			if this.CoachingActive
+				this.shutdownCoaching()
+
+			this.iCoachingActive := false
+			this.iAvailableTelemetry := CaseInsenseMap()
+		}
 	}
 
 	connectorState(state, reason := false, arguments*) {
@@ -623,6 +655,74 @@ class DrivingCoach extends GridRaceAssistant {
 			this.iIssueCollector.stopIssueCollector()
 	}
 
+	startupCoaching() {
+		if !this.TelemetryCollector
+			this.startupTelemetryCollector()
+	}
+
+	shutdownCoaching() {
+		if this.TelemetryCollector
+			this.shutdownTelemetryCollector()
+	}
+
+	telemetryAvailable(laps) {
+		local ignore, lap
+
+		if (this.AvailableTelemetry.Count = 0)
+			this.getSpeaker().speak("CoachingReady")
+
+		for ignore, lap in laps
+			this.AvailableTelemetry[lap] := true
+	}
+
+	startupTelemetryCollector() {
+		local loadedLaps
+
+		updateTelemetry() {
+			local newLaps := []
+			local lap
+
+			loop Files, kTempDirectory . "Driving Coach\Telemetry\*.telemetry" {
+				lap := StrReplace(StrReplace(A_LoopFileName, "Lap ", ""), ".telemetry", "")
+
+				if !loadedLaps.Has(lap)
+					newLaps.Push(lap)
+			}
+
+			if (newLaps.Length > 0) {
+				bubbleSort(&newLaps)
+
+				this.telemetryAvailable(newLaps)
+			}
+		}
+
+		if (!this.TelemetryCollector && (this.TrackLength > 0)) {
+			DirCreate(kTempDirectory . "Driving Coach")
+			DirCreate(kTempDirectory . "Driving Coach\Telemetry")
+
+			this.iTelemetryCollector := TelemetryCollector(kTempDirectory . "Driving Coach\Telemetry", this.Simulator, this.Track, this.TrackLength)
+
+			this.iTelemetryCollector.startup()
+
+			loadedLaps := CaseInsenseMap()
+
+			this.iCollectorTask := PeriodicTask(updateTelemetry, 1000, kLowPriority)
+
+			this.iCollectorTask.start()
+		}
+	}
+
+	shutdownTelemetryCollector() {
+		if this.TelemetryCollector
+			this.TelemetryCollector.shutdown()
+
+		if this.iCollectorTask
+			this.iCollectorTask.stop()
+
+		this.iTelemetryCollector := false
+		this.iCollectorTask := false
+	}
+
 	prepareSession(&settings, &data, formationLap := true) {
 		local prepared := this.Prepared
 		local announcements := false
@@ -741,6 +841,18 @@ class DrivingCoach extends GridRaceAssistant {
 		local result := super.addLap(lapNumber, &data)
 
 		this.updateLaps(lapNumber, data)
+
+		if this.CoachingActive
+			this.startupCoaching()
+
+		return result
+	}
+
+	updateLap(lapNumber, &data, arguments*) {
+		local result := super.updateLap(lapNumber, &data, arguments*)
+
+		if this.CoachingActive
+			this.startupCoaching()
 
 		return result
 	}

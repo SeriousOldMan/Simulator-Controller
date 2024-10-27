@@ -965,10 +965,3 @@ nullRound(value, precision := 0) {
 	else
 		return value
 }
-
-analyzer := TelemetryAnalyzer("Assetto Corsa Competizione", "Brands Hatch")
-
-telm := analyzer.createTelemetry(FileSelect())
-
-js := telm.JSON
-MsgBox js

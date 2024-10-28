@@ -630,6 +630,10 @@ class Telemetry {
 		Get {
 			return this.iSections
 		}
+
+		Set {
+			return (this.iSections := value)
+		}
 	}
 
 	MaxG {

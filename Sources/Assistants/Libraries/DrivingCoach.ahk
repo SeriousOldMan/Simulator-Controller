@@ -575,18 +575,22 @@ class DrivingCoach extends GridRaceAssistant {
 		local corner := this.getNumber(words)
 		local telemetry := this.getLapsTelemetry(3, corner)
 
-		if (telemetry.Length > 0)
+		if (this.TelemetryAnalyzer && (telemetry.Length > 0))
 			this.handleVoiceText("TEXT", substituteVariables(this.Instructions["Coaching.Corner"]
-														   , {telemetry: values2String("`n`n", collect(telemetry, (t) => t.JSON))
+														   , {telemetry: values2String("`n`n", collect(telemetry, (t) => t.JSON)*)
 															, corner: corner}))
+		else
+			this.getSpeaker().speakPhrase("Later")
 	}
 
 	reviewLapRecognized(words) {
 		local telemetry := this.getLapsTelemetry(3)
 
-		if (telemetry.Length > 0)
+		if (this.TelemetryAnalyzer && (telemetry.Length > 0))
 			this.handleVoiceText("TEXT", substituteVariables(this.Instructions["Coaching.Lap"]
-														   , {telemetry: values2String("`n`n", collect(telemetry, (t) => t.JSON))}))
+														   , {telemetry: values2String("`n`n", collect(telemetry, (t) => t.JSON)*)}))
+		else
+			this.getSpeaker().speakPhrase("Later")
 	}
 
 	liveCoachingStartRecognized(words) {

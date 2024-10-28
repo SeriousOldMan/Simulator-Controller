@@ -340,7 +340,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 	}
 
 	enableTrackMapping(label := false, force := false) {
-		local simulator, car, track, trackType
+		local simulator, car, track, trackType, telemetryData, positionsData
 
 		if (!this.TrackMappingEnabled || force) {
 			if !label
@@ -367,8 +367,12 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 																   , "Simulator." . SessionDatabase.getSimulatorName(this.Simulator.Simulator[true])
 																   , "Track.Type", "Circuit")
 
-					if (trackType != "Circuit")
-						this.startupTrackMapper(trackType)
+					if (trackType != "Circuit") {
+						simulator.acquireSessionData(&telemetryData, &positionsData)
+
+						this.startupTrackMapper(trackType, getMultiMapValue(positionsData, "Track Data", "Length"
+																		  , getMultiMapValue(telemetryData, "Track Data", "Length", 0)))
+					}
 				}
 			}
 
@@ -591,7 +595,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 		return false
 	}
 
-	startupTrackMapper(trackType) {
+	startupTrackMapper(trackType, trackLength := 0) {
 		local simulator, simulatorName, simulatorCode, hasTrackMap, track, exePath, pid, dataFile, mapperState
 
 		static sessionDB := false
@@ -678,7 +682,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 
 					this.iMapperPhase := "Collect"
 
-					Run(A_ComSpec . " /c `"`"" . exePath . "`" -Map `"" . trackType . "`" > `"" . dataFile . "`"`"", kBinariesDirectory, "Hide", &pid)
+					Run(A_ComSpec . " /c `"`"" . exePath . "`" -Map `"" . trackType . "`" " . trackLength . " > `"" . dataFile . "`"`"", kBinariesDirectory, "Hide", &pid)
 
 					this.iMapperPID := pid
 				}
@@ -748,7 +752,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 			trackType := getMultiMapValue(settings, "Simulator." . SessionDatabase.getSimulatorName(this.Simulator.Simulator[true]), "Track.Type", "Circuit")
 
 			if ((trackType != "Circuit") && this.TrackMappingEnabled)
-				this.startupTrackMapper(trackType)
+				this.startupTrackMapper(trackType, getMultiMapValue(data, "Track Data", "Length"))
 		}
 	}
 
@@ -774,7 +778,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 		super.addLap(lap, running, data)
 
 		if (this.RaceAssistant && this.Simulator && (trackType = "Circuit") && this.TrackMappingEnabled)
-			this.startupTrackMapper(trackType)
+			this.startupTrackMapper(trackType, getMultiMapValue(data, "Track Data", "Length"))
 	}
 
 	positionTrigger(actionNr, positionX, positionY) {

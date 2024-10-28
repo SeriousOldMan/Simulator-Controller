@@ -756,7 +756,9 @@ class SpeechSynthesizer {
 			ssml .= "</speak>"
 
 			ssml := substituteVariables(ssml, {volume: this.iVolume, pitch: ((this.iPitch > 0) ? "+" : "-") . Abs(this.iPitch) . "st", rate: 1 + (0.05 * this.iRate)
-											 , language: this.Locale, voice: this.Voice, text: text})
+											 , language: this.Locale, voice: this.Voice, text: StrReplace(text, "%", "|||percent|||")})
+
+			ssml := StrReplace(ssml, "|||percent|||", "%")
 
 			try {
 				if ((this.Synthesizer = "Google") && (this.iGoogleMode = "HTTP")) {

@@ -21,6 +21,7 @@
 #Include "..\..\Libraries\HTTP.ahk"
 #Include "..\..\Libraries\LLMConnector.ahk"
 #Include "RaceAssistant.ahk"
+#Include "..\..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\..\Database\Libraries\TelemetryCollector.ahk"
 #Include "..\..\Garage\Libraries\IssueCollector.ahk"
 #Include "..\..\Garage\Libraries\IRCIssueCollector.ahk"
@@ -55,6 +56,8 @@ class DrivingCoach extends GridRaceAssistant {
 	iTelemetryAnalyzer := false
 	iTelemetryCollector := false
 	iCollectorTask := false
+
+	iCornerTriggerPID := false
 
 	class CoachVoiceManager extends RaceAssistant.RaceVoiceManager {
 	}
@@ -133,7 +136,7 @@ class DrivingCoach extends GridRaceAssistant {
 		Get {
 			if isSet(type) {
 				if (type == true)
-					return ["Character", "Simulation", "Session", "Stint", "Knowledge", "Handling", "Coaching", "Coaching.Lap", "Coaching.Corner"]
+					return ["Character", "Simulation", "Session", "Stint", "Knowledge", "Handling", "Coaching", "Coaching.Lap", "Coaching.Corner", "Coaching.Corner.Short"]
 				else
 					return (this.iInstructions.Has(type) ? this.iInstructions[type] : false)
 			}
@@ -253,6 +256,7 @@ class DrivingCoach extends GridRaceAssistant {
 			if this.TelemetryCollector
 				this.TelemetryCollector.shutdown()
 		})
+		OnExit(ObjBindMethod(this, "shutdownCornerTrigger", true))
 	}
 
 	loadFromConfiguration(configuration) {
@@ -594,15 +598,16 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	liveCoachingStartRecognized(words) {
-		this.getSpeaker().speakPhrase("Roger")
-
-
+		if this.startupCornerTrigger()
+			this.getSpeaker().speakPhrase("Roger")
+		else
+			this.getSpeaker().speakPhrase("Later")
 	}
 
 	liveCoachingFinishRecognized(words) {
 		this.getSpeaker().speakPhrase("Okay")
 
-
+		this.shutdownCornerTrigger()
 	}
 
 	handleVoiceText(grammar, text) {
@@ -723,6 +728,8 @@ class DrivingCoach extends GridRaceAssistant {
 	shutdownCoaching() {
 		local state := newMultiMap()
 
+		this.shutdownCornerTrigger()
+
 		if this.TelemetryCollector
 			this.shutdownTelemetryCollector()
 
@@ -839,6 +846,102 @@ class DrivingCoach extends GridRaceAssistant {
 		this.iTelemetryAnalyzer := false
 		this.iTelemetryCollector := false
 		this.iCollectorTask := false
+	}
+
+	startupCornerTrigger() {
+		local sections, positions, simulator, track, sessionDB, code, data, exePath, pid
+		local lastSection, index, section
+
+		if (!this.iCornerTriggerPID && this.Simulator && this.TelemetryAnalyzer) {
+			sections := this.TelemetryAnalyzer.TrackSections
+
+			if (sections && (sections.Length > 0)) {
+				positions := ""
+
+				for index, section in sections
+					if (section.Type = "Corner") {
+						if (index = 1)
+							lastSection := sections[sections.Length]
+						else if (index = sections.Length)
+							lastSection := sections[1]
+						else
+							lastSection := sections[index - 1]
+
+						if (lastSection.Length > 200)
+							positions .= (A_Space . lastSection.X . A_Space . lastSection.Y)
+					}
+
+				simulator := this.Simulator
+				track := this.Track
+
+				code := SessionDatabase.getSimulatorCode(simulator)
+				data := SessionDatabase.getTrackData(simulator, track)
+
+				exePath := (kBinariesDirectory . "Providers\" . code . " SHM Spotter.exe")
+				pid := false
+
+				try {
+					if !FileExist(exePath)
+						throw "File not found..."
+
+					if data
+						Run("`"" . exePath . "`" -Trigger `"" . data . "`" " . positions, kBinariesDirectory, "Hide", &pid)
+					else
+						Run("`"" . exePath . "`" -Trigger " . positions, kBinariesDirectory, "Hide", &pid)
+				}
+				catch Any as exception {
+					logError(exception, true)
+
+					logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
+															   , {simulator: code, protocol: "SHM"})
+										   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+										   . kBinariesDirectory . translate(")"))
+
+					showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
+												  , {exePath: exePath, simulator: code, protocol: "SHM"})
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				}
+
+				if pid
+					this.iCornerTriggerPID := pid
+			}
+		}
+
+		return (this.iCornerTriggerPID != false)
+	}
+
+	shutdownCornerTrigger(force := false, arguments*) {
+		local pid := this.iCornerTriggerPID
+		local tries
+
+		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
+			return false
+
+		if pid {
+			ProcessClose(pid)
+
+			if (force && ProcessExist(pid)) {
+				Sleep(500)
+
+				tries := 5
+
+				while (tries-- > 0) {
+					pid := ProcessExist(pid)
+
+					if pid {
+						ProcessClose(pid)
+
+						Sleep(500)
+					}
+					else
+						break
+				}
+			}
+
+			this.iCornerTriggerPID := false
+		}
+
+		return false
 	}
 
 	prepareSession(&settings, &data, formationLap := true) {
@@ -976,5 +1079,21 @@ class DrivingCoach extends GridRaceAssistant {
 			this.startupCoaching()
 
 		return result
+	}
+
+	positionTrigger(cornerNr, positionX, positionY) {
+		local telemetry
+
+		static lastRecommendation := false
+
+		if (A_TickCount < (lastRecommendation + 20000))
+			return
+
+		telemetry := this.getLapsTelemetry(3, cornerNr)
+
+		if (this.TelemetryAnalyzer && (telemetry.Length > 0))
+			this.handleVoiceText("TEXT", substituteVariables(this.Instructions["Coaching.Corner.Short"]
+														   , {telemetry: values2String("`n`n", collect(telemetry, (t) => t.JSON)*)
+															, corner: cornerNr}))
 	}
 }

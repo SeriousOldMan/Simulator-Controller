@@ -535,8 +535,6 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 					if !FileExist(exePath)
 						throw "File not found..."
 
-					this.shutdownTrackAutomation()
-
 					if data
 						Run("`"" . exePath . "`" -Automation `"" . data . "`" " . positions, kBinariesDirectory, "Hide", &pid)
 					else

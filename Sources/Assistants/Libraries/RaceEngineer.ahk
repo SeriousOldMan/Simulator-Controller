@@ -353,7 +353,7 @@ class RaceEngineer extends RaceAssistant {
 				if !this.supportsPitstop()
 					this.getSpeaker().speakPhrase("NoPitstop")
 				else if (this.hasPlannedPitstop() && this.Listener) {
-					this.getSpeaker().speakPhrase("ConfirmRePlan")
+					this.getSpeaker().speakPhrase("ConfirmRePlan", false, true)
 
 					this.setContinuation(ObjBindMethod(this, "planPitstopRecognized", words))
 				}
@@ -382,7 +382,7 @@ class RaceEngineer extends RaceAssistant {
 				}
 				else if this.hasPlannedPitstop() {
 					if this.Listener {
-						this.getSpeaker().speakPhrase("ConfirmRePlan")
+						this.getSpeaker().speakPhrase("ConfirmRePlan", false, true)
 
 						this.setContinuation(ObjBindMethod(this, "driverSwapRecognized", words))
 					}

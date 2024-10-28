@@ -492,9 +492,9 @@ class Corner extends Section {
 		return Corner(section, (sumSteering > 0) ? "Right" : "Left", (curvature != kNull) ? curvature : 0
 							 , brakingTime, brakingLength, rollingTime, rollingLength, acceleratingTime, acceleratingLength
 							 , minLatG, maxLatG, average(latGs), minSpeed, maxSpeed, average(speeds), tcActivations, absActivations
-							 , Max(0, steeringChanges - 1), 100 - ((steeringChanges / steeringCount) * 100)
-							 , Max(0, throttleChanges - 1), 100 - ((throttleChanges / throttleCount) * 100)
-							 , Max(0, brakeChanges - 1), 100 - ((brakeChanges / brakeCount) * 100))
+							 , Max(0, steeringChanges - 1), 100 - (steeringCount ? ((steeringChanges / steeringCount) * 100) : 0)
+							 , Max(0, throttleChanges - 1), 100 - (throttleCount ? ((throttleChanges / throttleCount) * 100): 0)
+							 , Max(0, brakeChanges - 1), 100 - (brakeCount ? ((brakeChanges / brakeCount) * 100) : 0))
 	}
 }
 

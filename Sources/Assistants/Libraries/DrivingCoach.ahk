@@ -555,7 +555,12 @@ class DrivingCoach extends GridRaceAssistant {
 					this.handleVoiceText("TEXT", values2String(A_Space, words*))
 			case "LiveCoachingStart":
 				if this.CoachingActive
-					this.liveCoachingRecognized(words)
+					this.liveCoachingStartRecognized(words)
+				else
+					this.handleVoiceText("TEXT", values2String(A_Space, words*))
+			case "LiveCoachingFinish":
+				if this.CoachingActive
+					this.liveCoachingFinishRecognized(words)
 				else
 					this.handleVoiceText("TEXT", values2String(A_Space, words*))
 			default:
@@ -610,7 +615,7 @@ class DrivingCoach extends GridRaceAssistant {
 		this.shutdownCornerTrigger()
 	}
 
-	handleVoiceText(grammar, text) {
+	handleVoiceText(grammar, text, reportError := true) {
 		local answer := false
 		local ignore, part
 
@@ -628,14 +633,15 @@ class DrivingCoach extends GridRaceAssistant {
 			if answer
 				report := true
 			else if (this.Speaker && report) {
-				this.getSpeaker().speakPhrase("Later", false, false, false, {Noise: false})
+				if reportError
+					this.getSpeaker().speakPhrase("Later", false, false, false, {Noise: false})
 
 				report := false
 			}
 		}
 		catch Any as exception {
 			if report {
-				if this.Speaker
+				if (this.Speaker && reportError)
 					this.getSpeaker().speakPhrase("Later", false, false, false, {Noise: false})
 
 				report := false
@@ -745,7 +751,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local ignore, lap
 
 		if (this.AvailableTelemetry.Count = 0)
-			this.getSpeaker().speakPhrase("CoachingReady")
+			this.getSpeaker().speakPhrase("CoachingReady", false, true)
 
 		for ignore, lap in laps
 			this.AvailableTelemetry[lap] := true
@@ -869,13 +875,19 @@ class DrivingCoach extends GridRaceAssistant {
 
 						if (lastSection.Length > 200)
 							positions .= (A_Space . lastSection.X . A_Space . lastSection.Y)
+						else
+							positions .= (A_Space . -32700 . A_Space . -32700)
 					}
+					else
+						positions .= (A_Space . -32700 . A_Space . -32700)
 
 				simulator := this.Simulator
 				track := this.Track
 
-				code := SessionDatabase.getSimulatorCode(simulator)
-				data := SessionDatabase.getTrackData(simulator, track)
+				sessionDB := SessionDatabase()
+
+				code := sessionDB.getSimulatorCode(simulator)
+				data := sessionDB.getTrackData(simulator, track)
 
 				exePath := (kBinariesDirectory . "Providers\" . code . " SHM Spotter.exe")
 				pid := false
@@ -1086,6 +1098,9 @@ class DrivingCoach extends GridRaceAssistant {
 
 		static lastRecommendation := false
 
+		if ((Round(positionX) = -32700) && (Round(positionY) = -32700))
+			return
+
 		if (A_TickCount < (lastRecommendation + 20000))
 			return
 
@@ -1094,6 +1109,7 @@ class DrivingCoach extends GridRaceAssistant {
 		if (this.TelemetryAnalyzer && (telemetry.Length > 0))
 			this.handleVoiceText("TEXT", substituteVariables(this.Instructions["Coaching.Corner.Short"]
 														   , {telemetry: values2String("`n`n", collect(telemetry, (t) => t.JSON)*)
-															, corner: cornerNr}))
+															, corner: cornerNr})
+									   , false)
 	}
 }

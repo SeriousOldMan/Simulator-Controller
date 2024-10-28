@@ -13,6 +13,7 @@
 #Include "..\Libraries\CLR.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Database\Libraries\TelemetryCollector.ahk"
+#Include "Libraries\SimulatorPlugin.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

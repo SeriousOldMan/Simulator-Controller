@@ -372,7 +372,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 				}
 			}
 
-			this.updateActions(kSessionFinished)
+			this.updateActions(kSessionUnknown)
 		}
 	}
 
@@ -389,7 +389,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 
 			this.updateMappingTrayLabel(label, false)
 
-			this.updateActions(kSessionFinished)
+			this.updateActions(kSessionUnknown)
 		}
 	}
 
@@ -451,7 +451,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 				}
 			}
 
-			this.updateActions(kSessionFinished)
+			this.updateActions(kSessionUnknown)
 		}
 	}
 
@@ -471,7 +471,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 			if this.Simulator
 				this.Simulator.resetTrackAutomation()
 
-			this.updateActions(kSessionFinished)
+			this.updateActions(kSessionUnknown)
 		}
 	}
 
@@ -534,9 +534,9 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 					this.shutdownTrackAutomation()
 
 					if data
-						Run("`"" . exePath . "`" -Trigger `"" . data . "`" " . positions, kBinariesDirectory, "Hide", &pid)
+						Run("`"" . exePath . "`" -Automation `"" . data . "`" " . positions, kBinariesDirectory, "Hide", &pid)
 					else
-						Run("`"" . exePath . "`" -Trigger " . positions, kBinariesDirectory, "Hide", &pid)
+						Run("`"" . exePath . "`" -Automation " . positions, kBinariesDirectory, "Hide", &pid)
 				}
 				catch Any as exception {
 					logError(exception, true)

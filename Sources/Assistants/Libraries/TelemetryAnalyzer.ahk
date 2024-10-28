@@ -276,7 +276,17 @@ class Corner extends Section {
 			descriptor.Curvature := this.Curvature
 
 			descriptor.ApexG := nullRound(this.AvgG, 2)
-			descriptor.ApexSpeed := (nullRound(this.AvgSpeed) . " km/h")
+			descriptor.ApexSpeed := (nullRound(this.MinSpeed) . " km/h")
+
+			/*
+			descriptor.MinG := nullRound(this.MinG, 2)
+			descriptor.MaxG := nullRound(this.MaxG, 2)
+			descriptor.AvgG := nullRound(this.AvgG, 2)
+
+			descriptor.MinSpeed := (nullRound(this.MinSpeed) . " km/h")
+			descriptor.MaxSpeed := (nullRound(this.MaxSpeed) . " km/h")
+			descriptor.AvgSpeed := (nullRound(this.AvgSpeed) . " km/h")
+			*/
 
 			descriptor.BrakingTime := (nullRound(this.Time["Entry"] / 1000, 2) . " Seconds")
 			descriptor.BrakingLength := (nullRound(this.Length["Entry"], 1) . " Meter")
@@ -349,10 +359,6 @@ class Corner extends Section {
 		local brakingTime := 0
 		local rollingTime := 0
 		local acceleratingTime := 0
-		local brakingG := kUndefined
-		local brakingSpeed := kUndefined
-		local acceleratingG := kUndefined
-		local acceleratingSpeed := kUndefined
 		local curvature := telemetry.getValue(index, "Curvature", 0)
 		local speed := kUndefined
 		local latG := kUndefined
@@ -371,24 +377,29 @@ class Corner extends Section {
 		local steeringCount := 0
 		local steeringChanges := 0
 		local sumSteering := 0
-		local minSpeed, maxSpeed, speeds, minLatG, maxLatG, latGs
+		local speed := telemetry.getValue(index, "Speed")
+		local minSpeed := speed
+		local maxSpeed := speed
+		local speeds := []
+		local latG := Abs(telemetry.getValue(index, "Lat G"))
+		local minLatG := latG
+		local maxLatG := latG
+		local latGs := []
 		local brake, throttle, steering
 		local startDistance, startTime
 
 		updatePhase(phase, index) {
 			if (phase = "Braking") {
-				brakingLength := (telemetry.getValue(index, "Distance") - startDistance)
-				brakingTime := (telemetry.getValue(index, "Time", 0) - startTime)
-				brakingG := Abs(telemetry.getValue(index, "Lat G"))
-				brakingSpeed := telemetry.getValue(index, "Speed")
+				brakingLength += (telemetry.getValue(index, "Distance") - startDistance)
+				brakingTime += (telemetry.getValue(index, "Time", 0) - startTime)
 			}
 			else if (phase = "Rolling") {
-				rollingLength := (telemetry.getValue(index, "Distance") - startDistance)
-				rollingTime := (telemetry.getValue(index, "Time", 0) - startTime)
+				rollingLength += (telemetry.getValue(index, "Distance") - startDistance)
+				rollingTime += (telemetry.getValue(index, "Time", 0) - startTime)
 			}
 			else if (phase = "Accelerating") {
-				acceleratingLength := (telemetry.getValue(index, "Distance") - startDistance)
-				acceleratingTime := (telemetry.getValue(index, "Time", 0) - startTime)
+				acceleratingLength += (telemetry.getValue(index, "Distance") - startDistance)
+				acceleratingTime += (telemetry.getValue(index, "Time", 0) - startTime)
 			}
 		}
 
@@ -405,6 +416,16 @@ class Corner extends Section {
 			steering := telemetry.getValue(index, "Steering")
 			brake := telemetry.getValue(index, "Brake")
 			throttle := telemetry.getValue(index, "Throttle")
+			speed := telemetry.getValue(index, "Speed")
+			latG := Abs(telemetry.getValue(index, "Lat G"))
+
+			minSpeed := Min(speed, minSpeed)
+			maxSpeed := Max(speed, maxSpeed)
+			speeds.Push(speed)
+
+			minLatG := Min(minLatG, latG)
+			maxLatG := Max(maxLatG, latG)
+			latGs.Push(latG)
 
 			sumSteering += steering
 
@@ -418,34 +439,14 @@ class Corner extends Section {
 			lastSteeringDelta := (steering - lastSteering)
 			lastSteering := steering
 
-			if ((brake > 0) && (lastPhase = "Approaching")) {
+			if (brake > 0.2)
 				phase := "Braking"
-			}
-			else if ((brake <= 0.2) && (throttle <= 0.2) && (lastPhase = "Braking")) {
+			else if (throttle <= 0.2)
 				phase := "Rolling"
-			}
-			else if ((brake <= 0.2) && (throttle > 0.5) && ((lastPhase = "Braking") || (lastPhase = "Rolling"))) {
+			else
 				phase := "Accelerating"
-			}
-
-			speed := telemetry.getValue(index, "Speed")
-			latG := Abs(telemetry.getValue(index, "Lat G"))
 
 			if (phase != lastPhase) {
-				if (phase = "Rolling") {
-					minLatG := latG
-					maxLatG := latG
-					latGs := []
-
-					minSpeed := speed
-					maxSpeed := speed
-					speeds := []
-				}
-				else if (phase = "Accelerating") {
-					acceleratingG := latG
-					acceleratingSpeed := speed
-				}
-
 				updatePhase(lastPhase, index)
 
 				startDistance := telemetry.getValue(index, "Distance")
@@ -468,15 +469,6 @@ class Corner extends Section {
 				lastBrakeDelta := (brake - lastBrake)
 				lastBrake := brake
 			}
-			else if (phase = "Rolling") {
-				minLatG := Min(minLatG, latG)
-				maxLatG := Max(maxLatG, latG)
-				latGs.Push(latG)
-
-				minSpeed := Min(minSpeed, speed)
-				maxSpeed := Max(maxSpeed, speed)
-				speeds.Push(speed)
-			}
 			else if (phase = "Accelerating") {
 				if telemetry.getValue(index, "TC", false)
 					tcActivations += 1
@@ -497,34 +489,12 @@ class Corner extends Section {
 
 		updatePhase(phase, index - 1)
 
-		if (speed = kUndefined) {
-			if (brakingG != kUndefined) {
-				latG := brakingG
-				speed := brakingSpeed
-			}
-			else if (acceleratingG != kUndefined) {
-				latG := acceleratingG
-				speed := acceleratingSpeed
-			}
-			else {
-				latG := 0
-				speed := 0
-			}
-
-			return Corner(section, (sumSteering > 0) ? "Right" : "Left", (curvature != kNull) ? curvature : 0
-								 , brakingTime, brakingLength, rollingTime, rollingLength, acceleratingTime, acceleratingLength
-								 , latG, latG, latG, speed, speed, speed, tcActivations, absActivations
-								 , Max(0, steeringChanges - 1), 100 - ((steeringChanges / steeringCount) * 100)
-								 , Max(0, throttleChanges - 1), 100 - ((throttleChanges / throttleCount) * 100)
-								 , Max(0, brakeChanges - 1), 100 - ((brakeChanges / brakeCount) * 100))
-		}
-		else
-			return Corner(section, (sumSteering > 0) ? "Right" : "Left", (curvature != kNull) ? curvature : 0
-								 , brakingTime, brakingLength, rollingTime, rollingLength, acceleratingTime, acceleratingLength
-								 , minLatG, maxLatG, average(latGs), minSpeed, maxSpeed, average(speeds), tcActivations, absActivations
-								 , Max(0, steeringChanges - 1), 100 - ((steeringChanges / steeringCount) * 100)
-								 , Max(0, throttleChanges - 1), 100 - ((throttleChanges / throttleCount) * 100)
-								 , Max(0, brakeChanges - 1), 100 - ((brakeChanges / brakeCount) * 100))
+		return Corner(section, (sumSteering > 0) ? "Right" : "Left", (curvature != kNull) ? curvature : 0
+							 , brakingTime, brakingLength, rollingTime, rollingLength, acceleratingTime, acceleratingLength
+							 , minLatG, maxLatG, average(latGs), minSpeed, maxSpeed, average(speeds), tcActivations, absActivations
+							 , Max(0, steeringChanges - 1), 100 - ((steeringChanges / steeringCount) * 100)
+							 , Max(0, throttleChanges - 1), 100 - ((throttleChanges / throttleCount) * 100)
+							 , Max(0, brakeChanges - 1), 100 - ((brakeChanges / brakeCount) * 100))
 	}
 }
 
@@ -629,6 +599,8 @@ class Straight extends Section {
 
 class Telemetry {
 	iTelemetryAnalyzer := false
+
+	iLap := false
 	iData := []
 
 	iSections := []
@@ -639,6 +611,12 @@ class Telemetry {
 	TelemetryAnalyzer {
 		Get {
 			return this.iTelemetryAnalyzer
+		}
+	}
+
+	Lap {
+		Get {
+			return this.iLap
 		}
 	}
 
@@ -668,7 +646,7 @@ class Telemetry {
 
 	Descriptor {
 		Get {
-			return {MaxG: this.MaxG, MaxSpeed: this.MaxSpeed, Sections: collect(this.Sections, (s) => s.Descriptor)}
+			return {Lap: this.Lap, MaxG: this.MaxG, MaxSpeed: this.MaxSpeed, Sections: collect(this.Sections, (s) => s.Descriptor)}
 		}
 	}
 
@@ -678,12 +656,14 @@ class Telemetry {
 		}
 	}
 
-	__New(analyzer, data) {
+	__New(analyzer, lap, data) {
 		local maxG := kUndefined
 		local maxSpeed := kUndefined
 		local ignore, section
 
 		this.iTelemetryAnalyzer := analyzer
+
+		this.iLap := lap
 		this.iData := data
 
 		this.iSections := this.createSections(this.Data)
@@ -980,8 +960,8 @@ class TelemetryAnalyzer {
 		return schema
 	}
 
-	createTelemetry(fileName) {
-		return Telemetry(this, this.loadData(fileName))
+	createTelemetry(lap, fileName) {
+		return Telemetry(this, lap, this.loadData(fileName))
 	}
 }
 

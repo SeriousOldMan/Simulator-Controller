@@ -21,9 +21,15 @@ namespace RF2SHMSpotter {
 
             SHMSpotter spotter = new SHMSpotter();
 
-            if (args.Length > 0 && args[0] == "-Trigger")
+            if (args.Length > 0 && args[0] == "-Automation")
             {
-                spotter.initializeTrigger(args);
+                spotter.initializeTrigger("Trigger", args);
+
+                spotter.Run(false, true, false);
+            }
+            else if (args.Length > 0 && args[0] == "-Trigger")
+            {
+                spotter.initializeTrigger("Trigger", args);
 
                 spotter.Run(false, true, false);
             }

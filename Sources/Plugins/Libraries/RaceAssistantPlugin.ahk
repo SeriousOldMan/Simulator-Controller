@@ -1671,11 +1671,11 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	activate() {
 		super.activate()
 
-		this.updateActions(kSessionFinished)
+		this.updateActions(kSessionUnknown)
 	}
 
 	updateFunctions() {
-		this.updateActions(kSessionFinished)
+		this.updateActions(kSessionUnknown)
 	}
 
 	updateActions(session) {
@@ -1787,7 +1787,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				this.updateTrayLabel(label, true)
 			}
 
-			this.updateActions(kSessionFinished)
+			this.updateActions(kSessionUnknown)
 		}
 	}
 

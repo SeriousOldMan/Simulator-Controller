@@ -85,11 +85,11 @@ startupDrivingCoach() {
 	local coachLogo := false
 	local coachLanguage := false
 	local coachSynthesizer := true
-	local coachSpeaker := false
+	local coachSpeaker := true
 	local coachSpeakerVocalics := false
 	local coachSpeakerBooster := false
 	local coachRecognizer := true
-	local coachListener := false
+	local coachListener := true
 	local coachListenerBooster := false
 	local coachConversationBooster := false
 	local coachAgentBooster := false
@@ -210,6 +210,10 @@ startupDrivingCoach() {
 
 	if remotePID
 		Task.startTask(PeriodicTask(checkRemoteProcessAlive.Bind(remotePID), 10000, kLowPriority))
+
+	coach.iCoachingActive := true
+	coach.startConversation()
+	coach.focusCornerRecognized(["Can", "we", "focus", "on", "corner", "number", "3"])
 
 	startupProcess()
 }

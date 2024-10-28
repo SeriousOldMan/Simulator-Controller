@@ -120,6 +120,16 @@ void sendAutomationMessage(string message) {
 		sendStringMessage(winHandle, 0, "Race Spotter:" + message);
 }
 
+void sendTriggerMessage(string message) {
+	HWND winHandle = FindWindowEx(0, 0, 0, L"Driving Coach.exe");
+
+	if (winHandle == 0)
+		winHandle = FindWindowEx(0, 0, 0, L"Driving Coach.ahk");
+
+	if (winHandle != 0)
+		sendStringMessage(winHandle, 0, "Driving Coach:" + message);
+}
+
 void sendAnalyzerMessage(string message) {
 	HWND winHandle = FindWindowEx(0, 0, 0, L"Setup Workbench.exe");
 
@@ -1977,6 +1987,7 @@ float xCoordinates[60];
 float yCoordinates[60];
 int numCoordinates = 0;
 time_t lastUpdate = 0;
+char* triggerType = (char *)"Automation";
 
 void checkCoordinates() {
 	if (time(NULL) > (lastUpdate + 2)) {
@@ -2015,7 +2026,10 @@ void checkCoordinates() {
 					sprintf_s(numBuffer, "%f", yCoordinates[i]);
 					strcat_s(buffer, numBuffer);
 
-					sendAutomationMessage(buffer);
+					if (strcmp(triggerType, "Automation") == 0)
+						sendAutomationMessage(buffer);
+					else
+						sendTriggerMessage(buffer);
 
 					lastUpdate = time(NULL);
 
@@ -2153,8 +2167,15 @@ int main(int argc, char* argv[])
 		calibrateTelemetry = (strcmp(argv[1], "-Calibrate") == 0);
 		analyzeTelemetry = calibrateTelemetry || (strcmp(argv[1], "-Analyze") == 0);
 		mapTrack = (strcmp(argv[1], "-Map") == 0);
-		positionTrigger = (strcmp(argv[1], "-Trigger") == 0);
+		positionTrigger = (strcmp(argv[1], "-Automation") == 0);
 		carTelemetry = (strcmp(argv[1], "-Telemetry") == 0);
+
+		if (!positionTrigger) {
+			positionTrigger = (strcmp(argv[1], "-Trigger") == 0);
+
+			if (positionTrigger)
+				triggerType = (char *)"Trigger";
+		}
 
 		if (mapTrack && argc >  2)
 			circuit = (strcmp(argv[2], "Circuit") == 0);

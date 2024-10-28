@@ -142,18 +142,29 @@ namespace RF2SHMSpotter {
 
 			if (winHandle != 0)
 				SendStringMessage(winHandle, 0, "Race Spotter:" + message);
-		}
+        }
 
-		void SendAutomationMessage(string message)
-		{
-			int winHandle = FindWindowEx(0, 0, null, "Simulator Controller.exe");
+        void SendAutomationMessage(string message)
+        {
+            int winHandle = FindWindowEx(0, 0, null, "Simulator Controller.exe");
 
-			if (winHandle == 0)
-				winHandle = FindWindowEx(0, 0, null, "Simulator Controller.ahk");
+            if (winHandle == 0)
+                winHandle = FindWindowEx(0, 0, null, "Simulator Controller.ahk");
 
-			if (winHandle != 0)
-				SendStringMessage(winHandle, 0, "Race Spotter:" + message);
-		}
+            if (winHandle != 0)
+                SendStringMessage(winHandle, 0, "Race Spotter:" + message);
+        }
+
+        void SendTriggerMessage(string message)
+        {
+            int winHandle = FindWindowEx(0, 0, null, "Driving Coach.exe");
+
+            if (winHandle == 0)
+                winHandle = FindWindowEx(0, 0, null, "Driving Coach.ahk");
+
+            if (winHandle != 0)
+                SendStringMessage(winHandle, 0, "Driving Coach:" + message);
+        }
 
         void SendAnalyzerMessage(string message)
         {
@@ -1657,6 +1668,7 @@ namespace RF2SHMSpotter {
 		float[] yCoordinates = new float[60];
 		int numCoordinates = 0;
 		long lastUpdate = 0;
+		string triggerType = "Automation";
 
 		void checkCoordinates(ref rF2VehicleScoring playerScoring)
 		{
@@ -1691,9 +1703,12 @@ namespace RF2SHMSpotter {
 					{
 						if (Math.Abs(xCoordinates[i] - coordinateX) < 20 && Math.Abs(yCoordinates[i] - coordinateY) < 20)
 						{
-							SendAutomationMessage("positionTrigger:" + (i + 1) + ";" + xCoordinates[i] + ";" + yCoordinates[i]);
+							if (triggerType == "Automation")
+								SendAutomationMessage("positionTrigger:" + (i + 1) + ";" + xCoordinates[i] + ";" + yCoordinates[i]);
+							else
+                                SendTriggerMessage("positionTrigger:" + (i + 1) + ";" + xCoordinates[i] + ";" + yCoordinates[i]);
 
-							lastUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                            lastUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 
 							break;
 						}
@@ -1780,8 +1795,10 @@ namespace RF2SHMSpotter {
             }
         }
 
-        public void initializeTrigger(string[] args)
+        public void initializeTrigger(string type, string[] args)
         {
+			triggerType = type;
+
 			for (int i = 1; i < (args.Length - 1); i += 2)
 			{
 				xCoordinates[numCoordinates] = float.Parse(args[i]);

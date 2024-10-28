@@ -582,11 +582,11 @@ class TeamServerPlugin extends ControllerPlugin {
 	activate() {
 		super.activate()
 
-		this.updateActions(kSessionFinished)
+		this.updateActions(kSessionUnknown)
 	}
 
 	updateFunctions() {
-		this.updateActions(kSessionFinished)
+		this.updateActions(kSessionUnknown)
 	}
 
 	updateActions(session) {
@@ -640,11 +640,11 @@ class TeamServerPlugin extends ControllerPlugin {
 
 			Task.startTask(ObjBindMethod(this, "tryConnect"), 2000, kLowPriority)
 
-			this.updateActions(kSessionFinished)
+			this.updateActions(kSessionUnknown)
 
 			this.updateTrayLabel(label, true)
 
-			this.updateActions(kSessionFinished)
+			this.updateActions(kSessionUnknown)
 		}
 	}
 
@@ -661,11 +661,11 @@ class TeamServerPlugin extends ControllerPlugin {
 
 			this.iTeamServerEnabled := false
 
-			this.updateActions(kSessionFinished)
+			this.updateActions(kSessionUnknown)
 
 			this.updateTrayLabel(label, false)
 
-			this.updateActions(kSessionFinished)
+			this.updateActions(kSessionUnknown)
 		}
 	}
 

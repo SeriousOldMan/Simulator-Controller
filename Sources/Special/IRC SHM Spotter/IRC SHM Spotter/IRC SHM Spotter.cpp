@@ -247,6 +247,22 @@ void sendAutomationMessage(const char* message) {
 	}
 }
 
+void sendTriggerMessage(const char* message) {
+	HWND winHandle = FindWindowEx(0, 0, 0, "Driving Coach.exe");
+
+	if (winHandle == 0)
+		winHandle = FindWindowEx(0, 0, 0, "Driving Coach.ahk");
+
+	if (winHandle != 0) {
+		char buffer[128];
+
+		strcpy_s(buffer, 128, "Driving Coach:");
+		strcpy_s(buffer + strlen("Driving Coach:"), 128 - strlen("Driving Coach:"), message);
+
+		sendStringMessage(winHandle, 0, buffer);
+	}
+}
+
 void sendAnalyzerMessage(const char* message) {
 	HWND winHandle = FindWindowEx(0, 0, 0, "Setup Workbench.exe");
 
@@ -1765,6 +1781,7 @@ float yCoordinates[60];
 float trackDistances[60];
 int numCoordinates = 0;
 time_t lastUpdate = 0;
+char* triggerType = "Automation";
 
 void loadTrackCoordinates(char* fileName) {
 	std::ifstream infile(fileName);
@@ -1842,7 +1859,10 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 				sprintf_s(numBuffer, "%f", yCoordinates[index]);
 				strcat_s(buffer, numBuffer);
 
-				sendAutomationMessage(buffer);
+				if (strcmp(triggerType, "Automation") == 0)
+					sendAutomationMessage(buffer);
+				else
+					sendTriggerMessage(buffer);
 
 				lastUpdate = time(NULL);
 			}
@@ -2026,8 +2046,15 @@ int main(int argc, char* argv[])
 		calibrateTelemetry = (strcmp(argv[1], "-Calibrate") == 0);
 		analyzeTelemetry = calibrateTelemetry || (strcmp(argv[1], "-Analyze") == 0);
 		mapTrack = (strcmp(argv[1], "-Map") == 0);
-		positionTrigger = (strcmp(argv[1], "-Trigger") == 0);
+		positionTrigger = (strcmp(argv[1], "-Automation") == 0);
 		carTelemetry = (strcmp(argv[1], "-Telemetry") == 0);
+
+		if (!positionTrigger) {
+			positionTrigger = (strcmp(argv[1], "-Trigger") == 0);
+
+			if (positionTrigger)
+				triggerType = "Trigger";
+		}
 
 		if (mapTrack && argc > 2)
 			circuit = (strcmp(argv[2], "Circuit") == 0);

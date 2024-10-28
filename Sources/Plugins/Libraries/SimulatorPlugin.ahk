@@ -18,6 +18,7 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+global kSessionUnknown := -2
 global kSessionFinished := 0
 global kSessionPaused := -1
 global kSessionOther := 1
@@ -578,7 +579,7 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 
 	updateFunctions() {
-		this.updateActions(kSessionFinished)
+		this.updateActions(kSessionUnknown)
 	}
 
 	updateActions(session) {

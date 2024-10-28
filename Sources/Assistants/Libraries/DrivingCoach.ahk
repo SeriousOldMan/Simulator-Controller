@@ -52,6 +52,7 @@ class DrivingCoach extends GridRaceAssistant {
 	iCoachingActive := false
 	iAvailableTelemetry := CaseInsenseMap()
 
+	iTelemetryAnalyzer := false
 	iTelemetryCollector := false
 	iCollectorTask := false
 
@@ -217,6 +218,12 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
+	TelemetryAnalyzer {
+		Get {
+			return this.iTelemetryAnalyzer
+		}
+	}
+
 	TelemetryCollector {
 		Get {
 			return this.iTelemetryCollector
@@ -300,10 +307,9 @@ class DrivingCoach extends GridRaceAssistant {
 		else if values.HasProp("Standings")
 			this.iStandings := values.Standings
 
-		if (values.HasProp("Session") && (values.Session == kSessionFinished) && (this.Session != kSessionFinished)) {
+		if (values.HasProp("Session") && (values.Session == kSessionFinished) && (this.Session != kSessionFinished))
 			if this.CoachingActive
 				this.shutdownCoaching()
-		}
 	}
 
 	connectorState(state, reason := false, arguments*) {
@@ -459,6 +465,9 @@ class DrivingCoach extends GridRaceAssistant {
 							return substituteVariables(this.Instructions["Handling"], {handling: handling})
 					}
 				}
+			case "Coaching":
+				if ((knowledgeBase || isDebug()) && this.CoachingActive)
+					return substituteVariables(this.Instructions["Coaching"], {name: this.VoiceManager.Name})
 		}
 
 		return false
@@ -530,14 +539,19 @@ class DrivingCoach extends GridRaceAssistant {
 				this.coachingRequestRecognized(words)
 			case "CoachingFinish":
 				this.coachingFinishRecognized(words)
-			case "FocusCorner":
+			case "ReviewCorner":
 				if this.CoachingActive
-					this.focusCornerRecognized(words)
+					this.reviewCornerRecognized(words)
 				else
 					this.handleVoiceText("TEXT", values2String(A_Space, words*))
-			case "GeneralAdvice":
+			case "ReviewLap":
 				if this.CoachingActive
-					this.generalAdviceRecognized(words)
+					this.reviewLapRecognized(words)
+				else
+					this.handleVoiceText("TEXT", values2String(A_Space, words*))
+			case "LiveCoaching":
+				if this.CoachingActive
+					this.liveCoachingRecognized(words)
 				else
 					this.handleVoiceText("TEXT", values2String(A_Space, words*))
 			default:
@@ -557,12 +571,28 @@ class DrivingCoach extends GridRaceAssistant {
 		this.shutdownCoaching()
 	}
 
-	focusCornerRecognized(words) {
-		this.getSpeaker().speakPhrase("Roger")
+	reviewCornerRecognized(words) {
+		local corner := this.getNumber(words)
+		local telemetry := this.getLapsTelemetry(3, corner)
+
+		if (telemetry.Length > 0)
+			this.handleVoiceText("TEXT", substituteVariables(this.Instructions["Coaching.Corner"]
+														   , {telemetry: values2String("`n`n", collect(telemetry, (t) => t.JSON))
+															, corner: corner}))
 	}
 
-	generalAdviceRecognized(words) {
-		this.getSpeaker().speakPhrase("Later")
+	reviewLapRecognized(words) {
+		local telemetry := this.getLapsTelemetry(3)
+
+		if (telemetry.Length > 0)
+			this.handleVoiceText("TEXT", substituteVariables(this.Instructions["Coaching.Lap"]
+														   , {telemetry: values2String("`n`n", collect(telemetry, (t) => t.JSON))}))
+	}
+
+	liveCoachingRecognized(words) {
+		this.getSpeaker().speakPhrase("Roger")
+
+
 	}
 
 	handleVoiceText(grammar, text) {
@@ -658,17 +688,40 @@ class DrivingCoach extends GridRaceAssistant {
 			this.iIssueCollector.stopIssueCollector()
 	}
 
+	startCoaching() {
+		this.coachingStartRecognized([])
+	}
+
+	finishCoaching() {
+		this.coachingFinishRecognized([])
+	}
+
 	startupCoaching() {
-		if !this.TelemetryCollector
+		local state
+
+		if !this.TelemetryCollector {
 			this.startupTelemetryCollector()
+
+			state := newMultiMap()
+
+			setMultiMapValue(state, "Coaching", "Active", true)
+
+			writeMultiMap(kTempDirectory . "Coaching.state", state)
+		}
 	}
 
 	shutdownCoaching() {
+		local state := newMultiMap()
+
 		if this.TelemetryCollector
 			this.shutdownTelemetryCollector()
 
 		this.iCoachingActive := false
 		this.iAvailableTelemetry := CaseInsenseMap()
+
+		setMultiMapValue(state, "Coaching", "Active", true)
+
+		writeMultiMap(kTempDirectory . "Coaching.state", state)
 	}
 
 	telemetryAvailable(laps) {
@@ -679,6 +732,47 @@ class DrivingCoach extends GridRaceAssistant {
 
 		for ignore, lap in laps
 			this.AvailableTelemetry[lap] := true
+	}
+
+	getLapsTelemetry(numLaps, corner := false) {
+		local result := []
+		local laps := getKeys(this.AvailableTelemetry)
+		local ignore, lap, found
+
+		for ignore, lap in bubbleSort(&laps, (a, b) => (a < b)) {
+			if ((A_Index > laps.Length) || (result.Length >= numLaps))
+				break
+
+			if (this.AvailableTelemetry[lap] == true)
+				this.AvailableTelemetry[lap] := this.TelemetryAnalyzer.createTelemetry(lap, kTempDirectory . "Driving Coach\Telemetry\Lap " . lap . ".telemetry")
+
+			if corner {
+				lap := this.AvailableTelemetry[lap].Clone()
+
+				found := false
+
+				lap.Sections := choose(lap.Sections, (section) {
+									if ((section.Type = "Corner") && (section.Nr = corner)) {
+										found := true
+
+										return true
+									}
+									else if found {
+										found := false
+
+										return true
+									}
+									else
+										return false
+								})
+
+				result.Push(lap)
+			}
+			else
+				result.Push(this.AvailableTelemetry[lap])
+		}
+
+		return result
 	}
 
 	startupTelemetryCollector() {
@@ -705,12 +799,14 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 		}
 
-		if (!this.TelemetryCollector && (this.TrackLength > 0)) {
+		if (!this.TelemetryCollector && this.Simulator && this.Track && ((this.TrackLength > 0) || isDebug())) {
 			DirCreate(kTempDirectory . "Driving Coach")
 			DirCreate(kTempDirectory . "Driving Coach\Telemetry")
 
-			deleteDirectory(kTempDirectory . "Driving Coach\Telemetry")
+			if !isDebug()
+				deleteDirectory(kTempDirectory . "Driving Coach\Telemetry")
 
+			this.iTelemetryAnalyzer := TelemetryAnalyzer(this.Simulator, this.Track)
 			this.iTelemetryCollector := TelemetryCollector(kTempDirectory . "Driving Coach\Telemetry", this.Simulator, this.Track, this.TrackLength)
 
 			this.iTelemetryCollector.startup()
@@ -730,6 +826,7 @@ class DrivingCoach extends GridRaceAssistant {
 		if this.iCollectorTask
 			this.iCollectorTask.stop()
 
+		this.iTelemetryAnalyzer := false
 		this.iTelemetryCollector := false
 		this.iCollectorTask := false
 	}

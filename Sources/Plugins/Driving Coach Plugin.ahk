@@ -97,6 +97,18 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 			if coaching
 				this.createRaceAssistantAction(controller, "Coaching", coaching)
 		}
+
+		deleteFile(kTempDirectory . "Coaching.state")
+
+		PeriodicTask(() {
+			local active := getMultiMapValue(readMultiMap(kTempDirectory . "Coaching.state"), "Coaching", "Active", false)
+
+			if (active != this.CoachingActive) {
+				this.iCoachingActive := active
+
+				this.updateActions(kSessionUnknown)
+			}
+		}, 5000, kLowPriority).start()
 	}
 
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {
@@ -226,15 +238,13 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 	}
 
 	startCoaching() {
-		this.iCoachingActive := true
-
-		this.updateActions(kSessionFinished)
+		if this.DrivingCoach
+			this.DrivingCoach.startCoaching()
 	}
 
 	finishCoaching() {
-		this.iCoachingActive := false
-
-		this.updateActions(kSessionFinished)
+		if this.DrivingCoach
+			this.DrivingCoach.finishCoaching()
 	}
 }
 

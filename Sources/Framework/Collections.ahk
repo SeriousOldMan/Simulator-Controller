@@ -289,13 +289,6 @@ strGreater(s1, s2) {
 	return ((StrCompare(s1, s2, false) <= 0) ? false : true)
 }
 
-eltGreater(idx, a1, a2) {
-	local a := a1[idx]
-	local b := a2[idx]
-
-	return ((isNumber(a) && isNumber(b)) ? (a > b) : strGreater(a, b))
-}
-
 bubbleSort(&array, comparator := (a, b) => (isNumber(a) && isNumber(b)) ? (a > b) : strGreater(a, b)) {
 	local n := array.Length
 	local newN, i, j, lineI, lineJ

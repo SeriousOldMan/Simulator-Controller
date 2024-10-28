@@ -1,3 +1,9 @@
+## 5.9.5.1-release 11/01/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Fixed saving of imported telemetry outside of the standard database location.
+  4. Fixed track mapping and telemetry collection of narrow tracks like Zandvoort.
+
 ## 5.9.5.0-release 10/25/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

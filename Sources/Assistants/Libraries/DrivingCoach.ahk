@@ -535,8 +535,8 @@ class DrivingCoach extends GridRaceAssistant {
 
 	handleVoiceCommand(grammar, words) {
 		switch grammar, false {
-			case "CoachingRequest":
-				this.coachingRequestRecognized(words)
+			case "CoachingStart":
+				this.coachingStartRecognized(words)
 			case "CoachingFinish":
 				this.coachingFinishRecognized(words)
 			case "ReviewCorner":
@@ -549,7 +549,7 @@ class DrivingCoach extends GridRaceAssistant {
 					this.reviewLapRecognized(words)
 				else
 					this.handleVoiceText("TEXT", values2String(A_Space, words*))
-			case "LiveCoaching":
+			case "LiveCoachingStart":
 				if this.CoachingActive
 					this.liveCoachingRecognized(words)
 				else
@@ -559,7 +559,7 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
-	coachingRequestRecognized(words) {
+	coachingStartRecognized(words) {
 		this.getSpeaker().speakPhrase("ConfirmCoaching")
 
 		this.iCoachingActive := true
@@ -589,8 +589,14 @@ class DrivingCoach extends GridRaceAssistant {
 														   , {telemetry: values2String("`n`n", collect(telemetry, (t) => t.JSON))}))
 	}
 
-	liveCoachingRecognized(words) {
+	liveCoachingStartRecognized(words) {
 		this.getSpeaker().speakPhrase("Roger")
+
+
+	}
+
+	liveCoachingFinishRecognized(words) {
+		this.getSpeaker().speakPhrase("Okay")
 
 
 	}

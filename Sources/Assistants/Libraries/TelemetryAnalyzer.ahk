@@ -273,7 +273,7 @@ class Corner extends Section {
 
 			descriptor.Nr := this.Nr
 			descriptor.Direction := this.Direction
-			descriptor.Curvature := this.Curvature
+			descriptor.Curvature := Round(this.Curvature, 2)
 
 			descriptor.ApexG := nullRound(this.AvgG, 2)
 			descriptor.ApexSpeed := (nullRound(this.MinSpeed) . " km/h")
@@ -650,7 +650,8 @@ class Telemetry {
 
 	Descriptor {
 		Get {
-			return {Lap: this.Lap, MaxG: this.MaxG, MaxSpeed: this.MaxSpeed, Sections: collect(this.Sections, (s) => s.Descriptor)}
+			return {Lap: this.Lap, MaxG: nullRound(this.MaxG, 2), MaxSpeed: (nullRound(this.MaxSpeed) . " km/h")
+								 , Sections: collect(this.Sections, (s) => s.Descriptor)}
 		}
 	}
 

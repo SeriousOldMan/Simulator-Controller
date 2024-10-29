@@ -3433,6 +3433,14 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker
 
+		repairPitstop() {
+			knowledgeBase.setValue("Damage.Repair.Suspension.Target", true)
+			knowledgeBase.setValue("Damage.Repair.Bodywork.Target", true)
+			knowledgeBase.setValue("Damage.Repair.Engine.Target", true)
+
+			this.planPitstop("Now")
+		}
+
 		if (this.hasEnoughData(false) && knowledgeBase.getValue("Lap.Remaining.Session", knowledgeBase.getValue("Lap.Remaining", 0)) > 3)
 			if (this.Speaker[false] && this.Announcements["DamageAnalysis"])
 				if (!knowledgeBase.getValue("InPitlane", false) && !knowledgeBase.getValue("InPit", false)) {
@@ -3448,7 +3456,7 @@ class RaceEngineer extends RaceAssistant {
 								if this.confirmAction("Pitstop.Repair") {
 									speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 
-									this.setContinuation(ObjBindMethod(this, "planPitstop", "Now"))
+									this.setContinuation(repairPitstop)
 								}
 								else
 									this.planPitstop("Now")

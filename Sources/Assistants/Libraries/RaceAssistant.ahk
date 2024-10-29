@@ -3165,7 +3165,7 @@ class GridRaceAssistant extends RaceAssistant {
 			return Integer(number)
 		}
 		else
-			return false
+			return kUndefined
 	}
 
 	getCarNumber(words, &number) {
@@ -3175,7 +3175,7 @@ class GridRaceAssistant extends RaceAssistant {
 
 		number := this.getNumber(words)
 
-		if number
+		if (number != kUndefined)
 			for ignore, candidate in this.getCars()
 				if (knowledgeBase.getValue("Car." . candidate . ".Nr", "-") = number) {
 					car := candidate
@@ -3300,7 +3300,7 @@ class GridRaceAssistant extends RaceAssistant {
 
 			position := this.getNumber(words)
 
-			if position
+			if (position != kUndefined)
 				for ignore, candidate in this.getCars()
 					if (knowledgeBase.getValue("Car." . candidate . ".Position", false) = position) {
 						car := candidate

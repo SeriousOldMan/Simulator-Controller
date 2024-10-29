@@ -569,6 +569,9 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	coachingStartRecognized(words) {
+		if !this.Connector
+			this.startConversation()
+
 		this.getSpeaker().speakPhrase("ConfirmCoaching")
 
 		this.iCoachingActive := true
@@ -584,12 +587,18 @@ class DrivingCoach extends GridRaceAssistant {
 		local corner := this.getNumber(words)
 		local telemetry := this.getLapsTelemetry(3, corner)
 
-		if (this.TelemetryAnalyzer && (telemetry.Length > 0))
-			this.handleVoiceText("TEXT", substituteVariables(this.Instructions["Coaching.Corner"]
-														   , {telemetry: values2String("`n`n", collect(telemetry, (t) => t.JSON)*)
-															, corner: corner}))
-		else
-			this.getSpeaker().speakPhrase("Later")
+		if (corner = kUndefined)
+			this.getSpeaker().speakPhrase("Repeat")
+		else {
+			telemetry := this.getLapsTelemetry(3, corner)
+
+			if (this.TelemetryAnalyzer && (telemetry.Length > 0))
+				this.handleVoiceText("TEXT", substituteVariables(this.Instructions["Coaching.Corner"]
+															   , {telemetry: values2String("`n`n", collect(telemetry, (t) => t.JSON)*)
+																, corner: corner}))
+			else
+				this.getSpeaker().speakPhrase("Later")
+		}
 	}
 
 	reviewLapRecognized(words) {
@@ -789,7 +798,8 @@ class DrivingCoach extends GridRaceAssistant {
 										return false
 								})
 
-				result.Push(lap)
+				if (lap.Sections.Length > 0)
+					result.Push(lap)
 			}
 			else
 				result.Push(this.AvailableTelemetry[lap])
@@ -1095,8 +1105,8 @@ class DrivingCoach extends GridRaceAssistant {
 	positionTrigger(cornerNr, positionX, positionY) {
 		local telemetry
 
-		static wait
-		static lastRecommendation := false
+		static nextRecommendation := false
+		static wait := false
 
 		if ((Round(positionX) = -32767) && (Round(positionY) = -32767))
 			return
@@ -1104,15 +1114,18 @@ class DrivingCoach extends GridRaceAssistant {
 		if !wait
 			wait := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Corner.Wait", 20)
 
-		if (A_TickCount < (lastRecommendation + (wait * 1000)))
-			return
-
 		telemetry := this.getLapsTelemetry(3, cornerNr)
 
-		if (this.TelemetryAnalyzer && (telemetry.Length > 0))
+		if (this.TelemetryAnalyzer && (telemetry.Length > 0)) {
+			if (A_TickCount < nextRecommendation)
+				return
+			else
+				nextRecommendation := (A_TickCount + (wait * 1000))
+
 			this.handleVoiceText("TEXT", substituteVariables(this.Instructions["Coaching.Corner.Short"]
 														   , {telemetry: values2String("`n`n", collect(telemetry, (t) => t.JSON)*)
 															, corner: cornerNr})
 									   , false)
+		}
 	}
 }

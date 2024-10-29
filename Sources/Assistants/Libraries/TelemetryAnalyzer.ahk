@@ -109,6 +109,10 @@ class Corner extends Section {
 	iDirection := "Left"				; OneOf("Left", "Right")
 	iCurvature := 0.0					; Higher values -> sharper corner
 
+	iBrakingStart := 0					; Distance into the track, where braking starts
+	iRollingStart := 0					; Distance into the track, where accelerating starts
+	iAcceleratingStart := 0				; Distance into the track, where accelerating starts
+
 	iBrakingTime := 0					; Time of the braking phase in meters
 	iRollingTime := 0					; Time of the rolling phase in meters
 	iAcceleratingTime := 0				; Time of the acceleration phase in meters
@@ -126,6 +130,9 @@ class Corner extends Section {
 
 	iTCActivations := 0					; # of TC activations (each meter is one tick)
 	iABSActivations := 0				; # of ABS activations (each meter is one tick)
+
+	iMaxBrakePressure := 0				; Percentage
+	iBrakePressureRampUp := 0			; Meters
 
 	iSteeringCorrections:= 0			; Count
 	iThrottleCorrections:= 0			; Count
@@ -163,6 +170,21 @@ class Corner extends Section {
 				return this.iRollingTime
 			else if ((part = "Exit") || (part = "Accelerating"))
 				return this.iAcceleratingTime
+			else
+				return 0
+		}
+	}
+
+	Start[part := "Overall"] {
+		Get {
+			if (part = "Overall")
+				return Min(nullZero(this.iBrakingStart), nullZero(this.iRollingStart), nullZero(this.iAcceleratingStart))
+			else if ((part = "Entry") || (part = "Braking"))
+				return nullZero(this.iBrakingStart)
+			else if ((part = "Apex") || (part = "Rolling"))
+				return nullZero(this.iRollingStart)
+			else if ((part = "Exit") || (part = "Accelerating"))
+				return nullZero(this.iAcceleratingStart)
 			else
 				return 0
 		}
@@ -216,6 +238,30 @@ class Corner extends Section {
 	AvgSpeed {
 		Get {
 			return this.iAvgSpeed
+		}
+	}
+
+	BrakingStart {
+		Get {
+			return this.iBrakingStart
+		}
+	}
+
+	AcceleratingStart {
+		Get {
+			return this.iAcceleratingStart
+		}
+	}
+
+	MaxBrakePressure {
+		Get {
+			return this.iMaxBrakePressure
+		}
+	}
+
+	BrakePressureRampUp {
+		Get {
+			return this.iBrakePressureRampUp
 		}
 	}
 
@@ -278,42 +324,45 @@ class Corner extends Section {
 			descriptor.ApexG := nullRound(this.AvgG, 2)
 			descriptor.ApexSpeed := (nullRound(this.MinSpeed) . " km/h")
 
-			/*
-			descriptor.MinG := nullRound(this.MinG, 2)
-			descriptor.MaxG := nullRound(this.MaxG, 2)
-			descriptor.AvgG := nullRound(this.AvgG, 2)
+			if this.Start["Entry"] {
+				descriptor.BrakingStart := (Round(this.Start["Entry"], 1) . " Meter")
+				descriptor.BrakingTime := (nullRound(this.Time["Entry"] / 1000, 2) . " Seconds")
+				descriptor.BrakingLength := (nullRound(this.Length["Entry"], 1) . " Meter")
+				descriptor.MaxBrakePressure := (this.MaxBrakePressure . " Percent")
+				descriptor.BrakePressureRampUp := (this.BrakePressureRampUp . " Meter")
+				descriptor.ABSActivations := this.ABSActivations
 
-			descriptor.MinSpeed := (nullRound(this.MinSpeed) . " km/h")
-			descriptor.MaxSpeed := (nullRound(this.MaxSpeed) . " km/h")
-			descriptor.AvgSpeed := (nullRound(this.AvgSpeed) . " km/h")
-			*/
+				descriptor.BrakeCorrections := this.BrakeCorrections
+				descriptor.BrakeSmoothness := (nullRound(this.BrakeSmoothness) . " Percent")
+			}
 
-			descriptor.BrakingTime := (nullRound(this.Time["Entry"] / 1000, 2) . " Seconds")
-			descriptor.BrakingLength := (nullRound(this.Length["Entry"], 1) . " Meter")
+			if (this.Start["Apex"] != kNull) {
+				descriptor.RollingStart := (Round(this.Start["Apex"], 1) . " Meter")
+				descriptor.RollingTime := (nullRound(this.Time["Apex"] / 1000, 2) . " Seconds")
+				descriptor.RollingLength := (nullRound(this.Length["Apex"], 1) . " Meter")
+			}
 
-			descriptor.RollingTime := (nullRound(this.Time["Apex"] / 1000, 2) . " Seconds")
-			descriptor.RollingLength := (nullRound(this.Length["Apex"], 1) . " Meter")
+			if (this.Start["Exit"] != kNull) {
+				descriptor.AcceleratingStart := (Round(this.Start["Entry"], 1) . " Meter")
+				descriptor.AcceleratingTime := (nullRound(this.Time["Exit"] / 1000, 2) . " Seconds")
+				descriptor.AcceleratingLength := (nullRound(this.Length["Exit"], 1) . " Meter")
+				descriptor.TCActivations := this.TCActivations
 
-			descriptor.AcceleratingTime := (nullRound(this.Time["Exit"] / 1000, 2) . " Seconds")
-			descriptor.AcceleratingLength := (nullRound(this.Length["Exit"], 1) . " Meter")
-
-			descriptor.TCActivations := this.TCActivations
-			descriptor.ABSActivations := this.ABSActivations
+				descriptor.ThrottleCorrections := this.ThrottleCorrections
+				descriptor.ThrottleSmoothness := (nullRound(this.ThrottleSmoothness) . " Percent")
+			}
 
 			descriptor.SteeringCorrections := this.SteeringCorrections
-			descriptor.ThrottleCorrections := this.ThrottleCorrections
-			descriptor.BarkeCorrections := this.BrakeCorrections
-
 			descriptor.SteeringSmoothness := (nullRound(this.SteeringSmoothness) . " Percent")
-			descriptor.ThrottleSmoothness := (nullRound(this.ThrottleSmoothness) . " Percent")
-			descriptor.BrakeSmoothness := (nullRound(this.BrakeSmoothness) . " Percent")
 
 			return descriptor
 		}
 	}
 
 	__New(trackSection, direction, curvature
-					  , brakingTime, brakingLength, rollingTime, rollingLength, acceleratingTime, acceleratingLength
+					  , brakingStart, brakingTime, brakingLength, maxBrakePressure, brakePressureRampUp
+					  , rollingStart, rollingTime, rollingLength
+					  , accelerationStart, acceleratingTime, acceleratingLength
 					  , minG, maxG, avgG, minSpeed, maxSpeed, avgSpeed, tcActivations, absActivations
 					  , steeringCorrections, steeringSmoothness
 					  , throttleCorrections, throttleSmoothness
@@ -322,6 +371,10 @@ class Corner extends Section {
 
 		this.iDirection := direction
 		this.iCurvature := curvature
+
+		this.iBrakingStart := brakingStart
+		this.iRollingStart := rollingStart
+		this.iAccelerationStart := accelerationStart
 
 		this.iBrakingTime := brakingTime
 		this.iRollingTime := rollingTime
@@ -337,6 +390,9 @@ class Corner extends Section {
 		this.iMinSpeed := minSpeed
 		this.iMaxSpeed := maxSpeed
 		this.iAvgSpeed := avgSpeed
+
+		this.iMaxBrakePressure := maxBrakePressure
+		this.iBrakePressureRampUp := brakePressureRampUp
 
 		this.iTCActivations := tcActivations
 		this.iABSActivations := absActivations
@@ -385,8 +441,13 @@ class Corner extends Section {
 		local minLatG := latG
 		local maxLatG := latG
 		local latGs := []
+		local brakingStart := kNull
+		local rollingStart := kNull
+		local acceleratingStart := kNull
+		local maxBrake := 0
+		local brakeRampUp := 0
 		local brake, throttle, steering
-		local startDistance, startTime
+		local startDistance, startTime, distance
 
 		updatePhase(phase, index) {
 			if (phase = "Braking") {
@@ -413,6 +474,7 @@ class Corner extends Section {
 					curvature := Max(curvature, newCurvature)
 			}
 
+			distance := telemetry.getValue(index, "Distance")
 			steering := telemetry.getValue(index, "Steering")
 			brake := telemetry.getValue(index, "Brake")
 			throttle := telemetry.getValue(index, "Throttle")
@@ -456,8 +518,17 @@ class Corner extends Section {
 			}
 
 			if (phase = "Braking") {
+				if (brakingStart == kNull)
+					brakingStart := startDistance
+
 				if telemetry.getValue(index, "ABS", false)
 					absActivations += 1
+
+				if (brake > maxBrake) {
+					brakeRampUp := (distance - startDistance)
+
+					maxBrake := brake
+				}
 
 				brakeCount += 1
 
@@ -469,7 +540,14 @@ class Corner extends Section {
 				lastBrakeDelta := (brake - lastBrake)
 				lastBrake := brake
 			}
+			else if (phase = "Rolling") {
+				if (rollingStart == kNull)
+					rollingStart := startDistance
+			}
 			else if (phase = "Accelerating") {
+				if (acceleratingStart == kNull)
+					acceleratingStart := startDistance
+
 				if telemetry.getValue(index, "TC", false)
 					tcActivations += 1
 
@@ -490,7 +568,9 @@ class Corner extends Section {
 		updatePhase(phase, index - 1)
 
 		return Corner(section, (sumSteering > 0) ? "Right" : "Left", (curvature != kNull) ? curvature : 0
-							 , brakingTime, brakingLength, rollingTime, rollingLength, acceleratingTime, acceleratingLength
+							 , brakingStart, brakingTime, brakingLength, Round(maxBrake * 100), brakeRampUp
+							 , rollingStart, rollingTime, rollingLength
+							 , acceleratingStart, acceleratingTime, acceleratingLength
 							 , minLatG, maxLatG, average(latGs), minSpeed, maxSpeed, average(speeds), tcActivations, absActivations
 							 , Max(0, steeringChanges - 1), 100 - (steeringCount ? ((steeringChanges / steeringCount) * 100) : 0)
 							 , Max(0, throttleChanges - 1), 100 - (throttleCount ? ((throttleChanges / throttleCount) * 100): 0)
@@ -1015,6 +1095,10 @@ class TelemetryAnalyzer {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Public Function Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+nullZero(value) {
+	return (isNull(value) ? 0 : value)
+}
 
 nullRound(value, precision := 0) {
 	if isNumber(value)

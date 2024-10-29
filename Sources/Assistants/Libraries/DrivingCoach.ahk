@@ -592,10 +592,13 @@ class DrivingCoach extends GridRaceAssistant {
 		else {
 			telemetry := this.getLapsTelemetry(3, corner)
 
-			if (this.TelemetryAnalyzer && (telemetry.Length > 0))
+			if (this.TelemetryAnalyzer && (telemetry.Length > 0)) {
+				this.getSpeaker().speakPhrase("Confirm")
+
 				this.handleVoiceText("TEXT", substituteVariables(this.Instructions["Coaching.Corner"]
 															   , {telemetry: values2String("`n`n", collect(telemetry, (t) => t.JSON)*)
 																, corner: corner}))
+			}
 			else
 				this.getSpeaker().speakPhrase("Later")
 		}
@@ -604,9 +607,12 @@ class DrivingCoach extends GridRaceAssistant {
 	reviewLapRecognized(words) {
 		local telemetry := this.getLapsTelemetry(3)
 
-		if (this.TelemetryAnalyzer && (telemetry.Length > 0))
+		if (this.TelemetryAnalyzer && (telemetry.Length > 0)) {
+			this.getSpeaker().speakPhrase("Confirm")
+
 			this.handleVoiceText("TEXT", substituteVariables(this.Instructions["Coaching.Lap"]
 														   , {telemetry: values2String("`n`n", collect(telemetry, (t) => t.JSON)*)}))
+		}
 		else
 			this.getSpeaker().speakPhrase("Later")
 	}
@@ -1135,13 +1141,14 @@ class DrivingCoach extends GridRaceAssistant {
 		if (this.TelemetryAnalyzer && (telemetry.Length > 0)) {
 			if (A_TickCount < nextRecommendation)
 				return
-			else
+			else if (Random(1, 10) > 5){
 				nextRecommendation := (A_TickCount + (wait * 1000))
 
-			this.handleVoiceText("TEXT", substituteVariables(this.Instructions["Coaching.Corner.Short"]
-														   , {telemetry: values2String("`n`n", collect(telemetry, (t) => t.JSON)*)
-															, corner: cornerNr})
-									   , false)
+				this.handleVoiceText("TEXT", substituteVariables(this.Instructions["Coaching.Corner.Short"]
+															   , {telemetry: values2String("`n`n", collect(telemetry, (t) => t.JSON)*)
+																, corner: cornerNr})
+										   , false)
+			}
 		}
 	}
 }

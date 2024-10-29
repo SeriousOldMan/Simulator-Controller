@@ -1,9 +1,9 @@
 [Development]
-Version=5.9.5.1-dev
-Target=5.9.5.1-release
-Date=10/28/2024
+Version=5.9.6.0-dev
+Target=5.9.6.0-release
+Date=10/29/2024
 Download=
-Changes=Fixed saving of imported telemetry outside of the database, Fixed track mapping and telemetry collection of narrow tracks
+Changes=Fixed saving of imported telemetry outside of the database, Fixed track mapping and telemetry collection of narrow tracks, Preselect repair options in pitstop settings for repair pitstops
 Components=Media->5.6.1,Configuration->5.9.1,Utilities->5.9.1
 [Release]
 Version=5.9.5.0-release
@@ -24,5 +24,5 @@ Utilities.5.9.1.Download=https://www.dropbox.com/scl/fi/n3n5gajdhb1swegw46bp6/Ut
 [Current]
 Type=Development
 [Version]
-Development=5.9.5.1-dev
+Development=5.9.6.0-dev
 Release=5.9.5.0-release

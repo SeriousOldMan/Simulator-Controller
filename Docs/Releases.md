@@ -1,8 +1,9 @@
-## 5.9.5.1-release 11/01/24 (planned)
+## 5.9.6.0-release 11/01/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed saving of imported telemetry outside of the standard database location.
   4. Fixed track mapping and telemetry collection of narrow tracks like Zandvoort.
+  5. When the Engineer asks for a pitstop for repairs and this is accepted by the driver, all repairs will be preselected in the pitstop settings, even if the defined repair thresholds are not met.
 
 ## 5.9.5.0-release 10/25/24
   1. Minor bugfixes, as always

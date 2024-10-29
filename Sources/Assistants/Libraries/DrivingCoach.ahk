@@ -57,7 +57,7 @@ class DrivingCoach extends GridRaceAssistant {
 	iTelemetryCollector := false
 	iCollectorTask := false
 
-	iCornerTriggerPID := false
+	iTrackTriggerPID := false
 
 	class CoachVoiceManager extends RaceAssistant.RaceVoiceManager {
 	}
@@ -256,7 +256,7 @@ class DrivingCoach extends GridRaceAssistant {
 			if this.TelemetryCollector
 				this.TelemetryCollector.shutdown()
 		})
-		OnExit(ObjBindMethod(this, "shutdownCornerTrigger", true))
+		OnExit(ObjBindMethod(this, "shutdownTrackTrigger", true))
 	}
 
 	loadFromConfiguration(configuration) {
@@ -553,14 +553,14 @@ class DrivingCoach extends GridRaceAssistant {
 					this.reviewLapRecognized(words)
 				else
 					this.handleVoiceText("TEXT", values2String(A_Space, words*))
-			case "LiveCoachingStart":
+			case "TrackCoachingStart":
 				if this.CoachingActive
-					this.liveCoachingStartRecognized(words)
+					this.trackCoachingStartRecognized(words)
 				else
 					this.handleVoiceText("TEXT", values2String(A_Space, words*))
-			case "LiveCoachingFinish":
+			case "TrackCoachingFinish":
 				if this.CoachingActive
-					this.liveCoachingFinishRecognized(words)
+					this.trackCoachingFinishRecognized(words)
 				else
 					this.handleVoiceText("TEXT", values2String(A_Space, words*))
 			default:
@@ -611,17 +611,19 @@ class DrivingCoach extends GridRaceAssistant {
 			this.getSpeaker().speakPhrase("Later")
 	}
 
-	liveCoachingStartRecognized(words) {
-		if this.startupCornerTrigger()
-			this.getSpeaker().speakPhrase("Roger")
+	trackCoachingStartRecognized(words, confirm := true) {
+		if this.startupTrackTrigger() {
+			if confirm
+				this.getSpeaker().speakPhrase("Roger")
+		}
 		else
 			this.getSpeaker().speakPhrase("Later")
 	}
 
-	liveCoachingFinishRecognized(words) {
+	trackCoachingFinishRecognized(words) {
 		this.getSpeaker().speakPhrase("Okay")
 
-		this.shutdownCornerTrigger()
+		this.shutdownTrackTrigger()
 	}
 
 	handleVoiceText(grammar, text, reportError := true) {
@@ -726,6 +728,20 @@ class DrivingCoach extends GridRaceAssistant {
 		this.coachingFinishRecognized([])
 	}
 
+	startTrackCoaching() {
+		if !this.CoachingActive {
+			this.coachingStartRecognized([])
+
+			this.trackCoachingStartRecognized([], false)
+		}
+		else
+			this.trackCoachingStartRecognized([])
+	}
+
+	finishTrackCoaching() {
+		this.trackCoachingFinishRecognized([])
+	}
+
 	startupCoaching() {
 		local state
 
@@ -743,7 +759,7 @@ class DrivingCoach extends GridRaceAssistant {
 	shutdownCoaching() {
 		local state := newMultiMap()
 
-		this.shutdownCornerTrigger()
+		this.shutdownTrackTrigger()
 
 		if this.TelemetryCollector
 			this.shutdownTelemetryCollector()
@@ -864,14 +880,14 @@ class DrivingCoach extends GridRaceAssistant {
 		this.iCollectorTask := false
 	}
 
-	startupCornerTrigger() {
+	startupTrackTrigger() {
 		local analyzer := this.TelemetryAnalyzer
 		local sections, positions, simulator, track, sessionDB, code, data, exePath, pid
 		local lastSection, index, ignore, section, x, y
 
 		static distance := false
 
-		if (!this.iCornerTriggerPID && this.Simulator && analyzer) {
+		if (!this.iTrackTriggerPID && this.Simulator && analyzer) {
 			sections := analyzer.TrackSections
 
 			if (sections && (sections.Length > 0)) {
@@ -924,15 +940,15 @@ class DrivingCoach extends GridRaceAssistant {
 				}
 
 				if pid
-					this.iCornerTriggerPID := pid
+					this.iTrackTriggerPID := pid
 			}
 		}
 
-		return (this.iCornerTriggerPID != false)
+		return (this.iTrackTriggerPID != false)
 	}
 
-	shutdownCornerTrigger(force := false, arguments*) {
-		local pid := this.iCornerTriggerPID
+	shutdownTrackTrigger(force := false, arguments*) {
+		local pid := this.iTrackTriggerPID
 		local tries
 
 		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
@@ -959,7 +975,7 @@ class DrivingCoach extends GridRaceAssistant {
 				}
 			}
 
-			this.iCornerTriggerPID := false
+			this.iTrackTriggerPID := false
 		}
 
 		return false

@@ -855,31 +855,30 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	startupCornerTrigger() {
+		local analyzer := this.TelemetryAnalyzer
 		local sections, positions, simulator, track, sessionDB, code, data, exePath, pid
-		local lastSection, index, section
+		local lastSection, index, ignore, section, x, y
 
-		if (!this.iCornerTriggerPID && this.Simulator && this.TelemetryAnalyzer) {
-			sections := this.TelemetryAnalyzer.TrackSections
+		static distance := false
+
+		if (!this.iCornerTriggerPID && this.Simulator && analyzer) {
+			sections := analyzer.TrackSections
 
 			if (sections && (sections.Length > 0)) {
 				positions := ""
 
-				for index, section in sections
-					if (section.Type = "Corner") {
-						if (index = 1)
-							lastSection := sections[sections.Length]
-						else if (index = sections.Length)
-							lastSection := sections[1]
-						else
-							lastSection := sections[index - 1]
+				if !distance
+					distance := - Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Corner.Distance", 400))
 
-						if (lastSection.Length > 200)
-							positions .= (A_Space . lastSection.X . A_Space . lastSection.Y)
+				for ignore, section in sections
+					if (section.Type = "Corner") {
+						if analyzer.getSectionCoordinateIndex(section, &x, &y, &index, distance)
+							positions .= (A_Space . x . A_Space . y)
 						else
-							positions .= (A_Space . -32700 . A_Space . -32700)
+							positions .= (A_Space . -32767 . A_Space . -32767)
 					}
 					else
-						positions .= (A_Space . -32700 . A_Space . -32700)
+						positions .= (A_Space . -32767 . A_Space . -32767)
 
 				simulator := this.Simulator
 				track := this.Track
@@ -1096,12 +1095,16 @@ class DrivingCoach extends GridRaceAssistant {
 	positionTrigger(cornerNr, positionX, positionY) {
 		local telemetry
 
+		static wait
 		static lastRecommendation := false
 
-		if ((Round(positionX) = -32700) && (Round(positionY) = -32700))
+		if ((Round(positionX) = -32767) && (Round(positionY) = -32767))
 			return
 
-		if (A_TickCount < (lastRecommendation + 20000))
+		if !wait
+			wait := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Corner.Wait", 20)
+
+		if (A_TickCount < (lastRecommendation + (wait * 1000)))
 			return
 
 		telemetry := this.getLapsTelemetry(3, cornerNr)

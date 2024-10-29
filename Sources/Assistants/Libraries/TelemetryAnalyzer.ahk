@@ -862,6 +862,47 @@ class TelemetryAnalyzer {
 		return index
 	}
 
+	getSectionCoordinateIndex(section, &x, &y, &index, offset := 0, threshold := 25) {
+		local trackMap := this.TrackMap
+		local distance := 0
+		local points, nextX, nextY
+
+		if trackMap {
+			points := getMultiMapValue(trackMap, "Map", "Points")
+
+			x := section.X
+			y := section.Y
+			index := section.Index
+
+			while (Abs(distance - offset) > threshold) {
+				nextX := getMultiMapValue(trackMap, "Points", index . ".X")
+				nextY := getMultiMapValue(trackMap, "Points", index . ".Y")
+
+				distance += Sqrt(((nextX - x) ** 2) + ((nextY - y) ** 2))
+
+				x := nextX
+				y := nextY
+
+				if (offset < 0) {
+					if (index = 1)
+						index := points
+					else
+						index -= 1
+				}
+				else {
+					if (index = points)
+						index := 1
+					else
+						index += 1
+				}
+			}
+
+			return true
+		}
+		else
+			return false
+	}
+
 	static getValue(data, name, default := kUndefined) {
 		local channel := TelemetryAnalyzer.Schema[name]
 		local index, value

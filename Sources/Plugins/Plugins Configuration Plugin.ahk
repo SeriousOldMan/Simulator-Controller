@@ -189,7 +189,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 			this.Control["pluginSimulatorsEdit"].Enabled := true
 		}
 
-		if inList(remove(kRaceAssistants, "Driving Coach"), this.Control["pluginEdit"].Text)
+		if inList(kRaceAssistants, this.Control["pluginEdit"].Text)
 			this.Control["pluginBoosterButton"].Enabled := true
 		else
 			this.Control["pluginBoosterButton"].Enabled := false
@@ -284,7 +284,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 		local assistant := this.Control["pluginEdit"].Text
 		local window := this.Window
 		local configuration, thePlugin
-		local ignore, otherAssistant, key, value, type
+		local ignore, otherAssistant, key, value, type, booster
 
 		if !inList(kRaceAssistants, assistant)
 			return
@@ -292,7 +292,11 @@ class PluginsConfigurator extends ConfigurationItemList {
 		window.Block()
 
 		try {
-			configuration := AssistantBoosterEditor(assistant, this.iConversationBoosterConfiguration).editBooster(window)
+			availableBooster := ((assistant = "Driving Coach") ? ["Speaker", "Listener"]
+															   : ["Speaker", "Listener", "Conversation", "Agent"])
+
+			configuration := AssistantBoosterEditor(assistant, this.iConversationBoosterConfiguration
+												  , availableBooster).editBooster(window)
 
 			if configuration {
 				thePlugin := this.buildItemFromEditor()

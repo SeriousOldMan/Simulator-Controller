@@ -461,8 +461,6 @@ class BasicStepWizard extends StepWizard {
 		super.showPage(page)
 
 		if (page = 2) {
-			this.Control["basicDCBoosterButton"].Enabled := false
-
 			if (this.Control["basicPushToTalkModeDropDown"].Value = 3) {
 				this.Control["basicPushToTalkEdit"].Enabled := false
 				this.Control["basicPushToTalkEdit"].Value := ""
@@ -1015,7 +1013,7 @@ class BasicStepWizard extends StepWizard {
 	editBooster(assistant) {
 		local wizard := this.SetupWizard
 		local window := this.Window
-		local configuration, setup, speakerBooster, listenerBooster, conversationBooster, agentBooster
+		local configuration, setup, availableBooster, speakerBooster, listenerBooster, conversationBooster, agentBooster
 
 		window.Block()
 
@@ -1059,7 +1057,10 @@ class BasicStepWizard extends StepWizard {
 				setMultiMapValue(configuration, "Agent Booster", assistant . ".Agent", setup.AgentBooster["Agent"])
 			}
 
-			configuration := AssistantBoosterEditor(assistant, configuration).editBooster(window)
+			availableBooster := ((assistant = "Driving Coach") ? ["Speaker", "Listener"]
+															   : ["Speaker", "Listener", "Conversation", "Agent"])
+
+			configuration := AssistantBoosterEditor(assistant, configuration, availableBooster).editBooster(window)
 
 			if configuration {
 				writeMultiMap(kUserHomeDirectory . "Setup\Conversation Booster Configuration.ini", configuration)

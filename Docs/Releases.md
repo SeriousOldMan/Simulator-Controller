@@ -5,6 +5,7 @@
   4. Fixed track mapping and telemetry collection of narrow tracks like Zandvoort.
   5. When the Engineer asks for a pitstop for repairs and this is accepted by the driver, all repairs will be preselected in the pitstop settings, even if the defined repair thresholds are not met.
   6. The track section editor is now also available in "Session Database", when no car but only a track is selected.
+  7. "Solo Center" and "Team Center" are more resilient against wrong session folder paths.
 
 ## 5.9.5.0-release 10/25/24
   1. Minor bugfixes, as always

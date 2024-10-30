@@ -948,6 +948,12 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 		}
 
+		state := newMultiMap()
+
+		setMultiMapValue(state, "Coaching", "Track", this.iTrackTriggerPID != false)
+
+		writeMultiMap(kTempDirectory . "Coaching.state", state)
+
 		return (this.iTrackTriggerPID != false)
 	}
 

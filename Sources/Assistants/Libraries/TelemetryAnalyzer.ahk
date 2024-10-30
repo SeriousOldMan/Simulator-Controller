@@ -969,7 +969,7 @@ class TelemetryAnalyzer {
 				x := nextX
 				y := nextY
 
-				if ((absOffset - distance) > threshold)
+				if ((absOffset - distance) <= threshold)
 					break
 
 				if (offset < 0) {

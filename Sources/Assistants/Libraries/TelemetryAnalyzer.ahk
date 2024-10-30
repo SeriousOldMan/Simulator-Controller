@@ -328,8 +328,8 @@ class Corner extends Section {
 				descriptor.BrakingStart := (Round(this.Start["Entry"], 1) . " Meter")
 				descriptor.BrakingTime := (nullRound(this.Time["Entry"] / 1000, 2) . " Seconds")
 				descriptor.BrakingLength := (nullRound(this.Length["Entry"], 1) . " Meter")
-				descriptor.MaxBrakePressure := (this.MaxBrakePressure . " Percent")
-				descriptor.BrakePressureRampUp := (this.BrakePressureRampUp . " Meter")
+				descriptor.MaxBrakePressure := (Round(this.MaxBrakePressure) . " Percent")
+				descriptor.BrakePressureRampUp := (Round(this.BrakePressureRampUp, 1) . " Meter")
 				descriptor.ABSActivations := this.ABSActivations
 
 				descriptor.BrakeCorrections := this.BrakeCorrections

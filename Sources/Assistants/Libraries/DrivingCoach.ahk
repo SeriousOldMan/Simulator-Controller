@@ -1146,7 +1146,7 @@ class DrivingCoach extends GridRaceAssistant {
 		if (this.TelemetryAnalyzer && (telemetry.Length > 0)) {
 			if (A_TickCount < nextRecommendation)
 				return
-			else {
+			else if (Random(1, 10) > 3) {
 				nextRecommendation := (A_TickCount + wait)
 
 				this.handleVoiceText("TEXT", substituteVariables(this.Instructions["Coaching.Corner.Short"]

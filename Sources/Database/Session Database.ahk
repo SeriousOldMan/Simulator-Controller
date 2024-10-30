@@ -1939,17 +1939,21 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						if (currentSection && (currentSection != previousSection)) {
 							ToolTip()
 
-							if (isObject(currentSection) && currentSection.HasProp("Nr")) {
-								switch currentSection.Type, false {
-									case "Corner":
-										positionInfo := (translate("Corner") . A_Space . currentSection.Nr . translate(": "))
-									case "Straight":
-										positionInfo := (translate("Straight") . A_Space . currentSection.Nr . translate(": "))
-									default:
-										throw "Unknown section type detected in SessionDatabaseEditor.show..."
-								}
+							if isObject(currentSection) {
+								if currentSection.HasProp("Nr") {
+									switch currentSection.Type, false {
+										case "Corner":
+											positionInfo := (translate("Corner") . A_Space . currentSection.Nr . translate(": "))
+										case "Straight":
+											positionInfo := (translate("Straight") . A_Space . currentSection.Nr . translate(": "))
+										default:
+											throw "Unknown section type detected in SessionDatabaseEditor.show..."
+									}
 
-								positionInfo .= (Round(currentSection.X, 3) . translate(", ") . Round(currentSection.Y, 3))
+									positionInfo .= (Round(currentSection.X, 3) . translate(", ") . Round(currentSection.Y, 3))
+								}
+								else
+									return
 							}
 							else
 								positionInfo := (Round(string2Values(";", currentSection)[1], 3) . translate(", ") . Round(string2Values(";", currentSection)[2], 3))

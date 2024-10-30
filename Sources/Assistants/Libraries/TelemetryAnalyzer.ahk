@@ -788,10 +788,15 @@ class Telemetry {
 
 				if index {
 					if lastSection
-						if (lastSection.Type = "Corner")
-							sections.Push(Corner.fromSection(this, section, startIndex, index - 1))
-						else
-							sections.Push(Straight.fromSection(this, section, startIndex, index - 1))
+						try {
+							if (lastSection.Type = "Corner")
+								sections.Push(Corner.fromSection(this, section, startIndex, Max(1, index - 1)))
+							else
+								sections.Push(Straight.fromSection(this, section, startIndex, Max(1, index - 1)))
+						}
+						catch Any as exception {
+							logError(exception)
+						}
 
 					lastSection := section
 					startIndex := index
@@ -945,6 +950,7 @@ class TelemetryAnalyzer {
 	getSectionCoordinateIndex(section, &x, &y, &index, offset := 0, threshold := 25) {
 		local trackMap := this.TrackMap
 		local distance := 0
+		local absOffset := Abs(offset)
 		local points, nextX, nextY
 
 		if trackMap {
@@ -954,7 +960,7 @@ class TelemetryAnalyzer {
 			y := section.Y
 			index := section.Index
 
-			while (Abs(distance - offset) > threshold) {
+			loop {
 				nextX := getMultiMapValue(trackMap, "Points", index . ".X")
 				nextY := getMultiMapValue(trackMap, "Points", index . ".Y")
 
@@ -962,6 +968,9 @@ class TelemetryAnalyzer {
 
 				x := nextX
 				y := nextY
+
+				if ((absOffset - distance) <= threshold)
+					break
 
 				if (offset < 0) {
 					if (index = 1)

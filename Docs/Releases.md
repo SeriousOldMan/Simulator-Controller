@@ -4,9 +4,10 @@
   3. A [live coaching mode](*) is now available when using the Driving Coach. The coach will take a look at the live telemetry data and will tell you where you have to change your driver inputs and maybe also ask you to take a different line to ultimately improve your lap time.
      - Many new voice commands have been defined to start a coaching session and also to interact with the Driving Coach during coaching. See the [voice command reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Driving-Coach-Commands-(EN)) for more information.
 	 - A controller action "Coaching" has been defined for the [Driving Coach plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-driving-coach) to start / finish a coaching session from your Button Box or Stream Deck.
-	 - A new icon for the "Coaching" action has been added to the Stream Deck icon set.
+	 - A controller action "TrackCoaching" has been defined for the [Driving Coach plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-driving-coach) to request active coaching while driving from your Button Box or Stream Deck.
+	 - New icons for the "Coaching" and "TrackCoaching" actions has been added to the Stream Deck icon set.
 	 - Several new settings in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) to fine-tune the corner by corner coaching of the Driving Coach.
-  4. *Speaker* and *Listener* booster are now available for the Driving Coach as well.
+  4. The *Rephrasing* and *Understanding* booster are now available for the Driving Coach as well.
 
 ## 5.9.5.0-release 10/25/24
   1. Minor bugfixes, as always

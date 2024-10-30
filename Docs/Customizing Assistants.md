@@ -20,13 +20,15 @@ Important: Even if you are not using a local LLM Runtime are the resource requir
 
 The voice recognition for all Assistants except the Driving Coach is normally pattern-based. [Here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(EN)), for example, you can find a documentation for the definition of the recognized commands of the Race Engineer and similar documentation is available for the other Assistants as well. The speech output of all Assistants is also preprogrammed with several different phrases for each message, to create at least a little variation.
 
-Said this, it is clear, that the interaction with the Assistants, although already impressive, will not feel absolutely natural in many cases. But using the latest development in AI with LLMs (aka large language model) it became possible to improve the conversation capabilities of the Assistants even further. Whenever you see a small button with an icon which looks like a launching space rocket, you can configure AI pre- and post-processing for voice recognition, speech output and general conversation.
+Said this, it is clear, that the interaction with the grammar-based Assistants, although already impressive, will not feel absolutely natural in many cases. But using the latest development in AI with LLMs (aka large language model) it became possible to improve the conversation capabilities of the Assistants even further. Whenever you see a small button with an icon which looks like a launching space rocket, you can configure AI pre- and post-processing for voice recognition, speech output and general conversation.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20Speech%20Improvement.JPG)
 
 Please note, that the first three conversation-related boosters all share a GPT service and a single model, whereas you can choose a separate GPT service and model for the *Reasoning* booster, which requires strong reasoning skills, but no conversational skills at all. This might be helpful to select the best possible model for each task.
 
 Please take a look at the documentation for the [Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#installation) for a description of the different providers and LLMs which can be configured here.
+
+As said, the Driving Coach is a bit different in the sense, that it allows free conversation with an LLM using a GPT service. But it also uses several pattern-based grammars for pre-defined commands like the other Assistants, therefore the Driving Coach is a kind of a hybrid, when it comes to voice interaction. For the pattern-based voice commands, the Driving Coach also supports the *Rephrasing* booster and the *Understanding* booster described a described below.
 
 IMPORTANT: As said in the beginning, all this is optional. The Race Assistants will do their job really good even without being connected to an LLM. Additionally, using a GPT service like OpenAI may create some costs, and running an LLM locally on your PC will require a very powerful system, especially when doing this while on the track. Therefore I recommend to use this feature not before everything else has been configured and is fully functional.
 
@@ -358,7 +360,7 @@ Notes:
 
 Additionally, you can allow the LLM to *call* [predefined or custom actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-actions) as a result of your conversation. For example, if you ask the Strategist whether an undercut might be possible in one of the next laps, the LLM may call the Monte Carlo traffic simulation using an internal action. Which actions will be available to the LLM depends on the current Assistant. See corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#trigger-actions-from-conversation) for the Strategist for an example.
 
-IMPORTANT: When action handling is enabled, it might be necessary to disable the *Recognition* booster or at least set the "Creativity" to a very low value. Otherwise the "Recognition" booster might detect a command pattern, which will match to a pre-defined voice command, thereby preventing the LLM from creating a custom action plan.
+IMPORTANT: When action handling is enabled, it might be necessary to disable the *Recognition* booster or at least set the "Creativity" to a very low value. Otherwise the *Understanding* booster might detect a command pattern, which will match to a pre-defined voice command, thereby preventing the LLM from creating a custom action plan.
 
 ### Reasoning Booster
 

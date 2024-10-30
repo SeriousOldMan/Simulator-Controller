@@ -600,6 +600,7 @@ PitstopPrepare.Activate=
 [Driving Coach]
 RaceAssistant.Toggle=
 Coaching.Toggle=
+TrackCoaching.Toggle=
 Call.Activate=
 SetupWorkbenchOpen.Activate=
 [Race Engineer]

@@ -7,7 +7,7 @@
 	 - A controller action "TrackCoaching" has been defined for the [Driving Coach plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-driving-coach) to request active coaching while driving from your Button Box or Stream Deck.
 	 - New icons for the "Coaching" and "TrackCoaching" actions has been added to the Stream Deck icon set.
 	 - Several new settings in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) to fine-tune the corner by corner coaching of the Driving Coach.
-  4. *Speaker* and *Listener* booster are now available for the Driving Coach as well.
+  4. The *Rephrasing* and *Understanding* booster are now available for the Driving Coach as well.
 
 ## 5.9.5.0-release 10/25/24
   1. Minor bugfixes, as always

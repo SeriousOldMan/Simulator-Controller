@@ -887,13 +887,14 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	startupTrackTrigger() {
+		local simulator := this.Simulator
 		local analyzer := this.TelemetryAnalyzer
-		local sections, positions, simulator, track, sessionDB, code, data, exePath, pid
-		local lastSection, index, ignore, section, x, y
+		local sections, positions, sessionDB, code, data, exePath, pid
+		local ignore, section, x, y
 
 		static distance := false
 
-		if (!this.iTrackTriggerPID && this.Simulator && analyzer) {
+		if (!this.iTrackTriggerPID && simulator && analyzer) {
 			sections := analyzer.TrackSections
 
 			if (sections && (sections.Length > 0)) {
@@ -904,7 +905,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 				for ignore, section in sections
 					if (section.Type = "Corner") {
-						if analyzer.getSectionCoordinateIndex(section, &x, &y, &index, distance)
+						if analyzer.getSectionCoordinateIndex(section, &x, &y, &ignore, distance)
 							positions .= (A_Space . x . A_Space . y)
 						else
 							positions .= (A_Space . -32767 . A_Space . -32767)
@@ -912,13 +913,10 @@ class DrivingCoach extends GridRaceAssistant {
 					else
 						positions .= (A_Space . -32767 . A_Space . -32767)
 
-				simulator := this.Simulator
-				track := this.Track
-
 				sessionDB := SessionDatabase()
 
 				code := sessionDB.getSimulatorCode(simulator)
-				data := sessionDB.getTrackData(simulator, track)
+				data := sessionDB.getTrackData(simulator, this.Track)
 
 				exePath := (kBinariesDirectory . "Providers\" . code . " SHM Spotter.exe")
 				pid := false
@@ -949,6 +947,12 @@ class DrivingCoach extends GridRaceAssistant {
 					this.iTrackTriggerPID := pid
 			}
 		}
+
+		state := newMultiMap()
+
+		setMultiMapValue(state, "Coaching", "Track", this.iTrackTriggerPID != false)
+
+		writeMultiMap(kTempDirectory . "Coaching.state", state)
 
 		return (this.iTrackTriggerPID != false)
 	}
@@ -1135,15 +1139,15 @@ class DrivingCoach extends GridRaceAssistant {
 			return
 
 		if !wait
-			wait := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Corner.Wait", 20)
+			wait := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Corner.Wait", 10) * 1000)
 
 		telemetry := this.getLapsTelemetry(3, cornerNr)
 
 		if (this.TelemetryAnalyzer && (telemetry.Length > 0)) {
 			if (A_TickCount < nextRecommendation)
 				return
-			else if (Random(1, 10) > 5){
-				nextRecommendation := (A_TickCount + (wait * 1000))
+			else {
+				nextRecommendation := (A_TickCount + wait)
 
 				this.handleVoiceText("TEXT", substituteVariables(this.Instructions["Coaching.Corner.Short"]
 															   , {telemetry: values2String("`n`n", collect(telemetry, (t) => t.JSON)*)

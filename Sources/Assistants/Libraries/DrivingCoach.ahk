@@ -1122,7 +1122,8 @@ class DrivingCoach extends GridRaceAssistant {
 		return result
 	}
 
-	positionTrigger(cornerNr, positionX, positionY) {
+	positionTrigger(sectionNr, positionX, positionY) {
+		local cornerNr := this.TelemetryAnalyzer.TrackSections[sectionNr].Nr
 		local telemetry
 
 		static nextRecommendation := false

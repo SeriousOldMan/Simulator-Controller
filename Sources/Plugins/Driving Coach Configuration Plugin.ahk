@@ -286,7 +286,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 		widget27 := window.Add("Text", "x" . x0 . " yp+24 w120 h23 +0x200 Hidden", translate("Instructions"))
 
-		widget28 := window.Add("DropDownList", "x" . x1 . " yp w120 vdcInstructionsDropDown Hidden", collect(this.Instructions[false], translate))
+		widget28 := window.Add("DropDownList", "x" . x1 . " yp w180 vdcInstructionsDropDown Hidden", collect(this.Instructions[false], translate))
 		widget28.OnEvent("Change", chooseInstructions)
 
 		if (StrSplit(A_ScriptName, ".")[1] = "Simulator Configuration")

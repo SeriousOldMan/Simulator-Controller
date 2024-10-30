@@ -46,6 +46,8 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 	iWindow := false
 
+	iBoosters := ["Speaker", "Listener", "Conversation", "Agent"]
+
 	iProviderConfigurations := CaseInsenseMap()
 	iCurrentConversationProvider := false
 	iCurrentAgentProvider := false
@@ -70,6 +72,12 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		}
 	}
 
+	Boosters {
+		Get {
+			return this.iBoosters
+		}
+	}
+
 	Models[provider] {
 		Get {
 			try {
@@ -81,8 +89,11 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		}
 	}
 
-	__New(assistant, configuration := false) {
+	__New(assistant, configuration := false, boosters := false) {
 		this.iAssistant := assistant
+
+		if boosters
+			this.iBoosters := boosters
 
 		super.__New(configuration)
 	}
@@ -851,16 +862,51 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 	updateState() {
 		local ignore, setting, llmRuntime
 
+		if ((this.Control["viAgentProviderDropDown"].Value < 2) || !inList(this.iBoosters, "Agent")) {
+			this.Control["viAgentEventsButton"].Enabled := false
+			this.Control["viAgentActionsButton"].Enabled := false
+			this.Control["viAgentInstructionsButton"].Enabled := false
+		}
+		else {
+			this.Control["viAgentEventsButton"].Enabled := true
+			this.Control["viAgentActionsButton"].Enabled := true
+			this.Control["viAgentInstructionsButton"].Enabled := true
+		}
+
+		if inList(this.iBoosters, "Agent")
+			this.Control["viAgentProviderDropDown"].Enabled := true
+		else {
+			this.Control["viAgentProviderDropDown"].Enabled := false
+			this.Control["viAgentProviderDropDown"].Value := 0
+		}
+
 		if this.iCurrentConversationProvider {
 			this.Control["viConversationServiceURLEdit"].Enabled := (this.Control["viConversationProviderDropDown"].Text != "LLM Runtime")
 			this.Control["viConversationServiceKeyEdit"].Enabled := !inList(["GPT4All", "Ollama", "LLM Runtime"], this.Control["viConversationProviderDropDown"].Text)
 
-			this.Control["viSpeakerCheck"].Enabled := true
-			this.Control["viListenerCheck"].Enabled := true
-			this.Control["viConversationCheck"].Enabled := true
-
 			this.Control["viConversationModelDropDown"].Enabled := true
 			this.Control["viConversationMaxTokensEdit"].Enabled := true
+
+			if inList(this.iBoosters, "Speaker")
+				this.Control["viSpeakerCheck"].Enabled := true
+			else {
+				this.Control["viSpeakerCheck"].Enabled := false
+				this.Control["viSpeakerCheck"].Value := 0
+			}
+
+			if inList(this.iBoosters, "Listener")
+				this.Control["viListenerCheck"].Enabled := true
+			else {
+				this.Control["viListenerCheck"].Enabled := false
+				this.Control["viListenerCheck"].Value := 0
+			}
+
+			if inList(this.iBoosters, "Conversation")
+				this.Control["viConversationCheck"].Enabled := true
+			else {
+				this.Control["viConversationCheck"].Enabled := false
+				this.Control["viConversationCheck"].Value := 0
+			}
 		}
 		else {
 			for ignore, setting in ["ServiceURL", "ServiceKey"]
@@ -877,7 +923,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 			this.Control["viConversationMaxTokensEdit"].Enabled := false
 		}
 
-		if this.iCurrentAgentProvider {
+		if (this.iCurrentAgentProvider && inList(this.iBoosters, "Agent")) {
 			this.Control["viAgentServiceURLEdit"].Enabled := (this.Control["viAgentProviderDropDown"].Text != "LLM Runtime")
 			this.Control["viAgentServiceKeyEdit"].Enabled := !inList(["GPT4All", "Ollama", "LLM Runtime"], this.Control["viAgentProviderDropDown"].Text)
 
@@ -890,7 +936,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 			this.Control["viAgentModelDropDown"].Enabled := false
 		}
 
-		if (this.Control["viSpeakerCheck"].Value = 0) {
+		if ((this.Control["viSpeakerCheck"].Value = 0) || !inList(this.iBoosters, "Speaker")) {
 			this.Control["viSpeakerProbabilityEdit"].Enabled := false
 			this.Control["viSpeakerTemperatureEdit"].Enabled := false
 			this.Control["viSpeakerProbabilityEdit"].Text := ""
@@ -910,7 +956,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 			this.Control["viSpeakerInstructionsButton"].Enabled := true
 		}
 
-		if (this.Control["viListenerCheck"].Value = 0) {
+		if ((this.Control["viListenerCheck"].Value = 0) || !inList(this.iBoosters, "Listener")) {
 			this.Control["viListenerModeDropDown"].Enabled := false
 			this.Control["viListenerTemperatureEdit"].Enabled := false
 			this.Control["viListenerModeDropDown"].Choose(0)
@@ -930,7 +976,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 			this.Control["viListenerInstructionsButton"].Enabled := true
 		}
 
-		if (this.Control["viConversationCheck"].Value = 0) {
+		if ((this.Control["viConversationCheck"].Value = 0) || !inList(this.iBoosters, "Conversation")) {
 			this.Control["viConversationMaxHistoryEdit"].Enabled := false
 			this.Control["viConversationTemperatureEdit"].Enabled := false
 			this.Control["viConversationActionsDropDown"].Enabled := false
@@ -956,17 +1002,6 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 			this.Control["viConversationInstructionsButton"].Enabled := true
 			this.Control["viConversationEditActionsButton"].Enabled := (this.Control["viConversationActionsDropDown"].Value = 1)
-		}
-
-		if (this.Control["viAgentProviderDropDown"].Value < 2) {
-			this.Control["viAgentEventsButton"].Enabled := false
-			this.Control["viAgentActionsButton"].Enabled := false
-			this.Control["viAgentInstructionsButton"].Enabled := false
-		}
-		else {
-			this.Control["viAgentEventsButton"].Enabled := true
-			this.Control["viAgentActionsButton"].Enabled := true
-			this.Control["viAgentInstructionsButton"].Enabled := true
 		}
 
 		llmRuntime := (this.iCurrentConversationProvider = "LLM Runtime")

@@ -485,7 +485,7 @@ class DrivingCoach extends GridRaceAssistant {
 				if ((knowledgeBase || isDebug()) && this.CoachingActive && (this.Mode = "Conversation")) {
 					telemetry := this.getLapsTelemetry(3)
 
-					if (this.TelemetryAnalyzer && (telemetry.Length > 0))
+					if (this.TelemetryAnalyzer && (telemetry.Length > 0) && (Trim(this.Instructions["Coaching"]) != ""))
 						return substituteVariables(this.Instructions["Coaching"] . "`n`n%telemetry%"
 												 , {name: this.VoiceManager.Name
 													telemetry: values2String("`n`n", collect(telemetry, (t) => t.JSON)*)})

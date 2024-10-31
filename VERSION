@@ -1,9 +1,9 @@
 [Development]
 Version=5.9.6.0-dev
 Target=5.9.6.0-release
-Date=10/30/2024
+Date=10/31/2024
 Download=
-Changes=Fixed saving of imported telemetry outside of the database, Fixed track mapping and telemetry collection of narrow tracks, Preselect repair options in pitstop settings for repair pitstops, Track editor availability in "Session Database", Made "Solo Center" and "Team Center" more resilient against wrong session folder
+Changes=Fixed saving of imported telemetry outside of the database, Fixed track mapping and telemetry collection of narrow tracks, Preselect repair options in pitstop settings for repair pitstops, Track editor availability in "Session Database", Made "Solo Center" and "Team Center" more resilient against wrong session folder, Engineer announces session type
 Components=Media->5.6.1,Configuration->5.9.1,Utilities->5.9.1
 [Release]
 Version=5.9.5.0-release

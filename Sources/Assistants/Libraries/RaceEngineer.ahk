@@ -1949,7 +1949,7 @@ class RaceEngineer extends RaceAssistant {
 		local configuration := this.Configuration
 		local facts := this.prepareSession(&settings, &data, false)
 		local simulatorName := this.Simulator
-		local deprecated, saveSettings, speaker, strategistPlugin, strategistName
+		local deprecated, saveSettings, speaker, strategistPlugin, strategistName, session
 
 		deprecated := getMultiMapValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveSettings", kNever)
 		saveSettings := getMultiMapValue(configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings", deprecated)
@@ -1969,7 +1969,18 @@ class RaceEngineer extends RaceAssistant {
 			speaker.beginTalk()
 
 			try {
-				speaker.speakPhrase("GreetingEngineer")
+				switch this.Session {
+					case kSessionPractice:
+						session := "Practice"
+					case kSessionQualification:
+						session := "Qualifying"
+					case kSessionRace:
+						session := "Race"
+					default:
+						session := "Session"
+				}
+
+				speaker.speakPhrase("GreetingEngineer", {session: session})
 
 				if ((this.Session = kSessionRace) && ProcessExist("Race Strategist.exe")) {
 					strategistPlugin := Plugin("Race Strategist", kSimulatorConfiguration)

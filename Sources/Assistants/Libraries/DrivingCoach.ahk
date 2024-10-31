@@ -50,6 +50,8 @@ class DrivingCoach extends GridRaceAssistant {
 
 	iTranscript := false
 
+	iMode := "Conversation"
+
 	iCoachingActive := false
 	iAvailableTelemetry := CaseInsenseMap()
 
@@ -168,6 +170,16 @@ class DrivingCoach extends GridRaceAssistant {
 	Transcript {
 		Get {
 			return this.iTranscript
+		}
+	}
+
+	Mode {
+		Get {
+			return this.iMode
+		}
+
+		Set {
+			return (this.iMode := value)
 		}
 	}
 
@@ -363,7 +375,7 @@ class DrivingCoach extends GridRaceAssistant {
 												  , track: settingsDB.getTrackName(simulator, track)})
 				}
 			case "Session":
-				if (knowledgeBase && this.Announcements["SessionInformation"]) {
+				if (knowledgeBase && this.Announcements["SessionInformation"] && (this.Mode = "Conversation")) {
 					position := this.GridPosition
 
 					if (position != 0)
@@ -373,7 +385,7 @@ class DrivingCoach extends GridRaceAssistant {
 												  , classPosition: this.GridPosition["Class"], overallPosition: position})
 				}
 			case "Stint":
-				if (knowledgeBase && this.Announcements["StintInformation"]) {
+				if (knowledgeBase && this.Announcements["StintInformation"] && (this.Mode = "Conversation")) {
 					position := this.getPosition(false, "Class")
 
 					if ((position != 0) && (this.Laps.Count > 0)) {
@@ -470,7 +482,7 @@ class DrivingCoach extends GridRaceAssistant {
 					}
 				}
 			case "Coaching":
-				if ((knowledgeBase || isDebug()) && this.CoachingActive) {
+				if ((knowledgeBase || isDebug()) && this.CoachingActive && (this.Mode = "Conversation")) {
 					telemetry := this.getLapsTelemetry(3)
 
 					if (this.TelemetryAnalyzer && (telemetry.Length > 0))
@@ -592,35 +604,45 @@ class DrivingCoach extends GridRaceAssistant {
 	reviewCornerRecognized(words) {
 		local corner := this.getNumber(words)
 		local telemetry := this.getLapsTelemetry(3, corner)
+		local oldMode := this.Mode
 
-		if (corner = kUndefined)
-			this.getSpeaker().speakPhrase("Repeat")
-		else {
-			telemetry := this.getLapsTelemetry(3, corner)
+		this.Mode := "Coaching"
 
-			if (this.TelemetryAnalyzer && (telemetry.Length > 0)) {
-				this.getSpeaker().speakPhrase("Confirm")
+		try {
+			if (corner = kUndefined)
+				this.getSpeaker().speakPhrase("Repeat")
+			else {
+				telemetry := this.getLapsTelemetry(3, corner)
 
-				this.handleVoiceText("TEXT", substituteVariables(this.Instructions["Coaching.Corner"]
-															   , {telemetry: values2String("`n`n", collect(telemetry, (t) => t.JSON)*)
-																, corner: corner}))
+				if (this.TelemetryAnalyzer && (telemetry.Length > 0))
+					this.handleVoiceText("TEXT", substituteVariables(this.Instructions["Coaching.Corner"]
+																   , {telemetry: values2String("`n`n", collect(telemetry, (t) => t.JSON)*)
+																	, corner: corner}))
+				else
+					this.getSpeaker().speakPhrase("Later")
 			}
-			else
-				this.getSpeaker().speakPhrase("Later")
+		}
+		finally {
+			this.Mode := oldMode
 		}
 	}
 
 	reviewLapRecognized(words) {
 		local telemetry := this.getLapsTelemetry(3)
+		local oldMode := this.Mode
 
-		if (this.TelemetryAnalyzer && (telemetry.Length > 0)) {
-			this.getSpeaker().speakPhrase("Confirm")
+		this.Mode := "Coaching"
 
-			this.handleVoiceText("TEXT", substituteVariables(this.Instructions["Coaching.Lap"]
-														   , {telemetry: values2String("`n`n", collect(telemetry, (t) => t.JSON)*)}))
+		try {
+			if (this.TelemetryAnalyzer && (telemetry.Length > 0))
+				this.handleVoiceText("TEXT", substituteVariables(this.Instructions["Coaching.Lap"]
+															   , {telemetry: values2String("`n`n", collect(telemetry, (t) => t.JSON)*)}))
+			else
+				this.getSpeaker().speakPhrase("Later")
 		}
-		else
-			this.getSpeaker().speakPhrase("Later")
+		finally {
+			this.Mode := oldMode
+		}
 	}
 
 	trackCoachingStartRecognized(words, confirm := true) {
@@ -1136,6 +1158,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 	positionTrigger(sectionNr, positionX, positionY) {
 		local cornerNr := this.TelemetryAnalyzer.TrackSections[sectionNr].Nr
+		local oldMode := this.Mode
 		local telemetry
 
 		static nextRecommendation := false
@@ -1155,10 +1178,17 @@ class DrivingCoach extends GridRaceAssistant {
 			else if (Random(1, 10) > 3) {
 				nextRecommendation := (A_TickCount + wait)
 
-				this.handleVoiceText("TEXT", substituteVariables(this.Instructions["Coaching.Corner.Short"]
-															   , {telemetry: values2String("`n`n", collect(telemetry, (t) => t.JSON)*)
-																, corner: cornerNr})
-										   , false)
+				this.Mode := "Coaching"
+
+				try {
+					this.handleVoiceText("TEXT", substituteVariables(this.Instructions["Coaching.Corner.Short"]
+																   , {telemetry: values2String("`n`n", collect(telemetry, (t) => t.JSON)*)
+																	, corner: cornerNr})
+											   , false)
+				}
+				finally {
+					this.Mode := oldMode
+				}
 			}
 		}
 	}

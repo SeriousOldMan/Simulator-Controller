@@ -23,10 +23,10 @@
 #Include "RaceAssistant.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\..\Database\Libraries\TelemetryCollector.ahk"
+#Include "..\..\Database\Libraries\TelemetryAnalyzer.ahk"
 #Include "..\..\Garage\Libraries\IssueCollector.ahk"
 #Include "..\..\Garage\Libraries\IRCIssueCollector.ahk"
 #Include "..\..\Garage\Libraries\R3EIssueCollector.ahk"
-#Include "TelemetryAnalyzer.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

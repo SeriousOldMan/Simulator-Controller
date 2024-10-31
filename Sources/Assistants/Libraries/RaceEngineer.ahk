@@ -1980,7 +1980,7 @@ class RaceEngineer extends RaceAssistant {
 						session := "Session"
 				}
 
-				speaker.speakPhrase("GreetingEngineer", {session: session})
+				speaker.speakPhrase("GreetingEngineer", {session: translate(session)})
 
 				if ((this.Session = kSessionRace) && ProcessExist("Race Strategist.exe")) {
 					strategistPlugin := Plugin("Race Strategist", kSimulatorConfiguration)

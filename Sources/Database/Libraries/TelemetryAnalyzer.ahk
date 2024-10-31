@@ -384,16 +384,16 @@ class Corner extends Section {
 								  , Speed: (nullRound(this.MinSpeed) . " km/h")}
 
 			if (this.Start["Exit"] != kNull) {
-				descrptor.Exit := {Phase: "Accelerating"
-								 , Start: (Round(this.Start["Entry"], 1) . " Meter")
-								 , Length: (nullRound(this.Length["Exit"], 1) . " Meter")
-								 , Duration: (nullRound(this.Time["Exit"] / 1000, 2) . " Seconds")
-								 , Gear: this.AcceleratingGear
-								 , RPM: this.AcceleratingRPM
-								 , Speed: this.AcceleratingSpeed
-								 , TCActivations: this.TCActivations
-								 , ThrottleCorrections: this.ThrottleCorrections
-								 , ThrottleSmoothness: (nullRound(this.ThrottleSmoothness) . " Percent")}
+				descriptor.Exit := {Phase: "Accelerating"
+								  , Start: (Round(this.Start["Entry"], 1) . " Meter")
+								  , Length: (nullRound(this.Length["Exit"], 1) . " Meter")
+								  , Duration: (nullRound(this.Time["Exit"] / 1000, 2) . " Seconds")
+								  , Gear: this.AcceleratingGear
+								  , RPM: this.AcceleratingRPM
+								  , Speed: this.AcceleratingSpeed
+								  , TCActivations: this.TCActivations
+								  , ThrottleCorrections: this.ThrottleCorrections
+								  , ThrottleSmoothness: (nullRound(this.ThrottleSmoothness) . " Percent")}
 			}
 
 			descriptor.SteeringCorrections := this.SteeringCorrections
@@ -407,7 +407,7 @@ class Corner extends Section {
 					  , brakingStart, brakingTime, brakingLength, maxBrakePressure, brakePressureRampUp
 					  , rollingStart, rollingTime, rollingLength
 					  , accelerationStart, acceleratingTime, acceleratingLength
-					  , rollingGear, rollingRPM, acceleratingGear, acceleratingGear, acceleratingSpeed
+					  , rollingGear, rollingRPM, acceleratingGear, acceleratingRPM, acceleratingSpeed
 					  , minG, maxG, avgG, minSpeed, maxSpeed, avgSpeed, tcActivations, absActivations
 					  , steeringCorrections, steeringSmoothness
 					  , throttleCorrections, throttleSmoothness
@@ -648,7 +648,7 @@ class Corner extends Section {
 							 , brakingStart, brakingTime, brakingLength, Round(maxBrake * 100), brakeRampUp
 							 , rollingStart, rollingTime, rollingLength
 							 , acceleratingStart, acceleratingTime, acceleratingLength
-							 , rollingGear, rollingRPM, acceleratingGear, acceleratingRPM
+							 , rollingGear, rollingRPM, acceleratingGear, acceleratingRPM, acceleratingSpeed
 							 , minLatG, maxLatG, average(latGs), minSpeed, maxSpeed, average(speeds), tcActivations, absActivations
 							 , Max(0, steeringChanges - 1), 100 - (steeringCount ? ((steeringChanges / steeringCount) * 100) : 0)
 							 , Max(0, throttleChanges - 1), 100 - (throttleCount ? ((throttleChanges / throttleCount) * 100): 0)

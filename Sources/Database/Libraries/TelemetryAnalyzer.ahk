@@ -363,8 +363,8 @@ class Corner extends Section {
 								   , Start: (Round(this.Start["Entry"], 1) . " Meter")
 								   , Length: (nullRound(this.Length["Entry"], 1) . " Meter")
 								   , Duration: (nullRound(this.Time["Entry"] / 1000, 2) . " Seconds")
-								   , MaxBrakePressure: (this.MaxBrakePressure . " Percent")
-								   , BrakePressureRampUp: (this.BrakePressureRampUp . " Meter")
+								   , MaxBrakePressure: (Round(this.MaxBrakePressure) . " Percent")
+								   , BrakePressureRampUp: (Round(this.BrakePressureRampUp, 1) . " Meter")
 								   , ABSActivations: this.ABSActivations
 								   , BrakeCorrections: this.BrakeCorrections
 								   , BrakeSmoothness: (nullRound(this.BrakeSmoothness) . " Percent")}

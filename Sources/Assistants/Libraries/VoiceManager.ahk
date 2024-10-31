@@ -735,7 +735,7 @@ class VoiceManager extends ConfigurationItem {
 
 		if (this.VoiceServer && this.iSpeechSynthesizer) {
 			messageSend(kFileMessage, "Voice", "unregisterVoiceClient:" . values2String(";", this.Name, ProcessExist()), this.VoiceServer)
-			
+
 			Sleep(2000)
 		}
 

@@ -476,7 +476,7 @@ class DrivingCoach extends GridRaceAssistant {
 					if (this.TelemetryAnalyzer && (telemetry.Length > 0))
 						return substituteVariables(this.Instructions["Coaching"] . "`n`n%telemetry%"
 												 , {name: this.VoiceManager.Name
-													telemetry: values2String("`n`n", collect(telemetry, (t) => t.JSON)*)})
+												  , telemetry: values2String("`n`n", collect(telemetry, (t) => t.JSON)*)})
 				}
 		}
 

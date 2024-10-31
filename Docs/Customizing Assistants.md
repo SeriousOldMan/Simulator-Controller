@@ -44,7 +44,7 @@ Good to know: Whenever one or more Assistant Boosters are configured for a Race 
 
 More variations in the speech output of the Assistants will be created, if *Rephrasing* is activated. This is done by using a GPT to rephrase one of the predefined phrases. The *Activation* setting defines the probability, with which the rephrasing happens (and thereby how many calls to the GPT service will be done) and using the *Creativity* setting, you can define, how *strong* the rephrasing will be. According to my tests, a value of 50% will create some intersting variation without altering the original sense of the message. Please note, that there are messages, especially the urgent alerts of the Spotter, which are time-critical. Those messages will never be send to the AI for rephrasing.
   
-A very small context window can be used here, since only the phrase which is to be process plus a couple of instructions are send to the LLM.
+A model with a very small context window can be used here, since only the phrase which is to be process plus a couple of instructions are send to the LLM.
 
 ### Understanding Booster
 
@@ -56,9 +56,7 @@ If *Understanding* is activated, a GPT is used to semantically analyze your voic
 	 
 There are two *Activation* methods available, both with their pros and cons. "Always" means, that the LLM is always asked to interpret the given command, whereas "Unrecognized" means, that it is only used, when the pattern-based voice recognition cannot identify the command. The later will result in less calls to the LLM and therefore will probably reduce costs and - even more important - will be better in terms of responsiveness, if you are already quite familar with the command patterns.
 
-Note: Using the semantic *Understanding* booster may only be usable in conjunction with voice recognition methods, that are cabable to recognize continuous, unstructured text. This is true for Google and Azure voice recognition, but not for the builtin voice recognition of Windows, which only work reliable for pattern-based recognition.
-	 
-A context window of at least 2048 tokens is required for this booster, since all predefined command phrases will be supplied to the LLM for matching.
+Note: Using the semantic *Understanding* booster may only be usable in conjunction with voice recognition methods, that are cabable to recognize continuous, unstructured text. This is the case for Google and Azure voice recognition, but not for the builtin voice recognition of Windows, which only work reliable for pattern-based recognition.
 
 ### Conversation Booster
 
@@ -73,7 +71,7 @@ Normally an Assistant will tell you that he didn't understand you, when the spok
 
 (1) Depending on the availabilty of the data by the current simulator.
 
-Since large parts of the knowledge base of the Assistants will be supplied to the LLM for matching, a context window of at least 4k tokens is required for this booster. Full standings history isn't possible at the moment, since this will overflow the input context area of the LLM, at least for the *smaller* models like GPT 3.5, Mistral 7b, and so on. Time will cure this problem, and I will update the capabilities of the integration, when more capable models become available. For the time being, the position data is available for the most recent laps and also the gaps for the most important opponents are passed to the LLM (for Strategist and Spotter).
+Since large parts of the knowledge base of the Assistants will be supplied to the LLM for matching, a larger model with a context window of at least 16k tokens is required for this booster. Full standings history isn't possible at the moment, since this will overflow the input context area of the LLM, at least for the *smaller* models like GPT 3.5, Mistral 7b, and so on. Time will cure this problem, and I will update the capabilities of the integration, when more capable models become available. For the time being, the position data is available for the most recent laps and also the gaps for the most important opponents are passed to the LLM (for Strategist and Spotter).
 
 Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 

@@ -106,13 +106,10 @@ initializeDebugging() {
 	local settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 	local criticalMemory := ((getMultiMapValue(settings, "Process", "Memory.Max", 1024) / 100)
 						   * getMultiMapValue(settings, "Process", "Memory.Critical", 80) * 1024 * 1024)
-	local pid
 
 	if kLogStartup {
-		pid := ProcessExist()
-
 		logMessage(kLogOff, "-----------------------------------------------------------------")
-		logMessage(kLogOff, translate("      Starting ") . StrSplit(A_ScriptName, ".")[1] . " [" . pid . "]")
+		logMessage(kLogOff, translate("      Starting ") . StrSplit(A_ScriptName, ".")[1] . " [" . ProcessExist() . "]")
 		logMessage(kLogOff, "-----------------------------------------------------------------")
 	}
 

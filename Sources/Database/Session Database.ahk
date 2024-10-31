@@ -1398,8 +1398,15 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		chooseTrackEditorMode(*) {
-			if (editorGui["trackEditorTypeDropDown"].Value = 2)
+			if (editorGui["trackEditorTypeDropDown"].Value = 2) {
+				if (!this.SelectedCar || (this.SelectedCar == true)) {
+					editorGui["trackEditorTypeDropDown"].Value := 1
+
+					return
+				}
+
 				this.iTrackEditorMode := "Automations"
+			}
 			else
 				this.iTrackEditorMode := "Sections"
 
@@ -3733,13 +3740,22 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.iTrackSections := []
 	}
 
-	selectAutomation() {
+	selectTrack() {
 		local ignore, column
 
 		if this.TrackMap
 			this.unloadTrackMap()
 
-		this.readTrackAutomations()
+		if (this.SelectedCar && (this.SelectedCar != true))
+			this.readTrackAutomations()
+		else {
+			this.Control["trackEditorTypeDropDown"].Value := 1
+
+			this.iTrackEditorMode := "Sections"
+
+			this.loadTrackMap(this.SessionDatabase.getTrackMap(this.SelectedSimulator, this.SelectedTrack)
+							, this.SessionDatabase.getTrackImage(this.SelectedSimulator, this.SelectedTrack))
+		}
 
 		loop this.DataListView.GetCount("Col")
 			this.DataListView.DeleteCol(1)
@@ -3750,7 +3766,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.DataListView.Delete()
 
 		this.DataListView.Add("", translate("Track: "), 1)
-		this.DataListView.Add("", translate("Automations: "), this.TrackAutomations.Length)
+		this.DataListView.Add("", translate("Automations: "), (this.SelectedCar && (this.SelectedCar != true)) ? this.TrackAutomations.Length : 0)
 
 		this.DataListView.ModifyCol()
 
@@ -4915,7 +4931,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				this.iAvailableModules["Strategies"] := true
 				this.iAvailableModules["Setups"] := true
 				this.iAvailableModules["Pressures"] := true
-				this.iAvailableModules["Track"] := this.SessionDatabase.hasTrackMap(simulator, track)
 			}
 			else {
 				this.iAvailableModules["Sessions"] := false
@@ -4923,8 +4938,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				this.iAvailableModules["Strategies"] := false
 				this.iAvailableModules["Setups"] := false
 				this.iAvailableModules["Pressures"] := false
-				this.iAvailableModules["Track"] := false
 			}
+
+			if (track && (track != true))
+				this.iAvailableModules["Track"] := this.SessionDatabase.hasTrackMap(simulator, track)
+			else
+				this.iAvailableModules["Track"] := false
 		}
 		else {
 			this.iAvailableModules["Settings"] := false
@@ -4966,7 +4985,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					case "Setups":
 						this.selectSetups()
 					case "Track":
-						this.selectAutomation()
+						this.selectTrack()
 					case "Pressures":
 						this.selectPressures()
 				}

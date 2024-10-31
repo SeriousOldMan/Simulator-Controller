@@ -1116,8 +1116,14 @@ class SoloCenter extends ConfigurationItem {
 
 		sessionsDirectory := getMultiMapValue(configuration, "Team Server", "Session.Folder", kTempDirectory . "Sessions")
 
+		if (!sessionsDirectory || (sessionsDirectory = "") || !FileExist(sessionsDirectory))
+			sessionsDirectory := (kTempDirectory . "Sessions")
+
 		this.iSessionDirectory := (normalizeDirectoryPath(getMultiMapValue(configuration, "Solo Center", "Session.Folder"
 																						, sessionsDirectory . "\Practice")) . "\")
+
+		if (!this.iSessionDirectory || (this.iSessionDirectory = "") || !FileExist(this.iSessionDirectory))
+			this.iSessionDirectory := (kTempDirectory . "Sessions\Practice\")
 
 		this.AutoClear := getMultiMapValue(settings, "Solo Center", "AutoClear", false)
 		this.AutoExport := getMultiMapValue(settings, "Solo Center", "AutoExport", false)

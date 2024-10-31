@@ -1379,10 +1379,10 @@ class TeamCenter extends ConfigurationItem {
 
 		directory := getMultiMapValue(configuration, "Team Server", "Session.Folder", kTempDirectory . "Sessions")
 
-		if (!directory || (directory = ""))
+		if (!directory || (directory = "") || !FileExist(directory))
 			directory := (kTempDirectory . "Sessions")
 
-		this.iSessionDirectory := (directory . "\")
+		this.iSessionDirectory := (normalizeDirectoryPath(directory) . "\")
 
 		settings := this.RaceSettings
 

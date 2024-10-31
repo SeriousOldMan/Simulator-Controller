@@ -1661,7 +1661,7 @@ class RaceStrategist extends GridRaceAssistant {
 								, BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0
 								, EnoughData: false, StrategyReported: (getMultiMapValue(data, "Stint Data", "Laps", 0) > 1)})
 
-		if (this.Speaker[false] && !raceEngineer)
+		if (this.Speaker[false] && !raceEngineer && (this.Session = kSessionRace))
 			this.getSpeaker().speakPhrase("Greeting")
 
 		if this.Debug[kDebugKnowledgeBase]

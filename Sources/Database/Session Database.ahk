@@ -3750,28 +3750,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		if this.TrackMap
 			this.unloadTrackMap()
 
-		if (this.SelectedCar && (this.SelectedCar != true)) {
+		if (this.SelectedCar && (this.SelectedCar != true))
 			this.readTrackAutomations()
-
-			loop this.DataListView.GetCount("Col")
-				this.DataListView.DeleteCol(1)
-
-			for ignore, column in collect(["Type", "#"], translate)
-				this.DataListView.InsertCol(A_Index, "", column)
-
-			this.DataListView.Delete()
-
-			this.DataListView.Add("", translate("Track: "), 1)
-			this.DataListView.Add("", translate("Automations: "), this.TrackAutomations.Length)
-
-			this.DataListView.ModifyCol()
-
-			loop 2
-				this.DataListView.ModifyCol(A_Index, 10)
-
-			loop 2
-				this.DataListView.ModifyCol(A_Index, "AutoHdr")
-		}
 		else {
 			this.Control["trackEditorTypeDropDown"].Value := 1
 
@@ -3780,6 +3760,25 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.loadTrackMap(this.SessionDatabase.getTrackMap(this.SelectedSimulator, this.SelectedTrack)
 							, this.SessionDatabase.getTrackImage(this.SelectedSimulator, this.SelectedTrack))
 		}
+
+		loop this.DataListView.GetCount("Col")
+			this.DataListView.DeleteCol(1)
+
+		for ignore, column in collect(["Type", "#"], translate)
+			this.DataListView.InsertCol(A_Index, "", column)
+
+		this.DataListView.Delete()
+
+		this.DataListView.Add("", translate("Track: "), 1)
+		this.DataListView.Add("", translate("Automations: "), (this.SelectedCar && (this.SelectedCar != true)) ? this.TrackAutomations.Length : 0)
+
+		this.DataListView.ModifyCol()
+
+		loop 2
+			this.DataListView.ModifyCol(A_Index, 10)
+
+		loop 2
+			this.DataListView.ModifyCol(A_Index, "AutoHdr")
 	}
 
 	deleteEntries(connectors, database, localTable, serverTable, driver) {

@@ -648,7 +648,7 @@ class Corner extends Section {
 							 , brakingStart, brakingTime, brakingLength, Round(maxBrake * 100), brakeRampUp
 							 , rollingStart, rollingTime, rollingLength
 							 , acceleratingStart, acceleratingTime, acceleratingLength
-							 , rollingGear, rollingRPM, acceleratingGear, acceleratingRPM
+							 , rollingGear, rollingRPM, acceleratingGear, acceleratingRPM, acceleratingSpeed
 							 , minLatG, maxLatG, average(latGs), minSpeed, maxSpeed, average(speeds), tcActivations, absActivations
 							 , Max(0, steeringChanges - 1), 100 - (steeringCount ? ((steeringChanges / steeringCount) * 100) : 0)
 							 , Max(0, throttleChanges - 1), 100 - (throttleCount ? ((throttleChanges / throttleCount) * 100): 0)

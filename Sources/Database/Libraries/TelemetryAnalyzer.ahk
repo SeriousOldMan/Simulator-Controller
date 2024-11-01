@@ -390,7 +390,7 @@ class Corner extends Section {
 								  , Duration: (nullRound(this.Time["Exit"] / 1000, 2) . " Seconds")
 								  , Gear: this.AcceleratingGear
 								  , RPM: this.AcceleratingRPM
-								  , Speed: this.AcceleratingSpeed
+								  , Speed: (Round(this.AcceleratingSpeed) . " km/h")
 								  , TCActivations: this.TCActivations
 								  , ThrottleCorrections: this.ThrottleCorrections
 								  , ThrottleSmoothness: (nullRound(this.ThrottleSmoothness) . " Percent")}

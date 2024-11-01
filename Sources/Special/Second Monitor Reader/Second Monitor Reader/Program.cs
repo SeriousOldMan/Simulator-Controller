@@ -25,6 +25,9 @@ static class Program
     static string driver = "John Doe (JD)";
     static int lapNumber = 0;
     static float lapTime = 0.0f;
+    static float sector1Time = 0.0f;
+    static float sector2Time = 0.0f;
+    static float sector3Time = 0.0f;
 
     static void skipObject(JsonTextReader reader)
     {
@@ -70,13 +73,21 @@ static class Program
                         reader.Read();
                         lapNumber = int.Parse(reader.Value.ToString());
                         break;
-                    case "LapTime":
+                    case "LapTimeSeconds":
                         reader.Read();
-
-                        TimeSpan time = TimeSpan.Parse(reader.Value.ToString());
-
-                        lapTime = (float)time.TotalSeconds;
-
+                        lapTime = float.Parse(reader.Value.ToString());
+                        break;
+                    case "Sector1TimeSeconds":
+                        reader.Read();
+                        sector1Time = float.Parse(reader.Value.ToString());
+                        break;
+                    case "Sector2TimeSeconds":
+                        reader.Read();
+                        sector2Time = float.Parse(reader.Value.ToString());
+                        break;
+                    case "Sector3TimeSeconds":
+                        reader.Read();
+                        sector3Time = float.Parse(reader.Value.ToString());
                         break;
                 }
 
@@ -404,6 +415,8 @@ static class Program
             outStream.Write("Driver="); outStream.WriteLine(driver);
             outStream.Write("Lap="); outStream.WriteLine(lapNumber);
             outStream.Write("LapTime="); outStream.WriteLine(lapTime);
+            outStream.Write("SectorTimes="); outStream.Write(sector1Time); outStream.Write(",");
+                                             outStream.Write(sector2Time); outStream.Write(","); outStream.WriteLine(sector3Time);
 
             outStream.Close();
         }

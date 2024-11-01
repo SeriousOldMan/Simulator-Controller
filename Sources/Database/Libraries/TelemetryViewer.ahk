@@ -1240,6 +1240,10 @@ class TelemetryViewer {
 							name := fileName
 							telemetry := dataFile
 							info := sessionDB.readTelemetryInfo(simulator, car, track, fileName)
+
+							theDriver := getMultiMapValue(info, "Lap", "Driver", false)
+							theLapTime := getMultiMapValue(info, "Lap", "LapTime", false)
+							theSectorTimes := getMultiMapValue(info, "Lap", "SectorTimes", false)
 						}
 						else
 							telemetry := false
@@ -1253,7 +1257,16 @@ class TelemetryViewer {
 				else {
 					name := fileName
 					telemetry := (directory . "\" . fileName . ".telemetry")
-					info := false
+
+					if FileExist(telemetry . ".info") {
+						info := readMultiMap(telemetry . ".info")
+
+						theDriver := getMultiMapValue(info, "Info", "Driver", false)
+						theLapTime := getMultiMapValue(info, "Info", "LapTime", false)
+						theSectorTimes := getMultiMapValue(info, "Info", "SectorTimes", false)
+					}
+					else
+						info := false
 				}
 			}
 
@@ -1391,11 +1404,21 @@ class TelemetryViewer {
 								this.Manager.getLapInformation(lap, &driver, &lapTime, &sectorTimes)
 
 								setMultiMapValue(info, "Lap", "Driver", driver)
-								setMultiMapValue(info, "Lap", "LapTime", lapTime)
-								setMultiMapValue(info, "Lap", "SectorTimes", sectorTimes)
+
+								if (lapTime && (lapTime != "-"))
+									setMultiMapValue(info, "Lap", "LapTime", lapTime)
+
+								if (sectorTimes && (sectorTimes.Length > 0) && (sectorTimes[1] != "-"))
+									setMultiMapValue(info, "Lap", "SectorTimes", values2String(",", sectorTimes*))
 							}
 							else {
+								setMultiMapValue(info, "Lap", "Driver", lap[2])
 
+								if (lap[3] && (lap[3] != "-"))
+									setMultiMapValue(info, "Lap", "LapTime", lap[3])
+
+								if (lap[4].Length > 0)
+									setMultiMapValue(info, "Lap", "SectorTimes", values2String(",", lap[4]*))
 							}
 
 							sessionDB.writeTelemetryInfo(simulator, car, track, fileName, info)

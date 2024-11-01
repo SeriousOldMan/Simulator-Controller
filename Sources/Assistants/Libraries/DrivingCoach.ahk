@@ -1022,7 +1022,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 	shutdownTrackTrigger(force := false, arguments*) {
 		local pid := this.iTrackTriggerPID
-		local tries
+		local tries, state
 
 		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
 			return false
@@ -1049,6 +1049,12 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 
 			this.iTrackTriggerPID := false
+
+			state := readMultiMap("Driving Coach\Coaching.state")
+
+			setMultiMapValue(state, "Coaching", "Track", false)
+
+			writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 		}
 
 		return false
@@ -1205,7 +1211,7 @@ class DrivingCoach extends GridRaceAssistant {
 		if !wait
 			wait := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Corner.Wait", 10) * 1000)
 
-		telemetry := this.getLapsTelemetry(3, cornerNr)
+		telemetry := this.getLapsTelemetry(3) ; , cornerNr)
 
 		if (this.TelemetryAnalyzer && (telemetry.Length > 0)) {
 			if (A_TickCount < nextRecommendation)

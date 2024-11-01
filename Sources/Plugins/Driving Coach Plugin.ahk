@@ -27,12 +27,28 @@ global kDrivingCoachPlugin := "Driving Coach"
 class DrivingCoachPlugin extends RaceAssistantPlugin {
 	iServiceState := "Available"
 
-	iCoachingActive := false
+	iTelemetryCoachingActive := false
 	iTrackCoachingActive := false
 
 	class RemoteDrivingCoach extends RaceAssistantPlugin.RemoteRaceAssistant {
 		__New(plugin, remotePID) {
 			super.__New(plugin, "Driving Coach", remotePID)
+		}
+
+		startCoaching(arguments*) {
+			this.callRemote("startCoaching", arguments*)
+		}
+
+		finishCoaching(arguments*) {
+			this.callRemote("finishCoaching", arguments*)
+		}
+
+		startTrackCoaching(arguments*) {
+			this.callRemote("startTrackCoaching", arguments*)
+		}
+
+		finishTrackCoaching(arguments*) {
+			this.callRemote("finishTrackCoaching", arguments*)
 		}
 	}
 
@@ -54,18 +70,10 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 		fireAction(function, trigger) {
 			local plugin := this.Plugin
 
-			if (plugin.CoachingActive && ((trigger = "On") || (trigger = "Off") || (trigger == "Push"))) {
+			if (plugin.TelemetryCoachingActive && ((trigger = "On") || (trigger = "Off") || (trigger == "Push")))
 				plugin.finishCoaching()
-
-				function.setLabel(plugin.actionLabel(this), "Black")
-				function.setIcon(plugin.actionIcon(this), "Deactivated")
-			}
-			else if (!plugin.CoachingActive && ((trigger = "On") || (trigger == "Push"))) {
+			else if (!plugin.TelemetryCoachingActive && ((trigger = "On") || (trigger == "Push")))
 				plugin.startCoaching()
-
-				function.setLabel(plugin.actionLabel(this), "Green")
-				function.setIcon(plugin.actionIcon(this), "Activated")
-			}
 		}
 	}
 
@@ -87,18 +95,10 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 		fireAction(function, trigger) {
 			local plugin := this.Plugin
 
-			if (plugin.TrackCoachingActive && ((trigger = "On") || (trigger = "Off") || (trigger == "Push"))) {
+			if (plugin.TrackCoachingActive && ((trigger = "On") || (trigger = "Off") || (trigger == "Push")))
 				plugin.finishTrackCoaching()
-
-				function.setLabel(plugin.actionLabel(this), "Black")
-				function.setIcon(plugin.actionIcon(this), "Deactivated")
-			}
-			else if (!plugin.TrackCoachingActive && ((trigger = "On") || (trigger == "Push"))) {
+			else if (!plugin.TrackCoachingActive && ((trigger = "On") || (trigger == "Push")))
 				plugin.startTrackCoaching()
-
-				function.setLabel(plugin.actionLabel(this), "Green")
-				function.setIcon(plugin.actionIcon(this), "Activated")
-			}
 		}
 	}
 
@@ -114,9 +114,9 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 		}
 	}
 
-	CoachingActive {
+	TelemetryCoachingActive {
 		Get {
-			return this.iCoachingActive
+			return this.iTelemetryCoachingActive
 		}
 	}
 
@@ -132,10 +132,10 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 		super.__New(controller, name, configuration)
 
 		if (this.Active || (isDebug() && isDevelopment())) {
-			coaching := this.getArgumentValue("coaching", false)
+			coaching := this.getArgumentValue("telemetryCoaching", false)
 
 			if coaching
-				this.createRaceAssistantAction(controller, "Coaching", coaching)
+				this.createRaceAssistantAction(controller, "TelemetryCoaching", coaching)
 		}
 
 		if (this.Active || (isDebug() && isDevelopment())) {
@@ -154,8 +154,8 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 			local active := getMultiMapValue(state, "Coaching", "Active", false)
 			local track := (active && getMultiMapValue(state, "Coaching", "Track", false))
 
-			if (active != this.CoachingActive) {
-				this.iCoachingActive := active
+			if (active != this.TelemetryCoachingActive) {
+				this.iTelemetryCoachingActive := active
 
 				this.updateActions(kSessionUnknown)
 			}
@@ -173,15 +173,17 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 
 		if (inList(["RaceAssistant", "Call", "SetupWorkbenchOpen"], action))
 			super.createRaceAssistantAction(controller, action, actionFunction, arguments*)
-		else if (action = "Coaching") {
+		else if (action = "TelemetryCoaching") {
 			descriptor := ConfigurationItem.descriptor(action, "Toggle")
 
-			this.registerAction(DrivingCoachPlugin.CoachingToggleAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
+			this.registerAction(DrivingCoachPlugin.CoachingToggleAction(this, controller.findFunction(actionFunction)
+																	  , this.getLabel(descriptor, action), this.getIcon(descriptor)))
 		}
 		else if (action = "TrackCoaching") {
 			descriptor := ConfigurationItem.descriptor(action, "Toggle")
 
-			this.registerAction(DrivingCoachPlugin.TrackCoachingToggleAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
+			this.registerAction(DrivingCoachPlugin.TrackCoachingToggleAction(this, controller.findFunction(actionFunction)
+																		   , this.getLabel(descriptor, action), this.getIcon(descriptor)))
 		}
 		else
 			logMessage(kLogWarn, translate("Action `"") . action . translate("`" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
@@ -222,8 +224,8 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 
 		for ignore, theAction in this.Actions {
 			if isInstance(theAction, DrivingCoachPlugin.CoachingToggleAction) {
-				theAction.Function.setLabel(this.actionLabel(theAction), this.CoachingActive ? "Green" : "Black")
-				theAction.Function.setIcon(this.actionIcon(theAction), this.CoachingActive ? "Activated" : "Deactivated")
+				theAction.Function.setLabel(this.actionLabel(theAction), this.TelemetryCoachingActive ? "Green" : "Black")
+				theAction.Function.setIcon(this.actionIcon(theAction), this.TelemetryCoachingActive ? "Activated" : "Deactivated")
 
 				theAction.Function.enable(kAllTrigger, theAction)
 			}

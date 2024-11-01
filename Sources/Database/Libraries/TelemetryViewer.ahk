@@ -636,7 +636,7 @@ class TelemetryViewer {
 										  : this.iLap)
 								  : false)
 			else
-				return (path ? this.iLap[4] : this.iLap)
+				return (path ? this.iLap[5] : this.iLap)
 		}
 
 		Set {
@@ -655,7 +655,7 @@ class TelemetryViewer {
 												   : this.iReferenceLap)
 										   : false)
 			else
-				return (path ? this.iReferenceLap[4] : this.iReferenceLap)
+				return (path ? this.iReferenceLap[5] : this.iReferenceLap)
 		}
 
 		Set {
@@ -1199,6 +1199,7 @@ class TelemetryViewer {
 		processFile(fileName, info) {
 			local theDriver := driver
 			local theLapTime := false
+			local theSectorTimes := false
 			local telemetry := false
 			local name, directory, dataFile, file, size, lap
 
@@ -1211,6 +1212,7 @@ class TelemetryViewer {
 					theDriver := getMultiMapValue(info, "Info", "Driver")
 
 				theLapTime := getMultiMapValue(info, "Info", "LapTime")
+				theSectorTimes := getMultiMapValue(info, "Info", "SectorTimes")
 
 				DirCreate(this.TelemetryDirectory . "Imported")
 
@@ -1260,9 +1262,13 @@ class TelemetryViewer {
 					lap := [name, theDriver ? theDriver
 											: SessionDatabase.getDriverName(simulator, getMultiMapValue(info, "Telemetry", "Driver"))
 						  , theLapTime ? theLapTime : "-"
+						  , theSectorTimes ? string2Values(",", theSectorTimes) : []
 						  , telemetry]
 				else
-					lap := [name, theDriver ? theDriver : "John Doe (JD)", theLapTime ? theLapTime : "-", telemetry]
+					lap := [name, theDriver ? theDriver : "John Doe (JD)"
+						  , theLapTime ? theLapTime : "-"
+						  , theSectorTimes ? string2Values(",", theSectorTimes) : []
+						  , telemetry]
 
 				this.ImportedLaps.Push(lap)
 
@@ -1303,7 +1309,7 @@ class TelemetryViewer {
 
 	saveLap(lap := false, prompt := true) {
 		local simulator, car, track
-		local sessionDB, dirName, fileName, newFileName, file, folder, telemetry, driver
+		local sessionDB, dirName, fileName, newFileName, file, folder, telemetry, driver, lapTime, sectorTimes
 
 		this.Manager.getSessionInformation(&simulator, &car, &track)
 
@@ -1320,8 +1326,11 @@ class TelemetryViewer {
 			else
 				dirName := ""
 
-			if isNumber(lap)
-				fileName := (dirName . "\Lap " . lap)
+			if isNumber(lap) {
+				this.Manager.getLapInformation(lap, &driver, &lapTime, &sectorTimes)
+
+				fileName := (dirName . "\Lap " . lap . translate(" (") . driver . ((lapTime != "-") ? (" - " . lapTime) : "") . translate(")"))
+			}
 			else {
 				SplitPath(lap[1], , , , &newFileName)
 
@@ -1353,7 +1362,7 @@ class TelemetryViewer {
 						if isNumber(lap)
 							file := FileOpen((this.TelemetryDirectory . "Lap " . lap . ".telemetry"), "r-wd")
 						else
-							file := FileOpen(lap[4], "r-wd")
+							file := FileOpen(lap[5], "r-wd")
 
 						if file {
 							size := file.Length
@@ -1376,6 +1385,21 @@ class TelemetryViewer {
 							sessionDB.writeTelemetry(simulator, car, track, fileName, telemetry, size
 												   , false, true, driver)
 
+							info := sessionDB.readTelemetryInfo(simulator, car, track, fileName)
+
+							if isNumber(lap) {
+								this.Manager.getLapInformation(lap, &driver, &lapTime, &sectorTimes)
+
+								setMultiMapValue(info, "Lap", "Driver", driver)
+								setMultiMapValue(info, "Lap", "LapTime", lapTime)
+								setMultiMapValue(info, "Lap", "SectorTimes", sectorTimes)
+							}
+							else {
+
+							}
+
+							sessionDB.writeTelemetryInfo(simulator, car, track, fileName, info)
+
 							return
 						}
 					}
@@ -1386,7 +1410,7 @@ class TelemetryViewer {
 						FileCopy(this.TelemetryDirectory . "Lap " . lap . ".telemetry"
 							   , folder . "\" . fileName . ".telemetry", 1)
 					else
-						FileCopy(lap[4], folder . "\" . fileName . ".telemetry", 1)
+						FileCopy(lap[5], folder . "\" . fileName . ".telemetry", 1)
 				}
 				catch Any as exception {
 					logError(exception)
@@ -1480,7 +1504,7 @@ class TelemetryViewer {
 	}
 
 	lapLabel(lap) {
-		local driver, lapTime, sectorTimes
+		local theLap, driver, lapTime, sectorTimes
 
 		lapTimeDisplayValue(lapTime) {
 			local seconds, fraction, minutes
@@ -1496,24 +1520,22 @@ class TelemetryViewer {
 		if isNumber(lap) {
 			this.Manager.getLapInformation(lap, &driver, &lapTime, &sectorTimes)
 
-			if (!InStr(driver, "John Doe") && (lapTime != "-"))
-				return (lap . translate(":") . A_Space . driver . translate(" - ") . lapTimeDisplayValue(lapTime) . A_Space . translate("[") . values2String(", ", collect(sectorTimes, lapTimeDisplayValue)*) . translate("]"))
-			else if !InStr(driver, "John Doe")
-				return (lap . translate(":") . A_Space . driver)
-			else
-				return lap
+			theLap := lap
 		}
 		else {
+			theLap := lap[1]
+
 			lapTime := lap[3]
 			driver := lap[2]
-
-			if (!InStr(driver, "John Doe") && (lapTime != "-"))
-				return (lap[1] . translate(":") . A_Space . driver . translate(" - ") . lapTimeDisplayValue(lapTime))
-			else if !InStr(driver, "John Doe")
-				return (lap[1] . translate(":") . A_Space . driver)
-			else
-				return lap[1]
+			sectorTimes := lap[4]
 		}
+
+		if (!InStr(driver, "John Doe") && (lapTime != "-"))
+			return (theLap . translate(":") . A_Space . driver . translate(" - ") . lapTimeDisplayValue(lapTime) . ((sectorTimes.Length > 0) ? (A_Space . translate("[") . values2String(", ", collect(sectorTimes, lapTimeDisplayValue)*) . translate("]")) : ""))
+		else if !InStr(driver, "John Doe")
+			return (theLap . translate(":") . A_Space . driver)
+		else
+			return theLap
 	}
 
 	loadTelemetry(select := false) {

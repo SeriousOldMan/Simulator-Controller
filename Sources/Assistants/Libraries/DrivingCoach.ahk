@@ -789,7 +789,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 			setMultiMapValue(state, "Coaching", "Active", true)
 
-			writeMultiMap(kTempDirectory . "Coaching.state", state)
+			writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 		}
 	}
 
@@ -806,7 +806,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		setMultiMapValue(state, "Coaching", "Active", false)
 
-		writeMultiMap(kTempDirectory . "Coaching.state", state)
+		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 	}
 
 	telemetryAvailable(laps) {
@@ -1011,11 +1011,11 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 		}
 
-		state := readMultiMap(kTempDirectory . "Coaching.state")
+		state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
 
 		setMultiMapValue(state, "Coaching", "Track", this.iTrackTriggerPID != false)
 
-		writeMultiMap(kTempDirectory . "Coaching.state", state)
+		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 
 		return (this.iTrackTriggerPID != false)
 	}

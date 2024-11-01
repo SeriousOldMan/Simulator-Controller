@@ -819,17 +819,27 @@ class DrivingCoach extends GridRaceAssistant {
 	getLapsTelemetry(numLaps, corner := false) {
 		local result := []
 		local laps := getKeys(this.AvailableTelemetry)
-		local ignore, lap, found
+		local ignore, lap, found, fileName, info, driver, lapTime, sectorTimes
 
 		for ignore, lap in bubbleSort(&laps, (a, b) => (a < b)) {
 			if ((A_Index > laps.Length) || (result.Length >= numLaps))
 				break
 
-			if (this.AvailableTelemetry[lap] == true)
-				this.AvailableTelemetry[lap] := this.TelemetryAnalyzer.createTelemetry(lap, kTempDirectory . "Driving Coach\Telemetry\Lap " . lap . ".telemetry")
+			if (this.AvailableTelemetry[lap] == true) {
+				fileName := (kTempDirectory . "Driving Coach\Telemetry\Lap " . lap . ".telemetry")
+
+				info := readMultiMap(fileName . ".info")
+
+				driver := getMultiMapValue(info, "Info", "Driver", SessionDatabase.getUserName())
+				lapTime := getMultiMapValue(info, "Info", "Driver", "LapTime", false)
+				sectorTimes := getMultiMapValue(info, "Info", "Driver", "SectorTimes", false)
+
+				this.AvailableTelemetry[lap] := [this.TelemetryAnalyzer.createTelemetry(lap, fileName)
+											   , driver, lapTime, sectorTimes]
+			}
 
 			if corner {
-				lap := this.AvailableTelemetry[lap].Clone()
+				lap := this.AvailableTelemetry[lap][1].Clone()
 
 				found := false
 
@@ -852,7 +862,7 @@ class DrivingCoach extends GridRaceAssistant {
 					result.Push(lap)
 			}
 			else
-				result.Push(this.AvailableTelemetry[lap])
+				result.Push(this.AvailableTelemetry[lap][1])
 		}
 
 		return result
@@ -862,18 +872,40 @@ class DrivingCoach extends GridRaceAssistant {
 		local loadedLaps
 
 		updateTelemetry() {
+			local knowledgeBase := this.KnowledgeBase
 			local newLaps := []
-			local lap
+			local lap, car, driver, lapTime, sectorTimes, info
 
-			loop Files, kTempDirectory . "Driving Coach\Telemetry\*.telemetry" {
-				lap := StrReplace(StrReplace(A_LoopFileName, "Lap ", ""), ".telemetry", "")
+			if knowledgeBase
+				loop Files, kTempDirectory . "Driving Coach\Telemetry\*.telemetry" {
+					lap := StrReplace(StrReplace(A_LoopFileName, "Lap ", ""), ".telemetry", "")
 
-				if !loadedLaps.Has(lap) {
-					newLaps.Push(lap)
+					if (!loadedLaps.Has(lap) && knowledgeBase.hasFact("Lap." . lap . ".Driver.ForName"))
+						car := knowledgeBase.getValue("Driver.Car", kUndefined)
 
-					loadedLaps[lap] := true
+						driver := driverName(knowledgeBase.getValue("Lap." . lap . ".Driver.ForName")
+										   , knowledgeBase.getValue("Lap." . lap . ".Driver.SurName")
+										   , knowledgeBase.getValue("Lap." . lap . ".Driver.NickName"))
+						lapTime := (this.getLapTime(car) / 1000)
+						sectorTimes := this.getSectorTimes(car)
+
+						info := newMultiMap()
+
+						setMultiMapValue(info, "Info", "Driver", driver)
+
+						if lapTime
+							setMultiMapValue(info, "Info", "LapTime", lapTime)
+
+						if (sectorTimes && (sectorTimes.Length > 0))
+							setMultiMapValue(info, "Info", "SectorTimes", values2String(",", sectorTimes*))
+
+						writeMultiMap(A_LoopFileFullPath . ".info", info)
+
+						newLaps.Push(lap)
+
+						loadedLaps[lap] := true
+					}
 				}
-			}
 
 			if (newLaps.Length > 0) {
 				bubbleSort(&newLaps)

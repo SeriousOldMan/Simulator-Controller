@@ -232,6 +232,7 @@ class LLMConnector {
 
 	iHistory := []
 	iMaxHistory := 3
+	iHistoryEnabled := true
 
 	class HTTPConnector extends LLMConnector {
 		iServer := ""
@@ -280,10 +281,12 @@ class LLMConnector {
 		}
 
 		AddConversation(question, answer) {
-			this.History.Push([question, answer])
+			if this.History {
+				this.History.Push([question, answer])
 
-			while (this.History.Length > this.MaxHistory)
-				this.History.RemoveAt(1)
+				while (this.History.Length > this.MaxHistory)
+					this.History.RemoveAt(1)
+			}
 		}
 
 		CreateServiceURL(server) {
@@ -425,7 +428,7 @@ class LLMConnector {
 
 			do(instructions, addInstruction)
 
-			for ignore, conversation in this.History {
+			for ignore, conversation in (this.History ? this.History : []) {
 				messages.Push({role: "user", content: conversation[1]})
 				messages.Push({role: "assistant", content: conversation[2]})
 			}
@@ -761,7 +764,7 @@ class LLMConnector {
 
 			do(instructions, addInstruction)
 
-			for ignore, conversation in this.History {
+			for ignore, conversation in (this.History ? this.History : []) {
 				prompt .= ("<|### User ###|>`n" . conversation[1] . "`n")
 				prompt .= ("<|### Assistant ###|>`n" . conversation[2] . "`n")
 			}
@@ -940,7 +943,14 @@ class LLMConnector {
 
 	History[key?] {
 		Get {
-			return (isSet(key) ? this.iHistory[key] : this.iHistory)
+			if this.iHistoryEnabled
+				return (isSet(key) ? this.iHistory[key] : this.iHistory)
+			else
+				return false
+		}
+
+		Set {
+			return (this.iHistoryEnabled := (value != false))
 		}
 	}
 
@@ -966,6 +976,8 @@ class LLMConnector {
 	}
 
 	Restart() {
+		this.History := true
+
 		this.History.Length := 0
 	}
 
@@ -978,10 +990,12 @@ class LLMConnector {
 	}
 
 	AddConversation(question, answer) {
-		this.History.Push([question, answer])
+		if this.History {
+			this.History.Push([question, answer])
 
-		while (this.History.Length > this.MaxHistory)
-			this.History.RemoveAt(1)
+			while (this.History.Length > this.MaxHistory)
+				this.History.RemoveAt(1)
+		}
 	}
 
 	Ask(question, instructions := false) {

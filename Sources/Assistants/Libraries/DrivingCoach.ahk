@@ -179,6 +179,9 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 
 		Set {
+			if this.Connector
+				this.Connector.History := (mode = "Conversation")
+
 			return (this.iMode := value)
 		}
 	}
@@ -831,8 +834,8 @@ class DrivingCoach extends GridRaceAssistant {
 				info := readMultiMap(fileName . ".info")
 
 				driver := getMultiMapValue(info, "Info", "Driver", SessionDatabase.getUserName())
-				lapTime := getMultiMapValue(info, "Info", "Driver", "LapTime", false)
-				sectorTimes := getMultiMapValue(info, "Info", "Driver", "SectorTimes", false)
+				lapTime := getMultiMapValue(info, "Info", "LapTime", false)
+				sectorTimes := getMultiMapValue(info, "Info", "SectorTimes", false)
 
 				this.AvailableTelemetry[lap] := [this.TelemetryAnalyzer.createTelemetry(lap, fileName)
 											   , driver, lapTime, sectorTimes]
@@ -880,7 +883,7 @@ class DrivingCoach extends GridRaceAssistant {
 				loop Files, kTempDirectory . "Driving Coach\Telemetry\*.telemetry" {
 					lap := StrReplace(StrReplace(A_LoopFileName, "Lap ", ""), ".telemetry", "")
 
-					if (!loadedLaps.Has(lap) && knowledgeBase.hasFact("Lap." . lap . ".Driver.ForName"))
+					if (!loadedLaps.Has(lap) && knowledgeBase.hasFact("Lap." . lap . ".Driver.ForName")) {
 						car := knowledgeBase.getValue("Driver.Car", kUndefined)
 
 						driver := driverName(knowledgeBase.getValue("Lap." . lap . ".Driver.ForName")

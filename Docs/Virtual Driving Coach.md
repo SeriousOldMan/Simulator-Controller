@@ -188,6 +188,16 @@ Below you find all instruction categories and the supported variables:
 |             | %telemetry%       | This variable is substituted with the content of the knowledge base in a self-explaining JSON format. |
 | Handling    | Scope             | This instruction is used only when handling problems had been detected in the telemetry. See the chapter below about detecting handling problems and discussin them with Aiden. |
 |             | %handling%        | An enumeration of all detected handing problems. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#detecting-and-discussing-handling-problems) below for more information. |
+| Coaching    | Scope             | This is a very long instruction, which is used when the telemetry-based coaching is active. It describes many areas to check in the telemetry data when looking for potential imrpvements. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#corner-by-corner-coaching-based-on-telemetry) below for more information. |
+|             | %telemetry%       | This is a special variable, because it is actually not part of the instruction text, but is appended in *normal* conversation when corner by corner coaching is active. This variable will be replaced condensed telemetry data in JSON format for the last lap and possible recent laps. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#corner-by-corner-coaching-based-on-telemetry) below for more information. |
+| Coaching.Lap | Scope            | This is synthetic question/command, which is sent to the LLM, if the user request a complete telemetry review of the last lap. |
+|             | %telemetry%       | This variable will be replaced with a condensed representation of the telemetry data in JSON format for the last lap and possible recent laps. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#corner-by-corner-coaching-based-on-telemetry) below for more information. |
+| Coaching.Corner | Scope            | This is synthetic question/command, which is sent to the LLM, if the user request a review for a specific corner. |
+|             | %telemetry%       | This variable will be replaced with a condensed representation of the telemetry data in JSON format for the last lap and possible recent laps. Only the data for the requested corner and the section after it will be included. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#corner-by-corner-coaching-based-on-telemetry) below for more information. |
+|             | %corner%          | The corner to be reviewed. |
+| Coaching.Corner.Short | Scope            | Similar to the "Coaching.Corner" instruction. Used for on-track recommendations for an upcoming corner. |
+|             | %telemetry%       | This variable will be replaced with a condensed representation of the telemetry data in JSON format for the last lap and possible recent laps. Only the data for the requested corner and the section after it will be included. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#corner-by-corner-coaching-based-on-telemetry) below for more information. |
+|             | %corner%          | The corner to be reviewed. |
 
 As said, all instructions can be modified in the configuration. You can even clear a complete instruction, if you want (and don't want to dicuss the corresponding information with Aiden). I do not recommend to clear the "Character" instruction, though.
 
@@ -221,7 +231,7 @@ The above list are only few of the rules to follow, though the most important on
 
 ### Detecting and discussing handling problems
 
-The Driving Coach will try to detect possible handling problems using the same mechanism used by the "Setup Workbench". In fact, Aiden uses the same [Issue Analyzer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-issue-analyzer) as the "Setup Workbench" and will use the same settings and thresholds you have selected for the same car and track last time. Therefore, if you want to discuss your handling issues with Aiden, be sure to have created a valid or even calibrated configuration in the Telemetry Analyzer for the given car and track.
+The Driving Coach will try to detect possible handling problems using the same mechanism that is used by the "Setup Workbench". In fact, Aiden uses the same [Issue Analyzer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-issue-analyzer) as the "Setup Workbench" and will use the same settings and thresholds you have selected for the same car and track last time. Therefore, if you want to discuss your handling issues with Aiden, be sure to have created a valid or even calibrated configuration in the Telemetry Analyzer for the given car and track.
 
 When at least one handling issue had been detected, the "Handling" instruction will be used to describe the handling issues to the Driving Coach. Each issue will be described on a single line in the instructions. Example:
  
@@ -230,6 +240,10 @@ When at least one handling issue had been detected, the "Handling" instruction w
 Using this knowledge, Aiden should be able to give you information how to cope with the given handling issues, for example by changing your driver inputs or changes to the car setup.
 
 Information: You can disable this instruction (and every other instruction as well) completely, by clearing it in the configuration, if you don't want Aiden to give you information regarding handling problems. If you want to temporarily enable or disable it during a running session, you can use the voice commands below.
+
+### Corner by corner coaching based on telemetry
+
+
 
 ### List of all voice commands
 

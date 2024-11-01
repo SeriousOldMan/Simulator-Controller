@@ -181,6 +181,7 @@
   - [Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#configuration)
     - [Instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#instructions)
   - [Interacting with Aiden](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#interacting-with-aiden)
+    - [Telemetry-based coaching](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#corner-by-corner-coaching-based-on-telemetry)
     - [List of all voice commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#list-of-all-voice-commands)
     - [Managing instructions and information processing](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#enabling-and-disabling-specific-instructions-and-information-processing)
     - [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#how-it-works)

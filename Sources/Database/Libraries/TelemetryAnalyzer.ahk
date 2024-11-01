@@ -51,21 +51,21 @@ class Section {
 		}
 	}
 
-	MinG {
+	MinLateralGForce {
 		Get {
-			throw "Virtual property Section.MinG must be implemented in a subclass..."
+			throw "Virtual property Section.MinLateralGForce must be implemented in a subclass..."
 		}
 	}
 
-	MaxG {
+	MaxLateralGForce {
 		Get {
-			throw "Virtual property Section.MaxG must be implemented in a subclass..."
+			throw "Virtual property Section.MaxLateralGForce must be implemented in a subclass..."
 		}
 	}
 
-	AvgG {
+	AvgLateralGForce {
 		Get {
-			throw "Virtual property Section.AvgG must be implemented in a subclass..."
+			throw "Virtual property Section.AvgLateralGForce must be implemented in a subclass..."
 		}
 	}
 
@@ -128,9 +128,9 @@ class Corner extends Section {
 	iAcceleratingRPM := 0				; RPM at start of the accelarating phase
 	iAcceleratingSpeed := 0				; Speed at the end of the accelerating phase
 
-	iMinG := 0							; Min G Force around apex (rolling phase)
-	iMaxG := 0							; Max G Force around apex (rolling phase)
-	iAvgG := 0							; Avg G Force around apex (rolling phase)
+	iMinLateralGForce := 0				; Min G Force around apex (rolling phase)
+	iMaxLateralGForce := 0				; Max G Force around apex (rolling phase)
+	iAvgLateralGForce := 0				; Avg G Force around apex (rolling phase)
 	iMinSpeed := 0						; Min Speed around apex (rolling phase)
 	iMaxSpeed := 0						; Max Speed around apex (rolling phase)
 	iAvgSpeed := 0						; Avg Speed around apex (rolling phase)
@@ -242,21 +242,21 @@ class Corner extends Section {
 		}
 	}
 
-	MinG {
+	MinLateralGForce {
 		Get {
-			return this.iMinG
+			return this.iMinLateralGForce
 		}
 	}
 
-	MaxG {
+	MaxLateralGForce {
 		Get {
-			return this.iMaxG
+			return this.iMaxLateralGForce
 		}
 	}
 
-	AvgG {
+	AvgLateralGForce {
 		Get {
-			return this.iAvgG
+			return this.iAvgLateralGForce
 		}
 	}
 
@@ -376,11 +376,11 @@ class Corner extends Section {
 								  , Duration: (nullRound(this.Time["Apex"] / 1000, 2) . " Seconds")
 								  , Gear: this.RollingGear
 								  , RPM: this.RollingRPM
-								  , G: nullRound(this.AvgG, 2)
+								  , LateralGForce: nullRound(this.AvgLateralGForce, 2)
 								  , Speed: (nullRound(this.MinSpeed) . " km/h")}
 			else
 				descriptor.Apex := {Phase: "Rolling"
-								  , G: nullRound(this.AvgG, 2)
+								  , LateralGForce: nullRound(this.AvgLateralGForce, 2)
 								  , Speed: (nullRound(this.MinSpeed) . " km/h")}
 
 			if (this.Start["Exit"] != kNull) {
@@ -435,9 +435,9 @@ class Corner extends Section {
 		this.iAcceleratingRPM := acceleratingRPM
 		this.iAcceleratingSpeed := acceleratingSpeed
 
-		this.iMinG := minG
-		this.iMaxG := maxG
-		this.iAvgG := avgG
+		this.iMinLateralGForce := minG
+		this.iMaxLateralGForce := maxG
+		this.iAvgLateralGForce := avgG
 		this.iMinSpeed := minSpeed
 		this.iMaxSpeed := maxSpeed
 		this.iAvgSpeed := avgSpeed
@@ -675,19 +675,19 @@ class Straight extends Section {
 		}
 	}
 
-	MinG {
+	MinLateralGForce {
 		Get {
 			return 0
 		}
 	}
 
-	MaxG {
+	MaxLateralGForce {
 		Get {
 			return 0
 		}
 	}
 
-	AvgG {
+	AvgLateralGForce {
 		Get {
 			return 0
 		}
@@ -763,7 +763,7 @@ class Telemetry {
 
 	iSections := []
 
-	iMaxG := 0
+	iMaxLateralGForce := 0
 	iMaxSpeed := 0
 
 	iMaxGear := 0
@@ -797,9 +797,9 @@ class Telemetry {
 		}
 	}
 
-	MaxG {
+	MaxLateralGForce {
 		Get {
-			return this.iMaxG
+			return this.iMaxLateralGForce
 		}
 	}
 
@@ -823,7 +823,7 @@ class Telemetry {
 
 	Descriptor {
 		Get {
-			return {Lap: this.Lap, MaxG: nullRound(this.MaxG, 2), MaxSpeed: (nullRound(this.MaxSpeed) . " km/h")
+			return {Lap: this.Lap, MaxLateralGForce: nullRound(this.MaxLateralGForce, 2), MaxSpeed: (nullRound(this.MaxSpeed) . " km/h")
 								 , MaxGear: this.MaxGear, MaxRPM: this.MaxRPM
 								 , Sections: collect(this.Sections, (s) => s.Descriptor)}
 		}
@@ -849,9 +849,9 @@ class Telemetry {
 
 		for ignore, section in this.Sections {
 			if (maxG == kUndefined)
-				maxG := section.MaxG
+				maxG := section.MaxLateralGForce
 			else
-				maxG := Max(section.MaxG, maxG)
+				maxG := Max(section.MaxLateralGForce, maxG)
 
 			if (maxSpeed == kUndefined)
 				maxSpeed := section.MaxSpeed
@@ -865,7 +865,7 @@ class Telemetry {
 		}
 
 		if (maxG != kUndefined) {
-			this.iMaxG := maxG
+			this.iMaxLateralGForce := maxG
 			this.iMaxSpeed := maxSpeed
 		}
 	}

@@ -132,10 +132,10 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 		super.__New(controller, name, configuration)
 
 		if (this.Active || (isDebug() && isDevelopment())) {
-			coaching := this.getArgumentValue("coaching", false)
+			coaching := this.getArgumentValue("telemetryCoaching", false)
 
 			if coaching
-				this.createRaceAssistantAction(controller, "Coaching", coaching)
+				this.createRaceAssistantAction(controller, "TelemetryCoaching", coaching)
 		}
 
 		if (this.Active || (isDebug() && isDevelopment())) {
@@ -171,15 +171,15 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 
 		if (inList(["RaceAssistant", "Call", "SetupWorkbenchOpen"], action))
 			super.createRaceAssistantAction(controller, action, actionFunction, arguments*)
-		else if (action = "Coaching") {
+		else if (action = "TelemetryCoaching") {
 			descriptor := ConfigurationItem.descriptor(action, "Toggle")
 
-			this.registerAction(DrivingCoachPlugin.CoachingToggleAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
+			this.registerAction(DrivingCoachPlugin.CoachingToggleAction(this, actionFunction, this.getLabel(descriptor, action), this.getIcon(descriptor)))
 		}
 		else if (action = "TrackCoaching") {
 			descriptor := ConfigurationItem.descriptor(action, "Toggle")
 
-			this.registerAction(DrivingCoachPlugin.TrackCoachingToggleAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
+			this.registerAction(DrivingCoachPlugin.TrackCoachingToggleAction(this, actionFunction, this.getLabel(descriptor, action), this.getIcon(descriptor)))
 		}
 		else
 			logMessage(kLogWarn, translate("Action `"") . action . translate("`" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))

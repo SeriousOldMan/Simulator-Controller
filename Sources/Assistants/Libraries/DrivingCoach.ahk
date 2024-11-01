@@ -180,7 +180,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		Set {
 			if this.Connector
-				this.Connector.History := (mode = "Conversation")
+				this.Connector.History := (value = "Conversation")
 
 			return (this.iMode := value)
 		}
@@ -804,7 +804,7 @@ class DrivingCoach extends GridRaceAssistant {
 		this.iCoachingActive := false
 		this.iAvailableTelemetry := CaseInsenseMap()
 
-		setMultiMapValue(state, "Coaching", "Active", true)
+		setMultiMapValue(state, "Coaching", "Active", false)
 
 		writeMultiMap(kTempDirectory . "Coaching.state", state)
 	}
@@ -1011,7 +1011,7 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 		}
 
-		state := newMultiMap()
+		state := readMultiMap(kTempDirectory . "Coaching.state")
 
 		setMultiMapValue(state, "Coaching", "Track", this.iTrackTriggerPID != false)
 

@@ -9,6 +9,16 @@
 	 - Several new settings in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) to fine-tune the corner by corner coaching of the Driving Coach.
   4. The *Rephrasing* and *Understanding* booster are now available for the Driving Coach as well.
 
+## 5.9.6.0-release 11/01/24
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Fixed a bug, that prevented saving a telemetry imported from *Second Monitor* or *MoTeC* outside the standard database location.
+  4. Fixed track mapping and telemetry collection for very narrow tracks like Zandvoort.
+  5. When the Engineer asks for a pitstop for repairs and this is accepted by the driver, all repairs will be preselected in the pitstop settings, even if the defined repair thresholds are not met.
+  6. The track section editor is now also available in "Session Database", when no car but only a track is selected.
+  7. "Solo Center" and "Team Center" are more resilient against wrong session folder paths.
+  8. The Engineer sometimes mentions the type of the session in its greeting message.
+
 ## 5.9.5.0-release 10/25/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

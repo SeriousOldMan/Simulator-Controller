@@ -5546,7 +5546,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local window := this.Window
 		local name := this.TelemetryListView.GetText(row, 2)
 		local info := this.SessionDatabase.readTelemetryInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name)
-		local viewer, telemetryData, size
+		local viewer, telemetryData, size, telemetryInfo
 
 		if (info && getMultiMapValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID) {
 			window["shareTelemetryWithCommunityCheck"].Value := getMultiMapValue(info, "Access", "Share", false)
@@ -5560,13 +5560,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.updateState()
 
 		if open {
-			telemetryData := this.SessionDatabase.readTelemetry(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name, &size)
-
 			DirCreate(kTempDirectory . "Telemetry")
 
 			deleteDirectory(kTempDirectory . "Telemetry", false, false)
 
 			DirCreate(kTempDirectory . "Telemetry\Import")
+
+			telemetryData := this.SessionDatabase.readTelemetry(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name, &size)
 
 			fileName := (kTempDirectory . "Telemetry\Import\" . name . ".telemetry")
 
@@ -5579,6 +5579,20 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			}
 
 			viewer := TelemetryViewer(SessionDatabaseEditor.TelemetryManager(this), kTempDirectory . "Telemetry", false)
+
+			telemetryInfo := newMultiMap()
+
+			setMultiMapValue(telemetryInfo, "Info", "Driver"
+										  , getMultiMapValue(info, "Lap", "Driver"
+														   , this.SessionDatabase.getDriverName(this.SelectedSimulator, getMultiMapValue(info, "Origin", "Driver"))))
+
+			if getMultiMapValue(info, "Lap", "LapTime", false)
+				setMultiMapValue(telemetryInfo, "Info", "LapTime", getMultiMapValue(info, "Lap", "LapTime"))
+
+			if getMultiMapValue(info, "Lap", "SectorTimes", false)
+				setMultiMapValue(telemetryInfo, "Info", "SectorTimes", getMultiMapValue(info, "Lap", "SectorTimes"))
+
+			writeMultiMap(fileName . ".info", telemetryInfo)
 
 			viewer.loadLap(fileName, this.TelemetryListView.GetText(row, 1))
 
@@ -5674,7 +5688,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	uploadTelemetry() {
 		local window := this.Window
-		local fileName, telemetry, file, size, info, driver, name, ignore
+		local fileName, telemetry, file, size, info, driver, lapTime, sectorTimes, name, ignore
 
 		window.Opt("+OwnDialogs")
 
@@ -5701,14 +5715,39 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 						file.Close()
 
-						if info
+						if info {
+							info := readMultiMap(info)
+
 							driver := this.SessionDatabase.getDriverID(this.SelectedSimulator
-																	 , getMultiMapValue(readMultiMap(info), "Info", "Driver"
-																					  , this.SessionDatabase.getUserName()))
+																	 , getMultiMapValue(info, "Info", "Driver", this.SessionDatabase.getUserName()))
+						}
 						else
 							driver := this.SessionDatabase.ID
 
 						this.SessionDatabase.writeTelemetry(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name, telemetry, size, false, true, driver)
+
+						if info {
+							driver := getMultiMapValue(info, "Info", "Driver", this.SessionDatabase.getUserName())
+							lapTime := getMultiMapValue(info, "Info", "LapTime", false)
+							sectorTimes := getMultiMapValue(info, "Info", "SectorTimes", false)
+						}
+						else {
+							driver := this.SessionDatabase.getUserName()
+							lapTime := false
+							sectorTimes := false
+						}
+
+						info := this.SessionDatabase.readTelemetryInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name)
+
+						setMultiMapValue(info, "Lap", "Driver", driver)
+
+						if lapTime
+							setMultiMapValue(info, "Lap", "LapTime", lapTime)
+
+						if sectorTimes
+							setMultiMapValue(info, "Lap", "SectorTimes", sectorTimes)
+
+						this.SessionDatabase.writeTelemetryInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name, info)
 					}
 				}
 			}
@@ -5776,15 +5815,16 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		window.Opt("+OwnDialogs")
 
-		SplitPath(telemetryName, , , &curExtension, &curName)
+		; SplitPath(telemetryName, , , &curExtension, &curName)
+		curName := telemetryName
 
 		result := withBlockedWindows(InputBox, translate("Please enter the new name for the selected lap telemetry:"), translate("Rename"), "w300 h200", curName)
 
 		if (result.Result = "Ok") {
 			newName := result.Value
 
-			if (StrLen(curExtension) > 0)
-				newName .= ("." . curExtension)
+			; if (StrLen(curExtension) > 0)
+			;	newName .= ("." . curExtension)
 
 			this.SessionDatabase.renameTelemetry(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, telemetryName, newName)
 
@@ -5863,15 +5903,16 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		window.Opt("+OwnDialogs")
 
-		SplitPath(strategyName, , , &curExtension, &curName)
+		; SplitPath(strategyName, , , &curExtension, &curName)
+		curName := strategyName
 
 		result := withBlockedWindows(InputBox, translate("Please enter the new name for the selected strategy:"), translate("Rename"), "w300 h200", curName)
 
 		if (result.Result = "Ok") {
 			newName := result.Value
 
-			if (StrLen(curExtension) > 0)
-				newName .= ("." . curExtension)
+			; if (StrLen(curExtension) > 0)
+			;	newName .= ("." . curExtension)
 
 			this.SessionDatabase.renameStrategy(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, strategyName, newName)
 

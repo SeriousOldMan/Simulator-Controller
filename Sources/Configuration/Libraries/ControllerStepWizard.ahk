@@ -855,17 +855,17 @@ class ControllerPreviewStepWizard extends StepWizard {
 
 				preview.setControlClickHandler(ObjBindMethod(this, "controlClick"))
 
-				if (index = 1) {
-					MonitorGetWorkArea(, &mainScreenLeft, &mainScreenTop, &mainScreenRight, &mainScreenBottom)
+				MonitorGetWorkArea(, &mainScreenLeft, &mainScreenTop, &mainScreenRight, &mainScreenBottom)
 
+				if ((index = 1) || ((this.iControllerPreviewCenterY - preview.Height) < mainScreenTop))
 					this.iControllerPreviewCenterY := (mainScreenBottom - Round(preview.Height / 2))
-				}
 				else
 					this.iControllerPreviewCenterY -= Round(preview.Height / 2)
 
 				preview.show()
 
 				this.iControllerPreviewCenterY -= Round(preview.Height / 2)
+
 				this.ControllerPreviews.Push(preview)
 			}
 

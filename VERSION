@@ -6,10 +6,10 @@ Download=
 Changes=Fully active coaching by the Driving Coach, Added "Coaching" and "TrackCoaching" action to the Driving Coach plugin, New icons in Stream Deck icon set for the "Coaching" and "TrackCoaching" actions, New settings for corner by corner coaching, Speaker and Listener booster for Driving Coach
 Components=Media->5.6.1,Configuration->6.0.0,Utilities->5.9.1
 [Release]
-Version=5.9.5.0-release
-Date=10/25/2024
-Download=https://cutt.ly/KeDSXONh;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.9.5.0-release.zip
-Changes=Several grammar fixes, Fixed RF2 telemetry file format, Section editor for track maps, New telemetry channel "Time", Telemetry smoothing, Telemetry support in "Setup Workbench" without specific car and track
+Version=5.9.6.0-release
+Date=11/01/2024
+Download=https://cutt.ly/leFV6GcM;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.9.6.0-release.zip
+Changes=Fixed saving of imported telemetry outside of the database, Fixed track mapping and telemetry collection of narrow tracks, Preselect repair options in pitstop settings for repair pitstops, Track editor availability in "Session Database", Made "Solo Center" and "Team Center" more resilient against wrong session folder, Engineer announces session type
 Components=Media->5.6.1,Configuration->5.9.1,Utilities->5.9.1
 [Components]
 Media.5.6.1.Path=Resources
@@ -28,4 +28,4 @@ Utilities.5.9.1.Download=https://www.dropbox.com/scl/fi/n3n5gajdhb1swegw46bp6/Ut
 Type=Development
 [Version]
 Development=6.0.0.0-dev
-Release=5.9.5.0-release
+Release=5.9.6.0-release

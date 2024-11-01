@@ -1420,8 +1420,12 @@ class TelemetryViewer {
 					}
 
 					DirCreate(folder)
-					FileCopy(this.TelemetryDirectory . "Lap " . lap . ".telemetry"
-						   , folder . "\" . fileName . ".telemetry", 1)
+
+					if isNumber(lap)
+						FileCopy(this.TelemetryDirectory . "Lap " . lap . ".telemetry"
+							   , folder . "\" . fileName . ".telemetry", 1)
+					else
+						FileCopy(lap[4], folder . "\" . fileName . ".telemetry", 1)
 				}
 				catch Any as exception {
 					logError(exception)

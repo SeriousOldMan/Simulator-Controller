@@ -715,7 +715,7 @@ class DrivingCoach extends GridRaceAssistant {
 					for ignore, part in string2Values(". ", answer)
 						this.getSpeaker().speak(part . ".", false, false, {Noise: false, Rephrase: false, Click: (A_Index = 1)})
 
-			if this.Transcript
+			if (this.Transcript && (this.Mode = "Conversation"))
 				FileAppend(translate("-- Driver --------") . "`n`n" . text . "`n`n" . translate("-- Coach ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16")
 		}
 	}

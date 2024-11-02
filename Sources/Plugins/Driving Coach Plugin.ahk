@@ -161,7 +161,7 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 			}
 
 			if (track != this.TrackCoachingActive) {
-				this.iTrackCoachingActive := active
+				this.iTrackCoachingActive := track
 
 				this.updateActions(kSessionUnknown)
 			}

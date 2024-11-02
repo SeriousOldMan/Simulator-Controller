@@ -649,7 +649,7 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	trackCoachingStartRecognized(words, confirm := true) {
-		if this.startupTrackTrigger() {
+		if this.startupTrackCoaching() {
 			if confirm
 				this.getSpeaker().speakPhrase("Roger")
 		}
@@ -660,7 +660,7 @@ class DrivingCoach extends GridRaceAssistant {
 	trackCoachingFinishRecognized(words) {
 		this.getSpeaker().speakPhrase("Okay")
 
-		this.shutdownTrackTrigger()
+		this.shutdownTrackCoaching()
 	}
 
 	handleVoiceText(grammar, text, reportError := true) {
@@ -805,6 +805,27 @@ class DrivingCoach extends GridRaceAssistant {
 		this.iAvailableTelemetry := CaseInsenseMap()
 
 		setMultiMapValue(state, "Coaching", "Active", false)
+
+		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
+	}
+
+	startupTrackCoaching() {
+		local state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
+		local started := this.startupTrackTrigger()
+
+		setMultiMapValue(state, "Coaching", "Track", started)
+
+		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
+
+		return started
+	}
+
+	shutdownTrackCoaching() {
+		local state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
+
+		this.shutdownTrackTrigger()
+
+		setMultiMapValue(state, "Coaching", "Track", false)
 
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 	}
@@ -1011,18 +1032,12 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 		}
 
-		state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
-
-		setMultiMapValue(state, "Coaching", "Track", this.iTrackTriggerPID != false)
-
-		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
-
 		return (this.iTrackTriggerPID != false)
 	}
 
 	shutdownTrackTrigger(force := false, arguments*) {
 		local pid := this.iTrackTriggerPID
-		local tries, state
+		local tries
 
 		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
 			return false
@@ -1049,12 +1064,6 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 
 			this.iTrackTriggerPID := false
-
-			state := readMultiMap("Driving Coach\Coaching.state")
-
-			setMultiMapValue(state, "Coaching", "Track", false)
-
-			writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 		}
 
 		return false

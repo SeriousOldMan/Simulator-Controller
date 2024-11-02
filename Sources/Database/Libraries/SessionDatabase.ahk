@@ -1549,6 +1549,7 @@ class SessionDatabase extends ConfigurationItem {
 			local steerLock := this.getCarSteerLock(simulator, car, track)
 			local channels := false
 			local skipNext := false
+			local time := 0
 			local entry, ignore, channel, importFileName
 
 			try {
@@ -1608,6 +1609,8 @@ class SessionDatabase extends ConfigurationItem {
 												else
 													value := (- value)
 											case "TIME":
+												time := Max(time, value)
+
 												value *= 1000
 										}
 
@@ -1626,6 +1629,8 @@ class SessionDatabase extends ConfigurationItem {
 
 				if !getMultiMapValue(info, "Info", "Driver", false)
 					setMultiMapValue(info, "Info", "Driver", SessionDatabase.getUserName())
+
+				setMultiMapValue(info, "Info", "LapTime", Round(time, 2))
 
 				if FileExist(importFileName) {
 					infoFileName := temporaryFileName("Import", "info")

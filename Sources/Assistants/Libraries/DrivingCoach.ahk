@@ -486,7 +486,7 @@ class DrivingCoach extends GridRaceAssistant {
 				}
 			case "Coaching":
 				if ((knowledgeBase || isDebug()) && this.CoachingActive && (this.Mode = "Conversation")) {
-					telemetry := this.getLapsTelemetry(3)
+					telemetry := this.getTelemetry()
 
 					if (this.TelemetryAnalyzer && (telemetry.Length > 0) && (Trim(this.Instructions["Coaching"]) != ""))
 						return substituteVariables(this.Instructions["Coaching"] . "`n`n%telemetry%"
@@ -606,8 +606,8 @@ class DrivingCoach extends GridRaceAssistant {
 
 	reviewCornerRecognized(words) {
 		local corner := this.getNumber(words)
-		local telemetry := this.getLapsTelemetry(3, corner)
 		local oldMode := this.Mode
+		local telemetry
 
 		this.Mode := "Coaching"
 
@@ -615,7 +615,7 @@ class DrivingCoach extends GridRaceAssistant {
 			if (corner = kUndefined)
 				this.getSpeaker().speakPhrase("Repeat")
 			else {
-				telemetry := this.getLapsTelemetry(3, corner)
+				telemetry := this.getTelemetry(corner)
 
 				if (this.TelemetryAnalyzer && (telemetry.Length > 0))
 					this.handleVoiceText("TEXT", substituteVariables(this.Instructions["Coaching.Corner"]
@@ -631,7 +631,7 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	reviewLapRecognized(words) {
-		local telemetry := this.getLapsTelemetry(3)
+		local telemetry := this.getTelemetry()
 		local oldMode := this.Mode
 
 		this.Mode := "Coaching"
@@ -831,26 +831,86 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	telemetryAvailable(laps) {
-		local ignore, lap
+		local bestLap, bestLaptime, bestInfo, telemetries, data
+		local ignore, lap, candidate, sessionDB, info, lapTime, size
 
-		if (this.AvailableTelemetry.Count = 0)
+		if (this.AvailableTelemetry.Count = 0) {
 			this.getSpeaker().speakPhrase("CoachingReady", false, true)
+
+			if getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference.Database", false) {
+				sessionDB := SessionDatabase()
+				bestLap := kUndefined
+
+				sessionDB.getTelemetryNames(this.Simulator, this.Car, this.Track, &telemetries := true, &ignore := false)
+
+				for ignore, candidate in telemetries {
+					info := sessionDB.readTelemetryInfo(this.Simulator, this.Car, this.Track, candidate)
+
+					lapTime := getMultiMapValue(info, "Lap", "LapTime", false)
+
+					if (lapTime && ((bestLap == kUndefined) || (lapTime < bestLapTime))) {
+						bestLap := candidate
+						bestLapTime := lapTime
+						bestInfo := info
+					}
+				}
+
+				if (bestLap != kUndefined) {
+					data := session.readTelemetry(this.Simulator, this.Car, this.Track, bestLap, &size)
+
+					if data {
+						deleteFile(kTempDirectory . "Driving Coach\Telemetry\Reference.telemetry")
+
+						file := FileOpen(kTempDirectory . "Driving Coach\Telemetry\Reference.telemetry", "w", "")
+
+						if file {
+							file.RawWrite(data, size)
+
+							file.Close()
+
+							info := newMultiMap()
+
+							setMultiMapValue(info, "Info", "Driver", getMultiMapValue(bestInfo, "Lap", "Driver", SessionDatabase.getUserName()))
+							setMultiMapValue(info, "Info", "LapTime", bestLapTime)
+
+							if getMultiMapValue(bestInfo, "Lap", "SectorTimes", false)
+								setMultiMapValue(info, "Info", "SectorTimes", getMultiMapValue(bestInfo, "Lap", "SectorTimes"))
+
+							writeMultiMap(kTempDirectory . "Driving Coach\Telemetry\Reference.telemetry.info", info)
+
+							this.AvailableTelemetry[0] := true
+						}
+					}
+				}
+			}
+		}
 
 		for ignore, lap in laps
 			this.AvailableTelemetry[lap] := true
 	}
 
-	getLapsTelemetry(numLaps, corner := false) {
+	getTelemetry(corner := false) {
 		local result := []
+		local mode := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference", "Fastest")
 		local laps := getKeys(this.AvailableTelemetry)
-		local ignore, lap, found, fileName, info, driver, lapTime, sectorTimes
+		local theLap := false
+		local bestLap := false
+		local lastLap := false
+		local ignore, lap, found, fileName, info, driver, lapTime, sectorTimes, lapNr, telemetry
 
 		for ignore, lap in bubbleSort(&laps, (a, b) => (a < b)) {
-			if ((A_Index > laps.Length) || (result.Length >= numLaps))
+			if (theLap && (mode = "None"))
+				break
+			else if ((mode = "Last") && theLap && lastLap)
 				break
 
-			if (this.AvailableTelemetry[lap] == true) {
-				fileName := (kTempDirectory . "Driving Coach\Telemetry\Lap " . lap . ".telemetry")
+			lapNr := lap
+
+			if (this.AvailableTelemetry[lapNr] == true) {
+				if (lapNr = 0)
+					fileName := (kTempDirectory . "Driving Coach\Telemetry\Reference.telemetry")
+				else
+					fileName := (kTempDirectory . "Driving Coach\Telemetry\Lap " . lapNr . ".telemetry")
 
 				info := readMultiMap(fileName . ".info")
 
@@ -858,35 +918,52 @@ class DrivingCoach extends GridRaceAssistant {
 				lapTime := getMultiMapValue(info, "Info", "LapTime", false)
 				sectorTimes := getMultiMapValue(info, "Info", "SectorTimes", false)
 
-				this.AvailableTelemetry[lap] := [this.TelemetryAnalyzer.createTelemetry(lap, fileName)
-											   , driver, lapTime, sectorTimes]
+				this.AvailableTelemetry[lapNr] := [this.TelemetryAnalyzer.createTelemetry(lapNr, fileName)
+												 , driver, lapTime, sectorTimes]
 			}
 
+			lap := this.AvailableTelemetry[lap]
+
 			if corner {
-				lap := this.AvailableTelemetry[lap][1].Clone()
+				telemetry := lap[1].Clone()
+				lap := lap.Clone()
+
+				lap[1] := telemetry
 
 				found := false
 
-				lap.Sections := choose(lap.Sections, (section) {
-									if ((section.Type = "Corner") && (section.Nr = corner)) {
-										found := true
+				telemetry.Sections := choose(telemetry.Sections, (section) {
+										  if ((section.Type = "Corner") && (section.Nr = corner)) {
+											  found := true
 
-										return true
-									}
-									else if found {
-										found := false
+											  return true
+										  }
+										  else if found {
+											  found := false
 
-										return true
-									}
-									else
-										return false
-								})
-
-				if (lap.Sections.Length > 0)
-					result.Push(lap)
+											  return true
+										  }
+										  else
+											  return false
+									  })
 			}
-			else
-				result.Push(this.AvailableTelemetry[lap][1])
+
+			if (!theLap && (lapNr != 0))
+				theLap := lap[1]
+			else if (theLap && !lastLap && (lapNr != 0))
+				lastLap := lap[1]
+			else if theLap
+				if (!bestLap || (lap[3] < bestLap[3]))
+					bestLap := lap
+		}
+
+		if theLap {
+			if ((mode = "Fastest") && bestLap)
+				result.Push(bestLap[1])
+			else if ((mode = "Last") && lastLap)
+				result.Push(lastLap)
+
+			result.Push(theLap)
 		}
 
 		return result
@@ -1220,7 +1297,7 @@ class DrivingCoach extends GridRaceAssistant {
 		if !wait
 			wait := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Corner.Wait", 10) * 1000)
 
-		telemetry := this.getLapsTelemetry(3) ; , cornerNr)
+		telemetry := this.getTelemetry(cornerNr)
 
 		if (this.TelemetryAnalyzer && (telemetry.Length > 0)) {
 			if (A_TickCount < nextRecommendation)

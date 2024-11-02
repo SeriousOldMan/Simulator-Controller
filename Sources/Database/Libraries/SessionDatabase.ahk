@@ -1680,7 +1680,6 @@ class SessionDatabase extends ConfigurationItem {
 			return false
 	}
 
-
 	readTelemetry(simulator, car, track, name, &size) {
 		local simulatorCode := this.getSimulatorCode(simulator)
 		local data, fileName, file

@@ -970,24 +970,24 @@ class DrivingCoach extends GridRaceAssistant {
 			lap := this.AvailableTelemetry[lap]
 
 			if (isSet(corner) && corner) {
-				telemetry := lap.Clone()
+				lap := lap.Clone()
 
 				found := false
 
-				telemetry.Sections := choose(telemetry.Sections, (section) {
-										  if ((section.Type = "Corner") && (section.Nr = corner)) {
-											  found := true
+				lap.Sections := choose(lap.Sections, (section) {
+									if ((section.Type = "Corner") && (section.Nr = corner)) {
+										found := true
 
-											  return true
-										  }
-										  else if found {
-											  found := false
+										return true
+									}
+									else if found {
+										found := false
 
-											  return true
-										  }
-										  else
-											  return false
-									  })
+										return true
+									}
+									else
+										return false
+								})
 			}
 
 			if theLap {

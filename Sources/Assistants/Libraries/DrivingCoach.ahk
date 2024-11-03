@@ -650,7 +650,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 					if reference
 						command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
-															   , {telemetry: telemetry.JSON}))
+															   , {telemetry: reference.JSON}))
 
 					this.handleVoiceText("TEXT", command)
 				}
@@ -677,7 +677,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 				if reference
 					command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
-														   , {telemetry: telemetry.JSON}))
+														   , {telemetry: reference.JSON}))
 
 				this.handleVoiceText("TEXT", command)
 			}
@@ -1358,7 +1358,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 					if reference
 						command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
-															   , {telemetry: telemetry.JSON}))
+															   , {telemetry: reference.JSON}))
 
 					this.handleVoiceText("TEXT", command, false)
 				}

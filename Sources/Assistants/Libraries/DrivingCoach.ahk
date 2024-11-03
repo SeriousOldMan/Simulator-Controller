@@ -184,7 +184,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		Set {
 			if this.Connector
-				this.Connector.History := (value = "Conversation")
+				this.Connector.History := ((value = "Conversation") || (value = "Review"))
 
 			return (this.iMode := value)
 		}
@@ -636,7 +636,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local oldMode := this.Mode
 		local telemetry, reference, command
 
-		this.Mode := "Coaching"
+		this.Mode := "Review"
 
 		try {
 			if (cornerNr = kUndefined)
@@ -669,7 +669,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		telemetry := this.getTelemetry(&reference := true)
 
-		this.Mode := "Coaching"
+		this.Mode := "Review"
 
 		try {
 			if (this.TelemetryAnalyzer && telemetry) {
@@ -756,7 +756,7 @@ class DrivingCoach extends GridRaceAssistant {
 					for ignore, part in string2Values(". ", answer)
 						this.getSpeaker().speak(part . ".", false, false, {Noise: false, Rephrase: false, Click: (A_Index = 1)})
 
-			if (this.Transcript && (this.Mode = "Conversation"))
+			if (this.Transcript && (this.Mode != "Coaching"))
 				FileAppend(translate("-- Driver --------") . "`n`n" . text . "`n`n" . translate("-- Coach ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16")
 		}
 	}

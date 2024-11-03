@@ -845,11 +845,16 @@ class Telemetry {
 
 	Descriptor {
 		Get {
-			local descriptor := {Lap: this.Lap, Driver: this.Driver, LapTime: Round(this.LapTime, 2)
-											  , MaxLateralGForce: nullRound(this.MaxLateralGForce, 2)
+			local descriptor := {Lap: this.Lap, MaxLateralGForce: nullRound(this.MaxLateralGForce, 2)
 											  , MaxSpeed: (nullRound(this.MaxSpeed) . " km/h")
 											  , MaxGear: this.MaxGear, MaxRPM: this.MaxRPM
 											  , Sections: collect(this.Sections, (s) => s.Descriptor)}
+
+			if this.Driver
+				descriptor.Driver := this.Driver
+
+			if this.LapTime
+				descriptor.LapTime := (Round(this.LapTime, 2) . " Seconds")
 
 			if this.SectorTimes
 				descriptor.SectorTimes := collect(this.SectorTimes, (t) => Round(t, 2))
@@ -864,7 +869,7 @@ class Telemetry {
 		}
 	}
 
-	__New(analyzer, lap, data, driver, lapTime, sectorTimes := false) {
+	__New(analyzer, lap, data, driver := false, lapTime := false, sectorTimes := false) {
 		local maxG := kUndefined
 		local maxSpeed := kUndefined
 		local ignore, section
@@ -1229,7 +1234,7 @@ class TelemetryAnalyzer {
 		return schema
 	}
 
-	createTelemetry(lap, fileName, driver, lapTime, sectorTimes := false) {
+	createTelemetry(lap, fileName, driver := false, lapTime := false, sectorTimes := false) {
 		return Telemetry(this, lap, this.loadData(fileName), driver, lapTime, sectorTimes)
 	}
 }

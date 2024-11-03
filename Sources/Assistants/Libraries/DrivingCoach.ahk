@@ -53,6 +53,10 @@ class DrivingCoach extends GridRaceAssistant {
 	iMode := "Conversation"
 
 	iCoachingActive := false
+
+	iReferenceMode := "None"
+	iLoadReference := false
+
 	iAvailableTelemetry := CaseInsenseMap()
 
 	iTelemetryAnalyzer := false
@@ -138,7 +142,7 @@ class DrivingCoach extends GridRaceAssistant {
 		Get {
 			if isSet(type) {
 				if (type == true)
-					return ["Character", "Simulation", "Session", "Stint", "Knowledge", "Handling", "Coaching", "Coaching.Lap", "Coaching.Corner", "Coaching.Corner.Short"]
+					return ["Character", "Simulation", "Session", "Stint", "Knowledge", "Handling", "Coaching", "Coaching.Lap", "Coaching.Corner", "Coaching.Corner.Short", "Coaching.Reference"]
 				else
 					return (this.iInstructions.Has(type) ? this.iInstructions[type] : false)
 			}
@@ -230,6 +234,18 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
+	ReferenceMode {
+		Get {
+			return this.iReferenceMode
+		}
+	}
+
+	LoadReference {
+		Get {
+			return this.iLoadReference
+		}
+	}
+
 	AvailableTelemetry {
 		Get {
 			return this.iAvailableTelemetry
@@ -318,6 +334,15 @@ class DrivingCoach extends GridRaceAssistant {
 		return DrivingCoach.CoachVoiceManager(this, name, options)
 	}
 
+	updateConfigurationValues(values) {
+		super.updateConfigurationValues(values)
+
+		if values.HasProp("Settings") {
+			this.iReferenceMode := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference", "Fastest")
+			this.iLoadReference := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference.Database", false)
+		}
+	}
+
 	updateSessionValues(values) {
 		super.updateSessionValues(values)
 
@@ -350,7 +375,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local settingsDB := this.SettingsDatabase
 		local simulator, car, track, position, hasSectorTimes, laps, lapData, ignore, carData, standingsData
 		local collector, issues, handling, ignore, type, speed, where, issue, index
-		local key, value, text, filter, telemetry, reference
+		local key, value, text, filter, telemetry
 
 		static sessions := false
 
@@ -486,19 +511,11 @@ class DrivingCoach extends GridRaceAssistant {
 				}
 			case "Coaching":
 				if ((knowledgeBase || isDebug()) && this.CoachingActive && (this.Mode = "Conversation")) {
-					telemetry := this.getTelemetry(&reference := true)
+					telemetry := this.getTelemetry()
 
-					if reference
-						telemetry := [telemetry, reference]
-					else if telemetry
-						telemetry := [telemetry]
-					else
-						telemetry := []
-
-					if (this.TelemetryAnalyzer && (telemetry.Length > 0) && (Trim(this.Instructions["Coaching"]) != ""))
+					if (this.TelemetryAnalyzer && telemetry && (Trim(this.Instructions["Coaching"]) != ""))
 						return substituteVariables(this.Instructions["Coaching"] . "`n`n%telemetry%"
-												 , {name: this.VoiceManager.Name
-												  , telemetry: values2String("`n`n", collect(telemetry, (t) => t.JSON)*)})
+												 , {name: this.VoiceManager.Name, telemetry: telemetry.JSON})
 				}
 		}
 
@@ -614,7 +631,7 @@ class DrivingCoach extends GridRaceAssistant {
 	reviewCornerRecognized(words) {
 		local cornerNr := this.getNumber(words)
 		local oldMode := this.Mode
-		local telemetry, reference
+		local telemetry, reference, command
 
 		this.Mode := "Coaching"
 
@@ -624,17 +641,16 @@ class DrivingCoach extends GridRaceAssistant {
 			else {
 				telemetry := this.getTelemetry(&reference := true, cornerNr)
 
-				if reference
-					telemetry := [telemetry, reference]
-				else if telemetry
-					telemetry := [telemetry]
-				else
-					telemetry := []
+				if (this.TelemetryAnalyzer && telemetry) {
+					command := substituteVariables(this.Instructions["Coaching.Corner"]
+												 , {telemetry: telemetry.JSON, corner: cornerNr})
 
-				if (this.TelemetryAnalyzer && (telemetry.Length > 0))
-					this.handleVoiceText("TEXT", substituteVariables(this.Instructions["Coaching.Corner"]
-																   , {telemetry: values2String("`n`n", collect(telemetry, (t) => t.JSON)*)
-																	, corner: cornerNr}))
+					if reference
+						command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
+															   , {telemetry: telemetry.JSON}))
+
+					this.handleVoiceText("TEXT", command)
+				}
 				else
 					this.getSpeaker().speakPhrase("Later")
 			}
@@ -646,23 +662,22 @@ class DrivingCoach extends GridRaceAssistant {
 
 	reviewLapRecognized(words) {
 		local oldMode := this.Mode
-		local telemetry, reference
+		local telemetry, reference, command
 
 		telemetry := this.getTelemetry(&reference := true)
-
-		if reference
-			telemetry := [telemetry, reference]
-		else if telemetry
-			telemetry := [telemetry]
-		else
-			telemetry := []
 
 		this.Mode := "Coaching"
 
 		try {
-			if (this.TelemetryAnalyzer && (telemetry.Length > 0))
-				this.handleVoiceText("TEXT", substituteVariables(this.Instructions["Coaching.Lap"]
-															   , {telemetry: values2String("`n`n", collect(telemetry, (t) => t.JSON)*)}))
+			if (this.TelemetryAnalyzer && telemetry) {
+				command := substituteVariables(this.Instructions["Coaching.Lap"], {telemetry: telemetry.JSON})
+
+				if reference
+					command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
+														   , {telemetry: telemetry.JSON}))
+
+				this.handleVoiceText("TEXT", command)
+			}
 			else
 				this.getSpeaker().speakPhrase("Later")
 		}
@@ -860,7 +875,7 @@ class DrivingCoach extends GridRaceAssistant {
 		if (this.AvailableTelemetry.Count = 0) {
 			this.getSpeaker().speakPhrase("CoachingReady", false, true)
 
-			if getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference.Database", false) {
+			if this.LoadReference {
 				sessionDB := SessionDatabase()
 				bestLap := kUndefined
 
@@ -913,7 +928,7 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	getTelemetry(&reference?, corner?) {
-		local mode := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference", "Fastest")
+		local mode := this.ReferenceMode
 		local laps := getKeys(this.AvailableTelemetry)
 		local theLap := false
 		local bestLap := false
@@ -972,13 +987,15 @@ class DrivingCoach extends GridRaceAssistant {
 									  })
 			}
 
-			if (!theLap && (lapNr != 0))
-				theLap := lap
-			else if (theLap && !lastLap && (lapNr != 0))
-				lastLap := lap
-			else if theLap
+			if theLap {
+				if (!lastLap && (lapNr != 0))
+					lastLap := lap
+
 				if (!bestLap || (lap.LapTime < bestLap.LapTime))
 					bestLap := lap
+			}
+			else if (lapNr != 0)
+				theLap := lap
 		}
 
 		if isSet(reference) {
@@ -1311,7 +1328,7 @@ class DrivingCoach extends GridRaceAssistant {
 	positionTrigger(sectionNr, positionX, positionY) {
 		local cornerNr := this.TelemetryAnalyzer.TrackSections[sectionNr].Nr
 		local oldMode := this.Mode
-		local telemetry, reference
+		local telemetry, reference, command
 
 		static nextRecommendation := false
 		static wait := false
@@ -1324,14 +1341,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		telemetry := this.getTelemetry(&reference := true, cornerNr)
 
-		if reference
-			telemetry := [telemetry, reference]
-		else if telemetry
-			telemetry := [telemetry]
-		else
-			telemetry := []
-
-		if (this.TelemetryAnalyzer && (telemetry.Length > 0)) {
+		if (this.TelemetryAnalyzer && telemetry) {
 			if (A_TickCount < nextRecommendation)
 				return
 			else if (Random(1, 10) > 3) {
@@ -1340,10 +1350,14 @@ class DrivingCoach extends GridRaceAssistant {
 				this.Mode := "Coaching"
 
 				try {
-					this.handleVoiceText("TEXT", substituteVariables(this.Instructions["Coaching.Corner.Short"]
-																   , {telemetry: values2String("`n`n", collect(telemetry, (t) => t.JSON)*)
-																	, corner: cornerNr})
-											   , false)
+					command := substituteVariables(this.Instructions["Coaching.Corner.Short"]
+												 , {telemetry: telemetry.JSON, corner: cornerNr})
+
+					if reference
+						command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
+															   , {telemetry: telemetry.JSON}))
+
+					this.handleVoiceText("TEXT", command, false)
 				}
 				finally {
 					this.Mode := oldMode

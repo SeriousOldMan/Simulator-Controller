@@ -510,13 +510,16 @@ class DrivingCoach extends GridRaceAssistant {
 					}
 				}
 			case "Coaching":
-				if ((knowledgeBase || isDebug()) && this.CoachingActive && (this.Mode = "Conversation")) {
-					telemetry := this.getTelemetry()
+				if ((knowledgeBase || isDebug()) && this.CoachingActive && this.TelemetryAnalyzer && (Trim(this.Instructions["Coaching"]) != ""))
+					if (this.Mode = "Conversation") {
+						telemetry := this.getTelemetry()
 
-					if (this.TelemetryAnalyzer && telemetry && (Trim(this.Instructions["Coaching"]) != ""))
-						return substituteVariables(this.Instructions["Coaching"] . "`n`n%telemetry%"
-												 , {name: this.VoiceManager.Name, telemetry: telemetry.JSON})
-				}
+						if telemetry
+							return substituteVariables(this.Instructions["Coaching"] . "`n`n%telemetry%"
+													 , {name: this.VoiceManager.Name, telemetry: telemetry.JSON})
+					}
+					else
+						return this.Instructions["Coaching"]
 		}
 
 		return false

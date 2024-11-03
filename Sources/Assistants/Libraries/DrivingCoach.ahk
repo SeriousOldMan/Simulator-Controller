@@ -1255,7 +1255,9 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	finishSession(shutdown := true) {
+		this.shutdownCoaching()
 		this.stopIssueAnalyzer()
+
 		this.updateDynamicValues({Prepared: false})
 	}
 

@@ -350,7 +350,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local settingsDB := this.SettingsDatabase
 		local simulator, car, track, position, hasSectorTimes, laps, lapData, ignore, carData, standingsData
 		local collector, issues, handling, ignore, type, speed, where, issue, index
-		local key, value, text, filter, telemetry
+		local key, value, text, filter, telemetry, reference
 
 		static sessions := false
 
@@ -486,7 +486,14 @@ class DrivingCoach extends GridRaceAssistant {
 				}
 			case "Coaching":
 				if ((knowledgeBase || isDebug()) && this.CoachingActive && (this.Mode = "Conversation")) {
-					telemetry := this.getTelemetry()
+					telemetry := this.getTelemetry(&reference := true)
+
+					if reference
+						telemetry := [telemetry, reference]
+					else if telemetry
+						telemetry := [telemetry]
+					else
+						telemetry := []
 
 					if (this.TelemetryAnalyzer && (telemetry.Length > 0) && (Trim(this.Instructions["Coaching"]) != ""))
 						return substituteVariables(this.Instructions["Coaching"] . "`n`n%telemetry%"
@@ -605,22 +612,29 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	reviewCornerRecognized(words) {
-		local corner := this.getNumber(words)
+		local cornerNr := this.getNumber(words)
 		local oldMode := this.Mode
-		local telemetry
+		local telemetry, reference
 
 		this.Mode := "Coaching"
 
 		try {
-			if (corner = kUndefined)
+			if (cornerNr = kUndefined)
 				this.getSpeaker().speakPhrase("Repeat")
 			else {
-				telemetry := this.getTelemetry(corner)
+				telemetry := this.getTelemetry(&reference := true, cornerNr)
+
+				if reference
+					telemetry := [telemetry, reference]
+				else if telemetry
+					telemetry := [telemetry]
+				else
+					telemetry := []
 
 				if (this.TelemetryAnalyzer && (telemetry.Length > 0))
 					this.handleVoiceText("TEXT", substituteVariables(this.Instructions["Coaching.Corner"]
 																   , {telemetry: values2String("`n`n", collect(telemetry, (t) => t.JSON)*)
-																	, corner: corner}))
+																	, corner: cornerNr}))
 				else
 					this.getSpeaker().speakPhrase("Later")
 			}
@@ -631,8 +645,17 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	reviewLapRecognized(words) {
-		local telemetry := this.getTelemetry()
 		local oldMode := this.Mode
+		local telemetry, reference
+
+		telemetry := this.getTelemetry(&reference := true)
+
+		if reference
+			telemetry := [telemetry, reference]
+		else if telemetry
+			telemetry := [telemetry]
+		else
+			telemetry := []
 
 		this.Mode := "Coaching"
 
@@ -889,8 +912,7 @@ class DrivingCoach extends GridRaceAssistant {
 			this.AvailableTelemetry[lap] := true
 	}
 
-	getTelemetry(corner := false) {
-		local result := []
+	getTelemetry(&reference?, corner?) {
 		local mode := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference", "Fastest")
 		local laps := getKeys(this.AvailableTelemetry)
 		local theLap := false
@@ -918,17 +940,17 @@ class DrivingCoach extends GridRaceAssistant {
 				lapTime := getMultiMapValue(info, "Info", "LapTime", false)
 				sectorTimes := getMultiMapValue(info, "Info", "SectorTimes", false)
 
-				this.AvailableTelemetry[lapNr] := [this.TelemetryAnalyzer.createTelemetry(lapNr, fileName)
-												 , driver, lapTime, sectorTimes]
+				if (sectorTimes && (Trim(sectorTimes) != ""))
+					sectorTimes := string2Values(",", sectorTimes
+
+				this.AvailableTelemetry[lapNr] := this.TelemetryAnalyzer.createTelemetry(lapNr ? lapNr : "Reference"
+																					   , fileName, driver, lapTime, sectorTimes)
 			}
 
 			lap := this.AvailableTelemetry[lap]
 
-			if corner {
-				telemetry := lap[1].Clone()
-				lap := lap.Clone()
-
-				lap[1] := telemetry
+			if (isSet(corner) && corner) {
+				telemetry := lap.Clone()
 
 				found := false
 
@@ -949,24 +971,25 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 
 			if (!theLap && (lapNr != 0))
-				theLap := lap[1]
+				theLap := lap
 			else if (theLap && !lastLap && (lapNr != 0))
-				lastLap := lap[1]
+				lastLap := lap
 			else if theLap
-				if (!bestLap || (lap[3] < bestLap[3]))
+				if (!bestLap || (lap.LapTime < bestLap.LapTime))
 					bestLap := lap
 		}
 
-		if theLap {
-			if ((mode = "Fastest") && bestLap)
-				result.Push(bestLap[1])
-			else if ((mode = "Last") && lastLap)
-				result.Push(lastLap)
+		if isSet(reference) {
+			reference := false
 
-			result.Push(theLap)
+			if theLap
+				if ((mode = "Fastest") && bestLap)
+					reference := bestLap
+				else if ((mode = "Last") && lastLap)
+					reference := lastLap
 		}
 
-		return result
+		return theLap
 	}
 
 	startupTelemetryCollector() {
@@ -1286,7 +1309,7 @@ class DrivingCoach extends GridRaceAssistant {
 	positionTrigger(sectionNr, positionX, positionY) {
 		local cornerNr := this.TelemetryAnalyzer.TrackSections[sectionNr].Nr
 		local oldMode := this.Mode
-		local telemetry
+		local telemetry, reference
 
 		static nextRecommendation := false
 		static wait := false
@@ -1297,7 +1320,14 @@ class DrivingCoach extends GridRaceAssistant {
 		if !wait
 			wait := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Corner.Wait", 10) * 1000)
 
-		telemetry := this.getTelemetry(cornerNr)
+		telemetry := this.getTelemetry(&reference := true, cornerNr)
+
+		if reference
+			telemetry := [telemetry, reference]
+		else if telemetry
+			telemetry := [telemetry]
+		else
+			telemetry := []
 
 		if (this.TelemetryAnalyzer && (telemetry.Length > 0)) {
 			if (A_TickCount < nextRecommendation)

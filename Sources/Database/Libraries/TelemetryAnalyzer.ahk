@@ -845,14 +845,14 @@ class Telemetry {
 
 	Descriptor {
 		Get {
-			local decriptor := {Lap: this.Lap, Driver: this.Driver. LapTime: Round(this.LapTime, 2)
-											 , MaxLateralGForce: nullRound(this.MaxLateralGForce, 2)
-											 , MaxSpeed: (nullRound(this.MaxSpeed) . " km/h")
-											 , MaxGear: this.MaxGear, MaxRPM: this.MaxRPM
-											 , Sections: collect(this.Sections, (s) => s.Descriptor)}
+			local descriptor := {Lap: this.Lap, Driver: this.Driver, LapTime: Round(this.LapTime, 2)
+											  , MaxLateralGForce: nullRound(this.MaxLateralGForce, 2)
+											  , MaxSpeed: (nullRound(this.MaxSpeed) . " km/h")
+											  , MaxGear: this.MaxGear, MaxRPM: this.MaxRPM
+											  , Sections: collect(this.Sections, (s) => s.Descriptor)}
 
-			if (this.SectorTimes && (this.SectorTimes.Length > 0))
-				decriptor.SectorTimes := collect(this.SectorTimes, (t) => Round(t, 2))
+			if this.SectorTimes
+				descriptor.SectorTimes := collect(this.SectorTimes, (t) => Round(t, 2))
 
 			return descriptor
 		}
@@ -864,7 +864,7 @@ class Telemetry {
 		}
 	}
 
-	__New(analyzer, lap, data) {
+	__New(analyzer, lap, data, driver, lapTime, sectorTimes := false) {
 		local maxG := kUndefined
 		local maxSpeed := kUndefined
 		local ignore, section
@@ -873,6 +873,12 @@ class Telemetry {
 
 		this.iLap := lap
 		this.iData := data
+
+		this.iDriver := driver
+		this.iLapTime := lapTime
+
+		if (sectorTimes && (sectorTimes.Length > 0))
+			this.iSectorTimes := sectorTimes
 
 		this.iSections := this.createSections(data)
 

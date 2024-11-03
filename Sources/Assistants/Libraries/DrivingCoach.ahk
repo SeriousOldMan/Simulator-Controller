@@ -941,7 +941,9 @@ class DrivingCoach extends GridRaceAssistant {
 				sectorTimes := getMultiMapValue(info, "Info", "SectorTimes", false)
 
 				if (sectorTimes && (Trim(sectorTimes) != ""))
-					sectorTimes := string2Values(",", sectorTimes
+					sectorTimes := string2Values(",", sectorTimes)
+				else
+					sectorTimes := false
 
 				this.AvailableTelemetry[lapNr] := this.TelemetryAnalyzer.createTelemetry(lapNr ? lapNr : "Reference"
 																					   , fileName, driver, lapTime, sectorTimes)

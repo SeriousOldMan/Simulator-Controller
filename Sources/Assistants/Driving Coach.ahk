@@ -218,7 +218,9 @@ startupDrivingCoach() {
 	coach.startCoaching()
 
 	; coach.reviewLapRecognized([])
-	coach.reviewCornerRecognized([2])
+	; coach.reviewCornerRecognized([2])
+
+	coach.handleVoiceText("TEXT", "What are my most important weaknesses and how should I work on them?")
 
 	startupProcess()
 }

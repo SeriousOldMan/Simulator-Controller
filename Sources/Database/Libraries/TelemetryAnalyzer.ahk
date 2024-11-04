@@ -476,14 +476,17 @@ class Corner extends Section {
 		local latG := kUndefined
 		local absActivations := 0
 		local tcActivations := 0
+		local brakeReference := 0
 		local lastBrake := 0
 		local lastBrakeDelta := 0
 		local brakeCount := 0
 		local brakeChanges := 0
+		local throttleReference := 0
 		local lastThrottle := 0
 		local lastThrottleDelta := 0
 		local throttleCount := 0
 		local throttleChanges := 0
+		local steeringReference := 0
 		local lastSteering := 0
 		local lastSteeringDelta := 0
 		local steeringCount := 0
@@ -503,19 +506,46 @@ class Corner extends Section {
 		local maxBrake := 0
 		local brakeRampUp := 0
 		local brake, throttle, steering, gear, rpm
-		local startDistance, startTime, distance
+		local startIdx, startTime
+
+		distance(from, to := false) {
+			local distance, lastX, lastY, x, y
+
+			; return (telemetry.getValue(to, "Distance") - telemetry.getValue(from, "Distance"))
+
+			if !to {
+				distance := telemetry.getValue(1, "Distance")
+
+				to := from
+				from := 1
+			}
+			else
+				distance := 0
+
+			lastX := telemetry.getValue(from, "PosX")
+			lastY := telemetry.getValue(from, "PosY")
+
+			loop {
+				x := telemetry.getValue(from, "PosX")
+				y := telemetry.getValue(from, "PosY")
+
+				distance += Sqrt(((x - lastX) ** 2) + ((y - lastY) ** 2))
+			} until (++from >= to)
+
+			return distance
+		}
 
 		updatePhase(phase, index) {
 			if (phase = "Braking") {
-				brakingLength += (telemetry.getValue(index, "Distance") - startDistance)
+				brakingLength += distance(startIdx, index)
 				brakingTime += (telemetry.getValue(index, "Time", 0) - startTime)
 			}
 			else if (phase = "Rolling") {
-				rollingLength += (telemetry.getValue(index, "Distance") - startDistance)
+				rollingLength += distance(startIdx, index)
 				rollingTime += (telemetry.getValue(index, "Time", 0) - startTime)
 			}
 			else if (phase = "Accelerating") {
-				acceleratingLength += (telemetry.getValue(index, "Distance") - startDistance)
+				acceleratingLength += distance(startIdx, index)
 				acceleratingTime += (telemetry.getValue(index, "Time", 0) - startTime)
 				acceleratingSpeed := Max(speed, acceleratingSpeed)
 			}
@@ -531,7 +561,6 @@ class Corner extends Section {
 					curvature := Max(curvature, newCurvature)
 			}
 
-			distance := telemetry.getValue(index, "Distance")
 			steering := telemetry.getValue(index, "Steering")
 			brake := telemetry.getValue(index, "Brake")
 			throttle := telemetry.getValue(index, "Throttle")
@@ -550,9 +579,18 @@ class Corner extends Section {
 
 			steeringCount += 1
 
-			if ((lastSteeringDelta > 0) && (steering < lastSteering))
-				steeringChanges += 1
-			else if ((lastSteeringDelta < 0) && (steering > lastSteering))
+			if ((lastSteeringDelta > 0) && (steering < lastSteering)) {
+				if ((steeringReference - steering) > 0.05)
+					steeringChanges += 1
+			}
+			else if ((lastSteeringDelta < 0) && (steering > lastSteering)) {
+				if ((steering - steeringReference) > 0.05)
+					steeringChanges += 1
+			}
+			else
+				steeringReference := steering
+
+			if (((sumSteering > 0) && (steering < 0)) || ((sumSteering < 0) && (steering > 0)))
 				steeringChanges += 1
 
 			lastSteeringDelta := (steering - lastSteering)
@@ -568,7 +606,7 @@ class Corner extends Section {
 			if (phase != lastPhase) {
 				updatePhase(lastPhase, index)
 
-				startDistance := telemetry.getValue(index, "Distance")
+				startIdx := index
 				startTime := telemetry.getValue(index, "Time", 0)
 
 				lastPhase := phase
@@ -576,30 +614,36 @@ class Corner extends Section {
 
 			if (phase = "Braking") {
 				if (brakingStart == kNull)
-					brakingStart := startDistance
+					brakingStart := distance(startIdx)
 
 				if telemetry.getValue(index, "ABS", false)
 					absActivations += 1
 
 				if (brake > maxBrake) {
-					brakeRampUp := (distance - startDistance)
+					brakeRampUp := distance(startIdx, index)
 
 					maxBrake := brake
 				}
 
 				brakeCount += 1
 
-				if ((lastBrakeDelta > 0) && (brake < lastBrake))
-					brakeChanges += 1
-				else if ((lastBrakeDelta < 0) && (brake > lastBrake))
-					brakeChanges += 1
+				if ((lastBrakeDelta > 0) && (brake < lastBrake)) {
+					if ((brakeReference - brake) > 0.2)
+						brakeChanges += 1
+				}
+				else if ((lastBrakeDelta < 0) && (brake > lastBrake)) {
+					if ((brake - brakeReference) > 0.2)
+						brakeChanges += 1
+				}
+				else
+					brakeReference := brake
 
 				lastBrakeDelta := (brake - lastBrake)
 				lastBrake := brake
 			}
 			else if (phase = "Rolling") {
 				if (rollingStart == kNull)
-					rollingStart := startDistance
+					rollingStart := distance(startIdx)
 
 				if (rollingGear == kNull) {
 					rollingGear := telemetry.getValue(index, "Gear")
@@ -619,7 +663,7 @@ class Corner extends Section {
 			}
 			else if (phase = "Accelerating") {
 				if (acceleratingStart == kNull) {
-					acceleratingStart := startDistance
+					acceleratingStart := distance(startIdx)
 
 					acceleratingGear := telemetry.getValue(index, "Gear")
 					acceleratingRPM := telemetry.getValue(index, "RPM")
@@ -630,10 +674,16 @@ class Corner extends Section {
 
 				throttleCount += 1
 
-				if ((lastThrottleDelta > 0) && (throttle < lastThrottle))
-					throttleChanges += 1
-				else if ((lastThrottleDelta < 0) && (throttle > lastThrottle))
-					throttleChanges += 1
+				if ((lastThrottleDelta > 0) && (throttle < lastThrottle)) {
+					if ((throttleReference - throttle) > 0.2)
+						throttleChanges += 1
+				}
+				else if ((lastThrottleDelta < 0) && (throttle > lastThrottle)) {
+					if ((throttle - throttleReference) > 0.2)
+						throttleChanges += 1
+				}
+				else
+					throttleReference := throttle
 
 				lastThrottleDelta := (throttle - lastThrottle)
 				lastThrottle := throttle
@@ -650,9 +700,9 @@ class Corner extends Section {
 							 , acceleratingStart, acceleratingTime, acceleratingLength
 							 , rollingGear, rollingRPM, acceleratingGear, acceleratingRPM, acceleratingSpeed
 							 , minLatG, maxLatG, average(latGs), minSpeed, maxSpeed, average(speeds), tcActivations, absActivations
-							 , Max(0, steeringChanges - 1), 100 - (steeringCount ? ((steeringChanges / steeringCount) * 100) : 0)
-							 , Max(0, throttleChanges - 1), 100 - (throttleCount ? ((throttleChanges / throttleCount) * 100): 0)
-							 , Max(0, brakeChanges - 1), 100 - (brakeCount ? ((brakeChanges / brakeCount) * 100) : 0))
+							 , Max(0, steeringChanges), 100 - (steeringCount ? ((steeringChanges / steeringCount) * 100) : 0)
+							 , Max(0, throttleChanges), 100 - (throttleCount ? ((throttleChanges / throttleCount) * 100): 0)
+							 , Max(0, brakeChanges), 100 - (brakeCount ? ((brakeChanges / brakeCount) * 100) : 0))
 	}
 }
 
@@ -877,7 +927,7 @@ class Telemetry {
 		this.iTelemetryAnalyzer := analyzer
 
 		this.iLap := lap
-		this.iData := data
+		this.iData := this.smoothChannels(data, ["Steering"])
 
 		this.iDriver := driver
 		this.iLapTime := lapTime
@@ -908,6 +958,36 @@ class Telemetry {
 			this.iMaxLateralGForce := maxG
 			this.iMaxSpeed := maxSpeed
 		}
+	}
+
+	smoothChannels(data, channels, window := 5) {
+		local channelHandler := Map()
+		local ignore, channel, entry
+
+		smoothValue(values, value) {
+			values.Push(value)
+
+			while (values.Length > window)
+				values.RemoveAt(1)
+
+			return average(values)
+		}
+
+		data := data.Clone()
+
+		for ignore, channel in channels
+			channelHandler[channel] := [TelemetryAnalyzer.Schema[channel].Indices[1], []]
+
+		for index, entry in data {
+			entry := entry.Clone()
+
+			for channel, handler in channelHandler
+				entry[handler[1]] := smoothValue(handler[2], entry[handler[1]])
+
+			data[index] := entry
+		}
+
+		return data
 	}
 
 	createSections(data) {

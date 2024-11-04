@@ -897,7 +897,7 @@ class DrivingCoach extends GridRaceAssistant {
 				}
 
 				if (bestLap != kUndefined) {
-					data := session.readTelemetry(this.Simulator, this.Car, this.Track, bestLap, &size)
+					data := sessionDB.readTelemetry(this.Simulator, this.Car, this.Track, bestLap, &size)
 
 					if data {
 						deleteFile(kTempDirectory . "Driving Coach\Telemetry\Reference.telemetry")

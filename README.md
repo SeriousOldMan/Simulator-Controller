@@ -175,6 +175,8 @@ Click on the picture to hear an actual conversation with the Driving Coach:
 
 [![](https://img.youtube.com/vi/LBtLk_md1IE/0.jpg)](https://youtu.be/LBtLk_md1IE)
 
+The Driving Coach can even use telemetry data to give you instructions how to improve your cornering performance while you are driving on the track.
+
 The Virtual Driving Coach can use LLM runtimes of OpenAI, Mistral and alike, but if your PC is powerful enough, you can also use an integrated runtime for a variety of LLM architectures, like Llama, Falcon, Mistral, GPT, and so on, as long as they are available in [GGUF format](https://github.com/ggerganov/ggml/pull/302).
 
 ##### Race Engineer & Race Strategist

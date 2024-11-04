@@ -188,18 +188,18 @@ Below you find all instruction categories and the supported variables:
 |             | %telemetry%       | This variable is substituted with the content of the knowledge base in a self-explaining JSON format. |
 | Handling    | Scope             | This instruction is used only when handling problems had been detected in the telemetry. See the chapter below about detecting handling problems and discussin them with Aiden. |
 |             | %handling%        | An enumeration of all detected handing problems. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#detecting-and-discussing-handling-problems) below for more information. |
-| Coaching    | Scope             | This is a very long instruction, which is used when the telemetry-based coaching is active. It describes many areas to check in the telemetry data when looking for potential imrpvements. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#corner-by-corner-coaching-based-on-telemetry) below for more information. |
-|             | %telemetry%       | This is a special variable, because it is actually not part of the instruction text, but is appended in *normal* conversation when corner by corner coaching is active. This variable will be replaced condensed telemetry data in JSON format for the last lap and possible recent laps. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#corner-by-corner-coaching-based-on-telemetry) below for more information. |
+| Coaching    | Scope             | This is a very long instruction, which is used when the telemetry-based coaching is active. It describes many areas to check in the telemetry data when looking for potential imrpvements. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#coaching-based-on-lap-telemetry-data) below for more information. |
+|             | %telemetry%       | This is a special variable, because it is actually not part of the instruction text, but is appended in *normal* conversation when corner by corner coaching is active. This variable will be replaced condensed telemetry data in JSON format for the last lap and possible recent laps. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#coaching-based-on-lap-telemetry-data) below for more information. |
 | Coaching.Lap | Scope            | This is synthetic question/command, which is sent to the LLM, if the user request a complete telemetry review of the last lap. |
-|             | %telemetry%       | This variable will be replaced with a condensed representation of the telemetry data in JSON format for the last lap and possible recent laps. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#corner-by-corner-coaching-based-on-telemetry) below for more information. |
+|             | %telemetry%       | This variable will be replaced with a condensed representation of the telemetry data in JSON format for the last lap and possible recent laps. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#coaching-based-on-lap-telemetry-data) below for more information. |
 | Coaching.Corner | Scope            | This is synthetic question/command, which is sent to the LLM, if the user request a review for a specific corner. |
-|             | %telemetry%       | This variable will be replaced with a condensed representation of the telemetry data in JSON format for the last lap. Only the data for the requested corner and the section after it will be included. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#corner-by-corner-coaching-based-on-telemetry) below for more information. |
+|             | %telemetry%       | This variable will be replaced with a condensed representation of the telemetry data in JSON format for the last lap. Only the data for the requested corner and the section after it will be included. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#coaching-based-on-lap-telemetry-data) below for more information. |
 |             | %corner%          | The corner to be reviewed. |
 | Coaching.Corner.Short | Scope            | Similar to the "Coaching.Corner" instruction. Used for on-track recommendations for an upcoming corner. |
-|             | %telemetry%       | This variable will be replaced with a condensed representation of the telemetry data in JSON format for the last lap. Only the data for the requested corner and the section after it will be included. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#corner-by-corner-coaching-based-on-telemetry) below for more information. |
+|             | %telemetry%       | This variable will be replaced with a condensed representation of the telemetry data in JSON format for the last lap. Only the data for the requested corner and the section after it will be included. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#coaching-based-on-lap-telemetry-data) below for more information. |
 |             | %corner%          | The corner to be reviewed. |
 | Coaching.Reference | Scope            | This is used as an addition for many of the above synthetic questions/commands for telemetry review. It is used, when a reference lap is available, which can be used for comparison against the most recent lap. |
-|             | %telemetry%       | This variable will be replaced with a condensed representation of the telemetry data in JSON format for the reference lap. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#corner-by-corner-coaching-based-on-telemetry) below for more information. |
+|             | %telemetry%       | This variable will be replaced with a condensed representation of the telemetry data in JSON format for the reference lap. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#coaching-based-on-lap-telemetry-data) below for more information. |
 
 As said, all instructions can be modified in the configuration. You can even clear a complete instruction, if you want (and don't want to dicuss the corresponding information with Aiden). I do not recommend to clear the "Character" instruction, though.
 
@@ -243,17 +243,13 @@ Using this knowledge, Aiden should be able to give you information how to cope w
 
 Information: You can disable this instruction (and every other instruction as well) completely, by clearing it in the configuration, if you don't want Aiden to give you information regarding handling problems. If you want to temporarily enable or disable it during a running session, you can use the voice commands below.
 
-### Corner by corner coaching based on telemetry
-
-
-
 ### List of all voice commands
 
 1. [English version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Driving-Coach-Commands-(EN))
 
 2. [German version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Driving-Coach-Commands-(DE))
 
-Normal you will use free conversation to interact with Aiden as shown in the example above. But there are also a couple of predefined grammar based commands available, for example to enable or disable the processing of specific information (see below in the next section). You will always find the current version of the grammar files as actually used by the software in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [Resources\Grammars directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Driving Coach.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Driving%20Coach.grammars.de).
+Normally you will use free conversation to interact with Aiden as shown in the example above. But there are also a couple of predefined grammar based commands available, for example to enable or disable the processing of specific information (see below in the next section) or to start on-track coaching. You will always find the current version of the grammar files as actually used by the software in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [Resources\Grammars directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Driving Coach.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Driving%20Coach.grammars.de).
 
 ### Enabling and disabling specific instructions and information processing 
 
@@ -265,11 +261,162 @@ As you might expect, the word "please" is optional. Available options for *infor
 
 	[Please] pay attention to *information* again [please]
 
-### How it works
+## Coaching based on lap telemetry data
+
+The Driving Coach is integrated with the telemetry data system of Simulator Controller. You can use a voice command or the plugin action "TelemetryCoaching" on your controller to activate telemtery collection for the Driving Coach. Example for a voice command: "Can you help me with my practice?"
+
+Aiden will then start collecting telemetry data and will contact you after a few laps, that he is ready to discuss your performance with you. You can ask for a review of a complete lap or a specific corner, if required. You can also ask more specifically, for example, if you have weaknesses in your braking and how you should work on them. Here is an example:
+
+**Driver:** What are my most important weaknesses and how should I work on them?
+
+**Aiden**: You have several areas to focus on for improvement. 
+
+In turn 2, your maximum lateral G-force is lower than in other corners with similar curvature, indicating that you might not be utilizing the car's full potential. Consider adjusting your cornering technique to extract more grip.
+
+In turn 3, the number of ABS activations is quite high at 13. This can degrade your braking performance. Try to implement trail braking to reduce the number of activations and improve your braking efficiency.
+
+In turn 7, you have 5 TC activations, which can hinder your acceleration out of the corner. Work on opening the throttle gradually or consider short-shifting to minimize traction control interventions.
+
+For turn 9, while your steering smoothness is good, the braking phase could be optimized. You might want to explore a later braking point to reduce the length of the braking phase and improve your overall time through the corner and the following section.
+
+Focusing on these areas will help you improve your lap times and overall performance.
+
+Beside discussing the telemetry data for the last lap, you can also ask Aiden to give you corner by corner instructions while you are driving. This is discussed [below](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#coaching-on-the-track).
+
+DISCLAIMER: This functionality requires a very capable LLM for decent results. This LLM must be able to follow multiple, complex chain of thoughts at the same time and must be able to perform reasoning based on supplied facts. At the time of this writing, only high end models like GPT 4o or Claude 3 Opus are in this group. The upcoming o1 model of OpenAI is even better in this area, but it is prohibitevly expensive. According to my testing, GPT 4o mini, the most cost-efficient model of OpenAI, also shows good results, but sometimes it mixes up things, for example, that applying less brake pressure will make your braking phase shorter. This can also happen with the stronger models sometimes, but not that often.
+
+### Track layout
+
+Before you can use the telemetry-based coaching, you must have recorded a [track map](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-mapping) for the given track and you must have defined the different sections (corners and straights) of the track. Detailed instructions can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation).
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/raw/main/Docs/Images/Session%20Database%2020.jpg)
+
+Please note, that you do not have to set sections for each corner, only for those where you are interested in. You also should not define corners where no braking or throttle lifting is necessary, since you will not get any valuable insights for those corners from Aiden.
+
+And be aware, that corners directly followed by another corner (a typical situation in chicanes on many tracks) are very challenging for Aiden. You can use that, but take the recommendations of Aiden with a grain of salt here.
+
+### Coaching on the track
+
+Aiden is capable to give you instructions and recommendations for the next corner while you are driving. You can enable this by a voice command, for example: "Can you give me instructions while I am driving?", or you can use the plugin action "TrackCoaching" on you your controller.
+
+If activated, Aiden will use the telemetry data of the recent lap to check for any areas for improvement. Additionally, the lap before the last lap, or the fastest lap of the session so far can be used as a reference for braking points, start of the acceleration phase, and so on. It is also possible to load the [fastest lap stored in the "Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#laps) as a reference. You configure the behaviour that suites you the most, by configuration using the corresponding [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) in the "Session Database".
+
+If you approach a corner, Aiden will then evaluate possible areas for improvement and will give you the necessary instructions before you enter the corner. This instructions will be very short and focused and not so detailed with explaations as in the exmple conversation above, of course. You can configure the typical distance to the corner, where these instructions will be given also in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) in the "Session Database". However, sometimes Aiden will be late, especially when the Spotter interrupted with an important message. Therefore, I recommend to do practice sessions with all other Assistants muted, which can be done with a Startup profile for example.
+
+## How it works
 
 Beside using an LLM to interact with the driver, the Driving Coach uses the same rule-based AI engine as the other Assistants. Therefore, the Driving Coach has the same understanding of the current race situation as the other Assistants. As you already might have guessed, this knowledge is used to supply the data to the LLM using the [Instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#instructions) described above.
 
-Unlike the other assistants, whose knowledge base, i.e. their memory, is deleted at the end of a session, with Aiden this remains until the start of the next session. This makes it possible to analyze and discuss various aspects of the session with Aiden after the end of a session. This retained memory covers everything from the performance information like lap and sector times, as well as position information and also includes handling information, if this was enabled during the session.
+Unlike the other Assistants, whose knowledge base, i.e. their memory, is deleted at the end of a session, Aidens memory will still be around until the start of the next session. This makes it possible to analyze and discuss various aspects of the session with Aiden after the end of a session. This retained memory covers everything from the performance information like lap and sector times, as well as position information and also includes handling information, if this was enabled during the session.
+
+The active coaching based on lap telemetry data deserves a more detailed explanation. The apporach to enable the Driving Coach to understand the telemetry data is a two step process. In the first step a special alorithm using an ML model divides the telemetry data into sections as defined in the track map and extracts important high-level information from the raw telemetry data. This information is converted into a JSON format, which looks like this:
+
+	{
+	  "Driver": "Oliver Juwig",
+	  "Lap": 3,
+	  "MaxGear": 6,
+	  "MaxLateralGForce": 2.66,
+	  "MaxRPM": 7708,
+	  "MaxSpeed": "244 km\/h",
+	  "Sections": [
+		{
+		  "Apex": {
+			"Duration": "0.85 Seconds",
+			"Gear": 2,
+			"LateralGForce": 1.16,
+			"Length": "26.9 Meter",
+			"Phase": "Rolling",
+			"RPM": 4391,
+			"Speed": "66 km\/h",
+			"Start": "19457.9 Meter"
+		  },
+		  "Curvature": -2.39,
+		  "Direction": "Right",
+		  "Entry": {
+			"ABSActivations": "7 Percent",
+			"BrakeCorrections": 0,
+			"BrakePressureRampUp": "35.2 Meter",
+			"BrakeSmoothness": "100 Percent",
+			"Duration": "2.43 Seconds",
+			"Length": "207.6 Meter",
+			"MaxBrakePressure": "89 Percent",
+			"Phase": "Braking",
+			"Start": "16557.4 Meter"
+		  },
+		  "Exit": {
+			"Duration": "6.21 Seconds",
+			"Gear": 2,
+			"Length": "786.9 Meter",
+			"Phase": "Accelerating",
+			"RPM": 5151,
+			"Speed": "161 km\/h",
+			"Start": "16557.4 Meter",
+			"TCActivations": "24 Percent",
+			"ThrottleCorrections": 0,
+			"ThrottleSmoothness": "100 Percent"
+		  },
+		  "Length": "1021.4 Meter",
+		  "Nr": 2,
+		  "SteeringCorrections": 7,
+		  "SteeringSmoothness": "77 Percent",
+		  "Time": "9.49 Seconds",
+		  "Type": "Corner"
+		},
+		{
+		  "Apex": {
+			"Duration": "0.82 Seconds",
+			"Gear": 3,
+			"LateralGForce": 0.95,
+			"Length": "11.8 Meter",
+			"Phase": "Rolling",
+			"RPM": 4931,
+			"Speed": "99 km\/h",
+			"Start": "29169.8 Meter"
+		  },
+		  "Curvature": -2.68,
+		  "Direction": "Left",
+		  "Entry": {
+			"ABSActivations": "6 Percent",
+			"BrakeCorrections": 1,
+			"BrakePressureRampUp": "0.0 Meter",
+			"BrakeSmoothness": "91 Percent",
+			"Duration": "1.44 Seconds",
+			"Length": "210.4 Meter",
+			"MaxBrakePressure": "82 Percent",
+			"Phase": "Braking",
+			"Start": "26615.9 Meter"
+		  },
+		  "Exit": {
+			"Duration": "2.05 Seconds",
+			"Gear": 3,
+			"Length": "271.8 Meter",
+			"Phase": "Accelerating",
+			"RPM": 5270,
+			"Speed": "132 km\/h",
+			"Start": "26615.9 Meter",
+			"TCActivations": "0 Percent",
+			"ThrottleCorrections": 0,
+			"ThrottleSmoothness": "100 Percent"
+		  },
+		  "Length": "494.1 Meter",
+		  "Nr": 2,
+		  "SteeringCorrections": 0,
+		  "SteeringSmoothness": "100 Percent",
+		  "Time": "4.31 Seconds",
+		  "Type": "Corner"
+		},
+		{
+		  "AvgSpeed": "170 km\/h",
+		  "Length": "196.0 Meter",
+		  "MaxSpeed": "190 km\/h",
+		  "MinSpeed": "134 km\/h",
+		  "Time": "4.10 Seconds",
+		  "Type": "Straight"
+		}
+	  ]
+	}
+
+This JSON object is then presented to the LLM of Aiden together with very detailed, context specific instructions and explanations. The instructions for the Driving Coach has already been discussed [above](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#instructions). Especially for the telemetry-based coaching they are very important, because they contain a lot of information about driving technique, which may be not available to an LLM in this level of detail. The instructions are based on my own experiences for a smooth, natural and fast driving style. They are not suitable to become an alien, since this type of drivers typically are using special driving techniques that won't work in a real car, for example. However, you can change the instructions for Aiden, so that it steers you in a direction of any driving style, but this can be very time-consuming process. Welcome in the exciting world of *prompt engineering*.
  
 ## Troubleshooting
 

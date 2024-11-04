@@ -599,7 +599,7 @@ PitstopPlan.Activate=
 PitstopPrepare.Activate=
 [Driving Coach]
 RaceAssistant.Toggle=
-Coaching.Toggle=
+TelemetryCoaching.Toggle=
 TrackCoaching.Toggle=
 Call.Activate=
 SetupWorkbenchOpen.Activate=

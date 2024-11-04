@@ -480,10 +480,10 @@ class DrivingCoach extends GridRaceAssistant {
 					}
 				}
 			case "Knowledge":
-				if knowledgeBase
+				if (knowledgeBase && (this.Mode = "Conversation"))
 					return substituteVariables(this.Instructions["Knowledge"], {knowledge: StrReplace(JSON.print(this.getKnowledge("Conversation")), "%", "\%")})
 			case "Handling":
-				if (knowledgeBase && this.Announcements["HandlingInformation"]) {
+				if (knowledgeBase && this.Announcements["HandlingInformation"] && (this.Mode = "Conversation")) {
 					collector := this.iIssueCollector
 
 					if collector {
@@ -897,7 +897,7 @@ class DrivingCoach extends GridRaceAssistant {
 				}
 
 				if (bestLap != kUndefined) {
-					data := session.readTelemetry(this.Simulator, this.Car, this.Track, bestLap, &size)
+					data := sessionDB.readTelemetry(this.Simulator, this.Car, this.Track, bestLap, &size)
 
 					if data {
 						deleteFile(kTempDirectory . "Driving Coach\Telemetry\Reference.telemetry")
@@ -975,13 +975,13 @@ class DrivingCoach extends GridRaceAssistant {
 				found := false
 
 				lap.Sections := choose(lap.Sections, (section) {
-									if ((section.Type = "Corner") && (section.Nr = corner)) {
-										found := true
+									if found {
+										found := false
 
 										return true
 									}
-									else if found {
-										found := false
+									else if ((section.Type = "Corner") && (section.Nr = corner)) {
+										found := true
 
 										return true
 									}

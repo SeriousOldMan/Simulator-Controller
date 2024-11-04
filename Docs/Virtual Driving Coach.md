@@ -243,7 +243,25 @@ Using this knowledge, Aiden should be able to give you information how to cope w
 
 Information: You can disable this instruction (and every other instruction as well) completely, by clearing it in the configuration, if you don't want Aiden to give you information regarding handling problems. If you want to temporarily enable or disable it during a running session, you can use the voice commands below.
 
-### Coaching based on lap telemetry data
+### List of all voice commands
+
+1. [English version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Driving-Coach-Commands-(EN))
+
+2. [German version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Driving-Coach-Commands-(DE))
+
+Normally you will use free conversation to interact with Aiden as shown in the example above. But there are also a couple of predefined grammar based commands available, for example to enable or disable the processing of specific information (see below in the next section) or to start on-track coaching. You will always find the current version of the grammar files as actually used by the software in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [Resources\Grammars directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Driving Coach.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Driving%20Coach.grammars.de).
+
+### Enabling and disabling specific instructions and information processing 
+
+As discussed above Aiden can process information about your current session in a simulation. This includes specific data about your own performance and the preformance of your competitors, as well as information about your recent handling issues. Since the processing of this data may sometimes confuse the AI behind the Driving Coach. Therefore you may disable specific information processing by using a special voice command:
+
+	[Please] do not pay attention *information* anymore [please]
+
+As you might expect, the word "please" is optional. Available options for *information* are: "session information", "stint information", "handling information". These options resemble, as you already may have recognized, the instructions discussed above. After you have disabled one of the information processings (all are enabled by default), you can reenable it with the following command:
+
+	[Please] pay attention to *information* again [please]
+
+## Coaching based on lap telemetry data
 
 The Driving Coach is integrated with the telemetry data system of Simulator Controller. You can use a voice command or the plugin action "TelemetryCoaching" on your controller to activate telemtery collection for the Driving Coach. Example for a voice command: "Can you help me with my practice?"
 
@@ -267,7 +285,7 @@ Beside discussing the telemetry data for the last lap, you can also ask Aiden to
 
 DISCLAIMER: This functionality requires a very capable LLM for decent results. This LLM must be able to follow multiple, complex chain of thoughts at the same time and must be able to perform reasoning based on supplied facts. At the time of this writing, only high end models like GPT 4o or Claude 3 Opus are in this group. The upcoming o1 model of OpenAI is even better in this area, but it is prohibitevly expensive. According to my testing, GPT 4o mini, the most cost-efficient model of OpenAI, also shows good results, but sometimes it mixes up things, for example, that applying less brake pressure will make your braking phase shorter. This can also happen with the stronger models sometimes, but not that often.
 
-#### Track layout
+### Track layout
 
 Before you can use the telemetry-based coaching, you must have recorded a [track map](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-mapping) for the given track and you must have defined the different sections (corners and straights) of the track. Detailed instructions can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation).
 
@@ -277,7 +295,7 @@ Please note, that you do not have to set sections for each corner, only for thos
 
 And be aware, that corners directly followed by another corner (a typical situation in chicanes on many tracks) are very challenging for Aiden. You can use that, but take the recommendations of Aiden with a grain of salt here.
 
-#### Coaching on the track
+### Coaching on the track
 
 Aiden is capable to give you instructions and recommendations for the next corner while you are driving. You can enable this by a voice command, for example: "Can you give me instructions while I am driving?", or you can use the plugin action "TrackCoaching" on you your controller.
 
@@ -285,9 +303,13 @@ If activated, Aiden will use the telemetry data of the recent lap to check for a
 
 If you approach a corner, Aiden will then evaluate possible areas for improvement and will give you the necessary instructions before you enter the corner. This instructions will be very short and focused and not so detailed with explaations as in the exmple conversation above, of course. You can configure the typical distance to the corner, where these instructions will be given also in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) in the "Session Database". However, sometimes Aiden will be late, especially when the Spotter interrupted with an important message. Therefore, I recommend to do practice sessions with all other Assistants muted, which can be done with a Startup profile for example.
 
-#### How it works
+## How it works
 
-The apporach to enable the Driving Coach to understand the telemetry data is a two step process. In the first step a special alorithm using an ML model divides the telemetry data into sections as defined in the track map and extracts important high-level information from the raw telemetry data. This information is converted into a JSON format, which looks like this:
+Beside using an LLM to interact with the driver, the Driving Coach uses the same rule-based AI engine as the other Assistants. Therefore, the Driving Coach has the same understanding of the current race situation as the other Assistants. As you already might have guessed, this knowledge is used to supply the data to the LLM using the [Instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#instructions) described above.
+
+Unlike the other Assistants, whose knowledge base, i.e. their memory, is deleted at the end of a session, Aidens memory will still be around until the start of the next session. This makes it possible to analyze and discuss various aspects of the session with Aiden after the end of a session. This retained memory covers everything from the performance information like lap and sector times, as well as position information and also includes handling information, if this was enabled during the session.
+
+The active coaching based on lap telemetry data deserves a more detailed explanation. The apporach to enable the Driving Coach to understand the telemetry data is a two step process. In the first step a special alorithm using an ML model divides the telemetry data into sections as defined in the track map and extracts important high-level information from the raw telemetry data. This information is converted into a JSON format, which looks like this:
 
 	{
 	  "Driver": "Oliver Juwig",
@@ -395,30 +417,6 @@ The apporach to enable the Driving Coach to understand the telemetry data is a t
 	}
 
 This JSON object is then presented to the LLM of Aiden together with very detailed, context specific instructions and explanations. The instructions for the Driving Coach has already been discussed [above](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#instructions). Especially for the telemetry-based coaching they are very important, because they contain a lot of information about driving technique, which may be not available to an LLM in this level of detail. The instructions are based on my own experiences for a smooth, natural and fast driving style. They are not suitable to become an alien, since this type of drivers typically are using special driving techniques that won't work in a real car, for example. However, you can change the instructions for Aiden, so that it steers you in a direction of any driving style, but this can be very time-consuming process. Welcome in the exciting world of *prompt engineering*.
-
-### List of all voice commands
-
-1. [English version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Driving-Coach-Commands-(EN))
-
-2. [German version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Driving-Coach-Commands-(DE))
-
-Normal you will use free conversation to interact with Aiden as shown in the example above. But there are also a couple of predefined grammar based commands available, for example to enable or disable the processing of specific information (see below in the next section). You will always find the current version of the grammar files as actually used by the software in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [Resources\Grammars directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Driving Coach.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Driving%20Coach.grammars.de).
-
-### Enabling and disabling specific instructions and information processing 
-
-As discussed above Aiden can process information about your current session in a simulation. This includes specific data about your own performance and the preformance of your competitors, as well as information about your recent handling issues. Since the processing of this data may sometimes confuse the AI behind the Driving Coach. Therefore you may disable specific information processing by using a special voice command:
-
-	[Please] do not pay attention *information* anymore [please]
-
-As you might expect, the word "please" is optional. Available options for *information* are: "session information", "stint information", "handling information". These options resemble, as you already may have recognized, the instructions discussed above. After you have disabled one of the information processings (all are enabled by default), you can reenable it with the following command:
-
-	[Please] pay attention to *information* again [please]
-
-### How it works
-
-Beside using an LLM to interact with the driver, the Driving Coach uses the same rule-based AI engine as the other Assistants. Therefore, the Driving Coach has the same understanding of the current race situation as the other Assistants. As you already might have guessed, this knowledge is used to supply the data to the LLM using the [Instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#instructions) described above.
-
-Unlike the other assistants, whose knowledge base, i.e. their memory, is deleted at the end of a session, with Aiden this remains until the start of the next session. This makes it possible to analyze and discuss various aspects of the session with Aiden after the end of a session. This retained memory covers everything from the performance information like lap and sector times, as well as position information and also includes handling information, if this was enabled during the session.
  
 ## Troubleshooting
 

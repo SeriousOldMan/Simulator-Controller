@@ -352,7 +352,7 @@ class DrivingCoach extends GridRaceAssistant {
 			this.iStandings := values.Standings
 
 		if (values.HasProp("Session") && (values.Session == kSessionFinished) && (this.Session != kSessionFinished))
-			if this.CoachingActive
+			if (this.CoachingActive && this.Prepared)
 				this.shutdownCoaching()
 	}
 
@@ -1244,8 +1244,6 @@ class DrivingCoach extends GridRaceAssistant {
 								, InitialFuelAmount: 0, EnoughData: false})
 
 		this.updateSessionValues({Standings: [], Laps: Map()})
-
-		; this.initializeGridPosition(data)
 
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledgeBase(this.KnowledgeBase)

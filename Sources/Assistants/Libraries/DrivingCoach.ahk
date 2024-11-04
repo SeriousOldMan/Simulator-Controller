@@ -650,7 +650,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 					if reference
 						command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
-															   , {telemetry: telemetry.JSON}))
+															   , {telemetry: reference.JSON}))
 
 					this.handleVoiceText("TEXT", command)
 				}
@@ -677,7 +677,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 				if reference
 					command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
-														   , {telemetry: telemetry.JSON}))
+														   , {telemetry: reference.JSON}))
 
 				this.handleVoiceText("TEXT", command)
 			}
@@ -897,7 +897,7 @@ class DrivingCoach extends GridRaceAssistant {
 				}
 
 				if (bestLap != kUndefined) {
-					data := session.readTelemetry(this.Simulator, this.Car, this.Track, bestLap, &size)
+					data := sessionDB.readTelemetry(this.Simulator, this.Car, this.Track, bestLap, &size)
 
 					if data {
 						deleteFile(kTempDirectory . "Driving Coach\Telemetry\Reference.telemetry")
@@ -975,13 +975,13 @@ class DrivingCoach extends GridRaceAssistant {
 				found := false
 
 				lap.Sections := choose(lap.Sections, (section) {
-									if ((section.Type = "Corner") && (section.Nr = corner)) {
-										found := true
+									if found {
+										found := false
 
 										return true
 									}
-									else if found {
-										found := false
+									else if ((section.Type = "Corner") && (section.Nr = corner)) {
+										found := true
 
 										return true
 									}
@@ -1358,7 +1358,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 					if reference
 						command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
-															   , {telemetry: telemetry.JSON}))
+															   , {telemetry: reference.JSON}))
 
 					this.handleVoiceText("TEXT", command, false)
 				}

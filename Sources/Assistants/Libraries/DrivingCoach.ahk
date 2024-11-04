@@ -975,13 +975,13 @@ class DrivingCoach extends GridRaceAssistant {
 				found := false
 
 				lap.Sections := choose(lap.Sections, (section) {
-									if ((section.Type = "Corner") && (section.Nr = corner)) {
-										found := true
+									if found {
+										found := false
 
 										return true
 									}
-									else if found {
-										found := false
+									else if ((section.Type = "Corner") && (section.Nr = corner)) {
+										found := true
 
 										return true
 									}

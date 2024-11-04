@@ -85,11 +85,11 @@ startupDrivingCoach() {
 	local coachLogo := false
 	local coachLanguage := false
 	local coachSynthesizer := true
-	local coachSpeaker := true
+	local coachSpeaker := false
 	local coachSpeakerVocalics := false
 	local coachSpeakerBooster := false
 	local coachRecognizer := true
-	local coachListener := true
+	local coachListener := false
 	local coachListenerBooster := false
 	local coachConversationBooster := false
 	local coachAgentBooster := false
@@ -210,17 +210,6 @@ startupDrivingCoach() {
 
 	if remotePID
 		Task.startTask(PeriodicTask(checkRemoteProcessAlive.Bind(remotePID), 10000, kLowPriority))
-
-	coach.iCoachingActive := true
-	coach.iTelemetryAnalyzer := TelemetryAnalyzer("ACC", "Brands Hatch")
-	coach.iAvailableTelemetry[3] := true
-	coach.startConversation()
-	coach.startCoaching()
-
-	; coach.reviewLapRecognized([])
-	; coach.reviewCornerRecognized([2])
-
-	coach.handleVoiceText("TEXT", "What are my most important weaknesses and how should I work on them?")
 
 	startupProcess()
 }

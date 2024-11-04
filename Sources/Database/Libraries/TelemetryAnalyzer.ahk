@@ -135,8 +135,8 @@ class Corner extends Section {
 	iMaxSpeed := 0						; Max Speed around apex (rolling phase)
 	iAvgSpeed := 0						; Avg Speed around apex (rolling phase)
 
-	iTCActivations := 0					; # of TC activations (each meter is one tick)
-	iABSActivations := 0				; # of ABS activations (each meter is one tick)
+	iTCActivations := 0					; Percentage of TC activations (each meter is one tick)
+	iABSActivations := 0				; Percentage of ABS activations (each meter is one tick)
 
 	iMaxBrakePressure := 0				; Percentage
 	iBrakePressureRampUp := 0			; Meters
@@ -365,7 +365,7 @@ class Corner extends Section {
 								   , Duration: (nullRound(this.Time["Entry"] / 1000, 2) . " Seconds")
 								   , MaxBrakePressure: (Round(this.MaxBrakePressure) . " Percent")
 								   , BrakePressureRampUp: (Round(this.BrakePressureRampUp, 1) . " Meter")
-								   , ABSActivations: this.ABSActivations
+								   , ABSActivations: (this.ABSActivations . " Percent")
 								   , BrakeCorrections: this.BrakeCorrections
 								   , BrakeSmoothness: (nullRound(this.BrakeSmoothness) . " Percent")}
 
@@ -391,7 +391,7 @@ class Corner extends Section {
 								  , Gear: this.AcceleratingGear
 								  , RPM: this.AcceleratingRPM
 								  , Speed: (Round(this.AcceleratingSpeed) . " km/h")
-								  , TCActivations: this.TCActivations
+								  , TCActivations: (this.TCActivations . " Percent")
 								  , ThrottleCorrections: this.ThrottleCorrections
 								  , ThrottleSmoothness: (nullRound(this.ThrottleSmoothness) . " Percent")}
 			}
@@ -511,8 +511,6 @@ class Corner extends Section {
 		distance(from, to := false) {
 			local distance, lastX, lastY, x, y
 
-			; return (telemetry.getValue(to, "Distance") - telemetry.getValue(from, "Distance"))
-
 			if !to {
 				distance := telemetry.getValue(1, "Distance")
 
@@ -530,7 +528,10 @@ class Corner extends Section {
 				y := telemetry.getValue(from, "PosY")
 
 				distance += Sqrt(((x - lastX) ** 2) + ((y - lastY) ** 2))
-			} until (++from >= to)
+
+				lastX := x
+				lastY := y
+			} until (++from > to)
 
 			return distance
 		}
@@ -699,7 +700,8 @@ class Corner extends Section {
 							 , rollingStart, rollingTime, rollingLength
 							 , acceleratingStart, acceleratingTime, acceleratingLength
 							 , rollingGear, rollingRPM, acceleratingGear, acceleratingRPM, acceleratingSpeed
-							 , minLatG, maxLatG, average(latGs), minSpeed, maxSpeed, average(speeds), tcActivations, absActivations
+							 , minLatG, maxLatG, average(latGs), minSpeed, maxSpeed, average(speeds)
+							 , Round((tcActivations / throttleCount) * 100), Round((absActivations / brakeCount) * 100)
 							 , Max(0, steeringChanges), 100 - (steeringCount ? ((steeringChanges / steeringCount) * 100) : 0)
 							 , Max(0, throttleChanges), 100 - (throttleCount ? ((throttleChanges / throttleCount) * 100): 0)
 							 , Max(0, brakeChanges), 100 - (brakeCount ? ((brakeChanges / brakeCount) * 100) : 0))

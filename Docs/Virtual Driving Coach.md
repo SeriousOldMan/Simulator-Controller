@@ -333,7 +333,7 @@ The active coaching based on lap telemetry data deserves a more detailed explana
 		  "Curvature": -2.39,
 		  "Direction": "Right",
 		  "Entry": {
-			"ABSActivations": 1,
+			"ABSActivations": "7 Percent",
 			"BrakeCorrections": 0,
 			"BrakePressureRampUp": "35.2 Meter",
 			"BrakeSmoothness": "100 Percent",
@@ -351,7 +351,7 @@ The active coaching based on lap telemetry data deserves a more detailed explana
 			"RPM": 5151,
 			"Speed": "161 km\/h",
 			"Start": "16557.4 Meter",
-			"TCActivations": 4,
+			"TCActivations": "24 Percent",
 			"ThrottleCorrections": 0,
 			"ThrottleSmoothness": "100 Percent"
 		  },
@@ -376,7 +376,7 @@ The active coaching based on lap telemetry data deserves a more detailed explana
 		  "Curvature": -2.68,
 		  "Direction": "Left",
 		  "Entry": {
-			"ABSActivations": 6,
+			"ABSActivations": "6 Percent",
 			"BrakeCorrections": 1,
 			"BrakePressureRampUp": "0.0 Meter",
 			"BrakeSmoothness": "91 Percent",
@@ -394,7 +394,7 @@ The active coaching based on lap telemetry data deserves a more detailed explana
 			"RPM": 5270,
 			"Speed": "132 km\/h",
 			"Start": "26615.9 Meter",
-			"TCActivations": 0,
+			"TCActivations": "0 Percent",
 			"ThrottleCorrections": 0,
 			"ThrottleSmoothness": "100 Percent"
 		  },

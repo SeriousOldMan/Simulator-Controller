@@ -644,7 +644,7 @@ class DrivingCoach extends GridRaceAssistant {
 			else {
 				telemetry := this.getTelemetry(&reference := true, cornerNr)
 
-				if (this.TelemetryAnalyzer && telemetry) {
+				if (this.TelemetryAnalyzer && telemetry && (telemetry.Sections.Length > 0)) {
 					command := substituteVariables(this.Instructions["Coaching.Corner"]
 												 , {telemetry: telemetry.JSON, corner: cornerNr})
 
@@ -672,7 +672,7 @@ class DrivingCoach extends GridRaceAssistant {
 		this.Mode := "Review"
 
 		try {
-			if (this.TelemetryAnalyzer && telemetry) {
+			if (this.TelemetryAnalyzer && telemetry && (telemetry.Sections.Length > 0)) {
 				command := substituteVariables(this.Instructions["Coaching.Lap"], {telemetry: telemetry.JSON})
 
 				if reference

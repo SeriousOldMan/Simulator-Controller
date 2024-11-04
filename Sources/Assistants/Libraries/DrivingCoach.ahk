@@ -352,8 +352,8 @@ class DrivingCoach extends GridRaceAssistant {
 			this.iStandings := values.Standings
 
 		if (values.HasProp("Session") && (values.Session == kSessionFinished) && (this.Session != kSessionFinished))
-			if (this.CoachingActive && this.Prepared)
-				this.shutdownCoaching()
+			if this.CoachingActive
+				this.shutdownCoaching(false)
 	}
 
 	connectorState(state, reason := false, arguments*) {
@@ -834,7 +834,7 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
-	shutdownCoaching() {
+	shutdownCoaching(deactivate := true) {
 		local state := newMultiMap()
 
 		this.shutdownTrackTrigger()
@@ -842,12 +842,14 @@ class DrivingCoach extends GridRaceAssistant {
 		if this.TelemetryCollector
 			this.shutdownTelemetryCollector()
 
-		this.iCoachingActive := false
 		this.iAvailableTelemetry := CaseInsenseMap()
 
 		setMultiMapValue(state, "Coaching", "Active", false)
 
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
+
+		if deactivate
+			this.iCoachingActive := false
 	}
 
 	startupTrackCoaching() {
@@ -1064,8 +1066,11 @@ class DrivingCoach extends GridRaceAssistant {
 			DirCreate(kTempDirectory . "Driving Coach")
 			DirCreate(kTempDirectory . "Driving Coach\Telemetry")
 
-			if !isDebug()
+			if !isDebug() {
 				deleteDirectory(kTempDirectory . "Driving Coach\Telemetry")
+
+				DirCreate(kTempDirectory . "Driving Coach\Telemetry")
+			}
 
 			this.iTelemetryAnalyzer := TelemetryAnalyzer(this.Simulator, this.Track)
 			this.iTelemetryCollector := TelemetryCollector(kTempDirectory . "Driving Coach\Telemetry", this.Simulator, this.Track, this.TrackLength)
@@ -1253,7 +1258,9 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	finishSession(shutdown := true) {
-		this.shutdownCoaching()
+		if (this.Session != kSessionFinished)
+			this.shutdownCoaching(false)
+
 		this.stopIssueAnalyzer()
 
 		this.updateDynamicValues({Prepared: false})
@@ -1347,7 +1354,7 @@ class DrivingCoach extends GridRaceAssistant {
 		if (this.TelemetryAnalyzer && telemetry) {
 			if (A_TickCount < nextRecommendation)
 				return
-			else if (Random(1, 10) > 3) {
+			else if ((Random(1, 10) > 3) && (telemetry.Sections.Length > 0)) {
 				nextRecommendation := (A_TickCount + wait)
 
 				this.Mode := "Coaching"

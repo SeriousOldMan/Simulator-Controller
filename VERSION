@@ -1,9 +1,9 @@
 [Development]
 Version=5.9.7.0-dev
 Target=5.9.7.0-release
-Date=11/02/2024
+Date=11/04/2024
 Download=
-Changes=Handle out of screen controller previews in "Simulator Setup", Fixed orphane state file handling in "System Monitor"
+Changes=Handle out of screen controller previews in "Simulator Setup", Fixed orphane state file handling in "System Monitor", New voice commands for pressure loss
 Components=Media->5.6.1,Configuration->5.9.1,Utilities->5.9.1
 [Release]
 Version=5.9.6.0-release

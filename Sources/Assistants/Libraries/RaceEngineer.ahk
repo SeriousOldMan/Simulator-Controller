@@ -460,6 +460,20 @@ class RaceEngineer extends RaceAssistant {
 					this.getSpeaker().speakPhrase("NoPitstop")
 				else
 					this.pitstopAdjustRepairRecognized("Engine", words)
+			case "PitstopCompensatePressureLoss":
+				this.clearContinuation()
+
+				if !this.supportsPitstop()
+					this.getSpeaker().speakPhrase("NoPitstop")
+				else
+					this.pitstopCompensatePressureLossRecognized(words, true)
+			case "PitstopNoCompensatePressureLoss":
+				this.clearContinuation()
+
+				if !this.supportsPitstop()
+					this.getSpeaker().speakPhrase("NoPitstop")
+				else
+					this.pitstopCompensatePressureLossRecognized(words, false)
 			default:
 				super.handleVoiceCommand(grammar, words)
 		}
@@ -1436,6 +1450,21 @@ class RaceEngineer extends RaceAssistant {
 			else
 				this.updatePitstopRepair(repairType, negation = "")
 		}
+	}
+
+	pitstopCompensatePressureLossRecognized(words, enabled) {
+		local knowledgeBase := this.KnowledgeBase
+
+		if !this.hasEnoughData()
+			return
+
+		if knowledgeBase {
+			this.getSpeaker().speakPhrase("Roger")
+
+			knowledgeBase.setFact("Session.Settings.Tyre.Pressure.Correction.Pressure", enabled)
+		}
+		else
+			this.getSpeaker().speakPhrase("Later")
 	}
 
 	updatePitstop(data) {

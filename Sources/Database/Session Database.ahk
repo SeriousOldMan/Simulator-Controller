@@ -6127,17 +6127,21 @@ sectionDialog(xOrCommand := false, y := false, section := false, *) {
 	try {
 		sectionsMenu.Show()
 
-		while !result
+		while (!result && !GetKeyState("Esc"))
 			Sleep(100)
 
-		if section
-			section := section.Clone()
+		if result {
+			if section
+				section := section.Clone()
+			else
+				section := Object()
+
+			section.Type := result
+
+			return section
+		}
 		else
-			section := Object()
-
-		section.Type := result
-
-		return section
+			return false
 	}
 	finally {
 		SessionDatabaseEditor.Instance.Window.Unblock()

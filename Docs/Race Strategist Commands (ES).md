@@ -80,10 +80,11 @@ Announcements=avisos meteorológicos
 
 	[(TellMe) decirme la hora, Que hora es, Cual es la {hora actual, hora}]
 
-	[(TellMe) las vueltas restantes, Cuántas vueltas quedan, Cuántas vueltas quedan, Cuántas vueltas faltan]
-FuturePosition=[Simula la {carrera, la clasificación} en (Number) vueltas, (CanYou) simular la {carrera, clasificación} en (Number) vueltas, ¿Cuál será mi posición en (Number) vueltas, ¿Cuál sera mi posición en (Number) vueltas]
-
 	[Como esta el tiempo, Puede llover, hay cambio de teimpo, (CanYou) comprobar el tiempo]
+
+	[(TellMe) las vueltas restantes, Cuántas vueltas quedan, Cuántas vueltas quedan, Cuántas vueltas faltan]
+
+	[Simula la {carrera, la clasificación} en (Number) vueltas, (CanYou) simular la {carrera, clasificación} en (Number) vueltas, ¿Cuál será mi posición en (Number) vueltas, ¿Cuál sera mi posición en (Number) vueltas]
 
 	[Simula la {carrera, la clasificación} en (Number) vueltas, (CanYou) simular la {carrera, clasificación} en (Number) vueltas, ¿Cuál será mi posición en (Number) vueltas, ¿Cuál sera mi posición en (Number) vueltas]
 	

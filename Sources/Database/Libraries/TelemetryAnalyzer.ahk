@@ -353,21 +353,27 @@ class Corner extends Section {
 	Descriptor {
 		Get {
 			local descriptor := super.Descriptor
+			local smoothness
 
 			descriptor.Nr := this.Nr
 			descriptor.Direction := this.Direction
 			descriptor.Curvature := Round(this.Curvature, 2)
 
-			if this.Start["Entry"]
+			if this.Start["Entry"] {
+				smoothness := nullRound(this.BrakeSmoothness)
+
 				descriptor.Entry := {Phase: "Braking"
 								   , Start: (Round(this.Start["Entry"], 1) . " Meter")
 								   , Length: (nullRound(this.Length["Entry"], 1) . " Meter")
 								   , Duration: (nullRound(this.Time["Entry"] / 1000, 2) . " Seconds")
 								   , MaxBrakePressure: (Round(this.MaxBrakePressure) . " Percent")
 								   , BrakePressureRampUp: (Round(this.BrakePressureRampUp, 1) . " Meter")
-								   , ABSActivations: (this.ABSActivations . " Percent")
+								   , ABSActivations: ((this.ABSActivations > TelemetryAnalyzer.ABSActivationsThreshold) ? (this.ABSActivations . " Percent")
+																														: "Okay")
 								   , BrakeCorrections: this.BrakeCorrections
-								   , BrakeSmoothness: (nullRound(this.BrakeSmoothness) . " Percent")}
+								   , BrakeSmoothness: ((smoothness < TelemetryAnalyzer.BrakeSmoothnessThreshold) ? (smoothness . " Percent")
+																												 : "Okay")}
+			}
 
 			if (this.Start["Apex"] != kNull)
 				descriptor.Apex := {Phase: "Rolling"
@@ -384,6 +390,8 @@ class Corner extends Section {
 								  , Speed: (nullRound(this.MinSpeed) . " km/h")}
 
 			if (this.Start["Exit"] != kNull) {
+				smoothness := nullRound(this.ThrottleSmoothness)
+
 				descriptor.Exit := {Phase: "Accelerating"
 								  , Start: (Round(this.Start["Entry"], 1) . " Meter")
 								  , Length: (nullRound(this.Length["Exit"], 1) . " Meter")
@@ -391,13 +399,18 @@ class Corner extends Section {
 								  , Gear: this.AcceleratingGear
 								  , RPM: this.AcceleratingRPM
 								  , Speed: (Round(this.AcceleratingSpeed) . " km/h")
-								  , TCActivations: (this.TCActivations . " Percent")
+								  , TCActivations: ((this.TCActivations > TelemetryAnalyzer.TCActivationsThreshold) ? (this.TCActivations . " Percent")
+																													: "Okay")
 								  , ThrottleCorrections: this.ThrottleCorrections
-								  , ThrottleSmoothness: (nullRound(this.ThrottleSmoothness) . " Percent")}
+								  , ThrottleSmoothness: ((smoothness < TelemetryAnalyzer.ThrottleSmoothnessThreshold) ? (smoothness . " Percent")
+																													  : "Okay")}
 			}
 
+			smoothness := nullRound(this.SteeringSmoothness)
+
 			descriptor.SteeringCorrections := this.SteeringCorrections
-			descriptor.SteeringSmoothness := (nullRound(this.SteeringSmoothness) . " Percent")
+			descriptor.SteeringSmoothness := ((smoothness < TelemetryAnalyzer.SteeringSmoothnessThreshold) ? (smoothness . " Percent")
+																										   : "Okay")
 
 			return descriptor
 		}
@@ -1038,6 +1051,12 @@ class Telemetry {
 class TelemetryAnalyzer {
 	static sSchema := false
 
+	static sTCActivationsThreshold := 20
+	static sABSThreshold := 20
+	static SteeringSmoothnessThreshold := 90
+	static sThrottleSmoothnessThreshold := 90
+	static sBrakeSmoothnessThreshold := 90
+
 	iSimulator := false
 	iTrack := false
 
@@ -1077,6 +1096,56 @@ class TelemetryAnalyzer {
 	TrackSections {
 		Get {
 			return this.iTrackSections
+		}
+	}
+
+	static TCActivationsThreshold {
+		Get {
+			return TelemetryAnalyzer.sTCActivationsThreshold
+		}
+
+		Set {
+			return (TelemetryAnalyzer.sTCActivationsThreshold := value)
+		}
+	}
+
+	static ABSActivationsThreshold {
+		Get {
+			return TelemetryAnalyzer.sABSActivationsThreshold
+		}
+
+		Set {
+			return (TelemetryAnalyzer.sABSActivationsThreshold := value)
+		}
+	}
+
+	static SteeringSmoothnessThreshold {
+		Get {
+			return TelemetryAnalyzer.sSteeringSmoothnessThreshold
+		}
+
+		Set {
+			return (TelemetryAnalyzer.sSteeringSmoothnessThreshold := value)
+		}
+	}
+
+	static ThrottleSmoothnessThreshold {
+		Get {
+			return TelemetryAnalyzer.sThrottleSmoothnessThreshold
+		}
+
+		Set {
+			return (TelemetryAnalyzer.sThrottleSmoothnessThreshold := value)
+		}
+	}
+
+	static BrakeSmoothnessThreshold {
+		Get {
+			return TelemetryAnalyzer.sBrakeSmoothnessThreshold
+		}
+
+		Set {
+			return (TelemetryAnalyzer.sBrakeSmoothnessThreshold := value)
 		}
 	}
 

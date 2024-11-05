@@ -340,6 +340,17 @@ class DrivingCoach extends GridRaceAssistant {
 		if values.HasProp("Settings") {
 			this.iReferenceMode := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference", "Fastest")
 			this.iLoadReference := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference.Database", false)
+
+			TelemetryAnalyzer.TCActivationsThreshold
+				:= getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.TCActivations", 20)
+			TelemetryAnalyzer.ABSActivationsThreshold
+				:= getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.ABSActivations", 20)
+			TelemetryAnalyzer.SteeringSmoothnessThreshold
+				:= getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.SteeringSmoothnessThreshold", 90)
+			TelemetryAnalyzer.ThrottleSmoothnessThreshold
+				:= getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.ThrottleSmoothnessThreshold", 90)
+			TelemetryAnalyzer.BrakeSmoothnessThreshold
+				:= getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.BrakeSmoothnessThreshold", 90)
 		}
 	}
 

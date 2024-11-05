@@ -6089,6 +6089,7 @@ copyFiles(source, destination) {
 }
 
 sectionDialog(xOrCommand := false, y := false, section := false, *) {
+	/*
 	global gPositionInfoEnabled
 
 	local x
@@ -6154,6 +6155,41 @@ sectionDialog(xOrCommand := false, y := false, section := false, *) {
 
 			gPositionInfoEnabled := true
 		}
+	}
+	*/
+
+	local result := false
+	local sectionsMenu := Menu()
+
+	sectionsMenu.Add(translate("Corner"), (*) => (result := "Corner"))
+	sectionsMenu.Add(translate("Straight"), (*) => (result := "Straight"))
+
+	if section
+		sectionsMenu.Check(translate(section.Type))
+
+	SessionDatabaseEditor.Instance.Window.Block()
+
+	try {
+		sectionsMenu.Show()
+
+		while (!result && !GetKeyState("Esc"))
+			Sleep(100)
+
+		if result {
+			if section
+				section := section.Clone()
+			else
+				section := Object()
+
+			section.Type := result
+
+			return section
+		}
+		else
+			return false
+	}
+	finally {
+		SessionDatabaseEditor.Instance.Window.Unblock()
 	}
 }
 

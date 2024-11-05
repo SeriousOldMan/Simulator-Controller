@@ -123,6 +123,6 @@ Announcements=fuel warnings, damage warnings, damage analysis, weather warnings,
 	
 	[(CanWe) repair the engine, {Please} do not repair the engine]
 	
-	[(CanYou) {compensate, compensate for} {tyre pressure, pressure} {loss, loss please}, {Please do compensate, Please do compensate for, Compensate, Compensate for} {tyre pressure, pressure} {loss, loss please}]
-
+	[(CanWe) {compensate, compensate for} {tyre pressure, pressure} {loss, loss please}, {Please do compensate, Please do compensate for, Compensate, Compensate for} {tyre pressure, pressure} {loss, loss please}, {Take, Please take} the {tyre pressure loss, pressure loss} into {account, account please}]
+	
 	[{Do not, Please do not} {compensate, compensate for} {tyre pressure, pressure} {loss, loss please}, No more compensation for {tyre pressure, pressure} {loss, loss please}]

@@ -7,8 +7,6 @@
   6. Documentation for the voice commands of all Assistants has been added for all supported languages. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#list-of-all-voice-commands) for an example.
   7. [Internal] Fixed orphane state file handling in "System Monitor".
 
-Handle out of screen controller previews in "Simulator Setup", Fixed orphane state file handling in "System Monitor", New voice commands for pressure loss, Fixed some duplicate messages by the Spotter, Configuration of track sections streamlined, Added documentation for all voice commands in all languages
-
 ## 5.9.6.0-release 11/01/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

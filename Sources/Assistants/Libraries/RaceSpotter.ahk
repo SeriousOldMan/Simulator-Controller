@@ -657,7 +657,7 @@ class PositionInfo {
 	}
 
 	hasBestLapTime() {
-		return (this.BestLapTime != this.Car.BestLapTime)
+		return (Round(this.BestLapTime, 2) != Round(this.Car.BestLapTime, 2))
 	}
 
 	hasGap(sector) {
@@ -2016,10 +2016,10 @@ class RaceSpotter extends GridRaceAssistant {
 			this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, &focused, true)
 
 			if (standingsAhead && (standingsAhead != leader)) {
-				situation := ("AheadPitting " . standingsAhead.Car.ID . A_Space . standingsAhead.Car.LastLap)
+				situation := ("AheadPitting " . standingsAhead.Car.ID . A_Space)
 
-				if !this.TacticalAdvices.Has(situation) {
-					this.TacticalAdvices[situation] := true
+				if (!this.TacticalAdvices.Has(situation . standingsAhead.Car.LastLap) && !this.TacticalAdvices.Has(situation . (standingsAhead.Car.LastLap - 1))) {
+					this.TacticalAdvices[situation . standingsAhead.Car.LastLap] := true
 
 					speaker.speakPhrase("AheadPitting")
 
@@ -2030,10 +2030,10 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 
 			if focused {
-				situation := ("FocusPitting " . focused.Car.ID . A_Space . focused.Car.LastLap)
+				situation := ("FocusPitting " . focused.Car.ID . A_Space)
 
-				if !this.TacticalAdvices.Has(situation) {
-					this.TacticalAdvices[situation] := true
+				if (!this.TacticalAdvices.Has(situation . focused.Car.LastLap) && !this.TacticalAdvices.Has(situation . (focused.Car.LastLap - 1))) {
+					this.TacticalAdvices[situation . focused.Car.LastLap] := true
 
 					speaker.speakPhrase("FocusPitting", {indicator: this.getCarIndicatorFragment(speaker, focused.Car.Nr, focused.Car.Position["Class"])})
 
@@ -2042,10 +2042,10 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 
 			if standingsBehind {
-				situation := ("BehindPitting " . standingsBehind.Car.ID . A_Space . standingsBehind.Car.LastLap)
+				situation := ("BehindPitting " . standingsBehind.Car.ID . A_Space)
 
-				if !this.TacticalAdvices.Has(situation) {
-					this.TacticalAdvices[situation] := true
+				if (!this.TacticalAdvices.Has(situation . standingsBehind.Car.LastLap) && !this.TacticalAdvices.Has(situation . (standingsBehind.Car.LastLap - 1))) {
+					this.TacticalAdvices[situation . standingsBehind.Car.LastLap] := true
 
 					speaker.speakPhrase("BehindPitting")
 
@@ -2056,10 +2056,10 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 
 			if (leader && (leader.Car.ID != this.DriverCar.ID)) {
-				situation := ("LeaderPitting " . leader.Car.ID . A_Space . leader.Car.LastLap)
+				situation := ("LeaderPitting " . leader.Car.ID . A_Space)
 
-				if !this.TacticalAdvices.Has(situation) {
-					this.TacticalAdvices[situation] := true
+				if (!this.TacticalAdvices.Has(situation . leader.Car.LastLap) && !this.TacticalAdvices.Has(situation . (leader.Car.LastLap - 1))) {
+					this.TacticalAdvices[situation . leader.Car.LastLap] := true
 
 					speaker.speakPhrase("LeaderPitting")
 

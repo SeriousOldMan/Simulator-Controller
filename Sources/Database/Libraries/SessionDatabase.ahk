@@ -3233,7 +3233,7 @@ synchronizeTelemetries(groups, sessionDB, connector, simulators, timestamp, last
 
 											connector.SetDataValue("Document", identifier, "Info", printMultiMap(info))
 
-											sessionDB.writeTelemetryInfo(simulator, car, track, getMultiMapValue(info, "Telemetry", "Name", info))
+											sessionDB.writeTelemetryInfo(simulator, car, track, getMultiMapValue(info, "Telemetry", "Name"), info)
 										}
 										catch Any as exception {
 											logError(exception)

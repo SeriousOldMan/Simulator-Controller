@@ -387,7 +387,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local settingsDB := this.SettingsDatabase
 		local simulator, car, track, position, hasSectorTimes, laps, lapData, ignore, carData, standingsData
 		local collector, issues, handling, ignore, type, speed, where, issue, index
-		local key, value, text, filter, telemetry
+		local key, value, text, filter, telemetry, reference, command
 
 		static sessions := false
 
@@ -524,11 +524,18 @@ class DrivingCoach extends GridRaceAssistant {
 			case "Coaching":
 				if ((knowledgeBase || isDebug()) && this.CoachingActive && this.TelemetryAnalyzer && (Trim(this.Instructions["Coaching"]) != ""))
 					if (this.Mode = "Conversation") {
-						telemetry := this.getTelemetry()
+						telemetry := this.getTelemetry(&reference := true)
 
-						if telemetry
-							return substituteVariables(this.Instructions["Coaching"] . "`n`n%telemetry%"
-													 , {name: this.VoiceManager.Name, telemetry: telemetry.JSON})
+						if telemetry {
+							command := substituteVariables(this.Instructions["Coaching"] . "`n`n%telemetry%"
+														 , {name: this.VoiceManager.Name, telemetry: telemetry.JSON})
+
+							if reference
+								command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
+																	   , {telemetry: reference.JSON}))
+
+							return command
+						}
 					}
 					else
 						return this.Instructions["Coaching"]

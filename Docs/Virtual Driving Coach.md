@@ -249,7 +249,13 @@ Information: You can disable this instruction (and every other instruction as we
 
 2. [German version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Driving-Coach-Commands-(DE))
 
-Normally you will use free conversation to interact with Aiden as shown in the example above. But there are also a couple of predefined grammar based commands available, for example to enable or disable the processing of specific information (see below in the next section) or to start on-track coaching. You will always find the current version of the grammar files as actually used by the software in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [Resources\Grammars directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Driving Coach.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Driving%20Coach.grammars.de).
+3. [Spanish version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Driving-Coach-Commands-(ES))
+
+4. [French version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Driving-Coach-Commands-(FR))
+
+5. [Italian version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Driving-Coach-Commands-(IT))
+
+Normal you will use free conversation to interact with Aiden as shown in the example above. But there are also a couple of predefined grammar based commands available, for example to enable or disable the processing of specific information (see below in the next section). You will always find the current version of the grammar files as actually used by the software in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [Resources\Grammars directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Driving Coach.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Driving%20Coach.grammars.de).
 
 ### Enabling and disabling specific instructions and information processing 
 
@@ -333,10 +339,10 @@ The active coaching based on lap telemetry data deserves a more detailed explana
 		  "Curvature": -2.39,
 		  "Direction": "Right",
 		  "Entry": {
-			"ABSActivations": "7 Percent",
+			"ABSActivations": "Okay",
 			"BrakeCorrections": 0,
 			"BrakePressureRampUp": "35.2 Meter",
-			"BrakeSmoothness": "100 Percent",
+			"BrakeSmoothness": "Okay",
 			"Duration": "2.43 Seconds",
 			"Length": "207.6 Meter",
 			"MaxBrakePressure": "89 Percent",
@@ -353,7 +359,7 @@ The active coaching based on lap telemetry data deserves a more detailed explana
 			"Start": "16557.4 Meter",
 			"TCActivations": "24 Percent",
 			"ThrottleCorrections": 0,
-			"ThrottleSmoothness": "100 Percent"
+			"ThrottleSmoothness": "Okay"
 		  },
 		  "Length": "1021.4 Meter",
 		  "Nr": 2,
@@ -376,10 +382,10 @@ The active coaching based on lap telemetry data deserves a more detailed explana
 		  "Curvature": -2.68,
 		  "Direction": "Left",
 		  "Entry": {
-			"ABSActivations": "6 Percent",
+			"ABSActivations": "Okay",
 			"BrakeCorrections": 1,
 			"BrakePressureRampUp": "0.0 Meter",
-			"BrakeSmoothness": "91 Percent",
+			"BrakeSmoothness": "Okay",
 			"Duration": "1.44 Seconds",
 			"Length": "210.4 Meter",
 			"MaxBrakePressure": "82 Percent",
@@ -394,14 +400,14 @@ The active coaching based on lap telemetry data deserves a more detailed explana
 			"RPM": 5270,
 			"Speed": "132 km\/h",
 			"Start": "26615.9 Meter",
-			"TCActivations": "0 Percent",
+			"TCActivations": "Okay",
 			"ThrottleCorrections": 0,
-			"ThrottleSmoothness": "100 Percent"
+			"ThrottleSmoothness": "Okay"
 		  },
 		  "Length": "494.1 Meter",
 		  "Nr": 2,
 		  "SteeringCorrections": 0,
-		  "SteeringSmoothness": "100 Percent",
+		  "SteeringSmoothness": "Okay",
 		  "Time": "4.31 Seconds",
 		  "Type": "Corner"
 		},

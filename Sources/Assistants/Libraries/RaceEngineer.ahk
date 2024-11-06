@@ -2474,10 +2474,11 @@ class RaceEngineer extends RaceAssistant {
 				fact := ("Lap." . lapNumber . ".Damage.Bodywork." . position)
 				oldValue := knowledgeBase.getValue(fact, 0)
 
-				if (isNumber(oldValue) && isNumber(newValue) && (oldValue < newValue))
+				if (isNumber(oldValue) && isNumber(newValue) && (oldValue < newValue)) {
 					knowledgeBase.setFact(fact, newValue)
 
-				changed := (changed || (Round(oldValue) < Round(newValue)))
+					changed := true
+				}
 			}
 
 			if changed {
@@ -2495,10 +2496,11 @@ class RaceEngineer extends RaceAssistant {
 				fact := ("Lap." . lapNumber . ".Damage.Suspension." . position)
 				oldValue := knowledgeBase.getValue(fact, 0)
 
-				if (isNumber(oldValue) && isNumber(newValue) && (oldValue < newValue))
+				if (isNumber(oldValue) && isNumber(newValue) && (oldValue < newValue)) {
 					knowledgeBase.setFact(fact, newValue)
 
-				changed := (changed || (Round(oldValue) < Round(newValue)))
+					changed := true
+				}
 			}
 
 			if changed {
@@ -2510,8 +2512,9 @@ class RaceEngineer extends RaceAssistant {
 
 		newValue := Round(getMultiMapValue(data, "Car Data", "EngineDamage", 0), 1)
 		fact := ("Lap." . lapNumber . ".Damage.Engine")
+		oldValue := knowledgeBase.getValue(fact, 0)
 
-		if (knowledgeBase.getValue(fact, 0) < newValue) {
+		if (isNumber(newValue) && isNumber(oldValue) && (oldValue < newValue)) {
 			knowledgeBase.setFact(fact, newValue)
 
 			knowledgeBase.addFact("Damage.Update.Engine", lapNumber)

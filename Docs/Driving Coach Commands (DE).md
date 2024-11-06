@@ -57,6 +57,12 @@ Information=Session Information, Stint Information, Information zum Fahrverhalte
 	
 	[Nein {danke, jetzt nicht, nicht jetzt, ich melde mich später}, Auf keinen Fall]
 
+	[(KannstDu) (Mir) einen Witz erzählen, Bitte erzähl mir einen Witz, Hast du einen Witz für mich]
+
+	[Halt die Klappe, Ruhe bitte, Sei still bitte, Ich muss mich konzentrieren, (KannstDu) {ruhig sein, still sein, die Klappe halten}]
+
+	[Okay Du kannst sprechen, Ich kann {jetzt, wieder} zuhören, Du kannst {jetzt, wieder} sprechen]
+
 	[{Bitte beachte, Beachte} (Information) nicht mehr, {Bitte ignoriere, Ignoriere} (Information), Ignoriere (Information) bitte]
 
 	[{Beachte, Berücksichtige, Bitte beachte, Bitte berücksichtige} (Information) wieder, {Beachte wieder, Berücksichtige wieder, Bitte beachte wieder, Bitte berücksichtige wieder} (Information)]

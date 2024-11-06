@@ -67,6 +67,12 @@ Information=session information, stint information, handling information
 	
 	[No {thank you, not now, I will call you later}, Not at the moment, Negative]
 
+	[(CanYou) tell me a joke, Do you have a joke for me]
+
+	[Shut up, Silence please, Be quiet please, I must concentrate, I {need to, must} focus now]
+
+	[Okay you can talk, I can listen {now, again}, You can talk {now, again}, Keep me {informed, updated, up to date}]
+
 	[{Please do, Do} not {pay attention, investigate} (Information) anymore, {Please ignore, Ignore} (Information), Ignore (Information) please]
 
 	[{Please pay attention to, Pay attention to, Please investigate, Investigate} (Information) again, {Please take, Take} (Information) into {account, account please}]

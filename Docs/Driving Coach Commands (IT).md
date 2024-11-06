@@ -67,6 +67,12 @@ Information=informazioni sulla sessione, informazioni sul turno, informazioni su
 
 	[No {grazie, non ora, ti richiamerò più tardi}, Non al momento, Negativo]
 
+	[(CanYou) raccontarmi una barzelletta, Hai una barzelletta per me]
+
+	[Stai zitto, Silenzio per favore, Per favore fai silenzio, Devo concentrarmi, {Devo, devo} concentrarmi ora]
+	
+	[Ok puoi parlare, Posso ascoltare {ora, di nuovo}, Puoi parlare {ora, di nuovo}, Tienimi {informato, aggiornato, aggiornato}]
+
 	[Per favore niente più (Announcements), Niente più (Announcements), Niente più (Announcements) per favore]
 
 	[Per favore dammi (Announcements), Puoi darmi (Announcements), Puoi darmi (Announcements) per favore, Dammi (Announcements), Dammi (Announcements) per favore]

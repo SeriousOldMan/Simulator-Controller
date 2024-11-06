@@ -67,6 +67,12 @@ Information=informations sur la session, informations sur le relais, information
 
 	[Non {merci, pas maintenant, je vous appellerai plus tard}, Pas pour le moment, Négatif]
 
+	[(CanYou) me raconter une blague, As-tu une blague pour moi]
+
+	[Tais-toi, Silence s'il te plaît, Tais-toi s'il te plaît, Je dois me concentrer, Je {dois, dois} me concentrer maintenant]
+
+	[D'accord, Vous pouvez parler, Je peux écouter {maintenant, encore}, Vous pouvez parler {maintenant, encore}, Tenez-moi {informé, mis à jour, à jour}]
+
 	[{Veuillez le faire, Ne} plus {faire attention, enquêter} (Information), {Veuillez ignorer, Ignorer} (Information), Ignorer (Information) s'il vous plaît]
 
 	[{Veuillez faire attention à, Faites attention à, Veuillez enquêter, Enquêter} (Information) à nouveau, {Veuillez prendre, Prendre} (Information) dans {compte, compte s'il vous plaît}]

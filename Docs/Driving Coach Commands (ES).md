@@ -66,6 +66,12 @@ Information=Información de la sesión, Información de la Stint, Información d
 	
 	[No, No más tarde]
 	
+	[(CanYou) contarme un chiste, Te sabes algun chiste]
+	
+	[Silencio, Calla, para]
+	
+	[Habla, Te escucho {ahora, otra vez}, ya puedes hablar {ahora, otra vez}]
+	
 	[Nada de (Announcements)]
 	
 	[Dame (Announcements)]

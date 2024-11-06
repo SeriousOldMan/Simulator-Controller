@@ -344,7 +344,7 @@ class DrivingCoach extends GridRaceAssistant {
 			TelemetryAnalyzer.TCActivationsThreshold
 				:= getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.TCActivations", 20)
 			TelemetryAnalyzer.ABSActivationsThreshold
-				:= getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.ABSActivations", 20)
+				:= getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.ABSActivations", 30)
 			TelemetryAnalyzer.SteeringSmoothnessThreshold
 				:= getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.SteeringSmoothnessThreshold", 90)
 			TelemetryAnalyzer.ThrottleSmoothnessThreshold

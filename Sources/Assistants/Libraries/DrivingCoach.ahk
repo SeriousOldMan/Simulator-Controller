@@ -55,6 +55,7 @@ class DrivingCoach extends GridRaceAssistant {
 	iCoachingActive := false
 
 	iReferenceMode := "None"
+	iReferenceModeAuto := true
 	iLoadReference := false
 
 	iAvailableTelemetry := CaseInsenseMap()
@@ -337,7 +338,7 @@ class DrivingCoach extends GridRaceAssistant {
 	updateConfigurationValues(values) {
 		super.updateConfigurationValues(values)
 
-		if values.HasProp("Settings") {
+		if (values.HasProp("Settings") && this.iReferenceModeAuto) {
 			this.iReferenceMode := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference", "Fastest")
 			this.iLoadReference := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference.Database", false)
 
@@ -599,29 +600,49 @@ class DrivingCoach extends GridRaceAssistant {
 	handleVoiceCommand(grammar, words) {
 		switch grammar, false {
 			case "CoachingStart":
+				this.clearContinuation()
+
 				this.coachingStartRecognized(words)
 			case "CoachingFinish":
+				this.clearContinuation()
+
 				this.coachingFinishRecognized(words)
 			case "ReviewCorner":
+				this.clearContinuation()
+
 				if this.CoachingActive
 					this.reviewCornerRecognized(words)
 				else
 					this.handleVoiceText("TEXT", values2String(A_Space, words*))
 			case "ReviewLap":
+				this.clearContinuation()
+
 				if this.CoachingActive
 					this.reviewLapRecognized(words)
 				else
 					this.handleVoiceText("TEXT", values2String(A_Space, words*))
 			case "TrackCoachingStart":
+				this.clearContinuation()
+
 				if this.CoachingActive
 					this.trackCoachingStartRecognized(words)
 				else
 					this.handleVoiceText("TEXT", values2String(A_Space, words*))
 			case "TrackCoachingFinish":
+				this.clearContinuation()
+
 				if this.CoachingActive
 					this.trackCoachingFinishRecognized(words)
 				else
 					this.handleVoiceText("TEXT", values2String(A_Space, words*))
+			case "ReferenceLap":
+				this.clearContinuation()
+
+				this.referenceLapRecognized(words)
+			case "NoReferenceLap":
+				this.clearContinuation()
+
+				this.noReferenceLapRecognized(words)
 			default:
 				super.handleVoiceCommand(grammar, words)
 		}
@@ -713,6 +734,31 @@ class DrivingCoach extends GridRaceAssistant {
 		this.getSpeaker().speakPhrase("Okay")
 
 		this.shutdownTrackCoaching()
+	}
+
+	referenceLapRecognized(words) {
+		local speaker := this.getSpeaker()
+
+		if inList(words, speaker.Fragments["Fastest"])
+			this.iReferenceMode := "Fastest"
+		else if inList(words, speaker.Fragments["Last"])
+			this.iReferenceMode := "Last"
+		else {
+			speaker.speakPhrase("Later")
+
+			return
+		}
+
+		this.iReferenceModeAuto := false
+
+		speaker.speakPhrase("Roger")
+	}
+
+	noReferenceLapRecognized(words) {
+		this.getSpeaker().speakPhrase("Roger")
+
+		this.iReferenceMode := "None"
+		this.iReferenceModeAuto := false
 	}
 
 	handleVoiceText(grammar, text, reportError := true) {

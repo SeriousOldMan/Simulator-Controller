@@ -1080,7 +1080,7 @@ class Window extends Gui {
 						case "h":
 							h += Round((horizontal ? dw : dh) * factor)
 						default:
-							logError("Unknown variable detected in Resizre.Optimize...")
+							logError("Unknown variable detected in ControlResizer.Optimize...")
 					}
 				}
 

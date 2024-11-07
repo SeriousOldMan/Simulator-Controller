@@ -1,15 +1,15 @@
 [Development]
-Version=5.9.7.0-dev
+Version=5.9.7.0-release
 Target=5.9.7.0-release
-Date=11/06/2024
-Download=
+Date=11/08/2024
+Download=https://cutt.ly/EeG6NiUg;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.9.7.0-release.zip
 Changes=Handle out of screen controller previews in "Simulator Setup", Fixed orphane state file handling in "System Monitor", New voice commands for pressure loss, Fixed some duplicate messages by the Spotter, Configuration of track sections streamlined, Added documentation for all voice commands in all languages, Fixed sharing of lap telemetries on Team Server, Fixed reporting of suspension damage at the point of incident
 Components=Media->5.6.1,Configuration->5.9.1,Utilities->5.9.1
 [Release]
-Version=5.9.6.0-release
-Date=11/01/2024
-Download=https://cutt.ly/leFV6GcM;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.9.6.0-release.zip
-Changes=Fixed saving of imported telemetry outside of the database, Fixed track mapping and telemetry collection of narrow tracks, Preselect repair options in pitstop settings for repair pitstops, Track editor availability in "Session Database", Made "Solo Center" and "Team Center" more resilient against wrong session folder, Engineer announces session type
+Version=5.9.7.0-release
+Date=11/08/2024
+Download=https://cutt.ly/EeG6NiUg;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.9.7.0-release.zip
+Changes=Handle out of screen controller previews in "Simulator Setup", Fixed orphane state file handling in "System Monitor", New voice commands for pressure loss, Fixed some duplicate messages by the Spotter, Configuration of track sections streamlined, Added documentation for all voice commands in all languages, Fixed sharing of lap telemetries on Team Server
 Components=Media->5.6.1,Configuration->5.9.1,Utilities->5.9.1
 [Components]
 Media.5.6.1.Path=Resources
@@ -22,7 +22,7 @@ Utilities.5.9.1.Path=.
 Utilities.5.9.1.Content=Utilities
 Utilities.5.9.1.Download=https://www.dropbox.com/scl/fi/n3n5gajdhb1swegw46bp6/Utilities-5.9.1.zip?rlkey=sl8dbbf0gndpaqyj8g66by8o5&st=3ullp93q&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.9.1.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=5.9.7.0-dev
-Release=5.9.6.0-release
+Development=5.9.7.0-release
+Release=5.9.7.0-release

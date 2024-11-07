@@ -363,8 +363,8 @@ class Corner extends Section {
 				smoothness := nullRound(this.BrakeSmoothness)
 
 				descriptor.Entry := {Phase: "Braking"
-								   , Start: (Round(this.Start["Entry"], 1) . " Meter")
-								   , Length: (nullRound(this.Length["Entry"], 1) . " Meter")
+								   , BrakingPoint: (Round(this.Start["Entry"], 1) . " Meter from the start")
+								   , BrakingLength: (nullRound(this.Length["Entry"], 1) . " Meter")
 								   , Duration: (nullRound(this.Time["Entry"] / 1000, 2) . " Seconds")
 								   , MaxBrakePressure: (Round(this.MaxBrakePressure) . " Percent")
 								   , BrakePressureRampUp: (Round(this.BrakePressureRampUp, 1) . " Meter")
@@ -377,7 +377,7 @@ class Corner extends Section {
 
 			if (this.Start["Apex"] != kNull)
 				descriptor.Apex := {Phase: "Rolling"
-								  , Start: (Round(this.Start["Apex"], 1) . " Meter")
+								  , Start: (Round(this.Start["Apex"], 1) . " Meter from the start")
 								  , Length: (nullRound(this.Length["Apex"], 1) . " Meter")
 								  , Duration: (nullRound(this.Time["Apex"] / 1000, 2) . " Seconds")
 								  , Gear: this.RollingGear
@@ -393,8 +393,8 @@ class Corner extends Section {
 				smoothness := nullRound(this.ThrottleSmoothness)
 
 				descriptor.Exit := {Phase: "Accelerating"
-								  , Start: (Round(this.Start["Entry"], 1) . " Meter")
-								  , Length: (nullRound(this.Length["Exit"], 1) . " Meter")
+								  , AccelerationStart: (Round(this.Start["Entry"], 1) . " Meter from the start")
+								  , AccelerationLength: (nullRound(this.Length["Exit"], 1) . " Meter")
 								  , Duration: (nullRound(this.Time["Exit"] / 1000, 2) . " Seconds")
 								  , Gear: this.AcceleratingGear
 								  , RPM: this.AcceleratingRPM
@@ -1052,7 +1052,7 @@ class TelemetryAnalyzer {
 	static sSchema := false
 
 	static sTCActivationsThreshold := 20
-	static sABSThreshold := 20
+	static sABSActivationsThreshold := 30
 	static SteeringSmoothnessThreshold := 90
 	static sThrottleSmoothnessThreshold := 90
 	static sBrakeSmoothnessThreshold := 90

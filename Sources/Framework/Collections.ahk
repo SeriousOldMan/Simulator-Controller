@@ -14,6 +14,7 @@
 
 #Include "Strings.ahk"
 
+
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Classes Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
@@ -102,6 +103,7 @@ class CaseInsenseWeakMap extends WeakMap {
 		super.__New(arguments*)
 	}
 }
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Function Declaration Section                  ;;;

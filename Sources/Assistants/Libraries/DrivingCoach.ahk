@@ -770,9 +770,10 @@ class DrivingCoach extends GridRaceAssistant {
 
 	handleVoiceText(grammar, text, reportError := true) {
 		local answer := false
-		local ignore, part
+		local ignore, part, telemetry, reference, folder
 
 		static report := true
+		static conversationNr := 1
 
 		try {
 			if (this.Speaker && this.Options["Driving Coach.Confirmation"] && (this.ConnectionState = "Active"))
@@ -783,8 +784,33 @@ class DrivingCoach extends GridRaceAssistant {
 
 			answer := this.Connector.Ask(text)
 
-			if answer
+			if answer {
 				report := true
+
+				if (this.CoachingActive && !InStr(kVersion, "-release")) {
+					if !FileExist(kTempDirectory . "Driving Coach\Conversations")
+						conversationNr := 1
+
+					DirCreate(kTempDirectory . "Driving Coach\Conversations")
+
+					folder := (kTempDirectory . "Driving Coach\Conversations\" . Format("{:03}", conversationNr) . "\")
+
+					DirCreate(folder)
+
+					telemetry := telemetry := this.getTelemetry(&reference := true)
+
+					if telemetry {
+						FileAppend(telemetry.JSON, folder . "Telemetry.JSON")
+
+						if reference
+							FileAppend(reference.JSON, folder . "Reference.JSON")
+					}
+
+					FileAppend(translate("-- Driver --------") . "`n`n" . text . "`n`n" . translate("-- Coach ---------") . "`n`n" . answer . "`n`n", folder . "Conversation.txt", "UTF-16")
+
+					conversationNr += 1
+				}
+			}
 			else if (this.Speaker && report) {
 				if reportError
 					this.getSpeaker().speakPhrase("Later", false, false, false, {Noise: false})
@@ -1129,6 +1155,9 @@ class DrivingCoach extends GridRaceAssistant {
 		if (!this.TelemetryCollector && this.Simulator && this.Track && ((this.TrackLength > 0) || isDebug())) {
 			DirCreate(kTempDirectory . "Driving Coach")
 			DirCreate(kTempDirectory . "Driving Coach\Telemetry")
+			DirCreate(kTempDirectory . "Driving Coach\Conversations")
+
+			deleteDirectory(kTempDirectory . "Driving Coach\Conversations")
 
 			if !isDebug() {
 				deleteDirectory(kTempDirectory . "Driving Coach\Telemetry")

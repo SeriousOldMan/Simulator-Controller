@@ -122,3 +122,7 @@ Announcements=Benzinmangel Warnungen, Schadenswarnungen, Schadensanalysen, Wette
 	[(KannstDu) die Verkleidung {reparieren, reparieren bitte}, (KannstDu) die Verkleidung {bitte nicht, nicht} {reparieren, reparieren bitte}]
 	
 	[(KannstDu) den Motor {reparieren, reparieren bitte}, (KannstDu) den Motor {bitte nicht, nicht} {reparieren, reparieren bitte}]
+	
+	[(KoennenWir) den {Druckverlust, Druckverlust in den Reifen} {kompensieren, bitte kompensieren, berücksichtigen, bitte berücksichtigen}, {Bitte kompensiere, Kompensiere, Berücksichtige, Bitte berücksichtige} den {Druckverlust, Druckverlust in den Reifen}]
+	
+	[(KoennenWir) den {Druckverlust, Druckverlust in den Reifen} {nicht kompensieren, bitte nicht kompensieren}, {Bitte den, Den} {Druckverlust, Druckverlust in den Reifen} {nicht kompensieren, bitte nicht kompensieren}]

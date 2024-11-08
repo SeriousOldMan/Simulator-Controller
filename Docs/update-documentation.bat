@@ -36,6 +36,18 @@ copy "Driving Coach Commands (DE).md" ..\..\Controller.Wiki\Driving-Coach-Comman
 copy "Race Engineer Commands (DE).md" ..\..\Controller.Wiki\Race-Engineer-Commands-(DE).md
 copy "Race Strategist Commands (DE).md" ..\..\Controller.Wiki\Race-Strategist-Commands-(DE).md
 copy "Race Spotter Commands (DE).md" ..\..\Controller.Wiki\Race-Spotter-Commands-(DE).md
+copy "Driving Coach Commands (FR).md" ..\..\Controller.Wiki\Driving-Coach-Commands-(FR).md
+copy "Race Engineer Commands (FR).md" ..\..\Controller.Wiki\Race-Engineer-Commands-(FR).md
+copy "Race Strategist Commands (FR).md" ..\..\Controller.Wiki\Race-Strategist-Commands-(FR).md
+copy "Race Spotter Commands (FR).md" ..\..\Controller.Wiki\Race-Spotter-Commands-(FR).md
+copy "Driving Coach Commands (ES).md" ..\..\Controller.Wiki\Driving-Coach-Commands-(ES).md
+copy "Race Engineer Commands (ES).md" ..\..\Controller.Wiki\Race-Engineer-Commands-(ES).md
+copy "Race Strategist Commands (ES).md" ..\..\Controller.Wiki\Race-Strategist-Commands-(ES).md
+copy "Race Spotter Commands (ES).md" ..\..\Controller.Wiki\Race-Spotter-Commands-(ES).md
+copy "Driving Coach Commands (IT).md" ..\..\Controller.Wiki\Driving-Coach-Commands-(IT).md
+copy "Race Engineer Commands (IT).md" ..\..\Controller.Wiki\Race-Engineer-Commands-(IT).md
+copy "Race Strategist Commands (IT).md" ..\..\Controller.Wiki\Race-Strategist-Commands-(IT).md
+copy "Race Spotter Commands (IT).md" ..\..\Controller.Wiki\Race-Spotter-Commands-(IT).md
 copy "Race Settings.md" ..\..\Controller.Wiki\Race-Settings.md
 copy "Keyboard Modifiers.md" ..\..\Controller.Wiki\Keyboard-Modifiers.md
 copy "Core Configuration.md" ..\..\Controller.Wiki\Core-Configuration.md

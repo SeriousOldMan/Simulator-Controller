@@ -110,6 +110,14 @@ Telemetry data for individual laps can be stored in the session database, for ex
 
 You can use the buttons below the list to upload, download, rename or delete lap telemetry data, but in most cases you will use the ["Solo Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center), the ["Team Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center) or the ["Setup Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench) to record the telemetry data and store it in the database. Once you have selected telemetry data in the list above, you can decide whether you want to share it potentially with the community (if you have given consent to share telemetry data - see the information about community data at the end of this chapter) and/or whether you want to synchronize the lap telemetry with any of the [connected Team Servers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration) (see below).
 
+##### Naming conventions
+
+Although technically not strictly necessary, it would be benificial that everybody who contributes to the lap telemetry collection will follow the same naming conventions. Therefore, I dare to propose a naming scheme here:
+
+[Nickname] [Laptime] [Date]
+
+with *Laptime* in Seconds and *Date* in YYYYMMDD format. Example: "TBO 104.5 20241101"
+
 ##### Telemetry Viewer
 
 If a lap is double clicked, the Telemetry Viewer will open up and let you examine the given telemetry data.
@@ -165,6 +173,14 @@ This tab shows you a list of race stratagies, which are stored in the database. 
 You can use the buttons below the list to upload, download, rename or delete a strategy, but in most cases you will use the ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench) to create a strategy and store it in the database. Once you have selected a strategy in the list above, you can decide whether you want to share this strategy potentially with the community (if you have given consent to share strategies - see the information about community data at the end of this chapter) and/or whether you want to synchronize the strategy with any of the [connected Team Servers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration) (see below).
 
 Good to know: Strategies can be opened in the "Strategy Workbench" by double-clicking them.
+
+##### Naming conventions
+
+Although technically not strictly necessary, it would be benificial that everybody who contributes to the strategy collection will follow the same naming conventions. Therefore, I dare to propose a naming scheme here:
+
+[Nickname] [Format] ( ... )
+
+with *Format* something like "144M", "6H", "30L", and so on, followed by additional information enclosed in paranthesis. Example: "TBO 6H (65M stint timer, 4 tyre sets)"
 
 #### Setups
 

@@ -1,3 +1,13 @@
+## 5.9.7.0-release 11/08/24
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. A bug has been fixed for the Spotter, which caused information about pitstops or lap times of the opponents to be issued more than once.
+  4. Fixed a bug that prevented sharing of lap telemtry data on the Team Server.
+  5. "Simulator Setup" can now handle more preview windows for Button Boxes and Stream Decks than can fit on the screen vertically.
+  6. The Race Engineer now allow you to enable / disable the handling of pressure loss for the next pitstop using new voice commands.
+  7. Documentation for the voice commands of all Assistants has been added for all supported languages. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#list-of-all-voice-commands) for an example.
+  8. [Internal] Fixed orphane state file handling in "System Monitor".
+
 ## 5.9.6.0-release 11/01/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

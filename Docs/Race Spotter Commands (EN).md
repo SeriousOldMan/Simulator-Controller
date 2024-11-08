@@ -1,4 +1,4 @@
-Below you will find a complete list of all voice commands recognized by Cat, the Virtual Race Strategist together with a short introduction into the syntax of the phrase grammars.
+Below you will find a complete list of all voice commands recognized by Cat, the Virtual Race Spotter together with a short introduction into the syntax of the phrase grammars.
 
 ## Syntax
 
@@ -25,7 +25,7 @@ Below you will find a complete list of all voice commands recognized by Cat, the
    
 		{ pressures, tyre pressures }
 
-   If a given list of choices is used in several phrases, a variable may be defined for it and a variable reference (the name of the choices list enclosed by **(** and **)**) may be used instead of explicit syntax. All predefined choices are listed in the section "[Choices]" of the [grammar file]](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Assistants/Grammars/Race%20Spotter.grammars.en) and look like this:
+   If a given list of choices is used in several phrases, a variable may be defined for it and a variable reference (the name of the choices list enclosed by **(** and **)**) may be used instead of explicit syntax. All predefined choices are listed in the section "[Choices]" of the [grammar file](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Assistants/Grammars/Race%20Spotter.grammars.en) and look like this:
 
 		TellMe=Can you tell me, Please tell me, Tell me, Can you give me, Please give me, Give me
 

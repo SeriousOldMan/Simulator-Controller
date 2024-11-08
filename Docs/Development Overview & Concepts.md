@@ -364,7 +364,7 @@ Voice commands are defined using a kind of rule based grammar. Please read the i
 	GreetingEngineer.2=Hier ist %name%. Ich kümmere mich heute um Deinen Wagen.
 	GreetingEngineer.3=Hier ist %name%.
 
-Every phrase spoken by an Assistant has a unique name, "GreetingEngineer" in this example. You can supply alternatives by appending a dot and a number to the speech name. Thos numbers must start with *1* and must be consecutive without any gap. You may use variables in the phrase. %driver% and %name% (the name of the Assistant) are always available, other variables are specific for a given phrase. Those variables may not be translated, of course.
+Every phrase spoken by an Assistant has a unique name, "GreetingEngineer" in this example. You can supply alternatives by appending a dot and a number to the speech name. Those numbers must start with *1* and must be consecutive without any gap. You may use variables in the phrase. %driver% and %name% (the name of the Assistant) are always available, other variables are specific for a given phrase. Those variables may not be translated, of course.
 
 #### Modularization of grammar files
 

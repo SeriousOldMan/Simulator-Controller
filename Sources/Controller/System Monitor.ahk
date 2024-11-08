@@ -46,6 +46,9 @@ global kOk := "Ok"
 global kCancel := "Cancel"
 global kClose := "Close"
 
+global kStateFiles := concatenate(["Simulator Controller", "Database Synchronizer", "Track Mapper"]
+								, kRaceAssistants, collect(kRaceAssistants, (a) => (a . " Session")))
+
 global kStateIcons := CaseInsenseMap("Disabled", kIconsDirectory . "Black.ico"
 								   , "Passive", kIconsDirectory . "Gray.ico"
 								   , "Active", kIconsDirectory . "Green.ico"
@@ -2037,18 +2040,23 @@ clearOrphaneStateFiles() {
 			excludedFiles.Push(kTempDirectory . assistant . ".state")
 	}
 
-	for ignore, fileName in getFileNames("*.state", kTempDirectory)
-		if !inList(excludedFiles, fileName) {
-			if !stateFiles.Has(fileName)
-				stateFiles[fileName] := 0
+	for ignore, fileName in getFileNames("*.state", kTempDirectory) {
+		SplitPath(fileName, , , , &name)
+	
+		if inList(kStateFiles, name) {
+			if !inList(excludedFiles, fileName) {
+				if !stateFiles.Has(fileName)
+					stateFiles[fileName] := 0
 
-			modTime := FileGetTime(fileName, "M")
+				modTime := FileGetTime(fileName, "M")
 
-			if (stateFiles[fileName] != modTime)
-				stateFiles[fileName] := modTime
-			else
-				deleteFile(fileName)
+				if (stateFiles[fileName] != modTime)
+					stateFiles[fileName] := modTime
+				else
+					deleteFile(fileName)
+			}
 		}
+	}
 }
 
 startupSystemMonitor() {
@@ -2065,8 +2073,10 @@ startupSystemMonitor() {
 		deleteFile(kTempDirectory . "Database Synchronizer.state")
 		deleteFile(kTempDirectory . "Track Mapper.state")
 
-		for ignore, assistant in kRaceAssistants
+		for ignore, assistant in kRaceAssistants {
+			deleteFile(kTempDirectory . assistant . ".state")
 			deleteFile(kTempDirectory . assistant . " Session.state")
+		}
 
 		PeriodicTask(clearOrphaneStateFiles, 60000, kLowPriority).start()
 

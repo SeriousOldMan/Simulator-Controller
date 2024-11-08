@@ -237,6 +237,12 @@ Information: You can disable this instruction (and every other instruction as we
 
 2. [German version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Driving-Coach-Commands-(DE))
 
+3. [Spanish version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Driving-Coach-Commands-(ES))
+
+4. [French version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Driving-Coach-Commands-(FR))
+
+5. [Italian version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Driving-Coach-Commands-(IT))
+
 Normal you will use free conversation to interact with Aiden as shown in the example above. But there are also a couple of predefined grammar based commands available, for example to enable or disable the processing of specific information (see below in the next section). You will always find the current version of the grammar files as actually used by the software in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [Resources\Grammars directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Driving Coach.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Driving%20Coach.grammars.de).
 
 ### Enabling and disabling specific instructions and information processing 

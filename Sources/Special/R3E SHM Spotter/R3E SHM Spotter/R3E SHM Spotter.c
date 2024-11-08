@@ -1936,9 +1936,7 @@ int main(int argc, char* argv[])
 				wait = TRUE;
 		}
         
-		if (carTelemetry)
-			Sleep(10);
-		else if (analyzeTelemetry || positionTrigger)
+		if (carTelemetry || analyzeTelemetry || positionTrigger)
 			Sleep(10);
 		else if (wait)
 			Sleep(50);

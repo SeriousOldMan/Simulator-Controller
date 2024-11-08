@@ -1736,9 +1736,7 @@ int main(int argc, char* argv[]) {
 			else
 				wait = true;
 
-			if (carTelemetry)
-				Sleep(20);
-			else if (analyzeTelemetry || positionTrigger)
+			if (carTelemetry || analyzeTelemetry || positionTrigger)
 				Sleep(10);
 			else if (wait)
 				Sleep(50);

@@ -76,6 +76,10 @@ Information=Información de la sesión, Información de la Stint, Información d
 	
 	[Dame (Announcements)]
 
+2.  Información
+
+	[(TellMe) decirme la hora, Que hora es, Cual es la {hora actual, hora}]
+
 #### Conversación
 
 Utilizarás una conversación gratuita con el Driving Coach en su mayor parte. Por lo tanto, cada comando de voz que no coincida con ninguno de los comandos mostrados anteriormente se reenviará al modelo de lenguaje GPT, lo que dará como resultado un cuadro de diálogo similar al de un humano como se muestra en el [ejemplo](https://github.com/ SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#a-typical-dialog).

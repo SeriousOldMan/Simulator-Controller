@@ -77,6 +77,10 @@ Information=session information, stint information, handling information
 
 	[{Please pay attention to, Pay attention to, Please investigate, Investigate} (Information) again, {Please take, Take} (Information) into {account, account please}]
 
+2.  Information
+
+	[(TellMe) the time, What time is it, What is the {current time, time}]
+
 #### Conversation
 
 You will use a free conversation with the Driving Coach for the most part. Therefore, every voice command, that does not match any of the commands shown above will be forwarded to the GPT language model, which will result in a human-like dialog as shown in the [example](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#a-typical-dialog).

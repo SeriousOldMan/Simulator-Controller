@@ -201,6 +201,7 @@ class DatabaseCreator {
 
 	loadLapTelemetry(simulator, car, track, telemetryFile) {
 		local directory := this.TargetDirectory
+		local info, newInfo
 
 		if this.IncludeTelemetries {
 			updateProgress("Telemetries: " . simulator . " / " . car . " / " . track . "...")
@@ -208,6 +209,24 @@ class DatabaseCreator {
 			DirCreate(directory . "Community\" . simulator . "\" . car . "\" . track . "\Lap Telemetries")
 
 			FileCopy(telemetryFile, directory . "Community\" . simulator . "\" . car . "\" . track . "\Lap Telemetries", 1)
+
+			if FileExist(telemetryFile . ".info") {
+				info := readMultiMap(telemetryFile . ".info")
+				newInfo := newMultiMap()
+
+				setMultiMapValue(newInfo, "Info", "Driver", "John Doe")
+
+				if getMultiMapValue(info, "Lap", "LapTime", false)
+					setMultiMapValue(newInfo, "Info", "LapTime", getMultiMapValue(info, "Lap", "LapTime"))
+
+				if getMultiMapValue(info, "Lap", "SectorTimes", false)
+					setMultiMapValue(newInfo, "Info", "SectorTimes", getMultiMapValue(info, "Lap", "SectorTimes"))
+
+				SplitPath(telemetryFile, &telemetryFile)
+
+				writeMultiMap(directory . "Community\" . simulator . "\" . car . "\" . track . "\Lap Telemetries\" . telemetryFile . ".info"
+							, newInfo)
+			}
 		}
 	}
 

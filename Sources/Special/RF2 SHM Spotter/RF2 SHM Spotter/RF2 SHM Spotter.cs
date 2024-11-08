@@ -1986,9 +1986,7 @@ namespace RF2SHMSpotter {
                         else
                             wait = true;
 
-						if (carTelemetry)
-                            Thread.Sleep(20);
-                        else if (analyzeTelemetry || positionTrigger)
+						if (carTelemetry || analyzeTelemetry || positionTrigger)
                             Thread.Sleep(10);
                         else if (wait)
 							Thread.Sleep(50);

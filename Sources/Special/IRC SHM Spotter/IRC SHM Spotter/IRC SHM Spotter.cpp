@@ -2350,13 +2350,9 @@ int main(int argc, char* argv[])
 				delete g_data;
 		}
 
-		if (carTelemetry)
-			Sleep(20);
-		else if (analyzeTelemetry)
-			Sleep(10);
-		else if (mapTrack)
+		if (mapTrack)
 			Sleep(1);
-		else if (positionTrigger)
+		else if (carTelemetry || analyzeTelemetry || positionTrigger)
 			Sleep(10);
 		else if (wait)
 			Sleep(50);

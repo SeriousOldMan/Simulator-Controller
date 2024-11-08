@@ -1216,9 +1216,18 @@ class TelemetryViewer {
 
 				DirCreate(this.TelemetryDirectory . "Imported")
 
-				FileCopy(fileName, this.TelemetryDirectory . "Imported\Lap " . getMultiMapValue(info, "Info", "Lap") . ".telemetry", 1)
+				if getMultiMapValue(info, "Info", "Lap", false) {
+					FileCopy(fileName, this.TelemetryDirectory . "Imported\Lap " . getMultiMapValue(info, "Info", "Lap") . ".telemetry", 1)
 
-				fileName := (this.TelemetryDirectory . "Imported\Lap " . getMultiMapValue(info, "Info", "Lap") . ".telemetry")
+					fileName := (this.TelemetryDirectory . "Imported\Lap " . getMultiMapValue(info, "Info", "Lap") . ".telemetry")
+				}
+				else {
+					SplitPath(fileName, , , , &name)
+
+					FileCopy(fileName, this.TelemetryDirectory . "Imported\" . name . ".telemetry", 1)
+
+					fileName := (this.TelemetryDirectory . "Imported\" . name . ".telemetry")
+				}
 			}
 
 			if (fileName && (fileName != "")) {
@@ -1553,7 +1562,7 @@ class TelemetryViewer {
 			sectorTimes := lap[4]
 		}
 
-		if (!InStr(driver, "John Doe") && (lapTime != "-"))
+		if (lapTime != "-")
 			return (theLap . translate(":") . A_Space . driver . translate(" - ") . lapTimeDisplayValue(lapTime) . ((sectorTimes.Length > 0) ? (A_Space . translate("[") . values2String(", ", collect(sectorTimes, lapTimeDisplayValue)*) . translate("]")) : ""))
 		else if !InStr(driver, "John Doe")
 			return (theLap . translate(":") . A_Space . driver)

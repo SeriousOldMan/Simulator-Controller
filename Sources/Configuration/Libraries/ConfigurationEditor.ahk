@@ -174,11 +174,15 @@ class ConfigurationEditor extends ConfigurationItem {
 	}
 
 	getSimulatorConfiguration() {
-		local configuration := newMultiMap()
+		if this.Window {
+			local configuration := newMultiMap()
 
-		this.saveToConfiguration(configuration)
+			this.saveToConfiguration(configuration)
 
-		return configuration
+			return configuration
+		}
+		else
+			return this.Configuration
 	}
 
 	registerConfigurator(label, configurator, documentation := false) {

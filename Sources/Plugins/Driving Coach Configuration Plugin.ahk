@@ -359,17 +359,28 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 	initializeInstructions(provider, model, setting, edit := false) {
 		local providerConfiguration := this.iProviderConfigurations[provider]
-		local language, value, instructions
+		local language, value, instructions, thePlugin, configuration
 
 		value := (edit ? this.Value[setting] : providerConfiguration[setting])
 
 		if (value = "") {
-			if isSet(SetupWizard)
-				language := SetupWizard.Instance.getModuleValue("Driving Coach", "Language", getLanguage())
-			else if isSet(VoiceControlConfigurator)
-				language := VoiceControlConfigurator.Instance.getCurrentLanguage()
-			else
-				language := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Language", getLanguage())
+			try {
+				configuration := ConfigurationEditor.Instance.getSimulatorConfiguration()
+
+				if isSet(SetupWizard)
+					language := SetupWizard.Instance.getModuleValue("Driving Coach", "Language", getLanguage())
+				else if isSet(ConfigurationEditor)
+					language := Plugin("Driving Coach", ConfigurationEditor.Instance.getSimulatorConfiguration()).getArgumentValue("raceAssistantLanguage", getLanguage())
+				else if isSet(VoiceControlConfigurator)
+					language := VoiceControlConfigurator.Instance.getCurrentLanguage()
+				else
+					language := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Language", getLanguage())
+			}
+			catch Any as exception {
+				logError(exception)
+
+				language := getLanguage()
+			}
 
 			if edit
 				this.Value[setting] := getMultiMapValue(this.Templates[this.Templates.Has(language) ? language : "EN"], "Instructions", StrReplace(setting, "Instructions.", ""))

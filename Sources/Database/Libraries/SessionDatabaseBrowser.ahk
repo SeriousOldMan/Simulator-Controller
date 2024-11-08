@@ -26,9 +26,8 @@
 
 browseLapTelemetries(ownerOrCommand := false, arguments*) {
 	local x, y, names, ignore, infos, index, name, dirName, driverName
-	local carNames, trackNames, newSimulator, newCar, newTrack, force
-	local userTelemetries, communityTelemetries, info
-	local command, fileNames
+	local carNames, trackNames, newSimulator, newCar, newTrack, newSourceType, force
+	local userTelemetries, communityTelemetries, info, command, fileNames
 
 	static sessionDB := false
 
@@ -45,6 +44,8 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 	static car := false
 	static track := false
 
+	static sourceType := "User"
+
 	selectSimulator(*) {
 		try
 			browseLapTelemetries("ChooseSimulator", simulators[browserGui["simulatorDropDown"].Value])
@@ -58,6 +59,11 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 	selectTrack(*) {
 		try
 			browseLapTelemetries("ChooseTrack", tracks[browserGui["trackDropDown"].Value])
+	}
+
+	selectSource(*) {
+		try
+			browseLapTelemetries("ChooseSource", ["User", "Community"][browserGui["sourceTypeDropDown"].Value])
 	}
 
 	if ((ownerOrCommand == kOk) || (ownerOrCommand == kCancel))
@@ -176,32 +182,35 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 			if track {
 				browserGui["trackDropDown"].Choose(inList(tracks, track))
 
-				sessionDB.getTelemetryNames(simulator, car, track, &userTelemetries := true
-																 , &communityTelemetries := sessionDB.UseCommunity)
+				if (sourceType = "User") {
+					sessionDB.getTelemetryNames(simulator, car, track, &userTelemetries := true, &ignore := false)
 
-				for ignore, name in userTelemetries {
-					info := sessionDB.readTelemetryInfo(simulator, car, track, name)
+					for ignore, name in userTelemetries {
+						info := sessionDB.readTelemetryInfo(simulator, car, track, name)
 
-					if getMultiMapValue(info, "Telemetry", "Driver", false)
-						driverName := SessionDatabase.getDriverName(simulator, getMultiMapValue(info, "Telemetry", "Driver"))
-					else
-						driverName := false
+						if getMultiMapValue(info, "Telemetry", "Driver", false)
+							driverName := SessionDatabase.getDriverName(simulator, getMultiMapValue(info, "Telemetry", "Driver"))
+						else
+							driverName := false
 
-					if !driverName
-						driverName := getMultiMapValue(info, "Telemetry", "Driver")
+						if !driverName
+							driverName := getMultiMapValue(info, "Telemetry", "Driver")
 
-					if !driverName
-						driverName := SessionDatabase.getUserName()
+						if !driverName
+							driverName := SessionDatabase.getUserName()
 
-					browserGui["telemetryListView"].Add("", name, driverName
-														  , FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "ShortDate") . translate(" - ")
-														  . FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "Time"))
+						browserGui["telemetryListView"].Add("", name, driverName
+															  , FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "ShortDate") . translate(" - ")
+															  . FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "Time"))
+					}
 				}
+				else {
+					sessionDB.getTelemetryNames(simulator, car, track, &userTelemetries := true, &communityTelemetries := true)
 
-				if sessionDB.UseCommunity
 					for ignore, name in communityTelemetries
 						if !inList(userTelemetries, name)
 							browserGui["telemetryListView"].Add("", name, translate("Community"), translate("-"))
+				}
 
 				if (browserGui["telemetryListView"].GetCount() > 1)
 					browserGui["telemetryListView"].Modify(1, "Select +Vis")
@@ -213,11 +222,25 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 			}
 		}
 	}
+	else if (ownerOrCommand = "ChooseSource") {
+		newSourceType := arguments[1]
+		force := ((arguments.Length > 1) ? arguments[2] : false)
+
+		if (force || (newSourceType != sourceType)) {
+			sourceType := newSourceType
+
+			browserGui["sourceTypeDropDown"].Choose(inList(["User", "Community"], sourceType))
+
+			browseLapTelemetries("ChooseTrack", tracks[browserGui["trackDropDown"].Value], true)
+		}
+	}
 	else {
 		fileName := false
 
 		sessionDB := SessionDatabase()
 		simulators := sessionDB.getSimulators()
+
+		sourceType := "User"
 
 		result := false
 
@@ -234,6 +257,9 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 
 		browserGui.Add("Text", "x8 yp+24 w70 h23 +0x200", translate("Track"))
 		browserGui.Add("DropDownList", "x90 yp w275 vtrackDropDown").OnEvent("Change", selectTrack)
+
+		browserGui.Add("Text", "x8 yp+30 w70 h23 +0x200", translate("Source"))
+		browserGui.Add("DropDownList", "x90 yp w275 Choose1 vsourceTypeDropDown", collect(["User", "Community"], translate)).OnEvent("Change", selectSource)
 
 		browserGui.Add("ListView", "x8 yp+30 w357 h335 +Multi -LV0x10 AltSubmit vtelemetryListView", collect(["Telemetry", "Driver", "Date"], translate))
 		browserGui["telemetryListView"].OnEvent("DoubleClick", browseLapTelemetries.Bind(kOk))
@@ -285,6 +311,7 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 				}
 				else {
 					fileNames := []
+					infos := []
 
 					index := 0
 
@@ -293,15 +320,22 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 								   . browserGui["telemetryListView"].GetText(index) . ".telemetry")
 							fileNames.Push(sessionDB.getTelemetryDirectory(simulator, car, track, "User")
 										 . browserGui["telemetryListView"].GetText(index) . ".telemetry")
-						else
+						else {
 							fileNames.Push(sessionDB.getTelemetryDirectory(simulator, car, track, "Community")
 										 . browserGui["telemetryListView"].GetText(index) . ".telemetry")
+
+							infos.Push(sessionDB.getTelemetryDirectory(simulator, car, track, "Community")
+									 . browserGui["telemetryListView"].GetText(index) . ".telemetry.info")
+						}
 					}
 
 					if (fileNames.Length > 0) {
 						%arguments[1]% := simulator
 						%arguments[2]% := car
 						%arguments[3]% := track
+
+						if ((infos.Length > 0) && (arguments.Length > 3))
+							%arguments[4]% := infos
 
 						return fileNames
 					}
@@ -794,7 +828,7 @@ browseTeamSessions(ownerOrCommand := false, arguments*) {
 
 browseStrategies(ownerOrCommand := false, arguments*) {
 	local x, y, names, infos, index, name, driverName
-	local carNames, trackNames, newSimulator, newCar, newTrack, force, dirName
+	local carNames, trackNames, newSimulator, newCar, newTrack, newSourceType, force, dirName
 	local userStrategies, communityStrategies
 
 	static sessionDB := false
@@ -814,6 +848,8 @@ browseStrategies(ownerOrCommand := false, arguments*) {
 
 	static fileName := false
 
+	static sourceType := "User"
+
 	selectSimulator(*) {
 		try
 			browseStrategies("ChooseSimulator", simulators[browserGui["simulatorDropDown"].Value])
@@ -827,6 +863,11 @@ browseStrategies(ownerOrCommand := false, arguments*) {
 	selectTrack(*) {
 		try
 			browseStrategies("ChooseTrack", tracks[browserGui["trackDropDown"].Value])
+	}
+
+	selectSource(*) {
+		try
+			browseStrategies("ChooseSource", ["User", "Community"][browserGui["sourceTypeDropDown"].Value])
 	}
 
 	if ((ownerOrCommand == kOk) || (ownerOrCommand == kCancel))
@@ -919,21 +960,27 @@ browseStrategies(ownerOrCommand := false, arguments*) {
 			if track {
 				browserGui["trackDropDown"].Choose(inList(tracks, track))
 
-				sessionDB.getStrategyNames(simulator, car, track, &userStrategies := true
-																, &communityStrategies := sessionDB.UseCommunity)
+				if (sourceType = "User") {
+					sessionDB.getStrategyNames(simulator, car, track, &userStrategies := true, &ignore := false)
 
-				names := userStrategies
-				strategyTypes := []
+					names := userStrategies
+					strategyTypes := []
 
-				loop names.Length
-					strategyTypes.Push("User")
+					loop names.Length
+						strategyTypes.Push("User")
+				}
+				else {
+					sessionDB.getStrategyNames(simulator, car, track, &userStrategies := true, &communityStrategies := true)
 
-				if sessionDB.UseCommunity
-					for index, name in communityStrategies
-						if !inList(names, name) {
+					names := []
+					strategyTypes := []
+
+					for ignore, name in communityStrategies
+						if !inList(userStrategies, name) {
 							names.Push(name)
 							strategyTypes.Push("Community")
 						}
+				}
 
 				for index, name in names
 					browserGui["strategyListView"].Add("", name)
@@ -948,9 +995,23 @@ browseStrategies(ownerOrCommand := false, arguments*) {
 			}
 		}
 	}
+	else if (ownerOrCommand = "ChooseSource") {
+		newSourceType := arguments[1]
+		force := ((arguments.Length > 1) ? arguments[2] : false)
+
+		if (force || (newSourceType != sourceType)) {
+			sourceType := newSourceType
+
+			browserGui["sourceTypeDropDown"].Choose(inList(["User", "Community"], sourceType))
+
+			browseStrategies("ChooseTrack", tracks[browserGui["trackDropDown"].Value], true)
+		}
+	}
 	else {
 		sessionDB := SessionDatabase()
 		simulators := sessionDB.getSimulators()
+
+		sourceType := "User"
 
 		fileName := false
 		result := false
@@ -968,6 +1029,9 @@ browseStrategies(ownerOrCommand := false, arguments*) {
 
 		browserGui.Add("Text", "x8 yp+24 w70 h23 +0x200", translate("Track"))
 		browserGui.Add("DropDownList", "x90 yp w275 vtrackDropDown").OnEvent("Change", selectTrack)
+
+		browserGui.Add("Text", "x8 yp+30 w70 h23 +0x200", translate("Source"))
+		browserGui.Add("DropDownList", "x90 yp w275 Choose1 vsourceTypeDropDown", collect(["User", "Community"], translate)).OnEvent("Change", selectSource)
 
 		browserGui.Add("ListView", "x8 yp+30 w357 h335 -Multi -LV0x10 AltSubmit vstrategyListView", collect(["Strategy"], translate))
 		browserGui["strategyListView"].OnEvent("DoubleClick", browseStrategies.Bind(kOk))

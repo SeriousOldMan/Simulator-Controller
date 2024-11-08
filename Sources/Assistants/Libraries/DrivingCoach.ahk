@@ -279,6 +279,8 @@ class DrivingCoach extends GridRaceAssistant {
 												  , recognizer, listener, listenerBooster, conversationBooster, agentBooster
 												  , muted, voiceServer)
 
+		this.loadInstructions(configuration)
+
 		this.updateConfigurationValues({Announcements: {SessionInformation: true, StintInformation: false, HandlingInformation: false}})
 
 		DirCreate(this.Options["Driving Coach.Archive"])
@@ -292,7 +294,7 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	loadFromConfiguration(configuration) {
-		local options, laps, ignore, instruction
+		local options
 
 		super.loadFromConfiguration(configuration)
 
@@ -313,6 +315,12 @@ class DrivingCoach extends GridRaceAssistant {
 
 		options["Driving Coach.MaxHistory"] := getMultiMapValue(configuration, "Driving Coach Personality", "MaxHistory", 3)
 		options["Driving Coach.Confirmation"] := getMultiMapValue(configuration, "Driving Coach Personality", "Confirmation", true)
+	}
+
+	loadInstructions(configuration) {
+		local options, laps, ignore, instruction
+
+		options := this.Options
 
 		for ignore, instruction in this.Instructions[true]
 			if (getMultiMapValue(configuration, "Driving Coach Personality", "Instructions." . instruction, kUndefined) != kUndefined)

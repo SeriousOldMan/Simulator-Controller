@@ -67,6 +67,10 @@ Information=Session Information, Stint Information, Information zum Fahrverhalte
 
 	[{Beachte, Berücksichtige, Bitte beachte, Bitte berücksichtige} (Information) wieder, {Beachte wieder, Berücksichtige wieder, Bitte beachte wieder, Bitte berücksichtige wieder} (Information)]
 
+2.  Information
+
+	[(KannstDu) (Mir) die Uhrzeit sagen, Wie viel Uhr ist es, Sag {mir bitte, mir} die Uhrzeit]
+
 #### Gespräch
 
 Du wirst größtenteils einen freien Dialog mit dem Fahrtrainer führen. Daher wird jeder Sprachbefehl, der keinem der oben gezeigten Befehle entspricht, an das GPT-Sprachmodell weitergeleitet. Das Resultat ist ein sehr natürlicher Dialog mit dem virtuellen Fahrtrainer, wie im [Beispiel](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#a-typical-dialog) gezeigt.

@@ -77,6 +77,10 @@ Information=informations sur la session, informations sur le relais, information
 
 	[{Veuillez faire attention à, Faites attention à, Veuillez enquêter, Enquêter} (Information) à nouveau, {Veuillez prendre, Prendre} (Information) dans {compte, compte s'il vous plaît}]
 
+2.  Information
+
+	[(TellMe) l'heure, Quelle heure est-il, Quelle est {l'heure, l'heure actuelle}]
+
 #### Conversation
 
 Vous utiliserez pour la plupart une conversation gratuite avec le Driving Coach. Par conséquent, chaque commande vocale qui ne correspond à aucune des commandes indiquées ci-dessus sera transmise au modèle de langage GPT, ce qui entraînera une boîte de dialogue de type humain, comme indiqué dans l'[exemple](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#a-typical-dialog).

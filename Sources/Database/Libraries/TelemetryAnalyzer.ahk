@@ -369,10 +369,10 @@ class Corner extends Section {
 								   , MaxBrakePressure: (Round(this.MaxBrakePressure) . " Percent")
 								   , BrakePressureRampUp: (Round(this.BrakePressureRampUp, 1) . " Meter")
 								   , ABSActivations: ((this.ABSActivations > TelemetryAnalyzer.ABSActivationsThreshold) ? (this.ABSActivations . " Percent")
-																														: "Okay")
+																														: "Low")
 								   , BrakeCorrections: this.BrakeCorrections
 								   , BrakeSmoothness: ((smoothness < TelemetryAnalyzer.BrakeSmoothnessThreshold) ? (smoothness . " Percent")
-																												 : "Okay")}
+																												 : "Good")}
 			}
 
 			if (this.Start["Apex"] != kNull)
@@ -400,17 +400,17 @@ class Corner extends Section {
 								  , RPM: this.AcceleratingRPM
 								  , Speed: (Round(this.AcceleratingSpeed) . " km/h")
 								  , TCActivations: ((this.TCActivations > TelemetryAnalyzer.TCActivationsThreshold) ? (this.TCActivations . " Percent")
-																													: "Okay")
+																													: "Low")
 								  , ThrottleCorrections: this.ThrottleCorrections
 								  , ThrottleSmoothness: ((smoothness < TelemetryAnalyzer.ThrottleSmoothnessThreshold) ? (smoothness . " Percent")
-																													  : "Okay")}
+																													  : "Good")}
 			}
 
 			smoothness := nullRound(this.SteeringSmoothness)
 
 			descriptor.SteeringCorrections := this.SteeringCorrections
 			descriptor.SteeringSmoothness := ((smoothness < TelemetryAnalyzer.SteeringSmoothnessThreshold) ? (smoothness . " Percent")
-																										   : "Okay")
+																										   : "Good")
 
 			return descriptor
 		}

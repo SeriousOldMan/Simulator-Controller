@@ -77,6 +77,10 @@ Information=informazioni sulla sessione, informazioni sul turno, informazioni su
 
 	[Per favore dammi (Announcements), Puoi darmi (Announcements), Puoi darmi (Announcements) per favore, Dammi (Announcements), Dammi (Announcements) per favore]
 
+2.  Information
+
+	[(TellMe) l'ora, Che ore sono, Qual è {l'ora attuale, l'orario}]
+
 #### Conversazione
 
 Per la maggior parte utilizzerai una conversazione gratuita con l'allenatore di guida. Pertanto, ogni comando vocale che non corrisponde a nessuno dei comandi mostrati sopra verrà inoltrato al modello linguistico GPT, che risulterà in una finestra di dialogo simile a quella umana come mostrato nell'[esempio](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#a-typical-dialog).

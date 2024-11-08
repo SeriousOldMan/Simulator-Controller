@@ -50,11 +50,6 @@ Later.2=Too early, just run a few laps.
 // Session Settings Handling //
 ConfirmSaveSettings.1=Shall I note all the settings for the next race?
 ConfirmSaveSettings.2=Oh, %driver%, shall I note all the settings?
-// Announcement Handling //
-ConfirmAnnouncementOff.1=You want no more %announcement%. Is this correct?
-ConfirmAnnouncementOff.2=No more %announcement%. Right?
-ConfirmAnnouncementOn.1=You want me to give you %announcement%. Right?
-ConfirmAnnouncementOn.2=I will give you %announcement%. Is this correct?
 // Information //
 ConfirmFocusCar.1=Okay, you want me to observe car number %number%, is that correct?
 ConfirmFocusCar.2=I shall update you on car number %number% from time to time, right?

@@ -359,7 +359,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 	initializeInstructions(provider, model, setting, edit := false) {
 		local providerConfiguration := this.iProviderConfigurations[provider]
-		local language, value, instructions, thePlugin, configuration
+		local language, value, instructions, configuration
 
 		value := (edit ? this.Value[setting] : providerConfiguration[setting])
 
@@ -369,8 +369,13 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 				if isSet(SetupWizard)
 					language := SetupWizard.Instance.getModuleValue("Driving Coach", "Language", getLanguage())
-				else if isSet(ConfigurationEditor)
-					language := Plugin("Driving Coach", ConfigurationEditor.Instance.getSimulatorConfiguration()).getArgumentValue("raceAssistantLanguage", getLanguage())
+				else if isSet(PluginsConfigurator) {
+					configuration := newMultiMap()
+
+					PluginsConfigurator.Instance.saveToConfiguration(configuration)
+
+					language := Plugin("Driving Coach", configuration).getArgumentValue("raceAssistantLanguage")
+				}
 				else if isSet(VoiceControlConfigurator)
 					language := VoiceControlConfigurator.Instance.getCurrentLanguage()
 				else

@@ -366,6 +366,13 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		if (value = "") {
 			if isSet(SetupWizard)
 				language := SetupWizard.Instance.getModuleValue("Driving Coach", "Language", getLanguage())
+			else if isSet(PluginsConfigurator) {
+				configuration := newMultiMap()
+
+				PluginsConfigurator.Instance.saveToConfiguration(configuration)
+
+				language := Plugin("Driving Coach", configuration).getArgumentValue("raceAssistantLanguage")
+			}
 			else if isSet(VoiceControlConfigurator)
 				language := VoiceControlConfigurator.Instance.getCurrentLanguage()
 			else

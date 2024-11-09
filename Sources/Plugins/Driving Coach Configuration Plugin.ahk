@@ -365,8 +365,6 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 		if (value = "") {
 			try {
-				configuration := ConfigurationEditor.Instance.getSimulatorConfiguration()
-
 				if isSet(SetupWizard)
 					language := SetupWizard.Instance.getModuleValue("Driving Coach", "Language", getLanguage())
 				else if isSet(PluginsConfigurator) {

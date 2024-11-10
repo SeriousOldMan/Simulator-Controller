@@ -1,11 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Startup Sequence                ;;;
-;;;     1. Voice Recognition 	- Voice Command Recognition (VoiceMacro)    ;;;
-;;;     2. Face Recogition      - Headtracking Neural Network (AITrack)     ;;;
-;;;     3. View Tracking        - Viewtracking Interface Manager (opentrack);;;
-;;;     4. Simulator Controller - Simulator Controller & Automation         ;;;
-;;;     5. Tactile Feedback     - Tactile Feedback System (SimHub)          ;;;
-;;;     6. Motion Feedback      - Motion Feedback System (SimFeedback)      ;;;
+;;;   Modular Simulator Controller System - Startup Manager                 ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;

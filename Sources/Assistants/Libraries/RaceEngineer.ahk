@@ -2016,15 +2016,15 @@ class RaceEngineer extends RaceAssistant {
 					strategistName := strategistPlugin.getArgumentValue("raceAssistantName", false)
 
 					if strategistName {
-						speaker.speakPhrase("GreetingStrategist", {strategist: strategistName})
+						speaker.speakPhrase("GreetingStrategist", {strategist: strategistName, session: translate(session)})
 
-						speaker.speakPhrase("CallUs")
+						speaker.speakPhrase("CallUs", {session: translate(session)})
 					}
 					else
-						speaker.speakPhrase("CallMe")
+						speaker.speakPhrase("CallMe", {session: translate(session)})
 				}
 				else
-					speaker.speakPhrase("CallMe")
+					speaker.speakPhrase("CallMe", {session: translate(session)})
 			}
 			finally {
 				speaker.endTalk()

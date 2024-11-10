@@ -1095,6 +1095,13 @@ class TelemetryAnalyzer {
 
 	TrackSections {
 		Get {
+			if (this.iTrackSections.Length = 0) {
+				this.iTrackMap := SessionDatabase().getTrackMap(this.Simulator, this.Track)
+
+				if this.TrackMap
+					this.iTrackSections := this.createTrackSections()
+			}
+
 			return this.iTrackSections
 		}
 	}
@@ -1158,9 +1165,6 @@ class TelemetryAnalyzer {
 		this.iSimulator := simulator
 		this.iTrack := track
 		this.iTrackMap := sessionDB.getTrackMap(simulator, track)
-
-		if this.TrackMap
-			this.iTrackSections := this.createTrackSections()
 	}
 
 	static getTrackCoordinateIndex(trackMap, x, y, threshold := 5) {

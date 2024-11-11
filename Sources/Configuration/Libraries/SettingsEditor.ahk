@@ -158,8 +158,8 @@ editModes(&settingsOrCommand, arguments*) {
 
 		modesEditorGui.SetFont("Norm", "Arial")
 
-		modesEditorGui.Add("Button", "x170 y280 w80 h23 Default", translate("Ok")).OnEvent("Click", editModes.Bind(&kSave))
-		modesEditorGui.Add("Button", "x260 y280 w80 h23", translate("&Cancel")).OnEvent("Click", editModes.Bind(&kCancel))
+		modesEditorGui.Add("Button", "x85 y280 w80 h23 Default", translate("Ok")).OnEvent("Click", editModes.Bind(&kSave))
+		modesEditorGui.Add("Button", "x175 y280 w80 h23", translate("&Cancel")).OnEvent("Click", editModes.Bind(&kCancel))
 
 		simulators := []
 

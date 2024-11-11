@@ -759,7 +759,7 @@ class DrivingCoach extends GridRaceAssistant {
 		else if inList(words, speaker.Fragments["Last"])
 			this.iReferenceMode := "Last"
 		else {
-			speaker.speakPhrase("Later")
+			speaker.speakPhrase("Repeat")
 
 			return
 		}

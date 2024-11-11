@@ -7295,8 +7295,10 @@ editSettings(editorOrCommand, arguments*) {
 		rebuildButton := settingsEditorGui.Add("Button", "x296 yp w96", translate("Rebuild..."))
 		rebuildButton.OnEvent("Click", rebuildDatabase)
 
-		settingsEditorGui.Add("Button", "x122 ys+248 w80 h23", translate("Ok")).OnEvent("Click", editSettings.Bind(kOk))
-		settingsEditorGui.Add("Button", "x216 yp w80 h23", translate("&Cancel")).OnEvent("Click", editSettings.Bind(kCancel))
+		settingsEditorGui.Add("Button", "x16 ys+248 w120 h23", translate("Consent...")).OnEvent("Click", (*) => showConsentDialog())
+
+		settingsEditorGui.Add("Button", "x230 yp w80 h23", translate("Ok")).OnEvent("Click", editSettings.Bind(kOk))
+		settingsEditorGui.Add("Button", "x324 yp w80 h23", translate("&Cancel")).OnEvent("Click", editSettings.Bind(kCancel))
 
 		editSettings("UpdateState")
 

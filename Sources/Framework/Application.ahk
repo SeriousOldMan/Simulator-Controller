@@ -464,6 +464,30 @@ viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 80
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+showConsentDialog(consent := false) {
+	local result, id, type, key
+
+	if !consent
+		consent := readMultiMap(kUserConfigDirectory . "CONSENT")
+
+	result := withBlockedWindows(() => consentDialog(getMultiMapValue(consent, "General", "ID"), consent))
+
+	for type, key in Map("TyrePressures", "Share Tyre Pressures", "RaceStrategies", "Share Race Strategies", "CarSetups", "Share Car Setups", "LapTelemetries", "Share Lap Telemetries")
+		switch result[type], false {
+			case "Yes":
+				setMultiMapValue(consent, "Consent", key, "Yes")
+			case "No":
+				setMultiMapValue(consent, "Consent", key, "No")
+			case "Retry":
+				setMultiMapValue(consent, "Consent", key, "Undecided")
+				setMultiMapValue(consent, "General", "Countdown", 10)
+		}
+
+	setMultiMapValue(consent, "Consent", "Date", A_MM . "/" . A_DD . "/" . A_YYYY)
+
+	writeMultiMap(kUserConfigDirectory . "CONSENT", consent)
+}
+
 startupApplication() {
 	global kLogStartup
 

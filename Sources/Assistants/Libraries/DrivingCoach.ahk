@@ -373,7 +373,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		if (values.HasProp("Session") && (values.Session == kSessionFinished) && (this.Session != kSessionFinished))
 			if this.CoachingActive
-				this.shutdownCoaching(false)
+				this.shutdownTelemetryCoaching(false)
 	}
 
 	connectorState(state, reason := false, arguments*) {
@@ -617,11 +617,11 @@ class DrivingCoach extends GridRaceAssistant {
 			case "CoachingStart":
 				this.clearContinuation()
 
-				this.coachingStartRecognized(words)
+				this.telemetryCoachingStartRecognized(words)
 			case "CoachingFinish":
 				this.clearContinuation()
 
-				this.coachingFinishRecognized(words)
+				this.telemetryCoachingFinishRecognized(words)
 			case "ReviewCorner":
 				this.clearContinuation()
 
@@ -663,19 +663,21 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
-	coachingStartRecognized(words) {
+	telemetryCoachingStartRecognized(words) {
 		if !this.Connector
 			this.startConversation()
 
 		this.getSpeaker().speakPhrase("ConfirmCoaching")
 
 		this.iCoachingActive := true
+
+		this.startupTelemetryCoaching()
 	}
 
-	coachingFinishRecognized(words) {
+	telemetryCoachingFinishRecognized(words) {
 		this.getSpeaker().speakPhrase("Roger")
 
-		this.shutdownCoaching()
+		this.shutdownTelemetryCoaching()
 	}
 
 	reviewCornerRecognized(words) {
@@ -896,17 +898,17 @@ class DrivingCoach extends GridRaceAssistant {
 			this.iIssueCollector.stopIssueCollector()
 	}
 
-	startCoaching() {
-		this.coachingStartRecognized([])
+	startTelemetryCoaching() {
+		this.telemetryCoachingStartRecognized([])
 	}
 
-	finishCoaching() {
-		this.coachingFinishRecognized([])
+	finishTelemetryCoaching() {
+		this.telemetryCoachingFinishRecognized([])
 	}
 
 	startTrackCoaching() {
 		if !this.CoachingActive {
-			this.coachingStartRecognized([])
+			this.telemetryCoachingStartRecognized([])
 
 			this.trackCoachingStartRecognized([], false)
 		}
@@ -918,12 +920,10 @@ class DrivingCoach extends GridRaceAssistant {
 		this.trackCoachingFinishRecognized([])
 	}
 
-	startupCoaching() {
+	startupTelemetryCoaching() {
 		local state
 
-		if !this.TelemetryCollector {
-			this.startupTelemetryCollector()
-
+		if (!this.TelemetryCollector && this.startupTelemetryCollector()) {
 			state := newMultiMap()
 
 			setMultiMapValue(state, "Coaching", "Active", true)
@@ -932,7 +932,7 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
-	shutdownCoaching(deactivate := true) {
+	shutdownTelemetryCoaching(deactivate := true) {
 		local state := newMultiMap()
 
 		this.shutdownTrackTrigger()
@@ -1183,19 +1183,27 @@ class DrivingCoach extends GridRaceAssistant {
 			this.iCollectorTask := PeriodicTask(updateTelemetry, 10000, kLowPriority)
 
 			this.iCollectorTask.start()
+
+			return true
 		}
+		else
+			return false
 	}
 
 	shutdownTelemetryCollector() {
-		if this.TelemetryCollector
+		if this.TelemetryCollector {
 			this.TelemetryCollector.shutdown()
 
-		if this.iCollectorTask
+			this.iTelemetryCollector := false
+		}
+
+		if this.iCollectorTask {
 			this.iCollectorTask.stop()
 
+			this.iCollectorTask := false
+		}
+
 		this.iTelemetryAnalyzer := false
-		this.iTelemetryCollector := false
-		this.iCollectorTask := false
 	}
 
 	startupTrackTrigger() {
@@ -1335,7 +1343,7 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 
 		if this.CoachingActive
-			this.startupCoaching()
+			this.startupTelemetryCoaching()
 
 		return facts
 	}
@@ -1360,7 +1368,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 	finishSession(shutdown := true) {
 		if (this.Session != kSessionFinished)
-			this.shutdownCoaching(false)
+			this.shutdownTelemetryCoaching(false)
 
 		this.stopIssueAnalyzer()
 
@@ -1422,7 +1430,7 @@ class DrivingCoach extends GridRaceAssistant {
 		this.updateLaps(lapNumber, data)
 
 		if this.CoachingActive
-			this.startupCoaching()
+			this.startupTelemetryCoaching()
 
 		return result
 	}
@@ -1431,7 +1439,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local result := super.updateLap(lapNumber, &data, arguments*)
 
 		if this.CoachingActive
-			this.startupCoaching()
+			this.startupTelemetryCoaching()
 
 		return result
 	}

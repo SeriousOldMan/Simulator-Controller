@@ -35,12 +35,12 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 			super.__New(plugin, "Driving Coach", remotePID)
 		}
 
-		startCoaching(arguments*) {
-			this.callRemote("startCoaching", arguments*)
+		startTelemetryCoaching(arguments*) {
+			this.callRemote("startTelemetryCoaching", arguments*)
 		}
 
-		finishCoaching(arguments*) {
-			this.callRemote("finishCoaching", arguments*)
+		finishTelemetryCoaching(arguments*) {
+			this.callRemote("finishTelemetryCoaching", arguments*)
 		}
 
 		startTrackCoaching(arguments*) {
@@ -71,9 +71,9 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 			local plugin := this.Plugin
 
 			if (plugin.TelemetryCoachingActive && ((trigger = "On") || (trigger = "Off") || (trigger == "Push")))
-				plugin.finishCoaching()
+				plugin.finishTelemetryCoaching()
 			else if (!plugin.TelemetryCoachingActive && ((trigger = "On") || (trigger == "Push")))
-				plugin.startCoaching()
+				plugin.startTelemetryCoaching()
 		}
 	}
 
@@ -307,14 +307,14 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 		this.startSession(settings, data)
 	}
 
-	startCoaching() {
+	startTelemetryCoaching() {
 		if this.DrivingCoach
-			this.DrivingCoach.startCoaching()
+			this.DrivingCoach.startTelemetryCoaching()
 	}
 
-	finishCoaching() {
+	finishTelemetryCoaching() {
 		if this.DrivingCoach
-			this.DrivingCoach.finishCoaching()
+			this.DrivingCoach.finishTelemetryCoaching()
 	}
 
 	startTrackCoaching() {
@@ -333,7 +333,7 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 ;;;                        Controller Action Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startCoaching() {
+startTelemetryCoaching() {
 	local controller := SimulatorController.Instance
 	local plugin := controller.findPlugin(kDrivingCoachPlugin)
 
@@ -341,14 +341,14 @@ startCoaching() {
 
 	try {
 		if (plugin && controller.isActive(plugin))
-			plugin.startCoaching()
+			plugin.startTelemetryCoaching()
 	}
 	finally {
 		protectionOff()
 	}
 }
 
-finishCoaching() {
+finishTelemetryCoaching() {
 	local controller := SimulatorController.Instance
 	local plugin := controller.findPlugin(kDrivingCoachPlugin)
 
@@ -356,7 +356,37 @@ finishCoaching() {
 
 	try {
 		if (plugin && controller.isActive(plugin))
-			plugin.finishCoaching()
+			plugin.finishTelemetryCoaching()
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+startTrackCoaching() {
+	local controller := SimulatorController.Instance
+	local plugin := controller.findPlugin(kDrivingCoachPlugin)
+
+	protectionOn()
+
+	try {
+		if (plugin && controller.isActive(plugin))
+			plugin.startTrackCoaching()
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+finishTrackCoaching() {
+	local controller := SimulatorController.Instance
+	local plugin := controller.findPlugin(kDrivingCoachPlugin)
+
+	protectionOn()
+
+	try {
+		if (plugin && controller.isActive(plugin))
+			plugin.finishTrackCoaching()
 	}
 	finally {
 		protectionOff()

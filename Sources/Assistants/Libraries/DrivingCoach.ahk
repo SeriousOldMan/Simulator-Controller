@@ -701,7 +701,7 @@ class DrivingCoach extends GridRaceAssistant {
 						command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
 															   , {telemetry: reference.JSON}))
 
-					this.handleVoiceText("TEXT", command)
+					this.handleVoiceText("TEXT", command, true, values2String(A_Space, words*))
 				}
 				else
 					this.getSpeaker().speakPhrase("Later")
@@ -728,7 +728,7 @@ class DrivingCoach extends GridRaceAssistant {
 					command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
 														   , {telemetry: reference.JSON}))
 
-				this.handleVoiceText("TEXT", command)
+				this.handleVoiceText("TEXT", command, true, values2String(A_Space, words*))
 			}
 			else
 				this.getSpeaker().speakPhrase("Later")
@@ -761,7 +761,7 @@ class DrivingCoach extends GridRaceAssistant {
 		else if inList(words, speaker.Fragments["Last"])
 			this.iReferenceMode := "Last"
 		else {
-			speaker.speakPhrase("Later")
+			speaker.speakPhrase("Repeat")
 
 			return
 		}
@@ -778,7 +778,7 @@ class DrivingCoach extends GridRaceAssistant {
 		this.iReferenceModeAuto := false
 	}
 
-	handleVoiceText(grammar, text, reportError := true) {
+	handleVoiceText(grammar, text, reportError := true, originalText := false) {
 		local answer := false
 		local ignore, part, telemetry, reference, folder
 
@@ -857,7 +857,7 @@ class DrivingCoach extends GridRaceAssistant {
 						this.getSpeaker().speak(part . ".", false, false, {Noise: false, Rephrase: false, Click: (A_Index = 1)})
 
 			if (this.Transcript && (this.Mode != "Coaching"))
-				FileAppend(translate("-- Driver --------") . "`n`n" . text . "`n`n" . translate("-- Coach ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16")
+				FileAppend(translate("-- Driver --------") . "`n`n" . (originalText ? originalText : text) . "`n`n" . translate("-- Coach ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16")
 		}
 	}
 

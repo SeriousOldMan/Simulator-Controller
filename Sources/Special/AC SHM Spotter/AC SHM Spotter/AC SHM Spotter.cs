@@ -1710,7 +1710,7 @@ namespace ACSHMSpotter {
 						telemetryFile.Write(physics.Gas + ";");
 						telemetryFile.Write(physics.Brake + ";");
 						telemetryFile.Write(physics.SteerAngle + ";");
-						telemetryFile.Write(physics.Gear + ";");
+						telemetryFile.Write((physics.Gear - 1) + ";");
 						telemetryFile.Write(physics.Rpms + ";");
 						telemetryFile.Write(physics.SpeedKmh + ";");
 

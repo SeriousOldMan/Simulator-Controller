@@ -714,7 +714,8 @@ class Corner extends Section {
 							 , acceleratingStart, acceleratingTime, acceleratingLength
 							 , rollingGear, rollingRPM, acceleratingGear, acceleratingRPM, acceleratingSpeed
 							 , minLatG, maxLatG, average(latGs), minSpeed, maxSpeed, average(speeds)
-							 , Round((tcActivations / throttleCount) * 100), Round((absActivations / brakeCount) * 100)
+							 , (throttleCount ? Round((tcActivations / throttleCount) * 100) : 100)
+							 , (brakeCount ? Round((absActivations / brakeCount) * 100) : 100)
 							 , Max(0, steeringChanges), 100 - (steeringCount ? ((steeringChanges / steeringCount) * 100) : 0)
 							 , Max(0, throttleChanges), 100 - (throttleCount ? ((throttleChanges / throttleCount) * 100): 0)
 							 , Max(0, brakeChanges), 100 - (brakeCount ? ((brakeChanges / brakeCount) * 100) : 0))
@@ -1312,7 +1313,7 @@ class TelemetryAnalyzer {
 					index := lastSection.Index
 
 					while (index < section.Index) {
-						distance += Sqrt(((getMultiMapValue(trackMap, "Points", index . ".X") - x) ** 2)
+						distance := Sqrt(((getMultiMapValue(trackMap, "Points", index . ".X") - x) ** 2)
 									   + ((getMultiMapValue(trackMap, "Points", index . ".Y") - y) ** 2))
 
 						if (distance <= threshold)

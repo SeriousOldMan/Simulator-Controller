@@ -1568,7 +1568,7 @@ class TelemetryViewer {
 				section := telemetry.findSection(x, y)
 
 				if section
-					TelemetryInfoViewer.showSection(section)
+					SectionInfoViewer.showSectionInfo(section)
 			}
 		}
 		catch Any as exception {
@@ -1719,7 +1719,7 @@ class TelemetryViewer {
 	}
 }
 
-class TelemetryInfoViewer {
+class SectionInfoViewer {
 	static Instance := false
 
 	iWindow := false
@@ -1727,7 +1727,7 @@ class TelemetryInfoViewer {
 
 	iSection := false
 
-	class TelemetryInfoWindow extends Window {
+	class SectionInfoWindow extends Window {
 		iViewer := false
 
 		__New(viewer, arguments*) {
@@ -1741,23 +1741,19 @@ class TelemetryInfoViewer {
 		}
 	}
 
-	class TelemetryInfoResizer extends Window.Resizer {
+	class SectionInfoResizer extends Window.Resizer {
 		iViewer := false
 
 		__New(viewer, arguments*) {
 			this.iViewer := viewer
 
 			super.__New(viewer.Window, arguments*)
-
-			Task.startTask(ObjBindMethod(this, "RedrawHTMLViewer"), 500, kHighPriority)
 		}
 
 		Resize(deltaWidth, deltaHeight) {
 			this.iViewer.InfoViewer.Resized()
 
-			this.iViewer.showSection(this.iViewer.Section)
-
-			return Task.CurrentTask
+			this.iViewer.showSectionInfo(this.iViewer.Section)
 		}
 	}
 
@@ -1779,24 +1775,24 @@ class TelemetryInfoViewer {
 		}
 	}
 
-	static showSection(section) {
-		if !TelemetryInfoViewer.Instance {
-			TelemetryInfoViewer.Instance := TelemetryInfoViewer()
+	static showSectionInfo(section) {
+		if !SectionInfoViewer.Instance {
+			SectionInfoViewer.Instance := SectionInfoViewer()
 
-			TelemetryInfoViewer.Instance.show()
+			SectionInfoViewer.Instance.show()
 		}
 
-		TelemetryInfoViewer.Instance.showSection(section)
+		SectionInfoViewer.Instance.showSectionInfo(section)
 	}
 
 	createGui() {
-		local infoGui := TelemetryInfoViewer.TelemetryInfoWindow(this, {Descriptor: "Telemetry Browser.Info Viewer", Closeable: true, Options: "0x400000"})
+		local infoGui := SectionInfoViewer.SectionInfoWindow(this, {Descriptor: "Telemetry Browser.Info Viewer", Closeable: true, Options: "0x400000"})
 
 		this.iWindow := infoGui
 
-		this.iInfoViewer := infoGui.Add("HTMLViewer", "x0 y0 w240 h480")
+		this.iInfoViewer := infoGui.Add("HTMLViewer", "x0 y0 w240 h" . Round(240 * 1.618))
 
-		infoGui.Add(TelemetryInfoViewer.TelemetryInfoResizer(this))
+		infoGui.Add(SectionInfoViewer.SectionInfoResizer(this))
 	}
 
 	show() {
@@ -1812,12 +1808,12 @@ class TelemetryInfoViewer {
 	}
 
 	close() {
-		TelemetryInfoViewer.Instance := false
+		SectionInfoViewer.Instance := false
 
 		this.Window.Destroy()
 	}
 
-	showSection(section) {
+	showSectionInfo(section) {
 		local infoText := "<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='3' topmargin='3' rightmargin='3' bottommargin='3'><style> table, p { color: #%fontColor%; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><p>" . section.JSON . "</p></body></html>"
 
 		this.iSection := section

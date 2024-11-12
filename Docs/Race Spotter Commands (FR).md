@@ -12,7 +12,7 @@ Vous trouverez ci-dessous une liste complète de toutes les commandes vocales re
    
 		Mary veut une glace
 
-		(TellMe) ton nom ?
+		(TellMe) ton nom?
 		
 		Quelle { heure est-il, est l'heure actuelle }?
 		

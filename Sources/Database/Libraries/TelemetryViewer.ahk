@@ -519,7 +519,7 @@ class TelemetryViewer {
 		}
 
 		Close(*) {
-			this.iViewer.Close()
+			this.iViewer.close()
 		}
 	}
 
@@ -1568,7 +1568,7 @@ class TelemetryViewer {
 				section := telemetry.findSection(x, y)
 
 				if section
-					ToolTip(section.JSON)
+					TelemetryInfoViewer.showSection(section)
 			}
 		}
 		catch Any as exception {
@@ -1719,6 +1719,116 @@ class TelemetryViewer {
 	}
 }
 
+class TelemetryInfoViewer {
+	static Instance := false
+
+	iWindow := false
+	iInfoViewer := false
+
+	iSection := false
+
+	class TelemetryInfoWindow extends Window {
+		iViewer := false
+
+		__New(viewer, arguments*) {
+			this.iViewer := viewer
+
+			super.__New(arguments*)
+		}
+
+		Close(*) {
+			this.iViewer.close()
+		}
+	}
+
+	class TelemetryInfoResizer extends Window.Resizer {
+		iViewer := false
+
+		__New(viewer, arguments*) {
+			this.iViewer := viewer
+
+			super.__New(viewer.Window, arguments*)
+
+			Task.startTask(ObjBindMethod(this, "RedrawHTMLViewer"), 500, kHighPriority)
+		}
+
+		Resize(deltaWidth, deltaHeight) {
+			this.iViewer.InfoViewer.Resized()
+
+			this.iViewer.showSection(this.iViewer.Section)
+
+			return Task.CurrentTask
+		}
+	}
+
+	Window {
+		Get {
+			return this.iWindow
+		}
+	}
+
+	InfoViewer {
+		Get {
+			return this.iInfoViewer
+		}
+	}
+
+	Section {
+		Get {
+			return this.iSection
+		}
+	}
+
+	static showSection(section) {
+		if !TelemetryInfoViewer.Instance {
+			TelemetryInfoViewer.Instance := TelemetryInfoViewer()
+
+			TelemetryInfoViewer.Instance.show()
+		}
+
+		TelemetryInfoViewer.Instance.showSection(section)
+	}
+
+	createGui() {
+		local infoGui := TelemetryInfoViewer.TelemetryInfoWindow(this, {Descriptor: "Telemetry Browser.Info Viewer", Closeable: true, Options: "0x400000"})
+
+		this.iWindow := infoGui
+
+		this.iInfoViewer := infoGui.Add("HTMLViewer", "x0 y0 w240 h480")
+
+		infoGui.Add(TelemetryInfoViewer.TelemetryInfoResizer(this))
+	}
+
+	show() {
+		this.createGui()
+
+		if getWindowPosition("Telemetry Browser.Info Viewer", &x, &y)
+			this.Window.Show("x" . x . " y" . y)
+		else
+			this.Window.Show()
+
+		if getWindowSize("Telemetry Browser.Info Viewer", &w, &h)
+			this.Window.Resize("Initialize", w, h)
+	}
+
+	close() {
+		TelemetryInfoViewer.Instance := false
+
+		this.Window.Destroy()
+	}
+
+	showSection(section) {
+		local infoText := "<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='3' topmargin='3' rightmargin='3' bottommargin='3'><style> table, p { color: #%fontColor%; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><p>" . section.JSON . "</p></body></html>"
+
+		this.iSection := section
+
+		this.InfoViewer.document.open()
+		this.InfoViewer.document.write(substituteVariables(infoText, {fontColor: this.Window.Theme.TextColor
+																	, backColor: this.Window.AltBackColor}))
+		this.InfoViewer.document.close()
+	}
+}
+
 class TrackMap {
 	iTelemetryViewer := false
 
@@ -1848,7 +1958,7 @@ class TrackMap {
 				this.trackClicked(coordinateX, coordinateY)
 		}
 
-		local mapGui := TrackMap.TrackMapWindow(this, {Descriptor: "Track Map", Closeable: true, Resizeable:  "Deferred"})
+		local mapGui := TrackMap.TrackMapWindow(this, {Descriptor: "Telemetry Browser.Track Map", Closeable: true, Resizeable:  "Deferred"})
 
 		this.iWindow := mapGui
 
@@ -1870,12 +1980,12 @@ class TrackMap {
 
 		this.createGui()
 
-		if getWindowPosition("Track Map", &x, &y)
+		if getWindowPosition("Telemetry Browser.Track Map", &x, &y)
 			this.Window.Show("x" . x . " y" . y)
 		else
 			this.Window.Show()
 
-		if getWindowSize("Track Map", &w, &h)
+		if getWindowSize("Telemetry Browser.Track Map", &w, &h)
 			this.Window.Resize("Initialize", w, h)
 
 		this.loadTrackMap(sessionDB.getTrackMap(this.Simulator, this.Track)

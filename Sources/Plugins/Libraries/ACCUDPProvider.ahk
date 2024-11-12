@@ -249,11 +249,14 @@ class ACCUDPProvider {
 	startup(force := false) {
 		local exePath, options, udpClient
 
-		if (!this.UDPClient || !ProcessExist("ACC UDP Provider.exe") || force) {
+		if (this.UDPClient = "Starting")
+			return
+
+		if (!this.UDPClient || force) {
 			if force
 				this.shutdown(force)
 
-			this.iUDPClient := false
+			this.iUDPClient := "Starting"
 
 			exePath := (kBinariesDirectory . "Providers\ACC UDP Provider.exe")
 
@@ -316,6 +319,9 @@ class ACCUDPProvider {
 				if !ProcessExist("ACC UDP Provider.exe")
 					break
 			}
+
+			if (this.UDPClient && isNumber(this.UDPClient) && ProcessExist(this.UDPClient))
+				ProcessClose(this.UDPClient)
 
 			this.iUDPClient := false
 		}

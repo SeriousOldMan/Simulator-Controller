@@ -71,6 +71,24 @@ Information=Session Information, Stint Information, Information zum Fahrverhalte
 
 	[(KannstDu) (Mir) die Uhrzeit sagen, Wie viel Uhr ist es, Sag {mir bitte, mir} die Uhrzeit]
 
+3.  Training
+
+	[(KannstDu) (Mir) {beim, bei meinem} Training helfen, (KannstDu) {mein Training, meinen Fahrstil} beobachten, (KannstDu) meine Fahrtechnik überprüfen, Ich brauche mal {Deine Hilfe, ein Training, ein Coaching}]
+
+	[{Ich danke Dir, Danke} für Deine {Hilfe, Unterstützung}, {Danke ich, Ich} habe viel {gelernt, gelernt danke}, Das war {großartig, prima, großartig danke, prima danke}, Okay {das, dass} ist genug für heute]
+
+	[(KannstDu) (Mir) {einen Überblick über die, eine Zusammenfassung der} {letzte Runde, letzten Runde, Runde} geben, {Bitte schau, Schau} Dir mal {die ganze, die} {Runde, Strecke} an, Wo kann ich mich verbessern, Worauf soll ich {achten, achten um mich zu verbessern}]
+
+	[(KannstDu) (Mir) eine Einschätzung von Kurve (Number) geben, {Kannst Du Dir mal, Schau Dir mal, Kannst Du Dir bitte mal, Bitte schau Dir mal} Kurve (Number) {anschauen, anschauen bitte}, Wie kann ich mich in Kurve (Number) verbessern, Worauf soll ich in Kurve (Number) achten]
+
+	[(KannstDu) (Mir) {Anweisungen, Anweisungen für jede Kurve} {geben, geben während ich fahre}, (GibMir) {Anweisungen, Anweisungen für jede Kurve}, {Bitte sag, Sag} (Mir) {vor jeder Kurve, für jede Kurve} {wie ich mich verbessern kann, was ich ändern muss}]
+
+	[{Danke jetzt, Jetzt} muss ich mich {konzentrieren, konzentrieren danke}, {Okay jetzt, Jetzt} werde {ich das, ich Deine Anweisungen, ich Deine Hinweise} erst {mal, einmal} anwenden, {Danke jetzt, Jetzt} komme ich erstmal alleine klar, {Bitte keine, Keine} Hinweise mehr]
+
+	[(KoennenWir) die {schnellste, letzte} Runde als {Referenz, Referenzrunde} verwenden, {Bitte verwende, Verwende} die {schnellste, letzte} Runde als {Referenz, Referenzrunde}, {Bitte als, Als} {Referenz, Referenzrunde} die {schnellste, letzte} Runde {verwenden, verwenden bitte}]
+
+	[{Bitte keine, Keine} {Referenzrunde mehr, Referenzrunde} {verwenden, verwenden bitte}]
+
 #### Gespräch
 
-Du wirst größtenteils einen freien Dialog mit dem Fahrtrainer führen. Daher wird jeder Sprachbefehl, der keinem der oben gezeigten Befehle entspricht, an das GPT-Sprachmodell weitergeleitet. Das Resultat ist ein sehr natürlicher Dialog mit dem virtuellen Fahrtrainer, wie im [Beispiel](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#a-typical-dialog) gezeigt.
+Daneben kannst Du größtenteils einen freien Dialog mit dem Fahrtrainer führen. Daher wird jeder Sprachbefehl, der keinem der oben gezeigten Befehle entspricht, an das GPT-Sprachmodell weitergeleitet. Das Resultat ist ein sehr natürlicher Dialog mit dem virtuellen Fahrtrainer, wie im [Beispiel](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#a-typical-dialog) gezeigt.

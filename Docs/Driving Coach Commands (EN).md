@@ -80,7 +80,25 @@ Information=session information, stint information, handling information
 2.  Information
 
 	[(TellMe) the time, What time is it, What is the {current time, time}]
+	
+3.  Coaching
+
+	[(CanYou) give me a {coaching, coaching lesson}, (CanWe) run a {coaching, training, practice, practise} session, (CanYou) {help, help me} with {the, my} {training, practice, practise}, (CanYou) {observe, watch} my {training, practice, practise, driving}, (CanYou) {check, watch} my driving {technique, style}, (CanWe) improve my driving skills]
+
+	[Thank you {for your help, I learned a lot, that was great}, That was great thank you, Okay that's enough for today]
+
+	[(CanYou) give me {an overview, an overview corner by corner, an overview for zhe whole lap, a complete overview, a complete overview corner by corner}, {Please take, Take} a look at the complete track, Where can I improve around the track]
+
+	[(CanWe) {focus on, talk about} {corner number, corner} (Number), {Please take, Take} a {closer look, look} at {corner number, corner} (Number), Where can I improve in {corner number, corner} (Number), What should I consider {for, in} {corner number, corner} (Number)]
+
+	[(CanYou) give me {recommendations, tips, a guide, instructions} {while I am driving, while driving, for each corner}, {Please tell, Tell} me {ahead of, for} each corner what I {can, should} change, (CanYou) coach me {on the track, while I am driving, while driving}]
+
+	[{Thank you now, Now} I want to focus, {Okay let, Let} me {apply, try} {your recommendations, your instructions, that} now, {Please stop, Stop} giving me {recommendations, tips, instructions, recommendations for each corner, tips for each corner, instructions for each corner}, {Please no, No} more {instructions, instructions please}]
+
+	[(CanWe) use the {fastest, last} lap as {reference, reference lap}, {Please use, Use} the {fastest, last} lap as {reference, reference lap}]
+
+	[{Please do, Do} not use a reference {lap, lap please}]
 
 #### Conversation
 
-You will use a free conversation with the Driving Coach for the most part. Therefore, every voice command, that does not match any of the commands shown above will be forwarded to the GPT language model, which will result in a human-like dialog as shown in the [example](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#a-typical-dialog).
+Additionally, you can have a free conversation with the Driving Coach for the most part. Therefore, every voice command, that does not match any of the commands shown above will be forwarded to the GPT language model, which will result in a human-like dialog as shown in the [example](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#a-typical-dialog).

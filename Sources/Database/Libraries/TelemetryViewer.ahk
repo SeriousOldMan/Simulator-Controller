@@ -14,6 +14,7 @@
 #Include "SessionDatabase.ahk"
 #Include "SessionDatabaseBrowser.ahk"
 #Include "TelemetryCollector.ahk"
+#Include "TelemetryAnalyzer.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -427,7 +428,7 @@ class TelemetryChart {
 	}
 
 	selectRow(row) {
-		local environment
+		local data, x
 
 		static htmlViewer := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "HTML", "Viewer", "IE11")
 
@@ -435,6 +436,15 @@ class TelemetryChart {
 			this.ChartArea.HTMLViewer.WebView2.Core().ExecuteScript("selectTelemetry(" . row . ")", false)
 		else
 			this.ChartArea.document.parentWindow.selectTelemetry(row)
+
+		data := this.TelemetryViewer.Data[this.TelemetryViewer.SelectedLap[true]]
+
+		if (data.Has(row) && (data[row].Length > 11)) {
+			x := data[row][12]
+
+			if isNumber(x)
+				this.TelemetryViewer.showSectionInfo(x, data[row][13])
+		}
 	}
 
 	selectPosition(posX, posY, threshold := 40) {
@@ -1532,6 +1542,37 @@ class TelemetryViewer {
 
 				this.updateState()
 			}
+		}
+	}
+
+	showSectionInfo(x, y) {
+		local simulator, car, track, analyzer, telemetry, section, lap, driver, lapTime, sectorTimes
+
+		try {
+			this.Manager.getSessionInformation(&simulator, &car, &track)
+
+			analyzer := TelemetryAnalyzer(simulator, track)
+			lap := this.SelectedLap
+
+			if isNumber(lap)
+				this.Manager.getLapInformation(lap, &driver, &lapTime, &sectorTimes)
+			else {
+				driver := lap[2]
+				lapTime := ((lap[3] != "-") ? lap[3] : false)
+				sectorTimes := lap[4]
+			}
+
+			telemetry := analyzer.createTelemetry(0, this.SelectedLap[true], driver, lapTime, sectorTimes)
+
+			if telemetry {
+				section := telemetry.findSection(x, y)
+
+				if section
+					ToolTip(section.JSON)
+			}
+		}
+		catch Any as exception {
+			logError(exception)
 		}
 	}
 

@@ -1043,6 +1043,17 @@ class Telemetry {
 		return sections
 	}
 
+	findSection(x, y, threshold := 10) {
+		local section := this.TelemetryAnalyzer.findSection(x, y, threshold)
+		local ignore, candidate
+
+		for ignore, candidate in this.Sections
+			if (candidate.TrackSection = section)
+				return candidate
+
+		return false
+	}
+
 	getValue(index, name, default := kUndefined) {
 		return TelemetryAnalyzer.getValue(this.Data[index], name, default)
 	}
@@ -1284,6 +1295,40 @@ class TelemetryAnalyzer {
 		}
 		else
 			return false
+	}
+
+	findSection(x, y, threshold := 10) {
+		local trackMap := this.TrackMap
+		local lastSection := false
+		local ignore, section, points, sX, sY, distance
+
+		if trackMap {
+			points := getMultiMapValue(trackMap, "Map", "Points")
+
+			for ignore, section in this.TrackSections
+				if !lastSection
+					lastSection := section
+				else {
+					index := lastSection.Index
+
+					while (index < section.Index) {
+						distance += Sqrt(((getMultiMapValue(trackMap, "Points", index . ".X") - x) ** 2)
+									   + ((getMultiMapValue(trackMap, "Points", index . ".Y") - y) ** 2))
+
+						if (distance <= threshold)
+							return section
+
+						index += 1
+					}
+
+					lastSection := section
+				}
+
+			if lastSection
+				return lastSection
+		}
+
+		return false
 	}
 
 	static getValue(data, name, default := kUndefined) {

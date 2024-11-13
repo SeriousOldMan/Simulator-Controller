@@ -134,7 +134,7 @@ With the controls in the upper right, you can change the zoom factor in both dim
 
 Select the channels you want to display in the telemetry graph and move them up and down as you like. Please note, that not every channel is available for every simulator or for data imported from external sources. Additionally, only telemetry data from the same source may be really comparable.
 
-If available, a map for the current track can be opened with the "Map..." button. You can click on a location of the track map and the corresponding data points will be highlighted in the telemetry graph. It is also possible to click on a data point in the graph and the corresponding location will be selected in the track map.
+If available, a map for the current track can be opened with the "Map..." button. You can click on a location of the track map and the corresponding data points will be highlighted in the telemetry graph. It is also possible to click on a data point in the graph and the corresponding location will be selected in the track map. When clicking on a point in the graph, an additional window will be opened as long as track sections have been defined for the given track, which displays a performance summary of the given section.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Telemetry%20Browser%20Track%20Map.jpg)
 

@@ -359,7 +359,7 @@ class Corner extends Section {
 			descriptor.Direction := this.Direction
 			descriptor.Curvature := Round(this.Curvature, 2)
 
-			if this.Start["Entry"] {
+			if (this.Start["Entry"] && (this.Start["Entry"] != kNull)) {
 				smoothness := nullRound(this.BrakeSmoothness)
 
 				descriptor.Entry := {Phase: "Braking"
@@ -375,7 +375,7 @@ class Corner extends Section {
 																												 : "Good")}
 			}
 
-			if (this.Start["Apex"] != kNull)
+			if (this.Start["Apex"] && (this.Start["Apex"] != kNull))
 				descriptor.Apex := {Phase: "Rolling"
 								  , Start: (Round(this.Start["Apex"], 1) . " Meter from the start")
 								  , Length: (nullRound(this.Length["Apex"], 1) . " Meter")
@@ -389,7 +389,7 @@ class Corner extends Section {
 								  , LateralGForce: nullRound(this.AvgLateralGForce, 2)
 								  , Speed: (nullRound(this.MinSpeed) . " km/h")}
 
-			if (this.Start["Exit"] != kNull) {
+			if (this.Start["Exit"] && (this.Start["Exit"] != kNull)) {
 				smoothness := nullRound(this.ThrottleSmoothness)
 
 				descriptor.Exit := {Phase: "Accelerating"
@@ -419,7 +419,7 @@ class Corner extends Section {
 	__New(trackSection, direction, curvature
 					  , brakingStart, brakingTime, brakingLength, maxBrakePressure, brakePressureRampUp
 					  , rollingStart, rollingTime, rollingLength
-					  , accelerationStart, acceleratingTime, acceleratingLength
+					  , acceleratingStart, acceleratingTime, acceleratingLength
 					  , rollingGear, rollingRPM, acceleratingGear, acceleratingRPM, acceleratingSpeed
 					  , minG, maxG, avgG, minSpeed, maxSpeed, avgSpeed, tcActivations, absActivations
 					  , steeringCorrections, steeringSmoothness
@@ -430,9 +430,9 @@ class Corner extends Section {
 		this.iDirection := direction
 		this.iCurvature := curvature
 
-		this.iBrakingStart := brakingStart
-		this.iRollingStart := rollingStart
-		this.iAccelerationStart := accelerationStart
+		this.iBrakingStart := (brakingStart ? brakingStart : kNull)
+		this.iRollingStart := (rollingStart ? rollingStart : kNull)
+		this.iAcceleratingStart := (acceleratingStart ? acceleratingStart : kNull)
 
 		this.iBrakingTime := brakingTime
 		this.iRollingTime := rollingTime

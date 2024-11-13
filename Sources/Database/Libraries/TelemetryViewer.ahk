@@ -1794,7 +1794,7 @@ class SectionInfoViewer {
 	}
 
 	createGui() {
-		local infoGui := SectionInfoViewer.SectionInfoWindow(this, {Descriptor: "Telemetry Browser.Info Viewer", Closeable: true, Resizeable: true, Options: "0x400000"})
+		local infoGui := SectionInfoViewer.SectionInfoWindow(this, {Descriptor: "Telemetry Browser.Info Viewer", Closeable: true, Resizeable: true, Options: "ToolWindow"}, translate("Section"))
 
 		this.iWindow := infoGui
 
@@ -1824,14 +1824,101 @@ class SectionInfoViewer {
 		this.Window.Destroy()
 	}
 
+	createSectionInfo(section) {
+		local html, smoothness
+
+		nullZero(value) {
+			return (isNull(value) ? 0 : value)
+		}
+
+		nullRound(value, precision := 0) {
+			if isNumber(value)
+				return Round(value, precision)
+			else
+				return value
+		}
+
+		if (section.Type = "Corner") {
+			html := ("<b><i>" . translate("Corner") . translate(" (") . translate(section.Direction) . translate(")") . "</i></b><br><br>")
+			html .= "<table>"
+			html .= ("<tr><td>" . translate("Nr: ") . "</td><td>" . section.Nr . "</td></tr>")
+			html .= ("<tr><td>" . translate("Length: ") . "</td><td>" . convertUnit("Length", section.Length) . A_Space . getUnit("Length") . "</td></tr>")
+			html .= ("<tr><td>" . translate("Time: ") . "</td><td>" . Round(section.Time / 1000, 2) . A_Space . translate("Seconds") . "</td></tr>")
+			html .= ("<tr><td>" . translate("Curvature: ") . "</td><td>" . Round(section.Curvature, 2) . "</td></tr>")
+			html .= "</table>"
+
+			if (section.Start["Entry"] && (section.Start["Entry"] != kNull)) {
+				html .= ("<br><br><i>" . translate("Entry") . "</i><br><br>")
+				html .= "<table>"
+
+				html .= ("<tr><td>" . translate("Time: ") . "</td><td>" . nullRound(section.Time["Entry"] / 1000, 2) . A_Space . translate("Seconds") . "</td></tr>")
+				html .= ("<tr><td>" . translate("Braking Point: ") . "</td><td>" . convertUnit("Length", Round(section.Start["Entry"], 1)) . A_Space . getUnit("Length") . "</td></tr>")
+				html .= ("<tr><td>" . translate("Braking Distance: ") . "</td><td>" . convertUnit("Length", nullRound(section.Length["Entry"], 1)) . A_Space . getUnit("Length") . "</td></tr>")
+				html .= ("<tr><td>" . translate("Brake Pressure: ") . "</td><td>" . Round(section.MaxBrakePressure) . A_Space . translate("\%") . "</td></tr>")
+				html .= ("<tr><td>" . translate("Brake Rampup: ") . "</td><td>" . convertUnit("Length", section.BrakePressureRampUp) . A_Space . getUnit("Length") . "</td></tr>")
+				html .= ("<tr><td>" . translate("Brake Corrections: ") . "</td><td>" . section.BrakeCorrections . "</td></tr>")
+				html .= ("<tr><td>" . translate("Brake Smoothness: ") . "</td><td>" . nullRound(section.BrakeSmoothness) . A_Space . translate("\%") . "</td></tr>")
+				html .= ("<tr><td>" . translate("ABS Activations: ") . "</td><td>" . section.ABSActivations . A_Space . translate("\%") . "</td></tr>")
+
+				html .= "</table>"
+			}
+
+			if (section.Start["Apex"] && (section.Start["Apex"] != kNull)) {
+				html .= ("<br><br><i>" . translate("Apex") . "</i><br><br>")
+				html .= "<table>"
+
+				html .= ("<tr><td>" . translate("Time: ") . "</td><td>" . nullRound(section.Time["Apex"] / 1000, 2) . A_Space . translate("Seconds") . "</td></tr>")
+				html .= ("<tr><td>" . translate("Rolling Start: ") . "</td><td>" . convertUnit("Length", Round(section.Start["Apex"], 1)) . A_Space . getUnit("Length") . "</td></tr>")
+				html .= ("<tr><td>" . translate("Rolling Distance: ") . "</td><td>" . convertUnit("Length", nullRound(section.Length["Apex"], 1)) . A_Space . getUnit("Length") . "</td></tr>")
+				html .= ("<tr><td>" . translate("Gear: ") . "</td><td>" . section.RollingGear . "</td></tr>")
+				html .= ("<tr><td>" . translate("RPM: ") . "</td><td>" . section.RollingRPM . "</td></tr>")
+				html .= ("<tr><td>" . translate("Speed: ") . "</td><td>" . convertUnit("Speed", nullRound(section.MinSpeed)) . A_Space . getUnit("Speed") . "</td></tr>")
+				html .= ("<tr><td>" . translate("Lateral G-Force: ") . "</td><td>" . nullRound(section.AvgLateralGForce, 2) . "</td></tr>")
+
+				html .= "</table>"
+			}
+
+			if (section.Start["Exit"] && (section.Start["Exit"] != kNull)) {
+				html .= ("<br><br><i>" . translate("Exit") . "</i><br><br>")
+				html .= "<table>"
+
+				html .= ("<tr><td>" . translate("Time: ") . "</td><td>" . nullRound(section.Time["Exit"] / 1000, 2) . A_Space . translate("Seconds") . "</td></tr>")
+				html .= ("<tr><td>" . translate("Acceleration Start: ") . "</td><td>" . convertUnit("Length", Round(section.Start["Exit"], 1)) . A_Space . getUnit("Length") . "</td></tr>")
+				html .= ("<tr><td>" . translate("Acceleration Length: ") . "</td><td>" . convertUnit("Length", nullRound(section.Length["Exit"], 1)) . A_Space . getUnit("Length") . "</td></tr>")
+				html .= ("<tr><td>" . translate("Gear: ") . "</td><td>" . section.AcceleratingGear . "</td></tr>")
+				html .= ("<tr><td>" . translate("RPM: ") . "</td><td>" . section.AcceleratingRPM . "</td></tr>")
+				html .= ("<tr><td>" . translate("Speed: ") . "</td><td>" . convertUnit("Speed", nullRound(section.AcceleratingSpeed)) . A_Space . getUnit("Speed") . "</td></tr>")
+				html .= ("<tr><td>" . translate("Throttle Corrections: ") . "</td><td>" . section.ThrottleCorrections . "</td></tr>")
+				html .= ("<tr><td>" . translate("Throttle Smoothness: ") . "</td><td>" . nullRound(section.ThrottleSmoothness) . A_Space . translate("\%") . "</td></tr>")
+				html .= ("<tr><td>" . translate("TC Activations: ") . "</td><td>" . section.TCActivations . A_Space . translate("\%") . "</td></tr>")
+
+				html .= "</table>"
+			}
+		}
+		else {
+			html := ("<b><i>" . translate("Straight") . "</i></b><br><br>")
+			html .= "<table>"
+			html .= ("<tr><td>" . translate("Nr: ") . "</td><td>" . section.Nr . "</td></tr>")
+			html .= ("<tr><td>" . translate("Length: ") . "</td><td>" . convertUnit("Length", section.Length) . A_Space . getUnit("Length") . "</td></tr>")
+			html .= ("<tr><td>" . translate("Time: ") . "</td><td>" . Round(section.Time / 1000, 2) . A_Space . translate("Seconds") . "</td></tr>")
+			html .= ("<tr><td>" . translate("Min Speed: ") . "</td><td>" . convertUnit("Speed", nullRound(section.MinSpeed)) . A_Space . getUnit("Speed") . "</td></tr>")
+			html .= ("<tr><td>" . translate("Max Speed: ") . "</td><td>" . convertUnit("Speed", nullRound(section.MaxSpeed)) . A_Space . getUnit("Speed") . "</td></tr>")
+			html .= ("<tr><td>" . translate("Avg Speed: ") . "</td><td>" . convertUnit("Speed", nullRound(section.AvgSpeed)) . A_Space . getUnit("Speed") . "</td></tr>")
+			html .= "</table>"
+		}
+
+		return html
+	}
+
 	showSectionInfo(section) {
-		local infoText := "<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='3' topmargin='3' rightmargin='3' bottommargin='3'><style> table, p { color: #%fontColor%; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><p>" . section.JSON . "</p></body></html>"
+		local infoText := "<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='3' topmargin='3' rightmargin='3' bottommargin='3'><style> table, p { color: #%fontColor%; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><p>" . this.createSectionInfo(section) . "</p></body></html>"
 
 		this.iSection := section
 
 		this.InfoViewer.document.open()
-		this.InfoViewer.document.write(substituteVariables(infoText, {fontColor: this.Window.Theme.TextColor
-																	, backColor: this.Window.AltBackColor}))
+		this.InfoViewer.document.write(StrReplace(substituteVariables(infoText, {fontColor: this.Window.Theme.TextColor
+																			   , backColor: this.Window.AltBackColor})
+												, "\%", "%"))
 		this.InfoViewer.document.close()
 	}
 }

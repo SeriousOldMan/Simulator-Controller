@@ -1038,6 +1038,8 @@ class TelemetryViewer {
 		if this.TrackMap
 			this.closeTrackMap()
 
+		SectionInfoViewer.closeSectionInfo()
+
 		this.Window.Destroy()
 	}
 
@@ -1753,7 +1755,8 @@ class SectionInfoViewer {
 		Resize(deltaWidth, deltaHeight) {
 			this.iViewer.InfoViewer.Resized()
 
-			this.iViewer.showSectionInfo(this.iViewer.Section)
+			if this.iViewer.Section
+				this.iViewer.showSectionInfo(this.iViewer.Section)
 		}
 	}
 
@@ -1785,12 +1788,20 @@ class SectionInfoViewer {
 		SectionInfoViewer.Instance.showSectionInfo(section)
 	}
 
+	static closeSectionInfo() {
+		if SectionInfoViewer.Instance
+			SectionInfoViewer.Instance.close()
+	}
+
 	createGui() {
-		local infoGui := SectionInfoViewer.SectionInfoWindow(this, {Descriptor: "Telemetry Browser.Info Viewer", Closeable: true, Options: "0x400000"})
+		local infoGui := SectionInfoViewer.SectionInfoWindow(this, {Descriptor: "Telemetry Browser.Info Viewer", Closeable: true, Resizeable: true, Options: "0x400000"})
 
 		this.iWindow := infoGui
 
-		this.iInfoViewer := infoGui.Add("HTMLViewer", "x0 y0 w240 h" . Round(240 * 1.618))
+		infoGui.MarginX := 0
+		infoGui.MarginY := 0
+
+		this.iInfoViewer := infoGui.Add("HTMLViewer", "x0 y0 w240 h" . Round(240 * 1.618) . " W:Grow H:Grow")
 
 		infoGui.Add(SectionInfoViewer.SectionInfoResizer(this))
 	}

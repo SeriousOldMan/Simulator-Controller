@@ -1,3 +1,11 @@
+## 5.9.8.0-release 11/15/24
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Fixed and optimized some language specific instructions for the Driving Coach.
+  3. Strategies and lap telemetries provided by the community can now be loaded directly from the database browser dialog.
+  4. The Race Engineer now mentions the correct session type in its greeting message.
+  5. {Internal] Significant performance improvement on Win 11
+
 ## 5.9.7.1-release 11/13/24
   1. Potential fix for UDP connector runaway after last Microsoft Patch Day.
   2. Implemented a watchdog which kills zombie UDO connection processes.

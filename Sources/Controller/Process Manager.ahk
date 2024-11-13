@@ -137,8 +137,11 @@ killZombies() {
 		validPIDs := collect(validProvider, (vp) => vp[2])
 
 		do(provider, (p) {
-			if !inList(validPIDs, p[2])
+			if !inList(validPIDs, p[2]) {
 				ProcessClose(p[2])
+
+				logMessage(kLogCritical, "Killed zombie ACC UDP provider process " . p[2])
+			}
 		})
 	}
 }

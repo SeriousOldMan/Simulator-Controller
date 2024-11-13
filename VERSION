@@ -1,14 +1,14 @@
 [Development]
-Version=5.9.7.0-release
-Target=5.9.7.0-release
-Date=11/08/2024
-Download=https://cutt.ly/EeG6NiUg;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.9.7.0-release.zip
+Version=5.9.7.1-release
+Target=5.9.7.1-release
+Date=11/13/2024
+Download=https://cutt.ly/zeJemK0V;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.9.7.1-release.zip
 Changes=Handle out of screen controller previews in "Simulator Setup", Fixed orphane state file handling in "System Monitor", New voice commands for pressure loss, Fixed some duplicate messages by the Spotter, Configuration of track sections streamlined, Added documentation for all voice commands in all languages, Fixed sharing of lap telemetries on Team Server
 Components=Media->5.6.1,Configuration->5.9.1,Utilities->5.9.1
 [Release]
-Version=5.9.7.0-release
-Date=11/08/2024
-Download=https://cutt.ly/EeG6NiUg;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.9.7.0-release.zip
+Version=5.9.7.1-release
+Date=11/13/2024
+Download=https://cutt.ly/zeJemK0V;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.9.7.1-release.zip
 Changes=Handle out of screen controller previews in "Simulator Setup", Fixed orphane state file handling in "System Monitor", New voice commands for pressure loss, Fixed some duplicate messages by the Spotter, Configuration of track sections streamlined, Added documentation for all voice commands in all languages, Fixed sharing of lap telemetries on Team Server
 Components=Media->5.6.1,Configuration->5.9.1,Utilities->5.9.1
 [Components]
@@ -24,5 +24,5 @@ Utilities.5.9.1.Download=https://www.dropbox.com/scl/fi/n3n5gajdhb1swegw46bp6/Ut
 [Current]
 Type=Release
 [Version]
-Development=5.9.7.0-release
-Release=5.9.7.0-release
+Development=5.9.7.1-release
+Release=5.9.7.1-release

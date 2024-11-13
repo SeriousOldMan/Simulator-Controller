@@ -1825,7 +1825,7 @@ class SectionInfoViewer {
 	}
 
 	createSectionInfo(section) {
-		local html, smoothness
+		local html
 
 		nullZero(value) {
 			return (isNull(value) ? 0 : value)
@@ -1891,6 +1891,8 @@ class SectionInfoViewer {
 				html .= ("<tr><td>" . translate("Throttle Corrections: ") . "</td><td>" . section.ThrottleCorrections . "</td></tr>")
 				html .= ("<tr><td>" . translate("Throttle Smoothness: ") . "</td><td>" . nullRound(section.ThrottleSmoothness) . A_Space . translate("\%") . "</td></tr>")
 				html .= ("<tr><td>" . translate("TC Activations: ") . "</td><td>" . section.TCActivations . A_Space . translate("\%") . "</td></tr>")
+				html .= ("<tr><td>" . translate("Steering Corrections: ") . "</td><td>" . section.SteeringCorrections . "</td></tr>")
+				html .= ("<tr><td>" . translate("Steering Smoothness: ") . "</td><td>" . nullRound(section.SteeringSmoothness) . A_Space . translate("\%") . "</td></tr>")
 
 				html .= "</table>"
 			}

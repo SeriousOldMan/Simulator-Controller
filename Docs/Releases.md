@@ -11,6 +11,10 @@
   4. The *Rephrasing* and *Understanding* boosters are now available for the Driving Coach as well.
   5. A new info popup shows important information when clicking in Telemetry Viewer.
 
+## 5.9.7.1-release 11/13/24
+  1. Potential fix for UDP connector runaway after last Microsoft Patch Day.
+  2. Implemented a watchdog which kills zombie UDO connection processes.
+  
 ## 5.9.7.0-release 11/08/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

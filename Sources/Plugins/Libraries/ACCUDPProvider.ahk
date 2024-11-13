@@ -252,7 +252,7 @@ class ACCUDPProvider {
 		if (this.UDPClient = "Starting")
 			return
 
-		if (!this.UDPClient || force) {
+		if (!this.UDPClient || !ProcessExist("ACC UDP Provider.exe") || force) {
 			if force
 				this.shutdown(force)
 

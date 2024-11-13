@@ -45,15 +45,15 @@ Vous trouverez ci-dessous une liste complète de toutes les commandes vocales re
 
 #### Choix prédéfinis
 
-TellMe=Pouvez-vous me dire, S'il vous plaît, Dites-moi, Pouvez-vous me donner, S'il vous plaît, Donnez-moi, Donnez-moi
+TellMe=Pouvez-vous me dire, S'il vous plaît dites-moi, Pouvez-vous me donner, S'il vous plaît donnez-moi, Donnez-moi
 
 WhatAre=Dis-moi, Donne-moi, Qu'est-ce que
 
 WhatIs=Dis-moi, Donne-moi, Qu'est-ce que c'est
 
-CanYou=Pouvez-vous, Pouvons-nous, S'il vous plaît
+CanYou=Pouvez-vous, S'il vous plaît pouvez-vous
 
-CanWe=Pouvez-vous, Pouvons-nous, S'il vous plaît
+CanWe=Pouvez-vous, Pouvons-nous, S'il vous plaît pouvez-vous, S'il vous plaît pouvons-nous
 
 Announcements=informations delta, conseils tactiques, alertes latérales, alertes arrière, avertissements drapeau bleu, avertissements drapeau jaune, avertissements de coupure, informations sur les pénalités, avertissements de voiture lente, avertissements d'accidents devant, informations d'accidents derrière
 

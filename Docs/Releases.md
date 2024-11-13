@@ -9,6 +9,7 @@
 	 - Several new settings in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) to fine-tune the corner by corner coaching of the Driving Coach.
      - New controller action functions [*startTelemetryCoaching*, *finishTelemetryCoaching*, *startTrackCoaching* and *finishTrackCoaching*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allow you to control the telemetry based coaching mode from custom functions and scripts. Even use them in LLM actions in the *Reasoning* booster.
   4. The *Rephrasing* and *Understanding* boosters are now available for the Driving Coach as well.
+  5. A new info popup shows important information when clicking in Telemetry Viewer.
 
 ## 5.9.7.0-release 11/08/24
   1. Minor bugfixes, as always

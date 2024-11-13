@@ -2110,7 +2110,7 @@ void collectCarTelemetry() {
 							<< (pf->gas >= 0 ? pf->gas : 0) << ";"
 							<< (pf->brake >= 0 ? pf->brake : 0) << ";"
 							<< pf->steerAngle << ";"
-							<< pf->gear << ";"
+							<< (pf->gear - 1) << ";"
 							<< pf->rpms << ";"
 							<< pf->speedKmh << ";"
 							<< pf->tc << ";"

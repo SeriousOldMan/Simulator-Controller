@@ -714,7 +714,8 @@ class Corner extends Section {
 							 , acceleratingStart, acceleratingTime, acceleratingLength
 							 , rollingGear, rollingRPM, acceleratingGear, acceleratingRPM, acceleratingSpeed
 							 , minLatG, maxLatG, average(latGs), minSpeed, maxSpeed, average(speeds)
-							 , Round((tcActivations / throttleCount) * 100), Round((absActivations / brakeCount) * 100)
+							 , (throttleCount ? Round((tcActivations / throttleCount) * 100) : 100)
+							 , (brakeCount ? Round((absActivations / brakeCount) * 100) : 100)
 							 , Max(0, steeringChanges), 100 - (steeringCount ? ((steeringChanges / steeringCount) * 100) : 0)
 							 , Max(0, throttleChanges), 100 - (throttleCount ? ((throttleChanges / throttleCount) * 100): 0)
 							 , Max(0, brakeChanges), 100 - (brakeCount ? ((brakeChanges / brakeCount) * 100) : 0))
@@ -1043,6 +1044,17 @@ class Telemetry {
 		return sections
 	}
 
+	findSection(x, y, threshold := 10) {
+		local section := this.TelemetryAnalyzer.findSection(x, y, threshold)
+		local ignore, candidate
+
+		for ignore, candidate in this.Sections
+			if (candidate.TrackSection = section)
+				return candidate
+
+		return false
+	}
+
 	getValue(index, name, default := kUndefined) {
 		return TelemetryAnalyzer.getValue(this.Data[index], name, default)
 	}
@@ -1284,6 +1296,40 @@ class TelemetryAnalyzer {
 		}
 		else
 			return false
+	}
+
+	findSection(x, y, threshold := 10) {
+		local trackMap := this.TrackMap
+		local lastSection := false
+		local ignore, section, points, sX, sY, distance
+
+		if trackMap {
+			points := getMultiMapValue(trackMap, "Map", "Points")
+
+			for ignore, section in this.TrackSections
+				if !lastSection
+					lastSection := section
+				else {
+					index := lastSection.Index
+
+					while (index < section.Index) {
+						distance := Sqrt(((getMultiMapValue(trackMap, "Points", index . ".X") - x) ** 2)
+									   + ((getMultiMapValue(trackMap, "Points", index . ".Y") - y) ** 2))
+
+						if (distance <= threshold)
+							return section
+
+						index += 1
+					}
+
+					lastSection := section
+				}
+
+			if lastSection
+				return lastSection
+		}
+
+		return false
 	}
 
 	static getValue(data, name, default := kUndefined) {

@@ -14,6 +14,7 @@
 #Include "SessionDatabase.ahk"
 #Include "SessionDatabaseBrowser.ahk"
 #Include "TelemetryCollector.ahk"
+#Include "TelemetryAnalyzer.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -427,7 +428,7 @@ class TelemetryChart {
 	}
 
 	selectRow(row) {
-		local environment
+		local data, x
 
 		static htmlViewer := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "HTML", "Viewer", "IE11")
 
@@ -435,6 +436,15 @@ class TelemetryChart {
 			this.ChartArea.HTMLViewer.WebView2.Core().ExecuteScript("selectTelemetry(" . row . ")", false)
 		else
 			this.ChartArea.document.parentWindow.selectTelemetry(row)
+
+		data := this.TelemetryViewer.Data[this.TelemetryViewer.SelectedLap[true]]
+
+		if (data.Has(row) && (data[row].Length > 11)) {
+			x := data[row][12]
+
+			if isNumber(x)
+				this.TelemetryViewer.showSectionInfo(x, data[row][13])
+		}
 	}
 
 	selectPosition(posX, posY, threshold := 40) {
@@ -509,7 +519,7 @@ class TelemetryViewer {
 		}
 
 		Close(*) {
-			this.iViewer.Close()
+			this.iViewer.close()
 		}
 	}
 
@@ -1028,6 +1038,8 @@ class TelemetryViewer {
 		if this.TrackMap
 			this.closeTrackMap()
 
+		SectionInfoViewer.closeSectionInfo()
+
 		this.Window.Destroy()
 	}
 
@@ -1535,6 +1547,37 @@ class TelemetryViewer {
 		}
 	}
 
+	showSectionInfo(x, y) {
+		local simulator, car, track, analyzer, telemetry, section, lap, driver, lapTime, sectorTimes
+
+		try {
+			this.Manager.getSessionInformation(&simulator, &car, &track)
+
+			analyzer := TelemetryAnalyzer(simulator, track)
+			lap := this.SelectedLap
+
+			if isNumber(lap)
+				this.Manager.getLapInformation(lap, &driver, &lapTime, &sectorTimes)
+			else {
+				driver := lap[2]
+				lapTime := ((lap[3] != "-") ? lap[3] : false)
+				sectorTimes := lap[4]
+			}
+
+			telemetry := analyzer.createTelemetry(0, this.SelectedLap[true], driver, lapTime, sectorTimes)
+
+			if telemetry {
+				section := telemetry.findSection(x, y)
+
+				if section
+					SectionInfoViewer.showSectionInfo(section)
+			}
+		}
+		catch Any as exception {
+			logError(exception)
+		}
+	}
+
 	lapLabel(lap) {
 		local theLap, driver, lapTime, sectorTimes
 
@@ -1678,6 +1721,121 @@ class TelemetryViewer {
 	}
 }
 
+class SectionInfoViewer {
+	static Instance := false
+
+	iWindow := false
+	iInfoViewer := false
+
+	iSection := false
+
+	class SectionInfoWindow extends Window {
+		iViewer := false
+
+		__New(viewer, arguments*) {
+			this.iViewer := viewer
+
+			super.__New(arguments*)
+		}
+
+		Close(*) {
+			this.iViewer.close()
+		}
+	}
+
+	class SectionInfoResizer extends Window.Resizer {
+		iViewer := false
+
+		__New(viewer, arguments*) {
+			this.iViewer := viewer
+
+			super.__New(viewer.Window, arguments*)
+		}
+
+		Resize(deltaWidth, deltaHeight) {
+			this.iViewer.InfoViewer.Resized()
+
+			if this.iViewer.Section
+				this.iViewer.showSectionInfo(this.iViewer.Section)
+		}
+	}
+
+	Window {
+		Get {
+			return this.iWindow
+		}
+	}
+
+	InfoViewer {
+		Get {
+			return this.iInfoViewer
+		}
+	}
+
+	Section {
+		Get {
+			return this.iSection
+		}
+	}
+
+	static showSectionInfo(section) {
+		if !SectionInfoViewer.Instance {
+			SectionInfoViewer.Instance := SectionInfoViewer()
+
+			SectionInfoViewer.Instance.show()
+		}
+
+		SectionInfoViewer.Instance.showSectionInfo(section)
+	}
+
+	static closeSectionInfo() {
+		if SectionInfoViewer.Instance
+			SectionInfoViewer.Instance.close()
+	}
+
+	createGui() {
+		local infoGui := SectionInfoViewer.SectionInfoWindow(this, {Descriptor: "Telemetry Browser.Info Viewer", Closeable: true, Resizeable: true, Options: "0x400000"})
+
+		this.iWindow := infoGui
+
+		infoGui.MarginX := 0
+		infoGui.MarginY := 0
+
+		this.iInfoViewer := infoGui.Add("HTMLViewer", "x0 y0 w240 h" . Round(240 * 1.618) . " W:Grow H:Grow")
+
+		infoGui.Add(SectionInfoViewer.SectionInfoResizer(this))
+	}
+
+	show() {
+		this.createGui()
+
+		if getWindowPosition("Telemetry Browser.Info Viewer", &x, &y)
+			this.Window.Show("x" . x . " y" . y)
+		else
+			this.Window.Show()
+
+		if getWindowSize("Telemetry Browser.Info Viewer", &w, &h)
+			this.Window.Resize("Initialize", w, h)
+	}
+
+	close() {
+		SectionInfoViewer.Instance := false
+
+		this.Window.Destroy()
+	}
+
+	showSectionInfo(section) {
+		local infoText := "<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='3' topmargin='3' rightmargin='3' bottommargin='3'><style> table, p { color: #%fontColor%; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><p>" . section.JSON . "</p></body></html>"
+
+		this.iSection := section
+
+		this.InfoViewer.document.open()
+		this.InfoViewer.document.write(substituteVariables(infoText, {fontColor: this.Window.Theme.TextColor
+																	, backColor: this.Window.AltBackColor}))
+		this.InfoViewer.document.close()
+	}
+}
+
 class TrackMap {
 	iTelemetryViewer := false
 
@@ -1807,7 +1965,7 @@ class TrackMap {
 				this.trackClicked(coordinateX, coordinateY)
 		}
 
-		local mapGui := TrackMap.TrackMapWindow(this, {Descriptor: "Track Map", Closeable: true, Resizeable:  "Deferred"})
+		local mapGui := TrackMap.TrackMapWindow(this, {Descriptor: "Telemetry Browser.Track Map", Closeable: true, Resizeable:  "Deferred"})
 
 		this.iWindow := mapGui
 
@@ -1829,12 +1987,12 @@ class TrackMap {
 
 		this.createGui()
 
-		if getWindowPosition("Track Map", &x, &y)
+		if getWindowPosition("Telemetry Browser.Track Map", &x, &y)
 			this.Window.Show("x" . x . " y" . y)
 		else
 			this.Window.Show()
 
-		if getWindowSize("Track Map", &w, &h)
+		if getWindowSize("Telemetry Browser.Track Map", &w, &h)
 			this.Window.Resize("Initialize", w, h)
 
 		this.loadTrackMap(sessionDB.getTrackMap(this.Simulator, this.Track)

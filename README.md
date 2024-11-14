@@ -37,15 +37,15 @@ Here is a short video which shows how to configure Simulator Controller for the 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[5.9.7.1-release](https://cutt.ly/zeJemK0V) (Changes: Handle out of screen controller previews in "Simulator Setup", Fixed orphane state file handling in "System Monitor", New voice commands for pressure loss, Fixed some duplicate messages by the Spotter, Configuration of track sections streamlined, Added documentation for all voice commands in all languages, Fixed sharing of lap telemetries on Team Server, Fixed reporting of suspension damage at the point of incident.)
+[5.9.8.0-release](https://cutt.ly/PeJkx8Ff) (Changes: Load community telemetries and strategies from browser, Fixed language specific update of instructions for Driving Coach, Engineer mentions the correct session type in greeting, Significant performance improvement on Win 11, Fixed the weather voice command for Italian.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-597) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-598) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[5.9.6.0-release](https://cutt.ly/leFV6GcM) (Changes: Fixed saving of imported telemetry outside of the database, Fixed track mapping and telemetry collection of narrow tracks, Preselect repair options in pitstop settings for repair pitstops, Track editor availability in "Session Database", Made "Solo Center" and "Team Center" more resilient against wrong session folder, Engineer announces session type.)
+[5.9.7.1-release](https://cutt.ly/zeJemK0V) (Changes: Handle out of screen controller previews in "Simulator Setup", Fixed orphane state file handling in "System Monitor", New voice commands for pressure loss, Fixed some duplicate messages by the Spotter, Configuration of track sections streamlined, Added documentation for all voice commands in all languages, Fixed sharing of lap telemetries on Team Server, Fixed reporting of suspension damage at the point of incident.)
 
-[5.9.5.0-release](https://cutt.ly/KeDSXONh) (Changes: Several grammar fixes, Fixed RF2 telemetry file format, Section editor for track maps, New telemetry channel "Time", Telemetry smoothing, Telemetry support in "Setup Workbench" without specific car and track.)
+[5.9.6.0-release](https://cutt.ly/leFV6GcM) (Changes: Fixed saving of imported telemetry outside of the database, Fixed track mapping and telemetry collection of narrow tracks, Preselect repair options in pitstop settings for repair pitstops, Track editor availability in "Session Database", Made "Solo Center" and "Team Center" more resilient against wrong session folder, Engineer announces session type.)
 
 #### Latest development build
 

@@ -25,7 +25,7 @@ Utilities.5.9.8.Path=.
 Utilities.5.9.8.Content=Utilities
 Utilities.5.9.8.Download=https://www.dropbox.com/scl/fi/pjtq7f3u6uoy5ld88vqz9/Utilities-5.9.8.zip?rlkey=crido9soi8aiocepz10xdoev3&st=cprt4qr2&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.9.8.zip
 [Current]
-Type=Release
+Type=Development
 [Version]
 Development=6.0.0.0-dev
 Release=5.9.8.0-release

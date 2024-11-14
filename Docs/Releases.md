@@ -9,7 +9,7 @@
 
 ## 5.9.7.1-release 11/13/24
   1. Potential fix for UDP connector runaway after last Microsoft Patch Day.
-  2. Implemented a watchdog which kills zombie UDO connection processes.
+  2. Implemented a watchdog which kills zombie UDP connection processes.
   
 ## 5.9.7.0-release 11/08/24
   1. Minor bugfixes, as always

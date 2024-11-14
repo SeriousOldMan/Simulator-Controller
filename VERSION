@@ -1,9 +1,9 @@
 [Development]
 Version=5.9.8.0-dev
 Target=5.9.8.0-release
-Date=11/13/2024
+Date=11/14/2024
 Download=
-Changes=Load community telemetries and strategies from browser, Fixed language specific update of instructions for Driving Coach, Engineer mentions the correct session type in greeting, Significant performance improvement on Win 11
+Changes=Load community telemetries and strategies from browser, Fixed language specific update of instructions for Driving Coach, Engineer mentions the correct session type in greeting, Significant performance improvement on Win 11, Fixed the weather voice command for Italian
 Components=Media->5.6.1,Configuration->5.9.1,Utilities->5.9.1
 [Release]
 Version=5.9.7.1-release

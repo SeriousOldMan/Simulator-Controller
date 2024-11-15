@@ -1,3 +1,10 @@
+## 5.9.9.0-release 11/22/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. A new version of the local LLM Runtime is available, which includes the llama backend.
+  
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-599), if you are using the local LLM Runtime.
+
 ## 5.9.8.0-release 11/15/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

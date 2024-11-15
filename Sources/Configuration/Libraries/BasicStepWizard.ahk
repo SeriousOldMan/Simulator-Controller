@@ -1057,7 +1057,7 @@ class BasicStepWizard extends StepWizard {
 				setMultiMapValue(configuration, "Agent Booster", assistant . ".Agent", setup.AgentBooster["Agent"])
 			}
 
-			availableBooster := ((assistant = "Driving Coach") ? ["Speaker", "Listener"]
+			availableBooster := ((assistant = "Driving Coach") ? ["Speaker", "Listener", "Agent"]
 															   : ["Speaker", "Listener", "Conversation", "Agent"])
 
 			configuration := AssistantBoosterEditor(assistant, configuration, availableBooster).editBooster(window)

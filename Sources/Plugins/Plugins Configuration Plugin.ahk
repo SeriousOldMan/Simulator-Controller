@@ -292,7 +292,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 		window.Block()
 
 		try {
-			availableBooster := ((assistant = "Driving Coach") ? ["Speaker", "Listener"]
+			availableBooster := ((assistant = "Driving Coach") ? ["Speaker", "Listener", "Agent"]
 															   : ["Speaker", "Listener", "Conversation", "Agent"])
 
 			configuration := AssistantBoosterEditor(assistant, this.iConversationBoosterConfiguration

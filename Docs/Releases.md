@@ -5,7 +5,14 @@
   4. Fixed and optimized some language specific instructions for the Driving Coach.
   5. Strategies and lap telemetries provided by the community can now be loaded directly from the database browser dialog.
   6. The Race Engineer now mentions the correct session type in its greeting message.
-  7. {Internal] Significant performance improvement on Win 11.
+  7. New voice recognition engines for Spanish and Italian. Please see the notes below.
+  8. {Internal] Significant performance improvement on Win 11.
+  
+IMPORTANT: The new voice recognition engines cannot be installed automatically, because the installer is unable to remove the old version of the library. You will see this alert, if you run "Simulator Setup".
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Update%202.jpg)
+
+To install the new libraries, follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-598).
 
 ## 5.9.7.1-release 11/13/24
   1. Potential fix for UDP connector runaway after last Microsoft Patch Day.

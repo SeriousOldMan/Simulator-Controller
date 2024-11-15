@@ -37,7 +37,11 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 5.9.8
 
-Nothing to do.
+This release introduces new builtin voice recognition engines by Microsoft for Italian and Spanish. Unfortunately, update is not automatic. Please open the Windows settings and go to "Apps & Features". Deinstall the currently installed versions as marked in the below picture.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Update%201.webp)
+
+After that, open "Simulator Setup" and go to the *Basic* configuration page. The new versions of the voice recognition engines will then be installed automatically.
 
 ***
 

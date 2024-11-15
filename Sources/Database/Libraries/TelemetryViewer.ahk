@@ -772,9 +772,10 @@ class TelemetryViewer {
 				layouts[name] := {Name: name
 								, WidthZoom: getMultiMapValue(configuration, "Zoom", name . ".Width", 100)
 								, HeightZoom: getMultiMapValue(configuration, "Zoom", name . ".Height", 100)
-								, Channels: collect(string2Values(",", definition), (name) {
-												return choose(kTelemetryChannels, (s) => s.Name = name)[1]
-											})}
+								, Channels: choose(collect(string2Values(",", definition), (name) {
+													   return choose(kTelemetryChannels, (s) => s.Name = name)[1]
+												   })
+												 , (s) => s.HasProp("Size"))}
 
 			this.iLayouts := layouts
 			this.iSelectedLayout := getMultiMapValue(configuration, "Selected", "Layout")

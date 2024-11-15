@@ -1,7 +1,9 @@
 ## 5.9.9.0-release 11/22/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. A new version of the local LLM Runtime is available, which includes the llama backend.
+  3. Fixed several bugs for the MoTeC telemetry importer.
+  4. The community sharing consent can now be changed in the settings dialog of the "Session Database".
+  5. A new version of the local LLM Runtime is available, which includes the llama backend.
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-599), if you are using the local LLM Runtime.
 

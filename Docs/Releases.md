@@ -1,3 +1,30 @@
+## 5.9.9.0-release 11/22/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. A new version of the local LLM Runtime is available, which includes the llama backend.
+  
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-599), if you are using the local LLM Runtime.
+
+## 5.9.8.0-release 11/15/24
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Fixed the weather voice command for the Italian language.
+  4. Fixed and optimized some language specific instructions for the Driving Coach.
+  5. Strategies and lap telemetries provided by the community can now be loaded directly from the database browser dialog.
+  6. The Race Engineer now mentions the correct session type in its greeting message.
+  7. New voice recognition engines for Spanish and Italian. Please see the notes below.
+  8. {Internal] Significant performance improvement on Win 11.
+  
+IMPORTANT: The new voice recognition engines cannot be installed automatically, because the installer is unable to remove the old version of the library. You will see this alert, if you run "Simulator Setup".
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Update%202.jpg)
+
+To install the new libraries, follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-598).
+
+## 5.9.7.1-release 11/13/24
+  1. Potential fix for UDP connector runaway after last Microsoft Patch Day.
+  2. Implemented a watchdog which kills zombie UDP connection processes.
+  
 ## 5.9.7.0-release 11/08/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

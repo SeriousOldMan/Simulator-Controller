@@ -1,9 +1,9 @@
 [Development]
-Version=5.9.8.0-release
-Target=5.9.8.0-release
+Version=5.9.9.0-dev
+Target=5.9.9.0-release
 Date=11/15/2024
-Download=https://cutt.ly/PeJkx8Ff;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.9.8.0-release.zip
-Changes=Load community telemetries and strategies from browser, Fixed language specific update of instructions for Driving Coach, Engineer mentions the correct session type in greeting, Significant performance improvement on Win 11, Fixed the weather voice command for Italian
+Download=
+Changes=
 Components=Media->5.6.1,Configuration->5.9.8,Utilities->5.9.8
 [Release]
 Version=5.9.8.0-release
@@ -15,20 +15,14 @@ Components=Media->5.6.1,Configuration->5.9.8,Utilities->5.9.8
 Media.5.6.1.Path=Resources
 Media.5.6.1.Content=Splash Media
 Media.5.6.1.Download=https://www.dropbox.com/scl/fi/3c56fjdvdd4od5t7rsuc9/Media-5.6.1.zip?rlkey=x0icl05jy05nn886due4dsblv&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Media+5.6.1.zip
-Configuration.5.9.1.Path=Resources
-Configuration.5.9.1.Content=Setup
-Configuration.5.9.1.Download=https://www.dropbox.com/scl/fi/m9n4pwph45b5md8kgcc4u/Configuration-5.9.1.zip?rlkey=cji8tptxk1cuaraq1ltwijhih&st=1uq2hxfh&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+5.9.1.zip
 Configuration.5.9.8.Path=Resources
 Configuration.5.9.8.Content=Setup
 Configuration.5.9.8.Download=https://www.dropbox.com/scl/fi/551prmyyi64mtszwn713c/Configuration-5.9.8.zip?rlkey=xh7441tk4799ra43bap747n1u&st=8t6klbsq&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+5.9.8.zip
-Utilities.5.9.1.Path=.
-Utilities.5.9.1.Content=Utilities
-Utilities.5.9.1.Download=https://www.dropbox.com/scl/fi/n3n5gajdhb1swegw46bp6/Utilities-5.9.1.zip?rlkey=sl8dbbf0gndpaqyj8g66by8o5&st=3ullp93q&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.9.1.zip
 Utilities.5.9.8.Path=.
 Utilities.5.9.8.Content=Utilities
 Utilities.5.9.8.Download=https://www.dropbox.com/scl/fi/pjtq7f3u6uoy5ld88vqz9/Utilities-5.9.8.zip?rlkey=crido9soi8aiocepz10xdoev3&st=cprt4qr2&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.9.8.zip
 [Current]
-Type=Release
+Type=Development
 [Version]
-Development=5.9.8.0-release
+Development=5.9.9.0-dev
 Release=5.9.8.0-release

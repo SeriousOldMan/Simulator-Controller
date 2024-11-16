@@ -186,7 +186,7 @@ computeCurvature(data) {
 		absG := Abs(data[11])
 
 		if (absG > 0.1)
-			return - Log(((data[7] / 3.6) ** 2) / ((absG = 0) ? 0.00001 : absG))
+			return - Log(((data[7] / 3.6) ** 2) / absG)
 		else
 			return kNull
 	}

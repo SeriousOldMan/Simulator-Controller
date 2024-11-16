@@ -363,7 +363,7 @@ class Corner extends Section {
 				smoothness := nullRound(this.BrakeSmoothness)
 
 				descriptor.Entry := {Phase: "Braking"
-								   , BrakingPoint: (Round(this.Start["Entry"], 1) . " Meter from the start")
+								   , BrakingPoint: (Round(Abs(this.Start["Entry"]), 1) . ((this.Start["Entry"] > 0) ? " Meter before apex" : " Meter after apex"))
 								   , BrakingLength: (nullRound(this.Length["Entry"], 1) . " Meter")
 								   , Duration: (nullRound(this.Time["Entry"] / 1000, 2) . " Seconds")
 								   , MaxBrakePressure: (Round(this.MaxBrakePressure) . " Percent")
@@ -377,7 +377,7 @@ class Corner extends Section {
 
 			if (this.Start["Apex"] && (this.Start["Apex"] != kNull))
 				descriptor.Apex := {Phase: "Rolling"
-								  , Start: (Round(this.Start["Apex"], 1) . " Meter from the start")
+								  , Start: (Round(Abs(this.Start["Apex"]), 1) . ((this.Start["Apex"] > 0) ? " Meter before apex" : " Meter after apex"))
 								  , Length: (nullRound(this.Length["Apex"], 1) . " Meter")
 								  , Duration: (nullRound(this.Time["Apex"] / 1000, 2) . " Seconds")
 								  , Gear: this.RollingGear
@@ -393,7 +393,7 @@ class Corner extends Section {
 				smoothness := nullRound(this.ThrottleSmoothness)
 
 				descriptor.Exit := {Phase: "Accelerating"
-								  , AccelerationStart: (Round(this.Start["Entry"], 1) . " Meter from the start")
+								  , AccelerationStart: (Round(Abs(this.Start["Exit"]), 1) . ((this.Start["Exit"] > 0) ? " Meter after apex" : " Meter before apex"))
 								  , AccelerationLength: (nullRound(this.Length["Exit"], 1) . " Meter")
 								  , Duration: (nullRound(this.Time["Exit"] / 1000, 2) . " Seconds")
 								  , Gear: this.AcceleratingGear
@@ -430,9 +430,9 @@ class Corner extends Section {
 		this.iDirection := direction
 		this.iCurvature := curvature
 
-		this.iBrakingStart := (brakingStart ? brakingStart : kNull)
-		this.iRollingStart := (rollingStart ? rollingStart : kNull)
-		this.iAcceleratingStart := (acceleratingStart ? acceleratingStart : kNull)
+		this.iBrakingStart := brakingStart
+		this.iRollingStart := rollingStart
+		this.iAcceleratingStart := acceleratingStart
 
 		this.iBrakingTime := brakingTime
 		this.iRollingTime := rollingTime
@@ -518,8 +518,9 @@ class Corner extends Section {
 		local acceleratingStart := kNull
 		local maxBrake := 0
 		local brakeRampUp := 0
+		local apexIndex := kNull
 		local brake, throttle, steering, gear, rpm
-		local startIdx, startTime
+		local startIdx, startTime, newCurvature
 
 		distance(from, to := false) {
 			local distance, lastX, lastY, x, y
@@ -566,13 +567,20 @@ class Corner extends Section {
 		}
 
 		while (index <= endIndex) {
-			if (curvature = kNull)
+			if (curvature = kNull) {
 				curvature := telemetry.getValue(index, "Curvature")
+
+				if (curvature != kNull)
+					apexIndex := index
+			}
 			else {
 				newCurvature := telemetry.getValue(index, "Curvature")
 
-				if (newCurvature != kNull)
-					curvature := Max(curvature, newCurvature)
+				if ((newCurvature != kNull) && (newCurvature > curvature)) {
+					apexIndex := index
+
+					curvature := newCurvature
+				}
 			}
 
 			steering := telemetry.getValue(index, "Steering")
@@ -614,7 +622,7 @@ class Corner extends Section {
 				phase := "Braking"
 			else if (throttle <= 0.2)
 				phase := "Rolling"
-			else
+			else if (phase != "Approaching")
 				phase := "Accelerating"
 
 			if (phase != lastPhase) {
@@ -628,7 +636,7 @@ class Corner extends Section {
 
 			if (phase = "Braking") {
 				if (brakingStart == kNull)
-					brakingStart := distance(startIdx)
+					brakingStart := startIdx
 
 				if telemetry.getValue(index, "ABS", false)
 					absActivations += 1
@@ -657,7 +665,7 @@ class Corner extends Section {
 			}
 			else if (phase = "Rolling") {
 				if (rollingStart == kNull)
-					rollingStart := distance(startIdx)
+					rollingStart := startIdx
 
 				if (rollingGear == kNull) {
 					rollingGear := telemetry.getValue(index, "Gear")
@@ -677,7 +685,7 @@ class Corner extends Section {
 			}
 			else if (phase = "Accelerating") {
 				if (acceleratingStart == kNull) {
-					acceleratingStart := distance(startIdx)
+					acceleratingStart := startIdx
 
 					acceleratingGear := telemetry.getValue(index, "Gear")
 					acceleratingRPM := telemetry.getValue(index, "RPM")
@@ -707,6 +715,33 @@ class Corner extends Section {
 		}
 
 		updatePhase(phase, index - 1)
+
+		if ((brakingStart != kNull) && (apexIndex != kNull)) {
+			if (brakingStart > apexIndex)
+				brakingStart := - distance(apexIndex, brakingStart)
+			else
+				brakingStart := distance(brakingStart, apexIndex)
+		}
+		else
+			brakingStart := kNull
+
+		if ((rollingStart != kNull) && (apexIndex != kNull)) {
+			if (rollingStart > apexIndex)
+				rollingStart := - distance(apexIndex, rollingStart)
+			else
+				rollingStart := distance(rollingStart, apexIndex)
+		}
+		else
+			rollingStart := kNull
+
+		if ((acceleratingStart != kNull) && (apexIndex != kNull)) {
+			if (acceleratingStart > apexIndex)
+				acceleratingStart := distance(apexIndex, acceleratingStart)
+			else
+				acceleratingStart := - distance(acceleratingStart, apexIndex)
+		}
+		else
+			acceleratingStart := kNull
 
 		return Corner(section, (sumSteering > 0) ? "Right" : "Left", (curvature != kNull) ? curvature : 0
 							 , brakingStart, brakingTime, brakingLength, Round(maxBrake * 100), brakeRampUp
@@ -1025,9 +1060,9 @@ class Telemetry {
 					if lastSection
 						try {
 							if (lastSection.Type = "Corner")
-								sections.Push(Corner.fromSection(this, section, startIndex, Max(1, index - 1)))
+								sections.Push(Corner.fromSection(this, lastSection, startIndex, Max(1, index - 1)))
 							else
-								sections.Push(Straight.fromSection(this, section, startIndex, Max(1, index - 1)))
+								sections.Push(Straight.fromSection(this, lastSection, startIndex, Max(1, index - 1)))
 						}
 						catch Any as exception {
 							logError(exception)
@@ -1317,7 +1352,7 @@ class TelemetryAnalyzer {
 									   + ((getMultiMapValue(trackMap, "Points", index . ".Y") - y) ** 2))
 
 						if (distance <= threshold)
-							return section
+							return lastSection
 
 						index += 1
 					}

@@ -1,7 +1,7 @@
 [Development]
 Version=6.0.0.0-dev
 Target=6.0.0.0-release
-Date=11/15/2024
+Date=11/16/2024
 Download=
 Changes=Fully active coaching by the Driving Coach, Added "Coaching" and "TrackCoaching" action to the Driving Coach plugin, New icons in Stream Deck icon set for the "Coaching" and "TrackCoaching" actions, New settings for corner by corner coaching, Speaker and Listener booster for Driving Coach, New controller action functions for "Driving Coach" plugin, Info window in Telemetry Viewer
 Components=Media->5.6.1,Configuration->6.0.0,Utilities->5.9.8

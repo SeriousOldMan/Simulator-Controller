@@ -759,9 +759,9 @@ class RaceAssistant extends ConfigurationItem {
 
 			options["Language"] := ((language != false) ? language : options["Language"])
 			options["Synthesizer"] := ((synthesizer == true) ? options["Synthesizer"] : synthesizer)
-			options["Speaker"] := ((speaker == true) ? options["Speaker"] : speaker)
+			options["Speaker"] := speaker ; ((speaker == true) ? options["Speaker"] : speaker)
 			options["Recognizer"] := ((recognizer == true) ? options["Recognizer"] : recognizer)
-			options["Listener"] := ((listener == true) ? options["Listener"] : listener)
+			options["Listener"] := listener ; ((listener == true) ? options["Listener"] : listener)
 			options["VoiceServer"] := voiceServer
 
 			if vocalics {

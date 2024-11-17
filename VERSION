@@ -1,5 +1,5 @@
 [Development]
-Version=6.0.0.0-dev
+Version=6.0.0.0-alpha
 Target=6.0.0.0-release
 Date=11/17/2024
 Download=
@@ -27,5 +27,5 @@ Utilities.5.9.8.Download=https://www.dropbox.com/scl/fi/pjtq7f3u6uoy5ld88vqz9/Ut
 [Current]
 Type=Development
 [Version]
-Development=6.0.0.0-dev
+Development=6.0.0.0-alpha
 Release=5.9.8.0-release

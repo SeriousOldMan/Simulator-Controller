@@ -2588,7 +2588,7 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 			while layouts.Has(newName)
 				newName := (name . translate(" (") . A_Index . translate(")"))
 
-			layouts[newName] := {Name: newName, WidthZoom: 100, HeightZoom: 100, Channels: [kTelemetryChannels[1]]}
+			layouts[newName] := {Name: newName, WidthZoom: 100, HeightZoom: 100, Channels: [choose(kTelemetryChannels, (s) => s.HasProp("Size"))[1]]}
 
 			editLayoutSettings("LayoutsLoad", layouts)
 			editLayoutSettings("LayoutLoad", layouts[newName])
@@ -2641,7 +2641,7 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 				channelsListView.Add("Check", translate(channel.Name))
 			}
 
-			for ignore, channel in kTelemetryChannels
+			for ignore, channel in choose(kTelemetryChannels, (s) => s.HasProp("Size"))
 				if (!inList(names, channel.Name) && (channel.Channels.Length > 0))
 					channelsListView.Add("", translate(channel.Name))
 

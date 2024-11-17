@@ -2141,7 +2141,7 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 			while layouts.Has(newName)
 				newName := (name . translate(" (") . A_Index . translate(")"))
 
-			layouts[newName] := {Name: newName, WidthZoom: 100, HeightZoom: 100, Series: [kDataSeries[1]]}
+			layouts[newName] := {Name: newName, WidthZoom: 100, HeightZoom: 100, Series: [choose(kDataSeries, (s) => s.HasProp("Size"))[1]]}
 
 			editLayoutSettings("LayoutsLoad", layouts)
 			editLayoutSettings("LayoutLoad", layouts[newName])
@@ -2194,7 +2194,7 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 				seriesListView.Add("Check", translate(series.Name))
 			}
 
-			for ignore, series in kDataSeries
+			for ignore, series in choose(kDataSeries, (s) => s.HasProp("Size"))
 				if !inList(names, series.Name)
 					seriesListView.Add("", translate(series.Name))
 

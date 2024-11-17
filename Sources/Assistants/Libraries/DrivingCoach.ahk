@@ -143,7 +143,7 @@ class DrivingCoach extends GridRaceAssistant {
 		Get {
 			if isSet(type) {
 				if (type == true)
-					return ["Character", "Simulation", "Session", "Stint", "Knowledge", "Handling", "Coaching", "Coaching.Lap", "Coaching.Corner", "Coaching.Corner.Short", "Coaching.Reference"]
+					return ["Character", "Simulation", "Session", "Stint", "Knowledge", "Handling", "Coaching", "Coaching.Lap", "Coaching.Corner", "Coaching.Corner.Approaching", "Coaching.Reference"]
 				else
 					return (this.iInstructions.Has(type) ? this.iInstructions[type] : false)
 			}
@@ -1469,7 +1469,7 @@ class DrivingCoach extends GridRaceAssistant {
 				this.Mode := "Coaching"
 
 				try {
-					command := substituteVariables(this.Instructions["Coaching.Corner.Short"]
+					command := substituteVariables(this.Instructions["Coaching.Corner.Approaching"]
 												 , {telemetry: telemetry.JSON, corner: cornerNr})
 
 					if reference

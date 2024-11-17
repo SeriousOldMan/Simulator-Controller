@@ -760,8 +760,8 @@ class TelemetryViewer {
 										  , {Name: translate("Standard")
 										   , WidthZoom: 100, HeightZoom: 100
 										   , Channels: choose(kTelemetryChannels
-															, (s) => !inList(["Speed", "Throttle", "Brake", "TC", "ABS"
-																			, "Long G", "Lat G"], s.Name))})
+															, (s) => (!inList(["Speed", "Throttle", "Brake", "TC", "ABS"
+																			, "Long G", "Lat G"], s.Name) && s.HasProp("Size")))})
 
 			this.iSelectedLayout := translate("Standard")
 		}

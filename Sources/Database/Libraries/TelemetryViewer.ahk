@@ -764,7 +764,7 @@ class TelemetryViewer {
 			this.iLayouts := CaseInsenseMap(translate("Standard")
 										  , {Name: translate("Standard")
 										   , WidthZoom: 100, HeightZoom: 100
-										   , Series: choose(kTelemetryChannels
+										   , Series: choose(kDataSeries
 														  , (s) => (!inList(["Speed", "Throttle", "Brake", "TC", "ABS"
 																		   , "Long G", "Lat G"], s.Name) && s.HasProp("Size")))})
 

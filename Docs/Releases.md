@@ -17,8 +17,9 @@
   3. Fixed several bugs for the MoTeC telemetry importer.
   4. Fixed a critical bug in Telemetry Viewer, when no layout has been ever defined.
   5. Fixed a bug which prevented random voices to be selected for Assistants, if configured.
-  6. The community sharing consent can now be changed in the settings dialog of the "Session Database".
-  7. A new version of the local LLM Runtime is available, which includes the llama backend.
+  6. Track sections can now also be edited in the track map of the Telemetry Viewer.
+  7. The community sharing consent can now be changed in the settings dialog of the "Session Database".
+  8. A new version of the local LLM Runtime is available, which includes the llama backend.
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-599), if you are using the local LLM Runtime.
 

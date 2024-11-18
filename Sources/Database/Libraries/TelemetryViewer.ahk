@@ -1137,13 +1137,14 @@ class TelemetryViewer {
 		local simulator, car, track
 
 		if this.TrackMap
-			this.TrackMap.close()
+			WinActivate(this.TrackMap.Window)
+		else {
+			this.Manager.getSessionInformation(&simulator, &car, &track)
 
-		this.Manager.getSessionInformation(&simulator, &car, &track)
+			this.iTrackMap := TrackMap(this, simulator, track)
 
-		this.iTrackMap := TrackMap(this, simulator, track)
-
-		this.TrackMap.show()
+			this.TrackMap.show()
+		}
 	}
 
 	closeTrackMap() {
@@ -2134,6 +2135,10 @@ class TrackMap {
 	iTrackMap := false
 	iTrackImage := false
 
+	iTrackMapMode := "Position"
+
+	iTrackSections := []
+
 	iLastTrackPosition := false
 
 	class TrackMapWindow extends Window {
@@ -2227,6 +2232,22 @@ class TrackMap {
 		}
 	}
 
+	TrackMapMode {
+		Get {
+			return this.iTrackMapMode
+		}
+	}
+
+	TrackSections[key?] {
+		Get {
+			return (isSet(key) ? this.iTrackSections[key] : this.iTrackSections)
+		}
+
+		Set {
+			return (isSet(key) ? (this.iTrackSections[key] := value) : (this.iTrackSections := value))
+		}
+	}
+
 	__New(telemetryViewer, simulator, track) {
 		this.iTelemetryViewer := telemetryViewer
 
@@ -2238,7 +2259,9 @@ class TrackMap {
 		selectTrackPosition(*) {
 			local coordinateX := false
 			local coordinateY := false
-			local x, y
+			local action := false
+			local section := false
+			local x, y, originalX, originalY, currentX, currentY, msgResult
 
 			MouseGetPos(&x, &y)
 
@@ -2246,7 +2269,80 @@ class TrackMap {
 			y := screen2Window(y)
 
 			if this.findTrackCoordinate(x - this.iTrackDisplayArea[1], y - this.iTrackDisplayArea[2], &coordinateX, &coordinateY)
-				this.trackClicked(coordinateX, coordinateY)
+				if (this.TrackMapMode = "Position") {
+					this.trackClicked(coordinateX, coordinateY)
+				}
+				else {
+					section := this.findTrackSection(coordinateX, coordinateY)
+
+					if section {
+						if GetKeyState("Ctrl") {
+							OnMessage(0x44, translateYesNoButtons)
+							msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected section?"), translate("Delete"), 262436)
+							OnMessage(0x44, translateYesNoButtons, 0)
+
+							if (msgResult = "Yes")
+								this.deleteTrackSection(section)
+						}
+						else {
+							originalX := section.X
+							originalY := section.Y
+
+							while (GetKeyState("LButton")) {
+								MouseGetPos(&x, &y)
+
+								x := screen2Window(x)
+								y := screen2Window(y)
+
+								if this.findTrackCoordinate(x - this.iTrackDisplayArea[1], y - this.iTrackDisplayArea[2], &coordinateX, &coordinateY) {
+									section.X := coordinateX
+									section.Y := coordinateY
+
+									this.updateTrackMap()
+								}
+							}
+
+							currentX := section.X
+							currentY := section.Y
+
+							section.X := originalX
+							section.Y := originalY
+
+							if (this.findTrackSection(currentX, currentY) == section) {
+								this.updateTrackMap()
+
+								this.sectionClicked(originalX, originalY, section)
+							}
+							else {
+								section.X := currentX
+								section.Y := currentY
+
+								this.updateTrackSections()
+							}
+						}
+					}
+					else
+						this.trackClicked(coordinateX, coordinateY)
+				}
+		}
+
+		toggleMode(*) {
+			if (this.TrackMapMode = "Position") {
+				this.iTrackMapMode := "Edit"
+
+				this.Control["editButton"].Text := translate("Save")
+
+				this.updateTrackMap()
+			}
+			else {
+				this.iTrackMapMode := "Position"
+
+				this.Control["editButton"].Text := translate("Edit")
+
+				this.updateTrackSections(true)
+
+				this.updateTrackMap()
+			}
 		}
 
 		local mapGui := TrackMap.TrackMapWindow(this, {Descriptor: "Telemetry Browser.Track Map", Closeable: true, Resizeable:  "Deferred"})
@@ -2255,9 +2351,11 @@ class TrackMap {
 
 		this.iTrackDisplayArea := [480, 480, 480, 380]
 
-		mapGui.Add("Text", "x8 y2 w466 H:Center Center vtrackNameDisplay")
+		mapGui.Add("Text", "x88 y2 w306 H:Center Center vtrackNameDisplay")
 
-		mapGui.Add("Picture", "x0 y20 w479 h379 W:Grow H:Grow vtrackDisplayArea")
+		mapGui.Add("Button", "x399 yp w23 h20 w80 Center +0x200 X:Move veditButton", translate("Edit")).OnEvent("Click", toggleMode)
+
+		mapGui.Add("Picture", "x0 y25 w479 h379 W:Grow H:Grow vtrackDisplayArea")
 
 		this.iTrackDisplay := mapGui.Add("Picture", "x479 y379 BackgroundTrans vtrackDisplay")
 		this.iTrackDisplay.OnEvent("Click", selectTrackPosition)
@@ -2289,8 +2387,73 @@ class TrackMap {
 		this.Window.Destroy()
 	}
 
+	findTrackSection(coordinateX, coordinateY, threshold := 40) {
+		local trackMap := this.TrackMap
+		local candidate, deltaX, deltaY, dX, dY
+		local index, section
+
+		if ((this.TrackMapMode = "Edit") && trackMap) {
+			candidate := false
+			deltaX := false
+			deltaY := false
+
+			threshold := (threshold / getMultiMapValue(trackMap, "Map", "Scale"))
+
+			for index, section in this.TrackSections {
+				dX := Abs(coordinateX - section.X)
+				dY := Abs(coordinateY - section.Y)
+
+				if ((dX <= threshold) && (dY <= threshold) && (!candidate || ((dX + dy) < (deltaX + deltaY)))) {
+					candidate := section
+
+					deltaX := dx
+					deltaY := dy
+				}
+			}
+
+			return candidate
+		}
+		else
+			return false
+	}
+
+	getTrackCoordinateIndex(x, y, threshold := 5) {
+		local trackMap := this.TrackMap
+		local index := false
+		local candidateX, candidateY, deltaX, deltaY, coordX, coordY, dX, dY
+
+		if trackMap {
+			candidateX := kUndefined
+			candidateY := false
+			deltaX := false
+			deltaY := false
+
+			loop getMultiMapValue(trackMap, "Map", "Points") {
+				coordX := getMultiMapValue(trackMap, "Points", A_Index . ".X")
+				coordY := getMultiMapValue(trackMap, "Points", A_Index . ".Y")
+
+				dX := Abs(coordX - x)
+				dY := Abs(coordY - y)
+
+				if ((dX <= threshold) && (dY <= threshold) && ((candidateX == kUndefined) || ((dx + dy) < (deltaX + deltaY)))) {
+					candidateX := coordX
+					candidateY := coordY
+					deltaX := dX
+					deltaY := dY
+
+					index := A_Index
+				}
+			}
+
+			return index
+		}
+		else
+			return false
+	}
+
 	loadTrackMap(trackMap, trackImage) {
 		local directory := kTempDirectory . "Track Images"
+		local sections := []
 		local image
 
 		deleteDirectory(directory)
@@ -2305,6 +2468,15 @@ class TrackMap {
 		this.Control["trackNameDisplay"].Text := SessionDatabase.getTrackName(this.Simulator
 																			, getMultiMapValue(trackMap, "General", "Track", ""))
 
+		loop getMultiMapValue(trackMap, "Sections", "Count")
+			sections.Push({Type: getMultiMapValue(trackMap, "Sections", A_Index . ".Type")
+						 , X: getMultiMapValue(trackMap, "Sections", A_Index . ".X")
+						 , Y: getMultiMapValue(trackMap, "Sections", A_Index . ".Y")})
+
+		this.iTrackSections := sections
+
+		this.updateTrackSections(false)
+
 		this.createTrackMap()
 	}
 
@@ -2313,6 +2485,11 @@ class TrackMap {
 
 		this.iTrackMap := false
 		this.iTrackImage := false
+
+		this.iTrackMapMode := "Position"
+
+		this.Control["editButton"].Enabled := false
+		this.Control["editButton"].Text := translate("Edit")
 	}
 
 	updateTrackMap(simulator := false, track := false) {
@@ -2341,10 +2518,84 @@ class TrackMap {
 		}
 
 		if (this.TrackMap && this.TrackImage)
-			if this.iLastTrackPosition
+			if ((this.TrackMapMode = "Position") && this.iLastTrackPosition)
 				this.createTrackMap(this.iLastTrackPosition[1], this.iLastTrackPosition[2])
 			else
 				this.createTrackMap()
+	}
+
+	updateTrackSections(save := false) {
+		local straights := 0
+		local corners := 0
+		local sections, index, section
+
+		computeLength(index) {
+			local next := ((index = this.TrackSections.Length) ? 1 : (index + 1))
+			local distance := 0
+			local count := getMultiMapValue(this.TrackMap, "Map", "Points", 0)
+			local lastX, lastY, nextX, nextY
+
+			index := this.getTrackCoordinateIndex(this.TrackSections[index].X, this.TrackSections[index].Y)
+			next := this.getTrackCoordinateIndex(this.TrackSections[next].X, this.TrackSections[next].Y)
+
+			if (index && next) {
+				lastX := getMultiMapValue(this.TrackMap, "Points", index . ".X", 0)
+				lastY := getMultiMapValue(this.TrackMap, "Points", index . ".Y", 0)
+
+				index += 1
+
+				loop
+					if (index = next)
+						break
+					else if (index > count)
+						index := 1
+					else {
+						nextX := getMultiMapValue(this.TrackMap, "Points", index . ".X", 0)
+						nextY := getMultiMapValue(this.TrackMap, "Points", index . ".Y", 0)
+
+						distance += Sqrt(((nextX - lastX) ** 2) + ((nextY - lastY) ** 2))
+
+						lastX := nextX
+						lastY := nextY
+
+						index += 1
+					}
+				}
+
+			return Round(convertUnit("Length", distance))
+		}
+
+		sections := this.TrackSections
+
+		for index, section in sections
+			section.Index := this.getTrackCoordinateIndex(section.X, section.Y)
+
+		bubbleSort(&sections,  (a, b) => (a.Index > b.Index))
+
+		for index, section in this.TrackSections
+			section.Nr := ((section.Type = "Corner") ? ++corners : ++straights)
+
+		if (save && this.TrackMap) {
+			sections := this.TrackSections.Clone()
+
+			Task.startTask(() {
+				local index, section
+
+				removeMultiMapValues(this.TrackMap, "Sections")
+
+				setMultiMapValue(this.TrackMap, "Sections", "Count", this.TrackSections.Length)
+
+				for index, section in sections {
+					setMultiMapValue(this.TrackMap, "Sections", index . ".Nr", section.Nr)
+					setMultiMapValue(this.TrackMap, "Sections", index . ".Type", section.Type)
+					setMultiMapValue(this.TrackMap, "Sections", index . ".Index", section.Index)
+					setMultiMapValue(this.TrackMap, "Sections", index . ".X", section.X)
+					setMultiMapValue(this.TrackMap, "Sections", index . ".Y", section.Y)
+				}
+
+				SessionDatabase().updateTrackMap(this.Simulator, this.Track, this.TrackMap)
+			}, 0, kLowPriority)
+		}
 	}
 
 	updateTrackPosition(posX?, posY?) {
@@ -2427,9 +2678,123 @@ class TrackMap {
 	}
 
 	trackClicked(coordinateX, coordinateY) {
-		this.TelemetryViewer.TelemetryChart.selectPosition(coordinateX, coordinateY)
+		local oldCoordMode := A_CoordModeMouse
+		local x, y, action, section
 
-		this.updateTrackPosition(coordinateX, coordinateY)
+		CoordMode("Mouse", "Screen")
+
+		MouseGetPos(&x, &y)
+
+		x := screen2Window(x)
+		y := screen2Window(y)
+
+		CoordMode("Mouse", oldCoordMode)
+
+		if (this.TrackMapMode = "Position") {
+			this.TelemetryViewer.TelemetryChart.selectPosition(coordinateX, coordinateY)
+
+			this.updateTrackPosition(coordinateX, coordinateY)
+		}
+		else {
+			section := this.chooseTrackSectionType()
+
+			if section {
+				section.X := coordinateX
+				section.Y := coordinateY
+
+				this.addTrackSection(section)
+			}
+		}
+	}
+
+	sectionClicked(coordinateX, coordinateY, section) {
+		local oldCoordMode := A_CoordModeMouse
+		local x, y
+
+		CoordMode("Mouse", "Screen")
+
+		MouseGetPos(&x, &y)
+
+		x := screen2Window(x)
+		y := screen2Window(y)
+
+		CoordMode("Mouse", oldCoordMode)
+
+		section := this.chooseTrackSectionType(section)
+
+		if section
+			this.updateTrackSection(section)
+	}
+
+	addTrackSection(section) {
+		this.TrackSections.Push(section)
+
+		this.updateTrackSections()
+		this.updateTrackMap()
+	}
+
+	updateTrackSection(section) {
+		local index, candidate
+
+		for index, candidate in this.TrackSections
+			if ((section.X = candidate.X) && (section.Y = candidate.Y)) {
+				this.TrackSections[index] := section
+
+				this.updateTrackSections()
+				this.updateTrackMap()
+
+				break
+			}
+	}
+
+	deleteTrackSection(section) {
+		local index, candidate
+
+		for index, candidate in this.TrackSections
+			if ((section.X = candidate.X) && (section.Y = candidate.Y)) {
+				this.TrackSections.RemoveAt(index)
+
+				this.updateTrackSections()
+				this.updateTrackMap()
+
+				break
+			}
+	}
+
+	chooseTrackSectionType(section := false) {
+		local result := false
+		local sectionsMenu := Menu()
+
+		sectionsMenu.Add(translate("Corner"), (*) => (result := "Corner"))
+		sectionsMenu.Add(translate("Straight"), (*) => (result := "Straight"))
+
+		if section
+			sectionsMenu.Check(translate(section.Type))
+
+		this.Window.Block()
+
+		try {
+			sectionsMenu.Show()
+
+			while (!result && !GetKeyState("Esc"))
+				Sleep(100)
+
+			if result {
+				if section
+					section := section.Clone()
+				else
+					section := Object()
+
+				section.Type := result
+
+				return section
+			}
+			else
+				return false
+		}
+		finally {
+			this.Window.Unblock()
+		}
 	}
 
 	createTrackMap(posX?, posY?) {
@@ -2454,7 +2819,39 @@ class TrackMap {
 
 		imgScale := Min(w / imgWidth, h / imgHeight)
 
-		if (isSet(posX) && isSet(posY)) {
+		if (this.TrackMapMode = "Position") {
+			if (isSet(posX) && isSet(posY)) {
+				token := Gdip_Startup()
+
+				bitmap := Gdip_CreateBitmapFromFile(trackImage)
+
+				graphics := Gdip_GraphicsFromImage(bitmap)
+
+				Gdip_SetSmoothingMode(graphics, 4)
+
+				brush := Gdip_BrushCreateSolid(0xff00ff00)
+
+				r := Round(15 / (imgScale * 3))
+
+				imgX := Round((marginX + offsetX + posX) * scale)
+				imgY := Round((marginX + offsetY + posY) * scale)
+
+				Gdip_FillEllipse(graphics, brush, imgX - r, imgY - r, r * 2, r * 2)
+
+				Gdip_DeleteBrush(brush)
+
+				trackImage := temporaryFileName("Track Images\TrackMap", "png")
+
+				Gdip_SaveBitmapToFile(bitmap, trackImage)
+
+				Gdip_DisposeImage(bitmap)
+
+				Gdip_DeleteGraphics(graphics)
+
+				Gdip_Shutdown(token)
+			}
+		}
+		else {
 			token := Gdip_Startup()
 
 			bitmap := Gdip_CreateBitmapFromFile(trackImage)
@@ -2463,16 +2860,27 @@ class TrackMap {
 
 			Gdip_SetSmoothingMode(graphics, 4)
 
-			brush := Gdip_BrushCreateSolid(0xff00ff00)
-
 			r := Round(15 / (imgScale * 3))
 
-			imgX := Round((marginX + offsetX + posX) * scale)
-			imgY := Round((marginX + offsetY + posY) * scale)
+			brushStart := Gdip_BrushCreateSolid(0xff808080)
+			brushCorner := Gdip_BrushCreateSolid(0xffFF0000)
+			brushStraight := Gdip_BrushCreateSolid(0xff00FF00)
 
-			Gdip_FillEllipse(graphics, brush, imgX - r, imgY - r, r * 2, r * 2)
+			imgX := Round((marginX + offsetX + getMultiMapValue(trackMap, "Points", "1.X")) * scale)
+			imgY := Round((marginX + offsetY + getMultiMapValue(trackMap, "Points", "1.Y")) * scale)
 
-			Gdip_DeleteBrush(brush)
+			Gdip_FillEllipse(graphics, brushStart, imgX - r, imgY - r, r * 2, r * 2)
+
+			for ignore, section in this.TrackSections {
+				imgX := Round((marginX + offsetX + section.X) * scale)
+				imgY := Round((marginX + offsetY + section.Y) * scale)
+
+				Gdip_FillEllipse(graphics, (section.Type = "Corner") ? brushCorner : brushStraight, imgX - r, imgY - r, r * 2, r * 2)
+			}
+
+			Gdip_DeleteBrush(brushStart)
+			Gdip_DeleteBrush(brushCorner)
+			Gdip_DeleteBrush(brushStraight)
 
 			trackImage := temporaryFileName("Track Images\TrackMap", "png")
 

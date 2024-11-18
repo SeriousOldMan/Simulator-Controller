@@ -3265,7 +3265,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		action := actionDialog(x, y, action)
 
 		if action
-			this.updateTrackSction(action)
+			this.updateTrackSection(action)
 	}
 
 	sectionClicked(coordinateX, coordinateY, section) {
@@ -3725,10 +3725,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.iTrackMap := trackMap
 		this.iTrackImage := this.Window.Theme.RecolorizeImage(trackImage)
 
-		loop getMultiMapValue(this.TrackMap, "Sections", "Count")
-			sections.Push({Type: getMultiMapValue(this.TrackMap, "Sections", A_Index ".Type")
-						 , X: getMultiMapValue(this.TrackMap, "Sections", A_Index ".X")
-						 , Y: getMultiMapValue(this.TrackMap, "Sections", A_Index ".Y")})
+		loop getMultiMapValue(trackMap, "Sections", "Count")
+			sections.Push({Type: getMultiMapValue(trackMap, "Sections", A_Index ".Type")
+						 , X: getMultiMapValue(trackMap, "Sections", A_Index ".X")
+						 , Y: getMultiMapValue(trackMap, "Sections", A_Index ".Y")})
 
 		this.iTrackSections := sections
 

@@ -484,7 +484,7 @@ class Corner extends Section {
 		local acceleratingGear := 0
 		local acceleratingRPM := 0
 		local acceleratingSpeed := 0
-		local curvature := telemetry.getValue(index, "Curvature", 0)
+		local curvature := telemetry.getValue(index, "Curvature", kNull)
 		local speed := kUndefined
 		local latG := kUndefined
 		local absActivations := 0
@@ -1212,6 +1212,12 @@ class TelemetryAnalyzer {
 		this.iSimulator := simulator
 		this.iTrack := track
 		this.iTrackMap := sessionDB.getTrackMap(simulator, track)
+	}
+
+	trackMapChanged(trackMap) {
+		this.iTrackMap := trackMap
+
+		this.iTrackSections := []
 	}
 
 	static getTrackCoordinateIndex(trackMap, x, y, threshold := 5) {

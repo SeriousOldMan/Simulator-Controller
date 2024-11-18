@@ -140,6 +140,8 @@ If available, a map for the current track can be opened with the "Map..." button
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Telemetry%20Browser%20Track%20Map.jpg)
 
+Also, you can edit the track sections by clicking on the "Edit" button in the right corner of the window. 
+
 Important: This functionality may not be available when using *WebView2* as the HTML viewer.
 
 The Telemetry Viewer is available in the following applications to collect lap telemetry data, where additional documentation is available:

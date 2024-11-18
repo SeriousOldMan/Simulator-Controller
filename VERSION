@@ -1,9 +1,9 @@
 [Development]
 Version=5.9.9.0-dev
 Target=5.9.9.0-release
-Date=11/15/2024
+Date=11/18/2024
 Download=
-Changes=Updated LLM Runtime to the newest llama backend release
+Changes=Updated LLM Runtime to the newest llama backend release, Track sections editor in Telemetry Viewer
 Components=Media->5.6.1,Configuration->5.9.8,Utilities->5.9.8
 [Release]
 Version=5.9.8.0-release

@@ -2,6 +2,7 @@
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. A new version of the local LLM Runtime is available, which includes the llama backend.
+  4. Track sections can now also be edited in the track map of the Telemetry Viewer.
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-599), if you are using the local LLM Runtime.
 

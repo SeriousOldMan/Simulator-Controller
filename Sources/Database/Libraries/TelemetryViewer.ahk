@@ -1161,6 +1161,9 @@ class TelemetryViewer {
 		this.iTrackMap := false
 	}
 
+	trackMapChanged(trackMap) {
+	}
+
 	restart(directory, collect := true) {
 		local simulator, car, track
 
@@ -2148,6 +2151,8 @@ class TrackMap {
 
 				SessionDatabase().updateTrackMap(this.Simulator, this.Track, this.TrackMap)
 			}, 0, kLowPriority)
+
+			this.TelemetryViewer.trackMapChanged(this.TrackMap)
 		}
 	}
 

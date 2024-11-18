@@ -27,7 +27,7 @@ global kGuardExit := true
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                        Private Constant Section                         ;;;
+;;;                        Internal Constant Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 global kUninstallKey := "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\SimulatorController"

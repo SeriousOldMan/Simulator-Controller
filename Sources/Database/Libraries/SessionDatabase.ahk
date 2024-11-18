@@ -1551,6 +1551,10 @@ class SessionDatabase extends ConfigurationItem {
 			local skipNext := false
 			local entry, ignore, channel, importFileName
 
+			static motecChannels := ["Distance", "THROTTLE", "BRAKE"
+								   , "STEERANGLE", "GEAR", "RPMS", "SPEED"
+								   , "TC", "ABS", "G_LON", "G_LAT", "UNKNOWN (PosX)", "UNKNOWN (PosY)", "TIME"]
+
 			try {
 				importFileName := temporaryFileName("Import", "telemetry")
 
@@ -1580,12 +1584,10 @@ class SessionDatabase extends ConfigurationItem {
 						else if (entry[1] = "Range")
 							setMultiMapValue(info, "Info", "Lap", Trim(StrReplace(entry[2], "Lap", "")))
 						else if !channels {
-							if (entry[1] = "Distance") {
+							if inList(motecChannels, entry[1]) {
 								channels := []
 
-								for ignore, channel in ["Distance", "THROTTLE", "BRAKE"
-													  , "STEERANGLE", "GEAR", "RPMS", "SPEED"
-													  , "TC", "ABS", "G_LON", "G_LAT", "UNKNOWN (PosX)", "UNKNOWN (PosY)", "TIME"]
+								for ignore, channel in motecChannels
 									channels.Push([channel, inList(entry, channel)])
 
 								skipNext := true

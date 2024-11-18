@@ -357,8 +357,9 @@ getControllerState(configuration?, force := false) {
 
 		if force
 			deleteFile(kTempDirectory . "Simulator Controller.state")
-
-		if (isSet(isProperInstallation) && isProperInstallation() && load && FileExist(kUserConfigDirectory . "Simulator Controller.install"))
+			
+		if (isSet(isProperInstallation) && isProperInstallation() && load
+		 && (FileExist(kUserConfigDirectory . "Simulator Controller.install") || (RegRead("HKLM\" . kUninstallKey, "InstallLocation", "") != "")))
 			if (!pid && (configuration || !FileExist(kTempDirectory . "Simulator Controller.state"))) {
 				try {
 					if configuration {

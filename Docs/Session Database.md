@@ -296,6 +296,8 @@ Please note, that the initial synchronization might take quite a while (up to a 
 
 Final note: Once you have changed the database location or the synchronization settings, you will be prompted to restart all applications of Simulator Controller.
 
+With the "Consent..." button in the lower left corner of the dialog, you can open the [consent dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#sharing-data-with-the-community), if you want to change your community settings.
+
 ##### Data privacy
 
 It is important to understand, that in all cases only data that you created yourself, will be replicated to a central database in a Team Server. This protects the personal rights and copyrights of other drivers. Although you will receive all data from all other team members, this data will never be replicated back to any (other) Team Server. So, if you switch teams, for example, the data replicated from your former team will still be available in your local database, but it will not be synchronized with the central Team Server database of your new team.

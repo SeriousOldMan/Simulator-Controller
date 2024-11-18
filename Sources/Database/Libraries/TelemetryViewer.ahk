@@ -1159,9 +1159,13 @@ class TelemetryViewer {
 		this.iTrackMap := false
 	}
 
-	trackMapChanged(trackMap, x := false, y := false) {
-		if (x || y)
+	trackMapChanged(trackMap) {
+		local x, y
+
+		if (this.TrackMap && this.TrackMap.getSelectedTrackPosition(&x, &y))
 			this.showSectionInfo(x, y, false)
+		else
+			SectionInfoViewer.closeSectionInfo()
 	}
 
 	restart(directory, collect := true) {
@@ -1526,6 +1530,7 @@ class TelemetryViewer {
 
 	selectLap(lap, force := false) {
 		local index := 0
+		local x, y
 
 		if (force || (lap != this.SelectedLap)) {
 			this.SelectedLap := lap
@@ -1542,8 +1547,14 @@ class TelemetryViewer {
 
 				this.Control["lapDropDown"].Choose(index)
 
-				if this.TrackMap
+				if this.TrackMap {
 					this.TrackMap.updateTrackPosition()
+
+					if (this.TrackMap.getSelectedTrackPosition(&x, &y))
+						this.showSectionInfo(x, y, false)
+					else
+						SectionInfoViewer.closeSectionInfo()
+				}
 
 				this.updateState()
 			}
@@ -1571,8 +1582,14 @@ class TelemetryViewer {
 
 				this.Control["referenceLapDropDown"].Choose(index + 1)
 
-				if this.TrackMap
+				if this.TrackMap {
 					this.TrackMap.updateTrackPosition()
+
+					if (this.TrackMap.getSelectedTrackPosition(&x, &y))
+						this.showSectionInfo(x, y, false)
+					else
+						SectionInfoViewer.closeSectionInfo()
+				}
 
 				this.updateState()
 			}
@@ -2393,6 +2410,17 @@ class TrackMap {
 		this.Window.Destroy()
 	}
 
+	getSelectedTrackPosition(&x, &y) {
+		if this.iLastTrackPosition {
+			x := this.iLastTrackPosition[1]
+			y := this.iLastTrackPosition[2]
+
+			return true
+		}
+		else
+			return false
+	}
+
 	findTrackSection(coordinateX, coordinateY, threshold := 40) {
 		local trackMap := this.TrackMap
 		local candidate, deltaX, deltaY, dX, dY
@@ -2601,8 +2629,7 @@ class TrackMap {
 
 				SessionDatabase().updateTrackMap(this.Simulator, this.Track, this.TrackMap)
 
-				this.TelemetryViewer.trackMapChanged(this.TrackMap, this.iLastTrackPosition ? this.iLastTrackPosition[1] : false
-																  , this.iLastTrackPosition ? this.iLastTrackPosition[2] : false)
+				this.TelemetryViewer.trackMapChanged(this.TrackMap)
 			}, 0, kLowPriority)
 		}
 	}

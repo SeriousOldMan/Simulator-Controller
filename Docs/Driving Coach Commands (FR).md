@@ -81,6 +81,24 @@ Information=informations sur la session, informations sur le relais, information
 
 	[(TellMe) l'heure, Quelle heure est-il, Quelle est {l'heure, l'heure actuelle}]
 
+3.  Entraînement
+
+	[(CanYou) me donner {un coaching , une leçon de coaching}, (CanWe) organiser une séance {de coaching, de formation, d'entraînement}, (CanYou) m'aider avec ma {formation, pratique}, (CanYou) {observer, regarder} {mon entraînement, ma pratique, ma conduite}, (CanYou) {vérifier, regarder} {ma technique, mon style} de conduite, (CanWe) améliorer mes compétences de conduite]
+
+	[Merci {pour votre aide, j'ai beaucoup appris, c'était super}, C'était super merci, Okay that's enough for today, D'accord, c'est assez pour aujourd'hui]
+
+	[(CanYou) me donner {un aperçu, un aperçu virage par virage, un aperçu de tout le tour, un aperçu complet, un aperçu complet virage par virage}, {Veuillez jeter, Jetez} un oeil à la piste complète, Où peut-on je m'améliore sur la piste]
+
+	[(CanWe) {concentrer sur le, parler de} {coin numéro, coin} (Number), {Veuillez regarder, Regarder} {de plus près le, un oeil au} {coin numéro, coin} (Number), Où puis-je m'améliorer dans {coin numéro, coin} (Number), Que dois-je considérer {pour, dans} le {coin numéro, coin} (Number)]
+
+	[(CanYou) me donner {des recommandations, des conseils, un guide, des instructions} {pendant que je conduis, en conduisant, à chaque virage}, {S'il vous plaît dites-moi, Dites-moi} {avant, pour} chaque coin ce que je {peut, devrais} changer, (CanYou) {m'entraîner sur la piste, me coacher pendant que je conduis, me coacher en conduisant}]
+	
+	[{Merci maintenant, Maintenant} je veux me concentrer, Ok, laisse-moi {appliquer, essayer} {tes instructions, vos recommandations, ça} maintenant, {S'il vous plaît arrêtez, Arrêtez} de me donner des {instructions, recommandations, instructions pour chaque coin, recommandations pour chaque coin}, {S'il vous plaît plus, Plus} {d'instructions, d'instructions s'il vous plaît}]
+
+	[(CanWe) utiliser le tour le plus rapide comme {référence, tour de référence}, {Veuillez utiliser, Utiliser} le tour le plus rapide comme {référence, tour de référence}]
+
+	[{S'il vous plaît n'utilisez, N'utilisez} pas de référence {tour, tour s'il vous plaît}]
+
 #### Conversation
 
 Vous utiliserez pour la plupart une conversation gratuite avec le Driving Coach. Par conséquent, chaque commande vocale qui ne correspond à aucune des commandes indiquées ci-dessus sera transmise au modèle de langage GPT, ce qui entraînera une boîte de dialogue de type humain, comme indiqué dans l'[exemple](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#a-typical-dialog).

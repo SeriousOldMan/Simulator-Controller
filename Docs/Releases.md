@@ -2,7 +2,7 @@
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. A [telemetry-based coaching mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#coaching-based-on-lap-telemetry-data) is now available when using the Driving Coach. The coach will take a look at the live telemetry data and will tell you where you have to change your driver inputs and maybe also ask you to take a different line to ultimately improve your lap time.
-     - Many new voice commands have been defined to start a coaching session and also to interact with the Driving Coach during coaching. See the [voice command reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Driving-Coach-Commands-(EN)) for more information.
+     - Many new voice commands have been defined to start a coaching session and also to interact with the Driving Coach during coaching. See the [voice command reference for English](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Driving-Coach-Commands-(EN)) (or for any of the other supported languages) for more information.
 	 - A controller action "TelemetryCoaching" has been defined for the [Driving Coach plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-driving-coach) to start / finish a coaching session from your Button Box or Stream Deck.
 	 - A controller action "TrackCoaching" has been defined for the [Driving Coach plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-driving-coach) to request active coaching while driving from your Button Box or Stream Deck.
 	 - New icons for the "TelemetryCoaching" and "TrackCoaching" actions has been added to the Stream Deck icon set.

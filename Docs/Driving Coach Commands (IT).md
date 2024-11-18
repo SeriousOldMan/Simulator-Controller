@@ -81,6 +81,24 @@ Information=informazioni sulla sessione, informazioni sul turno, informazioni su
 
 	[(TellMe) l'ora, Che ore sono, Qual è {l'ora attuale, l'orario}]
 
+3.  Formazione
+
+	[(CanYou) dammi un {coaching, lezione di coaching}, (CanWe) organizza una sessione di {coaching, formazione, pratica}, (CanYou) {aiutare, aiutami} con {la, mio} {formazione, pratica}, (CanYou) {osservare, guardare} il mio {allenamento, pratica, guida}, (CanYou) {controllare, guardare} la mia {tecnica, stile} di guida, (CanWe) migliorare la mia guida competenze]
+
+	[Grazie {per il tuo aiuto, ho imparato molto, è stato fantastico}, È stato fantastico grazie, Okay per oggi basta]
+
+	[(CanYou) dammi {una panoramica, una panoramica curva per curva, una panoramica per l'intero giro, una panoramica completa, una panoramica completa curva per curva}, {Per favore dai, Dai} un'occhiata al percorso completo, Dove posso migliorare in pista]
+
+	[(CanWe) {concentrarsi, parlare di} {curva, curva numero} (Number), {Per favore dare, Dare} uno {sguardo più attento, guardare} a {curva, curva numero} (Number), Dove posso migliorare {curva, curva numero} (Number), Cosa dovrei considerare per la {curva, curva numero} (Number)]
+
+	[(CanYou) dammi {raccomandazioni, suggerimenti, una guida, istruzioni} {mentre guido, per ogni curva}, {Per favore dimmi, Dimmi} {davanti, per} ogni curva quello che {posso, dovrebbe} cambiare, (CanYou) allenami {in pista, mentre guido}]
+
+	[{Grazie adesso, Adesso} voglio concentrarmi, {Okay lasciami, Lasciami} {applicare, provare} {i tuoi consigli, le tue istruzioni, quello} ora, {Per favore fermati, Fermati} dandomi {raccomandazioni, suggerimenti, istruzioni, consigli per ogni curva, suggerimenti per ogni curva, istruzioni per ogni curva}, {Per favore no, No} altro {istruzioni, istruzioni per favore}]
+
+	[(CanWe) utilizzare il giro {più veloce, ultimo} come {riferimento, giro di riferimento}, {Per favore utilizzare, Utilizzare} il giro {più veloce, ultimo} come {riferimento, giro di riferimento}]
+
+	[{Per favore non, Non} utilizzare un {giro di riferimento, riferimento, giro di riferimento per favore, riferimento per favore}]
+
 #### Conversazione
 
 Per la maggior parte utilizzerai una conversazione gratuita con l'allenatore di guida. Pertanto, ogni comando vocale che non corrisponde a nessuno dei comandi mostrati sopra verrà inoltrato al modello linguistico GPT, che risulterà in una finestra di dialogo simile a quella umana come mostrato nell'[esempio](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#a-typical-dialog).

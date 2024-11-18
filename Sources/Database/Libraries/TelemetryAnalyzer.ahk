@@ -1214,12 +1214,6 @@ class TelemetryAnalyzer {
 		this.iTrackMap := sessionDB.getTrackMap(simulator, track)
 	}
 
-	trackMapChanged(trackMap) {
-		this.iTrackMap := trackMap
-
-		this.iTrackSections := []
-	}
-
 	static getTrackCoordinateIndex(trackMap, x, y, threshold := 5) {
 		local index := false
 		local candidateX, candidateY, deltaX, deltaY, coordX, coordY, dX, dY

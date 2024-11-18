@@ -1159,7 +1159,9 @@ class TelemetryViewer {
 		this.iTrackMap := false
 	}
 
-	trackMapChanged(trackMap) {
+	trackMapChanged(trackMap, x := false, y := false) {
+		if (x || y)
+			this.showSectionInfo(x, y, false)
 	}
 
 	restart(directory, collect := true) {
@@ -1577,7 +1579,7 @@ class TelemetryViewer {
 		}
 	}
 
-	showSectionInfo(x, y) {
+	showSectionInfo(x, y, open := true) {
 		local referenceTelemetry := false
 		local simulator, car, track, analyzer, telemetry, section, lap, referenceLap, driver, lapTime, sectorTimes
 
@@ -1615,7 +1617,7 @@ class TelemetryViewer {
 				section := telemetry.findSection(x, y)
 
 				if section
-					SectionInfoViewer.showSectionInfo(section, referenceTelemetry ? referenceTelemetry.findSection(x, y) : false)
+					SectionInfoViewer.showSectionInfo(section, referenceTelemetry ? referenceTelemetry.findSection(x, y) : false, open)
 			}
 		}
 		catch Any as exception {
@@ -1835,14 +1837,15 @@ class SectionInfoViewer {
 			WinActivate(SectionInfoViewer.Instance.Window)
 	}
 
-	static showSectionInfo(section, referenceSection := false) {
-		if !SectionInfoViewer.Instance {
+	static showSectionInfo(section, referenceSection := false, open := true) {
+		if (!SectionInfoViewer.Instance && open) {
 			SectionInfoViewer.Instance := SectionInfoViewer()
 
 			SectionInfoViewer.Instance.show()
 		}
 
-		SectionInfoViewer.Instance.showSectionInfo(section, referenceSection)
+		if SectionInfoViewer.Instance
+			SectionInfoViewer.Instance.showSectionInfo(section, referenceSection)
 	}
 
 	static closeSectionInfo() {
@@ -2597,9 +2600,10 @@ class TrackMap {
 				}
 
 				SessionDatabase().updateTrackMap(this.Simulator, this.Track, this.TrackMap)
-			}, 0, kLowPriority)
 
-			this.TelemetryViewer.trackMapChanged(this.TrackMap)
+				this.TelemetryViewer.trackMapChanged(this.TrackMap, this.iLastTrackPosition ? this.iLastTrackPosition[1] : false
+																  , this.iLastTrackPosition ? this.iLastTrackPosition[2] : false)
+			}, 0, kLowPriority)
 		}
 	}
 

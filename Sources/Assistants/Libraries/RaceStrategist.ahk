@@ -520,11 +520,7 @@ class RaceStrategist extends GridRaceAssistant {
 			this.iStatistics := statistics
 			this.iRaceStrategist := strategist
 			this.iLap := knowledgeBase.getValue("Lap")
-			this.iTelemetryDatabase
-				:= RaceStrategist.SessionTelemetryDatabase(strategist
-														 , strategist.Simulator
-														 , knowledgeBase.getValue("Session.Car")
-														 , knowledgeBase.getValue("Session.Track"))
+			this.iTelemetryDatabase := RaceStrategist.SessionTelemetryDatabase(strategist, strategist.Simulator, strategist.Car, strategist.Track)
 
 			this.iFullCourseYellow := fullCourseYellow
 			this.iForcedPitstop := forcedPitstop
@@ -1578,7 +1574,8 @@ class RaceStrategist extends GridRaceAssistant {
 			this.updateRaceInfo(this.createRaceData(data))
 
 		if ((this.Session == kSessionRace) && (getMultiMapValue(data, "Stint Data", "Laps", 0) < 5)
-										   && FileExist(kUserConfigDirectory . "Race.strategy") && !this.Strategy) {
+										   && FileExist(kUserConfigDirectory . "Race.strategy")
+										   && (!this.Strategy || !this.KnowledgeBase || (this.KnowledgeBase.getValue("Strategy.Name", false) != this.Strategy.Name))) {
 			theStrategy := RaceStrategist.RaceStrategy(this, readMultiMap(kUserConfigDirectory . "Race.strategy"), SessionDatabase.ID, [])
 
 			applicableStrategy := false
@@ -3170,6 +3167,8 @@ class RaceStrategist extends GridRaceAssistant {
 					if ((pitstop.Lap >= maxLap) && (scenario.Pitstops[1].Lap < pitstop.Lap))
 						return true
 		}
+		else ; Nothing to see here, move on
+			return false
 
 		; Negative => Better, Positive => Worse
 
@@ -4207,7 +4206,8 @@ class RaceStrategist extends GridRaceAssistant {
 
 		if ((lapState = "Valid") && !pitstop) {
 			telemetryDB.addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor
-										 , map, tc, abs, fuelConsumption, fuelRemaining, lapTime)
+										 , map, tc, abs, fuelConsumption, fuelRemaining, lapTime
+										 , isDebug() ? SessionDatabase.getDriverID(this.Simulator, this.DriverFullName) : false)
 
 			lastPitstop := knowledgeBase.getValue("Pitstop.Last", false)
 
@@ -4222,7 +4222,8 @@ class RaceStrategist extends GridRaceAssistant {
 									   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
 									   , wear ? wear[1] : kNull, wear ? wear[2] : kNull
 									   , wear ? wear[3] : kNull, wear ? wear[4] : kNull
-									   , fuelConsumption, fuelRemaining, lapTime)
+									   , fuelConsumption, fuelRemaining, lapTime
+									   , isDebug() ? SessionDatabase.getDriverID(this.Simulator, this.DriverFullName) : false)
 		}
 
 		if (this.RemoteHandler && this.CollectTelemetry) {

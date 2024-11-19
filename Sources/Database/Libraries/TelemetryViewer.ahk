@@ -2912,7 +2912,7 @@ class TrackMap {
 			r := Round(15 / (imgScale * 3))
 
 			if (isSet(posX) && isSet(posY)) {
-				brush := Gdip_BrushCreateSolid(0xff008800)
+				brush := Gdip_BrushCreateSolid(0xffB0B0B0)
 
 				r := Round(15 / (imgScale * 3))
 

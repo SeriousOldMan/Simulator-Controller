@@ -53,7 +53,9 @@ The documentation is devided into the following sections:
   
   - [Virtual Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach)
 
-    This a very special chatbot, which behaves as your personal driving coach. Based on text-based GPT technology, it uses a publically available large language model which has been trained with vasts amount of information. Aks anything about racing, car handling and driving techniques and you will probably will get an interesting answer.
+    This a very special chatbot, which behaves as your personal driving coach. Based on text-based GPT technology, it uses a publically available large language model which has been trained with vasts amount of information. Ask anything about racing, car handling and driving techniques and you will probably will get an interesting answer.
+	
+	Additonally, you can activate an active coaching mode based on your cars telemetry data. If this mode is active, the coach can give you corner by corner instructions while you are driving. And you can discuss potential improvements for the whole lap or specific corners after the session. Reference laps from yourself or any other source can be used by the coach to boost your personal driving skills.
 	
   - [Virtual Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer)
 
@@ -61,11 +63,11 @@ The documentation is devided into the following sections:
 	
   - [Virtual Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist)
 
-    The other Assistant, Cato, takes care of all strategic aspects during races with one or more pit stops, even under changing weather conditions. It will provide you with extensive after race reports for analysis and documentation and will help you with strategy development based on telemetry data of past sessions.
+    Another Assistant, Cato, takes care of all strategic aspects during races with one or more pit stops, even under changing weather conditions. It will provide you with extensive after race reports for analysis and documentation and will help you with strategy development based on telemetry data of past sessions.
 	
   - [Virtual Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter)
 
-    The third Assistant, Elisa, will watch your race and will warn you about nearby other cars and will give you general information about the current race situation.
+    The third Race Assistant, Elisa, will watch your race and will warn you about nearby other cars and will give you valuable information about the current race situation.
 	
   - [Customizing Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants)
 

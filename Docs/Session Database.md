@@ -86,7 +86,7 @@ This page offers two different editors. The first one allows you to divide the t
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2020.jpg)
 
-To start a new section, simply click on a position on the track and choose whether the following section is considered a corner or a straight. You can also move section starting points around using the mouse. If you want to delete a section starting point, hold down the control key and click on the corresponding starting point. By the way, the small gray dot marks the start/finish line as recorded by the track mapper.
+To start a new section, simply click on a position on the track and choose whether the following section is considered a corner or a straight. You can also move section starting points around using the mouse. If you want to delete a section starting point, choose "Delete" from section popup menu or hold down the control key and click on the corresponding starting point. By the way, the small gray dot marks the start/finish line as recorded by the track mapper.
 
 When defining sections and you want to work with telemetry data or use the on-track coaching of the Driving Coach, it is important to set the section starting point before any section specific driver inputs take place. For example, a corner section should include the complete braking phase and also the initial part of the acceleration phase until the car has settled.
 
@@ -140,7 +140,7 @@ If available, a map for the current track can be opened with the "Map..." button
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Telemetry%20Browser%20Track%20Map.jpg)
 
-Also, you can edit the track sections by clicking on the "Edit" button in the right corner of the window. 
+Also, you can edit the track sections by clicking on the "Edit" button in the right corner of the window. This enables you to edit the sections as described above for the [sections editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation).
 
 Important: This functionality may not be available when using *WebView2* as the HTML viewer.
 

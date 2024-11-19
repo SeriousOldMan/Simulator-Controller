@@ -3238,7 +3238,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			}
 		}
 		else {
-			section := sectionDialog(x, y)
+			section := this.chooseTrackSectionType()
 
 			if section {
 				section.X := coordinateX
@@ -3270,7 +3270,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	sectionClicked(coordinateX, coordinateY, section) {
 		local oldCoordMode := A_CoordModeMouse
-		local x, y
+		local x, y, newSection
 
 		CoordMode("Mouse", "Screen")
 
@@ -3281,10 +3281,59 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		CoordMode("Mouse", oldCoordMode)
 
-		section := sectionDialog(x, y, section)
+		newSection := this.chooseTrackSectionType(section)
 
-		if section
-			this.updateTrackSection(section)
+		if (newSection = "Delete")
+			this.deleteTrackSection(section)
+		else if newSection
+			this.updateTrackSection(newSection)
+	}
+
+	chooseTrackSectionType(section := false) {
+		local result := false
+		local sectionsMenu := Menu()
+
+		sectionsMenu.Add(translate("Corner"), (*) => (result := "Corner"))
+		sectionsMenu.Add(translate("Straight"), (*) => (result := "Straight"))
+
+		if section {
+			sectionsMenu.Check(translate(section.Type))
+
+			sectionsMenu.Add()
+
+			sectionsMenu.Add(translate("Delete"), (*) => (result := "Delete"))
+		}
+
+		sectionsMenu.Add()
+
+		sectionsMenu.Add(translate("Cancel"), (*) => (result := "Cancel"))
+
+		this.Window.Block()
+
+		try {
+			sectionsMenu.Show()
+
+			while (!result && !GetKeyState("Esc"))
+				Sleep(100)
+
+			if (result = "Delete")
+				return result
+			else if (result && (result != "Cancel")) {
+				if section
+					section := section.Clone()
+				else
+					section := Object()
+
+				section.Type := result
+
+				return section
+			}
+			else
+				return false
+		}
+		finally {
+			this.Window.Unblock()
+		}
 	}
 
 	addTrackSection(section) {
@@ -6086,111 +6135,6 @@ copyFiles(source, destination) {
 	showProgress({progress: 50, color: "Green"})
 
 	copyDirectory(source, destination, 50 / count, &step)
-}
-
-sectionDialog(xOrCommand := false, y := false, section := false, *) {
-	/*
-	global gPositionInfoEnabled
-
-	local x
-
-	static result := false
-
-	static sectionTypeDropDown
-	static sectionDialogGui
-
-	if (xOrCommand == kOk)
-		result := kOk
-	else if (xOrCommand == kCancel)
-		result := kCancel
-	else {
-		result := false
-
-		sectionDialogGui := Window({Options: "0x400000"}, translate("Section"))
-
-		sectionDialogGui.SetFont("Norm", "Arial")
-
-		sectionDialogGui.Add("Text", "x16 y16 w70 h23 +0x200", translate("Type"))
-
-		if section
-			chosen := inList(["Straight", "Corner"], section.Type)
-		else
-			chosen := 1
-
-		sectionTypeDropDown := sectionDialogGui.Add("DropDownList", "x90 yp+1 w180 Choose" . chosen, collect(["Straight", "Corner"], translate))
-
-		sectionDialogGui.Add("Button", "x104 yp+30 w80 h23 Default", translate("Ok")).OnEvent("Click", sectionDialog.Bind(kOk))
-		sectionDialogGui.Add("Button", "x190 yp w80 h23", translate("&Cancel")).OnEvent("Click", sectionDialog.Bind(kCancel))
-
-		x := (xOrCommand - 150)
-		y := (y - 35)
-
-		sectionDialogGui.Opt("+Owner" . SessionDatabaseEditor.Instance.Window.Hwnd)
-
-		sectionDialogGui.Show("x" . x . " y" . y . " AutoSize")
-
-		gPositionInfoEnabled := false
-
-		ToolTip()
-
-		while !result
-			Sleep(100)
-
-		try {
-			if (result == kCancel)
-				return false
-			else if (result == kOk) {
-				if section
-					section := section.Clone()
-				else
-					section := Object()
-
-				section.Type := ["Straight", "Corner"][sectionTypeDropDown.Value]
-
-				return section
-			}
-		}
-		finally {
-			sectionDialogGui.Destroy()
-
-			gPositionInfoEnabled := true
-		}
-	}
-	*/
-
-	local result := false
-	local sectionsMenu := Menu()
-
-	sectionsMenu.Add(translate("Corner"), (*) => (result := "Corner"))
-	sectionsMenu.Add(translate("Straight"), (*) => (result := "Straight"))
-
-	if section
-		sectionsMenu.Check(translate(section.Type))
-
-	SessionDatabaseEditor.Instance.Window.Block()
-
-	try {
-		sectionsMenu.Show()
-
-		while (!result && !GetKeyState("Esc"))
-			Sleep(100)
-
-		if result {
-			if section
-				section := section.Clone()
-			else
-				section := Object()
-
-			section.Type := result
-
-			return section
-		}
-		else
-			return false
-	}
-	finally {
-		SessionDatabaseEditor.Instance.Window.Unblock()
-	}
 }
 
 actionDialog(xOrCommand := false, y := false, action := false, *) {

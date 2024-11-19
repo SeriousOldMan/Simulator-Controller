@@ -663,6 +663,7 @@ Note: If you are a developer and want to take the challenge to adopt Jona to a d
 
 The biggest hurdle to overcome when using Jona, is to find a satisfying setting for voice recognition. Here are some hints:
 
+  - First and foremost, check your audio settins, especially if you have different microphones connected from time to time to your system. Windows switches the standard audio device without notice.
   - I strongly recommend to use a head set. Although it is possible, and I have tested it myself, to talk to Jona using a desktop or webcam microphone, it is hard to find a satisfying setup. Typically, you will get a couple of false positives in this scenario, while the V12 sound from the Aston Martin is hammering from the speakers. You have been warned...
   - Even when using headset, you might get false positives. The reason for that, normally is a too sensitive microphone level. Reduce the input level of the microphone as low as possible in the Windows audio devices settings, so that Jona still recognizes your spoken words, but does not interpret your sighs and breath noises as valid input.
   - If voice recognition is not working at all, you might need to unblock the DLLs. Follow the instructions in the [installation section](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation-of-speech-recognition-libraries) above.

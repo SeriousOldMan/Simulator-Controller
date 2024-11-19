@@ -2074,7 +2074,7 @@ class TrackMap {
 		}
 
 		if (this.TrackMap && this.TrackImage)
-			if ((this.TrackMapMode = "Position") && this.iLastTrackPosition)
+			if this.iLastTrackPosition
 				this.createTrackMap(this.iLastTrackPosition[1], this.iLastTrackPosition[2])
 			else
 				this.createTrackMap()
@@ -2267,7 +2267,7 @@ class TrackMap {
 
 	sectionClicked(coordinateX, coordinateY, section) {
 		local oldCoordMode := A_CoordModeMouse
-		local x, y
+		local x, y, newSection
 
 		CoordMode("Mouse", "Screen")
 
@@ -2278,10 +2278,12 @@ class TrackMap {
 
 		CoordMode("Mouse", oldCoordMode)
 
-		section := this.chooseTrackSectionType(section)
+		newSection := this.chooseTrackSectionType(section)
 
-		if section
-			this.updateTrackSection(section)
+		if (newSection = "Delete")
+			this.deleteTrackSection(section)
+		else if newSection
+			this.updateTrackSection(newSection)
 	}
 
 	addTrackSection(section) {
@@ -2326,8 +2328,17 @@ class TrackMap {
 		sectionsMenu.Add(translate("Corner"), (*) => (result := "Corner"))
 		sectionsMenu.Add(translate("Straight"), (*) => (result := "Straight"))
 
-		if section
+		if section {
 			sectionsMenu.Check(translate(section.Type))
+
+			sectionsMenu.Add()
+
+			sectionsMenu.Add(translate("Delete"), (*) => (result := "Delete"))
+		}
+
+		sectionsMenu.Add()
+
+		sectionsMenu.Add(translate("Cancel"), (*) => (result := "Cancel"))
 
 		this.Window.Block()
 
@@ -2337,7 +2348,9 @@ class TrackMap {
 			while (!result && !GetKeyState("Esc"))
 				Sleep(100)
 
-			if result {
+			if (result = "Delete")
+				return result
+			else if (result && (result != "Cancel")) {
 				if section
 					section := section.Clone()
 				else
@@ -2419,6 +2432,19 @@ class TrackMap {
 			Gdip_SetSmoothingMode(graphics, 4)
 
 			r := Round(15 / (imgScale * 3))
+
+			if (isSet(posX) && isSet(posY)) {
+				brush := Gdip_BrushCreateSolid(0xff008800)
+
+				r := Round(15 / (imgScale * 3))
+
+				imgX := Round((marginX + offsetX + posX) * scale)
+				imgY := Round((marginX + offsetY + posY) * scale)
+
+				Gdip_FillEllipse(graphics, brush, imgX - r, imgY - r, r * 2, r * 2)
+
+				Gdip_DeleteBrush(brush)
+			}
 
 			brushStart := Gdip_BrushCreateSolid(0xff808080)
 			brushCorner := Gdip_BrushCreateSolid(0xffFF0000)

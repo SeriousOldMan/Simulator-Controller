@@ -134,19 +134,19 @@ class DatabaseCreator {
 		loop Files, databaseDirectory . "*.*", "D" {
 			simulator := A_LoopFileName
 
-			if ((simulator = "1") || (simulator = "Unknown"))
+			if ((simulator = "1") || (simulator = "0") || (simulator = "Unknown"))
 				deleteDirectory(databaseDirectory . simulator)
 			else
 				loop Files, databaseDirectory . simulator . "\*.*", "D" {
 					car := A_LoopFileName
 
-					if ((car = "1") || (car = "Unknown"))
+					if ((car = "1") || (car = "0") || (car = "Unknown"))
 						deleteDirectory(databaseDirectory . simulator . "\" . car)
 					else
 						loop Files, databaseDirectory . simulator . "\" . car . "\*.*", "D" {
 							track := A_LoopFileName
 
-							if ((track = "1") || (track = "Unknown"))
+							if ((track = "1") || (track = "0") || (track = "Unknown"))
 								deleteDirectory(databaseDirectory . simulator . "\" . car . "\" . track)
 							else {
 								directory := databaseDirectory . simulator . "\" . car . "\" . track . "\"
@@ -157,17 +157,21 @@ class DatabaseCreator {
 								if FileExist(directory . "Tyres.Pressures.Distribution.CSV")
 									this.loadPressures(simulator, car, track, Database(directory, kTyresSchemas))
 
-								loop Files, databaseDirectory . simulator . "\" . car . "\" . track . "\Lap Telemetries\*.*"
+								loop Files, databaseDirectory . simulator . "\" . car . "\" . track . "\Lap Telemetries\*.telemetry"
 									this.loadLapTelemetry(simulator, car, track, A_LoopFilePath)
 
-								loop Files, databaseDirectory . simulator . "\" . car . "\" . track . "\Race Strategies\*.*"
+								loop Files, databaseDirectory . simulator . "\" . car . "\" . track . "\Race Strategies\*.strategy"
 									this.loadRaceStrategy(simulator, car, track, A_LoopFilePath)
 
 								loop Files, databaseDirectory . simulator . "\" . car . "\" . track . "\Car Setups\*.*", "D" {
 									type := A_LoopFileName
 
-									loop Files, databaseDirectory . simulator . "\" . car . "\Car Setups\" . type . "\*.*"
-										this.loadCarSetup(simulator, car, track, type, A_LoopFilePath)
+									loop Files, databaseDirectory . simulator . "\" . car . "\Car Setups\" . type . "\*.*" {
+										SplitPath(A_LoopFilePath, , , &extension)
+
+										if (extension != "info")
+											this.loadCarSetup(simulator, car, track, type, A_LoopFilePath)
+									}
 								}
 							}
 						}
@@ -201,7 +205,6 @@ class DatabaseCreator {
 
 	loadLapTelemetry(simulator, car, track, telemetryFile) {
 		local directory := this.TargetDirectory
-		local info, newInfo
 
 		if this.IncludeTelemetries {
 			updateProgress("Telemetries: " . simulator . " / " . car . " / " . track . "...")

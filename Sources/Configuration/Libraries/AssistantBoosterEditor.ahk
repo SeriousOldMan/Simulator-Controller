@@ -400,6 +400,8 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 			else
 				this.Control["vi" . type . "ModelDropDown"].Choose((models.Length > 0) ? 1 : 0)
 		}
+
+		this.updateState()
 	}
 
 	normalizeConfiguration(configuration) {
@@ -731,6 +733,8 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 			else
 				this.loadModels("Agent", false)
 		}
+
+		this.updateState()
 	}
 
 	saveProviderConfiguration() {
@@ -869,8 +873,16 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		}
 		else {
 			this.Control["viAgentEventsButton"].Enabled := true
-			this.Control["viAgentActionsButton"].Enabled := true
-			this.Control["viAgentInstructionsButton"].Enabled := true
+
+			if ((this.Control["viAgentProviderDropDown"].Value = 2)
+			 && ((Trim(this.Control["viAgentServiceURLEdit"].Text) = "") || (Trim(this.Control["viAgentModelDropDown"].Text = "")))) {
+				this.Control["viAgentActionsButton"].Enabled := false
+				this.Control["viAgentInstructionsButton"].Enabled := false
+			}
+			else {
+				this.Control["viAgentActionsButton"].Enabled := true
+				this.Control["viAgentInstructionsButton"].Enabled := true
+			}
 		}
 
 		if inList(this.iBoosters, "Agent")

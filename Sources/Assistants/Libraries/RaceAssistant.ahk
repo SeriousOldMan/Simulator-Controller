@@ -800,7 +800,7 @@ class RaceAssistant extends ConfigurationItem {
 		if options["AgentBooster"] {
 			booster := EventBooster(this, options["AgentBooster"], this.Configuration, this.VoiceManager.Language)
 
-			if (booster.Model && booster.Active)
+			if booster.Active
 				this.iAgentBooster := booster
 		}
 
@@ -841,8 +841,13 @@ class RaceAssistant extends ConfigurationItem {
 		else
 			options["ConversationBooster"] := false
 
-		if getMultiMapValue(configuration, "Agent Booster", this.AssistantType . ".Agent", true)
-			options["AgentBooster"] := ((getMultiMapValue(configuration, "Agent Booster", this.AssistantType . ".Model", kUndefined) != kUndefined) ? this.AssistantType : false)
+		if getMultiMapValue(configuration, "Agent Booster", this.AssistantType . ".Agent", true) {
+			if ((getMultiMapValue(configuration, "Agent Booster", this.AssistantType . ".Model", kUndefined) != kUndefined)
+			 || (InStr(getMultiMapValue(configuration, "Agent Booster", this.AssistantType . ".Service", ""), "Generic") == 1))
+				options["AgentBooster"] := this.AssistantType
+			else
+				options["AgentBooster"] := false
+		}
 		else
 			options["AgentBooster"] := false
 	}

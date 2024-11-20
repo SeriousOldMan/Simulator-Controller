@@ -370,6 +370,8 @@ As already mentioned, you can choose a different LLM for this booster, because h
 	 
 Important: This booster directly alters the behavior of the Assistant for the good or for the bad. Even if you don't change or extend the definition of the events and actions, it still depends on the reasoning capabilities of the used large language model, whether the Assistant will behave as expected. Therefore, always test everything before using it in an important race.
 
+As a special case can the *Reasoning* booster also be used to extend the rules of the Assistant as such, without using an LLM. To do this, use the "Generic" provider, but do not enter additional information like URL, Model and such. In this case, only *Events* can be configured. You can enter as many event rules as you want, but they must execute their corresponding action on its own.
+
 ### Using Actions & Events
 
 The *Reasoning* booster as well as to some extent the *Conversation* booster rely on the capability of the configured LLM to *call* external functions as part of their reasoning process. This is achieved by the so-called tool interface of the LLM. Tools are supported at the time of this writing by the following models:

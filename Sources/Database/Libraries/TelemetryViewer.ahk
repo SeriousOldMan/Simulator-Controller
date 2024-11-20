@@ -9,6 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\..\Libraries\Task.ahk"
 #Include "..\..\Libraries\HTMLViewer.ahk"
 #Include "..\..\Libraries\GDIP.ahk"
 #Include "SessionDatabase.ahk"
@@ -2164,6 +2165,8 @@ class TrackMap {
 
 	iLastTrackPosition := false
 
+	iEditorTask := false
+
 	class TrackMapWindow extends Window {
 		iMap := false
 
@@ -2174,7 +2177,7 @@ class TrackMap {
 		}
 
 		Close(*) {
-			this.iMap.Close()
+			this.iMap.close()
 		}
 	}
 
@@ -2362,9 +2365,10 @@ class TrackMap {
 
 				this.Control["editButton"].Text := translate("Edit")
 
-				this.updateTrackSections(true)
+				if !GetKeyState("Ctrl")
+					this.updateTrackSections(true, false)
 
-				this.updateTrackMap()
+				this.updateTrackMap(this.Simulator, this.Track)
 			}
 		}
 
@@ -2402,9 +2406,22 @@ class TrackMap {
 
 		this.loadTrackMap(sessionDB.getTrackMap(this.Simulator, this.Track)
 						, sessionDB.getTrackImage(this.Simulator, this.Track))
+
+		this.iEditorTask := PeriodicTask(() {
+								if (this.TrackMapMode = "Edit")
+									this.Control["editButton"].Text := translate(GetKeyState("Ctrl") ? "Cancel" : "Save")
+							}, 100, kHighPriority)
+
+		this.iEditorTask.start()
 	}
 
 	close() {
+		if this.iEditorTask {
+			this.iEditorTask.stop()
+
+			this.iEditorTask := false
+		}
+
 		this.TelemetryViewer.closedTrackMap()
 
 		this.Window.Destroy()
@@ -2512,6 +2529,9 @@ class TrackMap {
 		this.updateTrackSections(false)
 
 		this.createTrackMap()
+
+		this.Control["editButton"].Enabled := true
+		this.Control["editButton"].Text := translate("Edit")
 	}
 
 	unloadTrackMap() {
@@ -2558,7 +2578,7 @@ class TrackMap {
 				this.createTrackMap()
 	}
 
-	updateTrackSections(save := false) {
+	updateTrackSections(save := false, async := true) {
 		local straights := 0
 		local corners := 0
 		local sections, index, section
@@ -2599,6 +2619,26 @@ class TrackMap {
 			return Round(convertUnit("Length", distance))
 		}
 
+		saveTrackMap() {
+			local index, section
+
+			removeMultiMapValues(this.TrackMap, "Sections")
+
+			setMultiMapValue(this.TrackMap, "Sections", "Count", this.TrackSections.Length)
+
+			for index, section in sections {
+				setMultiMapValue(this.TrackMap, "Sections", index . ".Nr", section.Nr)
+				setMultiMapValue(this.TrackMap, "Sections", index . ".Type", section.Type)
+				setMultiMapValue(this.TrackMap, "Sections", index . ".Index", section.Index)
+				setMultiMapValue(this.TrackMap, "Sections", index . ".X", section.X)
+				setMultiMapValue(this.TrackMap, "Sections", index . ".Y", section.Y)
+			}
+
+			SessionDatabase().updateTrackMap(this.Simulator, this.Track, this.TrackMap)
+
+			this.TelemetryViewer.trackMapChanged(this.TrackMap)
+		}
+
 		sections := this.TrackSections
 
 		for index, section in sections
@@ -2612,25 +2652,10 @@ class TrackMap {
 		if (save && this.TrackMap) {
 			sections := this.TrackSections.Clone()
 
-			Task.startTask(() {
-				local index, section
-
-				removeMultiMapValues(this.TrackMap, "Sections")
-
-				setMultiMapValue(this.TrackMap, "Sections", "Count", this.TrackSections.Length)
-
-				for index, section in sections {
-					setMultiMapValue(this.TrackMap, "Sections", index . ".Nr", section.Nr)
-					setMultiMapValue(this.TrackMap, "Sections", index . ".Type", section.Type)
-					setMultiMapValue(this.TrackMap, "Sections", index . ".Index", section.Index)
-					setMultiMapValue(this.TrackMap, "Sections", index . ".X", section.X)
-					setMultiMapValue(this.TrackMap, "Sections", index . ".Y", section.Y)
-				}
-
-				SessionDatabase().updateTrackMap(this.Simulator, this.Track, this.TrackMap)
-
-				this.TelemetryViewer.trackMapChanged(this.TrackMap)
-			}, 0, kLowPriority)
+			if async
+				Task.startTask(saveTrackMap, 0, kLowPriority)
+			else
+				saveTrackMap()
 		}
 	}
 

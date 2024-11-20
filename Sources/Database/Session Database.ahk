@@ -1051,7 +1051,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					section := editor.findTrackSection(coordinateX, coordinateY)
 
 					if section {
-						if GetKeyState("Ctrl") {
+						if (false && GetKeyState("Ctrl")) {
 							OnMessage(0x44, translateYesNoButtons)
 							msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected section?"), translate("Delete"), 262436)
 							OnMessage(0x44, translateYesNoButtons, 0)

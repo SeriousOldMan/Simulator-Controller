@@ -88,7 +88,7 @@ This page offers two different editors. The first one allows you to divide the t
 
 To start a new section, simply click on a position on the track and choose whether the following section is considered a corner or a straight. You can also move section starting points around using the mouse. If you want to delete a section starting point, click on it and choose "Delete" from section popup menu. By the way, the small gray dot marks the start/finish line as recorded by the track mapper.
 
-When defining sections and you want to work with telemetry data, it is important to set the section starting point before any section specific driver inputs take place. For example, a corner section should include the complete braking phase and also the initial part of the acceleration phase until the car has settled.
+When defining sections and you want to work with telemetry data or use the on-track coaching of the Driving Coach, it is important to set the section starting point before any section specific driver inputs take place. For example, a corner section should include the complete braking phase and also the initial part of the acceleration phase until the car has settled.
 
 With the second editor you can define automatic actions for specific locations at the track. Since this is a very extensive functionality and observing your car and its position on the track is the duty of the Race Spotter, there is a [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-automations) in the documentation of the Virtual Race Spotter, which shows how to setup and use track automations.
 

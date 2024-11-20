@@ -307,7 +307,7 @@ Aiden is capable to give you instructions and recommendations for the next corne
 
 If activated, Aiden will use the telemetry data of the recent lap to check for any areas for improvement. Additionally, the lap before the last lap, or the fastest lap of the session so far can be used as a reference for braking points, start of the acceleration phase, and so on. It is also possible to load the [fastest lap stored in the "Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#laps) as a reference. You configure the behaviour that suites you the most, by using the corresponding [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) in the "Session Database".
 
-If you approach a corner, Aiden will then evaluate possible areas for improvement and will give you the necessary instructions before you enter the corner. This instructions will be very short and focused and not so detailed with explanations as in the example conversation above, of course. You can configure the typical distance to the corner, where these instructions will be given also in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) in the "Session Database". However, sometimes Aiden will be late, especially when the Spotter interrupted with an important message. Therefore, I recommend to do practice sessions with all other Assistants muted, which can be done with a Startup Profile for example.
+If you approach a corner, Aiden will then evaluate possible areas for improvement and will give you the necessary instructions before you enter the corner. This instructions will be very short and focused and not so detailed with explanations as in the example conversation above, of course. You can configure the typical distance to the corner, where these instructions will be given also in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) in the "Session Database". However, sometimes Aiden will be late, espeutcially when the Spotter interrupted with an important message. Therefore, I recommend to do practice sessions with all other Assistants muted, which can be done with a Startup Profile for example.
 
 How the Driving Coach interprets the telemetry data and what instructions will be given by him is largely determined by the instructions. Especially the "Coaching.Corner.Approaching" instruction has a big influence. Let's have a look at the default instruction:
 
@@ -316,6 +316,12 @@ How the Driving Coach interprets the telemetry data and what instructions will b
 	%telemetry%
 
 Important is here the restriction to a short message (25 to 35 words) and the focus on driver inputs. However, you can change that, if you want different corner hints from the Coach or longer explanations, for example. But bear in mind, that these instructions will be given while you are driving, so keeping them short might be a good idea. If you experiment with the length of the Coach's corner hints by increasing the number of words, for example, be sure to adjust the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) "Coach: Time between Instructions" and "Coach: Distance before Corner" in the "Session Database" as well.
+
+### Automatic handling of coaching mode
+
+Normally you will only use the telemetry based coaching during practice sessions. And maybe you want to have the coach on your side in each practice session. Always having to ask the coach to come along can become boring with time. But it is easy to automate that using the [*Resonaing* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster).
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Driving%20Coach%20Startup.JPG) 
 
 ## How it works
 
@@ -431,11 +437,25 @@ The active coaching based on lap telemetry data deserves a more detailed explana
 	}
 
 This JSON object is then presented to the LLM of Aiden together with very detailed, context specific instructions and explanations. The instructions for the Driving Coach has already been discussed [above](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#instructions). Especially for the telemetry-based coaching they are very important, because they contain a lot of information about driving technique, which may be not available to an LLM in this level of detail. The instructions are based on my own experiences for a smooth, natural and fast driving style. They are not suitable to become an alien, since this type of drivers typically are using special driving techniques that won't work in a real car, for example. However, you can change the instructions for Aiden, so that it steers you in a direction of any driving style, but this can be very time-consuming process. Welcome in the exciting world of *prompt engineering*.
- 
+
+### About attention deficits, hallucinations and other funny stuff
+
+The Driving Coach does not tell you the truth all the time and occasionally even makes things up. Therefore always double check the recommendations and instructions given by the Coach against your own experiences and expectations. However, the deviations from the "truth" are sometimes very sublte and hard to detect. But what is the reason for this:
+
+  1. A large language model simulates intelligence. Although it is doing this really well, the consant feedback loop of self-aware thinking is missing. An LLM does not really understand the topic it is talking about, it just derives the probability of words in the given context. Since there is also random factor in play, it can happen, that an LLM creates answers that sound totally plausible, but are utterly wrong.
+  
+  2. LLMs, especially non-premium models, can also have something called attention deficit. They are not good in following multiple, mostly indepedent chain of thoughts at the same time. The Driving Coach is provided with a lot of data, when you interact with him. Standings, handling information, session and car state, telemetry information, just to name a few. It is therefore possible that the Coach is not using an important information, although it is available. Sometimes it helps in this case to tell the Coach that he has this informtion and he will work with it then.
+  
+  3. Especially in the case of telemetry based coaching it is very important that the data quality is as good as it can get. The Coach will be provided with a high level condensed summary of the telemetry data (see above) to work with. To create this summary the telemetry data is split along the defined sections of the given track. If this sections are not well set, for example, if the car is already under full braking before the the corner starting point, the Coach will derive funny things from it. You have been warned...
+  
+In summary work with the Coach as you would work with ChatGPT. Always use your own brain as well. As LLMs get smarter, especially with the upcoming multi-level reasoning models like OpenAIs o1, we will see big improvements here. With its architecture, Simulator Controller is prepared to participate from this development.
+
 ## Troubleshooting
 
 For some tips n tricks for the best voice recognition experience, see the [corresponding chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#troubleshooting) in the documentation of Jona.
 
-A typical problem, which might happen, is that the Driving Coach does not wait with its answer until you have finished your question. This happens especially, when you are formulating very long questions. In this case, use the *Push-To-Talk* method "Hold & Press", which will prevent this.
+A typical problem which shows up in conversations with Aiden, is, that the Driving Coach does not wait with its answer until you have finished your question. This happens especially, when you are formulating very long questions. In this case, use the *Push-To-Talk* method "Hold & Talk", which will prevent this.
 
-As said above, using the "Azure" voice recognition engine is strongly recommend, because of its superior quality. When using the "Dektop" service, which is builtin to the Windows operating system, you will encounter wrong recognitions here and there, esppecially when formulating long questions. To get the best recognition quality with the "Desktop" recognition engine, you can train your computer for your pronounciation. Follow the instructions found in the [Microsoft documentation](https://support.microsoft.com/en-us/windows/use-voice-recognition-in-windows-83ff75bd-63eb-0b6c-18d4-6fae94050571).
+Another important aspect is the support for different languages, which are in theory supported by Simulator Controller. Although an LLM can support multiple languages at the same time, only premium models and for the most part paid models have been trained with enough international data. Therefore I strongly recommend to use English as your conversation language with Aiden, especially when using a free or even an open souce model.
+
+As said above, using the "Azure" or the "Google" voice recognition engine is strongly recommended, because of its superior quality. When using the "Dektop" service, which is builtin to the Windows operating system, you will encounter wrong recognitions here and there, esppecially when formulating long questions. To get the best recognition quality with the "Desktop" recognition engine, you can train your computer for your pronounciation. Follow the instructions found in the [Microsoft documentation](https://support.microsoft.com/en-us/windows/use-voice-recognition-in-windows-83ff75bd-63eb-0b6c-18d4-6fae94050571).

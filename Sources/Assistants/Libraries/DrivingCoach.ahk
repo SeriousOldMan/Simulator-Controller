@@ -663,19 +663,21 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
-	telemetryCoachingStartRecognized(words) {
+	telemetryCoachingStartRecognized(words, confirm := true) {
 		if !this.Connector
 			this.startConversation()
 
-		this.getSpeaker().speakPhrase("ConfirmCoaching")
+		if confirm
+			this.getSpeaker().speakPhrase("ConfirmCoaching")
 
 		this.iCoachingActive := true
 
 		this.startupTelemetryCoaching()
 	}
 
-	telemetryCoachingFinishRecognized(words) {
-		this.getSpeaker().speakPhrase("Roger")
+	telemetryCoachingFinishRecognized(words, confirm := true) {
+		if confirm
+			this.getSpeaker().speakPhrase("Roger")
 
 		this.shutdownTelemetryCoaching()
 	}
@@ -747,8 +749,9 @@ class DrivingCoach extends GridRaceAssistant {
 			this.getSpeaker().speakPhrase("Later")
 	}
 
-	trackCoachingFinishRecognized(words) {
-		this.getSpeaker().speakPhrase("Okay")
+	trackCoachingFinishRecognized(words, confirm := true) {
+		if confirm
+			this.getSpeaker().speakPhrase("Okay")
 
 		this.shutdownTrackCoaching()
 	}
@@ -898,26 +901,26 @@ class DrivingCoach extends GridRaceAssistant {
 			this.iIssueCollector.stopIssueCollector()
 	}
 
-	startTelemetryCoaching() {
-		this.telemetryCoachingStartRecognized([])
+	startTelemetryCoaching(confirm := true) {
+		this.telemetryCoachingStartRecognized([], confirm)
 	}
 
-	finishTelemetryCoaching() {
-		this.telemetryCoachingFinishRecognized([])
+	finishTelemetryCoaching(confirm := true) {
+		this.telemetryCoachingFinishRecognized([], confirm)
 	}
 
-	startTrackCoaching() {
+	startTrackCoaching(confirm := true) {
 		if !this.CoachingActive {
-			this.telemetryCoachingStartRecognized([])
+			this.telemetryCoachingStartRecognized([], confirm)
 
 			this.trackCoachingStartRecognized([], false)
 		}
 		else
-			this.trackCoachingStartRecognized([])
+			this.trackCoachingStartRecognized([], confirm)
 	}
 
-	finishTrackCoaching() {
-		this.trackCoachingFinishRecognized([])
+	finishTrackCoaching(confirm := true) {
+		this.trackCoachingFinishRecognized([], confirm)
 	}
 
 	startupTelemetryCoaching() {

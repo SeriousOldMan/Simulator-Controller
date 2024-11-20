@@ -7,7 +7,7 @@
 	 - A controller action "TrackCoaching" has been defined for the [Driving Coach plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-driving-coach) to request active coaching while driving from your Button Box or Stream Deck.
 	 - New icons for the "TelemetryCoaching" and "TrackCoaching" actions has been added to the Stream Deck icon set.
 	 - Several new settings in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) to fine-tune the corner by corner coaching of the Driving Coach.
-     - New controller action functions [*startTelemetryCoaching*, *finishTelemetryCoaching*, *startTrackCoaching* and *finishTrackCoaching*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allow you to control the telemetry based coaching mode from custom functions and scripts. Even use them in LLM actions in the *Reasoning* booster.
+     - New controller action functions [*startTelemetryCoaching*, *finishTelemetryCoaching*, *startTrackCoaching* and *finishTrackCoaching*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allow you to control the telemetry-based coaching mode from custom functions and scripts. Even use them in LLM actions in the *Reasoning* booster.
 	 - Several other changes and additions in the documentation for the [Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach), which will make worth to re-read the chapter.
   4. The *Rephrasing*, *Understanding* and *Reasoning* boosters are now available for the Driving Coach as well.
   5. A new info popup shows important information about the nearest track section when clicking in Telemetry Viewer.
@@ -72,7 +72,7 @@ To install the new libraries, follow the instructions in the [Update Notes](http
   4. A channel for the elapsed time since start of the lap has been added to the telemetry system.
   5. A new filter smoothes out inconsistent telemetry values reported by some simulators.
   6. Telemetry collection can now be enabled in the "Setup Workbench" even if no car and/or track has been selected beforehand. The required information about the track will be gathered on the fly, if possible. Please note, that this does not work for *Assetto Corsa Competizione*.
-  7. A section editor has been added to the track map viewer in the "Session Database" (on the way to telemetry based live coaching). The arrangement of the different tabs in the "Session Database" has changed a bit in the course of this change. Please see the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation) for more information.
+  7. A section editor has been added to the track map viewer in the "Session Database" (on the way to telemetry-based live coaching). The arrangement of the different tabs in the "Session Database" has changed a bit in the course of this change. Please see the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation) for more information.
   
      It is strongly recommended to rebuild all track maps with this version, so that the track starting point is as close as possible to the real start/finish line. Thias was not important in the past and the track recording started anywhere. Please see the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-595) for instructions how to recreate the track maps.
 

@@ -319,7 +319,7 @@ Important is here the restriction to a short message (25 to 35 words) and the fo
 
 ### Automatic handling of coaching mode
 
-Normally you will only use the telemetry based coaching during practice sessions. And maybe you want to have the coach on your side in each practice session. Always having to ask the coach to come along can become boring with time. But it is easy to automate that using the [*Resonaing* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster).
+Normally you will only use the telemetry-based coaching during practice sessions. And maybe you want to have the coach on your side in each practice session. Always having to ask the coach to come along can become boring with time. But it is easy to automate that using the [*Resonaing* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster).
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Driving%20Coach%20Startup.JPG) 
 
@@ -446,7 +446,7 @@ The Driving Coach does not tell you the truth all the time and occasionally even
   
   2. LLMs, especially non-premium models, can also have something called attention deficit. They are not good in following multiple, mostly indepedent chain of thoughts at the same time. The Driving Coach is provided with a lot of data, when you interact with him. Standings, handling information, session and car state, telemetry information, just to name a few. It is therefore possible that the Coach is not using an important information, although it is available. Sometimes it helps in this case to tell the Coach that he has this informtion and he will work with it then.
   
-  3. Especially in the case of telemetry based coaching it is very important that the data quality is as good as it can get. The Coach will be provided with a high level condensed summary of the telemetry data (see above) to work with. To create this summary the telemetry data is split along the defined sections of the given track. If this sections are not well set, for example, if the car is already under full braking before the the corner starting point, the Coach will derive funny things from it. You have been warned...
+  3. Especially in the case of telemetry-based coaching it is very important that the data quality is as good as it can get. The Coach will be provided with a high level condensed summary of the telemetry data (see above) to work with. To create this summary the telemetry data is split along the defined sections of the given track. If this sections are not well set, for example, if the car is already under full braking before the the corner starting point, the Coach will derive funny things from it. You have been warned...
   
 In summary work with the Coach as you would work with ChatGPT. Always use your own brain as well. As LLMs get smarter, especially with the upcoming multi-level reasoning models like OpenAIs o1, we will see big improvements here. With its architecture, Simulator Controller is prepared to participate from this development.
 

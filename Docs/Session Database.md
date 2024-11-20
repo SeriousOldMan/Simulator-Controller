@@ -82,7 +82,7 @@ When clicking on "Import...", you can select a folder with recently exported set
 
 #### Track & Automation
 
-This page offers two different editors. The first one allows you to divide the track into different sections, thereby creating a sequence of corners and straights.
+This page offers two different editors. The first one allows you to divide the track into different sections, thereby creating a sequence of corners and straights. This information is used by the Telemetry Viewer and the Driving Coach to understand the track layout.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2020.jpg)
 

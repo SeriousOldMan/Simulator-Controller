@@ -305,7 +305,9 @@ And be aware, that corners directly followed by another corner (a typical situat
 
 Aiden is capable to give you instructions and recommendations for the next corner while you are driving. You can enable this by a voice command, for example: "Can you give me instructions while I am driving?", or you can use the plugin action "TrackCoaching" on you your controller.
 
-If activated, Aiden will use the telemetry data of the recent lap to check for any areas for improvement. Additionally, the lap before the last lap, or the fastest lap of the session so far can be used as a reference for braking points, start of the acceleration phase, and so on. It is also possible to load the [fastest lap stored in the "Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#laps) as a reference. You configure the behaviour that suites you the most, by using the corresponding [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) in the "Session Database".
+If activated, Aiden will use the telemetry data of the recent lap to check for any areas for improvement. Additionally, the lap before the last lap, or the fastest lap of the session so far can be used as a reference for braking points, start of the acceleration phase, and so on. It is also possible to load the [fastest lap stored in the "Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#laps), which will then be used as a reference lap unless you have driven a faster one in the current session. You configure the behaviour that suites you the most, by using the corresponding [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) in the "Session Database".
+
+Please note, that the recommendations of Aiden might not be trustworthy, if no reference lap is available. Therefore, unless you have loaded a reference lap from the session database, take all recomendations for the first lap after Aiden has told you that telemetry data is available with a grain of salt.
 
 If you approach a corner, Aiden will then evaluate possible areas for improvement and will give you the necessary instructions before you enter the corner. This instructions will be very short and focused and not so detailed with explanations as in the example conversation above, of course. You can configure the typical distance to the corner, where these instructions will be given also in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) in the "Session Database". However, sometimes Aiden will be late, espeutcially when the Spotter interrupted with an important message. Therefore, I recommend to do practice sessions with all other Assistants muted, which can be done with a Startup Profile for example.
 
@@ -321,7 +323,19 @@ Important is here the restriction to a short message (25 to 35 words) and the fo
 
 Normally you will only use the telemetry-based coaching during practice sessions. And maybe you want to have the coach on your side in each practice session. Always having to ask the coach to come along can become boring with time. But it is easy to automate that using the [*Resonaing* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster).
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Driving%20Coach%20Startup.JPG) 
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Driving%20Coach%20Startup.JPG)
+
+If you want to use this for your own setup, here is the rule text, so you can copy it:
+
+	{All: [?Session.Type = 2], {None: [?Coaching.Started]}} =>
+			(Call: Assistant.Call(startTelemetryCoaching, false)), (Set: Coaching.Started),
+			(Call: Assistant.Speak("Kim here. I'll start my computer. Run some warmup laps and then we will have a look at the telemetry."))
+
+	[?Session.Type != 2] => (Call: Assistant.Call(finishTelemetryCoaching, false)), (Clear: Coaching.Started)
+
+Replace "Kim" with the name of your Driving Coach.
+
+Expert Notes: *startTelemetryCoaching* and *finishTelemetryCoaching* are methods of the *DrivingCoach* class, **2** represents the session type *practice*, **3** stands for *qualifying* and **4** for a *race* session.
 
 ## How it works
 

@@ -107,6 +107,69 @@ updatePitstopLap(?lap) <= Set(Pitstop.1.Lap, ?lap), Set(Pitstop.Last, 1)
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                            Telemetry Coaching                           ;;;
+;;;                                                                         ;;;
+;;; These rules compute a number of recommendations and instructions for an ;;;
+;;; upcoming corner baesd on data about the last lap and possibly a         ;;;
+;;; reference lap.                                                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+[?Coaching.Cleanup] => (ProveAll: clearTelemetry()), (Clear: Coaching.Cleanup)
+
+clearTelemetry() <= clearTelemetry(Lap.Corner)
+clearTelemetry() <= clearTelemetry(Lap.Straight)
+clearTelemetry() <= clearTelemetry(Reference.Corner)
+clearTelemetry() <= clearTelemetry(Reference.Straight)
+
+clearTelemetry(Lap.Corner) <= Clear(Lap.Corner.Nr), Clear(Lap.Corner.Time), Clear(Lap.Corner.Length),
+							  Clear(Lap.Corner.Steering.Corrections), Clear(Lap.Corner.Steering.Smoothness),
+							  clearTelemetry(Lap.Corner, [Entry, Apex, Exit])
+clearTelemetry(Lap.Straight) <= Clear(Lap.Straight.Nr), Clear(Lap.Straight.Time), Clear(Lap.Straight.Length),
+								Clear(Lap.Straight.Speed.Min), Clear(Lap.Straight.Speed.Max), Clear(Lap.Straight.Speed.Avg)
+
+clearTelemetry(Reference.Corner) <= Clear(Reference.Corner.Nr), Clear(Reference.Corner.Time), Clear(Reference.Corner.Length),
+									Clear(Reference.Corner.Steering.Corrections), Clear(Reference.Corner.Steering.Smoothness),
+									clearTelemetry(Reference.Corner, [Entry, Apex, Exit])
+clearTelemetry(Reference.Straight) <= Clear(Reference.Straight.Nr),
+									  Clear(Reference.Straight.Time),
+									  Clear(Reference.Straight.Length),
+									  Clear(Reference.Straight.Speed.Min),
+									  Clear(Reference.Straight.Speed.Max),
+									  Clear(Reference.Straight.Speed.Avg)
+
+clearTelemetry(type, [])
+clearTelemetry(type, [phase | phases]) <= clearTelemetry(type, phase), clearTelemetry(type, phases)
+
+clearTelemetry(type, Entry) <= Clear(type, Entry.Time),
+							   Clear(type, Entry.Braking.Start),
+							   Clear(type, Entry.Braking.Length),
+							   Clear(type, Entry.Braking.Pressure),
+							   Clear(type, Entry.Braking.Rampup),
+							   Clear(type, Entry.Brake.Corrections),
+							   Clear(type, Entry.Brake.Smoothness),
+							   Clear(type, Entry.ABSActivations), !
+
+clearTelemetry(type, Apex) <= Clear(type, Apex.Time),
+							  Clear(type, Apex.Rolling.Start),
+							  Clear(type, Apex.Rolling.Length),
+							  Clear(type, Apex.Acceleration.Lateral),
+							  Clear(type, Apex.Gear),
+							  Clear(type, Apex.RPM),
+							  Clear(type, Apex.Speed), !
+
+clearTelemetry(type, Exit) <= Clear(type, Exit.Time),
+							  Clear(type, Exit.Accelerating.Start),
+							  Clear(type, Exit.Accelerating.Length),
+							  Clear(type, Exit.Acceleration.Lateral),
+							  Clear(type, Exit.Gear),
+							  Clear(type, Exit.RPM),
+							  Clear(type, Exit.Speed),
+							  Clear(type, Exit.Throttle.Corrections),
+							  Clear(type, Exit.Throttle.Smoothness),
+							  Clear(type, Exit.TCActivations), !
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                              Memory Cleanup                             ;;;
 ;;;                                                                         ;;;
 ;;; These rules remove knowledge that is no longer needed.					;;;

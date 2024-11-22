@@ -114,7 +114,77 @@ updatePitstopLap(?lap) <= Set(Pitstop.1.Lap, ?lap), Set(Pitstop.Last, 1)
 ;;; reference lap.                                                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Coaching.Cleanup] => (ProveAll: clearTelemetry()), (Clear: Coaching.Cleanup)
+{All: [?Lap.Corner.Entry.Braking.Start < ?Reference.Corner.Entry.Braking.Start]} =>
+		(Prove: addDriverInput(LateBraking))
+
+{All: [?Lap.Corner.Entry.Braking.Start > ?Reference.Corner.Entry.Braking.Start]} =>
+		(Prove: addDriverInput(EarlyBraking))
+
+{All: [?Lap.Corner.Entry.Braking.Pressure < ?Reference.Corner.Entry.Braking.Pressure]} =>
+		(Prove: addDriverInput(SoftBraking))
+
+{All: [?Lap.Corner.Entry.Braking.Pressure > ?Reference.Corner.Entry.Braking.Pressure]} =>
+		(Prove: addDriverInput(HardBraking))
+
+{All: [?Lap.Corner.Exit.Accelerating.Start < ?Reference.Corner.Exit.Accelerating.Start]} =>
+		(Prove: addDriverInput(EarlyAccelerating))
+
+{All: [?Lap.Corner.Exit.Accelerating.Start > ?Reference.Corner.Exit.Accelerating.Start]} =>
+		(Prove: addDriverInput(LateAccelerating))
+
+{All: [?Lap.Corner.Entry.Braking.Distance > ?Reference.Corner.Entry.Braking.Distance],
+	  [?Lap.Corner.Entry.ABSActivations > ?Reference.Corner.Entry.ABSActivations]} =>
+		(Prove: addDriverInput(OverBraking))
+
+{All: [?Lap.Corner.Entry.Braking.Distance > ?Reference.Corner.Entry.Braking.Distance],
+	  [?Lap.Corner.Entry.ABSActivations =< ?Reference.Corner.Entry.ABSActivations]} =>
+		(Prove: addDriverInput(UnderBraking))
+
+{All: {Prove: worsePerformance()},
+	  [?Lap.Corner.Entry.Braking.Start < ?Reference.Corner.Entry.Braking.Start],
+	  {Any: [?Lap.Corner.Steering.Smoothness < ?Reference.Corner.Steering.Smoothness],
+			[?Lap.Corner.Brake.Smoothness < ?Reference.Corner.Brake.Smoothness],
+			[?Lap.Corner.Exit.ABSActivations > ?Reference.Corner.ABSActivations]}} =>
+		(Prove: addDriverInput(OverPushing))
+
+{All: {Prove: worsePerformance()},
+	  [?Lap.Corner.Entry.Braking.Start > ?Reference.Corner.Entry.Braking.Start],
+	  {Any: [?Lap.Corner.Steering.Smoothness > ?Reference.Corner.Steering.Smoothness],
+			[?Lap.Corner.Brake.Smoothness > ?Reference.Corner.Brake.Smoothness],
+			[?Lap.Corner.Exit.ABSActivations < ?Reference.Corner.ABSActivations]}} =>
+		(Prove: addDriverInput(UnderPushing))
+
+{All: {Prove: worsePerformance()},
+	  [?Lap.Corner.Exit.Accelerating.Start < ?Reference.Corner.Exit.Accelerating.Start],
+	  {Any: [?Lap.Corner.Exit.TCActivations > ?Reference.Corner.Exit.TCActivations],
+			[?Lap.Corner.Throttle.Smoothness < ?Reference.Corner.Throttle.Smoothness],
+			[?Lap.Corner.Steering.Smoothness < ?Reference.Corner.Steering.Smoothness]}} =>
+		(Prove: addDriverInput(OverPushing))
+
+{All: {Prove: worsePerformance()},
+	  [?Lap.Corner.Exit.Accelerating.Start > ?Reference.Corner.Exit.Accelerating.Start],
+	  {Any: [?Lap.Corner.Exit.TCActivations < ?Reference.Corner.Exit.TCActivations],
+			[?Lap.Corner.Throttle.Smoothness > ?Reference.Corner.Throttle.Smoothness],
+			[?Lap.Corner.Steering.Smoothness > ?Reference.Corner.Steering.Smoothness]}} =>
+		(Prove: addDriverInput(UnderPushing))
+
+addDriverInput(?input) <= Set(DriverInputs, !DriverInputs.Count, ?input),
+						  ?count = !DriverInputs.Count + 1, Set(DriverInputs.Count, ?count)
+
+betterPerformance() <= ?lapTime = !Lap.Corner.Time + !Lap.Following.Time,
+					   ?referenceTime = !Reference.Corner.Time + !Reference.Following.Time,
+					   ?lapTime < ?referenceTime
+					   
+worsePerformance() <= betterPerformance(), !, fail
+worsePerformance()
+										  
+[?Coaching.Cleanup] => (ProveAll: clearTelemetry()), (Prove: clearDriverInputs()),
+					   (Clear: Coaching.Cleanup)
+
+clearDriverInputs() <= clearDriverInputs(!DriverInputs.Count)
+
+clearDriverInputs(0) <= !
+clearDriverInputs(?index) <= Clear(DriverInputs, ?index), ?newIndex = ?index - 1, clearDriverInputs(?newIndex)
 
 clearTelemetry() <= clearTelemetry(Lap.Corner)
 clearTelemetry() <= clearTelemetry(Lap.Straight)
@@ -137,36 +207,36 @@ clearTelemetry(Reference.Straight) <= Clear(Reference.Straight.Nr),
 									  Clear(Reference.Straight.Speed.Max),
 									  Clear(Reference.Straight.Speed.Avg)
 
-clearTelemetry(type, [])
-clearTelemetry(type, [phase | phases]) <= clearTelemetry(type, phase), clearTelemetry(type, phases)
+clearTelemetry(?type, [])
+clearTelemetry(?type, [?phase | ?phases]) <= clearTelemetry(?type, ?phase), clearTelemetry(?type, ?phases)
 
-clearTelemetry(type, Entry) <= Clear(type, Entry.Time),
-							   Clear(type, Entry.Braking.Start),
-							   Clear(type, Entry.Braking.Length),
-							   Clear(type, Entry.Braking.Pressure),
-							   Clear(type, Entry.Braking.Rampup),
-							   Clear(type, Entry.Brake.Corrections),
-							   Clear(type, Entry.Brake.Smoothness),
-							   Clear(type, Entry.ABSActivations), !
+clearTelemetry(?type, Entry) <= Clear(?type, Entry.Time),
+								Clear(?type, Entry.Braking.Start),
+								Clear(?type, Entry.Braking.Length),
+								Clear(?type, Entry.Braking.Pressure),
+								Clear(?type, Entry.Braking.Rampup),
+								Clear(?type, Entry.Brake.Corrections),
+								Clear(?type, Entry.Brake.Smoothness),
+								Clear(?type, Entry.ABSActivations), !
 
-clearTelemetry(type, Apex) <= Clear(type, Apex.Time),
-							  Clear(type, Apex.Rolling.Start),
-							  Clear(type, Apex.Rolling.Length),
-							  Clear(type, Apex.Acceleration.Lateral),
-							  Clear(type, Apex.Gear),
-							  Clear(type, Apex.RPM),
-							  Clear(type, Apex.Speed), !
+clearTelemetry(?type, Apex) <= Clear(?type, Apex.Time),
+							   Clear(?type, Apex.Rolling.Start),
+							   Clear(?type, Apex.Rolling.Length),
+							   Clear(?type, Apex.Acceleration.Lateral),
+							   Clear(?type, Apex.Gear),
+							   Clear(?type, Apex.RPM),
+							   Clear(?type, Apex.Speed), !
 
-clearTelemetry(type, Exit) <= Clear(type, Exit.Time),
-							  Clear(type, Exit.Accelerating.Start),
-							  Clear(type, Exit.Accelerating.Length),
-							  Clear(type, Exit.Acceleration.Lateral),
-							  Clear(type, Exit.Gear),
-							  Clear(type, Exit.RPM),
-							  Clear(type, Exit.Speed),
-							  Clear(type, Exit.Throttle.Corrections),
-							  Clear(type, Exit.Throttle.Smoothness),
-							  Clear(type, Exit.TCActivations), !
+clearTelemetry(?type, Exit) <= Clear(?type, Exit.Time),
+							   Clear(?type, Exit.Accelerating.Start),
+							   Clear(?type, Exit.Accelerating.Length),
+							   Clear(?type, Exit.Acceleration.Lateral),
+							   Clear(?type, Exit.Gear),
+							   Clear(?type, Exit.RPM),
+							   Clear(?type, Exit.Speed),
+							   Clear(?type, Exit.Throttle.Corrections),
+							   Clear(?type, Exit.Throttle.Smoothness),
+							   Clear(?type, Exit.TCActivations), !
 
 
 ;;;-------------------------------------------------------------------------;;;

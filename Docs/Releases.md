@@ -13,7 +13,7 @@
   5. A new info popup shows important information about the nearest track section when clicking in Telemetry Viewer.
   6. The *Reasoning* booster can now be used without an LLM, if you only want to extend the rule base of an Assistant. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster) for more information.
 
-## 5.9.9.0-release 11/22/24 (planned)
+## 5.9.9.0-release 11/22/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed several bugs for the MoTeC telemetry importer.
@@ -2719,7 +2719,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. New server based solution for team endurace races. See the all [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) for more information.
-     a. New ["Team MAnagement" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-team-management) in "Simulator Configuration" for managing your Teams, Drivers and Sessions.
+     a. New ["Team Management" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-team-management) in "Simulator Configuration" for managing your Teams, Drivers and Sessions.
 	 b. New ["Team" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-team) in "Race Settings" for all team member to configure their role in a team session.
   4. The new "Team Server" plugin as well as the "Race Engineer" and the "Race Strategist" plugins now allow to specify the initial operation state without supplying a function to be triggered from a hardware controller.
   5. Major bug fixes in "Simulator Setup"

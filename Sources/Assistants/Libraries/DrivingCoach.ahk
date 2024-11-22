@@ -59,6 +59,7 @@ class DrivingCoach extends GridRaceAssistant {
 	iLoadReference := false
 
 	iAvailableTelemetry := CaseInsenseMap()
+	iInstructionHints := CaseInsenseMap()
 
 	iTelemetryAnalyzer := false
 	iTelemetryCollector := false
@@ -521,8 +522,9 @@ class DrivingCoach extends GridRaceAssistant {
 
 										handling .= ("- " . substituteVariables(translate("%severity% %type% at %speed% corner %where%")
 																			  , {severity: translate(issue.Severity . A_Space)
-																			   , type: translate(type . A_Space), speed: translate(speed . A_Space)
-																			   , where: where . A_Space}))
+																			   , type: translate(type . A_Space)
+																			   , speed: translate(speed . A_Space)
+																			   , where: translate(where . A_Space)}))
 									}
 
 						if index
@@ -1115,6 +1117,131 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 
 		return theLap
+	}
+
+	addInstructionHint(instruction) {
+		this.iInstructionHints[instruction] := true
+	}
+
+	getInstructionHints(cornerNr) {
+		local knowledgeBase := this.KnowledgeBase
+		local telemetry, reference
+
+		nullZero(value) {
+			return (isNull(value) ? 0 : value)
+		}
+
+		nullRound(value, precision := 0, default := 0) {
+			if isNumber(value)
+				return Round(value, precision)
+			else
+				return default
+		}
+
+		writeCorner(type, corner) {
+			if (corner.Type != "Corner")
+				throw "Inconsistent section type detected in DrivingCoach.getInstructionHints..."
+
+			knowledgeBase.addFact(type . ".Corner.Nr", corner.Nr)
+			knowledgeBase.addFact(type . ".Corner.Time", corner.Time)
+			knowledgeBase.addFact(type . ".Corner.Length", corner.Length)
+
+			if (corner.Start["Entry"] && (corner.Start["Entry"] != kNull)) {
+				knowledgeBase.addFact(type . ".Corner.Entry.Braking.Time", nullRound(corner.Time["Entry"], 0, 0))
+				knowledgeBase.addFact(type . ".Corner.Entry.Braking.Start", Round(corner.Start["Entry"], 1))
+				knowledgeBase.addFact(type . ".Corner.Entry.Braking.Length", nullRound(corner.Length["Entry"], 1, 0))
+				knowledgeBase.addFact(type . ".Corner.Entry.Brake.Pressure", Round(corner.MaxBrakePressure))
+				knowledgeBase.addFact(type . ".Corner.Entry.Brake.Rampup", Round(corner.BrakePressureRampUp, 1))
+				knowledgeBase.addFact(type . ".Corner.Entry.Brake.Corrections", corner.BrakeCorrections)
+				knowledgeBase.addFact(type . ".Corner.Entry.Brake.Smoothness", nullRound(corner.BrakeSmoothness, 0, 100))
+				knowledgeBase.addFact(type . ".Corner.Entry.ABSActivations", corner.ABSActivations)
+			}
+
+			if (corner.Start["Apex"] && (corner.Start["Apex"] != kNull))
+			}
+
+			if (corner.Start["Exit"] && (corner.Start["Exit"] != kNull))
+			}
+		}
+
+		writeFollowUp(type, followUp) {
+			knowledgeBase.addFact(type . ".FollowUp.Nr", followUp.Nr)
+			knowledgeBase.addFact(type . ".FollowUp.Type", followUp.Type)
+			knowledgeBase.addFact(type . ".FollowUp.Time", followUp.Time)
+			knowledgeBase.addFact(type . ".FollowUp.Length", followUp.Length)
+		}
+
+		telemetry := this.getTelemetry(&reference := true, cornerNr)
+
+		if (knowledgeBase && telemetry && reference) {
+			for index, section in telemetry.Sections {
+				if (index = 1)
+					writeCorner("Lap", section)
+				else
+					writeFollowUp("Lap", section)
+			}
+
+			for index, section in reference.Sections {
+				if (index = 1)
+					writeCorner("Reference", section)
+				else
+					writeFollowUp("Reference", section)
+			}
+
+			if (this.Start["Apex"] && (this.Start["Apex"] != kNull))
+				descriptor.Apex := {Phase: "Rolling"
+								  , Start: (Round(Abs(this.Start["Apex"]), 1) . ((this.Start["Apex"] > 0) ? " Meter before apex" : " Meter after apex"))
+								  , Length: (nullRound(this.Length["Apex"], 1) . " Meter")
+								  , Duration: (nullRound(this.Time["Apex"] / 1000, 2) . " Seconds")
+								  , Gear: this.RollingGear
+								  , RPM: this.RollingRPM
+								  , LateralGForce: nullRound(this.AvgLateralGForce, 2)
+								  , Speed: (nullRound(this.MinSpeed) . " km/h")}
+			else
+				descriptor.Apex := {Phase: "Rolling"
+								  , LateralGForce: nullRound(this.AvgLateralGForce, 2)
+								  , Speed: (nullRound(this.MinSpeed) . " km/h")}
+
+			if (this.Start["Exit"] && (this.Start["Exit"] != kNull)) {
+				smoothness := nullRound(this.ThrottleSmoothness)
+
+				descriptor.Exit := {Phase: "Accelerating"
+								  , AccelerationStart: (Round(Abs(this.Start["Exit"]), 1) . ((this.Start["Exit"] > 0) ? " Meter after apex" : " Meter before apex"))
+								  , AccelerationLength: (nullRound(this.Length["Exit"], 1) . " Meter")
+								  , Duration: (nullRound(this.Time["Exit"] / 1000, 2) . " Seconds")
+								  , Gear: this.AcceleratingGear
+								  , RPM: this.AcceleratingRPM
+								  , Speed: (Round(this.AcceleratingSpeed) . " km/h")
+								  , TCActivations: ((this.TCActivations > TelemetryAnalyzer.TCActivationsThreshold) ? (this.TCActivations . " Percent")
+																													: "Low")
+								  , ThrottleCorrections: this.ThrottleCorrections
+								  , ThrottleSmoothness: ((smoothness < TelemetryAnalyzer.ThrottleSmoothnessThreshold) ? (smoothness . " Percent")
+																													  : "Good")}
+			}
+
+			smoothness := nullRound(this.SteeringSmoothness)
+
+			descriptor.SteeringCorrections := this.SteeringCorrections
+			descriptor.SteeringSmoothness := ((smoothness < TelemetryAnalyzer.SteeringSmoothnessThreshold) ? (smoothness . " Percent")
+																										   : "Good")
+
+
+
+
+			this.iInstructionHints := CaseInsenseMap()
+
+			knowledgeBase.produce()
+
+			Tast.startTask(() {
+				knowledgeBase.addFact("Performance.Clear")
+
+				knowledgeBase.produce()
+			}
+
+			return getKeys(this.iInstructionHints)
+		}
+		else
+			return []
 	}
 
 	startupTelemetryCollector() {

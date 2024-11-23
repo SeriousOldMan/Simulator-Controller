@@ -1566,25 +1566,29 @@ class DrivingCoach extends GridRaceAssistant {
 
 		static nextRecommendation := false
 		static wait := false
-
-		static hintProblems := Map("BrakeEarlier", "Too late braking"
-								 , "BrakeLater", "Too early braking"
-								 , "BrakeHarder", "Not enough brake pressure"
-								 , "BrakeSofter", "Too much brake pressure"
-								 , "BrakeFaster", "Building brake pressure too slow"
-								 , "BrakeSlower", "Building brake pressure too fast"
-								 , "PushLess", "Too much pushing"
-								 , "PushMore", "Not enough pushing"
-								 , "AccelerateEarlier", "Accelerating too late"
-								 , "AccelerateLater", "Accelerating too early"
-								 , "AccelerateHarder", "Not hard enough on the throttle"
-								 , "AccelerateSofter", "Too hard on the throttle")
+		static hintProblems := false
 
 		if ((Round(positionX) = -32767) && (Round(positionY) = -32767))
 			return
 
-		if !wait
+		if !wait {
 			wait := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Corner.Wait", 10) * 1000)
+
+			hintProblems := Map("BrakeEarlier", "Too late braking"
+							  , "BrakeLater", "Too early braking"
+							  , "BrakeHarder", "Not enough brake pressure"
+							  , "BrakeSofter", "Too much brake pressure"
+							  , "BrakeFaster", "Building brake pressure too slow"
+							  , "BrakeSlower", "Building brake pressure too fast"
+							  , "PushLess", "Too much pushing"
+							  , "PushMore", "Not enough pushing"
+							  , "AccelerateEarlier", "Accelerating too late"
+							  , "AccelerateLater", "Accelerating too early"
+							  , "AccelerateHarder", "Not hard enough on the throttle"
+							  , "AccelerateSofter", "Too hard on the throttle")
+
+			hintProblems.Default := ""
+		}
 
 		telemetry := this.getTelemetry(&reference := true, cornerNr)
 

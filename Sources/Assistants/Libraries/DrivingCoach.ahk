@@ -1596,7 +1596,6 @@ class DrivingCoach extends GridRaceAssistant {
 
 				this.Mode := "Coaching"
 
-				/*
 				instructionHints := this.getInstructionHints(cornerNr)
 
 				if (instructionHints.Length > 0) {
@@ -1605,12 +1604,11 @@ class DrivingCoach extends GridRaceAssistant {
 					instructionHints := (translate("Possible problems at this corner are: ") . values2String(", ", instructionHints*) . "\n\n")
 				}
 				else
-				*/
 					instructionHints := ""
 
 				try {
 					command := substituteVariables(this.Instructions["Coaching.Corner.Approaching"]
-												 , {telemetry: instructions . telemetry.JSON, corner: cornerNr})
+												 , {telemetry: instructionHints . telemetry.JSON, corner: cornerNr})
 
 					if reference
 						command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]

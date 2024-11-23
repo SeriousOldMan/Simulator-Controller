@@ -3041,7 +3041,7 @@ class Facts {
 		deleteFile(fileName)
 
 		for key, value in this.Facts {
-			text := (key . " = " . value . "`n")
+			text := (key . " = " . String(value) . "`n")
 
 			FileAppend(text, fileName)
 		}

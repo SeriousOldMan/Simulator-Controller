@@ -1146,8 +1146,11 @@ class DrivingCoach extends GridRaceAssistant {
 			knowledgeBase.addFact(type . ".Corner.Time", corner.Time)
 			knowledgeBase.addFact(type . ".Corner.Length", corner.Length)
 
+			knowledgeBase.addFact(type . ".Corner.Steering.Corrections", corner.SteeringCorrections)
+			knowledgeBase.addFact(type . ".Corner.Steering.Smoothness", nullRound(corner.SteeringSmoothness))
+
 			if (corner.Start["Entry"] && (corner.Start["Entry"] != kNull)) {
-				knowledgeBase.addFact(type . ".Corner.Entry.Braking.Time", nullRound(corner.Time["Entry"], 0, 0))
+				knowledgeBase.addFact(type . ".Corner.Entry.Time", nullRound(corner.Time["Entry"], 0, 0))
 				knowledgeBase.addFact(type . ".Corner.Entry.Braking.Start", Round(corner.Start["Entry"], 1))
 				knowledgeBase.addFact(type . ".Corner.Entry.Braking.Length", nullRound(corner.Length["Entry"], 1, 0))
 				knowledgeBase.addFact(type . ".Corner.Entry.Brake.Pressure", Round(corner.MaxBrakePressure))
@@ -1158,7 +1161,7 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 
 			if (corner.Start["Apex"] && (corner.Start["Apex"] != kNull)) {
-				knowledgeBase.addFact(type . ".Corner.Apex.Rolling.Time", nullRound(corner.Time["Apex"], 0, 0))
+				knowledgeBase.addFact(type . ".Corner.Apex.Time", nullRound(corner.Time["Apex"], 0, 0))
 				knowledgeBase.addFact(type . ".Corner.Apex.Rolling.Start", Round(corner.Start["Apex"], 1))
 				knowledgeBase.addFact(type . ".Corner.Apex.Rolling.Length", nullRound(corner.Length["Apex"], 1, 0))
 				knowledgeBase.addFact(type . ".Corner.Apex.Acceleration.Lateral", nullRound(corner.AvgLateralGForce, 2))
@@ -1172,14 +1175,14 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 
 			if (corner.Start["Exit"] && (corner.Start["Exit"] != kNull)) {
-				knowledgeBase.addFact(type . ".Corner.Exit.Accelerating.Time", nullRound(corner.Time["Exit"], 0, 0))
+				knowledgeBase.addFact(type . ".Corner.Exit.Time", nullRound(corner.Time["Exit"], 0, 0))
 				knowledgeBase.addFact(type . ".Corner.Exit.Accelerating.Start", Round(corner.Start["Exit"], 1))
 				knowledgeBase.addFact(type . ".Corner.Exit.Accelerating.Length", nullRound(corner.Length["Exit"], 1, 0))
 				knowledgeBase.addFact(type . ".Corner.Exit.Gear", corner.AcceleratingGear)
 				knowledgeBase.addFact(type . ".Corner.Exit.RPM", corner.AcceleratingRPM)
 				knowledgeBase.addFact(type . ".Corner.Exit.Speed", nullRound(corner.AcceleratingSpeed))
 				knowledgeBase.addFact(type . ".Corner.Exit.Throttle.Corrections", corner.ThrottleCorrections)
-				knowledgeBase.addFact(type . ".Corner.Exit.Throttle.Smoothness", nullRound(this.ThrottleSmoothness, 0, 100))
+				knowledgeBase.addFact(type . ".Corner.Exit.Throttle.Smoothness", nullRound(corner.ThrottleSmoothness, 0, 100))
 				knowledgeBase.addFact(type . ".Corner.Exit.TCActivations", corner.TCActivations)
 			}
 		}
@@ -1208,28 +1211,17 @@ class DrivingCoach extends GridRaceAssistant {
 					writeFollowUp("Reference", section)
 			}
 
-			if (this.Start["Exit"] && (this.Start["Exit"] != kNull)) {
-
-			}
-
-			smoothness := nullRound(this.SteeringSmoothness)
-
-			descriptor.SteeringCorrections := this.SteeringCorrections
-			descriptor.SteeringSmoothness := ((smoothness < TelemetryAnalyzer.SteeringSmoothnessThreshold) ? (smoothness . " Percent")
-																										   : "Good")
-
-
-
-
 			this.iInstructionHints := CaseInsenseMap()
+
+			knowledgeBase.addFact("Performance.Analyze", true)
 
 			knowledgeBase.produce()
 
-			Tast.startTask(() {
-				knowledgeBase.addFact("Performance.Clear")
+			Task.startTask(() {
+				knowledgeBase.addFact("Performance.Clear", true)
 
 				knowledgeBase.produce()
-			}
+			})
 
 			return getKeys(this.iInstructionHints)
 		}
@@ -1570,10 +1562,19 @@ class DrivingCoach extends GridRaceAssistant {
 	positionTrigger(sectionNr, positionX, positionY) {
 		local cornerNr := this.TelemetryAnalyzer.TrackSections[sectionNr].Nr
 		local oldMode := this.Mode
-		local telemetry, reference, command
+		local telemetry, reference, command, instructionHints
 
 		static nextRecommendation := false
 		static wait := false
+
+		static hintPhrases := Map("BrakeEarlier", "Earlier Braking"
+								, "BrakeLater", "Later Braking"
+								, "BrakeHarder", "Harder Braking"
+								, "BrakeSofter", "Softer Braking"
+								, "PushLess", "Less Pushing"
+								, "PushMore", "More Pushing"
+								, "AccelerateEarlier", "Earlier Acceleration"
+								, "AccelerateLater", "Later Acceleration")
 
 		if ((Round(positionX) = -32767) && (Round(positionY) = -32767))
 			return
@@ -1590,6 +1591,18 @@ class DrivingCoach extends GridRaceAssistant {
 				nextRecommendation := (A_TickCount + wait)
 
 				this.Mode := "Coaching"
+
+				/*
+				instructionHints := this.getInstructionHints(cornerNr)
+
+				if (instructionHints.Length > 0) {
+					instructionHints := collect(instructionHints, (h) => translate(hintPhrases[h]))
+
+					instructionHints := (translate("Especially look at: ") . values2String(", ", instructionHints*) . "\n\n")
+				}
+				else
+					instructionHints := ""
+				*/
 
 				try {
 					command := substituteVariables(this.Instructions["Coaching.Corner.Approaching"]

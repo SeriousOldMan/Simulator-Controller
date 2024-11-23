@@ -144,7 +144,7 @@ class DrivingCoach extends GridRaceAssistant {
 		Get {
 			if isSet(type) {
 				if (type == true)
-					return ["Character", "Simulation", "Session", "Stint", "Knowledge", "Handling", "Coaching", "Coaching.Lap", "Coaching.Corner", "Coaching.Corner.Approaching", "Coaching.Reference"]
+					return ["Character", "Simulation", "Session", "Stint", "Knowledge", "Handling", "Coaching", "Coaching.Lap", "Coaching.Corner", "Coaching.Corner.Approaching", "Coaching.Corner.Problems", "Coaching.Reference"]
 				else
 					return (this.iInstructions.Has(type) ? this.iInstructions[type] : false)
 			}
@@ -1562,23 +1562,23 @@ class DrivingCoach extends GridRaceAssistant {
 	positionTrigger(sectionNr, positionX, positionY) {
 		local cornerNr := this.TelemetryAnalyzer.TrackSections[sectionNr].Nr
 		local oldMode := this.Mode
-		local telemetry, reference, command, instructionHints
+		local telemetry, reference, command, instructionHints, problemsInstruction
 
 		static nextRecommendation := false
 		static wait := false
 
-		static hintPhrases := Map("BrakeEarlier", "Too late braking"
-								, "BrakeLater", "Too early braking"
-								, "BrakeHarder", "Not enough brake pressure"
-								, "BrakeSofter", "Too much brake pressure"
-								, "BrakeFaster", "Building brake pressure too slow"
-								, "BrakeSlower", "Building brake pressure too fast"
-								, "PushLess", "Too much pushing"
-								, "PushMore", "Not enough pushing"
-								, "AccelerateEarlier", "Accelerating too late"
-								, "AccelerateLater", "Accelerating too early"
-								, "AccelerateHarder", "Not hard enough on the throttle"
-								, "AccelerateSofter", "Too hard on the throttle")
+		static hintProblems := Map("BrakeEarlier", "Too late braking"
+								 , "BrakeLater", "Too early braking"
+								 , "BrakeHarder", "Not enough brake pressure"
+								 , "BrakeSofter", "Too much brake pressure"
+								 , "BrakeFaster", "Building brake pressure too slow"
+								 , "BrakeSlower", "Building brake pressure too fast"
+								 , "PushLess", "Too much pushing"
+								 , "PushMore", "Not enough pushing"
+								 , "AccelerateEarlier", "Accelerating too late"
+								 , "AccelerateLater", "Accelerating too early"
+								 , "AccelerateHarder", "Not hard enough on the throttle"
+								 , "AccelerateSofter", "Too hard on the throttle")
 
 		if ((Round(positionX) = -32767) && (Round(positionY) = -32767))
 			return
@@ -1596,19 +1596,23 @@ class DrivingCoach extends GridRaceAssistant {
 
 				this.Mode := "Coaching"
 
-				instructionHints := this.getInstructionHints(cornerNr)
+				telemetry := telemetry.JSON
 
-				if (instructionHints.Length > 0) {
-					instructionHints := collect(instructionHints, (h) => translate(hintPhrases[h]))
+				problemsInstruction := this.Instructions["Coaching.Corner.Problems"]
 
-					instructionHints := (translate("Possible problems at this corner are: ") . values2String(", ", instructionHints*) . "\n\n")
+				if (Trim(problemsInstruction) != "") {
+					instructionHints := this.getInstructionHints(cornerNr)
+
+					if (instructionHints.Length > 0)
+						telemetry := (substituteVariables(problemsInstruction
+														, {problems: values2String(", ", collect(instructionHints
+																							   , (h) => translate(hintProblems[h]))*)})
+									. "\n\n" . telemetry)
 				}
-				else
-					instructionHints := ""
 
 				try {
 					command := substituteVariables(this.Instructions["Coaching.Corner.Approaching"]
-												 , {telemetry: instructionHints . telemetry.JSON, corner: cornerNr})
+												 , {telemetry: telemetry, corner: cornerNr})
 
 					if reference
 						command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]

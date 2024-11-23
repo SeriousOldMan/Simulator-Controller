@@ -1157,10 +1157,30 @@ class DrivingCoach extends GridRaceAssistant {
 				knowledgeBase.addFact(type . ".Corner.Entry.ABSActivations", corner.ABSActivations)
 			}
 
-			if (corner.Start["Apex"] && (corner.Start["Apex"] != kNull))
+			if (corner.Start["Apex"] && (corner.Start["Apex"] != kNull)) {
+				knowledgeBase.addFact(type . ".Corner.Apex.Rolling.Time", nullRound(corner.Time["Apex"], 0, 0))
+				knowledgeBase.addFact(type . ".Corner.Apex.Rolling.Start", Round(corner.Start["Apex"], 1))
+				knowledgeBase.addFact(type . ".Corner.Apex.Rolling.Length", nullRound(corner.Length["Apex"], 1, 0))
+				knowledgeBase.addFact(type . ".Corner.Apex.Acceleration.Lateral", nullRound(corner.AvgLateralGForce, 2))
+				knowledgeBase.addFact(type . ".Corner.Apex.Gear", corner.RollingGear)
+				knowledgeBase.addFact(type . ".Corner.Apex.RPM", corner.RollingRPM)
+				knowledgeBase.addFact(type . ".Corner.Apex.Speed", nullRound(corner.MinSpeed))
+			}
+			else {
+				knowledgeBase.addFact(type . ".Corner.Apex.Acceleration.Lateral", nullRound(corner.AvgLateralGForce, 2))
+				knowledgeBase.addFact(type . ".Corner.Apex.Speed", nullRound(corner.MinSpeed))
 			}
 
-			if (corner.Start["Exit"] && (corner.Start["Exit"] != kNull))
+			if (corner.Start["Exit"] && (corner.Start["Exit"] != kNull)) {
+				knowledgeBase.addFact(type . ".Corner.Exit.Accelerating.Time", nullRound(corner.Time["Exit"], 0, 0))
+				knowledgeBase.addFact(type . ".Corner.Exit.Accelerating.Start", Round(corner.Start["Exit"], 1))
+				knowledgeBase.addFact(type . ".Corner.Exit.Accelerating.Length", nullRound(corner.Length["Exit"], 1, 0))
+				knowledgeBase.addFact(type . ".Corner.Exit.Gear", corner.AcceleratingGear)
+				knowledgeBase.addFact(type . ".Corner.Exit.RPM", corner.AcceleratingRPM)
+				knowledgeBase.addFact(type . ".Corner.Exit.Speed", nullRound(corner.AcceleratingSpeed))
+				knowledgeBase.addFact(type . ".Corner.Exit.Throttle.Corrections", corner.ThrottleCorrections)
+				knowledgeBase.addFact(type . ".Corner.Exit.Throttle.Smoothness", nullRound(this.ThrottleSmoothness, 0, 100))
+				knowledgeBase.addFact(type . ".Corner.Exit.TCActivations", corner.TCActivations)
 			}
 		}
 
@@ -1177,46 +1197,19 @@ class DrivingCoach extends GridRaceAssistant {
 			for index, section in telemetry.Sections {
 				if (index = 1)
 					writeCorner("Lap", section)
-				else
+				else if (index = 2)
 					writeFollowUp("Lap", section)
 			}
 
 			for index, section in reference.Sections {
 				if (index = 1)
 					writeCorner("Reference", section)
-				else
+				else if (index = 2)
 					writeFollowUp("Reference", section)
 			}
 
-			if (this.Start["Apex"] && (this.Start["Apex"] != kNull))
-				descriptor.Apex := {Phase: "Rolling"
-								  , Start: (Round(Abs(this.Start["Apex"]), 1) . ((this.Start["Apex"] > 0) ? " Meter before apex" : " Meter after apex"))
-								  , Length: (nullRound(this.Length["Apex"], 1) . " Meter")
-								  , Duration: (nullRound(this.Time["Apex"] / 1000, 2) . " Seconds")
-								  , Gear: this.RollingGear
-								  , RPM: this.RollingRPM
-								  , LateralGForce: nullRound(this.AvgLateralGForce, 2)
-								  , Speed: (nullRound(this.MinSpeed) . " km/h")}
-			else
-				descriptor.Apex := {Phase: "Rolling"
-								  , LateralGForce: nullRound(this.AvgLateralGForce, 2)
-								  , Speed: (nullRound(this.MinSpeed) . " km/h")}
-
 			if (this.Start["Exit"] && (this.Start["Exit"] != kNull)) {
-				smoothness := nullRound(this.ThrottleSmoothness)
 
-				descriptor.Exit := {Phase: "Accelerating"
-								  , AccelerationStart: (Round(Abs(this.Start["Exit"]), 1) . ((this.Start["Exit"] > 0) ? " Meter after apex" : " Meter before apex"))
-								  , AccelerationLength: (nullRound(this.Length["Exit"], 1) . " Meter")
-								  , Duration: (nullRound(this.Time["Exit"] / 1000, 2) . " Seconds")
-								  , Gear: this.AcceleratingGear
-								  , RPM: this.AcceleratingRPM
-								  , Speed: (Round(this.AcceleratingSpeed) . " km/h")
-								  , TCActivations: ((this.TCActivations > TelemetryAnalyzer.TCActivationsThreshold) ? (this.TCActivations . " Percent")
-																													: "Low")
-								  , ThrottleCorrections: this.ThrottleCorrections
-								  , ThrottleSmoothness: ((smoothness < TelemetryAnalyzer.ThrottleSmoothnessThreshold) ? (smoothness . " Percent")
-																													  : "Good")}
 			}
 
 			smoothness := nullRound(this.SteeringSmoothness)

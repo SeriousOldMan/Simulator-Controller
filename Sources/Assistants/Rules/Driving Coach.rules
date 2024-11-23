@@ -144,8 +144,9 @@ priority: 10, {All: {None: [?Performance]}, {Prove: worsePerformance()}} => (Set
 priority: 10, {All: {None: [?Performance]}, {Prove: betterPerformance()}} => (Set: Performance, Better)
 
 betterPerformance() <= ?lapTime = !Lap.Corner.Time + !Lap.Following.Time,
-					   ?referenceTime = !Reference.Corner.Time + !Reference.Following.Time,
+					   ?referenceTime = !Reference.Corner.Time + !Reference.Following.Time, !,
 					   ?lapTime < ?referenceTime
+betterPerformance() <= !Lap.Corner.Time < !Reference.Corner.Time
 					   
 worsePerformance() <= betterPerformance(), !, fail
 worsePerformance()
@@ -284,7 +285,6 @@ clearTelemetry(?type, Apex) <= Clear(?type, Apex.Time),
 clearTelemetry(?type, Exit) <= Clear(?type, Exit.Time),
 							   Clear(?type, Exit.Accelerating.Start),
 							   Clear(?type, Exit.Accelerating.Length),
-							   Clear(?type, Exit.Acceleration.Lateral),
 							   Clear(?type, Exit.Gear),
 							   Clear(?type, Exit.RPM),
 							   Clear(?type, Exit.Speed),

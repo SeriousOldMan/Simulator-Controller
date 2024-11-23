@@ -1567,14 +1567,18 @@ class DrivingCoach extends GridRaceAssistant {
 		static nextRecommendation := false
 		static wait := false
 
-		static hintPhrases := Map("BrakeEarlier", "Earlier Braking"
-								, "BrakeLater", "Later Braking"
-								, "BrakeHarder", "Harder Braking"
-								, "BrakeSofter", "Softer Braking"
-								, "PushLess", "Less Pushing"
-								, "PushMore", "More Pushing"
-								, "AccelerateEarlier", "Earlier Acceleration"
-								, "AccelerateLater", "Later Acceleration")
+		static hintPhrases := Map("BrakeEarlier", "Too late braking"
+								, "BrakeLater", "Too early braking"
+								, "BrakeHarder", "Not enough brake pressure"
+								, "BrakeSofter", "Too much brake pressure"
+								, "BrakeFaster", "Building brake pressure too slow"
+								, "BrakeSlower", "Building brake pressure too fast"
+								, "PushLess", "Too much pushing"
+								, "PushMore", "Not enough pushing"
+								, "AccelerateEarlier", "Accelerating too late"
+								, "AccelerateLater", "Accelerating too early"
+								, "AccelerateHarder", "Not hard enough on the throttle"
+								, "AccelerateSofter", "Too hard on the throttle")
 
 		if ((Round(positionX) = -32767) && (Round(positionY) = -32767))
 			return
@@ -1598,15 +1602,15 @@ class DrivingCoach extends GridRaceAssistant {
 				if (instructionHints.Length > 0) {
 					instructionHints := collect(instructionHints, (h) => translate(hintPhrases[h]))
 
-					instructionHints := (translate("Especially look at: ") . values2String(", ", instructionHints*) . "\n\n")
+					instructionHints := (translate("Possible problems at this corner are: ") . values2String(", ", instructionHints*) . "\n\n")
 				}
 				else
-					instructionHints := ""
 				*/
+					instructionHints := ""
 
 				try {
 					command := substituteVariables(this.Instructions["Coaching.Corner.Approaching"]
-												 , {telemetry: telemetry.JSON, corner: cornerNr})
+												 , {telemetry: instructions . telemetry.JSON, corner: cornerNr})
 
 					if reference
 						command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]

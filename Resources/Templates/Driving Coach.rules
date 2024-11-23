@@ -128,17 +128,34 @@ updatePitstopLap(?lap) <= Set(Pitstop.1.Lap, ?lap), Set(Pitstop.Last, 1)
 ;;; reference lap.                                                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+priority: 10, {All: [?Performance.Analyze], {Prove: worsePerformance()}} => (Set: Performance, Worse)
+priority: 10, {All: [?Performance.Analyze], {Prove: betterPerformance()}} => (Set: Performance, Better)
+
+betterPerformance() <= ?lapTime = !Lap.Corner.Time + !Lap.FollowUp.Time,
+					   ?referenceTime = !Reference.Corner.Time + !Reference.FollowUp.Time, !,
+					   ?lapTime < ?referenceTime
+betterPerformance() <= !Lap.Corner.Time < !Reference.Corner.Time
+
+worsePerformance() <= betterPerformance(), !, fail
+worsePerformance()
+
 priority: 10, {All: [?Lap.Corner.Entry.Braking.Start < ?Reference.Corner.Entry.Braking.Start]} =>
 		(Prove: addDriverInput(LateBraking))
 
 priority: 10, {All: [?Lap.Corner.Entry.Braking.Start > ?Reference.Corner.Entry.Braking.Start]} =>
 		(Prove: addDriverInput(EarlyBraking))
 
-priority: 10, {All: [?Lap.Corner.Entry.Braking.Pressure < ?Reference.Corner.Entry.Braking.Pressure]} =>
+priority: 10, {All: [?Lap.Corner.Entry.Brake.Pressure < ?Reference.Corner.Entry.Brake.Pressure]} =>
 		(Prove: addDriverInput(SoftBraking))
 
-priority: 10, {All: [?Lap.Corner.Entry.Braking.Pressure > ?Reference.Corner.Entry.Braking.Pressure]} =>
+priority: 10, {All: [?Lap.Corner.Entry.Brake.Pressure > ?Reference.Corner.Entry.Brake.Pressure]} =>
 		(Prove: addDriverInput(HardBraking))
+
+priority: 10, {All: [?Lap.Corner.Entry.Brake.RampUp < ?Reference.Corner.Entry.Brake.RampUp]} =>
+		(Prove: addDriverInput(FastBraking))
+
+priority: 10, {All: [?Lap.Corner.Entry.Brake.RampUp > ?Reference.Corner.Entry.Brake.RampUp]} =>
+		(Prove: addDriverInput(SlowBraking))
 
 priority: 10, {All: [?Lap.Corner.Exit.Accelerating.Start < ?Reference.Corner.Exit.Accelerating.Start]} =>
 		(Prove: addDriverInput(EarlyAccelerating))
@@ -147,51 +164,46 @@ priority: 10, {All: [?Lap.Corner.Exit.Accelerating.Start > ?Reference.Corner.Exi
 		(Prove: addDriverInput(LateAccelerating))
 
 priority: 10, {All: [?Lap.Corner.Entry.Braking.Distance > ?Reference.Corner.Entry.Braking.Distance],
-	  [?Lap.Corner.Entry.ABSActivations > ?Reference.Corner.Entry.ABSActivations]} =>
+					[?Lap.Corner.Entry.ABSActivations > ?Reference.Corner.Entry.ABSActivations]} =>
 		(Prove: addDriverInput(OverBraking))
 
 priority: 10, {All: [?Lap.Corner.Entry.Braking.Distance > ?Reference.Corner.Entry.Braking.Distance],
-					[?Lap.Corner.Entry.ABSActivations != ?Reference.Corner.Entry.ABSActivations]} =>
+					[?Lap.Corner.Entry.ABSActivations < ?Reference.Corner.Entry.ABSActivations]} =>
 		(Prove: addDriverInput(UnderBraking))
 
-priority: 10, {All: [?Performance.Analyze], {Prove: worsePerformance()}} => (Set: Performance, Worse)
-priority: 10, {All: [?Performance.Analyze], {Prove: betterPerformance()}} => (Set: Performance, Better)
+priority: 10, [?Lap.Corner.Exit.TCActivations > ?Reference.Corner.Exit.TCActivations] =>
+		(Prove: addDriverInput(OverAccelerating))
 
-betterPerformance() <= ?lapTime = !Lap.Corner.Time + !Lap.Following.Time,
-					   ?referenceTime = !Reference.Corner.Time + !Reference.Following.Time, !,
-					   ?lapTime < ?referenceTime
-betterPerformance() <= !Lap.Corner.Time < !Reference.Corner.Time
-					   
-worsePerformance() <= betterPerformance(), !, fail
-worsePerformance()
+priority: 10, [?Lap.Corner.Exit.TCActivations < ?Reference.Corner.Exit.TCActivations] =>
+		(Prove: addDriverInput(UnderAccelerating))
 
 priority: 10, {All: [?Performance = Worse],
 					[?Lap.Corner.Entry.Braking.Start < ?Reference.Corner.Entry.Braking.Start],
-				    {Any: [?Lap.Corner.Steering.Smoothness < ?Reference.Corner.Steering.Smoothness],
-						  [?Lap.Corner.Brake.Smoothness < ?Reference.Corner.Brake.Smoothness],
-						  [?Lap.Corner.Exit.ABSActivations > ?Reference.Corner.ABSActivations]}} =>
-		(Prove: addDriverInput(OverPushing))
+				    {Any: [?Lap.Corner.Entry.ABSActivations > ?Reference.Corner.Entry.ABSActivations],
+						  [?Lap.Corner.Steering.Smoothness < ?Reference.Corner.Steering.Smoothness],
+						  [?Lap.Corner.Entry.Brake.Smoothness < ?Reference.Corner.Entry.Brake.Smoothness]}} =>
+		(Prove: addDriverInput(OverPushing)), (Prove: addDriverInput(OverBraking))
 
 priority: 10, {All: [?Performance = Worse],
 					[?Lap.Corner.Entry.Braking.Start > ?Reference.Corner.Entry.Braking.Start],
-					{Any: [?Lap.Corner.Steering.Smoothness > ?Reference.Corner.Steering.Smoothness],
-						  [?Lap.Corner.Brake.Smoothness > ?Reference.Corner.Brake.Smoothness],
-						  [?Lap.Corner.Exit.ABSActivations < ?Reference.Corner.ABSActivations]}} =>
-		(Prove: addDriverInput(UnderPushing))
+					{Any: [?Lap.Corner.Entry.ABSActivations < ?Reference.Corner.Entry.ABSActivations],
+						  [?Lap.Corner.Steering.Smoothness > ?Reference.Corner.Steering.Smoothness],
+						  [?Lap.Corner.Entry.Brake.Smoothness > ?Reference.Corner.Entry.Brake.Smoothness]}} =>
+		(Prove: addDriverInput(UnderPushing)), (Prove: addDriverInput(UnderBraking))
 
 priority: 10, {All: [?Performance = Worse],
 					[?Lap.Corner.Exit.Accelerating.Start < ?Reference.Corner.Exit.Accelerating.Start],
 				    {Any: [?Lap.Corner.Exit.TCActivations > ?Reference.Corner.Exit.TCActivations],
-						  [?Lap.Corner.Throttle.Smoothness < ?Reference.Corner.Throttle.Smoothness],
+						  [?Lap.Corner.Exit.Throttle.Smoothness < ?Reference.Corner.Exit.Throttle.Smoothness],
 						  [?Lap.Corner.Steering.Smoothness < ?Reference.Corner.Steering.Smoothness]}} =>
-		(Prove: addDriverInput(OverPushing))
+		(Prove: addDriverInput(OverPushing)), (Prove: addDriverInput(OverAccelerating))
 
 priority: 10, {All: [?Performance = Worse],
 				    [?Lap.Corner.Exit.Accelerating.Start > ?Reference.Corner.Exit.Accelerating.Start],
 				    {Any: [?Lap.Corner.Exit.TCActivations < ?Reference.Corner.Exit.TCActivations],
-						  [?Lap.Corner.Throttle.Smoothness > ?Reference.Corner.Throttle.Smoothness],
+						  [?Lap.Corner.Exit.Throttle.Smoothness > ?Reference.Corner.Exit.Throttle.Smoothness],
 						  [?Lap.Corner.Steering.Smoothness > ?Reference.Corner.Steering.Smoothness]}} =>
-		(Prove: addDriverInput(UnderPushing))
+		(Prove: addDriverInput(UnderPushing)), (Prove: addDriverInput(UnderAccelerating))
 
 priority: 20, {None: [?DriverInputs.Count]} => (Set: DriverInputs.Count, 0)
 
@@ -221,10 +233,18 @@ priority: 5, {All: [?Performance], {Prove: driverInput(SoftBraking, ?count)}, {P
 		(Set: Performance.SoftBraking, ?count)
 priority: 5, {All: [?Performance], {Prove: driverInput(HardBraking, ?count)}, {Prove: >(?count, 0)}} =>
 		(Set: Performance.HardBraking, ?count)
+priority: 5, {All: [?Performance], {Prove: driverInput(FastBraking, ?count)}, {Prove: >(?count, 0)}} =>
+		(Set: Performance.FastBraking, ?count)
+priority: 5, {All: [?Performance], {Prove: driverInput(SlowBraking, ?count)}, {Prove: >(?count, 0)}} =>
+		(Set: Performance.SlowBraking, ?count)
 priority: 5, {All: [?Performance], {Prove: driverInput(LateAccelerating, ?count)}, {Prove: >(?count, 0)}} =>
 		(Set: Performance.LateAccelerating, ?count)
 priority: 5, {All: [?Performance], {Prove: driverInput(EarlyAccelerating, ?count)}, {Prove: >(?count, 0)}} =>
 		(Set: Performance.EarlyAccelerating, ?count)
+priority: 5, {All: [?Performance], {Prove: driverInput(OverAccelerating, ?count)}, {Prove: >(?count, 0)}} =>
+		(Set: Performance.OverAccelerating, ?count)
+priority: 5, {All: [?Performance], {Prove: driverInput(UnderAccelerating, ?count)}, {Prove: >(?count, 0)}} =>
+		(Set: Performance.UnderAccelerating, ?count)
 
 {All: [?Performance = Worse], [?Performance.EarlyBraking],
 	  {Any: [?Performance.UnderBraking],
@@ -242,21 +262,33 @@ priority: 5, {All: [?Performance], {Prove: driverInput(EarlyAccelerating, ?count
 {All: [?Performance = Worse], [?Performance.HardBraking], [?Performance.OverBraking]} =>
 		(Call: callAssistant(addInstructionHint, BrakeSofter))
 
+{All: [?Performance = Worse], [?Performance.SlowBraking], {None: [?Performance.OverBraking]}} =>
+		(Call: callAssistant(addInstructionHint, BrakeFaster))
+
+{All: [?Performance = Worse], [?Performance.FastBraking], [?Performance.OverBraking]} =>
+		(Call: callAssistant(addInstructionHint, BrakeSlower))
+
 {All: [?Performance = Worse], [?Performance.OverPushing]} =>
 		(Call: callAssistant(addInstructionHint, PushLess))
 
 {All: [?Performance = Worse], [?Performance.UnderPushing]} =>
 		(Call: callAssistant(addInstructionHint, PushMore))
 
-{All: [?Performance = Worse], [?Performance.EarlyAccelerating], [?Performance.OverPushing]} =>
+{All: [?Performance = Worse], [?Performance.EarlyAccelerating], [?Performance.OverAccelerating]} =>
 		(Call: callAssistant(addInstructionHint, AccelerateLater))
 
-{All: [?Performance = Worse], [?Performance.LateAccelerating], {None: [?Performance.OverPushing]}} =>
+{All: [?Performance = Worse], [?Performance.LateAccelerating], {None: [?Performance.OverAccelerating]}} =>
 		(Call: callAssistant(addInstructionHint, AccelerateEarlier))
+
+{All: [?Performance = Worse], [?Performance.OverAccelerating]} =>
+		(Call: callAssistant(addInstructionHint, AccelerateSofter))
+
+{All: [?Performance = Worse], {None: [?Performance.EarlyAccelerating]}, {None: [?Performance.OverAccelerating]}} =>
+		(Call: callAssistant(addInstructionHint, AccelerateHarder))
 
 priority: -20,
 [?Performance.Clear] => (ProveAll: clearTelemetry()), (ProveAll: clearPerformance()), (Prove: clearDriverInputs()),
-						(Clear: Performance.Clear)
+						(Clear: Performance.Analyze), (Clear: Performance.Clear)
 
 clearDriverInputs() <= clearDriverInputs(!DriverInputs.Count), Set(DriverInputs.Count, 0)
 
@@ -264,9 +296,9 @@ clearDriverInputs(0) <= !
 clearDriverInputs(?index) <= Clear(DriverInputs, ?index), ?newIndex = ?index - 1, clearDriverInputs(?newIndex)
 
 clearPerformance() <= Clear(Performance)
-clearPerformance() <= Clear(Performance.Analyze)
 clearPerformance() <= clearPerformance([OverPushing, UnderPushing, OverBraking, Underbraking, EarlyBraking, LateBraking,
-										SoftBraking, HardBraking, EarlyAccelerating, LateAccelerating])
+										SoftBraking, HardBraking, FastBraking, SlowBraking, EarlyAccelerating, LateAccelerating,
+										OverAccelerating, UnderAccelerating])
 
 clearPerformance([])
 clearPerformance([?performance | ?performances]) <= Clear(Performance, ?performance), clearPerformance(?performances)

@@ -23,7 +23,7 @@ Then we have the contributors to the car meta data, especially Chris Matthews an
 
 And I don't want to forget Matus Celko (@winzarten), who was so kind to provide a special export format for telemetry data in his "Second Monitor" app.
 
-A very special thanks goes to @Keith M and @MOnk3y, who has supported me numerous times with testing.
+A very special thanks goes to @Keith M, who has supported me numerous times with testing.
 
 And I don't want forget to mention Martin Moser, who contributed the marvelous icon set for Stream Deck.
 

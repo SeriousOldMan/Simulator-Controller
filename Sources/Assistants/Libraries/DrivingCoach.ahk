@@ -345,11 +345,20 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	updateConfigurationValues(values) {
+		local lapName
+
 		super.updateConfigurationValues(values)
 
 		if (values.HasProp("Settings") && this.iReferenceModeAuto) {
 			this.iReferenceMode := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference", "Fastest")
 			this.iLoadReference := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference.Database", false)
+
+			if this.iLoadReference {
+				lapName := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference.Database.Name", "")
+
+				if (Trim(lapName) != "")
+					this.iLoadReference := lapName
+			}
 
 			TelemetryAnalyzer.TCActivationsThreshold
 				:= getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.TCActivations", 20)
@@ -987,15 +996,28 @@ class DrivingCoach extends GridRaceAssistant {
 				sessionDB := SessionDatabase()
 				bestLap := kUndefined
 
-				sessionDB.getTelemetryNames(this.Simulator, this.Car, this.Track, &telemetries := true, &ignore := false)
+				if (this.LoadReference == true) {
+					sessionDB.getTelemetryNames(this.Simulator, this.Car, this.Track, &telemetries := true, &ignore := false)
 
-				for ignore, candidate in telemetries {
-					info := sessionDB.readTelemetryInfo(this.Simulator, this.Car, this.Track, candidate)
+					for ignore, candidate in telemetries {
+						info := sessionDB.readTelemetryInfo(this.Simulator, this.Car, this.Track, candidate)
+
+						lapTime := getMultiMapValue(info, "Lap", "LapTime", false)
+
+						if (lapTime && ((bestLap == kUndefined) || (lapTime < bestLapTime))) {
+							bestLap := candidate
+							bestLapTime := lapTime
+							bestInfo := info
+						}
+					}
+				}
+				else {
+					info := sessionDB.readTelemetryInfo(this.Simulator, this.Car, this.Track, this.LoadReference)
 
 					lapTime := getMultiMapValue(info, "Lap", "LapTime", false)
 
-					if (lapTime && ((bestLap == kUndefined) || (lapTime < bestLapTime))) {
-						bestLap := candidate
+					if lapTime {
+						bestLap := this.LoadReference
 						bestLapTime := lapTime
 						bestInfo := info
 					}

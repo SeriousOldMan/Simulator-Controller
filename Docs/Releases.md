@@ -1,7 +1,7 @@
 ## 6.0.0.0-release 12/06/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. A groundbreaking [telemetry-based coaching mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#coaching-based-on-lap-telemetry-data) is now available when using the Driving Coach. The coach will take a look at the live telemetry data and will tell you where you have to change your driver inputs and maybe also ask you to take a different line to ultimately improve your lap time.
+  3. A stunning new feature, a [fully interactive coaching mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#coaching-based-on-lap-telemetry-data) is now offered by the Driving Coach. The coach will take a look at the live telemetry data and will tell you where you have to change your driver inputs and driving style to ultimately improve your lap time.
      - Many new voice commands have been defined to start a coaching session and also to interact with the Driving Coach during coaching. See the [voice command reference for English](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Driving-Coach-Commands-(EN)) (or for any of the other supported languages) for more information.
 	 - A controller action "TelemetryCoaching" has been defined for the [Driving Coach plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-driving-coach) to start / finish a coaching session from your Button Box or Stream Deck.
 	 - A controller action "TrackCoaching" has been defined for the [Driving Coach plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-driving-coach) to request active coaching while driving from your Button Box or Stream Deck.
@@ -11,8 +11,8 @@
      - Many new [system level instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#instructions) for the Driving Coach, which guide the LLM through the complex resoning process.
 	 - Telemetry data for reference laps can be stored weather specific in the "Session Database".
 	 - Several other changes and additions in the documentation for the [Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach), which will make worth to re-read the chapter.
-  4. The *Rephrasing*, *Understanding* and *Reasoning* boosters are now available for the Driving Coach as well.
-  5. A new info popup shows important information about the nearest track section when clicking in Telemetry Viewer.
+  4. The *Rephrasing*, *Understanding* and *Reasoning* boosters are now available for the Driving Coach as well. For obvious reasons, there is no need for the *Conversation* booster.
+  5. A new info popup shows important information about the nearest track section when clicking at a specific spot in the Telemetry Viewer or the assoiated track map.
   6. The *Reasoning* booster can now be used without an LLM, if you only want to extend the rule base of an Assistant. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster) for more information.
 
 ## 5.9.9.0-release 11/22/24

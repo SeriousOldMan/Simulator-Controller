@@ -1224,19 +1224,17 @@ class DrivingCoach extends GridRaceAssistant {
 		telemetry := this.getTelemetry(&reference := true, cornerNr)
 
 		if (knowledgeBase && telemetry && reference) {
-			for index, section in telemetry.Sections {
+			for index, section in telemetry.Sections
 				if (index = 1)
 					writeCorner("Lap", section)
 				else if (index = 2)
 					writeFollowUp("Lap", section)
-			}
 
-			for index, section in reference.Sections {
+			for index, section in reference.Sections
 				if (index = 1)
 					writeCorner("Reference", section)
 				else if (index = 2)
 					writeFollowUp("Reference", section)
-			}
 
 			this.iInstructionHints := CaseInsenseMap()
 

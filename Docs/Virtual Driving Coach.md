@@ -322,9 +322,9 @@ How the Driving Coach interprets the telemetry data and what instructions will b
 
 Important is here the restriction to a short message (25 to 35 words) and the focus on driver inputs. However, you can change that, if you want different corner hints from the Coach or longer explanations, for example. But bear in mind, that these instructions will be given while you are driving, so keeping them short might be a good idea. If you experiment with the length of the Coach's corner hints by increasing the number of words, for example, be sure to adjust the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) "Coach: Time between Instructions" and "Coach: Distance before Corner" in the "Session Database" as well.
 
-### Automatic handling of coaching mode
+### Automatic activation of coaching mode
 
-Normally you will only use the telemetry-based coaching during practice sessions. And maybe you want to have the coach on your side in each practice session. Always having to ask the coach to come along can become boring with time. But it is easy to automate that using the [*Resonaing* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster).
+Normally you will only use the telemetry-based coaching during practice sessions. And maybe you want to have the coach on your side in each practice session. Always having to ask the coach to come along can become boring with time. But it is easy to automate that using the [*Reasoning* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster).
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Driving%20Coach%20Startup.JPG)
 
@@ -338,7 +338,7 @@ If you want to use this for your own setup, here is the rule text, so you can co
 
 Replace "Kim" with the name of your Driving Coach.
 
-Expert Notes: *startTelemetryCoaching* and *finishTelemetryCoaching* are methods of the *DrivingCoach* class, **2** represents the session type *practice*, **3** stands for *qualifying* and **4** for a *race* session.
+Expert Notes: *startTelemetryCoaching* and *finishTelemetryCoaching* are methods of the *DrivingCoach* class, the session type **2** represents *practice*, **3** stands for *qualifying* and **4** for a *race* session.
 
 ## How it works
 
@@ -346,7 +346,7 @@ Beside using an LLM to interact with the driver, the Driving Coach uses the same
 
 Unlike the other Assistants, whose knowledge base, i.e. their memory, is deleted at the end of a session, Aidens memory will still be around until the start of the next session. This makes it possible to analyze and discuss various aspects of the session with Aiden after the end of a session. This retained memory covers everything from the performance information like lap and sector times, as well as position information and also includes handling information, if this was enabled during the session.
 
-The active coaching based on lap telemetry data deserves a more detailed explanation. The apporach to enable the Driving Coach to understand the telemetry data is a two step process. In the first step a special alorithm using an ML model divides the telemetry data into sections as defined in the track map and extracts important high-level information from the raw telemetry data. This information is converted into a JSON format, which looks like this:
+The active coaching based on lap telemetry data deserves a more detailed explanation. The apporach to enable the Driving Coach to understand the telemetry data is a three step process. In the first step a special alorithm using an ML model identifies the most important driver input related variables that affect the time used through a part of the track based on the sections defined in the track map and extracts important high-level information from the raw telemetry data. This information is converted into a JSON format, which looks like this:
 
 	{
 	  "Driver": "Oliver Juwig",
@@ -453,7 +453,7 @@ The active coaching based on lap telemetry data deserves a more detailed explana
 	  ]
 	}
 
-This JSON object is then presented to the LLM of Aiden together with very detailed, context specific instructions and explanations. The instructions for the Driving Coach has already been discussed [above](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#instructions). Especially for the telemetry-based coaching they are very important, because they contain a lot of information about driving technique, which may be not available to an LLM in this level of detail. The instructions are based on my own experiences for a smooth, natural and fast driving style. They are not suitable to become an alien, since this type of drivers typically are using special driving techniques that won't work in a real car, for example. However, you can change the instructions for Aiden, so that it steers you in a direction of any driving style, but this can be very time-consuming process. Welcome in the exciting world of *prompt engineering*.
+In the second step a specialized set of rules in the [Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-engine) converts this information into some high-level driver errors "Braking is too hard" (i.e. braking late with too much brake pressure thereby triggering accessive ABS activations). This information together with the above JSON object is then presented to the LLM of Aiden together with very detailed, context specific instructions and explanations. The instructions for the Driving Coach has already been discussed [above](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#instructions). Especially for the telemetry-based coaching they are very important, because they contain a lot of information about driving technique, which may not be available to a pre-trained LLM in this level of detail. The instructions are based on my own experiences for a smooth, natural and fast driving style. They are not suitable to become an alien, since this type of drivers typically are using special driving techniques that won't work in a real car and espcially not for the average driver, for example. However, you can change the instructions for Aiden, so that it steers you in a direction of any driving style, but this can be very time-consuming process. Welcome in the exciting world of [prompt engineering](https://en.wikipedia.org/wiki/Prompt_engineering).
 
 ### About attention deficits, hallucinations and other funny stuff
 

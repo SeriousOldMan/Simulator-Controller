@@ -338,67 +338,74 @@ class LLMConnector {
 					FileAppend(body, kTempDirectory . "LLM.request")
 			}
 
-			answer := WinHttpRequest({Timeouts: [0, 60000, 30000, 60000]}).POST(this.CreateServiceURL(this.Server), body, headers, {Object: true, Encoding: "UTF-8"})
+			try {
+				answer := WinHttpRequest({Timeouts: [0, 60000, 30000, 60000]}).POST(this.CreateServiceURL(this.Server), body, headers, {Object: true, Encoding: "UTF-8"})
 
-			if ((answer.Status >= 200) && (answer.Status < 300)) {
-				this.Manager.connectorState("Active")
+				if ((answer.Status >= 200) && (answer.Status < 300)) {
+					this.Manager.connectorState("Active")
 
-				answer := answer.JSON
+					answer := answer.JSON
 
-				if isDebug() {
-					deleteFile(kTempDirectory . "LLM.response")
+					if isDebug() {
+						deleteFile(kTempDirectory . "LLM.response")
 
-					try
-						FileAppend(JSON.print(answer, "  "), kTempDirectory . "LLM.response")
-				}
+						try
+							FileAppend(JSON.print(answer, "  "), kTempDirectory . "LLM.response")
+					}
 
-				try {
-					answer := answer["choices"][1]
+					try {
+						answer := answer["choices"][1]
 
-					if answer.Has("message") {
-						answer := answer["message"]
+						if answer.Has("message") {
+							answer := answer["message"]
 
-						if isSet(calls)
-							toolCall := this.ProcessToolCalls(tools, answer, &calls)
-						else
-							toolCall := this.ProcessToolCalls(tools, answer)
+							if isSet(calls)
+								toolCall := this.ProcessToolCalls(tools, answer, &calls)
+							else
+								toolCall := this.ProcessToolCalls(tools, answer)
 
-						if toolCall {
-							if answer.Has("content") {
+							if toolCall {
+								if answer.Has("content") {
+									answer := answer["content"]
+
+									if ((answer = kNull) || (Trim(answer) = ""))
+										answer := true
+								}
+								else
+									answer := true
+							}
+							else if answer.Has("content") {
 								answer := answer["content"]
 
 								if ((answer = kNull) || (Trim(answer) = ""))
-									answer := true
+									answer := false
 							}
 							else
-								answer := true
-						}
-						else if answer.Has("content") {
-							answer := answer["content"]
-
-							if ((answer = kNull) || (Trim(answer) = ""))
 								answer := false
 						}
+						else if answer.Has("text")
+							answer := answer["text"]
 						else
-							answer := false
+							throw "Unknown answer format detected..."
+
+						if (answer && (answer != true))
+							this.AddConversation(question, answer)
+
+						return answer
 					}
-					else if answer.Has("text")
-						answer := answer["text"]
-					else
-						throw "Unknown answer format detected..."
+					catch Any as exception {
+						this.Manager.connectorState("Error", "Answer", answer)
 
-					if (answer && (answer != true))
-						this.AddConversation(question, answer)
-
-					return answer
+						return false
+					}
 				}
-				catch Any as exception {
-					this.Manager.connectorState("Error", "Answer", answer)
+				else {
+					this.Manager.connectorState("Error", "Connection", answer.Status)
 
 					return false
 				}
 			}
-			else {
+			catch Any as exception {
 				this.Manager.connectorState("Error", "Connection", answer.Status)
 
 				return false

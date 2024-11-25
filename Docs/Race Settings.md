@@ -22,6 +22,12 @@ This settings are generally available, although you can and have to define them 
 |            | Time between Instructions                | Integer | 10            | No  | The time the Coach waits between to instructions for the next corner. |
 |            | Reference lap                            | None, Last, Fastest | Fastest            | No  | Declares which past lap telemetry will be used as a reference when evaluating the current lap telemetry. |
 |            | Load reference lap from Database         | Boolean | True            | No  | If enabled (*True*), the Coach will load the telemetry for the fastest lap stored in the database and will use it as reference, if applicable. |
+|            | Name reference lap from Database         | String | -            | No  | If loading of a reference lap from the database is enabled, the Driving Coach will normally look for the fastest lap in the database. Using this setting you can specify the name of the reference lap to use and since settings can be weather specific, it is possible to specify different reference laps for different conditions. |
+
+
+Name reference lap from Database
+
+
 |            | Threshold for TC activations             | Integer | 20            | No  | If the percentage of TC activations at corner exit is **above** this threshold, it will be considered by the Coach during telemetry evaluation. |
 |            | Threshold for ABS activations            | Integer | 30            | No  | If the percentage of ABS activations during corner entry is **above** this threshold, it will be considered by the Coach during telemetry evaluation. |
 |            | Threshold for steering smoothness        | Integer | 90            | No  | If (100 - percentage of steering corrections) around a corner is **below** this threshold, it will be considered by the Coach during telemetry evaluation. |

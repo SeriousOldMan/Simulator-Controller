@@ -59,6 +59,7 @@ class DrivingCoach extends GridRaceAssistant {
 	iLoadReference := false
 
 	iAvailableTelemetry := CaseInsenseMap()
+	iInstructionHints := CaseInsenseMap()
 
 	iTelemetryAnalyzer := false
 	iTelemetryCollector := false
@@ -143,7 +144,7 @@ class DrivingCoach extends GridRaceAssistant {
 		Get {
 			if isSet(type) {
 				if (type == true)
-					return ["Character", "Simulation", "Session", "Stint", "Knowledge", "Handling", "Coaching", "Coaching.Lap", "Coaching.Corner", "Coaching.Corner.Approaching", "Coaching.Reference"]
+					return ["Character", "Simulation", "Session", "Stint", "Knowledge", "Handling", "Coaching", "Coaching.Lap", "Coaching.Corner", "Coaching.Corner.Approaching", "Coaching.Corner.Problems", "Coaching.Reference"]
 				else
 					return (this.iInstructions.Has(type) ? this.iInstructions[type] : false)
 			}
@@ -344,11 +345,20 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	updateConfigurationValues(values) {
+		local lapName
+
 		super.updateConfigurationValues(values)
 
 		if (values.HasProp("Settings") && this.iReferenceModeAuto) {
 			this.iReferenceMode := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference", "Fastest")
 			this.iLoadReference := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference.Database", false)
+
+			if this.iLoadReference {
+				lapName := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference.Database.Name", "")
+
+				if (Trim(lapName) != "")
+					this.iLoadReference := lapName
+			}
 
 			TelemetryAnalyzer.TCActivationsThreshold
 				:= getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.TCActivations", 20)
@@ -521,8 +531,9 @@ class DrivingCoach extends GridRaceAssistant {
 
 										handling .= ("- " . substituteVariables(translate("%severity% %type% at %speed% corner %where%")
 																			  , {severity: translate(issue.Severity . A_Space)
-																			   , type: translate(type . A_Space), speed: translate(speed . A_Space)
-																			   , where: where . A_Space}))
+																			   , type: translate(type . A_Space)
+																			   , speed: translate(speed . A_Space)
+																			   , where: translate(where . A_Space)}))
 									}
 
 						if index
@@ -985,15 +996,28 @@ class DrivingCoach extends GridRaceAssistant {
 				sessionDB := SessionDatabase()
 				bestLap := kUndefined
 
-				sessionDB.getTelemetryNames(this.Simulator, this.Car, this.Track, &telemetries := true, &ignore := false)
+				if (this.LoadReference == true) {
+					sessionDB.getTelemetryNames(this.Simulator, this.Car, this.Track, &telemetries := true, &ignore := false)
 
-				for ignore, candidate in telemetries {
-					info := sessionDB.readTelemetryInfo(this.Simulator, this.Car, this.Track, candidate)
+					for ignore, candidate in telemetries {
+						info := sessionDB.readTelemetryInfo(this.Simulator, this.Car, this.Track, candidate)
+
+						lapTime := getMultiMapValue(info, "Lap", "LapTime", false)
+
+						if (lapTime && ((bestLap == kUndefined) || (lapTime < bestLapTime))) {
+							bestLap := candidate
+							bestLapTime := lapTime
+							bestInfo := info
+						}
+					}
+				}
+				else {
+					info := sessionDB.readTelemetryInfo(this.Simulator, this.Car, this.Track, this.LoadReference)
 
 					lapTime := getMultiMapValue(info, "Lap", "LapTime", false)
 
-					if (lapTime && ((bestLap == kUndefined) || (lapTime < bestLapTime))) {
-						bestLap := candidate
+					if lapTime {
+						bestLap := this.LoadReference
 						bestLapTime := lapTime
 						bestInfo := info
 					}
@@ -1115,6 +1139,116 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 
 		return theLap
+	}
+
+	addInstructionHint(instruction) {
+		this.iInstructionHints[instruction] := true
+	}
+
+	getInstructionHints(cornerNr) {
+		local knowledgeBase := this.KnowledgeBase
+		local telemetry, reference
+
+		nullZero(value) {
+			return (isNull(value) ? 0 : value)
+		}
+
+		nullRound(value, precision := 0, default := 0) {
+			if isNumber(value)
+				return Round(value, precision)
+			else
+				return default
+		}
+
+		writeCorner(type, corner) {
+			if (corner.Type != "Corner")
+				throw "Inconsistent section type detected in DrivingCoach.getInstructionHints..."
+
+			knowledgeBase.addFact(type . ".Corner.Nr", corner.Nr)
+			knowledgeBase.addFact(type . ".Corner.Time", corner.Time)
+			knowledgeBase.addFact(type . ".Corner.Length", corner.Length)
+
+			knowledgeBase.addFact(type . ".Corner.Steering.Corrections", corner.SteeringCorrections)
+			knowledgeBase.addFact(type . ".Corner.Steering.Smoothness", nullRound(corner.SteeringSmoothness))
+
+			if (corner.Start["Entry"] && (corner.Start["Entry"] != kNull)) {
+				knowledgeBase.addFact(type . ".Corner.Entry.Time", nullRound(corner.Time["Entry"], 0, 0))
+				knowledgeBase.addFact(type . ".Corner.Entry.Braking.Start", Round(corner.Start["Entry"], 1))
+				knowledgeBase.addFact(type . ".Corner.Entry.Braking.Length", nullRound(corner.Length["Entry"], 1, 0))
+				knowledgeBase.addFact(type . ".Corner.Entry.Brake.Pressure", Round(corner.MaxBrakePressure))
+				knowledgeBase.addFact(type . ".Corner.Entry.Brake.Rampup", Round(corner.BrakePressureRampUp, 1))
+				knowledgeBase.addFact(type . ".Corner.Entry.Brake.Corrections", corner.BrakeCorrections)
+				knowledgeBase.addFact(type . ".Corner.Entry.Brake.Smoothness", nullRound(corner.BrakeSmoothness, 0, 100))
+				knowledgeBase.addFact(type . ".Corner.Entry.ABSActivations", corner.ABSActivations)
+			}
+
+			if (corner.Start["Apex"] && (corner.Start["Apex"] != kNull)) {
+				knowledgeBase.addFact(type . ".Corner.Apex.Time", nullRound(corner.Time["Apex"], 0, 0))
+				knowledgeBase.addFact(type . ".Corner.Apex.Rolling.Start", Round(corner.Start["Apex"], 1))
+				knowledgeBase.addFact(type . ".Corner.Apex.Rolling.Length", nullRound(corner.Length["Apex"], 1, 0))
+				knowledgeBase.addFact(type . ".Corner.Apex.Acceleration.Lateral", nullRound(corner.AvgLateralGForce, 2))
+				knowledgeBase.addFact(type . ".Corner.Apex.Gear", corner.RollingGear)
+				knowledgeBase.addFact(type . ".Corner.Apex.RPM", corner.RollingRPM)
+				knowledgeBase.addFact(type . ".Corner.Apex.Speed", nullRound(corner.MinSpeed))
+			}
+			else {
+				knowledgeBase.addFact(type . ".Corner.Apex.Acceleration.Lateral", nullRound(corner.AvgLateralGForce, 2))
+				knowledgeBase.addFact(type . ".Corner.Apex.Speed", nullRound(corner.MinSpeed))
+			}
+
+			if (corner.Start["Exit"] && (corner.Start["Exit"] != kNull)) {
+				knowledgeBase.addFact(type . ".Corner.Exit.Time", nullRound(corner.Time["Exit"], 0, 0))
+				knowledgeBase.addFact(type . ".Corner.Exit.Accelerating.Start", Round(corner.Start["Exit"], 1))
+				knowledgeBase.addFact(type . ".Corner.Exit.Accelerating.Length", nullRound(corner.Length["Exit"], 1, 0))
+				knowledgeBase.addFact(type . ".Corner.Exit.Gear", corner.AcceleratingGear)
+				knowledgeBase.addFact(type . ".Corner.Exit.RPM", corner.AcceleratingRPM)
+				knowledgeBase.addFact(type . ".Corner.Exit.Speed", nullRound(corner.AcceleratingSpeed))
+				knowledgeBase.addFact(type . ".Corner.Exit.Throttle.Corrections", corner.ThrottleCorrections)
+				knowledgeBase.addFact(type . ".Corner.Exit.Throttle.Smoothness", nullRound(corner.ThrottleSmoothness, 0, 100))
+				knowledgeBase.addFact(type . ".Corner.Exit.TCActivations", corner.TCActivations)
+			}
+		}
+
+		writeFollowUp(type, followUp) {
+			knowledgeBase.addFact(type . ".FollowUp.Nr", followUp.Nr)
+			knowledgeBase.addFact(type . ".FollowUp.Type", followUp.Type)
+			knowledgeBase.addFact(type . ".FollowUp.Time", followUp.Time)
+			knowledgeBase.addFact(type . ".FollowUp.Length", followUp.Length)
+		}
+
+		telemetry := this.getTelemetry(&reference := true, cornerNr)
+
+		if (knowledgeBase && telemetry && reference) {
+			for index, section in telemetry.Sections {
+				if (index = 1)
+					writeCorner("Lap", section)
+				else if (index = 2)
+					writeFollowUp("Lap", section)
+			}
+
+			for index, section in reference.Sections {
+				if (index = 1)
+					writeCorner("Reference", section)
+				else if (index = 2)
+					writeFollowUp("Reference", section)
+			}
+
+			this.iInstructionHints := CaseInsenseMap()
+
+			knowledgeBase.addFact("Performance.Analyze", true)
+
+			knowledgeBase.produce()
+
+			Task.startTask(() {
+				knowledgeBase.addFact("Performance.Clear", true)
+
+				knowledgeBase.produce()
+			})
+
+			return getKeys(this.iInstructionHints)
+		}
+		else
+			return []
 	}
 
 	startupTelemetryCollector() {
@@ -1450,16 +1584,33 @@ class DrivingCoach extends GridRaceAssistant {
 	positionTrigger(sectionNr, positionX, positionY) {
 		local cornerNr := this.TelemetryAnalyzer.TrackSections[sectionNr].Nr
 		local oldMode := this.Mode
-		local telemetry, reference, command
+		local telemetry, reference, command, instructionHints, problemsInstruction
 
 		static nextRecommendation := false
 		static wait := false
+		static hintProblems := false
 
 		if ((Round(positionX) = -32767) && (Round(positionY) = -32767))
 			return
 
-		if !wait
+		if !wait {
 			wait := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Corner.Wait", 10) * 1000)
+
+			hintProblems := Map("BrakeEarlier", "Too late braking"
+							  , "BrakeLater", "Too early braking"
+							  , "BrakeHarder", "Not enough brake pressure"
+							  , "BrakeSofter", "Too much brake pressure"
+							  , "BrakeFaster", "Building brake pressure too slow"
+							  , "BrakeSlower", "Building brake pressure too fast"
+							  , "PushLess", "Too much pushing"
+							  , "PushMore", "Not enough pushing"
+							  , "AccelerateEarlier", "Accelerating too late"
+							  , "AccelerateLater", "Accelerating too early"
+							  , "AccelerateHarder", "Not hard enough on the throttle"
+							  , "AccelerateSofter", "Too hard on the throttle")
+
+			hintProblems.Default := ""
+		}
 
 		telemetry := this.getTelemetry(&reference := true, cornerNr)
 
@@ -1471,9 +1622,23 @@ class DrivingCoach extends GridRaceAssistant {
 
 				this.Mode := "Coaching"
 
+				telemetry := telemetry.JSON
+
+				problemsInstruction := this.Instructions["Coaching.Corner.Problems"]
+
+				if (Trim(problemsInstruction) != "") {
+					instructionHints := this.getInstructionHints(cornerNr)
+
+					if (instructionHints.Length > 0)
+						telemetry := (substituteVariables(problemsInstruction
+														, {problems: values2String(", ", collect(instructionHints
+																							   , (h) => translate(hintProblems[h]))*)})
+									. "\n\n" . telemetry)
+				}
+
 				try {
 					command := substituteVariables(this.Instructions["Coaching.Corner.Approaching"]
-												 , {telemetry: telemetry.JSON, corner: cornerNr})
+												 , {telemetry: telemetry, corner: cornerNr})
 
 					if reference
 						command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]

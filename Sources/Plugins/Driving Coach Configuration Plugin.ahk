@@ -80,9 +80,9 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 	Instructions[qualified := true] {
 		Get {
 			if qualified
-				return ["Instructions.Character", "Instructions.Simulation", "Instructions.Session", "Instructions.Stint", "Instructions.Knowledge", "Instructions.Handling", "Instructions.Coaching", "Instructions.Coaching.Lap", "Instructions.Coaching.Corner", "Instructions.Coaching.Corner.Approaching", "Instructions.Coaching.Reference"]
+				return ["Instructions.Character", "Instructions.Simulation", "Instructions.Session", "Instructions.Stint", "Instructions.Knowledge", "Instructions.Handling", "Instructions.Coaching", "Instructions.Coaching.Lap", "Instructions.Coaching.Corner", "Instructions.Coaching.Corner.Approaching", "Instructions.Coaching.Corner.Problems", "Instructions.Coaching.Reference"]
 			else
-				return ["Character", "Simulation", "Session", "Stint", "Knowledge", "Handling", "Coaching", "Coaching.Lap", "Coaching.Corner", "Coaching.Corner.Approaching", "Coaching.Reference"]
+				return ["Character", "Simulation", "Session", "Stint", "Knowledge", "Handling", "Coaching", "Coaching.Lap", "Coaching.Corner", "Coaching.Corner.Approaching", "Coaching.Corner.Problems", "Coaching.Reference"]
 		}
 	}
 

@@ -262,7 +262,7 @@ Normal you will use free conversation to interact with Aiden as shown in the exa
 
 ### Enabling and disabling specific instructions and information processing 
 
-As discussed above Aiden can process information about your current session in a simulation. This includes specific data about your own performance and the preformance of your competitors, as well as information about your recent handling issues. Since the processing of this data may sometimes confuse the AI behind the Driving Coach. Therefore you may disable specific information processing by using a special voice command:
+As discussed above Aiden can process information about your current session in a simulation. This includes specific data about your own performance and the preformance of your competitors, as well as information about your recent handling issues. The processing of this data may sometimes confuse the AI behind the Driving Coach, especially for some of the lower-grade LLMs. Therefore you may disable specific information processing by using a special voice command:
 
 	[Please] do not pay attention *information* anymore [please]
 
@@ -274,7 +274,7 @@ As you might expect, the word "please" is optional. Available options for *infor
 
 The Driving Coach is integrated with the telemetry data system of Simulator Controller. You can use a voice command or the plugin action "TelemetryCoaching" on your controller to activate telemtery collection for the Driving Coach. Example for a voice command: "Can you help me with my practice?"
 
-Aiden will then start collecting telemetry data and will contact you after a few laps, that he is ready to discuss your performance with you. You can ask for a review of a complete lap or a specific corner, if required. You can also ask more specifically, for example, if you have weaknesses in your braking and how you should work on them. Here is an example:
+Aiden will then start collecting telemetry data and will contact you after a few laps that he is ready to discuss your performance with you. You can ask for a review of a complete lap or a specific corner, if required. You can also ask more specifically, for example, if you have weaknesses in your braking and how you should work on them. Here is an example:
 
 **Driver:** What are my most important weaknesses and how should I work on them?
 
@@ -292,7 +292,7 @@ Focusing on these areas will help you improve your lap times and overall perform
 
 Beside discussing the telemetry data for the last lap, you can also ask Aiden to give you corner by corner instructions while you are driving. This is discussed [below](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#coaching-on-the-track).
 
-DISCLAIMER: This functionality requires a very capable LLM for decent results. This LLM must be able to follow multiple, complex chain of thoughts at the same time and must be able to perform reasoning based on supplied facts. At the time of this writing, only high end models like GPT 4o, Claude 3 Opus or Mistral Large are in this group. The upcoming o1 model of OpenAI is even better in this area, but it is prohibitevly expensive. According to my testing, GPT 4o mini, the most cost-efficient model of OpenAI and also Mistral Small by Mistral AI also show good results, but sometimes they mix up things, for example, that applying less brake pressure at the start of the braking phase will make your braking phase shorter. This can also happen with the stronger models sometimes, but not that often.
+DISCLAIMER: This functionality requires a very capable LLM for decent results. This LLM must be able to follow multiple, complex chain of thoughts at the same time and must be able to perform reasoning based on supplied facts. At the time of this writing, only high end models like GPT 4o, Claude 3 Opus or Mistral Large are in this group. The upcoming o1 model of OpenAI may be even better in this area, but it will be prohibitevly expensive. According to my testing, GPT 4o mini, the most cost-efficient model of OpenAI and also Mistral Small by Mistral AI show good results as well, but sometimes they mix up things, for example, that applying less brake pressure at the start of the braking phase will make your braking phase shorter. This can also happen with the stronger models sometimes, but not that often. You can experiment with the *Creativity* configuration setting of the Driving Coach to find the best compromise here.
 
 ### Track layout
 
@@ -300,13 +300,13 @@ Before you can use the telemetry-based coaching, you must have recorded a [track
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/raw/main/Docs/Images/Session%20Database%2020.jpg)
 
-Please note, that you do not have to set sections for each corner, only for those where you are interested in. You also should not define corners where no braking or throttle lifting is necessary, since you will not get any valuable insights for those corners from Aiden.
+Please note, that you do not have to set sections for each corner, only for those where you are interested in. You also should not define corners where no braking is necessary, since you will not get any valuable insights for those corners from Aiden.
 
 And be aware, that corners directly followed by another corner (a typical situation in chicanes on many tracks) are very challenging for Aiden. You can use that, but take the recommendations of Aiden with a grain of salt here.
 
 ### Coaching on the track
 
-Aiden is capable to give you instructions and recommendations for the next corner while you are driving. You can enable this by a voice command, for example: "Can you give me instructions while I am driving?", or you can use the plugin action "TrackCoaching" on you your controller.
+Aiden can give you instructions and recommendations for the next corner while you are driving. You can enable this by a voice command, for example: "Can you give me instructions while I am driving?", or you can use the plugin action "TrackCoaching" on you your controller.
 
 If activated, Aiden will use the telemetry data of the recent lap to check for any areas for improvement. Additionally, the lap before the last lap, or the fastest lap of the session so far can be used as a reference for braking points, start of the acceleration phase, and so on. It is also possible to load the [fastest lap stored in the "Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#laps), which will then be used as a reference lap unless you have driven a faster one in the current session. You configure the behaviour that suites you the most, by using the corresponding [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) in the "Session Database".
 

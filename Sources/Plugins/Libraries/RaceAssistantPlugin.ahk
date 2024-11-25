@@ -1898,6 +1898,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	loadSettings(simulator, car, track, data := false, settings := false) {
 		local settingsDB := SettingsDatabase()
 		local simulatorName := settingsDB.getSimulatorName(simulator)
+		local dbSettings := settingsDB.loadSettings(simulatorName, car, track
+												  , getMultiMapValue(data, "Weather Data", "Weather", "Dry"))
 		local load, section, values, key, value
 
 		if !settings
@@ -1907,10 +1909,12 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		load := getMultiMapValue(this.Configuration, "Race Assistant Startup", simulatorName . ".LoadSettings", load)
 
 		if (data && ((load = "SettingsDatabase") || (load = "SessionDatabase")))
-			for section, values in settingsDB.loadSettings(simulatorName, car, track
-														 , getMultiMapValue(data, "Weather Data", "Weather", "Dry"))
-				for key, value in values
-					setMultiMapValue(settings, section, key, value)
+			addMultiMapValues(settings, dbSettings)
+		else {
+			addMultiMapValues(dbSettings, settings)
+
+			settings := dbSettings
+		}
 
 		if this.StartupSettings
 			setMultiMapValue(settings, "Assistant", "Assistant.Autonomy"

@@ -960,7 +960,7 @@ class SimulatorController extends ConfigurationItem {
 					activationCommand := StrReplace(getMultiMapValue(this.Configuration, "Voice Control", "ActivationCommand", false), ";", ",")
 
 					messageSend(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", "Controller", "Controller", pid
-																								 , activationCommand, "activationCommand", false
+																								 , activationCommand, "activationCommand", false, false
 																								 , false, false, false, true, true)
 							  , this.VoiceServer)
 

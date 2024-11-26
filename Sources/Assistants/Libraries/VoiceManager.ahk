@@ -999,6 +999,7 @@ class VoiceManager extends ConfigurationItem {
 										, "registerVoiceClient:" . values2String(";", this.Name, this.Routing, ProcessExist()
 																					, StrReplace(activationCommand, ";", ",")
 																					, "remoteActivationRecognized", "remoteDeactivationRecognized"
+																					, "remoteSpeakingStatusUpdate"
 																					, this.Language, this.Synthesizer, this.Speaker
 																					, this.Recognizer, this.Listener
 																					, this.SpeakerVolume, this.SpeakerPitch, this.SpeakerSpeed
@@ -1301,6 +1302,13 @@ class VoiceManager extends ConfigurationItem {
 
 	remoteDeactivationRecognized(words*) {
 		; this.clearContinuation()
+	}
+
+	remoteSpeakingStatusUpdate(status) {
+		if (status = "Start")
+			this.Speaking := true
+		else if (status = "Stop")
+			this.Speaking := false
 	}
 
 	remoteCommandRecognized(grammar, command, words*) {

@@ -492,7 +492,12 @@ class VoiceServer extends ConfigurationItem {
 							if !this.Interrupted
 								this.SpeechSynthesizer[true].speak(text, true, false, options)
 
-							if this.Interrupted {
+							if (this.Interrupted = "Abort") {
+								this.iInterrupted := false
+
+								break
+							}
+							else if this.Interrupted {
 								Sleep(2000)
 
 								while this.Muted {
@@ -502,13 +507,7 @@ class VoiceServer extends ConfigurationItem {
 									Sleep(Round(Random(1, 2000)))
 								}
 
-								if (this.Interrupted = "Abort") {
-									this.iInterrupted := false
-
-									break
-								}
-								else
-									this.iInterrupted := false
+								this.iInterrupted := false
 							}
 							else
 								break
@@ -1163,8 +1162,10 @@ class VoiceServer extends ConfigurationItem {
 	interrupt(descriptor := false) {
 		local ignore, client
 
-		for ignore, client in this.VoiceClients
-			if (!descriptor || client.Descriptor = descriptor)
+		if descriptor
+			this.getVoiceClient(descriptor).interrupt()
+		else
+			for ignore, client in this.VoiceClients
 				client.interrupt()
 	}
 

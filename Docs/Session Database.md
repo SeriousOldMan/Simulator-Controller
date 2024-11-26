@@ -144,7 +144,7 @@ Important: This functionality may not be available when using *WebView2* as the 
 
 Also, you can edit the track sections by clicking on the "Edit" button in the right corner of the window. This enables you to edit the sections as described above for the [sections editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation).
 
-Good to know: Beside the dark gray dot which marks the start/finish line, a second gray dot may be present, which marks the currently selected track position. This is very helpful when creating sections based on driver inputs from the telemetry data.
+Good to know: Beside the dark gray dot which marks the start/finish line, a second gray dot may be present, which marks the currently selected track position. This is very helpful when creating sections based on driver inputs from the telemetry data. For example, set the start marker for a corner a few meters before the start of the braking zone.
 
 The Telemetry Viewer is available in the following applications to collect lap telemetry data, where additional documentation is available:
 

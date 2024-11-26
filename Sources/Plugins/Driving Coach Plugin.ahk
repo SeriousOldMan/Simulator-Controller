@@ -171,7 +171,7 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {
 		local descriptor
 
-		if (inList(["RaceAssistant", "Call", "SetupWorkbenchOpen"], action))
+		if (inList(["RaceAssistant", "Call", "SetupWorkbenchOpen", "Interrupt"], action))
 			super.createRaceAssistantAction(controller, action, actionFunction, arguments*)
 		else if (action = "TelemetryCoaching") {
 			descriptor := ConfigurationItem.descriptor(action, "Toggle")

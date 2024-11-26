@@ -144,6 +144,10 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			this.callRemote("reject", arguments*)
 		}
 
+		interrupt(arguments*) {
+			this.callRemote("interrupt", arguments*)
+		}
+
 		mute(arguments*) {
 			this.callRemote("mute", arguments*)
 		}
@@ -216,6 +220,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 						this.Plugin.accept()
 					case "Reject":
 						this.Plugin.reject()
+					case "Interrupt":
+						this.Plugin.interrupt()
 					case "Mute":
 						this.Plugin.mute()
 					case "Unmute":
@@ -961,7 +967,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 				this.registerAction(RaceAssistantPlugin.RaceAssistantAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), "InformationRequest", arguments*))
 			}
-			else if inList(["Call", "Accept", "Reject", "Mute", "Unmute"], action) {
+			else if inList(["Call", "Accept", "Reject", "Interrupt", "Mute", "Unmute"], action) {
 				descriptor := ConfigurationItem.descriptor(action, "Activate")
 
 				this.registerAction(RaceAssistantPlugin.RaceAssistantAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), action))
@@ -2109,6 +2115,11 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	reject() {
 		if this.RaceAssistant[true]
 			this.RaceAssistant[true].reject()
+	}
+
+	interrupt(all := false) {
+		if this.RaceAssistant
+			this.RaceAssistant.interrupt(all)
 	}
 
 	mute() {

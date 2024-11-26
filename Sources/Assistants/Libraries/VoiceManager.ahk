@@ -1098,6 +1098,16 @@ class VoiceManager extends ConfigurationItem {
 			}
 	}
 
+	interrupt(all := false) {
+		local voiceServer := this.VoiceServer
+
+		if voiceServer
+			if all
+				messageSend(kFileMessage, "Voice", "interrupt", this.VoiceServer)
+			else
+				messageSend(kFileMessage, "Voice", "interrupt:" . this.Name, this.VoiceServer)
+	}
+
 	mute() {
 		local voiceServer := this.VoiceServer
 

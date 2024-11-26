@@ -502,7 +502,13 @@ class VoiceServer extends ConfigurationItem {
 									Sleep(Round(Random(1, 2000)))
 								}
 
-								this.iInterrupted := false
+								if (this.Interrupted = "Abort") {
+									this.iInterrupted := false
+
+									break
+								}
+								else
+									this.iInterrupted := false
 							}
 							else
 								break
@@ -569,11 +575,18 @@ class VoiceServer extends ConfigurationItem {
 				}
 		}
 
+		interrupt() {
+			local synthesizer := this.SpeechSynthesizer
+
+			if (synthesizer && this.Speaking && !this.Interrupted && this.Interruptable && synthesizer.Stoppable)
+				this.iInterrupted := (synthesizer.stop() ? "Abort" : false)
+		}
+
 		mute() {
 			local synthesizer := this.SpeechSynthesizer
 
 			if (synthesizer && this.Speaking && !this.Interrupted && this.Interruptable && synthesizer.Stoppable)
-					this.iInterrupted := synthesizer.stop()
+				this.iInterrupted := synthesizer.stop()
 
 			if !this.Muted {
 				this.iMuted := true
@@ -1147,6 +1160,14 @@ class VoiceServer extends ConfigurationItem {
 		return (activeClient ? activeClient.stopListening(retry) : this.stopActivationListener(retry))
 	}
 
+	interrupt(descriptor := false) {
+		local ignore, client
+
+		for ignore, client in this.VoiceClients
+			if (!descriptor || client.Descriptor = descriptor)
+				client.interrupt()
+	}
+
 	mute() {
 		local ignore, client
 
@@ -1194,7 +1215,7 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	registerVoiceClient(descriptor, routing, pid
-					  , activationCommand := false, activationCallback := false, deactivationCallback := false, speakingStatusCallback := false,
+					  , activationCommand := false, activationCallback := false, deactivationCallback := false, speakingStatusCallback := false
 					  , language := false, synthesizer := true, speaker := true, recognizer := false, listener := false
 					  , speakerVolume := kUndefined, speakerPitch := kUndefined, speakerSpeed := kUndefined
 					  , speakerBooster := false, listenerBooster := false

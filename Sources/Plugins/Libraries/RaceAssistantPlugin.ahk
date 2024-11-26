@@ -1734,7 +1734,12 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				}
 			}
 			else if isInstance(theAction, RaceAssistantPlugin.RaceAssistantAction)
-				if (((theAction.Action = "Accept") || (theAction.Action = "Reject") || (theAction.Action = "Call"))
+				if (theAction.Action = "Interrupt") {
+					theAction.Function.enable(kAllTrigger, theAction)
+					theAction.Function.setLabel(this.actionLabel(theAction))
+					theAction.Function.setIcon(this.actionIcon(theAction))
+				}
+				else if (((theAction.Action = "Accept") || (theAction.Action = "Reject") || (theAction.Action = "Call"))
 				 && (this.RaceAssistant[true] != false)) {
 					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setLabel(this.actionLabel(theAction))
@@ -2117,9 +2122,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			this.RaceAssistant[true].reject()
 	}
 
-	interrupt(all := false) {
+	interrupt() {
 		if this.RaceAssistant
-			this.RaceAssistant.interrupt(all)
+			this.RaceAssistant.interrupt()
 	}
 
 	mute() {

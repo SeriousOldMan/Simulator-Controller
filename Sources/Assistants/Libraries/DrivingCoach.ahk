@@ -56,7 +56,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 	iReferenceMode := "None"
 	iReferenceModeAuto := true
-	iLoadReference := false
+	iLoadReference := "None"
 
 	iAvailableTelemetry := CaseInsenseMap()
 	iInstructionHints := CaseInsenseMap()
@@ -351,9 +351,14 @@ class DrivingCoach extends GridRaceAssistant {
 
 		if (values.HasProp("Settings") && this.iReferenceModeAuto) {
 			this.iReferenceMode := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference", "Fastest")
-			this.iLoadReference := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference.Database", false)
+			this.iLoadReference := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference.Database", "None")
 
-			if this.iLoadReference {
+			if !this.LoadReference
+				this.iLoadReference := "None"
+			else if (this.LoadReference == true)
+				this.iLoadReference := "Fastest"
+
+			if (this.LoadReference = "Name") {
 				lapName := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference.Database.Name", "")
 
 				if (Trim(lapName) != "")
@@ -992,11 +997,11 @@ class DrivingCoach extends GridRaceAssistant {
 		if (this.AvailableTelemetry.Count = 0) {
 			this.getSpeaker().speakPhrase("CoachingReady", false, true)
 
-			if this.LoadReference {
+			if (this.LoadReference != "None") {
 				sessionDB := SessionDatabase()
 				bestLap := kUndefined
 
-				if (this.LoadReference == true) {
+				if (this.LoadReference == "Fastest") {
 					sessionDB.getTelemetryNames(this.Simulator, this.Car, this.Track, &telemetries := true, &ignore := false)
 
 					for ignore, candidate in telemetries {
@@ -1219,19 +1224,17 @@ class DrivingCoach extends GridRaceAssistant {
 		telemetry := this.getTelemetry(&reference := true, cornerNr)
 
 		if (knowledgeBase && telemetry && reference) {
-			for index, section in telemetry.Sections {
+			for index, section in telemetry.Sections
 				if (index = 1)
 					writeCorner("Lap", section)
 				else if (index = 2)
 					writeFollowUp("Lap", section)
-			}
 
-			for index, section in reference.Sections {
+			for index, section in reference.Sections
 				if (index = 1)
 					writeCorner("Reference", section)
 				else if (index = 2)
 					writeFollowUp("Reference", section)
-			}
 
 			this.iInstructionHints := CaseInsenseMap()
 

@@ -268,10 +268,10 @@ priority: 5, {All: [?Performance], {Prove: driverInput(UnderAccelerating, ?count
 {All: [?Performance = Worse], [?Performance.FastBraking], [?Performance.OverBraking]} =>
 		(Call: callAssistant(addInstructionHint, BrakeSlower))
 
-{All: [?Performance = Worse], [?Performance.OverPushing]} =>
+{All: [?Performance = Worse], {All: [?Performance.OverPushing], {None: [?Performance.UnderPushing]}}} =>
 		(Call: callAssistant(addInstructionHint, PushLess))
 
-{All: [?Performance = Worse], [?Performance.UnderPushing]} =>
+{All: [?Performance = Worse], {All: [?Performance.UnderPushing], {None: [?Performance.OverPushing]}}} =>
 		(Call: callAssistant(addInstructionHint, PushMore))
 
 {All: [?Performance = Worse], [?Performance.EarlyAccelerating], [?Performance.OverAccelerating]} =>

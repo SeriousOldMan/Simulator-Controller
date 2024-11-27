@@ -226,7 +226,7 @@ class MessageManager extends PeriodicTask {
 
 	receiveFileMessages() {
 		local result := []
-		local messageHandlers, messageHandler, result, pid, fileName, file, line, data, category
+		local messageHandlers, messageHandler, result, pid, fileName, file, line, request, data, category
 
 		pid := ProcessExist()
 
@@ -259,14 +259,26 @@ class MessageManager extends PeriodicTask {
 					break
 
 				if InStr(line, ":") {
-					data := StrSplit(line, ":", , 2)
-					category := data[1]
+					line := StrSplit(line, ":", , 3)
+
+					request := line[1]
+					category := line[2]
+					data := line[3]
 
 					messageHandler := (messageHandlers.Has(category) ? messageHandlers[category] : messageHandlers["*"])
 
-					logMessage(kLogInfo, translate("Dispatching message `"") . category . (data[2] ? translate("`": ") . data[2] : translate("`"")))
+					logMessage(kLogInfo, translate("Dispatching message `"") . category . (data ? translate("`": ") . data : translate("`"")))
 
-					result.Push(Array(messageHandler, category, decode(data[2])))
+					if (request = "INTR") {
+						try {
+							withProtection(ObjBindMethod(messageHandler, "call", category, decode(data)))
+						}
+						catch Any as exception {
+							logError(exception, true)
+						}
+					}
+					else
+						result.Push(Array(messageHandler, category, decode(data)))
 				}
 			}
 
@@ -304,8 +316,8 @@ class MessageManager extends PeriodicTask {
 			return false
 	}
 
-	sendFileMessage(pid, category, data) {
-		local text := category . ":" . encode(data) . "`n"
+	sendFileMessage(pid, category, data, request) {
+		local text := (request . ":" . category . ":" . encode(data) . "`n")
 
 		try {
 			FileAppend(text, kTempDirectory . "Messages\" . pid . ".msg")
@@ -397,7 +409,7 @@ class MessageManager extends PeriodicTask {
 			case kFileMessage:
 				logMessage(kLogInfo, translate("Sending message `"") . category . (data ? translate("`": ") . data : translate("`"")) . translate(" to target ") . target)
 
-				this.OutgoingMessages.Push(ObjBindMethod(this, "sendFileMessage", target, category, data))
+				this.OutgoingMessages.Push(ObjBindMethod(this, "sendFileMessage", target, category, data, request))
 			default:
 				throw "Unknown message type (" . messageType . ") detected in messageSend..."
 		}
@@ -467,28 +479,28 @@ sendWindowMessage(target, category, data, request) {
 	;---------------------------------------------------------------------------
 	dwData := encodeDWORD(request)
 	cbData := (StrLen(category) * 2) + 1 			; length of DATA string (incl. ZERO)
-	lpData := &category								; pointer to DATA string
+	lpData := StrPtr(category)						; pointer to DATA string
 
 	;---------------------------------------------------------------------------
 	; put the message in a COPYDATASTRUCT
 	;---------------------------------------------------------------------------
 	struct := Buffer(A_PtrSize * 3, 0)        		; initialize COPYDATASTRUCT
-	NumPut("UInt", dwData, struct, A_PtrSize * 0)   ; DWORD
-	NumPut("UInt", cbData, struct, A_PtrSize * 1)   ; DWORD
-	NumPut("UInt", lpData, struct, A_PtrSize * 2)   ; 32bit pointer
+	NumPut("UPtr", dwData, struct, A_PtrSize * 0)   ; DWORD
+	NumPut("UPtr", cbData, struct, A_PtrSize * 1)   ; DWORD
+	NumPut("UPtr", lpData, struct, A_PtrSize * 2)   ; 32bit pointer
 
 	;---------------------------------------------------------------------------
 	; parameters for PostMessage command
 	;---------------------------------------------------------------------------
 	message := 0x4a			; WM_COPYDATA
 	wParam  := ""			; not used
-	lParam  := &struct		; COPYDATASTRUCT
+	lParam  := struct		; COPYDATASTRUCT
 
 	SetTitleMatchMode(2) 		; match part of the title
 	DetectHiddenWindows(true)	; needed for sending messages
 
 	try {
-		PostMessage(message, wParam, lParam, "", target)
+		SendMessage(message, wParam, lParam, , target)
 
 		return true
 	}
@@ -517,11 +529,11 @@ receiveWindowMessage(wParam, lParam, *) {
 	;---------------------------------------------------------------------------
     ; interpret available info
     ;---------------------------------------------------------------------------
-    request := decodeDWORD(dwData)              ; 4-char decoded request
+    request := decodeDWORD(dwData)              	; 4-char decoded request
 
 	if ((request = "RS") || (request = "SD")) {
 		length  := (cbData - 1)						; length of DATA string (excl ZERO)
-		data    := StrGet(lpData, length, "")       ; DATA string from pointer
+		data    := StrGet(lpData, length)       	; DATA string from pointer
 	}
 	else if ((request = "NORM") || (request = "INTR")) {
 		length  := (cbData - 1) / 2					; length of DATA string (excl ZERO)
@@ -537,7 +549,7 @@ receiveWindowMessage(wParam, lParam, *) {
 
 	messageHandler := (messageHandlers.Has(category) ? messageHandlers[category] : messageHandlers["*"])
 
-	logMessage(kLogInfo, translate("Dispatching message `"") . category . (data[2] ? translate("`": ") . data[2] : translate("`"")))
+	logMessage(kLogInfo, translate("Dispatching message `"") . request . "/" . category . (data[2] ? translate("`": ") . data[2] : translate("`"")))
 
 	if ((request = "RS") || (request = "INTR")) {
 		try {
@@ -556,7 +568,7 @@ stopMessageManager(arguments*) {
 
 	if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
 			return false
-	
+
 	Task.removeTask(MessageManager.Instance)
 
 	pid := ProcessExist()

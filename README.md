@@ -119,6 +119,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 29. [Managing telemetry data](https://youtu.be/h_WOf4mpWiA) - This video demonstrates the telemetry data system and shows how the different applications collect telemetry and what you can do with it.
 
+30. [Track coaching by an AI](https://youtu.be/mgfFkNh2_Lw) - Demonstrates an on-track coaching lesson by the Driving Coach. The Coach ready the telemetry data, compares it to the data of a reference lap and will give instructions how to improve corner by corner.
+
 This list will be extended from time to time to cover new functionalities.
 
 ### Discord Community

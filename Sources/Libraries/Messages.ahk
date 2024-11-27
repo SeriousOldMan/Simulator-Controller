@@ -480,9 +480,9 @@ sendWindowMessage(target, category, data, request) {
 	;---------------------------------------------------------------------------
 	; parameters for PostMessage command
 	;---------------------------------------------------------------------------
-	message := 0x4a			; WM_COPYDATA
-	wParam  := ""			; not used
-	lParam  := &struct		; COPYDATASTRUCT
+	message := 0x4a				; WM_COPYDATA
+	wParam  := ""				; not used
+	lParam  := &struct			; COPYDATASTRUCT
 
 	SetTitleMatchMode(2) 		; match part of the title
 	DetectHiddenWindows(true)	; needed for sending messages
@@ -517,7 +517,7 @@ receiveWindowMessage(wParam, lParam, *) {
 	;---------------------------------------------------------------------------
     ; interpret available info
     ;---------------------------------------------------------------------------
-    request := decodeDWORD(dwData)              ; 4-char decoded request
+    request := decodeDWORD(dwData)					; 4-char decoded request
 
 	if ((request = "RS") || (request = "SD")) {
 		length  := (cbData - 1)						; length of DATA string (excl ZERO)
@@ -555,9 +555,9 @@ stopMessageManager(arguments*) {
 	local pid
 
 	if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
-			return false
-	
-	Task.removeTask(MessageManager.Instance)
+		return false
+
+	Task.stopTask(MessageManager.Instance)
 
 	pid := ProcessExist()
 

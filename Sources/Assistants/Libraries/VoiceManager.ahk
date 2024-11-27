@@ -1103,9 +1103,9 @@ class VoiceManager extends ConfigurationItem {
 
 		if voiceServer
 			if all
-				messageSend(kFileMessage, "Voice", "interrupt", this.VoiceServer)
+				messageSend(kWindowMessage, "Voice", "interrupt", "ahk_pid " . this.VoiceServer, "INTR")
 			else
-				messageSend(kFileMessage, "Voice", "interrupt:" . this.Name, this.VoiceServer)
+				messageSend(kWindowMessage, "Voice", "interrupt:" . this.Name, "ahk_pid " . this.VoiceServer, "INTR")
 	}
 
 	mute() {

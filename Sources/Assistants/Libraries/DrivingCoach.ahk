@@ -1635,7 +1635,8 @@ class DrivingCoach extends GridRaceAssistant {
 					if (instructionHints.Length > 0)
 						telemetry := (substituteVariables(problemsInstruction
 														, {problems: values2String(", ", collect(instructionHints
-																							   , (h) => translate(hintProblems[h]))*)})
+																							   , (h) => translate(hintProblems[h]))*)
+														 , corner: cornerNr})
 									. "\n\n" . telemetry)
 				}
 

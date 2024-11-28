@@ -181,7 +181,9 @@ Click on the picture to hear an actual conversation with the Driving Coach:
 
 The Driving Coach can even use telemetry data to give you instructions how to improve your cornering performance while you are driving on the track.
 
-The Virtual Driving Coach can use LLM runtimes of OpenAI, Mistral and alike, but if your PC is powerful enough, you can also use an integrated runtime for a variety of LLM architectures, like Llama, Falcon, Mistral, GPT, and so on, as long as they are available in [GGUF format](https://github.com/ggerganov/ggml/pull/302).
+[![](https://img.youtube.com/vi/mgfFkNh2_Lw/0.jpg)](https://youtu.be/mgfFkNh2_Lw)
+
+The Virtual Driving Coach can use LLM runtimes of OpenAI, Mistral and alike, but if your PC is powerful enough, you can also use an integrated runtime for a variety of LLM architectures, like Llama, Falcon, Mistral, GPT, and so on, using a local runtime, which comes with Simulator Controller or using tools like Ollama or GPT4All.
 
 ##### Race Engineer & Race Strategist
 
@@ -200,6 +202,10 @@ Another capability of the Virtual Race Strategist is to support you during the [
 You can even use all these functionalities during multiplayer team races using the [*Team Server*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server), which handles the state and knowledge of the Race Assistants and share this information between all participating drivers. The Team Server is the backend for the so called "Team Center", a console, which can be used by any team member (even if not an active driver) to gather all kind of session data and remote control various aspects of the session, for example the settings for an upcoming pitstop.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%201.JPG)
+
+Take a look at this video to see all this parts working together in a challenging race:
+
+[![](https://img.youtube.com/vi/MlbAESpzg7Q/0.jpg)](https://youtu.be/MlbAESpzg7Q)
 
 ##### Race Spotter
 

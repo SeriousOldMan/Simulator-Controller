@@ -512,6 +512,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			if isObject(type) {
 				editorGui["settingValueEdit"].Visible := false
 				editorGui["settingValueText"].Visible := false
+				editorGui["settingValueString"].Visible := false
 				editorGui["settingValueCheck"].Visible := false
 				editorGui["settingValueDropDown"].Visible := true
 				editorGui["settingValueDropDown"].Enabled := true
@@ -528,6 +529,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				editorGui["settingValueDropDown"].Visible := false
 				editorGui["settingValueEdit"].Visible := false
 				editorGui["settingValueText"].Visible := false
+				editorGui["settingValueString"].Visible := false
 				editorGui["settingValueCheck"].Visible := true
 				editorGui["settingValueCheck"].Enabled := true
 
@@ -535,10 +537,23 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				value := default
 			}
+			else if (type = "String") {
+				editorGui["settingValueDropDown"].Visible := false
+				editorGui["settingValueCheck"].Visible := false
+				editorGui["settingValueEdit"].Visible := false
+				editorGui["settingValueText"].Visible := false
+				editorGui["settingValueString"].Visible := true
+				editorGui["settingValueString"].Enabled := true
+
+				editorGui["settingValueString"].Text := default
+
+				value := default
+			}
 			else if (type = "Text") {
 				editorGui["settingValueDropDown"].Visible := false
 				editorGui["settingValueCheck"].Visible := false
 				editorGui["settingValueEdit"].Visible := false
+				editorGui["settingValueString"].Visible := false
 				editorGui["settingValueText"].Visible := true
 				editorGui["settingValueText"].Enabled := true
 
@@ -550,6 +565,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				editorGui["settingValueDropDown"].Visible := false
 				editorGui["settingValueCheck"].Visible := false
 				editorGui["settingValueText"].Visible := false
+				editorGui["settingValueString"].Visible := false
 				editorGui["settingValueEdit"].Visible := true
 				editorGui["settingValueEdit"].Enabled := true
 
@@ -617,6 +633,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				if isObject(type) {
 					editorGui["settingValueEdit"].Visible := false
 					editorGui["settingValueText"].Visible := false
+					editorGui["settingValueString"].Visible := false
 					editorGui["settingValueCheck"].Visible := false
 					editorGui["settingValueDropDown"].Visible := true
 					editorGui["settingValueDropDown"].Enabled := true
@@ -633,6 +650,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					editorGui["settingValueDropDown"].Visible := false
 					editorGui["settingValueEdit"].Visible := false
 					editorGui["settingValueText"].Visible := false
+					editorGui["settingValueString"].Visible := false
 					editorGui["settingValueCheck"].Visible := true
 					editorGui["settingValueCheck"].Enabled := true
 
@@ -640,10 +658,23 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 					value := default
 				}
+				else if (type = "String") {
+					editorGui["settingValueDropDown"].Visible := false
+					editorGui["settingValueEdit"].Visible := false
+					editorGui["settingValueCheck"].Visible := false
+					editorGui["settingValueText"].Visible := false
+					editorGui["settingValueString"].Visible := true
+					editorGui["settingValueString"].Enabled := true
+
+					editorGui["settingValueString"].Text := default
+
+					value := default
+				}
 				else if (type = "Text") {
 					editorGui["settingValueDropDown"].Visible := false
 					editorGui["settingValueEdit"].Visible := false
 					editorGui["settingValueCheck"].Visible := false
+					editorGui["settingValueString"].Visible := false
 					editorGui["settingValueText"].Visible := true
 					editorGui["settingValueText"].Enabled := true
 
@@ -655,6 +686,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					editorGui["settingValueDropDown"].Visible := false
 					editorGui["settingValueCheck"].Visible := false
 					editorGui["settingValueText"].Visible := false
+					editorGui["settingValueString"].Visible := false
 					editorGui["settingValueEdit"].Visible := true
 					editorGui["settingValueEdit"].Enabled := true
 
@@ -704,6 +736,17 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						value := type[inList(collect(type, translate), editorGui["settingValueDropDown"].Text)]
 					else if (type = "Boolean")
 						value := editorGui["settingValueCheck"].Value
+					else if (type = "String") {
+						settingValue := editorGui["settingValueString"].Value
+
+						if InStr(settingValue, "`n") {
+							settingValue := StrReplace(StrReplace(settingValue, "`n", A_Space), "`r", "")
+
+							editorGui["settingValueString"].Value := settingValue
+						}
+
+						value := settingValue
+					}
 					else if (type = "Text") {
 						settingValue := editorGui["settingValueText"].Value
 
@@ -1614,12 +1657,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.iSettingsListView.OnEvent("ItemSelect", navSetting)
 
 		editorGui.Add("Text", "x296 yp+419 w80 h23 X:Move(0.2) Y:Move +0x200", translate("Setting"))
-		editorGui.Add("DropDownList", "xp+90 yp w270 Y:Move X:Move(0.2) W:Grow(0.8) vsettingDropDown").OnEvent("Change", selectSetting)
+		editorGui.Add("DropDownList", "xp+94 yp w266 Y:Move X:Move(0.2) W:Grow(0.8) vsettingDropDown").OnEvent("Change", selectSetting)
 
 		editorGui.Add("Text", "x296 yp+24 w80 h23 X:Move(0.2) Y:Move +0x200", translate("Value"))
-		editorGui.Add("DropDownList", "xp+90 yp w180 X:Move(0.2) Y:Move vsettingValueDropDown").OnEvent("Change", changeSetting)
+		editorGui.Add("DropDownList", "xp+94 yp w184 X:Move(0.2) Y:Move vsettingValueDropDown").OnEvent("Change", changeSetting)
 		editorGui.Add("Edit", "xp yp w50 X:Move(0.2) Y:Move vsettingValueEdit").OnEvent("Change", changeSetting)
-		editorGui.Add("Edit", "xp yp w210 h57 Y:Move X:Move(0.2) W:Grow(0.8) vsettingValueText").OnEvent("Change", changeSetting)
+		editorGui.Add("Edit", "xp yp w184 h57 Y:Move X:Move(0.2) W:Grow(0.8) vsettingValueText").OnEvent("Change", changeSetting)
+		editorGui.Add("Edit", "xp yp w184 Y:Move X:Move(0.2) W:Grow(0.8) vsettingValueString").OnEvent("Change", changeSetting)
 		editorGui.Add("CheckBox", "xp yp+4 X:Move(0.2) Y:Move vsettingValueCheck").OnEvent("Click", changeSetting)
 
 		editorGui.Add("Button", "x606 yp+30 w23 h23 X:Move Y:Move vaddSettingButton").OnEvent("Click", addSetting)
@@ -2406,6 +2450,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			window["settingValueDropDown"].Enabled := true
 			window["settingValueEdit"].Enabled := true
 			window["settingValueText"].Enabled := true
+			window["settingValueString"].Enabled := true
 			window["settingValueCheck"].Enabled := true
 		}
 		else {
@@ -2417,6 +2462,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			window["settingValueCheck"].Enabled := false
 			window["settingValueText"].Visible := false
 			window["settingValueText"].Enabled := false
+			window["settingValueString"].Visible := false
+			window["settingValueString"].Enabled := false
 			window["settingValueEdit"].Visible := true
 			window["settingValueEdit"].Enabled := false
 
@@ -5181,7 +5228,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	chooseSetting() {
 		local selected, setting, value, settings, section, key, ignore, candidate
-		local labels, descriptor, type
+		local labels, descriptor, type, default
 
 		selected := this.SettingsListView.GetNext(0)
 
@@ -5215,13 +5262,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.Control["settingDropDown"].Add(labels)
 		this.Control["settingDropDown"].Choose(inList(labels, setting))
 
-		ignore := false
-
-		type := this.getSettingType(section, key, &ignore)
+		type := this.getSettingType(section, key, &default := false)
 
 		if isObject(type) {
 			this.Control["settingValueEdit"].Visible := false
 			this.Control["settingValueText"].Visible := false
+			this.Control["settingValueString"].Visible := false
 			this.Control["settingValueCheck"].Visible := false
 			this.Control["settingValueDropDown"].Visible := true
 			this.Control["settingValueDropDown"].Enabled := true
@@ -5230,22 +5276,39 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			this.Control["settingValueDropDown"].Delete()
 			this.Control["settingValueDropDown"].Add(labels)
-			this.Control["settingValueDropDown"].Choose(inList(labels, value))
+
+			if inList(labels, value)
+				this.Control["settingValueDropDown"].Choose(inList(labels, value))
+			else
+				this.Control["settingValueDropDown"].Choose(inList(labels, default))
 		}
 		else if (type = "Boolean") {
 			this.Control["settingValueDropDown"].Visible := false
 			this.Control["settingValueEdit"].Visible := false
 			this.Control["settingValueText"].Visible := false
+			this.Control["settingValueString"].Visible := false
 			this.Control["settingValueCheck"].Visible := true
 			this.Control["settingValueCheck"].Enabled := true
 
 			if (this.Control["settingValueCheck"].Value != value)
 				this.Control["settingValueCheck"].Value := (value = "x") ? true : false
 		}
+		else if (type = "String") {
+			this.Control["settingValueDropDown"].Visible := false
+			this.Control["settingValueCheck"].Visible := false
+			this.Control["settingValueEdit"].Visible := false
+			this.Control["settingValueText"].Visible := false
+			this.Control["settingValueString"].Visible := true
+			this.Control["settingValueString"].Enabled := true
+
+			if (this.Control["settingValueString"].Text != value)
+				this.Control["settingValueString"].Text := value
+		}
 		else if (type = "Text") {
 			this.Control["settingValueDropDown"].Visible := false
 			this.Control["settingValueCheck"].Visible := false
 			this.Control["settingValueEdit"].Visible := false
+			this.Control["settingValueString"].Visible := false
 			this.Control["settingValueText"].Visible := true
 			this.Control["settingValueText"].Enabled := true
 
@@ -5256,6 +5319,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.Control["settingValueDropDown"].Visible := false
 			this.Control["settingValueCheck"].Visible := false
 			this.Control["settingValueText"].Visible := false
+			this.Control["settingValueString"].Visible := false
 			this.Control["settingValueEdit"].Visible := true
 			this.Control["settingValueEdit"].Enabled := true
 
@@ -5285,7 +5349,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				display := translate(value)
 			else if (type = "Boolean")
 				display := (value ? "x" : "")
-			else if (type = "Text")
+			else if ((type = "Text") || (type = "String"))
 				display := StrReplace(StrReplace(value, "`n", A_Space), "`r", "")
 			else if (type = "Float")
 				display := displayValue("Float", value)
@@ -5366,7 +5430,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				display := translate(value)
 			else if (type = "Boolean")
 				display := (value ? "x" : "")
-			else if (type = "Text")
+			else if ((type = "Text") || (type = "String"))
 				display := StrReplace(StrReplace(value, "`n", A_Space), "`r", "")
 			else if (type = "Float")
 				display := displayValue("Float", value)
@@ -6369,7 +6433,7 @@ selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner :
 							value := translate(value)
 						else if (type = "Boolean")
 							value := (value ? translate("x") : "")
-						else if (type = "Text")
+						else if ((type = "Text") || (type = "String"))
 							value := StrReplace(StrReplace(value, "`n", A_Space), "`r", "")
 						else
 							value := displayValue("Float", value)

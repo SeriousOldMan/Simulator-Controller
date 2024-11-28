@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[6.0.0.0-beta](https://cutt.ly/leLHvpsK) (Open Beta for 6.0.0. Changes: Fully interactive coaching by the Driving Coach, Added "Coaching" and "TrackCoaching" action to the Driving Coach plugin, New icons in Stream Deck icon set for the "Coaching" and "TrackCoaching" actions, New settings for corner by corner coaching, Speaker and Listener booster for Driving Coach, New controller action functions for "Driving Coach" plugin, Section explorer in Telemetry Viewer, Support for rule extensions using the *Reasoning* booster, Many new LLM instructions for the Driving Coach.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-600) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 
@@ -119,6 +121,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 29. [Managing telemetry data](https://youtu.be/h_WOf4mpWiA) - This video demonstrates the telemetry data system and shows how the different applications collect telemetry and what you can do with it.
 
+30. [Track coaching by an AI](https://youtu.be/mgfFkNh2_Lw) - Demonstrates an on-track coaching lesson by the Driving Coach. The Coach ready the telemetry data, compares it to the data of a reference lap and will give instructions how to improve corner by corner.
+
 This list will be extended from time to time to cover new functionalities.
 
 ### Discord Community
@@ -177,7 +181,9 @@ Click on the picture to hear an actual conversation with the Driving Coach:
 
 The Driving Coach can even use telemetry data to give you instructions how to improve your cornering performance while you are driving on the track.
 
-The Virtual Driving Coach can use LLM runtimes of OpenAI, Mistral and alike, but if your PC is powerful enough, you can also use an integrated runtime for a variety of LLM architectures, like Llama, Falcon, Mistral, GPT, and so on, as long as they are available in [GGUF format](https://github.com/ggerganov/ggml/pull/302).
+[![](https://img.youtube.com/vi/mgfFkNh2_Lw/0.jpg)](https://youtu.be/mgfFkNh2_Lw)
+
+The Virtual Driving Coach can use LLM runtimes of OpenAI, Mistral and alike, but if your PC is powerful enough, you can also use an integrated runtime for a variety of LLM architectures, like Llama, Falcon, Mistral, GPT, and so on, using a local runtime, which comes with Simulator Controller or using tools like Ollama or GPT4All.
 
 ##### Race Engineer & Race Strategist
 
@@ -196,6 +202,10 @@ Another capability of the Virtual Race Strategist is to support you during the [
 You can even use all these functionalities during multiplayer team races using the [*Team Server*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server), which handles the state and knowledge of the Race Assistants and share this information between all participating drivers. The Team Server is the backend for the so called "Team Center", a console, which can be used by any team member (even if not an active driver) to gather all kind of session data and remote control various aspects of the session, for example the settings for an upcoming pitstop.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%201.JPG)
+
+Take a look at this video to see all this parts working together in a challenging race:
+
+[![](https://img.youtube.com/vi/MlbAESpzg7Q/0.jpg)](https://youtu.be/MlbAESpzg7Q)
 
 ##### Race Spotter
 

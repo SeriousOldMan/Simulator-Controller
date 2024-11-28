@@ -56,7 +56,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 	iReferenceMode := "None"
 	iReferenceModeAuto := true
-	iLoadReference := false
+	iLoadReference := "None"
 
 	iAvailableTelemetry := CaseInsenseMap()
 	iInstructionHints := CaseInsenseMap()
@@ -351,9 +351,14 @@ class DrivingCoach extends GridRaceAssistant {
 
 		if (values.HasProp("Settings") && this.iReferenceModeAuto) {
 			this.iReferenceMode := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference", "Fastest")
-			this.iLoadReference := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference.Database", false)
+			this.iLoadReference := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference.Database", "None")
 
-			if this.iLoadReference {
+			if !this.LoadReference
+				this.iLoadReference := "None"
+			else if (this.LoadReference == true)
+				this.iLoadReference := "Fastest"
+
+			if (this.LoadReference = "Name") {
 				lapName := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference.Database.Name", "")
 
 				if (Trim(lapName) != "")
@@ -678,7 +683,7 @@ class DrivingCoach extends GridRaceAssistant {
 		if !this.Connector
 			this.startConversation()
 
-		if confirm
+		if (confirm && this.Speaker)
 			this.getSpeaker().speakPhrase("ConfirmCoaching")
 
 		this.iCoachingActive := true
@@ -687,7 +692,7 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	telemetryCoachingFinishRecognized(words, confirm := true) {
-		if confirm
+		if (confirm && this.Speaker)
 			this.getSpeaker().speakPhrase("Roger")
 
 		this.shutdownTelemetryCoaching()
@@ -701,8 +706,11 @@ class DrivingCoach extends GridRaceAssistant {
 		this.Mode := "Review"
 
 		try {
-			if (cornerNr = kUndefined)
-				this.getSpeaker().speakPhrase("Repeat")
+			if (cornerNr = kUndefined) {
+				if this.Speaker {
+					this.getSpeaker().speakPhrase("Repeat")
+				}
+			}
 			else {
 				telemetry := this.getTelemetry(&reference := true, cornerNr)
 
@@ -716,7 +724,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 					this.handleVoiceText("TEXT", command, true, values2String(A_Space, words*))
 				}
-				else
+				else if this.Speaker
 					this.getSpeaker().speakPhrase("Later")
 			}
 		}
@@ -743,7 +751,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 				this.handleVoiceText("TEXT", command, true, values2String(A_Space, words*))
 			}
-			else
+			else if this.Speaker
 				this.getSpeaker().speakPhrase("Later")
 		}
 		finally {
@@ -753,40 +761,45 @@ class DrivingCoach extends GridRaceAssistant {
 
 	trackCoachingStartRecognized(words, confirm := true) {
 		if this.startupTrackCoaching() {
-			if confirm
+			if (confirm && this.Speaker)
 				this.getSpeaker().speakPhrase("Roger")
 		}
-		else
+		else if this.Speaker
 			this.getSpeaker().speakPhrase("Later")
 	}
 
 	trackCoachingFinishRecognized(words, confirm := true) {
-		if confirm
+		if (confirm && this.Speaker)
 			this.getSpeaker().speakPhrase("Okay")
 
 		this.shutdownTrackCoaching()
 	}
 
 	referenceLapRecognized(words) {
-		local speaker := this.getSpeaker()
+		local speaker
 
-		if inList(words, speaker.Fragments["Fastest"])
-			this.iReferenceMode := "Fastest"
-		else if inList(words, speaker.Fragments["Last"])
-			this.iReferenceMode := "Last"
-		else {
-			speaker.speakPhrase("Repeat")
+		if this.Speaker {
+			speaker := this.getSpeaker()
 
-			return
+			if inList(words, speaker.Fragments["Fastest"])
+				this.iReferenceMode := "Fastest"
+			else if inList(words, speaker.Fragments["Last"])
+				this.iReferenceMode := "Last"
+			else {
+				speaker.speakPhrase("Repeat")
+
+				return
+			}
+
+			this.iReferenceModeAuto := false
+
+			speaker.speakPhrase("Roger")
 		}
-
-		this.iReferenceModeAuto := false
-
-		speaker.speakPhrase("Roger")
 	}
 
 	noReferenceLapRecognized(words) {
-		this.getSpeaker().speakPhrase("Roger")
+		if this.Speaker
+			this.getSpeaker().speakPhrase("Roger")
 
 		this.iReferenceMode := "None"
 		this.iReferenceModeAuto := false
@@ -990,13 +1003,14 @@ class DrivingCoach extends GridRaceAssistant {
 		local ignore, lap, candidate, sessionDB, info, lapTime, size
 
 		if (this.AvailableTelemetry.Count = 0) {
-			this.getSpeaker().speakPhrase("CoachingReady", false, true)
+			if this.Speaker
+				this.getSpeaker().speakPhrase("CoachingReady", false, true)
 
-			if this.LoadReference {
+			if (this.LoadReference != "None") {
 				sessionDB := SessionDatabase()
 				bestLap := kUndefined
 
-				if (this.LoadReference == true) {
+				if (this.LoadReference == "Fastest") {
 					sessionDB.getTelemetryNames(this.Simulator, this.Car, this.Track, &telemetries := true, &ignore := false)
 
 					for ignore, candidate in telemetries {
@@ -1219,19 +1233,17 @@ class DrivingCoach extends GridRaceAssistant {
 		telemetry := this.getTelemetry(&reference := true, cornerNr)
 
 		if (knowledgeBase && telemetry && reference) {
-			for index, section in telemetry.Sections {
+			for index, section in telemetry.Sections
 				if (index = 1)
 					writeCorner("Lap", section)
 				else if (index = 2)
 					writeFollowUp("Lap", section)
-			}
 
-			for index, section in reference.Sections {
+			for index, section in reference.Sections
 				if (index = 1)
 					writeCorner("Reference", section)
 				else if (index = 2)
 					writeFollowUp("Reference", section)
-			}
 
 			this.iInstructionHints := CaseInsenseMap()
 
@@ -1632,7 +1644,8 @@ class DrivingCoach extends GridRaceAssistant {
 					if (instructionHints.Length > 0)
 						telemetry := (substituteVariables(problemsInstruction
 														, {problems: values2String(", ", collect(instructionHints
-																							   , (h) => translate(hintProblems[h]))*)})
+																							   , (h) => translate(hintProblems[h]))*)
+														 , corner: cornerNr})
 									. "\n\n" . telemetry)
 				}
 

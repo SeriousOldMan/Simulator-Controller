@@ -262,7 +262,7 @@ Normal you will use free conversation to interact with Aiden as shown in the exa
 
 ### Enabling and disabling specific instructions and information processing 
 
-As discussed above Aiden can process information about your current session in a simulation. This includes specific data about your own performance and the preformance of your competitors, as well as information about your recent handling issues. Since the processing of this data may sometimes confuse the AI behind the Driving Coach. Therefore you may disable specific information processing by using a special voice command:
+As discussed above Aiden can process information about your current session in a simulation. This includes specific data about your own performance and the preformance of your competitors, as well as information about your recent handling issues. The processing of this data may sometimes confuse the AI behind the Driving Coach, especially for some of the lower-grade LLMs. Therefore you may disable specific information processing by using a special voice command:
 
 	[Please] do not pay attention *information* anymore [please]
 
@@ -274,7 +274,7 @@ As you might expect, the word "please" is optional. Available options for *infor
 
 The Driving Coach is integrated with the telemetry data system of Simulator Controller. You can use a voice command or the plugin action "TelemetryCoaching" on your controller to activate telemtery collection for the Driving Coach. Example for a voice command: "Can you help me with my practice?"
 
-Aiden will then start collecting telemetry data and will contact you after a few laps, that he is ready to discuss your performance with you. You can ask for a review of a complete lap or a specific corner, if required. You can also ask more specifically, for example, if you have weaknesses in your braking and how you should work on them. Here is an example:
+Aiden will then start collecting telemetry data and will contact you after a few laps that he is ready to discuss your performance with you. You can ask for a review of a complete lap or a specific corner, if required. You can also ask more specifically, for example, if you have weaknesses in your braking and how you should work on them. Here is an example:
 
 **Driver:** What are my most important weaknesses and how should I work on them?
 
@@ -292,7 +292,11 @@ Focusing on these areas will help you improve your lap times and overall perform
 
 Beside discussing the telemetry data for the last lap, you can also ask Aiden to give you corner by corner instructions while you are driving. This is discussed [below](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#coaching-on-the-track).
 
-DISCLAIMER: This functionality requires a very capable LLM for decent results. This LLM must be able to follow multiple, complex chain of thoughts at the same time and must be able to perform reasoning based on supplied facts. At the time of this writing, only high end models like GPT 4o, Claude 3 Opus or Mistral Large are in this group. The upcoming o1 model of OpenAI is even better in this area, but it is prohibitevly expensive. According to my testing, GPT 4o mini, the most cost-efficient model of OpenAI and also Mistral Small by Mistral AI also show good results, but sometimes they mix up things, for example, that applying less brake pressure at the start of the braking phase will make your braking phase shorter. This can also happen with the stronger models sometimes, but not that often.
+Here is a recording of a training session, since no words can really adequately describe this feature.
+
+[![](https://img.youtube.com/vi/mgfFkNh2_Lw/0.jpg)](https://youtu.be/mgfFkNh2_Lw)
+
+DISCLAIMER: This functionality requires a very capable LLM for decent results. This LLM must be able to follow multiple, complex chain of thoughts at the same time and must be able to perform reasoning based on supplied facts. At the time of this writing, only high end models like GPT 4o, Claude 3 Opus or Mistral Large are in this group. The upcoming o1 model of OpenAI may be even better in this area, but it will be prohibitevly expensive. According to my testing, GPT 4o mini, the most cost-efficient model of OpenAI and also Mistral Small by Mistral AI show good results as well, but sometimes they mix up things, for example, that applying less brake pressure at the start of the braking phase will make your braking phase shorter. This can also happen with the stronger models sometimes, but not that often. You can experiment with the *Creativity* configuration setting of the Driving Coach to find the best compromise here.
 
 ### Track layout
 
@@ -300,13 +304,13 @@ Before you can use the telemetry-based coaching, you must have recorded a [track
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/raw/main/Docs/Images/Session%20Database%2020.jpg)
 
-Please note, that you do not have to set sections for each corner, only for those where you are interested in. You also should not define corners where no braking or throttle lifting is necessary, since you will not get any valuable insights for those corners from Aiden.
+Please note, that you do not have to set sections for each corner, only for those where you are interested in. You also should not define corners where no braking is necessary, since you will not get any valuable insights for those corners from Aiden.
 
 And be aware, that corners directly followed by another corner (a typical situation in chicanes on many tracks) are very challenging for Aiden. You can use that, but take the recommendations of Aiden with a grain of salt here.
 
 ### Coaching on the track
 
-Aiden is capable to give you instructions and recommendations for the next corner while you are driving. You can enable this by a voice command, for example: "Can you give me instructions while I am driving?", or you can use the plugin action "TrackCoaching" on you your controller.
+Aiden can give you instructions and recommendations for the next corner while you are driving. You can enable this by a voice command, for example: "Can you give me instructions while I am driving?", or you can use the plugin action "TrackCoaching" on you your controller.
 
 If activated, Aiden will use the telemetry data of the recent lap to check for any areas for improvement. Additionally, the lap before the last lap, or the fastest lap of the session so far can be used as a reference for braking points, start of the acceleration phase, and so on. It is also possible to load the [fastest lap stored in the "Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#laps), which will then be used as a reference lap unless you have driven a faster one in the current session. You configure the behaviour that suites you the most, by using the corresponding [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) in the "Session Database".
 
@@ -316,15 +320,23 @@ If you approach a corner, Aiden will then evaluate possible areas for improvemen
 
 How the Driving Coach interprets the telemetry data and what instructions will be given by him is largely determined by the instructions. Especially the "Coaching.Corner.Approaching" instruction has a big influence. Let's have a look at the default instruction:
 
-	Evaluate the data from the last lap below and take a look at corner %corner%. Tell me the two most important areas for improvement for this particular corner. The shorter the time through the corner and the following section, the better. Only mention aspects that I can actually influence, such as braking point and brake pressure, start of acceleration, pedal and steering smoothness, line choice and so on. If the performance of the corner and the following section was already better than in the reference lap, mention only that. Keep your answer extremly short (around 25 to 35 words) without explanations and use the imperative. Think twice, before answering.
+	Evaluate the data from the last lap below and take a look at corner %corner%.
+	Tell me the twomost important areas for improvement for this particular corner.
+	The shorter the time through the corner and the following section, the better.
+	Only mention aspects that I can actually influence, such as braking point and
+	brake pressure, start of acceleration, pedal and steering smoothness, line choice
+	and so on. If the performance of the corner and the following section was already
+	better than in the reference lap, mention only that. Keep your answer extremly short
+	(around 25 to 35 words) without explanations and use the imperative.
+	Think twice, before answering.
 	
 	%telemetry%
 
 Important is here the restriction to a short message (25 to 35 words) and the focus on driver inputs. However, you can change that, if you want different corner hints from the Coach or longer explanations, for example. But bear in mind, that these instructions will be given while you are driving, so keeping them short might be a good idea. If you experiment with the length of the Coach's corner hints by increasing the number of words, for example, be sure to adjust the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) "Coach: Time between Instructions" and "Coach: Distance before Corner" in the "Session Database" as well.
 
-### Automatic handling of coaching mode
+### Automatic activation of coaching mode
 
-Normally you will only use the telemetry-based coaching during practice sessions. And maybe you want to have the coach on your side in each practice session. Always having to ask the coach to come along can become boring with time. But it is easy to automate that using the [*Resonaing* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster).
+Normally you will only use the telemetry-based coaching during practice sessions. And maybe you want to have the coach on your side in each practice session. Always having to ask the coach to come along can become boring with time. But it is easy to automate that using the [*Reasoning* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster).
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Driving%20Coach%20Startup.JPG)
 
@@ -338,7 +350,7 @@ If you want to use this for your own setup, here is the rule text, so you can co
 
 Replace "Kim" with the name of your Driving Coach.
 
-Expert Notes: *startTelemetryCoaching* and *finishTelemetryCoaching* are methods of the *DrivingCoach* class, **2** represents the session type *practice*, **3** stands for *qualifying* and **4** for a *race* session.
+Expert Notes: *startTelemetryCoaching* and *finishTelemetryCoaching* are methods of the *DrivingCoach* class, the session type **2** represents *practice*, **3** stands for *qualifying* and **4** for a *race* session.
 
 ## How it works
 
@@ -346,7 +358,7 @@ Beside using an LLM to interact with the driver, the Driving Coach uses the same
 
 Unlike the other Assistants, whose knowledge base, i.e. their memory, is deleted at the end of a session, Aidens memory will still be around until the start of the next session. This makes it possible to analyze and discuss various aspects of the session with Aiden after the end of a session. This retained memory covers everything from the performance information like lap and sector times, as well as position information and also includes handling information, if this was enabled during the session.
 
-The active coaching based on lap telemetry data deserves a more detailed explanation. The apporach to enable the Driving Coach to understand the telemetry data is a two step process. In the first step a special alorithm using an ML model divides the telemetry data into sections as defined in the track map and extracts important high-level information from the raw telemetry data. This information is converted into a JSON format, which looks like this:
+The active coaching based on lap telemetry data deserves a more detailed explanation. The apporach to enable the Driving Coach to understand the telemetry data is a three step process. In the first step a special alorithm using an ML model identifies the most important driver input related variables that affect the time used through a part of the track based on the sections defined in the track map and extracts important high-level information from the raw telemetry data. This information is converted into a JSON format, which looks like this:
 
 	{
 	  "Driver": "Oliver Juwig",
@@ -453,7 +465,7 @@ The active coaching based on lap telemetry data deserves a more detailed explana
 	  ]
 	}
 
-This JSON object is then presented to the LLM of Aiden together with very detailed, context specific instructions and explanations. The instructions for the Driving Coach has already been discussed [above](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#instructions). Especially for the telemetry-based coaching they are very important, because they contain a lot of information about driving technique, which may be not available to an LLM in this level of detail. The instructions are based on my own experiences for a smooth, natural and fast driving style. They are not suitable to become an alien, since this type of drivers typically are using special driving techniques that won't work in a real car, for example. However, you can change the instructions for Aiden, so that it steers you in a direction of any driving style, but this can be very time-consuming process. Welcome in the exciting world of *prompt engineering*.
+In the second step a specialized set of rules in the [Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-engine) converts this information into some high-level driver errors "Braking is too hard" (i.e. braking late with too much brake pressure thereby triggering accessive ABS activations). This information together with the above JSON object is then presented to the LLM of Aiden together with very detailed, context specific instructions and explanations. The instructions for the Driving Coach has already been discussed [above](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#instructions). Especially for the telemetry-based coaching they are very important, because they contain a lot of information about driving technique, which may not be available to a pre-trained LLM in this level of detail. The instructions are based on my own experiences for a smooth, natural and fast driving style. They are not suitable to become an alien, since this type of drivers typically are using special driving techniques that won't work in a real car and espcially not for the average driver, for example. However, you can change the instructions for Aiden, so that it steers you in a direction of any driving style, but this can be very time-consuming process. Welcome in the exciting world of [prompt engineering](https://en.wikipedia.org/wiki/Prompt_engineering).
 
 ### About attention deficits, hallucinations and other funny stuff
 

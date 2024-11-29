@@ -292,6 +292,10 @@ Focusing on these areas will help you improve your lap times and overall perform
 
 Beside discussing the telemetry data for the last lap, you can also ask Aiden to give you corner by corner instructions while you are driving. This is discussed [below](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#coaching-on-the-track).
 
+Here is a recording of a training session, since no words can really adequately describe this feature.
+
+[![](https://img.youtube.com/vi/mgfFkNh2_Lw/0.jpg)](https://youtu.be/mgfFkNh2_Lw)
+
 DISCLAIMER: This functionality requires a very capable LLM for decent results. This LLM must be able to follow multiple, complex chain of thoughts at the same time and must be able to perform reasoning based on supplied facts. At the time of this writing, only high end models like GPT 4o, Claude 3 Opus or Mistral Large are in this group. The upcoming o1 model of OpenAI may be even better in this area, but it will be prohibitevly expensive. According to my testing, GPT 4o mini, the most cost-efficient model of OpenAI and also Mistral Small by Mistral AI show good results as well, but sometimes they mix up things, for example, that applying less brake pressure at the start of the braking phase will make your braking phase shorter. This can also happen with the stronger models sometimes, but not that often. You can experiment with the *Creativity* configuration setting of the Driving Coach to find the best compromise here.
 
 ### Track layout
@@ -316,7 +320,15 @@ If you approach a corner, Aiden will then evaluate possible areas for improvemen
 
 How the Driving Coach interprets the telemetry data and what instructions will be given by him is largely determined by the instructions. Especially the "Coaching.Corner.Approaching" instruction has a big influence. Let's have a look at the default instruction:
 
-	Evaluate the data from the last lap below and take a look at corner %corner%. Tell me the two most important areas for improvement for this particular corner. The shorter the time through the corner and the following section, the better. Only mention aspects that I can actually influence, such as braking point and brake pressure, start of acceleration, pedal and steering smoothness, line choice and so on. If the performance of the corner and the following section was already better than in the reference lap, mention only that. Keep your answer extremly short (around 25 to 35 words) without explanations and use the imperative. Think twice, before answering.
+	Evaluate the data from the last lap below and take a look at corner %corner%.
+	Tell me the twomost important areas for improvement for this particular corner.
+	The shorter the time through the corner and the following section, the better.
+	Only mention aspects that I can actually influence, such as braking point and
+	brake pressure, start of acceleration, pedal and steering smoothness, line choice
+	and so on. If the performance of the corner and the following section was already
+	better than in the reference lap, mention only that. Keep your answer extremly short
+	(around 25 to 35 words) without explanations and use the imperative.
+	Think twice, before answering.
 	
 	%telemetry%
 

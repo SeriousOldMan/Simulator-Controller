@@ -2,7 +2,7 @@
 
 Several applications of Simulator Controller, most notably the Virtual Race Assistants, exhibit a kind of *intelligence* in the sense, that they are able to understand a given situation or a set of information provided by the user and then they use a reasoning process to recommend an appropriate action or at least recommend a reasonable action. All applications have access to a custom build Hybrid Rule Engine to implement these capabilities. This rule engine supplies forward chaining capabilities similar to the famous OPS5 as well as a first-order logic programming language very similar to Prolog. Both have acces to a shared knowledge base and can work together on a given goal or task.
 
-The rule engine can handle thousands of rules and execute them efficiently. Forward chaining rules (also named productions) are arranged in a so called [Rete network](https://en.wikipedia.org/wiki/Rete_algorithm) so that only rules are considered for execution, for which the incoming facts in the condition part has been changed since the last execution. Efficient execution of the backward chaining rules (als called reductions) is secured by a compiler which create an execution pseudo code which then can be efficiently execute incl. proper tail-recursion optimization.
+The rule engine can handle thousands of rules and execute them efficiently. Forward chaining rules (also named productions) are arranged in a so called [Rete network](https://en.wikipedia.org/wiki/Rete_algorithm) so that only rules are considered for execution, for which the incoming facts in the condition part has been changed since the last execution. Efficient execution of the backward chaining rules (also called reductions) is secured by a compiler which create an execution pseudo code which then can be efficiently execute incl. proper tail-recursion optimization.
 
 Okay, enough tech babble. Before going more into the details, let's take a look at a concrete example.
 
@@ -522,7 +522,7 @@ The combination of the facts in the knowledge base with both type of rules, allo
 
   1. The current state of the session, the state of the car like important telemetry values and also information about all opponente are stored as facts in the knowledge base.
   2. A set of production rules constantly check whether a specific condition exists, for example that fuel will be depleted in about 3 laps.
-  3. If one of this conditions is detected, the production rule can start complex calculations using reductions rules as a resulting action.
+  3. If one of this conditions is detected, the production rule can start complex calculations using reduction rules as a resulting action.
 
 This is exactly the approach, how the rule sets for the Race Assistants has been built.
 

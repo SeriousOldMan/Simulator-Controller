@@ -1,9 +1,9 @@
 [Development]
 Version=6.0.0.0-beta
 Target=6.0.0.0-release
-Date=11/28/2024
+Date=11/29/2024
 Download=https://cutt.ly/leLHvpsK;https://www.dropbox.com/scl/fi/f79sew43sol6buiau0agg/Simulator-Controller-6.0.0.0-beta.zip?rlkey=3qtx0ielzjcqckynuoi0tpgrc&st=7f9icyha&dl=1
-Changes=Fully interactive coaching by the Driving Coach, Added "Coaching" and "TrackCoaching" action to the Driving Coach plugin, New icons in Stream Deck icon set for the "Coaching" and "TrackCoaching" actions, New settings for corner by corner coaching, Speaker and Listener booster for Driving Coach, New controller action functions for "Driving Coach" plugin, Section explorer in Telemetry Viewer, Support for rule extensions using the *Reasoning* booster, Many new LLM instructions for the Driving Coach
+Changes=Fully interactive coaching by the Driving Coach, Added "Coaching" and "TrackCoaching" action to the Driving Coach plugin, New icons in Stream Deck icon set for the "Coaching" and "TrackCoaching" actions, New settings for corner by corner coaching, Speaker and Listener booster for Driving Coach, New controller action functions for "Driving Coach" plugin, Section explorer in Telemetry Viewer, Support for rule extensions using the *Reasoning* booster, Many new LLM instructions for the Driving Coach, Spotter no longer informs about lap time delta which is actually zero
 Components=Media->5.6.1,Configuration->6.0.0,Utilities->5.9.8
 [Release]
 Version=5.9.9.0-release

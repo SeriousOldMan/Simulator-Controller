@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.0.0.0-beta](https://cutt.ly/leLHvpsK) (Open Beta for 6.0.0. Changes: Fully interactive coaching by the Driving Coach, Added "Coaching" and "TrackCoaching" action to the Driving Coach plugin, New icons in Stream Deck icon set for the "Coaching" and "TrackCoaching" actions, New settings for corner by corner coaching, Speaker and Listener booster for Driving Coach, New controller action functions for "Driving Coach" plugin, Section explorer in Telemetry Viewer, Support for rule extensions using the *Reasoning* booster, Many new LLM instructions for the Driving Coach.)
+[6.0.0.0-beta](https://cutt.ly/leLHvpsK) (Open Beta for 6.0.0. Changes: Fully interactive coaching by the Driving Coach, Added "Coaching" and "TrackCoaching" action to the Driving Coach plugin, New icons in Stream Deck icon set for the "Coaching" and "TrackCoaching" actions, New settings for corner by corner coaching, Speaker and Listener booster for Driving Coach, New controller action functions for "Driving Coach" plugin, Section explorer in Telemetry Viewer, Support for rule extensions using the *Reasoning* booster, Many new LLM instructions for the Driving Coach, Spotter no longer informs about lap time delta which is actually zero.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-600) of this version and all the versions you might have skipped, before installing and using this version.
 

@@ -1626,10 +1626,10 @@ class DrivingCoach extends GridRaceAssistant {
 
 		telemetry := this.getTelemetry(&reference := true, cornerNr)
 
-		if (this.TelemetryAnalyzer && telemetry) {
+		if (this.TelemetryAnalyzer && telemetry && this.Speaker) {
 			if (A_TickCount < nextRecommendation)
 				return
-			else if ((Random(1, 10) > 3) && (telemetry.Sections.Length > 0)) {
+			else if ((telemetry.Sections.Length > 0) && !this.getSpeaker().Speaking) {
 				nextRecommendation := (A_TickCount + wait)
 
 				this.Mode := "Coaching"

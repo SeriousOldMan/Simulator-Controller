@@ -13,7 +13,8 @@
 	 - Several other changes and additions in the documentation for the [Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach), which will make worth to re-read the chapter.
   4. The *Rephrasing*, *Understanding* and *Reasoning* boosters are now available for the Driving Coach as well. For obvious reasons, there is no need for the *Conversation* booster.
   5. A new info popup shows important information about the nearest track section when clicking at a specific spot in the Telemetry Viewer or the assoiated track map. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetry-viewer) for more information.
-  6. The *Reasoning* booster can now be used without an LLM, if you only want to extend the rule base of an Assistant. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster) for more information.
+  6. The detection of click / drag of track points in the track map editor has been improved.
+  7. [Expert] The *Reasoning* booster can now be used without an LLM, if you only want to extend the rule base of an Assistant. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster) for more information.
 
 ## 5.9.9.0-release 11/22/24
   1. Minor bugfixes, as always

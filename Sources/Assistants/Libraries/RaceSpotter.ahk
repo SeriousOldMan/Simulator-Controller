@@ -1874,10 +1874,12 @@ class RaceSpotter extends GridRaceAssistant {
 												   , seconds: speaker.number2Speech(lapTime - (minute * 60), 1)
 												   , indicator: this.getCarIndicatorFragment(speaker, number, position)})
 
+						delta := Round(Abs(delta), 1)
 
-						speaker.speakPhrase("LapTimeDelta", {delta: speaker.number2Speech(Round(Abs(delta), 1))
-														   , relativeYou: fragments[(delta >= 0) ? "Faster" : "Slower"]
-														   , relativeOther: fragments[(delta < 0) ? "Faster" : "Slower"]})
+						if (delta != 0)
+							speaker.speakPhrase("LapTimeDelta", {delta: speaker.number2Speech(delta)
+															   , relativeYou: fragments[(delta > 0) ? "Faster" : "Slower"]
+															   , relativeOther: fragments[(delta < 0) ? "Faster" : "Slower"]})
 					}
 					finally {
 						speaker.endTalk()
@@ -2857,10 +2859,12 @@ class RaceSpotter extends GridRaceAssistant {
 										   , seconds: speaker.number2Speech(lapTime - (minute * 60), 1)
 										   , indicator: this.getCarIndicatorFragment(speaker, number, position)})
 
+				delta := Round(Abs(delta), 1)
 
-				speaker.speakPhrase("LapTimeDelta", {delta: speaker.number2Speech(Round(Abs(delta), 1))
-												   , relativeYou: speaker.Fragments[(delta >= 0) ? "Faster" : "Slower"]
-												   , relativeOther: speaker.Fragments[(delta < 0) ? "Faster" : "Slower"]})
+				if (delta != 0)
+					speaker.speakPhrase("LapTimeDelta", {delta: speaker.number2Speech(delta)
+													   , relativeYou: speaker.Fragments[(delta > 0) ? "Faster" : "Slower"]
+													   , relativeOther: speaker.Fragments[(delta < 0) ? "Faster" : "Slower"]})
 			}
 			finally {
 				speaker.endTalk()

@@ -201,7 +201,7 @@ If you want to see all this in action in session in *Assetto Corsa Competizione*
 
 [![](https://img.youtube.com/vi/MlbAESpzg7Q/0.jpg)](https://www.youtube.com/watch?v=MlbAESpzg7Q)
 
-The video has jump marks, so you can skip the boring time in between the interesting parts, where the Race Assistants take action.
+The video has jump marks, so you can skip the boring time between the interesting parts, where the Race Assistants take action.
 
 ### Adjusting the Strategy during a race
 

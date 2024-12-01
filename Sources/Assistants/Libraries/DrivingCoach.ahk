@@ -1614,16 +1614,42 @@ class DrivingCoach extends GridRaceAssistant {
 		static nextRecommendation := false
 		static wait := false
 		static hintProblems := false
+		static hints := false
 
-		instructionCompare(h1, h2) {
-			static hints := ["BrakeEarlier", "BrakeLater"
-						   , "BrakeHarder", "BrakeSofter"
-						   , "BrakeFaster", "BrakeSlower"
-						   , "AccelerateEarlier", "AccelerateLater"
-						   , "AccelerateHarder", "AccelerateSofter"
-						   , "PushLess", "PushMore"]
+		filterInstructionHints(instructionHints) {
+			local result := []
+			local ignore, hint
 
-			return (inList(hints, h1) > inList(hints, h2))
+			for ignore, hint in instructionHints {
+				if ((hint = "BrakeEarlier") && inList(result, "BrakeLater"))
+					continue
+				else if ((hint = "BrakeLater") && inList(result, "BrakeEarlier"))
+					continue
+				else if ((hint = "BrakeHarder") && inList(result, "BrakeSofter"))
+					continue
+				else if ((hint = "BrakeSofter") && inList(result, "BrakeHarder"))
+					continue
+				else if ((hint = "BrakeFaster") && inList(result, "BrakeSlower"))
+					continue
+				else if ((hint = "BrakeSlower") && inList(result, "BrakeFaster"))
+					continue
+				else if ((hint = "AccelerateEarlier") && inList(result, "AccelerateLater"))
+					continue
+				else if ((hint = "AccelerateLater") && inList(result, "AccelerateEarlier"))
+					continue
+				else if ((hint = "AccelerateHarder") && inList(result, "AccelerateSofter"))
+					continue
+				else if ((hint = "AccelerateLater") && inList(result, "AccelerateHarder"))
+					continue
+				else if ((hint = "PushMore") && inList(result, "PushLess"))
+					continue
+				else if ((hint = "PushLess") && inList(result, "PushMore"))
+					continue
+
+				result.Push(hint)
+			}
+
+			return result
 		}
 
 		instructionConjunction(h1, h2) {
@@ -1655,6 +1681,10 @@ class DrivingCoach extends GridRaceAssistant {
 		if !wait {
 			wait := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Corner.Wait", 10) * 1000)
 
+			hints := ["BrakeEarlier", "BrakeLater", "BrakeHarder", "BrakeSofter"
+					, "BrakeFaster", "BrakeSlower", "AccelerateEarlier", "AccelerateLater"
+					, "AccelerateHarder", "AccelerateSofter", "PushLess", "PushMore"]
+
 			hintProblems := Map("BrakeEarlier", "Too late braking"
 							  , "BrakeLater", "Too early braking"
 							  , "BrakeHarder", "Not enough brake pressure"
@@ -1667,7 +1697,6 @@ class DrivingCoach extends GridRaceAssistant {
 							  , "AccelerateLater", "Accelerating too early"
 							  , "AccelerateHarder", "Not hard enough on the throttle"
 							  , "AccelerateSofter", "Too hard on the throttle")
-
 			hintProblems.Default := ""
 		}
 
@@ -1691,7 +1720,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 						if (instructionHints.Length > 0)
 							telemetry := (substituteVariables(problemsInstruction
-															, {problems: values2String(", ", collect(instructionHints
+															, {problems: values2String(", ", collect(filterInstructionHints(instructionHints)
 																								   , (h) => translate(hintProblems[h]))*)
 															 , corner: cornerNr})
 										. "\n\n" . telemetry)
@@ -1722,7 +1751,8 @@ class DrivingCoach extends GridRaceAssistant {
 						try {
 							lastHint := false
 
-							for index, hint in bubbleSort(&instructionHints, instructionCompare) {
+							for index, hint in bubbleSort(&instructionHints := filterInstructionHints(instructionHints)
+														, (h1, h2) => inList(hints, h1) > inList(hints, h2)) {
 								conjunction := (lastHint ? instructionConjunction(lastHint, hint) : false)
 
 								if conjunction

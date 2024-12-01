@@ -248,6 +248,23 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 		if this.Active {
 			if this.RaceAssistantEnabled {
 				if this.RaceAssistant {
+					if (this.iServiceState != "Available") {
+						setMultiMapValue(configuration, this.Plugin, "State", "Critical")
+
+						if ((InStr(this.iServiceState, "Error") = 1)
+						 && (string2Values(":", this.iServiceState)[2] = "Connection")) {
+							setMultiMapValue(configuration, "Race Assistants", this.Plugin, "Active")
+
+							setMultiMapValue(configuration, "Race Assistants", this.Plugin, "Restricted")
+						}
+						else
+							setMultiMapValue(configuration, "Race Assistants", this.Plugin, "Critical")
+					}
+					else {
+						setMultiMapValue(configuration, "Race Assistants", this.Plugin, "Active")
+						setMultiMapValue(configuration, this.Plugin, "State", "Active")
+					}
+
 					setMultiMapValue(configuration, "Race Assistants", this.Plugin, (this.iServiceState = "Available") ? "Active" : "Critical")
 
 					setMultiMapValue(configuration, this.Plugin, "State", (this.iServiceState = "Available") ? "Active" : "Critical")
@@ -263,7 +280,6 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 					}
 					else if (InStr(this.iServiceState, "Error") = 1)
 						information .= ("; " . translate("Problem: ") . translate(string2Values(":", this.iServiceState)[2]))
-
 
 					setMultiMapValue(configuration, this.Plugin, "Information", information)
 				}

@@ -1250,7 +1250,10 @@ systemMonitor(command := false, arguments*) {
 				if (state = "Active") {
 					overallState := "Active"
 
-					state := translate("Active")
+					if getMultiMapValue(controllerState, key, "Restricted", false)
+						state := translate("Restricted")
+					else
+						state := translate("Active")
 
 					configuration := readMultiMap(kTempDirectory . key . ".state")
 
@@ -1264,6 +1267,9 @@ systemMonitor(command := false, arguments*) {
 					}
 					else if getMultiMapValue(controllerState, key, "Muted", false)
 						state .= translate(" (Muted)")
+
+					if getMultiMapValue(controllerState, key, "Restricted", false)
+						state .= (translate(" - ") . translate("Restricted"))
 				}
 				else if (state = "Waiting") {
 					if (overallState = "Disabled")
@@ -2042,7 +2048,7 @@ clearOrphaneStateFiles() {
 
 	for ignore, fileName in getFileNames("*.state", kTempDirectory) {
 		SplitPath(fileName, , , , &name)
-	
+
 		if inList(kStateFiles, name) {
 			if !inList(excludedFiles, fileName) {
 				if !stateFiles.Has(fileName)

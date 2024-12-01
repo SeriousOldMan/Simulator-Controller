@@ -603,6 +603,8 @@ class DrivingCoach extends GridRaceAssistant {
 				catch Any as exception {
 					logError(exception)
 
+					this.iConnector := false
+
 					this.connectorState("Error", "Configuration")
 
 					throw "Unsupported service detected in DrivingCoach.startConversation..."
@@ -618,9 +620,14 @@ class DrivingCoach extends GridRaceAssistant {
 				if !this.Instructions[instruction]
 					this.Instructions[instruction] := ""
 			}
+
+			return true
 		}
-		else
-			throw "Unsupported service detected in DrivingCoach.startConversation..."
+		else {
+			this.connectorState("Error", "Configuration")
+
+			return false
+		}
 	}
 
 	restartConversation() {
@@ -816,36 +823,41 @@ class DrivingCoach extends GridRaceAssistant {
 			if (this.Speaker && this.Options["Driving Coach.Confirmation"] && (this.ConnectionState = "Active"))
 				this.getSpeaker().speakPhrase("Confirm", false, false, false, {Noise: false})
 
-			if !this.Connector
-				this.startConversation()
+			if (this.Connector || this.startConversation()) {
+				answer := this.Connector.Ask(text)
 
-			answer := this.Connector.Ask(text)
+				if answer {
+					report := true
 
-			if answer {
-				report := true
+					if (this.CoachingActive && !InStr(kVersion, "-release")) {
+						if !FileExist(kTempDirectory . "Driving Coach\Conversations")
+							conversationNr := 1
 
-				if (this.CoachingActive && !InStr(kVersion, "-release")) {
-					if !FileExist(kTempDirectory . "Driving Coach\Conversations")
-						conversationNr := 1
+						DirCreate(kTempDirectory . "Driving Coach\Conversations")
 
-					DirCreate(kTempDirectory . "Driving Coach\Conversations")
+						folder := (kTempDirectory . "Driving Coach\Conversations\" . Format("{:03}", conversationNr) . "\")
 
-					folder := (kTempDirectory . "Driving Coach\Conversations\" . Format("{:03}", conversationNr) . "\")
+						DirCreate(folder)
 
-					DirCreate(folder)
+						telemetry := telemetry := this.getTelemetry(&reference := true)
 
-					telemetry := telemetry := this.getTelemetry(&reference := true)
+						if telemetry {
+							FileAppend(telemetry.JSON, folder . "Telemetry.JSON")
 
-					if telemetry {
-						FileAppend(telemetry.JSON, folder . "Telemetry.JSON")
+							if reference
+								FileAppend(reference.JSON, folder . "Reference.JSON")
+						}
 
-						if reference
-							FileAppend(reference.JSON, folder . "Reference.JSON")
+						FileAppend(translate("-- Driver --------") . "`n`n" . text . "`n`n" . translate("-- Coach ---------") . "`n`n" . answer . "`n`n", folder . "Conversation.txt", "UTF-16")
+
+						conversationNr += 1
 					}
+				}
+				else if (this.Speaker && report) {
+					if reportError
+						this.getSpeaker().speakPhrase("Later", false, false, false, {Noise: false})
 
-					FileAppend(translate("-- Driver --------") . "`n`n" . text . "`n`n" . translate("-- Coach ---------") . "`n`n" . answer . "`n`n", folder . "Conversation.txt", "UTF-16")
-
-					conversationNr += 1
+					report := false
 				}
 			}
 			else if (this.Speaker && report) {

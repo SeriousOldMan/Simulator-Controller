@@ -289,8 +289,8 @@ class VoiceManager extends ConfigurationItem {
 			super.__New(synthesizer, speaker, language)
 		}
 
-		beginTalk(force := false) {
-			if (force || this.UseTalking)
+		beginTalk(options := false) {
+			if ((options && options.HasProp("Talking") && options.Talking) || this.UseTalking)
 				this.iIsTalking := true
 		}
 

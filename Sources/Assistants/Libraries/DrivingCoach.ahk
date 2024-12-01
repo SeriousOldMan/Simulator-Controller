@@ -1653,7 +1653,15 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 
 		instructionConjunction(h1, h2) {
-			if ((h1 = "BrakeHarder") && (h2 = "BrakeSlower"))
+			if ((h1 = "BrakeEarlier") && (h2 = "BrakeSofter"))
+				return "But"
+			else if ((h1 = "BrakeLater") && (h2 = "BrakeHarder"))
+				return "And"
+			else if ((h1 = "BrakeEarlier") && (h2 = "BrakeHarder"))
+				return "And"
+			else if ((h1 = "BrakeLater") && (h2 = "BrakeSofter"))
+				return "But"
+			else if ((h1 = "BrakeHarder") && (h2 = "BrakeSlower"))
 				return "But"
 			else if ((h1 = "BrakeSofter") && (h2 = "BrakeFaster"))
 				return "But"
@@ -1746,7 +1754,7 @@ class DrivingCoach extends GridRaceAssistant {
 					if (instructionHints.Length > 0) {
 						speaker := this.getSpeaker()
 
-						speaker.beginTalk(true)
+						speaker.beginTalk({Talking: true})
 
 						try {
 							lastHint := false

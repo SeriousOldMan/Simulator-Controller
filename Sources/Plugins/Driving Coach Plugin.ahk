@@ -243,7 +243,7 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 	}
 
 	writePluginState(configuration) {
-		local problem
+		local problem, state
 
 		if this.Active {
 			if this.RaceAssistantEnabled {
@@ -252,10 +252,11 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 						setMultiMapValue(configuration, this.Plugin, "State", "Critical")
 
 						if ((InStr(this.iServiceState, "Error") = 1)
-						 && (string2Values(":", this.iServiceState)[2] = "Connection")) {
+						 && ((string2Values(":", this.iServiceState)[2] = "Configuration")
+						  || (string2Values(":", this.iServiceState)[2] = "Connection"))) {
 							setMultiMapValue(configuration, "Race Assistants", this.Plugin, "Active")
 
-							setMultiMapValue(configuration, "Race Assistants", this.Plugin, "Restricted")
+							setMultiMapValue(configuration, this.Plugin, "Restricted", true)
 						}
 						else
 							setMultiMapValue(configuration, "Race Assistants", this.Plugin, "Critical")
@@ -264,10 +265,6 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 						setMultiMapValue(configuration, "Race Assistants", this.Plugin, "Active")
 						setMultiMapValue(configuration, this.Plugin, "State", "Active")
 					}
-
-					setMultiMapValue(configuration, "Race Assistants", this.Plugin, (this.iServiceState = "Available") ? "Active" : "Critical")
-
-					setMultiMapValue(configuration, this.Plugin, "State", (this.iServiceState = "Available") ? "Active" : "Critical")
 
 					information := (translate("Started: ") . translate(this.RaceAssistant ? "Yes" : "No"))
 

@@ -1746,7 +1746,7 @@ class DrivingCoach extends GridRaceAssistant {
 					if (instructionHints.Length > 0) {
 						speaker := this.getSpeaker()
 
-						speaker.beginTalk()
+						speaker.beginTalk(true)
 
 						try {
 							lastHint := false
@@ -1770,7 +1770,7 @@ class DrivingCoach extends GridRaceAssistant {
 							}
 						}
 						finally {
-							speaker.endTalk()
+							speaker.endTalk({Rephrase: false})
 						}
 					}
 				}

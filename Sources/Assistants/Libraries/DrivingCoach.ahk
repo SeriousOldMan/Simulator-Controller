@@ -1597,10 +1597,45 @@ class DrivingCoach extends GridRaceAssistant {
 		local cornerNr := this.TelemetryAnalyzer.TrackSections[sectionNr].Nr
 		local oldMode := this.Mode
 		local telemetry, reference, command, instructionHints, problemsInstruction
+		local speaker, index, hint, lastHint, conjunction, conclusion
 
 		static nextRecommendation := false
 		static wait := false
 		static hintProblems := false
+
+		instructionCompare(h1, h2) {
+			static hints := ["BrakeEarlier", "BrakeLater"
+						   , "BrakeHarder", "BrakeSofter"
+						   , "BrakeFaster", "BrakeSlower"
+						   , "AccelerateEarlier", "AccelerateLater"
+						   , "AccelerateHarder", "AccelerateSofter"
+						   , "PushLess", "PushMore"]
+
+			return (inList(hints, h1) > inList(hints, h2))
+		}
+
+		instructionConjunction(h1, h2) {
+			if ((h1 = "BrakeHarder") && (h2 = "BrakeSlower"))
+				return "But"
+			else if ((h1 = "BrakeSofter") && (h2 = "BrakeFaster"))
+				return "But"
+			else if ((h1 = "BrakeHarder") && (h2 = "BrakeSlower"))
+				return "But"
+			else if ((h1 = "BrakeHarder") && (h2 = "BrakeFaster"))
+				return "And"
+			else if ((h1 = "BrakeSofter") && (h2 = "BrakeSlower"))
+				return "And"
+			else if ((h1 = "AccelerateEarlier") && (h2 = "AccelerateHarder"))
+				return "And"
+			else if ((h1 = "AccelerateLater") && (h2 = "AccelerateSofter"))
+				return "And"
+			else if ((h1 = "AccelerateEarlier") && (h2 = "AccelerateSofter"))
+				return "But"
+			else if ((h1 = "AccelerateLater") && (h2 = "AccelerateHarder"))
+				return "But"
+
+			return false
+		}
 
 		if ((Round(positionX) = -32767) && (Round(positionY) = -32767))
 			return
@@ -1632,35 +1667,70 @@ class DrivingCoach extends GridRaceAssistant {
 			else if ((Random(1, 10) > 3) && (telemetry.Sections.Length > 0)) {
 				nextRecommendation := (A_TickCount + wait)
 
-				this.Mode := "Coaching"
+				if (this.ConnectionState = "Active") {
+					this.Mode := "Coaching"
 
-				telemetry := telemetry.JSON
+					telemetry := telemetry.JSON
 
-				problemsInstruction := this.Instructions["Coaching.Corner.Problems"]
+					problemsInstruction := this.Instructions["Coaching.Corner.Problems"]
 
-				if (Trim(problemsInstruction) != "") {
+					if (Trim(problemsInstruction) != "") {
+						instructionHints := this.getInstructionHints(cornerNr)
+
+						if (instructionHints.Length > 0)
+							telemetry := (substituteVariables(problemsInstruction
+															, {problems: values2String(", ", collect(instructionHints
+																								   , (h) => translate(hintProblems[h]))*)
+															 , corner: cornerNr})
+										. "\n\n" . telemetry)
+					}
+
+					try {
+						command := substituteVariables(this.Instructions["Coaching.Corner.Approaching"]
+													 , {telemetry: telemetry, corner: cornerNr})
+
+						if reference
+							command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
+																   , {telemetry: reference.JSON}))
+
+						this.handleVoiceText("TEXT", command, false)
+					}
+					finally {
+						this.Mode := oldMode
+					}
+				}
+				else if this.Speaker {
 					instructionHints := this.getInstructionHints(cornerNr)
 
-					if (instructionHints.Length > 0)
-						telemetry := (substituteVariables(problemsInstruction
-														, {problems: values2String(", ", collect(instructionHints
-																							   , (h) => translate(hintProblems[h]))*)
-														 , corner: cornerNr})
-									. "\n\n" . telemetry)
-				}
+					if (instructionHints.Length > 0) {
+						speaker := this.getSpeaker()
 
-				try {
-					command := substituteVariables(this.Instructions["Coaching.Corner.Approaching"]
-												 , {telemetry: telemetry, corner: cornerNr})
+						speaker.beginTalk()
 
-					if reference
-						command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
-															   , {telemetry: reference.JSON}))
+						try {
+							lastHint := false
 
-					this.handleVoiceText("TEXT", command, false)
-				}
-				finally {
-					this.Mode := oldMode
+							for index, hint in bubbleSort(&instructionHints, instructionCompare) {
+								conjunction := (lastHint ? instructionConjunction(lastHint, hint) : false)
+
+								if conjunction
+									conjunction := speaker.Fragments[conjunction]
+								else if !lastHint
+									conjunction := ""
+								else
+									conjunction := ". "
+
+								conclusion := ((index = instructionHints.Length) ? "." : "")
+
+								speaker.speakPhrase(hint, {conjunction: conjunction, conclusion: conclusion})
+
+								lastHint := hint
+							}
+						}
+						finally {
+							speaker.endTalk()
+						}
+					}
 				}
 			}
 		}

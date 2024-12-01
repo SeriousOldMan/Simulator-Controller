@@ -1515,7 +1515,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	importTelemetry(simulator, car, track, fileName, &info, verbose := true) {
-		local name
+		local name, infoFileName
 
 		importFromSecondMonitor(&info) {
 			local pid, count, importFileName
@@ -1550,7 +1550,7 @@ class SessionDatabase extends ConfigurationItem {
 			local channels := false
 			local skipNext := false
 			local time := 0
-			local entry, ignore, channel, importFileName
+			local entry, ignore, channel, importFileName, infoFileName
 
 			static motecChannels := ["Distance", "THROTTLE", "BRAKE"
 								   , "STEERANGLE", "GEAR", "RPMS", "SPEED"
@@ -1675,6 +1675,25 @@ class SessionDatabase extends ConfigurationItem {
 		}
 		else if InStr(fileName, ".telemetry") {
 			info := false
+
+			if FileExist(fileName . ".telemetry.info") {
+				info := readMultiMap(fileName . ".telemetry.info")
+
+				if ((getMultiMapValues(info, "Info").Count = 0) && (getMultiMapValues(info, "Lap").Count > 0))
+					setMultiMapValues(info, "Info", getMultiMapValues(info, "Lap"))
+				else
+					info := false
+
+				if info {
+					infoFileName := temporaryFileName("Telemetry", "info")
+
+					writeMultiMap(infoFileName, info)
+
+					info := infoFileName
+				}
+			}
+			else
+				info := false
 
 			return fileName
 		}

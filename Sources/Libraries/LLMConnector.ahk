@@ -406,7 +406,7 @@ class LLMConnector {
 				}
 			}
 			catch Any as exception {
-				this.Manager.connectorState("Error", "Connection", answer.Status)
+				this.Manager.connectorState("Error", "Connection", isSet(answer) ? answer.Status : unset)
 
 				return false
 			}

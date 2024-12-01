@@ -1740,7 +1740,7 @@ class DrivingCoach extends GridRaceAssistant {
 							}
 						}
 						finally {
-							speaker.endTalk()
+							speaker.endTalk({Rephrase: false})
 						}
 					}
 				}

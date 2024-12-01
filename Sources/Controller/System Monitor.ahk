@@ -1267,9 +1267,6 @@ systemMonitor(command := false, arguments*) {
 					}
 					else if getMultiMapValue(controllerState, key, "Muted", false)
 						state .= translate(" (Muted)")
-
-					if getMultiMapValue(controllerState, key, "Restricted", false)
-						state .= (translate(" - ") . translate("Restricted"))
 				}
 				else if (state = "Waiting") {
 					if (overallState = "Disabled")

@@ -1654,9 +1654,9 @@ class DrivingCoach extends GridRaceAssistant {
 
 		instructionConjunction(h1, h2) {
 			if ((h1 = "BrakeEarlier") && (h2 = "BrakeSofter"))
-				return "But"
-			else if ((h1 = "BrakeLater") && (h2 = "BrakeHarder"))
 				return "And"
+			else if ((h1 = "BrakeLater") && (h2 = "BrakeHarder"))
+				return "But"
 			else if ((h1 = "BrakeEarlier") && (h2 = "BrakeHarder"))
 				return "And"
 			else if ((h1 = "BrakeLater") && (h2 = "BrakeSofter"))
@@ -1664,8 +1664,6 @@ class DrivingCoach extends GridRaceAssistant {
 			else if ((h1 = "BrakeHarder") && (h2 = "BrakeSlower"))
 				return "But"
 			else if ((h1 = "BrakeSofter") && (h2 = "BrakeFaster"))
-				return "But"
-			else if ((h1 = "BrakeHarder") && (h2 = "BrakeSlower"))
 				return "But"
 			else if ((h1 = "BrakeHarder") && (h2 = "BrakeFaster"))
 				return "And"

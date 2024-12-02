@@ -603,6 +603,8 @@ class DrivingCoach extends GridRaceAssistant {
 				catch Any as exception {
 					logError(exception)
 
+					this.iConnector := false
+
 					this.connectorState("Error", "Configuration")
 
 					throw "Unsupported service detected in DrivingCoach.startConversation..."
@@ -618,9 +620,14 @@ class DrivingCoach extends GridRaceAssistant {
 				if !this.Instructions[instruction]
 					this.Instructions[instruction] := ""
 			}
+
+			return true
 		}
-		else
-			throw "Unsupported service detected in DrivingCoach.startConversation..."
+		else {
+			this.connectorState("Error", "Configuration")
+
+			return false
+		}
 	}
 
 	restartConversation() {
@@ -816,36 +823,41 @@ class DrivingCoach extends GridRaceAssistant {
 			if (this.Speaker && this.Options["Driving Coach.Confirmation"] && (this.ConnectionState = "Active"))
 				this.getSpeaker().speakPhrase("Confirm", false, false, false, {Noise: false})
 
-			if !this.Connector
-				this.startConversation()
+			if (this.Connector || this.startConversation()) {
+				answer := this.Connector.Ask(text)
 
-			answer := this.Connector.Ask(text)
+				if answer {
+					report := true
 
-			if answer {
-				report := true
+					if (this.CoachingActive && !InStr(kVersion, "-release")) {
+						if !FileExist(kTempDirectory . "Driving Coach\Conversations")
+							conversationNr := 1
 
-				if (this.CoachingActive && !InStr(kVersion, "-release")) {
-					if !FileExist(kTempDirectory . "Driving Coach\Conversations")
-						conversationNr := 1
+						DirCreate(kTempDirectory . "Driving Coach\Conversations")
 
-					DirCreate(kTempDirectory . "Driving Coach\Conversations")
+						folder := (kTempDirectory . "Driving Coach\Conversations\" . Format("{:03}", conversationNr) . "\")
 
-					folder := (kTempDirectory . "Driving Coach\Conversations\" . Format("{:03}", conversationNr) . "\")
+						DirCreate(folder)
 
-					DirCreate(folder)
+						telemetry := telemetry := this.getTelemetry(&reference := true)
 
-					telemetry := telemetry := this.getTelemetry(&reference := true)
+						if telemetry {
+							FileAppend(telemetry.JSON, folder . "Telemetry.JSON")
 
-					if telemetry {
-						FileAppend(telemetry.JSON, folder . "Telemetry.JSON")
+							if reference
+								FileAppend(reference.JSON, folder . "Reference.JSON")
+						}
 
-						if reference
-							FileAppend(reference.JSON, folder . "Reference.JSON")
+						FileAppend(translate("-- Driver --------") . "`n`n" . text . "`n`n" . translate("-- Coach ---------") . "`n`n" . answer . "`n`n", folder . "Conversation.txt", "UTF-16")
+
+						conversationNr += 1
 					}
+				}
+				else if (this.Speaker && report) {
+					if reportError
+						this.getSpeaker().speakPhrase("Later", false, false, false, {Noise: false})
 
-					FileAppend(translate("-- Driver --------") . "`n`n" . text . "`n`n" . translate("-- Coach ---------") . "`n`n" . answer . "`n`n", folder . "Conversation.txt", "UTF-16")
-
-					conversationNr += 1
+					report := false
 				}
 			}
 			else if (this.Speaker && report) {
@@ -1597,16 +1609,89 @@ class DrivingCoach extends GridRaceAssistant {
 		local cornerNr := this.TelemetryAnalyzer.TrackSections[sectionNr].Nr
 		local oldMode := this.Mode
 		local telemetry, reference, command, instructionHints, problemsInstruction
+		local speaker, index, hint, lastHint, conjunction, conclusion
 
 		static nextRecommendation := false
 		static wait := false
 		static hintProblems := false
+		static hints := false
+
+		filterInstructionHints(instructionHints) {
+			local result := []
+			local ignore, hint
+
+			for ignore, hint in instructionHints {
+				if ((hint = "BrakeEarlier") && inList(result, "BrakeLater"))
+					continue
+				else if ((hint = "BrakeLater") && inList(result, "BrakeEarlier"))
+					continue
+				else if ((hint = "BrakeHarder") && inList(result, "BrakeSofter"))
+					continue
+				else if ((hint = "BrakeSofter") && inList(result, "BrakeHarder"))
+					continue
+				else if ((hint = "BrakeFaster") && inList(result, "BrakeSlower"))
+					continue
+				else if ((hint = "BrakeSlower") && inList(result, "BrakeFaster"))
+					continue
+				else if ((hint = "AccelerateEarlier") && inList(result, "AccelerateLater"))
+					continue
+				else if ((hint = "AccelerateLater") && inList(result, "AccelerateEarlier"))
+					continue
+				else if ((hint = "AccelerateHarder") && inList(result, "AccelerateSofter"))
+					continue
+				else if ((hint = "AccelerateLater") && inList(result, "AccelerateHarder"))
+					continue
+				else if ((hint = "PushMore") && inList(result, "PushLess"))
+					continue
+				else if ((hint = "PushLess") && inList(result, "PushMore"))
+					continue
+
+				result.Push(hint)
+			}
+
+			return result
+		}
+
+		instructionConjunction(h1, h2) {
+			if ((h1 = "BrakeEarlier") && (h2 = "BrakeSofter"))
+				return "But"
+			else if ((h1 = "BrakeLater") && (h2 = "BrakeHarder"))
+				return "And"
+			else if ((h1 = "BrakeEarlier") && (h2 = "BrakeHarder"))
+				return "And"
+			else if ((h1 = "BrakeLater") && (h2 = "BrakeSofter"))
+				return "But"
+			else if ((h1 = "BrakeHarder") && (h2 = "BrakeSlower"))
+				return "But"
+			else if ((h1 = "BrakeSofter") && (h2 = "BrakeFaster"))
+				return "But"
+			else if ((h1 = "BrakeHarder") && (h2 = "BrakeSlower"))
+				return "But"
+			else if ((h1 = "BrakeHarder") && (h2 = "BrakeFaster"))
+				return "And"
+			else if ((h1 = "BrakeSofter") && (h2 = "BrakeSlower"))
+				return "And"
+			else if ((h1 = "AccelerateEarlier") && (h2 = "AccelerateHarder"))
+				return "And"
+			else if ((h1 = "AccelerateLater") && (h2 = "AccelerateSofter"))
+				return "And"
+			else if ((h1 = "AccelerateEarlier") && (h2 = "AccelerateSofter"))
+				return "But"
+			else if ((h1 = "AccelerateLater") && (h2 = "AccelerateHarder"))
+				return "But"
+
+			return false
+		}
 
 		if ((Round(positionX) = -32767) && (Round(positionY) = -32767))
 			return
 
 		if !wait {
 			wait := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Corner.Wait", 10) * 1000)
+
+			hints := ["BrakeEarlier", "BrakeLater", "BrakeHarder", "BrakeSofter"
+					, "BrakeFaster", "BrakeSlower", "AccelerateEarlier", "AccelerateLater"
+					, "AccelerateHarder", "AccelerateSofter", "PushLess", "PushMore"]
 
 			hintProblems := Map("BrakeEarlier", "Too late braking"
 							  , "BrakeLater", "Too early braking"
@@ -1620,7 +1705,6 @@ class DrivingCoach extends GridRaceAssistant {
 							  , "AccelerateLater", "Accelerating too early"
 							  , "AccelerateHarder", "Not hard enough on the throttle"
 							  , "AccelerateSofter", "Too hard on the throttle")
-
 			hintProblems.Default := ""
 		}
 
@@ -1632,35 +1716,71 @@ class DrivingCoach extends GridRaceAssistant {
 			else if ((telemetry.Sections.Length > 0) && !this.getSpeaker().Speaking) {
 				nextRecommendation := (A_TickCount + wait)
 
-				this.Mode := "Coaching"
+				if (this.ConnectionState = "Active") {
+					this.Mode := "Coaching"
 
-				telemetry := telemetry.JSON
+					telemetry := telemetry.JSON
 
-				problemsInstruction := this.Instructions["Coaching.Corner.Problems"]
+					problemsInstruction := this.Instructions["Coaching.Corner.Problems"]
 
-				if (Trim(problemsInstruction) != "") {
+					if (Trim(problemsInstruction) != "") {
+						instructionHints := this.getInstructionHints(cornerNr)
+
+						if (instructionHints.Length > 0)
+							telemetry := (substituteVariables(problemsInstruction
+															, {problems: values2String(", ", collect(filterInstructionHints(instructionHints)
+																								   , (h) => translate(hintProblems[h]))*)
+															 , corner: cornerNr})
+										. "\n\n" . telemetry)
+					}
+
+					try {
+						command := substituteVariables(this.Instructions["Coaching.Corner.Approaching"]
+													 , {telemetry: telemetry, corner: cornerNr})
+
+						if reference
+							command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
+																   , {telemetry: reference.JSON}))
+
+						this.handleVoiceText("TEXT", command, false)
+					}
+					finally {
+						this.Mode := oldMode
+					}
+				}
+				else if this.Speaker {
 					instructionHints := this.getInstructionHints(cornerNr)
 
-					if (instructionHints.Length > 0)
-						telemetry := (substituteVariables(problemsInstruction
-														, {problems: values2String(", ", collect(instructionHints
-																							   , (h) => translate(hintProblems[h]))*)
-														 , corner: cornerNr})
-									. "\n\n" . telemetry)
-				}
+					if (instructionHints.Length > 0) {
+						speaker := this.getSpeaker()
 
-				try {
-					command := substituteVariables(this.Instructions["Coaching.Corner.Approaching"]
-												 , {telemetry: telemetry, corner: cornerNr})
+						speaker.beginTalk({Talking: true})
 
-					if reference
-						command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
-															   , {telemetry: reference.JSON}))
+						try {
+							lastHint := false
 
-					this.handleVoiceText("TEXT", command, false)
-				}
-				finally {
-					this.Mode := oldMode
+							for index, hint in bubbleSort(&instructionHints := filterInstructionHints(instructionHints)
+														, (h1, h2) => inList(hints, h1) > inList(hints, h2)) {
+								conjunction := (lastHint ? instructionConjunction(lastHint, hint) : false)
+
+								if conjunction
+									conjunction := speaker.Fragments[conjunction]
+								else if !lastHint
+									conjunction := ""
+								else
+									conjunction := ". "
+
+								conclusion := ((index = instructionHints.Length) ? "." : "")
+
+								speaker.speakPhrase(hint, {conjunction: conjunction, conclusion: conclusion})
+
+								lastHint := hint
+							}
+						}
+						finally {
+							speaker.endTalk({Rephrase: false})
+						}
+					}
 				}
 			}
 		}

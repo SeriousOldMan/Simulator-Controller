@@ -2287,12 +2287,17 @@ class TrackMap {
 			local coordinateY := false
 			local action := false
 			local section := false
-			local x, y, originalX, originalY, currentX, currentY, msgResult
+			local x, y, moved, startX, startY, originalX, originalY, currentX, currentY, msgResult
 
 			MouseGetPos(&x, &y)
 
 			x := screen2Window(x)
 			y := screen2Window(y)
+
+			startX := x
+			startY := y
+
+			moved := false
 
 			if this.findTrackCoordinate(x - this.iTrackDisplayArea[1], y - this.iTrackDisplayArea[2], &coordinateX, &coordinateY)
 				if (this.TrackMapMode = "Position") {
@@ -2320,6 +2325,9 @@ class TrackMap {
 								x := screen2Window(x)
 								y := screen2Window(y)
 
+								if ((Abs(startX - x) > 15) || (Abs(startY - y) > 15))
+									moved := true
+
 								if this.findTrackCoordinate(x - this.iTrackDisplayArea[1], y - this.iTrackDisplayArea[2], &coordinateX, &coordinateY) {
 									section.X := coordinateX
 									section.Y := coordinateY
@@ -2334,16 +2342,16 @@ class TrackMap {
 							section.X := originalX
 							section.Y := originalY
 
-							if (this.findTrackSection(currentX, currentY) == section) {
-								this.updateTrackMap()
-
-								this.sectionClicked(originalX, originalY, section)
-							}
-							else {
+							if moved {
 								section.X := currentX
 								section.Y := currentY
 
 								this.updateTrackSections()
+							}
+							else {
+								this.updateTrackMap()
+
+								this.sectionClicked(originalX, originalY, section)
 							}
 						}
 					}

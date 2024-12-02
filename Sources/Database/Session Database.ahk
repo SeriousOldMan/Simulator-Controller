@@ -1032,12 +1032,17 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			local coordinateY := false
 			local action := false
 			local section := false
-			local x, y, originalX, originalY, currentX, currentY, msgResult
+			local x, y, moved, startX, startY, originalX, originalY, currentX, currentY, msgResult
 
 			MouseGetPos(&x, &y)
 
 			x := screen2Window(x)
 			y := screen2Window(y)
+
+			startX := x
+			startY := y
+
+			moved := false
 
 			if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1], y - editor.iTrackDisplayArea[2], &coordinateX, &coordinateY) {
 				if (this.TrackEditorMode = "Automations") {
@@ -1062,6 +1067,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 								x := screen2Window(x)
 								y := screen2Window(y)
 
+								if ((Abs(startX - x) > 15) || (Abs(startY - y) > 15))
+									moved := true
+
 								if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1], y - editor.iTrackDisplayArea[2], &coordinateX, &coordinateY) {
 									action.X := coordinateX
 									action.Y := coordinateY
@@ -1076,14 +1084,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							action.X := originalX
 							action.Y := originalY
 
-							if (editor.findTrackAction(currentX, currentY) == action) {
+							if moved {
+								action.X := currentX
+								action.Y := currentY
+							}
+							else {
 								editor.updateTrackMap()
 
 								editor.actionClicked(originalX, originalY, action)
-							}
-							else {
-								action.X := currentX
-								action.Y := currentY
 							}
 						}
 					}
@@ -1112,6 +1120,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 								x := screen2Window(x)
 								y := screen2Window(y)
 
+								if ((Abs(startX - x) > 15) || (Abs(startY - y) > 15))
+									moved := true
+
 								if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1], y - editor.iTrackDisplayArea[2], &coordinateX, &coordinateY) {
 									section.X := coordinateX
 									section.Y := coordinateY
@@ -1126,16 +1137,16 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							section.X := originalX
 							section.Y := originalY
 
-							if (editor.findTrackSection(currentX, currentY) == section) {
-								editor.updateTrackMap()
-
-								editor.sectionClicked(originalX, originalY, section)
-							}
-							else {
+							if moved {
 								section.X := currentX
 								section.Y := currentY
 
 								this.updateTrackSections()
+							}
+							else {
+								editor.updateTrackMap()
+
+								editor.sectionClicked(originalX, originalY, section)
 							}
 						}
 					}

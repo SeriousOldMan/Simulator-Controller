@@ -1676,21 +1676,21 @@ class SessionDatabase extends ConfigurationItem {
 		else if InStr(fileName, ".telemetry") {
 			info := false
 
-			if FileExist(fileName . ".telemetry.info") {
-				info := readMultiMap(fileName . ".telemetry.info")
+			if FileExist(fileName . ".info") {
+				info := readMultiMap(fileName . ".info")
 
 				if ((getMultiMapValues(info, "Info").Count = 0) && (getMultiMapValues(info, "Lap").Count > 0))
 					setMultiMapValues(info, "Info", getMultiMapValues(info, "Lap"))
-				else
-					info := false
 
-				if info {
+				if (getMultiMapValues(info, "Info").Count > 0) {
 					infoFileName := temporaryFileName("Telemetry", "info")
 
 					writeMultiMap(infoFileName, info)
 
 					info := infoFileName
 				}
+				else
+					info := false
 			}
 			else
 				info := false

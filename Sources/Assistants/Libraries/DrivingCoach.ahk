@@ -1304,7 +1304,7 @@ class DrivingCoach extends GridRaceAssistant {
 							setMultiMapValue(info, "Info", "LapTime", lapTime)
 
 						if (sectorTimes && (sectorTimes.Length > 0))
-							setMultiMapValue(info, "Info", "SectorTimes", values2String(",", sectorTimes*))
+							setMultiMapValue(info, "Info", "SectorTimes", values2String(",", collect(sectorTimes, (t) => Round(t / 1000, 2))*))
 
 						writeMultiMap(A_LoopFileFullPath . ".info", info)
 

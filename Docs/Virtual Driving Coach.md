@@ -147,6 +147,12 @@ Once you have selected and download a model, enter the full path to the model fi
 
 Please be aware, that running a large language model locally puts heavy load on your PC and can use quite a lot of memory (even from your GPU). Therefore do not ask any questions while driving, unless you have a really powerful configuration. Even if your PC is idle, the answer will take some time to be generated, so be patient.
 
+### Using the Driving Coach without an LLM
+
+It is possible to use the Driving Coach without a large language model. This configuration supplies only a very [restricted version of the on-track coaching functionality](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#restricted-mode-without-an-llm) and only pre-defined voice commands will be supported. Of course, you will miss all the fun of a natural conversation with a very skilled racing expert as demonstrated above, but it is a starting point.
+
+To use this restricted mode, select the *Generic* GPT provider in the configuration, but leave all fields like Service URL and the Model empty. As this is actual the default for a new installation, the restricted mode will be available out of the box.
+
 ## Configuration
 
 The next step is to setup everything in the configuration, either in "Simulator Setup" or "Simulator Configuration". Please follow the instructions in the [Installation & Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-driving-coach) chapter.
@@ -351,6 +357,10 @@ If you want to use this for your own setup, here is the rule text, so you can co
 Replace "Kim" with the name of your Driving Coach.
 
 Expert Notes: *startTelemetryCoaching* and *finishTelemetryCoaching* are methods of the *DrivingCoach* class, the session type **2** represents *practice*, **3** stands for *qualifying* and **4** for a *race* session.
+
+### Restricted mode without an LLM
+
+As mentioned [above](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#using-the-driving-coach-without-an-llm), the Driving Coach can also be used without an LLM and will supply a basic and somewhat restricted support for on-track coaching. All the intelligence supplied by the LLM will be missing and the recommendations given by the coach will be very simple and kind of repetitve. Since this functionality uses a rule based approach when judging the performance of a given corner, it will only work when a reference with a better performance at that given point on the track is available.
 
 ## How it works
 

@@ -916,7 +916,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 			this.iAgentBooster := this.getArgumentValue("agentBooster", this.getArgumentValue("raceAssistantAgentBooster", false))
 
-			this.iMuted := this.getArgumentValue("muted", this.getArgumentValue("raceAssistantMuted", false))
+			this.iMuted := (this.getArgumentValue("muted", this.getArgumentValue("raceAssistantMuted", false)) != false)
 
 			if this.StartupSettings
 				this.iMuted := getMultiMapValue(this.StartupSettings, this.Plugin, "Muted", this.iMuted)

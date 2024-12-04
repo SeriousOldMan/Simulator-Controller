@@ -315,7 +315,7 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 
 					index := 0
 
-					while (index := browserGui["telemetryListView"].GetNext(index)) {
+					while (index := browserGui["telemetryListView"].GetNext(index))
 						if FileExist(sessionDB.getTelemetryDirectory(simulator, car, track, "User")
 								   . browserGui["telemetryListView"].GetText(index) . ".telemetry")
 							fileNames.Push(sessionDB.getTelemetryDirectory(simulator, car, track, "User")
@@ -327,7 +327,6 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 							infos.Push(sessionDB.getTelemetryDirectory(simulator, car, track, "Community")
 									 . browserGui["telemetryListView"].GetText(index) . ".telemetry.info")
 						}
-					}
 
 					if (fileNames.Length > 0) {
 						%arguments[1]% := simulator

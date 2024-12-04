@@ -358,7 +358,7 @@ class DrivingCoach extends GridRaceAssistant {
 			else if (this.LoadReference == true)
 				this.iLoadReference := "Fastest"
 
-			if (this.LoadReference = "Name") {
+			if (this.LoadReference = "Named") {
 				lapName := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference.Database.Name", "")
 
 				if (Trim(lapName) != "")

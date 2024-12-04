@@ -1864,7 +1864,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 					for ignore, parameter in ["Name", "Logo", "Language", "Synthesizer", "Speaker", "SpeakerVocalics", "Recognizer", "Listener"
 											, "SpeakerBooster", "ListenerBooster", "ConversationBooster", "AgentBooster"]
 						if this.%parameter%
-							options .= (" -" . parameter . " `"" . this.RaceAssistant%parameter% . "`"")
+							options .= (" -" . parameter . " `"" . this.%parameter% . "`"")
 
 					if this.Muted
 						options .= " -Muted"

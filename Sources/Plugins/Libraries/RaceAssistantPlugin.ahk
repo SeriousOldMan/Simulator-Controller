@@ -45,20 +45,20 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 	static sSimulator := false
 
-	iRaceAssistantEnabled := false
-	iRaceAssistantName := false
-	iRaceAssistantLogo := false
-	iRaceAssistantLanguage := false
-	iRaceAssistantSynthesizer := false
-	iRaceAssistantSpeaker := false
-	iRaceAssistantSpeakerVocalics := false
-	iRaceAssistantSpeakerBooster := false
-	iRaceAssistantRecognizer := false
-	iRaceAssistantListener := false
-	iRaceAssistantListenerBooster := false
-	iRaceAssistantConversationBooster := false
-	iRaceAssistantAgentBooster := false
-	iRaceAssistantMuted := false
+	iEnabled := false
+	iName := false
+	iLogo := false
+	iLanguage := false
+	iSynthesizer := false
+	iSpeaker := false
+	iSpeakerVocalics := false
+	iSpeakerBooster := false
+	iRecognizer := false
+	iListener := false
+	iListenerBooster := false
+	iConversationBooster := false
+	iAgentBooster := false
+	iMuted := false
 
 	iRaceAssistant := false
 	iRaceAssistantZombie := false
@@ -293,14 +293,14 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		fireAction(function, trigger) {
 			local plugin := this.Plugin
 
-			if plugin.RaceAssistantName
-				if (plugin.RaceAssistantEnabled && ((trigger = "On") || (trigger = "Off") || (trigger == "Push"))) {
+			if plugin.Name
+				if (plugin.Enabled && ((trigger = "On") || (trigger = "Off") || (trigger == "Push"))) {
 					plugin.disableRaceAssistant(plugin.actionLabel(this))
 
 					function.setLabel(plugin.actionLabel(this), "Black")
 					function.setIcon(plugin.actionIcon(this), "Deactivated")
 				}
-				else if (!plugin.RaceAssistantEnabled && ((trigger = "On") || (trigger == "Push"))) {
+				else if (!plugin.Enabled && ((trigger = "On") || (trigger == "Push"))) {
 					plugin.enableRaceAssistant(plugin.actionLabel(this))
 
 					function.setLabel(plugin.actionLabel(this), "Green")
@@ -661,9 +661,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		}
 	}
 
-	RaceAssistantEnabled {
+	Enabled {
 		Get {
-			return this.iRaceAssistantEnabled
+			return this.iEnabled
 		}
 	}
 
@@ -673,81 +673,81 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		}
 	}
 
-	RaceAssistantName {
+	Name {
 		Get {
-			return this.iRaceAssistantName
+			return this.iName
 		}
 	}
 
-	RaceAssistantLogo {
+	Logo {
 		Get {
-			return this.iRaceAssistantLogo
+			return this.iLogo
 		}
 	}
 
-	RaceAssistantLanguage {
+	Language {
 		Get {
-			return this.iRaceAssistantLanguage
+			return this.iLanguage
 		}
 	}
 
-	RaceAssistantSynthesizer {
+	Synthesizer {
 		Get {
-			return this.iRaceAssistantSynthesizer
+			return this.iSynthesizer
 		}
 	}
 
-	RaceAssistantSpeaker {
+	Speaker {
 		Get {
-			return this.iRaceAssistantSpeaker
+			return this.iSpeaker
 		}
 	}
 
-	RaceAssistantSpeakerVocalics {
+	SpeakerVocalics {
 		Get {
-			return this.iRaceAssistantSpeakerVocalics
+			return this.iSpeakerVocalics
 		}
 	}
 
-	RaceAssistantSpeakerBooster {
+	SpeakerBooster {
 		Get {
-			return this.iRaceAssistantSpeakerBooster
+			return this.iSpeakerBooster
 		}
 	}
 
-	RaceAssistantRecognizer {
+	Recognizer {
 		Get {
-			return this.iRaceAssistantRecognizer
+			return this.iRecognizer
 		}
 	}
 
-	RaceAssistantListener {
+	Listener {
 		Get {
-			return this.iRaceAssistantListener
+			return this.iListener
 		}
 	}
 
-	RaceAssistantListenerBooster {
+	ListenerBooster {
 		Get {
-			return this.iRaceAssistantListenerBooster
+			return this.iListenerBooster
 		}
 	}
 
-	RaceAssistantConversationBooster {
+	ConversationBooster {
 		Get {
-			return this.iRaceAssistantConversationBooster
+			return this.iConversationBooster
 		}
 	}
 
-	RaceAssistantAgentBooster {
+	AgentBooster {
 		Get {
-			return this.iRaceAssistantAgentBooster
+			return this.iAgentBooster
 		}
 	}
 
-	RaceAssistantMuted {
+	Muted {
 		Get {
-			return this.iRaceAssistantMuted
+			return this.iMuted
 		}
 	}
 
@@ -782,9 +782,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		if (this.Active || (isDebug() && isDevelopment())) {
 			RaceAssistantPlugin.Assistants.Push(this)
 
-			this.iRaceAssistantName := this.getArgumentValue("raceAssistantName", false)
-			this.iRaceAssistantLogo := this.getArgumentValue("raceAssistantLogo", false)
-			this.iRaceAssistantLanguage := this.getArgumentValue("raceAssistantLanguage", false)
+			this.iName := this.getArgumentValue("name", this.getArgumentValue("raceAssistantName", false))
+			this.iLogo := this.getArgumentValue("logo", this.getArgumentValue("raceAssistantLogo", false))
+			this.iLanguage := this.getArgumentValue("language", this.getArgumentValue("raceAssistantLanguage", false))
 
 			raceAssistantToggle := this.getArgumentValue("raceAssistant", false)
 
@@ -797,16 +797,16 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				if ((arguments.Length == 1) && !inList(["On", "Off"], arguments[1]))
 					arguments.InsertAt(1, "On")
 
-				this.iRaceAssistantEnabled := (arguments[1] = "On")
+				this.iEnabled := (arguments[1] = "On")
 
 				if (arguments.Length > 1)
 					this.createRaceAssistantAction(controller, "RaceAssistant", arguments[2])
 			}
 			else
-				this.iRaceAssistantEnabled := (this.iRaceAssistantName != false)
+				this.iEnabled := (this.iName != false)
 
 			if this.StartupSettings
-				this.iRaceAssistantEnabled := getMultiMapValue(this.StartupSettings, this.Plugin, "Enabled", this.iRaceAssistantEnabled)
+				this.iEnabled := getMultiMapValue(this.StartupSettings, this.Plugin, "Enabled", this.iEnabled)
 
 			if (teamServer && teamServer.Active) {
 				teamServerToggle := this.getArgumentValue("teamServer", false)
@@ -880,46 +880,46 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			for ignore, theAction in string2Values(",", this.getArgumentValue("assistantCommands", ""))
 				this.createRaceAssistantAction(controller, string2Values(A_Space, substituteString(theAction, "  ", A_Space))*)
 
-			this.iRaceAssistantSynthesizer := this.getArgumentValue("raceAssistantSynthesizer", false)
+			this.iSynthesizer := this.getArgumentValue("synthesizer", this.getArgumentValue("raceAssistantSynthesizer", false))
 
-			assistantSpeaker := this.getArgumentValue("raceAssistantSpeaker", false)
+			assistantSpeaker := this.getArgumentValue("speaker", this.getArgumentValue("raceAssistantSpeaker", false))
 
 			if ((assistantSpeaker = kFalse) || (assistantSpeaker = "Off"))
 				assistantSpeaker := false
 
 			if assistantSpeaker {
-				this.iRaceAssistantSpeaker := (((assistantSpeaker = kTrue) || (assistantSpeaker = "On")) ? true : assistantSpeaker)
+				this.iSpeaker := (((assistantSpeaker = kTrue) || (assistantSpeaker = "On")) ? true : assistantSpeaker)
 
 				if (this.StartupSettings && (getMultiMapValue(this.StartupSettings, this.Plugin, "Silent", kUndefined) != kUndefined))
 					if getMultiMapValue(this.StartupSettings, this.Plugin, "Silent", false) {
-						this.iRaceAssistantSpeaker := false
+						this.iSpeaker := false
 
 						assistantSpeaker := false
 					}
 
 				if assistantSpeaker {
-					this.iRaceAssistantSpeakerVocalics := this.getArgumentValue("raceAssistantSpeakerVocalics", false)
-					this.iRaceAssistantSpeakerBooster := this.getArgumentValue("raceAssistantSpeakerBooster", false)
+					this.iSpeakerVocalics := this.getArgumentValue("speakerVocalics", this.getArgumentValue("raceAssistantSpeakerVocalics", false))
+					this.iSpeakerBooster := this.getArgumentValue("speakerBooster", this.getArgumentValue("raceAssistantSpeakerBooster", false))
 
-					this.iRaceAssistantRecognizer := this.getArgumentValue("raceAssistantRecognizer", false)
+					this.iRecognizer := this.getArgumentValue("recognizer", this.getArgumentValue("raceAssistantRecognizer", false))
 
-					assistantListener := this.getArgumentValue("raceAssistantListener", false)
+					assistantListener := this.getArgumentValue("listener", this.getArgumentValue("raceAssistantListener", false))
 
 					if ((assistantListener != false) && (assistantListener != kFalse) && (assistantListener != "Off")) {
-						this.iRaceAssistantListenerBooster := this.getArgumentValue("raceAssistantListenerBooster", false)
-						this.iRaceAssistantConversationBooster := this.getArgumentValue("raceAssistantConversationBooster", false)
+						this.iListenerBooster := this.getArgumentValue("listenerBooster", this.getArgumentValue("raceAssistantListenerBooster", false))
+						this.iConversationBooster := this.getArgumentValue("conversationBooster", this.getArgumentValue("raceAssistantConversationBooster", false))
 
-						this.iRaceAssistantListener := (((assistantListener = kTrue) || (assistantListener = "On")) ? true : assistantListener)
+						this.iListener := (((assistantListener = kTrue) || (assistantListener = "On")) ? true : assistantListener)
 					}
 				}
 			}
 
-			this.iRaceAssistantAgentBooster := this.getArgumentValue("raceAssistantAgentBooster", false)
+			this.iAgentBooster := this.getArgumentValue("agentBooster", this.getArgumentValue("raceAssistantAgentBooster", false))
 
-			this.iRaceAssistantMuted := this.getArgumentValue("raceAssistantMuted", false)
+			this.iMuted := this.getArgumentValue("muted", this.getArgumentValue("raceAssistantMuted", false))
 
 			if this.StartupSettings
-				this.iRaceAssistantMuted := getMultiMapValue(this.StartupSettings, this.Plugin, "Muted", this.iRaceAssistantMuted)
+				this.iMuted := getMultiMapValue(this.StartupSettings, this.Plugin, "Muted", this.iMuted)
 
 			deleteDirectory(kTempDirectory . "Race Assistant")
 
@@ -927,7 +927,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 			registerMessageHandler(this.Plugin, methodMessageHandler, this)
 
-			if this.RaceAssistantEnabled
+			if this.Enabled
 				this.enableRaceAssistant(false, true)
 			else
 				this.disableRaceAssistant(false, true)
@@ -1035,7 +1035,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 					logError(exception)
 				}
 
-			if this.RaceAssistantEnabled {
+			if this.Enabled {
 				if (this.RaceAssistant && !this.RaceAssistantActive && !this.WaitForShutdown) {
 					setMultiMapValue(configuration, "Race Assistants", this.Plugin, "Waiting")
 
@@ -1068,13 +1068,13 @@ class RaceAssistantPlugin extends ControllerPlugin {
 													 , translate("Laps: ") . this.LastLap
 													 , translate("Mode: ") . translate(this.TeamSessionActive ? "Team" : "Solo"))
 
-					if !this.RaceAssistantSpeaker {
+					if !this.Speaker {
 						information .= ("; " . translate("Silent: ") . translate("Yes"))
 
 						setMultiMapValue(configuration, this.Plugin, "Silent", true)
 					}
 
-					if this.RaceAssistantMuted {
+					if this.Muted {
 						information .= ("; " . translate("Muted: ") . translate("Yes"))
 
 						setMultiMapValue(configuration, this.Plugin, "Muted", true)
@@ -1361,7 +1361,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 		if (shutdownAssistant && !restart)
 			for ignore, assistant in RaceAssistantPlugin.Assistants
-				if (assistant.RaceAssistantEnabled && assistant.RaceAssistant && !assistant.RaceAssistantPersistent) {
+				if (assistant.Enabled && assistant.RaceAssistant && !assistant.RaceAssistantPersistent) {
 					RaceAssistantPlugin.WaitForShutdown := true
 
 					break
@@ -1371,7 +1371,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			finalizeAssistant := false
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
-			if (assistant.RaceAssistantEnabled && assistant.RaceAssistant)
+			if (assistant.Enabled && assistant.RaceAssistant)
 				assistant.finishSession(finalizeAssistant, shutdownAssistant)
 
 		if (shutdownTeamSession && RaceAssistantPlugin.TeamSessionActive) {
@@ -1447,7 +1447,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if (assistant.requireRaceAssistant() && assistant.RaceAssistantActive)
 				assistant.restoreSessionState(data)
-			else if !assistant.RaceAssistantEnabled
+			else if !assistant.Enabled
 				assistant.clearSessionInfo()
 	}
 
@@ -1537,7 +1537,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			RaceAssistantPlugin.Simulator.updateTelemetryData(data)
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
-			if assistant.RaceAssistantEnabled
+			if assistant.Enabled
 				assistant.updateTelemetryData(data)
 	}
 
@@ -1548,7 +1548,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			RaceAssistantPlugin.Simulator.updatePositionsData(data)
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
-			if assistant.RaceAssistantEnabled
+			if assistant.Enabled
 				assistant.updatePositionsData(data)
 	}
 
@@ -1689,10 +1689,10 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 		for ignore, theAction in this.Actions
 			if isInstance(theAction, RaceAssistantPlugin.RaceAssistantToggleAction) {
-				theAction.Function.setLabel(this.actionLabel(theAction), this.RaceAssistantName ? (this.RaceAssistantEnabled ? "Green" : "Black") : "Gray")
-				theAction.Function.setIcon(this.actionIcon(theAction), this.RaceAssistantName ? (this.RaceAssistantEnabled ? "Activated" : "Deactivated") : "Disabled")
+				theAction.Function.setLabel(this.actionLabel(theAction), this.Name ? (this.Enabled ? "Green" : "Black") : "Gray")
+				theAction.Function.setIcon(this.actionIcon(theAction), this.Name ? (this.Enabled ? "Activated" : "Deactivated") : "Disabled")
 
-				if this.RaceAssistantName
+				if this.Name
 					theAction.Function.enable(kAllTrigger, theAction)
 				else
 					theAction.Function.disable(kAllTrigger, theAction)
@@ -1758,7 +1758,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	}
 
 	toggleRaceAssistant() {
-		if this.RaceAssistantEnabled
+		if this.Enabled
 			this.disableRaceAssistant()
 		else
 			this.enableRaceAssistant()
@@ -1787,10 +1787,10 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	}
 
 	enableRaceAssistant(label := false, startup := false) {
-		if (!this.RaceAssistantEnabled || startup) {
-			this.iRaceAssistantEnabled := (this.RaceAssistantName != false)
+		if (!this.Enabled || startup) {
+			this.iEnabled := (this.Name != false)
 
-			if this.RaceAssistantEnabled {
+			if this.Enabled {
 				label := translate(this.Plugin)
 
 				trayMessage(label, translate("State: On"))
@@ -1805,12 +1805,12 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	disableRaceAssistant(label := false, startup := false) {
 		local ignore, assistant
 
-		if (this.RaceAssistantEnabled || startup) {
+		if (this.Enabled || startup) {
 			label := translate(this.Plugin)
 
 			trayMessage(label, translate("State: Off"))
 
-			this.iRaceAssistantEnabled := false
+			this.iEnabled := false
 
 			if this.RaceAssistant
 				this.finishSession(!(GetKeyState("Shift") && GetKeyState("Ctrl")))
@@ -1818,7 +1818,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			this.updateTrayLabel(label, false)
 
 			for ignore, assistant in RaceAssistantPlugin.Assistants
-				if assistant.RaceAssistantEnabled
+				if assistant.Enabled
 					return
 
 			RaceAssistantPlugin.finishAssistantsSession()
@@ -1852,7 +1852,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	requireRaceAssistant() {
 		local pid, options, ignore, parameter, exePath
 
-		if this.RaceAssistantEnabled {
+		if this.Enabled {
 			if !this.RaceAssistant {
 				pid := ProcessExist()
 
@@ -1863,10 +1863,10 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 					for ignore, parameter in ["Name", "Logo", "Language", "Synthesizer", "Speaker", "SpeakerVocalics", "Recognizer", "Listener"
 											, "SpeakerBooster", "ListenerBooster", "ConversationBooster", "AgentBooster"]
-						if this.RaceAssistant%parameter%
+						if this.%parameter%
 							options .= (" -" . parameter . " `"" . this.RaceAssistant%parameter% . "`"")
 
-					if this.RaceAssistantMuted
+					if this.Muted
 						options .= " -Muted"
 
 					if this.Controller.VoiceServer
@@ -2647,7 +2647,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 														 , Round((getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000) / 60))
 
 									for ignore, assistant in RaceAssistantPlugin.Assistants
-										if assistant.RaceAssistantEnabled {
+										if assistant.Enabled {
 											teamServer.setSessionValue(assistant.Plugin . " Settings", "")
 											teamServer.setSessionValue(assistant.Plugin . " State", "")
 										}
@@ -2813,7 +2813,7 @@ openRaceSettings(import := false, silent := false, plugin := false, fileName := 
 			settings := readMultiMap(fileName)
 
 			for ignore, assistant in RaceAssistantPlugin.Assistants
-				if (assistant && controller.isActive(assistant) && assistant.RaceAssistantEnabled)
+				if (assistant && controller.isActive(assistant) && assistant.Enabled)
 					assistant.reloadSettings(settings)
 
 			if temporary
@@ -2829,7 +2829,7 @@ openRaceSettings(import := false, silent := false, plugin := false, fileName := 
 		fileName := kUserConfigDirectory . "Race.settings"
 
 		for ignore, plugin in RaceAssistantPlugin.Assistants
-			if (plugin && controller.isActive(plugin) && plugin.RaceAssistantEnabled
+			if (plugin && controller.isActive(plugin) && plugin.Enabled
 			 && FileExist(kTempDirectory . plugin.Plugin . ".settings"))
 				try {
 					fileName := temporaryFileName("Race", "settings")

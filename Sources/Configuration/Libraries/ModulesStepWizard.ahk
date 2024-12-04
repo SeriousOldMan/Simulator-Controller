@@ -76,11 +76,11 @@ class SilentAssistant extends NamedPreset {
 				assistant := Plugin(this.Assistant, simulatorConfiguration)
 
 				if this.iDisabled {
-					assistant.setArgumentValue("raceAssistantSpeaker", "Off")
-					assistant.setArgumentValue("raceAssistantListener", "Off")
+					assistant.setArgumentValue("speaker", "Off")
+					assistant.setArgumentValue("listener", "Off")
 				}
 				else
-					assistant.setArgumentValue("raceAssistantMuted", "true")
+					assistant.setArgumentValue("muted", "true")
 
 				assistant.saveToConfiguration(simulatorConfiguration)
 			}
@@ -149,7 +149,7 @@ class DifferentVoices extends NamedPreset {
 						if (getMultiMapValue(simulatorConfiguration, "Plugins", assistant, kUndefined) != kUndefined) {
 							assistant := Plugin(assistant, simulatorConfiguration)
 
-							assistant.setArgumentValue("raceAssistantSpeaker", voices.Pop())
+							assistant.setArgumentValue("speaker", voices.Pop())
 
 							assistant.saveToConfiguration(simulatorConfiguration)
 

@@ -238,9 +238,9 @@ The following rules apply:
     Example:
   
     [Replace: Plugins]
-	Race Spotter=raceAssistantName: Elisa->raceAssistantName: Tom|raceAssistantListener: On->raceAssistantListener: Microsoft Stefan (de-DE)
-	Race Engineer=raceAssistantName: Jona->raceAssistantName: Frank
-	Race Strategist=raceAssistantName: Khato->raceAssistantName: Mary
+	Race Spotter=name: Elisa->name: Tom|listener: On->listener: Microsoft Stefan (de-DE)
+	Race Engineer=name: Jona->name: Frank
+	Race Strategist=name: Khato->name: Mary
 
 ### Running the Configuration tool
 

@@ -2013,7 +2013,7 @@ class RaceEngineer extends RaceAssistant {
 
 				if ((this.Session = kSessionRace) && ProcessExist("Race Strategist.exe")) {
 					strategistPlugin := Plugin("Race Strategist", kSimulatorConfiguration)
-					strategistName := strategistPlugin.getArgumentValue("raceAssistantName", false)
+					strategistName := strategistPlugin.getArgumentValue("name", strategistPlugin.getArgumentValue("raceAssistantName", false))
 
 					if strategistName {
 						speaker.speakPhrase("GreetingStrategist", {strategist: strategistName, session: translate(session)})

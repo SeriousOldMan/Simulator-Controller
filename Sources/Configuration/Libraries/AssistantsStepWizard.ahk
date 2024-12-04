@@ -93,13 +93,13 @@ class AssistantsStepWizard extends ActionsStepWizard {
 				}
 
 				if (assistant = "Race Engineer")
-					arguments := ("raceAssistantName: " . wizard.getModuleValue(assistant, "Name", "Jona"))
+					arguments := ("name: " . wizard.getModuleValue(assistant, "Name", "Jona"))
 				else if (assistant = "Race Strategist")
-					arguments := ("raceAssistantName: " . wizard.getModuleValue(assistant, "Name", "Khato"))
+					arguments := ("name: " . wizard.getModuleValue(assistant, "Name", "Khato"))
 				else if (assistant = "Race Spotter")
-					arguments := ("raceAssistantName: " . wizard.getModuleValue(assistant, "Name", "Elisa"))
+					arguments := ("name: " . wizard.getModuleValue(assistant, "Name", "Elisa"))
 				else if (assistant = "Driving Coach")
-					arguments := ("raceAssistantName: " . wizard.getModuleValue(assistant, "Name", "Aiden"))
+					arguments := ("name: " . wizard.getModuleValue(assistant, "Name", "Aiden"))
 				else
 					throw "Unsupported race assistant detected in AssistantsStepWizard.saveToConfiguration..."
 
@@ -125,10 +125,10 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 				if wizard.isModuleSelected("Voice Control") {
 					if (wizard.getModuleValue(assistant, "Language", kUndefined) != kUndefined)
-						arguments .= ("; raceAssistantLanguage: " . wizard.getModuleValue(assistant, "Language"))
+						arguments .= ("; language: " . wizard.getModuleValue(assistant, "Language"))
 
 					if (wizard.getModuleValue(assistant, "Synthesizer", kUndefined) != kUndefined)
-						arguments .= ("; raceAssistantSynthesizer: " . wizard.getModuleValue(assistant, "Synthesizer"))
+						arguments .= ("; synthesizer: " . wizard.getModuleValue(assistant, "Synthesizer"))
 
 					voice := wizard.getModuleValue(assistant, "Voice", true)
 
@@ -137,13 +137,13 @@ class AssistantsStepWizard extends ActionsStepWizard {
 					else if (voice == false)
 						voice := "Off"
 
-					arguments .= ("; raceAssistantSpeaker: " . voice . "; raceAssistantListener: On")
+					arguments .= ("; speaker: " . voice . "; listener: On")
 
 					if ((wizard.getModuleValue(assistant, "Volume", "*") != "*") || (wizard.getModuleValue(assistant, "Pitch", "*") != "*")
 																				 || (wizard.getModuleValue(assistant, "Speed", "*") != "*"))
-						arguments .= ("; raceAssistantSpeakerVocalics: " . values2String(",", wizard.getModuleValue(assistant, "Volume", "*")
-																							, wizard.getModuleValue(assistant, "Pitch", "*")
-																							, wizard.getModuleValue(assistant, "Speed", "*")))
+						arguments .= ("; speakerVocalics: " . values2String(",", wizard.getModuleValue(assistant, "Volume", "*")
+																			   , wizard.getModuleValue(assistant, "Pitch", "*")
+																			   , wizard.getModuleValue(assistant, "Speed", "*")))
 
 					speakerBooster := wizard.getModuleValue(assistant, "Speaker Booster", wizard.getModuleValue(assistant, "Booster", false))
 					listenerBooster := wizard.getModuleValue(assistant, "Listener Booster", false)
@@ -163,7 +163,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 							speakerBooster["SpeakerTemperature"] := (speakerBooster.Has("Temperature") ? speakerBooster["Temperature"] : 0.5)
 
 						if speakerBooster["Speaker"]
-							arguments .= ("; raceAssistantSpeakerBooster: " . assistant)
+							arguments .= ("; speakerBooster: " . assistant)
 
 						setMultiMapValue(configuration, "Conversation Booster", assistant . ".Service", speakerBooster["Service"])
 						setMultiMapValue(configuration, "Conversation Booster", assistant . ".Model", speakerBooster["Model"])
@@ -188,7 +188,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 							listenerBooster["ListenerTemperature"] := 0.5
 
 						if listenerBooster["Listener"]
-							arguments .= ("; raceAssistantListenerBooster: " . assistant)
+							arguments .= ("; listenerBooster: " . assistant)
 
 						setMultiMapValue(configuration, "Conversation Booster", assistant . ".Service", listenerBooster["Service"])
 						setMultiMapValue(configuration, "Conversation Booster", assistant . ".Model", listenerBooster["Model"])
@@ -216,7 +216,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 							conversationBooster["ConversationActions"] := false
 
 						if conversationBooster["Conversation"]
-							arguments .= ("; raceAssistantConversationBooster: " . assistant)
+							arguments .= ("; conversationBooster: " . assistant)
 
 						setMultiMapValue(configuration, "Conversation Booster", assistant . ".Service", conversationBooster["Service"])
 						setMultiMapValue(configuration, "Conversation Booster", assistant . ".Model", conversationBooster["Model"])
@@ -242,7 +242,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 							agentBooster["AgentMaxHistory"] := 3
 
 						if agentBooster["Agent"]
-							arguments .= ("; raceAssistantAgentBooster: " . assistant)
+							arguments .= ("; agentBooster: " . assistant)
 
 						setMultiMapValue(configuration, "Agent Booster", assistant . ".Service", agentBooster["Service"])
 						setMultiMapValue(configuration, "Agent Booster", assistant . ".Model", agentBooster["Model"])
@@ -253,7 +253,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 						setMultiMapValue(configuration, "Agent Booster", assistant . ".Agent", false)
 				}
 				else
-					arguments .= "; raceAssistantSpeaker: Off"
+					arguments .= "; speaker: Off"
 
 				for ignore, action in string2Values(",", getMultiMapValue(wizard.Definition, "Setup.Assistants", "Assistants.Actions.Special"))
 					if wizard.assistantActionAvailable(assistant, action) {

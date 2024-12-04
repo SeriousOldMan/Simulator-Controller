@@ -1745,6 +1745,23 @@ updateInstallationForV500() {
 	}
 }
 
+updateConfigurationForV602() {
+	local fileName := (kUserHomeDirectory . "Setup\Configuration Patch.ini")
+	local ignore, parameter, text
+
+	if FileExist(fileName) {
+		text := FileRead(fileName)
+
+		for ignore, parameter in ["name", "logo", "language", "synthesizer", "speaker", "speakerVocalics", "recognizer", "listener"
+								, "speakerBooster", "listenerBooster", "conversationBooster", "agentBooster", "muted"] {
+			text := StrReplace(text, "raceAssistant" . parameter, parameter)
+
+		deleteFile(fileName, true)
+
+		FileAppend(text, fileName)
+	}
+}
+
 updateConfigurationForV593() {
 	local ignore, assistant, extension, type, fileName, configuration, name, definition
 

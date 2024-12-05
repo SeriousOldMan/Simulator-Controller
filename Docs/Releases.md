@@ -1,4 +1,4 @@
-## 6.0.0.0-release 12/06/24 (planned)
+## 6.0.0.0-release 12/06/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. A stunning new feature, a [fully interactive coaching mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#coaching-based-on-lap-telemetry-data) is now offered by the Driving Coach. The coach will take a look at the live telemetry data and will tell you where you have to change your driver inputs and driving style to ultimately improve your lap time.

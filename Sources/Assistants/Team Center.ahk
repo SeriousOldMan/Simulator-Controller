@@ -2447,17 +2447,17 @@ class TeamCenter extends ConfigurationItem {
 		centerGui.Add("Button", "x474 yp+50 w23 h23 Center +0x200 vloadSetupButton" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Click", loadSetup)
 		setButtonIcon(centerGui["loadSetupButton"], kIconsDirectory . "Database.ico", 1, "L4 T4 R4 B4")
 
-		centerGui.Add("Button", "x525 yp w23 h23 Center +0x200 vaddSetupButton" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Click", addSetup)
+		centerGui.Add("Button", "x527 yp w23 h23 Center +0x200 vaddSetupButton" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Click", addSetup)
 		setButtonIcon(centerGui["addSetupButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
-		centerGui.Add("Button", "x550 yp w23 h23 Center +0x200 vcopySetupButton" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Click", copySetup)
+		centerGui.Add("Button", "x552 yp w23 h23 Center +0x200 vcopySetupButton" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Click", copySetup)
 		setButtonIcon(centerGui["copySetupButton"], kIconsDirectory . "Copy.ico", 1, "L4 T4 R4 B4")
-		centerGui.Add("Button", "x575 yp w23 h23 Center +0x200 vdeleteSetupButton" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Click", deleteSetup)
+		centerGui.Add("Button", "x577 yp w23 h23 Center +0x200 vdeleteSetupButton" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Click", deleteSetup)
 		setButtonIcon(centerGui["deleteSetupButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
 		centerGui.Add("Button", "x378 ys+279 w160" . ((this.Mode = "Simple") ? " X:Move" : ""), translate("Save Setups")).OnEvent("Click", releaseSetups)
-		centerGui.Add("Button", "x553 yp w23 h23 Center +0x200 vuploadSetupsButton" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Click", uploadSetups)
+		centerGui.Add("Button", "x552 yp w23 h23 Center +0x200 vuploadSetupsButton" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Click", uploadSetups)
 		setButtonIcon(centerGui["uploadSetupsButton"], kIconsDirectory . "Upload.ico", 1, "L4 T4 R4 B4")
-		centerGui.Add("Button", "xp+24 yp w23 h23 Center +0x200 vdownloadSetupsButton" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Click", downloadSetups)
+		centerGui.Add("Button", "xp+25 yp w23 h23 Center +0x200 vdownloadSetupsButton" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Click", downloadSetups)
 		setButtonIcon(centerGui["downloadSetupsButton"], kIconsDirectory . "Download.ico", 1, "L4 T4 R4 B4")
 
 		centerTab.UseTab(5 + ((this.Mode = "Normal") ? 1 : 0))

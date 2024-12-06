@@ -1250,7 +1250,10 @@ systemMonitor(command := false, arguments*) {
 				if (state = "Active") {
 					overallState := "Active"
 
-					state := translate("Active")
+					if getMultiMapValue(controllerState, key, "Restricted", false)
+						state := translate("Restricted")
+					else
+						state := translate("Active")
 
 					configuration := readMultiMap(kTempDirectory . key . ".state")
 
@@ -2042,7 +2045,7 @@ clearOrphaneStateFiles() {
 
 	for ignore, fileName in getFileNames("*.state", kTempDirectory) {
 		SplitPath(fileName, , , , &name)
-	
+
 		if inList(kStateFiles, name) {
 			if !inList(excludedFiles, fileName) {
 				if !stateFiles.Has(fileName)

@@ -1350,6 +1350,10 @@ class RaceAssistant extends ConfigurationItem {
 		*/
 	}
 
+	interrupt() {
+		this.VoiceManager.interrupt()
+	}
+
 	mute() {
 		this.deactivateRecognized([])
 	}
@@ -1357,7 +1361,6 @@ class RaceAssistant extends ConfigurationItem {
 	unmute() {
 		this.activateRecognized([])
 	}
-
 
 	nameRecognized(words) {
 		this.getSpeaker().speakPhrase("IHearYou")

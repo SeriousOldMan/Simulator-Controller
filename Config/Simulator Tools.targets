@@ -25,6 +25,7 @@ Release 5.8.7=Release 5.8.6 -> updateConfigurationForV587
 Release 5.9.0=Release 5.8.7 -> renewConsent
 Release 5.9.3=Release 5.9.0 -> updateConfigurationForV593
 Release 6.0.0=Release 5.9.3 -> updateStreamDeckIconPreset, updateActionLabels, updateActionIcons
+Release 6.0.1=Release 6.0.0 -> updateStreamDeckIconPreset, updateActionLabels, updateActionIcons
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

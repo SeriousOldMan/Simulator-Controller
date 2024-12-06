@@ -21,7 +21,7 @@
   1. Controller action and voice command to enable/disable data collection
   2. Better answers by the Strategist, when a pitstop cannot be recommended
   3. Simple on-track coaching mode for the Driving Coach **without** a connected LLM.
-  4. Direct critics by the Coach for the last section during on-track coaching.
+  4. Direct critics by the Coach for the last section during on-track coaching
 
 #### Session Database
   1. Active validation of value ranges in settings definitions

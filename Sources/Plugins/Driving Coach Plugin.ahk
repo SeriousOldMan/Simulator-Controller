@@ -246,7 +246,7 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 		local problem, state
 
 		if this.Active {
-			if this.RaceAssistantEnabled {
+			if this.Enabled {
 				if this.RaceAssistant {
 					if (this.iServiceState != "Available") {
 						setMultiMapValue(configuration, this.Plugin, "State", "Critical")
@@ -269,10 +269,10 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 					information := (translate("Started: ") . translate(this.RaceAssistant ? "Yes" : "No"))
 
 					if (this.iServiceState = "Available") {
-						if !this.RaceAssistantSpeaker
+						if !this.Speaker
 							information .= ("; " . translate("Silent: ") . translate("Yes"))
 
-						if this.RaceAssistantMuted
+						if this.Muted
 							information .= ("; " . translate("Muted: ") . translate("Yes"))
 					}
 					else if (InStr(this.iServiceState, "Error") = 1)

@@ -1,3 +1,8 @@
+## 6.0.2.0-release 12/20/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. [Expert] Many parameters of all Race Assistant plugins have been renamed. The old names are still supported for compatibility reasons, but they are deprecated.
+
 ## 6.0.1.0-release 12/13/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

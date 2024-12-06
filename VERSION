@@ -1,9 +1,9 @@
 [Development]
-Version=6.0.1.0-dev
-Target=6.0.1.0-release
-Date=12/03/2024
+Version=6.0.2.0-dev
+Target=6.0.2.0-release
+Date=12/04/2024
 Download=
-Changes=Optimized asynchronous speaking status of all Assistants, Interrupt Assistant voice output, New controller action "Interrupt" for all Assistants, New Stream Deck icon for "Interrupt" action, Improved telemetry importer, Simple on-track coaching without LLM for the Driving Coach
+Changes=Renamed many parameters of the Assistant plugins
 Components=Media->5.6.1,Configuration->6.0.1,Utilities->5.9.8
 [Release]
 Version=5.9.9.0-release
@@ -30,5 +30,5 @@ Utilities.5.9.8.Download=https://www.dropbox.com/scl/fi/pjtq7f3u6uoy5ld88vqz9/Ut
 [Current]
 Type=Development
 [Version]
-Development=6.0.1.0-dev
+Development=6.0.2.0-dev
 Release=5.9.9.0-release

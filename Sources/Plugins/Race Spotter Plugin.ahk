@@ -735,6 +735,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 							break
 					}
 				}
+
+				this.iMapperPID := false
 			}
 		}
 

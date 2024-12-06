@@ -117,6 +117,7 @@ class VoiceServer extends ConfigurationItem {
 
 		iActivationCallback := false
 		iDeactivationCallback := false
+		iSpeakingStatusCallback := false
 		iVoiceCommands := CaseInsenseMap()
 
 		class ClientSpeechSynthesizer extends SpeechSynthesizer {
@@ -375,6 +376,12 @@ class VoiceServer extends ConfigurationItem {
 			}
 		}
 
+		SpeakingStatusCallback {
+			Get {
+				return this.iSpeakingStatusCallback
+			}
+		}
+
 		VoiceCommands[key := kUndefined] {
 			Get {
 				if (key != kUndefined)
@@ -436,7 +443,7 @@ class VoiceServer extends ConfigurationItem {
 		__New(voiceServer, descriptor, routing, pid
 			, language, synthesizer, speaker, recognizer, listener
 			, speakerVolume, speakerPitch, speakerSpeed, speakerBooster, listenerBooster
-			, activationCallback, deactivationCallback, recognizerMode) {
+			, activationCallback, deactivationCallback, speakingStatusCallback, recognizerMode) {
 			this.iVoiceServer := voiceServer
 			this.iDescriptor := descriptor
 			this.iRouting := routing
@@ -454,6 +461,7 @@ class VoiceServer extends ConfigurationItem {
 			this.iListenerBooster := listenerBooster
 			this.iActivationCallback := activationCallback
 			this.iDeactivationCallback := deactivationCallback
+			this.iSpeakingStatusCallback := speakingStatusCallback
 		}
 
 		speak(text, options := false) {
@@ -470,6 +478,9 @@ class VoiceServer extends ConfigurationItem {
 			oldInterruptable := this.iInterruptable
 
 			try {
+				if !this.Speaking
+					this.startSpeaking()
+
 				this.iSpeaking := true
 				this.iInterruptable := true
 
@@ -481,11 +492,20 @@ class VoiceServer extends ConfigurationItem {
 							if !this.Interrupted
 								this.SpeechSynthesizer[true].speak(text, true, false, options)
 
-							if this.Interrupted {
+							if (this.Interrupted = "Abort") {
+								this.iInterrupted := false
+
+								break
+							}
+							else if this.Interrupted {
 								Sleep(2000)
 
-								while this.Muted
-									Sleep(100)
+								while this.Muted {
+									while this.Muted
+										Sleep(100)
+
+									Sleep(Round(Random(1, 2000)))
+								}
 
 								this.iInterrupted := false
 							}
@@ -497,12 +517,25 @@ class VoiceServer extends ConfigurationItem {
 				finally {
 					this.iInterruptable := oldInterruptable
 					this.iSpeaking := oldSpeaking
+
+					if !this.Speaking
+						this.stopSpeaking()
 				}
 			}
 			finally {
 				if stopped
 					this.VoiceServer.startListening()
 			}
+		}
+
+		startSpeaking() {
+			if this.SpeakingStatusCallback
+				messageSend(kFileMessage, "Voice", this.SpeakingStatusCallback . ":Start", this.PID)
+		}
+
+		stopSpeaking() {
+			if this.SpeakingStatusCallback
+				messageSend(kFileMessage, "Voice", this.SpeakingStatusCallback . ":Stop", this.PID)
 		}
 
 		startListening(retry := true) {
@@ -541,11 +574,18 @@ class VoiceServer extends ConfigurationItem {
 				}
 		}
 
+		interrupt() {
+			local synthesizer := this.SpeechSynthesizer
+
+			if (synthesizer && this.Speaking && !this.Interrupted && this.Interruptable && synthesizer.Stoppable)
+				this.iInterrupted := (synthesizer.stop() ? "Abort" : false)
+		}
+
 		mute() {
 			local synthesizer := this.SpeechSynthesizer
 
 			if (synthesizer && this.Speaking && !this.Interrupted && this.Interruptable && synthesizer.Stoppable)
-					this.iInterrupted := synthesizer.stop()
+				this.iInterrupted := synthesizer.stop()
 
 			if !this.Muted {
 				this.iMuted := true
@@ -1119,6 +1159,16 @@ class VoiceServer extends ConfigurationItem {
 		return (activeClient ? activeClient.stopListening(retry) : this.stopActivationListener(retry))
 	}
 
+	interrupt(descriptor := false) {
+		local ignore, client
+
+		if descriptor
+			this.getVoiceClient(descriptor).interrupt()
+		else
+			for ignore, client in this.VoiceClients
+				client.interrupt()
+	}
+
 	mute() {
 		local ignore, client
 
@@ -1166,8 +1216,8 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	registerVoiceClient(descriptor, routing, pid
-					  , activationCommand := false, activationCallback := false, deactivationCallback := false, language := false
-					  , synthesizer := true, speaker := true, recognizer := false, listener := false
+					  , activationCommand := false, activationCallback := false, deactivationCallback := false, speakingStatusCallback := false
+					  , language := false, synthesizer := true, speaker := true, recognizer := false, listener := false
 					  , speakerVolume := kUndefined, speakerPitch := kUndefined, speakerSpeed := kUndefined
 					  , speakerBooster := false, listenerBooster := false
 					  , recognizerMode := "Grammar") {
@@ -1207,7 +1257,7 @@ class VoiceServer extends ConfigurationItem {
 
 		client := VoiceServer.VoiceClient(this, descriptor, routing, pid, language, synthesizer, speaker, recognizer, listener
 											  , speakerVolume, speakerPitch, speakerSpeed, speakerBooster, listenerBooster
-											  , activationCallback, deactivationCallback, recognizerMode)
+											  , activationCallback, deactivationCallback, speakingStatusCallback, recognizerMode)
 
 		this.VoiceClients[descriptor] := client
 

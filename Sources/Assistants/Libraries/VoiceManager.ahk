@@ -138,8 +138,8 @@ class VoiceManager extends ConfigurationItem {
 			this.iLanguage := language
 		}
 
-		beginTalk() {
-			if this.UseTalking
+		beginTalk(force := false) {
+			if (force || this.UseTalking)
 				this.iIsTalking := true
 		}
 
@@ -289,8 +289,8 @@ class VoiceManager extends ConfigurationItem {
 			super.__New(synthesizer, speaker, language)
 		}
 
-		beginTalk() {
-			if this.UseTalking
+		beginTalk(options := false) {
+			if ((options && options.HasProp("Talking") && options.Talking) || this.UseTalking)
 				this.iIsTalking := true
 		}
 
@@ -999,6 +999,7 @@ class VoiceManager extends ConfigurationItem {
 										, "registerVoiceClient:" . values2String(";", this.Name, this.Routing, ProcessExist()
 																					, StrReplace(activationCommand, ";", ",")
 																					, "remoteActivationRecognized", "remoteDeactivationRecognized"
+																					, "remoteSpeakingStatusUpdate"
 																					, this.Language, this.Synthesizer, this.Speaker
 																					, this.Recognizer, this.Listener
 																					, this.SpeakerVolume, this.SpeakerPitch, this.SpeakerSpeed
@@ -1095,6 +1096,16 @@ class VoiceManager extends ConfigurationItem {
 
 				return true
 			}
+	}
+
+	interrupt(all := false) {
+		local voiceServer := this.VoiceServer
+
+		if voiceServer
+			if all
+				messageSend(kWindowMessage, "Voice", "interrupt", "ahk_pid " . this.VoiceServer, "INTR")
+			else
+				messageSend(kWindowMessage, "Voice", "interrupt:" . this.Name, "ahk_pid " . this.VoiceServer, "INTR")
 	}
 
 	mute() {
@@ -1301,6 +1312,13 @@ class VoiceManager extends ConfigurationItem {
 
 	remoteDeactivationRecognized(words*) {
 		; this.clearContinuation()
+	}
+
+	remoteSpeakingStatusUpdate(status) {
+		if (status = "Start")
+			this.Speaking := true
+		else if (status = "Stop")
+			this.Speaking := false
 	}
 
 	remoteCommandRecognized(grammar, command, words*) {

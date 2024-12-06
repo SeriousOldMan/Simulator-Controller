@@ -171,7 +171,7 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {
 		local descriptor
 
-		if (inList(["RaceAssistant", "Call", "SetupWorkbenchOpen"], action))
+		if (inList(["RaceAssistant", "Call", "SetupWorkbenchOpen", "Interrupt"], action))
 			super.createRaceAssistantAction(controller, action, actionFunction, arguments*)
 		else if (action = "TelemetryCoaching") {
 			descriptor := ConfigurationItem.descriptor(action, "Toggle")
@@ -243,14 +243,28 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 	}
 
 	writePluginState(configuration) {
-		local problem
+		local problem, state
 
 		if this.Active {
 			if this.RaceAssistantEnabled {
 				if this.RaceAssistant {
-					setMultiMapValue(configuration, "Race Assistants", this.Plugin, (this.iServiceState = "Available") ? "Active" : "Critical")
+					if (this.iServiceState != "Available") {
+						setMultiMapValue(configuration, this.Plugin, "State", "Critical")
 
-					setMultiMapValue(configuration, this.Plugin, "State", (this.iServiceState = "Available") ? "Active" : "Critical")
+						if ((InStr(this.iServiceState, "Error") = 1)
+						 && ((string2Values(":", this.iServiceState)[2] = "Configuration")
+						  || (string2Values(":", this.iServiceState)[2] = "Connection"))) {
+							setMultiMapValue(configuration, "Race Assistants", this.Plugin, "Active")
+
+							setMultiMapValue(configuration, this.Plugin, "Restricted", true)
+						}
+						else
+							setMultiMapValue(configuration, "Race Assistants", this.Plugin, "Critical")
+					}
+					else {
+						setMultiMapValue(configuration, "Race Assistants", this.Plugin, "Active")
+						setMultiMapValue(configuration, this.Plugin, "State", "Active")
+					}
 
 					information := (translate("Started: ") . translate(this.RaceAssistant ? "Yes" : "No"))
 
@@ -263,7 +277,6 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 					}
 					else if (InStr(this.iServiceState, "Error") = 1)
 						information .= ("; " . translate("Problem: ") . translate(string2Values(":", this.iServiceState)[2]))
-
 
 					setMultiMapValue(configuration, this.Plugin, "Information", information)
 				}

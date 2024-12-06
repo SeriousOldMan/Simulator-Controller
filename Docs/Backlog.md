@@ -26,6 +26,7 @@
 #### Session Database
   1. Active validation of value ranges in settings definitions
   2. Auto track section creation based on lap telemetry data
+  3. Integration with an upcoming REST/JSON realtime interface of Second Monitor
 
 #### Setup Workbench
   1. Collect telemetry data from multiple drivers and generate combined setup recommendations

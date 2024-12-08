@@ -37,6 +37,7 @@
   1. Multi session tyre management - manage tyre sets and driven laps for a whole weekend (Practice, Qualifying, Race 1, Race 2, ...)
   2. Introduce data groups (for example all data belonging to a complete weekend w. practice, qualiy and race) and make this group usable for future strategy calculation
   3. Handle DT as an alternative to reset the stint timer at the end of a race
+  4. Integrate Code Editor plugin for editing scenario validation rules
 
 #### Team Center
   1. Change hot target pressures for the next pitstop

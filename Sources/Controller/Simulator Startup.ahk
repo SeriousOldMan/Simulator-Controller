@@ -483,6 +483,7 @@ launchPad(command := false, arguments*) {
 
 	getStartupProfile() {
 		local startupProfile := translate("Standard")
+		local profiles, profile
 
 		if FileExist(kUserConfigDirectory . "Startup.settings") {
 			if gStartupProfile {
@@ -516,8 +517,10 @@ launchPad(command := false, arguments*) {
 	}
 
 	launchStartup(configure, *) {
+		global gStartupProfile
+
 		local x, y, w, h, mX, mY
-		local curCoordMode
+		local curCoordMode, clickStart, profiles, profilesMenu, ignore, profile, result
 
 		if !configure
 			configure := GetKeyState("Ctrl")
@@ -538,9 +541,53 @@ launchPad(command := false, arguments*) {
 
 			if ((mX >= x) && (mX <= (x + w)) && (mY >= y) && (mY <= (y + h)))
 				configure := true
+			else {
+				clickStart := A_TickCount
+
+				while (GetKeyState("LButton") && (A_TickCount <= (clickStart + 1000)))
+					Sleep(10)
+
+				if (A_TickCount > (clickStart + 1000))
+					configure := "Choose"
+			}
 		}
 
-		if configure {
+		if (configure = "Choose") {
+			profiles := string2Values(";|;", getMultiMapValue(readMultiMap(kUserConfigDirectory . "Startup.settings")
+																		 , "Profiles", "Profiles", ""))
+			profilesMenu := Menu()
+
+			profilesMenu.Add(translate("Standard"), (*) => result := true)
+
+			if !gStartupProfile
+				profilesMenu.Check(translate("Standard"))
+
+			for ignore, profile in profiles {
+				profilesMenu.Add(profile, (profile, *) => result := profile)
+
+				if (profile = gStartupProfile)
+					profilesMenu.Check(profile)
+			}
+
+			profilesMenu.Add()
+			profilesMenu.Add(translate("Cancel"), (*) => result := false)
+
+			result := kUndefined
+
+			profilesMenu.Show()
+
+			while (result = kUndefined)
+				Sleep(100)
+
+			if result {
+				startupButton.Text := ("Startup`n" . ((result = true) ? translate("Standard") : result))
+
+				gStartupProfile := ((result = true) ? false : result)
+
+				launchPad("Startup")
+			}
+		}
+		else if configure {
 			if (editStartupProfiles(launchPadGui) = "Startup") {
 				startupButton.Text := ("Startup`n" . getStartupProfile())
 

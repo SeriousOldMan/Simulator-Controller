@@ -290,8 +290,8 @@ class DrivingCoach extends GridRaceAssistant {
 
 		this.loadInstructions(configuration)
 
-		this.updateConfigurationValues({Announcements: {SessionInformation: true, StintInformation: false, HandlingInformation: false}}
-									 , {OnTrackCoaching: false})
+		this.updateConfigurationValues({Announcements: {SessionInformation: true, StintInformation: false, HandlingInformation: false}
+									  , OnTrackCoaching: false})
 
 		DirCreate(this.Options["Driving Coach.Archive"])
 

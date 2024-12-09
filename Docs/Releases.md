@@ -1,11 +1,13 @@
 ## 6.0.1.0-release 12/13/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. A new controller action "Interrupt" is available for all Assistants, which can be used to interrupt a lengthy speech. Bind it to a button on your steering wheel for all Assistants, for example.
-  4. New Stream Deck icon for the above "Interrupt" action.
-  5. The telemetry importer has been improved to also read the lap time, sector times, and so on, if htis information is available. This is useful, when importing lap telemetry data after a race from the telemetry collection of the Driving Coach, which is located in [Documents]\Simulator Controller\Temp\Driving Coach\Telemetry.
-  6. The Driving Coach now supplies a basic and somewhat [restricted on-track coaching](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#using-the-driving-coach-without-an-llm) when an LLM for the Coach has not yet been configured. Since this is the default configuration for a fresh installation, the Coach is already usable to some extent without being fully configured.
-  7. [Internal] Optimized asynchronous speaking status of all Assistants. This gives the Driving Coach more room for the corner by corner instructions. 
+  3. Fixed editing of track automation points, which was broken with 6.0.0.
+  4. A new controller action "Interrupt" is available for all Assistants, which can be used to interrupt a lengthy speech. Bind it to a button on your steering wheel for all Assistants, for example.
+  5. New Stream Deck icon for the above "Interrupt" action.
+  6. The telemetry importer has been improved to also read the lap time, sector times, and so on, if this information is available. This is useful, when importing lap telemetry data after a race from the telemetry collection of the Driving Coach, which is located in [Documents]\Simulator Controller\Temp\Driving Coach\Telemetry.
+  7. A new convinience shortcut has been implemented in "Simulator Startup" to select the startup profile. Hold down the mouse button for at least a second when clicking on the "Startup" button to choose the profile for the next startup. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#notes) for more information.
+  8. The Driving Coach now supplies a basic and somewhat [restricted on-track coaching](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#using-the-driving-coach-without-an-llm) when an LLM for the Coach has not yet been configured. Since this is the default configuration for a fresh installation, the Coach is already usable to some extent without being fully configured.
+  9. [Internal] Optimized asynchronous speaking status of all Assistants. This gives the Driving Coach more room for the corner by corner instructions. 
   
 ## 6.0.0.0-release 12/06/24
   1. Minor bugfixes, as always

@@ -1294,7 +1294,7 @@ class SoloCenter extends ConfigurationItem {
 							for ignore, lap in run.Laps
 								center.LapsListView.Modify(lap.Row, "-Check")
 
-						center.withExceptionhandler(ObjBindMethod(center, "showRunDetails", run, selected ? false : unset))
+						center.withExceptionhandler(ObjBindMethod(center, "showRunDetails", run, selected ? false : GetKeyState("Ctrl")))
 
 						centerGui["runNotesEdit"].Text := run.Notes
 
@@ -1360,7 +1360,7 @@ class SoloCenter extends ConfigurationItem {
 						if (center.SessionExported || center.SessionLoaded)
 							listView.Modify(line, "-Check")
 
-						center.withExceptionhandler(ObjBindMethod(center, "showLapDetails", center.Laps[listView.GetText(line, 1)], selected ? false : unset))
+						center.withExceptionhandler(ObjBindMethod(center, "showLapDetails", center.Laps[listView.GetText(line, 1)], selected ? false : GetKeyState("Ctrl")))
 					}
 				}, 200)
 			}
@@ -2584,7 +2584,7 @@ class SoloCenter extends ConfigurationItem {
 			case 14: ; Update Statistics
 				this.updateStatistics()
 			case 16: ; Session Summary
-				this.showSessionSummary()
+				this.showSessionSummary(GetKeyState("Ctrl"))
 			case 18: ; Export data
 				if (this.HasData && !this.SessionExported) {
 					OnMessage(0x44, translateYesNoButtons)
@@ -2652,7 +2652,7 @@ class SoloCenter extends ConfigurationItem {
 						this.analyzeTelemetry()
 					}
 					else if ((line - (this.AvailableTyreCompounds.Length + 1)) = 1) ; Data Summary
-						this.showDataSummary()
+						this.showDataSummary(GetKeyState("Ctrl"))
 				}
 		}
 
@@ -2674,7 +2674,7 @@ class SoloCenter extends ConfigurationItem {
 						OnMessage(0x44, translateOkButton, 0)
 					}
 				case 5:
-					this.showRunsSummary()
+					this.showRunsSummary(GetKeyState("Ctrl"))
 			}
 		}
 		else if (line = 3)
@@ -4177,12 +4177,12 @@ class SoloCenter extends ConfigurationItem {
 			selectedLap := this.LapsListView.GetNext(0)
 
 			if (selectedLap && (this.SelectedDetailReport = "Lap"))
-				this.showLapDetails(this.Laps[selectedLap], false)
+				this.showLapDetails(this.Laps[selectedLap])
 			else {
 				selectedRun := this.RunsListView.GetNext(0)
 
 				if (selectedRun && (this.SelectedDetailReport = "Run"))
-					this.showRunDetails(this.Runs[selectedRun], false)
+					this.showRunDetails(this.Runs[selectedRun])
 				else if (this.SelectedDetailReport && this.iSelectedDetailHTML) {
 					this.DetailsViewer.document.open()
 					this.DetailsViewer.document.write(this.iSelectedDetailHTML)
@@ -4200,16 +4200,16 @@ class SoloCenter extends ConfigurationItem {
 			if (selectLap && (this.SelectedDetailReport = "Lap")) {
 				this.LapsListView.Modify(this.LapsListView.GetCount(), "Select Vis")
 
-				this.showLapDetails(this.LastLap, false)
+				this.showLapDetails(this.LastLap)
 			}
 			else if (selectRun && (this.SelectedDetailReport = "Run")) {
 				this.RunsListView.Modify(this.RunsListView.GetCount(), "Select Vis")
 
-				this.showRunDetails(this.CurrentRun, false)
+				this.showRunDetails(this.CurrentRun)
 			}
 			else {
 				if (this.SelectedDetailReport = "Data")
-					this.showDataSummary(false)
+					this.showDataSummary()
 				else if (this.SelectedDetailReport = "Session")
 					this.showSessionSummary(false)
 				else if (this.SelectedDetailReport = "Runs")
@@ -6585,7 +6585,7 @@ class SoloCenter extends ConfigurationItem {
 		return drawChartFunction
 	}
 
-	showDataSummary(viewer := GetKeyState("Ctrl")) {
+	showDataSummary(viewer := false) {
 		local telemetryDB := this.TelemetryDatabase
 		local html := ("<div id=`"header`"><b>" . translate("Data Summary") . "</b></div>")
 		local simulator := this.Simulator
@@ -6697,7 +6697,7 @@ class SoloCenter extends ConfigurationItem {
 		this.showDetails("Data", !viewer ? false : translate("Data Summary"), html)
 	}
 
-	showSessionSummary(viewer := GetKeyState("Ctrl")) {
+	showSessionSummary(viewer := false) {
 		local telemetryDB := this.TelemetryDatabase
 		local html := ("<div id=`"header`"><b>" . translate("Session Summary") . "</b></div>")
 		local runs := []
@@ -6836,7 +6836,7 @@ class SoloCenter extends ConfigurationItem {
 		this.showDetails("Session", !viewer ? false : translate("Session Summary"), html, [1, chart1])
 	}
 
-	showRunsSummary(viewer := GetKeyState("Ctrl")) {
+	showRunsSummary(viewer := false) {
 		local telemetryDB := this.TelemetryDatabase
 		local html := ("<div id=`"header`"><b>" . translate("Stints Summary") . "</b></div>")
 		local runs := []
@@ -7221,7 +7221,7 @@ class SoloCenter extends ConfigurationItem {
 		return html
 	}
 
-	showRunDetails(run, viewer := GetKeyState("Ctrl")) {
+	showRunDetails(run, viewer := false) {
 		showRunDetailsAsync(run) {
 			local html := ("<div id=`"header`"><b>" . translate("Stint: ") . run.Nr . "</b></div>")
 			local laps := []
@@ -7568,7 +7568,7 @@ class SoloCenter extends ConfigurationItem {
 		return html
 	}
 
-	showLapDetails(lap, viewer := GetKeyState("Ctrl")) {
+	showLapDetails(lap, viewer := false) {
 		showLapDetailsAsync(lap) {
 			local html := ("<div id=`"header`"><b>" . translate("Lap: ") . lap.Nr . "</b></div>")
 

@@ -3323,7 +3323,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		action := actionDialog(x, y, action)
 
 		if action
-			this.updateTrackSection(action)
+			this.updateTrackAction(action)
 	}
 
 	sectionClicked(coordinateX, coordinateY, section) {

@@ -6,11 +6,11 @@ Download=
 Changes=Renamed many parameters of the Assistant plugins, Automated detection of track sections
 Components=Media->5.6.1,Configuration->6.0.1,Utilities->5.9.8
 [Release]
-Version=5.9.9.0-release
-Date=11/22/2024
-Download=https://cutt.ly/ieKAs4Yh;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+5.9.9.0-release.zip
-Changes=Updated LLM Runtime to the newest llama backend release, Open consent dialog from "Session Database", Fixed MoTeC importer, Fixed random voice handling for Assistants, Fixed channel bug in telemetry viewer, Track sections editor in Telemetry Viewer
-Components=Media->5.6.1,Configuration->5.9.8,Utilities->5.9.8
+Version=6.0.0.0-release
+Date=12/06/2024
+Download=https://cutt.ly/veXxT9sB;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.0.0.0-release.zip
+Changes=Fully interactive coaching by the Driving Coach, Added "Coaching" and "TrackCoaching" action to the Driving Coach plugin, New icons in Stream Deck icon set for the "Coaching" and "TrackCoaching" actions, New settings for corner by corner coaching, Speaker and Listener booster for Driving Coach, New controller action functions for "Driving Coach" plugin, Section explorer in Telemetry Viewer, Support for rule extensions using the *Reasoning* booster, Many new LLM instructions for the Driving Coach, Spotter no longer informs about lap time delta which is actually zero, Optimized track section click / dragging detection
+Components=Media->5.6.1,Configuration->6.0.0,Utilities->5.9.8
 [Components]
 Media.5.6.1.Path=Resources
 Media.5.6.1.Content=Splash Media
@@ -21,9 +21,6 @@ Configuration.6.0.0.Download=https://www.dropbox.com/scl/fi/ijsahtdj6w6n66g2n2ia
 Configuration.6.0.1.Path=Resources
 Configuration.6.0.1.Content=Setup  
 Configuration.6.0.1.Download=https://www.dropbox.com/scl/fi/pxxweuqlu5nhn3rjlo746/Configuration-6.0.1.zip?rlkey=bl4q8dsu71hscb6ug2v7sykwz&st=w8q6ujzu&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.0.1.zip
-Configuration.5.9.8.Path=Resources
-Configuration.5.9.8.Content=Setup
-Configuration.5.9.8.Download=https://www.dropbox.com/scl/fi/551prmyyi64mtszwn713c/Configuration-5.9.8.zip?rlkey=xh7441tk4799ra43bap747n1u&st=8t6klbsq&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+5.9.8.zip
 Utilities.5.9.8.Path=.
 Utilities.5.9.8.Content=Utilities
 Utilities.5.9.8.Download=https://www.dropbox.com/scl/fi/pjtq7f3u6uoy5ld88vqz9/Utilities-5.9.8.zip?rlkey=crido9soi8aiocepz10xdoev3&st=cprt4qr2&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.9.8.zip
@@ -31,4 +28,4 @@ Utilities.5.9.8.Download=https://www.dropbox.com/scl/fi/pjtq7f3u6uoy5ld88vqz9/Ut
 Type=Development
 [Version]
 Development=6.0.2.0-dev
-Release=5.9.9.0-release
+Release=6.0.0.0-release

@@ -368,7 +368,7 @@ Beside using an LLM to interact with the driver, the Driving Coach uses the same
 
 Unlike the other Assistants, whose knowledge base, i.e. their memory, is deleted at the end of a session, Aidens memory will still be around until the start of the next session. This makes it possible to analyze and discuss various aspects of the session with Aiden after the end of a session. This retained memory covers everything from the performance information like lap and sector times, as well as position information and also includes handling information, if this was enabled during the session.
 
-The active coaching based on lap telemetry data deserves a more detailed explanation. The apporach to enable the Driving Coach to understand the telemetry data is a three step process. In the first step a special alorithm using an ML model identifies the most important driver input related variables that affect the time used through a part of the track based on the sections defined in the track map and extracts important high-level information from the raw telemetry data. This information is converted into a JSON format, which looks like this:
+The active coaching based on lap telemetry data deserves a more detailed explanation. The apporach to enable the Driving Coach to understand the telemetry data is a three step process. In the first step a special algorithm using an ML model identifies the most important driver input related variables that affect the time used through a part of the track based on the sections defined in the track map and extracts important high-level information from the raw telemetry data. This information is converted into a JSON format, which looks like this:
 
 	{
 	  "Driver": "Oliver Juwig",
@@ -481,7 +481,7 @@ Depending on the [race settings](https://github.com/SeriousOldMan/Simulator-Cont
 
 ### About attention deficits, hallucinations and other funny stuff
 
-The Driving Coach does not tell you the truth all the time and occasionally even makes things up. Therefore always double check the recommendations and instructions given by the Coach against your own experiences and expectations. However, the deviations from the "truth" are sometimes very sublte and hard to detect. But what is the reason for this:
+The Driving Coach does not tell you the truth all the time and occasionally even makes things up. Therefore always double check the recommendations and instructions given by the Coach against your own experiences and expectations. However, the deviations from the "truth" are sometimes very subtle and hard to detect. But what is the reason for this:
 
   1. A large language model simulates intelligence. Although it is doing this really well, the constant feedback loop of self-aware thinking is missing. An LLM does not really understand the topic it is talking about, it just derives the probability of words in the given context. Since there is also random factor in play (the *Creativity*, as defined in the configuration), it can happen, that an LLM creates answers that sound totally plausible, but are utterly wrong. If you encounter this too often, reduce the *Creativity* setting. This will reduce the variation in the answers of the model, but will also reduce hallucinations.
   

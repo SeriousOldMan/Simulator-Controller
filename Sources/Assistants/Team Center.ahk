@@ -1651,7 +1651,7 @@ class TeamCenter extends ConfigurationItem {
 
 				Task.startTask(() {
 					if !wasDouble
-						center.withExceptionhandler(ObjBindMethod(center, "showStintDetails", center.Stints[listView.GetText(line, 1)], selected ? false : unset))
+						center.withExceptionhandler(ObjBindMethod(center, "showStintDetails", center.Stints[listView.GetText(line, 1)], selected ? false : GetKeyState("Ctrl")))
 				}, 200)
 			}
 		}
@@ -1675,7 +1675,7 @@ class TeamCenter extends ConfigurationItem {
 
 				Task.startTask(() {
 					if !wasDouble
-						center.withExceptionhandler(ObjBindMethod(center, "showLapDetails", center.Laps[listView.GetText(line, 1)], selected ? false : unset))
+						center.withExceptionhandler(ObjBindMethod(center, "showLapDetails", center.Laps[listView.GetText(line, 1)], selected ? false : GetKeyState("Ctrl")))
 				}, 200)
 			}
 		}
@@ -2038,7 +2038,7 @@ class TeamCenter extends ConfigurationItem {
 			center.withExceptionhandler(ObjBindMethod(center, "planPitstop"))
 		}
 
-		pitstopSelected(line, show, viewer?) {
+		pitstopSelected(line, show, viewer) {
 			local sessionStore := center.SessionStore
 			local pitstops := sessionStore.Tables["Pitstop.Data"]
 			local pitstop
@@ -2056,7 +2056,7 @@ class TeamCenter extends ConfigurationItem {
 					center.PitstopsListView.Modify(line, "Check")
 
 					if show
-						center.withExceptionhandler(ObjBindMethod(center, "showPitstopDetails", pitstop, viewer?))
+						center.withExceptionhandler(ObjBindMethod(center, "showPitstopDetails", pitstop, viewer))
 				}
 				else {
 					center.PitstopsListView.Modify(line, "Check")
@@ -2077,7 +2077,7 @@ class TeamCenter extends ConfigurationItem {
 
 			Task.startTask(() {
 				if !wasDouble
-					pitstopSelected(line, (this.Mode = "Normal"), selected ? false : unset)
+					pitstopSelected(line, (this.Mode = "Normal"), selected ? false : GetKeyState("Ctrl"))
 			}, 200)
 		}
 
@@ -5055,9 +5055,9 @@ class TeamCenter extends ConfigurationItem {
 				case 15: ; Update Statistics
 					this.updateStatistics()
 				case 18: ; Race Summary
-					this.showSessionSummary()
+					this.showSessionSummary(GetKeyState("Ctrl"))
 				case 19: ; Driver Statistics
-					this.showDriverStatistics()
+					this.showDriverStatistics(GetKeyState("Ctrl"))
 			}
 		}
 		else {
@@ -5100,9 +5100,9 @@ class TeamCenter extends ConfigurationItem {
 				case 3: ; Update Statistics
 					this.updateStatistics()
 				case 4: ; Race Summary
-					this.showSessionSummary()
+					this.showSessionSummary(GetKeyState("Ctrl"))
 				case 5: ; Driver Statistics
-					this.showDriverStatistics()
+					this.showDriverStatistics(GetKeyState("Ctrl"))
 				case 6: ; Session Information
 					Run("`"" . kBinariesDirectory . "System Monitor.exe`" -Show Session", kBinariesDirectory)
 			}
@@ -5352,7 +5352,7 @@ class TeamCenter extends ConfigurationItem {
 			case 4:
 				this.pushTask(ObjBindMethod(this, "clearPlan"))
 			case 6:
-				this.showPlanDetails()
+				this.showPlanDetails(GetKeyState("Ctrl"))
 
 				this.iSelectedDetailReport := "Plan"
 			case 8:
@@ -5481,11 +5481,11 @@ class TeamCenter extends ConfigurationItem {
 				case 11:
 					this.pushTask(downloadSetups)
 				case 13:
-					this.showSetupsDetails()
+					this.showSetupsDetails(GetKeyState("Ctrl"))
 
 					this.iSelectedDetailReport := "Setups"
 				case 14:
-					this.showPitstopsDetails()
+					this.showPitstopsDetails(GetKeyState("Ctrl"))
 
 					this.iSelectedDetailReport := "Pitstops"
 				case 16:
@@ -5531,9 +5531,9 @@ class TeamCenter extends ConfigurationItem {
 				case 6:
 					this.pushTask(downloadSetups)
 				case 7:
-					this.showSetupsDetails()
+					this.showSetupsDetails(GetKeyState("Ctrl"))
 				case 8:
-					this.showPitstopsDetails()
+					this.showPitstopsDetails(GetKeyState("Ctrl"))
 				case 9:
 					this.iTyrePressureMode := ((this.TyrePressureMode = "Reference") ? false : "Reference")
 
@@ -11824,7 +11824,7 @@ class TeamCenter extends ConfigurationItem {
 		return html
 	}
 
-	showStintDetails(stint, viewer := GetKeyState("Ctrl")) {
+	showStintDetails(stint, viewer := false) {
 		showStintDetailsAsync(stint) {
 			local html := ("<div id=`"header`"><b>" . translate("Stint: ") . stint.Nr . "</b></div>")
 			local laps := []
@@ -12206,7 +12206,7 @@ class TeamCenter extends ConfigurationItem {
 		return html
 	}
 
-	showLapDetails(lap, viewer := GetKeyState("Ctrl")) {
+	showLapDetails(lap, viewer := false) {
 		showLapDetailsAsync(lap) {
 			local html := ("<div id=`"header`"><b>" . translate("Lap: ") . lap.Nr . "</b></div>")
 
@@ -12517,7 +12517,7 @@ class TeamCenter extends ConfigurationItem {
 		return html
 	}
 
-	showPitstopDetails(pitstopNr, viewer := GetKeyState("Ctrl")) {
+	showPitstopDetails(pitstopNr, viewer := false) {
 		showPitstopDetailsAsync(pitstopNr) {
 			local pitstopData := this.SessionStore.Tables["Pitstop.Data"][pitstopNr]
 			local html, tyreCompound, tyreCompoundColor, tyreWearDetails
@@ -12712,7 +12712,7 @@ class TeamCenter extends ConfigurationItem {
 		return html
 	}
 
-	showPitstopsDetails(viewer := GetKeyState("Ctrl")) {
+	showPitstopsDetails(viewer := false) {
 		showPitstopsDetailsAsync() {
 			local html := ("<div id=`"header`"><b>" . translate("Pitstops Summary") . "</b></div>")
 			local pitstopData, tyreCompound, tyreWearDetails
@@ -12953,7 +12953,7 @@ class TeamCenter extends ConfigurationItem {
 		return drawChartFunction
 	}
 
-	showDriverStatistics(viewer := GetKeyState("Ctrl")) {
+	showDriverStatistics(viewer := false) {
 		local html := ("<div id=`"header`"><b>" . translate("Driver Statistics") . "</b></div>")
 		local ignore, driver, width, chart1, chart2
 
@@ -13015,7 +13015,7 @@ class TeamCenter extends ConfigurationItem {
 		return drawChartFunction
 	}
 
-	showSessionSummary(viewer := GetKeyState("Ctrl")) {
+	showSessionSummary(viewer := false) {
 		local telemetryDB := this.TelemetryDatabase
 		local html := ("<div id=`"header`"><b>" . translate("Session Summary") . "</b></div>")
 		local stints := []
@@ -13150,7 +13150,7 @@ class TeamCenter extends ConfigurationItem {
 		this.showDetails("Session", (!viewer && (this.Mode = "Normal")) ? false : translate("Session Summary"), html, [1, chart1])
 	}
 
-	showPlanDetails(viewer := GetKeyState("Ctrl")) {
+	showPlanDetails(viewer := false) {
 		local html := ("<div id=`"header`"><b>" . translate("Plan Summary") . "</b></div>")
 		local telemetryDB := this.TelemetryDatabase
 		local window := this.Window
@@ -13223,7 +13223,7 @@ class TeamCenter extends ConfigurationItem {
 		this.showDetails("Plan", (!viewer && (this.Mode = "Normal")) ? false : translate("Plan Summary"), html)
 	}
 
-	showSetupsDetails(viewer := GetKeyState("Ctrl")) {
+	showSetupsDetails(viewer := false) {
 		local html := ("<div id=`"header`"><b>" . translate("Setups Summary") . "</b></div>")
 		local window := this.Window
 		local currentListView, driver, conditions, tyreCompound, pressures, notes

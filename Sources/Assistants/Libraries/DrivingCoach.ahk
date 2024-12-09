@@ -1012,11 +1012,17 @@ class DrivingCoach extends GridRaceAssistant {
 
 	telemetryAvailable(laps) {
 		local bestLap, bestLaptime, bestInfo, telemetries, data
-		local ignore, lap, candidate, sessionDB, info, lapTime, size
+		local ignore, lap, candidate, sessionDB, info, lapTime, size, telemetry
 
 		if (this.AvailableTelemetry.Count = 0) {
 			if this.Speaker
 				this.getSpeaker().speakPhrase("CoachingReady", false, true)
+
+			if (this.TelemetryAnalyzer.TrackSections.Length = 0) {
+				telemetry := this.TelemetryAnalyzer.createTelemetry(laps[1], kTempDirectory . "Driving Coach\Telemetry\Lap " . laps[1] . ".telemetry")
+
+				this.TelemetryAnalyzer.requireTrackSections(telemetry)
+			}
 
 			if (this.LoadReference != "None") {
 				sessionDB := SessionDatabase()

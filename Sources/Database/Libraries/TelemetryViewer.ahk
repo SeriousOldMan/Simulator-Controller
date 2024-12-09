@@ -2380,6 +2380,47 @@ class TrackMap {
 			}
 		}
 
+		autoSections(*) {
+			this.Window.Block()
+
+			try {
+				withTask(WorkingTask(translate("Extracting Sections")), () {
+					local analyzer := TelemetryAnalyzer(this.Simulator, this.Track)
+					local lap := this.TelemetryViewer.SelectedLap
+					local driver, lapTime, sectorTimes, telemetry, index, section
+
+					if isNumber(lap)
+						this.TelemetryViewer.Manager.getLapInformation(lap, &driver, &lapTime, &sectorTimes)
+					else {
+						driver := lap[2]
+						lapTime := ((lap[3] != "-") ? lap[3] : false)
+						sectorTimes := lap[4]
+					}
+
+					telemetry := analyzer.createTelemetry(0, this.TelemetryViewer.SelectedLap[true], driver, lapTime, sectorTimes)
+
+					removeMultiMapValues(this.TrackMap, "Sections")
+
+					this.iTrackSections := analyzer.findTrackSections(telemetry)
+
+					this.updateTrackSections(false)
+
+					for index, section in this.TrackSections {
+						setMultiMapValue(this.TrackMap, "Sections", index . ".Index", section.Index)
+						setMultiMapValue(this.TrackMap, "Sections", index . ".Nr", section.Nr)
+						setMultiMapValue(this.TrackMap, "Sections", index . ".Type", section.Type)
+						setMultiMapValue(this.TrackMap, "Sections", index . ".X", section.X)
+						setMultiMapValue(this.TrackMap, "Sections", index . ".Y", section.Y)
+					}
+
+					this.updateTrackMap()
+				})
+			}
+			finally {
+				this.Window.Unblock()
+			}
+		}
+
 		local mapGui := TrackMap.TrackMapWindow(this, {Descriptor: "Telemetry Browser.Track Map", Closeable: true, Resizeable:  "Deferred"})
 
 		this.iWindow := mapGui
@@ -2388,7 +2429,8 @@ class TrackMap {
 
 		mapGui.Add("Text", "x88 y2 w306 H:Center Center vtrackNameDisplay")
 
-		mapGui.Add("Button", "x399 yp w23 h20 w80 Center +0x200 X:Move veditButton", translate("Edit")).OnEvent("Click", toggleMode)
+		mapGui.Add("Button", "x8 yp h20 w80 Center +0x200 X:Move vscanButton Hidden", translate("Scan")).OnEvent("Click", autoSections)
+		mapGui.Add("Button", "x399 yp h20 w80 Center +0x200 X:Move veditButton", translate("Edit")).OnEvent("Click", toggleMode)
 
 		mapGui.Add("Picture", "x0 y25 w479 h379 W:Grow H:Grow vtrackDisplayArea")
 
@@ -2539,6 +2581,7 @@ class TrackMap {
 		this.createTrackMap()
 
 		this.Control["editButton"].Enabled := true
+		this.Control["scanButton"].Visible := ((this.TrackMapMode = "Edit") && !!this.TelemetryViewer.SelectedLap)
 		this.Control["editButton"].Text := translate("Edit")
 	}
 
@@ -2551,6 +2594,7 @@ class TrackMap {
 		this.iTrackMapMode := "Position"
 
 		this.Control["editButton"].Enabled := false
+		this.Control["scanButton"].Visible := false
 		this.Control["editButton"].Text := translate("Edit")
 	}
 
@@ -2584,6 +2628,8 @@ class TrackMap {
 				this.createTrackMap(this.iLastTrackPosition[1], this.iLastTrackPosition[2])
 			else
 				this.createTrackMap()
+
+		this.Control["scanButton"].Visible := ((this.TrackMapMode = "Edit") && !!this.TelemetryViewer.SelectedLap)
 	}
 
 	updateTrackSections(save := false, async := true) {
@@ -2680,6 +2726,8 @@ class TrackMap {
 			if this.TrackMap
 				this.createTrackMap()
 		}
+
+		this.Control["scanButton"].Visible := ((this.TrackMapMode = "Edit") && !!this.TelemetryViewer.SelectedLap)
 	}
 
 	findTrackCoordinate(x, y, &coordinateX, &coordinateY, threshold := 40) {

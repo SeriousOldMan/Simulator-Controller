@@ -1,7 +1,9 @@
 ## 6.0.2.0-release 12/20/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. [Expert] Many parameters of all Race Assistant plugins have been renamed. The old names are still supported for compatibility reasons, but they are deprecated.
+  3. Track sections can be automatically created in the Telemetry Viewer based on the currently selected telemetry. Enter the "Edit" mode in the track map and use the "Scan" button.
+  4. The Driving Coach will also use automatically generated track sections if none are yet configured for the given track.
+  5. [Expert] Many parameters of all Race Assistant plugins have been renamed. The old names are still supported for compatibility reasons, but they are deprecated.
 
 ## 6.0.1.0-release 12/13/24 (planned)
   1. Minor bugfixes, as always

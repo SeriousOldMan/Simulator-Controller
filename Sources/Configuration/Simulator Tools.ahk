@@ -1753,7 +1753,7 @@ updateConfigurationForV602() {
 		text := FileRead(fileName)
 
 		for ignore, parameter in ["name", "logo", "language", "synthesizer", "speaker", "speakerVocalics", "recognizer", "listener"
-								, "speakerBooster", "listenerBooster", "conversationBooster", "agentBooster", "muted"] {
+								, "speakerBooster", "listenerBooster", "conversationBooster", "agentBooster", "muted"]
 			text := StrReplace(text, "raceAssistant" . parameter, parameter)
 
 		deleteFile(fileName, true)

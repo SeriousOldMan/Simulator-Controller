@@ -1403,6 +1403,85 @@ class TelemetryAnalyzer {
 		return data
 	}
 
+	requireTrackSections(telemetry) {
+		local index, section
+
+		if (this.TrackSections.Length = 0) {
+			this.iTrackSections := this.findTrackSections(telemetry)
+
+			for index, section in this.TrackSections {
+				setMultiMapValue(this.TrackMap, "Sections", index . ".Index", section.Index)
+				setMultiMapValue(this.TrackMap, "Sections", index . ".Nr", section.Nr)
+				setMultiMapValue(this.TrackMap, "Sections", index . ".Type", section.Type)
+				setMultiMapValue(this.TrackMap, "Sections", index . ".X", section.X)
+				setMultiMapValue(this.TrackMap, "Sections", index . ".Y", section.Y)
+			}
+		}
+	}
+
+	findTrackSections(telemetry) {
+		local trackMap := this.TrackMap
+		local sections := []
+		local count := getMultiMapValue(trackMap, "Map", "Points")
+		local index := 1
+		local phase := "Find"
+		local cornerNr := 1
+		local straightNr := 1
+		local startIndex, startX, startY, telemetryIndex, value
+
+		loop {
+			if (index > count)
+				break
+
+			x := getMultiMapValue(trackMap, "Points", index . ".X", 0)
+			y := getMultiMapValue(trackMap, "Points", index . ".Y", 0)
+
+			telemetryIndex := TelemetryAnalyzer.getTelemetryCoordinateIndex(telemetry.Data, x, y)
+
+			if telemetryIndex
+				if ((phase = "Find") || (phase = "Straight")) {
+					value := TelemetryAnalyzer.getValue(telemetry.Data[telemetryIndex], "Brake", 0)
+
+					if (value > 0) {
+						if (phase = "Straight")
+							sections.Push({Type: "Straight", Nr: straightNr++, Index: startIndex, X: startX, Y: startY})
+
+						phase := "Entry"
+						index := Max(1, index - 10)
+
+						startIndex := index
+						startX := getMultiMapValue(trackMap, "Points", index . ".X", 0)
+						startY := getMultiMapValue(trackMap, "Points", index . ".Y", 0)
+					}
+				}
+				else if (phase = "Entry") {
+					value := TelemetryAnalyzer.getValue(telemetry.Data[telemetryIndex], "Brake", 0)
+
+					if (value > 0.3)
+						phase := "Exit"
+				}
+				else if (phase = "Exit") {
+					value := TelemetryAnalyzer.getValue(telemetry.Data[telemetryIndex], "Throttle", 0)
+
+					if (value = 1.0) {
+						sections.Push({Type: "Corner", Nr: cornerNr++, Index: startIndex, X: startX, Y: startY})
+
+						phase := "Straight"
+
+						index := Min(count, index + 10)
+
+						startIndex := index
+						startX := getMultiMapValue(trackMap, "Points", index . ".X", 0)
+						startY := getMultiMapValue(trackMap, "Points", index . ".Y", 0)
+					}
+				}
+
+			index += 1
+		}
+
+		return sections
+	}
+
 	createTrackSections() {
 		local trackMap := this.TrackMap
 		local straights := 0

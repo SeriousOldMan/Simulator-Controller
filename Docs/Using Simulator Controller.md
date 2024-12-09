@@ -141,6 +141,7 @@ The checkbox for each function has three states - selected, deselected and indet
 |------------------|---------------------------------------|-------------------|-------------|
 | Driving Coach    | Performance Analysis                  | Setting           | If enabled, the standings data, lap and sector times and so on are collected and are provided to the Driving Coach for further analysis. |
 |                  | Handling Anlaysis                     | Setting           | If enabled, information about over- and understeering are collected during driving and are provided to the Driving Coach for further analysis. |
+|                  | On-track Coaching                     | Controller Action | If enabled, on-track coaching by the Driving Coach will be automatically enabled automatically. |
 | Race Spotter     | Track Mapping                         | Controller Action | Enables or disables track mapping for the given session. This can be especially useful when mapping non-circuit tracks that require a roll-forward to the start line. |
 |                  | Track Automation                      | Controller Action | Enables or disables the Track Automation for the given session. |
 | Race Strategist  | Telemetry Collection                  | Setting           | If enabled, general telemetry data is collected by the Strategist during the given session. |

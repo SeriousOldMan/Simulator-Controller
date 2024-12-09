@@ -194,7 +194,7 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 	}
 
 	loadSettings(simulator, car, track, data := false, settings := false) {
-		local analyzePerformance, analyzeHandling, ignore, session, instruction
+		local analyzePerformance, analyzeHandling, telemetryCoaching, ignore, session, instruction
 
 		settings := super.loadSettings(simulator, car, track, data, settings)
 
@@ -212,6 +212,12 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 				for ignore, session in ["Practice", "Qualification", "Race"]
 					for ignore, instruction in ["Session", "Handling"]
 						setMultiMapValue(settings, "Assistant.Coach", "Data." . session . "." . instruction, analyzeHandling)
+
+			telemetryCoaching := getMultiMapValue(this.StartupSettings, "Functions", "On-track Coaching", kUndefined)
+
+			if (telemetryCoaching != kUndefined)
+				for ignore, session in ["Practice", "Qualification", "Race"]
+					setMultiMapValue(settings, "Assistant.Coach", session . ".TelemetryCoaching", telemetryCoaching)
 		}
 
 		return settings

@@ -314,6 +314,8 @@ Please note, that you do not have to set sections for each corner, only for thos
 
 And be aware, that corners directly followed by another corner (a typical situation in chicanes on many tracks) are very challenging for Aiden. You can use that, but take the recommendations of Aiden with a grain of salt here.
 
+Good to know: If no sections are defined for the current track, the Driving Coach will try to derive sections automatically based on the lap telemetry data. I strongly recommend to define the sections manually, because this will yield the best results, but the automatically generated sections will provide a starting point. 
+
 ### Coaching on the track
 
 Aiden can give you instructions and recommendations for the next corner while you are driving. You can enable this by a voice command, for example: "Can you give me instructions while I am driving?", or you can use the plugin action "TrackCoaching" on you your controller.
@@ -357,6 +359,8 @@ If you want to use this for your own setup, here is the rule text, so you can co
 Replace "Kim" with the name of your Driving Coach.
 
 Expert Notes: *startTelemetryCoaching* and *finishTelemetryCoaching* are methods of the *DrivingCoach* class, the session type **2** represents *practice*, **3** stands for *qualifying* and **4** for a *race* session.
+
+Another and possibly easier way to automatically start telemtry-based coaching is by using the "On-track Coaching" function in a [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles). This will not only start the collection of telemetry data, but will also start on-track coaching, once telemetry data is available.
 
 ### Restricted mode without an LLM
 

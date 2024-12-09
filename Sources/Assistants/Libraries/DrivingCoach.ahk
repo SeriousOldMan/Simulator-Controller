@@ -58,6 +58,8 @@ class DrivingCoach extends GridRaceAssistant {
 	iReferenceModeAuto := true
 	iLoadReference := "None"
 
+	iTelemetryCoaching := false
+
 	iAvailableTelemetry := CaseInsenseMap()
 	iInstructionHints := CaseInsenseMap()
 
@@ -230,6 +232,12 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
+	TelemetryCoaching {
+		Get {
+			return this.iTelemetryCoaching
+		}
+	}
+
 	CoachingActive {
 		Get {
 			return this.iCoachingActive
@@ -282,7 +290,8 @@ class DrivingCoach extends GridRaceAssistant {
 
 		this.loadInstructions(configuration)
 
-		this.updateConfigurationValues({Announcements: {SessionInformation: true, StintInformation: false, HandlingInformation: false}})
+		this.updateConfigurationValues({Announcements: {SessionInformation: true, StintInformation: false, HandlingInformation: false}}
+									 , {TelemetryCoaching: false})
 
 		DirCreate(this.Options["Driving Coach.Archive"])
 
@@ -375,6 +384,12 @@ class DrivingCoach extends GridRaceAssistant {
 				:= getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.ThrottleSmoothnessThreshold", 90)
 			TelemetryAnalyzer.BrakeSmoothnessThreshold
 				:= getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.BrakeSmoothnessThreshold", 90)
+		}
+
+		if values.HasProp("TelemetryCoaching") {
+			this.iTelemetryCoaching := values.TelemetryCoaching
+
+			this.iCoachingActive := true
 		}
 	}
 
@@ -1015,7 +1030,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local ignore, lap, candidate, sessionDB, info, lapTime, size, telemetry
 
 		if (this.AvailableTelemetry.Count = 0) {
-			if this.Speaker
+			if (this.Speaker && !this.TelemetryCoaching)
 				this.getSpeaker().speakPhrase("CoachingReady", false, true)
 
 			if (this.TelemetryAnalyzer.TrackSections.Length = 0) {
@@ -1087,6 +1102,9 @@ class DrivingCoach extends GridRaceAssistant {
 
 		for ignore, lap in laps
 			this.AvailableTelemetry[lap] := true
+
+		if this.TelemetryCoaching
+			this.startupTrackCoaching()
 	}
 
 	getTelemetry(&reference?, corner?) {
@@ -1475,6 +1493,7 @@ class DrivingCoach extends GridRaceAssistant {
 	prepareSession(&settings, &data, formationLap := true) {
 		local prepared := this.Prepared
 		local announcements := false
+		local telemetryCoaching := false
 		local facts
 
 		if !prepared {
@@ -1492,21 +1511,32 @@ class DrivingCoach extends GridRaceAssistant {
 		if (!prepared && settings) {
 			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Coach", "Voice.UseTalking", true)})
 
-			if (this.Session = kSessionPractice)
+			if (this.Session = kSessionPractice) {
 				announcements := {SessionInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Practice.Session", true)
 								, StintInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Practice.Stint", true)
 								, HandlingInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Practice.Handling", true)}
-			else if (this.Session = kSessionQualification)
+
+				telemetryCoaching := getMultiMapValue(settings, "Assistant.Coach", "Practice.TelemetryCoaching", false)
+			}
+			else if (this.Session = kSessionQualification) {
 				announcements := {SessionInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Qualification.Session", true)
 								, StintInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Qualification.Stint", true)
 								, HandlingInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Qualification.Handling", false)}
-			else if (this.Session = kSessionRace)
+
+				telemetryCoaching := getMultiMapValue(settings, "Assistant.Coach", "Qualification.TelemetryCoaching", false)
+			}
+			else if (this.Session = kSessionRace) {
 				announcements := {SessionInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Race.Session", true)
 								, StintInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Race.Stint", true)
 								, HandlingInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Race.Handling", false)}
 
+				telemetryCoaching := getMultiMapValue(settings, "Assistant.Coach", "Race.TelemetryCoaching", false)
+			}
+
 			if announcements
-				this.updateConfigurationValues({Announcements: announcements})
+				this.updateConfigurationValues({Announcements: announcements, TelemetryCoaching: telemetryCoaching})
+			else
+				this.updateConfigurationValues({TelemetryCoaching: telemetryCoaching})
 		}
 
 		if this.CoachingActive

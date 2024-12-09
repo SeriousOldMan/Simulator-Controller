@@ -1082,6 +1082,7 @@ availableFunctions(configuration, &hasTeamServer := false
 	if hasDrivingCoach {
 		functions.Push(Array("Driving Coach", "Performance Analysis"))
 		functions.Push(Array("Driving Coach", "Handling Analysis"))
+		functions.Push(Array("Driving Coach", "On-track Coaching"))
 	}
 
 	if hasRaceSpotter {

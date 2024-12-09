@@ -1756,6 +1756,8 @@ updateConfigurationForV602() {
 								, "speakerBooster", "listenerBooster", "conversationBooster", "agentBooster", "muted"]
 			text := StrReplace(text, "raceAssistant" . parameter, parameter)
 
+		text := StrReplace(text, "raceAssistantVocalics", "speakerVocalics")
+
 		deleteFile(fileName, true)
 
 		FileAppend(text, fileName)

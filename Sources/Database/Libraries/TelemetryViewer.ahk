@@ -2384,7 +2384,7 @@ class TrackMap {
 			this.Window.Block()
 
 			try {
-				withTask(WorkingTask(translate("Extracting Sections")), () {
+				withTask(WorkingTask(StrReplace(translate("Scanning track..."), "...", "")), () {
 					local analyzer := TelemetryAnalyzer(this.Simulator, this.Track)
 					local lap := this.TelemetryViewer.SelectedLap
 					local driver, lapTime, sectorTimes, telemetry, index, section

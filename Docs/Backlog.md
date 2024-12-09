@@ -13,15 +13,18 @@
 
 #### Core System
   1. Integration of Whisper as local voice recognition engine
+  2. Startup Profile function for on-track coaching
 
 #### Plugins
   1. Make the post-pitstop position prediction available in the "Session State.json" file
+  2. Make next corner instructions of the Driving Coach available in the "Session State.json" file
 
 #### Assistants
   1. Controller action and voice command to enable/disable data collection
   2. Better answers by the Strategist, when a pitstop cannot be recommended
   3. Simple on-track coaching mode for the Driving Coach **without** a connected LLM.
-  4. Direct critics by the Coach for the last section during on-track coaching
+  4. Direct critics by the Coach for the last section during on-track coaching (needs real time telemetry)
+  5. Integrate support for LAMs
 
 #### Session Database
   1. Active validation of value ranges in settings definitions
@@ -35,6 +38,7 @@
 #### Strategy Workbench
   1. Multi session tyre management - manage tyre sets and driven laps for a whole weekend (Practice, Qualifying, Race 1, Race 2, ...)
   2. Introduce data groups (for example all data belonging to a complete weekend w. practice, qualiy and race) and make this group usable for future strategy calculation
+  3. Integrate rule editor for custom validation rules
 
 #### Team Center
   1. Change hot target pressures for the next pitstop

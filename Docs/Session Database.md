@@ -142,7 +142,7 @@ Important: This functionality may not be available when using *WebView2* as the 
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Telemetry%20Browser%20Track%20Map.jpg)
 
-Also, you can edit the track sections by clicking on the "Edit" button in the right corner of the window. This enables you to edit the sections as described above for the [sections editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation).
+Also, you can edit the track sections by clicking on the "Edit" button in the right corner of the window. This enables you to edit the sections as described above for the [sections editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation). When in "Edit" mode, you can either save the edited track sections by clicking on the "Save" button, or you can hold down the Control key and click on the "Cancel" button to discard all changes. Lastly, beside adding all sections by yourself, you can use the "Scan" button to create sections based on the currently selected lap telemetry data. But check the sections after they have been created, because the scanning method may have taken some wrong decisions.
 
 Good to know: Beside the dark gray dot which marks the start/finish line, a second gray dot may be present, which marks the currently selected track position. This is very helpful when creating sections based on driver inputs from the telemetry data. For example, set the start marker for a corner a few meters before the start of the braking zone.
 

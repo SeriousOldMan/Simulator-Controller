@@ -1427,7 +1427,8 @@ class TelemetryAnalyzer {
 		local phase := "Find"
 		local cornerNr := 1
 		local straightNr := 1
-		local startIndex, startX, startY, telemetryIndex, value
+		local startIndex := false
+		local startX, startY, telemetryIndex, value
 
 		loop {
 			if (index > count)
@@ -1447,7 +1448,7 @@ class TelemetryAnalyzer {
 							sections.Push({Type: "Straight", Nr: straightNr++, Index: startIndex, X: startX, Y: startY})
 
 						phase := "Entry"
-						index := Max(1, index - 10)
+						index := Max(1, startIndex + 5, index - 10)
 
 						startIndex := index
 						startX := getMultiMapValue(trackMap, "Points", index . ".X", 0)

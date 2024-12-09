@@ -121,6 +121,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 30. [Track coaching by an AI](https://youtu.be/mgfFkNh2_Lw) - Demonstrates an on-track coaching lesson by the Driving Coach. The Coach ready the telemetry data, compares it to the data of a reference lap and will give instructions how to improve corner by corner.
 
+31. [Mastering on-trck coaching](https://youtu.be/Gnzye2kf7HI) - This video gives you valuable insights in the configuration of the on-track coaching provided by the Driving Coach. A live conversation is also part of the demonstration.
+
 This list will be extended from time to time to cover new functionalities.
 
 ### Discord Community

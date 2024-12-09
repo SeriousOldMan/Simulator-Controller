@@ -217,7 +217,7 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 
 			if (telemetryCoaching != kUndefined)
 				for ignore, session in ["Practice", "Qualification", "Race"]
-					setMultiMapValue(settings, "Assistant.Coach", session . ".TelemetryCoaching", telemetryCoaching)
+					setMultiMapValue(settings, "Assistant.Coach", session . ".OnTrackCoaching", telemetryCoaching)
 		}
 
 		return settings

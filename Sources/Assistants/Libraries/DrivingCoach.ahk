@@ -386,11 +386,8 @@ class DrivingCoach extends GridRaceAssistant {
 				:= getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.BrakeSmoothnessThreshold", 90)
 		}
 
-		if values.HasProp("OnTrackCoaching") {
+		if values.HasProp("OnTrackCoaching")
 			this.iOnTrackCoaching := values.OnTrackCoaching
-
-			this.iCoachingActive := true
-		}
 	}
 
 	updateSessionValues(values) {
@@ -1541,6 +1538,8 @@ class DrivingCoach extends GridRaceAssistant {
 
 		if this.CoachingActive
 			this.startupTelemetryCoaching()
+		else if this.OnTrackCoaching
+			this.startTelemetryCoaching()
 
 		return facts
 	}

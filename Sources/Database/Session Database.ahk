@@ -52,6 +52,15 @@ global kClose := "Close"
 
 global kSetupNames := CaseInsenseMap("DQ", "Qualifying (Dry)", "DR", "Race (Dry)", "WQ", "Qualifying (Wet)", "WR", "Race (Wet)")
 
+global kModuleDocumentations := Map("Settings", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#race-settings"
+								  , "Data", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#administration"
+								  , "Sessions", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#sessions"
+								  , "Laps", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#laps"
+								  , "Strategies", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#strategies"
+								  , "Setups", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#setups"
+								  , "Pressures", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#tyre-pressures"
+								  , "Track", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation")
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Constant Declaration Section                  ;;;
@@ -1398,7 +1407,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		chooseTab(module, *) {
-			if editor.moduleAvailable(module)
+			if GetKeyState("Ctrl")
+				Run(kModuleDocumentations[module])
+			else if editor.moduleAvailable(module)
 				editor.selectModule(module)
 		}
 

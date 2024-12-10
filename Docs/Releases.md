@@ -8,7 +8,8 @@
   7. A new convinience shortcut has been implemented in "Simulator Startup" to select the startup profile. Hold down the mouse button for at least a second when clicking on the "Startup" button to choose the profile for the next startup. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#notes) for more information.
   8. The Driving Coach now supplies a basic and somewhat [restricted on-track coaching](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#using-the-driving-coach-without-an-llm) when an LLM for the Coach has not yet been configured. Since this is the default configuration for a fresh installation, the Coach is already usable to some extent without being fully configured.
   9. The automatic startup of the on-track coaching as described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#automatic-activation-of-coaching-mode) has been updated, so that the acquired knowledge does not get removed after the end of a session.
-  10. [Internal] Optimized asynchronous speaking status of all Assistants. This gives the Driving Coach more room for the corner by corner instructions. 
+  10. "Session Database" now supports to open the documentation for one the database categories by holding down the Control key when clicking on the category.
+  11. [Internal] Optimized asynchronous speaking status of all Assistants. This gives the Driving Coach more room for the corner by corner instructions. 
   
 ## 6.0.0.0-release 12/06/24
   1. Minor bugfixes, as always

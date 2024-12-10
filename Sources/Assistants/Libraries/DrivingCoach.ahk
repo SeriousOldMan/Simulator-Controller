@@ -698,12 +698,12 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
-	telemetryCoachingStartRecognized(words, confirm := true) {
+	telemetryCoachingStartRecognized(words, confirm := true, auto := false) {
 		if !this.Connector
 			this.startConversation()
 
 		if (confirm && this.Speaker)
-			this.getSpeaker().speakPhrase("ConfirmCoaching")
+			this.getSpeaker().speakPhrase(auto ? "StartCoaching" : "ConfirmCoaching")
 
 		this.iCoachingActive := true
 
@@ -949,8 +949,8 @@ class DrivingCoach extends GridRaceAssistant {
 			this.iIssueCollector.stopIssueCollector()
 	}
 
-	startTelemetryCoaching(confirm := true) {
-		this.telemetryCoachingStartRecognized([], confirm)
+	startTelemetryCoaching(confirm := true, auto := false) {
+		this.telemetryCoachingStartRecognized([], confirm, auto)
 	}
 
 	finishTelemetryCoaching(confirm := true) {
@@ -1539,7 +1539,7 @@ class DrivingCoach extends GridRaceAssistant {
 		if this.CoachingActive
 			this.startupTelemetryCoaching()
 		else if this.OnTrackCoaching
-			this.startTelemetryCoaching()
+			this.startTelemetryCoaching(true, true)
 
 		return facts
 	}

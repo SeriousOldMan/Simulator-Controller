@@ -2,7 +2,7 @@
 
 Simulator Controller is a modular and extendable administration and controller application for Sim Racing. At the core is a comprehensive plugin capable automation framework, which can use almost any external controller hardware, such as Button Boxes, to control typical simulator components such as SimHub, SimFeedback and alike. Beside that, Simulator Controller also comes with several voice chat capable Assistants, which are based on artificial intelligence technologies. The first, a kind of Virtual Race Engineer, will assist you during your races to keep the hands on the wheel. It will handle all the cumbersome stuff, like preparing a pitstop, take an eye on the weather forecast, calculate damage impact on your lap times, and so on. The second Assistant, a Virtual Race Strategist, will keep an eye on the overall race situation and will develop and adapt strategies depending on race position, traffic and weather changes. The next Assistant, a Virtual Race Spotter will watch over your race and will warn you about crtical situations with nearby cars, and so on. Last, but not least, a Virtual Driving Coach will be your invaluable source for information about car handling and everything, you want to know about racing in the real world or in a simulation. And he can coach you improve your driving skills by giving you valuable instructions while you are on the track.
 
-Beside that, Simulator Controller brings even a bunch of other functionality and features to make the life of all of us virtual racers even more fun and simple. You will find a [comprehensive overwiew](https://github.com/SeriousOldMan/Simulator-Controller#main-features) of all features later in this document, but first things first...
+Beside that, Simulator Controller brings even a bunch of other functionality and features to make the life of all of us virtual racers even more fun and simple. You will find a [comprehensive overview](https://github.com/SeriousOldMan/Simulator-Controller#main-features) of all features later in this document, but first things first...
 
 ### Donation
 
@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[6.0.1.0-dev](https://www.dropbox.com/scl/fi/4jevhetbcgk3c349ostvb/Simulator-Controller-6.0.1.0-dev.zip?rlkey=39ofllupf7vhazodc25cnrv7k&st=n1nsamml&dl=1) (Early build for 6.0.1. Changes: Optimized asynchronous speaking status of all Assistants, Interrupt Assistant voice output, New controller action "Interrupt" for all Assistants, New Stream Deck icon for "Interrupt" action, Improved telemetry importer, Simple on-track coaching without LLM for the Driving Coach, Shortcut menu for Startup Profiles in "Simulator Startup".)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-601) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 
@@ -120,6 +122,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 29. [Managing telemetry data](https://youtu.be/h_WOf4mpWiA) - This video demonstrates the telemetry data system and shows how the different applications collect telemetry and what you can do with it.
 
 30. [Track coaching by an AI](https://youtu.be/mgfFkNh2_Lw) - Demonstrates an on-track coaching lesson by the Driving Coach. The Coach ready the telemetry data, compares it to the data of a reference lap and will give instructions how to improve corner by corner.
+
+31. [Mastering on-trck coaching](https://youtu.be/Gnzye2kf7HI) - This video gives you valuable insights in the configuration of the on-track coaching provided by the Driving Coach. A live conversation is also part of the demonstration.
 
 This list will be extended from time to time to cover new functionalities.
 

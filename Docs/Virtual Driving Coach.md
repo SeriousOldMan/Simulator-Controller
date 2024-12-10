@@ -354,11 +354,11 @@ If you want to use this for your own setup, here is the rule text, so you can co
 			(Call: Assistant.Call(startTelemetryCoaching, false)), (Set: Coaching.Started),
 			(Call: Assistant.Speak("Kim here. I'll start my computer. Run some warmup laps and then we will have a look at the telemetry."))
 
-	[?Session.Type != 2] => (Call: Assistant.Call(finishTelemetryCoaching, false)), (Clear: Coaching.Started)
+	[?Session.Type > 2] => (Call: Assistant.Call(finishTelemetryCoaching, false)), (Clear: Coaching.Started)
 
 Replace "Kim" with the name of your Driving Coach.
 
-Expert Notes: *startTelemetryCoaching* and *finishTelemetryCoaching* are methods of the *DrivingCoach* class, the session type **2** represents *practice*, **3** stands for *qualifying* and **4** for a *race* session.
+Expert Notes: *startTelemetryCoaching* and *finishTelemetryCoaching* are methods of the *DrivingCoach* class, the session type **2** represents *practice*, **3** stands for *qualifying* and **4** for a *race* session, all values below **2** are for internal purposes.
 
 Another and possibly easier way to automatically start telemtry-based coaching is by using the "On-track Coaching" function in a [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles). This will not only start the collection of telemetry data, but will also start on-track coaching, once telemetry data is available.
 

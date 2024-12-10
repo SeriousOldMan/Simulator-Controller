@@ -52,6 +52,15 @@ global kClose := "Close"
 
 global kSetupNames := CaseInsenseMap("DQ", "Qualifying (Dry)", "DR", "Race (Dry)", "WQ", "Qualifying (Wet)", "WR", "Race (Wet)")
 
+global kModuleDocumentations := Map("Settings", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#race-settings"
+								  , "Data", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#administration"
+								  , "Sessions", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#sessions"
+								  , "Laps", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#laps"
+								  , "Strategies", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#strategies"
+								  , "Setups", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#setups"
+								  , "Pressures", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#tyre-pressures"
+								  , "Track", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation")
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Constant Declaration Section                  ;;;
@@ -1398,7 +1407,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		chooseTab(module, *) {
-			if editor.moduleAvailable(module)
+			if GetKeyState("Ctrl")
+				Run(kModuleDocumentations[module])
+			else if editor.moduleAvailable(module)
 				editor.selectModule(module)
 		}
 
@@ -1506,6 +1517,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			}
 		}
 
+		openDocumentation(*) {
+			Run(kModuleDocumentations[this.SelectedModule])
+		}
+
 		editorGui := Window({Descriptor: "Session Database", Closeable: true, Resizeable: true, Options: "-MaximizeBox"})
 
 		this.iWindow := editorGui
@@ -1577,6 +1592,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui.Add("Picture", "x280 ys w30 h30 X:Move(0.2) Section", this.themeIcon(kIconsDirectory . "Report.ico"))
 		editorGui.Add("Text", "xp+34 yp+5 w180 h26 X:Move(0.2) W:Grow(0.8)", translate("Notes"))
+
+		button := editorGui.Add("Button", "x623 yp+6 w23 h23 X:Move")
+		button.OnEvent("Click", openDocumentation)
+		setButtonIcon(button, kIconsDirectory . "Book.ico", 1, "L4 T4 R4 B4")
 
 		button := editorGui.Add("Button", "x647 yp w23 h23 X:Move")
 		button.OnEvent("Click", showSettings)

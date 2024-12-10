@@ -7972,7 +7972,7 @@ recommendDataRun(centerOrCommand := false, arguments*) {
 			recoGui.SetFont("s9 Norm", "Arial")
 
 			recoGui.Add("Documentation", "x106 YP+20 w164 Center", translate("Run Sheet")
-									   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#using-the-run-sheet")
+									   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#using-the-run-sheet")
 
 			recoGui.SetFont("s8 Norm", "Arial")
 

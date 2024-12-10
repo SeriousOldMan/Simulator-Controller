@@ -1517,6 +1517,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			}
 		}
 
+		openDocumentation(*) {
+			Run(kModuleDocumentations[this.SelectedModule])
+		}
+
 		editorGui := Window({Descriptor: "Session Database", Closeable: true, Resizeable: true, Options: "-MaximizeBox"})
 
 		this.iWindow := editorGui
@@ -1588,6 +1592,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui.Add("Picture", "x280 ys w30 h30 X:Move(0.2) Section", this.themeIcon(kIconsDirectory . "Report.ico"))
 		editorGui.Add("Text", "xp+34 yp+5 w180 h26 X:Move(0.2) W:Grow(0.8)", translate("Notes"))
+
+		button := editorGui.Add("Button", "x623 yp+6 w23 h23 X:Move")
+		button.OnEvent("Click", openDocumentation)
+		setButtonIcon(button, kIconsDirectory . "Book.ico", 1, "L4 T4 R4 B4")
 
 		button := editorGui.Add("Button", "x647 yp w23 h23 X:Move")
 		button.OnEvent("Click", showSettings)

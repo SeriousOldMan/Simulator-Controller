@@ -520,7 +520,7 @@ launchPad(command := false, arguments*) {
 		global gStartupProfile
 
 		local x, y, w, h, mX, mY
-		local curCoordMode, clickStart, profiles, profilesMenu, ignore, profile, result
+		local curCoordMode, clickStart, profiles, profilesMenu, ignore, profile, result, startupProfile
 
 		if !configure
 			configure := GetKeyState("Ctrl")
@@ -559,13 +559,15 @@ launchPad(command := false, arguments*) {
 
 			profilesMenu.Add(translate("Standard"), (*) => result := true)
 
-			if !gStartupProfile
+			startupProfile := getStartupProfile()
+
+			if (!gStartupProfile && (!startupProfile || (startupProfile = translate("Standard"))))
 				profilesMenu.Check(translate("Standard"))
 
 			for ignore, profile in profiles {
 				profilesMenu.Add(profile, (profile, *) => result := profile)
 
-				if (profile = gStartupProfile)
+				if ((profile = gStartupProfile) || (profile = startupProfile))
 					profilesMenu.Check(profile)
 			}
 
@@ -574,15 +576,15 @@ launchPad(command := false, arguments*) {
 
 			result := kUndefined
 
-			profilesMenu.Show()
+			profilesMenu.Show( , , true)
 
-			while (result = kUndefined)
-				Sleep(100)
+			if (result = kUndefined)
+				result := false
 
 			if result {
 				startupButton.Text := ("Startup`n" . ((result = true) ? translate("Standard") : result))
 
-				gStartupProfile := ((result = true) ? false : result)
+				writeMultiMap(kUserConfigDirectory . "Startup.settings", loadStartupProfiles(((result == true) ? false : result)))
 
 				launchPad("Startup")
 			}

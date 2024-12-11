@@ -1922,6 +1922,27 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.loadCar(car, true)
 		this.loadTrack(track, true)
 		this.loadWeather(weather, true)
+
+		PeriodicTask(() {
+			local documentation := GetKeyState("Ctrl")
+
+			static lastDocumentation := false
+
+			if (documentation != lastDocumentation) {
+				lastDocumentation := documentation
+
+				if documentation {
+					loop 8
+						editorGui["settingsTab" . A_Index].SetFont("Italic Underline C" . editorGui.Theme.LinkColor)
+				}
+				else {
+					loop 8
+						editorGui["settingsTab" . A_Index].SetFont("Norm")
+
+					this.updateState()
+				}
+			}
+		}, 100, kHighPriority).start()
 	}
 
 	show() {

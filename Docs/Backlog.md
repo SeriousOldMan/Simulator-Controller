@@ -14,7 +14,8 @@
 
 #### Core System
   1. Integration of Whisper as local voice recognition engine
-  2. Startup Profile function for on-track coaching
+  2. Integration of local TTS engines for voice generation
+  3. Startup Profile function for on-track coaching
 
 #### Plugins
   1. Make the post-pitstop position prediction available in the "Session State.json" file
@@ -23,10 +24,9 @@
 #### Assistants
   1. Controller action and voice command to enable/disable data collection
   2. Better answers by the Strategist, when a pitstop cannot be recommended
-  3. Simple on-track coaching mode for the Driving Coach **without** a connected LLM
-  4. Direct critics by the Coach for the last section during on-track coaching (needs real time telemetry)
-  5. Extend "Session State.json" with on-track coaching instructions
-  6. Integrate support for LAMs
+  3. Direct critics by the Coach for the last section during on-track coaching (needs real time telemetry)
+  4. Extend "Session State.json" with on-track coaching instructions
+  5. Integrate support for LAMs
 
 #### Session Database
   1. Active validation of value ranges in settings definitions

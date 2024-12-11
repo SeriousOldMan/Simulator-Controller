@@ -165,7 +165,7 @@ Finally, if you are ready to start, choose the profile you want to start with an
 
 1. If you want "Simulator Startup" to use a specific startup profile independent from what is chosen in the configuration of the startup profiles, you can run "Simulator Startup.exe" with the "-Startup [Profile]" option, where *[Profile]* is the name of the profile you want to use (possibly enclosed in quotes). This is especially helpful together with the "-NoLaunchPad" option, when running "Simulator Startup" from a Stream Deck, for example.
 
-2. If you click on the "Startup" button and hold down the mouse button for at least a second, a menu will appear with all available startup profiles. If you choose one here, the startup process will use this profile. The choosen profile will be used as long as "Simulator Startup" is running (or until you choose a different one), but it will not be selevcted permanently.
+2. If you click on the "Startup" button and hold down the mouse button for at least a second, a menu will appear with all available startup profiles. If you choose one here, the startup process will use this profile and this profile will be selected as the default profile for all subsequent startups.
 
 ### Team Management
 

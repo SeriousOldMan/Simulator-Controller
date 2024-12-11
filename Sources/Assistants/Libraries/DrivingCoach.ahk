@@ -950,6 +950,9 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	startTelemetryCoaching(confirm := true, auto := false) {
+		if auto
+			this.updateConfigurationValues({OnTrackCoaching: true})
+
 		this.telemetryCoachingStartRecognized([], confirm, auto)
 	}
 

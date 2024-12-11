@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.0.1.0-dev](https://www.dropbox.com/scl/fi/4jevhetbcgk3c349ostvb/Simulator-Controller-6.0.1.0-dev.zip?rlkey=39ofllupf7vhazodc25cnrv7k&st=n1nsamml&dl=1) (Early build for 6.0.1. Changes: Optimized asynchronous speaking status of all Assistants, Interrupt Assistant voice output, New controller action "Interrupt" for all Assistants, New Stream Deck icon for "Interrupt" action, Improved telemetry importer, Simple on-track coaching without LLM for the Driving Coach, Shortcut menu for Startup Profiles in "Simulator Startup", Documentation jump out in "Session Database".)
+[6.0.1.0-alpha](https://www.dropbox.com/scl/fi/ic7p0yq31x17m8pny9vzp/Simulator-Controller-6.0.1.0-alpha.zip?rlkey=5uky73h3u7683dcssgki1jk6j&st=jbmfp5cf&dl=1) (Test build for 6.0.1. Changes: Optimized asynchronous speaking status of all Assistants, Interrupt Assistant voice output, New controller action "Interrupt" for all Assistants, New Stream Deck icon for "Interrupt" action, Improved telemetry importer, Simple on-track coaching without LLM for the Driving Coach, Shortcut menu for Startup Profiles in "Simulator Startup", Documentation jump out in "Session Database".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-601) of this version and all the versions you might have skipped, before installing and using this version.
 

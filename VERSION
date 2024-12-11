@@ -1,8 +1,8 @@
 [Development]
-Version=6.0.1.0-dev
+Version=6.0.1.0-alpha
 Target=6.0.1.0-release
-Date=12/10/2024
-Download=https://www.dropbox.com/scl/fi/4jevhetbcgk3c349ostvb/Simulator-Controller-6.0.1.0-dev.zip?rlkey=39ofllupf7vhazodc25cnrv7k&st=w75oqbey&dl=1
+Date=12/11/2024
+Download=https://www.dropbox.com/scl/fi/ic7p0yq31x17m8pny9vzp/Simulator-Controller-6.0.1.0-alpha.zip?rlkey=5uky73h3u7683dcssgki1jk6j&st=jbmfp5cf&dl=1
 Changes=Optimized asynchronous speaking status of all Assistants, Interrupt Assistant voice output, New controller action "Interrupt" for all Assistants, New Stream Deck icon for "Interrupt" action, Improved telemetry importer, Simple on-track coaching without LLM for the Driving Coach, Shortcut menu for Startup Profiles in "Simulator Startup", Documentation jump out in "Session Database"
 Components=Media->5.6.1,Configuration->6.0.1,Utilities->5.9.8
 [Release]
@@ -27,5 +27,5 @@ Utilities.5.9.8.Download=https://www.dropbox.com/scl/fi/pjtq7f3u6uoy5ld88vqz9/Ut
 [Current]
 Type=Development
 [Version]
-Development=6.0.1.0-dev
+Development=6.0.1.0-alpha
 Release=6.0.0.0-release

@@ -293,8 +293,7 @@ The "Race Engineer" plugin handles the interaction of the currently active simul
 
 	raceAssistant: [*initialState*] [*onOffFunction*]; name: *name*; logo: On | Off; language: DE | EN | ...;
 	synthesizer: Windows | dotNET | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey;
-	speaker: On | Off | *Speech Generation Language*;
-	speakerVocalics: *volume* , *pitch* , *rate*;
+	speaker: On | Off | *Speech Generation Language*; speakerVocalics: *volume* , *pitch* , *rate*;
 	speakerBooster: *speakerBooster*;
 	recognizer: Server | Desktop | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey;
 	listener: On | Off | *Speech Recognition Engine*; listenerBooster: *listenerBooster*;
@@ -451,8 +450,7 @@ The "Race Spotter" plugin handles the interaction of the currently active simula
 
 	raceAssistant: [*initialState*] *onOffFunction*; name: *name*; logo: On | Off; language: DE | EN | ...;
 	synthesizer: Windows | dotNET | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey;
-	speaker: On | Off | *Speech Generation Language*;
-	speakerVocalics: *volume* , *pitch* , *rate*;
+	speaker: On | Off | *Speech Generation Language*; speakerVocalics: *volume* , *pitch* , *rate*;
 	speakerBooster: *speakerBooster*;
 	recognizer: Server | Desktop | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey;
 	listener: On | Off | *Speech Recognition Engine*; listenerBooster: *listenerBooster*;

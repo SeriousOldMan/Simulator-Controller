@@ -1,7 +1,7 @@
 ## 6.0.2.0-release 12/20/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. Track sections can be automatically created in the Telemetry Viewer based on the currently selected telemetry. Enter the "Edit" mode in the track map and use the "Scan" button.
+  3. Track sections can be automatically created in the Telemetry Viewer based on the currently selected telemetry data. Enter the "Edit" mode in the track map and use the "Scan" button. Since this is a heuristical approach, please check (and edit) the created section starting points afterwards.
   4. The Driving Coach will also use automatically generated track sections if none are yet configured for the given track.
   5. New "On-track Coaching" function in the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles), which automatically starts telemetry based coaching and on-track coaching by the Driving Coach when this startup profile is active.
   6. On-track coaching can now also enabled from the tray menu of the "Simulator Controller" process.

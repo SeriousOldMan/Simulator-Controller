@@ -1532,6 +1532,13 @@ class DrivingCoach extends GridRaceAssistant {
 
 				onTrackCoaching := getMultiMapValue(settings, "Assistant.Coach", "Race.OnTrackCoaching", false)
 			}
+			else if (this.Session = kSessionTimeTrial) {
+				announcements := {SessionInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Time Trial.Session", true)
+								, StintInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Time Trial.Stint", true)
+								, HandlingInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Time Trial.Handling", false)}
+
+				onTrackCoaching := getMultiMapValue(settings, "Assistant.Coach", "Time Trial.OnTrackCoaching", false)
+			}
 
 			if announcements
 				this.updateConfigurationValues({Announcements: announcements, OnTrackCoaching: onTrackCoaching})

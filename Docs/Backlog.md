@@ -10,7 +10,6 @@
   1. Better integration with the weather forecast data of *rFactor 2* and *Le Mans Ultimate*
   2. Pitstop automation for *Le Mans Ultimate*
   3. Support for new and also historic simulators
-  4. Support for TimeTrial / Hotlapping sessions, similar to Practice
 
 #### Core System
   1. Integration of Whisper as local voice recognition engine

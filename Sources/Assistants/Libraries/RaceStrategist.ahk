@@ -1421,6 +1421,8 @@ class RaceStrategist extends GridRaceAssistant {
 			case kSessionRace:
 				session := "Race"
 				default := true
+			case kSessionTimeTrial:
+				session := "Time Trial"
 		}
 
 		return getMultiMapValue(this.Settings, "Session Settings", "Telemetry." . session, default)

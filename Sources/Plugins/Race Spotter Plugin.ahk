@@ -184,15 +184,21 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 			OnExit(ObjBindMethod(this, "shutdownTrackAutomation", true))
 			OnExit(ObjBindMethod(this, "shutdownTrackMapper", true))
 
-			if this.TrackAutomationEnabled
-				this.enableTrackAutomation(false, true)
-			else
-				this.disableTrackAutomation(false, true)
+			Task.startTask(() {
+				if this.Controller.Started {
+					if this.TrackAutomationEnabled
+						this.enableTrackAutomation(false, true)
+					else
+						this.disableTrackAutomation(false, true)
 
-			if this.TrackMappingEnabled
-				this.enableTrackMapping(false, true)
-			else
-				this.disableTrackMapping(false, true)
+					if this.TrackMappingEnabled
+						this.enableTrackMapping(false, true)
+					else
+						this.disableTrackMapping(false, true)
+				}
+				else
+					return Task.CurrentTask
+			}, 500, kHighPriority)
 
 			if register
 				controller.registerPlugin(this)

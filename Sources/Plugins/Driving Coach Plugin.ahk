@@ -157,6 +157,8 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 			if (active != this.TelemetryCoachingActive) {
 				this.iTelemetryCoachingActive := active
 
+				this.updateTelemetryCoachingTrayLabel(translate("On-track Coaching"), active)
+
 				this.updateActions(kSessionUnknown)
 			}
 
@@ -166,6 +168,13 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 				this.updateActions(kSessionUnknown)
 			}
 		}, 5000, kLowPriority).start()
+
+		Task.startTask(() {
+			if this.Controller.Started
+				this.updateTelemetryCoachingTrayLabel(translate("On-track Coaching"), false)
+			else
+				return Task.CurrentTask
+		}, 500, kHighPriority)
 	}
 
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {
@@ -194,7 +203,7 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 	}
 
 	loadSettings(simulator, car, track, data := false, settings := false) {
-		local analyzePerformance, analyzeHandling, ignore, session, instruction
+		local analyzePerformance, analyzeHandling, telemetryCoaching, ignore, session, instruction
 
 		settings := super.loadSettings(simulator, car, track, data, settings)
 
@@ -212,6 +221,12 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 				for ignore, session in ["Practice", "Qualification", "Race"]
 					for ignore, instruction in ["Session", "Handling"]
 						setMultiMapValue(settings, "Assistant.Coach", "Data." . session . "." . instruction, analyzeHandling)
+
+			telemetryCoaching := getMultiMapValue(this.StartupSettings, "Functions", "On-track Coaching", kUndefined)
+
+			if (telemetryCoaching != kUndefined)
+				for ignore, session in ["Practice", "Qualification", "Race"]
+					setMultiMapValue(settings, "Assistant.Coach", session . ".OnTrackCoaching", telemetryCoaching)
 		}
 
 		return settings
@@ -246,7 +261,7 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 		local problem, state
 
 		if this.Active {
-			if this.RaceAssistantEnabled {
+			if this.Enabled {
 				if this.RaceAssistant {
 					if (this.iServiceState != "Available") {
 						setMultiMapValue(configuration, this.Plugin, "State", "Critical")
@@ -269,10 +284,10 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 					information := (translate("Started: ") . translate(this.RaceAssistant ? "Yes" : "No"))
 
 					if (this.iServiceState = "Available") {
-						if !this.RaceAssistantSpeaker
+						if !this.Speaker
 							information .= ("; " . translate("Silent: ") . translate("Yes"))
 
-						if this.RaceAssistantMuted
+						if this.Muted
 							information .= ("; " . translate("Muted: ") . translate("Yes"))
 					}
 					else if (InStr(this.iServiceState, "Error") = 1)
@@ -320,9 +335,34 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 		this.startSession(settings, data)
 	}
 
-	startTelemetryCoaching() {
+	updateTelemetryCoachingTrayLabel(label, enabled) {
+		static hasTrayMenu := false
+
+		toggleTelemetryCoaching(*) {
+			if this.TelemetryCoachingActive
+				this.finishTelemetryCoaching()
+			else
+				this.startTelemetryCoaching(true)
+		}
+
+		label := StrReplace(StrReplace(label, "`n", A_Space), "`r", "")
+
+		if !hasTrayMenu {
+			A_TrayMenu.Insert("1&")
+			A_TrayMenu.Insert("1&", label, toggleTelemetryCoaching)
+
+			hasTrayMenu := true
+		}
+
+		if enabled
+			A_TrayMenu.Check(label)
+		else
+			A_TrayMenu.Uncheck(label)
+	}
+
+	startTelemetryCoaching(auto := false) {
 		if this.DrivingCoach
-			this.DrivingCoach.startTelemetryCoaching()
+			this.DrivingCoach.startTelemetryCoaching(true, auto)
 	}
 
 	finishTelemetryCoaching() {

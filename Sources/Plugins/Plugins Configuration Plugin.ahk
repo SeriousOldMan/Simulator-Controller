@@ -302,10 +302,10 @@ class PluginsConfigurator extends ConfigurationItemList {
 				thePlugin := this.buildItemFromEditor()
 
 				if thePlugin {
-					thePlugin.removeArgument("raceAssistantSpeakerBooster")
-					thePlugin.removeArgument("raceAssistantListenerBooster")
-					thePlugin.removeArgument("raceAssistantConversationBooster")
-					thePlugin.removeArgument("raceAssistantAgentBooster")
+					thePlugin.removeArgument("speakerBooster")
+					thePlugin.removeArgument("listenerBooster")
+					thePlugin.removeArgument("conversationBooster")
+					thePlugin.removeArgument("agentBooster")
 
 					for ignore, otherAssistant in kRaceAssistants
 						if (otherAssistant != assistant)
@@ -317,16 +317,16 @@ class PluginsConfigurator extends ConfigurationItemList {
 					this.iConversationBoosterConfiguration := configuration
 
 					if getMultiMapValue(configuration, "Conversation Booster", assistant . ".Speaker", false)
-						thePlugin.setArgumentValue("raceAssistantSpeakerBooster", assistant)
+						thePlugin.setArgumentValue("speakerBooster", assistant)
 
 					if getMultiMapValue(configuration, "Conversation Booster", assistant . ".Listener", false)
-						thePlugin.setArgumentValue("raceAssistantListenerBooster", assistant)
+						thePlugin.setArgumentValue("listenerBooster", assistant)
 
 					if getMultiMapValue(configuration, "Conversation Booster", assistant . ".Conversation", false)
-						thePlugin.setArgumentValue("raceAssistantConversationBooster", assistant)
+						thePlugin.setArgumentValue("conversationBooster", assistant)
 
 					if getMultiMapValue(configuration, "Agent Booster", assistant . ".Agent", false)
-						thePlugin.setArgumentValue("raceAssistantAgentBooster", assistant)
+						thePlugin.setArgumentValue("agentBooster", assistant)
 
 					this.loadEditor(thePlugin)
 				}

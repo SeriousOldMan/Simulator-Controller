@@ -38,6 +38,7 @@ global kSessionOther := 1
 global kSessionPractice := 2
 global kSessionQualification := 3
 global kSessionRace := 4
+global kSessionTimeTrial := 5
 
 global kDebugKnowledgeBase := 1
 global kDebugRules := 2
@@ -1107,7 +1108,8 @@ class RaceAssistant extends ConfigurationItem {
 		}
 
 		if !isSet(sessionTypes) {
-			sessionTypes := Map(kSessionPractice, "Practice", kSessionQualification, "Qualification", kSessionRace, "Race", kSessionOther, "Other")
+			sessionTypes := Map(kSessionPractice, "Practice", kSessionQualification, "Qualification"
+							  , kSessionRace, "Race", kSessionTimeTrial, "Time Trial", kSessionOther, "Other")
 
 			sessionTypes.Default := "Other"
 		}
@@ -1760,6 +1762,8 @@ class RaceAssistant extends ConfigurationItem {
 				session := kSessionQualification
 			case "Race":
 				session := kSessionRace
+			case "Time Trial":
+				session := kSessionTimeTrial
 			default:
 				session := kSessionOther
 		}
@@ -2010,7 +2014,8 @@ class RaceAssistant extends ConfigurationItem {
 		static sessionTypes
 
 		if !isSet(sessionTypes) {
-			sessionTypes := Map(kSessionPractice, "Practice", kSessionQualification, "Qualification", kSessionRace, "Race", kSessionOther, "Other")
+			sessionTypes := Map(kSessionPractice, "Practice", kSessionQualification, "Qualification"
+							  , kSessionRace, "Race", kSessionTimeTrial, "Time Trial", kSessionOther, "Other")
 
 			sessionTypes.Default := "Other"
 		}

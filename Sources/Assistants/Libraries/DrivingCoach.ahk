@@ -58,6 +58,8 @@ class DrivingCoach extends GridRaceAssistant {
 	iReferenceModeAuto := true
 	iLoadReference := "None"
 
+	iOnTrackCoaching := false
+
 	iAvailableTelemetry := CaseInsenseMap()
 	iInstructionHints := CaseInsenseMap()
 
@@ -230,6 +232,12 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
+	OnTrackCoaching {
+		Get {
+			return this.iOnTrackCoaching
+		}
+	}
+
 	CoachingActive {
 		Get {
 			return this.iCoachingActive
@@ -282,7 +290,8 @@ class DrivingCoach extends GridRaceAssistant {
 
 		this.loadInstructions(configuration)
 
-		this.updateConfigurationValues({Announcements: {SessionInformation: true, StintInformation: false, HandlingInformation: false}})
+		this.updateConfigurationValues({Announcements: {SessionInformation: true, StintInformation: false, HandlingInformation: false}
+									  , OnTrackCoaching: false})
 
 		DirCreate(this.Options["Driving Coach.Archive"])
 
@@ -376,6 +385,9 @@ class DrivingCoach extends GridRaceAssistant {
 			TelemetryAnalyzer.BrakeSmoothnessThreshold
 				:= getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.BrakeSmoothnessThreshold", 90)
 		}
+
+		if values.HasProp("OnTrackCoaching")
+			this.iOnTrackCoaching := values.OnTrackCoaching
 	}
 
 	updateSessionValues(values) {
@@ -686,12 +698,12 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
-	telemetryCoachingStartRecognized(words, confirm := true) {
+	telemetryCoachingStartRecognized(words, confirm := true, auto := false) {
 		if !this.Connector
 			this.startConversation()
 
 		if (confirm && this.Speaker)
-			this.getSpeaker().speakPhrase("ConfirmCoaching")
+			this.getSpeaker().speakPhrase(auto ? "StartCoaching" : "ConfirmCoaching")
 
 		this.iCoachingActive := true
 
@@ -937,8 +949,11 @@ class DrivingCoach extends GridRaceAssistant {
 			this.iIssueCollector.stopIssueCollector()
 	}
 
-	startTelemetryCoaching(confirm := true) {
-		this.telemetryCoachingStartRecognized([], confirm)
+	startTelemetryCoaching(confirm := true, auto := false) {
+		if auto
+			this.updateConfigurationValues({OnTrackCoaching: true})
+
+		this.telemetryCoachingStartRecognized([], confirm, auto)
 	}
 
 	finishTelemetryCoaching(confirm := true) {
@@ -1012,11 +1027,17 @@ class DrivingCoach extends GridRaceAssistant {
 
 	telemetryAvailable(laps) {
 		local bestLap, bestLaptime, bestInfo, telemetries, data
-		local ignore, lap, candidate, sessionDB, info, lapTime, size
+		local ignore, lap, candidate, sessionDB, info, lapTime, size, telemetry
 
 		if (this.AvailableTelemetry.Count = 0) {
-			if this.Speaker
+			if (this.Speaker && !this.OnTrackCoaching)
 				this.getSpeaker().speakPhrase("CoachingReady", false, true)
+
+			if (this.TelemetryAnalyzer.TrackSections.Length = 0) {
+				telemetry := this.TelemetryAnalyzer.createTelemetry(laps[1], kTempDirectory . "Driving Coach\Telemetry\Lap " . laps[1] . ".telemetry")
+
+				this.TelemetryAnalyzer.requireTrackSections(telemetry)
+			}
 
 			if (this.LoadReference != "None") {
 				sessionDB := SessionDatabase()
@@ -1081,6 +1102,9 @@ class DrivingCoach extends GridRaceAssistant {
 
 		for ignore, lap in laps
 			this.AvailableTelemetry[lap] := true
+
+		if this.OnTrackCoaching
+			this.startupTrackCoaching()
 	}
 
 	getTelemetry(&reference?, corner?) {
@@ -1469,6 +1493,7 @@ class DrivingCoach extends GridRaceAssistant {
 	prepareSession(&settings, &data, formationLap := true) {
 		local prepared := this.Prepared
 		local announcements := false
+		local onTrackCoaching := false
 		local facts
 
 		if !prepared {
@@ -1486,25 +1511,45 @@ class DrivingCoach extends GridRaceAssistant {
 		if (!prepared && settings) {
 			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Coach", "Voice.UseTalking", true)})
 
-			if (this.Session = kSessionPractice)
+			if (this.Session = kSessionPractice) {
 				announcements := {SessionInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Practice.Session", true)
 								, StintInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Practice.Stint", true)
 								, HandlingInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Practice.Handling", true)}
-			else if (this.Session = kSessionQualification)
+
+				onTrackCoaching := getMultiMapValue(settings, "Assistant.Coach", "Practice.OnTrackCoaching", false)
+			}
+			else if (this.Session = kSessionQualification) {
 				announcements := {SessionInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Qualification.Session", true)
 								, StintInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Qualification.Stint", true)
 								, HandlingInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Qualification.Handling", false)}
-			else if (this.Session = kSessionRace)
+
+				onTrackCoaching := getMultiMapValue(settings, "Assistant.Coach", "Qualification.OnTrackCoaching", false)
+			}
+			else if (this.Session = kSessionRace) {
 				announcements := {SessionInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Race.Session", true)
 								, StintInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Race.Stint", true)
 								, HandlingInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Race.Handling", false)}
 
+				onTrackCoaching := getMultiMapValue(settings, "Assistant.Coach", "Race.OnTrackCoaching", false)
+			}
+			else if (this.Session = kSessionTimeTrial) {
+				announcements := {SessionInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Time Trial.Session", true)
+								, StintInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Time Trial.Stint", true)
+								, HandlingInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Time Trial.Handling", false)}
+
+				onTrackCoaching := getMultiMapValue(settings, "Assistant.Coach", "Time Trial.OnTrackCoaching", false)
+			}
+
 			if announcements
-				this.updateConfigurationValues({Announcements: announcements})
+				this.updateConfigurationValues({Announcements: announcements, OnTrackCoaching: onTrackCoaching})
+			else
+				this.updateConfigurationValues({OnTrackCoaching: onTrackCoaching})
 		}
 
 		if this.CoachingActive
 			this.startupTelemetryCoaching()
+		else if this.OnTrackCoaching
+			this.startTelemetryCoaching(true, true)
 
 		return facts
 	}

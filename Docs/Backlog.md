@@ -10,12 +10,10 @@
   1. Better integration with the weather forecast data of *rFactor 2* and *Le Mans Ultimate*
   2. Pitstop automation for *Le Mans Ultimate*
   3. Support for new and also historic simulators
-  4. Support for TimeTrial / Hotlapping sessions, similar to Practice.
 
 #### Core System
   1. Integration of Whisper as local voice recognition engine
   2. Integration of local TTS engines for voice generation
-  3. Startup Profile function for on-track coaching
 
 #### Plugins
   1. Make the post-pitstop position prediction available in the "Session State.json" file
@@ -25,13 +23,11 @@
   1. Controller action and voice command to enable/disable data collection
   2. Better answers by the Strategist, when a pitstop cannot be recommended
   3. Direct critics by the Coach for the last section during on-track coaching (needs real time telemetry)
-  4. Extend "Session State.json" with on-track coaching instructions
-  5. Integrate support for LAMs
+  4. Integrate support for LAMs
 
 #### Session Database
   1. Active validation of value ranges in settings definitions
-  2. Auto track section creation based on lap telemetry data
-  3. Integration with an upcoming REST/JSON realtime interface of Second Monitor
+  2. Integration with an upcoming REST/JSON realtime interface of Second Monitor
 
 #### Setup Workbench
   1. Collect telemetry data from multiple drivers and generate combined setup recommendations

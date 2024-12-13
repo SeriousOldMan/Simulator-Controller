@@ -1,4 +1,4 @@
-## 6.0.1.0-release 12/13/24 (planned)
+## 6.0.1.0-release 12/13/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed editing of track automation points, which was broken with 6.0.0.

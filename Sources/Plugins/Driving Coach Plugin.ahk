@@ -360,9 +360,9 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 			A_TrayMenu.Uncheck(label)
 	}
 
-	startTelemetryCoaching(auto := false) {
+	startTelemetryCoaching(auto := false, confirm := true) {
 		if this.DrivingCoach
-			this.DrivingCoach.startTelemetryCoaching(true, auto)
+			this.DrivingCoach.startTelemetryCoaching(confim, auto)
 	}
 
 	finishTelemetryCoaching() {
@@ -370,9 +370,9 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 			this.DrivingCoach.finishTelemetryCoaching()
 	}
 
-	startTrackCoaching() {
+	startTrackCoaching(confirm := true) {
 		if this.DrivingCoach
-			this.DrivingCoach.startTrackCoaching()
+			this.DrivingCoach.startTrackCoaching(confirm)
 	}
 
 	finishTrackCoaching() {
@@ -386,7 +386,7 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 ;;;                        Controller Action Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startTelemetryCoaching() {
+startTelemetryCoaching(confirm := true, auto := false) {
 	local controller := SimulatorController.Instance
 	local plugin := controller.findPlugin(kDrivingCoachPlugin)
 
@@ -394,7 +394,7 @@ startTelemetryCoaching() {
 
 	try {
 		if (plugin && controller.isActive(plugin))
-			plugin.startTelemetryCoaching()
+			plugin.startTelemetryCoaching(auto, confirm)
 	}
 	finally {
 		protectionOff()
@@ -416,7 +416,7 @@ finishTelemetryCoaching() {
 	}
 }
 
-startTrackCoaching() {
+startTrackCoaching(confirm := true) {
 	local controller := SimulatorController.Instance
 	local plugin := controller.findPlugin(kDrivingCoachPlugin)
 
@@ -424,7 +424,7 @@ startTrackCoaching() {
 
 	try {
 		if (plugin && controller.isActive(plugin))
-			plugin.startTrackCoaching()
+			plugin.startTrackCoaching(confirm)
 	}
 	finally {
 		protectionOff()

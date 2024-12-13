@@ -342,7 +342,7 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 			if this.TelemetryCoachingActive
 				this.finishTelemetryCoaching()
 			else
-				this.startTelemetryCoaching(true)
+				this.startTelemetryCoaching(true, true)
 		}
 
 		label := StrReplace(StrReplace(label, "`n", A_Space), "`r", "")
@@ -360,9 +360,9 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 			A_TrayMenu.Uncheck(label)
 	}
 
-	startTelemetryCoaching(auto := false, confirm := true) {
+	startTelemetryCoaching(confirm := true, auto := false) {
 		if this.DrivingCoach
-			this.DrivingCoach.startTelemetryCoaching(confim, auto)
+			this.DrivingCoach.startTelemetryCoaching(confirm, auto)
 	}
 
 	finishTelemetryCoaching() {

@@ -6,7 +6,7 @@
   5. New "On-track Coaching" function in the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles), which automatically starts telemetry based coaching and on-track coaching by the Driving Coach when this startup profile is active.
   6. On-track coaching can now also enabled from the tray menu of the "Simulator Controller" process.
   7. Support for an additional session type named "Time Trial" has been added to all applications.
-     - Hotlap and Time Trial modes of the different simulators are mapped to this single session type.
+     - Hotlap and time trial modes of the different simulators are mapped to this single session type.
 	 - General support by all Assistants is comparable to "Qualification".
 	 - Corresponding settings for the different Assistant services has been added to the "Session Database".
   8. [Expert] Many parameters of all Race Assistant plugins have been renamed. The old names are still supported for compatibility reasons, but they are deprecated.

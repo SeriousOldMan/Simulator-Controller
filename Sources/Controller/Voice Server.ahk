@@ -611,60 +611,64 @@ class VoiceServer extends ConfigurationItem {
 		registerChoices(name, choices*) {
 			local recognizer := this.SpeechRecognizer[true]
 
-			recognizer.setChoices(name, values2String(",", choices*))
+			if recognizer {
+				recognizer.setChoices(name, values2String(",", choices*))
 
-			if recognizer.Booster
-				recognizer.Booster.setChoices(name, choices)
+				if recognizer.Booster
+					recognizer.Booster.setChoices(name, choices)
+			}
 		}
 
 		registerVoiceCommand(grammar, command, callback) {
 			local recognizer := this.SpeechRecognizer[true]
 			local key, descriptor, nextCharIndex
 
-			if !grammar {
-				for key, descriptor in this.iVoiceCommands
+			if recognizer {
+				if !grammar {
+					for key, descriptor in this.iVoiceCommands
+						if ((descriptor[1] = command) && (descriptor[2] = callback))
+							return
+
+					grammar := ("__Grammar." . this.iCounter++)
+				}
+				else if this.VoiceCommands.Has(grammar) {
+					descriptor := this.VoiceCommands[grammar]
+
 					if ((descriptor[1] = command) && (descriptor[2] = callback))
 						return
-
-				grammar := ("__Grammar." . this.iCounter++)
-			}
-			else if this.VoiceCommands.Has(grammar) {
-				descriptor := this.VoiceCommands[grammar]
-
-				if ((descriptor[1] = command) && (descriptor[2] = callback))
-					return
-			}
-
-			if this.VoiceServer.Debug[kDebugGrammars] {
-				nextCharIndex := 1
-
-				showMessage("Register command phrase: " . GrammarCompiler(recognizer).readGrammar(&command, &nextCharIndex).toString())
-			}
-
-			try {
-				if (grammar = "Text") {
-					; if (this.RecognizerMode != "Text")
-					;	throw "Continuous text is not supported in grammar based recognition..."
-				}
-				else if (this.RecognizerMode = "Text")
-					throw "Listener grammars are not supported in continuous text recognition..."
-				else {
-					if !recognizer.loadGrammar(grammar, recognizer.compileGrammar(command), ObjBindMethod(this.VoiceServer, "recognizeVoiceCommand", this))
-						throw "Recognizer not running..."
-
-					if recognizer.Booster
-						recognizer.Booster.setGrammar(grammar, command)
 				}
 
-				this.VoiceCommands[grammar] := Array(command, callback)
-			}
-			catch Any as exception {
-				logError(exception, true)
+				if this.VoiceServer.Debug[kDebugGrammars] {
+					nextCharIndex := 1
 
-				logMessage(kLogCritical, translate("Error while registering voice command `"") . command . translate("`" - please check the configuration"))
+					showMessage("Register command phrase: " . GrammarCompiler(recognizer).readGrammar(&command, &nextCharIndex).toString())
+				}
 
-				showMessage(substituteVariables(translate("Cannot register voice command `"%command%`" - please check the configuration..."), {command: command})
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				try {
+					if (grammar = "Text") {
+						; if (this.RecognizerMode != "Text")
+						;	throw "Continuous text is not supported in grammar based recognition..."
+					}
+					else if (this.RecognizerMode = "Text")
+						throw "Listener grammars are not supported in continuous text recognition..."
+					else {
+						if !recognizer.loadGrammar(grammar, recognizer.compileGrammar(command), ObjBindMethod(this.VoiceServer, "recognizeVoiceCommand", this))
+							throw "Recognizer not running..."
+
+						if recognizer.Booster
+							recognizer.Booster.setGrammar(grammar, command)
+					}
+
+					this.VoiceCommands[grammar] := Array(command, callback)
+				}
+				catch Any as exception {
+					logError(exception, true)
+
+					logMessage(kLogCritical, translate("Error while registering voice command `"") . command . translate("`" - please check the configuration"))
+
+					showMessage(substituteVariables(translate("Cannot register voice command `"%command%`" - please check the configuration..."), {command: command})
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				}
 			}
 		}
 
@@ -1287,7 +1291,7 @@ class VoiceServer extends ConfigurationItem {
 									throw "Recognizer not running..."
 						}
 
-					if (client.RecognizerMode = "Grammar") {
+					if ((client.RecognizerMode = "Grammar") && client.Listener) {
 						clientRecognizer := client.SpeechRecognizer[true]
 
 						if (clientRecognizer.Method = "Pattern")

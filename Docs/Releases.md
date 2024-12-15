@@ -2,16 +2,17 @@
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a rare bug in the handling of deactivated voice recognition, which caused unnecessary error messages popping up.
-  4. Track sections can be automatically created in the Telemetry Viewer based on the currently selected telemetry data. Enter the "Edit" mode in the track map and use the "Scan" button. Since this is a heuristical approach, please check (and edit) the created section starting points afterwards.
-  5. The Driving Coach will also use automatically generated track sections if none are yet configured for the given track.
-  6. New "On-track Coaching" function in the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles), which automatically starts telemetry based coaching and on-track coaching by the Driving Coach when this startup profile is active.
-  7. On-track coaching can now also enabled from the tray menu of the "Simulator Controller" process.
-  8. Additional arguments for the controller action functions [*startTelemetryCoaching* and *startTrackCoaching*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions), that let you control whether the Driving Coach will confirm the command.
-  9. Support for an additional session type named "Time Trial" has been added to all applications.
+  4. The progress bar will not open up in the "Solo Center", if data is exported in the background, because auto save is enabled.
+  5. Track sections can be automatically created in the Telemetry Viewer based on the currently selected telemetry data. Enter the "Edit" mode in the track map and use the "Scan" button. Since this is a heuristical approach, please check (and edit) the created section starting points afterwards.
+  6. The Driving Coach will also use automatically generated track sections if none are yet configured for the given track.
+  7. New "On-track Coaching" function in the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles), which automatically starts telemetry based coaching and on-track coaching by the Driving Coach when this startup profile is active.
+  8. On-track coaching can now also enabled from the tray menu of the "Simulator Controller" process.
+  9. Additional arguments for the controller action functions [*startTelemetryCoaching* and *startTrackCoaching*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions), that let you control whether the Driving Coach will confirm the command.
+  10. Support for an additional session type named "Time Trial" has been added to all applications.
      - Hotlap and time trial modes of the different simulators are mapped to this single session type.
 	 - General support by all Assistants is comparable to "Qualification".
 	 - Corresponding settings for the different Assistant services has been added to the "Session Database".
-  10. [Expert] Many parameters of all Race Assistant plugins have been renamed. The old names are still supported for compatibility reasons, but they are deprecated.
+  11. [Expert] Many parameters of all Race Assistant plugins have been renamed. The old names are still supported for compatibility reasons, but they are deprecated.
 
 ## 6.0.1.0-release 12/13/24
   1. Minor bugfixes, as always

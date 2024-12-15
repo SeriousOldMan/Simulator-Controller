@@ -4046,15 +4046,14 @@ class SoloCenter extends ConfigurationItem {
 			this.showDataSummary()
 	}
 
-	exportSession(wait := false) {
+	exportSession(wait := false, progress := true) {
 		exportSessionAsync(fromTask := true) {
-			local progressWindow := showProgress({color: "Green", title: translate("Export to Database")})
 			local telemetryDB := TelemetryDatabase(this.Simulator, this.Car, this.Track)
 			local tyresDB := TyresDatabase()
 			local row := 0
 			local locked := false
 			local count := 0
-			local lap, driver, telemetryData, pressures, temperatures, wear, pressuresData, info
+			local progressWindow, lap, driver, telemetryData, pressures, temperatures, wear, pressuresData, info
 
 			while (row := this.LapsListView.GetNext(row, "C"))
 				count += 1
@@ -4062,11 +4061,15 @@ class SoloCenter extends ConfigurationItem {
 			if fromTask
 				Task.CurrentTask.Critical := true
 
+			if progress
+				progressWindow := showProgress({color: "Green", title: translate("Export to Database")})
+
 			try {
 				row := 0
 
 				while (row := this.LapsListView.GetNext(row, "C")) {
-					showProgress({progress: Round((A_Index / count) * 100), color: "Green", message: translate("Lap:") . A_Space . A_Index})
+					if progress
+						showProgress({progress: Round((A_Index / count) * 100), color: "Green", message: translate("Lap:") . A_Space . A_Index})
 
 					Sleep(50)
 
@@ -4122,6 +4125,9 @@ class SoloCenter extends ConfigurationItem {
 				}
 			}
 			finally {
+				if progress
+					hideProgress()
+
 				if locked
 					try {
 						tyresDB.unlock()
@@ -4149,8 +4155,6 @@ class SoloCenter extends ConfigurationItem {
 
 			loop this.LapsListView.GetCount()
 				this.LapsListView.Modify(A_Index, "-Check")
-
-			hideProgress()
 
 			this.updateState()
 		}
@@ -7606,7 +7610,7 @@ class SoloCenter extends ConfigurationItem {
 
 				if (this.HasData && !this.SessionExported && (this.SessionMode != "Loaded")) {
 					if this.AutoExport
-						this.exportSession(true)
+						this.exportSession(true, false)
 					else if this.AutoClear {
 						if save
 							this.saveSession(true, false, false)

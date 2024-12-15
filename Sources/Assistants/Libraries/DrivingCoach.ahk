@@ -1026,6 +1026,8 @@ class DrivingCoach extends GridRaceAssistant {
 		setMultiMapValue(state, "Coaching", "Track", false)
 
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
+
+		this.iOnTrackCoaching := false
 	}
 
 	telemetryAvailable(laps) {

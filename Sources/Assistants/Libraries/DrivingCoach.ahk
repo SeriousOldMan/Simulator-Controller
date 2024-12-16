@@ -1022,6 +1022,8 @@ class DrivingCoach extends GridRaceAssistant {
 
 		setMultiMapValue(state, "Coaching", "Track", false)
 
+		removeMultiMapValues(state, "Instructions")
+
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 	}
 
@@ -1756,45 +1758,43 @@ class DrivingCoach extends GridRaceAssistant {
 		if (this.TelemetryAnalyzer && telemetry && this.Speaker) {
 			if (A_TickCount < nextRecommendation)
 				return
-			else if ((telemetry.Sections.Length > 0) && !this.getSpeaker().Speaking) {
-				nextRecommendation := (A_TickCount + wait)
+			else {
+				instructionHints := this.getInstructionHints(cornerNr)
 
-				if (this.ConnectionState = "Active") {
-					this.Mode := "Coaching"
+				if (instructionHints.Length > 0)
+					instructionHints := filterInstructionHints(instructionHints)
 
-					telemetry := telemetry.JSON
+				if ((telemetry.Sections.Length > 0) && !this.getSpeaker().Speaking) {
+					nextRecommendation := (A_TickCount + wait)
 
-					problemsInstruction := this.Instructions["Coaching.Corner.Problems"]
+					if (this.ConnectionState = "Active") {
+						this.Mode := "Coaching"
 
-					if (Trim(problemsInstruction) != "") {
-						instructionHints := this.getInstructionHints(cornerNr)
+						telemetry := telemetry.JSON
 
-						if (instructionHints.Length > 0)
+						problemsInstruction := this.Instructions["Coaching.Corner.Problems"]
+
+						if ((Trim(problemsInstruction) != "") && (instructionHints.Length > 0))
 							telemetry := (substituteVariables(problemsInstruction
-															, {problems: values2String(", ", collect(filterInstructionHints(instructionHints)
-																								   , (h) => translate(hintProblems[h]))*)
+															, {problems: values2String(", ", collect(instructionHints, (h) => translate(hintProblems[h]))*)
 															 , corner: cornerNr})
 										. "\n\n" . telemetry)
+
+						try {
+							command := substituteVariables(this.Instructions["Coaching.Corner.Approaching"]
+														 , {telemetry: telemetry, corner: cornerNr})
+
+							if reference
+								command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
+																	   , {telemetry: reference.JSON}))
+
+							this.handleVoiceText("TEXT", command, false)
+						}
+						finally {
+							this.Mode := oldMode
+						}
 					}
-
-					try {
-						command := substituteVariables(this.Instructions["Coaching.Corner.Approaching"]
-													 , {telemetry: telemetry, corner: cornerNr})
-
-						if reference
-							command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
-																   , {telemetry: reference.JSON}))
-
-						this.handleVoiceText("TEXT", command, false)
-					}
-					finally {
-						this.Mode := oldMode
-					}
-				}
-				else if this.Speaker {
-					instructionHints := this.getInstructionHints(cornerNr)
-
-					if (instructionHints.Length > 0) {
+					else if (this.Speaker && (instructionHints.Length > 0)) {
 						speaker := this.getSpeaker()
 
 						speaker.beginTalk({Talking: true})
@@ -1802,8 +1802,7 @@ class DrivingCoach extends GridRaceAssistant {
 						try {
 							lastHint := false
 
-							for index, hint in bubbleSort(&instructionHints := filterInstructionHints(instructionHints)
-														, (h1, h2) => inList(hints, h1) > inList(hints, h2)) {
+							for index, hint in bubbleSort(&instructionHints, (h1, h2) => inList(hints, h1) > inList(hints, h2)) {
 								conjunction := (lastHint ? instructionConjunction(lastHint, hint) : false)
 
 								if conjunction
@@ -1825,6 +1824,23 @@ class DrivingCoach extends GridRaceAssistant {
 						}
 					}
 				}
+
+				if (instructionHints.Length > 0)
+					Task.startTask(() {
+						local state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
+						local speaker := (this.Speaker && this.getSpeaker())
+						local ignore, hint
+
+						setMultiMapValue(state, "Instructions", "Corner", cornerNr)
+
+						setMultiMapValue(state, "Instructions", "Instructions", values2String(", ", instructionHints))
+
+						if speaker
+							for ignore, hint in instructionHints
+								setMultiMapValue(state, "Instructions", hint, speaker.getPhrase(hint, {conjunction: "", conclusion: ""}))
+
+						writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
+					})
 			}
 		}
 	}

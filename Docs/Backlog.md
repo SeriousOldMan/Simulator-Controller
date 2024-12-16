@@ -6,14 +6,14 @@
 	 - Number of pitstops
 	 - Relative performance
 
+#### Core System
+  1. Integration of Whisper as local voice recognition engine
+  2. Integration of local TTS engines for voice generation
+
 #### Simulation Support
   1. Better integration with the weather forecast data of *rFactor 2* and *Le Mans Ultimate*
   2. Pitstop automation for *Le Mans Ultimate*
   3. Support for new and also historic simulators
-
-#### Core System
-  1. Integration of Whisper as local voice recognition engine
-  2. Integration of local TTS engines for voice generation
 
 #### Plugins
   1. Make the post-pitstop position prediction available in the "Session State.json" file

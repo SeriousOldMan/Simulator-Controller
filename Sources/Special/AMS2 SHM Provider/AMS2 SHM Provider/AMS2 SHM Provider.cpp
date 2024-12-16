@@ -173,8 +173,10 @@ int main(int argc, char* argv[]) {
 			printf("Session=Race\n");
 		else if (localCopy->mSessionState == SESSION_QUALIFY)
 			printf("Session=Qualification\n");
-		else if (localCopy->mSessionState == SESSION_PRACTICE)
+		else if ((localCopy->mSessionState == SESSION_PRACTICE) || (localCopy->mSessionState == SESSION_TEST))
 			printf("Session=Practice\n");
+		else if (localCopy->mSessionState == SESSION_TIME_ATTACK)
+			printf("Session=Time Trial\n");
 		else
 			printf("Session=Other\n");
 

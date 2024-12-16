@@ -207,6 +207,12 @@ inline const string getSession(AC_SESSION_TYPE session) {
 	case AC_RACE:
 		return "Race";
 		break;
+	case AC_HOTLAP:
+		return "Time Trial";
+		break;
+	case AC_TIME_ATTACK:
+		return "Time Trial";
+		break;
 	default:
 		return "Other";
 		break;

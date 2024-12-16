@@ -35,6 +35,10 @@ namespace SHMConnector
                     return "Qualification";
                 case AC_SESSION_TYPE.AC_RACE:
                     return "Race";
+                case AC_SESSION_TYPE.AC_HOTLAP:
+                    return "Time Trial";
+                case AC_SESSION_TYPE.AC_TIME_ATTACK:
+                    return "Time Trial";
                 default:
                     return "Other";
             }

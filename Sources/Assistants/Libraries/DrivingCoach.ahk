@@ -1000,8 +1000,11 @@ class DrivingCoach extends GridRaceAssistant {
 
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 
-		if deactivate
+		if deactivate {
 			this.iCoachingActive := false
+
+			this.iOnTrackCoaching := false
+		}
 	}
 
 	startupTrackCoaching() {
@@ -1025,6 +1028,8 @@ class DrivingCoach extends GridRaceAssistant {
 		removeMultiMapValues(state, "Instructions")
 
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
+
+		this.iOnTrackCoaching := false
 	}
 
 	telemetryAvailable(laps) {
@@ -1543,9 +1548,9 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 
 			if announcements
-				this.updateConfigurationValues({Announcements: announcements, OnTrackCoaching: onTrackCoaching})
+				this.updateConfigurationValues({Announcements: announcements, OnTrackCoaching: onTrackCoaching || this.OnTrackCoaching})
 			else
-				this.updateConfigurationValues({OnTrackCoaching: onTrackCoaching})
+				this.updateConfigurationValues({OnTrackCoaching: onTrackCoaching || this.OnTrackCoaching})
 		}
 
 		if this.CoachingActive

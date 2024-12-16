@@ -13,6 +13,7 @@
 	 - General support by all Assistants is comparable to "Qualification".
 	 - Corresponding settings for the different Assistant services has been added to the "Session Database".
   11. [Expert] Many parameters of all Race Assistant plugins have been renamed. The old names are still supported for compatibility reasons, but they are deprecated.
+  12. [Expert] Corner by corner instructions of the Driving Coach are now written to the "Session State.json" file which can be used to implement SimHub Dashboards and Overlays.
 
 ## 6.0.1.0-release 12/13/24
   1. Minor bugfixes, as always

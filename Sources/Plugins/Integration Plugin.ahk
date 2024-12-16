@@ -11,6 +11,7 @@
 
 #Include "..\Libraries\Task.ahk"
 #Include "..\Libraries\JSON.ahk"
+#Include "Driving Coach Plugin.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -25,8 +26,16 @@ global kIntegrationPlugin := "Integration"
 ;;;-------------------------------------------------------------------------;;;
 
 class IntegrationPlugin extends ControllerPlugin {
+	iDrivingCoach := false
+
 	iStateFile := (kTempDirectory . "Session State.json")
 	iAssistantsStateTask := false
+
+	DrivingCoach {
+		Get {
+			return this.iDrivingCoach
+		}
+	}
 
 	StateFile {
 		Get {
@@ -55,6 +64,8 @@ class IntegrationPlugin extends ControllerPlugin {
 
 			this.updateSessionState()
 		}
+
+		this.iDrivingCoach := this.Controller.findPlugin(kDrivingCoachPlugin)
 	}
 
 	simulatorStartup(simulator) {
@@ -481,6 +492,27 @@ class IntegrationPlugin extends ControllerPlugin {
 		return state
 	}
 
+	createCornerInstructions(sessionInfo) {
+		local coachingState := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
+		local coachingHints := string2Values(",", getMultiMapValue(coachingState, "Instructions", "Instructions", ""))
+		local state := kNull
+		local ignore, hint, hints, message
+
+		if (coachingHints.Length > 0) {
+			hints := []
+
+			for ignore, hint in coachingHints {
+				message := getMultiMapValue(coachingState, "Instructions", hint, false)
+
+				hints.Push(Map("Hint", hint, "Message", message ? message : kNull))
+			}
+
+			state := Map("Corner", getMultiMapValue(coachingState, "Instructions", "Corner", kNull), "Hints", hints)
+		}
+
+		return state
+	}
+
 	updateControllerState(sessionState, controllerState) {
 		local assistantsState := Map()
 		local teamServerState := Map()
@@ -519,6 +551,7 @@ class IntegrationPlugin extends ControllerPlugin {
 		if (assistantsState.Count == 0) {
 			assistantsState["Mode"] := kNull
 			assistantsState["Session"] := kNull
+			assistantsState["Driving Coach"] := Map("State", "Disabled", "Silent", kNull, "Muted", kNull)
 			assistantsState["Race Engineer"] := Map("State", "Disabled", "Silent", kNull, "Muted", kNull)
 			assistantsState["Race Strategist"] := Map("State", "Disabled", "Silent", kNull, "Muted", kNull)
 			assistantsState["Race Spotter"] := Map("State", "Disabled", "Silent", kNull, "Muted", kNull)
@@ -623,6 +656,17 @@ class IntegrationPlugin extends ControllerPlugin {
 							  , "Damage", this.createDamageState(sessionInfo)
 							  , "Pitstop", this.createPitstopState(sessionInfo)
 							  , "Standings", this.createStandingsState(sessionInfo))
+
+			if (this.DrivingCoach && this.DrivingCoach.TrackCoachingActive) {
+				sessionState["Instructions"] := this.createCornerInstructions(sessionInfo)
+
+				Task.CurrentTask.Priority := kHighPriority
+				Task.CurrentTask.Sleep := 500
+			}
+			else {
+				Task.CurrentTask.Priority := kLowPriority
+				Task.CurrentTask.Sleep := 1000
+			}
 
 			this.updateControllerState(sessionState, readMultiMap(kTempDirectory . "Simulator Controller.state"))
 

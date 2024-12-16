@@ -726,9 +726,8 @@ class DrivingCoach extends GridRaceAssistant {
 
 		try {
 			if (cornerNr = kUndefined) {
-				if this.Speaker {
+				if this.Speaker
 					this.getSpeaker().speakPhrase("Repeat")
-				}
 			}
 			else {
 				telemetry := this.getTelemetry(&reference := true, cornerNr)
@@ -1761,7 +1760,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		telemetry := this.getTelemetry(&reference := true, cornerNr)
 
-		if (this.TelemetryAnalyzer && telemetry && this.Speaker) {
+		if (this.TelemetryAnalyzer && telemetry) {
 			if (A_TickCount < nextRecommendation)
 				return
 			else {
@@ -1770,66 +1769,67 @@ class DrivingCoach extends GridRaceAssistant {
 				if (instructionHints.Length > 0)
 					instructionHints := filterInstructionHints(instructionHints)
 
-				if ((telemetry.Sections.Length > 0) && !this.getSpeaker().Speaking) {
-					nextRecommendation := (A_TickCount + wait)
+				if this.Speaker
+					if ((telemetry.Sections.Length > 0) && !this.getSpeaker().Speaking) {
+						nextRecommendation := (A_TickCount + wait)
 
-					if (this.ConnectionState = "Active") {
-						this.Mode := "Coaching"
+						if (this.ConnectionState = "Active") {
+							this.Mode := "Coaching"
 
-						telemetry := telemetry.JSON
+							telemetry := telemetry.JSON
 
-						problemsInstruction := this.Instructions["Coaching.Corner.Problems"]
+							problemsInstruction := this.Instructions["Coaching.Corner.Problems"]
 
-						if ((Trim(problemsInstruction) != "") && (instructionHints.Length > 0))
-							telemetry := (substituteVariables(problemsInstruction
-															, {problems: values2String(", ", collect(instructionHints, (h) => translate(hintProblems[h]))*)
-															 , corner: cornerNr})
-										. "\n\n" . telemetry)
+							if ((Trim(problemsInstruction) != "") && (instructionHints.Length > 0))
+								telemetry := (substituteVariables(problemsInstruction
+																, {problems: values2String(", ", collect(instructionHints, (h) => translate(hintProblems[h]))*)
+																 , corner: cornerNr})
+											. "\n\n" . telemetry)
 
-						try {
-							command := substituteVariables(this.Instructions["Coaching.Corner.Approaching"]
-														 , {telemetry: telemetry, corner: cornerNr})
+							try {
+								command := substituteVariables(this.Instructions["Coaching.Corner.Approaching"]
+															 , {telemetry: telemetry, corner: cornerNr})
 
-							if reference
-								command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
-																	   , {telemetry: reference.JSON}))
+								if reference
+									command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
+																		   , {telemetry: reference.JSON}))
 
-							this.handleVoiceText("TEXT", command, false)
-						}
-						finally {
-							this.Mode := oldMode
-						}
-					}
-					else if (this.Speaker && (instructionHints.Length > 0)) {
-						speaker := this.getSpeaker()
-
-						speaker.beginTalk({Talking: true})
-
-						try {
-							lastHint := false
-
-							for index, hint in bubbleSort(&instructionHints, (h1, h2) => inList(hints, h1) > inList(hints, h2)) {
-								conjunction := (lastHint ? instructionConjunction(lastHint, hint) : false)
-
-								if conjunction
-									conjunction := speaker.Fragments[conjunction]
-								else if !lastHint
-									conjunction := ""
-								else
-									conjunction := ". "
-
-								conclusion := ((index = instructionHints.Length) ? "." : "")
-
-								speaker.speakPhrase(hint, {conjunction: conjunction, conclusion: conclusion})
-
-								lastHint := hint
+								this.handleVoiceText("TEXT", command, false)
+							}
+							finally {
+								this.Mode := oldMode
 							}
 						}
-						finally {
-							speaker.endTalk({Rephrase: false})
+						else if (instructionHints.Length > 0) {
+							speaker := this.getSpeaker()
+
+							speaker.beginTalk({Talking: true})
+
+							try {
+								lastHint := false
+
+								for index, hint in bubbleSort(&instructionHints, (h1, h2) => inList(hints, h1) > inList(hints, h2)) {
+									conjunction := (lastHint ? instructionConjunction(lastHint, hint) : false)
+
+									if conjunction
+										conjunction := speaker.Fragments[conjunction]
+									else if !lastHint
+										conjunction := ""
+									else
+										conjunction := ". "
+
+									conclusion := ((index = instructionHints.Length) ? "." : "")
+
+									speaker.speakPhrase(hint, {conjunction: conjunction, conclusion: conclusion})
+
+									lastHint := hint
+								}
+							}
+							finally {
+								speaker.endTalk({Rephrase: false})
+							}
 						}
 					}
-				}
 
 				instructionCount += 1
 
@@ -1842,7 +1842,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 						setMultiMapValue(state, "Instructions", "Corner", cornerNr)
 
-						setMultiMapValue(state, "Instructions", "Instructions", values2String(", ", instructionHints))
+						setMultiMapValue(state, "Instructions", "Instructions", values2String(", ", instructionHints*))
 
 						if speaker
 							for ignore, hint in instructionHints

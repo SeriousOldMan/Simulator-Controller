@@ -660,10 +660,12 @@ class IntegrationPlugin extends ControllerPlugin {
 			if (this.DrivingCoach && this.DrivingCoach.TrackCoachingActive) {
 				sessionState["Instructions"] := this.createCornerInstructions(sessionInfo)
 
-				Task.CurrentTask.Priority := kHighPriority
-				Task.CurrentTask.Sleep := 500
+				if Task.CurrentTask {
+					Task.CurrentTask.Priority := kHighPriority
+					Task.CurrentTask.Sleep := 500
+				}
 			}
-			else {
+			else if Task.CurrentTask {
 				Task.CurrentTask.Priority := kLowPriority
 				Task.CurrentTask.Sleep := 1000
 			}

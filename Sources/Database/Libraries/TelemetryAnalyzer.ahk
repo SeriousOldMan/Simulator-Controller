@@ -1480,6 +1480,9 @@ class TelemetryAnalyzer {
 			index += 1
 		}
 
+		for index, section in sections
+			section.Length := computeSectionLength(trackMap, sections, index, section)
+
 		return sections
 	}
 
@@ -1490,42 +1493,6 @@ class TelemetryAnalyzer {
 		local sections := []
 		local index, section
 
-		computeLength(index) {
-			local next := ((index = sections.Length) ? 1 : (index + 1))
-			local distance := 0
-			local count := getMultiMapValue(trackMap, "Map", "Points", 0)
-			local lastX, lastY, nextX, nextY
-
-			index := TelemetryAnalyzer.getTrackCoordinateIndex(trackMap, sections[index].X, sections[index].Y)
-			next := TelemetryAnalyzer.getTrackCoordinateIndex(trackMap, sections[next].X, sections[next].Y)
-
-			if (index && next) {
-				lastX := getMultiMapValue(trackMap, "Points", index . ".X", 0)
-				lastY := getMultiMapValue(trackMap, "Points", index . ".Y", 0)
-
-				index += 1
-
-				loop
-					if (index = next)
-						break
-					else if (index > count)
-						index := 1
-					else {
-						nextX := getMultiMapValue(trackMap, "Points", index . ".X", 0)
-						nextY := getMultiMapValue(trackMap, "Points", index . ".Y", 0)
-
-						distance += Sqrt(((nextX - lastX) ** 2) + ((nextY - lastY) ** 2))
-
-						lastX := nextX
-						lastY := nextY
-
-						index += 1
-					}
-				}
-
-			return Round(convertUnit("Length", distance))
-		}
-
 		loop getMultiMapValue(trackMap, "Sections", "Count")
 			sections.Push({Nr: getMultiMapValue(trackMap, "Sections", A_Index . ".Nr")
 						 , Type: getMultiMapValue(trackMap, "Sections", A_Index . ".Type")
@@ -1534,7 +1501,7 @@ class TelemetryAnalyzer {
 						 , Y: getMultiMapValue(trackMap, "Sections", A_Index . ".Y")})
 
 		for index, section in sections
-			section.Length := computeLength(index)
+			section.Length := computeSectionLength(trackMap, sections, index, section)
 
 		return sections
 	}
@@ -1553,6 +1520,47 @@ class TelemetryAnalyzer {
 	createTelemetry(lap, fileName, driver := false, lapTime := false, sectorTimes := false) {
 		return Telemetry(this, lap, this.loadData(fileName), driver, lapTime, sectorTimes)
 	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                        Private Function Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+computeSectionLength(trackMap, sections, index, section) {
+	local next := ((index = sections.Length) ? 1 : (index + 1))
+	local distance := 0
+	local count := getMultiMapValue(trackMap, "Map", "Points", 0)
+	local lastX, lastY, nextX, nextY
+
+	index := TelemetryAnalyzer.getTrackCoordinateIndex(trackMap, sections[index].X, sections[index].Y)
+	next := TelemetryAnalyzer.getTrackCoordinateIndex(trackMap, sections[next].X, sections[next].Y)
+
+	if (index && next) {
+		lastX := getMultiMapValue(trackMap, "Points", index . ".X", 0)
+		lastY := getMultiMapValue(trackMap, "Points", index . ".Y", 0)
+
+		index += 1
+
+		loop
+			if (index = next)
+				break
+			else if (index > count)
+				index := 1
+			else {
+				nextX := getMultiMapValue(trackMap, "Points", index . ".X", 0)
+				nextY := getMultiMapValue(trackMap, "Points", index . ".Y", 0)
+
+				distance += Sqrt(((nextX - lastX) ** 2) + ((nextY - lastY) ** 2))
+
+				lastX := nextX
+				lastY := nextY
+
+				index += 1
+			}
+		}
+
+	return Round(convertUnit("Length", distance))
 }
 
 

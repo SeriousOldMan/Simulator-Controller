@@ -17,7 +17,6 @@
 
 #### Plugins
   1. Make the post-pitstop position prediction available in the "Session State.json" file
-  2. Make next corner instructions of the Driving Coach available in the "Session State.json" file
 
 #### Assistants
   1. Controller action and voice command to enable/disable data collection

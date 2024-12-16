@@ -1667,6 +1667,7 @@ class DrivingCoach extends GridRaceAssistant {
 		static wait := false
 		static hintProblems := false
 		static hints := false
+		static instructionCount := 0
 
 		filterInstructionHints(instructionHints) {
 			local result := []
@@ -1830,10 +1831,13 @@ class DrivingCoach extends GridRaceAssistant {
 					}
 				}
 
+				instructionCount += 1
+
 				if (instructionHints.Length > 0)
 					Task.startTask(() {
 						local state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
 						local speaker := (this.Speaker && this.getSpeaker())
+						local lastInstruction := instructionCount
 						local ignore, hint
 
 						setMultiMapValue(state, "Instructions", "Corner", cornerNr)
@@ -1842,9 +1846,19 @@ class DrivingCoach extends GridRaceAssistant {
 
 						if speaker
 							for ignore, hint in instructionHints
-								setMultiMapValue(state, "Instructions", hint, speaker.getPhrase(hint, {conjunction: "", conclusion: ""}))
+								setMultiMapValue(state, "Instructions", hint, Trim(speaker.getPhrase(hint, {conjunction: "", conclusion: ""})))
 
 						writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
+
+						Task.startTask(() {
+							if (lastInstruction = instructionCount) {
+								local state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
+
+								removeMultiMapValues(state, "Instructions")
+
+								writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
+							}
+						}, wait * 2, kLowPriority)
 					})
 			}
 		}

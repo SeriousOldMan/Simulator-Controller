@@ -379,7 +379,7 @@ class VoiceManager extends ConfigurationItem {
 		}
 
 		speakPhrase(phrase, variables := false, focus := false, cache := false, options := false) {
-			local phrase := this.getPhrase(phrase, variables, cache)
+			phrase := this.getPhrase(phrase, variables, cache)
 
 			if phrase
 				this.speak(phrase, focus, cache, options)

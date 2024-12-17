@@ -4598,12 +4598,77 @@ class SoloCenter extends ConfigurationItem {
 		this.pushTask(updateStatisticsAsync)
 	}
 
-	saveSession(copy := false, prompt := true, async := true) {
-		saveSessionAsync(copy := false) {
+	saveSession(copy := false, prompt := true, async := true, progress := true) {
+		saveSessionAsync(copy, progress) {
 			local simulator := this.Simulator
 			local car := this.Car
 			local track := this.Track
-			local sessionDB, info, dirName, directory, fileName, newFileName, folder, session, file, size, dataFile
+			local info, dirName, directory, fileName, newFileName
+
+			saveSession(directory, fileName) {
+				try {
+					local sessionDB := SessionDatabase()
+					local info, dataFile, session, file, size, folder
+
+					SplitPath(fileName, , &folder, , &fileName)
+
+					info := readMultiMap(directory . "Practice.info")
+
+					setMultiMapValue(info, "Session", "Exported", true)
+
+					writeMultiMap(directory . "Practice.info", info)
+
+					if (getMultiMapValue(info, "Creator", "ID", kUndefined) = kUndefined) {
+						setMultiMapValue(info, "Creator", "ID", SessionDatabase.ID)
+						setMultiMapValue(info, "Creator", "Name", SessionDatabase.getUserName())
+					}
+
+					setMultiMapValue(info, "Session", "Exported", true)
+
+					if (normalizeDirectoryPath(folder) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Solo"))) {
+						dataFile := temporaryFileName("Practice", "zip")
+
+						try {
+							RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
+
+							file := FileOpen(dataFile, "r-wd")
+
+							if file {
+								size := file.Length
+
+								session := Buffer(size)
+
+								file.RawRead(session, size)
+
+								file.Close()
+
+								sessionDB.writeSession(simulator, car, track, "Solo", fileName, info, session, size
+													 , false, !FileExist(directory . "Telemetry\*.telemetry")
+													 , SessionDatabase.ID)
+
+								return
+							}
+						}
+						finally {
+							deleteFile(dataFile)
+						}
+					}
+
+					DirCreate(folder)
+					deleteFile(folder . "\" . fileName . ".data")
+
+					dataFile := temporaryFileName("Practice", "zip")
+
+					RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
+
+					FileMove(dataFile, folder . "\" . fileName . ".data", 1)
+
+					writeMultiMap(folder . "\" . fileName . ".solo", info)
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+			}
 
 			if this.TelemetryViewer
 				this.TelemetryViewer.shutdownCollector()
@@ -4665,76 +4730,17 @@ class SoloCenter extends ConfigurationItem {
 				}
 
 				if (fileName != "")
-					withTask(WorkingTask(StrReplace(translate("Save Session..."), "...", "")), () {
-						try {
-							sessionDB := SessionDatabase()
-
-							SplitPath(fileName, , &folder, , &fileName)
-
-							info := readMultiMap(directory . "Practice.info")
-
-							setMultiMapValue(info, "Session", "Exported", true)
-
-							writeMultiMap(directory . "Practice.info", info)
-
-							if (getMultiMapValue(info, "Creator", "ID", kUndefined) = kUndefined) {
-								setMultiMapValue(info, "Creator", "ID", SessionDatabase.ID)
-								setMultiMapValue(info, "Creator", "Name", SessionDatabase.getUserName())
-							}
-
-							setMultiMapValue(info, "Session", "Exported", true)
-
-							if (normalizeDirectoryPath(folder) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Solo"))) {
-								dataFile := temporaryFileName("Practice", "zip")
-
-								try {
-									RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
-
-									file := FileOpen(dataFile, "r-wd")
-
-									if file {
-										size := file.Length
-
-										session := Buffer(size)
-
-										file.RawRead(session, size)
-
-										file.Close()
-
-										sessionDB.writeSession(simulator, car, track, "Solo", fileName, info, session, size
-															 , false, !FileExist(directory . "Telemetry\*.telemetry")
-															 , SessionDatabase.ID)
-
-										return
-									}
-								}
-								finally {
-									deleteFile(dataFile)
-								}
-							}
-
-							DirCreate(folder)
-							deleteFile(folder . "\" . fileName . ".data")
-
-							dataFile := temporaryFileName("Practice", "zip")
-
-							RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
-
-							FileMove(dataFile, folder . "\" . fileName . ".data", 1)
-
-							writeMultiMap(folder . "\" . fileName . ".solo", info)
-						}
-						catch Any as exception {
-							logError(exception)
-						}
-					})
+					if progress
+						withTask(WorkingTask(StrReplace(translate("Save Session..."), "...", "")), saveSession.Bind(directory, fileName))
+					else
+						saveSession(directory, fileName)
 			}
 		}
 
 		if async
-			this.pushTask(saveSessionAsync.Bind(copy))
+			this.pushTask(saveSessionAsync.Bind(copy, progress))
 		else
-			saveSessionAsync(copy)
+			saveSessionAsync(copy, progress)
 	}
 
 	clearSession(wait := false) {
@@ -7613,11 +7619,11 @@ class SoloCenter extends ConfigurationItem {
 						this.exportSession(true, false)
 
 						if save
-							this.saveSession(true, false, false)
+							this.saveSession(true, false, false, false)
 					}
 					else if this.AutoClear {
 						if save
-							this.saveSession(true, false, false)
+							this.saveSession(true, false, false, false)
 					}
 					else {
 						translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])

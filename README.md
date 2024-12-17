@@ -123,7 +123,7 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 30. [Track coaching by an AI](https://youtu.be/mgfFkNh2_Lw) - Demonstrates an on-track coaching lesson by the Driving Coach. The Coach ready the telemetry data, compares it to the data of a reference lap and will give instructions how to improve corner by corner.
 
-31. [Mastering on-trck coaching](https://youtu.be/Gnzye2kf7HI) - This video gives you valuable insights in the configuration of the on-track coaching provided by the Driving Coach. A live conversation is also part of the demonstration.
+31. [Mastering on-track coaching](https://youtu.be/Gnzye2kf7HI) - This video gives you valuable insights in the configuration of the on-track coaching provided by the Driving Coach. A live conversation is also part of the demonstration.
 
 This list will be extended from time to time to cover new functionalities.
 
@@ -148,8 +148,8 @@ Simulator Controller comes with a set of virtual Assistants to guide you through
     
     ![](./Docs/Images/Button%20Box%202.JPG)
     
-    - Code your own functions to be called by the controller buttons and switches using the simple, object-oriented scripting language
-  - Configure all additional [applications](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications) to your taste, including the simulation games used for your virtual races
+  - Code your own functions to be called by the controller buttons and switches using the simple, object-oriented scripting language
+  - Configure additional [applications](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications) to your taste, including the simulation games used for your virtual races
     - Start and stop applications from your controller hardware or automatically upon configurable events
     - Add splash screens and title melodies using a spedial editor for a more emotional startup experience
     - Full support for sophisticated application automation - for example, start your favorite voice chat software like TeamSpeak and automatically switch to your standard channel 
@@ -160,6 +160,7 @@ Simulator Controller comes with a set of virtual Assistants to guide you through
     - Send your predefined kudos and rants to the ingame chat without touching the keyboard
   - Additional support to trigger every function and action from external sources like a voice or gesture recognition software to always keep your hands on the wheel
   - Builtin support for visual head tracking to control ingame viewing angle - see [third party applications](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications) below
+  - And many more, the possibilities are endless
 
 #### AI powered Virtual Race Assistants
 

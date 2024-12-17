@@ -10,9 +10,9 @@
   9. On-track coaching can now also enabled from the tray menu of the "Simulator Controller" process.
   10. Additional arguments for the controller action functions [*startTelemetryCoaching* and *startTrackCoaching*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions), that let you control whether the Driving Coach will confirm the command.
   11. Support for an additional session type named "Time Trial" has been added to all applications.
-     - Hotlap and time trial modes of the different simulators are mapped to this single session type.
-	 - General support by all Assistants is comparable to "Qualification".
-	 - Corresponding settings for the different Assistant services has been added to the "Session Database".
+      - Hotlap and time trial modes of the different simulators are mapped to this single session type.
+	  - General support by all Assistants is comparable to "Qualification".
+	  - Corresponding settings for the different Assistant services has been added to the "Session Database".
   12. [Expert] Many parameters of all Race Assistant plugins have been renamed. The old names are still supported for compatibility reasons, but they are deprecated.
   13. [Expert] Corner by corner instructions of the Driving Coach are now written to the "Session State.json" file which can be used to implement SimHub Dashboards and Overlays.
 

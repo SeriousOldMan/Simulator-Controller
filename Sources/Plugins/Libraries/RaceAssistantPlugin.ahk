@@ -1057,6 +1057,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 							session := "Practice"
 						case kSessionRace:
 							session := "Race"
+						case kSessionTimeTrial:
+							session := "Time Trial"
 						default:
 							session := "Unknown"
 					}
@@ -2722,6 +2724,8 @@ getDataSession(data, &finished) {
 					return kSessionPractice
 				case "Qualification":
 					return kSessionQualification
+				case "Time Trial":
+					return kSessionTimeTrial
 				case "Finished":
 					finished := true
 

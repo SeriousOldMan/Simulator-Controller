@@ -244,8 +244,10 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 			printLine(&output, "Session=Race");
 		else if (localCopy->mSessionState == SESSION_QUALIFY)
 			printLine(&output, "Session=Qualification");
-		else if (localCopy->mSessionState == SESSION_PRACTICE)
+		else if ((localCopy->mSessionState == SESSION_PRACTICE) || (localCopy->mSessionState == SESSION_TEST))
 			printLine(&output, "Session=Practice");
+		else if (localCopy->mSessionState == SESSION_TIME_ATTACK)
+			printLine(&output, "Session=Time Trial");
 		else
 			printLine(&output, "Session=Other");
 

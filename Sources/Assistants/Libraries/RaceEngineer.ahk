@@ -1803,6 +1803,8 @@ class RaceEngineer extends RaceAssistant {
 				default := true
 			case kSessionQualification:
 				session := "Qualification"
+			case kSessionTimeTrial:
+				session := "Time Trial"
 			case kSessionRace:
 				session := "Race"
 				default := true
@@ -1943,6 +1945,11 @@ class RaceEngineer extends RaceAssistant {
 								, DamageReporting: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Race.Damage", true)
 								, DamageAnalysis: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Race.Damage", true)
 								, PressureReporting: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Race.Pressure", true)}
+			else if (this.Session = kSessionTimeTrial)
+				announcements := {FuelWarning: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Time Trial.LowFuel", false)
+								, DamageReporting: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Time Trial.Damage", false)
+								, DamageAnalysis: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Time Trial.Damage", false)
+								, PressureReporting: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Time Trial.Pressure", true)}
 
 			if announcements
 				this.updateConfigurationValues({Announcements: announcements})
@@ -2005,6 +2012,8 @@ class RaceEngineer extends RaceAssistant {
 						session := "Qualifying"
 					case kSessionRace:
 						session := "Race"
+					case kSessionTimeTrial:
+						session := "Time Trial"
 					default:
 						session := "Session"
 				}
@@ -2606,6 +2615,8 @@ class RaceEngineer extends RaceAssistant {
 					return getMultiMapValue(this.Settings, "Session Settings", "Pitstop.Qualification", false)
 				case kSessionRace:
 					return getMultiMapValue(this.Settings, "Session Settings", "Pitstop.Race", true)
+				case kSessionTimeTrial:
+					return getMultiMapValue(this.Settings, "Session Settings", "Pitstop.Time Trial", false)
 				default:
 					return false
 			}

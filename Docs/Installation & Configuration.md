@@ -518,9 +518,9 @@ Although you may call any globally defined function, you should use only the fol
 | changePitstopTyrePressure | tyre, direction, [Optional] increments | AC, ACC, RF2, IRC | Changes the tyre pressure during the next pitstop. *tyre* must be one of "All Around", "Front Left", "Front Right", "Rear Left" and "Rear Right", and *direction* must be either "Increase" or "Decrease". *increments* with a default of 1 define the change in 0.1 psi increments. |
 | changePitstopBrakePadType | brake, selection | ACC | Selects the brake pad compound to change to during the next pitstop. *brake* must be "Front Brake" or "Rear Brake" and *selection* must be "Next" or "Previous".  |
 | changePitstopDriver | selection | ACC, RF2 | Selects the driver to take the car during the next pitstop. *selection* must be either "Next" or "Previous". |
-| startTelemetryCoaching | - | Driving Coach | Initiates telemetry data collection by the Driving Coach. After a few laps the Coach will be ready to discuss your performance with you. |
-| finishTelemetryCoaching | - | Driving Coach | Stops the telemetry based coaching mode of the Driving Coach. |
-| startTrackCoaching | - | Driving Coach | Instructs the Driving Coach to give corner by corner instructions while you are driving. |
+| startTelemetryCoaching | confirm, auto | Driving Coach | Initiates telemetry data collection by the Driving Coach. After a few laps the Coach will be ready to discuss your performance with you. If *confirm* is supplied and *false*, no confirmation is given by the Driving Coach. If *auto* is supplied and *true*, the Driving Coach will start to give corner by corner instructions, once telemetry is available. |
+| finishTelemetryCoaching | confirm | Driving Coach | Stops the telemetry based coaching mode of the Driving Coach. |
+| startTrackCoaching | - | Driving Coach | Instructs the Driving Coach to give corner by corner instructions while you are driving. If *confirm* is supplied and *false*, no confirmation is given by the Driving Coach. |
 | finishTrackCoaching | - | Driving Coach | Stops the Driving Coach to give corner by corner instructions. |
 | planPitstop | - | Race Engineer | *planPitstop* triggers Jona, the Virtual Race Engineer, to plan a pitstop. |
 | planDriverSwap | - | Race Engineer | This is a special form of *planPitstop*, which is only available in team races. Jona is asked to plan the next pitstop for the next driver according to the stint plan of the session. |

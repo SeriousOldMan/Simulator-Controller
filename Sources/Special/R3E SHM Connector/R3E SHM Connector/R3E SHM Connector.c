@@ -321,7 +321,7 @@ extern __declspec(dllexport) int __stdcall call(char* request, char* result, int
 				writeString(result, "Session=Qualification\n", &pos);
 			else if (map_buffer->session_type == R3E_SESSION_RACE)
 				writeString(result, "Session=Race\n", &pos);
-			else if (map_buffer->session_type == R3E_SESSION_PRACTICE) {
+			else if ((map_buffer->session_type == R3E_SESSION_WARMUP) || (map_buffer->session_type == R3E_SESSION_PRACTICE)) {
 				writeString(result, "Session=Practice\n", &pos);
 
 				practice = TRUE;

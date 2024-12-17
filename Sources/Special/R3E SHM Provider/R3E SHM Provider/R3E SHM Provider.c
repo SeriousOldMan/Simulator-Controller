@@ -269,7 +269,7 @@ int main(int argc, char* argv[])
 				wprintf_s(L"Session=Qualification\n");
 			else if (map_buffer->session_type == R3E_SESSION_RACE)
 				wprintf_s(L"Session=Race\n");
-			else if (map_buffer->session_type == R3E_SESSION_PRACTICE) {
+			else if ((map_buffer->session_type == R3E_SESSION_WARMUP) || (map_buffer->session_type == R3E_SESSION_PRACTICE)) {
 				wprintf_s(L"Session=Practice\n");
 
 				practice = TRUE;

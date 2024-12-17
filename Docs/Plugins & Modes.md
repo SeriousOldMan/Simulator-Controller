@@ -293,8 +293,7 @@ The "Race Engineer" plugin handles the interaction of the currently active simul
 
 	raceAssistant: [*initialState*] [*onOffFunction*]; name: *name*; logo: On | Off; language: DE | EN | ...;
 	synthesizer: Windows | dotNET | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey;
-	speaker: On | Off | *Speech Generation Language*;
-	speakerVocalics: *volume* , *pitch* , *rate*;
+	speaker: On | Off | *Speech Generation Language*; speakerVocalics: *volume* , *pitch* , *rate*;
 	speakerBooster: *speakerBooster*;
 	recognizer: Server | Desktop | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey;
 	listener: On | Off | *Speech Recognition Engine*; listenerBooster: *listenerBooster*;
@@ -451,8 +450,7 @@ The "Race Spotter" plugin handles the interaction of the currently active simula
 
 	raceAssistant: [*initialState*] *onOffFunction*; name: *name*; logo: On | Off; language: DE | EN | ...;
 	synthesizer: Windows | dotNET | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey;
-	speaker: On | Off | *Speech Generation Language*;
-	speakerVocalics: *volume* , *pitch* , *rate*;
+	speaker: On | Off | *Speech Generation Language*; speakerVocalics: *volume* , *pitch* , *rate*;
 	speakerBooster: *speakerBooster*;
 	recognizer: Server | Desktop | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey;
 	listener: On | Off | *Speech Recognition Engine*; listenerBooster: *listenerBooster*;
@@ -1589,5 +1587,24 @@ The content of the JSON file looks like this (depending on the current situation
 			],
 			"TyreCompound": "Dry (M)"
 			"TyreSet": 3
+		},
+		"Instructions": {
+			"Corner": 3,
+			"Hints": [
+				{
+					"Hint": "BrakeEarlier",
+					"Message": "Brake a bit earlier"
+				},
+				{
+					"Hint": "BrakeHarder",
+					"Message": "Put more pressure on the brakes"
+				},
+				{
+					"Hint": "AccelerateLater",
+					"Message": "Later on the throttle"
+				}
+			]
 		}
 	}
+	
+A special case here is of course the "Instructions" object. This object is present if [corner by corner coaching](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#coaching-on-the-track) by the Driving Coach is currently active. The "Message"* field will have the instruction translated to the language configured for the Driving Coach. If no voice configuration for the Driving Coach is available, "Message" will be *null*.

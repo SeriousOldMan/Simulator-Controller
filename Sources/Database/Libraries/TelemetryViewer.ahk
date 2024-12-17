@@ -1617,6 +1617,12 @@ class TelemetryViewer {
 
 			telemetry := analyzer.createTelemetry(0, this.SelectedLap[true], driver, lapTime, sectorTimes)
 
+			if (analyzer.TrackSections.Length = 0) {
+				analyzer.requireTrackSections(telemetry)
+
+				telemetry := analyzer.createTelemetry(0, this.SelectedLap[true], driver, lapTime, sectorTimes)
+			}
+
 			referenceLap := this.SelectedReferenceLap
 
 			if referenceLap {

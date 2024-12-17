@@ -7609,13 +7609,15 @@ class SoloCenter extends ConfigurationItem {
 				save := (this.AutoSave && this.SessionActive)
 
 				if (this.HasData && !this.SessionExported && (this.SessionMode != "Loaded")) {
-					if this.AutoExport
+					if this.AutoExport {
 						this.exportSession(true, false)
+
+						if save
+							this.saveSession(true, false, false)
+					}
 					else if this.AutoClear {
 						if save
 							this.saveSession(true, false, false)
-
-						this.clearSession(true)
 					}
 					else {
 						translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])

@@ -2,7 +2,7 @@
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a rare bug in the handling of deactivated voice recognition, which caused unnecessary error messages popping up.
-  4. Fixed a bug in "Solo Center" which prevented auto saving of session, when auto exporting was enabled.
+  4. Fixed a bug in "Solo Center" which prevented auto saving of sessions, when auto exporting was enabled.
   5. The progress bar will not open up in the "Solo Center", if data is exported in the background, because auto save is enabled.
   6. Track sections will now automatically be detected, if required.
      - You can use the new "Scan" method while in the "Edit" mode of the track map in the Telemetry Viewer. Track sections will be created based on the currently selected telemetry data. Since this is a heuristical approach, please check (and edit) the created section starting points afterwards. Once you are fine with the track sections, store them permanently using the "Save" button.

@@ -2678,7 +2678,7 @@ class SoloCenter extends ConfigurationItem {
 			}
 		}
 		else if (line = 3)
-			this.showRunsSummary()
+			this.showRunsSummary(GetKeyState("Ctrl"))
 
 		this.updateRunMenu()
 	}

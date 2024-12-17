@@ -129,7 +129,7 @@ This list will be extended from time to time to cover new functionalities.
 
 ### Discord Community
 
-If you want to become a part of the small and very young Community for Simulator Controller on Discord. Here you will also find a large collection of FAQs and you will be able to attend live coaching sessions each Monday. Please use [this invitation](https://discord.gg/5N8JrNr48H) to join the Discord Server.
+If you want to become a part of the community for Simulator Controller on Discord use [this invitation](https://discord.gg/5N8JrNr48H). Here you will find a large collection of FAQs and you will be able to attend live coaching sessions. And of course, you can post your questions and you can participate in the discussion.
 
 ### Main features
 

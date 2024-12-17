@@ -1428,7 +1428,7 @@ class TelemetryAnalyzer {
 		local cornerNr := 1
 		local straightNr := 1
 		local startIndex := false
-		local startX, startY, telemetryIndex, value
+		local startX, startY, telemetryIndex
 
 		loop {
 			if (index > count)
@@ -1441,9 +1441,7 @@ class TelemetryAnalyzer {
 
 			if telemetryIndex
 				if ((phase = "Find") || (phase = "Straight")) {
-					value := TelemetryAnalyzer.getValue(telemetry.Data[telemetryIndex], "Brake", 0)
-
-					if (value > 0) {
+					if (TelemetryAnalyzer.getValue(telemetry.Data[telemetryIndex], "Brake", 0) > 0) {
 						if (phase = "Straight")
 							sections.Push({Type: "Straight", Nr: straightNr++, Index: startIndex, X: startX, Y: startY})
 
@@ -1456,15 +1454,11 @@ class TelemetryAnalyzer {
 					}
 				}
 				else if (phase = "Entry") {
-					value := TelemetryAnalyzer.getValue(telemetry.Data[telemetryIndex], "Brake", 0)
-
-					if (value > 0.3)
+					if (TelemetryAnalyzer.getValue(telemetry.Data[telemetryIndex], "Brake", 0) > 0.3)
 						phase := "Exit"
 				}
 				else if (phase = "Exit") {
-					value := TelemetryAnalyzer.getValue(telemetry.Data[telemetryIndex], "Throttle", 0)
-
-					if (value = 1.0) {
+					if (TelemetryAnalyzer.getValue(telemetry.Data[telemetryIndex], "Throttle", 0) = 1.0) {
 						sections.Push({Type: "Corner", Nr: cornerNr++, Index: startIndex, X: startX, Y: startY})
 
 						phase := "Straight"

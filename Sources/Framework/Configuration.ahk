@@ -345,8 +345,9 @@ class Application extends ConfigurationItem {
 
 			logMessage(kLogCritical, translate("Error while starting application ") . application . translate(" (") . exePath . translate("): ") . message . " - please check the configuration")
 
-			showMessage(substituteVariables(translate("Cannot start %application% (%exePath%) - please check the configuration..."), {application: application, exePath: exePath})
-					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			if !kSilentMode
+				showMessage(substituteVariables(translate("Cannot start %application% (%exePath%) - please check the configuration..."), {application: application, exePath: exePath})
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 
 			return false
 		}

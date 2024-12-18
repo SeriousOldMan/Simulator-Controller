@@ -696,8 +696,9 @@ administrationEditor(configurationOrCommand, arguments*) {
 		catch Any as exception {
 			logMessage(kLogCritical, translate("Error while initializing Team Server Connector - please rebuild the applications"))
 
-			showMessage(translate("Error while initializing Team Server Connector - please rebuild the applications") . translate("...")
-					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			if !kSilentMode
+				showMessage(translate("Error while initializing Team Server Connector - please rebuild the applications") . translate("...")
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
 
 		administrationConfig := readMultiMap(kUserConfigDirectory . "Application Settings.ini")

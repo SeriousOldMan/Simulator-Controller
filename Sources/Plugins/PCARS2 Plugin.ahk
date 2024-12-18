@@ -108,8 +108,9 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 
 				logMessage(kLogCritical, translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration"))
 
-				showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				if !kSilentMode
+					showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 
 			return false

@@ -1260,8 +1260,9 @@ class VoiceManager extends ConfigurationItem {
 
 							logMessage(kLogCritical, translate("Error while registering voice command `"") . definition . translate("`" - please check the configuration"))
 
-							showMessage(substituteVariables(translate("Cannot register voice command `"%command%`" - please check the configuration..."), {command: definition})
-									  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+							if !kSilentMode
+								showMessage(substituteVariables(translate("Cannot register voice command `"%command%`" - please check the configuration..."), {command: definition})
+										  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 						}
 				}
 				else if (grammar != "Call") {
@@ -1369,8 +1370,9 @@ class VoiceManager extends ConfigurationItem {
 
 					logMessage(kLogCritical, translate("Error while initializing speech recognition module - please install the speech recognition software"))
 
-					showMessage(translate("Error while initializing speech recognition module - please install the speech recognition software") . translate("...")
-										, translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+					if !kSilentMode
+						showMessage(translate("Error while initializing speech recognition module - please install the speech recognition software") . translate("...")
+											, translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 			}
 

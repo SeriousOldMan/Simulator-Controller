@@ -202,8 +202,9 @@ class ACCUDPProvider {
 			if !udpConfigValid {
 				logMessage(kLogCritical, translate("The UDP configuration for Assetto Corsa Competizione is not valid - please consult the documentation for the ACC plugin"))
 
-				showMessage(translate("The UDP configuration for Assetto Corsa Competizione is not valid - please consult the documentation for the ACC plugin") . translate("...")
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				if !kSilentMode
+					showMessage(translate("The UDP configuration for Assetto Corsa Competizione is not valid - please consult the documentation for the ACC plugin") . translate("...")
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 		}
 	}
@@ -237,9 +238,10 @@ class ACCUDPProvider {
 								   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 								   . kBinariesDirectory . translate(")"))
 
-			showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
-										  , {exePath: exePath, simulator: "ACC", protocol: "UDP"})
-					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			if !kSilentMode
+				showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
+											  , {exePath: exePath, simulator: "ACC", protocol: "UDP"})
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
 		finally {
 			deleteFile(fileName)
@@ -291,9 +293,10 @@ class ACCUDPProvider {
 									   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 									   . kBinariesDirectory . translate(")"))
 
-				showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
-											  , {exePath: exePath, simulator: "ACC", protocol: "UDP"})
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				if !kSilentMode
+					showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
+												  , {exePath: exePath, simulator: "ACC", protocol: "UDP"})
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 
 				this.iUDPClient := false
 			}

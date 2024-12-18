@@ -891,9 +891,10 @@ class DrivingCoach extends GridRaceAssistant {
 				logMessage(kLogCritical, substituteVariables(translate("Cannot connect to GPT service (%service%) - please check the configuration")
 														   , {service: this.Options["Driving Coach.Service"]}))
 
-				showMessage(substituteVariables(translate("Cannot connect to GPT service (%service%) - please check the configuration...")
-											  , {service: this.Options["Driving Coach.Service"]})
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				if !kSilentMode
+					showMessage(substituteVariables(translate("Cannot connect to GPT service (%service%) - please check the configuration...")
+												  , {service: this.Options["Driving Coach.Service"]})
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 		}
 
@@ -1450,9 +1451,10 @@ class DrivingCoach extends GridRaceAssistant {
 										   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 										   . kBinariesDirectory . translate(")"))
 
-					showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
-												  , {exePath: exePath, simulator: code, protocol: "SHM"})
-							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+					if !kSilentMode
+						showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
+													  , {exePath: exePath, simulator: code, protocol: "SHM"})
+								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 
 				if pid

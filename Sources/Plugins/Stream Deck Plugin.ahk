@@ -201,8 +201,9 @@ class StreamDeck extends FunctionController {
 
 			logMessage(kLogCritical, substituteVariables(translate("Cannot start Stream Deck Connector (%dllFile%) - please check the configuration..."), {dllFile: dllFile}))
 
-			showMessage(substituteVariables(translate("Cannot start Stream Deck Connector (%dllFile%) - please check the configuration..."), {dllFile: dllFile})
-					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			if !kSilentMode
+				showMessage(substituteVariables(translate("Cannot start Stream Deck Connector (%dllFile%) - please check the configuration..."), {dllFile: dllFile})
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
 
 		super.__New(controller, configuration)

@@ -3025,8 +3025,7 @@ runSpecialTargets(&buildProgress) {
 
 					SplitPath(file, , , , &solution)
 
-					if !kSilentMode
-						showProgress({progress: ++buildProgress, message: translate("Compiling ") . solution . translate("...")})
+					showProgress({progress: ++buildProgress, message: translate("Compiling ") . solution . translate("...")})
 
 					try {
 						if (InStr(solution, "Microsoft Speech") || InStr(solution, "AC UDP Provider"))
@@ -3046,8 +3045,9 @@ runSpecialTargets(&buildProgress) {
 					catch Any as exception {
 						logMessage(kLogCritical, translate("Cannot compile ") . solution . translate(" - Solution or MSBuild (") . msBuild . translate(") not found"))
 
-						showMessage(substituteVariables(translate("Cannot compile %solution%: Solution or MSBuild (%msBuild%) not found..."), {solution: solution, msBuild: msBuild})
-								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+						if !kSilentMode
+							showMessage(substituteVariables(translate("Cannot compile %solution%: Solution or MSBuild (%msBuild%) not found..."), {solution: solution, msBuild: msBuild})
+									  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 
 						success := true
 					}
@@ -3071,8 +3071,7 @@ runUpdateTargets(&buildProgress) {
 	for ignore, target in gUpdateTargets {
 		targetName := target[1]
 
-		if !kSilentMode
-			showProgress({progress: buildProgress, message: translate("Updating to ") . targetName . translate("...")})
+		showProgress({progress: buildProgress, message: translate("Updating to ") . targetName . translate("...")})
 
 		logMessage(kLogInfo, translate("Updating to ") . targetName)
 
@@ -3081,14 +3080,12 @@ runUpdateTargets(&buildProgress) {
 		progressStep := (100 / (gTargetsCount + 1))
 
 		for ignore, updateFunction in target[2] {
-			if !kSilentMode {
-				if kUpdateMessages.Has(updateFunction)
-					message := translate(kUpdateMessages[updateFunction]) . targetName . translate("...")
-				else
-					message := translate("Updating configuration to ") . targetName . translate("...")
+			if kUpdateMessages.Has(updateFunction)
+				message := translate(kUpdateMessages[updateFunction]) . targetName . translate("...")
+			else
+				message := translate("Updating configuration to ") . targetName . translate("...")
 
-				showProgress({progress: buildProgress, message: message})
-			}
+			showProgress({progress: buildProgress, message: message})
 
 			%updateFunction%()
 
@@ -3097,8 +3094,7 @@ runUpdateTargets(&buildProgress) {
 			buildProgress += Ceil(buildProgress + progressStep)
 		}
 
-		if !kSilentMode
-			showProgress({progress: buildProgress})
+		showProgress({progress: buildProgress})
 	}
 
 	updatesFileName := getFileName("UPDATES", kUserConfigDirectory)
@@ -3117,8 +3113,7 @@ runCleanTargets(&buildProgress) {
 	for ignore, target in gCleanupTargets {
 		targetName := target[1]
 
-		if !kSilentMode
-			showProgress({progress: buildProgress, message: translate("Cleaning ") . targetName . translate("...")})
+		showProgress({progress: buildProgress, message: translate("Cleaning ") . targetName . translate("...")})
 
 		logMessage(kLogInfo, translate("Cleaning ") . targetName)
 
@@ -3137,8 +3132,7 @@ runCleanTargets(&buildProgress) {
 						else
 							deleteFile(A_LoopFilePath)
 
-						if !kSilentMode
-							showProgress({progress: buildProgress, message: translate("Deleting ") . A_LoopFileName . translate("...")})
+						showProgress({progress: buildProgress, message: translate("Deleting ") . A_LoopFileName . translate("...")})
 
 						Sleep(50)
 					}
@@ -3162,8 +3156,7 @@ runCleanTargets(&buildProgress) {
 				loop Files, pattern, options {
 					deleteFile(A_LoopFilePath)
 
-					if !kSilentMode
-						showProgress({progress: buildProgress, message: translate("Deleting ") . A_LoopFileName . translate("...")})
+					showProgress({progress: buildProgress, message: translate("Deleting ") . A_LoopFileName . translate("...")})
 
 					Sleep(50)
 				}
@@ -3177,8 +3170,7 @@ runCleanTargets(&buildProgress) {
 
 		buildProgress += Ceil(100 / (gTargetsCount + 1))
 
-		if !kSilentMode
-			showProgress({progress: buildProgress})
+		showProgress({progress: buildProgress})
 	}
 }
 
@@ -3186,8 +3178,7 @@ runCopyTargets(&buildProgress) {
 	local title, ignore, target, targetSource, targetDestination, targetFile, srcLastModified, dstLastModified, copy
 	local targetName, targetDirectory
 
-	if !kSilentMode
-		showProgress({progress: buildProgress, message: A_Space})
+	showProgress({progress: buildProgress, message: A_Space})
 
 	for ignore, target in gCopyTargets {
 		targetName := ConfigurationItem.splitDescriptor(target[1])[1]
@@ -3233,8 +3224,7 @@ runCopyTargets(&buildProgress) {
 					copy := false
 
 				if copy {
-					if !kSilentMode
-						showProgress({progress: buildProgress, message: translate("Copying ") . targetName . translate("...")})
+					showProgress({progress: buildProgress, message: translate("Copying ") . targetName . translate("...")})
 
 					logMessage(kLogInfo, targetName . translate(" out of date - update needed"))
 					logMessage(kLogInfo, translate("Copying ") . A_LoopFilePath)
@@ -3250,8 +3240,7 @@ runCopyTargets(&buildProgress) {
 
 					buildProgress += Ceil(100 / (gTargetsCount + 1))
 
-					if !kSilentMode
-						showProgress({progress: buildProgress})
+					showProgress({progress: buildProgress})
 				}
 			}
 		}
@@ -3290,8 +3279,7 @@ runCopyTargets(&buildProgress) {
 			}
 
 			if copy {
-				if !kSilentMode
-					showProgress({progress: buildProgress, message: translate("Copying ") . targetName . translate("...")})
+				showProgress({progress: buildProgress, message: translate("Copying ") . targetName . translate("...")})
 
 				logMessage(kLogInfo, targetName . translate(" out of date - update needed"))
 				logMessage(kLogInfo, translate("Copying ") . targetSource)
@@ -3323,8 +3311,7 @@ runCopyTargets(&buildProgress) {
 
 				buildProgress += Ceil(100 / (gTargetsCount + 1))
 
-				if !kSilentMode
-					showProgress({progress: buildProgress})
+				showProgress({progress: buildProgress})
 			}
 		}
 	}
@@ -3334,8 +3321,7 @@ runBuildTargets(&buildProgress) {
 	local title, ignore, target, targetName, build, targetSource, targetBinary, srcLastModified, binLastModified
 	local compiledFile, targetDirectory, sourceDirectory, sourceCode, result, options
 
-	if !kSilentMode
-		showProgress({progress: buildProgress, message: ""})
+	showProgress({progress: buildProgress, message: ""})
 
 	showProgress({progress: buildProgress, message: translate("...")})
 
@@ -3379,8 +3365,7 @@ runBuildTargets(&buildProgress) {
 			build := true
 
 		if build {
-			if !kSilentMode
-				showProgress({progress: buildProgress, message: translate("Compiling ") . targetName . translate("...")})
+			showProgress({progress: buildProgress, message: translate("Compiling ") . targetName . translate("...")})
 
 			logMessage(kLogInfo, targetName . translate(" or dependent files out of date - recompile triggered"))
 			logMessage(kLogInfo, translate("Compiling ") . targetSource)
@@ -3419,9 +3404,10 @@ runBuildTargets(&buildProgress) {
 			catch Any as exception {
 				logMessage(kLogCritical, translate("Cannot compile ") . targetSource . translate(" - source file or AHK Compiler (") . kDevelopmentCompiler . translate(") not found"))
 
-				showMessage(substituteVariables(translate("Cannot compile %targetSource%: Source file or AHK Compiler (%compiler%) not found...")
-											  , {targetSource: targetSource, compiler: kDevelopmentCompiler})
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				if !kSilentMode
+					showMessage(substituteVariables(translate("Cannot compile %targetSource%: Source file or AHK Compiler (%compiler%) not found...")
+												  , {targetSource: targetSource, compiler: kDevelopmentCompiler})
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 
 				result := true
 			}
@@ -3448,8 +3434,7 @@ runBuildTargets(&buildProgress) {
 
 		buildProgress += (Ceil(100 / (gTargetsCount + 1)) * 3)
 
-		if !kSilentMode
-			showProgress({progress: buildProgress})
+		showProgress({progress: buildProgress})
 	}
 }
 
@@ -3475,8 +3460,7 @@ prepareTargets(&buildProgress, updateOnly) {
 
 		update := gUpdateSettings[target]
 
-		if !kSilentMode
-			showProgress({progress: buildProgress, message: target . ": " . (update ? translate("Yes") : translate("No"))})
+		showProgress({progress: buildProgress, message: target . ": " . (update ? translate("Yes") : translate("No"))})
 
 		if update {
 			arguments := string2Values("->", substituteVariables(arguments))
@@ -3503,8 +3487,7 @@ prepareTargets(&buildProgress, updateOnly) {
 
 			cleanup := (InStr(target, "*.bak") ? gCleanupSettings[target] : gCleanupSettings[targetName])
 
-			if !kSilentMode
-				showProgress({progress: buildProgress, message: targetName . ": " . (cleanup ? translate("Yes") : translate("No"))})
+			showProgress({progress: buildProgress, message: targetName . ": " . (cleanup ? translate("Yes") : translate("No"))})
 
 			if cleanup {
 				arguments := substituteVariables(arguments)
@@ -3525,8 +3508,7 @@ prepareTargets(&buildProgress, updateOnly) {
 
 			copy := gCopySettings[targetName]
 
-			if !kSilentMode
-				showProgress({progress: buildProgress, message: targetName . ": " . (copy ? translate("Yes") : translate("No"))})
+			showProgress({progress: buildProgress, message: targetName . ": " . (copy ? translate("Yes") : translate("No"))})
 
 			if copy {
 				rule := string2Values("<-", substituteVariables(arguments))
@@ -3546,8 +3528,7 @@ prepareTargets(&buildProgress, updateOnly) {
 
 			build := gBuildSettings[target]
 
-			if !kSilentMode
-				showProgress({progress: buildProgress, message: target . ": " . (build ? translate("Yes") : translate("No"))})
+			showProgress({progress: buildProgress, message: target . ": " . (build ? translate("Yes") : translate("No"))})
 
 			if build {
 				if (arguments = "Special")
@@ -3611,8 +3592,7 @@ startupSimulatorTools() {
 
 	Sleep(500)
 
-	if !kSilentMode
-		showProgress({color: "Blue", message: "", title: translate("Preparing Targets")})
+	showProgress({color: "Blue", message: "", title: translate("Preparing Targets")})
 
 	buildProgress := 0
 
@@ -3623,8 +3603,7 @@ startupSimulatorTools() {
 	; gTargetsCount := (gUpdateTargets.Length + gCleanupTargets.Length + gCopyTargets.Length + gBuildTargets.Length
 	; 				+ (((kMSBuildDirectory != "") && (gSpecialTargets.Length > 0)) ? getFileNames("*", kSourcesDirectory . "Special\").Length : 0))
 
-	if !kSilentMode
-		showProgress({message: "", progress: 0, color: "Green", title: translate("Running Targets")})
+	showProgress({message: "", progress: 0, color: "Green", title: translate("Running Targets")})
 
 	buildProgress := 0
 
@@ -3643,18 +3622,15 @@ startupSimulatorTools() {
 		runBuildTargets(&buildProgress)
 	}
 
-	if !kSilentMode
-		showProgress({progress: 100, message: translate("Done")})
+	showProgress({progress: 100, message: translate("Done")})
 
 	Sleep(500)
 
-	if !kSilentMode {
-		hideProgress()
+	hideProgress()
 
-		if gSplashScreen
-			hideSplashScreen()
-	}
-
+	if (!kSilentMode && gSplashScreen)
+		hideSplashScreen()
+	
 	ExitApp(0)
 }
 

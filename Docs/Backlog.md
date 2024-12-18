@@ -1,11 +1,3 @@
-#### New App
-  1. Pitwall timing application with full information about all cars on the track
-     - Timings
-	 - Incidents
-	 - Drivers
-	 - Number of pitstops
-	 - Relative performance
-
 #### Core System
   1. Integration of Whisper as local voice recognition engine
   2. Integration of local TTS engines for voice generation
@@ -40,3 +32,11 @@
 
 #### Team Center
   1. Change hot target pressures for the next pitstop
+  
+#### New Apps
+  1. Pitwall timing application with full information about all cars on the track
+     - Timings
+	 - Incidents
+	 - Drivers
+	 - Number of pitstops
+	 - Relative performance

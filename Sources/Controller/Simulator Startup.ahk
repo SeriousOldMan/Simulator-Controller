@@ -2509,7 +2509,7 @@ manageTeams(ownerOrCommand, arguments*) {
 		teamManagerGui.Add("Documentation", "x174 YP+20 w178 Center H:Center", translate("Team Management")
 						 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#team-management")
 
-		teamManagerGui.Add("Text", "x8 yp+26 w508 0x10")
+		teamManagerGui.Add("Text", "x8 yp+26 w508 0x10 W:Grow")
 
 		teamManagerPanel := TeamManagementPanel(TeamManagerOwner(teamManagerGui), kSimulatorConfiguration)
 

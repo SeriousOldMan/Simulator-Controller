@@ -39,6 +39,9 @@ global kDebugRecognitions := 4
 ;;;-------------------------------------------------------------------------;;;
 
 class VoiceManager extends ConfigurationItem {
+	static sInterruptable := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+											, "Voice", "Interruptable", false)
+
 	iDebug := kDebugOff
 
 	iLanguage := "en"
@@ -615,6 +618,18 @@ class VoiceManager extends ConfigurationItem {
 		}
 	}
 
+	static Interruptable {
+		Get {
+			return VoiceManager.sInterruptable
+		}
+	}
+
+	Interruptable {
+		Get {
+			return VoiceManager.Interruptable
+		}
+	}
+
 	Speaking {
 		Get {
 			return this.iIsSpeaking
@@ -1083,6 +1098,9 @@ class VoiceManager extends ConfigurationItem {
 				return false
 			}
 			else {
+				if this.Interruptable
+					this.interrupt(true)
+
 				playSound("VMSoundPlayer.exe", talkSound, audioDevice)
 
 				this.iIsListening := true
@@ -1112,12 +1130,20 @@ class VoiceManager extends ConfigurationItem {
 
 	interrupt(all := false) {
 		local voiceServer := this.VoiceServer
+		local speaker
 
-		if voiceServer
+		if voiceServer {
 			if all
 				messageSend(kWindowMessage, "Voice", "interrupt", "ahk_pid " . this.VoiceServer, "INTR")
 			else
 				messageSend(kWindowMessage, "Voice", "interrupt:" . this.Name, "ahk_pid " . this.VoiceServer, "INTR")
+		}
+		else {
+			speaker := this.getSpeaker()
+
+			if speaker
+				speaker.stop()
+		}
 	}
 
 	mute() {

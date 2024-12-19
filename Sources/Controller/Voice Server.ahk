@@ -54,6 +54,9 @@ global kDebugRecognitions := 4
 ;;;-------------------------------------------------------------------------;;;
 
 class VoiceServer extends ConfigurationItem {
+	static sInterruptable := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+											, "Voice", "Interruptable", false)
+
 	iDebug := kDebugOff
 
 	iVoiceClients := CaseInsenseMap()
@@ -574,7 +577,7 @@ class VoiceServer extends ConfigurationItem {
 				}
 		}
 
-		interrupt() {
+		interrupt(pending := false) {
 			local synthesizer := this.SpeechSynthesizer
 
 			if (synthesizer && this.Speaking && !this.Interrupted && this.Interruptable && synthesizer.Stoppable)
@@ -755,6 +758,18 @@ class VoiceServer extends ConfigurationItem {
 	Speaker {
 		Get {
 			return this.iSpeaker
+		}
+	}
+
+	static Interruptable {
+		Get {
+			return VoiceManager.sInterruptable
+		}
+	}
+
+	Interruptable {
+		Get {
+			return VoiceManager.Interruptable
 		}
 	}
 
@@ -1128,6 +1143,9 @@ class VoiceServer extends ConfigurationItem {
 				return false
 			}
 			else {
+				if this.Interruptable
+					this.interrupt(false, true)
+
 				if this.hasPushToTalk()
 					playSound("VSSoundPlayer.exe", talkSound, audioDevice)
 
@@ -1155,6 +1173,9 @@ class VoiceServer extends ConfigurationItem {
 	startListening(retry := true) {
 		local activeClient := this.getVoiceClient()
 
+		if this.Interruptable
+			this.interrupt(false, true)
+
 		return (activeClient ? activeClient.startListening(retry) : this.startActivationListener(retry))
 	}
 
@@ -1164,14 +1185,14 @@ class VoiceServer extends ConfigurationItem {
 		return (activeClient ? activeClient.stopListening(retry) : this.stopActivationListener(retry))
 	}
 
-	interrupt(descriptor := false) {
+	interrupt(descriptor := false, pending := false) {
 		local ignore, client
 
 		if descriptor
-			this.getVoiceClient(descriptor).interrupt()
+			this.getVoiceClient(descriptor).interrupt(pending)
 		else
 			for ignore, client in this.VoiceClients
-				client.interrupt()
+				client.interrupt(pending)
 	}
 
 	mute() {
@@ -1200,7 +1221,7 @@ class VoiceServer extends ConfigurationItem {
 
 		text := text
 
-		if this.Speaking
+		if (this.Speaking || this.Listening || (choose(this.VoiceClients, (c) => (c.Speaking || c.Listening)).Length > 0))
 			Task.startTask(ObjBindMethod(this, "speak", descriptor, text, activate, options))
 		else {
 			this.iSpeaking := true

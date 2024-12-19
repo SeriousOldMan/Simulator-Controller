@@ -783,6 +783,8 @@ class LayoutsList extends ConfigurationItemList {
 
 		bbWidget3 := window.Add("Text", "x8 y493 w86 h23 +0x200", translate("Layout"))
 
+		window.SetFont("s7")
+
 		bbWidget4 := window.Add("Text", "x16 y516 w133 h20 c" . window.Theme.TextColor["Disabled"], translate("(R x C, Margins)"))
 
 		window.SetFont()

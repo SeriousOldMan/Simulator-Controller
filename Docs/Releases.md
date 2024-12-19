@@ -1,4 +1,4 @@
-## 6.0.2.0-release 12/20/24 (planned)
+## 6.0.2.0-release 12/20/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a rare bug in the handling of deactivated voice recognition, which caused unnecessary error messages popping up.

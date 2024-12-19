@@ -84,6 +84,8 @@ class VoiceServer extends ConfigurationItem {
 	iHasPendingActivation := false
 	iLastCommand := A_TickCount
 
+	iLastInterrupt := false
+
 	class VoiceClient {
 		iRouting := false
 
@@ -1144,7 +1146,7 @@ class VoiceServer extends ConfigurationItem {
 			}
 			else {
 				if this.Interruptable
-					this.interrupt(false, true)
+					this.interrupt(false, (this.Interruptable = "All"))
 
 				if this.hasPushToTalk()
 					playSound("VSSoundPlayer.exe", talkSound, audioDevice)
@@ -1174,7 +1176,7 @@ class VoiceServer extends ConfigurationItem {
 		local activeClient := this.getVoiceClient()
 
 		if this.Interruptable
-			this.interrupt(false, true)
+			this.interrupt(false, (this.Interruptable = "All"))
 
 		return (activeClient ? activeClient.startListening(retry) : this.startActivationListener(retry))
 	}
@@ -1188,11 +1190,14 @@ class VoiceServer extends ConfigurationItem {
 	interrupt(descriptor := false, pending := false) {
 		local ignore, client
 
+		if pending
+			this.iLastInterrupt := A_TickCount
+
 		if descriptor
-			this.getVoiceClient(descriptor).interrupt(pending)
+			this.getVoiceClient(descriptor).interrupt()
 		else
 			for ignore, client in this.VoiceClients
-				client.interrupt(pending)
+				client.interrupt()
 	}
 
 	mute() {
@@ -1221,9 +1226,7 @@ class VoiceServer extends ConfigurationItem {
 
 		text := text
 
-		if (this.Speaking || this.Listening || (choose(this.VoiceClients, (c) => (c.Speaking || c.Listening)).Length > 0))
-			Task.startTask(ObjBindMethod(this, "speak", descriptor, text, activate, options))
-		else {
+		speak() {
 			this.iSpeaking := true
 
 			try {
@@ -1239,6 +1242,24 @@ class VoiceServer extends ConfigurationItem {
 				this.iSpeaking := oldSpeaking
 			}
 		}
+
+		speakAgain() {
+			if (this.iLastInterrupt < Task.CurrentTask.SpeechStart)
+				if (this.Speaking || this.Listening || (choose(this.VoiceClients, (c) => (c.Speaking || c.Listening)).Length > 0))
+					return this
+				else
+					speak()
+		}
+
+		if (this.Speaking || this.Listening || (choose(this.VoiceClients, (c) => (c.Speaking || c.Listening)).Length > 0)) {
+			retryTask := Task(speakAgain)
+
+			retryTask.SpeechStart := A_TickCount
+
+			retryTask.start()
+		}
+		else
+			speak()
 	}
 
 	registerVoiceClient(descriptor, routing, pid

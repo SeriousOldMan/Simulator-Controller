@@ -765,13 +765,13 @@ class VoiceServer extends ConfigurationItem {
 
 	static Interruptable {
 		Get {
-			return VoiceManager.sInterruptable
+			return VoiceServer.sInterruptable
 		}
 	}
 
 	Interruptable {
 		Get {
-			return VoiceManager.Interruptable
+			return VoiceServer.Interruptable
 		}
 	}
 
@@ -999,7 +999,7 @@ class VoiceServer extends ConfigurationItem {
 
 		if toggle {
 			if pressed {
-				if listenTask {
+				if (listenTask && !this.Interruptable) {
 					listen := true
 
 					listenTask.stop()
@@ -1026,7 +1026,7 @@ class VoiceServer extends ConfigurationItem {
 
 					listening := true
 				}
-				else {
+				else if !listenTask {
 					listenTask := Task(ObjBindMethod(this, "listen", true, true), speed, kInterruptPriority)
 
 					Task.startTask(listenTask)
@@ -1040,7 +1040,7 @@ class VoiceServer extends ConfigurationItem {
 			if (((A_TickCount - lastDown) < (speed / 2)) && !activation)
 				pressed := false
 
-			if (!this.Speaking && pressed) {
+			if ((!this.Speaking || this.Interruptable) && pressed) {
 				if activation
 					this.startActivationListener()
 				else

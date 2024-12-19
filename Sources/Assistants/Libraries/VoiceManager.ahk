@@ -924,7 +924,7 @@ class VoiceManager extends ConfigurationItem {
 
 		if toggle {
 			if pressed {
-				if listenTask {
+				if (listenTask && !this.Interruptable) {
 					listen := true
 
 					listenTask.stop()
@@ -950,7 +950,7 @@ class VoiceManager extends ConfigurationItem {
 
 					listening := true
 				}
-				else {
+				else if !listenTask {
 					listenTask := Task(ObjBindMethod(this, "listen", true, true), speed, kInterruptPriority)
 
 					Task.startTask(listenTask)
@@ -964,7 +964,7 @@ class VoiceManager extends ConfigurationItem {
 			if (((A_TickCount - lastDown) < (speed / 2)) && !activation)
 				pressed := false
 
-			if (!this.Speaking && pressed) {
+			if ((!this.Speaking || this.Interruptable) && pressed) {
 				if activation
 					this.startActivationListener()
 				else

@@ -380,8 +380,11 @@ class SimulatorStartup extends ConfigurationItem {
 			if (this.ControllerPID == 0)
 				exitStartup(true)
 
-			if (!kSilentMode && this.iSplashScreen)
+			if (!kSilentMode && this.iSplashScreen) {
 				showSplashScreen(this.iSplashScreen, playSong)
+
+				Task.startTask(ObjBindMethod(this, "hideSplashScreen"), 20000)
+			}
 
 			if !kSilentMode
 				showProgress({color: "Blue", message: translate("Start: Simulator Controller"), title: translate("Initialize Core System")})

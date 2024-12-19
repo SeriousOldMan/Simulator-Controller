@@ -58,7 +58,8 @@ showSplash(image, alwaysOnTop := true, video := false) {
 			try
 				splashGui["videoPlayer"].Stop()
 
-			splashGui.Destroy()
+			try
+				splashGui.Destroy()
 
 			splashGuis[splashCounter] := false
 		}
@@ -71,7 +72,8 @@ showSplash(image, alwaysOnTop := true, video := false) {
 				splashCounter := 1
 
 				if splashGuis[splashCounter] {
-					splashGuis[splashCounter].Destroy()
+					try
+						splashGuis[splashCounter].Destroy()
 
 					splashGuis[splashCounter] := false
 				}

@@ -1,22 +1,23 @@
-## 6.0.2.0-release 12/20/24 (planned)
+## 6.0.2.0-release 12/20/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a rare bug in the handling of deactivated voice recognition, which caused unnecessary error messages popping up.
   4. Fixed a bug in "Solo Center" which prevented auto saving of sessions, when auto exporting was enabled.
-  5. The progress bar will not open up in the "Solo Center", if data is exported in the background, because auto save is enabled.
-  6. Track sections will now automatically be detected, if required.
+  5. Fixed several problems with the Spanish voice recognition of the Driving Coach.
+  6. The progress bar will not open up in the "Solo Center", if data is exported in the background, because auto save is enabled.
+  7. Track sections will now automatically be detected, if required.
      - You can use the new "Scan" method while in the "Edit" mode of the track map in the Telemetry Viewer. Track sections will be created based on the currently selected telemetry data. Since this is a heuristical approach, please check (and edit) the created section starting points afterwards. Once you are fine with the track sections, store them permanently using the "Save" button.
      - The Telemetry Viewer will also create track sections on the fly, if no sections have been created and stored together with the track in the session database so far. Since this is using a quite complex data analysis, it takes a few seconds each time, and it is also not perfect, as just mentioned. Therefore I recommend to do it once and store the track sections into the session database.
      - The Driving Coach will also use automatically generated track sections if none are yet configured for the given track. Same remarks apply here.
-  7. New "On-track Coaching" function in the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles), which automatically starts telemetry based coaching and on-track coaching by the Driving Coach when this startup profile is active.
-  8. On-track coaching can now also enabled from the tray menu of the "Simulator Controller" process.
-  9. Additional arguments for the controller action functions [*startTelemetryCoaching* and *startTrackCoaching*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions), that let you control whether the Driving Coach will confirm the command.
-  10. Support for an additional session type named "Time Trial" has been added to all applications.
+  8. New "On-track Coaching" function in the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles), which automatically starts telemetry based coaching and on-track coaching by the Driving Coach when this startup profile is active.
+  9. On-track coaching can now also enabled from the tray menu of the "Simulator Controller" process.
+  10. Additional arguments for the controller action functions [*startTelemetryCoaching* and *startTrackCoaching*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions), that let you control whether the Driving Coach will confirm the command.
+  11. Support for an additional session type named "Time Trial" has been added to all applications.
       - Hotlap and time trial modes of the different simulators are mapped to this single session type.
 	  - General support by all Assistants is comparable to "Qualification".
 	  - Corresponding settings for the different Assistant services has been added to the "Session Database".
-  11. [Expert] Many parameters of all Race Assistant plugins have been renamed. The old names are still supported for compatibility reasons, but they are deprecated.
-  12. [Expert] Corner by corner instructions of the Driving Coach are now written to the "Session State.json" file which can be used to implement SimHub Dashboards and Overlays.
+  12. [Expert] Many parameters of all Race Assistant plugins have been renamed. The old names are still supported for compatibility reasons, but they are deprecated.
+  13. [Expert] Corner by corner instructions of the Driving Coach are now written to the "Session State.json" file which can be used to implement SimHub Dashboards and Overlays.
 
 ## 6.0.1.0-release 12/13/24
   1. Minor bugfixes, as always

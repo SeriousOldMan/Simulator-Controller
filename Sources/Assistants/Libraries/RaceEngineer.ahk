@@ -1191,7 +1191,7 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker := this.getSpeaker()
 		local fragments := speaker.Fragments
-		local compound, compoundColor, ignore, candidate
+		local compound, compoundColor, ignore, candidate, found
 
 		if !this.hasPlannedPitstop() {
 			if this.Listener {
@@ -1221,6 +1221,8 @@ class RaceEngineer extends RaceAssistant {
 				compound := "Dry"
 
 			if compound {
+				found := false
+
 				for ignore, candidate in SessionDatabase.getTyreCompounds(knowledgeBase.getValue("Session.Simulator")
 																		, knowledgeBase.getValue("Session.Car")
 																		, knowledgeBase.getValue("Session.Track"))
@@ -1234,9 +1236,14 @@ class RaceEngineer extends RaceAssistant {
 						}
 						else
 							this.updatePitstopTyreCompound(compound, compoundColor)
+
+						found := true
+
+						break
 					}
-					else
-						speaker.speakPhrase("CompoundNotAvailable", {compound: fragments[compound . "Tyre"]})
+
+				if !found
+					speaker.speakPhrase("CompoundNotAvailable", {compound: fragments[compound . "Tyre"]})
 			}
 			else
 				speaker.speakPhrase("Repeat")

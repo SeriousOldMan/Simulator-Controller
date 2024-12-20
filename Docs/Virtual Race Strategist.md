@@ -235,7 +235,7 @@ Remarks:
 
 If you have chosen *Autonomous Mode* in the [*Strategy* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#tab-strategy) of the "Race Settings" as described above, the Strategist and the Engineer will work together using the selected strategy in such a way, that no further interaction or decisions are needed from the drivers side regarding strategy updates, pitstop handling, and so on. Both Assistants will exhibit the same behaviour as in the non-autonomous mode, but they will not ask for confirmation, if they think that an action is required. Instead of asking for confirmation, the corresponding action is performed immediately and you are notified about that. As a result, the two Assistants now act as Agents, which feels very natural, very much like a real pit crew.
 
-The Strateist will not ask for confirmation for the following actions:
+The Strategist will not ask for confirmation for the following actions:
 
 1. Give an introduction for the race strategy at the beginning of a session.
 2. Alter the strategy due to fuel requirements or changing conditions.

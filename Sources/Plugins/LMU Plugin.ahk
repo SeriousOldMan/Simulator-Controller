@@ -39,6 +39,8 @@ class LMUPlugin extends RF2Plugin {
 	iRepairSuspensionChosen := true
 	iRepairBodyworkChosen := true
 
+	static sCarData := false
+
 	PreviousOptionHotkey {
 		Get {
 			return this.iPreviousOptionHotkey
@@ -102,6 +104,19 @@ class LMUPlugin extends RF2Plugin {
 
 	supportsSetupImport() {
 		return false
+	}
+
+	static requireCarDatabase() {
+		local data
+
+		if !LMUPlugin.sCarData {
+			data := readMultiMap(kResourcesDirectory . "Simulator Data\LMU\Car Data.ini")
+
+			if FileExist(kUserHomeDirectory . "Simulator Data\LMU\Car Data.ini")
+				addMultiMapValues(data, readMultiMap(kUserHomeDirectory . "Simulator Data\LMU\Car Data.ini"))
+
+			LMUPlugin.sCarData := data
+		}
 	}
 
 	requirePitstopMFD() {
@@ -300,6 +315,23 @@ class LMUPlugin extends RF2Plugin {
 	}
 
 	tyrePressureSteps(pressure) {
+		local compounds, index, candidate
+
+		if tyreCompound {
+			compounds := SessionDatabase().getTyreCompounds(this.Simulator[true], this.Car, this.Track)
+			index := inList(compounds, compound(tyreCompound, tyreCompoundColor))
+
+			if index
+				return index
+			else
+				for index, candidate in compounds
+					if (InStr(candidate, tyreCompound) == 1)
+						return index
+
+			return false
+		}
+		else
+			return false
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, liters) {

@@ -338,7 +338,7 @@ class LMUPlugin extends RF2Plugin {
 		}
 	}
 
-	tyrePressureSteps(pressure) {
+	tyrePressureIncrement(pressure) {
 		local key := false
 		local minPressure, maxPressure, pressureSteps, step, class
 
@@ -417,7 +417,7 @@ class LMUPlugin extends RF2Plugin {
 			if this.selectPitstopOption("Front Left") {
 				this.dialPitstopOption("Front Left", "Decrease", 100)
 
-				this.dialPitstopOption("Front Left", "Increase", this.tyrePressureSteps(pressureFL))
+				this.dialPitstopOption("Front Left", "Increase", this.tyrePressureIncrement(pressureFL))
 
 				this.deselectPitstopOption("Front Left")
 			}
@@ -425,7 +425,7 @@ class LMUPlugin extends RF2Plugin {
 			if this.selectPitstopOption("Front Right") {
 				this.dialPitstopOption("Front Right", "Decrease", 100)
 
-				this.dialPitstopOption("Front Right", "Increase", this.tyrePressureSteps(pressureFR))
+				this.dialPitstopOption("Front Right", "Increase", this.tyrePressureIncrement(pressureFR))
 
 				this.deselectPitstopOption("Front Right")
 			}
@@ -433,7 +433,7 @@ class LMUPlugin extends RF2Plugin {
 			if this.selectPitstopOption("Rear Left") {
 				this.dialPitstopOption("Rear Left", "Decrease", 100)
 
-				this.dialPitstopOption("Rear Left", "Increase", this.tyrePressureSteps(pressureRL))
+				this.dialPitstopOption("Rear Left", "Increase", this.tyrePressureIncrement(pressureRL))
 
 				this.deselectPitstopOption("Rear Left")
 			}
@@ -441,7 +441,7 @@ class LMUPlugin extends RF2Plugin {
 			if this.selectPitstopOption("Rear Right") {
 				this.dialPitstopOption("Rear Right", "Decrease", 100)
 
-				this.dialPitstopOption("Rear Right", "Increase", this.tyrePressureSteps(pressureRR))
+				this.dialPitstopOption("Rear Right", "Increase", this.tyrePressureIncrement(pressureRR))
 
 				this.deselectPitstopOption("Rear Right")
 			}
@@ -454,14 +454,12 @@ class LMUPlugin extends RF2Plugin {
 		super.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
 
 		if (this.iRepairSuspensionChosen != repairSuspension)
-			if this.requirePitstopMFD()
-				if this.selectPitstopOption("Repair Suspension")
-					this.changePitstopOption("Repair Suspension")
+			if (this.requirePitstopMFD() && this.selectPitstopOption("Repair Suspension"))
+				this.changePitstopOption("Repair Suspension")
 
 		if (this.iRepairBodyworkChosen != repairBodywork)
-			if this.requirePitstopMFD()
-				if this.selectPitstopOption("Repair Bodywork")
-					this.changePitstopOption("Repair Bodywork")
+			if (this.requirePitstopMFD() && this.selectPitstopOption("Repair Bodywork"))
+				this.changePitstopOption("Repair Bodywork")
 	}
 
 	requestPitstopDriver(pitstopNumber, driver) {

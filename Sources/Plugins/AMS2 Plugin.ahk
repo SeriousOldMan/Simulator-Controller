@@ -305,14 +305,12 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 		super.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
 
 		if (this.iRepairSuspensionChosen != repairSuspension)
-			if this.requirePitstopMFD()
-				if this.selectPitstopOption("Repair Suspension")
-					this.changePitstopOption("Repair Suspension")
+			if (this.requirePitstopMFD() && this.selectPitstopOption("Repair Suspension"))
+				this.changePitstopOption("Repair Suspension")
 
 		if (this.iRepairBodyworkChosen != repairBodywork)
-			if this.requirePitstopMFD()
-				if this.selectPitstopOption("Repair Bodywork")
-					this.changePitstopOption("Repair Bodywork")
+			if (this.requirePitstopMFD() && this.selectPitstopOption("Repair Bodywork"))
+				this.changePitstopOption("Repair Bodywork")
 	}
 
 	finishPitstopSetup(pitstopNumber) {

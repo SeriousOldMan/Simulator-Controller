@@ -626,21 +626,17 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		super.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
 
 		if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey != "Off")) {
-			if this.optionAvailable("Repair Suspension")
-				if (repairSuspension != this.optionChosen("Repair Suspension"))
-					this.toggleActivity("Repair Suspension", false, true)
+			if (this.optionAvailable("Repair Suspension") && (repairSuspension != this.optionChosen("Repair Suspension")))
+				this.toggleActivity("Repair Suspension", false, true)
 
-			if this.optionAvailable("Repair Bodywork")
-				if (repairBodywork != this.optionChosen("Repair Bodywork"))
-					this.toggleActivity("Repair Bodywork", false, true)
+			if (this.optionAvailable("Repair Bodywork") && (repairBodywork != this.optionChosen("Repair Bodywork")))
+				this.toggleActivity("Repair Bodywork", false, true)
 
-			if this.optionAvailable("Repair Front Aero")
-				if (repairBodywork != this.optionChosen("Repair Front Aero"))
-					this.toggleActivity("Repair Front Aero", false, true)
+			if (this.optionAvailable("Repair Front Aero") && (repairBodywork != this.optionChosen("Repair Front Aero")))
+				this.toggleActivity("Repair Front Aero", false, true)
 
-			if this.optionAvailable("Repair Rear Aero")
-				if (repairBodywork != this.optionChosen("Repair Rear Aero"))
-					this.toggleActivity("Repair Rear Aero", false, true)
+			if (this.optionAvailable("Repair Rear Aero") && (repairBodywork != this.optionChosen("Repair Rear Aero")))
+				this.toggleActivity("Repair Rear Aero", false, true)
 		}
 	}
 

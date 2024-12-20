@@ -82,9 +82,10 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 									   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 									   . kBinariesDirectory . translate(")"))
 
-				showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
-											  , {exePath: exePath, simulator: this.Code, protocol: "SHM"})
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				if !kSilentMode
+					showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
+												  , {exePath: exePath, simulator: this.Code, protocol: "SHM"})
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 	}
 
@@ -123,8 +124,9 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 
 				logMessage(kLogCritical, translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration"))
 
-				showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				if !kSilentMode
+					showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 
 				return false
 			}

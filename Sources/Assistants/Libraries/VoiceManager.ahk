@@ -39,6 +39,9 @@ global kDebugRecognitions := 4
 ;;;-------------------------------------------------------------------------;;;
 
 class VoiceManager extends ConfigurationItem {
+	static sInterruptable := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+											, "Voice", "Interruptable", false)
+
 	iDebug := kDebugOff
 
 	iLanguage := "en"
@@ -615,6 +618,18 @@ class VoiceManager extends ConfigurationItem {
 		}
 	}
 
+	static Interruptable {
+		Get {
+			return VoiceManager.sInterruptable
+		}
+	}
+
+	Interruptable {
+		Get {
+			return VoiceManager.Interruptable
+		}
+	}
+
 	Speaking {
 		Get {
 			return this.iIsSpeaking
@@ -909,7 +924,7 @@ class VoiceManager extends ConfigurationItem {
 
 		if toggle {
 			if pressed {
-				if listenTask {
+				if (listenTask && !this.Interruptable) {
 					listen := true
 
 					listenTask.stop()
@@ -935,7 +950,7 @@ class VoiceManager extends ConfigurationItem {
 
 					listening := true
 				}
-				else {
+				else if !listenTask {
 					listenTask := Task(ObjBindMethod(this, "listen", true, true), speed, kInterruptPriority)
 
 					Task.startTask(listenTask)
@@ -949,7 +964,7 @@ class VoiceManager extends ConfigurationItem {
 			if (((A_TickCount - lastDown) < (speed / 2)) && !activation)
 				pressed := false
 
-			if (!this.Speaking && pressed) {
+			if ((!this.Speaking || this.Interruptable) && pressed) {
 				if activation
 					this.startActivationListener()
 				else
@@ -1083,6 +1098,9 @@ class VoiceManager extends ConfigurationItem {
 				return false
 			}
 			else {
+				if this.Interruptable
+					this.interrupt(true)
+
 				playSound("VMSoundPlayer.exe", talkSound, audioDevice)
 
 				this.iIsListening := true
@@ -1112,12 +1130,20 @@ class VoiceManager extends ConfigurationItem {
 
 	interrupt(all := false) {
 		local voiceServer := this.VoiceServer
+		local speaker
 
-		if voiceServer
+		if voiceServer {
 			if all
 				messageSend(kWindowMessage, "Voice", "interrupt", "ahk_pid " . this.VoiceServer, "INTR")
 			else
 				messageSend(kWindowMessage, "Voice", "interrupt:" . this.Name, "ahk_pid " . this.VoiceServer, "INTR")
+		}
+		else {
+			speaker := this.getSpeaker()
+
+			if speaker
+				speaker.stop()
+		}
 	}
 
 	mute() {
@@ -1260,8 +1286,9 @@ class VoiceManager extends ConfigurationItem {
 
 							logMessage(kLogCritical, translate("Error while registering voice command `"") . definition . translate("`" - please check the configuration"))
 
-							showMessage(substituteVariables(translate("Cannot register voice command `"%command%`" - please check the configuration..."), {command: definition})
-									  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+							if !kSilentMode
+								showMessage(substituteVariables(translate("Cannot register voice command `"%command%`" - please check the configuration..."), {command: definition})
+										  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 						}
 				}
 				else if (grammar != "Call") {
@@ -1369,8 +1396,9 @@ class VoiceManager extends ConfigurationItem {
 
 					logMessage(kLogCritical, translate("Error while initializing speech recognition module - please install the speech recognition software"))
 
-					showMessage(translate("Error while initializing speech recognition module - please install the speech recognition software") . translate("...")
-										, translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+					if !kSilentMode
+						showMessage(translate("Error while initializing speech recognition module - please install the speech recognition software") . translate("...")
+											, translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 			}
 

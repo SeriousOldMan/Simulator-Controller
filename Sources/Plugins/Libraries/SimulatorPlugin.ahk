@@ -39,7 +39,7 @@ global kSessions := [kSessionOther, kSessionPractice, kSessionQualification, kSe
 global kSessionNames := ["Other", "Practice", "Qualification", "Race", "Time Trial"]
 
 global kAssistantAnswerActions := ["Accept", "Reject"]
-global kAssistantRaceActions := ["PitstopPlan", "DriverSwapPlan", "PitstopPrepare", "PitstopRecommend", "StrategyRecommend", "StrategyCancel"]
+global kAssistantRaceActions := ["PitstopPlan", "DriverSwapPlan", "PitstopPrepare", "PitstopRecommend", "StrategyRecommend", "FCYRecommend", "StrategyCancel"]
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -720,6 +720,8 @@ class RaceAssistantAction extends ControllerAction {
 				plugin.recommendPitstop()
 			case "StrategyRecommend":
 				plugin.recommendStrategy()
+			case "FCYRecommend":
+				plugin.recommendFullCourseYellow()
 			case "StrategyCancel":
 				plugin.cancelStrategy()
 			case "PitstopPlan":
@@ -1030,6 +1032,11 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	recommendStrategy() {
 		if this.RaceStrategist
 			this.RaceStrategist.recommendStrategy()
+	}
+
+	recommendFullCourseYellow() {
+		if this.RaceStrategist
+			this.RaceStrategist.recommendFullCourseYellow()
 	}
 
 	cancelStrategy() {

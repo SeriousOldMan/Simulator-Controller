@@ -261,20 +261,22 @@ class SimulatorStartup extends ConfigurationItem {
 					profile := getMultiMapValue(readMultiMap(fileName), "Profiles", "Profile", false)
 
 				if profile {
-					showProgress({color: "Blue", message: translate("Loading profile ") . profile . translate("..."), title: translate("Preparing startup profile")})
+					if !kSilentMode {
+						showProgress({color: "Blue", message: translate("Loading profile ") . profile . translate("..."), title: translate("Preparing startup profile")})
 
-					loop 50 {
-						showProgress({progress: A_Index})
+						loop 50 {
+							showProgress({progress: A_Index})
 
-						Sleep 50
-					}
+							Sleep 50
+						}
 
-					showProgress({color: "Green", message: translate("Applying profile ") . profile . translate("...")})
+						showProgress({color: "Green", message: translate("Applying profile ") . profile . translate("...")})
 
-					loop 50 {
-						showProgress({progress: A_Index + 50})
+						loop 50 {
+							showProgress({progress: A_Index + 50})
 
-						Sleep 50
+							Sleep 50
+						}
 					}
 
 					configuration := readMultiMap(fileName)
@@ -313,8 +315,9 @@ class SimulatorStartup extends ConfigurationItem {
 		catch Any as exception {
 			logMessage(kLogCritical, translate("Cannot start Simulator Controller (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
-			showMessage(substituteVariables(translate("Cannot start Simulator Controller (%kBinariesDirectory%Simulator Controller.exe) - please rebuild the applications..."))
-					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			if !kSilentMode
+				showMessage(substituteVariables(translate("Cannot start Simulator Controller (%kBinariesDirectory%Simulator Controller.exe) - please rebuild the applications..."))
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 
 			return 0
 		}
@@ -2309,8 +2312,9 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 			catch Any as exception {
 				logMessage(kLogCritical, translate("Error while initializing Team Server Connector - please rebuild the applications"))
 
-				showMessage(translate("Error while initializing Team Server Connector - please rebuild the applications") . translate("...")
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				if !kSilentMode
+					showMessage(translate("Error while initializing Team Server Connector - please rebuild the applications") . translate("...")
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 		}
 

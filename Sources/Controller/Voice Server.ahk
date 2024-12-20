@@ -54,6 +54,9 @@ global kDebugRecognitions := 4
 ;;;-------------------------------------------------------------------------;;;
 
 class VoiceServer extends ConfigurationItem {
+	static sInterruptable := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+											, "Voice", "Interruptable", false)
+
 	iDebug := kDebugOff
 
 	iVoiceClients := CaseInsenseMap()
@@ -80,6 +83,8 @@ class VoiceServer extends ConfigurationItem {
 	iPendingCommands := []
 	iHasPendingActivation := false
 	iLastCommand := A_TickCount
+
+	iLastInterrupt := false
 
 	class VoiceClient {
 		iRouting := false
@@ -574,7 +579,7 @@ class VoiceServer extends ConfigurationItem {
 				}
 		}
 
-		interrupt() {
+		interrupt(pending := false) {
 			local synthesizer := this.SpeechSynthesizer
 
 			if (synthesizer && this.Speaking && !this.Interrupted && this.Interruptable && synthesizer.Stoppable)
@@ -666,8 +671,9 @@ class VoiceServer extends ConfigurationItem {
 
 					logMessage(kLogCritical, translate("Error while registering voice command `"") . command . translate("`" - please check the configuration"))
 
-					showMessage(substituteVariables(translate("Cannot register voice command `"%command%`" - please check the configuration..."), {command: command})
-							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+					if !kSilentMode
+						showMessage(substituteVariables(translate("Cannot register voice command `"%command%`" - please check the configuration..."), {command: command})
+								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 			}
 		}
@@ -754,6 +760,18 @@ class VoiceServer extends ConfigurationItem {
 	Speaker {
 		Get {
 			return this.iSpeaker
+		}
+	}
+
+	static Interruptable {
+		Get {
+			return VoiceServer.sInterruptable
+		}
+	}
+
+	Interruptable {
+		Get {
+			return VoiceServer.Interruptable
 		}
 	}
 
@@ -981,7 +999,7 @@ class VoiceServer extends ConfigurationItem {
 
 		if toggle {
 			if pressed {
-				if listenTask {
+				if (listenTask && !this.Interruptable) {
 					listen := true
 
 					listenTask.stop()
@@ -1008,7 +1026,7 @@ class VoiceServer extends ConfigurationItem {
 
 					listening := true
 				}
-				else {
+				else if !listenTask {
 					listenTask := Task(ObjBindMethod(this, "listen", true, true), speed, kInterruptPriority)
 
 					Task.startTask(listenTask)
@@ -1022,7 +1040,7 @@ class VoiceServer extends ConfigurationItem {
 			if (((A_TickCount - lastDown) < (speed / 2)) && !activation)
 				pressed := false
 
-			if (!this.Speaking && pressed) {
+			if ((!this.Speaking || this.Interruptable) && pressed) {
 				if activation
 					this.startActivationListener()
 				else
@@ -1127,6 +1145,9 @@ class VoiceServer extends ConfigurationItem {
 				return false
 			}
 			else {
+				if this.Interruptable
+					this.interrupt(false, (this.Interruptable = "All"))
+
 				if this.hasPushToTalk()
 					playSound("VSSoundPlayer.exe", talkSound, audioDevice)
 
@@ -1154,6 +1175,9 @@ class VoiceServer extends ConfigurationItem {
 	startListening(retry := true) {
 		local activeClient := this.getVoiceClient()
 
+		if this.Interruptable
+			this.interrupt(false, (this.Interruptable = "All"))
+
 		return (activeClient ? activeClient.startListening(retry) : this.startActivationListener(retry))
 	}
 
@@ -1163,8 +1187,11 @@ class VoiceServer extends ConfigurationItem {
 		return (activeClient ? activeClient.stopListening(retry) : this.stopActivationListener(retry))
 	}
 
-	interrupt(descriptor := false) {
+	interrupt(descriptor := false, pending := false) {
 		local ignore, client
+
+		if pending
+			this.iLastInterrupt := A_TickCount
 
 		if descriptor
 			this.getVoiceClient(descriptor).interrupt()
@@ -1199,9 +1226,7 @@ class VoiceServer extends ConfigurationItem {
 
 		text := text
 
-		if this.Speaking
-			Task.startTask(ObjBindMethod(this, "speak", descriptor, text, activate, options))
-		else {
+		speak() {
 			this.iSpeaking := true
 
 			try {
@@ -1217,6 +1242,24 @@ class VoiceServer extends ConfigurationItem {
 				this.iSpeaking := oldSpeaking
 			}
 		}
+
+		speakAgain() {
+			if (this.iLastInterrupt < Task.CurrentTask.SpeechStart)
+				if (this.Speaking || this.Listening || (choose(this.VoiceClients, (c) => (c.Speaking || c.Listening)).Length > 0))
+					return this
+				else
+					speak()
+		}
+
+		if (this.Speaking || this.Listening || (choose(this.VoiceClients, (c) => (c.Speaking || c.Listening)).Length > 0)) {
+			retryTask := Task(speakAgain)
+
+			retryTask.SpeechStart := A_TickCount
+
+			retryTask.start()
+		}
+		else
+			speak()
 	}
 
 	registerVoiceClient(descriptor, routing, pid
@@ -1315,8 +1358,9 @@ class VoiceServer extends ConfigurationItem {
 
 					logMessage(kLogCritical, translate("Error while registering voice command `"") . activationCommand . translate("`" - please check the configuration"))
 
-					showMessage(substituteVariables(translate("Cannot register voice command `"%command%`" - please check the configuration..."), {command: activationCommand})
-							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+					if !kSilentMode
+						showMessage(substituteVariables(translate("Cannot register voice command `"%command%`" - please check the configuration..."), {command: activationCommand})
+								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 			}
 		}

@@ -522,9 +522,10 @@ callSimulator(simulator, options := "", protocol?) {
 								   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 								   . kBinariesDirectory . translate(")"))
 
-			showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
-										  , {exePath: exePath, simulator: simulator, protocol: "SHM"})
-					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			if !kSilentMode
+				showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
+											  , {exePath: exePath, simulator: simulator, protocol: "SHM"})
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 
 			return newMultiMap()
 		}

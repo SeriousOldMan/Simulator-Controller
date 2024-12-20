@@ -276,8 +276,9 @@ startDatabaseSynchronizer() {
 			catch Any as exception {
 				logMessage(kLogCritical, translate("Cannot start Database Synchronizer - please rebuild the applications..."))
 
-				showMessage(translate("Cannot start Database Synchronizer - please rebuild the applications...")
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				if !kSilentMode
+					showMessage(translate("Cannot start Database Synchronizer - please rebuild the applications...")
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 		}
 	}

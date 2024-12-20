@@ -46,6 +46,7 @@ The following group let's you control a couple of aspects of the voice recogniti
 |      | Activation Speed  | 500 (Windows default)    | The maximum number of milliseconds between a click or press on the Push-To-Talk, so that an activation mode is triggered. Default is the Windows setting for the mouse double click speed (typically 500 ms, if not changed by the user). |
 |      | High Rating  | 0.85     | This value represents the Sorenson-Dice rating for a good enough match of a command phrase, when comparing a spoken command against the registered command syntax. The range of the rating is from 0.0 (no match at all) up to 1.0 (perfect word by word match). When a registered phrase is found with a *High Rating* quality index or higher, this command is used, regardless, whether there are remaining phrases to be tested. By tuning this setting, you can specify how precise the spoken commands must follow the registered syntax. |
 |      | Low Rating | 0.7     | This value represents the Sorenson-Dice rating a registered command syntax must reach, when compared to a spoken command, so that this command is even considered. The range of the rating is from 0.0 (no match at all) up to 1.0 (perfect word by word match). |
+|      | Interruptable | false | If not *false*, the currently active speech will be interrupted, if Push-to-Talk is pressed. If the value is "All", all currently pending speeches will be discarded as well, before the listener is activated. |
 
 
 And finally a couple of other settings which configure low level components of Simulator Controller:

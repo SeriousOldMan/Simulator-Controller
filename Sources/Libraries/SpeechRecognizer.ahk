@@ -299,8 +299,9 @@ class SpeechRecognizer {
 					
 					kNirCmd := false
 
-					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
-							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+					if !kSilentMode
+						showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
+								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 			}
 
@@ -399,7 +400,7 @@ class SpeechRecognizer {
 				if (this.RecognizerList.Length == 0) {
 					logMessage(kLogCritical, translate("No languages found while initializing speech recognition system - please install the speech recognition software"))
 
-					if !silent
+					if (!silent && !kSilentMode)
 						showMessage(translate("No languages found while initializing speech recognition system - please install the speech recognition software") . translate("...")
 								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
@@ -437,7 +438,7 @@ class SpeechRecognizer {
 
 			logMessage(kLogCritical, translate("Error while initializing speech recognition module - please install the speech recognition software"))
 
-			if !silent
+			if (!silent && !kSilentMode)
 				showMessage(translate("Error while initializing speech recognition module - please install the speech recognition software") . translate("...")
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 
@@ -455,8 +456,9 @@ class SpeechRecognizer {
 					
 					kNirCmd := false
 
-					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
-							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+					if !kSilentMode
+						showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
+								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 			}
 		}
@@ -547,8 +549,9 @@ class SpeechRecognizer {
 				
 				kNirCmd := false
 
-				showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				if !kSilentMode
+					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 		}
 
@@ -598,8 +601,9 @@ class SpeechRecognizer {
 					
 					kNirCmd := false
 
-					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
-							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+					if !kSilentMode
+						showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
+								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 			}
 		}
@@ -1614,8 +1618,9 @@ matchWords(string1, string2) {
 
 			logMessage(kLogCritical, translate("Error while initializing speech recognition module - please install the speech recognition software"))
 
-			showMessage(translate("Error while initializing speech recognition module - please install the speech recognition software") . translate("...")
-								, translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			if !kSilentMode
+				showMessage(translate("Error while initializing speech recognition module - please install the speech recognition software") . translate("...")
+									, translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
 	}
 

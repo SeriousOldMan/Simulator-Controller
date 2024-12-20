@@ -17,7 +17,6 @@ targetListener(target) {
 }
 
 startActivation() {
-	showMessage("M")
 	while FileExist(kTempDirectory . "Voice.cmd")
 		deleteFile(kTempDirectory . "Voice.cmd")
 

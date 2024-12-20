@@ -429,8 +429,9 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 			logMessage(kLogCritical, translate("Cannot start the Session Database tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
-			showMessage(substituteVariables(translate("Cannot start the Session Database tool (%exePath%) - please check the configuration..."), {exePath: exePath})
-					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			if !kSilentMode
+				showMessage(substituteVariables(translate("Cannot start the Session Database tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
 	}
 
@@ -1054,8 +1055,9 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			catch Any as exception {
 				logMessage(kLogCritical, translate("Error while initializing Team Server Connector - please rebuild the applications"))
 
-				showMessage(translate("Error while initializing Team Server Connector - please rebuild the applications") . translate("...")
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				if !kSilentMode
+					showMessage(translate("Error while initializing Team Server Connector - please rebuild the applications") . translate("...")
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 		}
 

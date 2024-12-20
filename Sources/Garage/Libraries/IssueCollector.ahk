@@ -296,9 +296,10 @@ class IssueCollector {
 				message := substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
 											 , {simulator: code, protocol: "SHM", exePath: kBinariesDirectory . "Providers\" . code . " SHM Spotter.exe"})
 
-				logMessage(kLogCritical, message)
+				logMessage(kLogCritical, StrReplace(message, translate("..."), ""))
 
-				showMessage(message, translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				if !kSilentMode
+					showMessage(message, translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 
 				pid := false
 			}

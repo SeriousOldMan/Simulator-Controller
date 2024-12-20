@@ -188,8 +188,9 @@ class SessionDatabase extends ConfigurationItem {
 					catch Any as exception {
 						logMessage(kLogCritical, translate("Error while initializing Data Store Connector - please rebuild the applications"))
 
-						showMessage(translate("Error while initializing Data Store Connector - please rebuild the applications") . translate("...")
-											, translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+						if !kSilentMode
+							showMessage(translate("Error while initializing Data Store Connector - please rebuild the applications") . translate("...")
+												, translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 					}
 
 					if connector {
@@ -725,8 +726,9 @@ class SessionDatabase extends ConfigurationItem {
 
 			logMessage(kLogCritical, translate("Cannot start Track Mapper - please rebuild the applications..."))
 
-			showMessage(translate("Cannot start Track Mapper - please rebuild the applications...")
-					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			if !kSilentMode
+				showMessage(translate("Cannot start Track Mapper - please rebuild the applications...")
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 
 			deleteFile(kTempDirectory . "Track Mapper.state")
 

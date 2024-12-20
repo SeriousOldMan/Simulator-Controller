@@ -40,6 +40,7 @@ class LMUPlugin extends RF2Plugin {
 	iRepairBodyworkChosen := true
 
 	static sCarData := false
+	static sTyreData := false
 
 	PreviousOptionHotkey {
 		Get {
@@ -117,6 +118,29 @@ class LMUPlugin extends RF2Plugin {
 
 			LMUPlugin.sCarData := data
 		}
+	}
+
+	static requireTyreDatabase() {
+		local data
+
+		if !LMUPlugin.sTyreData {
+			data := readMultiMap(kResourcesDirectory . "Simulator Data\LMU\Tyre Data.ini")
+
+			if FileExist(kUserHomeDirectory . "Simulator Data\LMU\Tyre Data.ini")
+				addMultiMapValues(data, readMultiMap(kUserHomeDirectory . "Simulator Data\LMU\Tyre Data.ini"))
+
+			LMUPlugin.sTyreData := data
+		}
+	}
+
+	simulatorStartup(simulator) {
+		if (simulator = kLMUApplication)
+			Task.startTask(() {
+				LMUPLugin.requireCarDatabase()
+				LMUPLugin.requireTyreDatabase()
+			}, 1000, kLowPriority)
+
+		super.simulatorStartup(simulator)
 	}
 
 	requirePitstopMFD() {
@@ -315,20 +339,33 @@ class LMUPlugin extends RF2Plugin {
 	}
 
 	tyrePressureSteps(pressure) {
-		local compounds, index, candidate
+		local key := false
+		local minPressure, maxPressure, pressureSteps, step, class
 
-		if tyreCompound {
-			compounds := SessionDatabase().getTyreCompounds(this.Simulator[true], this.Car, this.Track)
-			index := inList(compounds, compound(tyreCompound, tyreCompoundColor))
+		static pressures := false
 
-			if index
-				return index
-			else
-				for index, candidate in compounds
-					if (InStr(candidate, tyreCompound) == 1)
-						return index
+		if !pressures {
+			LMUPlugin.requireTyreDatabase()
 
-			return false
+			pressures := getMultiMapValues(LMUPlugin.sTyreData, "Pressures")
+		}
+
+
+		if pressures.Has(this.Car . ".MinPressure")
+			key := this.Car
+		else if pressures.Has(this.Car . ".Class") {
+			key := pressures[this.Car . ".Class"]
+
+			if !pressures.Has(key . ".MinPressure")
+				key := false
+		}
+
+		if key {
+			minPressure := pressures[key . ".MinPressure"]
+			maxPressure := pressures[key . ".MaxPressure"]
+			pressureSteps := pressures[key . ".PressureSteps"]
+
+			return Round((pressure - minPressure) / ((maxPressure - minPressure) / pressureSteps))
 		}
 		else
 			return false

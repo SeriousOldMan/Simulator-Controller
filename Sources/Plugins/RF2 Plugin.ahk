@@ -178,6 +178,8 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 					this.sendPitstopCommand("Pitstop", action, "Tyre Pressure", 0.0, 0.0, 0.0, Round(steps * 0.1, 1))
 				case "Driver", "Repair":
 					this.sendPitstopCommand("Pitstop", action, option, Round(steps))
+				default:
+					throw "Unsupported change operation `"" . action . "`" detected in RF2Plugin.changePitstopOption..."
 			}
 		}
 	}

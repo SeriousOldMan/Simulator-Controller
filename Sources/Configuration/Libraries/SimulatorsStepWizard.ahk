@@ -172,8 +172,9 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 				code := getApplicationDescriptor(simulator)[1]
 				keys := getMultiMapValue(wizard.Definition, "Setup.Simulators", "Simulators.MFDKeys." . code, false)
 
-				if keys {
-					this.iSimulatorMFDKeys[simulator] := []
+				this.iSimulatorMFDKeys[simulator] := []
+
+				if (keys && (keys != "")) {
 					keyY := labelY + 90
 
 					for ignore, key in string2Values("|", keys) {
@@ -251,7 +252,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		super.updateState()
 
 		for ignore, simulator in this.Definition
-			if wizard.isApplicationSelected(simulator)
+			if (wizard.isApplicationSelected(simulator) || isDebug())
 				simulators.Push(simulator)
 
 		this.iSimulators := simulators

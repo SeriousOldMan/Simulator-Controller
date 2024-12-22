@@ -1551,9 +1551,9 @@ showRaceSettingsEditor() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Race Settings"
 
-	gSimulator := false
-	gCar := false
-	gTrack := false
+	gSimulator := "Le Mans Ultimate"
+	gCar := "Foo"
+	gTrack := "Bar"
 	gWeather := "Dry"
 	gAirTemperature := 23
 	gTrackTemperature := 27

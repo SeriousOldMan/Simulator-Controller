@@ -252,7 +252,7 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 
 			loadSetup := SettingsDatabase().readSettingValue(lastSimulator, lastCar, lastTrack, "*"
 														   , "Simulator." . this.Simulator[true], "Session.Data.Setup"
-														   , (lastSimulator = "Le Mans Ultimate") ? 10 : 60)
+														   , (lastSimulator = "Le Mans Ultimate") ? 20 : 60)
 		}
 
 		this.parseCarName(getMultiMapValue(telemetryData, "Session Data", "CarRaw"), &model)

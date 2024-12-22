@@ -545,6 +545,8 @@ readSimulatorData(simulator, car, track) {
 	if ((simulator = "LMU") && car && track) {
 		setupData := LMURESTProvider.SetupData(simulator, car, track)
 
+		setMultiMapValue(data, "Setup Data", "FuelAmount", setupData.FuelAmount)
+
 		tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, setupData.TyreCompound, false)
 
 		if tyreCompound {
@@ -558,6 +560,12 @@ readSimulatorData(simulator, car, track) {
 		setMultiMapValue(data, "Setup Data", "TyrePressureFR", setupData.TyrePressure["Front Right"])
 		setMultiMapValue(data, "Setup Data", "TyrePressureRL", setupData.TyrePressure["Rear Left"])
 		setMultiMapValue(data, "Setup Data", "TyrePressureRR", setupData.TyrePressure["Rear Right"])
+
+		setupData := LMURESTProvider.PitstopData(simulator, car, track)
+
+		setMultiMapValue(data, "Setup Data", "RepairBodywork", setupData.RepairBodywork)
+		setMultiMapValue(data, "Setup Data", "RepairSuspension", setupData.RepairSuspension)
+		setMultiMapValue(data, "Setup Data", "RepairEngine", setupData.RepairEngine)
 	}
 	else
 		setMultiMapValues(data, "Setup Data", getMultiMapValues(callSimulator(simulator, "Setup=true"), "Setup Data"))
@@ -567,7 +575,7 @@ readSimulatorData(simulator, car, track) {
 			tyreCompound := getMultiMapValue(data, section, "TyreCompoundRaw", kUndefined)
 
 			if (tyreCompound && (tyreCompound != kUndefined)) {
-				tyreCompound := SessionDatabase.getTyreCompoundName(simulator, gCar, gTrack, tyreCompound, false)
+				tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
 
 				if tyreCompound {
 					tyreCompoundColor := false

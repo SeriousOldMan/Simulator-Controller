@@ -906,7 +906,6 @@ namespace RF2SHMProvider {
 					Console.WriteLine("RepairSupension=false");
 					Console.WriteLine("RepairBodywork=false");
 				}
-
 			}
 		}
     }

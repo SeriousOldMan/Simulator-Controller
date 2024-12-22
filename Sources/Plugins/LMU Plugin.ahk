@@ -28,7 +28,7 @@ global kLMUPlugin := "LMU"
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class LMUPlugin extends RF2Plugin {
+class LMUPlugin extends Sector397Plugin {
 	iRequestPitstopHotkey := false
 
 	RequestPitstopHotkey {
@@ -176,7 +176,7 @@ class LMUPlugin extends RF2Plugin {
 								pitstop.setBrakeChange(true)
 					}
 				case "Driver":
-					if pitstop.supportsDriverSwap()
+					if pitstop.supportsDriverSwap() {
 						switch operation, false {
 							case "Get":
 								return pitstop.getDriver()
@@ -185,6 +185,7 @@ class LMUPlugin extends RF2Plugin {
 							case "Change":
 								pitstop.changeDriver(value)
 						}
+					}
 					else
 						return SessionDatabase.getDriverName(this.Simulator[true], SessionDatabase.ID)
 			}
@@ -339,6 +340,45 @@ class LMUPlugin extends RF2Plugin {
 			super.parseCarName(carName, , &nr, &category)
 
 
+	}
+
+	readSessionData(options := "", protocol?) {
+		local simulator, car, track, data, setupData, tyreCompound, tyreCompoundColor
+
+		if InStr(options, "Setup=true") {
+			simulator := this.Simulator[true]
+			car := this.Car
+			track := this.Track
+
+			setupData := LMURESTProvider.SetupData(simulator, car, track)
+			data := newMultiMap()
+
+			setMultiMapValue(data, "Setup Data", "FuelAmount", setupData.FuelAmount)
+
+			tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, setupData.TyreCompound, false)
+
+			if tyreCompound {
+				splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
+
+				setMultiMapValue(data, "Setup Data", "TyreCompound", tyreCompound)
+				setMultiMapValue(data, "Setup Data", "TyreCompoundColor", tyreCompoundColor)
+			}
+
+			setMultiMapValue(data, "Setup Data", "TyrePressureFL", setupData.TyrePressure["Front Left"])
+			setMultiMapValue(data, "Setup Data", "TyrePressureFR", setupData.TyrePressure["Front Right"])
+			setMultiMapValue(data, "Setup Data", "TyrePressureRL", setupData.TyrePressure["Rear Left"])
+			setMultiMapValue(data, "Setup Data", "TyrePressureRR", setupData.TyrePressure["Rear Right"])
+
+			setupData := LMURESTProvider.PitstopData(simulator, car, track)
+
+			setMultiMapValue(data, "Setup Data", "RepairBodywork", setupData.RepairBodywork)
+			setMultiMapValue(data, "Setup Data", "RepairSuspension", setupData.RepairSuspension)
+			setMultiMapValue(data, "Setup Data", "RepairEngine", setupData.RepairEngine)
+
+			return data
+		}
+		else
+			return super.readSessionData(options, protocol?)
 	}
 }
 

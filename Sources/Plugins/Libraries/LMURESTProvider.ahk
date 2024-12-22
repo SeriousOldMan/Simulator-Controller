@@ -22,7 +22,7 @@ class LMURestProvider {
 	class RESTData {
 		iSimulator := false
 		iCar := false
-		iTrack = false
+		iTrack := false
 
 		iData := false
 
@@ -256,6 +256,16 @@ class LMURestProvider {
 		}
 
 		getTyrePressure(tyre) {
+			static tyreTypes := CaseInsenseMap("FL", "FL", "FL", "FR", "FR", "RL", "RL", "RR", "RR"
+											 , "Front Left", "FL", "Front Right", "FR", "Rear Left", "RL", "Rear Right", "RR")
+
+			if this.Data {
+				pressure := this.lookup(this.Data, tyreTypes[tyre] . " PRESS:")
+
+				return string2Values(A_Space, pressure["settings"][pressure["currentSetting"]][1] / 6.894757, 2)
+			}
+			else
+				return false
 		}
 
 		setTyrePressure(tyre, code) {
@@ -390,11 +400,16 @@ class LMURestProvider {
 		getTyreCompound(tyre) {
 			local carSetup
 
+			static tyreTypes := CaseInsenseMap("All", "FL", "FL", "FL", "FR", "FR", "RL", "RL", "RR", "RR"
+											 , "Front Left", "FL", "Front Right", "FR", "Rear Left", "RL", "Rear Right", "RR")
+
 			if this.Data {
 				try {
 					carSetup := this.Data["carSetup"]["garageValues"]
 
-					return SessionDatabase.getTyreCompounds(this.Simulator, this.Car, this.Track)[carSetup["WM_COMPOUND-W_FL"]["value"] + 1]
+					return SessionDatabase.getTyreCompounds(this.Simulator
+														  , this.Car
+														  , this.Track)[carSetup["WM_COMPOUND-W_" . tyreTypes[tyre]]["value"] + 1]
 				}
 				catch Any as exception {
 					logError(exception)
@@ -407,6 +422,26 @@ class LMURestProvider {
 		}
 
 		getTyrePressure(tyre) {
+			local pressure
+
+			static tyreTypes := CaseInsenseMap("FL", "FL", "FL", "FR", "FR", "RL", "RL", "RR", "RR"
+											 , "Front Left", "FL", "Front Right", "FR", "Rear Left", "RL", "Rear Right", "RR")
+
+			if this.Data {
+				try {
+					pressure := this.Data["carSetup"]["garageValues"]["WM_PRESSURE-W_" . tyreTypes[tyre]]["stringValue"]
+
+					if InStr(pressure, "kPa")
+						return Round(string2Values(A_Space, pressure)[1] / 6.894757, 2)
+					else
+						return Round(string2Values(A_Space, pressure)[1], 2)
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+			}
+
+			return false
 		}
 	}
 

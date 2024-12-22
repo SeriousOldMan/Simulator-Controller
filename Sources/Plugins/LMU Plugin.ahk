@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "Libraries\SimulatorPlugin.ahk"
+#Include "Libraries\LMURESTProvider.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "RF2 Plugin.ahk"
 
@@ -28,43 +29,7 @@ global kLMUPlugin := "LMU"
 ;;;-------------------------------------------------------------------------;;;
 
 class LMUPlugin extends RF2Plugin {
-	iPreviousOptionHotkey := false
-	iNextOptionHotkey := false
-	iPreviousChoiceHotkey := false
-	iNextChoiceHotkey := false
-
 	iRequestPitstopHotkey := false
-
-	iTyreCompoundChosen := 0
-	iRepairSuspensionChosen := true
-	iRepairBodyworkChosen := true
-
-	static sCarData := false
-	static sTyreData := false
-
-	PreviousOptionHotkey {
-		Get {
-			return this.iPreviousOptionHotkey
-		}
-	}
-
-	NextOptionHotkey {
-		Get {
-			return this.iNextOptionHotkey
-		}
-	}
-
-	PreviousChoiceHotkey {
-		Get {
-			return this.iPreviousChoiceHotkey
-		}
-	}
-
-	NextChoiceHotkey {
-		Get {
-			return this.iNextChoiceHotkey
-		}
-	}
 
 	RequestPitstopHotkey {
 		Get {
@@ -74,11 +39,6 @@ class LMUPlugin extends RF2Plugin {
 
 	__New(controller, name, simulator, configuration := false) {
 		super.__New(controller, name, simulator, configuration)
-
-		this.iPreviousOptionHotkey := this.getArgumentValue("previousOption", "{Up}")
-		this.iNextOptionHotkey := this.getArgumentValue("nextOption", "{Down}")
-		this.iPreviousChoiceHotkey := this.getArgumentValue("previousChoice", "{Left}")
-		this.iNextChoiceHotkey := this.getArgumentValue("nextChoice", "{Right}")
 
 		this.iRequestPitstopHotkey := this.getArgumentValue("requestPitstop", false)
 
@@ -104,141 +64,177 @@ class LMUPlugin extends RF2Plugin {
 	}
 
 	supportsSetupImport() {
-		return false
+		return false ; ?????
 	}
 
-	static requireCarDatabase() {
-		local data
+	getOptionHandler(option) {
+		return (operation, value?) {
+			local pitstop := LMURESTProvider.PitstopData()
+			local compound, code, tyre
 
-		if !LMUPlugin.sCarData {
-			data := readMultiMap(kResourcesDirectory . "Simulator Data\LMU\Car Data.ini")
+			switch option, false {
+				case "Refuel":
+					switch operation, false {
+						case "Get":
+							return pitstop.getRefuelAmount()
+						case "Set":
+							pitstop.setRefuelAmount(value)
+						case "Change":
+							pitstop.changeRefuelAmount(value)
+					}
+				case "Tyre Compound", "Tyre Compound Front Left", "Tyre Compound Front Right"
+									, "Tyre Compound Rear Left", "Tyre Compound Rear Right":
+					if (option = "Tyre Compound")
+						tyre := "All"
+					else
+						tyre := StrReplace(option, "Tyre Compound ", "")
 
-			if FileExist(kUserHomeDirectory . "Simulator Data\LMU\Car Data.ini")
-				addMultiMapValues(data, readMultiMap(kUserHomeDirectory . "Simulator Data\LMU\Car Data.ini"))
+					switch operation, false {
+						case "Get":
+							compound := SessionDatabase.getTyreCompoundName(this.Simulator[true], this.Car, this.Track
+																		  , pitstop.getTyreCompound(tyre), kUndefined)
 
-			LMUPlugin.sCarData := data
+							return ((compound = kUndefined) ? normalizeCompound("Dry") : compound)
+						case "Set":
+							if value {
+								code := SessionDatabase.getTyreCompoundCode(this.Simulator[true], this.Car, this.Track, value, kUndefined)
+
+								if (code = kUndefined)
+									code := SessionDatabase.getTyreCompounds(this.Simulator[true], this.Car, this.Track, true)[1]
+
+								pitstop.setTyreCompound(tyre, code)
+							}
+							else
+								pitstop.setTyreCompound(tyre, false)
+						case "Change":
+							pitstop.changeTyreCompound(value)
+					}
+				case "Front Left", "Front Right", "Rear Left", "Rear Right":
+					switch operation, false {
+						case "Get":
+							return pitstop.getTyrePressure(option)
+						case "Set":
+							pitstop.setTyrePressure(option)
+						case "Change":
+							pitstop.changeTyrePressure(option, value)
+					}
+				case "Repair Bodywork":
+					switch operation, false {
+						case "Get":
+							pitstop.getRepairs(&value, &ignore, &ignore)
+
+							return value
+						case "Set":
+							pitstop.setRepairs(value, pitstop.RepairSuspension, pitstop.RepairEngine)
+						case "Change":
+							if (value < 0)
+								pitstop.setRepairs(false, pitstop.RepairSuspension, pitstop.RepairEngine)
+							else if (value < 0)
+								pitstop.setRepairs(true, pitstop.RepairSuspension, pitstop.RepairEngine)
+					}
+				case "Repair Bodywork":
+					switch operation, false {
+						case "Get":
+							pitstop.getRepairs(&ignore, &value, &ignore)
+
+							return value
+						case "Set":
+							pitstop.setRepairs(pitstop.RepairBodywork, value, pitstop.RepairEngine)
+						case "Change":
+							if (value < 0)
+								pitstop.setRepairs(pitstop.RepairBodywork, false, pitstop.RepairEngine)
+							else if (value < 0)
+								pitstop.setRepairs(pitstop.RepairBodywork, true, pitstop.RepairEngine)
+					}
+				case "Repair Engine":
+					if pitstop.supportsEngineRepair()
+						switch operation, false {
+							case "Get":
+								pitstop.getRepairs(&ignore, &ignore, &value)
+
+								return value
+							case "Set":
+								pitstop.setRepairs(pitstop.RepairBodywork, pitstop.RepairSuspension, value)
+							case "Change":
+								if (value < 0)
+									pitstop.setRepairs(pitstop.RepairBodywork, pitstop.RepairSuspension, false)
+								else if (value < 0)
+									pitstop.setRepairs(pitstop.RepairBodywork, pitstop.RepairSuspension, true)
+						}
+					else
+						return false
+				case "Change Brakes":
+					switch operation, false {
+						case "Get":
+							return pitstop.getBrakeChange()
+						case "Set":
+							pitstop.setBrakeChange(value)
+						case "Change":
+							if (value < 0)
+								pitstop.setBrakeChange(false)
+							else if (value > 0)
+								pitstop.setBrakeChange(true)
+					}
+				case "Driver":
+					if pitstop.supportsDriverSwap()
+						switch operation, false {
+							case "Get":
+								return pitstop.getDriver()
+							case "Set":
+								pitstop.setDriver(value)
+							case "Change":
+								pitstop.changeDriver(value)
+						}
+					else
+						return SessionDatabase.getDriverName(this.Simulator[true], SessionDatabase.ID)
+			}
+
+			pitstop.write()
 		}
 	}
 
-	static requireTyreDatabase() {
-		local data
-
-		if !LMUPlugin.sTyreData {
-			data := readMultiMap(kResourcesDirectory . "Simulator Data\LMU\Tyre Data.ini")
-
-			if FileExist(kUserHomeDirectory . "Simulator Data\LMU\Tyre Data.ini")
-				addMultiMapValues(data, readMultiMap(kUserHomeDirectory . "Simulator Data\LMU\Tyre Data.ini"))
-
-			LMUPlugin.sTyreData := data
-		}
-	}
-
-	simulatorStartup(simulator) {
-		if (simulator = kLMUApplication)
-			Task.startTask(() {
-				LMUPLugin.requireCarDatabase()
-				LMUPLugin.requireTyreDatabase()
-			}, 1000, kLowPriority)
-
-		super.simulatorStartup(simulator)
-	}
-
-	requirePitstopMFD() {
-		return this.openPitstopMFD()
-	}
-
-	selectPitstopOption(option) {
-		local steps
+	getPitstopOptionValues(option) {
+		local data, compound, compoundColor
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			steps := false
+			switch option, false {
+				case "Refuel":
+					return this.getOptionHandler(option).Call("Get")
+				case "Tyre Pressures":
+					return [this.getOptionHandler("Front Left").Call("Get"), this.getOptionHandler("Front Right").Call("Get")
+						  , this.getOptionHandler("Rear Left").Call("Get"), this.getOptionHandler("Rear Right").Call("Get")]
+				case "Tyre Compound", "TyreCompound":
+					compound := this.getOptionHandler("Tyre Compound").Call("Get")
 
-			if ((option = "Refuel") || (option = "No Refuel"))
-				steps := false
-			else if (option = "Tyre Compound")
-				steps := 2
-			else if (option = "Tyre Compound Front Left")
-				steps := 3
-			else if (option = "Tyre Compound Front Right")
-				steps := 4
-			else if (option = "Tyre Compound Rear Left")
-				steps := 5
-			else if (option = "Tyre Compound Rear Right")
-				steps := 6
-			else if ((option = "All Around") || (option = "Front Left"))
-				steps := 9
-			else if (option = "Front Right")
-				steps := 10
-			else if (option = "Rear Left")
-				steps := 11
-			else if (option = "Rear Right")
-				steps := 12
-			else if ((option = "Repair All") || (option = "Repair Bodywork") || (option = "Repair Suspension"))
-				steps := false
-			else if (option = "Change Brakes")
-				steps := 13
+					if compound
+						splitCompound(compound, &compound, &compoundColor := false)
 
-			if steps {
-				loop steps
-					this.sendCommand(this.NextOptionHotkey)
-
-				return true
+					return [compound, compoundColor]
+				case "Repair Suspension", "Repair Bodywork", "Repair Engine":
+					return this.getOptionHandler(option).Call("Get")
+				case "Change Brakes":
+					return this.getOptionHandler(option).Call("Get")
+				case "Driver":
+					return this.getOptionHandler(option).Call("Get")
+				default:
+					return super.getPitstopOptionValues(option)
 			}
-			else
-				return false
 		}
 		else
 			return false
 	}
 
-	deselectPitstopOption(option) {
-		local steps
-
-		if (this.OpenPitstopMFDHotkey != "Off") {
-			steps := false
-
-			if ((option = "Refuel") || (option = "No Refuel"))
-				steps := false
-			else if (option = "Tyre Compound")
-				steps := 2
-			else if (option = "Tyre Compound Front Left")
-				steps := 3
-			else if (option = "Tyre Compound Front Right")
-				steps := 4
-			else if (option = "Tyre Compound Rear Left")
-				steps := 5
-			else if (option = "Tyre Compound Rear Right")
-				steps := 6
-			else if ((option = "All Around") || (option = "Front Left"))
-				steps := 9
-			else if (option = "Front Right")
-				steps := 10
-			else if (option = "Rear Left")
-				steps := 11
-			else if (option = "Rear Right")
-				steps := 12
-			else if ((option = "Repair All") || (option = "Repair Bodywork") || (option = "Repair Suspension"))
-				steps := false
-			else if (option = "Change Brakes")
-				steps := 13
-
-			loop steps
-				this.sendCommand(this.PreviousOptionHotkey)
-		}
-	}
-
 	dialPitstopOption(option, action, steps := 1) {
 		if (this.OpenPitstopMFDHotkey != "Off")
-			switch action, false {
-				case "Increase":
-					loop steps
-						this.sendCommand(this.NextChoiceHotkey)
-				case "Decrease":
-					loop steps
-						this.sendCommand(this.PreviousChoiceHotkey)
-				default:
-					throw "Unsupported change operation `"" . action . "`" detected in LMUPlugin.dialPitstopOption..."
-			}
+			if ((action = "Increase") || (option = "Decrease"))
+				this.getOptionHandler(option).Call("Change", steps)
+			else
+				throw "Unsupported change operation `"" . action . "`" detected in LMUPlugin.dialPitstopOption..."
+	}
+
+	setPitstopOption(option, value) {
+		if (this.OpenPitstopMFDHotkey != "Off")
+			this.getOptionHandler(option).Call("Set", value)
 	}
 
 	changePitstopOption(option, action, steps := 1) {
@@ -249,163 +245,42 @@ class LMUPlugin extends RF2Plugin {
 						this.sendCommand(this.RequestPitstopHotKey)
 				case "Refuel":
 					this.dialPitstopOption(option, action, steps)
-
-					this.deselectPitstopOption(option)
 				case "No Refuel":
 					this.dialPitstopOption("Refuel", "Decrease", 250)
-
-					this.deselectPitstopOption("Refuel")
-				case "Tyre Compound":
-					this.iTyreCompoundChosen += 1
-
-					if (this.iTyreCompoundChosen > SessionDatabase.getTyreCompounds(this.Simulator[true], this.Car, this.Track).Length)
-						this.iTyreCompoundChosen := 0
-
-					this.dialPitstopOption("Tyre Compound", "Decrease", 10)
-
-					if this.iTyreCompoundChosen
-						this.dialPitstopOption("Tyre Compound", "Increase", this.iTyreCompoundChosen)
-
-					this.deselectPitstopOption("Tyre Compound")
+				case "Tyre Compound", "Tyre Compound Front Left", "Tyre Compound Front Right"
+									, "Tyre Compound Rear Left", "Tyre Compound Rear Right":
+					this.dialPitstopOption(option, action, steps)
 				case "All Around":
-					this.dialPitstopOption("Front Left", action, 1)
-					this.sendCommand(this.NextOptionHotkey)
-					this.dialPitstopOption("Front Right", action, 1)
-					this.sendCommand(this.NextOptionHotkey)
-					this.dialPitstopOption("Rear Left", action, 1)
-					this.sendCommand(this.NextOptionHotkey)
-					this.dialPitstopOption("Rear Right", action, 1)
-
-					this.sendCommand(this.PreviousOptionHotkey)
-					this.sendCommand(this.PreviousOptionHotkey)
-					this.sendCommand(this.PreviousOptionHotkey)
-
-					this.deselectPitstopOption("Front Left")
-				case "Front Left":
-					this.dialPitstopOption("Front Left", action, 1)
-
-					this.deselectPitstopOption("Front Left")
-				case "Front Right":
-					this.dialPitstopOption("Front Right", action, 1)
-
-					this.deselectPitstopOption("Front Right")
-				case "Rear Left":
-					this.dialPitstopOption("Rear Left", action, 1)
-
-					this.deselectPitstopOption("Rear Left")
-				case "Rear Right":
-					this.dialPitstopOption("Rear Right", action, 1)
-
-					this.deselectPitstopOption("Rear Right")
-				case "Repair Bodywork":
-					this.dialPitstopOption("Repair All", "Decrease", 4)
-
-					this.iRepairBodyworkChosen := !this.iRepairBodyworkChosen
-
-					if (this.iRepairBodyworkChosen && this.iRepairSuspensionChosen)
-						this.dialPitstopOption("Repair All", "Increase", 3)
-					else if this.iRepairBodyworkChosen
-						this.dialPitstopOption("Repair Bodywork", "Increase", 1)
-					else if this.iRepairSuspensionChosen
-						this.dialPitstopOption("Repair Suspension", "Increase", 2)
-
-					this.deselectPitstopOption("Repair All")
-				case "Repair Suspension":
-					this.dialPitstopOption("Repair All", "Decrease", 4)
-
-					this.iRepairSuspensionChosen := !this.iRepairSuspensionChosen
-
-					if (this.iRepairBodyworkChosen && this.iRepairSuspensionChosen)
-						this.dialPitstopOption("Repair All", "Increase", 3)
-					else if this.iRepairBodyworkChosen
-						this.dialPitstopOption("Repair Bodywork", "Increase", 1)
-					else if this.iRepairSuspensionChosen
-						this.dialPitstopOption("Repair Suspension", "Increase", 2)
-
-					this.deselectPitstopOption("Repair All")
+					this.dialPitstopOption("Front Left", action, steps)
+					this.dialPitstopOption("Front Right", action, steps)
+					this.dialPitstopOption("Rear Left", action, steps)
+					this.dialPitstopOption("Rear Right", action, steps)
+				case "Front Left", "Front Right", "Rear Left", "Rear Right":
+					this.dialPitstopOption(option, action, steps)
+				case "Repair Bodywork", "Repair Suspension", "Repair Engine":
+					this.dialPitstopOption(option, action, steps)
 				case "Change Brakes":
-					this.dialPitstopOption("Change Brakes", action, 1)
-
-					this.deselectPitstopOption("Change Brakes")
-				case "Tyre Compound Front Left":
-				case "Tyre Compound Front Right":
-				case "Tyre Compound Rear Left":
-				case "Tyre Compound Rear Right":
+					this.dialPitstopOption("Change Brakes", action, steps)
 				case "Driver":
+					this.dialPitstopOption("Driver", action, steps)
 				default:
 					throw "Unsupported change operation `"" . action . "`" detected in LMUPlugin.changePitstopOption..."
 			}
 		}
 	}
 
-	tyrePressureIncrement(pressure) {
-		local key := false
-		local minPressure, maxPressure, pressureSteps, step, class
-
-		static pressures := false
-
-		if !pressures {
-			LMUPlugin.requireTyreDatabase()
-
-			pressures := getMultiMapValues(LMUPlugin.sTyreData, "Pressures")
-		}
-
-
-		if pressures.Has(this.Car . ".MinPressure")
-			key := this.Car
-		else if pressures.Has(this.Car . ".Class") {
-			key := pressures[this.Car . ".Class"]
-
-			if !pressures.Has(key . ".MinPressure")
-				key := false
-		}
-
-		if key {
-			minPressure := pressures[key . ".MinPressure"]
-			maxPressure := pressures[key . ".MaxPressure"]
-			pressureSteps := pressures[key . ".PressureSteps"]
-
-			return Round((pressure - minPressure) / ((maxPressure - minPressure) / pressureSteps))
-		}
-		else
-			return false
-	}
-
 	setPitstopRefuelAmount(pitstopNumber, liters) {
 		super.setPitstopRefuelAmount(pitstopNumber, liters)
 
-		if this.openPitstopMFD() {
-			if this.selectPitstopOption("Refuel") {
-				this.dialPitstopOption("Refuel", "Decrease", 250)
-				this.dialPitstopOption("Refuel", "Increase", Round(liters))
-
-				this.deselectPitstopOption("Refuel")
-			}
-
-			this.closePitstopMFD()
-		}
+		if (this.OpenPitstopMFDHotkey != "Off")
+			this.setPitstopOption("Refuel", liters)
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
-		local delta
-
 		super.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
-		delta := this.tyreCompoundIndex(compound, compoundColor)
-
-		if (!compound || delta) {
-			if this.selectPitstopOption("Tyre Compound") {
-				this.dialPitstopOption("Tyre Compound", "Decrease", 10)
-
-				this.iTyreCompoundChosen := delta
-
-				this.dialPitstopOption("Tyre Compound", "Increase", this.iTyreCompoundChosen)
-
-				this.deselectPitstopOption("Tyre Compound")
-			}
-
-			this.closePitstopMFD()
-		}
+		if (this.OpenPitstopMFDHotkey != "Off")
+			this.setPitstopOption("Tyre Compound", compound ? this.tyreCompoundCode(compound, compoundColor) : false)
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
@@ -413,76 +288,57 @@ class LMUPlugin extends RF2Plugin {
 
 		super.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
 
-		if this.openPitstopMFD() {
-			if this.selectPitstopOption("Front Left") {
-				this.dialPitstopOption("Front Left", "Decrease", 100)
-
-				this.dialPitstopOption("Front Left", "Increase", this.tyrePressureIncrement(pressureFL))
-
-				this.deselectPitstopOption("Front Left")
-			}
-
-			if this.selectPitstopOption("Front Right") {
-				this.dialPitstopOption("Front Right", "Decrease", 100)
-
-				this.dialPitstopOption("Front Right", "Increase", this.tyrePressureIncrement(pressureFR))
-
-				this.deselectPitstopOption("Front Right")
-			}
-
-			if this.selectPitstopOption("Rear Left") {
-				this.dialPitstopOption("Rear Left", "Decrease", 100)
-
-				this.dialPitstopOption("Rear Left", "Increase", this.tyrePressureIncrement(pressureRL))
-
-				this.deselectPitstopOption("Rear Left")
-			}
-
-			if this.selectPitstopOption("Rear Right") {
-				this.dialPitstopOption("Rear Right", "Decrease", 100)
-
-				this.dialPitstopOption("Rear Right", "Increase", this.tyrePressureIncrement(pressureRR))
-
-				this.deselectPitstopOption("Rear Right")
-			}
-
-			this.closePitstopMFD()
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			this.setPitstopOption("Front Left", pressureFL)
+			this.setPitstopOption("Front Right", pressureFR)
+			this.setPitstopOption("Rear Left", pressureRL)
+			this.setPitstopOption("Rear Right", pressureRR)
 		}
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
 		super.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
 
-		if (this.iRepairSuspensionChosen != repairSuspension)
-			if (this.requirePitstopMFD() && this.selectPitstopOption("Repair Suspension"))
-				this.changePitstopOption("Repair Suspension")
-
-		if (this.iRepairBodyworkChosen != repairBodywork)
-			if (this.requirePitstopMFD() && this.selectPitstopOption("Repair Bodywork"))
-				this.changePitstopOption("Repair Bodywork")
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			this.setPitstopOption("Repair Suspension", repairSuspension)
+			this.setPitstopOption("Repair Bodywork", repairBodywork)
+			this.setPitstopOption("Repair Engine", repairEngine)
+		}
 	}
 
 	requestPitstopDriver(pitstopNumber, driver) {
+		if (this.OpenPitstopMFDHotkey != "Off")
+			this.setPitstopOption("Driver", driver)
 	}
 
-	updateSession(session, force := false) {
-		super.updateSession(session, force)
+	parseCategory(candidate, &rest) {
+		super.parseCategory(candidate, &rest)
 
-		if (session == kSessionFinished) {
-			this.iTyreCompoundChosen := 0
-			this.iRepairSuspensionChosen := true
-			this.iRepairBodyworkChosen := true
-		}
+		return false
 	}
 
 	parseCarName(carName, &model?, &nr?, &category?, &team?) {
+		static gridData := LMURESTProvider.GridData()
+
+		model := gridData.Car[carName]
+
+		if !model {
+			gridData := LMURESTProvider.GridData()
+
+			model := gridData.Car[carName]
+		}
+
+		team := gridData.Team[carName]
+
 		if ((carName != "") && isNumber(SubStr(carName, 1, 1))) {
 			nr := this.parseNr(carName, &carName)
 
-			super.parseCarName(carName, &model, , &category, &team)
+			super.parseCarName(carName, , , &category)
 		}
 		else
-			super.parseCarName(carName, &model, &nr, &category, &team)
+			super.parseCarName(carName, , &nr, &category)
+
+
 	}
 }
 

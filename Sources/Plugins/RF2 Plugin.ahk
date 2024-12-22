@@ -253,14 +253,14 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	setPitstopRefuelAmount(pitstopNumber, liters) {
 		super.setPitstopRefuelAmount(pitstopNumber, liters)
 
-		if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey != "Off"))
+		if (this.OpenPitstopMFDHotkey != "Off")
 			this.sendPitstopCommand("Pitstop", "Set", "Refuel", Round(liters))
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
 		super.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
-		if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey != "Off"))
+		if (this.OpenPitstopMFDHotkey != "Off")
 			if compound {
 				compound := this.tyreCompoundCode(compound, compoundColor)
 
@@ -278,7 +278,7 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
 		super.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
 
-		if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey != "Off"))
+		if (this.OpenPitstopMFDHotkey != "Off")
 			this.sendPitstopCommand("Pitstop", "Set", "Tyre Pressure"
 								  , Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
 	}
@@ -286,7 +286,7 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
 		super.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
 
-		if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey != "Off"))
+		if (this.OpenPitstopMFDHotkey != "Off")
 			if (repairBodywork && repairSuspension)
 				this.sendPitstopCommand("Pitstop", "Set", "Repair", "Both")
 			else if repairSuspension
@@ -302,7 +302,7 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 
 		super.requestPitstopDriver(pitstopNumber, driver)
 
-		if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey != "Off"))
+		if (this.OpenPitstopMFDHotkey != "Off")
 			if driver {
 				driver := string2Values("|", driver)
 

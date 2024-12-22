@@ -1745,6 +1745,15 @@ updateInstallationForV500() {
 	}
 }
 
+updateConfigurationForV610() {
+	try {
+		DirMove(kDatabaseDirectory . "User\LMU", kDatabaseDirectory . "User\LMU.archive")
+	}
+	catch Any as exception {
+		logError(exception)
+	}
+}
+
 updateConfigurationForV602() {
 	local fileName := (kUserHomeDirectory . "Setup\Configuration Patch.ini")
 	local ignore, parameter, text
@@ -3630,7 +3639,7 @@ startupSimulatorTools() {
 
 	if (!kSilentMode && gSplashScreen)
 		hideSplashScreen()
-	
+
 	ExitApp(0)
 }
 

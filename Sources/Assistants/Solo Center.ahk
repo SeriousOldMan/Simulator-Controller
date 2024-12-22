@@ -2172,7 +2172,7 @@ class SoloCenter extends ConfigurationItem {
 			return
 		}
 
-		data := readSimulatorData(prefix)
+		data := readSimulatorData(prefix, this.Car, this.Track)
 
 		if ((getMultiMapValue(data, "Session Data", "Car") != this.Car)
 		 || (getMultiMapValue(data, "Session Data", "Track") != this.Track))
@@ -8032,15 +8032,6 @@ recommendDataRun(centerOrCommand := false, arguments*) {
 			recommendDataRun("Update", arguments[5], arguments[6])
 		}
 	}
-}
-
-readSimulatorData(simulator) {
-	local data := callSimulator(simulator)
-	local setupData := callSimulator(simulator, "Setup=true")
-
-	setMultiMapValues(data, "Setup Data", getMultiMapValues(setupData, "Setup Data"))
-
-	return data
 }
 
 getDeprecatedValue(data, section, newKey, oldKey, default := false) {

@@ -2913,7 +2913,7 @@ class StrategyWorkbench extends ConfigurationItem {
 						return
 					}
 
-					data := readSimulatorData(prefix)
+					data := readSimulatorData(prefix, car, track)
 
 					if ((getMultiMapValue(data, "Session Data", "Car") != car) || (getMultiMapValue(data, "Session Data", "Track") != track))
 						return
@@ -3815,15 +3815,6 @@ class StrategyWorkbench extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-readSimulatorData(simulator) {
-	local data := callSimulator(simulator)
-	local setupData := callSimulator(simulator, "Setup=true")
-
-	setMultiMapValues(data, "Setup Data", getMultiMapValues(setupData, "Setup Data"))
-
-	return data
-}
 
 filterSchema(schema) {
 	local newSchema := []

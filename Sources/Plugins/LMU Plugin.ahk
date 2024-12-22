@@ -64,12 +64,12 @@ class LMUPlugin extends RF2Plugin {
 	}
 
 	supportsSetupImport() {
-		return false ; ?????
+		return true
 	}
 
 	getOptionHandler(option) {
 		return (operation, value?) {
-			local pitstop := LMURESTProvider.PitstopData()
+			local pitstop := LMURESTProvider.PitstopData(this.Simulator[true], this.Car, this.Track)
 			local compound, code, tyre
 
 			switch option, false {
@@ -318,12 +318,12 @@ class LMUPlugin extends RF2Plugin {
 	}
 
 	parseCarName(carName, &model?, &nr?, &category?, &team?) {
-		static gridData := LMURESTProvider.GridData()
+		static gridData := LMURESTProvider.GridData(this.Simulator[true], this.Car, this.Track)
 
 		model := gridData.Car[carName]
 
 		if !model {
-			gridData := LMURESTProvider.GridData()
+			gridData := LMURESTProvider.GridData(this.Simulator[true], this.Car, this.Track)
 
 			model := gridData.Car[carName]
 		}

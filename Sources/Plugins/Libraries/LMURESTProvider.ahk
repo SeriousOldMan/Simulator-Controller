@@ -20,6 +20,10 @@
 
 class LMURestProvider {
 	class RESTData {
+		iSimulator := false
+		iCar := false
+		iTrack = false
+
 		iData := false
 
 		iCachedObjects := CaseInsenseMap()
@@ -36,6 +40,24 @@ class LMURestProvider {
 			}
 		}
 
+		Simulator {
+			Get {
+				return this.iSimulator
+			}
+		}
+
+		Car {
+			Get {
+				return this.iCar
+			}
+		}
+
+		Track {
+			Get {
+				return this.iTrack
+			}
+		}
+
 		Data {
 			Get {
 				if !this.iData
@@ -43,6 +65,12 @@ class LMURestProvider {
 
 				return this.iData
 			}
+		}
+
+		__New(simulator := false, car := false, track := false) {
+			this.iSimulator := simulator
+			this.iCar := car
+			this.iTrack := track
 		}
 
 		read() {
@@ -317,6 +345,69 @@ class LMURestProvider {
 	}
 
 	class SetupData extends LMURESTProvider.RESTData {
+		GETURL {
+			Get {
+				return "http://localhost:6397/rest/garage/UIScreen/CarSetupOverview"
+			}
+		}
+
+		FuelAmount {
+			Get {
+				return this.getFuelAmount()
+			}
+		}
+
+		TyreCompound[tyre := "All"] {
+			Get {
+				return this.getTyreCompound(tyre)
+			}
+		}
+
+		TyrePressure[tyre] {
+			Get {
+				return this.getTyrePressure(tyre)
+			}
+		}
+
+		getFuelAmount() {
+			local carSetup, capacity
+
+			if this.Data {
+				carSetup := this.Data["carSetup"]["garageValues"]
+				capacity := string2Values(A_Space, carSetup["VM_FUEL_CAPACITY"]["stringValue"])[1]
+
+				if InStr(capacity, "gal")
+					capacity := (StrReplace(capacity, "gal", "") * 4.54609)
+				else
+					capacity := StrReplace(capacity, "l", "")
+
+				return ((carSetup["VM_VIRTUAL_ENERGY"]["value"] / 100) * capacity * carSetup["VM_FUEL_LEVEL"]["stringValue"])
+			}
+			else
+				return false
+		}
+
+		getTyreCompound(tyre) {
+			local carSetup
+
+			if this.Data {
+				try {
+					carSetup := this.Data["carSetup"]["garageValues"]
+
+					return SessionDatabase.getTyreCompounds(this.Simulator, this.Car, this.Track)[carSetup["WM_COMPOUND-W_FL"]["value"] + 1]
+				}
+				catch Any as exception {
+					logError(exception)
+
+					return SessionDatabase.getTyreCompounds(this.Simulator, this.Car, this.Track)[1]
+				}
+			}
+			else
+				return false
+		}
+
+		getTyrePressure(tyre) {
+		}
 	}
 
 	class GridData extends LMURESTProvider.RESTData {

@@ -35,6 +35,7 @@
 #Include "..\Libraries\Messages.ahk"
 #Include "..\Libraries\CLR.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
+#Include "..\Plugins\Libraries\LMURESTProvider.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -454,7 +455,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			prefix := SessionDatabase.getSimulatorCode(simulator)
 		}
 
-		data := readSimulatorData(prefix)
+		data := readSimulatorData(prefix, gCar, gTrack)
 
 		if (getMultiMapValues(data, "Setup Data").Count > 0) {
 			readTyreSetup(readMultiMap(kRaceSettingsFile))
@@ -1537,33 +1538,6 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		return result
 	}
-}
-
-readSimulatorData(simulator) {
-	local data := callSimulator(simulator)
-	local ignore, section, tyreCompound, tyreCompoundColor
-
-	setMultiMapValues(data, "Setup Data", getMultiMapValues(callSimulator(simulator, "Setup=true"), "Setup Data"))
-
-	for ignore, section in ["Car Data", "Setup Data"]
-		if (getMultiMapValue(data, section, "TyreCompound", kUndefined) = kUndefined) {
-			tyreCompound := getMultiMapValue(data, section, "TyreCompoundRaw", kUndefined)
-
-			if (tyreCompound && (tyreCompound != kUndefined)) {
-				tyreCompound := SessionDatabase.getTyreCompoundName(simulator, gCar, gTrack, tyreCompound, false)
-
-				if tyreCompound {
-					tyreCompoundColor := false
-
-					splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
-
-					setMultiMapValue(data, section, "TyreCompound", tyreCompound)
-					setMultiMapValue(data, section, "TyreCompoundColor", tyreCompoundColor)
-				}
-			}
-		}
-
-	return data
 }
 
 showRaceSettingsEditor() {

@@ -3319,6 +3319,8 @@ class SoloCenter extends ConfigurationItem {
 
 			if isNumber(pressure)
 				pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
+			else if (pressure = kNull)
+				pressures[A_Index] := "-"
 		}
 
 		row := sessionStore.query("Lap.Data", {Where: {Lap: lap.Nr}})
@@ -7313,6 +7315,8 @@ class SoloCenter extends ConfigurationItem {
 
 				if isNumber(pressure)
 					coldPressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
+				else if (pressure = kNull)
+					coldPressures[A_Index] := "-"
 			}
 
 			coldPressures := values2String(", ", coldPressures*)
@@ -7327,6 +7331,8 @@ class SoloCenter extends ConfigurationItem {
 
 				if isNumber(pressure)
 					hotPressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
+				else if (pressure = kNull)
+					hotPressures[A_Index] := "-"
 			}
 
 			hotPressures := values2String(", ", hotPressures*)
@@ -7339,6 +7345,8 @@ class SoloCenter extends ConfigurationItem {
 
 				if isNumber(pressure)
 					pressuresLosses[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
+				else if (pressure = kNull)
+					pressuresLosses[A_Index] := "-"
 			}
 
 			pressuresLosses := values2String(", ", pressuresLosses*)
@@ -7357,6 +7365,8 @@ class SoloCenter extends ConfigurationItem {
 
 						if isNumber(pressure)
 							hotPressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
+						else if (pressure = kNull)
+							hotPressures[A_Index] := "-"
 					}
 
 					hotPressures := values2String(", ", hotPressures*)

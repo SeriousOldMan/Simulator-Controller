@@ -2241,7 +2241,7 @@ class RaceStrategist extends GridRaceAssistant {
 					if ((options == true) || (options.HasProp("Map") && options.Map)) {
 						map := strategy.Map
 
-						if ((map != "n/a") && (map != knowledgeBase.getValue("Lap." . knowledgeBase.getValue("Lap") . ".Map", "n/a")))
+						if (map && (map != "n/a") && (map != knowledgeBase.getValue("Lap." . knowledgeBase.getValue("Lap") . ".Map", "n/a")))
 							speaker.speakPhrase("StrategyMap", {map: map})
 					}
 				}
@@ -2290,7 +2290,7 @@ class RaceStrategist extends GridRaceAssistant {
 						if ((options == true) || (options.HasProp("Map") && options.Map)) {
 							map := knowledgeBase.getValue("Strategy.Map")
 
-							if ((map != "n/a") && (map != knowledgeBase.getValue("Lap." . knowledgeBase.getValue("Lap") . ".Map", "n/a")))
+							if (map && (map != "n/a") && (map != knowledgeBase.getValue("Lap." . knowledgeBase.getValue("Lap") . ".Map", "n/a")))
 								speaker.speakPhrase("StrategyMap", {map: map})
 						}
 					}

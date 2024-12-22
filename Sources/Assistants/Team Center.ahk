@@ -7836,6 +7836,8 @@ class TeamCenter extends ConfigurationItem {
 
 					if isNumber(pressure)
 						pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
+					else if (pressure = kNull)
+						pressures[A_Index] := "-"
 				}
 
 				row := this.Laps[lap].Row
@@ -9764,6 +9766,8 @@ class TeamCenter extends ConfigurationItem {
 
 				if isNumber(pressure)
 					pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
+				else
+					pressures[A_Index] := "-"
 			}
 
 			fuel := pitstop["Fuel"]
@@ -11935,6 +11939,8 @@ class TeamCenter extends ConfigurationItem {
 
 					if isNumber(pressure)
 						coldPressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
+					else (pressure = kNull)
+						coldPressures[A_Index] := "-"
 				}
 
 				coldPressures := values2String(", ", coldPressures*)
@@ -11951,6 +11957,8 @@ class TeamCenter extends ConfigurationItem {
 
 					if isNumber(pressure)
 						hotPressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
+					else if (pressure = kNull)
+						hotPressures[A_Index] := "-"
 				}
 
 				hotPressures := values2String(", ", hotPressures*)
@@ -11963,6 +11971,8 @@ class TeamCenter extends ConfigurationItem {
 
 					if isNumber(pressure)
 						pressuresLosses[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
+					else if (pressure = kNull)
+						pressuresLosses[A_Index] := "-"
 				}
 
 				pressuresLosses := values2String(", ", pressuresLosses*)
@@ -11981,6 +11991,8 @@ class TeamCenter extends ConfigurationItem {
 
 							if isNumber(pressure)
 								hotPressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
+							else if (pressure = kNull)
+								hotPressures[A_Index] := "-"
 						}
 
 						hotPressures := values2String(", ", hotPressures*)
@@ -12250,6 +12262,8 @@ class TeamCenter extends ConfigurationItem {
 
 			if isNumber(pressure)
 				pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
+			else if (pressure = kNull)
+				pressures[A_Index] := "-"
 		}
 
 		pressures := values2String(", ", pressures*)
@@ -12323,6 +12337,8 @@ class TeamCenter extends ConfigurationItem {
 
 				if isNumber(pressure)
 					pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
+				else if (pressure = kNull)
+					pressures[A_Index] := "-"
 			}
 
 			pressures := values2String(", ", pressures*)
@@ -12608,6 +12624,8 @@ class TeamCenter extends ConfigurationItem {
 
 					if isNumber(pressure)
 						pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
+					else if (pressure = kNull)
+						pressures[A_Index] := "-"
 				}
 
 				pressures := values2String(", ", pressures*)
@@ -12687,6 +12705,8 @@ class TeamCenter extends ConfigurationItem {
 
 						if isNumber(pressure)
 							tyrePressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
+						else if (pressure = kNull)
+							tyrePressures[A_Index] := "-"
 					}
 
 					tyrePressures := values2String(", ", tyrePressures*)

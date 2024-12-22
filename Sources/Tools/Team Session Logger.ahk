@@ -37,7 +37,7 @@ global vBuildConfiguration := "Development"
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-readSimulatorData(simulator, options := "", protocol := "SHM") {
+readData(simulator, options := "", protocol := "SHM") {
 	exePath := kBinariesDirectory . simulator . A_Space . protocol . " Provider.exe"
 
 	FileCreateDir %kTempDirectory%%simulator% Data
@@ -77,7 +77,7 @@ runTeamSessionLogger() {
 	deleteFile(kTempDirectory . "Team Session.log")
 
 	loop {
-		data := readSimulatorData("ACC")
+		data := readData("ACC")
 
 		info := values2String("; ", A_Now,
 								  , getMultiMapValue(data, "Session Data", "Active", "?")

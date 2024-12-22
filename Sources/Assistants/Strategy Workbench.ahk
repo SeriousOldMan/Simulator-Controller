@@ -1444,8 +1444,8 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w45 r1", getUnit("Volume", true))
 
 		workbenchGui.Add("Text", "x" . x . " yp+21 w72 h20 +0x200", translate("Map"))
-		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w45 h20 Number Limit2 VsimMapEdit", 1)
-		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99", 1)
+		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w45 h20 Number Limit2 VsimMapEdit", "n/a").OnEvent("Change", (*) => this.updateState())
+		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99", "n/a")
 
 		workbenchGui.Add("Text", "x" . x . " yp+23 w72 h23 +0x200", translate("Avg. Lap Time"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp w45 h20 VsimAvgLapTimeEdit", displayValue("Float", 120.0)).OnEvent("Change", validateSimAvgLapTime)
@@ -1742,6 +1742,9 @@ class StrategyWorkbench extends ConfigurationItem {
 			this.Control["simAvgLapTimeEdit"].Enabled := false
 			this.Control["simFuelConsumptionEdit"].Enabled := false
 		}
+
+		if (this.Control["simMapEdit"].Text = 0)
+			this.Control["simMapEdit"].Text := "n/a"
 
 		this.Control["tyreSetAddButton"].Enabled := (this.TyreCompounds.Length > this.TyreSetListView.GetCount())
 
@@ -2168,6 +2171,11 @@ class StrategyWorkbench extends ConfigurationItem {
 			this.Control["simDriverDropDown"].Choose(0)
 
 			this.Control["driverDropDown"].Delete()
+
+			if (simulator = "Assetto Corsa Competizione")
+				this.Control["simMapEdit"].Text := 1
+			else
+				this.Control["simMapEdit"].Text := "n/a"
 
 			this.iSelectedDrivers := false
 
@@ -2913,7 +2921,7 @@ class StrategyWorkbench extends ConfigurationItem {
 						return
 					}
 
-					data := readSimulatorData(prefix)
+					data := readSimulatorData(prefix, car, track)
 
 					if ((getMultiMapValue(data, "Session Data", "Car") != car) || (getMultiMapValue(data, "Session Data", "Track") != track))
 						return
@@ -3815,15 +3823,6 @@ class StrategyWorkbench extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-readSimulatorData(simulator) {
-	local data := callSimulator(simulator)
-	local setupData := callSimulator(simulator, "Setup=true")
-
-	setMultiMapValues(data, "Setup Data", getMultiMapValues(setupData, "Setup Data"))
-
-	return data
-}
 
 filterSchema(schema) {
 	local newSchema := []

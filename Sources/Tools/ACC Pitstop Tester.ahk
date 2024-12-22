@@ -641,7 +641,9 @@ class ACCPitstopTester extends Plugin {
 ;;;                        Private Function Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-readSimulatorData(simulator, options := "", protocol := "SHM") {
+readACCData(options := "", protocol := "SHM") {
+	simulator := "ACC"
+	
 	exePath := kBinariesDirectory . "Providers\" . simulator . A_Space . protocol . " Provider.exe"
 
 	FileCreateDir %kTempDirectory%%simulator% Data
@@ -773,7 +775,7 @@ runACCPitstopTester() {
 
 		pitstopTester.logMessage("Peparation: Reading current MFD settings...`n`n")
 
-		data := readSimulatorData("ACC", "-Setup")
+		data := readACCData("-Setup")
 
 		for key, value in getMultiMapValues(data, "Setup Data")
 			pitstopTester.logMessage(key . " = " . value)

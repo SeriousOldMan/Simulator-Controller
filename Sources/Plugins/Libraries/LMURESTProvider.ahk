@@ -64,10 +64,10 @@ class LMURestProvider {
 
 		Data {
 			Get {
-				if !this.iData
+				if (!this.iData || this.iData.Has("error"))
 					this.read()
 
-				return this.iData
+				return (this.iData.Has("error") ? false : this.iData)
 			}
 		}
 
@@ -634,13 +634,13 @@ class LMURestProvider {
 		getCar(carID) {
 			local car := this.getCarDescriptor(carID)
 
-			return (car ? string2Values(",", car["fullTreePath"])[3] : false)
+			return (car ? string2Values(",", car["fullPathTree"])[3] : false)
 		}
 
 		getClass(carID) {
 			local car := this.getCarDescriptor(carID)
 
-			return (car ? string2Values(",", car["fullTreePath"])[2] : false)
+			return (car ? string2Values(",", car["fullPathTree"])[2] : false)
 		}
 
 		getTeam(carID) {

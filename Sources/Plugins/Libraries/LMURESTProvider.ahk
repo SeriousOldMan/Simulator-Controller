@@ -12,6 +12,7 @@
 #Include "..\..\Libraries\Task.ahk"
 #Include "..\..\Libraries\HTTP.ahk"
 #Include "..\..\Libraries\JSON.ahk"
+#Include "..\..\Database\Libraries\SessionDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -19,6 +20,9 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class LMURestProvider {
+	static sTyreTypes := CaseInsenseMap("All", "FL", "FL", "FL", "FR", "FR", "RL", "RL", "RR", "RR"
+									  , "Front Left", "FL", "Front Right", "FR", "Rear Left", "RL", "Rear Right", "RR")
+
 	class RESTData {
 		iSimulator := false
 		iCar := false
@@ -92,7 +96,7 @@ class LMURestProvider {
 				}
 		}
 
-		lookup(data, name) {
+		lookup(name) {
 			local ignore, candidate
 
 			if this.iCachedObjects.Has(name)
@@ -238,46 +242,170 @@ class LMURestProvider {
 		}
 
 		getRefuelAmount() {
+			local ratio := this.lookup("FUEL RATIO:")
+			local energy := this.lookup("VIRTUAL ENERGY:")
+
+			if (ratio && energy)
+				return (ratio["settings"][ratio["currentSetting"]]["text"] * energy["currentSetting"])
+			else
+				return false
 		}
 
 		setRefuelAmount(liters) {
+			local ratio := this.lookup("FUEL RATIO:")
+			local energy := this.lookup("VIRTUAL ENERGY:")
+
+			if (ratio && energy)
+				energy["currentSetting"] := Min(100, Max(0, Round(liters / ratio["settings"][ratio["currentSetting"]]["text"])))
 		}
 
 		changeRefuelAmount(steps := 1) {
+			local energy := this.lookup("VIRTUAL ENERGY:")
+
+			energy["currentSetting"] := Min(100, Max(0, energy["currentSetting"] + Round(steps)))
 		}
 
 		getTyreCompound(tyre) {
+			tyre := this.lookup((tyre = "All") ? "TIRES:" : (LMURESTProvider.TyreTypes[tyre] . " TIRE:"))
+
+			if tyre
+				return ((tyre["currentSetting"] > 0) ? tyre["settings"][tyre["currentSetting"]]["type"] : false)
+			else
+				return false
 		}
 
 		setTyreCompound(tyre, code) {
+			local index, candidate
+
+			if (tyre = "All") {
+				this.setTyreCompound("FL", code)
+				this.setTyreCompound("FR", code)
+				this.setTyreCompound("RL", code)
+				this.setTyreCompound("RR", code)
+
+				tyre := this.lookup("TIRES:")
+			}
+			else
+				tyre := this.lookup(LMURESTProvider.TyreTypes[tyre] . " TIRE:")
+
+			if tyre
+				if !isInteger(code) {
+					for index, candidate in tyre["settings"]
+						if (candidate["type"] = code) {
+							tyre["currentSetting"] := index
+
+							break
+						}
+				}
+				else
+					tyre["currentSetting"] := code
 		}
 
 		changeTyreCompound(tyre, steps := 1) {
+			local all := (tyre = "All")
+			local index, candidate
+
+			tyre := this.lookup((tyre = "All") ? "TIRES:" : (LMURESTProvider.TyreTypes[tyre] . " TIRE:"))
+
+			if tyre {
+				tyre["currentSetting"] := Min(tyre["settings"].Length - 1
+											, SessionDatabase.getTyreCompounds(this.Simulator, this.Car, this.Track).Length
+											, Max(0, tyre["currentSetting"] + Round(steps)))
+
+				if all {
+					this.setTyreCompound("FL", tyre["currentSetting"])
+					this.setTyreCompound("FR", tyre["currentSetting"])
+					this.setTyreCompound("RL", tyre["currentSetting"])
+					this.setTyreCompound("RR", tyre["currentSetting"])
+				}
+			}
 		}
 
 		getTyrePressure(tyre) {
-			static tyreTypes := CaseInsenseMap("FL", "FL", "FL", "FR", "FR", "RL", "RL", "RR", "RR"
-											 , "Front Left", "FL", "Front Right", "FR", "Rear Left", "RL", "Rear Right", "RR")
+			local pressure := this.lookup(LMURESTProvider.TyreTypes[tyre] . " PRESS:")
 
-			if this.Data {
-				pressure := this.lookup(this.Data, tyreTypes[tyre] . " PRESS:")
+			if pressure {
+				pressure := string2Values(A_Space, pressure["settings"][pressure["currentSetting"]]["text"])[1]
 
-				return string2Values(A_Space, pressure["settings"][pressure["currentSetting"]][1] / 6.894757, 2)
+				return ((pressure > 50) ? Round(pressure / 6.894757, 2) : pressure)
 			}
 			else
 				return false
 		}
 
-		setTyrePressure(tyre, code) {
+		setTyrePressure(tyre, value) {
+			local pressure, index, candidate
+
+			value := Round((value < 50) ? (value * 6.894757) : value)
+
+			pressure := this.lookup(LMURESTProvider.TyreTypes[tyre] . " PRESS:")
+
+			if pressure {
+				for index, candidate in pressure["settings"]
+					if ((index = 1) && (string2Values(A_Space, candidate)[1] <= value)) {
+						pressure["currentSetting"] := 0
+
+						return
+					}
+					else if (string2Values(A_Space, candidate)[1] = value) {
+						pressure["currentSetting"] := (index - 1)
+
+						return
+					}
+
+				pressure["currentSetting"] := (pressure["settings"].Length - 1)
+			}
 		}
 
 		changeTyrePressure(tyre, steps := 1) {
+			local pressure := this.lookup(LMURESTProvider.TyreTypes[tyre] . " PRESS:")
+
+			pressure["currentSetting"] := Min(pressure["settings"].Length, Max(0, pressure["currentSetting"] + Round(steps)))
 		}
 
 		getRepairs(&bodywork, &suspension, &engine) {
+			local damage, value
+
+			bodywork := false
+			suspension := false
+			engine := false
+
+			damage := this.lookup("DAMAGE:")
+
+			if (damage && (damage["settings"].Length > 1)) {
+				value := damage["currentSetting"]
+
+				if (value >= 1)
+					bodywork := true
+
+				if (damage["settings"].Length > 3) {
+					if (value >= 2)
+						suspension := true
+				}
+				else if (value = 2)
+					suspension := true
+			}
 		}
 
 		setRepairs(bodywork, suspension, engine) {
+			local damage := this.lookup("DAMAGE:")
+
+			if (damage && (damage["settings"].Length > 1)) {
+				damage["currentSetting"] := 0
+
+				if (damage["settings"].Length > 3) {
+					if (bodywork && suspension)
+						damage["currentSetting"] := (damage["settings"].Length - 1)
+					else if bodywork
+						damage["currentSetting"] := 1
+					else if suspension
+						damage["currentSetting"] := 2
+				}
+				else if (bodywork && suspension)
+					damage["currentSetting"] := (damage["settings"].Length - 1)
+				else if bodywork
+					damage["currentSetting"] := 1
+			}
 		}
 
 		changeRepairs(steps := 1) {
@@ -308,7 +436,7 @@ class LMURestProvider {
 			}
 
 			if this.supportsEngineRepair() {
-				index := (inThreeStates(this.RepairBodywork, this.RepairSuspension, this.RepairEngine) + steps)
+				index := (inThreeStates(this.RepairBodywork, this.RepairSuspension, this.RepairEngine) + Round(steps))
 
 				if index {
 					while ((steps > 0) && (index > threeStates.Length))
@@ -323,7 +451,7 @@ class LMURestProvider {
 				}
 			}
 			else {
-				index := (inTwoStates(this.RepairBodywork, this.RepairSuspension) + steps)
+				index := (inTwoStates(this.RepairBodywork, this.RepairSuspension) + Round(steps))
 
 				if index {
 					while ((steps > 0) && (index > twoStates.Length))
@@ -339,12 +467,30 @@ class LMURestProvider {
 		}
 
 		getBrakeChange() {
+			local brakes := this.lookup("REPLACE BRAKES:")
+
+			return (brakes ? (brakes["currentSetting"] != 0) : false)
 		}
 
 		setBrakeChange(change) {
+			local brakes := this.lookup("REPLACE BRAKES:")
+
+			if brakes
+				brakes["currentSetting"] := (change ? 1 : 0)
+		}
+
+		changeBrakeChange(steps := 1) {
+			local brakes := this.lookup("REPLACE BRAKES:")
+
+			if brakes
+				brakes["currentSetting"] := Max(0, Min(1, brakes["currentSetting"] + Round(steps)))
 		}
 
 		getDriver() {
+			local driver := this.lookup("DRIVER:")
+
+			return (driver ? driver["settings"][driver["currentSetting"]]["text"]
+						   : SessionDatabase.getDriverName(this.Simulator, SessionDatabase.ID))
 		}
 
 		setDriver(driver) {
@@ -400,21 +546,18 @@ class LMURestProvider {
 		getTyreCompound(tyre) {
 			local carSetup
 
-			static tyreTypes := CaseInsenseMap("All", "FL", "FL", "FL", "FR", "FR", "RL", "RL", "RR", "RR"
-											 , "Front Left", "FL", "Front Right", "FR", "Rear Left", "RL", "Rear Right", "RR")
-
 			if this.Data {
 				try {
 					carSetup := this.Data["carSetup"]["garageValues"]
 
 					return SessionDatabase.getTyreCompounds(this.Simulator
 														  , this.Car
-														  , this.Track)[carSetup["WM_COMPOUND-W_" . tyreTypes[tyre]]["value"] + 1]
+														  , this.Track, true)[carSetup["WM_COMPOUND-W_" . LMURESTProvider.TyreTypes[tyre]]["value"] + 1]
 				}
 				catch Any as exception {
 					logError(exception)
 
-					return SessionDatabase.getTyreCompounds(this.Simulator, this.Car, this.Track)[1]
+					return SessionDatabase.getTyreCompounds(this.Simulator, this.Car, this.Track, true)[1]
 				}
 			}
 			else
@@ -424,12 +567,9 @@ class LMURestProvider {
 		getTyrePressure(tyre) {
 			local pressure
 
-			static tyreTypes := CaseInsenseMap("FL", "FL", "FL", "FR", "FR", "RL", "RL", "RR", "RR"
-											 , "Front Left", "FL", "Front Right", "FR", "Rear Left", "RL", "Rear Right", "RR")
-
 			if this.Data {
 				try {
-					pressure := this.Data["carSetup"]["garageValues"]["WM_PRESSURE-W_" . tyreTypes[tyre]]["stringValue"]
+					pressure := this.Data["carSetup"]["garageValues"]["WM_PRESSURE-W_" . LMURESTProvider.TyreTypes[tyre]]["stringValue"]
 
 					if InStr(pressure, "kPa")
 						return Round(string2Values(A_Space, pressure)[1] / 6.894757, 2)
@@ -507,6 +647,12 @@ class LMURestProvider {
 			local car := this.getCarDescriptor(carID)
 
 			return (car ? car["team"] : false)
+		}
+	}
+
+	static TyreTypes {
+		Get {
+			return LMURestProvider.sTyreTypes
 		}
 	}
 }

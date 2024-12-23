@@ -29,27 +29,6 @@ global kLMUPlugin := "LMU"
 ;;;-------------------------------------------------------------------------;;;
 
 class LMUPlugin extends Sector397Plugin {
-	iRequestPitstopHotkey := false
-
-	RequestPitstopHotkey {
-		Get {
-			return this.iRequestPitstopHotkey
-		}
-	}
-
-	__New(controller, name, simulator, configuration := false) {
-		super.__New(controller, name, simulator, configuration)
-
-		this.iRequestPitstopHotkey := this.getArgumentValue("requestPitstop", false)
-
-		if this.RequestPitstopHotkey {
-			this.iRequestPitstopHotkey := Trim(this.RequestPitstopHotkey)
-
-			if (this.RequestPitstopHotkey = "")
-				this.iRequestPitstopHotkey := false
-		}
-	}
-
 	getPitstopActions(&allActions, &selectActions) {
 		allActions := CaseInsenseMap("NoRefuel", "No Refuel", "Refuel", "Refuel"
 								   , "TyreCompound", "Tyre Compound"
@@ -244,8 +223,11 @@ class LMUPlugin extends Sector397Plugin {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			switch option, false {
 				case "Pitstop":
-					if this.RequestPitstopHotKey
+					if this.RequestPitstopHotKey {
+						this.activateWindow()
+
 						this.sendCommand(this.RequestPitstopHotKey)
+					}
 				case "Refuel":
 					this.dialPitstopOption(option, action, steps)
 				case "No Refuel":
@@ -333,15 +315,32 @@ class LMUPlugin extends Sector397Plugin {
 
 		team := gridData.Team[carName]
 
-		if ((carName != "") && isNumber(SubStr(carName, 1, 1))) {
+		if ((carName != "") && isNumber(SubStr(carName, 1, 1)))
 			nr := this.parseNr(carName, &carName)
-
-			super.parseCarName(carName, , , &category)
-		}
 		else
-			super.parseCarName(carName, , &nr, &category)
+			super.parseCarName(carName, , &nr)
 
+		try {
+			category := gridData.Drivers[carName][1].Category
+		}
+		catch Any {
+			category := false
+		}
+	}
 
+	parseDriverName(carName, forName, surName, nickName) {
+		local driver
+
+		static gridData := LMURESTProvider.GridData(this.Simulator[true], this.Car, this.Track)
+
+		try {
+			driver := gridData.Drivers[carName][1]
+		}
+		catch Any {
+			driver := false
+		}
+
+		return (driver ? driver.Name : super.parseDriverName(carName, forName, surName, nickName))
 	}
 
 	readSessionData(options := "", protocol?) {

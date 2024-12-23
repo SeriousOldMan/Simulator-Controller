@@ -1478,7 +1478,7 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local result := false
 		local verbose := knowledgeBase.getValue("Pitstop.Planned.Adjusted", false)
-		local index, suffix, prssKey, changed, values
+		local index, suffix, prssKey, changed, values, value, color
 
 		if (this.iPitstopAdjustments && this.hasPreparedPitstop()) {
 			value := getMultiMapValue(data, "Setup Data", "FuelAmount", kUndefined)
@@ -1490,9 +1490,11 @@ class RaceEngineer extends RaceAssistant {
 			}
 
 			value := getMultiMapValue(data, "Setup Data", "TyreCompound", kUndefined)
+			color := getMultiMapValue(data, "Setup Data", "TyreCompoundColor")
 
-			if ((value != kUndefined) && (knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound") != value)) {
-				this.pitstopOptionChanged("Tyre Compound", verbose, value, getMultiMapValue(data, "Setup Data", "TyreCompoundColor"))
+			if ((value != kUndefined) && ((knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound") != value)
+									   || (knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound.Color") != color))) {
+				this.pitstopOptionChanged("Tyre Compound", verbose, value, color)
 
 				result := true
 			}

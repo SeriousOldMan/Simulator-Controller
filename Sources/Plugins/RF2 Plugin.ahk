@@ -29,6 +29,7 @@ global kRF2Plugin := "RF2"
 class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 	iOpenPitstopMFDHotkey := false
 	iClosePitstopMFDHotkey := false
+	iRequestPitstopHotkey := false
 
 	OpenPitstopMFDHotkey {
 		Get {
@@ -42,6 +43,12 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
+	RequestPitstopHotkey {
+		Get {
+			return this.iRequestPitstopHotkey
+		}
+	}
+
 	__New(controller, name, simulator, configuration := false) {
 		super.__New(controller, name, simulator, configuration)
 
@@ -52,11 +59,16 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 				this.iOpenPitstopMFDHotkey := "Off"
 
 			this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
-		}
-	}
 
-	activateWindow() {
-		return true
+			this.iRequestPitstopHotkey := this.getArgumentValue("requestPitstop", false)
+
+			if this.RequestPitstopHotkey {
+				this.iRequestPitstopHotkey := Trim(this.RequestPitstopHotkey)
+
+				if (this.RequestPitstopHotkey = "")
+					this.iRequestPitstopHotkey := false
+			}
+		}
 	}
 
 	openPitstopMFD(descriptor := false) {
@@ -194,11 +206,15 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
+	parseDriverName(carName, forName, surName, nickName) {
+		return driverName(forName, surName, nickName)
+	}
+
 	acquirePositionsData(telemetryData, finished := false) {
 		local positionsData := super.acquirePositionsData(telemetryData, finished)
 		local numbers := Map()
 		local duplicateNrs := false
-		local carRaw, carID, model, category, nr
+		local carRaw, carID, model, category, nr, forName, surName, nickName
 
 		loop getMultiMapValue(positionsData, "Position Data", "Car.Count", 0) {
 			carRaw := getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".CarRaw", kUndefined)
@@ -208,6 +224,15 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 
 				if model
 					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Car", model)
+
+				parseDriverName(this.parseDriverName(carRaw, getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Forname", "")
+														   , getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Surname", "")
+														   , getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", ""))
+							  , &forName, &surName, &nickName)
+
+				setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Forname", forName)
+				setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Surname", surName)
+				setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", nickName)
 
 				nr := Integer(nr ? nr : getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".ID"))
 
@@ -236,7 +261,7 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 
 	acquireTelemetryData() {
 		local telemetryData := super.acquireTelemetryData()
-		local model
+		local model, forName, surName, nickName
 
 		static lastSimulator := false
 		static lastCar := false
@@ -259,6 +284,15 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 
 		if model
 			setMultiMapValue(telemetryData, "Session Data", "Car", model)
+
+		parseDriverName(this.parseDriverName(carRaw, getMultiMapValue(telemetryData, "Stint Data", "DriverForname", "")
+												   , getMultiMapValue(telemetryData, "Stint Data", "DriverSurname", "")
+												   , getMultiMapValue(telemetryData, "Stint Data", "DriverNickname", ""))
+					  , &forName, &surName, &nickName)
+
+		setMultiMapValue(telemetryData, "Stint Data", "DriverForname", forName)
+		setMultiMapValue(telemetryData, "Stint Data", "DriverSurname", surName)
+		setMultiMapValue(telemetryData, "Stint Data", "DriverNickname", nickName)
 
 		if (loadSetup == true)
 			addMultiMapValues(telemetryData, this.readSessionData("Setup=true"))
@@ -286,7 +320,7 @@ class RF2Plugin extends Sector397Plugin {
 	getPitstopActions(&allActions, &selectActions) {
 		allActions := CaseInsenseMap("NoRefuel", "No Refuel", "Refuel", "Refuel", "TyreCompound", "Tyre Compound", "TyreAllAround", "All Around"
 								   , "TyreFrontLeft", "Front Left", "TyreFrontRight", "Front Right", "TyreRearLeft", "Rear Left", "TyreRearRight", "Rear Right"
-								   , "DriverSelect", "Driver", "RepairRequest", "Repair")
+								   , "DriverSelect", "Driver", "RepairRequest", "Repair", "PitstopRequest", "Pitstop")
 
 		selectActions := []
 	}
@@ -367,6 +401,12 @@ class RF2Plugin extends Sector397Plugin {
 	changePitstopOption(option, action, steps := 1) {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			switch option, false {
+				case "Pitstop":
+					if this.RequestPitstopHotKey {
+						this.activateWindow()
+
+						this.sendCommand(this.RequestPitstopHotKey)
+					}
 				case "Refuel":
 					this.sendPitstopCommand("Pitstop", action, "Refuel", Round(steps))
 				case "No Refuel":

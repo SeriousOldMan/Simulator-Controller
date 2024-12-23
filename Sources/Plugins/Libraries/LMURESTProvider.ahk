@@ -624,6 +624,12 @@ class LMURestProvider {
 			}
 		}
 
+		Drivers[carID] {
+			Get {
+				return this.getDrivers(carID)
+			}
+		}
+
 		getCarDescriptor(carID) {
 			local ignore, candidate
 
@@ -659,6 +665,19 @@ class LMURestProvider {
 			local car := this.getCarDescriptor(carID)
 
 			return (car ? car["team"] : false)
+		}
+
+		getDrivers(carID) {
+			local car := this.getCarDescriptor(carID)
+			local result := []
+			local ignore, driver
+
+			if car
+				for ignore, driver in car["drivers"]
+					if (Trim(driver["name"]) != "")
+						result.Push({Name: driver["name"], Category: driver["skill"]})
+
+			return result
 		}
 	}
 

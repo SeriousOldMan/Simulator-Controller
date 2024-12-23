@@ -67,7 +67,7 @@ class LMURestProvider {
 				if (!this.iData || this.iData.Has("error"))
 					this.read()
 
-				return (this.iData.Has("error") ? false : this.iData)
+				return ((!this.iData || this.iData.Has("error")) ? false : this.iData)
 			}
 		}
 
@@ -80,9 +80,14 @@ class LMURestProvider {
 		read() {
 			try {
 				this.iData := WinHttpRequest().GET(this.GETURL, "", false, {Encoding: "UTF-8"}).JSON
+
+				if !isObject(this.iData)
+					this.iData := false
 			}
 			catch Any as exception {
 				logError(exception, true)
+
+				this.iData := false
 			}
 		}
 
@@ -636,12 +641,13 @@ class LMURestProvider {
 			if this.iCachedCars.Has(carID)
 				return this.iCachedCars[carID]
 			else if this.Data {
-				for ignore, candidate in this.Data
-					if (InStr(candidate["desc"], carID) = 1) {
-						this.iCachedCars[carID] := candidate
+				if (Trim(carID) != "")
+					for ignore, candidate in this.Data
+						if (InStr(candidate["desc"], carID) = 1) {
+							this.iCachedCars[carID] := candidate
 
-						return candidate
-					}
+							return candidate
+						}
 
 				return false
 			}

@@ -212,6 +212,7 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 
 	acquirePositionsData(telemetryData, finished := false) {
 		local positionsData := super.acquirePositionsData(telemetryData, finished)
+		local driver := getMultiMapValue(positionsData, "Position Data", "Driver.Car", 0)
 		local numbers := Map()
 		local duplicateNrs := false
 		local carRaw, carID, model, category, nr, forName, surName, nickName
@@ -225,14 +226,16 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 				if model
 					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Car", model)
 
-				parseDriverName(this.parseDriverName(carRaw, getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Forname", "")
-														   , getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Surname", "")
-														   , getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", ""))
-							  , &forName, &surName, &nickName)
+				if (A_Index != driver) {
+					parseDriverName(this.parseDriverName(carRaw, getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Forname", "")
+															   , getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Surname", "")
+															   , getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", ""))
+								  , &forName, &surName, &nickName)
 
-				setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Forname", forName)
-				setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Surname", surName)
-				setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", nickName)
+					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Forname", forName)
+					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Surname", surName)
+					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", nickName)
+				}
 
 				nr := Integer(nr ? nr : getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".ID"))
 
@@ -284,15 +287,6 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 
 		if model
 			setMultiMapValue(telemetryData, "Session Data", "Car", model)
-
-		parseDriverName(this.parseDriverName(carRaw, getMultiMapValue(telemetryData, "Stint Data", "DriverForname", "")
-												   , getMultiMapValue(telemetryData, "Stint Data", "DriverSurname", "")
-												   , getMultiMapValue(telemetryData, "Stint Data", "DriverNickname", ""))
-					  , &forName, &surName, &nickName)
-
-		setMultiMapValue(telemetryData, "Stint Data", "DriverForname", forName)
-		setMultiMapValue(telemetryData, "Stint Data", "DriverSurname", surName)
-		setMultiMapValue(telemetryData, "Stint Data", "DriverNickname", nickName)
 
 		if (loadSetup == true)
 			addMultiMapValues(telemetryData, this.readSessionData("Setup=true"))

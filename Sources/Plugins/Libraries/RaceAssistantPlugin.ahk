@@ -1913,7 +1913,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		local settingsDB := SettingsDatabase()
 		local simulatorName := settingsDB.getSimulatorName(simulator)
 		local dbSettings := settingsDB.loadSettings(simulatorName, car, track
-												  , getMultiMapValue(data, "Weather Data", "Weather", "Dry"))
+												  , (data ? getMultiMapValue(data, "Weather Data", "Weather", "Dry") : "Dry"))
 		local load, section, values, key, value
 
 		if !settings
@@ -2778,7 +2778,7 @@ getSimulatorOptions(plugin := false) {
 	plugin := findActivePlugin(plugin)
 
 	if (plugin && plugin.Simulator) {
-		data := plugin.Simulator.readSessionData()
+		data := plugin.Simulator.acquireTelemetryData()
 
 		if getMultiMapValue(data, "Session Data", "Active", false) {
 			options := "-Simulator `"" . SessionDatabase.getSimulatorName(plugin.Simulator.runningSimulator()) . "`""

@@ -107,14 +107,14 @@ class LMUPlugin extends Sector397Plugin {
 							else
 								pitstop.setTyreCompound(tyre, false)
 						case "Change":
-							pitstop.changeTyreCompound(value)
+							pitstop.changeTyreCompound(tyre, value)
 					}
 				case "Front Left", "Front Right", "Rear Left", "Rear Right":
 					switch operation, false {
 						case "Get":
 							return pitstop.getTyrePressure(option)
 						case "Set":
-							pitstop.setTyrePressure(option)
+							pitstop.setTyrePressure(option, value)
 						case "Change":
 							pitstop.changeTyrePressure(option, value)
 					}
@@ -200,7 +200,7 @@ class LMUPlugin extends Sector397Plugin {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			switch option, false {
 				case "Refuel":
-					return this.getOptionHandler(option).Call("Get")
+					return [this.getOptionHandler(option).Call("Get")]
 				case "Tyre Pressures":
 					return [this.getOptionHandler("Front Left").Call("Get"), this.getOptionHandler("Front Right").Call("Get")
 						  , this.getOptionHandler("Rear Left").Call("Get"), this.getOptionHandler("Rear Right").Call("Get")]
@@ -212,11 +212,11 @@ class LMUPlugin extends Sector397Plugin {
 
 					return [compound, compoundColor]
 				case "Repair Suspension", "Repair Bodywork", "Repair Engine":
-					return this.getOptionHandler(option).Call("Get")
+					return [this.getOptionHandler(option).Call("Get")]
 				case "Change Brakes":
-					return this.getOptionHandler(option).Call("Get")
+					return [this.getOptionHandler(option).Call("Get")]
 				case "Driver":
-					return this.getOptionHandler(option).Call("Get")
+					return [this.getOptionHandler(option).Call("Get")]
 				default:
 					return super.getPitstopOptionValues(option)
 			}
@@ -227,8 +227,10 @@ class LMUPlugin extends Sector397Plugin {
 
 	dialPitstopOption(option, action, steps := 1) {
 		if (this.OpenPitstopMFDHotkey != "Off")
-			if ((action = "Increase") || (option = "Decrease"))
+			if (action = "Increase")
 				this.getOptionHandler(option).Call("Change", steps)
+			else if (action = "Decrease")
+				this.getOptionHandler(option).Call("Change", - steps)
 			else
 				throw "Unsupported change operation `"" . action . "`" detected in LMUPlugin.dialPitstopOption..."
 	}
@@ -350,10 +352,10 @@ class LMUPlugin extends Sector397Plugin {
 			car := this.Car
 			track := this.Track
 
-			setupData := LMURESTProvider.SetupData(simulator, car, track)
+			setupData := LMURESTProvider.PitstopData(simulator, car, track)
 			data := newMultiMap()
 
-			setMultiMapValue(data, "Setup Data", "FuelAmount", setupData.FuelAmount)
+			setMultiMapValue(data, "Setup Data", "FuelAmount", setupData.RefuelAmount)
 
 			tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, setupData.TyreCompound, false)
 

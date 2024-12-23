@@ -1552,8 +1552,8 @@ showRaceSettingsEditor() {
 	A_IconTip := "Race Settings"
 
 	gSimulator := "Le Mans Ultimate"
-	gCar := "Foo"
-	gTrack := "Bar"
+	gCar := "Alpine A424"
+	gTrack := "Autodromo Enzo e Dino Ferrari"
 	gWeather := "Dry"
 	gAirTemperature := 23
 	gTrackTemperature := 27

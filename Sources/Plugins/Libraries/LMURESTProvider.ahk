@@ -87,9 +87,11 @@ class LMURestProvider {
 		}
 
 		write() {
+			local data := JSON.print(this.Data, "  ")
+
 			if this.Data
 				try {
-					WinHttpRequest().PUT(this.PUTURL, JSON.print(this.Data), false, {Object: true, Encoding: "UTF-8"})
+					WinHttpRequest().POST(this.PUTURL, data, false, {Object: true, Encoding: "UTF-8"})
 				}
 				catch Any as exception {
 					logError(exception, true)
@@ -103,7 +105,7 @@ class LMURestProvider {
 				return this.iCachedObjects[name]
 			else if this.Data {
 				for ignore, candidate in this.Data
-					if (candidate.Has(name) && (candidate[name] = name)) {
+					if (candidate.Has("name") && (candidate["name"] = name)) {
 						this.iCachedObjects[name] := candidate
 
 						return candidate
@@ -246,7 +248,7 @@ class LMURestProvider {
 			local energy := this.lookup("VIRTUAL ENERGY:")
 
 			if (ratio && energy)
-				return (ratio["settings"][ratio["currentSetting"]]["text"] * energy["currentSetting"])
+				return (ratio["settings"][ratio["currentSetting"] + 1]["text"] * energy["currentSetting"])
 			else
 				return false
 		}
@@ -256,20 +258,21 @@ class LMURestProvider {
 			local energy := this.lookup("VIRTUAL ENERGY:")
 
 			if (ratio && energy)
-				energy["currentSetting"] := Min(100, Max(0, Round(liters / ratio["settings"][ratio["currentSetting"]]["text"])))
+				energy["currentSetting"] := Min(100, Max(0, Round(liters / ratio["settings"][ratio["currentSetting"] + 1]["text"])))
 		}
 
 		changeRefuelAmount(steps := 1) {
 			local energy := this.lookup("VIRTUAL ENERGY:")
 
-			energy["currentSetting"] := Min(100, Max(0, energy["currentSetting"] + Round(steps)))
+			if energy
+				energy["currentSetting"] := Min(100, Max(0, energy["currentSetting"] + Round(steps)))
 		}
 
 		getTyreCompound(tyre) {
 			tyre := this.lookup((tyre = "All") ? "TIRES:" : (LMURESTProvider.TyreTypes[tyre] . " TIRE:"))
 
 			if tyre
-				return ((tyre["currentSetting"] > 0) ? tyre["settings"][tyre["currentSetting"]]["type"] : false)
+				return ((tyre["currentSetting"] > 0) ? tyre["settings"][tyre["currentSetting"] + 1]["type"] : false)
 			else
 				return false
 		}
@@ -291,8 +294,8 @@ class LMURestProvider {
 			if tyre
 				if !isInteger(code) {
 					for index, candidate in tyre["settings"]
-						if (candidate["type"] = code) {
-							tyre["currentSetting"] := index
+						if ((index > 1) && (candidate["type"] = code)) {
+							tyre["currentSetting"] := (index - 1)
 
 							break
 						}
@@ -325,7 +328,7 @@ class LMURestProvider {
 			local pressure := this.lookup(LMURESTProvider.TyreTypes[tyre] . " PRESS:")
 
 			if pressure {
-				pressure := string2Values(A_Space, pressure["settings"][pressure["currentSetting"]]["text"])[1]
+				pressure := string2Values(A_Space, pressure["settings"][pressure["currentSetting"] + 1]["text"])[1]
 
 				return ((pressure > 50) ? Round(pressure / 6.894757, 2) : pressure)
 			}
@@ -334,24 +337,33 @@ class LMURestProvider {
 		}
 
 		setTyrePressure(tyre, value) {
-			local pressure, index, candidate
+			local pressure, index, candidate, cValue
 
 			value := Round((value < 50) ? (value * 6.894757) : value)
 
 			pressure := this.lookup(LMURESTProvider.TyreTypes[tyre] . " PRESS:")
 
 			if pressure {
-				for index, candidate in pressure["settings"]
-					if ((index = 1) && (string2Values(A_Space, candidate)[1] <= value)) {
+				for index, candidate in pressure["settings"] {
+					cValue := string2Values(A_Space, candidate["text"])[1]
+					cValue := Round((cValue < 50) ? (cValue * 6.894757) : cValue)
+
+					if ((index = 1) && (value <= cValue)) {
 						pressure["currentSetting"] := 0
 
 						return
 					}
-					else if (string2Values(A_Space, candidate)[1] = value) {
+					else if (cValue = value) {
 						pressure["currentSetting"] := (index - 1)
 
 						return
 					}
+					else if (cValue > value) {
+						pressure["currentSetting"] := Max(0, (index - 2))
+
+						return
+					}
+				}
 
 				pressure["currentSetting"] := (pressure["settings"].Length - 1)
 			}
@@ -489,7 +501,7 @@ class LMURestProvider {
 		getDriver() {
 			local driver := this.lookup("DRIVER:")
 
-			return (driver ? driver["settings"][driver["currentSetting"]]["text"]
+			return (driver ? driver["settings"][driver["currentSetting"] + 1]["text"]
 						   : SessionDatabase.getDriverName(this.Simulator, SessionDatabase.ID))
 		}
 

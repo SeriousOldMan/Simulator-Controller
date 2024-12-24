@@ -895,9 +895,9 @@ Note: You can use all these commands in the *pitstopCommands* list as well, whic
 
 ### Configuration
 
-First, you need to define, how to open and close the Pitstop MFD (aka HUD) in *rFactor 2*. Please supply the bindings you have defined in the controller setup in *rFactor 2*.
+First, you can define, how to open and close the Pitstop MFD (aka HUD) in *rFactor 2*. This is actually optional, since the menu have not to be open for the control of the pitstop settings. If you want to use the "PitstopRequest" controller action (see below), supply an argument for *pitstopRequest*. Please supply the bindings you have defined in the controller setup in *rFactor 2*.
 
-	openPitstopMFD: *openHotkey*; closePitstopMFD: *closeHotkey*;
+	openPitstopMFD: *openHotkey*; closePitstopMFD: *closeHotkey*; requestPitstop: *requestPitstopHotkey*;
 	pitstopMFDMode: Event | Input | Play | Raw | Default
 
 The parameter *pitstopMFDMode* determines, how the communication to the simulator is handled. You can try different values for this parameter, if the Pitstop MFD does not open. Simulator Controller simulates keyboard input for the simulator and there are different ways to do that. These are named "Event", Input", "Play", "Raw" and "Default". For whatever reason, there is not the one method, which works for every Windows installation. For me, "Event" works best and is therefore the standard, if you don't supply the parameter.
@@ -923,6 +923,7 @@ See the following table for the supported settings:
 | TyreRearRight | Change the pressure for the rear right tyre. Supports the additional increments argument. |
 | DriverSelect | Selects the driver for the next stint in a multiplayer team race. |
 | RepairRequest | Cycles through the available repair options. |
+| PitstopRequest | Requests or unrequests a pitstop. |
 
 Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
 
@@ -1305,9 +1306,9 @@ Note: You can use all these commands in the *pitstopCommands* list as well, whic
 
 ### Configuration
 
-First, you need to define, how to open and close the Pitstop MFD (aka HUD) in *Le Mans Ultimate*. Please supply the bindings you have defined in the controller setup in *Le Mans Ultimate*.
+First, you can define, how to open and close the Pitstop MFD (aka HUD) in *Le Mans Ultimate*. This is actually optional, since the menu have not to be open for the control of the pitstop settings. If you want to use the "PitstopRequest" controller action (see below), supply an argument for *pitstopRequest*. Please supply the bindings you have defined in the controller setup in *Le Mans Ultimate*.
 
-	openPitstopMFD: *openHotkey*; closePitstopMFD: *closeHotkey*;
+	openPitstopMFD: *openHotkey*; closePitstopMFD: *closeHotkey*; requestPitstop: *requestPitstopHotkey*;
 	pitstopMFDMode: Event | Input | Play | Raw | Default
 
 The parameter *pitstopMFDMode* determines, how the communication to the simulator is handled. You can try different values for this parameter, if the Pitstop MFD does not open. Simulator Controller simulates keyboard input for the simulator and there are different ways to do that. These are named "Event", Input", "Play", "Raw" and "Default". For whatever reason, there is not the one method, which works for every Windows installation. For me, "Event" works best and is therefore the standard, if you don't supply the parameter.
@@ -1325,14 +1326,21 @@ See the following table for the supported settings:
 | ------ | ------ |
 | Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
 | NoRefuel | Sets the refuel amount to zero, thereby skipping refueling. |
-| TyreCompound | Cycles through the available tyre compounds. |
+| TyreCompound | Cycles through the available tyre compounds for all tyres. |
+| TyreCompoundFrontLeft | Cycles through the available tyre compounds of the front left tyre. |
+| TyreCompoundFrontRight | Cycles through the available tyre compounds of the front right tyre. |
+| TyreCompoundRearLeft | Cycles through the available tyre compounds of the rear left tyre. |
+| TyreCompoundRearRight | Cycles through the available tyre compounds of the rear right tyre. |
 | TyreAllAround | Change the pressure for all tyres at once. Supports the additional increments argument. |
 | TyreFrontLeft | Change the pressure for the front left tyre. Supports the additional increments argument. |
 | TyreFrontRight | Change the pressure for the front right tyre. Supports the additional increments argument. |
 | TyreRearLeft | Change the pressure for the rear left tyre. Supports the additional increments argument. |
 | TyreRearRight | Change the pressure for the rear right tyre. Supports the additional increments argument. |
 | DriverSelect | Selects the driver for the next stint in a multiplayer team race. |
-| RepairRequest | Cycles through the available repair options. |
+| SuspensionRepair | Toggles the repair of the suspension components. |
+| BodyworkRepair | Toggles the repair of all the bodywork. |
+| BrakeChange | Toggles the replacement of the brake pads. |
+| PitstopRequest | Requests or unrequests a pitstop. |
 
 Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
 
@@ -1369,7 +1377,17 @@ For *Le Mans Ultimate*, you need to install a plugin into a special location for
 
 ### Special notes for *Le Mans Ultimate*
 
-The *Le Mans Ultimate* data API (similar to *rFactor 2*) does not provide a car model field and also no dedicated race number for each car. There is only one field that provides a combination of car model, team name, race number and other information. Not all components are there all the time and the format of the field content is not consistent. The "LMU" plugin parses this field and extracts as much information as possible. But it can happen, that several cars with the same race number are on the grid. In this case, the plugin generates synthetical race numbers starting from **1** to keep things working. Also it is possible that the car model is more like the team name and so on. Please blame the developers of *rFactor 2* and *Le Mans Ultimate* for this mess.
+1. The *Le Mans Ultimate* shared memory API (inherited from *rFactor 2*) does not provide a car model field and also no dedicated race number for each car. There is only one field that provides a combination of car model, team name, race number and other information. Not all components are there all the time and the format of the field content is not consistent. The "LMU" plugin parses this field and extracts as much information as possible. But it can happen, that several cars with the same race number are on the grid. In this case, the plugin generates synthetical race numbers starting from **1** to keep things working. Please blame the developers of *rFactor 2* and *Le Mans Ultimate* for this mess.
+
+2. *Le Mans Ultimate* currently does not support drivers swaps, although it has already been announced for an upcoming release. The "DriverSelect" action therefore does nothing.
+
+3. It sometimes happens that driver names contain corrupt characters. Looks like a different interpretation of character codings inherited by the *rFactor 2* data API.
+
+4. The Race Engineer calculates the energy fill up of an upcoming pitstop based on the fuel consumption of the recent laps. When the Engineer announces the amount of fuel to be added for the next pitstop, the fuel amount will be divided by the *fuel ratio* as currently set in the pitstop menu of the HUD, before being used as the value for the virtual energy replenishment. So make sure, that your *fuel ratio* setting is as desired at the time, when the pitstop settings are changed.
+
+   Note: The *fuel ratio* implicitely includes the max fuel the car can carry, since the value can be greater than 1. Confusing, isn't it.
+
+5. Additionally, the Race Engineer can only handle identical tyre compounds for all four tyres and can only change all four tyres together. You may, however adjust this manually once the Engineer has prepared the pitstop. This may change with a future release.
 
 ## Plugin *Integration*
 

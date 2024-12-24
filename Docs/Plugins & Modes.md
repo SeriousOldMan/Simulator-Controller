@@ -1389,6 +1389,8 @@ For *Le Mans Ultimate*, you need to install a plugin into a special location for
 
 5. Additionally, the Race Engineer can only handle identical tyre compounds for all four tyres and can only change all four tyres together. You may, however adjust this manually once the Engineer has prepared the pitstop. This may change with a future release.
 
+   When the Race Engineer determines the currently mounted tyre compound, he always looks at the front left tyre as a reference.
+
 ## Plugin *Integration*
 
 This plugin, which is normally not automatically included and enabled, can export the internal state of Simulator Controller - especially a lot of the knowledge of all Race Assistants and plenty of information about the currently running simulator session - to other applications using a JSON file.

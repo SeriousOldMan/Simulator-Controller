@@ -133,33 +133,6 @@ If you want to become a part of the community for Simulator Controller on Discor
 
 Simulator Controller comes with a set of virtual Assistants to guide you throughout your races. To control the Assistants, you can use controllers like Button Boxes or interact with them directly in a natural voice dialog. In addition, several built-in applications assist you with setup and strategy development, or support you in monitoring and controlling your races and so on.
 
-#### Support for controllers and devices
-
-  - Connect all your external controllers, like Button Boxes, Stream Decks, and so on, to one single center of control
-    - An unlimited number of layers of functions and actions, called modes, can be defined for your controller. Switch between modes simply by pushing a button or switch a toggle on your controller. Here is an example of several layers of functions and actions combined in five modes:
-	
-	![](./Docs/Images/Button%20Box%20Layout.jpg)
-	
-	- Modes are defined and handled by [plugins](https://github.com/SeriousOldMan/Simulator-Controller#included-plugins), which can be implemented using an object oriented scripting language.
-  - Configurable, visual feedback for your controller actions
-    - Define your own Button Box visual representation and integrate it with the Simulator Controller using the simple plugin support and a graphical layout editor. Depending on configuration, the Button Box window will popup whenever an action is triggered from your controller, even during active simulation, or it might stay open all the time, if you have anough screen space, for example a second monitor.
-    
-    ![](./Docs/Images/Button%20Box%202.JPG)
-    
-  - Code your own functions to be called by the controller buttons and switches using the simple, object-oriented scripting language
-  - Configure additional [applications](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications) to your taste, including the simulation games used for your virtual races
-    - Start and stop applications from your controller hardware or automatically upon configurable events
-    - Add splash screens and title melodies using a spedial editor for a more emotional startup experience
-    - Full support for sophisticated application automation - for example, start your favorite voice chat software like TeamSpeak and automatically switch to your standard channel 
-  - Several plugins are supplied out of the box:
-    - Support for *Assetto Corsa*, *Assetto Corsa Competizione*, *rFactor 2*, *Le Mans Ultimate*, *iRacing*, *Automobilista 2*, *RaceRoom Racing Experience*, *Project CARS 2* and *Le Mans Ultimate* is already builtin, other simulation games will follow, when they become available
-    - Fully customizable plugins supplied for total control of SimHub and SimFeedback - change your settings while racing using the dials and switches on your favorite Button Box
-	- Control the calibration curves of your high end pedals by a simple button press with the plugin for the Heusinkveld pedal family
-    - Send your predefined kudos and rants to the ingame chat without touching the keyboard
-  - Additional support to trigger every function and action from external sources like a voice or gesture recognition software to always keep your hands on the wheel
-  - Builtin support for visual head tracking to control ingame viewing angle - see [third party applications](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications) below
-  - And many more, the possibilities are endless
-
 #### AI powered Virtual Race Assistants
 
 Simulator Controller offers a virtual pit crew based on an AI powered chatbot engine. At the heart of this engine is hybrid rule engine coupled with voice recognition and voice synthesis. A rule engine is very suitable for the tasks of a typical pit crew, since all actions are event based and use large amounts of data.
@@ -223,6 +196,37 @@ Beside the typical duties of a Spotter, this Assistant is also able to automate 
 Another very useful tool of the Simulator Controller suite is the Setup Workbench. This tool is based upon the AI technology which is used by the Race Assistants and generates recommendations for changing the setup options of a car based on handling problems described by the driver.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Workbench.jpg)
+
+#### Support for controllers and devices
+
+  - Connect all your external controllers, like Button Boxes, Stream Decks, and so on, to one single center of control
+    - An unlimited number of layers of functions and actions, called modes, can be defined for your controller. Switch between modes simply by pushing a button or switch a toggle on your controller. Here is an example of several layers of functions and actions combined in five modes:
+	
+	![](./Docs/Images/Button%20Box%20Layout.jpg)
+	
+	- Modes are defined and handled by [plugins](https://github.com/SeriousOldMan/Simulator-Controller#included-plugins), which can be implemented using an object oriented scripting language.
+  - Configurable, visual feedback for your controller actions
+    - Define your own Button Box visual representation and integrate it with the Simulator Controller using the simple plugin support and a graphical layout editor. Depending on configuration, the Button Box window will popup whenever an action is triggered from your controller, even during active simulation, or it might stay open all the time, if you have anough screen space, for example a second monitor.
+    
+    ![](./Docs/Images/Button%20Box%202.JPG)
+    
+  - Full support for Stream Deck with hundreds of handcrafted icons for all functions of Simulator Controller
+  
+    ![](./Docs/Images/Stream%20Deck%20Icons.JPG)
+	
+  - Code your own functions to be called by the controller buttons and switches using the simple, object-oriented scripting language
+  - Configure additional [applications](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications) to your taste, including the simulation games used for your virtual races
+    - Start and stop applications from your controller hardware or automatically upon configurable events
+    - Add splash screens and title melodies using a spedial editor for a more emotional startup experience
+    - Full support for sophisticated application automation - for example, start your favorite voice chat software like TeamSpeak and automatically switch to your standard channel 
+  - Several plugins are supplied out of the box:
+    - Support for *Assetto Corsa*, *Assetto Corsa Competizione*, *rFactor 2*, *Le Mans Ultimate*, *iRacing*, *Automobilista 2*, *RaceRoom Racing Experience*, *Project CARS 2* and *Le Mans Ultimate* is already builtin, other simulation games will follow, when they become available
+    - Fully customizable plugins supplied for total control of SimHub and SimFeedback - change your settings while racing using the dials and switches on your favorite Button Box
+	- Control the calibration curves of your high end pedals by a simple button press with the plugin for the Heusinkveld pedal family
+    - Send your predefined kudos and rants to the ingame chat without touching the keyboard
+  - Additional support to trigger every function and action from external sources like a voice or gesture recognition software to always keep your hands on the wheel
+  - Builtin support for visual head tracking to control ingame viewing angle - see [third party applications](https://github.com/SeriousOldMan/Simulator-Controller#third-party-applications) below
+  - And many more, the possibilities are endless
 
 ### Additional features
 

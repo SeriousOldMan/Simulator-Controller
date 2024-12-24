@@ -37,7 +37,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 6.1.0
 
-The databse content for *Le Mans Ultimate* has been cleared by this release. The reason for this is that in the past the content for a given car has been stored under the name of a team and not under the name of a car model. Since from now on car models are used as database key. You will find the content that has been collected in the past in the folder [Documents]\Simulator Controller\Database\User\LMU.old. All files here may be accessed using a normal text editor and you may manually consolidate them under the correct car model name into the new database, once you have driven a few laps with that car already.
+The databse content for *Le Mans Ultimate* has been cleared by this release. The reason for this is that in the past the content for a given car has been stored under the name of a team and not under the name of a car model. Since from now on car models are used as database key. You will find the content that has been collected in the past in the folder [Documents]\Simulator Controller\Database\User\LMU.archive. All files here may be accessed using a normal text editor and you may manually consolidate them under the correct car model name into the new database, once you have driven a few laps with that car already.
 
 ***
 

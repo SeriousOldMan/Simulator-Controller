@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Simulator Controller            ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1233,7 +1233,7 @@ class SimulatorController extends ConfigurationItem {
 		if (show != kUndefined)
 			this.iShowLogo := show
 		else if (this.iShowLogo && !this.iLogoIsVisible) {
-			info := kVersion . " - 2024, Oliver Juwig`nCreative Commons - BY-NC-SA"
+			info := kVersion . " - 2025, Oliver Juwig`nCreative Commons - BY-NC-SA"
 
 			MonitorGetWorkArea(, &mainScreenLeft, &mainScreenTop, &mainScreenRight, &mainScreenBottom)
 

@@ -72,9 +72,51 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	openPitstopMFD(descriptor := false) {
+		static reported := false
+
+		if this.OpenPitstopMFDHotkey {
+			if (this.OpenPitstopMFDHotkey != "Off") {
+				if this.activateWindow() {
+					this.sendCommand(this.OpenPitstopMFDHotkey)
+
+					return true
+				}
+				else
+					return false
+			}
+			else
+				return false
+		}
+		else if !reported {
+			reported := true
+
+			logMessage(kLogCritical, translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration"))
+
+			if !kSilentMode
+				showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+
+			return false
+		}
 	}
 
 	closePitstopMFD() {
+		static reported := false
+
+		if this.ClosePitstopMFDHotkey {
+			if (this.OpenPitstopMFDHotkey != "Off")
+				if this.activateWindow()
+					this.sendCommand(this.ClosePitstopMFDHotkey)
+		}
+		else if !reported {
+			reported := true
+
+			logMessage(kLogCritical, translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration"))
+
+			if !kSilentMode
+				showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+		}
 	}
 
 	requirePitstopMFD() {
@@ -280,7 +322,7 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 
 			loadSetup := SettingsDatabase().readSettingValue(lastSimulator, lastCar, lastTrack, "*"
 														   , "Simulator." . this.Simulator[true], "Session.Data.Setup"
-														   , (lastSimulator = "Le Mans Ultimate") ? 20 : 60)
+														   , (lastSimulator = "rFactor 2") ? 60 : 20)
 		}
 
 		this.parseCarName(getMultiMapValue(telemetryData, "Session Data", "CarRaw"), &model)
@@ -341,54 +383,6 @@ class RF2Plugin extends Sector397Plugin {
 												  , {exePath: exePath, simulator: simulator, protocol: "SHM"})
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
-		}
-	}
-
-	openPitstopMFD(descriptor := false) {
-		static reported := false
-
-		if this.OpenPitstopMFDHotkey {
-			if (this.OpenPitstopMFDHotkey != "Off") {
-				if this.activateWindow() {
-					this.sendCommand(this.OpenPitstopMFDHotkey)
-
-					return true
-				}
-				else
-					return false
-			}
-			else
-				return false
-		}
-		else if !reported {
-			reported := true
-
-			logMessage(kLogCritical, translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration"))
-
-			if !kSilentMode
-				showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-
-			return false
-		}
-	}
-
-	closePitstopMFD() {
-		static reported := false
-
-		if this.ClosePitstopMFDHotkey {
-			if (this.OpenPitstopMFDHotkey != "Off")
-				if this.activateWindow()
-					this.sendCommand(this.ClosePitstopMFDHotkey)
-		}
-		else if !reported {
-			reported := true
-
-			logMessage(kLogCritical, translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration"))
-
-			if !kSilentMode
-				showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
 	}
 

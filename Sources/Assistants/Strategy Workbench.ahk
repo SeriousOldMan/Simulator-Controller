@@ -2172,11 +2172,6 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			this.Control["driverDropDown"].Delete()
 
-			if (simulator = "Assetto Corsa Competizione")
-				this.Control["simMapEdit"].Text := 1
-			else
-				this.Control["simMapEdit"].Text := "n/a"
-
 			this.iSelectedDrivers := false
 
 			this.DriversListView.Delete()
@@ -2185,6 +2180,8 @@ class StrategyWorkbench extends ConfigurationItem {
 			this.DriversListView.ModifyCol()
 			this.DriversListView.ModifyCol(1, "AutoHdr")
 			this.DriversListView.ModifyCol(2, "AutoHdr")
+
+			this.Control["simMapEdit"].Text := "n/a"
 
 			this.iStintDrivers := [SessionDatabase.ID]
 

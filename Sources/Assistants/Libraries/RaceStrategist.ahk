@@ -1486,6 +1486,9 @@ class RaceStrategist extends GridRaceAssistant {
 
 				facts["Strategy.Pitstop.Next"] := 1
 				facts["Strategy.Pitstop.Lap"] := pitstopLap
+
+				if isInstance(strategy, RaceStrategist.TrafficRaceStrategy)
+					facts["Strategy.Pitstop.Position"] := pitstop.getPosition()
 			}
 
 			facts["Strategy.Pitstop." . A_Index . ".Lap"] := pitstopLap
@@ -3240,6 +3243,7 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	chooseScenario(scenario, confirm?) {
+		local knowledgeBase := this.KnowledgeBase
 		local speaker := this.getSpeaker()
 		local hadScenario := (scenario != false)
 		local dispose := true

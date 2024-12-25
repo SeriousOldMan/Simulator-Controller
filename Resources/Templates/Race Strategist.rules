@@ -426,7 +426,7 @@ updatePitWarningLap(?pitstopLap, ?warningLaps) <= ?warningLap = ?pitstopLap - ?w
 reportUpcomingPitstop(?lap) <= Call(raiseEvent, PitstopUpcoming, ?lap), !
 reportUpcomingPitstop(?lap) <= Call(reportUpcomingPitstop, ?lap)
 
-[?Pitstop.Lap] => (Prove: pitstopPerformed(?Pitstop.Lap))
+[?Pitstop.Lap] => (Prove: pitstopPerformed(?Pitstop.Lap)), (Clear: Strategy.Pitstop.Position)
 
 pitstopPerformed(?) <= unbound?(!Strategy.Pitstop.Next), !
 pitstopPerformed(?pitstopLap) <= validPitstopLap(?pitstopLap), !Strategy.Pitstop.Next < !Strategy.Pitstop.Count, !,

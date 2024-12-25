@@ -248,7 +248,7 @@ class IntegrationPlugin extends ControllerPlugin {
 		local remainingPitstops := 0
 		local state := Map()
 		local pitstops := []
-		local nextPitstop, tyreCompound, tyreCompoundColor, pitstop
+		local nextPitstop, tyreCompound, tyreCompoundColor, pitstop, position
 
 		if (pitstopsCount == kUndefined) {
 			pitstopsCount := 0
@@ -276,11 +276,16 @@ class IntegrationPlugin extends ControllerPlugin {
 				tyreCompound := kNull
 
 			state["TyreCompound"] := tyreCompound
+
+			position := getMultiMapValue(sessionState, "Strategy", "Pitstop.Next.Position", false)
+
+			state["Position"] := (position ? position : kNull)
 		}
 		else {
 			state["Lap"] := kNull
 			state["Fuel"] := kNull
 			state["TyreCompound"] := kNull
+			state["Position"] := kNull
 		}
 
 		loop pitstopsCount {

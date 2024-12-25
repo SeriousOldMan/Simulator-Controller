@@ -1557,6 +1557,7 @@ The content of the JSON file looks like this (depending on the current situation
 			"State": "Active",
 			"Fuel": 12.0,
 			"Lap": 10,
+			"Position": 7,
 			"PlannedPitstops": 2,
 			"RemainingPitstops": 2,
 			"TyreCompound": "Dry (Black)",

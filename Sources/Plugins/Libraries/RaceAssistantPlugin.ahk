@@ -1516,25 +1516,6 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		if (maxFuel && (maxFuel != kUndefined) && (maxFuel != ""))
 			setMultiMapValue(data, "Session Data", "FuelAmount", maxFuel)
 
-		for ignore, section in ["Car Data", "Setup Data"] {
-			compound := getMultiMapValue(data, section, "TyreCompoundRaw", kUndefined)
-
-			if (compound != kUndefined) {
-				compound := SessionDatabase().getTyreCompoundName(simulator, car, track, compound, kUndefined)
-
-				if (compound = kUndefined)
-					compound := normalizeCompound("Dry")
-
-				compoundColor := false
-
-				if compound
-					splitCompound(compound, &compound, &compoundColor)
-
-				setMultiMapValue(data, section, "TyreCompound", compound)
-				setMultiMapValue(data, section, "TyreCompoundColor", compoundColor)
-			}
-		}
-
 		if RaceAssistantPlugin.Simulator
 			RaceAssistantPlugin.Simulator.updateTelemetryData(data)
 

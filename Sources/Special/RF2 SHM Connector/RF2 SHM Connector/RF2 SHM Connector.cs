@@ -627,14 +627,14 @@ namespace SHMConnector {
 			SendPitstopCommand(new string(action, (int)Double.Parse(stepsArgument)));
 		}
 
-		private void ExecuteSetTyreCompoundCommand(string tyreCompound) {
+		private void ExecuteSetTyreCompoundFrontCommand(string tyreCompound) {
 			if (tyreCompound == "None") {
-				Console.WriteLine("Adjusting Tyre Compound: No Change");
+				Console.WriteLine("Adjusting Front Tyre Compound: No Change");
 
 				tyreCompound = "No Change";
 			}
 			else {
-				Console.Write("Adjusting Tyre Compound: ");
+				Console.Write("Adjusting Front Tyre Compound: ");
 				Console.WriteLine(tyreCompound);
 			}
 
@@ -644,19 +644,49 @@ namespace SHMConnector {
 			}
 
 			selectAxleTyreCompound("F TIRES:");
+		}
+
+		private void ExecuteSetTyreCompoundRearCommand(string tyreCompound) {
+			if (tyreCompound == "None") {
+				Console.WriteLine("Adjusting Rear Tyre Compound: No Change");
+
+				tyreCompound = "No Change";
+			}
+			else {
+				Console.Write("Adjusting Rear Tyre Compound: ");
+				Console.WriteLine(tyreCompound);
+			}
+
+			void selectAxleTyreCompound(string category) {
+				if (SelectPitstopCategory(category))
+					SelectPitstopOption(tyreCompound, "+");
+			}
+
 			selectAxleTyreCompound("R TIRES:");
 		}
+
+		private void ExecuteSetTyreCompoundCommand(string tyreCompound) {
+			ExecuteSetTyreCompoundFrontCommand(tyreCompound);
+			ExecuteSetTyreCompoundRearCommand(tyreCompound);
+		}
 		
-		private void ExecuteChangeTyreCompoundCommand(char action, string stepsArgument) {
+		private void ExecuteChangeTyreCompoundFrontCommand(char action, string stepsArgument) {
 			if (!SelectPitstopCategory("F TIRES:"))
 				return;
 
 			SendPitstopCommand(new string(action, (int)Double.Parse(stepsArgument)));
-			
+		}
+		
+		private void ExecuteChangeTyreCompoundRearCommand(char action, string stepsArgument) {
 			if (!SelectPitstopCategory("R TIRES:"))
 				return;
 
 			SendPitstopCommand(new string(action, (int)Double.Parse(stepsArgument)));
+		}
+		
+		private void ExecuteChangeTyreCompoundCommand(char action, string stepsArgument) {
+			ExecuteChangeTyreCompoundFrontCommand(action, stepsArgument);
+			ExecuteChangeTyreCompoundRearCommand(action, stepsArgument);
 		}
 
 		private void ExecuteSetTyreSetCommand(string tyreSetArgument) {
@@ -768,6 +798,12 @@ namespace SHMConnector {
 				case "Tyre Compound":
 					ExecuteSetTyreCompoundCommand(arguments[0]);
 					break;
+				case "Tyre Compound Front":
+					ExecuteSetTyreCompoundFrontCommand(arguments[0]);
+					break;
+				case "Tyre Compound Rear":
+					ExecuteSetTyreCompoundRearCommand(arguments[0]);
+					break;
 				case "Tyre Set":
 					ExecuteSetTyreSetCommand(arguments[0]);
 					break;
@@ -792,6 +828,12 @@ namespace SHMConnector {
 					break;
 				case "Tyre Compound":
 					ExecuteChangeTyreCompoundCommand(action, arguments[0]);
+					break;
+				case "Tyre Compound Front":
+					ExecuteChangeTyreCompoundFrontCommand(action, arguments[0]);
+					break;
+				case "Tyre Compound Rear":
+					ExecuteChangeTyreCompoundRearCommand(action, arguments[0]);
 					break;
 				case "Tyre Pressure":
 					ExecuteChangeTyrePressureCommand(action, arguments);
@@ -887,33 +929,53 @@ namespace SHMConnector {
 				if (SelectPitstopCategory("FUEL:"))
 					strWriter.Write("FuelAmount="); strWriter.WriteLine(pitInfo.mPitMenu.mChoiceIndex);
 
-				if (!SelectPitstopCategory("F TIRES:"))
+				if (SelectPitstopCategory("F TIRES:"))
 				{
 					string compound = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
 
-					if (compound != "No Change")
+					if (compound != "No Change") {
 						strWriter.WriteLine("TyreCompoundRaw=" + compound);
-					else
-						strWriter.WriteLine("TyreCompoundRaw=false");
-
-					void writePressure(string category, string key)
-					{
-						if (SelectPitstopCategory(category))
-						{
-							string currentPressure = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
-
-							if (currentPressure.Contains(" "))
-								currentPressure = currentPressure.Split(' ')[0];
-
-							strWriter.Write(key); strWriter.Write("="); strWriter.WriteLine(GetPsi(Int16.Parse(currentPressure)));
-						}
+						strWriter.WriteLine("TyreCompoundRawFrontLeft=" + compound);
+						strWriter.WriteLine("TyreCompoundRawFrontRight=" + compound);
 					}
-
-					writePressure("FL PRESS:", "TyrePressureFL");
-					writePressure("FR PRESS:", "TyrePressureFR");
-					writePressure("RL PRESS:", "TyrePressureRL");
-					writePressure("RR PRESS:", "TyrePressureRR");
+					else {
+						strWriter.WriteLine("TyreCompoundRaw=false");
+						strWriter.WriteLine("TyreCompoundRawFrontLeft=false");
+						strWriter.WriteLine("TyreCompoundRawFrontRight=false");
+					}
 				}
+
+				if (SelectPitstopCategory("R TIRES:"))
+				{
+					string compound = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
+
+					if (compound != "No Change") {
+						strWriter.WriteLine("TyreCompoundRawRearLeft=" + compound);
+						strWriter.WriteLine("TyreCompoundRawRearRight=" + compound);
+					}
+					else {
+						strWriter.WriteLine("TyreCompoundRawRearLeft=false");
+						strWriter.WriteLine("TyreCompoundRawRearRight=false");
+					}
+				}
+
+				void writePressure(string category, string key)
+				{
+					if (SelectPitstopCategory(category))
+					{
+						string currentPressure = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
+
+						if (currentPressure.Contains(" "))
+							currentPressure = currentPressure.Split(' ')[0];
+
+						strWriter.Write(key); strWriter.Write("="); strWriter.WriteLine(GetPsi(Int16.Parse(currentPressure)));
+					}
+				}
+
+				writePressure("FL PRESS:", "TyrePressureFL");
+				writePressure("FR PRESS:", "TyrePressureFR");
+				writePressure("RL PRESS:", "TyrePressureRL");
+				writePressure("RR PRESS:", "TyrePressureRR");
 
 				if (SelectPitstopCategory("DAMAGE:"))
 				{

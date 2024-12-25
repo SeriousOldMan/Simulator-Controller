@@ -319,7 +319,8 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 		super.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
 
 		if this.openPitstopMFD("Fuel")
-			this.sendPitstopCommand("Pitstop", "Set", "Repair", (repairBodywork || repairSuspension) ? "true" : "false")
+			this.sendPitstopCommand("Pitstop", "Set", "Repair"
+								  , (repairBodywork || repairSuspension || repairEngine) ? "true" : "false")
 	}
 
 	updateTelemetryData(data) {

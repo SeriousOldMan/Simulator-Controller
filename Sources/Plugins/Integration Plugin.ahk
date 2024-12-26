@@ -277,7 +277,7 @@ class IntegrationPlugin extends ControllerPlugin {
 
 			state["TyreCompound"] := tyreCompound
 
-			position := getMultiMapValue(sessionState, "Strategy", "Pitstop.Next.Position", false)
+			position := getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Position", false)
 
 			state["Position"] := (position ? position : kNull)
 		}

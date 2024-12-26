@@ -13,9 +13,22 @@
   12. Finally full support for management of pitstop settings and pitstop automation by the Assistants in *Le Mans Ultimate*.
       - The car models are correctly named now (they have been the team names in the past). Due to this, all entries in the session database have been invalidated and the database for *Le Mans Ultimate* has been clear. See the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-610) for information how to restore your previous database content.
 	  - The Race Engineer cannot handle different tyre compounds for the different wheels yet and he also will currently always change all four tyres together. Please see the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#special-notes-for-le-mans-ultimate) for more information about this and also additional restrictions.
-  13. Handling of individual tyre change and/or tyre compounds has been implemented for *RaceRoom Racing Experience*, *rFactor 2* and *iRacing*. This is available as individual controller actions for Button Box or Stream Decks. The Race Engineer will still change all four tyres at once and will always select the same compound for all four wheels.
-  
+  13. Handling of individual tyre change and/or tyre compounds has been implemented for *RaceRoom Racing Experience*, *rFactor 2*, *Le Mans Ultimate* and *iRacing*. This is available as individual controller actions for Button Box or Stream Decks. The Race Engineer will still change all four tyres at once and will always select the same compound for all four wheels.
+	  - New controller actions "TyreChangeFront" and "TyreChangeRear" for *RaceRoom Racing Experience*.
+      - New controller actions "TyreCompoundFront" and "TyreCompoundRear" for *rFactor 2*.
+	  - New controller actions "TyreCompoundFrontLeft", "TyreCompoundFrontRight", "TyreCompoundRearLeft" and "TyreCompoundRearRight" for *Le Mans Ultimate*.
+      - New controller actions "TyreChangeFrontLeft", "TyreChangeFrontRight", "TyreChangeRearLeft" and "TyreChangeRearRight" for *iRacing*.
+  14. New controller action "PitstopRequest" for *rFactor 2*.
+  15. New controller actions "BrakeChange" and "PitstopRequest" for *Le Mans Ultimate*.
+  16. The definition of the "RepairRequest" controller action for *iRacing* has changed. You may want to check your configuration, if you use this action.
+
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-610) for on information on how to restore your session database content, if you have used *Le Mans Ultimate* previously.
+
+## 6.0.3.0-release 12/27/24 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Fixed a critical bug introduced with the 6.0.2 that caused pitstop changes to be applied twice in some cases, when using Button Box and/or Stream Deck.
+  4. Several new settings in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) for the new "Time Trial" session type which was introduced with version 6.0.2.
 
 ## 6.0.2.0-release 12/20/24
   1. Minor bugfixes, as always

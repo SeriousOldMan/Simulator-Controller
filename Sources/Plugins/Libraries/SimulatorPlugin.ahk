@@ -1308,6 +1308,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		trackData := sessionDB.getTrackData(this.Code, this.Track)
 
 		return this.readSessionData(trackData ? ("Track=" . trackData) : "")
+
 	}
 
 	acquirePositionsData(telemetryData, finished := false) {
@@ -1339,6 +1340,9 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	readSessionData(options := "", protocol?) {
+		local simulator := this.Simulator[true]
+		local car := this.Car
+		local track := this.Track
 		local data := callSimulator(this.Code, options, protocol?)
 		local tyreCompound, tyreCompoundColor, ignore, section
 

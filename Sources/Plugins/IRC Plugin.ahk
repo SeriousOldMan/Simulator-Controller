@@ -162,7 +162,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	requirePitstopMFD() {
+	requirePitstopMFD(descriptor := false) {
 		return true
 	}
 
@@ -269,13 +269,13 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	startPitstopSetup(pitstopNumber) {
 		super.startPitstopSetup(pitstopNumber)
 
-		requirePitstopMFD()
+		this.requirePitstopMFD()
 	}
 
 	finishPitstopSetup(pitstopNumber) {
 		super.finishPitstopSetup(pitstopNumber)
 
-		closePitstopMFD()
+		this.closePitstopMFD()
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, liters) {
@@ -365,7 +365,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 					tyreCompound := getMultiMapValue(data, section, "TyreCompoundRaw" . postFix, kUndefined)
 
 					if ((tyreCompound != kUndefined) && tyreCompound) {
-						tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, setupData.TyreCompound[key], false)
+						tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
 
 						if tyreCompound {
 							splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)

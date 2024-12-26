@@ -348,7 +348,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 					tyreCompound := getMultiMapValue(data, section, "TyreCompoundRaw" . postFix, kUndefined)
 
 					if ((tyreCompound != kUndefined) && tyreCompound) {
-						tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, setupData.TyreCompound[key], false)
+						tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
 
 						if tyreCompound {
 							splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)

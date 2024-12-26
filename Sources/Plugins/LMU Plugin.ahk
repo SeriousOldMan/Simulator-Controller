@@ -387,10 +387,10 @@ class LMUPlugin extends Sector397Plugin {
 				tyreCompound := getMultiMapValue(data, "Car Data", "TyreCompound" . postFix, kUndefined)
 
 				if (tyreCompound = kUndefined) {
-					tyreCompound := getMultiMapValue(data, section, "TyreCompoundRaw" . postFix, kUndefined)
+					tyreCompound := getMultiMapValue(data, "Car Data", "TyreCompoundRaw" . postFix, kUndefined)
 
 					if ((tyreCompound != kUndefined) && tyreCompound) {
-						tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, setupData.TyreCompound[key], false)
+						tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
 
 						if tyreCompound {
 							splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)

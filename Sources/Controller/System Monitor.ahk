@@ -754,7 +754,7 @@ systemMonitor(command := false, arguments*) {
 		local pitstopsCount := getMultiMapValue(sessionState, "Strategy", "Pitstops", kUndefined)
 		local html := ""
 		local remainingPitstops := 0
-		local nextPitstop, tyreCompound
+		local nextPitstop, tyreCompound, position
 
 		try {
 			html .= "<table class=`"table-std`">"
@@ -781,6 +781,11 @@ systemMonitor(command := false, arguments*) {
 						tyreCompound := translate("No")
 
 					html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`">" . tyreCompound . "</td></tr>")
+
+					position := getMultiMapValue(sessionState, "Strategy", "Pitstop.Next.Position", false)
+
+					if position
+						html .= ("<tr><th class=`"th-std th-left`">" . translate("Position") . "</th><td class=`"td-wdg`">" . position . "</td></tr>")
 				}
 			}
 			else

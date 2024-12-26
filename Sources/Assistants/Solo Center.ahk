@@ -2181,19 +2181,6 @@ class SoloCenter extends ConfigurationItem {
 			tyreCompound := getMultiMapValue(data, "Car Data", "TyreCompound", kUndefined)
 			tyreCompoundColor := getMultiMapValue(data, "Car Data", "TyreCompoundColor", kUndefined)
 
-			if (tyreCompound = kUndefined) {
-				tyreCompound := getMultiMapValue(data, "Car Data", "TyreCompoundRaw", kUndefined)
-
-				if (tyreCompound && (tyreCompound != kUndefined)) {
-					tyreCompound := SessionDatabase.getTyreCompoundName(simulator, this.Car, this.Track, tyreCompound, false)
-
-					if tyreCompound
-						splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
-					else
-						tyreCompound := kUndefined
-				}
-			}
-
 			if ((tyreCompound != kUndefined) && (tyreCompoundColor != kUndefined))
 				this.Control["tyreCompoundDropDown"].Choose(inList(this.TyreCompounds, compound(tyreCompound, tyreCompoundColor)) + 2)
 

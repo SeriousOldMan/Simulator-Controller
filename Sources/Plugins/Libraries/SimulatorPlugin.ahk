@@ -1162,8 +1162,6 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	updateTyreCompound(data) {
-		local tyreCompound, tyreCompoundColor
-
 		if (!getMultiMapValue(data, "Car Data", "TyreCompound", false)
 		 && !getMultiMapValue(data, "Car Data", "TyreCompoundRaw", false))
 			if this.CurrentTyreCompound {
@@ -1341,7 +1339,32 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	readSessionData(options := "", protocol?) {
-		return callSimulator(this.Code, options, protocol?)
+		local data := callSimulator(this.Code, options, protocol?)
+		local tyreCompound, tyreCompoundColor, ignore, section
+
+		for ignore, section in ["Car Data", "Setup Data"] {
+			tyreCompound := getMultiMapValue(data, section, "TyreCompound", kUndefined)
+
+			if (tyreCompound = kUndefined) {
+				tyreCompound := getMultiMapValue(data, section, "TyreCompoundRaw", kUndefined)
+
+				if ((tyreCompound != kUndefined) && tyreCompound) {
+					tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, kUndefined)
+
+					if (tyreCompound = kUndefined)
+						tyreCompound := normalizeCompound("Dry")
+
+					if tyreCompound {
+						splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor := false)
+
+						setMultiMapValue(data, section, "TyreCompound", tyreCompound)
+						setMultiMapValue(data, section, "TyreCompoundColor", tyreCompoundColor)
+					}
+				}
+			}
+		}
+
+		return data
 	}
 }
 

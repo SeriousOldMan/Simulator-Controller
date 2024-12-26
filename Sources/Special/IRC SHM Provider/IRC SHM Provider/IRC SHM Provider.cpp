@@ -318,7 +318,7 @@ void requestPitstopRepairs(bool repair) {
 		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_ClearFR, 0);
 }
 
-void requestPitstopTyreChange(bool change) {
+void requestPitstopTyreChangeAll(bool change) {
 	if (change) {
 		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_LF, 0);
 		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_RF, 0);
@@ -415,7 +415,15 @@ void pitstopSetValues(const irsdk_header* header, const char* data, const char* 
 	else if (strcmp(service, "Repair") == 0)
 		requestPitstopRepairs((strcmp(values, "true") == 0));
 	else if (strcmp(service, "Tyre Change") == 0)
-		requestPitstopTyreChange((strcmp(values, "true") == 0));
+		requestPitstopTyreChangeAll((strcmp(values, "true") == 0));
+	else if ((strcmp(service, "Tyre Change Front Left") == 0) && (strcmp(values, "true") == 0))
+		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_LF, 0);
+	else if ((strcmp(service, "Tyre Change Front Right") == 0) && (strcmp(values, "true") == 0))
+		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_RF, 0);
+	else if ((strcmp(service, "Tyre Change Rear Left") == 0) && (strcmp(values, "true") == 0))
+		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_LR, 0);
+	else if ((strcmp(service, "Tyre Change Rear Right") == 0) && (strcmp(values, "true") == 0))
+		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_RR, 0);
 	else if (strcmp(service, "Tyre Compound") == 0)
 		setTyreCompound(atoi(values));
 	else if (strcmp(service, "Tyre Pressure") == 0) {
@@ -495,7 +503,15 @@ void pitstopChangeValues(const irsdk_header* header, const char* data, const cha
 	else if (strcmp(service, "Repair") == 0)
 		requestPitstopRepairs((strcmp(values, "true") == 0));
 	else if (strcmp(service, "Tyre Change") == 0)
-		requestPitstopTyreChange((strcmp(values, "true") == 0));
+		requestPitstopTyreChangeAll((strcmp(values, "true") == 0));
+	else if ((strcmp(service, "Tyre Change Front Left") == 0) && (strcmp(values, "true") == 0))
+		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_LF, 0);
+	else if ((strcmp(service, "Tyre Change Front Right") == 0) && (strcmp(values, "true") == 0))
+		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_RF, 0);
+	else if ((strcmp(service, "Tyre Change Rear Left") == 0) && (strcmp(values, "true") == 0))
+		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_LR, 0);
+	else if ((strcmp(service, "Tyre Change Rear Right") == 0) && (strcmp(values, "true") == 0))
+		irsdk_broadcastMsg(irsdk_BroadcastPitCommand, irsdk_PitCommand_RR, 0);
 	else if (strcmp(service, "Tyre Compound") == 0)
 		changePitstopTyreCompound(header, data, atoi(values));
 	else if (strcmp(service, "Tyre Set") == 0) {
@@ -791,10 +807,6 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 		printf("[Setup Data]\n");
 
-		int compound = getDataInt(header, data, "PitSvTireCompound");
-
-		printf("TyreCompoundRaw=%d\n", (compound == -1) ? 1 : compound + 1);
-
 		printf("FuelAmount=%f\n", getDataFloat(header, data, "PitSvFuel"));
 
 		float pressureFL = GetPsi(getDataFloat(header, data, "PitSvLFP"));
@@ -808,6 +820,50 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 		printf("TyrePressureRR=%f\n", pressureRR);
 
 		printf("TyrePressure = %f, %f, %f, %f\n", pressureFL, pressureFR, pressureRL, pressureRR);
+		
+		int flags = getDataInt(header, data, "PitSvFlags");
+		int compound = getDataInt(header, data, "PitSvTireCompound");
+		bool change = false;
+		
+		compound = (compound == -1) ? 1 : compound + 1;
+		
+		if (flags & irsdk_LFTireChange) {
+			change = true;
+			printf("TyreCompoundRawFrontLeft=%d\n", compound);
+		}
+		else
+			printf("TyreCompoundRawFrontLeft=false");
+		
+		if (flags & irsdk_RFTireChange) {
+			change = true;
+			printf("TyreCompoundRawFrontRight=%d\n", compound);
+		}
+		else
+			printf("TyreCompoundRawFrontRight=false");
+		
+		if (flags & irsdk_LRTireChange) {
+			change = true;
+			printf("TyreCompoundRawRearLeft%d\n", compound);
+		}
+		else
+			printf("TyreCompoundRawRearLeft=false");
+		
+		if (flags & irsdk_RRTireChange) {
+			change = true;
+			printf("TyreCompoundRawRearRight=%d\n", compound);
+		}
+		else
+			printf("TyreCompoundRawRearRight=false");
+		
+		if (change)
+			printf("TyreCompoundRaw=%d\n", compound);
+		else
+			printf("TyreCompoundRaw=false");
+		
+		if (flags & irsdk_FastRepair)
+			printf("RepairRaw=true\n");
+		else
+			printf("RepairRaw=false\n");
 		
 		if (!setupOnly) {
 			printf("[Session Data]\n");

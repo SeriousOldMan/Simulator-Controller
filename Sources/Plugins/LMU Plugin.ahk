@@ -344,25 +344,29 @@ class LMUPlugin extends Sector397Plugin {
 	}
 
 	readSessionData(options := "", protocol?) {
-		local simulator, car, track, data, setupData, tyreCompound, tyreCompoundColor
+		local simulator := this.Simulator[true]
+		local car := this.Car
+		local track := this.Track
+		local data, setupData, tyreCompound, tyreCompoundColor, key, postFix
+
+		static keys := Map("All", "", "Front Left", "FrontLeft", "Front Right", "FrontRight"
+									, "Rear Left", "RearLeft", "Rear Right", "RearRight")
 
 		if InStr(options, "Setup=true") {
-			simulator := this.Simulator[true]
-			car := this.Car
-			track := this.Track
-
 			setupData := LMURESTProvider.PitstopData(simulator, car, track)
 			data := newMultiMap()
 
 			setMultiMapValue(data, "Setup Data", "FuelAmount", setupData.RefuelAmount)
 
-			tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, setupData.TyreCompound, false)
+			for key, postFix in keys {
+				tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, setupData.TyreCompound[key], false)
 
-			if tyreCompound {
-				splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
+				if tyreCompound {
+					splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
 
-				setMultiMapValue(data, "Setup Data", "TyreCompound", tyreCompound)
-				setMultiMapValue(data, "Setup Data", "TyreCompoundColor", tyreCompoundColor)
+					setMultiMapValue(data, "Setup Data", "TyreCompound" . postFix, tyreCompound)
+					setMultiMapValue(data, "Setup Data", "TyreCompoundColor" . postFix, tyreCompoundColor)
+				}
 			}
 
 			setMultiMapValue(data, "Setup Data", "TyrePressureFL", setupData.TyrePressure["Front Left"])
@@ -375,11 +379,44 @@ class LMUPlugin extends Sector397Plugin {
 			setMultiMapValue(data, "Setup Data", "RepairBodywork", setupData.RepairBodywork)
 			setMultiMapValue(data, "Setup Data", "RepairSuspension", setupData.RepairSuspension)
 			setMultiMapValue(data, "Setup Data", "RepairEngine", setupData.RepairEngine)
-
-			return data
 		}
-		else
-			return super.readSessionData(options, protocol?)
+		else {
+			data := super.readSessionData(options, protocol?)
+
+			for key, postFix in keys {
+				tyreCompound := getMultiMapValue(data, "Car Data", "TyreCompound" . postFix, kUndefined)
+
+				if (tyreCompound = kUndefined) {
+					tyreCompound := getMultiMapValue(data, section, "TyreCompoundRaw" . postFix, kUndefined)
+
+					if ((tyreCompound != kUndefined) && tyreCompound) {
+						tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, setupData.TyreCompound[key], false)
+
+						if tyreCompound {
+							splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
+
+							setMultiMapValue(data, "Car Data", "TyreCompound" . postFix, tyreCompound)
+							setMultiMapValue(data, "Car Data", "TyreCompoundColor" . postFix, tyreCompoundColor)
+
+							if (postfix = "Front") {
+								setMultiMapValue(data, "Car Data", "TyreCompoundFrontLeft" . postFix, tyreCompound)
+								setMultiMapValue(data, "Car Data", "TyreCompoundColorFrontLeft" . postFix, tyreCompoundColor)
+								setMultiMapValue(data, "Car Data", "TyreCompoundFrontRight" . postFix, tyreCompound)
+								setMultiMapValue(data, "Car Data", "TyreCompoundColorFrontRight" . postFix, tyreCompoundColor)
+							}
+							else if (postfix = "Rear") {
+								setMultiMapValue(data, "Car Data", "TyreCompoundRearLeft" . postFix, tyreCompound)
+								setMultiMapValue(data, "Car Data", "TyreCompoundColorRearLeft" . postFix, tyreCompoundColor)
+								setMultiMapValue(data, "Car Data", "TyreCompoundRearRight" . postFix, tyreCompound)
+								setMultiMapValue(data, "Car Data", "TyreCompoundColorRearRight" . postFix, tyreCompoundColor)
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return data
 	}
 }
 

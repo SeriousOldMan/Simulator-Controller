@@ -1077,6 +1077,9 @@ class RaceStrategist extends GridRaceAssistant {
 								 , "Lap", (knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Lap") + 1)
 								 , "Refuel", (Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"), 1) . " Liters"))
 
+					if knowledgeBase.getValue("Strategy.Pitstop.Position", false)
+						pitstop["Position"] := knowledgeBase.getValue("Strategy.Pitstop.Position")
+
 					if knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change", false) {
 						pitstop["TyreChange"] := kTrue
 						pitstop["TyreCompound"] := compound(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound")
@@ -1483,6 +1486,9 @@ class RaceStrategist extends GridRaceAssistant {
 
 				facts["Strategy.Pitstop.Next"] := 1
 				facts["Strategy.Pitstop.Lap"] := pitstopLap
+
+				if isInstance(strategy, RaceStrategist.TrafficRaceStrategy)
+					facts["Strategy.Pitstop.Position"] := pitstop.getPosition()
 			}
 
 			facts["Strategy.Pitstop." . A_Index . ".Lap"] := pitstopLap
@@ -1872,6 +1878,9 @@ class RaceStrategist extends GridRaceAssistant {
 
 				setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Lap", knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Lap") + 1)
 				setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Refuel", Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"), 1))
+
+				if knowledgeBase.getValue("Strategy.Pitstop.Position", false)
+					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Position", knowledgeBase.getValue("Strategy.Pitstop.Position"))
 
 				if knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change", false) {
 					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound", knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound"))
@@ -2358,7 +2367,8 @@ class RaceStrategist extends GridRaceAssistant {
 
 		for ignore, theFact in ["Name", "Version", "Weather", "Weather.Temperature.Air", "Weather.Temperature.Track"
 							  , "Tyre.Compound", "Tyre.Compound.Color", "Map", "TC", "ABS"
-							  , "Pitstop.Next", "Pitstop.Lap", "Pitstop.Lap.Warning", "Pitstop.Deviation"]
+							  , "Pitstop.Next", "Pitstop.Lap", "Pitstop.Position"
+							  , "Pitstop.Lap.Warning", "Pitstop.Deviation"]
 			knowledgeBase.clearFact("Strategy." . theFact)
 
 		loop knowledgeBase.getValue("Strategy.Pitstop.Count", 0) {
@@ -3233,6 +3243,7 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	chooseScenario(scenario, confirm?) {
+		local knowledgeBase := this.KnowledgeBase
 		local speaker := this.getSpeaker()
 		local hadScenario := (scenario != false)
 		local dispose := true

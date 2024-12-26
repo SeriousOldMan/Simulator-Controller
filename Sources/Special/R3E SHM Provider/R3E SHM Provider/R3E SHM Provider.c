@@ -330,6 +330,22 @@ int main(int argc, char* argv[])
 				strcpy_s(tyreCompoundRaw, 10, "Hard");
 				
 			wprintf_s(L"TyreCompoundRaw=%S\n", tyreCompoundRaw);
+			wprintf_s(L"TyreCompoundRawFront=%S\n", tyreCompoundRaw);
+
+			if (map_buffer->tire_subtype_rear == R3E_TIRE_SUBTYPE_PRIMARY)
+				strcpy_s(tyreCompoundRaw, 10, "Primary");
+			else if (map_buffer->tire_subtype_rear == R3E_TIRE_SUBTYPE_ALTERNATE)
+				strcpy_s(tyreCompoundRaw, 10, "Alternate");
+			else if (map_buffer->tire_subtype_rear == R3E_TIRE_SUBTYPE_SOFT)
+				strcpy_s(tyreCompoundRaw, 10, "Soft");
+			else if (map_buffer->tire_subtype_rear == R3E_TIRE_SUBTYPE_MEDIUM)
+				strcpy_s(tyreCompoundRaw, 10, "Medium");
+			else if (map_buffer->tire_subtype_rear == R3E_TIRE_SUBTYPE_HARD)
+				strcpy_s(tyreCompoundRaw, 10, "Hard");
+			else
+				strcpy_s(tyreCompoundRaw, 10, "Unknown");
+			
+			wprintf_s(L"TyreCompoundRawRear=%S\n", tyreCompoundRaw);
 			
 			wprintf_s(L"TyreTemperature=%f,%f,%f,%f\n",
 				map_buffer->tire_temp[R3E_TIRE_FRONT_LEFT].current_temp[R3E_TIRE_TEMP_CENTER],

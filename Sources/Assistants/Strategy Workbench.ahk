@@ -2172,11 +2172,6 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			this.Control["driverDropDown"].Delete()
 
-			if (simulator = "Assetto Corsa Competizione")
-				this.Control["simMapEdit"].Text := 1
-			else
-				this.Control["simMapEdit"].Text := "n/a"
-
 			this.iSelectedDrivers := false
 
 			this.DriversListView.Delete()
@@ -2185,6 +2180,8 @@ class StrategyWorkbench extends ConfigurationItem {
 			this.DriversListView.ModifyCol()
 			this.DriversListView.ModifyCol(1, "AutoHdr")
 			this.DriversListView.ModifyCol(2, "AutoHdr")
+
+			this.Control["simMapEdit"].Text := "n/a"
 
 			this.iStintDrivers := [SessionDatabase.ID]
 
@@ -2937,19 +2934,6 @@ class StrategyWorkbench extends ConfigurationItem {
 
 						tyreCompound := getMultiMapValue(data, "Car Data", "TyreCompound", kUndefined)
 						tyreCompoundColor := getMultiMapValue(data, "Car Data", "TyreCompoundColor", kUndefined)
-
-						if (tyreCompound = kUndefined) {
-							tyreCompound := getMultiMapValue(data, "Car Data", "TyreCompoundRaw", kUndefined)
-
-							if (tyreCompound && (tyreCompound != kUndefined)) {
-								tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
-
-								if tyreCompound
-									splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
-								else
-									tyreCompound := kUndefined
-							}
-						}
 
 						if ((tyreCompound != kUndefined) && (tyreCompoundColor != kUndefined))
 							this.Control["simCompoundDropDown"].Choose(inList(this.TyreCompounds, compound(tyreCompound, tyreCompoundColor)))

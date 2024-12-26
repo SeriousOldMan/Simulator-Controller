@@ -380,6 +380,22 @@ extern __declspec(dllexport) int __stdcall call(char* request, char* result, int
 				strcpy_s(tyreCompoundRaw, 10, "Hard");
 
 			writeStringOption(result, "TyreCompoundRaw=", tyreCompoundRaw, &pos);
+			writeStringOption(result, "TyreCompoundRawFront=", tyreCompoundRaw, &pos);
+
+			if (map_buffer->tire_subtype_rear == R3E_TIRE_SUBTYPE_PRIMARY)
+				strcpy_s(tyreCompoundRaw, 10, "Primary");
+			else if (map_buffer->tire_subtype_rear == R3E_TIRE_SUBTYPE_ALTERNATE)
+				strcpy_s(tyreCompoundRaw, 10, "Alternate");
+			else if (map_buffer->tire_subtype_rear == R3E_TIRE_SUBTYPE_SOFT)
+				strcpy_s(tyreCompoundRaw, 10, "Soft");
+			else if (map_buffer->tire_subtype_rear == R3E_TIRE_SUBTYPE_MEDIUM)
+				strcpy_s(tyreCompoundRaw, 10, "Medium");
+			else if (map_buffer->tire_subtype_rear == R3E_TIRE_SUBTYPE_HARD)
+				strcpy_s(tyreCompoundRaw, 10, "Hard");
+			else
+				strcpy_s(tyreCompoundRaw, 10, "Unknown");
+			
+			writeStringOption(result, "TyreCompoundRawRear=", tyreCompoundRaw, &pos);
 
 			writeString(result, "TyreTemperature=", &pos);
 			writeFloat(result, map_buffer->tire_temp[R3E_TIRE_FRONT_LEFT].current_temp[R3E_TIRE_TEMP_CENTER], &pos); writeString(result, ", ", &pos);

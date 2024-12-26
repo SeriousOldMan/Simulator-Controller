@@ -116,7 +116,10 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	getPitstopActions(&allActions, &selectActions) {
-		allActions := CaseInsenseMap("Strategy", "Strategy", "NoRefuel", "No Refuel", "Refuel", "Refuel", "TyreChange", "Change Tyres", "TyreCompound", "Tyre Compound"
+		allActions := CaseInsenseMap("Strategy", "Strategy", "NoRefuel", "No Refuel", "Refuel", "Refuel"
+								   , "TyreChange", "Tyre Change"
+								   , "TyreChangeFront", "Tyre Change Front", "TyreChangeRear", "Tyre Change Rear"
+								   , "TyreCompound", "Tyre Compound"
 								   , "BodyworkRepair", "Repair Bodywork", "SuspensionRepair", "Repair Suspension")
 
 		selectActions := []
@@ -411,8 +414,12 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			if (option = "Repair Bodywork")
 				return (this.optionAvailable("Repair Bodywork") || this.optionAvailable("Repair Front Aero") || this.optionAvailable("Repair Rear Aero"))
-			else if ((option = "Change Tyres") || (option = "Tyre Compound"))
+			else if ((option = "Tyre Change") || (option = "Tyre Compound"))
 				return (this.optionAvailable("Change Front Tyres") || this.optionAvailable("Change Rear Tyres"))
+			else if (option = "Tyre Change Front")
+				return this.optionAvailable("Change Front Tyres")
+			else if (option = "Tyre Change Rear")
+				return this.optionAvailable("Change Rear Tyres")
 			else if this.activateWindow() {
 				index := this.optionIndex(option)
 
@@ -446,10 +453,14 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 				this.changeFuelAmount(action, steps, false, false)
 			else if (option = "No Refuel")
 				this.changeFuelAmount("Decrease", 250, false, false)
-			else if (option = "Change Tyres") {
+			else if (option = "Tyre Change") {
 				this.toggleActivity("Change Front Tyres", false, true)
 				this.toggleActivity("Change Rear Tyres", false, true)
 			}
+			else if (option = "Tyre Change Front")
+				this.toggleActivity("Change Front Tyres", false, true)
+			else if (option = "Tyre Change Rear")
+				this.toggleActivity("Change Rear Tyres", false, true)
 			else if (option = "Tyre Compound") {
 				changed := false
 
@@ -788,6 +799,38 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			logMessage(kLogInfo, substituteVariables(translate("'%image%' not found"), {image: imageName}))
 
 		return false
+	}
+
+	readSessionData(options := "", protocol?) {
+		local simulator := this.Simulator[true]
+		local car := this.Car
+		local track := this.Track
+		local data := super.readSessionData(options, protocol?)
+		local tyreCompound, tyreCompoundColor, ignore, postFix
+
+		static tyres := ["Front", "Rear"]
+
+		for ignore, section in ["Car Data", "Setup Data"]
+			for ignore, postfix in tyres {
+				tyreCompound := getMultiMapValue(data, section, "TyreCompound" . postFix, kUndefined)
+
+				if (tyreCompound = kUndefined) {
+					tyreCompound := getMultiMapValue(data, section, "TyreCompoundRaw" . postFix, kUndefined)
+
+					if ((tyreCompound != kUndefined) && tyreCompound) {
+						tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, setupData.TyreCompound[key], false)
+
+						if tyreCompound {
+							splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
+
+							setMultiMapValue(data, section, "TyreCompound" . postFix, tyreCompound)
+							setMultiMapValue(data, section, "TyreCompoundColor" . postFix, tyreCompoundColor)
+						}
+					}
+				}
+			}
+
+		return data
 	}
 }
 

@@ -3,7 +3,7 @@ Version=6.1.0.0-dev
 Target=6.1.0.0-release
 Date=12/25/2024
 Download=
-Changes=Reworking of silent mode, Fixed FCY command for Simulator Assistant Mode, Core setting for interruptable speeches, Fixed tyre compound selection voice command, Fixed display of unavailable pressures in "Solo Center" and "Team Center", Renamed LMU database to LMU.old, Fixed handling of n/a Map in strategy, Full support for pitstop controller for LMU, Position after pitstop in session info and knowledgebase
+Changes=Reworking of silent mode, Fixed FCY command for Simulator Assistant Mode, Core setting for interruptable speeches, Fixed tyre compound selection voice command, Fixed display of unavailable pressures in "Solo Center" and "Team Center", Renamed LMU database to LMU.old, Fixed handling of n/a Map in strategy, Full support for pitstop controller for LMU, Position after pitstop in session info and knowledgebase, Handle different tyre compounds for different wheels
 Components=Media->5.6.1,Configuration->6.1.0,Utilities->5.9.8
 [Release]
 Version=6.0.2.0-release

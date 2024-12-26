@@ -1497,8 +1497,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 	static updateAssistantsTelemetryData(data) {
 		local teamServer := this.TeamServer
-		local simulator, car, track, maxFuel, compound, compoundColor
-		local ignore, assistant, section
+		local simulator, car, track, maxFuel
+		local ignore, assistant
 
 		static settingsDB := false
 

@@ -935,13 +935,11 @@ namespace SHMConnector {
 
 					if (compound != "No Change") {
 						strWriter.WriteLine("TyreCompoundRaw=" + compound);
-						strWriter.WriteLine("TyreCompoundRawFrontLeft=" + compound);
-						strWriter.WriteLine("TyreCompoundRawFrontRight=" + compound);
+						strWriter.WriteLine("TyreCompoundRawFront=" + compound);
 					}
 					else {
 						strWriter.WriteLine("TyreCompoundRaw=false");
-						strWriter.WriteLine("TyreCompoundRawFrontLeft=false");
-						strWriter.WriteLine("TyreCompoundRawFrontRight=false");
+						strWriter.WriteLine("TyreCompoundRawFront=false");
 					}
 				}
 
@@ -949,14 +947,10 @@ namespace SHMConnector {
 				{
 					string compound = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
 
-					if (compound != "No Change") {
-						strWriter.WriteLine("TyreCompoundRawRearLeft=" + compound);
-						strWriter.WriteLine("TyreCompoundRawRearRight=" + compound);
-					}
-					else {
-						strWriter.WriteLine("TyreCompoundRawRearLeft=false");
-						strWriter.WriteLine("TyreCompoundRawRearRight=false");
-					}
+					if (compound != "No Change")
+						strWriter.WriteLine("TyreCompoundRawRear=" + compound);
+					else
+						strWriter.WriteLine("TyreCompoundRawRear=false");
 				}
 
 				void writePressure(string category, string key)

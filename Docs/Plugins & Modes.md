@@ -798,7 +798,7 @@ Note: You can use all these commands in the *pitstopCommands* list as well, whic
 
 ### Configuration
 
-First, you need to define, how to open and close the different Pitstop MFDs (aka Black Boxes) in *iRacing*. Please supply the bindings you have defined in the "Controls" setup in *iRacing*.
+First, you can define+ how to open and close the different Pitstop MFDs (aka Black Boxes) in *iRacing*. This is actually optional, since the menu have not to be open for the control of the pitstop settings. Please supply the bindings you have defined in the "Controls" setup in *iRacing*.
 
 	togglePitstopFuelMFD: *toggleHotkey*; togglePitstopTyreMFD: *toggleHotkey*;
 	pitstopMFDMode: Event | Input | Play | Raw | Default
@@ -823,6 +823,10 @@ See the following table for the supported settings:
 | Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
 | NoRefuel | Sets the refuel amount to zero, thereby skipping refueling. |
 | TyreChange | Toggles, whether tyres will be changed at the pitstop. |
+| TyreChangeFrontLeft | Toggles, whether the front left tyre will be changed at the pitstop. |
+| TyreChangeFrontRight | Toggles, whether the front right tyre will be changed at the pitstop. |
+| TyreChangeRearLeft | Toggles, whether the rear left tyre will be changed at the pitstop. |
+| TyreChangeRearRight | Toggles, whether the rear right tyre will be changed at the pitstop. |
 | TyreCompound | Cycles through the available tyre compounds. |
 | TyreAllAround | Change the pressure for all tyres at once. Supports the additional increments argument. |
 | TyreFrontLeft | Change the pressure for the front left tyre. Supports the additional increments argument. |
@@ -916,6 +920,8 @@ See the following table for the supported settings:
 | Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
 | NoRefuel | Sets the refuel amount to zero, thereby skipping refueling. |
 | TyreCompound | Cycles through the available tyre compounds. |
+| TyreCompoundFront | Cycles through the available tyre compounds for the front axle. |
+| TyreCompoundRear | Cycles through the available tyre compounds for the rear axle. |
 | TyreAllAround | Change the pressure for all tyres at once. Supports the additional increments argument. |
 | TyreFrontLeft | Change the pressure for the front left tyre. Supports the additional increments argument. |
 | TyreFrontRight | Change the pressure for the front right tyre. Supports the additional increments argument. |
@@ -1022,6 +1028,8 @@ See the following table for the supported settings:
 | Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
 | NoRefuel | Sets the refuel amount to zero, thereby skipping refueling. |
 | TyreChange | Toggles, whether you want to change the tyres at the next pitstop or not. |
+| TyreChangeFront | Toggles, whether you want to change the front tyres at the next pitstop or not. |
+| TyreChangeRear | Toggles, whether you want to change the rear tyres at the next pitstop or not. |
 | TyreCompound | Cycles through the available tyre compounds. |
 | SuspensionRepair | Toggles the repair of the suspension components. |
 | BodyworkRepair | Toggles the repair of all the bodywork and aerodynamic elements. |
@@ -1327,10 +1335,10 @@ See the following table for the supported settings:
 | Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
 | NoRefuel | Sets the refuel amount to zero, thereby skipping refueling. |
 | TyreCompound | Cycles through the available tyre compounds for all tyres. |
-| TyreCompoundFrontLeft | Cycles through the available tyre compounds of the front left tyre. |
-| TyreCompoundFrontRight | Cycles through the available tyre compounds of the front right tyre. |
-| TyreCompoundRearLeft | Cycles through the available tyre compounds of the rear left tyre. |
-| TyreCompoundRearRight | Cycles through the available tyre compounds of the rear right tyre. |
+| TyreCompoundFrontLeft | Cycles through the available tyre compounds for the front left tyre. |
+| TyreCompoundFrontRight | Cycles through the available tyre compounds for the front right tyre. |
+| TyreCompoundRearLeft | Cycles through the available tyre compounds for the rear left tyre. |
+| TyreCompoundRearRight | Cycles through the available tyre compounds for the rear right tyre. |
 | TyreAllAround | Change the pressure for all tyres at once. Supports the additional increments argument. |
 | TyreFrontLeft | Change the pressure for the front left tyre. Supports the additional increments argument. |
 | TyreFrontRight | Change the pressure for the front right tyre. Supports the additional increments argument. |

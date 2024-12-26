@@ -9,9 +9,10 @@
   8. More progress bars and message windows will be suppressed if Simulator Controller is running in *silent* mode.
   9. The projected position after the upcoming pitstop will be available in the LLM knowledge and also in the session info of the "System Monitor", if the strategy was calculated by the Strategist with activated traffic simulation.
   10. Finally full support for management of pitstop settings and pitstop automation by the Assistants in *Le Mans Ultimate*.
-     - The car models are correctly named now (they have been the team names in the past). Due to this, all entries in the session database have been invalidated and the database for *Le Mans Ultimate* has been clear. See the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-610) for information how to restore your previous database content.
-	 - The Race Engineer cannot handle different tyre compounds for the different wheels yet and he also will currently always change all four tyres together. Please see the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#special-notes-for-le-mans-ultimate) for more information about this and also additional restrictions.
-
+      - The car models are correctly named now (they have been the team names in the past). Due to this, all entries in the session database have been invalidated and the database for *Le Mans Ultimate* has been clear. See the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-610) for information how to restore your previous database content.
+	  - The Race Engineer cannot handle different tyre compounds for the different wheels yet and he also will currently always change all four tyres together. Please see the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#special-notes-for-le-mans-ultimate) for more information about this and also additional restrictions.
+  11. Handling of individual tyre change and/or tyre compounds has been implemented for *RaceRoom Racing Experience*, *rFactor 2* and *iRacing*. This is available as individual controller actions for Button Box or Stream Decks. The Race Engineer will still change all four tyres at once and will always select the same compound for all four wheels.
+  
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-610) for on information on how to restore your session database content, if you have used *Le Mans Ultimate* previously.
 
 ## 6.0.3.0-release 12/27/24 (planned)

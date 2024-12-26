@@ -300,6 +300,7 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 			printLine(&output, ",", localCopy->mTyreTreadTemp[TYRE_REAR_RIGHT] - 272.15);
 		}
 		else {
+			printLine(&output, "TyreCompoundRaw=", localCopy->mTyreCompound[TYRE_FRONT_LEFT]);
 			printLine(&output, "TyreCompoundRawFL=", localCopy->mTyreCompound[TYRE_FRONT_LEFT]);
 			printLine(&output, "TyreCompoundRawFR=", localCopy->mTyreCompound[TYRE_FRONT_RIGHT]);
 			printLine(&output, "TyreCompoundRawRL=", localCopy->mTyreCompound[TYRE_REAR_LEFT]);

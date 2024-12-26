@@ -238,6 +238,7 @@ int main(int argc, char* argv[]) {
 				localCopy->mTyreTreadTemp[TYRE_REAR_RIGHT] - 272.15);
 		}
 		else {
+			printf("TyreCompoundRaw=%s\n", localCopy->mTyreCompound[TYRE_FRONT_LEFT]);
 			printf("TyreCompoundRawFL=%s\n", localCopy->mTyreCompound[TYRE_FRONT_LEFT]);
 			printf("TyreCompoundRawFR=%s\n", localCopy->mTyreCompound[TYRE_FRONT_RIGHT]);
 			printf("TyreCompoundRawRL=%s\n", localCopy->mTyreCompound[TYRE_REAR_LEFT]);

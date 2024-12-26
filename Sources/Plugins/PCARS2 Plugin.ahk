@@ -322,6 +322,38 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 			this.iRepairBodyworkChosen := true
 		}
 	}
+
+	readSessionData(options := "", protocol?) {
+		local simulator := this.Simulator[true]
+		local car := this.Car
+		local track := this.Track
+		local data := super.readSessionData(options, protocol?)
+		local tyreCompound, tyreCompoundColor, ignore, postFix
+
+		static tyres := ["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
+
+		for ignore, section in ["Car Data", "Setup Data"]
+			for ignore, postfix in tyres {
+				tyreCompound := getMultiMapValue(data, section, "TyreCompound" . postFix, kUndefined)
+
+				if (tyreCompound = kUndefined) {
+					tyreCompound := getMultiMapValue(data, section, "TyreCompoundRaw" . postFix, kUndefined)
+
+					if ((tyreCompound != kUndefined) && tyreCompound) {
+						tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, setupData.TyreCompound[key], false)
+
+						if tyreCompound {
+							splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
+
+							setMultiMapValue(data, section, "TyreCompound" . postFix, tyreCompound)
+							setMultiMapValue(data, section, "TyreCompoundColor" . postFix, tyreCompoundColor)
+						}
+					}
+				}
+			}
+
+		return data
+	}
 }
 
 

@@ -907,13 +907,11 @@ namespace RF2SHMProvider {
 
 				if (compound != "No Change") {
 					Console.WriteLine("TyreCompoundRaw=" + compound);
-					Console.WriteLine("TyreCompoundRawFrontLeft=" + compound);
-					Console.WriteLine("TyreCompoundRawFrontRight=" + compound);
+					Console.WriteLine("TyreCompoundRawFront=" + compound);
 				}
 				else {
 					Console.WriteLine("TyreCompoundRaw=false");
-					Console.WriteLine("TyreCompoundRawFrontLeft=false");
-					Console.WriteLine("TyreCompoundRawFrontRight=false");
+					Console.WriteLine("TyreCompoundRawFront=false");
 				}
 
 				if (!SelectPitstopCategory("R TIRES:"))
@@ -921,14 +919,10 @@ namespace RF2SHMProvider {
 
 				compound = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
 
-				if (compound != "No Change") {
-					Console.WriteLine("TyreCompoundRawRearLeft=" + compound);
-					Console.WriteLine("TyreCompoundRawRearRight=" + compound);
-				}
-				else {
-					Console.WriteLine("TyreCompoundRawRearLeft=false");
-					Console.WriteLine("TyreCompoundRawRearRight=false");
-				}
+				if (compound != "No Change")
+					Console.WriteLine("TyreCompoundRawRear=" + compound);
+				else
+					Console.WriteLine("TyreCompoundRawRear=false");
 
                 void writePressure(string category, string key) {
 					if (!SelectPitstopCategory(category))

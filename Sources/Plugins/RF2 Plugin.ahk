@@ -348,13 +348,48 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 			if (getMultiMapValue(data, "Car Data", "FuelRemaining", 0) = 0)
 				setMultiMapValue(data, "Session Data", "Paused", true)
 	}
+
+	readSessionData(options := "", protocol?) {
+		local simulator := this.Simulator[true]
+		local car := this.Car
+		local track := this.Track
+		local data := super.readSessionData(options, protocol?)
+		local tyreCompound, tyreCompoundColor, ignore, postFix
+
+		static tyres := ["Front", "Rear"]
+
+		for ignore, section in ["Car Data", "Setup Data"]
+			for ignore, postfix in tyres {
+				tyreCompound := getMultiMapValue(data, section, "TyreCompound" . postFix, kUndefined)
+
+				if (tyreCompound = kUndefined) {
+					tyreCompound := getMultiMapValue(data, section, "TyreCompoundRaw" . postFix, kUndefined)
+
+					if ((tyreCompound != kUndefined) && tyreCompound) {
+						tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, setupData.TyreCompound[key], false)
+
+						if tyreCompound {
+							splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
+
+							setMultiMapValue(data, section, "TyreCompound" . postFix, tyreCompound)
+							setMultiMapValue(data, section, "TyreCompoundColor" . postFix, tyreCompoundColor)
+						}
+					}
+				}
+			}
+
+		return data
+	}
 }
 
 class RF2Plugin extends Sector397Plugin {
 	iSelectedDriver := false
 
 	getPitstopActions(&allActions, &selectActions) {
-		allActions := CaseInsenseMap("NoRefuel", "No Refuel", "Refuel", "Refuel", "TyreCompound", "Tyre Compound", "TyreAllAround", "All Around"
+		allActions := CaseInsenseMap("NoRefuel", "No Refuel", "Refuel", "Refuel"
+								   , "TyreCompound", "Tyre Compound"
+								   , "TyreCompoundFront", "Tyre Compound Front", "TyreCompoundRear", "Tyre Compound Rear"
+								   , "TyreAllAround", "All Around"
 								   , "TyreFrontLeft", "Front Left", "TyreFrontRight", "Front Right", "TyreRearLeft", "Rear Left", "TyreRearRight", "Rear Right"
 								   , "DriverSelect", "Driver", "RepairRequest", "Repair", "PitstopRequest", "Pitstop")
 
@@ -399,8 +434,8 @@ class RF2Plugin extends Sector397Plugin {
 					this.sendPitstopCommand("Pitstop", action, "Refuel", Round(steps))
 				case "No Refuel":
 					this.sendPitstopCommand("Pitstop", "Decrease", "Refuel", 250)
-				case "Tyre Compound":
-					this.sendPitstopCommand("Pitstop", action, "Tyre Compound", Round(steps))
+				case "Tyre Compound", "Tyre Compound Front", "Tyre Compound Rear":
+					this.sendPitstopCommand("Pitstop", action, option, Round(steps))
 				case "All Around":
 					this.sendPitstopCommand("Pitstop", action, "Tyre Pressure", Round(steps * 0.1, 1), Round(steps * 0.1, 1), Round(steps * 0.1, 1), Round(steps * 0.1, 1))
 				case "Front Left":
@@ -436,18 +471,8 @@ class RF2Plugin extends Sector397Plugin {
 				case "Tyre Compound", "TyreCompound":
 					data := this.readSessionData("Setup=true")
 
-					compound := getMultiMapValue(data, "Setup Data", "TyreCompoundRaw")
-					compound := SessionDatabase.getTyreCompoundName(this.Simulator[true], this.Car, this.Track, compound, kUndefined)
-
-					if (compound = kUndefined)
-						compound := normalizeCompound("Dry")
-
-					compoundColor := false
-
-					if compound
-						splitCompound(compound, &compound, &compoundColor)
-
-					return [compound, compoundColor]
+					return [getMultiMapValue(data, "Setup Data", "TyreCompound", false)
+						  , getMultiMapValue(data, "Setup Data", "TyreCompoundColor", false)]
 				case "Repair Suspension":
 					data := this.readSessionData("Setup=true")
 

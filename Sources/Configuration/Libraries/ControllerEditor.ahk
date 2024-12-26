@@ -1027,7 +1027,7 @@ class LayoutsList extends ConfigurationItemList {
 			this.Control["layoutSidesMarginEdit"].Text := ""
 			this.Control["layoutBottomMarginEdit"].Text := ""
 
-			if ((size[1] = 2) && (size[1] = 3))
+			if ((size[1] = 2) && (size[2] = 3))
 				this.Control["layoutDropDown"].Choose(1)
 			else if (size[1] = 3)
 				this.Control["layoutDropDown"].Choose(2)

@@ -3,22 +3,19 @@
   2. Documentation updates here and there, as always
   3. Fxied a bug in the processing of the voice command which handles tyre compound selection during pitstop preparation.
   4. Fixed handling of non-available engine maps in strategy simulation.
-  5. Added missing FCY command in the Assistant mode of all simulator plugins.
-  6. A new [core setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) allow you to configure a special mode, which enables the *Push-to-Talk* button to interrupt the currently active speech.
-  7. Fixed display of unavailable pressures in "Solo Center" and "Team Center".
-  8. More progress bars and message windows will be suppressed if Simulator Controller is running in *silent* mode.
-  9. The projected position after the upcoming pitstop will be available in the LLM knowledge and also in the session info of the "System Monitor", if the strategy was calculated by the Strategist with activated traffic simulation.
-  10. Finally full support for management of pitstop settings and pitstop automation by the Assistants in *Le Mans Ultimate*.
+  5. Fixed handling of Stream Deck Mini layouts in "Simulator Setup".
+  6. Added missing FCY command in the Assistant mode of all simulator plugins.
+  7. Several new settings in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) for the new "Time Trial" session type which was introduced with version 6.0.2.
+  8. A new [core setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) allow you to configure a special mode, which enables the *Push-to-Talk* button to interrupt the currently active speech.
+  9. Fixed display of unavailable pressures in "Solo Center" and "Team Center".
+  10. More progress bars and message windows will be suppressed if Simulator Controller is running in *silent* mode.
+  11. The projected position after the upcoming pitstop will be available in the LLM knowledge and also in the session info of the "System Monitor", if the strategy was calculated by the Strategist with activated traffic simulation.
+  12. Finally full support for management of pitstop settings and pitstop automation by the Assistants in *Le Mans Ultimate*.
       - The car models are correctly named now (they have been the team names in the past). Due to this, all entries in the session database have been invalidated and the database for *Le Mans Ultimate* has been clear. See the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-610) for information how to restore your previous database content.
 	  - The Race Engineer cannot handle different tyre compounds for the different wheels yet and he also will currently always change all four tyres together. Please see the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#special-notes-for-le-mans-ultimate) for more information about this and also additional restrictions.
-  11. Handling of individual tyre change and/or tyre compounds has been implemented for *RaceRoom Racing Experience*, *rFactor 2* and *iRacing*. This is available as individual controller actions for Button Box or Stream Decks. The Race Engineer will still change all four tyres at once and will always select the same compound for all four wheels.
+  13. Handling of individual tyre change and/or tyre compounds has been implemented for *RaceRoom Racing Experience*, *rFactor 2* and *iRacing*. This is available as individual controller actions for Button Box or Stream Decks. The Race Engineer will still change all four tyres at once and will always select the same compound for all four wheels.
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-610) for on information on how to restore your session database content, if you have used *Le Mans Ultimate* previously.
-
-## 6.0.3.0-release 12/27/24 (planned)
-  1. Minor bugfixes, as always
-  2. Documentation updates here and there, as always
-  3. Several new settings in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) for the new "Time Trial" session type which was introduced with version 6.0.2.
 
 ## 6.0.2.0-release 12/20/24
   1. Minor bugfixes, as always

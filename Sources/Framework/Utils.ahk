@@ -466,9 +466,6 @@ callSimulator(simulator, options := "", protocol?) {
 			DllCall(simulator . " SHM Connector\call", "AStr", options, "Ptr", buf, "Int", buf.Size)
 
 			data := parseMultiMap(StrGet(buf, "UTF-8"))
-
-			if (data.Count = 0)
-				throw ("DLL returned empty data in callSimulator for " . simulator . "...")
 		}
 		else if (protocol = "CLR") {
 			if connectors.Has(simulator . ".CLR")
@@ -489,9 +486,6 @@ callSimulator(simulator, options := "", protocol?) {
 			}
 
 			data := parseMultiMap(connector.Call(options))
-
-			if (data.Count = 0)
-				throw ("DLL returned empty data in callSimulator for " . simulator . "...")
 		}
 		else if (protocol = "EXE") {
 			exePath := (kBinariesDirectory . "Providers\" . simulator . " SHM Provider.exe")

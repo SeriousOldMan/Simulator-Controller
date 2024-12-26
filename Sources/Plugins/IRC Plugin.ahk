@@ -77,22 +77,21 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	sendPitstopCommand(command, operation, message, arguments*) {
 		local exePath := (kBinariesDirectory . "Connectors\" . "IRC SHM Connector.dll")
 
-		if this.iCurrentPitstopMFD
-			try {
-				callSimulator(this.Code, command . "=" . operation . "=" . message . ":" . values2String(";", arguments*), "DLL")
-			}
-			catch Any as exception {
-				logError(exception, true)
+		try {
+			callSimulator(this.Code, command . "=" . operation . "=" . message . ":" . values2String(";", arguments*), "DLL")
+		}
+		catch Any as exception {
+			logError(exception, true)
 
-				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: this.Code, protocol: "SHM"})
-									   . exePath . translate(") - please rebuild the applications in the binaries folder (")
-									   . kBinariesDirectory . translate(")"))
+			logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: this.Code, protocol: "SHM"})
+								   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+								   . kBinariesDirectory . translate(")"))
 
-				if !kSilentMode
-					showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
-												  , {exePath: exePath, simulator: this.Code, protocol: "SHM"})
-							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-			}
+			if !kSilentMode
+				showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
+											  , {exePath: exePath, simulator: this.Code, protocol: "SHM"})
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+		}
 	}
 
 	openPitstopMFD(descriptor := false) {

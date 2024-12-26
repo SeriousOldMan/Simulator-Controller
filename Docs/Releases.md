@@ -1,7 +1,7 @@
 ## 6.0.3.0-release 12/27/24 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. Fixed a critical bug that caused pitstop changes to be applied twice in some cases, when using Button Box and/or Stream Deck.
+  3. Fixed a critical bug introduced with the 6.0.2 that caused pitstop changes to be applied twice in some cases, when using Button Box and/or Stream Deck.
   4. Several new settings in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) for the new "Time Trial" session type which was introduced with version 6.0.2.
 
 ## 6.0.2.0-release 12/20/24

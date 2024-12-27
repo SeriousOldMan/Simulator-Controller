@@ -286,27 +286,42 @@ class LMURestProvider {
 			local index, candidate
 
 			if (tyre = "All") {
-				this.setTyreCompound("FL", code)
-				this.setTyreCompound("FR", code)
-				this.setTyreCompound("RL", code)
-				this.setTyreCompound("RR", code)
+				if !this.setTyreCompound("FL", code)
+					return false
+
+				if !this.setTyreCompound("FR", code)
+					return false
+
+				if !this.setTyreCompound("RL", code)
+					return false
+
+				if !this.setTyreCompound("RR", code)
+					return false
 
 				tyre := this.lookup("TIRES:")
 			}
 			else
 				tyre := this.lookup(LMURESTProvider.TyreTypes[tyre] . " TIRE:")
 
-			if tyre
+			if tyre {
 				if !isInteger(code) {
 					for index, candidate in tyre["settings"]
 						if ((index > 1) && (candidate["type"] = code)) {
 							tyre["currentSetting"] := (index - 1)
 
-							break
+							return true
 						}
+
+					return false
 				}
-				else
+				else {
 					tyre["currentSetting"] := code
+
+					return true
+				}
+			}
+			else
+				return false
 		}
 
 		changeTyreCompound(tyre, steps := 1) {

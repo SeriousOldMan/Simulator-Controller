@@ -1399,6 +1399,10 @@ For *Le Mans Ultimate*, you need to install a plugin into a special location for
 
    When the Race Engineer determines the currently mounted tyre compound, he always looks at the front left tyre as a reference.
 
+6. When it comes to tyre compounds, there are also some aspects to consider:
+   - Hypercars can use in general four different compounds, Soft, Medium, Dry and Wet, which are mapped to Dry (S), Dry (M), Dry (H) and Wet. But not all compounds may be available in a given season or on a given track. The Engineer on its own, will never change the compound mixture, when changing tyres. If you are using a pre-defined strategy which is handled by the Strategist, be sure to set the tyre set count for those compounds which are not available for the race to zero. This ensures that those tyre compounds will not be used during the race.
+   - The available tyre compounds for LMP2, GTE and GT3 are currently restricted to Medium and Wet, whic are mapped to Dry (M) and Wet.
+
 ## Plugin *Integration*
 
 This plugin, which is normally not automatically included and enabled, can export the internal state of Simulator Controller - especially a lot of the knowledge of all Race Assistants and plenty of information about the currently running simulator session - to other applications using a JSON file.

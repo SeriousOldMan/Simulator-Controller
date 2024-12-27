@@ -20,7 +20,8 @@
       - New controller actions "TyreChangeFrontLeft", "TyreChangeFrontRight", "TyreChangeRearLeft" and "TyreChangeRearRight" for *iRacing*.
   14. New controller action "PitstopRequest" for *rFactor 2*.
   15. New controller actions "BrakeChange" and "PitstopRequest" for *Le Mans Ultimate*.
-  16. The definition of the "RepairRequest" controller action for *iRacing* has changed. You may want to check your configuration, if you use this action.
+  16. Many new Stream Deck icons for the above controller actions.
+  17. The definition of the "RepairRequest" controller action for *iRacing* has changed. You may want to check your configuration, if you use this action.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-610) for on information on how to restore your session database content, if you have used *Le Mans Ultimate* previously.
 

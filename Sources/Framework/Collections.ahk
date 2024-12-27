@@ -5,7 +5,7 @@
 ;;;   https://www.autohotkey.com/boards/viewtopic.php?t=46260               ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;

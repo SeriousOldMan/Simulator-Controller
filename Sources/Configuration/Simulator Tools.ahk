@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Build & Maintenance Tool        ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1746,6 +1746,20 @@ updateInstallationForV500() {
 }
 
 updateConfigurationForV610() {
+	local configuration, subtitle
+
+	if FileExist(kUserConfigDirectory . "Simulator Configuration.ini") {
+		configuration := readMultiMap(kUserConfigDirectory . "Simulator Configuration.ini")
+
+		subtitle := getMultiMapValue(configuration, "Splash Window", "Subtitle", false)
+
+		if subtitle {
+			setMultiMapValue(configuration, "Splash Window", "Subtitle", StrReplace(subtitle, "2024", "2025"))
+
+			writeMultiMap(kUserConfigDirectory . "Simulator Configuration.ini", configuration)
+		}
+	}
+
 	try {
 		DirMove(kDatabaseDirectory . "User\LMU", kDatabaseDirectory . "User\LMU.archive")
 	}

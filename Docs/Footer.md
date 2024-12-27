@@ -1,1 +1,1 @@
-Simulator Controller - 2024 by Oliver Juwig (TheBigO), Creative Commons - BY-NC-SA
+Simulator Controller - 2025 by Oliver Juwig (TheBigO), Creative Commons - BY-NC-SA

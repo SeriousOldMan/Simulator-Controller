@@ -4,7 +4,7 @@
 ;;;   Created from CLR.ahk by Lexikos (https://github.com/Lexikos/CLR.ahk)  ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2024) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;

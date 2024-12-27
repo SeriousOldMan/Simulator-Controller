@@ -1393,14 +1393,18 @@ For *Le Mans Ultimate*, you need to install a plugin into a special location for
 
 4. The Race Engineer calculates the energy fill up of an upcoming pitstop based on the fuel consumption of the recent laps. When the Engineer announces the amount of fuel to be added for the next pitstop, the fuel amount will be divided by the *fuel ratio* as currently set in the pitstop menu of the HUD, before being used as the value for the virtual energy replenishment. So make sure, that your *fuel ratio* setting is as desired at the time, when the pitstop settings are changed.
 
-   Note: The *fuel ratio* implicitely includes the max fuel the car can carry, since the value can be greater than 1. Confusing, isn't it.
+   Note: The *fuel ratio* implicitely includes the max fuel the car can carry, since the value can be greater than 1. Confusing, isn't it. This has the following implications at the moment:
+   
+     - The Engineer may calculate more refueling than what is actually possible due to virtual energy limits. This will be corrected based on the fuel ratio at the time the pitstop is prepared, which then is communicated back to the Engineer. You can overfill the car, by increasing the fuel ratio, but why would you do that?
+	 
+	 - When working with the ["Setup Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench), it is important to set the max fuel the car can carry to fulfill the virtual energy constraints, which will be lower than the fuel capacity of the car on most tracks. Otherwise you will end up with strategies, which might be agianst the rules of the WEC. You can use fuel capacity in the "Session Database" for a given car / track combination, once you have dialed your numbers. The use the "Initialize from Database" command in the "Session" menu of "Setup Workbench", before you simulate your strategy.
 
 5. Additionally, the Race Engineer can only handle identical tyre compounds for all four tyres and can only change all four tyres together. You may, however adjust this manually once the Engineer has prepared the pitstop. This may change with a future release.
 
    When the Race Engineer determines the currently mounted tyre compound, he always looks at the front left tyre as a reference.
 
 6. When it comes to tyre compounds, there are also some aspects to consider:
-   - Hypercars can use in general four different compounds, Soft, Medium, Dry and Wet, which are mapped to Dry (S), Dry (M), Dry (H) and Wet. But not all compounds may be available in a given season or on a given track. The Engineer on its own, will never change the compound mixture, when changing tyres. If you are using a pre-defined strategy which is handled by the Strategist, be sure to set the tyre set count for those compounds which are not available for the race to zero. This ensures that those tyre compounds will not be used during the race.
+   - Hypercars can use in general four different compounds, Soft, Medium, Hard and Wet, which are mapped to Dry (S), Dry (M), Dry (H) and Wet. But not all compounds may be available in a given season or on a given track. The Engineer on its own, will never change the compound mixture, when changing tyres. If you are using a pre-defined strategy which is handled by the Strategist, be sure to set the tyre set count for those compounds which are not available for the race to zero. This ensures that those tyre compounds will not be used during the race.
    - The available tyre compounds for LMP2, GTE and GT3 are currently restricted to Medium and Wet, whic are mapped to Dry (M) and Wet.
 
 ## Plugin *Integration*

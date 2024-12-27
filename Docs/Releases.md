@@ -1,4 +1,4 @@
-## 6.0.3.0-release 12/27/24 (planned)
+## 6.0.3.0-release 12/27/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a critical bug introduced with the 6.0.2 that caused pitstop changes to be applied twice in some cases, when using Button Box and/or Stream Deck.

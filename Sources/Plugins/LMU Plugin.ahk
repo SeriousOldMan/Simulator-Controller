@@ -210,9 +210,10 @@ class LMUPlugin extends Sector397Plugin {
 						  , this.getOptionHandler("Rear Left").Call("Get"), this.getOptionHandler("Rear Right").Call("Get")]
 				case "Tyre Compound", "TyreCompound":
 					compound := this.getOptionHandler("Tyre Compound").Call("Get")
+					compoundColor := false
 
 					if compound
-						splitCompound(compound, &compound, &compoundColor := false)
+						splitCompound(compound, &compound, &compoundColor)
 
 					return [compound, compoundColor]
 				case "Repair Suspension", "Repair Bodywork", "Repair Engine":
@@ -227,6 +228,10 @@ class LMUPlugin extends Sector397Plugin {
 		}
 		else
 			return false
+	}
+
+	notifyPitstopChanged(option) {
+		super.notifyPitstopChanged((option = "No Refuel") ? "Refuel" : option)
 	}
 
 	dialPitstopOption(option, action, steps := 1) {

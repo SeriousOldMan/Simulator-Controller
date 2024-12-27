@@ -265,6 +265,22 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
+	notifyPitstopChanged(option) {
+		local newValues
+
+		if this.RaceEngineer
+			switch option, false {
+				case "Tyre Change", "Tyre Change Front Left", "Tyre Change Front Right"
+								  , "Tyre Change Rear Left", "Tyre Change Rear Right":
+					newValues := this.getPitstopOptionValues("Tyre Compound")
+
+					if newValues
+						this.RaceEngineer.pitstopOptionChanged("Tyre Compound", true, newValues*)
+				default:
+					super.notifyPitstopChanged((option = "No Refuel") ? "Refuel" : option)
+			}
+	}
+
 	startPitstopSetup(pitstopNumber) {
 		super.startPitstopSetup(pitstopNumber)
 

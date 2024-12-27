@@ -255,7 +255,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 
 				return [getMultiMapValue(data, "Setup Data", "TyrePressureFL", 26.1), getMultiMapValue(data, "Setup Data", "TyrePressureFR", 26.1)
 					  , getMultiMapValue(data, "Setup Data", "TyrePressureRL", 26.1), getMultiMapValue(data, "Setup Data", "TyrePressureRR", 26.1)]
-			case "Tyre Compound":
+			case "Tyre Compound", "TyreCompound":
 				data := this.readSessionData("Setup=true")
 
 				return [getMultiMapValue(data, "Setup Data", "TyreCompound", false)

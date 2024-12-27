@@ -624,12 +624,16 @@ class SimulatorPlugin extends ControllerPlugin {
 
 		if this.RaceEngineer
 			switch option, false {
-				case "Refuel", "Tyre Compound", "Tyre Set", "Repair Suspension", "Repair Bodywork", "Repair Engine":
+				case "Refuel", "Tyre Compound", "TyreCompound", "Tyre Set"
+				   , "Repair Suspension", "Repair Bodywork", "Repair Engine":
+					if (option = "TyreCompound")
+						option := "Tyre Compound"
+
 					newValues := this.getPitstopOptionValues(option)
 
 					if newValues {
 						if isDebug()
-							logMessage(kLogDebug, "Changing " . option . " to: " . values2String(", ", newValues*))
+							logMessage(kLogDebug, "Changing `"" . option . "`" to: " . values2String(", ", newValues*))
 
 						this.RaceEngineer.pitstopOptionChanged(option, true, newValues*)
 					}
@@ -638,7 +642,7 @@ class SimulatorPlugin extends ControllerPlugin {
 
 					if newValues {
 						if isDebug()
-							logMessage(kLogDebug, "Changing " . option . " to: " . values2String(", ", newValues*))
+							logMessage(kLogDebug, "Changing `"" . option . "`" to: " . values2String(", ", newValues*))
 
 						this.RaceEngineer.pitstopOptionChanged("Tyre Pressures", true, newValues*)
 					}

@@ -49,7 +49,7 @@ class LMUPlugin extends Sector397Plugin {
 	getOptionHandler(option) {
 		return (operation, value?) {
 			local pitstop := LMURESTProvider.PitstopData(this.Simulator[true], this.Car, this.Track)
-			local compound, code, tyre, found, tyreCompound, tyreCompoundColor, cTyreCompound, cTyreCompoundColor
+			local code, tyre, found, tyreCompound, tyreCompoundColor, cTyreCompound, cTyreCompoundColor
 
 			switch option, false {
 				case "Refuel":
@@ -70,30 +70,35 @@ class LMUPlugin extends Sector397Plugin {
 
 					switch operation, false {
 						case "Get":
-							compound := pitstop.getTyreCompound(tyre)
+							tyreCompound := pitstop.getTyreCompound(tyre)
 
-							if compound
-								compound := SessionDatabase.getTyreCompoundName(this.Simulator[true], this.Car, this.Track
-																			  , compound, kUndefined)
+							if tyreCompound
+								tyreCompound := SessionDatabase.getTyreCompoundName(this.Simulator[true]
+																				  , this.Car, this.Track
+																				  , tyreCompound, kUndefined)
 
-							return ((compound = kUndefined) ? normalizeCompound("Dry") : compound)
+							return ((tyreCompound = kUndefined) ? normalizeCompound("Dry") : tyreCompound)
 						case "Set":
 							if value {
-								code := SessionDatabase.getTyreCompoundCode(this.Simulator[true], this.Car, this.Track, value, kUndefined)
+								code := SessionDatabase.getTyreCompoundCode(this.Simulator[true]
+																		  , this.Car, this.Track, value, kUndefined)
 								found := false
 
 								if (code = kUndefined)
 									try
-										code := SessionDatabase.getTyreCompounds(this.Simulator[true], this.Car, this.Track, true)[1]
+										code := SessionDatabase.getTyreCompounds(this.Simulator[true]
+																			   , this.Car, this.Track, true)[1]
 
 								if !pitstop.setTyreCompound(tyre, code) {
 									splitCompound(value, &tyreCompound, &tyreCompoundColor)
 
-									for ignore, candidate in SessionDatabase.getTyreCompounds(this.Simulator[true], this.Car, this.Track) {
+									for ignore, candidate in SessionDatabase.getTyreCompounds(this.Simulator[true]
+																							, this.Car, this.Track) {
 										splitCompound(candidate, &cTyreCompound, &cTyreCompoundColor)
 
 										if (tyreCompound = cTyreCompound) {
-											code := SessionDatabase.getTyreCompoundCode(this.Simulator[true], this.Car, this.Track, candidate)
+											code := SessionDatabase.getTyreCompoundCode(this.Simulator[true]
+																					  , this.Car, this.Track, candidate)
 
 											if pitstop.setTyreCompound(tyre, code) {
 												found := true
@@ -105,7 +110,8 @@ class LMUPlugin extends Sector397Plugin {
 
 									if !found {
 										try
-											code := SessionDatabase.getTyreCompounds(this.Simulator[true], this.Car, this.Track, true)[1]
+											code := SessionDatabase.getTyreCompounds(this.Simulator[true]
+																				   , this.Car, this.Track, true)[1]
 
 										pitstop.setTyreCompound(tyre, code)
 									}
@@ -406,8 +412,6 @@ class LMUPlugin extends Sector397Plugin {
 			setMultiMapValue(data, "Setup Data", "TyrePressureFR", setupData.TyrePressure["Front Right"])
 			setMultiMapValue(data, "Setup Data", "TyrePressureRL", setupData.TyrePressure["Rear Left"])
 			setMultiMapValue(data, "Setup Data", "TyrePressureRR", setupData.TyrePressure["Rear Right"])
-
-			setupData := LMURESTProvider.PitstopData(simulator, car, track)
 
 			setMultiMapValue(data, "Setup Data", "RepairBodywork", setupData.RepairBodywork)
 			setMultiMapValue(data, "Setup Data", "RepairSuspension", setupData.RepairSuspension)

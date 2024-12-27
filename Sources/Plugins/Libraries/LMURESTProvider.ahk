@@ -328,7 +328,7 @@ class LMURestProvider {
 			local all := (tyre = "All")
 			local index, candidate
 
-			tyre := this.lookup((tyre = "All") ? "TIRES:" : (LMURESTProvider.TyreTypes[tyre] . " TIRE:"))
+			tyre := this.lookup(all ? "TIRES:" : (LMURESTProvider.TyreTypes[tyre] . " TIRE:"))
 
 			if tyre {
 				tyre["currentSetting"] := Min(tyre["settings"].Length - 1

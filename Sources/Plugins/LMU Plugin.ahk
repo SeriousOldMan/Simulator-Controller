@@ -286,11 +286,11 @@ class LMUPlugin extends Sector397Plugin {
 			this.setPitstopOption("Refuel", liters)
 	}
 
-	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
-		super.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
+	setPitstopTyreSet(pitstopNumber, tyreCompound, tyreCompoundColor := false, set := false) {
+		super.setPitstopTyreSet(pitstopNumber, tyreCompound, tyreCompoundColor, set)
 
 		if (this.OpenPitstopMFDHotkey != "Off")
-			this.setPitstopOption("Tyre Compound", compound ? this.tyreCompoundCode(compound, compoundColor) : false)
+			this.setPitstopOption("Tyre Compound", compound ? compound(tyreCompound, tyreCompoundColor) : false)
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {

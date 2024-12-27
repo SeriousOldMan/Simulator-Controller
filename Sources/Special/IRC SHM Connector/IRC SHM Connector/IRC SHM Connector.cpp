@@ -1318,6 +1318,9 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 						if (argument != "")
 							pitstopChangeValues(pHeader, g_data, argument.c_str());
 					}
+
+					output << "[No Data]" << std::endl;
+					output << "Active=false" << std::endl;
 				}
 				else {
 					output << "[Debug]" << std::endl;

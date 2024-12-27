@@ -33,6 +33,9 @@ namespace RF2SHMProvider {
                     provider.ExecutePitstopSetCommand(message[0], message[1].Split(';'));
                 else if ((arguments[0] == "Increase") || (arguments[0] == "Decrease"))
                     provider.ExecutePitstopChangeCommand(message[0], arguments[0], message[1].Split(';'));
+
+                Console.WriteLine("[No Data]");
+                Console.WriteLine("Active=false");
             }
             else if (request.StartsWith("Setup"))
                 provider.ReadSetup();

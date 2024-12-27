@@ -86,7 +86,7 @@ namespace SHMConnector {
             {
                 this.Disconnect();
 
-                return "";
+                return "Error";
             }
 
             if (request.StartsWith("Pitstop"))
@@ -101,7 +101,12 @@ namespace SHMConnector {
                 else if ((arguments[0] == "Increase") || (arguments[0] == "Decrease"))
                     this.ExecutePitstopChangeCommand(message[0], arguments[0], message[1].Split(';'));
 
-				return "";
+                StringWriter strWriter = new StringWriter();
+
+                strWriter.WriteLine("[No Data]");
+                strWriter.WriteLine("Active=false");
+
+                return strWriter.ToString();
             }
             else if (request.StartsWith("Setup"))
                 return this.ReadSetup();

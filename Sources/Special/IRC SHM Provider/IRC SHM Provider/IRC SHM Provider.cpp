@@ -1302,6 +1302,9 @@ int main(int argc, char* argv[])
 						if (argument != "")
 							pitstopChangeValues(pHeader, g_data, argument.c_str());
 					}
+
+					printf("[No Data]\n");
+					printf("Active=false\n");
 				}
 				else {
 					if (getArgument(request, "Setup") != "")

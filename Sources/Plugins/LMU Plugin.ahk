@@ -70,8 +70,11 @@ class LMUPlugin extends Sector397Plugin {
 
 					switch operation, false {
 						case "Get":
-							compound := SessionDatabase.getTyreCompoundName(this.Simulator[true], this.Car, this.Track
-																		  , pitstop.getTyreCompound(tyre), kUndefined)
+							compound := pitstop.getTyreCompound(tyre)
+
+							if compound
+								compound := SessionDatabase.getTyreCompoundName(this.Simulator[true], this.Car, this.Track
+																			  , compound, kUndefined)
 
 							return ((compound = kUndefined) ? normalizeCompound("Dry") : compound)
 						case "Set":

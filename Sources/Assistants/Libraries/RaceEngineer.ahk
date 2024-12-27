@@ -3066,6 +3066,9 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local prssKey, incrKey, targetPressure, index, suffix
 
+		if isDebug()
+			logMessage(kLogDebug, "Changing " . option . " to: " . values2String(", ", values*))
+
 		if this.hasPreparedPitstop() {
 			switch option, false {
 				case "Refuel":

@@ -697,6 +697,59 @@ class LMURestProvider {
 		}
 	}
 
+	class SessionData extends LMURESTProvider.RESTData {
+		GETURL {
+			Get {
+				return "?????"
+			}
+		}
+
+		Car {
+			Get {
+				return this.getCar()
+			}
+		}
+
+		Track {
+			Get {
+				return this.getTrack()
+			}
+		}
+
+		Class {
+			Get {
+				return this.getClass()
+			}
+		}
+
+		Driver {
+			Get {
+				return this.getDriver()
+			}
+		}
+
+		Team {
+			Get {
+				return this.getTeam()
+			}
+		}
+
+		getCar() {
+		}
+
+		getTrack() {
+		}
+
+		getClass() {
+		}
+
+		getDriver() {
+		}
+
+		getTeam() {
+		}
+	}
+
 	class GridData extends LMURESTProvider.RESTData {
 		iCachedCars := CaseInsenseMap()
 

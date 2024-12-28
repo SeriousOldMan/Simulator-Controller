@@ -30,10 +30,21 @@ global kLMUPlugin := "LMU"
 ;;;-------------------------------------------------------------------------;;;
 
 class LMUPlugin extends Sector397Plugin {
+	iSessionData := false
+
 	iFuelRatio := 1
 
 	iFuelLevels := []
 	iVirtualEnergyLevels := []
+
+	SessionData {
+		Get {
+			if !this.iSessionData
+				this.iSessionData := LMURESTProvider.SessionData(simulator, car, track)
+
+			return this.iSessionData
+		}
+	}
 
 	getPitstopActions(&allActions, &selectActions) {
 		allActions := CaseInsenseMap("NoRefuel", "No Refuel", "Refuel", "Refuel"
@@ -435,6 +446,7 @@ class LMUPlugin extends Sector397Plugin {
 		super.updateSession(session, force)
 
 		if (session == kSessionFinished) {
+			this.iSessionData := false
 			this.iFuelLevels := []
 			this.iVirtualEnergyLevels := []
 			this.iFuelRatio := 1
@@ -443,14 +455,15 @@ class LMUPlugin extends Sector397Plugin {
 
 	readSessionData(options := "", protocol?) {
 		local simulator := this.Simulator[true]
-		local car := this.Car
-		local track := this.Track
-		local data, setupData, tyreCompound, tyreCompoundColor, key, postFix, fuelAmount
+		local car, track, data, setupData, tyreCompound, tyreCompoundColor, key, postFix, fuelAmount
 
 		static keys := Map("All", "", "Front Left", "FrontLeft", "Front Right", "FrontRight"
 									, "Rear Left", "RearLeft", "Rear Right", "RearRight")
 
 		if InStr(options, "Setup=true") {
+			car := this.Car
+			track := this.Track
+
 			setupData := LMURESTProvider.PitstopData(simulator, car, track)
 			data := newMultiMap()
 
@@ -488,6 +501,25 @@ class LMUPlugin extends Sector397Plugin {
 		}
 		else {
 			data := super.readSessionData(options, protocol?)
+
+			car := this.SessionData.Car
+			track := this.SessionData.Track
+
+			if car {
+				setMultiMapValue(data, "Session Data", "Car", car)
+
+				this.Car := car
+			}
+			else
+				car := this.Car
+
+			if track {
+				setMultiMapValue(data, "Session Data", "Track", track)
+
+				this.Track := track
+			}
+			else
+				track := this.Track
 
 			fuelAmount := getMultiMapValue(data, "Session Data", "FuelAmount", false)
 

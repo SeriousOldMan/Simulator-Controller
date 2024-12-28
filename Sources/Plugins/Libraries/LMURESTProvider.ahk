@@ -305,14 +305,21 @@ class LMURestProvider {
 
 			if tyre {
 				if !isInteger(code) {
-					for index, candidate in tyre["settings"]
-						if ((index > 1) && (candidate["type"] = code)) {
-							tyre["currentSetting"] := (index - 1)
+					if code {
+						for index, candidate in tyre["settings"]
+							if ((index > 1) && (candidate["type"] = code)) {
+								tyre["currentSetting"] := (index - 1)
 
-							return true
-						}
+								return true
+							}
 
-					return false
+						return false
+					}
+					else {
+						tyre["currentSetting"] := code
+
+						return true
+					}
 				}
 				else {
 					tyre["currentSetting"] := code
@@ -328,7 +335,7 @@ class LMURestProvider {
 			local all := (tyre = "All")
 			local index, candidate
 
-			tyre := this.lookup((tyre = "All") ? "TIRES:" : (LMURESTProvider.TyreTypes[tyre] . " TIRE:"))
+			tyre := this.lookup(all ? "TIRES:" : (LMURESTProvider.TyreTypes[tyre] . " TIRE:"))
 
 			if tyre {
 				tyre["currentSetting"] := Min(tyre["settings"].Length - 1

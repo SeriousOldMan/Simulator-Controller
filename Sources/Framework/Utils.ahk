@@ -539,15 +539,16 @@ callSimulator(simulator, options := "", protocol?) {
 }
 
 readSimulatorData(simulator, car, track) {
-	local data := callSimulator(simulator)
+	local code := SessionDatabase.getSimulatorCode(simulator)
+	local data := callSimulator(code)
 	local ignore, section, tyreCompound, tyreCompoundColor, key, prefix, setupData
 
 	static tyreTypes := ["", "Front", "Rear", "FrontLeft", "FrontRight", "RearLeft", "RearRight"]
 	static keys := Map("All", "", "Front Left", "FrontLeft", "Front Left", "FrontLeft"
 								, "Front Left", "FrontLeft", "Front Left", "FrontLeft")
 
-	if ((simulator = "LMU") && car && track) {
-		setupData := LMURESTProvider.SetupData(simulator, car, track)
+	if ((code = "LMU") && car && track) {
+		setupData := LMURESTProvider.SetupData(code, car, track)
 
 		setMultiMapValue(data, "Setup Data", "FuelAmount", setupData.FuelAmount)
 
@@ -566,15 +567,9 @@ readSimulatorData(simulator, car, track) {
 		setMultiMapValue(data, "Setup Data", "TyrePressureFR", setupData.TyrePressure["Front Right"])
 		setMultiMapValue(data, "Setup Data", "TyrePressureRL", setupData.TyrePressure["Rear Left"])
 		setMultiMapValue(data, "Setup Data", "TyrePressureRR", setupData.TyrePressure["Rear Right"])
-
-		setupData := LMURESTProvider.PitstopData(simulator, car, track)
-
-		setMultiMapValue(data, "Setup Data", "RepairBodywork", setupData.RepairBodywork)
-		setMultiMapValue(data, "Setup Data", "RepairSuspension", setupData.RepairSuspension)
-		setMultiMapValue(data, "Setup Data", "RepairEngine", setupData.RepairEngine)
 	}
 	else
-		setMultiMapValues(data, "Setup Data", getMultiMapValues(callSimulator(simulator, "Setup=true"), "Setup Data"))
+		setMultiMapValues(data, "Setup Data", getMultiMapValues(callSimulator(code, "Setup=true"), "Setup Data"))
 
 	for ignore, section in ["Car Data", "Setup Data"]
 		for ignore, postFix in tyreTypes

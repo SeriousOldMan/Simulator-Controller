@@ -2650,7 +2650,7 @@ class RaceEngineer extends RaceAssistant {
 		if this.hasEnoughData()
 			if (this.Simulator = "Le Mans Ultimate") {
 				if this.Speaker
-					this.getSpeaker().speakPhrase("Okay")
+					this.getSpeaker().speakPhrase("Roger")
 
 				if this.RemoteHandler {
 					if !isSet(safetyFuel)

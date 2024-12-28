@@ -1762,6 +1762,8 @@ updateConfigurationForV610() {
 
 	try {
 		DirMove(kDatabaseDirectory . "User\LMU", kDatabaseDirectory . "User\LMU.archive")
+
+		deleteDirectory(kDatabaseDirectory . "User\LMU")
 	}
 	catch Any as exception {
 		logError(exception)

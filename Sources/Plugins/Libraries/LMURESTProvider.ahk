@@ -140,7 +140,21 @@ class LMURestProvider {
 			}
 
 			Set {
-				return this.setRefuelAmount(value)
+				this.setRefuelAmount(value)
+
+				return this.RefuelAmount
+			}
+		}
+
+		FuelRatio {
+			Get {
+				return this.getFuelRatio()
+			}
+
+			Set {
+				this.setFuelRatio(value)
+
+				return this.FuelRatio
 			}
 		}
 
@@ -271,6 +285,37 @@ class LMURestProvider {
 
 			if energy
 				energy["currentSetting"] := Min(100, Max(0, energy["currentSetting"] + Round(steps)))
+		}
+
+		getFuelRatio() {
+			local ratio := this.lookup("FUEL RATIO:")
+
+			return (ratio ? ratio["settings"][ratio["currentSetting"] + 1]["text"] : false)
+		}
+
+		setFuelRatio(value) {
+			local ratio := this.lookup("FUEL RATIO:")
+
+			value := Round(value, 2)
+
+			if ratio {
+				for index, candidate in ratio["settings"] {
+					candidate := candidate["text"]
+
+					if ((index = 1) && (value < candidate)) {
+						ratio["currentSetting"] := 0
+
+						return
+					}
+					else if (value = candidate) {
+						ratio["currentSetting"] := (index - 1)
+
+						return
+					}
+				}
+
+				ratio["currentSetting"] := (ratio["settings"].Length - 1)
+			}
 		}
 
 		getTyreCompound(tyre) {

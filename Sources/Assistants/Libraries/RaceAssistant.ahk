@@ -2148,6 +2148,8 @@ class RaceAssistant extends ConfigurationItem {
 
 		sessionTimeRemaining := getDeprecatedValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
 
+		knowledgeBase.setFact("Session.Settings.Fuel.Max", getMultiMapValue(data, "Session Data", "FuelAmount", 0))
+
 		knowledgeBase.setFact("Session.Time.Remaining", sessionTimeRemaining)
 		knowledgeBase.setFact("Session.Lap.Remaining", getDeprecatedValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0))
 
@@ -2395,6 +2397,8 @@ class RaceAssistant extends ConfigurationItem {
 
 		if (lapPenalty = kUndefined)
 			lapPenalty := getMultiMapValue(data, "Stint Data", "Penalty", false)
+
+		knowledgeBase.setFact("Session.Settings.Fuel.Max", getMultiMapValue(data, "Session Data", "FuelAmount", 0))
 
 		knowledgeBase.setFact("Lap.Valid", lapValid)
 		knowledgeBase.setFact("Lap.Penalty", lapPenalty)

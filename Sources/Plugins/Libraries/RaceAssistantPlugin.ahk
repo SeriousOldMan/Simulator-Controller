@@ -1511,10 +1511,12 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		car := getMultiMapValue(data, "Session Data", "Car")
 		track := getMultiMapValue(data, "Session Data", "Track")
 
-		maxFuel := settingsDB.getSettingValue(simulator, car, track, "*", "Session Settings", "Fuel.Amount", kUndefined)
+		if !getMultiMapValue(data, "Session Data", "FuelAmount", false) {
+			maxFuel := settingsDB.getSettingValue(simulator, car, track, "*", "Session Settings", "Fuel.Amount", kUndefined)
 
-		if (maxFuel && (maxFuel != kUndefined) && (maxFuel != ""))
-			setMultiMapValue(data, "Session Data", "FuelAmount", maxFuel)
+			if (maxFuel && (maxFuel != kUndefined) && (maxFuel != ""))
+				setMultiMapValue(data, "Session Data", "FuelAmount", maxFuel)
+		}
 
 		if RaceAssistantPlugin.Simulator
 			RaceAssistantPlugin.Simulator.updateTelemetryData(data)

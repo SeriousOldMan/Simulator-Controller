@@ -1320,7 +1320,6 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		trackData := sessionDB.getTrackData(this.Code, this.Track)
 
 		return this.readSessionData(trackData ? ("Track=" . trackData) : "")
-
 	}
 
 	acquirePositionsData(telemetryData, finished := false) {

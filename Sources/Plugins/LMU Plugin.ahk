@@ -29,6 +29,8 @@ global kLMUPlugin := "LMU"
 ;;;-------------------------------------------------------------------------;;;
 
 class LMUPlugin extends Sector397Plugin {
+	iFuelRatio := 1
+
 	getPitstopActions(&allActions, &selectActions) {
 		allActions := CaseInsenseMap("NoRefuel", "No Refuel", "Refuel", "Refuel"
 								   , "TyreCompound", "Tyre Compound"
@@ -382,11 +384,18 @@ class LMUPlugin extends Sector397Plugin {
 		return (driver ? driver.Name : super.parseDriverName(carName, forName, surName, nickName))
 	}
 
+	updateSession(session, force := false) {
+		super.updateSession(session, force)
+
+		if (session == kSessionFinished)
+			this.iFuelRatio := 1
+	}
+
 	readSessionData(options := "", protocol?) {
 		local simulator := this.Simulator[true]
 		local car := this.Car
 		local track := this.Track
-		local data, setupData, tyreCompound, tyreCompoundColor, key, postFix
+		local data, setupData, tyreCompound, tyreCompoundColor, key, postFix, fuelAmount
 
 		static keys := Map("All", "", "Front Left", "FrontLeft", "Front Right", "FrontRight"
 									, "Rear Left", "RearLeft", "Rear Right", "RearRight")
@@ -424,9 +433,16 @@ class LMUPlugin extends Sector397Plugin {
 			setMultiMapValue(data, "Setup Data", "RepairBodywork", setupData.RepairBodywork)
 			setMultiMapValue(data, "Setup Data", "RepairSuspension", setupData.RepairSuspension)
 			setMultiMapValue(data, "Setup Data", "RepairEngine", setupData.RepairEngine)
+
+			this.iFuelRatio := setupData.FuelRatio
 		}
 		else {
 			data := super.readSessionData(options, protocol?)
+
+			fuelAmount := getMultiMapValue(data, "Session Data", "FuelAmount", false)
+
+			if fuelAmount
+				setMultiMapValue(data, "Session Data", "FuelAmount", Round(this.iFuelRatio * 100, 1))
 
 			for key, postFix in keys {
 				tyreCompound := getMultiMapValue(data, "Car Data", "TyreCompound" . postFix, kUndefined)

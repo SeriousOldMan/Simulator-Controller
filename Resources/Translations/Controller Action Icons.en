@@ -651,6 +651,7 @@ Reject.Activate=
 Interrupt.Activate=
 Mute.Activate=
 Unmute.Activate=
+FuelRatioOptimize.Activate=
 PitstopPlan.Activate=
 DriverSwapPlan.Activate=
 PitstopPrepare.Activate=

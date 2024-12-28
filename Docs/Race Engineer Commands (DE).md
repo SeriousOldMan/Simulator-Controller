@@ -99,6 +99,8 @@ Announcements=Benzinmangel Warnungen, Schadenswarnungen, Schadensanalysen, Wette
 
 3.  Boxenstopp
 
+	(KoennenWir) {das Kraftstoffverhältnis, die Kraftstoffmenge, die Benzinmenge} {optimieren, neu berechnen, berechnen}
+	
 	[(KoennenWir) {den Boxenstopp planen, den Plan für den Boxenstopp erstellen}, (KannstDu) (Mir) den Boxenstopp Plan {durchsagen, durchsagen bitte}]
 	
 	[(KoennenWir) {den Fahrerwechsel planen, den Plan für den Fahrerwechsel erstellen}, (KannstDu) (Mir) den Fahrerwechsel Plan {durchsagen, durchsagen bitte}]

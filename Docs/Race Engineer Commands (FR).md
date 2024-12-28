@@ -99,6 +99,8 @@ Announcements=avertissements de carburant, avertissements de dommages, analyse d
 
 3.  Arrêt au stand
 
+	(CanWe) {optimiser, recalculer, calculer} [le rapport carburant, la quantité de carburant, la quantité d'essence}
+	
 	(CanWe) {planifier l'arrêt au stand, créer un plan pour l'arrêt au stand, créer un plan d'arrêt au stand, proposer un plan d'arrêt au stand}
 
 	(CanWe) {planifier l'échange de pilote, créer un plan pour l'échange de pilote, créer un plan d'échange de pilote, proposer un plan d'échange de pilote}

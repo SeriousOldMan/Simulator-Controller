@@ -669,6 +669,32 @@ class LMURestProvider {
 		}
 	}
 
+	class ConsumptionData extends LMURESTProvider.RESTData {
+		GETURL {
+			Get {
+				return "????"
+			}
+		}
+
+		VirtualEnergyConsumption {
+			Get {
+				return this.getVirtualEnergyConsumption()
+			}
+		}
+
+		FuelConsumption {
+			Get {
+				return this.getFuelConsumption()
+			}
+		}
+
+		getVirtualEnergyConsumption() {
+		}
+
+		getFuelConsumption() {
+		}
+	}
+
 	class GridData extends LMURESTProvider.RESTData {
 		iCachedCars := CaseInsenseMap()
 

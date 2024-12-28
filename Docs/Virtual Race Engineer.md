@@ -439,6 +439,8 @@ The following statistical models are currently implemented:
   
      Depending on the number of remaining laps and average fuel comsumption, Jona derives the exact amount of fuel required for the next stint. As for the tyre pressures, the lap weight of past laps may be configured for the fuel average calculation, so the remarks above on statistical window and damping factor are valid here as well.
 	 
+	 When using *Le Mans Ultimate*, the amount of fuel to be added depends on the virtual energy consumption and the so called fuel ratio. Make sure you have read the [special notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#special-notes-for-le-mans-ultimate) which explains this aspect in detail. If you want to optimize the fuel ratio, once your fuel consumption is settled, you can use the voice command: "Can you recalculate the fuel ratio?"
+	 
   4. Damage related lap time degration
   
      After Jona detects a new damage, the devlopment of your lap times are observed and Jona might suggest an adopted pitstop strategy, depending on remaining stint time and the delta time necessary for a pitstop. The underlying model is quite complex and recognizes and excludes special lap situations like pitstops, accidents, and so on, from the average laptime calculation. All laps of the current stint (except a couple of laps at the beginning) are considered by the algorithm and the average lap time incl. the standard deviation before the accident will be taken as the reference lap time. This means, that the computation will fail, if you had an accident very early in your stint, since you never had the chance to set a good reference lap.

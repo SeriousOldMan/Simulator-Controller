@@ -213,6 +213,10 @@ class RaceEngineer extends RaceAssistant {
 		planDriverSwap(arguments*) {
 			this.callRemote("planDriverSwap", arguments*)
 		}
+
+		optimizeFuelRatio(arguments*) {
+			this.callRemote("optimizeFuelRatio", arguments*)
+		}
 	}
 
 	Knowledge {
@@ -347,6 +351,8 @@ class RaceEngineer extends RaceAssistant {
 				this.tyreInfoRecognized(concatenate(Array(this.getSpeaker().Fragments["Pressures"]), words))
 			case "Weather":
 				this.weatherRecognized(words)
+			case "FuelRatioOptimize":
+				this.fuelRatioOptimizeRecognized(words)
 			case "PitstopPlan":
 				this.clearContinuation()
 
@@ -833,6 +839,10 @@ class RaceEngineer extends RaceAssistant {
 			default:
 				super.requestInformation(category, arguments*)
 		}
+	}
+
+	fuelRatioOptimizeRecognized(words) {
+		this.optimizeFuelRatio()
 	}
 
 	lapInfoRecognized(words) {
@@ -2632,6 +2642,25 @@ class RaceEngineer extends RaceAssistant {
 		}
 		else
 			return false
+	}
+
+	optimizeFuelRatio(safetyFuel?) {
+		local knowledgeBase := this.KnowledgeBase
+
+		if this.hasEnoughData()
+			if (this.Simulator = "Le Mans Ultimate") {
+				if this.Speaker
+					this.getSpeaker().speakPhrase("Okay")
+
+				if this.RemoteHandler {
+					if !isSet(safetyFuel)
+						safetyFuel := knowledgeBase.getValue("Session.Settings.Fuel.SafetyMargin", 5)
+
+					this.RemoteHandler.optimizeFuelRatio(safetyFuel)
+				}
+			}
+			else if this.Speaker
+				this.getSpeaker().speakPhrase("Repeat")
 	}
 
 	planPitstop(optionsOrLap := kUndefined, refuelAmount := kUndefined

@@ -295,6 +295,25 @@ class LMUPlugin extends Sector397Plugin {
 		}
 	}
 
+	addLap(lap, data) {
+		super.addLap(lap, data)
+
+		if getMultiMapValue(this.Settings, "Simulator.Le Mans Ultimate", "Pitstop.Fuel.Ratio", false)
+			Task.startTask(ObjBindMethod(this, "optimizeFuelRatio"), 2000, kLowPriority)
+	}
+
+	optimizeFuelRatio(safetyFuel?) {
+		local pitstop := LMURESTProvider.PitstopData(this.Simulator[true], this.Car, this.Track)
+		local energyConsumption := pitstop.VirtualEnergyConsumption()
+		local fuelConsumption := pitstop.FuelConsumption
+
+		if !isSet(safetyFuel)
+			safetyFuel := getMultiMapValue(this.Settings, "Session Settings", "Fuel.SafetyMargin", 5)
+
+		if (energyConsumption && fuelConsumption)
+			pitstop.setFuelRatio(((100 / energyConsumption * fuelConsumption) + safetyFuel) / 100)
+	}
+
 	setPitstopRefuelAmount(pitstopNumber, liters) {
 		super.setPitstopRefuelAmount(pitstopNumber, liters)
 

@@ -1934,6 +1934,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			writeMultiMap(settingsFileName, settings)
 
 			this.RaceAssistant.updateSettings(settingsFileName)
+
+			if this.Simulator
+				this.Simulator.Settings := settings
 		}
 	}
 
@@ -2039,6 +2042,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			writeMultiMap(dataFile, data)
 
 			this.RaceAssistant.addLap(lap, dataFile)
+
+			if this.Simulator
+				this.Simulator.addLap(lap, data)
 		}
 	}
 
@@ -2051,6 +2057,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			writeMultiMap(dataFile, data)
 
 			this.RaceAssistant.updateLap(lap, dataFile)
+
+			if this.Simulator
+				this.Simulator.addLap(lap, data)
 		}
 	}
 

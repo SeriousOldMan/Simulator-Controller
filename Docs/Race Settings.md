@@ -194,16 +194,26 @@ The following settings are only available, if you have selected the correspondin
 |            | Repair duration for suspension damage    | Float   | 31.0                            | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the suspension at a pitstop. |
 |            | Repair duration for engine damage        | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the engine at a pitstop. |
 
-3. *rFactor 2* and *Le Mans Ultimate*
+3. *rFactor 2*
 
 | Category   | Setting                                  | Type    | Default                         | Description  |
 |------------|------------------------------------------|---------|---------------------------------|--------------|
-| Data       | Pitstop setup update interval            | Integer | 60, 20                          | Specifies how often the current choices in the Pitstop menu are requested. Since the API call moves the cursor in the menu (at least for *rFactor 2*, it can be very annoying for the driver, when this is done too often. If **0**, the data is never requested. Otherwise specify a number of seconds to wait between each request. Default is 60 seconds for *rFactor 2* and 20 for *Le Mans Ultimate*. |
+| Data       | Pitstop setup update interval            | Integer | 60                              | Specifies how often the current choices in the Pitstop menu are requested. Since the API call moves the cursor in the menu (at least for *rFactor 2*, it can be very annoying for the driver, when this is done too often. If **0**, the data is never requested. Otherwise specify a number of seconds to wait between each request. |
 | Pitstop    | Repair duration for bodywork damage      | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the bodywork at a pitstop. |
 |            | Repair duration for suspension damage    | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the suspension at a pitstop. |
 |            | Repair duration for engine damage        | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the engine at a pitstop. |
 
-4. *Automobilista 2* and *iRacing*
+4. *Le Mans Ultimate*
+
+| Category   | Setting                                  | Type    | Default                         | Description  |
+|------------|------------------------------------------|---------|---------------------------------|--------------|
+| Data       | Pitstop setup update interval            | Integer | 20                              | Specifies how often the current choices in the Pitstop menu are requested. If **0**, the data is never requested. Otherwise specify a number of seconds to wait between each request. |
+| Engineer    | Recalculate fuel ratio                  | Boolean | false                           | If *true*, the fuel ratio is recalulated automatically from time to time and especially before a pitstop is prepared. There is also a voice command and a controller action available to trigger this manually. |
+| Pitstop    | Repair duration for bodywork damage      | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the bodywork at a pitstop. |
+|            | Repair duration for suspension damage    | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the suspension at a pitstop. |
+|            | Repair duration for engine damage        | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the engine at a pitstop. |
+
+5. *Automobilista 2* and *iRacing*
 
 | Category   | Setting                                  | Type    | Default                         | Description  |
 |------------|------------------------------------------|---------|---------------------------------|--------------|
@@ -213,7 +223,7 @@ The following settings are only available, if you have selected the correspondin
 |            | Repair duration for engine damage        | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the engine at a pitstop. |
 | Track      | Type                                     | Circuit, Rally, Hill, Street | Circuit    | Defines the type of the specific track. ALl closed tracks are of type *Circuit*, all open tracks are of type *Rally*. |
 
-5. *Project Cars 2* and *RaceRoom Racing Experience*
+6. *Project Cars 2* and *RaceRoom Racing Experience*
 
 | Category   | Setting                                  | Type    | Default                         | Description  |
 |------------|------------------------------------------|---------|---------------------------------|--------------|

@@ -99,6 +99,8 @@ Information=avvisi carburante, avvisi danni, analisi danni, avvisi meteo, avvisi
 
 3.  Pitstop
 
+	(CanWe) {ottimizzare, ricalcolare, calcolare} {il rapporto carburante, la quantità di carburante, la quantità di benzina}
+	
 	(CanWe) {pianificare il pitstop, creare un piano per il pitstop, creare un piano pitstop, elaborare un piano per il pitstop}
 
 	(CanWe) {pianificare il cambio pilota, creare un piano per il cambio pilota, creare un piano di cambio pilota, elaborare un piano per il cambio pilota}

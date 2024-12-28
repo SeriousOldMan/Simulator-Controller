@@ -9,9 +9,10 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\Libraries\Math.ahk"
+#Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "Libraries\SimulatorPlugin.ahk"
 #Include "Libraries\LMURESTProvider.ahk"
-#Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "RF2 Plugin.ahk"
 
 
@@ -30,6 +31,9 @@ global kLMUPlugin := "LMU"
 
 class LMUPlugin extends Sector397Plugin {
 	iFuelRatio := 1
+
+	iFuelLevels := []
+	iVirtualEnergyLevels := []
 
 	getPitstopActions(&allActions, &selectActions) {
 		allActions := CaseInsenseMap("NoRefuel", "No Refuel", "Refuel", "Refuel"
@@ -298,20 +302,44 @@ class LMUPlugin extends Sector397Plugin {
 	addLap(lap, data) {
 		super.addLap(lap, data)
 
+		this.iFuelLevels.Push(getMultiMapValue(data, "Car Data", "FuelRemaining", 0))
+		this.iVirtualEnergyLevels.Push(LMURESTProvider.EnergyData(this.Simulator[true], this.Car, this.Track).RemainingVirtualEnergy)
+
+		while (this.iFuelLevels.Length > 10) {
+			this.iFuelLevels.RemoveAt(1)
+			this.iVirtualEnergyLevels.RemoveAt(1)
+		}
+
 		if getMultiMapValue(this.Settings, "Simulator.Le Mans Ultimate", "Pitstop.Fuel.Ratio", false)
 			Task.startTask(ObjBindMethod(this, "optimizeFuelRatio"), 2000, kLowPriority)
 	}
 
 	optimizeFuelRatio(safetyFuel?) {
-		local pitstop := LMURESTProvider.PitstopData(this.Simulator[true], this.Car, this.Track)
-		local energyConsumption := pitstop.VirtualEnergyConsumption()
-		local fuelConsumption := pitstop.FuelConsumption
+		local pitstop, energyConsumption, fuelConsumption
+
+		computeConsumption(series) {
+			local values := []
+
+			loop series.Length
+				if (A_Index > 1)
+					values.Push(series[A_Index - 1] - series[A_Index])
+
+			return average(values)
+		}
+
+		energyConsumption := computeConsumption(this.iVirtualEnergyLevels)
+		fuelConsumption := computeConsumption(this.iFuelLevels)
 
 		if !isSet(safetyFuel)
 			safetyFuel := getMultiMapValue(this.Settings, "Session Settings", "Fuel.SafetyMargin", 5)
 
-		if (energyConsumption && fuelConsumption)
+		if (energyConsumption && fuelConsumption) {
+			pitstop := LMURESTProvider.PitstopData(this.Simulator[true], this.Car, this.Track)
+
 			pitstop.setFuelRatio(((100 / energyConsumption * fuelConsumption) + safetyFuel) / 100)
+
+			pitstop.write()
+		}
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, liters) {
@@ -406,8 +434,11 @@ class LMUPlugin extends Sector397Plugin {
 	updateSession(session, force := false) {
 		super.updateSession(session, force)
 
-		if (session == kSessionFinished)
+		if (session == kSessionFinished) {
+			this.iFuelLevels := []
+			this.iVirtualEnergyLevels := []
 			this.iFuelRatio := 1
+		}
 	}
 
 	readSessionData(options := "", protocol?) {

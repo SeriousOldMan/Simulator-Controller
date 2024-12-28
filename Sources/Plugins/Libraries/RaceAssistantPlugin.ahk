@@ -1404,6 +1404,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			setMultiMapValue(telemetryData, "Stint Data", "StartTime", RaceAssistantPlugin.sStintStartTime)
 		}
 
+		if this.Simulator
+			this.Simulator.addLap(RaceAssistantPlugin.LastLap, data)
+
 		if RaceAssistantPlugin.TeamSessionActive
 			RaceAssistantPlugin.TeamServer.addLap(RaceAssistantPlugin.LastLap, telemetryData, positionsData)
 
@@ -1419,6 +1422,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			setMultiMapValue(data, "Stint Data", "StartTime", RaceAssistantPlugin.sStintStartTime)
 			setMultiMapValue(telemetryData, "Stint Data", "StartTime", RaceAssistantPlugin.sStintStartTime)
 		}
+
+		if this.Simulator
+			this.Simulator.updateLap(RaceAssistantPlugin.LastLap, data)
 
 		if RaceAssistantPlugin.TeamSessionActive
 			RaceAssistantPlugin.TeamServer.updateLap(RaceAssistantPlugin.LastLap, RaceAssistantPlugin.LapRunning, data, telemetryData, positionsData)
@@ -2042,9 +2048,6 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			writeMultiMap(dataFile, data)
 
 			this.RaceAssistant.addLap(lap, dataFile)
-
-			if this.Simulator
-				this.Simulator.addLap(lap, data)
 		}
 	}
 
@@ -2057,9 +2060,6 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			writeMultiMap(dataFile, data)
 
 			this.RaceAssistant.updateLap(lap, dataFile)
-
-			if this.Simulator
-				this.Simulator.addLap(lap, data)
 		}
 	}
 

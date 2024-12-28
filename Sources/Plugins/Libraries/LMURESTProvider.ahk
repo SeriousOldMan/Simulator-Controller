@@ -669,29 +669,31 @@ class LMURestProvider {
 		}
 	}
 
-	class ConsumptionData extends LMURESTProvider.RESTData {
+	class EnergyData extends LMURESTProvider.RESTData {
 		GETURL {
 			Get {
-				return "????"
+				return "http://localhost:6397/rest/garage/UIScreen/PitCarReview"
 			}
 		}
 
-		VirtualEnergyConsumption {
+		RemainingVirtualEnergy {
 			Get {
-				return this.getVirtualEnergyConsumption()
+				return this.getRemainingVirtualEnergy()
 			}
 		}
 
-		FuelConsumption {
+		RemainingFuelAmount {
 			Get {
-				return this.getFuelConsumption()
+				return this.getRemainingFuelAmount()
 			}
 		}
 
-		getVirtualEnergyConsumption() {
+		getRemainingVirtualEnergy() {
+			return (this.Data.Has("fuelInfo") ? Round(this.Data["fuelInfo"]["currentVirtualEnergy"] / this.Data["fuelInfo"]["maxVirtualEnergy"] * 100, 2) : false)
 		}
 
-		getFuelConsumption() {
+		getFuelAmount() {
+			return (this.Data.Has("fuelInfo") ? Round(this.Data["fuelInfo"]["currentFuel"], 2) : false)
 		}
 	}
 

@@ -140,9 +140,9 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 			else if (this.Plugin.RaceEngineer && (this.Action = "DriverSwapPlan"))
 				this.Plugin.planDriverSwap()
 			else if (this.Plugin.RaceEngineer && (this.Action = "PitstopPrepare"))
-				this.Plugin.optimizeFuelRatio("Engineer")
-			else if (this.Plugin.RaceEngineer && (this.Action = "FuelRatioOptimize"))
 				this.Plugin.preparePitstop()
+			else if (this.Plugin.RaceEngineer && (this.Action = "FuelRatioOptimize"))
+				this.Plugin.optimizeFuelRatio("Engineer")
 			else
 				super.fireAction(function, trigger)
 		}

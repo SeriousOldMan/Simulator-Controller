@@ -30,19 +30,39 @@ global kLMUPlugin := "LMU"
 ;;;-------------------------------------------------------------------------;;;
 
 class LMUPlugin extends Sector397Plugin {
-	iSessionData := false
+	iTrackData := false
+	iTeamData := false
+	iGridData := false
 
 	iFuelRatio := 1
 
 	iFuelLevels := []
 	iVirtualEnergyLevels := []
 
-	SessionData {
+	TeamData {
 		Get {
-			if !this.iSessionData
-				this.iSessionData := LMURESTProvider.SessionData(simulator, car, track)
+			if !this.iTeamData
+				this.iTeamData := LMURESTProvider.TeamData()
 
-			return this.iSessionData
+			return this.iTeamData
+		}
+	}
+
+	TrackData {
+		Get {
+			if !this.iTrackData
+				this.iTrackData := LMURESTProvider.TrackData()
+
+			return this.iTrackData
+		}
+	}
+
+	GridData {
+		Get {
+			if !this.iGridData
+				this.iGridData := LMURESTProvider.GridData()
+
+			return this.iGridData
 		}
 	}
 
@@ -402,16 +422,9 @@ class LMUPlugin extends Sector397Plugin {
 	}
 
 	parseCarName(carName, &model?, &nr?, &category?, &team?) {
-		static gridData := LMURESTProvider.GridData(this.Simulator[true], this.Car, this.Track)
+		local gridData := this.GridData
 
 		model := gridData.Car[carName]
-
-		if !model {
-			gridData := LMURESTProvider.GridData(this.Simulator[true], this.Car, this.Track)
-
-			model := gridData.Car[carName]
-		}
-
 		team := gridData.Team[carName]
 
 		if ((carName != "") && isNumber(SubStr(carName, 1, 1)))
@@ -430,10 +443,8 @@ class LMUPlugin extends Sector397Plugin {
 	parseDriverName(carName, forName, surName, nickName) {
 		local driver
 
-		static gridData := LMURESTProvider.GridData(this.Simulator[true], this.Car, this.Track)
-
 		try {
-			driver := gridData.Drivers[carName][1]
+			driver := this.GridData.Drivers[carName][1]
 		}
 		catch Any {
 			driver := false
@@ -446,7 +457,10 @@ class LMUPlugin extends Sector397Plugin {
 		super.updateSession(session, force)
 
 		if (session == kSessionFinished) {
-			this.iSessionData := false
+			this.iTrackData := false
+			this.iTeamData := false
+			this.iGridData := false
+
 			this.iFuelLevels := []
 			this.iVirtualEnergyLevels := []
 			this.iFuelRatio := 1
@@ -502,22 +516,16 @@ class LMUPlugin extends Sector397Plugin {
 		else {
 			data := super.readSessionData(options, protocol?)
 
-			car := this.SessionData.Car
-			track := this.SessionData.Track
+			car := this.TeamData.Car
+			track := this.TrackData.Track
 
-			if car {
+			if car
 				setMultiMapValue(data, "Session Data", "Car", car)
-
-				this.Car := car
-			}
 			else
 				car := this.Car
 
-			if track {
+			if track
 				setMultiMapValue(data, "Session Data", "Track", track)
-
-				this.Track := track
-			}
 			else
 				track := this.Track
 

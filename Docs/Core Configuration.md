@@ -28,15 +28,15 @@ Built on top of the Task framework, the Message Manager handles the communcation
 | Messages     | Schedule | 200 | The number of milliseconds to wait between each run of the message scheduler, which sends messages to and receives messages from other processes of Simulator Controller. |
 |      | Dispatch | 100 | All received messages are placed in a queue for processing. This setting defines the number of milliseconds to let other activities run between each message processing. |
 
-The next group of settings are used mainly for development purposes. It allows to control the level of self-diagnosing of the framework during development and testing, but can also be used to track down really complex bugs in the production code. Please note, that some of these settings can also be toggled using the choices in the respective application menu during runtime.
+The next group of settings are used mainly for development purposes. It allows to control the level of self-diagnosing of the framework during development and testing, but can also be used to track down really complex bugs in the production code. Please note, that some of these settings can also be toggled using the choices in the respective application menus in the tray of the Windows task bar during runtime.
 
 | Category | Setting | Default | Description |
 |----------|---------|---------|-------------|
 | Build     | Configuration | Production | Chooses the runtime mode (*Production* or *Development*) of the framework. This normaly determined during compile time, but it is possible to activate parts of the *Development* mode even for production code.  |
-| Debug     | Debug | *depending on configuration* | Specifies, whether the framework is running in a special debug mode. Default is *false* for a production (release) configuration and *true* for a development configuration. This option overwrites the choice as set in "Simulator Configuration" and it can be switched using the application menu. |
+| Debug     | Debug | *depending on configuration* | Specifies, whether the framework is running in a special debug mode. Default is *False* for a production (release) configuration and *True* for a development configuration. This option overwrites the choice as set in "Simulator Configuration" and it can be switched using the application menu. |
 |      | LogLevel | *depending on configuration* | Defines the level of verbosity of the logging messages. Allowed values are *Debug*, *Info*, *Warn*, *Critical* and *Off*. Defult is *Warn* for production configuration and *Debug* for devlopment configuration. This option overwrites the choice as set in "Simulator Configuration" and it can be switched using the application menu. |
 |      | LogStartup | False | If *True*, special logging is enabled which gives you insights into the timing during the startup process of any of the applications of Simulator Controller. Use this, if any of the applications seems to hang during startup. |
-|      | Verbose | *depending on configuration* | Enables or disables additional and very verbose diagnostic output. Never use it in a real race, since error dialogs might popup while driving. Default is *true* for non-compiled code, when *Debug* is enabled, *false* otherwise. |
+|      | Verbose | *depending on configuration* | Enables or disables additional and very verbose diagnostic output. Never use it in a real race, since error dialogs might popup while driving. Default is *True* for non-compiled code, when *Debug* is enabled, *False* otherwise. |
 
 The following group let's you control a couple of aspects of the voice recognition engine.
 
@@ -46,7 +46,7 @@ The following group let's you control a couple of aspects of the voice recogniti
 |      | Activation Speed  | 500 (Windows default)    | The maximum number of milliseconds between a click or press on the Push-To-Talk, so that an activation mode is triggered. Default is the Windows setting for the mouse double click speed (typically 500 ms, if not changed by the user). |
 |      | High Rating  | 0.85     | This value represents the Sorenson-Dice rating for a good enough match of a command phrase, when comparing a spoken command against the registered command syntax. The range of the rating is from 0.0 (no match at all) up to 1.0 (perfect word by word match). When a registered phrase is found with a *High Rating* quality index or higher, this command is used, regardless, whether there are remaining phrases to be tested. By tuning this setting, you can specify how precise the spoken commands must follow the registered syntax. |
 |      | Low Rating | 0.7     | This value represents the Sorenson-Dice rating a registered command syntax must reach, when compared to a spoken command, so that this command is even considered. The range of the rating is from 0.0 (no match at all) up to 1.0 (perfect word by word match). |
-|      | Interruptable | false | If not *false*, the currently active speech will be interrupted, if Push-to-Talk is pressed. If the value is "All", all currently pending speeches will be discarded as well, before the listener is activated. |
+|      | Interruptable | False | If not *False*, the currently active speech will be interrupted, if Push-to-Talk is pressed. If the value is "All", all currently pending speeches will be discarded as well, before the listener is activated. |
 
 
 And finally a couple of other settings which configure low level components of Simulator Controller:

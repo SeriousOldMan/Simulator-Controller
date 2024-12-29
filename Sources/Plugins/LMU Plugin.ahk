@@ -385,6 +385,15 @@ class LMUPlugin extends Sector397Plugin {
 		}
 	}
 
+	performPitstop(lapNumber, options) {
+		super.performPitstop(lapNumber, options)
+
+		this.iLastFuelAmount := 0
+
+		this.iFuelLevels := []
+		this.iVirtualEnergyLevels := []
+	}
+
 	setPitstopRefuelAmount(pitstopNumber, liters) {
 		super.setPitstopRefuelAmount(pitstopNumber, liters)
 
@@ -496,7 +505,7 @@ class LMUPlugin extends Sector397Plugin {
 			setupData := LMURESTProvider.PitstopData(simulator, car, track)
 			data := newMultiMap()
 
-			setMultiMapValue(data, "Setup Data", "FuelAmount", getOptionHandler("Refuel").Call("Get", , setupData))
+			setMultiMapValue(data, "Setup Data", "FuelAmount", this.getOptionHandler("Refuel").Call("Get", , setupData))
 
 			for key, postFix in keys {
 				tyreCompound := setupData.TyreCompound[key]

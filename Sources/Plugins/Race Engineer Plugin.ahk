@@ -193,6 +193,19 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 		return RaceEngineerPlugin.RemoteRaceEngineer(this, pid)
 	}
 
+	updateActions(session) {
+		local ignore, theAction
+
+		super.updateActions(session)
+
+		for ignore, theAction in this.Actions
+			if (isInstance(theAction, RaceAssistantPlugin.RaceAssistantAction) && (theAction.Action = "FuelRatioOptimize")
+			 && (!this.Simulator || (this.Simulator.Simulator[true] != "Le Mans Ultimate"))) {
+				theAction.Function.disable(kAllTrigger, theAction)
+				theAction.Function.setLabel(this.actionLabel(theAction), "Gray")
+			}
+	}
+
 	loadSettings(simulator, car, track, data := false, settings := false) {
 		local tyresDB, simulatorName, compound, compoundColor
 		local tpSettings, pressures, certainty, collectPressure, pitstopService, ignore, session

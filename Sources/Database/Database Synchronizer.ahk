@@ -40,6 +40,13 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                   Private Variables Declaration Section                 ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global gSynchronizing := false
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -335,6 +342,13 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 }
 
 synchronizeCommunityDatabase(id, usePressures, useSetups, useStrategies, useTelemetries) {
+	global gSynchronizing
+
+	if gSynchronizing
+		return Task.CurrentTask
+	else
+		gSynchronizing := true
+
 	synchronizeDatabase("Stop")
 
 	Task.CurrentTask.Critical := true
@@ -347,6 +361,8 @@ synchronizeCommunityDatabase(id, usePressures, useSetups, useStrategies, useTele
 		Task.CurrentTask.Critical := false
 
 		synchronizeDatabase("Start")
+
+		gSynchronizing := false
 	}
 
 	Task.CurrentTask.Sleep := (24 * 60 * 60 * 1000)
@@ -355,6 +371,13 @@ synchronizeCommunityDatabase(id, usePressures, useSetups, useStrategies, useTele
 }
 
 synchronizeSessionDatabase(minutes) {
+	global gSynchronizing
+
+	if gSynchronizing
+		return Task.CurrentTask
+	else
+		gSynchronizing := true
+
 	Task.CurrentTask.Critical := true
 
 	try {
@@ -365,6 +388,8 @@ synchronizeSessionDatabase(minutes) {
 	}
 	finally {
 		Task.CurrentTask.Critical := false
+
+		gSynchronizing := false
 	}
 
 	Task.CurrentTask.Sleep := (minutes * 60000)
@@ -390,7 +415,7 @@ updateSessionDatabase() {
 		id := inList(A_Args, "-ID")
 
 		if id
-			PeriodicTask(synchronizeCommunityDatabase.Bind(A_Args[id + 1], usePressures, useSetups, useStrategies, useTelemetries), 10000, kLowPriority).start()
+			PeriodicTask(synchronizeCommunityDatabase.Bind(A_Args[id + 1], usePressures, useSetups, useStrategies, useTelemetries), 240000, kLowPriority).start()
 
 		minutes := inList(A_Args, "-Synchronize")
 

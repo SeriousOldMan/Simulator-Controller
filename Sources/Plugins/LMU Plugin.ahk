@@ -362,7 +362,7 @@ class LMUPlugin extends Sector397Plugin {
 		fuelConsumption := computeConsumption(this.iFuelLevels)
 
 		if !isSet(safetyFuel)
-			safetyFuel := getMultiMapValue(this.Settings, "Session Settings", "Fuel.SafetyMargin", 5)
+			safetyFuel := getMultiMapValue(this.Settings, "Session Settings", "Fuel.SafetyMargin", 4)
 
 		if (energyConsumption && fuelConsumption) {
 			pitstop := LMURESTProvider.PitstopData(this.Simulator[true], this.Car, this.Track)

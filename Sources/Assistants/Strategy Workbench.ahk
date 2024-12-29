@@ -2799,7 +2799,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 							this.Control["pitstopFuelServiceEdit"].Text := displayValue("Float", value)
 							this.Control["pitstopServiceDropDown"].Choose((getMultiMapValue(settings, "Strategy Settings", "Service.Order", "Simultaneous") = "Simultaneous") ? 1 : 2)
-							this.Control["safetyFuelEdit"].Text := displayValue("Float", convertUnit("Volume", getMultiMapValue(settings, "Session Settings", "Fuel.SafetyMargin", 3)), 0)
+							this.Control["safetyFuelEdit"].Text := displayValue("Float", convertUnit("Volume", getMultiMapValue(settings, "Session Settings", "Fuel.SafetyMargin", 4)), 0)
 
 							tyreCompound := getMultiMapValue(settings, "Session Setup", "Tyre.Compound", "Dry")
 							tyreCompoundColor := getMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")

@@ -134,15 +134,15 @@ class LMURestProvider {
 			}
 		}
 
-		RefuelAmount {
+		RefuelLevel {
 			Get {
-				return this.getRefuelAmount()
+				return this.getRefuelLevel()
 			}
 
 			Set {
-				this.setRefuelAmount(value)
+				this.setRefuelLevel(value)
 
-				return this.RefuelAmount
+				return this.RefuelLevel
 			}
 		}
 
@@ -262,7 +262,7 @@ class LMURestProvider {
 			return false
 		}
 
-		getRefuelAmount() {
+		getRefuelLevel() {
 			local ratio := this.lookup("FUEL RATIO:")
 			local energy := this.lookup("VIRTUAL ENERGY:")
 
@@ -272,7 +272,7 @@ class LMURestProvider {
 				return false
 		}
 
-		setRefuelAmount(liters) {
+		setRefuelLevel(liters) {
 			local ratio := this.lookup("FUEL RATIO:")
 			local energy := this.lookup("VIRTUAL ENERGY:")
 
@@ -280,7 +280,7 @@ class LMURestProvider {
 				energy["currentSetting"] := Min(100, Max(0, Round(liters / ratio["settings"][ratio["currentSetting"] + 1]["text"])))
 		}
 
-		changeRefuelAmount(steps := 1) {
+		changeRefuelLevel(steps := 1) {
 			local energy := this.lookup("VIRTUAL ENERGY:")
 
 			if energy

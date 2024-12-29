@@ -34,6 +34,9 @@ class LMUPlugin extends Sector397Plugin {
 	iTeamData := false
 	iGridData := false
 
+	iLastFuelAmount := 0
+	iRemainingFuelAmount := 0
+
 	iFuelRatio := 1
 
 	iFuelLevels := []
@@ -84,19 +87,26 @@ class LMUPlugin extends Sector397Plugin {
 	}
 
 	getOptionHandler(option) {
-		return (operation, value?) {
-			local pitstop := LMURESTProvider.PitstopData(this.Simulator[true], this.Car, this.Track)
+		return (operation, value?, pitstop := false) {
+			local simulator := this.Simulator[true]
+			local car := this.Car
+			local track := this.Track
 			local code, tyre, found, tyreCompound, tyreCompoundColor, cTyreCompound, cTyreCompoundColor
+
+			if !pitstop
+				pitstop := LMURESTProvider.PitstopData(simulator, car, track)
 
 			switch option, false {
 				case "Refuel":
 					switch operation, false {
 						case "Get":
-							return pitstop.getRefuelAmount()
+							return (pitstop.getRefuelLevel() - this.iRemainingFuelAmount)
 						case "Set":
-							pitstop.setRefuelAmount(value)
+							this.iRemainingFuelAmount := this.iLastFuelAmount
+
+							pitstop.setRefuelLevel(value + this.iRemainingFuelAmount)
 						case "Change":
-							pitstop.changeRefuelAmount(value)
+							pitstop.changeRefuelLevel(value)
 					}
 				case "Tyre Compound", "Tyre Compound Front Left", "Tyre Compound Front Right"
 									, "Tyre Compound Rear Left", "Tyre Compound Rear Right":
@@ -333,7 +343,9 @@ class LMUPlugin extends Sector397Plugin {
 	addLap(lap, data) {
 		super.addLap(lap, data)
 
-		this.iFuelLevels.Push(getMultiMapValue(data, "Car Data", "FuelRemaining", 0))
+		this.iLastFuelAmount := getMultiMapValue(data, "Car Data", "FuelRemaining", 0)
+
+		this.iFuelLevels.Push(this.iLastFuelAmount)
 		this.iVirtualEnergyLevels.Push(LMURESTProvider.EnergyData(this.Simulator[true], this.Car, this.Track).RemainingVirtualEnergy)
 
 		while (this.iFuelLevels.Length > 10) {
@@ -461,6 +473,9 @@ class LMUPlugin extends Sector397Plugin {
 			this.iTeamData := false
 			this.iGridData := false
 
+			this.iLastFuelAmount := 0
+			this.iRemainingFuelAmount := 0
+
 			this.iFuelLevels := []
 			this.iVirtualEnergyLevels := []
 			this.iFuelRatio := 1
@@ -481,7 +496,7 @@ class LMUPlugin extends Sector397Plugin {
 			setupData := LMURESTProvider.PitstopData(simulator, car, track)
 			data := newMultiMap()
 
-			setMultiMapValue(data, "Setup Data", "FuelAmount", setupData.RefuelAmount)
+			setMultiMapValue(data, "Setup Data", "FuelAmount", getOptionHandler("Refuel").Call("Get", , setupData))
 
 			for key, postFix in keys {
 				tyreCompound := setupData.TyreCompound[key]

@@ -1516,7 +1516,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("Text", "x399 yp+39 w60 h23 +0x200", translate("Use"))
 
-		choices := collect(["Initial Conditions", "Telemetry Data", "Initial Cond. + Telemetry"], translate)
+		choices := collect(["Fixed", "Telemetry Data", "Fixed + Telemetry"], translate)
 
 		workbenchGui.Add("DropDownList", "x460 yp w136 Choose2 VsimInputDropDown", choices).OnEvent("Change", (*) => this.updateState())
 

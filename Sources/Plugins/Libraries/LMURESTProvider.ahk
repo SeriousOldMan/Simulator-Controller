@@ -462,11 +462,7 @@ class LMURestProvider {
 				if (value >= 1)
 					bodywork := true
 
-				if (damage["settings"].Length > 3) {
-					if (value >= 2)
-						suspension := true
-				}
-				else if (value = 2)
+				if ((damage["settings"].Length > 2) && (value >= 2))
 					suspension := true
 			}
 		}
@@ -477,7 +473,7 @@ class LMURestProvider {
 			if (damage && (damage["settings"].Length > 1)) {
 				damage["currentSetting"] := 0
 
-				if (damage["settings"].Length > 3) {
+				if (damage["settings"].Length > 2) {
 					if (bodywork && suspension)
 						damage["currentSetting"] := (damage["settings"].Length - 1)
 					else if bodywork

@@ -6,27 +6,29 @@
   5. Fixed handling of Stream Deck Mini layouts in "Simulator Setup".
   6. Fixed lap time delta announcement when requesting lap times by voice command.
   7. Added missing FCY command in the Assistant mode of all simulator plugins.
-  8. Several new settings in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) for the new "Time Trial" session type which was introduced with version 6.0.2.
-  9. A new [core setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) allow you to configure a special mode, which enables the *Push-to-Talk* button to interrupt the currently active speech.
-  10. Fixed display of unavailable pressures in "Solo Center" and "Team Center".
-  11. More progress bars and message windows will be suppressed if Simulator Controller is running in *silent* mode.
-  12. The projected position after the upcoming pitstop will be available in the LLM knowledge and also in the session info of the "System Monitor", if the strategy was calculated by the Strategist with activated traffic simulation.
-  13. Finally full support for management of pitstop settings and pitstop automation by the Assistants in *Le Mans Ultimate*.
+  8. Renamed "Initial Conditions" simulation to "Fixed" simulation in "Strategy Workbench".
+  9. Several new settings in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) for the new "Time Trial" session type which was introduced with version 6.0.2.
+  10. A new [core setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) allow you to configure a special mode, which enables the *Push-to-Talk* button to interrupt the currently active speech.
+  11. Fixed display of unavailable pressures in "Solo Center" and "Team Center".
+  12. More progress bars and message windows will be suppressed if Simulator Controller is running in *silent* mode.
+  13. The projected position after the upcoming pitstop will be available in the LLM knowledge and also in the session info of the "System Monitor", if the strategy was calculated by the Strategist with activated traffic simulation.
+  14. Finally full support for management of pitstop settings and pitstop automation by the Assistants in *Le Mans Ultimate*.
       - The car models are correctly named now (they have been the team names in the past). Due to this, all entries in the session database have been invalidated and the database for *Le Mans Ultimate* has been cleared. See the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-610) for information how to restore your previous database content.
 	  - The Race Engineer cannot handle different tyre compounds for the different wheels yet and he also will currently always change all four tyres together. Please see the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#special-notes-for-le-mans-ultimate) for more information about this and also additional restrictions.
 	  - New voice command for the Race Engineer that triggers recalulation of the fuel ratio. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#list-of-all-voice-commands) for a description.
 	  - New controller action "FuelRatioOptimize" that triggers the recalution of the fuel ratio as well. A new icon for the Stream Deck is included.
 	  - A new setting in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) of the "Session Database" that enables automatic recalculation of the fuel ratio.
-  14. Handling of individual tyre change and/or tyre compounds has been implemented for *RaceRoom Racing Experience*, *rFactor 2*, *Le Mans Ultimate* and *iRacing*. This is available as individual controller actions for Button Box or Stream Decks. The Race Engineer will still change all four tyres at once and will always select the same compound for all four wheels.
+  15. Handling of individual tyre change and/or tyre compounds has been implemented for *RaceRoom Racing Experience*, *rFactor 2*, *Le Mans Ultimate* and *iRacing*. This is available as individual controller actions for Button Box or Stream Decks. The Race Engineer will still change all four tyres at once and will always select the same compound for all four wheels.
 	  - New controller actions "TyreChangeFront" and "TyreChangeRear" for *RaceRoom Racing Experience*.
       - New controller actions "TyreCompoundFront" and "TyreCompoundRear" for *rFactor 2*.
 	  - New controller actions "TyreCompoundFrontLeft", "TyreCompoundFrontRight", "TyreCompoundRearLeft" and "TyreCompoundRearRight" for *Le Mans Ultimate*.
       - New controller actions "TyreChangeFrontLeft", "TyreChangeFrontRight", "TyreChangeRearLeft" and "TyreChangeRearRight" for *iRacing*.
-  15. New controller action "PitstopRequest" for *rFactor 2*.
-  16. New controller actions "BrakeChange" and "PitstopRequest" for *Le Mans Ultimate*.
-  17. Many new Stream Deck icons for the above controller actions.
-  18. The definition of the "RepairRequest" controller action for *iRacing* has changed. You may want to check your configuration, if you use this action.
-  19. [Internal] Improved task management in database synchronization process.
+  16. New controller action "PitstopRequest" for *rFactor 2*.
+  17. New controller actions "BrakeChange" and "PitstopRequest" for *Le Mans Ultimate*.
+  18. Many new Stream Deck icons for the above controller actions.
+  19. The definition of the "RepairRequest" controller action for *iRacing* has changed. You may want to check your configuration, if you use this action.
+  20. [Internal] Improved task management in database synchronization process.
+  21. [Internal] Updated all copyright notes to 2025.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-610) for on information on how to restore your session database content, if you have used *Le Mans Ultimate* previously.
 

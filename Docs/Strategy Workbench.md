@@ -24,7 +24,7 @@ Good to know: The chart in the upper area of the "Strategy Workbench" allows you
 
 ### Rules & Settings
 
-In the first tab you enter the rules and settings for the upcoming event. Using the *Settings* drop down menu directly above the tabbed area, you can load settings values from different sources, for example from the Session Database or the from the currently active simulation.
+In the first tab you enter the rules and settings for the upcoming event. Using the *Settings* menu directly above the tabbed area, you can load settings values from different sources, for example from the Session Database or the from the currently active simulation.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%201.JPG)
 
@@ -60,7 +60,7 @@ Loading of settings is supported for:
 	   - Average Lap Time
 	   - Average Fuel Consumption
 	   - Settings of the Optimizer
-	   - Selected data sources (Telemetry & Initial Conditions)
+	   - Selected data sources (Telemetry & Fixed)
   
   2. *Race.settings* file
   
@@ -345,13 +345,13 @@ Enter the required values in the *Initial Conditions* group, choose the data to 
 
 For every slider not at the zero position, different variations of the underlying value will be created as strategy scenarios, which will be compared at the end for better results. The number of variations depend on the slider position. The slider more to the right will result in more variations.
 
-You can use the commands in the *Simulation* drop down menu to start a simulation (similar to use the "Simulate!" button), and to copy the current results over to the *Strategy* tab. If you hold the Control key while pressing the "Simulate!" button or choosing the corresponding menu item, the selected scenario will be copied to the *Strategy* tab after the simulation.
+You can use the commands in the *Simulation* menu to start a simulation (similar to use the "Simulate!" button), and to copy the current results over to the *Strategy* tab. If you hold the Control key while pressing the "Simulate!" button or choosing the corresponding menu item, the selected scenario will be copied to the *Strategy* tab after the simulation.
 
 Important: You all know the phrase "Shit in - shit out". Therefore please check that the telemetry data, that is used for the strategy simulation, is correct. There is a filter that learns, what are correct entries and what are not, but this filter uses a standard variation algorithm and therefore needs a lot of valid data vs. a small amount of invalid data. Especially in the beginning, if you only have data from a few laps, double check the results of the simulation and - if you think, they are off, for example for the fuel consumption - use only the data, you entered in the *Initial Conditions* field group for the simulation. By the way, you can delete corrupt data, if necessary. The telemtry data is stored lap by lap in the CSV files "Electronics.CSV" and "Tyres.CSV", which are located in the folder *Simulator Controller\Database\User\\[simulator]\\[car]\\[track]* (with [simulator], [car] and [track] substituted with the corresponding values) in your user *Documents* folder. You can open this file with your favorite editor and delete the suspicious lines. Another approach is to use the "Cleanup Data" command from the data selection popup. It will remove all entries from the telemetry database, whose values are way off the average value. Only the values for the currently selected driver (or in case "All" are selected, your own driver) will be considered during the cleanup process, and if you have configured a data replication to the Team Server, the entries will be deleted there as well.
 
 ### Strategy
 
-The values in this tab and also the document display on the right side of the tabbed pane describe the currently selected strategy. The *Strategy* drop down menu above allows you to save the current strategy, you can load a strategy from the database (or any other location on your PC) and you can compare different strategies. Finally, you can export the current stragey to Cato to be used for the next race or you can clear a previously exported strategy, so that you are on your own on the track.
+The values in this tab and also the document display on the right side of the tabbed pane describe the currently selected strategy. The *Strategy* menu above allows you to save the current strategy, you can load a strategy from the database (or any other location on your PC) and you can compare different strategies. Finally, you can export the current stragey to Cato to be used for the next race or you can clear a previously exported strategy, so that you are on your own on the track.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%204.JPG)
 

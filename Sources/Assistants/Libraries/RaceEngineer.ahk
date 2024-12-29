@@ -2654,7 +2654,7 @@ class RaceEngineer extends RaceAssistant {
 
 				if this.RemoteHandler {
 					if !isSet(safetyFuel)
-						safetyFuel := knowledgeBase.getValue("Session.Settings.Fuel.SafetyMargin", 5)
+						safetyFuel := knowledgeBase.getValue("Session.Settings.Fuel.SafetyMargin", 4)
 
 					this.RemoteHandler.optimizeFuelRatio(safetyFuel)
 				}

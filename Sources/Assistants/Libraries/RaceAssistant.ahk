@@ -1854,7 +1854,7 @@ class RaceAssistant extends ConfigurationItem {
 						    , "Session.Settings.Lap.AvgTime", getDeprecatedValue(settings, "Session Settings", "Race Settings", "Lap.AvgTime", 0)
 						    , "Session.Settings.Lap.PitstopWarning", getDeprecatedValue(settings, "Session Settings", "Race Settings", "Lap.PitstopWarning", 5)
 							, "Session.Settings.Fuel.AvgConsumption", getDeprecatedValue(settings, "Session Settings", "Race Settings", "Fuel.AvgConsumption", 0)
-							, "Session.Settings.Fuel.SafetyMargin", getDeprecatedValue(settings, "Session Settings", "Race Settings", "Fuel.SafetyMargin", 5))
+							, "Session.Settings.Fuel.SafetyMargin", getDeprecatedValue(settings, "Session Settings", "Race Settings", "Fuel.SafetyMargin", 4))
 	}
 
 	callUpdateSettings(fileName) {
@@ -2910,7 +2910,7 @@ class GridRaceAssistant extends RaceAssistant {
 
 					delta := (driverLapTime - lapTime)
 
-					if (Abs(delta) > 0.5)
+					if ((Abs(delta) > 0.5) && (Abs(delta) < 5))
 						speaker.speakPhrase("LapTimeDelta", {delta: speaker.number2Speech(Abs(delta), 1)
 														   , difference: (delta > 0) ? fragments["Faster"] : fragments["Slower"]})
 				}

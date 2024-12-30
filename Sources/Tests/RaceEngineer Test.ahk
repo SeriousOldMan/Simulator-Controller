@@ -181,11 +181,11 @@ class TestPitstopHandler {
 		vCompletedActions["finishPitstopSetup"] := pitstopNumber
 	}
 
-	setPitstopRefuelAmount(pitstopNumber, liters) {
+	setPitstopRefuelAmount(pitstopNumber, liters, fillUp) {
 		global vPitstopFuel, vPitstopTyreCompound, vPitstopTyreCompoundColor, vPitstopTyreSet, vPitstopTyrePressures
 		global vPitstopRepairSuspension, vPitstopRepairBodywork, vPitstopRepairEngine
 
-		this.showAction("setPitstopRefuelAmount", pitstopNumber, liters)
+		this.showAction("setPitstopRefuelAmount", pitstopNumber, liters, fillUp)
 
 		vCompletedActions["setPitstopRefuelAmount"] := pitstopNumber
 

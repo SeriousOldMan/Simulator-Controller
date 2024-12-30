@@ -42,6 +42,8 @@ class LMUPlugin extends Sector397Plugin {
 	iFuelLevels := []
 	iVirtualEnergyLevels := []
 
+	iAdjustRefuelAmount := false
+
 	TeamData {
 		Get {
 			if !this.iTeamData
@@ -87,7 +89,7 @@ class LMUPlugin extends Sector397Plugin {
 	}
 
 	getOptionHandler(option) {
-		return (operation, value?, pitstop := false) {
+		return (operation, value?, pitstop := false, initial := true) {
 			local simulator := this.Simulator[true]
 			local car := this.Car
 			local track := this.Track
@@ -102,7 +104,8 @@ class LMUPlugin extends Sector397Plugin {
 						case "Get":
 							return (pitstop.getRefuelLevel() - this.iRemainingFuelAmount)
 						case "Set":
-							this.iRemainingFuelAmount := this.iLastFuelAmount
+							if initial
+								this.iRemainingFuelAmount := this.iLastFuelAmount
 
 							pitstop.setRefuelLevel(value + this.iRemainingFuelAmount)
 						case "Change":
@@ -340,6 +343,21 @@ class LMUPlugin extends Sector397Plugin {
 		}
 	}
 
+	getConsumptions(&virtualEnergy, &fuel) {
+		computeConsumption(series) {
+			local values := []
+
+			loop series.Length
+				if (A_Index > 1)
+					values.Push(series[A_Index - 1] - series[A_Index])
+
+			return average(values)
+		}
+
+		virtualEnergy := computeConsumption(this.iVirtualEnergyLevels)
+		fuel := computeConsumption(this.iFuelLevels)
+	}
+
 	addLap(lap, data) {
 		super.addLap(lap, data)
 
@@ -353,6 +371,16 @@ class LMUPlugin extends Sector397Plugin {
 			this.iVirtualEnergyLevels.RemoveAt(1)
 		}
 
+		if this.iAdjustRefuelAmount
+			Task.startTask(() {
+				local handler := this.getOptionHandler("Refuel")
+				local ignore, fuelConsumption
+
+				this.getConsumptions(&ignore, &fuelConsumption)
+
+				handler.Call("Set", handler.Call("Get") - fuelConsumption, false, false)
+			}, 1000, kLowPriority)
+
 		if getMultiMapValue(this.Settings, "Simulator.Le Mans Ultimate", "Pitstop.Fuel.Ratio", false)
 			Task.startTask(ObjBindMethod(this, "optimizeFuelRatio"), 2000, kLowPriority)
 	}
@@ -360,18 +388,7 @@ class LMUPlugin extends Sector397Plugin {
 	optimizeFuelRatio(safetyFuel?) {
 		local pitstop, energyConsumption, fuelConsumption
 
-		computeConsumption(series) {
-			local values := []
-
-			loop series.Length
-				if (A_Index > 1)
-					values.Push(series[A_Index - 1] - series[A_Index])
-
-			return average(values)
-		}
-
-		energyConsumption := computeConsumption(this.iVirtualEnergyLevels)
-		fuelConsumption := computeConsumption(this.iFuelLevels)
+		this.getConsumptions(&energyConsumption, &fuelConsumption)
 
 		if !isSet(safetyFuel)
 			safetyFuel := getMultiMapValue(this.Settings, "Session Settings", "Fuel.SafetyMargin", 4)
@@ -392,13 +409,19 @@ class LMUPlugin extends Sector397Plugin {
 
 		this.iFuelLevels := []
 		this.iVirtualEnergyLevels := []
+
+		this.iAdjustRefuelAmount := false
 	}
 
-	setPitstopRefuelAmount(pitstopNumber, liters) {
-		super.setPitstopRefuelAmount(pitstopNumber, liters)
+	setPitstopRefuelAmount(pitstopNumber, liters, fillUp) {
+		super.setPitstopRefuelAmount(pitstopNumber, liters, fillUp)
 
-		if (this.OpenPitstopMFDHotkey != "Off")
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			if !fillUp
+				this.iAdjustRefuelAmount := getMultiMapValue(this.Settings, "Simulator.Le Mans Ultimate", "Pitstop.Energy.Adjust", false)
+
 			this.setPitstopOption("Refuel", liters)
+		}
 	}
 
 	setPitstopTyreSet(pitstopNumber, tyreCompound, tyreCompoundColor := false, set := false) {
@@ -488,6 +511,8 @@ class LMUPlugin extends Sector397Plugin {
 			this.iFuelLevels := []
 			this.iVirtualEnergyLevels := []
 			this.iFuelRatio := 1
+
+			this.iAdjustRefuelAmount := false
 		}
 	}
 

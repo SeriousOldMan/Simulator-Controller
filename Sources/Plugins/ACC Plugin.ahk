@@ -2028,12 +2028,12 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	setPitstopRefuelAmount(pitstopNumber, liters) {
+	setPitstopRefuelAmount(pitstopNumber, liters, fillUp) {
 		local litersIncrement
 
 		liters := Ceil(liters)
 
-		super.setPitstopRefuelAmount(pitstopNumber, liters)
+		super.setPitstopRefuelAmount(pitstopNumber, liters, fillUp)
 
 		if this.requirePitstopMFD()
 			loop 3 {

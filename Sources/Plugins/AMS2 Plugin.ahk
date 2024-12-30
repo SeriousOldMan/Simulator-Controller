@@ -270,8 +270,8 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	setPitstopRefuelAmount(pitstopNumber, liters) {
-		super.setPitstopRefuelAmount(pitstopNumber, liters)
+	setPitstopRefuelAmount(pitstopNumber, liters, fillUp) {
+		super.setPitstopRefuelAmount(pitstopNumber, liters, fillUp)
 
 		if this.requirePitstopMFD()
 			if this.selectPitstopOption("Refuel") {

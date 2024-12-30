@@ -1297,7 +1297,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("Text", "x" . x . " yp+19 w110 h23 +0x200", translate("Safety Fuel"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp+1 w50 h20 Number Limit2 VsafetyFuelEdit", displayValue("Float", convertUnit("Volume", 5), 0))
-		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99", displayValue("Float", convertUnit("Volume", 5), 0))
+		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99", displayValue("Float", convertUnit("Volume", 4), 0))
 		workbenchGui.Add("Text", "x" . x3 . " yp+2 w90 h20", getUnit("Volume", true))
 
 		workbenchTab.UseTab(3)

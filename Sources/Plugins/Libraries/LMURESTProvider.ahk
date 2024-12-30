@@ -685,11 +685,12 @@ class LMURestProvider {
 		}
 
 		getRemainingVirtualEnergy() {
-			return (this.Data.Has("fuelInfo") ? Round(this.Data["fuelInfo"]["currentVirtualEnergy"] / this.Data["fuelInfo"]["maxVirtualEnergy"] * 100, 2) : false)
+			return ((this.Data && this.Data.Has("fuelInfo")) ? Round(this.Data["fuelInfo"]["currentVirtualEnergy"] / this.Data["fuelInfo"]["maxVirtualEnergy"] * 100, 2)
+															 : false)
 		}
 
 		getFuelAmount() {
-			return (this.Data.Has("fuelInfo") ? Round(this.Data["fuelInfo"]["currentFuel"], 2) : false)
+			return ((this.Data && this.Data.Has("fuelInfo")) ? Round(this.Data["fuelInfo"]["currentFuel"], 2) : false)
 		}
 	}
 
@@ -711,11 +712,13 @@ class LMURestProvider {
 		getTrack() {
 			if this.iCachedTrack
 				return this.iCachedTrack
-			else if this.Data.Has("trackInfo") {
+			else if (this.Data && this.Data.Has("trackInfo")) {
 				this.iCachedTrack := this.Data["trackInfo"]["properTrackName"]
 
 				return this.iCachedTrack
 			}
+			else
+				return false
 		}
 	}
 
@@ -744,21 +747,25 @@ class LMURestProvider {
 		getCar() {
 			if this.iCachedCar
 				return this.iCachedCar
-			else if this.Data.Has("teamInfo") {
+			else if (this.Data && this.Data.Has("teamInfo")) {
 				this.iCachedTeam := this.Data["teamInfo"]["vehicleName"]
 
 				return this.iCachedCar
 			}
+			else
+				return false
 		}
 
 		getTeam() {
 			if this.iCachedTeam
 				return this.iCachedTeam
-			else if this.Data.Has("teamInfo") {
+			else if (this.Data && this.Data.Has("teamInfo")) {
 				this.iCachedTeam := this.Data["teamInfo"]["teamName"]
 
 				return this.iCachedTeam
 			}
+			else
+				return false
 		}
 	}
 

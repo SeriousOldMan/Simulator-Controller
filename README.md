@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.1.0.0-beta]() (Test build for 6.1.0. Changes: Reworking of silent mode, Fixed FCY command for Simulator Assistant Mode, Core setting for interruptable speeches, Fixed tyre compound selection voice command, Fixed display of unavailable pressures in "Solo Center" and "Team Center", Renamed LMU database to LMU.old, Fixed handling of n/a Map in strategy, Full support for pitstop controller for LMU, Position after pitstop in session info and knowledgebase, Handle different tyre compounds for different wheels, New icons for Stream Deck, New voice command to recalulate fuel ratio, New controller action "FuelRatioOptimize", New setting for automatic fuel ratio computation, Renamed "Initial Conditions" simulation to "Fixed" simulation in "Strategy Workbench".)
+[6.1.0.0-beta](https://www.dropbox.com/scl/fi/7oheakqyw8m2hi7dh3b9f/Simulator-Controller-6.1.0.0-beta.zip?rlkey=fjr8n31ddhhvkaqh93qxyg5e8&st=8jqyojwh&dl=1) (Test build for 6.1.0. Changes: Reworking of silent mode, Fixed FCY command for Simulator Assistant Mode, Core setting for interruptable speeches, Fixed tyre compound selection voice command, Fixed display of unavailable pressures in "Solo Center" and "Team Center", Renamed LMU database to LMU.old, Fixed handling of n/a Map in strategy, Full support for pitstop controller for LMU, Position after pitstop in session info and knowledgebase, Handle different tyre compounds for different wheels, New icons for Stream Deck, New voice command to recalulate fuel ratio, New controller action "FuelRatioOptimize", New setting for automatic fuel ratio computation, Renamed "Initial Conditions" simulation to "Fixed" simulation in "Strategy Workbench", Adjust virtual energy level setting.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-610) of this version and all the versions you might have skipped, before installing and using this version.
 
@@ -124,6 +124,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 30. [Track coaching by an AI](https://youtu.be/mgfFkNh2_Lw) - Demonstrates an on-track coaching lesson by the Driving Coach. The Coach ready the telemetry data, compares it to the data of a reference lap and will give instructions how to improve corner by corner.
 
 31. [Mastering on-track coaching](https://youtu.be/Gnzye2kf7HI) - This video gives you valuable insights in the configuration of the on-track coaching provided by the Driving Coach. A live conversation is also part of the demonstration.
+
+32. [Running an LMU race with an AI pit crew](https://youtu.be/ntQRnx0Grjk) - Demonstration of the new automated strategy and pitstop handling for Le Mans Ultimate. Please don't judge my driving, this was for demonstration purposes. :-)
 
 This list will be extended from time to time to cover new functionalities.
 

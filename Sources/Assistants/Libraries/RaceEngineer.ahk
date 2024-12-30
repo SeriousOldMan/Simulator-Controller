@@ -3636,8 +3636,16 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, fuel) {
-		if this.RemoteHandler
-			this.RemoteHandler.setPitstopRefuelAmount(pitstopNumber, fuel)
+		local knowledgeBase := this.KnowledgeBase
+		local fillUp
+
+		if this.RemoteHandler {
+			fillUp := ((knowledgeBase.getValue("Lap." . knowledgeBase.getValue("Lap") . ".Fuel.Remaining", 0)
+					  + knowledgeBase.getValue("Pitstop.Planned.Fuel", 0))
+					>= (knowledgeBase.getValue("Session.Settings.Fuel.Max", 0) - this.AvgFuelConsumption))
+
+			this.RemoteHandler.setPitstopRefuelAmount(pitstopNumber, fuel, fillUp)
+		}
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor, set) {

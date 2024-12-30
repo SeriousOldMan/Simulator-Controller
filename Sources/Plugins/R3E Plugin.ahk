@@ -574,8 +574,8 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			}
 	}
 
-	setPitstopRefuelAmount(pitstopNumber, liters) {
-		super.setPitstopRefuelAmount(pitstopNumber, liters)
+	setPitstopRefuelAmount(pitstopNumber, liters, fillUp) {
+		super.setPitstopRefuelAmount(pitstopNumber, liters, fillUp)
 
 		if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey != "Off")) {
 			if this.optionAvailable("Refuel") {

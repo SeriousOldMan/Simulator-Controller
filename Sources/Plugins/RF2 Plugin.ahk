@@ -500,8 +500,8 @@ class RF2Plugin extends Sector397Plugin {
 		this.iSelectedDriver := false
 	}
 
-	setPitstopRefuelAmount(pitstopNumber, liters) {
-		super.setPitstopRefuelAmount(pitstopNumber, liters)
+	setPitstopRefuelAmount(pitstopNumber, liters, fillUp) {
+		super.setPitstopRefuelAmount(pitstopNumber, liters, fillUp)
 
 		if (this.OpenPitstopMFDHotkey != "Off")
 			this.sendPitstopCommand("Pitstop", "Set", "Refuel", Round(liters))

@@ -388,8 +388,8 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 				throw "Unsupported change operation `"" . action . "`" detected in ACPlugin.changePitstopOption..."
 	}
 
-	setPitstopRefuelAmount(pitstopNumber, liters) {
-		super.setPitstopRefuelAmount(pitstopNumber, liters)
+	setPitstopRefuelAmount(pitstopNumber, liters, fillUp) {
+		super.setPitstopRefuelAmount(pitstopNumber, liters, fillUp)
 
 		if this.requirePitstopMFD()
 			if this.selectPitstopOption("Refuel") {

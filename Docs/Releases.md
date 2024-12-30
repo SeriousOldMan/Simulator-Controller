@@ -18,6 +18,7 @@
 	  - New voice command for the Race Engineer that triggers recalulation of the fuel ratio. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#list-of-all-voice-commands) for a description.
 	  - New controller action "FuelRatioOptimize" that triggers the recalution of the fuel ratio as well. A new icon for the Stream Deck is included.
 	  - A new setting in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) of the "Session Database" that enables automatic recalculation of the fuel ratio.
+	  - A new setting in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) of the "Session Database" that activates automatic adjustment of the virtual energy level for the last stint, if you pit later than planned.
   15. Handling of individual tyre change and/or tyre compounds has been implemented for *RaceRoom Racing Experience*, *rFactor 2*, *Le Mans Ultimate* and *iRacing*. This is available as individual controller actions for Button Box or Stream Decks. The Race Engineer will still change all four tyres at once and will always select the same compound for all four wheels.
 	  - New controller actions "TyreChangeFront" and "TyreChangeRear" for *RaceRoom Racing Experience*.
       - New controller actions "TyreCompoundFront" and "TyreCompoundRear" for *rFactor 2*.

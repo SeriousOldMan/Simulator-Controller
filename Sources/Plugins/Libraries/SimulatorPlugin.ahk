@@ -39,7 +39,7 @@ global kSessions := [kSessionOther, kSessionPractice, kSessionQualification, kSe
 global kSessionNames := ["Other", "Practice", "Qualification", "Race", "Time Trial"]
 
 global kAssistantAnswerActions := ["Accept", "Reject"]
-global kAssistantRaceActions := ["PitstopPlan", "DriverSwapPlan", "PitstopPrepare", "PitstopRecommend", "StrategyRecommend", "FCYRecommend", "StrategyCancel"]
+global kAssistantRaceActions := ["FuelRatioOptimize", "PitstopPlan", "DriverSwapPlan", "PitstopPrepare", "PitstopRecommend", "StrategyRecommend", "FCYRecommend", "StrategyCancel"]
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -624,16 +624,28 @@ class SimulatorPlugin extends ControllerPlugin {
 
 		if this.RaceEngineer
 			switch option, false {
-				case "Refuel", "Tyre Compound", "Tyre Set", "Repair Suspension", "Repair Bodywork", "Repair Engine":
+				case "Refuel", "Tyre Compound", "TyreCompound", "Tyre Set"
+				   , "Repair Suspension", "Repair Bodywork", "Repair Engine":
+					if (option = "TyreCompound")
+						option := "Tyre Compound"
+
 					newValues := this.getPitstopOptionValues(option)
 
-					if newValues
+					if newValues {
+						if isDebug()
+							logMessage(kLogDebug, "Changing `"" . option . "`" to: " . values2String(", ", newValues*))
+
 						this.RaceEngineer.pitstopOptionChanged(option, true, newValues*)
+					}
 				case "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right":
 					newValues := this.getPitstopOptionValues("Tyre Pressures")
 
-					if newValues
+					if newValues {
+						if isDebug()
+							logMessage(kLogDebug, "Changing `"" . option . "`" to: " . values2String(", ", newValues*))
+
 						this.RaceEngineer.pitstopOptionChanged("Tyre Pressures", true, newValues*)
+					}
 			}
 	}
 
@@ -724,6 +736,8 @@ class RaceAssistantAction extends ControllerAction {
 				plugin.recommendFullCourseYellow()
 			case "StrategyCancel":
 				plugin.cancelStrategy()
+			case "FuelRatioOptimize":
+				plugin.optimizeFuelRatio()
 			case "PitstopPlan":
 				plugin.planPitstop()
 			case "DriverSwapPlan":
@@ -743,6 +757,8 @@ class RaceAssistantAction extends ControllerAction {
 class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	iActionMode := kPitstopMode
 
+	iSettings := false
+
 	iRaceEngineer := false
 	iRaceStrategist := false
 	iRaceSpotter := false
@@ -751,6 +767,16 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	iRequestedTyreCompound := false
 
 	iHasPositionsData := false
+
+	Settings {
+		Get {
+			return this.iSettings
+		}
+
+		Set {
+			return (this.iSettings := value)
+		}
+	}
 
 	RaceEngineer {
 		Get {
@@ -995,6 +1021,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 		}
 
+		this.Settings := settings
+
 		this.Car := car
 		this.Track := track
 
@@ -1024,6 +1052,12 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		this.Track := false
 	}
 
+	addLap(lap, data) {
+	}
+
+	updateLap(lap, data) {
+	}
+
 	recommendPitstop() {
 		if this.RaceStrategist
 			this.RaceStrategist.recommendPitstop()
@@ -1042,6 +1076,11 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	cancelStrategy() {
 		if this.RaceStrategist
 			this.RaceStrategist.cancelStrategy()
+	}
+
+	optimizeFuelRatio() {
+		if this.RaceEngineer
+			this.RaceEngineer.optimizeFuelRatio("Engineer")
 	}
 
 	planPitstop() {
@@ -1308,7 +1347,6 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		trackData := sessionDB.getTrackData(this.Code, this.Track)
 
 		return this.readSessionData(trackData ? ("Track=" . trackData) : "")
-
 	}
 
 	acquirePositionsData(telemetryData, finished := false) {

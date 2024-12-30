@@ -123,7 +123,14 @@ installOptions(options, *) {
 			valid := true
 			empty := true
 
-			if !FileExist(directory) {
+			if InStr(directory, A_MyDocuments) {
+				OnMessage(0x44, translateOkButton)
+				withBlockedWindows(MsgBox, translate("You must enter a valid directory."), translate("Error"), 262160)
+				OnMessage(0x44, translateOkButton, 0)
+
+				valid := false
+			}
+			else if !FileExist(directory) {
 				try {
 					DirCreate(directory)
 				}
@@ -1761,7 +1768,17 @@ updateConfigurationForV610() {
 	}
 
 	try {
-		DirMove(kDatabaseDirectory . "User\LMU", kDatabaseDirectory . "User\LMU.archive")
+		if !FileExist(A_Desktop . "\LMU.archive")
+			if (kDatabaseDirectory . "User\LMU.archive") {
+				DirMove(kDatabaseDirectory . "User\LMU.archive", A_Desktop . "\LMU.archive")
+
+				deleteDirectory(kDatabaseDirectory . "User\LMU.archive")
+			}
+			else {
+				DirMove(kDatabaseDirectory . "User\LMU", A_Desktop . "\LMU.archive")
+
+				deleteDirectory(kDatabaseDirectory . "User\LMU")
+			}
 	}
 	catch Any as exception {
 		logError(exception)

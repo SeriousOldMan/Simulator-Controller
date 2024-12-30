@@ -213,6 +213,10 @@ class RaceEngineer extends RaceAssistant {
 		planDriverSwap(arguments*) {
 			this.callRemote("planDriverSwap", arguments*)
 		}
+
+		optimizeFuelRatio(arguments*) {
+			this.callRemote("optimizeFuelRatio", arguments*)
+		}
 	}
 
 	Knowledge {
@@ -347,6 +351,8 @@ class RaceEngineer extends RaceAssistant {
 				this.tyreInfoRecognized(concatenate(Array(this.getSpeaker().Fragments["Pressures"]), words))
 			case "Weather":
 				this.weatherRecognized(words)
+			case "FuelRatioOptimize":
+				this.fuelRatioOptimizeRecognized(words)
 			case "PitstopPlan":
 				this.clearContinuation()
 
@@ -833,6 +839,10 @@ class RaceEngineer extends RaceAssistant {
 			default:
 				super.requestInformation(category, arguments*)
 		}
+	}
+
+	fuelRatioOptimizeRecognized(words) {
+		this.optimizeFuelRatio()
 	}
 
 	lapInfoRecognized(words) {
@@ -2634,6 +2644,25 @@ class RaceEngineer extends RaceAssistant {
 			return false
 	}
 
+	optimizeFuelRatio(safetyFuel?) {
+		local knowledgeBase := this.KnowledgeBase
+
+		if this.hasEnoughData()
+			if (this.Simulator = "Le Mans Ultimate") {
+				if this.Speaker
+					this.getSpeaker().speakPhrase("Roger")
+
+				if this.RemoteHandler {
+					if !isSet(safetyFuel)
+						safetyFuel := knowledgeBase.getValue("Session.Settings.Fuel.SafetyMargin", 4)
+
+					this.RemoteHandler.optimizeFuelRatio(safetyFuel)
+				}
+			}
+			else if this.Speaker
+				this.getSpeaker().speakPhrase("Repeat")
+	}
+
 	planPitstop(optionsOrLap := kUndefined, refuelAmount := kUndefined
 			  , changeTyres := kUndefined, tyreSet := kUndefined
 			  , tyreCompound := kUndefined, tyreCompoundColor := kUndefined, tyrePressures := kUndefined
@@ -3067,6 +3096,9 @@ class RaceEngineer extends RaceAssistant {
 		local prssKey, incrKey, targetPressure, index, suffix
 
 		if this.hasPreparedPitstop() {
+			if isDebug()
+				logMessage(kLogDebug, "Changing `"" . option . "`" to: " . values2String(", ", values*))
+
 			switch option, false {
 				case "Refuel":
 					knowledgeBase.setFact("Pitstop.Planned.Fuel", values[1])

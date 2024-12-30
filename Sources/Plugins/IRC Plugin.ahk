@@ -255,7 +255,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 
 				return [getMultiMapValue(data, "Setup Data", "TyrePressureFL", 26.1), getMultiMapValue(data, "Setup Data", "TyrePressureFR", 26.1)
 					  , getMultiMapValue(data, "Setup Data", "TyrePressureRL", 26.1), getMultiMapValue(data, "Setup Data", "TyrePressureRR", 26.1)]
-			case "Tyre Compound":
+			case "Tyre Compound", "TyreCompound":
 				data := this.readSessionData("Setup=true")
 
 				return [getMultiMapValue(data, "Setup Data", "TyreCompound", false)
@@ -379,16 +379,21 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 				if (tyreCompound = kUndefined) {
 					tyreCompound := getMultiMapValue(data, section, "TyreCompoundRaw" . postFix, kUndefined)
 
-					if ((tyreCompound != kUndefined) && tyreCompound) {
-						tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
-
+					if (tyreCompound != kUndefined)
 						if tyreCompound {
-							splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
+							tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
 
-							setMultiMapValue(data, section, "TyreCompound" . postFix, tyreCompound)
-							setMultiMapValue(data, section, "TyreCompoundColor" . postFix, tyreCompoundColor)
+							if tyreCompound {
+								splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
+
+								setMultiMapValue(data, section, "TyreCompound" . postFix, tyreCompound)
+								setMultiMapValue(data, section, "TyreCompoundColor" . postFix, tyreCompoundColor)
+							}
 						}
-					}
+						else {
+							setMultiMapValue(data, section, "TyreCompound" . postFix, false)
+							setMultiMapValue(data, section, "TyreCompoundColor" . postFix, false)
+						}
 				}
 			}
 

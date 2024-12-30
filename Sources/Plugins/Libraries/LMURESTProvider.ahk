@@ -85,7 +85,7 @@ class LMURestProvider {
 					this.iData := false
 			}
 			catch Any as exception {
-				logError(exception, true)
+				logError(exception)
 
 				this.iData := false
 			}
@@ -134,13 +134,27 @@ class LMURestProvider {
 			}
 		}
 
-		RefuelAmount {
+		RefuelLevel {
 			Get {
-				return this.getRefuelAmount()
+				return this.getRefuelLevel()
 			}
 
 			Set {
-				return this.setRefuelAmount(value)
+				this.setRefuelLevel(value)
+
+				return this.RefuelLevel
+			}
+		}
+
+		FuelRatio {
+			Get {
+				return this.getFuelRatio()
+			}
+
+			Set {
+				this.setFuelRatio(value)
+
+				return this.FuelRatio
 			}
 		}
 
@@ -248,7 +262,7 @@ class LMURestProvider {
 			return false
 		}
 
-		getRefuelAmount() {
+		getRefuelLevel() {
 			local ratio := this.lookup("FUEL RATIO:")
 			local energy := this.lookup("VIRTUAL ENERGY:")
 
@@ -258,7 +272,7 @@ class LMURestProvider {
 				return false
 		}
 
-		setRefuelAmount(liters) {
+		setRefuelLevel(liters) {
 			local ratio := this.lookup("FUEL RATIO:")
 			local energy := this.lookup("VIRTUAL ENERGY:")
 
@@ -266,11 +280,42 @@ class LMURestProvider {
 				energy["currentSetting"] := Min(100, Max(0, Round(liters / ratio["settings"][ratio["currentSetting"] + 1]["text"])))
 		}
 
-		changeRefuelAmount(steps := 1) {
+		changeRefuelLevel(steps := 1) {
 			local energy := this.lookup("VIRTUAL ENERGY:")
 
 			if energy
 				energy["currentSetting"] := Min(100, Max(0, energy["currentSetting"] + Round(steps)))
+		}
+
+		getFuelRatio() {
+			local ratio := this.lookup("FUEL RATIO:")
+
+			return (ratio ? ratio["settings"][ratio["currentSetting"] + 1]["text"] : false)
+		}
+
+		setFuelRatio(value) {
+			local ratio := this.lookup("FUEL RATIO:")
+
+			value := Round(value, 2)
+
+			if ratio {
+				for index, candidate in ratio["settings"] {
+					candidate := candidate["text"]
+
+					if ((index = 1) && (value < candidate)) {
+						ratio["currentSetting"] := 0
+
+						return
+					}
+					else if (value = candidate) {
+						ratio["currentSetting"] := (index - 1)
+
+						return
+					}
+				}
+
+				ratio["currentSetting"] := (ratio["settings"].Length - 1)
+			}
 		}
 
 		getTyreCompound(tyre) {
@@ -305,14 +350,21 @@ class LMURestProvider {
 
 			if tyre {
 				if !isInteger(code) {
-					for index, candidate in tyre["settings"]
-						if ((index > 1) && (candidate["type"] = code)) {
-							tyre["currentSetting"] := (index - 1)
+					if code {
+						for index, candidate in tyre["settings"]
+							if ((index > 1) && (candidate["type"] = code)) {
+								tyre["currentSetting"] := (index - 1)
 
-							return true
-						}
+								return true
+							}
 
-					return false
+						return false
+					}
+					else {
+						tyre["currentSetting"] := code
+
+						return true
+					}
 				}
 				else {
 					tyre["currentSetting"] := code
@@ -328,7 +380,7 @@ class LMURestProvider {
 			local all := (tyre = "All")
 			local index, candidate
 
-			tyre := this.lookup((tyre = "All") ? "TIRES:" : (LMURESTProvider.TyreTypes[tyre] . " TIRE:"))
+			tyre := this.lookup(all ? "TIRES:" : (LMURESTProvider.TyreTypes[tyre] . " TIRE:"))
 
 			if tyre {
 				tyre["currentSetting"] := Min(tyre["settings"].Length - 1
@@ -410,11 +462,7 @@ class LMURestProvider {
 				if (value >= 1)
 					bodywork := true
 
-				if (damage["settings"].Length > 3) {
-					if (value >= 2)
-						suspension := true
-				}
-				else if (value = 2)
+				if ((damage["settings"].Length > 2) && (value >= 2))
 					suspension := true
 			}
 		}
@@ -425,7 +473,7 @@ class LMURestProvider {
 			if (damage && (damage["settings"].Length > 1)) {
 				damage["currentSetting"] := 0
 
-				if (damage["settings"].Length > 3) {
+				if (damage["settings"].Length > 2) {
 					if (bodywork && suspension)
 						damage["currentSetting"] := (damage["settings"].Length - 1)
 					else if bodywork
@@ -614,6 +662,103 @@ class LMURestProvider {
 			}
 
 			return false
+		}
+	}
+
+	class EnergyData extends LMURESTProvider.RESTData {
+		GETURL {
+			Get {
+				return "http://localhost:6397/rest/garage/UIScreen/RepairAndRefuel"
+			}
+		}
+
+		RemainingVirtualEnergy {
+			Get {
+				return this.getRemainingVirtualEnergy()
+			}
+		}
+
+		RemainingFuelAmount {
+			Get {
+				return this.getRemainingFuelAmount()
+			}
+		}
+
+		getRemainingVirtualEnergy() {
+			return (this.Data.Has("fuelInfo") ? Round(this.Data["fuelInfo"]["currentVirtualEnergy"] / this.Data["fuelInfo"]["maxVirtualEnergy"] * 100, 2) : false)
+		}
+
+		getFuelAmount() {
+			return (this.Data.Has("fuelInfo") ? Round(this.Data["fuelInfo"]["currentFuel"], 2) : false)
+		}
+	}
+
+	class TrackData extends LMURESTProvider.RESTData {
+		iCachedTrack := false
+
+		GETURL {
+			Get {
+				return "http://localhost:6397/rest/garage/UIScreen/RaceHistory"
+			}
+		}
+
+		Track {
+			Get {
+				return this.getTrack()
+			}
+		}
+
+		getTrack() {
+			if this.iCachedTrack
+				return this.iCachedTrack
+			else if this.Data.Has("trackInfo") {
+				this.iCachedTrack := this.Data["trackInfo"]["properTrackName"]
+
+				return this.iCachedTrack
+			}
+		}
+	}
+
+	class TeamData extends LMURESTProvider.RESTData {
+		iCachedCar := false
+		iCachedTeam := false
+
+		GETURL {
+			Get {
+				return "http://localhost:6397/rest/garage/UIScreen/CarSetupOverview"
+			}
+		}
+
+		Car {
+			Get {
+				return this.getCar()
+			}
+		}
+
+		Team {
+			Get {
+				return this.getTeam()
+			}
+		}
+
+		getCar() {
+			if this.iCachedCar
+				return this.iCachedCar
+			else if this.Data.Has("teamInfo") {
+				this.iCachedTeam := this.Data["teamInfo"]["vehicleName"]
+
+				return this.iCachedCar
+			}
+		}
+
+		getTeam() {
+			if this.iCachedTeam
+				return this.iCachedTeam
+			else if this.Data.Has("teamInfo") {
+				this.iCachedTeam := this.Data["teamInfo"]["teamName"]
+
+				return this.iCachedTeam
+			}
 		}
 	}
 

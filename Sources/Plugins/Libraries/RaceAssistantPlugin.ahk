@@ -1404,6 +1404,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			setMultiMapValue(telemetryData, "Stint Data", "StartTime", RaceAssistantPlugin.sStintStartTime)
 		}
 
+		if this.Simulator
+			this.Simulator.addLap(RaceAssistantPlugin.LastLap, data)
+
 		if RaceAssistantPlugin.TeamSessionActive
 			RaceAssistantPlugin.TeamServer.addLap(RaceAssistantPlugin.LastLap, telemetryData, positionsData)
 
@@ -1419,6 +1422,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			setMultiMapValue(data, "Stint Data", "StartTime", RaceAssistantPlugin.sStintStartTime)
 			setMultiMapValue(telemetryData, "Stint Data", "StartTime", RaceAssistantPlugin.sStintStartTime)
 		}
+
+		if this.Simulator
+			this.Simulator.updateLap(RaceAssistantPlugin.LastLap, data)
 
 		if RaceAssistantPlugin.TeamSessionActive
 			RaceAssistantPlugin.TeamServer.updateLap(RaceAssistantPlugin.LastLap, RaceAssistantPlugin.LapRunning, data, telemetryData, positionsData)
@@ -1511,10 +1517,12 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		car := getMultiMapValue(data, "Session Data", "Car")
 		track := getMultiMapValue(data, "Session Data", "Track")
 
-		maxFuel := settingsDB.getSettingValue(simulator, car, track, "*", "Session Settings", "Fuel.Amount", kUndefined)
+		if !getMultiMapValue(data, "Session Data", "FuelAmount", false) {
+			maxFuel := settingsDB.getSettingValue(simulator, car, track, "*", "Session Settings", "Fuel.Amount", kUndefined)
 
-		if (maxFuel && (maxFuel != kUndefined) && (maxFuel != ""))
-			setMultiMapValue(data, "Session Data", "FuelAmount", maxFuel)
+			if (maxFuel && (maxFuel != kUndefined) && (maxFuel != ""))
+				setMultiMapValue(data, "Session Data", "FuelAmount", maxFuel)
+		}
 
 		if RaceAssistantPlugin.Simulator
 			RaceAssistantPlugin.Simulator.updateTelemetryData(data)
@@ -1932,6 +1940,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			writeMultiMap(settingsFileName, settings)
 
 			this.RaceAssistant.updateSettings(settingsFileName)
+
+			if this.Simulator
+				this.Simulator.Settings := settings
 		}
 	}
 

@@ -127,6 +127,10 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 		pitstopPrepared(arguments*) {
 			this.callRemote("pitstopPrepared", arguments*)
 		}
+
+		optimizeFuelRatio(arguments*) {
+			this.callRemote("optimizeFuelRatio", arguments*)
+		}
 	}
 
 	class RaceEngineerAction extends RaceAssistantPlugin.RaceAssistantAction {
@@ -137,6 +141,8 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 				this.Plugin.planDriverSwap()
 			else if (this.Plugin.RaceEngineer && (this.Action = "PitstopPrepare"))
 				this.Plugin.preparePitstop()
+			else if (this.Plugin.RaceEngineer && (this.Action = "FuelRatioOptimize"))
+				this.Plugin.optimizeFuelRatio("Engineer")
 			else
 				super.fireAction(function, trigger)
 		}
@@ -166,7 +172,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {
 		local function, descriptor
 
-		if inList(["PitstopPlan", "DriverSwapPlan", "PitstopPrepare"], action) {
+		if inList(["PitstopPlan", "DriverSwapPlan", "PitstopPrepare", "FuelRatioOptimize"], action) {
 			function := controller.findFunction(actionFunction)
 
 			if (function != false) {
@@ -185,6 +191,19 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 
 	createRaceAssistant(pid) {
 		return RaceEngineerPlugin.RemoteRaceEngineer(this, pid)
+	}
+
+	updateActions(session) {
+		local ignore, theAction
+
+		super.updateActions(session)
+
+		for ignore, theAction in this.Actions
+			if (isInstance(theAction, RaceAssistantPlugin.RaceAssistantAction) && (theAction.Action = "FuelRatioOptimize")
+			 && (!this.Simulator || (this.Simulator.Simulator[true] != "Le Mans Ultimate"))) {
+				theAction.Function.disable(kAllTrigger, theAction)
+				theAction.Function.setLabel(this.actionLabel(theAction), "Gray")
+			}
 	}
 
 	loadSettings(simulator, car, track, data := false, settings := false) {
@@ -372,6 +391,13 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 		}
 		else
 			return false
+	}
+
+	optimizeFuelRatio(safetyFuel?) {
+		if (isSet(safetyFuel) && (safetyFuel = "Engineer") && this.RaceEngineer)
+			this.RaceEngineer.optimizeFuelRatio()
+		else if (isSet(LMUPlugin) && isInstance(this.Simulator, LMUPlugin))
+			this.Simulator.optimizeFuelRatio(isSet(safetyFuel) ? ((safetyFuel = "Engineer") ? unset : safetyFuel) : unset)
 	}
 
 	planPitstop() {

@@ -99,6 +99,8 @@ Announcements=fuel warnings, damage warnings, damage analysis, weather warnings,
 
 3.  Pitstop
 
+	[(CanWe) {optimize, recalculate, calculate} the fuel ratio, (CanWe) optimize the refuel amount, (CanWe) optimize the energy replenishment]
+	
 	(CanWe) {plan the pitstop, create a plan for the pitstop, create a pitstop plan, come up with a pitstop plan}
 	
 	(CanWe) {plan the driver swap, create a plan for the driver swap, create a driver swap plan, come up with a driver swap plan}

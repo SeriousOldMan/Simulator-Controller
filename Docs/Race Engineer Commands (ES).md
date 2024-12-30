@@ -96,6 +96,8 @@ Announcements=advertencias de combustible, advertencias de daños, análisis de 
 
 3.  Parada en boxes
 
+	(CanWe) {optimizar, recalcular, calcular} {la proporción de combustible, la cantidad de combustible, la cantidad de gasolina}
+	
 	(CanWe) {planificar la parada, crear un plan para la parada}
 	
 	(CanWe) {planificar la cambio de piloto, crear un plan para la cambio de piloto}

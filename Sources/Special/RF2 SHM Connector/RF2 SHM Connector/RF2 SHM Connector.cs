@@ -241,7 +241,17 @@ namespace SHMConnector {
 					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Driver.Nickname="); strWriter.WriteLine(GetNickname(vehicle.mDriverName));
 
 					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".InPitLane="); strWriter.WriteLine(vehicle.mInPits != 0 ? "true" : "false");
-					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".InPit="); strWriter.WriteLine(vehicle.mPitState == (byte)Stopped ? "true" : "false");
+					
+					if (vehicle.mInPits != 0) {
+						double speed = VehicleSpeed(ref vehicle);
+						
+						if (speed < 5 || vehicle.mPitState == (byte)Stopped) {
+							strWriter.Write("Car."); strWriter.Write(i); strWriter.WriteLine(".InPit=true");
+						}
+						else {
+							strWriter.Write("Car."); strWriter.Write(i); strWriter.WriteLine(".InPit=false");
+						}
+					}
 
 					if (vehicle.mIsPlayer == 1)
                     {
@@ -335,7 +345,15 @@ namespace SHMConnector {
 
 				strWriter.Write("StintTimeRemaining="); strWriter.WriteLine(time);
 				strWriter.Write("DriverTimeRemaining="); strWriter.WriteLine(time);
-				strWriter.Write("InPit="); strWriter.WriteLine(playerScoring.mPitState == (byte)Stopped ? "true" : "false");
+					
+				if (playerScoring.mInPits != 0) {
+					double speed = VehicleSpeed(ref playerScoring);
+					
+					if (speed < 5 || playerScoring.mPitState == (byte)Stopped)
+						strWriter.WriteLine("InPit=true");
+					else
+						strWriter.WriteLine("InPit=false");
+				}
 			}
 
 			strWriter.WriteLine("[Car Data]");
@@ -424,6 +442,13 @@ namespace SHMConnector {
 			return (value < 0) ? 0 : value;
 
 		}
+
+        double VehicleSpeed(ref rF2VehicleScoring vehicle)
+        {
+            rF2Vec3 localVel = vehicle.mLocalVel;
+
+            return Math.Sqrt(localVel.x * localVel.x + localVel.y * localVel.y + localVel.z * localVel.z) * 3.6;
+        }
 
 		private long GetRemainingLaps(ref rF2VehicleScoring playerScoring) {
 			if (playerScoring.mTotalLaps < 1)

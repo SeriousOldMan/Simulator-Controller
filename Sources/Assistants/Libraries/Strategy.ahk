@@ -914,7 +914,7 @@ class VariationSimulation extends StrategySimulation {
 
 								stintLaps := Floor((stintLength * 60) / avgLapTime)
 
-								name := (translate("Initial Conditions - Map ") . ecuMap)
+								name := (translate("Fixed - Map ") . ecuMap)
 
 								this.setFixedLapTime(avgLapTime)
 
@@ -1296,7 +1296,7 @@ class TrafficSimulation extends StrategySimulation {
 
 									stintLaps := Floor((stintLength * 60) / avgLapTime)
 
-									name := (translate("Initial Conditions - Map ") . ecuMap)
+									name := (translate("Fixed - Map ") . ecuMap)
 
 									this.setFixedLapTime(avgLapTime)
 

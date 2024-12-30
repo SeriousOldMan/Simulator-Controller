@@ -123,6 +123,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 31. [Mastering on-track coaching](https://youtu.be/Gnzye2kf7HI) - This video gives you valuable insights in the configuration of the on-track coaching provided by the Driving Coach. A live conversation is also part of the demonstration.
 
+32. [Running an LMU race with an AI pit crew](https://youtu.be/ntQRnx0Grjk) - Demonstration of the new automated strategy and pitstop handling for Le Mans Ultimate. Please don't judge my driving, this was for demonstration purposes. :-)
+
 This list will be extended from time to time to cover new functionalities.
 
 ### Discord Community

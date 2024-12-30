@@ -89,7 +89,7 @@ class LMUPlugin extends Sector397Plugin {
 	}
 
 	getOptionHandler(option) {
-		return (operation, value?, pitstop := false) {
+		return (operation, value?, pitstop := false, initial := true) {
 			local simulator := this.Simulator[true]
 			local car := this.Car
 			local track := this.Track
@@ -104,7 +104,8 @@ class LMUPlugin extends Sector397Plugin {
 						case "Get":
 							return (pitstop.getRefuelLevel() - this.iRemainingFuelAmount)
 						case "Set":
-							this.iRemainingFuelAmount := this.iLastFuelAmount
+							if initial
+								this.iRemainingFuelAmount := this.iLastFuelAmount
 
 							pitstop.setRefuelLevel(value + this.iRemainingFuelAmount)
 						case "Change":
@@ -372,11 +373,12 @@ class LMUPlugin extends Sector397Plugin {
 
 		if this.iAdjustRefuelAmount
 			Task.startTask(() {
+				local handler := this.getOptionHandler("Refuel")
 				local ignore, fuelConsumption
 
 				this.getConsumptions(&ignore, &fuelConsumption)
 
-				this.setPitstopOption("Refuel", this.getOptionHandler("Refuel").Call("Get") - fuelConsumption)
+				handler.Call("Set", handler.Call("Get") - fuelConsumption, false, false)
 			}, 1000, kLowPriority)
 
 		if getMultiMapValue(this.Settings, "Simulator.Le Mans Ultimate", "Pitstop.Fuel.Ratio", false)

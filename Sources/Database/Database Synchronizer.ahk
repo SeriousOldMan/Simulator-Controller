@@ -277,21 +277,14 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategies, downloadTelemetries) {
 	local sessionDBPath := SessionDatabase.DatabasePath
 	local downloadTimeStamp := sessionDBPath . "DOWNLOAD"
-	local ignore, fileName, type, databaseDirectory, configuration
+	local ignore, fileName, type, databaseDirectory
 
 	if FileExist(downloadTimeStamp)
 		if (DateDiff(A_Now, StrSplit(FileRead(downloadTimeStamp), "`n", "`r")[1], "days") <= 2)
 			return
 
-	try {
-		try {
-			DirDelete(kTempDirectory . "Shared Database", 1)
-		}
-		catch Any as exception {
-			logError(exception)
-		}
-
-		configuration := newMultiMap()
+	updateState() {
+		local configuration := newMultiMap()
 
 		setMultiMapValue(configuration, "Database Synchronizer", "UserID", SessionDatabase.ID)
 		setMultiMapValue(configuration, "Database Synchronizer", "DatabaseID", SessionDatabase.DatabaseID)
@@ -304,6 +297,17 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 		setMultiMapValue(configuration, "Database Synchronizer", "Synchronization", "Downloading")
 
 		writeMultiMap(kTempDirectory . "Database Synchronizer.state", configuration)
+	}
+
+	try {
+		try {
+			DirDelete(kTempDirectory . "Shared Database", 1)
+		}
+		catch Any as exception {
+			logError(exception)
+		}
+
+		updateState()
 
 		for ignore, fileName in ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads") {
 			SplitPath(fileName, , , , &databaseDirectory)
@@ -314,12 +318,16 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 				if (SessionDatabase.DatabaseVersion != databaseDirectory) {
 					ftpDownload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads/" . fileName, kTempDirectory . fileName)
 
+					updateState()
+
 					try {
 						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kTempDirectory . fileName . "' -DestinationPath '" . kTempDirectory . "Shared Database' -Force", , "Hide")
 					}
 					catch Any as exception {
 						logError(exception)
 					}
+
+					updateState()
 
 					deleteFile(kTempDirectory . fileName)
 					deleteDirectory(sessionDBPath . "Community")

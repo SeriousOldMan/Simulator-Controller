@@ -580,8 +580,10 @@ class LMUPlugin extends Sector397Plugin {
 
 			fuelAmount := getMultiMapValue(data, "Session Data", "FuelAmount", false)
 
-			if fuelAmount
+			if (fuelAmount && this.iFuelRatio)
 				setMultiMapValue(data, "Session Data", "FuelAmount", Round(this.iFuelRatio * 100, 1))
+			else if !fuelAmount
+				setMultiMapValue(data, "Session Data", "FuelAmount", LMURESTProvider.EnergyData(simulator, car, track).MaxFuelAmount)
 
 			for key, postFix in keys {
 				tyreCompound := getMultiMapValue(data, "Car Data", "TyreCompound" . postFix, kUndefined)

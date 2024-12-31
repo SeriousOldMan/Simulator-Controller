@@ -55,31 +55,28 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 	local sessionDBPath := sessionDB.DatabasePath
 	local uploadTimeStamp := sessionDBPath . "UPLOAD"
 	local targetDB := TyresDatabase()
+	local configuration := newMultiMap()
 	local step := 20
 	local simulator, car, track, distFile
 	local directory, sourceDB, targetDB, ignore, type, row, compound, compoundColor
 
 	updateState() {
-		local configuration
-
 		if (++step > 20) {
 			step := 0
-
-			configuration := newMultiMap()
-
-			setMultiMapValue(configuration, "Database Synchronizer", "UserID", sessionDB.ID)
-			setMultiMapValue(configuration, "Database Synchronizer", "DatabaseID", sessionDB.DatabaseID)
-
-			setMultiMapValue(configuration, "Database Synchronizer", "State", "Active")
-
-			setMultiMapValue(configuration, "Database Synchronizer", "Information"
-						   , translate("Message: ") . translate("Uploading community database..."))
-
-			setMultiMapValue(configuration, "Database Synchronizer", "Synchronization", "Uploading")
 
 			writeMultiMap(kTempDirectory . "Database Synchronizer.state", configuration)
 		}
 	}
+
+	setMultiMapValue(configuration, "Database Synchronizer", "UserID", sessionDB.ID)
+	setMultiMapValue(configuration, "Database Synchronizer", "DatabaseID", sessionDB.DatabaseID)
+
+	setMultiMapValue(configuration, "Database Synchronizer", "State", "Active")
+
+	setMultiMapValue(configuration, "Database Synchronizer", "Information"
+				   , translate("Message: ") . translate("Uploading community database..."))
+
+	setMultiMapValue(configuration, "Database Synchronizer", "Synchronization", "Uploading")
 
 	if FileExist(uploadTimeStamp)
 		if (DateDiff(A_Now, StrSplit(FileRead(uploadTimeStamp), "`n", "`r")[1], "days") <= 7)
@@ -277,6 +274,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategies, downloadTelemetries) {
 	local sessionDBPath := SessionDatabase.DatabasePath
 	local downloadTimeStamp := sessionDBPath . "DOWNLOAD"
+	local configuration := newMultiMap()
 	local ignore, fileName, type, databaseDirectory
 
 	if FileExist(downloadTimeStamp)
@@ -284,20 +282,18 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 			return
 
 	updateState() {
-		local configuration := newMultiMap()
-
-		setMultiMapValue(configuration, "Database Synchronizer", "UserID", SessionDatabase.ID)
-		setMultiMapValue(configuration, "Database Synchronizer", "DatabaseID", SessionDatabase.DatabaseID)
-
-		setMultiMapValue(configuration, "Database Synchronizer", "State", "Active")
-
-		setMultiMapValue(configuration, "Database Synchronizer", "Information"
-					   , translate("Message: ") . translate("Downloading community database..."))
-
-		setMultiMapValue(configuration, "Database Synchronizer", "Synchronization", "Downloading")
-
 		writeMultiMap(kTempDirectory . "Database Synchronizer.state", configuration)
 	}
+
+	setMultiMapValue(configuration, "Database Synchronizer", "UserID", SessionDatabase.ID)
+	setMultiMapValue(configuration, "Database Synchronizer", "DatabaseID", SessionDatabase.DatabaseID)
+
+	setMultiMapValue(configuration, "Database Synchronizer", "State", "Active")
+
+	setMultiMapValue(configuration, "Database Synchronizer", "Information"
+				   , translate("Message: ") . translate("Downloading community database..."))
+
+	setMultiMapValue(configuration, "Database Synchronizer", "Synchronization", "Downloading")
 
 	try {
 		try {
@@ -353,8 +349,6 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 		deleteFile(sessionDBPath . "DOWNLOAD")
 
 		FileAppend(A_Now, sessionDBPath . "DOWNLOAD")
-
-		setMultiMapValue(configuration, "Database Synchronizer", "State", "Active")
 
 		setMultiMapValue(configuration, "Database Synchronizer", "Information"
 					   , translate("Message: ") . translate("Synchronization finished..."))

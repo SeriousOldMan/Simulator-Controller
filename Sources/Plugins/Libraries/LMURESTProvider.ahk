@@ -265,26 +265,58 @@ class LMURestProvider {
 		getRefuelLevel() {
 			local ratio := this.lookup("FUEL RATIO:")
 			local energy := this.lookup("VIRTUAL ENERGY:")
+			local fuel
 
 			if (ratio && energy)
 				return (ratio["settings"][ratio["currentSetting"] + 1]["text"] * energy["currentSetting"])
-			else
-				return false
+			else {
+				fuel := this.lookup("FUEL:")
+
+				if fuel
+					return string2Values("l/", fuel["settings"][fuel["currentSetting"]]["text"])[1]
+				else
+					return false
+			}
 		}
 
 		setRefuelLevel(liters) {
 			local ratio := this.lookup("FUEL RATIO:")
 			local energy := this.lookup("VIRTUAL ENERGY:")
+			local fuel, index, value
 
 			if (ratio && energy)
 				energy["currentSetting"] := Min(100, Max(0, Round(liters / ratio["settings"][ratio["currentSetting"] + 1]["text"])))
+			else {
+				fuel := this.lookup("FUEL:")
+
+				if fuel {
+					for index, value in fuel["settings"] {
+						value := string2Values("l/", value["text"])[1]
+
+						if (value > liters) {
+							fuel["currentSetting"] := (index - 1)
+
+							return
+						}
+					}
+
+					fuel["currentSetting"] := (fuel["settings"].Length - 1)
+				}
+			}
 		}
 
 		changeRefuelLevel(steps := 1) {
 			local energy := this.lookup("VIRTUAL ENERGY:")
+			local fuel
 
 			if energy
 				energy["currentSetting"] := Min(100, Max(0, energy["currentSetting"] + Round(steps)))
+			else {
+				fuel := this.lookup("FUEL:")
+
+				if fuel
+					fuel["currentSetting"] := Min(fuel["settings"].Length - 1, Max(0, fuel["currentSetting"] + Round(steps)))
+			}
 		}
 
 		getFuelRatio() {
@@ -678,19 +710,37 @@ class LMURestProvider {
 			}
 		}
 
+		MaxVirtualEnergy {
+			Get {
+				return 100
+			}
+		}
+
 		RemainingFuelAmount {
 			Get {
 				return this.getRemainingFuelAmount()
 			}
 		}
 
-		getRemainingVirtualEnergy() {
-			return ((this.Data && this.Data.Has("fuelInfo")) ? Round(this.Data["fuelInfo"]["currentVirtualEnergy"] / this.Data["fuelInfo"]["maxVirtualEnergy"] * 100, 2)
-															 : false)
+		MaxFuelAmount {
+			Get {
+				return this.getMaxFuelAmount()
+			}
 		}
 
-		getFuelAmount() {
+		getRemainingVirtualEnergy() {
+			if (this.Data && this.Data.Has("fuelInfo") && this.Data["fuelInfo"].Has("currentVirtualEnergy"))
+				return Round(this.Data["fuelInfo"]["currentVirtualEnergy"] / this.Data["fuelInfo"]["maxVirtualEnergy"] * 100, 2)
+			else
+				return false
+		}
+
+		getRemainingFuelAmount() {
 			return ((this.Data && this.Data.Has("fuelInfo")) ? Round(this.Data["fuelInfo"]["currentFuel"], 2) : false)
+		}
+
+		getMaxFuelAmount() {
+			return ((this.Data && this.Data.Has("fuelInfo")) ? Round(this.Data["fuelInfo"]["maxFuel"], 2) : false)
 		}
 	}
 

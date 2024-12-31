@@ -1200,6 +1200,8 @@ class TelemetryViewer {
 			else
 				this.closeTrackMap()
 		}
+
+		SectionInfoViewer.closeSectionInfo()
 	}
 
 	clear() {

@@ -325,11 +325,14 @@ All Race Assistants can be temporarily instructed with a couple of voice command
 It is possible, although not much fun, to use Jona without its natural language interface. Only the pitstop planning and setup capabilities are available in this configuration, but it is still useful. You can use the following parameters to connect these actions to your controller hardware:
 
 	assistantCommands: PitstopPlan *function*, DriverSwapPlan *function*, PitstopPrepare *function*,
+					   FuelRatioOptimize *function*,
 					   Call *callFunction*, Accept *acceptFunction*, Reject *rejectFunction*,
 					   Interrupt *interruptFunction*, Mute *muteFunction*, Unmute *unmuteFunction*,
 					   InformationRequest *requestFunction* *command* [*arguments*], ...
 	
 All these command actions will be bound to the plugin itself, thereby are available all the time, and only unary functions are supported here. By using this actions, you will be able to use Jona with voice output, but no voice control, thereby getting most of the support from Jona, but you have to use an *oldschool* interface to control the engineer actions. To *answer* "Yes" to one of the questions of Jona, you must supply a controller function, for example a push button function, to the *Accept* parameter and for "No", you must use the *Reject* parameter. A little bit different is the *Call* action. This action will activate Jona and will make it the active listening dialog partner for voice control by the push of a button. This is similar to issuing the "Hey Jona" activation command. With *Interrupt* you can interrupt the currently running speech of Jona, and last but not least, you can use *Mute* and *Unmute*, when you temporarely want to deactivate voice ouput for Jona.
+
+Note: The *FuelRatioOptimize* is available only when using *Le Mans Ultimate*.
 
 Furthermore, you can request a lot of information from Jona, mostly about the current state of your car. Thefore, you can supply the *InformationRequest* parameter multiple times.
 
@@ -406,7 +409,7 @@ These additional commands are available:
 | ------ | ------ |
 | StrategyCancel | Cancels the current strategy. Cato will not have any strategy information from now on. |
 | StrategyRecommend | Cato will try to update the currently active strategy according to the current situation. Very useful after an unplanned pitstop or a sudden weather change. |
-| FCYRecommend | This command can be triggered, when the track is under Full Course Yellow with pitstops allowed. Cato  |
+| FCYRecommend | This command can be triggered, when the track is under Full Course Yellow with pitstops allowed. Cato will then check whether a pitstop under full course yellow will have a strategical benefit.  |
 | PitstopRecommend | Cato will try to determine the best possible lap for the next pitstop. Possible undercuts will be taken into account as well as the traffic situation after the pitstop. |
 
 Furthermore, you can request a lot of information from Cato about the current race situation. Thefore, you can supply the *InformationRequest* parameter multiple times.
@@ -618,6 +621,7 @@ See the following table for the supported Assistant commands.
 | Command | Description |
 | ------ | ------ |
 | InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your Race Assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
+| FCYRecommend | This command can be triggered, when the track is under Full Course Yellow with pitstops allowed. The Race Strategist will then check whether a pitstop under full course yellow will have a strategical benefit.  |
 | PitstopRecommend | Asks the Virtual Race Strategist for a recommendation for the next pitstop. |
 | StrategyRecommend | Asks the Virtual Race Strategist to [recalculate and adjust the strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) based on the currently active strategy and the current race situation. Very useful after an unplanned pitstop. |
 | StrategyCancel | Asks the Virtual Race Strategist to drop the currently active strategy. |
@@ -740,6 +744,7 @@ See the following table for the supported Assistant commands.
 | Command | Description |
 | ------ | ------ |
 | InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your Race Assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
+| FCYRecommend | This command can be triggered, when the track is under Full Course Yellow with pitstops allowed. The Race Strategist will then check whether a pitstop under full course yellow will have a strategical benefit.  |
 | PitstopRecommend | Asks the Virtual Race Strategist for a recommendation for the next pitstop. |
 | StrategyRecommend | Asks the Virtual Race Strategist to [recalculate and adjust the strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) based on the currently active strategy and the current race situation. Very useful after an unplanned pitstop. |
 | StrategyCancel | Asks the Virtual Race Strategist to drop the currently active strategy. |
@@ -851,6 +856,7 @@ See the following table for the supported Assistant commands.
 | Command | Description |
 | ------ | ------ |
 | InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your Race Assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
+| FCYRecommend | This command can be triggered, when the track is under Full Course Yellow with pitstops allowed. The Race Strategist will then check whether a pitstop under full course yellow will have a strategical benefit.  |
 | PitstopRecommend | Asks the virtual Eace Strategist for a recommendation for the next pitstop. |
 | StrategyRecommend | Asks the Virtual Race Strategist to [recalculate and adjust the strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) based on the currently active strategy and the current race situation. Very useful after an unplanned pitstop. |
 | StrategyCancel | Asks the Virtual Race Strategist to drop the currently active strategy. |
@@ -863,6 +869,10 @@ See the following table for the supported Assistant commands.
 See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *DriverSwapPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* or *StrategyCancel*.
 
 Note: For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
+
+### Special notes for *iRacing*
+
+*iRacing* does not provide tyre pressure data in the API while you are out on the track and any calculation of cold pressures for changing tyres will end up in a desaster. Therefore, the handling of tyres during pitstop is disabled by default for the Race Engineer. You can change that using a setting in the "Session Database", but then be sure to check the pressures.
 
 ## Plugin *RF2*
 
@@ -947,6 +957,7 @@ See the following table for the supported Assistant commands.
 | Command | Description |
 | ------ | ------ |
 | InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your Race Assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
+| FCYRecommend | This command can be triggered, when the track is under Full Course Yellow with pitstops allowed. The Race Strategist will then check whether a pitstop under full course yellow will have a strategical benefit.  |
 | PitstopRecommend | Asks the Virtual Race Strategist for a recommendation for the next pitstop. |
 | StrategyRecommend | Asks the Virtual Race Strategist to [recalculate and adjust the strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) based on the currently active strategy and the current race situation. Very useful after an unplanned pitstop. |
 | StrategyCancel | Asks the Virtual Race Strategist to drop the currently active strategy. |
@@ -1050,6 +1061,7 @@ See the following table for the supported Assistant commands.
 | Command | Description |
 | ------ | ------ |
 | InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your Race Assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
+| FCYRecommend | This command can be triggered, when the track is under Full Course Yellow with pitstops allowed. The Race Strategist will then check whether a pitstop under full course yellow will have a strategical benefit.  |
 | PitstopRecommend | Asks the Virtual Race Strategist for a recommendation for the next pitstop. |
 | StrategyRecommend | Asks the Virtual Race Strategist to [recalculate and adjust the strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) based on the currently active strategy and the current race situation. Very useful after an unplanned pitstop. |
 | StrategyCancel | Asks the Virtual Race Strategist to drop the currently active strategy. |
@@ -1157,6 +1169,7 @@ See the following table for the supported Assistant commands.
 | Command | Description |
 | ------ | ------ |
 | InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your Race Assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
+| FCYRecommend | This command can be triggered, when the track is under Full Course Yellow with pitstops allowed. The Race Strategist will then check whether a pitstop under full course yellow will have a strategical benefit.  |
 | PitstopRecommend | Asks the Virtual Race Strategist for a recommendation for the next pitstop. |
 | StrategyRecommend | Asks the Virtual Race Strategist to [recalculate and adjust the strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) based on the currently active strategy and the current race situation. Very useful after an unplanned pitstop. |
 | StrategyCancel | Asks the Virtual Race Strategist to drop the currently active strategy. |
@@ -1258,6 +1271,7 @@ See the following table for the supported assistant commands.
 | Command | Description |
 | ------ | ------ |
 | InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your race assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
+| FCYRecommend | This command can be triggered, when the track is under Full Course Yellow with pitstops allowed. The Race Strategist will then check whether a pitstop under full course yellow will have a strategical benefit.  |
 | PitstopRecommend | Asks the virtual race strategist for a recommendation for the next pitstop. This commadn is most useful, when no strategy is currently active. |
 | StrategyRecommend | Asks the Virtual Race Strategist to [recalculate and adjust the strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) based on the currently active strategy and the current race situation. Very useful after an unplanned pitstop. |
 | StrategyCancel | Asks the virtual race strategist to drop the currently active strategy. |
@@ -1366,9 +1380,11 @@ See the following table for the supported Assistant commands.
 | Command | Description |
 | ------ | ------ |
 | InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your Race Assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
+| FCYRecommend | This command can be triggered, when the track is under Full Course Yellow with pitstops allowed. The Race Strategist will then check whether a pitstop under full course yellow will have a strategical benefit.  |
 | PitstopRecommend | Asks the Virtual Race Strategist for a recommendation for the next pitstop. |
 | StrategyRecommend | Asks the Virtual Race Strategist to [recalculate and adjust the strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) based on the currently active strategy and the current race situation. Very useful after an unplanned pitstop. |
 | StrategyCancel | Asks the Virtual Race Strategist to drop the currently active strategy. |
+| FuelRatioOptimize | Requests a recalcualtion of the fuel ratio by the Virtual Race Engineer. |
 | PitstopPlan | Requests a pitstop plan from the Virtual Race Engineer. |
 | DriverSwapPlan | Requests a pitstop plan for the next driver in a team session from the Virtual Race Engineer. |
 | PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
@@ -1391,16 +1407,23 @@ For *Le Mans Ultimate*, you need to install a plugin into a special location for
 
 3. It sometimes happens that driver names contain corrupt characters. Looks like a different interpretation of character codings inherited by the *rFactor 2* data API.
 
-4. The Race Engineer calculates the energy fill up of an upcoming pitstop based on the fuel consumption of the recent laps. When the Engineer announces the amount of fuel to be added for the next pitstop, the fuel amount will be divided by the *fuel ratio* as currently set in the pitstop menu of the HUD, before being used as the value for the virtual energy replenishment. So make sure, that your *fuel ratio* setting is as desired at the time, when the pitstop settings are changed.
+4. As usual, the Race Engineer calculates the energy fill up of an upcoming pitstop based on the fuel consumption of the recent laps.
 
-   Note: The *fuel ratio* implicitely includes the max fuel the car can carry, since the value can be greater than 1. Confusing, isn't it. This has the following implications at the moment:
+   - For Hypercars and LMGT3 cars the following applies:
+
+     When the Engineer announces the amount of fuel to be added for the next pitstop, the fuel amount will be divided by the *fuel ratio* as currently set in the pitstop menu of the HUD, before being used as the value for the virtual energy replenishment. So make sure, that your *fuel ratio* setting is as desired at the time, when the pitstop settings are changed.
+
+     Note: The *fuel ratio* implicitely includes the max fuel the car can carry, since the value can be greater than 1. Confusing, isn't it. This has the following implications at the moment:
    
-     - The fuel ratio normally contain a certain amount of safety fuel, that assure that you will not run out of fuel with 100% energy consumption. But make sure you pit before dropping virtual energy to 0%. You can recalibrate the fuel ratio once you have driven a few laps using the "FuelRatioOptimize" action or the corresponding voice command of the Race Engineer. This will use your current fuel consumption for every 1% virtual energy plus the safety fuel specified in the settings to compute an optimal fuel ratio.
+       - The fuel ratio normally contain a certain amount of safety fuel, that assure that you will not run out of fuel with 100% energy consumption. But make sure you pit before dropping virtual energy to 0%. You can recalibrate the fuel ratio once you have driven a few laps using the "FuelRatioOptimize" action or the corresponding voice command of the Race Engineer. This will use your current fuel consumption for every 1% virtual energy plus the safety fuel specified in the settings to compute an optimal fuel ratio.
 	 
-	 - When working with the ["Setup Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench), it is important to set the max fuel the car can carry to fulfill the virtual energy constraints, which will be lower than the fuel capacity of the car on most tracks. Otherwise you will end up with strategies, which might be agianst the rules of the WEC. You can set the fuel capacity in the "Session Database" for a given car / track combination, once you have dialed your numbers (it may have been set there already for you by the Assistants, but be sure to correct the value, once you have found a perfect fuel ratio). Then use the "Initialize from Database" command in the "Session" menu of "Setup Workbench", before you simulate your strategy.
+	   - When working with the ["Setup Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench), it is important to set the max fuel the car can carry to fulfill the virtual energy constraints, which will be lower than the fuel capacity of the car on most tracks. Otherwise you will end up with strategies, which might be agianst the rules of the WEC. You can set the fuel capacity in the "Session Database" for a given car / track combination, once you have dialed your numbers (it may have been set there already for you by the Assistants, but be sure to correct the value, once you have found a perfect fuel ratio). Then use the "Initialize from Database" command in the "Session" menu of "Setup Workbench", before you simulate your strategy.
 
-   Another important aspect of the virtual energy system is that the setting in the pitstop MFD of *Le Mans Ultimate* does not define how much energy has to be added at the next pitstop, but instead specifies the energy amount that will be available, when you leave the pit. This will be taken automatically into account when the refuel amount is calculated, but this is only correct at the current lap. So don't wait too long before you go to the pit or let the Engineer create a new pitstop plan, just before coming to the pit.
-   When running on a pre-defined strategy, refueling calculation works a bit different. The Strategist and the Engineer will tell you the lap you have to come in. The calculation of the virtual energy will be exact for this particular lap. Of course youcan come in later, if you have still some virtual energy left, but then you may have to correct the virtual energy level by this number of laps, at least if the next stint will be your last one. Said all that, please take a look at the [setting "Engineer: Adjust virtual energy level for pitstop"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) of the "Session Database".
+     Another important aspect of the virtual energy system is that the setting in the pitstop menu of *Le Mans Ultimate* does not define how much energy has to be added at the next pitstop, but instead specifies the energy amount that will be available, when you leave the pit. This will be taken automatically into account when the refuel amount is calculated, but this is only correct at the current lap. So don't wait too long before you go to the pit or let the Engineer create a new pitstop plan, just before coming to the pit.
+   
+     When running on a pre-defined strategy, refueling calculation works a bit different. The Strategist and the Engineer will tell you the lap you have to come in. The calculation of the virtual energy will be exact for this particular lap. Of course youcan come in later, if you have still some virtual energy left, but then you may have to correct the virtual energy level by this number of laps, at least if the next stint will be your last one. Said all that, please take a look at the [setting "Engineer: Adjust virtual energy level for pitstop"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) of the "Session Database".
+
+  - LMP2 cars have a *classical* fuel capacity, so virtual energy and fuel ratio does not apply here. Nevertheless, the way the refueling calculation works, is the same as for Hypercars and LMGT3s. This means, that the calculation made by the Engineer is based on the amount of fuel to be added, whereas the pitstop menu specifies the amount of fuel in the tank, when the car leaves the pit. Conversion between these two models are automatic, but you may also want to take a look at the [setting "Engineer: Adjust virtual energy level for pitstop"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) of the "Session Database", as discussed above.
 
 5. Additionally, the Race Engineer can only handle identical tyre compounds for all four tyres and can only change all four tyres together. You may, however adjust this manually once the Engineer has prepared the pitstop. This may change with a future release.
 

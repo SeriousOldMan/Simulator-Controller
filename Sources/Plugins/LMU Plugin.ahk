@@ -84,6 +84,18 @@ class LMUPlugin extends Sector397Plugin {
 		selectActions := []
 	}
 
+	updateRaceAssistantActions(session) {
+		local ignore, theAction
+
+		super.updateRaceAssistantActions(session)
+
+		for ignore, theAction in this.Actions
+			if (isInstance(theAction, RaceAssistantPlugin.RaceAssistantAction) && (theAction.Action = "FuelRatioOptimize")) {
+			 	theAction.Function.enable(kAllTrigger, theAction)
+				theAction.Function.setLabel(this.actionLabel(theAction))
+			}
+	}
+
 	supportsSetupImport() {
 		return true
 	}

@@ -369,9 +369,11 @@ checkInstallation() {
 
 					for ignore, url in string2Values(";", getMultiMapValue(packageInfo, "Components", component . "." . version . ".Download", "")) {
 						try {
+							deleteFile(A_Temp . "\Temp.zip")
+
 							Download(url, A_Temp . "\Temp.zip")
 
-							urlError := false
+							urlError := !FileExist(A_Temp . "\Temp.zip")
 						}
 						catch Any as exception {
 							urlError := exception

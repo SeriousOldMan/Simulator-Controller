@@ -79,7 +79,7 @@ class LMURestProvider {
 
 		read() {
 			try {
-				this.iData := WinHttpRequest().GET(this.GETURL, "", false, {Encoding: "UTF-8"}).JSON
+				this.iData := WinHttpRequest({Timeouts: [0, 5000, 5000, 5000]}).GET(this.GETURL, "", false, {Encoding: "UTF-8"}).JSON
 
 				if !isObject(this.iData)
 					this.iData := false
@@ -96,7 +96,7 @@ class LMURestProvider {
 
 			if this.Data
 				try {
-					WinHttpRequest().POST(this.PUTURL, data, false, {Object: true, Encoding: "UTF-8"})
+					WinHttpRequest({Timeouts: [0, 5000, 5000, 5000]}).POST(this.PUTURL, data, false, {Object: true, Encoding: "UTF-8"})
 				}
 				catch Any as exception {
 					logError(exception, true)

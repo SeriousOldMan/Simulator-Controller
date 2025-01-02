@@ -22,8 +22,16 @@
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class LMUSetup extends FileSetup {
+	iHeader := ""
+
 	iOriginalData := false
 	iModifiedData := false
+
+	Header {
+		Get {
+			return this.iHeader
+		}
+	}
 
 	Data[original := false] {
 		Get {
@@ -49,19 +57,31 @@ class LMUSetup extends FileSetup {
 			if !settings.Has("Aero.Height.Rear.Right")
 				setMultiMapValue(setup, "REARRIGHT", "RideHeightSetting", getMultiMapValue(setup, "REARLEFT", "RideHeightSetting"))
 
-			value := printMultiMap(setup)
-
-			return (super.Setup[original?] := StrReplace(StrReplace(value, "=true", "=1"), "=false", "=0"))
+			return (super.Setup[original] := (this.Header . StrReplace(StrReplace(printMultiMap(setup), "=true", "=1"), "=false", "=0")))
 		}
 	}
 
 	__New(editor, originalFileName := false, modifiedFileName := false) {
+		local header := ""
+		local line
+
 		iEditor := editor
 
 		super.__New(editor, originalFileName, modifiedFileName)
 
 		this.iOriginalData := parseMultiMap(this.Setup[true], false)
 		this.iModifiedData := parseMultiMap(this.Setup[false], false)
+
+		loop Parse, this.Setup[true], "`n", "`r" {
+			line := Trim(A_LoopField)
+
+			if (InStr(line, "[") = 1)
+				break
+			else
+				header := (header . line . "`n")
+		}
+
+		this.iHeader := header
 	}
 
 	valueAvailable(setting, original := false) {
@@ -102,7 +122,7 @@ class LMUSetup extends FileSetup {
 			if this.valueAvailable(setting, true)
 				this.setValue(setting, this.getValue(setting, !this.Enabled[setting]), display)
 
-		return printMultiMap(display)
+		return (this.Header . printMultiMap(display))
 	}
 
 	enable(setting) {

@@ -848,7 +848,20 @@ class LMURESTProvider {
 	}
 
 	class GarageData extends LMURESTProvider.RESTData {
+		POSTURL {
+			Get {
+				return "http://localhost:6397/rest/garage/refreshsetups"
+			}
+		}
+
 		refreshSetups() {
+			try {
+				WinHttpRequest().POST(this.POSTURL, "", false, {Encoding: "UTF-8"})
+			}
+			catch Any as exception {
+				msgbox 1
+				logError(exception)
+			}
 		}
 	}
 

@@ -12,11 +12,16 @@
 [?Initialize] => (Prove: addSimulator("Le Mans Ultimate")),
 				 (Prove: addCharacteristics("Le Mans Ultimate", *, *, *)),
 				 (Prove: addSettings("Le Mans Ultimate", *, *)),
-				 (Prove: removeSettings("Le Mans Ultimate", *, [Aero.Splitter.Front,
+				 (Prove: removeSettings("Le Mans Ultimate", *, [Aero.Splitter.Front, Electronics.MGUH.Mode,
 																Aero.Wing.Front.Left, Aero.Wing.Front.Right,
 																Aero.Wing.Rear.Left, Aero.Wing.Rear.Right,
-																Aero.Height.Front.Left, Aero.Height.Front.Right,
-																Aero.Height.Rear.Left, Aero.Height.Rear.Right]))
+																Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,
+																Bumpstop.Rate.Rear.Left, Bumpstop.Rate.Rear.Right,
+																Spring.Rate.Front.Heave, Spring.Rate.Rear.Heave,
+																Damper.Compression.Slow.Front.Heave, Damper.Compression.Slow.Rear.Heave,
+																Damper.Compression.Fast.Front.Heave, Damper.Compression.Fast.Rear.Heave,
+																Damper.Rebound.Slow.Front.Heave, Damper.Rebound.Slow.Rear.Heave,
+																Damper.Rebound.Fast.Front.Heave, Damper.Rebound.Fast.Rear.Heave]))
 
 
 ;;;-------------------------------------------------------------------------;;;

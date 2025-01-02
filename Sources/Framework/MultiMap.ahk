@@ -106,7 +106,7 @@ newSectionMap(arguments*) {
 	return SectionMap(arguments*)
 }
 
-readMultiMap(multiMapFile, class?) {
+readMultiMap(multiMapFile, class?, comments := true) {
 	local file := false
 	local tries := 20
 	local data := false
@@ -148,14 +148,14 @@ readMultiMap(multiMapFile, class?) {
 		if (data && (data != "")) {
 			SplitPath(multiMapFile, , &directory)
 
-			return parseMultiMap(data, class?, directory)
+			return parseMultiMap(data, comments, class?, directory)
 		}
 	}
 
 	return newMultiMap()
 }
 
-parseMultiMap(text, class?, directory?) {
+parseMultiMap(text, comments := true, class?, directory?) {
 	local multiMap := (isSet(class) ? class() : newMultiMap())
 	local section := false
 	local currentLine, firstChar, keyValue, key, value
@@ -181,7 +181,15 @@ parseMultiMap(text, class?, directory?) {
 		else if section {
 			keyValue := LTrim(currentLine)
 
-			if ((SubStr(keyValue, 1, 2) != "//") && (SubStr(keyValue, 1, 1) != ";")) {
+			if ((comments == true) && ((SubStr(keyValue, 1, 2) != "//") && (SubStr(keyValue, 1, 1) != ";"))) {
+				keyValue := StrSplit(StrReplace(StrReplace(StrReplace(keyValue, "\=", "_#_EQ-#_"), "\\", "_#_AC-#_"), "\n", "_#_CR-#_"), "=", "", 2)
+
+				key := StrReplace(StrReplace(StrReplace(keyValue[1], "_#_EQ-#_", "="), "_#_AC-#_", "\\"), "_#_CR-#_", "`n")
+				value := ((keyValue.Length > 1) ? StrReplace(StrReplace(StrReplace(keyValue[2], "_#_EQ-#_", "="), "_#_AC-#_", "\"), "_#_CR-#_", "`n") : "")
+
+				multiMap[section][key] := ((value = "true") ? true : ((value = "false") ? false : value))
+			}
+			else if (!comments || exist(comments, (c) => (InStr(keyValue, c) = 1))) {
 				keyValue := StrSplit(StrReplace(StrReplace(StrReplace(keyValue, "\=", "_#_EQ-#_"), "\\", "_#_AC-#_"), "\n", "_#_CR-#_"), "=", "", 2)
 
 				key := StrReplace(StrReplace(StrReplace(keyValue[1], "_#_EQ-#_", "="), "_#_AC-#_", "\\"), "_#_CR-#_", "`n")

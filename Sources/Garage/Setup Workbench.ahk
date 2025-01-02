@@ -1952,6 +1952,10 @@ class Setup {
 		this.iModifiedSetup := false
 	}
 
+	valueAvailable(setting, original := false) {
+		return true
+	}
+
 	getValue(setting, original := false, default := false) {
 		throw "Virtual method Setup.getValue must be implemented in a subclass..."
 	}
@@ -2677,62 +2681,63 @@ class SetupEditor extends ConfigurationItem {
 
 		setup.disable(false)
 
-		for ignore, setting in this.Workbench.Settings {
-			handler := this.createSettingHandler(setting)
+		for ignore, setting in this.Workbench.Settings
+			if (setup.valueAvailable(setting, true) && setup.valueAvailable(setting, false)) {
+				handler := this.createSettingHandler(setting)
 
-			if handler {
-				originalValue := handler.convertToDisplayValue(setup.getValue(setting, true))
-				modifiedValue := handler.convertToDisplayValue(setup.getValue(setting, false))
+				if handler {
+					originalValue := handler.convertToDisplayValue(setup.getValue(setting, true))
+					modifiedValue := handler.convertToDisplayValue(setup.getValue(setting, false))
 
-				if (isNumber(originalValue) && isNumber(modifiedValue)) {
-					if (originalValue = modifiedValue)
-						value := displayValue("Float", handler.formatValue(originalValue))
-					else if (modifiedValue > originalValue) {
-						value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "+"
-								. displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
+					if (isNumber(originalValue) && isNumber(modifiedValue)) {
+						if (originalValue = modifiedValue)
+							value := displayValue("Float", handler.formatValue(originalValue))
+						else if (modifiedValue > originalValue) {
+							value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "+"
+									. displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
 
-						setup.enable(setting)
-					}
-					else {
-						value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "-"
-								. displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
-
-						setup.enable(setting)
-					}
-				}
-				else {
-					if (originalValue = modifiedValue)
-						value := originalValue
-					else {
-						value := modifiedValue
-
-						setup.enable(setting)
-					}
-				}
-
-				category := ""
-
-				for candidate, settings in categories {
-					for ignore, cSetting in string2Values(";", settings)
-						if (InStr(setting, cSetting) == 1) {
-							category := candidate
-
-							break
+							setup.enable(setting)
 						}
+						else {
+							value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "-"
+									. displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
 
-					if (category != "")
-						break
+							setup.enable(setting)
+						}
+					}
+					else {
+						if (originalValue = modifiedValue)
+							value := originalValue
+						else {
+							value := modifiedValue
+
+							setup.enable(setting)
+						}
+					}
+
+					category := ""
+
+					for candidate, settings in categories {
+						for ignore, cSetting in string2Values(";", settings)
+							if (InStr(setting, cSetting) == 1) {
+								category := candidate
+
+								break
+							}
+
+						if (category != "")
+							break
+					}
+
+					label := this.getLabel(setting)
+
+					this.SettingsListView.Add((originalValue = modifiedValue) ? "" : "Check"
+											, categoriesLabels[category], label, value, this.getUnit(setting))
+
+					this.Settings[setting] := label
+					this.Settings[label] := setting
 				}
-
-				label := this.getLabel(setting)
-
-				this.SettingsListView.Add((originalValue = modifiedValue) ? "" : "Check"
-										, categoriesLabels[category], label, value, this.getUnit(setting))
-
-				this.Settings[setting] := label
-				this.Settings[label] := setting
 			}
-		}
 
 		this.SettingsListView.ModifyCol()
 
@@ -3688,6 +3693,7 @@ startupSetupWorkbench() {
 #Include "Libraries\R3EIssueAnalyzer.ahk"
 #Include "Libraries\ACCSetupEditor.ahk"
 #Include "Libraries\ACSetupEditor.ahk"
+#Include "Libraries\LMUSetupEditor.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

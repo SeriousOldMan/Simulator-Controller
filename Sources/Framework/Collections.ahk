@@ -212,6 +212,16 @@ collect(list, function) {
 	return result
 }
 
+exist(list, predicate) {
+	local ignore, value
+
+	for ignore, value in list
+		if predicate.Call(value)
+			return true
+
+	return false
+}
+
 do(list, function) {
 	local ignore, value
 

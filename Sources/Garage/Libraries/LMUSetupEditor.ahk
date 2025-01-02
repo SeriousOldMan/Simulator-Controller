@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
+#Include "..\..\Plugins\Libraries\LMURESTProvider.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -90,7 +91,7 @@ class LMUSetup extends FileSetup {
 	}
 
 	printSetup(setup) {
-		local display := newMultiMap()
+		local display := setup.Clone()
 		local ignore, setting, section, values, key, value
 
 		for section, values in setup
@@ -98,7 +99,8 @@ class LMUSetup extends FileSetup {
 				setMultiMapValue(display, section, key, value)
 
 		for ignore, setting in this.Editor.Workbench.Settings
-			this.setValue(setting, this.getValue(setting, !this.Enabled[setting]), display)
+			if this.valueAvailable(setting, true)
+				this.setValue(setting, this.getValue(setting, !this.Enabled[setting]), display)
 
 		return printMultiMap(display)
 	}
@@ -136,10 +138,17 @@ class LMUSetupEditor extends FileSetupEditor {
 	}
 
 	chooseSetup(load := true) {
-		local directory := "" ; (A_MyDocuments . "\Assetto Corsa\setups")
+		local lmuApplication := Application("Le Mans Ultimate", kSimulatorConfiguration)
 		local car := SessionDatabase.getCarCode(this.Workbench.SelectedSimulator[false], this.Workbench.SelectedCar[false])
 		local track := SessionDatabase.getTrackCode(this.Workbench.SelectedSimulator[false], this.Workbench.SelectedTrack[false])
+		local directory := ""
 		local fileName, theSetup
+
+		if (lmuApplication.ExePath != "") {
+			SplitPath(lmuApplication.ExePath, , &directory)
+
+			directory := normalizeDirectoryPath(directory . "\UserData\player\Settings")
+		}
 
 		if (car && (car != true))
 			directory .= ("\" . car)
@@ -203,6 +212,9 @@ class LMUSetupEditor extends FileSetupEditor {
 			FileAppend(text, fileName)
 
 			this.Setup.FileName := fileName
+
+			if Application("Le Mans Ultimate", kSimulatorConfiguration).isRunning()
+				LMURESTProvider.GarageData().refreshSetups()
 		}
 	}
 }
@@ -213,10 +225,17 @@ class LMUSetupEditor extends FileSetupEditor {
 
 class LMUSetupComparator extends FileSetupComparator {
 	chooseSetup(type, load := true) {
-		local directory := "" ; (A_MyDocuments . "\Assetto Corsa\setups")
+		local lmuApplication := Application("Le Mans Ultimate", kSimulatorConfiguration)
 		local car := SessionDatabase.getCarCode(this.Workbench.SelectedSimulator[false], this.Workbench.SelectedCar[false])
 		local track := SessionDatabase.getTrackCode(this.Workbench.SelectedSimulator[false], this.Workbench.SelectedTrack[false])
+		local directory := ""
 		local fileName, theSetup, ignore
+
+		if (lmuApplication.ExePath != "") {
+			SplitPath(lmuApplication.ExePath, , &directory)
+
+			directory := normalizeDirectoryPath(directory . "\UserData\player\Settings")
+		}
 
 		if (car && (car != true))
 			directory .= ("\" . car)

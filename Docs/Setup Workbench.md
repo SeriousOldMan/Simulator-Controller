@@ -87,7 +87,7 @@ Final note: I would like to take the opportunity to thank the user "WallyM" of t
 
 #### Installation of Telemetry Providers
 
-The analyzer acquires telemetry data from the different simulation games using so called telemtry providers, which in most cases read the required data from a shared memory interface. In general these are already included in Simulator Controller and there is nothing to do, but for *Assetto Corsa*, *rFactor 2* and *Le Mans Ultimate*, you need to install a plugin into a special location for the telemetry interface to work and for *Automobilista 2* and *Project CARS 2* a change in the settings is necessary.
+The analyzer acquires telemetry data from the different simulation games using so called telemtry providers, which in most cases read the required data from a shared memory interface. In general these are already included in Simulator Controller and there is nothing to do, but for *Assetto Corsa*, *rFactor 2* and *Le Mans Ultimate*, you need to install and activate a plugin into a special location for the telemetry interface to work and for *Automobilista 2* and *Project CARS 2* a change in the settings is necessary.
 
 Please, note that all of this also applies to the Virtual Race Assistants, but you have to do it only once, of course.
 
@@ -201,7 +201,7 @@ On the right side, you will see the simulator specific content of the setup file
 
 Using the checkboxes on the left side of each setting, you can control which modifications will be included in the modified setup and which are not. The changes will also be reflected in the internal format at the right, but this is more for documentary purposes. Once you have reviewed, chosen and possibly corrected some of the modifications, you can press the "Save..." button to save everything to a new setup file. Or you can use the "Reset" button to start over again.
 
-Note: The *Setup Editor* is currently only available for *Assetto Corsa* and *Assetto Corsa Competizione*. More simulators might be supported with future releases. Please see the [notes section](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#notes) down below.
+Note: The *Setup Editor* is currently only available for *Assetto Corsa*, *Assetto Corsa Competizione* and *Le Mans Ultimate*. More simulators might be supported with future releases. Please see the [notes section](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#notes) down below.
 
 ## Comparing Car Setups
 
@@ -482,7 +482,8 @@ As you can see, the approach is quite simple, since the structure of the JSON-ba
 
 ## Notes
 
-  1. Only *Assetto Corsa* and *Assetto Corsa Competizione* are supported at the moment, when it comes to editing, comparing and saving setup files. Other simulators might follow with future releases, but a first investigation has shown that setup file handling and - even more important - setup file format is rather cryptic and undocumented in other simulators.
+  1. Only *Assetto Corsa*, *Assetto Corsa Competizione* and *Le Mans Ultimate* are supported at the moment, when it comes to editing, comparing and saving setup files. Other simulators might follow with future releases, but a first investigation has shown that setup file handling and - even more important - setup file format is rather cryptic and undocumented in other simulators.
   2. The implementation for *Assetto Corsa Competizione* provides a generic car model and detailed car specifications for all currently available cars. More cars will be added when additional DLCs become availabble.
-  3. The implementation for *Assetto Corsa* currently provides a generic car model and a couple of detailed car models at the moment. More detailed car models will be added over time. If you don't find your favorite car, please feel free to implement the car definition and rules files (takes a couple of minutes, see the description in the previous section). I will be happy to add your car to the package as a community contribution.
+  3. The implementation for *Assetto Corsa* currently provides a generic car model and many detailed car models at the moment. More detailed car models will be added over time. If you don't find your favorite car, please feel free to implement the car definition and rules files (takes a couple of minutes, see the description in the previous section). I will be happy to add your car to the package as a community contribution.
+  3. The implementation for *Le Mans Ultimate* currently provides a generic car model and detailed car models for all cars from the simulator including all current extensions. Working with *Le Mans Ultimate* setup is a bit different than for the other simulators, since setups are not stored car specific, but only track specific. So be sure to include the car model name in the name of the setup file to help identifying the correct setup later on.
   4. Last but not least, specifications for specific car models are missing completely for all other simulators, only a generic car is supported here, although all cars you have used so far for the given simulator, will be available in the car selection menu. Nevertheless, only those settings, which are actually available in a given simulator, are used by "Setup Workbench". 

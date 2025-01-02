@@ -334,11 +334,12 @@ The following table shows, which simulator supports which damage type:
 | Project CARS 2             | Yes      | Yes        | Yes    |
 | RaceRoom Racing Experience | Yes      | Yes        | Yes    |
 | rFactor 2                  | Yes      | No         | No     |
-| Le Mans Ultimate           | Yes      | No         | No     |
+| Le Mans Ultimate           | Yes      | No (2)     | No     |
 
 ##### Notes
 
 (1) Supported but not reported in the data API.
+(2) Supported but not reported in the API. However, when it comes to pitstop planning, it is detected, that suspension damage must be repaired and that option is chosen.
 
 For tyre compound changes, you can choose between the triggers "Never", "Tyre Temperature" and "Weather". If you choose "Weather", Jona will advise wet tyres for light rain or worse and dry tyres for a dry track or drizzle. "Tyre Temperature" will allow you to enter a temperature threshold, where Jona will plan a tyre change, if the tyre temeprature falls outside its optimal temperature window by this amount. For dry tyres, the optimal temperature is considered around 85 Celsius and for wet tyres something around 50 Celsius. These values can be specified in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database"
 
@@ -403,7 +404,7 @@ No special setup required for *rFactor 2*, since this simulation has an integrat
 
 #### *Le Mans Ultimate*
 
-Same applies to *Le Mans Ultimate*, since this simulation uses the same engine as *rFactor 2*.
+Same applies to *Le Mans Ultimate*, since this simulation uses a similar API as *rFactor 2*.
 
 #### *iRacing*
 

@@ -1,4 +1,4 @@
-## 6.1.0.0-release 01/03/25 (planned)
+## 6.1.0.0-release 01/03/25
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fxied a bug in the processing of the voice command which handles tyre compound selection during pitstop preparation.

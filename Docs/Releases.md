@@ -3,7 +3,7 @@
   2. Documentation updates here and there, as always
   3. Full support for editing of *Le Mans Ultimate* setups in "Setup Workbench".
 
-## 6.1.0.0-release 01/03/25 (planned)
+## 6.1.0.0-release 01/03/25
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fxied a bug in the processing of the voice command which handles tyre compound selection during pitstop preparation.
@@ -24,6 +24,7 @@
 	  - New controller action "FuelRatioOptimize" that triggers the recalution of the fuel ratio as well. A new icon for the Stream Deck is included.
 	  - A new setting in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) of the "Session Database" that enables automatic recalculation of the fuel ratio.
 	  - A new setting in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) of the "Session Database" that activates automatic adjustment of the virtual energy level for the last stint, if you pit later than planned.
+	  - If you want to use all this stuff, it is really important that you read the [special notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#special-notes-for-le-mans-ultimate) about the *Le Mans Ultimate* integration since the handling of virtual energy is quite different than just topping up the fuel and you need to understand what is going on there.
   15. Handling of individual tyre change and/or tyre compounds has been implemented for *RaceRoom Racing Experience*, *rFactor 2*, *Le Mans Ultimate* and *iRacing*. This is available as individual controller actions for Button Box or Stream Decks. The Race Engineer will still change all four tyres at once and will always select the same compound for all four wheels.
 	  - New controller actions "TyreChangeFront" and "TyreChangeRear" for *RaceRoom Racing Experience*.
       - New controller actions "TyreCompoundFront" and "TyreCompoundRear" for *rFactor 2*.

@@ -76,8 +76,14 @@ class AssistantMode extends ControllerMode {
 					theAction.Function.setLabel(this.actionLabel(theAction))
 				}
 				else if inList([kSessionPractice, kSessionRace], session) {
-					theAction.Function.enable(kAllTrigger, theAction)
-					theAction.Function.setLabel(this.actionLabel(theAction))
+					if (theAction.Action = "FuelRatioOptimize") {
+						theAction.Function.disable(kAllTrigger, theAction)
+						theAction.Function.setLabel(this.actionLabel(theAction), "Gray")
+					}
+					else {
+						theAction.Function.enable(kAllTrigger, theAction)
+						theAction.Function.setLabel(this.actionLabel(theAction))
+					}
 				}
 				else {
 					theAction.Function.disable(kAllTrigger, theAction)

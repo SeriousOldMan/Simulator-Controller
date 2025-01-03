@@ -84,12 +84,24 @@ class LMUPlugin extends Sector397Plugin {
 		selectActions := []
 	}
 
+	updateRaceAssistantActions(session) {
+		local ignore, theAction
+
+		super.updateRaceAssistantActions(session)
+
+		for ignore, theAction in this.Actions
+			if (isInstance(theAction, RaceAssistantPlugin.RaceAssistantAction) && (theAction.Action = "FuelRatioOptimize")) {
+			 	theAction.Function.enable(kAllTrigger, theAction)
+				theAction.Function.setLabel(this.actionLabel(theAction))
+			}
+	}
+
 	supportsSetupImport() {
 		return true
 	}
 
 	getOptionHandler(option) {
-		return (operation, value?, pitstop := false) {
+		return (operation, value?, pitstop := false, initial := true) {
 			local simulator := this.Simulator[true]
 			local car := this.Car
 			local track := this.Track
@@ -104,7 +116,8 @@ class LMUPlugin extends Sector397Plugin {
 						case "Get":
 							return (pitstop.getRefuelLevel() - this.iRemainingFuelAmount)
 						case "Set":
-							this.iRemainingFuelAmount := this.iLastFuelAmount
+							if initial
+								this.iRemainingFuelAmount := this.iLastFuelAmount
 
 							pitstop.setRefuelLevel(value + this.iRemainingFuelAmount)
 						case "Change":
@@ -372,11 +385,12 @@ class LMUPlugin extends Sector397Plugin {
 
 		if this.iAdjustRefuelAmount
 			Task.startTask(() {
+				local handler := this.getOptionHandler("Refuel")
 				local ignore, fuelConsumption
 
 				this.getConsumptions(&ignore, &fuelConsumption)
 
-				this.setPitstopOption("Refuel", this.getOptionHandler("Refuel").Call("Get") - fuelConsumption)
+				handler.Call("Set", handler.Call("Get") - fuelConsumption, false, false)
 			}, 1000, kLowPriority)
 
 		if getMultiMapValue(this.Settings, "Simulator.Le Mans Ultimate", "Pitstop.Fuel.Ratio", false)
@@ -578,8 +592,10 @@ class LMUPlugin extends Sector397Plugin {
 
 			fuelAmount := getMultiMapValue(data, "Session Data", "FuelAmount", false)
 
-			if fuelAmount
+			if (fuelAmount && this.iFuelRatio)
 				setMultiMapValue(data, "Session Data", "FuelAmount", Round(this.iFuelRatio * 100, 1))
+			else if !fuelAmount
+				setMultiMapValue(data, "Session Data", "FuelAmount", LMURESTProvider.EnergyData(simulator, car, track).MaxFuelAmount)
 
 			for key, postFix in keys {
 				tyreCompound := getMultiMapValue(data, "Car Data", "TyreCompound" . postFix, kUndefined)

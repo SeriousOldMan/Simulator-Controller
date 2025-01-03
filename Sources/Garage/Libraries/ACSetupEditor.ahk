@@ -169,7 +169,7 @@ class ACSetupEditor extends FileSetupEditor {
 		local fileName := this.Setup.FileName
 		local directory, text
 
-		if (fileName = "this.Setup.FileName[true]")
+		if (fileName = this.Setup.FileName[true])
 			SplitPath(fileName, , &directory)
 		else
 			directory := fileName

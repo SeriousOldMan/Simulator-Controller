@@ -4,21 +4,18 @@
 
 #### Simulation Support
   1. Better integration with the weather forecast data of *rFactor 2* and *Le Mans Ultimate*
-  2. Pitstop automation for *Le Mans Ultimate*
-  3. Support changing of individual tyres for *iRacing*
-  4. Full support of hybrid cars
-  5. Support for new and also historic simulators
+  2. Support changing of individual tyres for *iRacing*
+  3. Full support of hybrid cars
+  4. Support for new and also historic simulators
 
 #### Plugins
-  1. Make the post-pitstop position prediction available in the "Session State.json" file
-  2. Cleanup of "Session State.json" file, i.e. not using *null* anymore for unavailable data
+  1. Cleanup of "Session State.json" file, i.e. not using *null* anymore for unavailable data
 
 #### Assistants
   1. Controller action and voice command to enable/disable data collection
   2. Better answers by the Strategist, when a pitstop cannot be recommended
   3. Direct critics by the Coach for the last section during on-track coaching (needs real time telemetry)
-  4. Full support of hybrid cars for strategy and pitstop
-  5. Integrate support for LAMs
+  4. Integrate support for LAMs
 
 #### Session Database
   1. Active validation of value ranges in settings definitions
@@ -33,6 +30,7 @@
   2. Introduce data groups (for example all data belonging to a complete weekend w. practice, qualiy and race) and make this group usable for future strategy calculation
   3. Handle DT as an alternative to reset the stint timer at the end of a race
   4. Integrate Code Editor plugin for editing scenario validation rules
+  5. Integrate a "Strategy Workbench Lite" into "Race Settings"
 
 #### Team Center
   1. Change hot target pressures for the next pitstop

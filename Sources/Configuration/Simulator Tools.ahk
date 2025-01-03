@@ -360,7 +360,7 @@ checkInstallation() {
 			componentNr := A_Index
 
 			if ((packageLocation = installLocation) || !installedComponents.Has(component)
-													|| (VerCompare(version, installedComponents[component]) > 0)) {
+													|| (VerCompare(version, installedComponents[component]) != 0)) {
 				try {
 					showProgress({progress: (gProgressCount += 2)
 								, message: translate("Downloading ") . component . translate(" files...")})
@@ -369,9 +369,11 @@ checkInstallation() {
 
 					for ignore, url in string2Values(";", getMultiMapValue(packageInfo, "Components", component . "." . version . ".Download", "")) {
 						try {
+							deleteFile(A_Temp . "\Temp.zip")
+
 							Download(url, A_Temp . "\Temp.zip")
 
-							urlError := false
+							urlError := !FileExist(A_Temp . "\Temp.zip")
 						}
 						catch Any as exception {
 							urlError := exception

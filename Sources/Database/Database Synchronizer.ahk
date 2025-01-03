@@ -55,8 +55,28 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 	local sessionDBPath := sessionDB.DatabasePath
 	local uploadTimeStamp := sessionDBPath . "UPLOAD"
 	local targetDB := TyresDatabase()
-	local simulator, car, track, distFile, configuration
+	local configuration := newMultiMap()
+	local step := 20
+	local simulator, car, track, distFile
 	local directory, sourceDB, targetDB, ignore, type, row, compound, compoundColor
+
+	updateState() {
+		if (++step > 20) {
+			step := 0
+
+			writeMultiMap(kTempDirectory . "Database Synchronizer.state", configuration)
+		}
+	}
+
+	setMultiMapValue(configuration, "Database Synchronizer", "UserID", sessionDB.ID)
+	setMultiMapValue(configuration, "Database Synchronizer", "DatabaseID", sessionDB.DatabaseID)
+
+	setMultiMapValue(configuration, "Database Synchronizer", "State", "Active")
+
+	setMultiMapValue(configuration, "Database Synchronizer", "Information"
+				   , translate("Message: ") . translate("Uploading community database..."))
+
+	setMultiMapValue(configuration, "Database Synchronizer", "Synchronization", "Uploading")
 
 	if FileExist(uploadTimeStamp)
 		if (DateDiff(A_Now, StrSplit(FileRead(uploadTimeStamp), "`n", "`r")[1], "days") <= 7)
@@ -66,19 +86,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 	targetDB.Shared := false
 
 	try {
-		configuration := newMultiMap()
-
-		setMultiMapValue(configuration, "Database Synchronizer", "UserID", sessionDB.ID)
-		setMultiMapValue(configuration, "Database Synchronizer", "DatabaseID", sessionDB.DatabaseID)
-
-		setMultiMapValue(configuration, "Database Synchronizer", "State", "Active")
-
-		setMultiMapValue(configuration, "Database Synchronizer", "Information"
-					   , translate("Message: ") . translate("Uploading community database..."))
-
-		setMultiMapValue(configuration, "Database Synchronizer", "Synchronization", "Uploading")
-
-		writeMultiMap(kTempDirectory . "Database Synchronizer.state", configuration)
+		updateState()
 
 		deleteDirectory(kTempDirectory . "Shared Database")
 
@@ -101,6 +109,8 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 						loop Files, sessionDBPath . "User\" . simulator . "\" . car . "\*.*", "D" {
 							track := A_LoopFileName
 
+							updateState()
+
 							if ((track = "1") || (track = "0") || (track = "Unknown"))
 								deleteDirectory(sessionDBPath . "User\" . simulator . "\" . car . "\" . track)
 							else {
@@ -113,6 +123,8 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 										sourceDB := Database(directory, kTyresSchemas)
 
 										for ignore, row in sourceDB.query("Tyres.Pressures.Distribution", {Where: {Driver: sessionDB.ID} }) {
+											updateState()
+
 											compound := row["Compound"]
 											compoundColor := row["Compound.Color"]
 
@@ -145,6 +157,8 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 
 											for ignore, type in kSetupTypes
 												loop Files, directory . type . "\*.info", "F" {
+													updateState()
+
 													SplitPath(A_LoopFileName, , , , &name)
 
 													info := sessionDB.readSetupInfo(simulator, car, track, type, name)
@@ -173,6 +187,8 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 											directory := kTempDirectory . "Shared Database\Community\" . simulator . "\" . car . "\" . track . "\Race Strategies\"
 
 											loop Files, directory . "*.info", "F" {
+												updateState()
+
 												SplitPath(A_LoopFileName, , , , &name)
 
 												info := sessionDB.readStrategyInfo(simulator, car, track, name)
@@ -201,6 +217,8 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 											directory := kTempDirectory . "Shared Database\Community\" . simulator . "\" . car . "\" . track . "\Lap Telemetries\"
 
 											loop Files, directory . "*.info", "F" {
+												updateState()
+
 												SplitPath(A_LoopFileName, , , , &name)
 
 												info := sessionDB.readTelemetryInfo(simulator, car, track, name)
@@ -256,11 +274,26 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategies, downloadTelemetries) {
 	local sessionDBPath := SessionDatabase.DatabasePath
 	local downloadTimeStamp := sessionDBPath . "DOWNLOAD"
-	local ignore, fileName, type, databaseDirectory, configuration
+	local configuration := newMultiMap()
+	local ignore, fileName, type, databaseDirectory
 
 	if FileExist(downloadTimeStamp)
 		if (DateDiff(A_Now, StrSplit(FileRead(downloadTimeStamp), "`n", "`r")[1], "days") <= 2)
 			return
+
+	updateState() {
+		writeMultiMap(kTempDirectory . "Database Synchronizer.state", configuration)
+	}
+
+	setMultiMapValue(configuration, "Database Synchronizer", "UserID", SessionDatabase.ID)
+	setMultiMapValue(configuration, "Database Synchronizer", "DatabaseID", SessionDatabase.DatabaseID)
+
+	setMultiMapValue(configuration, "Database Synchronizer", "State", "Active")
+
+	setMultiMapValue(configuration, "Database Synchronizer", "Information"
+				   , translate("Message: ") . translate("Downloading community database..."))
+
+	setMultiMapValue(configuration, "Database Synchronizer", "Synchronization", "Downloading")
 
 	try {
 		try {
@@ -270,19 +303,7 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 			logError(exception)
 		}
 
-		configuration := newMultiMap()
-
-		setMultiMapValue(configuration, "Database Synchronizer", "UserID", SessionDatabase.ID)
-		setMultiMapValue(configuration, "Database Synchronizer", "DatabaseID", SessionDatabase.DatabaseID)
-
-		setMultiMapValue(configuration, "Database Synchronizer", "State", "Active")
-
-		setMultiMapValue(configuration, "Database Synchronizer", "Information"
-					   , translate("Message: ") . translate("Downloading community database..."))
-
-		setMultiMapValue(configuration, "Database Synchronizer", "Synchronization", "Downloading")
-
-		writeMultiMap(kTempDirectory . "Database Synchronizer.state", configuration)
+		updateState()
 
 		for ignore, fileName in ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads") {
 			SplitPath(fileName, , , , &databaseDirectory)
@@ -293,12 +314,16 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 				if (SessionDatabase.DatabaseVersion != databaseDirectory) {
 					ftpDownload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads/" . fileName, kTempDirectory . fileName)
 
+					updateState()
+
 					try {
 						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kTempDirectory . fileName . "' -DestinationPath '" . kTempDirectory . "Shared Database' -Force", , "Hide")
 					}
 					catch Any as exception {
 						logError(exception)
 					}
+
+					updateState()
 
 					deleteFile(kTempDirectory . fileName)
 					deleteDirectory(sessionDBPath . "Community")
@@ -324,8 +349,6 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 		deleteFile(sessionDBPath . "DOWNLOAD")
 
 		FileAppend(A_Now, sessionDBPath . "DOWNLOAD")
-
-		setMultiMapValue(configuration, "Database Synchronizer", "State", "Active")
 
 		setMultiMapValue(configuration, "Database Synchronizer", "Information"
 					   , translate("Message: ") . translate("Synchronization finished..."))
@@ -415,7 +438,7 @@ updateSessionDatabase() {
 		id := inList(A_Args, "-ID")
 
 		if id
-			PeriodicTask(synchronizeCommunityDatabase.Bind(A_Args[id + 1], usePressures, useSetups, useStrategies, useTelemetries), 240000, kLowPriority).start()
+			PeriodicTask(synchronizeCommunityDatabase.Bind(A_Args[id + 1], usePressures, useSetups, useStrategies, useTelemetries), 2000, kLowPriority).start()
 
 		minutes := inList(A_Args, "-Synchronize")
 

@@ -79,7 +79,7 @@ class LMURESTProvider {
 
 		read() {
 			try {
-				this.iData := WinHttpRequest().GET(this.GETURL, "", false, {Encoding: "UTF-8"}).JSON
+				this.iData := WinHttpRequest({Timeouts: [0, 5000, 5000, 5000]}).GET(this.GETURL, "", false, {Encoding: "UTF-8"}).JSON
 
 				if !isObject(this.iData)
 					this.iData := false
@@ -96,7 +96,7 @@ class LMURESTProvider {
 
 			if this.Data
 				try {
-					WinHttpRequest().POST(this.PUTURL, data, false, {Object: true, Encoding: "UTF-8"})
+					WinHttpRequest({Timeouts: [0, 5000, 5000, 5000]}).POST(this.PUTURL, data, false, {Object: true, Encoding: "UTF-8"})
 				}
 				catch Any as exception {
 					logError(exception, true)
@@ -265,26 +265,58 @@ class LMURESTProvider {
 		getRefuelLevel() {
 			local ratio := this.lookup("FUEL RATIO:")
 			local energy := this.lookup("VIRTUAL ENERGY:")
+			local fuel
 
 			if (ratio && energy)
 				return (ratio["settings"][ratio["currentSetting"] + 1]["text"] * energy["currentSetting"])
-			else
-				return false
+			else {
+				fuel := this.lookup("FUEL:")
+
+				if fuel
+					return string2Values("l/", fuel["settings"][fuel["currentSetting"]]["text"])[1]
+				else
+					return false
+			}
 		}
 
 		setRefuelLevel(liters) {
 			local ratio := this.lookup("FUEL RATIO:")
 			local energy := this.lookup("VIRTUAL ENERGY:")
+			local fuel, index, value
 
 			if (ratio && energy)
 				energy["currentSetting"] := Min(100, Max(0, Round(liters / ratio["settings"][ratio["currentSetting"] + 1]["text"])))
+			else {
+				fuel := this.lookup("FUEL:")
+
+				if fuel {
+					for index, value in fuel["settings"] {
+						value := string2Values("l/", value["text"])[1]
+
+						if (value > liters) {
+							fuel["currentSetting"] := (index - 1)
+
+							return
+						}
+					}
+
+					fuel["currentSetting"] := (fuel["settings"].Length - 1)
+				}
+			}
 		}
 
 		changeRefuelLevel(steps := 1) {
 			local energy := this.lookup("VIRTUAL ENERGY:")
+			local fuel
 
 			if energy
 				energy["currentSetting"] := Min(100, Max(0, energy["currentSetting"] + Round(steps)))
+			else {
+				fuel := this.lookup("FUEL:")
+
+				if fuel
+					fuel["currentSetting"] := Min(fuel["settings"].Length - 1, Max(0, fuel["currentSetting"] + Round(steps)))
+			}
 		}
 
 		getFuelRatio() {
@@ -678,18 +710,37 @@ class LMURESTProvider {
 			}
 		}
 
+		MaxVirtualEnergy {
+			Get {
+				return 100
+			}
+		}
+
 		RemainingFuelAmount {
 			Get {
 				return this.getRemainingFuelAmount()
 			}
 		}
 
-		getRemainingVirtualEnergy() {
-			return (this.Data.Has("fuelInfo") ? Round(this.Data["fuelInfo"]["currentVirtualEnergy"] / this.Data["fuelInfo"]["maxVirtualEnergy"] * 100, 2) : false)
+		MaxFuelAmount {
+			Get {
+				return this.getMaxFuelAmount()
+			}
 		}
 
-		getFuelAmount() {
-			return (this.Data.Has("fuelInfo") ? Round(this.Data["fuelInfo"]["currentFuel"], 2) : false)
+		getRemainingVirtualEnergy() {
+			if (this.Data && this.Data.Has("fuelInfo") && this.Data["fuelInfo"].Has("currentVirtualEnergy"))
+				return Round(this.Data["fuelInfo"]["currentVirtualEnergy"] / this.Data["fuelInfo"]["maxVirtualEnergy"] * 100, 2)
+			else
+				return false
+		}
+
+		getRemainingFuelAmount() {
+			return ((this.Data && this.Data.Has("fuelInfo")) ? Round(this.Data["fuelInfo"]["currentFuel"], 2) : false)
+		}
+
+		getMaxFuelAmount() {
+			return ((this.Data && this.Data.Has("fuelInfo")) ? Round(this.Data["fuelInfo"]["maxFuel"], 2) : false)
 		}
 	}
 
@@ -711,11 +762,13 @@ class LMURESTProvider {
 		getTrack() {
 			if this.iCachedTrack
 				return this.iCachedTrack
-			else if this.Data.Has("trackInfo") {
+			else if (this.Data && this.Data.Has("trackInfo")) {
 				this.iCachedTrack := this.Data["trackInfo"]["properTrackName"]
 
 				return this.iCachedTrack
 			}
+			else
+				return false
 		}
 	}
 
@@ -744,21 +797,25 @@ class LMURESTProvider {
 		getCar() {
 			if this.iCachedCar
 				return this.iCachedCar
-			else if this.Data.Has("teamInfo") {
+			else if (this.Data && this.Data.Has("teamInfo")) {
 				this.iCachedTeam := this.Data["teamInfo"]["vehicleName"]
 
 				return this.iCachedCar
 			}
+			else
+				return false
 		}
 
 		getTeam() {
 			if this.iCachedTeam
 				return this.iCachedTeam
-			else if this.Data.Has("teamInfo") {
+			else if (this.Data && this.Data.Has("teamInfo")) {
 				this.iCachedTeam := this.Data["teamInfo"]["teamName"]
 
 				return this.iCachedTeam
 			}
+			else
+				return false
 		}
 	}
 

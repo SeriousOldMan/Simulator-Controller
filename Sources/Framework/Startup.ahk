@@ -124,9 +124,9 @@ loadSimulatorConfiguration() {
 
 	pid := ProcessExist()
 
-	logMessage(kLogOff, "-----------------------------------------------------------------")
+	logMessage(kLogOff, "---------------------------------------------------------------------")
 	logMessage(kLogOff, translate("      Running ") . StrSplit(A_ScriptName, ".")[1] . " (" . kVersion . ") [" . pid . "]")
-	logMessage(kLogOff, "-----------------------------------------------------------------")
+	logMessage(kLogOff, "---------------------------------------------------------------------")
 
 	if (kSimulatorConfiguration.Count == 0)
 		logMessage(kLogCritical, translate("No configuration found - please run the configuration tool"))

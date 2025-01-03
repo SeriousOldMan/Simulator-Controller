@@ -85,9 +85,13 @@ class LMUSetup extends FileSetup {
 	}
 
 	valueAvailable(setting, original := false) {
+		/*
 		setting := StrSplit(getMultiMapValue(this.Editor.Configuration, "Setup.Settings", setting), ".", , 2)
 
 		return (getMultiMapValue(this.Data[original], setting[1], setting[2], kUndefined) != kUndefined)
+		*/
+
+		return super.valueAvailable(setting, original)
 	}
 
 	getValue(setting, original := false, default := false) {

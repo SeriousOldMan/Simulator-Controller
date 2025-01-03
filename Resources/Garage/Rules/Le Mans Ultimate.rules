@@ -11,17 +11,25 @@
 
 [?Initialize] => (Prove: addSimulator("Le Mans Ultimate")),
 				 (Prove: addCharacteristics("Le Mans Ultimate", *, *, *)),
+				 (Prove: removeCharacteristics("Le Mans Ultimate", *, *, [Battery.Depletion.Low, Battery.Depletion.High])),
 				 (Prove: addSettings("Le Mans Ultimate", *, *)),
-				 (Prove: removeSettings("Le Mans Ultimate", *, [Aero.Splitter.Front, Electronics.MGUH.Mode,
+				 (Prove: removeSettings("Le Mans Ultimate", *, [Aero.Splitter.Front,
 																Aero.Wing.Front.Left, Aero.Wing.Front.Right,
 																Aero.Wing.Rear.Left, Aero.Wing.Rear.Right,
-																Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,
-																Bumpstop.Rate.Rear.Left, Bumpstop.Rate.Rear.Right,
+																Geometry.Caster.Left, Geometry.Caster.Right,
+																Electronics.ABS,
+																Electronics.MGUK.Recovery, Electronics.MGUK.Delivery, Electronics.MGUH.Mode,
+																Electronics.Engine.Brake, Electronics.Engine.Limiter, Electronics.Turbo,
+																Geometry.Caster.Left, Geometry.Caster.Right,
+																Bumpstop.Range.Front.Left, Bumpstop.Range.Front.Right,
+																Bumpstop.Range.Rear.Left, Bumpstop.Range.Rear.Right,
 																Spring.Rate.Front.Heave, Spring.Rate.Rear.Heave,
+																Bumpstop.Range.Front.Heave, Bumpstop.Range.Rear.Heave,
 																Damper.Compression.Slow.Front.Heave, Damper.Compression.Slow.Rear.Heave,
 																Damper.Compression.Fast.Front.Heave, Damper.Compression.Fast.Rear.Heave,
 																Damper.Rebound.Slow.Front.Heave, Damper.Rebound.Slow.Rear.Heave,
-																Damper.Rebound.Fast.Front.Heave, Damper.Rebound.Fast.Rear.Heave]))
+																Damper.Rebound.Fast.Front.Heave, Damper.Rebound.Fast.Rear.Heave,
+																Differential.Coast, Differential.Power]))
 
 
 ;;;-------------------------------------------------------------------------;;;

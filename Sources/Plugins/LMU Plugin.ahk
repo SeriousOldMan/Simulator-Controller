@@ -265,7 +265,8 @@ class LMUPlugin extends Sector397Plugin {
 						return SessionDatabase.getDriverName(this.Simulator[true], SessionDatabase.ID)
 			}
 
-			pitstop.write()
+			if (operation != "Get")
+				pitstop.write()
 		}
 	}
 

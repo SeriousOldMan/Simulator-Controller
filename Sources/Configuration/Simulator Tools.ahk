@@ -360,7 +360,7 @@ checkInstallation() {
 			componentNr := A_Index
 
 			if ((packageLocation = installLocation) || !installedComponents.Has(component)
-													|| (VerCompare(version, installedComponents[component]) != 0)) {
+													|| (VerCompare(version, installedComponents[component]) > 0)) {
 				try {
 					showProgress({progress: (gProgressCount += 2)
 								, message: translate("Downloading ") . component . translate(" files...")})

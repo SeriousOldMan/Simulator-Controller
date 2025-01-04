@@ -1,0 +1,15 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Le Mans Ultimate                ;;;
+;;;                                         Corvette C8.R GTE               ;;;
+;;;                                         Setup Rules                     ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
+;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Initialization                               ;;;
+;;;-------------------------------------------------------------------------;;;
+
+[?Initialize] => (Prove: addSettings("Le Mans Ultimate", "Corvette C8.R GTE", [])),
+				 (Prove: removeSettings("Le Mans Ultimate", "Corvette C8.R GTE", [Aero.Splitter.Front]))

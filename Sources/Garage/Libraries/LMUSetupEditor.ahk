@@ -57,7 +57,7 @@ class LMUSetup extends FileSetup {
 			if !settings.Has("Aero.Height.Rear.Right")
 				setMultiMapValue(setup, "REARRIGHT", "RideHeightSetting", getMultiMapValue(setup, "REARLEFT", "RideHeightSetting"))
 
-			return (super.Setup[original] := (this.Header . StrReplace(StrReplace(printMultiMap(setup), "=true", "=1"), "=false", "=0")))
+			return (super.Setup[original] := StrReplace(StrReplace(this.printSetup(setup), "=true", "=1"), "=false", "=0"))
 		}
 	}
 
@@ -132,6 +132,7 @@ class LMUSetup extends FileSetup {
 	}
 
 	printSetup(setup) {
+		local result := ""
 		local display := setup.Clone()
 		local ignore, setting, section, values, key, value
 
@@ -143,7 +144,18 @@ class LMUSetup extends FileSetup {
 			if this.valueAvailable(setting, true)
 				this.setValue(setting, this.getValue(setting, !this.Enabled[setting]), display)
 
-		return (this.Header . printMultiMap(display))
+		setMultiMapValue(display, "GENERAL", "Symmetric", 0)
+
+		for ignore, section in ["GENERAL", "LEFTFENDER", "RIGHTFENDER", "FRONTWING", "REARWING"
+							  , "BODYAERO", "SUSPENSION", "CONTROLS", "ENGINE", "DRIVELINE"
+							  , "FRONTLEFT", "FRONTRIGHT", "REARLEFT", "REARRIGHT", "BASIC"] {
+			values := getMultiMapValues(display, section, false)
+
+			if values
+				result .= (printSectionMap(section, values) . "`n`n")
+		}
+
+		return (this.Header . "`n" . result)
 	}
 
 	enable(setting) {

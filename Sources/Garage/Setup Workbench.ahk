@@ -1227,7 +1227,7 @@ class SetupWorkbench extends ConfigurationItem {
 													  , kResourcesDirectory, kUserHomeDirectory))
 
 		for ignore, section in ["Workbench.Characteristics", "Workbench.Categories", "Workbench.Settings"]
-			addMultiMapValues(this.Definition, getMultiMapValues(simulatorDefinition, section))
+			setMultiMapValues(this.Definition, section, getMultiMapValues(simulatorDefinition, section), false)
 
 		for ignore, section in ["Workbench.Characteristics.Labels", "Workbench.Categories.Labels", "Workbench.Settings.Labels"] {
 			values := getMultiMapValues(simulatorDefinition, section . "." . getLanguage())

@@ -11,4 +11,5 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: removeSettings("Le Mans Ultimate", "Ferrari 488 GTE EVO", []))
+[?Initialize] => (Prove: addSettings("Le Mans Ultimate", "Ferrari 488 GTE EVO", [Differential.Coast, Differential.Power])),
+				 (Prove: removeSettings("Le Mans Ultimate", "Ferrari 488 GTE EVO", [Aero.Splitter.Front]))

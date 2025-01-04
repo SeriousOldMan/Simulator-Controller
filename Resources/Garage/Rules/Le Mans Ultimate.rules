@@ -11,9 +11,10 @@
 
 [?Initialize] => (Prove: addSimulator("Le Mans Ultimate")),
 				 (Prove: addCharacteristics("Le Mans Ultimate", *, *, *)),
+				 (Prove: addCharacteristics("Le Mans Ultimate", *, *, [Geometry.Toe.Front, Geometry.Toe.Rear])),
 				 (Prove: removeCharacteristics("Le Mans Ultimate", *, *, [Battery.Depletion.Low, Battery.Depletion.High])),
 				 (Prove: addSettings("Le Mans Ultimate", *, *)),
-				 (Prove: removeSettings("Le Mans Ultimate", *, [Aero.Splitter.Front,
+				 (Prove: removeSettings("Le Mans Ultimate", *, [Aero.Wing.Front, Aero.Height.Front, Aero.Height.Rear,
 																Aero.Wing.Front.Left, Aero.Wing.Front.Right,
 																Aero.Wing.Rear.Left, Aero.Wing.Rear.Right,
 																Geometry.Caster.Left, Geometry.Caster.Right,
@@ -21,14 +22,17 @@
 																Electronics.MGUK.Recovery, Electronics.MGUK.Delivery, Electronics.MGUH.Mode,
 																Electronics.Engine.Brake, Electronics.Engine.Limiter, Electronics.Turbo,
 																Geometry.Caster.Left, Geometry.Caster.Right,
-																Bumpstop.Range.Front.Left, Bumpstop.Range.Front.Right,
-																Bumpstop.Range.Rear.Left, Bumpstop.Range.Rear.Right,
+																Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,
+																Bumpstop.Rate.Rear.Left, Bumpstop.Rate.Rear.Right,
+																Bumpstop.Rate.Front.Heave, Bumpstop.Rate.Rear.Heave,
 																Spring.Rate.Front.Heave, Spring.Rate.Rear.Heave,
 																Bumpstop.Range.Front.Heave, Bumpstop.Range.Rear.Heave,
 																Damper.Compression.Slow.Front.Heave, Damper.Compression.Slow.Rear.Heave,
 																Damper.Compression.Fast.Front.Heave, Damper.Compression.Fast.Rear.Heave,
 																Damper.Rebound.Slow.Front.Heave, Damper.Rebound.Slow.Rear.Heave,
 																Damper.Rebound.Fast.Front.Heave, Damper.Rebound.Fast.Rear.Heave,
+																Geometry.Toe.Front.Left, Geometry.Toe.Front.Right,
+																Geometry.Toe.Rear.Left, Geometry.Toe.Rear.Right,
 																Differential.Coast, Differential.Power]))
 
 
@@ -37,3 +41,57 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include %kResourcesDirectory%Garage\Rules\Generic Recommendations.rules
+
+{All: [?Tyre.Temperatures.Hot.Front.Around.Correction != 0], [?Tyre.Temperatures.Hot.Front.Around.Value > 50]} =>
+		(Prove: changeSetting(Geometry.Toe.Front, -1, ?Tyre.Temperatures.Hot.Front.Around.Correction))
+		
+{All: [?Tyre.Temperatures.Hot.Rear.Around.Correction != 0], [?Tyre.Temperatures.Hot.Rear.Around.Value > 50]} =>
+		(Prove: changeSetting(Geometry.Toe.Rear, 1, ?Tyre.Temperatures.Hot.Rear.Around.Correction))
+
+{All: [?Tyre.Temperatures.Cold.Front.Around.Correction != 0], [?Tyre.Temperatures.Cold.Front.Around.Value > 50]} =>
+		(Prove: changeSetting(Geometry.Toe.Front, 1, ?Tyre.Temperatures.Cold.Front.Around.Correction))
+		
+{All: [?Tyre.Temperatures.Cold.Rear.Around.Correction != 0], [?Tyre.Temperatures.Cold.Rear.Around.Value > 50]} =>
+		(Prove: changeSetting(Geometry.Toe.Rear, -1, ?Tyre.Temperatures.Cold.Rear.Around.Correction))
+
+{All: [?Tyre.Temperatures.Hot.Front.Inner.Correction != 0], [?Tyre.Temperatures.Hot.Front.Inner.Value > 50]} =>
+		(Prove: changeSetting(Geometry.Toe.Front, -1, ?Tyre.Temperatures.Hot.Front.Inner.Correction))
+
+{All: [?Tyre.Temperatures.Hot.Rear.Inner.Correction != 0], [?Tyre.Temperatures.Hot.Rear.Inner.Value > 50]} =>
+		(Prove: changeSetting(Geometry.Toe.Rear, 1, ?Tyre.Temperatures.Hot.Rear.Inner.Correction))
+		
+{All: [?Tyre.Temperatures.Cold.Front.Inner.Correction != 0], [?Tyre.Temperatures.Cold.Front.Inner.Value > 50]} =>
+		(Prove: changeSetting(Geometry.Toe.Front, 1, ?Tyre.Temperatures.Cold.Front.Inner.Correction))
+
+{All: [?Tyre.Temperatures.Cold.Rear.Inner.Correction != 0], [?Tyre.Temperatures.Cold.Rear.Inner.Value > 50]} =>
+		(Prove: changeSetting(Geometry.Toe.Rear, -1, ?Tyre.Temperatures.Cold.Rear.Inner.Correction))
+
+{All: [?Tyre.Temperatures.Hot.Front.Outer.Correction != 0], [?Tyre.Temperatures.Hot.Front.Outer.Value > 50]} =>
+		(Prove: changeSetting(Geometry.Toe.Front, -1, ?Tyre.Temperatures.Hot.Front.Outer.Correction))
+
+{All: [?Tyre.Temperatures.Hot.Rear.Outer.Correction != 0], [?Tyre.Temperatures.Hot.Rear.Outer.Value > 50]} =>
+		(Prove: changeSetting(Geometry.Toe.Rear, 1, ?Tyre.Temperatures.Hot.Rear.Outer.Correction))
+		
+{All: [?Tyre.Temperatures.Cold.Front.Outer.Correction != 0], [?Tyre.Temperatures.Cold.Front.Outer.Value > 50]} =>
+		(Prove: changeSetting(Geometry.Toe.Front, 1, ?Tyre.Temperatures.Cold.Front.Outer.Correction))
+
+{All: [?Tyre.Temperatures.Cold.Rear.Outer.Correction != 0], [?Tyre.Temperatures.Cold.Rear.Outer.Value > 50]} =>
+		(Prove: changeSetting(Geometry.Toe.Rear, -1, ?Tyre.Temperatures.Cold.Rear.Outer.Correction))
+
+{All: [?Understeer.General.Correction != 0], [?Understeer.General.Value > 50]} =>
+		(Prove: changeSetting(Geometry.Toe.Rear, 0.5, ?Understeer.General.Correction))
+
+{All: [?Oversteer.General.Correction != 0], [?Oversteer.General.Value > 50]} =>
+		(Prove: changeSetting(Geometry.Toe.Rear, -0.5, ?Oversteer.General.Correction))
+		
+{All: [?Understeer.Corner.Entry.Slow.Correction != 0], [?Understeer.Corner.Entry.Slow.Value > 50]} =>
+		(Prove: changeSetting(Geometry.Toe.Front, 0.5, ?Understeer.Corner.Entry.Slow.Correction))
+		
+{All: [?Oversteer.Corner.Entry.Slow.Correction != 0], [?Oversteer.Corner.Entry.Slow.Value > 50]} =>
+		(Prove: changeSetting(Geometry.Toe.Front, -0.5, ?Oversteer.Corner.Entry.Slow.Correction))
+
+{All: [?Understeer.Corner.Entry.Fast.Correction != 0], [?Understeer.Corner.Entry.Fast.Value > 50]} =>
+		(Prove: changeSetting(Geometry.Toe.Front, 0.25, ?Understeer.Corner.Entry.Fast.Correction))
+		
+{All: [?Oversteer.Corner.Entry.Fast.Correction != 0], [?Oversteer.Corner.Entry.Fast.Value > 50]} =>
+		(Prove: changeSetting(Geometry.Toe.Front, -0.25, ?Oversteer.Corner.Entry.Fast.Correction))

@@ -250,9 +250,28 @@ writeMultiMap(multiMapFile, multiMap, symbolic := true) {
 		}
 }
 
+printSectionMap(sectionMap, symbolic := true) {
+	local pairs := ""
+	local key, value
+
+	if (keyValues.Count > 0) {
+		pairs := ""
+
+		for key, value in keyValues {
+			value := encode(value)
+
+			pairs .= (key . "=" . (symbolic ? ((value == true) ? kTrue : ((value == false) ? kFalse : value)) : value) . "`n")
+		}
+
+		return ("[" . section . "]" . pairs)
+	}
+	else
+		return ""
+}
+
 printMultiMap(multiMap, symbolic := true) {
 	local result := ""
-	local pairs
+	local section, keyValues, pairs, key, value
 
 	for section, keyValues in multiMap
 		if (keyValues.Count > 0) {

@@ -1,7 +1,8 @@
 ## 6.1.1.0-release 01/10/25 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. Full support for editing of *Le Mans Ultimate* setups in "Setup Workbench".
+  3. Pressure values are now converted to the specified display unit in "Setup Workbench".
+  4. Full support for editing of *Le Mans Ultimate* setups in "Setup Workbench".
 
 ## 6.1.0.1-release 01/03/25
   1. Fixed a timing issue when requesting data from *Le Mans Ultimate*.

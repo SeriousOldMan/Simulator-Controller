@@ -203,11 +203,8 @@ class LMUSetupEditor extends FileSetupEditor {
 			directory := normalizeDirectoryPath(directory . "\UserData\player\Settings")
 		}
 
-		if (car && (car != true))
-			directory .= ("\" . car)
-
 		if (track && (track != true))
-			loop Files, directory "\*.*", "D"
+			loop Files, directory . "\*.*", "D"
 				if (InStr(track, A_LoopFileName) == 1) {
 					directory .= ("\" . A_LoopFileName)
 
@@ -290,11 +287,8 @@ class LMUSetupComparator extends FileSetupComparator {
 			directory := normalizeDirectoryPath(directory . "\UserData\player\Settings")
 		}
 
-		if (car && (car != true))
-			directory .= ("\" . car)
-
 		if (track && (track != true))
-			loop Files, directory "\*.*", "D"
+			loop Files, directory . "\*.*", "D"
 				if (InStr(track, A_LoopFileName) == 1) {
 					directory .= ("\" . A_LoopFileName)
 
@@ -314,7 +308,7 @@ class LMUSetupComparator extends FileSetupComparator {
 		OnMessage(0x44, translateLoadCancelButtons, 0)
 
 		if fileName {
-			theSetup := ACSetup(this, fileName)
+			theSetup := LMUSetup(this, fileName)
 
 			if load {
 				if (type = "A")

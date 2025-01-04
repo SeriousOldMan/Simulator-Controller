@@ -384,7 +384,8 @@ class LMUPlugin extends Sector397Plugin {
 			this.iVirtualEnergyLevels.RemoveAt(1)
 		}
 
-		if this.iAdjustRefuelAmount
+		if (this.iAdjustRefuelAmount && !getMultiMapValue(data, "Stint Data", "InPitlane", false)
+									 && !getMultiMapValue(data, "Stint Data", "InPit", false))
 			Task.startTask(() {
 				local handler := this.getOptionHandler("Refuel")
 				local ignore, fuelConsumption

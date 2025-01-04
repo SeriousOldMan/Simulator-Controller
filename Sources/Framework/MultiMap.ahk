@@ -189,7 +189,7 @@ parseMultiMap(text, comments := true, class?, directory?) {
 
 				multiMap[section][key] := ((value = "true") ? true : ((value = "false") ? false : value))
 			}
-			else if (!comments || exist(comments, (c) => (InStr(keyValue, c) = 1))) {
+			else if (!comments || (isObject(comments) && exist(comments, (c) => (InStr(keyValue, c) = 1)))) {
 				keyValue := StrSplit(StrReplace(StrReplace(StrReplace(keyValue, "\=", "_#_EQ-#_"), "\\", "_#_AC-#_"), "\n", "_#_CR-#_"), "=", "", 2)
 
 				key := StrReplace(StrReplace(StrReplace(keyValue[1], "_#_EQ-#_", "="), "_#_AC-#_", "\\"), "_#_CR-#_", "`n")

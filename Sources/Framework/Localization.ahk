@@ -244,10 +244,13 @@ displayTimeValue(time, fillHours := false, withSeconds := true, withFractions :=
 	}
 }
 
-internalPressureValue(value, rnd) {
+internalPressureValue(value, rnd, unit := false) {
 	global gPressureUnit
 
-	switch gPressureUnit, false {
+	if !unit
+		unit := gPressureUnit
+
+	switch unit, false {
 		case "PSI":
 			return (rnd ? Round(value, 1) : value)
 		case "Bar":
@@ -259,10 +262,13 @@ internalPressureValue(value, rnd) {
 	}
 }
 
-internalTemperatureValue(value, rnd) {
+internalTemperatureValue(value, rnd, unit := false) {
 	global gTemperatureUnit
 
-	switch gTemperatureUnit, false {
+	if !unit
+		unit := gTemperatureUnit
+
+	switch unit, false {
 		case "Celsius":
 			return (rnd ? Round(value, 1) : value)
 		case "Fahrenheit":
@@ -272,10 +278,13 @@ internalTemperatureValue(value, rnd) {
 	}
 }
 
-internalLengthValue(value, rnd) {
+internalLengthValue(value, rnd, unit := false) {
 	global gLengthUnit
 
-	switch gLengthUnit, false {
+	if !unit
+		unit := gLengthUnit
+
+	switch unit, false {
 		case "Meter":
 			return (rnd ? Round(value, 1) : value)
 		case "Yard":
@@ -285,10 +294,13 @@ internalLengthValue(value, rnd) {
 	}
 }
 
-internalSpeedValue(value, rnd) {
+internalSpeedValue(value, rnd, unit := false) {
 	global gSpeedUnit
 
-	switch gSpeedUnit, false {
+	if !unit
+		unit := gSpeedUnit
+
+	switch unit, false {
 		case "km/h":
 			return (rnd ? Round(value, 1) : value)
 		case "mph":
@@ -298,10 +310,13 @@ internalSpeedValue(value, rnd) {
 	}
 }
 
-internalMassValue(value, rnd) {
+internalMassValue(value, rnd, unit := false) {
 	global gMassUnit
 
-	switch gMassUnit, false {
+	if !unit
+		unit := gMassUnit
+
+	switch unit, false {
 		case "Kilogram":
 			return (rnd ? Round(value, 1) : value)
 		case "Pound":
@@ -311,10 +326,13 @@ internalMassValue(value, rnd) {
 	}
 }
 
-internalVolumeValue(value, rnd) {
+internalVolumeValue(value, rnd, unit := false) {
 	global gVolumeUnit
 
-	switch gVolumeUnit, false {
+	if !unit
+		unit := gVolumeUnit
+
+	switch unit, false {
 		case "Liter":
 			return (rnd ? Round(value, 1) : value)
 		case "Gallon (US)":
@@ -695,7 +713,7 @@ getFloatSeparator() {
 }
 
 convertUnit(type, value, display := true, rnd := true) {
-	if display {
+	if (display == true) {
 		switch type, false {
 			case "Pressure":
 				return displayPressureValue(value, rnd)
@@ -709,6 +727,24 @@ convertUnit(type, value, display := true, rnd := true) {
 				return displayMassValue(value, rnd)
 			case "Volume":
 				return displayVolumeValue(value, rnd)
+			default:
+				throw "Unknown unit type detected in convertUnit..."
+		}
+	}
+	else if display {
+		switch type, false {
+			case "Pressure":
+				return internalPressureValue(value, rnd, display)
+			case "Temperature":
+				return internalTemperatureValue(value, rnd, display)
+			case "Length":
+				return internalLengthValue(value, rnd, display)
+			case "Speed":
+				return internalSpeedValue(value, rnd, display)
+			case "Mass":
+				return internalMassValue(value, rnd, display)
+			case "Volume":
+				return internalVolumeValue(value, rnd, display)
 			default:
 				throw "Unknown unit type detected in convertUnit..."
 		}

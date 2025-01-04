@@ -2659,7 +2659,7 @@ class SetupEditor extends ConfigurationItem {
 
 	loadSetup(&setup := false) {
 		local categories, categoriesLabels
-		local ignore, setting, handler, modifiedValue, originalValue, value, category, candidate, settings
+		local ignore, setting, handler, modifiedValue, originalValue, unit, value, category, candidate, settings
 		local cSetting, label, lastCategory
 
 		if !setup
@@ -2686,8 +2686,17 @@ class SetupEditor extends ConfigurationItem {
 				handler := this.createSettingHandler(setting)
 
 				if handler {
+					unit := this.getUnit(setting)
+
 					originalValue := handler.convertToDisplayValue(setup.getValue(setting, true))
 					modifiedValue := handler.convertToDisplayValue(setup.getValue(setting, false))
+
+					if (inList(kPressureUnits, unit) && (unit != getUnit("Pressure"))) {
+						originalValue := convertUnit("Pressure", convertUnit("Pressure", originalValue, unit))
+						modifiedValue := convertUnit("Pressure", convertUnit("Pressure", modifiedValue, unit))
+
+						unit := getUnit("Pressure")
+					}
 
 					if (isNumber(originalValue) && isNumber(modifiedValue)) {
 						if (originalValue = modifiedValue)
@@ -2732,7 +2741,7 @@ class SetupEditor extends ConfigurationItem {
 					label := this.getLabel(setting)
 
 					this.SettingsListView.Add((originalValue = modifiedValue) ? "" : "Check"
-											, categoriesLabels[category], label, value, this.getUnit(setting))
+											, categoriesLabels[category], label, value, unit)
 
 					this.Settings[setting] := label
 					this.Settings[label] := setting
@@ -3235,7 +3244,7 @@ class SetupComparator extends ConfigurationItem {
 
 	loadSetups(&setupA := false, &setupB := false, mix := 0) {
 		local setupClass, setupAB, categories, categoriesLabels
-		local ignore, setting, handler, valueA, valueB, category, candidate, settings, cSetting
+		local ignore, setting, handler, unit, valueA, valueB, category, candidate, settings, cSetting
 		local targetAB, valueAB, lastValueAB, delta, label, lastCategory
 
 		if !setupA
@@ -3271,6 +3280,8 @@ class SetupComparator extends ConfigurationItem {
 			handler := this.Editor.createSettingHandler(setting)
 
 			if handler {
+				unit := this.getUnit(setting)
+
 				valueA := handler.convertToDisplayValue(setupA.getValue(setting, false))
 				valueB := handler.convertToDisplayValue(setupB.getValue(setting, true))
 
@@ -3318,6 +3329,14 @@ class SetupComparator extends ConfigurationItem {
 
 					valueAB := handler.formatValue(valueAB)
 
+					if (inList(kPressureUnits, unit) && (unit != getUnit("Pressure"))) {
+						valueA := convertUnit("Pressure", convertUnit("Pressure", valueA, unit))
+						valueB := convertUnit("Pressure", convertUnit("Pressure", valueB, unit))
+						valueAB := convertUnit("Pressure", convertUnit("Pressure", valueAB, unit))
+
+						unit := getUnit("Pressure")
+					}
+
 					if (valueB > valueA)
 						valueB := (displayValue("Float", valueB) . A_Space . translate("(") . "+"
 								 . displayValue("Float", handler.formatValue(Abs(valueA - valueB))) . translate(")"))
@@ -3346,7 +3365,7 @@ class SetupComparator extends ConfigurationItem {
 				label := this.getLabel(setting)
 
 				this.SettingsListView.Add("", categoriesLabels[category]
-											, label, isNumber(valueA) ? displayValue("Float", valueA) : valueA, valueB, valueAB, this.getUnit(setting))
+											, label, isNumber(valueA) ? displayValue("Float", valueA) : valueA, valueB, valueAB, unit)
 
 				this.Settings[setting] := label
 				this.Settings[label] := setting

@@ -2691,25 +2691,30 @@ class SetupEditor extends ConfigurationItem {
 					originalValue := handler.convertToDisplayValue(setup.getValue(setting, true))
 					modifiedValue := handler.convertToDisplayValue(setup.getValue(setting, false))
 
-					if (inList(kPressureUnits, unit) && (unit != getUnit("Pressure"))) {
-						originalValue := convertUnit("Pressure", convertUnit("Pressure", originalValue, unit))
-						modifiedValue := convertUnit("Pressure", convertUnit("Pressure", modifiedValue, unit))
-
-						unit := getUnit("Pressure")
-					}
-
 					if (isNumber(originalValue) && isNumber(modifiedValue)) {
-						if (originalValue = modifiedValue)
-							value := displayValue("Float", handler.formatValue(originalValue))
-						else if (modifiedValue > originalValue) {
-							value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "+"
-									. displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
+						if (originalValue = modifiedValue) {
+							value := handler.formatValue(originalValue)
 
-							setup.enable(setting)
+							if (inList(kPressureUnits, unit) && (unit != getUnit("Pressure")))
+								value := convertUnit("Pressure", convertUnit("Pressure", value, unit, false))
+
+							value := displayValue("Float", value)
 						}
 						else {
-							value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "-"
-									. displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
+							value := handler.formatValue(Abs(originalValue - modifiedValue))
+
+							if (inList(kPressureUnits, unit) && (unit != getUnit("Pressure"))) {
+								originalValue := convertUnit("Pressure", convertUnit("Pressure", originalValue, unit, false))
+								modifiedValue := convertUnit("Pressure", convertUnit("Pressure", modifiedValue, unit, false))
+								value := convertUnit("Pressure", convertUnit("Pressure", value, unit, false))
+							}
+
+							if (modifiedValue > originalValue)
+								value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "+"
+										. displayValue("Float", value) . translate(")"))
+							else
+								value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "-"
+										. displayValue("Float", value) . translate(")"))
 
 							setup.enable(setting)
 						}
@@ -2739,6 +2744,9 @@ class SetupEditor extends ConfigurationItem {
 					}
 
 					label := this.getLabel(setting)
+
+					if inList(kPressureUnits, unit)
+						unit := getUnit("Pressure")
 
 					this.SettingsListView.Add((originalValue = modifiedValue) ? "" : "Check"
 											, categoriesLabels[category], label, value, unit)
@@ -2890,7 +2898,7 @@ class SetupEditor extends ConfigurationItem {
 		local setup := this.Setup
 		local label := this.Settings[setting]
 		local row := false
-		local candidate, handler, originalValue, modifiedValue, value
+		local candidate, handler, unit, originalValue, modifiedValue, value
 
 		setup.setValue(setting, newValue)
 
@@ -2904,25 +2912,38 @@ class SetupEditor extends ConfigurationItem {
 			}
 		}
 
+		unit := this.getUnit(setting)
+
 		handler := this.createSettingHandler(setting)
 		originalValue := handler.convertToDisplayValue(setup.getValue(setting, true))
 		modifiedValue := handler.convertToDisplayValue(setup.getValue(setting, false))
 
 		if (isNumber(originalValue) && isNumber(modifiedValue)) {
 			if (originalValue = modifiedValue) {
-				value := displayValue("Float", handler.formatValue(originalValue))
+				value := handler.formatValue(originalValue)
+
+				if (inList(kPressureUnits, unit) && (unit != getUnit("Pressure")))
+					value := convertUnit("Pressure", convertUnit("Pressure", value, unit, false))
+
+				value := displayValue("Float", value)
 
 				setup.disable(setting)
 			}
-			else if (modifiedValue > originalValue) {
-				value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "+"
-						. displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
-
-				setup.enable(setting)
-			}
 			else {
-				value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "-"
-						. displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
+				value := handler.formatValue(Abs(originalValue - modifiedValue))
+
+				if (inList(kPressureUnits, unit) && (unit != getUnit("Pressure"))) {
+					originalValue := convertUnit("Pressure", convertUnit("Pressure", originalValue, unit, false))
+					modifiedValue := convertUnit("Pressure", convertUnit("Pressure", modifiedValue, unit, false))
+					value := convertUnit("Pressure", convertUnit("Pressure", value, unit, false))
+				}
+
+				 if (modifiedValue > originalValue)
+					value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "+"
+							. displayValue("Float", value) . translate(")"))
+				else
+					value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "-"
+							. displayValue("Float", value) . translate(")"))
 
 				setup.enable(setting)
 			}
@@ -3244,7 +3265,7 @@ class SetupComparator extends ConfigurationItem {
 
 	loadSetups(&setupA := false, &setupB := false, mix := 0) {
 		local setupClass, setupAB, categories, categoriesLabels
-		local ignore, setting, handler, unit, valueA, valueB, category, candidate, settings, cSetting
+		local ignore, setting, handler, unit, value, valueA, valueB, category, candidate, settings, cSetting
 		local targetAB, valueAB, lastValueAB, delta, label, lastCategory
 
 		if !setupA
@@ -3329,31 +3350,66 @@ class SetupComparator extends ConfigurationItem {
 
 					valueAB := handler.formatValue(valueAB)
 
-					if (inList(kPressureUnits, unit) && (unit != getUnit("Pressure"))) {
-						valueA := convertUnit("Pressure", convertUnit("Pressure", valueA, unit))
-						valueB := convertUnit("Pressure", convertUnit("Pressure", valueB, unit))
-						valueAB := convertUnit("Pressure", convertUnit("Pressure", valueAB, unit))
+					if (valueB > valueA) {
+						value := handler.formatValue(Abs(valueA - valueB))
 
-						unit := getUnit("Pressure")
-					}
+						if (inList(kPressureUnits, unit) && (unit != getUnit("Pressure"))) {
+							value := convertUnit("Pressure", convertUnit("Pressure", valueAB, unit, false))
+							valueB := convertUnit("Pressure", convertUnit("Pressure", valueB, unit, false))
+						}
 
-					if (valueB > valueA)
 						valueB := (displayValue("Float", valueB) . A_Space . translate("(") . "+"
-								 . displayValue("Float", handler.formatValue(Abs(valueA - valueB))) . translate(")"))
-					else if (valueB < valueA)
+								 . displayValue("Float", value) . translate(")"))
+					}
+					else if (valueB < valueA) {
+						value := handler.formatValue(Abs(valueA - valueB))
+
+						if (inList(kPressureUnits, unit) && (unit != getUnit("Pressure"))) {
+							value := convertUnit("Pressure", convertUnit("Pressure", value, unit, false))
+							valueB := convertUnit("Pressure", convertUnit("Pressure", valueB, unit, false))
+						}
+
 						valueB := (displayValue("Float", valueB) . A_Space . translate("(") . "-"
-								 . displayValue("Float", handler.formatValue(Abs(valueA - valueB))) . translate(")"))
-					else
+								 . displayValue("Float", value) . translate(")"))
+					}
+					else {
 						valueB := displayValue("Float", valueB)
 
-					if (valueAB > valueA)
+						if (inList(kPressureUnits, unit) && (unit != getUnit("Pressure")))
+							valueB := convertUnit("Pressure", convertUnit("Pressure", valueB, unit, false))
+					}
+
+					if (valueAB > valueA) {
+						value := handler.formatValue(Abs(valueA - valueAB))
+
+						if (inList(kPressureUnits, unit) && (unit != getUnit("Pressure"))) {
+							value := convertUnit("Pressure", convertUnit("Pressure", value, unit, false))
+							valueAB := convertUnit("Pressure", convertUnit("Pressure", valueAB, unit, false))
+						}
+
 						valueAB := (displayValue("Float", valueAB) . A_Space . translate("(") . "+"
-								  . displayValue("Float", handler.formatValue(Abs(valueA - valueAB))) . translate(")"))
-					else if (valueAB < valueA)
+								  . displayValue("Float", value) . translate(")"))
+					}
+					else if (valueAB < valueA) {
+						value := handler.formatValue(Abs(valueA - valueAB))
+
+						if (inList(kPressureUnits, unit) && (unit != getUnit("Pressure"))) {
+							value := convertUnit("Pressure", convertUnit("Pressure", value, unit, false))
+							valueAB := convertUnit("Pressure", convertUnit("Pressure", valueAB, unit, false))
+						}
+
 						valueAB := (displayValue("Float", valueAB) . A_Space . translate("(") . "-"
-								  . displayValue("Float", handler.formatValue(Abs(valueA - valueAB))) . translate(")"))
-					else
+								  . displayValue("Float", value) . translate(")"))
+					}
+					else {
+						if (inList(kPressureUnits, unit) && (unit != getUnit("Pressure")))
+							valueAB := convertUnit("Pressure", convertUnit("Pressure", valueAB, unit, false))
+
 						valueAB := displayValue("Float", valueAB)
+					}
+
+					if (inList(kPressureUnits, unit) && (unit != getUnit("Pressure")))
+						valueA := convertUnit("Pressure", convertUnit("Pressure", valueA, unit, false))
 				}
 				else {
 					if (mix < 0)
@@ -3363,6 +3419,9 @@ class SetupComparator extends ConfigurationItem {
 				}
 
 				label := this.getLabel(setting)
+
+				if inList(kPressureUnits, unit)
+					unit := getUnit("Pressure")
 
 				this.SettingsListView.Add("", categoriesLabels[category]
 											, label, isNumber(valueA) ? displayValue("Float", valueA) : valueA, valueB, valueAB, unit)
@@ -3414,7 +3473,7 @@ class SetupComparator extends ConfigurationItem {
 
 	updateSetting(setting, newValue) {
 		local setup := this.SetupAB
-		local label, row, candidate, handler, originalValue, modifiedValue, value
+		local label, row, candidate, handler, unit, originalValue, modifiedValue, value
 
 		setup.setValue(setting, newValue)
 
@@ -3431,19 +3490,43 @@ class SetupComparator extends ConfigurationItem {
 			}
 		}
 
+		unit := this.getUnit(setting)
+
 		handler := this.Editor.createSettingHandler(setting)
 		originalValue := handler.convertToDisplayValue(this.SetupA.getValue(setting, false))
 		modifiedValue := handler.convertToDisplayValue(setup.getValue(setting, false))
 
 		if (isNumber(originalValue) && isNumber(modifiedValue)) {
-			if (originalValue = modifiedValue)
-				value := displayValue("Float", handler.formatValue(originalValue))
-			else if (modifiedValue > originalValue)
+			if (originalValue = modifiedValue) {
+				value := handler.formatValue(originalValue)
+
+				if (inList(kPressureUnits, unit) && (unit != getUnit("Pressure")))
+					value := convertUnit("Pressure", convertUnit("Pressure", value, unit, false))
+
+				value := displayValue("Float", value)
+			}
+			else if (modifiedValue > originalValue) {
+				value := handler.formatValue(Abs(originalValue - modifiedValue))
+
+				if (inList(kPressureUnits, unit) && (unit != getUnit("Pressure"))) {
+					modifiedValue := convertUnit("Pressure", convertUnit("Pressure", modifiedValue, unit, false))
+					value := convertUnit("Pressure", convertUnit("Pressure", value, unit, false))
+				}
+
 				value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "+"
-						. displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
-			else
+						. displayValue("Float", value) . translate(")"))
+			}
+			else {
+				value := handler.formatValue(Abs(originalValue - modifiedValue))
+
+				if (inList(kPressureUnits, unit) && (unit != getUnit("Pressure"))) {
+					modifiedValue := convertUnit("Pressure", convertUnit("Pressure", modifiedValue, unit, false))
+					value := convertUnit("Pressure", convertUnit("Pressure", value, unit, false))
+				}
+
 				value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "-"
-						. displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
+						. displayValue("Float", value) . translate(")"))
+			}
 		}
 		else {
 			if (originalValue = modifiedValue)

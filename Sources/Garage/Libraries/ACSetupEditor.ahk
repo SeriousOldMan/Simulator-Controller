@@ -134,7 +134,7 @@ class ACSetupEditor extends FileSetupEditor {
 			directory .= ("\" . car)
 
 		if (track && (track != true))
-			loop Files, directory "\*.*", "D"
+			loop Files, directory . "\*.*", "D"
 				if (InStr(track, A_LoopFileName) == 1) {
 					directory .= ("\" . A_LoopFileName)
 

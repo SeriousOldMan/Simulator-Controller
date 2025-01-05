@@ -1,0 +1,15 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Le Mans Ultimate                ;;;
+;;;                                         Oreca 07                        ;;;
+;;;                                         Setup Rules                     ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
+;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Initialization                               ;;;
+;;;-------------------------------------------------------------------------;;;
+
+[?Initialize] => (Prove: addSettings("Le Mans Ultimate", "Oreca 07", [Differential.Power, Differential.Coast])),
+				 (Prove: removeSettings("Le Mans Ultimate", "Oreca 07", [Aero.Splitter.Front]))

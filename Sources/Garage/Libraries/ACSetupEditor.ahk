@@ -124,6 +124,10 @@ class ACSetupEditor extends FileSetupEditor {
 		}
 	}
 
+	editableSetup(car) {
+		return true
+	}
+
 	chooseSetup(load := true) {
 		local directory := (A_MyDocuments . "\Assetto Corsa\setups")
 		local car := SessionDatabase.getCarCode(this.Workbench.SelectedSimulator[false], this.Workbench.SelectedCar[false])

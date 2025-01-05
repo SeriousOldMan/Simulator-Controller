@@ -981,13 +981,15 @@ class SetupWorkbench extends ConfigurationItem {
 	}
 
 	updateState() {
+		local editorClass := (this.SimulatorDefinition && getMultiMapValue(this.SimulatorDefinition, "Setup", "Editor", false))
+
 		if (this.SelectedCharacteristics.Length < kMaxCharacteristics)
 			this.Control["characteristicsButton"].Enabled := true
 		else
 			this.Control["characteristicsButton"].Enabled := false
 
-		if (this.SimulatorDefinition && getMultiMapValue(this.SimulatorDefinition, "Setup", "Editor", false))
-			this.Control["editSetupButton"].Enabled := true
+		if editorClass
+			this.Control["editSetupButton"].Enabled := %editorClass%(this).editableSetup(this.SelectedCar["*"])
 		else
 			this.Control["editSetupButton"].Enabled := false
 
@@ -2559,6 +2561,10 @@ class SetupEditor extends ConfigurationItem {
 		}
 		else
 			viewer.Value := ""
+	}
+
+	editableSetup(car) {
+		return (car != "*")
 	}
 
 	editSetup(setup := false) {

@@ -1,9 +1,9 @@
 [Development]
 Version=6.1.1.0-dev
 Target=6.1.1.0-release
-Date=01/04/2025
+Date=01/05/2025
 Download=
-Changes=Full support for Le Mans Ultimate in "Setup Workbench", Unit conversion for pressures in "Setup Workbench"
+Changes=Full support for Le Mans Ultimate in "Setup Workbench", Unit conversion for pressures in "Setup Workbench", Filter safety car from the grid in AMS2
 Components=Media->5.6.1,Configuration->6.1.0,Utilities->5.9.8
 [Release]
 Version=6.1.0.1-release

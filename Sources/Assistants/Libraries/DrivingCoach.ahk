@@ -782,7 +782,7 @@ class DrivingCoach extends GridRaceAssistant {
 			if (confirm && this.Speaker)
 				this.getSpeaker().speakPhrase("Roger")
 		}
-		else if this.Speaker
+		else if (confirm && this.Speaker)
 			this.getSpeaker().speakPhrase("Later")
 	}
 
@@ -1037,7 +1037,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local ignore, lap, candidate, sessionDB, info, lapTime, size, telemetry
 
 		if (this.AvailableTelemetry.Count = 0) {
-			if (this.Speaker && !this.OnTrackCoaching)
+			if (this.Speaker[false] && !this.OnTrackCoaching)
 				this.getSpeaker().speakPhrase("CoachingReady", false, true)
 
 			if (this.TelemetryAnalyzer.TrackSections.Length = 0) {
@@ -1771,7 +1771,7 @@ class DrivingCoach extends GridRaceAssistant {
 				if (instructionHints.Length > 0)
 					instructionHints := filterInstructionHints(instructionHints)
 
-				if this.Speaker
+				if this.Speaker[false]
 					if ((telemetry.Sections.Length > 0) && !this.getSpeaker().Speaking) {
 						nextRecommendation := (A_TickCount + wait)
 
@@ -1838,7 +1838,7 @@ class DrivingCoach extends GridRaceAssistant {
 				if (instructionHints.Length > 0)
 					Task.startTask(() {
 						local state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
-						local speaker := (this.Speaker && this.getSpeaker())
+						local speaker := (this.Speaker[false] && this.getSpeaker())
 						local lastInstruction := instructionCount
 						local ignore, hint
 

@@ -427,12 +427,19 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 			printLine(&output, "Driver.Car=0");
 		}
 		else {
-			printLine(&output, "Car.Count=", localCopy->mNumParticipants);
+			int count = localCopy->mNumParticipants;
+			
 			printLine(&output, "Driver.Car=", localCopy->mViewedParticipantIndex + 1);
 
 			for (int i = 1; i <= localCopy->mNumParticipants; ++i) {
 				ParticipantInfo vehicle = localCopy->mParticipantInfo[i - 1];
 
+				if (strcmp(localCopy->mCarClassNames[i - 1], "SafetyCar") == 0 && localCopy->mNumParticipants == i) {
+					count -= 1;
+					
+					break;
+				}
+				
 				print(&output, "Car.", i); printLine(&output, ".Nr=", i);
 				print(&output, "Car.", i); printLine(&output, ".Class=", localCopy->mCarClassNames[i - 1]);
 				print(&output, "Car.", i); printLine(&output, ".Position=", (long)vehicle.mRacePosition);
@@ -473,6 +480,8 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 				print(&output, "Car.", i); printLine(&output, ".InPitLane=", localCopy->mPitModes[i - 1] > PIT_MODE_NONE ? "true" : "false");
 				print(&output, "Car.", i); printLine(&output, ".InPit=", localCopy->mPitModes[i - 1] > PIT_MODE_IN_PIT ? "true" : "false");
 			}
+			
+			printLine(&output, "Car.Count=", count);
 		}
 	}
 

@@ -371,11 +371,18 @@ int main(int argc, char* argv[]) {
 			printf("Driver.Car=0\n");
 		}
 		else {
-			printf("Car.Count=%d\n", localCopy->mNumParticipants);
+			int count = localCopy->mNumParticipants;
+			
 			printf("Driver.Car=%d\n", localCopy->mViewedParticipantIndex + 1);
 
 			for (int i = 1; i <= localCopy->mNumParticipants; ++i) {
 				ParticipantInfo vehicle = localCopy->mParticipantInfo[i - 1];
+
+				if (strcmp(localCopy->mCarClassNames[i - 1], "SafetyCar") == 0 && localCopy->mNumParticipants == i) {
+					count -= 1;
+					
+					break;
+				}
 
 				printf("Car.%d.Nr=%d\n", i, i);
 				printf("Car.%d.Class=%s\n", i, localCopy->mCarClassNames[i - 1]);
@@ -416,6 +423,8 @@ int main(int argc, char* argv[]) {
 				printf("Car.%d.InPitLane=%s\n", i, localCopy->mPitModes[i - 1] > PIT_MODE_NONE ? "true" : "false");
 				printf("Car.%d.InPit=%s\n", i, localCopy->mPitModes[i - 1] > PIT_MODE_IN_PIT ? "true" : "false");
 			}
+			
+			printf("Car.Count=%d\n", count);
 		}
 	}
 

@@ -77,7 +77,7 @@ class LMUSetup extends FileSetup {
 
 			if (InStr(line, "[") = 1)
 				break
-			else
+			else if (Trim(line) != "")
 				header := (header . line . "`n")
 		}
 
@@ -117,9 +117,12 @@ class LMUSetup extends FileSetup {
 
 		try {
 			if (getMultiMapValue(data, path[1], path[2], kUndefined) != kUndefined)
-				setMultiMapValue(data, path[1], path[2], value) ; . "//" . StrSplit(getMultiMapValue(data, path[1], path[2]), "//", , 2)[2])
-			else if (getMultiMapValue(data, path[1], "//" . path[2], kUndefined) != kUndefined)
-				setMultiMapValue(data, path[1], path[2], value) ; . "//" . StrSplit(getMultiMapValue(data, path[1], "//" . path[2]), "//", , 2)[2])
+				setMultiMapValue(data, path[1], path[2], value)
+			else if (getMultiMapValue(data, path[1], "//" . path[2], kUndefined) != kUndefined) {
+				removeMultiMapValue(data, path[1], "//" . path[2])
+
+				setMultiMapValue(data, path[1], path[2], value)
+			}
 
 			if !display
 				this.Setup := this.printSetup(data)

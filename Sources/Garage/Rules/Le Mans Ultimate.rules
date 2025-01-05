@@ -14,7 +14,7 @@
 				 (Prove: addCharacteristics("Le Mans Ultimate", *, *, [Geometry.Toe.Front, Geometry.Toe.Rear])),
 				 (Prove: removeCharacteristics("Le Mans Ultimate", *, *, [Battery.Depletion.Low, Battery.Depletion.High])),
 				 (Prove: addSettings("Le Mans Ultimate", *, *)),
-				 (Prove: removeSettings("Le Mans Ultimate", *, [Aero.Wing.Front, Aero.Height.Front, Aero.Height.Rear,
+				 (Prove: removeSettings("Le Mans Ultimate", *, [Aero.Splitter.Front, Aero.Wing.Front, Aero.Height.Front, Aero.Height.Rear,
 																Aero.Wing.Front.Left, Aero.Wing.Front.Right,
 																Aero.Wing.Rear.Left, Aero.Wing.Rear.Right,
 																Geometry.Caster.Left, Geometry.Caster.Right,

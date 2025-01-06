@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Le Mans Ultimate                ;;;
-;;;                                         BMW M Hybrid V8                 ;;;
+;;;                                         Lamborghini SC63                ;;;
 ;;;                                         Setup Rules                     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -11,9 +11,9 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: addCharacteristics("Le Mans Ultimate", "BMW M Hybrid V8", *,
+[?Initialize] => (Prove: addCharacteristics("Le Mans Ultimate", "Lamborghini SC63", *,
 											[Battery.Depletion.Low, Battery.Depletion.High])),
-				 (Prove: addSettings("Le Mans Ultimate", "BMW M Hybrid V8",
+				 (Prove: addSettings("Le Mans Ultimate", "Lamborghini SC63",
 									 [Electronics.MGUK.Recovery, Electronics.MGUK.Delivery,
 									  Spring.Rate.Front.Heave, Spring.Rate.Rear.Heave,
 									  Bumpstop.Range.Front.Heave, Bumpstop.Range.Rear.Heave,
@@ -21,4 +21,4 @@
 									  Damper.Compression.Fast.Front.Heave, Damper.Compression.Fast.Rear.Heave,
 									  Damper.Rebound.Slow.Front.Heave, Damper.Rebound.Slow.Rear.Heave,
 									  Damper.Rebound.Fast.Front.Heave, Damper.Rebound.Fast.Rear.Heave])),
-				 (Prove: removeSettings("Le Mans Ultimate", "BMW M Hybrid V8", [Electronics.Map]))
+				 (Prove: removeSettings("Le Mans Ultimate", "Lamborghini SC63", [Electronics.Map]))

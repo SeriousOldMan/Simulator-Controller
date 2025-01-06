@@ -21,5 +21,4 @@
 									  Damper.Compression.Fast.Front.Heave, Damper.Compression.Fast.Rear.Heave,
 									  Damper.Rebound.Slow.Front.Heave, Damper.Rebound.Slow.Rear.Heave,
 									  Damper.Rebound.Fast.Front.Heave, Damper.Rebound.Fast.Rear.Heave])),
-				 (Prove: removeSettings("Le Mans Ultimate", "Alpine A424",
-									    [Electronics.Map]))
+				 (Prove: removeSettings("Le Mans Ultimate", "Alpine A424", [Electronics.Map]))

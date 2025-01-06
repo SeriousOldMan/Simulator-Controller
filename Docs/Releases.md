@@ -3,7 +3,7 @@
   2. Documentation updates here and there, as always
   3. Safety Cars are now removed from the grid in *Automobilista 2* (and probably *ProjectCARS 2*) in most cases.
   4. Pressure values are now converted to the specified display unit in "Setup Workbench".
-  5. Full support for editing of *Le Mans Ultimate* setups in "Setup Workbench".
+  5. Full support for editing of *Le Mans Ultimate* setups in "Setup Workbench". Meta data is included for all GTE and for all GT3 cars, as well as for the Oreca 07 LMP2 car. Four the Hypercar category the Alpine A424 is also already included. The list of cars will be completed with the next release.
 
 ## 6.1.0.1-release 01/03/25
   1. Fixed a timing issue when requesting data from *Le Mans Ultimate*.

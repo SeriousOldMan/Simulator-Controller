@@ -497,7 +497,7 @@ The Driving Coach does not tell you the truth all the time and occasionally even
   
   3. Especially in the case of telemetry-based coaching it is very important that the data quality is as good as it can get. The Coach will be provided with a high level condensed summary of the telemetry data (see above) to work with. To create this summary the telemetry data is split along the defined sections of the given track. If this sections are not well set, for example, if the car is already under full braking before the the corner starting point, the Coach will derive funny things from it. You have been warned...
   
-In summary work with the Coach as you would work with ChatGPT. Always use your own brain as well. As LLMs get smarter, especially with the upcoming multi-level reasoning models like OpenAIs o1, we will see big improvements here. With its architecture, Simulator Controller is prepared to participate from this development.
+In summary work with the Coach as you would work with ChatGPT. Always use your own brain as well. As LLMs get smarter, especially with the multi-level reasoning models like OpenAIs o1 or the upcoming o3, we will see big improvements here. With its architecture, Simulator Controller is prepared to participate from this development.
 
 ## Troubleshooting
 

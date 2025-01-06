@@ -2564,7 +2564,7 @@ class SetupEditor extends ConfigurationItem {
 	}
 
 	editableSetup(car) {
-		return (car != "*")
+		return FileExist(kResourcesDirectory . "Garage\Definitions\Cars\" . this.Workbench.SelectedSimulator . "." . this.Workbench.SelectedCar . ".ini")
 	}
 
 	editSetup(setup := false) {

@@ -125,7 +125,7 @@ class ACSetupEditor extends FileSetupEditor {
 	}
 
 	editableSetup(car) {
-		return true
+		return ((car = "*") || super.editableSetup(car))
 	}
 
 	chooseSetup(load := true) {

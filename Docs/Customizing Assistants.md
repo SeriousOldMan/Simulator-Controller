@@ -436,6 +436,18 @@ Since the control flow between the rule engine and the LLM especially for the *R
 3. The LLM can decide to *call* one or more of these actions, which then will be executed in parallel.
 4. An action can do almost anything. Typically it triggers a special behaviour of the Assistant, for example, create a pitstop plan, but it can also call any of the available [action functions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) in Simulator Controller, or it can generate voice output, and so on. Using *Assistant.Raise* (see below for [more information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-events)), it can also raise additional events, even for other Assistants. These enables the LLM to create a complex chain of thought or collaborate with other Assistants.
 
+### About hallucinations and other funny stuff
+
+Especially when using the *Conversation* and/or the *Reasoning* booster keep the following things in mind, please:
+
+  1. A large language model simulates intelligence. Although it is doing this really well, the constant feedback loop of self-aware thinking is missing. An LLM does not really understand the topic it is talking about, it just derives the probability of words in the given context. Since there is also random factor in play (the *Creativity*, as defined in the configuration), it can happen, that an LLM creates answers that sound totally plausible, but are utterly wrong. If you encounter this too often, reduce the *Creativity* setting. This will reduce the variation in the answers of the model, but will also reduce hallucinations.
+  
+  2. LLMs, especially non-premium models, can also have something called attention deficit. They are not good in following multiple, mostly indepedent chain of thoughts at the same time. The LLM used by the boosters is provided with a lot of data, when you interact with them. Standings, handling information, session and car state, telemetry information, just to name a few. It is therefore possible that the LLM is not using an important information, although it is available. Sometimes it helps in this case to clarify that the informtion is available and the LLM will work with it then.
+  
+  3. What really can be a problem, is, that an LLM can lie to you. For example, if you ask the Strategist with an active *Conversation* booster (and no appropriate action enabled), that he should change the strategy to pit in lap 20, the LLM might answer, that the strategy has been changed, although it is not able to do this. There is no pre-defined voice command for this kind of request and the LLM only wanted you to be happy. You have been warned...
+  
+In summary work especially with the *Conversation* booster as you would work with ChatGPT. Always use your own brain as well. As LLMs get smarter, especially with the multi-level reasoning models like OpenAIs o1 or the upcoming o3, we will see big improvements here. With its architecture, Simulator Controller is prepared to participate from this development.
+
 ## Managing Actions
 
 A special editor is provided to manage the actions for a given Assistant. An action allows the LLM not only to react with a message to your request, but also to trigger some predefined functions. There are several predefined actions available for the different assistants, but you can also define your own ones.

@@ -2081,8 +2081,17 @@ class NumberHandler extends SettingHandler {
 		}
 	}
 
+	Reverse {
+		Get {
+			return false
+		}
+	}
+
 	validValue(displayValue) {
-		return ((displayValue >= this.MinValue) && (displayValue <= this.MaxValue))
+		if this.Reverse
+			return ((displayValue >= this.MaxValue) && (displayValue <= this.MinValue))
+		else
+			return ((displayValue >= this.MinValue) && (displayValue <= this.MaxValue))
 	}
 }
 
@@ -2096,6 +2105,8 @@ class DiscreteValuesHandler extends NumberHandler {
 	iMinValue := kUndefined
 	iMaxValue := kUndefined
 
+	iReverse := false
+
 	Zero {
 		Get {
 			return this.iZero
@@ -2105,6 +2116,12 @@ class DiscreteValuesHandler extends NumberHandler {
 	Increment {
 		Get {
 			return this.iIncrement
+		}
+	}
+
+	Reverse {
+		Get {
+			return this.iReverse
 		}
 	}
 
@@ -2124,23 +2141,22 @@ class DiscreteValuesHandler extends NumberHandler {
 		this.iZero := zero
 		this.iMinValue := minValue
 		this.iMaxValue := maxValue
-
-		if (isNumber(minValue) && isNumber(maxValue)) {
-			if (((maxValue < minValue) && (increment > 0)) || ((maxValue > minValue) && (increment < 0)))
-				this.iIncrement := - increment
-			else
-				this.iIncrement := increment
-		}
-		else
-			this.iIncrement := increment
+		this.iReverse := ((isNumber(minValue) && isNumber(maxValue)) && (maxValue < minValue))
+		this.iIncrement := Abs(increment)
 	}
 
 	convertToDisplayValue(rawValue) {
-		return this.formatValue(this.Zero + (rawValue * this.Increment))
+		if this.Reverse
+			return this.formatValue(this.Zero - (rawValue * this.Increment))
+		else
+			return this.formatValue(this.Zero + (rawValue * this.Increment))
 	}
 
 	convertToRawValue(displayValue) {
-		return Round((displayValue - this.Zero) / this.Increment)
+		if this.Reverse
+			return Round((this.Zero - displayValue) / this.Increment)
+		else
+			return Round((displayValue - this.Zero) / this.Increment)
 	}
 
 	increaseValue(displayValue) {
@@ -2148,7 +2164,7 @@ class DiscreteValuesHandler extends NumberHandler {
 
 		if this.validValue(value)
 			return value
-		else if (this.MaxValue > this.MinValue)
+		else if !this.Reverse
 			return Min(this.MaxValue, Max(this.MinValue, displayValue))
 		else
 			return Max(this.MaxValue, Min(this.MinValue, displayValue))
@@ -2159,7 +2175,7 @@ class DiscreteValuesHandler extends NumberHandler {
 
 		if this.validValue(value)
 			return value
-		else if (this.MaxValue > this.MinValue)
+		else if !this.Reverse
 			return Max(this.MinValue, Min(this.MaxValue, displayValue))
 		else
 			return Min(this.MaxValue, Max(this.MinValue, displayValue))

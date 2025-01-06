@@ -49,7 +49,10 @@ getControllerActionDefinitions(type) {
 	if (!FileExist(kTranslationsDirectory . fileName) && !FileExist(kUserTranslationsDirectory . fileName))
 		fileName := ("Controller Action " . type . ".en")
 
-	definitions := readMultiMap(kTranslationsDirectory . fileName)
+	if (type = "Icons")
+		definitions := readMultiMap(kUserTranslationsDirectory . ("Controller Action " . type . ".en"))
+	else
+		definitions := readMultiMap(kTranslationsDirectory . fileName)
 
 	for section, values in readMultiMap(kUserTranslationsDirectory . fileName)
 		for key, value in values

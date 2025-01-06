@@ -1213,8 +1213,8 @@ class RaceAssistant extends ConfigurationItem {
 
 	handleVoiceText(grammar, text) {
 		local ignore, part
-		
-		static audioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Activation.AudioDevice", false)
+
+		static audioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Conversation.AudioDevice", false)
 		static conversationSound := getFileName("Conversation.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
 
 		if (grammar = "Text") {
@@ -1226,7 +1226,7 @@ class RaceAssistant extends ConfigurationItem {
 				if text {
 					if (text != true) {
 						playSound("RASoundPlayer.exe", conversationSound, audioDevice)
-						
+
 						if this.VoiceManager.UseTalking
 							this.getSpeaker().speak(text, false, false, {Noise: false, Rephrase: false})
 						else

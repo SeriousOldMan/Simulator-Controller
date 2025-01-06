@@ -327,11 +327,12 @@ Supported output routes are:
 
 | Route           | Description                                                                                                          |
 |-----------------|----------------------------------------------------------------------------------------------------------------------|
-| Activation      | The short acknowledge sound, when the Push-2-Talk button is pressed.                                                 |
+| Activation      | The short acknowledge sound, when the Push-2-Talk button is pressed.                |
 | Driving Coach   | All voice output by the Driving Coach.                                                                               |
 | Race Spotter    | All voice output by the Race Spotter.                                                                                |
 | Race Engineer   | All voice output by the Race Engineer.                                                                               |
 | Race Strategist | All voice output by the Race Strategist.                                                                             |
+| Conversation    | The short sound that indicates that an answer is given by the *Conversation* booster. |
 | Controller      | The short acknowledge sound, when the Controller itself received a voice command or was activated for voice control. |
 | Analyzer        | The feedback sound of the Issue Analyzer for over- or understeer handling events.                                    |
 

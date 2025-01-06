@@ -358,6 +358,8 @@ Notes:
 
 Additionally, you can allow the LLM to *call* [predefined or custom actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-actions) as a result of your conversation. For example, if you ask the Strategist whether an undercut might be possible in one of the next laps, the LLM may call the Monte Carlo traffic simulation using an internal action. Which actions will be available to the LLM depends on the current Assistant. See corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#trigger-actions-from-conversation) for the Strategist for an example.
 
+Please be aware that you are talking to an AI based on GPT technology when using the *Conversation* booster. And AIs o n lie or can give wrong answers. More details on that can be found below in the [How it works section](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#how-it-works). A short sound helps you identify that the *Conversation* booster is active and that an LLM is giving you the answer. As with the *Push-to-Talk* sound, you can route this acknowledge sound to a different device in a streaming setup, if required.
+
 IMPORTANT: When action handling is enabled, it might be necessary to disable the *Understanding* booster or at least set the "Creativity" to a very low value. Otherwise the *Understanding* booster might detect a command pattern, which will match to a pre-defined voice command, thereby preventing the LLM from creating a custom action plan.
 
 ### Reasoning Booster

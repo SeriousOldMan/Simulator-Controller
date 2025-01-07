@@ -485,6 +485,7 @@ int referenceDriverIdx;
 long lastTrackSplineUpdate = 0;
 
 bool trackSplineBuilding = false;
+bool trackSplineRebuild = false;
 long bestLapTime = LONG_MAX;
 
 int minX = INT_MAX;
@@ -729,7 +730,7 @@ void updateTrackSpline() {
 				if (done) {
 					trackSplineBuilding = false;
 
-					if (!trackSplineReady || ((gf->iLastTime > 0) && ((gf->iLastTime * 1.002) < bestLapTime))) {
+					if (!trackSplineReady || trackSplineRebuild || ((gf->iLastTime > 0) && ((gf->iLastTime * 1.002) < bestLapTime))) {
 						bestLapTime = gf->iLastTime;
 
 						int length = idealLine.size();
@@ -751,7 +752,7 @@ void updateTrackSpline() {
 							else
 								buildTrackSplineRunning = point.distance;
 
-							buildTrackSpline->erase("#" + std::to_string(i));
+							// buildTrackSpline->erase("#" + std::to_string(i));
 						}
 
 						activeTrackSpline = buildTrackSpline;
@@ -780,7 +781,7 @@ void updateTrackSpline() {
 								zeroCount += 1;
 						}
 						
-						trackSplineValid = (zeroCount < 5);
+						trackSplineValid = (last > 100 && ((float)zeroCount / (float)last) < 0.1);
 					}
 				}
 				else {
@@ -836,7 +837,7 @@ void updateTrackSpline() {
 
 int baseLap = -1;
 
-bool startTrackSplineBuilder(int driverIdx) {
+bool startTrackSplineBuilder(int driverIdx, bool rebuild = false) {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
 	if (baseLap == -1)
@@ -856,6 +857,7 @@ bool startTrackSplineBuilder(int driverIdx) {
 		}
 
 		trackSplineBuilding = true;
+		trackSplineRebuild = rebuild;
 		buildTrackSplineRunning = 0;
 
 		referenceDriverPosX = gf->carCoordinates[driverIdx][0];
@@ -2149,7 +2151,7 @@ void collectCarTelemetry() {
 	else if (trackSplineBuilding)
 		updateTrackSpline();
 	else
-		startTrackSplineBuilder(carID);
+		startTrackSplineBuilder(carID, true);
 }
 
 bool started = false;

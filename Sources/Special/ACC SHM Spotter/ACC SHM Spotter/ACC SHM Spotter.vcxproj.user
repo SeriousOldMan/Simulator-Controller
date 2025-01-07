@@ -4,4 +4,8 @@
     <LocalDebuggerCommandArguments>-Telemetry 4520 "D:\Dateien\Dokumente\Simulator Controller\Temp\Telemetry"</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LocalDebuggerCommandArguments>-Telemetry 4096 "D:\Dateien\Dokumente\Simulator Controller\Temp\Sessions\Practice\Telemetry"</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
 </Project>

@@ -498,6 +498,7 @@ TrackSpline* activeTrackSpline = NULL;
 float activeTrackSplineLength;
 
 bool trackSplineReady = false;
+bool trackSplineValid = true;
 
 class IdealLine
 {
@@ -768,6 +769,18 @@ void updateTrackSpline() {
 
 							output.close();
 						}
+						
+						int zeroCount = 0;
+						last = (int)(activeTrackSpline->size() / 2) - 1;
+						
+						for (int i = 0; i <= last; i++) {
+							TrackSplinePoint point = (*activeTrackSpline)["#" + std::to_string(i)];
+							
+							if (point.distance == 0)
+								zeroCount += 1;
+						}
+						
+						trackSplineValid = (zeroCount < 5);
 					}
 				}
 				else {
@@ -2065,7 +2078,7 @@ void collectCarTelemetry() {
 			break;
 		}
 
-	if (trackSplineReady) {
+	if (trackSplineReady && trackSplineValid) {
 		float driverRunning = getRunning(carID);
 
 		if (driverRunning >= 0)

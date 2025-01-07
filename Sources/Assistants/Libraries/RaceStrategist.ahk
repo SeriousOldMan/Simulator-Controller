@@ -2176,76 +2176,85 @@ class RaceStrategist extends GridRaceAssistant {
 					else if (options.HasProp("FullCourseYellow") && options.FullCourseYellow)
 						speaker.speakPhrase("FCYStrategy")
 
-					if ((options == true) || (options.HasProp("Pitstops") && options.Pitstops)) {
-						speaker.speakPhrase("Pitstops", {pitstops: strategy.Pitstops.Length})
-
-						if activeStrategy {
-							difference := (strategy.Pitstops.Length - (activeStrategy.Pitstops.Length - activeStrategy.RunningPitstops))
-
-							if ((difference != 0) && ((difference > 0) || (strategy.Pitstops.Length > 0)))
-								speaker.speakPhrase("PitstopsDifference", {difference: Abs(difference), pitstops: strategy.Pitstops.Length - difference
-																		 , direction: (difference < 0) ? fragments["Less"] : fragments["More"]})
-						}
-
-						reported := (strategy.Pitstops.Length = 0)
-					}
-
 					nextPitstop := ((strategy.Pitstops.Length > 0) ? strategy.Pitstops[1] : false)
 
-					if nextPitstop {
-						lap := nextPitstop.Lap
-						refuel := nextPitstop.RefuelAmount
-						tyreChange := nextPitstop.TyreChange
-						activePitstop := false
-
-						if (activeStrategy && ((activeStrategy.Pitstops.Length - activeStrategy.RunningPitstops) > 0))
-							activePitstop := activeStrategy.Pitstops[strategy.RunningPitstops + 1]
-
+					if !nextPitstop
 						if ((options == true) || (options.HasProp("NextPitstop") && options.NextPitstop)) {
-							speaker.speakPhrase("NextPitstop", {pitstopLap: (lap + 1)})
-
-							if activePitstop {
-								difference := (lap - activePitstop.Lap)
-
-								if (difference != 0)
-									speaker.speakPhrase("LapsDifference", {difference: Abs(difference), lap: activePitstop.Lap + 1
-																		 , label: (Abs(difference) = 1) ? fragments["Lap"] : fragments["Laps"]
-																		 , direction: (difference < 0) ? fragments["Earlier"] : fragments["Later"]})
-							}
-						}
-
-						if ((options == true) || (options.HasProp("Refuel") && options.Refuel)) {
-							speaker.speakPhrase((refuel > 0) ? "Refuel" : "NoRefuel"
-											  , {fuel: speaker.number2Speech(convertUnit("Volume", refuel), 1), unit: speaker.Fragments[getUnit("Volume")]})
-
-							if activePitstop {
-								difference := (refuel - activePitstop.RefuelAmount)
-
-								if (difference != 0)
-									speaker.speakPhrase("RefuelDifference", {difference: speaker.number2Speech(convertUnit("Volume", Abs(difference)), 1)
-																		   , refuel: speaker.number2Speech(convertUnit("Volume", activePitstop.RefuelAmount), 1)
-																		   , unit: fragments[getUnit("Volume")]
-																		   , direction: (difference < 0) ? fragments["Less"] : fragments["More"]})
-							}
-						}
-
-						if ((options == true) || (options.HasProp("TyreChange") && options.TyreChange)) {
-							speaker.speakPhrase(tyreChange ? "TyreChange" : "NoTyreChange")
-
-							if activePitstop
-								if (nextPitstop.TyreChange && !activePitstop.TyreChange)
-									speaker.speakPhrase("TyreChangeDifference")
-								else if (!nextPitstop.TyreChange && activePitstop.TyreChange)
-									speaker.speakPhrase("NoTyreChangeDifference")
-								else if (nextPitstop.TyreChange
-									  && ((nextPitstop.TyreCompound != activePitstop.TyreCompound)
-									   || (nextPitstop.TyreCompoundColor != activePitstop.TyreCompoundColor)))
-									speaker.speakPhrase("TyreCompoundDifference")
-						}
-					}
-					else if ((options == true) || (options.HasProp("NextPitstop") && options.NextPitstop))
-						if !reported
 							speaker.speakPhrase("NoNextPitstop")
+
+							reported := true
+						}
+
+					if !reported {
+						if ((options == true) || (options.HasProp("Pitstops") && options.Pitstops)) {
+							speaker.speakPhrase("Pitstops", {pitstops: strategy.Pitstops.Length})
+
+							if activeStrategy {
+								difference := (strategy.Pitstops.Length - (activeStrategy.Pitstops.Length - activeStrategy.RunningPitstops))
+
+								if ((difference != 0) && ((difference > 0) || (strategy.Pitstops.Length > 0)))
+									speaker.speakPhrase("PitstopsDifference", {difference: Abs(difference), pitstops: strategy.Pitstops.Length - difference
+																			 , direction: (difference < 0) ? fragments["Less"] : fragments["More"]})
+							}
+
+							reported := (strategy.Pitstops.Length = 0)
+						}
+
+						if nextPitstop {
+							lap := nextPitstop.Lap
+							refuel := nextPitstop.RefuelAmount
+							tyreChange := nextPitstop.TyreChange
+							activePitstop := false
+
+							if (activeStrategy && ((activeStrategy.Pitstops.Length - activeStrategy.RunningPitstops) > 0))
+								activePitstop := activeStrategy.Pitstops[strategy.RunningPitstops + 1]
+
+							if ((options == true) || (options.HasProp("NextPitstop") && options.NextPitstop)) {
+								speaker.speakPhrase("NextPitstop", {pitstopLap: (lap + 1)})
+
+								if activePitstop {
+									difference := (lap - activePitstop.Lap)
+
+									if (difference != 0)
+										speaker.speakPhrase("LapsDifference", {difference: Abs(difference), lap: activePitstop.Lap + 1
+																			 , label: (Abs(difference) = 1) ? fragments["Lap"] : fragments["Laps"]
+																			 , direction: (difference < 0) ? fragments["Earlier"] : fragments["Later"]})
+								}
+							}
+
+							if ((options == true) || (options.HasProp("Refuel") && options.Refuel)) {
+								speaker.speakPhrase((refuel > 0) ? "Refuel" : "NoRefuel"
+												  , {fuel: speaker.number2Speech(convertUnit("Volume", refuel), 1), unit: speaker.Fragments[getUnit("Volume")]})
+
+								if activePitstop {
+									difference := (refuel - activePitstop.RefuelAmount)
+
+									if (difference != 0)
+										speaker.speakPhrase("RefuelDifference", {difference: speaker.number2Speech(convertUnit("Volume", Abs(difference)), 1)
+																			   , refuel: speaker.number2Speech(convertUnit("Volume", activePitstop.RefuelAmount), 1)
+																			   , unit: fragments[getUnit("Volume")]
+																			   , direction: (difference < 0) ? fragments["Less"] : fragments["More"]})
+								}
+							}
+
+							if ((options == true) || (options.HasProp("TyreChange") && options.TyreChange)) {
+								speaker.speakPhrase(tyreChange ? "TyreChange" : "NoTyreChange")
+
+								if activePitstop
+									if (nextPitstop.TyreChange && !activePitstop.TyreChange)
+										speaker.speakPhrase("TyreChangeDifference")
+									else if (!nextPitstop.TyreChange && activePitstop.TyreChange)
+										speaker.speakPhrase("NoTyreChangeDifference")
+									else if (nextPitstop.TyreChange
+										  && ((nextPitstop.TyreCompound != activePitstop.TyreCompound)
+										   || (nextPitstop.TyreCompoundColor != activePitstop.TyreCompoundColor)))
+										speaker.speakPhrase("TyreCompoundDifference")
+							}
+						}
+						else if ((options == true) || (options.HasProp("NextPitstop") && options.NextPitstop))
+							if !reported
+								speaker.speakPhrase("NoNextPitstop")
+					}
 
 					if ((options == true) || (options.HasProp("Map") && options.Map)) {
 						map := strategy.Map

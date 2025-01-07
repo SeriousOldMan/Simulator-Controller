@@ -878,18 +878,22 @@ namespace SHMConnector {
 		}
 		
 		private bool SelectPitstopOption(string option, string direction) {
-			int tries = 2;
+			int rounds = 20;
+			int tries = 3;
 
 			pitInfoBuffer.GetMappedData(ref pitInfo);
 
 			string start = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
 
 			while (!GetStringFromBytes(pitInfo.mPitMenu.mChoiceString).Contains(option)) {
+				if (--rounds <= 0)
+					return false;
+				
 				SendPitstopCommand(direction);
 
 				pitInfoBuffer.GetMappedData(ref pitInfo);
 
-				if ((GetStringFromBytes(pitInfo.mPitMenu.mChoiceString) == start) && (--tries == 0)) {
+				if ((GetStringFromBytes(pitInfo.mPitMenu.mChoiceString) == start) && (--tries <= 0)) {
 					// Console.Write("Not found: "); Console.WriteLine(category);
 
 					return false;
@@ -900,18 +904,22 @@ namespace SHMConnector {
 		}
 
 		private bool SelectPitstopCategory(string category) {
-			int tries = 2;
+			int rounds = 20;
+			int tries = 3;
 
 			pitInfoBuffer.GetMappedData(ref pitInfo);
 
 			string start = GetStringFromBytes(pitInfo.mPitMenu.mCategoryName);
 
 			while (category != GetStringFromBytes(pitInfo.mPitMenu.mCategoryName)) {
+				if (--rounds <= 0)
+					return false;
+				
 				SendPitstopCommand("D");
 
 				pitInfoBuffer.GetMappedData(ref pitInfo);
 
-				if ((GetStringFromBytes(pitInfo.mPitMenu.mCategoryName) == start) && (--tries == 0)) {
+				if ((GetStringFromBytes(pitInfo.mPitMenu.mCategoryName) == start) && (--tries <= 0)) {
 					// Console.Write("Not found: "); Console.WriteLine(category);
 
 					return false;

@@ -7,7 +7,8 @@
   6. The reliability of the track spline builder for *Assetto Corsa Competizione* has been improved. This positively affects the accident detection by the Spotter and the collection of car telemetry data by various applications.
   7. Pressure values are now converted to the specified display unit in "Setup Workbench".
   8. A short sound is played now, whenever an Assistant answer is given by the *Conversation* booster. This helps to understand whether a given answer is absolutely reliable or not.
-  9. Full support for editing of *Le Mans Ultimate* setups in "Setup Workbench". Meta data is included for all GTE and for all GT3 cars, as well as for the Oreca 07 LMP2 car. Four the Hypercar category the Alpine A424 is also already included. The list of cars will be completed with the next release.
+  9. New settings in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) has been defined for *rFactor 2* and *Le Mans Ultimate*, which will enable auto-requesting of the pitstop in the simulator after all pitstop settings has been updated by the Race Engineer in the preparation phase.
+  10. Full support for editing of *Le Mans Ultimate* setups in "Setup Workbench". Meta data is included for all cars with one exception. For the Peugeot 9x8, only the 2024 version is supported, the one with adjustable wing.
 
 ## 6.1.0.1-release 01/03/25
   1. Fixed a timing issue when requesting data from *Le Mans Ultimate*.

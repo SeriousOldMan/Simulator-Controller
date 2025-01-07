@@ -1,7 +1,7 @@
 [Development]
 Version=6.1.1.0-dev
 Target=6.1.1.0-release
-Date=01/06/2025
+Date=01/07/2025
 Download=
 Changes=Full support for Le Mans Ultimate in "Setup Workbench", Unit conversion for pressures in "Setup Workbench", Filter safety car from the grid in AMS2, Fixed Stream Deck Icons, Acknowledge sound for Conversation booster activation, Optimized strategy announcement by Strategist, Increased reliability of track spline builder for ACC
 Components=Media->5.6.1,Configuration->6.1.0,Utilities->5.9.8

@@ -396,7 +396,7 @@ class RF2Plugin extends Sector397Plugin {
 								   , "TyreCompoundFront", "Tyre Compound Front", "TyreCompoundRear", "Tyre Compound Rear"
 								   , "TyreAllAround", "All Around"
 								   , "TyreFrontLeft", "Front Left", "TyreFrontRight", "Front Right", "TyreRearLeft", "Rear Left", "TyreRearRight", "Rear Right"
-								   , "DriverSelect", "Driver", "RepairRequest", "Repair", "PitstopRequest", "Pitstop")
+								   , "DriverSelect", "Driver", "RepairRequest", "Repair", "PitstopRequest", "RequestPitstop")
 
 		selectActions := []
 	}
@@ -426,11 +426,11 @@ class RF2Plugin extends Sector397Plugin {
 		}
 	}
 
-	changePitstopOption(option, action, steps := 1) {
+	changePitstopOption(option, action := "Increase", steps := 1) {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			switch option, false {
-				case "Pitstop":
-					if this.RequestPitstopHotKey {
+				case "RequestPitstop":
+					if (this.RequestPitstopHotKey && (steps > 0)) {
 						this.activateWindow()
 
 						this.sendCommand(this.RequestPitstopHotKey)
@@ -569,6 +569,13 @@ class RF2Plugin extends Sector397Plugin {
 
 				this.iSelectedDriver := nextDriver[2]
 			}
+	}
+
+	finishPitstopSetup(pitstopNumber) {
+		super.finishPitstopSetup(pitstopNumber)
+
+		if getMultiMapValue(this.Settings, "Simulator.rFactor 2", "Pitstop.Request", false)
+			this.changePitstopOption("RequestPitstop")
 	}
 }
 

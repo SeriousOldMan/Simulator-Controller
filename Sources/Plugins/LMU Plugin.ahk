@@ -79,7 +79,7 @@ class LMUPlugin extends Sector397Plugin {
 								   , "TyreAllAround", "All Around"
 								   , "TyreFrontLeft", "Front Left", "TyreFrontRight", "Front Right", "TyreRearLeft", "Rear Left", "TyreRearRight", "Rear Right"
 								   , "BodyworkRepair", "Repair Bodywork", "SuspensionRepair", "Repair Suspension"
-								   , "BrakeChange", "Change Brakes", "DriverSelect", "Driver", "PitstopRequest", "Pitstop")
+								   , "BrakeChange", "Change Brakes", "DriverSelect", "Driver", "PitstopRequest", "RequestPitstop")
 
 		selectActions := []
 	}
@@ -321,11 +321,11 @@ class LMUPlugin extends Sector397Plugin {
 			this.getOptionHandler(option).Call("Set", value)
 	}
 
-	changePitstopOption(option, action, steps := 1) {
+	changePitstopOption(option, action := "Increase", steps := 1) {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			switch option, false {
-				case "Pitstop":
-					if this.RequestPitstopHotKey {
+				case "RequestPitstop":
+					if (this.RequestPitstopHotKey && (steps > 0)) {
 						this.activateWindow()
 
 						this.sendCommand(this.RequestPitstopHotKey)
@@ -471,6 +471,13 @@ class LMUPlugin extends Sector397Plugin {
 	requestPitstopDriver(pitstopNumber, driver) {
 		if (this.OpenPitstopMFDHotkey != "Off")
 			this.setPitstopOption("Driver", driver)
+	}
+
+	finishPitstopSetup(pitstopNumber) {
+		super.finishPitstopSetup(pitstopNumber)
+
+		if getMultiMapValue(this.Settings, "Simulator.Le Mans Ultimate", "Pitstop.Request", false)
+			this.changePitstopOption("RequestPitstop")
 	}
 
 	parseCategory(candidate, &rest) {

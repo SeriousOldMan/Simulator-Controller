@@ -657,23 +657,37 @@ namespace SHMConnector {
 			SendPitstopCommand(new string(action, (int)Double.Parse(stepsArgument)));
 		}
 
-		private void ExecuteSetTyreCompoundFrontCommand(string tyreCompound) {
-			if (tyreCompound == "None") {
+		private void ExecuteSetTyreCompoundFrontCommand(string tyreCompound)
+		{
+			if (tyreCompound == "None")
+			{
 				Console.WriteLine("Adjusting Front Tyre Compound: No Change");
 
 				tyreCompound = "No Change";
 			}
-			else {
+			else
+			{
 				Console.Write("Adjusting Front Tyre Compound: ");
 				Console.WriteLine(tyreCompound);
 			}
 
-			void selectAxleTyreCompound(string category) {
+			bool selectAxleTyreCompound(string category)
+			{
 				if (SelectPitstopCategory(category))
+				{
 					SelectPitstopOption(tyreCompound, "+");
+
+					return true;
+				}
+				else
+					return false;
 			}
 
-			selectAxleTyreCompound("F TIRES:");
+			if (!selectAxleTyreCompound("F TIRES:"))
+			{
+				selectAxleTyreCompound("FL TIRE:");
+				selectAxleTyreCompound("FR TIRE:");
+			}
 		}
 
 		private void ExecuteSetTyreCompoundRearCommand(string tyreCompound) {
@@ -685,15 +699,26 @@ namespace SHMConnector {
 			else {
 				Console.Write("Adjusting Rear Tyre Compound: ");
 				Console.WriteLine(tyreCompound);
-			}
+            }
 
-			void selectAxleTyreCompound(string category) {
-				if (SelectPitstopCategory(category))
-					SelectPitstopOption(tyreCompound, "+");
-			}
+            bool selectAxleTyreCompound(string category)
+            {
+                if (SelectPitstopCategory(category))
+                {
+                    SelectPitstopOption(tyreCompound, "+");
 
-			selectAxleTyreCompound("R TIRES:");
-		}
+                    return true;
+                }
+                else
+                    return false;
+            }
+
+            if (!selectAxleTyreCompound("R TIRES:"))
+            {
+                selectAxleTyreCompound("RL TIRE:");
+                selectAxleTyreCompound("RR TIRE:");
+            }
+        }
 
 		private void ExecuteSetTyreCompoundCommand(string tyreCompound) {
 			ExecuteSetTyreCompoundFrontCommand(tyreCompound);
@@ -701,17 +726,27 @@ namespace SHMConnector {
 		}
 		
 		private void ExecuteChangeTyreCompoundFrontCommand(char action, string stepsArgument) {
-			if (!SelectPitstopCategory("F TIRES:"))
-				return;
+			if (SelectPitstopCategory("F TIRES:"))
+				SendPitstopCommand(new string(action, (int)Double.Parse(stepsArgument)));
+			else if (SelectPitstopCategory("FL TIRE:"))
+			{
+				SendPitstopCommand(new string(action, (int)Double.Parse(stepsArgument)));
 
-			SendPitstopCommand(new string(action, (int)Double.Parse(stepsArgument)));
-		}
+				if (SelectPitstopCategory("FR TIRE:"))
+					SendPitstopCommand(new string(action, (int)Double.Parse(stepsArgument)));
+			}
+        }
 		
 		private void ExecuteChangeTyreCompoundRearCommand(char action, string stepsArgument) {
-			if (!SelectPitstopCategory("R TIRES:"))
-				return;
+			if (SelectPitstopCategory("R TIRES:"))
+				SendPitstopCommand(new string(action, (int)Double.Parse(stepsArgument)));
+			else if (SelectPitstopCategory("RL TIRE:"))
+            {
+                SendPitstopCommand(new string(action, (int)Double.Parse(stepsArgument)));
 
-			SendPitstopCommand(new string(action, (int)Double.Parse(stepsArgument)));
+                if (SelectPitstopCategory("RR TIRE:"))
+                    SendPitstopCommand(new string(action, (int)Double.Parse(stepsArgument)));
+            }
 		}
 		
 		private void ExecuteChangeTyreCompoundCommand(char action, string stepsArgument) {
@@ -973,7 +1008,7 @@ namespace SHMConnector {
 				if (SelectPitstopCategory("FUEL:"))
 					strWriter.Write("FuelAmount="); strWriter.WriteLine(pitInfo.mPitMenu.mChoiceIndex);
 
-				if (SelectPitstopCategory("F TIRES:"))
+				if (SelectPitstopCategory("F TIRES:") || SelectPitstopCategory("FL TIRE:"))
 				{
 					string compound = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
 
@@ -987,7 +1022,7 @@ namespace SHMConnector {
 					}
 				}
 
-				if (SelectPitstopCategory("R TIRES:"))
+                if (SelectPitstopCategory("R TIRES:") || SelectPitstopCategory("RL TIRE:"))
 				{
 					string compound = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
 

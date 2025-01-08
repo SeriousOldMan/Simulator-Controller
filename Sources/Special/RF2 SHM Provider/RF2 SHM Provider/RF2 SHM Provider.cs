@@ -635,13 +635,24 @@ namespace RF2SHMProvider {
 				Console.WriteLine(tyreCompound);
 			}
 
-			void selectAxleTyreCompound(string category) {
-				if (SelectPitstopCategory(category))
-					SelectPitstopOption(tyreCompound, "+");
-			}
+            bool selectAxleTyreCompound(string category)
+            {
+                if (SelectPitstopCategory(category))
+                {
+                    SelectPitstopOption(tyreCompound, "+");
 
-			selectAxleTyreCompound("F TIRES:");
-		}
+                    return true;
+                }
+                else
+                    return false;
+            }
+
+            if (!selectAxleTyreCompound("F TIRES:"))
+            {
+                selectAxleTyreCompound("FL TIRE:");
+                selectAxleTyreCompound("FR TIRE:");
+            }
+        }
 
 		private void ExecuteSetTyreCompoundRearCommand(string tyreCompound) {
 			if (tyreCompound == "None") {
@@ -654,13 +665,24 @@ namespace RF2SHMProvider {
 				Console.WriteLine(tyreCompound);
 			}
 
-			void selectAxleTyreCompound(string category) {
-				if (SelectPitstopCategory(category))
-					SelectPitstopOption(tyreCompound, "+");
-			}
+            bool selectAxleTyreCompound(string category)
+            {
+                if (SelectPitstopCategory(category))
+                {
+                    SelectPitstopOption(tyreCompound, "+");
 
-			selectAxleTyreCompound("R TIRES:");
-		}
+                    return true;
+                }
+                else
+                    return false;
+            }
+
+            if (!selectAxleTyreCompound("R TIRES:"))
+            {
+                selectAxleTyreCompound("RL TIRE:");
+                selectAxleTyreCompound("RR TIRE:");
+            }
+        }
 
 		private void ExecuteSetTyreCompoundCommand(string tyreCompound) {
 			ExecuteSetTyreCompoundFrontCommand(tyreCompound);
@@ -668,18 +690,28 @@ namespace RF2SHMProvider {
 		}
 		
 		private void ExecuteChangeTyreCompoundFrontCommand(char action, string stepsArgument) {
-			if (!SelectPitstopCategory("F TIRES:"))
-				return;
+            if (SelectPitstopCategory("F TIRES:"))
+                SendPitstopCommand(new string(action, (int)Double.Parse(stepsArgument)));
+            else if (SelectPitstopCategory("FL TIRE:"))
+            {
+                SendPitstopCommand(new string(action, (int)Double.Parse(stepsArgument)));
 
-			SendPitstopCommand(new string(action, (int)Double.Parse(stepsArgument)));
-		}
+                if (SelectPitstopCategory("FR TIRE:"))
+                    SendPitstopCommand(new string(action, (int)Double.Parse(stepsArgument)));
+            }
+        }
 		
 		private void ExecuteChangeTyreCompoundRearCommand(char action, string stepsArgument) {
-			if (!SelectPitstopCategory("R TIRES:"))
-				return;
+            if (SelectPitstopCategory("R TIRES:"))
+                SendPitstopCommand(new string(action, (int)Double.Parse(stepsArgument)));
+            else if (SelectPitstopCategory("RL TIRE:"))
+            {
+                SendPitstopCommand(new string(action, (int)Double.Parse(stepsArgument)));
 
-			SendPitstopCommand(new string(action, (int)Double.Parse(stepsArgument)));
-		}
+                if (SelectPitstopCategory("RR TIRE:"))
+                    SendPitstopCommand(new string(action, (int)Double.Parse(stepsArgument)));
+            }
+        }
 		
 		private void ExecuteChangeTyreCompoundCommand(char action, string stepsArgument) {
 			ExecuteChangeTyreCompoundFrontCommand(action, stepsArgument);
@@ -939,29 +971,31 @@ namespace RF2SHMProvider {
 
 				Console.Write("FuelAmount="); Console.WriteLine(pitInfo.mPitMenu.mChoiceIndex);
 
-				if (!SelectPitstopCategory("F TIRES:"))
-					return;
+				if (SelectPitstopCategory("F TIRES:") || SelectPitstopCategory("FL TIRE:"))
+				{
+					string compound = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
 
-				string compound = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
-
-				if (compound != "No Change") {
-					Console.WriteLine("TyreCompoundRaw=" + compound);
-					Console.WriteLine("TyreCompoundRawFront=" + compound);
+					if (compound != "No Change")
+					{
+						Console.WriteLine("TyreCompoundRaw=" + compound);
+						Console.WriteLine("TyreCompoundRawFront=" + compound);
+					}
+					else
+					{
+						Console.WriteLine("TyreCompoundRaw=false");
+						Console.WriteLine("TyreCompoundRawFront=false");
+					}
 				}
-				else {
-					Console.WriteLine("TyreCompoundRaw=false");
-					Console.WriteLine("TyreCompoundRawFront=false");
+
+				if (SelectPitstopCategory("R TIRES:") || SelectPitstopCategory("RL TIRE:"))
+				{
+					string compound = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
+
+					if (compound != "No Change")
+						Console.WriteLine("TyreCompoundRawRear=" + compound);
+					else
+						Console.WriteLine("TyreCompoundRawRear=false");
 				}
-
-				if (!SelectPitstopCategory("R TIRES:"))
-					return;
-
-				compound = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
-
-				if (compound != "No Change")
-					Console.WriteLine("TyreCompoundRawRear=" + compound);
-				else
-					Console.WriteLine("TyreCompoundRawRear=false");
 
                 void writePressure(string category, string key) {
 					if (!SelectPitstopCategory(category))

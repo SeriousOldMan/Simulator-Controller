@@ -878,7 +878,7 @@ namespace SHMConnector {
 		}
 		
 		private bool SelectPitstopOption(string option, string direction) {
-			int rounds = 20;
+			int rounds = 40;
 			int tries = 3;
 
 			pitInfoBuffer.GetMappedData(ref pitInfo);

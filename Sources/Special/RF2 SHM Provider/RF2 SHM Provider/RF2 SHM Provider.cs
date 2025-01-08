@@ -850,13 +850,16 @@ namespace RF2SHMProvider {
 			pitInfoBuffer.GetMappedData(ref pitInfo);
 
 			string start = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
+            string name = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
 
-			while (!GetStringFromBytes(pitInfo.mPitMenu.mChoiceString).Contains(option)) {
+            while (!option.Contains(name) && !name.Contains(option)) {
 				SendPitstopCommand(direction);
 
 				pitInfoBuffer.GetMappedData(ref pitInfo);
 
-				if ((GetStringFromBytes(pitInfo.mPitMenu.mChoiceString) == start) && (--tries == 0)) {
+                name = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
+
+                if ((name == start) && (--tries == 0)) {
 					// Console.Write("Not found: "); Console.WriteLine(category);
 
 					return false;
@@ -872,13 +875,16 @@ namespace RF2SHMProvider {
 			pitInfoBuffer.GetMappedData(ref pitInfo);
 
 			string start = GetStringFromBytes(pitInfo.mPitMenu.mCategoryName);
+			string name = GetStringFromBytes(pitInfo.mPitMenu.mCategoryName);
 
-			while (category != GetStringFromBytes(pitInfo.mPitMenu.mCategoryName)) {
+            while (!category.Contains(name) && !name.Contains(category)) {
 				SendPitstopCommand("D");
 
 				pitInfoBuffer.GetMappedData(ref pitInfo);
 
-				if ((GetStringFromBytes(pitInfo.mPitMenu.mCategoryName) == start) && (--tries == 0)) {
+				name = GetStringFromBytes(pitInfo.mPitMenu.mCategoryName);
+
+                if ((name == start) && (--tries == 0)) {
 					// Console.Write("Not found: "); Console.WriteLine(category);
 
 					return false;
@@ -958,7 +964,10 @@ namespace RF2SHMProvider {
 					if (currentPressure.Contains(" "))
 						currentPressure = currentPressure.Split(' ')[0];
 
-					Console.Write(key); Console.Write("="); Console.WriteLine(GetPsi(Int16.Parse(currentPressure)));
+					if (currentPressure != "")
+					{
+						Console.Write(key); Console.Write("="); Console.WriteLine(GetPsi(Int16.Parse(currentPressure)));
+					}
 				}
 
 				writePressure("FL PRESS:", "TyrePressureFL");

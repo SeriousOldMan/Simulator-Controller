@@ -3837,6 +3837,7 @@ startupSetupWorkbench() {
 #Include "Libraries\ACCSetupEditor.ahk"
 #Include "Libraries\ACSetupEditor.ahk"
 #Include "Libraries\LMUSetupEditor.ahk"
+#Include "Libraries\RF2SetupEditor.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

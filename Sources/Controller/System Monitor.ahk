@@ -907,11 +907,14 @@ systemMonitor(command := false, arguments*) {
 		}
 
 		computePressure(key) {
-			local increment := getMultiMapValue(sessionState, "Pitstop", key . ".Increment")
+			local increment := getMultiMapValue(sessionState, "Pitstop", key . ".Increment", 0)
 			local sign := ((increment > 0) ? "+ " : ((increment < 0) ? "- " : ""))
 
-			return (displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", key)))
-				  . translate(" (") . sign . displayValue("Float", convertUnit("Pressure", Abs(increment))) . translate(")"))
+			if getMultiMapValue(sessionState, "Pitstop", key, false)
+				return (displayValue("Float", convertUnit("Pressure", getMultiMapValue(sessionState, "Pitstop", key)))
+					  . translate(" (") . sign . displayValue("Float", convertUnit("Pressure", Abs(increment))) . translate(")"))
+			else
+				return "-"
 		}
 
 		try {

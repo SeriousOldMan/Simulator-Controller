@@ -811,12 +811,25 @@ planPitstop() <= Set(Pitstop.Planned.Nr, 1)
 {All: [?Pitstop.Plan],
 	  [?Session.Settings.Pitstop.Service.Refuel = false]} => (Set: Pitstop.Planned.Fuel, 0)
 {All: [?Pitstop.Plan],
-	  [?Session.Settings.Pitstop.Service.Tyres = false]} => (Set: Pitstop.Planned.Tyre.Compound, false),
-															(Set: Pitstop.Planned.Tyre.Compound.Color, false),
-															(Set: Pitstop.Planned.Tyre.Pressure.FL, false),
-															(Set: Pitstop.Planned.Tyre.Pressure.FR, false),
-															(Set: Pitstop.Planned.Tyre.Pressure.RL, false),
-															(Set: Pitstop.Planned.Tyre.Pressure.RR, false)
+	  [?Session.Settings.Pitstop.Service.Tyres = Off]} => (Set: Pitstop.Planned.Tyre.Compound, false),
+														  (Set: Pitstop.Planned.Tyre.Compound.Color, false),
+														  (Set: Pitstop.Planned.Tyre.Pressure.FL, false),
+														  (Set: Pitstop.Planned.Tyre.Pressure.FR, false),
+														  (Set: Pitstop.Planned.Tyre.Pressure.RL, false),
+														  (Set: Pitstop.Planned.Tyre.Pressure.RR, false),
+														  (Set: Pitstop.Planned.Tyre.Pressure.FL.Increment, false),
+														  (Set: Pitstop.Planned.Tyre.Pressure.FR.Increment, false),
+														  (Set: Pitstop.Planned.Tyre.Pressure.RL.Increment, false),
+														  (Set: Pitstop.Planned.Tyre.Pressure.RR.Increment, false)
+{All: [?Pitstop.Plan],
+	  [?Session.Settings.Pitstop.Service.Tyres = Change]} => (Set: Pitstop.Planned.Tyre.Pressure.FL, false),
+															 (Set: Pitstop.Planned.Tyre.Pressure.FR, false),
+															 (Set: Pitstop.Planned.Tyre.Pressure.RL, false),
+															 (Set: Pitstop.Planned.Tyre.Pressure.RR, false),
+															 (Set: Pitstop.Planned.Tyre.Pressure.FL.Increment, false),
+															 (Set: Pitstop.Planned.Tyre.Pressure.FR.Increment, false),
+															 (Set: Pitstop.Planned.Tyre.Pressure.RL.Increment, false),
+															 (Set: Pitstop.Planned.Tyre.Pressure.RR.Increment, false)
 {All: [?Pitstop.Plan],
 	  [?Session.Settings.Pitstop.Service.Repairs = false]} => (Set: Pitstop.Planned.Repair.Suspension, false),
 															  (Set: Pitstop.Planned.Repair.Bodywork, false),
@@ -965,14 +978,14 @@ setRefuelAmount(?pitstopNumber) <= !Session.Settings.Pitstop.Service.Refuel = tr
 								   Call(setPitstopRefuelAmount, ?pitstopNumber, !Pitstop.Planned.Fuel)
 setRefuelAmount(?)								   
 
-setTyreSet(?pitstopNumber) <= !Session.Settings.Pitstop.Service.Tyres = true, !,
+setTyreSet(?pitstopNumber) <= !Session.Settings.Pitstop.Service.Tyres != Off, !,
 							  Call(setPitstopTyreSet, ?pitstopNumber,
 								   !Pitstop.Planned.Tyre.Compound, !Pitstop.Planned.Tyre.Compound.Color, !Pitstop.Planned.Tyre.Set)
 setTyreSet(?)
-								   
-setTyrePressures(?pitstopNumber) <= !Session.Settings.Pitstop.Service.Tyres = true, !Pitstop.Planned.Tyre.Compound = false, !
+
+setTyrePressures(?pitstopNumber) <= !Session.Settings.Pitstop.Service.Tyres = Full, !Pitstop.Planned.Tyre.Compound = false, !
 setTyrePressures(?pitstopNumber) <=
-		!Session.Settings.Pitstop.Service.Tyres = true, !,
+		!Session.Settings.Pitstop.Service.Tyres = Full, !,
 		Call(setPitstopTyrePressures, ?pitstopNumber,
 									  !Pitstop.Planned.Tyre.Pressure.FL, !Pitstop.Planned.Tyre.Pressure.FR,
 									  !Pitstop.Planned.Tyre.Pressure.RL, !Pitstop.Planned.Tyre.Pressure.RR)

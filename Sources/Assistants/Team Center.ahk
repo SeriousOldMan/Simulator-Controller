@@ -8102,10 +8102,21 @@ class TeamCenter extends ConfigurationItem {
 						tyreCompound := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound", false)
 						tyreCompoundColor := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound.Color", false)
 						tyreSet := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Set", "-")
+						
 						pressureFL := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Pressure.FL", "-")
 						pressureFR := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Pressure.FR", "-")
 						pressureRL := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Pressure.RL", "-")
 						pressureRR := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Pressure.RR", "-")
+						
+						if !pressureFL
+							pressureFL := "-"
+						if !pressureFR
+							pressureFR := "-"
+						if !pressureRL
+							pressureRL := "-"
+						if !pressureRR
+							pressureRR := "-"
+							
 						repairBodywork := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Repair.Bodywork", false)
 						repairSuspension := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Repair.Suspension", false)
 						repairEngine := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Repair.Engine", false)

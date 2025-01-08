@@ -7,6 +7,7 @@
   6. The reliability of the track spline builder for *Assetto Corsa Competizione* has been improved. This positively affects the accident detection by the Spotter and the collection of car telemetry data by various applications.
   7. Pressure values are now converted to the specified display unit in "Setup Workbench".
   8. A short sound is played now, whenever an Assistant answer is given by the *Conversation* booster. This helps to understand whether a given answer is absolutely reliable or not.
+  9. The [setting "Engineer: Tyre Service"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" has been extended to choose between no tyre service, change of tyres with unchanged pressures, or full service including pressure adjustment by the Race Engineer.
   9. New settings in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) has been defined for *rFactor 2* and *Le Mans Ultimate*, which will enable auto-requesting of the pitstop in the simulator after all pitstop settings has been updated by the Race Engineer in the preparation phase.
   10. Full support for editing of *Le Mans Ultimate* setups in "Setup Workbench". Meta data is included for all cars with one exception. For the Peugeot 9x8, only the 2024 version is supported, the one with adjustable wing.
 

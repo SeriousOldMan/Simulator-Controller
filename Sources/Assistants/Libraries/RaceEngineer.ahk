@@ -574,11 +574,12 @@ class RaceEngineer extends RaceAssistant {
 				if (knowledgeBase.getValue("Pitstop.Planned.Tyre.Set", 0) != 0)
 					pitstop["TyreSet"] := knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")
 
-				pitstop["TyrePressures"]
-					:= Map("FrontLeft", (Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL", 0), 1) . psi)
-						 , "FrontRight", (Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR", 0), 1) . psi)
-						 , "RearLeft", (Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL", 0), 1) . psi)
-						 , "RearRight", (Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR", 0), 1) . psi))
+				if knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL", false)
+					pitstop["TyrePressures"]
+						:= Map("FrontLeft", (Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL", 0), 1) . psi)
+							 , "FrontRight", (Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR", 0), 1) . psi)
+							 , "RearLeft", (Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL", 0), 1) . psi)
+							 , "RearRight", (Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR", 0), 1) . psi))
 			}
 
 			return pitstop
@@ -1539,8 +1540,9 @@ class RaceEngineer extends RaceAssistant {
 
 					values.Push(value)
 
-					if (value && (Abs(Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . suffix, false), 1) - Round(value, 1)) > 0.2))
-						changed := true
+					if knowledgeBase.getValue(prssKey, false)
+						if (value && (Abs(Round(knowledgeBase.getValue(prssKey, false), 1) - Round(value, 1)) > 0.2))
+							changed := true
 				}
 
 				if changed {
@@ -1877,9 +1879,18 @@ class RaceEngineer extends RaceAssistant {
 		if ((engineRepair = "Threshold") && (engineDuration != 0))
 			engineThreshold /= engineDuration
 
+		tyreService := getMultiMapValue(settings, section, "Pitstop.Service.Tyres", "Full")
+
+		if (tyreService == false)
+			tyreService := "Off"
+		else if (tyreService == true)
+			tyreService := "Full"
+		else if (tyreService && !inList(["Off", "Change", "Full"], tyreService))
+			tyreService := "Full"
+
 		return combine(super.readSettings(simulator, car, track, &settings)
 					 , CaseInsenseMap("Session.Settings.Pitstop.Service.Refuel", getMultiMapValue(settings, section, "Pitstop.Service.Refuel", true)
-									, "Session.Settings.Pitstop.Service.Tyres", getMultiMapValue(settings, section, "Pitstop.Service.Tyres", true)
+									, "Session.Settings.Pitstop.Service.Tyres", tyreService
 									, "Session.Settings.Pitstop.Service.Repairs", getMultiMapValue(settings, section, "Pitstop.Service.Repairs", true)
 									, "Session.Settings.Pitstop.Repair.Bodywork.Duration", bodyworkDuration
 									, "Session.Settings.Pitstop.Repair.Suspension.Duration", suspensionDuration
@@ -2899,7 +2910,7 @@ class RaceEngineer extends RaceAssistant {
 					for tyre, tyreType in Map("FrontLeft", "FL", "FrontRight", "FR", "RearLeft", "RL", "RearRight", "RR") {
 						lostPressure := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.Lost." . tyreType, false)
 
-						if (lostPressure && (lostPressure >= deviationThreshold))
+						if (lostPressure && (lostPressure >= deviationThreshold) && (increment%tyreType% != 0))
 							speaker.speakPhrase("PressureAdjustment", {tyre: fragments[tyre]
 																	 , lost: speaker.number2Speech(convertUnit("Pressure", lostPressure))
 																	 , unit: fragments[getUnit("Pressure")]})
@@ -3124,14 +3135,16 @@ class RaceEngineer extends RaceAssistant {
 						prssKey := ("Pitstop.Planned.Tyre.Pressure." . suffix)
 						incrKey := ("Pitstop.Planned.Tyre.Pressure." . suffix . ".Increment")
 
-						targetPressure := values[index]
+						if knowledgeBase.getValue(prssKey, false) {
+							targetPressure := values[index]
 
-						if knowledgeBase.getValue(incrKey, false)
-							knowledgeBase.setFact(incrKey, knowledgeBase.getValue(incrKey) + (targetPressure - knowledgeBase.getValue(prssKey)))
-						else
-							knowledgeBase.setFact(incrKey, 0)
+							if knowledgeBase.getValue(incrKey, false)
+								knowledgeBase.setFact(incrKey, knowledgeBase.getValue(incrKey) + (targetPressure - knowledgeBase.getValue(prssKey)))
+							else
+								knowledgeBase.setFact(incrKey, 0)
 
-						knowledgeBase.setFact(prssKey, targetPressure)
+							knowledgeBase.setFact(prssKey, targetPressure)
+						}
 					}
 				case "Repair Suspension":
 					knowledgeBase.setFact("Pitstop.Planned.Repair.Suspension", values[1])

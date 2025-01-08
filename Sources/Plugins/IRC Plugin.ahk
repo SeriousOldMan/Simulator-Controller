@@ -227,7 +227,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 		settings := super.prepareSettings(settings, data)
 
 		if (getMultiMapValue(settings, "Simulator.iRacing", "Pitstop.Service.Tyres", kUndefined) == kUndefined)
-			setMultiMapValue(settings, "Simulator.iRacing", "Pitstop.Service.Tyres", false)
+			setMultiMapValue(settings, "Simulator.iRacing", "Pitstop.Service.Tyres", "Change")
 
 		return settings
 	}

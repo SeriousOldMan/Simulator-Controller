@@ -43,7 +43,7 @@ This settings are generally available, although you can and have to define them 
 | Engineer   | Late Join                                | Boolean | False                           | No  | If enabled (*True*), the Engineer will also become active, when you join mid-session. Attention: This can lead to funny results in almost all calculations. |
 |            | Repeat whole voice message               | Boolean | True                            | No  | When an Assistant voice output is interrupted, it will try to repeat its message. When this setting is enabled, which is the default, the whole message with all sentences which belong together, will be repeated.  |
 |            | Refuel Service                           | Boolean | True                            | No  | If enabled (*True*), the Engineer will consider refueling during pitstop servicing. You won't want to change this. |
-|            | Tyre Service                             | Boolean | True (1)                        | No  | If enabled (*True*), the Engineer will consider tyre changing during pitstop servicing. You may want to disable this for simulators without correct pressure information available in the API, like *iRacing*. In this case you will have to manage the tyres on your own. |
+|            | Tyre Service                             | Off, Change, Full | Full (1)                        | No  | If not *Off*, the Engineer will consider tyre changing during pitstop servicing. *Full* includes adjusting pressures as well. You may want to use *Change* only for simulators without correct pressure information available in the API, like *iRacing*. In this case you will have to manage the tyre pressures on your own. |
 |            | Repair Service                           | Boolean | True                            | No  | If enabled (*True*), the Engineer will consider repairing during pitstop servicing. You can disable this and manage the repair settings on your own, but why you want to do this? |
 |            | Confirm Pitstop Preparation              | Always, Listening, Never | Always         | No  | If *Always*, the Engineer will always ask for confirmation when it is time to prepare a pitstop, if *Listening*, only when a voice command listener is configured and if it is *Never*, the Engineer will never ask, but will always prepare the pitstop automatically. |
 |            | Confirm Pitstop for Refuel               | Always, Listening, Never | Always         | No  | If *Always*, the Engineer will always ask for confirmation to plan a pitstop when fuel is low, if *Listening*, only when a voice command listener is configured and if it is *Never*, the Engineer will never ask, but will always plan the pitstop immediately. |
@@ -163,7 +163,7 @@ This settings are generally available, although you can and have to define them 
 
 ##### Notes
 
-(1) The default for *iRacing* is *False*, since the simulator does not provide correct tyre pressure information while driving. This will lead to setup pressure values, which are way off, when tyres are changed at the pitstop. Therefore it might be better to manage tyre change manually. Up 2 u...
+(1) The default for *iRacing* is *Change*, since the simulator does not provide correct tyre pressure information while driving. This will lead to setup pressure values, which are way off, when tyres are changed at the pitstop. Therefore it might be better to manage tyre pressures manually. Up 2 u...
 
 ### Simulator specific settings
 

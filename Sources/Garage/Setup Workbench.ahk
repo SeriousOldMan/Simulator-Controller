@@ -1367,6 +1367,8 @@ class SetupWorkbench extends ConfigurationItem {
 				this.loadCars(this.AvailableCars[true])
 
 				this.initializeWorkbench()
+
+				this.updateState()
 			}
 			finally {
 				this.Window.Unblock()
@@ -1422,6 +1424,8 @@ class SetupWorkbench extends ConfigurationItem {
 				this.initializeWorkbench("Loading Car", "Loading Car", "Loading Car", true)
 
 				this.loadTrack(true, true)
+
+				this.updateState()
 			}
 			finally {
 				this.Window.Unblock()
@@ -1455,6 +1459,8 @@ class SetupWorkbench extends ConfigurationItem {
 				}
 
 				this.Control["trackDropDown"].Choose(track)
+
+				this.updateState()
 			}
 			finally {
 				this.Window.Unblock()
@@ -1463,6 +1469,7 @@ class SetupWorkbench extends ConfigurationItem {
 	}
 
 	loadWeather(weather, force := false) {
+		this.updateState()
 	}
 
 	startIssueAnalyzer() {

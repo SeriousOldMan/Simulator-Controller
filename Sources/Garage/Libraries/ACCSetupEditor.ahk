@@ -175,7 +175,10 @@ class ACCSetupEditor extends FileSetupEditor {
 			this.Workbench.Window.Opt("+OwnDialogs")
 
 		OnMessage(0x44, translateLoadCancelButtons)
-		fileName := withBlockedWindows(FileSelect, 1, directory, translate("Load ACC Setup File..."), "Setup (*.json)")
+		fileName := withBlockedWindows(FileSelect, 1, directory
+									 , substituteVariables(translate("Load %simulator% Setup File...")
+														 , {simulator: SessionDatabase.getSimulatorCode(this.Workbench.SelectedSimulator[false])})
+									 , "Setup (*.json)")
 		OnMessage(0x44, translateLoadCancelButtons, 0)
 
 		if fileName {
@@ -203,7 +206,10 @@ class ACCSetupEditor extends FileSetupEditor {
 			this.Window.Opt("+OwnDialogs")
 
 		OnMessage(0x44, translateSaveCancelButtons)
-		fileName := withBlockedWindows(FileSelect, "S17", directory, translate("Save ACC Setup File..."), "Setup (*.json)")
+		fileName := withBlockedWindows(FileSelect, "S17", directory
+									 , substituteVariables(translate("Save %simulator% Setup File...")
+														 , {simulator: SessionDatabase.getSimulatorCode(this.Workbench.SelectedSimulator[false])})
+									 , "Setup (*.json)")
 		OnMessage(0x44, translateSaveCancelButtons, 0)
 
 		if (fileName != "") {
@@ -247,7 +253,11 @@ class ACCSetupComparator extends FileSetupComparator {
 			this.Editor.Window.Opt("+OwnDialogs")
 
 		OnMessage(0x44, translateLoadCancelButtons)
-		fileName := withBlockedWindows(FileSelect, 1, directory, (translate("Load ") . translate((type = "A") ? "first" : "second") . translate(" ACC Setup File...")), "Setup (*.json)")
+		fileName := withBlockedWindows(FileSelect, 1, directory
+									 , (translate("Load ") . translate((type = "A") ? "first" : "second")
+									  . substituteVariables(translate(" %simulator% Setup File...")
+														  , {simulator: SessionDatabase.getSimulatorCode(this.Workbench.SelectedSimulator[false])}))
+									 , "Setup (*.json)")
 		OnMessage(0x44, translateLoadCancelButtons, 0)
 
 		if fileName {

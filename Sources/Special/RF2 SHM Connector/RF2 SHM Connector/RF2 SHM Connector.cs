@@ -400,7 +400,21 @@ namespace SHMConnector {
 			if (connected)
 			{
                 strWriter.Write("Length="); strWriter.WriteLine(scoring.mScoringInfo.mLapDist);
-                strWriter.WriteLine("Grip=Optimum");
+				
+				string grip = "Optimum";
+				
+				if (scoring.mScoringInfo.mMaxPathWetness > 0.7)
+					grip = "Flooded";
+				else if (scoring.mScoringInfo.mMaxPathWetness > 0.2)
+					grip = "Wet";
+				else if (scoring.mScoringInfo.mMaxPathWetness > 0.15)
+					grip = "Damp";
+				else if (scoring.mScoringInfo.mMaxPathWetness > 0.05)
+					grip = "Greasy";
+				else
+					grip = "Fast";
+				
+                strWriter.WriteLine("Grip=" + grip);
 				strWriter.Write("Temperature="); strWriter.WriteLine(scoring.mScoringInfo.mTrackTemp);
 
 				for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)	{

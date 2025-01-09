@@ -1364,19 +1364,23 @@ class RaceEngineer extends RaceAssistant {
 
 					delta := Round(pressureValue + (tenthPressureValue / 10), 1)
 
-					if this.Listener {
-						if (tyreType = "All")
-							speaker.speakPhrase("ConfirmAllPressureChange", {action: action, unit: fragments[getUnit("Pressure")]
-																		   , delta: speaker.number2Speech(delta, 1)}, true)
-						else
-							speaker.speakPhrase("ConfirmPressureChange", {action: action, tyre: tyreTypeFragments[tyreType]
-																		, unit: fragments[getUnit("Pressure")]
-																		, delta: speaker.number2Speech(delta, 1)}, true)
+					if knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL", false) {
+						if this.Listener {
+							if (tyreType = "All")
+								speaker.speakPhrase("ConfirmAllPressureChange", {action: action, unit: fragments[getUnit("Pressure")]
+																			   , delta: speaker.number2Speech(delta, 1)}, true)
+							else
+								speaker.speakPhrase("ConfirmPressureChange", {action: action, tyre: tyreTypeFragments[tyreType]
+																			, unit: fragments[getUnit("Pressure")]
+																			, delta: speaker.number2Speech(delta, 1)}, true)
 
-						this.setContinuation(ObjBindMethod(this, "updatePitstopTyrePressure", tyreType, (action == kIncrease) ? delta : (delta * -1)))
+							this.setContinuation(ObjBindMethod(this, "updatePitstopTyrePressure", tyreType, (action == kIncrease) ? delta : (delta * -1)))
+						}
+						else
+							this.updatePitstopTyrePressure(tyreType, (action == kIncrease) ? delta : (delta * -1))
 					}
 					else
-						this.updatePitstopTyrePressure(tyreType, (action == kIncrease) ? delta : (delta * -1))
+						speaker.speakPhrase("NotPossible")
 
 					return
 				}
@@ -1690,19 +1694,23 @@ class RaceEngineer extends RaceAssistant {
 				else
 					tyreType := Array(tyreType)
 
-				for ignore, tyre in tyreType {
-					targetValue := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . tyre)
-					targetIncrement := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . tyre . ".Increment")
+				if knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL", false) {
+					for ignore, tyre in tyreType {
+						targetValue := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . tyre)
+						targetIncrement := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . tyre . ".Increment")
 
-					knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure." . tyre, targetValue + delta)
-					knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure." . tyre . ".Increment", targetIncrement + delta)
+						knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure." . tyre, targetValue + delta)
+						knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure." . tyre . ".Increment", targetIncrement + delta)
+					}
+
+					if this.Debug[kDebugKnowledgeBase]
+						this.dumpKnowledgeBase(this.KnowledgeBase)
+
+					speaker.speakPhrase("ConfirmPlanUpdate")
+					speaker.speakPhrase("MoreChanges", false, true)
 				}
-
-				if this.Debug[kDebugKnowledgeBase]
-					this.dumpKnowledgeBase(this.KnowledgeBase)
-
-				speaker.speakPhrase("ConfirmPlanUpdate")
-				speaker.speakPhrase("MoreChanges", false, true)
+				else
+					speaker.speakPhrase("NotPossible")
 			}
 		}
 		finally {
@@ -1730,6 +1738,7 @@ class RaceEngineer extends RaceAssistant {
 			else {
 				knowledgeBase := this.KnowledgeBase
 
+				/*
 				if (knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound", "Dry") = "Dry") {
 					knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.FL", knowledgeBase.getValue("Session.Setup.Tyre.Dry.Pressure.FL", 26.1))
 					knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.FR", knowledgeBase.getValue("Session.Setup.Tyre.Dry.Pressure.FR", 26.1))
@@ -1742,7 +1751,12 @@ class RaceEngineer extends RaceAssistant {
 					knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.RL", knowledgeBase.getValue("Session.Setup.Tyre.Wet.Pressure.RL", 26.1))
 					knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.RR", knowledgeBase.getValue("Session.Setup.Tyre.Wet.Pressure.RR", 26.1))
 				}
+				*/
 
+				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.FL", false)
+				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.FR", false)
+				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.RL", false)
+				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.RR", false)
 				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.FL.Increment", 0)
 				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.FR.Increment", 0)
 				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.RL.Increment", 0)

@@ -366,7 +366,20 @@ namespace RF2SHMProvider {
 			{
 				Console.Write("Length="); Console.WriteLine(scoring.mScoringInfo.mLapDist);
 
-                Console.WriteLine("Grip=Optimum");
+                string grip = "Optimum";
+				
+				if (scoring.mScoringInfo.mMaxPathWetness > 0.7)
+					grip = "Flooded";
+				else if (scoring.mScoringInfo.mMaxPathWetness > 0.2)
+					grip = "Wet";
+				else if (scoring.mScoringInfo.mMaxPathWetness > 0.15)
+					grip = "Damp";
+				else if (scoring.mScoringInfo.mMaxPathWetness > 0.05)
+					grip = "Greasy";
+				else
+					grip = "Fast";
+				
+                Console.WriteLine("Grip=" + grip);
 				Console.Write("Temperature="); Console.WriteLine(scoring.mScoringInfo.mTrackTemp);
 
 				for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)	{

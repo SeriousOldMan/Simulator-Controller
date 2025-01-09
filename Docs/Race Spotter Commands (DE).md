@@ -1,4 +1,4 @@
-Nachfolgend ist eine vollständige Liste aller von Elisa, dem virtuellen Rennbeobachter, erkannten Sprachbefehle zusammen mit einer kurzen Einführung in die Syntax der Phrasengrammatiken.
+Nachfolgend ist eine vollständige Liste aller von Elisa, dem virtennbeobachter, erkannten Sprachbefehle zusammen mit einer kurzen Einführung in die Syntax der Phrasengrammatiken.
 
 ## Syntax
 

@@ -463,16 +463,16 @@ namespace RF2SHMProvider {
 		private static string GetWeather(double cloudLevel, double rainLevel) {
 			if (rainLevel == 0.0)
 				return "Dry";
-			else if (rainLevel <= 0.2)
+			else if (rainLevel <= 0.1)
 				return (cloudLevel < 0.5) ? "Drizzle" : "LightRain";
-			else if (rainLevel <= 0.4)
-				return (cloudLevel < 0.3) ? "Drizzle" : ((cloudLevel > 0.7) ? "MediumRain" : "LightRain");
+			else if (rainLevel <= 0.3)
+				return (cloudLevel > 0.5) ? "MediumRain" : "LightRain";
 			else if (rainLevel <= 0.6)
-				return (cloudLevel < 0.2) ? "LightRain" : ((cloudLevel > 0.7) ? "HeavyRain" : "MediumRain");
+				return (cloudLevel > 0.5) ? "HeavyRain" : "MediumRain";
 			else if (rainLevel <= 0.8)
-				return (cloudLevel < 0.2) ? "MediumRain" : ((cloudLevel > 0.7) ? "ThunderStorm" : "HeavyRain");
+				return (cloudLevel > 0.5) ? "ThunderStorm" : "HeavyRain";
 			else
-				return (cloudLevel < 0.2) ? "HeavyRain" : "Thunderstorm";
+				return "Thunderstorm";
 		}
 
 		private static double GetCelcius(double kelvin) {

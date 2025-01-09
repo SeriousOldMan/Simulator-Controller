@@ -1,17 +1,18 @@
-## 6.1.1.0-release 01/10/25 (planned)
+## 6.1.1.0-release 01/10/25
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed management of Stream Deck Icons for German and French UI settings.
   4. Fixed a bug in the handling of the *rFactor 2* pitstop settings that caused an infinite loop, if each tyre could be changed individually.
-  5. Safety Cars are now removed from the grid in *Automobilista 2* (and probably *ProjectCARS 2*) in most cases.
-  6. The strategy information given by the Strategist has been updated to be more concise if no more pitstops are needed.
-  7. The reliability of the track spline builder for *Assetto Corsa Competizione* has been improved. This positively affects the accident detection by the Spotter and the collection of car telemetry data by various applications.
-  8. Pressure values are now converted to the specified display unit in "Setup Workbench".
-  9. A short sound is played now, whenever an Assistant answer is given by the *Conversation* booster. This helps to understand whether a given answer is absolutely reliable or not.
-  10. The [setting "Engineer: Tyre Service"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" has been extended to choose between no tyre service, change of tyres with unchanged pressures, or full service including pressure adjustment by the Race Engineer.
-  11. New settings in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) has been defined for *rFactor 2* and *Le Mans Ultimate*, which will enable auto-requesting of the pitstop in the simulator after all pitstop settings has been updated by the Race Engineer in the preparation phase.
-  12. Full support for editing of *Le Mans Ultimate* setups in "Setup Workbench". Meta data is included for all cars with one exception. For the Peugeot 9x8, only the 2024 version is supported, the one with the adjustable wing.
-  13. Support for *rFactor 2* has been included in "Setup Workbench" as well, but no meta data for any car has been defined yet. Creating meta data on your own for the car of your choice is not that complicated. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-a-new-car) for more information.
+  5. Lowered the threshold values for the different rain levels in *rFactor 2* and *Le Mans Ultimate* so that pitting for tyres is recommended earlier.
+  6. Safety Cars are now removed from the grid in *Automobilista 2* (and probably *ProjectCARS 2*) in most cases.
+  7. The strategy information given by the Strategist has been updated to be more concise if no more pitstops are needed.
+  8. The reliability of the track spline builder for *Assetto Corsa Competizione* has been improved. This positively affects the accident detection by the Spotter and the collection of car telemetry data by various applications.
+  9. Pressure values are now converted to the specified display unit in "Setup Workbench".
+  10. A short sound is played now, whenever an Assistant answer is given by the *Conversation* booster. This helps to understand whether a given answer is absolutely reliable or not.
+  11. The [setting "Engineer: Tyre Service"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" has been extended to choose between no tyre service, change of tyres with unchanged pressures, or full service including pressure adjustment by the Race Engineer.
+  12. New settings in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) has been defined for *rFactor 2* and *Le Mans Ultimate*, which will enable auto-requesting of the pitstop in the simulator after all pitstop settings has been updated by the Race Engineer in the preparation phase.
+  13. Full support for editing of *Le Mans Ultimate* setups in "Setup Workbench". Meta data is included for all cars with one exception. For the Peugeot 9x8, only the 2024 version is supported, the one with the adjustable wing.
+  14. Support for *rFactor 2* has been included in "Setup Workbench" as well, but no meta data for any car has been defined yet. Creating meta data on your own for the car of your choice is not that complicated. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-a-new-car) for more information.
 
 ## 6.1.0.1-release 01/03/25
   1. Fixed a timing issue when requesting data from *Le Mans Ultimate*.

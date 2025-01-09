@@ -1,4 +1,4 @@
-Below you will find a complete list of all voice commands recognized by Cat, the Virtual Race Spotter together with a short introduction into the syntax of the phrase grammars.
+Below you will find a complete list of all voice commands recognized by Cat, the AI Race Spotter together with a short introduction into the syntax of the phrase grammars.
 
 ## Syntax
 

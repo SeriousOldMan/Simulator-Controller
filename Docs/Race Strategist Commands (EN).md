@@ -1,4 +1,4 @@
-Below you will find a complete list of all voice commands recognized by Cato, the Virtual Race Strategist together with a short introduction into the syntax of the phrase grammars.
+Below you will find a complete list of all voice commands recognized by Cato, the AI Race Strategist together with a short introduction into the syntax of the phrase grammars.
 
 ## Syntax
 

@@ -131,7 +131,7 @@ Note: The same is true here, you may want to share your definitions with me, so 
 You may have already wondered what all the nonsense is about. There are different places in Simulator Controller where the information is used.
 
 1. When changing the tyre compound for the next pitstop using one of the controller actions described in [Plugins & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes), the tyre compound mapping is useed to derive the number of diffent compounds and the correct tyre compound identifier to send to the current simulator, when you choose the next compound.
-2. When the pitstop settings are derived by the Virtual Race Engineer, the same applies.
+2. When the pitstop settings are derived by the AI Race Engineer, the same applies.
 3. All applications, which let you choose a tyre compound, will also use the available tyre compounds for the currently chosen car. This is especially true for "Strategy Workbench", where the compounds are used in the strategy simulation as well. The "Team Center" also uses the available tyre compounds when preparing a pitstop or to store the driver specific car setups.
 
 As you have seen above, a tyre compound consists of a tyre category (Dry, Intermediate and Wet) and a suffix, which specifies the mixture or hardness of the compound. As you might expect, the tyre category is most important for the behaviour of the tyre in varying conditions, whereas the mixture determine properties like tyre life time.
@@ -165,7 +165,7 @@ As already mentioned, the world is easy in *Assetto Corsa Competizione*. Every c
 
 ### Special notes for *Automobilista 2* and *Project CARS 2*
 
-Unfortunately, these two simulators does not provide any information about the currently mounted tyre compound in the data available through the API. So make sure, that you have set the mounted tyre compound with the [*Race Settings*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race), before you head out onto the track, otherwise you will end up with a wrong compound chosen during the next pitstop, or the control of tyre compounds in the ICM might fail completely.
+Unfortunately, these two simulators does not provide any information about the currently mounted tyre compound in the data available through the API. So make sure, that you have set the mounted tyre compound with the [*Race Settings*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-race), before you head out onto the track, otherwise you will end up with a wrong compound chosen during the next pitstop, or the control of tyre compounds in the ICM might fail completely.
 
 ### Special notes for *iRacing*
 

@@ -1,4 +1,4 @@
-A continuación encontrará una lista completa de todos los comandos de voz reconocidos por Jona, el ingeniero de carrera virtual, junto con una breve introducción a la sintaxis de las gramáticas de frases.
+A continuación encontrará una lista completa de todos los comandos de voz reconocidos por Jona, el ingeniero de carrera AI, junto con una breve introducción a la sintaxis de las gramáticas de frases.
 
 ## Sintaxis
 

@@ -901,10 +901,10 @@ The two classes *SimulatorPlugin* and *RaceAssistantSimlatorPlugin* can be used 
 
 	#Include ..\Plugins\Libraries\SimulatorPlugin.ahk
 
-You can take a look at a specific implementation of a simulator plugin for an example on how to use these building blocks (for example [AC Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/AC%20Plugin.ahk) with minimal support or [RF2 Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/RF2%20Plugin.ahk) with full support including the Virtual Race Engineer and pitstop handling).
+You can take a look at a specific implementation of a simulator plugin for an example on how to use these building blocks (for example [AC Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/AC%20Plugin.ahk) with minimal support or [RF2 Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/RF2%20Plugin.ahk) with full support including the AI Race Engineer and pitstop handling).
 
 ## SimulatorPlugin extends [ControllerPlugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controllerplugin-extends-plugin-simulator-controllerahk) ([SimulatorPlugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/SimulatorPlugin.ahk))
-This class may be used for simple simulator plugins which will NOT support the Virtual Race Engineer. The implementation *understands* that a given applicaton represents the simulator game and also is able to separate between different session types ("Practice", "Race", and so on). Depending on the technical capabilities and the supplied initialization arguements, a "Pitstop" mode (see class [PitstopMode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#pitstopmode-extends-controllermode-simulatorpluginahk)) is created upon initialization.
+This class may be used for simple simulator plugins which will NOT support the AI Race Engineer. The implementation *understands* that a given applicaton represents the simulator game and also is able to separate between different session types ("Practice", "Race", and so on). Depending on the technical capabilities and the supplied initialization arguements, a "Pitstop" mode (see class [PitstopMode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#pitstopmode-extends-controllermode-simulatorpluginahk)) is created upon initialization.
 
 ### Public Properties
 
@@ -971,7 +971,7 @@ This method is called always directly after *selectPitstopOption* to change the 
 This method will be called, when a simulator has been started or finished, or when the user enters a simulation session. The default implementation informs the *SimulatorController* instance, which then will activate the best fitting modes on the controller hardware.
 
 ## RaceAssistantSimulatorPlugin extends [SimulatorPlugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#simulatorplugin-extends-controllerplugin-simulatorpluginahk) ([SimulatorPlugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/SimulatorPlugin.ahk))
-*RaceAssistantSimulatorPlugin* extends the *SimulatorPlugin* class and adds support for Jona, the Virtual Race Engineer. Jona will be started automatically, whenever the underlying simulator game is running.
+*RaceAssistantSimulatorPlugin* extends the *SimulatorPlugin* class and adds support for Jona, the AI Race Engineer. Jona will be started automatically, whenever the underlying simulator game is running.
 
 ### Public Properties
 
@@ -993,10 +993,10 @@ Calling this method will ask Jona to plan an upcoming pitstop.
 Calling this method will ask Jona to prepare the last planned pitstop.
 
 #### *supportsSpotter()*
-If this method returns *true*, this plugin supports a spotter protocol together with the Virtual Race Spotter. The default implementation returns *true*, if a "xxx SHM Spotter.exe" exists in the *Binaries* folder, where xxx is equal to the plugin identifier. If the protocol uses a different data acquisition method rather than the shared memory reader process, an extension must be made to the implementation of the Virtual Race Spotter as well.
+If this method returns *true*, this plugin supports a spotter protocol together with the AI Race Spotter. The default implementation returns *true*, if a "xxx SHM Spotter.exe" exists in the *Binaries* folder, where xxx is equal to the plugin identifier. If the protocol uses a different data acquisition method rather than the shared memory reader process, an extension must be made to the implementation of the AI Race Spotter as well.
 
 #### *supportsPitstop()*
-If this method returns *true*, this plugin supports automated pitstop handling together with the Virtual Race Engineer. The default implementation returns *false*. Whenever a subclass of *RaceAssistantSimulatorPlugin* returns *true* here, it will implement at least some of the following methods as well.
+If this method returns *true*, this plugin supports automated pitstop handling together with the AI Race Engineer. The default implementation returns *false*. Whenever a subclass of *RaceAssistantSimulatorPlugin* returns *true* here, it will implement at least some of the following methods as well.
 
 #### *supportsSetupImport()*
 If this method returns *true*, this plugin supports loading setup information from the underlying simulation. The default implementation returns *false*. Whenever a subclass of *RaceAssistantSimulatorPlugin* returns *true* here, the telemetry provider must implement the "-Setup" protocol.
@@ -1032,10 +1032,10 @@ This method requests repairs for the different parts of the car at the pitstop. 
 This is the last method of the pitstop preparation cycle. It requests the next driver when swapping drivers in a team race. The default method handles internal state change.
 
 #### *updatePositionsData(data :: ConfigurationMap)*
-*updatePositionsData* is called after the [telemetry data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#telemetry-integration) has been loaded from the given simulation, but before the data is transferred to the Virtual Race Strategist. The implementation of *updatePositionsData* must add the position and timing information for all cars to the data object. See the documentation for the Virtual Race Strategist for more information about a [description of the corrsponding data fields](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#data-acquisition).
+*updatePositionsData* is called after the [telemetry data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#telemetry-integration) has been loaded from the given simulation, but before the data is transferred to the AI Race Strategist. The implementation of *updatePositionsData* must add the position and timing information for all cars to the data object. See the documentation for the AI Race Strategist for more information about a [description of the corrsponding data fields](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#data-acquisition).
 
 #### *updateSessionData(data :: ConfigurationMap)*
-*updateSessionData* is called after the [telemetry data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#telemetry-integration) has been loaded from the given simulation, but before the data is transferred to the Virtual Race Engineer. The implementation of *updateSessionData* might add some additional fields or change fields that has been provided by the simulation. See the [implementation of the *RaceRoom Racing Experience*](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/R3E%20Plugin.ahk) simulation for an example, where the name of the current car is read from an external JSON database file.
+*updateSessionData* is called after the [telemetry data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#telemetry-integration) has been loaded from the given simulation, but before the data is transferred to the AI Race Engineer. The implementation of *updateSessionData* might add some additional fields or change fields that has been provided by the simulation. See the [implementation of the *RaceRoom Racing Experience*](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/R3E%20Plugin.ahk) simulation for an example, where the name of the current car is read from an external JSON database file.
 
 ## PitstopMode extends [ControllerMode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controllermode-simulator-controllerahk) ([SimulatorPlugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/SimulatorPlugin.ahk))
 This special controller mode is created automatically by the *SimulatorPlugin* whenever a pitstop action has been configured for the plugin.
@@ -1046,7 +1046,7 @@ This special controller mode is created automatically by the *SimulatorPlugin* w
 This is called whenever the session state changes. The availability of all pitstop actions will be updated according to the new session state. The standard implementation enables the actions, whenever you are in a race or practice session.
 
 #### *updateRaceAssistantActions(sessionState:: OneOf(kSessionFinished, kSessionPaused, kSessionOther, kSessionPractice, kSessionQualification, kSessionRace))*
-This is called whenever the session state changes. The availability of the Race Engineer actions "PitstopPlan" and "PitstopPrepare* will be updated according to the new session state. The standard implementation enables the actions, whenever you are in a race session and the Virtual Race Strategist is running.
+This is called whenever the session state changes. The availability of the Race Engineer actions "PitstopPlan" and "PitstopPrepare* will be updated according to the new session state. The standard implementation enables the actions, whenever you are in a race session and the AI Race Strategist is running.
 
 ## [Abstract] PitstopAction extends [ControllerAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controlleraction-simulator-controllerahk) ([SimulatorPlugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/SimulatorPlugin.ahk))
 The base class of all pitstop actions.
@@ -1101,7 +1101,7 @@ Removes the *direction* parameter from the inherited constructor, which defaults
 Used when the configured controller function is binary, for example a toggle switch or a dial. Therefore the corresponding pitstop setting can be incremented ("Increase") or decremented ("Decrease").
 
 ## RaceAssistantAction extends [ControllerAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controlleraction-simulator-controllerahk) ([SimulatorPlugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/SimulatorPlugin.ahk))
-Used for the *PitstopPlan* and *PitstopPrepare* pitstop actions. The implementation of *fireAction* simply calls the [planPitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#planpitstop) or [preparePitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#preparepitstop) methods of the simulator plugin, when the Virtual Race Engineer is running.
+Used for the *PitstopPlan* and *PitstopPrepare* pitstop actions. The implementation of *fireAction* simply calls the [planPitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#planpitstop) or [preparePitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#preparepitstop) methods of the simulator plugin, when the AI Race Engineer is running.
 
 ### Public Properties
 

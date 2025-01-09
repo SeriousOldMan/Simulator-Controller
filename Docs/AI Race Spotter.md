@@ -1,14 +1,14 @@
 ## Introduction
 
-Elisa, the Virtual Race Spotter is a part of the Race Assistant family of Simulator Controller. As a spotter, Elisa watches over your car and all the cars around you. Elisa will warn you about critical situations, for example, when a car appears in your blind spot, or when a car is chasing you from behind. Furthermore, Elisa will inform you periodically about other aspects of the traffic around you, for example, when one of the leading cars is closing in from behind and you are getting a blue flag.
+Elisa, the AI Race Spotter is a part of the Race Assistant family of Simulator Controller. As a spotter, Elisa watches over your car and all the cars around you. Elisa will warn you about critical situations, for example, when a car appears in your blind spot, or when a car is chasing you from behind. Furthermore, Elisa will inform you periodically about other aspects of the traffic around you, for example, when one of the leading cars is closing in from behind and you are getting a blue flag.
 
 ## Installation
 
-The installation procedure for Elisa is the same as the [installation procedure for Jona](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation), which means, that you are also well prepared to use the Spotter, if you have everything setup correctly for the Engineer.
+The installation procedure for Elisa is the same as the [installation procedure for Jona](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation), which means, that you are also well prepared to use the Spotter, if you have everything setup correctly for the Engineer.
 
 ## Interacting with Elisa
 
-The same principles as [described for Jona](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#interacting-with-jona) apply here as well, since Elisa is based on the same technology as Jona.
+The same principles as [described for Jona](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#interacting-with-jona) apply here as well, since Elisa is based on the same technology as Jona.
 
 ### List of all voice commands
 
@@ -90,7 +90,7 @@ The Spotter will give you critical and in most cases real time information about
 
 9. Delta Information
 
-   Elisa observes your direct opponents behind and in front of you and informs you, whether you can catch up the car in front or whether you need to pay attention to the car behind you. Please take a look at the dedicated section about [Opponent and Delta Information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#opponent-and-delta-information) down below for more detailed information.
+   Elisa observes your direct opponents behind and in front of you and informs you, whether you can catch up the car in front or whether you need to pay attention to the car behind you. Please take a look at the dedicated section about [Opponent and Delta Information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#opponent-and-delta-information) down below for more detailed information.
    
    There are two methods available for this information:
    
@@ -104,7 +104,7 @@ The Spotter will give you critical and in most cases real time information about
 
 10. Tactical Advices
 
-    The Virtual Race Spotter has been trained to detect several typical race situations and therefore can advise you how to best handle the corresponding situation. For example will Elisa analyze the laptime difference, when you will be shortly overtaken by another car and will tell you whether it will be possible for you to stay in the slipstream of this faster car. Other adivises will help you to handle faster lapped cars, protect your position by bringing a slower car between you and direct opponent which tries to attack you, and so on. The Race Spotter will learn to detect and handle more situations in the future.
+    The AI Race Spotter has been trained to detect several typical race situations and therefore can advise you how to best handle the corresponding situation. For example will Elisa analyze the laptime difference, when you will be shortly overtaken by another car and will tell you whether it will be possible for you to stay in the slipstream of this faster car. Other adivises will help you to handle faster lapped cars, protect your position by bringing a slower car between you and direct opponent which tries to attack you, and so on. The Race Spotter will learn to detect and handle more situations in the future.
 
 11. Cut warnings & penalty information
 
@@ -219,7 +219,7 @@ Use one of "slow car warnings", "ahead accidents warnings", "behind accidents in
 
 ## Track Mapping
 
-Using the positions of the cars on the track, Elisa is able to create a map of any track in any simulator (except for *iRacing*, where a [different method](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#special-notes-about-track-mapping-in-iracing) is applied, since no coordinates are available in the API). A track map consists of two files which are stored in your local database. The first file with the ".map" extension contains the meta data of the track map and all way points (between 1000 and 1500 points for a typical race course).
+Using the positions of the cars on the track, Elisa is able to create a map of any track in any simulator (except for *iRacing*, where a [different method](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#special-notes-about-track-mapping-in-iracing) is applied, since no coordinates are available in the API). A track map consists of two files which are stored in your local database. The first file with the ".map" extension contains the meta data of the track map and all way points (between 1000 and 1500 points for a typical race course).
 
 	[General]
 	Simulator=Assetto Corsa Competizione

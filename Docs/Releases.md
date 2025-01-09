@@ -33,7 +33,7 @@
   14. Finally full support for management of pitstop settings and pitstop automation by the Assistants in *Le Mans Ultimate*.
       - The car models are correctly named now (they have been the team names in the past). Due to this, all entries in the session database have been invalidated and the database for *Le Mans Ultimate* has been cleared. See the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-610) for information how to restore your previous database content.
 	  - The Race Engineer cannot handle different tyre compounds for the different wheels yet and he also will currently always change all four tyres together. Please see the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#special-notes-for-le-mans-ultimate) for more information about this and also additional restrictions.
-	  - New voice command for the Race Engineer that triggers recalulation of the fuel ratio. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#list-of-all-voice-commands) for a description.
+	  - New voice command for the Race Engineer that triggers recalulation of the fuel ratio. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#list-of-all-voice-commands) for a description.
 	  - New controller action "FuelRatioOptimize" that triggers the recalution of the fuel ratio as well. A new icon for the Stream Deck is included.
 	  - A new setting in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) of the "Session Database" that enables automatic recalculation of the fuel ratio.
 	  - A new setting in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) of the "Session Database" that activates automatic adjustment of the virtual energy level for the last stint, if you pit later than planned.
@@ -87,24 +87,24 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   5. New Stream Deck icon for the above "Interrupt" action.
   6. The telemetry importer has been improved to also read the lap time, sector times, and so on, if this information is available. This is useful, when importing lap telemetry data after a race from the telemetry collection of the Driving Coach, which is located in [Documents]\Simulator Controller\Temp\Driving Coach\Telemetry.
   7. A new convinience shortcut has been implemented in "Simulator Startup" to select the startup profile. Hold down the mouse button for at least a second when clicking on the "Startup" button to choose the profile for the next startup. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#notes) for more information.
-  8. The Driving Coach now supplies a basic and somewhat [restricted on-track coaching](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#using-the-driving-coach-without-an-llm) when an LLM for the Coach has not yet been configured. Since this is the default configuration for a fresh installation, the Coach is already usable to some extent without being fully configured.
-  9. The automatic startup of the on-track coaching as described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#automatic-activation-of-coaching-mode) has been updated, so that the acquired knowledge does not get removed after the end of a session.
+  8. The Driving Coach now supplies a basic and somewhat [restricted on-track coaching](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#using-the-driving-coach-without-an-llm) when an LLM for the Coach has not yet been configured. Since this is the default configuration for a fresh installation, the Coach is already usable to some extent without being fully configured.
+  9. The automatic startup of the on-track coaching as described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#automatic-activation-of-coaching-mode) has been updated, so that the acquired knowledge does not get removed after the end of a session.
   10. "Session Database" now supports to open the documentation for the selected database category by holding down the Control key when clicking on the category. Or you can click on the small "Documentation" button in the upper right corner of the main window.
   11. [Internal] Optimized asynchronous speaking status of all Assistants. This gives the Driving Coach more room for the corner by corner instructions. 
   
 ## 6.0.0.0-release 12/06/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. A stunning new feature, a [fully interactive coaching mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#coaching-based-on-lap-telemetry-data) is now offered by the Driving Coach. The coach will take a look at the live telemetry data and will tell you where you have to change your driver inputs and driving style to ultimately improve your lap time.
+  3. A stunning new feature, a [fully interactive coaching mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#coaching-based-on-lap-telemetry-data) is now offered by the Driving Coach. The coach will take a look at the live telemetry data and will tell you where you have to change your driver inputs and driving style to ultimately improve your lap time.
      - Many new voice commands have been defined to start a coaching session and also to interact with the Driving Coach during coaching. See the [voice command reference for English](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Driving-Coach-Commands-(EN)) (or for any of the other supported languages) for more information.
 	 - A controller action "TelemetryCoaching" has been defined for the [Driving Coach plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-driving-coach) to start / finish a coaching session from your Button Box or Stream Deck.
 	 - A controller action "TrackCoaching" has been defined for the [Driving Coach plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-driving-coach) to request active coaching while driving from your Button Box or Stream Deck.
 	 - New icons for the "TelemetryCoaching" and "TrackCoaching" actions has been added to the Stream Deck icon set.
 	 - Several new settings in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) to fine-tune the corner by corner coaching of the Driving Coach.
      - New controller action functions [*startTelemetryCoaching*, *finishTelemetryCoaching*, *startTrackCoaching* and *finishTrackCoaching*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allow you to control the telemetry-based coaching mode from custom functions and scripts. Even use them in LLM actions in the *Reasoning* booster.
-     - Many new [system level instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#instructions) for the Driving Coach, which guide the LLM through the complex resoning process.
+     - Many new [system level instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#instructions) for the Driving Coach, which guide the LLM through the complex resoning process.
 	 - Telemetry data for reference laps can be stored weather specific in the "Session Database".
-	 - Several other changes and additions in the documentation for the [Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach), which will make worth to re-read the chapter.
+	 - Several other changes and additions in the documentation for the [Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach), which will make worth to re-read the chapter.
   4. The *Rephrasing*, *Understanding* and *Reasoning* boosters are now available for the Driving Coach as well. For obvious reasons, there is no need for the *Conversation* booster.
   5. A new info popup shows important information about the nearest track section when clicking at a specific spot in the Telemetry Viewer or the assoiated track map. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetry-viewer) for more information.
   6. The detection of click / drag of track points in the track map editor has been improved.
@@ -151,7 +151,7 @@ To install the new libraries, follow the instructions in the [Update Notes](http
   5. The Engineer sometimes did not report suspension damage right away, but delayed it until the next crossing of start/finish line. This has been fixed.
   6. "Simulator Setup" can now handle more preview windows for Button Boxes and Stream Decks than can fit on the screen vertically.
   7. The Race Engineer now allow you to enable / disable the handling of pressure loss for the next pitstop using new voice commands.
-  8. Documentation for the voice commands of all Assistants has been added for all supported languages. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#list-of-all-voice-commands) for an example.
+  8. Documentation for the voice commands of all Assistants has been added for all supported languages. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#list-of-all-voice-commands) for an example.
   9. [Internal] Fixed orphane state file handling in "System Monitor".
 
 ## 5.9.6.0-release 11/01/24
@@ -329,8 +329,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   2. Documentation updates here and there, as always
   3. Significant performance improvement for the "Dark" UI theme.
   4. The last choices for the configuration of the various graphs are now remembered by the "Strategy Workbench".
-  5. Using a new setting in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) you can specify in the "Session Database" for *Assetto Corsa*, *iRacing* and *Automobilista 2* the type of a track (Circuit, Rally, Hill, Street). When set to other than "Circuit", track mapping will create a non-closed track. In this case, mapping of the track will start immediately, when the car moves for the first time and will stop, when the car stops. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-types) for more information.
-  6. The documentation for [Track Automations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-automations) has been extended to reflect the new "Speech" and "Audio" actions, which can be used to create pace notes and other acoustical hints for open tracks.
+  5. Using a new setting in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) you can specify in the "Session Database" for *Assetto Corsa*, *iRacing* and *Automobilista 2* the type of a track (Circuit, Rally, Hill, Street). When set to other than "Circuit", track mapping will create a non-closed track. In this case, mapping of the track will start immediately, when the car moves for the first time and will stop, when the car stops. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#track-types) for more information.
+  6. The documentation for [Track Automations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#track-automations) has been extended to reflect the new "Speech" and "Audio" actions, which can be used to create pace notes and other acoustical hints for open tracks.
   7. Automatic track mapping can now be enabled or disabled in various ways, whichever suits your working style best. Default is "On" as before, but this is helpful, if the starting procedure of a non-circuit track requires to roll forward into the starting box.
      - The Tray menu of the "Simulator Controller" background process now contains an item for *Track Mapping*.
      - New controller action ["TrackMapping"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) for the Race Spotter plugin, which toggles the track mapping on / off.
@@ -392,7 +392,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   3. Most important, a new LLM Runtime has been implemented.
      - Better support for execution of all or parts of the model on the graphics card.
 	 - Since this runtime is quite large (> 200 MB), it is provided as a downloadable component. Run "Simulator Setup", go to the presets page and install the "Local runtime for LLMs" preset.
-	 - See the completely [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#llm-runtime) for more information.
+	 - See the completely [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#llm-runtime) for more information.
   4. The Race Engineer LLM event "damage_collected" has been renamed to "damage_detected". Revisit your event configuration and include the *updated* event, if necessary.
   5. A new event and a new action has been defined for the *Reasoning* booster of the Race Engineer. This pair handles reporting of critical time loss after an incident. Revisit your event configuration and include the new event and action, if necessary.
   6. The lap history data supplied to the LLMs has been extended.
@@ -506,7 +506,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	 - Hold down the Control key while clicking on "Ok" button will not leave the editor, but instead will show you the API tool definitions in JSON format.
   10. Whenever a Conversation Booster is configured for a Race Assistant, a transcript of every LLM activation is stored in the *Simulator Controller\Logs\Transcripts* folder which is located in your user *Documents* folder.
   11. The "Plan Pitstop" conversation action for the Race Engineer now lso allows to call for a driver swap in team races.
-  12. Two [predefined conversation actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#trigger-actions-from-conversation) for the Spotter are now available:
+  12. Two [predefined conversation actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#trigger-actions-from-conversation) for the Spotter are now available:
       - The LLM can decide to reset and recalculate the delta and lap time history for all cars.
 	  - And you can ask the LLM to reset the reference speed data of all cars around the track, when too many false positives for accidents and slow cars are given.
   13. [Expert only] All definition files for "Simulator Setup" can be *overwritten* in the *Simulator Controller\Setup\Definitions* folder which is located in your user *Documents* folder. This can be used to introduce new bundled applications or to replace the startup video, just to name two examples.
@@ -553,8 +553,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   6. Adopted *GPT4All* 2.8 API. Should be running stable now in all situations.
   7. The Conversation Booster no longer consume a voice command, when the invoked GPT service does not returned a valid result.
   8. LLMs sometimes use markdown syntax in their answers. Most of this syntactical elements are now removed, so that they do not interfere with the spoken words.
-  9. [*Ollama*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#ollama) has been added to the list of supported GPT service providers. This is a GPT server, which can be installed on the local PC.
-  10. A [*Generic*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#generic) GPT service provider is now also available. This supports HTTP based GPT services, which implements the OpenAI JSON protocol.
+  9. [*Ollama*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#ollama) has been added to the list of supported GPT service providers. This is a GPT server, which can be installed on the local PC.
+  10. A [*Generic*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#generic) GPT service provider is now also available. This supports HTTP based GPT services, which implements the OpenAI JSON protocol.
   11. The list of available LLMs is now automatically loaded from a GPT service provider (if supported) in the configuration dialogs.
   12. Increased timeout for GPT service requests to 60 seconds, so that even very slow models have a chance to complete their task.
   13. [Internal] Migrated to AHK 2.0.16.
@@ -579,8 +579,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   17. A method has been introduced, that checks whether you are using the default instructions for an LLM, so that you don't need to update them, when they have changed in the distribution package.
   18. It is now possible to manage teams, driver and sessions directly from "Simulator Startup", if you are using the Team Server. Please see the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#team-management) for more information.
   19. Renamed the "Team Server" tab in "Simulator Configuration" to "Team Management". Using this tab is not necessary anymore and it will eventually be removed, since the functionality is now provided from within "Simulator Startup".
-  20. [*OpenRouter*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#openrouter) has been added to the list of supported GPT service providers.
-  21. The documentation has been updated to cover the [configuration requirements](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#installation) for the added GPT providers.
+  20. [*OpenRouter*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#openrouter) has been added to the list of supported GPT service providers.
+  21. The documentation has been updated to cover the [configuration requirements](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#installation) for the added GPT providers.
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-573), especially if you have configured and are using the Driving Coach.
 
@@ -594,7 +594,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   7. The default context window size for an LLM has been increased to 2k tokens in the Driving Coach configuration.
   8. The next feature of the AI-based booster for the Assistants now integrates a general conversation capability. Every voice command, that cannot be matched against the list of predefined, pattern-based commands, will be forwarded to the GPT service for a general conversation. The LLM has full access to the knowledge base of the Assistant, incl. telemetry data, standings and position data, and so on. The exact knowledge will vary with the type of the Assistant (Engineer, Strategist, ...). See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for more information.
   9. Configuration of the Conversation Booster is now also possible using "Simulator Configuration". See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) for more information.
-  10. [*Mistral AI*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#mistral-ai) has been added to the list of supported GPT service providers.
+  10. [*Mistral AI*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#mistral-ai) has been added to the list of supported GPT service providers.
   11. Added "GPT-4o" to the list of OpenAI models.
   12. The pitstop component on the session info page of "System Monitor" now also displays the relative tyre pressure increment values for the next pitstop.
   13. [Internal] Migrated to AHK 2.0.15.
@@ -678,7 +678,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   9. The detection speed of controller trigger (buttons, dials, and so on) has been greatly increased. Dials are now also detected very reliable and fast.
   10. Key presses on the keyboard are now also detected during trigger detection in "Simulator Setup" and "Simulator Configuration".
   11. The hotkey string (e.g. 2Joy7 or <^<!A) for a detected trigger is now placed in the clipboard for further usage.
-  12. The Trigger Detector Tool is now also available when building [Track Automations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-automations).
+  12. The Trigger Detector Tool is now also available when building [Track Automations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#track-automations).
   13. Added "24H Nürburgring" to the track name file for *Assetto Corsa Competizione*.
 
 ## 5.6.5.0-release 04/05/24
@@ -716,7 +716,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	  - The Race Engineer is fully aware of the configured tyre compounds for a given car.
   15. "Practice Center" now informs about unsaved data before starting a new session.
   16. Updated car meta data for *RaceRoom Racing Experience* to the latest version.
-  17. [Accident and slow car detection](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#accident-detection-for-assetto-corsa-competizione) by the Spotter is now also available for *Assetto Corsa Competizione*.
+  17. [Accident and slow car detection](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#accident-detection-for-assetto-corsa-competizione) by the Spotter is now also available for *Assetto Corsa Competizione*.
   18. [Internal] Migrated to AHK version 2.0.12.
 
 **Important:** The accident detection has seen many changes since its initial release with 5.6.3. The current algorithms rely heavily on learning the track layout, the ideal line and the typical speeds during the initial laps. Unfortunately, the initial laps also see many accidents in some races, which can lead to false positives further down the road. I have included additional code which tries to detect and correct this, but it does not work all the time yet. If you encounter many false warnings like "Slow car ahead in 200 meters." by the Spotter during a race, although there is no such slow car, you can then disable the warnings by using the voice command:
@@ -745,7 +745,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   9. The minimum window height of "Simulator Setup" has been increased.
   10. The Strategist (or the Engineer, when the Strategist is disabled) will now inform you immediately, when you started into a race on a wrong tyre compound. No support for automated pitstop or strategy updates will be given, only the information. You won't start a race on wrong tyres, won't you?
   11. The Spotter can now inform about accidents and slow cars ahead and also about accidents behind. The Spotter will learn the track layout and the typical speed and position of a car at each part of the track during the first few laps. When one or more cars are way slower or are at positions far away from the ideal line, this will be counted as an accident.
-      - The support for these alerts vary between the different simulators. Be sure to check out the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#alerts--information).
+      - The support for these alerts vary between the different simulators. Be sure to check out the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#alerts--information).
       - "Simulator Configuration" and "Simulator Setup" has been extended to allow enabling / disabling of the new alerts.
       - The announcements voice command of the Spotter has been extended to allow to enable / disable the new alerts while driving. Example: ["Please no more slow car warnings"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)).
       - New settings for the Spotter in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" allow you to configure the distance before and behind the car, for which the traffic should be analyzed for accidents.
@@ -781,7 +781,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   6. Integrated support for *Le Mans Ultimate*:
      - [New plugin "LMU"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-lmu), which provides the same level of integration and similar controller actions as the "RF2" plugin for *rFactor 2*.
 	 - Full support in "Simulator Setup" to configure the "LMU" plugin.
-	 - Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation-of-telemetry-providers) for more information on how to install and configure the data integration plugin (*rFactor2SharedMemoryMapPlugin64.dll*) in the *Le Mans Ultimate* installation directory.
+	 - Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for more information on how to install and configure the data integration plugin (*rFactor2SharedMemoryMapPlugin64.dll*) in the *Le Mans Ultimate* installation directory.
 	 - *Le Mans Ultimate* is still under heavy development. Although it uses the same engine as *rFactor 2*, it looks like that several aspects of the shared memory API have changed. This is what has been achieved so far and what is not working:
 	   - General telemetry is working
        - Pressures, temperatures, and so on are all there
@@ -807,7 +807,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   8. You now have fine-grained control over the length of the first and also the length of the last stint in the strategy simulation. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#simulation) for more information.
   9. And you can vary the fuel amount added at a pitstop to some extent in the strategy simulation. This is helpful to reduce the car weight over the full race and even out the stint lengths in cases where otherwise a short last stint would have been used. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#simulation) for more information.
   10. The regular pitstop window is now a separate entry in the pitstop rules in the "Strategy Workbench". You now can have 2 required pitstops in this window, for example.
-  11. There is a new tab "Pitstops (fixed)" available in the "Strategy Workbench", which allows you to fix the lap for one or more pitstops during strategy simulation. But there are some drawbacks, so read the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#pitstops-fixed) carefully.
+  11. There is a new tab "Pitstops (fixed)" available in the "Strategy Workbench", which allows you to fix the lap for one or more pitstops during strategy simulation. But there are some drawbacks, so read the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#pitstops-fixed) carefully.
   12. The strategy simulation in the "Strategy Workbench" and the "Race Center" and also, when run by the Race Strategist, now keep track of tyre usage for all tyre sets. Tyre sets will appropriately be re-used in sessions with a restricted number of tyre sets and the strategy simulation will try to optimize the overall utilization of tyre sets for the whole session.
   13. Tyre set numbers are displayed in the strategy summary report in the "Strategy Workbench" and also in the "Race Center".
   14. For sessions with a fixed time, the strategy report now displays the full session time (enclosed in paranthesis) in the "Duration" field of the report.
@@ -815,7 +815,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   16. Strategy comparison reports now list the strategies in the order form best to worse.
   17. The default for the automatic pressure loss correction is now *Off* in the "Race Center".
   18. Several new RSS Formula cars have been included in the car meta data DLC by @mirko_lesko.
-  19. [Experts only] The rules for strategy validation in the "Strategy Workbench" have been revised and extended. Full information about tyre sets are now available for each pitstop. Please see the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#scenario-validation) for more information.
+  19. [Experts only] The rules for strategy validation in the "Strategy Workbench" have been revised and extended. Full information about tyre sets are now available for each pitstop. Please see the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#scenario-validation) for more information.
   20. New car models for "Setup Workbench":
       - Assetto Corsa
         - Lotus 72D
@@ -1041,7 +1041,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   8. Fixed an off by one error for the post pitstop tyre set information for *Asseto Corsa Competizione* in "Race Center".
   9. Corrected several values in the *Service* section of the Pitstop report in "Race Center".
   10. Separate values for service time, repairs time and pitlane time loss are now displayed in the Pitstop report in "Race Center".
-  11. Many [changes to the pitstop settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#the-pitstop), that are made using the game controls, will be correctly detected now by the Race Engineer in *rFactor 2*, *Assetto Corsa Competizione* and *iRacing*, as long as a pitstop has been already planned and prepared. The changed settings will be automatically integrated in the active pitstop plan of the Engineer and will also update the planned pitstop in the "Race Center". Exceptions are, for example, the choice of the tyre compound or the repair options in *Assetto Corsa Competizione*, since these values are unfortunately not available in the data API. More information can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#the-pitstop).
+  11. Many [changes to the pitstop settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#the-pitstop), that are made using the game controls, will be correctly detected now by the Race Engineer in *rFactor 2*, *Assetto Corsa Competizione* and *iRacing*, as long as a pitstop has been already planned and prepared. The changed settings will be automatically integrated in the active pitstop plan of the Engineer and will also update the planned pitstop in the "Race Center". Exceptions are, for example, the choice of the tyre compound or the repair options in *Assetto Corsa Competizione*, since these values are unfortunately not available in the data API. More information can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#the-pitstop).
   12. Changes in the pitstop settings are now almost immediately reflected in the "Race Center", independent how the change was initiated.
   13. Potential fix for scrambled result in "Race Reports", when drivers quit in the post-race lap, before the current driver has finished.
   14. New car models for "Setup Workbench":
@@ -1055,7 +1055,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   4. Fixed position and standings handling for *rFactor 2*.
   5. A new setting in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" allows you to set the interval, in which pitstop setup information is requested from *rFactor 2*. Default is once per minute.
   6. The handling of the *Automobilista 2* ICM has changed. You must now [set the ICM to the Pitstop page](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#special-requirements-when-using-the-pitstop-automation-1) and select the line at the bottom before using any of the automation of Simulator Controller.
-  7. Added a switch in the "Race Settings" app which allows you to promote the Assistants into fully autonomous mode for strategy and pitstop handling. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#autonomous-mode) for more information.
+  7. Added a switch in the "Race Settings" app which allows you to promote the Assistants into fully autonomous mode for strategy and pitstop handling. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#autonomous-mode) for more information.
   8. A corresponding setting is available in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) of the "Session Database".
   9. The Assistants now detect correctly that you have have quitted a session in the formation lap and started a new session with a different car or a different track.
   10. Increased reliability for position and standings calculations for retired cars.
@@ -1112,7 +1112,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	 - Unfortunately, *Assetto Corsa Competizione* does not provide the information, which tyre compound is currently selected in the Pitstop MFD in the data API. A new strategy in the option walk will now detect it anyway by checking the availibilty of other settings.
   6. Superfluous proximity alerts for cars that are actually behind a wall and driving in another direction or are not moving at all, are now supressed.
   7. You can now specify [a preference for an early or a late first pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#simulation), when running a strategy simulation in the "Strategy Workbench".
-  8. A runtime for large language models has been integrated into Simulator Controller, which allows you to run a LLM for the "Driving Coach" locally on your PC, without installing additional software or creating an OpenAI account. Please note that this increases the performance and memory requirements for the "Driving Coach" dramatically, but if your PC can handle it, then it is a great alternative to OpenAI and Co. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#llm-runtime) for more information about the configuration requirements.
+  8. A runtime for large language models has been integrated into Simulator Controller, which allows you to run a LLM for the "Driving Coach" locally on your PC, without installing additional software or creating an OpenAI account. Please note that this increases the performance and memory requirements for the "Driving Coach" dramatically, but if your PC can handle it, then it is a great alternative to OpenAI and Co. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#llm-runtime) for more information about the configuration requirements.
   9. New [control key modifiers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) for "Simulator Configuration" and "Simulator Setup" let you decide whether other applications will be terminated before working on the configuration.
   10. New car models for "Setup Workbench":
       - Assetto Corsa
@@ -1186,7 +1186,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   9. The pitstop info widget on the "Session" page of the "System Monitor" now includes the required time for the pitstop incl. pitlane delta.
   10. The required pitstop time has also been included ["Session State.json" file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) generated by the ["Integration"  plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration).
   11. New simulator specific [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database", which define the conversion between internal damage values for bodywork, suspension and engine damage and the time in seconds needed for repair the damage.
-  12. The behaviour of the "Treshold" choice for repairs in "Race Settings" has changed. Please see the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-pitstop) for more information.
+  12. The behaviour of the "Treshold" choice for repairs in "Race Settings" has changed. Please see the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-pitstop) for more information.
   13. Default for refueling time has changed to 1.8 seconds per 10 liter of fuel.
   14. New car models for "Setup Workbench":
       - Assetto Corsa
@@ -1211,10 +1211,10 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	 - Part of the new instructions is a data interface, that can be used to provide data about your recent laps as well as the full standings at the end of the last lap to the Driving Coach for performance analysis.
 	 - The Driving Coach can use the Telemetry Analyzer of the "Setup Workbench" during a session to acquire information about any handling issues to give you precise and context aware coaching on driving behaviour and possible car setup changes.
 	 - Instructions can be deleted in the configuration, if you don't need them at all.
-	 - New [voice commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#enabling-and-disabling-specific-instructions-and-information-processing) for the Drivong Coach to enable / disable instructions and thereby data integration during a running session.
+	 - New [voice commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#enabling-and-disabling-specific-instructions-and-information-processing) for the Drivong Coach to enable / disable instructions and thereby data integration during a running session.
 	 - A couple of [new settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" allow you to select, which instructions will be active during the different session types (Practice, Qualifying, Race).
      - Additionally, a [new setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" can be used to enable a mode, in which the Driving Coach will only repeat the last sentence and then continue, when the voice output is interrupted by another Assistant. Note: This setting is also available for all other Assistants.
-	 - Extensive [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#instructions) has been added which describes in detail how to use instructions to customize the behaviour and personality of the Driving Coach to your personal taste.
+	 - Extensive [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#instructions) has been added which describes in detail how to use instructions to customize the behaviour and personality of the Driving Coach to your personal taste.
 	 
 	 Please note, that it might be necessary to use a larger model like GPT 3.5 16k or GPT 4 to handle the full size of the input area, when all new instructions are active.
   5. New data categories in the Telemetry Analyzer of "Setup Workbench". See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-issue-analyzer) for more information.
@@ -1238,7 +1238,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a bug in "Strategy Workbench", which created a strategy with the wrong race length, when a mandatory pitstop in timed window was selected and the tyre usage forced an additional pitstop one lap before the end of the race. Certainly an edge case...
-  4. A new assistant, the Driving Coach, is available. It is based on GPT technology and allows fluent communication about driving techniques, car handling issues, car setup topics and strategy. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach) for more information.
+  4. A new assistant, the Driving Coach, is available. It is based on GPT technology and allows fluent communication about driving techniques, car handling issues, car setup topics and strategy. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach) for more information.
      - New plugin "Driving Coach", which handles the configuration and the communication with the assistant. The configuration of the Driving Coach supports three different service providers: OpenAI, Azure and GPT4All.
 	 - "Simulator Setup" has been updated to support the new Assistant.
 	 - New controller actions are available for the "Driving Coach" plugin.
@@ -1266,7 +1266,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   4. The detection of the last lap in timed races has been optimized.
   5. Manual installations using the ZIP file from GitHub are working again.
   6. "Simulator Setup" now detects software that has been removed from the PC after the last run of "Simulator Setup".
-  7. The semantics of tyre set handling in "Race Settings" has changed. Please read the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#assetto-corsa-competizione) for more information.
+  7. The semantics of tyre set handling in "Race Settings" has changed. Please read the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#assetto-corsa-competizione) for more information.
   8. Migrated sources to AHK 2.0.10.
   9. New car models for "Setup Workbench":
      - Assetto Corsa
@@ -1325,7 +1325,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
       - New [voice command "We have Full Course Cellow. Should I come to the pit?"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)) to ask the Strategist for possible actions under Full Course Yellow.
 	  - New controller action ["FCYRecommend"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the Race Strategist plugin, which triggers the same.
 	  - New icon in the Stream Deck icon set for the "FCYRecommend" action.
-	 Please see the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#handling-full-course-yellow) for more information about Full Course Yellow handling.
+	 Please see the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#handling-full-course-yellow) for more information about Full Course Yellow handling.
   11. New voice command for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)) and [Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(EN)) to ask for the last lap time of a specific car: "Can you tell me the last lap time of car number X?"
   12. New voice command for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)) and [Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(EN)) to ask for the last lap time of a car in a specific position: "Can you tell me the last lap time of position X?"
   13. You can also get information about the name of the driver in the car ahead or behind you:
@@ -1384,7 +1384,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   4. A new [voice command "Tell me my last laptime"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)) is available for the Race Strategist and Race Spotter.
   5. A new [information request action "LapTime"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) is available for the Race Strategist and Race Spotter to request the last lap time by a press of a button on your controller hardware.
   6. An icon has been added to the Stream Deck icon set for the "LapTime" information request action.
-  7. *Practice run sheets* have been added to the "Practice Center", which helps you to create telemetry data for special conditions and car setups, for which no data is available yet. See the all new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#using-the-run-sheet) for more information.
+  7. *Practice run sheets* have been added to the "Practice Center", which helps you to create telemetry data for special conditions and car setups, for which no data is available yet. See the all new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#using-the-run-sheet) for more information.
   8. When a stint plan is created or updated in the "Race Center" it now not only includes information from the strategy but also take the already run stints into account, especially for the driver selection of a stint in the stint plan. When a stint plan is already present, driver selection of stints that have not been started will not be overwritten anymore by information from the strategy.
   9. When initializing the settings for the next pitstop in the "Race Center", used tyre sets of past stints will be taken into account and the system tries to [recommend the next fresh tyre set](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#planning-a-pitstop). But be sure to double check the recommendation to not end up with worn tyres after your pitstop. This method can be deactivated in the "Pitstop" menu.
   10. "Race Center" and "Practice Center" now remember many menu choices between different runs.
@@ -1523,7 +1523,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   11. Fixed team data management in cases where one or more assistants are disabled.
   12. Fixed a couple of bugs in the post pitstop report of "Race Center".
   13. More intelligent detection of unplanned pitstops and stops for penalties by the Race Strategist.
-  14. The collaboration between the Strategist and the Engineer, when running a prepared strategy, has become more inteligent, especially for the last stint. The [documentation on strategy handliing](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) has been revised.
+  14. The collaboration between the Strategist and the Engineer, when running a prepared strategy, has become more inteligent, especially for the last stint. The [documentation on strategy handliing](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#strategy-handling) has been revised.
   15. If you ask the Strategist for the next pitstop, it will give you the option to inform the Engineer right away. Helpful, if you missed the upcoming pitstop warning.
   16. Fixed spurious input field appearing in Telemetry Analyzer, when running a recording.
   17. Migrated the sources to AHK 2.03
@@ -1558,8 +1558,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   2. Documentation updates here and there, as always
   3. A new page has been added to the "System Monitor", where important [information about the current session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities) is displayed. The next release will introduce more widgets for this session dashboard and the possibility to create your own set to be displayed according to your personal preferences and needs.
   4. When automatic strategy revision is enabled for the Strategist and a new strategy is available, you will get an overview about the key facts of the new strategy before you can decide, whether you want to activate it.
-  5. It is now possible to enable the [Monte Carlo traffic simulation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#adjusting-the-strategy-during-a-race) method, which has been [available in the "Race Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#strategy-handling) for quite some time, for the strategy simulation by the Virtual Race Strategist as well.
-     - New option in ["Race Settings"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#tab-strategy) let you enable / disable the Monte Carlo method.
+  5. It is now possible to enable the [Monte Carlo traffic simulation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#adjusting-the-strategy-during-a-race) method, which has been [available in the "Race Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#strategy-handling) for quite some time, for the strategy simulation by the AI Race Strategist as well.
+     - New option in ["Race Settings"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#tab-strategy) let you enable / disable the Monte Carlo method.
 	 - A couple of [new settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" allow you to fine tune the behaviour of the probabilistic algorithm.
      Important: Use with caution, since it imposes additional load on the CPU.
   6. A couple of bugs in the Monte Carlo simulation of the "Race Center" has been fixed, which were introduced with version 5.0.
@@ -1597,13 +1597,13 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. You can now set the range of interest for the gap (in seconds) for opponent information given by the Spotter. For example, you can ask the Spotter to give you only information about an opponent, which as at least a minute behind you, but you want no more information, when he is 5 seconds or less behind you, since you then will have visual information in the mirrors. You can find the corresponding [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database".
-  4. It is now possible to let the Strategist recalculate the currently chosen strategy from time to time in the background, while you are in a race. Whenever a better strategy can be found (also, when no valid strategy is available anymore), you will be informed and can decide what to do. You can find the corresponding [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database", as well as on the [*Strategy* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#tab-strategy) in "Race Settings". This settings allow you to specify, in what situations the current strategy should revised. See also the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#adjusting-the-strategy-during-a-race) about strategy handling during a race, to understand what the Strategist will do automatically and what not.
+  4. It is now possible to let the Strategist recalculate the currently chosen strategy from time to time in the background, while you are in a race. Whenever a better strategy can be found (also, when no valid strategy is available anymore), you will be informed and can decide what to do. You can find the corresponding [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database", as well as on the [*Strategy* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#tab-strategy) in "Race Settings". This settings allow you to specify, in what situations the current strategy should revised. See also the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#adjusting-the-strategy-during-a-race) about strategy handling during a race, to understand what the Strategist will do automatically and what not.
   5. Support for cup categories has been added to the multi-class management. It is now possible to create reports with cars splitted in cup categories and you can also configure the assistants to understand cup categories to give you gap and delta information with regards to your own category. You can find the corresponding [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database". In all interactive reports as well as in the "Race Center", you can use the [settings for the race reports](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports#selecting-report-data) to specify, how the information about the different car classes and cup categories should be displayed.
   6. If driver categories are available in the simulator (Platinum, Gold, ...), they can be displayed in various reports as well. See the documentation for the ["Race Reports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports#selecting-report-data) tool for information how to enable this.
   7. The "Strategy Workbench" has become a little bit *smarter*:
      - New stint length optimization rules based on data generated by machine learning have been included in the "Strategy Workbench". Will be active, if at least one optimization is enabled in the strategy optimizer. 
      - New tyre wear model based on data generated by machine learning have been included in the "Strategy Workbench". Will be active, if the *Tyre Usage* optimization is enabled in the strategy optimizer. The new approach gives the "Strategy Workbench" the ability to double-stint a tyre set, if necessary.
-  8. The strategy scripting language has been extended with new functions and predicates. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#scenario-validation) for more information.
+  8. The strategy scripting language has been extended with new functions and predicates. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#scenario-validation) for more information.
   9. Long running strategy simulations can now be canceled by pressing the ESC key.
   10. The data refresh frequency of the "Race Center" can now be configured, when holding down the control key and select the ["Synchronize"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) item in the "Session" menu.
   11. Fixed handling of *No tyre change* in pitstop preparation in "Race Center".
@@ -1887,7 +1887,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   2. Documentation updates, as always
   3. A new reload button allows you to reload the list of reports in "Race Reports". Helpful, when you just recorded a race on the selected track.
   4. Optimized the pitstop strategy simulation by the Race Strategist.
-  5. The Race Strategist can now optionally explain its pitstop recommendation. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#racing-with-cato) for more information.
+  5. The Race Strategist can now optionally explain its pitstop recommendation. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#racing-with-cato) for more information.
   6. New car models for "Setup Advisor":
       - Assetto Corsa:
 	    - Porsche 911 GT3 R 2016
@@ -1907,7 +1907,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 ## 4.5.3.0-release 12/23/22
   1. Minor bugfixes, as always
   2. Documentation updates, as always
-  3. The AI now detects pressure loss - either sudden or even a kreeping puncture, as long as not all tires are affected at the same time. The Race Engineer will inform you about pressure losses and he as well as the "Race Center" will try to compensate for that when planning and preparing pitstop. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#how-it-works) for more information.
+  3. The AI now detects pressure loss - either sudden or even a kreeping puncture, as long as not all tires are affected at the same time. The Race Engineer will inform you about pressure losses and he as well as the "Race Center" will try to compensate for that when planning and preparing pitstop. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#how-it-works) for more information.
   4. It is now possible to configure the [audio routing](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#audio-routing) for the voice output. This is an interesting feature for streamers or when you want to use your headphones and a 5.1 sound equipment at the same time.
   5. The input ranges of many integer fields have been tweaked to reflect the required number ranges.
   6. The handling of initial fuel in races with a formation lap has been optimized.
@@ -2054,7 +2054,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. UI specific settings, which are managed by the app "Simulator Settings", are now directly available from "Simulator Startup". See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller) for more information.
-  4. You can now choose between different methods for delta calculations for the Virtual Race Spotter. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#alerts--information) for more information.
+  4. You can now choose between different methods for delta calculations for the AI Race Spotter. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#alerts--information) for more information.
 
 ## 4.3.4.0-release 09/30/22
 
@@ -2087,7 +2087,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	 - No more reports for lapped cars for overtaking far too early.
 	 - Fixed tactical advise for possible slipstreaming a slightly faster car approaching from behind.
   5. Fixed volume control for voice output, when SoX is used.
-  6. New settings in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) allow to configure, whether the Assistants will be active, when a session has been joined after the second lap has been completed. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#racing-with-jona) for more information.
+  6. New settings in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) allow to configure, whether the Assistants will be active, when a session has been joined after the second lap has been completed. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#racing-with-jona) for more information.
   7. Increased precision in session end detection in ACC races
   8. New tyre compound data for *Automobilista 2*, thanks to Chris Matthews. With this, all current cars of *Automobilista 2* should be covered now.
   9. New car models for "Setup Advisor":
@@ -2157,7 +2157,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	 - Warning a few laps before the current stint is ending.
 	 - Information when temperatures are rising or falling.
 	 
-	 The configuration of "Race Spotter" plugin has been updated accordingly. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#alerts--information) for more information.
+	 The configuration of "Race Spotter" plugin has been updated accordingly. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#alerts--information) for more information.
   5. Delta calculation has been improved again for the Spotter:
      - The delta history will be reset when a given car is in the pits.
 	 - The delta history will also be reset when a car had a crash or a longer offtrack, which results in a lap time, which is far outside the standard deviation.
@@ -2167,13 +2167,13 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
      - When you ask for the gap to the car ahead or behind, it will be mentioned whether this car is at least one lap up or one lap down.
   7. A couple of improvements for the automated strategy handling (Race Strategist, Race Engineer and Race Center):
      - When a strategy is recalculated / adjusted in "Race Center", an urgent pitstop is created when the currently mounted tyres are not suitable for the current weather conditions.
-     - The Race Strategist can now [recalculate / adjust the currently active strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) anytime during a race.
+     - The Race Strategist can now [recalculate / adjust the currently active strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#strategy-handling) anytime during a race.
 	   - New voice command for the Strategist to trigger the recalculation of the current strategy.
 	   - New controller action ["StrategyRecommend"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin, which is equivalent to the above mentioned voice command, incl. a new icon in the Stream Deck icon set for this controller action.
 	 - When the Strategist instructs the Race Engineer to plan and prepare a pitstop, the tyre compound as defined in the strategy will now also be transfered to the Engineer, which will select this specific compound for the tyre change.
 	 - The Race Engineer now adjusts the fuel amount for the last stint when the pitstop has been triggered by the active strategy.
   8. Improvements for the Race Engineer:
-     - Correct handling of all tyre compounds, incl. Intermediate compounds, for tyre recommendations and for automated pitstops. See the [Tyre Compounds](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds) chapter as well as the corrsponding notes for [tyre compound handling by the "Race Engineer"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#how-it-works) for more information.
+     - Correct handling of all tyre compounds, incl. Intermediate compounds, for tyre recommendations and for automated pitstops. See the [Tyre Compounds](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds) chapter as well as the corrsponding notes for [tyre compound handling by the "Race Engineer"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#how-it-works) for more information.
 	 - Voice commands for tyre compound specification now also accept *Intermediate* as keyword.
 	 - Engine damage will now be detected and corresponding repair recommendations will be issued.
 	   - Damage will be detected for the simulators *Assetto Corsa*, *Automobilista 2*, *Project CARS 2* and *RaceRoom Racing Experience*.
@@ -2275,10 +2275,10 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   4. Introducing Track Automations, which let you automate your car settings like TC and ABS depending on track location.
      - A new page has been added to "Session Database", which allows you to specify [location specific actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track-&-automation) for a specific simulator / car / track combination.
      - Added the ["TrackAutomation" action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) to the "Race Spotter" plugin which let's you enable or disable location specific actions when you are out on the track.
-	 - New ["enableTrackAutomation", "disableTrackAutomations" and "selectTrackAutomation"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#choosing-between-different-track-automations), which let you control the Track Automations while on the track.
+	 - New ["enableTrackAutomation", "disableTrackAutomations" and "selectTrackAutomation"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#choosing-between-different-track-automations), which let you control the Track Automations while on the track.
      - Added a new icon to the Stream Deck icon set for the "TrackAutomation" action.
 	 - Track Automations can be exported and imported using the "Session Database" administration tool.
-  5. Track mapping incl. Track Automations are now supported for *iRacing* as well. But since the algorithm to derive the track layout works without a real coordinate system, there are a [few things to mention](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#special-notes-about-track-mapping-in-iracing).
+  5. Track mapping incl. Track Automations are now supported for *iRacing* as well. But since the algorithm to derive the track layout works without a real coordinate system, there are a [few things to mention](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#special-notes-about-track-mapping-in-iracing).
   6. Pretty track names will be collected for *iRacing* when you visit a track.
   7. Fixed a bug in race reports for *iRacing* when car race numbers contain a **"**.
   8. Fixed general bug in race reports, where no lap times where available in the "Overview" report in special situations. Also improved DNF calculation.
@@ -2300,9 +2300,9 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Full support for *Project CARS 2* is available incl. integration with all Race Assistants. See the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-424) how to activate the plugin and read the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-pcars2) for a description of all the features of the *Project CARS 2* integration.
-  4. The Spotter can now create track maps for most simulators. These maps are then used in "Race Center" to give you a [live view](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#data-analysis) of the current race situation. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-mapping) for more information, how the track mapping actually works.
+  4. The Spotter can now create track maps for most simulators. These maps are then used in "Race Center" to give you a [live view](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#data-analysis) of the current race situation. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#track-mapping) for more information, how the track mapping actually works.
   5. A new meta-model for tyre compounds has been added, which allow you to describe the tyre compounds used for the various cars in all simulators and how these simulator specific tyre compounds map to the internal compound descriptors of Simulator Controller. A complete new [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds) covers this topic. Don't miss it.
-  6. Schema specifiers has been added to the [export meta data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#importing-data-from-other-sources), so that you are able to import data from foreign sources, for eexample telemetry data from real cars.
+  6. Schema specifiers has been added to the [export meta data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#importing-data-from-other-sources), so that you are able to import data from foreign sources, for eexample telemetry data from real cars.
   7. A new preset has been added to "Simulator Setup", which helps you in creating a [patch file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#patching-the-configuration) for the generated configuration. Patch files allow you to change all aspects of configurations generated by "Simulator Setup", for example the names and voices of the Race Assistants.
   8. A delay can now be configured in the "Session Database" for the keyboard commands used when dialing pitstop settings in the various simulators. This helps me to fix problems in rare cases, where the PC is quite old and unable to process the fast keyboard commands issued by Simulator Controller.
   9. A new "TyreCompound" action has been added to the "RaceRoom Racing Experience" plugin which allows you to change the tyre compound for the next pitstop. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-8) for more information.
@@ -2354,7 +2354,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   7. All Race Assistants can entertain you now you by telling some jokes. Try: "Can you tell me a joke?"
   8. Reduced click area for window subtitles fixes the unwanted opening of a browser with context-sensitive documentation.
   9. Minimum number of tyre laps and minimum amount of start fuel is set to 10 now.
-  10. Full support for the Spotter and Strategist in *Assetto Corsa*. You have to install a plugin in *Assetto Corsa* for the data acquisition. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation-of-telemetry-providers) for more information.
+  10. Full support for the Spotter and Strategist in *Assetto Corsa*. You have to install a plugin in *Assetto Corsa* for the data acquisition. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for more information.
   11. "Simulator Setup" no longer overwrites the Team Server settings in "Simulator Configuration".
   12. Added installation support for all integration plugins to "Simulator Setup".
   13. Assistants can be muted and unmuted with a voice command by saying: "Be quiet please" and "I can listen again" or "You can talk again".
@@ -2411,7 +2411,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. An extended integration of *Assetto Corsa* is now available:
-     - Jona, the Virtual Race Engineer is aware of *Assetto Corsa* and can handle a pitstop automatically.
+     - Jona, the AI Race Engineer is aware of *Assetto Corsa* and can handle a pitstop automatically.
      - A number of actions are available in the "Pitstop" and "Assistants" modes.
      - "Simulator Setup" can be used to configure the *Assetto Corsa* integration.
      - Please see the [fully revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-ac) for the "Assetto Corsa" plugin for more information.
@@ -2437,9 +2437,9 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. [Comparing and merging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#comparing-car-setups) setups is now supported in "Setup Advisor".
-  4. The Virtual Race Strategist will give you now a post race summary. It will be very honest, so if you feel offended, you can disable it in the [configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist). But an AI doesn't lie, does it?
+  4. The AI Race Strategist will give you now a post race summary. It will be very honest, so if you feel offended, you can disable it in the [configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist). But an AI doesn't lie, does it?
   5. Reversed sign of laptime delta in all apps. Faster cars will have a positive delta, slower cars a negative one.
-  6. The Spotter-AI has been trained to detect several typical race situations and can advise you how to best react there. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#alerts--information) for more information.
+  6. The Spotter-AI has been trained to detect several typical race situations and can advise you how to best react there. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#alerts--information) for more information.
   7. New "Consistency" Report in "Race Reports" and "Race Center". See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports#consistency-report) for more information.
   8. Reduced volume of radio click noise for Race Assistant speech output. Thereby, the overall volume of the speech output has become louder, so you might have to adjust your volume balancing between your sim(s) and the Assistants.
   9. Fixed a bug in "Setup Advisor" where settings were off by one for some cars.
@@ -2453,9 +2453,9 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Increased precision of Spotter opponent delta information. See the extended [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#opponent-and-delta-information) for more information.
+  3. Increased precision of Spotter opponent delta information. See the extended [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#opponent-and-delta-information) for more information.
   4. Added new Spotter advises and extended information about opponent performance.  
-     - [Thresholds for delta information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#opponent-and-delta-information) can be defined in the "Session Database" settings.
+     - [Thresholds for delta information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#opponent-and-delta-information) can be defined in the "Session Database" settings.
 	 - [Update frequency](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-spotter) can be configured for each sector, beside each one, two, three or four laps.
   5. Spotter alert responsiveness has been increased even further by eliminating outdated warnings waiting in the queue.
   6. Number input dialog will be opened instead of the context menu, when clicking on a control with the Control key pressed in the [Controller Layout Editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#controller-layouts).
@@ -2516,7 +2516,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   3. Delta time calculation by the Spotter is much more precise now.
   4. Spotter warnings are much faster now due to caching of the generated sound files.
   5. Session Database location is now configurable. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration) for more information.
-  6. The Virtual Race Engineer can be asked about the amount of remaining fuel, like: "How much fuel is remaining?".
+  6. The AI Race Engineer can be asked about the amount of remaining fuel, like: "How much fuel is remaining?".
   7. The same can be achieved using the new *InformationRequest* action *FuelRemaining*, which is available for all simulator plugins and the "Race Engineer" plugin. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for more information.
   8. Larger window sizes for "Strategy Workbench" and "Race Center" (as requested by the community).
   9. Two new icons for Stream Deck to support the new action *FuelRemaining*.
@@ -2561,7 +2561,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   4. Support for multiple hotkeys in "Simulator Setup".
   5. Stability improvements in "Race Center".
   6. New Stream Deck icons for Chat messages.
-  7. Support editing of validation rules directly from "Strategy Workbench". See the revised [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#integrating-into-strategy-workbench) for more information.
+  7. Support editing of validation rules directly from "Strategy Workbench". See the revised [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#integrating-into-strategy-workbench) for more information.
   8. "Setup Advisor" is now able to [load, modify and save setup files](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#managing-car-setups) for *Assetto Corsa Competizione*.
   9. Track names are now displayed in non-internal format for ACC tracks.
 
@@ -2574,7 +2574,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Fixed fuel consumption displayed as negative after pitstop in "Race Center".
-  4. Default value for the "teamServer:" plugin argument is now *Off* in a new generated configuration. Please pay attention to this, when generating a new configuration using "Simulator Setup" and create an action binding for the "TeamServer" action for at least one of the Virtual Race Assistants.
+  4. Default value for the "teamServer:" plugin argument is now *Off* in a new generated configuration. Please pay attention to this, when generating a new configuration using "Simulator Setup" and create an action binding for the "TeamServer" action for at least one of the AI Race Assistants.
   5. Fixed a critical stack overflow with blocking error message in the Race Assistants, when corrupt data is processed from the ACC server backend.
   6. All new icon set for Stream Deck actions. Included as a preset in "Simulator Setup".
   7. Race Engineer now acknowledges any additional change of pitstop options after a pitstop has been prepared in ACC or RF2.
@@ -2603,7 +2603,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   4. Many new presets for the ACC pitstop search images thanks to contributions from iEnki (Robert Deutsch), Manfred Gnadl and Martin Moser.
   5. Fixed broken position reporting for RaceRoom Racing Experience.
   6. A couple of minor fixes and improvements for "Race Center".
-  7. Performance improvements for the Virtual Race Strategist by 20% for standings, track gap and future predictions.
+  7. Performance improvements for the AI Race Strategist by 20% for standings, track gap and future predictions.
   8. Initial preparation for sector based timing in the shared memory interfaces.
   9. More frequent position and gap update for Race Strategist and Race Spotter.
   10. Fixed a bug where the Spotter got into an endless loop announcing pit window in Assetto Corsa Competizione.
@@ -2623,7 +2623,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Full support for cloud based voice recognition. Use *Azure Cognitive Services* for the best possible recognition quality. You can choose in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control), which recognition language you want to use (as long as a grammar for this language is available).
-  4. The selection of the new cloud based voice recognition is also possible using the [plugin parameters](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) of the Virtual Race Assistants.
+  4. The selection of the new cloud based voice recognition is also possible using the [plugin parameters](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) of the AI Race Assistants.
   5. A new preset function in "Simulator Setup" let you pre-install Button Box and Stream Deck layouts and gives you control over some very special configuration options.
   6. The Race Spotter will start with its announcements when the race is started. Implemented for all simulators.
   7. [Experts Only] The [patch mechanism](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#patching-the-configuration) for configuration files generated by "Simulator Setup" has been extended.
@@ -2636,7 +2636,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Full implementation of the database consolidation and distribution process. Depending on your own consent, you will receive new tyre pressure information or even shared car setups from the community every 2 days. Because of this, you will be asked to renew your consent for sharing your own data, because you will only receive anything, if you are also willing to share.
-  4. New voice commands for the Virtual Race Spotter and the other Assistants to enable or disable announcments and warnings while out on the track. You can say, for example: "No more weather warnings please" or "Please give me blue flag warnings". See the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#enabling-and-disabling-specific-warnings-and-announcements) for more information.
+  4. New voice commands for the AI Race Spotter and the other Assistants to enable or disable announcments and warnings while out on the track. You can say, for example: "No more weather warnings please" or "Please give me blue flag warnings". See the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#enabling-and-disabling-specific-warnings-and-announcements) for more information.
   5. Support for .NET compatible TTS 5.1 voices for voice output. See the revised documentation for [voice control](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) configuration for more information.
   6. Support for an additional voice recognition framework, which provide a much better recognition rate and quality, as long as you have a decent voice audio quality (for example when using a headset). The changes are documented [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) as well.
   7. Renamed plugin parameter "raceAssistantService" to "raceAssistantSynthesizer" and introduced new parameter "raceAssistantRecognizer" for all Race Assistant plugins. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for more information.
@@ -2667,7 +2667,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   4. New ["Import from Strategy" command](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#rules--settings) in "Strategy Workbench" to initialize all Rules & Settings from a currently loaded strategy.
   5. Support for [Stint time variation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#simulation) based on tyre usage dependent lap time degradation in Strategy simulation.
   6. New settings for [disallowed refueling and disallowed tyre change](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#rules--settings) in Strategy simulation.
-  7. Support for [scenario validation rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#scenario-validation) in Strategy simulation. These rules, which can be created or changed by the user, are based on the logic programming language *Prolog*.
+  7. Support for [scenario validation rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#scenario-validation) in Strategy simulation. These rules, which can be created or changed by the user, are based on the logic programming language *Prolog*.
   8. Significant performance improvements by a factor of 10 in Strategy simulations.
   9. Full handling of restricted tyre sets in "Race Center" and special validation rules, when a strategy gets adopted to the current race situation.
   10. Improved data quality for missing laps in "Race Center".
@@ -2703,7 +2703,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Support for rFactor 2 has been added for the new Spotter Assistant.
-  4. The capabilities of the Spotter has been extended again. It now informs about your performance after the first few laps and also periodically during the race. It also announces you the final laps. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#alerts--information) for more information.
+  4. The capabilities of the Spotter has been extended again. It now informs about your performance after the first few laps and also periodically during the race. It also announces you the final laps. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#alerts--information) for more information.
   5. Fix for wonky Spotter side alerts in RaceRoom Racing Experience.
   6. Improved the Strategy Simulation by introducing an alorithm which includes tyre wear, fuel level induced lap time variations and the effects of ECU maps at the same time.
   7. Introduced new tyre compound types (colors) in all applications. Yellow, Green, Soft, Medium and Hard compounds are now supported, when the corresponding simulation supports them.
@@ -2716,7 +2716,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Support for the new Spotter Assistant has been added for iRacing, Automobilista 2 and RaceRoom Racing Experience.
-  4. The capabilities of the Spotter has been extended. It now supports yellow flag and blue flag warnings as well as information about pit window events. See the [expanded documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#introduction) for the Spotter for more information.
+  4. The capabilities of the Spotter has been extended. It now supports yellow flag and blue flag warnings as well as information about pit window events. See the [expanded documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#introduction) for the Spotter for more information.
   5. New InformationRequest Action for Jona and Cato to request the current time. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for more information.
   6. Improved handling in Race Reports when drivers leave before the end of the session.
   7. Fixed several bugs in iRacing Pitstop MFD control.
@@ -2730,7 +2730,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Extensive memory consumption reduction of all Race Assistants, especially when using the Team Server.
-  4. Initial implementation of a new Virtual Race Assistant, the [Spotter Elisa](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter). The first version only supports ACC for the moment, all other Simulations will follow with the next releases.
+  4. Initial implementation of a new AI Race Assistant, the [Spotter Elisa](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter). The first version only supports ACC for the moment, all other Simulations will follow with the next releases.
   5. New plugin ["Race Spotter"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) as the configuration interface for the Spotter, as well as the new [configuration tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-spotter) in "Simulator Configuration" to configure the statistical settings of the Spotter AI kernel.
   6. New plugin parameter "raceAssistantSpeakerVocalics" to set pitch, speed, etc. individually for each Race Assistant. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for more details.
 
@@ -2818,7 +2818,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   2. Documentation updates, as always
   3. New server based solution for team endurace races. See the all [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) for more information.
      a. New ["Team Management" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-team-management) in "Simulator Configuration" for managing your Teams, Drivers and Sessions.
-	 b. New ["Team" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-team) in "Race Settings" for all team member to configure their role in a team session.
+	 b. New ["Team" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-team) in "Race Settings" for all team member to configure their role in a team session.
   4. The new "Team Server" plugin as well as the "Race Engineer" and the "Race Strategist" plugins now allow to specify the initial operation state without supplying a function to be triggered from a hardware controller.
   5. Major bug fixes in "Simulator Setup"
 	 a. Fixed a bug Stream Deck configuration support
@@ -2860,7 +2860,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   2. Documentation updates, as always
   3. Improved corner case handling and stint optimizations in strategy development.
   4. Variation of fuel consumption, initial fuel level and tyre usage is now possible in strategy simulations. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#simulation) for more details.
-  5. Strategies created and exported by the "Simulator Workbench" will be automatically picked up by Cato in matching race session.  Cato will instruct Jona for all Pitstops defined in the strategy. See the [documentation on strategy handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) of the Virtual Race Strategist for more information.
+  5. Strategies created and exported by the "Simulator Workbench" will be automatically picked up by Cato in matching race session.  Cato will instruct Jona for all Pitstops defined in the strategy. See the [documentation on strategy handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#strategy-handling) of the AI Race Strategist for more information.
   6. Many new phrase grammars for Cato to handle all the new strategy stuff. See the [phrase grammar definition files](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Sources/Assistants/Grammars) for more information.
   7. New action "StrategyCancel" for "Race Strategist" and all simulator plugins to cancel a strategy, that is no longer applicable, from the Button Box.
   8. New "InformationRequest" commands "StrategyOverview" and "NextPitstop" for "Race Strategist" and all simulator plugins to request information about the current strategy or the upcoming pitstop, as defined in the strategy, from your Button Box.
@@ -2882,7 +2882,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Important fix for handling startup of SimFeedback by the "Motion Feedback" plugin.
-  4. Initial strategy simulation based on telemetry data for the "Strategy Workbench". The tool is still in an early stage of development and the functionality might change with future releases. A very rudimentary [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench) can be found in the chapter on the Virtual Race Strategist. This documentation will be completed with the upcoming releases.
+  4. Initial strategy simulation based on telemetry data for the "Strategy Workbench". The tool is still in an early stage of development and the functionality might change with future releases. A very rudimentary [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench) can be found in the chapter on the AI Race Strategist. This documentation will be completed with the upcoming releases.
 
 ## 3.5.9-release 10/01/21
 
@@ -2928,7 +2928,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   2. Documentation updates, as always
   3. New automatic download for Simulator Controller software and support for installation either as fully registered Windows application or as portable application. The beginning of the [Installation & Configuration documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration) has been completely rewritten to give you the necessary background information.
   4. Fully automatic update package download and installation process.
-  5. Change already prepared Pitstop settings created by the Race Engineer with your Button Box. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#the-pitstop) for Jonas pitstop handling for more information.
+  5. Change already prepared Pitstop settings created by the Race Engineer with your Button Box. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#the-pitstop) for Jonas pitstop handling for more information.
   
 ## 3.5.1-release 08/21/21
 
@@ -2984,9 +2984,9 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Initial support for *Automobilista 2*.
-  4. Recommendation for best pitstop lap in relation to traffic density and position development (see the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#a-typical-dialog) for an example on how to use this feature).
-  5. Handover between virtual strategist and engineer during pitstop planning (part of the above example).
-  6. [New options](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#tab-strategy) in the settings dialog for the Virtual Race Strategist.
+  4. Recommendation for best pitstop lap in relation to traffic density and position development (see the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#a-typical-dialog) for an example on how to use this feature).
+  5. Handover between AI Strategist and AI Engineer during pitstop planning (part of the above example).
+  6. [New options](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#tab-strategy) in the settings dialog for the AI Race Strategist.
 
 ## 3.1.5-release 06/25/21
 
@@ -2996,9 +2996,9 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. New Assetto Corsa Competizione data acquisition for Cato, the Virtual Race Strategist.
+  3. New Assetto Corsa Competizione data acquisition for Cato, the AI Race Strategist.
   4. Full propabilistic model for future race positions. You can ask Cato for future race standings (Example: "What will be my position in 4 laps").
-  5. New settings for the Virtual Race Strategist in order to customize the standings prediction model. See the ["Strategy" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#tab-strategy) in the "Race Settings" tool for more information.
+  5. New settings for the AI Race Strategist in order to customize the standings prediction model. See the ["Strategy" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#tab-strategy) in the "Race Settings" tool for more information.
   6. Renaming of several applications:
      - "Race Engineer Settings" => "Race Settings"
 	 - "Race Engineer Setups" => "Setup Database"
@@ -3011,11 +3011,11 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Multiple actions can be bound to one controller functions. Useful, to group several activation actions into one toggle switch for example. Please consult the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller) for more details, if you want to use this new feature.
-  4. The [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist) for the Virtual Race Strategist has been extendend - give it a read...
-  4. Model and initial rule set for race standings, lap time analysis and gaps between cars have been implemented for Cato, the Virtual Race Strategist.
-  5. New iRacing data acquisition for Cato, the Virtual Race Strategist.
-  6. New rFactor 2 data acquisition for Cato, the Virtual Race Strategist.
-  7. New  RaceRoom Racing Experience data acquisition for Cato, the Virtual Race Strategist.
+  4. The [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist) for the AI Race Strategist has been extendend - give it a read...
+  4. Model and initial rule set for race standings, lap time analysis and gaps between cars have been implemented for Cato, the AI Race Strategist.
+  5. New iRacing data acquisition for Cato, the AI Race Strategist.
+  6. New rFactor 2 data acquisition for Cato, the AI Race Strategist.
+  7. New  RaceRoom Racing Experience data acquisition for Cato, the AI Race Strategist.
   8. [For Developers]:
      - Refactored *RaceEngineerSimulatorPlugin* into *RaceAssistantSimulatorPlugin*, which now can handle multiple Race Assistants.
 	 - Refactord the *getAction* and *fireAction* methods of *SimulatorController* into *getActions* and *fireActions* for multiple actions per controller function.
@@ -3025,18 +3025,18 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Full rework of voice generation and recognition to allow for multiple voices even using different languages (see the [new documentation for voice control](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) for more information)
-  4. New plugin parameter *raceEngineerLanguage* for the ["Race Engineer" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) to overwrite the default language for the Virtual Race Engineer (same applies for the new Virtual Race Strategist)
-  5. Initial integration of the new AI-based [Virtual Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist). No useful initial functionality, but you can ask for weather information and remaining laps based on fuel or stint time calculation.
-  6. [New Plugin "Race Strategist"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) to control the new Virtual Race Strategist
-  7. [New Tab in the configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist) for the new Virtual Race Strategist
+  4. New plugin parameter *raceEngineerLanguage* for the ["Race Engineer" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) to overwrite the default language for the AI Race Engineer (same applies for the new AI Race Strategist)
+  5. Initial integration of the new AI-based [AI Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist). No useful initial functionality, but you can ask for weather information and remaining laps based on fuel or stint time calculation.
+  6. [New Plugin "Race Strategist"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) to control the new AI Race Strategist
+  7. [New Tab in the configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist) for the new AI Race Strategist
 
 ## 3.0.6-release 05/28/21
 
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. A [new page in the configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer) allows you to customize many aspects of the Race Engineer behaviour and the integration of Jona with the setup database.
-  4. The *Race Engineer Settings* tool has been overhauled, since some of the options has been moved to the configuration page of the configuration tool, as mentioned above. The [*Race Engineer Settings* tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-engineer-settings) now only contains session or race specific options.
-  5. Race Engineer Settings can now be stored also in the [setup database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#querying-the-session-database) for future use.
+  4. The *Race Engineer Settings* tool has been overhauled, since some of the options has been moved to the configuration page of the configuration tool, as mentioned above. The [*Race Engineer Settings* tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#race-engineer-settings) now only contains session or race specific options.
+  5. Race Engineer Settings can now be stored also in the [setup database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#querying-the-session-database) for future use.
   6. Before beginning a session, the best matching of the Race Engineer Settings can be selected from the setup database depending on the session duration. This settings will be activated for the next session, optionally together with the tyre pressures for the current environmaental conditions.
 
 ## 3.0.4-release 05/23/21
@@ -3055,9 +3055,9 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Tyre pressures can be [transfered from the setup database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#querying-the-session-database) to the *Race Engineer Settings* tool.
+  3. Tyre pressures can be [transfered from the setup database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#querying-the-session-database) to the *Race Engineer Settings* tool.
   4. Jona can consult the setup database for a second opinion for tyre pressures.
-  5. [New switches](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-pitstop) in *Race Engineer Settings* to control the different strategies that Jona uses to come up with target tyre pressures.
+  5. [New switches](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-pitstop) in *Race Engineer Settings* to control the different strategies that Jona uses to come up with target tyre pressures.
   6. Refactoring of the setup database code and some file relocations.
   7. New Unit Tests for the setup database.
 
@@ -3065,7 +3065,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Graphical interface for querying the setup database (see the updated [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#querying-the-session-database) for more information)
+  3. Graphical interface for querying the setup database (see the updated [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#querying-the-session-database) for more information)
   4. [New plugin parameter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin to open the setup database query tool. If a simulation is currently running, most of the query arguments will already be prefilled.
 
 ## 2.8.6-release 04/30/21
@@ -3075,7 +3075,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   3. Low level integration of *iRacing* telemetry information (see [IRC SHM Reader](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Sources/Foreign/IRC%20SHM%20Reader/IRC%20SHM%20Reader))
   4. Renaming of selected shared memory data fields
   5. ["Pitstop" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop-2) for *iRacing* plugin
-  6. [Jona integration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer) incl. pitstop handling for *iRacing*
+  6. [Jona integration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer) incl. pitstop handling for *iRacing*
   7. Two new actions "Accept" and "Reject" have been added to the ["Race Engineer" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer), which are aquivalent to the corrsponding voice commands. This will be helpful, if you want to use Jona without voice recognition support.
 
 ## 2.8.5-release 04/23/21
@@ -3098,7 +3098,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   5. The "Controller Plugin Labels" file is now available in different translations. See the documentation on [plugin configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) for more information and read the [update notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-282), in case you have changed this file locally.
   6. The active modes of the connected controllers (aka Button Boxes) can now be automatically activated depending on the current simulator and the active session. A default configuration, which behaves as before, is automatically created by the update procedure, but you might want to define your own [automation rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#configuration-of-the-controller-mode-automation).
   7. Jona now can handle the pitstop setup for you in the *rFactor 2* simulation.
-  8. Beginning with this release, you will find predefined configurations for Simulator Controller in the *Profiles\Simulator Controller* folder, which might help you in the initial configuration of the software. The first one is a configuration for all of you, who only want to use Jona, the Virtual Race Engineer. See the [Installation & Configuration documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) for more information.
+  8. Beginning with this release, you will find predefined configurations for Simulator Controller in the *Profiles\Simulator Controller* folder, which might help you in the initial configuration of the software. The first one is a configuration for all of you, who only want to use Jona, the AI Race Engineer. See the [Installation & Configuration documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) for more information.
   9. (Developer only): Introduced two new base classes *SimulatorPlugin* and *RaceEngineerSimulatorPlugin*, which reduces implementing plugins for simulation games to a few lines of code from now on. Please see the [updated developer reference documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#simulator-plugin-implementation-classes) for more information.
 
 ## 2.8-release 04/09/21
@@ -3107,11 +3107,11 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   2. Documentation updates, as always
   3. New plugin "Race Engineer" to handle Jona for different simulation games
      - Some of the *raceEngineer...* plugin parameters of the "ACC" plugin has been moved to the new "Race Engineer" plugin. See the new new documentation for the ["Race Engineer" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for more information.
-  4. Integration of Jona, the Virtual Race Engineer, for *RaceRoom Racing Experience*. No support for actual pitstop handling yet, and actually, this might never come due to limitations in the UI and API design of *RaceRoom Racing Experience*.
+  4. Integration of Jona, the AI Race Engineer, for *RaceRoom Racing Experience*. No support for actual pitstop handling yet, and actually, this might never come due to limitations in the UI and API design of *RaceRoom Racing Experience*.
   5. Initial version of Jona for rFactor 2 too. Support for pitstop handling will be added in a future release.
   6. Jona is now also active in practice sessions but does not support pitstop planning and preparation there.
   7. When the *Race Engineer.settings* file is changed while Jona is already active, the updated settings will be imported into the active session. This is useful during Practice, Qualifying or even Endurance Race sessions.
-  8. Introduced color coding (Red = Soft, White = Medium, Blue = Hard) to the tyre compound handling of the Virtual Race Engineer.
+  8. Introduced color coding (Red = Soft, White = Medium, Blue = Hard) to the tyre compound handling of the AI Race Engineer.
   9. (Developer only): Documentation for the configuration tool plugin interface has been added. Please take a look here: [Customizing the Configuration Tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#customizing-the-configuration-tool) and also the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#configuration-editor-classes) in the *Classes Reference* for more information.
   10. (Developer only): The build pipeline of *Simulator Tools* now incorporates *VS MSBuild*, so that all external applications and DLLs will be automatically compiled too. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#using-the-build-tool) on *Simulator Tools* for more information.
   11. (Developer only): New class *JSON* in *Libraries* to handle JSON files.
@@ -3124,8 +3124,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   3. Support for multiple active plugin modes, when more than one hardware controller is connected and configured. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration) of the "System" plugin configuration for more information.
   4. Layout editor for Button Box layouts integrated into the configuration tool. The [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#button-box-layouts) for Button Box layout configuration has been updated as well.
   5. Jona can be asked to **not** change the tyre pressures on an upcoming pitstop.
-  6. Visual feedback for tyre setup import action. See the documentation on the [Virtual Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) (moved to "Race Engineer" plugin in Release 2.8) integration of the "ACC" plugin for more information.
-  7. Setup Data will be stored at the end of the race only if [confirmed by the driver](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--setup-database)
+  6. Visual feedback for tyre setup import action. See the documentation on the [AI Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) (moved to "Race Engineer" plugin in Release 2.8) integration of the "ACC" plugin for more information.
+  7. Setup Data will be stored at the end of the race only if [confirmed by the driver](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#race--setup-database)
   8. Added "No Refuel" to the set of handled pitstop configurations - please take a look at the [Update Notes for Release 2.7](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-27) for more information.
   9. (Developer only): New plugin interface for the configuration tool (no documentation yet, for the moment you can take a look at one of the configuration plugins, for example the [Chat Messages Configuration.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Chat%20Messages%20Configuration%20Plugin.ahk) for an introduction and a template).
   10. An Easter Egg with a precious first prize is somewhere hidden in Simulator Controller. It will only be available for the four days of the upcoming Easter weekend.
@@ -3143,11 +3143,11 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   4. Improvments for ACC Pitstop MFD handling
      - Better support for Single Screen Setups
 	 - Several edge case optimizations
-	 - Full integration of shared memory information for refuel amount and tyre pressuresm, therefore simplified [setup of pitstop strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#the-pitstop)
+	 - Full integration of shared memory information for refuel amount and tyre pressuresm, therefore simplified [setup of pitstop strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#the-pitstop)
   5. Improvements for Jona
-	 - *Race Engineer Settings* tool can now [import the current settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race) from the Pitstop MFD 
+	 - *Race Engineer Settings* tool can now [import the current settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-race) from the Pitstop MFD 
 	 - When driver decides for a different tyre compound than recommended, the target pressures will be fully recalculated
-  5. Initial setup of database for [Big Data race setup collection](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--setup-database)
+  5. Initial setup of database for [Big Data race setup collection](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#race--setup-database)
      - Opt In for community based data acquisition
   6. Larger window size and better UI for configuration tool
      - You can [open related documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#using-the-configuration-tool) directly from the configuration tool in several places
@@ -3156,7 +3156,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. With the completion of the weather trend analysis, the capability to change tyre compounds depending on several conditions and almost 500 rules in the AI kernel, Jona is now feature complete and no longer considered to be in alpha stage. I still advise you to be cautious, especially during important races, and always double check Jonas recommendations, but I do use it during league races and the recommendations had been spot on so far. As always, take a look at the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#how-it-works) and especially on the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-engineer-settings) required for Jona
+  3. With the completion of the weather trend analysis, the capability to change tyre compounds depending on several conditions and almost 500 rules in the AI kernel, Jona is now feature complete and no longer considered to be in alpha stage. I still advise you to be cautious, especially during important races, and always double check Jonas recommendations, but I do use it during league races and the recommendations had been spot on so far. As always, take a look at the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#how-it-works) and especially on the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#race-engineer-settings) required for Jona
   4. [A new plugin argument](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the *Assetto Corsa Competizione* plugin allows you to open the Race Engineer settings dialog from your hardware controller (moved to "Race Engineer" plugin in Release 2.8)
   5. The support for multiple Button Boxes has been extended
      - New capabilities in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) for Launchpad applications and chat messages
@@ -3188,7 +3188,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   5. Change of Calibration Curves now works in the "Pedal Calibration" plugin also during a running simulation (even in an active race situation)
   6. Initial support for RaceRoom Racing Experience by a skeleton plugin
   7. Jona now recommends tyre pressure correction for the next stint based on environmental temperature development
-  8. Extended documentation on Jonas capabilities, see the documentation on [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#how-it-works)
+  8. Extended documentation on Jonas capabilities, see the documentation on [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#how-it-works)
 
 ## 2.3-release 02/19/21
   
@@ -3206,7 +3206,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Graphical user interface for editing the contents of the *Race Engineer.settings* file. It supports loading and saving the settings outside the standard location, thereby allows building a setup database. See the new documentation on the [race settings tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-engineer-settings) for more information
+  3. Graphical user interface for editing the contents of the *Race Engineer.settings* file. It supports loading and saving the settings outside the standard location, thereby allows building a setup database. See the new documentation on the [race settings tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#race-engineer-settings) for more information
   4. Phrase grammars can be used directly as controller function hotkeys. See the [updated documentation on configuring hotkeys](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller) for an introduction to voice triggers
   5. More stability improvements for Jona
   6. Update of the voice server process - this process will be started automatically by *Simulator Startup* and will stay open all the time. Normally you can ignore it, since it is controlled by the other Simulator Controller applications. But if you experience problems and want to disable voice completely, go to the Tray area of the Windows taskbar, right click on the *Voice Server.exe* icon and choose Exit.
@@ -3229,7 +3229,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Introduction of the **alpha** version of Jona, the AI based Virtual Race Engineer. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer) for a comprehensive overview of Jona.
+  3. Introduction of the **alpha** version of Jona, the AI based AI Race Engineer. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer) for a comprehensive overview of Jona.
   4. A new plugin "Pedal Calibration" allows you to dial in different calibration curves for your high end pedals (Heusinkveld) directly from the Button Box. An adoption to a different pedal vendor is possible without much effort.
   5. A lot of new stuff for developers:
      - A hybrid rule engine, which supports production rules like OPS5 and reduction rules like in Prolog. The rules are fully integrated with the AutoHotkey scripting language, thereby creating a rich, hybrid programming environment

@@ -1,4 +1,4 @@
-Vous trouverez ci-dessous une liste complète de toutes les commandes vocales reconnues par Aiden, le coach de conduite virtuel ainsi qu'une brève introduction à la syntaxe des grammaires de phrases.
+Vous trouverez ci-dessous une liste complète de toutes les commandes vocales reconnues par Aiden, le coach de conduite AI ainsi qu'une brève introduction à la syntaxe des grammaires de phrases.
 
 ## Syntaxe
 
@@ -101,4 +101,4 @@ Information=informations sur la session, informations sur le relais, information
 
 #### Conversation
 
-Vous utiliserez pour la plupart une conversation gratuite avec le Driving Coach. Par conséquent, chaque commande vocale qui ne correspond à aucune des commandes indiquées ci-dessus sera transmise au modèle de langage GPT, ce qui entraînera une boîte de dialogue de type humain, comme indiqué dans l'[exemple](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#a-typical-dialog).
+Vous utiliserez pour la plupart une conversation gratuite avec le Driving Coach. Par conséquent, chaque commande vocale qui ne correspond à aucune des commandes indiquées ci-dessus sera transmise au modèle de langage GPT, ce qui entraînera une boîte de dialogue de type humain, comme indiqué dans l'[exemple](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#a-typical-dialog).

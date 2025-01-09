@@ -1,4 +1,4 @@
-Vous trouverez ci-dessous une liste complète de toutes les commandes vocales reconnues par Cato, l'observateur virtuel de la course, ainsi qu'une brève introduction à la syntaxe des grammaires de phrases.
+Vous trouverez ci-dessous une liste complète de toutes les commandes vocales reconnues par Cato, l'observateur AI de la course, ainsi qu'une brève introduction à la syntaxe des grammaires de phrases.
 
 ## Syntaxe
 

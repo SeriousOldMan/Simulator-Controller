@@ -89,7 +89,7 @@ Final note: I would like to take the opportunity to thank the user "WallyM" of t
 
 The analyzer acquires telemetry data from the different simulation games using so called telemtry providers, which in most cases read the required data from a shared memory interface. In general these are already included in Simulator Controller and there is nothing to do, but for *Assetto Corsa*, *rFactor 2* and *Le Mans Ultimate*, you need to install and activate a plugin into a special location for the telemetry interface to work and for *Automobilista 2* and *Project CARS 2* a change in the settings is necessary.
 
-Please, note that all of this also applies to the Virtual Race Assistants, but you have to do it only once, of course.
+Please, note that all of this also applies to the AI Race Assistants, but you have to do it only once, of course.
 
   1. *Assetto Corsa*
   
@@ -168,7 +168,7 @@ The rules for the recommendations have been compiled from different sources, abo
 
 ## How it works
 
-"Setup Workbench" uses the same [Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine), that is used by the Virtual Race Assistants. A generic set of rules handle the overall computation and the analysis of the problem descriptions given by the driver. Each problem is identified by a descriptor, for example "Understeer.Corner.Exit.Fast" for understeering while accelerating out of fast corners. For each setup option, a descriptor exists as well, for example "Bumpstop.Range.Front.Left" for the length of the bumpstop rubber in the front left spring damper.
+"Setup Workbench" uses the same [Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine), that is used by the AI Race Assistants. A generic set of rules handle the overall computation and the analysis of the problem descriptions given by the driver. Each problem is identified by a descriptor, for example "Understeer.Corner.Exit.Fast" for understeering while accelerating out of fast corners. For each setup option, a descriptor exists as well, for example "Bumpstop.Range.Front.Left" for the length of the bumpstop rubber in the front left spring damper.
 
 During the first phase, the rule engine analyses all given problems and their "Importance" and "Severity" settings. A resulting correction value is derived, while handling contradictory requirements. Then a long list of rules are evaluated that look like this:
 

@@ -1,4 +1,4 @@
-Di seguito troverai l'elenco completo di tutti i comandi vocali riconosciuti da Jona, il l'ingegnere di pista virtuale insieme ad una breve introduzione alla sintassi delle grammatiche delle frasi.
+Di seguito troverai l'elenco completo di tutti i comandi vocali riconosciuti da Jona, il l'ingegnere di pista AI insieme ad una breve introduzione alla sintassi delle grammatiche delle frasi.
 
 ## Sintassi
 

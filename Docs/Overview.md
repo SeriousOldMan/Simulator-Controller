@@ -45,27 +45,27 @@ The documentation is devided into the following sections:
 	
   - [Strategy Workbench](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench)
 
-    This sophisticated application allows you to develop and simulate strategies for any type of race, ranging from a 30 minute, solo sprint race with one required pitstop up to full-weekend endurance races with multiple drivers. The strategy simulation is data-based and can even handle weather forecasts. A developed strategy can be handed over to the [Virtuak Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist), which then will keep track of the strategy during the race.
+    This sophisticated application allows you to develop and simulate strategies for any type of race, ranging from a 30 minute, solo sprint race with one required pitstop up to full-weekend endurance races with multiple drivers. The strategy simulation is data-based and can even handle weather forecasts. A developed strategy can be handed over to the [Virtuak Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist), which then will keep track of the strategy during the race.
 	
   - [Team Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center)
   
     Using the "Team Center", a complete pitwall application, you can plan the race, prepare a strategy and based on the strategy, the stint plan for the race. All team members or even a dedicated engineer can investigate the telemetry data and gather information about the race development in general. The car can be remotely controlled, for example to prepare an upcoming pitstop without any driver interaction. Last, but not least, if you encounter an unforeseen event during the race, you have various tools at hand to adopt the strategy to the new race situation. The "Team Center" requires all drivers to be connected to the ["Team Server"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) (see below).
   
-  - [Virtual Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach)
+  - [AI Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach)
 
     This a very special chatbot, which behaves as your personal driving coach. Based on text-based GPT technology, it uses a publically available large language model which has been trained with vasts amount of information. Ask anything about racing, car handling and driving techniques and you will probably will get an interesting answer.
 	
 	Additonally, you can activate an active coaching mode based on your cars telemetry data. If this mode is active, the coach can give you corner by corner instructions while you are driving. And you can discuss potential improvements for the whole lap or specific corners after the session. Reference laps from yourself or any other source can be used by the coach to boost your personal driving skills.
 	
-  - [Virtual Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer)
+  - [AI Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer)
 
-    You don't want to miss out Jona, the world first full voice dialog capable Virtual Race Engineer based on artificial intelligence algorithms. Jona keeps an eye on all the technical stuff regarding your car and will help you to determine the correct amount of fuel and the correct tyre pressures for an upcoming pitstop.
+    You don't want to miss out Jona, the world first full voice dialog capable AI Race Engineer based on artificial intelligence algorithms. Jona keeps an eye on all the technical stuff regarding your car and will help you to determine the correct amount of fuel and the correct tyre pressures for an upcoming pitstop.
 	
-  - [Virtual Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist)
+  - [AI Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist)
 
     Another Assistant, Cato, takes care of all strategic aspects during races with one or more pit stops, even under changing weather conditions. It will provide you with extensive after race reports for analysis and documentation and will help you with strategy development based on telemetry data of past sessions.
 	
-  - [Virtual Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter)
+  - [AI Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter)
 
     The third Race Assistant, Elisa, will watch your race and will warn you about nearby other cars and will give you valuable information about the current race situation.
 	
@@ -75,7 +75,7 @@ The documentation is devided into the following sections:
 	
   - [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server)
 
-    If you are participating in multiplayer team-based endurance races, you use the *Team Server* to share the car state and the knowledge ot the Virtual Race Assistants between all participating drivers. It is also necessary for using the "Team Center" in a team race.
+    If you are participating in multiplayer team-based endurance races, you use the *Team Server* to share the car state and the knowledge ot the AI Race Assistants between all participating drivers. It is also necessary for using the "Team Center" in a team race.
 	
   - [Development Guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts)
 

@@ -6,7 +6,7 @@ Important: "Session Database" displays some graphs using the Google chart librar
 
 Note: The database is stored in the *Simulator Controller\Database* folder, which is located in your users *Documents* folder. Your own data files will be located in the *User* subfolder, whereas the consolidated data will end up in the *Community* subfolder.
 
-*Very Important*: As long as we can't get the actual car setup information from the different simulation games via APIs, you **really** have to follow the guidelines mentioned [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings), so that the Assistants have a correct understanding of your initial car and tyre setup. This is important to get a correct setup for an upcoming pitstop by the Race Engineer, but it is even more important when building the databse, so that you do not end up with compromised data. Depending on your configuration, the Engineer will ask you at the end of the session, if you were happy with your setup and if you want to include the setup information in the database. Please only answer "Yes" here, if you are sure, that the setup information has been transferred correctly to Jona, as described above. Please note, that you still may have had a too low or too high hot tyre pressure during your session, because your initial setup was wrong in the first place. This is no problem, since the Engineer will store the corrected values in the database, as long as your initial setup values are known.
+*Very Important*: As long as we can't get the actual car setup information from the different simulation games via APIs, you **really** have to follow the guidelines mentioned [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#race-settings), so that the Assistants have a correct understanding of your initial car and tyre setup. This is important to get a correct setup for an upcoming pitstop by the Race Engineer, but it is even more important when building the databse, so that you do not end up with compromised data. Depending on your configuration, the Engineer will ask you at the end of the session, if you were happy with your setup and if you want to include the setup information in the database. Please only answer "Yes" here, if you are sure, that the setup information has been transferred correctly to Jona, as described above. Please note, that you still may have had a too low or too high hot tyre pressure during your session, because your initial setup was wrong in the first place. This is no problem, since the Engineer will store the corrected values in the database, as long as your initial setup values are known.
 
 ### Using the Solo Center
 
@@ -18,7 +18,7 @@ Whenever you have to setup your car for a given track and specific environmental
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%203.jpg)
 
-This tool gives you access to the database where you have access to the tyre pressures of all your past sessions, where you can store your track specific car setups and where you can provide default values for various settings for the Virtual Race Asssistants. These values can be used to initialize the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) using track and car specific default values. Telemetry information of all past sessions is also stored in the database. Use the ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench) to browse this data.
+This tool gives you access to the database where you have access to the tyre pressures of all your past sessions, where you can store your track specific car setups and where you can provide default values for various settings for the AI Race Asssistants. These values can be used to initialize the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#race-settings) using track and car specific default values. Telemetry information of all past sessions is also stored in the database. Use the ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench) to browse this data.
 
 You have to use the menus in the upper left area to specify the simulation, car, track, current weather and so on. After you have done that, you can select one of the database topics using the choice tabs.
 
@@ -40,7 +40,7 @@ Following you will find an overview about the different database topics:
 
 #### Race Settings
 
-The Virtual Race Assistants provide many settings, as you may have seen in the section about the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) in the documentation about the Race Engineer. Many values are specific for a given car or track, for example the pitstop delta or the time required to change tyres. You can change all these settings manually before each session, or you can store default values for all theses settings in the session database.
+The AI Race Assistants provide many settings, as you may have seen in the section about the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#race-settings) in the documentation about the Race Engineer. Many values are specific for a given car or track, for example the pitstop delta or the time required to change tyres. You can change all these settings manually before each session, or you can store default values for all theses settings in the session database.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%205.jpg)
 
@@ -91,7 +91,7 @@ To start a new section, simply click on a position on the track and choose wheth
 
 When defining sections and you want to work with telemetry data or use the on-track coaching of the Driving Coach, it is important to set the section starting point before any section specific driver inputs take place. For example, a corner section should include the complete braking phase and also the initial part of the acceleration phase until the car has settled.
 
-With the second editor you can define automatic actions for specific locations at the track. Since this is a very extensive functionality and observing your car and its position on the track is the duty of the Race Spotter, there is a [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-automations) in the documentation of the Virtual Race Spotter, which shows how to setup and use track automations.
+With the second editor you can define automatic actions for specific locations at the track. Since this is a very extensive functionality and observing your car and its position on the track is the duty of the Race Spotter, there is a [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#track-automations) in the documentation of the AI Race Spotter, which shows how to setup and use track automations.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2013.jpg)
 
@@ -167,7 +167,7 @@ Good to know: When importing lap telemetry data directly in the "Laps" tab of "S
 
 For unknown (and maybe historical) reasons *Assetto Corsa Competizione* supplies two different APIs, one of which comes with a very low refresh rate. The first is the so called shared memory API which provides a complete set of car telemetry data, but unfortunately not the current distance into the track spline. This information is provided in the so called UDP interface, which is network based and uses a low refresh rate. Long story short, collecting position dependent telemetry data for *Assetto Corsa Competizione* is complicated and unprecise to say the least.
 
-To get high precision samples with a resolution of at least 20 Hz, the telemetry collector implements a special method. This method first learns the layout of the track in the same manner as [track mapping for *iRacing*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#special-notes-about-track-mapping-in-iracing) is implemented, before telemetry data can be correlated to the track position. Therefore be sure to drive clean during the first laps.
+To get high precision samples with a resolution of at least 20 Hz, the telemetry collector implements a special method. This method first learns the layout of the track in the same manner as [track mapping for *iRacing*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#special-notes-about-track-mapping-in-iracing) is implemented, before telemetry data can be correlated to the track position. Therefore be sure to drive clean during the first laps.
 
 A drawback of this method is, that telemetry data can be reliably compared to each other only within one single session. The Telemetry Viewer provides the possibility to shift lap data *horizontally*, but there also may be subtle differences in track position between sessions. Be aware of that when comparing lap telemetry data of different sessions.
 
@@ -218,7 +218,7 @@ Here you will get a recommendation for initial cold tyre pressures, if a matchin
 Notes:
 
   1. If you choose a specific driver in the "Driver" menu, only the tyre pressures of this driver are shown, if available.
-  2. If the "Session Database" tool has been [started by the "Race Settings" tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race), you can transfer the current tyre pressure and compound information to the *Race Settings* by pressing the "Load" button.
+  2. If the "Session Database" tool has been [started by the "Race Settings" tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-race), you can transfer the current tyre pressure and compound information to the *Race Settings* by pressing the "Load" button.
   3. You can configure using the settings in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#race-settings) the session types, from which tyre pressure data will be collected and stored into the database by the Race Engineer. Default is to collect tyre pressure data during practice and race sessions.
 
 ##### Browsing and editing Tyre Pressures

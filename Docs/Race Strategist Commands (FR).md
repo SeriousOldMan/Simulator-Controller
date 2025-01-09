@@ -1,4 +1,4 @@
-Vous trouverez ci-dessous une liste complète de toutes les commandes vocales reconnues par Cato, le stratège de la course virtuelle, ainsi qu'une brève introduction à la syntaxe des grammaires de phrases.
+Vous trouverez ci-dessous une liste complète de toutes les commandes vocales reconnues par Cato, le stratège de la course AI, ainsi qu'une brève introduction à la syntaxe des grammaires de phrases.
 
 ## Syntaxe
 

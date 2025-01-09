@@ -155,7 +155,7 @@ Note: With the introduction of Release 2.0, the *ACC* plugin has become much mor
 
 ## Rule Engine
 
-A very important part of many applications of Simulator Controller, especially the Virtual Race Assistants, is the builtin Hybrid Rule Engine. This has been created exclusively for Simulator Controller and requires therefore its own documentation. You can find that documentation in a [separate chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine).
+A very important part of many applications of Simulator Controller, especially the AI Race Assistants, is the builtin Hybrid Rule Engine. This has been created exclusively for Simulator Controller and requires therefore its own documentation. You can find that documentation in a [separate chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine).
 
 ## Debugging
 

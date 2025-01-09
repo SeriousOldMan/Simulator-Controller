@@ -91,4 +91,4 @@ Information=Session Information, Stint Information, Information zum Fahrverhalte
 
 #### Gespräch
 
-Daneben kannst Du größtenteils einen freien Dialog mit dem Fahrtrainer führen. Daher wird jeder Sprachbefehl, der keinem der oben gezeigten Befehle entspricht, an das GPT-Sprachmodell weitergeleitet. Das Resultat ist ein sehr natürlicher Dialog mit dem virtuellen Fahrtrainer, wie im [Beispiel](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Driving-Coach#a-typical-dialog) gezeigt.
+Daneben kannst Du größtenteils einen freien Dialog mit dem Fahrtrainer führen. Daher wird jeder Sprachbefehl, der keinem der oben gezeigten Befehle entspricht, an das GPT-Sprachmodell weitergeleitet. Das Resultat ist ein sehr natürlicher Dialog mit dem virtuellen Fahrtrainer, wie im [Beispiel](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#a-typical-dialog) gezeigt.

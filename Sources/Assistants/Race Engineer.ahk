@@ -47,7 +47,7 @@ showLogo(name) {
 	local info := kVersion . " - 2025, Oliver Juwig`nCreative Commons - BY-NC-SA"
 	local logo := kResourcesDirectory . "Rotating Brain.gif"
 	local title1 := translate("Modular Simulator Controller System")
-	local title2 := substituteVariables(translate("%name% - The Virtual Race Engineer"), {name: name})
+	local title2 := substituteVariables(translate("%name% - The AI Race Engineer"), {name: name})
 	local mainScreenTop, mainScreenLeft, mainScreenRight, mainScreenBottom, x, y, html
 	local logoGui, videoPlayer
 

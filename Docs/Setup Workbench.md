@@ -221,7 +221,7 @@ Although it is possible to introduce support for a completely new simulator, muc
 
 ### Introducing a new car
 
-General car meta data is managed in the files "Car Data.ini" and "Tyre Data.ini" which can be found in *Resources\Simulator Data\[Simulator]* in the program folder (with [Simulator] substituted with "AC" or "ACC" and so on). If your specific car is not already available, you can create an entry for your own car by placing corresponding files in the *Simulator Controller\Simulator Data\[Simulator]* folder which resides in your user *Documents* folder. Use one of the already available cars as a template for your own entries.
+General car meta data is managed in the files "Car Data.ini" and "Tyre Data.ini" which can be found in *Resources\Simulator Data\\[Simulator]* in the program folder (with [Simulator] substituted with "AC" or "ACC" and so on). If your specific car is not already available, you can create an entry for your own car by placing corresponding files in the *Simulator Controller\Simulator Data\\[Simulator]* folder which resides in your user *Documents* folder. Use one of the already available cars as a template for your own entries.
 
 Once the car is generally known to Simulator Controller, proceed to the next section.
 

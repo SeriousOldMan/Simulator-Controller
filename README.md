@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.1.1.0-alpha](https://www.dropbox.com/scl/fi/imy5kdh0zeplssh78wqgn/Simulator-Controller-6.1.1.0-alpha.zip?rlkey=hyxlkdcmgyf3edyjx3yn91aup&st=4enid1du&dl=1) (Test build for 6.1.1. Changes: Full support for Le Mans Ultimate in "Setup Workbench", Unit conversion for pressures in "Setup Workbench", Filter safety car from the grid in AMS2, Fixed Stream Deck Icons, Acknowledge sound for Conversation booster activation, Optimized strategy announcement by Strategist, Increased reliability of track spline builder for ACC, Added auto request pitstop for rF2 and LMU.)
+[6.1.1.0-beta](https://www.dropbox.com/scl/fi/9jlsttlhkeqsfemlumop6/Simulator-Controller-6.1.1.0-beta.zip?rlkey=emkiwmivia7hjf1fdjrzwb6m6&st=vehrq2if&dl=1) (Test build for 6.1.1. Changes: Full support for Le Mans Ultimate in "Setup Workbench", Unit conversion for pressures in "Setup Workbench", Filter safety car from the grid in AMS2, Fixed Stream Deck Icons, Acknowledge sound for Conversation booster activation, Optimized strategy announcement by Strategist, Increased reliability of track spline builder for ACC, Added auto request pitstop for rF2 and LMU, Support for rF2 in "Setup Workbench".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-611) of this version and all the versions you might have skipped, before installing and using this version.
 

@@ -540,9 +540,16 @@ class LMUPlugin extends Sector397Plugin {
 	readSessionData(options := "", protocol?) {
 		local simulator := this.Simulator[true]
 		local car, track, data, setupData, tyreCompound, tyreCompoundColor, key, postFix, fuelAmount
+		local weatherData, lap, weather, time, session, remainingTime
 
 		static keys := Map("All", "", "Front Left", "FrontLeft", "Front Right", "FrontRight"
 									, "Rear Left", "RearLeft", "Rear Right", "RearRight")
+
+		static lastLap := 0
+		static duration := false
+		static lastWeather := false
+		static lastWeather10Min := false
+		static lastWeather30Min := false
 
 		if InStr(options, "Setup=true") {
 			car := this.Car
@@ -588,6 +595,49 @@ class LMUPlugin extends Sector397Plugin {
 
 			car := this.TeamData.Car
 			track := this.TrackData.Track
+
+			lap := getMultiMapValue("Stint Data", "Laps", 0)
+
+			if ((lap < lastLap) || (lap = 0) || (lap > (lastLap + 1))) {
+				lastLap := 0
+
+				lastWeather := getMultiMapValue(data, "Weather Data", "Weather", "Dry")
+				lastWeather10Min := getMultiMapValue(data, "Weather Data", "Weather10Min", "Dry")
+				lastWeather30Min := getMultiMapValue(data, "Weather Data", "Weather30Min", "Dry")
+
+				duration := (LMURESTProvider.SessionData().Duration[getMultiMapValue(data, "Session Data"
+																						 , "Session", "Race")] * 1000)
+			}
+
+			if (lap != lastLap) {
+				lastLap := lap
+
+				session := getMultiMapValue(data, "Session Data", "Session", "Race")
+				remainingTime := getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0)
+				weatherData := LMURestProvider.WeatherData()
+
+				time := Round(100 - (remainingTime / duration * 100))
+				weather := weatherData.RainLevel[session, time]
+
+				if weather
+					lastWeather := weather
+
+				time := Round(100 - (Max(0, remainingTime - 600000) / duration * 100))
+				weather := weatherData.RainLevel[session, time]
+
+				if weather
+					lastWeather10Min := weather
+
+				time := Round(100 - (Max(0, remainingTime - 1800000) / duration * 100))
+				weather := weatherData.RainLevel[session, time]
+
+				if weather
+					lastWeather30Min := weather
+			}
+
+			setMultiMapValue(data, "Weather Data", "Weather", lastWeather)
+			setMultiMapValue(data, "Weather Data", "Weather10Min", lastWeather10Min)
+			setMultiMapValue(data, "Weather Data", "Weather30Min", lastWeather30Min)
 
 			if car
 				setMultiMapValue(data, "Session Data", "Car", car)

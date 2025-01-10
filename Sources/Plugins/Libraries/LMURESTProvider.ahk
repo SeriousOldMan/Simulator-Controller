@@ -19,7 +19,7 @@
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class LMURESTProvider {
+class LMURestProvider {
 	static sTyreTypes := CaseInsenseMap("All", "FL", "FL", "FL", "FR", "FR", "RL", "RL", "RR", "RR"
 									  , "Front Left", "FL", "Front Right", "FR", "Rear Left", "RL", "Rear Right", "RR")
 
@@ -77,47 +77,61 @@ class LMURESTProvider {
 			this.iTrack := track
 		}
 
-		read() {
-			try {
-				this.iData := WinHttpRequest({Timeouts: [0, 5000, 5000, 5000]}).GET(this.GETURL, "", false, {Encoding: "UTF-8"}).JSON
+		read(url := this.GETURL, update := true) {
+			local data
 
-				if !isObject(this.iData)
-					this.iData := false
+			try {
+				data := WinHttpRequest({Timeouts: [0, 5000, 5000, 5000]}).GET(url, "", false, {Encoding: "UTF-8"}).JSON
+
+				if !isObject(data)
+					data := false
+
+				if update
+					this.iData := data
 			}
 			catch Any as exception {
 				logError(exception)
 
-				this.iData := false
+				if update
+					this.iData := false
+
+				data := false
 			}
+
+			return data
 		}
 
-		write() {
-			local data := JSON.print(this.Data, "  ")
+		write(url := this.PUTURL, data := this.Data) {
+			if data {
+				data := JSON.print(data, "  ")
 
-			if this.Data
 				try {
-					WinHttpRequest({Timeouts: [0, 5000, 5000, 5000]}).POST(this.PUTURL, data, false, {Object: true, Encoding: "UTF-8"})
+					WinHttpRequest({Timeouts: [0, 5000, 5000, 5000]}).POST(url, data, false, {Object: true, Encoding: "UTF-8"})
 				}
 				catch Any as exception {
 					logError(exception, true)
 				}
+			}
 		}
 
-		lookup(name) {
+		lookup(name, data := this.Data, cache := true) {
 			local ignore, candidate
 
-			if this.iCachedObjects.Has(name)
+			if (cache && this.iCachedObjects.Has(name))
 				return this.iCachedObjects[name]
-			else if this.Data {
-				for ignore, candidate in this.Data
+			else if data {
+				for ignore, candidate in data
 					if (candidate.Has("name") && (candidate["name"] = name)) {
-						this.iCachedObjects[name] := candidate
+						if cache
+							this.iCachedObjects[name] := candidate
 
 						return candidate
 					}
 
 				return false
 			}
+			else
+				return false
 		}
 	}
 
@@ -744,6 +758,24 @@ class LMURESTProvider {
 		}
 	}
 
+	class SessionData extends LMURESTProvider.RESTData {
+		GETURL {
+			Get {
+				return "?????"
+			}
+		}
+
+		Duration[session] {
+			Get {
+				return this.getSession(session)
+			}
+		}
+
+		getDuration(session) {
+			return 3600000
+		}
+	}
+
 	class TrackData extends LMURESTProvider.RESTData {
 		iCachedTrack := false
 
@@ -904,27 +936,157 @@ class LMURESTProvider {
 		}
 	}
 
-	class GarageData extends LMURESTProvider.RESTData {
-		POSTURL {
+	class WeatherData extends LMURESTProvider.RESTData {
+		GETURL {
 			Get {
-				return "http://localhost:6397/rest/garage/refreshsetups"
+				return "http://localhost:6397/rest/sessions/weather"
 			}
 		}
 
-		refreshSetups() {
-			try {
-				WinHttpRequest().POST(this.POSTURL, "", false, {Encoding: "UTF-8"})
+		Humidity[session := "Now", time := false] {
+			Get {
+				return this.getHumidity(session, time)
 			}
-			catch Any as exception {
-				msgbox 1
-				logError(exception)
+		}
+
+		RainChance[session := "Now", time := false] {
+			Get {
+				return this.getRainChance(session, time)
 			}
+		}
+
+		RainLevel[session := "Now", time := false] {
+			Get {
+				return this.getRainLevel(session, time)
+			}
+		}
+
+		getHumidity(session, time) {
+			local data, name
+
+			if (session = "Now") {
+				data := this.read("http://localhost:6397/rest/sessions/GetGameState", false)
+
+				if data.Has("closeestWeatherNode")
+					return Round(data["closeestWeatherNode"]["Humidity"])
+				else
+					return false
+			}
+			else if isNumber(time) {
+				if ((session = "Qualification") || (session = "Qualifying"))
+					session := "QUALIFY"
+				else
+					session := StrUpper(session)
+
+				data := this.Data
+
+				if (data && data.Has(session)) {
+					data := data[session]
+					time := Max(0, Min(100, (Round(time / 25) * 25)))
+
+					switch time {
+						case 0:
+							name := "START"
+						case 100:
+							name := "FINISH"
+						default:
+							name := ("Node_" . time)
+					}
+
+					if data.Has(name)
+						return data[name]["WNV_HUMIDITY"]["currentValue"]
+					else
+						return false
+				}
+				else
+					return false
+			}
+			else
+				throw ("Unsupported time " . time . " detected in WeatherData.getHumidity...")
+		}
+
+		getRainChance(session, time) {
+			local data, name
+
+			if (session = "Now") {
+				data := this.read("http://localhost:6397/rest/sessions/GetGameState", false)
+
+				if data.Has("closeestWeatherNode")
+					return Round(data["closeestWeatherNode"]["RainChance"])
+				else
+					return false
+			}
+			else if isNumber(time) {
+				if ((session = "Qualification") || (session = "Qualifying"))
+					session := "QUALIFY"
+				else
+					session := StrUpper(session)
+
+				data := this.Data
+
+				if (data && data.Has(session)) {
+					data := data[session]
+					time := Max(0, Min(100, (Round(time / 25) * 25)))
+
+					switch time {
+						case 0:
+							name := "START"
+						case 100:
+							name := "FINISH"
+						default:
+							name := ("Node_" . time)
+					}
+
+					if data.Has(name)
+						return data[name]["WNV_RAIN_CHANCE"]["currentValue"]
+					else
+						return false
+				}
+				else
+					return false
+			}
+			else
+				throw ("Unsupported time " . time . " detected in WeatherData.getRainChance...")
+		}
+
+		getRainLevel(session, time) {
+			local humidity := this.Humidity[session, time]
+			local rainChance := this.RainChance[session, time]
+
+			if (rainChance >= 90) {
+				if ((rainChance >= 95) && (humidity >= 95))
+					return "ThunderStorm"
+				else if (humidity >= 90)
+					return "HeavyRain"
+				else
+					return "MediumRain"
+			}
+			else if (rainChance >= 70) {
+				if (humidity >= 90)
+					return "MediumRain"
+				else
+					return "LightRain"
+			}
+			else if (rainChance >= 60) {
+				if (humidity >= 90)
+					return "LightRain"
+				else
+					return "Drizzle"
+			}
+			else if (rainChance >= 40) {
+				if (humidity >= 90)
+					return "Drizzle"
+				else
+					return "Dry"
+			}
+			else
+				return "Dry"
 		}
 	}
 
 	static TyreTypes {
 		Get {
-			return LMURESTProvider.sTyreTypes
+			return LMURestProvider.sTyreTypes
 		}
 	}
 }

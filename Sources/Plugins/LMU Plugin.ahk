@@ -617,19 +617,19 @@ class LMUPlugin extends Sector397Plugin {
 				weatherData := LMURestProvider.WeatherData()
 
 				time := Round(100 - (remainingTime / duration * 100))
-				weather := weatherData.RainLevel[session, time]
+				weather := weatherData.Weather["Now"]
 
 				if weather
 					lastWeather := weather
 
 				time := Round(100 - (Max(0, remainingTime - 600000) / duration * 100))
-				weather := weatherData.RainLevel[session, time]
+				weather := weatherData.Weather[session, time]
 
 				if weather
 					lastWeather10Min := weather
 
 				time := Round(100 - (Max(0, remainingTime - 1800000) / duration * 100))
-				weather := weatherData.RainLevel[session, time]
+				weather := weatherData.Weather[session, time]
 
 				if weather
 					lastWeather30Min := weather

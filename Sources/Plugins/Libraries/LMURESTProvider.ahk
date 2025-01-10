@@ -761,7 +761,7 @@ class LMURestProvider {
 	class SessionData extends LMURESTProvider.RESTData {
 		GETURL {
 			Get {
-				return "?????"
+				return "http://localhost:6397/rest/sessions/GetSessionsInfoForEvent"
 			}
 		}
 
@@ -771,8 +771,42 @@ class LMURestProvider {
 			}
 		}
 
+		RainChance[session] {
+			Get {
+				return this.getRainChance(session)
+			}
+		}
+
 		getDuration(session) {
-			return 3600000
+			local ignore, candidate
+
+			if InStr(session, "Qualif")
+				session := "QUALIFY"
+			else
+				session := StrUpper(session)
+
+			if (this.Data && this.Data.Has("scheduledSessions"))
+				for ignore, candidate in this.Data["scheduledSessions"]
+					if InStr(candidate["name"], session)
+						return (candidate["lengthTime"] * 60)
+
+			return false
+		}
+
+		getRainChance(session) {
+			local ignore, candidate
+
+			if InStr(session, "Qualif")
+				session := "QUALIFY"
+			else
+				session := StrUpper(session)
+
+			if (this.Data && this.Data.Has("scheduledSessions"))
+				for ignore, candidate in this.Data["scheduledSessions"]
+					if InStr(candidate["name"], session)
+						return candidate["rainChance"]
+
+			return false
 		}
 	}
 
@@ -961,6 +995,27 @@ class LMURestProvider {
 			}
 		}
 
+		Weather[session := "Now", time := false] {
+			Get {
+				return this.getRainLevel(session, time)
+			}
+		}
+
+		getWeather(index) {
+			if (index >= 10)
+				return "Thunderstorm"
+			else if (index >= 9)
+				return "HeavyRain"
+			else if (index >= 8)
+				return "MediumRain"
+			else if (index >= 6)
+				return "LightRain"
+			else if (index >= 5)
+				return "Drizzle"
+			else
+				return "Dry"
+		}
+
 		getHumidity(session, time) {
 			local data, name
 
@@ -973,7 +1028,7 @@ class LMURestProvider {
 					return false
 			}
 			else if isNumber(time) {
-				if ((session = "Qualification") || (session = "Qualifying"))
+				if InStr(session, "Qualif")
 					session := "QUALIFY"
 				else
 					session := StrUpper(session)
@@ -1012,12 +1067,12 @@ class LMURestProvider {
 				data := this.read("http://localhost:6397/rest/sessions/GetGameState", false)
 
 				if data.Has("closeestWeatherNode")
-					return Round(data["closeestWeatherNode"]["RainChance"])
+					return this.getWeather(data["closeestWeatherNode"]["RainChance"])
 				else
 					return false
 			}
 			else if isNumber(time) {
-				if ((session = "Qualification") || (session = "Qualifying"))
+				if InStr(session, "Qualif")
 					session := "QUALIFY"
 				else
 					session := StrUpper(session)
@@ -1038,7 +1093,51 @@ class LMURestProvider {
 					}
 
 					if data.Has(name)
-						return data[name]["WNV_RAIN_CHANCE"]["currentValue"]
+						return this.getWeather(data[name]["WNV_RAIN_CHANCE"]["currentValue"])
+					else
+						return false
+				}
+				else
+					return false
+			}
+			else
+				throw ("Unsupported time " . time . " detected in WeatherData.getRainLevel...")
+		}
+
+		getRainLevel(session, time) {
+			local data, name
+
+			if (session = "Now") {
+				data := this.read("http://localhost:6397/rest/sessions/GetGameState", false)
+
+				if data.Has("closeestWeatherNode")
+					return Round(data["closeestWeatherNode"]["Sky"])
+				else
+					return false
+			}
+			else if isNumber(time) {
+				if InStr(session, "Qualif")
+					session := "QUALIFY"
+				else
+					session := StrUpper(session)
+
+				data := this.Data
+
+				if (data && data.Has(session)) {
+					data := data[session]
+					time := Max(0, Min(100, (Round(time / 25) * 25)))
+
+					switch time {
+						case 0:
+							name := "START"
+						case 100:
+							name := "FINISH"
+						default:
+							name := ("Node_" . time)
+					}
+
+					if data.Has(name)
+						return data[name]["WNV_SKY"]["currentValue"]
 					else
 						return false
 				}
@@ -1047,40 +1146,6 @@ class LMURestProvider {
 			}
 			else
 				throw ("Unsupported time " . time . " detected in WeatherData.getRainChance...")
-		}
-
-		getRainLevel(session, time) {
-			local humidity := this.Humidity[session, time]
-			local rainChance := this.RainChance[session, time]
-
-			if (rainChance >= 90) {
-				if ((rainChance >= 95) && (humidity >= 95))
-					return "ThunderStorm"
-				else if (humidity >= 90)
-					return "HeavyRain"
-				else
-					return "MediumRain"
-			}
-			else if (rainChance >= 70) {
-				if (humidity >= 90)
-					return "MediumRain"
-				else
-					return "LightRain"
-			}
-			else if (rainChance >= 60) {
-				if (humidity >= 90)
-					return "LightRain"
-				else
-					return "Drizzle"
-			}
-			else if (rainChance >= 40) {
-				if (humidity >= 90)
-					return "Drizzle"
-				else
-					return "Dry"
-			}
-			else
-				return "Dry"
 		}
 	}
 

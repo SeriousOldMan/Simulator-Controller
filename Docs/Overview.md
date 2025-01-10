@@ -45,7 +45,7 @@ The documentation is devided into the following sections:
 	
   - [Strategy Workbench](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench)
 
-    This sophisticated application allows you to develop and simulate strategies for any type of race, ranging from a 30 minute, solo sprint race with one required pitstop up to full-weekend endurance races with multiple drivers. The strategy simulation is data-based and can even handle weather forecasts. A developed strategy can be handed over to the [Virtuak Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist), which then will keep track of the strategy during the race.
+    This sophisticated application allows you to develop and simulate strategies for any type of race, ranging from a 30 minute, solo sprint race with one required pitstop up to full-weekend endurance races with multiple drivers. The strategy simulation is data-based and can even handle weather forecasts. A developed strategy can be handed over to the [AI Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist), which then will keep track of the strategy during the race.
 	
   - [Team Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center)
   

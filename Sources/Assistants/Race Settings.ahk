@@ -1073,7 +1073,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.SetFont("Norm", "Arial")
 
 		settingsGui.Add("Documentation", "x118 YP+20 w168 Center", translate("Race Settings")
-					  , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings")
+					  , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#race-settings")
 
 		settingsGui.SetFont("Norm", "Arial")
 

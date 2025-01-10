@@ -1,4 +1,4 @@
-Di seguito troverai l'elenco completo di tutti i comandi vocali riconosciuti da Cato, il spotter di gara virtuale insieme ad una breve introduzione alla sintassi delle grammatiche delle frasi.
+Di seguito troverai l'elenco completo di tutti i comandi vocali riconosciuti da Cato, il spotter di gara AI insieme ad una breve introduzione alla sintassi delle grammatiche delle frasi.
 
 ## Sintassi
 

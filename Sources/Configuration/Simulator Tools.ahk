@@ -373,7 +373,10 @@ checkInstallation() {
 
 							Download(url, A_Temp . "\Temp.zip")
 
-							urlError := !FileExist(A_Temp . "\Temp.zip")
+							if FileExist(A_Temp . "\Temp.zip")
+								urlError := false
+							else
+								urlError := "Package URL not defined..."
 						}
 						catch Any as exception {
 							urlError := exception

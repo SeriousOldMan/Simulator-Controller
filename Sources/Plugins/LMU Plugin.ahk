@@ -589,6 +589,8 @@ class LMUPlugin extends Sector397Plugin {
 			setMultiMapValue(data, "Setup Data", "RepairEngine", setupData.RepairEngine)
 
 			this.iFuelRatio := setupData.FuelRatio
+
+			setMultiMapValue(data, "Setup Data", "ServiceTime", LMURESTProvider.ServiceData().ServiceTime)
 		}
 		else {
 			data := super.readSessionData(options, protocol?)

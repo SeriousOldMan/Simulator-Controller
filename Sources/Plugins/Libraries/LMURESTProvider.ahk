@@ -626,6 +626,27 @@ class LMURestProvider {
 		}
 	}
 
+	class ServiceData extends LMURESTProvider.RESTData {
+		GETURL {
+			Get {
+				return "http://localhost:6397/rest/garage/UIScreen/RepairAndRefuel"
+			}
+		}
+
+		ServiceTime {
+			Get {
+				return this.getServiceTime()
+			}
+		}
+
+		getServiceTime() {
+			if (this.Data && this.Data.Has("pitstopLength"))
+				return this.Data["pitstopLength"]["timeInSeconds"]
+			else
+				return false
+		}
+	}
+
 	class SetupData extends LMURESTProvider.RESTData {
 		GETURL {
 			Get {

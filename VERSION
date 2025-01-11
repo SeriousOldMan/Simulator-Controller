@@ -1,9 +1,9 @@
 [Development]
 Version=6.1.2.0-dev
 Target=6.1.2.0-release
-Date=01/10/2025
+Date=01/11/2025
 Download=
-Changes=Support for weather forecast in LMU, Major rework of the documentation
+Changes=Major rework of the documentation, Support for weather forecast in LMU, Aproximated grip status for LMU, Pitstop service time for LMU
 Components=Media->5.6.1,Configuration->6.1.0,Utilities->5.9.8
 [Release]
 Version=6.1.1.0-release

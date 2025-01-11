@@ -788,7 +788,7 @@ class LMURestProvider {
 
 		Duration[session] {
 			Get {
-				return this.getSession(session)
+				return this.getDuration(session)
 			}
 		}
 
@@ -1043,7 +1043,7 @@ class LMURestProvider {
 			if (session = "Now") {
 				data := this.read("http://localhost:6397/rest/sessions/GetGameState", false)
 
-				if data.Has("closeestWeatherNode")
+				if (data && data.Has("closeestWeatherNode"))
 					return Round(data["closeestWeatherNode"]["Humidity"])
 				else
 					return false
@@ -1087,7 +1087,7 @@ class LMURestProvider {
 			if (session = "Now") {
 				data := this.read("http://localhost:6397/rest/sessions/GetGameState", false)
 
-				if data.Has("closeestWeatherNode")
+				if (data && data.Has("closeestWeatherNode"))
 					return this.getWeather(data["closeestWeatherNode"]["RainChance"])
 				else
 					return false
@@ -1131,8 +1131,8 @@ class LMURestProvider {
 			if (session = "Now") {
 				data := this.read("http://localhost:6397/rest/sessions/GetGameState", false)
 
-				if data.Has("closeestWeatherNode")
-					return Round(data["closeestWeatherNode"]["Sky"])
+				if (data && data.Has("closeestWeatherNode"))
+					return this.getWeather(data["closeestWeatherNode"]["Sky"])
 				else
 					return false
 			}
@@ -1158,7 +1158,7 @@ class LMURestProvider {
 					}
 
 					if data.Has(name)
-						return data[name]["WNV_SKY"]["currentValue"]
+						return this.getWeather(data[name]["WNV_SKY"]["currentValue"])
 					else
 						return false
 				}

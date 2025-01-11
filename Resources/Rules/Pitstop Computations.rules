@@ -49,9 +49,6 @@ pitstopDeltaTime(?lap, ?fuel, ?tyreCompound, ?pitstopDeltaTime) <=
 		pitstopServiceTime(?refuelServiceTime, !Session.Settings.Pitstop.Service.Tyres.Duration, ?temp1),
 		?temp2 = !Session.Settings.Pitstop.Delta + ?temp1, ?pitstopDeltaTime = ?temp2 * 1000
 
-pitstopDeltaTime(?lap, ?targetLap, ?pitstopDeltaTime) <= bound?(!Target.Time.Box.Fixed), !,
-														 ?temp = !Session.Settings.Pitstop.Delta * 1000,
-														 ?pitstopDeltaTime = !Target.Time.Box.Fixed + ?temp 
 pitstopDeltaTime(?lap, ?targetLap, ?pitstopDeltaTime) <= pitstopRefuelServiceTime(?lap, ?targetLap, ?refuelServiceTime),
 														 pitstopTyreServiceTime(?lap, ?targetLap, ?tyreServiceTime),
 														 pitstopServiceTime(?refuelServiceTime, ?tyreServiceTime, ?temp1),

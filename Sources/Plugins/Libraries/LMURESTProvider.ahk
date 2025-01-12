@@ -286,8 +286,16 @@ class LMURestProvider {
 			else {
 				fuel := this.lookup("FUEL:")
 
-				if fuel
-					return string2Values("l/", fuel["settings"][fuel["currentSetting"]]["text"])[1]
+				if fuel {
+					fuel := fuel["settings"][fuel["currentSetting"]]["text"]
+
+					if InStr(fuel, "gal/")
+						fuel := (string2Values("gal/", fuel)[1] * 4.54609)
+					else
+						fuel := string2Values("l/", fuel)[1]
+
+					return fuel
+				}
 				else
 					return false
 			}
@@ -305,7 +313,12 @@ class LMURestProvider {
 
 				if fuel {
 					for index, value in fuel["settings"] {
-						value := string2Values("l/", value["text"])[1]
+						value := value["text"]
+
+						if InStr(value, "gal/")
+							value := (string2Values("gal/", value)[1] * 4.54609)
+						else
+							value := string2Values("l/", value)[1]
 
 						if (value > liters) {
 							fuel["currentSetting"] := (index - 1)

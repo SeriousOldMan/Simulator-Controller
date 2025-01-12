@@ -3,7 +3,7 @@ Version=6.1.2.0-dev
 Target=6.1.2.0-release
 Date=01/12/2025
 Download=
-Changes=Major rework of the documentation, Support for weather forecast in LMU, Aproximated grip status for LMU, Pitstop service time for LMU, Changed default activation recognizer to "Desktop"
+Changes=Major rework of the documentation, Support for weather forecast in LMU, Aproximated grip status for LMU, Pitstop service time for LMU, Changed default activation recognizer to "Desktop", Fixed some bugs for LMU if imperial units are selected
 Components=Media->5.6.1,Configuration->6.1.0,Utilities->5.9.8
 [Release]
 Version=6.1.1.0-release

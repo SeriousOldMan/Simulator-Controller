@@ -839,7 +839,7 @@ class VoiceServer extends ConfigurationItem {
 						settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 
 						this.iSpeechRecognizer := VoiceServer.ActivationSpeechRecognizer(getMultiMapValue(settings, "Voice", "Activation Recognizer"
-																										, getMultiMapValue(settings, "Voice", "ActivationRecognizer", "Server"))
+																										, getMultiMapValue(settings, "Voice", "ActivationRecognizer", "Desktop"))
 																					   , true, this.Language, true)
 
 						if (this.iSpeechRecognizer.Recognizers.Length = 0)

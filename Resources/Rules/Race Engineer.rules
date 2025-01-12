@@ -436,7 +436,6 @@ updatePitstopTargetTime() <= computeTargetDamages(?damages),
 
 computeTargetDamages(?damages) <= computeDamages([true, true, true], [!Damage.Bodywork, !Damage.Suspension, !Damage.Engine], ?damages)
 
-
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Damage Impact Analysis                         ;;;
 ;;;                                                                         ;;;

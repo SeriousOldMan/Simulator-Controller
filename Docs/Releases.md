@@ -1,3 +1,13 @@
+## 6.1.2.0-release 01/17/25 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Fixed some calculations for *Le Mans Ultimate* with regards to imperial units.
+  4. Changed default for activation recognizer to "Windows (Desktop)" rather than "Windows (Server)" voice recognition.
+  5. Major update to the documentation - removed the term "virtual".
+  6. A detailed weather forecast is now available for *Le Mans Ultimate*.
+  7. The track grip status has been refined for *rFactor 2* and *Le Mans Ultimate*. It is now mostly consistent with the status given in the simulator.
+  8. The overall pitstop service time is now calculated more precisely for *Le Mans Ultimate*.
+
 ## 6.1.1.0-release 01/10/25
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

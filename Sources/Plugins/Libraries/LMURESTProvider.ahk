@@ -290,7 +290,7 @@ class LMURestProvider {
 					fuel := fuel["settings"][fuel["currentSetting"]]["text"]
 
 					if InStr(fuel, "gal/")
-						fuel := (string2Values("gal/", fuel)[1] * 4.54609)
+						fuel := (string2Values("gal/", fuel)[1] * 3.785411)
 					else
 						fuel := string2Values("l/", fuel)[1]
 
@@ -316,7 +316,7 @@ class LMURestProvider {
 						value := value["text"]
 
 						if InStr(value, "gal/")
-							value := (string2Values("gal/", value)[1] * 4.54609)
+							value := (string2Values("gal/", value)[1] * 3.785411)
 						else
 							value := string2Values("l/", value)[1]
 
@@ -693,7 +693,7 @@ class LMURestProvider {
 				capacity := string2Values(A_Space, carSetup["VM_FUEL_CAPACITY"]["stringValue"])[1]
 
 				if InStr(capacity, "gal")
-					capacity := (StrReplace(capacity, "gal", "") * 4.54609)
+					capacity := (StrReplace(capacity, "gal", "") * 3.785411)
 				else
 					capacity := StrReplace(capacity, "l", "")
 

@@ -187,7 +187,7 @@ displayVolumeValue(liter, rnd) {
 		case "Liter":
 			return (rnd ? Round(liter, 1) : liter)
 		case "Gallon (US)":
-			return (rnd ? Round(liter / 3.785411, 2) : (liter / 3-785411))
+			return (rnd ? Round(liter / 3.785411, 2) : (liter / 3.785411))
 		case "Gallon (GB)", "Gallon":
 			return (rnd ? Round(liter / 4.546092, 2) : (liter / 4.546092))
 		default:

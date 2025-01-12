@@ -2,11 +2,12 @@
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed some calculations for *Le Mans Ultimate* with regards to imperial units.
-  4. Changed default for activation recognizer to "Windows (Desktop)" rather than "Windows (Server)" voice recognition.
-  5. Major update to the documentation - removed the term "virtual".
-  6. A detailed weather forecast is now available for *Le Mans Ultimate*.
-  7. The track grip status has been refined for *rFactor 2* and *Le Mans Ultimate*. It is now mostly consistent with the status given in the simulator.
-  8. The overall pitstop service time is now calculated more precisely for *Le Mans Ultimate*.
+  4. Fixed gallon to liter conversions for *Le Mans Ultimate*. Although the setting in LMU is named "imperial", it does not refer to the imperial gallon, which is roughly 4.5 liters. Rather it refers to the US gallon which is around 3.7 liters. Another weird LMU thing.
+  5. Changed default for activation recognizer to "Windows (Desktop)" rather than "Windows (Server)" voice recognition.
+  6. Major update to the documentation - removed the term "virtual".
+  7. A detailed weather forecast is now available for *Le Mans Ultimate*.
+  8. The track grip status has been refined for *rFactor 2* and *Le Mans Ultimate*. It is now mostly consistent with the status given in the simulator.
+  9. The overall pitstop service time is now calculated more precisely for *Le Mans Ultimate*.
 
 ## 6.1.1.0-release 01/10/25
   1. Minor bugfixes, as always

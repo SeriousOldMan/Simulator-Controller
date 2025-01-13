@@ -23,8 +23,8 @@ computeDamages([? | ?repairs], [?damage | ?damages], [?damage | ?rest]) <= compu
 pitstopDeltaTime(?lap, ?fuel, ?tyreCompound, ?damages, ?serviceTime, ?repairTime, ?pitlaneDelta) <=
 		bound?(!Target.Time.Box.Fixed), !, ?pitlaneDelta = !Session.Settings.Pitstop.Delta * 1000,
 		pitstopRefillServiceTime(?fuel, ?refuelServiceTime), pitstopTyreServiceTime(?tyreCompound, ?tyreServiceTime),
-		?temp = ?refuelServiceTime + ?tyreServiceTime, ?serviceTime = ?temp * 1000,
-		?repairTime = !Target.Time.Box.Fixed - ?serviceTime
+		?temp = ?refuelServiceTime + ?tyreServiceTime, ?fullTime = ?temp * 1000,
+		computeSeviceTimes(?fullTime, ?serviceTime, ?repairTime)
 pitstopDeltaTime(?lap, ?fuel, ?tyreCompound, ?damages, ?serviceTime, ?repairTime, ?pitlaneDelta) <=
 		?pitlaneDelta = !Session.Settings.Pitstop.Delta * 1000,
 		pitstopDeltaTime(?lap, ?fuel, ?tyreCompound, ?pitstopTime),
@@ -34,6 +34,12 @@ pitstopDeltaTime(?lap, ?fuel, ?tyreCompound, ?damages, ?serviceTime, ?repairTime
 										   !Session.Settings.Pitstop.Repair.Engine.Duration],
 						  ?temp),
 		?repairTime = ?temp * 1000
+
+computeSeviceTimes(?fullTime, ?serviceTime, ?repairTime) <=
+		?fullTime > !Target.Time.Box.Fixed, !,
+		?serviceTime = !Target.Time.Box.Fixed,
+		?repairTime = ?fullTime - !Target.Time.Box.Fixed
+computeSeviceTimes(?fullTime, !Target.Time.Box.Fixed, 0)
 
 pitstopDeltaTime(?lap, 0, false, ?pitstopDeltaTime) <=
 		?pitstopDeltaTime = !Session.Settings.Pitstop.Delta * 1000, !

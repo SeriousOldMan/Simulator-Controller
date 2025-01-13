@@ -1377,7 +1377,7 @@ class CallbacksEditor {
 		this.iPhraseField[2].Visible := (this.Type = "Agent.Events")
 
 		this.iCallableField := [editorGui.Add("Text", "x16 yp+28 w90 h23 +0x200 Y:Move(0.25)", translate("Call"))
-							  , editorGui.Add("Edit", "x110 yp w308 h140 H:Grow(0.75) W:Grow(0.34) Y:Move(0.25)")]
+							  , editorGui.Add("Edit", "x110 yp w738 h140 H:Grow(0.75) W:Grow Y:Move(0.25)")]
 
 		editorGui.SetFont("Norm", "Courier New")
 

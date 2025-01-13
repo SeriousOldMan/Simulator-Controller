@@ -3,11 +3,10 @@
   2. Integration of local TTS engines for voice generation
 
 #### Simulation Support
-  1. Better integration with the weather forecast data of *rFactor 2* and *Le Mans Ultimate*
+  1. Better integration with the weather forecast data of *rFactor 2*
   2. Support changing of individual tyres for *iRacing*
   3. Full support of hybrid cars
   4. Support for new and also historic simulators
-  5. Support for *rFactor 2* in the "Setup Workbench"
 
 #### Plugins
   1. Cleanup of "Session State.json" file, i.e. not using *null* anymore for unavailable data

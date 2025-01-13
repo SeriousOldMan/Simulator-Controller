@@ -16,10 +16,10 @@ copy "Sidebar.md" ..\..\Controller.Wiki\_Sidebar.md
 copy "Updates.md" ..\..\Controller.Wiki\Update-Notes.md
 copy "Tyre Compounds.md" ..\..\Controller.Wiki\Tyre-Compounds.md
 copy "Using Simulator Controller.md" ..\..\Controller.Wiki\Using-Simulator-Controller.md
-copy "Virtual Driving Coach.md" ..\..\Controller.Wiki\Virtual-Driving-Coach.md
-copy "Virtual Race Engineer.md" ..\..\Controller.Wiki\Virtual-Race-Engineer.md
-copy "Virtual Race Strategist.md" ..\..\Controller.Wiki\Virtual-Race-Strategist.md
-copy "Virtual Race Spotter.md" ..\..\Controller.Wiki\Virtual-Race-Spotter.md
+copy "AI Driving Coach.md" ..\..\Controller.Wiki\AI-Driving-Coach.md
+copy "AI Race Engineer.md" ..\..\Controller.Wiki\AI-Race-Engineer.md
+copy "AI Race Strategist.md" ..\..\Controller.Wiki\AI-Race-Strategist.md
+copy "AI Race Spotter.md" ..\..\Controller.Wiki\AI-Race-Spotter.md
 copy "Customizing Assistants.md" ..\..\Controller.Wiki\Customizing-Assistants.md
 copy "Team Server.md" ..\..\Controller.Wiki\Team-Server.md
 copy "Setup Workbench.md" ..\..\Controller.Wiki\Setup-Workbench.md

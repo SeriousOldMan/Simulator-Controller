@@ -339,6 +339,12 @@ class RaceAssistant extends ConfigurationItem {
 		}
 
 		customAction(arguments*) {
+			arguments := arguments.Clone()
+
+			loop arguments.Length
+				if !arguments.Has(A_Index)
+					arguments[A_Index] := kUndefined
+
 			this.callRemote("customAction", arguments*)
 		}
 	}
@@ -4151,26 +4157,66 @@ createTools(assistant, type) {
 	local activationIndex := 1
 	local ignore, action, definition, parameters, parameter, enumeration, handler, enoughData, confirm, required
 
-	normalizeCall(&function, &arguments) {
-		local index, argument
+	static audioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Reasoning.AudioDevice", false)
+	static reasoningSound := getFileName("Reasoning.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
+
+	normalizeCall(&function, parameters, &arguments) {
+		local index, argument, ignore, parameter, callArguments, found
+
+		normalizeArgument(argument) {
+			if isSet(argument) {
+				if (argument = kTrue)
+					return true
+				else if (argument = kFalse)
+					return false
+				else if (argument = "null")
+					return unset
+				else if ((InStr(argument, "`"") = 1) && (StrLen(argument) > 1) && (SubStr(argument, StrLen(argument)) = "`""))
+					return SubStr(argument, 2, StrLen(argument) - 2)
+				else
+					return argument
+			}
+			else
+				return unset
+		}
 
 		if InStr(function, "(") {
 			function := StrSplit(Trim(function), "(", " `t", 2)
 
-			arguments := concatenate(string2Values(",", SubStr(function[2], 1, StrLen(function[2]) - 1)), arguments)
+			callArguments := string2Values(",", SubStr(function[2], 1, StrLen(function[2]) - 1))
 
-			for index, argument in arguments {
+			for index, argument in callArguments {
 				argument := Trim(argument, " `t`n")
 
-				if (argument = kTrue)
-					arguments[index] := true
-				else if (argument = kFalse)
-					arguments[index] := false
-				else if ((InStr(argument, "`"") = 1) && (StrLen(argument) > 1) && (SubStr(argument, StrLen(argument)) = "`""))
-					arguments[index] := SubStr(argument, 2, StrLen(argument) - 2)
+				if ((InStr(argument, "%") = 1) && (StrLen(argument) > 1) && (SubStr(argument, StrLen(argument)) = "%")) {
+					argument := SubStr(argument, 2, StrLen(argument) - 2)
+					found := false
+
+					for ignore, parameter in parameters
+						if (parameter.Name = argument) {
+							if arguments.Has(A_Index) {
+								callArguments[index] := normalizeArgument(arguments[A_Index])
+
+								found := true
+							}
+						}
+
+					if !found
+						callArguments[index] := unset
+				}
+				else
+					callArguments[index] := normalizeArgument(argument)
 			}
 
 			function := Trim(function[1], " `t`n")
+			arguments := callArguments
+		}
+		else {
+			function := Trim(function)
+			arguments := arguments.Clone()
+
+			loop arguments.Length
+				arguments[A_Index] := normalizeArgument(arguments[A_Index])
 		}
 	}
 
@@ -4203,6 +4249,8 @@ createTools(assistant, type) {
 	}
 
 	runAction(enoughData, confirm) {
+		playSound("RASoundPlayer.exe", reasoningSound, audioDevice)
+
 		if (type = "Conversation") {
 			if !assistant.confirmCommand(enoughData, confirm)
 				return false
@@ -4215,14 +4263,14 @@ createTools(assistant, type) {
 		return true
 	}
 
-	callMethod(method, enoughData, confirm, arguments*) {
+	callMethod(method, enoughData, confirm, parameters, arguments*) {
 		local ignore, methodArguments
 
 		if !runAction(enoughData, confirm)
 			return
 
 		for ignore, method in StrSplit(method, "`n") {
-			normalizeCall(&method, &methodArguments := arguments)
+			normalizeCall(&method, parameters, &methodArguments := arguments)
 
 			if isDebug()
 				showMessage("LLM -> this." . method . "(" .  printArguments(methodArguments) . ")")
@@ -4267,29 +4315,29 @@ createTools(assistant, type) {
 
 				loadedRules[ruleFileName] := [("__" . action . ".A"), names]
 			}
+
+			knowledgeBase.setFact(loadedRules[ruleFileName][1], true)
+
+			names := loadedRules[ruleFileName][2]
+
+			for index, parameter in parameters
+				try {
+					knowledgeBase.setFact(names[parameter.Name], arguments[index])
+				}
+				catch UnsetItemError {
+					knowledgeBase.clearFact(names[parameter.Name])
+				}
+
+			knowledgeBase.produce()
+
+			knowledgeBase.clearFact(loadedRules[ruleFileName][1])
+
+			if assistant.Debug[kDebugKnowledgeBase]
+				assistant.dumpKnowledgeBase(knowledgeBase)
 		}
-
-		knowledgeBase.setFact(loadedRules[ruleFileName][1], true)
-
-		names := loadedRules[ruleFileName][2]
-
-		for index, parameter in parameters
-			try {
-				knowledgeBase.setFact(names[parameter.Name], arguments[index])
-			}
-			catch UnsetItemError {
-				knowledgeBase.clearFact(names[parameter.Name])
-			}
-
-		knowledgeBase.produce()
-
-		knowledgeBase.clearFact(loadedRules[ruleFileName][1])
-
-		if assistant.Debug[kDebugKnowledgeBase]
-			assistant.dumpKnowledgeBase(knowledgeBase)
 	}
 
-	callControllerMethod(method, enoughData, confirm, arguments*) {
+	callControllerMethod(method, enoughData, confirm, parameters, arguments*) {
 		local ignore, methodArguments
 
 		if assistant.RemoteHandler {
@@ -4297,17 +4345,17 @@ createTools(assistant, type) {
 				return
 
 			for ignore, method in StrSplit(method, "`n") {
-				normalizeCall(&method, &methodArguments := arguments)
+				normalizeCall(&method, parameters, &methodArguments := arguments)
 
 				if isDebug()
 					showMessage("LLM -> Controller." . method . "(" .  printArguments(methodArguments) . ")")
 
-				assistant.RemoteHandler.customAction("Method", method, methodArguments*)
+				assistant.RemoteHandler.customAction("Method", method, normalizeArguments(methodArguments, true)*)
 			}
 		}
 	}
 
-	callControllerFunction(function, enoughData, confirm, arguments*) {
+	callControllerFunction(function, enoughData, confirm, parameters, arguments*) {
 		local ignore, functionArguments
 
 		if assistant.RemoteHandler {
@@ -4315,12 +4363,12 @@ createTools(assistant, type) {
 				return
 
 			for ignore, function in StrSplit(function, "`n") {
-				normalizeCall(&function, &functionArguments := arguments)
+				normalizeCall(&function, parameters, &functionArguments := arguments)
 
 				if isDebug()
 					showMessage("LLM -> Controller:" . function . "(" .  printArguments(functionArguments) . ")")
 
-				assistant.RemoteHandler.customAction("Function", function, functionArguments*)
+				assistant.RemoteHandler.customAction("Function", function, normalizeArguments(functionArguments, true)*)
 			}
 		}
 	}
@@ -4358,22 +4406,22 @@ createTools(assistant, type) {
 
 				switch definition[1], false {
 					case "Assistant.Method":
-						handler := callMethod.Bind(definition[2], enoughData, confirm)
+						handler := callMethod.Bind(definition[2], enoughData, confirm, parameters)
 					case "Assistant.Rule":
 						handler := callRule.Bind(action, definition[2], enoughData, confirm, parameters)
 					case "Controller.Method":
-						handler := callControllerMethod.Bind(definition[2], enoughData, confirm)
+						handler := callControllerMethod.Bind(definition[2], enoughData, confirm, parameters)
 					case "Controller.Function":
-						handler := callControllerFunction.Bind(definition[2], enoughData, confirm)
+						handler := callControllerFunction.Bind(definition[2], enoughData, confirm, parameters)
 					default:
-						throw "Unknown action type (" definition[1] . ") detected in RaceAssistant.createConversationTools..."
+						throw "Unknown action type (" definition[1] . ") detected in createTools..."
 				}
 
 				if handler
 					tools.Push(LLMTool.Function(action, definition[6], parameters, handler))
 			}
 			else
-				throw "Unknown action (" action . ") detected in RaceAssistant.createConversationTools..."
+				throw "Unknown action (" action . ") detected in createTools..."
 		}
 		catch Any as exception {
 			logError(exception, true)
@@ -4404,8 +4452,13 @@ normalizeArguments(arguments, remote := false) {
 	local result := []
 	local ignore, argument
 
-	for ignore, argument in arguments
-		if ((argument = kNotInitialized) || (argument = kUndefined))
+	loop arguments.Length {
+		if arguments.Has(A_index)
+			argument := arguments[A_Index]
+		else
+			argument := unset
+
+		if (!isSet(argument) || (argument = kNotInitialized) || (argument = kUndefined) || (argument = kNull))
 			result.Push(remote ? kUndefined : unset)
 		else
 			try {
@@ -4417,6 +4470,7 @@ normalizeArguments(arguments, remote := false) {
 			catch Any {
 				result.Push(argument)
 			}
+		}
 
 	return result
 }

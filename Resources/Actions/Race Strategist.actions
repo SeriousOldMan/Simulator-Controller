@@ -1,8 +1,8 @@
 [Conversation.Actions]
 Active=plan_pitstop,simulate_pitstop,update_strategy
 [Conversation.Actions.Builtin]
-plan_pitstop=Assistant.Method|planPitstop|false|true|1|Ask the Engineer to plan a pitstop.
-simulate_pitstop=Assistant.Method|recommendPitstop|false|true|1|Simulates the outcome of an upcoming pitstop. The traffic situation after the pitstop will be evaluated and the target lap will be optimized, if an undercut is possible.
+plan_pitstop=Assistant.Method|planPitstop(%targetLap%)|false|true|1|Ask the Engineer to plan a pitstop.
+simulate_pitstop=Assistant.Method|recommendPitstop(%targetLap%)|false|true|1|Simulates the outcome of an upcoming pitstop. The traffic situation after the pitstop will be evaluated and the target lap will be optimized, if an undercut is possible.
 update_strategy=Assistant.Method|recommendStrategy|true|true|0|Trigger a recalculation of the current race strategy.
 [Conversation.Actions.Parameters]
 plan_pitstop.1=targetLap|Integer||false|The planned lap for the car to come to the pit.
@@ -11,10 +11,10 @@ simulate_pitstop.1=targetLap|Integer||false|The planned lap for the car to come 
 Active=plan_pitstop,simulate_pitstop,announce_upcoming_pitstop,update_strategy,report_weather_forecast
 [Agent.Actions.Builtin]
 plan_pitstop=Assistant.Method|planPitstop|false|false|1|Ask the Engineer to plan a pitstop.
-simulate_pitstop=Assistant.Method|recommendPitstop|false|false|1|Simulates the outcome of an upcoming pitstop. The traffic situation after the pitstop will be evaluated and the target lap will be optimized, if an undercut is possible.
-announce_upcoming_pitstop=Assistant.Method|reportUpcomingPitstop|false|false|1|Announces an upcoming pitstop according to the currently active strategy.
-update_strategy=Assistant.Method|recommendStrategyAction|false|false|1|Trigger a recalculation of the current race strategy. A specific lap for the next pitstop can be supplied to check whether this will result in a valid strategy.
-report_weather_forecast=Assistant.Method|weatherForecast|false|false|3|Reports an upcoming change in the weather conditions.
+simulate_pitstop=Assistant.Method|recommendPitstop(%targetLap%)|false|false|1|Simulates the outcome of an upcoming pitstop. The traffic situation after the pitstop will be evaluated and the target lap will be optimized, if an undercut is possible.
+announce_upcoming_pitstop=Assistant.Method|reportUpcomingPitstop(%plannedLap%)|false|false|1|Announces an upcoming pitstop according to the currently active strategy.
+update_strategy=Assistant.Method|recommendStrategyAction(%targetLap%)|false|false|1|Trigger a recalculation of the current race strategy. A specific lap for the next pitstop can be supplied to check whether this will result in a valid strategy.
+report_weather_forecast=Assistant.Method|weatherForecast(%weather%, %minutes%, %impactsStrategy%)|false|false|3|Reports an upcoming change in the weather conditions.
 [Agent.Actions.Parameters]
 plan_pitstop.1=targetLap|Integer||false|The planned lap for the car to come to the pit.
 simulate_pitstop.1=targetLap|Integer||false|The planned lap for the car to come to the pit.

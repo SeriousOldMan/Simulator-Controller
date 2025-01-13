@@ -1,7 +1,7 @@
 [Conversation.Actions]
 Active=plan_pitstop,cancel_pitstop,recalculate_damage_impact
 [Conversation.Actions.Builtin]
-plan_pitstop=Assistant.Method|planPitstopAction|false|true|6|Create a plan for the next pitstop.
+plan_pitstop=Assistant.Method|planPitstopAction(%targetLap%, %refuelAmount%, %changeTyres%, %tyreCompound%, %repairDamage%, %swapDriver%)|false|true|6|Create a plan for the next pitstop.
 cancel_pitstop=Assistant.Rule|Race Engineer.cancel_pitstop.rules|false|false|0|Clears the pitstop plan, if a pitstop is no longer needed.
 recalculate_damage_impact=Assistant.Rule|Race Engineer.recalculate_damage_impact.rules|false|true|0|Resets the damage impact calculation and then starts a full recalculation of the time loss caused by the damage.
 [Conversation.Actions.Parameters]
@@ -14,13 +14,13 @@ plan_pitstop.6=swapDriver|Boolean||false|Indicates in a team race whether the ne
 [Agent.Actions]
 Active=plan_pitstop,cancel_pitstop,report_damage,report_time_loss,report_weather_forecast,report_low_fuel,report_pressure_loss
 [Agent.Actions.Builtin]
-plan_pitstop=Assistant.Method|planPitstopAction|false|false|6|Creates a plan for the next pitstop.
+plan_pitstop=Assistant.Method|planPitstopAction(%targetLap%, %refuelAmount%, %changeTyres%, %tyreCompound%, %repairDamage%, %swapDriver%)|false|false|6|Creates a plan for the next pitstop.
 cancel_pitstop=Assistant.Rule|Race Engineer.cancel_pitstop.rules|false|false|0|Clears the pitstop plan, if a pitstop is no longer needed.
-report_low_fuel=Assistant.Method|lowFuelWarning|false|false|2|Reports that the car is running low on fuel.
-report_damage=Assistant.Method|damageWarning|false|false|3|Reports recent damage to the car to the driver.
-report_time_loss=Assistant.Method|reportTimeLossAction|false|false|2|Reports a critical time loss after an incident has damaged the car.
-report_pressure_loss=Assistant.Method|pressureLossWarning|false|false|2|Reports that a tyre has lost pressure.
-report_weather_forecast=Assistant.Method|weatherForecast|false|false|3|Reports an upcoming change in the weather conditions.
+report_low_fuel=Assistant.Method|lowFuelWarning(%remainingFuel%, %remainingLaps%))|false|false|2|Reports that the car is running low on fuel.
+report_damage=Assistant.Method|damageWarning(%suspensionDamage%, %bodyworkDamage%, %engineDamage%)|false|false|3|Reports recent damage to the car to the driver.
+report_time_loss=Assistant.Method|reportTimeLossAction(%lapsToDrive%, %timeLoss%)|false|false|2|Reports a critical time loss after an incident has damaged the car.
+report_pressure_loss=Assistant.Method|pressureLossWarning(%tyre%, %lostPressure%)|false|false|2|Reports that a tyre has lost pressure.
+report_weather_forecast=Assistant.Method|weatherForecast(%weather%, %minutes%, %impactsStrategy%)|false|false|3|Reports an upcoming change in the weather conditions.
 [Agent.Actions.Parameters]
 plan_pitstop.1=targetLap|Integer||false|The planned lap for the car to come to the pit.
 plan_pitstop.2=refuelAmount|Number||false|The amount of fuel to be filled into the car.

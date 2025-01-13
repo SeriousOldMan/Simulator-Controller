@@ -37,7 +37,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 6.1.2
 
-No manual updates needed.
+The format of action calls in the *Conversation* booster has changed. All builtin actions are still working as expected, but if you have defined your own action, which use *Assistant Method*, *Controller Method* or *Controller Function* as action type, you may want to check your definition according to the new documentation.
 
 ***
 

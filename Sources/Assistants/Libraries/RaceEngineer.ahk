@@ -1507,6 +1507,11 @@ class RaceEngineer extends RaceAssistant {
 		local verbose := knowledgeBase.getValue("Pitstop.Planned.Adjusted", false)
 		local index, suffix, prssKey, changed, values, value, color
 
+		if getMultiMapValue(data, "Setup Data", "ServiceTime", false)
+			knowledgeBase.setFact("Target.Time.Box.Fixed", Round(getMultiMapValue(data, "Setup Data", "ServiceTime") * 1000))
+		else
+			knowledgeBase.clearFact("Target.Time.Box.Fixed")
+
 		if (this.iPitstopAdjustments && this.hasPreparedPitstop()) {
 			value := getMultiMapValue(data, "Setup Data", "FuelAmount", kUndefined)
 

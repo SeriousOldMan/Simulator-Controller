@@ -1,4 +1,4 @@
-Nachfolgend ist eine vollständige Liste aller von Jona, dem virtuellen Renningenieur, erkannten Sprachbefehle zusammen mit einer kurzen Einführung in die Syntax der Phrasengrammatiken.
+Nachfolgend ist eine vollständige Liste aller von Jona, dem KI Renningenieur, erkannten Sprachbefehle zusammen mit einer kurzen Einführung in die Syntax der Phrasengrammatiken.
 
 ## Syntax
 

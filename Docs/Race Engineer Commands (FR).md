@@ -1,4 +1,4 @@
-Vous trouverez ci-dessous une liste complète de toutes les commandes vocales reconnues par Jona, l'ingénieur de course virtuel, ainsi qu'une brève introduction à la syntaxe des grammaires de phrases.
+Vous trouverez ci-dessous une liste complète de toutes les commandes vocales reconnues par Jona, l'ingénieur de course AI, ainsi qu'une brève introduction à la syntaxe des grammaires de phrases.
 
 ## Syntaxe
 

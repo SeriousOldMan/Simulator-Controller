@@ -1,4 +1,4 @@
-Nachfolgend ist eine vollständige Liste aller von Cato, dem virtuellen Rennstrategen, erkannten Sprachbefehle zusammen mit einer kurzen Einführung in die Syntax der Phrasengrammatiken.
+Nachfolgend ist eine vollständige Liste aller von Cato, dem KI Rennstrategen, erkannten Sprachbefehle zusammen mit einer kurzen Einführung in die Syntax der Phrasengrammatiken.
 
 ## Syntax
 

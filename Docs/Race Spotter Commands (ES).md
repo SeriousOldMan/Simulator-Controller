@@ -1,4 +1,4 @@
-A continuación encontrará una lista completa de todos los comandos de voz reconocidos por Cat, el observador virtual de carreras, junto con una breve introducción a la sintaxis de las gramáticas de frases.
+A continuación encontrará una lista completa de todos los comandos de voz reconocidos por Cat, el observador AI de carreras, junto con una breve introducción a la sintaxis de las gramáticas de frases.
 
 ## Sintaxis
 

@@ -19,7 +19,7 @@
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class LMURESTProvider {
+class LMURestProvider {
 	static sTyreTypes := CaseInsenseMap("All", "FL", "FL", "FL", "FR", "FR", "RL", "RL", "RR", "RR"
 									  , "Front Left", "FL", "Front Right", "FR", "Rear Left", "RL", "Rear Right", "RR")
 
@@ -77,47 +77,61 @@ class LMURESTProvider {
 			this.iTrack := track
 		}
 
-		read() {
-			try {
-				this.iData := WinHttpRequest({Timeouts: [0, 5000, 5000, 5000]}).GET(this.GETURL, "", false, {Encoding: "UTF-8"}).JSON
+		read(url := this.GETURL, update := true) {
+			local data
 
-				if !isObject(this.iData)
-					this.iData := false
+			try {
+				data := WinHttpRequest({Timeouts: [0, 5000, 5000, 5000]}).GET(url, "", false, {Encoding: "UTF-8"}).JSON
+
+				if !isObject(data)
+					data := false
+
+				if update
+					this.iData := data
 			}
 			catch Any as exception {
 				logError(exception)
 
-				this.iData := false
+				if update
+					this.iData := false
+
+				data := false
 			}
+
+			return data
 		}
 
-		write() {
-			local data := JSON.print(this.Data, "  ")
+		write(url := this.PUTURL, data := this.Data) {
+			if data {
+				data := JSON.print(data, "  ")
 
-			if this.Data
 				try {
-					WinHttpRequest({Timeouts: [0, 5000, 5000, 5000]}).POST(this.PUTURL, data, false, {Object: true, Encoding: "UTF-8"})
+					WinHttpRequest({Timeouts: [0, 5000, 5000, 5000]}).POST(url, data, false, {Object: true, Encoding: "UTF-8"})
 				}
 				catch Any as exception {
 					logError(exception, true)
 				}
+			}
 		}
 
-		lookup(name) {
+		lookup(name, data := this.Data, cache := true) {
 			local ignore, candidate
 
-			if this.iCachedObjects.Has(name)
+			if (cache && this.iCachedObjects.Has(name))
 				return this.iCachedObjects[name]
-			else if this.Data {
-				for ignore, candidate in this.Data
+			else if data {
+				for ignore, candidate in data
 					if (candidate.Has("name") && (candidate["name"] = name)) {
-						this.iCachedObjects[name] := candidate
+						if cache
+							this.iCachedObjects[name] := candidate
 
 						return candidate
 					}
 
 				return false
 			}
+			else
+				return false
 		}
 	}
 
@@ -272,8 +286,16 @@ class LMURESTProvider {
 			else {
 				fuel := this.lookup("FUEL:")
 
-				if fuel
-					return string2Values("l/", fuel["settings"][fuel["currentSetting"]]["text"])[1]
+				if fuel {
+					fuel := fuel["settings"][fuel["currentSetting"]]["text"]
+
+					if InStr(fuel, "gal/")
+						fuel := (string2Values("gal/", fuel)[1] * 3.785411)
+					else
+						fuel := string2Values("l/", fuel)[1]
+
+					return fuel
+				}
 				else
 					return false
 			}
@@ -291,7 +313,12 @@ class LMURESTProvider {
 
 				if fuel {
 					for index, value in fuel["settings"] {
-						value := string2Values("l/", value["text"])[1]
+						value := value["text"]
+
+						if InStr(value, "gal/")
+							value := (string2Values("gal/", value)[1] * 3.785411)
+						else
+							value := string2Values("l/", value)[1]
 
 						if (value > liters) {
 							fuel["currentSetting"] := (index - 1)
@@ -612,6 +639,27 @@ class LMURESTProvider {
 		}
 	}
 
+	class ServiceData extends LMURESTProvider.RESTData {
+		GETURL {
+			Get {
+				return "http://localhost:6397/rest/garage/UIScreen/RepairAndRefuel"
+			}
+		}
+
+		ServiceTime {
+			Get {
+				return this.getServiceTime()
+			}
+		}
+
+		getServiceTime() {
+			if (this.Data && this.Data.Has("pitstopLength"))
+				return this.Data["pitstopLength"]["timeInSeconds"]
+			else
+				return false
+		}
+	}
+
 	class SetupData extends LMURESTProvider.RESTData {
 		GETURL {
 			Get {
@@ -645,7 +693,7 @@ class LMURESTProvider {
 				capacity := string2Values(A_Space, carSetup["VM_FUEL_CAPACITY"]["stringValue"])[1]
 
 				if InStr(capacity, "gal")
-					capacity := (StrReplace(capacity, "gal", "") * 4.54609)
+					capacity := (StrReplace(capacity, "gal", "") * 3.785411)
 				else
 					capacity := StrReplace(capacity, "l", "")
 
@@ -741,6 +789,58 @@ class LMURESTProvider {
 
 		getMaxFuelAmount() {
 			return ((this.Data && this.Data.Has("fuelInfo")) ? Round(this.Data["fuelInfo"]["maxFuel"], 2) : false)
+		}
+	}
+
+	class SessionData extends LMURESTProvider.RESTData {
+		GETURL {
+			Get {
+				return "http://localhost:6397/rest/sessions/GetSessionsInfoForEvent"
+			}
+		}
+
+		Duration[session] {
+			Get {
+				return this.getDuration(session)
+			}
+		}
+
+		RainChance[session] {
+			Get {
+				return this.getRainChance(session)
+			}
+		}
+
+		getDuration(session) {
+			local ignore, candidate
+
+			if InStr(session, "Qualif")
+				session := "QUALIFY"
+			else
+				session := StrUpper(session)
+
+			if (this.Data && this.Data.Has("scheduledSessions"))
+				for ignore, candidate in this.Data["scheduledSessions"]
+					if InStr(candidate["name"], session)
+						return (candidate["lengthTime"] * 60)
+
+			return false
+		}
+
+		getRainChance(session) {
+			local ignore, candidate
+
+			if InStr(session, "Qualif")
+				session := "QUALIFY"
+			else
+				session := StrUpper(session)
+
+			if (this.Data && this.Data.Has("scheduledSessions"))
+				for ignore, candidate in this.Data["scheduledSessions"]
+					if InStr(candidate["name"], session)
+						return candidate["rainChance"]
+
+			return false
 		}
 	}
 
@@ -904,27 +1004,188 @@ class LMURESTProvider {
 		}
 	}
 
-	class GarageData extends LMURESTProvider.RESTData {
-		POSTURL {
+	class WeatherData extends LMURESTProvider.RESTData {
+		GETURL {
 			Get {
-				return "http://localhost:6397/rest/garage/refreshsetups"
+				return "http://localhost:6397/rest/sessions/weather"
 			}
 		}
 
-		refreshSetups() {
-			try {
-				WinHttpRequest().POST(this.POSTURL, "", false, {Encoding: "UTF-8"})
+		Humidity[session := "Now", time := false] {
+			Get {
+				return this.getHumidity(session, time)
 			}
-			catch Any as exception {
-				msgbox 1
-				logError(exception)
+		}
+
+		RainChance[session := "Now", time := false] {
+			Get {
+				return this.getRainChance(session, time)
 			}
+		}
+
+		RainLevel[session := "Now", time := false] {
+			Get {
+				return this.getRainLevel(session, time)
+			}
+		}
+
+		Weather[session := "Now", time := false] {
+			Get {
+				return this.getRainLevel(session, time)
+			}
+		}
+
+		getWeather(index) {
+			if (index >= 10)
+				return "Thunderstorm"
+			else if (index >= 9)
+				return "HeavyRain"
+			else if (index >= 8)
+				return "MediumRain"
+			else if (index >= 6)
+				return "LightRain"
+			else if (index >= 5)
+				return "Drizzle"
+			else
+				return "Dry"
+		}
+
+		getHumidity(session, time) {
+			local data, name
+
+			if (session = "Now") {
+				data := this.read("http://localhost:6397/rest/sessions/GetGameState", false)
+
+				if (data && data.Has("closeestWeatherNode"))
+					return Round(data["closeestWeatherNode"]["Humidity"])
+				else
+					return false
+			}
+			else if isNumber(time) {
+				if InStr(session, "Qualif")
+					session := "QUALIFY"
+				else
+					session := StrUpper(session)
+
+				data := this.Data
+
+				if (data && data.Has(session)) {
+					data := data[session]
+					time := Max(0, Min(100, (Round(time / 25) * 25)))
+
+					switch time {
+						case 0:
+							name := "START"
+						case 100:
+							name := "FINISH"
+						default:
+							name := ("Node_" . time)
+					}
+
+					if data.Has(name)
+						return data[name]["WNV_HUMIDITY"]["currentValue"]
+					else
+						return false
+				}
+				else
+					return false
+			}
+			else
+				throw ("Unsupported time " . time . " detected in WeatherData.getHumidity...")
+		}
+
+		getRainChance(session, time) {
+			local data, name
+
+			if (session = "Now") {
+				data := this.read("http://localhost:6397/rest/sessions/GetGameState", false)
+
+				if (data && data.Has("closeestWeatherNode"))
+					return this.getWeather(data["closeestWeatherNode"]["RainChance"])
+				else
+					return false
+			}
+			else if isNumber(time) {
+				if InStr(session, "Qualif")
+					session := "QUALIFY"
+				else
+					session := StrUpper(session)
+
+				data := this.Data
+
+				if (data && data.Has(session)) {
+					data := data[session]
+					time := Max(0, Min(100, (Round(time / 25) * 25)))
+
+					switch time {
+						case 0:
+							name := "START"
+						case 100:
+							name := "FINISH"
+						default:
+							name := ("Node_" . time)
+					}
+
+					if data.Has(name)
+						return this.getWeather(data[name]["WNV_RAIN_CHANCE"]["currentValue"])
+					else
+						return false
+				}
+				else
+					return false
+			}
+			else
+				throw ("Unsupported time " . time . " detected in WeatherData.getRainLevel...")
+		}
+
+		getRainLevel(session, time) {
+			local data, name
+
+			if (session = "Now") {
+				data := this.read("http://localhost:6397/rest/sessions/GetGameState", false)
+
+				if (data && data.Has("closeestWeatherNode"))
+					return this.getWeather(data["closeestWeatherNode"]["Sky"])
+				else
+					return false
+			}
+			else if isNumber(time) {
+				if InStr(session, "Qualif")
+					session := "QUALIFY"
+				else
+					session := StrUpper(session)
+
+				data := this.Data
+
+				if (data && data.Has(session)) {
+					data := data[session]
+					time := Max(0, Min(100, (Round(time / 25) * 25)))
+
+					switch time {
+						case 0:
+							name := "START"
+						case 100:
+							name := "FINISH"
+						default:
+							name := ("Node_" . time)
+					}
+
+					if data.Has(name)
+						return this.getWeather(data[name]["WNV_SKY"]["currentValue"])
+					else
+						return false
+				}
+				else
+					return false
+			}
+			else
+				throw ("Unsupported time " . time . " detected in WeatherData.getRainChance...")
 		}
 	}
 
 	static TyreTypes {
 		Get {
-			return LMURESTProvider.sTyreTypes
+			return LMURestProvider.sTyreTypes
 		}
 	}
 }

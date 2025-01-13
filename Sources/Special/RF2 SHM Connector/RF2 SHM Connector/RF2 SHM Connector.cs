@@ -402,14 +402,14 @@ namespace SHMConnector {
                 strWriter.Write("Length="); strWriter.WriteLine(scoring.mScoringInfo.mLapDist);
 				
 				string grip = "Optimum";
-				
-				if (scoring.mScoringInfo.mMaxPathWetness > 0.7)
+
+				if (scoring.mScoringInfo.mAvgPathWetness >= 0.7)
 					grip = "Flooded";
-				else if (scoring.mScoringInfo.mMaxPathWetness > 0.2)
+				else if (scoring.mScoringInfo.mAvgPathWetness >= 0.2)
 					grip = "Wet";
-				else if (scoring.mScoringInfo.mMaxPathWetness > 0.15)
+				else if (scoring.mScoringInfo.mAvgPathWetness >= 0.05)
 					grip = "Damp";
-				else if (scoring.mScoringInfo.mMaxPathWetness > 0.05)
+				else if (scoring.mScoringInfo.mAvgPathWetness > 0.0)
 					grip = "Greasy";
 				else
 					grip = "Fast";

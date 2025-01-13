@@ -21,6 +21,11 @@ computeDamages([false | ?repairs], [? | ?damages], [0 | ?rest]) <= !, computeDam
 computeDamages([? | ?repairs], [?damage | ?damages], [?damage | ?rest]) <= computeDamages(?repairs, ?damages, ?rest)
 
 pitstopDeltaTime(?lap, ?fuel, ?tyreCompound, ?damages, ?serviceTime, ?repairTime, ?pitlaneDelta) <=
+		bound?(!Target.Time.Box.Fixed), !, ?pitlaneDelta = !Session.Settings.Pitstop.Delta * 1000,
+		pitstopRefillServiceTime(?fuel, ?refuelServiceTime), pitstopTyreServiceTime(?tyreCompound, ?tyreServiceTime),
+		?temp = ?refuelServiceTime + ?tyreServiceTime, ?serviceTime = ?temp * 1000,
+		?repairTime = !Target.Time.Box.Fixed - ?serviceTime
+pitstopDeltaTime(?lap, ?fuel, ?tyreCompound, ?damages, ?serviceTime, ?repairTime, ?pitlaneDelta) <=
 		?pitlaneDelta = !Session.Settings.Pitstop.Delta * 1000,
 		pitstopDeltaTime(?lap, ?fuel, ?tyreCompound, ?pitstopTime),
 		?serviceTime = ?pitstopTime - ?pitlaneDelta,
@@ -73,6 +78,9 @@ pitstopTyreServiceTime(?lap, ?targetLap, !Session.Settings.Pitstop.Service.Tyres
 		remainingSessionLaps(?lap, ?tempLaps), ?remainingLaps = ?tempLaps - ?deltaLaps,
 		?remainingLaps > 5, ! 
 pitstopTyreServiceTime(?, ?, 0)
+
+pitstopTyreServiceTime(false, 0) <= !
+pitstopTyreServiceTime(?, !Session.Settings.Pitstop.Service.Tyres.Duration)
 
 pitstopServiceTime(?refuelServiceTime, ?tyreServiceTime, ?serviceTime) <= !Session.Settings.Pitstop.Service.Order = Simultaneous,
 																		  max(?refuelServiceTime, ?tyreServiceTime, ?serviceTime)

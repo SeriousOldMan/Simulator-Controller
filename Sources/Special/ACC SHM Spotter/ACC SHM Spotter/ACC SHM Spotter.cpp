@@ -499,7 +499,6 @@ TrackSpline* activeTrackSpline = NULL;
 float activeTrackSplineLength;
 
 bool trackSplineReady = false;
-bool trackSplineValid = true;
 
 class IdealLine
 {
@@ -758,9 +757,6 @@ void updateTrackSpline() {
 						activeTrackSpline = buildTrackSpline;
 						activeTrackSplineLength = buildTrackSplineRunning;
 
-						trackSplineReady = true;
-						trackSplineBuilding = false;
-
 						if (traceFileName != "") {
 							std::ofstream output;
 
@@ -780,8 +776,9 @@ void updateTrackSpline() {
 							if (point.distance == 0)
 								zeroCount += 1;
 						}
-						
-						trackSplineValid = (last > 100 && ((float)zeroCount / (float)last) < 0.1);
+
+						trackSplineReady = (last > 100 && ((float)zeroCount / (float)last) < 0.1);
+						trackSplineBuilding = false;
 					}
 				}
 				else {
@@ -2080,10 +2077,10 @@ void collectCarTelemetry() {
 			break;
 		}
 
-	if (trackSplineReady && trackSplineValid) {
+	if (trackSplineReady) {
 		float driverRunning = getRunning(carID);
 
-		if (driverRunning >= 0)
+		if (driverRunning > 0)
 			try {
 				SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
 			

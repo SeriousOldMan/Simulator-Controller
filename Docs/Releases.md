@@ -1,16 +1,17 @@
 ## 6.1.2.0-release 01/17/25 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. Fixed some calculations for *Le Mans Ultimate* with regards to imperial units.
-  4. Fixed gallon to liter conversions for *Le Mans Ultimate*. Although the setting in LMU is named "imperial", it does not refer to the imperial gallon, which is roughly 4.5 liters. Rather it refers to the US gallon which is around 3.7 liters. Another weird LMU thing.
-  5. Changed default for activation recognizer to "Windows (Desktop)" rather than "Windows (Server)" voice recognition.
-  6. Major update to the documentation - removed the term "virtual".
-  7. A detailed weather forecast is now available for *Le Mans Ultimate*.
-  8. The telemetry collector for ACC has been improved.
-  9. The track grip status has been refined for *rFactor 2* and *Le Mans Ultimate*. It is now mostly consistent with the status given in the simulator.
-  10. The overall pitstop service time is now calculated more precisely for *Le Mans Ultimate*.
-  11. A short sound is played now, whenever an Assistant action is triggered by the *Reasoning* booster. This helps to understand whether a given behaviour is caused by a connected LLM.
-  12. [Expert] The format of action definitions in the *Conversation* booster has changed. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions) for more information.
+  3. Fixed a bug in the Spanish grammars for the Spotter, which caused it to crash when announcing a new best lap for the leader.
+  4. Fixed some calculations for *Le Mans Ultimate* with regards to imperial units.
+  5. Fixed gallon to liter conversions for *Le Mans Ultimate*. Although the setting in LMU is named "imperial", it does not refer to the imperial gallon, which is roughly 4.5 liters. Rather it refers to the US gallon which is around 3.7 liters. Another weird LMU thing.
+  6. Changed default for activation recognizer to "Windows (Desktop)" rather than "Windows (Server)" voice recognition.
+  7. Major update to the documentation - removed the term "virtual".
+  8. A detailed weather forecast is now available for *Le Mans Ultimate*.
+  9. The telemetry collector for ACC has been improved.
+  10. The track grip status has been refined for *rFactor 2* and *Le Mans Ultimate*. It is now mostly consistent with the status given in the simulator.
+  11. The overall pitstop service time is now calculated more precisely for *Le Mans Ultimate*.
+  12. A short sound is played now, whenever an Assistant action is triggered by the *Reasoning* booster. This helps to understand whether a given behaviour is caused by a connected LLM.
+  13. [Expert] The format of action definitions in the *Conversation* booster has changed. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions) for more information.
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-612), if you are using actions in the *Conversation* booster.
 

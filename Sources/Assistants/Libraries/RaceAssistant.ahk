@@ -4259,7 +4259,9 @@ createTools(assistant, type) {
 	runAction(enoughData, confirm) {
 		playSound("RASoundPlayer.exe", reasoningSound, audioDevice)
 
-		if (type = "Conversation") {
+		if !assistant.KnowledgeBase
+			return assistant.hasEnoughData()
+		else if (type = "Conversation") {
 			if !assistant.confirmCommand(enoughData, confirm)
 				return false
 		}
@@ -4277,15 +4279,22 @@ createTools(assistant, type) {
 		if !runAction(enoughData, confirm)
 			return
 
-		for ignore, method in StrSplit(method, "`n") {
-			if (Trim(method) != "") {
-				normalizeCall(&method, parameters, &methodArguments := arguments)
+		try {
+			for ignore, method in StrSplit(method, "`n") {
+				if (Trim(method) != "") {
+					normalizeCall(&method, parameters, &methodArguments := arguments)
 
-				if isDebug()
-					showMessage("LLM -> this." . method . "(" .  printArguments(methodArguments) . ")")
+					if isDebug()
+						showMessage("LLM -> this." . method . "(" .  printArguments(methodArguments) . ")")
 
-				assistant.%method%(methodArguments*)
+					assistant.%method%(methodArguments*)
+				}
 			}
+		}
+		catch Any as exception {
+			logError(exception)
+
+			throw exception
 		}
 	}
 

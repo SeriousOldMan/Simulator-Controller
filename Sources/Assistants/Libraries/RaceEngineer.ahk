@@ -503,12 +503,12 @@ class RaceEngineer extends RaceAssistant {
 			tyreCompound := kUndefined
 
 		if (isSet(driverSwap) && driverSwap)
-			this.planDriverSwap("?" . (isSet(targetLap) ? targetLap : false)
+			this.planDriverSwap("?" . (isSet(targetLap) ? targetLap : "Now")
 							  , isSet(refuelAmount) ? refuelAmount : "!0"
 							  , isSet(changeTyres) ? changeTyres : "!0"
 							  , repairs, repairs, repairs, tyreCompound, tyreCompoundColor)
 		else
-			this.planPitstop(isSet(targetLap) ? targetLap : kUndefined
+			this.planPitstop(isSet(targetLap) ? targetLap : "Now"
 						   , isSet(refuelAmount) ? ("!" . refuelAmount) : "!0"
 						   , isSet(changeTyres) ? ("!" . changeTyres) : "!0"
 						   , kUndefined, tyreCompound, tyreCompoundColor, kUndefined

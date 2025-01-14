@@ -1074,9 +1074,13 @@ else {
 			if (data.Count == 0)
 				break
 			else {
+				setMultiMapValue(data, "Setup Data", "ServiceTime", 12)
+
 				engineer.addLap(A_Index, &data)
 
 				engineer.iSimulator := "ACC"
+
+				engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 				if (A_Index = 3) {
 					engineer.planPitstop()

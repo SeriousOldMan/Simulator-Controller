@@ -4161,7 +4161,7 @@ createTools(assistant, type) {
 	static reasoningSound := getFileName("Reasoning.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
 
 	normalizeCall(&function, parameters, &arguments) {
-		local index, argument, ignore, parameter, callArguments, found
+		local index, argument, ignore, parameter, callArguments, found, value
 
 		normalizeArgument(argument) {
 			if isSet(argument) {
@@ -4169,15 +4169,15 @@ createTools(assistant, type) {
 					return true
 				else if (argument = kFalse)
 					return false
-				else if (argument = "null")
-					return unset
+				else if (argument = kNull)
+					return kNull
 				else if ((InStr(argument, "`"") = 1) && (StrLen(argument) > 1) && (SubStr(argument, StrLen(argument)) = "`""))
 					return SubStr(argument, 2, StrLen(argument) - 2)
 				else
 					return argument
 			}
 			else
-				return unset
+				return kNull
 		}
 
 		if InStr(function, "(") {
@@ -4195,7 +4195,9 @@ createTools(assistant, type) {
 					for ignore, parameter in parameters
 						if (parameter.Name = argument) {
 							if arguments.Has(A_Index) {
-								callArguments[index] := normalizeArgument(arguments[A_Index])
+								value := normalizeArgument(arguments[A_Index])
+
+								callArguments[index] := ((value = kNull) ? unset : value)
 
 								found := true
 							}
@@ -4204,8 +4206,11 @@ createTools(assistant, type) {
 					if !found
 						callArguments[index] := unset
 				}
-				else
-					callArguments[index] := normalizeArgument(argument)
+				else {
+					value := normalizeArgument(argument)
+
+					callArguments[index] := ((value = kNull) ? unset : value)
+				}
 			}
 
 			function := Trim(function[1], " `t`n")
@@ -4215,8 +4220,11 @@ createTools(assistant, type) {
 			function := Trim(function)
 			arguments := arguments.Clone()
 
-			loop arguments.Length
-				arguments[A_Index] := normalizeArgument(arguments[A_Index])
+			loop arguments.Length {
+				value := normalizeArgument(arguments[A_Index])
+
+				arguments[A_Index] := ((value = kNull) ? unset : value)
+			}
 		}
 	}
 

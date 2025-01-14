@@ -50,7 +50,9 @@ Normally, you can use exactly the name, which is visible in the user interface o
 
 When creating the tyre compound rule as in the examples above, it is **important** that you use the same order as the *internal* identifiiers appear in the Pitstop dialog. Otherwise you will end up with wrong tyres after a pitstop. A notable exception here is *rFactor 2* or *Le Mans Ultimate*, which supports any order, since the API supports tyre compound selection by name. And of course *Assetto Corsa Competizione*, where the two available tyre categories (Dry and Wet) are hardcoded.
 
-A very special case is *Automobilista 2* and also *Project CARS 2*. The underlying simulation engine does not provide any tyre compound information at all. You may use any identifier here, even the placeholder "*". The system will work with relative offsets to compensate for this deficit.
+A very special case is *Project CARS 2*. The underlying simulation engine does not provide any tyre compound information at all. You may use any identifier here, even the placeholder "*". The system will work with relative offsets to compensate for this deficit.
+
+The situation is a bit different for *Automobilista 2*. Mounted tyre compounds can be identified, but when it comes to set the tyre compound for the next pitstop the tyre compoung must be identified by its index, which means, that the order of the different entries in the tyre compound rule is very important.
 
 ### *Tyre Data* files
 
@@ -163,9 +165,9 @@ The default tyre compouund is "Dry", when no dedicated information is available 
 
 As already mentioned, the world is easy in *Assetto Corsa Competizione*. Every car has a "Dry" and a "Wet" compound to use. So nothing to do here.
 
-### Special notes for *Automobilista 2* and *Project CARS 2*
+### Special notes for *Project CARS 2*
 
-Unfortunately, these two simulators does not provide any information about the currently mounted tyre compound in the data available through the API. So make sure, that you have set the mounted tyre compound with the [*Race Settings*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-race), before you head out onto the track, otherwise you will end up with a wrong compound chosen during the next pitstop, or the control of tyre compounds in the ICM might fail completely.
+Unfortunately, this simulator does not provide any information about the currently mounted tyre compound in the data available through the API. So make sure, that you have set the mounted tyre compound with the [*Race Settings*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-race), before you head out onto the track, otherwise you will end up with a wrong compound chosen during the next pitstop, or the control of tyre compounds in the ICM might fail completely.
 
 ### Special notes for *iRacing*
 

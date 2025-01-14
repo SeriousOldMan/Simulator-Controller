@@ -2370,7 +2370,7 @@ class RaceEngineer extends RaceAssistant {
 			driverNickname := knowledgeBase.getValue("Driver.Nickname", "JD")
 		}
 
-		if data.Has("Setup Data")
+		if (knowledgeBase && data.Has("Setup Data"))
 			if getMultiMapValue(data, "Setup Data", "ServiceTime", false)
 				knowledgeBase.setFact("Target.Time.Box.Fixed", Round(getMultiMapValue(data, "Setup Data", "ServiceTime") * 1000))
 			else

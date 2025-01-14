@@ -75,17 +75,22 @@ class TelemetryCollector {
 	}
 
 	__New(telemetryDirectory, simulator, track, trackLength) {
+		this.iTelemetryDirectory := telemetryDirectory
+
+		this.initialize(simulator, track, trackLength)
+	}
+
+	initialize(simulator, track, trackLength) {
 		this.iSimulator := simulator
 		this.iTrack := track
 		this.iTrackLength := trackLength
-		this.iTelemetryDirectory := telemetryDirectory
 	}
 
-	startup(force := false) {
+	startup(restart := false) {
 		local sessionDB := SessionDatabase()
 		local code, exePath, pid, trackData
 
-		if (this.iTelemetryCollectorPID && force)
+		if (this.iTelemetryCollectorPID && restart)
 			this.shutdown(true)
 
 		if (this.iTelemetryCollectorPID && !ProcessExist(this.iTelemetryCollectorPID))

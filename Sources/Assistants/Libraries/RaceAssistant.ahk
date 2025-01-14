@@ -4278,12 +4278,14 @@ createTools(assistant, type) {
 			return
 
 		for ignore, method in StrSplit(method, "`n") {
-			normalizeCall(&method, parameters, &methodArguments := arguments)
+			if (Trim(method) != "") {
+				normalizeCall(&method, parameters, &methodArguments := arguments)
 
-			if isDebug()
-				showMessage("LLM -> this." . method . "(" .  printArguments(methodArguments) . ")")
+				if isDebug()
+					showMessage("LLM -> this." . method . "(" .  printArguments(methodArguments) . ")")
 
-			assistant.%method%(methodArguments*)
+				assistant.%method%(methodArguments*)
+			}
 		}
 	}
 
@@ -4353,12 +4355,14 @@ createTools(assistant, type) {
 				return
 
 			for ignore, method in StrSplit(method, "`n") {
-				normalizeCall(&method, parameters, &methodArguments := arguments)
+				if (Trim(method) != "") {
+					normalizeCall(&method, parameters, &methodArguments := arguments)
 
-				if isDebug()
-					showMessage("LLM -> Controller." . method . "(" .  printArguments(methodArguments) . ")")
+					if isDebug()
+						showMessage("LLM -> Controller." . method . "(" .  printArguments(methodArguments) . ")")
 
-				assistant.RemoteHandler.customAction("Method", method, normalizeArguments(methodArguments, true)*)
+					assistant.RemoteHandler.customAction("Method", method, normalizeArguments(methodArguments, true)*)
+				}
 			}
 		}
 	}
@@ -4371,12 +4375,14 @@ createTools(assistant, type) {
 				return
 
 			for ignore, function in StrSplit(function, "`n") {
-				normalizeCall(&function, parameters, &functionArguments := arguments)
+				if (Trim(function) != "") {
+					normalizeCall(&function, parameters, &functionArguments := arguments)
 
-				if isDebug()
-					showMessage("LLM -> Controller:" . function . "(" .  printArguments(functionArguments) . ")")
+					if isDebug()
+						showMessage("LLM -> Controller:" . function . "(" .  printArguments(functionArguments) . ")")
 
-				assistant.RemoteHandler.customAction("Function", function, normalizeArguments(functionArguments, true)*)
+					assistant.RemoteHandler.customAction("Function", function, normalizeArguments(functionArguments, true)*)
+				}
 			}
 		}
 	}

@@ -1789,7 +1789,7 @@ class CallbacksEditor {
 			else {
 				this.setScript("", true)
 
-				this.CallableField[2].Text := callback.Definition
+				this.CallableField[2].Value := callback.Definition
 			}
 
 			for ignore, parameter in callback.Parameters

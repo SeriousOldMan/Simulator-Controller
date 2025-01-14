@@ -7603,10 +7603,13 @@ class SoloCenter extends ConfigurationItem {
 		this.pushTask(showLapDetailsAsync.Bind(lap))
 	}
 
-	startSession(fileName, wait := false) {
+	startSession(data, wait := false) {
 		startSessionAsync() {
-			local data := readMultiMap(fileName)
-			local save, translator
+			local fileName := (isObject(data) ? false : data)
+			local data, save, translator, msgResult
+
+			if fileName
+				data := readMultiMap(fileName)
 
 			try {
 				save := (this.AutoSave && this.SessionActive)
@@ -7654,7 +7657,8 @@ class SoloCenter extends ConfigurationItem {
 				this.analyzeTelemetry()
 			}
 			finally {
-				deleteFile(fileName)
+				if fileName
+					deleteFile(fileName)
 			}
 		}
 
@@ -7667,14 +7671,15 @@ class SoloCenter extends ConfigurationItem {
 	updateLap(lapNumber, fileName, update := false) {
 		updateLapAsync() {
 			local data := readMultiMap(fileName)
+			local track := getMultiMapValue(data, "Session Data", "Track", "Unknown")
+			local trackLength := getMultiMapValue(data, "Track Data", "Length", 0)
 
 			try {
 				if (!this.LastLap && !update)
-					this.startSession(fileName, true)
+					this.startSession(data, true)
 
-				if this.TelemetryViewer
-					this.TelemetryViewer.startupCollector(this.Simulator, getMultiMapValue(data, "Session Data", "Track", "Unknown")
-																		, getMultiMapValue(data, "Track Data", "Length", 0))
+				if (this.TelemetryViewer && (track != "Unknown") && (trackLength > 0))
+					this.TelemetryViewer.startupCollector(this.Simulator, track, trackLength)
 
 				if update {
 					if (this.SessionActive && (this.LastLap.Nr = lapNumber))

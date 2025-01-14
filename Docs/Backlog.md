@@ -16,6 +16,7 @@
   2. Better answers by the Strategist, when a pitstop cannot be recommended
   3. Direct critics by the Coach for the last section during on-track coaching (needs real time telemetry)
   4. Integrate support for LAMs
+  5. Support for Time+1 session format
 
 #### Session Database
   1. Active validation of value ranges in settings definitions

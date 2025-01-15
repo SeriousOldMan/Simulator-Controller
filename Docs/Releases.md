@@ -8,11 +8,12 @@
   7. Changed default for activation recognizer to "Windows (Desktop)" rather than "Windows (Server)" voice recognition.
   8. Major update to the documentation - removed the term "virtual".
   9. The telemetry collector for ACC has been improved.
-  10. A detailed weather forecast is now available for *Le Mans Ultimate*.
-  11. The track grip status has been refined for *rFactor 2* and *Le Mans Ultimate*. It is now mostly consistent with the status given in the simulator.
-  12. The overall pitstop service time is now calculated more precisely for *Le Mans Ultimate*.
-  13. A short sound is played now, whenever an Assistant action is triggered by the *Reasoning* booster. This helps to understand whether a given behaviour is caused by a connected LLM.
-  14. [Expert] The format of action definitions in the *Conversation* and in the *Reasoning* booster has changed. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions) for more information.
+  10. Optimized end of session detection for *iRacing* for timed races.
+  11. A detailed weather forecast is now available for *Le Mans Ultimate*.
+  12. The track grip status has been refined for *rFactor 2* and *Le Mans Ultimate*. It is now mostly consistent with the status given in the simulator.
+  13. The overall pitstop service time is now calculated more precisely for *Le Mans Ultimate*.
+  14. A short sound is played now, whenever an Assistant action is triggered by the *Reasoning* booster. This helps to understand whether a given behaviour is caused by a connected LLM.
+  15. [Expert] The format of action definitions in the *Conversation* and in the *Reasoning* booster has changed. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions) for more information.
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-612), if you are using actions in the *Conversation* booster.
 

@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.1.2.0-dev](https://www.dropbox.com/scl/fi/i288gfaukvzeyf4d4oapw/Simulator-Controller-6.1.2.0-dev.zip?rlkey=wgf10stpksazrhkjw4k38p9ie&st=unrv0k3l&dl=1) (Early build for 6.1.2. Changes: Major rework of the documentation, Support for weather forecast in LMU, Aproximated grip status for LMU, Pitstop service time for LMU, Changed default activation recognizer to "Desktop", Fixed some bugs for LMU if imperial units are selected, Incrceased telemetry collector for ACC, Acknowledge sound for Conversation booster activation, Extended action call format of Reasoning booster, Optimized end of session detection for iRacing.)
+[6.1.2.0-dev](https://www.dropbox.com/scl/fi/i288gfaukvzeyf4d4oapw/Simulator-Controller-6.1.2.0-dev.zip?rlkey=wgf10stpksazrhkjw4k38p9ie&st=unrv0k3l&dl=1) (Early build for 6.1.2. Changes: Major rework of the documentation, Support for weather forecast in LMU, Aproximated grip status for LMU, Pitstop service time for LMU, Changed default activation recognizer to "Desktop", Fixed some bugs for LMU if imperial units are selected, Incrceased telemetry collector for ACC, Acknowledge sound for Conversation booster activation, Extended action call format of Reasoning booster, Optimized end of session detection for iRacing, New car models for rFactor 2.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-612) of this version and all the versions you might have skipped, before installing and using this version.
 

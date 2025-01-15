@@ -14,6 +14,12 @@
   13. The overall pitstop service time is now calculated more precisely for *Le Mans Ultimate*.
   14. A short sound is played now, whenever an Assistant action is triggered by the *Reasoning* booster. This helps to understand whether a given behaviour is caused by a connected LLM.
   15. [Expert] The format of action definitions in the *Conversation* and in the *Reasoning* booster has changed. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions) for more information.
+  16. New car models for "Setup Workbench":
+      - rFactor 2
+        - McLaren 720s GT3
+		- Aston Martin Vantage GT3
+	  - Le Mans Ultimate
+	    - Fixed brake pressure range for Aston Martin Vantage AMR, Corvette C8.R GTE, Ferrari 488 GTE Evo and Porsche 911 RSR-19
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-612), if you are using actions in the *Conversation* booster.
 

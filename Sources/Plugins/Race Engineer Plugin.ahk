@@ -54,7 +54,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 
 		run() {
 			local teamServer := this.Plugin.TeamServer
-			local driverSwapPlan, requestDriver
+			local driverSwapPlan, requestDriver, lap
 
 			if (teamServer && teamServer.SessionActive) {
 				try {
@@ -68,7 +68,12 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 						requestDriver := getMultiMapValue(driverSwapPlan, "Pitstop", "Driver", false)
 						requestDriver := (requestDriver ? [requestDriver] : [])
 
-						this.Plugin.RaceEngineer.planDriverSwap(getMultiMapValue(driverSwapPlan, "Pitstop", "Lap", 0)
+						lap := getMultiMapValue(driverSwapPlan, "Pitstop", "Lap", 0)
+
+						if (lap = 0)
+							lap := "Now"
+
+						this.Plugin.RaceEngineer.planDriverSwap(lap
 															  , "!" . getMultiMapValue(driverSwapPlan, "Pitstop", "Refuel", 0)
 															  , "!" . getMultiMapValue(driverSwapPlan, "Pitstop", "Tyre.Change", false)
 															  , getMultiMapValue(driverSwapPlan, "Pitstop", "Tyre.Set", 0)

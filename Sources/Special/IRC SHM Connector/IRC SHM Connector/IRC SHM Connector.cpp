@@ -698,7 +698,7 @@ void writePositions(std::ostringstream* output, const irsdk_header *header, cons
 
 				getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarNumber:", carIdx);
 
-				; printLine(output, "Car." + std::string(carIdx1) + ".ID=" + std::string(carIdx1));
+				printLine(output, "Car." + std::string(carIdx1) + ".ID=" + std::string(carIdx1));
 				printLine(output, "Car." + std::string(carIdx1) + ".Nr=" + std::string(result));
 
 				if (carPositions)

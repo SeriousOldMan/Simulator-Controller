@@ -1778,7 +1778,7 @@ class RaceStrategist extends GridRaceAssistant {
 					categories := ["Class"]
 			}
 
-			this.RemoteHandler.reviewRace(values2String("|", categories*))
+			Task.startTask(() => this.RemoteHandler.reviewRace(values2String("|", categories*)), 5000, kLowPriority)
 		}
 		else
 			this.finishSession(shutdown, false)

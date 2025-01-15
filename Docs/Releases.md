@@ -9,12 +9,13 @@
   8. Major update to the documentation - removed the term "virtual".
   9. The telemetry collector for ACC has been improved.
   10. Optimized end of session detection for *iRacing* for timed races.
-  11. A detailed weather forecast is now available for *Le Mans Ultimate*.
-  12. The track grip status has been refined for *rFactor 2* and *Le Mans Ultimate*. It is now mostly consistent with the status given in the simulator.
-  13. The overall pitstop service time is now calculated more precisely for *Le Mans Ultimate*.
-  14. A short sound is played now, whenever an Assistant action is triggered by the *Reasoning* booster. This helps to understand whether a given behaviour is caused by a connected LLM.
-  15. [Expert] The format of action definitions in the *Conversation* and in the *Reasoning* booster has changed. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions) for more information.
-  16. New car models for "Setup Workbench":
+  11. Implemented a workaround for *iRacing* results at the end of a session, which are reported asynchronously by the simulator. Works in most cases, but not in all.
+  12. A detailed weather forecast is now available for *Le Mans Ultimate*.
+  13. The track grip status has been refined for *rFactor 2* and *Le Mans Ultimate*. It is now mostly consistent with the status given in the simulator.
+  14. The overall pitstop service time is now calculated more precisely for *Le Mans Ultimate*.
+  15. A short sound is played now, whenever an Assistant action is triggered by the *Reasoning* booster. This helps to understand whether a given behaviour is caused by a connected LLM.
+  16. [Expert] The format of action definitions in the *Conversation* and in the *Reasoning* booster has changed. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions) for more information.
+  17. New car models for "Setup Workbench":
       - rFactor 2
         - McLaren 720s GT3
 		- Aston Martin Vantage GT3

@@ -194,7 +194,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 	local dllFile, names, exception, value, chosen, choices, tabs, import, simulator, ignore, option
 	local dirName, simulatorCode, file, tyreCompound, tyreCompoundColor, fileName, token
 	local x, y, e, directory, connection, settings, serverURLs, settingsTab, oldTChoice, oldFChoice
-	local tyreSets, translatedCompounds
+	local tyreSets, tyreSet, translatedCompounds
 
 	local setupTyreCompound := "Dry"
 	local setupTyreCompoundColor := "Black"
@@ -1289,16 +1289,18 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		setMultiMapValue(newSettings, "Strategy Settings", "Traffic.Simulation", settingsGui["trafficSimulationCheck"].Value)
 
+		setMultiMapValue(newSettings, "Session Rules", "Strategy", ["Yes", "No"][settingsGui["strategyFromRulesDropDown"].Value])
+
 		setMultiMapValue(newSettings, "Session Rules", "Stint.Length", settingsGui["stintLengthEdit"].Text)
 
 		if (settingsGui["pitstopRuleDropDown"].Value = 2) {
-			setMultiMapValue(newSettings, "Session Rules", "Pitstop.Rule", settingsGui["pitstopRuleEdit"])
+			setMultiMapValue(newSettings, "Session Rules", "Pitstop.Rule", settingsGui["pitstopRuleEdit"].Text)
 
 			validatePitstopRule("Full")
 			validatePitstopWindow("Full")
 
 			if (settingsGui["pitstopWindowDropDown"].Value = 2)
-				setMultiMapValue(newSettings, "Session Rules", "Pitstop.Window", settingsGui["pitstopWindowEdit"])
+				setMultiMapValue(newSettings, "Session Rules", "Pitstop.Window", settingsGui["pitstopWindowEdit"].Text)
 			else
 				setMultiMapValue(newSettings, "Session Rules", "Pitstop.Window", false)
 		}
@@ -1313,8 +1315,12 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		tyreSets := []
 		translatedCompounds := collect(gTyreCompounds, translate)
 
-		loop tyreSetListView.GetCount()
-			tyreSets.Push(gTyreCompounds[inList(translatedCompounds, tyreSetListView.GetText(A_Index, 1))] . ":" . tyreSetListView.GetText(A_Index, 2))
+		loop tyreSetListView.GetCount() {
+			splitCompound(gTyreCompounds[inList(translatedCompounds, tyreSetListView.GetText(A_Index, 1))]
+						, &tyreCompound, &tyreCompoundColor)
+
+			tyreSets.Push(values2String(":", tyreCompound, tyreCompoundColor, tyreSetListView.GetText(A_Index, 2)))
+		}
 
 		setMultiMapValue(newSettings, "Session Rules", "TyreSets", values2String(";", tyreSets*))
 
@@ -1432,14 +1438,17 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.SetFont("Norm", "Arial")
 
-		settingsGui.Add("Text", "x16 y82 w75 h23 +0x200", translate("Max. Stint"))
+		settingsGui.Add("Text", "x16 y82 w108 h23", translate("Strategy"))
+		settingsGui.Add("DropDownList", "x" . x7 . " yp-3 w80 vstrategyFromRulesDropDown", collect(["Yes", "No", "Custom"], translate))
+
+		settingsGui.Add("Text", "x66 yp+32 w270 0x10")
+
+		settingsGui.Add("Text", "x16 yp+10 w75 h23 +0x200", translate("Max. Stint"))
 		settingsGui.Add("Edit", "x" . x7 . " yp w50 h20 Limit4 Number VstintLengthEdit", 70)
 		settingsGui.Add("UpDown", "x" . (x7 + 40) . " yp-2 w18 h20 Range1-9999 0x80", 70)
 		settingsGui.Add("Text", "x" . (x7 + 54) . " yp+2 w50 h20", translate("Minutes"))
 
-		settingsGui.Add("Text", "x66 yp+32 w270 0x10")
-
-		settingsGui.Add("Text", "x" . (x5 - 10) . " yp+10 w85 h20 +0x200", translate("Pitstop"))
+		settingsGui.Add("Text", "x" . (x5 - 10) . " yp+30 w85 h20 +0x200", translate("Pitstop"))
 		settingsGui.Add("DropDownList", "x" . x7 . " yp-2 w80 Choose1 VpitstopRuleDropDown", collect(["Optional", "Required"], translate)).OnEvent("Change", choosePitstopRule)
 		settingsGui.Add("Edit", "x" . x11 . " yp+1 w50 h20 Number Limit2 VpitstopRuleEdit", 1).OnEvent("Change", updatePitstopRule)
 		settingsGui.Add("UpDown", "x" . x11 . " yp+1 w50 h20 Range0-99 VpitstopRuleUpDown")
@@ -1455,20 +1464,18 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.Add("Text", "x" . (x5 - 10) . " yp+27 w85 h23 +0x200 VtyreChangeRequirementsLabel", translate("Tyre Change"))
 		settingsGui.Add("DropDownList", "x" . x7 . " yp w80 Choose1 VtyreChangeRequirementsDropDown", collect(["Optional", "Required", "Always", "Disallowed"], translate))
 
-		settingsGui.Add("Text", "x66 yp+32 w270 0x10")
+		settingsGui.Add("Text", "x" . (x5 - 10) . " yp+30 w85 h23 +0x200", translate("Tyre Sets"))
 
-		settingsGui.Add("Text", "x" . (x5 - 10) . " yp+10 w85 h23 +0x200", translate("Tyre Sets"))
+		w12 := (x11 + 70 - x7)
 
-		w12 := (x11 + 50 - x7)
-
-		tyreSetListView := settingsGui.Add("ListView", "x" . x7 . " yp w" . w12 . " h60 -Multi -Hdr -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "#"], translate))
+		tyreSetListView := settingsGui.Add("ListView", "x" . x7 . " yp w" . w12 . " h118 -Multi -Hdr -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "#"], translate))
 		tyreSetListView.OnEvent("Click", choosePSTyreSet)
 		tyreSetListView.OnEvent("DoubleClick", choosePSTyreSet)
 		tyreSetListView.OnEvent("ItemSelect", selectPSTyreSet)
 
-		x13 := (x7 + w12 + 5)
+		x13 := (x7 + w12 + 15)
 
-		settingsGui.Add("DropDownList", "x" . x13 . " yp w116 Choose0 vtyreSetDropDown", [translate(normalizeCompound("Dry"))]).OnEvent("Change", updatePSTyreSet)
+		settingsGui.Add("DropDownList", "x" . x13 . " yp w106 Choose0 vtyreSetDropDown", [translate(normalizeCompound("Dry"))]).OnEvent("Change", updatePSTyreSet)
 		settingsGui.Add("Edit", "x" . x13 . " yp+24 w40 h20 Limit2 Number vtyreSetCountEdit").OnEvent("Change", updatePSTyreSet)
 		settingsGui.Add("UpDown", "x" . x13 . " yp w18 h20 0x80 Range0-99")
 
@@ -1909,15 +1916,14 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		loadTyreCompounds()
 
+		settingsGui["strategyFromRulesDropDown"].Choose(inList(["Yes", "No"], getMultiMapValue(settingsOrCommand, "Session Rules", "Strategy", "No")))
 		settingsGui["stintLengthEdit"].Text := getMultiMapValue(settingsOrCommand, "Session Rules", "Stint.Length", 70)
 
-		if getMultiMapValue(settingsOrCommand, "Session Rules", "Pitstop.Window", false) {
-			settingsGui["pitstopRuleDropDown"].Choose(2)
+		settingsGui["pitstopRuleEdit"].Text := getMultiMapValue(settingsOrCommand, "Session Rules", "Pitstop.Rule", 0)
+		settingsGui["pitstopRuleDropDown"].Choose(1 + (settingsGui["pitstopRuleEdit"].Text > 0))
 
-			settingsGui["pitstopRuleEdit"] := getMultiMapValue(settingsOrCommand, "Session Rules", "Pitstop.Window")
-		}
-		else
-			settingsGui["pitstopRuleDropDown"].Choose(1)
+		settingsGui["pitstopWindowDropDown"].Choose(1 + !!getMultiMapValue(settingsOrCommand, "Session Rules", "Pitstop.Window", false))
+		settingsGui["pitstopWindowEdit"].Text := getMultiMapValue(settingsOrCommand, "Session Rules", "Pitstop.Window")
 
 		settingsGui["refuelRequirementsDropDown"].Choose(inList(["Optional", "Required", "Always", "Disallowed"]
 															  , getMultiMapValue(settingsOrCommand, "Session Rules"
@@ -1936,8 +1942,8 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			tyreCompound := string2Values(":", tyreCompound)
 
 			loop tyreSetListView.GetCount()
-				if (translate(tyreCompound[1]) = tyreSetListView.GetText(A_Index, 1))
-					tyreSetListView.Modify(A_Index, "Col2", tyreCompound[2])
+				if (translate(compound(tyreCompound[1], tyreCompound[2])) = tyreSetListView.GetText(A_Index, 1))
+					tyreSetListView.Modify(A_Index, "Col2", tyreCompound[3])
 		}
 
 		editRaceSettings(&updateState)
@@ -1974,9 +1980,9 @@ showRaceSettingsEditor() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Race Settings"
 
-	gSimulator := "Le Mans Ultimate"
-	gCar := "Alpine A424"
-	gTrack := "Autodromo Enzo e Dino Ferrari"
+	gSimulator := false
+	gCar := false
+	gTrack := false
 	gWeather := "Dry"
 	gAirTemperature := 23
 	gTrackTemperature := 27

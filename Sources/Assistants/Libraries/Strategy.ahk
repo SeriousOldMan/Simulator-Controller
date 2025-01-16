@@ -716,7 +716,7 @@ class StrategySimulation {
 			if verbose {
 				message := translate("Creating Scenarios...")
 
-				showProgress({progress: progress, color: "Green", title: translate("Running Simulation")})
+				showProgress({progress: progress, color: "Green", title: translate("Running Simulation"), message: message})
 			}
 
 			Sleep(200)

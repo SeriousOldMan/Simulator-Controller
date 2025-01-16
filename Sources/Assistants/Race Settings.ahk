@@ -1322,7 +1322,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			tyreSets.Push(values2String(":", tyreCompound, tyreCompoundColor, tyreSetListView.GetText(A_Index, 2)))
 		}
 
-		setMultiMapValue(newSettings, "Session Rules", "TyreSets", values2String(";", tyreSets*))
+		setMultiMapValue(newSettings, "Session Rules", "Tyre.Sets", values2String(";", tyreSets*))
 
 		if gTeamMode {
 			setMultiMapValue(newSettings, "Team Settings", "Server.URL", settingsGui["serverURLEdit"].Text)
@@ -1938,7 +1938,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			tyreSetListView.Modify(A_Index, "-Select Col2", 99)
 
 		for ignore, tyreCompound in string2Values(";", getMultiMapValue(settingsOrCommand, "Session Rules"
-																						 , "TyreSets", "")) {
+																						 , "Tyre.Sets", "")) {
 			tyreCompound := string2Values(":", tyreCompound)
 
 			loop tyreSetListView.GetCount()

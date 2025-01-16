@@ -787,7 +787,9 @@ class RaceStrategist extends GridRaceAssistant {
 
 	Strategy[original := false] {
 		Get {
-			return (original ? ((original = "Rejected") ? this.iRejectedStrategy : this.iOriginalStrategy) : this.iStrategy)
+			return (original ? ((original = "Rejected") ? this.iRejectedStrategy
+														: ((original = "Dynamic") ? this.iDynamicStrategy : this.iOriginalStrategy))
+							 : this.iStrategy)
 		}
 	}
 
@@ -1631,7 +1633,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 	loadRules(data) {
 		if ((this.Session == kSessionRace) && (getMultiMapValue(this.Settings, "Session Rules", "Strategy", "No") = "Yes")
-		 && !this.Strategy && !this.DynamicStrategy && (getMultiMapValue(data, "Stint Data", "Laps", 0) < 5)
+		 && !this.Strategy && !this.Strategy["Dynamic"] && (getMultiMapValue(data, "Stint Data", "Laps", 0) < 5)
 		 && this.hasEnoughData(false))
 			this.recommendStrategy({Silent: true, Confirm: false, Request: "Rules"})
 	}
@@ -2690,7 +2692,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 			sessionType := ((knowledgeBase.getValue("Session.Format", "Time") = "Time") ? "Duration" : "Laps")
 			sessionLength := (knowledgeBase.getValue("Session.Duration") / 60)
-			maxTyreLaps := getMultiMapValue(this.Settings, "Session Rules", "TyreLaps", 40)
+			maxTyreLaps := getMultiMapValue(this.Settings, "Session Rules", "Tyre.Laps", 40)
 			tyrePressures := [Round(knowledgeBase.getValue("Lap." . lap . ".Tyre.Pressure.FL"), 1)
 							, Round(knowledgeBase.getValue("Lap." . lap . ".Tyre.Pressure.FR"), 1)
 							, Round(knowledgeBase.getValue("Lap." . lap . ".Tyre.Pressure.RL"), 1)
@@ -2906,7 +2908,7 @@ class RaceStrategist extends GridRaceAssistant {
 			tyreSets := []
 
 			for ignore, tyreSet in string2Values(";", getMultiMapValue(this.Settings, "Session Rules"
-																					, "TyreSets", "")) {
+																					, "Tyre.Sets", "")) {
 				tyreSet := string2Values(":", tyreSet)
 
 				if (tyreSet.Length < 4) {

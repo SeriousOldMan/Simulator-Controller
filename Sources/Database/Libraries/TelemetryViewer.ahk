@@ -1121,9 +1121,14 @@ class TelemetryViewer {
 			this.CollectingNotifier.document.close()
 		}
 		else {
-			this.iTelemetryCollector.initialize(simulator, track, trackLength)
+			if ((this.iTelemetryCollector.Simulator != simulator) || (this.iTelemetryCollector.Track != track)
+																  || (this.iTelemetryCollector.TrackLength != trackLength)) {
+				this.iTelemetryCollector.initialize(simulator, track, trackLength)
 
-			this.iTelemetryCollector.startup(true)
+				this.iTelemetryCollector.startup(true)
+			}
+			else
+				this.iTelemetryCollector.startup()
 		}
 	}
 

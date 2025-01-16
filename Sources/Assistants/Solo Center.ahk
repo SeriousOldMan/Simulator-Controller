@@ -7606,7 +7606,7 @@ class SoloCenter extends ConfigurationItem {
 	startSession(data, wait := false) {
 		startSessionAsync() {
 			local fileName := (isObject(data) ? false : data)
-			local data, save, translator, msgResult
+			local save, translator, msgResult
 
 			if fileName
 				data := readMultiMap(fileName)

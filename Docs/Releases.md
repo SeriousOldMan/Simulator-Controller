@@ -1,3 +1,9 @@
+## 6.1.3.0-release 01/24/25 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. "Race Settings" has been extended and allows now to define basic race rules for the next race.
+  4. The Strategist can now create a strategy dynamically based on simple race rules configured in the "Race Settings".
+
 ## 6.1.2.0-release 01/17/25 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

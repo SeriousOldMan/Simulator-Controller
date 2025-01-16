@@ -1,9 +1,9 @@
 [Development]
-Version=6.1.2.0-beta
-Target=6.1.2.0-release
-Date=01/15/2025
-Download=https://www.dropbox.com/scl/fi/p8dgvpystukjzcarjhci1/Simulator-Controller-6.1.2.0-beta.zip?rlkey=sdm8q9slvhx3r0izww8t38xor&st=p84madms&dl=1
-Changes=Major rework of the documentation, Support for weather forecast in LMU, Aproximated grip status for LMU, Pitstop service time for LMU, Changed default activation recognizer to "Desktop", Fixed some bugs for LMU if imperial units are selected, Incrceased telemetry collector for ACC, Acknowledge sound for Conversation booster activation, Extended action call format of Reasoning booster, Optimized end of session detection for iRacing, New car models for rFactor 2, Updated car models for Le Mans Ultimate
+Version=6.1.3.0-dev
+Target=6.1.3.0-release
+Date=01/16/2025
+Download=
+Changes=Dynamic strategy creation based on race rules
 Components=Media->5.6.1,Configuration->6.1.2,Utilities->5.9.8
 [Release]
 Version=6.1.1.0-release
@@ -27,5 +27,5 @@ Utilities.5.9.8.Download=https://www.dropbox.com/scl/fi/pjtq7f3u6uoy5ld88vqz9/Ut
 [Current]
 Type=Development
 [Version]
-Development=6.1.2.0-beta
+Development=6.1.3.0-dev
 Release=6.1.1.0-release

@@ -246,39 +246,63 @@ class CarInfo {
 		}
 	}
 
-	AvgLapTime[count := 3] {
+	AvgLapTime[weighted := false, count := 3] {
 		Get {
 			local lapTimes := []
 			local numLapTimes := this.LapTimes.Length
+			local lapTime
 
-			loop Min(count, numLapTimes)
-				lapTimes.Push(this.LapTimes[numLapTimes - A_Index + 1])
+			if weighted {
+				loop Min(count, numLapTimes) {
+					lapTime := this.LapTimes[numLapTimes - A_Index + 1]
+
+					if (A_Index = numLapTimes)
+						lapTimes.Push(lapTime)
+
+					lapTimes.Push(lapTime)
+				}
+			}
+			else
+				loop Min(count, numLapTimes)
+					lapTimes.Push(this.LapTimes[numLapTimes - A_Index + 1])
 
 			return Round(average(lapTimes), 1)
 		}
 	}
 
-	AvgSectorTime[sector, count := 3] {
+	AvgSectorTime[sector, weighted := false, count := 3] {
 		Get {
 			local sectorTimes := []
 			local numSectorTimes := this.SectorTimes[sector].Length
+			local sectorTime
 
-			loop Min(count, numSectorTimes)
-				sectorTimes.Push(this.SectorTimes[sector][numSectorTimes - A_Index + 1])
+			if weighted {
+				loop Min(count, numSectorTimes) {
+					sectorTime := this.SectorTimes[sector][numSectorTimes - A_Index + 1]
+
+					if (A_Index = numLapTimes)
+						sectorTimes.Push(sectorTime)
+
+					sectorTimes.Push(sectorTime)
+				}
+			}
+			else
+				loop Min(count, numSectorTimes)
+					sectorTimes.Push(this.SectorTimes[sector][numSectorTimes - A_Index + 1])
 
 			return Round(average(sectorTimes), 1)
 		}
 	}
 
-	LapTime[average := false] {
+	LapTime[average := false, weighted := false] {
 		Get {
-			return (average ? this.AvgLapTime : this.LastLapTime)
+			return (average ? this.AvgLapTime[weighted] : this.LastLapTime)
 		}
 	}
 
-	SectorTime[sector, average := false] {
+	SectorTime[sector, average := false, weighted := false] {
 		Get {
-			return (average ? this.AvgSectorTime[sector] : this.LastSectorTime)
+			return (average ? this.AvgSectorTime[sector, weighted] : this.LastSectorTime)
 		}
 	}
 
@@ -691,6 +715,10 @@ class PositionInfo {
 			return (percentage ? (difference > (this.Spotter.DriverCar.AvgLapTime / 100 * percentage)) : true)
 		else
 			return false
+	}
+
+	isSlower(sector, percentage := false) {
+		return !this.isFaster(sector, percentage)
 	}
 
 	closingIn(sector, threshold := 0.5) {
@@ -2072,7 +2100,7 @@ class RaceSpotter extends GridRaceAssistant {
 			if (standingsAhead && standingsAhead.hasProblem()) {
 				situation := ("AheadProblem " . lastLap)
 
-				if !this.TacticalAdvices.Has(situation) {
+				if (!this.TacticalAdvices.Has(situation) && !this.TacticalAdvices.Has("AheadProblem " . (lastLap - 1))) {
 					this.TacticalAdvices[situation] := true
 
 					speaker.speakPhrase("AheadProblem")
@@ -2084,7 +2112,7 @@ class RaceSpotter extends GridRaceAssistant {
 			if (focused && focused.hasProblem()) {
 				situation := ("FocusProblem " . lastLap)
 
-				if !this.TacticalAdvices.Has(situation) {
+				if (!this.TacticalAdvices.Has(situation) && !this.TacticalAdvices.Has("FocusProblem " . (lastLap - 1))) {
 					this.TacticalAdvices[situation] := true
 
 					speaker.speakPhrase("FocusProblem", {indicator: this.getCarIndicatorFragment(speaker, focused.Car.Nr, focused.Car.Position["Class"])})
@@ -2125,8 +2153,7 @@ class RaceSpotter extends GridRaceAssistant {
 						return true
 					}
 				}
-				else if (((opponentType = "LapDown") || (opponentType = "LapUp"))
-					  && trackBehind.isFaster(sector, 1)) {
+				else if (((opponentType = "LapDown") || (opponentType = "LapUp")) && trackBehind.isFaster(sector, 0.25)) {
 					situation := (opponentType . "Faster " . trackBehind.Car.ID)
 
 					if !this.TacticalAdvices.Has(situation) {
@@ -2141,10 +2168,12 @@ class RaceSpotter extends GridRaceAssistant {
 							carPitstops := trackBehind.Car.Pitstops.Length
 
 							if ((driverPitstops < carPitstops) && (opponentType = "LapDown"))
-								speaker.speakPhrase("MorePitstops", {conjunction: speaker.Fragments["But"], pitstops: carPitstops - driverPitstops})
+								speaker.speakPhrase("MorePitstops", {conjunction: speaker.Fragments["But"]
+																   , pitstops: carPitstops - driverPitstops})
 							else if ((driverPitstops > carPitstops) && (opponentType = "LapUp"))
-								speaker.speakPhrase("LessPitstops", {conjunction: speaker.Fragments["But"], pitstops: driverPitstops - carPitstops})
-							else
+								speaker.speakPhrase("LessPitstops", {conjunction: speaker.Fragments["But"]
+																   , pitstops: driverPitstops - carPitstops})
+							else if !trackBehind.isFaster(sector, 0.75)
 								speaker.speakPhrase("Slipstream")
 						}
 						finally {
@@ -2159,7 +2188,7 @@ class RaceSpotter extends GridRaceAssistant {
 			if (standingsBehind && standingsBehind.hasProblem()) {
 				situation := ("BehindProblem " . lastLap)
 
-				if !this.TacticalAdvices.Has(situation) {
+				if (!this.TacticalAdvices.Has(situation) && !this.TacticalAdvices.Has("BehindProblem " . (lastLap - 1))) {
 					this.TacticalAdvices[situation] := true
 
 					speaker.speakPhrase("BehindProblem")
@@ -2846,7 +2875,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 		if lapTime {
 			minute := Floor(lapTime / 60)
-			delta := (lapTime - this.DriverCar.LapTime)
+			delta := (lapTime - this.DriverCar.LastLapTime)
 
 			speaker := this.getSpeaker()
 

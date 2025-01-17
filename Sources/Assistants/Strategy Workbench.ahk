@@ -2813,6 +2813,8 @@ class StrategyWorkbench extends ConfigurationItem {
 							this.Control["simFuelConsumptionEdit"].Text := displayValue("Float", convertUnit("Volume", getMultiMapValue(settings, "Session Settings", "Fuel.AvgConsumption", 3.0)))
 
 							if (getMultiMapValue(settings, "Session Rules", "Strategy", "No") = "Yes") {
+								this.Control["stintLengthEdit"].Text := getMultiMapValue(settings, "Session Rules", "Stint.Length", 70)
+
 								pitstopRule := getMultiMapValue(settings, "Session Rules", "Pitstop.Rule", 0)
 
 								if !pitstopRule {

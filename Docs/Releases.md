@@ -1,4 +1,4 @@
-## 6.1.2.0-release 01/17/25 (planned)
+## 6.1.2.0-release 01/17/25
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a bug in the Spanish grammars for the Spotter, which caused it to crash when announcing a new best lap for the leader.

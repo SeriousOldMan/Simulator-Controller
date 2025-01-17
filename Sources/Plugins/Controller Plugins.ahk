@@ -22,8 +22,9 @@
 #Include "Race Strategist Plugin.ahk"			; Must be loaded before any other Simulator Plugins
 #Include "Race Spotter Plugin.ahk"				; Must be loaded before any other Simulator Plugins
 #Include "AC Plugin.ahk"
-#Include "AMS2 Plugin.ahk"
+#Include "ACE Plugin.ahk"
 #Include "ACC Plugin.ahk"
+#Include "AMS2 Plugin.ahk"
 #Include "IRC Plugin.ahk"
 #Include "R3E Plugin.ahk"
 #Include "RF2 Plugin.ahk"

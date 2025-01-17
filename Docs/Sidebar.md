@@ -198,7 +198,7 @@
 	- [Extending capabilities with an LLM](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#extending-conversation-and-reasoning-capabilities-using-an-llm)
     - [Managing Announcements and Warnings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#enabling-and-disabling-specific-warnings-and-announcements)
   - [Racing with Jona](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#racing-with-jona)
-    - [Race Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-race)
+    - [Race Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-session)
     - [Pitstop Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-pitstop)
     - [Strategy Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-strategy)
 	- [Team Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-team)

@@ -295,7 +295,7 @@ Most options above define general settings which may be applicable to many diffe
 
 Let's have a look at the settings tool, which provides a graphical user interface for the *Race.settings* file. The dialog provides two distinct areas as tabs.
 
-#### Tab *Race*
+#### Tab *Session*
 
 The first tab of the settings tool contains information about the actual session, which typically will be a race.
 
@@ -309,9 +309,17 @@ Note: We requested a more versatile access to setup informations from Kunos alre
 
 Additionally worth to be mentioned is the field *Pitstop.Delta*, with which you supply the difference time needed for a normal pitstop (time for pit in and pit out but without any service the time minus the time to pass the pit area on the track). This information is used by Jona to decide, whether an early pitstop for a tyre change or damage repair might be worthwhile.
 
+#### Tab *Rules*
+
+Here you can enter basis race rules for the next race, which will be used by the AI Race Strategist, to try to create a strategy *on the fly*.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Settings%205.JPG)
+
+Please see the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#tab-rules) in the AI Race Strategist chapter for a description of these fields.
+
 #### Tab *Pitstop*
 
-The second tab, *Pitstop*, contains information that will be used to derived the settings for a pitstop.
+The third tab, *Pitstop*, contains information that will be used to derive the plan for a pitstop.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Settings%202.JPG)
 
@@ -355,7 +363,7 @@ Beside the session respectively race specific settings described in the previous
 
 #### Tab *Strategy*
 
-You will find settings for the race strategy analysis and simulation in the third tab. These settings are mainly used by the AI Race Strategist, but some of them, for example the *Pitstop Delta* time or the *Safety Fuel* will also be used by Jona.
+You will find settings for the race strategy analysis and simulation in the fourth tab. These settings are mainly used by the AI Race Strategist, but some of them, for example the *Pitstop Delta* time or the *Safety Fuel* will also be used by Jona.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Settings%203.JPG)
 
@@ -394,7 +402,7 @@ It is no problem to change the settings marked above with "No" in a case of urge
 
 #### *Assetto Corsa Competizione*
 
-Jona can acquire the curent settings directly from *Assetto Corsa Competizione* via API. Jona uses the values already set in the Pitstop MFD and applies the delta to the desired target values. Please note, that this requires the settings in the [*Race Settings*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-race) dialog to be valid. Beside that, I still recommend to setup a reasonable pitstop strategy, since this will reduce the time needed to dial in all those numbers (going from 0 to 120 liters of refueling will take quite some time).
+Jona can acquire the curent settings directly from *Assetto Corsa Competizione* via API. Jona uses the values already set in the Pitstop MFD and applies the delta to the desired target values. Please note, that this requires the settings in the [*Race Settings*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-session) dialog to be valid. Beside that, I still recommend to setup a reasonable pitstop strategy, since this will reduce the time needed to dial in all those numbers (going from 0 to 120 liters of refueling will take quite some time).
 
 A special case is the management of tyre sets. You can either dial the values of the tyre set mounted at the start of the session and the first fresh tyre set for the first pitstop into the "Race Settings", or you can set both values to "Auto" (or to **0** in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database)). In this case, tyre sets are managed completely by the simulation when it comes to a pitstop.
 

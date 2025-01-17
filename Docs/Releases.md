@@ -3180,7 +3180,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	 - Several edge case optimizations
 	 - Full integration of shared memory information for refuel amount and tyre pressuresm, therefore simplified [setup of pitstop strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#the-pitstop)
   5. Improvements for Jona
-	 - *Race Engineer Settings* tool can now [import the current settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-race) from the Pitstop MFD 
+	 - *Race Engineer Settings* tool can now [import the current settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-session) from the Pitstop MFD 
 	 - When driver decides for a different tyre compound than recommended, the target pressures will be fully recalculated
   5. Initial setup of database for [Big Data race setup collection](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#race--setup-database)
      - Opt In for community based data acquisition

@@ -218,7 +218,7 @@ Here you will get a recommendation for initial cold tyre pressures, if a matchin
 Notes:
 
   1. If you choose a specific driver in the "Driver" menu, only the tyre pressures of this driver are shown, if available.
-  2. If the "Session Database" tool has been [started by the "Race Settings" tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-race), you can transfer the current tyre pressure and compound information to the *Race Settings* by pressing the "Load" button.
+  2. If the "Session Database" tool has been [started by the "Race Settings" tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-session), you can transfer the current tyre pressure and compound information to the *Race Settings* by pressing the "Load" button.
   3. You can configure using the settings in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#race-settings) the session types, from which tyre pressure data will be collected and stored into the database by the Race Engineer. Default is to collect tyre pressure data during practice and race sessions.
 
 ##### Browsing and editing Tyre Pressures

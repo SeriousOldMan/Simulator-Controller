@@ -1474,7 +1474,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		loop 2
 			runWidgets.Push(%"widget" . A_Index%)
 
-		widget1 := analyzerGui.Add("ListView", "x16 ys w336 h254 -Multi -LV0x10 Checked NoSort NoSortHdr  Hidden", collect(["Characteristic", "Intensity", "Frequency (%)"], translate))
+		widget1 := analyzerGui.Add("ListView", "x16 ys w336 h254 -Multi -LV0x10 Checked NoSort NoSortHdr Hidden", collect(["Characteristic", "Intensity", "Frequency (%)"], translate))
 		widget1.OnEvent("Click", noSelect)
 		widget1.OnEvent("DoubleClick", noSelect)
 

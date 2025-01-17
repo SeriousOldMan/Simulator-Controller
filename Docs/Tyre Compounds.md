@@ -167,7 +167,7 @@ As already mentioned, the world is easy in *Assetto Corsa Competizione*. Every c
 
 ### Special notes for *Project CARS 2*
 
-Unfortunately, this simulator does not provide any information about the currently mounted tyre compound in the data available through the API. So make sure, that you have set the mounted tyre compound with the [*Race Settings*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-race), before you head out onto the track, otherwise you will end up with a wrong compound chosen during the next pitstop, or the control of tyre compounds in the ICM might fail completely.
+Unfortunately, this simulator does not provide any information about the currently mounted tyre compound in the data available through the API. So make sure, that you have set the mounted tyre compound with the [*Race Settings*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-session), before you head out onto the track, otherwise you will end up with a wrong compound chosen during the next pitstop, or the control of tyre compounds in the ICM might fail completely.
 
 ### Special notes for *iRacing*
 

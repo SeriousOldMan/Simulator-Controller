@@ -70,6 +70,7 @@ Loading of settings is supported for:
 	   - Race Duration
 	   - Formation Lap
 	   - Post Race Lap
+	   - All pitstop rules if active in the race settings
 	 - Pitstop & Service
 	   - Pitstop Delta
 	   - Tyre Service Time

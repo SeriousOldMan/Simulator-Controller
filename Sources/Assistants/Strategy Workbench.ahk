@@ -2623,10 +2623,13 @@ class StrategyWorkbench extends ConfigurationItem {
 							this.Control["tyreChangeRequirementsDropDown"].Choose(inList(["Optional", "Always", "Disallowed"], strategy.TyreChangeRule))
 						}
 
-						this.TyreSetListView.Delete()
-
-						for ignore, descriptor in strategy.TyreSets
+						for ignore, descriptor in strategy.TyreSets {
 							this.TyreSetListView.Add("", translate(compound(descriptor[1], descriptor[2])), descriptor[3])
+
+							loop this.TyreSetListView.GetCount()
+								if (translate(compound(descriptor[1], descriptor[2])) = this.TyreSetListView.GetText(A_Index, 1))
+									this.TyreSetListView.Modify(A_Index, "Col2", descriptor[3])
+						}
 
 						this.TyreSetListView.ModifyCol()
 
@@ -2808,6 +2811,73 @@ class StrategyWorkbench extends ConfigurationItem {
 
 							this.Control["simAvgLapTimeEdit"].Text := displayValue("Float", getMultiMapValue(settings, "Session Settings", "Lap.AvgTime", 120), 1)
 							this.Control["simFuelConsumptionEdit"].Text := displayValue("Float", convertUnit("Volume", getMultiMapValue(settings, "Session Settings", "Fuel.AvgConsumption", 3.0)))
+
+							if (getMultiMapValue(settings, "Session Rules", "Strategy", "No") = "Yes") {
+								pitstopRule := getMultiMapValue(settings, "Session Rules", "Pitstop.Rule", 0)
+
+								if !pitstopRule {
+									this.Control["pitstopRuleDropDown"].Choose(1)
+
+									value := ""
+								}
+								else {
+									this.Control["pitstopRuleDropDown"].Choose(2)
+
+									value := pitstopRule
+								}
+
+								this.Control["pitstopRuleEdit"].Text := value
+
+								pitstopWindow := getMultiMapValue(settings, "Session Rules", "Pitstop.Window", false)
+
+								if !pitstopWindow {
+									this.Control["pitstopWindowDropDown"].Choose(1)
+
+									value := ""
+								}
+								else {
+									this.Control["pitstopWindowDropDown"].Delete()
+									this.Control["pitstopWindowDropDown"].Add(collect(["Always", "Window"], translate))
+
+									this.Control["pitstopWindowDropDown"].Choose(2)
+
+									value := values2String("-", pitstopWindow*)
+								}
+
+								this.Control["pitstopWindowEdit"].Text := value
+
+								if pitstopRule {
+									this.Control["tyreChangeRequirementsDropDown"].Delete()
+									this.Control["tyreChangeRequirementsDropDown"].Add(collect(["Optional", "Required", "Always", "Disallowed"], translate))
+									this.Control["refuelRequirementsDropDown"].Delete()
+									this.Control["refuelRequirementsDropDown"].Add(collect(["Optional", "Required", "Always", "Disallowed"], translate))
+
+									this.Control["refuelRequirementsDropDown"].Choose(inList(["Optional", "Required", "Always", "Disallowed"], getMultiMapValue(settings, "Session Rules", "Pitstop.Refuel", "Optional")))
+									this.Control["tyreChangeRequirementsDropDown"].Choose(inList(["Optional", "Required", "Always", "Disallowed"], getMultiMapValue(settings, "Session Rules", "Pitstop.Tyre", "Optional")))
+								}
+								else {
+									this.Control["tyreChangeRequirementsDropDown"].Delete()
+									this.Control["tyreChangeRequirementsDropDown"].Add(collect(["Optional", "Always", "Disallowed"], translate))
+									this.Control["refuelRequirementsDropDown"].Delete()
+									this.Control["refuelRequirementsDropDown"].Add(collect(["Optional", "Always", "Disallowed"], translate))
+
+									this.Control["refuelRequirementsDropDown"].Choose(inList(["Optional", "Always", "Disallowed"], getMultiMapValue(settings, "Session Rules", "Pitstop.Refuel", "Optional")))
+									this.Control["tyreChangeRequirementsDropDown"].Choose(inList(["Optional", "Always", "Disallowed"], getMultiMapValue(settings, "Session Rules", "Pitstop.Tyre", "Optional")))
+								}
+
+								for ignore, descriptor in string2Values(";", getMultiMapValue(settings, "Session Rules"
+																									  , "Tyre.Sets", "")) {
+									descriptor := string2Values(":", descriptor)
+
+									loop this.TyreSetListView.GetCount()
+										if (translate(compound(descriptor[1], descriptor[2])) = this.TyreSetListView.GetText(A_Index, 1))
+											this.TyreSetListView.Modify(A_Index, "Col2", descriptor[3])
+								}
+
+								this.TyreSetListView.ModifyCol()
+
+								this.updateState()
+							}
 						}
 					}
 				}

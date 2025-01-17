@@ -134,9 +134,17 @@ Cato *understands* multi-class and multi-category races. Position evaluation and
 
 Cato shares many settings with Jona. Therefore consult the documentation on the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#race-settings) in the documentation for Jona for the general use of the settings tool and the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database).
 
+#### Tab *Rules*
+
+Normally, Cato will use a predefined strategy which can be created using the ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench) as described [below](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#strategy-handling). As an alternative, you can also enter the race rules in the "Race Settings" and the Strategist will try to create a strategy *on the fly*. This is useful for races with simple rules, like in typical sprint races with one pitstop. For more complex strategies prepare your strategy before the race.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Settings%205.JPG)
+
+To prepare for a race with this kind of strategy handling, set *Active* to "Yes" and enter the race rules using the entry fields below. This settings have more than less the same meaning as in the [tab *Rules & Settings*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#rules--settings) in the "Strategy Workbench". Most important is the number of required pitstops and whether refueling and tyre changes are required. You can also define a pitstop window here. If the session has a restricted number of tyre sets, you can also specify the available sets here.
+
 #### Tab *Strategy*
 
-You will find settings for the race strategy analysis and simulation in the third tab of the settings tool.
+You will find settings for the race strategy analysis and simulation in the fourth tab of the settings tool.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Settings%203.JPG)
 
@@ -169,19 +177,23 @@ The following statistical models are currently implemented:
 	 
 	 You can configure in the race settings, that this predefined strategy will be revised actively by Cato depending on the current race situation or unplanned pitstops and so on.
 
-  2. Weather trend analysis
+  2. *On the fly* strategy development
+  
+     Quite similar to the previous point, a strategy can also be derived from the basic race rules specified in the "Race Settings". Additionally, enough data for the current car / track combination must be available in the "Session Database". If a strategy can be created by Cato this way, it will further behave identical to a predefined strategy created by the "Strategy Workbench".
+
+  3. Weather trend analysis
   
      Cato will observe the weather development using the same rule set, that Jona uses. Thereby, Cato will notify you, when it is time to change the tyres, to achieve the best results. If you accept the recommendation, Cato will inform Jona to plan a pitstop with the best tyre compound for the upcoming conditions. Additionally, if Cato is currently following a predefined strategy, he will try to revise this strategy to take the new weather conditions into account.
 
-  3. Fuel availabilty and stint time calculation
+  4. Fuel availabilty and stint time calculation
   
      Cato will observe the average fuel comsumption. Depending on the race situation and strategy requirements, Cato might suggest to save fuel to get one or two more laps from the available full. If you don't follow this recommendations, Cato will try to revise the strategy, to take this into account as well.
 
-  4. Standings and race position development
+  5. Standings and race position development
 
      Using the position data gathered from the simulation game, Cato builds a knowledge of the pace of the various drivers. As a simple application of this knowledge, Cato can give you information about the current race positions and lap times of your opponents and the gaps between the cars. A more complex application will be a forecast of the race positions in a given time frame (see the next point).
 	 
-  5. Pitstop simulation
+  6. Pitstop simulation
   
      Also using the position data and a complex prediction model, Cato can determine the best lap for the next pitstop in a given pitstop window. The pitstop delta time as well as the service time is taken into account. The best pitstop lap will be selected based on position and the expected traffic after the pitstop.
 
@@ -190,6 +202,8 @@ The following statistical models are currently implemented:
 Cato can use strategies that have been created with the ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench) during a race. When a race session starts, Cato looks for a currently defined strategy and checks, whether this strategy has been defined for the same car and track in the same conditions and whether the duration of the upcoming session is identical to that defined in the strategy. If all these aspects match, Cato will use the given strategy during the race. If there is a pitstop upcoming, Cato will actively inform you and will, as long as you accept it, hand over all settings for the pitstop to Jona for further handling. The pitstop will be planned and prepared for a specific lap and if you are in this lap, all settings will be entered into the Pitstop MFD of the current simulation without any necessary interaction from your side.
 
 The Engineer, however, may revise parts of the request of the Strategist, especially for the last stint, because he has a much more precise understanding of the car state, fuel consumption, tyre wear, and so on. Those changes are only applied, if they are in accordance with the race rules.
+
+As said above, Cato is also able to derive a strategy *on the fly* based on the supplied race rules in the "Race Settings" as long as enough data about the current car / track combination is available in the "Session Database". If this is possible, Cato will tell you that a strategy is available immediately after the end of the learning phase. This strategy may not be as sophisticated as a predefined strategy, but for the purpose of simple sprint races with one or two pitstops, going this route will be more than good enough.
 
 Important: Cato keeps track of your pitstops, if you visit the pit after being called and with a preparation done by Jona. But Cato also checks whether the current lap fits to the strategy, if you visit the pit *on your own*. As long as the current lap is equal to the lap planned in the strategy +/- the number of laps defined as the pitstop window in the settings, it will count as a valid pitstop with regards to the strategy. Since most simulators do not flag a stop in the pits, whether it is a normal one, or whether it is for serving a penalty, this can lead to *problems* in those special cases, when you got a penalty and serve it right before the next planned pitstop. Cato tries to cope with that, but is not always successful. Sometimes, Cato will come up with a strategy revision after you have been in the pit for serving a penalty (depending on the conditions and the initial race rules), if you  have enabled automatic strategy revisions in the settings. Be sure to check the revised strategy before accepting it, since Cato may count the penalty serving as a valid pitstop against the pitstop rules. If in doubt, reject the recommendation.
 

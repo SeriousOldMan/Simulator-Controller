@@ -219,6 +219,7 @@
 	- [Extending capabilities with an LLM](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#extending-conversation-and-reasoning-capabilities-using-an-llm)
     - [Managing Announcements and Warnings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#enabling-and-disabling-specific-warnings-and-announcements)
   - [Racing with Cato](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#racing-with-cato)
+    - [Race Rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#tab-rules)
     - [Strategy Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#tab-strategy)
     - [Pitstop Recommendation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#pitstop-recommendation)
 	- [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#how-it-works)

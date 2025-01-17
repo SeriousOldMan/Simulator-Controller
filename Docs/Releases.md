@@ -4,7 +4,7 @@
   3. "Race Settings" has been extended and allows now to define basic race rules for the next race.
   4. The Strategist can now create a strategy dynamically based on simple race rules configured in the "Race Settings".
 
-## 6.1.2.0-release 01/17/25 (planned)
+## 6.1.2.0-release 01/17/25
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a bug in the Spanish grammars for the Spotter, which caused it to crash when announcing a new best lap for the leader.

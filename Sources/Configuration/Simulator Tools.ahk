@@ -2828,6 +2828,27 @@ updateConfigurationForV400() {
 }
 */
 
+updatePluginsForV613() {
+	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	local userConfiguration := readMultiMap(userConfigurationFile)
+	local changed, ace
+
+	if (userConfiguration.Count > 0) {
+		changed := false
+
+		if !getMultiMapValue(userConfiguration, "Plugins", "ACE", false) {
+			ace := Plugin("ACE", false, false, "Assetto Corsa EVO")
+
+			ace.saveToConfiguration(userConfiguration)
+
+			changed := true
+		}
+
+		if changed
+			writeMultiMap(userConfigurationFile, userConfiguration)
+	}
+}
+
 updatePluginsForV561() {
 	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	local userConfiguration := readMultiMap(userConfigurationFile)

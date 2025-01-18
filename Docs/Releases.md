@@ -1,9 +1,11 @@
 ## 6.1.3.0-release 01/24/25 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. Initial support for *Assetto Corsa EVO*. Not real functionality yet...
+  3. Initial support for *Assetto Corsa EVO*. Not much functionality yet...
   4. "Race Settings" has been [extended](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-rules) and allows now to define basic race rules for the next race.
   5. The Strategist can now create a strategy dynamically based on simple race rules configured in the "Race Settings". See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#tab-rules) for more information.
+  
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-613), if you want to include support for *Assetto Corsa EVO*.
 
 ## 6.1.2.0-release 01/17/25
   1. Minor bugfixes, as always

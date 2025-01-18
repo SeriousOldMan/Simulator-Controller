@@ -37,7 +37,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 6.1.3
 
-Nothing to do.
+Initial support for *Assetto Corsa EVO* has been added. The plugin has been added in "Simulator Configuration", but it is deactivated. You can activate it manually and add the required application in "Simulator Configuration", but I strongly recommend to use "Simulator Setup". Go to the "Basic" page and *Assetto Corsa EVO* will normally be detected automatically. Then create a new configuration.
 
 ***
 

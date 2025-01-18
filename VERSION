@@ -1,15 +1,15 @@
 [Development]
 Version=6.1.3.0-dev
 Target=6.1.3.0-release
-Date=01/17/2025
+Date=01/18/2025
 Download=
-Changes=Dynamic strategy creation based on race rules
+Changes=Dynamic strategy creation based on race rules, New car models for Setup Workbench, Initial support for Assetto Corsa EVO
 Components=Media->5.6.1,Configuration->6.1.2,Utilities->5.9.8
 [Release]
 Version=6.1.2.0-release
 Date=01/17/2025
 Download=https://cutt.ly/ce97qsrM;https://www.dropbox.com/scl/fi/wbmegbf00io98nm2kxl6z/Simulator-Controller-6.1.2.0-release.zip?rlkey=uwmhmnvzpahar9xp3l1ygvq6l&st=unwcb3v9&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.1.2.0-release.zip
-Changes=Major rework of the documentation, Support for weather forecast in LMU, Aproximated grip status for LMU, Pitstop service time for LMU, Changed default activation recognizer to "Desktop", Fixed some bugs for LMU if imperial units are selected, Incrceased telemetry collector for ACC, Acknowledge sound for Conversation booster activation, Extended action call format of Reasoning booster, Optimized end of session detection for iRacing, New car models for rFactor 2, Updated car models for Le Mans Ultimate
+Changes=Major rework of the documentation, Support for weather forecast in LMU, Aproximated grip status for LMU, Pitstop service time for LMU, Changed default activation recognizer to "Desktop", Fixed some bugs for LMU if imperial units are selected, Increased reliability of telemetry collector for ACC, Acknowledge sound for Conversation booster activation, Extended action call format of Reasoning booster, Optimized end of session detection for iRacing, New car models for rFactor 2, Updated car models for Le Mans Ultimate
 Components=Media->5.6.1,Configuration->6.1.2,Utilities->5.9.8
 [Components]
 Media.5.6.1.Path=Resources

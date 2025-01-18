@@ -4,7 +4,10 @@
   3. Initial support for *Assetto Corsa EVO*. Not much functionality yet...
   4. "Race Settings" has been [extended](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-rules) and allows now to define basic race rules for the next race.
   5. The Strategist can now create a strategy dynamically based on simple race rules configured in the "Race Settings". See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#tab-rules) for more information.
-  
+  6. New car models for "Setup Workbench":
+      - rFactor 2
+        - Audi R8 LMS GT3 2019
+
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-613), if you want to include support for *Assetto Corsa EVO*.
 
 ## 6.1.2.0-release 01/17/25
@@ -16,7 +19,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   6. Fixed gallon to liter conversions for *Le Mans Ultimate*. Although the setting in LMU is named "imperial", it does not refer to the imperial gallon, which is roughly 4.5 liters. Rather it refers to the US gallon which is around 3.7 liters. Another weird LMU thing.
   7. Changed default for activation recognizer to "Windows (Desktop)" rather than "Windows (Server)" voice recognition.
   8. Major update to the documentation - removed the term "virtual".
-  9. The telemetry collector for ACC has been improved.
+  9. The telemetry collector for *Assetto Corsa Competizione* has been improved.
   10. Optimized end of session detection for *iRacing* for timed races.
   11. Implemented a workaround for *iRacing* results at the end of a session, which are reported asynchronously by the simulator. Works in most cases, but not in all.
   12. A detailed weather forecast is now available for *Le Mans Ultimate*.

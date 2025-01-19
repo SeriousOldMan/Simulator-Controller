@@ -14,6 +14,9 @@
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-613), if you want to include support for *Assetto Corsa EVO*.
 
+## 6.1.2.1-release 01/19/25
+  1. Workaround for incompatible OpenAI client certificate request.
+
 ## 6.1.2.0-release 01/17/25
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

@@ -733,7 +733,7 @@ checkInstallation() {
 							SetWorkingDir(directory)
 
 							RunWait("Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File", , "Hide")
-					RunWait("Powershell -Command Get-ChildItem Cert:\CurrentUser\My\ -Recurse | findstr -i CN=localhost | out-null; if ($LASTEXITCODE -eq 1) { New-SelfSignedCertificate -DnsName localhost -CertStoreLocation cert:\CurrentUser\My -NotAfter (Get-Date).AddYears(100) }", , "Hide")
+					RunWait("Powershell -Command Get-ChildItem Cert:\CurrentUser\My\ -Recurse | findstr -i CN=SimulatorController | out-null; if ($LASTEXITCODE -eq 1) { New-SelfSignedCertificate -DnsName SimulatorController -CertStoreLocation cert:\CurrentUser\My -NotAfter (Get-Date).AddYears(100) }", , "Hide")
 
 						}
 						catch Any as exception {

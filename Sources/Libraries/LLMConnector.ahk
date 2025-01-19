@@ -271,7 +271,7 @@ class LLMConnector {
 		Model[external := false] {
 			Get {
 				if !external {
-					if inList(this.base.Models, super.Model)
+					if inList(this.Models, super.Model)
 						return StrLower(StrReplace(super.Model, A_Space, "-"))
 					else
 						return super.Model
@@ -602,7 +602,7 @@ class LLMConnector {
 	class OpenAIConnector extends LLMConnector.APIConnector {
 		static Models {
 			Get {
-				return ["GPT 3.5 turbo", "GPT 4", "GPT 4 32k", "GPT 4 turbo", "GPT 4o"]
+				return ["GPT 4o mini", "GPT 3.5 turbo", "GPT 4", "GPT 4 32k", "GPT 4 turbo", "GPT 4o"]
 			}
 		}
 

@@ -252,7 +252,7 @@ class LLMConnector {
 
 		Certificate {
 			Get {
-				return true
+				return false
 			}
 		}
 
@@ -345,7 +345,20 @@ class LLMConnector {
 			}
 
 			try {
-				answer := WinHttpRequest({Timeouts: [0, 60000, 30000, 60000], Certificate: this.Certificate}).POST(this.CreateServiceURL(this.Server), body, headers, {Object: true, Encoding: "UTF-8"})
+				if this.Certificate {
+					try {
+						answer := WinHttpRequest({Timeouts: [0, 60000, 30000, 60000]
+												, Certificate: this.Certificate}).POST(this.CreateServiceURL(this.Server)
+																					 , body, headers, {Object: true, Encoding: "UTF-8"})
+					}
+					catch Any {
+						answer := WinHttpRequest({Timeouts: [0, 60000, 30000, 60000]}).POST(this.CreateServiceURL(this.Server)
+																						  , body, headers, {Object: true, Encoding: "UTF-8"})
+					}
+				}
+				else
+					answer := WinHttpRequest({Timeouts: [0, 60000, 30000, 60000]}).POST(this.CreateServiceURL(this.Server)
+																					  , body, headers, {Object: true, Encoding: "UTF-8"})
 
 				if ((answer.Status >= 200) && (answer.Status < 300)) {
 					this.Manager.connectorState("Active")
@@ -548,10 +561,19 @@ class LLMConnector {
 		}
 
 		LoadModels() {
-			local models, ignore, element, answer
-
 			try {
 				answer := WinHttpRequest({Certificate: this.Certificate}).GET(this.CreateModelsURL(this.Server), "", this.CreateHeaders(), {Encoding: "UTF-8"})
+
+				if this.Certificate {
+					try {
+						answer := WinHttpRequest({Certificate: this.Certificate}).GET(this.CreateModelsURL(this.Server), "", this.CreateHeaders(), {Encoding: "UTF-8"})
+					}
+					catch Any {
+						answer := WinHttpRequest().GET(this.CreateModelsURL(this.Server), "", this.CreateHeaders(), {Encoding: "UTF-8"})
+					}
+				}
+				else
+					answer := WinHttpRequest().GET(this.CreateModelsURL(this.Server), "", this.CreateHeaders(), {Encoding: "UTF-8"})
 
 				if ((answer.Status >= 200) && (answer.Status < 300))
 					return this.ParseModels(answer.JSON)
@@ -576,7 +598,7 @@ class LLMConnector {
 	class OpenAIConnector extends LLMConnector.APIConnector {
 		Certificate {
 			Get {
-				return false
+				return "CURRENT_USER\My\localhost"
 			}
 		}
 

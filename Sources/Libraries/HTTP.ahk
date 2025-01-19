@@ -61,8 +61,8 @@ class WinHTTPRequest extends WinHttpRequest._Call {
         if (options.HasProp("Timeouts"))
             this.SetTimeouts(options.Timeouts*)
 
-        if (options.HasProp("Certificate") && !options.Certificate)
-            this.whr.Option[5] := "CURRENT_USER\My\localhost"
+        if (options.HasProp("Certificate") && (options.Certificate != false))
+            this.whr.Option[5] := options.Certificate
     }
 
     __Delete() {

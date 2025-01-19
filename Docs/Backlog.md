@@ -17,6 +17,7 @@
   3. Direct critics by the Coach for the last section during on-track coaching (needs real time telemetry)
   4. Integrate support for LAMs
   5. Support for Time+1 session format
+  6. Approaching corner braking point countdown 
 
 #### Session Database
   1. Active validation of value ranges in settings definitions

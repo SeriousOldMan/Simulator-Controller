@@ -351,7 +351,9 @@ class LLMConnector {
 												, Certificate: this.Certificate}).POST(this.CreateServiceURL(this.Server)
 																					 , body, headers, {Object: true, Encoding: "UTF-8"})
 					}
-					catch Any {
+					catch Any as exception {
+						logError(exception, true)
+
 						answer := WinHttpRequest({Timeouts: [0, 60000, 30000, 60000]}).POST(this.CreateServiceURL(this.Server)
 																						  , body, headers, {Object: true, Encoding: "UTF-8"})
 					}
@@ -568,7 +570,9 @@ class LLMConnector {
 					try {
 						answer := WinHttpRequest({Certificate: this.Certificate}).GET(this.CreateModelsURL(this.Server), "", this.CreateHeaders(), {Encoding: "UTF-8"})
 					}
-					catch Any {
+					catch Any as exception {
+						logError(exception, true)
+
 						answer := WinHttpRequest().GET(this.CreateModelsURL(this.Server), "", this.CreateHeaders(), {Encoding: "UTF-8"})
 					}
 				}

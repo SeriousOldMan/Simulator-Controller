@@ -2,10 +2,11 @@
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed several missing translations.
-  4. Initial support for *Assetto Corsa EVO*. Not much functionality yet...
-  5. "Race Settings" has been [extended](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-rules) and allows now to define basic race rules for the next race.
-  6. The Strategist can now create a strategy dynamically based on simple race rules configured in the "Race Settings". See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#tab-rules) for more information.
-  7. New car models for "Setup Workbench":
+  4. When unblocking DLLs and Applications a fake certificate is also created to work around the invalid handling of client side certificate requests by OpenAI.
+  5. Initial support for *Assetto Corsa EVO*. Not much functionality yet...
+  6. "Race Settings" has been [extended](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-rules) and allows now to define basic race rules for the next race.
+  7. The Strategist can now create a strategy dynamically based on simple race rules configured in the "Race Settings". See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#tab-rules) for more information.
+  8. New car models for "Setup Workbench":
       - rFactor 2
         - Audi R8 LMS GT3 (Variante 2019)
 		- Bentley Continental GT3 (Variante 2020)

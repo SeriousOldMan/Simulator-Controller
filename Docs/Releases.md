@@ -6,7 +6,10 @@
   5. The Strategist can now create a strategy dynamically based on simple race rules configured in the "Race Settings". See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#tab-rules) for more information.
   6. New car models for "Setup Workbench":
       - rFactor 2
-        - Audi R8 LMS GT3 2019
+        - Audi R8 LMS GT3 (Variante 2019)
+		- Bentley Continental GT3 (Variante 2020)
+		- BMW M6 GT3
+		- Aston Martin Vantage GT3 (fixed ABS settings)
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-613), if you want to include support for *Assetto Corsa EVO*.
 

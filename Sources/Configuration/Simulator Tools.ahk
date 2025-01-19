@@ -723,9 +723,7 @@ checkInstallation() {
 					installComponents(packageLocation, installLocation)
 
 					for ignore, directory in [kBinariesDirectory, kResourcesDirectory . "Setup\Installer\", kResourcesDirectory . "Setup\Windows Runtimes\"] {
-						gProgressCount += 1
-
-						showProgress({progress: gProgressCount, message: translate("Unblocking Applications and DLLs...")})
+						showProgress({progress: ++gProgressCount, message: translate("Unblocking Applications and DLLs...")})
 
 						currentDirectory := A_WorkingDir
 
@@ -733,15 +731,20 @@ checkInstallation() {
 							SetWorkingDir(directory)
 
 							RunWait("Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File", , "Hide")
-					RunWait("Powershell -Command Get-ChildItem Cert:\CurrentUser\My\ -Recurse | findstr -i CN=SimulatorController | out-null; if ($LASTEXITCODE -eq 1) { New-SelfSignedCertificate -DnsName SimulatorController -CertStoreLocation cert:\CurrentUser\My -NotAfter (Get-Date).AddYears(100) }", , "Hide")
-
 						}
 						catch Any as exception {
-							logError(exception)
+							logError(exception, true)
 						}
 						finally {
 							SetWorkingDir(currentDirectory)
 						}
+					}
+
+					try {
+						RunWait("Powershell -Command Get-ChildItem Cert:\CurrentUser\My\ -Recurse | findstr -i CN=SimulatorController | out-null; if ($LASTEXITCODE -eq 1) { New-SelfSignedCertificate -DnsName SimulatorController -CertStoreLocation cert:\CurrentUser\My -NotAfter (Get-Date).AddYears(100) }", , "Hide")
+					}
+					catch Any as exception {
+						logError(exception, true)
 					}
 
 					if (installLocation != packageLocation)

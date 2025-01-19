@@ -2703,15 +2703,6 @@ startSimulator() {
 
 					Run("Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File", , "Hide", &pid)
 
-					fixIE(11, "Session Database.exe")
-					fixIE(11, "Setup Workbench.exe")
-					fixIE(11, "Race Reports.exe")
-					fixIE(11, "Strategy Workbench.exe")
-					fixIE(11, "Solo Center.exe")
-					fixIE(11, "Team Center.exe")
-					fixIE(10, "Simulator Setup.exe")
-					fixIE(11, "System Monitor.exe")
-
 					while ProcessExist(pid) {
 						showProgress({progress: Min(100, progress++)})
 
@@ -2724,6 +2715,22 @@ startSimulator() {
 				finally {
 					SetWorkingDir(currentDirectory)
 				}
+			}
+
+			fixIE(11, "Session Database.exe")
+			fixIE(11, "Setup Workbench.exe")
+			fixIE(11, "Race Reports.exe")
+			fixIE(11, "Strategy Workbench.exe")
+			fixIE(11, "Solo Center.exe")
+			fixIE(11, "Team Center.exe")
+			fixIE(10, "Simulator Setup.exe")
+			fixIE(11, "System Monitor.exe")
+
+			try {
+				RunWait("Powershell -Command Get-ChildItem Cert:\CurrentUser\My\ -Recurse | findstr -i CN=SimulatorController | out-null; if ($LASTEXITCODE -eq 1) { New-SelfSignedCertificate -DnsName SimulatorController -CertStoreLocation cert:\CurrentUser\My -NotAfter (Get-Date).AddYears(100) }", , "Hide")
+			}
+			catch Any as exception {
+				logError(exception, true)
 			}
 
 			while (progress++ <= 100) {

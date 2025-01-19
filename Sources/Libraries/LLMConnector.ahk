@@ -250,6 +250,12 @@ class LLMConnector {
 			}
 		}
 
+		Certificate {
+			Get {
+				return true
+			}
+		}
+
 		static Models {
 			Get {
 				return []
@@ -339,7 +345,7 @@ class LLMConnector {
 			}
 
 			try {
-				answer := WinHttpRequest({Timeouts: [0, 60000, 30000, 60000]}).POST(this.CreateServiceURL(this.Server), body, headers, {Object: true, Encoding: "UTF-8"})
+				answer := WinHttpRequest({Timeouts: [0, 60000, 30000, 60000], Certificate: this.Certificate}).POST(this.CreateServiceURL(this.Server), body, headers, {Object: true, Encoding: "UTF-8"})
 
 				if ((answer.Status >= 200) && (answer.Status < 300)) {
 					this.Manager.connectorState("Active")
@@ -394,18 +400,25 @@ class LLMConnector {
 						return answer
 					}
 					catch Any as exception {
+						logError(exception, true)
+
 						this.Manager.connectorState("Error", "Answer", answer)
 
 						return false
 					}
 				}
 				else {
+					if isDebug()
+						logMessage(kLogDebug, "LLM API call returned " . answer.Status . " in HTTPConnector.Ask...")
+
 					this.Manager.connectorState("Error", "Connection", answer.Status)
 
 					return false
 				}
 			}
 			catch Any as exception {
+				logError(exception, true)
+
 				this.Manager.connectorState("Error", "Connection", isSet(answer) ? answer.Status : unset)
 
 				return false
@@ -535,12 +548,23 @@ class LLMConnector {
 		}
 
 		LoadModels() {
-			local models, ignore, element
+			local models, ignore, element, answer
 
 			try {
-				return this.ParseModels(WinHttpRequest().GET(this.CreateModelsURL(this.Server), "", this.CreateHeaders(), {Encoding: "UTF-8"}).JSON)
+				answer := WinHttpRequest({Certificate: this.Certificate}).GET(this.CreateModelsURL(this.Server), "", this.CreateHeaders(), {Encoding: "UTF-8"})
+
+				if ((answer.Status >= 200) && (answer.Status < 300))
+					return this.ParseModels(answer.JSON)
+				else {
+					if isDebug()
+						logMessage(kLogDebug, "LLM API call returned " . answer.Status . " in APIConnector.LoadModels...")
+
+					return []
+				}
 			}
 			catch Any as exception {
+				logError(exception, true)
+
 				return []
 			}
 		}
@@ -550,6 +574,12 @@ class LLMConnector {
 	}
 
 	class OpenAIConnector extends LLMConnector.APIConnector {
+		Certificate {
+			Get {
+				return false
+			}
+		}
+
 		static Models {
 			Get {
 				return ["GPT 3.5 turbo", "GPT 4", "GPT 4 32k", "GPT 4 turbo", "GPT 4o"]
@@ -741,7 +771,7 @@ class LLMConnector {
 					}
 					catch Any as exception {
 						if (A_Index = 5)
-							logError(exception)
+							logError(exception, true)
 					}
 
 					Sleep(250)
@@ -822,7 +852,7 @@ class LLMConnector {
 					}
 					catch Any as exception {
 						if (A_Index = 5)
-							logError(exception)
+							logError(exception, true)
 						else
 							Sleep(10)
 					}
@@ -838,6 +868,8 @@ class LLMConnector {
 							Sleep(1000)
 			}
 			catch Any as exception {
+				logError(exception, true)
+
 				this.Manager.connectorState("Error", "Connection")
 
 				return false

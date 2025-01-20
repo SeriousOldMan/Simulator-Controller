@@ -56,6 +56,8 @@ class TelemetryCollector {
 		iTelemetryCollector := false
 		iFileName := false
 
+		iCollected := false
+
 		TelemetryCollector {
 			Get {
 				return this.iTelemetryCollector
@@ -64,39 +66,50 @@ class TelemetryCollector {
 
 		FileName {
 			Get {
+				if !this.iCollected
+					this.stop()
+
 				return this.iFileName
 			}
 		}
 
-		__New(collector, fileName) {
-			local fileName := ()
-
+		__New(collector) {
 			this.iTelemetryCollector := collector
-			this.iFileName := temporaryFileName(normalizeDirectoryPath(collector.TelemetryDirectory) . "Lap", "telemetry")
+			this.iFileName := temporaryFileName(normalizeDirectoryPath(collector.TelemetryDirectory) . "Telemetry", "section")
+
+			this.iCorner := corner
 
 			if collector.iCollecting
 				throw "Partial telemetry collection still running in TelemetryCollector.SectionCollector.__New..."
 
-			FileAppend("", normalizeDirectoryPath(collector.TelemetryDirectory) . "Lap R.tmp")
+			FileAppend("", normalizeDirectoryPath(collector.TelemetryDirectory) . "Section.tmp")
 
 			collector.iCollecting := true
 		}
 
-		shutdown() {
-			local fileName := (normalizeDirectoryPath(this.TelemetryDirectory) . "Lap R.tmp")
+		dispose() {
+			deleteFile(this.FileName)
+		}
 
-			if !FileExist(fileName)
-				throw "No partial telemetry collection running in TelemetryCollector.SectionCollector.shutdown..."
+		stop() {
+			local fileName := (normalizeDirectoryPath(this.TelemetryDirectory) . "Section.tmp")
 
-			loop
-				try {
-					FileMove(fileName, this.FileName, 1)
+			if !this.iCollected {
+				if !FileExist(fileName)
+					throw "No partial telemetry collection running in TelemetryCollector.SectionCollector.shutdown..."
 
-					break
-				}
-				catch Any {
-					Sleep(1)
-				}
+				loop
+					try {
+						FileMove(fileName, this.FileName, 1)
+
+						break
+					}
+					catch Any {
+						Sleep(1)
+					}
+
+				this.iCollected := true
+			}
 		}
 	}
 
@@ -232,15 +245,7 @@ class TelemetryCollector {
 	}
 
 	collect() {
-		return TelemetryCollector.SectionCollector()
-	}
-
-	shutdownSection() {
-		local collectorFileName := (normalizeDirectoryPath(this.TelemetryDirectory) . "Lap R.tmp")
-		local outputFileName :=
-
-		if !FileExist(collectorFileName)
-			throw "No partial telemetry collection running in TelemetryCollector.startupPartial..."
+		return TelemetryCollector.SectionCollector(this)
 	}
 }
 

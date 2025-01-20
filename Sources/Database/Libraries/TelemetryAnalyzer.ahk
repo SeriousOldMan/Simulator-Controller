@@ -1057,7 +1057,7 @@ class Telemetry {
 				index := TelemetryAnalyzer.getTelemetryCoordinateIndex(data, section.X, section.Y)
 
 				if index {
-					if lastSection
+					if startIndex
 						try {
 							if (lastSection.Type = "Corner")
 								sections.Push(Corner.fromSection(this, lastSection, startIndex, Max(1, index - 1)))
@@ -1068,9 +1068,10 @@ class Telemetry {
 							logError(exception)
 						}
 
-					lastSection := section
 					startIndex := index
 				}
+
+				lastSection := section
 			}
 		}
 

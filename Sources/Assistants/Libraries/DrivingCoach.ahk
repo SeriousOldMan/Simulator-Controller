@@ -60,6 +60,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 	iOnTrackCoaching := false
 	iFocusedCorner := false
+	iLastCorner := false
 
 	iAvailableTelemetry := CaseInsenseMap()
 	iInstructionHints := CaseInsenseMap()
@@ -844,6 +845,7 @@ class DrivingCoach extends GridRaceAssistant {
 				this.getSpeaker().speakPhrase("Roger")
 
 			this.iFocusedCorner := corner
+			this.iLastCorner := false
 		}
 	}
 
@@ -1029,6 +1031,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 			this.iOnTrackCoaching := false
 			this.iFocusedCorner := false
+			this.iLastCorner := false
 		}
 	}
 
@@ -1041,6 +1044,7 @@ class DrivingCoach extends GridRaceAssistant {
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 
 		this.iFocusedCorner := false
+		this.iLastCorner := false
 
 		return started
 	}
@@ -1058,6 +1062,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		this.iOnTrackCoaching := false
 		this.iFocusedCorner := false
+		this.iLastCorner := false
 	}
 
 	telemetryAvailable(laps) {
@@ -1142,6 +1147,33 @@ class DrivingCoach extends GridRaceAssistant {
 			this.startupTrackCoaching()
 	}
 
+	reviewCornerPerformance(cornerNr) {
+		local oldMode := this.Mode
+		local lastLapTelemetry, currentLapTelemetry, command, ignore
+
+		if this.Speaker[false] {
+			this.Mode := "Review"
+
+			try {
+				lastLapTelemetry := this.getTelemetry(&ignore := false, cornerNr)
+				currentLapTelemetry := this.getRunningTelemetry(cornerNr)
+
+				if (this.TelemetryAnalyzer && lastLapTelemetry && (lastLapTelemetry.Sections.Length > 0)) {
+					command := substituteVariables(this.Instructions["Coaching.Corner.Review"]
+												 , {lastLap: lastLapTelemetry.JSON, currentLap: currentLapTelemetry.JSON
+												  , corner: cornerNr})
+
+					this.handleVoiceText("TEXT", command, true, values2String(A_Space, words*))
+				}
+				else if this.Speaker
+					this.getSpeaker().speakPhrase("Later")
+			}
+			finally {
+				this.Mode := oldMode
+			}
+		}
+	}
+
 	getTelemetry(&reference?, corner?) {
 		local mode := this.ReferenceMode
 		local laps := getKeys(this.AvailableTelemetry)
@@ -1224,6 +1256,10 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 
 		return theLap
+	}
+
+	getRunningTelemetry(corner?) {
+		return this.getTelemetry(&ignore := false, corner?)
 	}
 
 	addInstructionHint(instruction) {
@@ -1763,8 +1799,12 @@ class DrivingCoach extends GridRaceAssistant {
 			return false
 		}
 
-		if (this.FocusedCorner && (cornerNr != this.FocusedCorner))
-			return
+		if this.FocusedCorner {
+			if (this.iLastCorner = (this.FocusedCorner + 1))
+				this.reviewCornerPerformance(cornerNr)
+			else if (cornerNr != this.FocusedCorner)
+				return
+		}
 
 		if ((Round(positionX) = -32767) && (Round(positionY) = -32767))
 			return
@@ -1805,6 +1845,9 @@ class DrivingCoach extends GridRaceAssistant {
 				if this.Speaker[false]
 					if ((telemetry.Sections.Length > 0) && !this.getSpeaker().Speaking) {
 						nextRecommendation := (A_TickCount + wait)
+
+						if this.FocusedCorner
+							this.iLastCorner := cornerNr
 
 						if (this.ConnectionState = "Active") {
 							this.Mode := "Coaching"

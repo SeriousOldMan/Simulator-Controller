@@ -203,6 +203,7 @@ Please note, that you can remove presets later on. But depending on the type of 
 | Simulator                   | File                 | Comments                                        |
 |-----------------------------|----------------------|-------------------------------------------------|
 | Assetto Corsa               | AssettoCorsa.exe     |                                                 |
+| Assetto Corsa EVO           | AssettoCorsaEVO.exe  |                                                 |
 | Assetto Corsa  Competizione | acc.exe              |                                                 |
 | rFactor 2                   | rFactor2.exe         |                                                 |
 | Le Mans Ultimate            | Le Mans Ultimate.exe |                                                 |

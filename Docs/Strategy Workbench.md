@@ -70,7 +70,7 @@ Loading of settings is supported for:
 	   - Race Duration
 	   - Formation Lap
 	   - Post Race Lap
-	   - Pitstop rules if active
+	   - Pitstop rules (if active)
 	     - Pitstop Rule
 		 - Pitstop Window (Regular)
 		 - Refuel Rule

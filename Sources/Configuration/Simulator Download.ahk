@@ -141,6 +141,8 @@ downloadSimulatorController() {
 			updateTask := PeriodicTask(updateProgress.Bind(45), 1500)
 
 			updateTask.start()
+			
+			deleteFile(A_Temp . "\Simulator Controller.zip")
 
 			error := false
 

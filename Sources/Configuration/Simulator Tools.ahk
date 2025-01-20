@@ -733,6 +733,8 @@ checkInstallation() {
 							SetWorkingDir(directory)
 
 							RunWait("Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File", , "Hide")
+					RunWait("Powershell -Command Get-ChildItem Cert:\CurrentUser\My\ -Recurse | findstr -i CN=SimulatorController | out-null; if ($LASTEXITCODE -eq 1) { New-SelfSignedCertificate -DnsName SimulatorController -CertStoreLocation cert:\CurrentUser\My -NotAfter (Get-Date).AddYears(100) }", , "Hide")
+
 						}
 						catch Any as exception {
 							logError(exception)
@@ -2827,6 +2829,27 @@ updateConfigurationForV400() {
 	deleteFile(kDatabaseDirectory . "User\UPLOAD")
 }
 */
+
+updatePluginsForV613() {
+	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	local userConfiguration := readMultiMap(userConfigurationFile)
+	local changed, ace
+
+	if (userConfiguration.Count > 0) {
+		changed := false
+
+		if !getMultiMapValue(userConfiguration, "Plugins", "ACE", false) {
+			ace := Plugin("ACE", false, false, "Assetto Corsa EVO")
+
+			ace.saveToConfiguration(userConfiguration)
+
+			changed := true
+		}
+
+		if changed
+			writeMultiMap(userConfigurationFile, userConfiguration)
+	}
+}
 
 updatePluginsForV561() {
 	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)

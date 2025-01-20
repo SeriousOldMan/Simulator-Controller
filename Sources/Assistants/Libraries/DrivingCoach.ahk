@@ -835,18 +835,24 @@ class DrivingCoach extends GridRaceAssistant {
 		this.iReferenceModeAuto := false
 	}
 
-	focusCornerRecognized(words) {
+	focusCornerRecognized(words, confirm := true) {
 		local corner
 
-		corner := this.getNumber(words)
+		if this.startupTrackCoaching() {
+			corner := this.getNumber(words)
 
-		if (corner != kUndefined) {
-			if this.Speaker
-				this.getSpeaker().speakPhrase("Roger")
+			if (corner != kUndefined) {
+				if this.Speaker
+					this.getSpeaker().speakPhrase("Roger")
 
-			this.iFocusedCorner := corner
-			this.iLastCorner := false
+				this.iFocusedCorner := corner
+				this.iLastCorner := false
+			}
+			else
+				speaker.speakPhrase("Repeat")
 		}
+		else if (confirm && this.Speaker)
+			this.getSpeaker().speakPhrase("Later")
 	}
 
 	handleVoiceText(grammar, text, reportError := true, originalText := false) {
@@ -1799,12 +1805,11 @@ class DrivingCoach extends GridRaceAssistant {
 			return false
 		}
 
-		if this.FocusedCorner {
-			if (this.iLastCorner = (this.FocusedCorner + 1))
+		if this.FocusedCorner
+			if ((this.iLastCorner = (this.FocusedCorner + 1)) || (this.iLastCorner && (cornerNr < this.iLastCorner)))
 				this.reviewCornerPerformance(cornerNr)
 			else if (cornerNr != this.FocusedCorner)
 				return
-		}
 
 		if ((Round(positionX) = -32767) && (Round(positionY) = -32767))
 			return

@@ -20,13 +20,13 @@
 #Include "..\..\Libraries\JSON.ahk"
 #Include "..\..\Libraries\HTTP.ahk"
 #Include "..\..\Libraries\LLMConnector.ahk"
-#Include "RaceAssistant.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\..\Database\Libraries\TelemetryCollector.ahk"
 #Include "..\..\Database\Libraries\TelemetryAnalyzer.ahk"
 #Include "..\..\Garage\Libraries\IssueCollector.ahk"
 #Include "..\..\Garage\Libraries\IRCIssueCollector.ahk"
 #Include "..\..\Garage\Libraries\R3EIssueCollector.ahk"
+#Include "RaceAssistant.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -59,6 +59,7 @@ class DrivingCoach extends GridRaceAssistant {
 	iLoadReference := "None"
 
 	iOnTrackCoaching := false
+	iFocusedCorner := false
 
 	iAvailableTelemetry := CaseInsenseMap()
 	iInstructionHints := CaseInsenseMap()
@@ -235,6 +236,12 @@ class DrivingCoach extends GridRaceAssistant {
 	OnTrackCoaching {
 		Get {
 			return this.iOnTrackCoaching
+		}
+	}
+
+	FocusedCorner {
+		Get {
+			return this.iFocusedCorner
 		}
 	}
 
@@ -693,6 +700,10 @@ class DrivingCoach extends GridRaceAssistant {
 				this.clearContinuation()
 
 				this.noReferenceLapRecognized(words)
+			case "FocusCorner":
+				this.clearContinuation()
+
+				this.focusCornerRecognized(words)
 			default:
 				super.handleVoiceCommand(grammar, words)
 		}
@@ -821,6 +832,19 @@ class DrivingCoach extends GridRaceAssistant {
 
 		this.iReferenceMode := "None"
 		this.iReferenceModeAuto := false
+	}
+
+	focusCornerRecognized(words) {
+		local corner
+
+		corner := this.getNumber(words)
+
+		if (corner != kUndefined) {
+			if this.Speaker
+				this.getSpeaker().speakPhrase("Roger")
+
+			this.iFocusedCorner := corner
+		}
 	}
 
 	handleVoiceText(grammar, text, reportError := true, originalText := false) {
@@ -1004,6 +1028,7 @@ class DrivingCoach extends GridRaceAssistant {
 			this.iCoachingActive := false
 
 			this.iOnTrackCoaching := false
+			this.iFocusedCorner := false
 		}
 	}
 
@@ -1014,6 +1039,8 @@ class DrivingCoach extends GridRaceAssistant {
 		setMultiMapValue(state, "Coaching", "Track", started)
 
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
+
+		this.iFocusedCorner := false
 
 		return started
 	}
@@ -1030,6 +1057,7 @@ class DrivingCoach extends GridRaceAssistant {
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 
 		this.iOnTrackCoaching := false
+		this.iFocusedCorner := false
 	}
 
 	telemetryAvailable(laps) {
@@ -1734,6 +1762,9 @@ class DrivingCoach extends GridRaceAssistant {
 
 			return false
 		}
+
+		if (this.FocusedCorner && (cornerNr != this.FocusedCorner))
+			return
 
 		if ((Round(positionX) = -32767) && (Round(positionY) = -32767))
 			return

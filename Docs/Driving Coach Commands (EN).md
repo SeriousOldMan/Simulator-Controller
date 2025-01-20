@@ -98,6 +98,8 @@ Information=session information, stint information, handling information
 	[(CanWe) use the {fastest, last} lap as {reference, reference lap}, {Please use, Use} the {fastest, last} lap as {reference, reference lap}]
 
 	[{Please do, Do} not use a reference {lap, lap please}]
+	
+	[(CanWe) {focus on, practice, practise} {corner, corner number} (Number), Let us {focus on, practice, practise} {corner, corner number} (Number), (CanYou) give me {recommendations, tips, a guide, instructions} for {corner, corner number} (Number)]
 
 #### Conversation
 

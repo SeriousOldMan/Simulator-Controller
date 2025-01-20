@@ -97,6 +97,8 @@ Information=Información de la sesión, Información de la Stint, Información d
 	[(CanWe) usar la vuelta {más rápida, última} como {referencia, vuelta de referencia}, {Por favor use, Use} la vuelta {más rápida, última} como {referencia, vuelta de referencia}]
 
 	[{Por favor haz, Haz} no utilices una referencia {vuelta, vuelta por favor}]
+	
+	[(CanWe) centrarnos en la {número de curva, curva} (Number), {Practiquemos, Centrémonos} la {número de curva, curva} (Number), (CanYou) darme {recomendaciones, consejos, una guía, instrucciones} para la {número de curva, curva} (Number)]
 
 #### Conversación
 

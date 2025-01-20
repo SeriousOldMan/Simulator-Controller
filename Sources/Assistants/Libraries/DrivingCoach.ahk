@@ -59,7 +59,7 @@ class DrivingCoach extends GridRaceAssistant {
 	iLoadReference := "None"
 
 	iOnTrackCoaching := false
-	iFocusedCorner := false
+	iFocusedCorners := []
 	iLastCorner := false
 
 	iAvailableTelemetry := CaseInsenseMap()
@@ -240,9 +240,9 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
-	FocusedCorner {
+	FocusedCorners {
 		Get {
-			return this.iFocusedCorner
+			return this.iFocusedCorners
 		}
 	}
 
@@ -845,7 +845,9 @@ class DrivingCoach extends GridRaceAssistant {
 				if this.Speaker
 					this.getSpeaker().speakPhrase("Roger")
 
-				this.iFocusedCorner := corner
+				if !inList(this.FocusedCorners, corner)
+					this.FocusedCorners.Push(corner)
+
 				this.iLastCorner := false
 			}
 			else
@@ -1036,7 +1038,7 @@ class DrivingCoach extends GridRaceAssistant {
 			this.iCoachingActive := false
 
 			this.iOnTrackCoaching := false
-			this.iFocusedCorner := false
+			this.iFocusedCorners := []
 			this.iLastCorner := false
 		}
 	}
@@ -1049,7 +1051,6 @@ class DrivingCoach extends GridRaceAssistant {
 
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 
-		this.iFocusedCorner := false
 		this.iLastCorner := false
 
 		return started
@@ -1067,7 +1068,7 @@ class DrivingCoach extends GridRaceAssistant {
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 
 		this.iOnTrackCoaching := false
-		this.iFocusedCorner := false
+		this.iFocusedCorners := []
 		this.iLastCorner := false
 	}
 
@@ -1805,10 +1806,10 @@ class DrivingCoach extends GridRaceAssistant {
 			return false
 		}
 
-		if this.FocusedCorner
-			if ((this.iLastCorner = (this.FocusedCorner + 1)) || (this.iLastCorner && (cornerNr < this.iLastCorner)))
-				this.reviewCornerPerformance(cornerNr)
-			else if (cornerNr != this.FocusedCorner)
+		if this.iLastCorner
+			if ((cornerNr = (this.iLastCorner + 1)) || (cornerNr < this.iLastCorner))
+				this.reviewCornerPerformance(this.iLastCorner)
+			else if !inList(this.FocusedCorners, cornerNr)
 				return
 
 		if ((Round(positionX) = -32767) && (Round(positionY) = -32767))
@@ -1851,7 +1852,7 @@ class DrivingCoach extends GridRaceAssistant {
 					if ((telemetry.Sections.Length > 0) && !this.getSpeaker().Speaking) {
 						nextRecommendation := (A_TickCount + wait)
 
-						if this.FocusedCorner
+						if inList(this.FocusedCorners, cornerNr)
 							this.iLastCorner := cornerNr
 
 						if (this.ConnectionState = "Active") {

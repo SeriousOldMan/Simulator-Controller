@@ -50,6 +50,56 @@ class TelemetryCollector {
 
 	iExitCallback := false
 
+	iCollecting := false
+
+	class SectionCollector {
+		iTelemetryCollector := false
+		iFileName := false
+
+		TelemetryCollector {
+			Get {
+				return this.iTelemetryCollector
+			}
+		}
+
+		FileName {
+			Get {
+				return this.iFileName
+			}
+		}
+
+		__New(collector, fileName) {
+			local fileName := ()
+
+			this.iTelemetryCollector := collector
+			this.iFileName := temporaryFileName(normalizeDirectoryPath(collector.TelemetryDirectory) . "Lap", "telemetry")
+
+			if collector.iCollecting
+				throw "Partial telemetry collection still running in TelemetryCollector.SectionCollector.__New..."
+
+			FileAppend("", normalizeDirectoryPath(collector.TelemetryDirectory) . "Lap R.tmp")
+
+			collector.iCollecting := true
+		}
+
+		shutdown() {
+			local fileName := (normalizeDirectoryPath(this.TelemetryDirectory) . "Lap R.tmp")
+
+			if !FileExist(fileName)
+				throw "No partial telemetry collection running in TelemetryCollector.SectionCollector.shutdown..."
+
+			loop
+				try {
+					FileMove(fileName, this.FileName, 1)
+
+					break
+				}
+				catch Any {
+					Sleep(1)
+				}
+		}
+	}
+
 	Simulator {
 		Get {
 			return this.iSimulator
@@ -129,6 +179,7 @@ class TelemetryCollector {
 
 			if pid {
 				this.iTelemetryCollectorPID := pid
+				this.iCollecting := false
 
 				if !this.iExitCallback {
 					this.iExitCallback := ObjBindMethod(this, "shutdown", true)
@@ -174,9 +225,22 @@ class TelemetryCollector {
 			}
 
 			this.iTelemetryCollectorPID := false
+			this.iCollecting := false
 		}
 
 		return false
+	}
+
+	collect() {
+		return TelemetryCollector.SectionCollector()
+	}
+
+	shutdownSection() {
+		local collectorFileName := (normalizeDirectoryPath(this.TelemetryDirectory) . "Lap R.tmp")
+		local outputFileName :=
+
+		if !FileExist(collectorFileName)
+			throw "No partial telemetry collection running in TelemetryCollector.startupPartial..."
 	}
 }
 

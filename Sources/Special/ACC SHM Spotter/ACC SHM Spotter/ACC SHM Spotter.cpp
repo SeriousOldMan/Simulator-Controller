@@ -2131,6 +2131,27 @@ void collectCarTelemetry() {
 							<< gf->carCoordinates[carID][0] << ";" << gf->carCoordinates[carID][2] << ";"
 							<< gf->iCurrentTime << endl;
 
+						if (fileExists(telemetryDirectory + "\\Lap R.tmp")) {
+							ofstream file;
+
+							file.open(telemetryDirectory + "\\Lap R.tmp", ios::out | ios::ate);
+
+							file << (driverRunning * trackLength) << ";"
+								<< (pf->gas >= 0 ? pf->gas : 0) << ";"
+								<< (pf->brake >= 0 ? pf->brake : 0) << ";"
+								<< pf->steerAngle << ";"
+								<< (pf->gear - 1) << ";"
+								<< pf->rpms << ";"
+								<< pf->speedKmh << ";"
+								<< pf->tc << ";"
+								<< pf->abs << ";"
+								<< longG << ";" << latG << ";"
+								<< gf->carCoordinates[carID][0] << ";" << gf->carCoordinates[carID][2] << ";"
+								<< gf->iCurrentTime << endl;
+
+							file.close();
+						}
+						
 						lastRunning = driverRunning;
 					}
 				}

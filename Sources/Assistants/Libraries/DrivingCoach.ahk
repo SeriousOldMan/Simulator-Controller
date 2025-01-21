@@ -60,7 +60,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 	iOnTrackCoaching := false
 	iFocusedCorners := []
-	iLastCorner := false
+	iTelemetryFuture := false
 
 	iAvailableTelemetry := CaseInsenseMap()
 	iInstructionHints := CaseInsenseMap()
@@ -705,6 +705,10 @@ class DrivingCoach extends GridRaceAssistant {
 				this.clearContinuation()
 
 				this.focusCornerRecognized(words)
+			case "NoFocusCorner":
+				this.clearContinuation()
+
+				this.noFocusCornerRecognized(words)
 			default:
 				super.handleVoiceCommand(grammar, words)
 		}
@@ -848,13 +852,21 @@ class DrivingCoach extends GridRaceAssistant {
 				if !inList(this.FocusedCorners, corner)
 					this.FocusedCorners.Push(corner)
 
-				this.iLastCorner := false
+				this.iTelemetryFuture := false
 			}
 			else
 				speaker.speakPhrase("Repeat")
 		}
 		else if (confirm && this.Speaker)
 			this.getSpeaker().speakPhrase("Later")
+	}
+
+	noFocusCornerRecognized(words, confirm := true) {
+		if this.Speaker
+			this.getSpeaker().speakPhrase("Roger")
+
+		this.iFocusedCorners := []
+		this.iTelemetryFuture := false
 	}
 
 	handleVoiceText(grammar, text, reportError := true, originalText := false) {
@@ -1039,7 +1051,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 			this.iOnTrackCoaching := false
 			this.iFocusedCorners := []
-			this.iLastCorner := false
+			this.iTelemetryFuture := false
 		}
 	}
 
@@ -1051,7 +1063,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 
-		this.iLastCorner := false
+		this.iTelemetryFuture := false
 
 		return started
 	}
@@ -1069,7 +1081,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		this.iOnTrackCoaching := false
 		this.iFocusedCorners := []
-		this.iLastCorner := false
+		this.iTelemetryFuture := false
 	}
 
 	telemetryAvailable(laps) {
@@ -1821,12 +1833,11 @@ class DrivingCoach extends GridRaceAssistant {
 			return false
 		}
 
-		if this.iLastCorner
-			if ((cornerNr = (this.iLastCorner.Corner + 1)) || (cornerNr < this.iLastCorner.Corner)) {
-				this.reviewCornerPerformance(this.iLastCorner.Corner, this.iLastCorner.FileName)
+		if this.iTelemetryFuture
+			if ((cornerNr = (this.iTelemetryFuture.Corner + 1)) || (cornerNr < this.iTelemetryFuture.Corner)) {
+				this.reviewCornerPerformance(this.iTelemetryFuture.Corner, this.iTelemetryFuture.FileName)
 
-				this.iLastCorner.dispose()
-				this.iListCorner := false
+				this.iTelemetryFuture := false
 			}
 			else if !inList(this.FocusedCorners, cornerNr)
 				return
@@ -1872,9 +1883,9 @@ class DrivingCoach extends GridRaceAssistant {
 						nextRecommendation := (A_TickCount + wait)
 
 						if inList(this.FocusedCorners, cornerNr) {
-							this.iLastCorner := this.TelemetryCollector.collect()
+							this.iTelemetryFuture := this.TelemetryCollector.collectTelemetry()
 
-							this.iLastCorner.Corner := cornerNr
+							this.iTelemetryFuture.Corner := cornerNr
 						}
 
 						if (this.ConnectionState = "Active") {

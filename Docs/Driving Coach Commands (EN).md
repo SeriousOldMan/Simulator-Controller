@@ -100,6 +100,8 @@ Information=session information, stint information, handling information
 	[{Please do, Do} not use a reference {lap, lap please}]
 	
 	[(CanWe) {focus on, practice, practise} {corner, corner number} (Number), Let us {focus on, practice, practise} {corner, corner number} (Number), (CanYou) give me {recommendations, tips, a guide, instructions} for {corner, corner number} (Number)]
+	
+	[(CanWe) {focus, focus again} on the whole track, Let us {focus, focus again} on the whole track]
 
 #### Conversation
 

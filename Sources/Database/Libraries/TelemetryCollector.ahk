@@ -52,7 +52,7 @@ class TelemetryCollector {
 
 	iCollecting := false
 
-	class SectionCollector {
+	class TelemetryFuture {
 		iTelemetryCollector := false
 		iFileName := false
 
@@ -66,8 +66,7 @@ class TelemetryCollector {
 
 		FileName {
 			Get {
-				if !this.iCollected
-					this.stop()
+				this.stop()
 
 				return this.iFileName
 			}
@@ -80,23 +79,31 @@ class TelemetryCollector {
 			this.iCorner := corner
 
 			if collector.iCollecting
-				throw "Partial telemetry collection still running in TelemetryCollector.SectionCollector.__New..."
+				throw "Partial telemetry collection still running in TelemetryCollector.TelemetryFuture.__New..."
 
-			FileAppend("", normalizeDirectoryPath(collector.TelemetryDirectory) . "Section.tmp")
+			FileAppend("", normalizeDirectoryPath(collector.TelemetryDirectory) . "Telemetry.section")
 
 			collector.iCollecting := true
 		}
 
+		__Delete() {
+			this.dispose()
+		}
+
 		dispose() {
+			this.stop()
+
 			deleteFile(this.FileName)
 		}
 
 		stop() {
-			local fileName := (normalizeDirectoryPath(this.TelemetryDirectory) . "Section.tmp")
+			local fileName
 
 			if !this.iCollected {
+				fileName := (normalizeDirectoryPath(this.TelemetryDirectory) . "Telemetry.section")
+
 				if !FileExist(fileName)
-					throw "No partial telemetry collection running in TelemetryCollector.SectionCollector.shutdown..."
+					throw "No partial telemetry collection running in TelemetryCollector.TelemetryFuture.stop..."
 
 				loop
 					try {
@@ -244,8 +251,8 @@ class TelemetryCollector {
 		return false
 	}
 
-	collect() {
-		return TelemetryCollector.SectionCollector(this)
+	collectTelemetry() {
+		return TelemetryCollector.TelemetryFuture(this)
 	}
 }
 

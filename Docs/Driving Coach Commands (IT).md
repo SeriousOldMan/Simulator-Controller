@@ -100,6 +100,8 @@ Information=informazioni sulla sessione, informazioni sul turno, informazioni su
 	[{Per favore non, Non} utilizzare un {giro di riferimento, riferimento, giro di riferimento per favore, riferimento per favore}]
 	
 	[(CanWe) {concentrarci, esercitarci} {sulla curva numero, sulla curva} (Number), Concentriamoci {sulla curva numero, sulla curva} (Number), (CanYou) dammi {raccomandazioni, suggerimenti, una guida, istruzioni} per la {curva numero, curva} (Number)]
+	
+	[(CanWe) {concentrarci, concentrarci di nuovo} sull'intera traccia, {Concentriamoci ancora, Concentriamoci} sull'intera traccia]
 
 #### Conversazione
 

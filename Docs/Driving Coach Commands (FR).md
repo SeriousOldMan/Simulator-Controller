@@ -100,6 +100,8 @@ Information=informations sur la session, informations sur le relais, information
 	[{S'il vous plaît n'utilisez, N'utilisez} pas de référence {tour, tour s'il vous plaît}]
 	
 	[(CanWe) {concentrer sur, pratiquer} le {coin numéro, coin} (Number), {Pratiquons, Concentrons-nous sur} le {coin numéro, coin} (Number), (CanYou) me donner {des recommandations, des conseils, un guide, des instructions} pour le {coin numéro, coin} (Number)]
+	
+	[(CanWe) {concentrer, concentrer à nouveau} sur toute la piste, {Concentrons-nous, Concentrons-nous à nouveau} sur toute la piste]
 
 #### Conversation
 

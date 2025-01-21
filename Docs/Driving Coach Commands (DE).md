@@ -90,6 +90,8 @@ Information=Session Information, Stint Information, Information zum Fahrverhalte
 	[{Bitte keine, Keine} {Referenzrunde mehr, Referenzrunde} {verwenden, verwenden bitte}]
 	
 	[(KoennenWir) {uns, Dich} auf {Kurve, Kurve Nummer} (Number) konzentrieren, Lass uns auf {Kurve, Kurve Nummer} (Number) konzentrieren, (KannstDu) (Mir) Anweisungen für {Kurve, Kurve Nummer} (Number) geben]
+	
+	[(KoennenWir) {uns, Dich} {wieder auf, auf} {die ganze, die} Strecke konzentrieren, Lass uns {wieder auf, auf} {die ganze, die} Strecke konzentrieren]
 
 #### Gespräch
 

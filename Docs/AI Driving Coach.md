@@ -204,6 +204,10 @@ Below you find all instruction categories and the supported variables:
 | Coaching.Corner.Approaching | Scope            | Similar to the "Coaching.Corner" instruction. Used for on-track recommendations for an upcoming corner. |
 |             | %telemetry%       | This variable will be replaced with a condensed representation of the telemetry data in JSON format for the last lap. Only the data for the requested corner and the section after it will be included. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#coaching-based-on-lap-telemetry-data) below for more information. |
 |             | %corner%          | The corner to be reviewed. |
+| Coaching.Corner.Review | Scope            | This instruction is used to generate feedback after passing a corner and the following section. |
+|             | %previousLap%       | This variable will be replaced with a condensed representation of the telemetry data in JSON format for the previous lap. Only the data for the requested corner and the section after it will be included. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#focusing-on-specific-corners) below for more information. |
+|             | %currentLap%        | *currentLap* will be replaced with a condensed representation of the telemetry data in JSON format for the current lap. Only the data for the requested corner and the section after it will be included. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#focusing-on-a-specific-corner) below for more information. |
+|             | %corner%          | The corner to be reviewed. |
 | Coaching.Corner.Problems | Scope            | This instruction is used in several situations to give the LLM additional knowledge about the possible problems induced by driver input errors at a given corner. This knowledge is derived by the rule engine based on the telemetry data. Particular useful for smaller LLMs which are not that strong in reasoning. If you are using a premium model, the text of this instruction can be deleted to let the LLM decide on its own. |
 |             | %problems%       | Will be replaced with a comma separated list of driver errors like "Too much pushing, Too late braking". See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#coaching-based-on-lap-telemetry-data) below for more information. |
 |             | %corner%          | The corner to be reviewed. |
@@ -345,6 +349,16 @@ How the Driving Coach interprets the telemetry data and what instructions will b
 	%telemetry%
 
 Important is here the restriction to a short message (25 to 35 words) and the focus on driver inputs. However, you can change that, if you want different corner hints from the Coach or longer explanations, for example. But bear in mind, that these instructions will be given while you are driving, so keeping them short might be a good idea. If you experiment with the length of the Coach's corner hints by increasing the number of words, for example, be sure to adjust the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#race-settings) "Coach: Time between Instructions" and "Coach: Distance before Corner" in the "Session Database" as well.
+
+#### Focusing on specific corners
+
+It is possible to work with the Driving Coach on specific corners. To start this special on-track coaching mode, ask:
+
+	Can we focus on corner number *X*
+
+with *X* the number of the corner you want to practice. This command can be issued multiple times and the Driving Coach will remember the different corners you want to practice.
+
+If this mode is active, Aiden will not only give you instructions for the corners you requested, but will also give you immediate feedback after you have passed the corner and the following section. This feedback will compare your performance of your current lap at this corner with the performance of the previous lap (not the reference lap) and will tell you what was good and where you can still improve. The instruction "Coaching.Corner.Review" is used to generate this feedback.
 
 ### Automatic activation of coaching mode
 

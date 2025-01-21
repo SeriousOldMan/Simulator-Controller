@@ -1168,13 +1168,13 @@ class DrivingCoach extends GridRaceAssistant {
 
 	reviewCornerPerformance(cornerNr, fileName) {
 		local oldMode := this.Mode
-		local lastLap, currentLap, command, ignore
+		local previousLap, currentLap, command, ignore
 
 		if this.Speaker[false] {
 			this.Mode := "Review"
 
 			try {
-				lastLap := this.getTelemetry(&ignore := false, cornerNr)
+				previousLap := this.getTelemetry(&ignore := false, cornerNr)
 				currentLap := this.TelemetryAnalyzer.createTelemetry("Reference", fileName)
 
 				currentLap.Sections := choose(currentLap.Sections, (section) {
@@ -1192,9 +1192,9 @@ class DrivingCoach extends GridRaceAssistant {
 											   return false
 									   })
 
-				if (this.TelemetryAnalyzer && lastLapTelemetry && (lastLapTelemetry.Sections.Length > 0)) {
+				if (this.TelemetryAnalyzer && previousLap && (previousLap.Sections.Length > 0)) {
 					command := substituteVariables(this.Instructions["Coaching.Corner.Review"]
-												 , {lastLap: lastLap.JSON, currentLap: currentLap.JSON
+												 , {previousLap: previousLap.JSON, currentLap: currentLap.JSON
 												  , corner: cornerNr})
 
 					this.handleVoiceText("TEXT", command, true, values2String(A_Space, words*))

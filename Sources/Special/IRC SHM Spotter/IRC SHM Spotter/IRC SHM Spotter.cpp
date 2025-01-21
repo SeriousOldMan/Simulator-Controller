@@ -1923,8 +1923,6 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 			playerRunning = ((float*)trackPositions)[playerCarIndex];
 
 		if (playerRunning > lastTelemetryRunning) {
-			lastTelemetryRunning = playerRunning;
-			
 			if (getRawDataValue(rawValue, header, data, "Speed"))
 				speed = *((float*)rawValue) * 3.6;
 
@@ -1971,6 +1969,34 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 				telemetryFile << ";" << coordinateX << ";" << coordinateY << std::endl;
 			else
 				telemetryFile << std::endl;
+
+			if (fileExists(telemetryDirectory + "\\Telemetry.section"))
+				try {
+					std::ofstream file;
+
+					file.open(telemetryDirectory + "\\Telemetry.section", std::ios::out | std::ios::ate);
+
+					file << (playerRunning * trackLength) << ";"
+						 << throttle << ";"
+						 << brake << ";"
+						 << steerAngle << ";"
+						 << gear << ";"
+						 << rpms << ";"
+						 << speed << ";"
+						 << "n/a" << ";"
+						 << "n/a" << ";"
+						 << longG << ";" << -latG;
+
+					if (getCarCoordinates(header, data, playerCarIndex, coordinateX, coordinateY))
+						file << ";" << coordinateX << ";" << coordinateY << std::endl;
+					else
+						file << std::endl;
+
+					file.close();
+				}
+				catch (...) {}
+
+			lastTelemetryRunning = playerRunning;
 		}
 	}
 	catch (...) {

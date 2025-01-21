@@ -2131,26 +2131,28 @@ void collectCarTelemetry() {
 							<< gf->carCoordinates[carID][0] << ";" << gf->carCoordinates[carID][2] << ";"
 							<< gf->iCurrentTime << endl;
 
-						if (fileExists(telemetryDirectory + "\\Telemetry.section")) {
-							ofstream file;
+						if (fileExists(telemetryDirectory + "\\Telemetry.section"))
+							try {
+								ofstream file;
 
-							file.open(telemetryDirectory + "\\Telemetry.section", ios::out | ios::ate);
+								file.open(telemetryDirectory + "\\Telemetry.section", ios::out | ios::ate);
 
-							file << (driverRunning * trackLength) << ";"
-								<< (pf->gas >= 0 ? pf->gas : 0) << ";"
-								<< (pf->brake >= 0 ? pf->brake : 0) << ";"
-								<< pf->steerAngle << ";"
-								<< (pf->gear - 1) << ";"
-								<< pf->rpms << ";"
-								<< pf->speedKmh << ";"
-								<< pf->tc << ";"
-								<< pf->abs << ";"
-								<< longG << ";" << latG << ";"
-								<< gf->carCoordinates[carID][0] << ";" << gf->carCoordinates[carID][2] << ";"
-								<< gf->iCurrentTime << endl;
+								file << (driverRunning * trackLength) << ";"
+									<< (pf->gas >= 0 ? pf->gas : 0) << ";"
+									<< (pf->brake >= 0 ? pf->brake : 0) << ";"
+									<< pf->steerAngle << ";"
+									<< (pf->gear - 1) << ";"
+									<< pf->rpms << ";"
+									<< pf->speedKmh << ";"
+									<< pf->tc << ";"
+									<< pf->abs << ";"
+									<< longG << ";" << latG << ";"
+									<< gf->carCoordinates[carID][0] << ";" << gf->carCoordinates[carID][2] << ";"
+									<< gf->iCurrentTime << endl;
 
-							file.close();
-						}
+								file.close();
+							}
+							catch (...) {}
 						
 						lastRunning = driverRunning;
 					}

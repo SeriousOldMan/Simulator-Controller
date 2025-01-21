@@ -1704,8 +1704,6 @@ namespace ACSHMSpotter {
 
 					if (running > lastRunning)
 					{
-						lastRunning = running;
-
 						telemetryFile.Write(running + ";");
 						telemetryFile.Write(physics.Gas + ";");
 						telemetryFile.Write(physics.Brake + ";");
@@ -1722,8 +1720,35 @@ namespace ACSHMSpotter {
 						telemetryFile.Write(cars.cars[carID].worldPosition.x + ";");
                         telemetryFile.Write(cars.cars[carID].worldPosition.z + ";");
                         telemetryFile.WriteLine(graphics.iCurrentTime);
+
+						if (System.IO.File.Exists(telemetryDirectory + "\\Telemetry.section"))
+							try {
+								StreamWriter file = new StreamWriter(telemetryDirectory + "\\Telemetry.section", true);
+
+								file.Write(running + ";");
+								file.Write(physics.Gas + ";");
+								file.Write(physics.Brake + ";");
+								file.Write(physics.SteerAngle + ";");
+								file.Write((physics.Gear - 1) + ";");
+								file.Write(physics.Rpms + ";");
+								file.Write(physics.SpeedKmh + ";");
+
+								file.Write(physics.TC + ";");
+								file.Write(physics.Abs + ";");
+								file.Write(longG + ";");
+								file.Write(latG + ";");
+
+								file.Write(cars.cars[carID].worldPosition.x + ";");
+								file.Write(cars.cars[carID].worldPosition.z + ";");
+								file.WriteLine(graphics.iCurrentTime);
+
+								file.Close();
+                            }
+                            catch (Exception) { }
+
+                        lastRunning = running;
                     }
-				}
+                }
             }
             catch (Exception)
             {

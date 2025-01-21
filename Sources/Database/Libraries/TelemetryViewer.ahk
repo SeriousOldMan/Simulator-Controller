@@ -1629,9 +1629,11 @@ class TelemetryViewer {
 
 			if (analyzer.TrackSections.Length = 0)
 				withTask(WorkingTask(StrReplace(translate("Scanning track..."), "...", "")), () {
-					analyzer.requireTrackSections(telemetry)
+					withBlockedWindows(() {
+						analyzer.requireTrackSections(telemetry)
 
-					telemetry := analyzer.createTelemetry(0, this.SelectedLap[true], driver, lapTime, sectorTimes)
+						telemetry := analyzer.createTelemetry(0, this.SelectedLap[true], driver, lapTime, sectorTimes)
+					})
 				})
 
 			referenceLap := this.SelectedReferenceLap
@@ -2402,35 +2404,37 @@ class TrackMap {
 
 			try {
 				withTask(WorkingTask(StrReplace(translate("Scanning track..."), "...", "")), () {
-					local analyzer := TelemetryAnalyzer(this.Simulator, this.Track)
-					local lap := this.TelemetryViewer.SelectedLap
-					local driver, lapTime, sectorTimes, telemetry, index, section
+					withBlockWindows(() {
+						local analyzer := TelemetryAnalyzer(this.Simulator, this.Track)
+						local lap := this.TelemetryViewer.SelectedLap
+						local driver, lapTime, sectorTimes, telemetry, index, section
 
-					if isNumber(lap)
-						this.TelemetryViewer.Manager.getLapInformation(lap, &driver, &lapTime, &sectorTimes)
-					else {
-						driver := lap[2]
-						lapTime := ((lap[3] != "-") ? lap[3] : false)
-						sectorTimes := lap[4]
-					}
+						if isNumber(lap)
+							this.TelemetryViewer.Manager.getLapInformation(lap, &driver, &lapTime, &sectorTimes)
+						else {
+							driver := lap[2]
+							lapTime := ((lap[3] != "-") ? lap[3] : false)
+							sectorTimes := lap[4]
+						}
 
-					telemetry := analyzer.createTelemetry(0, this.TelemetryViewer.SelectedLap[true], driver, lapTime, sectorTimes)
+						telemetry := analyzer.createTelemetry(0, this.TelemetryViewer.SelectedLap[true], driver, lapTime, sectorTimes)
 
-					removeMultiMapValues(this.TrackMap, "Sections")
+						removeMultiMapValues(this.TrackMap, "Sections")
 
-					this.iTrackSections := analyzer.findTrackSections(telemetry)
+						this.iTrackSections := analyzer.findTrackSections(telemetry)
 
-					this.updateTrackSections(false)
+						this.updateTrackSections(false)
 
-					for index, section in this.TrackSections {
-						setMultiMapValue(this.TrackMap, "Sections", index . ".Index", section.Index)
-						setMultiMapValue(this.TrackMap, "Sections", index . ".Nr", section.Nr)
-						setMultiMapValue(this.TrackMap, "Sections", index . ".Type", section.Type)
-						setMultiMapValue(this.TrackMap, "Sections", index . ".X", section.X)
-						setMultiMapValue(this.TrackMap, "Sections", index . ".Y", section.Y)
-					}
+						for index, section in this.TrackSections {
+							setMultiMapValue(this.TrackMap, "Sections", index . ".Index", section.Index)
+							setMultiMapValue(this.TrackMap, "Sections", index . ".Nr", section.Nr)
+							setMultiMapValue(this.TrackMap, "Sections", index . ".Type", section.Type)
+							setMultiMapValue(this.TrackMap, "Sections", index . ".X", section.X)
+							setMultiMapValue(this.TrackMap, "Sections", index . ".Y", section.Y)
+						}
 
-					this.updateTrackMap()
+						this.updateTrackMap()
+					})
 				})
 			}
 			finally {

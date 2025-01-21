@@ -1,9 +1,9 @@
 [Development]
-Version=6.1.3.0-dev
-Target=6.1.3.0-release
-Date=01/19/2025
+Version=6.1.4.0-dev
+Target=6.1.4.0-release
+Date=01/21/2025
 Download=
-Changes=Dynamic strategy creation based on race rules, New car models for Setup Workbench, Initial support for Assetto Corsa EVO, Fixed missing translations, Fixed invalid certificate handling for OpenAI
+Changes=New voice commands for focusing on specific corners by the Driving Coach, New instruction for post corner review by the Driving Coach, Post corner critics by the Driving Coach
 Components=Media->5.6.1,Configuration->6.1.2,Utilities->5.9.8
 [Release]
 Version=6.1.2.1-release
@@ -24,5 +24,5 @@ Utilities.5.9.8.Download=https://www.dropbox.com/scl/fi/pjtq7f3u6uoy5ld88vqz9/Ut
 [Current]
 Type=Development
 [Version]
-Development=6.1.3.0-dev
+Development=6.1.4.0-dev
 Release=6.1.2.1-release

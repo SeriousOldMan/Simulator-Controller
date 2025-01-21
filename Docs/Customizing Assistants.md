@@ -362,6 +362,16 @@ Please be aware that you are talking to an AI based on GPT technology when using
 
 IMPORTANT: When action handling is enabled, it might be necessary to disable the *Understanding* booster or at least set the "Creativity" to a very low value. Otherwise the *Understanding* booster might detect a command pattern, which will match to a pre-defined voice command, thereby preventing the LLM from creating a custom action plan.
 
+#### Examples
+
+The following short conversations demonstrate the potential of the *Conversation* booster with both the Engineer and the Strategist.
+
+[Conversation with Engineer](https://www.dropbox.com/scl/fi/bqfs6xxvr9jjca4yr3ajt/Conversation_with_the_Engineer.mp3?rlkey=33t4j70e3fuetosklvo2peoya&st=dolh5gkc&dl=1)
+
+[Conversation with Strategist 1](https://www.dropbox.com/scl/fi/zza32wd7a4dw9r7u6u2q9/Conversation_with_the_Strategist_1.mp3?rlkey=5nbo5q1qz0xdvsdgdibk652dq&st=4vnvfd4x&dl=1)
+
+[Conversation with Strategist 2](https://www.dropbox.com/scl/fi/o3ej147izjzpm0zymyvdi/Conversation_with_the_Strategist_2.mp3?rlkey=qozaqvqjfhy6tiysvhs6ojkn4&st=qkuy6eei&dl=1)
+
 ### Reasoning Booster
 
 *Reasoning* is the most complex and most capable booster, since it allows you to alter or extend the behavior of the Assistant. You can use predefined events or even define your own ones in the [Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine) (as shown below), which then result in a request to the LLM (actually you can process events even without using the LLM directly in rule engine, but this is only half of the fun). Similar to the *Conversation* booster above, the LLM then can decide to activate one or more [predefined or custom actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-booster-actions) to fulfill the request or react to the situation. To support its conclusion, the LLM will have full access to the same knowledge as in the *Conversation* booster.

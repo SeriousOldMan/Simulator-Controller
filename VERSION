@@ -4,7 +4,7 @@ Target=6.1.4.0-release
 Date=01/21/2025
 Download=
 Changes=New voice commands for focusing on specific corners by the Driving Coach, New instruction for post corner review by the Driving Coach, Post corner critics by the Driving Coach
-Components=Media->5.6.1,Configuration->6.1.2,Utilities->5.9.8
+Components=Media->5.6.1,Configuration->6.1.3,Utilities->5.9.8
 [Release]
 Version=6.1.2.1-release
 Date=01/19/2025
@@ -18,6 +18,9 @@ Media.5.6.1.Download=https://www.dropbox.com/scl/fi/3c56fjdvdd4od5t7rsuc9/Media-
 Configuration.6.1.2.Path=Resources
 Configuration.6.1.2.Content=Setup
 Configuration.6.1.2.Download=https://www.dropbox.com/scl/fi/khphlu9kqqzozggilhg9t/Configuration-6.1.2.zip?rlkey=vnp4xb912qfijucl35aroc5rb&st=os6keqn3&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.1.2.zip
+Configuration.6.1.3.Path=Resources
+Configuration.6.1.3.Content=Setup
+Configuration.6.1.3.Download=https://www.dropbox.com/scl/fi/rdnj6urr8qt3dzi5ut9up/Configuration-6.1.3.zip?rlkey=iw2utnrd185owgb32ov49rj91&st=487vvwrg&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.1.3.zip
 Utilities.5.9.8.Path=.
 Utilities.5.9.8.Content=Utilities
 Utilities.5.9.8.Download=https://www.dropbox.com/scl/fi/pjtq7f3u6uoy5ld88vqz9/Utilities-5.9.8.zip?rlkey=crido9soi8aiocepz10xdoev3&st=cprt4qr2&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.9.8.zip

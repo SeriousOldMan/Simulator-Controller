@@ -313,7 +313,7 @@ Additionally worth to be mentioned is the field *Pitstop.Delta*, with which you 
 
 Here you can enter basis race rules for the next race, which will be used by the AI Race Strategist, to try to create a strategy *on the fly*.
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Settings%205.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/race%20settings%205.JPG)
 
 Please see the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#tab-rules) in the AI Race Strategist chapter for a description of these fields.
 

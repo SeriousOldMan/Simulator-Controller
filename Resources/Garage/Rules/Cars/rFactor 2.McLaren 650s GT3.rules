@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - rFactor 2                       ;;;
-;;;                                         BMW M6 GT3                      ;;;
+;;;                                         McLaren 650s GT3                ;;;
 ;;;                                         Setup Rules                     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -11,5 +11,5 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: addSettings("rFactor 2", "BMW M6 GT3", [Electronics.ABS])),
-				 (Prove: removeSettings("rFactor 2", "BMW M6 GT3", [Aero.Splitter.Front, Differential.Preload]))
+[?Initialize] => (Prove: addSettings("rFactor 2", "McLaren 650s GT3", [Electronics.ABS])),
+				 (Prove: removeSettings("rFactor 2", "McLaren 650s GT3", [Aero.Splitter.Front]))

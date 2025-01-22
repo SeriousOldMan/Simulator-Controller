@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - rFactor 2                       ;;;
-;;;                                         BMW M6 GT3                      ;;;
+;;;                                         Callaway Corvette C7 GT3-R      ;;;
 ;;;                                         Setup Rules                     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -11,5 +11,9 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: addSettings("rFactor 2", "BMW M6 GT3", [Electronics.ABS])),
-				 (Prove: removeSettings("rFactor 2", "BMW M6 GT3", [Aero.Splitter.Front, Differential.Preload]))
+[?Initialize] => (Prove: addSettings("rFactor 2", "Callaway Corvette C7 GT3-R", [Electronics.ABS])),
+				 (Prove: removeSettings("rFactor 2", "Callaway Corvette C7 GT3-R", [Aero.Splitter.Front,
+																					Damper.Compression.Fast.Front.Left, Damper.Compression.Fast.Front.Right,
+																					Damper.Compression.Fast.Rear.Left, Damper.Compression.Fast.Rear.Right,
+																					Damper.Rebound.Fast.Front.Left, Damper.Rebound.Fast.Front.Right,
+																					Damper.Rebound.Fast.Rear.Left, Damper.Rebound.Fast.Rear.Right]))

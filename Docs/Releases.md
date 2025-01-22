@@ -11,6 +11,8 @@
         - Audi R8 LMS GT3 (Variante 2019)
 		- Bentley Continental GT3 (Variante 2020)
 		- BMW M6 GT3
+		- Callaway Corvette C7 GT3-R
+		- McLaren 650s GT3
 		- Aston Martin Vantage GT3 (fixed ABS settings)
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-613), if you want to include support for *Assetto Corsa EVO*.

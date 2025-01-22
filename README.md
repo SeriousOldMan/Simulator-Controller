@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[6.1.3.0-beta](https://www.dropbox.com/scl/fi/10x283bn11nmx37odntd0/Simulator-Controller-6.1.3.0-beta.zip?rlkey=s6mc2w0k84lyvcxfdpgyvhoen&st=d5hfk6u6&dl=1) (Test build for 6.1.3. Changes: Dynamic strategy creation based on race rules, New car models for Setup Workbench, Initial support for Assetto Corsa EVO, Fixed missing translations, Fixed invalid certificate handling for OpenAI.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-613) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

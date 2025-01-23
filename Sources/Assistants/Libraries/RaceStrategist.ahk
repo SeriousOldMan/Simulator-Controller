@@ -2188,19 +2188,19 @@ class RaceStrategist extends GridRaceAssistant {
 					fragments := speaker.Fragments
 					activeStrategy := (isObject(options) && options.HasProp("Active") && options.Active)
 
-					if ((options == true) || (options.HasProp("Strategy") && options.Strategy))
-						speaker.speakPhrase("Strategy")
+					nextPitstop := ((strategy.Pitstops.Length > 0) ? strategy.Pitstops[1] : false)
+
+					reported := (!nextPitstop && ((options == true) || (options.HasProp("NextPitstop") && options.NextPitstop)))
+
+					if ((options == true) || (options.HasProp("Strategy") && options.Strategy)) {
+						if !reported
+							speaker.speakPhrase("Strategy")
+					}
 					else if (options.HasProp("FullCourseYellow") && options.FullCourseYellow)
 						speaker.speakPhrase("FCYStrategy")
 
-					nextPitstop := ((strategy.Pitstops.Length > 0) ? strategy.Pitstops[1] : false)
-
-					if !nextPitstop
-						if ((options == true) || (options.HasProp("NextPitstop") && options.NextPitstop)) {
-							speaker.speakPhrase("NoNextPitstop")
-
-							reported := true
-						}
+					if reported
+						speaker.speakPhrase("NoNextPitstop")
 
 					if !reported {
 						if ((options == true) || (options.HasProp("Pitstops") && options.Pitstops)) {
@@ -2291,16 +2291,20 @@ class RaceStrategist extends GridRaceAssistant {
 					speaker.beginTalk()
 
 					try {
-						if ((options == true) || (options.HasProp("Strategy") && options.Strategy))
-							speaker.speakPhrase("Strategy")
-
-						if ((options == true) || (options.HasProp("Pitstops") && options.Pitstops)) {
-							speaker.speakPhrase("Pitstops", {pitstops: knowledgeBase.getValue("Strategy.Pitstop.Count")})
-
-							reported := (knowledgeBase.getValue("Strategy.Pitstop.Count") = 0)
-						}
-
 						nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next", false)
+
+						reported := (!nextPitstop && ((options == true) || (options.HasProp("NextPitstop") && options.NextPitstop)))
+
+						if !reported {
+							if ((options == true) || (options.HasProp("Strategy") && options.Strategy))
+								speaker.speakPhrase("Strategy")
+
+							if ((options == true) || (options.HasProp("Pitstops") && options.Pitstops)) {
+								speaker.speakPhrase("Pitstops", {pitstops: knowledgeBase.getValue("Strategy.Pitstop.Count")})
+
+								reported := (knowledgeBase.getValue("Strategy.Pitstop.Count") = 0)
+							}
+						}
 
 						if nextPitstop {
 							if ((options == true) || (options.HasProp("NextPitstop") && options.NextPitstop)) {
@@ -2319,8 +2323,7 @@ class RaceStrategist extends GridRaceAssistant {
 							}
 						}
 						else if ((options == true) || (options.HasProp("NextPitstop") && options.NextPitstop))
-							if !reported
-								speaker.speakPhrase("NoNextPitstop")
+							speaker.speakPhrase("NoNextPitstop")
 
 						if ((options == true) || (options.HasProp("Map") && options.Map)) {
 							map := knowledgeBase.getValue("Strategy.Map")
@@ -3302,26 +3305,29 @@ class RaceStrategist extends GridRaceAssistant {
 		else ; Nothing to see here, move on
 			return false
 
+		if (!sPitstops && cPitstops)
+			extended := false
+
 		; Negative => Better, Positive => Worse
 
 		result := (StrategySimulation.scenarioCoefficient("PitstopsCount", cPitstops - sPitstops, 1)
 				 + StrategySimulation.scenarioCoefficient("TyreSetsCount", sTSets - cTSets, 1))
 
-		if extended
+		if extended {
 			result += (StrategySimulation.scenarioCoefficient("FuelMax", cFuel - sFuel, 10)
 					 + StrategySimulation.scenarioCoefficient("TyreLapsMax", cTLaps - sTLaps, 10)
 					 + StrategySimulation.scenarioCoefficient("PitstopsPostLaps", sPLaps - cPLaps, 10))
 
-		if (scenario.SessionType = "Duration") {
-			if (!scenario.FullCourseYellow || (result != 0)) {
-				result += StrategySimulation.scenarioCoefficient("ResultMajor", sLaps - cLaps, 1)
+			if (scenario.SessionType = "Duration") {
+				if (!scenario.FullCourseYellow || (result != 0)) {
+					result += StrategySimulation.scenarioCoefficient("ResultMajor", sLaps - cLaps, 1)
 
-				if extended
 					result += StrategySimulation.scenarioCoefficient("ResultMinor", cDuration - sDuration, (strategy.AvgLapTime + scenario.AvgLapTime) / 4)
+				}
 			}
+			else
+				result += StrategySimulation.scenarioCoefficient("ResultMajor", cDuration - sDuration, (strategy.AvgLapTime + scenario.AvgLapTime) / 4)
 		}
-		else
-			result += StrategySimulation.scenarioCoefficient("ResultMajor", cDuration - sDuration, (strategy.AvgLapTime + scenario.AvgLapTime) / 4)
 
 		if ((cPitstops > 0) && !scenario.FullCourseYellow &&  (scenario.Pitstops[1].Lap <= (knowledgeBase.getValue("Lap") + 1)))
 			result := false

@@ -12,4 +12,4 @@
 ;;;-------------------------------------------------------------------------;;;
 
 [?Initialize] => (Prove: addSettings("rFactor 2", "BMW M6 GT3", [Electronics.ABS])),
-				 (Prove: removeSettings("rFactor 2", "BMW M6 GT3", [Aero.Splitter.Front]))
+				 (Prove: removeSettings("rFactor 2", "BMW M6 GT3", [Aero.Splitter.Front, Differential.Preload]))

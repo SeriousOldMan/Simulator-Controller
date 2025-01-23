@@ -3447,7 +3447,7 @@ runBuildTargets(&buildProgress) {
 
 				options := " /base `"" . kAHKDirectory . "v2\AutoHotkey64.exe`""
 
-				loop 2 {
+				loop {
 					if (gTargetConfiguration = "Production") {
 						SplitPath(targetSource, , &sourceDirectory)
 

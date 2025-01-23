@@ -5,7 +5,7 @@
      - New voice commands let you provide the numbers for those corners where you want to get a post corner review. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#list-of-all-voice-commands) for a description.
 	 - A new LLM instruction is available which can be customized to control the different aspects of the critics given by the Driving Coach.
 
-## 6.1.3.0-release 01/24/25 (planned)
+## 6.1.3.0-release 01/24/25
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed several missing translations.
@@ -13,11 +13,14 @@
   5. Initial support for *Assetto Corsa EVO*. Not much functionality yet...
   6. "Race Settings" has been [extended](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-rules) and allows now to define basic race rules for the next race.
   7. The Strategist can now create a strategy dynamically based on simple race rules configured in the "Race Settings". See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#tab-rules) for more information.
-  8. New car models for "Setup Workbench":
+  8. The default for the [race setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) "Engineer: Tyre Service" has changed to "Change" for *Automobilista 2*, *ProjectCARS 2 and *RaceRoom Racing Experience*, because these simulators do not support adjusting pressures during a pitstop.
+  9. New car models for "Setup Workbench":
       - rFactor 2
         - Audi R8 LMS GT3 (Variante 2019)
 		- Bentley Continental GT3 (Variante 2020)
 		- BMW M6 GT3
+		- Callaway Corvette C7 GT3-R
+		- McLaren 650s GT3
 		- Aston Martin Vantage GT3 (fixed ABS settings)
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-613), if you want to include support for *Assetto Corsa EVO*.

@@ -163,7 +163,7 @@ This settings are generally available, although you can and have to define them 
 
 ##### Notes
 
-(1) The default for *iRacing* is *Change*, since the simulator does not provide correct tyre pressure information while driving. This will lead to setup pressure values, which are way off, when tyres are changed at the pitstop. Therefore it might be better to manage tyre pressures manually. Up 2 u...
+(1) The default for *iRacing* is *Change*, since the simulator does not provide correct tyre pressure information while driving. This will lead to setup pressure values, which are way off, when tyres are changed at the pitstop. Therefore it might be better to manage tyre pressures manually. *Change* is also the default for *Automobilista 2*, *ProjectCARS 2* and *RaceRoom Racing Experience*, because these simulators do not support pressure adjustments during a pitstop.
 
 ### Simulator specific settings
 

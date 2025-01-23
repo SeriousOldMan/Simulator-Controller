@@ -7,8 +7,11 @@
   6. "Race Settings" has been [extended](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-rules) and allows now to define basic race rules for the next race.
   7. The Strategist can now create a strategy dynamically based on simple race rules configured in the "Race Settings". See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#tab-rules) for more information.
   8. The default for the [race setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) "Engineer: Tyre Service" has changed to "Change" for *Automobilista 2*, *ProjectCARS 2 and *RaceRoom Racing Experience*, because these simulators do not support adjusting pressures during a pitstop.
-  9. Auto requesting the pitstop can now be configured in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" for *Automobilista 2*. The default is *True*, which resembles the previously implemented behaviour.
-  10. New car models for "Setup Workbench":
+  9. Auto requesting the pitstop for *Automobilista 2* can now be configured in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database".
+
+     **IMPORTANT**: The default for this setting is *False*, which is **different** from the previously implemented behaviour.
+  10. A new action "PitstopRequest" has been defined for the *Automobilista 2* plugin to request a pitstop manually.
+  11. New car models for "Setup Workbench":
       - rFactor 2
         - Audi R8 LMS GT3 (Variante 2019)
 		- Bentley Continental GT3 (Variante 2020)
@@ -17,7 +20,7 @@
 		- McLaren 650s GT3
 		- Aston Martin Vantage GT3 (fixed ABS settings)
 
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-613), if you want to include support for *Assetto Corsa EVO*.
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-613), especially if you want to include support for *Assetto Corsa EVO*.
 
 ## 6.1.2.1-release 01/19/25
   1. Workaround for incompatible OpenAI client certificate request.

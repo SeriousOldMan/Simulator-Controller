@@ -37,7 +37,9 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 6.1.3
 
-Initial support for *Assetto Corsa EVO* has been added. The plugin has been added in "Simulator Configuration", but it is deactivated. You can activate it manually and add the required application in "Simulator Configuration", but I strongly recommend to use "Simulator Setup". Go to the "Basic" page and *Assetto Corsa EVO* will normally be detected automatically. Then create a new configuration.
+1. Initial support for *Assetto Corsa EVO* has been added. The plugin has been added in "Simulator Configuration", but it is deactivated. You can activate it manually and add the required application in "Simulator Configuration", but I strongly recommend to use "Simulator Setup". Go to the "Basic" page and *Assetto Corsa EVO* will normally be detected automatically. Then create a new configuration.
+
+2. The Engineer does no longer automatically request the pitstop after all settings has been prepared in *Automobilista 2*, since this can lead to unwanted effects when pitstops are planned and prepared multiple times. But there is as [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" to make it automatic again.
 
 ***
 

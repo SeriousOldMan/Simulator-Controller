@@ -910,7 +910,7 @@ Note: You can use all these commands in the *pitstopCommands* list as well, whic
 
 ### Configuration
 
-First, you can define, how to open and close the Pitstop MFD (aka HUD) in *rFactor 2*. This is actually optional, since the menu have not to be open for the control of the pitstop settings. If you want to use the "PitstopRequest" controller action (see below), supply an argument for *pitstopRequest*. Please supply the bindings you have defined in the controller setup in *rFactor 2*.
+First, you can define, how to open and close the Pitstop MFD (aka HUD) in *rFactor 2*. This is actually optional, since the menu have not to be open for the control of the pitstop settings. If you want to use the "PitstopRequest" controller action (see below), supply an argument for *requestPitstop*. Please supply the bindings you have defined in the controller setup in *rFactor 2*.
 
 	openPitstopMFD: *openHotkey*; closePitstopMFD: *closeHotkey*; requestPitstop: *requestPitstopHotkey*;
 	pitstopMFDMode: Event | Input | Play | Raw | Default
@@ -1153,6 +1153,7 @@ See the following table for the supported settings:
 | SuspensionRepair | Toggles the repair of the suspension components. |
 | BodyworkRepair | Toggles the repair of all the bodywork and aerodynamic elements. |
 | DriverSwap | Enables or disables driver swap for the upcoming pitstop. |
+| PitstopRequest | Requests or unrequests a pitstop. |
 
 Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
 
@@ -1329,7 +1330,7 @@ Note: You can use all these commands in the *pitstopCommands* list as well, whic
 
 ### Configuration
 
-First, you can define, how to open and close the Pitstop MFD (aka HUD) in *Le Mans Ultimate*. This is actually optional, since the menu have not to be open for the control of the pitstop settings. If you want to use the "PitstopRequest" controller action (see below), supply an argument for *pitstopRequest*. Please supply the bindings you have defined in the controller setup in *Le Mans Ultimate*.
+First, you can define, how to open and close the Pitstop MFD (aka HUD) in *Le Mans Ultimate*. This is actually optional, since the menu have not to be open for the control of the pitstop settings. If you want to use the "PitstopRequest" controller action (see below), supply an argument for *requestPitstop*. Please supply the bindings you have defined in the controller setup in *Le Mans Ultimate*.
 
 	openPitstopMFD: *openHotkey*; closePitstopMFD: *closeHotkey*; requestPitstop: *requestPitstopHotkey*;
 	pitstopMFDMode: Event | Input | Play | Raw | Default

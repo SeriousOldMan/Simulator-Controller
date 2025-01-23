@@ -5,7 +5,7 @@ Aiden, The AI Driving Coach, is a fully AI based chatbot which plays the role of
 Simulator Controller does not provide its own LLM, of course. And this is even not necessary, since there are a dozens of very good models available in the Open Source (see the [Hugging Face website](https://huggingface.co/) for a complete overview what's available). And there are commercial models available as well, first and foremost from OpenAI, the company, that created the famous ChatGPT solutions. Simulator Controller uses API calls to use the services provided by an existing GPT engine to run the LLM used by Aiden, or you can use the integrated "LLM Runtime", to run everything on your own PC, as long as your machine is powerful enough. You can choose in the configuration which provider is used and even which LLM you want to use (see below in the chapters about [installation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#installation) and [configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#configuration).
 
 Before we proceed to the details of the configruation and the rules how to interact with your personal Driving Coach, let's take a look at a typical interaction with Aiden.
- 
+
 ### A typical dialog
 
 It is very hard to describe, how the interaction with Aiden is like. Therefore, let's take a look together at a short interaction. By the way, the Driving Coach is named "Kim" here.

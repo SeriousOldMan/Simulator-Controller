@@ -1,4 +1,4 @@
-## 6.1.3.0-release 01/24/25 (planned)
+## 6.1.3.0-release 01/24/25
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed several missing translations.

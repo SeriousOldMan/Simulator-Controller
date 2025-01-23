@@ -1,23 +1,20 @@
 [Development]
-Version=6.1.3.0-beta
+Version=6.1.3.0-release
 Target=6.1.3.0-release
-Date=01/23/2025
-Download=https://www.dropbox.com/scl/fi/10x283bn11nmx37odntd0/Simulator-Controller-6.1.3.0-beta.zip?rlkey=s6mc2w0k84lyvcxfdpgyvhoen&st=d5hfk6u6&dl=1
+Date=01/24/2025
+Download=https://cutt.ly/le8QI2kN;https://www.dropbox.com/scl/fi/501s2dv7mpre0mzjpkrhk/Simulator-Controller-6.1.3.0-release.zip?rlkey=vdc4w19zkt34u8ycks8gm59u7&st=gippaf4s&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.1.3.0-release.zip
 Changes=Dynamic strategy creation based on race rules, New car models for Setup Workbench, Initial support for Assetto Corsa EVO, Fixed missing translations, Fixed invalid certificate handling for OpenAI, Changed defaults for "Engineer: Tyre Service"
 Components=Media->5.6.1,Configuration->6.1.3,Utilities->5.9.8
 [Release]
-Version=6.1.2.1-release
-Date=01/19/2025
-Download=https://cutt.ly/ce97qsrM;https://www.dropbox.com/scl/fi/wbmegbf00io98nm2kxl6z/Simulator-Controller-6.1.2.0-release.zip?rlkey=uwmhmnvzpahar9xp3l1ygvq6l&st=unwcb3v9&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.1.2.0-release.zip
-Changes=Major rework of the documentation, Support for weather forecast in LMU, Aproximated grip status for LMU, Pitstop service time for LMU, Changed default activation recognizer to "Desktop", Fixed some bugs for LMU if imperial units are selected, Increased reliability of telemetry collector for ACC, Acknowledge sound for Conversation booster activation, Extended action call format of Reasoning booster, Optimized end of session detection for iRacing, New car models for rFactor 2, Updated car models for Le Mans Ultimate
-Components=Media->5.6.1,Configuration->6.1.2,Utilities->5.9.8
+Version=6.1.3.0-release
+Date=01/24/2025
+Download=https://cutt.ly/le8QI2kN;https://www.dropbox.com/scl/fi/501s2dv7mpre0mzjpkrhk/Simulator-Controller-6.1.3.0-release.zip?rlkey=vdc4w19zkt34u8ycks8gm59u7&st=gippaf4s&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.1.3.0-release.zip
+Changes=Dynamic strategy creation based on race rules, New car models for Setup Workbench, Initial support for Assetto Corsa EVO, Fixed missing translations, Fixed invalid certificate handling for OpenAI, Changed defaults for "Engineer: Tyre Service"
+Components=Media->5.6.1,Configuration->6.1.3,Utilities->5.9.8
 [Components]
 Media.5.6.1.Path=Resources
 Media.5.6.1.Content=Splash Media
 Media.5.6.1.Download=https://www.dropbox.com/scl/fi/3c56fjdvdd4od5t7rsuc9/Media-5.6.1.zip?rlkey=x0icl05jy05nn886due4dsblv&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Media+5.6.1.zip
-Configuration.6.1.2.Path=Resources
-Configuration.6.1.2.Content=Setup
-Configuration.6.1.2.Download=https://www.dropbox.com/scl/fi/khphlu9kqqzozggilhg9t/Configuration-6.1.2.zip?rlkey=vnp4xb912qfijucl35aroc5rb&st=os6keqn3&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.1.2.zip
 Configuration.6.1.3.Path=Resources
 Configuration.6.1.3.Content=Setup
 Configuration.6.1.3.Download=https://www.dropbox.com/scl/fi/rdnj6urr8qt3dzi5ut9up/Configuration-6.1.3.zip?rlkey=iw2utnrd185owgb32ov49rj91&st=487vvwrg&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.1.3.zip
@@ -25,7 +22,7 @@ Utilities.5.9.8.Path=.
 Utilities.5.9.8.Content=Utilities
 Utilities.5.9.8.Download=https://www.dropbox.com/scl/fi/pjtq7f3u6uoy5ld88vqz9/Utilities-5.9.8.zip?rlkey=crido9soi8aiocepz10xdoev3&st=cprt4qr2&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.9.8.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=6.1.3.0-beta
-Release=6.1.2.1-release
+Development=6.1.3.0-release
+Release=6.1.3.0-release

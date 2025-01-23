@@ -316,9 +316,10 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	finishPitstopSetup(pitstopNumber) {
 		super.finishPitstopSetup(pitstopNumber)
 
-		if this.requirePitstopMFD()
-			if this.selectPitstopOption("Request Pitstop")
-				this.changePitstopOption("Request Pitstop")
+		if getMultiMapValue(this.Settings, "Simulator.Automobilista 2", "Pitstop.Request", false)
+			if this.requirePitstopMFD()
+				if this.selectPitstopOption("Request Pitstop")
+					this.changePitstopOption("Request Pitstop")
 	}
 
 	updateSession(session, force := false) {

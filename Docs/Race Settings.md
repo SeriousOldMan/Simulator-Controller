@@ -216,7 +216,27 @@ The following settings are only available, if you have selected the correspondin
 |            | Repair duration for suspension damage    | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the suspension at a pitstop. |
 |            | Repair duration for engine damage        | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the engine at a pitstop. |
 
-5. *Automobilista 2* and *iRacing*
+5. *Automobilista 2*
+
+| Category   | Setting                                  | Type    | Default                         | Description  |
+|------------|------------------------------------------|---------|---------------------------------|--------------|
+| Pitstop    | Key Delay                                | Integer | 20                              | The time in ms to wait between each virtual key press, when controlling the pitstop settings of the simulator. Increase this, if your computer can't keep up with the speed of the virtual input. |
+| Engineer    | Request pitstop                         | Boolean | True                            | If *True* (which is the default), the pitstop is requested after all settings has been updated. |
+|            | Repair duration for bodywork damage      | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the bodywork at a pitstop. |
+|            | Repair duration for suspension damage    | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the suspension at a pitstop. |
+|            | Repair duration for engine damage        | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the engine at a pitstop. |
+| Track      | Type                                     | Circuit, Rally, Hill, Street | Circuit    | Defines the type of the specific track. ALl closed tracks are of type *Circuit*, all open tracks are of type *Rally*. |
+
+6. *Project Cars 2*
+
+| Category   | Setting                                  | Type    | Default                         | Description  |
+|------------|------------------------------------------|---------|---------------------------------|--------------|
+| Pitstop    | Key Delay                                | Integer | 20                              | The time in ms to wait between each virtual key press, when controlling the pitstop settings of the simulator. Increase this, if your computer can't keep up with the speed of the virtual input. |
+|            | Repair duration for bodywork damage      | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the bodywork at a pitstop. |
+|            | Repair duration for suspension damage    | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the suspension at a pitstop. |
+|            | Repair duration for engine damage        | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the engine at a pitstop. |
+
+7. *iRacing*
 
 | Category   | Setting                                  | Type    | Default                         | Description  |
 |------------|------------------------------------------|---------|---------------------------------|--------------|
@@ -226,7 +246,7 @@ The following settings are only available, if you have selected the correspondin
 |            | Repair duration for engine damage        | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the engine at a pitstop. |
 | Track      | Type                                     | Circuit, Rally, Hill, Street | Circuit    | Defines the type of the specific track. ALl closed tracks are of type *Circuit*, all open tracks are of type *Rally*. |
 
-6. *Project Cars 2* and *RaceRoom Racing Experience*
+8. *RaceRoom Racing Experience*
 
 | Category   | Setting                                  | Type    | Default                         | Description  |
 |------------|------------------------------------------|---------|---------------------------------|--------------|

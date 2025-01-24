@@ -222,7 +222,7 @@ namespace SHMConnector {
 						lapTime = (int)Math.Round(Normalize(vehicle.mBestLapTime) * 1000);
 
 					int sector1Time = (int)Math.Round(Normalize(vehicle.mLastSector1) * 1000);
-					int sector2Time = (int)Math.Round(Normalize(vehicle.mLastSector2) * 1000);
+					int sector2Time = (int)Math.Round(Normalize(vehicle.mLastSector2) * 1000) - sector1Time;
 					int sector3Time = lapTime - sector1Time - sector2Time;
 
 					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Time="); strWriter.WriteLine(lapTime);

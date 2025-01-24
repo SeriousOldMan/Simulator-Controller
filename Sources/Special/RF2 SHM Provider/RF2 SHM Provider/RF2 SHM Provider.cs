@@ -169,7 +169,7 @@ namespace RF2SHMProvider {
 					lapTime = (int)Math.Round(Normalize(vehicle.mBestLapTime) * 1000);
 
                 int sector1Time = (int)Math.Round(Normalize(vehicle.mLastSector1) * 1000);
-				int sector2Time = (int)Math.Round(Normalize(vehicle.mLastSector2) * 1000);
+				int sector2Time = (int)Math.Round(Normalize(vehicle.mLastSector2) * 1000) - sector1Time;
 				int sector3Time = lapTime - sector1Time - sector2Time;
 
 				Console.Write("Car."); Console.Write(i); Console.Write(".Time="); Console.WriteLine(lapTime);

@@ -20,13 +20,13 @@
 #Include "..\..\Libraries\JSON.ahk"
 #Include "..\..\Libraries\HTTP.ahk"
 #Include "..\..\Libraries\LLMConnector.ahk"
-#Include "RaceAssistant.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\..\Database\Libraries\TelemetryCollector.ahk"
 #Include "..\..\Database\Libraries\TelemetryAnalyzer.ahk"
 #Include "..\..\Garage\Libraries\IssueCollector.ahk"
 #Include "..\..\Garage\Libraries\IRCIssueCollector.ahk"
 #Include "..\..\Garage\Libraries\R3EIssueCollector.ahk"
+#Include "RaceAssistant.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -59,6 +59,8 @@ class DrivingCoach extends GridRaceAssistant {
 	iLoadReference := "None"
 
 	iOnTrackCoaching := false
+	iFocusedCorners := []
+	iTelemetryFuture := false
 
 	iAvailableTelemetry := CaseInsenseMap()
 	iInstructionHints := CaseInsenseMap()
@@ -235,6 +237,12 @@ class DrivingCoach extends GridRaceAssistant {
 	OnTrackCoaching {
 		Get {
 			return this.iOnTrackCoaching
+		}
+	}
+
+	FocusedCorners {
+		Get {
+			return this.iFocusedCorners
 		}
 	}
 
@@ -693,6 +701,14 @@ class DrivingCoach extends GridRaceAssistant {
 				this.clearContinuation()
 
 				this.noReferenceLapRecognized(words)
+			case "FocusCorner":
+				this.clearContinuation()
+
+				this.focusCornerRecognized(words)
+			case "NoFocusCorner":
+				this.clearContinuation()
+
+				this.noFocusCornerRecognized(words)
 			default:
 				super.handleVoiceCommand(grammar, words)
 		}
@@ -821,6 +837,36 @@ class DrivingCoach extends GridRaceAssistant {
 
 		this.iReferenceMode := "None"
 		this.iReferenceModeAuto := false
+	}
+
+	focusCornerRecognized(words, confirm := true) {
+		local corner
+
+		if this.startupTrackCoaching() {
+			corner := this.getNumber(words)
+
+			if (corner != kUndefined) {
+				if this.Speaker
+					this.getSpeaker().speakPhrase("Roger")
+
+				if !inList(this.FocusedCorners, corner)
+					this.FocusedCorners.Push(corner)
+
+				this.iTelemetryFuture := false
+			}
+			else
+				speaker.speakPhrase("Repeat")
+		}
+		else if (confirm && this.Speaker)
+			this.getSpeaker().speakPhrase("Later")
+	}
+
+	noFocusCornerRecognized(words, confirm := true) {
+		if this.Speaker
+			this.getSpeaker().speakPhrase("Roger")
+
+		this.iFocusedCorners := []
+		this.iTelemetryFuture := false
 	}
 
 	handleVoiceText(grammar, text, reportError := true, originalText := false) {
@@ -1004,6 +1050,8 @@ class DrivingCoach extends GridRaceAssistant {
 			this.iCoachingActive := false
 
 			this.iOnTrackCoaching := false
+			this.iFocusedCorners := []
+			this.iTelemetryFuture := false
 		}
 	}
 
@@ -1014,6 +1062,8 @@ class DrivingCoach extends GridRaceAssistant {
 		setMultiMapValue(state, "Coaching", "Track", started)
 
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
+
+		this.iTelemetryFuture := false
 
 		return started
 	}
@@ -1030,6 +1080,8 @@ class DrivingCoach extends GridRaceAssistant {
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 
 		this.iOnTrackCoaching := false
+		this.iFocusedCorners := []
+		this.iTelemetryFuture := false
 	}
 
 	telemetryAvailable(laps) {
@@ -1114,6 +1166,48 @@ class DrivingCoach extends GridRaceAssistant {
 			this.startupTrackCoaching()
 	}
 
+	reviewCornerPerformance(cornerNr, fileName) {
+		local oldMode := this.Mode
+		local previousLap, currentLap, command, ignore
+
+		if this.Speaker[false] {
+			this.Mode := "Review"
+
+			try {
+				previousLap := this.getTelemetry(&ignore := false, cornerNr)
+				currentLap := this.TelemetryAnalyzer.createTelemetry("Reference", fileName)
+
+				currentLap.Sections := choose(currentLap.Sections, (section) {
+										   if found {
+											   found := false
+
+											   return true
+										   }
+										   else if ((section.Type = "Corner") && (section.Nr = corner)) {
+											   found := true
+
+											   return true
+										   }
+										   else
+											   return false
+									   })
+
+				if (this.TelemetryAnalyzer && previousLap && (previousLap.Sections.Length > 0)) {
+					command := substituteVariables(this.Instructions["Coaching.Corner.Review"]
+												 , {previousLap: previousLap.JSON, currentLap: currentLap.JSON
+												  , corner: cornerNr})
+
+					this.handleVoiceText("TEXT", command, true, values2String(A_Space, words*))
+				}
+				else if this.Speaker
+					this.getSpeaker().speakPhrase("Later")
+			}
+			finally {
+				this.Mode := oldMode
+			}
+		}
+	}
+
 	getTelemetry(&reference?, corner?) {
 		local mode := this.ReferenceMode
 		local laps := getKeys(this.AvailableTelemetry)
@@ -1196,6 +1290,10 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 
 		return theLap
+	}
+
+	getRunningTelemetry(corner?) {
+		return this.getTelemetry(&ignore := false, corner?)
 	}
 
 	addInstructionHint(instruction) {
@@ -1735,6 +1833,15 @@ class DrivingCoach extends GridRaceAssistant {
 			return false
 		}
 
+		if this.iTelemetryFuture
+			if ((cornerNr = (this.iTelemetryFuture.Corner + 1)) || (cornerNr < this.iTelemetryFuture.Corner)) {
+				this.reviewCornerPerformance(this.iTelemetryFuture.Corner, this.iTelemetryFuture.FileName)
+
+				this.iTelemetryFuture := false
+			}
+			else if !inList(this.FocusedCorners, cornerNr)
+				return
+
 		if ((Round(positionX) = -32767) && (Round(positionY) = -32767))
 			return
 
@@ -1774,6 +1881,12 @@ class DrivingCoach extends GridRaceAssistant {
 				if this.Speaker[false]
 					if ((telemetry.Sections.Length > 0) && !this.getSpeaker().Speaking) {
 						nextRecommendation := (A_TickCount + wait)
+
+						if inList(this.FocusedCorners, cornerNr) {
+							this.iTelemetryFuture := this.TelemetryCollector.collectTelemetry()
+
+							this.iTelemetryFuture.Corner := cornerNr
+						}
 
 						if (this.ConnectionState = "Active") {
 							this.Mode := "Coaching"

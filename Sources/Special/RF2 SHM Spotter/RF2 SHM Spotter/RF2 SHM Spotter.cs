@@ -1778,7 +1778,35 @@ namespace RF2SHMSpotter {
 					ref rF2VehicleTelemetry vehicle = ref GetPlayerTelemetry(playerID, ref telemetry);
 
 					telemetryFile.WriteLine((vehicle.mElapsedTime - vehicle.mLapStartET) * 1000);
-				}
+
+                    if (System.IO.File.Exists(telemetryDirectory + "\\Telemetry.section"))
+                        try
+                        {
+                            StreamWriter file = new StreamWriter(telemetryDirectory + "\\Telemetry.section", true);
+
+                            file.Write(playerScoring.mLapDist + ";");
+                            file.Write((float)telemetry.mVehicles[playerID].mFilteredThrottle + ";");
+                            file.Write((float)telemetry.mVehicles[playerID].mFilteredBrake + ";");
+                            file.Write((float)telemetry.mVehicles[playerID].mFilteredSteering + ";");
+                            file.Write((float)telemetry.mVehicles[playerID].mGear + ";");
+                            file.Write((float)telemetry.mVehicles[playerID].mEngineRPM + ";");
+                            file.Write(vehicleSpeed(ref playerScoring) + ";");
+
+                            file.Write("n/a;");
+                            file.Write("n/a;");
+
+                            file.Write((-playerScoring.mLocalAccel.z / 9.807f) + ";");
+                            file.Write((playerScoring.mLocalAccel.x / 9.807f) + ";");
+
+                            file.Write(playerScoring.mPos.x + ";");
+                            file.Write(-playerScoring.mPos.z + ";");
+
+                            file.WriteLine((vehicle.mElapsedTime - vehicle.mLapStartET) * 1000);
+
+                            file.Close();
+                        }
+                        catch (Exception) { }
+                }
             }
             catch (Exception)
             {

@@ -1642,11 +1642,11 @@ FILE* telemetryFile = 0;
 int telemetryLap = -1;
 double lastRunning = -1;
 
-inline void printNAValue(float value) {
+inline void printNAValue(FILE* file, float value) {
 	if (value == -1)
-		fprintf(telemetryFile, "n/a;");
+		fprintf(file, "n/a;");
 	else
-		fprintf(telemetryFile, "%f;", value);
+		fprintf(file, "%f;", value);
 }
 
 void collectCarTelemetry(int playerID) {
@@ -1668,7 +1668,6 @@ void collectCarTelemetry(int playerID) {
 
 	if ((carLaps + 1) != telemetryLap) {
 		if (telemetryFile) {
-			fflush(telemetryFile);
 			fclose(telemetryFile);
 
 			int offset = strlen(telemetryDirectory);
@@ -1723,8 +1722,6 @@ void collectCarTelemetry(int playerID) {
 	float running = (float)max(0, min(1, fabs(carDistance / map_buffer->layout_length)));
 
 	if (running > lastRunning) {
-		lastRunning = running;
-		
 		/*
 		fprintf(telemetryFile, "%f;%f;%f;%f;%d;%d;%f;%d;%d;%f;%f;%f;%f;%d\n",
 							   running, map_buffer->throttle, map_buffer->brake, map_buffer->steer_input_raw,
@@ -1737,9 +1734,9 @@ void collectCarTelemetry(int playerID) {
 							   (int)round(map_buffer->lap_time_current_self * 1000));
 		*/
 
-		printNAValue(running);
-		printNAValue(map_buffer->throttle);
-		printNAValue(map_buffer->brake);
+		printNAValue(telemetryFile, running);
+		printNAValue(telemetryFile, map_buffer->throttle);
+		printNAValue(telemetryFile, map_buffer->brake);
 		fprintf(telemetryFile, "%f;%d;%d;%f;%d;%d;%f;%f;%f;%f;", map_buffer->steer_input_raw, map_buffer->gear,
 																 (int)round(map_buffer->engine_rps * 2 * PI), map_buffer->car_speed * 3.6f,
 																 (map_buffer->aid_settings.tc == 5) ? 1 : 0, (map_buffer->aid_settings.abs == 5) ? 1 : 0,
@@ -1752,6 +1749,37 @@ void collectCarTelemetry(int playerID) {
 			fprintf(telemetryFile, "%d\n", (long)round(map_buffer->lap_time_current_self * 1000));
 		else
 			fprintf(telemetryFile, "n/a\n");
+
+		int offset = strlen(telemetryDirectory);
+
+		strcpy_s(tmpFileName, 512, telemetryDirectory);
+		strcpy_s(tmpFileName + offset, 512 - offset, "\\Telemetry.section");
+
+		if (fileExists(tmpFileName)) {
+			FILE* file;
+
+			if (fopen_s(&file, tmpFileName, "a")) {
+				printNAValue(file, running);
+				printNAValue(file, map_buffer->throttle);
+				printNAValue(file, map_buffer->brake);
+				fprintf(file, "%f;%d;%d;%f;%d;%d;%f;%f;%f;%f;", map_buffer->steer_input_raw, map_buffer->gear,
+																(int)round(map_buffer->engine_rps * 2 * PI), map_buffer->car_speed * 3.6f,
+																(map_buffer->aid_settings.tc == 5) ? 1 : 0, (map_buffer->aid_settings.abs == 5) ? 1 : 0,
+																-(map_buffer->local_acceleration.z / 9.807),
+																(map_buffer->local_acceleration.x / 9.807),
+																map_buffer->all_drivers_data_1[index].position.x,
+																-map_buffer->all_drivers_data_1[index].position.z);
+
+				if (map_buffer->lap_time_current_self != -1)
+					fprintf(file, "%d\n", (long)round(map_buffer->lap_time_current_self * 1000));
+				else
+					fprintf(file, "n/a\n");
+
+				fclose(file);
+			}
+		}
+
+		lastRunning = running;
 	}
 }
 

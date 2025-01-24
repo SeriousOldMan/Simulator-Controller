@@ -50,6 +50,76 @@ class TelemetryCollector {
 
 	iExitCallback := false
 
+	iCollecting := false
+
+	class TelemetryFuture {
+		iTelemetryCollector := false
+		iFileName := false
+
+		iCollected := false
+
+		TelemetryCollector {
+			Get {
+				return this.iTelemetryCollector
+			}
+		}
+
+		FileName {
+			Get {
+				this.stop()
+
+				return this.iFileName
+			}
+		}
+
+		__New(collector) {
+			this.iTelemetryCollector := collector
+			this.iFileName := temporaryFileName(normalizeDirectoryPath(collector.TelemetryDirectory) . "Telemetry", "section")
+
+			this.iCorner := corner
+
+			if collector.iCollecting
+				throw "Partial telemetry collection still running in TelemetryCollector.TelemetryFuture.__New..."
+
+			FileAppend("", normalizeDirectoryPath(collector.TelemetryDirectory) . "Telemetry.section")
+
+			collector.iCollecting := true
+		}
+
+		__Delete() {
+			this.dispose()
+		}
+
+		dispose() {
+			this.stop()
+
+			deleteFile(this.FileName)
+		}
+
+		stop() {
+			local fileName
+
+			if !this.iCollected {
+				fileName := (normalizeDirectoryPath(this.TelemetryDirectory) . "Telemetry.section")
+
+				if !FileExist(fileName)
+					throw "No partial telemetry collection running in TelemetryCollector.TelemetryFuture.stop..."
+
+				loop
+					try {
+						FileMove(fileName, this.FileName, 1)
+
+						break
+					}
+					catch Any {
+						Sleep(1)
+					}
+
+				this.iCollected := true
+			}
+		}
+	}
+
 	Simulator {
 		Get {
 			return this.iSimulator
@@ -129,6 +199,7 @@ class TelemetryCollector {
 
 			if pid {
 				this.iTelemetryCollectorPID := pid
+				this.iCollecting := false
 
 				if !this.iExitCallback {
 					this.iExitCallback := ObjBindMethod(this, "shutdown", true)
@@ -174,9 +245,14 @@ class TelemetryCollector {
 			}
 
 			this.iTelemetryCollectorPID := false
+			this.iCollecting := false
 		}
 
 		return false
+	}
+
+	collectTelemetry() {
+		return TelemetryCollector.TelemetryFuture(this)
 	}
 }
 

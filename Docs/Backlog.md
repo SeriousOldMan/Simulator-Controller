@@ -13,11 +13,10 @@
 #### Assistants
   1. Controller action and voice command to enable/disable data collection
   2. Better answers by the Strategist, when a pitstop cannot be recommended
-  3. Direct critics by the Coach for the last section during on-track coaching (needs real time telemetry)
-  4. Support for partial tyre changes
-  5. Integrate support for LAMs
-  6. Support for Time+1 session format
-  7. Approaching corner braking point countdown 
+  3. Support for partial tyre changes
+  4. Integrate support for LAMs
+  5. Support for Time+1 session format
+  6. Approaching corner braking point countdown 
 
 #### Session Database
   1. Active validation of value ranges in settings definitions

@@ -1489,8 +1489,6 @@ void collectCarTelemetry(const SharedMemory* sharedData) {
 		}
 
 		if (vehicle.mCurrentLapDistance > lastRunning) {
-			lastRunning = vehicle.mCurrentLapDistance;
-			
 			telemetryFile << vehicle.mCurrentLapDistance << ";"
 						  << sharedData->mThrottle << ";"
 						  << sharedData->mBrake << ";"
@@ -1505,6 +1503,33 @@ void collectCarTelemetry(const SharedMemory* sharedData) {
 						  << sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mWorldPosition[VEC_X] << ";"
 						  << -sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mWorldPosition[VEC_Z] << ";"
 						  << round(sharedData->mCurrentTime * 1000) << std::endl;
+
+			if (fileExists(telemetryDirectory + "\\Telemetry.section"))
+				try {
+					std::ofstream file;
+
+					file.open(telemetryDirectory + "\\Telemetry.section", std::ios::out | std::ios::ate);
+
+					file << vehicle.mCurrentLapDistance << ";"
+						 << sharedData->mThrottle << ";"
+						 << sharedData->mBrake << ";"
+						 << sharedData->mSteering << ";"
+						 << sharedData->mGear << ";"
+						 << sharedData->mRpm << ";"
+						 << (sharedData->mSpeed * 3.6) << ";"
+						 << "n/a" << ";"
+						 << "n/a" << ";"
+						 << -sharedData->mLocalAcceleration[VEC_Z] / 9.807f << ";"
+						 << sharedData->mLocalAcceleration[VEC_X] / 9.807f << ";"
+						 << sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mWorldPosition[VEC_X] << ";"
+						 << -sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mWorldPosition[VEC_Z] << ";"
+						 << round(sharedData->mCurrentTime * 1000) << std::endl;
+
+					file.close();
+				}
+				catch (...) {}
+
+			lastRunning = vehicle.mCurrentLapDistance;
 		}
 	}
 	catch (...) {

@@ -759,9 +759,9 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
 
 Note: For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
-### Installation of the *Assetto Corsa* Pitstop Interface
+### Installation of the *Assetto Corsa* data interface
 
-For *Assetto Corsa*, you need to install a plugin into a special location for the pitstop interface to work. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
+For *Assetto Corsa*, you need to install a plugin into a special location for everything to work. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
 
 ### Special requirements when using the Pitstop automation
 
@@ -976,9 +976,9 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
 
 Note: For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
-### Installation of the *rFactor 2* Pitstop Interface
+### Installation of the *rFactor 2* data interface
 
-For *rFactor 2*, you need to install a plugin into a special location for the pitstop interface to work. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
+For *rFactor 2*, you need to install a plugin into a special location for everything to work. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
 
 ### Special notes for *rFactor 2*
 
@@ -1401,9 +1401,9 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
 
 Note: For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
-### Installation of the *Le Mans Ultimate* Pitstop Interface
+### Installation of the *Le Mans Ultimate* data interface
 
-For *Le Mans Ultimate*, you need to install a plugin into a special location for the pitstop interface to work. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
+For *Le Mans Ultimate*, you need to install a plugin into a special location for everything to work. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
 
 ### Special notes for *Le Mans Ultimate*
 

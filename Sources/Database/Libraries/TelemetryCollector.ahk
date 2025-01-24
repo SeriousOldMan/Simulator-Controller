@@ -29,7 +29,7 @@ global kTelemetryChannels := [{Name: "Distance", Indices: [1], Channels: []}
 							, {Name: "Gear", Indices: [5], Size: 0.5, Channels: ["Gear"]}
 							, {Name: "Long G", Indices: [10], Size: 1, Channels: ["Long G"]}
 							, {Name: "Lat G", Indices: [11], Size: 1, Channels: ["Lat G"]}
-							, {Name: "Long G/Lat G", Indices: [10, 11], Size: 1, Channels: ["Long G", "Lat G"]}
+							, {Name: "Lat G/Long G", Indices: [10, 11], Size: 1, Channels: ["Long G", "Lat G"]}
 							, {Name: "Curvature", Function: computeCurvature, Indices: [false], Size: 1, Channels: ["Curvature"]}
 							, {Name: "Time", Indices: [14], Size: 1, Channels: ["Time"], Converter: [(t) => isNumber(t) ? (t / 1000) : kNull]}
 							, {Name: "PosX", Indices: [12], Channels: []}

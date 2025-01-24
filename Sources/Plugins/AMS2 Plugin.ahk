@@ -322,6 +322,15 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 					this.changePitstopOption("Request Pitstop")
 	}
 
+	prepareSettings(settings, data) {
+		settings := super.prepareSettings(settings, data)
+
+		if (getMultiMapValue(settings, "Simulator.Automobilista 2", "Pitstop.Service.Tyres", kUndefined) == kUndefined)
+			setMultiMapValue(settings, "Simulator.Automobilista 2", "Pitstop.Service.Tyres", "Change")
+
+		return settings
+	}
+
 	updateSession(session, force := false) {
 		super.updateSession(session, force)
 

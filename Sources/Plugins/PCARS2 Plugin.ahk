@@ -313,6 +313,15 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 					this.changePitstopOption("Repair Bodywork")
 	}
 
+	prepareSettings(settings, data) {
+		settings := super.prepareSettings(settings, data)
+
+		if (getMultiMapValue(settings, "Simulator.Project CARS 2", "Pitstop.Service.Tyres", kUndefined) == kUndefined)
+			setMultiMapValue(settings, "Simulator.Project CARS 2", "Pitstop.Service.Tyres", "Change")
+
+		return settings
+	}
+
 	updateSession(session, force := false) {
 		super.updateSession(session, force)
 

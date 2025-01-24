@@ -6,7 +6,7 @@
   5. Initial support for *Assetto Corsa EVO*. Not much functionality yet...
   6. "Race Settings" has been [extended](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-rules) and allows now to define basic race rules for the next race.
   7. The Strategist can now create a strategy dynamically based on simple race rules configured in the "Race Settings". See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#tab-rules) for more information.
-  8. The default for the [race setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) "Engineer: Tyre Service" has changed to "Change" for *Automobilista 2*, *ProjectCARS 2 and *RaceRoom Racing Experience*, because these simulators do not support adjusting pressures during a pitstop.
+  8. The default for the [race setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) "Engineer: Tyre Service" has changed to "Change" for *Automobilista 2*, *Project CARS 2 and *RaceRoom Racing Experience*, because these simulators do not support adjusting pressures during a pitstop.
   9. Auto requesting the pitstop for *Automobilista 2* can now be configured in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database".
 
      **IMPORTANT**: The default for this setting is *False*, which is **different** from the previously implemented behaviour.
@@ -57,7 +57,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   3. Fixed management of Stream Deck Icons for German and French UI settings.
   4. Fixed a bug in the handling of the *rFactor 2* pitstop settings that caused an infinite loop, if each tyre could be changed individually.
   5. Lowered the threshold values for the different rain levels in *rFactor 2* and *Le Mans Ultimate* so that pitting for tyres is recommended earlier.
-  6. Safety Cars are now removed from the grid in *Automobilista 2* (and probably *ProjectCARS 2*) in most cases.
+  6. Safety Cars are now removed from the grid in *Automobilista 2* (and probably *Project CARS 2*) in most cases.
   7. The strategy information given by the Strategist has been updated to be more concise if no more pitstops are needed.
   8. The reliability of the track spline builder for *Assetto Corsa Competizione* has been improved. This positively affects the accident detection by the Spotter and the collection of car telemetry data by various applications.
   9. Pressure values are now converted to the specified display unit in "Setup Workbench".

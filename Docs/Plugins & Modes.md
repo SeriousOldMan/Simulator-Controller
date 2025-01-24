@@ -759,6 +759,10 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
 
 Note: For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
+### Installation of the *Assetto Corsa* Pitstop Interface
+
+For *Assetto Corsa*, you need to install a plugin into a special location for the pitstop interface to work. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
+
 ### Special requirements when using the Pitstop automation
 
 *Assetto Corsa* does not provide any information about the current available settings in the Pitstop HUD and their corresponding car specific value range. And, since *Assetto Corsa* is open to modding, the list of cars is potentially endless. Therefore, you may have to provide a couple of information for the car in use, so that the pitstop automation will function correctly, when contolled by the AI Race Engineer or using the Pitsop mode on your hardware controller. I will compile a list of meta data for all the standard cars over time, when they are added to "Setup Workbench" (you can check whether the meta data for a specific car is already there in the file *Resources\Simulator Data\AC\Car Data.ini*, which resides in the programm directory. Unless a car is already known there in the "[Pitstop Settings]" section, you will have to enter the values mentioned below into the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) tool, as long as the defaults does not fit. As an alternative, you can create your own "Car Data.ini" file and place it in the *Simulator Controller\Simulator Data\AC* folder which resides in your user *Documents* folder. By the way, the same applies for tyre data as well, using the file ["Tyre Data.ini"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#tyre-data-files), where the available tyre compounds for a given car are defined.
@@ -974,7 +978,7 @@ Note: For convenience, all commands available for the *assistantCommands* parame
 
 ### Installation of the *rFactor 2* Pitstop Interface
 
-For *rFactor 2*, you need to install a plugin into a special location for the pitstop interface to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip* or you can load the [latest version](https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin) from GitHub. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
+For *rFactor 2*, you need to install a plugin into a special location for the pitstop interface to work. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
 
 ### Special notes for *rFactor 2*
 
@@ -1399,7 +1403,7 @@ Note: For convenience, all commands available for the *assistantCommands* parame
 
 ### Installation of the *Le Mans Ultimate* Pitstop Interface
 
-For *Le Mans Ultimate*, you need to install a plugin into a special location for the pitstop interface to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip* or you can load the [latest version](https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin) from GitHub. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
+For *Le Mans Ultimate*, you need to install a plugin into a special location for the pitstop interface to work. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
 
 ### Special notes for *Le Mans Ultimate*
 

@@ -801,6 +801,15 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		return false
 	}
 
+	prepareSettings(settings, data) {
+		settings := super.prepareSettings(settings, data)
+
+		if (getMultiMapValue(settings, "Simulator.RaceRoom Racing Experience", "Pitstop.Service.Tyres", kUndefined) == kUndefined)
+			setMultiMapValue(settings, "Simulator.RaceRoom Racing Experience", "Pitstop.Service.Tyres", "Change")
+
+		return settings
+	}
+
 	readSessionData(options := "", protocol?) {
 		local simulator := this.Simulator[true]
 		local car := this.Car

@@ -77,8 +77,11 @@ class TelemetryCollector {
 
 			if FileExist(directory . "Telemetry.cmd")
 				throw "Partial telemetry collection still running in TelemetryCollector.TelemetryFuture.__New..."
-			else
+			else {
+				deleteFile(directory . "\Telemetry.section")
+
 				FileAppend("COLLECT", directory . "\Telemetry.cmd")
+			}
 		}
 
 		__Delete() {
@@ -88,7 +91,8 @@ class TelemetryCollector {
 		dispose() {
 			this.stop()
 
-			deleteFile(this.FileName)
+			if this.FileName
+				deleteFile(this.FileName)
 		}
 
 		stop() {

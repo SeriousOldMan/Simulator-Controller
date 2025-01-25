@@ -842,10 +842,10 @@ class DrivingCoach extends GridRaceAssistant {
 	focusCornerRecognized(words, confirm := true) {
 		local corner
 
-		if this.startupTrackCoaching() {
-			corner := this.getNumber(words)
+		corner := this.getNumber(words)
 
-			if (corner != kUndefined) {
+		if (corner != kUndefined) {
+			if this.startupTrackCoaching() {
 				if this.Speaker
 					this.getSpeaker().speakPhrase("Roger")
 
@@ -854,11 +854,11 @@ class DrivingCoach extends GridRaceAssistant {
 
 				this.iTelemetryFuture := false
 			}
-			else
-				this.getSpeaker().speakPhrase("Repeat")
+			else if (confirm && this.Speaker)
+				this.getSpeaker().speakPhrase("Later")
 		}
-		else if (confirm && this.Speaker)
-			this.getSpeaker().speakPhrase("Later")
+		else
+			this.getSpeaker().speakPhrase("Repeat")
 	}
 
 	noFocusCornerRecognized(words, confirm := true) {
@@ -1837,7 +1837,12 @@ class DrivingCoach extends GridRaceAssistant {
 			this.reviewCornerPerformance(this.iTelemetryFuture.Corner, this.iTelemetryFuture.FileName)
 
 			if this.iTelemetryFuture.FileName
-				this.reviewCornerPerformance(this.iTelemetryFuture.Corner, this.iTelemetryFuture.FileName)
+				try {
+					this.reviewCornerPerformance(this.iTelemetryFuture.Corner, this.iTelemetryFuture.FileName)
+				}
+				catch Any as exception {
+					logError(exception, true)
+				}
 
 			this.iTelemetryFuture := false
 

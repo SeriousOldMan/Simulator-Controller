@@ -3305,8 +3305,8 @@ class RaceStrategist extends GridRaceAssistant {
 		else ; Nothing to see here, move on
 			return false
 
-		if (!sPitstops && cPitstops)
-			extended := false
+		; if (!sPitstops && cPitstops)
+		;	extended := false
 
 		; Negative => Better, Positive => Worse
 
@@ -3331,6 +3331,9 @@ class RaceStrategist extends GridRaceAssistant {
 
 		if ((cPitstops > 0) && !scenario.FullCourseYellow &&  (scenario.Pitstops[1].Lap <= (knowledgeBase.getValue("Lap") + 1)))
 			result := false
+		else if (!sPitstops && (cPitstops = 1) && !scenario.Pitstops[1].TyreCompound
+							&& (scenario.Pitstops[1].RefuelAmount <= scenario.SafetyFuel))
+			return false
 		else if (result > 0)
 			result := false
 		else if (result < 0)

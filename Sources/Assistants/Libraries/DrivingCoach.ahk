@@ -1835,7 +1835,8 @@ class DrivingCoach extends GridRaceAssistant {
 
 		if this.iTelemetryFuture
 			if ((cornerNr = (this.iTelemetryFuture.Corner + 1)) || (cornerNr < this.iTelemetryFuture.Corner)) {
-				this.reviewCornerPerformance(this.iTelemetryFuture.Corner, this.iTelemetryFuture.FileName)
+				if this.iTelemetryFuture.FileName
+					this.reviewCornerPerformance(this.iTelemetryFuture.Corner, this.iTelemetryFuture.FileName)
 
 				this.iTelemetryFuture := false
 			}

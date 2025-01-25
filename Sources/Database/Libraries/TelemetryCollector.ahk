@@ -50,8 +50,6 @@ class TelemetryCollector {
 
 	iExitCallback := false
 
-	iCollecting := false
-
 	class TelemetryFuture {
 		iTelemetryCollector := false
 		iFileName := false
@@ -73,17 +71,14 @@ class TelemetryCollector {
 		}
 
 		__New(collector) {
+			local directory := (normalizeDirectoryPath(collector.TelemetryDirectory) . "\")
+
 			this.iTelemetryCollector := collector
-			this.iFileName := temporaryFileName(normalizeDirectoryPath(collector.TelemetryDirectory) . "Telemetry", "section")
 
-			this.iCorner := corner
-
-			if collector.iCollecting
+			if FileExist(directory . "Telemetry.cmd")
 				throw "Partial telemetry collection still running in TelemetryCollector.TelemetryFuture.__New..."
-
-			FileAppend("", normalizeDirectoryPath(collector.TelemetryDirectory) . "Telemetry.section")
-
-			collector.iCollecting := true
+			else
+				FileAppend("COLLECT", directory . "\Telemetry.cmd")
 		}
 
 		__Delete() {
@@ -97,23 +92,26 @@ class TelemetryCollector {
 		}
 
 		stop() {
-			local fileName
+			local directory := (normalizeDirectoryPath(collector.TelemetryDirectory) . "\")
+			local inFileName := (directory . "Telemetry.section")
+			local outFileName := temporaryFileName(directory . "Telemetry", "section")
 
 			if !this.iCollected {
-				fileName := (normalizeDirectoryPath(this.TelemetryDirectory) . "Telemetry.section")
+				deleteFile(directory . "Telemetry.cmd")
 
-				if !FileExist(fileName)
-					throw "No partial telemetry collection running in TelemetryCollector.TelemetryFuture.stop..."
+				if FileExist(inFileName) {
+					loop
+						try {
+							FileMove(inFileName, outFileName, 1)
 
-				loop
-					try {
-						FileMove(fileName, this.FileName, 1)
+							break
+						}
+						catch Any {
+							Sleep(1)
+						}
 
-						break
-					}
-					catch Any {
-						Sleep(1)
-					}
+					this.iFileName := outFileName
+				}
 
 				this.iCollected := true
 			}
@@ -199,7 +197,6 @@ class TelemetryCollector {
 
 			if pid {
 				this.iTelemetryCollectorPID := pid
-				this.iCollecting := false
 
 				if !this.iExitCallback {
 					this.iExitCallback := ObjBindMethod(this, "shutdown", true)
@@ -245,7 +242,6 @@ class TelemetryCollector {
 			}
 
 			this.iTelemetryCollectorPID := false
-			this.iCollecting := false
 		}
 
 		return false

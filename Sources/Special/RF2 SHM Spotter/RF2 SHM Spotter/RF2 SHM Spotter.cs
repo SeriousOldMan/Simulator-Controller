@@ -1779,7 +1779,7 @@ namespace RF2SHMSpotter {
 
 					telemetryFile.WriteLine((vehicle.mElapsedTime - vehicle.mLapStartET) * 1000);
 
-                    if (System.IO.File.Exists(telemetryDirectory + "\\Telemetry.section"))
+                    if (System.IO.File.Exists(telemetryDirectory + "\\Telemetry.cmd"))
                         try
                         {
                             StreamWriter file = new StreamWriter(telemetryDirectory + "\\Telemetry.section", true);

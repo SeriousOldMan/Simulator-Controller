@@ -855,7 +855,7 @@ class DrivingCoach extends GridRaceAssistant {
 				this.iTelemetryFuture := false
 			}
 			else
-				speaker.speakPhrase("Repeat")
+				this.getSpeaker().speakPhrase("Repeat")
 		}
 		else if (confirm && this.Speaker)
 			this.getSpeaker().speakPhrase("Later")
@@ -1197,7 +1197,7 @@ class DrivingCoach extends GridRaceAssistant {
 												 , {previousLap: previousLap.JSON, currentLap: currentLap.JSON
 												  , corner: cornerNr})
 
-					this.handleVoiceText("TEXT", command, true, values2String(A_Space, words*))
+					this.handleVoiceText("TEXT", command, false)
 				}
 				else if this.Speaker
 					this.getSpeaker().speakPhrase("Later")

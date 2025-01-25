@@ -88,11 +88,12 @@ class TelemetryCollector {
 		dispose() {
 			this.stop()
 
-			deleteFile(this.FileName)
+			if this.FileName
+				deleteFile(this.FileName)
 		}
 
 		stop() {
-			local directory := (normalizeDirectoryPath(collector.TelemetryDirectory) . "\")
+			local directory := (normalizeDirectoryPath(this.TelemetryCollector.TelemetryDirectory) . "\")
 			local inFileName := (directory . "Telemetry.section")
 			local outFileName := temporaryFileName(directory . "Telemetry", "section")
 

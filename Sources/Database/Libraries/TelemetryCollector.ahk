@@ -74,14 +74,14 @@ class TelemetryCollector {
 
 		__New(collector) {
 			this.iTelemetryCollector := collector
-			this.iFileName := temporaryFileName(normalizeDirectoryPath(collector.TelemetryDirectory) . "Telemetry", "section")
+			this.iFileName := temporaryFileName(normalizeDirectoryPath(collector.TelemetryDirectory) . "\Telemetry", "section")
 
 			this.iCorner := corner
 
 			if collector.iCollecting
 				throw "Partial telemetry collection still running in TelemetryCollector.TelemetryFuture.__New..."
 
-			FileAppend("", normalizeDirectoryPath(collector.TelemetryDirectory) . "Telemetry.section")
+			FileAppend("", normalizeDirectoryPath(collector.TelemetryDirectory) . "\Telemetry.section")
 
 			collector.iCollecting := true
 		}
@@ -100,7 +100,7 @@ class TelemetryCollector {
 			local fileName
 
 			if !this.iCollected {
-				fileName := (normalizeDirectoryPath(this.TelemetryDirectory) . "Telemetry.section")
+				fileName := (normalizeDirectoryPath(this.TelemetryCollector.TelemetryDirectory) . "\Telemetry.section")
 
 				if !FileExist(fileName)
 					throw "No partial telemetry collection running in TelemetryCollector.TelemetryFuture.stop..."

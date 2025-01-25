@@ -1833,14 +1833,16 @@ class DrivingCoach extends GridRaceAssistant {
 			return false
 		}
 
-		if this.iTelemetryFuture
-			if ((cornerNr = (this.iTelemetryFuture.Corner + 1)) || (cornerNr < this.iTelemetryFuture.Corner)) {
-				this.reviewCornerPerformance(this.iTelemetryFuture.Corner, this.iTelemetryFuture.FileName)
+		if (this.iTelemetryFuture && (cornerNr != this.iTelemetryFuture.Corner)) {
+			this.reviewCornerPerformance(this.iTelemetryFuture.Corner, this.iTelemetryFuture.FileName)
 
-				this.iTelemetryFuture := false
-			}
-			else if !inList(this.FocusedCorners, cornerNr)
-				return
+			this.iTelemetryFuture := false
+
+			return
+		}
+
+		if !inList(this.FocusedCorners, cornerNr)
+			return
 
 		if ((Round(positionX) = -32767) && (Round(positionY) = -32767))
 			return
@@ -1882,13 +1884,13 @@ class DrivingCoach extends GridRaceAssistant {
 					if ((telemetry.Sections.Length > 0) && !this.getSpeaker().Speaking) {
 						nextRecommendation := (A_TickCount + wait)
 
-						if inList(this.FocusedCorners, cornerNr) {
-							this.iTelemetryFuture := this.TelemetryCollector.collectTelemetry()
-
-							this.iTelemetryFuture.Corner := cornerNr
-						}
-
 						if (this.ConnectionState = "Active") {
+							if inList(this.FocusedCorners, cornerNr) {
+								this.iTelemetryFuture := this.TelemetryCollector.collectTelemetry()
+
+								this.iTelemetryFuture.Corner := cornerNr
+							}
+
 							this.Mode := "Coaching"
 
 							telemetry := telemetry.JSON

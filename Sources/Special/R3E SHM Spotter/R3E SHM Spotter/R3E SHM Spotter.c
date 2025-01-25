@@ -1753,10 +1753,13 @@ void collectCarTelemetry(int playerID) {
 		int offset = strlen(telemetryDirectory);
 
 		strcpy_s(tmpFileName, 512, telemetryDirectory);
-		strcpy_s(tmpFileName + offset, 512 - offset, "\\Telemetry.section");
+		strcpy_s(tmpFileName + offset, 512 - offset, "\\Telemetry.cmd");
 
 		if (fileExists(tmpFileName)) {
 			FILE* file;
+
+			strcpy_s(tmpFileName, 512, telemetryDirectory);
+			strcpy_s(tmpFileName + offset, 512 - offset, "\\Telemetry.section");
 
 			if (fopen_s(&file, tmpFileName, "a")) {
 				printNAValue(file, running);

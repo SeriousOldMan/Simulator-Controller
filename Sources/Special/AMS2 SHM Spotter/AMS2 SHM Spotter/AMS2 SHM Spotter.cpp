@@ -1504,11 +1504,11 @@ void collectCarTelemetry(const SharedMemory* sharedData) {
 						  << -sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mWorldPosition[VEC_Z] << ";"
 						  << round(sharedData->mCurrentTime * 1000) << std::endl;
 
-			if (fileExists(telemetryDirectory + "\\Telemetry.section"))
+			if (fileExists(telemetryDirectory + "\\Telemetry.cmd"))
 				try {
 					std::ofstream file;
 
-					file.open(telemetryDirectory + "\\Telemetry.section", std::ios::out | std::ios::ate);
+					file.open(telemetryDirectory + "\\Telemetry.section", std::ios::out | std::ios::ate | std::ios::app);
 
 					file << vehicle.mCurrentLapDistance << ";"
 						 << sharedData->mThrottle << ";"

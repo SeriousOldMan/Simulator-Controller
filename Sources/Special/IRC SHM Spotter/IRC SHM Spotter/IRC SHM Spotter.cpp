@@ -1970,11 +1970,11 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 			else
 				telemetryFile << std::endl;
 
-			if (fileExists(telemetryDirectory + "\\Telemetry.section"))
+			if (fileExists(telemetryDirectory + "\\Telemetry.cmd"))
 				try {
 					std::ofstream file;
 
-					file.open(telemetryDirectory + "\\Telemetry.section", std::ios::out | std::ios::ate);
+					file.open(telemetryDirectory + "\\Telemetry.section", std::ios::out | std::ios::ate | std::ios::app);
 
 					file << (playerRunning * trackLength) << ";"
 						 << throttle << ";"

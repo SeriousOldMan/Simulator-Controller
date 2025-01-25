@@ -92,7 +92,7 @@ class TelemetryCollector {
 		}
 
 		stop() {
-			local directory := (normalizeDirectoryPath(collector.TelemetryDirectory) . "\")
+			local directory := (normalizeDirectoryPath(this.TelemetryCollector.TelemetryDirectory) . "\")
 			local inFileName := (directory . "Telemetry.section")
 			local outFileName := temporaryFileName(directory . "Telemetry", "section")
 

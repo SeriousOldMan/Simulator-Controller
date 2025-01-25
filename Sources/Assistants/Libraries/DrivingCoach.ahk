@@ -846,7 +846,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		if (corner != kUndefined) {
 			if this.startupTrackCoaching() {
-				if this.Speaker
+				if (confirm && this.Speaker)
 					this.getSpeaker().speakPhrase("Roger")
 
 				if !inList(this.FocusedCorners, corner)
@@ -860,7 +860,7 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	noFocusCornerRecognized(words, confirm := true) {
-		if this.Speaker
+		if (confirm && this.Speaker)
 			this.getSpeaker().speakPhrase("Roger")
 
 		this.iFocusedCorners := []
@@ -1832,21 +1832,23 @@ class DrivingCoach extends GridRaceAssistant {
 			return false
 		}
 
-		if (this.iTelemetryFuture && ((cornerNr = (this.iTelemetryFuture.Corner + 2)) || (cornerNr < this.iTelemetryFuture.Corner))) {
-			if this.iTelemetryFuture.FileName
-				try {
-					this.reviewCornerPerformance(this.iTelemetryFuture.Corner, this.iTelemetryFuture.FileName)
-				}
-				catch Any as exception {
-					logError(exception, true)
-				}
+		if this.iTelemetryFuture {
+			if ((cornerNr > (this.iTelemetryFuture.Corner + 1)) || (cornerNr < this.iTelemetryFuture.Corner)) {
+				if this.iTelemetryFuture.FileName
+					try {
+						this.reviewCornerPerformance(this.iTelemetryFuture.Corner, this.iTelemetryFuture.FileName)
+					}
+					catch Any as exception {
+						logError(exception, true)
+					}
 
-			this.iTelemetryFuture := false
+				this.iTelemetryFuture := false
+			}
 
 			return
 		}
 
-		if !inList(this.FocusedCorners, cornerNr)
+		if ((this.FocusedCorners.Length > 0) && !inList(this.FocusedCorners, cornerNr))
 			return
 
 		if ((Round(positionX) = -32767) && (Round(positionY) = -32767))

@@ -16,7 +16,8 @@
   3. Support for partial tyre changes
   4. Integrate support for LAMs
   5. Support for Time+1 session format
-  6. Approaching corner braking point countdown 
+  6. Approaching corner braking point countdown
+  7. Configurable priority for voice output between Spotter and other Assistants
 
 #### Session Database
   1. Active validation of value ranges in settings definitions

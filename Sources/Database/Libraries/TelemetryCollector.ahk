@@ -96,11 +96,13 @@ class TelemetryCollector {
 		}
 
 		stop() {
-			local directory := (normalizeDirectoryPath(this.TelemetryCollector.TelemetryDirectory) . "\")
-			local inFileName := (directory . "Telemetry.section")
-			local outFileName := temporaryFileName(directory . "Telemetry", "section")
+			local directory, inFileName, outFileName
 
 			if !this.iCollected {
+				directory := (normalizeDirectoryPath(this.TelemetryCollector.TelemetryDirectory) . "\")
+				inFileName := (directory . "Telemetry.section")
+				outFileName := temporaryFileName("Telemetry", "section")
+
 				deleteFile(directory . "Telemetry.cmd")
 
 				if FileExist(inFileName) {
@@ -110,7 +112,9 @@ class TelemetryCollector {
 
 							break
 						}
-						catch Any {
+						catch Any as exception {
+							logError(exception)
+
 							Sleep(1)
 						}
 

@@ -851,8 +851,6 @@ class DrivingCoach extends GridRaceAssistant {
 
 				if !inList(this.FocusedCorners, corner)
 					this.FocusedCorners.Push(corner)
-
-				this.iTelemetryFuture := false
 			}
 			else if (confirm && this.Speaker)
 				this.getSpeaker().speakPhrase("Later")
@@ -1168,6 +1166,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 	reviewCornerPerformance(cornerNr, fileName) {
 		local oldMode := this.Mode
+		local found := false
 		local previousLap, currentLap, command, ignore
 
 		if this.Speaker[false] {
@@ -1833,9 +1832,7 @@ class DrivingCoach extends GridRaceAssistant {
 			return false
 		}
 
-		if (this.iTelemetryFuture && (cornerNr != this.iTelemetryFuture.Corner)) {
-			this.reviewCornerPerformance(this.iTelemetryFuture.Corner, this.iTelemetryFuture.FileName)
-
+		if (this.iTelemetryFuture && ((cornerNr = (this.iTelemetryFuture.Corner + 2)) || (cornerNr < this.iTelemetryFuture.Corner))) {
 			if this.iTelemetryFuture.FileName
 				try {
 					this.reviewCornerPerformance(this.iTelemetryFuture.Corner, this.iTelemetryFuture.FileName)

@@ -2846,7 +2846,6 @@ class RaceStrategist extends GridRaceAssistant {
 					initialTyreLaps := Max(0, (initialLap - Task.CurrentTask.Pitstops[initialStint - 1].Lap))
 				else
 					initialTyreLaps := initialLap
-				}
 
 				initialFuelAmount := knowledgeBase.getValue("Lap." . initialLap . ".Fuel.Remaining")
 			}

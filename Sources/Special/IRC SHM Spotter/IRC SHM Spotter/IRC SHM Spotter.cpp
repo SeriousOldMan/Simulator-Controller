@@ -1729,8 +1729,6 @@ bool writeCoordinates(const irsdk_header* header, const char* data) {
 			
 			printf("0.0,0.0,0.0,0.0,0.0\n");
 
-			int carIdx = ;
-
 			char* trackPositions;
 
 			if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))

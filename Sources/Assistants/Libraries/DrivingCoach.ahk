@@ -840,14 +840,14 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	focusCornerRecognized(words, confirm := true) {
-		local corner
-
-		corner := this.getNumber(words)
+		local corner := this.getNumber(words)
 
 		if (corner != kUndefined) {
 			if this.startupTrackCoaching() {
 				if (confirm && this.Speaker)
 					this.getSpeaker().speakPhrase("Roger")
+
+				corner := String(corner)
 
 				if !inList(this.FocusedCorners, corner)
 					this.FocusedCorners.Push(corner)
@@ -1174,7 +1174,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 			try {
 				previousLap := this.getTelemetry(&ignore := false, cornerNr)
-				currentLap := this.TelemetryAnalyzer.createTelemetry("Reference", fileName)
+				currentLap := this.TelemetryAnalyzer.createTelemetry("Current", fileName)
 
 				currentLap.Sections := choose(currentLap.Sections, (section) {
 										   if found {
@@ -1182,7 +1182,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 											   return true
 										   }
-										   else if ((section.Type = "Corner") && (section.Nr = corner)) {
+										   else if ((section.Type = "Corner") && (section.Nr = cornerNr)) {
 											   found := true
 
 											   return true
@@ -1191,7 +1191,8 @@ class DrivingCoach extends GridRaceAssistant {
 											   return false
 									   })
 
-				if (this.TelemetryAnalyzer && previousLap && (previousLap.Sections.Length > 0)) {
+				if (this.TelemetryAnalyzer && previousLap && (previousLap.Sections.Length > 0)
+										   && currentLap && (currentLap.Sections.Length > 0)) {
 					command := substituteVariables(this.Instructions["Coaching.Corner.Review"]
 												 , {previousLap: previousLap.JSON, currentLap: currentLap.JSON
 												  , corner: cornerNr})
@@ -1756,7 +1757,7 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	positionTrigger(sectionNr, positionX, positionY) {
-		local cornerNr := this.TelemetryAnalyzer.TrackSections[sectionNr].Nr
+		local cornerNr := Integer(this.TelemetryAnalyzer.TrackSections[sectionNr].Nr)
 		local oldMode := this.Mode
 		local telemetry, reference, command, instructionHints, problemsInstruction
 		local speaker, index, hint, lastHint, conjunction, conclusion
@@ -1848,7 +1849,7 @@ class DrivingCoach extends GridRaceAssistant {
 			return
 		}
 
-		if ((this.FocusedCorners.Length > 0) && !inList(this.FocusedCorners, cornerNr))
+		if ((this.FocusedCorners.Length > 0) && !inList(this.FocusedCorners, String(cornerNr)))
 			return
 
 		if ((Round(positionX) = -32767) && (Round(positionY) = -32767))
@@ -1892,7 +1893,7 @@ class DrivingCoach extends GridRaceAssistant {
 						nextRecommendation := (A_TickCount + wait)
 
 						if (this.ConnectionState = "Active") {
-							if inList(this.FocusedCorners, cornerNr) {
+							if inList(this.FocusedCorners, String(cornerNr)) {
 								this.iTelemetryFuture := this.TelemetryCollector.collectTelemetry()
 
 								this.iTelemetryFuture.Corner := cornerNr

@@ -1687,6 +1687,7 @@ int lastLap = 0;
 float lastRunning = 0.0;
 bool recording = false;
 long lastTick = 0;
+int points = 0;
 
 bool circuit = true;
 bool mapStarted = false;
@@ -1727,9 +1728,9 @@ bool writeCoordinates(const irsdk_header* header, const char* data) {
 		if (laps != lastLap) {
 			lastLap = laps;
 			
-			printf("0.0,0.0,0.0,0.0,0.0,0.0,0.0\n");
+			printf("0.0,0.0,0.0,0.0,0.0\n");
 
-			long lastTick = GetTickCount();
+			lastTick = GetTickCount();
 
 			recording = true;
 		}
@@ -1754,6 +1755,7 @@ bool writeCoordinates(const irsdk_header* header, const char* data) {
 
 		float yaw = atof(buffer);
 
+		/*
 		getDataValue(buffer, header, data, "YawNorth");
 
 		float yawNorth = atof(buffer);
@@ -1770,7 +1772,8 @@ bool writeCoordinates(const irsdk_header* header, const char* data) {
 
 		float velocityZ = atof(buffer);
 
-		// float distance = sqrt(velocityX * velocityX + velocityY * velocityY + velocityZ * velocityZ);
+		float distance = sqrt(velocityX * velocityX + velocityY * velocityY + velocityZ * velocityZ);
+		*/
 
 		getDataValue(buffer, header, data, "Speed");
 
@@ -1787,9 +1790,9 @@ bool writeCoordinates(const irsdk_header* header, const char* data) {
 			lastX += dx;
 			lastY += dy;
 
-			printf("%f,%f,%f,%f,%f,%f,%f\n", running, lastX, lastY, velocityX, yaw, yawNorth, distance);
+			printf("%f,%f,%f,%f,%f\n", running, lastX, lastY, yaw, distance);
 
-			if (circuit && fabs(lastX - initialX) < 10.0 && fabs(lastY - initialY) < 10.0)
+			if (circuit && (++points > 100) && fabs(lastX - initialX) < 10.0 && fabs(lastY - initialY) < 10.0)
 				return false;
 		}
 		else if (mapStarted && !circuit)

@@ -82,7 +82,8 @@ class RaceStrategist extends GridRaceAssistant {
 	iStrategyReported := false
 	iLastStrategyUpdate := 0
 	iRejectedStrategy := false
-	iDynamicStrategy := false
+
+	iStrategyCreated := false
 
 	iUseTraffic := false
 
@@ -787,9 +788,14 @@ class RaceStrategist extends GridRaceAssistant {
 
 	Strategy[original := false] {
 		Get {
-			return (original ? ((original = "Rejected") ? this.iRejectedStrategy
-														: ((original = "Dynamic") ? this.iDynamicStrategy : this.iOriginalStrategy))
+			return (original ? ((original = "Rejected") ? this.iRejectedStrategy : this.iOriginalStrategy)
 							 : this.iStrategy)
+		}
+	}
+
+	StrategyCreated {
+		Get {
+			return this.iStrategyCreated
 		}
 	}
 
@@ -937,8 +943,8 @@ class RaceStrategist extends GridRaceAssistant {
 		if values.HasProp("StrategyReported")
 			this.iStrategyReported := values.StrategyReported
 
-		if values.HasProp("DynamicStrategy")
-			this.iDynamicStrategy := values.DynamicStrategy
+		if values.HasProp("StrategyCreated")
+			this.iStrategyCreated := values.StrategyCreated
 
 		if values.HasProp("RejectedStrategy") {
 			if (this.iRejectedStrategy && (this.iRejectedStrategy != values.RejectedStrategy))
@@ -1633,9 +1639,12 @@ class RaceStrategist extends GridRaceAssistant {
 
 	loadRules(data) {
 		if ((this.Session == kSessionRace) && (getMultiMapValue(this.Settings, "Session Rules", "Strategy", "No") = "Yes")
-		 && !this.Strategy && !this.Strategy["Dynamic"] && (getMultiMapValue(data, "Stint Data", "Laps", 0) < 5)
-		 && this.hasEnoughData(false))
+		 && !this.Strategy && !this.StrategyCreated && (getMultiMapValue(data, "Stint Data", "Laps", 0) < 5)
+		 && this.hasEnoughData(false)) {
 			this.recommendStrategy({Silent: true, Confirm: false, Request: "Rules"})
+
+			this.updateDynamicValues({StrategyCreated: true})
+		}
 	}
 
 	updateSettings(settings, edit := false) {
@@ -1755,7 +1764,7 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 
 		this.updateDynamicValues({OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false
-								, StrategyReported: false, RejectedStrategy: false, DynamicStrategy: false
+								, StrategyReported: false, RejectedStrategy: false, StrategyCreated: false
 								, HasTelemetryData: false})
 		this.updateSessionValues({Simulator: "", Car: "", Track: "", Session: kSessionFinished, OriginalStrategy: false, Strategy: false, SessionTime: false})
 	}
@@ -2797,30 +2806,11 @@ class RaceStrategist extends GridRaceAssistant {
 					 , &initialMap, &initialFuelConsumption, &initialAvgLapTime) {
 		local knowledgeBase := this.KnowledgeBase
 		local strategy := this.Strategy[true]
-		local goal, resultSet, tyreSets, telemetryDB, consumption, stintLength
+		local ruleBased := (getMultiMapValue(this.Settings, "Session Rules", "Strategy", "No") = "Yes")
+		local goal, resultSet, tyreSets, consumption, stintLength
 
-		if (strategy || (getMultiMapValue(this.Settings, "Session Rules", "Strategy", "No") = "Yes")) {
-			stintLength := (strategy ? strategy.StintLength : getMultiMapValue(this.Settings, "Session Rules", "Stint.Length", 70))
-			initialStint := (Task.CurrentTask.Pitstops.Length + 1)
+		if (strategy || ruleBased) {
 			initialLap := Task.CurrentTask.Lap
-			initialStintTime := Ceil((stintLength * 60) - (knowledgeBase.getValue("Driver.Time.Stint.Remaining") / 1000))
-
-			telemetryDB := Task.CurrentTask.TelemetryDatabase
-
-			initialTyreSet := knowledgeBase.getValue("Tyre.Set", "false")
-
-			if !telemetryDB.suitableTyreCompound(this.Simulator, this.Car, this.Track
-											   , knowledgeBase.getValue("Weather.Weather.10Min", "Dry")
-											   , compound(knowledgeBase.getValue("Tyre.Compound", "Dry")
-														, knowledgeBase.getValue("Tyre.Compound.Color", "Black")))
-				initialTyreLaps := 999
-			else if (initialStint > 1)
-				initialTyreLaps := Max(0, (knowledgeBase.getValue("Lap", 0) - Task.CurrentTask.Pitstops[initialStint - 1].Lap))
-			else
-				initialTyreLaps := knowledgeBase.getValue("Lap", 0)
-
-			initialFuelAmount := knowledgeBase.getValue("Lap." . initialLap . ".Fuel.Remaining")
-			initialMap := knowledgeBase.getValue("Lap." . initialLap . ".Map")
 
 			consumption := knowledgeBase.getValue("Lap." . initialLap . ".Fuel.AvgConsumption")
 
@@ -2837,7 +2827,41 @@ class RaceStrategist extends GridRaceAssistant {
 			else
 				initialAvgLapTime := (knowledgeBase.getValue("Lap." . initialLap . ".Time") / 1000)
 
-			initialSessionTime := (this.OverallTime / 1000)
+			initialTyreSet := knowledgeBase.getValue("Tyre.Set", "false")
+			initialMap := knowledgeBase.getValue("Lap." . initialLap . ".Map")
+
+			If strategy {
+				stintLength := strategy.StintLength
+
+				initialStint := (Task.CurrentTask.Pitstops.Length + 1)
+				initialStintTime := Ceil((stintLength * 60) - (knowledgeBase.getValue("Driver.Time.Stint.Remaining") / 1000))
+				initialSessionTime := (this.OverallTime / 1000)
+
+				if !Task.CurrentTask.TelemetryDatabase.suitableTyreCompound(this.Simulator, this.Car, this.Track
+																		  , knowledgeBase.getValue("Weather.Weather.10Min", "Dry")
+																		  , compound(knowledgeBase.getValue("Tyre.Compound", "Dry")
+																				   , knowledgeBase.getValue("Tyre.Compound.Color", "Black")))
+					initialTyreLaps := 999
+				else if (initialStint > 1)
+					initialTyreLaps := Max(0, (initialLap - Task.CurrentTask.Pitstops[initialStint - 1].Lap))
+				else
+					initialTyreLaps := initialLap
+				}
+
+				initialFuelAmount := knowledgeBase.getValue("Lap." . initialLap . ".Fuel.Remaining")
+			}
+			else {
+				stintLength := getMultiMapValue(this.Settings, "Session Rules", "Stint.Length", 70)
+
+				initialStint := 1
+				initialStintTime := 0
+				initialSessionTime := 0
+				initialTyreLaps := 0
+
+				initialFuelAmount := (knowledgeBase.getValue("Lap." . initialLap . ".Fuel.Remaining") + (initialLap * consumption))
+
+				initialLap := 0
+			}
 
 			return true
 		}
@@ -3515,8 +3539,6 @@ class RaceStrategist extends GridRaceAssistant {
 				scenario.setVersion(A_Now)
 
 				dispose := false
-
-				this.updateDynamicValues({DynamicStrategy: scenario})
 
 				Task.startTask(ObjBindMethod(this, "updateStrategy", scenario, (request = "Rules"), false, scenario.Version), 1000)
 			}

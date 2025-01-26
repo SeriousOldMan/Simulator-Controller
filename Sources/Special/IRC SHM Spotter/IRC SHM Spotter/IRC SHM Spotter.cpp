@@ -1686,6 +1686,7 @@ float lastY = 0.0;
 int lastLap = 0;
 float lastRunning = 0.0;
 bool recording = false;
+long lastTick = 0;
 
 bool circuit = true;
 bool mapStarted = false;
@@ -1727,6 +1728,8 @@ bool writeCoordinates(const irsdk_header* header, const char* data) {
 			lastLap = laps;
 			
 			printf("0.0,0.0,0.0,0.0,0.0,0.0,0.0\n");
+
+			long lastTick = GetTickCount();
 
 			recording = true;
 		}
@@ -1771,7 +1774,9 @@ bool writeCoordinates(const irsdk_header* header, const char* data) {
 
 		getDataValue(buffer, header, data, "Speed");
 
-		float distance = atof(buffer);
+		float distance = atof(buffer) * ((float)(GetTickCount() - lastTick) / 1000);
+
+		lastTick = GetTickCount();
 		
 		float dx = distance * sin(yaw);
 		float dy = distance * cos(yaw);
@@ -1837,18 +1842,9 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 		if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
 			running = ((float*)trackPositions)[carIdx];
 
-		getDataValue(buffer, header, data, "Yaw");
+		getDataValue(buffer, header, data, "Speed");
 
-		float yaw = atof(buffer);
-
-		getDataValue(buffer, header, data, "VelocityX");
-
-		float velocityX = atof(buffer) * 3.6;
-
-		float dx = velocityX * sin(yaw);
-		float dy = velocityX * cos(yaw);
-
-		if ((dx > 0) || (dy > 0)) {
+		if (atof(buffer) > 0) {
 			float distance;
 			int index = 0;
 

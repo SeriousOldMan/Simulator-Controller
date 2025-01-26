@@ -1686,7 +1686,6 @@ float lastY = 0.0;
 int lastLap = 0;
 float lastRunning = 0.0;
 bool recording = false;
-long lastTick = 0;
 int points = 0;
 
 bool circuit = true;
@@ -1730,7 +1729,12 @@ bool writeCoordinates(const irsdk_header* header, const char* data) {
 			
 			printf("0.0,0.0,0.0,0.0,0.0\n");
 
-			lastTick = GetTickCount();
+			int carIdx = ;
+
+			char* trackPositions;
+
+			if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
+				lastRunning = ((float*)trackPositions)[atoi(playerCarIdx)];
 
 			recording = true;
 		}
@@ -1748,8 +1752,10 @@ bool writeCoordinates(const irsdk_header* header, const char* data) {
 
 		if (running < lastRunning)
 			return false;
-		else
-			lastRunning = running;
+		
+		float distance = (running - lastRunning) * 6000;
+		
+		lastRunning = running;
 
 		getDataValue(buffer, header, data, "Yaw");
 
@@ -1774,12 +1780,6 @@ bool writeCoordinates(const irsdk_header* header, const char* data) {
 
 		float distance = sqrt(velocityX * velocityX + velocityY * velocityY + velocityZ * velocityZ);
 		*/
-
-		getDataValue(buffer, header, data, "Speed");
-
-		float distance = atof(buffer) * ((float)(GetTickCount() - lastTick) / 1000);
-
-		lastTick = GetTickCount();
 		
 		float dx = distance * sin(yaw);
 		float dy = distance * cos(yaw);

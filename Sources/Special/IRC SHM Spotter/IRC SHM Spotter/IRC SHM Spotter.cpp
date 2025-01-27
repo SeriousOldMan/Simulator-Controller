@@ -1692,6 +1692,22 @@ bool circuit = true;
 bool mapStarted = false;
 int mapLap = -1;
 
+inline float vectorLength(float x, float y) {
+	return sqrt((x * x) + (y * y));
+}
+
+float vectorAngle(float x, float y) {
+	float scalar = (x * 0) + (y * 1);
+	float length = vectorLength(x, y);
+
+	float angle = (length > 0) ? acos(scalar / length) : 0;
+
+	if (x < 0)
+		angle = - angle;
+
+	return angle;
+}
+
 bool writeCoordinates(const irsdk_header* header, const char* data) {
 	char buffer[60];
 	char* rawValue;
@@ -1727,7 +1743,7 @@ bool writeCoordinates(const irsdk_header* header, const char* data) {
 		if (laps != lastLap) {
 			lastLap = laps;
 			
-			printf("0.0,0.0,0.0,0.0,0.0\n");
+			printf("0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0\n");
 
 			char* trackPositions;
 
@@ -1779,8 +1795,26 @@ bool writeCoordinates(const irsdk_header* header, const char* data) {
 		float distance = sqrt(velocityX * velocityX + velocityY * velocityY + velocityZ * velocityZ);
 		*/
 		
-		float dx = distance * sin(yaw);
-		float dy = distance * cos(yaw);
+		// float dx = distance * sin(yaw);
+		// float dy = distance * cos(yaw);
+
+		getDataValue(buffer, header, data, "VelocityX");
+
+		float velocityX = atof(buffer);
+
+		getDataValue(buffer, header, data, "VelocityY");
+
+		float velocityY = atof(buffer);
+
+		getDataValue(buffer, header, data, "VelocityZ");
+
+		float velocityZ = atof(buffer);
+
+		// float angle = vectorAngle(velocityX, velocityY);
+		float angle = 3.14 + yaw;
+
+		float dx = distance * sin(angle);
+		float dy = distance * cos(angle);
 
 		if (dx > 0 || dy > 0) {
 			mapStarted = true;
@@ -1788,7 +1822,7 @@ bool writeCoordinates(const irsdk_header* header, const char* data) {
 			lastX += dx;
 			lastY += dy;
 
-			printf("%f,%f,%f,%f,%f\n", running, lastX, lastY, yaw, distance);
+			printf("%f,%f,%f,%f,%f,%f,%f,%f\n", running, lastX, lastY, yaw, velocityX, velocityY, angle, distance);
 
 			if (circuit && (++points > 100) && fabs(lastX - initialX) < 10.0 && fabs(lastY - initialY) < 10.0)
 				return false;

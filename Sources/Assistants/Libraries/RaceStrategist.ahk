@@ -1443,7 +1443,7 @@ class RaceStrategist extends GridRaceAssistant {
 		return getMultiMapValue(this.Settings, "Session Settings", "Telemetry." . session, default)
 	}
 
-	loadStrategy(facts, strategy, lastLap := false, lastPitstop := false, lastPitstopLap := false) {
+	loadStrategy(strategy, facts, lastLap := false, lastPitstop := false, lastPitstopLap := false) {
 		local pitstopWindow := (this.Settings ? getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Window.Considered", 3) : 3)
 		local fullCourseYellow, forcedPitstop, pitstop, count, ignore, pitstopLap, pitstopMaxLap, first, rootStrategy, pitstopDeviation
 
@@ -1627,7 +1627,7 @@ class RaceStrategist extends GridRaceAssistant {
 					applicableStrategy := false
 
 				if applicableStrategy {
-					this.loadStrategy(facts, theStrategy)
+					this.loadStrategy(theStrategy, facts)
 
 					this.updateSessionValues({OriginalStrategy: theStrategy, Strategy: theStrategy})
 				}
@@ -1766,7 +1766,8 @@ class RaceStrategist extends GridRaceAssistant {
 		this.updateDynamicValues({OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false
 								, StrategyReported: false, RejectedStrategy: false, StrategyCreated: false
 								, HasTelemetryData: false})
-		this.updateSessionValues({Simulator: "", Car: "", Track: "", Session: kSessionFinished, OriginalStrategy: false, Strategy: false, SessionTime: false})
+		this.updateSessionValues({Simulator: "", Car: "", Track: "", Session: kSessionFinished
+								, OriginalStrategy: false, Strategy: false, SessionTime: false})
 	}
 
 	forceFinishSession() {
@@ -1989,7 +1990,7 @@ class RaceStrategist extends GridRaceAssistant {
 				this.Strategy["Rejected"].RunningTime += lastTime
 			}
 
-			if (!this.StrategyReported && this.hasEnoughData(false) && (this.Strategy == this.Strategy[true])) {
+			if (!this.StrategyReported && this.hasEnoughData(false) && (this.Strategy == this.Strategy["Original"])) {
 				if (this.Speaker[false] && this.Announcements["StrategySummary"])
 					if this.confirmAction("Strategy.Explain") {
 						this.getSpeaker().speakPhrase("ConfirmReportStrategy", false, true)
@@ -2480,7 +2481,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if version
 			if (this.Strategy && (this.Strategy.Version = version))
 				return
-			else if (this.Strategy[true] && (this.Strategy[true].Version = version))
+			else if (this.Strategy["Original"] && (this.Strategy["Original"].Version = version))
 				return
 			else if (knowledgeBase.getValue("Strategy.Version", false) = version)
 				report := false
@@ -2494,12 +2495,13 @@ class RaceStrategist extends GridRaceAssistant {
 
 				lastPitstop := knowledgeBase.getValue("Pitstop.Last", false)
 
-				for fact, value in this.loadStrategy(CaseInsenseMap(), newStrategy
+				for fact, value in this.loadStrategy(newStrategy, CaseInsenseMap()
 												   , knowledgeBase.getValue("Lap", false)
 												   , lastPitstop, lastPitstop ? knowledgeBase.getValue("Pitstop." . lastPitstop . ".Lap") : false)
 					knowledgeBase.setFact(fact, value)
 
-				this.dumpKnowledgeBase(knowledgeBase)
+				if this.Debug[kDebugKnowledgeBase]
+					this.dumpKnowledgeBase(knowledgeBase)
 
 				if original
 					this.updateSessionValues({OriginalStrategy: newStrategy, Strategy: newStrategy})
@@ -2594,7 +2596,7 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	getStintDriver(stintNumber, &driverID, &driverName) {
-		local strategy := this.Strategy[true]
+		local strategy := this.Strategy["Original"]
 		local sessionDB, numPitstops, index
 
 		if strategy {
@@ -2630,7 +2632,7 @@ class RaceStrategist extends GridRaceAssistant {
 					  , &sessionType, &sessionLength
 					  , &maxTyreLaps, &tyreCompound, &tyreCompoundColor, &tyrePressures) {
 		local knowledgeBase := this.KnowledgeBase
-		local strategy := this.Strategy[true]
+		local strategy := this.Strategy["Original"]
 		local lap := Task.CurrentTask.Lap
 		local availableTyreSets, strategyTask, telemetryDB, candidate
 
@@ -2719,7 +2721,7 @@ class RaceStrategist extends GridRaceAssistant {
 	getSessionSettings(&stintLength, &formationLap, &postRaceLap, &fuelCapacity, &safetyFuel
 					 , &pitstopDelta, &pitstopFuelService, &pitstopTyreService, &pitstopServiceOrder) {
 		local knowledgeBase := this.KnowledgeBase
-		local strategy := this.Strategy[true]
+		local strategy := this.Strategy["Original"]
 
 		if strategy {
 			stintLength := strategy.StintLength
@@ -2758,7 +2760,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 	getSessionWeather(minute, &weather, &airTemperature, &trackTemperature) {
 		local knowledgeBase := this.KnowledgeBase
-		local strategy := this.Strategy[true]
+		local strategy := this.Strategy["Original"]
 
 		if strategy {
 			weather := knowledgeBase.getValue("Weather.Weather.10Min", false)
@@ -2805,7 +2807,7 @@ class RaceStrategist extends GridRaceAssistant {
 					 , &initialTyreSet, &initialTyreLaps, &initialFuelAmount
 					 , &initialMap, &initialFuelConsumption, &initialAvgLapTime) {
 		local knowledgeBase := this.KnowledgeBase
-		local strategy := this.Strategy[true]
+		local strategy := this.Strategy["Original"]
 		local ruleBased := (getMultiMapValue(this.Settings, "Session Rules", "Strategy", "No") = "Yes")
 		local goal, resultSet, tyreSets, consumption, stintLength
 
@@ -2872,7 +2874,7 @@ class RaceStrategist extends GridRaceAssistant {
 						, &consumptionVariation, &initialFuelVariation, &refuelVariation
 						, &tyreUsageVariation, &tyreCompoundVariation
 						, &firstStintWeight, &lastStintWeight) {
-		local strategy := this.Strategy[true]
+		local strategy := this.Strategy["Original"]
 
 		useInitialConditions := false
 		useTelemetryData := true
@@ -3399,7 +3401,8 @@ class RaceStrategist extends GridRaceAssistant {
 		local speaker := this.getSpeaker()
 		local hadScenario := (scenario != false)
 		local dispose := true
-		local request, fullCourseYellow, forcedPitstop, report
+		local request := false
+		local fullCourseYellow, forcedPitstop, report
 
 		static wasSkipped := false
 
@@ -3451,7 +3454,7 @@ class RaceStrategist extends GridRaceAssistant {
 							this.reportStrategy({Strategy: false, Pitstops: true, NextPitstop: true
 											   , TyreChange: true, Refuel: true, Map: true, Active: this.Strategy}, scenario)
 
-							if ((this.Strategy != this.Strategy[true]) || isDebug())
+							if ((this.Strategy != this.Strategy["Original"]) || isDebug())
 								this.explainStrategyRecommendation(scenario)
 
 							if this.Speaker {
@@ -3481,7 +3484,7 @@ class RaceStrategist extends GridRaceAssistant {
 						else if (request != "Pitstop")
 							if (this.Strategy["Rejected"] && isInstance(this.Strategy["Rejected"], Strategy) && !this.betterScenario(this.Strategy["Rejected"], scenario, &report))
 								return
-							else if ((this.Strategy != this.Strategy[true]) && !this.betterScenario(this.Strategy, scenario, &report))
+							else if ((this.Strategy != this.Strategy["Original"]) && !this.betterScenario(this.Strategy, scenario, &report))
 								return
 
 						if (report && this.Speaker) {
@@ -3491,7 +3494,7 @@ class RaceStrategist extends GridRaceAssistant {
 								this.reportStrategy({Strategy: false, Pitstops: true, NextPitstop: true
 												   , TyreChange: true, Refuel: true, Map: true, Active: this.Strategy}, scenario)
 
-								if ((this.Strategy != this.Strategy[true]) || isDebug())
+								if ((this.Strategy != this.Strategy["Original"]) || isDebug())
 									this.explainStrategyRecommendation(scenario)
 							}
 
@@ -3532,14 +3535,15 @@ class RaceStrategist extends GridRaceAssistant {
 			}
 
 			if scenario {
-				if this.Strategy[true]
-					scenario.PitstopRule := this.Strategy[true].PitstopRule
+				if this.Strategy["Original"]
+					scenario.PitstopRule := this.Strategy["Original"].PitstopRule
 
 				scenario.setVersion(A_Now)
 
 				dispose := false
 
-				Task.startTask(ObjBindMethod(this, "updateStrategy", scenario, (request = "Rules"), false, scenario.Version), 1000)
+				Task.startTask(ObjBindMethod(this, "updateStrategy", scenario, (request = "Rules")
+																   , false, scenario.Version), 1000)
 			}
 			else {
 				if (confirm && this.Speaker)

@@ -2,8 +2,10 @@
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed time of second sector in "Solo Center" and "Team Center" for *rFactor 2* and *Le Mans Ultimate*.
-  4. A lot of fine-tuning for the recently added rule-based strategy handling.
-  5. The Driving Coach now provides a new mode for on-track coaching in which you will be given a [review of your performance](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#focusing-on-specific-corners) at a given corner compared to the last lap.
+  4. Fixed strategy handling in "Autonomous" mode.
+  5. A lot of fine-tuning for the recently added rule-based strategy handling.
+  6. All Spotter announcements from the "Tactical Advices" group do not interrupt announcements of other Assistants anymore.
+  7. The Driving Coach now provides a new mode for on-track coaching in which you will be given a [review of your performance](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#focusing-on-specific-corners) at a given corner compared to the last lap.
      - New voice commands let you provide the numbers for those corners where you want to get a post corner review. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#list-of-all-voice-commands) for a description.
 	 - A new LLM instruction is available which can be customized to control the different aspects of the critics given by the Driving Coach.
   6. Updated car meta data for *RaceRoom Racing Experience* to the latest version.

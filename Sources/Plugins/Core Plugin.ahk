@@ -77,7 +77,7 @@ startVoiceMacro() {
 
 				WinActivate(windowTitle)
 
-				if !WinActive(windowTitle) {
+				if !WinActive(windowTitle)
 					Sleep(1000)
 
 				WinMove(50, 50, , , windowTitle)

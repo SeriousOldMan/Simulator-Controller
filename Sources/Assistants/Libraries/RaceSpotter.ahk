@@ -280,7 +280,7 @@ class CarInfo {
 				loop Min(count, numSectorTimes) {
 					sectorTime := this.SectorTimes[sector][numSectorTimes - A_Index + 1]
 
-					if (A_Index = numLapTimes)
+					if (A_Index = numSectorTimes)
 						sectorTimes.Push(sectorTime)
 
 					sectorTimes.Push(sectorTime)

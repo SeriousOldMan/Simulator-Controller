@@ -1523,6 +1523,12 @@ class DrivingCoach extends GridRaceAssistant {
 					else
 						positions .= (A_Space . -32767 . A_Space . -32767)
 
+				for ignore, section in sections
+					if analyzer.getSectionCoordinateIndex(section, &x, &y, &ignore)
+						positions .= (A_Space . x . A_Space . y)
+					else
+						positions .= (A_Space . -32767 . A_Space . -32767)
+
 				sessionDB := SessionDatabase()
 
 				code := sessionDB.getSimulatorCode(simulator)
@@ -1757,9 +1763,9 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	positionTrigger(sectionNr, positionX, positionY) {
-		local cornerNr := Integer(this.TelemetryAnalyzer.TrackSections[sectionNr].Nr)
+		local analyzer := this.TelemetryAnalyzer
 		local oldMode := this.Mode
-		local telemetry, reference, command, instructionHints, problemsInstruction
+		local cornerNr, instruct, telemetry, reference, command, instructionHints, problemsInstruction
 		local speaker, index, hint, lastHint, conjunction, conclusion
 
 		static nextRecommendation := false
@@ -1833,11 +1839,19 @@ class DrivingCoach extends GridRaceAssistant {
 			return false
 		}
 
-		if this.iTelemetryFuture {
-			if ((cornerNr > (this.iTelemetryFuture.Corner + 1)) || (cornerNr < this.iTelemetryFuture.Corner)) {
+		if !analyzer
+			return
+
+		instruct := (sectionNr <= analyzer.TrackSections.Length)
+
+		if (this.iTelemetryFuture && !instruct) {
+			sectionNr -= analyzer.TrackSections.Length
+
+			if ((sectionNr >= (this.iTelemetryFuture.Section + 2)) || (sectionNr < this.iTelemetryFuture.Section)) {
 				if this.iTelemetryFuture.FileName
 					try {
-						this.reviewCornerPerformance(this.iTelemetryFuture.Corner, this.iTelemetryFuture.FileName)
+						this.reviewCornerPerformance(Integer(analyzer.TrackSections[this.iTelemetryFuture.Section].Nr)
+												   , this.iTelemetryFuture.FileName)
 					}
 					catch Any as exception {
 						logError(exception, true)
@@ -1877,114 +1891,118 @@ class DrivingCoach extends GridRaceAssistant {
 			hintProblems.Default := ""
 		}
 
-		telemetry := this.getTelemetry(&reference := true, cornerNr)
+		if (analyzer && instruct) {
+			cornerNr := Integer(analyzer.TrackSections[sectionNr].Nr)
 
-		if (this.TelemetryAnalyzer && telemetry) {
-			if (A_TickCount < nextRecommendation)
-				return
-			else {
-				instructionHints := this.getInstructionHints(cornerNr)
+			telemetry := this.getTelemetry(&reference := true, cornerNr)
 
-				if (instructionHints.Length > 0)
-					instructionHints := filterInstructionHints(instructionHints)
+			if telemetry {
+				if (A_TickCount < nextRecommendation)
+					return
+				else {
+					instructionHints := this.getInstructionHints(cornerNr)
 
-				if this.Speaker[false]
-					if ((telemetry.Sections.Length > 0) && !this.getSpeaker().Speaking) {
-						nextRecommendation := (A_TickCount + wait)
+					if (instructionHints.Length > 0)
+						instructionHints := filterInstructionHints(instructionHints)
 
-						if (this.ConnectionState = "Active") {
-							if inList(this.FocusedCorners, String(cornerNr)) {
-								this.iTelemetryFuture := this.TelemetryCollector.collectTelemetry()
+					if this.Speaker[false]
+						if ((telemetry.Sections.Length > 0) && !this.getSpeaker().Speaking) {
+							nextRecommendation := (A_TickCount + wait)
 
-								this.iTelemetryFuture.Corner := cornerNr
-							}
+							if (this.ConnectionState = "Active") {
+								if inList(this.FocusedCorners, String(cornerNr)) {
+									this.iTelemetryFuture := this.TelemetryCollector.collectTelemetry()
 
-							this.Mode := "Coaching"
+									this.iTelemetryFuture.Section := sectionNr
+								}
 
-							telemetry := telemetry.JSON
+								this.Mode := "Coaching"
 
-							problemsInstruction := this.Instructions["Coaching.Corner.Problems"]
+								telemetry := telemetry.JSON
 
-							if ((Trim(problemsInstruction) != "") && (instructionHints.Length > 0))
-								telemetry := (substituteVariables(problemsInstruction
-																, {problems: values2String(", ", collect(instructionHints, (h) => translate(hintProblems[h]))*)
-																 , corner: cornerNr})
-											. "\n\n" . telemetry)
+								problemsInstruction := this.Instructions["Coaching.Corner.Problems"]
 
-							try {
-								command := substituteVariables(this.Instructions["Coaching.Corner.Approaching"]
-															 , {telemetry: telemetry, corner: cornerNr})
+								if ((Trim(problemsInstruction) != "") && (instructionHints.Length > 0))
+									telemetry := (substituteVariables(problemsInstruction
+																	, {problems: values2String(", ", collect(instructionHints, (h) => translate(hintProblems[h]))*)
+																	 , corner: cornerNr})
+												. "\n\n" . telemetry)
 
-								if reference
-									command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
-																		   , {telemetry: reference.JSON}))
+								try {
+									command := substituteVariables(this.Instructions["Coaching.Corner.Approaching"]
+																 , {telemetry: telemetry, corner: cornerNr})
 
-								this.handleVoiceText("TEXT", command, false)
-							}
-							finally {
-								this.Mode := oldMode
-							}
-						}
-						else if (instructionHints.Length > 0) {
-							speaker := this.getSpeaker()
+									if reference
+										command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
+																			   , {telemetry: reference.JSON}))
 
-							speaker.beginTalk({Talking: true})
-
-							try {
-								lastHint := false
-
-								for index, hint in bubbleSort(&instructionHints, (h1, h2) => inList(hints, h1) > inList(hints, h2)) {
-									conjunction := (lastHint ? instructionConjunction(lastHint, hint) : false)
-
-									if conjunction
-										conjunction := speaker.Fragments[conjunction]
-									else if !lastHint
-										conjunction := ""
-									else
-										conjunction := ". "
-
-									conclusion := ((index = instructionHints.Length) ? "." : "")
-
-									speaker.speakPhrase(hint, {conjunction: conjunction, conclusion: conclusion})
-
-									lastHint := hint
+									this.handleVoiceText("TEXT", command, false)
+								}
+								finally {
+									this.Mode := oldMode
 								}
 							}
-							finally {
-								speaker.endTalk({Rephrase: false})
+							else if (instructionHints.Length > 0) {
+								speaker := this.getSpeaker()
+
+								speaker.beginTalk({Talking: true})
+
+								try {
+									lastHint := false
+
+									for index, hint in bubbleSort(&instructionHints, (h1, h2) => inList(hints, h1) > inList(hints, h2)) {
+										conjunction := (lastHint ? instructionConjunction(lastHint, hint) : false)
+
+										if conjunction
+											conjunction := speaker.Fragments[conjunction]
+										else if !lastHint
+											conjunction := ""
+										else
+											conjunction := ". "
+
+										conclusion := ((index = instructionHints.Length) ? "." : "")
+
+										speaker.speakPhrase(hint, {conjunction: conjunction, conclusion: conclusion})
+
+										lastHint := hint
+									}
+								}
+								finally {
+									speaker.endTalk({Rephrase: false})
+								}
 							}
 						}
-					}
 
-				instructionCount += 1
+					instructionCount += 1
 
-				if (instructionHints.Length > 0)
-					Task.startTask(() {
-						local state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
-						local speaker := (this.Speaker[false] && this.getSpeaker())
-						local lastInstruction := instructionCount
-						local ignore, hint
-
-						setMultiMapValue(state, "Instructions", "Corner", cornerNr)
-
-						setMultiMapValue(state, "Instructions", "Instructions", values2String(", ", instructionHints*))
-
-						if speaker
-							for ignore, hint in instructionHints
-								setMultiMapValue(state, "Instructions", hint, Trim(speaker.getPhrase(hint, {conjunction: "", conclusion: ""})))
-
-						writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
-
+					if (instructionHints.Length > 0)
 						Task.startTask(() {
-							if (lastInstruction = instructionCount) {
-								local state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
+							local state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
+							local speaker := (this.Speaker[false] && this.getSpeaker())
+							local lastInstruction := instructionCount
+							local ignore, hint
 
-								removeMultiMapValues(state, "Instructions")
+							setMultiMapValue(state, "Instructions", "Corner", cornerNr)
 
-								writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
-							}
-						}, wait * 2, kLowPriority)
-					})
+							setMultiMapValue(state, "Instructions", "Instructions", values2String(", ", instructionHints*))
+
+							if speaker
+								for ignore, hint in instructionHints
+									setMultiMapValue(state, "Instructions", hint, Trim(speaker.getPhrase(hint, {conjunction: "", conclusion: ""})))
+
+							writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
+
+							Task.startTask(() {
+								if (lastInstruction = instructionCount) {
+									local state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
+
+									removeMultiMapValues(state, "Instructions")
+
+									writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
+								}
+							}, wait * 2, kLowPriority)
+						})
+				}
 			}
 		}
 	}

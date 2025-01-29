@@ -1792,7 +1792,7 @@ bool writeCoordinates(const irsdk_header* header, const char* data, int playerCa
 		float dx = distance * sin(yaw);
 		float dy = distance * cos(yaw);
 
-		if (dx > 0 || dy > 0) {
+		if (dx != 0 || dy != 0) {
 			mapStarted = true;
 
 			lastX += dx;
@@ -2113,7 +2113,7 @@ int main(int argc, char* argv[])
 			if (argc > 2)
 				circuit = (strcmp(argv[2], "Circuit") == 0);
 
-			SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
+			// SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
 		}
 
 		if (analyzeTelemetry) {
@@ -2408,7 +2408,7 @@ int main(int argc, char* argv[])
 		}
 
 		if (mapTrack)
-			Sleep(20);
+			Sleep(5);
 		else if (carTelemetry || analyzeTelemetry || positionTrigger)
 			Sleep(10);
 		else if (wait)

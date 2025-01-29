@@ -1758,7 +1758,7 @@ bool writeCoordinates(const irsdk_header* header, const char* data) {
 	else if (laps != lastLap) 
 		return false;
 	else {
-		if (GetTickCount() - lastTickCount < 50)
+		if (GetTickCount() - lastTickCount < 20)
 			return true;
 
 		int carIdx = atoi(playerCarIdx);
@@ -2123,8 +2123,12 @@ int main(int argc, char* argv[])
 				triggerType = "Trigger";
 		}
 
-		if (mapTrack && argc > 2)
-			circuit = (strcmp(argv[2], "Circuit") == 0);
+		if (mapTrack) {
+			if (argc > 2)
+				circuit = (strcmp(argv[2], "Circuit") == 0);
+
+			SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
+		}
 
 		if (analyzeTelemetry) {
 			dataFile = argv[2];
@@ -2418,7 +2422,7 @@ int main(int argc, char* argv[])
 		}
 
 		if (mapTrack)
-			Sleep(1);
+			Sleep(20);
 		else if (carTelemetry || analyzeTelemetry || positionTrigger)
 			Sleep(10);
 		else if (wait)

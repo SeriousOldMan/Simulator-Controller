@@ -11,8 +11,9 @@
 	 - A new LLM instruction is available which can be customized to control the different aspects of the critics given by the Driving Coach.
   9. Optimized the Driving Coach instructions used when approaching a corner.
   10. Updated car meta data for *RaceRoom Racing Experience* to the latest version.
-  11. [Internal] Migrated to AHK 2.1-alpha.15.
-  12. New car models for "Setup Workbench":
+  11. [Expert] "Simulator Startup" now supports the integration of additional startup scripts to customize your environment when starting up Simulator Controller.
+  12. [Internal] Migrated to AHK 2.1-alpha.15.
+  13. New car models for "Setup Workbench":
       - rFactor 2
 	    - Mercedes AMG GT3
 		- Porsche 911 GT3 R
@@ -20,7 +21,9 @@
 		- McLaren 650s GT3 (fixed Aero Height at the front)
 		
       With this release, the list of GT3 cars for rFactor 2 is complete. I won't create meta data for more cars, but doing this on your own is easy. Let me know, and I will be happy to give instructions.
-  
+
+IMPORTANT: Track mapping and track position detection is currently not working for *iRacing*. This also affects many other functionalities in Simulator Controller, for example on-track coaching by the Driving Coach. I am already in contact with the *iRacing* developers, since it was working before the latest *iRacing* release. 
+
 ## 6.1.3.0-release 01/24/25
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

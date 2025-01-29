@@ -226,6 +226,12 @@ class SimulatorStartup extends ConfigurationItem {
 		try {
 			logMessage(kLogInfo, translate("Starting ") . translate("Simulator Controller"))
 
+			if FileExist(kUserHomeDirectory . "Programs\Startup.bat")
+				Run(kUserHomeDirectory . "Programs\Startup.bat")
+
+			if FileExist(kUserHomeDirectory . "Programs\Startup.cmd")
+				Run(kUserHomeDirectory . "Programs\Startup.cmd")
+
 			exePath := (kBinariesDirectory . "Process Manager.exe")
 
 			Run(exePath, kBinariesDirectory)

@@ -1750,12 +1750,17 @@ bool writeCoordinates(const irsdk_header* header, const char* data) {
 			if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
 				lastRunning = ((float*)trackPositions)[atoi(playerCarIdx)];
 
+			lastTickCount = GetTickCount();
+
 			recording = true;
 		}
 	}
 	else if (laps != lastLap) 
 		return false;
 	else {
+		if (GetTickCount() - lastTickCount < 50)
+			return true;
+
 		int carIdx = atoi(playerCarIdx);
 
 		char* trackPositions;
@@ -1814,6 +1819,8 @@ bool writeCoordinates(const irsdk_header* header, const char* data) {
 		}
 		else if (mapStarted && !circuit)
 			return false;
+
+		lastTickCount = GetTickCount();
 	}
 
 	return true;

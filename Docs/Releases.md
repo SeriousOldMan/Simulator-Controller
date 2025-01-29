@@ -10,6 +10,14 @@
      - New voice commands let you provide the numbers for those corners where you want to get a post corner review. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#list-of-all-voice-commands) for a description.
 	 - A new LLM instruction is available which can be customized to control the different aspects of the critics given by the Driving Coach.
   9. Updated car meta data for *RaceRoom Racing Experience* to the latest version.
+  10. New car models for "Setup Workbench":
+      - rFactor 2
+	    - Mercedes AMG GT3
+		- Porsche 911 GT3 R
+		- Radical RXC Turbo GT3
+		- McLaren 650s GT3 (fixed Aero Height at the front)
+		
+      With this release, the list of GT3 cars for rFactor 2 is complete. I won't create meta data for more cars, but doing this on your own is easy. Let me know, and I will be happy to give instructions.
   
 ## 6.1.3.0-release 01/24/25
   1. Minor bugfixes, as always

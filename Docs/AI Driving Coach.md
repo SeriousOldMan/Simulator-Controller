@@ -358,7 +358,7 @@ It is possible to work with the Driving Coach on specific corners. To start this
 
 with *X* the number of the corner you want to practice. This command can be issued multiple times and the Driving Coach will remember the different corners you want to practice.
 
-If this mode is active, Aiden will not only give you instructions for the corners you requested, but will also give you immediate feedback after you have passed the corner and the following section. This feedback will compare your performance of your current lap at this corner with the performance of the previous lap (not the reference lap) and will tell you what was good and where you can still improve. The instruction "Coaching.Corner.Review" is used to generate this feedback.
+If this mode is active, Aiden will not only give you instructions for the corners you requested, but will also give you immediate feedback after you have passed the corner and the following section. This feedback will compare the performance of your current lap at this corner with the performance of the previous lap (not the reference lap) and will tell you what was good and where you can still improve. The instruction "Coaching.Corner.Review" is used to generate this feedback.
 
 ### Automatic activation of coaching mode
 

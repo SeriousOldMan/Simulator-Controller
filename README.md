@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.1.4.0-dev](https://www.dropbox.com/scl/fi/vtx1405gu9736zuyitc7w/Simulator-Controller-6.1.4.0-dev.zip?rlkey=esviz0zful7pfzuvz1c3nlfga&st=0y8e6bif&dl=1) (Early build for 6.1.4. Changes: Dynamic strategy creation based on race rules, New car models for Setup Workbench, Initial support for Assetto Corsa EVO, Fixed missing translations, Fixed invalid certificate handling for OpenAI, Changed defaults for "Engineer: Tyre Service".)
+[6.1.4.0-alpha](https://www.dropbox.com/scl/fi/n1sc6ywofwqznmy7pirxz/Simulator-Controller-6.1.4.0-alpha.zip?rlkey=kba3ch4zh8p16a2a4he8fp6r2&st=27koufhz&dl=1) (Test build for 6.1.4. Changes: New voice commands for focusing on specific corners by the Driving Coach, New instruction for post corner review by the Driving Coach, Post corner critics by the Driving Coach, Fixed sector 2 time for LMU and RF2, Fixed strategy handling in autonomous mode, More interruptable Spotter phrases, Integrated latest version of R3E meta data, New car models for Setup Workbench, Optimized Driving Coach instructions, Migrated to AHK 2.1-alpha.15.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-614) of this version and all the versions you might have skipped, before installing and using this version.
 

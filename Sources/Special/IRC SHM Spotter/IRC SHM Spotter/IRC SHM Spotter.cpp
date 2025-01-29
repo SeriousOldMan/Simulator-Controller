@@ -176,9 +176,9 @@ bool getDataValue(char* value, const irsdk_header* header, const char* data, con
 				case irsdk_int:
 					sprintf(value, "%d", ((int*)(data + rec->offset))[0]); break;
 				case irsdk_float:
-					sprintf(value, "%0.2f", ((float*)(data + rec->offset))[0]); break;
+					sprintf(value, "%0.6f", ((float*)(data + rec->offset))[0]); break;
 				case irsdk_double:
-					sprintf(value, "%0.2f", ((double*)(data + rec->offset))[0]); break;
+					sprintf(value, "%0.8f", ((double*)(data + rec->offset))[0]); break;
 				default:
 					return false;
 				}
@@ -1743,12 +1743,14 @@ bool writeCoordinates(const irsdk_header* header, const char* data) {
 		if (laps != lastLap) {
 			lastLap = laps;
 			
-			printf("0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0\n");
+			printf("0.0,0.0,0.0,0.0,0.0\n");
 
 			char* trackPositions;
 
 			if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
 				lastRunning = ((float*)trackPositions)[atoi(playerCarIdx)];
+
+			lastTickCount = GetTickCount();
 
 			recording = true;
 		}
@@ -1756,6 +1758,9 @@ bool writeCoordinates(const irsdk_header* header, const char* data) {
 	else if (laps != lastLap) 
 		return false;
 	else {
+		if (GetTickCount() - lastTickCount < 20)
+			return true;
+
 		int carIdx = atoi(playerCarIdx);
 
 		char* trackPositions;
@@ -1798,23 +1803,8 @@ bool writeCoordinates(const irsdk_header* header, const char* data) {
 		// float dx = distance * sin(yaw);
 		// float dy = distance * cos(yaw);
 
-		getDataValue(buffer, header, data, "VelocityX");
-
-		float velocityX = atof(buffer);
-
-		getDataValue(buffer, header, data, "VelocityY");
-
-		float velocityY = atof(buffer);
-
-		getDataValue(buffer, header, data, "VelocityZ");
-
-		float velocityZ = atof(buffer);
-
-		// float angle = vectorAngle(velocityX, velocityY);
-		float angle = 3.14 + yaw;
-
-		float dx = distance * sin(angle);
-		float dy = distance * cos(angle);
+		float dx = distance * sin(yaw);
+		float dy = distance * cos(yaw);
 
 		if (dx > 0 || dy > 0) {
 			mapStarted = true;
@@ -1822,13 +1812,15 @@ bool writeCoordinates(const irsdk_header* header, const char* data) {
 			lastX += dx;
 			lastY += dy;
 
-			printf("%f,%f,%f,%f,%f,%f,%f,%f\n", running, lastX, lastY, yaw, velocityX, velocityY, angle, distance);
+			printf("%f,%f,%f,%f,%f\n", running, lastX, lastY, yaw, distance);
 
 			if (circuit && (++points > 100) && fabs(lastX - initialX) < 10.0 && fabs(lastY - initialY) < 10.0)
 				return false;
 		}
 		else if (mapStarted && !circuit)
 			return false;
+
+		lastTickCount = GetTickCount();
 	}
 
 	return true;
@@ -2131,8 +2123,12 @@ int main(int argc, char* argv[])
 				triggerType = "Trigger";
 		}
 
-		if (mapTrack && argc > 2)
-			circuit = (strcmp(argv[2], "Circuit") == 0);
+		if (mapTrack) {
+			if (argc > 2)
+				circuit = (strcmp(argv[2], "Circuit") == 0);
+
+			SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
+		}
 
 		if (analyzeTelemetry) {
 			dataFile = argv[2];
@@ -2426,7 +2422,7 @@ int main(int argc, char* argv[])
 		}
 
 		if (mapTrack)
-			Sleep(1);
+			Sleep(20);
 		else if (carTelemetry || analyzeTelemetry || positionTrigger)
 			Sleep(10);
 		else if (wait)

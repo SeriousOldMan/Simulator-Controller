@@ -1423,7 +1423,7 @@ class TelemetryAnalyzer {
 	findTrackSections(telemetry) {
 		local trackMap := this.TrackMap
 		local sections := []
-		local count := getMultiMapValue(trackMap, "Map", "Points")
+		local count := (trackMap ? getMultiMapValue(trackMap, "Map", "Points") : 0)
 		local index := 1
 		local phase := "Find"
 		local cornerNr := 1

@@ -214,7 +214,7 @@ createTrackMap(simulator, track, fileName) {
 
 			for ignore, coordinate in coordinates {
 				if (coordinate[1] != 0.0)
-					normalized[Round(coordinate[1] * 1000)] := [coordinate[2], coordinate[3]]
+					normalized[Max(1, Min(1000, Round(coordinate[1] * 1000)))] := [coordinate[2], coordinate[3]]
 
 				Sleep(1)
 
@@ -362,6 +362,9 @@ startupTrackMapper() {
 
 			deleteFile(data)
 		}
+		catch Any as exception {
+			logError(exception, true)
+		}
 		finally {
 			Task.CurrentTask.Critical := false
 
@@ -372,6 +375,9 @@ startupTrackMapper() {
 	recreateMaps() {
 		try {
 			recreateTrackMaps()
+		}
+		catch Any as exception {
+			logError(exception, true)
 		}
 		finally {
 			ExitApp(0)

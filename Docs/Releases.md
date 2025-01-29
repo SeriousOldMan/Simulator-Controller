@@ -10,6 +10,7 @@
      - New voice commands let you provide the numbers for those corners where you want to get a post corner review. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#list-of-all-voice-commands) for a description.
 	 - A new LLM instruction is available which can be customized to control the different aspects of the critics given by the Driving Coach.
   9. Updated car meta data for *RaceRoom Racing Experience* to the latest version.
+  10. [Internal] Migrated to AHK 2.1-alpha.15.
   
 ## 6.1.3.0-release 01/24/25
   1. Minor bugfixes, as always

@@ -18,10 +18,12 @@
   5. Support for Time+1 session format
   6. Approaching corner braking point countdown
   7. Configurable priority for voice output between Spotter and other Assistants
+  8. Driving Coach uses corner names, if available
 
 #### Session Database
   1. Active validation of value ranges in settings definitions
   2. Integration with an upcoming REST/JSON realtime interface of Second Monitor
+  3. Associate corners in track map with names
 
 #### Setup Workbench
   1. Collect telemetry data from multiple drivers and generate combined setup recommendations

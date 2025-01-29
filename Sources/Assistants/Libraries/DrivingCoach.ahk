@@ -1863,9 +1863,6 @@ class DrivingCoach extends GridRaceAssistant {
 			return
 		}
 
-		if ((this.FocusedCorners.Length > 0) && !inList(this.FocusedCorners, String(cornerNr)))
-			return
-
 		if ((Round(positionX) = -32767) && (Round(positionY) = -32767))
 			return
 
@@ -1893,6 +1890,9 @@ class DrivingCoach extends GridRaceAssistant {
 
 		if (analyzer && instruct) {
 			cornerNr := Integer(analyzer.TrackSections[sectionNr].Nr)
+
+			if ((this.FocusedCorners.Length > 0) && !inList(this.FocusedCorners, String(cornerNr)))
+				return
 
 			telemetry := this.getTelemetry(&reference := true, cornerNr)
 

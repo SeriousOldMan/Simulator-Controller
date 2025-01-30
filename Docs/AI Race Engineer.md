@@ -224,7 +224,7 @@ To reactivate the Assistant use:
 
 These commands are also available as "Mute" and "Unmute" plugin actions, which can be configured for a Button Box or a Stream Deck, for example.
 
-Good to know: Even if Jona is muted, you can interact with the Engineer, for example to plan and prepare a pitstop. If a chain of conversation is initiated by you, the driver, Jona will react normally.
+Good to know: Even if Jona is muted, you can interact with the Engineer, for example to plan and prepare a pitstop. If a chain of conversation is initiated by you, the driver, Jona will react normally. Jona will also communicate with you regarding all pitstop related questions.
 
 ## Racing with Jona
 

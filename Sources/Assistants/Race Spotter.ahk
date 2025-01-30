@@ -17,7 +17,7 @@
 ;@SC #Include "..\Framework\Production.ahk"
 ;@SC-EndIf
 
-;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Artificial Intelligence.ico
+;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Artificial Intelligence Blue.ico
 ;@Ahk2Exe-ExeName Race Spotter.exe
 
 
@@ -79,7 +79,7 @@ checkRemoteProcessAlive(pid) {
 }
 
 startupRaceSpotter() {
-	local icon := kIconsDirectory . "Artificial Intelligence.ico"
+	local icon := kIconsDirectory . "Artificial Intelligence Blue.ico"
 	local remotePID := false
 	local spotterName := "Elisa"
 	local spotterLogo := false

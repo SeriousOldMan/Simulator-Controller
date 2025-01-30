@@ -234,7 +234,7 @@ logMessage(logLevel, message, monitor := true) {
 	}
 }
 
-logError(exception, unhandled := false, report := true) {
+logError(exception, unexpected := false, report := true) {
 	local debug := (isDevelopment() && isDebug())
 	local handle, message, settings
 
@@ -243,25 +243,25 @@ logError(exception, unhandled := false, report := true) {
 	if isObject(exception) {
 		message := exception.Message
 
-		logMessage((unhandled || isDevelopment()) ? kLogCritical : kLogDebug
-				 , translate(unhandled ? "Unhandled exception encountered in " : "Handled exception encountered in ")
+		logMessage((unexpected || isDevelopment()) ? kLogCritical : kLogDebug
+				 , translate(unexpected ? "Unexpected exception encountered in " : "Handled exception encountered in ")
 				 . exception.File . translate(" at line ") . exception.Line . translate(": ") . message)
 
 
 		if exception.HasProp("Stack")
-			logMessage((unhandled || isDevelopment()) ? kLogCritical : kLogDebug, "`n`nStack:`n`n" . exception.Stack, false)
+			logMessage((unexpected || isDevelopment()) ? kLogCritical : kLogDebug, "`n`nStack:`n`n" . exception.Stack, false)
 	}
 	else
-		logMessage(((unhandled || isDevelopment()) || isDevelopment()) ? kLogCritical : kLogDebug
-				 , translate(unhandled ? "Unhandled exception encountered: " : "Handled exception encountered: ") . exception)
+		logMessage(((unexpected || isDevelopment()) || isDevelopment()) ? kLogCritical : kLogDebug
+				 , translate(unexpected ? "Unexpected exception encountered: " : "Handled exception encountered: ") . exception)
 
-	if (verbose && (unhandled || report))
+	if (verbose && (unexpected || report))
 		if isObject(exception)
-			withBlockedWindows(MsgBox, translate(unhandled ? "Unhandled exception encountered in " : "Handled exception encountered in ")
-				 . exception.File . translate(" at line ") . exception.Line . translate(": ") . exception.Message
-				 . (exception.HasProp("Stack") ? ("`n`nStack:`n`n" . exception.Stack) : ""))
+			withBlockedWindows(MsgBox, translate(unexpected ? "Unexpected exception encountered in " : "Handled exception encountered in ")
+									 . exception.File . translate(" at line ") . exception.Line . translate(": ") . exception.Message
+									 . (exception.HasProp("Stack") ? ("`n`nStack:`n`n" . exception.Stack) : ""))
 		else
-			withBlockedWindows(MsgBox, translate(unhandled ? "Unhandled exception encountered: " : "Handled exception encountered: ") . exception)
+			withBlockedWindows(MsgBox, translate(unexpected ? "Unexpected exception encountered: " : "Handled exception encountered: ") . exception)
 
 	if debug
 		return (A_IsCompiled ? -1 : false)

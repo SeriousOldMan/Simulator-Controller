@@ -17,7 +17,7 @@
 ;@SC #Include "..\Framework\Production.ahk"
 ;@SC-EndIf
 
-;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Artificial Intelligence.ico
+;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Artificial Intelligence Green.ico
 ;@Ahk2Exe-ExeName Race Strategist.exe
 
 
@@ -79,7 +79,7 @@ checkRemoteProcessAlive(pid) {
 }
 
 startupRaceStrategist() {
-	local icon := kIconsDirectory . "Artificial Intelligence.ico"
+	local icon := kIconsDirectory . "Artificial Intelligence Green.ico"
 	local remotePID := false
 	local strategistName := "Cato"
 	local strategistLogo := false

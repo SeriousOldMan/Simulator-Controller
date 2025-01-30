@@ -1604,7 +1604,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui.SetFont("s8 Norm", "Arial")
 
-		editorGui.Add("Edit", "x280 yp+32 w390 h94 X:Move(0.2) W:Grow(0.8) vnotesEdit").OnEvent("Change", updateNotes)
+		editorGui.Add("Edit", "x280 yp+26 w390 h94 X:Move(0.2) W:Grow(0.8) vnotesEdit").OnEvent("Change", updateNotes)
 
 		editorGui.Add("Text", "x16 yp+104 w654 W:Grow 0x10")
 

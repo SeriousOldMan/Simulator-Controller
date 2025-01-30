@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.1.4.0-alpha](https://www.dropbox.com/scl/fi/n1sc6ywofwqznmy7pirxz/Simulator-Controller-6.1.4.0-alpha.zip?rlkey=kba3ch4zh8p16a2a4he8fp6r2&st=27koufhz&dl=1) (Test build for 6.1.4. Changes: New voice commands for focusing on specific corners by the Driving Coach, New instruction for post corner review by the Driving Coach, Post corner critics by the Driving Coach, Fixed sector 2 time for LMU and RF2, Fixed strategy handling in autonomous mode, More interruptable Spotter phrases, Integrated latest version of R3E meta data, New car models for Setup Workbench, Optimized Driving Coach instructions, Migrated to AHK 2.1-alpha.15.)
+[6.1.4.0-alpha](https://www.dropbox.com/scl/fi/n1sc6ywofwqznmy7pirxz/Simulator-Controller-6.1.4.0-alpha.zip?rlkey=kba3ch4zh8p16a2a4he8fp6r2&st=27koufhz&dl=1) (Test build for 6.1.4. Changes: New voice commands for focusing on specific corners by the Driving Coach, New instruction for post corner review by the Driving Coach, Post corner critics by the Driving Coach, Fixed sector 2 time for LMU and RF2, Fixed strategy handling in autonomous mode, More interruptable Spotter phrases, Integrated latest version of R3E meta data, New car models for Setup Workbench, Optimized Driving Coach instructions, Migrated to AHK 2.1-alpha.15, Fixed track mapping for iRacing.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-614) of this version and all the versions you might have skipped, before installing and using this version.
 
@@ -126,6 +126,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 31. [Mastering on-track coaching](https://youtu.be/Gnzye2kf7HI) - This video gives you valuable insights in the configuration of the on-track coaching provided by the Driving Coach. A live conversation is also part of the demonstration.
 
 32. [Running an LMU race with an AI pit crew](https://youtu.be/ntQRnx0Grjk) - Demonstration of the new automated strategy and pitstop handling for Le Mans Ultimate. Please don't judge my driving, this was for demonstration purposes. :-)
+
+33. [Section feedback of the Driving Coach](https://youtu.be/jexBxAjmU1s) - This short video demonstrates a new feature of the Drivng Coach. If this is enabled, you will get immediate feedback for your driving performance in the last section of the track.
 
 This list will be extended from time to time to cover new functionalities.
 

@@ -1,4 +1,4 @@
-## 6.1.4.0-release 01/31/25 (planned)
+## 6.1.4.0-release 01/31/25
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed time of second sector in "Solo Center" and "Team Center" for *rFactor 2* and *Le Mans Ultimate*.

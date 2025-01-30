@@ -21,7 +21,7 @@
 		- Radical RXC Turbo GT3
 		- McLaren 650s GT3 (fixed Aero Height at the front)
 		
-      With this release, the list of GT3 cars for *rFactor 2* is complete. I won't create meta data for more cars, but doing this on your own is easy. Let me know, and I will be happy to give instructions.
+      With this release, the list of GT3 cars for *rFactor 2* is complete (with only the latest version for the Audi and the Bentley). I won't create meta data for more cars, but doing this on your own is easy. Let me know, and I will be happy to give instructions.
 
 ## 6.1.3.0-release 01/24/25
   1. Minor bugfixes, as always

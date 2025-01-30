@@ -20,10 +20,10 @@
 #Include "..\..\Libraries\RuleEngine.ahk"
 #Include "..\..\Libraries\Database.ahk"
 #Include "..\..\Libraries\LLMConnector.ahk"
-#Include "RaceAssistant.ahk"
-#Include "Strategy.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\..\Database\Libraries\TelemetryDatabase.ahk"
+#Include "RaceAssistant.ahk"
+#Include "Strategy.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -3327,8 +3327,11 @@ class RaceStrategist extends GridRaceAssistant {
 					if ((pitstop.Lap >= maxLap) && (scenario.Pitstops[1].Lap < pitstop.Lap))
 						return true
 		}
-		else ; Nothing to see here, move on
+		else if (!cPitstops && !sPitstops) {
+			; Nothing to see here, move on
+
 			return false
+		}
 
 		; if (!sPitstops && cPitstops)
 		;	extended := false
@@ -3485,6 +3488,8 @@ class RaceStrategist extends GridRaceAssistant {
 							if (this.Strategy["Rejected"] && isInstance(this.Strategy["Rejected"], Strategy) && !this.betterScenario(this.Strategy["Rejected"], scenario, &report))
 								return
 							else if ((this.Strategy != this.Strategy["Original"]) && !this.betterScenario(this.Strategy, scenario, &report))
+								return
+							else if ((this.Strategy.RunningPitstops > 0) && !this.betterScenario(this.Strategy, scenario, &report))
 								return
 
 						if (report && this.Speaker) {
@@ -3813,6 +3818,9 @@ class RaceStrategist extends GridRaceAssistant {
 	pitstopPerformed(pitstopNr) {
 		if this.Strategy
 			this.Strategy.RunningPitstops += 1
+
+		if (this.Strategy["Rejected"] && isInstance(this.Strategy["Rejected"], Strategy))
+			this.Strategy["Rejected"].RunningPitstops += 1
 	}
 
 	callRecommendPitstop(lapNumber := false) {

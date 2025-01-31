@@ -270,9 +270,9 @@ A special case when recording the track coordinates is *iRacing*. This simulator
 1. Initialize the starting position as *x = 0.0* and *y = 0.0*.
 1. Apply a fixed sampling rate, in this case 60 Hz.
 2. Get a cars *yaw* value from the *iRacing* API.
-4. Get the cars *velocity* for the x-direction from the *iRacing* API.
-5. Calculate *dx* as *velocity(x)* * *sin(yaw)*.
-6. Calculate *dy* as *velocity(x)* * *cos(yaw)*.
+4. Get the cars *velocity* from the *iRacing* API and calculate the distance traveled since the last sample.
+5. Calculate *dx* as *distance* * *sin(yaw)*.
+6. Calculate *dy* as *distance* * *cos(yaw)*.
 7. Set *x* as *x* + *dx*.
 8. Set *y* as *y* + *dy*.
 9. Wait one sample and go to 2. unless the starting position (plus / minus a threshold) has been reached.
@@ -283,7 +283,7 @@ As you can see, the yaw angle is the most important value in this calculation, t
 
 When a track map is available, the Race Spotter is able to trigger special actions at any location of the track. Using this actions, you can send commands to the running simulator to switch between car settings, for example the traction control.
 
-Track Automations are configured in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database). Once a track map is available for a given track, you can choose the "Automation" section there:
+Track Automations are configured in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database). Once a track map is available for a given track, you can choose the "Track & Automation" section there:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Track%20Automation%202.JPG)
 

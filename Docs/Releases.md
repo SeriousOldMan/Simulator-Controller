@@ -12,7 +12,7 @@
 	 - A new LLM instruction is available which can be customized to control the different aspects of the critics given by the Driving Coach.
   10. Optimized the Driving Coach instructions used when approaching a corner.
   11. Updated car meta data for *RaceRoom Racing Experience* to the latest version.
-  12. [Expert] "Simulator Startup" now supports the [integration of additional startup scripts](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#notes) to customize your environment when starting up Simulator Controller.
+  12. [Expert] "Simulator Startup" now supports the [integration of additional startup scripts](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#customizing-startup-configuration) to customize your environment when starting up Simulator Controller.
   13. [Internal] Migrated to AHK 2.1-alpha.15.
   14. New car models for "Setup Workbench":
       - rFactor 2

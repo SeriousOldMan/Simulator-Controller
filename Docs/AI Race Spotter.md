@@ -148,7 +148,7 @@ Elisa tracks the positions, lap times and the deltas to your own car for four di
 
 When you approach a car in front of you, Elisa will gather all available information for the given car, whether the driver is quite inconsistent or is doing a lot of mistakes, and so on. Depending on the situation, Elisa might give you this information and will ask you to be careful, if necessary.
 
-Elise uses different delta thresholds to decide, whether the situation changed to an extent that an update will be of any value for you. You can define your own thresholds in the "Race Settings" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database). See the table below for the thresholds and their default values.
+Elise uses different delta thresholds to decide, whether the situation changed to an extent that an update will be of any value for you. You can define your own thresholds in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database". See the table below for the thresholds and their default values.
 
 | Threshold                | Default Value (Seconds) |
 | ------------------------ | ----------------------- |

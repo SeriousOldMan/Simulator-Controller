@@ -1947,7 +1947,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			settingsGui.Add("Text", "x126 yp+30 r6 w256", translate("Note: These settings define the access data for a team session. In order to join this session, it is still necessary for you to activate the team mode within the first lap of the session. Please consult the documentation for more information and detailed instructions."))
 
 			if (gTeamMode = "Team")
-				settingsTab.Value := 4
+				settingsTab.Value := 5
 		}
 
 		loadTyreCompounds()

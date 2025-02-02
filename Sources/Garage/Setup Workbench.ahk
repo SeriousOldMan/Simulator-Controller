@@ -1058,12 +1058,16 @@ class SetupWorkbench extends ConfigurationItem {
 							if (!fast && !isDebug())
 								Sleep(25)
 						}
-						else if knowledgeBase.prove(compiler.compileGoal("characteristicActive("
-																	   . StrReplace(values2String(",", simulator, car, track, characteristic), A_Space, "\ ")
-																	   . ")")) {
-							showProgress({progress: ++this.ProgressCount})
+						else {
+							option := StrReplace(values2String(",", simulator, car, track, characteristic), A_Space, "\ ")
+							option := StrReplace(option, "(", "\(")
+							option := StrReplace(option, ")", "\)")
 
-							this.Characteristics.Push(characteristic)
+							if knowledgeBase.prove(compiler.compileGoal("characteristicActive(" . option . ")")) {
+								showProgress({progress: ++this.ProgressCount})
+
+								this.Characteristics.Push(characteristic)
+							}
 						}
 					}
 				}
@@ -1081,12 +1085,16 @@ class SetupWorkbench extends ConfigurationItem {
 						if (!fast && !isDebug())
 							Sleep(25)
 					}
-					else if knowledgeBase.prove(compiler.compileGoal("characteristicActive("
-																   . StrReplace(values2String(",", simulator, car, track, characteristic), A_Space, "\ ")
-																   . ")")) {
-						showProgress({progress: ++this.ProgressCount})
+					else {
+						option := StrReplace(values2String(",", simulator, car, track, characteristic), A_Space, "\ ")
+						option := StrReplace(option, "(", "\(")
+						option := StrReplace(option, ")", "\)")
 
-						this.Characteristics.Push(characteristic)
+						if knowledgeBase.prove(compiler.compileGoal("characteristicActive(" . option . ")")) {
+							showProgress({progress: ++this.ProgressCount})
+
+							this.Characteristics.Push(characteristic)
+						}
 					}
 				}
 			}
@@ -1147,12 +1155,16 @@ class SetupWorkbench extends ConfigurationItem {
 							if (!fast && !isDebug())
 								Sleep(25)
 						}
-						else if knowledgeBase.prove(compiler.compileGoal("settingAvailable("
-																	   . StrReplace(values2String(",", simulator, car, setting), A_Space, "\ ")
-																	   . ")")) {
-							showProgress({progress: ++this.ProgressCount})
+						else {
+							option := StrReplace(values2String(",", simulator, car, setting), A_Space, "\ ")
+							option := StrReplace(option, "(", "\(")
+							option := StrReplace(option, ")", "\)")
 
-							this.Settings.Push(setting)
+							if knowledgeBase.prove(compiler.compileGoal("settingAvailable(" . option . ")")) {
+								showProgress({progress: ++this.ProgressCount})
+
+								this.Settings.Push(setting)
+							}
 						}
 					}
 				}
@@ -1170,12 +1182,16 @@ class SetupWorkbench extends ConfigurationItem {
 						if (!fast && !isDebug())
 							Sleep(25)
 					}
-					else if knowledgeBase.prove(compiler.compileGoal("settingAvailable("
-																   . StrReplace(values2String(",", simulator, car, setting), A_Space, "\ ")
-																   . ")")) {
-						showProgress({progress: ++this.ProgressCount})
+					else {
+						option := StrReplace(values2String(",", simulator, car, setting), A_Space, "\ ")
+						option := StrReplace(option, "(", "\(")
+						option := StrReplace(option, ")", "\)")
 
-						this.Settings.Push(setting)
+						if knowledgeBase.prove(compiler.compileGoal("settingAvailable(" . option . ")")) {
+							showProgress({progress: ++this.ProgressCount})
+
+							this.Settings.Push(setting)
+						}
 					}
 				}
 			}

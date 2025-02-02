@@ -770,13 +770,18 @@ class TelemetryViewer {
 			layouts := CaseInsenseMap()
 
 			for name, definition in getMultiMapValues(configuration, "Layouts")
-				layouts[name] := {Name: name
-								, WidthZoom: getMultiMapValue(configuration, "Zoom", name . ".Width", 100)
-								, HeightZoom: getMultiMapValue(configuration, "Zoom", name . ".Height", 100)
-								, Channels: choose(collect(string2Values(",", definition), (name) {
-													   return choose(kTelemetryChannels, (s) => s.Name = name)[1]
-												   })
-												 , (s) => s.HasProp("Size"))}
+				try {
+					layouts[name] := {Name: name
+									, WidthZoom: getMultiMapValue(configuration, "Zoom", name . ".Width", 100)
+									, HeightZoom: getMultiMapValue(configuration, "Zoom", name . ".Height", 100)
+									, Channels: choose(collect(string2Values(",", definition), (name) {
+														   return choose(kTelemetryChannels, (s) => s.Name = name)[1]
+													   })
+													 , (s) => s.HasProp("Size"))}
+				}
+				catch Any as exception {
+					logError(exception)
+				}
 
 			this.iLayouts := layouts
 			this.iSelectedLayout := getMultiMapValue(configuration, "Selected", "Layout")

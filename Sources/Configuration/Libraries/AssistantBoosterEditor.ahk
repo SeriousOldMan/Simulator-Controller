@@ -1124,6 +1124,10 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 	}
 }
 
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; CallbacksEditor                                                         ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
 class CallbacksEditor {
 	iEditor := false
 	iType := false
@@ -1405,7 +1409,7 @@ class CallbacksEditor {
 
 		editorGui.SetFont("Norm", "Arial")
 
-		editorGui.Add("Button", "x350 yp+10 w80 h23 Default X:Move(0.5) Y:Move", translate("Ok")).OnEvent("Click", (*) => (GetKeyState("Ctrl") && (this.Type != "Agent.Events"))? this.showCallbacks() : (this.iResult := kOk))
+		editorGui.Add("Button", "x350 yp+10 w80 h23 Default X:Move(0.5) Y:Move", translate("Ok")).OnEvent("Click", (*) => (GetKeyState("Ctrl") && (this.Type != "Agent.Events")) ? this.showCallbacks() : (this.iResult := kOk))
 		editorGui.Add("Button", "x436 yp w80 h23 X:Move(0.5) Y:Move", translate("&Cancel")).OnEvent("Click", (*) => this.iResult := kCancel)
 
 		this.iParametersListView := editorGui.Add("ListView", "x430 ys w418 h96 X:Move(0.34) W:Grow(0.66) Y:Move(0.25) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Parameter", "Description"], translate))
@@ -2138,11 +2142,19 @@ class CallbacksEditor {
 	}
 }
 
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; EventsEditor                                                            ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
 class EventsEditor extends CallbacksEditor {
 	editEvents(owner := false) {
 		this.editCallbacks(owner)
 	}
 }
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; ActionsEditor                                                           ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class ActionsEditor extends CallbacksEditor {
 	editActions(owner := false) {

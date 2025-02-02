@@ -4005,7 +4005,7 @@ class ValidatorsEditor {
 
 		editorGui.SetFont("Norm", "Arial")
 
-		editorGui.Add("Documentation", "x308 YP+20 w248 H:Center Center", translate("Scenario Validators")
+		editorGui.Add("Documentation", "x308 YP+20 w248 H:Center Center", translate("Validation Rules")
 					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#scenario-validation")
 
 		editorGui.SetFont("Norm", "Arial")

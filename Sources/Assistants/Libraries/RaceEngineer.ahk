@@ -1967,7 +1967,7 @@ class RaceEngineer extends RaceAssistant {
 									, "Session.Settings.Pitstop.Repair.Suspension.Duration", suspensionDuration
 									, "Session.Settings.Pitstop.Repair.Engine.Duration", engineDuration
 									, "Session.Settings.Pitstop.Delta", getMultiMapValue(settings, "Strategy Settings", "Pitstop.Delta"
-																					   , getDeprecatedValue(settings, "Session Settings", "Race Settings", "Pitstop.Delta", 30))
+																					   , getDeprecatedValue(settings, "Session Settings", "Race Settings", "Pitstop.Delta", 60))
 									, "Session.Settings.Pitstop.Service.Refuel.Rule", getMultiMapValue(settings, "Strategy Settings"
 																											   , "Service.Refuel.Rule", "Dynamic")
 									, "Session.Settings.Pitstop.Service.Refuel.Duration", getMultiMapValue(settings, "Strategy Settings"

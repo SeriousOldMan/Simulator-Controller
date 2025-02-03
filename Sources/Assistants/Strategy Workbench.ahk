@@ -4025,8 +4025,8 @@ class ValidatorsEditor {
 		editorGui.Add("Button", "x324 yp w23 h23 Center +0x200 Y:Move(0.25) vdeleteValidatorButton").OnEvent("Click", (*) => this.deleteValidator())
 		setButtonIcon(editorGui["deleteValidatorButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
-		editorGui.Add("Text", "x16 yp+1 w80 h23 Y:Move(0.25)", translate("Name"))
-		editorGui.Add("Edit", "x96 yp-1 h23 w177 Y:Move(0.25) vvalidatorNameEdit").OnEvent("Change", updateValidatorsList)
+		editorGui.Add("Text", "x16 yp+2 w70 h23 Y:Move(0.25)", translate("Name"))
+		editorGui.Add("Edit", "x86 yp-2 h23 w177 Y:Move(0.25) vvalidatorNameEdit").OnEvent("Change", updateValidatorsList)
 
 		editorGui.SetFont("Norm", "Courier New")
 

@@ -266,7 +266,11 @@ Beside these predicates, which access the data of the current scenario, you have
 
 ##### Integrating into Strategy Workbench
 
-Once you have created a set of validation rules similar to the examples above, you can put the script in a file with the ".rules" extension and place this file in the *Validators* folder which is located in the *Simulator Controller* folder in your user *Documents* folder. For your convenience, this folder opens when you choose the "Rules:" item in the "Settings" menu. Once you have done this, you can activate the *validator* in the "Settings" menu of "Simulator Workbench". And from now on, you can hold down the control key while selecting the validator from the menu to start a text editor for this file.
+To take a look at the predefined validation rules or to create your own ones, you can use a special rule editor, which can be opened by selecting the "Rules:" item in the "Session" menu.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Validation%20Rules.JPG)
+
+You can create new rules by clicking on the "+" button or you can copy one of the existing rules as a starting point. The predefined validation rules cannot be changed, of course.
 
 ### Pitstop & Service
 

@@ -4012,21 +4012,21 @@ class ValidatorsEditor {
 
 		editorGui.Add("Text", "x8 yp+30 w848 W:Grow 0x10")
 
-		this.iValidatorsListView := editorGui.Add("ListView", "x16 y+10 w332 h140 W:Grow H:Grow(0.25) -Multi -LV0x10 AltSubmit NoSort NoSortHdr"
+		this.iValidatorsListView := editorGui.Add("ListView", "x16 y+10 w332 h140 H:Grow(0.25) -Multi -LV0x10 AltSubmit NoSort NoSortHdr"
 												, collect(["Name"], translate))
 
 		this.iValidatorsListView.OnEvent("Click", chooseValidator)
 		this.iValidatorsListView.OnEvent("DoubleClick", chooseValidator)
 
-		editorGui.Add("Button", "x276 yp+145 w23 h23 Center +0x200 X:Move Y:Move(0.25) vaddValidatorButton").OnEvent("Click", (*) => this.addValidator())
+		editorGui.Add("Button", "x276 yp+145 w23 h23 Center +0x200 Y:Move(0.25) vaddValidatorButton").OnEvent("Click", (*) => this.addValidator())
 		setButtonIcon(editorGui["addValidatorButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
-		editorGui.Add("Button", "x300 yp w23 h23 Center +0x200 X:Move Y:Move(0.25) vcopyValidatorButton").OnEvent("Click", (*) => this.copyValidator())
+		editorGui.Add("Button", "x300 yp w23 h23 Center +0x200 Y:Move(0.25) vcopyValidatorButton").OnEvent("Click", (*) => this.copyValidator())
 		setButtonIcon(editorGui["copyValidatorButton"], kIconsDirectory . "Copy.ico", 1, "L4 T4 R4 B4")
-		editorGui.Add("Button", "x324 yp w23 h23 Center +0x200 X:Move Y:Move(0.25) vdeleteValidatorButton").OnEvent("Click", (*) => this.deleteValidator())
+		editorGui.Add("Button", "x324 yp w23 h23 Center +0x200 Y:Move(0.25) vdeleteValidatorButton").OnEvent("Click", (*) => this.deleteValidator())
 		setButtonIcon(editorGui["deleteValidatorButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
 		editorGui.Add("Text", "x16 yp+1 w80 h23 Y:Move(0.25)", translate("Name"))
-		editorGui.Add("Edit", "x96 yp-1 h23 w177 W:Grow(0.34) Y:Move(0.25) vvalidatorNameEdit").OnEvent("Change", updateValidatorsList)
+		editorGui.Add("Edit", "x96 yp-1 h23 w177 Y:Move(0.25) vvalidatorNameEdit").OnEvent("Change", updateValidatorsList)
 
 		editorGui.SetFont("Norm", "Courier New")
 

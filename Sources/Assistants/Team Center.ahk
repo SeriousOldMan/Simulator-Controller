@@ -8102,12 +8102,12 @@ class TeamCenter extends ConfigurationItem {
 						tyreCompound := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound", false)
 						tyreCompoundColor := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound.Color", false)
 						tyreSet := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Set", "-")
-						
+
 						pressureFL := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Pressure.FL", "-")
 						pressureFR := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Pressure.FR", "-")
 						pressureRL := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Pressure.RL", "-")
 						pressureRR := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Pressure.RR", "-")
-						
+
 						if !pressureFL
 							pressureFL := "-"
 						if !pressureFR
@@ -8116,7 +8116,7 @@ class TeamCenter extends ConfigurationItem {
 							pressureRL := "-"
 						if !pressureRR
 							pressureRR := "-"
-							
+
 						repairBodywork := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Repair.Bodywork", false)
 						repairSuspension := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Repair.Suspension", false)
 						repairEngine := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Repair.Engine", false)
@@ -9197,7 +9197,7 @@ class TeamCenter extends ConfigurationItem {
 
 	saveSetups(flush := false) {
 		local sessionStore := this.SessionStore
-		local driver, conditions, tyreCompound, tyreCompoundColor, pressures, notes, temperatures
+		local driver, conditions, tyreCompound, tyreCompoundColor, pressures, notes, temperatures, index
 
 		sessionStore.clear("Setups.Data")
 
@@ -9213,8 +9213,16 @@ class TeamCenter extends ConfigurationItem {
 
 			tyreCompoundColor := false
 
-			splitCompound(this.TyreCompounds[inList(collect(this.TyreCompounds, translate), tyreCompound)]
-						, &tyreCompound, &tyreCompoundColor)
+			index := inList(collect(this.TyreCompounds, translate), tyreCompound)
+
+			if index
+				splitCompound(this.TyreCompounds[index], &tyreCompound, &tyreCompoundColor)
+			else if (this.TyreCompounds.Length > 0)
+				splitCompound(this.TyreCompounds[1], &tyreCompound, &tyreCompoundColor)
+			else {
+				tyreCompound := "Dry"
+				tyreCompoundColor := "Black"
+			}
 
 			pressures := string2Values(", ", pressures)
 
@@ -11950,7 +11958,7 @@ class TeamCenter extends ConfigurationItem {
 
 					if isNumber(pressure)
 						coldPressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
-					else (pressure = kNull)
+					else if (pressure = kNull)
 						coldPressures[A_Index] := "-"
 				}
 

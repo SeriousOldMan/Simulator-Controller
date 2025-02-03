@@ -264,7 +264,7 @@ Beside these predicates, which access the data of the current scenario, you have
   
     *?resultList* is unified with a list which contains all elements of *?list* except all occurences of *?value*.
 
-##### Integrating into Strategy Workbench
+##### Editing validation rules
 
 To take a look at the predefined validation rules or to create your own ones, you can use a special rule editor, which can be opened by selecting the "Rules:" item in the "Session" menu.
 

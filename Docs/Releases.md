@@ -7,7 +7,7 @@
   6. Fixed display of cold tyre pressure recommendations in the lap report of the "Team Center" and "Solo Center".
   7. The layout editor for Button Boxes has been extended with additional validations, so that no invalid layouts can be defined anymore.
   8. The Engineer will now use the most recent values of remaining fuel, tyre temperatures and pressures as well as brake temperatures (if available) rather than the values at the start of the current lap, when asked for this information using a voice command or a controller action.
-  9. The special validation rules in "Setup Workbench" can now be edited using a specialized syntax aware editor for the underlying rule language. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#scenario-validation) for more information.
+  9. The special validation rules in "Setup Workbench" can now be edited using a specialized syntax aware editor for the underlying rule language. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#editing-validation-rules) for more information.
 
 ## 6.1.4.0-release 01/31/25
   1. Minor bugfixes, as always

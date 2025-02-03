@@ -33,6 +33,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\Libraries\HTMLViewer.ahk"
+#Include "..\Libraries\CodeEditor.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Database\Libraries\SessionDatabaseBrowser.ahk"
 #Include "..\Database\Libraries\SettingsDatabase.ahk"
@@ -1911,7 +1912,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	updateSettingsMenu() {
 		local settingsMenu := collect(["Settings", "---------------------------------------------", "Initialize from Strategy", "Initialize from Settings...", "Initialize from Database", "Initialize from Telemetry", "Initialize from Simulation", "---------------------------------------------"], translate)
 		local fileNames := getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\")
-		local validators, ignore, fileName, validator
+		local validators, ignore, fileName, validator, found
 
 		if this.FixedPitstops
 			settingsMenu.Push(translate("[x]") . A_Space . translate("Fixed Pitstops"))
@@ -1923,6 +1924,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			settingsMenu.Push(translate("Rules:"))
 
 			validators := []
+			found := false
 
 			for ignore, fileName in fileNames {
 				SplitPath(fileName, , , , &validator)
@@ -1930,12 +1932,18 @@ class StrategyWorkbench extends ConfigurationItem {
 				if !inList(validators, validator) {
 					validators.Push(validator)
 
-					if (validator = this.SelectedValidator)
+					if (validator = this.SelectedValidator) {
 						settingsMenu.Push("[x] " . validator)
+
+						found := true
+					}
 					else
 						settingsMenu.Push("[  ] " . validator)
 				}
 			}
+
+			if !found
+				this.iSelectedValidator := false
 		}
 
 		this.Control["settingsMenuDropDown"].Delete()
@@ -3039,45 +3047,34 @@ class StrategyWorkbench extends ConfigurationItem {
 					}
 				}
 			default:
-				if (line = 11)
-					Run(kUserHomeDirectory . "Validators")
+				if (line = 11) {
+					this.Window.Block()
+
+					try {
+						ValidatorsEditor(this).editValidators(this.Window)
+					}
+					finally {
+						this.Window.Unblock()
+					}
+				}
 				else if (line > 11) {
 					validators := []
 
-					if GetKeyState("Ctrl") {
-						index := 0
+					for ignore, fileName in getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\") {
+						SplitPath(fileName, , , , &validator)
 
-						for ignore, fileName in getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\") {
-							SplitPath(fileName, , , , &validator)
-
-							if !inList(validators, validator) {
-								if ((++index = (line - 11)) && !InStr(fileName, kResourcesDirectory)) {
-									Run("notepad " fileName)
-
-									break
-								}
-							}
-							else
-								validators.Push(validator)
-						}
+						if !inList(validators, validator)
+							validators.Push(validator)
 					}
-					else {
-						for ignore, fileName in getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\") {
-							SplitPath(fileName, , , , &validator)
 
-							if !inList(validators, validator)
-								validators.Push(validator)
-						}
+					validator := validators[line - 11]
 
-						validator := validators[line - 11]
+					if (this.iSelectedValidator = validator)
+						this.iSelectedValidator := false
+					else
+						this.iSelectedValidator := validator
 
-						if (this.iSelectedValidator = validator)
-							this.iSelectedValidator := false
-						else
-							this.iSelectedValidator := validator
-
-						this.updateSettingsMenu()
-					}
+					this.updateSettingsMenu()
 				}
 		}
 
@@ -3872,6 +3869,478 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 			}
 		}
+	}
+}
+
+class ValidatorsEditor {
+	iWorkbench := false
+
+	iWindow := false
+	iResult := false
+
+	iValidatorsListView := false
+	iNameField := false
+	iScriptEditor := false
+
+	iValidators := []
+	iSelectedValidator := false
+
+	class ValidatorsEditorWindow extends Window {
+		iValidatorsEditor := false
+
+		ValidatorsEditor {
+			Get {
+				return this.iValidatorsEditor
+			}
+		}
+
+		__New(editor) {
+			this.iValidatorsEditor := editor
+
+			super.__New({Descriptor: ("Strategy Workbench.Validators Editor"), Closeable: true, Resizeable: true, Options: "0x400000"})
+		}
+
+		Close(*) {
+			local translator
+
+			if this.Closeable {
+				translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
+
+				OnMessage(0x44, translator)
+				msgResult := withBlockedWindows(MsgBox, translate("Do you want to save your changes?"), translate("Close"), 262179)
+				OnMessage(0x44, translator, 0)
+
+				if (msgResult = "Yes")
+					this.ValidatorsEditor.iResult := kOk
+				else if (msgResult = "No")
+					this.ValidatorsEditor.iResult := kCancel
+				else if (msgResult = "Cancel")
+					return true
+			}
+			else
+				return true
+		}
+	}
+
+	Workbench {
+		Get {
+			return this.iWorkbench
+		}
+	}
+
+	Window {
+		Get {
+			return this.iWindow
+		}
+	}
+
+	Control[name] {
+		Get {
+			return this.Window[name]
+		}
+	}
+
+	ValidatorsListView {
+		Get {
+			return this.iValidatorsListView
+		}
+	}
+
+	NameField {
+		Get {
+			return this.iNameField
+		}
+	}
+
+	ScriptEditor {
+		Get {
+			return this.iScriptEditor
+		}
+	}
+
+	Validators[key?] {
+		Get {
+			return (isSet(key) ? this.iValidators[key] : this.iValidators)
+		}
+
+		Set {
+			return (isSet(key) ? (this.iValidators[key] := value) : (this.iValidators := value))
+		}
+	}
+
+	SelectedValidator {
+		Get {
+			return this.iSelectedValidator
+		}
+	}
+
+	__New(workbench) {
+		this.iWorkbench := workbench
+	}
+
+	createGui() {
+		local editorGui
+
+		chooseValidator(listView, line, *) {
+			this.selectValidator(line ? this.Validators[line] : false)
+		}
+
+		updateValidatorsList(*) {
+			if this.SelectedValidator
+				this.ValidatorsListView.Modify(inList(this.Validators, this.SelectedValidator), ""
+											 , Trim(this.Control["validatorNameEdit"].Text))
+
+			this.updateState()
+		}
+
+		; editorGui := Window({Descriptor: (this.Type . " Editor"), Resizeable: true, Options: "0x400000"})
+
+		editorGui := ValidatorsEditor.ValidatorsEditorWindow(this)
+
+		this.iWindow := editorGui
+
+		editorGui.SetFont("Bold", "Arial")
+
+		editorGui.Add("Text", "w848 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(editorGui, "Strategy Workbench.Validators Editor"))
+
+		editorGui.SetFont("Norm", "Arial")
+
+		editorGui.Add("Documentation", "x308 YP+20 w248 H:Center Center", translate("Validation Rules")
+					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#scenario-validation")
+
+		editorGui.SetFont("Norm", "Arial")
+
+		editorGui.Add("Text", "x8 yp+30 w848 W:Grow 0x10")
+
+		this.iValidatorsListView := editorGui.Add("ListView", "x16 y+10 w332 h140 H:Grow(0.25) -Multi -LV0x10 AltSubmit NoSort NoSortHdr"
+												, collect(["Name"], translate))
+
+		this.iValidatorsListView.OnEvent("Click", chooseValidator)
+		this.iValidatorsListView.OnEvent("DoubleClick", chooseValidator)
+
+		editorGui.Add("Button", "x276 yp+145 w23 h23 Center +0x200 Y:Move(0.25) vaddValidatorButton").OnEvent("Click", (*) => this.addValidator())
+		setButtonIcon(editorGui["addValidatorButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		editorGui.Add("Button", "x300 yp w23 h23 Center +0x200 Y:Move(0.25) vcopyValidatorButton").OnEvent("Click", (*) => this.copyValidator())
+		setButtonIcon(editorGui["copyValidatorButton"], kIconsDirectory . "Copy.ico", 1, "L4 T4 R4 B4")
+		editorGui.Add("Button", "x324 yp w23 h23 Center +0x200 Y:Move(0.25) vdeleteValidatorButton").OnEvent("Click", (*) => this.deleteValidator())
+		setButtonIcon(editorGui["deleteValidatorButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+
+		editorGui.Add("Text", "x16 yp+1 w80 h23 Y:Move(0.25)", translate("Name"))
+		editorGui.Add("Edit", "x96 yp-1 h23 w177 Y:Move(0.25) vvalidatorNameEdit").OnEvent("Change", updateValidatorsList)
+
+		editorGui.SetFont("Norm", "Courier New")
+
+		this.iScriptEditor := editorGui.Add("CodeEditor", "x16 yp+30 w832 h140 DefaultOpt SystemTheme Border Disabled W:Grow Y:Move(0.25) H:Grow(0.75)")
+
+		this.ScriptEditor.CaseSense := false
+
+		this.ScriptEditor.SetKeywords("priority"
+									, "Any All None One Predicate"
+									, "Call Prove ProveAll Set Get Clear Produce Option Sqrt Unbound Append get"
+									, "messageShow messageBox"
+									, "? ! fail"
+									, ""
+									, "true false")
+
+		this.ScriptEditor.Brace.Chars := "()[]{}"
+		this.ScriptEditor.SyntaxEscapeChar := "``"
+		this.ScriptEditor.SyntaxCommentLine := ";"
+
+		this.ScriptEditor.Tab.Width := 4
+
+		editorGui.Add("Text", "x8 yp+150 w848 Y:Move W:Grow 0x10")
+
+		editorGui.SetFont("Norm", "Arial")
+
+		editorGui.Add("Button", "x350 yp+10 w80 h23 Default X:Move(0.5) Y:Move", translate("Ok")).OnEvent("Click", (*) => this.iResult := kOk)
+		editorGui.Add("Button", "x436 yp w80 h23 X:Move(0.5) Y:Move", translate("&Cancel")).OnEvent("Click", (*) => this.iResult := kCancel)
+
+		this.updateState()
+	}
+
+	setScript(text, readOnly := false) {
+		this.ScriptEditor.Loading := true
+
+		try {
+			this.ScriptEditor.Content[true] := text
+			this.ScriptEditor.Editable := !readOnly
+			this.ScriptEditor.Enabled := true
+		}
+		finally {
+			this.ScriptEditor.Loading := false
+		}
+	}
+
+	editValidators(owner := false) {
+		local window, x, y, w, h
+
+		this.createGui()
+
+		window := this.Window
+
+		if owner
+			window.Opt("+Owner" . owner.Hwnd)
+
+		if getWindowPosition("Strategy Workbench.Validators Editor", &x, &y)
+			window.Show("x" . x . " y" . y)
+		else
+			window.Show()
+
+		if getWindowSize("Strategy Workbench.Validators Editor", &w, &h)
+			window.Resize("Initialize", w, h)
+
+		this.loadValidators()
+
+		try {
+			loop {
+				loop
+					Sleep(200)
+				until this.iResult
+
+				if (this.iResult = kOk) {
+					this.iResult := this.saveValidators()
+
+					if this.iResult
+						return this.iResult
+					else
+						this.iResult := false
+				}
+				else
+					return false
+			}
+		}
+		finally {
+			this.ScriptEditor.Destroy()
+
+			window.Destroy()
+		}
+	}
+
+	updateState() {
+		local type
+
+		this.Control["addValidatorButton"].Enabled := true
+
+		if this.SelectedValidator {
+			this.Control["copyValidatorButton"].Enabled := true
+
+			if this.SelectedValidator.Builtin {
+				this.Control["deleteValidatorButton"].Enabled := false
+
+				this.Control["validatorNameEdit"].Opt("+ReadOnly")
+			}
+			else {
+				this.Control["deleteValidatorButton"].Enabled := true
+
+				this.Control["validatorNameEdit"].Opt("-ReadOnly")
+			}
+
+			if (this.ScriptEditor.Content[true] = "")
+				this.setScript("; Insert your rules here...`n`n", this.SelectedValidator.Builtin)
+
+			this.ScriptEditor.Visible := true
+		}
+		else {
+			this.Control["copyValidatorButton"].Enabled := false
+			this.Control["deleteValidatorButton"].Enabled := false
+
+			this.setScript("", true)
+			this.Control["validatorNameEdit"].Text := ""
+
+			this.ScriptEditor.Visible := true
+			this.Control["validatorNameEdit"].Opt("+ReadOnly")
+		}
+	}
+
+	selectValidator(validator, force := false, save := true) {
+		if (force || (this.SelectedValidator != validator)) {
+			if (save && this.SelectedValidator)
+				if !this.saveValidator(this.SelectedValidator) {
+					this.ValidatorsListView.Modify(inList(this.Validators, this.SelectedValidator), "Select Vis")
+
+					return
+				}
+
+			if validator
+				this.ValidatorsListView.Modify(inList(this.Validators, validator), "Select Vis")
+
+			this.iSelectedValidator := validator
+
+			this.loadValidator(validator)
+
+			this.updateState()
+		}
+	}
+
+	addValidator() {
+		local validator
+
+		if this.SelectedValidator
+			if !this.saveValidator(this.SelectedValidator) {
+				this.ValidatorsListView.Modify(inList(this.Validators, this.SelectedValidator), "Select Vis")
+
+				return
+			}
+
+		validator := {Name: "", Builtin: false, Script: ""}
+
+		this.Validators.Push(validator)
+
+		this.ValidatorsListView.Add("", "")
+
+		this.selectValidator(validator, true, false)
+	}
+
+	copyValidator() {
+		local validator
+
+		if this.SelectedValidator
+			if !this.saveValidator(this.SelectedValidator) {
+				this.ValidatorsListView.Modify(inList(this.Validators, this.SelectedValidator), "Select Vis")
+
+				return
+			}
+
+		validator := this.SelectedValidator.Clone()
+
+		validator.Builtin := false
+
+		loop
+			if (choose(this.Validators, (v) => (v.Name = (validator.Name . " (" . A_Index . ")"))).Length = 0) {
+				validator.Name := (validator.Name . " (" . A_Index . ")")
+
+				break
+			}
+
+		this.Validators.Push(validator)
+
+		this.ValidatorsListView.Add("", validator.Name)
+
+		this.selectValidator(validator, true, false)
+	}
+
+	deleteValidator() {
+		local index := inList(this.Validators, this.SelectedValidator)
+
+		this.ValidatorsListView.Delete(index)
+
+		this.Validators.RemoveAt(index)
+
+		this.selectValidator(false, true, false)
+	}
+
+	loadValidator(validator) {
+		local ignore
+
+		if validator {
+			this.Control["validatorNameEdit"].Text := validator.Name
+
+			this.setScript(validator.Script, validator.Builtin)
+		}
+		else {
+			this.Control["validatorNameEdit"].Text := ""
+
+			this.setScript("", true)
+		}
+
+		this.updateState()
+	}
+
+	saveValidator(validator) {
+		local valid := true
+		local name := this.Control["validatorNameEdit"].Text
+		local errorMessage := ""
+		local ignore, other, type
+
+		if (Trim(name) = "") {
+			errorMessage .= ("`n" . translate("Error: ") . "Name cannot be empty...")
+
+			valid := false
+		}
+
+		for ignore, other in this.Validators
+			if ((other != validator) && (name = other.Name)) {
+				errorMessage .= ("`n" . translate("Error: ") . "Name must be unique...")
+
+				valid := false
+			}
+
+		try {
+			RuleCompiler().compileRules(this.ScriptEditor.Content[true], &ignore := false, &ignore := false)
+		}
+		catch Any as exception {
+			errorMessage .= ("`n" . translate("Error: ") . (isObject(exception) ? exception.Message : exception))
+
+			valid := false
+		}
+
+		if valid {
+			validator.Name := name
+
+			validator.Script := this.ScriptEditor.Content[true]
+
+			this.ValidatorsListView.Modify(inList(this.Validators, validator), "", validator.Name)
+		}
+		else {
+			if (StrLen(errorMessage) > 0)
+				errorMessage := ("`n" . errorMessage)
+
+			OnMessage(0x44, translateOkButton)
+			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct...") . errorMessage, translate("Error"), 262160)
+			OnMessage(0x44, translateOkButton, 0)
+		}
+
+		return valid
+	}
+
+	loadValidators() {
+		local validators := []
+		local ignore, fileName, theValidator
+
+		for ignore, fileName in getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\") {
+			SplitPath(fileName, , , , &validator)
+
+			if (choose(validators, (v) => v.Name = validator).Length = 0)
+				validators.Push({Name: validator, Builtin: true, Script: FileRead(fileName)})
+		}
+
+		for ignore, fileName in getFileNames("*.rules", kUserHomeDirectory . "Validators\") {
+			SplitPath(fileName, , , , &validator)
+
+			if (choose(validators, (v) => v.Name = validator).Length = 0)
+				validators.Push({Name: validator, Builtin: false, Script: FileRead(fileName)})
+		}
+
+		this.Validators := validators
+
+		this.ValidatorsListView.Delete()
+
+		for ignore, validator in this.Validators
+			this.ValidatorsListView.Add("", validator.Name)
+
+		this.ValidatorsListView.ModifyCol()
+
+		loop this.ValidatorsListView.GetCount("Col")
+			this.ValidatorsListView.ModifyCol(A_Index, "AutoHdr")
+	}
+
+	saveValidators(save := true) {
+		local ignore, validator
+
+		if this.SelectedValidator
+			if !this.saveValidator(this.SelectedValidator) {
+				this.ValidatorsListView.Modify(inList(this.Validators, this.SelectedValidator), "Select Vis")
+
+				return false
+			}
+
+		deleteDirectory(kUserHomeDirectory . "Validators", false)
+
+		for ignore, validator in this.Validators
+			if !validator.Builtin
+				FileAppend(validator.Script, kUserHomeDirectory . "Validators\" . validator.Name . ".rules")
+
+		return true
 	}
 }
 

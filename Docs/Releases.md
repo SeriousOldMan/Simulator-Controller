@@ -2,7 +2,7 @@
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. The "Team" tab in "Race Settings" are now automatically preselected, when "Race Settings" is opened to edit the team race credentials.
-  4. Fixed a crash in "Setup Workbench" for cars with parantheses ("(" and ")") in their names.
+  4. Fixed a crash in "Setup Workbench" for cars with parantheses "(" and ")" in their names.
   5. Fixed the default value for pitlane delta default value in those rare cases, when not available from the settings. The default value is 60 seconds, which is the maximum value for all known tracks.
   6. Fixed display of cold tyre pressure recommendations in the lap report of the "Team Center" and "Solo Center".
   7. The layout editor for Button Boxes has been extended with additional validations, so that no invalid layouts can be defined anymore.

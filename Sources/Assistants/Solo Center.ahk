@@ -4068,47 +4068,51 @@ class SoloCenter extends ConfigurationItem {
 					if (lap && isNumber(lap.LapTime) && lap.HasProp("TelemetryData")) {
 						driver := lap.Run.Driver.ID
 
-						if InStr(lap.TelemetryData, "|||")
-							telemetryData := string2Values("|||", lap.TelemetryData)
-						else
-							telemetryData := string2Values("---", lap.TelemetryData)
-
-						telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
-													 , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9]
-													 , driver)
-
-						pressures := string2Values(",", telemetryData[17])
-						temperatures := string2Values(",", telemetryData[18])
-						wear := string2Values(",", telemetryData[19])
-
-						telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]
-											   , telemetryData[14], telemetryData[15], telemetryData[16]
-											   , pressures[1], pressures[2], pressures[3], pressures[4]
-											   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
-											   , wear[1], wear[2], wear[3], wear[4]
-											   , telemetryData[7], telemetryData[8], telemetryData[9]
-											   , driver)
-
-						if InStr(lap.PressuresData, "|||")
-							pressuresData := string2Values("|||", lap.PressuresData)
-						else
-							pressuresData := string2Values("---", lap.PressuresData)
-
-						if !locked
-							if tyresDB.lock(pressuresData[1], pressuresData[2], pressuresData[3], false)
-								locked := true
+						if lap.HasOwnProp("TelemetryData") {
+							if InStr(lap.TelemetryData, "|||")
+								telemetryData := string2Values("|||", lap.TelemetryData)
 							else
-								Sleep(200)
+								telemetryData := string2Values("---", lap.TelemetryData)
 
-						if locked {
-							coldPressures := string2Values(",", pressuresData[9])
-							hotPressures := string2Values(",", pressuresData[10])
+							telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
+														 , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9]
+														 , driver)
 
-							if (isNumber(coldPressures[1]) && isNumber(hotPressures[1]))
-								tyresDB.updatePressures(pressuresData[1], pressuresData[2], pressuresData[3]
-													  , pressuresData[4], pressuresData[5], pressuresData[6]
-													  , pressuresData[7], pressuresData[8]
-													  , coldPressures, hotPressures, false, driver)
+							pressures := string2Values(",", telemetryData[17])
+							temperatures := string2Values(",", telemetryData[18])
+							wear := string2Values(",", telemetryData[19])
+
+							telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]
+												   , telemetryData[14], telemetryData[15], telemetryData[16]
+												   , pressures[1], pressures[2], pressures[3], pressures[4]
+												   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
+												   , wear[1], wear[2], wear[3], wear[4]
+												   , telemetryData[7], telemetryData[8], telemetryData[9]
+												   , driver)
+						}
+
+						if lap.HasOwnProp("PressuresData") {
+							if InStr(lap.PressuresData, "|||")
+								pressuresData := string2Values("|||", lap.PressuresData)
+							else
+								pressuresData := string2Values("---", lap.PressuresData)
+
+							if !locked
+								if tyresDB.lock(pressuresData[1], pressuresData[2], pressuresData[3], false)
+									locked := true
+								else
+									Sleep(200)
+
+							if locked {
+								coldPressures := string2Values(",", pressuresData[9])
+								hotPressures := string2Values(",", pressuresData[10])
+
+								if (isNumber(coldPressures[1]) && isNumber(hotPressures[1]))
+									tyresDB.updatePressures(pressuresData[1], pressuresData[2], pressuresData[3]
+														  , pressuresData[4], pressuresData[5], pressuresData[6]
+														  , pressuresData[7], pressuresData[8]
+														  , coldPressures, hotPressures, false, driver)
+							}
 						}
 					}
 				}
@@ -4776,7 +4780,13 @@ class SoloCenter extends ConfigurationItem {
 												   , lap["Tyre.Pressure.Hot.Rear.Left"], lap["Tyre.Pressure.Hot.Rear.Right"])
 					 , Temperatures: values2String(",", lap["Tyre.Temperature.Front.Left"], lap["Tyre.Temperature.Front.Right"]
 													  , lap["Tyre.Temperature.Rear.Left"], lap["Tyre.Temperature.Rear.Right"])
-					 , Data: false, TelemetryData: lap["Data.Telemetry"], PressuresData: lap["Data.Pressures"]}
+					 , Data: false}
+
+			if lap.Has("Data.Telemetry")
+				newLap.TelemetryData := lap["Data.Telemetry"]
+
+			if lap.Has("Data.Pressures")
+				newLap.PressuresData := lap["Data.Pressures"]
 
 			if isNull(newLap.Map)
 				newLap.Map := "n/a"
@@ -5008,10 +5018,11 @@ class SoloCenter extends ConfigurationItem {
 				if this.Laps.Has(A_Index) {
 					lap := this.Laps[A_Index]
 
-					if InStr(lap.PressuresData, "|||")
-						this.addPressures(lap, string2Values("|||", lap.PressuresData)*)
-					else
-						this.addPressures(lap, string2Values("---", lap.PressuresData)*)
+					if lap.HasOwnProp("PressuresData")
+						if InStr(lap.PressuresData, "|||")
+							this.addPressures(lap, string2Values("|||", lap.PressuresData)*)
+						else
+							this.addPressures(lap, string2Values("---", lap.PressuresData)*)
 				}
 	}
 
@@ -6249,7 +6260,8 @@ class SoloCenter extends ConfigurationItem {
 								  , "Weather", lap.Weather, "Temperature.Air", null(lap.AirTemperature), "Temperature.Track", null(lap.TrackTemperature)
 								  , "Grip", lap.Grip, "Map", null(lap.Map), "TC", null(lap.TC), "ABS", null(lap.ABS)
 								  , "Tyre.Compound", compound(lap.Compound), "Tyre.Compound.Color", compoundColor(lap.Compound), "Tyre.Set", lap.TyreSet
-								  , "Data.Telemetry", lap.TelemetryData, "Data.Pressures", lap.PressuresData)
+								  , "Data.Telemetry", lap.HasOwnProp("TelemetryData") ? lap.TelemetryData : kNull
+								  , "Data.Pressures", lap.HasOwnProp("PressuresData") ? lap.PressuresData : kNull)
 				lapData[field] := value
 
 			pressures := pressuresTable[this.PressuresDatabase.Laps[lapNr]]

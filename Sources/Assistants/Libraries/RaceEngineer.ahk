@@ -154,7 +154,7 @@ class RaceEngineer extends RaceAssistant {
 	iPitstopAdjustments := false
 
 	iCurrentTyreTemperatures := false
-	iCurrentTyrePressuress := false
+	iCurrentTyrePressures := false
 	iCurrentBrakeTemperatures := false
 	iCurrentRemainingFuel := false
 
@@ -268,9 +268,9 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
-	CurrentTyrePressuress {
+	CurrentTyrePressures {
 		Get {
-			return this.iCurrentTyrePressuress
+			return this.iCurrentTyrePressures
 		}
 	}
 
@@ -282,7 +282,7 @@ class RaceEngineer extends RaceAssistant {
 
 	CurrentRemainingFuel {
 		Get {
-			return this.CurrentRemainingFuel
+			return this.iCurrentRemainingFuel
 		}
 	}
 
@@ -323,7 +323,7 @@ class RaceEngineer extends RaceAssistant {
 			this.iPitstopAdjustments := false
 
 			this.iCurrentTyreTemperatures := false
-			this.iCurrentTyrePressuress := false
+			this.iCurrentTyrePressures := false
 			this.iCurrentBrakeTemperatures := false
 			this.iCurrentRemainingFuel := false
 		}

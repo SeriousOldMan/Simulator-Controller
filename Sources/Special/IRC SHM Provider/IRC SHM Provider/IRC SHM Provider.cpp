@@ -330,7 +330,7 @@ void requestPitstopTyreChangeAll(bool change) {
 }
 
 float getTyreTemperature(const irsdk_header* header, const char* sessionInfo, const char* data, char* sessionPath,
-	char* dataVariableO, char* dataVariableM, char* dataVariableI) {
+						 char* dataVariableO, char* dataVariableM, char* dataVariableI) {
 	char result[32];
 
 	if (getDataValue(result, header, data, dataVariableO))
@@ -354,6 +354,15 @@ float getTyreTemperature(const irsdk_header* header, const char* sessionInfo, co
 
 		return (temps[0] + temps[1] + temps[2]) / 3;
 	}
+	else
+		return 0;
+}
+
+float getOMITyreTemperature(const irsdk_header* header, const char* sessionInfo, const char* data, char* variable) {
+	char result[32];
+
+	if (getDataValue(result, header, data, variable))
+		return atof(result);
 	else
 		return 0;
 }
@@ -810,10 +819,22 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 		printf("FuelAmount=%f\n", getDataFloat(header, data, "PitSvFuel"));
 
-		float pressureFL = GetPsi(getDataFloat(header, data, "PitSvLFP"));
-		float pressureFR = GetPsi(getDataFloat(header, data, "PitSvRFP"));
-		float pressureRL = GetPsi(getDataFloat(header, data, "PitSvLRP"));
-		float pressureRR = GetPsi(getDataFloat(header, data, "PitSvRRP"));
+		float pressureFL = GetPsi(getDataFloat(header, data, "LFcoldPressure"));
+		float pressureFR = GetPsi(getDataFloat(header, data, "RFcoldPressure"));
+		float pressureRL = GetPsi(getDataFloat(header, data, "LRcoldPressure"));
+		float pressureRR = GetPsi(getDataFloat(header, data, "RRcoldPressure"));
+
+		printf("SetupTyrePressureFL=%f\n", pressureFL);
+		printf("SetupTyrePressureFR=%f\n", pressureFR);
+		printf("SetupTyrePressureRL=%f\n", pressureRL);
+		printf("SetupTyrePressureRR=%f\n", pressureRR);
+
+		printf("SetupTyrePressure = %f, %f, %f, %f\n", pressureFL, pressureFR, pressureRL, pressureRR);
+
+		pressureFL = GetPsi(getDataFloat(header, data, "PitSvLFP"));
+		pressureFR = GetPsi(getDataFloat(header, data, "PitSvRFP"));
+		pressureRL = GetPsi(getDataFloat(header, data, "PitSvLRP"));
+		pressureRR = GetPsi(getDataFloat(header, data, "PitSvRRP"));
 
 		printf("TyrePressureFL=%f\n", pressureFL);
 		printf("TyrePressureFR=%f\n", pressureFR);
@@ -1021,6 +1042,24 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 				getTyreTemperature(header, sessionInfo, data, "CarSetup:Suspension:RightFront:LastTempsOMI:", "RFtempCL", "RFtempCM", "RFtempCR"),
 				getTyreTemperature(header, sessionInfo, data, "CarSetup:Suspension:LeftRear:LastTempsOMI:", "LRtempCL", "LRtempCM", "LRtempCR"),
 				getTyreTemperature(header, sessionInfo, data, "CarSetup:Suspension:RightRear:LastTempsOMI:", "RRtempCL", "RRtempCM", "RRtempCR"));
+
+			printf("TyreInnerTemperature=%f,%f,%f,%f\n",
+				getOMITyreTemperature(header, sessionInfo, data, "LFtempCR"),
+				getOMITyreTemperature(header, sessionInfo, data, "RFtempCL"),
+				getOMITyreTemperature(header, sessionInfo, data, "LRtempCR"),
+				getOMITyreTemperature(header, sessionInfo, data, "RRtempCL"));
+
+			printf("TyreMiddleTemperature=%f,%f,%f,%f\n",
+				getOMITyreTemperature(header, sessionInfo, data, "LFtempCM"),
+				getOMITyreTemperature(header, sessionInfo, data, "RFtempCM"),
+				getOMITyreTemperature(header, sessionInfo, data, "LRtempCM"),
+				getOMITyreTemperature(header, sessionInfo, data, "RRtempCM"));
+
+			printf("TyreOuterTemperature=%f,%f,%f,%f\n",
+				getOMITyreTemperature(header, sessionInfo, data, "LFtempCL"),
+				getOMITyreTemperature(header, sessionInfo, data, "RFtempCR"),
+				getOMITyreTemperature(header, sessionInfo, data, "LRtempCL"),
+				getOMITyreTemperature(header, sessionInfo, data, "RRtempCR"));
 
 			printf("TyreWear=%d,%d,%d,%d\n",
 				getTyreWear(header, sessionInfo, data, "LFwearL", "LFwearM", "LFwearR"),

@@ -445,6 +445,13 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		local result := false
 		local candidate, ignore, data, tyreCompound, tyreCompoundColor
 
+		getSetupPressure(tyre, default) {
+			return displayValue("Float"
+							  , convertUnit("Pressure"
+										  , getMultiMapValue(data, "Setup Data", "SetupTyrePressure" . tyre
+																 , getMultiMapValue(data, "Setup Data", "TyrePressure" . tyre, default))))
+		}
+
 		if (message != "Import") {
 			settings := false
 
@@ -483,10 +490,10 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			setMultiMapValue(data, "Setup Data", "TyreCompoundColor", tyreCompoundColor)
 
 			if (tyreCompound = "Dry") {
-				dryFrontLeft := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureFL", dryFrontLeft)))
-				dryFrontRight := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureFR", dryFrontRight)))
-				dryRearLeft := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureRL", dryRearLeft)))
-				dryRearRight := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureRR", dryRearRight)))
+				dryFrontLeft := getSetupPressure("FL", dryFrontLeft)
+				dryFrontRight := getSetupPressure("FR", dryFrontRight)
+				dryRearLeft := getSetupPressure("RL", dryRearLeft)
+				dryRearRight := getSetupPressure("RR", dryRearRight)
 
 				if settings {
 					setMultiMapValue(settings, "Session Setup", "Tyre.Compound", tyreCompound)
@@ -509,10 +516,10 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 				result := tyreCompound
 			}
 			else if ((tyreCompound = "Wet") || (tyreCompound = "Intermediate")) {
-				wetFrontLeft := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureFL", wetFrontLeft)))
-				wetFrontRight := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureFR", wetFrontRight)))
-				wetRearLeft := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureRL", wetRearLeft)))
-				wetRearRight := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureRR", wetRearRight)))
+				wetFrontLeft := getSetupPressure("FL", wetFrontLeft)
+				wetFrontRight := getSetupPressure("FR", wetFrontRight)
+				wetRearLeft := getSetupPressure("RL", wetRearLeft)
+				wetRearRight := getSetupPressure("RR", wetRearRight)
 
 				if settings {
 					setMultiMapValue(settings, "Session Setup", "Tyre.Compound", tyreCompound)

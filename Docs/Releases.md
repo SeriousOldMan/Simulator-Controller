@@ -8,7 +8,9 @@
   7. The layout editor for Button Boxes has been extended with additional validations, so that no invalid layouts can be defined anymore.
   8. The Engineer will now use the most recent values of remaining fuel, tyre temperatures and pressures as well as brake temperatures (if available) rather than the values at the start of the current lap, when asked for this information using a voice command or a controller action.
   9. The special validation rules in "Setup Workbench" can now be edited using a specialized syntax aware editor for the underlying rule language. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#editing-validation-rules) for more information.
-  10. A new version of the local LLM Runtime is available, which includes the latest Llama backend. Support for the deepseek v3 model is included, if you have 800 GB of memory in your machine :-)
+  10. Inner, Middle and Outer carcass tyre temperature readings are now supported for *rFactor 2*, *Le Mans Ultimate* and *iRacing* in "Solo Center", "Team Center" and "Setup Workbench".
+  11. The real setup pressures from the garage are now used by the Race Engineer for *iRacing*.
+  12. [Expert] A new version of the local LLM Runtime is available, which includes the latest Llama backend. Support for the deepseek v3 model is included, if you have 800 GB of memory in your machine :-)
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-615), if you are using the local LLM Runtime.
 

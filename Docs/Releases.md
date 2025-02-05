@@ -12,7 +12,8 @@
   11. Inner, Middle and Outer carcass tyre temperature readings are now supported for *rFactor 2*, *Le Mans Ultimate* and *iRacing* in "Solo Center" and in the issue analyzer of "Setup Workbench".
   12. The real setup pressures from the garage are now used by the Race Engineer for *iRacing*.
   13. [Expert] A new version of the local LLM Runtime is available, which includes the latest Llama backend. Support for the deepseek v3 model is included, if you have 800 GB of memory in your machine :-)
-  14. [Internal] Added sensible information to the manifest of all executable files.
+  14. [Internal] Increased reliability of shared memory connectors.
+  15. [Internal] Added sensible information to the manifest of all executable files.
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-615), if you are using the local LLM Runtime.
 

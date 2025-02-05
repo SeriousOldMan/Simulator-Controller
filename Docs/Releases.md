@@ -1,7 +1,7 @@
 ## 6.1.5.0-release 02/07/25 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. Fixed a crash in "Setup Workbench" for cars with parantheses ("(" and ")") in their names.
+  3. Fixed a crash in "Setup Workbench" for cars with parantheses "(" and ")" in their names.
   4. Fixed the default value for pitlane delta default value in those rare cases, when not available from the settings. The default value is 60 seconds, which is the maximum value for all known tracks.
   5. Fixed display of cold tyre pressure recommendations in the lap report of the "Team Center" and "Solo Center".
   6. Fixed a problem when a non-existent speech recognizer is selected for Azure voice recognition.
@@ -9,7 +9,7 @@
   8. The layout editor for Button Boxes has been extended with additional validations, so that no invalid layouts can be defined anymore.
   9. The Engineer will now use the most recent values of remaining fuel, tyre temperatures and pressures as well as brake temperatures (if available) rather than the values at the start of the current lap, when asked for this information using a voice command or a controller action.
   10. The special validation rules in "Setup Workbench" can now be edited using a specialized syntax aware editor for the underlying rule language. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#editing-validation-rules) for more information.
-  11. Inner, Middle and Outer carcass tyre temperature readings are now supported for *rFactor 2*, *Le Mans Ultimate* and *iRacing* in the "Running" report in "Solo Center".
+  11. Inner, Middle and Outer carcass tyre temperature readings are now supported for *rFactor 2*, *Le Mans Ultimate* and *iRacing* in "Solo Center" and in the issue analyzer of "Setup Workbench".
   12. The real setup pressures from the garage are now used by the Race Engineer for *iRacing*.
   13. [Expert] A new version of the local LLM Runtime is available, which includes the latest Llama backend. Support for the deepseek v3 model is included, if you have 800 GB of memory in your machine :-)
   14. [Internal] Added sensible information to the manifest of all executable files.

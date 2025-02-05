@@ -720,6 +720,11 @@ class RaceEngineer extends RaceAssistant {
 						lap["Brakes"] := brakes
 				}
 
+			if (this.activeTopic(options, "Fuel") && knowledge.Has("Fuel") && this.CurrentRemainingFuel)
+				knowledge["Fuel"]["Remaining"] := (Round(this.CurrentRemainingFuel, 1) . " Liter")
+
+
+
 			if this.activeTopic(options, "Tyres") {
 				tyres := knowledge["Tyres"]
 
@@ -1026,7 +1031,7 @@ class RaceEngineer extends RaceAssistant {
 						value := speaker.number2Speech(convertUnit("Pressure", knowledgeBase.getValue("Lap." . lap . ".Tyre.Pressure." . suffix)))
 				}
 				else if this.CurrentTyreTemperatures
-					value := speaker.number2Speech(convertUnit("Temperature",  this.CurrentTyrePressures[index]))
+					value := speaker.number2Speech(convertUnit("Temperature",  this.CurrentTyreTemperatures[index]))
 				else
 					value := speaker.number2Speech(convertUnit("Temperature", knowledgeBase.getValue("Lap." . lap . ".Tyre.Temperature." . suffix)), 0)
 

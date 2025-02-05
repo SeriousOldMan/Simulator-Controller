@@ -175,11 +175,20 @@ extern "C" __declspec(dllexport) int __stdcall close() {
 	CloseHandle(fileHandle);
 	delete localCopy;
 
+	fileHandle = NULL;
+
 	return 0;
 }
 
 extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result, int size) {
 	std::ostringstream output;
+
+	if (fileHandle == NULL) {
+		open();
+
+		if (fileHandle == NULL)
+			return -1;
+	}
 
 	if (fileHandle != NULL) {
 		sharedData = (SharedMemory*)MapViewOfFile(fileHandle, PAGE_READONLY, 0, 0, sizeof(SharedMemory));
@@ -221,13 +230,6 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 
 	bool writeStandings = (getArgument(request, "Standings") != "");
 	bool writeTelemetry = !writeStandings;
-	
-	if (fileHandle == NULL) {
-		open();
-		
-		if (fileHandle == NULL)
-			return -1;
-	}
 
 	if (writeTelemetry) {
 		printLine(&output, "[Session Data]");

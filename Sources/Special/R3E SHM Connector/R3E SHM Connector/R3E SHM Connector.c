@@ -245,6 +245,8 @@ extern __declspec(dllexport) int __stdcall call(char* request, char* result, int
 		
 		if (!mapped_r3e) {
 			writeString(result, "", &pos);
+
+			result[pos] = '\0';
 			
 			return -1;
 		}

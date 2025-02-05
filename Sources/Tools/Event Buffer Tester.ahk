@@ -23,7 +23,7 @@ ListLines Off					; Disable execution history
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Tools.ico
 ;@Ahk2Exe-ExeName Event Buffer Tester.exe
 ;@Ahk2Exe-SetCompanyName Oliver Juwig (TheBigO)
-;@Ahk2Exe-SetCopyright Creative Commons - BY-NC-SA
+;@Ahk2Exe-SetCopyright TheBigO - Creative Commons - BY-NC-SA
 ;@Ahk2Exe-SetProductName Simulator Controller
 ;@Ahk2Exe-SetVersion 1.0.0.0
 

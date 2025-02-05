@@ -110,7 +110,7 @@ Not much to do here, since Jona is a fully integrated component of the Simulator
 
 ### Installation of Telemetry Providers
 
-Jona acquires telemetry data from the different simulation games using so called telemtry providers, which in most cases read the [required data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#telemetry-integration) from a shared memory interface. In general these are already included in Simulator Controller and there is nothing to do, but for *Assetto Corsa*, *rFactor 2* and *Le Mans Ultimate*, you need to install a plugin into a special location for the telemetry interface to work and for *Automobilista 2* and *Project CARS 2* a change in the settings is necessary.
+Jona acquires telemetry data from the different simulation games using so called telemetry providers, which in most cases read the [required data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#telemetry-integration) from a shared memory interface. In general these are already included in Simulator Controller and there is nothing to do, but for *Assetto Corsa*, *rFactor 2* and *Le Mans Ultimate*, you need to install a plugin into a special location for the telemetry interface to work and for *Automobilista 2* and *Project CARS 2* a change in the settings is necessary.
 
 Please, note that all of this also applies to all other AI Race Assistants, but you have to do it only once, of course.
 
@@ -224,7 +224,7 @@ To reactivate the Assistant use:
 
 These commands are also available as "Mute" and "Unmute" plugin actions, which can be configured for a Button Box or a Stream Deck, for example.
 
-Good to know: Even if Jona is muted, you can interact with the Engineer, for example to plan and prepare a pitstop. If a chain of conversation is initiated by you, the driver, Jona will react normally. Jona will also communicate with you regarding all pitstop related questions.
+Good to know: Even if Jona is muted, you can interact with the Engineer, for example to plan and prepare a pitstop. If a chain of conversation is initiated by you, the driver, Jona will react normally.
 
 ## Racing with Jona
 

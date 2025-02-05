@@ -1,16 +1,18 @@
 ## 6.1.5.0-release 02/07/25 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. The "Team" tab in "Race Settings" are now automatically preselected, when "Race Settings" is opened to edit the team race credentials.
-  4. Fixed a crash in "Setup Workbench" for cars with parantheses "(" and ")" in their names.
-  5. Fixed the default value for pitlane delta default value in those rare cases, when not available from the settings. The default value is 60 seconds, which is the maximum value for all known tracks.
-  6. Fixed display of cold tyre pressure recommendations in the lap report of the "Team Center" and "Solo Center".
-  7. The layout editor for Button Boxes has been extended with additional validations, so that no invalid layouts can be defined anymore.
-  8. The Engineer will now use the most recent values of remaining fuel, tyre temperatures and pressures as well as brake temperatures (if available) rather than the values at the start of the current lap, when asked for this information using a voice command or a controller action.
-  9. The special validation rules in "Setup Workbench" can now be edited using a specialized syntax aware editor for the underlying rule language. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#editing-validation-rules) for more information.
-  10. Inner, Middle and Outer carcass tyre temperature readings are now supported for *rFactor 2*, *Le Mans Ultimate* and *iRacing* in "Solo Center" and in the issue analyzer of "Setup Workbench".
-  11. The real setup pressures from the garage are now used by the Race Engineer for *iRacing*.
-  12. [Expert] A new version of the local LLM Runtime is available, which includes the latest Llama backend. Support for the deepseek v3 model is included, if you have 800 GB of memory in your machine :-)
+  3. Fixed a crash in "Setup Workbench" for cars with parantheses "(" and ")" in their names.
+  4. Fixed the default value for pitlane delta default value in those rare cases, when not available from the settings. The default value is 60 seconds, which is the maximum value for all known tracks.
+  5. Fixed display of cold tyre pressure recommendations in the lap report of the "Team Center" and "Solo Center".
+  6. Fixed a problem when a non-existent speech recognizer is selected for Azure voice recognition.
+  7. The "Team" tab in "Race Settings" are now automatically preselected, when "Race Settings" is opened to edit the team race credentials.
+  8. The layout editor for Button Boxes has been extended with additional validations, so that no invalid layouts can be defined anymore.
+  9. The Engineer will now use the most recent values of remaining fuel, tyre temperatures and pressures as well as brake temperatures (if available) rather than the values at the start of the current lap, when asked for this information using a voice command or a controller action.
+  10. The special validation rules in "Setup Workbench" can now be edited using a specialized syntax aware editor for the underlying rule language. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#editing-validation-rules) for more information.
+  11. Inner, Middle and Outer carcass tyre temperature readings are now supported for *rFactor 2*, *Le Mans Ultimate* and *iRacing* in "Solo Center" and in the issue analyzer of "Setup Workbench".
+  12. The real setup pressures from the garage are now used by the Race Engineer for *iRacing*.
+  13. [Expert] A new version of the local LLM Runtime is available, which includes the latest Llama backend. Support for the deepseek v3 model is included, if you have 800 GB of memory in your machine :-)
+  14. [Internal] Added sensible information to the manifest of all executable files.
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-615), if you are using the local LLM Runtime.
 
@@ -244,7 +246,7 @@ To install the new libraries, follow the instructions in the [Update Notes](http
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. A bug has been fixed for the Spotter, which caused information about pitstops or lap times of the opponents to be issued more than once.
-  4. Fixed a bug that prevented sharing of lap telemtry data on the Team Server.
+  4. Fixed a bug that prevented sharing of lap telemetry data on the Team Server.
   5. The Engineer sometimes did not report suspension damage right away, but delayed it until the next crossing of start/finish line. This has been fixed.
   6. "Simulator Setup" can now handle more preview windows for Button Boxes and Stream Decks than can fit on the screen vertically.
   7. The Race Engineer now allow you to enable / disable the handling of pressure loss for the next pitstop using new voice commands.
@@ -337,7 +339,7 @@ IMPORTANT: Please take a look at the [Update Notes](https://github.com/SeriousOl
   8. The selection dialog for telemetry data now supports opening multiple lap telemetries at once by shift-clicking in the list. The file selection dialog opened by the "Open..." button also supports multi-selection.
   9. The Telemetry Viewer now can display a track map in a separate. You can click in the graph to show the corresponding location on the track map and vice versa. Only telemetry data collected with 5.9.2 and later will support this. If *WebView2* is configured as HTML Viewer in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration), it will not work yet either. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetry-viewer) for more information.
   10. A rotating ball is now displayed, when the Telemetry Viewer is collecting lap telemetry data.
-  11. "Setup Workbench" now also supports collecting lap telemtry data. See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#telemetry-viewer) for more information.
+  11. "Setup Workbench" now also supports collecting lap telemetry data. See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#telemetry-viewer) for more information.
   12. The Track Automation state is now displayed with color coding on a Button Box. Gray if it is enabled but not yet available, and yellow if no Automation has been defined for the given track and Green, if enabled and active.
   13. The setting to startup a simulation together with Simulator Controller has been moved from the global settings of "Simulator Startup" to the Startup Profiles. Veeery useful...
 
@@ -1509,7 +1511,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   10. Fixed a rare bug with SFX-100 motion intensity controller.
   11. Support for a couple of new fields has been added in the simulator data files - inner, middle and outer tyre temperatures and in-game tyre compound identifiers for *Automobilista 2*.
   12. The telemetry charts in "Race Center" and "Practice Center" now apply unit conversion correctly.
-  13. New data summary report in "Practice Center" and a new tab to review the [available telemtry data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#exploring-data).
+  13. New data summary report in "Practice Center" and a new tab to review the [available telemetry data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#exploring-data).
   14. New [stints summary report](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#data-analysis) in "Practice Center".
   15. Updated *Automobilista 2* data integration to shared memory API version 13.
   16. The Standings info widget in "Session Monitor" now also shows the observed opponent, if one is currently observed by the Spotter.

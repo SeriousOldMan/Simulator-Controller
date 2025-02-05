@@ -45,6 +45,7 @@
     - [Startup profiles](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles)
     - [Team Management](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#team-management)
     - [Voice Commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands)
+	  - [Testing voice commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#testing-voice-configuration-and-voice-commands)
 	  - [Non-standard voice configurations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#non-standard-voice-configurations)
     - [Controller Commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#controller-commands)
     - [External Commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#external-commands)

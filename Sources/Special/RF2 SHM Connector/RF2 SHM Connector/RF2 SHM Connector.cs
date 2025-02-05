@@ -65,12 +65,21 @@ namespace SHMConnector {
         public void Close()
 		{
 			this.Disconnect();
+			
+			this.connected = false;
 		}
 
         public string Call(string request)
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
 
+			if (!this.connected) {
+				Open();
+				
+				if (!this.connected)
+					return "";
+			}
+			
             try
             {
                 extendedBuffer.GetMappedData(ref extended);

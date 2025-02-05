@@ -81,7 +81,7 @@ class LMURestProvider {
 			local data
 
 			try {
-				data := WinHttpRequest({Timeouts: [0, 5000, 5000, 5000]}).GET(url, "", false, {Encoding: "UTF-8"}).JSON
+				data := WinHttpRequest({Timeouts: [0, 500, 500, 500]}).GET(url, "", false, {Encoding: "UTF-8"}).JSON
 
 				if !isObject(data)
 					data := false
@@ -106,7 +106,7 @@ class LMURestProvider {
 				data := JSON.print(data, "  ")
 
 				try {
-					WinHttpRequest({Timeouts: [0, 5000, 5000, 5000]}).POST(url, data, false, {Object: true, Encoding: "UTF-8"})
+					WinHttpRequest({Timeouts: [0, 500, 500, 500]}).POST(url, data, false, {Object: true, Encoding: "UTF-8"})
 				}
 				catch Any as exception {
 					logError(exception, true)

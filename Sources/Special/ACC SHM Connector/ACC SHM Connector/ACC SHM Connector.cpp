@@ -272,11 +272,15 @@ std::string getArgument(char* request, std::string key) {
 	return getArgument(std::string(request), key);
 }
 
+bool connected = false;
+
 extern "C" __declspec(dllexport) int __stdcall open() {
 	initPhysics();
 	initGraphics();
 	initStatic();
 
+	connected = true;
+	
 	return 0;
 }
 
@@ -285,6 +289,8 @@ extern "C" __declspec(dllexport) int __stdcall close() {
 	dismiss(m_physics);
 	dismiss(m_static);
 
+	connected = false;
+	
 	return 0;
 }
 
@@ -294,6 +300,18 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 	SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
 	ostringstream output;
+	
+	if (!connected) {
+		open();
+		
+		if (!connected) {
+			output << "";
+			
+			strcpy_s(result, size, output.str().c_str());
+			
+			return -1;
+		}
+	}
 	
 	if (strlen(request) == 0)
 	{

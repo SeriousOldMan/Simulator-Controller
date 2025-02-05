@@ -430,11 +430,19 @@ namespace SHMConnector
         public void Close()
         {
             memoryStatus = AC_MEMORY_STATUS.DISCONNECTED;
+			connected = false;
         }
 
         public string Call(string request)
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
+			
+			if (!connected) {
+				Open();
+				
+				if (!connected)
+					return "";
+			}
 
             physics = ReadPhysics();
             graphics = ReadGraphics();

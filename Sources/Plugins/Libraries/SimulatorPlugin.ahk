@@ -582,6 +582,8 @@ class SimulatorPlugin extends ControllerPlugin {
 
 			SimulatorPlugin.sActiveSimulator := false
 			SimulatorPlugin.sActiveSimulation := false
+
+			callSimulator(this.Code, "Close")
 		}
 	}
 

@@ -1254,13 +1254,19 @@ std::string getArgument(char* request, std::string key) {
 	return getArgument(std::string(request), key);
 }
 
+bool connected = false;
+
 extern "C" __declspec(dllexport) int __stdcall open() {
+	irsdk_startup();
+	
 	// bump priority up so we get time from the sim
 	SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
 
 	// ask for 1ms timer so sleeps are more precise
 	timeBeginPeriod(1);
 
+	connected = true;
+	
 	return 0;
 }
 
@@ -1268,6 +1274,8 @@ extern "C" __declspec(dllexport) int __stdcall close() {
 	irsdk_shutdown();
 	timeEndPeriod(1);
 
+	connected = false;
+	
 	return 0;
 }
 
@@ -1284,6 +1292,18 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 	std::ostringstream output;
 	g_data = NULL;
 	int tries = 3;
+	
+	if (!connected) {
+		open();
+		
+		if (!connected) {
+			output << "";
+			
+			strcpy_s(result, size, output.str().c_str());
+			
+			return -1;
+		}
+	}
 
 	output << "[Debug]" << std::endl;
 	output << "Request=" << request << std::endl;

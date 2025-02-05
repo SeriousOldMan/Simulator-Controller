@@ -221,6 +221,13 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 
 	bool writeStandings = (getArgument(request, "Standings") != "");
 	bool writeTelemetry = !writeStandings;
+	
+	if (fileHandle == NULL) {
+		open();
+		
+		if (fileHandle == NULL)
+			return -1;
+	}
 
 	if (writeTelemetry) {
 		printLine(&output, "[Session Data]");

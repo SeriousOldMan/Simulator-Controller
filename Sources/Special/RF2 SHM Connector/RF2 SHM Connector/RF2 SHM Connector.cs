@@ -64,7 +64,8 @@ namespace SHMConnector {
 
         public void Close()
 		{
-			this.Disconnect();
+			if (this.connected)
+				this.Disconnect();
 			
 			this.connected = false;
 		}

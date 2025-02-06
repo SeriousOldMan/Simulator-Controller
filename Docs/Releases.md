@@ -1,4 +1,4 @@
-## 6.1.5.0-release 02/07/25 (planned)
+## 6.1.5.0-release 02/07/25
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a crash in "Setup Workbench" for cars with parantheses "(" and ")" in their names.

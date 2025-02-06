@@ -610,7 +610,7 @@ class DrivingCoach extends GridRaceAssistant {
 				throw "Unsupported service detected in DrivingCoach.startConversation..."
 
 			try {
-				if (Trim(this.Options["Driving Coach.Model"]) = "")
+				if (!this.Options["Driving Coach.Model"] || (Trim(this.Options["Driving Coach.Model"]) = ""))
 					throw "Empty model detected in DrivingCoach.startConversation..."
 				else if (service[1] = "LLM Runtime")
 					this.iConnector := LLMConnector.LLMRuntimeConnector(this, this.Options["Driving Coach.Model"]

@@ -546,7 +546,7 @@ callSimulator(simulator, options := "", protocol?) {
 				return newMultiMap()
 			}
 			else {
-				logError(exception, true)
+				logError(exception)
 
 				return callSimulator(simulator, options, "EXE")
 			}

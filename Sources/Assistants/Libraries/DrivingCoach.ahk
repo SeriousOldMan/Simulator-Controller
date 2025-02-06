@@ -609,26 +609,29 @@ class DrivingCoach extends GridRaceAssistant {
 			if !inList(this.Providers, service[1])
 				throw "Unsupported service detected in DrivingCoach.startConversation..."
 
-			if (service[1] = "LLM Runtime")
-				this.iConnector := LLMConnector.LLMRuntimeConnector(this, this.Options["Driving Coach.Model"]
-																		, this.Options["Driving Coach.GPULayers"])
-			else
-				try {
+			try {
+				if (Trim(this.Options["Driving Coach.Model"]) = "")
+					throw "Empty model detected in DrivingCoach.startConversation..."
+				else if (service[1] = "LLM Runtime")
+					this.iConnector := LLMConnector.LLMRuntimeConnector(this, this.Options["Driving Coach.Model"]
+																			, this.Options["Driving Coach.GPULayers"])
+				else {
 					this.iConnector := LLMConnector.%StrReplace(service[1], A_Space, "")%Connector(this, this.Options["Driving Coach.Model"])
 
 					this.Connector.Connect(service[2], service[3])
 
 					this.connectorState("Active")
 				}
-				catch Any as exception {
-					logError(exception)
+			}
+			catch Any as exception {
+				logError(exception)
 
-					this.iConnector := false
+				this.iConnector := false
 
-					this.connectorState("Error", "Configuration")
+				this.connectorState("Error", "Configuration")
 
-					throw "Unsupported service detected in DrivingCoach.startConversation..."
-				}
+				return false
+			}
 
 			this.Connector.MaxTokens := this.Options["Driving Coach.MaxTokens"]
 			this.Connector.Temperature := this.Options["Driving Coach.Temperature"]

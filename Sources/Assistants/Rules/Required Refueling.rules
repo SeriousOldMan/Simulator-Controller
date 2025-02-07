@@ -1,8 +1,8 @@
-; Checks whether at least one pitstop has been planned and
+; Checks whether at least one pitstop will be done and
 ; the car gets at least refueled once.
 ;
-; 1. Get the number of pitstop refuels with pitstopFuel.
-;    The amount of taken fuel actually does not matter.
+; 1. Get the number of pitstop refuels with "pitstopFuel".
+;    The amount of fuel actually does not matter.
 ; 2. The scenario is valid, if at least one time the car
 ;    gets refueled.
 

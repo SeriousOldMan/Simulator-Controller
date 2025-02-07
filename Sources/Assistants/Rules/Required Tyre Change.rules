@@ -1,9 +1,9 @@
-; Checks whether at least one pitstop has been planned and
-; the car gets new tyres at least once.
+; Checks whether at least one pitstop will be done and the car
+; gets new tyres at least once.
 ;
 ; 1. Get the list of tyre compounds used at the different pitstops
-;    with pitstopTyreCompounds.
-; 2. Compute the length of this list.
+;    with "pitstopTyreCompounds".
+; 2. Compute the "length" of this list.
 ; 3. The scenario is valid, if the length of this list is larger than
 ;    zero, actually meaning that tyres have been changed at least once.
 

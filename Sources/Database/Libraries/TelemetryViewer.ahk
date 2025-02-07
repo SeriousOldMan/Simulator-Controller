@@ -754,21 +754,10 @@ class TelemetryViewer {
 
 	loadLayouts() {
 		local configuration := readMultiMap(kUserConfigDirectory . "Telemetry.layouts")
-		local layouts, name, definition, ignore
+		local layouts := CaseInsenseMap()
+		local name, definition, ignore
 
-		if (configuration.Count = 0) {
-			this.iLayouts := CaseInsenseMap(translate("Standard")
-										  , {Name: translate("Standard")
-										   , WidthZoom: 100, HeightZoom: 100
-										   , Channels: choose(kTelemetryChannels
-															, (s) => (!inList(["Speed", "Throttle", "Brake", "TC", "ABS"
-																			 , "Long G", "Lat G"], s.Name) && s.HasProp("Size")))})
-
-			this.iSelectedLayout := translate("Standard")
-		}
-		else {
-			layouts := CaseInsenseMap()
-
+		if (configuration.Count > 0)
 			for name, definition in getMultiMapValues(configuration, "Layouts")
 				try {
 					layouts[name] := {Name: name
@@ -783,6 +772,17 @@ class TelemetryViewer {
 					logError(exception)
 				}
 
+		if (layouts.Count = 0) {
+			this.iLayouts := CaseInsenseMap(translate("Standard")
+										  , {Name: translate("Standard")
+										   , WidthZoom: 100, HeightZoom: 100
+										   , Channels: choose(kTelemetryChannels
+															, (s) => (!inList(["Speed", "Throttle", "Brake", "TC", "ABS"
+																			 , "Long G", "Lat G"], s.Name) && s.HasProp("Size")))})
+
+			this.iSelectedLayout := translate("Standard")
+		}
+		else {
 			this.iLayouts := layouts
 			this.iSelectedLayout := getMultiMapValue(configuration, "Selected", "Layout")
 		}

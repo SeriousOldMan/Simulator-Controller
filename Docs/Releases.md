@@ -1,7 +1,8 @@
 ## 6.1.6.0-release 02/14/25 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. The Telemetry Viewer now remebers the chosen layout and restores it the next time.
+  3. Fixed a rare error where the session mode in a Startup Profile was reset to "Solo".
+  4. The Telemetry Viewer now remebers the chosen layout and restores it the next time.
 
 ## 6.1.5.0-release 02/07/25
   1. Minor bugfixes, as always
@@ -442,7 +443,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
      - New controller action ["TrackMapping"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) for the Race Spotter plugin, which toggles the track mapping on / off.
 	 - New [controller action functions *enableTrackMapping* and *disableTrackMapping*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions), which can be used to automate the track mapping.
 	 - The *Conversation* booster for the Race Spotter supports starting and stopping the track mapper by voice command (see below).
-	 - Track mapping can also be enabled ot disabled in the startup profiles.
+	 - Track mapping can also be enabled ot disabled in the Startup Profiles.
 	 - New icon in the Stream Deck icon set for the "TrackMapping" action.
   8. The key combination to request an unblocking of all executables in "Simulator Startup" has changed from Ctrl-Shift to Ctrl-Alt.
   9. A new LLM event has been defined for the [*Reasoning* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-spotter) of the Race Spotter. "blue_flag_alert" will be signalled, once a faster car appears in the mirror, that is at least one lap ahead. Revisit your event configuration, include the new events and define actions (for example flash a red light in your dashboard using SimHub, for example), if necessary.

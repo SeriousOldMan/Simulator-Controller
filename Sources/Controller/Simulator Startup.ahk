@@ -1407,9 +1407,12 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 			}
 
 			profile := CaseInsenseMap("Name", name
-									, "Mode", hasTeamServer ? getMultiMapValue(settings, "Profiles", name . ".Mode", "Solo") : false
+									, "Mode", (hasTeamServer ? getMultiMapValue(settings, "Profiles", name . ".Mode", "Solo") : "Solo")
 									, "Tools", values2String(",", tools*)
 									, "Simulator", getMultiMapValue(settings, "Profiles", name . ".Simulator", false))
+
+			if !profile["Mode"]
+				profile["Mode"] := "Solo"
 
 			for ignore, assistant in kRaceAssistants
 				profile[assistant] := getMultiMapValue(settings, "Profiles", name . "." . assistant, "Default")

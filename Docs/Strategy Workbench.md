@@ -154,7 +154,7 @@ That said, let's take a look at the builtin predicates:
 
   1. *totalFuel(?fuelAmount, ?numRefuels)*
   
-     *?fuelAmount* is unified with total amount of fuel which will be used for the session and *?numRefuels* will be unified with the number of refuels at the pitstops during the session.
+     *?fuelAmount* is unified with the total amount of fuel which will be used for the session and *?numRefuels* will be unified with the number of refuels at the pitstops during the session.
   
   2. *startFuel(?startFuel)*
   
@@ -162,7 +162,7 @@ That said, let's take a look at the builtin predicates:
 
   3. *pitstopFuel(?refuelAmount, ?numRefuels)*
   
-     *?refuelAmount* is unified with amount of fuel which will be refilled at the pitstops and *?numRefuels* will be unified with the number of refuels at the pitstops.
+     *?refuelAmount* is unified with the amount of fuel which will be refilled at the pitstops and *?numRefuels* will be unified with the number of refuels at the pitstops.
   
   4. *startTyreCompound(?tyreCompound, ?tyreCompoundColor)*
   

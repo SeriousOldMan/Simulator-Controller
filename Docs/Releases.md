@@ -1,3 +1,8 @@
+## 6.1.6.0-release 02/14/25 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. The Telemetry Viewer now remebers the chosen layout and restores it the next time.
+
 ## 6.1.5.0-release 02/07/25
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

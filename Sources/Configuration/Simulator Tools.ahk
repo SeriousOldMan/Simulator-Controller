@@ -3468,7 +3468,8 @@ runBuildTargets(&buildProgress) {
 
 					FileAppend(sourceCode, sourceDirectory . "\compile.ahk", "UTF-8")
 
-					result := RunWait(kProductionCompiler . options . " /in `"" . sourceDirectory . "\compile.ahk" . "`"")
+					result := RunWait(((gTargetConfiguration = "Production") ? kProductionCompiler : kDevelopmentCompiler)
+									. options . " /in `"" . sourceDirectory . "\compile.ahk" . "`"")
 
 					deleteFile(sourceDirectory . "\compile.ahk")
 

@@ -3452,25 +3452,25 @@ runBuildTargets(&buildProgress) {
 				options := " /base `"" . kAHKDirectory . "v2\AutoHotkey64.exe`""
 
 				loop {
+					SplitPath(targetSource, , &sourceDirectory)
+
+					sourceCode := FileRead(targetSource)
+
 					if (gTargetConfiguration = "Production") {
-						SplitPath(targetSource, , &sourceDirectory)
-
-						sourceCode := FileRead(targetSource)
-
 						sourceCode := StrReplace(sourceCode, ";@SC-IF %configuration% == Development`r`n#Include `"..\Framework\Development.ahk`"`r`n;@SC-EndIF", "")
 
 						sourceCode := StrReplace(sourceCode, ";@SC #Include `"..\Framework\Production.ahk`"", "#Include `"..\Framework\Production.ahk`"")
-
-						deleteFile(sourceDirectory . "\compile.ahk")
-
-						FileAppend(sourceCode, sourceDirectory . "\compile.ahk", "UTF-8")
-
-						result := RunWait(kProductionCompiler . options . " /in `"" . sourceDirectory . "\compile.ahk" . "`"")
-
-						deleteFile(sourceDirectory . "\compile.ahk")
 					}
-					else
-						result := RunWait(kDevelopmentCompiler . options . " /in `"" . targetSource . "`"")
+
+					sourceCode := StrReplace(sourceCode, ";@Ahk2Exe-SetVersion 1.0.0.0", ";@Ahk2Exe-SetVersion " . kVersion)
+
+					deleteFile(sourceDirectory . "\compile.ahk")
+
+					FileAppend(sourceCode, sourceDirectory . "\compile.ahk", "UTF-8")
+
+					result := RunWait(kProductionCompiler . options . " /in `"" . sourceDirectory . "\compile.ahk" . "`"")
+
+					deleteFile(sourceDirectory . "\compile.ahk")
 
 					if !result
 						break

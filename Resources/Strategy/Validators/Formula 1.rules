@@ -1,3 +1,20 @@
+; Checks whether the given scenario fulfills Formula 1 race rules
+; of 2022.
+;
+; 1. Check that the car never gets refueled at a pitstop - actually
+;    restricting the number of refuels as zero using refuels.
+; 2. Then get the list of used tyre compounds for all pitstops with
+;    tyreCompounds check whether they are valid with regards to the
+;    race rules.
+; 3. Three different combinations of tyre compounds are valid:
+;    a. At least one set of Wet tyres have been used throughout the
+;       race or
+;    b. At least one set of Intermediate tyres have been used
+;       throughout the race or
+;    c. At least two different types of Dry tyre compounds have been
+;       used throughout the race. This is the case, if the list of
+;       unique tyre compounds used is longer than 1.
+
 validScenario() <= refuels(0), tyreCompounds(?tyreCompounds), validTyreCompounds(?tyreCompounds)
 
 validTyreCompounds(?tyreCompounds) <= any?([Wet | ?], ?tyreCompounds)

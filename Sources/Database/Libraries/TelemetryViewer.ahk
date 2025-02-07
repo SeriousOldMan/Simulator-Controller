@@ -901,6 +901,8 @@ class TelemetryViewer {
 		}
 
 		selectLayout(*) {
+			local configuration := readMultiMap(kUserConfigDirectory . "Telemetry.layouts")
+
 			this.iSelectedLayout := viewerGui["layoutDropDown"].Text
 
 			this.TelemetryChart.WidthZoom := this.Layouts[this.SelectedLayout].WidthZoom
@@ -908,6 +910,10 @@ class TelemetryViewer {
 
 			this.Window["zoomWSlider"].Value := this.TelemetryChart.WidthZoom
 			this.Window["zoomHSlider"].Value := this.TelemetryChart.HeightZoom
+
+			setMultiMapValue(configuration, "Selected", "Layout", this.SelectedLayout)
+
+			writeMultiMap(kUserConfigDirectory . "Telemetry.layouts", configuration)
 
 			this.updateTelemetryChart(true)
 		}

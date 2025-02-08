@@ -24,7 +24,7 @@ ListLines(false)					; Disable execution history
 ;@Ahk2Exe-SetCompanyName Oliver Juwig (TheBigO)
 ;@Ahk2Exe-SetCopyright TheBigO - Creative Commons - BY-NC-SA
 ;@Ahk2Exe-SetProductName Simulator Controller
-;@Ahk2Exe-SetVersion 1.0.0.0
+;@Ahk2Exe-SetVersion 0.0.0.0
 
 global kBuildConfiguration := "Development"
 

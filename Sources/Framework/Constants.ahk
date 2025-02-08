@@ -57,7 +57,7 @@ global kUndefined := "__Undefined__"
 
 global kVersion := "0.0.0.0-dev"
 
-global kSimulatorConfiguration := Map()
+global kSimulatorConfiguration := newMultiMap()
 
 global kSilentMode := false
 

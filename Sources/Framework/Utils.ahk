@@ -726,7 +726,7 @@ triggerDetector(callback := false, options := ["Joy", "Key"]) {
 testAssistants(configurator, assistants := kRaceAssistants, booster := false) {
 	local configuration := configurator.getSimulatorConfiguration()
 	local configurationFile := temporaryFileName("Simulator Configuration", "ini")
-	local thePlugin, ignore, assistant, options, parameter, value
+	local thePlugin, ignore, assistant, options, parameter, value, found
 
 	deleteConfiguration(*) {
 		deleteFile(configurationFile)
@@ -750,10 +750,21 @@ testAssistants(configurator, assistants := kRaceAssistants, booster := false) {
 
 		options := ""
 
-		for ignore, parameter in ["Name", "Language", "Synthesizer", "Speaker", "SpeakerVocalics", "Recognizer", "Listener"]
-			if thePlugin.hasArgument("raceAssistant" . parameter) {
+		for ignore, parameter in ["Name", "Language", "Synthesizer", "Speaker", "SpeakerVocalics", "Recognizer", "Listener"] {
+			found := false
+
+			if thePlugin.hasArgument(parameter) {
+				value := thePlugin.getArgumentValue(parameter)
+
+				found := true
+			}
+			else if thePlugin.hasArgument("raceAssistant" . parameter) {
 				value := thePlugin.getArgumentValue("raceAssistant" . parameter)
 
+				found := true
+			}
+
+			if found {
 				if ((value = "On") || (value = kTrue))
 					value := true
 				else if ((value = "Off") || (value = kFalse))
@@ -761,12 +772,24 @@ testAssistants(configurator, assistants := kRaceAssistants, booster := false) {
 
 				options .= (" -" . parameter . " `"" . value . "`"")
 			}
+		}
 
 		if booster
-			for ignore, parameter in ["SpeakerBooster", "ListenerBooster", "ConversationBooster", "AgentBooster"]
-				if thePlugin.hasArgument("raceAssistant" . parameter) {
+			for ignore, parameter in ["SpeakerBooster", "ListenerBooster", "ConversationBooster", "AgentBooster"] {
+				found := false
+
+				if thePlugin.hasArgument(parameter) {
+					value := thePlugin.getArgumentValue(parameter)
+
+					found := true
+				}
+				else if thePlugin.hasArgument("raceAssistant" . parameter) {
 					value := thePlugin.getArgumentValue("raceAssistant" . parameter)
 
+					found := true
+				}
+				
+				if found {
 					if ((value = "On") || (value = kTrue))
 						value := true
 					else if ((value = "Off") || (value = kFalse))
@@ -774,6 +797,7 @@ testAssistants(configurator, assistants := kRaceAssistants, booster := false) {
 
 					options .= (" -" . parameter . " `"" . value . "`"")
 				}
+			}
 
 		Run(kBinariesDirectory . assistant . ".exe -Logo true -Debug true -Configuration `"" . configurationFile . "`"" . options)
 	}

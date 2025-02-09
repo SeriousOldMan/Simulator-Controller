@@ -2442,6 +2442,9 @@ class TrackMap {
 							setMultiMapValue(this.TrackMap, "Sections", index . ".Type", section.Type)
 							setMultiMapValue(this.TrackMap, "Sections", index . ".X", section.X)
 							setMultiMapValue(this.TrackMap, "Sections", index . ".Y", section.Y)
+
+							if (section.HasProp("Name") && (Trim(section.Name) != ""))
+								setMultiMapValue(this.TrackMap, "Sections", index . ".Name", section.Name)
 						}
 
 						this.updateTrackMap()
@@ -2601,10 +2604,14 @@ class TrackMap {
 		this.Control["trackNameDisplay"].Text := SessionDatabase.getTrackName(this.Simulator
 																			, getMultiMapValue(trackMap, "General", "Track", ""))
 
-		loop getMultiMapValue(trackMap, "Sections", "Count")
+		loop getMultiMapValue(trackMap, "Sections", "Count") {
 			sections.Push({Type: getMultiMapValue(trackMap, "Sections", A_Index . ".Type")
 						 , X: getMultiMapValue(trackMap, "Sections", A_Index . ".X")
 						 , Y: getMultiMapValue(trackMap, "Sections", A_Index . ".Y")})
+
+			if (getMultiMapValue(trackMap, "Sections", A_Index ".Name", kUndefined) != kUndefined)
+				sections[A_Index].Name := getMultiMapValue(trackMap, "Sections", A_Index ".Name")
+		}
 
 		this.iTrackSections := sections
 
@@ -2718,6 +2725,9 @@ class TrackMap {
 				setMultiMapValue(this.TrackMap, "Sections", index . ".Index", section.Index)
 				setMultiMapValue(this.TrackMap, "Sections", index . ".X", section.X)
 				setMultiMapValue(this.TrackMap, "Sections", index . ".Y", section.Y)
+
+				if (section.HasProp("Name") && (Trim(section.Name) != ""))
+					setMultiMapValue(this.TrackMap, "Sections", index . ".Name", section.Name)
 			}
 
 			SessionDatabase().updateTrackMap(this.Simulator, this.Track, this.TrackMap)
@@ -2915,12 +2925,19 @@ class TrackMap {
 	chooseTrackSectionType(section := false) {
 		local result := false
 		local sectionsMenu := Menu()
+		local label := translate("Corner")
 
-		sectionsMenu.Add(translate("Corner"), (*) => (result := "Corner"))
+		if (section && (section.Type = "Corner"))
+			label .= translate("...")
+
+		sectionsMenu.Add(label, (*) => (result := "Corner"))
 		sectionsMenu.Add(translate("Straight"), (*) => (result := "Straight"))
 
 		if section {
-			sectionsMenu.Check(translate(section.Type))
+			if (section.Type = "Corner")
+				sectionsMenu.Check(label)
+			else
+				sectionsMenu.Check(translate(section.Type))
 
 			sectionsMenu.Add()
 
@@ -2942,8 +2959,16 @@ class TrackMap {
 			if (result = "Delete")
 				return result
 			else if (result && (result != "Cancel")) {
-				if section
+				if section {
 					section := section.Clone()
+
+					result := withBlockedWindows(InputBox, translate("Please enter the name of the corner:"), translate("Corner"), "w300 h100", section.HasProp("Name") ? section.Name : "")
+
+					if (result.Result = "Ok")
+						section.Name := result.Value
+
+					result := "Corner"
+				}
 				else
 					section := Object()
 

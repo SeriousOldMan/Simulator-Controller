@@ -4,6 +4,7 @@
   3. Fixed a rare error where the session mode in a Startup Profile was reset to "Solo".
   4. Fixed voice recognition test mode, which was broken for some time now.
   5. The Telemetry Viewer now remebers the chosen layout and restores it the next time.
+  6. Corners can now be given names in the track map. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation) for information on how to do this. If you have configured corner names, the Driving Coach may use the name rather than a simple number when referencing a corner.
 
 ## 6.1.5.0-release 02/07/25
   1. Minor bugfixes, as always

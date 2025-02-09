@@ -2050,7 +2050,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 								if currentSection.HasProp("Nr") {
 									switch currentSection.Type, false {
 										case "Corner":
-											positionInfo := (translate("Corner") . A_Space . currentSection.Nr . translate(": "))
+											if (currentSection.HasProp("Name") && (Trim(currentSection.Name) != ""))
+												positionInfo := (translate(" (") . currentSection.Name . translate(")"))
+											else
+												positionInfo := ""
+
+											positionInfo := (translate("Corner") . A_Space . currentSection.Nr . positionInfo . translate(": "))
 										case "Straight":
 											positionInfo := (translate("Straight") . A_Space . currentSection.Nr . translate(": "))
 										default:
@@ -3395,12 +3400,19 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	chooseTrackSectionType(section := false) {
 		local result := false
 		local sectionsMenu := Menu()
+		local label := translate("Corner")
 
-		sectionsMenu.Add(translate("Corner"), (*) => (result := "Corner"))
+		if (section && (section.Type = "Corner"))
+			label .= translate("...")
+
+		sectionsMenu.Add(label, (*) => (result := "Corner"))
 		sectionsMenu.Add(translate("Straight"), (*) => (result := "Straight"))
 
 		if section {
-			sectionsMenu.Check(translate(section.Type))
+			if (section.Type = "Corner")
+				sectionsMenu.Check(label)
+			else
+				sectionsMenu.Check(translate(section.Type))
 
 			sectionsMenu.Add()
 
@@ -3422,8 +3434,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			if (result = "Delete")
 				return result
 			else if (result && (result != "Cancel")) {
-				if section
+				if section {
 					section := section.Clone()
+
+					if (result = "Corner") {
+						result := withBlockedWindows(InputBox, translate("Please enter the name of the corner:"), translate("Corner"), "w300 h100", section.HasProp("Name") ? section.Name : "")
+
+						if (result.Result = "Ok")
+							section.Name := result.Value
+
+						result := "Corner"
+					}
+				}
 				else
 					section := Object()
 
@@ -3550,6 +3572,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					setMultiMapValue(this.TrackMap, "Sections", index . ".Index", section.Index)
 					setMultiMapValue(this.TrackMap, "Sections", index . ".X", section.X)
 					setMultiMapValue(this.TrackMap, "Sections", index . ".Y", section.Y)
+
+					if (section.HasProp("Name") && (Trim(section.Name) != ""))
+						setMultiMapValue(this.TrackMap, "Sections", index . ".Name", section.Name)
 				}
 
 				this.SessionDatabase.updateTrackMap(this.SelectedSimulator, this.SelectedTrack
@@ -3877,10 +3902,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.iTrackMap := trackMap
 		this.iTrackImage := this.Window.Theme.RecolorizeImage(trackImage)
 
-		loop getMultiMapValue(trackMap, "Sections", "Count")
+		loop getMultiMapValue(trackMap, "Sections", "Count") {
 			sections.Push({Type: getMultiMapValue(trackMap, "Sections", A_Index ".Type")
 						 , X: getMultiMapValue(trackMap, "Sections", A_Index ".X")
 						 , Y: getMultiMapValue(trackMap, "Sections", A_Index ".Y")})
+
+			if (getMultiMapValue(trackMap, "Sections", A_Index ".Name", kUndefined) != kUndefined)
+				sections[A_Index].Name := getMultiMapValue(trackMap, "Sections", A_Index ".Name")
+		}
 
 		this.iTrackSections := sections
 

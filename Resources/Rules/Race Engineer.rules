@@ -963,9 +963,10 @@ priority: -20, [?Pitstop.Plan] => (Set: Pitstop.Planned), (Clear: Pitstop.Plan),
 
 {All: [?Pitstop.Planned], [?Pitstop.Planned.Lap > 0], [?Pitstop.Planned.Lap <= ?Lap]} => (Set: Pitstop.Prepare)
 
-{All: [?Pitstop.Planned], [?Pitstop.Prepare]} => (ProveAll: preparePitstop(!Pitstop.Planned.Nr))
-priority: -20, {All: [?Pitstop.Planned], [?Pitstop.Prepare]} => (Clear: Pitstop.Planned), (Clear: Pitstop.Prepare),
-																(Clear: Pitstop.Planned.Adjusted), (Set: Pitstop.Prepared)
+{All: [?Pitstop.Planned], [?Pitstop.Prepare],
+	  {None: [?InPitlane = true], [?InPit = true]}} => (ProveAll: preparePitstop(!Pitstop.Planned.Nr)), (Set: Pitstop.Set)
+priority: -20, [?Pitstop.Set] => (Clear: Pitstop.Planned), (Clear: Pitstop.Planned.Adjusted),
+								 (Clear: Pitstop.Prepare), (Clear: Pitstop.Set), (Set: Pitstop.Prepared)
 
 preparePitstop(?pitstopNumber) <= Call(startPitstopSetup, ?pitstopNumber)
 preparePitstop(?pitstopNumber) <= setRefuelAmount(?pitstopNumber),

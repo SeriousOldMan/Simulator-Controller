@@ -39,6 +39,20 @@ class Section {
 		}
 	}
 
+	Name {
+		Get {
+			local name
+
+			if this.TrackSection.HasProp("Name") {
+				name := Trim(this.TrackSection)
+
+				return ((name != "") ? name : false)
+			}
+			else
+				return false
+		}
+	}
+
 	Length {
 		Get {
 			return this.TrackSection.Length
@@ -89,8 +103,14 @@ class Section {
 
 	Descriptor {
 		Get {
-			return {Type: this.Type, Length: (nullRound(this.Length, 1) . " Meter")
-				  , Time: (nullRound(this.Time / 1000, 2) . " Seconds")}
+			local descriptor := {Type: this.Type, Length: (nullRound(this.Length, 1) . " Meter")
+							   , Time: (nullRound(this.Time / 1000, 2) . " Seconds")}
+			local name := this.Name
+
+			if name
+				descriptor.Name := name
+
+			return descriptor
 		}
 	}
 

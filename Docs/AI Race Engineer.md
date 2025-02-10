@@ -593,7 +593,9 @@ At this time, Jona can handle three important states in its knowledge base.
   - A pitstop has been prepared, which means that all the settings had been transferred to the simulation game, for example to the Pitstop MFD of *Assetto Corsa Competizione*
   - The car is in the pit and the crew is working on the car
   
-You can trigger the first two states, as long as logical for the given situation, by setting the facts *Pitstop.Plan* or *Pitstop.Prepare* to *true* in the knowledge base. The rule network will do the rest. An undertaken pitstop must be triggered by setting *Pitstop.Lap* to the lap number, where the driver pitted. All this is handled by the *RaceEngineer* class already, so there is no need to do this at the knowledge base level. But it is important to know, that these states exist, in order to undertstand Jonas reactions to your requests. For example, Jona first wants to plan a pitstop before you enter the pit, which is quite logical, right?
+You can trigger the first two states, as long as logical for the given situation, by setting the facts *Pitstop.Plan* or *Pitstop.Prepare* to *true* in the knowledge base. The rule network will do the rest. An undertaken pitstop must be triggered by setting *Pitstop.Lap* to the lap number, where the driver pitted. All this is handled by the *RaceEngineer* class already, so there is no need to do this at the knowledge base level. But it is important to know, that these states exist, in order to undertstand Jonas reactions to your requests. For example, Jona first wants to plan a pitstop before you enter the pit, which is quite logical, right? 
+
+Good to know: Jona will not send the choices for the upcoming pitstop to the simulator, when the car is currently in the pitlane. This will prevent in most cases problems with the pit limiter, if the driver is curretly serving a penalty. Since the processing is inherently asynchronous, there is still a chance that the pit limiter will be disengaged, if a pitstop is prepared while serving a penalty at the same time, but the chance for such a problem is reduced quite a lot.
 
 ### Jonas Memory
 

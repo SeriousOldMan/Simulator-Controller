@@ -7,9 +7,10 @@
   6. Improved detection of exact car location in the pitlane for *Assetto Corsa*, *Automobilista 2*, *Le Mans Ultimate*, *rFactor 2* and *iRacing*.
   7. The Race Engineer now tries to prevent preparation of a pitstop while the car is in the pitlane, since the driver might actually doing a drive-through with engaged pit limiter. Since the processing is inherently asynchronous, there is still a chance that the pit limiter will be disengaged, if a pitstop is prepared while serving a penalty at the same time, but the chance for such a problem is reduced quite a lot.
   8. Corners can now be given names in the track map. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation) for information on how to do this. If you have configured corner names, the Driving Coach may use the name rather than a simple number when referencing a corner.
-  9. The Driving Coach will use corner names, if available, to reference a specific corner.
-     - Corner names must have been defined for the track map (see item 8. above)
-	 - The Driving Coach instructions have been updated. If you have tweaked your instructions, you may want to update and include your changes again.
+  9. Corner names will be shown in the inspector window of the Telemetry Viewer, if available.
+  10. The Driving Coach will also use corner names, if available, to reference a specific corner.
+      - Corner names must have been defined for the track map (see item 8. above)
+	  - The Driving Coach instructions have been updated. If you have tweaked your instructions, you may want to update and include your changes again.
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-616), if you have tweaked your Drving Coach instructions.
 

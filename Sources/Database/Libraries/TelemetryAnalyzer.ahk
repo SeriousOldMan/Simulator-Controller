@@ -44,7 +44,7 @@ class Section {
 			local name
 
 			if this.TrackSection.HasProp("Name") {
-				name := Trim(this.TrackSection)
+				name := Trim(this.TrackSection.Name)
 
 				return ((name != "") ? name : false)
 			}
@@ -1436,6 +1436,9 @@ class TelemetryAnalyzer {
 				setMultiMapValue(this.TrackMap, "Sections", index . ".Type", section.Type)
 				setMultiMapValue(this.TrackMap, "Sections", index . ".X", section.X)
 				setMultiMapValue(this.TrackMap, "Sections", index . ".Y", section.Y)
+
+				if (section.HasProp("Name") && (Trim(section.Name) != ""))
+					setMultiMapValue(this.TrackMap, "Sections", index . ".Name", section.Name)
 			}
 		}
 	}
@@ -1508,12 +1511,16 @@ class TelemetryAnalyzer {
 		local sections := []
 		local index, section
 
-		loop getMultiMapValue(trackMap, "Sections", "Count")
+		loop getMultiMapValue(trackMap, "Sections", "Count") {
 			sections.Push({Nr: getMultiMapValue(trackMap, "Sections", A_Index . ".Nr")
 						 , Type: getMultiMapValue(trackMap, "Sections", A_Index . ".Type")
 						 , Index: getMultiMapValue(trackMap, "Sections", A_Index . ".Index")
 						 , X: getMultiMapValue(trackMap, "Sections", A_Index . ".X")
 						 , Y: getMultiMapValue(trackMap, "Sections", A_Index . ".Y")})
+
+			if (getMultiMapValue(trackMap, "Sections", A_Index . ".Name", kUndefined) != kUndefined)
+				sections[A_Index].Name := getMultiMapValue(trackMap, "Sections", A_Index . ".Name")
+		}
 
 		for index, section in sections
 			section.Length := computeSectionLength(trackMap, sections, index, section)

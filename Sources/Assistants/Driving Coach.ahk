@@ -89,11 +89,11 @@ startupDrivingCoach() {
 	local coachLogo := false
 	local coachLanguage := false
 	local coachSynthesizer := true
-	local coachSpeaker := false
+	local coachSpeaker := true
 	local coachSpeakerVocalics := false
 	local coachSpeakerBooster := false
 	local coachRecognizer := true
-	local coachListener := false
+	local coachListener := true
 	local coachListenerBooster := false
 	local coachConversationBooster := false
 	local coachAgentBooster := false
@@ -214,6 +214,20 @@ startupDrivingCoach() {
 
 	if remotePID
 		Task.startTask(PeriodicTask(checkRemoteProcessAlive.Bind(remotePID), 10000, kLowPriority))
+
+	coach.iSimulator := "Assetto Corsa Competizione"
+	coach.iTrack := "Brands Hatch"
+	coach.iTelemetryAnalyzer := TelemetryAnalyzer("Assetto Corsa Competizione", "Brands Hatch")
+	coach.iTelemetryCollector := TelemetryCollector(kTempDirectory . "Driving Coach\Telemetry", "Assetto Corsa Competizione", "Brands Hatch", 4000)
+
+	coach.iTelemetryCollector.startup()
+
+	coach.iCoachingActive := true
+	coach.iCoachingActive := true
+
+	coach.telemetryAvailable([3])
+
+	coach.handleVoiceText("TEXT", "What can you tell me about corner number 3?")
 
 	startupProcess()
 }

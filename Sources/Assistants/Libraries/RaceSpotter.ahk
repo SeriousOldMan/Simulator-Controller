@@ -3844,17 +3844,26 @@ class RaceSpotter extends GridRaceAssistant {
 
 					prefix := ("Car." . carIndex)
 
-					carOverallPosition := this.getPosition(carIndex, "Overall", data)
-					carClassPosition := carClassPositions[carIndex]
-					carDelta := (((carLaps + carRunning) - (driverLaps + driverRunning)) * lapTime)
+					try {
+						carOverallPosition := this.getPosition(carIndex, "Overall", data)
+						carClassPosition := carClassPositions[carIndex]
+						carDelta := (((carLaps + carRunning) - (driverLaps + driverRunning)) * lapTime)
 
-					if (driverRunning < carRunning) {
-						carAheadDelta := ((carRunning - driverRunning) * lapTime)
-						carBehindDelta := ((1 - carRunning + driverRunning) * lapTime * -1)
+						if (driverRunning < carRunning) {
+							carAheadDelta := ((carRunning - driverRunning) * lapTime)
+							carBehindDelta := ((1 - carRunning + driverRunning) * lapTime * -1)
+						}
+						else {
+							carAheadDelta := ((1 - driverRunning + carRunning) * lapTime)
+							carBehindDelta := ((driverRunning - carRunning) * lapTime * -1)
+						}
 					}
-					else {
-						carAheadDelta := ((1 - driverRunning + carRunning) * lapTime)
-						carBehindDelta := ((driverRunning - carRunning) * lapTime * -1)
+					catch Any as exception {
+						logError(exception)
+
+						carDelta := false
+						carAheadDelta := false
+						carBehindDelta := false
 					}
 
 					inPit := (getMultiMapValue(data, "Position Data", prefix . ".InPitLane", false)

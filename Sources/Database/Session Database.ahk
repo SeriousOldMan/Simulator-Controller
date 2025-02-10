@@ -3903,12 +3903,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.iTrackImage := this.Window.Theme.RecolorizeImage(trackImage)
 
 		loop getMultiMapValue(trackMap, "Sections", "Count") {
-			sections.Push({Type: getMultiMapValue(trackMap, "Sections", A_Index ".Type")
-						 , X: getMultiMapValue(trackMap, "Sections", A_Index ".X")
-						 , Y: getMultiMapValue(trackMap, "Sections", A_Index ".Y")})
+			sections.Push({Type: getMultiMapValue(trackMap, "Sections", A_Index . ".Type")
+						 , X: getMultiMapValue(trackMap, "Sections", A_Index . ".X")
+						 , Y: getMultiMapValue(trackMap, "Sections", A_Index . ".Y")})
 
-			if (getMultiMapValue(trackMap, "Sections", A_Index ".Name", kUndefined) != kUndefined)
-				sections[A_Index].Name := getMultiMapValue(trackMap, "Sections", A_Index ".Name")
+			if (getMultiMapValue(trackMap, "Sections", A_Index . ".Name", kUndefined) != kUndefined)
+				sections[A_Index].Name := getMultiMapValue(trackMap, "Sections", A_Index . ".Name")
 		}
 
 		this.iTrackSections := sections

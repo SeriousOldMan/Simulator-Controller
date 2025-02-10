@@ -2000,7 +2000,7 @@ class SectionInfoViewer {
 	}
 
 	createSectionInfo(section, referenceSection := false) {
-		local html
+		local html, name
 
 		nullZero(value) {
 			return (isNull(value) ? 0 : value)
@@ -2082,7 +2082,12 @@ class SectionInfoViewer {
 		}
 
 		if (section.Type = "Corner") {
-			this.Window.Title := (translate("Corner") . translate(" (") . translate(section.Direction) . translate(")"))
+			if section.HasProp("Name")
+				name := (A_Space . section.Name)
+			else
+				name := ""
+
+			this.Window.Title := (translate("Corner") . name . translate(" (") . translate(section.Direction) . translate(")"))
 
 			html := "<table class=`"table-std`">"
 
@@ -2609,8 +2614,8 @@ class TrackMap {
 						 , X: getMultiMapValue(trackMap, "Sections", A_Index . ".X")
 						 , Y: getMultiMapValue(trackMap, "Sections", A_Index . ".Y")})
 
-			if (getMultiMapValue(trackMap, "Sections", A_Index ".Name", kUndefined) != kUndefined)
-				sections[A_Index].Name := getMultiMapValue(trackMap, "Sections", A_Index ".Name")
+			if (getMultiMapValue(trackMap, "Sections", A_Index . ".Name", kUndefined) != kUndefined)
+				sections[A_Index].Name := getMultiMapValue(trackMap, "Sections", A_Index . ".Name")
 		}
 
 		this.iTrackSections := sections

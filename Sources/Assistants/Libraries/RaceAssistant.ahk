@@ -2416,6 +2416,9 @@ class RaceAssistant extends ConfigurationItem {
 		knowledgeBase.setFact("Lap.Penalty", lapPenalty)
 		knowledgeBase.setFact("Lap.Warnings", getMultiMapValue(data, "Stint Data", "Warnings", 0))
 
+		knowledgeBase.setFact("InPitlane", getMultiMapValue(data, "Stint Data", "InPitlane", false))
+		knowledgeBase.setFact("InPit", getMultiMapValue(data, "Stint Data", "InPit", false))
+
 		knowledgeBase.setFact("Update", true)
 
 		result := knowledgeBase.produce()

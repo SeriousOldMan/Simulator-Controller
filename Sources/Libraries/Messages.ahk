@@ -319,16 +319,33 @@ class MessageManager extends PeriodicTask {
 	}
 
 	sendFileMessage(pid, category, data, request) {
+		local fileName := (kTempDirectory . "Messages\" . pid . ".msg")
 		local text := (request . ":" . category . ":" . encode(data) . "`n")
+		local file := false
 
 		try {
-			FileAppend(text, kTempDirectory . "Messages\" . pid . ".msg")
+			file := FileOpen(fileName, "a-rwd")
+
+			if !file
+				return false
+			else {
+				file.Write(text)
+
+				return true
+			}
 		}
 		catch Any as exception {
+			logError(exception)
+
+			if isDevelopment()
+				logMessage(kLogWarn, "Waiting for file `"" . fileName . "`"...")
+
 			return false
 		}
-
-		return true
+		finally {
+			if file
+				file.Close()
+		}
 	}
 
 	receiveMessages() {

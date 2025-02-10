@@ -37,7 +37,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 6.1.6
 
-Everything handled automatically.
+The Driving Coach instructions have changed with this release. If you have modified the default instructions, you will have to revert them back to original and integrate your modifications back again. Take a look especially at the "Coaching" instruction, which has changed for corner name handling.
 
 ***
 

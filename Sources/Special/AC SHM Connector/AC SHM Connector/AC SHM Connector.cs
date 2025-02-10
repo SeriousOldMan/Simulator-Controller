@@ -375,6 +375,7 @@ namespace SHMConnector
             strWriter.WriteLine("StintTimeRemaining=" + time);
             strWriter.WriteLine("DriverTimeRemaining=" + time);
             strWriter.WriteLine("InPit=" + (graphics.IsInPit != 0 ? "true" : "false"));
+            strWriter.WriteLine("InPitLane=" + ((graphics.IsInPitLane + graphics.IsInPit) != 0 ? "true" : "false"));
 
             strWriter.WriteLine("[Track Data]");
             strWriter.Write("Length="); strWriter.WriteLine(staticInfo.TrackSPlineLength);

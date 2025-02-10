@@ -409,6 +409,7 @@ namespace ACSHMProvider
             }
             */
             Console.WriteLine("InPit=" + (graphics.IsInPit != 0 ? "true" : "false"));
+            Console.WriteLine("InPitLane=" + ((graphics.IsInPitLane + graphics.IsInPit) != 0 ? "true" : "false"));
 
             Console.WriteLine("[Track Data]");
 

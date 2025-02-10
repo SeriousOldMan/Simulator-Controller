@@ -306,17 +306,19 @@ namespace RF2SHMProvider {
 
 					Console.Write("StintTimeRemaining="); Console.WriteLine(time);
 					Console.Write("DriverTimeRemaining="); Console.WriteLine(time);
-				/*
+                /*
 				}
 				*/
-					
-				if (playerScoring.mInPits != 0) {
+
+                Console.Write("InPitLane="); Console.WriteLine(playerScoring.mInPits != 0 ? "true" : "false");
+
+                if (playerScoring.mInPits != 0) {
 					double speed = VehicleSpeed(ref playerScoring);
 					
 					if (speed < 5 || playerScoring.mPitState == (byte)Stopped)
-						Console.Write("InPit=true");
+						Console.WriteLine("InPit=true");
 					else
-						Console.Write("InPit=false");
+						Console.WriteLine("InPit=false");
 				}
 			}
 

@@ -355,8 +355,10 @@ namespace SHMConnector {
 
 				strWriter.Write("StintTimeRemaining="); strWriter.WriteLine(time);
 				strWriter.Write("DriverTimeRemaining="); strWriter.WriteLine(time);
-					
-				if (playerScoring.mInPits != 0) {
+
+                strWriter.Write("InPitLane="); strWriter.WriteLine(playerScoring.mInPits != 0 ? "true" : "false");
+
+                if (playerScoring.mInPits != 0) {
 					double speed = VehicleSpeed(ref playerScoring);
 					
 					if (speed < 5 || playerScoring.mPitState == (byte)Stopped)

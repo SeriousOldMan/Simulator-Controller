@@ -398,6 +398,7 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		printLine(&output, "DriverTimeRemaining=", timeRemaining);
 		
 		printLine(&output, "InPit=", (localCopy->mPitMode == PIT_MODE_IN_PIT) ? "true" : "false");
+		printLine(&output, "InPitLane=", (localCopy->mPitMode > PIT_MODE_NONE) ? "true" : "false");
 
 		printLine(&output, "[Track Data]");
 		printLine(&output, "Length=", localCopy->mTrackLength);

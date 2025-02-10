@@ -748,6 +748,9 @@ void writePositions(const irsdk_header *header, const char* data)
 
 				if (getRawDataValue(pitLaneStates, header, data, "CarIdxOnPitRoad"))
 					printf("Car.%s.InPitLane=%s\n", carIdx1, ((bool*)pitLaneStates)[carIndex] ? "true" : "false");
+
+				if (getRawDataValue(pitLaneStates, header, data, "CarIdxTrackSurface"))
+					printf("Car.%s.InPit=%s\n", carIdx1, ((irsdk_TrkLoc*)pitLaneStates)[carIndex] == irsdk_InPitStall ? "true" : "false");
 			}
 		}
 
@@ -1136,6 +1139,11 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			}
 			else
 				printf("InPit=false\n");
+
+			char* pitLaneStates;
+
+			if (getRawDataValue(pitLaneStates, header, data, "CarIdxOnPitRoad"))
+				printf("InPit=%s\n", std::string(((bool*)pitLaneStates)[atoi(playerCarIdx)] ? "true" : "false"));
 
 			printf("[Track Data]\n");
 

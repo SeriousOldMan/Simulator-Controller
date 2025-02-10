@@ -3857,7 +3857,7 @@ class RaceSpotter extends GridRaceAssistant {
 						carBehindDelta := ((driverRunning - carRunning) * lapTime * -1)
 					}
 
-					inPit := (getMultiMapValue(data, "Position Data", prefix . ".InPitlane", false)
+					inPit := (getMultiMapValue(data, "Position Data", prefix . ".InPitLane", false)
 						   || getMultiMapValue(data, "Position Data", prefix . ".InPit", false))
 
 					sectorTimes := getMultiMapValue(data, "Position Data", prefix . ".Time.Sectors", false)

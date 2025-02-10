@@ -3588,7 +3588,7 @@ class RaceEngineer extends RaceAssistant {
 		local speaker
 
 		if (this.hasEnoughData(false) && this.Speaker[false] && this.Announcements["FuelWarning"])
-			if (!knowledgeBase.getValue("InPitlane", false) && !knowledgeBase.getValue("InPit", false)) {
+			if (!knowledgeBase.getValue("InPitLane", false) && !knowledgeBase.getValue("InPit", false)) {
 				remainingFuel := Round(remainingFuel, 1)
 				remainingLaps := Floor(remainingLaps)
 
@@ -3632,7 +3632,7 @@ class RaceEngineer extends RaceAssistant {
 		local speaker, phrase
 
 		if ((this.hasEnoughData(false) || (knowledgeBase.getValue("Lap", 0) <= this.LearningLaps)) && this.Speaker[false] && this.Announcements["DamageReporting"])
-			if (!knowledgeBase.getValue("InPitlane", false) && !knowledgeBase.getValue("InPit", false)) {
+			if (!knowledgeBase.getValue("InPitLane", false) && !knowledgeBase.getValue("InPit", false)) {
 				speaker := this.getSpeaker()
 				phrase := false
 
@@ -3679,7 +3679,7 @@ class RaceEngineer extends RaceAssistant {
 
 		if (this.hasEnoughData(false) && knowledgeBase.getValue("Lap.Remaining.Session", knowledgeBase.getValue("Lap.Remaining", 0)) > 3)
 			if (this.Speaker[false] && this.Announcements["DamageAnalysis"])
-				if (!knowledgeBase.getValue("InPitlane", false) && !knowledgeBase.getValue("InPit", false)) {
+				if (!knowledgeBase.getValue("InPitLane", false) && !knowledgeBase.getValue("InPit", false)) {
 					speaker := this.getSpeaker()
 
 					if repair {
@@ -3713,7 +3713,7 @@ class RaceEngineer extends RaceAssistant {
 		static tyreLookup := CaseInsenseMap("FL", "FrontLeft", "FR", "FrontRight", "RL", "RearLeft", "RR", "RearRight")
 
 		if (this.hasEnoughData(false) && (this.Session == kSessionRace))
-			if (!knowledgeBase.getValue("InPitlane", false) && !knowledgeBase.getValue("InPit", false))
+			if (!knowledgeBase.getValue("InPitLane", false) && !knowledgeBase.getValue("InPit", false))
 				if (this.Speaker[false] && this.Announcements["PressureReporting"]) {
 					speaker := this.getSpeaker()
 					fragments := speaker.Fragments

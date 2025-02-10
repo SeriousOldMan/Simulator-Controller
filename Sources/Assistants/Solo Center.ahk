@@ -3502,7 +3502,7 @@ class SoloCenter extends ConfigurationItem {
 		}
 
 		loop getMultiMapValue(data, "Position Data", "Car.Count", 0)
-			if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPitlane", false)
+			if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPitLane", false)
 			 || getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPit", false)) {
 				carID := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".ID", A_Index)
 

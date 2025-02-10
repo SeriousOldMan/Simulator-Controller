@@ -13,7 +13,8 @@
   9. The Driving Coach will also use corner names, if available, to reference a specific corner.
      - Corner names must have been defined for the track map (see item 8. above)
      - The Driving Coach instructions have been updated. If you have tweaked your instructions, you may want to update and include your changes again.
-  10. [Internal] Improved handling of inter process messages in cases where message processing needs longer than usual.
+  10. [Expert] The meta information between <think> and </think> is now removed automatically from the answer, when models like deepseek-r1 are used.
+  11. [Internal] Improved handling of inter process messages in cases where message processing needs longer than usual.
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-616), if you have tweaked your Drving Coach instructions.
 

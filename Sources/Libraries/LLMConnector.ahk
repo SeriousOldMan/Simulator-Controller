@@ -400,12 +400,14 @@ class LLMConnector {
 
 								if ((answer = kNull) || (Trim(answer) = ""))
 									answer := false
+								else
+									answer := this.ParseAnswer(answer)
 							}
 							else
 								answer := false
 						}
 						else if answer.Has("text")
-							answer := answer["text"]
+							answer := this.ParseAnswer(answer["text"])
 						else
 							throw "Unknown answer format detected..."
 
@@ -835,6 +837,10 @@ class LLMConnector {
 			return false
 		}
 
+		ParseAnswer(answer) {
+			return Trim(StrReplace(StrReplace(StrReplace(super.ParseAnswer(answer), "System:", ""), "Assistant:", ""), "User:", ""))
+		}
+
 		Ask(question, instructions := false, tools := false, &calls?) {
 			local prompt := this.CreatePrompt(instructions ? instructions : this.GetInstructions()
 											, tools ? tools : this.GetTools()
@@ -922,7 +928,7 @@ class LLMConnector {
 					if toolCall
 						return true
 					else {
-						answer := Trim(StrReplace(StrReplace(StrReplace(answer, "System:", ""), "Assistant:", ""), "User:", ""))
+						answer := this.ParseAnswer(answer)
 
 						if isDebug() {
 							deleteFile(kTempDirectory . "LLM.response")
@@ -1046,6 +1052,15 @@ class LLMConnector {
 
 	GetTools() {
 		return this.Manager.getTools()
+	}
+
+	ParseAnswer(answer) {
+		local index := InStr(answer, "</think>")
+
+		if index
+			answer := SubStr(answer, index + 8)
+
+		return answer
 	}
 
 	AddConversation(question, answer) {

@@ -2484,6 +2484,97 @@ class TrackMap {
 		local sessionDB := SessionDatabase()
 		local x, y, w, h
 
+		showPositionInfo(*) {
+			global gPositionInfoEnabled
+
+			local x, y, coordinateX, coordinateY, window
+
+			static currentAction := false
+			static previousAction := false
+			static currentSection := false
+			static previousSection := false
+			static positionInfo := ""
+
+			displayToolTip() {
+				SetTimer(displayToolTip, 0)
+
+				ToolTip(positionInfo)
+
+				SetTimer(removeToolTip, 10000)
+			}
+
+			removeToolTip() {
+				SetTimer(removeToolTip, 0)
+
+				ToolTip()
+			}
+
+			MouseGetPos(&x, &y)
+
+			x := screen2Window(x)
+			y := screen2Window(y)
+
+			coordinateX := false
+			coordinateY := false
+
+			if this.findTrackCoordinate(x - this.iTrackDisplayArea[1], y - this.iTrackDisplayArea[2], &coordinateX, &coordinateY) {
+				previousAction := false
+
+				currentSection := this.findTrackSection(coordinateX, coordinateY)
+
+				if !currentSection
+					currentSection := (coordinateX . ";" . coordinateY)
+
+				if (currentSection && (currentSection != previousSection)) {
+					ToolTip()
+
+					if isObject(currentSection) {
+						if currentSection.HasProp("Nr") {
+							switch currentSection.Type, false {
+								case "Corner":
+									if (currentSection.HasProp("Name") && (Trim(currentSection.Name) != ""))
+										positionInfo := (translate(" (") . currentSection.Name . translate(")"))
+									else
+										positionInfo := ""
+
+									positionInfo := (translate("Corner") . A_Space . currentSection.Nr . positionInfo . translate(": "))
+								case "Straight":
+									positionInfo := (translate("Straight") . A_Space . currentSection.Nr . translate(": "))
+								default:
+									throw "Unknown section type detected in SessionDatabaseEditor.show..."
+							}
+
+							positionInfo .= (Round(currentSection.X, 3) . translate(", ") . Round(currentSection.Y, 3))
+						}
+						else
+							return
+					}
+					else
+						positionInfo := (Round(string2Values(";", currentSection)[1], 3) . translate(", ") . Round(string2Values(";", currentSection)[2], 3))
+
+					SetTimer(removeToolTip, 0)
+					SetTimer(displayToolTip, 1000)
+
+					previousSection := currentSection
+				}
+				else if !currentSection {
+					ToolTip()
+
+					SetTimer(removeToolTip, 0)
+
+					previousSection := false
+				}
+			}
+			else {
+				ToolTip()
+
+				SetTimer(removeToolTip, 0)
+
+				previousAction := false
+				previousSection := false
+			}
+		}
+
 		this.createGui()
 
 		if getWindowPosition("Telemetry Browser.Track Map", &x, &y)
@@ -2500,6 +2591,11 @@ class TrackMap {
 		this.iEditorTask := PeriodicTask(() {
 								if (this.TrackMapMode = "Edit")
 									this.Control["editButton"].Text := translate(GetKeyState("Ctrl") ? "Cancel" : "Save")
+
+								if WinActive(this.Window)
+									OnMessage(0x0200, showPositionInfo)
+								else
+									OnMessage(0x0200, showPositionInfo, 0)
 							}, 100, kHighPriority)
 
 		this.iEditorTask.start()

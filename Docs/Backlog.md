@@ -18,7 +18,6 @@
   5. Support for Time+1 session format
   6. Approaching corner braking point countdown
   7. Configurable priority for voice output between Spotter and other Assistants
-  8. Driving Coach uses corner names, if available
 
 #### Session Database
   1. Active validation of value ranges in settings definitions

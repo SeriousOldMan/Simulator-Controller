@@ -2108,7 +2108,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		else
 			this.selectModule("Settings")
 
-		OnMessage(0x0200, showPositionInfo)
+		PeriodicTask(() {
+			if WinActive(window)
+				OnMessage(0x0200, showPositionInfo)
+			else
+				OnMessage(0x0200, showPositionInfo, 0)
+		}, 1000, kLowPriority).start()
 	}
 
 	themeIcon(fileName) {
@@ -3549,7 +3554,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		for index, section in this.TrackSections {
 			section.Nr := ((section.Type = "Corner") ? ++corners : ++straights)
 
-			this.TrackSectionsListView.Add("", section.Nr, translate(section.Type), computeLength(index), Round(section.X), Round(section.Y))
+			this.TrackSectionsListView.Add("", section.Nr, translate(section.Type) . (section.HasProp("Name") ? (translate(" - ") . section.Name) : "")
+											 , computeLength(index), Round(section.X), Round(section.Y))
 		}
 
 		this.TrackSectionsListView.ModifyCol()

@@ -4,7 +4,7 @@
 
 #### Simulation Support
   1. Better integration with the weather forecast data of *rFactor 2*
-  2. Full support of hybrid cars
+  2. Full support for hybrid and fully electric cars
   3. Support for new and also historic simulators
 
 #### Plugins

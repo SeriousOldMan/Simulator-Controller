@@ -129,7 +129,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		local data
 
 		if !R3EPlugin.sCarDB {
-			data := JSON.parse(FileRead(kResourcesDirectory . "Simulator Data\R3E\r3e-data.json"))
+			data := JSON.parse(FileRead(kResourcesDirectory . "Simulator Data\R3E\r3e-data.json", "UTF-8"))
 
 			R3EPlugin.sClassDB := data["classes"]
 			R3EPlugin.sCarDB := data["cars"]

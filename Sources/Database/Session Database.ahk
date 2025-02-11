@@ -416,6 +416,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		this.iRequestorPID := requestorPID
+		this.iTrackEditorMode := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+												, "Session Database", "Track Editor", this.TrackEditorMode)
 
 		super.__New(kSimulatorConfiguration)
 
@@ -1467,6 +1469,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		chooseTrackEditorMode(*) {
+			local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
 			if (editorGui["trackEditorTypeDropDown"].Value = 2) {
 				if (!this.SelectedCar || (this.SelectedCar == true)) {
 					editorGui["trackEditorTypeDropDown"].Value := 1
@@ -1478,6 +1482,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			}
 			else
 				this.iTrackEditorMode := "Sections"
+
+			setMultiMapValue(settings, "Session Database", "Track Editor", this.TrackEditorMode)
+
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
 			this.updateTrackMap()
 			this.updateState()
@@ -1859,7 +1867,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui["settingsTab"].UseTab(7)
 
 		editorGui.Add("Text", "x296 ys w80 h23 +0x200 X:Move(0.2)", translate("Edit"))
-		editorGui.Add("DropDownList", "xp+90 yp w270 X:Move(0.2) W:Grow(0.8) Choose2 vtrackEditorTypeDropDown"
+
+		chosen := inList(["Sections", "Automations"], this.TrackEditorMode)
+
+		editorGui.Add("DropDownList", "xp+90 yp w270 X:Move(0.2) W:Grow(0.8) Choose" . chosen . " vtrackEditorTypeDropDown"
 					, collect(["Sections", "Automations"], translate)).OnEvent("Change", chooseTrackEditorMode)
 
 		this.iTrackDisplayArea := [297, 263, 358, 326]

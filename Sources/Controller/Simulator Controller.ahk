@@ -37,10 +37,10 @@
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\GIFViewer.ahk"
-#Include "..\Libraries\Task.ahk"
-#Include "..\Libraries\Messages.ahk"
-#Include "..\Libraries\SpeechRecognizer.ahk"
+#Include "..\Framework\Extensions\GIFViewer.ahk"
+#Include "..\Framework\Extensions\Task.ahk"
+#Include "..\Framework\Extensions\Messages.ahk"
+#Include "..\Framework\Extensions\SpeechRecognizer.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

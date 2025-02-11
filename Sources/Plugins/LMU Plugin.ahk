@@ -9,7 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\Math.ahk"
+#Include "..\Framework\Extensions\Math.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "Libraries\SimulatorPlugin.ahk"
 #Include "Libraries\LMURESTProvider.ahk"

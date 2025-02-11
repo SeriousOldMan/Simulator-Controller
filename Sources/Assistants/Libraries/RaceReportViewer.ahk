@@ -9,8 +9,8 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\..\Libraries\HTMLViewer.ahk"
-#Include "..\..\Libraries\Math.ahk"
+#Include "..\..\Framework\Extensions\HTMLViewer.ahk"
+#Include "..\..\Framework\Extensions\Math.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 #Include "RaceReportReader.ahk"
 

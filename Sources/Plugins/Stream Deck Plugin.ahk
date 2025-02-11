@@ -16,10 +16,10 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\Task.ahk"
-#Include "..\Libraries\Messages.ahk"
-#Include "..\Libraries\CLR.ahk"
-#Include "..\Libraries\GDIP.ahk"
+#Include "..\Framework\Extensions\Task.ahk"
+#Include "..\Framework\Extensions\Messages.ahk"
+#Include "..\Framework\Extensions\CLR.ahk"
+#Include "..\Framework\Extensions\GDIP.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -9,7 +9,7 @@
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\..\Libraries\LLMConnector.ahk"
+#Include "..\..\Framework\Extensions\LLMConnector.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -23,11 +23,11 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\..\Libraries\SpeechSynthesizer.ahk"
-#Include "..\..\Libraries\LLMConnector.ahk"
-#Include "..\..\Libraries\JSON.ahk"
-#Include "..\..\Libraries\CodeEditor.ahk"
-#Include "..\..\Libraries\RuleEngine.ahk"
+#Include "..\..\Framework\Extensions\SpeechSynthesizer.ahk"
+#Include "..\..\Framework\Extensions\LLMConnector.ahk"
+#Include "..\..\Framework\Extensions\JSON.ahk"
+#Include "..\..\Framework\Extensions\CodeEditor.ahk"
+#Include "..\..\Framework\Extensions\RuleEngine.ahk"
 #Include "ConfigurationEditor.ahk"
 
 

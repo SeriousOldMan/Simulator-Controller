@@ -38,8 +38,8 @@
 
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Database\Libraries\SettingsDatabase.ahk"
-#Include "..\Libraries\GDIP.ahk"
-#Include "..\Libraries\Task.ahk"
+#Include "..\Framework\Extensions\GDIP.ahk"
+#Include "..\Framework\Extensions\Task.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

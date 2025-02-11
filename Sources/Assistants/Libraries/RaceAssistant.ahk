@@ -16,12 +16,12 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\..\Libraries\JSON.ahk"
-#Include "..\..\Libraries\Task.ahk"
-#Include "..\..\Libraries\RuleEngine.ahk"
-#Include "..\..\Libraries\LLMConnector.ahk"
-#Include "..\..\Libraries\LLMBooster.ahk"
-#Include "..\..\Libraries\LLMAgent.ahk"
+#Include "..\..\Framework\Extensions\JSON.ahk"
+#Include "..\..\Framework\Extensions\Task.ahk"
+#Include "..\..\Framework\Extensions\RuleEngine.ahk"
+#Include "..\..\Framework\Extensions\LLMConnector.ahk"
+#Include "..\..\Framework\Extensions\LLMBooster.ahk"
+#Include "..\..\Framework\Extensions\LLMAgent.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\..\Database\Libraries\SettingsDatabase.ahk"
 #Include "..\..\Database\Libraries\TyresDatabase.ahk"

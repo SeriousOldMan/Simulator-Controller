@@ -9,8 +9,8 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Framework\Framework.ahk"
-#Include "..\Framework\Gui.ahk"
+#Include "..\Framework.ahk"
+#Include "..\Gui.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -36,8 +36,8 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\Messages.ahk"
-#Include "..\Libraries\CLR.ahk"
+#Include "..\Framework\Extensions\Messages.ahk"
+#Include "..\Framework\Extensions\CLR.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Plugins\Libraries\LMURESTProvider.ahk"
 

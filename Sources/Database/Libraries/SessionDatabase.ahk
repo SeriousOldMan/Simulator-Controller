@@ -17,9 +17,9 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\..\Libraries\CLR.ahk"
-#Include "..\..\Libraries\Task.ahk"
-#Include "..\..\Libraries\Database.ahk"
+#Include "..\..\Framework\Extensions\CLR.ahk"
+#Include "..\..\Framework\Extensions\Task.ahk"
+#Include "..\..\Framework\Extensions\Database.ahk"
 #Include "SettingsDatabase.ahk"
 #Include "..\..\Garage\Libraries\CarInformation.ahk"
 

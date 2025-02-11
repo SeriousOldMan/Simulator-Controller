@@ -9,9 +9,9 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\..\Libraries\Task.ahk"
-#Include "..\..\Libraries\HTTP.ahk"
-#Include "..\..\Libraries\JSON.ahk"
+#Include "..\..\Framework\Extensions\Task.ahk"
+#Include "..\..\Framework\Extensions\HTTP.ahk"
+#Include "..\..\Framework\Extensions\JSON.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 
 

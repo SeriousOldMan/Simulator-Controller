@@ -9,8 +9,8 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\..\Libraries\JSON.ahk"
-#Include "..\..\Libraries\Math.ahk"
+#Include "..\..\Framework\Extensions\JSON.ahk"
+#Include "..\..\Framework\Extensions\Math.ahk"
 #Include "TelemetryCollector.ahk"
 
 

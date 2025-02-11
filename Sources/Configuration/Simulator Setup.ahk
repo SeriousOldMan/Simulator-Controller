@@ -36,10 +36,10 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\HTMLViewer.ahk"
-#Include "..\Libraries\Task.ahk"
-#Include "..\Libraries\JSON.ahk"
-#Include "..\Libraries\RuleEngine.ahk"
+#Include "..\Framework\Extensions\HTMLViewer.ahk"
+#Include "..\Framework\Extensions\Task.ahk"
+#Include "..\Framework\Extensions\JSON.ahk"
+#Include "..\Framework\Extensions\RuleEngine.ahk"
 #Include "Libraries\SettingsEditor.ahk"
 #Include "Libraries\ConfigurationEditor.ahk"
 #Include "Libraries\ControllerActionsEditor.ahk"

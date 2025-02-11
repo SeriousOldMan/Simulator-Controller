@@ -9,7 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\..\Libraries\Task.ahk"
+#Include "..\..\Framework\Extensions\Task.ahk"
 #Include "ConfigurationItemList.ahk"
 #Include "ButtonBoxPreview.ahk"
 #Include "StreamDeckPreview.ahk"

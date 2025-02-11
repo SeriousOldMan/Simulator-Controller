@@ -10,7 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "Strategy.ahk"
-#Include "..\..\Libraries\HTMLViewer.ahk"
+#Include "..\..\Framework\Extensions\HTMLViewer.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 
 

@@ -10,7 +10,7 @@
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\LLMConnector.ahk"
+#Include "..\Framework\Extensions\LLMConnector.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -36,8 +36,8 @@
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\Task.ahk"
-#Include "..\Libraries\Messages.ahk"
+#Include "..\Framework\Extensions\Task.ahk"
+#Include "..\Framework\Extensions\Messages.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Configuration\Libraries\SettingsEditor.ahk"
 #Include "..\Configuration\Libraries\TeamManagementPanel.ahk"

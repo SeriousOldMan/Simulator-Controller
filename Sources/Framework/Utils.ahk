@@ -22,9 +22,9 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\CLR.ahk"
-#Include "..\Libraries\Messages.ahk"
-#Include "..\Libraries\Task.ahk"
+#Include "..\Framework\Extensions\CLR.ahk"
+#Include "..\Framework\Extensions\Messages.ahk"
+#Include "..\Framework\Extensions\Task.ahk"
 #Include "..\Plugins\Libraries\LMURESTProvider.ahk"
 
 

@@ -36,9 +36,9 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\Task.ahk"
-#Include "..\Libraries\GDIP.ahk"
-#Include "..\Libraries\CLR.ahk"
+#Include "..\Framework\Extensions\Task.ahk"
+#Include "..\Framework\Extensions\GDIP.ahk"
+#Include "..\Framework\Extensions\CLR.ahk"
 #Include "Libraries\SettingsDatabase.ahk"
 #Include "Libraries\TelemetryDatabase.ahk"
 #Include "Libraries\TyresDatabase.ahk"

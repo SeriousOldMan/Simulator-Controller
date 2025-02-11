@@ -16,10 +16,10 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\..\Libraries\Task.ahk"
-#Include "..\..\Libraries\JSON.ahk"
-#Include "..\..\Libraries\HTTP.ahk"
-#Include "..\..\Libraries\LLMConnector.ahk"
+#Include "..\..\Framework\Extensions\Task.ahk"
+#Include "..\..\Framework\Extensions\JSON.ahk"
+#Include "..\..\Framework\Extensions\HTTP.ahk"
+#Include "..\..\Framework\Extensions\LLMConnector.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\..\Database\Libraries\TelemetryCollector.ahk"
 #Include "..\..\Database\Libraries\TelemetryAnalyzer.ahk"

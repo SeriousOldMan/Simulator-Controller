@@ -35,8 +35,8 @@ global LogMenu := Menu()
 #Include "TrayMenu.ahk"
 #Include "Message.ahk"
 #Include "MultiMap.ahk"
-#Include "..\Libraries\Messages.ahk"
-#Include "..\Libraries\Task.ahk"
+#Include "..\Framework\Extensions\Messages.ahk"
+#Include "..\Framework\Extensions\Task.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

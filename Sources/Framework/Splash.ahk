@@ -23,7 +23,7 @@
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\GIFViewer.ahk"
+#Include "..\Framework\Extensions\GIFViewer.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

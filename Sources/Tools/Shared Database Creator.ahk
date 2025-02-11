@@ -40,7 +40,7 @@ global kBuildConfiguration := "Development"
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\FTP.ahk"
+#Include "..\Framework\Extensions\FTP.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Database\Libraries\TyresDatabase.ahk"
 

@@ -16,7 +16,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\..\Libraries\HTMLViewer.ahk"
+#Include "..\..\Framework\Extensions\HTMLViewer.ahk"
 #Include "TyresDatabase.ahk"
 
 

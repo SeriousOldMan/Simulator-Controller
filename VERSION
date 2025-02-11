@@ -3,8 +3,8 @@ Version=6.1.6.0-dev
 Target=6.1.6.0-release
 Date=02/11/2025
 Download=https://www.dropbox.com/scl/fi/16riy0kt62516rwi1qhwf/Simulator-Controller-6.1.6.0-dev.zip?rlkey=dggabezguy2hyriefnxmvce05&st=n577qjag&dl=1
-Changes=Remember choice of layout in Telemetry Viewer, Fixed missing mode flag in Startup Profiles, Fixed voice recognition test mode, Corners can be given names in track maps, Driving Coach understands and uses corner names, Prevent pitstop preparation if the car is in the pitlane, Optimized pitlane location detection, Show corner names in the title bar of the telemetry inspector, Remove meta information from thinking LLMs, Refactored extension libraries
-Components=Media->5.6.1,Configuration->6.1.3,Utilities->5.9.8
+Changes=Remember choice of layout in Telemetry Viewer, Fixed missing mode flag in Startup Profiles, Fixed voice recognition test mode, Corners can be given names in track maps, Driving Coach understands and uses corner names, Prevent pitstop preparation if the car is in the pitlane, Optimized pitlane location detection, Show corner names in the title bar of the telemetry inspector, Remove meta information from thinking LLMs, Refactored extension libraries, Updated WebView2
+Components=Media->5.6.1,Configuration->6.1.3,Utilities->6.1.6
 [Release]
 Version=6.1.5.0-release
 Date=02/07/2025
@@ -21,6 +21,9 @@ Configuration.6.1.3.Download=https://www.dropbox.com/scl/fi/rdnj6urr8qt3dzi5ut9u
 Utilities.5.9.8.Path=.
 Utilities.5.9.8.Content=Utilities
 Utilities.5.9.8.Download=https://www.dropbox.com/scl/fi/pjtq7f3u6uoy5ld88vqz9/Utilities-5.9.8.zip?rlkey=crido9soi8aiocepz10xdoev3&st=cprt4qr2&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.9.8.zip
+Utilities.6.1.6.Path=.
+Utilities.6.1.6.Content=Utilities
+Utilities.6.1.6.Download=
 [Current]
 Type=Development
 [Version]

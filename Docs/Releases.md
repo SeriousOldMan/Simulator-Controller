@@ -15,7 +15,8 @@
      - The Driving Coach instructions have been updated. If you have tweaked your instructions, you may want to revert to original and include your changes again.
   10. [Expert] The meta information between <think> and </think> is now removed automatically from the answer, when models like deepseek-r1 are used.
   11. [Internal] Improved handling of inter process messages in cases where message processing needs longer than usual.
-  12. [Developer] The framework extensions formerly located in the "Libraries" folder in the sources tree has been moved to the folder "Framework\Extensions".
+  12. [Internal] Updated WebView2, the internal HTML renderer, to the latest version.
+  13. [Developer] The framework extensions formerly located in the "Libraries" folder in the sources tree has been moved to the folder "Framework\Extensions".
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-616), if you have tweaked your Drving Coach instructions.
 

@@ -382,7 +382,7 @@ class MessageManager extends PeriodicTask {
 		local messages, oldPriority
 
 		if !this.Paused {
-			oldPriority := Task.block(kHighPriority)
+			oldPriority := Task.block(kInterruptPriority)
 
 			protectionOn()
 

@@ -1125,10 +1125,11 @@ class LayoutsList extends ConfigurationItemList {
 
 		if ((name = "") || !isInteger(this.Control["layoutRowsEdit"].Text) || (this.Control["layoutRowsEdit"].Text = 0)
 						|| !isInteger(this.Control["layoutColumnsEdit"].Text) || (this.Control["layoutColumnsEdit"].Text = 0)
-						|| !isInteger(this.Control["layoutRowMarginEdit"].Text)
-						|| !isInteger(this.Control["layoutColumnMarginEdit"].Text)
-						|| !isInteger(this.Control["layoutSidesMarginEdit"].Text)
-						|| !isInteger(this.Control["layoutBottomMarginEdit"].Text)) {
+						|| ((["Button Box", "Stream Deck"][this.Control["layoutTypeDropDown"].Value] = "Button Box")
+						 && (!isInteger(this.Control["layoutRowMarginEdit"].Text)
+						  || !isInteger(this.Control["layoutColumnMarginEdit"].Text)
+						  || !isInteger(this.Control["layoutSidesMarginEdit"].Text)
+						  || !isInteger(this.Control["layoutBottomMarginEdit"].Text)))) {
 			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)

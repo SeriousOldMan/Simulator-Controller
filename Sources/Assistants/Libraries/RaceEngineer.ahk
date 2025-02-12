@@ -99,6 +99,28 @@ class TimeLossEvent extends EngineerEvent {
 	}
 }
 
+class NoTimeLossEvent extends EngineerEvent {
+	createArguments(event, arguments) {
+		local result := []
+
+		loop arguments.Length
+			result.Push(arguments.Has(A_Index) ? arguments[A_Index] : 0)
+
+		return result
+	}
+
+	createTrigger(event, phrase, arguments) {
+		return ("The driver has recovered his pace and repairs are no longer needed.")
+	}
+
+	handleEvent(event, stintLaps, delta, arguments*) {
+		if !super.handleEvent(event, stintLaps, delta, arguments*)
+			this.Assistant.reportDamageAnalysis(false, stintLaps, delta, concatenate([true], arguments)*)
+
+		return true
+	}
+}
+
 class PressureLossEvent extends EngineerEvent {
 	createTrigger(event, phrase, arguments) {
 		static tyres := CaseInsenseMap("FL", "front left", "FR", "front right", "RL", "rear left", "RR", "rear right")
@@ -517,6 +539,10 @@ class RaceEngineer extends RaceAssistant {
 
 	reportTimeLossAction(lapsToDrive, delta) {
 		this.reportDamageAnalysis(true, lapsToDrive, delta)
+	}
+
+	reportNoTimeLossAction(lapsToDrive, delta) {
+		this.reportDamageAnalysis(false, lapsToDrive, delta, true)
 	}
 
 	getKnowledge(type, options := false) {
@@ -3574,7 +3600,7 @@ class RaceEngineer extends RaceAssistant {
 			}
 	}
 
-	reportDamageAnalysis(repair, stintLaps, delta) {
+	reportDamageAnalysis(repair, stintLaps, delta, update := false) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker
 
@@ -3748,10 +3774,10 @@ damageWarning(context, newSuspensionDamage, newBodyworkDamage, newEngineDamage) 
 	return true
 }
 
-reportDamageAnalysis(context, repair, stintLaps, delta) {
+reportDamageAnalysis(context, repair, stintLaps, delta, update := false) {
 	context.KnowledgeBase.RaceAssistant.clearContinuation()
 
-	context.KnowledgeBase.RaceAssistant.reportDamageAnalysis(repair, stintLaps, delta)
+	context.KnowledgeBase.RaceAssistant.reportDamageAnalysis(repair, stintLaps, delta, update)
 
 	return true
 }

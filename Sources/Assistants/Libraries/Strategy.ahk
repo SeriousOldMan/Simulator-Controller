@@ -16,7 +16,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\..\Libraries\RuleEngine.ahk"
+#Include "..\..\Framework\Extensions\RuleEngine.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 
 

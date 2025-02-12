@@ -64,13 +64,23 @@ namespace SHMConnector {
 
         public void Close()
 		{
-			this.Disconnect();
+			if (this.connected)
+				this.Disconnect();
+			
+			this.connected = false;
 		}
 
         public string Call(string request)
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
 
+			if (!this.connected) {
+				Open();
+				
+				if (!this.connected)
+					return "";
+			}
+			
             try
             {
                 extendedBuffer.GetMappedData(ref extended);
@@ -222,7 +232,7 @@ namespace SHMConnector {
 						lapTime = (int)Math.Round(Normalize(vehicle.mBestLapTime) * 1000);
 
 					int sector1Time = (int)Math.Round(Normalize(vehicle.mLastSector1) * 1000);
-					int sector2Time = (int)Math.Round(Normalize(vehicle.mLastSector2) * 1000);
+					int sector2Time = (int)Math.Round(Normalize(vehicle.mLastSector2) * 1000) - sector1Time;
 					int sector3Time = lapTime - sector1Time - sector2Time;
 
 					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Time="); strWriter.WriteLine(lapTime);
@@ -345,8 +355,10 @@ namespace SHMConnector {
 
 				strWriter.Write("StintTimeRemaining="); strWriter.WriteLine(time);
 				strWriter.Write("DriverTimeRemaining="); strWriter.WriteLine(time);
-					
-				if (playerScoring.mInPits != 0) {
+
+                strWriter.Write("InPitLane="); strWriter.WriteLine(playerScoring.mInPits != 0 ? "true" : "false");
+
+                if (playerScoring.mInPits != 0) {
 					double speed = VehicleSpeed(ref playerScoring);
 					
 					if (speed < 5 || playerScoring.mPitState == (byte)Stopped)

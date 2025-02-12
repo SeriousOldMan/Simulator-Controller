@@ -29,7 +29,7 @@ global kTelemetryChannels := [{Name: "Distance", Indices: [1], Channels: []}
 							, {Name: "Gear", Indices: [5], Size: 0.5, Channels: ["Gear"]}
 							, {Name: "Long G", Indices: [10], Size: 1, Channels: ["Long G"]}
 							, {Name: "Lat G", Indices: [11], Size: 1, Channels: ["Lat G"]}
-							, {Name: "Long G/Lat G", Indices: [10, 11], Size: 1, Channels: ["Long G", "Lat G"]}
+							, {Name: "Lat G/Long G", Indices: [10, 11], Size: 1, Channels: ["Long G", "Lat G"]}
 							, {Name: "Curvature", Function: computeCurvature, Indices: [false], Size: 1, Channels: ["Curvature"]}
 							, {Name: "Time", Indices: [14], Size: 1, Channels: ["Time"], Converter: [(t) => isNumber(t) ? (t / 1000) : kNull]}
 							, {Name: "PosX", Indices: [12], Channels: []}
@@ -49,8 +49,6 @@ class TelemetryCollector {
 	iTelemetryCollectorPID := false
 
 	iExitCallback := false
-
-	iCollecting := false
 
 	class TelemetryFuture {
 		iTelemetryCollector := false
@@ -73,17 +71,17 @@ class TelemetryCollector {
 		}
 
 		__New(collector) {
+			local directory := (normalizeDirectoryPath(collector.TelemetryDirectory) . "\")
+
 			this.iTelemetryCollector := collector
-			this.iFileName := temporaryFileName(normalizeDirectoryPath(collector.TelemetryDirectory) . "Telemetry", "section")
 
-			this.iCorner := corner
-
-			if collector.iCollecting
+			if FileExist(directory . "Telemetry.cmd")
 				throw "Partial telemetry collection still running in TelemetryCollector.TelemetryFuture.__New..."
+			else {
+				deleteFile(directory . "\Telemetry.section")
 
-			FileAppend("", normalizeDirectoryPath(collector.TelemetryDirectory) . "Telemetry.section")
-
-			collector.iCollecting := true
+				FileAppend("COLLECT", directory . "\Telemetry.cmd")
+			}
 		}
 
 		__Delete() {
@@ -93,27 +91,35 @@ class TelemetryCollector {
 		dispose() {
 			this.stop()
 
-			deleteFile(this.FileName)
+			if this.FileName
+				deleteFile(this.FileName)
 		}
 
 		stop() {
-			local fileName
+			local directory, inFileName, outFileName
 
 			if !this.iCollected {
-				fileName := (normalizeDirectoryPath(this.TelemetryDirectory) . "Telemetry.section")
+				directory := (normalizeDirectoryPath(this.TelemetryCollector.TelemetryDirectory) . "\")
+				inFileName := (directory . "Telemetry.section")
+				outFileName := temporaryFileName("Telemetry", "section")
 
-				if !FileExist(fileName)
-					throw "No partial telemetry collection running in TelemetryCollector.TelemetryFuture.stop..."
+				deleteFile(directory . "Telemetry.cmd")
 
-				loop
-					try {
-						FileMove(fileName, this.FileName, 1)
+				if FileExist(inFileName) {
+					loop
+						try {
+							FileMove(inFileName, outFileName, 1)
 
-						break
-					}
-					catch Any {
-						Sleep(1)
-					}
+							break
+						}
+						catch Any as exception {
+							logError(exception)
+
+							Sleep(1)
+						}
+
+					this.iFileName := outFileName
+				}
 
 				this.iCollected := true
 			}
@@ -199,7 +205,6 @@ class TelemetryCollector {
 
 			if pid {
 				this.iTelemetryCollectorPID := pid
-				this.iCollecting := false
 
 				if !this.iExitCallback {
 					this.iExitCallback := ObjBindMethod(this, "shutdown", true)
@@ -245,7 +250,6 @@ class TelemetryCollector {
 			}
 
 			this.iTelemetryCollectorPID := false
-			this.iCollecting := false
 		}
 
 		return false

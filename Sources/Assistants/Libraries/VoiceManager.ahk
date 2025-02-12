@@ -17,11 +17,11 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\..\Libraries\Task.ahk"
-#Include "..\..\Libraries\Messages.ahk"
-#Include "..\..\Libraries\SpeechSynthesizer.ahk"
-#Include "..\..\Libraries\SpeechRecognizer.ahk"
-#Include "..\..\Libraries\LLMBooster.ahk"
+#Include "..\..\Framework\Extensions\Task.ahk"
+#Include "..\..\Framework\Extensions\Messages.ahk"
+#Include "..\..\Framework\Extensions\SpeechSynthesizer.ahk"
+#Include "..\..\Framework\Extensions\SpeechRecognizer.ahk"
+#Include "..\..\Framework\Extensions\LLMBooster.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

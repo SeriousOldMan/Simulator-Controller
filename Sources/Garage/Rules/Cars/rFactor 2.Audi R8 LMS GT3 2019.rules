@@ -1,0 +1,20 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - rFactor 2                       ;;;
+;;;                                         Audi R8 LMS GT3 2019            ;;;
+;;;                                         Setup Rules                     ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
+;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Initialization                               ;;;
+;;;-------------------------------------------------------------------------;;;
+
+[?Initialize] => (Prove: addSettings("rFactor 2", "Audi R8 LMS GT3 2019", [Electronics.ABS])),
+				 (Prove: removeSettings("rFactor 2", "Audi R8 LMS GT3 2019",
+										[Aero.Splitter.Front,
+										 Damper.Compression.Fast.Front.Left, Damper.Compression.Fast.Front.Right,
+										 Damper.Compression.Fast.Rear.Left, Damper.Compression.Fast.Rear.Right,
+										 Damper.Rebound.Fast.Front.Left, Damper.Rebound.Fast.Front.Right,
+										 Damper.Rebound.Fast.Rear.Left, Damper.Rebound.Fast.Rear.Right]))

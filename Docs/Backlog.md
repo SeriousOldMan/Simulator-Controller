@@ -4,7 +4,7 @@
 
 #### Simulation Support
   1. Better integration with the weather forecast data of *rFactor 2*
-  2. Full support of hybrid cars
+  2. Full support for hybrid and fully electric cars
   3. Support for new and also historic simulators
 
 #### Plugins
@@ -16,11 +16,13 @@
   3. Support for partial tyre changes
   4. Integrate support for LAMs
   5. Support for Time+1 session format
-  6. Approaching corner braking point countdown 
+  6. Approaching corner braking point countdown
+  7. Configurable priority for voice output between Spotter and other Assistants
 
 #### Session Database
   1. Active validation of value ranges in settings definitions
   2. Integration with an upcoming REST/JSON realtime interface of Second Monitor
+  3. Importer for telemtry data in IBT format
 
 #### Setup Workbench
   1. Collect telemetry data from multiple drivers and generate combined setup recommendations
@@ -30,7 +32,6 @@
   1. Multi session tyre management - manage tyre sets and driven laps for a whole weekend (Practice, Qualifying, Race 1, Race 2, ...)
   2. Introduce data groups (for example all data belonging to a complete weekend w. practice, qualiy and race) and make this group usable for future strategy calculation
   3. Handle DT as an alternative to reset the stint timer at the end of a race
-  4. Integrate a "Strategy Workbench Lite" into "Race Settings"
 
 #### Team Center
   1. Change hot target pressures for the next pitstop

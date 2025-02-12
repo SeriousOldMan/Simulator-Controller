@@ -22,6 +22,10 @@ ListLines Off					; Disable execution history
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Engine.ico
 ;@Ahk2Exe-ExeName ACC UDP Tester.exe
+;@Ahk2Exe-SetCompanyName Oliver Juwig (TheBigO)
+;@Ahk2Exe-SetCopyright TheBigO - Creative Commons - BY-NC-SA
+;@Ahk2Exe-SetProductName Simulator Controller
+;@Ahk2Exe-SetVersion 0.0.0.0
 
 global vBuildConfiguration := "Development"
 

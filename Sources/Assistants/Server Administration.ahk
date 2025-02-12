@@ -19,6 +19,10 @@
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Server Administration.ico
 ;@Ahk2Exe-ExeName Server Administration.exe
+;@Ahk2Exe-SetCompanyName Oliver Juwig (TheBigO)
+;@Ahk2Exe-SetCopyright TheBigO - Creative Commons - BY-NC-SA
+;@Ahk2Exe-SetProductName Simulator Controller
+;@Ahk2Exe-SetVersion 0.0.0.0
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -32,8 +36,8 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\CLR.ahk"
-#Include "..\Libraries\Task.ahk"
+#Include "..\Framework\Extensions\CLR.ahk"
+#Include "..\Framework\Extensions\Task.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 
 

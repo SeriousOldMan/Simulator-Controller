@@ -37,19 +37,21 @@ Here is a short video which shows how to configure Simulator Controller for the 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[6.1.3.0-release](https://cutt.ly/le8QI2kN) (Changes: Dynamic strategy creation based on race rules, New car models for Setup Workbench, Initial support for Assetto Corsa EVO, Fixed missing translations, Fixed invalid certificate handling for OpenAI, Changed defaults for "Engineer: Tyre Service".)
+[6.1.5.0-release](https://cutt.ly/Ee5IKmhY) (Changes: Fixed handling of team tab in "Race Settings", Fixed crash in "Setup Workbench" for special characters in car names, Fixed default for pitlane delta default value when not set, Up 2 date info for fuel, tyres and brakes by the Engineer, Fixed display of cold pressures in "Team Center" lap data, More checks in Controller layout editor, Special editor for validation rules in "Setup Workbench", Support for Inner, Middle and Outer tyre temperatures for iRacing, Real setup pressures are now used by the Engineer for iRacing, Fixed a bug in Azure voice recognition, Added Manifest Information, Increased reliability of shared memory connectors, Fixed restricted mode display for Driving Coach.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-613) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-615) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[6.1.2.1-release](https://cutt.ly/ce97qsrM) (Changes: Major rework of the documentation, Support for weather forecast in LMU, Aproximated grip status for LMU, Pitstop service time for LMU, Changed default activation recognizer to "Desktop", Fixed some bugs for LMU if imperial units are selected, Increased reliability of telemetry collector for ACC, Acknowledge sound for Conversation booster activation, Extended action call format of Reasoning booster, Optimized end of session detection for iRacing, New car models for rFactor 2, Updated car models for Le Mans Ultimate.)
+[6.1.4.0-release](https://cutt.ly/oe45E2Oi) (Changes: New voice commands for focusing on specific corners by the Driving Coach, New instruction for post corner review by the Driving Coach, Post corner critics by the Driving Coach, Fixed sector 2 time for LMU and RF2, Fixed strategy handling in autonomous mode, More interruptable Spotter phrases, Integrated latest version of R3E meta data, New car models for Setup Workbench, Optimized Driving Coach instructions, Migrated to AHK 2.1-alpha.15, Fixed track mapping for iRacing.)
 
-[6.1.1.0-release](https://cutt.ly/Be2cd7x2) (Changes: Full support for Le Mans Ultimate in "Setup Workbench", Unit conversion for pressures in "Setup Workbench", Filter safety car from the grid in AMS2, Fixed Stream Deck Icons, Acknowledge sound for Conversation booster activation, Optimized strategy announcement by Strategist, Increased reliability of track spline builder for ACC, Added auto request pitstop for rF2 and LMU, Support for rF2 in "Setup Workbench".)
+[6.1.3.0-release](https://cutt.ly/le8QI2kN) (Changes: Dynamic strategy creation based on race rules, New car models for Setup Workbench, Initial support for Assetto Corsa EVO, Fixed missing translations, Fixed invalid certificate handling for OpenAI, Changed defaults for "Engineer: Tyre Service".)
 
 #### Latest development build
 
-None for the moment...
+[6.1.6.0-dev](https://www.dropbox.com/scl/fi/16riy0kt62516rwi1qhwf/Simulator-Controller-6.1.6.0-dev.zip?rlkey=dggabezguy2hyriefnxmvce05&st=n577qjag&dl=1) (Early build for 6.1.6. Changes: Remember choice of layout in Telemetry Viewer, Fixed missing mode flag in Startup Profiles, Fixed voice recognition test mode, Corners can be given names in track maps, Driving Coach understands and uses corner names, Prevent pitstop preparation if the car is in the pitlane, Optimized pitlane location detection, Show corner names in the title bar of the telemetry inspector, Remove meta information from thinking LLMs, Refactored extension libraries, Updated WebView2, Remember track editor mode in "Session Database", Fixed validation of controller layout definitions.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-615) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 
@@ -124,6 +126,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 31. [Mastering on-track coaching](https://youtu.be/Gnzye2kf7HI) - This video gives you valuable insights in the configuration of the on-track coaching provided by the Driving Coach. A live conversation is also part of the demonstration.
 
 32. [Running an LMU race with an AI pit crew](https://youtu.be/ntQRnx0Grjk) - Demonstration of the new automated strategy and pitstop handling for Le Mans Ultimate. Please don't judge my driving, this was for demonstration purposes. :-)
+
+33. [Section feedback of the Driving Coach](https://youtu.be/jexBxAjmU1s) - This short video demonstrates a new feature of the Drivng Coach. If this is enabled, you will get immediate feedback for your driving performance in the last section of the track.
 
 This list will be extended from time to time to cover new functionalities.
 

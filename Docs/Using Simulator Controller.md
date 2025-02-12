@@ -10,7 +10,7 @@ The two applications on the lower left and on the lower right side of the launch
 
 If you want to download and install a new version of Simulator Controller, it is important that none of the applications of the suite is running during the update. Please use the button "Close All..." in the lower right corner just before running the update.
 
-Note: If you don't want to use the launch window and want "Simulator Startup" to run through, create a shortcut and add the option "-NoLaunchPad" to the *Target* field. When you use this shortcut file, no launch window will be shown, unless you hold down the Shift key, while running "Simulator Startup". The other way around can also be used: If you press the Shift key while running "Simulator Startup" normally, no launch window will be shown and the startup process will run directly.
+If you don't want to use the launch window and want "Simulator Startup" to run through, create a shortcut and add the option "-NoLaunchPad" to the *Target* field. When you use this shortcut file, no launch window will be shown, unless you hold down the Shift key, while running "Simulator Startup". The other way around can also be used: If you press the Shift key while running "Simulator Startup" normally, no launch window will be shown and the startup process will run directly.
 
 ## Startup Process & Settings
 
@@ -27,6 +27,8 @@ Beside maintaining this startup settings, you can jump to the [configuration too
 In the first group, you can decide which of the core applications configured in the [Applications tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-applications) of the configuration tool should be started during the startup process. Normally you want to start all of them, after all they are core applications, right? A special case might be the ["System Monitor"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities), which gives you a great overview of the health state and the activities of all system components, but it needs some screen space and can therefore only be used during a simulation, if you have a second monitor in your setup.
 
 The second group lets you decide whether to start the different feedback components of your simulation rig. In the configuration, that is part of the standard distribution of Simulator Controller, feedback is handled by the ["Tactile Feedback"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-tactile-feedback) and ["Motion Feedback"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-motion-feedback) plugins, which on their side will use the [SimHub](https://www.simhubdash.com/) and [SimFeedback](https://www.opensfx.com/) applications to implement their functionalities. These two applications may be started in advance during the startup process, but they also can be started later from your hardware controller. Me, myself and I, for example, almost always start *SimHub* in advance, since I will always use vibration effects to get a better understanding about what my tyres are doing, but I will start motion feedback later depending on the track and the kind of driving, I am in (training, racing, having fun with friends, and so on).
+
+If you have some additional tasks to run whenever you startup Simulator Controller, for example starting up the software for your VR headset, you can place the required commands in a file named "Startup.bat" or "Startup.cmd", which must be placed in the *Simulator Controller\Programs* folder which is located in your user *Documents* folder.
 
 ### Customizing Controller Notifications
 
@@ -242,6 +244,10 @@ As an alternative to starting the test mode from one of the configuration pages,
 	D:\Controller\Binaries>"Race Strategist.exe" -Debug true -Speaker true -Listener true -language EN -Name Cato -Logo true
 
 Beside the *builtin* voice recognition capabilities, you can still use specialized external voice recognition appplications like [VoiceMacro](http://www.voicemacro.net/) as an external event source for controller actions, since these specialized applications might have a better recognition quality in some cases.
+
+##### Troubleshooting
+
+If it looks like, that voice commands are not recognized correctly, you can activate a troubleshooting mode, where a small window pops up and shows what has been understood, whenever a voice command has been given. To enable this mode, go to the tray in the lower righ corner of the Windows task bar and find the "Voice Server" process (indicated by a small icon with a green microphone). Right-click on the icon to open the process menu and select "Debug Recognitions" from the "Support" submenu.
 
 #### Non-standard voice configurations
 

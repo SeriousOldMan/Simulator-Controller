@@ -9,8 +9,8 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\..\Libraries\Task.ahk"
-#Include "..\..\Libraries\Math.ahk"
+#Include "..\..\Framework\Extensions\Task.ahk"
+#Include "..\..\Framework\Extensions\Math.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 
 

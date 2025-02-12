@@ -9,7 +9,7 @@
 ;;;                           Local Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\..\Libraries\JSON.ahk"
+#Include "..\..\Framework\Extensions\JSON.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 
 

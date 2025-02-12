@@ -1,4 +1,4 @@
-## Thread Protection ([Task.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Libraries/Task.ahk))
+## Thread Protection ([Task.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Extensions/Task.ahk))
 In AutoHotkey scripts, running threads may be interrupted by other events, such as keyboard events or timer functions. Using the functions below, it is possible to create protected sections of code, which may not be interrupted.
 
 #### *protectionOn()*
@@ -165,7 +165,7 @@ Deletes the directory with the given name incl. all current content. Returns *tr
 
 ***
 
-## Process Communication ([Messages.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Libraries/Messages.ahk))
+## Process Communication ([Messages.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Extensions/Messages.ahk))
 Messages may be used to communicate between different processes. In Simulator Controller, the startup application sends events to the controller application to start all components configured for the Simulator Controller, to play and stop a startup song and so on.
 
 #### *registerMesssageHandler(category :: String, handler :: Func, object :: Object := false)*

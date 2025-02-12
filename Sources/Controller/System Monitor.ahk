@@ -19,6 +19,10 @@
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Monitoring.ico
 ;@Ahk2Exe-ExeName System Monitor.exe
+;@Ahk2Exe-SetCompanyName Oliver Juwig (TheBigO)
+;@Ahk2Exe-SetCopyright TheBigO - Creative Commons - BY-NC-SA
+;@Ahk2Exe-SetProductName Simulator Controller
+;@Ahk2Exe-SetVersion 0.0.0.0
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -32,9 +36,9 @@
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\HTMLViewer.ahk"
-#Include "..\Libraries\Task.ahk"
-#Include "..\Libraries\Messages.ahk"
+#Include "..\Framework\Extensions\HTMLViewer.ahk"
+#Include "..\Framework\Extensions\Task.ahk"
+#Include "..\Framework\Extensions\Messages.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 
 

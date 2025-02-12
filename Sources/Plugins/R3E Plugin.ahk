@@ -9,8 +9,8 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\JSON.ahk"
-#Include "..\Libraries\Task.ahk"
+#Include "..\Framework\Extensions\JSON.ahk"
+#Include "..\Framework\Extensions\Task.ahk"
 #Include "Libraries\SimulatorPlugin.ahk"
 #Include "..\Database\Libraries\SettingsDatabase.ahk"
 
@@ -129,7 +129,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		local data
 
 		if !R3EPlugin.sCarDB {
-			data := JSON.parse(FileRead(kResourcesDirectory . "Simulator Data\R3E\r3e-data.json"))
+			data := JSON.parse(FileRead(kResourcesDirectory . "Simulator Data\R3E\r3e-data.json", "UTF-8"))
 
 			R3EPlugin.sClassDB := data["classes"]
 			R3EPlugin.sCarDB := data["cars"]
@@ -799,6 +799,15 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			logMessage(kLogInfo, substituteVariables(translate("'%image%' not found"), {image: imageName}))
 
 		return false
+	}
+
+	prepareSettings(settings, data) {
+		settings := super.prepareSettings(settings, data)
+
+		if (getMultiMapValue(settings, "Simulator.RaceRoom Racing Experience", "Pitstop.Service.Tyres", kUndefined) == kUndefined)
+			setMultiMapValue(settings, "Simulator.RaceRoom Racing Experience", "Pitstop.Service.Tyres", "Change")
+
+		return settings
 	}
 
 	readSessionData(options := "", protocol?) {

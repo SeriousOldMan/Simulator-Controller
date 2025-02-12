@@ -336,6 +336,7 @@ int main(int argc, char* argv[]) {
 		}
 		*/
 		printf("InPit=%s\n", (localCopy->mPitMode == PIT_MODE_IN_PIT) ? "true" : "false");
+		printf("InPitLane=%s\n", (localCopy->mPitMode > PIT_MODE_NONE) ? "true" : "false");
 
 		printf("[Track Data]\n");
 		printf("Length=%f\n", localCopy->mTrackLength);

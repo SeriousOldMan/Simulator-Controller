@@ -16,7 +16,7 @@ The same principles as [described for Jona](https://github.com/SeriousOldMan/Sim
 
 2. [German version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(DE))
 
-3. [Spanish version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(ES)
+3. [Spanish version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(ES))
 
 4. [French version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(FR))
 
@@ -148,7 +148,7 @@ Elisa tracks the positions, lap times and the deltas to your own car for four di
 
 When you approach a car in front of you, Elisa will gather all available information for the given car, whether the driver is quite inconsistent or is doing a lot of mistakes, and so on. Depending on the situation, Elisa might give you this information and will ask you to be careful, if necessary.
 
-Elise uses different delta thresholds to decide, whether the situation changed to an extent that an update will be of any value for you. You can define your own thresholds in the "Race Settings" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database). See the table below for the thresholds and their default values.
+Elise uses different delta thresholds to decide, whether the situation changed to an extent that an update will be of any value for you. You can define your own thresholds in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database". See the table below for the thresholds and their default values.
 
 | Threshold                | Default Value (Seconds) |
 | ------------------------ | ----------------------- |
@@ -201,7 +201,7 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 
 (6) No detailed information for the concrete penalty available.
 
-(7) The distance ahead or behind, for which this is checked and reported can be defined in the [race settings] (https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database". Default is 800 meter for accidents ahead and 500 meter for slow cars and accidents behind. The track spline will be learned during the initial laps, depending on the simulator. Therefore accident detection might not be available in this time. See also the special notes for *Assetto Corsa Competizione* below.
+(7) The distance ahead or behind, for which this is checked and reported can be defined in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database". Default is 800 meter for accidents ahead and 500 meter for slow cars and accidents behind. The track spline will be learned during the initial laps, depending on the simulator. Therefore accident detection might not be available in this time. See also the special notes for *Assetto Corsa Competizione* below.
 
 (8) The *iRacing* API does not provide any information about the current speed of all cars on the track, only for the drivers car. Since the crash detection is implemented using an integral over track distance and speed, the algorithm tries to learn the typical speed for each car over time. The detection is therefore not reliable during the first laps.
 
@@ -270,9 +270,9 @@ A special case when recording the track coordinates is *iRacing*. This simulator
 1. Initialize the starting position as *x = 0.0* and *y = 0.0*.
 1. Apply a fixed sampling rate, in this case 60 Hz.
 2. Get a cars *yaw* value from the *iRacing* API.
-4. Get the cars *velocity* for the x-direction from the *iRacing* API.
-5. Calculate *dx* as *velocity(x)* * *sin(yaw)*.
-6. Calculate *dy* as *velocity(x)* * *cos(yaw)*.
+4. Get the cars *velocity* from the *iRacing* API and calculate the distance traveled since the last sample.
+5. Calculate *dx* as *distance* * *sin(yaw)*.
+6. Calculate *dy* as *distance* * *cos(yaw)*.
 7. Set *x* as *x* + *dx*.
 8. Set *y* as *y* + *dy*.
 9. Wait one sample and go to 2. unless the starting position (plus / minus a threshold) has been reached.
@@ -283,7 +283,7 @@ As you can see, the yaw angle is the most important value in this calculation, t
 
 When a track map is available, the Race Spotter is able to trigger special actions at any location of the track. Using this actions, you can send commands to the running simulator to switch between car settings, for example the traction control.
 
-Track Automations are configured in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database). Once a track map is available for a given track, you can choose the "Automation" section there:
+Track Automations are configured in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database). Once a track map is available for a given track, you can choose the "Track & Automation" section there:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Track%20Automation%202.JPG)
 

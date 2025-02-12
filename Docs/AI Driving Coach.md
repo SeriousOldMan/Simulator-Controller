@@ -5,7 +5,7 @@ Aiden, The AI Driving Coach, is a fully AI based chatbot which plays the role of
 Simulator Controller does not provide its own LLM, of course. And this is even not necessary, since there are a dozens of very good models available in the Open Source (see the [Hugging Face website](https://huggingface.co/) for a complete overview what's available). And there are commercial models available as well, first and foremost from OpenAI, the company, that created the famous ChatGPT solutions. Simulator Controller uses API calls to use the services provided by an existing GPT engine to run the LLM used by Aiden, or you can use the integrated "LLM Runtime", to run everything on your own PC, as long as your machine is powerful enough. You can choose in the configuration which provider is used and even which LLM you want to use (see below in the chapters about [installation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#installation) and [configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#configuration).
 
 Before we proceed to the details of the configruation and the rules how to interact with your personal Driving Coach, let's take a look at a typical interaction with Aiden.
- 
+
 ### A typical dialog
 
 It is very hard to describe, how the interaction with Aiden is like. Therefore, let's take a look together at a short interaction. By the way, the Driving Coach is named "Kim" here.
@@ -358,7 +358,7 @@ It is possible to work with the Driving Coach on specific corners. To start this
 
 with *X* the number of the corner you want to practice. This command can be issued multiple times and the Driving Coach will remember the different corners you want to practice.
 
-If this mode is active, Aiden will not only give you instructions for the corners you requested, but will also give you immediate feedback after you have passed the corner and the following section. This feedback will compare your performance of your current lap at this corner with the performance of the previous lap (not the reference lap) and will tell you what was good and where you can still improve. The instruction "Coaching.Corner.Review" is used to generate this feedback.
+If this mode is active, Aiden will not only give you instructions for the corners you requested, but will also give you immediate feedback after you have passed the corner and the following section. This feedback will compare the performance of your current lap at this corner with the performance of the previous lap (not the reference lap) and will tell you what was good and where you can still improve. The instruction "Coaching.Corner.Review" is used to generate this feedback.
 
 ### Automatic activation of coaching mode
 
@@ -378,7 +378,7 @@ Replace "Kim" with the name of your Driving Coach.
 
 Expert Notes: *startTelemetryCoaching* and *finishTelemetryCoaching* are methods of the *DrivingCoach* class, the session type **2** represents *practice*, **3** stands for *qualifying* and **4** for a *race* session, all values below **2** are for internal purposes.
 
-Another and possibly easier way to automatically start telemtry-based coaching is by using the "On-track Coaching" function in a [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles). This will not only start the collection of telemetry data, but will also start on-track coaching, once telemetry data is available.
+Another and possibly easier way to automatically start telemetry-based coaching is by using the "On-track Coaching" function in a [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles). This will not only start the collection of telemetry data, but will also start on-track coaching, once telemetry data is available.
 
 ### Restricted mode without an LLM
 

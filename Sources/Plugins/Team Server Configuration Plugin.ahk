@@ -10,7 +10,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\Task.ahk"
+#Include "..\Framework\Extensions\Task.ahk"
 #Include "..\Configuration\Libraries\TeamManagementPanel.ahk"
 
 

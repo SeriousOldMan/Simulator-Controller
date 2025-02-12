@@ -19,6 +19,10 @@
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Workbench.ico
 ;@Ahk2Exe-ExeName Strategy Workbench.exe
+;@Ahk2Exe-SetCompanyName Oliver Juwig (TheBigO)
+;@Ahk2Exe-SetCopyright TheBigO - Creative Commons - BY-NC-SA
+;@Ahk2Exe-SetProductName Simulator Controller
+;@Ahk2Exe-SetVersion 0.0.0.0
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -32,8 +36,8 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\HTMLViewer.ahk"
-#Include "..\Libraries\CodeEditor.ahk"
+#Include "..\Framework\Extensions\HTMLViewer.ahk"
+#Include "..\Framework\Extensions\CodeEditor.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Database\Libraries\SessionDatabaseBrowser.ahk"
 #Include "..\Database\Libraries\SettingsDatabase.ahk"
@@ -4025,8 +4029,8 @@ class ValidatorsEditor {
 		editorGui.Add("Button", "x324 yp w23 h23 Center +0x200 Y:Move(0.25) vdeleteValidatorButton").OnEvent("Click", (*) => this.deleteValidator())
 		setButtonIcon(editorGui["deleteValidatorButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
-		editorGui.Add("Text", "x16 yp+1 w80 h23 Y:Move(0.25)", translate("Name"))
-		editorGui.Add("Edit", "x96 yp-1 h23 w177 Y:Move(0.25) vvalidatorNameEdit").OnEvent("Change", updateValidatorsList)
+		editorGui.Add("Text", "x16 yp+2 w70 h23 Y:Move(0.25)", translate("Name"))
+		editorGui.Add("Edit", "x86 yp-2 h23 w177 Y:Move(0.25) vvalidatorNameEdit").OnEvent("Change", updateValidatorsList)
 
 		editorGui.SetFont("Norm", "Courier New")
 

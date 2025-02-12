@@ -1,9 +1,71 @@
-## 6.1.4.0-release 01/31/25 (planned)
+## 6.1.6.0-release 02/14/25 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. The Driving Coach now provides a new mode for on-track coaching in which you will be given a [review of your performance](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#focusing-on-specific-corners) at a given corner compared to the last lap.
+  3. Fixed a rare error where the session mode in a Startup Profile was reset to "Solo".
+  4. Fixed voice recognition test mode, which was broken for some time now.
+  5. Fixed superfluous validation errors for Button Box layouts introduced with the last release.
+  6. The Telemetry Viewer now remembers the chosen layout and restores it the next time.
+  7. Improved detection of exact car location in the pitlane for *Assetto Corsa*, *Automobilista 2*, *Le Mans Ultimate*, *rFactor 2* and *iRacing*.
+  8. The chosen track editor mode will be now remembered between runs of the "Session Database".
+  9. The Race Engineer now tries to prevent preparation of a pitstop while the car is in the pitlane, since the driver might actually doing a drive-through with engaged pit limiter. Since the processing is inherently asynchronous, there is still a chance that the pit limiter will be disengaged, if a pitstop is prepared while serving a penalty at the same time, but the chance for such a problem is reduced quite a lot.
+  10. Corners can now be given names in the track map. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation) for information on how to do this. If you have configured corner names, the Driving Coach may use the name rather than a simple number when referencing a corner.
+      - If available, corner names will be shown in the title bar of the inspector window of the Telemetry Viewer.
+	  - They will also be included in the tool tips, if the mouse is hoovering above one of the section points in the track map of the "Session Database".
+      - Tool tips are now also available for section points in the track map of the Telemetry Viewer, and of course, the corner names will be shown there as well.
+  11. The Driving Coach will now use corner names, if available, to reference a specific corner.
+      - Corner names must have been defined for the track map (see item 10. above)
+      - The Driving Coach instructions have been updated. If you have tweaked your instructions, you may want to revert to original and include your changes again.
+  12. [Expert] The meta information between <think> and </think> is now removed automatically from the answer, when models like deepseek-r1 are used.
+  13. [Internal] Improved handling of inter process messages in cases where message processing needs longer than usual.
+  14. [Internal] Updated WebView2, the internal HTML renderer, to the latest version.
+  15. [Developer] The framework extensions formerly located in the "Libraries" folder in the sources tree has been moved to the folder "Framework\Extensions".
+  
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-616), if you have tweaked your Drving Coach instructions.
+
+## 6.1.5.0-release 02/07/25
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Fixed a crash in "Setup Workbench" for cars with parantheses "(" and ")" in their names.
+  4. Fixed the default value for pitlane delta default value in those rare cases, when not available from the settings. The default value is 60 seconds, which is the maximum value for all known tracks.
+  5. Fixed display of cold tyre pressure recommendations in the lap report of the "Team Center" and "Solo Center".
+  6. Fixed a problem when a non-existent speech recognizer is selected for Azure voice recognition.
+  7. The "Restricted" mode, which is activated whenever no valid GPT connection is configured for the Driving Coach, is now displayed correctly in all cases in the "System Monitor".
+  8. The "Team" tab in "Race Settings" are now automatically preselected, when "Race Settings" is opened to edit the team race credentials.
+  9. The layout editor for Button Boxes has been extended with additional validations, so that no invalid layouts can be defined anymore.
+  10. The Engineer will now use the most recent values of remaining fuel, tyre temperatures and pressures as well as brake temperatures (if available) rather than the values at the start of the current lap, when asked for this information using a voice command or a controller action.
+  11. The special validation rules in "Setup Workbench" can now be edited using a specialized syntax aware editor for the underlying rule language. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#editing-validation-rules) for more information.
+  12. Inner, Middle and Outer carcass tyre temperature readings are now supported for *rFactor 2*, *Le Mans Ultimate* and *iRacing* in "Solo Center" and in the issue analyzer of "Setup Workbench".
+  13. The real setup pressures from the garage are now used by the Race Engineer for *iRacing*.
+  14. [Expert] A new version of the local LLM Runtime is available, which includes the latest Llama backend. Support for the deepseek v3 model is included, if you have 800 GB of memory in your machine :-)
+  15. [Internal] Increased reliability of shared memory connectors.
+  16. [Internal] Added sensible information to the manifest of all executable files.
+  
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-615), if you are using the local LLM Runtime.
+
+## 6.1.4.0-release 01/31/25
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Fixed time of second sector in "Solo Center" and "Team Center" for *rFactor 2* and *Le Mans Ultimate*.
+  4. Fixed track scanning in the track map of the Telemetry Viewer, which was broken with the last release.
+  5. Fixed strategy handling in "Autonomous" mode.
+  6. Fixed track mapping for *iRacing*.
+  7. A lot of fine-tuning for the recently added rule-based strategy handling.
+  8. All Spotter announcements from the "Tactical Advices" group do not interrupt announcements of other Assistants anymore.
+  9. The Driving Coach now provides a new mode for on-track coaching in which you will be given a [review of your performance](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#focusing-on-specific-corners) at a given corner compared to the last lap.
      - New voice commands let you provide the numbers for those corners where you want to get a post corner review. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#list-of-all-voice-commands) for a description.
 	 - A new LLM instruction is available which can be customized to control the different aspects of the critics given by the Driving Coach.
+  10. Optimized the Driving Coach instructions used when approaching a corner.
+  11. Updated car meta data for *RaceRoom Racing Experience* to the latest version.
+  12. [Expert] "Simulator Startup" now supports the [integration of additional startup scripts](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#customizing-startup-configuration) to customize your environment when starting up Simulator Controller.
+  13. [Internal] Migrated to AHK 2.1-alpha.15.
+  14. New car models for "Setup Workbench":
+      - rFactor 2
+	    - Mercedes AMG GT3
+		- Porsche 911 GT3 R
+		- Radical RXC Turbo GT3
+		- McLaren 650s GT3 (fixed Aero Height at the front)
+		
+      With this release, the list of GT3 cars for *rFactor 2* is complete (with only the latest version for the Audi and the Bentley). I won't create meta data for more cars, but doing this on your own is easy. Let me know, and I will be happy to give instructions.
 
 ## 6.1.3.0-release 01/24/25
   1. Minor bugfixes, as always
@@ -13,8 +75,12 @@
   5. Initial support for *Assetto Corsa EVO*. Not much functionality yet...
   6. "Race Settings" has been [extended](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-rules) and allows now to define basic race rules for the next race.
   7. The Strategist can now create a strategy dynamically based on simple race rules configured in the "Race Settings". See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#tab-rules) for more information.
-  8. The default for the [race setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) "Engineer: Tyre Service" has changed to "Change" for *Automobilista 2*, *ProjectCARS 2 and *RaceRoom Racing Experience*, because these simulators do not support adjusting pressures during a pitstop.
-  9. New car models for "Setup Workbench":
+  8. The default for the [race setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) "Engineer: Tyre Service" has changed to "Change" for *Automobilista 2*, *Project CARS 2 and *RaceRoom Racing Experience*, because these simulators do not support adjusting pressures during a pitstop.
+  9. Auto requesting the pitstop for *Automobilista 2* can now be configured in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database".
+
+     **IMPORTANT**: The default for this setting is *False*, which is **different** from the previously implemented behaviour.
+  10. A new action "PitstopRequest" has been defined for the *Automobilista 2* plugin to request a pitstop manually.
+  11. New car models for "Setup Workbench":
       - rFactor 2
         - Audi R8 LMS GT3 (Variante 2019)
 		- Bentley Continental GT3 (Variante 2020)
@@ -23,7 +89,7 @@
 		- McLaren 650s GT3
 		- Aston Martin Vantage GT3 (fixed ABS settings)
 
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-613), if you want to include support for *Assetto Corsa EVO*.
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-613), especially if you want to include support for *Assetto Corsa EVO*.
 
 ## 6.1.2.1-release 01/19/25
   1. Workaround for incompatible OpenAI client certificate request.
@@ -60,7 +126,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   3. Fixed management of Stream Deck Icons for German and French UI settings.
   4. Fixed a bug in the handling of the *rFactor 2* pitstop settings that caused an infinite loop, if each tyre could be changed individually.
   5. Lowered the threshold values for the different rain levels in *rFactor 2* and *Le Mans Ultimate* so that pitting for tyres is recommended earlier.
-  6. Safety Cars are now removed from the grid in *Automobilista 2* (and probably *ProjectCARS 2*) in most cases.
+  6. Safety Cars are now removed from the grid in *Automobilista 2* (and probably *Project CARS 2*) in most cases.
   7. The strategy information given by the Strategist has been updated to be more concise if no more pitstops are needed.
   8. The reliability of the track spline builder for *Assetto Corsa Competizione* has been improved. This positively affects the accident detection by the Spotter and the collection of car telemetry data by various applications.
   9. Pressure values are now converted to the specified display unit in "Setup Workbench".
@@ -206,7 +272,7 @@ To install the new libraries, follow the instructions in the [Update Notes](http
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. A bug has been fixed for the Spotter, which caused information about pitstops or lap times of the opponents to be issued more than once.
-  4. Fixed a bug that prevented sharing of lap telemtry data on the Team Server.
+  4. Fixed a bug that prevented sharing of lap telemetry data on the Team Server.
   5. The Engineer sometimes did not report suspension damage right away, but delayed it until the next crossing of start/finish line. This has been fixed.
   6. "Simulator Setup" can now handle more preview windows for Button Boxes and Stream Decks than can fit on the screen vertically.
   7. The Race Engineer now allow you to enable / disable the handling of pressure loss for the next pitstop using new voice commands.
@@ -299,7 +365,7 @@ IMPORTANT: Please take a look at the [Update Notes](https://github.com/SeriousOl
   8. The selection dialog for telemetry data now supports opening multiple lap telemetries at once by shift-clicking in the list. The file selection dialog opened by the "Open..." button also supports multi-selection.
   9. The Telemetry Viewer now can display a track map in a separate. You can click in the graph to show the corresponding location on the track map and vice versa. Only telemetry data collected with 5.9.2 and later will support this. If *WebView2* is configured as HTML Viewer in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration), it will not work yet either. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetry-viewer) for more information.
   10. A rotating ball is now displayed, when the Telemetry Viewer is collecting lap telemetry data.
-  11. "Setup Workbench" now also supports collecting lap telemtry data. See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#telemetry-viewer) for more information.
+  11. "Setup Workbench" now also supports collecting lap telemetry data. See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#telemetry-viewer) for more information.
   12. The Track Automation state is now displayed with color coding on a Button Box. Gray if it is enabled but not yet available, and yellow if no Automation has been defined for the given track and Green, if enabled and active.
   13. The setting to startup a simulation together with Simulator Controller has been moved from the global settings of "Simulator Startup" to the Startup Profiles. Veeery useful...
 
@@ -395,7 +461,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
      - New controller action ["TrackMapping"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) for the Race Spotter plugin, which toggles the track mapping on / off.
 	 - New [controller action functions *enableTrackMapping* and *disableTrackMapping*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions), which can be used to automate the track mapping.
 	 - The *Conversation* booster for the Race Spotter supports starting and stopping the track mapper by voice command (see below).
-	 - Track mapping can also be enabled ot disabled in the startup profiles.
+	 - Track mapping can also be enabled ot disabled in the Startup Profiles.
 	 - New icon in the Stream Deck icon set for the "TrackMapping" action.
   8. The key combination to request an unblocking of all executables in "Simulator Startup" has changed from Ctrl-Shift to Ctrl-Alt.
   9. A new LLM event has been defined for the [*Reasoning* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-spotter) of the Race Spotter. "blue_flag_alert" will be signalled, once a faster car appears in the mirror, that is at least one lap ahead. Revisit your event configuration, include the new events and define actions (for example flash a red light in your dashboard using SimHub, for example), if necessary.
@@ -1471,7 +1537,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   10. Fixed a rare bug with SFX-100 motion intensity controller.
   11. Support for a couple of new fields has been added in the simulator data files - inner, middle and outer tyre temperatures and in-game tyre compound identifiers for *Automobilista 2*.
   12. The telemetry charts in "Race Center" and "Practice Center" now apply unit conversion correctly.
-  13. New data summary report in "Practice Center" and a new tab to review the [available telemtry data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#exploring-data).
+  13. New data summary report in "Practice Center" and a new tab to review the [available telemetry data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#exploring-data).
   14. New [stints summary report](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#data-analysis) in "Practice Center".
   15. Updated *Automobilista 2* data integration to shared memory API version 13.
   16. The Standings info widget in "Session Monitor" now also shows the observed opponent, if one is currently observed by the Spotter.

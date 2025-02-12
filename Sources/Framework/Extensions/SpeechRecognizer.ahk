@@ -12,7 +12,7 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Framework\Framework.ahk"
+#Include "..\Framework.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -73,7 +73,7 @@ global kAzureLanguages := Map("af-ZA", "Afrikaans (South Africa)"
 							, "en-SG", "English (Singapore)"
 							, "en-ZA", "English (South Africa)"
 							, "en-TZ", "English (Tanzania)"
-							, "en-GG", "English (United Kingdom)"
+							, "en-GB", "English (United Kingdom)"
 							, "en-US", "English (United States)")
 
 initializeAzureLanguages() {
@@ -168,7 +168,7 @@ initializeGoogleLanguages() {
 						  , "ar-MA", "ar-OM", "ar-PS", "ar-QA", "ar-SA", "ar-SY", "ar-TN", "ar-AE", "ar-YE", "bg-BG"
 						  , "my-MM", "ca-ES", "zh-HK", "zh-CN", "zh-TW", "hr-HR", "cs-CZ", "da-DK", "nl-BE", "nl-NL"
 						  , "en-AU", "en-CA", "en-GH", "en-HK", "en-IN", "en-IE", "en-KE", "en-NZ", "en-NG", "en-PH"
-						  , "en-SG", "en-ZA", "en-TZ", "en-GG", "en-US", "et-EE", "fil-PH", "fi-FI", "fr-BE", "fr-CA"
+						  , "en-SG", "en-ZA", "en-TZ", "en-GB", "en-US", "et-EE", "fil-PH", "fi-FI", "fr-BE", "fr-CA"
 						  , "fr-FR", "fr-CH", "de-AT", "de-DE", "de-CH", "el-GR", "gu-IN", "he-IL", "hi-IN", "hu-HU"
 						  , "is-IS", "id-ID", "ga-IE", "it-IT", "ja-JP", "jv-ID", "kn-IN", "km-KH", "ko-KR", "lo-LA"
 						  , "lv-LV", "lt-LT", "mk-MK", "ms-MY", "mt-MT", "mr-IN", "nb-NO", "fa-IR", "pl-PL", "pt-BR"
@@ -262,7 +262,7 @@ class SpeechRecognizer {
 
 	__New(engine, recognizer := false, language := false, silent := false, mode := "Grammar") {
 		global kNirCmd
-		
+
 		local dllName := ((InStr(engine, "Google|") = 1) ? "Google.Speech.Recognizer.dll" : "Microsoft.Speech.Recognizer.dll")
 		local dllFile := (kBinariesDirectory . ((InStr(engine, "Google|") = 1) ? "Google\" : "Microsoft\") . dllName)
 		local instance, choices, found, ignore, recognizerDescriptor, configuration, audioDevice
@@ -296,7 +296,7 @@ class SpeechRecognizer {
 				}
 				catch Any as exception {
 					logError(exception, true)
-					
+
 					kNirCmd := false
 
 					if !kSilentMode
@@ -453,7 +453,7 @@ class SpeechRecognizer {
 				}
 				catch Any as exception {
 					logError(exception, true)
-					
+
 					kNirCmd := false
 
 					if !kSilentMode
@@ -537,7 +537,7 @@ class SpeechRecognizer {
 
 	startRecognizer() {
 		global kNirCmd
-		
+
 		local audioDevice := SpeechRecognizer.sRecognizerAudioDevice
 
 		if (audioDevice && kNirCmd) {
@@ -546,7 +546,7 @@ class SpeechRecognizer {
 			}
 			catch Any as exception {
 				logError(exception, true)
-				
+
 				kNirCmd := false
 
 				if !kSilentMode
@@ -570,7 +570,7 @@ class SpeechRecognizer {
 
 	stopRecognizer() {
 		global kNirCmd
-		
+
 		local audioDevice := SpeechRecognizer.sDefaultAudioDevice
 
 		try {
@@ -598,7 +598,7 @@ class SpeechRecognizer {
 				}
 				catch Any as exception {
 					logError(exception, true)
-					
+
 					kNirCmd := false
 
 					if !kSilentMode

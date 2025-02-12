@@ -18,7 +18,7 @@ global kUserHomeDirectory := A_MyDocuments . "\Simulator Controller\"
 global kResourcesDirectory := normalizeFilePath(A_ScriptDir . (A_IsCompiled ? "\..\Resources\" : "\..\..\Resources\"))
 global kSourcesDirectory := normalizeFilePath(A_ScriptDir . (A_IsCompiled ? "\..\Sources\" : "\..\..\Sources\"))
 global kFrameworkDirectory := normalizeFilePath(A_ScriptDir . (A_IsCompiled ? "\..\Sources\Framework\" : "\..\..\Sources\Framework\"))
-global kLibrariesDirectory := normalizeFilePath(A_ScriptDir . (A_IsCompiled ? "\..\Sources\Libraries\" : "\..\..\Sources\Libraries\"))
+global kExtensionsDirectory := normalizeFilePath(A_ScriptDir . (A_IsCompiled ? "\..\Sources\Framework\Extensions\" : "\..\..\Sources\Framework\Extensions\"))
 global kBinariesDirectory := normalizeFilePath(A_ScriptDir . (A_IsCompiled ? "\..\Binaries\" : "\..\..\Binaries\"))
 
 global kLogsDirectory := kUserHomeDirectory . "Logs\"
@@ -57,7 +57,7 @@ global kUndefined := "__Undefined__"
 
 global kVersion := "0.0.0.0-dev"
 
-global kSimulatorConfiguration := Map()
+global kSimulatorConfiguration := newMultiMap()
 
 global kSilentMode := false
 

@@ -9,7 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\..\Libraries\Task.ahk"
+#Include "..\..\Framework\Extensions\Task.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\..\Database\Libraries\SettingsDatabase.ahk"
 
@@ -582,6 +582,8 @@ class SimulatorPlugin extends ControllerPlugin {
 
 			SimulatorPlugin.sActiveSimulator := false
 			SimulatorPlugin.sActiveSimulation := false
+
+			callSimulator(this.Code, "Close")
 		}
 	}
 
@@ -1244,9 +1246,9 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		}
 
 		if (driver && (count > 0))
-			if (getMultiMapValue(data, "Position Data", "Car." . driver . ".InPitlane", false)
-			 && !getMultiMapValue(data, "Stint Data", "InPitlane", false))
-				setMultiMapValue(data, "Stint Data", "InPitlane", true)
+			if (getMultiMapValue(data, "Position Data", "Car." . driver . ".InPitLane", false)
+			 && !getMultiMapValue(data, "Stint Data", "InPitLane", false))
+				setMultiMapValue(data, "Stint Data", "InPitLane", true)
 
 		this.iHasPositionsData := (count > 0)
 	}

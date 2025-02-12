@@ -9,14 +9,14 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Framework\Framework.ahk"
+#Include "..\Framework.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\Task.ahk"
+#Include "..\Extensions\Task.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -38,7 +38,7 @@ global kFileMessage := 3
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class MessageManager extends PeriodicTask {
-	static sPriority := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Messages", "Schedule", 200)
+	static sSchedule := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Messages", "Schedule", 200)
 
 	static sMessageHandlers := false
 	static sOutgoingMessages := []
@@ -319,16 +319,33 @@ class MessageManager extends PeriodicTask {
 	}
 
 	sendFileMessage(pid, category, data, request) {
+		local fileName := (kTempDirectory . "Messages\" . pid . ".msg")
 		local text := (request . ":" . category . ":" . encode(data) . "`n")
+		local file := false
 
 		try {
-			FileAppend(text, kTempDirectory . "Messages\" . pid . ".msg")
+			file := FileOpen(fileName, "a-rwd")
+
+			if !file
+				return false
+			else {
+				file.Write(text)
+
+				return true
+			}
 		}
 		catch Any as exception {
+			logError(exception)
+
+			if isDevelopment()
+				logMessage(kLogWarn, "Waiting for file `"" . fileName . "`"...")
+
 			return false
 		}
-
-		return true
+		finally {
+			if file
+				file.Close()
+		}
 	}
 
 	receiveMessages() {
@@ -362,9 +379,11 @@ class MessageManager extends PeriodicTask {
 	}
 
 	run() {
-		local messages
+		local messages, oldPriority
 
 		if !this.Paused {
+			oldPriority := Task.block(kInterruptPriority)
+
 			protectionOn()
 
 			try {
@@ -377,10 +396,12 @@ class MessageManager extends PeriodicTask {
 			}
 			finally {
 				protectionOff()
+
+				Task.unblock(oldPriority)
 			}
 		}
 
-		this.Sleep := MessageManager.sPriority
+		this.Sleep := MessageManager.sSchedule
 	}
 
 	messageSend(messageType, category, data, target := false, request := "NORM") {

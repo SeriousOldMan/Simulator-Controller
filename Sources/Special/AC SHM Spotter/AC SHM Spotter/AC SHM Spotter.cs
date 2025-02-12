@@ -1721,7 +1721,7 @@ namespace ACSHMSpotter {
                         telemetryFile.Write(cars.cars[carID].worldPosition.z + ";");
                         telemetryFile.WriteLine(graphics.iCurrentTime);
 
-						if (System.IO.File.Exists(telemetryDirectory + "\\Telemetry.section"))
+						if (System.IO.File.Exists(telemetryDirectory + "\\Telemetry.cmd"))
 							try {
 								StreamWriter file = new StreamWriter(telemetryDirectory + "\\Telemetry.section", true);
 

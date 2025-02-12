@@ -22,9 +22,9 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\CLR.ahk"
-#Include "..\Libraries\Messages.ahk"
-#Include "..\Libraries\Task.ahk"
+#Include "..\Framework\Extensions\CLR.ahk"
+#Include "..\Framework\Extensions\Messages.ahk"
+#Include "..\Framework\Extensions\Task.ahk"
 #Include "..\Plugins\Libraries\LMURESTProvider.ahk"
 
 
@@ -440,102 +440,117 @@ callSimulator(simulator, options := "", protocol?) {
 	else if (!isSet(protocol) && protocols.Has(simulator))
 		protocol := protocols[simulator]
 
-	try {
-		if (protocol = "DLL") {
-			if connectors.Has(simulator . ".DLL")
-				connector := connectors[simulator . ".DLL"]
-			else {
-				curWorkingDir := A_WorkingDir
+	if (options = "Close") {
+		connector := false
 
-				SetWorkingDir(kBinariesDirectory . "Connectors\")
+		if ((protocol = "DLL") && connectors.Has(simulator . ".DLL"))
+			connector := connectors[simulator . ".DLL"]
+		else if ((protocol = "CLR") && connectors.Has(simulator . ".CLR"))
+			connector := connectors[simulator . ".CLR"]
 
-				try {
-					connector := DllCall("LoadLibrary", "Str", simulator . " SHM Connector.dll", "Ptr")
+		if connector
+			if (protocol = "DLL")
+				DLLCall(simulator . " SHM Connector\close")
+			else
+				connector.Close()
+	}
+	else
+		try {
+			if (protocol = "DLL") {
+				if connectors.Has(simulator . ".DLL")
+					connector := connectors[simulator . ".DLL"]
+				else {
+					curWorkingDir := A_WorkingDir
 
-					DLLCall(simulator . " SHM Connector\open")
+					SetWorkingDir(kBinariesDirectory . "Connectors\")
 
-					connectors[simulator . ".DLL"] := connector
+					try {
+						connector := DllCall("LoadLibrary", "Str", simulator . " SHM Connector.dll", "Ptr")
+
+						DLLCall(simulator . " SHM Connector\open")
+
+						connectors[simulator . ".DLL"] := connector
+					}
+					finally {
+						SetWorkingDir(curWorkingDir)
+					}
 				}
-				finally {
-					SetWorkingDir(curWorkingDir)
+
+				buf := Buffer(1024 * 1024)
+
+				DllCall(simulator . " SHM Connector\call", "AStr", options, "Ptr", buf, "Int", buf.Size)
+
+				data := parseMultiMap(StrGet(buf, "UTF-8"))
+
+				if (data.Count = 0)
+					throw ("DLL returned empty data in callSimulator for " . simulator . "...")
+			}
+			else if (protocol = "CLR") {
+				if connectors.Has(simulator . ".CLR")
+					connector := connectors[simulator . ".CLR"]
+				else {
+					dllName := (simulator . " SHM Connector.dll")
+					dllFile := (kBinariesDirectory . "Connectors\" . dllName)
+
+					if (!FileExist(dllFile))
+						throw "Unable to find " . dllName . " in " . kBinariesDirectory . "..."
+
+					connector := CLR_LoadLibrary(dllFile).CreateInstance("SHMConnector.SHMConnector")
+
+					if (!connector.Open() && !isDebug())
+						throw "Cannot startup " . dllName . " in " . kBinariesDirectory . "..."
+
+					connectors[simulator . ".CLR"] := connector
 				}
+
+				data := parseMultiMap(connector.Call(options))
+
+				if (data.Count = 0)
+					throw ("DLL returned empty data in callSimulator for " . simulator . "...")
+			}
+			else if (protocol = "EXE") {
+				exePath := (kBinariesDirectory . "Providers\" . simulator . " SHM Provider.exe")
+
+				if !FileExist(exePath)
+					throw "File not found..."
+
+				DirCreate(kTempDirectory . simulator . " Data")
+
+				dataFile := temporaryFileName(simulator . " Data\SHM", "data")
+
+				RunWait(A_ComSpec . " /c `"`"" . exePath . "`" `"" . options . "`" > `"" . dataFile . "`"`"", , "Hide")
+
+				data := readMultiMap(dataFile)
+
+				deleteFile(dataFile)
 			}
 
-			buf := Buffer(1024 * 1024)
+			setMultiMapValue(data, "Session Data", "Simulator", simulator)
 
-			DllCall(simulator . " SHM Connector\call", "AStr", options, "Ptr", buf, "Int", buf.Size)
-
-			data := parseMultiMap(StrGet(buf, "UTF-8"))
-
-			if (data.Count = 0)
-				throw ("DLL returned empty data in callSimulator for " . simulator . "...")
+			return data
 		}
-		else if (protocol = "CLR") {
-			if connectors.Has(simulator . ".CLR")
-				connector := connectors[simulator . ".CLR"]
-			else {
-				dllName := (simulator . " SHM Connector.dll")
-				dllFile := (kBinariesDirectory . "Connectors\" . dllName)
+		catch Any as exception {
+			if (protocol = "EXE") {
+				logError(exception, true)
 
-				if (!FileExist(dllFile))
-					throw "Unable to find " . dllName . " in " . kBinariesDirectory . "..."
+				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider (")
+														   , {simulator: simulator, protocol: protocol})
+									   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+									   . kBinariesDirectory . translate(")"))
 
-				connector := CLR_LoadLibrary(dllFile).CreateInstance("SHMConnector.SHMConnector")
+				if !kSilentMode
+					showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
+												  , {exePath: exePath, simulator: simulator, protocol: "SHM"})
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 
-				if (!connector.Open() && !isDebug())
-					throw "Cannot startup " . dllName . " in " . kBinariesDirectory . "..."
-
-				connectors[simulator . ".CLR"] := connector
+				return newMultiMap()
 			}
+			else {
+				logError(exception)
 
-			data := parseMultiMap(connector.Call(options))
-
-			if (data.Count = 0)
-				throw ("DLL returned empty data in callSimulator for " . simulator . "...")
+				return callSimulator(simulator, options, "EXE")
+			}
 		}
-		else if (protocol = "EXE") {
-			exePath := (kBinariesDirectory . "Providers\" . simulator . " SHM Provider.exe")
-
-			if !FileExist(exePath)
-				throw "File not found..."
-
-			DirCreate(kTempDirectory . simulator . " Data")
-
-			dataFile := temporaryFileName(simulator . " Data\SHM", "data")
-
-			RunWait(A_ComSpec . " /c `"`"" . exePath . "`" `"" . options . "`" > `"" . dataFile . "`"`"", , "Hide")
-
-			data := readMultiMap(dataFile)
-
-			deleteFile(dataFile)
-		}
-
-		setMultiMapValue(data, "Session Data", "Simulator", simulator)
-
-		return data
-	}
-	catch Any as exception {
-		if (protocol = "EXE") {
-			logError(exception, true)
-
-			logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider (")
-													   , {simulator: simulator, protocol: protocol})
-								   . exePath . translate(") - please rebuild the applications in the binaries folder (")
-								   . kBinariesDirectory . translate(")"))
-
-			if !kSilentMode
-				showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
-											  , {exePath: exePath, simulator: simulator, protocol: "SHM"})
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-
-			return newMultiMap()
-		}
-		else {
-			logError(exception, true)
-
-			return callSimulator(simulator, options, "EXE")
-		}
-	}
 }
 
 readSimulatorData(simulator, car, track) {
@@ -711,7 +726,7 @@ triggerDetector(callback := false, options := ["Joy", "Key"]) {
 testAssistants(configurator, assistants := kRaceAssistants, booster := false) {
 	local configuration := configurator.getSimulatorConfiguration()
 	local configurationFile := temporaryFileName("Simulator Configuration", "ini")
-	local thePlugin, ignore, assistant, options, parameter, value
+	local thePlugin, ignore, assistant, options, parameter, value, found
 
 	deleteConfiguration(*) {
 		deleteFile(configurationFile)
@@ -735,10 +750,21 @@ testAssistants(configurator, assistants := kRaceAssistants, booster := false) {
 
 		options := ""
 
-		for ignore, parameter in ["Name", "Language", "Synthesizer", "Speaker", "SpeakerVocalics", "Recognizer", "Listener"]
-			if thePlugin.hasArgument("raceAssistant" . parameter) {
+		for ignore, parameter in ["Name", "Language", "Synthesizer", "Speaker", "SpeakerVocalics", "Recognizer", "Listener"] {
+			found := false
+
+			if thePlugin.hasArgument(parameter) {
+				value := thePlugin.getArgumentValue(parameter)
+
+				found := true
+			}
+			else if thePlugin.hasArgument("raceAssistant" . parameter) {
 				value := thePlugin.getArgumentValue("raceAssistant" . parameter)
 
+				found := true
+			}
+
+			if found {
 				if ((value = "On") || (value = kTrue))
 					value := true
 				else if ((value = "Off") || (value = kFalse))
@@ -746,12 +772,24 @@ testAssistants(configurator, assistants := kRaceAssistants, booster := false) {
 
 				options .= (" -" . parameter . " `"" . value . "`"")
 			}
+		}
 
 		if booster
-			for ignore, parameter in ["SpeakerBooster", "ListenerBooster", "ConversationBooster", "AgentBooster"]
-				if thePlugin.hasArgument("raceAssistant" . parameter) {
+			for ignore, parameter in ["SpeakerBooster", "ListenerBooster", "ConversationBooster", "AgentBooster"] {
+				found := false
+
+				if thePlugin.hasArgument(parameter) {
+					value := thePlugin.getArgumentValue(parameter)
+
+					found := true
+				}
+				else if thePlugin.hasArgument("raceAssistant" . parameter) {
 					value := thePlugin.getArgumentValue("raceAssistant" . parameter)
 
+					found := true
+				}
+				
+				if found {
 					if ((value = "On") || (value = kTrue))
 						value := true
 					else if ((value = "Off") || (value = kFalse))
@@ -759,6 +797,7 @@ testAssistants(configurator, assistants := kRaceAssistants, booster := false) {
 
 					options .= (" -" . parameter . " `"" . value . "`"")
 				}
+			}
 
 		Run(kBinariesDirectory . assistant . ".exe -Logo true -Debug true -Configuration `"" . configurationFile . "`"" . options)
 	}

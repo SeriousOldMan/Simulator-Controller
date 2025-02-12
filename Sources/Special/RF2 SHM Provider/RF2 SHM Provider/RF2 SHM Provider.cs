@@ -169,7 +169,7 @@ namespace RF2SHMProvider {
 					lapTime = (int)Math.Round(Normalize(vehicle.mBestLapTime) * 1000);
 
                 int sector1Time = (int)Math.Round(Normalize(vehicle.mLastSector1) * 1000);
-				int sector2Time = (int)Math.Round(Normalize(vehicle.mLastSector2) * 1000);
+				int sector2Time = (int)Math.Round(Normalize(vehicle.mLastSector2) * 1000) - sector1Time;
 				int sector3Time = lapTime - sector1Time - sector2Time;
 
 				Console.Write("Car."); Console.Write(i); Console.Write(".Time="); Console.WriteLine(lapTime);
@@ -306,17 +306,19 @@ namespace RF2SHMProvider {
 
 					Console.Write("StintTimeRemaining="); Console.WriteLine(time);
 					Console.Write("DriverTimeRemaining="); Console.WriteLine(time);
-				/*
+                /*
 				}
 				*/
-					
-				if (playerScoring.mInPits != 0) {
+
+                Console.Write("InPitLane="); Console.WriteLine(playerScoring.mInPits != 0 ? "true" : "false");
+
+                if (playerScoring.mInPits != 0) {
 					double speed = VehicleSpeed(ref playerScoring);
 					
 					if (speed < 5 || playerScoring.mPitState == (byte)Stopped)
-						Console.Write("InPit=true");
+						Console.WriteLine("InPit=true");
 					else
-						Console.Write("InPit=false");
+						Console.WriteLine("InPit=false");
 				}
 			}
 
@@ -332,7 +334,27 @@ namespace RF2SHMProvider {
 								  GetCelcius(playerTelemetry.mWheels[1].mTireCarcassTemperature) + "," +
 								  GetCelcius(playerTelemetry.mWheels[2].mTireCarcassTemperature) + "," +
 								  GetCelcius(playerTelemetry.mWheels[3].mTireCarcassTemperature));
-				Console.Write("TyrePressure=");
+
+                Console.Write("TyreInnerTemperature=");
+				Console.WriteLine(GetCelcius(playerTelemetry.mWheels[0].mTemperature[2]) + "," +
+                                  GetCelcius(playerTelemetry.mWheels[1].mTemperature[0]) + "," +
+                                  GetCelcius(playerTelemetry.mWheels[2].mTemperature[2]) + "," +
+                                  GetCelcius(playerTelemetry.mWheels[3].mTemperature[0]));
+
+                Console.Write("TyreMiddleTemperature=");
+                Console.WriteLine(GetCelcius(playerTelemetry.mWheels[0].mTemperature[1]) + "," +
+                                  GetCelcius(playerTelemetry.mWheels[1].mTemperature[1]) + "," +
+                                  GetCelcius(playerTelemetry.mWheels[2].mTemperature[1]) + "," +
+                                  GetCelcius(playerTelemetry.mWheels[3].mTemperature[1]));
+
+                Console.Write("TyreOuterTemperature=");
+                Console.WriteLine(GetCelcius(playerTelemetry.mWheels[0].mTemperature[0]) + "," +
+                                  GetCelcius(playerTelemetry.mWheels[1].mTemperature[2]) + "," +
+                                  GetCelcius(playerTelemetry.mWheels[2].mTemperature[0]) + "," +
+                                  GetCelcius(playerTelemetry.mWheels[3].mTemperature[2]));
+
+
+                Console.Write("TyrePressure=");
 				Console.WriteLine(GetPsi(playerTelemetry.mWheels[0].mPressure) + "," +
 								  GetPsi(playerTelemetry.mWheels[1].mPressure) + "," +
 								  GetPsi(playerTelemetry.mWheels[2].mPressure) + "," +

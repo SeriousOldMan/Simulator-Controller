@@ -35,6 +35,18 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars*, *Simulator Controller\Rules* and other folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on its own. But be sure to make a backup copy of all the files, just for the peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 6.1.6
+
+The Driving Coach instructions have changed with this release. If you have modified the default instructions, you will have to revert them back to original and integrate your modifications back again. Take a look especially at the "Coaching" instruction, which has changed for corner name handling.
+
+***
+
+## Release 6.1.5
+
+The local LLM Runtime has been updated. If you are using the LLM Runtime, open "Simulator Setup", remove the "Local Runtime..." preset and reinstall it.
+
+***
+
 ## Release 6.1.4
 
 Nothing to do.
@@ -43,7 +55,9 @@ Nothing to do.
 
 ## Release 6.1.3
 
-Initial support for *Assetto Corsa EVO* has been added. The plugin has been added in "Simulator Configuration", but it is deactivated. You can activate it manually and add the required application in "Simulator Configuration", but I strongly recommend to use "Simulator Setup" to do it for you. Go to the "Basic" page and *Assetto Corsa EVO* will normally be detected automatically. Then create a new configuration.
+1. Initial support for *Assetto Corsa EVO* has been added. The plugin has been added in "Simulator Configuration", but it is deactivated. You can activate it manually and add the required application in "Simulator Configuration", but I strongly recommend to use "Simulator Setup" to do it for you. Go to the "Basic" page and *Assetto Corsa EVO* will normally be detected automatically. Then create a new configuration.
+
+2. The Engineer does no longer automatically request the pitstop after all settings has been prepared in *Automobilista 2*, since this can lead to unwanted effects when pitstops are planned and prepared multiple times. But there is as [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" to make it automatic again.
 
 ***
 
@@ -1212,7 +1226,7 @@ This update is handled completely without manual interaction. You might want to 
 
 This release finalizes the integration for *iRacing*. A new "Pitstop" mode has been introduced and Jona is aware of iRacing and can execute a pitstop automatically. Please take a look at the configuration documentation for the ["IRC" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop-2), if you want to use the "Pitstop" mode on your Button Box. You also might want to adjust the [controller automation rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#configuration-of-the-controller-mode-automation) for the new plugin modes as well.
 
-For Developers: Some of the data fields in the telemtry interface file structure have changed, please consult the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#telemetry-integration), if required.
+For Developers: Some of the data fields in the telemetry interface file structure have changed, please consult the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#telemetry-integration), if required.
 
 ***
 
@@ -1242,7 +1256,7 @@ As always, must of the update work in this release will be handled automatically
 
   1. The plugin "RRE" had been renamed to "R3E". The update to the configuration will handle this and will also update the start hook from "startRRE" to "startR3E" automatically. If you configured additional hooks for the *RaceRoom Racing Experience* plugin, you should rename them as well.
   2. This update introduces the integration of Jona with *rFactor 2* and *RaceRoom Racing Experience*. Therefore a lot of functionality, that had been private to the "ACC" plugin in the past, had been moved to a new plugin "Race Engineer", in order to make them available to other simulation plugins as well. Most of the initialization parameters of the "ACC" plugin for the AI Race Engineer have been moved to the new plugin as well. This is also handled by the update procedure, but you might want to have a look afterwards to check, if everything is correct. Please also take a look at the documentation for the new ["Race Engineer" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer). Important: You must install a plugin into *rFactor 2* for the telemetry interface to work, which you can find in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip*. A Readme file is included.
-  3. There had been quite some changes for the internal data format of the telemtry information and also some changes in the AI kernel of Jona, but I don't think, that there is someone out there, who already worked on this stuff.
+  3. There had been quite some changes for the internal data format of the telemetry information and also some changes in the AI kernel of Jona, but I don't think, that there is someone out there, who already worked on this stuff.
   4. Two new actions "Accept" and "Reject" have been added to the "Race Engineer" plugin, which you might wand to include in your [configuration}(https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer).
   5. (Developer only): The *Simulator Tools.targets* file changed again, so you might have to mrge your local changes, if there are any.
 

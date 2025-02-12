@@ -9,8 +9,8 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\..\Libraries\JSON.ahk"
-#Include "..\..\Libraries\Math.ahk"
+#Include "..\..\Framework\Extensions\JSON.ahk"
+#Include "..\..\Framework\Extensions\Math.ahk"
 #Include "TelemetryCollector.ahk"
 
 
@@ -36,6 +36,20 @@ class Section {
 	Nr {
 		Get {
 			return this.TrackSection.Nr
+		}
+	}
+
+	Name {
+		Get {
+			local name
+
+			if this.TrackSection.HasProp("Name") {
+				name := Trim(this.TrackSection.Name)
+
+				return ((name != "") ? name : false)
+			}
+			else
+				return false
 		}
 	}
 
@@ -89,8 +103,14 @@ class Section {
 
 	Descriptor {
 		Get {
-			return {Type: this.Type, Length: (nullRound(this.Length, 1) . " Meter")
-				  , Time: (nullRound(this.Time / 1000, 2) . " Seconds")}
+			local descriptor := {Type: this.Type, Length: (nullRound(this.Length, 1) . " Meter")
+							   , Time: (nullRound(this.Time / 1000, 2) . " Seconds")}
+			local name := this.Name
+
+			if name
+				descriptor.Name := name
+
+			return descriptor
 		}
 	}
 
@@ -1416,6 +1436,9 @@ class TelemetryAnalyzer {
 				setMultiMapValue(this.TrackMap, "Sections", index . ".Type", section.Type)
 				setMultiMapValue(this.TrackMap, "Sections", index . ".X", section.X)
 				setMultiMapValue(this.TrackMap, "Sections", index . ".Y", section.Y)
+
+				if (section.HasProp("Name") && (Trim(section.Name) != ""))
+					setMultiMapValue(this.TrackMap, "Sections", index . ".Name", section.Name)
 			}
 		}
 	}
@@ -1423,7 +1446,7 @@ class TelemetryAnalyzer {
 	findTrackSections(telemetry) {
 		local trackMap := this.TrackMap
 		local sections := []
-		local count := getMultiMapValue(trackMap, "Map", "Points")
+		local count := (trackMap ? getMultiMapValue(trackMap, "Map", "Points") : 0)
 		local index := 1
 		local phase := "Find"
 		local cornerNr := 1
@@ -1488,12 +1511,16 @@ class TelemetryAnalyzer {
 		local sections := []
 		local index, section
 
-		loop getMultiMapValue(trackMap, "Sections", "Count")
+		loop getMultiMapValue(trackMap, "Sections", "Count") {
 			sections.Push({Nr: getMultiMapValue(trackMap, "Sections", A_Index . ".Nr")
 						 , Type: getMultiMapValue(trackMap, "Sections", A_Index . ".Type")
 						 , Index: getMultiMapValue(trackMap, "Sections", A_Index . ".Index")
 						 , X: getMultiMapValue(trackMap, "Sections", A_Index . ".X")
 						 , Y: getMultiMapValue(trackMap, "Sections", A_Index . ".Y")})
+
+			if (getMultiMapValue(trackMap, "Sections", A_Index . ".Name", kUndefined) != kUndefined)
+				sections[A_Index].Name := getMultiMapValue(trackMap, "Sections", A_Index . ".Name")
+		}
 
 		for index, section in sections
 			section.Length := computeSectionLength(trackMap, sections, index, section)

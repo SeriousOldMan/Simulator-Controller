@@ -19,6 +19,10 @@
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Database Update.ico
 ;@Ahk2Exe-ExeName Database Synchronizer.exe
+;@Ahk2Exe-SetCompanyName Oliver Juwig (TheBigO)
+;@Ahk2Exe-SetCopyright TheBigO - Creative Commons - BY-NC-SA
+;@Ahk2Exe-SetProductName Simulator Controller
+;@Ahk2Exe-SetVersion 0.0.0.0
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -32,8 +36,8 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\FTP.ahk"
-#Include "..\Libraries\Task.ahk"
+#Include "..\Framework\Extensions\FTP.ahk"
+#Include "..\Framework\Extensions\Task.ahk"
 #Include "Libraries\SessionDatabase.ahk"
 #Include "Libraries\TelemetryDatabase.ahk"
 #Include "Libraries\TyresDatabase.ahk"

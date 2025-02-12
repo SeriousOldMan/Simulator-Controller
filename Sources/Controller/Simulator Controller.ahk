@@ -19,6 +19,10 @@
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Gear.ico
 ;@Ahk2Exe-ExeName Simulator Controller.exe
+;@Ahk2Exe-SetCompanyName Oliver Juwig (TheBigO)
+;@Ahk2Exe-SetCopyright TheBigO - Creative Commons - BY-NC-SA
+;@Ahk2Exe-SetProductName Simulator Controller
+;@Ahk2Exe-SetVersion 0.0.0.0
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -33,10 +37,10 @@
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\GIFViewer.ahk"
-#Include "..\Libraries\Task.ahk"
-#Include "..\Libraries\Messages.ahk"
-#Include "..\Libraries\SpeechRecognizer.ahk"
+#Include "..\Framework\Extensions\GIFViewer.ahk"
+#Include "..\Framework\Extensions\Task.ahk"
+#Include "..\Framework\Extensions\Messages.ahk"
+#Include "..\Framework\Extensions\SpeechRecognizer.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

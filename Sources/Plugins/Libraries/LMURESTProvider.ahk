@@ -9,9 +9,9 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\..\Libraries\Task.ahk"
-#Include "..\..\Libraries\HTTP.ahk"
-#Include "..\..\Libraries\JSON.ahk"
+#Include "..\..\Framework\Extensions\Task.ahk"
+#Include "..\..\Framework\Extensions\HTTP.ahk"
+#Include "..\..\Framework\Extensions\JSON.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 
 
@@ -81,7 +81,7 @@ class LMURestProvider {
 			local data
 
 			try {
-				data := WinHttpRequest({Timeouts: [0, 5000, 5000, 5000]}).GET(url, "", false, {Encoding: "UTF-8"}).JSON
+				data := WinHttpRequest({Timeouts: [0, 500, 500, 500]}).GET(url, "", false, {Encoding: "UTF-8"}).JSON
 
 				if !isObject(data)
 					data := false
@@ -106,7 +106,7 @@ class LMURestProvider {
 				data := JSON.print(data, "  ")
 
 				try {
-					WinHttpRequest({Timeouts: [0, 5000, 5000, 5000]}).POST(url, data, false, {Object: true, Encoding: "UTF-8"})
+					WinHttpRequest({Timeouts: [0, 500, 500, 500]}).POST(url, data, false, {Object: true, Encoding: "UTF-8"})
 				}
 				catch Any as exception {
 					logError(exception, true)
@@ -287,7 +287,7 @@ class LMURestProvider {
 				fuel := this.lookup("FUEL:")
 
 				if fuel {
-					fuel := fuel["settings"][fuel["currentSetting"]]["text"]
+					fuel := StrLower(fuel["settings"][fuel["currentSetting"]]["text"])
 
 					if InStr(fuel, "gal/")
 						fuel := (string2Values("gal/", fuel)[1] * 3.785411)
@@ -313,7 +313,7 @@ class LMURestProvider {
 
 				if fuel {
 					for index, value in fuel["settings"] {
-						value := value["text"]
+						value := StrLower(value["text"])
 
 						if InStr(value, "gal/")
 							value := (string2Values("gal/", value)[1] * 3.785411)

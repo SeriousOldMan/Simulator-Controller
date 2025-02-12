@@ -24,7 +24,7 @@ global kBuildConfiguration := "Production"
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\RuleEngine.ahk"
+#Include "..\Framework\Extensions\RuleEngine.ahk"
 #Include "AHKUnit\AHKUnit.ahk"
 
 

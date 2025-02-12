@@ -19,6 +19,10 @@
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Configuration Wand.ico
 ;@Ahk2Exe-ExeName Simulator Setup.exe
+;@Ahk2Exe-SetCompanyName Oliver Juwig (TheBigO)
+;@Ahk2Exe-SetCopyright TheBigO - Creative Commons - BY-NC-SA
+;@Ahk2Exe-SetProductName Simulator Controller
+;@Ahk2Exe-SetVersion 0.0.0.0
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -32,10 +36,10 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\HTMLViewer.ahk"
-#Include "..\Libraries\Task.ahk"
-#Include "..\Libraries\JSON.ahk"
-#Include "..\Libraries\RuleEngine.ahk"
+#Include "..\Framework\Extensions\HTMLViewer.ahk"
+#Include "..\Framework\Extensions\Task.ahk"
+#Include "..\Framework\Extensions\JSON.ahk"
+#Include "..\Framework\Extensions\RuleEngine.ahk"
 #Include "Libraries\SettingsEditor.ahk"
 #Include "Libraries\ConfigurationEditor.ahk"
 #Include "Libraries\ControllerActionsEditor.ahk"

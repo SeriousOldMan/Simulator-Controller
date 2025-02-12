@@ -16,12 +16,12 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\..\Libraries\JSON.ahk"
-#Include "..\..\Libraries\Task.ahk"
-#Include "..\..\Libraries\RuleEngine.ahk"
-#Include "..\..\Libraries\LLMConnector.ahk"
-#Include "..\..\Libraries\LLMBooster.ahk"
-#Include "..\..\Libraries\LLMAgent.ahk"
+#Include "..\..\Framework\Extensions\JSON.ahk"
+#Include "..\..\Framework\Extensions\Task.ahk"
+#Include "..\..\Framework\Extensions\RuleEngine.ahk"
+#Include "..\..\Framework\Extensions\LLMConnector.ahk"
+#Include "..\..\Framework\Extensions\LLMBooster.ahk"
+#Include "..\..\Framework\Extensions\LLMAgent.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\..\Database\Libraries\SettingsDatabase.ahk"
 #Include "..\..\Database\Libraries\TyresDatabase.ahk"
@@ -2209,7 +2209,7 @@ class RaceAssistant extends ConfigurationItem {
 		if (trackTemperature = 0)
 			trackTemperature := Round(getMultiMapValue(data, "Car Data", "RoadTemperature", 0))
 
-		knowledgeBase.setFact("InPitlane", getMultiMapValue(data, "Stint Data", "InPitlane", false))
+		knowledgeBase.setFact("InPitLane", getMultiMapValue(data, "Stint Data", "InPitLane", false))
 		knowledgeBase.setFact("InPit", getMultiMapValue(data, "Stint Data", "InPit", false))
 
 		weatherNow := getMultiMapValue(data, "Weather Data", "Weather", "Dry")
@@ -2415,6 +2415,9 @@ class RaceAssistant extends ConfigurationItem {
 		knowledgeBase.setFact("Lap.Valid", lapValid)
 		knowledgeBase.setFact("Lap.Penalty", lapPenalty)
 		knowledgeBase.setFact("Lap.Warnings", getMultiMapValue(data, "Stint Data", "Warnings", 0))
+
+		knowledgeBase.setFact("InPitLane", getMultiMapValue(data, "Stint Data", "InPitLane", false))
+		knowledgeBase.setFact("InPit", getMultiMapValue(data, "Stint Data", "InPit", false))
 
 		knowledgeBase.setFact("Update", true)
 
@@ -3828,7 +3831,7 @@ class GridRaceAssistant extends RaceAssistant {
 		}
 
 		loop getMultiMapValue(data, "Position Data", "Car.Count", 0) {
-			if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPitlane", false)
+			if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPitLane", false)
 			 || getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPit", false)) {
 				carID := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".ID", A_Index)
 

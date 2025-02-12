@@ -16,10 +16,10 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\..\Libraries\Task.ahk"
-#Include "..\..\Libraries\Math.ahk"
-#Include "..\..\Libraries\RuleEngine.ahk"
-#Include "..\..\Libraries\LLMConnector.ahk"
+#Include "..\..\Framework\Extensions\Task.ahk"
+#Include "..\..\Framework\Extensions\Math.ahk"
+#Include "..\..\Framework\Extensions\RuleEngine.ahk"
+#Include "..\..\Framework\Extensions\LLMConnector.ahk"
 #Include "RaceAssistant.ahk"
 
 
@@ -280,7 +280,7 @@ class CarInfo {
 				loop Min(count, numSectorTimes) {
 					sectorTime := this.SectorTimes[sector][numSectorTimes - A_Index + 1]
 
-					if (A_Index = numLapTimes)
+					if (A_Index = numSectorTimes)
 						sectorTimes.Push(sectorTime)
 
 					sectorTimes.Push(sectorTime)
@@ -1974,7 +1974,7 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	tacticalAdvice(lastLap, sector, positions, regular) {
-		local speaker := this.getSpeaker(true)
+		local speaker := this.getSpeaker()
 		local standingsAhead := false
 		local standingsBehind := false
 		local trackAhead := false
@@ -3844,20 +3844,29 @@ class RaceSpotter extends GridRaceAssistant {
 
 					prefix := ("Car." . carIndex)
 
-					carOverallPosition := this.getPosition(carIndex, "Overall", data)
-					carClassPosition := carClassPositions[carIndex]
-					carDelta := (((carLaps + carRunning) - (driverLaps + driverRunning)) * lapTime)
+					try {
+						carOverallPosition := this.getPosition(carIndex, "Overall", data)
+						carClassPosition := carClassPositions[carIndex]
+						carDelta := (((carLaps + carRunning) - (driverLaps + driverRunning)) * lapTime)
 
-					if (driverRunning < carRunning) {
-						carAheadDelta := ((carRunning - driverRunning) * lapTime)
-						carBehindDelta := ((1 - carRunning + driverRunning) * lapTime * -1)
+						if (driverRunning < carRunning) {
+							carAheadDelta := ((carRunning - driverRunning) * lapTime)
+							carBehindDelta := ((1 - carRunning + driverRunning) * lapTime * -1)
+						}
+						else {
+							carAheadDelta := ((1 - driverRunning + carRunning) * lapTime)
+							carBehindDelta := ((driverRunning - carRunning) * lapTime * -1)
+						}
 					}
-					else {
-						carAheadDelta := ((1 - driverRunning + carRunning) * lapTime)
-						carBehindDelta := ((driverRunning - carRunning) * lapTime * -1)
+					catch Any as exception {
+						logError(exception)
+
+						carDelta := false
+						carAheadDelta := false
+						carBehindDelta := false
 					}
 
-					inPit := (getMultiMapValue(data, "Position Data", prefix . ".InPitlane", false)
+					inPit := (getMultiMapValue(data, "Position Data", prefix . ".InPitLane", false)
 						   || getMultiMapValue(data, "Position Data", prefix . ".InPit", false))
 
 					sectorTimes := getMultiMapValue(data, "Position Data", prefix . ".Time.Sectors", false)

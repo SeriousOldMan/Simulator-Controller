@@ -25,8 +25,8 @@ global kBuildConfiguration := "Production"
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\Framework\Startup.ahk"
-#Include "..\Libraries\Task.ahk"
-#Include "..\Libraries\RuleEngine.ahk"
+#Include "..\Framework\Extensions\Task.ahk"
+#Include "..\Framework\Extensions\RuleEngine.ahk"
 #Include "..\Assistants\Libraries\RaceStrategist.ahk"
 #Include "AHKUnit\AHKUnit.ahk"
 

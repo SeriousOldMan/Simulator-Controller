@@ -759,6 +759,10 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
 
 Note: For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
+### Installation of the *Assetto Corsa* data interface
+
+For *Assetto Corsa*, you need to install a plugin into a special location for everything to work. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
+
 ### Special requirements when using the Pitstop automation
 
 *Assetto Corsa* does not provide any information about the current available settings in the Pitstop HUD and their corresponding car specific value range. And, since *Assetto Corsa* is open to modding, the list of cars is potentially endless. Therefore, you may have to provide a couple of information for the car in use, so that the pitstop automation will function correctly, when contolled by the AI Race Engineer or using the Pitsop mode on your hardware controller. I will compile a list of meta data for all the standard cars over time, when they are added to "Setup Workbench" (you can check whether the meta data for a specific car is already there in the file *Resources\Simulator Data\AC\Car Data.ini*, which resides in the programm directory. Unless a car is already known there in the "[Pitstop Settings]" section, you will have to enter the values mentioned below into the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) tool, as long as the defaults does not fit. As an alternative, you can create your own "Car Data.ini" file and place it in the *Simulator Controller\Simulator Data\AC* folder which resides in your user *Documents* folder. By the way, the same applies for tyre data as well, using the file ["Tyre Data.ini"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#tyre-data-files), where the available tyre compounds for a given car are defined.
@@ -910,7 +914,7 @@ Note: You can use all these commands in the *pitstopCommands* list as well, whic
 
 ### Configuration
 
-First, you can define, how to open and close the Pitstop MFD (aka HUD) in *rFactor 2*. This is actually optional, since the menu have not to be open for the control of the pitstop settings. If you want to use the "PitstopRequest" controller action (see below), supply an argument for *pitstopRequest*. Please supply the bindings you have defined in the controller setup in *rFactor 2*.
+First, you can define, how to open and close the Pitstop MFD (aka HUD) in *rFactor 2*. This is actually optional, since the menu have not to be open for the control of the pitstop settings. If you want to use the "PitstopRequest" controller action (see below), supply an argument for *requestPitstop*. Please supply the bindings you have defined in the controller setup in *rFactor 2*.
 
 	openPitstopMFD: *openHotkey*; closePitstopMFD: *closeHotkey*; requestPitstop: *requestPitstopHotkey*;
 	pitstopMFDMode: Event | Input | Play | Raw | Default
@@ -972,9 +976,9 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
 
 Note: For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
-### Installation of the *rFactor 2* Pitstop Interface
+### Installation of the *rFactor 2* data interface
 
-For *rFactor 2*, you need to install a plugin into a special location for the pitstop interface to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip* or you can load the [latest version](https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin) from GitHub. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
+For *rFactor 2*, you need to install a plugin into a special location for everything to work. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
 
 ### Special notes for *rFactor 2*
 
@@ -1086,7 +1090,7 @@ Note: The picture search will initially take some time, but the algorithm will l
 
 Second note: The image search algorithm used here is as good as it can be. But unfortunately, the Pitstop MFD in *RaceRoom Racing Experience* has very low contrast differences in several places, other than the Pitstop MFD of *Assetto Corsa Competizione*, Therefore, it is possible from time to time, that the search will yield false positives, which in the end will lead to false values and choices entered into fields of the Pitstop MFD. So please always double check, that everything is correct, before entering the pit lane.
 
-Last note: On our Discord server (https://discord.gg/5N8JrNr48H), there is a small tool in the channel #tools-and-fixes available, with which you can test, whether all your pictures can be be found.
+Last note: On our [Discord server](https://discord.gg/5N8JrNr48H), there is a small tool in the channel #tools-and-fixes available, with which you can test, whether all your pictures can be be found.
 
 ## Plugin *AMS2*
 
@@ -1153,6 +1157,7 @@ See the following table for the supported settings:
 | SuspensionRepair | Toggles the repair of the suspension components. |
 | BodyworkRepair | Toggles the repair of all the bodywork and aerodynamic elements. |
 | DriverSwap | Enables or disables driver swap for the upcoming pitstop. |
+| PitstopRequest | Requests or unrequests a pitstop. |
 
 Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
 
@@ -1329,7 +1334,7 @@ Note: You can use all these commands in the *pitstopCommands* list as well, whic
 
 ### Configuration
 
-First, you can define, how to open and close the Pitstop MFD (aka HUD) in *Le Mans Ultimate*. This is actually optional, since the menu have not to be open for the control of the pitstop settings. If you want to use the "PitstopRequest" controller action (see below), supply an argument for *pitstopRequest*. Please supply the bindings you have defined in the controller setup in *Le Mans Ultimate*.
+First, you can define, how to open and close the Pitstop MFD (aka HUD) in *Le Mans Ultimate*. This is actually optional, since the menu have not to be open for the control of the pitstop settings. If you want to use the "PitstopRequest" controller action (see below), supply an argument for *requestPitstop*. Please supply the bindings you have defined in the controller setup in *Le Mans Ultimate*.
 
 	openPitstopMFD: *openHotkey*; closePitstopMFD: *closeHotkey*; requestPitstop: *requestPitstopHotkey*;
 	pitstopMFDMode: Event | Input | Play | Raw | Default
@@ -1396,9 +1401,9 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
 
 Note: For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
-### Installation of the *Le Mans Ultimate* Pitstop Interface
+### Installation of the *Le Mans Ultimate* data interface
 
-For *Le Mans Ultimate*, you need to install a plugin into a special location for the pitstop interface to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip* or you can load the [latest version](https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin) from GitHub. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
+For *Le Mans Ultimate*, you need to install a plugin into a special location for everything to work. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
 
 ### Special notes for *Le Mans Ultimate*
 

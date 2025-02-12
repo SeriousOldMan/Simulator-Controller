@@ -16,9 +16,9 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\..\Libraries\Task.ahk"
-#Include "..\..\Libraries\RuleEngine.ahk"
-#Include "..\..\Libraries\LLMConnector.ahk"
+#Include "..\..\Framework\Extensions\Task.ahk"
+#Include "..\..\Framework\Extensions\RuleEngine.ahk"
+#Include "..\..\Framework\Extensions\LLMConnector.ahk"
 #Include "RaceAssistant.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 
@@ -175,6 +175,11 @@ class RaceEngineer extends RaceAssistant {
 
 	iPitstopAdjustments := false
 
+	iCurrentTyreTemperatures := false
+	iCurrentTyrePressures := false
+	iCurrentBrakeTemperatures := false
+	iCurrentRemainingFuel := false
+
 	class RaceEngineerRemoteHandler extends RaceAssistant.RaceAssistantRemoteHandler {
 		__New(remotePID) {
 			super.__New("Race Engineer", remotePID)
@@ -279,6 +284,30 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
+	CurrentTyreTemperatures {
+		Get {
+			return this.iCurrentTyreTemperatures
+		}
+	}
+
+	CurrentTyrePressures {
+		Get {
+			return this.iCurrentTyrePressures
+		}
+	}
+
+	CurrentBrakeTemperatures {
+		Get {
+			return this.iCurrentBrakeTemperatures
+		}
+	}
+
+	CurrentRemainingFuel {
+		Get {
+			return this.iCurrentRemainingFuel
+		}
+	}
+
 	__New(configuration, remoteHandler := false, name := false, language := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, speakerBooster := false
 		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, agentBooster := false
@@ -312,8 +341,14 @@ class RaceEngineer extends RaceAssistant {
 	updateSessionValues(values) {
 		super.updateSessionValues(values)
 
-		if (values.HasProp("Session") && (values.Session == kSessionFinished))
+		if (values.HasProp("Session") && (values.Session == kSessionFinished)) {
 			this.iPitstopAdjustments := false
+
+			this.iCurrentTyreTemperatures := false
+			this.iCurrentTyrePressures := false
+			this.iCurrentBrakeTemperatures := false
+			this.iCurrentRemainingFuel := false
+		}
 	}
 
 	updateDynamicValues(values) {
@@ -711,6 +746,11 @@ class RaceEngineer extends RaceAssistant {
 						lap["Brakes"] := brakes
 				}
 
+			if (this.activeTopic(options, "Fuel") && knowledge.Has("Fuel") && this.CurrentRemainingFuel)
+				knowledge["Fuel"]["Remaining"] := (Round(this.CurrentRemainingFuel, 1) . " Liter")
+
+
+
 			if this.activeTopic(options, "Tyres") {
 				tyres := knowledge["Tyres"]
 
@@ -729,10 +769,10 @@ class RaceEngineer extends RaceAssistant {
 					tyreCompound := "Wet"
 
 				tyres["Pressures"]
-					:= Map("Current", Map("FrontLeft", (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.FL") . psi)
-										, "FrontRight", (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.FR") . psi)
-										, "RearLeft", (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.RL") . psi)
-										, "RearRight", (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.RR") . psi))
+					:= Map("Current", Map("FrontLeft", (Round(this.CurrentTyrePressures[1], 1) . psi)
+										, "FrontRight", (Round(this.CurrentTyrePressures[2], 1) . psi)
+										, "RearLeft", (Round(this.CurrentTyrePressures[3], 1) . psi)
+										, "RearRight", (Round(this.CurrentTyrePressures[4], 1) . psi))
 						 , "Ideal", Map("FrontLeft", (knowledgeBase.getValue("Session.Settings.Tyre." . tyreCompound . ".Pressure.Target.FL") . psi)
 									  , "FrontRight", (knowledgeBase.getValue("Session.Settings.Tyre." . tyreCompound . ".Pressure.Target.FR") . psi)
 									  , "RearLeft", (knowledgeBase.getValue("Session.Settings.Tyre." . tyreCompound . ".Pressure.Target.RL") . psi)
@@ -747,19 +787,19 @@ class RaceEngineer extends RaceAssistant {
 									   , "RearRight", (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Wear.RR") . percent))
 
 				tyres["Temperatures"]
-					:= Map("Current", Map("FrontLeft", (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Temperature.FL") . celsius)
-										, "FrontRight", (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Temperature.FR") . celsius)
-										, "RearLeft", (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Temperature.RL") . celsius)
-										, "RearRight", (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Temperature.RR") . celsius)))
+					:= Map("Current", Map("FrontLeft", (Round(this.CurrentTyreTemperatures[1], 1) . celsius)
+										, "FrontRight", (Round(this.CurrentTyreTemperatures[2], 1) . celsius)
+										, "RearLeft", (Round(this.CurrentTyreTemperatures[3], 1) . celsius)
+										, "RearRight", (Round(this.CurrentTyreTemperatures[4], 1) . celsius)))
 			}
 
 			if this.activeTopic(options, "Brakes") {
-				if (knowledgeBase.getValue("Lap." . lapNumber . ".Brake.Temperature.FL", kUndefined) != kUndefined)
+				if this.CurrentBrakeTemperatures
 					knowledge["Brakes"]
-						:= Map("Temperatures", Map("FrontLeft", (knowledgeBase.getValue("Lap." . lapNumber . ".Brake.Temperature.FL") . celsius)
-												 , "FrontRight", (knowledgeBase.getValue("Lap." . lapNumber . ".Brake.Temperature.FR") . celsius)
-												 , "RearLeft", (knowledgeBase.getValue("Lap." . lapNumber . ".Brake.Temperature.RL") . celsius)
-												 , "RearRight", (knowledgeBase.getValue("Lap." . lapNumber . ".Brake.Temperature.RR") . celsius)))
+						:= Map("Temperatures", Map("FrontLeft", (Round(this.CurrentBrakeTemperatures[1], 1) . celsius)
+												 , "FrontRight", (Round(this.CurrentBrakeTemperatures[2], 1) . celsius)
+												 , "RearLeft", (Round(this.CurrentBrakeTemperatures[3], 1) . celsius)
+												 , "RearRight", (Round(this.CurrentBrakeTemperatures[4], 1) . celsius)))
 
 				if (knowledgeBase.getValue("Lap." . lapNumber . ".Brake.Wear.FL", kUndefined) != kUndefined) {
 					if !knowledge.Has("Brakes")
@@ -932,6 +972,9 @@ class RaceEngineer extends RaceAssistant {
 
 			if (fuel == 0)
 				speaker.speakPhrase("Later")
+			else if this.CurrentRemainingFuel
+				speaker.speakPhrase("Fuel", {fuel: speaker.number2Speech(Floor(convertUnit("Volume", this.CurrentRemainingFuel)), 0)
+										   , unit: speaker.Fragments[getUnit("Volume")]})
 			else
 				speaker.speakPhrase("Fuel", {fuel: speaker.number2Speech(Floor(convertUnit("Volume", fuel)), 0)
 										   , unit: speaker.Fragments[getUnit("Volume")]})
@@ -1008,9 +1051,13 @@ class RaceEngineer extends RaceAssistant {
 						value := speaker.number2Speech(convertUnit("Pressure", setupPressures[index]))
 					else if forCold
 						value := speaker.number2Speech(convertUnit("Pressure", knowledgeBase.getValue("Tyre.Pressure.Target." . suffix)))
+					else if this.CurrentTyrePressures
+						value := speaker.number2Speech(convertUnit("Pressure", this.CurrentTyrePressures[index]))
 					else
 						value := speaker.number2Speech(convertUnit("Pressure", knowledgeBase.getValue("Lap." . lap . ".Tyre.Pressure." . suffix)))
 				}
+				else if this.CurrentTyreTemperatures
+					value := speaker.number2Speech(convertUnit("Temperature",  this.CurrentTyreTemperatures[index]))
 				else
 					value := speaker.number2Speech(convertUnit("Temperature", knowledgeBase.getValue("Lap." . lap . ".Tyre.Temperature." . suffix)), 0)
 
@@ -1078,17 +1125,32 @@ class RaceEngineer extends RaceAssistant {
 			try {
 				speaker.speakPhrase("Temperatures")
 
-				speaker.speakPhrase("BrakeFL", {value: speaker.number2Speech(convertUnit("Temperature", knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.FL")), 0)
-											  , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
+				if this.CurrentBrakeTemperatures {
+					speaker.speakPhrase("BrakeFL", {value: speaker.number2Speech(convertUnit("Temperature", this.CurrentBrakeTemperatures[1]), 0)
+												  , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
 
-				speaker.speakPhrase("BrakeFR", {value: speaker.number2Speech(convertUnit("Temperature", knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.FR")), 0)
-											  , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
+					speaker.speakPhrase("BrakeFR", {value: speaker.number2Speech(convertUnit("Temperature", this.CurrentBrakeTemperatures[2]), 0)
+												  , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
 
-				speaker.speakPhrase("BrakeRL", {value: speaker.number2Speech(convertUnit("Temperature", knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.RL")), 0)
-											  , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
+					speaker.speakPhrase("BrakeRL", {value: speaker.number2Speech(convertUnit("Temperature",  this.CurrentBrakeTemperatures[3]), 0)
+												  , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
 
-				speaker.speakPhrase("BrakeRR", {value: speaker.number2Speech(convertUnit("Temperature", knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.RR")), 0)
-											  , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
+					speaker.speakPhrase("BrakeRR", {value: speaker.number2Speech(convertUnit("Temperature",  this.CurrentBrakeTemperatures[4]), 0)
+												  , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
+				}
+				else {
+					speaker.speakPhrase("BrakeFL", {value: speaker.number2Speech(convertUnit("Temperature", knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.FL")), 0)
+												  , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
+
+					speaker.speakPhrase("BrakeFR", {value: speaker.number2Speech(convertUnit("Temperature", knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.FR")), 0)
+												  , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
+
+					speaker.speakPhrase("BrakeRL", {value: speaker.number2Speech(convertUnit("Temperature", knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.RL")), 0)
+												  , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
+
+					speaker.speakPhrase("BrakeRR", {value: speaker.number2Speech(convertUnit("Temperature", knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.RR")), 0)
+												  , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
+				}
 			}
 			finally {
 				speaker.endTalk()
@@ -1936,7 +1998,7 @@ class RaceEngineer extends RaceAssistant {
 									, "Session.Settings.Pitstop.Repair.Suspension.Duration", suspensionDuration
 									, "Session.Settings.Pitstop.Repair.Engine.Duration", engineDuration
 									, "Session.Settings.Pitstop.Delta", getMultiMapValue(settings, "Strategy Settings", "Pitstop.Delta"
-																					   , getDeprecatedValue(settings, "Session Settings", "Race Settings", "Pitstop.Delta", 30))
+																					   , getDeprecatedValue(settings, "Session Settings", "Race Settings", "Pitstop.Delta", 60))
 									, "Session.Settings.Pitstop.Service.Refuel.Rule", getMultiMapValue(settings, "Strategy Settings"
 																											   , "Service.Refuel.Rule", "Dynamic")
 									, "Session.Settings.Pitstop.Service.Refuel.Duration", getMultiMapValue(settings, "Strategy Settings"
@@ -2443,6 +2505,25 @@ class RaceEngineer extends RaceAssistant {
 		car := knowledgeBase.getValue("Session.Car")
 		track := knowledgeBase.getValue("Session.Track")
 
+		this.iCurrentTyrePressures := [knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.FL")
+									 , knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.FR")
+									 , knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.RL")
+									 , knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.RR")]
+		this.iCurrentTyreTemperatures := [knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Temperature.FL")
+										, knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Temperature.FR")
+										, knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Temperature.RL")
+										, knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Temperature.RR")]
+
+		if (knowledgeBase.getValue("Lap." . lapNumber . ".Brake.Temperature.FL", kUndefined) != kUndefined)
+			this.iCurrentBrakeTemperatures := [knowledgeBase.getValue("Lap." . lapNumber . ".Brake.Temperature.FL")
+											 , knowledgeBase.getValue("Lap." . lapNumber . ".Brake.Temperature.FR")
+											 , knowledgeBase.getValue("Lap." . lapNumber . ".Brake.Temperature.RL")
+											 , knowledgeBase.getValue("Lap." . lapNumber . ".Brake.Temperature.RR")]
+		else
+			this.iCurrentBrakeTemperatures := false
+
+		this.iCurrentRemainingFuel := knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.Remaining")
+
 		if (this.SaveTyrePressures != kNever) {
 			knowledgeBase := this.KnowledgeBase
 
@@ -2538,6 +2619,16 @@ class RaceEngineer extends RaceAssistant {
 		local fact, index, tyreType, oldValue, newValue, position, learningLaps
 		local simulator, car, track
 		local pitstopState, key, value, stateFile
+
+		this.iCurrentTyrePressures := tyrePressures
+		this.iCurrentTyreTemperatures := tyreTemperatures
+
+		if (getMultiMapValue(data, "Car Data", "BrakeTemperatures", kUndefined) != kUndefined)
+			this.iCurrentBrakeTemperatures := string2Values(",", getMultiMapValue(data, "Car Data", "BrakeTemperatures"))
+		else
+			this.iCurrentBrakeTemperatures := false
+
+		this.iCurrentRemainingFuel := getMultiMapValue(data, "Car Data", "FuelRemaining", 0)
 
 		if data.Has("Setup Data")
 			if getMultiMapValue(data, "Setup Data", "ServiceTime", false)
@@ -3523,7 +3614,7 @@ class RaceEngineer extends RaceAssistant {
 		local speaker
 
 		if (this.hasEnoughData(false) && this.Speaker[false] && this.Announcements["FuelWarning"])
-			if (!knowledgeBase.getValue("InPitlane", false) && !knowledgeBase.getValue("InPit", false)) {
+			if (!knowledgeBase.getValue("InPitLane", false) && !knowledgeBase.getValue("InPit", false)) {
 				remainingFuel := Round(remainingFuel, 1)
 				remainingLaps := Floor(remainingLaps)
 
@@ -3567,7 +3658,7 @@ class RaceEngineer extends RaceAssistant {
 		local speaker, phrase
 
 		if ((this.hasEnoughData(false) || (knowledgeBase.getValue("Lap", 0) <= this.LearningLaps)) && this.Speaker[false] && this.Announcements["DamageReporting"])
-			if (!knowledgeBase.getValue("InPitlane", false) && !knowledgeBase.getValue("InPit", false)) {
+			if (!knowledgeBase.getValue("InPitLane", false) && !knowledgeBase.getValue("InPit", false)) {
 				speaker := this.getSpeaker()
 				phrase := false
 
@@ -3614,7 +3705,7 @@ class RaceEngineer extends RaceAssistant {
 
 		if (this.hasEnoughData(false) && knowledgeBase.getValue("Lap.Remaining.Session", knowledgeBase.getValue("Lap.Remaining", 0)) > 3)
 			if (this.Speaker[false] && this.Announcements["DamageAnalysis"])
-				if (!knowledgeBase.getValue("InPitlane", false) && !knowledgeBase.getValue("InPit", false)) {
+				if (!knowledgeBase.getValue("InPitLane", false) && !knowledgeBase.getValue("InPit", false)) {
 					speaker := this.getSpeaker()
 
 					if repair {
@@ -3648,7 +3739,7 @@ class RaceEngineer extends RaceAssistant {
 		static tyreLookup := CaseInsenseMap("FL", "FrontLeft", "FR", "FrontRight", "RL", "RearLeft", "RR", "RearRight")
 
 		if (this.hasEnoughData(false) && (this.Session == kSessionRace))
-			if (!knowledgeBase.getValue("InPitlane", false) && !knowledgeBase.getValue("InPit", false))
+			if (!knowledgeBase.getValue("InPitLane", false) && !knowledgeBase.getValue("InPit", false))
 				if (this.Speaker[false] && this.Announcements["PressureReporting"]) {
 					speaker := this.getSpeaker()
 					fragments := speaker.Fragments

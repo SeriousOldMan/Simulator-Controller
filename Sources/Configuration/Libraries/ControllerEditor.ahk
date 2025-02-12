@@ -9,7 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\..\Libraries\Task.ahk"
+#Include "..\..\Framework\Extensions\Task.ahk"
 #Include "ConfigurationItemList.ahk"
 #Include "ButtonBoxPreview.ahk"
 #Include "StreamDeckPreview.ahk"
@@ -525,7 +525,7 @@ class ControlsList extends ConfigurationItemList {
 
 	buildItemFromEditor(isNew := false) {
 		if ((Trim(this.Control["controlNameEdit"].Text) = "") || !inList([1, 2, 3, 4], this.Control["controlTypeDropDown"].Value)
-		 || (Trim(this.Control["imageFilePathEdit"].Text) = "")  || (this.Control["imageWidthEdit"].Text = 0) || (this.Control["imageHeightEdit"].Text = 0)) {
+		 || (Trim(this.Control["imageFilePathEdit"].Text) = "") || !isInteger(this.Control["imageWidthEdit"].Text) || !isInteger(this.Control["imageHeightEdit"].Text)) {
 			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
@@ -671,7 +671,7 @@ class LabelsList extends ConfigurationItemList {
 	}
 
 	buildItemFromEditor(isNew := false) {
-		if ((Trim(this.Control["labelNameEdit"].Text) = "") || (this.Control["labelWidthEdit"].Text = 0) || (this.Control["labelHeightEdit"].Text = 0)) {
+		if ((Trim(this.Control["labelNameEdit"].Text) = "") || !isInteger(this.Control["labelWidthEdit"].Text) || !isInteger(this.Control["labelHeightEdit"].Text)) {
 			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
@@ -808,13 +808,13 @@ class LayoutsList extends ConfigurationItemList {
 
 		window.SetFont()
 
-		bbWidget14 := window.Add("Edit", "x215 y493 w40 h21 X:Move(0.2) Limit2 Number  VlayoutRowMarginEdit")
+		bbWidget14 := window.Add("Edit", "x215 y493 w40 h21 X:Move(0.2) Limit2 Number VlayoutRowMarginEdit")
 		bbWidget14.OnEvent("Change", updateLayoutRowEditor)
-		bbWidget15 := window.Add("Edit", "x265 y493 w40 h21 X:Move(0.2) Limit2 Number  VlayoutColumnMarginEdit")
+		bbWidget15 := window.Add("Edit", "x265 y493 w40 h21 X:Move(0.2) Limit2 Number VlayoutColumnMarginEdit")
 		bbWidget15.OnEvent("Change", updateLayoutRowEditor)
-		bbWidget16 := window.Add("Edit", "x315 y493 w40 h21 X:Move(0.2) Limit2 Number  VlayoutSidesMarginEdit")
+		bbWidget16 := window.Add("Edit", "x315 y493 w40 h21 X:Move(0.2) Limit2 Number VlayoutSidesMarginEdit")
 		bbWidget16.OnEvent("Change", updateLayoutRowEditor)
-		bbWidget17 := window.Add("Edit", "x365 y493 w40 h21 X:Move(0.2) Limit2 Number  VlayoutBottomMarginEdit")
+		bbWidget17 := window.Add("Edit", "x365 y493 w40 h21 X:Move(0.2) Limit2 Number VlayoutBottomMarginEdit")
 		bbWidget17.OnEvent("Change", updateLayoutRowEditor)
 
 		window.Add("DropDownList", "x8 y534 w86 Choose0 VlayoutRowDropDown", ["", ""]).OnEvent("Change", updateLayoutRowEditor)
@@ -1123,7 +1123,13 @@ class LayoutsList extends ConfigurationItemList {
 		local name := Trim(this.Control["layoutNameEdit"].Text)
 		local ignore, index, layout, duplicate
 
-		if ((name = "") || (this.Control["layoutRowsEdit"].Text = 0) || (this.Control["layoutColumnsEdit"].Text = 0)) {
+		if ((name = "") || !isInteger(this.Control["layoutRowsEdit"].Text) || (this.Control["layoutRowsEdit"].Text = 0)
+						|| !isInteger(this.Control["layoutColumnsEdit"].Text) || (this.Control["layoutColumnsEdit"].Text = 0)
+						|| ((["Button Box", "Stream Deck"][this.Control["layoutTypeDropDown"].Value] = "Button Box")
+						 && (!isInteger(this.Control["layoutRowMarginEdit"].Text)
+						  || !isInteger(this.Control["layoutColumnMarginEdit"].Text)
+						  || !isInteger(this.Control["layoutSidesMarginEdit"].Text)
+						  || !isInteger(this.Control["layoutBottomMarginEdit"].Text)))) {
 			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)

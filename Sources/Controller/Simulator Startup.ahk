@@ -19,6 +19,10 @@
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Startup.ico
 ;@Ahk2Exe-ExeName Simulator Startup.exe
+;@Ahk2Exe-SetCompanyName Oliver Juwig (TheBigO)
+;@Ahk2Exe-SetCopyright TheBigO - Creative Commons - BY-NC-SA
+;@Ahk2Exe-SetProductName Simulator Controller
+;@Ahk2Exe-SetVersion 0.0.0.0
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -32,8 +36,8 @@
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\Task.ahk"
-#Include "..\Libraries\Messages.ahk"
+#Include "..\Framework\Extensions\Task.ahk"
+#Include "..\Framework\Extensions\Messages.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Configuration\Libraries\SettingsEditor.ahk"
 #Include "..\Configuration\Libraries\TeamManagementPanel.ahk"
@@ -225,6 +229,12 @@ class SimulatorStartup extends ConfigurationItem {
 
 		try {
 			logMessage(kLogInfo, translate("Starting ") . translate("Simulator Controller"))
+
+			if FileExist(kUserHomeDirectory . "Programs\Startup.bat")
+				Run(kUserHomeDirectory . "Programs\Startup.bat")
+
+			if FileExist(kUserHomeDirectory . "Programs\Startup.cmd")
+				Run(kUserHomeDirectory . "Programs\Startup.cmd")
 
 			exePath := (kBinariesDirectory . "Process Manager.exe")
 
@@ -1397,9 +1407,12 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 			}
 
 			profile := CaseInsenseMap("Name", name
-									, "Mode", hasTeamServer ? getMultiMapValue(settings, "Profiles", name . ".Mode", "Solo") : false
+									, "Mode", (hasTeamServer ? getMultiMapValue(settings, "Profiles", name . ".Mode", "Solo") : "Solo")
 									, "Tools", values2String(",", tools*)
 									, "Simulator", getMultiMapValue(settings, "Profiles", name . ".Simulator", false))
+
+			if !profile["Mode"]
+				profile["Mode"] := "Solo"
 
 			for ignore, assistant in kRaceAssistants
 				profile[assistant] := getMultiMapValue(settings, "Profiles", name . "." . assistant, "Default")

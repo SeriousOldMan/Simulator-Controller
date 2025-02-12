@@ -163,7 +163,7 @@ This settings are generally available, although you can and have to define them 
 
 ##### Notes
 
-(1) The default for *iRacing* is *Change*, since the simulator does not provide correct tyre pressure information while driving. This will lead to setup pressure values, which are way off, when tyres are changed at the pitstop. Therefore it might be better to manage tyre pressures manually. *Change* is also the default for *Automobilista 2*, *ProjectCARS 2* and *RaceRoom Racing Experience*, because these simulators do not support pressure adjustments during a pitstop.
+(1) The default for *iRacing* is *Change*, since the simulator does not provide correct tyre pressure information while driving. This will lead to setup pressure values, which are way off, when tyres are changed at the pitstop. Therefore it might be better to manage tyre pressures manually. *Change* is also the default for *Automobilista 2*, *Project CARS 2* and *RaceRoom Racing Experience*, because these simulators do not support pressure adjustments during a pitstop.
 
 ### Simulator specific settings
 
@@ -216,7 +216,27 @@ The following settings are only available, if you have selected the correspondin
 |            | Repair duration for suspension damage    | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the suspension at a pitstop. |
 |            | Repair duration for engine damage        | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the engine at a pitstop. |
 
-5. *Automobilista 2* and *iRacing*
+5. *Automobilista 2*
+
+| Category   | Setting                                  | Type    | Default                         | Description  |
+|------------|------------------------------------------|---------|---------------------------------|--------------|
+| Pitstop    | Key Delay                                | Integer | 20                              | The time in ms to wait between each virtual key press, when controlling the pitstop settings of the simulator. Increase this, if your computer can't keep up with the speed of the virtual input. |
+| Engineer    | Request pitstop                         | Boolean | False                           | If *True*, the pitstop is requested after all settings has been updated. Use with caution if you plan and prepare a pitstop multiple times, since then the pitstop may be unrequested. |
+|            | Repair duration for bodywork damage      | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the bodywork at a pitstop. |
+|            | Repair duration for suspension damage    | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the suspension at a pitstop. |
+|            | Repair duration for engine damage        | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the engine at a pitstop. |
+| Track      | Type                                     | Circuit, Rally, Hill, Street | Circuit    | Defines the type of the specific track. ALl closed tracks are of type *Circuit*, all open tracks are of type *Rally*. |
+
+6. *Project Cars 2*
+
+| Category   | Setting                                  | Type    | Default                         | Description  |
+|------------|------------------------------------------|---------|---------------------------------|--------------|
+| Pitstop    | Key Delay                                | Integer | 20                              | The time in ms to wait between each virtual key press, when controlling the pitstop settings of the simulator. Increase this, if your computer can't keep up with the speed of the virtual input. |
+|            | Repair duration for bodywork damage      | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the bodywork at a pitstop. |
+|            | Repair duration for suspension damage    | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the suspension at a pitstop. |
+|            | Repair duration for engine damage        | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the engine at a pitstop. |
+
+7. *iRacing*
 
 | Category   | Setting                                  | Type    | Default                         | Description  |
 |------------|------------------------------------------|---------|---------------------------------|--------------|
@@ -226,7 +246,7 @@ The following settings are only available, if you have selected the correspondin
 |            | Repair duration for engine damage        | Float   | 0.0                             | This value is multiplied with the internal damage percentage to compute the number of seconds need to repair the engine at a pitstop. |
 | Track      | Type                                     | Circuit, Rally, Hill, Street | Circuit    | Defines the type of the specific track. ALl closed tracks are of type *Circuit*, all open tracks are of type *Rally*. |
 
-6. *Project Cars 2* and *RaceRoom Racing Experience*
+8. *RaceRoom Racing Experience*
 
 | Category   | Setting                                  | Type    | Default                         | Description  |
 |------------|------------------------------------------|---------|---------------------------------|--------------|

@@ -9,9 +9,9 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\..\Libraries\Task.ahk"
-#Include "..\..\Libraries\HTMLViewer.ahk"
-#Include "..\..\Libraries\GDIP.ahk"
+#Include "..\..\Framework\Extensions\Task.ahk"
+#Include "..\..\Framework\Extensions\HTMLViewer.ahk"
+#Include "..\..\Framework\Extensions\GDIP.ahk"
 #Include "SessionDatabase.ahk"
 #Include "SessionDatabaseBrowser.ahk"
 #Include "TelemetryCollector.ahk"
@@ -754,30 +754,35 @@ class TelemetryViewer {
 
 	loadLayouts() {
 		local configuration := readMultiMap(kUserConfigDirectory . "Telemetry.layouts")
-		local layouts, name, definition, ignore
+		local layouts := CaseInsenseMap()
+		local name, definition, ignore
 
-		if (configuration.Count = 0) {
+		if (configuration.Count > 0)
+			for name, definition in getMultiMapValues(configuration, "Layouts")
+				try {
+					layouts[name] := {Name: name
+									, WidthZoom: getMultiMapValue(configuration, "Zoom", name . ".Width", 100)
+									, HeightZoom: getMultiMapValue(configuration, "Zoom", name . ".Height", 100)
+									, Channels: choose(collect(string2Values(",", definition), (name) {
+														   return choose(kTelemetryChannels, (s) => s.Name = name)[1]
+													   })
+													 , (s) => s.HasProp("Size"))}
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+
+		if (layouts.Count = 0) {
 			this.iLayouts := CaseInsenseMap(translate("Standard")
 										  , {Name: translate("Standard")
 										   , WidthZoom: 100, HeightZoom: 100
 										   , Channels: choose(kTelemetryChannels
 															, (s) => (!inList(["Speed", "Throttle", "Brake", "TC", "ABS"
-																			, "Long G", "Lat G"], s.Name) && s.HasProp("Size")))})
+																			 , "Long G", "Lat G"], s.Name) && s.HasProp("Size")))})
 
 			this.iSelectedLayout := translate("Standard")
 		}
 		else {
-			layouts := CaseInsenseMap()
-
-			for name, definition in getMultiMapValues(configuration, "Layouts")
-				layouts[name] := {Name: name
-								, WidthZoom: getMultiMapValue(configuration, "Zoom", name . ".Width", 100)
-								, HeightZoom: getMultiMapValue(configuration, "Zoom", name . ".Height", 100)
-								, Channels: choose(collect(string2Values(",", definition), (name) {
-													   return choose(kTelemetryChannels, (s) => s.Name = name)[1]
-												   })
-												 , (s) => s.HasProp("Size"))}
-
 			this.iLayouts := layouts
 			this.iSelectedLayout := getMultiMapValue(configuration, "Selected", "Layout")
 		}
@@ -896,6 +901,8 @@ class TelemetryViewer {
 		}
 
 		selectLayout(*) {
+			local configuration := readMultiMap(kUserConfigDirectory . "Telemetry.layouts")
+
 			this.iSelectedLayout := viewerGui["layoutDropDown"].Text
 
 			this.TelemetryChart.WidthZoom := this.Layouts[this.SelectedLayout].WidthZoom
@@ -903,6 +910,10 @@ class TelemetryViewer {
 
 			this.Window["zoomWSlider"].Value := this.TelemetryChart.WidthZoom
 			this.Window["zoomHSlider"].Value := this.TelemetryChart.HeightZoom
+
+			setMultiMapValue(configuration, "Selected", "Layout", this.SelectedLayout)
+
+			writeMultiMap(kUserConfigDirectory . "Telemetry.layouts", configuration)
 
 			this.updateTelemetryChart(true)
 		}
@@ -1989,7 +2000,7 @@ class SectionInfoViewer {
 	}
 
 	createSectionInfo(section, referenceSection := false) {
-		local html
+		local html, name
 
 		nullZero(value) {
 			return (isNull(value) ? 0 : value)
@@ -2071,7 +2082,12 @@ class SectionInfoViewer {
 		}
 
 		if (section.Type = "Corner") {
-			this.Window.Title := (translate("Corner") . translate(" (") . translate(section.Direction) . translate(")"))
+			if section.HasProp("Name")
+				name := (A_Space . section.Name)
+			else
+				name := ""
+
+			this.Window.Title := (translate("Corner") . name . translate(" (") . translate(section.Direction) . translate(")"))
 
 			html := "<table class=`"table-std`">"
 
@@ -2404,7 +2420,7 @@ class TrackMap {
 
 			try {
 				withTask(WorkingTask(StrReplace(translate("Scanning track..."), "...", "")), () {
-					withBlockWindows(() {
+					withBlockedWindows(() {
 						local analyzer := TelemetryAnalyzer(this.Simulator, this.Track)
 						local lap := this.TelemetryViewer.SelectedLap
 						local driver, lapTime, sectorTimes, telemetry, index, section
@@ -2431,6 +2447,9 @@ class TrackMap {
 							setMultiMapValue(this.TrackMap, "Sections", index . ".Type", section.Type)
 							setMultiMapValue(this.TrackMap, "Sections", index . ".X", section.X)
 							setMultiMapValue(this.TrackMap, "Sections", index . ".Y", section.Y)
+
+							if (section.HasProp("Name") && (Trim(section.Name) != ""))
+								setMultiMapValue(this.TrackMap, "Sections", index . ".Name", section.Name)
 						}
 
 						this.updateTrackMap()
@@ -2465,6 +2484,97 @@ class TrackMap {
 		local sessionDB := SessionDatabase()
 		local x, y, w, h
 
+		showPositionInfo(*) {
+			global gPositionInfoEnabled
+
+			local x, y, coordinateX, coordinateY, window
+
+			static currentAction := false
+			static previousAction := false
+			static currentSection := false
+			static previousSection := false
+			static positionInfo := ""
+
+			displayToolTip() {
+				SetTimer(displayToolTip, 0)
+
+				ToolTip(positionInfo)
+
+				SetTimer(removeToolTip, 10000)
+			}
+
+			removeToolTip() {
+				SetTimer(removeToolTip, 0)
+
+				ToolTip()
+			}
+
+			MouseGetPos(&x, &y)
+
+			x := screen2Window(x)
+			y := screen2Window(y)
+
+			coordinateX := false
+			coordinateY := false
+
+			if this.findTrackCoordinate(x - this.iTrackDisplayArea[1], y - this.iTrackDisplayArea[2], &coordinateX, &coordinateY) {
+				previousAction := false
+
+				currentSection := this.findTrackSection(coordinateX, coordinateY)
+
+				if !currentSection
+					currentSection := (coordinateX . ";" . coordinateY)
+
+				if (currentSection && (currentSection != previousSection)) {
+					ToolTip()
+
+					if isObject(currentSection) {
+						if currentSection.HasProp("Nr") {
+							switch currentSection.Type, false {
+								case "Corner":
+									if (currentSection.HasProp("Name") && (Trim(currentSection.Name) != ""))
+										positionInfo := (translate(" (") . currentSection.Name . translate(")"))
+									else
+										positionInfo := ""
+
+									positionInfo := (translate("Corner") . A_Space . currentSection.Nr . positionInfo . translate(": "))
+								case "Straight":
+									positionInfo := (translate("Straight") . A_Space . currentSection.Nr . translate(": "))
+								default:
+									throw "Unknown section type detected in SessionDatabaseEditor.show..."
+							}
+
+							positionInfo .= (Round(currentSection.X, 3) . translate(", ") . Round(currentSection.Y, 3))
+						}
+						else
+							return
+					}
+					else
+						positionInfo := (Round(string2Values(";", currentSection)[1], 3) . translate(", ") . Round(string2Values(";", currentSection)[2], 3))
+
+					SetTimer(removeToolTip, 0)
+					SetTimer(displayToolTip, 1000)
+
+					previousSection := currentSection
+				}
+				else if !currentSection {
+					ToolTip()
+
+					SetTimer(removeToolTip, 0)
+
+					previousSection := false
+				}
+			}
+			else {
+				ToolTip()
+
+				SetTimer(removeToolTip, 0)
+
+				previousAction := false
+				previousSection := false
+			}
+		}
+
 		this.createGui()
 
 		if getWindowPosition("Telemetry Browser.Track Map", &x, &y)
@@ -2481,6 +2591,11 @@ class TrackMap {
 		this.iEditorTask := PeriodicTask(() {
 								if (this.TrackMapMode = "Edit")
 									this.Control["editButton"].Text := translate(GetKeyState("Ctrl") ? "Cancel" : "Save")
+
+								if WinActive(this.Window)
+									OnMessage(0x0200, showPositionInfo)
+								else
+									OnMessage(0x0200, showPositionInfo, 0)
 							}, 100, kHighPriority)
 
 		this.iEditorTask.start()
@@ -2590,10 +2705,14 @@ class TrackMap {
 		this.Control["trackNameDisplay"].Text := SessionDatabase.getTrackName(this.Simulator
 																			, getMultiMapValue(trackMap, "General", "Track", ""))
 
-		loop getMultiMapValue(trackMap, "Sections", "Count")
+		loop getMultiMapValue(trackMap, "Sections", "Count") {
 			sections.Push({Type: getMultiMapValue(trackMap, "Sections", A_Index . ".Type")
 						 , X: getMultiMapValue(trackMap, "Sections", A_Index . ".X")
 						 , Y: getMultiMapValue(trackMap, "Sections", A_Index . ".Y")})
+
+			if (getMultiMapValue(trackMap, "Sections", A_Index . ".Name", kUndefined) != kUndefined)
+				sections[A_Index].Name := getMultiMapValue(trackMap, "Sections", A_Index . ".Name")
+		}
 
 		this.iTrackSections := sections
 
@@ -2707,6 +2826,9 @@ class TrackMap {
 				setMultiMapValue(this.TrackMap, "Sections", index . ".Index", section.Index)
 				setMultiMapValue(this.TrackMap, "Sections", index . ".X", section.X)
 				setMultiMapValue(this.TrackMap, "Sections", index . ".Y", section.Y)
+
+				if (section.HasProp("Name") && (Trim(section.Name) != ""))
+					setMultiMapValue(this.TrackMap, "Sections", index . ".Name", section.Name)
 			}
 
 			SessionDatabase().updateTrackMap(this.Simulator, this.Track, this.TrackMap)
@@ -2904,12 +3026,19 @@ class TrackMap {
 	chooseTrackSectionType(section := false) {
 		local result := false
 		local sectionsMenu := Menu()
+		local label := translate("Corner")
 
-		sectionsMenu.Add(translate("Corner"), (*) => (result := "Corner"))
+		if (section && (section.Type = "Corner"))
+			label .= translate("...")
+
+		sectionsMenu.Add(label, (*) => (result := "Corner"))
 		sectionsMenu.Add(translate("Straight"), (*) => (result := "Straight"))
 
 		if section {
-			sectionsMenu.Check(translate(section.Type))
+			if (section.Type = "Corner")
+				sectionsMenu.Check(label)
+			else
+				sectionsMenu.Check(translate(section.Type))
 
 			sectionsMenu.Add()
 
@@ -2931,8 +3060,16 @@ class TrackMap {
 			if (result = "Delete")
 				return result
 			else if (result && (result != "Cancel")) {
-				if section
+				if section {
 					section := section.Clone()
+
+					result := withBlockedWindows(InputBox, translate("Please enter the name of the corner:"), translate("Corner"), "w300 h100", section.HasProp("Name") ? section.Name : "")
+
+					if (result.Result = "Ok")
+						section.Name := result.Value
+
+					result := "Corner"
+				}
 				else
 					section := Object()
 

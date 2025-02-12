@@ -17,8 +17,12 @@
 ;@SC #Include "..\Framework\Production.ahk"
 ;@SC-EndIf
 
-;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Artificial Intelligence.ico
+;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Artificial Intelligence Blue.ico
 ;@Ahk2Exe-ExeName Race Spotter.exe
+;@Ahk2Exe-SetCompanyName Oliver Juwig (TheBigO)
+;@Ahk2Exe-SetCopyright TheBigO - Creative Commons - BY-NC-SA
+;@Ahk2Exe-SetProductName Simulator Controller
+;@Ahk2Exe-SetVersion 0.0.0.0
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -32,10 +36,10 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\GIFViewer.ahk"
-#Include "..\Libraries\Task.ahk"
-#Include "..\Libraries\Messages.ahk"
-#Include "..\Libraries\RuleEngine.ahk"
+#Include "..\Framework\Extensions\GIFViewer.ahk"
+#Include "..\Framework\Extensions\Task.ahk"
+#Include "..\Framework\Extensions\Messages.ahk"
+#Include "..\Framework\Extensions\RuleEngine.ahk"
 #Include "..\Assistants\Libraries\RaceSpotter.ahk"
 
 
@@ -79,7 +83,7 @@ checkRemoteProcessAlive(pid) {
 }
 
 startupRaceSpotter() {
-	local icon := kIconsDirectory . "Artificial Intelligence.ico"
+	local icon := kIconsDirectory . "Artificial Intelligence Blue.ico"
 	local remotePID := false
 	local spotterName := "Elisa"
 	local spotterLogo := false

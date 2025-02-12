@@ -25,7 +25,7 @@ global kBuildConfiguration := "Development"
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\Messages.ahk"
+#Include "..\Framework\Extensions\Messages.ahk"
 #Include "AHKUnit\AHKUnit.ahk"
 
 

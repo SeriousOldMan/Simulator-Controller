@@ -19,6 +19,10 @@
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Console.ico
 ;@Ahk2Exe-ExeName Team Center.exe
+;@Ahk2Exe-SetCompanyName Oliver Juwig (TheBigO)
+;@Ahk2Exe-SetCopyright TheBigO - Creative Commons - BY-NC-SA
+;@Ahk2Exe-SetProductName Simulator Controller
+;@Ahk2Exe-SetVersion 0.0.0.0
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -32,11 +36,11 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\HTMLViewer.ahk"
-#Include "..\Libraries\Messages.ahk"
-#Include "..\Libraries\Math.ahk"
-#Include "..\Libraries\CLR.ahk"
-#Include "..\Libraries\GDIP.ahk"
+#Include "..\Framework\Extensions\HTMLViewer.ahk"
+#Include "..\Framework\Extensions\Messages.ahk"
+#Include "..\Framework\Extensions\Math.ahk"
+#Include "..\Framework\Extensions\CLR.ahk"
+#Include "..\Framework\Extensions\GDIP.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Database\Libraries\SessionDatabaseBrowser.ahk"
 #Include "..\Database\Libraries\SettingsDatabase.ahk"
@@ -7008,7 +7012,7 @@ class TeamCenter extends ConfigurationItem {
 		}
 
 		loop getMultiMapValue(data, "Position Data", "Car.Count", 0)
-			if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPitlane", false)
+			if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPitLane", false)
 			 || getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPit", false)) {
 				carID := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".ID", A_Index)
 
@@ -8102,12 +8106,12 @@ class TeamCenter extends ConfigurationItem {
 						tyreCompound := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound", false)
 						tyreCompoundColor := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound.Color", false)
 						tyreSet := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Set", "-")
-						
+
 						pressureFL := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Pressure.FL", "-")
 						pressureFR := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Pressure.FR", "-")
 						pressureRL := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Pressure.RL", "-")
 						pressureRR := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Pressure.RR", "-")
-						
+
 						if !pressureFL
 							pressureFL := "-"
 						if !pressureFR
@@ -8116,7 +8120,7 @@ class TeamCenter extends ConfigurationItem {
 							pressureRL := "-"
 						if !pressureRR
 							pressureRR := "-"
-							
+
 						repairBodywork := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Repair.Bodywork", false)
 						repairSuspension := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Repair.Suspension", false)
 						repairEngine := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Repair.Engine", false)
@@ -9197,7 +9201,7 @@ class TeamCenter extends ConfigurationItem {
 
 	saveSetups(flush := false) {
 		local sessionStore := this.SessionStore
-		local driver, conditions, tyreCompound, tyreCompoundColor, pressures, notes, temperatures
+		local driver, conditions, tyreCompound, tyreCompoundColor, pressures, notes, temperatures, index
 
 		sessionStore.clear("Setups.Data")
 
@@ -9213,8 +9217,16 @@ class TeamCenter extends ConfigurationItem {
 
 			tyreCompoundColor := false
 
-			splitCompound(this.TyreCompounds[inList(collect(this.TyreCompounds, translate), tyreCompound)]
-						, &tyreCompound, &tyreCompoundColor)
+			index := inList(collect(this.TyreCompounds, translate), tyreCompound)
+
+			if index
+				splitCompound(this.TyreCompounds[index], &tyreCompound, &tyreCompoundColor)
+			else if (this.TyreCompounds.Length > 0)
+				splitCompound(this.TyreCompounds[1], &tyreCompound, &tyreCompoundColor)
+			else {
+				tyreCompound := "Dry"
+				tyreCompoundColor := "Black"
+			}
 
 			pressures := string2Values(", ", pressures)
 
@@ -11950,7 +11962,7 @@ class TeamCenter extends ConfigurationItem {
 
 					if isNumber(pressure)
 						coldPressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
-					else (pressure = kNull)
+					else if (pressure = kNull)
 						coldPressures[A_Index] := "-"
 				}
 

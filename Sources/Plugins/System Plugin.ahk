@@ -9,10 +9,10 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\Task.ahk"
-#Include "..\Libraries\Messages.ahk"
-#Include "..\Libraries\SpeechSynthesizer.ahk"
-#Include "..\Libraries\SpeechRecognizer.ahk"
+#Include "..\Framework\Extensions\Task.ahk"
+#Include "..\Framework\Extensions\Messages.ahk"
+#Include "..\Framework\Extensions\SpeechSynthesizer.ahk"
+#Include "..\Framework\Extensions\SpeechRecognizer.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -538,7 +538,7 @@ class SystemPlugin extends ControllerPlugin {
 
 	initializeBackgroundTasks() {
 		PeriodicTask(updateApplicationStates, 5000, kLowPriority).start()
-		PeriodicTask(updateModeSelector, 500, kLowPriority).start()
+		PeriodicTask(updateModeSelector, 500, kInterruptPriority).start()
 	}
 }
 
@@ -593,7 +593,7 @@ mouseClicked(clicked := true) {
 
 restoreSimulatorVolume() {
 	global kNirCmd
-	
+
 	local pid, simulator
 
 	if kNirCmd
@@ -610,7 +610,7 @@ restoreSimulatorVolume() {
 			logError(exception, true)
 
 			kNirCmd := false
-			
+
 			if !kSilentMode
 				showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
@@ -619,7 +619,7 @@ restoreSimulatorVolume() {
 
 muteSimulator() {
 	global kNirCmd
-	
+
 	local simulator := SimulatorController.Instance.ActiveSimulator
 	local pid
 
@@ -636,7 +636,7 @@ muteSimulator() {
 			}
 			catch Any as exception {
 				logError(exception, true)
-				
+
 				kNirCmd := false
 
 				if !kSilentMode

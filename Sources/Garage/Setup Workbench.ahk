@@ -19,6 +19,10 @@
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Setup.ico
 ;@Ahk2Exe-ExeName Setup Workbench.exe
+;@Ahk2Exe-SetCompanyName Oliver Juwig (TheBigO)
+;@Ahk2Exe-SetCopyright TheBigO - Creative Commons - BY-NC-SA
+;@Ahk2Exe-SetProductName Simulator Controller
+;@Ahk2Exe-SetVersion 0.0.0.0
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -32,10 +36,10 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\HTMLViewer.ahk"
-#Include "..\Libraries\Task.ahk"
-#Include "..\Libraries\Math.ahk"
-#Include "..\Libraries\RuleEngine.ahk"
+#Include "..\Framework\Extensions\HTMLViewer.ahk"
+#Include "..\Framework\Extensions\Task.ahk"
+#Include "..\Framework\Extensions\Math.ahk"
+#Include "..\Framework\Extensions\RuleEngine.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Database\Libraries\TelemetryViewer.ahk"
 #Include "..\Plugins\Libraries\ACCUDPProvider.ahk"
@@ -1058,12 +1062,16 @@ class SetupWorkbench extends ConfigurationItem {
 							if (!fast && !isDebug())
 								Sleep(25)
 						}
-						else if knowledgeBase.prove(compiler.compileGoal("characteristicActive("
-																	   . StrReplace(values2String(",", simulator, car, track, characteristic), A_Space, "\ ")
-																	   . ")")) {
-							showProgress({progress: ++this.ProgressCount})
+						else {
+							option := StrReplace(values2String(",", simulator, car, track, characteristic), A_Space, "\ ")
+							option := StrReplace(option, "(", "\(")
+							option := StrReplace(option, ")", "\)")
 
-							this.Characteristics.Push(characteristic)
+							if knowledgeBase.prove(compiler.compileGoal("characteristicActive(" . option . ")")) {
+								showProgress({progress: ++this.ProgressCount})
+
+								this.Characteristics.Push(characteristic)
+							}
 						}
 					}
 				}
@@ -1081,12 +1089,16 @@ class SetupWorkbench extends ConfigurationItem {
 						if (!fast && !isDebug())
 							Sleep(25)
 					}
-					else if knowledgeBase.prove(compiler.compileGoal("characteristicActive("
-																   . StrReplace(values2String(",", simulator, car, track, characteristic), A_Space, "\ ")
-																   . ")")) {
-						showProgress({progress: ++this.ProgressCount})
+					else {
+						option := StrReplace(values2String(",", simulator, car, track, characteristic), A_Space, "\ ")
+						option := StrReplace(option, "(", "\(")
+						option := StrReplace(option, ")", "\)")
 
-						this.Characteristics.Push(characteristic)
+						if knowledgeBase.prove(compiler.compileGoal("characteristicActive(" . option . ")")) {
+							showProgress({progress: ++this.ProgressCount})
+
+							this.Characteristics.Push(characteristic)
+						}
 					}
 				}
 			}
@@ -1147,12 +1159,16 @@ class SetupWorkbench extends ConfigurationItem {
 							if (!fast && !isDebug())
 								Sleep(25)
 						}
-						else if knowledgeBase.prove(compiler.compileGoal("settingAvailable("
-																	   . StrReplace(values2String(",", simulator, car, setting), A_Space, "\ ")
-																	   . ")")) {
-							showProgress({progress: ++this.ProgressCount})
+						else {
+							option := StrReplace(values2String(",", simulator, car, setting), A_Space, "\ ")
+							option := StrReplace(option, "(", "\(")
+							option := StrReplace(option, ")", "\)")
 
-							this.Settings.Push(setting)
+							if knowledgeBase.prove(compiler.compileGoal("settingAvailable(" . option . ")")) {
+								showProgress({progress: ++this.ProgressCount})
+
+								this.Settings.Push(setting)
+							}
 						}
 					}
 				}
@@ -1170,12 +1186,16 @@ class SetupWorkbench extends ConfigurationItem {
 						if (!fast && !isDebug())
 							Sleep(25)
 					}
-					else if knowledgeBase.prove(compiler.compileGoal("settingAvailable("
-																   . StrReplace(values2String(",", simulator, car, setting), A_Space, "\ ")
-																   . ")")) {
-						showProgress({progress: ++this.ProgressCount})
+					else {
+						option := StrReplace(values2String(",", simulator, car, setting), A_Space, "\ ")
+						option := StrReplace(option, "(", "\(")
+						option := StrReplace(option, ")", "\)")
 
-						this.Settings.Push(setting)
+						if knowledgeBase.prove(compiler.compileGoal("settingAvailable(" . option . ")")) {
+							showProgress({progress: ++this.ProgressCount})
+
+							this.Settings.Push(setting)
+						}
 					}
 				}
 			}

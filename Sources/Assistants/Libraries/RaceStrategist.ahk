@@ -16,14 +16,14 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\..\Libraries\Task.ahk"
-#Include "..\..\Libraries\RuleEngine.ahk"
-#Include "..\..\Libraries\Database.ahk"
-#Include "..\..\Libraries\LLMConnector.ahk"
-#Include "RaceAssistant.ahk"
-#Include "Strategy.ahk"
+#Include "..\..\Framework\Extensions\Task.ahk"
+#Include "..\..\Framework\Extensions\RuleEngine.ahk"
+#Include "..\..\Framework\Extensions\Database.ahk"
+#Include "..\..\Framework\Extensions\LLMConnector.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\..\Database\Libraries\TelemetryDatabase.ahk"
+#Include "RaceAssistant.ahk"
+#Include "Strategy.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -82,7 +82,8 @@ class RaceStrategist extends GridRaceAssistant {
 	iStrategyReported := false
 	iLastStrategyUpdate := 0
 	iRejectedStrategy := false
-	iDynamicStrategy := false
+
+	iStrategyCreated := false
 
 	iUseTraffic := false
 
@@ -787,9 +788,14 @@ class RaceStrategist extends GridRaceAssistant {
 
 	Strategy[original := false] {
 		Get {
-			return (original ? ((original = "Rejected") ? this.iRejectedStrategy
-														: ((original = "Dynamic") ? this.iDynamicStrategy : this.iOriginalStrategy))
+			return (original ? ((original = "Rejected") ? this.iRejectedStrategy : this.iOriginalStrategy)
 							 : this.iStrategy)
+		}
+	}
+
+	StrategyCreated {
+		Get {
+			return this.iStrategyCreated
 		}
 	}
 
@@ -937,8 +943,8 @@ class RaceStrategist extends GridRaceAssistant {
 		if values.HasProp("StrategyReported")
 			this.iStrategyReported := values.StrategyReported
 
-		if values.HasProp("DynamicStrategy")
-			this.iDynamicStrategy := values.DynamicStrategy
+		if values.HasProp("StrategyCreated")
+			this.iStrategyCreated := values.StrategyCreated
 
 		if values.HasProp("RejectedStrategy") {
 			if (this.iRejectedStrategy && (this.iRejectedStrategy != values.RejectedStrategy))
@@ -1437,7 +1443,7 @@ class RaceStrategist extends GridRaceAssistant {
 		return getMultiMapValue(this.Settings, "Session Settings", "Telemetry." . session, default)
 	}
 
-	loadStrategy(facts, strategy, lastLap := false, lastPitstop := false, lastPitstopLap := false) {
+	loadStrategy(strategy, facts, lastLap := false, lastPitstop := false, lastPitstopLap := false) {
 		local pitstopWindow := (this.Settings ? getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Window.Considered", 3) : 3)
 		local fullCourseYellow, forcedPitstop, pitstop, count, ignore, pitstopLap, pitstopMaxLap, first, rootStrategy, pitstopDeviation
 
@@ -1621,7 +1627,7 @@ class RaceStrategist extends GridRaceAssistant {
 					applicableStrategy := false
 
 				if applicableStrategy {
-					this.loadStrategy(facts, theStrategy)
+					this.loadStrategy(theStrategy, facts)
 
 					this.updateSessionValues({OriginalStrategy: theStrategy, Strategy: theStrategy})
 				}
@@ -1633,9 +1639,12 @@ class RaceStrategist extends GridRaceAssistant {
 
 	loadRules(data) {
 		if ((this.Session == kSessionRace) && (getMultiMapValue(this.Settings, "Session Rules", "Strategy", "No") = "Yes")
-		 && !this.Strategy && !this.Strategy["Dynamic"] && (getMultiMapValue(data, "Stint Data", "Laps", 0) < 5)
-		 && this.hasEnoughData(false))
+		 && !this.Strategy && !this.StrategyCreated && (getMultiMapValue(data, "Stint Data", "Laps", 0) < 5)
+		 && this.hasEnoughData(false)) {
 			this.recommendStrategy({Silent: true, Confirm: false, Request: "Rules"})
+
+			this.updateDynamicValues({StrategyCreated: true})
+		}
 	}
 
 	updateSettings(settings, edit := false) {
@@ -1755,9 +1764,10 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 
 		this.updateDynamicValues({OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false
-								, StrategyReported: false, RejectedStrategy: false, DynamicStrategy: false
+								, StrategyReported: false, RejectedStrategy: false, StrategyCreated: false
 								, HasTelemetryData: false})
-		this.updateSessionValues({Simulator: "", Car: "", Track: "", Session: kSessionFinished, OriginalStrategy: false, Strategy: false, SessionTime: false})
+		this.updateSessionValues({Simulator: "", Car: "", Track: "", Session: kSessionFinished
+								, OriginalStrategy: false, Strategy: false, SessionTime: false})
 	}
 
 	forceFinishSession() {
@@ -1980,7 +1990,7 @@ class RaceStrategist extends GridRaceAssistant {
 				this.Strategy["Rejected"].RunningTime += lastTime
 			}
 
-			if (!this.StrategyReported && this.hasEnoughData(false) && (this.Strategy == this.Strategy[true])) {
+			if (!this.StrategyReported && this.hasEnoughData(false) && (this.Strategy == this.Strategy["Original"])) {
 				if (this.Speaker[false] && this.Announcements["StrategySummary"])
 					if this.confirmAction("Strategy.Explain") {
 						this.getSpeaker().speakPhrase("ConfirmReportStrategy", false, true)
@@ -2414,9 +2424,9 @@ class RaceStrategist extends GridRaceAssistant {
 
 	recommendStrategyAction(lap := false) {
 		if lap
-			this.recommendStrategy({Pitstop: lap, Request: "Pitstop", Silent: true, Confirm: true})
+			this.recommendStrategy({Pitstop: lap, Silent: true, Confirm: true})
 		else
-			this.recommendStrategy({Request: "Pitstop", Silent: true, Confirm: true})
+			this.recommendStrategy({Silent: true, Confirm: true})
 	}
 
 	recommendStrategy(options := {}) {
@@ -2471,7 +2481,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if version
 			if (this.Strategy && (this.Strategy.Version = version))
 				return
-			else if (this.Strategy[true] && (this.Strategy[true].Version = version))
+			else if (this.Strategy["Original"] && (this.Strategy["Original"].Version = version))
 				return
 			else if (knowledgeBase.getValue("Strategy.Version", false) = version)
 				report := false
@@ -2485,12 +2495,13 @@ class RaceStrategist extends GridRaceAssistant {
 
 				lastPitstop := knowledgeBase.getValue("Pitstop.Last", false)
 
-				for fact, value in this.loadStrategy(CaseInsenseMap(), newStrategy
+				for fact, value in this.loadStrategy(newStrategy, CaseInsenseMap()
 												   , knowledgeBase.getValue("Lap", false)
 												   , lastPitstop, lastPitstop ? knowledgeBase.getValue("Pitstop." . lastPitstop . ".Lap") : false)
 					knowledgeBase.setFact(fact, value)
 
-				this.dumpKnowledgeBase(knowledgeBase)
+				if this.Debug[kDebugKnowledgeBase]
+					this.dumpKnowledgeBase(knowledgeBase)
 
 				if original
 					this.updateSessionValues({OriginalStrategy: newStrategy, Strategy: newStrategy})
@@ -2585,7 +2596,7 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	getStintDriver(stintNumber, &driverID, &driverName) {
-		local strategy := this.Strategy[true]
+		local strategy := this.Strategy["Original"]
 		local sessionDB, numPitstops, index
 
 		if strategy {
@@ -2621,7 +2632,7 @@ class RaceStrategist extends GridRaceAssistant {
 					  , &sessionType, &sessionLength
 					  , &maxTyreLaps, &tyreCompound, &tyreCompoundColor, &tyrePressures) {
 		local knowledgeBase := this.KnowledgeBase
-		local strategy := this.Strategy[true]
+		local strategy := this.Strategy["Original"]
 		local lap := Task.CurrentTask.Lap
 		local availableTyreSets, strategyTask, telemetryDB, candidate
 
@@ -2710,7 +2721,7 @@ class RaceStrategist extends GridRaceAssistant {
 	getSessionSettings(&stintLength, &formationLap, &postRaceLap, &fuelCapacity, &safetyFuel
 					 , &pitstopDelta, &pitstopFuelService, &pitstopTyreService, &pitstopServiceOrder) {
 		local knowledgeBase := this.KnowledgeBase
-		local strategy := this.Strategy[true]
+		local strategy := this.Strategy["Original"]
 
 		if strategy {
 			stintLength := strategy.StintLength
@@ -2749,7 +2760,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 	getSessionWeather(minute, &weather, &airTemperature, &trackTemperature) {
 		local knowledgeBase := this.KnowledgeBase
-		local strategy := this.Strategy[true]
+		local strategy := this.Strategy["Original"]
 
 		if strategy {
 			weather := knowledgeBase.getValue("Weather.Weather.10Min", false)
@@ -2796,31 +2807,12 @@ class RaceStrategist extends GridRaceAssistant {
 					 , &initialTyreSet, &initialTyreLaps, &initialFuelAmount
 					 , &initialMap, &initialFuelConsumption, &initialAvgLapTime) {
 		local knowledgeBase := this.KnowledgeBase
-		local strategy := this.Strategy[true]
-		local goal, resultSet, tyreSets, telemetryDB, consumption, stintLength
+		local strategy := this.Strategy["Original"]
+		local ruleBased := (getMultiMapValue(this.Settings, "Session Rules", "Strategy", "No") = "Yes")
+		local goal, resultSet, tyreSets, consumption, stintLength
 
-		if (strategy || (getMultiMapValue(this.Settings, "Session Rules", "Strategy", "No") = "Yes")) {
-			stintLength := (strategy ? strategy.StintLength : getMultiMapValue(this.Settings, "Session Rules", "Stint.Length", 70))
-			initialStint := (Task.CurrentTask.Pitstops.Length + 1)
+		if (strategy || ruleBased) {
 			initialLap := Task.CurrentTask.Lap
-			initialStintTime := Ceil((stintLength * 60) - (knowledgeBase.getValue("Driver.Time.Stint.Remaining") / 1000))
-
-			telemetryDB := Task.CurrentTask.TelemetryDatabase
-
-			initialTyreSet := knowledgeBase.getValue("Tyre.Set", "false")
-
-			if !telemetryDB.suitableTyreCompound(this.Simulator, this.Car, this.Track
-											   , knowledgeBase.getValue("Weather.Weather.10Min", "Dry")
-											   , compound(knowledgeBase.getValue("Tyre.Compound", "Dry")
-														, knowledgeBase.getValue("Tyre.Compound.Color", "Black")))
-				initialTyreLaps := 999
-			else if (initialStint > 1)
-				initialTyreLaps := Max(0, (knowledgeBase.getValue("Lap", 0) - Task.CurrentTask.Pitstops[initialStint - 1].Lap))
-			else
-				initialTyreLaps := knowledgeBase.getValue("Lap", 0)
-
-			initialFuelAmount := knowledgeBase.getValue("Lap." . initialLap . ".Fuel.Remaining")
-			initialMap := knowledgeBase.getValue("Lap." . initialLap . ".Map")
 
 			consumption := knowledgeBase.getValue("Lap." . initialLap . ".Fuel.AvgConsumption")
 
@@ -2837,7 +2829,40 @@ class RaceStrategist extends GridRaceAssistant {
 			else
 				initialAvgLapTime := (knowledgeBase.getValue("Lap." . initialLap . ".Time") / 1000)
 
-			initialSessionTime := (this.OverallTime / 1000)
+			initialTyreSet := knowledgeBase.getValue("Tyre.Set", "false")
+			initialMap := knowledgeBase.getValue("Lap." . initialLap . ".Map")
+
+			If strategy {
+				stintLength := strategy.StintLength
+
+				initialStint := (Task.CurrentTask.Pitstops.Length + 1)
+				initialStintTime := Ceil((stintLength * 60) - (knowledgeBase.getValue("Driver.Time.Stint.Remaining") / 1000))
+				initialSessionTime := (this.OverallTime / 1000)
+
+				if !Task.CurrentTask.TelemetryDatabase.suitableTyreCompound(this.Simulator, this.Car, this.Track
+																		  , knowledgeBase.getValue("Weather.Weather.10Min", "Dry")
+																		  , compound(knowledgeBase.getValue("Tyre.Compound", "Dry")
+																				   , knowledgeBase.getValue("Tyre.Compound.Color", "Black")))
+					initialTyreLaps := 999
+				else if (initialStint > 1)
+					initialTyreLaps := Max(0, (initialLap - Task.CurrentTask.Pitstops[initialStint - 1].Lap))
+				else
+					initialTyreLaps := initialLap
+
+				initialFuelAmount := knowledgeBase.getValue("Lap." . initialLap . ".Fuel.Remaining")
+			}
+			else {
+				stintLength := getMultiMapValue(this.Settings, "Session Rules", "Stint.Length", 70)
+
+				initialStint := 1
+				initialStintTime := 0
+				initialSessionTime := 0
+				initialTyreLaps := 0
+
+				initialFuelAmount := (knowledgeBase.getValue("Lap." . initialLap . ".Fuel.Remaining") + (initialLap * consumption))
+
+				initialLap := 0
+			}
 
 			return true
 		}
@@ -2849,7 +2874,7 @@ class RaceStrategist extends GridRaceAssistant {
 						, &consumptionVariation, &initialFuelVariation, &refuelVariation
 						, &tyreUsageVariation, &tyreCompoundVariation
 						, &firstStintWeight, &lastStintWeight) {
-		local strategy := this.Strategy[true]
+		local strategy := this.Strategy["Original"]
 
 		useInitialConditions := false
 		useTelemetryData := true
@@ -3302,11 +3327,14 @@ class RaceStrategist extends GridRaceAssistant {
 					if ((pitstop.Lap >= maxLap) && (scenario.Pitstops[1].Lap < pitstop.Lap))
 						return true
 		}
-		else ; Nothing to see here, move on
-			return false
+		else if (!cPitstops && !sPitstops) {
+			; Nothing to see here, move on
 
-		if (!sPitstops && cPitstops)
-			extended := false
+			return false
+		}
+
+		; if (!sPitstops && cPitstops)
+		;	extended := false
 
 		; Negative => Better, Positive => Worse
 
@@ -3331,6 +3359,9 @@ class RaceStrategist extends GridRaceAssistant {
 
 		if ((cPitstops > 0) && !scenario.FullCourseYellow &&  (scenario.Pitstops[1].Lap <= (knowledgeBase.getValue("Lap") + 1)))
 			result := false
+		else if (!sPitstops && (cPitstops = 1) && !scenario.Pitstops[1].TyreCompound
+							&& (scenario.Pitstops[1].RefuelAmount <= scenario.SafetyFuel))
+			return false
 		else if (result > 0)
 			result := false
 		else if (result < 0)
@@ -3373,7 +3404,8 @@ class RaceStrategist extends GridRaceAssistant {
 		local speaker := this.getSpeaker()
 		local hadScenario := (scenario != false)
 		local dispose := true
-		local request, fullCourseYellow, forcedPitstop, report
+		local request := false
+		local fullCourseYellow, forcedPitstop, report
 
 		static wasSkipped := false
 
@@ -3425,7 +3457,7 @@ class RaceStrategist extends GridRaceAssistant {
 							this.reportStrategy({Strategy: false, Pitstops: true, NextPitstop: true
 											   , TyreChange: true, Refuel: true, Map: true, Active: this.Strategy}, scenario)
 
-							if ((this.Strategy != this.Strategy[true]) || isDebug())
+							if ((this.Strategy != this.Strategy["Original"]) || isDebug())
 								this.explainStrategyRecommendation(scenario)
 
 							if this.Speaker {
@@ -3455,7 +3487,9 @@ class RaceStrategist extends GridRaceAssistant {
 						else if (request != "Pitstop")
 							if (this.Strategy["Rejected"] && isInstance(this.Strategy["Rejected"], Strategy) && !this.betterScenario(this.Strategy["Rejected"], scenario, &report))
 								return
-							else if ((this.Strategy != this.Strategy[true]) && !this.betterScenario(this.Strategy, scenario, &report))
+							else if ((this.Strategy != this.Strategy["Original"]) && !this.betterScenario(this.Strategy, scenario, &report))
+								return
+							else if ((this.Strategy.RunningPitstops > 0) && !this.betterScenario(this.Strategy, scenario, &report))
 								return
 
 						if (report && this.Speaker) {
@@ -3465,7 +3499,7 @@ class RaceStrategist extends GridRaceAssistant {
 								this.reportStrategy({Strategy: false, Pitstops: true, NextPitstop: true
 												   , TyreChange: true, Refuel: true, Map: true, Active: this.Strategy}, scenario)
 
-								if ((this.Strategy != this.Strategy[true]) || isDebug())
+								if ((this.Strategy != this.Strategy["Original"]) || isDebug())
 									this.explainStrategyRecommendation(scenario)
 							}
 
@@ -3506,16 +3540,15 @@ class RaceStrategist extends GridRaceAssistant {
 			}
 
 			if scenario {
-				if this.Strategy[true]
-					scenario.PitstopRule := this.Strategy[true].PitstopRule
+				if this.Strategy["Original"]
+					scenario.PitstopRule := this.Strategy["Original"].PitstopRule
 
 				scenario.setVersion(A_Now)
 
 				dispose := false
 
-				this.updateDynamicValues({DynamicStrategy: scenario})
-
-				Task.startTask(ObjBindMethod(this, "updateStrategy", scenario, (request = "Rules"), false, scenario.Version), 1000)
+				Task.startTask(ObjBindMethod(this, "updateStrategy", scenario, (request = "Rules")
+																   , false, scenario.Version), 1000)
 			}
 			else {
 				if (confirm && this.Speaker)
@@ -3785,6 +3818,9 @@ class RaceStrategist extends GridRaceAssistant {
 	pitstopPerformed(pitstopNr) {
 		if this.Strategy
 			this.Strategy.RunningPitstops += 1
+
+		if (this.Strategy["Rejected"] && isInstance(this.Strategy["Rejected"], Strategy))
+			this.Strategy["Rejected"].RunningPitstops += 1
 	}
 
 	callRecommendPitstop(lapNumber := false) {

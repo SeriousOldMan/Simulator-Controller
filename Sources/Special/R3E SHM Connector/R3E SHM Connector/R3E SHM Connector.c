@@ -227,6 +227,8 @@ extern __declspec(dllexport) int __stdcall open() {
 
 extern __declspec(dllexport) int __stdcall close() {
 	map_close();
+	
+	mapped_r3e = FALSE;
 
 	return 0;
 }
@@ -237,6 +239,18 @@ extern __declspec(dllexport) int __stdcall call(char* request, char* result, int
 
 	BOOL writeStandings = getArgument(buffer, request, "Standings");
 	BOOL writeTelemetry = !writeStandings;
+	
+	if (!mapped_r3e) {
+		open();
+		
+		if (!mapped_r3e) {
+			writeString(result, "", &pos);
+
+			result[pos] = '\0';
+			
+			return -1;
+		}
+	}
 	
 	if (writeStandings) {
 		writeString(result, "[Position Data]\n", &pos);

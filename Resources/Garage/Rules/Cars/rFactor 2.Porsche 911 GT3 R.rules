@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - rFactor 2                       ;;;
-;;;                                         Bentley Continental GT3         ;;;
+;;;                                         Porsche 911 GT3 R               ;;;
 ;;;                                         Setup Rules                     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -11,5 +11,5 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: addSettings("rFactor 2", "Bentley Continental GT3", [Electronics.ABS])),
-				 (Prove: removeSettings("rFactor 2", "Bentley Continental GT3", [Aero.Splitter.Front]))
+[?Initialize] => (Prove: addSettings("rFactor 2", "Porsche 911 GT3 R", [Electronics.ABS])),
+				 (Prove: removeSettings("rFactor 2", "Porsche 911 GT3 R", [Aero.Splitter.Front, Differential.Preload]))

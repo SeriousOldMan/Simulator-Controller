@@ -176,9 +176,9 @@ bool getDataValue(char* value, const irsdk_header* header, const char* data, con
 				case irsdk_int:
 					sprintf(value, "%d", ((int*)(data + rec->offset))[0]); break;
 				case irsdk_float:
-					sprintf(value, "%0.2f", ((float*)(data + rec->offset))[0]); break;
+					sprintf(value, "%0.6f", ((float*)(data + rec->offset))[0]); break;
 				case irsdk_double:
-					sprintf(value, "%0.2f", ((double*)(data + rec->offset))[0]); break;
+					sprintf(value, "%0.8f", ((double*)(data + rec->offset))[0]); break;
 				default:
 					return false;
 				}
@@ -1686,12 +1686,29 @@ float lastY = 0.0;
 int lastLap = 0;
 float lastRunning = 0.0;
 bool recording = false;
+int points = 0;
 
 bool circuit = true;
 bool mapStarted = false;
 int mapLap = -1;
 
-bool writeCoordinates(const irsdk_header* header, const char* data) {
+inline float vectorLength(float x, float y) {
+	return sqrt((x * x) + (y * y));
+}
+
+float vectorAngle(float x, float y) {
+	float scalar = (x * 0) + (y * 1);
+	float length = vectorLength(x, y);
+
+	float angle = (length > 0) ? acos(scalar / length) : 0;
+
+	if (x < 0)
+		angle = - angle;
+
+	return angle;
+}
+
+bool writeCoordinates(const irsdk_header* header, const char* data, int playerCarIdx) {
 	char buffer[60];
 	char* rawValue;
 
@@ -1708,69 +1725,88 @@ bool writeCoordinates(const irsdk_header* header, const char* data) {
 		else if (carLaps == mapLap)
 			return true;
 
-	const char* sessionInfo = irsdk_getSessionInfoStr();
-	char playerCarIdx[10] = "";
-	char sessionID[10] = "";
-
-	getYamlValue(playerCarIdx, sessionInfo, "DriverInfo:DriverCarIdx:");
-	itoa(getCurrentSessionID(sessionInfo), sessionID, 10);
-
-	int laps = 0;
-
-	if (getYamlValue(buffer, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}LapsComplete:", sessionID, playerCarIdx))
-		laps = atoi(buffer);
-
 	if (lastLap == 0)
-		lastLap = laps;
+		lastLap = carLaps;
 	else if (!recording) {
-		if (laps != lastLap) {
-			lastLap = laps;
+		if (carLaps != lastLap) {
+			lastLap = carLaps;
 			
-			printf("0.0,0.0,0.0\n");
+			printf("0.0,0.0,0.0,0.0,0.0\n");
+
+			char* trackPositions;
+
+			if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
+				lastRunning = ((float*)trackPositions)[playerCarIdx];
+
+			lastTickCount = GetTickCount();
 
 			recording = true;
 		}
 	}
-	else if (laps != lastLap) 
+	else if (carLaps != lastLap)
 		return false;
 	else {
-		int carIdx = atoi(playerCarIdx);
+		if (GetTickCount() - lastTickCount < 20)
+			return true;
 
 		char* trackPositions;
 		float running = 0.0;
 
 		if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
-			running = ((float*)trackPositions)[carIdx];
+			running = ((float*)trackPositions)[playerCarIdx];
 
 		if (running < lastRunning)
 			return false;
-		else
-			lastRunning = running;
+		
+		float distance = (running - lastRunning) * 6000;
+		
+		lastRunning = running;
 
 		getDataValue(buffer, header, data, "Yaw");
 
 		float yaw = atof(buffer);
 
+		/*
+		getDataValue(buffer, header, data, "YawNorth");
+
+		float yawNorth = atof(buffer);
+
 		getDataValue(buffer, header, data, "VelocityX");
 
 		float velocityX = atof(buffer);
 
-		float dx = velocityX * sin(yaw);
-		float dy = velocityX * cos(yaw);
+		getDataValue(buffer, header, data, "VelocityY");
 
-		if (dx > 0 || dy > 0) {
+		float velocityY = atof(buffer);
+
+		getDataValue(buffer, header, data, "VelocityZ");
+
+		float velocityZ = atof(buffer);
+
+		float distance = sqrt(velocityX * velocityX + velocityY * velocityY + velocityZ * velocityZ);
+		*/
+		
+		// float dx = distance * sin(yaw);
+		// float dy = distance * cos(yaw);
+
+		float dx = distance * sin(yaw);
+		float dy = distance * cos(yaw);
+
+		if (dx != 0 || dy != 0) {
 			mapStarted = true;
 
 			lastX += dx;
 			lastY += dy;
 
-			printf("%f,%f,%f\n", running, lastX, lastY);
+			printf("%f,%f,%f,%f,%f\n", running, lastX, lastY, yaw, distance);
 
-			if (circuit && fabs(lastX - initialX) < 10.0 && fabs(lastY - initialY) < 10.0)
+			if (circuit && (++points > 100) && fabs(lastX - initialX) < 10.0 && fabs(lastY - initialY) < 10.0)
 				return false;
 		}
 		else if (mapStarted && !circuit)
 			return false;
+
+		lastTickCount = GetTickCount();
 	}
 
 	return true;
@@ -1819,18 +1855,9 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 		if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
 			running = ((float*)trackPositions)[carIdx];
 
-		getDataValue(buffer, header, data, "Yaw");
+		getDataValue(buffer, header, data, "Speed");
 
-		float yaw = atof(buffer);
-
-		getDataValue(buffer, header, data, "VelocityX");
-
-		float velocityX = atof(buffer) * 3.6;
-
-		float dx = velocityX * sin(yaw);
-		float dy = velocityX * cos(yaw);
-
-		if ((dx > 0) || (dy > 0)) {
+		if (atof(buffer) > 0) {
 			float distance;
 			int index = 0;
 
@@ -1970,11 +1997,11 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 			else
 				telemetryFile << std::endl;
 
-			if (fileExists(telemetryDirectory + "\\Telemetry.section"))
+			if (fileExists(telemetryDirectory + "\\Telemetry.cmd"))
 				try {
 					std::ofstream file;
 
-					file.open(telemetryDirectory + "\\Telemetry.section", std::ios::out | std::ios::ate);
+					file.open(telemetryDirectory + "\\Telemetry.section", std::ios::out | std::ios::ate | std::ios::app);
 
 					file << (playerRunning * trackLength) << ";"
 						 << throttle << ";"
@@ -2082,8 +2109,12 @@ int main(int argc, char* argv[])
 				triggerType = "Trigger";
 		}
 
-		if (mapTrack && argc > 2)
-			circuit = (strcmp(argv[2], "Circuit") == 0);
+		if (mapTrack) {
+			if (argc > 2)
+				circuit = (strcmp(argv[2], "Circuit") == 0);
+
+			// SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
+		}
 
 		if (analyzeTelemetry) {
 			dataFile = argv[2];
@@ -2227,6 +2258,14 @@ int main(int argc, char* argv[])
 						trackLength = atof(buffer) * 1000;
 					}
 
+					if (playerCarIndex == -1) {
+						char playerCarIdx[10] = "";
+
+						getYamlValue(playerCarIdx, irsdk_getSessionInfoStr(), "DriverInfo:DriverCarIdx:");
+
+						playerCarIndex = atoi(playerCarIdx);
+					}
+
 					if (analyzeTelemetry) {
 						if (collectTelemetry(pHeader, g_data, soundsDirectory, audioDevice, calibrateTelemetry)) {
 							if (remainder(counter, 20) == 0)
@@ -2236,7 +2275,7 @@ int main(int argc, char* argv[])
 							break;
 					}
 					else if (mapTrack) {
-						if (!writeCoordinates(pHeader, g_data)) {
+						if (!writeCoordinates(pHeader, g_data, playerCarIndex)) {
 							done = true;
 
 							break;
@@ -2289,14 +2328,6 @@ int main(int argc, char* argv[])
 
 						if (running) {
 							char* rawValue;
-
-							if (playerCarIndex == -1) {
-								char playerCarIdx[10] = "";
-
-								getYamlValue(playerCarIdx, irsdk_getSessionInfoStr(), "DriverInfo:DriverCarIdx:");
-
-								playerCarIndex = atoi(playerCarIdx);
-							}
 
 							if (carTelemetry)
 								collectCarTelemetry(pHeader, g_data, playerCarIndex, trackLength);
@@ -2377,7 +2408,7 @@ int main(int argc, char* argv[])
 		}
 
 		if (mapTrack)
-			Sleep(1);
+			Sleep(5);
 		else if (carTelemetry || analyzeTelemetry || positionTrigger)
 			Sleep(10);
 		else if (wait)

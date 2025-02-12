@@ -9,7 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\..\Libraries\SpeechSynthesizer.ahk"
+#Include "..\..\Framework\Extensions\SpeechSynthesizer.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

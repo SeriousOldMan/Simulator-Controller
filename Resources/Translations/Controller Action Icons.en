@@ -551,6 +551,7 @@ BodyworkRepair.Decrease=
 DriverSwap.Toggle=
 DriverSwap.Increase=
 DriverSwap.Decrease=
+PitstopRequest.Activate=
 LapsRemaining.Activate=
 FuelRemaining.Activate=
 Time.Activate=

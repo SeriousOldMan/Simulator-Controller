@@ -10,7 +10,7 @@
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\LLMConnector.ahk"
+#Include "..\Framework\Extensions\LLMConnector.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -80,9 +80,9 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 	Instructions[qualified := true] {
 		Get {
 			if qualified
-				return ["Instructions.Character", "Instructions.Simulation", "Instructions.Session", "Instructions.Stint", "Instructions.Knowledge", "Instructions.Handling", "Instructions.Coaching", "Instructions.Coaching.Lap", "Instructions.Coaching.Corner", "Instructions.Coaching.Corner.Approaching", "Instructions.Coaching.Corner.Problems", "Instructions.Coaching.Reference"]
+				return ["Instructions.Character", "Instructions.Simulation", "Instructions.Session", "Instructions.Stint", "Instructions.Knowledge", "Instructions.Handling", "Instructions.Coaching", "Instructions.Coaching.Lap", "Instructions.Coaching.Corner", "Instructions.Coaching.Corner.Approaching", "Instructions.Coaching.Corner.Problems", "Instructions.Coaching.Corner.Review", "Instructions.Coaching.Reference"]
 			else
-				return ["Character", "Simulation", "Session", "Stint", "Knowledge", "Handling", "Coaching", "Coaching.Lap", "Coaching.Corner", "Coaching.Corner.Approaching", "Coaching.Corner.Problems", "Coaching.Reference"]
+				return ["Character", "Simulation", "Session", "Stint", "Knowledge", "Handling", "Coaching", "Coaching.Lap", "Coaching.Corner", "Coaching.Corner.Approaching", "Coaching.Corner.Problems", "Coaching.Corner.Review", "Coaching.Reference"]
 		}
 	}
 
@@ -373,7 +373,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 					PluginsConfigurator.Instance.saveToConfiguration(configuration)
 
 					thePlugin := Plugin("Driving Coach", configuration)
-					
+
 					language := thePlugin.getArgumentValue("language", thePlugin.getArgumentValue("raceAssistantLanguage"))
 				}
 				else if isSet(VoiceControlConfigurator)

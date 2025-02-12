@@ -375,6 +375,7 @@ namespace SHMConnector
             strWriter.WriteLine("StintTimeRemaining=" + time);
             strWriter.WriteLine("DriverTimeRemaining=" + time);
             strWriter.WriteLine("InPit=" + (graphics.IsInPit != 0 ? "true" : "false"));
+            strWriter.WriteLine("InPitLane=" + ((graphics.IsInPitLane + graphics.IsInPit) != 0 ? "true" : "false"));
 
             strWriter.WriteLine("[Track Data]");
             strWriter.Write("Length="); strWriter.WriteLine(staticInfo.TrackSPlineLength);
@@ -430,11 +431,19 @@ namespace SHMConnector
         public void Close()
         {
             memoryStatus = AC_MEMORY_STATUS.DISCONNECTED;
+			connected = false;
         }
 
         public string Call(string request)
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
+			
+			if (!connected) {
+				Open();
+				
+				if (!connected)
+					return "";
+			}
 
             physics = ReadPhysics();
             graphics = ReadGraphics();

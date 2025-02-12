@@ -19,6 +19,10 @@
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Session Database.ico
 ;@Ahk2Exe-ExeName Session Database.exe
+;@Ahk2Exe-SetCompanyName Oliver Juwig (TheBigO)
+;@Ahk2Exe-SetCopyright TheBigO - Creative Commons - BY-NC-SA
+;@Ahk2Exe-SetProductName Simulator Controller
+;@Ahk2Exe-SetVersion 0.0.0.0
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -32,9 +36,9 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\Task.ahk"
-#Include "..\Libraries\GDIP.ahk"
-#Include "..\Libraries\CLR.ahk"
+#Include "..\Framework\Extensions\Task.ahk"
+#Include "..\Framework\Extensions\GDIP.ahk"
+#Include "..\Framework\Extensions\CLR.ahk"
 #Include "Libraries\SettingsDatabase.ahk"
 #Include "Libraries\TelemetryDatabase.ahk"
 #Include "Libraries\TyresDatabase.ahk"
@@ -412,6 +416,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		this.iRequestorPID := requestorPID
+		this.iTrackEditorMode := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+												, "Session Database", "Track Editor", this.TrackEditorMode)
 
 		super.__New(kSimulatorConfiguration)
 
@@ -1463,6 +1469,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		chooseTrackEditorMode(*) {
+			local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
 			if (editorGui["trackEditorTypeDropDown"].Value = 2) {
 				if (!this.SelectedCar || (this.SelectedCar == true)) {
 					editorGui["trackEditorTypeDropDown"].Value := 1
@@ -1474,6 +1482,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			}
 			else
 				this.iTrackEditorMode := "Sections"
+
+			setMultiMapValue(settings, "Session Database", "Track Editor", this.TrackEditorMode)
+
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
 			this.updateTrackMap()
 			this.updateState()
@@ -1604,7 +1616,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui.SetFont("s8 Norm", "Arial")
 
-		editorGui.Add("Edit", "x280 yp+32 w390 h94 X:Move(0.2) W:Grow(0.8) vnotesEdit").OnEvent("Change", updateNotes)
+		editorGui.Add("Edit", "x280 yp+26 w390 h94 X:Move(0.2) W:Grow(0.8) vnotesEdit").OnEvent("Change", updateNotes)
 
 		editorGui.Add("Text", "x16 yp+104 w654 W:Grow 0x10")
 
@@ -1855,7 +1867,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui["settingsTab"].UseTab(7)
 
 		editorGui.Add("Text", "x296 ys w80 h23 +0x200 X:Move(0.2)", translate("Edit"))
-		editorGui.Add("DropDownList", "xp+90 yp w270 X:Move(0.2) W:Grow(0.8) Choose2 vtrackEditorTypeDropDown"
+
+		chosen := inList(["Sections", "Automations"], this.TrackEditorMode)
+
+		editorGui.Add("DropDownList", "xp+90 yp w270 X:Move(0.2) W:Grow(0.8) Choose" . chosen . " vtrackEditorTypeDropDown"
 					, collect(["Sections", "Automations"], translate)).OnEvent("Change", chooseTrackEditorMode)
 
 		this.iTrackDisplayArea := [297, 263, 358, 326]
@@ -2046,7 +2061,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 								if currentSection.HasProp("Nr") {
 									switch currentSection.Type, false {
 										case "Corner":
-											positionInfo := (translate("Corner") . A_Space . currentSection.Nr . translate(": "))
+											if (currentSection.HasProp("Name") && (Trim(currentSection.Name) != ""))
+												positionInfo := (translate(" (") . currentSection.Name . translate(")"))
+											else
+												positionInfo := ""
+
+											positionInfo := (translate("Corner") . A_Space . currentSection.Nr . positionInfo . translate(": "))
 										case "Straight":
 											positionInfo := (translate("Straight") . A_Space . currentSection.Nr . translate(": "))
 										default:
@@ -2099,7 +2119,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		else
 			this.selectModule("Settings")
 
-		OnMessage(0x0200, showPositionInfo)
+		PeriodicTask(() {
+			if WinActive(window)
+				OnMessage(0x0200, showPositionInfo)
+			else
+				OnMessage(0x0200, showPositionInfo, 0)
+		}, 1000, kLowPriority).start()
 	}
 
 	themeIcon(fileName) {
@@ -3391,12 +3416,19 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	chooseTrackSectionType(section := false) {
 		local result := false
 		local sectionsMenu := Menu()
+		local label := translate("Corner")
 
-		sectionsMenu.Add(translate("Corner"), (*) => (result := "Corner"))
+		if (section && (section.Type = "Corner"))
+			label .= translate("...")
+
+		sectionsMenu.Add(label, (*) => (result := "Corner"))
 		sectionsMenu.Add(translate("Straight"), (*) => (result := "Straight"))
 
 		if section {
-			sectionsMenu.Check(translate(section.Type))
+			if (section.Type = "Corner")
+				sectionsMenu.Check(label)
+			else
+				sectionsMenu.Check(translate(section.Type))
 
 			sectionsMenu.Add()
 
@@ -3418,8 +3450,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			if (result = "Delete")
 				return result
 			else if (result && (result != "Cancel")) {
-				if section
+				if section {
 					section := section.Clone()
+
+					if (result = "Corner") {
+						result := withBlockedWindows(InputBox, translate("Please enter the name of the corner:"), translate("Corner"), "w300 h100", section.HasProp("Name") ? section.Name : "")
+
+						if (result.Result = "Ok")
+							section.Name := result.Value
+
+						result := "Corner"
+					}
+				}
 				else
 					section := Object()
 
@@ -3523,7 +3565,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		for index, section in this.TrackSections {
 			section.Nr := ((section.Type = "Corner") ? ++corners : ++straights)
 
-			this.TrackSectionsListView.Add("", section.Nr, translate(section.Type), computeLength(index), Round(section.X), Round(section.Y))
+			this.TrackSectionsListView.Add("", section.Nr, translate(section.Type) . (section.HasProp("Name") ? (translate(" - ") . section.Name) : "")
+											 , computeLength(index), Round(section.X), Round(section.Y))
 		}
 
 		this.TrackSectionsListView.ModifyCol()
@@ -3546,6 +3589,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					setMultiMapValue(this.TrackMap, "Sections", index . ".Index", section.Index)
 					setMultiMapValue(this.TrackMap, "Sections", index . ".X", section.X)
 					setMultiMapValue(this.TrackMap, "Sections", index . ".Y", section.Y)
+
+					if (section.HasProp("Name") && (Trim(section.Name) != ""))
+						setMultiMapValue(this.TrackMap, "Sections", index . ".Name", section.Name)
 				}
 
 				this.SessionDatabase.updateTrackMap(this.SelectedSimulator, this.SelectedTrack
@@ -3873,10 +3919,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.iTrackMap := trackMap
 		this.iTrackImage := this.Window.Theme.RecolorizeImage(trackImage)
 
-		loop getMultiMapValue(trackMap, "Sections", "Count")
-			sections.Push({Type: getMultiMapValue(trackMap, "Sections", A_Index ".Type")
-						 , X: getMultiMapValue(trackMap, "Sections", A_Index ".X")
-						 , Y: getMultiMapValue(trackMap, "Sections", A_Index ".Y")})
+		loop getMultiMapValue(trackMap, "Sections", "Count") {
+			sections.Push({Type: getMultiMapValue(trackMap, "Sections", A_Index . ".Type")
+						 , X: getMultiMapValue(trackMap, "Sections", A_Index . ".X")
+						 , Y: getMultiMapValue(trackMap, "Sections", A_Index . ".Y")})
+
+			if (getMultiMapValue(trackMap, "Sections", A_Index . ".Name", kUndefined) != kUndefined)
+				sections[A_Index].Name := getMultiMapValue(trackMap, "Sections", A_Index . ".Name")
+		}
 
 		this.iTrackSections := sections
 

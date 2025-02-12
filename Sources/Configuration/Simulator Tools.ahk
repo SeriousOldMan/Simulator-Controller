@@ -19,6 +19,10 @@
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Tools.ico
 ;@Ahk2Exe-ExeName Simulator Tools.exe
+;@Ahk2Exe-SetCompanyName Oliver Juwig (TheBigO)
+;@Ahk2Exe-SetCopyright TheBigO - Creative Commons - BY-NC-SA
+;@Ahk2Exe-SetProductName Simulator Controller
+;@Ahk2Exe-SetVersion 0.0.0.0
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -32,8 +36,8 @@
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\Database.ahk"
-#Include "..\Libraries\HTMLViewer.ahk"
+#Include "..\Framework\Extensions\Database.ahk"
+#Include "..\Framework\Extensions\HTMLViewer.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Database\Libraries\TyresDatabase.ahk"
 #Include "..\Database\Libraries\TelemetryDatabase.ahk"
@@ -3458,13 +3462,14 @@ runBuildTargets(&buildProgress) {
 						sourceCode := StrReplace(sourceCode, ";@SC #Include `"..\Framework\Production.ahk`"", "#Include `"..\Framework\Production.ahk`"")
 					}
 
-					sourceCode := StrReplace(sourceCode, ";@Ahk2Exe-SetVersion 1.0.0.0", ";@Ahk2Exe-SetVersion " . kVersion)
+					sourceCode := StrReplace(sourceCode, ";@Ahk2Exe-SetVersion 0.0.0.0", ";@Ahk2Exe-SetVersion " . kVersion)
 
 					deleteFile(sourceDirectory . "\compile.ahk")
 
 					FileAppend(sourceCode, sourceDirectory . "\compile.ahk", "UTF-8")
 
-					result := RunWait(kProductionCompiler . options . " /in `"" . sourceDirectory . "\compile.ahk" . "`"")
+					result := RunWait(((gTargetConfiguration = "Production") ? kProductionCompiler : kDevelopmentCompiler)
+									. options . " /in `"" . sourceDirectory . "\compile.ahk" . "`"")
 
 					deleteFile(sourceDirectory . "\compile.ahk")
 

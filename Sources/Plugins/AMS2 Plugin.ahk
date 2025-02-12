@@ -87,7 +87,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 
 	getPitstopActions(&allActions, &selectActions) {
 		allActions := CaseInsenseMap("Strategy", "Strategy", "NoRefuel", "No Refuel", "Refuel", "Refuel", "TyreCompound", "Tyre Compound"
-								   , "BodyworkRepair", "Repair Bodywork", "SuspensionRepair", "Repair Suspension", "DriverSwap", "Swap Driver")
+								   , "BodyworkRepair", "Repair Bodywork", "SuspensionRepair", "Repair Suspension", "DriverSwap", "Swap Driver", "PitstopRequest", "Request Pitstop")
 		selectActions := []
 	}
 
@@ -316,9 +316,19 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	finishPitstopSetup(pitstopNumber) {
 		super.finishPitstopSetup(pitstopNumber)
 
-		if this.requirePitstopMFD()
-			if this.selectPitstopOption("Request Pitstop")
-				this.changePitstopOption("Request Pitstop")
+		if getMultiMapValue(this.Settings, "Simulator.Automobilista 2", "Pitstop.Request", false)
+			if this.requirePitstopMFD()
+				if this.selectPitstopOption("Request Pitstop")
+					this.changePitstopOption("Request Pitstop")
+	}
+
+	prepareSettings(settings, data) {
+		settings := super.prepareSettings(settings, data)
+
+		if (getMultiMapValue(settings, "Simulator.Automobilista 2", "Pitstop.Service.Tyres", kUndefined) == kUndefined)
+			setMultiMapValue(settings, "Simulator.Automobilista 2", "Pitstop.Service.Tyres", "Change")
+
+		return settings
 	}
 
 	updateSession(session, force := false) {

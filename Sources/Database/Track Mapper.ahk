@@ -19,6 +19,10 @@
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Track.ico
 ;@Ahk2Exe-ExeName Track Mapper.exe
+;@Ahk2Exe-SetCompanyName Oliver Juwig (TheBigO)
+;@Ahk2Exe-SetCopyright TheBigO - Creative Commons - BY-NC-SA
+;@Ahk2Exe-SetProductName Simulator Controller
+;@Ahk2Exe-SetVersion 0.0.0.0
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -34,8 +38,8 @@
 
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Database\Libraries\SettingsDatabase.ahk"
-#Include "..\Libraries\GDIP.ahk"
-#Include "..\Libraries\Task.ahk"
+#Include "..\Framework\Extensions\GDIP.ahk"
+#Include "..\Framework\Extensions\Task.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -214,7 +218,7 @@ createTrackMap(simulator, track, fileName) {
 
 			for ignore, coordinate in coordinates {
 				if (coordinate[1] != 0.0)
-					normalized[Round(coordinate[1] * 1000)] := [coordinate[2], coordinate[3]]
+					normalized[Max(1, Min(1000, Round(coordinate[1] * 1000)))] := [coordinate[2], coordinate[3]]
 
 				Sleep(1)
 
@@ -362,6 +366,9 @@ startupTrackMapper() {
 
 			deleteFile(data)
 		}
+		catch Any as exception {
+			logError(exception, true)
+		}
 		finally {
 			Task.CurrentTask.Critical := false
 
@@ -372,6 +379,9 @@ startupTrackMapper() {
 	recreateMaps() {
 		try {
 			recreateTrackMaps()
+		}
+		catch Any as exception {
+			logError(exception, true)
 		}
 		finally {
 			ExitApp(0)

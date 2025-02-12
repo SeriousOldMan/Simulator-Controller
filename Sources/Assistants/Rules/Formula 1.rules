@@ -21,5 +21,4 @@ validTyreCompounds(?tyreCompounds) <= any?([Wet | ?], ?tyreCompounds)
 validTyreCompounds(?tyreCompounds) <= any?([Intermediate | ?], ?tyreCompounds)
 validTyreCompounds(?tyreCompounds) <= tyreCompounds(?tyreCompounds, Dry, ?temp),
 									  unique(?temp, ?compounds),
-									  length(?compounds, ?length),
-									  ?length > 1
+									  length(?compounds, ?length), ?length > 1

@@ -113,9 +113,9 @@ class NoTimeLossEvent extends EngineerEvent {
 		return ("The driver has recovered his pace and repairs are no longer needed.")
 	}
 
-	handleEvent(event, stintLaps, delta, arguments*) {
-		if !super.handleEvent(event, stintLaps, delta, arguments*)
-			this.Assistant.reportDamageAnalysis(false, stintLaps, delta, concatenate([true], arguments)*)
+	handleEvent(event, stintLaps, delta, *) {
+		if !super.handleEvent(event, stintLaps, delta)
+			this.Assistant.reportDamageAnalysis(false, stintLaps, delta, true)
 
 		return true
 	}
@@ -3691,7 +3691,7 @@ class RaceEngineer extends RaceAssistant {
 			}
 	}
 
-	reportDamageAnalysis(repair, stintLaps, delta, update := false) {
+	reportDamageAnalysis(repair, stintLaps, delta, clear := false) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker
 
@@ -3708,7 +3708,7 @@ class RaceEngineer extends RaceAssistant {
 				if (!knowledgeBase.getValue("InPitLane", false) && !knowledgeBase.getValue("InPit", false)) {
 					speaker := this.getSpeaker()
 
-					if update
+					if clear
 						speaker.speakPhrase("RepairPitstopNotNeeded", {laps: Round(stintLaps), delta: speaker.number2Speech(delta, 1)})
 					else if repair {
 						speaker.beginTalk()
@@ -3867,10 +3867,10 @@ damageWarning(context, newSuspensionDamage, newBodyworkDamage, newEngineDamage) 
 	return true
 }
 
-reportDamageAnalysis(context, repair, stintLaps, delta, update := false) {
+reportDamageAnalysis(context, repair, stintLaps, delta, clear := false) {
 	context.KnowledgeBase.RaceAssistant.clearContinuation()
 
-	context.KnowledgeBase.RaceAssistant.reportDamageAnalysis(repair, stintLaps, delta, update)
+	context.KnowledgeBase.RaceAssistant.reportDamageAnalysis(repair, stintLaps, delta, clear)
 
 	return true
 }

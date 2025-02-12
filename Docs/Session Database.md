@@ -95,6 +95,8 @@ With the second editor you can define automatic actions for specific locations a
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2013.jpg)
 
+Good to know: The currently selection of the track editor will be remembered for the next run of "Session Database".
+
 #### Sessions
 
 All practice and race sessions, which have been stored in the database are shown here. Practice sessions can be recorded and saved using the ["Solo Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center), which can collect data from all solo sessions, therefore also solo races. The name "Solo Center" is therfore somewhat misleading. Race session on the other hand are created by the ["Team Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center), which collects data for a team race on a central server, the [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server). Normally, the sessions run this way are team races with multiple drivers.

@@ -122,17 +122,19 @@ class TestRaceEngineer extends RaceEngineer {
 			showMessage("Pressure loss warning for " . tyre . ": " . lostPressure)
 	}
 
-	reportDamageAnalysis(repair, stintLaps, delta) {
+	reportDamageAnalysis(repair, stintLaps, delta, update := false) {
 		global vSuspensionDamage, vBodyworkDamage, vEngineDamage, vDamageRepair, vDamageLapDelta, vDamageStintLaps
 
 		super.reportDamageAnalysis(repair, stintLaps, delta)
 
-		if isDebug()
-			showMessage("Damage analysis - Repair: " . (repair ? "Yes" : "No") . "; Lap Delta : " . delta . "; Remaining Laps: " . stintLaps)
+		if !update {
+			if isDebug()
+				showMessage("Damage analysis - Repair: " . (repair ? "Yes" : "No") . "; Lap Delta : " . delta . "; Remaining Laps: " . stintLaps)
 
-		vDamageRepair := repair
-		vDamageLapDelta := delta
-		vDamageStintLaps := stintLaps
+			vDamageRepair := repair
+			vDamageLapDelta := delta
+			vDamageStintLaps := stintLaps
+		}
 	}
 }
 

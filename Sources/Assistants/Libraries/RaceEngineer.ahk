@@ -3708,7 +3708,9 @@ class RaceEngineer extends RaceAssistant {
 				if (!knowledgeBase.getValue("InPitLane", false) && !knowledgeBase.getValue("InPit", false)) {
 					speaker := this.getSpeaker()
 
-					if repair {
+					if update
+						speaker.speakPhrase("RepairPitstopNotNeeded", {laps: Round(stintLaps), delta: speaker.number2Speech(delta, 1)})
+					else if repair {
 						speaker.beginTalk()
 
 						try {

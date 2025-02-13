@@ -1,4 +1,4 @@
-## 6.1.6.0-release 02/14/25 (planned)
+## 6.1.6.0-release 02/14/25
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a rare error where the session mode in a Startup Profile was reset to "Solo".

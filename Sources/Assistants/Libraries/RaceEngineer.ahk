@@ -2835,6 +2835,7 @@ class RaceEngineer extends RaceAssistant {
 			  , repairBodywork := kUndefined, repairSuspension := kUndefined, repairEngine := kUndefined
 			  , requestDriver := kUndefined) {
 		local knowledgeBase := this.KnowledgeBase
+		local lapNr := knowledgeBase.getValue("Lap")
 		local confirm := true
 		local options := ((optionsOrLap = kUndefined) ? true : optionsOrLap)
 		local plannedLap := false
@@ -2892,7 +2893,7 @@ class RaceEngineer extends RaceAssistant {
 				targetFuel := knowledgeBase.getValue("Fuel.Amount.Target", false)
 
 				if (targetFuel && (targetFuel != refuelAmount)) {
-					if ((knowledgeBase.getValue("Lap." . knowledgeBase.getValue("Lap") . ".Fuel.Remaining") + targetFuel)
+					if ((knowledgeBase.getValue("Lap." . lapNr . ".Fuel.Remaining") + targetFuel)
 					  < knowledgeBase.getValue("Session.Settings.Fuel.Max"))
 						correctedFuel := true
 					else
@@ -3062,17 +3063,20 @@ class RaceEngineer extends RaceAssistant {
 
 				if ((options == true) || (options.HasProp("Repairs") && options.Repairs)
 				 || (repairBodywork != kUndefined) || (repairSuspension != kUndefined) || (repairEngine != kUndefined)) {
-					if knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension", false)
+					if ((knowledgeBase.getValue("Lap." . lapNr . ".Damage.Suspension", 0) > 0)
+					 && knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension", false))
 						speaker.speakPhrase("RepairSuspension")
 					else if debug
 						speaker.speakPhrase("NoRepairSuspension")
 
-					if knowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork", false)
+					if ((knowledgeBase.getValue("Lap." . lapNr . ".Damage.Bodywork", 0) > 0)
+					 && knowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork", false))
 						speaker.speakPhrase("RepairBodywork")
 					else if debug
 						speaker.speakPhrase("NoRepairBodywork")
 
-					if knowledgeBase.getValue("Pitstop.Planned.Repair.Engine", false)
+					if ((knowledgeBase.getValue("Lap." . lapNr . ".Damage.Engine", 0) > 0)
+					 && knowledgeBase.getValue("Pitstop.Planned.Repair.Engine", false))
 						speaker.speakPhrase("RepairEngine")
 					else if debug
 						speaker.speakPhrase("NoRepairEngine")

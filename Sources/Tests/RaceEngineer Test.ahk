@@ -122,12 +122,12 @@ class TestRaceEngineer extends RaceEngineer {
 			showMessage("Pressure loss warning for " . tyre . ": " . lostPressure)
 	}
 
-	reportDamageAnalysis(repair, stintLaps, delta, update := false) {
+	reportDamageAnalysis(repair, stintLaps, delta, clear := false) {
 		global vSuspensionDamage, vBodyworkDamage, vEngineDamage, vDamageRepair, vDamageLapDelta, vDamageStintLaps
 
-		super.reportDamageAnalysis(repair, stintLaps, delta)
+		super.reportDamageAnalysis(repair, stintLaps, delta, clear)
 
-		if !update {
+		if !clear {
 			if isDebug()
 				showMessage("Damage analysis - Repair: " . (repair ? "Yes" : "No") . "; Lap Delta : " . delta . "; Remaining Laps: " . stintLaps)
 
@@ -135,6 +135,8 @@ class TestRaceEngineer extends RaceEngineer {
 			vDamageLapDelta := delta
 			vDamageStintLaps := stintLaps
 		}
+		else
+			MsgBox("Damage analysis - Repair: " . (repair ? "Yes" : "No") . "; Lap Delta : " . delta . "; Remaining Laps: " . stintLaps)
 	}
 }
 
@@ -1059,7 +1061,7 @@ if !GetKeyState("Ctrl") {
 	withBlockedWindows(MsgBox, "Full run took " . (A_TickCount - startTime) . " ms")
 }
 else {
-	raceNr := (GetKeyState("Alt") ? 18 : ((GetKeyState("Shift") ? 2 : 1)))
+	raceNr := (GetKeyState("Alt") ? 3 : ((GetKeyState("Shift") ? 2 : 1)))
 
 	engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer.settings")
 							   , TestPitStopHandler(), "Jona", "EN", true, true, false, true, true, true, true, true, true)

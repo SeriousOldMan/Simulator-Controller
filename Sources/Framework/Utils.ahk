@@ -747,35 +747,11 @@ testAssistants(configurator, assistants := kRaceAssistants, booster := false) {
 
 	for ignore, assistant in assistants {
 		thePlugin := Plugin(assistant, configuration)
+		
+		if thePlugin.Active {
+			options := ""
 
-		options := ""
-
-		for ignore, parameter in ["Name", "Language", "Synthesizer", "Speaker", "SpeakerVocalics", "Recognizer", "Listener"] {
-			found := false
-
-			if thePlugin.hasArgument(parameter) {
-				value := thePlugin.getArgumentValue(parameter)
-
-				found := true
-			}
-			else if thePlugin.hasArgument("raceAssistant" . parameter) {
-				value := thePlugin.getArgumentValue("raceAssistant" . parameter)
-
-				found := true
-			}
-
-			if found {
-				if ((value = "On") || (value = kTrue))
-					value := true
-				else if ((value = "Off") || (value = kFalse))
-					value := false
-
-				options .= (" -" . parameter . " `"" . value . "`"")
-			}
-		}
-
-		if booster
-			for ignore, parameter in ["SpeakerBooster", "ListenerBooster", "ConversationBooster", "AgentBooster"] {
+			for ignore, parameter in ["Name", "Language", "Synthesizer", "Speaker", "SpeakerVocalics", "Recognizer", "Listener"] {
 				found := false
 
 				if thePlugin.hasArgument(parameter) {
@@ -788,7 +764,7 @@ testAssistants(configurator, assistants := kRaceAssistants, booster := false) {
 
 					found := true
 				}
-				
+
 				if found {
 					if ((value = "On") || (value = kTrue))
 						value := true
@@ -799,6 +775,32 @@ testAssistants(configurator, assistants := kRaceAssistants, booster := false) {
 				}
 			}
 
-		Run(kBinariesDirectory . assistant . ".exe -Logo true -Debug true -Configuration `"" . configurationFile . "`"" . options)
+			if booster
+				for ignore, parameter in ["SpeakerBooster", "ListenerBooster", "ConversationBooster", "AgentBooster"] {
+					found := false
+
+					if thePlugin.hasArgument(parameter) {
+						value := thePlugin.getArgumentValue(parameter)
+
+						found := true
+					}
+					else if thePlugin.hasArgument("raceAssistant" . parameter) {
+						value := thePlugin.getArgumentValue("raceAssistant" . parameter)
+
+						found := true
+					}
+					
+					if found {
+						if ((value = "On") || (value = kTrue))
+							value := true
+						else if ((value = "Off") || (value = kFalse))
+							value := false
+
+						options .= (" -" . parameter . " `"" . value . "`"")
+					}
+				}
+
+			Run(kBinariesDirectory . assistant . ".exe -Logo true -Debug true -Configuration `"" . configurationFile . "`"" . options)
+		}
 	}
 }

@@ -1360,7 +1360,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 	}
 
 	testPushToTalk() {
-		testAssistants(this.Editor, ["Race Engineer", "Race Strategist"], GetKeyState("Ctrl"))
+		testAssistants(this.Editor, , GetKeyState("Ctrl"))
 	}
 
 	testSpeaker() {

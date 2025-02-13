@@ -516,12 +516,18 @@ class SetupPatch extends NamedPreset {
 	}
 }
 
-class LLMRuntime extends NamedPreset {
+class RuntimePreset extends NamedPreset {
 	iURL := false
 
 	URL {
 		Get {
 			return this.iURL
+		}
+	}
+
+	Prefix {
+		Get {
+			throw "Virtual property RuntimePreset.Prefix must be implemented in a subclass..."
 		}
 	}
 
@@ -560,18 +566,18 @@ class LLMRuntime extends NamedPreset {
 
 				updateTask.start()
 
-				deleteFile(A_Temp . "\LLM Runtime.zip")
+				deleteFile(A_Temp . "\" . this.Prefix . " Runtime.zip")
 
-				Download(url, A_Temp . "\LLM Runtime.zip")
+				Download(url, A_Temp . "\" . this.Prefix . " Runtime.zip")
 
-				DirCreate(kUserHomeDirectory . "Programs\LLM Runtime")
+				DirCreate(kUserHomeDirectory . "Programs\" . this.Prefix . " Runtime")
 
 				showProgress({color: "Green", message: translate("Extracting...")})
 
-				RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\LLM Runtime.zip' -DestinationPath '" . kUserHomeDirectory . "Programs\LLM Runtime" . "' -Force", , "Hide")
+				RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\" . this.Prefix . " Runtime.zip' -DestinationPath '" . kUserHomeDirectory . "Programs\" . this.Prefix . " Runtime" . "' -Force", , "Hide")
 
 				try {
-					SetWorkingDir(kUserHomeDirectory . "Programs\LLM Runtime")
+					SetWorkingDir(kUserHomeDirectory . "Programs\" . this.Prefix . " Runtime")
 
 					RunWait("Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File", , "Hide")
 				}
@@ -593,7 +599,23 @@ class LLMRuntime extends NamedPreset {
 	}
 
 	uninstall(wizard) {
-		deleteDirectory(kUserHomeDirectory . "Programs\LLM Runtime")
+		deleteDirectory(kUserHomeDirectory . "Programs\" . this.Prefix . " Runtime")
+	}
+}
+
+class LLMRuntime extends RuntimePreset {
+	Prefix {
+		Get {
+			return "LLM"
+		}
+	}
+}
+
+class WhisperRuntime extends RuntimePreset {
+	Prefix {
+		Get {
+			return "Whisper"
+		}
 	}
 }
 

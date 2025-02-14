@@ -4,22 +4,23 @@
   3. Fixed a rare error where the session mode in a Startup Profile was reset to "Solo".
   4. Fixed voice recognition test mode, which was broken for some time now.
   5. Fixed superfluous validation errors for Button Box layouts introduced with the last release.
-  6. Added several missing translations.
-  7. The Telemetry Viewer now remembers the chosen layout and restores it the next time.
-  8. Improved detection of exact car location in the pitlane for *Assetto Corsa*, *Automobilista 2*, *Le Mans Ultimate*, *rFactor 2* and *iRacing*.
-  9. The chosen track editor mode will be now remembered between runs of the "Session Database".
-  10. The Race Engineer now tries to prevent preparation of a pitstop while the car is in the pitlane, since the driver might actually doing a drive-through with engaged pit limiter. Since the processing is inherently asynchronous, there is still a chance that the pit limiter will be disengaged, if a pitstop is prepared while serving a penalty at the same time, but the chance for such a problem is reduced quite a lot.
-  11. Corners can now be given names in the track map. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation) for information on how to do this. If you have configured corner names, the Driving Coach may use the name rather than a simple number when referencing a corner.
+  6. Fixed wet tyre compound specifier for *Le Mans Ultimate* GTE cars.
+  7. Added several missing translations.
+  8. The Telemetry Viewer now remembers the chosen layout and restores it the next time.
+  9. Improved detection of exact car location in the pitlane for *Assetto Corsa*, *Automobilista 2*, *Le Mans Ultimate*, *rFactor 2* and *iRacing*.
+  10. The chosen track editor mode will be now remembered between runs of the "Session Database".
+  11. The Race Engineer now tries to prevent preparation of a pitstop while the car is in the pitlane, since the driver might actually doing a drive-through with engaged pit limiter. Since the processing is inherently asynchronous, there is still a chance that the pit limiter will be disengaged, if a pitstop is prepared while serving a penalty at the same time, but the chance for such a problem is reduced quite a lot.
+  12. Corners can now be given names in the track map. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation) for information on how to do this. If you have configured corner names, the Driving Coach may use the name rather than a simple number when referencing a corner.
       - If available, corner names will be shown in the title bar of the inspector window of the Telemetry Viewer.
 	  - They will also be included in the tool tips, if the mouse is hoovering above one of the section points in the track map of the "Session Database".
       - Tool tips are now also available for section points in the track map of the Telemetry Viewer, and of course, the corner names will be shown there as well.
-  12. The Driving Coach will now use corner names, if available, to reference a specific corner.
-      - Corner names must have been defined for the track map (see item 11. above)
+  13. The Driving Coach will now use corner names, if available, to reference a specific corner.
+      - Corner names must have been defined for the track map (see item 12. above)
       - The Driving Coach instructions have been updated. If you have tweaked your instructions, you may want to revert to original and include your changes again.
-  13. [Expert] The meta information between <think> and </think> is now removed automatically from the answer, when models like deepseek-r1 are used.
-  14. [Internal] Improved handling of inter process messages in cases where message processing needs longer than usual.
-  15. [Internal] Updated WebView2, the internal HTML renderer, to the latest version.
-  16. [Developer] The framework extensions formerly located in the "Libraries" folder in the sources tree has been moved to the folder "Framework\Extensions".
+  14. [Expert] The meta information between <think> and </think> is now removed automatically from the answer, when models like deepseek-r1 are used.
+  15. [Internal] Improved handling of inter process messages in cases where message processing needs longer than usual.
+  16. [Internal] Updated WebView2, the internal HTML renderer, to the latest version.
+  17. [Developer] The framework extensions formerly located in the "Libraries" folder in the sources tree has been moved to the folder "Framework\Extensions".
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-616), if you have tweaked your Drving Coach instructions.
 

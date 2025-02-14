@@ -2469,7 +2469,7 @@ class TrackMap {
 
 		mapGui.Add("Text", "x88 y2 w306 H:Center Center vtrackNameDisplay")
 
-		mapGui.Add("Button", "x8 yp h20 w80 Center +0x200 X:Move vscanButton Hidden", translate("Scan")).OnEvent("Click", autoSections)
+		mapGui.Add("Button", "x8 yp h20 w80 Center +0x200 vscanButton Hidden", translate("Scan")).OnEvent("Click", autoSections)
 		mapGui.Add("Button", "x399 yp h20 w80 Center +0x200 X:Move veditButton", translate("Edit")).OnEvent("Click", toggleMode)
 
 		mapGui.Add("Picture", "x0 y25 w479 h379 W:Grow H:Grow vtrackDisplayArea")

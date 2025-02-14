@@ -497,7 +497,10 @@ priority: 5, {All: {Any: [?Damage.Suspension.Lap.Delta = 0], {None: [?Damage.Sus
 				   {Any: [?Damage.Bodywork.Lap.Delta = 0], {None: [?Damage.Bodywork.Lap.Delta]},
 						 [?Damage.Bodywork = 0], {None: [?Damage.Bodywork]}},
 				   {Any: [?Damage.Engine.Lap.Delta = 0], {None: [?Damage.Engine.Lap.Delta]},
-						 [?Damage.Engine = 0], {None: [?Damage.Engine]}}} => (Clear: Damage.Analysis.Reported), (Clear: Damage.Reported)
+						 [?Damage.Engine = 0], {None: [?Damage.Engine]}}} => (Clear: Damage.Analysis.Reported),
+																			 (Clear: Damage.Analysis.Reported.Repair),
+																			 (Clear: Damage.Analysis.Updated),
+																			 (Clear: Damage.Reported)
 				   
 priority: -5, {All: [?Lap], [?Damage.Reported],
 					{None: [?Damage.Analysis.Reported > ?Damage.Reported]},
@@ -531,13 +534,36 @@ reportLapDelta(?sDelta, ?bDelta, ?eDelta) <=
 
 reportDamageAnalysis(?lostTime, ?stintLaps, ?delta) <= >=(?lostTime, !Session.Settings.Pitstop.Delta),
 													   reportTimeLoss(?stintLaps, ?delta),
-													   Set(Damage.Analysis.Reported, !Lap)
+													   Set(Damage.Analysis.Reported, !Lap), Set(Damage.Analysis.Reported.Repair, true),
+													   Clear(Damage.Analysis.Updated)
 reportDamageAnalysis(?lostTime, ?stintLaps, ?delta) <= ?lostTime < !Session.Settings.Pitstop.Delta,
 													   Call(reportDamageAnalysis, false, ?stintLaps, ?delta),
-													   Set(Damage.Analysis.Reported, !Lap)
-
+													   Set(Damage.Analysis.Reported, !Lap), Set(Damage.Analysis.Reported.Repair, false),
+													   Clear(Damage.Analysis.Updated)
+													
 reportTimeLoss(?stintLaps, ?delta) <= Call(raiseEvent, TimeLoss, ?stintLaps, ?delta), !
 reportTimeLoss(?stintLaps, ?delta) <= Call(reportDamageAnalysis, true, ?stintLaps, ?delta)
+				   
+priority: -5, {All: [?Lap], [?Damage.Analysis.Reported.Repair = true], {None: [?Damage.Analysis.Updated]}} =>
+		(Prove: reportAnalysisUpdate(!Damage.Suspension.Lap.Delta, !Damage.Bodywork.Lap.Delta, !Damage.Engine.Lap.Delta))
+
+reportAnalysisUpdate(?sDelta, ?bDelta, ?eDelta) <= unbound?(?sDelta), unbound?(?eDelta), reportLapDeltaUpdate(0, ?bDelta, 0), !
+reportAnalysisUpdate(?sDelta, ?bDelta, ?eDelta) <= unbound?(?sDelta), unbound?(?bDelta), reportLapDeltaUpdate(0, 0, ?eDelta), !
+reportAnalysisUpdate(?sDelta, ?bDelta, ?eDelta) <= unbound?(?bDelta), unbound?(?eDelta), reportLapDeltaUpdate(?sDelta, 0, 0), !
+reportAnalysisUpdate(?sDelta, ?bDelta, ?eDelta) <= unbound?(?sDelta), reportLapDeltaUpdate(0, ?bDelta, ?eDelta), !
+reportAnalysisUpdate(?sDelta, ?bDelta, ?eDelta) <= unbound?(?bDelta), reportLapDeltaUpdate(?sDelta, 0, ?eDelta), !
+reportAnalysisUpdate(?sDelta, ?bDelta, ?eDelta) <= unbound?(?eDelta), reportLapDeltaUpdate(?sDelta, ?bDelta, 0), !
+reportAnalysisUpdate(?sDelta, ?bDelta, ?eDelta) <= reportLapDeltaUpdate(?sDelta, ?bDelta, ?eDelta)
+
+reportLapDeltaUpdate(?sDelta, ?bDelta, ?eDelta) <=
+		?temp = !Damage.Reported + !Session.Settings.Damage.Analysis.Laps, !Lap > ?temp,
+		max(?sDelta, ?bDelta, ?tDelta), max(?tDelta, ?eDelta, ?tempDelta), max(0, ?tempDelta, ?delta),
+		remainingStintLaps(!Lap, ?stintLaps), ?lostTime = ?stintLaps * ?delta,
+		?lostTime < !Session.Settings.Pitstop.Delta, reportNoTimeLoss(?stintLaps, ?delta),
+		Set(Damage.Analysis.Updated, true)
+
+reportNoTimeLoss(?stintLaps, ?delta) <= Call(raiseEvent, NoTimeLoss, ?stintLaps, ?delta), !
+reportNoTimeLoss(?stintLaps, ?delta) <= Call(reportDamageAnalysis, false, ?stintLaps, ?delta, true)
 
 
 ;;;-------------------------------------------------------------------------;;;

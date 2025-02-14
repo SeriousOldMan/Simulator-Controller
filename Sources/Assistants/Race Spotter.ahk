@@ -57,8 +57,8 @@ showLogo(name) {
 
 	MonitorGetWorkArea(, &mainScreenLeft, &mainScreenTop, &mainScreenRight, &mainScreenBottom)
 
-	x := mainScreenLeft
-	y := mainScreenBottom - 234
+	x := mainScreenRight - 299
+	y := mainScreenTop
 
 	logoGui := Window()
 

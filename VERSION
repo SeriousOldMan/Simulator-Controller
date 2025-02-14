@@ -1,9 +1,9 @@
 [Development]
-Version=6.1.6.0-release
-Target=6.1.6.0-release
+Version=6.1.7.0-dev
+Target=6.1.7.0-release
 Date=02/14/2025
-Download=https://cutt.ly/trqpEE9N;https://www.dropbox.com/scl/fi/f8mschkrb2bjkbqbf4lmu/Simulator-Controller-6.1.6.0-release.zip?rlkey=m2cub9xs7gspy0lqky92dajfp&st=hnp0har2&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.1.6.0-release.zip
-Changes=Remember choice of layout in Telemetry Viewer, Fixed missing mode flag in Startup Profiles, Fixed voice recognition test mode, Corners can be given names in track maps, Driving Coach understands and uses corner names, Prevent pitstop preparation if the car is in the pitlane, Optimized pitlane location detection, Show corner names in the title bar of the telemetry inspector, Remove meta information from thinking LLMs, Refactored extension libraries, Updated WebView2, Remember track editor mode in "Session Database", Fixed validation of controller layout definitions, Added missing translations, Fixed Wet tyre model for LMU GTE cars
+Download=
+Changes=Engineer updates about repairs no longer needed, Engineer does not announce unnecessary repairs for a pitstop anymore, Voice recognition test mode now starts all Assistants
 Components=Media->5.6.1,Configuration->6.1.3,Utilities->6.1.6
 [Release]
 Version=6.1.6.0-release
@@ -22,7 +22,7 @@ Utilities.6.1.6.Path=.
 Utilities.6.1.6.Content=Utilities
 Utilities.6.1.6.Download=https://www.dropbox.com/scl/fi/zo6ve6h67jluj25zkni9z/Utilities-6.1.6.zip?rlkey=qmp8jzvx54roz3l72zovvk6we&st=wfvj3oxf&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.1.6.zip
 [Current]
-Type=Release
+Type=Development
 [Version]
-Development=6.1.6.0-release
+Development=6.1.7.0-dev
 Release=6.1.6.0-release

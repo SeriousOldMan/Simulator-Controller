@@ -22,6 +22,7 @@
   1. Active validation of value ranges in settings definitions
   2. Integration with an upcoming REST/JSON realtime interface of Second Monitor
   3. Importer for telemtry data in IBT format
+  4. Support section names also for straights in a track map
 
 #### Setup Workbench
   1. Collect telemetry data from multiple drivers and generate combined setup recommendations

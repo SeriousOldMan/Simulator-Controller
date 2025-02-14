@@ -1,15 +1,16 @@
 [Development]
-Version=6.1.6.0-beta
+Version=6.1.6.0-release
 Target=6.1.6.0-release
-Date=02/12/2025
-Download=https://www.dropbox.com/scl/fi/vitysxyiptmeqtvuq0xk7/Simulator-Controller-6.1.6.0-beta.zip?rlkey=3uqtu1ugekmrhmol2f7emwwf4&st=lgge6u5z&dl=1
-Changes=Remember choice of layout in Telemetry Viewer, Fixed missing mode flag in Startup Profiles, Fixed voice recognition test mode, Corners can be given names in track maps, Driving Coach understands and uses corner names, Prevent pitstop preparation if the car is in the pitlane, Optimized pitlane location detection, Show corner names in the title bar of the telemetry inspector, Remove meta information from thinking LLMs, Refactored extension libraries, Updated WebView2, Remember track editor mode in "Session Database", Fixed validation of controller layout definitionsComponents=Media->5.6.1,Configuration->6.1.3,Utilities->6.1.6
+Date=02/14/2025
+Download=https://cutt.ly/trqpEE9N;https://www.dropbox.com/scl/fi/f8mschkrb2bjkbqbf4lmu/Simulator-Controller-6.1.6.0-release.zip?rlkey=m2cub9xs7gspy0lqky92dajfp&st=hnp0har2&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.1.6.0-release.zip
+Changes=Remember choice of layout in Telemetry Viewer, Fixed missing mode flag in Startup Profiles, Fixed voice recognition test mode, Corners can be given names in track maps, Driving Coach understands and uses corner names, Prevent pitstop preparation if the car is in the pitlane, Optimized pitlane location detection, Show corner names in the title bar of the telemetry inspector, Remove meta information from thinking LLMs, Refactored extension libraries, Updated WebView2, Remember track editor mode in "Session Database", Fixed validation of controller layout definitions, Added missing translations, Fixed Wet tyre model for LMU GTE cars
+Components=Media->5.6.1,Configuration->6.1.3,Utilities->6.1.6
 [Release]
-Version=6.1.5.0-release
-Date=02/07/2025
-Download=https://cutt.ly/Ee5IKmhY;https://www.dropbox.com/scl/fi/9bv0mcakmcdub8u7dimrl/Simulator-Controller-6.1.5.0-release.zip?rlkey=0qk0wpaw9k7w3zxvjqism7hxw&st=d9zbaqt6&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.1.5.0-release.zip
-Changes=Fixed handling of team tab in "Race Settings", Fixed crash in "Setup Workbench" for special characters in car names, Fixed default for pitlane delta default value when not set, Up 2 date info for fuel, tyres and brakes by the Engineer, Fixed display of cold pressures in "Team Center" lap data, More checks in Controller layout editor, Special editor for validation rules in "Setup Workbench", Support for Inner, Middle and Outer tyre temperatures for iRacing, Real setup pressures are now used by the Engineer for iRacing, Fixed a bug in Azure voice recognition, Added Manifest Information, Increased reliability of shared memory connectors, Fixed restricted mode display for Driving Coach
-Components=Media->5.6.1,Configuration->6.1.3,Utilities->5.9.8
+Version=6.1.6.0-release
+Date=02/14/2025
+Download=https://cutt.ly/trqpEE9N;https://www.dropbox.com/scl/fi/f8mschkrb2bjkbqbf4lmu/Simulator-Controller-6.1.6.0-release.zip?rlkey=m2cub9xs7gspy0lqky92dajfp&st=hnp0har2&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.1.6.0-release.zip
+Changes=Remember choice of layout in Telemetry Viewer, Fixed missing mode flag in Startup Profiles, Fixed voice recognition test mode, Corners can be given names in track maps, Driving Coach understands and uses corner names, Prevent pitstop preparation if the car is in the pitlane, Optimized pitlane location detection, Show corner names in the title bar of the telemetry inspector, Remove meta information from thinking LLMs, Refactored extension libraries, Updated WebView2, Remember track editor mode in "Session Database", Fixed validation of controller layout definitions, Added missing translations
+Components=Media->5.6.1,Configuration->6.1.3,Utilities->6.1.6
 [Components]
 Media.5.6.1.Path=Resources
 Media.5.6.1.Content=Splash Media
@@ -17,14 +18,11 @@ Media.5.6.1.Download=https://www.dropbox.com/scl/fi/3c56fjdvdd4od5t7rsuc9/Media-
 Configuration.6.1.3.Path=Resources
 Configuration.6.1.3.Content=Setup
 Configuration.6.1.3.Download=https://www.dropbox.com/scl/fi/rdnj6urr8qt3dzi5ut9up/Configuration-6.1.3.zip?rlkey=iw2utnrd185owgb32ov49rj91&st=487vvwrg&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.1.3.zip
-Utilities.5.9.8.Path=.
-Utilities.5.9.8.Content=Utilities
-Utilities.5.9.8.Download=https://www.dropbox.com/scl/fi/pjtq7f3u6uoy5ld88vqz9/Utilities-5.9.8.zip?rlkey=crido9soi8aiocepz10xdoev3&st=cprt4qr2&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+5.9.8.zip
 Utilities.6.1.6.Path=.
 Utilities.6.1.6.Content=Utilities
 Utilities.6.1.6.Download=https://www.dropbox.com/scl/fi/zo6ve6h67jluj25zkni9z/Utilities-6.1.6.zip?rlkey=qmp8jzvx54roz3l72zovvk6we&st=wfvj3oxf&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.1.6.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=6.1.6.0-beta
-Release=6.1.5.0-release
+Development=6.1.6.0-release
+Release=6.1.6.0-release

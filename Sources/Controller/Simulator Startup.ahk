@@ -2708,7 +2708,7 @@ startSimulator() {
 
 		try {
 			for ignore, directory in [kBinariesDirectory, kResourcesDirectory . "Setup\Installer\"
-									, kResourcesDirectory . "Setup\Plugins\"] {
+									, kResourcesDirectory . "Setup\Windows Runtimes\", kResourcesDirectory . "Setup\Plugins\"] {
 				currentDirectory := A_WorkingDir
 
 				try {

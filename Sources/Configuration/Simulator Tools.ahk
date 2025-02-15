@@ -726,7 +726,8 @@ checkInstallation() {
 				try {
 					installComponents(packageLocation, installLocation)
 
-					for ignore, directory in [kBinariesDirectory, kResourcesDirectory . "Setup\Installer\", kResourcesDirectory . "Setup\Windows Runtimes\"] {
+					for ignore, directory in [kBinariesDirectory, kResourcesDirectory . "Setup\Installer\"
+											, kResourcesDirectory . "Setup\Windows Runtimes\", kResourcesDirectory . "Setup\Plugins\"] {
 						showProgress({progress: ++gProgressCount, message: translate("Unblocking Applications and DLLs...")})
 
 						currentDirectory := A_WorkingDir

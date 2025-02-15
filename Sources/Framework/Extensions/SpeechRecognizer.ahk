@@ -20,6 +20,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "CLR.ahk"
+#Include "JSON.ahk"
 #Include "HTTP.ahk"
 #Include "Task.ahk"
 #Include "SpeechSynthesizer.ahk"
@@ -181,6 +182,9 @@ initializeGoogleLanguages() {
 
 initializeGoogleLanguages()
 
+global kWhisperModels := ["tiny", "tiny.en", "base", "base.en", "small", "small.en"
+						, "medium", "medium.en", "large", "turbo"]
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Class Section                           ;;;
@@ -192,13 +196,16 @@ initializeGoogleLanguages()
 
 class SpeechRecognizer {
 	iEngine := false
+	iModel := false
+
 	iChoices := CaseInsenseMap()
 
 	iMode := "Grammar"
 
 	iGoogleMode := "HTTP"
 	iGoogleAPIKey := false
-	iGoogleCapturedAudioFile := false
+
+	iCapturedAudioFile := false
 
 	static sAudioRoutingInitialized := false
 	static sRecognizerAudioDevice := false
@@ -221,9 +228,15 @@ class SpeechRecognizer {
 		}
 	}
 
+	Model {
+		Get {
+			return this.iModel
+		}
+	}
+
 	Method {
 		Get {
-			return (inList(["Azure", "Google"], this.Engine) ? "Text" : "Pattern")
+			return (inList(["Azure", "Google", "Whisper"], this.Engine) ? "Text" : "Pattern")
 		}
 	}
 
@@ -263,9 +276,16 @@ class SpeechRecognizer {
 	__New(engine, recognizer := false, language := false, silent := false, mode := "Grammar") {
 		global kNirCmd
 
-		local dllName := ((InStr(engine, "Google|") = 1) ? "Google.Speech.Recognizer.dll" : "Microsoft.Speech.Recognizer.dll")
-		local dllFile := (kBinariesDirectory . ((InStr(engine, "Google|") = 1) ? "Google\" : "Microsoft\") . dllName)
-		local instance, choices, found, ignore, recognizerDescriptor, configuration, audioDevice
+		local dllName, dllFile, instance, choices, found, ignore, recognizerDescriptor, configuration, audioDevice
+
+		if (InStr(engine, "Whisper") = 1) {
+			dllName := "Audio Recorder.dll"
+			dllFile := (kBinariesDirectory . "Audio Recorder\" . dllName)
+		}
+		else {
+			dllName := ((InStr(engine, "Google|") = 1) ? "Google.Speech.Recognizer.dll" : "Microsoft.Speech.Recognizer.dll")
+			dllFile := (kBinariesDirectory . ((InStr(engine, "Google|") = 1) ? "Google\" : "Microsoft\") . dllName)
+		}
 
 		this.iEngine := engine
 		this.Instance := false
@@ -382,6 +402,16 @@ class SpeechRecognizer {
 
 				instance.SetEngine(engine)
 			}
+			else if (engine = "Whisper") {
+				if !FileExist(kUserHomeDirectory . "Programs\Whisper Runtime\faster-whisper-xxl.exe")
+					throw Exception("Unsupported engine detected in SpeechRecognizer.__New...")
+
+				this.iEngine := "Whisper"
+
+				instance := CLR_LoadLibrary(dllFile).CreateInstance("AudioRecorder.AudioRecorder")
+
+				this.Instance := instance
+			}
 			else
 				throw Exception("Unsupported engine detected in SpeechRecognizer.__New...")
 
@@ -407,7 +437,17 @@ class SpeechRecognizer {
 
 				found := false
 
-				if ((recognizer == true) && language) {
+				if (this.Engine = "Whisper") {
+					found := true
+
+					if ((recognizer == true) && (language = "en"))
+						recognizer := "medium.en"
+					else if (recognizer == true)
+						recognizer := "medium"
+					else if (recognizer && !inList(kWhisperModels, recognizer))
+						recognizer := "medium"
+				}
+				else if ((recognizer == true) && language) {
 					for ignore, recognizerDescriptor in this.getRecognizerList()
 						if ((recognizerDescriptor.Language = language) && ((this.Engine != "Google") || (recognizerDescriptor.Model = "latest_short"))) {
 							recognizer := recognizerDescriptor.ID
@@ -428,7 +468,7 @@ class SpeechRecognizer {
 						}
 
 				if !found
-					recognizer := 0
+					recognizer := ((this.Engine = "Whisper") ? "medium" : 0)
 
 				this.initialize(recognizer)
 			}
@@ -499,6 +539,8 @@ class SpeechRecognizer {
 					recognizerList.Push({ID: index, Name: name . " (" . culture . ")", Culture: culture, Language: language, Model: model})
 				}
 		}
+		else if (this.Engine = "Whisper")
+			recognizerList := kWhisperModels
 		else if this.Instance {
 			loop this.Instance.GetRecognizerCount() {
 				index := A_Index - 1
@@ -529,6 +571,8 @@ class SpeechRecognizer {
 				this.Instance.SetLanguage(recognizer.Culture)
 				this.Instance.SetModel(recognizer.Model)
 			}
+			else if (this.Engine = "Whisper")
+				this.iModel := id
 			else if (id > this.Instance.getRecognizerCount() - 1)
 				throw "Invalid recognizer ID (" . id . ") detected in SpeechRecognizer.initialize..."
 			else
@@ -556,10 +600,10 @@ class SpeechRecognizer {
 		}
 
 		if this.Instance {
-			if (this.Engine = "Google") {
-				this.iGoogleCapturedAudioFile := temporaryFileName("capturedAudio", "wav")
+			if ((this.Engine = "Google") || (this.Engine = "Whisper")) {
+				this.iCapturedAudioFile := temporaryFileName("capturedAudio", "wav")
 
-				return this.Instance.StartRecognizer(this.iGoogleCapturedAudioFile)
+				return this.Instance.StartRecognizer(this.iCapturedAudioFile)
 			}
 			else
 				return this.Instance.StartRecognizer()
@@ -575,15 +619,15 @@ class SpeechRecognizer {
 
 		try {
 			if (this.Instance ? this.Instance.StopRecognizer() : false) {
-				if ((this.Engine = "Google") && (this.iGoogleMode = "HTTP") && this.iGoogleCapturedAudioFile)
+				if ((((this.Engine = "Google") && (this.iGoogleMode = "HTTP")) || (this.Engine = "Whisper")) && this.iCapturedAudioFile)
 					try {
-						this.processAudio(this.iGoogleCapturedAudioFile)
+						this.processAudio(this.iCapturedAudioFile)
 					}
 					finally {
 						if !isDebug()
-							deleteFile(this.iGoogleCapturedAudioFile)
+							deleteFile(this.iCapturedAudioFile)
 
-						this.iGoogleCapturedAudioFile := false
+						this.iCapturedAudioFile := false
 					}
 
 				return true
@@ -610,27 +654,32 @@ class SpeechRecognizer {
 	}
 
 	processAudio(audioFile) {
-		request := Map("config", Map("languageCode", this.Instance.GetLanguage(), "model", this.Instance.GetModel()
-								   , "useEnhanced", true)
-					 , "audio", Map("content", this.Instance.ReadAudio(audioFile)))
+		if (this.Engine = "Google") {
+			request := Map("config", Map("languageCode", this.Instance.GetLanguage(), "model", this.Instance.GetModel()
+									   , "useEnhanced", true)
+						 , "audio", Map("content", this.Instance.ReadAudio(audioFile)))
 
-		result := WinHttpRequest().POST("https://speech.googleapis.com/v1/speech:recognize?key=" . this.iGoogleAPIKey
-									  , JSON.print(request), Map("Content-Type", "application/json"), {Object: true, Encoding: "UTF-8"})
+			result := WinHttpRequest().POST("https://speech.googleapis.com/v1/speech:recognize?key=" . this.iGoogleAPIKey
+										  , JSON.print(request), Map("Content-Type", "application/json"), {Object: true, Encoding: "UTF-8"})
 
-		try {
-			if ((result.Status >= 200) && (result.Status < 300)) {
-				result := result.JSON
+			try {
+				if ((result.Status >= 200) && (result.Status < 300)) {
+					result := result.JSON
 
-				if result.Has("results")
-					this._onTextCallback(result["results"][1]["alternatives"][1]["transcript"])
+					if result.Has("results")
+						this._onTextCallback(result["results"][1]["alternatives"][1]["transcript"])
+				}
+				else
+					throw "Error while speech recognition..."
 			}
-			else
-				throw "Error while speech recognition..."
-		}
-		catch Any as exception {
-			logError(exception, true)
+			catch Any as exception {
+				logError(exception, true)
 
-			SpeechSynthesizer("Windows", true, "EN").speak("Error while calling Google Speech Services. Maybe your monthly contingent is exhausted.")
+				SpeechSynthesizer("Windows", true, "EN").speak("Error while calling Google Speech Services. Maybe your monthly contingent is exhausted.")
+			}
+		}
+		else if this.Model {
+			RunWait(kUserHomeDirectory . "Programs\Whisper Runtime\faster-whisper-xxl.exe `"" . audioFile . "`" -o source --language " . this.Language . " -f JSON -m " . this.Model . " --beep_off", , "Hide")
 		}
 	}
 
@@ -651,7 +700,7 @@ class SpeechRecognizer {
 		if isSet(name) {
 			if this.iChoices.Has(name)
 				return this.iChoices[name]
-			else if ((this.Engine = "Azure") || (this.Engine = "Google") || (this.Engine = "Compiler"))
+			else if ((this.Engine = "Azure") || (this.Engine = "Google") || (this.Engine = "Compiler") || (this.Engine = "Whisper"))
 				return []
 			else
 				return (this.Instance ? ((this.Engine = "Server") ? this.Instance.GetServerChoices(name) : this.Instance.GetDesktopChoices(name)) : [])

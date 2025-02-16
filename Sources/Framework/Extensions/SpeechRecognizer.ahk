@@ -663,6 +663,8 @@ class SpeechRecognizer {
 	}
 
 	processAudio(audioFile) {
+		local request, result, name
+
 		if (this.Engine = "Google") {
 			request := Map("config", Map("languageCode", this.Instance.GetLanguage(), "model", this.Instance.GetModel()
 									   , "useEnhanced", true)
@@ -688,7 +690,23 @@ class SpeechRecognizer {
 			}
 		}
 		else if this.Model {
-			RunWait(kUserHomeDirectory . "Programs\Whisper Runtime\faster-whisper-xxl.exe `"" . audioFile . "`" -o source --language " . this.Language . " -f JSON -m " . this.Model . " --beep_off", , "Hide")
+			DirCreate(kTempDirectory . "Whisper")
+
+			RunWait(kUserHomeDirectory . "Programs\Whisper Runtime\faster-whisper-xxl.exe `"" . audioFile . "`" -o `"" . kTempDirectory . "Whisper" . "`" --language " . this.Language . " -f JSON -m " . this.Model . " --beep_off", , "Hide")
+
+			deleteFile(audioFile)
+
+			SplitPath(audioFile, , , , &name)
+
+			try {
+				result := JSON.parse(FileRead(kTempDirectory . "Whisper\" . name . ".JSON"))
+
+				if result.Has("transcription")
+					this._onTextCallback(result["text"])
+			}
+			catch Any as exception {
+				logError(exception)
+			}
 		}
 	}
 

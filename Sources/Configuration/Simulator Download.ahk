@@ -166,8 +166,7 @@ downloadSimulatorController() {
 
 					deleteDirectory(A_Temp . "\Simulator Controller")
 
-					if (RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Simulator Controller.zip' -DestinationPath '" . A_Temp . "\Simulator Controller' -Force", , "Hide") != 0)
-						throw "Extraction of installation package from archive failed..."
+					RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Simulator Controller.zip' -DestinationPath '" . A_Temp . "\Simulator Controller' -Force", , "Hide")
 
 					exitOthers()
 
@@ -195,7 +194,7 @@ downloadSimulatorController() {
 							withBlockedWindows(MsgBox, translate("An error occured while starting the automatic instalation due to Windows security restrictions. You can try a manual installation."), translate("Error"), 262160)
 							OnMessage(0x44, translateOkButton, 0)
 
-							Run("https://github.com/SeriousOldMan/Simulator-Controller#latest-release-builds")
+							Run("https://github.com/SeriousOldMan/Simulator-Controller#latest-release-build")
 
 							ExitApp(0)
 						}
@@ -204,7 +203,7 @@ downloadSimulatorController() {
 						}
 					}
 					else
-						throw "Archive did not contain an installation package..."
+						throw "Archive does not contain a valid installation package..."
 
 					break
 				}
@@ -245,7 +244,7 @@ downloadSimulatorController() {
 				withBlockedWindows(MsgBox, translate("An error occured while starting the automatic instalation due to Windows security restrictions. You can try a manual installation."), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
 
-				Run("https://github.com/SeriousOldMan/Simulator-Controller#latest-release-builds")
+				Run("https://github.com/SeriousOldMan/Simulator-Controller#latest-release-build")
 			}
 
 			Sleep(1000)
@@ -253,7 +252,7 @@ downloadSimulatorController() {
 			hideProgress()
 		}
 		else
-			Run("https://github.com/SeriousOldMan/Simulator-Controller#latest-release-builds")
+			Run("https://github.com/SeriousOldMan/Simulator-Controller#latest-release-build")
 	}
 
 	ExitApp(0)

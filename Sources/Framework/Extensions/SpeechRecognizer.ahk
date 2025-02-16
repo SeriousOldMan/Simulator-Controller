@@ -726,7 +726,7 @@ class SpeechRecognizer {
 		else if this.Model {
 			DirCreate(kTempDirectory . "Whisper")
 
-			RunWait(kUserHomeDirectory . "Programs\Whisper Runtime\faster-whisper-xxl.exe `"" . audioFile . "`" -o `"" . kTempDirectory . "Whisper" . "`" --language " . this.Language . " -f JSON -m " . this.Model . " --beep_off", , "Hide")
+			RunWait(kUserHomeDirectory . "Programs\Whisper Runtime\faster-whisper-xxl.exe `"" . audioFile . "`" -o `"" . kTempDirectory . "Whisper" . "`" --language " . StrLower(this.Language) . " -f json -m " . StrLower(this.Model) . " --beep_off", , "Hide")
 
 			deleteFile(audioFile)
 
@@ -735,7 +735,7 @@ class SpeechRecognizer {
 			try {
 				result := JSON.parse(FileRead(kTempDirectory . "Whisper\" . name . ".JSON"))
 
-				if result.Has("transcription")
+				if result.Has("text")
 					this._onTextCallback(result["text"])
 			}
 			catch Any as exception {
@@ -877,7 +877,7 @@ class SpeechRecognizer {
 
 		if this.Instance
 			for index, value in strings {
-				rating := this.Instance.Compare(string, value)
+				rating := matchWords(string, value)
 
 				if (rating > minRating) {
 					ratings.Push({Rating: rating, Target: value})
@@ -903,7 +903,7 @@ class SpeechRecognizer {
 
 		if this.Instance
 			for key, value in strings {
-				rating := this.Instance.Compare(string, value)
+				rating := matchWords(string, value)
 
 				if ((rating > minRating) && (highestRating < rating)) {
 					highestRating := rating

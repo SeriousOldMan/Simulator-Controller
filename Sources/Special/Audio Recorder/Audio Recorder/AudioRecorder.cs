@@ -1,6 +1,6 @@
 ﻿using NAudio.Wave;
 
-namespace AudioRecorder
+namespace Speech
 {
     public class AudioRecorder
     {
@@ -10,13 +10,13 @@ namespace AudioRecorder
         /// <summary>
         ///  The main entry point for the application.
         /// </summary>
-        AudioRecorder()
+        public AudioRecorder()
         {
         }
 
-        void StartRecording(string fileName) {
+        public bool StartRecognizer(string fileName) {
             if (writer != null)
-                StopRecording();
+                StopRecognizer();
 
             waveIn = new WaveInEvent();
 
@@ -35,9 +35,11 @@ namespace AudioRecorder
                 }
                 */
             };
+
+            return true;
         }
 
-        void StopRecording() {
+        public bool StopRecognizer() {
             if (writer != null)
             {
                 waveIn.StopRecording();
@@ -46,7 +48,11 @@ namespace AudioRecorder
                 writer = null;
 
                 waveIn = null;
+
+                return true;
             }
+            else
+                return false;
         }
     }
 }

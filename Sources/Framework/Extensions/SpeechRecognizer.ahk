@@ -417,9 +417,24 @@ class SpeechRecognizer {
 
 				this.iEngine := "Whisper"
 
-				instance := CLR_LoadLibrary(dllFile).CreateInstance("AudioRecorder.AudioRecorder")
+				library := CLR_LoadLibrary(dllFile)
+				instance := library.CreateInstance("Speech.AudioRecorder")
 
 				this.Instance := instance
+
+				choices := []
+
+				loop 101
+					choices.Push((A_Index - 1) . "")
+
+				this.setChoices("Number", choices)
+
+				choices := []
+
+				loop 10
+					choices.Push((A_Index - 1) . "")
+
+				this.setChoices("Digit", choices)
 			}
 			else
 				throw Exception("Unsupported engine detected in SpeechRecognizer.__New...")
@@ -612,7 +627,14 @@ class SpeechRecognizer {
 			if ((this.Engine = "Google") || (this.Engine = "Whisper")) {
 				this.iCapturedAudioFile := temporaryFileName("capturedAudio", "wav")
 
-				return this.Instance.StartRecognizer(this.iCapturedAudioFile)
+				try {
+					return this.Instance.StartRecognizer(this.iCapturedAudioFile)
+				}
+				catch Any as exception {
+					logError(exception)
+
+					return false
+				}
 			}
 			else
 				return this.Instance.StartRecognizer()
@@ -643,6 +665,9 @@ class SpeechRecognizer {
 			}
 			else
 				return false
+		}
+		catch Any as exception {
+			logError(exception)
 		}
 		finally {
 			if (audioDevice && kNirCmd) {
@@ -709,7 +734,7 @@ class SpeechRecognizer {
 		if isSet(name) {
 			if this.iChoices.Has(name)
 				return this.iChoices[name]
-			else if ((this.Engine = "Azure") || (this.Engine = "Google") || (this.Engine = "Compiler") || (this.Engine = "Whisper"))
+			else if inList(["Azure", "Google", "Compiler", "Whisper"], this.Engine)
 				return []
 			else
 				return (this.Instance ? ((this.Engine = "Server") ? this.Instance.GetServerChoices(name) : this.Instance.GetDesktopChoices(name)) : [])
@@ -739,7 +764,7 @@ class SpeechRecognizer {
 			switch this.Engine, false {
 				case "Desktop":
 					return this.Instance.NewDesktopGrammar()
-				case "Azure", "Google", "Compiler":
+				case "Azure", "Google", "Compiler", "Whisper":
 					return Grammar()
 				case "Server":
 					return this.Instance.NewServerGrammar()
@@ -754,7 +779,7 @@ class SpeechRecognizer {
 			switch this.Engine, false {
 				case "Desktop":
 					return this.Instance.NewDesktopChoices(isObject(choices) ? values2String(", ", choices*) : choices)
-				case "Azure", "Google", "Compiler":
+				case "Azure", "Google", "Compiler", "Whisper":
 					return Grammar.Choices(!isObject(choices) ? string2Values(",", choices) : choices)
 				case "Server":
 					return this.Instance.NewServerChoices(isObject(choices) ? values2String(", ", choices*) : choices)
@@ -765,7 +790,7 @@ class SpeechRecognizer {
 	}
 
 	registerRecognitionHandler(owner, handler) {
-		if inList(["Azure", "Google"], this.Engine)
+		if inList(["Azure", "Google", "Whisper"], this.Engine)
 			this._recognitionHandlers.Push(Array(owner, handler))
 	}
 
@@ -791,7 +816,7 @@ class SpeechRecognizer {
 
 		this._grammarCallbacks[name] := callback
 
-		if ((this.Engine = "Azure") || (this.Engine = "Google") || (this.Engine = "Compiler")) {
+		if inList(["Azure", "Google", "Compiler", "Whisper"], this.Engine) {
 			Task.startTask(prepareGrammar.Bind(name, theGrammar), 1000, kLowPriority)
 
 			theGrammar := {Name: name, Grammar: theGrammar, Callback: callback}

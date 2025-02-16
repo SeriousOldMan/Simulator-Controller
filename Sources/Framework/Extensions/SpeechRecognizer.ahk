@@ -258,18 +258,27 @@ class SpeechRecognizer {
 
 	Recognizers[language := false] {
 		Get {
-			local result := []
-			local ignore, recognizer
+			local result, ignore, recognizer
 
-			for ignore, recognizer in this.getRecognizerList()
-				if language {
-					if (recognizer.Language = language)
-						result.Push(recognizer.Name)
-				}
+			if (this.Engine = "Whisper") {
+				if (language = "en")
+					return kWhisperModels
 				else
-					result.Push(recognizer.Name)
+					return choose(kWhisperModels, (m) => !InStr(m, ".en"))
+			}
+			else {
+				result := []
 
-			return result
+				for ignore, recognizer in this.getRecognizerList()
+					if language {
+						if (recognizer.Language = language)
+							result.Push(recognizer.Name)
+					}
+					else
+						result.Push(recognizer.Name)
+
+				return result
+			}
 		}
 	}
 
@@ -403,7 +412,7 @@ class SpeechRecognizer {
 				instance.SetEngine(engine)
 			}
 			else if (engine = "Whisper") {
-				if !FileExist(kUserHomeDirectory . "Programs\Whisper Runtime\faster-whisper-xxl.exe")
+				if (!isDebug() && !FileExist(kUserHomeDirectory . "Programs\Whisper Runtime\faster-whisper-xxl.exe"))
 					throw Exception("Unsupported engine detected in SpeechRecognizer.__New...")
 
 				this.iEngine := "Whisper"
@@ -418,7 +427,7 @@ class SpeechRecognizer {
 			this.setMode(mode)
 
 			if (engine != "Compiler") {
-				if (this.Instance.OkCheck() != "OK") {
+				if ((engine != "Whisper") && (this.Instance.OkCheck() != "OK")) {
 					logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
 					logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
 

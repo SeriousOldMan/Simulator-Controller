@@ -47,6 +47,7 @@ namespace Speech
                 writer?.Dispose();
                 writer = null;
 
+                waveIn?.Dispose();
                 waveIn = null;
 
                 return true;

@@ -196,6 +196,7 @@ global kWhisperModels := ["tiny", "tiny.en", "base", "base.en", "small", "small.
 
 class SpeechRecognizer {
 	iEngine := false
+	iLanguage := "en"
 	iModel := false
 
 	iChoices := CaseInsenseMap()
@@ -225,6 +226,12 @@ class SpeechRecognizer {
 	Engine {
 		Get {
 			return this.iEngine
+		}
+	}
+
+	Language {
+		Get {
+			return this.iLanguage
 		}
 	}
 
@@ -301,6 +308,11 @@ class SpeechRecognizer {
 		this.RecognizerList := []
 		this.iMode := mode
 
+		if !language
+			language := "en"
+
+		this.iLanguage := language
+
 		try {
 			if (!FileExist(dllFile)) {
 				logMessage(kLogCritical, translate("Speech.Recognizer.dll not found in ") . kBinariesDirectory)
@@ -333,9 +345,6 @@ class SpeechRecognizer {
 								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 			}
-
-			if !language
-				language := "en"
 
 			if ((InStr(engine, "Azure|") == 1) || (engine = "Compiler")) {
 				instance := CLR_LoadLibrary(dllFile).CreateInstance("Speech.MicrosoftSpeechRecognizer")

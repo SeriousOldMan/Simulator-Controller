@@ -54,7 +54,7 @@ updateProgress(max) {
 downloadSimulatorController() {
 	local icon := kIconsDirectory . "Installer.ico"
 	local options, index, cState, devVersion, release, version, package, updateTask
-	local directory, currentDirectory, start, ignore, url, error
+	local directory, currentDirectory, ignore, url, error
 
 	exitOthers() {
 		loop 20
@@ -139,22 +139,71 @@ downloadSimulatorController() {
 			package := getMultiMapValue(release, "Release", "Download", false)
 
 		if package {
-			showProgress({color: "Green", title: translate(inList(A_Args, "-Update") ? "Updating Simulator Controller" : "Installing Simulator Controller")
-						, message: translate("Downloading Version ") . version})
-
-			updateTask := PeriodicTask(updateProgress.Bind(45), 1500)
-
-			updateTask.start()
-			
-			deleteFile(A_Temp . "\Simulator Controller.zip")
-
-			error := false
+			exitOthers()
 
 			for ignore, url in string2Values(";", package)
 				try {
+					error := false
+
+					showProgress({progress: 0, color: "Green", title: translate(inList(A_Args, "-Update") ? "Updating Simulator Controller" : "Installing Simulator Controller")
+								, message: translate("Downloading Version ") . version})
+
+					updateTask := PeriodicTask(updateProgress.Bind(45), 1500)
+
+					updateTask.start()
+
+					deleteFile(A_Temp . "\Simulator Controller.zip")
+
 					Download(url, A_Temp . "\Simulator Controller.zip")
 
-					error := false
+					updateTask.stop()
+
+					updateTask := PeriodicTask(updateProgress.Bind(90), 1000)
+
+					updateTask.start()
+
+					showProgress({message: translate("Extracting installation files...")})
+
+					deleteDirectory(A_Temp . "\Simulator Controller")
+
+					RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Simulator Controller.zip' -DestinationPath '" . A_Temp . "\Simulator Controller' -Force", , "Hide")
+
+					exitOthers()
+
+					deleteFile(A_Temp . "\Simulator Controller.zip")
+
+					directory := (A_Temp . "\Simulator Controller")
+
+					if FileExist(directory . "\Simulator Controller")
+						directory .= "\Simulator Controller"
+
+					if DirExist(directory . "\Binaries") {
+						currentDirectory := A_WorkingDir
+
+						try {
+							showProgress({message: translate("Unblocking Applications and DLLs...")})
+
+							SetWorkingDir(directory . "\Binaries")
+
+							RunWait("Powershell -Command Get-ChildItem -Path '.' | Unblock-File", , "Hide")
+						}
+						catch Any as exception {
+							logError(exception, true)
+
+							OnMessage(0x44, translateOkButton)
+							withBlockedWindows(MsgBox, translate("An error occured while starting the automatic instalation due to Windows security restrictions. You can try a manual installation."), translate("Error"), 262160)
+							OnMessage(0x44, translateOkButton, 0)
+
+							Run("https://github.com/SeriousOldMan/Simulator-Controller#latest-release-build")
+
+							ExitApp(0)
+						}
+						finally {
+							SetWorkingDir(currentDirectory)
+						}
+					}
+					else
+						throw "Archive does not contain a valid installation package..."
 
 					break
 				}
@@ -165,73 +214,6 @@ downloadSimulatorController() {
 			if error {
 				logError(error, true)
 
-				OnMessage(0x44, translateOkButton)
-				withBlockedWindows(MsgBox, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
-				OnMessage(0x44, translateOkButton, 0)
-
-				ExitApp(0)
-			}
-
-			exitOthers()
-
-			updateTask.stop()
-
-			updateTask := PeriodicTask(updateProgress.Bind(90), 1000)
-
-			updateTask.start()
-
-			showProgress({message: translate("Extracting installation files...")})
-
-			deleteDirectory(A_Temp . "\Simulator Controller")
-
-			try {
-				RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Simulator Controller.zip' -DestinationPath '" . A_Temp . "\Simulator Controller' -Force", , "Hide")
-			}
-			catch Any as exception {
-				logError(exception, true)
-
-				OnMessage(0x44, translateOkButton)
-				withBlockedWindows(MsgBox, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
-				OnMessage(0x44, translateOkButton, 0)
-
-				ExitApp(0)
-			}
-
-			exitOthers()
-
-			deleteFile(A_Temp . "\Simulator Controller.zip")
-
-			directory := (A_Temp . "\Simulator Controller")
-
-			if FileExist(directory . "\Simulator Controller")
-				directory .= "\Simulator Controller"
-
-			showProgress({message: translate("Unblocking Applications and DLLs...")})
-
-			currentDirectory := A_WorkingDir
-
-			if DirExist(directory . "\Binaries") {
-				try {
-					SetWorkingDir(directory . "\Binaries")
-
-					RunWait("Powershell -Command Get-ChildItem -Path '.' | Unblock-File", , "Hide")
-				}
-				catch Any as exception {
-					logError(exception, true)
-
-					OnMessage(0x44, translateOkButton)
-					withBlockedWindows(MsgBox, translate("An error occured while starting the automatic instalation due to Windows security restrictions. You can try a manual installation."), translate("Error"), 262160)
-					OnMessage(0x44, translateOkButton, 0)
-
-					Run("https://github.com/SeriousOldMan/Simulator-Controller#latest-release-builds")
-
-					ExitApp(0)
-				}
-				finally {
-					SetWorkingDir(currentDirectory)
-				}
-			}
-			else {
 				OnMessage(0x44, translateOkButton)
 				withBlockedWindows(MsgBox, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
@@ -252,11 +234,8 @@ downloadSimulatorController() {
 			index := inList(A_Args, "-Start")
 
 			try {
-				if index {
-					start := A_Args[index + 1]
-
-					Run("`"" . directory . "\Binaries\Simulator Tools.exe`" -NoUpdate -Install -Start `"" . start . "`"")
-				}
+				if index
+					Run("`"" . directory . "\Binaries\Simulator Tools.exe`" -NoUpdate -Install -Start `"" . A_Args[index + 1] . "`"")
 				else
 					Run("`"" . directory . "\Binaries\Simulator Tools.exe`" -NoUpdate -Install")
 			}
@@ -265,7 +244,7 @@ downloadSimulatorController() {
 				withBlockedWindows(MsgBox, translate("An error occured while starting the automatic instalation due to Windows security restrictions. You can try a manual installation."), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
 
-				Run("https://github.com/SeriousOldMan/Simulator-Controller#latest-release-builds")
+				Run("https://github.com/SeriousOldMan/Simulator-Controller#latest-release-build")
 			}
 
 			Sleep(1000)
@@ -273,7 +252,7 @@ downloadSimulatorController() {
 			hideProgress()
 		}
 		else
-			Run("https://github.com/SeriousOldMan/Simulator-Controller#latest-release-builds")
+			Run("https://github.com/SeriousOldMan/Simulator-Controller#latest-release-build")
 	}
 
 	ExitApp(0)

@@ -348,7 +348,7 @@ checkForUpdates() {
 						if automaticUpdates
 							Run((!A_IsAdmin ? "*RunAs `"" : "`"") . kBinariesDirectory . "Simulator Download.exe`" -NoUpdate -Download -Update -Start `"" . A_ScriptFullPath . "`"")
 						else
-							Run("https://github.com/SeriousOldMan/Simulator-Controller#latest-release-builds")
+							Run("https://github.com/SeriousOldMan/Simulator-Controller#latest-release-build")
 
 						ExitApp(0)
 					}

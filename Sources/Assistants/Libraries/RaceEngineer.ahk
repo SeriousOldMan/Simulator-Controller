@@ -99,6 +99,28 @@ class TimeLossEvent extends EngineerEvent {
 	}
 }
 
+class NoTimeLossEvent extends EngineerEvent {
+	createArguments(event, arguments) {
+		local result := []
+
+		loop arguments.Length
+			result.Push(arguments.Has(A_Index) ? arguments[A_Index] : 0)
+
+		return result
+	}
+
+	createTrigger(event, phrase, arguments) {
+		return ("The driver has recovered his pace and repairs are no longer needed.")
+	}
+
+	handleEvent(event, stintLaps, delta, *) {
+		if !super.handleEvent(event, stintLaps, delta)
+			this.Assistant.reportDamageAnalysis(false, stintLaps, delta, true)
+
+		return true
+	}
+}
+
 class PressureLossEvent extends EngineerEvent {
 	createTrigger(event, phrase, arguments) {
 		static tyres := CaseInsenseMap("FL", "front left", "FR", "front right", "RL", "rear left", "RR", "rear right")
@@ -552,6 +574,10 @@ class RaceEngineer extends RaceAssistant {
 
 	reportTimeLossAction(lapsToDrive, delta) {
 		this.reportDamageAnalysis(true, lapsToDrive, delta)
+	}
+
+	reportNoTimeLossAction(lapsToDrive, delta) {
+		this.reportDamageAnalysis(false, lapsToDrive, delta, true)
 	}
 
 	getKnowledge(type, options := false) {
@@ -2809,6 +2835,7 @@ class RaceEngineer extends RaceAssistant {
 			  , repairBodywork := kUndefined, repairSuspension := kUndefined, repairEngine := kUndefined
 			  , requestDriver := kUndefined) {
 		local knowledgeBase := this.KnowledgeBase
+		local lapNr := knowledgeBase.getValue("Lap")
 		local confirm := true
 		local options := ((optionsOrLap = kUndefined) ? true : optionsOrLap)
 		local plannedLap := false
@@ -2866,7 +2893,7 @@ class RaceEngineer extends RaceAssistant {
 				targetFuel := knowledgeBase.getValue("Fuel.Amount.Target", false)
 
 				if (targetFuel && (targetFuel != refuelAmount)) {
-					if ((knowledgeBase.getValue("Lap." . knowledgeBase.getValue("Lap") . ".Fuel.Remaining") + targetFuel)
+					if ((knowledgeBase.getValue("Lap." . lapNr . ".Fuel.Remaining") + targetFuel)
 					  < knowledgeBase.getValue("Session.Settings.Fuel.Max"))
 						correctedFuel := true
 					else
@@ -3036,17 +3063,20 @@ class RaceEngineer extends RaceAssistant {
 
 				if ((options == true) || (options.HasProp("Repairs") && options.Repairs)
 				 || (repairBodywork != kUndefined) || (repairSuspension != kUndefined) || (repairEngine != kUndefined)) {
-					if knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension", false)
+					if ((knowledgeBase.getValue("Lap." . lapNr . ".Damage.Suspension", 0) > 0)
+					 && knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension", false))
 						speaker.speakPhrase("RepairSuspension")
 					else if debug
 						speaker.speakPhrase("NoRepairSuspension")
 
-					if knowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork", false)
+					if ((knowledgeBase.getValue("Lap." . lapNr . ".Damage.Bodywork", 0) > 0)
+					 && knowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork", false))
 						speaker.speakPhrase("RepairBodywork")
 					else if debug
 						speaker.speakPhrase("NoRepairBodywork")
 
-					if knowledgeBase.getValue("Pitstop.Planned.Repair.Engine", false)
+					if ((knowledgeBase.getValue("Lap." . lapNr . ".Damage.Engine", 0) > 0)
+					 && knowledgeBase.getValue("Pitstop.Planned.Repair.Engine", false))
 						speaker.speakPhrase("RepairEngine")
 					else if debug
 						speaker.speakPhrase("NoRepairEngine")
@@ -3665,7 +3695,7 @@ class RaceEngineer extends RaceAssistant {
 			}
 	}
 
-	reportDamageAnalysis(repair, stintLaps, delta) {
+	reportDamageAnalysis(repair, stintLaps, delta, clear := false) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker
 
@@ -3682,7 +3712,9 @@ class RaceEngineer extends RaceAssistant {
 				if (!knowledgeBase.getValue("InPitLane", false) && !knowledgeBase.getValue("InPit", false)) {
 					speaker := this.getSpeaker()
 
-					if repair {
+					if clear
+						speaker.speakPhrase("RepairPitstopNotNeeded", {laps: Round(stintLaps), delta: speaker.number2Speech(delta, 1)})
+					else if repair {
 						speaker.beginTalk()
 
 						try {
@@ -3839,10 +3871,10 @@ damageWarning(context, newSuspensionDamage, newBodyworkDamage, newEngineDamage) 
 	return true
 }
 
-reportDamageAnalysis(context, repair, stintLaps, delta) {
+reportDamageAnalysis(context, repair, stintLaps, delta, clear := false) {
 	context.KnowledgeBase.RaceAssistant.clearContinuation()
 
-	context.KnowledgeBase.RaceAssistant.reportDamageAnalysis(repair, stintLaps, delta)
+	context.KnowledgeBase.RaceAssistant.reportDamageAnalysis(repair, stintLaps, delta, clear)
 
 	return true
 }

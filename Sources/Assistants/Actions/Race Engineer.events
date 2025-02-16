@@ -5,6 +5,7 @@ Active=fuel_low,damage_detected,damage_time_loss,pressure_loss,weather_forecast
 fuel_low=Assistant.Class|FuelLowEvent|FuelLow||2|This event is triggered when the car is running low on fuel.
 damage_detected=Assistant.Class|DamageEvent|Damage||3|This event is triggered when new damage has been detected on the car.
 damage_time_loss=Assistant.Class|TimeLossEvent|TimeLoss||2|This event is triggered after it has become clear, that the damage costs too much time per lap.
+damage_no_time_loss=Assistant.Class|NoTimeLossEvent|NoTimeLoss||2|This event is triggered after the driver recovered his pace and repairs may no longer be needed.
 pressure_loss=Assistant.Class|PressureLossEvent|PressureLoss||2|This event is triggered when a loss of pressure on a given tyre is detected.
 [Agent.Events.Parameters]
 fuel_low.1=remainingFuel|Integer||true|The remaining amount of fuel in liters.
@@ -14,5 +15,7 @@ damage_detected.2=bodyworkDamage|Boolean||true|Indicates whether new damage to t
 damage_detected.3=engineDamage|Boolean||true|Indicates whether new damage to the engine occured.
 damage_time_loss.1=lapsToDrive|Number||true|The number of laps still to drive.
 damage_time_loss.2=timeLoss|Number||true|The time lost per lap in seconds.
+damage_no_time_loss.1=lapsToDrive|Number||true|The number of laps still to drive.
+damage_no_time_loss.2=timeLoss|Number||true|The time lost per lap in seconds.
 pressure_loss.1=tyre|String|FL,FR,RL,RR|true|A symbol (FL, FR, ...) indicating the tyre that lost pressure.
 pressure_loss.2=lostPressure|Number||true|The amount of pressure in PSI, that has been lost compared to all other tyres.

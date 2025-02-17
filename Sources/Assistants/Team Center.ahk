@@ -13695,7 +13695,7 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 			settingsGui.SetFont("s9 Norm", "Arial")
 
 			settingsGui.Add("Documentation", "x68 YP+20 w172 Center", translate("Pitstop Settings")
-						  , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#initiating-a-pitstop-for-the-current-driver")
+						  , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#initiating-a-pitstop-for-the-current-driver")
 
 			settingsGui.SetFont("s8 Norm", "Arial")
 

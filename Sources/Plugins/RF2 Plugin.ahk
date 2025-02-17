@@ -462,29 +462,35 @@ class RF2Plugin extends Sector397Plugin {
 	getPitstopOptionValues(option) {
 		local data, compound, compoundColor
 
+		static lastData := false
+
 		if (this.OpenPitstopMFDHotkey != "Off") {
+			data := this.readSessionData()
+
+			if (getMultiMapValue(data, "Stint Data", "InPitLane", false) || getMultiMapValue(data, "Stint Data", "InPit", false)) {
+				if lastData
+					data := lastData
+				else
+					return false
+			}
+			else {
+				data := this.readSessionData("Setup=true")
+
+				lastData := data
+			}
+
 			switch option, false {
 				case "Refuel":
-					data := this.readSessionData("Setup=true")
-
 					return [getMultiMapValue(data, "Setup Data", "FuelAmount", 0)]
 				case "Tyre Pressures":
-					data := this.readSessionData("Setup=true")
-
 					return [getMultiMapValue(data, "Setup Data", "TyrePressureFL", 26.1), getMultiMapValue(data, "Setup Data", "TyrePressureFR", 26.1)
 						  , getMultiMapValue(data, "Setup Data", "TyrePressureRL", 26.1), getMultiMapValue(data, "Setup Data", "TyrePressureRR", 26.1)]
 				case "Tyre Compound", "TyreCompound":
-					data := this.readSessionData("Setup=true")
-
 					return [getMultiMapValue(data, "Setup Data", "TyreCompound", false)
 						  , getMultiMapValue(data, "Setup Data", "TyreCompoundColor", false)]
 				case "Repair Suspension":
-					data := this.readSessionData("Setup=true")
-
 					return [getMultiMapValue(data, "Setup Data", "RepairSuspension", false)]
 				case "Repair Bodywork":
-					data := this.readSessionData("Setup=true")
-
 					return [getMultiMapValue(data, "Setup Data", "RepairBodywork", false)]
 				default:
 					return super.getPitstopOptionValues(option)

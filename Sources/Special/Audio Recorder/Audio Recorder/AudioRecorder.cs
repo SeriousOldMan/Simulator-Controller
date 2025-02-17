@@ -20,8 +20,6 @@ namespace Speech
 
             waveIn = new WaveInEvent();
 
-            waveIn.StartRecording();
-
             writer = new WaveFileWriter(fileName, waveIn.WaveFormat);
 
             waveIn.DataAvailable += (s, a) =>
@@ -35,6 +33,8 @@ namespace Speech
                 }
                 */
             };
+
+            waveIn.StartRecording();
 
             return true;
         }

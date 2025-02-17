@@ -87,7 +87,7 @@ isPositiveFloat(numbers*) {
 	for ignore, value in numbers {
 		value := internalValue("Float", value)
 
-		if !isFloat(value)
+		if (!isFloat(value) && !isInteger(value))
 			return false
 		else if (value < 0)
 			return false

@@ -699,7 +699,7 @@ class SpeechRecognizer {
 	}
 
 	processAudio(audioFile) {
-		local request, result, name
+		local request, result, name, install
 
 		if (this.Engine = "Google") {
 			request := Map("config", Map("languageCode", this.Instance.GetLanguage(), "model", this.Instance.GetModel()
@@ -728,7 +728,9 @@ class SpeechRecognizer {
 		else if this.Model {
 			DirCreate(kTempDirectory . "Whisper")
 
-			RunWait(kUserHomeDirectory . "Programs\Whisper Runtime\faster-whisper-xxl.exe `"" . audioFile . "`" -o `"" . kTempDirectory . "Whisper" . "`" --language " . StrLower(this.Language) . " -f json -m " . StrLower(this.Model) . " --beep_off", , "Hide")
+			install := !FileExist(kUserHomeDirectory . "Programs\Whisper Runtime\_models\faster-whisper-" . this.Model)
+
+			RunWait(kUserHomeDirectory . "Programs\Whisper Runtime\faster-whisper-xxl.exe `"" . audioFile . "`" -o `"" . kTempDirectory . "Whisper" . "`" --language " . StrLower(this.Language) . " -f json -m " . StrLower(this.Model) . " --beep_off", , install ? "" : "Hide")
 
 			deleteFile(audioFile)
 

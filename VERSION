@@ -1,10 +1,10 @@
 [Development]
-Version=6.1.7.0-dev
-Target=6.1.7.0-release
+Version=6.2.0.0-dev
+Target=6.2.0.0-release
 Date=02/17/2025
-Download=
-Changes=Engineer updates about repairs no longer needed, Engineer does not announce unnecessary repairs for a pitstop anymore, Voice recognition test mode now starts all Assistants, Prevent rF2 pitstop option walk in pitlane, Fixed download mirror handling in "Simulator Download", Fixed download mirror handling in "Siimulator Tools", Fixed unit conversion problem in "Race Settings"
-Components=Media->5.6.1,Configuration->6.1.3,Utilities->6.1.6
+Download=https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.2.0.0-dev.zip
+Changes=Engineer updates about repairs no longer needed, Engineer does not announce unnecessary repairs for a pitstop anymore, Voice recognition test mode now starts all Assistants, Prevent rF2 pitstop option walk in pitlane, Fixed download mirror handling in "Simulator Download", Fixed download mirror handling in "Siimulator Tools", Fixed unit conversion problem in "Race Settings", Implemented runtime for Whisper speech recognition
+Components=Media->5.6.1,Configuration->6.2.0,Utilities->6.1.6
 [Release]
 Version=6.1.6.0-release
 Date=02/14/2025
@@ -18,11 +18,14 @@ Media.5.6.1.Download=https://www.dropbox.com/scl/fi/3c56fjdvdd4od5t7rsuc9/Media-
 Configuration.6.1.3.Path=Resources
 Configuration.6.1.3.Content=Setup
 Configuration.6.1.3.Download=https://www.dropbox.com/scl/fi/rdnj6urr8qt3dzi5ut9up/Configuration-6.1.3.zip?rlkey=iw2utnrd185owgb32ov49rj91&st=487vvwrg&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.1.3.zip
+Configuration.6.2.0.Path=Resources
+Configuration.6.2.0.Content=Setup
+Configuration.6.2.0.Download=https://www.dropbox.com/scl/fi/e5s5e8w62cdscan2ejqp3/Configuration-6.2.0.zip?rlkey=98xz3jr9z50v8vk1fsfzlkn2a&st=vndo8e1w&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.2.0.zip
 Utilities.6.1.6.Path=.
 Utilities.6.1.6.Content=Utilities
 Utilities.6.1.6.Download=https://www.dropbox.com/scl/fi/zo6ve6h67jluj25zkni9z/Utilities-6.1.6.zip?rlkey=qmp8jzvx54roz3l72zovvk6we&st=wfvj3oxf&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.1.6.zip
 [Current]
 Type=Development
 [Version]
-Development=6.1.7.0-dev
+Development=6.2.0.0-dev
 Release=6.1.6.0-release

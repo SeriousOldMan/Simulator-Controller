@@ -1,3 +1,14 @@
+## 6.2.0.0-release 02/21/25 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Fixed validation of pressures in "Race Settings", when kPa is selected as pressure unit.
+  4. The voice recognition test mode in "Simulator Setup" and "Simulator Configuration" now starts all four Assistants.
+  5. The Race Engineer no longer informs you about repairs that are actually not needed, if a pitstop has been triggered manually using the "Team Center" or by the Race Strategist as a result of the active strategy.
+  6. The Race Engineer will now tell you that you have recovered your pace after an accident and that a repiar, which was originally recommended are actually not longer worthwhile.
+  7. When using *rFactor 2* the Race Engineer no longer requests the current pitstop settings from the simulator while the car is in the pitlane. This prevents a potential delay in pitstop servicing, if the *rFactor 2* Pitstop MFD is running through the options and settings.
+  8. The installation and update procedure has been overhauled to be more resilient against unavailable download mirrors.
+  9. A new voice recoginition system has been made available, which supports free speech and provides an excellent alternative to Azure and Google voice recognition services, as long as you have some memory available on your graphics card while runniing your preferred simulator. It is based on Whisper, a multilingual solution based on neural network technology made available in the open source by OpenAI. Please see the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#whisper-runtime) for more information on how to install and use Whsper.
+
 ## 6.1.6.0-release 02/14/25
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always

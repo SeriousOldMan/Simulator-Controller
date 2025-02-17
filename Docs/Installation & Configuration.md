@@ -365,7 +365,7 @@ Please note that it might be necessary to use one of the cloud based voice recog
 
 Whisper is a very capable speech recognition system developed by OpenAI. Whisper is open source and executes locally on your PC and it graphics card. Therefore it requires a powerful machine and a GPU with at least 6GB of free memory beside the requirements of the current simulator. To make Whisper available, do the following:
 
-1. Install CUDA libraries for your GPU. These can be typically found on on the website of the graphics card manufacturer. Here is the [link](https://developer.nvidia.com/cuda-downloads) for Nvidia GPU support.
+1. Install CUDA libraries for your GPU. These can be typically found on on the website of the graphics card manufacturer. Here is the [link](https://developer.nvidia.com/cuda-downloads) for Nvidia GPU support. A solution for AMD GPUs is described [here](https://www.xda-developers.com/nvidia-cuda-amd-zluda/).
 2. Install the [preset "Local runtime for Whisper speech recognition"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#presets--special-configurations) using "Simulator Setup". Please note that the Whisper runtime itself is a download package of around 2.5 GB, so be patient. Additionally, the chosen model will be downloaded on first execution, which will consume another 3 - 15 GB of precious space on your drive and will take some time as well to download and install.
 
 After everything is installed, Whisper Runtime will be available as speech recognition engine (a restart of "Simulator Setup" may be necessary, though). When using Whisper Runtime, you can choose between models of different sizes - I recommend to start with the "medium" model, which supports different languages, shows a good recognition quality and consumes *only* around 6 GB of graphics card memory.
@@ -379,7 +379,7 @@ After everything is installed, Whisper Runtime will be available as speech recog
 | large  |   1550 M   |        N/A         |      `large`       |    ~10 GB     |       1x       |
 | turbo  |   809 M    |        N/A         |      `turbo`       |     ~6 GB     |      ~8x       |
 
-If you are using English to interact with all Assistants, you can use one of the models with the ".en" ending. They are much smaller and also a bit faster than their Multilingual counterparts.
+If you are using English to interact with all Assistants, you can use one of the models with the ".en" ending. They are much smaller and also a bit faster than their multilingual counterparts.
 
 IMPORTANT: When you are using a given model for the first time, it will be downloaded in the background. Depending on the size of the model, this can take a very long time. Currently there is no visual feedback available, that shows the progress of the download, but you can use the Windows Task Manager and have a look at the network traffic.
 

@@ -615,25 +615,27 @@ class SpeechRecognizer {
 	startRecognizer() {
 		global kNirCmd
 
-		local audioDevice := SpeechRecognizer.sRecognizerAudioDevice
-
-		if (audioDevice && kNirCmd) {
-			try {
-				Run("`"" . kNirCmd . "`" setdefaultsounddevice `"" . audioDevice . "`"")
-			}
-			catch Any as exception {
-				logError(exception, true)
-
-				kNirCmd := false
-
-				if !kSilentMode
-					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
-							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-			}
-		}
+		local audioDevice
 
 		if this.Instance {
-			if ((this.Engine = "Google") || (this.Engine = "Whisper")) {
+			audioDevice := SpeechRecognizer.sRecognizerAudioDevice
+
+			if (audioDevice && kNirCmd) {
+				try {
+					Run("`"" . kNirCmd . "`" setdefaultsounddevice `"" . audioDevice . "`"")
+				}
+				catch Any as exception {
+					logError(exception, true)
+
+					kNirCmd := false
+
+					if !kSilentMode
+						showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
+								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				}
+			}
+
+			if ((this.Engine = "Google") || ((this.Engine = "Whisper") && this.Model)) {
 				this.iCapturedAudioFile := temporaryFileName("capturedAudio", "wav")
 
 				try {

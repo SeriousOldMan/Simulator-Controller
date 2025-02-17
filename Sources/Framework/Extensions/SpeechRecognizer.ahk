@@ -747,8 +747,11 @@ class SpeechRecognizer {
 				RunWait(kUserHomeDirectory . "Programs\Whisper Runtime\faster-whisper-xxl.exe `"" . audioFile . "`" -o `"" . kTempDirectory . "Whisper" . "`" --language " . StrLower(this.Language) . " -f json -m " . StrLower(this.Model) . " --beep_off", , "Hide")
 			}
 			finally {
-				if install
+				if install {
 					install.stop()
+
+					hideProgress()
+				}
 			}
 
 			deleteFile(audioFile)

@@ -240,22 +240,22 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		widget7 := window.Add("DropDownList", "x" . x1 . " yp w100 Choose1 vdcProviderDropDown Hidden", this.Providers)
 		widget7.OnEvent("Change", chooseProvider)
 
-		widget8 := window.Add("Edit", "x" . (x1 + 102) . " yp w" . (w1 - 102) . " h23 vdcServiceURLEdit Hidden")
+		widget8 := window.Add("Edit", "x" . (x1 + 102) . " yp w" . (w1 - 102) . " h23 W:Grow(0.3) vdcServiceURLEdit Hidden")
 		widget8.OnEvent("Change", loadModels)
 
 		widget9 := window.Add("Text", "x" . x0 . " yp+24 w120 h23 +0x200 Section Hidden vdcServiceKeyLabel", translate("Service Key"))
-		widget10 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h23 Password vdcServiceKeyEdit Hidden")
+		widget10 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h23 W:Grow(0.3) Password vdcServiceKeyEdit Hidden")
 		widget10.OnEvent("Change", loadModels)
 
 		widget11 := window.Add("Text", "x" . x0 . " yp+30 w120 h23 +0x200 vdcModelLabel Hidden", translate("Model / # Tokens"))
-		widget12 := window.Add("ComboBox", "x" . x1 . " yp w" . (w1 - 64) . " vdcModelDropDown Hidden")
-		widget13 := window.Add("Edit", "x" . (x1 + (w1 - 60)) . " yp-1 w60 h23 Number vdcMaxTokensEdit Hidden")
+		widget12 := window.Add("ComboBox", "x" . x1 . " yp w" . (w1 - 64) . " W:Grow(0.3) vdcModelDropDown Hidden")
+		widget13 := window.Add("Edit", "x" . (x1 + (w1 - 60)) . " yp-1 w60 h23 X:Move(0.3) Number vdcMaxTokensEdit Hidden")
 		widget13.OnEvent("Change", validateTokens.Bind("dcMaxTokensEdit"))
-		widget14 := window.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 Range32-131072 vdcMaxTokensRange Hidden")
+		widget14 := window.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 X:Move(0.3) Range32-131072 vdcMaxTokensRange Hidden")
 
 		widget38 := window.Add("Text", "x" . x0 . " ys+5 w120 h23 +0x200 vdcLLMRTModelLabel Hidden", translate("Model"))
-		widget31 := window.Add("Edit", "x" . x1 . " yp w" . (w1 - 24) . " vdcLLMRTModelEdit Hidden")
-		widget32 := window.Add("Button", "x" . (x1 + (w1 - 23)) . " yp h23 w23 vdcLLMRTModelButton Hidden", translate("..."))
+		widget31 := window.Add("Edit", "x" . x1 . " yp w" . (w1 - 24) . " W:Grow(0.3) vdcLLMRTModelEdit Hidden")
+		widget32 := window.Add("Button", "x" . (x1 + (w1 - 23)) . " yp h23 w23 X:Move(0.3) vdcLLMRTModelButton Hidden", translate("..."))
 		widget32.OnEvent("Click", chooseModelPath)
 
 		widget33 := window.Add("Text", "x" . x0 . " yp+24 w120 h23 +0x200 vdcLLMRTTokensLabel Hidden", translate("# Tokens / # GPULayers"))

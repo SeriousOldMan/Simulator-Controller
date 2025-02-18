@@ -191,7 +191,7 @@ installOptions(options, *) {
 
 		if (empty && valid)
 			result := kOk
-		else if !empty {
+		else if (!empty && !update) {
 			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgBox, translate("The installation folder must be empty."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)

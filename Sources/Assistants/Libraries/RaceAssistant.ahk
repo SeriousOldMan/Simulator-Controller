@@ -3853,11 +3853,11 @@ class GridRaceAssistant extends RaceAssistant {
 
 	createSessionInfo(lapNumber, valid, data, simulator, car, track) {
 		local knowledgeBase := this.KnowledgeBase
-		local driver := knowledgeBase.getValue("Driver.Car")
 		local sessionInfo := super.createSessionInfo(lapNumber, valid, data, simulator, car, track)
-		local position, classPosition
+		local driver, position, classPosition
 
 		if knowledgeBase {
+			driver := knowledgeBase.getValue("Driver.Car")
 			position := this.getPosition()
 			classPosition := (this.MultiClass ? this.getPosition(false, "Class") : position)
 

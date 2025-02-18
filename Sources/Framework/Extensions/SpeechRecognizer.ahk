@@ -812,7 +812,7 @@ class SpeechRecognizer {
 							progress := 0
 					}
 
-					Sleep(50)
+					Sleep(200)
 				}
 			}
 			finally {

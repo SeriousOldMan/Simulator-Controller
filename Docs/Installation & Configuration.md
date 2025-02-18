@@ -381,7 +381,7 @@ After everything is installed, Whisper Runtime will be available as speech recog
 
 If you are using English to interact with all Assistants, you can use one of the models with the ".en" ending. They are much smaller and also a bit faster than their multilingual counterparts.
 
-IMPORTANT: When you are using a given model for the first time, it will be downloaded in the background. Depending on the size of the model, this can take a very long time. Currently there is no visual feedback available, that shows the progress of the download, but you can use the Windows Task Manager and have a look at the network traffic.
+IMPORTANT: When you are using a given model for the first time, it will be downloaded and installed automatically. Depending on the size of the model, this can take a very long time. A progress bar will be opened while downloading, so be sure to not do this while driving.
 
 ###### Notes
 

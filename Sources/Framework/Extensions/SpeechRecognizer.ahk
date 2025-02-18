@@ -295,8 +295,8 @@ class SpeechRecognizer {
 		local dllName, dllFile, instance, choices, found, ignore, recognizerDescriptor, configuration, audioDevice
 
 		if (InStr(engine, "Whisper") = 1) {
-			dllName := "Audio Recorder.dll"
-			dllFile := (kBinariesDirectory . "Audio Recorder\" . dllName)
+			dllName := "Audio Capture.dll"
+			dllFile := (kBinariesDirectory . "Audio Capture\" . dllName)
 		}
 		else {
 			dllName := ((InStr(engine, "Google|") = 1) ? "Google.Speech.Recognizer.dll" : "Microsoft.Speech.Recognizer.dll")
@@ -426,8 +426,7 @@ class SpeechRecognizer {
 
 				this.iEngine := "Whisper"
 
-				library := CLR_LoadLibrary(dllFile)
-				instance := library.CreateInstance("Speech.AudioRecorder")
+				instance := CLR_LoadLibrary(dllFile).CreateInstance("Audio.AudioCapture")
 
 				this.Instance := instance
 
@@ -451,7 +450,7 @@ class SpeechRecognizer {
 			this.setMode(mode)
 
 			if (engine != "Compiler") {
-				if ((engine != "Whisper") && (this.Instance.OkCheck() != "OK")) {
+				if (this.Instance.OkCheck() != "OK") {
 					logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
 					logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
 
@@ -637,7 +636,7 @@ class SpeechRecognizer {
 
 			if ((this.Engine = "Google") || ((this.Engine = "Whisper") && this.Model)) {
 				this.iCapturedAudioFile := temporaryFileName("capturedAudio", "wav")
-
+msgbox 1
 				try {
 					return this.Instance.StartRecognizer(this.iCapturedAudioFile)
 				}
@@ -699,7 +698,7 @@ class SpeechRecognizer {
 	}
 
 	processAudio(audioFile) {
-		local request, result, name
+		local request, result, name, install, progress
 
 		if (this.Engine = "Google") {
 			request := Map("config", Map("languageCode", this.Instance.GetLanguage(), "model", this.Instance.GetModel()
@@ -728,7 +727,31 @@ class SpeechRecognizer {
 		else if this.Model {
 			DirCreate(kTempDirectory . "Whisper")
 
-			RunWait(kUserHomeDirectory . "Programs\Whisper Runtime\faster-whisper-xxl.exe `"" . audioFile . "`" -o `"" . kTempDirectory . "Whisper" . "`" --language " . StrLower(this.Language) . " -f json -m " . StrLower(this.Model) . " --beep_off", , "Hide")
+			install := !FileExist(kUserHomeDirectory . "Programs\Whisper Runtime\_models\faster-whisper-" . this.Model)
+
+			if (install && !kSilentMode) {
+				showProgress({progress: (progress := 0), color: "Blue", title: translate("Downloading ") . this.Model . translate("...")})
+
+				install := PeriodicTask(() {
+							   showProgress({progress: progress++})
+
+							   if (progress >= 100)
+								   progress := 0
+						   }, 500)
+
+				install.start()
+			}
+
+			try {
+				RunWait(kUserHomeDirectory . "Programs\Whisper Runtime\faster-whisper-xxl.exe `"" . audioFile . "`" -o `"" . kTempDirectory . "Whisper" . "`" --language " . StrLower(this.Language) . " -f json -m " . StrLower(this.Model) . " --beep_off", , "Hide")
+			}
+			finally {
+				if (install && !kSilentMode) {
+					install.stop()
+
+					hideProgress()
+				}
+			}
 
 			deleteFile(audioFile)
 

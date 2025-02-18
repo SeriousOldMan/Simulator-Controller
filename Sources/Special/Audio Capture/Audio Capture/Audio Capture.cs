@@ -1,8 +1,8 @@
 ﻿using NAudio.Wave;
 
-namespace Speech
+namespace Audio
 {
-    public class AudioRecorder
+    public class AudioCapture
     {
         WaveInEvent waveIn = null;
         WaveFileWriter writer = null;
@@ -10,36 +10,36 @@ namespace Speech
         /// <summary>
         ///  The main entry point for the application.
         /// </summary>
-        public AudioRecorder()
+        public AudioCapture()
         {
         }
 
-        public bool StartRecognizer(string fileName) {
+        public string OkCheck()
+        {
+            return "Ok";
+        }
+
+        public bool StartRecognizer(string fileName)
+        {
             if (writer != null)
                 StopRecognizer();
 
             waveIn = new WaveInEvent();
-
-            waveIn.StartRecording();
 
             writer = new WaveFileWriter(fileName, waveIn.WaveFormat);
 
             waveIn.DataAvailable += (s, a) =>
             {
                 writer.Write(a.Buffer, 0, a.BytesRecorded);
-
-                /*
-                if (writer.Position > waveIn.WaveFormat.AverageBytesPerSecond * 30)
-                {
-                    waveIn.StopRecording();
-                }
-                */
             };
+
+            waveIn.StartRecording();
 
             return true;
         }
 
-        public bool StopRecognizer() {
+        public bool StopRecognizer()
+        {
             if (writer != null)
             {
                 waveIn.StopRecording();

@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.2.0.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/zKxS2eUq) (Early build for 6.2.0. Changes: Engineer updates about repairs no longer needed, Engineer does not announce unnecessary repairs for a pitstop anymore, Voice recognition test mode now starts all Assistants, Prevent rF2 pitstop option walk in pitlane, Fixed download mirror handling in "Simulator Download", Fixed download mirror handling in "Siimulator Tools", Fixed unit conversion problem in "Race Settings", Implemented runtime for Whisper speech recognition.)
+[6.2.0.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/zKxS2eUq) (Early build for 6.2.0. Changes: Engineer updates about repairs no longer needed, Engineer does not announce unnecessary repairs for a pitstop anymore, Voice recognition test mode now starts all Assistants, Prevent rF2 pitstop option walk in pitlane, Fixed download mirror handling in "Simulator Download", Fixed download mirror handling in "Siimulator Tools", Fixed unit conversion problem in "Race Settings", Implemented runtime for Whisper speech recognition, Ported Team Server to .NET Runtime 8.0.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-620) of this version and all the versions you might have skipped, before installing and using this version.
 

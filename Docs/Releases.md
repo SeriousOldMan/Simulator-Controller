@@ -9,6 +9,7 @@
   8. The installation and update procedure has been overhauled to be more resilient against unavailable download mirrors.
   9. A new voice recognition system has been made available, which supports free speech and provides an excellent alternative to Azure and Google voice recognition services, as long as you have some memory available on your graphics card while runniing your preferred simulator. It is based on Whisper, a multilingual solution based on neural network technology provided in the open source by OpenAI. Please see the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#whisper-runtime) for more information on how to install and use Whisper.
   10. With the genereous support of @Caleidosttk, I have set up a new download mirror for all installation and update packages. The problems seen recently with the unavailable download repository, after so many new users joined our community, should be a thing of the past now.
+  11. [Expert] The Team Server backend has beeen ported to .NET Runtime 8.0. No action required at this point, unless you redeploy your own server.
 
 ## 6.1.6.0-release 02/14/25
   1. Minor bugfixes, as always

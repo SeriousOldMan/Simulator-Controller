@@ -1,25 +1,35 @@
 ﻿using NAudio.Wave;
+using System.IO;
+using System.Threading;
 
 namespace Audio
 {
-    public class AudioCapture
+    internal class Program
     {
-        WaveInEvent waveIn = null;
-        WaveFileWriter writer = null;
+        static WaveInEvent waveIn = null;
+        static WaveFileWriter writer = null;
 
-        /// <summary>
-        ///  The main entry point for the application.
-        /// </summary>
-        public AudioCapture()
+        static void Main(string[] args)
         {
+            bool done = false;
+            string ctrlFile = args[0];
+
+            StartRecognizer(args[1]);
+
+            while (!done)
+                if (!File.Exists(ctrlFile))
+                    Thread.Sleep(100);
+                else
+                {
+                    File.Delete(ctrlFile);
+
+                    StopRecognizer();
+
+                    done = true;
+                }
         }
 
-        public string OkCheck()
-        {
-            return "Ok";
-        }
-
-        public bool StartRecognizer(string fileName)
+        static void StartRecognizer(string fileName)
         {
             if (writer != null)
                 StopRecognizer();
@@ -34,11 +44,9 @@ namespace Audio
             };
 
             waveIn.StartRecording();
-
-            return true;
         }
 
-        public bool StopRecognizer()
+        static void StopRecognizer()
         {
             if (writer != null)
             {
@@ -49,11 +57,7 @@ namespace Audio
 
                 waveIn?.Dispose();
                 waveIn = null;
-
-                return true;
             }
-            else
-                return false;
         }
     }
 }

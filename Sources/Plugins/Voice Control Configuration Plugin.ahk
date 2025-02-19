@@ -733,7 +733,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		chosen := inList(recognizers, listener)
 
 		if (chosen == 0)
-			chosen := "1"
+			chosen := 1
 
 		this.Control["listenerDropDown"].Delete()
 		this.Control["listenerDropDown"].Add(recognizers)

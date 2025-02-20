@@ -27,7 +27,7 @@ A very special thanks goes to @Keith M and @Atlas, who has supported me numerous
 
 And I don't want forget to mention Martin Moser, who contributed large parts of the marvelous icon set for Stream Deck.
 
-Also, a big thank you goes out to @Caleidottk for providing his excellent NAS solution and some of his precious bandwidth for an additional download mirror for installation and update packages.
+Also, a big thank you goes out to @Caleidosttk for providing his excellent NAS solution and some of his precious bandwidth for an additional download mirror for installation and update packages.
 
 ### Supporters
 

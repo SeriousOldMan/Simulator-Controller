@@ -1970,7 +1970,7 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 				gear = *(int*)rawValue;
 
 			if (getRawDataValue(rawValue, header, data, "RPM"))
-				rpms = *(int*)rawValue;
+				rpms = (int)*(float*)rawValue;
 
 			if (getRawDataValue(rawValue, header, data, "LongAccel"))
 				longG = (*(float*)rawValue) / 9.807;

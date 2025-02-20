@@ -155,7 +155,7 @@ installOptions(options, *) {
 
 			if (empty && valid)
 				installGui["installLocationPathEdit"].Text := directory
-			else if !empty {
+			else if (!empty && !update) {
 				OnMessage(0x44, translateOkButton)
 				withBlockedWindows(MsgBox, translate("The installation folder must be empty."), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
@@ -191,7 +191,7 @@ installOptions(options, *) {
 
 		if (empty && valid)
 			result := kOk
-		else if !empty {
+		else if (!empty && !update) {
 			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgBox, translate("The installation folder must be empty."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
@@ -200,6 +200,8 @@ installOptions(options, *) {
 	else if (options == kCancel)
 		result := kCancel
 	else {
+		update := options.Update
+
 		result := false
 
 		installGui := Window({Options: "0x400000"}, translate("Install"))
@@ -223,7 +225,7 @@ installOptions(options, *) {
 
 		chosen := inList(["Registry", "Portable"], options.InstallType)
 
-		disabled := (options.Update ? "Disabled" : "")
+		disabled := (update ? "Disabled" : "")
 
 		installGui.Add("Text", "x16 yp+60 w100 h23 +0x200", translate("Installation Type"))
 		installGui.Add("DropDownList", "x116 yp w80 " . disabled . " Choose" . chosen . " vinstallationTypeDropDown", collect(["Registry", "Portable"], translate))
@@ -366,56 +368,57 @@ checkInstallation() {
 			if ((packageLocation = installLocation) || !installedComponents.Has(component)
 													|| (VerCompare(version, installedComponents[component]) > 0)) {
 				try {
-					showProgress({progress: (gProgressCount += 2)
-								, message: translate("Downloading ") . component . translate(" files...")})
-
 					urlError := "Package URL not defined..."
 
-					for ignore, url in string2Values(";", getMultiMapValue(packageInfo, "Components", component . "." . version . ".Download", "")) {
+					for ignore, url in string2Values(";", getMultiMapValue(packageInfo, "Components", component . "." . version . ".Download", ""))
 						try {
+							showProgress({progress: (gProgressCount += 2)
+										, message: translate("Downloading ") . component . translate(" files...")})
+
 							deleteFile(A_Temp . "\Temp.zip")
 
 							Download(url, A_Temp . "\Temp.zip")
 
-							if FileExist(A_Temp . "\Temp.zip")
-								urlError := false
-							else
+							if !FileExist(A_Temp . "\Temp.zip")
 								urlError := "Package URL not defined..."
+							else {
+								showProgress({progress: (gProgressCount += 2)
+											, message: translate("Extracting ") . component . translate(" files...")})
+
+								path := Trim(getMultiMapValue(packageInfo, "Components", component . "." . version . ".Path", ""))
+
+								if (path && (path != "") && (path != "."))
+									path := (packageLocation . "\" . path)
+								else
+									path := packageLocation
+
+								if temporary {
+									destination := (A_Temp . "\SC-Component" . componentNr)
+
+									deleteFile(destination)
+									deleteDirectory(destination)
+
+									for ignore, part in string2Values(",", getMultiMapValue(installInfo, "Components", component . "." . version . ".Content"))
+										components.Push([path . "\" . part, destination . "\" . part])
+								}
+								else
+									destination := path
+
+								RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Temp.zip' -DestinationPath '" . destination . "' -Force", , "Hide")
+
+								if (!DirExist(destination) || !FileExist(destination . "\*.*"))
+									throw "Archive does not contain a valid component package..."
+
+								showProgress({progress: (gProgressCount += 5)})
+
+								urlError := false
+
+								break
+							}
 						}
 						catch Any as exception {
 							urlError := exception
-
-							continue
 						}
-
-						showProgress({progress: (gProgressCount += 2)
-									, message: translate("Extracting ") . component . translate(" files...")})
-
-						path := Trim(getMultiMapValue(packageInfo, "Components", component . "." . version . ".Path", ""))
-
-						if (path && (path != "") && (path != "."))
-							path := (packageLocation . "\" . path)
-						else
-							path := packageLocation
-
-						if temporary {
-							destination := (A_Temp . "\SC-Component" . componentNr)
-
-							deleteFile(destination)
-							deleteDirectory(destination)
-
-							for ignore, part in string2Values(",", getMultiMapValue(installInfo, "Components", component . "." . version . ".Content"))
-								components.Push([path . "\" . part, destination . "\" . part])
-						}
-						else
-							destination := path
-
-						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Temp.zip' -DestinationPath '" . destination . "' -Force", , "Hide")
-
-						showProgress({progress: (gProgressCount += 5)})
-
-						break
-					}
 
 					if urlError {
 						logError(urlError, true)
@@ -726,7 +729,8 @@ checkInstallation() {
 				try {
 					installComponents(packageLocation, installLocation)
 
-					for ignore, directory in [kBinariesDirectory, kResourcesDirectory . "Setup\Installer\", kResourcesDirectory . "Setup\Windows Runtimes\"] {
+					for ignore, directory in [kBinariesDirectory, kResourcesDirectory . "Setup\Installer\"
+											, kResourcesDirectory . "Setup\Windows Runtimes\", kResourcesDirectory . "Setup\Plugins\"] {
 						showProgress({progress: ++gProgressCount, message: translate("Unblocking Applications and DLLs...")})
 
 						currentDirectory := A_WorkingDir

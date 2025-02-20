@@ -566,8 +566,6 @@ class LLMConnector {
 
 		LoadModels() {
 			try {
-				answer := WinHttpRequest({Certificate: this.Certificate}).GET(this.CreateModelsURL(this.Server), "", this.CreateHeaders(), {Encoding: "UTF-8"})
-
 				if this.Certificate {
 					try {
 						answer := WinHttpRequest({Certificate: this.Certificate}).GET(this.CreateModelsURL(this.Server), "", this.CreateHeaders(), {Encoding: "UTF-8"})
@@ -650,7 +648,7 @@ class LLMConnector {
 		}
 
 		CreateServiceURL(server) {
-			return substituteVariables(server, {model: this.Model})
+			return substituteVariables(server, {model: this.iModel})
 		}
 
 		CreateHeaders(headers) {

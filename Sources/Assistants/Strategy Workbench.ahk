@@ -100,6 +100,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	iAirTemperature := 23
 	iTrackTemperature := 27
 
+	iAutoInitialize := false
 	iFixedPitstops := false
 
 	iFixedPitstopsListView := false
@@ -294,6 +295,12 @@ class StrategyWorkbench extends ConfigurationItem {
 	TyreSetListView {
 		Get {
 			return this.iTyreSetListView
+		}
+	}
+
+	AutoInitialize {
+		Get {
+			return this.iAutoInitialize
 		}
 	}
 
@@ -1079,6 +1086,8 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm", "Arial")
 
 		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+		this.iAutoInitialize := getMultiMapValue(settings, "Strategy Workbench", "Auto Initialize", true)
 
 		this.iSelectedDataType := getMultiMapValue(settings, "Strategy Workbench", "Data Type", "Electronics")
 
@@ -1914,9 +1923,16 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	updateSettingsMenu() {
-		local settingsMenu := collect(["Settings", "---------------------------------------------", "Initialize from Strategy", "Initialize from Settings...", "Initialize from Database", "Initialize from Telemetry", "Initialize from Simulation", "---------------------------------------------"], translate)
+		local settingsMenu := collect(["Settings", "---------------------------------------------"], translate)
 		local fileNames := getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\")
 		local validators, ignore, fileName, validator, found
+
+		if this.AutoInitialize
+			settingsMenu.Push(translate("[x]") . A_Space . translate("Auto Initialize"))
+		else
+			settingsMenu.Push(translate("[  ]") . A_Space . translate("Auto Initialize"))
+
+		settingsMenu.Push(collect(["---------------------------------------------", "Initialize from Strategy", "Initialize from Settings...", "Initialize from Database", "Initialize from Telemetry", "Initialize from Simulation", "---------------------------------------------"], translate)*)
 
 		if this.FixedPitstops
 			settingsMenu.Push(translate("[x]") . A_Space . translate("Fixed Pitstops"))
@@ -2254,6 +2270,9 @@ class StrategyWorkbench extends ConfigurationItem {
 			this.loadTyreCompounds(simulator, car, track)
 
 			this.loadWeather(this.SelectedWeather, true)
+
+			if this.AutoInitialize
+				this.chooseSettingsMenu("Database")
 		}
 	}
 
@@ -2554,7 +2573,15 @@ class StrategyWorkbench extends ConfigurationItem {
 		local validators, index, fileName, validator, index, forecast, time, hour, minute, value, fixedPitstop
 
 		switch line {
-			case 3: ; "Load from Strategy"
+			case 3:
+				this.iAutoInitialize := !this.AutoInitialize
+
+				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+				setMultiMapValue(settings, "Strategy Workbench", "Auto Initialize", this.AutoInitialize)
+
+				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+			case 5, "Strategy": ; "Load from Strategy"
 				if (simulator && car && track) {
 					strategy := this.SelectedStrategy
 
@@ -2762,7 +2789,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					withBlockedWindows(MsgBox, translate("You must first select a car and a track."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
-			case 4: ; "Load from Settings..."
+			case 6: ; "Load from Settings..."
 				if (simulator && car && track) {
 					if GetKeyState("Ctrl") {
 						directory := SessionDatabase.DatabasePath
@@ -2900,7 +2927,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					withBlockedWindows(MsgBox, translate("You must first select a car and a track."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
-			case 5:
+			case 7, "Database":
 				if (simulator && car && track) {
 					settings := SettingsDatabase().loadSettings(simulator, car, track, this.SelectedWeather)
 
@@ -2965,7 +2992,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					withBlockedWindows(MsgBox, translate("You must first select a car and a track."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
-			case 6: ; "Update from Telemetry..."
+			case 8: ; "Update from Telemetry..."
 				if (simulator && car && track) {
 					telemetryDB := TelemetryDatabase(simulator, car, track, this.SelectedDrivers)
 
@@ -2990,7 +3017,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					withBlockedWindows(MsgBox, translate("You must first select a car and a track."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
-			case 7: ; "Import from Simulation..."
+			case 9: ; "Import from Simulation..."
 				if simulator {
 					prefix := SessionDatabase.getSimulatorCode(simulator)
 
@@ -3033,7 +3060,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					withBlockedWindows(MsgBox, translate("You must first select a simulation."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
-			case 9:
+			case 11:
 				if this.FixedPitstops {
 					this.iFixedPitstops := false
 
@@ -3051,7 +3078,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					}
 				}
 			default:
-				if (line = 11) {
+				if (line = 13) {
 					this.Window.Block()
 
 					try {
@@ -3061,7 +3088,7 @@ class StrategyWorkbench extends ConfigurationItem {
 						this.Window.Unblock()
 					}
 				}
-				else if (line > 11) {
+				else if (line > 13) {
 					validators := []
 
 					for ignore, fileName in getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\") {
@@ -3071,7 +3098,7 @@ class StrategyWorkbench extends ConfigurationItem {
 							validators.Push(validator)
 					}
 
-					validator := validators[line - 11]
+					validator := validators[line - 13]
 
 					if (this.iSelectedValidator = validator)
 						this.iSelectedValidator := false
@@ -3134,8 +3161,12 @@ class StrategyWorkbench extends ConfigurationItem {
 				if FileExist(fileName) {
 					strategy := readMultiMap(fileName)
 
-					if (strategy.Count > 0)
+					if (strategy.Count > 0) {
 						this.selectStrategy(this.createStrategy(strategy))
+
+						if this.AutoInitialize
+							this.chooseSettingsMenu("Strategy")
+					}
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
@@ -3153,8 +3184,12 @@ class StrategyWorkbench extends ConfigurationItem {
 					if (fileName != "") {
 						strategy := readMultiMap(fileName)
 
-						if (strategy.Count > 0)
+						if (strategy.Count > 0) {
 							this.selectStrategy(this.createStrategy(strategy))
+
+							if this.AutoInitialize
+								this.chooseSettingsMenu("Strategy")
+						}
 					}
 				}
 				else {
@@ -3178,8 +3213,12 @@ class StrategyWorkbench extends ConfigurationItem {
 							try {
 								strategy := sessionDB.readStrategy(simulator, car, track, fileName)
 
-								if (strategy && (strategy.Count > 0))
+								if (strategy && (strategy.Count > 0)) {
 									this.selectStrategy(this.createStrategy(strategy))
+
+									if this.AutoInitialize
+										this.chooseSettingsMenu("Strategy")
+								}
 							}
 							catch Any as exception {
 								logError(exception)
@@ -3190,8 +3229,12 @@ class StrategyWorkbench extends ConfigurationItem {
 						else {
 							strategy := readMultiMap(directory . "\" . fileName . ".strategy")
 
-							if (strategy.Count > 0)
+							if (strategy.Count > 0) {
 								this.selectStrategy(this.createStrategy(strategy))
+
+								if this.AutoInitialize
+									this.chooseSettingsMenu("Strategy")
+							}
 						}
 					}
 				}

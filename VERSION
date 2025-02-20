@@ -3,7 +3,7 @@ Version=6.2.0.0-dev
 Target=6.2.0.0-release
 Date=02/18/2025
 Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/zKxS2eUq
-Changes=Engineer updates about repairs no longer needed, Engineer does not announce unnecessary repairs for a pitstop anymore, Voice recognition test mode now starts all Assistants, Prevent rF2 pitstop option walk in pitlane, Fixed download mirror handling in "Simulator Download", Fixed download mirror handling in "Siimulator Tools", Fixed unit conversion problem in "Race Settings", Implemented runtime for Whisper speech recognition, Ported Team Server to .NET Runtime 8.0, Fixed crash when selecting Azure GPT provider
+Changes=Engineer updates about repairs no longer needed, Engineer does not announce unnecessary repairs for a pitstop anymore, Voice recognition test mode now starts all Assistants, Prevent rF2 pitstop option walk in pitlane, Fixed download mirror handling in "Simulator Download", Fixed download mirror handling in "Siimulator Tools", Fixed unit conversion problem in "Race Settings", Implemented runtime for Whisper speech recognition, Ported Team Server to .NET Runtime 8.0, Fixed crash when selecting Azure GPT provider, Fixed Reasoning booster
 Components=Media->5.6.1,Configuration->6.2.0,Utilities->6.1.6
 [Release]
 Version=6.1.6.0-release

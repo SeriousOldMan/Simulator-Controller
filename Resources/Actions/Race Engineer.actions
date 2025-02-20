@@ -16,7 +16,7 @@ Active=plan_pitstop,cancel_pitstop,report_damage,report_time_loss,report_no_time
 [Agent.Actions.Builtin]
 plan_pitstop=Assistant.Method|planPitstopAction(%targetLap%, %refuelAmount%, %changeTyres%, %tyreCompound%, %repairDamage%, %swapDriver%)|false|false|6|Creates a plan for the next pitstop.
 cancel_pitstop=Assistant.Rule|Race Engineer.cancel_pitstop.rules|false|false|0|Clears the pitstop plan, if a pitstop is no longer needed.
-report_low_fuel=Assistant.Method|lowFuelWarning(%remainingFuel%, %remainingLaps%))|false|false|2|Reports that the car is running low on fuel.
+report_low_fuel=Assistant.Method|lowFuelWarning(%remainingFuel%, %remainingLaps%)|false|false|2|Reports that the car is running low on fuel.
 report_damage=Assistant.Method|damageWarning(%suspensionDamage%, %bodyworkDamage%, %engineDamage%)|false|false|3|Reports recent damage to the car to the driver.
 report_time_loss=Assistant.Method|reportTimeLossAction(%lapsToDrive%, %timeLoss%)|false|false|2|Reports a critical time loss after an incident has damaged the car.
 report_no_time_loss=Assistant.Method|reportNoTimeLossAction(%lapsToDrive%, %timeLoss%)|false|false|2|Reports that the driver has recovered its pace and repairs may no longer be needed.

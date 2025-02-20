@@ -3063,12 +3063,14 @@ class TrackMap {
 				if section {
 					section := section.Clone()
 
-					result := withBlockedWindows(InputBox, translate("Please enter the name of the corner:"), translate("Corner"), "w300 h100", section.HasProp("Name") ? section.Name : "")
+					if ((result = "Corner") && (section.Type = "Corner")) {
+						result := withBlockedWindows(InputBox, translate("Please enter the name of the corner:"), translate("Corner"), "w300 h100", section.HasProp("Name") ? section.Name : "")
 
-					if (result.Result = "Ok")
-						section.Name := result.Value
+						if (result.Result = "Ok")
+							section.Name := result.Value
 
-					result := "Corner"
+						result := "Corner"
+					}
 				}
 				else
 					section := Object()

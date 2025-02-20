@@ -1,4 +1,4 @@
-## 6.2.0.0-release 02/21/25 (planned)
+## 6.2.0.0-release 02/21/25
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed validation of pressures in "Race Settings", when kPa is selected as pressure unit.

@@ -5,6 +5,8 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
+using System.Globalization;
+using System.Threading;
 using System.Threading.Tasks;
 
 using iRacing.IRSDK;
@@ -15,6 +17,8 @@ namespace iRacingIBTReader
     {
         static void Main(string[] args)
         {
+			Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
+			
             convertTelemetry(args[0], args[1]);
         }
 
@@ -39,6 +43,8 @@ namespace iRacingIBTReader
             int rpmsIdx = 0;
             int longGIdx = 0;
             int latGIdx = 0;
+			
+			int lapTimeIdx = 0;
 
             for (int i = 0; i < ibtFile.getNumVars(); i++)
             {
@@ -68,6 +74,8 @@ namespace iRacingIBTReader
                     longGIdx = i;
                 else if (name == "LatAccel")
                     latGIdx = i;
+                else if (name == "LapLastLapTime")
+					lapTimeIdx = i;
             }
 
             while (true)
@@ -79,14 +87,23 @@ namespace iRacingIBTReader
 
                     if (currentLap != lap)
                     {
-                        lap = currentLap;
-
                         if (csvFile != null)
                         {
                             csvFile.Close();
 
                             csvFile = null;
+							
+							StreamWriter infoFile = new StreamWriter(telemetryDirectory + "\\Lap " + lap + ".info", false);
+
+							infoFile.WriteLine("[Info]");
+							infoFile.WriteLine("Source=iRacing");
+							infoFile.Write("Lap="); infoFile.WriteLine(lap);
+							infoFile.Write("LapTime="); infoFile.WriteLine((float)ibtFile.getVarValue(lapTimeIdx));
+
+							infoFile.Close();
                         }
+						
+                        lap = currentLap;
                     }
 
                     if (lap > 0)
@@ -116,9 +133,7 @@ namespace iRacingIBTReader
                         csvFile.Write("N/A" + ";");
                         csvFile.Write(longG + ";");
                         csvFile.Write(-latG + ";");
-                        csvFile.Write(playerRunningPct + ";");
-
-                        csvFile.WriteLine();
+                        csvFile.WriteLine(playerRunningPct);
                     }
                 }
                 else

@@ -4,13 +4,14 @@
   3. Fixed validation of pressures in "Race Settings", when kPa is selected as pressure unit.
   4. Fixed a crash in "Simulator Setup" and "Simulator Configuration" when selecting the Azure GPT provider.
   5. Fixed a rare bug for handling RPM values in the *iRacing* telemetry data acquisition.
-  6. The voice recognition test mode in "Simulator Setup" and "Simulator Configuration" now starts all four Assistants.
-  7. The Race Engineer no longer informs you about repairs that are actually not needed, if a pitstop has been triggered manually using the "Team Center" or by the Race Strategist as a result of the active strategy.
-  8. The Race Engineer will now tell you that you have recovered your pace after an accident and that a repiar, which was originally recommended are actually not longer worthwhile.
-  9. When using *rFactor 2* the Race Engineer no longer requests the current pitstop settings from the simulator while the car is in the pitlane. This prevents a potential delay in pitstop servicing, if the *rFactor 2* Pitstop MFD is running through the options and settings.
-  10. The installation and update procedure has been overhauled to be more resilient against unavailable download mirrors.
-  11. A new voice recognition system has been made available, which supports free speech and provides an excellent alternative to Azure and Google voice recognition services, as long as you have some memory available on your graphics card while runniing your preferred simulator. It is based on Whisper, a multilingual solution based on neural network technology provided in the open source by OpenAI. Please see the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#whisper-runtime) for more information on how to install and use Whisper.
-  12. With the genereous support of @Caleidosttk, I have set up a new download mirror for all installation and update packages. The problems seen recently with the unavailable download repository, after so many new users joined our community, should be a thing of the past now.
+  6. Fixed a rare bug which only shows up when the *Reasoning* booster is used and you are running out ot fuel. This caused the Engineer to loose its focus.
+  7. The voice recognition test mode in "Simulator Setup" and "Simulator Configuration" now starts all four Assistants.
+  8. The Race Engineer no longer informs you about repairs that are actually not needed, if a pitstop has been triggered manually using the "Team Center" or by the Race Strategist as a result of the active strategy.
+  9. The Race Engineer will now tell you that you have recovered your pace after an accident and that a repiar, which was originally recommended are actually not longer worthwhile.
+  10. When using *rFactor 2* the Race Engineer no longer requests the current pitstop settings from the simulator while the car is in the pitlane. This prevents a potential delay in pitstop servicing, if the *rFactor 2* Pitstop MFD is running through the options and settings.
+  11. The installation and update procedure has been overhauled to be more resilient against unavailable download mirrors.
+  12. A new voice recognition system has been made available, which supports free speech and provides an excellent alternative to Azure and Google voice recognition services, as long as you have some memory available on your graphics card while runniing your preferred simulator. It is based on Whisper, a multilingual solution based on neural network technology provided in the open source by OpenAI. Please see the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#whisper-runtime) for more information on how to install and use Whisper.
+  13. With the genereous support of @Caleidosttk, I have set up a new download mirror for all installation and update packages. The problems seen recently with the unavailable download repository, after so many new users joined our community, should be a thing of the past now.
 
 ## 6.1.6.0-release 02/14/25
   1. Minor bugfixes, as always

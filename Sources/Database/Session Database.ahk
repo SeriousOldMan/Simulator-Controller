@@ -5937,13 +5937,31 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	uploadTelemetry() {
 		local window := this.Window
+		local simulator := this.SelectedSimulator
+		local options := "*.telemetry; *.JSON; *.CSV"
+		local directory := false
 		local fileName, telemetry, file, size, info, driver, lapTime, sectorTimes, name, ignore
 
 		window.Opt("+OwnDialogs")
 
+		if ((simulator = "iRacing") && this.SessionDatabase.hasTrackMap(simulator, this.SelectedTrackrack))
+			options .= "; *.ibt"
+
 		OnMessage(0x44, translateLoadCancelButtons)
-		fileName := withBlockedWindows(FileSelect, "M1", "", translate("Upload Telemetry File..."), "Lap Telemetry (*.telemetry; *.JSON; *.CSV)")
+		fileName := withBlockedWindows(FileSelect, "M1", "", translate("Upload Telemetry File..."), "Lap Telemetry (" . options . ")")
 		OnMessage(0x44, translateLoadCancelButtons, 0)
+
+		if (!isObject(fileName) && InStr(fileName, ".ibt")) {
+			directory := (kTempDirectory . "Telemetry\IBT Import")
+
+			deleteDirectory(directory)
+
+			RunWait("`"" . kBinariesDirectory . "Connectors\iRacing IBT Reader\iRacing IBT Reader.exe`" `"" . fileName . "`" `"" . directory . "`"", , "Hide")
+
+			OnMessage(0x44, translateLoadCancelButtons)
+			fileName := withBlockedWindows(FileSelect, "M1", directory, translate("Upload Telemetry File..."), "Lap Telemetry (*.irc)")
+			OnMessage(0x44, translateLoadCancelButtons, 0)
+		}
 
 		if ((fileName != "") || (isObject(fileName) && (fileName.Length > 0))) {
 			for ignore, fileName in isObject(fileName) ? fileName : [fileName] {
@@ -6012,6 +6030,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			this.loadTelemetries(fileName)
 		}
+
+		if (directory && !isDebug())
+			deleteDirectory(directory)
 	}
 
 	downloadTelemetry(telemetryName) {

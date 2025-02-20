@@ -1654,6 +1654,49 @@ class SessionDatabase extends ConfigurationItem {
 			return false
 		}
 
+		importFromIRacing(&info) {
+			local trackData := []
+			local running, name
+
+			loop Read, this.getTrackData(simulator, track)
+				trackData.Push(string2Values(A_Space, A_LoopReadLine))
+
+			SplitPath(fileName, , , , &name)
+
+			info := newMultiMap()
+
+			setMultiMapValue(info, "Info", "Track", track)
+			setMultiMapValue(info, "Info", "Driver", SessionDatabase.getUserName())
+			setMultiMapValue(info, "Info", "Lap", StrReplace(name, "Lap ", ""))
+
+			try {
+				importFileName := temporaryFileName("Import", "telemetry")
+
+				deleteFile(importFileName)
+
+				loop Read, fileName
+					if (Trim(A_LoopReadLine) != "") {
+						line := string2Values(";", A_LoopReadLine)
+
+						running := Round(line[12] * 1000)
+
+						line[12] := trackData[running][1]
+						line.Push(trackData[running][2])
+
+						FileAppend(values2String(";", line*) . "`n", importFileName)
+					}
+
+				return importFileName
+			}
+			catch Any as exception {
+				logError(exception)
+
+				info := false
+			}
+
+			return false
+		}
+
 		SplitPath(fileName, , , , &name)
 
 		if InStr(fileName, ".json") {
@@ -1673,6 +1716,16 @@ class SessionDatabase extends ConfigurationItem {
 				})
 			else
 				fileName := importFromMoTec(&info)
+
+			return fileName
+		}
+		else if InStr(fileName, ".irc") {
+			if verbose
+				withTask(WorkingTask(translate("Extracting ") . name), () {
+					fileName := importFromIRacing(&info)
+				})
+			else
+				fileName := importFromIRacing(&info)
 
 			return fileName
 		}

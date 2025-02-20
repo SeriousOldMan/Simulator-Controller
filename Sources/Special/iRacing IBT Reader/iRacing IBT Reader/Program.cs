@@ -29,6 +29,7 @@ namespace iRacingIBTReader
 
             int lapIdx = 0;
             int lapDistIdx = 0;
+            int lapDistPctIdx = 0;
             int speedIdx = 0;
             int throttleIdx = 0;
             int brakeIdx = 0;
@@ -47,6 +48,8 @@ namespace iRacingIBTReader
                     lapIdx = i;
                 else if (name == "LapDist")
                     lapDistIdx = i;
+                else if (name == "LapDistPct")
+                    lapDistPctIdx = i;
                 else if (name == "Speed")
                     speedIdx = i;
                 else if (name == "Throttle")
@@ -100,6 +103,7 @@ namespace iRacingIBTReader
                         int rpms = (int)(float)ibtFile.getVarValue(rpmsIdx);
                         float longG = (float)ibtFile.getVarValue(longGIdx) / 9.807f;
                         float latG = (float)ibtFile.getVarValue(latGIdx) / 9.807f;
+                        float playerRunningPct = (float)ibtFile.getVarValue(lapDistPctIdx);
 
                         csvFile.Write(playerRunning + ";");
                         csvFile.Write(throttle + ";");
@@ -112,6 +116,7 @@ namespace iRacingIBTReader
                         csvFile.Write("N/A" + ";");
                         csvFile.Write(longG + ";");
                         csvFile.Write(-latG + ";");
+                        csvFile.Write(playerRunningPct + ";");
 
                         csvFile.WriteLine();
                     }

@@ -2149,7 +2149,13 @@ class SectionInfoViewer {
 			}
 		}
 		else {
-			this.Window.Title := translate("Straight")
+
+			if section.HasProp("Name")
+				name := (A_Space . section.Name)
+			else
+				name := ""
+
+			this.Window.Title := (translate("Straight") . name)
 
 			html := "<table class=`"table-std`">"
 

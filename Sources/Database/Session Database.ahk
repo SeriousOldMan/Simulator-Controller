@@ -3577,7 +3577,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		for index, section in sections {
 			section.Index := this.getTrackCoordinateIndex(section.X, section.Y)
 
-			if section.HasProp("Name")
+			if (section.HasProp("Name") && (Trim(section.Name) != ""))
 				hasNames := true
 		}
 

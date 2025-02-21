@@ -2287,13 +2287,16 @@ initializeHTMLViewer() {
 
 	fixIE(kExplorerVersions[Strsplit(A_ScriptName, ".")[1]])
 
+	deleteDirectory(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1])
+
+	DirCreate(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1])
+
+	Window.DefineCustomControl("WebView2Viewer", createWebView2Viewer)
+	Window.DefineCustomControl("IE11Viewer", createIEViewer)
+
 	if ((getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "HTML", "Viewer", "IE11") = "WebView2") ||
 		(getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 						, "General", "HTML Viewer", "IE11") = "WebView2")) {
-		deleteDirectory(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1])
-
-		DirCreate(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1])
-
 		Window.DefineCustomControl("HTMLViewer", createWebView2Viewer)
 	}
 	else

@@ -755,7 +755,7 @@ class TelemetryViewer {
 	loadLayouts() {
 		local configuration := readMultiMap(kUserConfigDirectory . "Telemetry.layouts")
 		local layouts := CaseInsenseMap()
-		local name, definition, ignore
+		local name, definition, ignore, button
 
 		if (configuration.Count > 0)
 			for name, definition in getMultiMapValues(configuration, "Layouts")
@@ -772,20 +772,22 @@ class TelemetryViewer {
 					logError(exception)
 				}
 
-		if (layouts.Count = 0) {
-			this.iLayouts := CaseInsenseMap(translate("Standard")
-										  , {Name: translate("Standard")
-										   , WidthZoom: 100, HeightZoom: 100
-										   , Channels: choose(kTelemetryChannels
-															, (s) => (!inList(["Speed", "Throttle", "Brake", "TC", "ABS"
-																			 , "Long G", "Lat G"], s.Name) && s.HasProp("Size")))})
+		if (layouts.Count = 0)
+			layouts := CaseInsenseMap(translate("Standard")
+									, {Name: translate("Standard")
+									 , WidthZoom: 100, HeightZoom: 100
+									 , Channels: choose(kTelemetryChannels
+													  , (s) => (!inList(["Speed", "Throttle", "Brake", "TC", "ABS"
+																	   , "Long G", "Lat G"], s.Name) && s.HasProp("Size")))})
 
-			this.iSelectedLayout := translate("Standard")
-		}
-		else {
-			this.iLayouts := layouts
-			this.iSelectedLayout := getMultiMapValue(configuration, "Selected", "Layout")
-		}
+		this.iLayouts := layouts
+		this.iSelectedLayout := getMultiMapValue(configuration, "Selected", "Layout", translate("Standard"))
+
+		if !layouts.Has(this.iSelectedLayout)
+			if layouts.Has(translate("Standard"))
+				this.iSelectedLayout := translate("Standard")
+			else
+				this.iSelectedLayout := getKeys(layouts)[1]
 	}
 
 	saveLayouts() {
@@ -970,7 +972,11 @@ class TelemetryViewer {
 		viewerGui.Add("Documentation", "x186 YP+20 w336 H:Center Center", translate("Telemetry Viewer")
 					 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#Telemetry-Viewer")
 
-		viewerGui.Add("Text", "x8 yp+30 w676 W:Grow 0x10")
+		button := viewerGui.Add("Button", "x653 yp+5 w23 h23 X:Move")
+		; button.OnEvent("Click", showSettings)
+		setButtonIcon(button, kIconsDirectory . "Connect.ico", 1)
+
+		viewerGui.Add("Text", "x8 yp+25 w676 W:Grow 0x10")
 
 		viewerGui.SetFont("s8 Norm", "Arial")
 

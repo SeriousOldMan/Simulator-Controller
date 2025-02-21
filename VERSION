@@ -1,9 +1,9 @@
 [Development]
-Version=6.2.0.0-release
-Target=6.2.0.0-release
+Version=6.2.1.0-dev
+Target=6.2.1.0-release
 Date=02/21/2025
-Download=https://cutt.ly/jrwB9DkC;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/iBoeu7PG;https://www.dropbox.com/scl/fi/clv38rt1ee6o86v2sc5no/Simulator-Controller-6.2.0.0-release.zip?rlkey=plshk29r63m1vwtw95lvuro0h&st=qc1bgriz&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.2.0.0-release.zip
-Changes=Engineer updates about repairs no longer needed, Engineer does not announce unnecessary repairs for a pitstop anymore, Voice recognition test mode now starts all Assistants, Prevent rF2 pitstop option walk in pitlane, Fixed download mirror handling in "Simulator Download", Fixed download mirror handling in "Siimulator Tools", Fixed unit conversion problem in "Race Settings", Implemented runtime for Whisper speech recognition, Ported Team Server to .NET Runtime 8.0, Fixed crash when selecting Azure GPT provider, Fixed RPM values in iRacing telemetry data, Fixed Reasoning booster
+Download=
+Changes=Auto Initialize for "Strategy Workbench", Names for straights in track maps, iRacing IBT file support in telemetry importer
 Components=Media->5.6.1,Configuration->6.2.0,Utilities->6.1.6
 [Release]
 Version=6.2.0.0-release
@@ -22,7 +22,7 @@ Utilities.6.1.6.Path=.
 Utilities.6.1.6.Content=Utilities
 Utilities.6.1.6.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Gs12Shqo;https://www.dropbox.com/scl/fi/zo6ve6h67jluj25zkni9z/Utilities-6.1.6.zip?rlkey=qmp8jzvx54roz3l72zovvk6we&st=wfvj3oxf&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.1.6.zip
 [Current]
-Type=Release
+Type=Development
 [Version]
-Development=6.2.0.0-release
+Development=6.2.1.0-dev
 Release=6.2.0.0-release

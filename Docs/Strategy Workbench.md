@@ -114,6 +114,8 @@ Loading of settings is supported for:
 	   - Tyre Compound
 	   - Tyre Compound Color
 
+If you enable "Auto Initialize" in the "Settings" menu, settings will be initialized automatically when a strategy is loaded. And whenever you switch between simulators, cars and/or tracks, the settings will be loaded from the database as described above. Your choice of "Auto Initialize" will be remembered between runs of "Strategy Workbench".
+
 Notes:
 
   1. If you have set a number of required pitstops **and** a pitstop window, it depends on the starting fuel, whether the requirements can be met.

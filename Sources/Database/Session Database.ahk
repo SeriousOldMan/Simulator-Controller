@@ -2059,16 +2059,16 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 							if isObject(currentSection) {
 								if currentSection.HasProp("Nr") {
+									if (currentSection.HasProp("Name") && (Trim(currentSection.Name) != ""))
+										positionInfo := (translate(" (") . currentSection.Name . translate(")"))
+									else
+										positionInfo := ""
+
 									switch currentSection.Type, false {
 										case "Corner":
-											if (currentSection.HasProp("Name") && (Trim(currentSection.Name) != ""))
-												positionInfo := (translate(" (") . currentSection.Name . translate(")"))
-											else
-												positionInfo := ""
-
 											positionInfo := (translate("Corner") . A_Space . currentSection.Nr . positionInfo . translate(": "))
 										case "Straight":
-											positionInfo := (translate("Straight") . A_Space . currentSection.Nr . translate(": "))
+											positionInfo := (translate("Straight") . A_Space . currentSection.Nr . positionInfo . translate(": "))
 										default:
 											throw "Unknown section type detected in SessionDatabaseEditor.show..."
 									}
@@ -3416,19 +3416,24 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	chooseTrackSectionType(section := false) {
 		local result := false
 		local sectionsMenu := Menu()
-		local label := translate("Corner")
+		local cornerLabel := translate("Corner")
+		local straightLabel := translate("Straight")
 
 		if (section && (section.Type = "Corner"))
-			label .= translate("...")
+			cornerLabel .= translate("...")
 
-		sectionsMenu.Add(label, (*) => (result := "Corner"))
-		sectionsMenu.Add(translate("Straight"), (*) => (result := "Straight"))
+		sectionsMenu.Add(cornerLabel, (*) => (result := "Corner"))
+
+		if (section && (section.Type = "Straight"))
+			straightLabel .= translate("...")
+
+		sectionsMenu.Add(straightLabel, (*) => (result := "Straight"))
 
 		if section {
 			if (section.Type = "Corner")
-				sectionsMenu.Check(label)
+				sectionsMenu.Check(cornerLabel)
 			else
-				sectionsMenu.Check(translate(section.Type))
+				sectionsMenu.Check(straightLabel)
 
 			sectionsMenu.Add()
 
@@ -3460,6 +3465,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							section.Name := result.Value
 
 						result := "Corner"
+					}
+					else if ((result = "Straight") && (section.Type = "Straight")) {
+						result := withBlockedWindows(InputBox, translate("Please enter the name of the straight:"), translate("Straight"), "w300 h100", section.HasProp("Name") ? section.Name : "")
+
+						if (result.Result = "Ok")
+							section.Name := result.Value
+
+						result := "Straight"
 					}
 				}
 				else
@@ -3515,7 +3528,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	updateTrackSections(save := true) {
 		local straights := 0
 		local corners := 0
-		local sections, index, section
+		local hasNames := false
+		local sections, index, section, ignore, column
 
 		computeLength(index) {
 			local next := ((index = this.TrackSections.Length) ? 1 : (index + 1))
@@ -3557,21 +3571,41 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		this.TrackSectionsListView.Delete()
 
-		for index, section in sections
+		loop this.TrackSectionsListView.GetCount("Col")
+			this.TrackSectionsListView.DeleteCol(1)
+
+		for index, section in sections {
 			section.Index := this.getTrackCoordinateIndex(section.X, section.Y)
 
-		bubbleSort(&sections,  (a, b) => (a.Index > b.Index))
+			if (section.HasProp("Name") && (Trim(section.Name) != ""))
+				hasNames := true
+		}
 
-		for index, section in this.TrackSections {
+		if hasNames {
+			for ignore, column in [translate("Nr."), translate("Type"), translate("Name"), translate("Length") . translate(" (") . translate(getUnit("Length")) . translate(")"), translate("X"), translate("Y")]
+				this.TrackSectionsListView.InsertCol(A_Index, "", column)
+		}
+		else
+			for ignore, column in [translate("Nr."), translate("Type"), translate("Length") . translate(" (") . translate(getUnit("Length")) . translate(")"), translate("X"), translate("Y")]
+				this.TrackSectionsListView.InsertCol(A_Index, "", column)
+
+		bubbleSort(&sections, (a, b) => (a.Index > b.Index))
+
+		for index, section in sections {
 			section.Nr := ((section.Type = "Corner") ? ++corners : ++straights)
 
-			this.TrackSectionsListView.Add("", section.Nr, translate(section.Type) . (section.HasProp("Name") ? (translate(" - ") . section.Name) : "")
-											 , computeLength(index), Round(section.X), Round(section.Y))
+			if hasNames
+				this.TrackSectionsListView.Add("", section.Nr, translate(section.Type), (section.HasProp("Name") ? section.Name : "")
+												 , computeLength(index), Round(section.X), Round(section.Y))
+			else
+				this.TrackSectionsListView.Add("", section.Nr, translate(section.Type), computeLength(index), Round(section.X), Round(section.Y))
 		}
 
 		this.TrackSectionsListView.ModifyCol()
 		loop 4
 			this.TrackSectionsListView.ModifyCol(A_Index, "AutoHdr")
+
+		this.TrackSectionsListView.Redraw()
 
 		if (save && this.TrackMap) {
 			sections := this.TrackSections.Clone()
@@ -5903,13 +5937,40 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	uploadTelemetry() {
 		local window := this.Window
+		local simulator := this.SelectedSimulator
+		local options := "*.telemetry; *.JSON; *.CSV"
+		local directory := false
 		local fileName, telemetry, file, size, info, driver, lapTime, sectorTimes, name, ignore
 
 		window.Opt("+OwnDialogs")
 
+		if ((simulator = "iRacing") && this.SessionDatabase.hasTrackMap(simulator, this.SelectedTrack))
+			options .= "; *.ibt"
+
 		OnMessage(0x44, translateLoadCancelButtons)
-		fileName := withBlockedWindows(FileSelect, "M1", "", translate("Upload Telemetry File..."), "Lap Telemetry (*.telemetry; *.JSON; *.CSV)")
+		fileName := withBlockedWindows(FileSelect, "M1", "", translate("Upload Telemetry File..."), "Lap Telemetry (" . options . ")")
 		OnMessage(0x44, translateLoadCancelButtons, 0)
+
+		if (isObject(fileName) && (fileName.Length = 1) && InStr(fileName[1], ".ibt"))
+			fileName := fileName[1]
+
+		if (!isObject(fileName) && InStr(fileName, ".ibt")) {
+			directory := (kTempDirectory . "Telemetry\IBT Import")
+
+			deleteDirectory(directory)
+
+			DirCreate(directory)
+
+			SplitPath(fileName, &name)
+
+			withTask(WorkingTask(translate("Extracting ") . name), () {
+				RunWait("`"" . kBinariesDirectory . "Connectors\iRacing IBT Reader\iRacing IBT Reader.exe`" `"" . fileName . "`" `"" . directory . "`"", , "Hide")
+			})
+
+			OnMessage(0x44, translateLoadCancelButtons)
+			fileName := withBlockedWindows(FileSelect, "M1", directory, translate("Upload Telemetry File..."), "Lap Telemetry (*.irc)")
+			OnMessage(0x44, translateLoadCancelButtons, 0)
+		}
 
 		if ((fileName != "") || (isObject(fileName) && (fileName.Length > 0))) {
 			for ignore, fileName in isObject(fileName) ? fileName : [fileName] {
@@ -5978,6 +6039,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			this.loadTelemetries(fileName)
 		}
+
+		if (directory && !isDebug())
+			deleteDirectory(directory)
 	}
 
 	downloadTelemetry(telemetryName) {

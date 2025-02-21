@@ -161,6 +161,7 @@ If you use the "Open..." button in the dialog, which let's you browse the availa
 
 - You can load telemetry files from Simulator Controller, for example a file that has been sent to you by a team mate.
 - You can import telemetery data from ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), as long as it has been saved as JSON file, which can be activated in the settings of "Second Monitor".
+- Importing IBT files from *iRacing* is also supported, as long as a track map for the currently selected track is already available. In this case, you will first have to select the IBT file, which is then split up into individual files for each lap contained in the IBT file. After that is done, you can select the laps, which you want to import.
 - And you can import telemetry files from "MoTec". They must be exported as "CSV" files and the "Distance" field must be included. Since "MoTeC" uses the absolute angle for the steering information, it is beneficial to divide this value to the steer lock of the car, to make the information comparable to that of other lap telemetry data. The importer will use the information available in the "Setup Workbench" about the different cars, or you can define the [corresponding setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#race-settings) in the "Session Database".
 
 Good to know: When importing lap telemetry data directly in the "Laps" tab of "Session Database", the same applies.

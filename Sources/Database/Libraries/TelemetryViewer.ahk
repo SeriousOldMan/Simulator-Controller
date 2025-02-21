@@ -2149,7 +2149,13 @@ class SectionInfoViewer {
 			}
 		}
 		else {
-			this.Window.Title := translate("Straight")
+
+			if section.HasProp("Name")
+				name := (A_Space . section.Name)
+			else
+				name := ""
+
+			this.Window.Title := (translate("Straight") . name)
 
 			html := "<table class=`"table-std`">"
 
@@ -2530,16 +2536,16 @@ class TrackMap {
 
 					if isObject(currentSection) {
 						if currentSection.HasProp("Nr") {
+							if (currentSection.HasProp("Name") && (Trim(currentSection.Name) != ""))
+								positionInfo := (translate(" (") . currentSection.Name . translate(")"))
+							else
+								positionInfo := ""
+
 							switch currentSection.Type, false {
 								case "Corner":
-									if (currentSection.HasProp("Name") && (Trim(currentSection.Name) != ""))
-										positionInfo := (translate(" (") . currentSection.Name . translate(")"))
-									else
-										positionInfo := ""
-
 									positionInfo := (translate("Corner") . A_Space . currentSection.Nr . positionInfo . translate(": "))
 								case "Straight":
-									positionInfo := (translate("Straight") . A_Space . currentSection.Nr . translate(": "))
+									positionInfo := (translate("Straight") . A_Space . currentSection.Nr . positionInfo . translate(": "))
 								default:
 									throw "Unknown section type detected in SessionDatabaseEditor.show..."
 							}
@@ -3026,19 +3032,24 @@ class TrackMap {
 	chooseTrackSectionType(section := false) {
 		local result := false
 		local sectionsMenu := Menu()
-		local label := translate("Corner")
+		local cornerLabel := translate("Corner")
+		local straightLabel := translate("Straight")
 
 		if (section && (section.Type = "Corner"))
-			label .= translate("...")
+			cornerLabel .= translate("...")
 
-		sectionsMenu.Add(label, (*) => (result := "Corner"))
-		sectionsMenu.Add(translate("Straight"), (*) => (result := "Straight"))
+		sectionsMenu.Add(cornerLabel, (*) => (result := "Corner"))
+
+		if (section && (section.Type = "Straight"))
+			straightLabel .= translate("...")
+
+		sectionsMenu.Add(straightLabel, (*) => (result := "Straight"))
 
 		if section {
 			if (section.Type = "Corner")
-				sectionsMenu.Check(label)
+				sectionsMenu.Check(cornerLabel)
 			else
-				sectionsMenu.Check(translate(section.Type))
+				sectionsMenu.Check(straightLabel)
 
 			sectionsMenu.Add()
 
@@ -3070,6 +3081,14 @@ class TrackMap {
 							section.Name := result.Value
 
 						result := "Corner"
+					}
+					else if ((result = "Straight") && (section.Type = "Straight")) {
+						result := withBlockedWindows(InputBox, translate("Please enter the name of the straight:"), translate("Straight"), "w300 h100", section.HasProp("Name") ? section.Name : "")
+
+						if (result.Result = "Ok")
+							section.Name := result.Value
+
+						result := "Straight"
 					}
 				}
 				else

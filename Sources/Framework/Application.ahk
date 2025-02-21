@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Global Application Library      ;;;
+;;;   Modular Simulator Controller System - Global Application Framework    ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
@@ -200,7 +200,7 @@ checkForNews() {
 
 		if check {
 			try {
-				Download("https://fileshare.impresion3d.pro/filebrowser/api/public/dl/36C2etOo", kTempDirectory . "NEWS")
+				Download("https://fileshare.impresion3d.pro/filebrowser/api/public/dl/36C2etOo", kTempDirectory . "NEWS.ini")
 			}
 			catch Any as exception {
 				check := false
@@ -210,7 +210,7 @@ checkForNews() {
 		if check {
 			news := readMultiMap(kUserConfigDirectory . "NEWS")
 
-			for nr, html in getMultiMapValues(readMultiMap(kTempDirectory . "NEWS"), "News")
+			for nr, html in getMultiMapValues(readMultiMap(kTempDirectory . "NEWS.ini"), "News")
 				if !getMultiMapValue(news, "News", nr, false) {
 					try {
 						Download(html, A_Temp . "\News.zip")
@@ -226,7 +226,7 @@ checkForNews() {
 
 							writeMultiMap(kUserConfigDirectory . "NEWS", news)
 
-							viewHTML(kTempDirectory . "NEWS.htm")
+							viewHTML(kTempDirectory . "News\News.htm")
 						}
 					}
 					catch Any as exception {

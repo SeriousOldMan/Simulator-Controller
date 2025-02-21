@@ -1656,21 +1656,21 @@ class SessionDatabase extends ConfigurationItem {
 
 		importFromIRacing(&info) {
 			local trackData := []
-			local running, name
+			local running, directory, name, importFileName, infoFileName
 
 			loop Read, this.getTrackData(simulator, track)
 				trackData.Push(string2Values(A_Space, A_LoopReadLine))
 
-			SplitPath(fileName, , , , &name)
+			SplitPath(fileName, , &directory, , &name)
 
-			info := newMultiMap()
+			info := readMultiMap(directory . "\" . name . ".info")
 
 			setMultiMapValue(info, "Info", "Track", track)
 			setMultiMapValue(info, "Info", "Driver", SessionDatabase.getUserName())
-			setMultiMapValue(info, "Info", "Lap", StrReplace(name, "Lap ", ""))
 
 			try {
 				importFileName := temporaryFileName("Import", "telemetry")
+				infoFileName := temporaryFileName("Import", "info")
 
 				deleteFile(importFileName)
 
@@ -1678,7 +1678,7 @@ class SessionDatabase extends ConfigurationItem {
 					if (Trim(A_LoopReadLine) != "") {
 						line := string2Values(";", A_LoopReadLine)
 
-						running := Round(line[12] * 1000)
+						running := Max(1, Min(1000, Round(line[12] * 1000)))
 
 						line[12] := trackData[running][1]
 						line.Push(trackData[running][2])
@@ -1686,15 +1686,19 @@ class SessionDatabase extends ConfigurationItem {
 						FileAppend(values2String(";", line*) . "`n", importFileName)
 					}
 
+				writeMultiMap(infoFileName, info)
+
+				info := infoFileName
+
 				return importFileName
 			}
 			catch Any as exception {
 				logError(exception)
 
 				info := false
-			}
 
-			return false
+				return false
+			}
 		}
 
 		SplitPath(fileName, , , , &name)

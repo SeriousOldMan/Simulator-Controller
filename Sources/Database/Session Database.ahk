@@ -5944,19 +5944,28 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		window.Opt("+OwnDialogs")
 
-		if ((simulator = "iRacing") && this.SessionDatabase.hasTrackMap(simulator, this.SelectedTrackrack))
+		if ((simulator = "iRacing") && this.SessionDatabase.hasTrackMap(simulator, this.SelectedTrack))
 			options .= "; *.ibt"
 
 		OnMessage(0x44, translateLoadCancelButtons)
 		fileName := withBlockedWindows(FileSelect, "M1", "", translate("Upload Telemetry File..."), "Lap Telemetry (" . options . ")")
 		OnMessage(0x44, translateLoadCancelButtons, 0)
 
+		if (isObject(fileName) && (fileName.Length = 1) && InStr(fileName[1], ".ibt"))
+			fileName := fileName[1]
+
 		if (!isObject(fileName) && InStr(fileName, ".ibt")) {
 			directory := (kTempDirectory . "Telemetry\IBT Import")
 
 			deleteDirectory(directory)
 
-			RunWait("`"" . kBinariesDirectory . "Connectors\iRacing IBT Reader\iRacing IBT Reader.exe`" `"" . fileName . "`" `"" . directory . "`"", , "Hide")
+			DirCreate(directory)
+
+			SplitPath(fileName, &name)
+
+			withTask(WorkingTask(translate("Extracting ") . name), () {
+				RunWait("`"" . kBinariesDirectory . "Connectors\iRacing IBT Reader\iRacing IBT Reader.exe`" `"" . fileName . "`" `"" . directory . "`"", , "Hide")
+			})
 
 			OnMessage(0x44, translateLoadCancelButtons)
 			fileName := withBlockedWindows(FileSelect, "M1", directory, translate("Upload Telemetry File..."), "Lap Telemetry (*.irc)")

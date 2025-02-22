@@ -3352,13 +3352,15 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		CoordMode("Mouse", oldCoordMode)
 
 		if (this.TrackEditorMode = "Automations") {
-			action := actionDialog(x, y)
+			if this.SelectedTrackAutomation {
+				action := actionDialog(x, y)
 
-			if action {
-				action.X := coordinateX
-				action.Y := coordinateY
+				if action {
+					action.X := coordinateX
+					action.Y := coordinateY
 
-				this.addTrackAction(action)
+					this.addTrackAction(action)
+				}
 			}
 		}
 		else {

@@ -720,7 +720,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
 			return false
 
-		if ((force || this.iMapperPID) && (this.iMapperPhase = "Collect"))) {
+		if ((force || this.iMapperPID) && (this.iMapperPhase = "Collect")) {
 			pid := this.iMapperPID
 
 			if pid {

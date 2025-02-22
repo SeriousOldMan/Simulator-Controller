@@ -2088,7 +2088,7 @@ class SectionInfoViewer {
 		}
 
 		if (section.Type = "Corner") {
-			if section.HasProp("Name")
+			if (section.HasProp("Name") && section.Name)
 				name := (A_Space . section.Name)
 			else
 				name := ""
@@ -2156,7 +2156,7 @@ class SectionInfoViewer {
 		}
 		else {
 
-			if section.HasProp("Name")
+			if (section.HasProp("Name") && section.Name)
 				name := (A_Space . section.Name)
 			else
 				name := ""
@@ -2542,7 +2542,7 @@ class TrackMap {
 
 					if isObject(currentSection) {
 						if currentSection.HasProp("Nr") {
-							if (currentSection.HasProp("Name") && (Trim(currentSection.Name) != ""))
+							if (currentSection.HasProp("Name") && currentSection.Name && (Trim(currentSection.Name) != ""))
 								positionInfo := (translate(" (") . currentSection.Name . translate(")"))
 							else
 								positionInfo := ""

@@ -2059,7 +2059,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 							if isObject(currentSection) {
 								if currentSection.HasProp("Nr") {
-									if (currentSection.HasProp("Name") && (Trim(currentSection.Name) != ""))
+									if (currentSection.HasProp("Name") && currentSection.Name && (Trim(currentSection.Name) != ""))
 										positionInfo := (translate(" (") . currentSection.Name . translate(")"))
 									else
 										positionInfo := ""

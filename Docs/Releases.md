@@ -1,16 +1,4 @@
-## 6.2.1.0-release 02/28/25 (planned)
-  1. Minor bugfixes, as always
-  2. Documentation updates here and there, as always
-  3. Several minor fixes for the Team Server including automatic deletion of expired accounts.
-  4. Increased resilience against corrupted telemetry layout definitions. Still do not understand, why theey get corrupted in the first place.
-  5. The "Strategy Workbench" now includes an "Auto Initialize" setting (default is True) which triggers automatic initialization of several settings from the session database and/or a strategy, which has been loaded manually.
-  6. Straights can now be given names as well in track maps.
-  7. Full support for importing iRacing IBT files into the "Session Database" as telemetry reference laps. Please take a look at the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#importing-telemetry-data) for more information.
-  8. Several default values have been changed for simulator specific settings in "Simulator Setup" and "Simulator Configuration" to make initial configuration more *friendly* for novices.
-  9. A new [race setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) "Spotter: Private Qualifying" let you suppress proximity alerts and other opponent related information by the Spotter in private qualifying. Use this setting for example in *Le Mans Ultimate* or other simulators where qualifying is being held without any other cars on the track.
-  10. Implemented a *News* system which will give you from time to time interesting or important information about Simulator Controller in general or upcoming features. And of course I will also ask to support the project once in a while.
-  
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-621), if you are hosting your own Team Server.
+# Latest stable release
 
 ## 6.2.0.0-release 02/21/25
   1. Minor bugfixes, as always
@@ -26,6 +14,25 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   11. The installation and update procedure has been overhauled to be more resilient against unavailable download mirrors.
   12. A new voice recognition system has been made available, which supports free speech and provides an excellent alternative to Azure and Google voice recognition services, as long as you have some memory available on your graphics card while runniing your preferred simulator. It is based on Whisper, a multilingual solution based on neural network technology provided in the open source by OpenAI. Please see the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#whisper-runtime) for more information on how to install and use Whisper.
   13. With the genereous support of @Caleidosttk, I have set up a new download mirror for all installation and update packages. The problems seen recently with the unavailable download repository, after so many new users joined our community, should be a thing of the past now.
+
+# Upcoming release
+
+## 6.2.1.0-release 02/28/25 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Several minor fixes for the Team Server including automatic deletion of expired accounts.
+  4. The track mapper resilience against precision deficits has been increased for *iRacing*.
+  5. Increased resilience against corrupted telemetry layout definitions. Still do not understand, why theey get corrupted in the first place.
+  6. The "Strategy Workbench" now includes an "Auto Initialize" setting (default is True) which triggers automatic initialization of several settings from the session database and/or a strategy, which has been loaded manually.
+  7. Straights can now be given names as well in track maps.
+  8. Full support for importing iRacing IBT files into the "Session Database" as telemetry reference laps. Please take a look at the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#importing-telemetry-data) for more information.
+  9. Several default values have been changed for simulator specific settings in "Simulator Setup" and "Simulator Configuration" to make initial configuration more *friendly* for novices.
+  10. A new [race setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) "Spotter: Private Qualifying" let you suppress proximity alerts and other opponent related information by the Spotter in private qualifying. Use this setting for example in *Le Mans Ultimate* or other simulators where qualifying is being held without any other cars on the track.
+  11. Implemented a *News* system which will give you from time to time interesting or important information about Simulator Controller in general or upcoming features. And of course I will also ask to support the project once in a while.
+  
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-621), if you are hosting your own Team Server.
+
+# Release history
 
 ## 6.1.6.0-release 02/14/25
   1. Minor bugfixes, as always

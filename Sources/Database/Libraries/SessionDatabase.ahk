@@ -80,6 +80,23 @@ class SessionDatabase extends ConfigurationItem {
 
 	iUseCommunity := false
 
+	class IRCImportTask extends ProgressTask {
+		iOptionsCallback := false
+
+		__New(title, optionsCallback) {
+			this.iOptionsCallback := optionsCallback
+
+			super.__New(title)
+		}
+
+		updateProgress() {
+			if this.iOptionsCallback
+				super.updateProgress(this.iOptionsCallback.Call())
+			else
+				super.updateProgress()
+		}
+	}
+
 	static ID {
 		Get {
 			return SessionDatabase.sID
@@ -1518,6 +1535,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	importTelemetry(simulator, car, track, fileName, &info, verbose := true) {
+		local running := 0
 		local name, infoFileName
 
 		importFromSecondMonitor(&info) {
@@ -1654,9 +1672,13 @@ class SessionDatabase extends ConfigurationItem {
 			return false
 		}
 
+		iRacingImportProgress() {
+			return {progress: Round(running / 1000), message: translate("Scanning track...")}
+		}
+
 		importFromIRacing(&info) {
 			local trackData := []
-			local running, directory, name, importFileName, infoFileName
+			local directory, name, importFileName, infoFileName
 
 			loop Read, this.getTrackData(simulator, track)
 				trackData.Push(string2Values(A_Space, A_LoopReadLine))
@@ -1725,7 +1747,7 @@ class SessionDatabase extends ConfigurationItem {
 		}
 		else if InStr(fileName, ".irc") {
 			if verbose
-				withTask(ProgressTask(translate("Extracting ") . name), () {
+				withTask(SessionDatabase.IRCImportTask(translate("Extracting ") . name, iRacingImportProgress), () {
 					fileName := importFromIRacing(&info)
 				})
 			else

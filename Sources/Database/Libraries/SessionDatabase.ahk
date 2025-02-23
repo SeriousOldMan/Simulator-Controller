@@ -1705,7 +1705,7 @@ class SessionDatabase extends ConfigurationItem {
 
 		if InStr(fileName, ".json") {
 			if verbose
-				withTask(WorkingTask(translate("Extracting ") . name), () {
+				withTask(ProgressTask(translate("Extracting ") . name), () {
 					fileName := importFromSecondMonitor(&info)
 				})
 			else
@@ -1715,7 +1715,7 @@ class SessionDatabase extends ConfigurationItem {
 		}
 		else if InStr(fileName, ".CSV") {
 			if verbose
-				withTask(WorkingTask(translate("Extracting ") . name), () {
+				withTask(ProgressTask(translate("Extracting ") . name), () {
 					fileName := importFromMoTec(&info)
 				})
 			else
@@ -1725,7 +1725,7 @@ class SessionDatabase extends ConfigurationItem {
 		}
 		else if InStr(fileName, ".irc") {
 			if verbose
-				withTask(WorkingTask(translate("Extracting ") . name), () {
+				withTask(ProgressTask(translate("Extracting ") . name), () {
 					fileName := importFromIRacing(&info)
 				})
 			else

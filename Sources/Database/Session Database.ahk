@@ -5965,7 +5965,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			SplitPath(fileName, &name)
 
-			withTask(WorkingTask(translate("Extracting ") . name), () {
+			withTask(ProgressTask(translate("Extracting ") . name), () {
 				RunWait("`"" . kBinariesDirectory . "Connectors\iRacing IBT Reader\iRacing IBT Reader.exe`" `"" . fileName . "`" `"" . directory . "`"", , "Hide")
 			})
 

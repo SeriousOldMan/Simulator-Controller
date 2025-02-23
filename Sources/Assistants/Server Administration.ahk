@@ -660,7 +660,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "Yes")
-					withTask(WorkingTask(translate("Compacting Database")), () {
+					withTask(ProgressTask(translate("Compacting Database")), () {
 						try {
 							connector.CompactDatabase()
 

@@ -517,15 +517,22 @@ class PeriodicTask extends Task {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; Class                           WorkingTask                             ;;;
+;;; Class                         ProgressTask                              ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class WorkingTask extends PeriodicTask {
+class ProgressTask extends PeriodicTask {
 	iTitle := ""
+
 	iProgressWindow := false
 
 	iStart := A_TickCount
 	iProgress := false
+
+	ProgressWindow {
+		Get {
+			return this.iProgressWindow
+		}
+	}
 
 	__New(title := "") {
 		this.iTitle := title
@@ -536,22 +543,34 @@ class WorkingTask extends PeriodicTask {
 	run() {
 		if (A_TickCount > (this.iStart + 250))
 			if !this.iProgress
-				this.iProgressWindow := ProgressWindow.showProgress({progress: this.iProgress++, color: "Blue", title: this.iTitle})
+				this.iProgressWindow := this.showProgress()
 			else if (this.iProgress != "Stop") {
 				if (this.iProgress > 100)
 					this.iProgress := 0
 
-				this.iProgressWindow.updateProgress({progress: this.iProgress++})
+				this.ProgressWindow.updateProgress({progress: this.iProgress++})
 			}
 	}
 
 	stop() {
-		this.iProgress := "Stop"
-
-		if this.iProgressWindow
-			this.iProgressWindow.hideProgress()
+		this.hideProgress()
 
 		super.stop()
+	}
+
+	showProgress() {
+		return ProgressWindow.showProgress({progress: this.iProgress++, color: "Blue", title: this.iTitle})
+	}
+
+	updateProgress() {
+		this.ProgressWindow.updateProgress({progress: this.iProgress++})
+	}
+
+	hideProgress() {
+		this.iProgress := "Stop"
+
+		if this.ProgressWindow
+			this.ProgressWindow.hideProgress()
 	}
 }
 

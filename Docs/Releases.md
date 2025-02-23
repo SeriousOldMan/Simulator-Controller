@@ -28,8 +28,9 @@
   8. Straights can now be given names as well in track maps.
   9. Full support for importing iRacing IBT files into the "Session Database" as telemetry reference laps. Please take a look at the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#importing-telemetry-data) for more information.
   10. Several default values have been changed for simulator specific settings in "Simulator Setup" and "Simulator Configuration" to make initial configuration more *friendly* for novices.
-  11. A new [race setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) "Spotter: Private Qualifying" let you suppress proximity alerts and other opponent related information by the Spotter in private qualifying. Use this setting for example in *Le Mans Ultimate* or other simulators where qualifying is being held without any other cars on the track.
-  12. Implemented a *News* system which will give you from time to time interesting or important information about Simulator Controller in general or upcoming features. And of course I will also ask to support the project once in a while.
+  11. A new [race setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) "Spotter: Private Practice" let you suppress proximity alerts and other opponent related information by the Spotter in private practice sessions. Use this setting for example in *Le Mans Ultimate* or other simulators where you can choose to *ghost* all other cars on the track.
+  12. A new [race setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) "Spotter: Private Qualifying" let you suppress proximity alerts and other opponent related information by the Spotter in private qualifying. Use this setting for example in *Le Mans Ultimate* or other simulators where qualifying is being held without any other cars on the track.
+  13. Implemented a *News* system which will give you from time to time interesting or important information about Simulator Controller in general or upcoming features. And of course I will also ask to support the project once in a while.
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-621), if you are hosting your own Team Server.
 

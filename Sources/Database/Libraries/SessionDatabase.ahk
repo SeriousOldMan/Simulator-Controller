@@ -1673,7 +1673,7 @@ class SessionDatabase extends ConfigurationItem {
 		}
 
 		iRacingImportProgress() {
-			return {progress: Round(running / 1000), message: translate("Scanning track...")}
+			return {progress: Round(running / 1000 * 100), message: translate("Scanning track..."), color: "Green"}
 		}
 
 		importFromIRacing(&info) {

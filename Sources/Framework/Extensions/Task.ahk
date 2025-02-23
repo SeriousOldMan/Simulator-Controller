@@ -562,8 +562,11 @@ class ProgressTask extends PeriodicTask {
 		return ProgressWindow.showProgress({progress: this.iProgress++, color: "Blue", title: this.iTitle})
 	}
 
-	updateProgress() {
-		this.ProgressWindow.updateProgress({progress: this.iProgress++})
+	updateProgress(options := {}) {
+		if !options.HasProp("progress")
+			options.progress := this.iProgress++
+
+		this.ProgressWindow.updateProgress(options)
 	}
 
 	hideProgress() {

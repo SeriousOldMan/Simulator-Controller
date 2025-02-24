@@ -437,7 +437,7 @@ viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 80
 
 		innerWidth := width - 16
 
-		htmlGui := Window({Descriptor: "HTML Viewer", Options: "0x400000"}, translate("News && Updates"))
+		htmlGui := Window({Descriptor: "HTML Viewer", Options: "0x400000"}, translate("News and Updates"))
 
 		htmlGui.SetFont("s10 Bold")
 
@@ -447,9 +447,11 @@ viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 80
 
 		htmlGui.Add("Text", "x8 yp+26 W" . innerWidth . " +0x200 +0x1 BackgroundTrans", title)
 
+		htmlGui.Add("Text", "x8 yp+26 w" . innerWidth . " 0x10")
+
 		editHeight := height - 102
 
-		htmlViewer := htmlGui.Add("WebView2Viewer", "X8 YP+26 W" . innerWidth . " H" . editHeight)
+		htmlViewer := htmlGui.Add("WebView2Viewer", "X8 YP+10 W" . innerWidth . " H" . editHeight)
 
 		htmlViewer.document.open()
 		htmlViewer.document.write(html)
@@ -484,10 +486,12 @@ viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 80
 
 		buttonX := Round(width / 2) - 40
 
+		htmlGui.Add("Text", "x8 yp+" . (editHeight + 10) . " w" . innerWidth . " 0x10")
+
 		htmlGui.Add("Button", "Default X" . buttonX . " y+10 w80", translate("Ok")).OnEvent("Click", viewHTML.Bind(false))
 
 		htmlGui.Opt("+AlwaysOnTop")
-		htmlGui.Show("X" . x . " Y" . y . " W" . width . " H" . height . " NoActivate")
+		htmlGui.Show("X" . x . " Y" . y . " W" . width . " NoActivate")
 	}
 	finally {
 		SetWorkingDir(curWorkingDir)

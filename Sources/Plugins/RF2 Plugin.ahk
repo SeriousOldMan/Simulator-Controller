@@ -20,6 +20,7 @@
 global kRF2Application := "rFactor 2"
 
 global kRF2Plugin := "RF2"
+global kChatMode := "Chat"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -30,6 +31,50 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 	iOpenPitstopMFDHotkey := false
 	iClosePitstopMFDHotkey := false
 	iRequestPitstopHotkey := false
+
+	iOpenChatHotkey := false
+
+	iPitstopMode := false
+	iChatMode := false
+
+	class ChatMode extends ControllerMode {
+		Mode {
+			Get {
+				return kChatMode
+			}
+		}
+
+		updateActions(session) {
+		}
+	}
+
+	class ChatAction extends ControllerAction {
+		iMessage := ""
+
+		Message {
+			Get {
+				return this.iMessage
+			}
+		}
+
+		__New(function, label, message) {
+			this.iMessage := message
+
+			super.__New(function, label)
+		}
+
+		fireAction(function, trigger) {
+			local message := this.Message
+
+			if this.Controller.findPlugin(kACCPlugin).activateWindow() {
+				Send("{Enter}")
+				Sleep(100)
+				Send(message)
+				Sleep(100)
+				Send("{Enter}")
+			}
+		}
+	}
 
 	OpenPitstopMFDHotkey {
 		Get {
@@ -49,10 +94,25 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
+	OpenChatHotkey {
+		Get {
+			return this.iOpenChatHotkey
+		}
+	}
+
 	__New(controller, name, simulator, configuration := false) {
 		super.__New(controller, name, simulator, configuration)
 
 		if (this.Active || (isDebug() && isDevelopment())) {
+			this.iPitstopMode := this.findMode(kPitstopMode)
+
+			this.iOpenChatHotkey := this.getArgumentValue("openChat", false)
+
+			if (this.iChatMode && this.OpenChatHotkey && (Trim(this.OpenChatHotkey) != ""))
+				this.registerMode(this.iChatMode)
+			else
+				this.iChatMode := false
+
 			if !inList(A_Args, "-Replay")
 				this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
 			else
@@ -69,6 +129,42 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 					this.iRequestPitstopHotkey := false
 			}
 		}
+	}
+
+	loadFromConfiguration(configuration) {
+		local function, descriptor, message
+
+		super.loadFromConfiguration(configuration)
+
+		for descriptor, message in getMultiMapValues(configuration, "Chat Messages") {
+			function := this.Controller.findFunction(descriptor)
+
+			if (function != false) {
+				message := string2Values("|", message)
+
+				if !this.iChatMode
+					this.iChatMode := RF2Plugin.ChatMode(this)
+
+				this.iChatMode.registerAction(RF2Plugin.ChatAction(function, message[1], message[2]))
+			}
+			else
+				this.logFunctionNotFound(descriptor)
+		}
+	}
+
+	updateSession(session, force := false) {
+		local lastSession := this.Session
+		local activeModes
+
+		super.updateSession(session, force)
+
+		activeModes := this.Controller.ActiveModes
+
+		if (inList(activeModes, this.iChatMode))
+			this.iChatMode.updateActions(session)
+
+		if (inList(activeModes, this.iPitstopMode))
+			this.iPitstopMode.updateActions(session)
 	}
 
 	openPitstopMFD(descriptor := false) {

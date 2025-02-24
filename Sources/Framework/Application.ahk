@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Global Application Library      ;;;
+;;;   Modular Simulator Controller System - Global Application Framework    ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
@@ -185,7 +185,8 @@ requestShareSessionDatabaseConsent() {
 }
 
 checkForNews() {
-	local check, lastModified, news, nr, html
+	local show := true
+	local check, lastModified, availableNews, news, nr, html, shown, rule
 
 	if inList(kForegroundApps, StrSplit(A_ScriptName, ".")[1]) {
 		check := !FileExist(kUserConfigDirectory . "NEWS")
@@ -193,14 +194,14 @@ checkForNews() {
 		if !check {
 			lastModified := FileGetTime(kUserConfigDirectory "NEWS", "M")
 
-			lastModified := DateAdd(lastModified, 1, "Days")
+			lastModified := DateAdd(lastModified, 3, "Days")
 
 			check := (lastModified < A_Now)
 		}
 
 		if check {
 			try {
-				Download("https://fileshare.impresion3d.pro/filebrowser/api/public/dl/36C2etOo", kTempDirectory . "NEWS")
+				Download("https://fileshare.impresion3d.pro/filebrowser/api/public/dl/r0q9-d-3", kTempDirectory . "NEWS.ini")
 			}
 			catch Any as exception {
 				check := false
@@ -208,32 +209,48 @@ checkForNews() {
 		}
 
 		if check {
+			availableNews := readMultiMap(kTempDirectory . "NEWS.ini")
 			news := readMultiMap(kUserConfigDirectory . "NEWS")
 
-			for nr, html in getMultiMapValues(readMultiMap(kTempDirectory . "NEWS"), "News")
-				if !getMultiMapValue(news, "News", nr, false) {
-					try {
-						Download(html, A_Temp . "\News.zip")
+			for nr, html in getMultiMapValues(availableNews, "News")
+				if isNumber(nr) {
+					shown := getMultiMapValue(news, "News", nr, false)
+					rule := getMultiMapValue(availableNews, "Rules", nr, "Once")
 
-						deleteDirectory(kTempDirectory . "News")
+					if (shown && InStr(rule, "Repeat"))
+						shown := (DateAdd(shown, string2Values(":", rule)[2], "Days") < A_Now)
+					else if (!shown && InStr(rule, "Timed")) {
+						rule := string2Values(":", rule)
 
-						DirCreate(kTempDirectory . "News")
+						show := ((A_Now > rule[2]) && ((rule.Length = 2) || (A_Now <= rule[3])))
+					}
 
-						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\News.zip' -DestinationPath '" . kTempDirectory . "News' -Force", , "Hide")
+					if (!shown && show) {
+						try {
+							deleteFile(A_Temp . "\News.zip")
 
-						if FileExist(kTempDirectory . "News\News.htm") {
-							setMultiMapValue(news, "News", nr, true)
+							Download(html, A_Temp . "\News.zip")
 
-							writeMultiMap(kUserConfigDirectory . "NEWS", news)
+							deleteDirectory(kTempDirectory . "News")
 
-							viewHTML(kTempDirectory . "NEWS.htm")
+							DirCreate(kTempDirectory . "News")
+
+							RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\News.zip' -DestinationPath '" . kTempDirectory . "News' -Force", , "Hide")
+
+							if FileExist(kTempDirectory . "News\News.htm") {
+								setMultiMapValue(news, "News", nr, A_Now)
+
+								writeMultiMap(kUserConfigDirectory . "NEWS", news)
+
+								viewHTML(kTempDirectory . "News\News.htm")
+							}
 						}
-					}
-					catch Any as exception {
-						logError(exception)
-					}
+						catch Any as exception {
+							logError(exception)
+						}
 
-					break
+						break
+					}
 				}
 		}
 	}
@@ -399,8 +416,9 @@ checkForUpdates() {
 ;;;-------------------------------------------------------------------------;;;
 
 viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 800, height := 400, *) {
+	local curWorkingDir := A_WorkingDir
 	local html, innerWidth, editHeight, buttonX
-	local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom
+	local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom, directory
 
 	static htmlGui
 	static htmlViewer
@@ -414,61 +432,74 @@ viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 80
 		return
 	}
 
-	html := FileRead(fileName)
+	SplitPath(fileName, , &directory)
 
-	innerWidth := width - 16
+	SetWorkingDir(directory)
 
-	htmlGui := Window({Descriptor: "HTML Viewer", Options: "0x400000"}, translate("News && Updates"))
+	try {
+		html := FileRead(fileName)
 
-	htmlGui.SetFont("s10 Bold")
+		innerWidth := width - 16
 
-	htmlGui.Add("Text", "x8 y8 W" . innerWidth . " +0x200 +0x1 BackgroundTrans", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(htmlGui, "HTML Viewer"))
+		htmlGui := Window({Descriptor: "HTML Viewer", Options: "0x400000"}, translate("News and Updates"))
 
-	htmlGui.SetFont()
+		htmlGui.SetFont("s10 Bold")
 
-	htmlGui.Add("Text", "x8 yp+26 W" . innerWidth . " +0x200 +0x1 BackgroundTrans", title)
+		htmlGui.Add("Text", "x8 y8 W" . innerWidth . " +0x200 +0x1 BackgroundTrans", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(htmlGui, "HTML Viewer"))
 
-	editHeight := height - 102
+		htmlGui.SetFont()
 
-	htmlViewer := htmlGui.Add("WebView2Viewer", "X8 YP+26 W" . innerWidth . " H" . editHeight)
+		htmlGui.Add("Text", "x8 yp+26 W" . innerWidth . " +0x200 +0x1 BackgroundTrans", title)
 
-	htmlViewer.document.open()
-	htmlViewer.document.write(html)
-	htmlViewer.document.close()
+		htmlGui.Add("Text", "x8 yp+26 w" . innerWidth . " 0x10")
 
-	MonitorGetWorkArea(, &mainScreenLeft, &mainScreenTop, &mainScreenRight, &mainScreenBottom)
+		editHeight := height - 102
 
-	if !getWindowPosition("HTML Viewer", &x, &y) {
-		x := kUndefined
-		y := kUndefined
+		htmlViewer := htmlGui.Add("WebView2Viewer", "X8 YP+10 W" . innerWidth . " H" . editHeight)
+
+		htmlViewer.document.open()
+		htmlViewer.document.write(html)
+		htmlViewer.document.close()
+
+		MonitorGetWorkArea(, &mainScreenLeft, &mainScreenTop, &mainScreenRight, &mainScreenBottom)
+
+		if !getWindowPosition("HTML Viewer", &x, &y) {
+			x := kUndefined
+			y := kUndefined
+		}
+
+		if (x = kUndefined)
+			switch x, false {
+				case "Left":
+					x := 25
+				case "Right":
+					x := mainScreenRight - width - 25
+				default:
+					x := "Center"
+			}
+
+		if (y = kUndefined)
+			switch y, false {
+				case "Top":
+					y := 25
+				case "Bottom":
+					y := mainScreenBottom - height - 25
+				default:
+					y := "Center"
+			}
+
+		buttonX := Round(width / 2) - 40
+
+		htmlGui.Add("Text", "x8 yp+" . (editHeight + 10) . " w" . innerWidth . " 0x10")
+
+		htmlGui.Add("Button", "Default X" . buttonX . " y+10 w80", translate("Ok")).OnEvent("Click", viewHTML.Bind(false))
+
+		htmlGui.Opt("+AlwaysOnTop")
+		htmlGui.Show("X" . x . " Y" . y . " W" . width . " NoActivate")
 	}
-
-	if (x = kUndefined)
-		switch x, false {
-			case "Left":
-				x := 25
-			case "Right":
-				x := mainScreenRight - width - 25
-			default:
-				x := "Center"
-		}
-
-	if (y = kUndefined)
-		switch y, false {
-			case "Top":
-				y := 25
-			case "Bottom":
-				y := mainScreenBottom - height - 25
-			default:
-				y := "Center"
-		}
-
-	buttonX := Round(width / 2) - 40
-
-	htmlGui.Add("Button", "Default X" . buttonX . " y+10 w80", translate("Ok")).OnEvent("Click", viewHTML.Bind(false))
-
-	htmlGui.Opt("+AlwaysOnTop")
-	htmlGui.Show("X" . x . " Y" . y . " W" . width . " H" . height . " NoActivate")
+	finally {
+		SetWorkingDir(curWorkingDir)
+	}
 }
 
 

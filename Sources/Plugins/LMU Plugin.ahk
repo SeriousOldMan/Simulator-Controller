@@ -618,20 +618,18 @@ class LMUPlugin extends Sector397Plugin {
 					session := getMultiMapValue(data, "Session Data", "Session", "Race")
 					remainingTime := getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0)
 					weatherData := LMURestProvider.WeatherData()
-
-					time := Round(100 - (remainingTime / duration * 100))
 					weather := weatherData.Weather["Now"]
 
 					if weather
 						lastWeather := weather
 
-					time := Round(100 - (Max(0, remainingTime - 600000) / duration * 100))
+					time := ((duration > 0) ? Round(100 - (Max(0, remainingTime - 600000) / duration * 100)) : 0)
 					weather := weatherData.Weather[session, time]
 
 					if weather
 						lastWeather10Min := weather
 
-					time := Round(100 - (Max(0, remainingTime - 1800000) / duration * 100))
+					time := ((duration > 0) ? Round(100 - (Max(0, remainingTime - 1800000) / duration * 100)) : 0)
 					weather := weatherData.Weather[session, time]
 
 					if weather

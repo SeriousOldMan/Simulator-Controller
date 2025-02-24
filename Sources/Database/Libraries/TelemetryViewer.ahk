@@ -755,7 +755,7 @@ class TelemetryViewer {
 	loadLayouts() {
 		local configuration := readMultiMap(kUserConfigDirectory . "Telemetry.layouts")
 		local layouts := CaseInsenseMap()
-		local name, definition, ignore
+		local name, definition, ignore, button
 
 		if (configuration.Count > 0)
 			for name, definition in getMultiMapValues(configuration, "Layouts")
@@ -772,20 +772,22 @@ class TelemetryViewer {
 					logError(exception)
 				}
 
-		if (layouts.Count = 0) {
-			this.iLayouts := CaseInsenseMap(translate("Standard")
-										  , {Name: translate("Standard")
-										   , WidthZoom: 100, HeightZoom: 100
-										   , Channels: choose(kTelemetryChannels
-															, (s) => (!inList(["Speed", "Throttle", "Brake", "TC", "ABS"
-																			 , "Long G", "Lat G"], s.Name) && s.HasProp("Size")))})
+		if (layouts.Count = 0)
+			layouts := CaseInsenseMap(translate("Standard")
+									, {Name: translate("Standard")
+									 , WidthZoom: 100, HeightZoom: 100
+									 , Channels: choose(kTelemetryChannels
+													  , (s) => (!inList(["Speed", "Throttle", "Brake", "TC", "ABS"
+																	   , "Long G", "Lat G"], s.Name) && s.HasProp("Size")))})
 
-			this.iSelectedLayout := translate("Standard")
-		}
-		else {
-			this.iLayouts := layouts
-			this.iSelectedLayout := getMultiMapValue(configuration, "Selected", "Layout")
-		}
+		this.iLayouts := layouts
+		this.iSelectedLayout := getMultiMapValue(configuration, "Selected", "Layout", translate("Standard"))
+
+		if !layouts.Has(this.iSelectedLayout)
+			if layouts.Has(translate("Standard"))
+				this.iSelectedLayout := translate("Standard")
+			else
+				this.iSelectedLayout := getKeys(layouts)[1]
 	}
 
 	saveLayouts() {
@@ -970,7 +972,22 @@ class TelemetryViewer {
 		viewerGui.Add("Documentation", "x186 YP+20 w336 H:Center Center", translate("Telemetry Viewer")
 					 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#Telemetry-Viewer")
 
-		viewerGui.Add("Text", "x8 yp+30 w676 W:Grow 0x10")
+		/*
+		button := viewerGui.Add("Button", "x653 yp+5 w23 h23 X:Move")
+		button.OnEvent("Click", (*) {
+			viewerGui.Block()
+
+			try {
+				editTelemetrySettings(this)
+			}
+			finally {
+				viewerGui.Unblock()
+			}
+		})
+		setButtonIcon(button, kIconsDirectory . "General Settings.ico", 1)
+		*/
+
+		viewerGui.Add("Text", "x8 yp+25 w676 W:Grow 0x10")
 
 		viewerGui.SetFont("s8 Norm", "Arial")
 
@@ -1639,7 +1656,7 @@ class TelemetryViewer {
 			telemetry := analyzer.createTelemetry(0, this.SelectedLap[true], driver, lapTime, sectorTimes)
 
 			if (analyzer.TrackSections.Length = 0)
-				withTask(WorkingTask(StrReplace(translate("Scanning track..."), "...", "")), () {
+				withTask(ProgressTask(StrReplace(translate("Scanning track..."), "...", "")), () {
 					withBlockedWindows(() {
 						analyzer.requireTrackSections(telemetry)
 
@@ -2082,7 +2099,7 @@ class SectionInfoViewer {
 		}
 
 		if (section.Type = "Corner") {
-			if section.HasProp("Name")
+			if (section.HasProp("Name") && section.Name)
 				name := (A_Space . section.Name)
 			else
 				name := ""
@@ -2150,7 +2167,7 @@ class SectionInfoViewer {
 		}
 		else {
 
-			if section.HasProp("Name")
+			if (section.HasProp("Name") && section.Name)
 				name := (A_Space . section.Name)
 			else
 				name := ""
@@ -2425,7 +2442,7 @@ class TrackMap {
 			this.Window.Block()
 
 			try {
-				withTask(WorkingTask(StrReplace(translate("Scanning track..."), "...", "")), () {
+				withTask(ProgressTask(StrReplace(translate("Scanning track..."), "...", "")), () {
 					withBlockedWindows(() {
 						local analyzer := TelemetryAnalyzer(this.Simulator, this.Track)
 						local lap := this.TelemetryViewer.SelectedLap
@@ -2536,7 +2553,7 @@ class TrackMap {
 
 					if isObject(currentSection) {
 						if currentSection.HasProp("Nr") {
-							if (currentSection.HasProp("Name") && (Trim(currentSection.Name) != ""))
+							if (currentSection.HasProp("Name") && currentSection.Name && (Trim(currentSection.Name) != ""))
 								positionInfo := (translate(" (") . currentSection.Name . translate(")"))
 							else
 								positionInfo := ""
@@ -3509,5 +3526,74 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 		}
 
 		return result
+	}
+}
+
+editTelemetrySettings(telemetryViewerOrCommand, arguments*) {
+	local settingsGui
+
+	static result := false
+
+	static providerDropDown
+	static endpointLabel
+	static endpointEdit
+
+	chooseProvider(*) {
+		editTelemetrySettings("UpdateState")
+	}
+
+	if (telemetryViewerOrCommand == kOk)
+		result := kOk
+	else if (telemetryViewerOrCommand == kCancel)
+		result := kCancel
+	else if (telemetryViewerOrCommand == "UpdateState") {
+		if (providerDropDown.Value = 1) {
+			endpointLabel.Visible := false
+			endpointEdit.Visible := false
+		}
+		else {
+			endpointLabel.Visible := true
+			endpointEdit.Visible := true
+
+			if (Trim(endpointEdit.Text) = "")
+				endpointEdit.Text := "http://localhost:5007/api"
+		}
+	}
+	else {
+		result := false
+
+		settingsGui := Window({Options: "0x400000"}, translate("Telemetry Viewer"))
+
+		settingsGui.SetFont("Norm", "Arial")
+
+		settingsGui.Add("Text", "x16 y16 w90 h23 +0x200", translate("Telemetry Provider"))
+		settingsGui.Add("Text", "x110 yp w160 h23 +0x200", "")
+
+		providerDropDown := settingsGui.Add("DropDownList", "x110 yp+1 w160 Choose1", collect(["Integrated", "Second Monitor"], translate))
+		providerDropDown.OnEvent("Change", chooseProvider)
+
+		endpointLabel := settingsGui.Add("Text", "x16 yp+30 w90 h23 +0x200 Hidden", translate("Provider URL"))
+		endpointEdit := settingsGui.Add("Edit", "x110 yp+1 w160 h21 Hidden")
+
+		settingsGui.Add("Button", "x60 yp+35 w80 h23 Default", translate("Ok")).OnEvent("Click", editTelemetrySettings.Bind(kOk))
+		settingsGui.Add("Button", "x146 yp w80 h23", translate("&Cancel")).OnEvent("Click", editTelemetrySettings.Bind(kCancel))
+
+		settingsGui.Opt("+Owner" . telemetryViewerOrCommand.Window.Hwnd)
+
+		settingsGui.Show("AutoSize Center")
+
+		while !result
+			Sleep(100)
+
+		try {
+			if (result == kCancel)
+				return false
+			else if (result == kOk) {
+				return true
+			}
+		}
+		finally {
+			settingsGui.Destroy()
+		}
 	}
 }

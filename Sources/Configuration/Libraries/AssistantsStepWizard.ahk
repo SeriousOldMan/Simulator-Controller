@@ -294,7 +294,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			else
 				Plugin(assistant, false, false, "", "").saveToConfiguration(configuration, false)
 
-		Plugin("Team Server", false, assistantActive, "", "").saveToConfiguration(configuration, false)
+		Plugin("Team Server", false, wizard.isModuleSelected("Team Server") && assistantActive, "", "").saveToConfiguration(configuration, false)
 	}
 
 	createGui(wizard, x, y, width, height) {

@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Global Application Library      ;;;
+;;;   Modular Simulator Controller System - Global Application Framework    ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
@@ -200,7 +200,7 @@ checkForNews() {
 
 		if check {
 			try {
-				Download("https://www.dropbox.com/s/3zfsgiepo85ufw3/NEWS?dl=1", kTempDirectory . "NEWS")
+				Download("https://fileshare.impresion3d.pro/filebrowser/api/public/dl/36C2etOo", kTempDirectory . "NEWS.ini")
 			}
 			catch Any as exception {
 				check := false
@@ -210,20 +210,31 @@ checkForNews() {
 		if check {
 			news := readMultiMap(kUserConfigDirectory . "NEWS")
 
-			for nr, html in getMultiMapValues(readMultiMap(kTempDirectory . "NEWS"), "News")
-				if !getMultiMapValue(news, "News", nr, false)
+			for nr, html in getMultiMapValues(readMultiMap(kTempDirectory . "NEWS.ini"), "News")
+				if !getMultiMapValue(news, "News", nr, false) {
 					try {
-						Download(html, kTempDirectory . "NEWS.htm")
+						Download(html, A_Temp . "\News.zip")
 
-						setMultiMapValue(news, "News", nr, true)
+						deleteDirectory(kTempDirectory . "News")
 
-						writeMultiMap(kUserConfigDirectory . "NEWS", news)
+						DirCreate(kTempDirectory . "News")
 
-						viewHTML(kTempDirectory . "NEWS.htm")
+						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\News.zip' -DestinationPath '" . kTempDirectory . "News' -Force", , "Hide")
+
+						if FileExist(kTempDirectory . "News\News.htm") {
+							setMultiMapValue(news, "News", nr, true)
+
+							writeMultiMap(kUserConfigDirectory . "NEWS", news)
+
+							viewHTML(kTempDirectory . "News\News.htm")
+						}
 					}
 					catch Any as exception {
 						logError(exception)
 					}
+
+					break
+				}
 		}
 	}
 }
@@ -395,7 +406,7 @@ viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 80
 	static htmlViewer
 
 	if !title
-		title := translate("News && Updates")
+		title := translate("News and Updates")
 
 	if !fileName {
 		htmlGui.Destroy()
@@ -419,7 +430,7 @@ viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 80
 
 	editHeight := height - 102
 
-	htmlViewer := htmlGui.Add("HTMLViewer", "X8 YP+26 W" . innerWidth . " H" . editHeight)
+	htmlViewer := htmlGui.Add("WebView2Viewer", "X8 YP+26 W" . innerWidth . " H" . editHeight)
 
 	htmlViewer.document.open()
 	htmlViewer.document.write(html)
@@ -542,12 +553,10 @@ if (!isDetachedInstallation() && !isDebug() && !inList(kBackgroundApps, StrSplit
 
 	requestShareSessionDatabaseConsent()
 
-	/*
 	if kLogStartup
 		logMessage(kLogOff, "Checking for news...")
 
 	checkForNews()
-	*/
 
 	if kLogStartup
 		logMessage(kLogOff, "Starting database synchronizer...")

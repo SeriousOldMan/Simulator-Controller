@@ -30,7 +30,10 @@ class BasicStepWizard extends StepWizard {
 
 	Pages {
 		Get {
-			return (1 + (this.BasicSetup ? 1 : 0))
+			if this.SetupWizard.Initialize
+				return (1 + (this.BasicSetup ? 1 : 0))
+			else
+				return 1
 		}
 	}
 
@@ -416,6 +419,9 @@ class BasicStepWizard extends StepWizard {
 
 		static installed := false
 
+		if !this.SetupWizard.Initialize
+			page := 2
+
 		if (page = 2) {
 			fullInstall := (!installed && (!isDevelopment() || (GetKeyState("Ctrl") && GetKeyState("Shift"))))
 
@@ -455,7 +461,7 @@ class BasicStepWizard extends StepWizard {
 
 			this.loadSetup(!fullInstall)
 
-			this.BasicSetup := false
+			this.BasicSetup := false ; this.SetupWizard.Initialize
 		}
 
 		super.showPage(page)
@@ -482,6 +488,9 @@ class BasicStepWizard extends StepWizard {
 	}
 
 	hidePage(page) {
+		if !this.SetupWizard.Initialize
+			page := 2
+
 		if (page = 2) {
 			this.updateSelectedSimulators()
 

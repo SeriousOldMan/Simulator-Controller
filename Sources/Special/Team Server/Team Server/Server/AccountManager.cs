@@ -208,7 +208,7 @@ namespace TeamServer.Server {
 
             await ObjectManager.Connection.QueryAsync<Account>(
                 @"
-                    Select * From Access_Accounts Where UseData = ?
+                    Select * From Access_Accounts Where DataAccess = ?
                 ", false).ContinueWith(t => t.Result.ForEach(a => {
                     if (!a.Administrator)
                         if (a.Contract == Account.ContractType.Expired)

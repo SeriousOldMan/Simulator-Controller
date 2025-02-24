@@ -972,7 +972,6 @@ class TelemetryViewer {
 		viewerGui.Add("Documentation", "x186 YP+20 w336 H:Center Center", translate("Telemetry Viewer")
 					 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#Telemetry-Viewer")
 
-		/*
 		button := viewerGui.Add("Button", "x653 yp+5 w23 h23 X:Move")
 		button.OnEvent("Click", (*) {
 			viewerGui.Block()
@@ -985,7 +984,6 @@ class TelemetryViewer {
 			}
 		})
 		setButtonIcon(button, kIconsDirectory . "General Settings.ico", 1)
-		*/
 
 		viewerGui.Add("Text", "x8 yp+25 w676 W:Grow 0x10")
 

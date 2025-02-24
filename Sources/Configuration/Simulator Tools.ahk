@@ -57,7 +57,7 @@ global kUpdateMessages := CaseInsenseMap("updateTranslations", "Updating transla
 									   , "updatePhraseGrammars", "Updating phrase grammars to ")
 
 global kDevelopmentCompiler := (kAHKDirectory . "Compiler\ahk2exe.exe")
-global kProductionCompiler := (kAHKDirectory . "Compiler\ahk2exe.exe /compress 2")
+global kProductionCompiler := kDevelopmentCompiler ; (kAHKDirectory . "Compiler\ahk2exe.exe /compress 2")
 
 global kSave := "save"
 global kRevert := "revert"

@@ -1624,7 +1624,7 @@ class DrivingCoach extends GridRaceAssistant {
 		facts := super.prepareSession(&settings, &data, formationLap)
 
 		if (!prepared && settings) {
-			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Coach", "Voice.UseTalking", true)})
+			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Coach", "Voice.UseTalking", false)})
 
 			if (this.Session = kSessionPractice) {
 				announcements := {SessionInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Practice.Session", true)

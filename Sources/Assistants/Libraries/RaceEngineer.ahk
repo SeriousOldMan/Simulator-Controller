@@ -2072,7 +2072,7 @@ class RaceEngineer extends RaceAssistant {
 		local facts := super.prepareSession(&settings, &data, formationLap?)
 
 		if (!prepared && settings) {
-			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Engineer", "Voice.UseTalking", true)})
+			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Engineer", "Voice.UseTalking", false)})
 
 			if (this.Session = kSessionPractice)
 				announcements := {FuelWarning: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Practice.LowFuel", true)

@@ -185,6 +185,7 @@ requestShareSessionDatabaseConsent() {
 }
 
 checkForNews() {
+	local show := true
 	local check, lastModified, availableNews, news, nr, html, shown, rule
 
 	if inList(kForegroundApps, StrSplit(A_ScriptName, ".")[1]) {
@@ -214,14 +215,17 @@ checkForNews() {
 			for nr, html in getMultiMapValues(availableNews, "News")
 				if isNumber(nr) {
 					shown := getMultiMapValue(news, "News", nr, false)
+					rule := getMultiMapValue(availableNews, "Rules", nr, "Once")
 
-					if shown {
-						rule := getMultiMapValue(availableNews, "Rules", nr, "Once")
+					if (shown && InStr(rule, "Repeat"))
+						shown := (DateAdd(shown, string2Values(":", rule)[2], "Days") < A_Now)
+					else if (!shown && InStr(rule, "Timed")) {
+						rule := string2Values(":", rule)
 
-						shown := ((rule = "Once") || (DateAdd(shown, string2Values(":", rule)[2], "Days") < A_Now))
+						show := ((A_Now > rule[2]) && ((rule.Length = 2) || (A_Now <= rule[3])))
 					}
 
-					if !shown {
+					if (!shown && show) {
 						try {
 							deleteFile(A_Temp . "\News.zip")
 

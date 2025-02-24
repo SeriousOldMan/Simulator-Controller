@@ -168,6 +168,7 @@ class VoiceServer extends ConfigurationItem {
 
 			speak(text, wait := true, cache := false, options := false) {
 				local booster := this.Booster
+				local ignore, part
 
 				if booster {
 					if options {
@@ -181,7 +182,11 @@ class VoiceServer extends ConfigurationItem {
 						text := booster.speak(text, Map("Variables", {assistant: this.Routing}))
 				}
 
-				super.speak(text, wait, cache, options)
+				if (!options || (options.HasProp("UseTalking") && options.UseTalking))
+					super.speak(text, wait, cache, options)
+				else
+					for ignore, part in string2Values(". ", text)
+						super.speak(part . ".", wait, cache, options)
 			}
 		}
 

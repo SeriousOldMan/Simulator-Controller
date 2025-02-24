@@ -1,9 +1,9 @@
 [Development]
-Version=6.2.1.0-dev
-Target=6.2.1.0-release
+Version=6.2.2.0-dev
+Target=6.2.2.0-release
 Date=02/23/2025
 Download=
-Changes=Auto Initialize for "Strategy Workbench", Names for straights in track maps, iRacing IBT file support in telemetry importer, Fixed deletion of expired accounts in Team Server, New default values for simulator specific settings, New race setting "Spotter: Private Practice", New race setting "Spotter: Private Qualifying", Increased resilience against corrupted telemetry layout definitions, Implemented News system, No shutdown for track mapper at end of session, Prevented unwanted track automation click handler, Streamlined basic configuration in "Simulator Setup", Fixed LMU practice session startup code
+Changes=Use rephrasing booster also for split talking, Chat mode support for rFactor 2 and Le Mans Ultimate
 Components=Media->5.6.1,Configuration->6.2.0,Utilities->6.1.6
 [Release]
 Version=6.2.0.0-release
@@ -24,5 +24,5 @@ Utilities.6.1.6.Download=https://fileshare.impresion3d.pro/filebrowser/api/publi
 [Current]
 Type=Development
 [Version]
-Development=6.2.1.0-dev
+Development=6.2.2.0-dev
 Release=6.2.0.0-release

@@ -2059,7 +2059,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 							if isObject(currentSection) {
 								if currentSection.HasProp("Nr") {
-									if (currentSection.HasProp("Name") && (Trim(currentSection.Name) != ""))
+									if (currentSection.HasProp("Name") && currentSection.Name && (Trim(currentSection.Name) != ""))
 										positionInfo := (translate(" (") . currentSection.Name . translate(")"))
 									else
 										positionInfo := ""
@@ -3352,13 +3352,15 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		CoordMode("Mouse", oldCoordMode)
 
 		if (this.TrackEditorMode = "Automations") {
-			action := actionDialog(x, y)
+			if this.SelectedTrackAutomation {
+				action := actionDialog(x, y)
 
-			if action {
-				action.X := coordinateX
-				action.Y := coordinateY
+				if action {
+					action.X := coordinateX
+					action.Y := coordinateY
 
-				this.addTrackAction(action)
+					this.addTrackAction(action)
+				}
 			}
 		}
 		else {
@@ -5963,7 +5965,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			SplitPath(fileName, &name)
 
-			withTask(WorkingTask(translate("Extracting ") . name), () {
+			withTask(ProgressTask(translate("Extracting ") . name), () {
 				RunWait("`"" . kBinariesDirectory . "Connectors\iRacing IBT Reader\iRacing IBT Reader.exe`" `"" . fileName . "`" `"" . directory . "`"", , "Hide")
 			})
 

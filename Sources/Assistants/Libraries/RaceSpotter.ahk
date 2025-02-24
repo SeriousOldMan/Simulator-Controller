@@ -875,7 +875,7 @@ class RaceSpotter extends GridRaceAssistant {
 	iBestTopSpeed := false
 	iLastTopSpeed := false
 
-	iPrivateQualification := false
+	iPrivateSession := false
 
 	class SpotterVoiceManager extends RaceAssistant.RaceVoiceManager {
 		iFastSpeechSynthesizer := false
@@ -1103,9 +1103,9 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
-	PrivateQualification {
+	PrivateSession {
 		Get {
-			return this.iPrivateQualification
+			return this.iPrivateSession
 		}
 	}
 
@@ -1158,8 +1158,8 @@ class RaceSpotter extends GridRaceAssistant {
 		if values.HasProp("DriverUpdateTime")
 			this.iDriverUpdateTime := values.DriverUpdateTime
 
-		if values.HasProp("PrivateQualification")
-			this.iPrivateQualification := values.PrivateQualification
+		if values.HasProp("PrivateSession")
+			this.iPrivateSession := values.PrivateSession
 	}
 
 	updateSessionValues(values) {
@@ -1995,7 +1995,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local situation, opponentType, driverPitstops, carPitstops, carInfo, indicator
 		local driverPosition, driverLapTime, slowerCar, carNr, carPosition, delta, lapTimeDifference, key
 
-		if ((this.Session = kSessionQualification) && !this.PrivateQualification) {
+		if ((this.Session = kSessionQualification) && !this.PrivateSession) {
 			this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, &focused)
 
 			if (trackAhead && trackAhead.inRange(sector, true)) {
@@ -3094,7 +3094,7 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	proximityAlert(alert) {
-		if (this.Speaker[false] && this.Running && !this.PrivateQualification
+		if (this.Speaker[false] && this.Running && !this.PrivateSession
 		 && ((!InStr(alert, "Behind") && this.Announcements["SideProximity"]) || (InStr(alert, "Behind") && this.Announcements["RearProximity"])))
 			this.pushAlert(alert, false, false, alert)
 	}
@@ -3102,7 +3102,7 @@ class RaceSpotter extends GridRaceAssistant {
 	slowCarAlert(arguments*) {
 		local distance, side, speaker
 
-		if (this.Announcements["SlowCars"] && this.Speaker[false] && this.Running && !this.PrivateQualification && this.hasEnoughData(false)) {
+		if (this.Announcements["SlowCars"] && this.Speaker[false] && this.Running && !this.PrivateSession && this.hasEnoughData(false)) {
 			if (arguments.Length = 0)
 				this.pushAlert("SlowCarAhead", false, false, "SlowCarAhead")
 			else {
@@ -3137,7 +3137,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local distance := false
 		local speaker
 
-		if (((type = "Ahead") || (this.Session = kSessionRace)) && !this.PrivateQualification)
+		if (((type = "Ahead") || (this.Session = kSessionRace)) && !this.PrivateSession)
 			if (this.Announcements["Accidents" . type] && this.Speaker[false] && this.Running && this.hasEnoughData(false)) {
 				speaker := this.getSpeaker(true)
 
@@ -3157,14 +3157,14 @@ class RaceSpotter extends GridRaceAssistant {
 		local speaker
 
 		if (this.Speaker[false] && (this.Session = kSessionRace) && this.Running
-		 && !this.PrivateQualification && (!this.KnowledgeBase || this.KnowledgeBase.getValue("Lap", 0) <= 1))
+		 && !this.PrivateSession && (!this.KnowledgeBase || this.KnowledgeBase.getValue("Lap", 0) <= 1))
 			this.pushAlert("Green", false, false, "Green")
 	}
 
 	yellowFlag(alert, arguments*) {
 		local sectors
 
-		if (this.Announcements["YellowFlags"] && this.Speaker[false] && this.Running && !this.PrivateQualification) {
+		if (this.Announcements["YellowFlags"] && this.Speaker[false] && this.Running && !this.PrivateSession) {
 			sectors := string2Values(",", this.getSpeaker(true).Fragments["Sectors"])
 
 			switch alert, false {
@@ -3188,7 +3188,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local delta
 
-		if (this.Announcements["BlueFlags"] && this.Speaker[false] && this.Running && !this.PrivateQualification) {
+		if (this.Announcements["BlueFlags"] && this.Speaker[false] && this.Running && !this.PrivateSession) {
 			if ((this.Session = kSessionRace) && positions.Has("StandingsBehind") && positions.Has(positions["StandingsBehind"])) {
 				delta := Abs(positions[positions["StandingsBehind"]][10])
 
@@ -3375,14 +3375,22 @@ class RaceSpotter extends GridRaceAssistant {
 		local prepared := this.Prepared
 		local speaker, fragments
 		local facts, weather, airTemperature, trackTemperature, weatherNow, weather10Min, weather30Min, driver
-		local position, length, facts
+		local position, length, facts, private
 
 		facts := super.prepareSession(&settings, &data, formationLap)
 
 		if !prepared {
-			if settings
+			if settings {
+				if (this.Session = kSessionQualification)
+					private := getMultiMapValue(settings, "Assistant.Spotter", "Qualification.Private", false)
+				else if (this.Session = kSessionPractice)
+					private := getMultiMapValue(settings, "Assistant.Spotter", "Practice.Private", false)
+				else
+					private := false
+
 				this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Spotter", "Voice.UseTalking", true)
-											  , PrivateQualification: getMultiMapValue(settings, "Assistant.Spotter", "Qualification.Private", false)})
+											  , PrivateSession: private})
+			}
 
 			this.initializeAnnouncements()
 

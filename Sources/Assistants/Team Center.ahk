@@ -9354,7 +9354,7 @@ class TeamCenter extends ConfigurationItem {
 				}
 
 				if (fileName != "")
-					withTask(WorkingTask(StrReplace(translate("Save Session..."), "...", "")), () {
+					withTask(ProgressTask(StrReplace(translate("Save Session..."), "...", "")), () {
 						try {
 							sessionDB := SessionDatabase()
 
@@ -9899,7 +9899,7 @@ class TeamCenter extends ConfigurationItem {
 					OnMessage(0x44, translateLoadCancelButtons, 0)
 				}
 
-				withTask(WorkingTask(StrReplace(translate("Extracting ") . translate("Session") . translate("..."), "...", "")), () {
+				withTask(ProgressTask(StrReplace(translate("Extracting ") . translate("Session") . translate("..."), "...", "")), () {
 					if (fileName && InStr(FileExist(fileName), "D"))
 						folder := fileName
 					else if (fileName && (fileName != "")) {
@@ -9969,7 +9969,7 @@ class TeamCenter extends ConfigurationItem {
 					OnMessage(0x44, translateOkButton, 0)
 				}
 				else {
-					withTask(WorkingTask(StrReplace(translate("Load Session..."), "...", "")), () {
+					withTask(ProgressTask(StrReplace(translate("Load Session..."), "...", "")), () {
 						this.iSyncTask.pause()
 
 						this.iConnection := false

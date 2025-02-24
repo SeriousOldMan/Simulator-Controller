@@ -2,6 +2,7 @@
   1. Integration of local TTS engines for voice generation
   2. Support automatic language translation when using Whisper voice recognition
   3. New GPT booster that supports automatic translation to a different language for voice generation
+  4. HTTP Server to run Whisper on a remote machine
 
 #### Simulation Support
   1. Better integration with the weather forecast data of *rFactor 2*
@@ -23,9 +24,7 @@
 #### Session Database
   1. Active validation of value ranges in settings definitions
   2. Integration with an upcoming REST/JSON realtime interface of Second Monitor
-  3. Importer for telemtry data in IBT format
-  4. Support section names also for straights in a track map
-
+  
 #### Setup Workbench
   1. Collect telemetry data from multiple drivers and generate combined setup recommendations
   2. Gear ratio optimizer for the Issue Analyzer

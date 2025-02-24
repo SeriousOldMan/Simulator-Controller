@@ -4728,7 +4728,7 @@ class SoloCenter extends ConfigurationItem {
 
 				if (fileName != "")
 					if progress
-						withTask(WorkingTask(StrReplace(translate("Save Session..."), "...", "")), saveSession.Bind(directory, fileName))
+						withTask(ProgressTask(StrReplace(translate("Save Session..."), "...", "")), saveSession.Bind(directory, fileName))
 					else
 						saveSession(directory, fileName)
 			}
@@ -5074,7 +5074,7 @@ class SoloCenter extends ConfigurationItem {
 					OnMessage(0x44, translateLoadCancelButtons, 0)
 				}
 
-				withTask(WorkingTask(StrReplace(translate("Extracting ") . translate("Session") . translate("..."), "...", "")), () {
+				withTask(ProgressTask(StrReplace(translate("Extracting ") . translate("Session") . translate("..."), "...", "")), () {
 					if (fileName && InStr(FileExist(fileName), "D"))
 						folder := fileName
 					else if (fileName && (fileName != "")) {
@@ -5133,7 +5133,7 @@ class SoloCenter extends ConfigurationItem {
 			}
 
 			if (folder != "") {
-				withTask(WorkingTask(StrReplace(translate("Load Session..."), "...", "")), () {
+				withTask(ProgressTask(StrReplace(translate("Load Session..."), "...", "")), () {
 					folder := (folder . "\")
 
 					info := readMultiMap(folder . "Practice.info")

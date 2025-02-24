@@ -820,9 +820,14 @@ class LMURestProvider {
 				session := StrUpper(session)
 
 			if (this.Data && this.Data.Has("scheduledSessions"))
-				for ignore, candidate in this.Data["scheduledSessions"]
-					if InStr(candidate["name"], session)
-						return (candidate["lengthTime"] * 60)
+				try {
+					for ignore, candidate in this.Data["scheduledSessions"]
+						if InStr(candidate["name"], session)
+							return (candidate["lengthTime"] * 60)
+				}
+				catch Any as exception {
+					logError(exception)
+				}
 
 			return false
 		}
@@ -836,9 +841,14 @@ class LMURestProvider {
 				session := StrUpper(session)
 
 			if (this.Data && this.Data.Has("scheduledSessions"))
-				for ignore, candidate in this.Data["scheduledSessions"]
-					if InStr(candidate["name"], session)
-						return candidate["rainChance"]
+				try {
+					for ignore, candidate in this.Data["scheduledSessions"]
+						if InStr(candidate["name"], session)
+							return candidate["rainChance"]
+				}
+				catch Any as exception {
+					logError(exception)
+				}
 
 			return false
 		}

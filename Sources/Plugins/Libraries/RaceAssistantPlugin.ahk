@@ -1899,7 +1899,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 					logMessage(kLogCritical, translate("Cannot start " . this.Plugin . " (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
 					if !kSilentMode
-						showMessage(substituteVariables(translate("Cannot start " . this.Plugin . " (%kBinariesDirectory%Race Assistant.exe) - please rebuild the applications..."))
+						showMessage(substituteVariables(translate("Cannot start " . this.Plugin . " (%kBinariesDirectory%" . this.Plugin . ".exe) - please rebuild the applications..."))
 								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 
 					return false

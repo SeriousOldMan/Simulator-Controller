@@ -3388,7 +3388,7 @@ class RaceSpotter extends GridRaceAssistant {
 				else
 					private := false
 
-				this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Spotter", "Voice.UseTalking", true)
+				this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Spotter", "Voice.UseTalking", false)
 											  , PrivateSession: private})
 			}
 

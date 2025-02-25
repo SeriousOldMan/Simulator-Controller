@@ -3,8 +3,8 @@ Version=6.2.2.0-dev
 Target=6.2.2.0-release
 Date=02/24/2025
 Download=
-Changes=Use rephrasing booster also for split talking, Chat mode support for rFactor 2 and Le Mans Ultimate, Telemetry provider setting for Driving Coach
-Components=Media->5.6.1,Configuration->6.2.0,Utilities->6.1.6
+Changes=Use rephrasing booster also for split talking, Chat mode support for rFactor 2 and Le Mans Ultimate, Telemetry provider setting for Driving Coach, Use Second Monitor as real time telemetry provider
+Components=Media->5.6.1,Configuration->6.2.1,Utilities->6.1.6
 [Release]
 Version=6.2.0.0-release
 Date=02/21/2025
@@ -18,6 +18,9 @@ Media.5.6.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl
 Configuration.6.2.0.Path=Resources
 Configuration.6.2.0.Content=Setup
 Configuration.6.2.0.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/XjItUnZi;https://www.dropbox.com/scl/fi/e5s5e8w62cdscan2ejqp3/Configuration-6.2.0.zip?rlkey=98xz3jr9z50v8vk1fsfzlkn2a&st=vndo8e1w&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.2.0.zip
+Configuration.6.2.1.Path=Resources
+Configuration.6.2.1.Content=Setup
+Configuration.6.2.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/CuyqbRlN;https://www.dropbox.com/scl/fi/oimops6ia2cmije8ijsi1/Configuration-6.2.1.zip?rlkey=exmxucfyhhytzteauunc5fd30&st=9jde5ox9&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.2.1.zip
 Utilities.6.1.6.Path=.
 Utilities.6.1.6.Content=Utilities
 Utilities.6.1.6.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Gs12Shqo;https://www.dropbox.com/scl/fi/zo6ve6h67jluj25zkni9z/Utilities-6.1.6.zip?rlkey=qmp8jzvx54roz3l72zovvk6we&st=wfvj3oxf&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.1.6.zip

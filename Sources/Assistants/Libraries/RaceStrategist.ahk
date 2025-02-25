@@ -1544,8 +1544,7 @@ class RaceStrategist extends GridRaceAssistant {
 									  , "Session.Settings.Pitstop.Strategy.Window.Considered", getMultiMapValue(settings, "Strategy Settings"
 																													  , "Strategy.Window.Considered", 3)))
 
-		this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Strategist", "Voice.UseTalking", true)
-									  , UseTraffic: getMultiMapValue(settings, "Strategy Settings", "Traffic.Simulation", false)})
+		this.updateConfigurationValues({UseTraffic: getMultiMapValue(settings, "Strategy Settings", "Traffic.Simulation", false)})
 
 		return facts
 	}
@@ -1587,7 +1586,7 @@ class RaceStrategist extends GridRaceAssistant {
 			this.updateSessionValues({RaceInfo: false})
 
 		if (!prepared && settings)
-			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Strategist", "Voice.UseTalking", true)
+			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Strategist", "Voice.UseTalking", false)
 										  , UseTraffic: getMultiMapValue(settings, "Strategy Settings", "Traffic.Simulation", false)})
 
 		if (!this.RaceInfo || (isSet(formationLap) && formationLap))

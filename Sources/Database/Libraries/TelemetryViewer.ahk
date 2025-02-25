@@ -3587,7 +3587,10 @@ editTelemetrySettings(telemetryViewerOrCommand, arguments*) {
 			if (result == kCancel)
 				return false
 			else if (result == kOk) {
-				return true
+				if (providerDropDown.Value = 1)
+					return "Integrated"
+				else
+					return ("Second Monitor|" . endpointEdit.Text)
 			}
 		}
 		finally {

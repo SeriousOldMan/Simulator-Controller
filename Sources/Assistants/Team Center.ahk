@@ -1377,6 +1377,9 @@ class TeamCenter extends ConfigurationItem {
 
 		this.iCollectTelemetry := getMultiMapValue(configuration, "Telemetry", "Collect", false)
 
+		if this.CollectTelemetry
+			this.iCollectTelemetry := getMultiMapValue(configuration, "Telemetry", "Provider", "Integrated")
+
 		setMultiMapValue(configuration, "Telemetry", "Directory", false)
 
 		writeMultiMap(kUserConfigDirectory . "Team Server.ini", configuration)
@@ -4977,12 +4980,15 @@ class TeamCenter extends ConfigurationItem {
 			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 		}
 
-		updateTelemetrySetting(enabled) {
+		updateTelemetrySetting(provider) {
 			local configuration := readMultiMap(kUserConfigDirectory . "Team Server.ini")
 
-			setMultiMapValue(configuration, "Telemetry", "Collect", enabled)
+			setMultiMapValue(configuration, "Telemetry", "Collect", provider != false)
 
-			setMultiMapValue(configuration, "Telemetry", "Directory", enabled ? (this.SessionDirectory . "Telemetry") : false)
+			if provider
+				setMultiMapValue(configuration, "Telemetry", "Provider", provider)
+
+			setMultiMapValue(configuration, "Telemetry", "Directory", provider ? (this.SessionDirectory . "Telemetry") : false)
 
 			writeMultiMap(kUserConfigDirectory . "Team Server.ini", configuration)
 		}
@@ -5038,7 +5044,11 @@ class TeamCenter extends ConfigurationItem {
 
 					this.updateState()
 				case 7: ; Telemetry
-					this.iCollectTelemetry := !this.CollectTelemetry
+					if !this.CollectTelemetry
+						this.iCollectTelemetry := editTelemetryProviderSettings(this, getMultiMapValue(readMultiMap(kUserConfigDirectory . "Team Server.ini")
+																									 , "Telemetry", "Provider", "Integrated"))
+					else
+						this.iCollectTelemetry := !this.CollectTelemetry
 
 					updateTelemetrySetting(this.CollectTelemetry)
 
@@ -8676,8 +8686,10 @@ class TeamCenter extends ConfigurationItem {
 							teamServerConfig := readMultiMap(kUserConfigDirectory . "Team Server.ini")
 
 							if (!getMultiMapValue(teamServerConfig, "Telemetry", "Collect")
+							 || (getMultiMapValue(teamServerConfig, "Telemetry", "Provider", false) != this.CollectTelemetry)
 							 || (getMultiMapValue(teamServerConfig, "Telemetry", "Directory") != (this.SessionDirectory . "Telemetry"))) {
 								setMultiMapValue(teamServerConfig, "Telemetry", "Collect", true)
+								setMultiMapValue(teamServerConfig, "Telemetry", "Provider", this.CollectTelemetry)
 								setMultiMapValue(teamServerConfig, "Telemetry", "Directory", this.SessionDirectory . "Telemetry")
 
 								writeMultiMap(kUserConfigDirectory . "Team Server.ini", teamServerConfig)
@@ -13790,6 +13802,86 @@ loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false,
 		}
 		finally {
 			loginGui.Destroy()
+		}
+	}
+}
+
+editTelemetryProviderSettings(teamCenterOrCommand, arguments*) {
+	local settingsGui
+
+	static result := false
+
+	static providerDropDown
+	static endpointLabel
+	static endpointEdit
+
+	chooseProvider(*) {
+		editTelemetryProviderSettings("UpdateState")
+	}
+
+	if (teamCenterOrCommand == kOk)
+		result := kOk
+	else if (teamCenterOrCommand == kCancel)
+		result := kCancel
+	else if (teamCenterOrCommand == "UpdateState") {
+		if (providerDropDown.Value = 1) {
+			endpointLabel.Visible := false
+			endpointEdit.Visible := false
+		}
+		else {
+			endpointLabel.Visible := true
+			endpointEdit.Visible := true
+
+			if (Trim(endpointEdit.Text) = "")
+				endpointEdit.Text := "http://localhost:5007/api"
+		}
+	}
+	else {
+		result := false
+
+		settingsGui := Window({Options: "0x400000"}, translate("Team Center"))
+
+		settingsGui.SetFont("Norm", "Arial")
+
+		settingsGui.Add("Text", "x16 y16 w90 h23 +0x200", translate("Telemetry Provider"))
+		settingsGui.Add("Text", "x110 yp w160 h23 +0x200", "")
+
+		providerDropDown := settingsGui.Add("DropDownList", "x110 yp+1 w160 Choose1", collect(["Integrated", "Second Monitor"], translate))
+		providerDropDown.OnEvent("Change", chooseProvider)
+
+		endpointLabel := settingsGui.Add("Text", "x16 yp+30 w90 h23 +0x200 Hidden", translate("Provider URL"))
+		endpointEdit := settingsGui.Add("Edit", "x110 yp+1 w160 h21 Hidden")
+
+		settingsGui.Add("Button", "x60 yp+35 w80 h23 Default", translate("Ok")).OnEvent("Click", editTelemetryProviderSettings.Bind(kOk))
+		settingsGui.Add("Button", "x146 yp w80 h23", translate("&Cancel")).OnEvent("Click", editTelemetryProviderSettings.Bind(kCancel))
+
+		settingsGui.Opt("+Owner" . teamCenterOrCommand.Window.Hwnd)
+
+		if (arguments[1] && (arguments[1] != "Integrated")) {
+			providerDropDown.Choose(2)
+
+			endpointEdit.Text := string2Values("|", arguments[1])[2]
+
+			editTelemetryProviderSettings("UpdateState")
+		}
+
+		settingsGui.Show("AutoSize Center")
+
+		while !result
+			Sleep(100)
+
+		try {
+			if (result == kCancel)
+				return false
+			else if (result == kOk) {
+				if (providerDropDown.Value = 1)
+					return "Integrated"
+				else
+					return ("Second Monitor|" . endpointEdit.Text)
+			}
+		}
+		finally {
+			settingsGui.Destroy()
 		}
 	}
 }

@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[6.2.1.0-dev](https://www.dropbox.com/scl/fi/k84ll02k42ednm1z85rhz/Simulator-Controller-6.2.1.0-dev.zip?rlkey=bskye3kgobwi9fxihhx5l640a&st=vz31jcte&dl=1) (Early build for 6.2.1. Changes: Auto Initialize for "Strategy Workbench", Names for straights in track maps, iRacing IBT file support in telemetry importer, Fixed deletion of expired accounts in Team Server, New default values for simulator specific settings, New race setting "Spotter: Private Practice", New race setting "Spotter: Private Qualifying", Increased resilience against corrupted telemetry layout definitions, Implemented News system, No shutdown for track mapper at end of session, Prevented unwanted track automation click handler, Streamlined basic configuration in "Simulator Setup", Fixed LMU practice session startup code, Changed default for "Repeat whole voice message".)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-621) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

@@ -1217,10 +1217,14 @@ class SessionDatabase extends ConfigurationItem {
 		local name := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
 									 , long ? "Track Names Long" : "Track Names Short", track, track)
 
+		if (StrLen(name) < 5)
+			name := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
+									 , "Track Names Long", track, name)
+
 		if (!name || (name = ""))
 			name := track
 
-		return name
+		return StrTitle(name)
 	}
 
 	getTrackName(simulator, track, long := true) {

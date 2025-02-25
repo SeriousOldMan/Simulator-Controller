@@ -168,7 +168,6 @@ class VoiceServer extends ConfigurationItem {
 
 			speak(text, wait := true, cache := false, options := false) {
 				local booster := this.Booster
-				local ignore, part
 
 				if booster {
 					if options {
@@ -182,11 +181,7 @@ class VoiceServer extends ConfigurationItem {
 						text := booster.speak(text, Map("Variables", {assistant: this.Routing}))
 				}
 
-				if (!options || (options.HasProp("UseTalking") && options.UseTalking))
-					super.speak(text, wait, cache, options)
-				else
-					for ignore, part in string2Values(". ", text)
-						super.speak(part . ".", wait, cache, options)
+				super.speak(text, wait, cache, options)
 			}
 		}
 
@@ -479,8 +474,7 @@ class VoiceServer extends ConfigurationItem {
 		}
 
 		speak(text, options := false) {
-			local tries := 5
-			local stopped, oldSpeaking, oldInterruptable
+			local tries, stopped, oldSpeaking, oldInterruptable, parts, ignore, part
 
 			while this.Muted
 				Sleep(100)
@@ -491,6 +485,15 @@ class VoiceServer extends ConfigurationItem {
 			oldSpeaking := this.Speaking
 			oldInterruptable := this.iInterruptable
 
+			if (!options || (options.HasProp("UseTalking") && options.UseTalking))
+				parts := [text]
+			else {
+				parts := []
+
+				for ignore, part in string2Values(". ", text)
+					parts.Push(part . ".")
+			}
+
 			try {
 				if !this.Speaking
 					this.startSpeaking()
@@ -499,32 +502,36 @@ class VoiceServer extends ConfigurationItem {
 				this.iInterruptable := true
 
 				try {
-					while (tries-- > 0) {
-						if (tries == 0)
-							this.SpeechSynthesizer[true].speak(text, true, false, options)
-						else {
-							if !this.Interrupted
-								this.SpeechSynthesizer[true].speak(text, true, false, options)
+					for ignore, part in parts {
+						tries := 5
 
-							if (this.Interrupted = "Abort") {
-								this.iInterrupted := false
+						while (tries-- > 0) {
+							if (tries == 0)
+								this.SpeechSynthesizer[true].speak(part, true, false, options)
+							else {
+								if !this.Interrupted
+									this.SpeechSynthesizer[true].speak(part, true, false, options)
 
-								break
-							}
-							else if this.Interrupted {
-								Sleep(2000)
+								if (this.Interrupted = "Abort") {
+									this.iInterrupted := false
 
-								while this.Muted {
-									while this.Muted
-										Sleep(100)
-
-									Sleep(Round(Random(1, 2000)))
+									break
 								}
+								else if this.Interrupted {
+									Sleep(2000)
 
-								this.iInterrupted := false
+									while this.Muted {
+										while this.Muted
+											Sleep(100)
+
+										Sleep(Round(Random(1, 2000)))
+									}
+
+									this.iInterrupted := false
+								}
+								else
+									break
 							}
-							else
-								break
 						}
 					}
 				}

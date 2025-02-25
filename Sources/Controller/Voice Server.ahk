@@ -165,24 +165,6 @@ class VoiceServer extends ConfigurationItem {
 
 				super.__New(arguments*)
 			}
-
-			speak(text, wait := true, cache := false, options := false) {
-				local booster := this.Booster
-
-				if booster {
-					if options {
-						options := toMap(options)
-
-						text := booster.speak(text, Map("Rephrase", (!options.Has("Rephrase") || options["Rephrase"])
-													  , "Translate", (options.Has("Translate") && options["Tranlate"])
-													  , "Variables", {assistant: this.Routing}))
-					}
-					else
-						text := booster.speak(text, Map("Variables", {assistant: this.Routing}))
-				}
-
-				super.speak(text, wait, cache, options)
-			}
 		}
 
 		class ClientSpeechRecognizer extends SpeechRecognizer {
@@ -474,7 +456,21 @@ class VoiceServer extends ConfigurationItem {
 		}
 
 		speak(text, options := false) {
+			local speaker := this.SpeechSynthesizer[true]
+			local booster := speaker.Booster
 			local tries, stopped, oldSpeaking, oldInterruptable, parts, ignore, part
+
+			if booster {
+				if options {
+					options := toMap(options)
+
+					text := booster.speak(text, Map("Rephrase", (!options.Has("Rephrase") || options["Rephrase"])
+												  , "Translate", (options.Has("Translate") && options["Tranlate"])
+												  , "Variables", {assistant: this.Routing}))
+				}
+				else
+					text := booster.speak(text, Map("Variables", {assistant: this.Routing}))
+			}
 
 			while this.Muted
 				Sleep(100)
@@ -507,10 +503,10 @@ class VoiceServer extends ConfigurationItem {
 
 						while (tries-- > 0) {
 							if (tries == 0)
-								this.SpeechSynthesizer[true].speak(part, true, false, options)
+								speaker.speak(part, true, false, options)
 							else {
 								if !this.Interrupted
-									this.SpeechSynthesizer[true].speak(part, true, false, options)
+									speaker.speak(part, true, false, options)
 
 								if (this.Interrupted = "Abort") {
 									this.iInterrupted := false

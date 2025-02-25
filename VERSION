@@ -3,7 +3,7 @@ Version=6.2.2.0-dev
 Target=6.2.2.0-release
 Date=02/24/2025
 Download=
-Changes=Use rephrasing booster also for split talking, Chat mode support for rFactor 2 and Le Mans Ultimate, Telemetry provider setting for Driving Coach, Use Second Monitor as real time telemetry provider
+Changes=Use rephrasing booster also for split talking, Chat mode support for rFactor 2 and Le Mans Ultimate, Telemetry provider setting for Driving Coach, Use Second Monitor as real time telemetry provider, Choose telemetry provider in Team Center, Choose telemetry provider in Telemetry Viewer, Updated Rephrasing booster instructions
 Components=Media->5.6.1,Configuration->6.2.1,Utilities->6.1.6
 [Release]
 Version=6.2.0.0-release

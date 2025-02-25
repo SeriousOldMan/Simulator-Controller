@@ -2747,7 +2747,7 @@ class SoloCenter extends ConfigurationItem {
 			if this.TelemetryViewer {
 				this.TelemetryViewer.shutdownCollector()
 
-				this.TelemetryViewer.restart(this.SessionDirectory . "Telemetry", active)
+				this.TelemetryViewer.restart(this.SessionDirectory . "Telemetry")
 			}
 
 			directory := this.SessionDirectory

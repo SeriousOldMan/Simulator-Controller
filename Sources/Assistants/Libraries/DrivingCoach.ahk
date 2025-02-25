@@ -1408,7 +1408,7 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	startupTelemetryCollector() {
-		local loadedLaps
+		local loadedLaps, provider
 
 		updateTelemetry() {
 			local knowledgeBase := this.KnowledgeBase
@@ -1466,8 +1466,13 @@ class DrivingCoach extends GridRaceAssistant {
 				DirCreate(kTempDirectory . "Driving Coach\Telemetry")
 			}
 
+			provider := getMultiMapValue(this.Settings, "Assistant.Coach", "Telemetry.Provider", "Integrated")
+			
+			if (provider != "Integrated")
+				provider .= ("|" . getMultiMapValue(this.Settings, "Assistant.Coach", "Telemetry.Provider.URL", ""))
+			
 			this.iTelemetryAnalyzer := TelemetryAnalyzer(this.Simulator, this.Track)
-			this.iTelemetryCollector := TelemetryCollector(kTempDirectory . "Driving Coach\Telemetry", this.Simulator, this.Track, this.TrackLength)
+			this.iTelemetryCollector := TelemetryCollector(provider, kTempDirectory . "Driving Coach\Telemetry", this.Simulator, this.Track, this.TrackLength)
 
 			this.iTelemetryCollector.startup()
 
@@ -1477,7 +1482,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 			this.iCollectorTask.start()
 
-			return true
+			return true6
 		}
 		else
 			return false

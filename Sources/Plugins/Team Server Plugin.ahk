@@ -1440,7 +1440,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 
-	startupTelemetryCollector(directory := false) {
+	startupTelemetryCollector(provider, directory := false) {
 		local loadedLaps := CaseInsenseMap()
 		local hasTelemetry := false
 
@@ -1499,7 +1499,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		if (this.TelemetryDirectory && !this.TelemetryCollector && (this.TrackLength > 0)) {
 			DirCreate(this.TelemetryDirectory)
 
-			this.iTelemetryCollector := TelemetryCollector(this.TelemetryDirectory, this.Simulator, this.Track, this.TrackLength)
+			this.iTelemetryCollector := TelemetryCollector(provider, this.TelemetryDirectory, this.Simulator, this.Track, this.TrackLength)
 
 			this.iTelemetryCollector.startup()
 
@@ -1649,7 +1649,8 @@ class TeamServerPlugin extends ControllerPlugin {
 							if this.TelemetryCollector
 								this.shutdownTelemetryCollector()
 
-							this.startupTelemetryCollector(normalizeDirectoryPath(telemetryDirectory))
+							this.startupTelemetryCollector(getMultiMapValue(teamServerConfig, "Telemetry", "Provider", "Integrated")
+														 , normalizeDirectoryPath(telemetryDirectory))
 						}
 					}
 					else if this.TelemetryCollector

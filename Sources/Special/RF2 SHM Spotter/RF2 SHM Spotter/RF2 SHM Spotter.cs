@@ -1785,11 +1785,11 @@ namespace RF2SHMSpotter {
                             StreamWriter file = new StreamWriter(telemetryDirectory + "\\Telemetry.section", true);
 
                             file.Write(playerScoring.mLapDist + ";");
-                            file.Write((float)telemetry.mVehicles[playerID].mFilteredThrottle + ";");
-                            file.Write((float)telemetry.mVehicles[playerID].mFilteredBrake + ";");
-                            file.Write((float)telemetry.mVehicles[playerID].mFilteredSteering + ";");
-                            file.Write((float)telemetry.mVehicles[playerID].mGear + ";");
-                            file.Write((float)telemetry.mVehicles[playerID].mEngineRPM + ";");
+                            file.Write((float)vehicle.mFilteredThrottle + ";");
+                            file.Write((float)vehicle.mFilteredBrake + ";");
+                            file.Write((float)vehicle.mFilteredSteering + ";");
+                            file.Write((float)vehicle.mGear + ";");
+                            file.Write((float)vehicle.mEngineRPM + ";");
                             file.Write(vehicleSpeed(ref playerScoring) + ";");
 
                             file.Write("n/a;");

@@ -36,6 +36,11 @@
   16. [Important] The default value for the [race setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) "Repeat whole voice message" has changed for all Assistants from *True* to *False* in the "Session Database". This means, that an Assistant from now on will only repeat the last sentence by default, if got interrupted by another Assistant. If you want to restore the previous bahaviour, include and change the setting in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) of the "Session Database" for your simulators.
   17. Implemented a *News* system which will give you from time to time interesting or important information about Simulator Controller in general or upcoming features. And of course I will also ask you to support the project once in a while.
   18. [Internal] Changed some compiler options to make AntiVirus programs more happy.
+  19. New car models for "Setup Workbench":
+      - Le Mans Ultimate
+	    - Aston Martin Vantage AMR LMGT3
+		- Ford Mustang LMGT3
+		- Porsche 911 GT3 R LMGT3
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-621), if you are hosting your own Team Server.
 

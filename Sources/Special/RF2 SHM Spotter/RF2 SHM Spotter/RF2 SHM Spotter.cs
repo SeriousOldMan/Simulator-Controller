@@ -1755,15 +1755,18 @@ namespace RF2SHMSpotter {
 					lastRunning = -1;
                 }
 
-				if (playerScoring.mLapDist > lastRunning) {
-					lastRunning = playerScoring.mLapDist;
+				if (playerScoring.mLapDist > lastRunning)
+                {
+                    ref rF2VehicleTelemetry vehicle = ref GetPlayerTelemetry(playerID, ref telemetry);
+
+                    lastRunning = playerScoring.mLapDist;
 					
 					telemetryFile.Write(playerScoring.mLapDist + ";");
-					telemetryFile.Write((float)telemetry.mVehicles[playerID].mFilteredThrottle + ";");
-					telemetryFile.Write((float)telemetry.mVehicles[playerID].mFilteredBrake + ";");
-					telemetryFile.Write((float)telemetry.mVehicles[playerID].mFilteredSteering + ";");
-					telemetryFile.Write((float)telemetry.mVehicles[playerID].mGear + ";");
-					telemetryFile.Write((float)telemetry.mVehicles[playerID].mEngineRPM + ";");
+					telemetryFile.Write((float)vehicle.mFilteredThrottle + ";");
+					telemetryFile.Write((float)vehicle.mFilteredBrake + ";");
+					telemetryFile.Write((float)vehicle.mFilteredSteering + ";");
+					telemetryFile.Write((float)vehicle.mGear + ";");
+					telemetryFile.Write((float)vehicle.mEngineRPM + ";");
 					telemetryFile.Write(vehicleSpeed(ref playerScoring) + ";");
 
 					telemetryFile.Write("n/a;");
@@ -1774,8 +1777,6 @@ namespace RF2SHMSpotter {
 
 					telemetryFile.Write(playerScoring.mPos.x + ";");
 					telemetryFile.Write(-playerScoring.mPos.z + ";");
-
-					ref rF2VehicleTelemetry vehicle = ref GetPlayerTelemetry(playerID, ref telemetry);
 
 					telemetryFile.WriteLine((vehicle.mElapsedTime - vehicle.mLapStartET) * 1000);
 

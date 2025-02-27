@@ -150,7 +150,7 @@ class TelemetryCollector {
 		}
 	}
 
-	__New(telemetryDirectory, simulator, track, trackLength) {
+	__New(provider, telemetryDirectory, simulator, track, trackLength) {
 		this.iTelemetryDirectory := telemetryDirectory
 
 		this.initialize(simulator, track, trackLength)

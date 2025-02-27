@@ -972,20 +972,40 @@ class TelemetryViewer {
 		viewerGui.Add("Documentation", "x186 YP+20 w336 H:Center Center", translate("Telemetry Viewer")
 					 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#Telemetry-Viewer")
 
-		/*
 		button := viewerGui.Add("Button", "x653 yp+5 w23 h23 X:Move")
 		button.OnEvent("Click", (*) {
+			local provider := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+														  , "Telemetry Viewer", "Provider", "Integrated")
+			local newProvider, configuration, collector
+
 			viewerGui.Block()
 
 			try {
-				editTelemetrySettings(this)
+				newProvider := editTelemetrySettings(this, provider)
+
+				if (newProvider && (newProvider != provider)) {
+					configuration := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+					setMultiMapValue(configuration, "Telemetry Viewer", "Provider", newProvider)
+
+					writeMultiMap(kUserConfigDirectory . "Application Settings.ini", configuration)
+
+					collector := this.TelemetryCollector
+
+					if collector {
+						this.shutdownCollector()
+
+						this.restart(this.TelemetryDirectory)
+
+						this.startupCollector(newProvider, this.TelemetryDirectory, collector.Simulator, collector.Track, collector.TrackLength)
+					}
+				}
 			}
 			finally {
 				viewerGui.Unblock()
 			}
 		})
 		setButtonIcon(button, kIconsDirectory . "General Settings.ico", 1)
-		*/
 
 		viewerGui.Add("Text", "x8 yp+25 w676 W:Grow 0x10")
 
@@ -1138,7 +1158,9 @@ class TelemetryViewer {
 
 	startupCollector(simulator, track, trackLength) {
 		if !this.TelemetryCollector {
-			this.iTelemetryCollector := TelemetryCollector(this.TelemetryDirectory, simulator, track, trackLength)
+			this.iTelemetryCollector := TelemetryCollector(getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+																		  , "Telemetry Viewer", "Provider", "Integrated")
+														 , this.TelemetryDirectory, simulator, track, trackLength)
 
 			this.iTelemetryCollector.startup()
 
@@ -1205,7 +1227,7 @@ class TelemetryViewer {
 			SectionInfoViewer.closeSectionInfo()
 	}
 
-	restart(directory, collect := true) {
+	restart(directory) {
 		local simulator, car, track
 
 		this.selectLap(false, true)
@@ -3578,6 +3600,14 @@ editTelemetrySettings(telemetryViewerOrCommand, arguments*) {
 		settingsGui.Add("Button", "x60 yp+35 w80 h23 Default", translate("Ok")).OnEvent("Click", editTelemetrySettings.Bind(kOk))
 		settingsGui.Add("Button", "x146 yp w80 h23", translate("&Cancel")).OnEvent("Click", editTelemetrySettings.Bind(kCancel))
 
+		if (arguments[1] && (arguments[1] != "Integrated")) {
+			providerDropDown.Choose(2)
+
+			endpointEdit.Text := string2Values("|", arguments[1])[2]
+
+			editTelemetrySettings("UpdateState")
+		}
+
 		settingsGui.Opt("+Owner" . telemetryViewerOrCommand.Window.Hwnd)
 
 		settingsGui.Show("AutoSize Center")
@@ -3589,7 +3619,10 @@ editTelemetrySettings(telemetryViewerOrCommand, arguments*) {
 			if (result == kCancel)
 				return false
 			else if (result == kOk) {
-				return true
+				if (providerDropDown.Value = 1)
+					return "Integrated"
+				else
+					return ("Second Monitor|" . endpointEdit.Text)
 			}
 		}
 		finally {

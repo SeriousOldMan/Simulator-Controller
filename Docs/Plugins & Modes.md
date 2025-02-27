@@ -18,7 +18,7 @@ The distribution of Simulator Controller includes a set of predefined plugins, w
 | ACE | Simple integration for Assetto Corsa EVO. No functionality beside starting and stopping from a hardware controller. |
 | [AMS2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-AMS2) | Integration for *Automobilista 2*, which supports  Jona, the AI Race Engineer, Cato, the AI Race Strategist and also Elisa, the AI Race Spotter. The Driving Coach Aiden also is integrated with *Automobilista 2*. The plugin also supports a "Pitstop" mode for adjusting pitstop settings and a "Assistant" mode to interact with the Race Assistants. |
 | [IRC](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-irc) | This plugin integrates the *iRacing* simulation game with Simulator Controller. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the AI Race Engineer, with Cato, the AI Race Strategist and also with Elisa, the AI Race Spotter is available as well. The Driving Coach Aiden also is integrated with *iRacing*. The "Assistant" mode can handle most of the Race Assistant commands from your hardware controller. |
-| [RF2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rf2) | Similar to the ACC and IRC plugin provides this plugin start and stop support for *rFactor 2*. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the AI Race Engineer, and with Cato, the AI Race Strategist is available as well. The Race Spotter Elisa and the Driving Coach are also integrated with *rFactor 2*. The "Assistant" mode can handle most of the Race Assistant commands from your hardware controller. |
+| [RF2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rf2) | Similar to the ACC and IRC plugin provides this plugin start and stop support for *rFactor 2*. The mode "Chat", which is available when *rFactor 2* is currently running, handle automated chat messages for the multiplayer ingame chat system, where the chat messages can be configured by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the AI Race Engineer, and with Cato, the AI Race Strategist is available as well. The Race Spotter Elisa and the Driving Coach are also integrated with *rFactor 2*. The "Assistant" mode can handle most of the Race Assistant commands from your hardware controller. |
 | [R3E](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rre) | Similar to the ACC, IRC and RF2 plugins provides this plugin start and stop support for *RaceRoom Racing Experience*. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the AI Race Engineer, with Cato, the AI Race Strategist and also with Elisa, the AI Race Spotter is available as well. The Driving Coach Aiden also is integrated with *RaceRoom Racing Experience*. The "Assistant" mode can handle most of the Race Assistant commands from your hardware controller. |
 | RSP | Simple integration for Rennsport. No functionality beside starting and stopping from a hardware controller. |
 | [PCARS2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-PCARS2) | Integration for *Project CARS 2*, which supports  Jona, the AI Race Engineer, Cato, the AI Race Strategist and also Elisa, the AI Race Spotter. The Driving Coach Aiden also is integrated with *Project CARS 2*. The plugin also supports a "Pitstop" mode for adjusting pitstop settings and a "Assistant" mode to interact with the Race Assistants. |
@@ -885,6 +885,12 @@ This plugin handles the *rFactor 2* simulation game. An application with the nam
 
 Important: You must install a plugin into *rFactor 2* plugins directory ([rF2]\Bin64\Plugins\) for the telemetry interface and the pitstop mode to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip*. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
 
+### Mode *Chat*
+
+The mode "Chat" binds all the configured chat messages to buttons on your controller hardware. The chat messages can be defined in the [Chat tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-chat). The messages will be only availabe in a multiuser race scenario, since "rFactor 2" activates the chat system only there.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%205.JPG)
+
 ### Mode *Pitstop*
 
 Similar to the pitstop mode the plugin for *Assetto Corsa Competizione*, you can control most of the pitstop settings of *rFactor 2*. 
@@ -917,11 +923,14 @@ Note: You can use all these commands in the *pitstopCommands* list as well, whic
 First, you can define, how to open and close the Pitstop MFD (aka HUD) in *rFactor 2*. This is actually optional, since the menu have not to be open for the control of the pitstop settings. If you want to use the "PitstopRequest" controller action (see below), supply an argument for *requestPitstop*. Please supply the bindings you have defined in the controller setup in *rFactor 2*.
 
 	openPitstopMFD: *openHotkey*; closePitstopMFD: *closeHotkey*; requestPitstop: *requestPitstopHotkey*;
+	openChat: *openChatHotkey*;
 	pitstopMFDMode: Event | Input | Play | Raw | Default
 
 The parameter *pitstopMFDMode* determines, how the communication to the simulator is handled. You can try different values for this parameter, if the Pitstop MFD does not open. Simulator Controller simulates keyboard input for the simulator and there are different ways to do that. These are named "Event", Input", "Play", "Raw" and "Default". For whatever reason, there is not the one method, which works for every Windows installation. For me, "Event" works best and is therefore the standard, if you don't supply the parameter.
 
 As a special case, you can provide "Off" as the argument to *openPitstopMFD*. This will disable the opening and thereby the complete control of the Pitstop MFD. The software, and especially the *Race Assistants* still *think*, that the pitstop settings had been changed, which is helpful, if you only want to get the target settings by voice, but want to dial them into the Pitstop MFD by your own.
+
+If you want to use the "Chat" mode, you have to define the key, which activates the chat entry field in *Le Mans Ultimate* using the *openChat* parameter. The key "t" is the typical default in *Le Mans Ultimate* for this command binding by the way.
 	
 With the plugin parameter *pitstopCommands* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
 
@@ -1305,6 +1314,10 @@ Important: You must install a plugin into *Le Mans Ultimate* plugins directory (
 
 The *Le Mans Ultimate* game is under heavy development by the studio at the time of this writing. It is marketed as early access and many things are still not working. This also affects the data API and the integration with Simulator Controller. For example, pitstop settings handling is not supported yet and there are problems with driver names and car model names. I will continiously improve on that as far as there are improvements on the side of the *Le Mans Ultimate* data API.
 
+### Mode *Chat*
+
+The mode "Chat" binds all the configured chat messages to buttons on your controller hardware. The chat messages can be defined in the [Chat tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-chat). The messages will be only availabe in a multiuser race scenario, since "Le Mans Ultimate" activates the chat system only there.
+
 ### Mode *Pitstop*
 
 Similar to the pitstop mode the plugin for *Assetto Corsa Competizione*, you can control most of the pitstop settings of *Le Mans Ultimate*. 
@@ -1313,7 +1326,7 @@ Similar to the pitstop mode the plugin for *Assetto Corsa Competizione*, you can
 
 All this will be achieved using the following plugin arguments:
 
-	openPitstopMFD: p; closePitstopMFD: p;
+	openPitstopMFD: p; closePitstopMFD: p; openChat: t;
 	pitstopCommands: Refuel Dial.1 5, TyreAllAround Dial.2, PitstopPlan Button.1, PitstopPrepare Button.5,
 					 TyreCompound Button.2 Button.6, RepairRequest Button.3 Button.7, DriverSelect Button.4 Button.8
 
@@ -1337,11 +1350,14 @@ Note: You can use all these commands in the *pitstopCommands* list as well, whic
 First, you can define, how to open and close the Pitstop MFD (aka HUD) in *Le Mans Ultimate*. This is actually optional, since the menu have not to be open for the control of the pitstop settings. If you want to use the "PitstopRequest" controller action (see below), supply an argument for *requestPitstop*. Please supply the bindings you have defined in the controller setup in *Le Mans Ultimate*.
 
 	openPitstopMFD: *openHotkey*; closePitstopMFD: *closeHotkey*; requestPitstop: *requestPitstopHotkey*;
+	openChat: *openChatHotkey*;
 	pitstopMFDMode: Event | Input | Play | Raw | Default
 
 The parameter *pitstopMFDMode* determines, how the communication to the simulator is handled. You can try different values for this parameter, if the Pitstop MFD does not open. Simulator Controller simulates keyboard input for the simulator and there are different ways to do that. These are named "Event", Input", "Play", "Raw" and "Default". For whatever reason, there is not the one method, which works for every Windows installation. For me, "Event" works best and is therefore the standard, if you don't supply the parameter.
 
 As a special case, you can provide "Off" as the argument to *openPitstopMFD*. This will disable the opening and thereby the complete control of the Pitstop MFD. The software, and especially the *Race Assistants* still *think*, that the pitstop settings had been changed, which is helpful, if you only want to get the target settings by voice, but want to dial them into the Pitstop MFD by your own.
+
+If you want to use the "Chat" mode, you have to define the key, which activates the chat entry field in *Le Mans Ultimate* using the *openChat* parameter. The key "t" is the typical default in *Le Mans Ultimate* for this command binding by the way.
 	
 With the plugin parameter *pitstopCommands* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
 

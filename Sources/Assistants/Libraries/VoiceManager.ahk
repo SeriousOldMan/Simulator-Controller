@@ -142,8 +142,7 @@ class VoiceManager extends ConfigurationItem {
 		}
 
 		beginTalk(force := false) {
-			if (force || this.UseTalking)
-				this.iIsTalking := true
+			this.iIsTalking := true
 		}
 
 		endTalk(options := false) {
@@ -172,9 +171,15 @@ class VoiceManager extends ConfigurationItem {
 				if options
 					throw "Options are not supported while talking..."
 			}
-			else
+			else {
+				if options
+					options.UseTalking := this.UseTalking
+				else
+					options := {UseTalking: this.UseTalking}
+
 				messageSend(kFileMessage, "Voice", "speak:" . values2String(";", this.VoiceManager.Name, text, focus, options ? map2String("|", "->", toMap(options)) : false)
 										, this.VoiceManager.VoiceServer)
+			}
 		}
 
 		getPhrase(phrase, variables := false, cache := false) {
@@ -299,8 +304,7 @@ class VoiceManager extends ConfigurationItem {
 		}
 
 		beginTalk(options := false) {
-			if ((options && options.HasProp("Talking") && options.Talking) || this.UseTalking)
-				this.iIsTalking := true
+			this.iIsTalking := true
 		}
 
 		endTalk(options := false) {
@@ -320,7 +324,7 @@ class VoiceManager extends ConfigurationItem {
 		}
 
 		speak(text, focus := false, cache := false, options := false) {
-			local booster, stopped
+			local booster, stopped, ignore, part
 
 			if this.Talking {
 				this.iText .= (A_Space . text)
@@ -350,7 +354,11 @@ class VoiceManager extends ConfigurationItem {
 					this.Speaking := true
 
 					try {
-						super.speak(text, !this.Awaitable, cache, options)
+						if this.UseTalking
+							super.speak(text, !this.Awaitable, cache, options)
+						else
+							for ignore, part in string2Values(". ", text)
+								super.speak(part . ".", !this.Awaitable, cache, options)
 					}
 					finally {
 						this.Speaking := false
@@ -446,11 +454,11 @@ class VoiceManager extends ConfigurationItem {
 			this.VoiceManager.raiseTextRecognized("Text", text)
 		}
 
-		parseText(&text, rephrase := false) {
+		parseText(&text, recognize := false) {
 			local booster := this.Booster
 			local alternateText
 
-			if (booster && rephrase && (booster.Mode = "Always")) {
+			if (booster && recognize && (booster.Mode = "Always")) {
 				alternateText := booster.recognize(text)
 
 				if (alternateText && (alternateText != ""))
@@ -460,11 +468,11 @@ class VoiceManager extends ConfigurationItem {
 			return super.parseText(&text)
 		}
 
-		unknownRecognized(&text, rephrase := false) {
+		unknownRecognized(&text, recognize := false) {
 			local booster := this.Booster
 			local alternateText
 
-			if (booster && rephrase && (booster.Mode = "Unknown")) {
+			if (booster && recognize && (booster.Mode = "Unknown")) {
 				alternateText := booster.recognize(text)
 
 				if (alternateText && (alternateText != "") && (alternateText != text)) {

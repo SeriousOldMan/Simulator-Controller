@@ -1530,7 +1530,7 @@ class SetupWorkbench extends ConfigurationItem {
 						if ((lastActiveSimulator != simulator) || (lastActiveTrack != track))
 							deleteDirectory(kTempDirectory . "Garage\Telemetry", false)
 
-						this.TelemetryViewer.restart(kTempDirectory . "Garage\Telemetry", true)
+						this.TelemetryViewer.restart(kTempDirectory . "Garage\Telemetry")
 					}
 
 					simulatorCode := SessionDatabase.getSimulatorCode(simulator)

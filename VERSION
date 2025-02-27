@@ -1,9 +1,9 @@
 [Development]
-Version=6.2.1.0-release
-Target=6.2.1.0-release
+Version=6.2.2.0-dev
+Target=6.2.2.0-release
 Date=02/27/2025
-Download=https://cutt.ly/YrrI31d1;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/4mEl0rJy;https://www.dropbox.com/scl/fi/byecupg7g9tgx055gm95b/Simulator-Controller-6.2.1.0-release.zip?rlkey=1wkjg1b2b4fdb9o7vbhvng0b6&st=my621qeh&dl=1
-Changes=Auto Initialize for "Strategy Workbench", Names for straights in track maps, iRacing IBT file support in telemetry importer, Fixed deletion of expired accounts in Team Server, New default values for simulator specific settings, New race setting "Spotter: Private Practice", New race setting "Spotter: Private Qualifying", Increased resilience against corrupted telemetry layout definitions, Implemented News system, No shutdown for track mapper at end of session, Prevented unwanted track automation click handler, Streamlined basic configuration in "Simulator Setup", Fixed LMU practice session startup code, Changed default for "Repeat whole voice message", New car models for "Setup Workbench", Fixed ramp down of Le Mans Ultimate
+Download=
+Changes=Use rephrasing booster also for split talking, Chat mode support for rFactor 2 and Le Mans Ultimate, Telemetry provider setting for Driving Coach, Use Second Monitor as real time telemetry provider, Choose telemetry provider in Team Center, Choose telemetry provider in Telemetry Viewer, Updated Rephrasing booster instructions
 Components=Media->5.6.1,Configuration->6.2.1,Utilities->6.1.6
 [Release]
 Version=6.2.1.0-release
@@ -22,7 +22,7 @@ Utilities.6.1.6.Path=.
 Utilities.6.1.6.Content=Utilities
 Utilities.6.1.6.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Gs12Shqo;https://www.dropbox.com/scl/fi/zo6ve6h67jluj25zkni9z/Utilities-6.1.6.zip?rlkey=qmp8jzvx54roz3l72zovvk6we&st=wfvj3oxf&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.1.6.zip
 [Current]
-Type=Release
+Type=Development
 [Version]
-Development=6.2.1.0-release
+Development=6.2.2.0-dev
 Release=6.2.1.0-release

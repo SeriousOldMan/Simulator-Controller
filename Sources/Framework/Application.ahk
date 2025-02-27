@@ -209,52 +209,54 @@ checkForNews() {
 		}
 
 		if check {
-			availableNews := readMultiMap(kTempDirectory . "NEWS.ini")
-			news := readMultiMap(kUserConfigDirectory . "NEWS")
+			Task.startTask(() {
+				availableNews := readMultiMap(kTempDirectory . "NEWS.ini")
+				news := readMultiMap(kUserConfigDirectory . "NEWS")
 
-			for nr, html in getMultiMapValues(availableNews, "News")
-				if isNumber(nr) {
-					shown := getMultiMapValue(news, "News", nr, false)
-					rule := getMultiMapValue(availableNews, "Rules", nr, "Once")
+				for nr, html in getMultiMapValues(availableNews, "News")
+					if isNumber(nr) {
+						shown := getMultiMapValue(news, "News", nr, false)
+						rule := getMultiMapValue(availableNews, "Rules", nr, "Once")
 
-					if (shown && InStr(rule, "Repeat"))
-						shown := (DateAdd(shown, string2Values(":", rule)[2], "Days") < A_Now)
-					else if (!shown && InStr(rule, "Timed")) {
-						rule := string2Values(":", rule)
+						if (shown && InStr(rule, "Repeat"))
+							shown := (DateAdd(shown, string2Values(":", rule)[2], "Days") < A_Now)
+						else if (!shown && InStr(rule, "Timed")) {
+							rule := string2Values(":", rule)
 
-						show := ((A_Now > rule[2]) && ((rule.Length = 2) || (A_Now <= rule[3])))
-					}
+							show := ((A_Now > rule[2]) && ((rule.Length = 2) || (A_Now <= rule[3])))
+						}
 
-					if (!shown && show) {
-						try {
-							deleteFile(A_Temp . "\News.zip")
-
-							Download(html, A_Temp . "\News.zip")
-
+						if (!shown && show) {
 							try {
-								deleteFile(kTempDirectory . "News")
-								deleteDirectory(kTempDirectory . "News")
+								deleteFile(A_Temp . "\News.zip")
+
+								Download(html, A_Temp . "\News.zip")
+
+								try {
+									deleteFile(kTempDirectory . "News")
+									deleteDirectory(kTempDirectory . "News")
+								}
+
+								DirCreate(kTempDirectory . "News")
+
+								RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\News.zip' -DestinationPath '" . kTempDirectory . "News' -Force", , "Hide")
+
+								if FileExist(kTempDirectory . "News\News.htm") {
+									setMultiMapValue(news, "News", nr, A_Now)
+
+									writeMultiMap(kUserConfigDirectory . "NEWS", news)
+
+									viewHTML(kTempDirectory . "News\News.htm")
+								}
+							}
+							catch Any as exception {
+								logError(exception)
 							}
 
-							DirCreate(kTempDirectory . "News")
-
-							RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\News.zip' -DestinationPath '" . kTempDirectory . "News' -Force", , "Hide")
-
-							if FileExist(kTempDirectory . "News\News.htm") {
-								setMultiMapValue(news, "News", nr, A_Now)
-
-								writeMultiMap(kUserConfigDirectory . "NEWS", news)
-
-								viewHTML(kTempDirectory . "News\News.htm")
-							}
+							break
 						}
-						catch Any as exception {
-							logError(exception)
-						}
-
-						break
 					}
-				}
+			}, 10000)
 		}
 	}
 }

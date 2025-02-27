@@ -346,7 +346,7 @@ checkInstallation() {
 	local installLocation := ""
 	local installInfo, quiet, options, msgResult, hasSplash, command, component, source
 	local install, index, options, isNew, packageLocation, packageInfo, packageType, version
-	local ignore, directory, currentDirectory
+	local ignore, directory, currentDirectory, folder1, folder2, directory1, directory2
 
 	installComponents(packageLocation, installLocation, temporary := false) {
 		global gProgressCount
@@ -808,7 +808,10 @@ checkInstallation() {
 					if (installLocation != packageLocation) {
 						showProgress({progress: gProgressCount++, message: translate("Removing installation files...")})
 
-						if InStr(packageLocation, kTempDirectory)
+						SplitPath(packageLocation, &folder1, &directory1)
+						SplitPath(kTempDirectory, &folder2, &directory2)
+
+						if InStr(directory1 . "\" . folder1, directory2 . "\" . folder2)
 							removeDirectory(packageLocation)
 						else {
 							OnMessage(0x44, translateYesNoButtons)
@@ -855,18 +858,20 @@ checkInstallation() {
 						Run(A_Args[index + 1])
 				}
 			}
-			else {
-				if (isNew || (options.InstallLocation != packageLocation))
-					if InStr(packageLocation, kTempDirectory)
-						removeDirectory(packageLocation)
-					else {
-						OnMessage(0x44, translateYesNoButtons)
-						msgResult := withBlockedWindows(MsgBox, translate("Do you want to remove the folder with the installation files?"), translate("Installation"), 262436)
-						OnMessage(0x44, translateYesNoButtons, 0)
+			else if (isNew || (options.InstallLocation != packageLocation)) {
+				SplitPath(packageLocation, &folder1, &directory1)
+				SplitPath(kTempDirectory, &folder2, &directory2)
 
-						if (msgResult = "Yes")
-							removeDirectory(packageLocation)
-					}
+				if InStr(directory1 . "\" . folder1, directory2 . "\" . folder2)
+					removeDirectory(packageLocation)
+				else {
+					OnMessage(0x44, translateYesNoButtons)
+					msgResult := withBlockedWindows(MsgBox, translate("Do you want to remove the folder with the installation files?"), translate("Installation"), 262436)
+					OnMessage(0x44, translateYesNoButtons, 0)
+
+					if (msgResult = "Yes")
+						removeDirectory(packageLocation)
+				}
 			}
 
 			ExitApp(0)

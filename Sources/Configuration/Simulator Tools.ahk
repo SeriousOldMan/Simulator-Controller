@@ -375,11 +375,11 @@ checkInstallation() {
 							showProgress({progress: (gProgressCount += 2)
 										, message: translate("Downloading ") . component . translate(" files...")})
 
-							deleteFile(A_Temp . "\Temp.zip")
+							deleteFile(kTempDirectory . "ComponentPackage.zip")
 
-							Download(url, A_Temp . "\Temp.zip")
+							Download(url, kTempDirectory . "ComponentPackage.zip")
 
-							if !FileExist(A_Temp . "\Temp.zip")
+							if !FileExist(kTempDirectory . "ComponentPackage.zip")
 								urlError := "Package URL not defined..."
 							else {
 								showProgress({progress: (gProgressCount += 2)
@@ -393,7 +393,7 @@ checkInstallation() {
 									path := packageLocation
 
 								if temporary {
-									destination := (A_Temp . "\SC-Component" . componentNr)
+									destination := (kTempDirectory . "SC-Component" . componentNr)
 
 									deleteFile(destination)
 									deleteDirectory(destination)
@@ -404,7 +404,7 @@ checkInstallation() {
 								else
 									destination := path
 
-								RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Temp.zip' -DestinationPath '" . destination . "' -Force", , "Hide")
+								RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kTempDirectory . "ComponentPackage.zip' -DestinationPath '" . destination . "' -Force", , "Hide")
 
 								if (!DirExist(destination) || !FileExist(destination . "\*.*"))
 									throw "Archive does not contain a valid component package..."
@@ -808,7 +808,7 @@ checkInstallation() {
 					if (installLocation != packageLocation) {
 						showProgress({progress: gProgressCount++, message: translate("Removing installation files...")})
 
-						if InStr(packageLocation, A_Temp)
+						if InStr(packageLocation, kTempDirectory)
 							removeDirectory(packageLocation)
 						else {
 							OnMessage(0x44, translateYesNoButtons)
@@ -857,7 +857,7 @@ checkInstallation() {
 			}
 			else {
 				if (isNew || (options.InstallLocation != packageLocation))
-					if InStr(packageLocation, A_Temp)
+					if InStr(packageLocation, kTempDirectory)
 						removeDirectory(packageLocation)
 					else {
 						OnMessage(0x44, translateYesNoButtons)

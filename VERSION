@@ -1,23 +1,20 @@
 [Development]
-Version=6.2.1.0-dev
+Version=6.2.1.0-release
 Target=6.2.1.0-release
-Date=02/24/2025
-Download=https://www.dropbox.com/scl/fi/k84ll02k42ednm1z85rhz/Simulator-Controller-6.2.1.0-dev.zip?rlkey=bskye3kgobwi9fxihhx5l640a&st=vz31jcte&dl=1
-Changes=Auto Initialize for "Strategy Workbench", Names for straights in track maps, iRacing IBT file support in telemetry importer, Fixed deletion of expired accounts in Team Server, New default values for simulator specific settings, New race setting "Spotter: Private Practice", New race setting "Spotter: Private Qualifying", Increased resilience against corrupted telemetry layout definitions, Implemented News system, No shutdown for track mapper at end of session, Prevented unwanted track automation click handler, Streamlined basic configuration in "Simulator Setup", Fixed LMU practice session startup code, Changed default for "Repeat whole voice message", New car models for "Setup Workbench"
+Date=02/27/2025
+Download=https://cutt.ly/YrrI31d1;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/4mEl0rJy;https://www.dropbox.com/scl/fi/byecupg7g9tgx055gm95b/Simulator-Controller-6.2.1.0-release.zip?rlkey=1wkjg1b2b4fdb9o7vbhvng0b6&st=my621qeh&dl=1
+Changes=Auto Initialize for "Strategy Workbench", Names for straights in track maps, iRacing IBT file support in telemetry importer, Fixed deletion of expired accounts in Team Server, New default values for simulator specific settings, New race setting "Spotter: Private Practice", New race setting "Spotter: Private Qualifying", Increased resilience against corrupted telemetry layout definitions, Implemented News system, No shutdown for track mapper at end of session, Prevented unwanted track automation click handler, Streamlined basic configuration in "Simulator Setup", Fixed LMU practice session startup code, Changed default for "Repeat whole voice message", New car models for "Setup Workbench", Fixed ramp down of Le Mans Ultimate
 Components=Media->5.6.1,Configuration->6.2.1,Utilities->6.1.6
 [Release]
-Version=6.2.0.0-release
-Date=02/21/2025
-Download=https://cutt.ly/jrwB9DkC;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/iBoeu7PG;https://www.dropbox.com/scl/fi/clv38rt1ee6o86v2sc5no/Simulator-Controller-6.2.0.0-release.zip?rlkey=plshk29r63m1vwtw95lvuro0h&st=qc1bgriz&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.2.0.0-release.zip
-Changes=Engineer updates about repairs no longer needed, Engineer does not announce unnecessary repairs for a pitstop anymore, Voice recognition test mode now starts all Assistants, Prevent rF2 pitstop option walk in pitlane, Fixed download mirror handling in "Simulator Download", Fixed download mirror handling in "Siimulator Tools", Fixed unit conversion problem in "Race Settings", Implemented runtime for Whisper speech recognition, Ported Team Server to .NET Runtime 8.0, Fixed crash when selecting Azure GPT provider, Fixed RPM values in iRacing telemetry data
-Components=Media->5.6.1,Configuration->6.2.0,Utilities->6.1.6
+Version=6.2.1.0-release
+Date=02/27/2025
+Download=https://cutt.ly/YrrI31d1;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/4mEl0rJy;https://www.dropbox.com/scl/fi/byecupg7g9tgx055gm95b/Simulator-Controller-6.2.1.0-release.zip?rlkey=1wkjg1b2b4fdb9o7vbhvng0b6&st=my621qeh&dl=1
+Changes=Auto Initialize for "Strategy Workbench", Names for straights in track maps, iRacing IBT file support in telemetry importer, Fixed deletion of expired accounts in Team Server, New default values for simulator specific settings, New race setting "Spotter: Private Practice", New race setting "Spotter: Private Qualifying", Increased resilience against corrupted telemetry layout definitions, Implemented News system, No shutdown for track mapper at end of session, Prevented unwanted track automation click handler, Streamlined basic configuration in "Simulator Setup", Fixed LMU practice session startup code, Changed default for "Repeat whole voice message", New car models for "Setup Workbench", Fixed ramp down of Le Mans Ultimate
+Components=Media->5.6.1,Configuration->6.2.1,Utilities->6.1.6
 [Components]
 Media.5.6.1.Path=Resources
 Media.5.6.1.Content=Splash Media
 Media.5.6.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/DfSnfhLR;https://www.dropbox.com/scl/fi/3c56fjdvdd4od5t7rsuc9/Media-5.6.1.zip?rlkey=x0icl05jy05nn886due4dsblv&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Media+5.6.1.zip
-Configuration.6.2.0.Path=Resources
-Configuration.6.2.0.Content=Setup
-Configuration.6.2.0.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/XjItUnZi;https://www.dropbox.com/scl/fi/e5s5e8w62cdscan2ejqp3/Configuration-6.2.0.zip?rlkey=98xz3jr9z50v8vk1fsfzlkn2a&st=vndo8e1w&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.2.0.zip
 Configuration.6.2.1.Path=Resources
 Configuration.6.2.1.Content=Setup
 Configuration.6.2.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/CuyqbRlN;https://www.dropbox.com/scl/fi/oimops6ia2cmije8ijsi1/Configuration-6.2.1.zip?rlkey=exmxucfyhhytzteauunc5fd30&st=9jde5ox9&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.2.1.zip
@@ -25,7 +22,7 @@ Utilities.6.1.6.Path=.
 Utilities.6.1.6.Content=Utilities
 Utilities.6.1.6.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Gs12Shqo;https://www.dropbox.com/scl/fi/zo6ve6h67jluj25zkni9z/Utilities-6.1.6.zip?rlkey=qmp8jzvx54roz3l72zovvk6we&st=wfvj3oxf&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.1.6.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=6.2.1.0-dev
-Release=6.2.0.0-release
+Development=6.2.1.0-release
+Release=6.2.1.0-release

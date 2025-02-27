@@ -41,6 +41,9 @@ global kTelemetryChannels := [{Name: "Distance", Indices: [1], Channels: []}
 ;;;-------------------------------------------------------------------------;;;
 
 class TelemetryCollector {
+	iProvider := "Integrated"
+	iProviderURL := false
+
 	iSimulator := false
 	iTrack := false
 	iTrackLength := false
@@ -126,6 +129,18 @@ class TelemetryCollector {
 		}
 	}
 
+	Provider {
+		Get {
+			return this.iProvider
+		}
+	}
+
+	ProviderURL {
+		Get {
+			return this.iProviderURL
+		}
+	}
+
 	Simulator {
 		Get {
 			return this.iSimulator
@@ -151,6 +166,15 @@ class TelemetryCollector {
 	}
 
 	__New(provider, telemetryDirectory, simulator, track, trackLength) {
+		if (provider != "Integrated") {
+			provider := string2Values("|", provider)
+
+			this.iProvider := provider[1]
+
+			if (provider.Length > 1)
+				this.iProviderURL := provider[2]
+		}
+
 		this.iTelemetryDirectory := telemetryDirectory
 
 		this.initialize(simulator, track, trackLength)
@@ -166,59 +190,63 @@ class TelemetryCollector {
 		local sessionDB := SessionDatabase()
 		local code, exePath, pid, trackData
 
-		if (this.iTelemetryCollectorPID && restart)
-			this.shutdown(true)
+		if (this.Provider = "Integrated") {
+			if (this.iTelemetryCollectorPID && restart)
+				this.shutdown(true)
 
-		if (this.iTelemetryCollectorPID && !ProcessExist(this.iTelemetryCollectorPID))
-			this.iTelemetryCollectorPID := false
+			if (this.iTelemetryCollectorPID && !ProcessExist(this.iTelemetryCollectorPID))
+				this.iTelemetryCollectorPID := false
 
-		if !this.iTelemetryCollectorPID {
-			code := sessionDB.getSimulatorCode(this.iSimulator)
-			exePath := (kBinariesDirectory . "Providers\" . code . " SHM Spotter.exe")
-			pid := false
+			if !this.iTelemetryCollectorPID {
+				code := sessionDB.getSimulatorCode(this.iSimulator)
+				exePath := (kBinariesDirectory . "Providers\" . code . " SHM Spotter.exe")
+				pid := false
 
-			try {
-				if !FileExist(exePath)
-					throw "File not found..."
+				try {
+					if !FileExist(exePath)
+						throw "File not found..."
 
-				DirCreate(this.TelemetryDirectory)
+					DirCreate(this.TelemetryDirectory)
 
-				trackData := sessionDB.getTrackData(code, this.Track)
+					trackData := sessionDB.getTrackData(code, this.Track)
 
-				Run("`"" . exePath . "`" -Telemetry " . this.iTrackLength
-				  . " `"" . normalizeDirectoryPath(this.TelemetryDirectory) . "`"" . (trackData ? (" `"" . trackData . "`"") : "")
-				  , kBinariesDirectory, "Hide", &pid)
-			}
-			catch Any as exception {
-				logError(exception, true)
+					Run("`"" . exePath . "`" -Telemetry " . this.iTrackLength
+					  . " `"" . normalizeDirectoryPath(this.TelemetryDirectory) . "`"" . (trackData ? (" `"" . trackData . "`"") : "")
+					  , kBinariesDirectory, "Hide", &pid)
+				}
+				catch Any as exception {
+					logError(exception, true)
 
-				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
-														   , {simulator: code, protocol: "SHM"})
-									   . exePath . translate(") - please rebuild the applications in the binaries folder (")
-									   . kBinariesDirectory . translate(")"))
+					logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
+															   , {simulator: code, protocol: "SHM"})
+										   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+										   . kBinariesDirectory . translate(")"))
 
-				if !kSilentMode
-					showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
-												  , {exePath: exePath, simulator: code, protocol: "SHM"})
-							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-			}
-
-			if pid {
-				this.iTelemetryCollectorPID := pid
-
-				if !this.iExitCallback {
-					this.iExitCallback := ObjBindMethod(this, "shutdown", true)
-
-					OnExit(this.iExitCallback)
+					if !kSilentMode
+						showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
+													  , {exePath: exePath, simulator: code, protocol: "SHM"})
+								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 
-				return true
+				if pid {
+					this.iTelemetryCollectorPID := pid
+
+					if !this.iExitCallback {
+						this.iExitCallback := ObjBindMethod(this, "shutdown", true)
+
+						OnExit(this.iExitCallback)
+					}
+
+					return true
+				}
+				else
+					return false
 			}
 			else
-				return false
+				return true
 		}
 		else
-			return true
+			return false
 	}
 
 	shutdown(force := false, arguments*) {
@@ -228,7 +256,7 @@ class TelemetryCollector {
 		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
 			return false
 
-		if pid {
+		if ((this.Provider = "Integrated") && pid) {
 			ProcessClose(pid)
 
 			if (force && ProcessExist(pid)) {
@@ -256,7 +284,10 @@ class TelemetryCollector {
 	}
 
 	collectTelemetry() {
-		return TelemetryCollector.TelemetryFuture(this)
+		if (this.Provider = "Integrated")
+			return TelemetryCollector.TelemetryFuture(this)
+		else
+			return false
 	}
 }
 

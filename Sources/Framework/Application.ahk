@@ -231,7 +231,10 @@ checkForNews() {
 
 							Download(html, A_Temp . "\News.zip")
 
-							deleteDirectory(kTempDirectory . "News")
+							try {
+								deleteFile(kTempDirectory . "News")
+								deleteDirectory(kTempDirectory . "News")
+							}
 
 							DirCreate(kTempDirectory . "News")
 

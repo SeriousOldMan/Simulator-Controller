@@ -73,7 +73,7 @@ class TelemetryCollector {
 			}
 		}
 
-		iLoadedLaps {
+		LoadedLaps {
 			Get {
 				return this.iLoadedLaps
 			}
@@ -81,7 +81,7 @@ class TelemetryCollector {
 
 		__New(collector, endpointURL) {
 			try {
-				if (endpointURL[StrLen(endpointURL)] != "/")
+				if (SubStr(endpointURL, StrLen(endpointURL), 1) != "/")
 					endpointURL .= "/"
 			}
 			catch Any as exception {
@@ -114,7 +114,9 @@ class TelemetryCollector {
 			local lastLap
 
 			try {
-				loop this.get("SessionInfo")["totalNumberOfLaps"]
+				info := this.get("DriversInfo")
+
+				loop choose(info, (di) => di["isPlayer"])[1]["completedLaps"]
 					if !this.LoadedLaps.Has(A_Index)
 						laps.Push(A_Index)
 			}
@@ -138,11 +140,11 @@ class TelemetryCollector {
 			importFileName := (normalizeDirectoryPath(this.TelemetryCollector.TelemetryDirectory)
 							 . "\Lap " . lap . ".telemetry")
 
-			deletFile(inputFileName)
-			deletFile(importFileName)
+			deleteFile(inputFileName)
+			deleteFile(importFileName)
 
 			try {
-				text := this.get("TelemetryInfo/GetForPlayerAndLap?Lap=" . lap, "Text")
+				text := this.get("TelemetryInfo/GetForPlayerAndLap?lapNumber=" . lap, "Text")
 
 				if (!text || (Trim(text) = ""))
 					throw "Empty data received in TelemetryCollector.SecondMonitorRESTProvider.loadLap..."
@@ -166,7 +168,7 @@ class TelemetryCollector {
 				logError(exception)
 			}
 			finally {
-				deletFile(inputFileName)
+				deleteFile(inputFileName)
 			}
 		}
 
@@ -176,11 +178,11 @@ class TelemetryCollector {
 			local importFileName := temporaryFileName("Import", "telemetry")
 			local text, pid
 
-			deletFile(inputFileName)
-			deletFile(importFileName)
+			deleteFile(inputFileName)
+			deleteFile(importFileName)
 
 			try {
-				text := this.get("TelemetryInfo/GetForPlayerSinceTime?StartTime=" . startTime, "Text")
+				text := this.get("TelemetryInfo/GetForPlayerSinceTime?sessionTimeSeconds=" . startTime, "Text")
 
 				if (!text || (Trim(text) = ""))
 					throw "Empty data received in TelemetryCollector.SecondMonitorRESTProvider.loadSection..."
@@ -204,7 +206,7 @@ class TelemetryCollector {
 				return false
 			}
 			finally {
-				deletFile(inputFileName)
+				deleteFile(inputFileName)
 			}
 		}
 	}
@@ -318,7 +320,7 @@ class TelemetryCollector {
 		__New(collector) {
 			super.__New(collector)
 
-			this.iSecondMonitorProvider := SecondMonitorRESTProvider(collector, collector.ProviderURL)
+			this.iSecondMonitorProvider := TelemetryCollector.SecondMonitorRESTProvider(collector, collector.ProviderURL)
 
 			try {
 				this.iStartTime := this.iSecondMonitorProvider.get("SessionInfo")["sessionIdentification"]["sessionTimeInSeconds"]
@@ -459,8 +461,8 @@ class TelemetryCollector {
 			if (this.iSecondMonitorTask && restart)
 				this.shutdown(true)
 
-			if !this.this.iSecondMonitorTask {
-				this.iSecondMonitorTask := PeriodicTask(ObjBindMethod(SecondMonitorRESTProvider(this, this.ProviderURL)
+			if !this.iSecondMonitorTask {
+				this.iSecondMonitorTask := PeriodicTask(ObjBindMethod(TelemetryCollector.SecondMonitorRESTProvider(this, this.ProviderURL)
 																	, "loadLaps")
 													  , 5000, kLowPriority)
 

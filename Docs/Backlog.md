@@ -24,8 +24,7 @@
 
 #### Session Database
   1. Active validation of value ranges in settings definitions
-  2. Integration with an upcoming REST/JSON realtime interface of Second Monitor
-  3. Define channel groups in Telemetry Viewer
+  2. Define channel groups in Telemetry Viewer
   
 #### Setup Workbench
   1. Collect telemetry data from multiple drivers and generate combined setup recommendations

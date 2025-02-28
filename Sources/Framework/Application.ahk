@@ -188,7 +188,7 @@ checkForNews() {
 	local show := true
 	local check, lastModified, availableNews, news, nr, html, shown, rule
 
-	if inList(kForegroundApps, StrSplit(A_ScriptName, ".")[1]) {
+	if (StrSplit(A_ScriptName, ".")[1] = "Simulator Startup") {
 		check := !FileExist(kUserConfigDirectory . "NEWS")
 
 		if !check {

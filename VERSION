@@ -3,7 +3,7 @@ Version=6.2.2.0-dev
 Target=6.2.2.0-release
 Date=02/28/2025
 Download=
-Changes=Use rephrasing booster also for split talking, Updated Rephrasing booster instructions, Chat mode support for rFactor 2 and Le Mans Ultimate, Use Second Monitor as real time telemetry provider, Telemetry provider setting for Driving Coach, Choose telemetry provider in Team Center, Choose telemetry provider in Telemetry Viewer, First part of portoguese translations, Use local temp folder for installation packages, Private session function in Startup Profiles
+Changes=Use rephrasing booster also for split talking, Updated Rephrasing booster instructions, Chat mode support for rFactor 2 and Le Mans Ultimate, Use Second Monitor as real time telemetry provider, Telemetry provider setting for Driving Coach, Choose telemetry provider in Team Center, Choose telemetry provider in Telemetry Viewer, First part of portoguese translations, Use local temp folder for installation packages, Private session function in Startup Profiles, Updated R3E car meta data
 Components=Media->5.6.1,Configuration->6.2.2,Utilities->6.2.2
 [Release]
 Version=6.2.1.0-release

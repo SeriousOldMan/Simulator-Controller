@@ -174,8 +174,8 @@ static class Program
             outStream.Write(abs + ";");
             outStream.Write(longG + ";");
             outStream.Write(latG + ";");
-            outStream.Write("n/a" + ";");
-            outStream.Write("n/a" + ";");
+            outStream.Write(posX + ";");
+            outStream.Write(posY + ";");
             outStream.WriteLine(time);
 
             lastRunning = running;
@@ -355,12 +355,12 @@ static class Program
                 switch (reader.Value.ToString())
                 {
                     case "xinM":
-                        posX = float.Parse(reader.Value.ToString());
                         reader.Read();
+                        posX = float.Parse(reader.Value.ToString());
                         break;
                     case "zinM":
-                        posY = float.Parse(reader.Value.ToString());
                         reader.Read();
+                        posY = float.Parse(reader.Value.ToString());
                         break;
                 }
     }

@@ -53,6 +53,162 @@ class TelemetryCollector {
 
 	iExitCallback := false
 
+	iSecondMonitorTask := false
+
+	class SecondMonitorRESTProvider {
+		iTelemetryCollector := false
+		iEndpointURL := false
+
+		iLoadedLaps := Map()
+
+		TelemetryCollector {
+			Get {
+				return this.iTelemetryCollector
+			}
+		}
+
+		EndpointURL {
+			Get {
+				return this.iEndpointURL
+			}
+		}
+
+		iLoadedLaps {
+			Get {
+				return this.iLoadedLaps
+			}
+		}
+
+		__New(collector, endpointURL) {
+			try {
+				if (endpointURL[StrLen(endpointURL)] != "/")
+					endpointURL .= "/"
+			}
+			catch Any as exception {
+				logError(exception)
+			}
+
+			this.iTelemetryCollector := collector
+			this.iEndpointURL := endpointURL
+		}
+
+		get(endpoint, type := "JSON") {
+			local data
+
+			try {
+				data := WinHttpRequest({Timeouts: [0, 500, 500, 500]}).GET(this.EndpointURL . endpoint, "", false, {Encoding: "UTF-8"})
+
+				return ((type = "JSON") ? data.JSON : data.Text)
+			}
+			catch Any as exception {
+				logError(exception)
+
+				data := false
+			}
+
+			return data
+		}
+
+		availableLaps() {
+			local laps := []
+			local lastLap
+
+			try {
+				loop this.get("SessionInfo")["totalNumberOfLaps"]
+					if !this.LoadedLaps.Has(A_Index)
+						laps.Push(A_Index)
+			}
+			catch Any as exception {
+				logError(exception)
+			}
+
+			return laps
+		}
+
+		loadLaps() {
+			do(this.availableLaps(), (lap) => this.loadLap(lap))
+		}
+
+		loadLap(lap) {
+			local inputFileName, importFileName, text, pid
+
+			lap := Integer(lap)
+
+			inputFileName := temporaryFileName("Telemetry", "json")
+			importFileName := (normalizeDirectoryPath(this.TelemetryCollector.TelemetryDirectory)
+							 . "\Lap " . lap . ".telemetry")
+
+			deletFile(inputFileName)
+			deletFile(importFileName)
+
+			try {
+				text := this.get("TelemetryInfo/GetForPlayerAndLap?Lap=" . lap, "Text")
+
+				if (!text || (Trim(text) = ""))
+					throw "Empty data received in TelemetryCollector.SecondMonitorRESTProvider.loadLap..."
+
+				FileAppend(text, inputFileName)
+
+				Run("`"" . kBinariesDirectory . "Connectors\Second Monitor Reader\Second Monitor Reader.exe`" `"" . inputFileName . "`" `"" . importFileName . "`"", , "Hide", &pid)
+
+				Sleep(500)
+
+				count := 0
+
+				while (ProcessExist(pid) && (count++ < 100))
+					Sleep(100)
+
+				this.LoadedLaps[lap] := lap
+
+				return importFileName
+			}
+			catch Any as exception {
+				logError(exception)
+			}
+			finally {
+				deletFile(inputFileName)
+			}
+		}
+
+		loadSection(startTime) {
+			local directory := (normalizeDirectoryPath(this.TelemetryCollector.TelemetryDirectory) . "\")
+			local inputFileName := temporaryFileName("Telemetry", "json")
+			local importFileName := temporaryFileName("Import", "telemetry")
+			local text, pid
+
+			deletFile(inputFileName)
+			deletFile(importFileName)
+
+			try {
+				text := this.get("TelemetryInfo/GetForPlayerSinceTime?StartTime=" . startTime, "Text")
+
+				if (!text || (Trim(text) = ""))
+					throw "Empty data received in TelemetryCollector.SecondMonitorRESTProvider.loadSection..."
+
+				FileAppend(text, inputFileName)
+
+				Run("`"" . kBinariesDirectory . "Connectors\Second Monitor Reader\Second Monitor Reader.exe`" `"" . inputFileName . "`" `"" . importFileName . "`"", , "Hide", &pid)
+
+				Sleep(500)
+
+				count := 0
+
+				while (ProcessExist(pid) && (count++ < 100))
+					Sleep(100)
+
+				return importFileName
+			}
+			catch Any as exception {
+				logError(exception)
+
+				return false
+			}
+			finally {
+				deletFile(inputFileName)
+			}
+		}
+	}
+
 	class TelemetryFuture {
 		iTelemetryCollector := false
 		iFileName := false
@@ -71,20 +227,27 @@ class TelemetryCollector {
 
 				return this.iFileName
 			}
+
+			Set {
+				if value
+					this.Collected := true
+
+				return (this.iFileName := value)
+			}
+		}
+
+		Collected {
+			Get {
+				return this.iCollected
+			}
+
+			Set {
+				return (this.iCollected := value)
+			}
 		}
 
 		__New(collector) {
-			local directory := (normalizeDirectoryPath(collector.TelemetryDirectory) . "\")
-
 			this.iTelemetryCollector := collector
-
-			if FileExist(directory . "Telemetry.cmd")
-				throw "Partial telemetry collection still running in TelemetryCollector.TelemetryFuture.__New..."
-			else {
-				deleteFile(directory . "\Telemetry.section")
-
-				FileAppend("COLLECT", directory . "\Telemetry.cmd")
-			}
 		}
 
 		__Delete() {
@@ -99,9 +262,28 @@ class TelemetryCollector {
 		}
 
 		stop() {
+		}
+	}
+
+	class IntegratedTelemetryFuture extends TelemetryCollector.TelemetryFuture {
+		__New(collector) {
+			super.__New(collector)
+
+			local directory := (normalizeDirectoryPath(collector.TelemetryDirectory) . "\")
+
+			if FileExist(directory . "Telemetry.cmd")
+				throw "Partial telemetry collection still running in TelemetryCollector.IntegratedTelemetryFuture.__New..."
+			else {
+				deleteFile(directory . "\Telemetry.section")
+
+				FileAppend("COLLECT", directory . "\Telemetry.cmd")
+			}
+		}
+
+		stop() {
 			local directory, inFileName, outFileName
 
-			if !this.iCollected {
+			if !this.Collected {
 				directory := (normalizeDirectoryPath(this.TelemetryCollector.TelemetryDirectory) . "\")
 				inFileName := (directory . "Telemetry.section")
 				outFileName := temporaryFileName("Telemetry", "section")
@@ -121,10 +303,38 @@ class TelemetryCollector {
 							Sleep(1)
 						}
 
-					this.iFileName := outFileName
+					this.FileName := outFileName
 				}
 
-				this.iCollected := true
+				this.Collected := true
+			}
+		}
+	}
+
+	class SecondMonitorTelemetryFuture extends TelemetryCollector.TelemetryFuture {
+		iSecondMonitorProvider := false
+		iStartTime := false
+
+		__New(collector) {
+			super.__New(collector)
+
+			this.iSecondMonitorProvider := SecondMonitorRESTProvider(collector, collector.ProviderURL)
+
+			try {
+				this.iStartTime := this.iSecondMonitorProvider.get("SessionInfo")["sessionIdentification"]["sessionTimeInSeconds"]
+			}
+			catch Any as exception {
+				logError(exception)
+			}
+		}
+
+		stop() {
+			local directory, inFileName, outFileName
+
+			if !this.Collected {
+				this.FileName := this.iSecondMonitorProvider.loadSection(this.iStartTime)
+
+				this.Collected := true
 			}
 		}
 	}
@@ -245,8 +455,22 @@ class TelemetryCollector {
 			else
 				return true
 		}
-		else
-			return false
+		else {
+			if (this.iSecondMonitorTask && restart)
+				this.shutdown(true)
+
+			if !this.this.iSecondMonitorTask {
+				this.iSecondMonitorTask := PeriodicTask(ObjBindMethod(SecondMonitorRESTProvider(this, this.ProviderURL)
+																	, "loadLaps")
+													  , 5000, kLowPriority)
+
+				this.iSecondMonitorTask.start()
+
+				return true
+			}
+			else
+				return false
+		}
 	}
 
 	shutdown(force := false, arguments*) {
@@ -279,15 +503,21 @@ class TelemetryCollector {
 
 			this.iTelemetryCollectorPID := false
 		}
+		else if (this.Provider = "Second Monitor")
+			if this.iSecondMonitorTask {
+				this.iSecondMonitorTask.stop()
+
+				this.iSecondMonitorTask := false
+			}
 
 		return false
 	}
 
 	collectTelemetry() {
 		if (this.Provider = "Integrated")
-			return TelemetryCollector.TelemetryFuture(this)
+			return TelemetryCollector.IntegratedTelemetryFuture(this)
 		else
-			return false
+			return TelemetryCollector.SecondMonitorTelemetryFuture(this)
 	}
 }
 

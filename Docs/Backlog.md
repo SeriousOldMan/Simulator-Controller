@@ -30,6 +30,7 @@
 #### Setup Workbench
   1. Collect telemetry data from multiple drivers and generate combined setup recommendations
   2. Gear ratio optimizer for the Issue Analyzer
+  3. Include oil and water temperature in data and handle in issue analyzer
 
 #### Strategy Workbench
   1. Multi session tyre management - manage tyre sets and driven laps for a whole weekend (Practice, Qualifying, Race 1, Race 2, ...)

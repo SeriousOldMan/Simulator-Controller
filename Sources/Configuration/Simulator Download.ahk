@@ -152,9 +152,9 @@ downloadSimulatorController() {
 
 					updateTask.start()
 
-					deleteFile(A_Temp . "\Simulator Controller.zip")
+					deleteFile(kTempDirectory . "InstallPackage.zip")
 
-					Download(url, A_Temp . "\Simulator Controller.zip")
+					Download(url, kTempDirectory . "InstallPackage.zip")
 
 					updateTask.stop()
 
@@ -164,15 +164,15 @@ downloadSimulatorController() {
 
 					showProgress({message: translate("Extracting installation files...")})
 
-					deleteDirectory(A_Temp . "\Simulator Controller")
+					deleteDirectory(kTempDirectory . "SC-Install")
 
-					RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Simulator Controller.zip' -DestinationPath '" . A_Temp . "\Simulator Controller' -Force", , "Hide")
+					RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kTempDirectory . "InstallPackage.zip' -DestinationPath '" . kTempDirectory . "SC-Install' -Force", , "Hide")
 
 					exitOthers()
 
-					deleteFile(A_Temp . "\Simulator Controller.zip")
+					deleteFile(kTempDirectory . "InstallPackage.zip")
 
-					directory := (A_Temp . "\Simulator Controller")
+					directory := (kTempDirectory . "SC-Install")
 
 					if FileExist(directory . "\Simulator Controller")
 						directory .= "\Simulator Controller"

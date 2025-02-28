@@ -1921,7 +1921,8 @@ class DrivingCoach extends GridRaceAssistant {
 								if inList(this.FocusedCorners, String(cornerNr)) {
 									this.iTelemetryFuture := this.TelemetryCollector.collectTelemetry()
 
-									this.iTelemetryFuture.Section := sectionNr
+									if this.iTelemetryFuture
+										this.iTelemetryFuture.Section := sectionNr
 								}
 
 								this.Mode := "Coaching"

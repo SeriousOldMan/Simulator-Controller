@@ -31,7 +31,21 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 # Upcoming release
 
-Not yet planned...
+## 6.2.2.0-release 03/07/25 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. The application of the *Rephrasing* booster has been optimized so that the LLM is allowed to rearrange the speech as long as the meaning is preserved. This will introduce even more variation into long speeches.
+  4. The instructions for the *Rephrasing* booster have been updated. If you have tweaked them, revert them to their original state and re-integrate your changes.
+  5. The "RF2" and the "LMU" plugin now offer a "Chat" mode similar to the one already available for the "ACC" plugin. Using this, you can send predefined chat messages using your Button Box, or even automated based on some events.
+  6. It is now possible to configure the application *Second Monitor* as the source for real time telemetry data. See the [extended documentation](*) on information about how to configure a connection between Simulator Controller and *Second Monitor*.
+     - The connection to *Second Monitor* in the different applications ("Solo Center", "Team Center" and "Setup Workbench") can be configured in the Telemetry Viewer.
+     - If you want to use *Second Monitor* also for the Driving Coach, this can be configured using new [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database".
+  8. The settings for "Private Practice" and "Private Qualifying" are now also available as "Functions" in the Startup Profiles.
+  9. Updated car meta data for *RaceRoom Racing Experience* to the latest version.
+  10. Thanks to our community member @Hudson Alves, this release comes with the first part of the translations for the Portoguese language.
+  11. [Internal] The "Temp" folder in the [Documents]\Simulator Controller folder is now used for the installation and update process. This may help to further reduce interventions of AntiVirus programs, when an exclusion for [Documents]\Simulator Controller already has been declared for this folder.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-622), if you have tweaked your *Rephrasing* booster instructions.
 
 # Release history
 

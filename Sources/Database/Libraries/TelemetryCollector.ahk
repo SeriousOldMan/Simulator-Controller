@@ -92,7 +92,7 @@ class TelemetryCollector {
 			this.iEndpointURL := endpointURL
 		}
 
-		get(endpoint, type := "JSON") {
+		read(endpoint, type := "JSON") {
 			local data
 
 			try {
@@ -114,7 +114,7 @@ class TelemetryCollector {
 			local lastLap
 
 			try {
-				info := this.get("DriversInfo")
+				info := this.read("DriversInfo")
 
 				loop choose(info, (di) => di["isPlayer"])[1]["completedLaps"]
 					if !this.LoadedLaps.Has(A_Index)
@@ -144,7 +144,7 @@ class TelemetryCollector {
 			deleteFile(importFileName)
 
 			try {
-				text := this.get("TelemetryInfo/GetForPlayerAndLap?lapNumber=" . lap, "Text")
+				text := this.read("TelemetryInfo/GetForPlayerAndLap?lapNumber=" . lap, "Text")
 
 				if (!text || (Trim(text) = ""))
 					throw "Empty data received in TelemetryCollector.SecondMonitorRESTProvider.loadLap..."
@@ -182,7 +182,7 @@ class TelemetryCollector {
 			deleteFile(importFileName)
 
 			try {
-				text := this.get("TelemetryInfo/GetForPlayerSinceTime?sessionTimeSeconds=" . startTime, "Text")
+				text := this.read("TelemetryInfo/GetForPlayerSinceTime?sessionTimeSeconds=" . startTime, "Text")
 
 				if (!text || (Trim(text) = ""))
 					throw "Empty data received in TelemetryCollector.SecondMonitorRESTProvider.loadSection..."
@@ -323,7 +323,7 @@ class TelemetryCollector {
 			this.iSecondMonitorProvider := TelemetryCollector.SecondMonitorRESTProvider(collector, collector.ProviderURL)
 
 			try {
-				this.iStartTime := this.iSecondMonitorProvider.get("SessionInfo")["sessionIdentification"]["sessionTimeInSeconds"]
+				this.iStartTime := this.iSecondMonitorProvider.read("SessionInfo")["sessionIdentification"]["sessionTimeInSeconds"]
 			}
 			catch Any as exception {
 				logError(exception)

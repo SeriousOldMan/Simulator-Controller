@@ -13825,14 +13825,19 @@ editTelemetryProviderSettings(teamCenterOrCommand, arguments*) {
 		result := kCancel
 	else if (teamCenterOrCommand == "UpdateState") {
 		if (providerDropDown.Value = 1) {
-			endpointLabel.Visible := false
-			endpointEdit.Visible := false
+			; endpointLabel.Visible := false
+			; endpointEdit.Visible := false
+
+			endpointEdit.Enabled := false
+			endpointEdit.Text := translate("n/a")
 		}
 		else {
-			endpointLabel.Visible := true
-			endpointEdit.Visible := true
+			; endpointLabel.Visible := true
+			; endpointEdit.Visible := true
 
-			if (Trim(endpointEdit.Text) = "")
+			endpointEdit.Enabled := true
+
+			if ((Trim(endpointEdit.Text) = "") || (endpointEdit.Text = translate("n/a")))
 				endpointEdit.Text := "http://localhost:5007/api"
 		}
 	}
@@ -13849,8 +13854,8 @@ editTelemetryProviderSettings(teamCenterOrCommand, arguments*) {
 		providerDropDown := settingsGui.Add("DropDownList", "x110 yp+1 w160 Choose1", collect(["Integrated", "Second Monitor"], translate))
 		providerDropDown.OnEvent("Change", chooseProvider)
 
-		endpointLabel := settingsGui.Add("Text", "x16 yp+30 w90 h23 +0x200 Hidden", translate("Provider URL"))
-		endpointEdit := settingsGui.Add("Edit", "x110 yp+1 w160 h21 Hidden")
+		endpointLabel := settingsGui.Add("Text", "x16 yp+30 w90 h23 +0x200", translate("Provider URL"))
+		endpointEdit := settingsGui.Add("Edit", "x110 yp+1 w160 h21")
 
 		settingsGui.Add("Button", "x60 yp+35 w80 h23 Default", translate("Ok")).OnEvent("Click", editTelemetryProviderSettings.Bind(kOk))
 		settingsGui.Add("Button", "x146 yp w80 h23", translate("&Cancel")).OnEvent("Click", editTelemetryProviderSettings.Bind(kCancel))
@@ -13861,11 +13866,11 @@ editTelemetryProviderSettings(teamCenterOrCommand, arguments*) {
 			providerDropDown.Choose(2)
 
 			endpointEdit.Text := string2Values("|", arguments[1])[2]
-
-			editTelemetryProviderSettings("UpdateState")
 		}
 
 		settingsGui.Show("AutoSize Center")
+
+		editTelemetrySettings("UpdateState")
 
 		while !result
 			Sleep(100)

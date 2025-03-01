@@ -663,6 +663,8 @@ class SpeechRecognizer {
 	initialize(id) {
 		local recognizer
 
+		; MsgBox id . " " . this.Engine . " " . this.RecognizerList.Length . " " . values2String("; ", collect(this.RecognizerList, (r) => r.Name)*)
+
 		if this.Instance
 			if ((this.Engine = "Azure") || (this.Engine = "Compiler"))
 				this.Instance.SetLanguage(this.getRecognizerList()[id + 1].Culture)
@@ -677,7 +679,14 @@ class SpeechRecognizer {
 			else if (id > this.Instance.getRecognizerCount() - 1)
 				throw "Invalid recognizer ID (" . id . ") detected in SpeechRecognizer.initialize..."
 			else
-				return this.Instance.Initialize(id)
+				try {
+					return this.Instance.Initialize(id)
+				}
+				catch Any as exception {
+					logError(exception, true)
+
+					throw "Invalid recognizer ID (" . id . ") detected in SpeechRecognizer.initialize..."
+				}
 	}
 
 	startRecognizer() {

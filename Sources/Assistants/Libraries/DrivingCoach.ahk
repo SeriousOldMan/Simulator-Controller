@@ -1467,10 +1467,10 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 
 			provider := getMultiMapValue(this.Settings, "Assistant.Coach", "Telemetry.Provider", "Integrated")
-			
+
 			if (provider != "Integrated")
 				provider .= ("|" . getMultiMapValue(this.Settings, "Assistant.Coach", "Telemetry.Provider.URL", ""))
-			
+
 			this.iTelemetryAnalyzer := TelemetryAnalyzer(this.Simulator, this.Track)
 			this.iTelemetryCollector := TelemetryCollector(provider, kTempDirectory . "Driving Coach\Telemetry", this.Simulator, this.Track, this.TrackLength)
 
@@ -1482,7 +1482,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 			this.iCollectorTask.start()
 
-			return true6
+			return true
 		}
 		else
 			return false

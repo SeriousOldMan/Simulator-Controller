@@ -972,7 +972,7 @@ class TelemetryViewer {
 		viewerGui.Add("Documentation", "x186 YP+20 w336 H:Center Center", translate("Telemetry Viewer")
 					 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#Telemetry-Viewer")
 
-		button := viewerGui.Add("Button", "x653 yp+5 w23 h23 X:Move")
+		button := viewerGui.Add("Button", "x653 yp+5 w23 h23 X:Move" . (!this.Collect ? " Disabled" : ""))
 		button.OnEvent("Click", (*) {
 			local provider := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 														  , "Telemetry Viewer", "Provider", "Integrated")
@@ -3570,14 +3570,19 @@ editTelemetrySettings(telemetryViewerOrCommand, arguments*) {
 		result := kCancel
 	else if (telemetryViewerOrCommand == "UpdateState") {
 		if (providerDropDown.Value = 1) {
-			endpointLabel.Visible := false
-			endpointEdit.Visible := false
+			; endpointLabel.Visible := false
+			; endpointEdit.Visible := false
+
+			endpointEdit.Enabled := false
+			endpointEdit.Text := translate("n/a")
 		}
 		else {
-			endpointLabel.Visible := true
-			endpointEdit.Visible := true
+			; endpointLabel.Visible := true
+			; endpointEdit.Visible := true
 
-			if (Trim(endpointEdit.Text) = "")
+			endpointEdit.Enabled := true
+
+			if ((Trim(endpointEdit.Text) = "") || (endpointEdit.Text = translate("n/a")))
 				endpointEdit.Text := "http://localhost:5007/api"
 		}
 	}
@@ -3594,8 +3599,8 @@ editTelemetrySettings(telemetryViewerOrCommand, arguments*) {
 		providerDropDown := settingsGui.Add("DropDownList", "x110 yp+1 w160 Choose1", collect(["Integrated", "Second Monitor"], translate))
 		providerDropDown.OnEvent("Change", chooseProvider)
 
-		endpointLabel := settingsGui.Add("Text", "x16 yp+30 w90 h23 +0x200 Hidden", translate("Provider URL"))
-		endpointEdit := settingsGui.Add("Edit", "x110 yp+1 w160 h21 Hidden")
+		endpointLabel := settingsGui.Add("Text", "x16 yp+30 w90 h23 +0x200", translate("Provider URL"))
+		endpointEdit := settingsGui.Add("Edit", "x110 yp+1 w160 h21")
 
 		settingsGui.Add("Button", "x60 yp+35 w80 h23 Default", translate("Ok")).OnEvent("Click", editTelemetrySettings.Bind(kOk))
 		settingsGui.Add("Button", "x146 yp w80 h23", translate("&Cancel")).OnEvent("Click", editTelemetrySettings.Bind(kCancel))

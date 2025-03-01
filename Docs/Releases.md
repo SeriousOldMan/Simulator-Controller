@@ -42,8 +42,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
      - If you want to use *Second Monitor* also for the Driving Coach, this can be configured using new [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database".
   8. The settings for "Private Practice" and "Private Qualifying" are now also available as "Functions" in the Startup Profiles.
   9. Updated car meta data for *RaceRoom Racing Experience* to the latest version.
-  10. Thanks to our community member @Hudson Alves, this release comes with the first part of the translations for the Portuguese language.
-  11. [Internal] The "Temp" folder in the [Documents]\Simulator Controller folder is now used for the installation and update process. This may help to further reduce interventions of AntiVirus programs, when an exclusion for [Documents]\Simulator Controller already has been declared for this folder.
+  10. Thanks to our community member @Hudson Alves, this release comes with the first part of the translations for the Portuguese language. Still some more releases needed to complete this task, but we have a good start.
+  11. [Internal] The "Temp" folder in the [Documents]\Simulator Controller folder is now used for the installation and update process instead of the standard AppData\Local\Temp folder. This may help to further reduce interventions of AntiVirus programs, when an exclusion for [Documents]\Simulator Controller already has been declared as recommended.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-622), if you have tweaked your *Rephrasing* booster instructions.
 

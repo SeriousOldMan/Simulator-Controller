@@ -308,6 +308,10 @@ Here is a recording of a training session, since no words can really adequately 
 
 DISCLAIMER: This functionality requires a very capable LLM for decent results. This LLM must be able to follow multiple, complex chain of thoughts at the same time and must be able to perform reasoning based on supplied facts. At the time of this writing, only high end models like GPT 4o, Claude 3 Opus or Mistral Large are in this group. The upcoming o1 model of OpenAI may be even better in this area, but it will be prohibitevly expensive. According to my testing, GPT 4o mini, the most cost-efficient model of OpenAI and also Mistral Small by Mistral AI show good results as well, but sometimes they mix up things, for example, that applying less brake pressure at the start of the braking phase will make your braking phase shorter. This can also happen with the stronger models sometimes, but not that often. You can experiment with the *Creativity* configuration setting of the Driving Coach to find the best compromise here.
 
+#### Choosing the telemetry provider
+
+The Driving Coach can work with telemetry data from two different sources. One source, which is the default, is integrated into Simulator Controller and will provide telemetry data after a learning phase of two laps. The other one uses a connection to ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), a tool developed by @winzarten. Which telemetry provider to be used can be configured using some [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database". If you choose "Second Monitor", be sure that this application is running while you are out on the track for some coaching.
+
 ### Track layout
 
 Before you can use the telemetry-based coaching, you must have recorded a [track map](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#track-mapping) for the given track and you must have defined the different sections (corners and straights) of the track. Detailed instructions can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation).

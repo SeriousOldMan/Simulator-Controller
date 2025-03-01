@@ -164,6 +164,10 @@ A valuable tool to analyze your lap times and those of your team mates is the in
 
 While you are in an active session, lap telemetry data will be collected lap by lap for those drivers that have enabled "Telemetry" in the "Session" menu (below the "Synchronize" command). The telemetry data for the last few laps of every driver, who has checked the "Telemetry" item in the "Session" menu, will be stored on the Team Server and will be replicated to all currently running "Team Center" for inspection and comparison with other laps.
 
+#### Choosing the telemetry provider
+
+The Telemetry Viewer supports two different sources of telemetry data. One, which is the default, is integrated into Simulator Controller and will provide telemetry data after a learning phase of two laps. The other one uses a connection to ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), a tool developed by @winzarten. You can choose, which telemetry provider to use by clicking on the settings button in the upper right corner of the Telemetry Viewer window. If you choose "Second Monitor" here, make sure that this application is running while you are out on the track.
+
 When looking for areas of improvement take a close look to the application of throttle and brakes and the activation of TC and ABS. Trailing off the brakes and the transition back to full throttle is the most important skill to master for fast lap times. This does not mean, that sometimes coasting around a corner is not necessary. Use the Telemetry Viewer to compare your laps with the fastest lap of a given session and learn what exactly made you faster there.
 
 Important: Sessions that are saved with telemetry data to the session database will NOT be synchronized with the Team Server by default, since the amount of data is quite large and will put a lot of stress on the Team Server. You can still activate the synchronization for a particular session in the "Session Database", but I strongly advise against it.

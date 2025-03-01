@@ -3617,6 +3617,8 @@ editTelemetrySettings(telemetryViewerOrCommand, arguments*) {
 
 		settingsGui.Show("AutoSize Center")
 
+		editTelemetrySettings("UpdateState")
+
 		while !result
 			Sleep(100)
 

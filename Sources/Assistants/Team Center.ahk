@@ -13866,11 +13866,11 @@ editTelemetryProviderSettings(teamCenterOrCommand, arguments*) {
 			providerDropDown.Choose(2)
 
 			endpointEdit.Text := string2Values("|", arguments[1])[2]
-
-			editTelemetryProviderSettings("UpdateState")
 		}
 
 		settingsGui.Show("AutoSize Center")
+
+		editTelemetrySettings("UpdateState")
 
 		while !result
 			Sleep(100)

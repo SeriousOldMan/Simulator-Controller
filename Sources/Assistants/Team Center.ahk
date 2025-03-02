@@ -2887,12 +2887,12 @@ class TeamCenter extends ConfigurationItem {
 		else if !this.SessionLoaded {
 			DirCreate(this.SessionDirectory . "Telemetry")
 
-			this.iTelemetryViewer := TelemetryViewer(this, this.SessionDirectory . "Telemetry", true)
+			this.iTelemetryViewer := TelemetryViewer(this, this.SessionDirectory . "Telemetry", true, false)
 
 			this.TelemetryViewer.show()
 		}
 		else if FileExist(this.SessionDirectory . "Telemetry") {
-			this.iTelemetryViewer := TelemetryViewer(this, this.SessionDirectory . "Telemetry", false)
+			this.iTelemetryViewer := TelemetryViewer(this, this.SessionDirectory . "Telemetry", false, false)
 
 			this.TelemetryViewer.show()
 		}

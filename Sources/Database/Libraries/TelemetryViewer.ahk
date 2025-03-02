@@ -499,10 +499,9 @@ class TelemetryViewer {
 
 	iDistanceCorrection := 0
 
-	iSynchronizeTask := false
-
 	iCollect := false
 	iSynchronize := false
+	iSynchronizeTask := false
 
 	iTrackMap := false
 
@@ -610,21 +609,9 @@ class TelemetryViewer {
 		}
 	}
 
-	ReadOnly {
-		Get {
-			return !this.iSynchronizeTask
-		}
-	}
-
 	Window {
 		Get {
 			return this.iWindow
-		}
-	}
-
-	SynchronizeTask {
-		Get {
-			return this.iSynchronizeTask
 		}
 	}
 
@@ -722,6 +709,12 @@ class TelemetryViewer {
 		}
 	}
 
+	SynchronizeTask {
+		Get {
+			return this.iSynchronizeTask
+		}
+	}
+
 	TrackMap {
 		Get {
 			return this.iTrackMap
@@ -750,12 +743,12 @@ class TelemetryViewer {
 		}
 	}
 
-	__New(manager, directory, collect := true, synchronize := true) {
+	__New(manager, directory, synchronize := true, collect := true) {
 		this.iManager := manager
 		this.iTelemetryDirectory := (normalizeDirectoryPath(directory) . "\")
 
-		this.iCollect := collect
 		this.iSynchronize := synchronize
+		this.iCollect := collect
 
 		this.loadLayouts()
 	}
@@ -876,7 +869,7 @@ class TelemetryViewer {
 		}
 
 		deleteLap(*) {
-			local all := (!this.ReadOnly && GetKeyState("Ctrl"))
+			local all := (this.Collect && GetKeyState("Ctrl"))
 			local msgResult
 
 			if this.SelectedLap {
@@ -980,7 +973,7 @@ class TelemetryViewer {
 		viewerGui.Add("Documentation", "x186 YP+20 w336 H:Center Center", translate("Telemetry Viewer")
 					 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#Telemetry-Viewer")
 
-		button := viewerGui.Add("Button", "x653 yp+5 w23 h23 X:Move" . (this.Collect ? " Disabled" : ""))
+		button := viewerGui.Add("Button", "x653 yp+5 w23 h23 X:Move" . (!this.Collect ? " Disabled" : ""))
 		button.OnEvent("Click", (*) {
 			local provider := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 														  , "Telemetry Viewer", "Provider", "Integrated")
@@ -1013,7 +1006,7 @@ class TelemetryViewer {
 				viewerGui.Unblock()
 			}
 		})
-		setButtonIcon(button, kIconsDirectory . "General Settings.ico", 1)
+		setButtonIcon(button, kIconsDirectory . "Connect.ico", 1)
 
 		viewerGui.Add("Text", "x8 yp+25 w676 W:Grow 0x10")
 
@@ -1165,29 +1158,30 @@ class TelemetryViewer {
 	}
 
 	startupCollector(simulator, track, trackLength) {
-		if !this.TelemetryCollector {
-			this.iTelemetryCollector := TelemetryCollector(getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-																		  , "Telemetry Viewer", "Provider", "Integrated")
-														 , this.TelemetryDirectory, simulator, track, trackLength)
+		if this.Collect
+			if !this.TelemetryCollector {
+				this.iTelemetryCollector := TelemetryCollector(getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+																			  , "Telemetry Viewer", "Provider", "Integrated")
+															 , this.TelemetryDirectory, simulator, track, trackLength)
 
-			this.iTelemetryCollector.startup()
-
-			this.CollectingNotifier.show()
-
-			this.CollectingNotifier.document.open()
-			this.CollectingNotifier.document.write("<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . (kResourcesDirectory . "Wait.gif?" . Random(1, 10000)) . "' width=28 height=28 border=0 padding=0></body></html>")
-			this.CollectingNotifier.document.close()
-		}
-		else {
-			if ((this.iTelemetryCollector.Simulator != simulator) || (this.iTelemetryCollector.Track != track)
-																  || (this.iTelemetryCollector.TrackLength != trackLength)) {
-				this.iTelemetryCollector.initialize(simulator, track, trackLength)
-
-				this.iTelemetryCollector.startup(true)
-			}
-			else
 				this.iTelemetryCollector.startup()
-		}
+
+				this.CollectingNotifier.show()
+
+				this.CollectingNotifier.document.open()
+				this.CollectingNotifier.document.write("<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . (kResourcesDirectory . "Wait.gif?" . Random(1, 10000)) . "' width=28 height=28 border=0 padding=0></body></html>")
+				this.CollectingNotifier.document.close()
+			}
+			else {
+				if ((this.iTelemetryCollector.Simulator != simulator) || (this.iTelemetryCollector.Track != track)
+																	  || (this.iTelemetryCollector.TrackLength != trackLength)) {
+					this.iTelemetryCollector.initialize(simulator, track, trackLength)
+
+					this.iTelemetryCollector.startup(true)
+				}
+				else
+					this.iTelemetryCollector.startup()
+			}
 	}
 
 	shutdownCollector() {

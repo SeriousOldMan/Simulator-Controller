@@ -5829,7 +5829,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				file.Close()
 			}
 
-			viewer := TelemetryViewer(SessionDatabaseEditor.TelemetryManager(this), kTempDirectory . "Telemetry", false)
+			viewer := TelemetryViewer(SessionDatabaseEditor.TelemetryManager(this), kTempDirectory . "Telemetry", false, false)
 
 			telemetryInfo := newMultiMap()
 

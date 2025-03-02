@@ -1584,7 +1584,7 @@ class SetupWorkbench extends ConfigurationItem {
 				DirCreate(kTempDirectory . "Garage\Telemetry")
 			}
 
-			this.iTelemetryViewer := TelemetryViewer(this, kTempDirectory . "Garage\Telemetry", true)
+			this.iTelemetryViewer := TelemetryViewer(this, kTempDirectory . "Garage\Telemetry")
 
 			this.TelemetryViewer.show()
 

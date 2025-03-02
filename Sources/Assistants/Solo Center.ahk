@@ -7630,8 +7630,8 @@ class SoloCenter extends ConfigurationItem {
 			try {
 				save := (this.AutoSave && this.SessionActive)
 
-				if (this.HasData && !this.SessionExported && (this.SessionMode != "Loaded")) {
-					if this.AutoExport {
+				if (this.HasData && (this.SessionMode != "Loaded")) {
+					if (this.AutoExport && !this.SessionExported) {
 						this.exportSession(true, false)
 
 						if save
@@ -7642,11 +7642,15 @@ class SoloCenter extends ConfigurationItem {
 							this.saveSession(true, false, false, false)
 					}
 					else {
-						translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
+						if !this.SessionExported {
+							translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
 
-						OnMessage(0x44, translator)
-						msgResult := withBlockedWindows(MsgBox, translate("You have unsaved data. Do you want to transfer it to the session database before starting a new session?"), translate("Export"), 262179)
-						OnMessage(0x44, translator, 0)
+							OnMessage(0x44, translator)
+							msgResult := withBlockedWindows(MsgBox, translate("You have unsaved data. Do you want to transfer it to the session database before starting a new session?"), translate("Export"), 262179)
+							OnMessage(0x44, translator, 0)
+						}
+						else
+							msgResult := "No"
 
 						if (msgResult = "Yes")
 							this.exportSession(true)

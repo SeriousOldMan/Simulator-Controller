@@ -499,9 +499,10 @@ class TelemetryViewer {
 
 	iDistanceCorrection := 0
 
-	iCollectorTask := false
+	iSynchronizeTask := false
 
 	iCollect := false
+	iSynchronize := false
 
 	iTrackMap := false
 
@@ -611,7 +612,7 @@ class TelemetryViewer {
 
 	ReadOnly {
 		Get {
-			return !this.iCollectorTask
+			return !this.iSynchronizeTask
 		}
 	}
 
@@ -621,9 +622,9 @@ class TelemetryViewer {
 		}
 	}
 
-	CollectorTask {
+	SynchronizeTask {
 		Get {
-			return this.iCollectorTask
+			return this.iSynchronizeTask
 		}
 	}
 
@@ -715,6 +716,12 @@ class TelemetryViewer {
 		}
 	}
 
+	Synchronize {
+		Get {
+			return this.iSynchronize
+		}
+	}
+
 	TrackMap {
 		Get {
 			return this.iTrackMap
@@ -743,11 +750,12 @@ class TelemetryViewer {
 		}
 	}
 
-	__New(manager, directory, collect := true) {
+	__New(manager, directory, collect := true, synchronize := true) {
 		this.iManager := manager
 		this.iTelemetryDirectory := (normalizeDirectoryPath(directory) . "\")
 
 		this.iCollect := collect
+		this.iSynchronize := synchronize
 
 		this.loadLayouts()
 	}
@@ -972,7 +980,7 @@ class TelemetryViewer {
 		viewerGui.Add("Documentation", "x186 YP+20 w336 H:Center Center", translate("Telemetry Viewer")
 					 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#Telemetry-Viewer")
 
-		button := viewerGui.Add("Button", "x653 yp+5 w23 h23 X:Move" . (!this.Collect ? " Disabled" : ""))
+		button := viewerGui.Add("Button", "x653 yp+5 w23 h23 X:Move" . (this.Collect ? " Disabled" : ""))
 		button.OnEvent("Click", (*) {
 			local provider := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 														  , "Telemetry Viewer", "Provider", "Integrated")
@@ -1089,23 +1097,23 @@ class TelemetryViewer {
 
 		this.updateTelemetryChart(true)
 
-		if this.Collect {
-			if this.CollectorTask
-				this.CollectorTask.stop()
+		if this.Synchronize {
+			if this.SynchronizeTask
+				this.SynchronizeTask.stop()
 
-			this.iCollectorTask := PeriodicTask(ObjBindMethod(this, "loadTelemetry"), 10000, kLowPriority)
+			this.iSynchronizeTask := PeriodicTask(ObjBindMethod(this, "loadTelemetry"), 10000, kLowPriority)
 
-			this.CollectorTask.start()
+			this.SynchronizeTask.start()
 		}
 	}
 
 	close() {
 		this.shutdownCollector()
 
-		if this.CollectorTask {
-			this.CollectorTask.stop()
+		if this.SynchronizeTask {
+			this.SynchronizeTask.stop()
 
-			this.iCollectorTask := false
+			this.iSynchronizeTask := false
 		}
 
 		this.Manager.closedTelemetryViewer()

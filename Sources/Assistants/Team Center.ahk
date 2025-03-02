@@ -13870,7 +13870,7 @@ editTelemetryProviderSettings(teamCenterOrCommand, arguments*) {
 
 		settingsGui.Show("AutoSize Center")
 
-		editTelemetrySettings("UpdateState")
+		editTelemetryProviderSettings("UpdateState")
 
 		while !result
 			Sleep(100)

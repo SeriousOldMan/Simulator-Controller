@@ -1649,7 +1649,7 @@ class TeamServerPlugin extends ControllerPlugin {
 							if this.TelemetryCollector
 								this.shutdownTelemetryCollector()
 
-							this.startupTelemetryCollector(getMultiMapValue(teamServerConfig, "Telemetry", "Provider", "Integrated")
+							this.startupTelemetryCollector(getMultiMapValue(teamServerConfig, "Telemetry", "Provider", "Internal")
 														 , normalizeDirectoryPath(telemetryDirectory))
 						}
 					}

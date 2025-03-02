@@ -41,7 +41,7 @@ global kTelemetryChannels := [{Name: "Distance", Indices: [1], Channels: []}
 ;;;-------------------------------------------------------------------------;;;
 
 class TelemetryCollector {
-	iProvider := "Integrated"
+	iProvider := "Internal"
 	iProviderURL := false
 
 	iSimulator := false
@@ -267,14 +267,14 @@ class TelemetryCollector {
 		}
 	}
 
-	class IntegratedTelemetryFuture extends TelemetryCollector.TelemetryFuture {
+	class InternalTelemetryFuture extends TelemetryCollector.TelemetryFuture {
 		__New(collector) {
 			super.__New(collector)
 
 			local directory := (normalizeDirectoryPath(collector.TelemetryDirectory) . "\")
 
 			if FileExist(directory . "Telemetry.cmd")
-				throw "Partial telemetry collection still running in TelemetryCollector.IntegratedTelemetryFuture.__New..."
+				throw "Partial telemetry collection still running in TelemetryCollector.InternalTelemetryFuture.__New..."
 			else {
 				deleteFile(directory . "\Telemetry.section")
 
@@ -378,7 +378,7 @@ class TelemetryCollector {
 	}
 
 	__New(provider, telemetryDirectory, simulator, track, trackLength) {
-		if (provider != "Integrated") {
+		if (provider != "Internal") {
 			provider := string2Values("|", provider)
 
 			this.iProvider := provider[1]
@@ -402,7 +402,7 @@ class TelemetryCollector {
 		local sessionDB := SessionDatabase()
 		local code, exePath, pid, trackData
 
-		if (this.Provider = "Integrated") {
+		if (this.Provider = "Internal") {
 			if (this.iTelemetryCollectorPID && restart)
 				this.shutdown(true)
 
@@ -482,7 +482,7 @@ class TelemetryCollector {
 		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
 			return false
 
-		if ((this.Provider = "Integrated") && pid) {
+		if ((this.Provider = "Internal") && pid) {
 			ProcessClose(pid)
 
 			if (force && ProcessExist(pid)) {
@@ -516,8 +516,8 @@ class TelemetryCollector {
 	}
 
 	collectTelemetry() {
-		if (this.Provider = "Integrated")
-			return TelemetryCollector.IntegratedTelemetryFuture(this)
+		if (this.Provider = "Internal")
+			return TelemetryCollector.InternalTelemetryFuture(this)
 		else
 			return TelemetryCollector.SecondMonitorTelemetryFuture(this)
 	}

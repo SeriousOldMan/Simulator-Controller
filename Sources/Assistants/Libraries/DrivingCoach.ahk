@@ -1466,9 +1466,9 @@ class DrivingCoach extends GridRaceAssistant {
 				DirCreate(kTempDirectory . "Driving Coach\Telemetry")
 			}
 
-			provider := getMultiMapValue(this.Settings, "Assistant.Coach", "Telemetry.Provider", "Integrated")
+			provider := getMultiMapValue(this.Settings, "Assistant.Coach", "Telemetry.Provider", "Internal")
 
-			if (provider != "Integrated")
+			if (provider != "Internal")
 				provider .= ("|" . getMultiMapValue(this.Settings, "Assistant.Coach", "Telemetry.Provider.URL", ""))
 
 			this.iTelemetryAnalyzer := TelemetryAnalyzer(this.Simulator, this.Track)

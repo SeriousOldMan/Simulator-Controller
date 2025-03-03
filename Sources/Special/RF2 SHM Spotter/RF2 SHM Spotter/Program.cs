@@ -23,7 +23,7 @@ namespace RF2SHMSpotter {
 
             if (args.Length > 0 && args[0] == "-Automation")
             {
-                spotter.initializeTrigger("Trigger", args);
+                spotter.initializeTrigger("Automation", args);
 
                 spotter.Run(false, true, false);
             }

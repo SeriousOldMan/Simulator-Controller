@@ -172,8 +172,8 @@ The telemetry system supports two different sources of telemetry data. One, whic
 
 ##### Notes
 
-1. It can take a few laps before the first telemetry data gets recorded.
-2. A special method is used for *Assetto Corsa Competizione*, which unfortunately does not supply the distance of the car into the track in the shared memory API (it is available in the UDP interface, though, but this interface does not provide telemetry data). Because of that, the track layout must be learned, before telemetry data can be correlated to the track position. Be sure to drive clean during the first laps.
+1. Depending on the telemetry provider it can take a few laps before the first telemetry data gets recorded.
+2. The internal telemetry provider uses a special method for *Assetto Corsa Competizione*, which unfortunately does not supply the distance of the car into the track in the shared memory API (it is available in the UDP interface, though, but this interface does not provide telemetry data). Because of that, the track layout must be learned, before telemetry data can be correlated to the track position. Be sure to drive clean during the first laps.
 5. The currently selected lap can be deleted by using the "-" button to the right of the drop down menu of all laps. If you hold down the Control key, all laps can be deleted at once. This is done only locally, it does NOT delete any laps on the Team Server.
 5. You can save and load telemetry data for a given lap for later usage:
    - Typically used for reference laps, even from other drivers.

@@ -32,6 +32,13 @@ IMPORTANT: The data format of saved sessions has changed over time. To load a se
 
 The "Auto Save" setting in the "Session" mennu allows you to automatically save a session before the window of the "Solo Center" is closed or before a new session will be started. However, doing this will collect a great amount of probably unnecessary data in your session database, therefore choose wisely.
 
+#### Difference between saving a session and exporting data
+
+It is important that you understand the difference between saving the current state of a session and [exporting data to the session database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#exporting-data-to-the-session-database). Both will typically be done at the end of a session, but the purpose is very different.
+
+- **Saving** a session means storing the complete state of the session in a file, pretty much like saving a text document. This data is kind of passive, it is a simple document. But it is useful for the records.
+- **Exporting** a session will write important data from the session, like pressures, temperatures, consumables, lap times and so on in a structured format to the session database, so that this data can be used by the Assistants and other applications like the "Strategy Workbench".
+
 ### Data Analysis
 
 "Solo Center" supplies you with a couple of reports, which you can use to analyse your performance and dig deeper into the telemetry data of the car. Choose one of the reports in the reports list and this report will be shown in the report area on the top right of "Solo Center" window.

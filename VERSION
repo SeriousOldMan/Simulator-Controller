@@ -2,7 +2,7 @@
 Version=6.2.2.0-dev
 Target=6.2.2.0-release
 Date=03/03/2025
-Download=
+Download=https://www.dropbox.com/scl/fi/5cwxnyysdb4nlaulkqab6/Simulator-Controller-6.2.2.0-dev.zip?rlkey=0iwow6kauzowsnno1m8salgig&st=9uj8dvzn&dl=1
 Changes=Use rephrasing booster also for split talking, Updated Rephrasing booster instructions, Chat mode support for rFactor 2 and Le Mans Ultimate, Use Second Monitor as real time telemetry provider, Telemetry provider setting for Driving Coach, Choose telemetry provider in Team Center, Choose telemetry provider in Telemetry Viewer, First part of portoguese translations, Use local temp folder for installation packages, Private session function in Startup Profiles, Updated R3E car meta data, Interpolate missing telemetry values, Saving sesssion in "Solo Center" with session type
 Components=Media->5.6.1,Configuration->6.2.2,Utilities->6.2.2
 [Release]
@@ -20,13 +20,13 @@ Configuration.6.2.1.Content=Setup
 Configuration.6.2.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/CuyqbRlN;https://www.dropbox.com/scl/fi/oimops6ia2cmije8ijsi1/Configuration-6.2.1.zip?rlkey=exmxucfyhhytzteauunc5fd30&st=9jde5ox9&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.2.1.zip
 Configuration.6.2.2.Path=Resources
 Configuration.6.2.2.Content=Setup
-Configuration.6.2.2.Download=
+Configuration.6.2.2.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/HFz3MPYi;https://www.dropbox.com/scl/fi/b06sa5lsqfbdiymnquq8k/Configuration-6.2.2.zip?rlkey=ziabrb78intu82i8g9ggvrhzh&st=vjxqpf6e&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.2.2.zip
 Utilities.6.1.6.Path=.
 Utilities.6.1.6.Content=Utilities
 Utilities.6.1.6.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Gs12Shqo;https://www.dropbox.com/scl/fi/zo6ve6h67jluj25zkni9z/Utilities-6.1.6.zip?rlkey=qmp8jzvx54roz3l72zovvk6we&st=wfvj3oxf&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.1.6.zip
 Utilities.6.2.2.Path=.
 Utilities.6.2.2.Content=Utilities
-Utilities.6.2.2.Download=
+Utilities.6.2.2.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Cn-Rmw_8;https://www.dropbox.com/scl/fi/lgc20h3afx2msjcarh9hi/Utilities-6.2.2.zip?rlkey=4aff0vxge03ghdr2umlhd1ex9&st=plp4tedq&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.2.2.zip
 [Current]
 Type=Development
 [Version]

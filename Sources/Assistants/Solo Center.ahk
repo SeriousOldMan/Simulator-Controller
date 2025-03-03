@@ -4600,7 +4600,7 @@ class SoloCenter extends ConfigurationItem {
 			local simulator := this.Simulator
 			local car := this.Car
 			local track := this.Track
-			local info, dirName, directory, fileName, newFileName
+			local info, dirName, directory, fileName, newFileName, session
 
 			saveSession(directory, fileName) {
 				try {
@@ -4709,7 +4709,14 @@ class SoloCenter extends ConfigurationItem {
 
 				directory := this.SessionDirectory
 
-				fileName := (dirName . "\Practice " . FormatTime(this.Date, "yyyy-MMM-dd"))
+				session := this.Session
+
+				if !session
+					session := "Unknown"
+				else if (session = "Qualification")
+					session := "Qualifying"
+
+				fileName := (dirName . "\" . translate(session) . FormatTime(this.Date, "yyyy-MMM-dd"))
 
 				newFileName := (fileName . ".solo")
 

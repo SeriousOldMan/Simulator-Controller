@@ -976,7 +976,7 @@ class TelemetryViewer {
 		button := viewerGui.Add("Button", "x653 yp+5 w23 h23 X:Move" . (!this.Collect ? " Disabled" : ""))
 		button.OnEvent("Click", (*) {
 			local provider := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-														  , "Telemetry Viewer", "Provider", "Integrated")
+														  , "Telemetry Viewer", "Provider", "Internal")
 			local newProvider, configuration, collector
 
 			viewerGui.Block()
@@ -1161,7 +1161,7 @@ class TelemetryViewer {
 		if this.Collect
 			if !this.TelemetryCollector {
 				this.iTelemetryCollector := TelemetryCollector(getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-																			  , "Telemetry Viewer", "Provider", "Integrated")
+																			  , "Telemetry Viewer", "Provider", "Internal")
 															 , this.TelemetryDirectory, simulator, track, trackLength)
 
 				this.iTelemetryCollector.startup()
@@ -3591,14 +3591,14 @@ editTelemetrySettings(telemetryViewerOrCommand, arguments*) {
 	else {
 		result := false
 
-		settingsGui := Window({Options: "0x400000"}, translate("Telemetry Viewer"))
+		settingsGui := Window({Options: "0x400000"}, translate("Telemetry"))
 
 		settingsGui.SetFont("Norm", "Arial")
 
 		settingsGui.Add("Text", "x16 y16 w90 h23 +0x200", translate("Telemetry Provider"))
 		settingsGui.Add("Text", "x110 yp w160 h23 +0x200", "")
 
-		providerDropDown := settingsGui.Add("DropDownList", "x110 yp+1 w160 Choose1", collect(["Integrated", "Second Monitor"], translate))
+		providerDropDown := settingsGui.Add("DropDownList", "x110 yp+1 w160 Choose1", collect(["Internal", "Second Monitor"], translate))
 		providerDropDown.OnEvent("Change", chooseProvider)
 
 		endpointLabel := settingsGui.Add("Text", "x16 yp+30 w90 h23 +0x200", translate("Provider URL"))
@@ -3607,7 +3607,7 @@ editTelemetrySettings(telemetryViewerOrCommand, arguments*) {
 		settingsGui.Add("Button", "x60 yp+35 w80 h23 Default", translate("Ok")).OnEvent("Click", editTelemetrySettings.Bind(kOk))
 		settingsGui.Add("Button", "x146 yp w80 h23", translate("&Cancel")).OnEvent("Click", editTelemetrySettings.Bind(kCancel))
 
-		if (arguments[1] && (arguments[1] != "Integrated")) {
+		if (arguments[1] && (arguments[1] != "Internal")) {
 			providerDropDown.Choose(2)
 
 			endpointEdit.Text := string2Values("|", arguments[1])[2]
@@ -3629,7 +3629,7 @@ editTelemetrySettings(telemetryViewerOrCommand, arguments*) {
 				return false
 			else if (result == kOk) {
 				if (providerDropDown.Value = 1)
-					return "Integrated"
+					return "Internal"
 				else
 					return ("Second Monitor|" . endpointEdit.Text)
 			}

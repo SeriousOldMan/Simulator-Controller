@@ -1378,7 +1378,7 @@ class TeamCenter extends ConfigurationItem {
 		this.iCollectTelemetry := getMultiMapValue(configuration, "Telemetry", "Collect", false)
 
 		if this.CollectTelemetry
-			this.iCollectTelemetry := getMultiMapValue(configuration, "Telemetry", "Provider", "Integrated")
+			this.iCollectTelemetry := getMultiMapValue(configuration, "Telemetry", "Provider", "Internal")
 
 		setMultiMapValue(configuration, "Telemetry", "Directory", false)
 
@@ -5046,7 +5046,7 @@ class TeamCenter extends ConfigurationItem {
 				case 7: ; Telemetry
 					if !this.CollectTelemetry
 						this.iCollectTelemetry := editTelemetryProviderSettings(this, getMultiMapValue(readMultiMap(kUserConfigDirectory . "Team Server.ini")
-																									 , "Telemetry", "Provider", "Integrated"))
+																									 , "Telemetry", "Provider", "Internal"))
 					else
 						this.iCollectTelemetry := !this.CollectTelemetry
 
@@ -13844,14 +13844,14 @@ editTelemetryProviderSettings(teamCenterOrCommand, arguments*) {
 	else {
 		result := false
 
-		settingsGui := Window({Options: "0x400000"}, translate("Team Center"))
+		settingsGui := Window({Options: "0x400000"}, translate("Telemetry"))
 
 		settingsGui.SetFont("Norm", "Arial")
 
 		settingsGui.Add("Text", "x16 y16 w90 h23 +0x200", translate("Telemetry Provider"))
 		settingsGui.Add("Text", "x110 yp w160 h23 +0x200", "")
 
-		providerDropDown := settingsGui.Add("DropDownList", "x110 yp+1 w160 Choose1", collect(["Integrated", "Second Monitor"], translate))
+		providerDropDown := settingsGui.Add("DropDownList", "x110 yp+1 w160 Choose1", collect(["Internal", "Second Monitor"], translate))
 		providerDropDown.OnEvent("Change", chooseProvider)
 
 		endpointLabel := settingsGui.Add("Text", "x16 yp+30 w90 h23 +0x200", translate("Provider URL"))
@@ -13862,7 +13862,7 @@ editTelemetryProviderSettings(teamCenterOrCommand, arguments*) {
 
 		settingsGui.Opt("+Owner" . teamCenterOrCommand.Window.Hwnd)
 
-		if (arguments[1] && (arguments[1] != "Integrated")) {
+		if (arguments[1] && (arguments[1] != "Internal")) {
 			providerDropDown.Choose(2)
 
 			endpointEdit.Text := string2Values("|", arguments[1])[2]
@@ -13880,7 +13880,7 @@ editTelemetryProviderSettings(teamCenterOrCommand, arguments*) {
 				return false
 			else if (result == kOk) {
 				if (providerDropDown.Value = 1)
-					return "Integrated"
+					return "Internal"
 				else
 					return ("Second Monitor|" . endpointEdit.Text)
 			}

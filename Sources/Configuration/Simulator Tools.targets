@@ -29,6 +29,7 @@ Release 6.0.1=Release 6.0.0 -> updateStreamDeckIconPreset, updateActionLabels, u
 Release 6.0.2=Release 6.0.1 -> updateConfigurationForV602
 Release 6.1.0=Release 6.0.2 -> updateConfigurationForV610, updateStreamDeckIconPreset, updateActionLabels, updateActionIcons
 Release 6.1.3=Release 6.1.0 -> updatePluginsForV613, updateStreamDeckIconPreset, updateActionLabels, updateActionIcons
+Release 6.2.2=Release 6.1.3 -> updateConfigurationForV622
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

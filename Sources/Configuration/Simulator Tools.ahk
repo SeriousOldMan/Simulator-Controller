@@ -1775,6 +1775,22 @@ updateInstallationForV500() {
 	}
 }
 
+updateConfigurationForV622() {
+	local appSettings, issueSettings
+
+	if FileExist(kUserConfigDirectory . "Application Settings.ini") {
+		appSettings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+		issueSettings := newMultiMap()
+
+		setMultiMapValues(issueSettings, "Settings", getMultiMapValues(appSettings, "Telemetry Collector"))
+
+		removeMultiMapValues(appSettings, "Telemetry Collector")
+
+		writeMultiMap(kUserConfigDirectory . "Application Settings.ini", appSettings)
+		writeMultiMap(kUserConfigDirectory . "Issue Collector.ini", issueSettings)
+	}
+}
+
 updateConfigurationForV610() {
 	local configuration, subtitle
 

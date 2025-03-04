@@ -266,19 +266,18 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		chosen := 0
 
-		for code, language in languages {
-			choices.Push(language)
-
-			if (code = "en")
-				enIndex := A_Index
-		}
-
 		for ignore, raceAssistant in kRaceAssistants
 			for ignore, grammarFile in getFileNames(raceAssistant . ".grammars.*", kUserGrammarsDirectory, kGrammarsDirectory) {
 				SplitPath(grammarFile, , , &code)
 
-				if (!languages.Has(code) && !inList(choices, code)) {
-					choices.Push(code)
+				if !inList(choices, languages.Has(code) ? languages[code] : code) {
+					if languages.Has(code)
+						choices.Push(languages[code])
+					else
+						choices.Push(code)
+
+					if (code == this.Value["voiceLanguage"])
+						chosen := A_Index
 
 					if (code = "en")
 						enIndex := choices.Length
@@ -639,32 +638,22 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		this.loadFromConfiguration(configuration, true)
 
-		for code, language in languages {
-			choices.Push(language)
-
-			if (language == this.Value["voiceLanguage"]) {
-				chosen := A_Index
-				languageCode := code
-			}
-
-			if (code = "en")
-				enIndex := A_Index
-		}
-
 		for ignore, grammarFile in getFileNames("Race Engineer.grammars.*", kUserGrammarsDirectory, kGrammarsDirectory) {
 			SplitPath(grammarFile, , , &code)
 
-			if !languages.Has(code) {
-				choices.Push(code)
+			if !choices.Has(languages.Has(code) ? languages[code] : code)
+				if languages.Has(code)
+					choices.Push(languages[code])
+				else
+					choices.Push(code)
 
-				if (code == this.Value["voiceLanguage"]) {
+				if ((languages.Has(code) ? languages[code] : code) == this.Value["voiceLanguage"]) {
 					chosen := choices.Length
 					languageCode := code
 				}
 
-				if (code = "en")
-					enIndex := choices.Length
-			}
+			if (code = "en")
+				enIndex := choices.Length
 		}
 
 		this.Control["voiceLanguageDropDown"].Choose(chosen)

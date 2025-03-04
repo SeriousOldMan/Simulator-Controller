@@ -46,7 +46,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   9. The settings for "Private Practice" and "Private Qualifying" are now also available as "Functions" in the Startup Profiles.
   10. Updated car meta data for *RaceRoom Racing Experience* to the latest version.
   11. Missing values in the telemetry data graph are now interpolated.
-  12. Thanks to our community member @Hudson Alves, this release comes with the first part of the translations for the Portuguese language. Still some more releases needed to complete this task, but we have a good start.
+  12. Thanks to our community member @Hudson Alves, this release comes with the first part of the translations for the Portuguese language. Still some more releases needed to complete the task, for example voice control is not yet supported in Portuguese, but we have a good start.
   13. [Internal] The "Temp" folder in the [Documents]\Simulator Controller folder is now used for the installation and update process instead of the standard AppData\Local\Temp folder. This may help to further reduce interventions of AntiVirus programs, when an exclusion for [Documents]\Simulator Controller already has been declared as recommended.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-622), if you have tweaked your *Rephrasing* booster instructions.

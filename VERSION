@@ -14,19 +14,19 @@ Components=Media->5.6.1,Configuration->6.2.1,Utilities->6.1.6
 [Components]
 Media.5.6.1.Path=Resources
 Media.5.6.1.Content=Splash Media
-Media.5.6.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/DfSnfhLR;https://www.dropbox.com/scl/fi/3c56fjdvdd4od5t7rsuc9/Media-5.6.1.zip?rlkey=x0icl05jy05nn886due4dsblv&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Media+5.6.1.zip
+Media.5.6.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/DfSnfhLR;https://www.dropbox.com/scl/fi/3c56fjdvdd4od5t7rsuc9/Media-5.6.1.zip?rlkey=x0icl05jy05nn886due4dsblv&dl=1;http://87.177.159.148:800/api/public/dl/QoDnWZ83;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Media+5.6.1.zip
 Configuration.6.2.1.Path=Resources
 Configuration.6.2.1.Content=Setup
 Configuration.6.2.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/CuyqbRlN;https://www.dropbox.com/scl/fi/oimops6ia2cmije8ijsi1/Configuration-6.2.1.zip?rlkey=exmxucfyhhytzteauunc5fd30&st=9jde5ox9&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.2.1.zip
 Configuration.6.2.2.Path=Resources
 Configuration.6.2.2.Content=Setup
-Configuration.6.2.2.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/HFz3MPYi;https://www.dropbox.com/scl/fi/b06sa5lsqfbdiymnquq8k/Configuration-6.2.2.zip?rlkey=ziabrb78intu82i8g9ggvrhzh&st=vjxqpf6e&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.2.2.zip
+Configuration.6.2.2.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/HFz3MPYi;https://www.dropbox.com/scl/fi/b06sa5lsqfbdiymnquq8k/Configuration-6.2.2.zip?rlkey=ziabrb78intu82i8g9ggvrhzh&st=vjxqpf6e&dl=1;http://87.177.159.148:800/api/public/dl/F0YSxMjH;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.2.2.zip
 Utilities.6.1.6.Path=.
 Utilities.6.1.6.Content=Utilities
 Utilities.6.1.6.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Gs12Shqo;https://www.dropbox.com/scl/fi/zo6ve6h67jluj25zkni9z/Utilities-6.1.6.zip?rlkey=qmp8jzvx54roz3l72zovvk6we&st=wfvj3oxf&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.1.6.zip
 Utilities.6.2.2.Path=.
 Utilities.6.2.2.Content=Utilities
-Utilities.6.2.2.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Cn-Rmw_8;https://www.dropbox.com/scl/fi/lgc20h3afx2msjcarh9hi/Utilities-6.2.2.zip?rlkey=4aff0vxge03ghdr2umlhd1ex9&st=plp4tedq&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.2.2.zip
+Utilities.6.2.2.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Cn-Rmw_8;https://www.dropbox.com/scl/fi/lgc20h3afx2msjcarh9hi/Utilities-6.2.2.zip?rlkey=4aff0vxge03ghdr2umlhd1ex9&st=plp4tedq&dl=1;http://87.177.159.148:800/api/public/dl/UUVNodWq;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.2.2.zip
 [Current]
 Type=Development
 [Version]

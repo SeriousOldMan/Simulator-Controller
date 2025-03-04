@@ -1809,6 +1809,10 @@ class SetupWorkbench extends ConfigurationItem {
 
 		characteristicsMenu.Add(label, (*) => this.startIssueAnalyzer())
 
+		if (!this.SimulatorDefinition || !getMultiMapValue(this.SimulatorDefinition, "Simulator", "Analyzer", false)
+									  || !inList(getKeys(getMultiMapValues(getControllerState(), "Simulators")), this.SelectedSimulator))
+			characteristicsMenu.Disable(label)
+
 		label := translate("Telemetry...")
 
 		characteristicsMenu.Add(label, (*) => this.openTelemetryViewer())

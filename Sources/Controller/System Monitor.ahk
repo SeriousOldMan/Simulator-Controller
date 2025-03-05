@@ -2093,7 +2093,7 @@ startupSystemMonitor() {
 			deleteFile(kTempDirectory . assistant . " Session.state")
 		}
 
-		PeriodicTask(clearOrphaneStateFiles, 60000, kLowPriority).start()
+		PeriodicTask(clearOrphaneStateFiles, 120000, kLowPriority).start()
 
 		startupApplication()
 

@@ -153,8 +153,8 @@ namespace SHMConnector {
 			if (forName.Contains(" ")) {
 				string[] names = forName.Split(' ');
 
-				return names[0].Substring(0, 1) + names[1].Substring(0, 1);
-			}
+                return names[0].Substring(0, Math.Min(1, names[0].Length)) + names[1].Substring(0, Math.Min(1, names[1].Length));
+            }
 			else
 				return "";
 		}

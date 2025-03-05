@@ -107,7 +107,7 @@ You can use the buttons below the list to rename or delete a session. You will h
 
 Good to know: Sessions can be opened in the corresponding *Center* by double-clicking them.
 
-#### Laps
+#### Telemetries
 
 Telemetry data for individual laps can be stored in the session database, for example to use them as reference for future comparisons. Note: Lap telemetry data can be recorded in the ["Solo Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center), for example, and can then be stored in the session database.
 
@@ -252,7 +252,7 @@ Here only the *McLaren 720s* data for the *Mount Panorama* and the *Nürburgring
 
 ##### Importing data from other sources
 
-You can import data from foreign sources, for example telemetry information from a real car, in order to use this data in "Strategy Workbench" or in other tools of Simulator Controller, as long as the structure follows the rules:
+You can import data from foreign sources, for example telemetry information from a real car, in order to use this data in "Strategy Workbench" or in other tools of Simulator Controller, as long as the structure adheres to the following rules:
 
 1. For the moment you have to choose one of the simulators as the home for your imported data. A future release might provide a special place for foreign data.
 2. You have to create a folder with the data to be imported.

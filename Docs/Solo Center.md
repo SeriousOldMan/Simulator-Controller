@@ -24,7 +24,7 @@ The default value for the data update frequency is 10 seconds, but you can can t
 
 ### Saving and loading sessions
 
-The "Solo Center" allows you to save the complete session data for later inspection by using the "Save Session..." command from the "Session" menu. You can use the "Load Session..." command to retrieve such a session later on and all information will be restored. Saving a session this way does **not** export the telemetry data to the session database, which is a completely different thing and must be triggered seperately. However, the full session information can also be stored in the session database, if needed, to have all information in a central location.
+The "Solo Center" allows you to save the complete session data for later inspection by using the "Save Session..." command from the "Session" menu. You can use the "Load Session..." command to retrieve such a session later on and all information will be restored. Saving a session this way does **not** export the detailed data about lap times, cosumables, tyre state and so on to the session database, which is a completely different thing and must be triggered seperately. However, the full session information can also be stored in the session database, if needed, to have all information in a central location.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%2011.JPG)
 
@@ -34,11 +34,11 @@ The "Auto Save" setting in the "Session" mennu allows you to automatically save 
 
 ### Data Analysis
 
-"Solo Center" supplies you with a couple of reports, which you can use to analyse your performance and dig deeper into the telemetry data of the car. Choose one of the reports in the reports list and this report will be shown in the report area on the top right of "Solo Center" window.
+"Solo Center" supplies you with a couple of reports, which you can use to analyse your performance and dig deeper into the state of the car. Choose one of the reports in the reports list and this report will be shown in the report area on the top right of "Solo Center" window.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%201.JPG)
 
-The reports at the top of the list are the well known reports, which are also available after a session using the ["Race Reports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports) tool. They are mostly useful to analyze the standings and the performance of the various drivers and cars. The other reports will give you an insight into the telemetry data. You can select the data to be shown using the selector menus on the right of the report list. You can also choose the type of visualization using the "Plot" menu on top of the report area. Use the "Stint" menu to restrict the visualized data to a specific stint or use the "Driver" menu to restrict the data of the various charts to one the drivers who has already driven some laps in the session (normally only you). Only data of the selected driver will be shown then.
+The reports at the top of the list are the well known reports, which are also available after a session using the ["Race Reports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports) tool. They are mostly useful to analyze the standings and the performance of the various drivers and cars. The other reports will give you an insight into the datailed data like pressures, temperatures and so on. You can select the data to be shown using the selector menus on the right of the report list. You can also choose the type of visualization using the "Plot" menu on top of the report area. Use the "Stint" menu to restrict the visualized data to a specific stint or use the "Driver" menu to restrict the data of the various charts to one the drivers who has already driven some laps in the session (normally only you). Only data of the selected driver will be shown then.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%202.JPG)
 
@@ -165,7 +165,7 @@ The choices (except tyre compounds) will be remembered between different runs of
 
 ### Exporting data to the session database
 
-At the end of your session, you can decide which data should be transfered to the session database by clicking the small check marks for each lap in the list of driven laps. "Solo Center" will already have selected by default all valid laps for your convenience. Then choose the command "Export to Database" from the "Session" menu.
+At the end of your session, you can decide which data should be transfered to the session database by clicking the small check marks for each lap in the list of driven laps. "Solo Center" will already have selected by default all valid laps for your convenience. Then choose the command "Export to Database" from the "Session" menu. This will transfer the data for the selected laps (lap times, consumption, tyre wear and pressures, brake wear, and so on) to the session database.
 
 Please note, that this export is possible only once, to prevent duplicate data entries in your database, and cannot be undone. Therefore check your selection carefully beforehand.
 

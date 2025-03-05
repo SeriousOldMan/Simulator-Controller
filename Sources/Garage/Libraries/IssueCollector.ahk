@@ -52,7 +52,7 @@ class IssueCollector {
 	iTemperatureSamples := []
 
 	iExitCallback := false
-	
+
 	Simulator {
 		Get {
 			return this.iSimulator
@@ -309,7 +309,7 @@ class IssueCollector {
 
 				if !this.iExitCallback {
 					this.iExitCallback := ObjBindMethod(this, "stopIssueCollector")
-					
+
 					OnExit(this.iExitCallback)
 				}
 			}
@@ -415,7 +415,8 @@ class IssueCollector {
 
 	updateSamples() {
 		local hasValues := false
-		local data, tyreTemperatures, tyreInnerTemperatures, tyreOuterTemperatures, brakeTemperatures, sample
+		local data, tyreTemperatures, tyreInnerTemperatures, tyreOuterTemperatures, brakeTemperatures
+		local waterTemperature, oilTemperature, sample
 
 		if inList(this.iCategories, "Temperatures") {
 			data := callSimulator(SessionDatabase.getSimulatorCode(this.Simulator))
@@ -423,6 +424,8 @@ class IssueCollector {
 			tyreInnerTemperatures := string2Values(",", getMultiMapValue(data, "Car Data", "TyreInnerTemperature", ""))
 			tyreOuterTemperatures := string2Values(",", getMultiMapValue(data, "Car Data", "TyreOuterTemperature", ""))
 			brakeTemperatures := string2Values(",", getMultiMapValue(data, "Car Data", "BrakeTemperature", ""))
+			waterTemperature := getMultiMapValue(data, "Car Data", "WaterTemperature", kUndefined)
+			oilTemperature := getMultiMapValue(data, "Car Data", "OilTemperature", kUndefined)
 			sample := {}
 
 			if (sum(tyreTemperatures) > 0) {
@@ -445,6 +448,12 @@ class IssueCollector {
 
 				hasValues := true
 			}
+
+			if (waterTemperature != kUndefined)
+				sample.WaterTemperature := waterTemperature
+
+			if (oilTemperature != kUndefined)
+				sample.OilTemperature := oilTemperature
 
 			if hasValues
 				this.iTemperatureSamples.Push(sample)

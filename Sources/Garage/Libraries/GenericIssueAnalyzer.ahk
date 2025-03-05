@@ -56,6 +56,9 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 	iFrontBrakeTemperatures := [300, 550, 680]
 	iRearBrakeTemperatures := [300, 550, 680]
 
+	iWaterTemperature := [80, 90, 100]
+	iOilTemperature := [80, 90, 100]
+
 	iAcousticFeedback := true
 	static sAudioDevice := false
 
@@ -281,6 +284,30 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 		}
 	}
 
+	WaterTemperature {
+		Get {
+			return this.iWaterTemperature
+		}
+
+		Set {
+			setAnalyzerSetting(this, "WaterTemperature", values2String(",", value*))
+
+			return (this.iWaterTemperature := value)
+		}
+	}
+
+	OilTemperature {
+		Get {
+			return this.iOilTemperature
+		}
+
+		Set {
+			setAnalyzerSetting(this, "OilTemperature", values2String(",", value*))
+
+			return (this.iOilTemperature := value)
+		}
+	}
+
 	AcousticFeedback {
 		Get {
 			return this.iAcousticFeedback
@@ -340,6 +367,8 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 		local defaultOITemperatureDifference := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "TyreOITemperatureDifference", 10)
 		local defaultFrontBrakeTemperatures := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "FrontBrakeTemperatures", "300,550,680")
 		local defaultRearBrakeTemperatures := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "RearBrakeTemperatures", "300,550,680")
+		local defaultWaterTemperature := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "WaterTemperature", "80,90,100")
+		local defaultOilTemperature := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "OilTemperature", "80,90,100")
 		local fileName, configuration, settings, prefix
 
 		static first := true
@@ -380,6 +409,8 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 				defaultOITemperatureDifference := getMultiMapValue(configuration, "Analyzer", "TyreOITemperatureDifference", defaultOITemperatureDifference)
 				defaultFrontBrakeTemperatures := getMultiMapValue(configuration, "Analyzer", "FrontBrakeTemperatures", defaultFrontBrakeTemperatures)
 				defaultRearBrakeTemperatures := getMultiMapValue(configuration, "Analyzer", "RearBrakeTemperatures", defaultRearBrakeTemperatures)
+				defaultWaterTemperature := getMultiMapValue(configuration, "Analyzer", "WaterTemperature", defaultWaterTemperature)
+				defaultOilTemperature := getMultiMapValue(configuration, "Analyzer", "OilTemperature", defaultOilTemperature)
 			}
 		}
 
@@ -402,6 +433,8 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 		defaultOITemperatureDifference := getMultiMapValue(settings, "Settings", prefix . "TyreOITemperatureDifference", defaultOITemperatureDifference)
 		defaultFrontBrakeTemperatures := getMultiMapValue(settings, "Settings", prefix . "FrontBrakeTemperatures", defaultFrontBrakeTemperatures)
 		defaultRearBrakeTemperatures := getMultiMapValue(settings, "Settings", prefix . "RearBrakeTemperatures", defaultRearBrakeTemperatures)
+		defaultWaterTemperature := getMultiMapValue(settings, "Settings", prefix . "WaterTemperature", defaultWaterTemperature)
+		defaultOilTemperature := getMultiMapValue(settings, "Settings", prefix . "OilTemperature", defaultOilTemperature)
 
 		prefix := (simulator . "." . (selectedCar ? selectedCar : "*") . "." . (selectedTrack ? selectedTrack : "*") . ".")
 
@@ -427,6 +460,11 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 														 , prefix . "FrontBrakeTemperatures", defaultFrontBrakeTemperatures))
 		this.iRearBrakeTemperatures := string2Values(",", getMultiMapValue(settings, "Settings"
 														, prefix . "RearBrakeTemperatures", defaultRearBrakeTemperatures))
+
+		this.iWaterTemperature := string2Values(",", getMultiMapValue(settings, "Settings"
+												   , prefix . "WaterTemperature", defaultWaterTemperature))
+		this.iOilTemperature := string2Values(",", getMultiMapValue(settings, "Settings"
+												 , prefix . "OilTemperature", defaultOilTemperature))
 
 		super.__New(workbench, simulator)
 
@@ -618,6 +656,8 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 		local tyreTemperatures := [[], [], [], []]
 		local brakeTemperatures := [[], [], [], []]
 		local tyreOITemperatureDifferences := [[], [], [], []]
+		local waterTemperatures := []
+		local oilTemperatures := []
 		local issues := CaseInsenseMap()
 
 		getTemperatures(category, temperatures) {
@@ -627,6 +667,14 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 				if sample.HasProp(category . "Temperatures")
 					loop 4
 						temperatures[A_Index].Push(sample.%category%Temperatures[A_Index])
+		}
+
+		getEngineTemperatures(category, temperatures) {
+			local ignore, sample
+
+			for ignore, sample in samples
+				if sample.HasProp(category . "Temperature")
+					temperatures.Push(sample.%category%Temperature)
 		}
 
 		getOIDifferences() {
@@ -723,15 +771,13 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 		}
 
 		computeBrakeIssues(category, positions, minThreshold, maxThreshold, idealValue) {
-			local coldHeavy, hotHeavy, coldMedium, hotMedium, coldLight, hotLight, difference
-			local ignore, position, value, key, type
-
-			coldHeavy := 0
-			hotHeavy := 0
-			coldMedium := 0
-			hotMedium := 0
-			coldLight := 0
-			hotLight := 0
+			local coldHeavy := 0
+			local hotHeavy := 0
+			local coldMedium := 0
+			local hotMedium := 0
+			local coldLight := 0
+			local hotLight := 0
+			local difference, ignore, position, value, key, type
 
 			for ignore, position in positions
 				for ignore, value in brakeTemperatures[position] {
@@ -766,6 +812,47 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 			}
 		}
 
+		computeEngineIssues(category, samples, minThreshold, maxThreshold, idealValue) {
+			local coldHeavy := 0
+			local hotHeavy := 0
+			local coldMedium := 0
+			local hotMedium := 0
+			local coldLight := 0
+			local hotLight := 0
+			local difference, ignore, position, value, key, type
+
+			for ignore, value in samples {
+				difference := (value - idealValue)
+
+				if (value < minThreshold)
+					coldHeavy += 1
+				else if (value > maxThreshold)
+					hotHeavy += 1
+				else if ((difference < 0) && (Abs(difference) > (Abs(idealValue - minThreshold) / 4 * 3)))
+					coldMedium += 1
+				else if ((difference > 0) && (Abs(difference) > (Abs(idealValue - maxThreshold) / 4 * 3)))
+					hotMedium += 1
+				else if ((difference < 0) && (Abs(difference) > (Abs(idealValue - minThreshold) / 2)))
+					coldLight += 1
+				else if ((difference > 0) && (Abs(difference) > (Abs(idealValue - maxThreshold) / 2)))
+					hotLight += 1
+			}
+
+			for ignore, temperature in ["Hot"] {
+				key := ("Engine.Temperatures." . category)
+
+				for ignore, type in ["Heavy", "Medium", "Light"] {
+					%temperature%%type% /= 2
+
+					if %temperature%%type%
+						if issues.Has(key)
+							issues[key].Push({Severity: type, Frequency: Round(%temperature%%type% / count * 100)})
+						else
+							issues[key] := [{Severity: type, Frequency: Round(%temperature%%type% / count * 100)}]
+				}
+			}
+		}
+
 		issues.Default := []
 
 		getTemperatures("Tyre", tyreTemperatures)
@@ -782,6 +869,12 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 
 		computeBrakeIssues("Front", [1, 2], this.FrontBrakeTemperatures[1], this.FrontBrakeTemperatures[3], this.FrontBrakeTemperatures[2])
 		computeBrakeIssues("Rear", [3, 4], this.RearBrakeTemperatures[1], this.RearBrakeTemperatures[3], this.RearBrakeTemperatures[2])
+
+		getEngineTemperatures("Water", waterTemperatures)
+		getEngineTemperatures("Oil", oilTemperatures)
+
+		computeEngineIssues("Water", waterTemperatures, this.WaterTemperature[1], this.WaterTemperature[3], this.WaterTemperature[2])
+		computeEngineIssues("Oil", oilTemperatures, this.OilTemperature[1], this.OilTemperature[3], this.OilTemperature[2])
 
 		return issues
 	}
@@ -849,6 +942,13 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	static minRearBrakeTemperatureEdit
 	static maxRearBrakeTemperatureEdit
 	static idealRearBrakeTemperatureEdit
+
+	static minWaterTemperatureEdit
+	static maxWaterTemperatureEdit
+	static idealWaterTemperatureEdit
+	static minOilTemperatureEdit
+	static maxOilTemperatureEdit
+	static idealOilTemperatureEdit
 
 	static issuesListView
 
@@ -1245,7 +1345,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 			analyzerGui.Add("Text", "x158 yp w180 h23 +0x200", SessionDatabase.getTrackName(analyzer.Simulator, analyzer.Track))
 		}
 
-		tabView := analyzerGui.Add("Tab3", "x16 yp+30 w340 h348 Section", collect(["Handling", "Temperatures"], translate))
+		tabView := analyzerGui.Add("Tab3", "x16 yp+30 w340 h388 Section", collect(["Handling", "Temperatures"], translate))
 		widget36 := tabView
 
 		tabView .UseTab(1)
@@ -1359,7 +1459,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		calibrateButton := analyzerGui.Add("Button", "x264 yp w80 h23 ", translate("Calibrate..."))
 		calibrateButton.OnEvent("Click", runAnalyzer.Bind("Calibrate"))
-		widget63 := calibrateButton
+		widget75 := calibrateButton
 
 		if !analyzer.settingAvailable("OversteerThresholds") {
 			heavyOversteerThresholdSlider.Enabled := false
@@ -1435,6 +1535,30 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		widget61 := maxRearBrakeTemperatureEdit
 		widget62 := idealRearBrakeTemperatureEdit
 
+		widget63 := analyzerGui.Add("GroupBox", "x24 yp+42 w320 h100", translate("Engine"))
+
+		analyzerGui.SetFont("Norm", "Arial")
+
+		widget64 := analyzerGui.Add("Text", "x174 yp+17 w45 h23 +0x200 Center", translate("Min"))
+		widget65 := analyzerGui.Add("Text", "x224 yp w45 h23 +0x200 Center", translate("Max"))
+		widget66 := analyzerGui.Add("Text", "x274 yp w45 h23 +0x200 Center", translate("Ideal"))
+
+		widget67 := analyzerGui.Add("Text", "x32 yp+24 w130 h23 +0x200", translate("Target Water"))
+		minWaterTemperatureEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", analyzer.WaterTemperature[1])))
+		maxWaterTemperatureEdit := analyzerGui.Add("Edit", "x224 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", analyzer.WaterTemperature[3])))
+		idealWaterTemperatureEdit := analyzerGui.Add("Edit", "x274 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", analyzer.WaterTemperature[2])))
+		widget68 := minWaterTemperatureEdit
+		widget69 := maxWaterTemperatureEdit
+		widget70 := idealWaterTemperatureEdit
+
+		widget71 := analyzerGui.Add("Text", "x32 yp+24 w130 h23 +0x200", translate("Target Oil"))
+		minOilTemperatureEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", analyzer.OilTemperature[1])))
+		maxOilTemperatureEdit := analyzerGui.Add("Edit", "x224 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", analyzer.OilTemperature[3])))
+		idealOilTemperatureEdit := analyzerGui.Add("Edit", "x274 yp w45 h23 +0x200", displayValue("Float", convertUnit("Temperature", analyzer.OilTemperature[2])))
+		widget72 := minOilTemperatureEdit
+		widget73 := maxOilTemperatureEdit
+		widget74 := idealOilTemperatureEdit
+
 		createTemperatureUpdater("FrontTyreTemperatures"
 							   , [minFrontTyreTemperatureEdit, idealFrontTyreTemperatureEdit, maxFrontTyreTemperatureEdit])
 		createTemperatureUpdater("RearTyreTemperatures"
@@ -1447,19 +1571,24 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		createTemperatureUpdater("RearBrakeTemperatures"
 							   , [minRearBrakeTemperatureEdit, idealRearBrakeTemperatureEdit, maxRearBrakeTemperatureEdit])
 
+		createTemperatureUpdater("WaterTemperature", [minWaterTemperatureEdit, idealWaterTemperatureEdit, maxWaterTemperatureEdit])
+		createTemperatureUpdater("OilTemperature", [minOilTemperatureEdit, idealOilTemperatureEdit, maxOilTemperatureEdit])
+
 		for ignore, widget in [minFrontTyreTemperatureEdit, idealFrontTyreTemperatureEdit, maxFrontTyreTemperatureEdit
 							 , minRearTyreTemperatureEdit, idealRearTyreTemperatureEdit, maxRearTyreTemperatureEdit
 							 , maxOITemperatureDifferenceEdit
 							 , minRearBrakeTemperatureEdit, idealRearBrakeTemperatureEdit, maxRearBrakeTemperatureEdit
-							 , minRearBrakeTemperatureEdit, idealRearBrakeTemperatureEdit, maxRearBrakeTemperatureEdit]
+							 , minRearBrakeTemperatureEdit, idealRearBrakeTemperatureEdit, maxRearBrakeTemperatureEdit
+							 , minWaterTemperatureEdit, idealWaterTemperatureEdit, maxWaterTemperatureEdit
+							 , minOilTemperatureEdit, idealOilTemperatureEdit, maxOilTemperatureEdit]
 			widget.OnEvent("Change", validateTemperature.Bind(widget))
 
-		loop 63
+		loop 75
 			prepareWidgets.Push(%"widget" . A_Index%)
 
 		tabView .UseTab(0)
 
-		widget1 := analyzerGui.Add("ListView", "x16 ys w336 h214 -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Characteristic", "Intensity", "Frequency (%)"], translate))
+		widget1 := analyzerGui.Add("ListView", "x16 ys w336 h254 -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Characteristic", "Intensity", "Frequency (%)"], translate))
 		widget1.OnEvent("Click", noSelect)
 		widget1.OnEvent("DoubleClick", noSelect)
 
@@ -1467,7 +1596,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		analyzerGui.SetFont("s14", "Arial")
 
-		widget2 := analyzerGui.Add("Text", "x16 ys+224 w336 h200 Wrap Hidden", translate("Go to the track and run some decent laps. Then click on `"Stop`" to analyze the telemetry data."))
+		widget2 := analyzerGui.Add("Text", "x16 ys+264 w336 h140 Wrap Hidden", translate("Go to the track and run some decent laps. Then click on `"Stop`" to analyze the telemetry data."))
 
 		analyzerGui.SetFont("Norm s8", "Arial")
 
@@ -1493,7 +1622,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		; calibrateButton := analyzerGui.Add("Button", "x16 ys+366 w80 h23 ", translate("Calibrate..."))
 		; calibrateButton.OnEvent("Click", runAnalyzer.Bind("Calibrate"))
-		activateButton := analyzerGui.Add("Button", "x176 ys+366 w80 h23 Default", translate("Start"))
+		activateButton := analyzerGui.Add("Button", "x176 ys+406 w80 h23 Default", translate("Start"))
 		activateButton.OnEvent("Click", runAnalyzer.Bind("Activate"))
 		analyzerGui.Add("Button", "xp+98 yp w80 h23", translate("Cancel")).OnEvent("Click", runAnalyzer.Bind(kCancel))
 

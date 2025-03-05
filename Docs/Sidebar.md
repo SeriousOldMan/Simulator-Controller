@@ -110,7 +110,7 @@
     - [Settings Overview](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings)
   - [Track & Automation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation)
   - [Sessions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#sessions)
-  - [Laps](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#laps)
+  - [Telemetries](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetries)
   - [Strategies](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#strategies)
   - [Setups](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#setups)
   - [Tyre Pressures](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#tyre-pressures)

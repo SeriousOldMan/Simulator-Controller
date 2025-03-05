@@ -3493,11 +3493,11 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 		layoutsGui.Add("Text", "x8 yp+30 w300 0x10")
 
 		layoutsGui.Add("Text", "x16 yp+10 w80", translate("Layout"))
-		layoutsGui.Add("DropDownList", "x98 yp-4 w120 vlayoutDropDown").OnEvent("Change", editLayoutSettings.Bind("LayoutSelect"))
+		layoutsGui.Add("DropDownList", "x98 yp-4 w152 vlayoutDropDown").OnEvent("Change", editLayoutSettings.Bind("LayoutSelect"))
 
-		layoutsGui.Add("Button", "x219 yp w23 h23 Center +0x200 vnewButton").OnEvent("Click", editLayoutSettings.Bind("LayoutNew"))
+		layoutsGui.Add("Button", "x252 yp w23 h23 Center +0x200 vnewButton").OnEvent("Click", editLayoutSettings.Bind("LayoutNew"))
 		setButtonIcon(layoutsGui["newButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
-		layoutsGui.Add("Button", "x243 yp w23 h23 Center +0x200 Disabled vdeleteButton").OnEvent("Click", editLayoutSettings.Bind("LayoutDelete"))
+		layoutsGui.Add("Button", "x277 yp w23 h23 Center +0x200 Disabled vdeleteButton").OnEvent("Click", editLayoutSettings.Bind("LayoutDelete"))
 		setButtonIcon(layoutsGui["deleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
 		channelsListView := layoutsGui.Add("ListView", "x16 yp+30 w284 h300 AltSubmit -Multi -LV0x10 Checked NoSort NoSortHdr", collect(["Channel"], translate))

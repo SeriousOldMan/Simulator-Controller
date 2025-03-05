@@ -201,7 +201,10 @@ checkForNews() {
 
 		if check {
 			try {
-				Download("https://fileshare.impresion3d.pro/filebrowser/api/public/dl/r0q9-d-3", kTempDirectory . "NEWS.ini")
+				if FileExist(kConfigDirectory . "NEWS")
+					FileCopy(kConfigDirectory . "NEWS", kTempDirectory . "NEWS.ini")
+				else
+					Download("https://fileshare.impresion3d.pro/filebrowser/api/public/dl/r0q9-d-3", kTempDirectory . "NEWS.ini")
 			}
 			catch Any as exception {
 				check := false
@@ -230,28 +233,33 @@ checkForNews() {
 							try {
 								deleteFile(A_Temp . "\News.zip")
 
-								Download(html, A_Temp . "\News.zip")
+								for ignore, html in string2Values(";", html)
+									try {
+										Download(html, A_Temp . "\News.zip")
 
-								try {
-									deleteFile(kTempDirectory . "News")
-									deleteDirectory(kTempDirectory . "News")
+										try {
+											deleteFile(kTempDirectory . "News")
+											deleteDirectory(kTempDirectory . "News")
+										}
+
+										DirCreate(kTempDirectory . "News")
+
+										RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\News.zip' -DestinationPath '" . kTempDirectory . "News' -Force", , "Hide")
+
+										if FileExist(kTempDirectory . "News\News.htm") {
+											setMultiMapValue(news, "News", nr, A_Now)
+
+											writeMultiMap(kUserConfigDirectory . "NEWS", news)
+
+											viewHTML(kTempDirectory . "News\News.htm")
+
+											break
+										}
+									}
+									catch Any as exception {
+										logError(exception)
+									}
 								}
-
-								DirCreate(kTempDirectory . "News")
-
-								RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\News.zip' -DestinationPath '" . kTempDirectory . "News' -Force", , "Hide")
-
-								if FileExist(kTempDirectory . "News\News.htm") {
-									setMultiMapValue(news, "News", nr, A_Now)
-
-									writeMultiMap(kUserConfigDirectory . "NEWS", news)
-
-									viewHTML(kTempDirectory . "News\News.htm")
-								}
-							}
-							catch Any as exception {
-								logError(exception)
-							}
 
 							break
 						}

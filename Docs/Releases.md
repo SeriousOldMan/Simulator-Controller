@@ -36,7 +36,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   2. Documentation updates here and there, as always
   3. Fixed track automation for *Le Mans Ultimate* and *rFactor 2* which had been broken since release 6.1.x.
   4. Fixed a bug the suggests the the *Issue Analyzer* in "Settup Workbench" is available for the *Generic* simulator, which is actually not the case.
-  5. Fixed a crtical crash in *rFactor 2* and *Le Mans Ultimate* data acquisition, if player names do **not** contain a space character.
+  5. Fixed a critical crash in *rFactor 2* and *Le Mans Ultimate* data acquisition, if player names do **not** contain a space character.
   6. The application of the *Rephrasing* booster has been optimized so that the LLM is allowed to rearrange the speech as long as the meaning is preserved. This will introduce even more variation into long speeches.
   7. The instructions for the *Rephrasing* booster have been updated. If you have tweaked them, revert them to their original state and re-integrate your changes.
   8. The "RF2" and the "LMU" plugin now offer a "Chat" mode similar to the one already available for the "ACC" plugin. Using this, you can send predefined chat messages using your Button Box, or even automated based on some events.
@@ -49,7 +49,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   12. Updated car meta data for *RaceRoom Racing Experience* to the latest version.
   13. Missing values in the telemetry data graph are now interpolated.
   14. Thanks to our community member @Hudson Alves, this release comes with the first part of the translations for the Portuguese language. Still some more releases needed to complete the task, for example voice control is not yet supported in Portuguese, but we have a good start.
-  15. [Internal] The "Temp" folder in the [Documents]\Simulator Controller folder is now used for the installation and update process instead of the standard AppData\Local\Temp folder. This may help to further reduce interventions of AntiVirus programs, when an exclusion for [Documents]\Simulator Controller already has been declared as recommended.
+  15. [Important] The tab "Laps" in the "Session Database" has been renamed to "Telemetries". Furthermore, the data category "Telemetry" in the "Administration" tab has been renamed to "Laps". Looks a bit confusing, since it seems like a swap of names, but it reflects the actual meaning of those items much more precisely than before.
+  16. [Internal] The "Temp" folder in the [Documents]\Simulator Controller folder is now used for the installation and update process instead of the standard AppData\Local\Temp folder. This may help to further reduce interventions of AntiVirus programs, when an exclusion for [Documents]\Simulator Controller already has been declared as recommended.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-622), if you have tweaked your *Rephrasing* booster instructions.
 

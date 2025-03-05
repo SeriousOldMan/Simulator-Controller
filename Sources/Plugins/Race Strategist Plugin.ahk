@@ -319,7 +319,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 		settings := super.loadSettings(simulator, car, track, data, settings)
 
 		if this.StartupSettings {
-			collectTelemetry := getMultiMapValue(this.StartupSettings, "Functions", "Telemetry Collection", kUndefined)
+			collectTelemetry := getMultiMapValue(this.StartupSettings, "Functions", "Data Collection", kUndefined)
 
 			if (collectTelemetry != kUndefined)
 				for ignore, session in ["Practice", "Qualification", "Race"]

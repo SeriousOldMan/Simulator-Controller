@@ -119,9 +119,9 @@ You can use the buttons below the list to upload, download, rename or delete lap
 
 Although technically not strictly necessary, it would be benificial that everybody who contributes to the lap telemetry collection will follow the same naming conventions. Therefore, I dare to propose a naming scheme here:
 
-[Nickname] [T Air] [T Track] [Weather] [Compound] [Laptime]
+[Nickname] [T Air] [T Track] [Weather] [Fuel Level] - [Laptime]
 
-with *Laptime* in Seconds and *Date* in YYYYMMDD format. Example: "TBO 24 27 Dry Dry (M) 104.5"
+with *Laptime* in Seconds and *Date* in YYYYMMDD format. Example: "TBO 24 27 Dry 60l - 104.5"
 
 ##### Telemetry Viewer
 

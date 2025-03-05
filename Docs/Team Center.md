@@ -162,16 +162,18 @@ A valuable tool to analyze your lap times and those of your team mates is the in
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Telemetry%20Browser.JPG)
 
-While you are in an active session, lap telemetry data will be collected lap by lap for those drivers that have enabled "Telemetry" in the "Session" menu (below the "Synchronize" command). The telemetry data for the last few laps of every driver, who has checked the "Telemetry" item in the "Session" menu, will be stored on the Team Server and will be replicated to all currently running "Team Center" for inspection and comparison with other laps.
-
-When looking for areas of improvement take a close look to the application of throttle and brakes and the activation of TC and ABS. Trailing off the brakes and the transition back to full throttle is the most important skill to master for fast lap times. This does not mean, that sometimes coasting around a corner is not necessary. Use the Telemetry Viewer to compare your laps with the fastest lap of a given session and learn what exactly made you faster there.
+While you are in an active session, lap telemetry data will be collected lap by lap for those drivers that have enabled the "Telemetry" setting in the "Session" menu (below the "Synchronize" command). The telemetry data for the last few laps of every driver, who has checked the "Telemetry" item in the "Session" menu, will be stored on the Team Server and will be replicated to all currently running "Team Center" for inspection and comparison with other laps.
 
 Important: Sessions that are saved with telemetry data to the session database will NOT be synchronized with the Team Server by default, since the amount of data is quite large and will put a lot of stress on the Team Server. You can still activate the synchronization for a particular session in the "Session Database", but I strongly advise against it.
 
+#### Choosing the telemetry provider
+
+The telemetry system supports two different sources of telemetry data. One, which is the default, is integrated into Simulator Controller and will provide telemetry data after a learning phase of two laps. The other one uses a connection to ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), a tool developed by @winzarten. You have to choose, which telemetry provider to use when enabling the "Telemetry" option in the "Session" menu. If you choose "Second Monitor" here, make sure that this application is running while you are out on the track.
+
 ##### Notes
 
-1. It can take a few laps before the first telemetry data gets recorded.
-2. A special method is used for *Assetto Corsa Competizione*, which unfortunately does not supply the distance of the car into the track in the shared memory API (it is available in the UDP interface, though, but this interface does not provide telemetry data). Because of that, the track layout must be learned, before telemetry data can be correlated to the track position. Be sure to drive clean during the first laps.
+1. Depending on the telemetry provider it can take a few laps before the first telemetry data gets recorded.
+2. The internal telemetry provider uses a special method for *Assetto Corsa Competizione*, which unfortunately does not supply the distance of the car into the track in the shared memory API (it is available in the UDP interface, though, but this interface does not provide telemetry data). Because of that, the track layout must be learned, before telemetry data can be correlated to the track position. Be sure to drive clean during the first laps.
 5. The currently selected lap can be deleted by using the "-" button to the right of the drop down menu of all laps. If you hold down the Control key, all laps can be deleted at once. This is done only locally, it does NOT delete any laps on the Team Server.
 5. You can save and load telemetry data for a given lap for later usage:
    - Typically used for reference laps, even from other drivers.

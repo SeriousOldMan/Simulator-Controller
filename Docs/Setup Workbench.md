@@ -117,13 +117,17 @@ Another valuable tool to improve your lap times is the integrated Telemetry View
 
 As long as the Telemetry Viewer is open, car telemetry data will be collected lap by lap in the background while you are driving. You can use the browser to load the telemetry for a given lap and you can choose a reference lap for comparison.
 
+#### Choosing the telemetry provider
+
+The Telemetry Viewer supports two different sources of telemetry data. One, which is the default, is integrated into Simulator Controller and will provide telemetry data after a learning phase of two laps. The other one uses a connection to ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), a tool developed by @winzarten. You can choose, which telemetry provider to use by clicking on the button with the "Connect" icon in the upper right corner of the Telemetry Viewer window. If you choose "Second Monitor" here, make sure that this application is running while you are out on the track.
+
 When looking for areas of improvement take a close look to your application of throttle and brakes and the activation of TC and ABS. Trailing off the brakes and the transition back to full throttle is the most important skill to master for fast lap times. This does not mean, that sometimes coasting around a corner is not necessary. Use the Telemetry Viewer to compare your laps with the fastest lap of a given session and learn what exactly made you faster there.
 
 ##### Notes
 
-1. It can take a few laps before the first telemetry data gets recorded.
-2. A special method is used for *Assetto Corsa Competizione*, which unfortunately does not supply the distance of the car into the track in the shared memory API (it is available in the UDP interface, though, but this interface does not provide telemetry data). Because of that, the track layout must be learned, before telemetry data can be correlated to the track position. Be sure to drive clean during the first laps.
-3. The telemetry recorder is only running, while the Telemetry Viewer is open. Therefore, you can restart the learning process for *Assetto Corsa Competizione*, if necessary, by closing the browser and re-open it.
+1. Depending on the telemetry provider it can take a few laps before the first telemetry data gets recorded.
+2. The internal telemetry provider uses a special method for *Assetto Corsa Competizione*, which unfortunately does not supply the distance of the car into the track in the shared memory API (it is available in the UDP interface, though, but this interface does not provide telemetry data). Because of that, the track layout must be learned, before telemetry data can be correlated to the track position. Be sure to drive clean during the first laps.
+3. The telemetry recorder is only running, while the Telemetry Viewer is open. Therefore, you can restart the learning process for *Assetto Corsa Competizione*, if necessary, by closing the window and re-open it.
 4. The currently selected lap can be deleted by using the "-" button to the right of the drop down menu of all laps. If you hold down the Control key, all laps can be deleted at once.
 5. You can save and load telemetry data for a given lap for later usage:
    - Typically used for reference laps, even from other drivers.

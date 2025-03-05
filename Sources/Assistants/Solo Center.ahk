@@ -1857,12 +1857,12 @@ class SoloCenter extends ConfigurationItem {
 
 			DirCreate(this.SessionDirectory . "Telemetry")
 
-			this.iTelemetryViewer := TelemetryViewer(this, this.SessionDirectory . "Telemetry", true)
+			this.iTelemetryViewer := TelemetryViewer(this, this.SessionDirectory . "Telemetry", true, true)
 
 			this.TelemetryViewer.show()
 		}
 		else if FileExist(this.SessionDirectory . "Telemetry") {
-			this.iTelemetryViewer := TelemetryViewer(this, this.SessionDirectory . "Telemetry", false)
+			this.iTelemetryViewer := TelemetryViewer(this, this.SessionDirectory . "Telemetry", false, false)
 
 			this.TelemetryViewer.show()
 		}
@@ -4600,7 +4600,7 @@ class SoloCenter extends ConfigurationItem {
 			local simulator := this.Simulator
 			local car := this.Car
 			local track := this.Track
-			local info, dirName, directory, fileName, newFileName
+			local info, dirName, directory, fileName, newFileName, session
 
 			saveSession(directory, fileName) {
 				try {
@@ -4709,7 +4709,14 @@ class SoloCenter extends ConfigurationItem {
 
 				directory := this.SessionDirectory
 
-				fileName := (dirName . "\Practice " . FormatTime(this.Date, "yyyy-MMM-dd"))
+				session := this.Session
+
+				if !session
+					session := "Unknown"
+				else if (session = "Qualification")
+					session := "Qualifying"
+
+				fileName := (dirName . "\" . translate(session) . FormatTime(this.Date, "yyyy-MMM-dd"))
 
 				newFileName := (fileName . ".solo")
 
@@ -7630,8 +7637,8 @@ class SoloCenter extends ConfigurationItem {
 			try {
 				save := (this.AutoSave && this.SessionActive)
 
-				if (this.HasData && !this.SessionExported && (this.SessionMode != "Loaded")) {
-					if this.AutoExport {
+				if (this.HasData && (this.SessionMode != "Loaded")) {
+					if (this.AutoExport && !this.SessionExported) {
 						this.exportSession(true, false)
 
 						if save
@@ -7642,11 +7649,15 @@ class SoloCenter extends ConfigurationItem {
 							this.saveSession(true, false, false, false)
 					}
 					else {
-						translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
+						if !this.SessionExported {
+							translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
 
-						OnMessage(0x44, translator)
-						msgResult := withBlockedWindows(MsgBox, translate("You have unsaved data. Do you want to transfer it to the session database before starting a new session?"), translate("Export"), 262179)
-						OnMessage(0x44, translator, 0)
+							OnMessage(0x44, translator)
+							msgResult := withBlockedWindows(MsgBox, translate("You have unsaved data. Do you want to transfer it to the session database before starting a new session?"), translate("Export"), 262179)
+							OnMessage(0x44, translator, 0)
+						}
+						else
+							msgResult := "No"
 
 						if (msgResult = "Yes")
 							this.exportSession(true)

@@ -1738,7 +1738,7 @@
 		"1747": {
 			"Name": "Chevrolet Corvette C6.R ZR1",
 			"BrandName": "Chevrolet",
-			"CarManufacturer": 2618,
+			"CarManufacturer": 2623,
 			"DefaultLivery": 3823,
 			"Id": 1747,
 			"Class": 1704,
@@ -7713,7 +7713,7 @@
 		"2611": {
 			"Name": "Chevrolet Corvette Z06.R GT3",
 			"BrandName": "Chevrolet",
-			"CarManufacturer": 2618,
+			"CarManufacturer": 2623,
 			"DefaultLivery": 2613,
 			"Id": 2611,
 			"Class": 2922,
@@ -9568,7 +9568,7 @@
 		"3508": {
 			"Name": "Chevrolet Corvette Z06.R GT3",
 			"BrandName": "Corvette",
-			"CarManufacturer": 2618,
+			"CarManufacturer": 2623,
 			"DefaultLivery": 3511,
 			"Id": 3508,
 			"Class": 3375,
@@ -10388,7 +10388,7 @@
 		"3626": {
 			"Name": "Chevrolet Corvette Z06.R GT3",
 			"BrandName": "Chevrolet",
-			"CarManufacturer": 2618,
+			"CarManufacturer": 2623,
 			"DefaultLivery": 3633,
 			"Id": 3626,
 			"Class": 1703,
@@ -11183,7 +11183,7 @@
 		"4075": {
 			"Name": "Chevrolet Corvette Greenwood 1977",
 			"BrandName": "Chevrolet",
-			"CarManufacturer": 2618,
+			"CarManufacturer": 2623,
 			"DefaultLivery": 4081,
 			"Id": 4075,
 			"Class": 1708,
@@ -12928,7 +12928,7 @@
 		"4570": {
 			"Name": "Chevrolet Corvette Z06.R GT3 GTM15",
 			"BrandName": "Corvette",
-			"CarManufacturer": 2618,
+			"CarManufacturer": 2623,
 			"DefaultLivery": 4572,
 			"Id": 4570,
 			"Class": 4516,
@@ -44304,7 +44304,7 @@
 			"Name": "BMW E30 M3 Drift",
 			"BrandName": "BMW",
 			"CarManufacturer": 2550,
-			"DefaultLivery": 12743,
+			"DefaultLivery": 13043,
 			"Id": 9761,
 			"Class": 1711,
 			"liveries": [
@@ -44325,11 +44325,26 @@
 				},
 				{
 					"Name": "#229",
-					"Team": 9762,
+					"Team": 13048,
+					"Car": 9761,
+					"Id": 9772,
+					"Class": 1711,
+					"TeamName": "Red Bull Driftbrothers",
+					"drivers": [
+						{
+							"Forename": "Elias",
+							"Surname": "Houndtondji",
+							"Id": 9781
+						}
+					]
+				},
+				{
+					"Name": "#229",
+					"Team": 13048,
 					"Car": 9761,
 					"Id": 9797,
 					"Class": 1711,
-					"TeamName": "ST Suspension",
+					"TeamName": "Red Bull Driftbrothers",
 					"drivers": [
 						{
 							"Forename": "Johannes",
@@ -44365,6 +44380,21 @@
 							"Forename": "Tim",
 							"Surname": "Heinemann",
 							"Id": 6818
+						}
+					]
+				},
+				{
+					"Name": "#70",
+					"Team": 13042,
+					"Car": 9761,
+					"Id": 13043,
+					"Class": 1711,
+					"TeamName": "BBS",
+					"drivers": [
+						{
+							"Forename": "Daniel",
+							"Surname": "Wheeland",
+							"Id": 13046
 						}
 					]
 				}
@@ -48015,6 +48045,76 @@
 							"Forename": "Martin",
 							"Surname": "Kroll",
 							"Id": 12752
+						}
+					]
+				}
+			]
+		},
+		"10604": {
+			"Name": "BMW G82 M4 Drift",
+			"BrandName": "BMW",
+			"CarManufacturer": 2550,
+			"DefaultLivery": 13045,
+			"Id": 10604,
+			"Class": 1711,
+			"liveries": [
+				{
+					"Name": "#229",
+					"Team": 10605,
+					"Car": 10604,
+					"Id": 10607,
+					"Class": 1711,
+					"TeamName": "Red Bull Driftbrothers",
+					"drivers": [
+						{
+							"Forename": "Elias",
+							"Surname": "Houndtondji",
+							"Id": 9781
+						}
+					]
+				},
+				{
+					"Name": "#42",
+					"Team": 10605,
+					"Car": 10604,
+					"Id": 10608,
+					"Class": 1711,
+					"TeamName": "Red Bull Driftbrothers",
+					"drivers": [
+						{
+							"Forename": "Johannes",
+							"Surname": "Hountondji",
+							"Id": 9782
+						}
+					]
+				},
+				{
+					"Name": "#0",
+					"Team": 12753,
+					"Car": 10604,
+					"Id": 12744,
+					"Class": 1711,
+					"TeamName": "Baggsy Boy UK",
+					"drivers": [
+						{
+							"Forename": "Steve Biagioni",
+							"Surname": "Baggsy",
+							"Id": 12399
+						}
+					]
+				},
+				{
+					"Name": "#79",
+					"Team": 13044,
+					"Car": 10604,
+					"Id": 13045,
+					"Class": 1711,
+					"TeamName": "ST Suspensions",
+					"drivers": [
+						{
+							"Forename": "Philipp",
+							"Surname": "Wendel",
+							"Id": 13047
 						}
 					]
 				}
@@ -57630,6 +57730,671 @@
 							"Forename": "Markku",
 							"Surname": "Alén",
 							"Id": 12879
+						}
+					]
+				}
+			]
+		},
+		"12942": {
+			"Name": "Porsche 911 GT3 Cup (992)",
+			"BrandName": "Porsche",
+			"CarManufacturer": 3013,
+			"DefaultLivery": 12981,
+			"Id": 12942,
+			"Class": 12969,
+			"liveries": [
+				{
+					"Name": "#2",
+					"Team": 12948,
+					"Car": 12942,
+					"Id": 12949,
+					"Class": 12969,
+					"TeamName": "ACI Motorsports",
+					"drivers": [
+						{
+							"Forename": "Jimmy",
+							"Surname": "Llibre",
+							"Id": 12950
+						}
+					]
+				},
+				{
+					"Name": "#4",
+					"Team": 12946,
+					"Car": 12942,
+					"Id": 12953,
+					"Class": 12969,
+					"TeamName": "JDX Racing",
+					"drivers": [
+						{
+							"Forename": "Elias",
+							"Surname": "de la Torre IV",
+							"Id": 12952
+						}
+					]
+				},
+				{
+					"Name": "#5",
+					"Team": 12955,
+					"Car": 12942,
+					"Id": 12956,
+					"Class": 12969,
+					"TeamName": "Momentop FMS Motorsport x RGB Racing",
+					"drivers": [
+						{
+							"Forename": "Angel",
+							"Surname": "Benitez Jr",
+							"Id": 12954
+						}
+					]
+				},
+				{
+					"Name": "#8",
+					"Team": 12945,
+					"Car": 12942,
+					"Id": 12957,
+					"Class": 12969,
+					"TeamName": "McCann Racing",
+					"drivers": [
+						{
+							"Forename": "Michael",
+							"Surname": "McCann Jr.",
+							"Id": 10196
+						}
+					]
+				},
+				{
+					"Name": "#9",
+					"Team": 12946,
+					"Car": 12942,
+					"Id": 12959,
+					"Class": 12969,
+					"TeamName": "JDX Racing",
+					"drivers": [
+						{
+							"Forename": "Zachary",
+							"Surname": "Vanier",
+							"Id": 12958
+						}
+					]
+				},
+				{
+					"Name": "#11",
+					"Team": 12960,
+					"Car": 12942,
+					"Id": 12962,
+					"Class": 12969,
+					"TeamName": "Forward Motorsport",
+					"drivers": [
+						{
+							"Forename": "Peter",
+							"Surname": "Ludwig",
+							"Id": 12961
+						}
+					]
+				},
+				{
+					"Name": "#13",
+					"Team": 12944,
+					"Car": 12942,
+					"Id": 12963,
+					"Class": 12969,
+					"TeamName": "Kellymoss",
+					"drivers": [
+						{
+							"Forename": "Todd",
+							"Surname": "Parriott",
+							"Id": 12964
+						}
+					]
+				},
+				{
+					"Name": "#14",
+					"Team": 12966,
+					"Car": 12942,
+					"Id": 12965,
+					"Class": 12969,
+					"TeamName": "GMG Racing",
+					"drivers": [
+						{
+							"Forename": "James",
+							"Surname": "Sofronas",
+							"Id": 8434
+						}
+					]
+				},
+				{
+					"Name": "#15",
+					"Team": 12948,
+					"Car": 12942,
+					"Id": 12967,
+					"Class": 12969,
+					"TeamName": "ACI Motorsports",
+					"drivers": [
+						{
+							"Forename": "Yves",
+							"Surname": "Baltas",
+							"Id": 12968
+						}
+					]
+				},
+				{
+					"Name": "#16",
+					"Team": 12948,
+					"Car": 12942,
+					"Id": 12971,
+					"Class": 12969,
+					"TeamName": "ACI Motorsports",
+					"drivers": [
+						{
+							"Forename": "Pedro",
+							"Surname": "Torres",
+							"Id": 12970
+						}
+					]
+				},
+				{
+					"Name": "#18",
+					"Team": 12948,
+					"Car": 12942,
+					"Id": 12973,
+					"Class": 12969,
+					"TeamName": "ACI Motorsports",
+					"drivers": [
+						{
+							"Forename": "Richard",
+							"Surname": "Edge",
+							"Id": 12972
+						}
+					]
+				},
+				{
+					"Name": "#19",
+					"Team": 12948,
+					"Car": 12942,
+					"Id": 12975,
+					"Class": 12969,
+					"TeamName": "ACI Motorsports",
+					"drivers": [
+						{
+							"Forename": "Tom",
+							"Surname": "Balames",
+							"Id": 12974
+						}
+					]
+				},
+				{
+					"Name": "#22",
+					"Team": 12977,
+					"Car": 12942,
+					"Id": 12978,
+					"Class": 12969,
+					"TeamName": "Alegra Motorsports, LLC",
+					"drivers": [
+						{
+							"Forename": "Carlos",
+							"Surname": "de Quesada",
+							"Id": 12976
+						}
+					]
+				},
+				{
+					"Name": "#23",
+					"Team": 12944,
+					"Car": 12942,
+					"Id": 12980,
+					"Class": 12969,
+					"TeamName": "Kellymoss",
+					"drivers": [
+						{
+							"Forename": "Jordan",
+							"Surname": "Wallace",
+							"Id": 12979
+						}
+					]
+				},
+				{
+					"Name": "#24",
+					"Team": 12944,
+					"Car": 12942,
+					"Id": 12981,
+					"Class": 12969,
+					"TeamName": "Kellymoss",
+					"drivers": [
+						{
+							"Forename": "Loek",
+							"Surname": "Hartog",
+							"Id": 12188
+						}
+					]
+				},
+				{
+					"Name": "#26",
+					"Team": 12948,
+					"Car": 12942,
+					"Id": 12983,
+					"Class": 12969,
+					"TeamName": "ACI Motorsports",
+					"drivers": [
+						{
+							"Forename": "Roberto",
+							"Surname": "Tutino",
+							"Id": 12982
+						}
+					]
+				},
+				{
+					"Name": "#32",
+					"Team": 12966,
+					"Car": 12942,
+					"Id": 12985,
+					"Class": 12969,
+					"TeamName": "GMG Racing",
+					"drivers": [
+						{
+							"Forename": "Kyle",
+							"Surname": "Washington",
+							"Id": 12984
+						}
+					]
+				},
+				{
+					"Name": "#37",
+					"Team": 12947,
+					"Car": 12942,
+					"Id": 12987,
+					"Class": 12969,
+					"TeamName": "MDK Motorsports",
+					"drivers": [
+						{
+							"Forename": "Sabré",
+							"Surname": "Cook",
+							"Id": 12986
+						}
+					]
+				},
+				{
+					"Name": "#44",
+					"Team": 12988,
+					"Car": 12942,
+					"Id": 12989,
+					"Class": 12969,
+					"TeamName": "Baby Bull Racing",
+					"drivers": [
+						{
+							"Forename": "Moisey",
+							"Surname": "Uretsky",
+							"Id": 11892
+						}
+					]
+				},
+				{
+					"Name": "#45",
+					"Team": 12990,
+					"Car": 12942,
+					"Id": 12992,
+					"Class": 12969,
+					"TeamName": "Ruckus Racing",
+					"drivers": [
+						{
+							"Forename": "Scott",
+							"Surname": "Blind",
+							"Id": 12991
+						}
+					]
+				},
+				{
+					"Name": "#55",
+					"Team": 12948,
+					"Car": 12942,
+					"Id": 12994,
+					"Class": 12969,
+					"TeamName": "ACI Motorsports",
+					"drivers": [
+						{
+							"Forename": "Matt",
+							"Surname": "Halcome",
+							"Id": 12993
+						}
+					]
+				},
+				{
+					"Name": "#57",
+					"Team": 12944,
+					"Car": 12942,
+					"Id": 12996,
+					"Class": 12969,
+					"TeamName": "Kellymoss",
+					"drivers": [
+						{
+							"Forename": "John",
+							"Surname": "Goetz",
+							"Id": 12995
+						}
+					]
+				},
+				{
+					"Name": "#64",
+					"Team": 12947,
+					"Car": 12942,
+					"Id": 12998,
+					"Class": 12969,
+					"TeamName": "MDK Motorsports",
+					"drivers": [
+						{
+							"Forename": "Dan",
+							"Surname": "Clarke",
+							"Id": 12997
+						}
+					]
+				},
+				{
+					"Name": "#66",
+					"Team": 12955,
+					"Car": 12942,
+					"Id": 13000,
+					"Class": 12969,
+					"TeamName": "Momentop FMS Motorsport x RGB Racing",
+					"drivers": [
+						{
+							"Forename": "David",
+							"Surname": "Tuaty",
+							"Id": 12999
+						}
+					]
+				},
+				{
+					"Name": "#68",
+					"Team": 12944,
+					"Car": 12942,
+					"Id": 13002,
+					"Class": 12969,
+					"TeamName": "Kellymoss",
+					"drivers": [
+						{
+							"Forename": "Chris",
+							"Surname": "Bellomo",
+							"Id": 13001
+						}
+					]
+				},
+				{
+					"Name": "#74",
+					"Team": 12947,
+					"Car": 12942,
+					"Id": 13004,
+					"Class": 12969,
+					"TeamName": "MDK Motorsports",
+					"drivers": [
+						{
+							"Forename": "Kenton",
+							"Surname": "King",
+							"Id": 13003
+						}
+					]
+				},
+				{
+					"Name": "#77",
+					"Team": 12943,
+					"Car": 12942,
+					"Id": 13006,
+					"Class": 12969,
+					"TeamName": "Topp Racing Performance",
+					"drivers": [
+						{
+							"Forename": "Colin",
+							"Surname": "Kaminsky",
+							"Id": 13005
+						}
+					]
+				},
+				{
+					"Name": "#78",
+					"Team": 12943,
+					"Car": 12942,
+					"Id": 13008,
+					"Class": 12969,
+					"TeamName": "Topp Racing Performance",
+					"drivers": [
+						{
+							"Forename": "Ryan",
+							"Surname": "Yardley",
+							"Id": 13007
+						}
+					]
+				},
+				{
+					"Name": "#82",
+					"Team": 12946,
+					"Car": 12942,
+					"Id": 13010,
+					"Class": 12969,
+					"TeamName": "JDX Racing",
+					"drivers": [
+						{
+							"Forename": "Madeline",
+							"Surname": "Stewart",
+							"Id": 13009
+						}
+					]
+				},
+				{
+					"Name": "#84",
+					"Team": 12948,
+					"Car": 12942,
+					"Id": 13012,
+					"Class": 12969,
+					"TeamName": "ACI Motorsports",
+					"drivers": [
+						{
+							"Forename": "Marco",
+							"Surname": "Cirone",
+							"Id": 13011
+						}
+					]
+				},
+				{
+					"Name": "#85",
+					"Team": 13014,
+					"Car": 12942,
+					"Id": 13015,
+					"Class": 12969,
+					"TeamName": "Rearden Racing",
+					"drivers": [
+						{
+							"Forename": "Jake",
+							"Surname": "Pedersen",
+							"Id": 13013
+						}
+					]
+				},
+				{
+					"Name": "#88",
+					"Team": 12943,
+					"Car": 12942,
+					"Id": 13017,
+					"Class": 12969,
+					"TeamName": "Topp Racing Performance",
+					"drivers": [
+						{
+							"Forename": "Michael",
+							"Surname": "Cooper",
+							"Id": 13016
+						}
+					]
+				},
+				{
+					"Name": "#91",
+					"Team": 12955,
+					"Car": 12942,
+					"Id": 13019,
+					"Class": 12969,
+					"TeamName": "Momentop FMS Motorsport x RGB Racing",
+					"drivers": [
+						{
+							"Forename": "André",
+							"Surname": "Fernandes",
+							"Id": 13018
+						}
+					]
+				},
+				{
+					"Name": "#98",
+					"Team": 12946,
+					"Car": 12942,
+					"Id": 13021,
+					"Class": 12969,
+					"TeamName": "JDX Racing",
+					"drivers": [
+						{
+							"Forename": "Alex",
+							"Surname": "Sedgwick",
+							"Id": 13020
+						}
+					]
+				},
+				{
+					"Name": "#99",
+					"Team": 12944,
+					"Car": 12942,
+					"Id": 13023,
+					"Class": 12969,
+					"TeamName": "Kellymoss",
+					"drivers": [
+						{
+							"Forename": "Alan",
+							"Surname": "Metni",
+							"Id": 13022
+						}
+					]
+				},
+				{
+					"Name": "#3",
+					"Team": 12966,
+					"Car": 12942,
+					"Id": 13024,
+					"Class": 12969,
+					"TeamName": "GMG Racing",
+					"drivers": [
+						{
+							"Forename": "Ofir",
+							"Surname": "Levy",
+							"Id": 12951
+						}
+					]
+				},
+				{
+					"Name": "#10",
+					"Team": 13026,
+					"Car": 12942,
+					"Id": 13027,
+					"Class": 12969,
+					"TeamName": "MGM Racing",
+					"drivers": [
+						{
+							"Forename": "Jodie",
+							"Surname": "Miller",
+							"Id": 13025
+						}
+					]
+				},
+				{
+					"Name": "#43",
+					"Team": 12947,
+					"Car": 12942,
+					"Id": 13028,
+					"Class": 12969,
+					"TeamName": "MDK Motorsports",
+					"drivers": [
+						{
+							"Forename": "Mark",
+							"Surname": "Kvamme",
+							"Id": 10357
+						}
+					]
+				},
+				{
+					"Name": "#46",
+					"Team": 12947,
+					"Car": 12942,
+					"Id": 13030,
+					"Class": 12969,
+					"TeamName": "MDK Motorsports",
+					"drivers": [
+						{
+							"Forename": "Naveen",
+							"Surname": "Rao",
+							"Id": 13029
+						}
+					]
+				},
+				{
+					"Name": "#56",
+					"Team": 12943,
+					"Car": 12942,
+					"Id": 13032,
+					"Class": 12969,
+					"TeamName": "Topp Racing Performance",
+					"drivers": [
+						{
+							"Forename": "Jeff",
+							"Surname": "Mosing",
+							"Id": 13031
+						}
+					]
+				},
+				{
+					"Name": "#65",
+					"Team": 12944,
+					"Car": 12942,
+					"Id": 13034,
+					"Class": 12969,
+					"TeamName": "Kellymoss",
+					"drivers": [
+						{
+							"Forename": "Efrin",
+							"Surname": "Castro",
+							"Id": 13033
+						}
+					]
+				},
+				{
+					"Name": "#69",
+					"Team": 13035,
+					"Car": 12942,
+					"Id": 13037,
+					"Class": 12969,
+					"TeamName": "BGB Motorsports",
+					"drivers": [
+						{
+							"Forename": "Thomas",
+							"Surname": "Collingwood",
+							"Id": 13036
+						}
+					]
+				}
+			]
+		},
+		"13039": {
+			"Name": "S.C. Cupra Formentor",
+			"BrandName": "CUPRA",
+			"CarManufacturer": 7159,
+			"DefaultLivery": 13041,
+			"Id": 13039,
+			"Class": 10743,
+			"liveries": [
+				{
+					"Name": "#0",
+					"Team": 13040,
+					"Car": 13039,
+					"Id": 13041,
+					"Class": 10743,
+					"TeamName": "DTM 40",
+					"drivers": [
+						{
+							"Forename": "Holger",
+							"Surname": "Stangl",
+							"Id": 4727
 						}
 					]
 				}
@@ -93947,6 +94712,21 @@
 				}
 			]
 		},
+		"9772": {
+			"Name": "#229",
+			"Team": 13048,
+			"Car": 9761,
+			"Id": 9772,
+			"Class": 1711,
+			"TeamName": "Red Bull Driftbrothers",
+			"drivers": [
+				{
+					"Forename": "Elias",
+					"Surname": "Houndtondji",
+					"Id": 9781
+				}
+			]
+		},
 		"9774": {
 			"Name": "#23",
 			"Team": 10780,
@@ -94024,11 +94804,11 @@
 		},
 		"9797": {
 			"Name": "#229",
-			"Team": 9762,
+			"Team": 13048,
 			"Car": 9761,
 			"Id": 9797,
 			"Class": 1711,
-			"TeamName": "ST Suspension",
+			"TeamName": "Red Bull Driftbrothers",
 			"drivers": [
 				{
 					"Forename": "Johannes",
@@ -98729,6 +99509,36 @@
 					"Forename": "Bruno",
 					"Surname": "Spengler",
 					"Id": 5568
+				}
+			]
+		},
+		"10607": {
+			"Name": "#229",
+			"Team": 10605,
+			"Car": 10604,
+			"Id": 10607,
+			"Class": 1711,
+			"TeamName": "Red Bull Driftbrothers",
+			"drivers": [
+				{
+					"Forename": "Elias",
+					"Surname": "Houndtondji",
+					"Id": 9781
+				}
+			]
+		},
+		"10608": {
+			"Name": "#42",
+			"Team": 10605,
+			"Car": 10604,
+			"Id": 10608,
+			"Class": 1711,
+			"TeamName": "Red Bull Driftbrothers",
+			"drivers": [
+				{
+					"Forename": "Johannes",
+					"Surname": "Hountondji",
+					"Id": 9782
 				}
 			]
 		},
@@ -110967,6 +111777,21 @@
 				}
 			]
 		},
+		"12744": {
+			"Name": "#0",
+			"Team": 12753,
+			"Car": 10604,
+			"Id": 12744,
+			"Class": 1711,
+			"TeamName": "Baggsy Boy UK",
+			"drivers": [
+				{
+					"Forename": "Steve Biagioni",
+					"Surname": "Baggsy",
+					"Id": 12399
+				}
+			]
+		},
 		"12746": {
 			"Name": "#150",
 			"Team": 12745,
@@ -112031,6 +112856,681 @@
 					"Id": 7153
 				}
 			]
+		},
+		"12949": {
+			"Name": "#2",
+			"Team": 12948,
+			"Car": 12942,
+			"Id": 12949,
+			"Class": 12969,
+			"TeamName": "ACI Motorsports",
+			"drivers": [
+				{
+					"Forename": "Jimmy",
+					"Surname": "Llibre",
+					"Id": 12950
+				}
+			]
+		},
+		"12953": {
+			"Name": "#4",
+			"Team": 12946,
+			"Car": 12942,
+			"Id": 12953,
+			"Class": 12969,
+			"TeamName": "JDX Racing",
+			"drivers": [
+				{
+					"Forename": "Elias",
+					"Surname": "de la Torre IV",
+					"Id": 12952
+				}
+			]
+		},
+		"12956": {
+			"Name": "#5",
+			"Team": 12955,
+			"Car": 12942,
+			"Id": 12956,
+			"Class": 12969,
+			"TeamName": "Momentop FMS Motorsport x RGB Racing",
+			"drivers": [
+				{
+					"Forename": "Angel",
+					"Surname": "Benitez Jr",
+					"Id": 12954
+				}
+			]
+		},
+		"12957": {
+			"Name": "#8",
+			"Team": 12945,
+			"Car": 12942,
+			"Id": 12957,
+			"Class": 12969,
+			"TeamName": "McCann Racing",
+			"drivers": [
+				{
+					"Forename": "Michael",
+					"Surname": "McCann Jr.",
+					"Id": 10196
+				}
+			]
+		},
+		"12959": {
+			"Name": "#9",
+			"Team": 12946,
+			"Car": 12942,
+			"Id": 12959,
+			"Class": 12969,
+			"TeamName": "JDX Racing",
+			"drivers": [
+				{
+					"Forename": "Zachary",
+					"Surname": "Vanier",
+					"Id": 12958
+				}
+			]
+		},
+		"12962": {
+			"Name": "#11",
+			"Team": 12960,
+			"Car": 12942,
+			"Id": 12962,
+			"Class": 12969,
+			"TeamName": "Forward Motorsport",
+			"drivers": [
+				{
+					"Forename": "Peter",
+					"Surname": "Ludwig",
+					"Id": 12961
+				}
+			]
+		},
+		"12963": {
+			"Name": "#13",
+			"Team": 12944,
+			"Car": 12942,
+			"Id": 12963,
+			"Class": 12969,
+			"TeamName": "Kellymoss",
+			"drivers": [
+				{
+					"Forename": "Todd",
+					"Surname": "Parriott",
+					"Id": 12964
+				}
+			]
+		},
+		"12965": {
+			"Name": "#14",
+			"Team": 12966,
+			"Car": 12942,
+			"Id": 12965,
+			"Class": 12969,
+			"TeamName": "GMG Racing",
+			"drivers": [
+				{
+					"Forename": "James",
+					"Surname": "Sofronas",
+					"Id": 8434
+				}
+			]
+		},
+		"12967": {
+			"Name": "#15",
+			"Team": 12948,
+			"Car": 12942,
+			"Id": 12967,
+			"Class": 12969,
+			"TeamName": "ACI Motorsports",
+			"drivers": [
+				{
+					"Forename": "Yves",
+					"Surname": "Baltas",
+					"Id": 12968
+				}
+			]
+		},
+		"12971": {
+			"Name": "#16",
+			"Team": 12948,
+			"Car": 12942,
+			"Id": 12971,
+			"Class": 12969,
+			"TeamName": "ACI Motorsports",
+			"drivers": [
+				{
+					"Forename": "Pedro",
+					"Surname": "Torres",
+					"Id": 12970
+				}
+			]
+		},
+		"12973": {
+			"Name": "#18",
+			"Team": 12948,
+			"Car": 12942,
+			"Id": 12973,
+			"Class": 12969,
+			"TeamName": "ACI Motorsports",
+			"drivers": [
+				{
+					"Forename": "Richard",
+					"Surname": "Edge",
+					"Id": 12972
+				}
+			]
+		},
+		"12975": {
+			"Name": "#19",
+			"Team": 12948,
+			"Car": 12942,
+			"Id": 12975,
+			"Class": 12969,
+			"TeamName": "ACI Motorsports",
+			"drivers": [
+				{
+					"Forename": "Tom",
+					"Surname": "Balames",
+					"Id": 12974
+				}
+			]
+		},
+		"12978": {
+			"Name": "#22",
+			"Team": 12977,
+			"Car": 12942,
+			"Id": 12978,
+			"Class": 12969,
+			"TeamName": "Alegra Motorsports, LLC",
+			"drivers": [
+				{
+					"Forename": "Carlos",
+					"Surname": "de Quesada",
+					"Id": 12976
+				}
+			]
+		},
+		"12980": {
+			"Name": "#23",
+			"Team": 12944,
+			"Car": 12942,
+			"Id": 12980,
+			"Class": 12969,
+			"TeamName": "Kellymoss",
+			"drivers": [
+				{
+					"Forename": "Jordan",
+					"Surname": "Wallace",
+					"Id": 12979
+				}
+			]
+		},
+		"12981": {
+			"Name": "#24",
+			"Team": 12944,
+			"Car": 12942,
+			"Id": 12981,
+			"Class": 12969,
+			"TeamName": "Kellymoss",
+			"drivers": [
+				{
+					"Forename": "Loek",
+					"Surname": "Hartog",
+					"Id": 12188
+				}
+			]
+		},
+		"12983": {
+			"Name": "#26",
+			"Team": 12948,
+			"Car": 12942,
+			"Id": 12983,
+			"Class": 12969,
+			"TeamName": "ACI Motorsports",
+			"drivers": [
+				{
+					"Forename": "Roberto",
+					"Surname": "Tutino",
+					"Id": 12982
+				}
+			]
+		},
+		"12985": {
+			"Name": "#32",
+			"Team": 12966,
+			"Car": 12942,
+			"Id": 12985,
+			"Class": 12969,
+			"TeamName": "GMG Racing",
+			"drivers": [
+				{
+					"Forename": "Kyle",
+					"Surname": "Washington",
+					"Id": 12984
+				}
+			]
+		},
+		"12987": {
+			"Name": "#37",
+			"Team": 12947,
+			"Car": 12942,
+			"Id": 12987,
+			"Class": 12969,
+			"TeamName": "MDK Motorsports",
+			"drivers": [
+				{
+					"Forename": "Sabré",
+					"Surname": "Cook",
+					"Id": 12986
+				}
+			]
+		},
+		"12989": {
+			"Name": "#44",
+			"Team": 12988,
+			"Car": 12942,
+			"Id": 12989,
+			"Class": 12969,
+			"TeamName": "Baby Bull Racing",
+			"drivers": [
+				{
+					"Forename": "Moisey",
+					"Surname": "Uretsky",
+					"Id": 11892
+				}
+			]
+		},
+		"12992": {
+			"Name": "#45",
+			"Team": 12990,
+			"Car": 12942,
+			"Id": 12992,
+			"Class": 12969,
+			"TeamName": "Ruckus Racing",
+			"drivers": [
+				{
+					"Forename": "Scott",
+					"Surname": "Blind",
+					"Id": 12991
+				}
+			]
+		},
+		"12994": {
+			"Name": "#55",
+			"Team": 12948,
+			"Car": 12942,
+			"Id": 12994,
+			"Class": 12969,
+			"TeamName": "ACI Motorsports",
+			"drivers": [
+				{
+					"Forename": "Matt",
+					"Surname": "Halcome",
+					"Id": 12993
+				}
+			]
+		},
+		"12996": {
+			"Name": "#57",
+			"Team": 12944,
+			"Car": 12942,
+			"Id": 12996,
+			"Class": 12969,
+			"TeamName": "Kellymoss",
+			"drivers": [
+				{
+					"Forename": "John",
+					"Surname": "Goetz",
+					"Id": 12995
+				}
+			]
+		},
+		"12998": {
+			"Name": "#64",
+			"Team": 12947,
+			"Car": 12942,
+			"Id": 12998,
+			"Class": 12969,
+			"TeamName": "MDK Motorsports",
+			"drivers": [
+				{
+					"Forename": "Dan",
+					"Surname": "Clarke",
+					"Id": 12997
+				}
+			]
+		},
+		"13000": {
+			"Name": "#66",
+			"Team": 12955,
+			"Car": 12942,
+			"Id": 13000,
+			"Class": 12969,
+			"TeamName": "Momentop FMS Motorsport x RGB Racing",
+			"drivers": [
+				{
+					"Forename": "David",
+					"Surname": "Tuaty",
+					"Id": 12999
+				}
+			]
+		},
+		"13002": {
+			"Name": "#68",
+			"Team": 12944,
+			"Car": 12942,
+			"Id": 13002,
+			"Class": 12969,
+			"TeamName": "Kellymoss",
+			"drivers": [
+				{
+					"Forename": "Chris",
+					"Surname": "Bellomo",
+					"Id": 13001
+				}
+			]
+		},
+		"13004": {
+			"Name": "#74",
+			"Team": 12947,
+			"Car": 12942,
+			"Id": 13004,
+			"Class": 12969,
+			"TeamName": "MDK Motorsports",
+			"drivers": [
+				{
+					"Forename": "Kenton",
+					"Surname": "King",
+					"Id": 13003
+				}
+			]
+		},
+		"13006": {
+			"Name": "#77",
+			"Team": 12943,
+			"Car": 12942,
+			"Id": 13006,
+			"Class": 12969,
+			"TeamName": "Topp Racing Performance",
+			"drivers": [
+				{
+					"Forename": "Colin",
+					"Surname": "Kaminsky",
+					"Id": 13005
+				}
+			]
+		},
+		"13008": {
+			"Name": "#78",
+			"Team": 12943,
+			"Car": 12942,
+			"Id": 13008,
+			"Class": 12969,
+			"TeamName": "Topp Racing Performance",
+			"drivers": [
+				{
+					"Forename": "Ryan",
+					"Surname": "Yardley",
+					"Id": 13007
+				}
+			]
+		},
+		"13010": {
+			"Name": "#82",
+			"Team": 12946,
+			"Car": 12942,
+			"Id": 13010,
+			"Class": 12969,
+			"TeamName": "JDX Racing",
+			"drivers": [
+				{
+					"Forename": "Madeline",
+					"Surname": "Stewart",
+					"Id": 13009
+				}
+			]
+		},
+		"13012": {
+			"Name": "#84",
+			"Team": 12948,
+			"Car": 12942,
+			"Id": 13012,
+			"Class": 12969,
+			"TeamName": "ACI Motorsports",
+			"drivers": [
+				{
+					"Forename": "Marco",
+					"Surname": "Cirone",
+					"Id": 13011
+				}
+			]
+		},
+		"13015": {
+			"Name": "#85",
+			"Team": 13014,
+			"Car": 12942,
+			"Id": 13015,
+			"Class": 12969,
+			"TeamName": "Rearden Racing",
+			"drivers": [
+				{
+					"Forename": "Jake",
+					"Surname": "Pedersen",
+					"Id": 13013
+				}
+			]
+		},
+		"13017": {
+			"Name": "#88",
+			"Team": 12943,
+			"Car": 12942,
+			"Id": 13017,
+			"Class": 12969,
+			"TeamName": "Topp Racing Performance",
+			"drivers": [
+				{
+					"Forename": "Michael",
+					"Surname": "Cooper",
+					"Id": 13016
+				}
+			]
+		},
+		"13019": {
+			"Name": "#91",
+			"Team": 12955,
+			"Car": 12942,
+			"Id": 13019,
+			"Class": 12969,
+			"TeamName": "Momentop FMS Motorsport x RGB Racing",
+			"drivers": [
+				{
+					"Forename": "André",
+					"Surname": "Fernandes",
+					"Id": 13018
+				}
+			]
+		},
+		"13021": {
+			"Name": "#98",
+			"Team": 12946,
+			"Car": 12942,
+			"Id": 13021,
+			"Class": 12969,
+			"TeamName": "JDX Racing",
+			"drivers": [
+				{
+					"Forename": "Alex",
+					"Surname": "Sedgwick",
+					"Id": 13020
+				}
+			]
+		},
+		"13023": {
+			"Name": "#99",
+			"Team": 12944,
+			"Car": 12942,
+			"Id": 13023,
+			"Class": 12969,
+			"TeamName": "Kellymoss",
+			"drivers": [
+				{
+					"Forename": "Alan",
+					"Surname": "Metni",
+					"Id": 13022
+				}
+			]
+		},
+		"13024": {
+			"Name": "#3",
+			"Team": 12966,
+			"Car": 12942,
+			"Id": 13024,
+			"Class": 12969,
+			"TeamName": "GMG Racing",
+			"drivers": [
+				{
+					"Forename": "Ofir",
+					"Surname": "Levy",
+					"Id": 12951
+				}
+			]
+		},
+		"13027": {
+			"Name": "#10",
+			"Team": 13026,
+			"Car": 12942,
+			"Id": 13027,
+			"Class": 12969,
+			"TeamName": "MGM Racing",
+			"drivers": [
+				{
+					"Forename": "Jodie",
+					"Surname": "Miller",
+					"Id": 13025
+				}
+			]
+		},
+		"13028": {
+			"Name": "#43",
+			"Team": 12947,
+			"Car": 12942,
+			"Id": 13028,
+			"Class": 12969,
+			"TeamName": "MDK Motorsports",
+			"drivers": [
+				{
+					"Forename": "Mark",
+					"Surname": "Kvamme",
+					"Id": 10357
+				}
+			]
+		},
+		"13030": {
+			"Name": "#46",
+			"Team": 12947,
+			"Car": 12942,
+			"Id": 13030,
+			"Class": 12969,
+			"TeamName": "MDK Motorsports",
+			"drivers": [
+				{
+					"Forename": "Naveen",
+					"Surname": "Rao",
+					"Id": 13029
+				}
+			]
+		},
+		"13032": {
+			"Name": "#56",
+			"Team": 12943,
+			"Car": 12942,
+			"Id": 13032,
+			"Class": 12969,
+			"TeamName": "Topp Racing Performance",
+			"drivers": [
+				{
+					"Forename": "Jeff",
+					"Surname": "Mosing",
+					"Id": 13031
+				}
+			]
+		},
+		"13034": {
+			"Name": "#65",
+			"Team": 12944,
+			"Car": 12942,
+			"Id": 13034,
+			"Class": 12969,
+			"TeamName": "Kellymoss",
+			"drivers": [
+				{
+					"Forename": "Efrin",
+					"Surname": "Castro",
+					"Id": 13033
+				}
+			]
+		},
+		"13037": {
+			"Name": "#69",
+			"Team": 13035,
+			"Car": 12942,
+			"Id": 13037,
+			"Class": 12969,
+			"TeamName": "BGB Motorsports",
+			"drivers": [
+				{
+					"Forename": "Thomas",
+					"Surname": "Collingwood",
+					"Id": 13036
+				}
+			]
+		},
+		"13041": {
+			"Name": "#0",
+			"Team": 13040,
+			"Car": 13039,
+			"Id": 13041,
+			"Class": 10743,
+			"TeamName": "DTM 40",
+			"drivers": [
+				{
+					"Forename": "Holger",
+					"Surname": "Stangl",
+					"Id": 4727
+				}
+			]
+		},
+		"13043": {
+			"Name": "#70",
+			"Team": 13042,
+			"Car": 9761,
+			"Id": 13043,
+			"Class": 1711,
+			"TeamName": "BBS",
+			"drivers": [
+				{
+					"Forename": "Daniel",
+					"Surname": "Wheeland",
+					"Id": 13046
+				}
+			]
+		},
+		"13045": {
+			"Name": "#79",
+			"Team": 13044,
+			"Car": 10604,
+			"Id": 13045,
+			"Class": 1711,
+			"TeamName": "ST Suspensions",
+			"drivers": [
+				{
+					"Forename": "Philipp",
+					"Surname": "Wendel",
+					"Id": 13047
+				}
+			]
 		}
 	},
 	"tracks": {
@@ -112067,6 +113567,12 @@
 					"Track": 262,
 					"MaxNumberOfVehicles": 38,
 					"Id": 267
+				},
+				{
+					"Name": "Drift Area",
+					"Track": 262,
+					"MaxNumberOfVehicles": 12,
+					"Id": 10414
 				}
 			]
 		},
@@ -113174,6 +114680,36 @@
 				}
 			]
 		},
+		"9320": {
+			"Name": "Genting Highlands Highway",
+			"Id": 9320,
+			"layouts": [
+				{
+					"Name": "Stage",
+					"Track": 9320,
+					"MaxNumberOfVehicles": 10,
+					"Id": 9321
+				},
+				{
+					"Name": "Circuit",
+					"Track": 9320,
+					"MaxNumberOfVehicles": 39,
+					"Id": 9360
+				},
+				{
+					"Name": "Dual Stage",
+					"Track": 9320,
+					"MaxNumberOfVehicles": 10,
+					"Id": 11859
+				},
+				{
+					"Name": "Short Stage",
+					"Track": 9320,
+					"MaxNumberOfVehicles": 10,
+					"Id": 11861
+				}
+			]
+		},
 		"9464": {
 			"Name": "Vålerbanen",
 			"Id": 9464,
@@ -113225,6 +114761,18 @@
 					"Track": 9657,
 					"MaxNumberOfVehicles": 36,
 					"Id": 12573
+				}
+			]
+		},
+		"9838": {
+			"Name": "Twin Forest",
+			"Id": 9838,
+			"layouts": [
+				{
+					"Name": "Duel",
+					"Track": 9838,
+					"MaxNumberOfVehicles": 2,
+					"Id": 9839
 				}
 			]
 		},
@@ -113283,7 +114831,7 @@
 				{
 					"Name": "DMEC",
 					"Track": 10273,
-					"MaxNumberOfVehicles": 8,
+					"MaxNumberOfVehicles": 10,
 					"Id": 10274
 				}
 			]
@@ -114226,6 +115774,12 @@
 			"MaxNumberOfVehicles": 43,
 			"Id": 9177
 		},
+		"9321": {
+			"Name": "Stage",
+			"Track": 9320,
+			"MaxNumberOfVehicles": 10,
+			"Id": 9321
+		},
 		"9324": {
 			"Name": "Grand Prix with Inner Loop",
 			"Track": 9176,
@@ -114243,6 +115797,12 @@
 			"Track": 9176,
 			"MaxNumberOfVehicles": 43,
 			"Id": 9344
+		},
+		"9360": {
+			"Name": "Circuit",
+			"Track": 9320,
+			"MaxNumberOfVehicles": 39,
+			"Id": 9360
 		},
 		"9465": {
 			"Name": "Full Circuit",
@@ -114273,6 +115833,12 @@
 			"Track": 5297,
 			"MaxNumberOfVehicles": 47,
 			"Id": 9796
+		},
+		"9839": {
+			"Name": "Duel",
+			"Track": 9838,
+			"MaxNumberOfVehicles": 2,
+			"Id": 9839
 		},
 		"9847": {
 			"Name": "Müllenbachschleife",
@@ -114313,7 +115879,7 @@
 		"10274": {
 			"Name": "DMEC",
 			"Track": 10273,
-			"MaxNumberOfVehicles": 8,
+			"MaxNumberOfVehicles": 10,
 			"Id": 10274
 		},
 		"10328": {
@@ -114345,6 +115911,12 @@
 			"Track": 10393,
 			"MaxNumberOfVehicles": 35,
 			"Id": 10394
+		},
+		"10414": {
+			"Name": "Drift Area",
+			"Track": 262,
+			"MaxNumberOfVehicles": 12,
+			"Id": 10414
 		},
 		"10463": {
 			"Name": "Grand Prix",
@@ -114381,6 +115953,18 @@
 			"Track": 2521,
 			"MaxNumberOfVehicles": 36,
 			"Id": 11296
+		},
+		"11859": {
+			"Name": "Dual Stage",
+			"Track": 9320,
+			"MaxNumberOfVehicles": 10,
+			"Id": 11859
+		},
+		"11861": {
+			"Name": "Short Stage",
+			"Track": 9320,
+			"MaxNumberOfVehicles": 10,
+			"Id": 11861
 		},
 		"11905": {
 			"Name": "Grand Prix",
@@ -114712,8 +116296,11 @@
 			"Id": 1710
 		},
 		"1711": {
-			"Name": "Sideways",
+			"Name": "Drift",
 			"Cars": [
+				{
+					"Id": 10604
+				},
 				{
 					"Id": 9761
 				}
@@ -115798,6 +117385,9 @@
 					"Id": 12537
 				},
 				{
+					"Id": 13039
+				},
+				{
 					"Id": 10721
 				}
 			],
@@ -116039,6 +117629,15 @@
 				}
 			],
 			"Id": 12770
+		},
+		"12969": {
+			"Name": "Porsche Carrera Cup North America 2024",
+			"Cars": [
+				{
+					"Id": 12942
+				}
+			],
+			"Id": 12969
 		}
 	},
 	"manufacturers": {
@@ -116053,10 +117652,6 @@
 		"2552": {
 			"Name": "Mercedes",
 			"Id": 2552
-		},
-		"2618": {
-			"Name": "Corvette",
-			"Id": 2618
 		},
 		"2619": {
 			"Name": "RUF",
@@ -116105,10 +117700,6 @@
 		"2632": {
 			"Name": "Radical",
 			"Id": 2632
-		},
-		"2633": {
-			"Name": "Mustang",
-			"Id": 2633
 		},
 		"2634": {
 			"Name": "Aquila",
@@ -124286,6 +125877,11 @@
 			"Name": "BMW Motorsport",
 			"Id": 10600
 		},
+		"10605": {
+			"Type": "CarTeam",
+			"Name": "Red Bull Driftbrothers",
+			"Id": 10605
+		},
 		"10638": {
 			"Type": "CarTeam",
 			"Name": "Raceroom",
@@ -126851,6 +128447,11 @@
 			"Name": "Hofor Racing by Bonk Motorsport",
 			"Id": 12750
 		},
+		"12753": {
+			"Type": "CarTeam",
+			"Name": "Baggsy Boy UK",
+			"Id": 12753
+		},
 		"12754": {
 			"Type": "CarTeam",
 			"Name": "Baggsy Boy UK",
@@ -127060,6 +128661,106 @@
 			"Type": "CarTeam",
 			"Name": "Jim Busby Racing",
 			"Id": 12935
+		},
+		"12939": {
+			"Type": "CarTeam",
+			"Name": "BMW Team Bigazzi",
+			"Id": 12939
+		},
+		"12943": {
+			"Type": "CarTeam",
+			"Name": "Topp Racing Performance",
+			"Id": 12943
+		},
+		"12944": {
+			"Type": "CarTeam",
+			"Name": "Kellymoss",
+			"Id": 12944
+		},
+		"12945": {
+			"Type": "CarTeam",
+			"Name": "McCann Racing",
+			"Id": 12945
+		},
+		"12946": {
+			"Type": "CarTeam",
+			"Name": "JDX Racing",
+			"Id": 12946
+		},
+		"12947": {
+			"Type": "CarTeam",
+			"Name": "MDK Motorsports",
+			"Id": 12947
+		},
+		"12948": {
+			"Type": "CarTeam",
+			"Name": "ACI Motorsports",
+			"Id": 12948
+		},
+		"12955": {
+			"Type": "CarTeam",
+			"Name": "Momentop FMS Motorsport x RGB Racing",
+			"Id": 12955
+		},
+		"12960": {
+			"Type": "CarTeam",
+			"Name": "Forward Motorsport",
+			"Id": 12960
+		},
+		"12966": {
+			"Type": "CarTeam",
+			"Name": "GMG Racing",
+			"Id": 12966
+		},
+		"12977": {
+			"Type": "CarTeam",
+			"Name": "Alegra Motorsports, LLC",
+			"Id": 12977
+		},
+		"12988": {
+			"Type": "CarTeam",
+			"Name": "Baby Bull Racing",
+			"Id": 12988
+		},
+		"12990": {
+			"Type": "CarTeam",
+			"Name": "Ruckus Racing",
+			"Id": 12990
+		},
+		"13014": {
+			"Type": "CarTeam",
+			"Name": "Rearden Racing",
+			"Id": 13014
+		},
+		"13026": {
+			"Type": "CarTeam",
+			"Name": "MGM Racing",
+			"Id": 13026
+		},
+		"13035": {
+			"Type": "CarTeam",
+			"Name": "BGB Motorsports",
+			"Id": 13035
+		},
+		"13040": {
+			"Type": "CarTeam",
+			"Name": "DTM 40",
+			"Id": 13040
+		},
+		"13042": {
+			"Type": "CarTeam",
+			"Name": "BBS",
+			"Id": 13042
+		},
+		"13044": {
+			"Type": "CarTeam",
+			"Name": "ST Suspensions",
+			"Id": 13044
+		},
+		"13048": {
+			"Type": "CarTeam",
+			"Name": "Red Bull Driftbrothers",
+			"Id": 13048
 		}
 	}
 }

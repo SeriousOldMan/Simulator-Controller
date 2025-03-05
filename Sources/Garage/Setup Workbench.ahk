@@ -1584,7 +1584,7 @@ class SetupWorkbench extends ConfigurationItem {
 				DirCreate(kTempDirectory . "Garage\Telemetry")
 			}
 
-			this.iTelemetryViewer := TelemetryViewer(this, kTempDirectory . "Garage\Telemetry", true)
+			this.iTelemetryViewer := TelemetryViewer(this, kTempDirectory . "Garage\Telemetry")
 
 			this.TelemetryViewer.show()
 
@@ -1808,6 +1808,10 @@ class SetupWorkbench extends ConfigurationItem {
 		label := translate("Analyzer...")
 
 		characteristicsMenu.Add(label, (*) => this.startIssueAnalyzer())
+
+		if (!this.SimulatorDefinition || !getMultiMapValue(this.SimulatorDefinition, "Simulator", "Analyzer", false)
+									  || !inList(getKeys(getMultiMapValues(getControllerState(), "Simulators")), this.SelectedSimulator))
+			characteristicsMenu.Disable(label)
 
 		label := translate("Telemetry...")
 

@@ -3683,6 +3683,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		window["trackAutomationNameEdit"].Value := ""
 
 		ControlFocus(window["trackAutomationNameEdit"])
+
+		WinRedraw(window)
 	}
 
 	deleteTrackAutomation() {
@@ -4840,6 +4842,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				this.AdministrationListView.ModifyCol(A_Index, "AutoHdr")
 
 			this.updateState()
+
+			WinRedraw(window)
 		}
 		finally {
 			window.Unblock()
@@ -5512,7 +5516,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.selectSettings(false)
 			this.updateState()
 
-			this.SettingsListView.Redraw()
+			WinRedraw(window)
 		}
 		finally {
 			window.Unblock()
@@ -5829,7 +5833,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				file.Close()
 			}
 
-			viewer := TelemetryViewer(SessionDatabaseEditor.TelemetryManager(this), kTempDirectory . "Telemetry", false)
+			viewer := TelemetryViewer(SessionDatabaseEditor.TelemetryManager(this), kTempDirectory . "Telemetry", false, false)
 
 			telemetryInfo := newMultiMap()
 

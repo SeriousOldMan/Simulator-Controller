@@ -1378,7 +1378,7 @@ class TeamCenter extends ConfigurationItem {
 		this.iCollectTelemetry := getMultiMapValue(configuration, "Telemetry", "Collect", false)
 
 		if this.CollectTelemetry
-			this.iCollectTelemetry := getMultiMapValue(configuration, "Telemetry", "Provider", "Integrated")
+			this.iCollectTelemetry := getMultiMapValue(configuration, "Telemetry", "Provider", "Internal")
 
 		setMultiMapValue(configuration, "Telemetry", "Directory", false)
 
@@ -2887,12 +2887,12 @@ class TeamCenter extends ConfigurationItem {
 		else if !this.SessionLoaded {
 			DirCreate(this.SessionDirectory . "Telemetry")
 
-			this.iTelemetryViewer := TelemetryViewer(this, this.SessionDirectory . "Telemetry", true)
+			this.iTelemetryViewer := TelemetryViewer(this, this.SessionDirectory . "Telemetry", true, false)
 
 			this.TelemetryViewer.show()
 		}
 		else if FileExist(this.SessionDirectory . "Telemetry") {
-			this.iTelemetryViewer := TelemetryViewer(this, this.SessionDirectory . "Telemetry", false)
+			this.iTelemetryViewer := TelemetryViewer(this, this.SessionDirectory . "Telemetry", false, false)
 
 			this.TelemetryViewer.show()
 		}
@@ -5046,7 +5046,7 @@ class TeamCenter extends ConfigurationItem {
 				case 7: ; Telemetry
 					if !this.CollectTelemetry
 						this.iCollectTelemetry := editTelemetryProviderSettings(this, getMultiMapValue(readMultiMap(kUserConfigDirectory . "Team Server.ini")
-																									 , "Telemetry", "Provider", "Integrated"))
+																									 , "Telemetry", "Provider", "Internal"))
 					else
 						this.iCollectTelemetry := !this.CollectTelemetry
 
@@ -13825,47 +13825,52 @@ editTelemetryProviderSettings(teamCenterOrCommand, arguments*) {
 		result := kCancel
 	else if (teamCenterOrCommand == "UpdateState") {
 		if (providerDropDown.Value = 1) {
-			endpointLabel.Visible := false
-			endpointEdit.Visible := false
+			; endpointLabel.Visible := false
+			; endpointEdit.Visible := false
+
+			endpointEdit.Enabled := false
+			endpointEdit.Text := translate("n/a")
 		}
 		else {
-			endpointLabel.Visible := true
-			endpointEdit.Visible := true
+			; endpointLabel.Visible := true
+			; endpointEdit.Visible := true
 
-			if (Trim(endpointEdit.Text) = "")
+			endpointEdit.Enabled := true
+
+			if ((Trim(endpointEdit.Text) = "") || (endpointEdit.Text = translate("n/a")))
 				endpointEdit.Text := "http://localhost:5007/api"
 		}
 	}
 	else {
 		result := false
 
-		settingsGui := Window({Options: "0x400000"}, translate("Team Center"))
+		settingsGui := Window({Options: "0x400000"}, translate("Telemetry"))
 
 		settingsGui.SetFont("Norm", "Arial")
 
 		settingsGui.Add("Text", "x16 y16 w90 h23 +0x200", translate("Telemetry Provider"))
 		settingsGui.Add("Text", "x110 yp w160 h23 +0x200", "")
 
-		providerDropDown := settingsGui.Add("DropDownList", "x110 yp+1 w160 Choose1", collect(["Integrated", "Second Monitor"], translate))
+		providerDropDown := settingsGui.Add("DropDownList", "x110 yp+1 w160 Choose1", collect(["Internal", "Second Monitor"], translate))
 		providerDropDown.OnEvent("Change", chooseProvider)
 
-		endpointLabel := settingsGui.Add("Text", "x16 yp+30 w90 h23 +0x200 Hidden", translate("Provider URL"))
-		endpointEdit := settingsGui.Add("Edit", "x110 yp+1 w160 h21 Hidden")
+		endpointLabel := settingsGui.Add("Text", "x16 yp+30 w90 h23 +0x200", translate("Provider URL"))
+		endpointEdit := settingsGui.Add("Edit", "x110 yp+1 w160 h21")
 
 		settingsGui.Add("Button", "x60 yp+35 w80 h23 Default", translate("Ok")).OnEvent("Click", editTelemetryProviderSettings.Bind(kOk))
 		settingsGui.Add("Button", "x146 yp w80 h23", translate("&Cancel")).OnEvent("Click", editTelemetryProviderSettings.Bind(kCancel))
 
 		settingsGui.Opt("+Owner" . teamCenterOrCommand.Window.Hwnd)
 
-		if (arguments[1] && (arguments[1] != "Integrated")) {
+		if (arguments[1] && (arguments[1] != "Internal")) {
 			providerDropDown.Choose(2)
 
 			endpointEdit.Text := string2Values("|", arguments[1])[2]
-
-			editTelemetryProviderSettings("UpdateState")
 		}
 
 		settingsGui.Show("AutoSize Center")
+
+		editTelemetryProviderSettings("UpdateState")
 
 		while !result
 			Sleep(100)
@@ -13875,7 +13880,7 @@ editTelemetryProviderSettings(teamCenterOrCommand, arguments*) {
 				return false
 			else if (result == kOk) {
 				if (providerDropDown.Value = 1)
-					return "Integrated"
+					return "Internal"
 				else
 					return ("Second Monitor|" . endpointEdit.Text)
 			}

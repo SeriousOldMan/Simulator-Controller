@@ -346,7 +346,7 @@ checkInstallation() {
 	local installLocation := ""
 	local installInfo, quiet, options, msgResult, hasSplash, command, component, source
 	local install, index, options, isNew, packageLocation, packageInfo, packageType, version
-	local ignore, directory, currentDirectory
+	local ignore, directory, currentDirectory, folder1, folder2, directory1, directory2
 
 	installComponents(packageLocation, installLocation, temporary := false) {
 		global gProgressCount
@@ -375,11 +375,11 @@ checkInstallation() {
 							showProgress({progress: (gProgressCount += 2)
 										, message: translate("Downloading ") . component . translate(" files...")})
 
-							deleteFile(A_Temp . "\Temp.zip")
+							deleteFile(kTempDirectory . "ComponentPackage.zip")
 
-							Download(url, A_Temp . "\Temp.zip")
+							Download(url, kTempDirectory . "ComponentPackage.zip")
 
-							if !FileExist(A_Temp . "\Temp.zip")
+							if !FileExist(kTempDirectory . "ComponentPackage.zip")
 								urlError := "Package URL not defined..."
 							else {
 								showProgress({progress: (gProgressCount += 2)
@@ -393,7 +393,7 @@ checkInstallation() {
 									path := packageLocation
 
 								if temporary {
-									destination := (A_Temp . "\SC-Component" . componentNr)
+									destination := (kTempDirectory . "SC-Component" . componentNr)
 
 									deleteFile(destination)
 									deleteDirectory(destination)
@@ -404,7 +404,7 @@ checkInstallation() {
 								else
 									destination := path
 
-								RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Temp.zip' -DestinationPath '" . destination . "' -Force", , "Hide")
+								RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kTempDirectory . "ComponentPackage.zip' -DestinationPath '" . destination . "' -Force", , "Hide")
 
 								if (!DirExist(destination) || !FileExist(destination . "\*.*"))
 									throw "Archive does not contain a valid component package..."
@@ -808,7 +808,10 @@ checkInstallation() {
 					if (installLocation != packageLocation) {
 						showProgress({progress: gProgressCount++, message: translate("Removing installation files...")})
 
-						if InStr(packageLocation, A_Temp)
+						SplitPath(packageLocation, &folder1, &directory1)
+						SplitPath(kTempDirectory, &folder2, &directory2)
+
+						if InStr(directory1 . "\" . folder1, directory2 . "\" . folder2)
 							removeDirectory(packageLocation)
 						else {
 							OnMessage(0x44, translateYesNoButtons)
@@ -855,18 +858,20 @@ checkInstallation() {
 						Run(A_Args[index + 1])
 				}
 			}
-			else {
-				if (isNew || (options.InstallLocation != packageLocation))
-					if InStr(packageLocation, A_Temp)
-						removeDirectory(packageLocation)
-					else {
-						OnMessage(0x44, translateYesNoButtons)
-						msgResult := withBlockedWindows(MsgBox, translate("Do you want to remove the folder with the installation files?"), translate("Installation"), 262436)
-						OnMessage(0x44, translateYesNoButtons, 0)
+			else if (isNew || (options.InstallLocation != packageLocation)) {
+				SplitPath(packageLocation, &folder1, &directory1)
+				SplitPath(kTempDirectory, &folder2, &directory2)
 
-						if (msgResult = "Yes")
-							removeDirectory(packageLocation)
-					}
+				if InStr(directory1 . "\" . folder1, directory2 . "\" . folder2)
+					removeDirectory(packageLocation)
+				else {
+					OnMessage(0x44, translateYesNoButtons)
+					msgResult := withBlockedWindows(MsgBox, translate("Do you want to remove the folder with the installation files?"), translate("Installation"), 262436)
+					OnMessage(0x44, translateYesNoButtons, 0)
+
+					if (msgResult = "Yes")
+						removeDirectory(packageLocation)
+				}
 			}
 
 			ExitApp(0)
@@ -1767,6 +1772,22 @@ updateInstallationForV500() {
 		catch Any as exception {
 			logError(exception)
 		}
+	}
+}
+
+updateConfigurationForV622() {
+	local appSettings, issueSettings
+
+	if FileExist(kUserConfigDirectory . "Application Settings.ini") {
+		appSettings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+		issueSettings := newMultiMap()
+
+		setMultiMapValues(issueSettings, "Settings", getMultiMapValues(appSettings, "Telemetry Collector"))
+
+		removeMultiMapValues(appSettings, "Telemetry Collector")
+
+		writeMultiMap(kUserConfigDirectory . "Application Settings.ini", appSettings)
+		writeMultiMap(kUserConfigDirectory . "Issue Collector.ini", issueSettings)
 	}
 }
 

@@ -416,7 +416,7 @@ class TelemetryChart {
 
 		axes .= " }"
 
-		drawChartFunction .= ("]);`nvar options = { " . axes . ", legend: { position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '2%', top: '5%', right: '2%', bottom: '10%' }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
+		drawChartFunction .= ("]);`nvar options = { interpolateNulls: true, " . axes . ", legend: { position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '2%', top: '5%', right: '2%', bottom: '10%' }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
 
 		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart')); chart.draw(data, options); document.telemetryChart = chart;")
 		drawChartFunction .= "`nfunction selectHandler(e) { var cSelection = chart.getSelection(); var selection = ''; for (var i = 0; i < cSelection.length; i++) { var item = cSelection[i]; if (i > 0) selection += ';'; selection += (item.row + '|' + item.column); } try { eventHandler('Select', selection); } catch(e) {} }"
@@ -499,9 +499,9 @@ class TelemetryViewer {
 
 	iDistanceCorrection := 0
 
-	iCollectorTask := false
-
 	iCollect := false
+	iSynchronize := false
+	iSynchronizeTask := false
 
 	iTrackMap := false
 
@@ -609,21 +609,9 @@ class TelemetryViewer {
 		}
 	}
 
-	ReadOnly {
-		Get {
-			return !this.iCollectorTask
-		}
-	}
-
 	Window {
 		Get {
 			return this.iWindow
-		}
-	}
-
-	CollectorTask {
-		Get {
-			return this.iCollectorTask
 		}
 	}
 
@@ -715,6 +703,18 @@ class TelemetryViewer {
 		}
 	}
 
+	Synchronize {
+		Get {
+			return this.iSynchronize
+		}
+	}
+
+	SynchronizeTask {
+		Get {
+			return this.iSynchronizeTask
+		}
+	}
+
 	TrackMap {
 		Get {
 			return this.iTrackMap
@@ -743,10 +743,11 @@ class TelemetryViewer {
 		}
 	}
 
-	__New(manager, directory, collect := true) {
+	__New(manager, directory, synchronize := true, collect := true) {
 		this.iManager := manager
 		this.iTelemetryDirectory := (normalizeDirectoryPath(directory) . "\")
 
+		this.iSynchronize := synchronize
 		this.iCollect := collect
 
 		this.loadLayouts()
@@ -868,7 +869,7 @@ class TelemetryViewer {
 		}
 
 		deleteLap(*) {
-			local all := (!this.ReadOnly && GetKeyState("Ctrl"))
+			local all := (this.Collect && GetKeyState("Ctrl"))
 			local msgResult
 
 			if this.SelectedLap {
@@ -972,10 +973,10 @@ class TelemetryViewer {
 		viewerGui.Add("Documentation", "x186 YP+20 w336 H:Center Center", translate("Telemetry Viewer")
 					 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#Telemetry-Viewer")
 
-		button := viewerGui.Add("Button", "x653 yp+5 w23 h23 X:Move")
+		button := viewerGui.Add("Button", "x653 yp+5 w23 h23 X:Move" . (!this.Collect ? " Disabled" : ""))
 		button.OnEvent("Click", (*) {
 			local provider := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-														  , "Telemetry Viewer", "Provider", "Integrated")
+														  , "Telemetry Viewer", "Provider", "Internal")
 			local newProvider, configuration, collector
 
 			viewerGui.Block()
@@ -1005,7 +1006,7 @@ class TelemetryViewer {
 				viewerGui.Unblock()
 			}
 		})
-		setButtonIcon(button, kIconsDirectory . "General Settings.ico", 1)
+		setButtonIcon(button, kIconsDirectory . "Connect.ico", 1)
 
 		viewerGui.Add("Text", "x8 yp+25 w676 W:Grow 0x10")
 
@@ -1089,23 +1090,23 @@ class TelemetryViewer {
 
 		this.updateTelemetryChart(true)
 
-		if this.Collect {
-			if this.CollectorTask
-				this.CollectorTask.stop()
+		if this.Synchronize {
+			if this.SynchronizeTask
+				this.SynchronizeTask.stop()
 
-			this.iCollectorTask := PeriodicTask(ObjBindMethod(this, "loadTelemetry"), 10000, kLowPriority)
+			this.iSynchronizeTask := PeriodicTask(ObjBindMethod(this, "loadTelemetry"), 10000, kLowPriority)
 
-			this.CollectorTask.start()
+			this.SynchronizeTask.start()
 		}
 	}
 
 	close() {
 		this.shutdownCollector()
 
-		if this.CollectorTask {
-			this.CollectorTask.stop()
+		if this.SynchronizeTask {
+			this.SynchronizeTask.stop()
 
-			this.iCollectorTask := false
+			this.iSynchronizeTask := false
 		}
 
 		this.Manager.closedTelemetryViewer()
@@ -1157,29 +1158,30 @@ class TelemetryViewer {
 	}
 
 	startupCollector(simulator, track, trackLength) {
-		if !this.TelemetryCollector {
-			this.iTelemetryCollector := TelemetryCollector(getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-																		  , "Telemetry Viewer", "Provider", "Integrated")
-														 , this.TelemetryDirectory, simulator, track, trackLength)
+		if this.Collect
+			if !this.TelemetryCollector {
+				this.iTelemetryCollector := TelemetryCollector(getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+																			  , "Telemetry Viewer", "Provider", "Internal")
+															 , this.TelemetryDirectory, simulator, track, trackLength)
 
-			this.iTelemetryCollector.startup()
-
-			this.CollectingNotifier.show()
-
-			this.CollectingNotifier.document.open()
-			this.CollectingNotifier.document.write("<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . (kResourcesDirectory . "Wait.gif?" . Random(1, 10000)) . "' width=28 height=28 border=0 padding=0></body></html>")
-			this.CollectingNotifier.document.close()
-		}
-		else {
-			if ((this.iTelemetryCollector.Simulator != simulator) || (this.iTelemetryCollector.Track != track)
-																  || (this.iTelemetryCollector.TrackLength != trackLength)) {
-				this.iTelemetryCollector.initialize(simulator, track, trackLength)
-
-				this.iTelemetryCollector.startup(true)
-			}
-			else
 				this.iTelemetryCollector.startup()
-		}
+
+				this.CollectingNotifier.show()
+
+				this.CollectingNotifier.document.open()
+				this.CollectingNotifier.document.write("<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . (kResourcesDirectory . "Wait.gif?" . Random(1, 10000)) . "' width=28 height=28 border=0 padding=0></body></html>")
+				this.CollectingNotifier.document.close()
+			}
+			else {
+				if ((this.iTelemetryCollector.Simulator != simulator) || (this.iTelemetryCollector.Track != track)
+																	  || (this.iTelemetryCollector.TrackLength != trackLength)) {
+					this.iTelemetryCollector.initialize(simulator, track, trackLength)
+
+					this.iTelemetryCollector.startup(true)
+				}
+				else
+					this.iTelemetryCollector.startup()
+			}
 	}
 
 	shutdownCollector() {
@@ -3570,37 +3572,42 @@ editTelemetrySettings(telemetryViewerOrCommand, arguments*) {
 		result := kCancel
 	else if (telemetryViewerOrCommand == "UpdateState") {
 		if (providerDropDown.Value = 1) {
-			endpointLabel.Visible := false
-			endpointEdit.Visible := false
+			; endpointLabel.Visible := false
+			; endpointEdit.Visible := false
+
+			endpointEdit.Enabled := false
+			endpointEdit.Text := translate("n/a")
 		}
 		else {
-			endpointLabel.Visible := true
-			endpointEdit.Visible := true
+			; endpointLabel.Visible := true
+			; endpointEdit.Visible := true
 
-			if (Trim(endpointEdit.Text) = "")
+			endpointEdit.Enabled := true
+
+			if ((Trim(endpointEdit.Text) = "") || (endpointEdit.Text = translate("n/a")))
 				endpointEdit.Text := "http://localhost:5007/api"
 		}
 	}
 	else {
 		result := false
 
-		settingsGui := Window({Options: "0x400000"}, translate("Telemetry Viewer"))
+		settingsGui := Window({Options: "0x400000"}, translate("Telemetry"))
 
 		settingsGui.SetFont("Norm", "Arial")
 
 		settingsGui.Add("Text", "x16 y16 w90 h23 +0x200", translate("Telemetry Provider"))
 		settingsGui.Add("Text", "x110 yp w160 h23 +0x200", "")
 
-		providerDropDown := settingsGui.Add("DropDownList", "x110 yp+1 w160 Choose1", collect(["Integrated", "Second Monitor"], translate))
+		providerDropDown := settingsGui.Add("DropDownList", "x110 yp+1 w160 Choose1", collect(["Internal", "Second Monitor"], translate))
 		providerDropDown.OnEvent("Change", chooseProvider)
 
-		endpointLabel := settingsGui.Add("Text", "x16 yp+30 w90 h23 +0x200 Hidden", translate("Provider URL"))
-		endpointEdit := settingsGui.Add("Edit", "x110 yp+1 w160 h21 Hidden")
+		endpointLabel := settingsGui.Add("Text", "x16 yp+30 w90 h23 +0x200", translate("Provider URL"))
+		endpointEdit := settingsGui.Add("Edit", "x110 yp+1 w160 h21")
 
 		settingsGui.Add("Button", "x60 yp+35 w80 h23 Default", translate("Ok")).OnEvent("Click", editTelemetrySettings.Bind(kOk))
 		settingsGui.Add("Button", "x146 yp w80 h23", translate("&Cancel")).OnEvent("Click", editTelemetrySettings.Bind(kCancel))
 
-		if (arguments[1] && (arguments[1] != "Integrated")) {
+		if (arguments[1] && (arguments[1] != "Internal")) {
 			providerDropDown.Choose(2)
 
 			endpointEdit.Text := string2Values("|", arguments[1])[2]
@@ -3612,6 +3619,8 @@ editTelemetrySettings(telemetryViewerOrCommand, arguments*) {
 
 		settingsGui.Show("AutoSize Center")
 
+		editTelemetrySettings("UpdateState")
+
 		while !result
 			Sleep(100)
 
@@ -3620,7 +3629,7 @@ editTelemetrySettings(telemetryViewerOrCommand, arguments*) {
 				return false
 			else if (result == kOk) {
 				if (providerDropDown.Value = 1)
-					return "Integrated"
+					return "Internal"
 				else
 					return ("Second Monitor|" . endpointEdit.Text)
 			}

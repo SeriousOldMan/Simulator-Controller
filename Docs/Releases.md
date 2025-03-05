@@ -1,5 +1,60 @@
 # Latest stable release
 
+## 6.2.1.0-release 02/27/25
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Several minor fixes for the Team Server including automatic deletion of expired accounts.
+  4. Fixed a rare bug in session startup for *Le Mans Ultimate*, when only a practice session has been configured.
+  5. Fixed some track names for *iRacing*.
+  6. Fixed a rare bug in the telemetry acquisition for *rFactor 2* and *Le Mans Ultimate* where throttle, brake, gear, and so on were always reported as unavailable.
+  7. Fixed Simulator Controller not a accepting a different simulator once *Le Mans Ultimate* has been used.
+  8. It is no longer possible to set a track automation point in "Session Database", if there is no currently selected set of track automations.
+  9. The track mapper resilience against precision deficits has been increased for *iRacing*.
+  10. Increased resilience against corrupted telemetry layout definitions. Still do not understand, why they get corrupted in the first place.
+  11. The "Strategy Workbench" now includes an "Auto Initialize" setting (default is True) which triggers automatic initialization of several settings from the session database and/or a strategy, which has been loaded manually.
+  12. Straights can now be given names in track maps as it has already been possible for corners.
+  13. Full support for importing iRacing IBT files into the "Session Database" as telemetry reference laps. Please take a look at the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#importing-telemetry-data) for more information. Please note, that importing IBT files requires a valid track map for the given track to be available, since all values from the IBT file will be mapped to the internal coordinate system.
+  14. Several default values have been changed for simulator specific settings in "Simulator Setup" and "Simulator Configuration" to make initial configuration more *easy* for beginners.
+  15. A new [race setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) "Spotter: Private Practice" let you suppress proximity alerts and other opponent related information by the Spotter in private practice sessions. Use this setting for example in *Le Mans Ultimate* or other simulators where you can choose to *ghost* all other cars on the track.
+  16. A new [race setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) "Spotter: Private Qualifying" let you suppress proximity alerts and other opponent related information by the Spotter in private qualifying. Use this setting for example in *Le Mans Ultimate* or other simulators where qualifying is being held without any other cars on the track.
+  17. The "Basic" configuration step of "Simulator Setup" is now an integral part of the configuration process after the initial setup. Only during the first configuration, you have the choice to skip the "Basic" configuration step and directly continue with the "Extended" configuration to install additional software in custom locations, for example. As before, you can stop after the "Basic" configuration, or you can simply continue to the "Extended" configuration.
+  18. [Important] The default value for the [race setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) "Repeat whole voice message" has changed for all Assistants from *True* to *False* in the "Session Database". This means, that an Assistant from now on will only repeat the last sentence by default, if got interrupted by another Assistant. If you want to restore the previous behaviour, include and change the setting in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) of the "Session Database" for your simulators.
+  19. Implemented a *News* system which will give you from time to time interesting or important information about Simulator Controller in general or upcoming features. And of course I will also ask you to support the project once in a while.
+  20. [Internal] Changed some compiler options to make AntiVirus programs more happy.
+  21. New car models for "Setup Workbench":
+      - Le Mans Ultimate
+	    - Aston Martin Vantage AMR LMGT3
+		- Ford Mustang LMGT3
+		- Porsche 911 GT3 R LMGT3
+  
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-621), if you are hosting your own Team Server.
+
+# Upcoming release
+
+## 6.2.2.0-release 03/07/25 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. Fixed track automation for *Le Mans Ultimate* and *rFactor 2* which had been broken since release 6.1.x.
+  4. Fixed a bug the suggests the the *Issue Analyzer* in "Settup Workbench" is available for the *Generic* simulator, which is actually not the case.
+  5. Fixed a crtical crash in *rFactor 2* and *Le Mans Ultimate* data acquisition, if player names do **not** contain a space character.
+  6. The application of the *Rephrasing* booster has been optimized so that the LLM is allowed to rearrange the speech as long as the meaning is preserved. This will introduce even more variation into long speeches.
+  7. The instructions for the *Rephrasing* booster have been updated. If you have tweaked them, revert them to their original state and re-integrate your changes.
+  8. The "RF2" and the "LMU" plugin now offer a "Chat" mode similar to the one already available for the "ACC" plugin. Using this, you can send predefined chat messages using your Button Box, or even automated based on some events.
+  9. When sessions are saved by the "Solo Center", the type of the session (practice, race, ...) will be used as default name together with the current date.
+  10. It is now possible to configure the application *Second Monitor* as the source for real time telemetry data. See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#choosing-the-telemetry-provider) on information about how to configure a connection between Simulator Controller and *Second Monitor*.
+     - The type of telemetry provider and thus the connection to *Second Monitor* in the different applications ("Solo Center", "Team Center" and "Setup Workbench") can be selected in the Telemetry Viewer.
+     - If you want to use *Second Monitor* also for the Driving Coach, this can be configured using new [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database".
+	 - The [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#telemetry-viewer) about how to use telemetry data in team sessions has been clarified.
+  11. The settings for "Private Practice" and "Private Qualifying" are now also available as "Functions" in the Startup Profiles.
+  12. Updated car meta data for *RaceRoom Racing Experience* to the latest version.
+  13. Missing values in the telemetry data graph are now interpolated.
+  14. Thanks to our community member @Hudson Alves, this release comes with the first part of the translations for the Portuguese language. Still some more releases needed to complete the task, for example voice control is not yet supported in Portuguese, but we have a good start.
+  15. [Internal] The "Temp" folder in the [Documents]\Simulator Controller folder is now used for the installation and update process instead of the standard AppData\Local\Temp folder. This may help to further reduce interventions of AntiVirus programs, when an exclusion for [Documents]\Simulator Controller already has been declared as recommended.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-622), if you have tweaked your *Rephrasing* booster instructions.
+
+# Release history
+
 ## 6.2.0.0-release 02/21/25
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
@@ -14,31 +69,6 @@
   11. The installation and update procedure has been overhauled to be more resilient against unavailable download mirrors.
   12. A new voice recognition system has been made available, which supports free speech and provides an excellent alternative to Azure and Google voice recognition services, as long as you have some memory available on your graphics card while runniing your preferred simulator. It is based on Whisper, a multilingual solution based on neural network technology provided in the open source by OpenAI. Please see the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#whisper-runtime) for more information on how to install and use Whisper.
   13. With the genereous support of @Caleidosttk, I have set up a new download mirror for all installation and update packages. The problems seen recently with the unavailable download repository, after so many new users joined our community, should be a thing of the past now.
-
-# Upcoming release
-
-## 6.2.1.0-release 02/28/25 (planned)
-  1. Minor bugfixes, as always
-  2. Documentation updates here and there, as always
-  3. Several minor fixes for the Team Server including automatic deletion of expired accounts.
-  4. Fixed a rare bug in session startup for *Le Mans Ultimate*, when only a practice session has been configured.
-  5. Fixed some track names for *iRacing*.
-  6. It is no longer possible to set a track automation point in "Session Database", if there is no currently selected set of track automations.
-  7. The track mapper resilience against precision deficits has been increased for *iRacing*.
-  8. Increased resilience against corrupted telemetry layout definitions. Still do not understand, why theey get corrupted in the first place.
-  9. The "Strategy Workbench" now includes an "Auto Initialize" setting (default is True) which triggers automatic initialization of several settings from the session database and/or a strategy, which has been loaded manually.
-  10. Straights can now be given names as well in track maps.
-  11. Full support for importing iRacing IBT files into the "Session Database" as telemetry reference laps. Please take a look at the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#importing-telemetry-data) for more information. Please note, that importing IBT files requires a valid track map for the given track to be available, since all values from the IBT file will be mapped to the internal coordinate system.
-  12. Several default values have been changed for simulator specific settings in "Simulator Setup" and "Simulator Configuration" to make initial configuration more *friendly* for novices.
-  13. A new [race setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) "Spotter: Private Practice" let you suppress proximity alerts and other opponent related information by the Spotter in private practice sessions. Use this setting for example in *Le Mans Ultimate* or other simulators where you can choose to *ghost* all other cars on the track.
-  14. A new [race setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) "Spotter: Private Qualifying" let you suppress proximity alerts and other opponent related information by the Spotter in private qualifying. Use this setting for example in *Le Mans Ultimate* or other simulators where qualifying is being held without any other cars on the track.
-  15. Implemented a *News* system which will give you from time to time interesting or important information about Simulator Controller in general or upcoming features. And of course I will also ask to support the project once in a while.
-  16. The "Basic" configuration step of "Simulator Setup" is now an integral part of the configuration process after the initial setup. Only during the first configuration, you have the choice to skip the "Basic" configuration step and directly continue with the "Extended" configuration to install additional software in custom locations, for example. As before, you can stop after the "Basic" configuration, or you can simply continue to the "Extended" configuration.
-  17. [Important] The default value for the [race setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) "Repeat whole voice message" has changed for all Assistants from *True* to *False* in the "Session Database". This means, that an Assistant from now on will only repeat the last sentence, if got interrupted by another Assistant. If you want to restore the *old* bahaviour, include and change the setting in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) of the "Session Database" for your simulators.
-  
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-621), if you are hosting your own Team Server.
-
-# Release history
 
 ## 6.1.6.0-release 02/14/25
   1. Minor bugfixes, as always

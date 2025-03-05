@@ -541,8 +541,8 @@ class ProgressTask extends PeriodicTask {
 	}
 
 	run() {
-		if (A_TickCount > (this.iStart + 250))
-			if !this.iProgress
+		if (A_TickCount > (this.iStart + 500))
+			if !this.ProgressWindow
 				this.iProgressWindow := this.showProgress()
 			else if (this.iProgress != "Stop")
 				this.updateProgress()

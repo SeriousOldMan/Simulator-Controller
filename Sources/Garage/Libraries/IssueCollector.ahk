@@ -169,14 +169,14 @@ class IssueCollector {
 		}
 	}
 
-	loadFromSettings(settings := false, section := "Telemetry Collector") {
+	loadFromSettings(settings := false, section := "Settigs") {
 		local defaultUndersteerThresholds := "40,70,100"
 		local defaultOversteerThresholds := "-40,-70,-100"
 		local defaultLowspeedThreshold := 120
 		local prefix
 
 		if !settings
-			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+			settings := readMultiMap(kUserConfigDirectory . "Issue Collector.ini")
 
 		prefix := (this.Simulator . "." . (this.Car ? this.Car : "*") . ".*.")
 

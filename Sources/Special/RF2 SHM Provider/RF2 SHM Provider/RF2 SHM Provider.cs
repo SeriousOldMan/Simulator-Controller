@@ -93,9 +93,10 @@ namespace RF2SHMProvider {
 
 			if (forName.Contains(" ")) {
 				string[] names = forName.Split(' ');
+				int length = Math.Min(1, names[0].Length);
 
-				return names[0].Substring(0, 1) + names[1].Substring(0, 1);
-			}
+                return names[0].Substring(0, Math.Min(1, names[0].Length)) + names[1].Substring(0, Math.Min(1, names[1].Length));
+            }
 			else
 				return "";
 		}
@@ -127,22 +128,28 @@ namespace RF2SHMProvider {
         {
             carName = carName.Trim();
 
-            if (carName.Length > 0)
-            {
-                if (carName[0] == '#')
-                {
-                    char[] delims = { ' ' };
-                    string[] parts = carName.Split(delims, 2);
+			try {
+				if (carName.Length > 0)
+				{
+					if (carName[0] == '#')
+					{
+						char[] delims = { ' ' };
+						string[] parts = carName.Split(delims, 2);
 
-                    return parts[0].Split('#')[1].Trim();
-                }
-                else if (carName.Contains("#"))
-                    return carName.Split('#')[1].Trim().Split(' ')[0].Trim();
-                else
-                    return (id + 1).ToString();
+						return parts[0].Split('#')[1].Trim();
+					}
+					else if (carName.Contains("#"))
+						return carName.Split('#')[1].Trim().Split(' ')[0].Trim();
+					else
+						return (id + 1).ToString();
+				}
+				else
+					return (id + 1).ToString();
             }
-            else
+            catch (Exception)
+            {
                 return (id + 1).ToString();
+            }
         }
 
         public void ReadStandings()

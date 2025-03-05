@@ -820,19 +820,19 @@ class BasicStepWizard extends StepWizard {
 		local key := this.Keys[assistant]
 		local choices := []
 		local languages := []
+		local allLanguages := availableLanguages()
 		local assistantLanguage, code, language, ignore, grammarFile
-
-		for code, language in availableLanguages() {
-			choices.Push(language)
-			languages.Push(code)
-		}
 
 		for ignore, assistant in this.Definition
 			for ignore, grammarFile in getFileNames(assistant . ".grammars.*", kUserGrammarsDirectory, kGrammarsDirectory) {
 				SplitPath(grammarFile, , , &code)
 
 				if !inList(languages, code) {
-					choices.Push(code)
+					if allLanguages.Has(code)
+						choices.Push(allLanguages[code])
+					else
+						choices.Push(code)
+
 					languages.Push(code)
 				}
 			}

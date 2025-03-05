@@ -19,7 +19,7 @@
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class LMURestProvider {
+class LMURESTProvider {
 	static sTyreTypes := CaseInsenseMap("All", "FL", "FL", "FL", "FR", "FR", "RL", "RL", "RR", "RR"
 									  , "Front Left", "FL", "Front Right", "FR", "Rear Left", "RL", "Rear Right", "RR")
 
@@ -80,29 +80,37 @@ class LMURestProvider {
 		read(url := this.GETURL, update := true) {
 			local data
 
-			try {
-				data := WinHttpRequest({Timeouts: [0, 500, 500, 500]}).GET(url, "", false, {Encoding: "UTF-8"}).JSON
+			static lmuApplication := Application("Le Mans Ultimate", kSimulatorConfiguration)
 
-				if !isObject(data)
+			if lmuApplication.isRunning() {
+				try {
+					data := WinHttpRequest({Timeouts: [0, 500, 500, 500]}).GET(url, "", false, {Encoding: "UTF-8"}).JSON
+
+					if !isObject(data)
+						data := false
+
+					if update
+						this.iData := data
+				}
+				catch Any as exception {
+					logError(exception)
+
+					if update
+						this.iData := false
+
 					data := false
-
-				if update
-					this.iData := data
+				}
 			}
-			catch Any as exception {
-				logError(exception)
-
-				if update
-					this.iData := false
-
+			else
 				data := false
-			}
 
 			return data
 		}
 
 		write(url := this.PUTURL, data := this.Data) {
-			if data {
+			static lmuApplication := Application("Le Mans Ultimate", kSimulatorConfiguration)
+
+			if (data && lmuApplication.isRunning()) {
 				data := JSON.print(data, "  ")
 
 				try {

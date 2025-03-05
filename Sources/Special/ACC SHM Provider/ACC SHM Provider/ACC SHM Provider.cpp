@@ -314,6 +314,8 @@ int main(int argc, char* argv[])
 		printData("FrontBrakePadCompoundRaw", pf->frontBrakeCompound + 1);
 		printData("RearBrakePadCompoundRaw", pf->rearBrakeCompound + 1);
 
+		printData("WaterTemperature", pf->waterTemp);
+
 		wcout << "[Stint Data]" << endl;
 		
 		wcout << "DriverForname=" << sf->playerName << endl;

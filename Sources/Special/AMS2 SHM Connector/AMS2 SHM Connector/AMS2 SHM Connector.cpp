@@ -351,6 +351,9 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		print(&output, ",", (int)round(localCopy->mBrakeDamage[TYRE_REAR_LEFT] * 100));
 		printLine(&output, ",", (int)round(localCopy->mBrakeDamage[TYRE_REAR_RIGHT] * 100));
 
+		printLine(&output, "WaterTemperature=", (int)round(localCopy->mWaterTempCelsius));
+		printLine(&output, "OilTemperature=", (int)round(localCopy->mOilTempCelsius));
+
 		printLine(&output, "[Stint Data]");
 
 		char name[100];

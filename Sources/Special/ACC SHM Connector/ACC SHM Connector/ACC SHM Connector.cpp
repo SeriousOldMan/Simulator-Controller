@@ -346,6 +346,8 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		printData(&output, "BrakeDiscLifeRaw", pf->discLife);
 		printData(&output, "FrontBrakePadCompoundRaw", pf->frontBrakeCompound + 1);
 		printData(&output, "RearBrakePadCompoundRaw", pf->rearBrakeCompound + 1);
+
+		printData(&output, "WaterTemperature", pf->waterTemp);
 	
 		output << "[Stint Data]" << endl;
 		

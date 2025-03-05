@@ -280,6 +280,9 @@ int main(int argc, char* argv[]) {
 			(int)round(localCopy->mBrakeDamage[TYRE_REAR_LEFT] * 100),
 			(int)round(localCopy->mBrakeDamage[TYRE_REAR_RIGHT] * 100));
 
+		printf("WaterTemperature=%d\n", (int)round(localCopy->mWaterTempCelsius));
+		printf("OilTemperature=%d\n", (int)round(localCopy->mOilTempCelsius));
+
 		printf("[Stint Data]\n");
 
 		char name[100];

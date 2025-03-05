@@ -412,7 +412,10 @@ namespace SHMConnector {
 				strWriter.Write("BodyworkDamage=0, 0, 0, 0, "); strWriter.WriteLine(extended.mTrackedDamages[playerTelemetry.mID].mAccumulatedImpactMagnitude / 1000);
 				strWriter.WriteLine("SuspensionDamage=0, 0, 0, 0");
 				strWriter.WriteLine("EngineDamage=0");
-			}
+
+                strWriter.WriteLine("WaterTemperature=" + playerTelemetry.mEngineWaterTemp);
+                strWriter.WriteLine("OilTemperature=" + playerTelemetry.mEngineOilTemp);
+            }
 
 			strWriter.WriteLine("[Track Data]");
 			if (connected)

@@ -387,7 +387,10 @@ namespace RF2SHMProvider {
 				Console.Write("BodyworkDamage=0, 0, 0, 0, "); Console.WriteLine(extended.mTrackedDamages[playerTelemetry.mID].mAccumulatedImpactMagnitude / 1000);
 				Console.WriteLine("SuspensionDamage=0, 0, 0, 0");
 				Console.WriteLine("EngineDamage=0");
-			}
+
+                Console.WriteLine("WaterTemperature=" + playerTelemetry.mEngineWaterTemp);
+                Console.WriteLine("OilTemperature=" + playerTelemetry.mEngineOilTemp);
+            }
 
 			Console.WriteLine("[Track Data]");
 

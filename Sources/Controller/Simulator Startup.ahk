@@ -1111,7 +1111,7 @@ availableFunctions(configuration, &hasTeamServer := false
 	}
 
 	if hasRaceStrategist {
-		functions.Push(Array("Race Strategist", "Telemetry Collection"))
+		functions.Push(Array("Race Strategist", "Data Collection"))
 		functions.Push(Array("Race Strategist", "Traffic Analysis"))
 	}
 

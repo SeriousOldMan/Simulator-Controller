@@ -6737,12 +6737,12 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 
 		importDataGui.SetFont("s8 Norm", "Arial")
 
-		importDataGui.Add("Text", "x8 yp+30 w410 X:Move(0.2) W:Grow(0.8) 0x10")
+		importDataGui.Add("Text", "x8 yp+30 w410 W:Grow 0x10") ; X:Move(0.2) W:Grow(0.8)
 
 		importSelectCheck := importDataGui.Add("CheckBox", "Check3 x16 yp+12 w15 h21 vimportSelectCheck")
 		importSelectCheck.OnEvent("Click", selectAllImportEntries)
 
-		importListView := importDataGui.Add("ListView", "x34 yp-2 w375 h400 H:Grow X:Move(0.2) W:Grow(0.8) -Multi -LV0x10 Checked AltSubmit", collect(["Type", "Car / Track", "Driver", "#"], translate))
+		importListView := importDataGui.Add("ListView", "x34 yp-2 w375 h400 H:Grow W:Grow -Multi -LV0x10 Checked AltSubmit", collect(["Type", "Car / Track", "Driver", "#"], translate)) ; X:Move(0.2) W:Grow(0.8)
 		importListView.OnEvent("Click", noSelect)
 		importListView.OnEvent("DoubleClick", noSelect)
 		importListView.OnEvent("ItemCheck", selectImportEntry)
@@ -7408,10 +7408,10 @@ editSettings(editorOrCommand, arguments*) {
 		settingsEditorGui.Add("Text", "x24 yp+16 w117 h23 +0x200", translate("Synchronization"))
 		synchTelemetryCheck := settingsEditorGui.Add("CheckBox", "x146 yp+2 w120 h21", translate("Laps"))
 		synchTelemetryCheck.OnEvent("Click", editSettings.Bind("UpdateState"))
-		synchStrategiesCheck := settingsEditorGui.Add("CheckBox", "x266 yp w120 h21", translate("Strategies"))
-		synchStrategiesCheck.OnEvent("Click", editSettings.Bind("UpdateState"))
-		synchPressuresCheck := settingsEditorGui.Add("CheckBox", "x146 yp+24 w120 h21", translate("Pressures"))
+		synchPressuresCheck := settingsEditorGui.Add("CheckBox", "x266 yp w120 h21", translate("Pressures"))
 		synchPressuresCheck.OnEvent("Click", editSettings.Bind("UpdateState"))
+		synchStrategiesCheck := settingsEditorGui.Add("CheckBox", "x146 yp+24 w120 h21", translate("Strategies"))
+		synchStrategiesCheck.OnEvent("Click", editSettings.Bind("UpdateState"))
 		synchSetupsCheck := settingsEditorGui.Add("CheckBox", "x266 yp w120 h21", translate("Setups"))
 		synchSetupsCheck.OnEvent("Click", editSettings.Bind("UpdateState"))
 		synchSessionsCheck := settingsEditorGui.Add("CheckBox", "x146 yp+24 w120 h21", translate("Sessions"))

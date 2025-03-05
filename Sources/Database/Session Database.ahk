@@ -59,7 +59,7 @@ global kSetupNames := CaseInsenseMap("DQ", "Qualifying (Dry)", "DR", "Race (Dry)
 global kModuleDocumentations := Map("Settings", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#race-settings"
 								  , "Data", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#administration"
 								  , "Sessions", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#sessions"
-								  , "Laps", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#laps"
+								  , "Laps", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetries"
 								  , "Strategies", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#strategies"
 								  , "Setups", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#setups"
 								  , "Pressures", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#tyre-pressures"
@@ -1648,7 +1648,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("s10 Bold", "Arial")
 
 		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg3", this.themeIcon(kIconsDirectory . "Tacho.ico")).OnEvent("Click", chooseTab.Bind("Laps"))
-		editorGui.Add("Text", "x50 yp+5 w220 h26 W:Grow(0.2) vsettingsTab3", translate("Laps")).OnEvent("Click", chooseTab.Bind("Laps"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 W:Grow(0.2) vsettingsTab3", translate("Telemetries")).OnEvent("Click", chooseTab.Bind("Laps"))
 
 		editorGui.Add("Text", "x16 yp+32 w267 W:Grow(0.2) 0x10")
 
@@ -1688,7 +1688,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui.Add("Picture", "x280 ys-2 w390 h554 Border X:Move(0.2) W:Grow(0.8) H:Grow")
 
-		tabs := collect(["Settings", "Track", "Session", "Laps", "Stratgies", "Setups", "Pressures", "Data"], translate)
+		tabs := collect(["Settings", "Track", "Session", "Telemetries", "Stratgies", "Setups", "Pressures", "Data"], translate)
 
 		editorGui.Add("Tab2", "x296 ys+16 w0 h0 -Wrap Section vsettingsTab", tabs)
 
@@ -4096,7 +4096,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				track := this.getTrackCode(simulator, track)
 
 				switch type, false {
-					case translate("Telemetry"):
+					case translate("Laps"):
 						telemetryDB := TelemetryDatabase(simulator, car, track).Database
 
 						this.deleteEntries(connectors, telemetryDB, "Electronics", "Electronics", driver)
@@ -4118,7 +4118,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 								this.SessionDatabase.removeSession(simulator, car, track, type, name)
 							}
-					case translate("Laps"):
+					case translate("Telemetries"):
 						code := this.SessionDatabase.getSimulatorCode(simulator)
 
 						loop Files, kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Lap Telemetries\*.telemetry", "F"
@@ -4228,7 +4228,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				targetDirectory := (directory . "\" . car . "\" . track . "\")
 
 				switch type, false {
-					case translate("Telemetry"):
+					case translate("Laps"):
 						sourceDB := TelemetryDatabase(simulator, car, track).Database
 						targetDB := Database(targetDirectory, kTelemetrySchemas)
 
@@ -4271,7 +4271,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 									}
 								}
 						}
-					case translate("Laps"):
+					case translate("Telemetries"):
 						code := this.SessionDatabase.getSimulatorCode(simulator)
 
 						DirCreate(targetDirectory . "Lap Telemetries")
@@ -4751,7 +4751,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 										number := (telemetryDB.getElectronicsCount(driver) + telemetryDB.getTyresCount(driver))
 
 										if (number > 0)
-											this.AdministrationListView.Add("", translate("Telemetry"), (carName . " / " . trackName), this.SessionDatabase.getDriverName(selectedSimulator, driver), number)
+											this.AdministrationListView.Add("", translate("Laps"), (carName . " / " . trackName), this.SessionDatabase.getDriverName(selectedSimulator, driver), number)
 									}
 
 									tyresDB := TyresDatabase().getTyresDatabase(simulator, car, track)
@@ -4785,7 +4785,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 										telemetries += 1
 
 									if (telemetries > 0)
-										this.AdministrationListView.Add("", translate("Laps"), (carName . " / " . trackName), "-", telemetries)
+										this.AdministrationListView.Add("", translate("Telemetries"), (carName . " / " . trackName), "-", telemetries)
 
 									sessions := CaseInsenseMap()
 
@@ -4971,10 +4971,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.DataListView.Add("", translate("Automations"), automations)
 			this.DataListView.Add("", translate("Drivers"), drivers.Length)
 			this.DataListView.Add("", translate("Cars"), cars.Length)
-			this.DataListView.Add("", translate("Telemetry"), telemetry)
+			this.DataListView.Add("", translate("Laps"), telemetry)
 			this.DataListView.Add("", translate("Pressures"), pressures)
 			this.DataListView.Add("", translate("Sessions"), sessions)
-			this.DataListView.Add("", translate("Laps"), telemetries)
+			this.DataListView.Add("", translate("Telemetries"), telemetries)
 			this.DataListView.Add("", translate("Strategies"), strategies)
 			this.DataListView.Add("", translate("Setups"), setups)
 
@@ -6809,7 +6809,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 						number := (telemetryDB.getElectronicsCount(driver) + telemetryDB.getTyresCount(driver))
 
 						if (number > 0)
-							importListView.Add("Check", translate("Telemetry"), (carName . " / " . trackName), driverName, number)
+							importListView.Add("Check", translate("Laps"), (carName . " / " . trackName), driverName, number)
 					}
 
 					tyresDB := Database(sourceDirectory . "\", kTyresSchemas)
@@ -6858,7 +6858,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 						telemetries += 1
 
 					if (telemetries > 0)
-						importListView.Add("Check", translate("Laps"), (carName . " / " . trackName), "-", telemetries)
+						importListView.Add("Check", translate("Telemetries"), (carName . " / " . trackName), "-", telemetries)
 
 					strategies := 0
 
@@ -6955,13 +6955,13 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 				switch type, false {
 					case translate("Tracks"):
 						type := "Tracks"
-					case translate("Telemetry"):
+					case translate("Laps"):
 						type := "Telemetry"
 					case translate("Pressures"):
 						type := "Pressures"
 					case translate("Strategies"):
 						type := "Strategies"
-					case translate("Laps"):
+					case translate("Telemetries"):
 						type := "Telemetries"
 					case translate("Sessions"):
 						type := "Sessions"
@@ -7406,17 +7406,17 @@ editSettings(editorOrCommand, arguments*) {
 		values := [synchTelemetryCheck, synchPressuresCheck, synchSessionsCheck, synchSetupsCheck, synchStrategiesCheck, synchTelemetriesCheck]
 
 		settingsEditorGui.Add("Text", "x24 yp+16 w117 h23 +0x200", translate("Synchronization"))
-		synchTelemetryCheck := settingsEditorGui.Add("CheckBox", "x146 yp+2 w120 h21", translate("Telemetry Data"))
+		synchTelemetryCheck := settingsEditorGui.Add("CheckBox", "x146 yp+2 w120 h21", translate("Laps"))
 		synchTelemetryCheck.OnEvent("Click", editSettings.Bind("UpdateState"))
-		synchStrategiesCheck := settingsEditorGui.Add("CheckBox", "x266 yp w120 h21", translate("Race Strategies"))
+		synchStrategiesCheck := settingsEditorGui.Add("CheckBox", "x266 yp w120 h21", translate("Strategies"))
 		synchStrategiesCheck.OnEvent("Click", editSettings.Bind("UpdateState"))
-		synchPressuresCheck := settingsEditorGui.Add("CheckBox", "x146 yp+24 w120 h21", translate("Pressures Data"))
+		synchPressuresCheck := settingsEditorGui.Add("CheckBox", "x146 yp+24 w120 h21", translate("Pressures"))
 		synchPressuresCheck.OnEvent("Click", editSettings.Bind("UpdateState"))
-		synchSetupsCheck := settingsEditorGui.Add("CheckBox", "x266 yp w120 h21", translate("Car Setups"))
+		synchSetupsCheck := settingsEditorGui.Add("CheckBox", "x266 yp w120 h21", translate("Setups"))
 		synchSetupsCheck.OnEvent("Click", editSettings.Bind("UpdateState"))
 		synchSessionsCheck := settingsEditorGui.Add("CheckBox", "x146 yp+24 w120 h21", translate("Sessions"))
 		synchSessionsCheck.OnEvent("Click", editSettings.Bind("UpdateState"))
-		synchTelemetriesCheck := settingsEditorGui.Add("CheckBox", "x266 yp w120 h21", translate("Laps"))
+		synchTelemetriesCheck := settingsEditorGui.Add("CheckBox", "x266 yp w120 h21", translate("Telemetries"))
 		synchTelemetriesCheck.OnEvent("Click", editSettings.Bind("UpdateState"))
 
 		synchTelemetryCheck.Value := values[1]

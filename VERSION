@@ -1,9 +1,9 @@
 [Development]
-Version=6.2.2.0-dev
+Version=6.2.2.0-beta
 Target=6.2.2.0-release
-Date=03/04/2025
-Download=https://www.dropbox.com/scl/fi/5cwxnyysdb4nlaulkqab6/Simulator-Controller-6.2.2.0-dev.zip?rlkey=0iwow6kauzowsnno1m8salgig&st=9uj8dvzn&dl=1
-Changes=Use rephrasing booster also for split talking, Updated Rephrasing booster instructions, Chat mode support for rFactor 2 and Le Mans Ultimate, Use Second Monitor as real time telemetry provider, Telemetry provider setting for Driving Coach, Choose telemetry provider in Team Center, Choose telemetry provider in Telemetry Viewer, First part of portoguese translations, Use local temp folder for installation packages, Private session function in Startup Profiles, Updated R3E car meta data, Interpolate missing telemetry values, Saving sesssion in "Solo Center" with session type, Fixed track automation for LMU and rF2, Fixed rF2 race number parsing
+Date=03/05/2025
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/y2LiFMQP
+Changes=Use rephrasing booster also for split talking, Updated Rephrasing booster instructions, Chat mode support for rFactor 2 and Le Mans Ultimate, Use Second Monitor as real time telemetry provider, Telemetry provider setting for Driving Coach, Choose telemetry provider in Team Center, Choose telemetry provider in Telemetry Viewer, First part of portoguese translations, Use local temp folder for installation packages, Private session function in Startup Profiles, Updated R3E car meta data, Interpolate missing telemetry values, Saving sesssion in "Solo Center" with session type, Fixed track automation for LMU and rF2, Fixed rF2 and LMU driver name parsing, Renamed "Laps" to "Telemetries" in "Session Database"
 Components=Media->5.6.1,Configuration->6.2.2,Utilities->6.2.2
 [Release]
 Version=6.2.1.0-release
@@ -30,5 +30,5 @@ Utilities.6.2.2.Download=https://fileshare.impresion3d.pro/filebrowser/api/publi
 [Current]
 Type=Development
 [Version]
-Development=6.2.2.0-dev
+Development=6.2.2.0-beta
 Release=6.2.1.0-release

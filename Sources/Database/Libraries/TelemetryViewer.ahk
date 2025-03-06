@@ -3353,6 +3353,9 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 		inputResult := withBlockedWindows(InputBox, translate("Please enter the name of the new layout:"), translate("Telemetry Layouts"), "w300 h120")
 
 		if (inputResult.Result = "Ok") {
+			if layout
+				editLayoutSettings("LayoutSave")
+
 			name := inputResult.Value
 			newName := name
 

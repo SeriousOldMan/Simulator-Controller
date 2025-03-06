@@ -3505,6 +3505,9 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 			editLayoutSettings("UpdateState")
 	}
 	else if (telemetryViewerOrCommand = "AdjustCluster") {
+		if (Trim(layoutsGui["clusterEdit"].Text) = "")
+			layoutsGui["clusterEdit"].Text := 1
+
 		currentGroups := 1
 
 		loop channelsListView.GetCount()

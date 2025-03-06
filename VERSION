@@ -1,34 +1,28 @@
 [Development]
-Version=6.2.2.0-beta
+Version=6.2.2.0-release
 Target=6.2.2.0-release
-Date=03/06/2025
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/y2LiFMQP
+Date=03/07/2025
+Download=https://cutt.ly/rryaJOEw;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/naiPciw5;https://www.dropbox.com/scl/fi/ybrz3lbd3g77p11vb0dsh/Simulator-Controller-6.2.2.0-release.zip?rlkey=xpwtd3y0snu47ymvafye0fbhj&st=rtpdbphu&dl=1;http://87.177.159.148:800/api/public/dl/bhp84xjs;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.2.2.0-release.zip
 Changes=Use rephrasing booster also for split talking, Updated Rephrasing booster instructions, Chat mode support for rFactor 2 and Le Mans Ultimate, Use Second Monitor as real time telemetry provider, Telemetry provider setting for Driving Coach, Choose telemetry provider in Team Center, Choose telemetry provider in Telemetry Viewer, First part of portoguese translations, Use local temp folder for installation packages, Private session function in Startup Profiles, Updated R3E car meta data, Interpolate missing telemetry values, Saving sesssion in "Solo Center" with session type, Fixed track automation for LMU and rF2, Fixed rF2 and LMU driver name parsing, Renamed "Laps" to "Telemetries" in "Session Database", Fixed layout saving in "Telemetry Viewer"
 Components=Media->5.6.1,Configuration->6.2.2,Utilities->6.2.2
 [Release]
-Version=6.2.1.0-release
-Date=02/27/2025
-Download=https://cutt.ly/YrrI31d1;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/4mEl0rJy;https://www.dropbox.com/scl/fi/byecupg7g9tgx055gm95b/Simulator-Controller-6.2.1.0-release.zip?rlkey=1wkjg1b2b4fdb9o7vbhvng0b6&st=my621qeh&dl=1
-Changes=Auto Initialize for "Strategy Workbench", Names for straights in track maps, iRacing IBT file support in telemetry importer, Fixed deletion of expired accounts in Team Server, New default values for simulator specific settings, New race setting "Spotter: Private Practice", New race setting "Spotter: Private Qualifying", Increased resilience against corrupted telemetry layout definitions, Implemented News system, No shutdown for track mapper at end of session, Prevented unwanted track automation click handler, Streamlined basic configuration in "Simulator Setup", Fixed LMU practice session startup code, Changed default for "Repeat whole voice message", New car models for "Setup Workbench", Fixed ramp down of Le Mans Ultimate
-Components=Media->5.6.1,Configuration->6.2.1,Utilities->6.1.6
+Version=6.2.2.0-release
+Date=03/07/2025
+Download=https://cutt.ly/rryaJOEw;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/naiPciw5;https://www.dropbox.com/scl/fi/ybrz3lbd3g77p11vb0dsh/Simulator-Controller-6.2.2.0-release.zip?rlkey=xpwtd3y0snu47ymvafye0fbhj&st=rtpdbphu&dl=1;http://87.177.159.148:800/api/public/dl/bhp84xjs;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.2.2.0-release.zip
+Changes=Use rephrasing booster also for split talking, Updated Rephrasing booster instructions, Chat mode support for rFactor 2 and Le Mans Ultimate, Use Second Monitor as real time telemetry provider, Telemetry provider setting for Driving Coach, Choose telemetry provider in Team Center, Choose telemetry provider in Telemetry Viewer, First part of portoguese translations, Use local temp folder for installation packages, Private session function in Startup Profiles, Updated R3E car meta data, Interpolate missing telemetry values, Saving sesssion in "Solo Center" with session type, Fixed track automation for LMU and rF2, Fixed rF2 and LMU driver name parsing, Renamed "Laps" to "Telemetries" in "Session Database", Fixed layout saving in "Telemetry Viewer"
+Components=Media->5.6.1,Configuration->6.2.2,Utilities->6.2.2
 [Components]
 Media.5.6.1.Path=Resources
 Media.5.6.1.Content=Splash Media
 Media.5.6.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/DfSnfhLR;https://www.dropbox.com/scl/fi/3c56fjdvdd4od5t7rsuc9/Media-5.6.1.zip?rlkey=x0icl05jy05nn886due4dsblv&dl=1;http://87.177.159.148:800/api/public/dl/QoDnWZ83;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Media+5.6.1.zip
-Configuration.6.2.1.Path=Resources
-Configuration.6.2.1.Content=Setup
-Configuration.6.2.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/CuyqbRlN;https://www.dropbox.com/scl/fi/oimops6ia2cmije8ijsi1/Configuration-6.2.1.zip?rlkey=exmxucfyhhytzteauunc5fd30&st=9jde5ox9&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.2.1.zip
 Configuration.6.2.2.Path=Resources
 Configuration.6.2.2.Content=Setup
 Configuration.6.2.2.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/HFz3MPYi;https://www.dropbox.com/scl/fi/b06sa5lsqfbdiymnquq8k/Configuration-6.2.2.zip?rlkey=ziabrb78intu82i8g9ggvrhzh&st=vjxqpf6e&dl=1;http://87.177.159.148:800/api/public/dl/F0YSxMjH;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.2.2.zip
-Utilities.6.1.6.Path=.
-Utilities.6.1.6.Content=Utilities
-Utilities.6.1.6.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Gs12Shqo;https://www.dropbox.com/scl/fi/zo6ve6h67jluj25zkni9z/Utilities-6.1.6.zip?rlkey=qmp8jzvx54roz3l72zovvk6we&st=wfvj3oxf&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.1.6.zip
 Utilities.6.2.2.Path=.
 Utilities.6.2.2.Content=Utilities
 Utilities.6.2.2.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Cn-Rmw_8;https://www.dropbox.com/scl/fi/lgc20h3afx2msjcarh9hi/Utilities-6.2.2.zip?rlkey=4aff0vxge03ghdr2umlhd1ex9&st=plp4tedq&dl=1;http://87.177.159.148:800/api/public/dl/UUVNodWq;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.2.2.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=6.2.2.0-beta
-Release=6.2.1.0-release
+Development=6.2.2.0-release
+Release=6.2.2.0-release

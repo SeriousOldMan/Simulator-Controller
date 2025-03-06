@@ -925,6 +925,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			editor.deleteTelemetry(editor.TelemetryListView.GetText(editor.TelemetryListView.GetNext(0), 2))
 		}
 
+		copyTelemetry(*) {
+			A_Clipboard := editor.TelemetryListView.GetText(editor.TelemetryListView.GetNext(0), 2)
+
+			showMessage(translate("Telemetry name copied to the clipboard."))
+		}
+
 		navStrategy(listView, line, selected) {
 			if selected
 				chooseStrategy(listView, line)
@@ -1741,14 +1747,16 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.iTelemetryListView.OnEvent("DoubleClick", openTelemetry)
 		this.iTelemetryListView.OnEvent("ItemSelect", navTelemetry)
 
-		editorGui.Add("Button", "xp+260 yp+440 w23 h23 X:Move Y:Move vuploadTelemetryButton").OnEvent("Click", uploadTelemetry)
+		editorGui.Add("Button", "xp+235 yp+440 w23 h23 X:Move Y:Move vuploadTelemetryButton").OnEvent("Click", uploadTelemetry)
 		editorGui.Add("Button", "xp+25 yp w23 h23 X:Move Y:Move vdownloadTelemetryButton").OnEvent("Click", downloadTelemetry)
 		editorGui.Add("Button", "xp+25 yp w23 h23 X:Move Y:Move vrenameTelemetryButton").OnEvent("Click", renameTelemetry)
 		editorGui.Add("Button", "xp+25 yp w23 h23 X:Move Y:Move vdeleteTelemetryButton").OnEvent("Click", deleteTelemetry)
+		editorGui.Add("Button", "xp+25 yp w23 h23 X:Move Y:Move vcopyTelemetryButton").OnEvent("Click", copyTelemetry)
 		setButtonIcon(editorGui["uploadTelemetryButton"], kIconsDirectory . "Upload.ico", 1)
 		setButtonIcon(editorGui["downloadTelemetryButton"], kIconsDirectory . "Download.ico", 1)
 		setButtonIcon(editorGui["renameTelemetryButton"], kIconsDirectory . "Pencil.ico", 1)
 		setButtonIcon(editorGui["deleteTelemetryButton"], kIconsDirectory . "Minus.ico", 1)
+		setButtonIcon(editorGui["copyTelemetryButton"], kIconsDirectory . "Copy.ico", 1)
 
 		editorGui.Add("Text", "x296 yp w80 h23 X:Move(0.2) Y:Move +0x200", translate("Share"))
 		editorGui.Add("CheckBox", "xp+90 yp+4 w140 X:Move(0.2) Y:Move vshareTelemetryWithCommunityCheck", translate("with Community")).OnEvent("Click", updateTelemetryAccess)
@@ -2382,6 +2390,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			name := this.TelemetryListView.GetText(selected, 2)
 
 			window["downloadTelemetryButton"].Enabled := true
+			window["copyTelemetryButton"].Enabled := true
 
 			if (type != translate("Community")) {
 				info := this.SessionDatabase.readTelemetryInfo(simulator, car, track, name)
@@ -2415,6 +2424,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		else {
 			window["downloadTelemetryButton"].Enabled := false
 			window["deleteTelemetryButton"].Enabled := false
+			window["copyTelemetryButton"].Enabled := false
 			window["renameTelemetryButton"].Enabled := false
 			window["shareTelemetryWithCommunityCheck"].Enabled := false
 			window["shareTelemetryWithTeamServerCheck"].Enabled := false

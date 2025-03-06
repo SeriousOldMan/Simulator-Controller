@@ -2178,7 +2178,7 @@ class SectionInfoViewer {
 
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Time") . "</th>" . fieldCell("Time", "Exit", 2, 1000, "Seconds") . "</tr>")
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Acceleration Start") . "</th>" . startCell("Exit") . "</tr>")
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Acceleration Length") . "</th>" . unitFieldCell("Length", "Exit", "Length") . "</tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Acceleration Distance") . "</th>" . unitFieldCell("Length", "Exit", "Length") . "</tr>")
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Gear") . "</th>" . stdCell("AcceleratingGear") . "</tr>")
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("RPM") . "</th>" . stdCell("AcceleratingRPM") . "</tr>")
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Speed") . "</th>" . unitCell("AcceleratingSpeed", "Speed") . "</tr>")
@@ -3353,6 +3353,9 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 		inputResult := withBlockedWindows(InputBox, translate("Please enter the name of the new layout:"), translate("Telemetry Layouts"), "w300 h120")
 
 		if (inputResult.Result = "Ok") {
+			if layout
+				editLayoutSettings("LayoutSave")
+
 			name := inputResult.Value
 			newName := name
 

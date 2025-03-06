@@ -73,7 +73,7 @@ class TelemetryChart {
 		this.iChartArea := chartArea
 	}
 
-	showTelemetryChart(channels, lapFileName, referenceLapFileName := false, distanceCorrection := 0) {
+	showTelemetryChart(cluster, channels, lapFileName, referenceLapFileName := false, distanceCorrection := 0) {
 		eventHandler(event, arguments*) {
 			local telemetryViewer := this.TelemetryViewer
 			local row := false
@@ -112,19 +112,23 @@ class TelemetryChart {
 
 		if this.ChartArea {
 			this.ChartArea.document.open()
-			this.ChartArea.document.write(this.createTelemetryChart(channels, lapFileName, referenceLapFileName, distanceCorrection))
+			this.ChartArea.document.write(this.createTelemetryChart(cluster, channels, lapFileName, referenceLapFileName, distanceCorrection))
 			this.ChartArea.document.close()
 
 			this.ChartArea.document.parentWindow.eventHandler := eventHandler
 		}
 	}
 
-	createTelemetryChart(channels, lapFileName, referenceLapFileName := false, distanceCorrection := 0, margin := 0, hScale := 1, wScale := 1) {
+	createTelemetryChart(cluster, channels, lapFileName, referenceLapFileName := false
+					   , distanceCorrection := 0, margin := 0, hScale := 1, wScale := 1) {
+		local channelCount := choose(channels, (c) => (c != "|")).Length
 		local lapTelemetry := []
 		local referenceLapTelemetry := false
 		local html := ""
+		local chartAreas := []
+		local chartFunctions := []
 		local width, height
-		local drawChartFunction, chartArea
+		local clusterIndex, currentCluster, clusterChannels, drawChartFunction
 		local before, after, margins
 		local entry, index, field, running
 
@@ -150,10 +154,28 @@ class TelemetryChart {
 		}
 
 		if this.ChartArea {
-			width := ((this.ChartArea.getWidth() - 4) / 100 * this.WidthZoom * wScale)
-			height := ((this.ChartArea.getHeight() - 4) / 100 * this.HeightZoom * hScale)
+			loop cluster {
+				currentCluster := 1
+				clusterIndex := A_index
 
-			chartArea:= this.createChannelChart(width, height, channels, lapTelemetry, referenceLapTelemetry, &drawChartFunction)
+				clusterChannels := choose(collect(channels, (c) {
+					if (c = "|")
+						currentCluster += 1
+					else if (clusterIndex = currentCluster)
+						return c
+
+					return false
+				}), (c) => c)
+
+				if (clusterChannels.Length > 0) {
+					width := ((this.ChartArea.getWidth() - 4) / 100 * this.WidthZoom * wScale)
+					height := ((this.ChartArea.getHeight() - 4) / 100 * this.HeightZoom * hScale) * (clusterChannels.Length / channelCount)
+
+					chartAreas.Push(this.createChannelChart(width, height, A_Index, clusterChannels
+														  , lapTelemetry, referenceLapTelemetry, &drawChartFunction))
+					chartFunctions.Push(drawChartFunction)
+				}
+			}
 
 			before := "
 			(
@@ -183,36 +205,51 @@ class TelemetryChart {
 			margins := substituteVariables("style='overflow: auto' leftmargin='%margin%' topmargin='%margin%' rightmargin='%margin%' bottommargin='%margin%'"
 										 , {margin: margin})
 
-			return ("<html>" . before . drawChartFunction . after . "<body style='background-color: #" . this.Window.AltBackColor . "' " . margins . "><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style>" . chartArea . "</body></html>")
+			before .= "`n function drawChart() {"
+
+			loop chartFunctions.Length
+				before .= (" drawChart" . A_Index . "();")
+
+			before .= " }`n"
+
+			before .= "`n function selectTelemetry(row) {"
+
+			loop chartFunctions.Length
+				before .= (" selectTelemetry" . A_Index . "(row);")
+
+			before .= " }`n"
+
+			return ("<html>" . before . values2String(A_Space, chartFunctions*) . after . "<body style='background-color: #" . this.Window.AltBackColor . "' " . margins . "><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style>" . values2String("", chartAreas*) . "</body></html>")
 		}
 		else
 			return "<html></html>"
 	}
 
-	createChannelChart(width, height, channels, lapTelemetry, referenceLapTelemetry, &drawChartFunction) {
+	createChannelChart(width, height, cluster, channels, lapTelemetry, referenceLapTelemetry, &drawChartFunction) {
 		local channelsCount := channels.Length
 		local channelsEstate := 0
 		local axisCount := 0
+		local currentCluster := 1
 		local ignore, index, offset, data, refData, axes, color, running, refRunning, values
 		local theChannel, theName, theIndex, theValue, theConverter, theMinValue, minValue, maxValue, spread
 
-		channels := collect(channels, (s) {
+		channels := collect(channels, (c) {
 			local minValues := []
 			local maxValues := []
 
-			s := s.Clone()
+			c := c.Clone()
 
-			channelsEstate += s.Size
+			channelsEstate += c.Size
 
-			s.MinValue := kUndefined
-			s.MaxValue := kUndefined
+			c.MinValue := kUndefined
+			c.MaxValue := kUndefined
 
-			axisCount += s.Indices.Length
+			axisCount += c.Indices.Length
 
-			return s
+			return c
 		})
 
-		drawChartFunction := ("function drawChart() {`nvar data = new google.visualization.DataTable();")
+		drawChartFunction := ("function drawChart" . cluster . "() {`nvar data = new google.visualization.DataTable();")
 
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Distance") . "');")
 
@@ -418,14 +455,14 @@ class TelemetryChart {
 
 		drawChartFunction .= ("]);`nvar options = { interpolateNulls: true, " . axes . ", legend: { position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '2%', top: '5%', right: '2%', bottom: '10%' }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
 
-		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart')); chart.draw(data, options); document.telemetryChart = chart;")
+		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart" . cluster . "')); chart.draw(data, options); document.telemetryChart" . cluster . " = chart;")
 		drawChartFunction .= "`nfunction selectHandler(e) { var cSelection = chart.getSelection(); var selection = ''; for (var i = 0; i < cSelection.length; i++) { var item = cSelection[i]; if (i > 0) selection += ';'; selection += (item.row + '|' + item.column); } try { eventHandler('Select', selection); } catch(e) {} }"
 
 		drawChartFunction .= "`ngoogle.visualization.events.addListener(chart, 'select', selectHandler); }"
 
-		drawChartFunction .= ("`nfunction selectTelemetry(row) {`ndocument.telemetryChart.setSelection([{row: row, column: null}]); }")
+		drawChartFunction .= ("`nfunction selectTelemetry" . cluster . "(row) {`ndocument.telemetryChart" . cluster . ".setSelection([{row: row, column: null}]); }")
 
-		return ("<div id=`"chart`" style=`"width: " . Round(width) . "px; height: " . Round(height) . "px`"></div>")
+		return ("<div id=`"chart" . cluster . "`" style=`"width: " . Round(width) . "px; height: " . Round(height) . "px`"></div>")
 	}
 
 	selectRow(row) {
@@ -756,21 +793,28 @@ class TelemetryViewer {
 	loadLayouts() {
 		local configuration := readMultiMap(kUserConfigDirectory . "Telemetry.layouts")
 		local layouts := CaseInsenseMap()
-		local name, definition, ignore, button
+		local name, definition, ignore, button, clusterCount
 
 		if (configuration.Count > 0)
 			for name, definition in getMultiMapValues(configuration, "Layouts")
 				try {
+					clusterCount := 1
+
 					layouts[name] := {Name: name
 									, WidthZoom: getMultiMapValue(configuration, "Zoom", name . ".Width", 100)
 									, HeightZoom: getMultiMapValue(configuration, "Zoom", name . ".Height", 100)
 									, Channels: choose(collect(string2Values(",", definition), (name) {
-														   if (name == true)
-															   return true
+														   if (name = "|") {
+															   clusterCount += 1
+
+															   return name
+														   }
 														   else
-															   return choose(kTelemetryChannels, (s) => s.Name = name)[1]
+															   return choose(kTelemetryChannels, (c) => c.Name = name)[1]
 													   })
-													 , (s) => s.HasProp("Size"))}
+													 , (c) => ((c = "|") ? c : c.HasProp("Size")))}
+
+					layouts[name].Cluster := clusterCount
 				}
 				catch Any as exception {
 					logError(exception)
@@ -780,9 +824,10 @@ class TelemetryViewer {
 			layouts := CaseInsenseMap(translate("Standard")
 									, {Name: translate("Standard")
 									 , WidthZoom: 100, HeightZoom: 100
+									 , Cluster: 1
 									 , Channels: choose(kTelemetryChannels
-													  , (s) => (!inList(["Speed", "Throttle", "Brake", "TC", "ABS"
-																	   , "Long G", "Lat G"], s.Name) && s.HasProp("Size")))})
+													  , (c) => (!inList(["Speed", "Throttle", "Brake", "TC", "ABS"
+																	   , "Long G", "Lat G"], c.Name) && c.HasProp("Size")))})
 
 		this.iLayouts := layouts
 		this.iSelectedLayout := getMultiMapValue(configuration, "Selected", "Layout", translate("Standard"))
@@ -799,7 +844,7 @@ class TelemetryViewer {
 		local name, layout
 
 		for name, layout in this.Layouts {
-			setMultiMapValue(configuration, "Layouts", name, values2String(",", collect(layout.Channels, (s) => ((s == true) ? true : s.Name))*))
+			setMultiMapValue(configuration, "Layouts", name, values2String(",", collect(layout.Channels, (c) => ((c = "|") ? c : c.Name))*))
 
 			setMultiMapValue(configuration, "Zoom", name . ".Width", layout.WidthZoom)
 			setMultiMapValue(configuration, "Zoom", name . ".Height", layout.HeightZoom)
@@ -1853,7 +1898,8 @@ class TelemetryViewer {
 
 	updateTelemetryChart(redraw := false) {
 		if (this.TelemetryChart && redraw) {
-			this.TelemetryChart.showTelemetryChart(this.Layouts[this.SelectedLayout].Channels, this.SelectedLap[true], this.SelectedReferenceLap[true], this.DistanceCorrection)
+			this.TelemetryChart.showTelemetryChart(this.Layouts[this.SelectedLayout].Cluster, this.Layouts[this.SelectedLayout].Channels
+												 , this.SelectedLap[true], this.SelectedReferenceLap[true], this.DistanceCorrection)
 
 			this.updateState()
 		}
@@ -3366,7 +3412,7 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 				newName := (name . translate(" (") . A_Index . translate(")"))
 
 			layouts[newName] := {Name: newName, WidthZoom: 100, HeightZoom: 100
-							   , Cluster: 1, Channels: [choose(kTelemetryChannels, (s) => s.HasProp("Size"))[1]]}
+							   , Cluster: 1, Channels: [choose(kTelemetryChannels, (c) => c.HasProp("Size"))[1]]}
 
 			editLayoutSettings("LayoutsLoad", layouts)
 			editLayoutSettings("LayoutLoad", layouts[newName])
@@ -3390,9 +3436,9 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 				name := channelsListView.GetText(selected)
 
 				if (name = translate("---------------------------------------------"))
-					channels.Push(true)
+					channels.Push("|")
 				else
-					channels.Push(choose(kTelemetryChannels, (s) => translate(s.Name) = name)[1])
+					channels.Push(choose(kTelemetryChannels, (c) => translate(c.Name) = name)[1])
 			}
 
 			layouts[layout.Name] := {Name: layout.Name
@@ -3419,7 +3465,7 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 			names := []
 
 			for ignore, channel in layout.Channels {
-				if (channel == true)
+				if (channel = "|")
 					channelsListView.Add("Check", translate("---------------------------------------------"))
 				else {
 					names.Push(channel.Name)
@@ -3428,7 +3474,7 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 				}
 			}
 
-			for ignore, channel in choose(kTelemetryChannels, (s) => s.HasProp("Size"))
+			for ignore, channel in choose(kTelemetryChannels, (c) => c.HasProp("Size"))
 				if (!inList(names, channel.Name) && (channel.Channels.Length > 0))
 					channelsListView.Add("", translate(channel.Name))
 

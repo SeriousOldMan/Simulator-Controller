@@ -1333,65 +1333,70 @@ class RaceStrategist extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local split, class, speaker, continuation, only, driver, goodPace
 
-		if ((this.Session = kSessionRace) && this.hasEnoughData(false) && (position != 0) && isInteger(position)) {
-			speaker := this.getSpeaker()
+		try {
+			if ((this.Session = kSessionRace) && this.hasEnoughData(false) && (position != 0) && isInteger(position) && this.Speaker) {
+				speaker := this.getSpeaker()
 
-			speaker.beginTalk()
+				speaker.beginTalk()
 
-			class := (multiClass ? speaker.Fragments["Class"] : "")
+				class := (multiClass ? speaker.Fragments["Class"] : "")
 
-			try {
-				split := Max(1, (cars / 5))
+				try {
+					split := Max(1, (cars / 5))
 
-				if (position <= split)
-					speaker.speakPhrase("GreatRace", {position: position, class: class})
-				else if (position <= (split * 3))
-					speaker.speakPhrase("MediocreRace", {position: position, class: class})
-				else
-					speaker.speakPhrase("CatastrophicRace", {position: position, class: class})
+					if (position <= split)
+						speaker.speakPhrase("GreatRace", {position: position, class: class})
+					else if (position <= (split * 3))
+						speaker.speakPhrase("MediocreRace", {position: position, class: class})
+					else
+						speaker.speakPhrase("CatastrophicRace", {position: position, class: class})
 
-				if (position > 1) {
-					only := ""
+					if (position > 1) {
+						only := ""
 
-					if (driverAvgLapTime < (leaderAvgLapTime * 1.01))
-						only := speaker.Fragments["Only"]
+						if (driverAvgLapTime < (leaderAvgLapTime * 1.01))
+							only := speaker.Fragments["Only"]
 
-					speaker.speakPhrase("Compare2Leader", {relative: only, seconds: speaker.number2Speech(Abs(driverAvgLapTime - leaderAvgLapTime), 1)})
+						speaker.speakPhrase("Compare2Leader", {relative: only, seconds: speaker.number2Speech(Abs(driverAvgLapTime - leaderAvgLapTime), 1)})
 
-					driver := knowledgeBase.getValue("Driver.Car")
+						driver := knowledgeBase.getValue("Driver.Car")
 
-					if (((laps - knowledgeBase.getValue("Car." . driver . ".Valid.Laps", laps)) > (laps * 0.08))
-					 || (knowledgeBase.getValue("Car." . driver . ".Incidents", 0) > (laps * 0.08)))
-						speaker.speakPhrase("InvalidCritics", {conjunction: speaker.Fragments[(only != "") ? "But" : "And"]})
+						if (((laps - knowledgeBase.getValue("Car." . driver . ".Valid.Laps", laps)) > (laps * 0.08))
+						 || (knowledgeBase.getValue("Car." . driver . ".Incidents", 0) > (laps * 0.08)))
+							speaker.speakPhrase("InvalidCritics", {conjunction: speaker.Fragments[(only != "") ? "But" : "And"]})
 
-					if (position <= (cars / 3))
-						speaker.speakPhrase("PositiveSummary")
+						if (position <= (cars / 3))
+							speaker.speakPhrase("PositiveSummary")
 
-					if (driverMinLapTime && driverLapTimeStdDev) {
-						goodPace := false
+						if (driverMinLapTime && driverLapTimeStdDev) {
+							goodPace := false
 
-						if (driverMinLapTime <= (leaderAvgLapTime * 1.005)) {
-							speaker.speakPhrase("GoodPace")
+							if (driverMinLapTime <= (leaderAvgLapTime * 1.005)) {
+								speaker.speakPhrase("GoodPace")
 
-							goodPace := true
+								goodPace := true
+							}
+							else if (driverMinLapTime <= (leaderAvgLapTime * 1.01))
+								speaker.speakPhrase("MediocrePace")
+							else
+								speaker.speakPhrase("BadPace")
+
+							if (driverLapTimeStdDev < (driverAvgLapTime * 0.004))
+								speaker.speakPhrase("GoodConsistency", {conjunction: speaker.Fragments[goodPace ? "And" : "But"]})
+							else if (driverLapTimeStdDev < (driverAvgLapTime * 0.008))
+								speaker.speakPhrase("MediocreConsistency", {conjunction: speaker.Fragments[goodPace ? "But" : "And"]})
+							else
+								speaker.speakPhrase("BadConsistency", {conjunction: speaker.Fragments[goodPace ? "But" : "And"]})
 						}
-						else if (driverMinLapTime <= (leaderAvgLapTime * 1.01))
-							speaker.speakPhrase("MediocrePace")
-						else
-							speaker.speakPhrase("BadPace")
-
-						if (driverLapTimeStdDev < (driverAvgLapTime * 0.004))
-							speaker.speakPhrase("GoodConsistency", {conjunction: speaker.Fragments[goodPace ? "And" : "But"]})
-						else if (driverLapTimeStdDev < (driverAvgLapTime * 0.008))
-							speaker.speakPhrase("MediocreConsistency", {conjunction: speaker.Fragments[goodPace ? "But" : "And"]})
-						else
-							speaker.speakPhrase("BadConsistency", {conjunction: speaker.Fragments[goodPace ? "But" : "And"]})
 					}
 				}
+				finally {
+					speaker.endTalk()
+				}
 			}
-			finally {
-				speaker.endTalk()
-			}
+		}
+		catch Any as exception {
+			logError(exception)
 		}
 
 		continuation := this.Continuation

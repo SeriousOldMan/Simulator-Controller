@@ -765,7 +765,10 @@ class TelemetryViewer {
 									, WidthZoom: getMultiMapValue(configuration, "Zoom", name . ".Width", 100)
 									, HeightZoom: getMultiMapValue(configuration, "Zoom", name . ".Height", 100)
 									, Channels: choose(collect(string2Values(",", definition), (name) {
-														   return choose(kTelemetryChannels, (s) => s.Name = name)[1]
+														   if (name == true)
+															   return true
+														   else
+															   return choose(kTelemetryChannels, (s) => s.Name = name)[1]
 													   })
 													 , (s) => s.HasProp("Size"))}
 				}
@@ -796,7 +799,7 @@ class TelemetryViewer {
 		local name, layout
 
 		for name, layout in this.Layouts {
-			setMultiMapValue(configuration, "Layouts", name, values2String(",", collect(layout.Channels, (s) => s.Name)*))
+			setMultiMapValue(configuration, "Layouts", name, values2String(",", collect(layout.Channels, (s) => ((s == true) ? true : s.Name))*))
 
 			setMultiMapValue(configuration, "Zoom", name . ".Width", layout.WidthZoom)
 			setMultiMapValue(configuration, "Zoom", name . ".Height", layout.HeightZoom)
@@ -3353,13 +3356,17 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 		inputResult := withBlockedWindows(InputBox, translate("Please enter the name of the new layout:"), translate("Telemetry Layouts"), "w300 h120")
 
 		if (inputResult.Result = "Ok") {
+			if layout
+				editLayoutSettings("LayoutSave")
+
 			name := inputResult.Value
 			newName := name
 
 			while layouts.Has(newName)
 				newName := (name . translate(" (") . A_Index . translate(")"))
 
-			layouts[newName] := {Name: newName, WidthZoom: 100, HeightZoom: 100, Channels: [choose(kTelemetryChannels, (s) => s.HasProp("Size"))[1]]}
+			layouts[newName] := {Name: newName, WidthZoom: 100, HeightZoom: 100
+							   , Cluster: 1, Channels: [choose(kTelemetryChannels, (s) => s.HasProp("Size"))[1]]}
 
 			editLayoutSettings("LayoutsLoad", layouts)
 			editLayoutSettings("LayoutLoad", layouts[newName])
@@ -3382,12 +3389,16 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 			while (selected := channelsListView.GetNext(selected, "C")) {
 				name := channelsListView.GetText(selected)
 
-				channels.Push(choose(kTelemetryChannels, (s) => translate(s.Name) = name)[1])
+				if (name = translate("---------------------------------------------"))
+					channels.Push(true)
+				else
+					channels.Push(choose(kTelemetryChannels, (s) => translate(s.Name) = name)[1])
 			}
 
 			layouts[layout.Name] := {Name: layout.Name
 								   , WidthZoom: layoutsGui["zoomWSlider"].Value
 								   , HeightZoom: layoutsGui["zoomHSlider"].Value
+								   , Cluster: layoutsGui["clusterEdit"].Text
 								   , Channels: channels}
 		}
 	}
@@ -3400,6 +3411,7 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 		layout := arguments[1]
 
 		layoutsGui["layoutDropDown"].Choose(inList(getKeys(layouts), layout.Name))
+		layoutsGui["clusterEdit"].Text := (layout.HasProp("Cluster") ? layout.Cluster : 1)
 
 		channelsListView.Delete()
 
@@ -3407,9 +3419,13 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 			names := []
 
 			for ignore, channel in layout.Channels {
-				names.Push(channel.Name)
+				if (channel == true)
+					channelsListView.Add("Check", translate("---------------------------------------------"))
+				else {
+					names.Push(channel.Name)
 
-				channelsListView.Add("Check", translate(channel.Name))
+					channelsListView.Add("Check", translate(channel.Name))
+				}
 			}
 
 			for ignore, channel in choose(kTelemetryChannels, (s) => s.HasProp("Size"))
@@ -3423,6 +3439,7 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 		channelsListView.ModifyCol()
 		channelsListView.ModifyCol(1, "AutoHdr")
 
+		editLayoutSettings("AdjustCluster")
 		editLayoutSettings("UpdateState")
 	}
 	else if (telemetryViewerOrCommand = "LayoutsLoad") {
@@ -3441,11 +3458,50 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 		else
 			editLayoutSettings("UpdateState")
 	}
+	else if (telemetryViewerOrCommand = "AdjustCluster") {
+		currentGroups := 1
+
+		loop channelsListView.GetCount()
+			if (channelsListView.GetText(A_Index) = translate("---------------------------------------------"))
+				currentGroups += 1
+
+		if (layoutsGui["clusterEdit"].Text > currentGroups)
+			loop Max(0, layoutsGui["clusterEdit"].Text - currentGroups)
+				channelsListView.Add("Check", translate("---------------------------------------------"))
+
+		if (layoutsGui["clusterEdit"].Text < currentGroups)
+			loop Max(0, currentGroups - layoutsGui["clusterEdit"].Text)
+				loop channelsListView.GetCount()
+					if (channelsListView.GetText(channelsListView.GetCount() - A_Index + 1) = translate("---------------------------------------------")) {
+						channelsListView.Delete(channelsListView.GetCount() - A_Index + 1)
+
+						break
+					}
+	}
 	else if (telemetryViewerOrCommand = "UpdateState") {
 		if ((layouts.Count <= 1) || !layout)
 			layoutsGui["deleteButton"].Enabled := false
 		else
 			layoutsGui["deleteButton"].Enabled := true
+
+		if layout {
+			layoutsGui["clusterEdit"].Enabled := true
+
+			if (Trim(layoutsGui["clusterEdit"].Text) = "") {
+				layoutsGui["clusterEdit"].Text := 1
+
+				editLayoutSettings("AdjustCluster")
+			}
+		}
+		else {
+			layoutsGui["clusterEdit"].Enabled := false
+
+			layoutsGui["clusterEdit"].Text := ""
+		}
+
+		loop channelsListView.GetCount()
+			if (channelsListView.GetText(A_Index) = translate("---------------------------------------------"))
+				channelsListView.Modify(A_Index, "Check")
 
 		selected := channelsListView.GetNext()
 
@@ -3499,6 +3555,12 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 		setButtonIcon(layoutsGui["newButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
 		layoutsGui.Add("Button", "x243 yp w23 h23 Center +0x200 Disabled vdeleteButton").OnEvent("Click", editLayoutSettings.Bind("LayoutDelete"))
 		setButtonIcon(layoutsGui["deleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+
+		layoutsGui.Add("Text", "x16 yp+26 w80", translate("Cluster"))
+		layoutsGui.Add("Edit", "x98 yp-2 w40 Number Limit1 vclusterEdit", 1)
+		layoutsGui.Add("UpDown", "xp+32 yp-2 w18 h20 Range1-4", 1)
+
+		layoutsGui["clusterEdit"].OnEvent("Change", (*) => editLayoutSettings("AdjustCluster"))
 
 		channelsListView := layoutsGui.Add("ListView", "x16 yp+30 w284 h300 AltSubmit -Multi -LV0x10 Checked NoSort NoSortHdr", collect(["Channel"], translate))
 		channelsListView.OnEvent("Click", editLayoutSettings.Bind("ChannelSelect"))

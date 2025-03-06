@@ -1776,7 +1776,7 @@ updateInstallationForV500() {
 }
 
 updateConfigurationForV622() {
-	local appSettings, issueSettings
+	local appSettings, issueSettings, text
 
 	if FileExist(kUserConfigDirectory . "Application Settings.ini") {
 		appSettings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
@@ -1788,6 +1788,18 @@ updateConfigurationForV622() {
 
 		writeMultiMap(kUserConfigDirectory . "Application Settings.ini", appSettings)
 		writeMultiMap(kUserConfigDirectory . "Issue Collector.ini", issueSettings)
+	}
+
+	if FileExist(kUserConfigDirectory . "Startup.settings") {
+		text := FileRead(kUserConfigDirectory . "Startup.settings")
+
+		if InStr(text, "Telemetry Collection") {
+			text := StrReplace(text, "Telemetry Collection", "Data Collection")
+
+			deleteFile(kUserConfigDirectory . "Startup.settings")
+
+			FileAppend(text, kUserConfigDirectory . "Startup.settings")
+		}
 	}
 }
 

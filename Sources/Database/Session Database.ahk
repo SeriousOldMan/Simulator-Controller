@@ -925,6 +925,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			editor.deleteTelemetry(editor.TelemetryListView.GetText(editor.TelemetryListView.GetNext(0), 2))
 		}
 
+		copyTelemetry(*) {
+			A_Clipboard := editor.TelemetryListView.GetText(editor.TelemetryListView.GetNext(0), 2)
+
+			showMessage(translate("Telemetry name copied to the clipboard."))
+		}
+
 		navStrategy(listView, line, selected) {
 			if selected
 				chooseStrategy(listView, line)
@@ -1741,14 +1747,16 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.iTelemetryListView.OnEvent("DoubleClick", openTelemetry)
 		this.iTelemetryListView.OnEvent("ItemSelect", navTelemetry)
 
-		editorGui.Add("Button", "xp+260 yp+440 w23 h23 X:Move Y:Move vuploadTelemetryButton").OnEvent("Click", uploadTelemetry)
+		editorGui.Add("Button", "xp+235 yp+440 w23 h23 X:Move Y:Move vuploadTelemetryButton").OnEvent("Click", uploadTelemetry)
 		editorGui.Add("Button", "xp+25 yp w23 h23 X:Move Y:Move vdownloadTelemetryButton").OnEvent("Click", downloadTelemetry)
 		editorGui.Add("Button", "xp+25 yp w23 h23 X:Move Y:Move vrenameTelemetryButton").OnEvent("Click", renameTelemetry)
 		editorGui.Add("Button", "xp+25 yp w23 h23 X:Move Y:Move vdeleteTelemetryButton").OnEvent("Click", deleteTelemetry)
+		editorGui.Add("Button", "xp+25 yp w23 h23 X:Move Y:Move vcopyTelemetryButton").OnEvent("Click", copyTelemetry)
 		setButtonIcon(editorGui["uploadTelemetryButton"], kIconsDirectory . "Upload.ico", 1)
 		setButtonIcon(editorGui["downloadTelemetryButton"], kIconsDirectory . "Download.ico", 1)
 		setButtonIcon(editorGui["renameTelemetryButton"], kIconsDirectory . "Pencil.ico", 1)
 		setButtonIcon(editorGui["deleteTelemetryButton"], kIconsDirectory . "Minus.ico", 1)
+		setButtonIcon(editorGui["copyTelemetryButton"], kIconsDirectory . "Copy.ico", 1)
 
 		editorGui.Add("Text", "x296 yp w80 h23 X:Move(0.2) Y:Move +0x200", translate("Share"))
 		editorGui.Add("CheckBox", "xp+90 yp+4 w140 X:Move(0.2) Y:Move vshareTelemetryWithCommunityCheck", translate("with Community")).OnEvent("Click", updateTelemetryAccess)
@@ -2382,6 +2390,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			name := this.TelemetryListView.GetText(selected, 2)
 
 			window["downloadTelemetryButton"].Enabled := true
+			window["copyTelemetryButton"].Enabled := true
 
 			if (type != translate("Community")) {
 				info := this.SessionDatabase.readTelemetryInfo(simulator, car, track, name)
@@ -2415,6 +2424,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		else {
 			window["downloadTelemetryButton"].Enabled := false
 			window["deleteTelemetryButton"].Enabled := false
+			window["copyTelemetryButton"].Enabled := false
 			window["renameTelemetryButton"].Enabled := false
 			window["shareTelemetryWithCommunityCheck"].Enabled := false
 			window["shareTelemetryWithTeamServerCheck"].Enabled := false
@@ -6559,12 +6569,12 @@ selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner :
 
 		importSettingsGui.SetFont("s8 Norm", "Arial")
 
-		importSettingsGui.Add("Text", "x8 yp+30 w410 X:Move(0.2) W:Grow(0.8) 0x10")
+		importSettingsGui.Add("Text", "x8 yp+30 w410 W:Grow 0x10")
 
 		importSelectCheck := importSettingsGui.Add("CheckBox", "Check3 x16 yp+12 w15 h21 vimportSelectCheck")
 		importSelectCheck.OnEvent("Click", selectAllImportEntries)
 
-		importListView := importSettingsGui.Add("ListView", "x34 yp-2 w375 h400 H:Grow X:Move(0.2) W:Grow(0.8) -Multi -LV0x10 Checked AltSubmit", collect(["Car", "Track", "Weather", "Setting", "Value"], translate))
+		importListView := importSettingsGui.Add("ListView", "x34 yp-2 w375 h400 H:Grow W:Grow -Multi -LV0x10 Checked AltSubmit", collect(["Car", "Track", "Weather", "Setting", "Value"], translate))
 		importListView.OnEvent("Click", noSelect)
 		importListView.OnEvent("DoubleClick", noSelect)
 		importListView.OnEvent("ItemCheck", selectImportEntry)
@@ -6634,7 +6644,7 @@ selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner :
 
 		importSettingsGui.SetFont("s8 Norm", "Arial")
 
-		importSettingsGui.Add("Text", "x8 yp+410 w410 X:Move(0.2) W:Grow(0.8) Y:Move 0x10")
+		importSettingsGui.Add("Text", "x8 yp+410 w410 W:Grow Y:Move 0x10")
 
 		importSettingsGui.Add("Button", "x123 yp+10 w80 h23 Y:Move X:Move(0.5) Default", translate("Ok")).OnEvent("Click", selectImportSettings.Bind(kOk))
 		importSettingsGui.Add("Button", "x226 yp w80 h23 Y:Move X:Move(0.5)", translate("&Cancel")).OnEvent("Click", selectImportSettings.Bind(kCancel))
@@ -6737,12 +6747,12 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 
 		importDataGui.SetFont("s8 Norm", "Arial")
 
-		importDataGui.Add("Text", "x8 yp+30 w410 X:Move(0.2) W:Grow(0.8) 0x10")
+		importDataGui.Add("Text", "x8 yp+30 w410 W:Grow 0x10")
 
 		importSelectCheck := importDataGui.Add("CheckBox", "Check3 x16 yp+12 w15 h21 vimportSelectCheck")
 		importSelectCheck.OnEvent("Click", selectAllImportEntries)
 
-		importListView := importDataGui.Add("ListView", "x34 yp-2 w375 h400 H:Grow X:Move(0.2) W:Grow(0.8) -Multi -LV0x10 Checked AltSubmit", collect(["Type", "Car / Track", "Driver", "#"], translate))
+		importListView := importDataGui.Add("ListView", "x34 yp-2 w375 h400 H:Grow W:Grow -Multi -LV0x10 Checked AltSubmit", collect(["Type", "Car / Track", "Driver", "#"], translate))
 		importListView.OnEvent("Click", noSelect)
 		importListView.OnEvent("DoubleClick", noSelect)
 		importListView.OnEvent("ItemCheck", selectImportEntry)
@@ -6906,7 +6916,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 
 		importDataGui.SetFont("s8 Norm", "Arial")
 
-		importDataGui.Add("Text", "x8 yp+410 w410 X:Move(0.2) W:Grow(0.8) Y:Move 0x10")
+		importDataGui.Add("Text", "x8 yp+410 w410 W:Grow Y:Move 0x10")
 
 		importDataGui.Add("Button", "x123 yp+10 w80 h23 Y:Move X:Move(0.5) Default", translate("Ok")).OnEvent("Click", selectImportData.Bind(kOk))
 		importDataGui.Add("Button", "x226 yp w80 h23 Y:Move X:Move(0.5)", translate("&Cancel")).OnEvent("Click", selectImportData.Bind(kCancel))
@@ -7408,10 +7418,10 @@ editSettings(editorOrCommand, arguments*) {
 		settingsEditorGui.Add("Text", "x24 yp+16 w117 h23 +0x200", translate("Synchronization"))
 		synchTelemetryCheck := settingsEditorGui.Add("CheckBox", "x146 yp+2 w120 h21", translate("Laps"))
 		synchTelemetryCheck.OnEvent("Click", editSettings.Bind("UpdateState"))
-		synchStrategiesCheck := settingsEditorGui.Add("CheckBox", "x266 yp w120 h21", translate("Strategies"))
-		synchStrategiesCheck.OnEvent("Click", editSettings.Bind("UpdateState"))
-		synchPressuresCheck := settingsEditorGui.Add("CheckBox", "x146 yp+24 w120 h21", translate("Pressures"))
+		synchPressuresCheck := settingsEditorGui.Add("CheckBox", "x266 yp w120 h21", translate("Pressures"))
 		synchPressuresCheck.OnEvent("Click", editSettings.Bind("UpdateState"))
+		synchStrategiesCheck := settingsEditorGui.Add("CheckBox", "x146 yp+24 w120 h21", translate("Strategies"))
+		synchStrategiesCheck.OnEvent("Click", editSettings.Bind("UpdateState"))
 		synchSetupsCheck := settingsEditorGui.Add("CheckBox", "x266 yp w120 h21", translate("Setups"))
 		synchSetupsCheck.OnEvent("Click", editSettings.Bind("UpdateState"))
 		synchSessionsCheck := settingsEditorGui.Add("CheckBox", "x146 yp+24 w120 h21", translate("Sessions"))

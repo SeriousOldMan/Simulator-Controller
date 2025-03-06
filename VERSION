@@ -1,9 +1,9 @@
 [Development]
-Version=6.2.2.0-release
-Target=6.2.2.0-release
-Date=03/07/2025
-Download=https://cutt.ly/rryaJOEw;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/naiPciw5;https://www.dropbox.com/scl/fi/ybrz3lbd3g77p11vb0dsh/Simulator-Controller-6.2.2.0-release.zip?rlkey=xpwtd3y0snu47ymvafye0fbhj&st=rtpdbphu&dl=1;http://87.177.159.148:800/api/public/dl/bhp84xjs;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.2.2.0-release.zip
-Changes=Use rephrasing booster also for split talking, Updated Rephrasing booster instructions, Chat mode support for rFactor 2 and Le Mans Ultimate, Use Second Monitor as real time telemetry provider, Telemetry provider setting for Driving Coach, Choose telemetry provider in Team Center, Choose telemetry provider in Telemetry Viewer, First part of portoguese translations, Use local temp folder for installation packages, Private session function in Startup Profiles, Updated R3E car meta data, Interpolate missing telemetry values, Saving sesssion in "Solo Center" with session type, Fixed track automation for LMU and rF2, Fixed rF2 and LMU driver name parsing, Renamed "Laps" to "Telemetries" in "Session Database", Fixed layout saving in "Telemetry Viewer"
+Version=6.2.3.0-dev
+Target=6.2.3.0-release
+Date=03/06/2025
+Download=
+Changes=Support clustering of telemetry channels in Telemetry Viewer
 Components=Media->5.6.1,Configuration->6.2.2,Utilities->6.2.2
 [Release]
 Version=6.2.2.0-release
@@ -22,7 +22,7 @@ Utilities.6.2.2.Path=.
 Utilities.6.2.2.Content=Utilities
 Utilities.6.2.2.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Cn-Rmw_8;https://www.dropbox.com/scl/fi/lgc20h3afx2msjcarh9hi/Utilities-6.2.2.zip?rlkey=4aff0vxge03ghdr2umlhd1ex9&st=plp4tedq&dl=1;http://87.177.159.148:800/api/public/dl/UUVNodWq;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.2.2.zip
 [Current]
-Type=Release
+Type=Development
 [Version]
-Development=6.2.2.0-release
+Development=6.2.3.0-dev
 Release=6.2.2.0-release

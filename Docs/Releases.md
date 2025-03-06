@@ -27,7 +27,16 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 # Upcoming release
 
-Not yet planned...
+## 6.2.2.0-release 03/14/25 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates here and there, as always
+  3. The layouting system of the Telemetry Viewer now supports grouping of channels into separate clusters. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetry-viewer) for more information.
+  4. Engine water and oil temperatures have been added to the internal data system and is acquired from all simulators, which support this information.
+     - Issues and corresponding setup settings have been added to the "Setup Workbench" for engine water and oil temperatures.
+     - The issue analyzer in the "Setup Workbench" let you define thresholds for these temperatures which in turn creates issues for the setup development.
+	 - The engine temperatures have beend added to various reports in "Solo Center" and "Team Center".
+	 - A new voice command for the Race Engineer lets you ask for the current engine temperatures.
+	 - A new information action "EngineTemperatures" for the ["Race Engineer"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin can be used to achieve the same result.
 
 # Release history
 

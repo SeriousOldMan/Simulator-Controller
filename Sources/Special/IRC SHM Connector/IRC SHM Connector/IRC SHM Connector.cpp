@@ -1037,8 +1037,11 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 				std::to_string(getTyreWear(header, sessionInfo, data, "LRwearL", "LRwearM", "LRwearR")) + "," +
 				std::to_string(getTyreWear(header, sessionInfo, data, "RRwearL", "RRwearM", "RRwearR")));
 
-			printLine(output, "WaterTemperature=" + std::to_string((int)getDataFloat(header, data, "WaterTemp")));
-			printLine(output, "OilTemperature=" + std::to_string((int)getDataFloat(header, data, "OilTemp")));
+			if ((int)getDataFloat(header, data, "WaterTemp"))
+				printLine(output, "WaterTemperature=" + std::to_string((int)getDataFloat(header, data, "WaterTemp")));
+
+			if ((int)getDataFloat(header, data, "OilTemp"))
+				printLine(output, "OilTemperature=" + std::to_string((int)getDataFloat(header, data, "OilTemp")));
 
 			printLine(output, "[Stint Data]");
 

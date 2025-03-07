@@ -413,8 +413,11 @@ namespace SHMConnector {
 				strWriter.WriteLine("SuspensionDamage=0, 0, 0, 0");
 				strWriter.WriteLine("EngineDamage=0");
 
-                strWriter.WriteLine("WaterTemperature=" + playerTelemetry.mEngineWaterTemp);
-                strWriter.WriteLine("OilTemperature=" + playerTelemetry.mEngineOilTemp);
+				if (playerTelemetry.mEngineWaterTemp > 0)
+                    strWriter.WriteLine("WaterTemperature=" + playerTelemetry.mEngineWaterTemp);
+
+                if (playerTelemetry.mEngineOilTemp > 0)
+                    strWriter.WriteLine("OilTemperature=" + playerTelemetry.mEngineOilTemp);
             }
 
 			strWriter.WriteLine("[Track Data]");

@@ -388,8 +388,11 @@ namespace RF2SHMProvider {
 				Console.WriteLine("SuspensionDamage=0, 0, 0, 0");
 				Console.WriteLine("EngineDamage=0");
 
-                Console.WriteLine("WaterTemperature=" + playerTelemetry.mEngineWaterTemp);
-                Console.WriteLine("OilTemperature=" + playerTelemetry.mEngineOilTemp);
+				if (playerTelemetry.mEngineWaterTemp > 0)
+					Console.WriteLine("WaterTemperature=" + playerTelemetry.mEngineWaterTemp);
+
+				if (playerTelemetry.mEngineOilTemp > 0)
+                    Console.WriteLine("OilTemperature=" + playerTelemetry.mEngineOilTemp);
             }
 
 			Console.WriteLine("[Track Data]");

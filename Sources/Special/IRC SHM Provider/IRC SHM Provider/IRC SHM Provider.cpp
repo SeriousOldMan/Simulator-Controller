@@ -1070,9 +1070,11 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 				getTyreWear(header, sessionInfo, data, "LRwearL", "LRwearM", "LRwearR"),
 				getTyreWear(header, sessionInfo, data, "RRwearL", "RRwearM", "RRwearR"));
 
+			if ((int)getDataFloat(header, data, "WaterTemp"))
+				printf("WaterTemperature=%d\n", (int)getDataFloat(header, data, "WaterTemp"));
 
-			printf("WaterTemperature=%d\n", (int)getDataFloat(header, data, "WaterTemp"));
-			printf("OilTemperature=%d\n", (int)getDataFloat(header, data, "OilTemp"));
+			if ((int)getDataFloat(header, data, "OilTemp"))
+				printf("OilTemperature=%d\n", (int)getDataFloat(header, data, "OilTemp"));
 
 			printf("[Stint Data]\n");
 

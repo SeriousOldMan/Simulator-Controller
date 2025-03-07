@@ -394,8 +394,11 @@ int main(int argc, char* argv[])
 			else
 				wprintf_s(L"BrakeTemperature=0,0,0,0\n");
 
-			wprintf_s(L"WaterTemperature=%d\n", (int)map_buffer->engine_water_temp);
-			wprintf_s(L"OilTemperature=%d\n", (int)map_buffer->engine_oil_temp);
+			if ((int)map_buffer->engine_water_temp)
+				wprintf_s(L"WaterTemperature=%d\n", (int)map_buffer->engine_water_temp);
+
+			if ((int)map_buffer->engine_oil_temp)
+				wprintf_s(L"OilTemperature=%d\n", (int)map_buffer->engine_oil_temp);
 		}
 
 		wprintf_s(L"[Stint Data]\n");

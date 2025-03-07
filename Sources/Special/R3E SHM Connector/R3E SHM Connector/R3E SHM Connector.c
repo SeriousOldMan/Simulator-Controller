@@ -461,6 +461,16 @@ extern __declspec(dllexport) int __stdcall call(char* request, char* result, int
 			else
 				writeString(result, "BrakeTemperature=0,0,0,0\n", &pos);
 
+			if ((int)map_buffer->engine_water_temp) {
+				writeString(result, "WaterTemperature=", &pos);
+				writeInt(result, (int)map_buffer->engine_water_temp, &pos); writeLine(result, &pos);
+			}
+
+			if ((int)map_buffer->engine_oil_temp) {
+				writeString(result, "OilTemperature=", &pos);
+				writeInt(result, (int)map_buffer->engine_oil_temp, &pos); writeLine(result, &pos);
+			}
+
 			writeString(result, "WaterTemperature=", &pos);
 			writeInt(result, (int)map_buffer->engine_water_temp, &pos); writeLine(result, &pos);
 

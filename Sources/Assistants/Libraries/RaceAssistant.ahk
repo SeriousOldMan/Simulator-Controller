@@ -2372,7 +2372,7 @@ class RaceAssistant extends ConfigurationItem {
 		oilTemperature := getMultiMapValue(data, "Car Data", "OilTemperature", kUndefined)
 
 		if (oilTemperature != kUndefined)
-			knowledgeBase.addFact("Lap." . lapNumber . ".Engine.Temperature.Water", oilTemperature)
+			knowledgeBase.addFact("Lap." . lapNumber . ".Engine.Temperature.Oil", oilTemperature)
 
 		knowledgeBase.addFact("Lap." . lapNumber . ".Weather", weatherNow)
 		knowledgeBase.addFact("Lap." . lapNumber . ".Weather.10Min", weather10Min)

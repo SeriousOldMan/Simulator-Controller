@@ -6840,6 +6840,9 @@ class TeamCenter extends ConfigurationItem {
 				lap.FuelConsumption := ((fuelConsumption > 0) ? Round(fuelConsumption, 2) : "-")
 			}
 
+			lap.WaterTemperature := getMultiMapValue(data, "Car Data", "WaterTemperature", kNull)
+			lap.OilTemperature := getMultiMapValue(data, "Car Data", "OilTemperature", kNull)
+
 			if (stint.Laps.Length == 0)
 				lap.LapTime := kNull
 			else

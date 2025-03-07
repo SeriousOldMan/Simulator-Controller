@@ -2407,7 +2407,7 @@ class RaceAssistant extends ConfigurationItem {
 
 	updateLap(lapNumber, &data, dump := true, lapValid := kUndefined, lapPenalty := kUndefined) {
 		local knowledgeBase := this.KnowledgeBase
-		local result
+		local result, newValue
 
 		if (lapNumber > this.LastLap)
 			this.updateDynamicValues({EnoughData: false})
@@ -2428,6 +2428,16 @@ class RaceAssistant extends ConfigurationItem {
 
 		knowledgeBase.setFact("InPitLane", getMultiMapValue(data, "Stint Data", "InPitLane", false))
 		knowledgeBase.setFact("InPit", getMultiMapValue(data, "Stint Data", "InPit", false))
+
+		newValue := getMultiMapValue(data, "Car Data", "WaterTemperature", kUndefined)
+
+		if isNumber(newValue)
+			knowledgeBase.setFact("Lap." . lapNumber . ".Engine.Temperature.Water", Round(newValue, 1))
+
+		newValue := getMultiMapValue(data, "Car Data", "OilTemperature", kUndefined)
+
+		if isNumber(newValue)
+			knowledgeBase.setFact("Lap." . lapNumber . ".Engine.Temperature.Oil", Round(newValue, 1))
 
 		knowledgeBase.setFact("Update", true)
 

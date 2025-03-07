@@ -254,7 +254,9 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 			logError(exception)
 		}
 
-		ftpUpload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", kTempDirectory . "Shared Database\Database." . id . ".zip", "htdocs/simulator-controller/database-uploads/Database." . id . ".zip")
+		; ftpUpload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", kTempDirectory . "Shared Database\Database." . id . ".zip", "htdocs/simulator-controller/database-uploads/Database." . id . ".zip")
+
+		ftpUpload("87.177.159.148", "SimulatorController", "Sc-1234567890-Sc", kTempDirectory . "Shared Database\Database." . id . ".zip", "Database-Uploads/Database." . id . ".zip")
 
 		deleteDirectory(kTempDirectory . "Shared Database")
 		deleteFile(sessionDBPath . "UPLOAD")
@@ -309,14 +311,16 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 
 		updateState()
 
-		for ignore, fileName in ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads") {
+		for ignore, fileName in ftpListFiles("87.177.159.148", "SimulatorController", "Sc-1234567890-Sc", "Database-Downloads") { ; ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads") {
 			SplitPath(fileName, , , , &databaseDirectory)
 
 			type := StrSplit(Trim(fileName), ".", "", 2)[1]
 
 			if (type = (downloadPressures . downloadSetups . downloadStrategies . downloadTelemetries)) {
 				if (SessionDatabase.DatabaseVersion != databaseDirectory) {
-					ftpDownload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads/" . fileName, kTempDirectory . fileName)
+					; ftpDownload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads/" . fileName, kTempDirectory . fileName)
+
+					ftpDownload("87.177.159.148", "SimulatorController", "Sc-1234567890-Sc", "Database-Downloads/" . fileName, kTempDirectory . fileName)
 
 					updateState()
 

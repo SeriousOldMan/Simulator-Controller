@@ -2769,6 +2769,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		loop 3
 			this.SessionListView.ModifyCol(A_Index, "AutoHdr")
 
+		WinRedraw(window)
+
 		if select
 			this.selectSession(select)
 		else
@@ -2776,9 +2778,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	loadTelemetries(select := false) {
-		local window, userTelemetries, communityTelemetries, ignore, name, info, origin
-
-		window := this.Window
+		local window := this.Window
+		local userTelemetries, communityTelemetries, ignore, name, info, origin
 
 		this.TelemetryListView.Delete()
 
@@ -2819,6 +2820,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		loop 2
 			this.TelemetryListView.ModifyCol(A_Index, "AutoHdr")
+
+		WinRedraw(window)
 
 		if isNumber(select)
 			this.selectTelemetry(select)
@@ -2870,6 +2873,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		loop 2
 			this.StrategyListView.ModifyCol(A_Index, "AutoHdr")
 
+		WinRedraw(window)
+
 		if isNumber(select)
 			this.selectStrategy(select)
 		else
@@ -2877,11 +2882,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	loadSetups(setupType, force := false, select := false) {
-		local window, userSetups, communitySetups, ignore, name, info, origin
+		local window := this.Window
+		local userSetups, communitySetups, ignore, name, info, origin
 
 		if (force || (setupType != this.SelectedSetupType)) {
-			window := this.Window
-
 			this.SetupListView.Delete()
 
 			this.iSelectedSetupType := setupType
@@ -2927,6 +2931,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			loop 2
 				this.SetupListView.ModifyCol(A_Index, "AutoHdr")
+
+			WinRedraw(window)
 
 			if isNumber(select)
 				this.selectSetup(select)
@@ -3122,6 +3128,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		loop 3
 			this.SettingsListView.ModifyCol(A_Index, "AutoHdr")
+
+		WinRedraw(window)
 
 		this.updateState()
 	}

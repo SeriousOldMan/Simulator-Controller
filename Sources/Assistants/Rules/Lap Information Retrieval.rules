@@ -169,7 +169,8 @@ clearLap(?lap) <= Append(Lap., ?lap, .Driver.Forname, ?fact), fact?(?fact), !,
 								  Damage.Bodywork, Damage.Bodywork.Center, Damage.Bodywork.Front, Damage.Bodywork.Rear,
 								  Damage.Bodywork.Left, Damage.Bodywork.Right,
 								  Damage.Suspension, Damage.Suspension.FL, Damage.Suspension.FR, Damage.Suspension.RL, Damage.Suspension.RR,
-								  Damage.Engine, Penalty, Warnings])
+								  Damage.Engine, Penalty, Warnings,
+								  Engine.Temperature.Water, Engine.Temperature.Oil])
 clearLap(?)
 
 clearLap(?, []) <= !

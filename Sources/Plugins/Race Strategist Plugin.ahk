@@ -33,7 +33,8 @@ global kRaceStrategistPlugin := "Race Strategist"
 class RaceStrategistPlugin extends RaceAssistantPlugin {
 	static kLapDataSchemas := CaseInsenseMap("Telemetry", ["Lap", "Simulator", "Car", "Track", "Weather", "Temperature.Air", "Temperature.Track"
 														 , "Fuel.Consumption", "Fuel.Remaining", "LapTime", "Pitstop", "Map", "TC", "ABS"
-														 , "Compound", "Compound.Color", "Pressures", "Temperatures", "Wear", "State"])
+														 , "Compound", "Compound.Color", "Pressures", "Temperatures", "Wear", "State"
+														 , "Engine.Temperature.Water", "Engine.Temperature.Oil"])
 
 	iRaceStrategist := false
 
@@ -336,7 +337,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 
 	saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 					, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
-					, compound, compoundColor, pressures, temperatures, wear, lapState) {
+					, compound, compoundColor, pressures, temperatures, wear, lapState
+					, waterTemperature, oilTemperature) {
 		local teamServer := this.TeamServer
 		local pid
 
@@ -347,7 +349,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 			teamServer.setLapValue(lapNumber, this.Plugin . " Telemetry"
 								 , values2String(";", simulator, car, track, weather, airTemperature, trackTemperature
 												    , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
-												    , compound, compoundColor, pressures, temperatures, wear, createGUID(), createGUID(), lapState))
+												    , compound, compoundColor, pressures, temperatures, wear, createGUID(), createGUID(), lapState
+													, waterTemperature, oilTemperature))
 		else {
 			pid := ProcessExist("Solo Center.exe")
 
@@ -357,7 +360,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 																							   , fuelConsumption, fuelRemaining, lapTime, pitstop
 																							   , map, tc, abs
 																							   , compound, compoundColor, pressures, temperatures
-																							   , wear, lapState)
+																							   , wear, lapState, waterTemperature, oilTemperature)
 										, pid)
 
 			this.LapDatabase.add("Telemetry", Database.Row("Lap", lapNumber, "Simulator", simulator, "Car", car, "Track", track
@@ -365,7 +368,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 														 , "Fuel.Consumption", fuelConsumption, "Fuel.Remaining", fuelRemaining, "LapTime", lapTime
 														 , "Pitstop", pitstop, "Map", map, "TC", tc, "ABS", abs
 														 , "Compound", compound, "Compound.Color", compoundColor
-														 , "Pressures", pressures, "Temperatures", temperatures, "Wear", wear, "State", lapState))
+														 , "Pressures", pressures, "Temperatures", temperatures, "Wear", wear, "State", lapState
+														 , "Engine.Temperature.Water", "Engine.Temperature.Oil"))
 		}
 	}
 

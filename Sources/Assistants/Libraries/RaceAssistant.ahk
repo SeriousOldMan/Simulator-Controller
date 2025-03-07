@@ -2364,6 +2364,16 @@ class RaceAssistant extends ConfigurationItem {
 			knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Wear.RR", Round(brakeWear[4], 1))
 		}
 
+		waterTemperature := getMultiMapValue(data, "Car Data", "WaterTemperature", kUndefined)
+
+		if (waterTemperature != kUndefined)
+			knowledgeBase.addFact("Lap." . lapNumber . ".Engine.Temperature.Water", waterTemperature)
+
+		oilTemperature := getMultiMapValue(data, "Car Data", "OilTemperature", kUndefined)
+
+		if (oilTemperature != kUndefined)
+			knowledgeBase.addFact("Lap." . lapNumber . ".Engine.Temperature.Water", oilTemperature)
+
 		knowledgeBase.addFact("Lap." . lapNumber . ".Weather", weatherNow)
 		knowledgeBase.addFact("Lap." . lapNumber . ".Weather.10Min", weather10Min)
 		knowledgeBase.addFact("Lap." . lapNumber . ".Weather.30Min", weather30Min)

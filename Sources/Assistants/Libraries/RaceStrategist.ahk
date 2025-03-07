@@ -1940,7 +1940,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local knowledgeBase, compound, result, lap, simulator, car, track, frequency, curContinuation
 		local pitstop, prefix, validLap, lapState, weather, airTemperature, trackTemperature, compound, compoundColor
 		local fuelConsumption, fuelRemaining, lapTime, map, tc, antiBS, pressures, temperatures, wear, multiClass
-		local sessionInfo, driverCar, driverID, lastTime
+		local sessionInfo, driverCar, driverID, lastTime, waterTemperature, oilTemperature
 
 		static lastLap := 0
 
@@ -2095,10 +2095,14 @@ class RaceStrategist extends GridRaceAssistant {
 					   , Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.FR"))
 					   , Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.RL"))
 					   , Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.RR"))]
+			
+			waterTemperature := knowledgeBase.getValue(prefix . ".Engine.Temperature.Water", kNull)
+			oilTemperature := knowledgeBase.getValue(prefix . ".Engine.Temperature.Oil", kNull)
 
 			this.saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 								 , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, antiBS
-								 , compound, compoundColor, pressures, temperatures, wear, lapState)
+								 , compound, compoundColor, pressures, temperatures, wear, lapState
+								 , waterTemperature, oilTemperature)
 		}
 
 		if this.Strategy {
@@ -4377,7 +4381,8 @@ class RaceStrategist extends GridRaceAssistant {
 
 	saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 					, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
-					, compound, compoundColor, pressures, temperatures, wear, lapState) {
+					, compound, compoundColor, pressures, temperatures, wear, lapState
+					, waterTemperature, oilTemperature) {
 		local knowledgeBase := this.KnowledgeBase
 		local telemetryDB := this.TelemetryDatabase
 		local tyreLaps, lastPitstop
@@ -4411,7 +4416,7 @@ class RaceStrategist extends GridRaceAssistant {
 											   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
 											   , compound, compoundColor, values2String(",", pressures*), values2String(",", temperatures*)
 											   , wear ? values2String(",", wear*) : false
-											   , lapState)
+											   , lapState, waterTemperature, oilTemperature)
 		}
 	}
 

@@ -94,7 +94,8 @@ global kSessionDataSchemas := CaseInsenseMap("Stint.Data", ["Nr", "Lap", "Driver
 														, "Tyre.Pressure.Loss.Front.Left", "Tyre.Pressure.Loss.Front.Right"
 														, "Tyre.Pressure.Loss.Rear.Left", "Tyre.Pressure.Loss.Rear.Right"
 														, "Penalty", "Time.Stint.Remaining", "Time.Driver.Remaining"
-														, "Lap.State", "Lap.Valid", "Sectors.Time"]
+														, "Lap.State", "Lap.Valid", "Sectors.Time"
+														, "Engine.Temperature.Water", "Engine.Temperature.Oil"]
 										   , "Pitstop.Data", ["Lap", "Fuel", "Tyre.Compound", "Tyre.Compound.Color", "Tyre.Set"
 															, "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right"
 															, "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
@@ -7615,7 +7616,9 @@ class TeamCenter extends ConfigurationItem {
 														  , getMultiMapValue(telemetry, "Car Data", "TyreTemperature", ",,,")
 														  , getMultiMapValue(telemetry, "Car Data", "TyreWear", "null,null,null,null")
 														  , false, false
-														  , "Unknown")
+														  , "Unknown"
+														  , getMultiMapValue(telemetry, "Car Data", "WaterTemperature", kNull)
+														  , getMultiMapValue(telemetry, "Car Data", "OilTemperature", kNull))
 					}
 					else
 						telemetryData := values2String(";", "-", "-", "-", "-", "-", "-", "-", "-", "-", wasPitstop(lap), "n/a", "n/a", "n/a", "-", "-", ",,,", ",,,", "null,null,null,null", false, false, "Unknown")
@@ -7669,6 +7672,11 @@ class TeamCenter extends ConfigurationItem {
 				if (telemetryData.Length > 20) {
 					theLap.State := telemetryData[21]
 					theLap.Valid := (theLap.State != "Invalid")
+				}
+
+				if (telemetryData.Length > 21) {
+					theLap.WaterTemperature := telemetryData[22]
+					theLap.OilTemperature := telemetryData[23]
 				}
 
 				row := theLap.Row
@@ -9457,7 +9465,9 @@ class TeamCenter extends ConfigurationItem {
 					 , Accident: lap["Accident"], Penalty: ((lap["Penalty"] != kNull) ? lap["Penalty"] : false)
 					 , Compound: compound(lap["Tyre.Compound"], lap["Tyre.Compound.Color"])
 					 , RemainingDriverTime: lap["Time.Driver.Remaining"], RemainingStintTime: lap["Time.Stint.Remaining"]
-					 , Telemetry: false}
+					 , Telemetry: false
+					 , WaterTemperature: lap.HasOwnProp("WaterTemperature") ? lap.WaterTemperature : kNull
+					 , OilTemperature: lap.HasOwnProp("OilTemperature") ? lap.OilTemperature : kNull}
 
 			if isNull(newLap.State)
 				newLap.State := "Valid"
@@ -10980,7 +10990,8 @@ class TeamCenter extends ConfigurationItem {
 							, "Brake.Temperature.Average", "Brake.Temperature.Front.Average", "Brake.Temperature.Rear.Average"
 							, "Brake.Temperature.Front.Left", "Brake.Temperature.Front.Right", "Brake.Temperature.Rear.Left", "Brake.Temperature.Rear.Right"
 							, "Brake.Wear.Average", "Brake.Wear.Front.Average", "Brake.Wear.Rear.Average"
-							, "Brake.Wear.Front.Left", "Brake.Wear.Front.Right", "Brake.Wear.Rear.Left", "Brake.Wear.Rear.Right"]
+							, "Brake.Wear.Front.Left", "Brake.Wear.Front.Right", "Brake.Wear.Rear.Left", "Brake.Wear.Rear.Right"
+							, "Engine.Temperature.Water", "Engine.Temperature.Oil"]
 
 				y2Choices := y1Choices
 				y3Choices := y1Choices
@@ -11003,7 +11014,8 @@ class TeamCenter extends ConfigurationItem {
 							, "Brake.Temperature.Average", "Brake.Temperature.Front.Average", "Brake.Temperature.Rear.Average"
 							, "Brake.Temperature.Front.Left", "Brake.Temperature.Front.Right", "Brake.Temperature.Rear.Left", "Brake.Temperature.Rear.Right"
 							, "Brake.Wear.Average", "Brake.Wear.Front.Average", "Brake.Wear.Rear.Average"
-							, "Brake.Wear.Front.Left", "Brake.Wear.Front.Right", "Brake.Wear.Rear.Left", "Brake.Wear.Rear.Right"]
+							, "Brake.Wear.Front.Left", "Brake.Wear.Front.Right", "Brake.Wear.Rear.Left", "Brake.Wear.Rear.Right"
+							, "Engine.Temperature.Water", "Engine.Temperature.Oil"]
 
 				y2Choices := y1Choices
 				y3Choices := y1Choices
@@ -11217,7 +11229,9 @@ class TeamCenter extends ConfigurationItem {
 										  , "Weather", lap.Weather, "Temperature.Air", null(lap.AirTemperature), "Temperature.Track", null(lap.TrackTemperature)
 										  , "Grip", lap.Grip, "Map", null(lap.Map), "TC", null(lap.TC), "ABS", null(lap.ABS)
 										  , "Tyre.Compound", compound(lap.Compound), "Tyre.Compound.Color", compoundColor(lap.Compound)
-										  , "Time.Stint.Remaining", lap.RemainingStintTime, "Time.Driver.Remaining", lap.RemainingDriverTime)
+										  , "Time.Stint.Remaining", lap.RemainingStintTime, "Time.Driver.Remaining", lap.RemainingDriverTime
+										  , "Engine.Temperature.Water", lap.HasOwnProp("WaterTemperature") ? lap.WaterTemperature : kNull
+										  , "Engine.Temperature.Oil", lap.HasOwnProp("OilTemperature") ? lap.OilTemperature : kNull)
 
 					pressures := pressuresTable[newLap]
 					tyres := tyresTable[newLap]

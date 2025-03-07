@@ -1,9 +1,9 @@
 [Development]
 Version=6.2.3.0-dev
 Target=6.2.3.0-release
-Date=03/06/2025
+Date=03/07/2025
 Download=
-Changes=Support clustering of telemetry channels in Telemetry Viewer, Support for water and oil temperatures in API, Support for water and oil temperatures in issue analyzer, Support for water and oil temperatures in "Solo Center", Support for water and oil temperatures in "Team Center", New FTP mirror for community database
+Changes=Support clustering of telemetry channels in Telemetry Viewer, Support for water and oil temperatures in API, Support for water and oil temperatures in issue analyzer, Support for water and oil temperatures in "Solo Center", Support for water and oil temperatures in "Team Center", New FTP mirror for community database, Track scanning for MoTeC importer
 Components=Media->5.6.1,Configuration->6.2.2,Utilities->6.2.2
 [Release]
 Version=6.2.2.0-release

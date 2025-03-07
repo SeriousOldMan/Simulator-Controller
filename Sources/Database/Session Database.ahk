@@ -5962,14 +5962,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	uploadTelemetry() {
 		local window := this.Window
 		local simulator := this.SelectedSimulator
-		local options := "*.telemetry; *.JSON; *.CSV"
+		local options := "*.telemetry; *.JSON"
 		local directory := false
 		local fileName, telemetry, file, size, info, driver, lapTime, sectorTimes, name, ignore
 
 		window.Opt("+OwnDialogs")
 
-		if ((simulator = "iRacing") && this.SessionDatabase.hasTrackMap(simulator, this.SelectedTrack))
-			options .= "; *.ibt"
+		if this.SessionDatabase.hasTrackMap(simulator, this.SelectedTrack) {
+			options .= "; *.CSV"
+
+			if (simulator = "iRacing")
+				options .= "; *.ibt"
+		}
 
 		OnMessage(0x44, translateLoadCancelButtons)
 		fileName := withBlockedWindows(FileSelect, "M1", "", translate("Upload Telemetry File..."), "Lap Telemetry (" . options . ")")

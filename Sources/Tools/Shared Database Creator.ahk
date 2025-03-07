@@ -301,7 +301,7 @@ downloadUserDatabases(directory) {
 		}
 	}
 
-	for ignore, fileName in ftpListFiles("87.177.159.148", "SimulatorController", "Sc-1234567890-Sc", "Database-Downloads") { ; ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-uploads") {
+	for ignore, fileName in ftpListFiles("87.177.159.148", "SimulatorController", "Sc-1234567890-Sc", "Database-Uploads") { ; ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-uploads") {
 		SplitPath(fileName, , , , &idName)
 
 		idName := StrReplace(idName, "Database.", "")
@@ -309,8 +309,8 @@ downloadUserDatabases(directory) {
 		updateProgress("Downloading " . idName . "...")
 
 		; ftpDownload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-uploads/" . fileName, directory . fileName)
-		
-		ftpDownload("87.177.159.148", "SimulatorController", "Sc-1234567890-Sc", "Database-Downloads/" . fileName, directory . fileName)
+
+		ftpDownload("87.177.159.148", "SimulatorController", "Sc-1234567890-Sc", "Database-Uploads/" . fileName, directory . fileName)
 
 		updateProgress("Extracting " . idName . "...")
 
@@ -532,7 +532,7 @@ quit
 		updateProgress("Uploading " . fileName . "...")
 
 		; ftpUpload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", filePath, "htdocs/simulator-controller/database-downloads/" . fileName)
-		
+
 		ftpUpload("87.177.159.148", "SimulatorController", "Sc-1234567890-Sc", filePath, "Database-Downloads/" . fileName)
 	}
 

@@ -4730,7 +4730,7 @@ class SoloCenter extends ConfigurationItem {
 				else if (session = "Qualification")
 					session := "Qualifying"
 
-				fileName := (dirName . "\" . translate(session) . FormatTime(this.Date, "yyyy-MMM-dd"))
+				fileName := (dirName . "\" . translate(session) . A_Space . FormatTime(this.Date, "yyyy-MMM-dd"))
 
 				newFileName := (fileName . ".solo")
 

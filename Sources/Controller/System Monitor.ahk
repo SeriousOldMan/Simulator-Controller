@@ -399,6 +399,7 @@ systemMonitor(command := false, arguments*) {
 										 "Fuel", createFuelWidget,
 										 "Tyres", createTyresWidget,
 										 "Brakes", createBrakesWidget,
+										 "Engine", createEngineWidget,
 										 "Damage", createDamageWidget,
 										 "Pitstop", createPitstopWidget,
 										 "Strategy", createStrategyWidget,
@@ -742,6 +743,37 @@ systemMonitor(command := false, arguments*) {
 					   . displayValue("Float", convertUnit("Temperature", wear[3])) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", convertUnit("Temperature", wear[4])) . "</td></tr>")
 			}
+		}
+		catch Any as exception {
+			logError(exception)
+
+			html := "<table>"
+		}
+
+		html .= "</table>"
+
+		return html
+	}
+
+	createEngineWidget(sessionState) {
+		local html := ""
+		local temperature
+
+		try {
+			html .= "<table class=`"table-std`">"
+			html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`"><div id=`"header`"><i>" . translate("Engine") . "</i></div></th></tr>")
+
+			temperature := getMultiMapValue(sessionState, "Engine", "WaterTemperature", kUndefined)
+
+			if (temperature != kUndefined)
+				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Temperature (Water)") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . displayValue("Float", convertUnit("Temperature", temperature)) . "</td></tr>")
+
+			temperature := getMultiMapValue(sessionState, "Engine", "OilTemperature", kUndefined)
+
+			if (temperature != kUndefined)
+				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Temperature (Oil)") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . displayValue("Float", convertUnit("Temperature", temperature)) . "</td></tr>")
 		}
 		catch Any as exception {
 			logError(exception)

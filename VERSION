@@ -3,7 +3,7 @@ Version=6.2.3.0-dev
 Target=6.2.3.0-release
 Date=03/07/2025
 Download=
-Changes=Support clustering of telemetry channels in Telemetry Viewer, Support for water and oil temperatures in API, Support for water and oil temperatures in issue analyzer, Support for water and oil temperatures in "Solo Center", Support for water and oil temperatures in "Team Center", New FTP mirror for community database, Track scanning for MoTeC importer
+Changes=Support clustering of telemetry channels in Telemetry Viewer, Support for water and oil temperatures in API, Support for water and oil temperatures in issue analyzer, New engine temperature related issues in "Setup Workbench", New settings for radiator covers in "Setup Workbench", Support for water and oil temperatures in "Solo Center", Water and oil temperatures integrated in LLM knowledge, New engine info widget in "System Monitor", Support for water and oil temperatures in "Team Center", New FTP mirror for community database, Track scanning for MoTeC importer
 Components=Media->5.6.1,Configuration->6.2.2,Utilities->6.2.2
 [Release]
 Version=6.2.2.0-release

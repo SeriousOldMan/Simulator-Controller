@@ -19,6 +19,7 @@
 																		  Bumpstop.Rate.Rear.Left, Bumpstop.Rate.Rear.Right,
 																		  Geometry.Caster.Left, Geometry.Caster.Right,
 																		  Brake.Duct.Front, Brake.Duct.Rear,
+																		  Radiator.Blanket.Water, Radiator.Blanket.Oil,
 																		  Aero.Wing.Front.Left, Aero.Wing.Front.Right,
 																		  Aero.Wing.Rear.Left, Aero.Wing.Rear.Right,
 																		  Aero.Height.Front.Left, Aero.Height.Front.Right,

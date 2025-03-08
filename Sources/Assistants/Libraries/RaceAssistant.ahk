@@ -617,7 +617,7 @@ class RaceAssistant extends ConfigurationItem {
 
 	Knowledge {
 		Get {
-			static knowledge := ["Session", "Stint", "Fuel", "Laps", "Weather", "Track", "Tyres"]
+			static knowledge := ["Session", "Stint", "Fuel", "Laps", "Weather", "Track", "Tyres", "Engine"]
 
 			return knowledge
 		}
@@ -1094,7 +1094,7 @@ class RaceAssistant extends ConfigurationItem {
 		local simulator := this.SettingsDatabase.getSimulatorName(this.Simulator)
 		local car := this.SettingsDatabase.getCarName(this.Simulator, this.Car)
 		local track := this.SettingsDatabase.getTrackName(this.Simulator, this.Track)
-		local lapNumber, tyreSet, lapNr, laps, tyreSets, tyreCompound, weather, bestLapTime, stint
+		local lapNumber, tyreSet, lapNr, laps, tyreSets, tyreCompound, weather, bestLapTime, stint, engine, value
 
 		static sessionTypes
 
@@ -1211,6 +1211,23 @@ class RaceAssistant extends ConfigurationItem {
 
 				if ((tyreSet != kUndefined) && (tyreSet != 0))
 					knowledge["Tyres"]["TyreSet"] := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Set")
+			}
+
+			if this.activeTopic(options, "Engine") {
+				engine := Map()
+
+				value := knowledgeBase.getValue("Lap." . lapNumber . ".Engine.Temperature.Water", false)
+
+				if value
+					engine["WaterTemperature"] := value
+
+				value := knowledgeBase.getValue("Lap." . lapNumber . ".Engine.Temperature.Oil", false)
+
+				if value
+					engine["OilTemperature"] := value
+
+				if (engine.Count > 0)
+					knowledge["Engine"] := engine
 			}
 		}
 
@@ -2109,6 +2126,12 @@ class RaceAssistant extends ConfigurationItem {
 
 				setMultiMapValue(sessionInfo, "Brakes", "Wear", values2String(",", Round(brakeWear[1]), Round(brakeWear[2]), Round(brakeWear[3]), Round(brakeWear[4])))
 			}
+
+			if (getMultiMapValue(data, "Car Data", "WaterTemperature", kUndefined) != kUndefined)
+				setMultiMapValue(sessionInfo, "Engine", "WaterTemperature", getMultiMapValue(data, "Car Data", "WaterTemperature"))
+
+			if (getMultiMapValue(data, "Car Data", "OilTemperature", kUndefined) != kUndefined)
+				setMultiMapValue(sessionInfo, "Engine", "OilTemperature", getMultiMapValue(data, "Car Data", "OilTemperature"))
 		}
 
 		return sessionInfo

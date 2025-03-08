@@ -206,16 +206,16 @@
 		(Prove: changeSetting(Brake.Duct.Rear, -1, ?Brake.Temperatures.Cold.Rear.Correction))
 
 [?Engine.Temperatures.Hot.Water.Correction != 0] =>
-		(Prove: changeSetting(Radiator.Water.Blanket, -1, ?Engine.Temperatures.Hot.Water.Correction))
+		(Prove: changeSetting(Radiator.Blanket.Water, -1, ?Engine.Temperatures.Hot.Water.Correction))
 
 [?Engine.Temperatures.Hot.Oil.Correction != 0] =>
-		(Prove: changeSetting(Radiator.Oil.Blanket, -1, ?Engine.Temperatures.Hot.Oil.Correction))
+		(Prove: changeSetting(Radiator.Blanket.Oil, -1, ?Engine.Temperatures.Hot.Oil.Correction))
 
 [?Engine.Temperatures.Cold.Water.Correction != 0] =>
-		(Prove: changeSetting(Radiator.Water.Blanket, 1, ?Engine.Temperatures.Cold.Water.Correction))
+		(Prove: changeSetting(Radiator.Blanket.Water, 1, ?Engine.Temperatures.Cold.Water.Correction))
 
 [?Engine.Temperatures.Cold.Oil.Correction != 0] =>
-		(Prove: changeSetting(Radiator.Oil.Blanket, 1, ?Engine.Temperatures.Cold.Oil.Correction))
+		(Prove: changeSetting(Radiator.Blanket.Oil, 1, ?Engine.Temperatures.Cold.Oil.Correction))
 
 [?Curbs.Stability.Correction != 0] =>
 		(Prove: changeSetting(Damper.Compression.Fast, [Front.Left, Front.Right, Rear.Left, Rear.Right], -1, ?Curbs.Stability.Correction)),

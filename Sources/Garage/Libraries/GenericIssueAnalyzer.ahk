@@ -564,27 +564,56 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 			maxFrequency := 0
 
 			for ignore, category in ["Front", "Rear"]
-				for ignore, issue in issues["Brake.Temperatures." . category]
-					maxFrequency := Max(maxFrequency, issue.Frequency)
+				for ignore, temperature in ["Cold", "Hot"]
+					for ignore, issue in issues["Brake.Temperatures." . temperature . "." . category]
+						maxFrequency := Max(maxFrequency, issue.Frequency)
 
 			if (maxFrequency > 0)
-				for ignore, category in ["Front", "Rear"] {
-					key := ("Brake.Temperatures." . category)
+				for ignore, category in ["Front", "Rear"]
+					for ignore, temperature in ["Cold", "Hot"] {
+						key := ("Brake.Temperatures." . temperature . "." category)
 
-					for ignore, issue in issues[key] {
-						value := issue.Frequency
-						severity := issue.Severity
+						for ignore, issue in issues[key] {
+							value := issue.Frequency
+							severity := issue.Severity
 
-						if !characteristics.Has(key)
-							characteristics[key] := [Round(value / maxFrequency * 66), severities[severity]]
-						else {
-							characteristic := characteristics[key]
+							if !characteristics.Has(key)
+								characteristics[key] := [Round(value / maxFrequency * 66), severities[severity]]
+							else {
+								characteristic := characteristics[key]
 
-							characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
-							characteristic[2] := Max(characteristic[2], severities[severity])
+								characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
+								characteristic[2] := Max(characteristic[2], severities[severity])
+							}
 						}
 					}
-				}
+
+			maxFrequency := 0
+
+			for ignore, category in ["Water", "Oil"]
+				for ignore, temperature in ["Cold", "Hot"]
+					for ignore, issue in issues["Engine.Temperatures." . temperature . "." . category]
+						maxFrequency := Max(maxFrequency, issue.Frequency)
+
+			if (maxFrequency > 0)
+				for ignore, category in ["Water", "Oil"]
+					for ignore, temperature in ["Cold", "Hot"] {
+						key := ("Engine.Temperatures." . temperature . "." . category)
+
+						for ignore, issue in issues[key] {
+							value := issue.Frequency
+							severity := issue.Severity
+
+							if !characteristics.Has(key)
+								characteristics[key] := [Round(value / maxFrequency * 66), severities[severity]]
+							else {
+								characteristic := characteristics[key]
+
+								characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
+								characteristic[2] := Max(characteristic[2], severities[severity])
+							}
+						}
+					}
 
 			Sleep(500)
 
@@ -800,8 +829,8 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 						hotLight += 1
 				}
 
-			for ignore, temperature in ["Hot"] {
-				key := ("Brake.Temperatures." . category)
+			for ignore, temperature in ["Cold", "Hot"] {
+				key := ("Brake.Temperatures." . temperature . "." . category)
 
 				for ignore, type in ["Heavy", "Medium", "Light"] {
 					%temperature%%type% /= 2
@@ -841,8 +870,8 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 					hotLight += 1
 			}
 
-			for ignore, temperature in ["Hot"] {
-				key := ("Engine.Temperatures." . category)
+			for ignore, temperature in ["Cold", "Hot"] {
+				key := ("Engine.Temperatures." . temperature . "." . category)
 
 				for ignore, type in ["Heavy", "Medium", "Light"] {
 					%temperature%%type% /= 2
@@ -858,26 +887,28 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 
 		issues.Default := []
 
-		getTemperatures("Tyre", tyreTemperatures)
+		if (count > 0) {
+			getTemperatures("Tyre", tyreTemperatures)
 
-		computeTyreIssues("Front", [1, 2], this.FrontTyreTemperatures[1], this.FrontTyreTemperatures[3], this.FrontTyreTemperatures[2])
-		computeTyreIssues("Rear", [3, 4], this.RearTyreTemperatures[1], this.RearTyreTemperatures[3], this.RearTyreTemperatures[2])
+			computeTyreIssues("Front", [1, 2], this.FrontTyreTemperatures[1], this.FrontTyreTemperatures[3], this.FrontTyreTemperatures[2])
+			computeTyreIssues("Rear", [3, 4], this.RearTyreTemperatures[1], this.RearTyreTemperatures[3], this.RearTyreTemperatures[2])
 
-		getOIDifferences()
+			getOIDifferences()
 
-		computeOIIssues("Front", [1, 2], this.OITemperatureDifference)
-		computeOIIssues("Rear", [3, 4], this.OITemperatureDifference)
+			computeOIIssues("Front", [1, 2], this.OITemperatureDifference)
+			computeOIIssues("Rear", [3, 4], this.OITemperatureDifference)
 
-		getTemperatures("Brake", brakeTemperatures)
+			getTemperatures("Brake", brakeTemperatures)
 
-		computeBrakeIssues("Front", [1, 2], this.FrontBrakeTemperatures[1], this.FrontBrakeTemperatures[3], this.FrontBrakeTemperatures[2])
-		computeBrakeIssues("Rear", [3, 4], this.RearBrakeTemperatures[1], this.RearBrakeTemperatures[3], this.RearBrakeTemperatures[2])
+			computeBrakeIssues("Front", [1, 2], this.FrontBrakeTemperatures[1], this.FrontBrakeTemperatures[3], this.FrontBrakeTemperatures[2])
+			computeBrakeIssues("Rear", [3, 4], this.RearBrakeTemperatures[1], this.RearBrakeTemperatures[3], this.RearBrakeTemperatures[2])
 
-		getEngineTemperatures("Water", waterTemperatures)
-		getEngineTemperatures("Oil", oilTemperatures)
+			getEngineTemperatures("Water", waterTemperatures)
+			getEngineTemperatures("Oil", oilTemperatures)
 
-		computeEngineIssues("Water", waterTemperatures, this.WaterTemperature[1], this.WaterTemperature[3], this.WaterTemperature[2])
-		computeEngineIssues("Oil", oilTemperatures, this.OilTemperature[1], this.OilTemperature[3], this.OilTemperature[2])
+			computeEngineIssues("Water", waterTemperatures, this.WaterTemperature[1], this.WaterTemperature[3], this.WaterTemperature[2])
+			computeEngineIssues("Oil", oilTemperatures, this.OilTemperature[1], this.OilTemperature[3], this.OilTemperature[2])
+		}
 
 		return issues
 	}

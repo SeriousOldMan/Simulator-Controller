@@ -146,19 +146,20 @@ Since "Setup Workbench" has no knowledge about the concrete settings in the curr
 
 Most of the recommended setup values will be self-explanatory. The table below will show you the meanung of the positive and negative values of the more special setup options.
 
-| Setting                 | Negative values                   | Positive values                   |
-| ----------------------- | --------------------------------- | --------------------------------- |
-| Brake Balance           | More pressure to the rear brakes  | More pressure to the front brakes |
-| Brake Ducts             | Less open duct                    | More open duct                    |
-| Splitter / Wing         | Less drag / downforce             | More drag / downforce             |
-| Ride Height             | Lower ride height                 | Higher ride height                |
-| Damper                  | Less damping / resistance         | More damping / resistance         |
-| Spring / Bumpstop Rate  | Softer                            | Stiffer                           |
-| Bumpstop Range          | Shorter                           | Longer                            |
-| Differential Preload    | Less opening resistance           | More opening resistance           |
-| Anti Roll Bar           | Softer                            | Stiffer                           |
-| Toe (1)                 | Less toe out / More toe in        | More toe out / Less toe in        |
-| Camber                  | Less negative camber              | More negative camber              |
+| Setting                 | Negative values                    | Positive values                    |
+| ----------------------- | ---------------------------------- | ---------------------------------- |
+| Brake Balance           | More pressure to the rear brakes   | More pressure to the front brakes  |
+| Brake Ducts             | Less open duct                     | More open duct                     |
+| Radiator Blankets       | Less radiator cover / more cooling | More radiator cover / less cooling |
+| Splitter / Wing         | Less drag / downforce              | More drag / downforce              |
+| Ride Height             | Lower ride height                  | Higher ride height                 |
+| Damper                  | Less damping / resistance          | More damping / resistance          |
+| Spring / Bumpstop Rate  | Softer                             | Stiffer                            |
+| Bumpstop Range          | Shorter                            | Longer                             |
+| Differential Preload    | Less opening resistance            | More opening resistance            |
+| Anti Roll Bar           | Softer                             | Stiffer                            |
+| Toe (1)                 | Less toe out / More toe in         | More toe out / Less toe in         |
+| Camber                  | Less negative camber               | More negative camber               |
 
 (1) Most race cars run a little bit of toe in at the rear. The recommendations are based on that assumption. If that is not the case with your car, please reverse the recommendations.
 

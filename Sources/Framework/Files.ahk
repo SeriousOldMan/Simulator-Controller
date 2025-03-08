@@ -81,6 +81,35 @@ normalizeFilePath(filePath) {
 	}
 }
 
+directoryContains(directory, fileOrDirectory) {
+	local curWorkingDir := A_WorkingDir
+	local folder, container
+
+	try {
+		SetWorkingDir(directory)
+
+		container := A_WorkingDir
+
+		if InStr(FileExist(fileOrDirectory), "D") {
+			SetWorkingDir(fileOrDirectory)
+
+			return InStr(A_WorkingDir, container)
+		}
+		else if InStr(FileExist(fileOrDirectory), "F") {
+			SplitPath(fileOrDirectory, , &folder)
+
+			SetWorkingDir(folder)
+
+			return InStr(A_WorkingDir, container)
+		}
+		else
+			return InStr(fileOrDirectory, directory)
+	}
+	finally {
+		SetWorkingDir(curWorkingDir)
+	}
+}
+
 normalizeDirectoryPath(path) {
 	while (SubStr(path, StrLen(path)) = "\")
 		path := SubStr(path, 1, StrLen(path) - 1)

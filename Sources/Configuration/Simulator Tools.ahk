@@ -346,7 +346,7 @@ checkInstallation() {
 	local installLocation := ""
 	local installInfo, quiet, options, msgResult, hasSplash, command, component, source
 	local install, index, options, isNew, packageLocation, packageInfo, packageType, version
-	local ignore, directory, currentDirectory, folder1, folder2, directory1, directory2
+	local ignore, directory, currentDirectory
 
 	installComponents(packageLocation, installLocation, temporary := false) {
 		global gProgressCount
@@ -808,10 +808,7 @@ checkInstallation() {
 					if (installLocation != packageLocation) {
 						showProgress({progress: gProgressCount++, message: translate("Removing installation files...")})
 
-						SplitPath(packageLocation, &folder1, &directory1)
-						SplitPath(kTempDirectory, &folder2, &directory2)
-
-						if InStr(directory1 . "\" . folder1, directory2 . "\" . folder2)
+						if directoryContains(kTempDirectory, packageLocation)
 							removeDirectory(packageLocation)
 						else {
 							OnMessage(0x44, translateYesNoButtons)
@@ -859,10 +856,7 @@ checkInstallation() {
 				}
 			}
 			else if (isNew || (options.InstallLocation != packageLocation)) {
-				SplitPath(packageLocation, &folder1, &directory1)
-				SplitPath(kTempDirectory, &folder2, &directory2)
-
-				if InStr(directory1 . "\" . folder1, directory2 . "\" . folder2)
+				if directoryContains(kTempDirectory, packageLocation)
 					removeDirectory(packageLocation)
 				else {
 					OnMessage(0x44, translateYesNoButtons)

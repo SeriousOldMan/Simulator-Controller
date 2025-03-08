@@ -242,6 +242,21 @@ class IntegrationPlugin extends ControllerPlugin {
 		return state
 	}
 
+	createEngineState(sessionInfo) {
+		local state := Map()
+		local temperature
+
+		temperature := getMultiMapValue(sessionInfo, "Engine", "WaterTemperature", kUndefined)
+
+		state["WaterTemperature"] := ((temperature != kUndefined) ? convertUnit("Temperature", temperature) : kNull)
+
+		temperature := getMultiMapValue(sessionInfo, "Engine", "OilTemperature", kUndefined)
+
+		state["OilTemperature"] := ((temperature != kUndefined) ? convertUnit("Temperature", temperature) : kNull)
+
+		return state
+	}
+
 	createStrategyState(sessionInfo) {
 		local pitstopsCount := getMultiMapValue(sessionInfo, "Strategy", "Pitstops", kUndefined)
 		local nextPitstop := getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next", false)
@@ -663,6 +678,7 @@ class IntegrationPlugin extends ControllerPlugin {
 							  , "Fuel", this.createFuelState(sessionInfo)
 							  , "Tyres", this.createTyresState(sessionInfo)
 							  , "Brakes", this.createBrakesState(sessionInfo)
+							  , "Engine", this.createEngineState(sessionInfo)
 							  , "Strategy", this.createStrategyState(sessionInfo)
 							  , "Damage", this.createDamageState(sessionInfo)
 							  , "Pitstop", this.createPitstopState(sessionInfo)

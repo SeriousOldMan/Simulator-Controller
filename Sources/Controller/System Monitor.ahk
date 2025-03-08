@@ -757,6 +757,7 @@ systemMonitor(command := false, arguments*) {
 
 	createEngineWidget(sessionState) {
 		local html := ""
+		local hasTemperatures := false
 		local temperature
 
 		try {
@@ -765,15 +766,21 @@ systemMonitor(command := false, arguments*) {
 
 			temperature := getMultiMapValue(sessionState, "Engine", "WaterTemperature", kUndefined)
 
-			if (temperature != kUndefined)
+			if (temperature != kUndefined) {
+				hasTemperatures := true
+
 				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Temperature (Water)") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", convertUnit("Temperature", temperature)) . "</td></tr>")
+			}
 
 			temperature := getMultiMapValue(sessionState, "Engine", "OilTemperature", kUndefined)
 
-			if (temperature != kUndefined)
+			if (temperature != kUndefined) {
+				hasTemperatures := true
+
 				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Temperature (Oil)") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", convertUnit("Temperature", temperature)) . "</td></tr>")
+			}
 		}
 		catch Any as exception {
 			logError(exception)
@@ -783,7 +790,7 @@ systemMonitor(command := false, arguments*) {
 
 		html .= "</table>"
 
-		return html
+		return (hasTemperatures ? html : "")
 	}
 
 	createStrategyWidget(sessionState) {

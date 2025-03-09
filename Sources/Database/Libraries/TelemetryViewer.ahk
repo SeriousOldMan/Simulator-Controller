@@ -3332,7 +3332,7 @@ class TrackMap {
 ;;;-------------------------------------------------------------------------;;;
 
 editLayoutSettings(telemetryViewerOrCommand, arguments*) {
-	local name, names, x, y, ignore, channel, selected, tempLayout, checked1, checked2, inputResult
+	local name, names, x, y, ignore, channel, selected, tempLayout, checked1, checked2, inputResult, select
 
 	static layoutsGui
 
@@ -3505,6 +3505,8 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 			editLayoutSettings("UpdateState")
 	}
 	else if (telemetryViewerOrCommand = "AdjustCluster") {
+		select := ((arguments.Length > 0) && arguments[1])
+
 		if (Trim(layoutsGui["clusterEdit"].Text) = "")
 			layoutsGui["clusterEdit"].Text := 1
 
@@ -3515,8 +3517,12 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 				currentGroups += 1
 
 		if (layoutsGui["clusterEdit"].Text > currentGroups)
-			loop Max(0, layoutsGui["clusterEdit"].Text - currentGroups)
+			loop Max(0, layoutsGui["clusterEdit"].Text - currentGroups) {
 				channelsListView.Add("Check", translate("---------------------------------------------"))
+
+				if select
+					channelsListView.Modify(channelsListView.GetCount(), "+Select Vis")
+			}
 
 		if (layoutsGui["clusterEdit"].Text < currentGroups)
 			loop Max(0, currentGroups - layoutsGui["clusterEdit"].Text)
@@ -3526,6 +3532,9 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 
 						break
 					}
+
+		if select
+			editLayoutSettings("UpdateState")
 	}
 	else if (telemetryViewerOrCommand = "UpdateState") {
 		if ((layouts.Count <= 1) || !layout)
@@ -3609,7 +3618,7 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 		layoutsGui.Add("Edit", "x98 yp-2 w40 Number Limit1 vclusterEdit", 1)
 		layoutsGui.Add("UpDown", "xp+32 yp-2 w18 h20 Range1-4", 1)
 
-		layoutsGui["clusterEdit"].OnEvent("Change", (*) => editLayoutSettings("AdjustCluster"))
+		layoutsGui["clusterEdit"].OnEvent("Change", (*) => editLayoutSettings("AdjustCluster", true))
 
 		channelsListView := layoutsGui.Add("ListView", "x16 yp+30 w284 h300 AltSubmit -Multi -LV0x10 Checked NoSort NoSortHdr", collect(["Channel"], translate))
 		channelsListView.OnEvent("Click", editLayoutSettings.Bind("ChannelSelect"))

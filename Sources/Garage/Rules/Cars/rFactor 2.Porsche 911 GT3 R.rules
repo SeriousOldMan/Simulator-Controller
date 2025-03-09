@@ -11,5 +11,5 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: addSettings("rFactor 2", "Porsche 911 GT3 R", [Electronics.ABS])),
+[?Initialize] => (Prove: addSettings("rFactor 2", "Porsche 911 GT3 R", [Electronics.ABS, Radiator.Blanket.Water])),
 				 (Prove: removeSettings("rFactor 2", "Porsche 911 GT3 R", [Aero.Splitter.Front, Differential.Preload]))

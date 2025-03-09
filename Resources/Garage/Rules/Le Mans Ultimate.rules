@@ -20,7 +20,7 @@
 																Geometry.Caster.Left, Geometry.Caster.Right,
 																Electronics.ABS,
 																Electronics.MGUK.Recovery, Electronics.MGUK.Delivery, Electronics.MGUH.Mode,
-																Electronics.Engine.Brake, Electronics.Engine.Limiter, Electronics.Turbo
+																Electronics.Engine.Brake, Electronics.Engine.Limiter, Electronics.Turbo,
 																Geometry.Caster.Left, Geometry.Caster.Right,
 																Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,
 																Bumpstop.Rate.Rear.Left, Bumpstop.Rate.Rear.Right,

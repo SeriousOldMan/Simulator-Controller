@@ -1260,42 +1260,81 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 					issues[key] := filteredHandling
 				}
 
-		for ignore, category in ["Front", "Rear"] {
-			key := ("Brake.Temperatures." . category)
+		for ignore, category in ["Front", "Rear"]
+			for ignore, temperature in ["Cold", "Hot"] {
+				key := ("Brake.Temperatures." . temperature . "." category)
 
-			filteredHandling := []
+				filteredHandling := []
 
-			for ignore, issue in issues[key] {
-				severity := issue.Severity
+				for ignore, issue in issues[key] {
+					severity := issue.Severity
 
-				include := (issue.Frequency >= applyThresholdSlider.Value)
+					include := (issue.Frequency >= applyThresholdSlider.Value)
 
-				if (include && final) {
-					include := false
+					if (include && final) {
+						include := false
 
-					characteristic := characteristicLabels[key]
+						characteristic := characteristicLabels[key]
 
-					row := resultListView.GetNext(0, "C")
+						row := resultListView.GetNext(0, "C")
 
-					while row {
-						value := resultListView.GetText(row)
+						while row {
+							value := resultListView.GetText(row)
 
-						if (value = characteristic) {
-							include := true
+							if (value = characteristic) {
+								include := true
 
-							break
+								break
+							}
+							else
+								row := resultListView.GetNext(row, "C")
 						}
-						else
-							row := resultListView.GetNext(row, "C")
 					}
+
+					if include
+						filteredHandling.Push(issue)
 				}
 
-				if include
-					filteredHandling.Push(issue)
+				issues[key] := filteredHandling
 			}
 
-			issues[key] := filteredHandling
-		}
+		for ignore, category in ["Water", "Oil"]
+			for ignore, temperature in ["Cold", "Hot"] {
+				key := ("Engine.Temperatures." . temperature . "." category)
+
+				filteredHandling := []
+
+				for ignore, issue in issues[key] {
+					severity := issue.Severity
+
+					include := (issue.Frequency >= applyThresholdSlider.Value)
+
+					if (include && final) {
+						include := false
+
+						characteristic := characteristicLabels[key]
+
+						row := resultListView.GetNext(0, "C")
+
+						while row {
+							value := resultListView.GetText(row)
+
+							if (value = characteristic) {
+								include := true
+
+								break
+							}
+							else
+								row := resultListView.GetNext(row, "C")
+						}
+					}
+
+					if include
+						filteredHandling.Push(issue)
+				}
+
+				issues[key] := filteredHandling
+			}
 
 		return issues
 	}
@@ -1329,13 +1368,23 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 																		  , translate(issue.Severity), issue.Frequency)
 				}
 
-		for ignore, category in ["Front", "Rear"] {
-			characteristic := ("Brake.Temperatures." . category)
+		for ignore, category in ["Front", "Rear"]
+			for ignore, temperature in ["Cold", "Hot"] {
+				characteristic := ("Brake.Temperatures." . temperature . "." . category)
 
-			for ignore, issue in temperatures[characteristic]
-				theListView.Add((state = "Analyze") ? "Check" : "", characteristicLabels[characteristic]
-																  , translate(issue.Severity), issue.Frequency)
-		}
+				for ignore, issue in temperatures[characteristic]
+					theListView.Add((state = "Analyze") ? "Check" : "", characteristicLabels[characteristic]
+																	  , translate(issue.Severity), issue.Frequency)
+			}
+
+		for ignore, category in ["Water", "Oil"]
+			for ignore, temperature in ["Cold", "Hot"] {
+				characteristic := ("Engine.Temperatures." . temperature . "." . category)
+
+				for ignore, issue in temperatures[characteristic]
+					theListView.Add((state = "Analyze") ? "Check" : "", characteristicLabels[characteristic]
+																	  , translate(issue.Severity), issue.Frequency)
+			}
 
 		theListView.ModifyCol()
 

@@ -3614,7 +3614,7 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 		layoutsGui.Add("Button", "x277 yp w23 h23 Center +0x200 Disabled vdeleteButton").OnEvent("Click", editLayoutSettings.Bind("LayoutDelete"))
 		setButtonIcon(layoutsGui["deleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
-		layoutsGui.Add("Text", "x16 yp+26 w80", translate("Cluster"))
+		layoutsGui.Add("Text", "x16 yp+26 w80", translate("Groups"))
 		layoutsGui.Add("Edit", "x98 yp-2 w40 Number Limit1 vclusterEdit", 1)
 		layoutsGui.Add("UpDown", "xp+32 yp-2 w18 h20 Range1-4", 1)
 

@@ -1744,7 +1744,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	updateState() {
-		local oldTChoice, oldFChoice
+		local oldTChoice, oldFChoice, index
 
 		if ((this.Control["simInputDropDown"].Value = 1) || (this.Control["simInputDropDown"].Value = 3)) {
 			this.Control["simMapEdit"].Enabled := true
@@ -1810,13 +1810,19 @@ class StrategyWorkbench extends ConfigurationItem {
 			this.Control["pitstopWindowLabel"].Visible := false
 		}
 
-		if this.Control["tyreChangeRequirementsDropDown"].Value
-			oldTChoice := ["Optional", "Required", "Always", "Disallowed"][this.Control["tyreChangeRequirementsDropDown"].Value]
+		if this.Control["tyreChangeRequirementsDropDown"].Value {
+			index := inList(collect(["Optional", "Required", "Always", "Disallowed"], translate), this.Control["tyreChangeRequirementsDropDown"].Text)
+
+			oldTChoice := ["Optional", "Required", "Always", "Disallowed"][index]
+		}
 		else
 			oldTChoice := false
 
-		if this.Control["refuelRequirementsDropDown"].Value
-			oldFChoice := ["Optional", "Required", "Always", "Disallowed"][this.Control["refuelRequirementsDropDown"].Value]
+		if this.Control["refuelRequirementsDropDown"].Value {
+			index := inList(collect(["Optional", "Required", "Always", "Disallowed"], translate), this.Control["refuelRequirementsDropDown"].Text)
+
+			oldFChoice := ["Optional", "Required", "Always", "Disallowed"][index]
+		}
 		else
 			oldFChoice := false
 
@@ -3569,7 +3575,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 	getPitstopRules(&validator, &pitstopRule, &pitstopWindow, &refuelRule, &tyreChangeRule, &tyreSets) {
 		local result := true
-		local tyreCompound, tyreCompoundColor, translatedCompounds, count
+		local tyreCompound, tyreCompoundColor, translatedCompounds, count, index
 
 		this.validatePitstopRule("Full")
 		this.validatePitstopWindow("Full")
@@ -3604,14 +3610,13 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 		}
 
-		if (this.Control["pitstopRuleDropDown"].Value > 1) {
-			refuelRule := ["Optional", "Required", "Always", "Disallowed"][this.Control["refuelRequirementsDropDown"].Value]
-			tyreChangeRule := ["Optional", "Required", "Always", "Disallowed"][this.Control["tyreChangeRequirementsDropDown"].Value]
-		}
-		else {
-			refuelRule := ["Optional", "Always", "Disallowed"][this.Control["refuelRequirementsDropDown"].Value]
-			tyreChangeRule := ["Optional", "Always", "Disallowed"][this.Control["tyreChangeRequirementsDropDown"].Value]
-		}
+		index := inList(collect(["Optional", "Required", "Always", "Disallowed"], translate), this.Control["refuelRequirementsDropDown"].Text)
+
+		refuelRule := ["Optional", "Required", "Always", "Disallowed"][index]
+
+		index := inList(collect(["Optional", "Required", "Always", "Disallowed"], translate), this.Control["tyreChangeRequirementsDropDown"].Text)
+
+		tyreChangeRule := ["Optional", "Required", "Always", "Disallowed"][index]
 
 		translatedCompounds := collect(this.TyreCompounds, translate)
 		tyreSets := []

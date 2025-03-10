@@ -198,7 +198,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 	local dllFile, names, exception, value, chosen, choices, tabs, import, simulator, ignore, option
 	local dirName, simulatorCode, file, tyreCompound, tyreCompoundColor, fileName, token
 	local x, y, e, directory, connection, settings, serverURLs, settingsTab, oldTChoice, oldFChoice
-	local tyreSets, tyreSet, translatedCompounds, rulesActive
+	local tyreSets, tyreSet, translatedCompounds, rulesActive, index
 
 	local setupTyreCompound := "Dry"
 	local setupTyreCompoundColor := "Black"
@@ -1351,10 +1351,13 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			else
 				setMultiMapValue(newSettings, "Session Rules", "Pitstop.Rule", false)
 
-			setMultiMapValue(newSettings, "Session Rules", "Pitstop.Refuel"
-						   , ["Optional", "Required", "Always", "Disallowed"][settingsGui["refuelRequirementsDropDown"].Value])
-			setMultiMapValue(newSettings, "Session Rules", "Pitstop.Tyre"
-						   , ["Optional", "Required", "Always", "Disallowed"][settingsGui["tyreChangeRequirementsDropDown"].Value])
+			index := inList(collect(["Optional", "Required", "Always", "Disallowed"], translate), settingsGui["refuelRequirementsDropDown"].Text)
+
+			setMultiMapValue(newSettings, "Session Rules", "Pitstop.Refuel", ["Optional", "Required", "Always", "Disallowed"][index])
+
+			index := inList(collect(["Optional", "Required", "Always", "Disallowed"], translate), settingsGui["tyreChangeRequirementsDropDown"].Text)
+
+			setMultiMapValue(newSettings, "Session Rules", "Pitstop.Tyre", ["Optional", "Required", "Always", "Disallowed"][index])
 
 			tyreSets := []
 			translatedCompounds := collect(gTyreCompounds, translate)

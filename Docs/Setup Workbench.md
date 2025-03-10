@@ -61,11 +61,11 @@ In this dialog you can initialize the analyzer for your car and your targeted dr
 
   5. Finally, you can enable a short feedback sound, which varies in frequency and volume depending on over-/understeer events and their intensity. Lower tones indicate oversteering while higher tones indicate understeering.
 
-On the second tab "Temperatures" you can specify several thresholds for tyre and brake temepratures:
+On the second tab "Temperatures" you can specify several thresholds for tyre, brake and engine temepratures:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Telemetry%20Analyzer%204.JPG)
 
-The *Ideal* temperatures are the values you want to target in average over the course of a complete lap, both for the tyres as well as for the brakes. Going over "Max" or going under "Min" will increase the severity of any created temperature related issues. And, last but not least, when the difference between inner and outer tyre temperatures of a given tyre exceeds the given "Max OI Difference" value, a corresponding issue will be generated as well.
+The *Ideal* temperatures are the values you want to target in average over the course of a complete lap. Going over "Max" or going under "Min" will increase the severity of any created temperature related issues. And, last but not least, when the difference between inner and outer tyre temperatures of a given tyre exceeds the given "Max OI Difference" value, a corresponding issue will be generated as well.
 
 Good to know: It is recommended to choose a car before entering the analyzer mode, since then some of the values in this dialog will be initialized with car specific data, depending on the chosen simulator. Also, all values you have chosen will be saved for the selected car / track combination and will be re-used the next time you will use the analyzer. Last but not least, if you change a setting while track is set to "All", this setting will be used as a default for all tracks, for which no settings have been selected so far.
 

@@ -37,7 +37,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   4. The layouting system of the Telemetry Viewer now supports grouping of channels into separate clusters. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetry-viewer) for more information.
   5. Engine water and oil temperatures have been added to the internal data system and is acquired from all simulators, which support this information.
      - New issues have been added to the "Setup Workbench" for engine water and oil temperatures.
-     - The issue analyzer in the "Setup Workbench" let you define thresholds for these temperatures which in turn creates issues for the setup development.
+     - The [issue analyzer in the "Setup Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-issue-analyzer) let you define thresholds for these temperatures which in turn creates issues for the setup development.
 	 - The engine temperatures have beend added to various reports in "Solo Center" and "Team Center".
 	 - Setup settings for radiator blankets have been added to the "Setup Workbench".
      - The setup meta data for all cars of *Le Mans Ultimate* and also for all GT3 cars of *rFactor 2* has been updated for the "Setup Workbench". Unfortunately, both simulators do not report water and oil temperatures in the API at the moment.

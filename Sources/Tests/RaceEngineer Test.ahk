@@ -1047,6 +1047,7 @@ class PitstopHandling extends Assert {
 setMultiMapValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknown" . ".ConsideredHistoryLaps", 2)
 setMultiMapValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknown" . ".HistoryLapsDamping", 0.5)
 setMultiMapValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknown" . ".AdjustLapTime", false)
+setMultiMapValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknown" . ".LearningLaps", 1)
 
 if !GetKeyState("Ctrl") {
 	startTime := A_TickCount

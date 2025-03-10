@@ -30,16 +30,22 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 # Upcoming release
 
-## 6.2.2.0-release 03/14/25 (planned)
+## 6.2.3.0-release 03/14/25 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. The layouting system of the Telemetry Viewer now supports grouping of channels into separate clusters. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetry-viewer) for more information.
-  4. Engine water and oil temperatures have been added to the internal data system and is acquired from all simulators, which support this information.
-     - Issues and corresponding setup settings have been added to the "Setup Workbench" for engine water and oil temperatures.
+  3. Fixed a bug in the strategy service rules for tyre change and refueling which caused a flip from "Disallowed" to "Always" in some situations.
+  4. The layouting system of the Telemetry Viewer now supports grouping of channels into separate clusters. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetry-viewer) for more information.
+  5. Engine water and oil temperatures have been added to the internal data system and is acquired from all simulators, which support this information.
+     - New issues have been added to the "Setup Workbench" for engine water and oil temperatures.
      - The issue analyzer in the "Setup Workbench" let you define thresholds for these temperatures which in turn creates issues for the setup development.
 	 - The engine temperatures have beend added to various reports in "Solo Center" and "Team Center".
-	 - A new voice command for the Race Engineer lets you ask for the current engine temperatures.
-	 - A new information action "EngineTemperatures" for the ["Race Engineer"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin can be used to achieve the same result.
+	 - Setup settings for radiator blankets have been added to the "Setup Workbench".
+     - The setup meta data for all cars of *Le Mans Ultimate* and also for all GT3 cars of *rFactor 2* has been updated for the "Setup Workbench". Unfortunately, both simulators do not report water and oil temperatures in the API at the moment.
+	 - Oil and water temperatures are passed to the LLM, if an Assistant is connected to a GPT service.
+	 - A new info widget is available in the "System Monitor" which shows the engine temperatures, if available.
+	 - [Developer] The same information is available in the "Session State.json" file, if the "Integration" plugin has been enabled.
+  6. If telemetry files are imported from MoTeC, the track is scanned for coordinates, so that the telemetry data can be used by the Drving Coach. Therefore, frm now on importing of MoTeC files is only possible, if a track map is available for the given track selection.
+  7. A new FTP site has been setup for the collection, consolidation and distribution of the community database.
 
 # Release history
 

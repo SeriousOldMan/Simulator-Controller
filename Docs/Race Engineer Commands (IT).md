@@ -90,6 +90,8 @@ Information=avvisi carburante, avvisi danni, analisi danni, avvisi meteo, avvisi
 	[(WhatAre) {le temperature dei freni, le attuali temperature dei freni, le temperature dei freni al momento}, (TellMe) {le temperature dei freni, le attuali temperature dei freni, le temperature dei freni al momento}]
 
 	[{Controlla, Per favore controlla} {l'usura dei freni, l'usura dei freni al momento}, (TellMe) {l'usura dei freni, l'usura dei freni al momento}]
+	
+	[(WhatAre) {le temperature del motore, le attuali temperature del motore}, (TellMe) {le temperature del motore, le attuali temperature del motore}]
 
 	[(TellMe) i giri rimanenti, Quanti giri mancano, Quanti giri restano, Quanti giri alla fine, Quanto tempo manca]
 

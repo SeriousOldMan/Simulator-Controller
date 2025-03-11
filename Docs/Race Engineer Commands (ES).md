@@ -90,6 +90,8 @@ Announcements=advertencias de combustible, advertencias de daños, análisis de 
 	
 	[{Revisa, Comprueba} {el desgaste de los frenos, el desgaste de los frenos en este momento}, (TellMe) {el desgaste de los frenos, el desgaste de los frenos en este momento}]
 	
+	[(WhatAre) la temperatura {del motor, actual del motor}, (TellMe) darme la temperatura del motor]
+	
 	[(TellMe) las vueltas que faltan, Cuantas vueltas quedan, Cuántas vueltas faltan]
 	
 	[Cuanto {deposito, gasolina} queda, cuanto {deposito, gasolina} queda en el tanque, (TellMe) {el deposito que, cuanta gasolina} queda,]

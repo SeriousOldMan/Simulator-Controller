@@ -90,6 +90,8 @@ Announcements=avertissements de carburant, avertissements de dommages, analyse d
 	[(WhatAre) {les températures des freins, les températures actuelles des freins, les températures des freins en ce moment}, (TellMe) {les températures des freins, les températures actuelles des freins, les températures des freins en ce moment}]
 
 	[{Vérifier, Veuillez vérifier} {l'usure des freins, l'usure des freins en ce moment}, (TellMe) {l'usure des freins, l'usure des freins en ce moment}]
+	
+	[(WhatAre) {les températures du moteur, les températures actuelles du moteur}, (TellMe) {les températures du moteur, les températures actuelles du moteur}]
 
 	[(TellMe) les tours restants, Combien de tours reste-t-il, Combien de tours reste-t-il, Combien de tours restants, Combien de temps reste-t-il]
 

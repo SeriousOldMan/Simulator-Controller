@@ -399,6 +399,7 @@ systemMonitor(command := false, arguments*) {
 										 "Fuel", createFuelWidget,
 										 "Tyres", createTyresWidget,
 										 "Brakes", createBrakesWidget,
+										 "Engine", createEngineWidget,
 										 "Damage", createDamageWidget,
 										 "Pitstop", createPitstopWidget,
 										 "Strategy", createStrategyWidget,
@@ -754,6 +755,44 @@ systemMonitor(command := false, arguments*) {
 		return html
 	}
 
+	createEngineWidget(sessionState) {
+		local html := ""
+		local hasTemperatures := false
+		local temperature
+
+		try {
+			html .= "<table class=`"table-std`">"
+			html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`"><div id=`"header`"><i>" . translate("Engine") . "</i></div></th></tr>")
+
+			temperature := getMultiMapValue(sessionState, "Engine", "WaterTemperature", kUndefined)
+
+			if (temperature != kUndefined) {
+				hasTemperatures := true
+
+				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Temperature (Water)") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . displayValue("Float", convertUnit("Temperature", temperature)) . "</td></tr>")
+			}
+
+			temperature := getMultiMapValue(sessionState, "Engine", "OilTemperature", kUndefined)
+
+			if (temperature != kUndefined) {
+				hasTemperatures := true
+
+				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Temperature (Oil)") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . displayValue("Float", convertUnit("Temperature", temperature)) . "</td></tr>")
+			}
+		}
+		catch Any as exception {
+			logError(exception)
+
+			html := "<table>"
+		}
+
+		html .= "</table>"
+
+		return (hasTemperatures ? html : "")
+	}
+
 	createStrategyWidget(sessionState) {
 		local pitstopsCount := getMultiMapValue(sessionState, "Strategy", "Pitstops", kUndefined)
 		local html := ""
@@ -1009,8 +1048,8 @@ systemMonitor(command := false, arguments*) {
 	}
 
 	createStandingsWidget(sessionState) {
-		local positionOverall := getMultiMapValue(sessionState, "Standings", "Position.Overall")
-		local positionClass := getMultiMapValue(sessionState, "Standings", "Position.Class")
+		local positionOverall := getMultiMapValue(sessionState, "Standings", "Position.Overall", false)
+		local positionClass := getMultiMapValue(sessionState, "Standings", "Position.Class", false)
 		local html := ""
 		local leaderNr := false
 		local nr, delta, colorOpen, colorClose
@@ -1032,6 +1071,9 @@ systemMonitor(command := false, arguments*) {
 
 			lastDelta := delta
 		}
+
+		if (!positionOverall || !positionClass)
+			return ""
 
 		try {
 			html .= "<table class=`"table-std`">"
@@ -1142,20 +1184,21 @@ systemMonitor(command := false, arguments*) {
 			local html := "<table>"
 			local row := 1
 			local column := 1
-			local ignore, widget
 			local columns := [[], [], []]
+			local ignore, widget
 
 			for ignore, widget in widgets
-				if (row <= 3) {
-					if (column > 3) {
-						row += 1
-						column := 1
-					}
+				if widget {
+					if (row <= 3) {
+						if (column > 3) {
+							row += 1
+							column := 1
+						}
 
-					if widget
 						columns[column].Push(widget(sessionState))
 
-					column += 1
+						column += 1
+					}
 				}
 
 			loop 3

@@ -11,5 +11,5 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: addSettings("rFactor 2", "Bentley Continental GT3 2020", [Electronics.ABS])),
+[?Initialize] => (Prove: addSettings("rFactor 2", "Bentley Continental GT3 2020", [Electronics.ABS, Radiator.Blanket.Water])),
 				 (Prove: removeSettings("rFactor 2", "Bentley Continental GT3 2020", [Aero.Splitter.Front]))

@@ -11,5 +11,5 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: addSettings("rFactor 2", "Aston Martin Vantage GT3", [Electronics.ABS])),
+[?Initialize] => (Prove: addSettings("rFactor 2", "Aston Martin Vantage GT3", [Electronics.ABS, Radiator.Blanket.Water])),
 				 (Prove: removeSettings("rFactor 2", "Aston Martin Vantage GT3", [Aero.Splitter.Front]))

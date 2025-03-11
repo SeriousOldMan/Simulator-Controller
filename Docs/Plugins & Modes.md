@@ -1523,6 +1523,10 @@ The content of the JSON file looks like this (depending on the current situation
 				3
 			]
 		},
+		"Engine": {
+			"WaterTemperature": 92.7,
+			"OilTemperature": 85.2
+		},
 		"Conditions": {
 			"AirTemperature": 24.9,
 			"Grip": "Optimum",

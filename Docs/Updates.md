@@ -37,7 +37,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 6.2.3
 
-Nothing to do.
+The file extension for issues saved by the "Setup Workbench" has been renamed from ".setup" to ".issues". If you have such save issue files, you have to change the extension accordingly to make them readable again.
 
 ***
 

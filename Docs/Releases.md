@@ -44,7 +44,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	 - Oil and water temperatures are passed to the LLM, if an Assistant is connected to a GPT service.
 	 - A new info widget is available in the "System Monitor" which shows the engine temperatures, if available.
 	 - [Developer] The same information is available in the "Session State.json" file, if the "Integration" plugin has been enabled.
-  6. If telemetry files are imported from MoTeC, the track is scanned for coordinates, so that the telemetry data can be used by the Drving Coach. Therefore, frm now on importing of MoTeC files is only possible, if a track map is available for the given track selection.
+  6. If telemetry files are imported from MoTeC, the track is now scanned for coordinates so that the telemetry data can be used by the Drving Coach. Therefore, from now on importing of MoTeC files is only possible, if a track map is available for the given track selection.
   7. A new FTP site has been setup for the collection, consolidation and distribution of the community database.
 
 # Release history

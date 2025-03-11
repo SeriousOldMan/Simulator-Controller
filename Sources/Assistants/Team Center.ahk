@@ -5045,9 +5045,17 @@ class TeamCenter extends ConfigurationItem {
 
 					this.updateState()
 				case 7: ; Telemetry
-					if !this.CollectTelemetry
-						this.iCollectTelemetry := editTelemetryProviderSettings(this, getMultiMapValue(readMultiMap(kUserConfigDirectory . "Team Server.ini")
-																									 , "Telemetry", "Provider", "Internal"))
+					if !this.CollectTelemetry {
+						this.Window.Block()
+
+						try {
+							this.iCollectTelemetry := editTelemetryProviderSettings(this, getMultiMapValue(readMultiMap(kUserConfigDirectory . "Team Server.ini")
+																										 , "Telemetry", "Provider", "Internal"))
+						}
+						finally {
+							this.Window.Unblock()
+						}
+					}
 					else
 						this.iCollectTelemetry := !this.CollectTelemetry
 
@@ -5108,7 +5116,19 @@ class TeamCenter extends ConfigurationItem {
 
 					this.updateState()
 				case 2: ; Telemetry
-					this.iCollectTelemetry := !this.CollectTelemetry
+					if !this.CollectTelemetry {
+						this.Window.Block()
+
+						try {
+							this.iCollectTelemetry := editTelemetryProviderSettings(this, getMultiMapValue(readMultiMap(kUserConfigDirectory . "Team Server.ini")
+																										 , "Telemetry", "Provider", "Internal"))
+						}
+						finally {
+							this.Window.Unblock()
+						}
+					}
+					else
+						this.iCollectTelemetry := !this.CollectTelemetry
 
 					updateTelemetrySetting(this.CollectTelemetry)
 

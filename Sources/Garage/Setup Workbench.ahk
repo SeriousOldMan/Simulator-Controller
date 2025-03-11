@@ -422,33 +422,33 @@ class SetupWorkbench extends ConfigurationItem {
 			workbench.editSetup()
 		}
 
-		loadSetup(*) {
+		loadIssues(*) {
 			local fileName
 
 			workbenchGui.Opt("+OwnDialogs")
 
 			OnMessage(0x44, translateLoadCancelButtons)
-			fileName := withBlockedWindows(FileSelect, 1, "", translate("Load Issues..."), "Issues (*.setup)")
+			fileName := withBlockedWindows(FileSelect, 1, "", translate("Load Issues..."), "Issues (*.issues)")
 			OnMessage(0x44, translateLoadCancelButtons, 0)
 
 			if (fileName != "")
 				workbench.restoreState(fileName, false)
 		}
 
-		saveSetup(*) {
+		saveIssues(*) {
 			local fileName
 
 			workbenchGui.Opt("+OwnDialogs")
 
 			OnMessage(0x44, translateSaveCancelButtons)
-			fileName := withBlockedWindows(FileSelect, "S17", "", translate("Save Issues..."), "Issues (*.setup)")
+			fileName := withBlockedWindows(FileSelect, "S17", "", translate("Save Issues..."), "Issues (*.issues)")
 			OnMessage(0x44, translateSaveCancelButtons, 0)
 
 			if (fileName != "") {
-				if !InStr(fileName, ".setup")
-					fileName := (fileName . ".setup")
+				if !InStr(fileName, ".issues")
+					fileName := (fileName . ".issues")
 
-				workbench.saveState(fileName)
+				workbench.saveIssues(fileName)
 			}
 		}
 
@@ -537,10 +537,10 @@ class SetupWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("Button", "x280 yp w70 h23 vcharacteristicsButton", translate("Issue...")).OnEvent("Click", chooseCharacteristic)
 		button := workbenchGui.Add("Button", "x352 yp w23 h23")
-		button.OnEvent("Click", loadSetup)
+		button.OnEvent("Click", loadIssues)
 		setButtonIcon(button, kIconsDirectory . "Load.ico", 1, "L2 T2 R2 B2")
 		button := workbenchGui.Add("Button", "x376 yp w23 h23")
-		button.OnEvent("Click", saveSetup)
+		button.OnEvent("Click", saveIssues)
 		setButtonIcon(button, kIconsDirectory . "Save.ico", 1, "L4 T4 R4 B4")
 
 		workbenchGui.SetFont("Norm")
@@ -560,8 +560,8 @@ class SetupWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("Text", "x8 y730 w1200 Y:Move W:Grow 0x10")
 
-		workbenchGui.Add("Button", "x16 y738 w77 h23 Y:Move", translate("&Load...")).OnEvent("Click", loadSetup)
-		workbenchGui.Add("Button", "x98 y738 w77 h23 Y:Move", translate("&Save...")).OnEvent("Click", saveSetup)
+		workbenchGui.Add("Button", "x16 y738 w77 h23 Y:Move", translate("&Load...")).OnEvent("Click", loadIssues)
+		workbenchGui.Add("Button", "x98 y738 w77 h23 Y:Move", translate("&Save...")).OnEvent("Click", saveIssues)
 
 		workbenchGui.Add("Button", "x574 y738 w80 h23 Y:Move H:Center", translate("Close")).OnEvent("Click", closeSetupWorkbench)
 		*/
@@ -582,11 +582,11 @@ class SetupWorkbench extends ConfigurationItem {
 			window.Resize("Initialize", w, h)
 	}
 
-	saveState(fileName := false) {
+	saveIssues(fileName := false) {
 		local state, ignore, characteristic, widgets, value1, value2
 
 		if !fileName
-			fileName := (kUserConfigDirectory . "Setup Workbench.setup")
+			fileName := (kUserConfigDirectory . "Setup Workbench.issues")
 
 		state := this.SimulatorDefinition.Clone()
 
@@ -620,7 +620,7 @@ class SetupWorkbench extends ConfigurationItem {
 		local ignore, characteristic
 
 		if !fileName
-			fileName := (kUserConfigDirectory . "Setup Workbench.setup")
+			fileName := (kUserConfigDirectory . "Setup Workbench.issues")
 
 		if FileExist(fileName) {
 			state := readMultiMap(fileName)
@@ -3740,7 +3740,7 @@ class FileSetupComparator extends SetupComparator {
 
 closeSetupWorkbench(*) {
 	if GetKeyState("Ctrl")
-		SetupWorkbench.Instance.saveState()
+		SetupWorkbench.Instance.saveIssues()
 
 	ExitApp(0)
 }

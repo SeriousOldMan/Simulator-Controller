@@ -129,6 +129,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 33. [Section feedback of the Driving Coach](https://youtu.be/jexBxAjmU1s) - This short video demonstrates a new feature of the Drivng Coach. If this is enabled, you will get immediate feedback for your driving performance in the last section of the track.
 
+34. [Telemetry System Revisited](https://youtu.be/pPPSqs5Bdrk) - This video provides you with updated information about the telemetry system of Simulator Controller, since many functions have been added recently.
+
 This list will be extended from time to time to cover new functionalities.
 
 ### Discord Community

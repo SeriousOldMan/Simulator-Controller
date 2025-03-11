@@ -40,7 +40,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
      - The [issue analyzer in the "Setup Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-issue-analyzer) let you define thresholds for these temperatures which in turn creates issues for the setup development.
 	 - The engine temperatures have beend added to various reports in "Solo Center" and "Team Center".
 	 - Setup settings for radiator blankets have been added to the "Setup Workbench".
-     - The setup meta data for all cars of *Le Mans Ultimate* and also for all GT3 cars of *rFactor 2* has been updated for the "Setup Workbench". Unfortunately, both simulators do not report water and oil temperatures in the API at the moment.
+     - The setup meta data for all cars of *Le Mans Ultimate* and also for all GT3 cars of *rFactor 2* has been updated for the "Setup Workbench". Unfortunately, both simulators do not report water and oil temperatures correctly in the API at the moment, but there is hope at least for *Le Mans Ultimate* for some future update.
 	 - Oil and water temperatures are passed to the LLM, if an Assistant is connected to a GPT service.
 	 - A new info widget is available in the "System Monitor" which shows the engine temperatures, if available.
 	 - [Developer] The same information is available in the "Session State.json" file, if the "Integration" plugin has been enabled.

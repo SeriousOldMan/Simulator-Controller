@@ -214,7 +214,7 @@ Why so complex? There is a strong dependency between the track surface state, ai
 
 Please note, that you can use the "Pencil" button to rename an already uploaded setup file to follow the above conventions, if necessary.
 
-#### Tyre Pressures
+#### Pressures
 
 Here you will get a recommendation for initial cold tyre pressures, if a matching setup is available in the database. Depending on the temperature settings the recommended tyre pressures will be marked in dark green for a perfect match, or light green or even yellow, if the values have been extra- or interpolated from different air and/or track temperatures.
 

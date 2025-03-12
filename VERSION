@@ -1,9 +1,9 @@
 [Development]
-Version=6.2.3.0-dev
+Version=6.2.3.0-beta
 Target=6.2.3.0-release
-Date=03/11/2025
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Fn_yqdsU
-Changes=Support clustering of telemetry channels in Telemetry Viewer, Support for water and oil temperatures in API, Support for water and oil temperatures in issue analyzer, New engine temperature related issues in "Setup Workbench", New settings for radiator covers in "Setup Workbench", Updated car models for "Setup Workbench", Water and oil temperatures integrated in LLM knowledge, New engine info widget in "System Monitor", Support for water and oil temperatures in "Team Center", Support for water and oil temperatures in "Solo Center", New FTP mirror for community database, Track scanning for MoTeC importer, Fixed service rules in "Race Settings" and "Strategy Workbench", Changed file extension of saved issues in "Setup Workbench"
+Date=03/12/2025
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/LshJRn7G
+Changes=Support clustering of telemetry channels in Telemetry Viewer, Support for water and oil temperatures in API, Support for water and oil temperatures in issue analyzer, New engine temperature related issues in "Setup Workbench", New settings for radiator covers in "Setup Workbench", Updated car models for "Setup Workbench", Water and oil temperatures integrated in LLM knowledge, New engine info widget in "System Monitor", Support for water and oil temperatures in "Team Center", Support for water and oil temperatures in "Solo Center", New FTP mirror for community database, Track scanning for MoTeC importer, Fixed service rules in "Race Settings" and "Strategy Workbench", Changed file extension of saved issues in "Setup Workbench", Renaming of "Session Database" items
 Components=Media->5.6.1,Configuration->6.2.2,Utilities->6.2.2
 [Release]
 Version=6.2.2.0-release
@@ -24,5 +24,5 @@ Utilities.6.2.2.Download=https://fileshare.impresion3d.pro/filebrowser/api/publi
 [Current]
 Type=Development
 [Version]
-Development=6.2.3.0-dev
+Development=6.2.3.0-beta
 Release=6.2.2.0-release

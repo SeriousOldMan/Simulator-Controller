@@ -18,7 +18,7 @@ Whenever you have to setup your car for a given track and specific environmental
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%203.jpg)
 
-This tool gives you access to the database where you have access to the tyre pressures of all your past sessions, where you can store your track specific car setups and where you can provide default values for various settings for the AI Race Asssistants. These values can be used to initialize the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#race-settings) using track and car specific default values. Telemetry information of all past sessions is also stored in the database. Use the ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench) to browse this data.
+This tool gives you access to the database where you have access to the data all your past sessions, like tyre pressures, for example. You can also store your track specific car setups and race strategies and you can provide default values for various settings for the AI Race Asssistants. These values can be used to initialize the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#race-settings) in the "Race Settings" application using track and car specific default values. But beside the settings available in this application, many more settings are available here to customize the behaviour of the Race Assistants and all other applications of Simulator Controller. Additionally, telemetry information of all past sessions is also stored in the database. This information can then be used by the ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench), for example, to create strategies for upcoming races.
 
 You have to use the menus in the upper left area to specify the simulation, car, track, current weather and so on. After you have done that, you can select one of the database topics using the choice tabs.
 
@@ -38,7 +38,7 @@ Important:
 
 Following you will find an overview about the different database topics:
 
-#### Race Settings
+#### Settings
 
 The AI Race Assistants provide many settings, as you may have seen in the section about the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#race-settings) in the documentation about the Race Engineer. Many values are specific for a given car or track, for example the pitstop delta or the time required to change tyres. You can change all these settings manually before each session, or you can store default values for all theses settings in the session database.
 
@@ -71,7 +71,7 @@ Important note: Some values underly a transformation between internal and extern
 
 The default values for all these settings may not only be used to initialize the race settings for an upcoming session, but they may also be used in the "Strategy Workbench" to provide values for many [settings for strategy simulation & planning](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#rules--settings).
 
-A detailed overview and description for all available settings and their usage can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings).
+A detailed overview and description for all available settings and their usage can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings).
 
 ##### Exporting and importing settings
 
@@ -113,7 +113,7 @@ Telemetry data for individual laps can be stored in the session database, for ex
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2019.jpg)
 
-You can use the buttons below the list to upload, download, rename or delete lap telemetry data, but in most cases you will use the ["Solo Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center), the ["Team Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center) or the ["Setup Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench) to record the telemetry data and store it in the database. Once you have selected telemetry data in the list above, you can decide whether you want to share it potentially with the community (if you have given consent to share telemetry data - see the information about community data at the end of this chapter) and/or whether you want to synchronize the lap telemetry with any of the [connected Team Servers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration) (see below). Additionally, you can use the copy button to copy the name of the telemetry data to the clipbaord. This is useful, if you want to register the given lap as reference lap for the Driving Coach in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#race-settings) in the "Session Database".
+You can use the buttons below the list to upload, download, rename or delete lap telemetry data, but in most cases you will use the ["Solo Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center), the ["Team Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center) or the ["Setup Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench) to record the telemetry data and store it in the database. Once you have selected telemetry data in the list above, you can decide whether you want to share it potentially with the community (if you have given consent to share telemetry data - see the information about community data at the end of this chapter) and/or whether you want to synchronize the lap telemetry with any of the [connected Team Servers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration) (see below). Additionally, you can use the copy button to copy the name of the telemetry data to the clipbaord. This is useful, if you want to register the given lap as reference lap for the Driving Coach in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings) in the "Session Database".
 
 ##### Naming conventions
 
@@ -164,7 +164,7 @@ If you use the "Open..." button in the dialog, which let's you browse the availa
 - You can load telemetry files from Simulator Controller, for example a file that has been sent to you by a team mate.
 - You can import telemetery data from ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), as long as it has been saved as JSON file, which can be activated in the settings of "Second Monitor".
 - Importing IBT files from *iRacing* is also supported, as long as a track map for the currently selected track is already available. In this case, you will first have to select the IBT file, which is then split up into individual files for each lap contained in the IBT file. After that is done, you can select the laps, which you want to import.
-- And you can import telemetry files from "MoTec". They must be exported as "CSV" files and the "Distance" field must be included. Since "MoTeC" uses the absolute angle for the steering information, it is beneficial to divide this value by the steer lock of the car, to make the information comparable to that of other lap telemetry data. The importer will use the information available in the "Setup Workbench" about the different cars, or you can define the [corresponding setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#race-settings) in the "Session Database".
+- And you can import telemetry files from "MoTec". They must be exported as "CSV" files and the "Distance" field must be included. Since "MoTeC" uses the absolute angle for the steering information, it is beneficial to divide this value by the steer lock of the car, to make the information comparable to that of other lap telemetry data. The importer will use the information available in the "Setup Workbench" about the different cars, or you can define the [corresponding setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings) in the "Session Database".
 
 Good to know: When importing lap telemetry data directly in the "Laps" tab of "Session Database", the same applies.
 
@@ -214,7 +214,7 @@ Why so complex? There is a strong dependency between the track surface state, ai
 
 Please note, that you can use the "Pencil" button to rename an already uploaded setup file to follow the above conventions, if necessary.
 
-#### Tyre Pressures
+#### Pressures
 
 Here you will get a recommendation for initial cold tyre pressures, if a matching setup is available in the database. Depending on the temperature settings the recommended tyre pressures will be marked in dark green for a perfect match, or light green or even yellow, if the values have been extra- or interpolated from different air and/or track temperatures.
 
@@ -224,7 +224,7 @@ Notes:
 
   1. If you choose a specific driver in the "Driver" menu, only the tyre pressures of this driver are shown, if available.
   2. If the "Session Database" tool has been [started by the "Race Settings" tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-session), you can transfer the current tyre pressure and compound information to the *Race Settings* by pressing the "Load" button.
-  3. You can configure using the settings in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#race-settings) the session types, from which tyre pressure data will be collected and stored into the database by the Race Engineer. Default is to collect tyre pressure data during practice and race sessions.
+  3. You can configure using the settings in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings) the session types, from which tyre pressure data will be collected and stored into the database by the Race Engineer. Default is to collect tyre pressure data during practice and race sessions.
 
 ##### Browsing and editing Tyre Pressures
 

@@ -1,4 +1,4 @@
-The following table will give you an overview over all settings, which are available in the session database. As described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#race-settings), this settings can be defined precisely for a given simulator / car / track / weather combo and will overwrite the settings you have chosen in the "Race Settings" dialog. This allows you to automate most of the settings required for an upcoming session.
+The following table will give you an overview over all settings, which are available in the session database. As described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings), these settings can be defined precisely for a given simulator / car / track / weather combo and will overwrite the settings you have chosen in the "Race Settings" application. This allows you to automate most of the settings required for an upcoming session.
 
 ### General settings
 

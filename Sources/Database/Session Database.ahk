@@ -56,13 +56,13 @@ global kClose := "Close"
 
 global kSetupNames := CaseInsenseMap("DQ", "Qualifying (Dry)", "DR", "Race (Dry)", "WQ", "Qualifying (Wet)", "WR", "Race (Wet)")
 
-global kModuleDocumentations := Map("Settings", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#race-settings"
+global kModuleDocumentations := Map("Settings", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings"
 								  , "Data", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#administration"
 								  , "Sessions", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#sessions"
 								  , "Laps", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetries"
 								  , "Strategies", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#strategies"
 								  , "Setups", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#setups"
-								  , "Pressures", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#tyre-pressures"
+								  , "Pressures", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#pressures"
 								  , "Track", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation")
 
 
@@ -1630,7 +1630,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("s10 Bold", "Arial")
 
 		editorGui.Add("Picture", "x16 yp+12 w30 h30 Section vsettingsImg1", this.themeIcon(kIconsDirectory . "General Settings.ico")).OnEvent("Click", chooseTab.Bind("Settings"))
-		editorGui.Add("Text", "x50 yp+5 w220 h26 W:Grow(0.2) vsettingsTab1", translate("Race Settings")).OnEvent("Click", chooseTab.Bind("Settings"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 W:Grow(0.2) vsettingsTab1", translate("Settings")).OnEvent("Click", chooseTab.Bind("Settings"))
 
 		editorGui.Add("Text", "x16 yp+32 w267 W:Grow(0.2) 0x10")
 
@@ -1678,7 +1678,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("s10 Bold", "Arial")
 
 		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg6", this.themeIcon(kIconsDirectory . "Pressure.ico")).OnEvent("Click", chooseTab.Bind("Pressures"))
-		editorGui.Add("Text", "x50 yp+5 w220 h26 W:Grow(0.2) vsettingsTab6", translate("Tyre Pressures")).OnEvent("Click", chooseTab.Bind("Pressures"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 W:Grow(0.2) vsettingsTab6", translate("Pressures")).OnEvent("Click", chooseTab.Bind("Pressures"))
 
 		editorGui.Add("Text", "x16 yp+32 w267 W:Grow(0.2) 0x10")
 

@@ -117,7 +117,7 @@ And you can choose furthermore, which Assistants will be available and whether t
 
 | Setting  | Description |
 | -------- | ----------- |
-| Default  | The Assistant will be configured as defined elsewhere in your configuration (for example, in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database"). |
+| Default  | The Assistant will be configured as defined elsewhere in your configuration (for example, in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database"). |
 | Disabled | The Assistant is fully disabled (i.e. will not be started when you enter a session). But: This also disables all their services like collecting telemetry data, calculating ideal cold tyre pressures or handling track automation events. Therefore, this is not recommended, with the exception of the Driving Coach, which does not participate in this stuff.
 | Silent   | Using "Silent" disables the voice interaction of the given Assistant completely. The Assistant will perform its actions normally, as long as no permission must be granted by the driver (unless fully autonomous mode is enabled). |
 | Muted    | "Muted" means, that the Assistant is fully active, including voice capabilities. But the Assistant will not contact the driver pro-actively, for example, to inform about an upcoming weather change. The Assistant will, however, react to voice commands and will allow full voice interaction, as long as the dialog is started by the driver.<br><br>Note: A "muted" Assistant can be fully or partially unmuted using a voice command. This is described in the individual documentation for each Assistant. |
@@ -137,7 +137,7 @@ On the last tab you can select or deselect several functions provided by the dif
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Startup%20Profiles%203.JPG)
 
-The checkbox for each function has three states - selected, deselected and indeterminated. The later means that the setting for this function will be used that has been defined elsewhere in your configuration (for example, in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database"). See the following list for a description of each function:
+The checkbox for each function has three states - selected, deselected and indeterminated. The later means that the setting for this function will be used that has been defined elsewhere in your configuration (for example, in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database"). See the following list for a description of each function:
 
 | Module           | Function                              | Type              | Description |
 |------------------|---------------------------------------|-------------------|-------------|
@@ -269,7 +269,7 @@ Normally you will use a standard configuration for voice control, which means, t
 
   4. Confirmation behaviour
   
-     This is more or less independent of the voice configuration. There are many cases, in which the Assistants ask you a question and wait then for your confirmation. In this case, you can either answer using a voice command or by pressing the "Accept" action button on your controller. But there are also a couple of [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database", with which you can customize the behaviour in case of a question/confirmation for different situations. For example, using the "Engineer: Confirm Pitstop Preparation", you can specify, how the Engineer should behave, when he wants to prepare a pitstop. Three options are available:
+     This is more or less independent of the voice configuration. There are many cases, in which the Assistants ask you a question and wait then for your confirmation. In this case, you can either answer using a voice command or by pressing the "Accept" action button on your controller. But there are also a couple of [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database", with which you can customize the behaviour in case of a question/confirmation for different situations. For example, using the "Engineer: Confirm Pitstop Preparation", you can specify, how the Engineer should behave, when he wants to prepare a pitstop. Three options are available:
 	 
 	 | Setting Value | Description |
 	 |---------------|-------------|

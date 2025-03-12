@@ -35,8 +35,9 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   2. Documentation updates here and there, as always
   3. Fixed a bug in the strategy service rules for tyre change and refueling which caused a flip from "Disallowed" to "Always" in some situations.
   4. Renamed several items in the "Session Database" (for example *Race Settings* -> *Settings*, *Tyre Pressures* -> *Pressures*).
-  5. The layouting system of the Telemetry Viewer now supports grouping of channels into separate clusters. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetry-viewer) for more information.
-  6. Engine water and oil temperatures have been added to the internal data system and is acquired from all simulators, which support this information.
+  5. The documentation page "Race Settings" has been renamed to ["Session Settings"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings).
+  6. The layouting system of the Telemetry Viewer now supports grouping of channels into separate clusters. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetry-viewer) for more information.
+  7. Engine water and oil temperatures have been added to the internal data system and is acquired from all simulators, which support this information.
      - New issues have been added to the "Setup Workbench" for engine water and oil temperatures.
      - The [issue analyzer in the "Setup Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-issue-analyzer) let you define thresholds for these temperatures which in turn creates issues for the setup development.
 	 - The engine temperatures have beend added to various reports in "Solo Center" and "Team Center".
@@ -45,9 +46,9 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	 - Oil and water temperatures are passed to the LLM, if an Assistant is connected to a GPT service.
 	 - A new info widget is available in the "System Monitor" which shows the engine temperatures, if available.
 	 - [Developer] The same information is available in the "Session State.json" file, if the "Integration" plugin has been enabled.
-  7. [Important] The file extension for issues saved by the "Setup Workbench" has been renamed from ".setup" to ".issues". If you have such save issue files, you have to change the extension accordingly to make them readable again.
-  8. If telemetry files are imported from MoTeC, the track is now scanned for coordinates so that the telemetry data can be used by the Driving Coach. Therefore, from now on importing of MoTeC files is only possible, if a track map is available for the given track selection.
-  9. [Internal] A new FTP site has been setup for the collection, consolidation and distribution of the community database.
+  8. [Important] The file extension for issues saved by the "Setup Workbench" has been renamed from ".setup" to ".issues". If you have such save issue files, you have to change the extension accordingly to make them readable again.
+  9. If telemetry files are imported from MoTeC, the track is now scanned for coordinates so that the telemetry data can be used by the Driving Coach. Therefore, from now on importing of MoTeC files is only possible, if a track map is available for the given track selection.
+  10. [Internal] A new FTP site has been setup for the collection, consolidation and distribution of the community database.
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-623), if you have issue files saved by the "Setup Workbench".
 

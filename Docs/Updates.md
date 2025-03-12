@@ -87,7 +87,7 @@ Nothing to do.
 
 1. Initial support for *Assetto Corsa EVO* has been added. The plugin has been added in "Simulator Configuration", but it is deactivated. You can activate it manually and add the required application in "Simulator Configuration", but I strongly recommend to use "Simulator Setup" to do it for you. Go to the "Basic" page and *Assetto Corsa EVO* will normally be detected automatically. Then create a new configuration.
 
-2. The Engineer does no longer automatically request the pitstop after all settings has been prepared in *Automobilista 2*, since this can lead to unwanted effects when pitstops are planned and prepared multiple times. But there is as [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" to make it automatic again.
+2. The Engineer does no longer automatically request the pitstop after all settings has been prepared in *Automobilista 2*, since this can lead to unwanted effects when pitstops are planned and prepared multiple times. But there is as [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" to make it automatic again.
 
 ***
 
@@ -474,7 +474,7 @@ No manual updates necessary.
 
 ## Release 5.4.2
 
-If you have used the "Threshold" choice for repair settings either in the "Race Settings" or as default value in the "Session Database", you may have to change this value. The "Threshold" is now labeled as seconds need to repair the given damage. The calculation uses [conversion factors](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) to derive the repair time needed from the internal damage value of the given simulator. For *Assetto Corsa Competizione*, the conversion factor are already known, for the other simulators they will be added with the next releases. If, you derive a conversion factor on your own, let me know, so that I can add them to the defaults.
+If you have used the "Threshold" choice for repair settings either in the "Race Settings" or as default value in the "Session Database", you may have to change this value. The "Threshold" is now labeled as seconds need to repair the given damage. The calculation uses [conversion factors](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) to derive the repair time needed from the internal damage value of the given simulator. For *Assetto Corsa Competizione*, the conversion factor are already known, for the other simulators they will be added with the next releases. If, you derive a conversion factor on your own, let me know, so that I can add them to the defaults.
 
 You can, however, use your old threshold values, if you set the conversion factor to **1** for each damage type (bodywork, suspension, engine). However, in this case, the unit of the threshold is not "Seconds", which does no harm in the repair calculations, but will result in wrong values for pitstop duration calaculations in "System Monitor" and "Team Center".
 
@@ -587,7 +587,7 @@ A bug has been fixed in the Team Server for handling strategies und setups. The 
 
 ## Release 5.0.8
 
-A duplicate setting named "Strategy: Pitstop Window" has been removed from the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) and joined with "Strategy: Pitstop Variation Window (+/- Lap)". Please check your settings in the "Session Database", when you have used these settings. You may have to remove remaining artefacts (a setting named "0") from your settings in the "Session Database".
+A duplicate setting named "Strategy: Pitstop Window" has been removed from the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) and joined with "Strategy: Pitstop Variation Window (+/- Lap)". Please check your settings in the "Session Database", when you have used these settings. You may have to remove remaining artefacts (a setting named "0") from your settings in the "Session Database".
 
 ***
 

@@ -1,7 +1,7 @@
 [Development]
 Version=6.2.4.0-dev
 Target=6.2.4.0-release
-Date=03/11/2025
+Date=03/12/2025
 Download=
 Changes=New voice command to request engine temperatures, New information request action "EngineTemperatures" for the "Race Engineer" plugin, New icon in the Stream Deck icon set for engine temperatures
 Components=Media->5.6.1,Configuration->6.2.4,Utilities->6.2.2
@@ -27,5 +27,4 @@ Utilities.6.2.2.Download=https://fileshare.impresion3d.pro/filebrowser/api/publi
 [Current]
 Type=Development
 [Version]
-Development=6.2.4.0-dev
 Release=6.2.2.0-release

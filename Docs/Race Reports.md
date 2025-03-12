@@ -14,7 +14,7 @@ The overview list all drivers / cars with their starting positions, the best and
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Reports%203.JPG)
 
-For multi-class sessions, two result columns with the overall result and the class-specific result will be available. If available, driver categories are shown here as well for the starting driver, when you have enabled it in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database".
+For multi-class sessions, two result columns with the overall result and the class-specific result will be available. If available, driver categories are shown here as well for the starting driver, when you have enabled it in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database".
 
 ### Car Report
   

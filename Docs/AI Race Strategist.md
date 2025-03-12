@@ -128,7 +128,7 @@ Important: In the default configuration, Cato will be activated in the first lap
 
 ### Multi-class support
 
-Cato *understands* multi-class and multi-category races. Position evaluation and gap and lap time information will be always focused on your own class. Where it is necessary to mention, for example, the overall position, Cato will phrase it in a way, so that you understand, that information is related to the whole grid. Support tools like "Race Reports" also *understand* multi-class races and will give you related information with a class-specific focus as well, or you can choose, at which class you want to look, for example in a report. You can configure in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database", in what way Cato uses the information about the car classes and cup categories to partition the grid.
+Cato *understands* multi-class and multi-category races. Position evaluation and gap and lap time information will be always focused on your own class. Where it is necessary to mention, for example, the overall position, Cato will phrase it in a way, so that you understand, that information is related to the whole grid. Support tools like "Race Reports" also *understand* multi-class races and will give you related information with a class-specific focus as well, or you can choose, at which class you want to look, for example in a report. You can configure in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database", in what way Cato uses the information about the car classes and cup categories to partition the grid.
 
 ### Race Settings
 

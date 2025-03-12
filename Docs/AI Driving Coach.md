@@ -310,7 +310,7 @@ DISCLAIMER: This functionality requires a very capable LLM for decent results. T
 
 #### Choosing the telemetry provider
 
-The Driving Coach can work with telemetry data from two different sources. One source, which is the default, is integrated into Simulator Controller and will provide telemetry data after a learning phase of two laps. The other one uses a connection to ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), a tool developed by @winzarten. Which telemetry provider to be used can be configured using some [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database". If you choose "Second Monitor", be sure that this application is running while you are out on the track for some coaching.
+The Driving Coach can work with telemetry data from two different sources. One source, which is the default, is integrated into Simulator Controller and will provide telemetry data after a learning phase of two laps. The other one uses a connection to ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), a tool developed by @winzarten. Which telemetry provider to be used can be configured using some [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database". If you choose "Second Monitor", be sure that this application is running while you are out on the track for some coaching.
 
 ### Track layout
 

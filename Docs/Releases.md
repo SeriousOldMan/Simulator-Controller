@@ -46,7 +46,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	 - A new info widget is available in the "System Monitor" which shows the engine temperatures, if available.
 	 - [Developer] The same information is available in the "Session State.json" file, if the "Integration" plugin has been enabled.
   7. [Important] The file extension for issues saved by the "Setup Workbench" has been renamed from ".setup" to ".issues". If you have such save issue files, you have to change the extension accordingly to make them readable again.
-  8. If telemetry files are imported from MoTeC, the track is now scanned for coordinates, so that the telemetry data can be used by the Drving Coach. Therefore, frm now on importing of MoTeC files is only possible, if a track map is available for the given track selection.
+  8. If telemetry files are imported from MoTeC, the track is now scanned for coordinates so that the telemetry data can be used by the Driving Coach. Therefore, from now on importing of MoTeC files is only possible, if a track map is available for the given track selection.
   9. [Internal] A new FTP site has been setup for the collection, consolidation and distribution of the community database.
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-623), if you have issue files saved by the "Setup Workbench".

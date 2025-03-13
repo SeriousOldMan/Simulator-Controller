@@ -446,6 +446,10 @@ The "System Monitor" is divided into several pages of information:
 	 
 	   Shows the current brake temperatures, and brake wear, if available.
 	   
+	 - Engine
+	 
+	   If available by the sim, the current water and oil temperatures are displayed.
+	   
 	 - Standings
 	 
 	   Gives you detailed information about your most important opponents, the leader, the car in front of you and the car behind you. For each opponent, the number of laps, the gap in seconds and the lap time is shown.

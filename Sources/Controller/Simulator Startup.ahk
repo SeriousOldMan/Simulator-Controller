@@ -484,7 +484,7 @@ launchPad(command := false, arguments*) {
 	global kSimulatorConfiguration
 
 	local ignore, application, startupConfig, x, y, infoButton, settingsButton
-	local name, options, lastModified, hasTeamServer, restart
+	local name, options, lastModified, hasTeamServer, restart, version
 
 	static result := false
 
@@ -907,17 +907,20 @@ launchPad(command := false, arguments*) {
 
 		launchPadGui.SetFont("s10 Bold", "Arial")
 
-		launchPadGui.Add("Text", "w580 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(launchPadGui, "Simulator Startup"))
+		launchPadGui.Add("Text", "x58 w480 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(launchPadGui, "Simulator Startup"))
 
 		launchPadGui.SetFont("s8 Norm", "Arial")
 
-		launchPadGui.Add("Text", "x544 YP w30 Section Right", string2Values("-", kVersion)[1])
+		version := string2Values("-", kVersion)
+
+		launchPadGui.Add("Documentation", "x544 YP w30 Section Right", version[1]
+					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#" . StrReplace(version[1], ".", ""))
 
 		launchPadGui.SetFont("s6")
 
 		try {
-			if (string2Values("-", kVersion)[2] != "release")
-				launchPadGui.Add("Text", "x546 YP+12 w30 BackgroundTrans Right c" . launchPadGui.Theme.TextColor["Disabled"], StrUpper(string2Values("-", kVersion)[2]))
+			if (version[2] != "release")
+				launchPadGui.Add("Text", "x546 YP+12 w30 BackgroundTrans Right c" . launchPadGui.Theme.TextColor["Disabled"], StrUpper(version[2]))
 		}
 
 		launchPadGui.SetFont("s9 Norm", "Arial")

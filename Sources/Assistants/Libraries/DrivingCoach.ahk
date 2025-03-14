@@ -301,7 +301,12 @@ class DrivingCoach extends GridRaceAssistant {
 		this.updateConfigurationValues({Announcements: {SessionInformation: true, StintInformation: false, HandlingInformation: false}
 									  , OnTrackCoaching: false})
 
-		DirCreate(this.Options["Driving Coach.Archive"])
+		try {
+			DirCreate(this.Options["Driving Coach.Archive"])
+		}
+		catch {
+			logError(exception)
+		}
 
 		OnExit(ObjBindMethod(this, "stopIssueCollector"))
 		OnExit((*) {
@@ -320,7 +325,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		options["Driving Coach.Archive"] := getMultiMapValue(configuration, "Driving Coach Conversations", "Archive", kTempDirectory . "Conversations")
 
-		if (!options["Driving Coach.Archive"] || (options["Driving Coach.Archive"] = ""))
+		if (!options["Driving Coach.Archive"] || (Trim(options["Driving Coach.Archive"]) = ""))
 			options["Driving Coach.Archive"] := (kTempDirectory . "Conversations")
 
 		options["Driving Coach.Service"] := getMultiMapValue(configuration, "Driving Coach Service", "Service", getMultiMapValue(configuration, "Driving Coach", "Service", false))
@@ -955,7 +960,12 @@ class DrivingCoach extends GridRaceAssistant {
 						this.getSpeaker().speak(part . ".", false, false, {Noise: false, Rephrase: false, Click: (A_Index = 1)})
 
 			if (this.Transcript && (this.Mode != "Coaching"))
-				FileAppend(translate("-- Driver --------") . "`n`n" . (originalText ? originalText : text) . "`n`n" . translate("-- Coach ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16")
+				try {
+					FileAppend(translate("-- Driver --------") . "`n`n" . (originalText ? originalText : text) . "`n`n" . translate("-- Coach ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16")
+				}
+				catch Any as exception {
+					logError(exception)
+				}
 		}
 	}
 

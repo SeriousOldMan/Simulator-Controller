@@ -1046,7 +1046,7 @@ class TelemetryViewer {
 
 						this.restart(this.TelemetryDirectory)
 
-						this.startupCollector(newProvider, this.TelemetryDirectory, collector.Simulator, collector.Track, collector.TrackLength)
+						this.startupCollector(collector.Simulator, collector.Track, collector.TrackLength)
 					}
 				}
 			}

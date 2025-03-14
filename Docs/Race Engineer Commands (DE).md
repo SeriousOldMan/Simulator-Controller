@@ -90,6 +90,8 @@ Announcements=Benzinmangel Warnungen, Schadenswarnungen, Schadensanalysen, Wette
 	[(GibMir) die {Bremsentemperaturen, Bremsen Temperaturen, Temperaturen der Bremsen im Moment}, (KannstDu) (Mir) die {Bremsentemperaturen, Bremsen Temperaturen, Temperaturen der Bremsen im Moment} {durchgeben, durchgeben bitte, bitte durchgeben}]
 
 	{Sag mir, Überprüfe mal, Überprüfe bitte mal, Bitte überprüfe} {den Bremsenverschleiß, den Verschleiß der Bremsen, den Bremsenverschleiß im Moment, den Verschleiß der Bremsen im Moment}
+	
+	[(GibMir) {die, die aktuellen} {Motortemperaturen, Motor Temperaturen}, (KannstDu) (Mir) {die, die aktuellen} {Motortemperaturen, Motor Temperaturen} {durchgeben, durchgeben bitte, bitte durchgeben}]
 
 	[{Wie viele, Sag mir wie viele, Sag mir bitte wie viele} Runden {bleiben, gehen} noch, Für wie viele Runden reicht der {Sprit, Sprit noch}, (KannstDu) (Mir) sagen {wie viele Runden noch gehen, wie viele Runden noch bleiben, für wie viele Runden der Sprit noch reicht}]
 

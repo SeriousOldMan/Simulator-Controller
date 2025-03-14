@@ -40,7 +40,7 @@ Following you will find an overview about the different database topics:
 
 #### Settings
 
-The AI Race Assistants provide many settings, as you may have seen in the section about the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#race-settings) in the documentation about the Race Engineer. Many values are specific for a given car or track, for example the pitstop delta or the time required to change tyres. You can change all these settings manually before each session, or you can store default values for all theses settings in the session database.
+The AI Race Assistants provide many settings, as you may have seen in the section about the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#race-settings) in the documentation about the Race Engineer. Many values are specific for a given car or track, for example the pitstop delta or the time required to change tyres. You can change all these settings manually before each session, or you can store default values for all these settings in the session database.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%205.jpg)
 

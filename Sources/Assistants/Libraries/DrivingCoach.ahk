@@ -883,7 +883,8 @@ class DrivingCoach extends GridRaceAssistant {
 		static conversationNr := 1
 
 		try {
-			if (this.Speaker && this.Options["Driving Coach.Confirmation"] && (this.ConnectionState = "Active"))
+			if (this.Speaker && this.Options["Driving Coach.Confirmation"]
+							 && (this.ConnectionState = "Active") && (this.Mode != "Coaching"))
 				this.getSpeaker().speakPhrase("Confirm", false, false, false, {Noise: false})
 
 			if (this.Connector || this.startConversation()) {

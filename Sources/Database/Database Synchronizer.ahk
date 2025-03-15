@@ -63,6 +63,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 	local step := 20
 	local simulator, car, track, distFile
 	local directory, sourceDB, targetDB, ignore, type, row, compound, compoundColor
+	local name, extension, files
 
 	updateState() {
 		if (++step > 20) {
@@ -154,27 +155,44 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 									try {
 										directory := sessionDBPath . "User\" . simulator . "\" . car . "\" . track . "\Car Setups"
 
-										if FileExist(directory)
+										if FileExist(directory) {
 											DirCopy(directory, kTempDirectory . "Shared Database\Community\" . simulator . "\" . car . "\" . track . "\Car Setups")
 
 											directory := kTempDirectory . "Shared Database\Community\" . simulator . "\" . car . "\" . track . "\Car Setups\"
 
-											for ignore, type in kSetupTypes
-												loop Files, directory . type . "\*.info", "F" {
-													updateState()
+											files := []
 
+											for ignore, type in kSetupTypes
+												loop Files, directory . type . "\*.*", "F" {
+													SplitPath(A_LoopFileName, , , &extension, &name)
+
+													if (extension = "info") {
+														updateState()
+
+														info := sessionDB.readSetupInfo(simulator, car, track, type, name)
+
+														if ((getMultiMapValue(info, "Origin", "Driver", false) != sessionDB.ID)
+														 || !getMultiMapValue(info, "Access", "Share", false))
+															deleteFile(directory . getMultiMapValue(info, "Setup", "Name"))
+														else
+															files.Push([type, getMultiMapValue(info, "Setup", "Name")])
+
+														deleteFile(A_LoopFilePath)
+
+														Sleep(1)
+													}
+												}
+
+											for ignore, type in kSetupTypes
+												loop Files, directory . type . "\*.*", "F" {
 													SplitPath(A_LoopFileName, , , , &name)
 
-													info := sessionDB.readSetupInfo(simulator, car, track, type, name)
-
-													if ((getMultiMapValue(info, "Origin", "Driver", false) != sessionDB.ID)
-													 || !getMultiMapValue(info, "Access", "Share", false))
-														deleteFile(directory . getMultiMapValue(info, "Setup", "Name"))
-
-													deleteFile(A_LoopFilePath)
+													if (choose(files, (c) => ((c[1] = type) && c[2] = name)).Length = 0)
+														deleteFile(A_LoopFilePath)
 
 													Sleep(1)
 												}
+										}
 									}
 									catch Any as exception {
 										logError(exception)
@@ -185,7 +203,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 									try {
 										directory := sessionDBPath . "User\" . simulator . "\" . car . "\" . track . "\Race Strategies"
 
-										if FileExist(directory)
+										if FileExist(directory) {
 											DirCopy(directory, kTempDirectory . "Shared Database\Community\" . simulator . "\" . car . "\" . track . "\Race Strategies")
 
 											directory := kTempDirectory . "Shared Database\Community\" . simulator . "\" . car . "\" . track . "\Race Strategies\"
@@ -205,6 +223,20 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 
 												Sleep(1)
 											}
+
+											loop Files, directory . "*.*", "FD" {
+												if InStr(FileExist(A_LoopFileName), "D")
+													deleteDirectory(A_LoopFileName)
+												else {
+													SplitPath(A_LoopFileName, , , &extension)
+
+													if ((extension != "info") && (extension != "strategy"))
+														deleteFile(A_LoopFileName)
+												}
+
+												Sleep(1)
+											}
+										}
 									}
 									catch Any as exception {
 										logError(exception)
@@ -215,7 +247,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 									try {
 										directory := sessionDBPath . "User\" . simulator . "\" . car . "\" . track . "\Lap Telemetries"
 
-										if FileExist(directory)
+										if FileExist(directory) {
 											DirCopy(directory, kTempDirectory . "Shared Database\Community\" . simulator . "\" . car . "\" . track . "\Lap Telemetries")
 
 											directory := kTempDirectory . "Shared Database\Community\" . simulator . "\" . car . "\" . track . "\Lap Telemetries\"
@@ -235,6 +267,20 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 
 												Sleep(1)
 											}
+
+											loop Files, directory . "*.*", "FD" {
+												if InStr(FileExist(A_LoopFileName), "D")
+													deleteDirectory(A_LoopFileName)
+												else {
+													SplitPath(A_LoopFileName, , , &extension)
+
+													if ((extension != "info") && (extension != "telemetry"))
+														deleteFile(A_LoopFileName)
+												}
+
+												Sleep(1)
+											}
+										}
 									}
 									catch Any as exception {
 										logError(exception)

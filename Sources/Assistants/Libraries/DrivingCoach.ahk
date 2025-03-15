@@ -577,7 +577,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 						if telemetry {
 							command := substituteVariables(this.Instructions["Coaching"] . "`n`n%telemetry%"
-														 , {name: this.VoiceManager.Name, telemetry: telemetry.JSON})
+														 , {telemetry: telemetry.JSON})
 
 							if reference
 								command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]

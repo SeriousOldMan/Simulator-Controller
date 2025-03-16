@@ -1022,6 +1022,86 @@ class LMURESTProvider {
 		}
 	}
 
+	class StandingsData extends LMURESTProvider.RESTData {
+		iCachedCars := CaseInsenseMap()
+
+		GETURL {
+			Get {
+				return "http://localhost:6397/rest/watch/standings/history"
+			}
+		}
+
+		Driver[carID] {
+			Get {
+				return this.getDriver[carID]
+			}
+		}
+
+		Position[carID] {
+			Get {
+				return this.getPosition[carID]
+			}
+		}
+
+		Class[carID] {
+			Get {
+				return this.getClass[carID]
+			}
+		}
+
+		Laps[carID] {
+			Get {
+				return this.getLaps[carID]
+			}
+		}
+
+		getCarDescriptor(carID) {
+			local ignore, candidate
+
+			if this.iCachedCars.Has(carID)
+				return this.iCachedCars[carID]
+			else if this.Data {
+				loop {
+					if !this.Data.Has(String(A_Index))
+						break
+
+					for ignore, candidate in this.Data[String(A_index)]
+						if (candidate["slotID"] = carID) {
+							this.iCachedCars[carID] := candidate
+
+							return candidate
+						}
+				}
+
+				return false
+			}
+		}
+
+		getDriver(carID) {
+			local car := this.getCarDescriptor(carID)
+
+			return (car ? car["driverName"] : false)
+		}
+
+		getPosition(carID) {
+			local car := this.getCarDescriptor(carID)
+
+			return (car ? car["position"] : false)
+		}
+
+		getClass(carID) {
+			local car := this.getCarDescriptor(carID)
+
+			return (car ? car["carClass"] : false)
+		}
+
+		getLaps(carID) {
+			local car := this.getCarDescriptor(carID)
+
+			return (car ? car["totalLaps"] : false)
+		}
+	}
+
 	class WeatherData extends LMURESTProvider.RESTData {
 		GETURL {
 			Get {

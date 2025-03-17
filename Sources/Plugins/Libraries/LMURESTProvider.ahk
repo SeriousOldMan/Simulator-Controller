@@ -84,7 +84,7 @@ class LMURESTProvider {
 
 			if lmuApplication.isRunning() {
 				try {
-					data := WinHttpRequest({Timeouts: [0, 500, 500, 500]}).GET(url, "", false, {Encoding: "UTF-8"}).JSON
+					data := WinHttpRequest({Timeouts: [0, 500, 500, 500]}).GET(url, "", false, {Encoding: "UTF-8", Content: "application/json"}).JSON
 
 					if !isObject(data)
 						data := false
@@ -1053,17 +1053,18 @@ class LMURESTProvider {
 		}
 
 		getCarDescriptor(carID) {
-			local ignore, candidate
+			local ignore, candidates, candidate
 
 			if this.iCachedCars.Has(carID)
 				return this.iCachedCars[carID]
 			else if this.Data
-				for ignore, candidate in this.Data
-					if (candidate["slotID"] = carID) {
-						this.iCachedCars[carID] := candidate
+				for ignore, candidates in this.Data
+					for ignore, candidate in candidates
+						if (candidate["slotID"] = carID) {
+							this.iCachedCars[carID] := candidate
 
-						return candidate
-					}
+							return candidate
+						}
 
 			return false
 		}

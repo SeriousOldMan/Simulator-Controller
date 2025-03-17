@@ -366,6 +366,11 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Car", model)
 
 				if (A_Index != driver) {
+					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Name"
+								   , driverName(getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Forname", "")
+											  , getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Surname", "")
+											  , getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", "")))
+
 					parseDriverName(this.parseDriverName(getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".ID")
 													   , carRaw, getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Forname", "")
 															   , getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Surname", "")

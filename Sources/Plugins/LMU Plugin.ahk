@@ -505,9 +505,9 @@ class LMUPlugin extends Sector397Plugin {
 	}
 
 	parseCarName(carID, carName, &model?, &nr?, &category?, &team?) {
+		local gridData := this.GridData
 		local drivers := gridData.Drivers[carName]
 		local standingsData := ((carID && (drivers.Length > 0)) ? this.StandingsData : false)
-		local gridData := this.GridData
 
 		model := gridData.Car[carName]
 		team := gridData.Team[carName]

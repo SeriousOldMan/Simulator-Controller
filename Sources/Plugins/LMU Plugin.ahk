@@ -33,7 +33,9 @@ class LMUPlugin extends Sector397Plugin {
 	iTrackData := false
 	iTeamData := false
 	iGridData := false
+
 	iStandingsData := false
+	iStandingsTimeout := 0
 
 	iLastFuelAmount := 0
 	iRemainingFuelAmount := 0
@@ -74,6 +76,15 @@ class LMUPlugin extends Sector397Plugin {
 
 	StandingsData {
 		Get {
+			if (A_TickCount > this.iStandingsTimeout)
+				this.iStandingsData := false
+
+			if !this.iStandingsData {
+				this.iStandingsData := LMURESTProvider.StandingsData()
+
+				this.iStandingsTimeout := (A_TickCount + 20000)
+			}
+
 			return this.iStandingsData
 		}
 	}

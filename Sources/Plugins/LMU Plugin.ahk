@@ -571,17 +571,6 @@ class LMUPlugin extends Sector397Plugin {
 		}
 	}
 
-	acquirePositionsData(telemetryData, finished := false) {
-		this.iStandingsData := LMURESTProvider.StandingsData()
-
-		try {
-			return super.acquirePositionsData(telemetryData, finished)
-		}
-		finally {
-			this.iStandingsData := false
-		}
-	}
-
 	readSessionData(options := "", protocol?) {
 		local simulator := this.Simulator[true]
 		local car, track, data, setupData, tyreCompound, tyreCompoundColor, key, postFix, fuelAmount

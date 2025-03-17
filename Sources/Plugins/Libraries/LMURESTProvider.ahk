@@ -946,70 +946,67 @@ class LMURESTProvider {
 			}
 		}
 
-		Car[carID] {
+		Car[carDesc] {
 			Get {
-				return this.getCar(carID)
+				return this.getCar(carDesc)
 			}
 		}
 
-		Class[carID] {
+		Class[carDesc] {
 			Get {
-				return this.getClass(carID)
+				return this.getClass(carDesc)
 			}
 		}
 
-		Team[carID] {
+		Team[carDesc] {
 			Get {
-				return this.getTeam(carID)
+				return this.getTeam(carDesc)
 			}
 		}
 
-		Drivers[carID] {
+		Drivers[carDesc] {
 			Get {
-				return this.getDrivers(carID)
+				return this.getDrivers(carDesc)
 			}
 		}
 
-		getCarDescriptor(carID) {
+		getCarDescriptor(carDesc) {
 			local ignore, candidate
 
-			if this.iCachedCars.Has(carID)
-				return this.iCachedCars[carID]
-			else if this.Data {
-				if (Trim(carID) != "")
+			if this.iCachedCars.Has(carDesc)
+				return this.iCachedCars[carDesc]
+			else if this.Data
+				if (Trim(carDesc) != "")
 					for ignore, candidate in this.Data
-						if (InStr(candidate["desc"], carID) = 1) {
-							this.iCachedCars[carID] := candidate
+						if (InStr(candidate["desc"], carDesc) = 1) {
+							this.iCachedCars[carDesc] := candidate
 
 							return candidate
 						}
 
-				return false
-			}
-			else
-				return false
+			return false
 		}
 
-		getCar(carID) {
-			local car := this.getCarDescriptor(carID)
+		getCar(carDesc) {
+			local car := this.getCarDescriptor(carDesc)
 
 			return (car ? string2Values(",", car["fullPathTree"])[3] : false)
 		}
 
-		getClass(carID) {
-			local car := this.getCarDescriptor(carID)
+		getClass(carDesc) {
+			local car := this.getCarDescriptor(carDesc)
 
 			return (car ? string2Values(",", car["fullPathTree"])[2] : false)
 		}
 
-		getTeam(carID) {
-			local car := this.getCarDescriptor(carID)
+		getTeam(carDesc) {
+			local car := this.getCarDescriptor(carDesc)
 
 			return (car ? car["team"] : false)
 		}
 
-		getDrivers(carID) {
-			local car := this.getCarDescriptor(carID)
+		getDrivers(carDesc) {
+			local car := this.getCarDescriptor(carDesc)
 			local result := []
 			local ignore, driver
 
@@ -1056,25 +1053,20 @@ class LMURESTProvider {
 		}
 
 		getCarDescriptor(carID) {
-			local ignore, candidate
+			local ignore, candidates, candidate
 
 			if this.iCachedCars.Has(carID)
 				return this.iCachedCars[carID]
-			else if this.Data {
-				loop {
-					if !this.Data.Has(String(A_Index))
-						break
-
-					for ignore, candidate in this.Data[String(A_index)]
+			else if this.Data
+				for ignore, candidates in this.Data
+					for ignore, candidate in candidates
 						if (candidate["slotID"] = carID) {
 							this.iCachedCars[carID] := candidate
 
 							return candidate
 						}
-				}
 
-				return false
-			}
+			return false
 		}
 
 		getDriver(carID) {

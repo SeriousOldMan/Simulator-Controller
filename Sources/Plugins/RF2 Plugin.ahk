@@ -297,7 +297,7 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 		return ((temp != "") ? temp : false)
 	}
 
-	parseCarName(carName, &model?, &nr?, &category?, &team?) {
+	parseCarName(carID, carName, &model?, &nr?, &category?, &team?) {
 		local index
 
 		model := false
@@ -344,7 +344,7 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	parseDriverName(carName, forName, surName, nickName) {
+	parseDriverName(carID, carName, forName, surName, nickName) {
 		return driverName(forName, surName, nickName)
 	}
 
@@ -359,13 +359,15 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 			carRaw := getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".CarRaw", kUndefined)
 
 			if (carRaw != kUndefined) {
-				this.parseCarName(carRaw, &model, &nr, &category)
+				this.parseCarName(getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".ID")
+								, carRaw, &model, &nr, &category)
 
 				if model
 					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Car", model)
 
 				if (A_Index != driver) {
-					parseDriverName(this.parseDriverName(carRaw, getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Forname", "")
+					parseDriverName(this.parseDriverName(getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".ID")
+													   , carRaw, getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Forname", "")
 															   , getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Surname", "")
 															   , getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", ""))
 								  , &forName, &surName, &nickName)
@@ -421,7 +423,7 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 														   , (lastSimulator = "rFactor 2") ? 60 : 20)
 		}
 
-		this.parseCarName(getMultiMapValue(telemetryData, "Session Data", "CarRaw"), &model)
+		this.parseCarName(false, getMultiMapValue(telemetryData, "Session Data", "CarRaw"), &model)
 
 		if model
 			setMultiMapValue(telemetryData, "Session Data", "Car", model)

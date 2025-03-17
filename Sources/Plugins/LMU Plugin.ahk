@@ -33,6 +33,7 @@ class LMUPlugin extends Sector397Plugin {
 	iTrackData := false
 	iTeamData := false
 	iGridData := false
+	iStandingsData := false
 
 	iLastFuelAmount := 0
 	iRemainingFuelAmount := 0
@@ -68,6 +69,12 @@ class LMUPlugin extends Sector397Plugin {
 				this.iGridData := LMURESTProvider.GridData()
 
 			return this.iGridData
+		}
+	}
+
+	StandingsData {
+		Get {
+			return this.iStandingsData
 		}
 	}
 
@@ -486,8 +493,10 @@ class LMUPlugin extends Sector397Plugin {
 		return false
 	}
 
-	parseCarName(carName, &model?, &nr?, &category?, &team?) {
+	parseCarName(carID, carName, &model?, &nr?, &category?, &team?) {
+		local standingsData := (carID ? this.StandingsData : false)
 		local gridData := this.GridData
+		local driver := gridData.Drivers[carName][1]
 
 		model := gridData.Car[carName]
 		team := gridData.Team[carName]
@@ -495,27 +504,41 @@ class LMUPlugin extends Sector397Plugin {
 		if ((carName != "") && isNumber(SubStr(carName, 1, 1)))
 			nr := this.parseNr(carName, &carName)
 		else
-			super.parseCarName(carName, , &nr)
+			super.parseCarName(carID, carName, , &nr)
 
 		try {
-			category := gridData.Drivers[carName][1].Category
+			if (!standingsData || (standingsData.Driver[carID] = driver.Name))
+				category := driver.Category
+			else
+				category := false
 		}
 		catch Any {
 			category := false
 		}
 	}
 
-	parseDriverName(carName, forName, surName, nickName) {
+	parseDriverName(carID, carName, forName, surName, nickName) {
+		local standingsData := this.StandingsData
 		local driver
 
 		try {
+			if standingsData {
+				driver := standingsData.Driver[carID]
+
+				if driver
+					return driver
+			}
+
 			driver := this.GridData.Drivers[carName][1]
+
+			if driver
+				return driver.Name
 		}
-		catch Any {
-			driver := false
+		catch Any as exception {
+			logError(exception)
 		}
 
-		return (driver ? driver.Name : super.parseDriverName(carName, forName, surName, nickName))
+		return super.parseDriverName(carID, carName, forName, surName, nickName)
 	}
 
 	updateSession(session, force := false) {
@@ -534,6 +557,17 @@ class LMUPlugin extends Sector397Plugin {
 			this.iFuelRatio := 1
 
 			this.iAdjustRefuelAmount := false
+		}
+	}
+
+	acquirePositionsData(telemetryData, finished := false) {
+		this.iStandingsData := LMURESTProvider.StandingsData()
+
+		try {
+			return super.acquirePositionsData(telemetryData, finished)
+		}
+		finally {
+			this.iStandingsData := false
 		}
 	}
 

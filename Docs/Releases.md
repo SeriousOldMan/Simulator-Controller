@@ -45,6 +45,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - [New voice command for the Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(EN)) lets you ask for the current engine temperatures.
   - New information request action "EngineTemperatures" for the ["Race Engineer"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin can be used to achieve the same result.
   - A new icon in the Stream Deck icon set is provided for the "EngineTemperatures" action.
+  - Additional translations for Portuguese thanks to @Hudson Alves.
 
 # Release history
 

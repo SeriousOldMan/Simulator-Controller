@@ -505,9 +505,9 @@ class LMUPlugin extends Sector397Plugin {
 	}
 
 	parseCarName(carID, carName, &model?, &nr?, &category?, &team?) {
-		local standingsData := (carID ? this.StandingsData : false)
+		local drivers := gridData.Drivers[carName]
+		local standingsData := ((carID && (drivers.Length > 0)) ? this.StandingsData : false)
 		local gridData := this.GridData
-		local driver := gridData.Drivers[carName][1]
 
 		model := gridData.Car[carName]
 		team := gridData.Team[carName]
@@ -518,8 +518,8 @@ class LMUPlugin extends Sector397Plugin {
 			super.parseCarName(carID, carName, , &nr)
 
 		try {
-			if (!standingsData || (standingsData.Driver[carID] = driver.Name))
-				category := driver.Category
+			if (!standingsData || (standingsData.Driver[carID] = drivers[1].Name))
+				category := drivers[1].Category
 			else
 				category := false
 		}
@@ -539,7 +539,12 @@ class LMUPlugin extends Sector397Plugin {
 				if driver
 					return driver
 			}
+		}
+		catch Any as exception {
+			logError(exception)
+		}
 
+		try {
 			driver := this.GridData.Drivers[carName][1]
 
 			if driver

@@ -1030,41 +1030,40 @@ class LMURESTProvider {
 
 		Driver[carID] {
 			Get {
-				return this.getDriver[carID]
+				return this.getDriver(carID)
 			}
 		}
 
 		Position[carID] {
 			Get {
-				return this.getPosition[carID]
+				return this.getPosition(carID)
 			}
 		}
 
 		Class[carID] {
 			Get {
-				return this.getClass[carID]
+				return this.getClass(carID)
 			}
 		}
 
 		Laps[carID] {
 			Get {
-				return this.getLaps[carID]
+				return this.getLaps(carID)
 			}
 		}
 
 		getCarDescriptor(carID) {
-			local ignore, candidates, candidate
+			local ignore, candidate
 
 			if this.iCachedCars.Has(carID)
 				return this.iCachedCars[carID]
 			else if this.Data
-				for ignore, candidates in this.Data
-					for ignore, candidate in candidates
-						if (candidate["slotID"] = carID) {
-							this.iCachedCars[carID] := candidate
+				for ignore, candidate in this.Data
+					if (candidate["slotID"] = carID) {
+						this.iCachedCars[carID] := candidate
 
-							return candidate
-						}
+						return candidate
+					}
 
 			return false
 		}

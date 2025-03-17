@@ -1,9 +1,9 @@
 [Development]
 Version=6.2.4.0-dev
 Target=6.2.4.0-release
-Date=03/14/2025
+Date=03/17/2025
 Download=
-Changes=New voice command to request engine temperatures, New information request action "EngineTemperatures" for the "Race Engineer" plugin, New icon in the Stream Deck icon set for engine temperatures, Fixed confirmation for on-track coaching
+Changes=New voice command to request engine temperatures, New information request action "EngineTemperatures" for the "Race Engineer" plugin, New icon in the Stream Deck icon set for engine temperatures, Fixed confirmation for on-track coaching, Next part of Portuguese translations, Fixed driver names for LMU
 Components=Media->5.6.1,Configuration->6.2.4,Utilities->6.2.2
 [Release]
 Version=6.2.3.0-release

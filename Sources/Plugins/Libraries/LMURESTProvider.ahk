@@ -1020,7 +1020,7 @@ class LMURESTProvider {
 	}
 
 	class StandingsData extends LMURESTProvider.RESTData {
-		iCachedCars := CaseInsenseMap()
+		iStandings := false
 
 		GETURL {
 			Get {
@@ -1028,67 +1028,65 @@ class LMURESTProvider {
 			}
 		}
 
-		Driver[carID] {
+		Count {
 			Get {
-				return this.getDriver(carID)
+				if !this.iStandings
+					this.getCarDescriptor(1)
+
+				return (this.iStandings ? this.iStandings.Count : false)
 			}
 		}
 
-		Position[carID] {
+		Driver[position] {
 			Get {
-				return this.getPosition(carID)
+				return this.getDriver(position)
 			}
 		}
 
-		Class[carID] {
+		Class[position] {
 			Get {
-				return this.getClass(carID)
+				return this.getClass(position)
 			}
 		}
 
-		Laps[carID] {
+		Laps[position] {
 			Get {
-				return this.getLaps(carID)
+				return this.getLaps(position)
 			}
 		}
 
-		getCarDescriptor(carID) {
-			local ignore, candidates, candidate
+		getCarDescriptor(position) {
+			local ignore, candidates, candidate, standings
 
-			if this.iCachedCars.Has(carID)
-				return this.iCachedCars[carID]
-			else if this.Data
+			if !this.iStandings && this.Data {
+				standings := Map()
+
 				for ignore, candidates in this.Data
 					for ignore, candidate in candidates
-						if (candidate["slotID"] = carID) {
-							this.iCachedCars[carID] := candidate
+						standings[Integer(candidate["position"])] := candidate
 
-							return candidate
-						}
+				this.iStandings := standings
+			}
 
-			return false
+			position := Integer(position)
+
+			return ((this.iStandings && this.iStandings.Has(position)) ? this.iStandings[position] : false)
 		}
 
-		getDriver(carID) {
-			local car := this.getCarDescriptor(carID)
+		getDriver(position) {
+			local car := this.getCarDescriptor(position)
 
 			return (car ? car["driverName"] : false)
 		}
 
-		getPosition(carID) {
-			local car := this.getCarDescriptor(carID)
-
-			return (car ? car["position"] : false)
-		}
-
-		getClass(carID) {
-			local car := this.getCarDescriptor(carID)
+		getClass(position) {
+			local car := this.getCarDescriptor(position)
 
 			return (car ? car["carClass"] : false)
 		}
 
-		getLaps(carID) {
-			local car := this.getCarDescriptor(carID)
+		getLaps(position) {
+			local car := this.getCarDescriptor(position)
 
 			return (car ? car["totalLaps"] : false)
 		}

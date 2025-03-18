@@ -603,6 +603,7 @@ class LMUPlugin extends Sector397Plugin {
 		}
 	}
 
+	/*
 	parseDriverName(carID, carName, forName, surName, nickName) {
 		local carInfos := this.CarInfos
 		local driver
@@ -626,6 +627,7 @@ class LMUPlugin extends Sector397Plugin {
 
 		return super.parseDriverName(carID, carName, forName, surName, nickName)
 	}
+	*/
 
 	updateSession(session, force := false) {
 		super.updateSession(session, force)

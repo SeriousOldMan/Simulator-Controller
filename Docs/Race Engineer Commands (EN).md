@@ -25,7 +25,7 @@ Below you will find a complete list of all voice commands recognized by Jona, th
    
 		{ pressures, tyre pressures }
 
-   If a given list of choices is used in several phrases, a variable may be defined for it and a variable reference (the name of the choices list enclosed by **(** and **)**) may be used instead of explicit syntax. All predefined choices are listed in the section "[Choices]" of the [grammar file](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Assistants/Grammars/Race%20Engineer.grammars.en) and look like this:
+   If a given list of choices is used in several phrases, a variable may be defined for it and a variable reference (the name of the choices list enclosed by **(** and **)**) may be used instead of explicit syntax. All predefined choices are listed in the section "[Choices]" of the [grammar file](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Assistants/Grammars/Choices.en) and look like this:
 
 		TellMe=Can you tell me, Please tell me, Tell me, Can you give me, Please give me, Give me
 
@@ -90,6 +90,8 @@ Announcements=fuel warnings, damage warnings, damage analysis, weather warnings,
 	[(WhatAre) {the brake temperatures, the current brake temperatures, the brake temperatures at the moment}, (TellMe) {the brake temperatures, the current brake temperatures, the brake temperatures at the moment}]
 
 	[{Check, Please check} {the brake wear, the brake wear at the moment}, (TellMe) {the brake wear, the brake wear at the moment}]
+	
+	[(WhatAre) {the engine temperatures, the current engine temperatures}, (TellMe) {the engine temperatures, the current engine temperatures}]
 
 	[(TellMe) the remaining laps, How many laps are remaining, How many laps are left, How many laps to go, How long to go]
 

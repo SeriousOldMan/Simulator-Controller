@@ -18,14 +18,13 @@ Vous trouverez ci-dessous une liste complète de toutes les commandes vocales re
 		
    Le premier exemple est une phrase simple. Le deuxième permet des choix tels que définis par la variable *TellMe* (voir ci-dessous), et le troisième exemple utilise un choix local et signifie "Quelle heure est-il?" et "Quelle est l'heure actuelle?".
 
-
 3. Choix
 
    En utilisant cette syntaxe, des parties alternatives d'une phrase peuvent être définies. Les (sous-)phrases alternatives doivent être entourées de **{** et **}** et doivent être séparées par des virgules. Chaque (sous-)phrase ne peut contenir que des mots simples. Exemple:
    
 		{ pressions, pressions des pneus }
 
-   Si une liste de choix donnée est utilisée dans plusieurs phrases, une variable peut être définie pour elle et une référence de variable (le nom de la liste de choix entouré de **(** et **)**) peut être utilisée à la place d'une référence explicite. syntaxe. Tous les choix prédéfinis sont répertoriés dans la section "[Choices]" du [fichier de grammaire](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Assistants/Grammars/Race%20Engineer.grammars.fr) et ressemble à ceci:
+   Si une liste de choix donnée est utilisée dans plusieurs phrases, une variable peut être définie pour elle et une référence de variable (le nom de la liste de choix entouré de **(** et **)**) peut être utilisée à la place d'une référence explicite. syntaxe. Tous les choix prédéfinis sont répertoriés dans la section "[Choices]" du [fichier de grammaire](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Assistants/Grammars/Choices.fr) et ressemble à ceci:
 
 		TellMe=Pouvez-vous me dire, S'il vous plaît, Dites-moi, Pouvez-vous me donner, S'il vous plaît, Donnez-moi, Donnez-moi
 

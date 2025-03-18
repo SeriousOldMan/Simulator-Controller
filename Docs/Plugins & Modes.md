@@ -360,6 +360,7 @@ Please see the following table for available information commands.
 | TyreWear | This command will give you the current tyre wear in percentage of total wear for the inidividual tyres. Not all simulators support this, and to be honest, it also not available for most race cars in real life. |
 | BrakeTemperatures | This command will give you the current temperatures for the individual brakes in Degrees Celsius. |
 | BrakeWear | This command will give you the current tyre wear in percentage of total wear for the brakes. Not all simulators support this, and to be honest, it also not available for most race cars in real life. |
+| EngineTemperatures | This command will give you the current water and oil temperatures, if they are available. |
 
 Note: All these commands are also available in most of the simulation plugins, either in the "Pitstop" mode or in the "Assistant" mode, depending on the configuration parameters.
 

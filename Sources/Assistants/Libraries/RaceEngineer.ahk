@@ -406,6 +406,8 @@ class RaceEngineer extends RaceAssistant {
 				this.tyreInfoRecognized(Array(this.getSpeaker().Fragments["Temperatures"]))
 			case "TyrePressures":
 				this.tyreInfoRecognized(concatenate(Array(this.getSpeaker().Fragments["Pressures"]), words))
+			case "EngineTemperatures":
+				this.engineInfoRecognized(Array(this.getSpeaker().Fragments["Temperatures"]))
 			case "Weather":
 				this.weatherRecognized(words)
 			case "FuelRatioOptimize":
@@ -915,6 +917,8 @@ class RaceEngineer extends RaceAssistant {
 				this.brakeTemperaturesRecognized([])
 			case "BrakeWear":
 				this.brakeWearRecognized([])
+			case "EngineTemperatures":
+				this.engineInfoRecognized(Array(this.getSpeaker().Fragments["Temperatures"]))
 			default:
 				super.requestInformation(category, arguments*)
 		}
@@ -1193,6 +1197,43 @@ class RaceEngineer extends RaceAssistant {
 			finally {
 				speaker.endTalk()
 			}
+		}
+	}
+
+	engineInfoRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		local speaker := this.getSpeaker()
+		local fragments := speaker.Fragments
+		local waterTemperature := false
+		local oilTemperature := false
+
+		if !this.hasEnoughData()
+			return
+
+		speaker.beginTalk()
+
+		try {
+			lap := knowledgeBase.getValue("Lap")
+
+			waterTemperature := knowledgeBase.getValue("Lap." . lap . ".Engine.Temperature.Water", false)
+			oilTemperature := knowledgeBase.getValue("Lap." . lap . ".Engine.Temperature.Oil", false)
+
+			if (waterTemperature || oilTemperature) {
+				speaker.speakPhrase("Temperatures")
+
+				if waterTemperature
+					speaker.speakPhrase("WaterTemperature", {value: speaker.number2Speech(convertUnit("Temperature",  waterTemperature))
+														   , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
+
+				if oilTemperature
+					speaker.speakPhrase("OilTemperature", {value: speaker.number2Speech(convertUnit("Temperature",  oilTemperature))
+														 , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
+			}
+			else
+				speaker.speakPhrase("NoData")
+		}
+		finally {
+			speaker.endTalk()
 		}
 	}
 

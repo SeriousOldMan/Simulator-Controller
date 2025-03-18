@@ -168,6 +168,9 @@ class WinHTTPRequest extends WinHttpRequest._Call {
         for key, value in (isInstance(headers, Map) ? headers : headers.OwnProps())
             this.whr.SetRequestHeader(key, value)
 
+        if options.HasProp("Content")
+            this.whr.SetRequestHeader("Content-Type", options.Content)
+
         this.whr.Send(body)
         this.whr.WaitForResponse()
 
@@ -213,7 +216,8 @@ class WinHTTPRequest extends WinHttpRequest._Call {
                                     , "jpg", "image/jpeg"
                                     , "json", "application/json"
                                     , "png", "image/png"
-                                    , "zip", "application/zip")
+                                    , "zip", "application/zip"
+                                    , "txt", "text/plain")
 
         return (mime.Has(extension) ? mime[Extension] : "application/octet-stream")
     }

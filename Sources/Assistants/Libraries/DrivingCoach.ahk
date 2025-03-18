@@ -577,7 +577,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 						if telemetry {
 							command := substituteVariables(this.Instructions["Coaching"] . "`n`n%telemetry%"
-														 , {name: this.VoiceManager.Name, telemetry: telemetry.JSON})
+														 , {telemetry: telemetry.JSON})
 
 							if reference
 								command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
@@ -883,7 +883,8 @@ class DrivingCoach extends GridRaceAssistant {
 		static conversationNr := 1
 
 		try {
-			if (this.Speaker && this.Options["Driving Coach.Confirmation"] && (this.ConnectionState = "Active"))
+			if (this.Speaker && this.Options["Driving Coach.Confirmation"]
+							 && (this.ConnectionState = "Active") && (this.Mode != "Coaching"))
 				this.getSpeaker().speakPhrase("Confirm", false, false, false, {Noise: false})
 
 			if (this.Connector || this.startConversation()) {

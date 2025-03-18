@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[6.2.4.0-dev](https://www.dropbox.com/scl/fi/nj4318hwq0ix9iglr9ymz/Simulator-Controller-6.2.4.0-dev.zip?rlkey=6v50kjsac3shvtgdaz0x45qhb&st=r14i22y2&dl=1) (Early build for 6.2.4. Changes: New voice command to request engine temperatures, New information request action "EngineTemperatures" for the "Race Engineer" plugin, New icon in the Stream Deck icon set for engine temperatures, Fixed confirmation for on-track coaching, Next part of Portuguese translations, Fixed driver names for LMU.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-624) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

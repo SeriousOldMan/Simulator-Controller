@@ -1,9 +1,9 @@
 [Development]
-Version=6.2.4.0-dev
+Version=6.2.4.0-beta
 Target=6.2.4.0-release
-Date=03/18/2025
-Download=https://www.dropbox.com/scl/fi/nj4318hwq0ix9iglr9ymz/Simulator-Controller-6.2.4.0-dev.zip?rlkey=6v50kjsac3shvtgdaz0x45qhb&st=r14i22y2&dl=1
-Changes=New voice command to request engine temperatures, New information request action "EngineTemperatures" for the "Race Engineer" plugin, New icon in the Stream Deck icon set for engine temperatures, Fixed confirmation for on-track coaching, Next part of Portuguese translations, Fixed driver names for LMU
+Date=03/19/2025
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/aZFKa6MN
+Changes=New voice command to request engine temperatures, New information request action "EngineTemperatures" for the "Race Engineer" plugin, New icon in the Stream Deck icon set for engine temperatures, Fixed confirmation for on-track coaching, Next part of Portuguese translations, Fixed driver names for LMU, Driver categoriy support for LMU
 Components=Media->5.6.1,Configuration->6.2.4,Utilities->6.2.2
 [Release]
 Version=6.2.3.0-release
@@ -27,5 +27,5 @@ Utilities.6.2.2.Download=https://fileshare.impresion3d.pro/filebrowser/api/publi
 [Current]
 Type=Development
 [Version]
-Development=6.2.4.0-dev
+Development=6.2.4.0-beta
 Release=6.2.3.0-release

@@ -541,7 +541,7 @@ namespace RF2SHMProvider {
 
 			var nullIdx = Array.IndexOf(bytes, (byte)0);
 
-			return nullIdx >= 0 ? Encoding.Default.GetString(bytes, 0, nullIdx) : Encoding.Default.GetString(bytes);
+			return nullIdx >= 0 ? Encoding.UTF8.GetString(bytes, 0, nullIdx) : Encoding.UTF8.GetString(bytes);
 		}
 
         static rF2VehicleScoring noPlayer = new rF2VehicleScoring();

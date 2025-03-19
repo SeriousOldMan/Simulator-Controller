@@ -571,8 +571,21 @@ class LMUPlugin extends Sector397Plugin {
 
 	parseCarName(carID, carName, &model?, &nr?, &category?, &team?) {
 		local gridData := this.GridData
-		local drivers := gridData.Drivers[carName]
-		local carInfos := (carID ? this.CarInfos : false)
+
+		model := gridData.Car[carName]
+		team := gridData.Team[carName]
+
+		if ((carName != "") && isNumber(SubStr(carName, 1, 1))) {
+			nr := this.parseNr(carName, &carName)
+
+			super.parseCarName(carID, carName, , , &category)
+		}
+		else
+			super.parseCarName(carID, carName, , &nr, &category)
+	}
+
+	parseDriverName(carID, carName, forName, surName, nickName, &category?) {
+		local drivers, carInfos
 
 		getCategory(drivers, driver) {
 			local ignore, candidate
@@ -584,45 +597,19 @@ class LMUPlugin extends Sector397Plugin {
 			return false
 		}
 
-		model := gridData.Car[carName]
-		team := gridData.Team[carName]
+		if isSet(category)
+			try {
+				drivers := this.GridData.Drivers[carName]
+				carInfos := (carID ? this.CarInfos : false)
 
-		if ((carName != "") && isNumber(SubStr(carName, 1, 1)))
-			nr := this.parseNr(carName, &carName)
-		else
-			super.parseCarName(carID, carName, , &nr)
+				category := (carInfos ? getCategory(drivers, carInfos.Driver[carID]) : false)
 
-		try {
-			category := (carInfos ? getCategory(drivers, carInfos.Driver[carID]) : false)
-
-			if (!category && (drivers.Length > 0))
-				category := drivers[1].Category
-		}
-		catch Any {
-			category := false
-		}
-	}
-
-	parseDriverName(carID, carName, forName, surName, nickName) {
-		local carInfos := this.CarInfos
-		local driver
-
-		if carInfos {
-			driver := carInfos.Driver[carID]
-
-			if driver
-				return driver
-		}
-
-		try {
-			driver := this.GridData.Drivers[carName][1]
-
-			if driver
-				return driver.Name
-		}
-		catch Any as exception {
-			logError(exception)
-		}
+				if (!category && (drivers.Length > 0))
+					category := drivers[1].Category
+			}
+			catch Any {
+				category := false
+			}
 
 		return super.parseDriverName(carID, carName, forName, surName, nickName)
 	}

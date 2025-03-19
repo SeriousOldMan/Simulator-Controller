@@ -591,7 +591,7 @@ class LMUPlugin extends Sector397Plugin {
 			local ignore, candidate
 
 			for ignore, candidate in drivers
-				if (candidate.Name = driver)
+				if (InStr(driver, candidate.Name) = 1)
 					return candidate.Category
 
 			return false
@@ -603,9 +603,6 @@ class LMUPlugin extends Sector397Plugin {
 				carInfos := (carID ? this.CarInfos : false)
 
 				category := (carInfos ? getCategory(drivers, carInfos.Driver[carID]) : false)
-
-				if (!category && (drivers.Length > 0))
-					category := drivers[1].Category
 			}
 			catch Any {
 				category := false

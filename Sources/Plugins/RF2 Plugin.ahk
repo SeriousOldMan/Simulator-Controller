@@ -356,14 +356,18 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 		local driver := getMultiMapValue(positionsData, "Position Data", "Driver.Car", 0)
 		local numbers := Map()
 		local duplicateNrs := false
-		local carRaw, carID, model, category, nr, forName, surName, nickName
+		local carCategory := false
+		local driverCategory := false
+		local model := false
+		local nr := false
+		local carRaw, carID, forName, surName, nickName
 
 		loop getMultiMapValue(positionsData, "Position Data", "Car.Count", 0) {
 			carRaw := getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".CarRaw", kUndefined)
 
 			if (carRaw != kUndefined) {
 				this.parseCarName(getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".ID")
-								, carRaw, &model, &nr, &category)
+								, carRaw, &model, &nr, &carCategory)
 
 				if model
 					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Car", model)
@@ -379,20 +383,23 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 													   , carRaw, getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Forname", "")
 															   , getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Surname", "")
 															   , getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", "")
-													   , category ? unset : &category)
+													   , &driverCategory)
 								  , &forName, &surName, &nickName)
 
 					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Forname", forName)
 					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Surname", surName)
 					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", nickName)
+
+					if driverCategory
+						setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Category", driverCategory)
 				}
 
 				nr := Integer(nr ? nr : getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".ID"))
 
 				setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Nr", nr)
 
-				if category
-					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Category", category)
+				if carCategory
+					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Category", carCategory)
 
 				if numbers.Has(nr)
 					duplicateNrs := true

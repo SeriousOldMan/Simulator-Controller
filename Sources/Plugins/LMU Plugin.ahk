@@ -574,16 +574,18 @@ class LMUPlugin extends Sector397Plugin {
 
 		model := gridData.Car[carName]
 		team := gridData.Team[carName]
-		category := false
 
-		if ((carName != "") && isNumber(SubStr(carName, 1, 1)))
+		if ((carName != "") && isNumber(SubStr(carName, 1, 1))) {
 			nr := this.parseNr(carName, &carName)
+
+			super.parseCarName(carID, carName, , , &category)
+		}
 		else
-			super.parseCarName(carID, carName, , &nr)
+			super.parseCarName(carID, carName, , &nr, &category)
 	}
 
 	parseDriverName(carID, carName, forName, surName, nickName, &category?) {
-		local gridData, drivers, carInfos
+		local drivers, carInfos
 
 		getCategory(drivers, driver) {
 			local ignore, candidate
@@ -595,12 +597,11 @@ class LMUPlugin extends Sector397Plugin {
 			return false
 		}
 
-		if isSet(category) {
-			gridData := this.GridData
-			drivers := gridData.Drivers[carName]
-			carInfos := (carID ? this.CarInfos : false)
-
+		if isSet(category)
 			try {
+				drivers := this.GridData.Drivers[carName]
+				carInfos := (carID ? this.CarInfos : false)
+
 				category := (carInfos ? getCategory(drivers, carInfos.Driver[carID]) : false)
 
 				if (!category && (drivers.Length > 0))
@@ -609,7 +610,6 @@ class LMUPlugin extends Sector397Plugin {
 			catch Any {
 				category := false
 			}
-		}
 
 		return super.parseDriverName(carID, carName, forName, surName, nickName)
 	}

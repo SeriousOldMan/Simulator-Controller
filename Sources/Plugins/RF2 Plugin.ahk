@@ -344,7 +344,9 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	parseDriverName(carID, carName, forName, surName, nickName) {
+	parseDriverName(carID, carName, forName, surName, nickName, &category?) {
+		category := false
+
 		return driverName(forName, surName, nickName)
 	}
 
@@ -376,7 +378,8 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 					parseDriverName(this.parseDriverName(getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".ID")
 													   , carRaw, getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Forname", "")
 															   , getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Surname", "")
-															   , getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", ""))
+															   , getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", "")
+													   , category ? unset : &category)
 								  , &forName, &surName, &nickName)
 
 					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Forname", forName)

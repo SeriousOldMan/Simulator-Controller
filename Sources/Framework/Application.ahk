@@ -185,8 +185,7 @@ requestShareSessionDatabaseConsent() {
 }
 
 checkForNews() {
-	local show := true
-	local check, lastModified, availableNews, news, nr, html, shown, rule
+	local check, lastModified, availableNews, news, nr, html, show, shown, rule
 
 	if (StrSplit(A_ScriptName, ".")[1] = "Simulator Startup") {
 		check := !FileExist(kUserConfigDirectory . "NEWS")
@@ -196,7 +195,7 @@ checkForNews() {
 
 			lastModified := DateAdd(lastModified, 3, "Days")
 
-			check := (lastModified < A_Now)
+			check := ((lastModified < A_Now) || isDebug())
 		}
 
 		if check {
@@ -218,11 +217,13 @@ checkForNews() {
 
 				for nr, html in getMultiMapValues(availableNews, "News")
 					if isNumber(nr) {
+						show := true
+
 						shown := getMultiMapValue(news, "News", nr, false)
 						rule := getMultiMapValue(availableNews, "Rules", nr, "Once")
 
 						if (shown && InStr(rule, "Repeat"))
-							shown := (DateAdd(shown, string2Values(":", rule)[2], "Days") < A_Now)
+							shown := (DateAdd(shown, string2Values(":", rule)[2], "Days") > A_Now)
 						else if (!shown && InStr(rule, "Timed")) {
 							rule := string2Values(":", rule)
 

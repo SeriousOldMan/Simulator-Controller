@@ -311,8 +311,8 @@ class RaceReports extends ConfigurationItem {
 		raceReportsGui.Add("Text", "x16 yp+30 w70 h23 Y:Move +0x200", translate("Info"))
 		raceReportsGui.Add("HTMLViewer", "x90 yp-2 w180 h170 Y:Move W:Grow(0.25) Border vinfoViewer")
 
-		raceReportsGui.Add("Text", "x290 ys w40 h23 +0x200 X:Move(0.25)", translate("Report"))
-		raceReportsGui.Add("DropDownList", "x334 yp w120 X:Move(0.25) Disabled Choose0 vreportsDropDown", collect(kRaceReports, translate)).OnEvent("Change", chooseReport)
+		raceReportsGui.Add("Text", "x290 ys w70 h23 +0x200 X:Move(0.25)", translate("Report"))
+		raceReportsGui.Add("DropDownList", "x364 yp w120 X:Move(0.25) Disabled Choose0 vreportsDropDown", collect(kRaceReports, translate)).OnEvent("Change", chooseReport)
 
 		raceReportsGui.Add("Button", "x1177 yp w23 h23 X:Move vreportSettingsButton").OnEvent("Click", reportSettings)
 		setButtonIcon(raceReportsGui["reportSettingsButton"], kIconsDirectory . "Report Settings.ico", 1)

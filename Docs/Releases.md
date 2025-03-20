@@ -10,6 +10,7 @@
   - Finally found a way to acquire the real driver names for *Le Mans Ultimate* grids.
   - Unicode characters are now displayed correctly for *rFactor 2* and *Le Mans Ultimate*.
   - Fixed many translations for all languages.
+  - Fixed a bug in the News system, which prevented more recent News to be presented.
   
 #### Changes
 
@@ -18,6 +19,7 @@
   - New information request action "EngineTemperatures" for the ["Race Engineer"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin can be used to achieve the same result.
   - A new icon in the Stream Deck icon set is provided for the "EngineTemperatures" action.
   - Additional translations for Portuguese thanks to @Hudson Alves. This time the grammars for the Assistants are included as well - see the [new command reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(PT)) for the Race Engineer for an example. Translation can be considered complete now.
+  - Added several more articels to the News system.
   
 # Upcoming release
 

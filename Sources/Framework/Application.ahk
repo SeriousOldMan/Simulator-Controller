@@ -451,7 +451,7 @@ viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 80
 	SetWorkingDir(directory)
 
 	try {
-		html := FileRead(fileName)
+		; html := FileRead(fileName)
 
 		innerWidth := width - 16
 
@@ -472,7 +472,7 @@ viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 80
 		htmlViewer := htmlGui.Add("WebView2Viewer", "X8 YP+10 W" . innerWidth . " H" . editHeight)
 
 		htmlViewer.document.open()
-		htmlViewer.document.write(html)
+		htmlViewer.document.write(fileName)
 		htmlViewer.document.close()
 
 		MonitorGetWorkArea(, &mainScreenLeft, &mainScreenTop, &mainScreenRight, &mainScreenBottom)

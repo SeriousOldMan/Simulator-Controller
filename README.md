@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.2.4.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/aZFKa6MN) (Test build for 6.2.4. Changes: New voice command to request engine temperatures, New information request action "EngineTemperatures" for the "Race Engineer" plugin, New icon in the Stream Deck icon set for engine temperatures, Fixed confirmation for on-track coaching, Next part of Portuguese translations, Fixed driver names for LMU, Driver categoriy support for LMU.)
+[6.2.4.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/aZFKa6MN) (Test build for 6.2.4. Changes: New voice command to request engine temperatures, New information request action "EngineTemperatures" for the "Race Engineer" plugin, New icon in the Stream Deck icon set for engine temperatures, Fixed confirmation for on-track coaching, Next part of Portuguese translations, Fixed driver names for LMU, Driver categoriy support for LMU, Fixed various translations.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-624) of this version and all the versions you might have skipped, before installing and using this version.
 

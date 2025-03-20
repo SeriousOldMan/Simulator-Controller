@@ -41,6 +41,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - The Driving Coach do **not** give confirmations anymore for on-track coaching instructions, if confirmations per se are active.
   - Finally found a way to acquire the real driver names for *Le Mans Ultimate* grids.
   - Unicode characters are now displayed correctly for *rFactor 2* and *Le Mans Ultimate*.
+  - Fixed many translations for all languages.
   
 #### Changes
 
@@ -48,7 +49,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - [New voice command for the Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(EN)) lets you ask for the current engine temperatures.
   - New information request action "EngineTemperatures" for the ["Race Engineer"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin can be used to achieve the same result.
   - A new icon in the Stream Deck icon set is provided for the "EngineTemperatures" action.
-  - Additional translations for Portuguese thanks to @Hudson Alves. This time the grammars for the Assistants are included as well - see the [new command reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(PT)) for the Race Engineer for an example.
+  - Additional translations for Portuguese thanks to @Hudson Alves. This time the grammars for the Assistants are included as well - see the [new command reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(PT)) for the Race Engineer for an example. Translation can be considered complete now.
 
 # Release history
 

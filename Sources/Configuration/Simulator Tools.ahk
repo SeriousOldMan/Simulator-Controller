@@ -3050,7 +3050,7 @@ updatePluginsForV402() {
 
 updateToV400() {
 	OnMessage(0x44, translateOkButton)
-	withBlockedWindows(MsgBox, translate("Your installed version is to old to be updated automatically. Please remove the `"Simulator Controller`" folder in your user `"Documents`" folder and restart the application. Application will exit..."), translate("Error"), 262160)
+	withBlockedWindows(MsgBox, translate("Your installed version is too old to be updated automatically. Please remove the `"Simulator Controller`" folder in your user `"Documents`" folder and restart the application. Application will exit..."), translate("Error"), 262160)
 	OnMessage(0x44, translateOkButton, 0)
 
 	ExitApp(0)

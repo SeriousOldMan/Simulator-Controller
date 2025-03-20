@@ -24,6 +24,8 @@
 
 #### Session Database
   1. Active validation of value ranges in settings definitions
+  2. Editor for fuel consumption values
+  3. Editor for tyre wear values
   
 #### Setup Workbench
   1. Collect telemetry data from multiple drivers and generate combined setup recommendations

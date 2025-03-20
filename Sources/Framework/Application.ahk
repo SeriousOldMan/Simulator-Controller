@@ -185,8 +185,7 @@ requestShareSessionDatabaseConsent() {
 }
 
 checkForNews() {
-	local show := true
-	local check, lastModified, availableNews, news, nr, html, shown, rule
+	local check, lastModified, availableNews, news, nr, html, show, shown, rule
 
 	if (StrSplit(A_ScriptName, ".")[1] = "Simulator Startup") {
 		check := !FileExist(kUserConfigDirectory . "NEWS")
@@ -196,7 +195,7 @@ checkForNews() {
 
 			lastModified := DateAdd(lastModified, 3, "Days")
 
-			check := (lastModified < A_Now)
+			check := ((lastModified < A_Now) || isDebug())
 		}
 
 		if check {
@@ -218,11 +217,13 @@ checkForNews() {
 
 				for nr, html in getMultiMapValues(availableNews, "News")
 					if isNumber(nr) {
+						show := true
+
 						shown := getMultiMapValue(news, "News", nr, false)
 						rule := getMultiMapValue(availableNews, "Rules", nr, "Once")
 
 						if (shown && InStr(rule, "Repeat"))
-							shown := (DateAdd(shown, string2Values(":", rule)[2], "Days") < A_Now)
+							shown := (DateAdd(shown, string2Values(":", rule)[2], "Days") > A_Now)
 						else if (!shown && InStr(rule, "Timed")) {
 							rule := string2Values(":", rule)
 
@@ -450,7 +451,7 @@ viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 80
 	SetWorkingDir(directory)
 
 	try {
-		html := FileRead(fileName)
+		; html := FileRead(fileName)
 
 		innerWidth := width - 16
 
@@ -471,7 +472,7 @@ viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 80
 		htmlViewer := htmlGui.Add("WebView2Viewer", "X8 YP+10 W" . innerWidth . " H" . editHeight)
 
 		htmlViewer.document.open()
-		htmlViewer.document.write(html)
+		htmlViewer.document.write(fileName)
 		htmlViewer.document.close()
 
 		MonitorGetWorkArea(, &mainScreenLeft, &mainScreenTop, &mainScreenRight, &mainScreenBottom)

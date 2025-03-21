@@ -1047,7 +1047,7 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	getTools(type) {
+	getTools(type := false) {
 		static conversationTools := false
 		static agentTools := false
 

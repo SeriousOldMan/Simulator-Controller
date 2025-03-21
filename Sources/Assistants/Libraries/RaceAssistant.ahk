@@ -1063,6 +1063,8 @@ class RaceAssistant extends ConfigurationItem {
 
 			return agentTools
 		}
+		else
+			return []
 	}
 
 	activeTopic(options, topic) {

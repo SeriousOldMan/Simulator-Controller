@@ -180,4 +180,4 @@ At the end of your session, you can decide which data should be transfered to th
 
 Please note, that this export is possible only once, to prevent duplicate data entries in your database, and cannot be undone. Therefore check your selection carefully beforehand.
 
-You can also store your session for later inspection in any location on your PC using the "Save Session..." command from the "Session" menu. The mentioned data export can also be initiated from a saved copy - very helpful, if you are exhausted after your session and want to defer the data inspection for later.
+As already mentioned, you can also store your session for later inspection in the "Session Database" or at any location on your PC using the "Save Session..." command from the "Session" menu. The mentioned data export may also be initiated from a saved copy - very helpful, if you are exhausted after your session and want to defer the data inspection for later.

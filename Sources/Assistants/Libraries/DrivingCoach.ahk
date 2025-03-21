@@ -598,10 +598,6 @@ class DrivingCoach extends GridRaceAssistant {
 					, (instruction) => (instruction && (Trim(instruction) != "")))
 	}
 
-	getTools() {
-		return []
-	}
-
 	startConversation() {
 		local service := this.Options["Driving Coach.Service"]
 		local ignore, instruction

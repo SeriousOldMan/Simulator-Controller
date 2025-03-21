@@ -1047,7 +1047,7 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	getTools(type) {
+	getTools(type := false) {
 		static conversationTools := false
 		static agentTools := false
 
@@ -1063,6 +1063,8 @@ class RaceAssistant extends ConfigurationItem {
 
 			return agentTools
 		}
+		else
+			return []
 	}
 
 	activeTopic(options, topic) {

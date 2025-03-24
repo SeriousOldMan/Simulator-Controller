@@ -1460,6 +1460,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						this.selectModule("Laps")
 					case translate("Pressures"):
 						this.selectModule("Pressures")
+					case translate("Setups"):
+						this.selectModule("Setups")
 					case translate("Tracks"), translate("Automations"):
 						if (type = translate("Tracks"))
 							track := SessionDatabase.getTrackCode(simulator, this.AdministrationListView.GetText(line, 2))
@@ -7129,8 +7131,11 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 }
 
 editLaps(editorOrCommand, arguments*) {
-	local simulator, car, track, ignore, entry, pressures, temperatures, wear, tyre, seperator
+	local simulator, car, track, ignore, entry, seperator
 	local msgResult, x, y, w, h, lapsTabView
+
+	static electronicsColumns := 9
+	static tyresColumns := 9
 
 	static result
 	static lapsGui
@@ -7140,32 +7145,105 @@ editLaps(editorOrCommand, arguments*) {
 	static editor
 	static telemetryDB
 
-	deleteData(localTable, serverTable, removedPredicate) {
-		local ignore, connector, row, removedRows
+	loadElectronics(entry) {
+		return [translate(entry["Weather"])
+			  , convertUnit("Temperature", entry["Temperature.Air"])
+			  , convertUnit("Temperature", entry["Temperature.Track"])
+			  , translate(compound(entry["Tyre.Compound"], entry["Tyre.Compound.Color"]))
+			  , convertUnit("Volume", entry["Fuel.Consumption"])
+			  , lapTimeDisplayValue(entry["Lap.Time"])
+			  , (entry["Map"] = kNull) ? translate("n/a") : entry["Map"]
+			  , (entry["TC"] = kNull) ? translate("n/a") : entry["TC"]
+			  , (entry["ABS"] = kNull) ? translate("n/a") : entry["ABS"]]
+	}
 
-		telemetryDB.Database.lock("Electronics")
+	loadTyres(entry) {
+		local seperator := ((getFloatSeparator() = ".") ? ", " : "; ")
+		local pressures := []
+		local temperatures := []
+		local wear := []
+		local ignore, tyre, seperator
 
-		try {
-			removedRows := choose(telemetryDB.Database.query(localTable, {Where: {Driver: telemetryDB.ID}}), removedPredicate)
+		for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"] {
+			tyre := entry["Tyre.Pressure." . tyre]
 
-			while (removedRows.Length > 0) {
-				row := removedRows.Pop()
+			if isNumber(tyre)
+				pressures.Push(displayValue("Float", convertUnit("Pressure", tyre)))
+			else {
+				pressures := false
 
-				if (row["Identifier"] != kNull)
-					for ignore, connector in editor.SessionDatabase.Connectors
-						try {
-							connector.DeleteData(serverTable, row["Identifier"])
-						}
-						catch Any as exception {
-							logError(exception, true)
-						}
-
-				telemetryDB.Database.remove(localTable, false, (r) => (r == row))
+				break
 			}
 		}
-		finally {
-			telemetryDB.Database.unlock("Electronics")
+
+		for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"] {
+			tyre := entry["Tyre.Temperature." . tyre]
+
+			if isNumber(tyre)
+				temperatures.Push(displayValue("Float", convertUnit("Temperature", tyre)))
+			else {
+				temperatures := false
+
+				break
+			}
 		}
+
+		for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"] {
+			tyre := entry["Tyre.Wear." . tyre]
+
+			if isNumber(tyre)
+				wear.Push(Round(tyre))
+			else {
+				wear := false
+
+				break
+			}
+		}
+
+		return [translate(entry["Weather"])
+			  , convertUnit("Temperature", entry["Temperature.Air"])
+			  , convertUnit("Temperature", entry["Temperature.Track"])
+			  , translate(compound(entry["Tyre.Compound"], entry["Tyre.Compound.Color"]))
+			  , convertUnit("Volume", entry["Fuel.Consumption"])
+			  , lapTimeDisplayValue(entry["Lap.Time"])
+			  , pressures ? values2String(seperator, pressures*) : translate("n/a")
+			  , temperatures ? values2String(seperator, temperatures*) : translate("n/a")
+			  , wear ? values2String(seperator, wear*) : translate("n/a")]
+	}
+
+	deleteData(localTable, serverTable, removedPredicate) {
+		withTask(ProgressTask(translate("Deleting Data")), () {
+			local ignore, connector, row, removedRows, removalRows
+
+			telemetryDB.Database.lock(localTable)
+
+			try {
+				removedRows := choose(telemetryDB.Database.query(localTable, {Where: {Driver: telemetryDB.ID}}), removedPredicate)
+				removalRows := removedRows.Clone()
+
+				while (removalRows.Length > 0) {
+					row := removalRows.Pop()
+
+					if (row["Identifier"] != kNull)
+						for ignore, connector in editor.SessionDatabase.Connectors
+							try {
+								connector.DeleteData(serverTable, row["Identifier"])
+							}
+							catch Any as exception {
+								logError(exception, true)
+							}
+				}
+
+				telemetryDB.Database.remove(localTable, false, (r) {
+					Sleep(50)
+
+					return inList(removedRows, r)
+				})
+			}
+			finally {
+				telemetryDB.Database.unlock(localTable)
+			}
+		})
 	}
 
 	if (editorOrCommand = "Close")
@@ -7179,15 +7257,7 @@ editLaps(editorOrCommand, arguments*) {
 			electronicsListView.ModifyCol(A_Index, "AutoHdr")
 
 		for ignore, entry in telemetryDB.Database.query("Electronics", {Where: {Driver: telemetryDB.ID} })
-			electronicsListView.Add("", translate(entry["Weather"])
-									  , convertUnit("Temperature", entry["Temperature.Air"])
-									  , convertUnit("Temperature", entry["Temperature.Track"])
-									  , translate(compound(entry["Tyre.Compound"], entry["Tyre.Compound.Color"]))
-									  , convertUnit("Volume", entry["Fuel.Consumption"])
-									  , lapTimeDisplayValue(entry["Lap.Time"])
-									  , (entry["Map"] = kNull) ? translate("n/a") : entry["Map"]
-									  , (entry["TC"] = kNull) ? translate("n/a") : entry["TC"]
-									  , (entry["ABS"] = kNull) ? translate("n/a") : entry["ABS"])
+			electronicsListView.Add("", loadElectronics(entry)*)
 
 		electronicsListView.ModifyCol()
 
@@ -7202,61 +7272,8 @@ editLaps(editorOrCommand, arguments*) {
 		loop 4
 			tyresListView.ModifyCol(A_Index, "AutoHdr")
 
-		seperator := ((getFloatSeparator() = ".") ? ", " : "; ")
-
-		for ignore, entry in telemetryDB.Database.query("Tyres", {Where: {Driver: telemetryDB.ID} }) {
-			pressures := []
-
-			for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"] {
-				tyre := entry["Tyre.Pressure." . tyre]
-
-				if isNumber(tyre)
-					pressures.Push(displayValue("Float", convertUnit("Pressure", tyre)))
-				else {
-					pressures := false
-
-					break
-				}
-			}
-
-			temperatures := []
-
-			for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"] {
-				tyre := entry["Tyre.Temperature." . tyre]
-
-				if isNumber(tyre)
-					temperatures.Push(displayValue("Float", convertUnit("Temperature", tyre)))
-				else {
-					temperatures := false
-
-					break
-				}
-			}
-
-			wear := []
-
-			for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"] {
-				tyre := entry["Tyre.Wear." . tyre]
-
-				if isNumber(tyre)
-					wear.Push(Round(tyre))
-				else {
-					wear := false
-
-					break
-				}
-			}
-
-			tyresListView.Add("", translate(entry["Weather"])
-								, convertUnit("Temperature", entry["Temperature.Air"])
-								, convertUnit("Temperature", entry["Temperature.Track"])
-								, translate(compound(entry["Tyre.Compound"], entry["Tyre.Compound.Color"]))
-								, convertUnit("Volume", entry["Fuel.Consumption"])
-								, lapTimeDisplayValue(entry["Lap.Time"])
-								, pressures ? values2String(seperator, pressures*) : translate("n/a")
-								, temperatures ? values2String(seperator, temperatures*) : translate("n/a")
-								, wear ? values2String(seperator, wear*) : translate("n/a"))
-		}
+		for ignore, entry in telemetryDB.Database.query("Tyres", {Where: {Driver: telemetryDB.ID} })
+			tyresListView.Add("", loadTyres(entry)*)
 
 		tyresListView.ModifyCol()
 
@@ -7271,17 +7288,23 @@ editLaps(editorOrCommand, arguments*) {
 		if (msgResult = "Yes") {
 			deleteData("Electronics", "Electronics", (entry) {
 				local index := 0
+				local match, data
 
-				while (index := electronicsListView.GetNext(index, "C"))
-					return ((electronicsListView.GetText(index, 1) = translate(entry["Weather"]))
-						 && (electronicsListView.GetText(index, 2) = convertUnit("Temperature", entry["Temperature.Air"]))
-						 && (electronicsListView.GetText(index, 3) = convertUnit("Temperature", entry["Temperature.Track"]))
-						 && (electronicsListView.GetText(index, 4) = translate(compound(entry["Tyre.Compound"], entry["Tyre.Compound.Color"])))
-						 && (electronicsListView.GetText(index, 5) = convertUnit("Volume", entry["Fuel.Consumption"]))
-						 && (electronicsListView.GetText(index, 6) = lapTimeDisplayValue(entry["Lap.Time"]))
-						 && (electronicsListView.GetText(index, 7) = ((entry["Map"] = kNull) ? translate("n/a") : entry["Map"]))
-						 && (electronicsListView.GetText(index, 8) = ((entry["TC"] = kNull) ? translate("n/a") : entry["TC"]))
-						 && (electronicsListView.GetText(index, 9) = ((entry["ABS"] = kNull) ? translate("n/a") : entry["ABS"])))
+				while (index := electronicsListView.GetNext(index, "C")) {
+					data := loadElectronics(entry)
+					match := true
+
+					loop electronicsColumns {
+						if (electronicsListView.GetText(index, A_Index) != data[A_Index])
+							match := false
+					}
+					until !match
+
+					if match
+						return true
+				}
+
+				return false
 			})
 
 			editLaps("LoadElectronics")
@@ -7296,6 +7319,23 @@ editLaps(editorOrCommand, arguments*) {
 
 		if (msgResult = "Yes") {
 			deleteData("Tyres", "Tyres", (entry) {
+				local index := 0
+				local match, data
+
+				while (index := tyresListView.GetNext(index, "C")) {
+					data := loadTyres(entry)
+					match := true
+
+					loop tyresColumns {
+						if (tyresListView.GetText(index, A_Index) != data[A_Index])
+							match := false
+					}
+					until !match
+
+					if match
+						return true
+				}
+
 				return false
 			})
 
@@ -7362,6 +7402,8 @@ editLaps(editorOrCommand, arguments*) {
 		editLaps("LoadTyres")
 
 		lapsTabView.UseTab(0)
+
+		lapsGui.Add("Button", "x174 yp+40 w80 h23 Y:Move X:Move(0.5) Default", translate("Close")).OnEvent("Click", editLaps.Bind("Close"))
 
 		editLaps("UpdateState")
 

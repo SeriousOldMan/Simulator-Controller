@@ -1416,84 +1416,103 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editData(listView, line, *) {
 			local type, data, simulator, car, track
 
-			if line {
-				simulator := this.SelectedSimulator
-				type := this.AdministrationListView.GetText(line, 1)
-				data := this.AdministrationListView.GetText(line, 2)
+			DllCall("user32.dll\SendMessage", "Ptr", this.Window.Hwnd, "UInt", 0xB, "Ptr", 0, "Ptr", 0)
 
-				if InStr(data, " / ") {
-					data := string2Values(" / ", data)
+			try {
+				if line {
+					simulator := this.SelectedSimulator
+					type := this.AdministrationListView.GetText(line, 1)
+					data := this.AdministrationListView.GetText(line, 2)
 
-					car := this.getCarCode(simulator, data[1])
-					track := this.getTrackCode(simulator, data[2])
-				}
-				else {
-					car := this.SelectedCar
-					track := this.SelectedTrack
+					if InStr(data, " / ") {
+						data := string2Values(" / ", data)
 
-					if (!car || (car == true))
-						car := "-"
+						car := this.getCarCode(simulator, data[1])
+						track := this.getTrackCode(simulator, data[2])
+					}
+					else {
+						car := this.SelectedCar
+						track := this.SelectedTrack
 
-					if (!track || (track == true))
-						track := "-"
-				}
+						if (!car || (car == true))
+							car := "-"
 
-				switch type, false {
-					case translate("Laps"):
-						driver := this.SessionDatabase.getDriverID(simulator, this.AdministrationListView.GetText(line, 3))
+						if (!track || (track == true))
+							track := "-"
+					}
 
-						if (driver = SessionDatabase.ID) {
-							this.Window.Block()
+					switch type, false {
+						case translate("Laps"):
+							driver := this.SessionDatabase.getDriverID(simulator, this.AdministrationListView.GetText(line, 3))
 
-							try {
-								editLaps(this, simulator, car, track)
+							if (driver = SessionDatabase.ID) {
+								this.Window.Block()
+
+								try {
+									editLaps(this, simulator, car, track)
+								}
+								finally {
+									this.Window.Unblock()
+								}
 							}
-							finally {
-								this.Window.Unblock()
-							}
-						}
-					case translate("Sessions"):
-						this.selectModule("Sessions")
-					case translate("Strategies"):
-						this.selectModule("Strategies")
-					case translate("Telemetries"):
-						this.selectModule("Laps")
-					case translate("Pressures"):
-						this.selectModule("Pressures")
-					case translate("Setups"):
-						this.selectModule("Setups")
-					case translate("Tracks"), translate("Automations"):
-						if (type = translate("Tracks"))
-							track := SessionDatabase.getTrackCode(simulator, this.AdministrationListView.GetText(line, 2))
-						else if (!car || (car == true))
-							track := false
-
-						if inList(this.getTracks(simulator, true), track) {
-							DllCall("user32.dll\SendMessage", "Ptr", this.Window.Hwnd, "UInt", 0xB, "Ptr", 0, "Ptr", 0)
-
-							try {
+						case translate("Sessions"), translate("Strategies"), translate("Telemetries"), translate("Pressures"), translate("Setups"):
+							if ((car != "-") && (track != "-")) {
 								this.selectModule("Settings")
 
-								if !this.SelectedCar
-									this.loadCar(true, true)
-								else if (this.SelectedCar != true)
-									if !inList(this.getTracks(simulator, this.SelectedCar), track)
-										this.loadCar(true, true)
-
+								this.loadCar(car, true)
 								this.loadTrack(track, true)
 
-								this.selectModule("Track", true, (type = translate("Tracks")) ? "Sections" : "Automations")
+								switch type, false {
+									case translate("Sessions"):
+										this.selectModule("Sessions")
+									case translate("Strategies"):
+										this.selectModule("Strategies")
+									case translate("Telemetries"):
+										this.selectModule("Laps")
+									case translate("Pressures"):
+										this.selectModule("Pressures")
+									case translate("Setups"):
+										this.selectModule("Setups")
+								}
 							}
-							finally {
-								DllCall("user32.dll\SendMessage", "Ptr", this.Window.Hwnd, "UInt", 0xB, "Ptr", 1, "Ptr", 0)
+						case translate("Tracks"), translate("Automations"):
+							if (type = translate("Tracks"))
+								track := SessionDatabase.getTrackCode(simulator, this.AdministrationListView.GetText(line, 2))
+							else if (!car || (car == true))
+								track := false
 
-								WinRedraw(this.Window)
+							if inList(this.getTracks(simulator, true), track) {
+								DllCall("user32.dll\SendMessage", "Ptr", this.Window.Hwnd, "UInt", 0xB, "Ptr", 0, "Ptr", 0)
+
+								try {
+									this.selectModule("Settings")
+
+									if !this.SelectedCar
+										this.loadCar(true, true)
+									else if (this.SelectedCar != true)
+										if !inList(this.getTracks(simulator, this.SelectedCar), track)
+											this.loadCar(true, true)
+
+									this.loadTrack(track, true)
+
+									this.selectModule("Track", true, (type = translate("Tracks")) ? "Sections" : "Automations")
+								}
+								finally {
+									DllCall("user32.dll\SendMessage", "Ptr", this.Window.Hwnd, "UInt", 0xB, "Ptr", 1, "Ptr", 0)
+
+									WinRedraw(this.Window)
+								}
 							}
-						}
+					}
 				}
-			}
 
-			noSelect(listView, line)
+				noSelect(listView, line)
+			}
+			finally {
+				DllCall("user32.dll\SendMessage", "Ptr", this.Window.Hwnd, "UInt", 0xB, "Ptr", 1, "Ptr", 0)
+
+				WinRedraw(this.Window)
+			}
 		}
 
 		deleteData(*) {

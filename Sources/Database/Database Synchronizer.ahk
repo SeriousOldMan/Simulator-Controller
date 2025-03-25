@@ -420,6 +420,8 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 
 synchronizeCommunityDatabase(id, usePressures, useSetups, useStrategies, useTelemetries) {
 	global gSynchronizing
+	
+	local oldCritical := Task.Critical
 
 	if gSynchronizing
 		return Task.CurrentTask
@@ -428,14 +430,14 @@ synchronizeCommunityDatabase(id, usePressures, useSetups, useStrategies, useTele
 
 	synchronizeDatabase("Stop")
 
-	Task.CurrentTask.Critical := true
+	Task.Critical := true
 
 	try {
 		uploadSessionDatabase(id, usePressures, useSetups, useStrategies, useTelemetries)
 		downloadSessionDatabase(id, usePressures, useSetups, useStrategies, useTelemetries)
 	}
 	finally {
-		Task.CurrentTask.Critical := false
+		Task.Critical := oldCritical
 
 		synchronizeDatabase("Start")
 
@@ -449,13 +451,15 @@ synchronizeCommunityDatabase(id, usePressures, useSetups, useStrategies, useTele
 
 synchronizeSessionDatabase(minutes) {
 	global gSynchronizing
+	
+	local oldCritical := Task.Critical
 
 	if gSynchronizing
 		return Task.CurrentTask
 	else
 		gSynchronizing := true
 
-	Task.CurrentTask.Critical := true
+	Task.Critical := true
 
 	try {
 		synchronizeDatabase()
@@ -464,7 +468,7 @@ synchronizeSessionDatabase(minutes) {
 		logError(exception, true)
 	}
 	finally {
-		Task.CurrentTask.Critical := false
+		Task.Critical := oldCritical
 
 		gSynchronizing := false
 	}

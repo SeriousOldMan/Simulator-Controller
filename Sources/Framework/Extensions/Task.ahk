@@ -45,7 +45,8 @@ class Task {
 
 	static sCurrentTask := false
 
-	static sCriticalHandler := () => (Task.CurrentTask && Task.CurrentTask.Critical)
+	static sCritical := false
+	static sCriticalHandler := () => ((Task.CurrentTask && Task.CurrentTask.Critical) || Task.sCritical)
 
 	iPreviousTask := false
 
@@ -120,6 +121,13 @@ class Task {
 	static Critical {
 		Get {
 			return Task.CriticalHandler.Call()
+		}
+
+		Set {
+			if Task.CurrentTask
+				return (Task.CurrentTask.Critical := value)
+			else
+				return (Task.sCritical := value)
 		}
 	}
 
@@ -199,7 +207,7 @@ class Task {
 
 	Critical {
 		Get {
-			return (this.iCritical || (this.iPreviousTask && this.iPreviousTask.Critical))
+			return (this.iCritical || (this.iPreviousTask && this.iPreviousTask.Critical) || Task.sCritical)
 		}
 
 		Set {

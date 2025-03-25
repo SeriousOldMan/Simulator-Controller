@@ -4060,13 +4060,13 @@ class SoloCenter extends ConfigurationItem {
 			local row := 0
 			local locked := false
 			local count := 0
+			local oldCritical := Task.Critical
 			local progressWindow, lap, driver, telemetryData, pressures, temperatures, wear, pressuresData, info
 
 			while (row := this.LapsListView.GetNext(row, "C"))
 				count += 1
 
-			if fromTask
-				Task.CurrentTask.Critical := true
+			Task.Critical := true
 
 			if progress
 				progressWindow := showProgress({color: "Green", title: translate("Export to Database")})
@@ -4147,8 +4147,7 @@ class SoloCenter extends ConfigurationItem {
 						logError(exception)
 					}
 
-				if fromTask
-					Task.CurrentTask.Critical := false
+				Task.Critical := oldCritical
 			}
 
 			this.iSessionExported := true

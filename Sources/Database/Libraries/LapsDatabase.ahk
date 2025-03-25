@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Telemetry Database              ;;;
+;;;   Modular Simulator Controller System - Laps Database                   ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
@@ -25,25 +25,25 @@
 ;;;                    Public Variable Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kTelemetrySchemas := CaseInsenseMap("Electronics", ["Weather", "Temperature.Air", "Temperature.Track", "Tyre.Compound", "Tyre.Compound.Color"
-														 , "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Map", "TC", "ABS", "Driver"
-														 , "Identifier", "Synchronized"]
-										 , "Tyres", ["Weather", "Temperature.Air", "Temperature.Track", "Tyre.Compound", "Tyre.Compound.Color"
-												   , "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Tyre.Laps"
-												   , "Tyre.Pressure.Front.Left", "Tyre.Pressure.Front.Right"
-												   , "Tyre.Pressure.Rear.Left", "Tyre.Pressure.Rear.Right"
-												   , "Tyre.Temperature.Front.Left", "Tyre.Temperature.Front.Right"
-												   , "Tyre.Temperature.Rear.Left", "Tyre.Temperature.Rear.Right"
-												   , "Tyre.Wear.Front.Left", "Tyre.Wear.Front.Right"
-												   , "Tyre.Wear.Rear.Left", "Tyre.Wear.Rear.Right", "Driver"
-												   , "Identifier", "Synchronized"])
+global kLapsSchemas := CaseInsenseMap("Electronics", ["Weather", "Temperature.Air", "Temperature.Track", "Tyre.Compound", "Tyre.Compound.Color"
+													, "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Map", "TC", "ABS", "Driver"
+													, "Identifier", "Synchronized"]
+									, "Tyres", ["Weather", "Temperature.Air", "Temperature.Track", "Tyre.Compound", "Tyre.Compound.Color"
+											  , "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Tyre.Laps"
+											  , "Tyre.Pressure.Front.Left", "Tyre.Pressure.Front.Right"
+											  , "Tyre.Pressure.Rear.Left", "Tyre.Pressure.Rear.Right"
+											  , "Tyre.Temperature.Front.Left", "Tyre.Temperature.Front.Right"
+											  , "Tyre.Temperature.Rear.Left", "Tyre.Temperature.Rear.Right"
+											  , "Tyre.Wear.Front.Left", "Tyre.Wear.Front.Right"
+											  , "Tyre.Wear.Rear.Left", "Tyre.Wear.Rear.Right", "Driver"
+											  , "Identifier", "Synchronized"])
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class TelemetryDatabase extends SessionDatabase {
+class LapsDatabase extends SessionDatabase {
 	iDatabase := false
 	iDrivers := false
 	iShared := true
@@ -83,7 +83,7 @@ class TelemetryDatabase extends SessionDatabase {
 			car := this.getCarCode(simulator, car)
 			track := this.getCarCode(simulator, track)
 
-			this.iDatabase := Database(this.DatabasePath . "User\" . simulatorCode . "\" . car . "\" . track . "\", kTelemetrySchemas)
+			this.iDatabase := Database(this.DatabasePath . "User\" . simulatorCode . "\" . car . "\" . track . "\", kLapsSchemas)
 		}
 	}
 
@@ -96,7 +96,7 @@ class TelemetryDatabase extends SessionDatabase {
 	}
 
 	getSchema(table, includeVirtualColumns := false) {
-		local schema := kTelemetrySchemas[table].Clone()
+		local schema := kLapsSchemas[table].Clone()
 
 		if (includeVirtualColumns && (table = "Tyres")) {
 			schema.Push("Tyre.Pressure")
@@ -231,7 +231,7 @@ class TelemetryDatabase extends SessionDatabase {
 										  , drivers)
 	}
 
-	cleanupData(weather, compound, compoundColor, drivers := kUndefined) {
+	cleanupData(weather, compound, compoundColor, drivers := kUndefined, types := ["Electronics", "Types"]) {
 		local database := this.Database
 		local where, ltAvg, ltStdDev, cAvg, cStdDev, rows, identifiers, filter, ignore, row, identifier, connector
 
@@ -243,7 +243,7 @@ class TelemetryDatabase extends SessionDatabase {
 			cAvg := false
 			cStdDev := false
 
-			if (!this.Shared || database.lock("Electronics", false))
+			if (inList(types, "Electronics") && (!this.Shared || database.lock("Electronics", false)))
 				try {
 					if this.Shared
 						database.reload("Electronics")
@@ -284,7 +284,7 @@ class TelemetryDatabase extends SessionDatabase {
 			cAvg := false
 			cStdDev := false
 
-			if (!this.Shared || database.lock("Tyres", false))
+			if (inList(types, "Tyres") && (!this.Shared || database.lock("Tyres", false)))
 				try {
 					if this.Shared
 						database.reload("Tyres")
@@ -321,6 +321,24 @@ class TelemetryDatabase extends SessionDatabase {
 				}
 
 		}
+	}
+
+	cleanupElectronics(drivers := kUndefined) {
+		local ignore, condition
+
+		for ignore, condition in this.combineResults("Electronics", {Select: ["Weather", "Tyre.Compound", "Tyre.Compound.Color"]
+																   , By: ["Weather", "Tyre.Compound", "Tyre.Compound.Color"]
+																   , Where: {}}, drivers)
+			this.cleanupData(condition["Weather"], condition["Tyre.Compound"], condition["Tyre.Compound.Color"], drivers, ["Electronics"])
+	}
+
+	cleanupTyres(drivers := kUndefined) {
+		local ignore, condition
+
+		for ignore, condition in this.combineResults("Tyres", {Select: ["Weather", "Tyre.Compound", "Tyre.Compound.Color"]
+															 , By: ["Weather", "Tyre.Compound", "Tyre.Compound.Color"]
+															 , Where: {}}, drivers)
+			this.cleanupData(condition["Weather"], condition["Tyre.Compound"], condition["Tyre.Compound.Color"], drivers, ["Tyres"])
 	}
 
 	addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor
@@ -583,7 +601,7 @@ synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSy
 					track := telemetry["Track"]
 
 					if ((simulator != lastSimulator) || (car != lastCar) || (track != lastTrack)) {
-						db := Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTelemetrySchemas)
+						db := Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kLapsSchemas)
 
 						lastSimulator := simulator
 						lastCar := car
@@ -621,7 +639,7 @@ synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSy
 					track := telemetry["Track"]
 
 					if ((simulator != lastSimulator) || (car != lastCar) || (track != lastTrack)) {
-						db := Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTelemetrySchemas)
+						db := Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kLapsSchemas)
 
 						lastSimulator := simulator
 						lastCar := car
@@ -666,7 +684,7 @@ synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSy
 
 				for ignore, car in sessionDB.getCars(simulator)
 					for ignore, track in sessionDB.getTracks(simulator, car) {
-						db := Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTelemetrySchemas)
+						db := Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kLapsSchemas)
 
 						if db.lock("Electronics", false)
 							try {

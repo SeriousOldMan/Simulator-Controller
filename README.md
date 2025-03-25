@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for a moment...
+[6.2.5.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/2Tjnzr1h) (Early build for 6.2.5. Changes: Fixed Agent Booster for Driving Coach, New LLM Runtime, Fixed max tokens field restriction to 999, Items in "Administration" tab in "Session Database" are double-clickable, Editor for "Laps" data item in "Session Database", Cleanup system for lap data in "Session Database", Added some missing translations, Renamed "TelemetryDatabase" to "LapsDatabase".)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-625) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

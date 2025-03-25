@@ -103,13 +103,13 @@ class LMUPlugin extends Sector397Plugin {
 			}
 		}
 
-		__New(positionsData) {
+		__New(standingsData) {
 			local ids := []
 			local positions := []
 
-			loop getMultiMapValue(positionsData, "Position Data", "Car.Count", 0) {
-				ids.Push(getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".ID"))
-				positions.Push(getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Position"))
+			loop getMultiMapValue(standingsData, "Position Data", "Car.Count", 0) {
+				ids.Push(getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID"))
+				positions.Push(getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Position"))
 			}
 
 			this.iCarIDs := ids
@@ -630,17 +630,17 @@ class LMUPlugin extends Sector397Plugin {
 		}
 	}
 
-	acquirePositionsData(telemetryData, finished := false) {
+	acquireStandingsData(telemetryData, finished := false) {
 		if (A_TickCount > this.iCarInfosRefresh)
 			this.iCarInfos := false
 
 		if !this.CarInfos {
-			this.iCarInfos := LMUPlugin.CarInfos(this.readPositionsData(telemetryData))
+			this.iCarInfos := LMUPlugin.CarInfos(this.readStandingsData(telemetryData))
 
 			this.iCarInfosRefresh := (A_TickCount + 30000)
 		}
 
-		return super.acquirePositionsData(telemetryData, finished)
+		return super.acquireStandingsData(telemetryData, finished)
 	}
 
 	readSessionData(options := "", protocol?) {

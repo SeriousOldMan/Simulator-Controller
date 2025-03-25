@@ -1563,7 +1563,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 
-	addLap(lapNumber, telemetryData, positionsData, retries := 10, wait := 500) {
+	addLap(lapNumber, telemetryData, standingsData, retries := 10, wait := 500) {
 		local waitUntil := (A_TickCount + (wait * retries))
 		local driverForName, driverSurName, driverNickName, stint, simulator, car, track, lap
 		local teamServerConfig, telemetryDirectory
@@ -1604,7 +1604,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 						if !this.TrackLength
 							this.iTrackLength := getMultiMapValue(telemetryData, "Track Data", "Length"
-																, getMultiMapValue(positionsData, "Track Data", "Length", 0))
+																, getMultiMapValue(standingsData, "Track Data", "Length", 0))
 
 						lap := this.Connector.CreateLap(stint, lapNumber)
 
@@ -1628,13 +1628,13 @@ class TeamServerPlugin extends ControllerPlugin {
 							Sleep(wait)
 					}
 
-				if (positionsData && (positionsData.Count > 0) && !this.iLapData["Positions"].Has(lapNumber)) {
-					positionsData := printMultiMap(positionsData)
+				if (standingsData && (standingsData.Count > 0) && !this.iLapData["Positions"].Has(lapNumber)) {
+					standingsData := printMultiMap(standingsData)
 
 					if (isDebug() && isLogLevel(kLogDebug))
-						showMessage("Setting standings data for lap " . lapNumber . ": " . positionsData)
+						showMessage("Setting standings data for lap " . lapNumber . ": " . standingsData)
 
-					this.setLapValue(lapNumber, "Positions Data", positionsData)
+					this.setLapValue(lapNumber, "Positions Data", standingsData)
 
 					this.iLapData["Positions"][lapNumber] := true
 				}
@@ -1670,7 +1670,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 
-	updateLap(lapNumber, running, data, telemetryData, positionsData) {
+	updateLap(lapNumber, running, data, telemetryData, standingsData) {
 		if this.TeamServerActive
 			this.setLapValue(lapNumber, "Data Update", printMultiMap(data))
 	}

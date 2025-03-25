@@ -10,7 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "Libraries\RaceAssistantPlugin.ahk"
-#Include "..\Database\Libraries\TelemetryDatabase.ahk"
+#Include "..\Database\Libraries\LapsDatabase.ahk"
 #Include "..\Assistants\Libraries\RaceReportReader.ahk"
 
 
@@ -335,10 +335,10 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 		return settings
 	}
 
-	saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
-					, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
-					, compound, compoundColor, pressures, temperatures, wear, lapState
-					, waterTemperature, oilTemperature) {
+	saveLapsData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
+			   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
+			   , compound, compoundColor, pressures, temperatures, wear, lapState
+			   , waterTemperature, oilTemperature) {
 		local teamServer := this.TeamServer
 		local pid
 
@@ -373,8 +373,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 		}
 	}
 
-	updateTelemetryDatabase() {
-		local telemetryDB := false
+	updateLapsDatabase() {
+		local lapsDB := false
 		local teamServer := this.TeamServer
 		local session := this.TeamSession
 		local runningLap := 0
@@ -410,14 +410,14 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 
 						telemetryData := string2Values(";", telemetryData)
 
-						if !telemetryDB
-							telemetryDB := TelemetryDatabase(telemetryData[1], telemetryData[2], telemetryData[3])
+						if !lapsDB
+							lapsDB := LapsDatabase(telemetryData[1], telemetryData[2], telemetryData[3])
 
 						if (newStint && driverID) {
 							driverName := teamServer.getStintDriverName(stint)
 
 							if driverName
-								telemetryDB.registerDriver(telemetryData[1], driverID, driverName)
+								lapsDB.registerDriver(telemetryData[1], driverID, driverName)
 						}
 
 						pitstop := telemetryData[10]
@@ -433,16 +433,16 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 							wear := string2Values(",", telemetryData[18])
 
 							try {
-								telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
-															 , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8]
-															 , telemetryData[9], driverID, telemetryData.Has(19) ? telemetryData[19] : false)
+								lapsDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
+														, telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8]
+														, telemetryData[9], driverID, telemetryData.Has(19) ? telemetryData[19] : false)
 
-								telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15], runningLap
-													   , pressures[1], pressures[2], pressures[4], pressures[4]
-													   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
-													   , wear[1], wear[2], wear[3], wear[4]
-													   , telemetryData[7], telemetryData[8], telemetryData[9], driverID
-													   , telemetryData.Has(20) ? telemetryData[20] : false)
+								lapsDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15], runningLap
+												  , pressures[1], pressures[2], pressures[4], pressures[4]
+												  , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
+												  , wear[1], wear[2], wear[3], wear[4]
+												  , telemetryData[7], telemetryData[8], telemetryData[9], driverID
+												  , telemetryData.Has(20) ? telemetryData[20] : false)
 							}
 							catch Any as exception {
 								logError(exception)
@@ -457,8 +457,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 		}
 		else
 			for ignore, telemetryData in this.LapDatabase.Tables["Telemetry"] {
-				if !telemetryDB
-					telemetryDB := TelemetryDatabase(telemetryData["Simulator"], telemetryData["Car"], telemetryData["Track"])
+				if !lapsDB
+					lapsDB := LapsDatabase(telemetryData["Simulator"], telemetryData["Car"], telemetryData["Track"])
 
 				if ((runningLap > 2) && telemetryData["Pitstop"])
 					runningLap := 0
@@ -467,21 +467,21 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 
 				if (!telemetryData["Pitstop"] && (telemetryData["State"] = "Valid"))
 					try {
-						telemetryDB.addElectronicEntry(telemetryData["Weather"], telemetryData["Temperature.Air"], telemetryData["Temperature.Track"]
-													 , telemetryData["Compound"], telemetryData["Compound.Color"]
-													 , telemetryData["Map"], telemetryData["TC"], telemetryData["ABS"]
-													 , telemetryData["Fuel.Consumption"], telemetryData["Fuel.Remaining"], telemetryData["LapTime"])
+						lapsDB.addElectronicEntry(telemetryData["Weather"], telemetryData["Temperature.Air"], telemetryData["Temperature.Track"]
+												, telemetryData["Compound"], telemetryData["Compound.Color"]
+												, telemetryData["Map"], telemetryData["TC"], telemetryData["ABS"]
+												, telemetryData["Fuel.Consumption"], telemetryData["Fuel.Remaining"], telemetryData["LapTime"])
 
 						pressures := string2Values(",", telemetryData["Pressures"])
 						temperatures := string2Values(",", telemetryData["Temperatures"])
 						wear := string2Values(",", telemetryData["Wear"])
 
-						telemetryDB.addTyreEntry(telemetryData["Weather"], telemetryData["Temperature.Air"], telemetryData["Temperature.Track"]
-											   , telemetryData["Compound"], telemetryData["Compound.Color"], runningLap
-											   , pressures[1], pressures[2], pressures[4], pressures[4]
-											   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
-											   , wear[1], wear[2], wear[3], wear[4]
-											   , telemetryData["Fuel.Consumption"], telemetryData["Fuel.Remaining"], telemetryData["LapTime"])
+						lapsDB.addTyreEntry(telemetryData["Weather"], telemetryData["Temperature.Air"], telemetryData["Temperature.Track"]
+										  , telemetryData["Compound"], telemetryData["Compound.Color"], runningLap
+										  , pressures[1], pressures[2], pressures[4], pressures[4]
+										  , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
+										  , wear[1], wear[2], wear[3], wear[4]
+										  , telemetryData["Fuel.Consumption"], telemetryData["Fuel.Remaining"], telemetryData["LapTime"])
 					}
 					catch Any as exception {
 						logError(exception)

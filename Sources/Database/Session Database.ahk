@@ -7135,7 +7135,7 @@ editLaps(editorOrCommand, arguments*) {
 	local msgResult, x, y, w, h, lapsTabView
 
 	static electronicsColumns := 9
-	static tyresColumns := 9
+	static tyresColumns := 10
 
 	static result
 	static lapsGui
@@ -7206,6 +7206,7 @@ editLaps(editorOrCommand, arguments*) {
 			  , translate(compound(entry["Tyre.Compound"], entry["Tyre.Compound.Color"]))
 			  , convertUnit("Volume", entry["Fuel.Consumption"])
 			  , lapTimeDisplayValue(entry["Lap.Time"])
+			  , isInteger(entry["Tyre.Laps"]) ? entry["Tyre.Laps"] : translate("n/a")
 			  , pressures ? values2String(seperator, pressures*) : translate("n/a")
 			  , temperatures ? values2String(seperator, temperatures*) : translate("n/a")
 			  , wear ? values2String(seperator, wear*) : translate("n/a")]
@@ -7280,6 +7281,48 @@ editLaps(editorOrCommand, arguments*) {
 		loop 4
 			tyresListView.ModifyCol(A_Index, "AutoHdr")
 	}
+	else if (editorOrCommand = "CleanupElectronics") {
+		OnMessage(0x44, translateYesNoButtons)
+		msgResult := withBlockedWindows(MsgBox, translate("Entries with lap times or fuel consumption outside the standard deviation will be deleted. Do you want to proceed?")
+											  , translate("Delete"), 262436)
+		OnMessage(0x44, translateYesNoButtons, 0)
+
+		if (msgResult = "Yes") {
+			lapsGui.Block()
+
+			try {
+				withTask(ProgressTask(translate("Cleaning ") . translate("Electronics")), () => telemetryDB.cleanupElectronics(telemetryDB.ID))
+
+				editLaps("LoadElectronics")
+
+				editLaps("UpdateState")
+			}
+			finally {
+				lapsGui.Unblock()
+			}
+		}
+	}
+	else if (editorOrCommand = "CleanupTyres") {
+		OnMessage(0x44, translateYesNoButtons)
+		msgResult := withBlockedWindows(MsgBox, translate("Entries with lap times or fuel consumption outside the standard deviation will be deleted. Do you want to proceed?")
+											  , translate("Delete"), 262436)
+		OnMessage(0x44, translateYesNoButtons, 0)
+
+		if (msgResult = "Yes") {
+			lapsGui.Block()
+
+			try {
+				withTask(ProgressTask(translate("Cleaning ") . translate("Tyres")), () => telemetryDB.cleanupTyres(telemetryDB.ID))
+
+				editLaps("LoadTyres")
+
+				editLaps("UpdateState")
+			}
+			finally {
+				lapsGui.Unblock()
+			}
+		}
+	}
 	else if (editorOrCommand = "DeleteElectronics") {
 		OnMessage(0x44, translateYesNoButtons)
 		msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected data?"), translate("Delete"), 262436)
@@ -7345,6 +7388,9 @@ editLaps(editorOrCommand, arguments*) {
 		}
 	}
 	else if (editorOrCommand = "UpdateState") {
+		lapsGui["cleanupElectronicsButton"].Enabled := (electronicsListView.GetCount() > 0)
+		lapsGui["cleanupTyresButton"].Enabled := (tyresListView.GetCount() > 0)
+
 		lapsGui["deleteElectronicsButton"].Enabled := (electronicsListView.GetNext(0, "C") != 0)
 		lapsGui["deleteTyresButton"].Enabled := (tyresListView.GetNext(0, "C") != 0)
 	}
@@ -7384,7 +7430,9 @@ editLaps(editorOrCommand, arguments*) {
 		electronicsListView.OnEvent("DoubleClick", noSelect)
 		electronicsListView.OnEvent("ItemCheck", (lv, *) => (noSelect(lv), editLaps("UpdateState")))
 
-		lapsGui.Add("Button", "x311 yp+340 w90 h23 Y:Move X:Move vdeleteElectronicsButton", translate("Delete...")).OnEvent("Click", editLaps.Bind("DeleteElectronics"))
+		lapsGui.Add("Button", "x24 yp+340 w90 h23 Y:Move vcleanupElectronicsButton", translate("Cleanup...")).OnEvent("Click", editLaps.Bind("CleanupElectronics"))
+
+		lapsGui.Add("Button", "x311 yp w90 h23 Y:Move X:Move vdeleteElectronicsButton", translate("Delete...")).OnEvent("Click", editLaps.Bind("DeleteElectronics"))
 
 		editLaps("LoadElectronics")
 
@@ -7392,12 +7440,14 @@ editLaps(editorOrCommand, arguments*) {
 
 		tyresListView := lapsGui.Add("ListView", "x24 ys+30 w377 h332 H:Grow W:Grow -Multi -LV0x10 Checked AltSubmit"
 											   , collect(["Weather", "Temperature (Air)", "Temperature (Track)", "Compound"
-														, "Consumption", "Lap Time", "Pressures", "Temperatures", "Wear"], translate))
+														, "Consumption", "Lap Time", "Tyre Laps", "Pressures", "Temperatures", "Wear"], translate))
 		tyresListView.OnEvent("Click", noSelect)
 		tyresListView.OnEvent("DoubleClick", noSelect)
 		tyresListView.OnEvent("ItemCheck", (lv, *) => (noSelect(lv), editLaps("UpdateState")))
 
-		lapsGui.Add("Button", "x311 yp+340 w90 h23 Y:Move X:Move vdeleteTyresButton", translate("Delete...")).OnEvent("Click", editLaps.Bind("DeleteTyres"))
+		lapsGui.Add("Button", "x24 yp+340 w90 h23 Y:Move vcleanupTyresButton", translate("Cleanup...")).OnEvent("Click", editLaps.Bind("CleanupTyres"))
+
+		lapsGui.Add("Button", "x311 yp w90 h23 Y:Move X:Move vdeleteTyresButton", translate("Delete...")).OnEvent("Click", editLaps.Bind("DeleteTyres"))
 
 		editLaps("LoadTyres")
 

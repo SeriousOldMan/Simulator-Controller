@@ -231,7 +231,7 @@ class TelemetryDatabase extends SessionDatabase {
 										  , drivers)
 	}
 
-	cleanupData(weather, compound, compoundColor, drivers := kUndefined) {
+	cleanupData(weather, compound, compoundColor, drivers := kUndefined, types := ["Electronics", "Types"]) {
 		local database := this.Database
 		local where, ltAvg, ltStdDev, cAvg, cStdDev, rows, identifiers, filter, ignore, row, identifier, connector
 
@@ -243,7 +243,7 @@ class TelemetryDatabase extends SessionDatabase {
 			cAvg := false
 			cStdDev := false
 
-			if (!this.Shared || database.lock("Electronics", false))
+			if (inList(types, "Electronics") && (!this.Shared || database.lock("Electronics", false)))
 				try {
 					if this.Shared
 						database.reload("Electronics")
@@ -284,7 +284,7 @@ class TelemetryDatabase extends SessionDatabase {
 			cAvg := false
 			cStdDev := false
 
-			if (!this.Shared || database.lock("Tyres", false))
+			if (inList(types, "Tyres") && (!this.Shared || database.lock("Tyres", false)))
 				try {
 					if this.Shared
 						database.reload("Tyres")
@@ -321,6 +321,24 @@ class TelemetryDatabase extends SessionDatabase {
 				}
 
 		}
+	}
+
+	cleanupElectronics(drivers := kUndefined) {
+		local ignore, condition
+
+		for ignore, condition in this.combineResults("Electronics", {Select: ["Weather", "Tyre.Compound", "Tyre.Compound.Color"]
+																   , By: ["Weather", "Tyre.Compound", "Tyre.Compound.Color"]
+																   , Where: {}}, drivers)
+			this.cleanupData(condition["Weather"], condition["Tyre.Compound"], condition["Tyre.Compound.Color"], drivers, ["Electronics"])
+	}
+
+	cleanupTyres(drivers := kUndefined) {
+		local ignore, condition
+
+		for ignore, condition in this.combineResults("Tyres", {Select: ["Weather", "Tyre.Compound", "Tyre.Compound.Color"]
+															 , By: ["Weather", "Tyre.Compound", "Tyre.Compound.Color"]
+															 , Where: {}}, drivers)
+			this.cleanupData(condition["Weather"], condition["Tyre.Compound"], condition["Tyre.Compound.Color"], drivers, ["Tyres"])
 	}
 
 	addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor

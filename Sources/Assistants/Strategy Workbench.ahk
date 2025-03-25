@@ -429,22 +429,23 @@ class StrategyWorkbench extends ConfigurationItem {
 									  , translate("Delete"), 262436)
 					OnMessage(0x44, translateYesNoButtons, 0)
 
-					if (msgResult = "Yes") {
-						this.Window.Block()
+					if (msgResult = "Yes")
+						withTask(ProgressTask(translate("Cleaning ") . translate("Data")), () {
+							this.Window.Block()
 
-						try {
-							TelemetryDatabase(workbench.SelectedSimulator , workbench.SelectedCar, workbench.SelectedTrack
-											, workbench.SelectedDrivers).cleanupData(workbench.SelectedWeather, workbench.SelectedCompound
-																				   , workbench.SelectedCompoundColor, workbench.SelectedDrivers ? workbench.SelectedDrivers : true)
+							try {
+								TelemetryDatabase(workbench.SelectedSimulator , workbench.SelectedCar, workbench.SelectedTrack
+												, workbench.SelectedDrivers).cleanupData(workbench.SelectedWeather, workbench.SelectedCompound
+																					   , workbench.SelectedCompoundColor, workbench.SelectedDrivers ? workbench.SelectedDrivers : true)
 
-							workbench.loadDataType(workbench.SelectedDataType, true)
+								workbench.loadDataType(workbench.SelectedDataType, true)
 
-							workbench.loadCompound(workbench.AvailableCompounds[workbenchGui["compoundDropDown"].Value], true)
-						}
-						finally {
-							this.Window.Unblock()
-						}
-					}
+								workbench.loadCompound(workbench.AvailableCompounds[workbenchGui["compoundDropDown"].Value], true)
+							}
+							finally {
+								this.Window.Unblock()
+							}
+						})
 				}
 
 				workbenchGui["dataTypeDropDown"].Choose(inList(["Electronics", "Tyres"], workbench.SelectedDataType))
@@ -1093,7 +1094,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		chosen := inList(["Electronics", "Tyres"], this.SelectedDataType)
 
-		workbenchGui.Add("DropDownList", "x12 yp+28 w76 Choose" . chosen . " vdataTypeDropDown  +0x200", collect(["Electronics", "Tyres", "-----------------", "Cleanup Data"], translate)).OnEvent("Change", chooseDataType)
+		workbenchGui.Add("DropDownList", "x12 yp+28 w76 Choose" . chosen . " vdataTypeDropDown  +0x200", collect(["Electronics", "Tyres", "-----------------", "Cleanup..."], translate)).OnEvent("Change", chooseDataType)
 
 		this.iDataListView := workbenchGui.Add("ListView", "x12 yp+24 w170 h172 W:Grow(0.1) H:Grow(0.2) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "Map", "#"], translate))
 		this.iDataListView.OnEvent("Click", noSelect)

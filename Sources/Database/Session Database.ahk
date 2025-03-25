@@ -40,7 +40,7 @@
 #Include "..\Framework\Extensions\GDIP.ahk"
 #Include "..\Framework\Extensions\CLR.ahk"
 #Include "Libraries\SettingsDatabase.ahk"
-#Include "Libraries\TelemetryDatabase.ahk"
+#Include "Libraries\LapsDatabase.ahk"
 #Include "Libraries\TyresDatabase.ahk"
 #Include "Libraries\PressuresEditor.ahk"
 #Include "Libraries\TelemetryViewer.ahk"
@@ -4165,7 +4165,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local connectors := this.SessionDatabase.Connectors
 		local window := this.Window
 		local progressWindow, simulator, count, row, type, data, car, track
-		local driver, telemetryDB, tyresDB, code, candidate, progress
+		local driver, lapsDB, tyresDB, code, candidate, progress
 		local ignore, identifier, identifiers, name, extension
 
 		progressWindow := showProgress({color: "Green", title: translate("Deleting Data")})
@@ -4217,10 +4217,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				switch type, false {
 					case translate("Laps"):
-						telemetryDB := TelemetryDatabase(simulator, car, track).Database
+						lapsDB := LapsDatabase(simulator, car, track).Database
 
-						this.deleteEntries(connectors, telemetryDB, "Electronics", "Electronics", driver)
-						this.deleteEntries(connectors, telemetryDB, "Tyres", "Tyres", driver)
+						this.deleteEntries(connectors, lapsDB, "Electronics", "Electronics", driver)
+						this.deleteEntries(connectors, lapsDB, "Tyres", "Tyres", driver)
 					case translate("Pressures"):
 						tyresDB := TyresDatabase().getTyresDatabase(simulator, car, track)
 
@@ -4349,11 +4349,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				switch type, false {
 					case translate("Laps"):
-						sourceDB := TelemetryDatabase(simulator, car, track).Database
-						targetDB := Database(targetDirectory, kTelemetrySchemas)
+						sourceDB := LapsDatabase(simulator, car, track).Database
+						targetDB := Database(targetDirectory, kLapsSchemas)
 
-						schemas["Electronics"] := kTelemetrySchemas["ELectronics"]
-						schemas["Tyres"] := kTelemetrySchemas["Tyres"]
+						schemas["Electronics"] := kLapsSchemas["ELectronics"]
+						schemas["Tyres"] := kLapsSchemas["Tyres"]
 
 						for ignore, entry in sourceDB.query("Electronics", {Where: {Driver: driver}})
 							targetDB.add("Electronics", entry, true)
@@ -4501,8 +4501,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			schemas := CaseInsenseMap()
 
-			schemas["Electronics"] := kTelemetrySchemas["Electronics"]
-			schemas["Tyres"] := kTelemetrySchemas["Tyres"]
+			schemas["Electronics"] := kLapsSchemas["Electronics"]
+			schemas["Tyres"] := kLapsSchemas["Tyres"]
 			schemas["Tyres.Pressures"] := kTyresSchemas["Tyres.Pressures"]
 			schemas["Tyres.Pressures.Distribution"] := kTyresSchemas["Tyres.Pressures.Distribution"]
 
@@ -4564,7 +4564,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 								drivers := selection[key . "Telemetry"]
 
 								sourceDB := Database(sourceDirectory . "\", schemas)
-								targetDB := TelemetryDatabase(simulator, car, track).Database
+								targetDB := LapsDatabase(simulator, car, track).Database
 
 								targetDB.lock("Electronics")
 
@@ -4813,7 +4813,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local window := this.Window
 		local progressWindow := showProgress({color: "Green", title: translate("Analyzing Data")})
 		local selectedSimulator, selectedCar, selectedTrack, drivers, simulator, progress, tracks, track
-		local car, carName, found, targetDirectory, telemetryDB, ignore, driver, tyresDB, result, number, strategies
+		local car, carName, found, targetDirectory, lapsDB, ignore, driver, tyresDB, result, number, strategies
 		local sessions, telemetries, automations, trackName, setups, ignore, type, extension
 
 		progressWindow.Opt("+Owner" . window.Hwnd)
@@ -4865,10 +4865,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 									targetDirectory := (kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\")
 
-									telemetryDB := TelemetryDatabase(simulator, car, track)
+									lapsDB := LapsDatabase(simulator, car, track)
 
 									for ignore, driver in drivers {
-										number := (telemetryDB.getElectronicsCount(driver) + telemetryDB.getTyresCount(driver))
+										number := (lapsDB.getElectronicsCount(driver) + lapsDB.getTyresCount(driver))
 
 										if (number > 0)
 											this.AdministrationListView.Add("", translate("Laps"), (carName . " / " . trackName), this.SessionDatabase.getDriverName(selectedSimulator, driver), number)
@@ -6812,7 +6812,7 @@ selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner :
 
 selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := false, *) {
 	local x, y, w, h, editor, simulator, code, info, drivers, id, name, progressWindow, tracks, progress
-	local car, carName, track, trackName, sourceDirectory, found, telemetryDB, tyresDB, driver, driverName, rows
+	local car, carName, track, trackName, sourceDirectory, found, lapsDB, tyresDB, driver, driverName, rows
 	local strategies, telemetries, setups, automations, row, selection, data, type, number, key, sessions, extension
 
 	static importDataGui
@@ -6938,12 +6938,12 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 
 					found := false
 
-					telemetryDB := TelemetryDatabase()
+					lapsDB := LapsDatabase()
 
-					telemetryDB.setDatabase(Database(sourceDirectory . "\", kTelemetrySchemas))
+					lapsDB.setDatabase(Database(sourceDirectory . "\", kLapsSchemas))
 
 					for driver, driverName in drivers {
-						number := (telemetryDB.getElectronicsCount(driver) + telemetryDB.getTyresCount(driver))
+						number := (lapsDB.getElectronicsCount(driver) + lapsDB.getTyresCount(driver))
 
 						if (number > 0)
 							importListView.Add("Check", translate("Laps"), (carName . " / " . trackName), driverName, number)
@@ -7143,7 +7143,7 @@ editLaps(editorOrCommand, arguments*) {
 	static tyresListView
 
 	static editor
-	static telemetryDB
+	static lapsDB
 
 	loadElectronics(entry) {
 		return [translate(entry["Weather"])
@@ -7216,10 +7216,10 @@ editLaps(editorOrCommand, arguments*) {
 		withTask(ProgressTask(translate("Deleting Data")), () {
 			local ignore, connector, row, removedRows, removalRows
 
-			telemetryDB.Database.lock(localTable)
+			lapsDB.Database.lock(localTable)
 
 			try {
-				removedRows := choose(telemetryDB.Database.query(localTable, {Where: {Driver: telemetryDB.ID}}), removedPredicate)
+				removedRows := choose(lapsDB.Database.query(localTable, {Where: {Driver: lapsDB.ID}}), removedPredicate)
 				removalRows := removedRows.Clone()
 
 				while (removalRows.Length > 0) {
@@ -7235,14 +7235,14 @@ editLaps(editorOrCommand, arguments*) {
 							}
 				}
 
-				telemetryDB.Database.remove(localTable, false, (r) {
+				lapsDB.Database.remove(localTable, false, (r) {
 					Sleep(50)
 
 					return inList(removedRows, r)
 				})
 			}
 			finally {
-				telemetryDB.Database.unlock(localTable)
+				lapsDB.Database.unlock(localTable)
 			}
 		})
 	}
@@ -7257,7 +7257,7 @@ editLaps(editorOrCommand, arguments*) {
 		loop 4
 			electronicsListView.ModifyCol(A_Index, "AutoHdr")
 
-		for ignore, entry in telemetryDB.Database.query("Electronics", {Where: {Driver: telemetryDB.ID} })
+		for ignore, entry in lapsDB.Database.query("Electronics", {Where: {Driver: lapsDB.ID} })
 			electronicsListView.Add("", loadElectronics(entry)*)
 
 		electronicsListView.ModifyCol()
@@ -7273,7 +7273,7 @@ editLaps(editorOrCommand, arguments*) {
 		loop 4
 			tyresListView.ModifyCol(A_Index, "AutoHdr")
 
-		for ignore, entry in telemetryDB.Database.query("Tyres", {Where: {Driver: telemetryDB.ID} })
+		for ignore, entry in lapsDB.Database.query("Tyres", {Where: {Driver: lapsDB.ID} })
 			tyresListView.Add("", loadTyres(entry)*)
 
 		tyresListView.ModifyCol()
@@ -7291,7 +7291,7 @@ editLaps(editorOrCommand, arguments*) {
 			lapsGui.Block()
 
 			try {
-				withTask(ProgressTask(translate("Cleaning ") . translate("Electronics")), () => telemetryDB.cleanupElectronics(telemetryDB.ID))
+				withTask(ProgressTask(translate("Cleaning ") . translate("Electronics")), () => lapsDB.cleanupElectronics(lapsDB.ID))
 
 				editLaps("LoadElectronics")
 
@@ -7312,7 +7312,7 @@ editLaps(editorOrCommand, arguments*) {
 			lapsGui.Block()
 
 			try {
-				withTask(ProgressTask(translate("Cleaning ") . translate("Tyres")), () => telemetryDB.cleanupTyres(telemetryDB.ID))
+				withTask(ProgressTask(translate("Cleaning ") . translate("Tyres")), () => lapsDB.cleanupTyres(lapsDB.ID))
 
 				editLaps("LoadTyres")
 
@@ -7402,7 +7402,7 @@ editLaps(editorOrCommand, arguments*) {
 		car := arguments[2]
 		track := arguments[3]
 
-		telemetryDB := TelemetryDatabase(simulator, car, track)
+		lapsDB := LapsDatabase(simulator, car, track)
 
 		lapsGui := EditLapsWindow({Descriptor: "Session Database.LapsData"
 								 , Resizeable: true, Options: "-MaximizeBox -MinimizeBox"}

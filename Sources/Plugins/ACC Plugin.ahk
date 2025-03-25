@@ -81,7 +81,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 	iSelectedDriver := false
 
-	iPositionsDataFuture := false
+	iStandingsDataFuture := false
 
 	static sCarData := false
 
@@ -281,15 +281,15 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		return telemetryData
 	}
 
-	acquireSessionData(&telemetryData, &positionsData, finished := false) {
-		if !this.iPositionsDataFuture
-			this.iPositionsDataFuture := this.UDPProvider.getPositionsDataFuture()
+	acquireSessionData(&telemetryData, &standingsData, finished := false) {
+		if !this.iStandingsDataFuture
+			this.iStandingsDataFuture := this.UDPProvider.getStandingsDataFuture()
 
-		super.acquireSessionData(&telemetryData, &positionsData, finished)
+		super.acquireSessionData(&telemetryData, &standingsData, finished)
 	}
 
-	acquirePositionsData(telemetryData, finished := false) {
-		local positionsData, session
+	acquireStandingsData(telemetryData, finished := false) {
+		local standingsData, session
 		local lap, restart, fileName, tries
 		local driverID, driverForname, driverSurname, driverNickname, lapTime, driverCar, driverCarCandidate, carID, car
 
@@ -319,21 +319,21 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		lastLap := lap
 
-		if (restart || !this.iPositionsDataFuture)
-			this.iPositionsDataFuture := this.UDPProvider.getPositionsDataFuture(restart)
+		if (restart || !this.iStandingsDataFuture)
+			this.iStandingsDataFuture := this.UDPProvider.getStandingsDataFuture(restart)
 
 		try {
-			positionsData := this.iPositionsDataFuture.PositionsData
+			standingsData := this.iStandingsDataFuture.StandingsData
 		}
 		finally {
-			this.iPositionsDataFuture := false
+			this.iStandingsDataFuture := false
 		}
 
-		if positionsData {
-			session := getMultiMapValue(positionsData, "Session Data", "Session", kUndefined)
+		if standingsData {
+			session := getMultiMapValue(standingsData, "Session Data", "Session", kUndefined)
 
 			if (session != kUndefined) {
-				removeMultiMapValues(positionsData, "Session Data")
+				removeMultiMapValues(standingsData, "Session Data")
 
 				setMultiMapValue(telemetryData, "Session Data", "Session", session)
 			}
@@ -351,8 +351,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			driverCar := false
 			driverCarCandidate := false
 
-			loop getMultiMapValue(positionsData, "Position Data", "Car.Count", 0) {
-				carID := getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Car", kUndefined)
+			loop getMultiMapValue(standingsData, "Position Data", "Car.Count", 0) {
+				carID := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", kUndefined)
 
 				if (carID != kUndefined) {
 					car := (carIDs.Has(carID) ? carIDs[carID] : ACCPlugin.kUnknown)
@@ -360,16 +360,16 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					if ((car = ACCPlugin.kUnknown) && isDebug())
 						showMessage("Unknown car with ID " . carID . " detected...")
 
-					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Car", car)
+					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", car)
 
-					if (getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".ID", false) = driverID) {
+					if (getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID", false) = driverID) {
 						driverCar := A_Index
 
 						lastDriverCar := driverCar
 					}
 					else if !driverCar
-						if ((getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Forname") = driverForname)
-						 && (getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Surname") = driverSurname)) {
+						if ((getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Forname") = driverForname)
+						 && (getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Surname") = driverSurname)) {
 							driverCar := A_Index
 
 							lastDriverCar := driverCar
@@ -378,11 +378,11 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 
 			if !driverCar
-				loop getMultiMapValue(positionsData, "Position Data", "Car.Count", 0) {
-					carID := getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Car", kUndefined)
+				loop getMultiMapValue(standingsData, "Position Data", "Car.Count", 0) {
+					carID := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", kUndefined)
 
 					if (carID != kUndefined)
-						if (getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Position")
+						if (getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Position")
 						  = getMultiMapValue(telemetryData, "Stint Data", "Position", kUndefined)) {
 						driverCar := A_Index
 
@@ -390,16 +390,16 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 						break
 					}
-					else if (getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Time") = lapTime)
+					else if (getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Time") = lapTime)
 						driverCarCandidate := A_Index
 				}
 
 			if !driverCar
 				driverCar := (lastDriverCar ? lastDriverCar : driverCarCandidate)
 
-			setMultiMapValue(positionsData, "Position Data", "Driver.Car", driverCar)
+			setMultiMapValue(standingsData, "Position Data", "Driver.Car", driverCar)
 
-			return (finished ? positionsData : this.correctPositionsData(positionsData))
+			return (finished ? standingsData : this.correctStandingsData(standingsData))
 		}
 		else {
 			this.UDPProvider.shutdown(true)
@@ -434,12 +434,12 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 	}
 
-	updatePositionsData(data) {
+	updateStandingsData(data) {
 		local car, carCategory, cupCategory
 
 		static carCategories := false
 
-		super.updatePositionsData(data)
+		super.updateStandingsData(data)
 
 		if !carCategories {
 			ACCPlugin.requireCarDatabase()

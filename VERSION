@@ -3,7 +3,7 @@ Version=6.2.5.0-dev
 Target=6.2.4.0-release
 Date=03/25/2025
 Download=
-Changes=Fixed Agent Booster for Driving Coach, New LLM Runtime, Fixed max tokens field restriction to 999, Items in "Administration" tab in "Session Database" are double-clickable, Editor for "Laps" data item in "Session Database", Cleanup system for lap data in "Session Database", Added some missing translations
+Changes=Fixed Agent Booster for Driving Coach, New LLM Runtime, Fixed max tokens field restriction to 999, Items in "Administration" tab in "Session Database" are double-clickable, Editor for "Laps" data item in "Session Database", Cleanup system for lap data in "Session Database", Added some missing translations, Renamed "TelemetryDatabase" to "LapsDatabase"
 Components=Media->5.6.1,Configuration->6.2.4,Utilities->6.2.2
 [Release]
 Version=6.2.4.0-release

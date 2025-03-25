@@ -344,10 +344,10 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	updatePositionsData(data) {
+	updateStandingsData(data) {
 		local carClass
 
-		super.updatePositionsData(data)
+		super.updateStandingsData(data)
 
 		loop getMultiMapValue(data, "Position Data", "Car.Count", 0) {
 			carClass := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", kUndefined)

@@ -304,7 +304,7 @@ class DrivingCoach extends GridRaceAssistant {
 		try {
 			DirCreate(this.Options["Driving Coach.Archive"])
 		}
-		catch {
+		catch Any as exception {
 			logError(exception)
 		}
 

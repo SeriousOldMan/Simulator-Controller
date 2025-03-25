@@ -1267,19 +1267,19 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			}
 	}
 
-	static acquireSessionData(&telemetryData, &positionsData, finished := false) {
+	static acquireSessionData(&telemetryData, &standingsData, finished := false) {
 		if RaceAssistantPlugin.Simulator {
-			RaceAssistantPlugin.Simulator.acquireSessionData(&telemetryData, &positionsData, finished)
+			RaceAssistantPlugin.Simulator.acquireSessionData(&telemetryData, &standingsData, finished)
 
 			data := newMultiMap()
 
 			setMultiMapValue(data, "System", "Time", A_TickCount)
 
 			RaceAssistantPlugin.updateAssistantsTelemetryData(telemetryData)
-			RaceAssistantPlugin.updateAssistantsPositionsData(positionsData)
+			RaceAssistantPlugin.updateAssistantsStandingsData(standingsData)
 
 			addMultiMapValues(data, telemetryData)
-			addMultiMapValues(data, positionsData)
+			addMultiMapValues(data, standingsData)
 
 			return data
 		}
@@ -1287,7 +1287,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			return newMultiMap()
 	}
 
-	static readSessionData(fileName, &telemetryData, &positionsData) {
+	static readSessionData(fileName, &telemetryData, &standingsData) {
 		local data := readMultiMap(fileName)
 
 		setMultiMapValue(data, "System", "Time", A_TickCount)
@@ -1296,14 +1296,14 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 		removeMultiMapValues(telemetryData, "Position Data")
 
-		positionsData := newMultiMap()
+		standingsData := newMultiMap()
 
-		setMultiMapValues(positionsData, "Position Data", getMultiMapValues(data, "Position Data"))
+		setMultiMapValues(standingsData, "Position Data", getMultiMapValues(data, "Position Data"))
 
 		data := newMultiMap()
 
 		addMultiMapValues(data, telemetryData)
-		addMultiMapValues(data, positionsData)
+		addMultiMapValues(data, standingsData)
 
 		return data
 	}
@@ -1396,7 +1396,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		}
 	}
 
-	static addAssistantsLap(data, telemetryData, positionsData) {
+	static addAssistantsLap(data, telemetryData, standingsData) {
 		local ignore, assistant
 
 		if RaceAssistantPlugin.sStintStartTime {
@@ -1408,14 +1408,14 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			this.Simulator.addLap(RaceAssistantPlugin.LastLap, data)
 
 		if RaceAssistantPlugin.TeamSessionActive
-			RaceAssistantPlugin.TeamServer.addLap(RaceAssistantPlugin.LastLap, telemetryData, positionsData)
+			RaceAssistantPlugin.TeamServer.addLap(RaceAssistantPlugin.LastLap, telemetryData, standingsData)
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if (assistant.requireRaceAssistant() && assistant.RaceAssistantActive)
 				assistant.addLap(RaceAssistantPlugin.LastLap, RaceAssistantPlugin.LapRunning, data)
 	}
 
-	static updateAssistantsLap(data, telemetryData, positionsData) {
+	static updateAssistantsLap(data, telemetryData, standingsData) {
 		local ignore, assistant
 
 		if RaceAssistantPlugin.sStintStartTime {
@@ -1427,7 +1427,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			this.Simulator.updateLap(RaceAssistantPlugin.LastLap, data)
 
 		if RaceAssistantPlugin.TeamSessionActive
-			RaceAssistantPlugin.TeamServer.updateLap(RaceAssistantPlugin.LastLap, RaceAssistantPlugin.LapRunning, data, telemetryData, positionsData)
+			RaceAssistantPlugin.TeamServer.updateLap(RaceAssistantPlugin.LastLap, RaceAssistantPlugin.LapRunning, data, telemetryData, standingsData)
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if (assistant.requireRaceAssistant() && assistant.RaceAssistantActive)
@@ -1532,15 +1532,15 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				assistant.updateTelemetryData(data)
 	}
 
-	static updateAssistantsPositionsData(data) {
+	static updateAssistantsStandingsData(data) {
 		local ignore, assistant
 
 		if RaceAssistantPlugin.Simulator
-			RaceAssistantPlugin.Simulator.updatePositionsData(data)
+			RaceAssistantPlugin.Simulator.updateStandingsData(data)
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if assistant.Enabled
-				assistant.updatePositionsData(data)
+				assistant.updateStandingsData(data)
 	}
 
 	static getSession(data := false) {
@@ -2159,7 +2159,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	updateTelemetryData(data) {
 	}
 
-	updatePositionsData(data) {
+	updateStandingsData(data) {
 	}
 
 	updateSession(session) {
@@ -2343,7 +2343,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		local splitTime := startTime
 		local lastLap := RaceAssistantPlugin.LastLap
 		local skippedLap := false
-		local telemetryData, positionsData, data, dataLastLap
+		local telemetryData, standingsData, data, dataLastLap
 		local testData, message, key, value, session, teamServer
 		local newLap, firstLap, ignore, assistant, hasAssistant, finalLap
 		local simulator, car, track, weather
@@ -2392,7 +2392,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 		if RaceAssistantPlugin.Simulator {
 			telemetryData := true
-			positionsData := true
+			standingsData := true
 
 			if RaceAssistantPlugin.ReplayDirectory {
 				replayIndex += 1
@@ -2411,10 +2411,10 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				}
 
 				data := RaceAssistantPlugin.readSessionData(RaceAssistantPlugin.ReplayDirectory . "Race Engineer Lap " . replayLap . "." . replayIndex . ".data"
-														  , &telemetryData, &positionsData)
+														  , &telemetryData, &standingsData)
 			}
 			else
-				data := RaceAssistantPlugin.acquireSessionData(&telemetryData, &positionsData)
+				data := RaceAssistantPlugin.acquireSessionData(&telemetryData, &standingsData)
 
 			dataLastLap := getMultiMapValue(data, "Stint Data", "Laps", 0)
 
@@ -2635,7 +2635,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 								finished := true
 
 							if (finished && !RaceAssistantPlugin.ReplayDirectory)
-								data := RaceAssistantPlugin.acquireSessionData(&telemetryData, &positionsData, true)
+								data := RaceAssistantPlugin.acquireSessionData(&telemetryData, &standingsData, true)
 						}
 
 						if joinedSession {
@@ -2693,9 +2693,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 						RaceAssistantPlugin.sLapRunning := (RaceAssistantPlugin.LapRunning + 1)
 
 						if newLap
-							RaceAssistantPlugin.addAssistantsLap(data, telemetryData, positionsData)
+							RaceAssistantPlugin.addAssistantsLap(data, telemetryData, standingsData)
 						else
-							RaceAssistantPlugin.updateAssistantsLap(data, telemetryData, positionsData)
+							RaceAssistantPlugin.updateAssistantsLap(data, telemetryData, standingsData)
 
 						if isDebug() {
 							logMessage(kLogInfo, "Collect session data (Process):" . (A_TickCount - splitTime) . " ms...")

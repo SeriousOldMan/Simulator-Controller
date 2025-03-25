@@ -185,7 +185,7 @@ requestShareSessionDatabaseConsent() {
 }
 
 checkForNews() {
-	local check, lastModified, availableNews, news, nr, html, show, shown, rule
+	local check, lastModified, availableNews, news, nr, html, show, shown, rule, ignre, url
 
 	if (StrSplit(A_ScriptName, ".")[1] = "Simulator Startup") {
 		check := !FileExist(kUserConfigDirectory . "NEWS")
@@ -200,10 +200,26 @@ checkForNews() {
 
 		if check {
 			try {
+				deleteFile(kTempDirectory . "NEWS.ini")
+
 				if FileExist(kConfigDirectory . "NEWS")
 					FileCopy(kConfigDirectory . "NEWS", kTempDirectory . "NEWS.ini")
-				else
-					Download("https://fileshare.impresion3d.pro/filebrowser/api/public/dl/r0q9-d-3", kTempDirectory . "NEWS.ini")
+				else {
+					check := false
+
+					for ignore, url in ["https://fileshare.impresion3d.pro/filebrowser/api/public/dl/r0q9-d-3"
+									  , "http://87.177.159.148:800/api/public/dl/jipSYNLz"
+									  , "https://www.dropbox.com/scl/fi/s5ewrqo9lzwcv6omvx667/NEWS?rlkey=j3t7aopmdye4efc8uc3xlekxz&st=wbuipual&dl=1"] {
+						try
+							Download("https://fileshare.impresion3d.pro/filebrowser/api/public/dl/r0q9-d-3", kTempDirectory . "NEWS.ini")
+
+						if FileExist(kTempDirectory . "NEWS.ini") {
+							check := true
+
+							break
+						}
+					}
+				}
 			}
 			catch Any as exception {
 				check := false

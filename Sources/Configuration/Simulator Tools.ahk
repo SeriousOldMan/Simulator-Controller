@@ -40,7 +40,7 @@
 #Include "..\Framework\Extensions\HTMLViewer.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Database\Libraries\TyresDatabase.ahk"
-#Include "..\Database\Libraries\TelemetryDatabase.ahk"
+#Include "..\Database\Libraries\LapsDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -2622,13 +2622,13 @@ updateConfigurationForV424() {
 
 					sourceDirectory := (kDatabaseDirectory . "User\RF2\" . oldCar . "\" . track . "\")
 
-					sourceDB := Database(sourceDirectory, kTelemetrySchemas)
-					targetDB := TelemetryDatabase(simulator, car, track).Database
+					sourceDB := Database(sourceDirectory, kLapsSchemas)
+					targetDB := LapsDatabase(simulator, car, track).Database
 
 					for ignore, row in sourceDB.Tables["Electronics"] {
 						data := Database.Row()
 
-						for ignore, field in kTelemetrySchemas["Electronics"]
+						for ignore, field in kLapsSchemas["Electronics"]
 							data[field] := row[field]
 
 						targetDB.add("Electronics", data, true)
@@ -2637,7 +2637,7 @@ updateConfigurationForV424() {
 					for ignore, row in sourceDB.Tables["Tyres"] {
 						data := Database.Row()
 
-						for ignore, field in kTelemetrySchemas["Tyres"]
+						for ignore, field in kLapsSchemas["Tyres"]
 							data[field] := row[field]
 
 						targetDB.add("Tyres", data, true)
@@ -2809,7 +2809,7 @@ updateConfigurationForV422() {
 			loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car "\*.*", "D" {
 				track := A_LoopFileName
 
-				db := TelemetryDatabase(simulator, car, track).Database
+				db := LapsDatabase(simulator, car, track).Database
 
 				addOwnerField(db, "Electronics", id)
 				clearWearFields(db, "Tyres", id)

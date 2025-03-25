@@ -26,7 +26,7 @@
 
 class StrategySimulation {
 	iStrategyManager := false
-	iTelemetryDatabase := false
+	iLapsDatabase := false
 
 	iFixedLapTime := false
 
@@ -45,9 +45,9 @@ class StrategySimulation {
 		}
 	}
 
-	TelemetryDatabase {
+	LapsDatabase {
 		Get {
-			return this.iTelemetryDatabase
+			return this.iLapsDatabase
 		}
 	}
 
@@ -103,10 +103,10 @@ class StrategySimulation {
 		}
 	}
 
-	__New(strategyManager, sessionType, telemetryDatabase) {
+	__New(strategyManager, sessionType, lapsDatabase) {
 		this.iStrategyManager := strategyManager
 		this.iSessionType := sessionType
-		this.iTelemetryDatabase := telemetryDatabase
+		this.iLapsDatabase := lapsDatabase
 	}
 
 	createKnowledgeBase(productions, reductions, facts := false, includes := false) {
@@ -293,11 +293,11 @@ class StrategySimulation {
 	}
 
 	setStintDriver(stintNumber, driverID) {
-		this.TelemetryDatabase.setDrivers(driverID)
+		this.LapsDatabase.setDrivers(driverID)
 	}
 
 	calcAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, weather, tyreCompound, tyreCompoundColor, tyreLaps
-				 , default := false, telemetryDB := false) {
+				 , default := false, lapsDB := false) {
 		local theMin := false
 		local theMax := false
 		local a, b, lapTimes, tyreLapTimes, xValues, yValues, ignore, entry
@@ -306,11 +306,11 @@ class StrategySimulation {
 		a := false
 		b := false
 
-		if !telemetryDB
-			telemetryDB := this.StrategyManager.TelemetryDatabase
+		if !lapsDB
+			lapsDB := this.StrategyManager.LapsDatabase
 
-		lapTimes := telemetryDB.getMapLapTimes(weather, tyreCompound, tyreCompoundColor)
-		tyreLapTimes := telemetryDB.getTyreLapTimes(weather, tyreCompound, tyreCompoundColor)
+		lapTimes := lapsDB.getMapLapTimes(weather, tyreCompound, tyreCompoundColor)
+		tyreLapTimes := lapsDB.getTyreLapTimes(weather, tyreCompound, tyreCompoundColor)
 
 		if (tyreLapTimes.Length > 1) {
 			xValues := []
@@ -373,7 +373,7 @@ class StrategySimulation {
 		local tyreCompoundColors := []
 		local ignore, row
 
-		for ignore, row in this.TelemetryDatabase.getTyreCompoundColors(weather, tyreCompound)
+		for ignore, row in this.LapsDatabase.getTyreCompoundColors(weather, tyreCompound)
 			tyreCompoundColors.Push(row["Tyre.Compound.Color"])
 
 		return tyreCompoundColors
@@ -384,15 +384,15 @@ class StrategySimulation {
 	}
 
 	acquireElectronicsData(weather, tyreCompound, tyreCompoundColor) {
-		return this.TelemetryDatabase.getMapData(weather, tyreCompound, tyreCompoundColor)
+		return this.LapsDatabase.getMapData(weather, tyreCompound, tyreCompoundColor)
 	}
 
 	acquireTyresData(weather, tyreCompound, tyreCompoundColor) {
-		return this.TelemetryDatabase.getTyreData(weather, tyreCompound, tyreCompoundColor)
+		return this.LapsDatabase.getTyreData(weather, tyreCompound, tyreCompoundColor)
 	}
 
 	acquireTelemetryData(&electronicsData, &tyresData, verbose, &progress) {
-		local telemetryDB := this.TelemetryDatabase
+		local lapsDB := this.LapsDatabase
 		local simulator := false
 		local car := false
 		local track := false
@@ -410,8 +410,8 @@ class StrategySimulation {
 		this.getStrategySettings(&simulator, &car, &track, &weather, &airTemperature, &trackTemperature
 							   , &sessionType, &sessionLength, &maxTyreLaps, &tyreCompound, &tyreCompoundColor, &tyrePressures)
 
-		if !telemetryDB.suitableTyreCompound(simulator, car, track, weather, compound(tyreCompound, tyreCompoundColor)) {
-			candidate := telemetryDB.optimalTyreCompound(simulator, car, track, weather, airTemperature, trackTemperature)
+		if !lapsDB.suitableTyreCompound(simulator, car, track, weather, compound(tyreCompound, tyreCompoundColor)) {
+			candidate := lapsDB.optimalTyreCompound(simulator, car, track, weather, airTemperature, trackTemperature)
 
 			if candidate
 				splitCompound(candidate, &tyreCompound, &tyreCompoundColor)
@@ -783,7 +783,7 @@ class StrategySimulation {
 
 class VariationSimulation extends StrategySimulation {
 	createScenarios(electronicsData, tyresData, verbose, &progress) {
-		local telemetryDB := this.TelemetryDatabase
+		local lapsDB := this.LapsDatabase
 		local simulator := false
 		local car := false
 		local track := false
@@ -889,8 +889,8 @@ class VariationSimulation extends StrategySimulation {
 		targetTyreCompound := tyreCompound
 		targetTyreCompoundColor := tyreCompoundColor
 
-		if !telemetryDB.suitableTyreCompound(simulator, car, track, weather, compound(tyreCompound, tyreCompoundColor)) {
-			candidate := telemetryDB.optimalTyreCompound(simulator, car, track, weather, airTemperature, trackTemperature)
+		if !lapsDB.suitableTyreCompound(simulator, car, track, weather, compound(tyreCompound, tyreCompoundColor)) {
+			candidate := lapsDB.optimalTyreCompound(simulator, car, track, weather, airTemperature, trackTemperature)
 
 			if candidate
 				splitCompound(candidate, &targetTyreCompound, &targetTyreCompoundColor)
@@ -1131,7 +1131,7 @@ class TrafficSimulation extends StrategySimulation {
 	}
 
 	createScenarios(electronicsData, tyresData, verbose, &progress) {
-		local telemetryDB := this.TelemetryDatabase
+		local lapsDB := this.LapsDatabase
 		local simulator := false
 		local car := false
 		local track := false
@@ -1265,8 +1265,8 @@ class TrafficSimulation extends StrategySimulation {
 			targetTyreCompound := tyreCompound
 			targetTyreCompoundColor := tyreCompoundColor
 
-			if !telemetryDB.suitableTyreCompound(simulator, car, track, weather, compound(tyreCompound, tyreCompoundColor)) {
-				candidate := telemetryDB.optimalTyreCompound(simulator, car, track, weather, airTemperature, trackTemperature)
+			if !lapsDB.suitableTyreCompound(simulator, car, track, weather, compound(tyreCompound, tyreCompoundColor)) {
+				candidate := lapsDB.optimalTyreCompound(simulator, car, track, weather, airTemperature, trackTemperature)
 
 				if candidate
 					splitCompound(candidate, &targetTyreCompound, &targetTyreCompoundColor)
@@ -3276,7 +3276,7 @@ class Strategy extends ConfigurationItem {
 	calcNextPitstopLap(pitstopNr, currentLap
 					 , remainingStintLaps, remainingSessionLaps, remainingTyreLaps, remainingFuel
 					 , &adjusted) {
-		local telemetryDB := this.StrategyManager.TelemetryDatabase
+		local lapsDB := this.StrategyManager.LapsDatabase
 		local simulator := this.Simulator
 		local car := this.Car
 		local track := this.Track
@@ -3311,8 +3311,8 @@ class Strategy extends ConfigurationItem {
 
 				this.getWeather(time / 60, &weather, &airTemperature, &trackTemperature)
 
-				if (!telemetryDB.suitableTyreCompound(simulator, car, track, weather, qualifiedCompound)
-				 && telemetryDB.optimalTyreCompound(simulator, car, track
+				if (!lapsDB.suitableTyreCompound(simulator, car, track, weather, qualifiedCompound)
+				 && lapsDB.optimalTyreCompound(simulator, car, track
 												  , weather, airTemperature, trackTemperature
 												  , this.availableTyreCompounds())) {
 					targetLap := (currentLap + A_Index - 1)
@@ -3465,7 +3465,7 @@ class Strategy extends ConfigurationItem {
 		local pitstopNr := currentStint
 		local pitstops, lastPitstops, ignore
 		local sessionLaps, numPitstops, fuelLaps, canonicalStintLaps, remainingFuel
-		local tyreChange, tyreCompound, tyreCompoundColor, forcedTyreCompound, driverID, driverName, pitstop, telemetryDB, candidate
+		local tyreChange, tyreCompound, tyreCompoundColor, forcedTyreCompound, driverID, driverName, pitstop, lapsDB, candidate
 		local time, weather, airTemperature, trackTemperature, pitstopRule, pitstopWindow, adjusted, lastPitstop, missed, isValid
 
 		this.iStartStint := currentStint
@@ -3609,13 +3609,13 @@ class Strategy extends ConfigurationItem {
 				}
 			}
 			else {
-				telemetryDB := this.StrategyManager.TelemetryDatabase
+				lapsDB := this.StrategyManager.LapsDatabase
 
 				this.getWeather((this.Time[true] + (pitstopLap - currentLap) * avgLapTime) / 60, &weather, &airTemperature, &trackTemperature)
 
-				candidate := telemetryDB.optimalTyreCompound(this.Simulator, this.Car, this.Track
-														   , weather, airTemperature, trackTemperature
-														   , this.availableTyreCompounds())
+				candidate := lapsDB.optimalTyreCompound(this.Simulator, this.Car, this.Track
+													  , weather, airTemperature, trackTemperature
+													  , this.availableTyreCompounds())
 
 				if candidate
 					splitCompound(candidate, &tyreCompound, &tyreCompoundColor)

@@ -247,7 +247,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		editorGui.Add("Text", "x" . x0 . " yp+30 w110 h23 +0x200 vviConversationModelLabel", translate("Model / # Tokens"))
 		editorGui.Add("ComboBox", "x" . x1 . " yp w" . (w1 - 64) . " vviConversationModelDropDown")
 		editorGui.Add("Edit", "x" . (x1 + (w1 - 60)) . " yp-1 w60 h23 Number vviConversationMaxTokensEdit").OnEvent("Change", validateTokens.Bind("viConversationMaxTokensEdit"))
-		editorGui.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 Range32-131072 vviConversationMaxTokensRange")
+		editorGui.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 0x80 Range32-131072 vviConversationMaxTokensRange")
 
 		editorGui.Add("Text", "x" . x0 . " ys+6 w110 h23 +0x200 vviConversationLLMRTModelLabel Hidden", translate("Model"))
 		editorGui.Add("Edit", "x" . x1 . " yp w" . (w1 - 24) . " vviConversationLLMRTModelEdit Hidden")
@@ -255,7 +255,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 		editorGui.Add("Text", "x" . x0 . " yp+24 w120 h23 +0x200 vviConversationLLMRTTokensLabel Hidden", translate("# Tokens / # GPULayers"))
 		editorGui.Add("Edit", "x" . x1 . " yp-1 w60 h23 Number vviConversationLLMRTMaxTokensEdit Hidden").OnEvent("Change", validateTokens.Bind("viConversationLLMRTMaxTokensEdit"))
-		editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range32-131072 vviConversationLLMRTMaxTokensRange Hidden")
+		editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 0x80 Range32-131072 vviConversationLLMRTMaxTokensRange Hidden")
 		editorGui.Add("Edit", "x" . (x1 + 62) . " yp w60 h23 Number Limit2 vviConversationLLMRTGPULayersEdit Hidden")
 		editorGui.Add("UpDown", "x" . (x1 + 62) . " yp w60 h23 Range0-99 vviConversationLLMRTGPULayersRange Hidden")
 

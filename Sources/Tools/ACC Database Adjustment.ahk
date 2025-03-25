@@ -42,7 +42,7 @@ global vBuildConfiguration := "Development"
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Database\Libraries\TyresDatabase.ahk
-#Include ..\Database\Libraries\TelemetryDatabase.ahk
+#Include ..\Database\Libraries\LapsDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -177,19 +177,19 @@ cleanupTelemetryData() {
 				if (progress > 100)
 					progress := 0
 
-				telemetryDB := TelemetryDatabase("Assetto Corsa Competizione", car, track)
+				lapsDB := LapsDatabase("Assetto Corsa Competizione", car, track)
 
-				for ignore, entry in telemetryDB.Database.Tables["Electronics"]
+				for ignore, entry in lapsDB.Database.Tables["Electronics"]
 					if (entry["Weather"] = "Dry")
 						entry["Lap.Time"] := Round(entry["Lap.Time"] + lapTimeCorrection, 1)
 
-				for ignore, entry in telemetryDB.Database.Tables["Tyres"]
+				for ignore, entry in lapsDB.Database.Tables["Tyres"]
 					if (entry["Weather"] = "Dry")
 						entry["Lap.Time"] := Round(entry["Lap.Time"] + lapTimeCorrection, 1)
 
 				Sleep 100
 
-				telemetryDB.Database.flush()
+				lapsDB.Database.flush()
 			}
 
 		hideProgress()

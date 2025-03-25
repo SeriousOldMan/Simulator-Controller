@@ -116,7 +116,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 			local value
 
 			field := this.Control[field]
-			value := field.Text
+			value := field.Value
 
 			if (!isInteger(value) || (value < 32)) {
 				field.Text := (field.HasProp("ValidText") ? field.ValidText : "200")
@@ -251,7 +251,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		widget12 := window.Add("ComboBox", "x" . x1 . " yp w" . (w1 - 64) . " W:Grow(0.3) vdcModelDropDown Hidden")
 		widget13 := window.Add("Edit", "x" . (x1 + (w1 - 60)) . " yp-1 w60 h23 X:Move(0.3) Number vdcMaxTokensEdit Hidden")
 		widget13.OnEvent("Change", validateTokens.Bind("dcMaxTokensEdit"))
-		widget14 := window.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 X:Move(0.3) Range32-131072 vdcMaxTokensRange Hidden")
+		widget14 := window.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 0x80 X:Move(0.3) Range32-131072 vdcMaxTokensRange Hidden")
 
 		widget38 := window.Add("Text", "x" . x0 . " ys+5 w120 h23 +0x200 vdcLLMRTModelLabel Hidden", translate("Model"))
 		widget31 := window.Add("Edit", "x" . x1 . " yp w" . (w1 - 24) . " W:Grow(0.3) vdcLLMRTModelEdit Hidden")
@@ -261,7 +261,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		widget33 := window.Add("Text", "x" . x0 . " yp+24 w120 h23 +0x200 vdcLLMRTTokensLabel Hidden", translate("# Tokens / # GPULayers"))
 		widget34 := window.Add("Edit", "x" . x1 . " yp-1 w60 h23 Number vdcLLMRTMaxTokensEdit Hidden")
 		widget34.OnEvent("Change", validateTokens.Bind("dcLLMRTMaxTokensEdit"))
-		widget35 := window.Add("UpDown", "x" . x1 . " yp w60 h23 Range32-131072 vdcLLMRTMaxTokensRange Hidden")
+		widget35 := window.Add("UpDown", "x" . x1 . " yp w60 h23 0x80 Range32-131072 vdcLLMRTMaxTokensRange Hidden")
 		widget36 := window.Add("Edit", "x" . (x1 + 62) . " yp w60 h23 Number Limit2 vdcLLMRTGPULayersEdit Hidden")
 		widget37 := window.Add("UpDown", "x" . (x1 + 62) . " yp w60 h23 Range0-99 vdcLLMRTGPULayersRange Hidden")
 

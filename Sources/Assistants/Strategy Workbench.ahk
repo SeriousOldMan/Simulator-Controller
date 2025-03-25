@@ -41,7 +41,7 @@
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Database\Libraries\SessionDatabaseBrowser.ahk"
 #Include "..\Database\Libraries\SettingsDatabase.ahk"
-#Include "..\Database\Libraries\TelemetryDatabase.ahk"
+#Include "..\Database\Libraries\LapsDatabase.ahk"
 #Include "Libraries\Strategy.ahk"
 #Include "Libraries\StrategyViewer.ahk"
 
@@ -112,7 +112,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	iStrategyViewer := false
 
 	iSimulation := false
-	iTelemetryDatabase := false
+	iLapsDatabase := false
 
 	class WorkbenchResizer extends Window.Resizer {
 		iRedraw := false
@@ -352,9 +352,9 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 	}
 
-	TelemetryDatabase {
+	LapsDatabase {
 		Get {
-			return this.iTelemetryDatabase
+			return this.iLapsDatabase
 		}
 	}
 
@@ -429,22 +429,23 @@ class StrategyWorkbench extends ConfigurationItem {
 									  , translate("Delete"), 262436)
 					OnMessage(0x44, translateYesNoButtons, 0)
 
-					if (msgResult = "Yes") {
-						this.Window.Block()
+					if (msgResult = "Yes")
+						withTask(ProgressTask(translate("Cleaning ") . translate("Data")), () {
+							this.Window.Block()
 
-						try {
-							TelemetryDatabase(workbench.SelectedSimulator , workbench.SelectedCar, workbench.SelectedTrack
-											, workbench.SelectedDrivers).cleanupData(workbench.SelectedWeather, workbench.SelectedCompound
-																				   , workbench.SelectedCompoundColor, workbench.SelectedDrivers ? workbench.SelectedDrivers : true)
+							try {
+								LapsDatabase(workbench.SelectedSimulator , workbench.SelectedCar, workbench.SelectedTrack
+										   , workbench.SelectedDrivers).cleanupData(workbench.SelectedWeather, workbench.SelectedCompound
+																				  , workbench.SelectedCompoundColor, workbench.SelectedDrivers ? workbench.SelectedDrivers : true)
 
-							workbench.loadDataType(workbench.SelectedDataType, true)
+								workbench.loadDataType(workbench.SelectedDataType, true)
 
-							workbench.loadCompound(workbench.AvailableCompounds[workbenchGui["compoundDropDown"].Value], true)
-						}
-						finally {
-							this.Window.Unblock()
-						}
-					}
+								workbench.loadCompound(workbench.AvailableCompounds[workbenchGui["compoundDropDown"].Value], true)
+							}
+							finally {
+								this.Window.Unblock()
+							}
+						})
 				}
 
 				workbenchGui["dataTypeDropDown"].Choose(inList(["Electronics", "Tyres"], workbench.SelectedDataType))
@@ -1093,7 +1094,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		chosen := inList(["Electronics", "Tyres"], this.SelectedDataType)
 
-		workbenchGui.Add("DropDownList", "x12 yp+28 w76 Choose" . chosen . " vdataTypeDropDown  +0x200", collect(["Electronics", "Tyres", "-----------------", "Cleanup Data"], translate)).OnEvent("Change", chooseDataType)
+		workbenchGui.Add("DropDownList", "x12 yp+28 w76 Choose" . chosen . " vdataTypeDropDown  +0x200", collect(["Electronics", "Tyres", "-----------------", "Cleanup..."], translate)).OnEvent("Change", chooseDataType)
 
 		this.iDataListView := workbenchGui.Add("ListView", "x12 yp+24 w170 h172 W:Grow(0.1) H:Grow(0.2) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "Map", "#"], translate))
 		this.iDataListView.OnEvent("Click", noSelect)
@@ -1116,7 +1117,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("Text", "x190 yp+28 w62 h23 X:Move(0.1) +0x200", translate("X-Axis"))
 
-		schema := filterSchema(TelemetryDatabase().getSchema("Electronics", true))
+		schema := filterSchema(LapsDatabase().getSchema("Electronics", true))
 
 		chosen := inList(schema, "Map")
 
@@ -2293,7 +2294,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	loadDataType(dataType, force := false) {
-		local tyreCompound, telemetryDB, ignore, column, categories, field, category, value, settings
+		local tyreCompound, lapsDB, ignore, column, categories, field, category, value, settings
 		local driverNames, index, names, schema, availableCompounds, settings, axis, value
 
 		if (force || (this.SelectedDataType != dataType)) {
@@ -2308,8 +2309,8 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
-			telemetryDB := TelemetryDatabase(this.SelectedSimulator, this.SelectedCar
-										   , this.SelectedTrack, this.SelectedDrivers)
+			lapsDB := LapsDatabase(this.SelectedSimulator, this.SelectedCar
+									  , this.SelectedTrack, this.SelectedDrivers)
 
 			this.DataListView.Delete()
 
@@ -2320,14 +2321,14 @@ class StrategyWorkbench extends ConfigurationItem {
 				for ignore, column in collect(["Compound", "Map", "#"], translate)
 					this.DataListView.InsertCol(A_Index, "", column)
 
-				categories := telemetryDB.getMapsCount(this.SelectedWeather)
+				categories := lapsDB.getMapsCount(this.SelectedWeather)
 				field := "Map"
 			}
 			else if (this.SelectedDataType = "Tyres") {
 				for ignore, column in collect(["Compound", "Pressure", "#"], translate)
 					this.DataListView.InsertCol(A_Index, "", column)
 
-				categories := telemetryDB.getPressuresCount(this.SelectedWeather)
+				categories := lapsDB.getPressuresCount(this.SelectedWeather)
 				field := "Tyre.Pressure"
 			}
 
@@ -2371,7 +2372,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				this.Control["driverDropDown"].Add(Array(translate("All"), driverNames*))
 				this.Control["driverDropDown"].Choose(1)
 
-				schema := filterSchema(telemetryDB.getSchema(dataType, true))
+				schema := filterSchema(lapsDB.getSchema(dataType, true))
 
 				this.Control["dataXDropDown"].Add(schema)
 				this.Control["dataY1DropDown"].Add(schema)
@@ -2504,24 +2505,24 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	loadChart(chartType, save := false) {
-		local telemetryDB, records, schema, xAxis, yAxises
+		local lapsDB, records, schema, xAxis, yAxises
 		local report, compound
 
 		this.iSelectedChartType := chartType
 
 		this.Control["chartTypeDropDown"].Choose(inList(["Scatter", "Bar", "Bubble", "Line"], chartType))
 
-		telemetryDB := TelemetryDatabase(this.SelectedSimulator, this.SelectedCar
-									   , this.SelectedTrack, this.SelectedDrivers)
+		lapsDB := LapsDatabase(this.SelectedSimulator, this.SelectedCar
+								  , this.SelectedTrack, this.SelectedDrivers)
 
 		if (this.SelectedDataType = "Electronics")
-			records := telemetryDB.getElectronicEntries(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor)
+			records := lapsDB.getElectronicEntries(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor)
 		else if (this.SelectedDataType = "Tyres")
-			records := telemetryDB.getTyreEntries(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor)
+			records := lapsDB.getTyreEntries(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor)
 		else
 			records := []
 
-		schema := filterSchema(telemetryDB.getSchema(this.SelectedDataType, true))
+		schema := filterSchema(lapsDB.getSchema(this.SelectedDataType, true))
 
 		try {
 			xAxis := schema[this.Control["dataXDropDown"].Value]
@@ -2575,7 +2576,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		local strategy, pitstopRule, pitstopWindow
 		local ignore, descriptor, directory, numPitstops, name, pitstop, tyreCompound, tyreCompoundColor
 		local simulator, car, track, simulatorCode, dirName, file, settings, settingsDB, msgResult
-		local telemetryDB, fastestLapTime, row, lapTime, prefix, data, fuelCapacity, initialFuelAmount, map
+		local lapsDB, fastestLapTime, row, lapTime, prefix, data, fuelCapacity, initialFuelAmount, map
 		local validators, index, fileName, validator, index, forecast, time, hour, minute, value, fixedPitstop
 
 		switch line {
@@ -3000,13 +3001,11 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 			case 8: ; "Update from Telemetry..."
 				if (simulator && car && track) {
-					telemetryDB := TelemetryDatabase(simulator, car, track, this.SelectedDrivers)
+					lapsDB := LapsDatabase(simulator, car, track, this.SelectedDrivers)
 
 					fastestLapTime := false
 
-					for ignore, row in telemetryDB.getMapData(this.SelectedWeather
-															, this.SelectedCompound
-															, this.SelectedCompoundColor) {
+					for ignore, row in lapsDB.getMapData(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor) {
 						lapTime := row["Lap.Time"]
 
 						if (!fastestLapTime || (lapTime < fastestLapTime)) {
@@ -3512,7 +3511,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	getStrategySettings(&simulator, &car, &track, &weather, &airTemperature, &trackTemperature
 					  , &sessionType, &sessionLength
 					  , &maxTyreLaps, &tyreCompound, &tyreCompoundColor, &tyrePressures) {
-		local telemetryDB, lowestLapTime, ignore, row, lapTime, settings
+		local lapsDB, lowestLapTime, ignore, row, lapTime, settings
 
 		simulator := this.SelectedSimulator
 		car := this.SelectedCar
@@ -3531,10 +3530,10 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		tyrePressures := false
 
-		telemetryDB := this.TelemetryDatabase
+		lapsDB := this.LapsDatabase
 		lowestLapTime := false
 
-		for ignore, row in telemetryDB.getLapTimePressures(weather, tyreCompound, tyreCompoundColor) {
+		for ignore, row in lapsDB.getLapTimePressures(weather, tyreCompound, tyreCompoundColor) {
 			lapTime := row["Lap.Time"]
 
 			if (!lowestLapTime || (lapTime < lowestLapTime)) {
@@ -3769,24 +3768,24 @@ class StrategyWorkbench extends ConfigurationItem {
 		return this.Simulation.calcAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, weather
 											, tyreCompound, tyreCompoundColor, tyreLaps
 											, default ? default : internalValue("Float", this.Control["simAvgLapTimeEdit"].Text)
-											, this.TelemetryDatabase)
+											, this.LapsDatabase)
 	}
 
 	runSimulation() {
-		local telemetryDB := TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
+		local lapsDB := LapsDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
 		local simulation
 
-		this.iTelemetryDatabase := telemetryDB
+		this.iLapsDatabase := lapsDB
 
 		try {
-			simulation := VariationSimulation(this, this.SelectedSessionType, telemetryDB)
+			simulation := VariationSimulation(this, this.SelectedSessionType, lapsDB)
 
 			this.iSimulation := simulation
 
 			simulation.runSimulation(true)
 		}
 		finally {
-			this.iTelemetryDatabase := false
+			this.iLapsDatabase := false
 			this.iSimulation := false
 		}
 	}

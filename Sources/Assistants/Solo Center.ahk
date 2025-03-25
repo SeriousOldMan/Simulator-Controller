@@ -43,7 +43,7 @@
 #Include "..\Database\Libraries\SessionDatabaseBrowser.ahk"
 #Include "..\Database\Libraries\SettingsDatabase.ahk"
 #Include "..\Database\Libraries\TyresDatabase.ahk"
-#Include "..\Database\Libraries\TelemetryDatabase.ahk"
+#Include "..\Database\Libraries\LapsDatabase.ahk"
 #Include "..\Database\Libraries\TelemetryViewer.ahk"
 #Include "Libraries\RaceReportViewer.ahk"
 
@@ -189,7 +189,7 @@ class SoloCenter extends ConfigurationItem {
 	iDataTyreCompoundColor := "Back"
 
 	iUseSessionData := true
-	iUseTelemetryDatabase := false
+	iUseLapsDatabase := false
 
 	iDrivers := []
 	iRuns := CaseInsenseWeakMap()
@@ -210,7 +210,7 @@ class SoloCenter extends ConfigurationItem {
 	iTyreDataListView := false
 
 	iSessionStore := false
-	iTelemetryDatabase := false
+	iLapsDatabase := false
 	iPressuresDatabase := false
 
 	iReportsListView := false
@@ -383,9 +383,9 @@ class SoloCenter extends ConfigurationItem {
 		}
 	}
 
-	class SessionTelemetryDatabase extends TelemetryDatabase {
+	class SessionLapsDatabase extends LapsDatabase {
 		iSoloCenter := false
-		iTelemetryDatabase := false
+		iLapsDatabase := false
 
 		iLaps := CaseInsenseWeakMap()
 
@@ -395,9 +395,9 @@ class SoloCenter extends ConfigurationItem {
 			}
 		}
 
-		TelemetryDatabase {
+		LapsDatabase {
 			Get {
-				return this.iTelemetryDatabase
+				return this.iLapsDatabase
 			}
 		}
 
@@ -418,17 +418,17 @@ class SoloCenter extends ConfigurationItem {
 
 			this.Shared := false
 
-			this.setDatabase(Database(soloCenter.SessionDirectory, kTelemetrySchemas))
+			this.setDatabase(Database(soloCenter.SessionDirectory, kLapsSchemas))
 
 			if simulator
-				this.iTelemetryDatabase := TelemetryDatabase(simulator, car, track)
+				this.iLapsDatabase := LapsDatabase(simulator, car, track)
 		}
 
 		setDrivers(drivers) {
 			super.setDrivers(drivers)
 
-			if this.TelemetryDatabase
-				this.TelemetryDatabase.setDrivers(drivers)
+			if this.LapsDatabase
+				this.LapsDatabase.setDrivers(drivers)
 		}
 
 		getMapData(weather, tyreCompound, tyreCompoundColor) {
@@ -440,10 +440,10 @@ class SoloCenter extends ConfigurationItem {
 					if ((entry["Fuel.Consumption"] > 0) && (entry["Lap.Time"] > 0))
 						entries.Push(entry)
 
-			if (this.SoloCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
+			if (this.SoloCenter.UseLapsDatabase && this.LapsDatabase) {
 				newEntries := []
 
-				for ignore, entry in this.TelemetryDatabase.getMapData(weather, tyreCompound, tyreCompoundColor) {
+				for ignore, entry in this.LapsDatabase.getMapData(weather, tyreCompound, tyreCompoundColor) {
 					if ((entry["Fuel.Consumption"] > 0) && (entry["Lap.Time"] > 0)) {
 						found := false
 
@@ -476,10 +476,10 @@ class SoloCenter extends ConfigurationItem {
 					if (entry["Lap.Time"] > 0)
 						entries.Push(entry)
 
-			if (this.SoloCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
+			if (this.SoloCenter.UseLapsDatabase && this.LapsDatabase) {
 				newEntries := []
 
-				for ignore, entry in this.TelemetryDatabase.getTyreData(weather, tyreCompound, tyreCompoundColor) {
+				for ignore, entry in this.LapsDatabase.getTyreData(weather, tyreCompound, tyreCompoundColor) {
 					if (entry["Lap.Time"] > 0) {
 						found := false
 
@@ -511,10 +511,10 @@ class SoloCenter extends ConfigurationItem {
 					if (entry["Lap.Time"] > 0)
 						entries.Push(entry)
 
-			if (this.SoloCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
+			if (this.SoloCenter.UseLapsDatabase && this.LapsDatabase) {
 				newEntries := []
 
-				for ignore, entry in this.TelemetryDatabase.getMapLapTimes(weather, tyreCompound, tyreCompoundColor) {
+				for ignore, entry in this.LapsDatabase.getMapLapTimes(weather, tyreCompound, tyreCompoundColor) {
 					if (entry["Lap.Time"] > 0) {
 						found := false
 
@@ -547,10 +547,10 @@ class SoloCenter extends ConfigurationItem {
 					if (entry["Lap.Time"] > 0)
 						entries.Push(entry)
 
-			if (this.SoloCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
+			if (this.SoloCenter.UseLapsDatabase && this.LapsDatabase) {
 				newEntries := []
 
-				for ignore, entry in this.TelemetryDatabase.getTyreLapTimes(weather, tyreCompound, tyreCompoundColor, withFuel) {
+				for ignore, entry in this.LapsDatabase.getTyreLapTimes(weather, tyreCompound, tyreCompoundColor, withFuel) {
 					if (entry["Lap.Time"] > 0) {
 						found := false
 
@@ -905,19 +905,11 @@ class SoloCenter extends ConfigurationItem {
 		Get {
 			return this.iUseSessionData
 		}
-
-		Set {
-			return (this.iUseSessionData := value)
-		}
 	}
 
-	UseTelemetryDatabase {
+	UseLapsDatabase {
 		Get {
-			return this.iUseTelemetryDatabase
-		}
-
-		Set {
-			return (this.iUseTelemetryDatabase := value)
+			return this.iUseLapsDatabase
 		}
 	}
 
@@ -1033,12 +1025,12 @@ class SoloCenter extends ConfigurationItem {
 		}
 	}
 
-	TelemetryDatabase {
+	LapsDatabase {
 		Get {
-			if !this.iTelemetryDatabase
-				this.iTelemetryDatabase := SoloCenter.SessionTelemetryDatabase(this, this.Simulator, this.Car, this.Track)
+			if !this.iLapsDatabase
+				this.iLapsDatabase := SoloCenter.SessionLapsDatabase(this, this.Simulator, this.Car, this.Track)
 
-			return this.iTelemetryDatabase
+			return this.iLapsDatabase
 		}
 	}
 
@@ -1134,8 +1126,8 @@ class SoloCenter extends ConfigurationItem {
 		this.AutoExport := getMultiMapValue(settings, "Solo Center", "AutoExport", false)
 		this.AutoSave := getMultiMapValue(settings, "Solo Center", "AutoSave", false)
 
-		this.UseSessionData := getMultiMapValue(settings, "Solo Center", "UseSessionData", true)
-		this.UseTelemetryDatabase := getMultiMapValue(settings, "Solo Center", "UseTelemetryDatabase", false)
+		this.iUseSessionData := getMultiMapValue(settings, "Solo Center", "UseSessionData", true)
+		this.iUseLapsDatabase := getMultiMapValue(settings, "Solo Center", "UseLapsDatabase", getMultiMapValue(settings, "Solo Center", "UseTelemetryDatabase", false))
 		this.iDataWeather := getMultiMapValue(settings, "Solo Center", "Weather", "Dry")
 
 		super.__New(configuration)
@@ -2490,7 +2482,7 @@ class SoloCenter extends ConfigurationItem {
 
 	updateDataMenu() {
 		local use1 := ((this.UseSessionData ? translate("[x]") : translate("[  ]")) . A_Space . translate("Use Session Data"))
-		local use2 := ((this.UseTelemetryDatabase ? translate("[x]") : translate("[  ]")) . A_Space . translate("Use Telemetry Database"))
+		local use2 := ((this.UseLapsDatabase ? translate("[x]") : translate("[  ]")) . A_Space . translate("Use Telemetry Database"))
 		local tyreCompounds := collect(this.AvailableTyreCompounds, translate)
 		local tyreCompound := translate(compound(this.TyreCompound["Data"], this.TyreCompoundColor["Data"]))
 		local weather := translate(this.Weather["Data"])
@@ -2611,15 +2603,15 @@ class SoloCenter extends ConfigurationItem {
 			case 3: ; Recommend...
 				this.withExceptionhandler(ObjBindMethod(this, "recommendDataRun", true))
 			case 5:
-				this.UseSessionData := !this.UseSessionData
+				this.iUseSessionData := !this.UseSessionData
 
 				updateSetting("UseSessionData", this.UseSessionData)
 
 				this.analyzeTelemetry()
 			case 6:
-				this.UseTelemetryDatabase := !this.UseTelemetryDatabase
+				this.iUseLapsDatabase := !this.UseLapsDatabase
 
-				updateSetting("UseTelemetryDatabase", this.UseTelemetryDatabase)
+				updateSetting("UseLapsDatabase", this.UseLapsDatabase)
 
 				this.analyzeTelemetry()
 			default:
@@ -2818,7 +2810,7 @@ class SoloCenter extends ConfigurationItem {
 		else
 			this.iCurrentRun := false
 
-		this.iTelemetryDatabase := false
+		this.iLapsDatabase := false
 		this.iPressuresDatabase := false
 		this.iSessionStore := false
 
@@ -3720,8 +3712,8 @@ class SoloCenter extends ConfigurationItem {
 			   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
 			   , compound, compoundColor, pressures, temperatures, wear, state
 			   , waterTemperature := kNull, oilTemperature := kNull) {
-		local telemetryDB := this.TelemetryDatabase
-		local tyresTable := this.TelemetryDatabase.Database.Tables["Tyres"]
+		local lapsDB := this.LapsDatabase
+		local tyresTable := this.LapsDatabase.Database.Tables["Tyres"]
 		local driver := lap.Run.Driver
 		local telemetry, telemetryData, pressuresData, temperaturesData, wearData, recentLap, tyreLaps
 		local newRun, oldRun, driverID, baseLap, lastLap
@@ -3755,8 +3747,8 @@ class SoloCenter extends ConfigurationItem {
 		loop (lastLap - baseLap) {
 			recentLap := (baseLap + A_Index)
 
-			if (this.Laps.Has(recentLap) && !telemetryDB.Laps.Has(recentLap)) {
-				telemetryDB.Laps[recentLap] := (tyresTable.Length + 1)
+			if (this.Laps.Has(recentLap) && !lapsDB.Laps.Has(recentLap)) {
+				lapsDB.Laps[recentLap] := (tyresTable.Length + 1)
 
 				recentLap := this.Laps[recentLap]
 
@@ -3787,21 +3779,21 @@ class SoloCenter extends ConfigurationItem {
 				recentLap.State := "Unknown"
 				recentLap.TelemetryData := values2String("|||", telemetryData*)
 
-				telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6]
-											 , telemetryData[14], telemetryData[15]
-											 , telemetryData[11], telemetryData[12], telemetryData[13]
-											 , kNull, telemetryData[8], telemetryData[9], driverID)
+				lapsDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6]
+										, telemetryData[14], telemetryData[15]
+										, telemetryData[11], telemetryData[12], telemetryData[13]
+										, kNull, telemetryData[8], telemetryData[9], driverID)
 
 				pressuresData := collect(string2Values(",", telemetryData[16]), null)
 				temperaturesData := collect(string2Values(",", telemetryData[17]), null)
 				wearData := collect(string2Values(",", telemetryData[18]), null)
 
-				telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]
-									   , telemetryData[14], telemetryData[15], tyreLaps
-									   , pressuresData[1], pressuresData[2], pressuresData[3], pressuresData[4]
-									   , temperaturesData[1], temperaturesData[2], temperaturesData[3], temperaturesData[4]
-									   , wearData[1], wearData[2], wearData[3], wearData[4], kNull, telemetryData[8], telemetryData[9]
-									   , driverID)
+				lapsDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]
+								  , telemetryData[14], telemetryData[15], tyreLaps
+								  , pressuresData[1], pressuresData[2], pressuresData[3], pressuresData[4]
+								  , temperaturesData[1], temperaturesData[2], temperaturesData[3], temperaturesData[4]
+								  , wearData[1], wearData[2], wearData[3], wearData[4], kNull, telemetryData[8], telemetryData[9]
+								  , driverID)
 
 				this.modifyLap(recentLap)
 			}
@@ -3816,21 +3808,21 @@ class SoloCenter extends ConfigurationItem {
 												, compound, compoundColor, tyreLaps, pressures, temperatures, wear, state
 												, waterTemperature, oilTemperature)
 
-		telemetryDB.addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor
-									 , map, tc, abs, fuelConsumption, fuelRemaining, lapTime
-									 , driverID)
+		lapsDB.addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor
+								, map, tc, abs, fuelConsumption, fuelRemaining, lapTime
+								, driverID)
 
 		pressures := collect(string2Values(",", pressures), null)
 		temperatures := collect(string2Values(",", temperatures), null)
 		wear := collect(string2Values(",", wear), null)
 
-		telemetryDB.addTyreEntry(weather, airTemperature, trackTemperature, compound, compoundColor, tyreLaps
-							   , pressures[1], pressures[2], pressures[3], pressures[4]
-							   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
-							   , wear[1], wear[2], wear[3], wear[4], fuelConsumption, fuelRemaining, lapTime
-							   , driverID)
+		lapsDB.addTyreEntry(weather, airTemperature, trackTemperature, compound, compoundColor, tyreLaps
+						  , pressures[1], pressures[2], pressures[3], pressures[4]
+						  , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
+						  , wear[1], wear[2], wear[3], wear[4], fuelConsumption, fuelRemaining, lapTime
+						  , driverID)
 
-		telemetryDB.Laps[lap.Nr] := tyresTable.Length
+		lapsDB.Laps[lap.Nr] := tyresTable.Length
 
 		this.modifyLap(lap)
 		this.modifyRun(lap.Run)
@@ -3911,21 +3903,21 @@ class SoloCenter extends ConfigurationItem {
 	}
 
 	analyzeData(weather, tyreCompound, tyreCompoundColor, &fuelLaps, &tyreLaps) {
-		local telemetryDB := this.TelemetryDatabase
+		local lapsDB := this.LapsDatabase
 		local simulator := this.Simulator
 		local car := this.Car
 		local track := this.Track
-		local curDrivers := telemetryDB.Drivers
+		local curDrivers := lapsDB.Drivers
 		local hasData := false
 		local map, fuel, ignore, entry, index
 
 		fuelLaps := CaseInsenseMap()
 		tyreLaps := CaseInsenseMap()
 
-		telemetryDB.setDrivers(this.Drivers ? ((this.Drivers.Length > 0) ? collect(this.Drivers, (d) => d.ID) : false) : false)
+		lapsDB.setDrivers(this.Drivers ? ((this.Drivers.Length > 0) ? collect(this.Drivers, (d) => d.ID) : false) : false)
 
 		try {
-			for ignore, entry in telemetryDB.getMapLapTimes(weather, tyreCompound, tyreCompoundColor) {
+			for ignore, entry in lapsDB.getMapLapTimes(weather, tyreCompound, tyreCompoundColor) {
 				map := entry["Map"]
 
 				if !fuelLaps.Has(map)
@@ -3941,7 +3933,7 @@ class SoloCenter extends ConfigurationItem {
 				hasData := true
 			}
 
-			for ignore, entry in telemetryDB.getTyreLapTimes(weather, tyreCompound, tyreCompoundColor, true) {
+			for ignore, entry in lapsDB.getTyreLapTimes(weather, tyreCompound, tyreCompoundColor, true) {
 				fuel := (Floor(entry["Fuel.Remaining"] / kFuelBucketSize) * kFuelBucketSize)
 
 				if !tyreLaps.Has(fuel)
@@ -3958,7 +3950,7 @@ class SoloCenter extends ConfigurationItem {
 			}
 		}
 		finally {
-			telemetryDB.setDrivers(curDrivers)
+			lapsDB.setDrivers(curDrivers)
 		}
 
 		return hasData
@@ -4055,7 +4047,7 @@ class SoloCenter extends ConfigurationItem {
 
 	exportSession(wait := false, progress := true) {
 		exportSessionAsync(fromTask := true) {
-			local telemetryDB := TelemetryDatabase(this.Simulator, this.Car, this.Track)
+			local lapsDB := LapsDatabase(this.Simulator, this.Car, this.Track)
 			local tyresDB := TyresDatabase()
 			local row := 0
 			local locked := false
@@ -4092,21 +4084,21 @@ class SoloCenter extends ConfigurationItem {
 							else
 								telemetryData := string2Values("---", lap.TelemetryData)
 
-							telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
-														 , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9]
-														 , driver)
+							lapsDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
+													, telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9]
+													, driver)
 
 							pressures := string2Values(",", telemetryData[17])
 							temperatures := string2Values(",", telemetryData[18])
 							wear := string2Values(",", telemetryData[19])
 
-							telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]
-												   , telemetryData[14], telemetryData[15], telemetryData[16]
-												   , pressures[1], pressures[2], pressures[3], pressures[4]
-												   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
-												   , wear[1], wear[2], wear[3], wear[4]
-												   , telemetryData[7], telemetryData[8], telemetryData[9]
-												   , driver)
+							lapsDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]
+											  , telemetryData[14], telemetryData[15], telemetryData[16]
+											  , pressures[1], pressures[2], pressures[3], pressures[4]
+											  , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
+											  , wear[1], wear[2], wear[3], wear[4]
+											  , telemetryData[7], telemetryData[8], telemetryData[9]
+											  , driver)
 						}
 
 						if lap.HasOwnProp("PressuresData") {
@@ -6296,7 +6288,7 @@ class SoloCenter extends ConfigurationItem {
 				lapData[field] := value
 
 			pressures := pressuresTable[this.PressuresDatabase.Laps[lapNr]]
-			tyres := tyresTable[this.TelemetryDatabase.Laps[lapNr]]
+			tyres := tyresTable[this.LapsDatabase.Laps[lapNr]]
 
 			pressureFL := pressures["Tyre.Pressure.Cold.Front.Left"]
 			pressureFR := pressures["Tyre.Pressure.Cold.Front.Right"]
@@ -6425,7 +6417,7 @@ class SoloCenter extends ConfigurationItem {
 
 		if lastLap {
 			pressuresTable := this.PressuresDatabase.Database.Tables["Tyres.Pressures"]
-			tyresTable := this.TelemetryDatabase.Database.Tables["Tyres"]
+			tyresTable := this.LapsDatabase.Database.Tables["Tyres"]
 
 			baseLap := sessionStore.Tables["Lap.Data"].Length
 			newLap := (baseLap + 1)
@@ -6436,7 +6428,7 @@ class SoloCenter extends ConfigurationItem {
 					if this.Laps.Has(A_Index) {
 						lap := this.Laps[A_Index]
 
-						if (this.TelemetryDatabase.Laps.Has(A_Index) && this.PressuresDatabase.Laps.Has(A_Index) && lap.HasProp("TelemetryData"))
+						if (this.LapsDatabase.Laps.Has(A_Index) && this.PressuresDatabase.Laps.Has(A_Index) && lap.HasProp("TelemetryData"))
 							for ignore, lapData in sessionStore.Tables["Lap.Data"]
 								if (lapData["Nr"] = A_Index) {
 									updateLap(lap, lapData)
@@ -6460,7 +6452,7 @@ class SoloCenter extends ConfigurationItem {
 
 					lap := this.Laps[newLap]
 
-					if (this.TelemetryDatabase.Laps.Has(newLap) && this.PressuresDatabase.Laps.Has(newLap) && lap.HasProp("TelemetryData")) {
+					if (this.LapsDatabase.Laps.Has(newLap) && this.PressuresDatabase.Laps.Has(newLap) && lap.HasProp("TelemetryData")) {
 						lapData := Database.Row()
 
 						updateLap(lap, lapData)
@@ -6628,7 +6620,7 @@ class SoloCenter extends ConfigurationItem {
 	}
 
 	showDataSummary(viewer := false) {
-		local telemetryDB := this.TelemetryDatabase
+		local lapsDB := this.LapsDatabase
 		local html := ("<div id=`"header`"><b>" . translate("Data Summary") . "</b></div>")
 		local simulator := this.Simulator
 		local carName := this.Car
@@ -6638,8 +6630,8 @@ class SoloCenter extends ConfigurationItem {
 		local ignore, weather, tyreCompound, tyreCompoundColor, fuelLaps, tyreLaps, dataSource
 		local map, tyreLaps, data, rows, row, columns
 
-		carName := (carName ? telemetryDB.getCarName(simulator, carName) : "-")
-		trackName := (trackName ? telemetryDB.getTrackName(simulator, trackName) : "-")
+		carName := (carName ? lapsDB.getCarName(simulator, carName) : "-")
+		trackName := (trackName ? lapsDB.getTrackName(simulator, trackName) : "-")
 
 		if sessionDate
 			sessionDate := FormatTime(sessionDate, "ShortDate")
@@ -6651,11 +6643,11 @@ class SoloCenter extends ConfigurationItem {
 		else
 			sessionTime := "-"
 
-		if (this.UseSessionData && this.UseTelemetryDatabase)
+		if (this.UseSessionData && this.UseLapsDatabase)
 			dataSource := (translate("Session") . translate(", ") . translate("Database"))
 		else if this.UseSessionData
 			dataSource := translate("Session")
-		else if this.UseTelemetryDatabase
+		else if this.UseLapsDatabase
 			dataSource := translate("Database")
 		else
 			dataSource := translate("-")
@@ -6740,7 +6732,7 @@ class SoloCenter extends ConfigurationItem {
 	}
 
 	showSessionSummary(viewer := false) {
-		local telemetryDB := this.TelemetryDatabase
+		local lapsDB := this.LapsDatabase
 		local html := ("<div id=`"header`"><b>" . translate("Session Summary") . "</b></div>")
 		local runs := []
 		local drivers := []
@@ -6765,8 +6757,8 @@ class SoloCenter extends ConfigurationItem {
 		local sessionTime := this.Date
 		local run, duration, ignore, lap, width, chart1, fuelConsumption
 
-		carName := (carName ? telemetryDB.getCarName(simulator, carName) : "-")
-		trackName := (trackName ? telemetryDB.getTrackName(simulator, trackName) : "-")
+		carName := (carName ? lapsDB.getCarName(simulator, carName) : "-")
+		trackName := (trackName ? lapsDB.getTrackName(simulator, trackName) : "-")
 
 		if sessionDate
 			sessionDate := FormatTime(sessionDate, "ShortDate")
@@ -6879,7 +6871,7 @@ class SoloCenter extends ConfigurationItem {
 	}
 
 	showRunsSummary(viewer := false) {
-		local telemetryDB := this.TelemetryDatabase
+		local lapsDB := this.LapsDatabase
 		local html := ("<div id=`"header`"><b>" . translate("Stints Summary") . "</b></div>")
 		local runs := []
 		local drivers := []
@@ -6903,8 +6895,8 @@ class SoloCenter extends ConfigurationItem {
 		local run, duration, ignore, lap, fuelAmount, width, chart
 		local positions, lapTimes, fuelConsumptions, temperatures
 
-		carName := (carName ? telemetryDB.getCarName(simulator, carName) : "-")
-		trackName := (trackName ? telemetryDB.getTrackName(simulator, trackName) : "-")
+		carName := (carName ? lapsDB.getCarName(simulator, carName) : "-")
+		trackName := (trackName ? lapsDB.getTrackName(simulator, trackName) : "-")
 
 		if sessionDate
 			sessionDate := FormatTime(sessionDate, "ShortDate")
@@ -7382,8 +7374,8 @@ class SoloCenter extends ConfigurationItem {
 			pressuresLosses := values2String(", ", pressuresLosses*)
 
 			if (hotPressures = "-, -, -, -")
-				if this.TelemetryDatabase.Laps.Has(lap.Nr) {
-					tyres := this.TelemetryDatabase.Database.Tables["Tyres"][this.TelemetryDatabase.Laps[lap.Nr]]
+				if this.LapsDatabase.Laps.Has(lap.Nr) {
+					tyres := this.LapsDatabase.Database.Tables["Tyres"][this.LapsDatabase.Laps[lap.Nr]]
 
 					hotPressures := [displayNullValue(tyres["Tyre.Pressure.Front.Left"])
 								   , displayNullValue(tyres["Tyre.Pressure.Front.Right"])
@@ -7443,7 +7435,7 @@ class SoloCenter extends ConfigurationItem {
 					   , translate("Track (Ahead)"), translate("Track (Behind)")]
 		local rowIndices := CaseInsenseMap("Standings.Leader", 1, "Standings.Front", 2, "Standings.Ahead", 2, "Standings.Behind", 3
 										 , "Track.Front", 4, "Track.Ahead", 4, "Track.Behind", 5)
-		local telemetryDB := this.TelemetryDatabase
+		local lapsDB := this.LapsDatabase
 		local rows := [1, 2, 3, 4, 5]
 		local deltas, ignore, entry, carNumber, carName, driverFullName, delta, row
 		local driverForname, driverSurname, driverNickname, entryType, index, label
@@ -7486,7 +7478,7 @@ class SoloCenter extends ConfigurationItem {
 				label := labels[index]
 
 				rows[index] := ("<tr><th class=`"th-std th-left`">" . label . "</th>"
-							  . "<td class=`"td-std`">" . values2String("</td><td class=`"td-std`">" , carNumber, driverFullname, telemetryDB.getCarName(this.Simulator, carName), delta)
+							  . "<td class=`"td-std`">" . values2String("</td><td class=`"td-std`">" , carNumber, driverFullname, lapsDB.getCarName(this.Simulator, carName), delta)
 							  . "</td></tr>")
 			}
 
@@ -7501,7 +7493,7 @@ class SoloCenter extends ConfigurationItem {
 
 	createLapStandings(lap) {
 		local sessionStore := this.SessionStore
-		local telemetryDB := this.TelemetryDatabase
+		local lapsDB := this.LapsDatabase
 		local isRace := (this.Session = "Race")
 		local html := "<table class=`"table-std`">"
 		local lapNr := lap.Nr
@@ -7568,7 +7560,7 @@ class SoloCenter extends ConfigurationItem {
 
 				html .= ("<tr><th class=`"th-std`">" . (isRace ? position : index) . "</th>")
 				html .= ("<td class=`"td-std`">" . values2String("</td><td class=`"td-std`">", carNumbers[index], driver
-																							 , telemetryDB.getCarName(this.Simulator, carNames[index]))
+																							 , lapsDB.getCarName(this.Simulator, carNames[index]))
 					   . "</td>")
 
 				if isRace {

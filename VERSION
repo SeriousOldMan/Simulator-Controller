@@ -3,7 +3,7 @@ Version=6.2.5.0-release
 Target=6.2.5.0-release
 Date=03/28/2025
 Download=https://cutt.ly/wrpLLjx3;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/K0txMwNT;https://www.dropbox.com/scl/fi/5z0rwevcjgr4t4583yvyj/Simulator-Controller-6.2.5.0-release.zip?rlkey=0qobyd71r907nmwqsgfjzwtgx&st=a8nipv9q&dl=1;http://87.177.159.148:800/api/public/dl/Ax3NMfWK;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.2.5.0-release.zip
-Changes=Fixed Agent Booster for Driving Coach, New LLM Runtime, Fixed max tokens field restriction to 999, Items in "Administration" tab in "Session Database" are double-clickable, Editor for "Laps" data item in "Session Database", Cleanup system for lap data in "Session Database", Added some missing translations, Renamed "TelemetryDatabase" to "LapsDatabase"
+Changes=Fixed Agent Booster for Driving Coach, New LLM Runtime, Fixed max tokens field restriction to 999, Items in "Administration" tab in "Session Database" are double-clickable, Editor for "Laps" data item in "Session Database", Cleanup system for lap data in "Session Database", Added some missing translations, Renamed "TelemetryDatabase" to "LapsDatabase", Fixed knowledge acquisition for LLMs by the Assistants, Changed default OpenAI model to "GPT 4o mini"
 Components=Media->5.6.1,Configuration->6.2.4,Utilities->6.2.2
 [Release]
 Version=6.2.5.0-release

@@ -1,5 +1,31 @@
 # Latest stable release
 
+## 6.2.5.0
+
+#### Date: 03/28/25 (planned)
+
+#### Fixes
+
+  - Fixed a bug which crashed the Driving Coach, when the *Reasoning* booster was enabled, but no action had been defined.
+  - Fixed a bug which restricted the number of output tokes for the Driving Coach LLM and also for the different Assistant boosters to a max value of 999.
+  - Fixed some translations and added a few which were missing.
+  - Fixed a bug which caused a request to a *Conversation* booster to fail in case specific informaton wasmissing in the knowledgebase.
+
+#### Changes
+
+  - Changed the default model for a new OpenAI connection to "GPT 4o mini" - this was long overdue.
+  - Most data items in the "Administration" tab of the "Session Database" can now be double-clicked. This will either bring you to the specific item list or editor. In case of *Laps* data, a double-click will open a special editor, which allows you to inspect and remove unwanted data, for example, because it has been collected in a session with a consumption multiplier or a tyre wear multiplier. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#administration) for more information.
+  - [Important] A new version of the local LLM Runtime is available. If you are using the local runtime, please follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-583).
+  - [Developer] Renamed the "TelemetryDatabase" class to "LapsDatabase".
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-625), if you are using the local LLM Runtime.
+  
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.2.4.0
 
 #### Date: 03/21/25
@@ -20,28 +46,6 @@
   - A new icon in the Stream Deck icon set is provided for the "EngineTemperatures" action.
   - Additional translations for Portuguese thanks to @Hudson Alves. This time the grammars for the Assistants are included as well - see the [new command reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(PT)) for the Race Engineer for an example. Translation can be considered complete now.
   - Added several more articels to the News system.
-  
-# Upcoming release
-
-## 6.2.5.0
-
-#### Date: 03/28/25 (planned)
-
-#### Fixes
-
-  - Fixed a bug which crashed the Driving Coach, when the *Reasoning* booster was enabled, but no action had been defined.
-  - Fixed a bug which restricted the number of outout tokes for the Driving Coach LLM and also for the different Assistant boosters to a max value of 999.
-  - Fixed some translations and added a few which were missing.
-
-#### Changes
-
-  - Most data items in the "Administration" tab of the "Session Database" can now be double-clicked. This will either bring you to the specific item list or editor. In case of "Laps" data, a double-click will open a special editor, which allows you to inspect and remove unwanted lap data, for example, because it has been collected in a session with a consumption multiplier or a tyre wear multiplier. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#administration) for more information.
-  - [Important] A new version of the local LLM Runtime is available. If you are using the local runtime, please follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-583).
-  - [Developer] Renamed the "TelemetryDatabase" class to "LapsDatabase".
-
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-625), if you are using Assistant Boosters or the local LLM Runtime.
-
-# Release history
 
 ## 6.2.3.0
 

@@ -1797,6 +1797,29 @@ updateConfigurationForV622() {
 	}
 }
 
+updateConfgurationForV626() {
+	local sessionDB, ignore, code
+
+	for ignore, code in ["AC", "ACC", "IRC", "AMS2", "PCARS2", "RF2", "LMU", "ACE", "RSP"]
+		if FileExist(kDatabaseDirectory . "User\" . code . "\Drivers.CSV") {
+			sessionDB := Database(kDatabaseDirectory . "User\" . code . "\", kSessionSchemas)
+
+			sessionDB.lock()
+
+			try {
+				sessionDB.Table["Drivers"]
+
+				sessionDB.changed("Drivers")
+			}
+			catch Any as exception {
+				logError(exception, true)
+			}
+			finally {
+				sessionDB.unlock()
+			}
+		}
+}
+
 updateConfigurationForV610() {
 	local configuration, subtitle
 

@@ -233,93 +233,100 @@ class LapsDatabase extends SessionDatabase {
 
 	cleanupData(weather, compound, compoundColor, drivers := kUndefined, types := ["Electronics", "Types"]) {
 		local database := this.Database
+		local oldCritical := Task.Critical
 		local where, ltAvg, ltStdDev, cAvg, cStdDev, rows, identifiers, filter, ignore, row, identifier, connector
 
 		if database {
-			where := Map("Weather", weather, "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor)
+			Task.Critical := true
 
-			ltAvg := false
-			ltStdDev := false
-			cAvg := false
-			cStdDev := false
+			try {
+				where := Map("Weather", weather, "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor)
 
-			if (inList(types, "Electronics") && (!this.Shared || database.lock("Electronics", false)))
-				try {
-					if this.Shared
-						database.reload("Electronics")
+				ltAvg := false
+				ltStdDev := false
+				cAvg := false
+				cStdDev := false
 
-					rows := this.combineResults("Electronics", {Where: where}, drivers)
+				if (inList(types, "Electronics") && (!this.Shared || database.lock("Electronics", false)))
+					try {
+						if this.Shared
+							database.reload("Electronics")
 
-					computeFilterValues(rows, &ltAvg, &ltStdDev, &cAvg, &cStdDev)
+						rows := this.combineResults("Electronics", {Where: where}, drivers)
 
-					filter := invalidLap.Bind(ltAvg, ltStdDev, cAvg, cStdDev, drivers)
+						computeFilterValues(rows, &ltAvg, &ltStdDev, &cAvg, &cStdDev)
 
-					if this.Shared {
-						identifiers := []
+						filter := invalidLap.Bind(ltAvg, ltStdDev, cAvg, cStdDev, drivers)
 
-						for ignore, row in rows
-							if (filter(row) && (row["Identifier"] != kNull) && (row["Driver"] = this.ID))
-								identifiers.Push(row["Identifier"])
+						if this.Shared {
+							identifiers := []
+
+							for ignore, row in rows
+								if (filter(row) && (row["Identifier"] != kNull) && (row["Driver"] = this.ID))
+									identifiers.Push(row["Identifier"])
+						}
+
+						this.Database.remove("Electronics", where, filter, true)
+
+						if this.Shared
+							for ignore, connector in this.Connectors
+								try {
+									for ignore, identifier in identifiers
+										connector.DeleteData("Electronics", identifier)
+								}
+								catch Any as exception {
+									logError(exception, true)
+								}
+					}
+					finally {
+						if this.Shared
+							database.unlock("Electronics")
 					}
 
-					this.Database.remove("Electronics", where, filter, true)
+				ltAvg := false
+				ltStdDev := false
+				cAvg := false
+				cStdDev := false
 
-					if this.Shared
-						for ignore, connector in this.Connectors
-							try {
-								for ignore, identifier in identifiers
-									connector.DeleteData("Electronics", identifier)
-							}
-							catch Any as exception {
-								logError(exception, true)
-							}
-				}
-				finally {
-					if this.Shared
-						database.unlock("Electronics")
-				}
+				if (inList(types, "Tyres") && (!this.Shared || database.lock("Tyres", false)))
+					try {
+						if this.Shared
+							database.reload("Tyres")
 
-			ltAvg := false
-			ltStdDev := false
-			cAvg := false
-			cStdDev := false
+						rows := this.combineResults("Tyres", {Where: where}, drivers)
 
-			if (inList(types, "Tyres") && (!this.Shared || database.lock("Tyres", false)))
-				try {
-					if this.Shared
-						database.reload("Tyres")
+						computeFilterValues(rows, &ltAvg, &ltStdDev, &cAvg, &cStdDev)
 
-					rows := this.combineResults("Tyres", {Where: where}, drivers)
+						filter := invalidLap.Bind(ltAvg, ltStdDev, cAvg, cStdDev, drivers)
 
-					computeFilterValues(rows, &ltAvg, &ltStdDev, &cAvg, &cStdDev)
+						if this.Shared {
+							identifiers := []
 
-					filter := invalidLap.Bind(ltAvg, ltStdDev, cAvg, cStdDev, drivers)
+							for ignore, row in rows
+								if (filter(row) && (row["Identifier"] != kNull) && (row["Driver"] = this.ID))
+									identifiers.Push(row["Identifier"])
+						}
 
-					if this.Shared {
-						identifiers := []
+						this.Database.remove("Tyres", where, filter, true)
 
-						for ignore, row in rows
-							if (filter(row) && (row["Identifier"] != kNull) && (row["Driver"] = this.ID))
-								identifiers.Push(row["Identifier"])
+						if this.Shared
+							for ignore, connector in this.Connectors
+								try {
+									for ignore, identifier in identifiers
+										connector.DeleteData("Tyres", identifier)
+								}
+								catch Any as exception {
+									logError(exception, true)
+								}
 					}
-
-					this.Database.remove("Tyres", where, filter, true)
-
-					if this.Shared
-						for ignore, connector in this.Connectors
-							try {
-								for ignore, identifier in identifiers
-									connector.DeleteData("Tyres", identifier)
-							}
-							catch Any as exception {
-								logError(exception, true)
-							}
-				}
-				finally {
-					if this.Shared
-						database.unlock("Tyres")
-				}
-
+					finally {
+						if this.Shared
+							database.unlock("Tyres")
+					}
+			}
+			finally {
+				Task.Critical := oldCritical
+			}
 		}
 	}
 

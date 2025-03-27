@@ -1,5 +1,82 @@
 # Latest stable release
 
+## 6.2.5.0
+
+#### Date: 03/28/25 (planned)
+
+#### Fixes
+
+  - Fixed a bug which crashed the Driving Coach, when the *Reasoning* booster was enabled, but no action had been defined.
+  - Fixed a bug which restricted the number of output tokes for the Driving Coach LLM and also for the different Assistant boosters to a max value of 999.
+  - Fixed some translations and added a few which were missing.
+  - Fixed a bug which caused a request to a *Conversation* booster to fail in case specific informaton wasmissing in the knowledgebase.
+
+#### Changes
+
+  - Changed the default model for a new OpenAI connection to "GPT 4o mini" - this was long overdue.
+  - Most data items in the "Administration" tab of the "Session Database" can now be double-clicked. This will either bring you to the specific item list or editor. In case of *Laps* data, a double-click will open a special editor, which allows you to inspect and remove unwanted data, for example, because it has been collected in a session with a consumption multiplier or a tyre wear multiplier. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#administration) for more information.
+  - [Important] A new version of the local LLM Runtime is available. If you are using the local runtime, please follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-583).
+  - [Developer] Renamed the "TelemetryDatabase" class to "LapsDatabase".
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-625), if you are using the local LLM Runtime.
+  
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
+## 6.2.4.0
+
+#### Date: 03/21/25
+
+#### Fixes
+
+  - The Driving Coach do **not** give confirmations anymore for on-track coaching instructions, if confirmations per se are active.
+  - Finally found a way to acquire the real driver names for *Le Mans Ultimate* grids.
+  - Unicode characters are now displayed correctly for *rFactor 2* and *Le Mans Ultimate*.
+  - Fixed many translations for all languages.
+  - Fixed a bug in the News system, which prevented more recent News to be presented.
+  
+#### Changes
+
+  - Driver categories (Silver, Gold, ...) are now supported in all applications for *Le Mans Ultimate*. This information is not (yet) available for non-AI drivers, though, since not (yet) supported by the API.
+  - [New voice command for the Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(EN)) lets you ask for the current engine temperatures.
+  - New information request action "EngineTemperatures" for the ["Race Engineer"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin can be used to achieve the same result.
+  - A new icon in the Stream Deck icon set is provided for the "EngineTemperatures" action.
+  - Additional translations for Portuguese thanks to @Hudson Alves. This time the grammars for the Assistants are included as well - see the [new command reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(PT)) for the Race Engineer for an example. Translation can be considered complete now.
+  - Added several more articels to the News system.
+
+## 6.2.3.0
+
+#### Date: 03/14/25
+
+#### Fixes
+  
+  - Fixed a bug in the strategy service rules for tyre change and refueling which caused a flip from "Disallowed" to "Always" in some situations.
+  - Fixed tyre compound mapping for LMP2 and GTE cars for *Le Mans Ultimate*. All tyre compounds are now available by default.
+
+#### Changes
+
+  - The version number in "Simulator Startup" can now be clicked to open the corresponding release notes for the current version.
+  - Renamed several items in the "Session Database" (for example *Race Settings* -> *Settings*, *Tyre Pressures* -> *Pressures*).
+  - The documentation page formerly named "Race Settings" has been renamed to ["Session Settings"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings).
+  - The layouting system of the Telemetry Viewer now supports grouping of channels into separate clusters. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetry-viewer) for more information.
+  - Engine water and oil temperatures have been added to the internal data system and are acquired from all simulators, which support this information.
+    - New issues have been added to the "Setup Workbench" for engine water and oil temperatures.
+    - The [issue analyzer in the "Setup Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-issue-analyzer) let you define thresholds for these temperatures which in turn creates issues for the setup development.
+	- The engine temperatures have beend added to various reports in "Solo Center" and "Team Center".
+	- Setup settings for radiator blankets have been added to the "Setup Workbench".
+    - The setup meta data for all cars of *Le Mans Ultimate* and also for all GT3 cars of *rFactor 2* has been updated for the "Setup Workbench". Unfortunately, both simulators do not report water and oil temperatures correctly in the API at the moment, but there is hope at least for *Le Mans Ultimate* for some future update.
+	- Oil and water temperatures are passed to the LLM, if an Assistant is connected to a GPT service.
+	- A new info widget is available in the "System Monitor" which shows the engine temperatures, if available.
+	- [Developer] The same information is available in the "Session State.json" file, if the "Integration" plugin has been enabled.
+  - [Important] The file extension for issues saved by the "Setup Workbench" has been renamed from ".setup" to ".issues". If you have such save issue files, you have to change the extension accordingly to make them readable again.
+  - If telemetry files are imported from MoTeC, the track is now scanned for coordinates so that the telemetry data can be used by the Driving Coach. Therefore, from now on importing of MoTeC files is only possible, if a track map is available for the given track selection.
+  - [Internal] A new FTP site has been setup for the collection, consolidation and distribution of the community database.
+  
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-623), if you have issue files saved by the "Setup Workbench".
+
 ## 6.2.2.0-release 03/07/25
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
@@ -27,17 +104,6 @@
   21. [Internal] The "Temp" folder in the [Documents]\Simulator Controller folder is now used for the installation and update process instead of the standard AppData\Local\Temp folder. This may help to further reduce interventions of AntiVirus programs, when an exclusion for [Documents]\Simulator Controller already has been declared as recommended.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-622), if you have tweaked your *Rephrasing* booster instructions.
-
-# Upcoming release
-
-## 6.2.4.0-release 03/21/25 (planned)
-  1. Minor bugfixes, as always
-  2. Documentation updates here and there, as always
-  3. [New voice command for the Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(EN)) lets you ask for the current engine temperatures.
-  4. New information request action "EngineTemperatures" for the ["Race Engineer"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin can be used to achieve the same result.
-  5. A new icon in the Stream Deck icon set is provided for the "EngineTemperatures" action.
-
-# Release history
 
 ## 6.2.1.0-release 02/27/25
   1. Minor bugfixes, as always

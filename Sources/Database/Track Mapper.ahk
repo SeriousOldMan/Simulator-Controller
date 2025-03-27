@@ -328,9 +328,10 @@ recreateTrackMap(simulator, track) {
 recreateTrackMaps() {
 	local sessionDB := SessionDatabase()
 	local directory := sessionDB.DatabasePath
+	local oldCritical := Task.Critical
 	local code, simulator, track
 
-	Task.CurrentTask.Critical := true
+	Task.Critical := true
 
 	try {
 		loop Files, directory . "User\Tracks\*.*", "D" {
@@ -346,11 +347,12 @@ recreateTrackMaps() {
 		}
 	}
 	finally {
-		Task.CurrentTask.Critical := false
+		Task.Critical := oldCritical
 	}
 }
 
 startupTrackMapper() {
+	local oldCritical := Task.Critical
 	local icon := kIconsDirectory . "Track.ico"
 	local simulator := false
 	local track := false
@@ -359,7 +361,7 @@ startupTrackMapper() {
 	local index
 
 	createMap(simulator, track, data) {
-		Task.CurrentTask.Critical := true
+		Task.Critical := true
 
 		try {
 			createTrackMap(simulator, track, data)
@@ -370,7 +372,7 @@ startupTrackMapper() {
 			logError(exception, true)
 		}
 		finally {
-			Task.CurrentTask.Critical := false
+			Task.Critical := oldCritical
 
 			ExitApp(0)
 		}

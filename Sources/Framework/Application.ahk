@@ -185,8 +185,7 @@ requestShareSessionDatabaseConsent() {
 }
 
 checkForNews() {
-	local show := true
-	local check, lastModified, availableNews, news, nr, html, shown, rule
+	local check, lastModified, availableNews, news, nr, html, show, shown, rule, ignre, url
 
 	if (StrSplit(A_ScriptName, ".")[1] = "Simulator Startup") {
 		check := !FileExist(kUserConfigDirectory . "NEWS")
@@ -196,15 +195,31 @@ checkForNews() {
 
 			lastModified := DateAdd(lastModified, 3, "Days")
 
-			check := (lastModified < A_Now)
+			check := ((lastModified < A_Now) || isDebug())
 		}
 
 		if check {
 			try {
+				deleteFile(kTempDirectory . "NEWS.ini")
+
 				if FileExist(kConfigDirectory . "NEWS")
 					FileCopy(kConfigDirectory . "NEWS", kTempDirectory . "NEWS.ini")
-				else
-					Download("https://fileshare.impresion3d.pro/filebrowser/api/public/dl/r0q9-d-3", kTempDirectory . "NEWS.ini")
+				else {
+					check := false
+
+					for ignore, url in ["https://fileshare.impresion3d.pro/filebrowser/api/public/dl/r0q9-d-3"
+									  , "http://87.177.159.148:800/api/public/dl/jipSYNLz"
+									  , "https://www.dropbox.com/scl/fi/s5ewrqo9lzwcv6omvx667/NEWS?rlkey=j3t7aopmdye4efc8uc3xlekxz&st=wbuipual&dl=1"] {
+						try
+							Download("https://fileshare.impresion3d.pro/filebrowser/api/public/dl/r0q9-d-3", kTempDirectory . "NEWS.ini")
+
+						if FileExist(kTempDirectory . "NEWS.ini") {
+							check := true
+
+							break
+						}
+					}
+				}
 			}
 			catch Any as exception {
 				check := false
@@ -218,11 +233,13 @@ checkForNews() {
 
 				for nr, html in getMultiMapValues(availableNews, "News")
 					if isNumber(nr) {
+						show := true
+
 						shown := getMultiMapValue(news, "News", nr, false)
 						rule := getMultiMapValue(availableNews, "Rules", nr, "Once")
 
 						if (shown && InStr(rule, "Repeat"))
-							shown := (DateAdd(shown, string2Values(":", rule)[2], "Days") < A_Now)
+							shown := (DateAdd(shown, string2Values(":", rule)[2], "Days") > A_Now)
 						else if (!shown && InStr(rule, "Timed")) {
 							rule := string2Values(":", rule)
 
@@ -450,7 +467,7 @@ viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 80
 	SetWorkingDir(directory)
 
 	try {
-		html := FileRead(fileName)
+		; html := FileRead(fileName)
 
 		innerWidth := width - 16
 
@@ -471,7 +488,7 @@ viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 80
 		htmlViewer := htmlGui.Add("WebView2Viewer", "X8 YP+10 W" . innerWidth . " H" . editHeight)
 
 		htmlViewer.document.open()
-		htmlViewer.document.write(html)
+		htmlViewer.document.write(fileName)
 		htmlViewer.document.close()
 
 		MonitorGetWorkArea(, &mainScreenLeft, &mainScreenTop, &mainScreenRight, &mainScreenBottom)

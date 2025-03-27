@@ -18,7 +18,7 @@ Whenever you have to setup your car for a given track and specific environmental
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%203.jpg)
 
-This tool gives you access to the database where you have access to the tyre pressures of all your past sessions, where you can store your track specific car setups and where you can provide default values for various settings for the AI Race Asssistants. These values can be used to initialize the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#race-settings) using track and car specific default values. Telemetry information of all past sessions is also stored in the database. Use the ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench) to browse this data.
+This tool gives you access to the database where you have access to the data all your past sessions, like tyre pressures, for example. You can also store your track specific car setups and race strategies and you can provide default values for various settings for the AI Race Asssistants. These values can be used to initialize the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#race-settings) in the "Race Settings" application using track and car specific default values. But beside the settings available in this application, many more settings are available here to customize the behaviour of the Race Assistants and all other applications of Simulator Controller. Additionally, telemetry information of all past sessions is also stored in the database. This information can then be used by the ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench), for example, to create strategies for upcoming races.
 
 You have to use the menus in the upper left area to specify the simulation, car, track, current weather and so on. After you have done that, you can select one of the database topics using the choice tabs.
 
@@ -40,7 +40,7 @@ Following you will find an overview about the different database topics:
 
 #### Settings
 
-The AI Race Assistants provide many settings, as you may have seen in the section about the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#race-settings) in the documentation about the Race Engineer. Many values are specific for a given car or track, for example the pitstop delta or the time required to change tyres. You can change all these settings manually before each session, or you can store default values for all theses settings in the session database.
+The AI Race Assistants provide many settings, as you may have seen in the section about the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#race-settings) in the documentation about the Race Engineer. Many values are specific for a given car or track, for example the pitstop delta or the time required to change tyres. You can change all these settings manually before each session, or you can store default values for all these settings in the session database.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%205.jpg)
 
@@ -214,7 +214,7 @@ Why so complex? There is a strong dependency between the track surface state, ai
 
 Please note, that you can use the "Pencil" button to rename an already uploaded setup file to follow the above conventions, if necessary.
 
-#### Tyre Pressures
+#### Pressures
 
 Here you will get a recommendation for initial cold tyre pressures, if a matching setup is available in the database. Depending on the temperature settings the recommended tyre pressures will be marked in dark green for a perfect match, or light green or even yellow, if the values have been extra- or interpolated from different air and/or track temperatures.
 
@@ -244,7 +244,17 @@ Here you can browse all available data in your session database. Data can be del
 
 You can restrict the scope of the data in the browser using the menus in the topleft corner of the window, thereby making it possible to work with the all the available data of a given simulator or only for a single car on a single track, for example. The window above shows a list of all available cars and tracks for *Assetto Corsa Competizione* with the *Honda NSX Evo* / *Hungaroring* combination selected either for export or even for deletion.
 
-When you export data by clicking on "Export...", you will be prompted to identify the target directory, where a directory containing all the selected data will be created. This export directory will be automatically named "Export_XXYYZZ", where *XXYYZZ* represents the current date and time. You may change the name afterwards, but make sure that you always pass the complete export directory to the target PC, where the data will be imported again.
+You can double-click on all types of data which will bring you to the corresponding list or editor for this data item. In case of a *Laps* entry with **data from yourself**, a special editor will open up, which let you browse this data and remove unwanted lap data, for example, because it has been collected in a session with a consumption multiplier or a tyre wear multiplier.
+
+##### Browsing *Laps* Data
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2021.jpg)
+
+As said, this editor is available to browse and cleanup your own *Laps* data. You check individual entries and delete them. Or you can use the "Cleanup..." button to automatically cleanup everything. It will remove all entries from the database, whose values for lap time, fuel consumption, and so on, are way off the average value in its group which is defined by "Weather" and "Compound". If you have configured a data replication to the Team Server, the entries will be deleted there as well.
+
+##### Exporting and Importing Data
+
+You can export data that has been checked by clicking on "Export...". You will be prompted to identify the target directory, where a directory containing all the selected data will be created. This export directory will be automatically named "Export_XXYYZZ", where *XXYYZZ* represents the current date and time. You may change the name afterwards, but make sure that you always pass the complete export directory to the target PC, where the data will be imported again.
 
 If you click on "Import..." you will be requested to locate this export directory. When you located a valid export directory, a window opens where you can select all data or only a fraction of the data available in the export package to be imported.
 
@@ -252,7 +262,7 @@ If you click on "Import..." you will be requested to locate this export director
 
 Here only the *McLaren 720s* data for the *Mount Panorama* and the *Nürburgring* will be imported, when you click on "Ok".
 
-##### Importing data from other sources
+###### Importing data from other sources
 
 You can import data from foreign sources, for example telemetry information from a real car, in order to use this data in "Strategy Workbench" or in other tools of Simulator Controller, as long as the structure adheres to the following rules:
 

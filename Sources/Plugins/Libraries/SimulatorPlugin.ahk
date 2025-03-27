@@ -774,7 +774,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	iCurrentTyreCompound := false
 	iRequestedTyreCompound := false
 
-	iHasPositionsData := false
+	iHasStandingsData := false
 
 	Settings {
 		Get {
@@ -877,7 +877,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		super.writePluginState(configuration)
 
 		if (this.Active && this.runningSimulator()) {
-			if (this.Car && this.Track && !this.iHasPositionsData) {
+			if (this.Car && this.Track && !this.iHasStandingsData) {
 				setMultiMapValue(configuration, this.Plugin, "State", "Warning")
 				setMultiMapValue(configuration, this.Plugin, "Information", getMultiMapValue(configuration, this.Plugin, "Information") . translate("; ") . translate("State:") . A_Space . translate("No participant information available..."))
 
@@ -903,7 +903,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 				else if isInstance(assistant, RaceSpotterPlugin)
 					this.iRaceSpotter := assistant
 
-			this.iHasPositionsData := false
+			this.iHasStandingsData := false
 		}
 	}
 
@@ -917,7 +917,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			this.iRaceStrategist := false
 			this.iRaceSpotter := false
 
-			this.iHasPositionsData := false
+			this.iHasStandingsData := false
 		}
 	}
 
@@ -1050,7 +1050,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	startSession(settings, data) {
 		this.prepareSession(settings, data)
 
-		this.iHasPositionsData := (getMultiMapValue(data, "Position Data", "Car.Count", 0) > 0)
+		this.iHasStandingsData := (getMultiMapValue(data, "Position Data", "Car.Count", 0) > 0)
 	}
 
 	finishSession() {
@@ -1231,7 +1231,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		}
 	}
 
-	updatePositionsData(data) {
+	updateStandingsData(data) {
 		local count := getMultiMapValue(data, "Position Data", "Car.Count", 0)
 		local driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
 		local carNr
@@ -1250,7 +1250,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			 && !getMultiMapValue(data, "Stint Data", "InPitLane", false))
 				setMultiMapValue(data, "Stint Data", "InPitLane", true)
 
-		this.iHasPositionsData := (count > 0)
+		this.iHasStandingsData := (count > 0)
 	}
 
 	saveSessionState(&sessionSettings, &sessionState) {
@@ -1301,16 +1301,16 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		}
 	}
 
-	correctPositionsData(positionsData, needCorrection := false) {
+	correctStandingsData(standingsData, needCorrection := false) {
 		local positions := Map()
 		local cars := []
 		local count, position
 
-		count := getMultiMapValue(positionsData, "Position Data", "Car.Count", 0)
+		count := getMultiMapValue(standingsData, "Position Data", "Car.Count", 0)
 
 		if !needCorrection
 			loop count {
-				position := (getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Position", 0) + 0)
+				position := (getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Position", 0) + 0)
 
 				if positions.Has(position)
 					needCorrection := true
@@ -1320,31 +1320,31 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 		if needCorrection {
 			loop count
-				cars.Push(Array(A_Index, getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Laps"
-																	   , getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Lap"))
-									   + getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Lap.Running")))
+				cars.Push(Array(A_Index, getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Laps"
+																	   , getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Lap"))
+									   + getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Lap.Running")))
 
 			bubbleSort(&cars, (c1, c2) => c1[2] < c2[2])
 
 			if isDebug() {
 				loop count {
-					if (getMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index][1] . ".Position") != A_Index)
+					if (getMultiMapValue(standingsData, "Position Data", "Car." . cars[A_Index][1] . ".Position") != A_Index)
 						logMessage(kLogDebug, "Corrected position for car " . cars[A_Index][1] . ": "
-											. getMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index][1] . ".Position")
+											. getMultiMapValue(standingsData, "Position Data", "Car." . cars[A_Index][1] . ".Position")
 											. " -> " . A_Index)
 
-					setMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index][1] . ".Position", A_Index)
+					setMultiMapValue(standingsData, "Position Data", "Car." . cars[A_Index][1] . ".Position", A_Index)
 				}
 			}
 			else
 				loop count
-					setMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index][1] . ".Position", A_Index)
+					setMultiMapValue(standingsData, "Position Data", "Car." . cars[A_Index][1] . ".Position", A_Index)
 		}
 
-		return positionsData
+		return standingsData
 	}
 
-	acquireTelemetryData() {
+	readTelemetryData() {
 		local trackData, data
 
 		static sessionDB := false
@@ -1357,32 +1357,38 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		return this.readSessionData(trackData ? ("Track=" . trackData) : "")
 	}
 
-	acquirePositionsData(telemetryData, finished := false) {
-		local positions := Map()
-		local needCorrection := false
-		local cars := []
-		local positionsData, count, position
+	readStandingsData(telemetryData, correct := false) {
+		local standingsData
 
 		if telemetryData.Has("Position Data") {
-			positionsData := newMultiMap()
+			standingsData := newMultiMap()
 
-			setMultiMapValues(positionsData, "Position Data", getMultiMapValues(telemetryData, "Position Data"))
+			setMultiMapValues(standingsData, "Position Data", getMultiMapValues(telemetryData, "Position Data"))
 		}
 		else
-			positionsData := this.readSessionData("Standings=true")
+			standingsData := this.readSessionData("Standings=true")
 
-		if !finished
-			positionsData := this.correctPositionsData(positionsData)
+		if correct {
+			standingsData := this.correctStandingsData(standingsData)
 
-		if telemetryData.Has("Position Data")
-			telemetryData["Position Data"] := positionsData["Position Data"]
+			if telemetryData.Has("Position Data")
+				telemetryData["Position Data"] := standingsData["Position Data"]
+		}
 
-		return positionsData
+		return standingsData
 	}
 
-	acquireSessionData(&telemetryData, &positionsData, finished := false) {
+	acquireTelemetryData() {
+		return this.readTelemetryData()
+	}
+
+	acquireStandingsData(telemetryData, finished := false) {
+		return this.readStandingsData(telemetryData, !finished)
+	}
+
+	acquireSessionData(&telemetryData, &standingsData, finished := false) {
 		telemetryData := this.acquireTelemetryData()
-		positionsData := this.acquirePositionsData(telemetryData, finished)
+		standingsData := this.acquireStandingsData(telemetryData, finished)
 	}
 
 	readSessionData(options := "", protocol?) {

@@ -10,6 +10,8 @@ The two applications on the lower left and on the lower right side of the launch
 
 If you want to download and install a new version of Simulator Controller, it is important that none of the applications of the suite is running during the update. Please use the button "Close All..." in the lower right corner just before running the update.
 
+For your convinience, you can click on the version number to open the release notes, that describe the fixes and changes included in the current version of Simulator Controller.
+ 
 If you don't want to use the launch window and want "Simulator Startup" to run through, create a shortcut and add the option "-NoLaunchPad" to the *Target* field. When you use this shortcut file, no launch window will be shown, unless you hold down the Shift key, while running "Simulator Startup". The other way around can also be used: If you press the Shift key while running "Simulator Startup" normally, no launch window will be shown and the startup process will run directly.
 
 ## Startup Process & Settings
@@ -215,7 +217,7 @@ With the introduction of a new Race Assistant in Release 3.1 there are now sever
 
 Before version 5.5.8 of Simulator Controller, it was necessary to press the *Push-To-Talk* button twice (like a double click with the mouse) to initiate an activation command. This is no longer necessary in most cases, but there is an exception. If you have configured the AI Driving Coach and you are using the voice recognition which comes with the Windows operating system (not "Azure" or "Google"), you will have to use the following method to activate another dialog partenr, once you are talking with the Driving Coach:
 
-You have to press the configured *Push-To-Talk* button twice like double-clicking a mouse button, you will activate a special listener, which only accepts the activation phrases. The last button press of the double-press must be held down as long as you speak, if you have configured the "Hold & Talk" behaviour as described below.
+You have to press the configured *Push-To-Talk* button twice like double-clicking a mouse button to activate a special listener, which only accepts the activation phrases. The last button press of the double-press must be held down as long as you speak, if you have configured the "Hold & Talk" method as described below.
 
 Good to know: You can alter the speed for the two clicks or presses (Windows default is 500 ms) in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration).
 
@@ -223,9 +225,9 @@ As said, this way to initiate an activation command is *only* required for the v
 
 #### Push-To-Talk Behaviour
 
-Beside the behaviour of the *Push-To-Talk* button described above, where you need to hold down the button as long as your are talking, there is an alternative mode available. This mode allows you to release the button while you are talking. Once, you have finished your voice command, you press the *Push-To-Talk* button again, to indicate that you have finished and that the command should be executed. This alternative mode can be enabled [voice control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control).
+Beside the behaviour of the *Push-To-Talk* button described above, where you need to hold down the button as long as your are talking, there is an alternative method available. This method allows you to release the button while you are talking. Once you have finished your voice command, you press the *Push-To-Talk* button again, to indicate that you have finished talking and that the command should be executed. This alternative method can be enabled in the [voice control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control).
 	
-Please don't forget to press the *Push-To-Talk* button at the end of your speech, even, if the command had already been recognized, because you made a long pause. If you don't push the button, the sequence will get out of sync and you will end up being very confused.
+Please don't forget to press the *Push-To-Talk* button at the end of your speech, even if the command had already been recognized, because you made a long pause. If you don't push the button, the sequence will get out of sync and you will end up being very confused.
 
 #### Testing voice configuration and voice commands
 
@@ -445,6 +447,10 @@ The "System Monitor" is divided into several pages of information:
 	 - Brakes
 	 
 	   Shows the current brake temperatures, and brake wear, if available.
+	   
+	 - Engine
+	 
+	   If available by the sim, the current water and oil temperatures are displayed.
 	   
 	 - Standings
 	 

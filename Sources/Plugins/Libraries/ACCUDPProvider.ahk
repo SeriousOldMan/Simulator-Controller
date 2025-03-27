@@ -23,25 +23,25 @@ class ACCUDPProvider {
 
 	iExitCallback := false
 
-	class PositionsDataFuture extends Task {
+	class StandingsDataFuture extends Task {
 		iUDPProvider := false
 
 		iRequested := false
 		iTries := 0
 
-		iPositionsData := kUndefined
+		iStandingsData := kUndefined
 
-		PositionsData {
+		StandingsData {
 			Get {
-				local positionsData := this.iPositionsData
+				local standingsData := this.iStandingsData
 
-				while (positionsData == kUndefined) {
+				while (standingsData == kUndefined) {
 					Task.yield(false)
 
-					positionsData := this.iPositionsData
+					standingsData := this.iStandingsData
 				}
 
-				return positionsData
+				return standingsData
 			}
 		}
 
@@ -53,7 +53,7 @@ class ACCUDPProvider {
 			Task.startTask(this)
 		}
 
-		requestPositionsData() {
+		requestStandingsData() {
 			loop 5
 				try {
 					FileAppend("Read`n", kTempDirectory . "ACCUDP.cmd")
@@ -68,8 +68,8 @@ class ACCUDPProvider {
 				}
 		}
 
-		readPositionsData() {
-			local fileName, positionsData
+		readStandingsData() {
+			local fileName, standingsData
 
 			if FileExist(kTempDirectory . "ACCUDP.cmd")
 				return false
@@ -79,22 +79,22 @@ class ACCUDPProvider {
 				if !FileExist(fileName)
 					return false
 				else {
-					positionsData := readMultiMap(fileName)
+					standingsData := readMultiMap(fileName)
 
 					deleteFile(fileName)
 
-					return positionsData
+					return standingsData
 				}
 			}
 		}
 
 		run() {
-			local positionsData
+			local standingsData
 
 			if !this.iRequested {
 				this.iUDPProvider.startup()
 
-				this.requestPositionsData()
+				this.requestStandingsData()
 
 				this.iRequested := true
 
@@ -102,10 +102,10 @@ class ACCUDPProvider {
 			}
 			else {
 				if (this.iTries++ <= 40) {
-					positionsData := this.readPositionsData()
+					standingsData := this.readStandingsData()
 
-					if positionsData
-						this.iPositionsData := positionsData
+					if standingsData
+						this.iStandingsData := standingsData
 					else {
 						Task.CurrentTask.Sleep := 50
 
@@ -113,7 +113,7 @@ class ACCUDPProvider {
 					}
 				}
 				else
-					this.iPositionsData := false
+					this.iStandingsData := false
 			}
 		}
 	}
@@ -332,10 +332,10 @@ class ACCUDPProvider {
 		return false
 	}
 
-	getPositionsDataFuture(restart := false) {
+	getStandingsDataFuture(restart := false) {
 		if restart
 			this.startup(true)
 
-		return ACCUDPProvider.PositionsDataFuture(this)
+		return ACCUDPProvider.StandingsDataFuture(this)
 	}
 }

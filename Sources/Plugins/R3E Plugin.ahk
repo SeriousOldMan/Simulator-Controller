@@ -689,10 +689,10 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		return lastClassName
 	}
 
-	updatePositionsData(data) {
+	updateStandingsData(data) {
 		local carID
 
-		super.updatePositionsData(data)
+		super.updateStandingsData(data)
 
 		loop getMultiMapValue(data, "Position Data", "Car.Count", 0) {
 			carID := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Car", kUndefined)

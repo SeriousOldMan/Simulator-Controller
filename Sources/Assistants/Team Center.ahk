@@ -45,7 +45,7 @@
 #Include "..\Database\Libraries\SessionDatabaseBrowser.ahk"
 #Include "..\Database\Libraries\SettingsDatabase.ahk"
 #Include "..\Database\Libraries\TyresDatabase.ahk"
-#Include "..\Database\Libraries\TelemetryDatabase.ahk"
+#Include "..\Database\Libraries\LapsDatabase.ahk"
 #Include "..\Database\Libraries\TelemetryViewer.ahk"
 #Include "Libraries\RaceReportViewer.ahk"
 #Include "Libraries\Strategy.ahk"
@@ -265,7 +265,7 @@ class TeamCenter extends ConfigurationItem {
 	iStrategy := false
 
 	iUseSessionData := true
-	iUseTelemetryDatabase := false
+	iUseLapsDatabase := false
 	iUseCurrentMap := true
 	iUseTraffic := false
 
@@ -297,10 +297,10 @@ class TeamCenter extends ConfigurationItem {
 	iSelectTyreSet := true
 
 	iSessionStore := false
-	iTelemetryDatabase := false
+	iLapsDatabase := false
 	iPressuresDatabase := false
 
-	iSimulationTelemetryDatabase := false
+	iSimulationLapsDatabase := false
 
 	iReportsListView := false
 	iWaitViewer := false
@@ -461,11 +461,11 @@ class TeamCenter extends ConfigurationItem {
 		}
 	}
 
-	class TeamCenterTelemetryDatabase extends TelemetryDatabase {
+	class TeamCenterLapsDatabase extends LapsDatabase {
 		iTeamCenter := false
-		iTelemetryDatabase := false
+		iLapsDatabase := false
 
-		class SessionTelemetryDatabase extends TeamCenter.TeamCenterTelemetryDatabase {
+		class SessionLapsDatabase extends TeamCenter.TeamCenterLapsDatabase {
 			Drivers {
 				Get {
 					return this.TeamCenter.SelectedDrivers
@@ -473,7 +473,7 @@ class TeamCenter extends ConfigurationItem {
 			}
 		}
 
-		class SimulationTelemetryDatabase extends TeamCenter.TeamCenterTelemetryDatabase {
+		class SimulationLapsDatabase extends TeamCenter.TeamCenterLapsDatabase {
 		}
 
 		TeamCenter {
@@ -482,9 +482,9 @@ class TeamCenter extends ConfigurationItem {
 			}
 		}
 
-		TelemetryDatabase {
+		LapsDatabase {
 			Get {
-				return this.iTelemetryDatabase
+				return this.iLapsDatabase
 			}
 		}
 
@@ -495,17 +495,17 @@ class TeamCenter extends ConfigurationItem {
 
 			this.Shared := false
 
-			this.setDatabase(Database(teamCenter.SessionDirectory, kTelemetrySchemas))
+			this.setDatabase(Database(teamCenter.SessionDirectory, kLapsSchemas))
 
 			if simulator
-				this.iTelemetryDatabase := TelemetryDatabase(simulator, car, track)
+				this.iLapsDatabase := LapsDatabase(simulator, car, track)
 		}
 
 		setDrivers(drivers) {
 			super.setDrivers(drivers)
 
-			if this.TelemetryDatabase
-				this.TelemetryDatabase.setDrivers(drivers)
+			if this.LapsDatabase
+				this.LapsDatabase.setDrivers(drivers)
 		}
 
 		getMapData(weather, tyreCompound, tyreCompoundColor) {
@@ -517,10 +517,10 @@ class TeamCenter extends ConfigurationItem {
 					if ((entry["Fuel.Consumption"] > 0) && (entry["Lap.Time"] > 0))
 						entries.Push(entry)
 
-			if (this.TeamCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
+			if (this.TeamCenter.UseLapsDatabase && this.LapsDatabase) {
 				newEntries := []
 
-				for ignore, entry in this.TelemetryDatabase.getMapData(weather, tyreCompound, tyreCompoundColor) {
+				for ignore, entry in this.LapsDatabase.getMapData(weather, tyreCompound, tyreCompoundColor) {
 					if ((entry["Fuel.Consumption"] > 0) && (entry["Lap.Time"] > 0)) {
 						found := false
 
@@ -567,10 +567,10 @@ class TeamCenter extends ConfigurationItem {
 					if (entry["Lap.Time"] > 0)
 						entries.Push(entry)
 
-			if (this.TeamCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
+			if (this.TeamCenter.UseLapsDatabase && this.LapsDatabase) {
 				newEntries := []
 
-				for ignore, entry in this.TelemetryDatabase.getTyreData(weather, tyreCompound, tyreCompoundColor) {
+				for ignore, entry in this.LapsDatabase.getTyreData(weather, tyreCompound, tyreCompoundColor) {
 					if (entry["Lap.Time"] > 0) {
 						found := false
 
@@ -602,10 +602,10 @@ class TeamCenter extends ConfigurationItem {
 					if (entry["Lap.Time"] > 0)
 						entries.Push(entry)
 
-			if (this.TeamCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
+			if (this.TeamCenter.UseLapsDatabase && this.LapsDatabase) {
 				newEntries := []
 
-				for ignore, entry in this.TelemetryDatabase.getMapLapTimes(weather, tyreCompound, tyreCompoundColor) {
+				for ignore, entry in this.LapsDatabase.getMapLapTimes(weather, tyreCompound, tyreCompoundColor) {
 					if (entry["Lap.Time"] > 0) {
 						found := false
 
@@ -652,10 +652,10 @@ class TeamCenter extends ConfigurationItem {
 					if (entry["Lap.Time"] > 0)
 						entries.Push(entry)
 
-			if (this.TeamCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
+			if (this.TeamCenter.UseLapsDatabase && this.LapsDatabase) {
 				newEntries := []
 
-				for ignore, entry in this.TelemetryDatabase.getTyreLapTimes(weather, tyreCompound, tyreCompoundColor) {
+				for ignore, entry in this.LapsDatabase.getTyreLapTimes(weather, tyreCompound, tyreCompoundColor) {
 					if (entry["Lap.Time"] > 0) {
 						found := false
 
@@ -1092,9 +1092,9 @@ class TeamCenter extends ConfigurationItem {
 		}
 	}
 
-	UseTelemetryDatabase {
+	UseLapsDatabase {
 		Get {
-			return this.iUseTelemetryDatabase
+			return this.iUseLapsDatabase
 		}
 	}
 
@@ -1236,18 +1236,18 @@ class TeamCenter extends ConfigurationItem {
 		}
 	}
 
-	TelemetryDatabase {
+	LapsDatabase {
 		Get {
-			if !this.iTelemetryDatabase
-				this.iTelemetryDatabase := TeamCenter.TeamCenterTelemetryDatabase.SessionTelemetryDatabase(this)
+			if !this.iLapsDatabase
+				this.iLapsDatabase := TeamCenter.TeamCenterLapsDatabase.SessionLapsDatabase(this)
 
-			return this.iTelemetryDatabase
+			return this.iLapsDatabase
 		}
 	}
 
-	SimulationTelemetryDatabase {
+	SimulationLapsDatabase {
 		Get {
-			return (this.iSimulationTelemetryDatabase ? this.iSimulationTelemetryDatabase : this.TelemetryDatabase)
+			return (this.iSimulationLapsDatabase ? this.iSimulationLapsDatabase : this.LapsDatabase)
 		}
 	}
 
@@ -1408,7 +1408,7 @@ class TeamCenter extends ConfigurationItem {
 		this.iSelectTyreSet := getMultiMapValue(settings, "Team Center", "SelectTyreSet", true)
 
 		this.iUseSessionData := getMultiMapValue(settings, "Team Center", "UseSessionData", true)
-		this.iUseTelemetryDatabase := getMultiMapValue(settings, "Team Center", "UseTelemetryDatabase", false)
+		this.iUseLapsDatabase := getMultiMapValue(settings, "Team Center", "UseLapsDatabase", getMultiMapValue(settings, "Team Center", "UseTelemetryDatabase", false))
 		this.iUseCurrentMap := getMultiMapValue(settings, "Team Center", "UseCurrentMap", true)
 		this.iUseTraffic := getMultiMapValue(settings, "Team Center", "UseTraffic", false)
 	}
@@ -1698,7 +1698,7 @@ class TeamCenter extends ConfigurationItem {
 
 		chooseSimulationSettings(*) {
 			center.iUseSessionData := (centerGui["useSessionDataDropDown"].Value == 1)
-			center.iUseTelemetryDatabase := (centerGui["useTelemetryDataDropDown"].Value == 1)
+			center.iUseLapsDatabase := (centerGui["useLapsDataDropDown"].Value == 1)
 			center.iUseCurrentMap := (centerGui["keepMapDropDown"].Value == 1)
 			center.iUseTraffic := (centerGui["considerTrafficDropDown"].Value == 1)
 
@@ -2195,8 +2195,8 @@ class TeamCenter extends ConfigurationItem {
 			centerGui.Add("DropDownList", "x215 yp+24 w171 vdataY5DropDown").OnEvent("Change", chooseAxis)
 			centerGui.Add("DropDownList", "x215 yp+24 w171 vdataY6DropDown").OnEvent("Change", chooseAxis)
 
-			centerGui.Add("Text", "x400 ys w60 h23 +0x200", translate("Plot"))
-			centerGui.Add("DropDownList", "x464 yp w80 Choose1 vchartTypeDropDown", collect(["Scatter", "Bar", "Bubble", "Line"], translate)).OnEvent("Change", chooseChartType)
+			centerGui.Add("Text", "x400 ys w70 h23 +0x200", translate("Plot"))
+			centerGui.Add("DropDownList", "x474 yp w80 Choose1 vchartTypeDropDown", collect(["Scatter", "Bar", "Bubble", "Line"], translate)).OnEvent("Change", chooseChartType)
 
 			centerGui.Add("Button", "x1327 yp w23 h23 X:Move vreportSettingsButton").OnEvent("Click", reportSettings)
 			setButtonIcon(centerGui["reportSettingsButton"], kIconsDirectory . "General Settings.ico", 1)
@@ -2371,7 +2371,7 @@ class TeamCenter extends ConfigurationItem {
 			centerGui.Add("DropDownList", "x520 yp-3 w50 Choose1 vuseSessionDataDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
 
 			centerGui.Add("Text", "x312 yp+27 w205 h23", translate("Use Telemetry Database"))
-			centerGui.Add("DropDownList", "x520 yp-3 w50 Choose2 vuseTelemetryDataDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
+			centerGui.Add("DropDownList", "x520 yp-3 w50 Choose2 vuseLapsDataDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
 
 			centerGui.Add("Text", "x312 yp+27 w205 h23", translate("Keep current Map"))
 			centerGui.Add("DropDownList", "x520 yp-3 w50 Choose1 vkeepMapDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
@@ -3429,7 +3429,7 @@ class TeamCenter extends ConfigurationItem {
 
 	updateStrategyMenu() {
 		local use1 := ((this.UseSessionData ? translate("[x]") : translate("[  ]")) . A_Space . translate("Use Session Data"))
-		local use2 := ((this.UseTelemetryDatabase ? translate("[x]") : translate("[  ]")) . A_Space . translate("Use Telemetry Database"))
+		local use2 := ((this.UseLapsDatabase ? translate("[x]") : translate("[  ]")) . A_Space . translate("Use Telemetry Database"))
 		local use3 := ((this.UseCurrentMap ? translate("[x]") : translate("[  ]")) . A_Space . translate("Keep current Map"))
 		local use4 := ((this.UseTraffic ? translate("[x]") : translate("[  ]")) . A_Space . translate("Analyze Traffic"))
 
@@ -3439,7 +3439,7 @@ class TeamCenter extends ConfigurationItem {
 		this.Control["strategyMenuDropDown"].Choose(1)
 
 		this.Control["useSessionDataDropDown"].Choose(this.UseSessionData ? 1 : 2)
-		this.Control["useTelemetryDataDropDown"].Choose(this.UseTelemetryDatabase ? 1 : 2)
+		this.Control["useLapsDataDropDown"].Choose(this.UseLapsDatabase ? 1 : 2)
 		this.Control["keepMapDropDown"].Choose(this.UseCurrentMap ? 1 : 2)
 		this.Control["considerTrafficDropDown"].Choose(this.UseTraffic ? 1 : 2)
 	}
@@ -5300,9 +5300,9 @@ class TeamCenter extends ConfigurationItem {
 
 				this.updateState()
 			case 10: ; Use Telemetry Database
-				this.iUseTelemetryDatabase := !this.UseTelemetryDatabase
+				this.iUseLapsDatabase := !this.UseLapsDatabase
 
-				updateSetting("UseTelemetryDatabase", this.UseTelemetryDatabase)
+				updateSetting("UseLapsDatabase", this.UseLapsDatabase)
 
 				this.updateState()
 			case 11: ; Use current Map
@@ -5695,7 +5695,7 @@ class TeamCenter extends ConfigurationItem {
 	}
 
 	runSimulationAsync(sessionType) {
-		local telemetryDB, simulation
+		local lapsDB, simulation
 
 		this.showMessage(translate("Saving session"))
 
@@ -5703,22 +5703,22 @@ class TeamCenter extends ConfigurationItem {
 
 		this.showMessage(translate("Running simulation"))
 
-		telemetryDB := TeamCenter.TeamCenterTelemetryDatabase.SimulationTelemetryDatabase(this, this.Simulator, this.Car, this.Track)
+		lapsDB := TeamCenter.TeamCenterLapsDatabase.SimulationLapsDatabase(this, this.Simulator, this.Car, this.Track)
 
-		this.iSimulationTelemetryDatabase := telemetryDB
+		this.iSimulationLapsDatabase := lapsDB
 
 		try {
 			if this.UseTraffic
-				simulation := TrafficSimulation(this, sessionType, telemetryDB)
+				simulation := TrafficSimulation(this, sessionType, lapsDB)
 			else
-				simulation := VariationSimulation(this, sessionType, telemetryDB)
+				simulation := VariationSimulation(this, sessionType, lapsDB)
 
 			Task.CurrentTask.Simulation := simulation
 
 			simulation.runSimulation(true)
 		}
 		finally {
-			this.iSimulationTelemetryDatabase := false
+			this.iSimulationLapsDatabase := false
 		}
 
 		this.showMessage(false)
@@ -5879,7 +5879,7 @@ class TeamCenter extends ConfigurationItem {
 					  , &sessionType, &sessionLength
 					  , &maxTyreLaps, &tyreCompound, &tyreCompoundColor, &tyrePressures) {
 		local strategy := this.Strategy
-		local telemetryDB, candidate
+		local lapsDB, candidate
 
 		if strategy {
 			if this.Simulator {
@@ -5913,11 +5913,11 @@ class TeamCenter extends ConfigurationItem {
 				tyreCompoundColor := strategy.TyreCompoundColor
 			}
 
-			telemetryDB := this.SimulationTelemetryDatabase
+			lapsDB := this.SimulationLapsDatabase
 
-			if !telemetryDB.suitableTyreCompound(simulator, car, track, weather, compound(tyreCompound, tyreCompoundColor)) {
-				candidate := telemetryDB.optimalTyreCompound(simulator, car, track, weather, airTemperature, trackTemperature
-														   , getKeys(this.computeAvailableTyreSets(strategy.AvailableTyreSets)))
+			if !lapsDB.suitableTyreCompound(simulator, car, track, weather, compound(tyreCompound, tyreCompoundColor)) {
+				candidate := lapsDB.optimalTyreCompound(simulator, car, track, weather, airTemperature, trackTemperature
+													  , getKeys(this.computeAvailableTyreSets(strategy.AvailableTyreSets)))
 
 				if candidate
 					splitCompound(candidate, &tyreCompound, &tyreCompoundColor)
@@ -6007,7 +6007,7 @@ class TeamCenter extends ConfigurationItem {
 	getStartConditions(&initialStint, &initialLap, &initialStintTime, &initialSessionTime
 					 , &initialTyreSet, &initialTyreLaps, &initialFuelAmount
 					 , &initialMap, &initialFuelConsumption, &initialAvgLapTime) {
-		local lastLap, tyresTable, lap, ignore, stint, telemetryDB
+		local lastLap, tyresTable, lap, ignore, stint, lapsDB
 		local strategy, simulator, car, track, weather, tyreCompound, tyreCompoundColor
 
 		lastLap := this.LastLap
@@ -6024,7 +6024,7 @@ class TeamCenter extends ConfigurationItem {
 		initialAvgLapTime := 0.0
 
 		if lastLap {
-			telemetryDB := this.SimulationTelemetryDatabase
+			lapsDB := this.SimulationLapsDatabase
 
 			initialStint := lastLap.Stint.Nr
 			initialLap := lastLap.Nr
@@ -6068,10 +6068,10 @@ class TeamCenter extends ConfigurationItem {
 
 			initialTyreSet := lastLap.TyreSet
 
-			if !telemetryDB.suitableTyreCompound(simulator, car, track, weather, compound(tyreCompound, tyreCompoundColor))
+			if !lapsDB.suitableTyreCompound(simulator, car, track, weather, compound(tyreCompound, tyreCompoundColor))
 				initialTyreLaps := 999
 			else {
-				tyresTable := telemetryDB.Database.Tables["Tyres"]
+				tyresTable := lapsDB.Database.Tables["Tyres"]
 
 				if (tyresTable.Length >= lastLap.Nr)
 					initialTyreLaps := tyresTable[lastLap.Nr]["Tyre.Laps"]
@@ -6149,7 +6149,7 @@ class TeamCenter extends ConfigurationItem {
 	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, weather, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
 		return Task.CurrentTask.Simulation.calcAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, weather
 														, tyreCompound, tyreCompoundColor, tyreLaps
-														, default ? default : this.Strategy.AvgLapTime, this.SimulationTelemetryDatabase)
+														, default ? default : this.Strategy.AvgLapTime, this.SimulationLapsDatabase)
 	}
 
 	computeAvailableTyreSets(availableTyreSets) {
@@ -6553,7 +6553,7 @@ class TeamCenter extends ConfigurationItem {
 		this.iLastLap := false
 		this.iCurrentStint := false
 
-		this.iTelemetryDatabase := false
+		this.iLapsDatabase := false
 		this.iPressuresDatabase := false
 		this.iSessionStore := false
 
@@ -7532,7 +7532,7 @@ class TeamCenter extends ConfigurationItem {
 	syncTelemetry(load := false) {
 		local lastLap := this.LastLap
 		local tyreChange := true
-		local newData, message, session, telemetryDB, tyresTable, lap, theLap, runningLap, driverID, telemetry
+		local newData, message, session, lapsDB, tyresTable, lap, theLap, runningLap, driverID, telemetry
 		local telemetryData, pressures, temperatures, wear, lapPressures, pressure, driver, row
 
 		wasPitstop(lap, &tyreChange := false) {
@@ -7570,9 +7570,9 @@ class TeamCenter extends ConfigurationItem {
 				logMessage(kLogInfo, message)
 
 			session := this.SelectedSession[true]
-			telemetryDB := this.TelemetryDatabase
+			lapsDB := this.LapsDatabase
 
-			tyresTable := telemetryDB.Database.Tables["Tyres"]
+			tyresTable := lapsDB.Database.Tables["Tyres"]
 
 			lap := tyresTable.Length
 
@@ -7679,16 +7679,16 @@ class TeamCenter extends ConfigurationItem {
 				else
 					wear := [kNull, kNull, kNull, kNull]
 
-				telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
-											 , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9]
-											 , driverID)
+				lapsDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
+										, telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9]
+										, driverID)
 
-				telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15], runningLap
-									   , pressures[1], pressures[2], pressures[4], pressures[4]
-									   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
-									   , wear[1], wear[2], wear[3], wear[4]
-									   , telemetryData[7], telemetryData[8], telemetryData[9]
-									   , driverID)
+				lapsDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15], runningLap
+								  , pressures[1], pressures[2], pressures[4], pressures[4]
+								  , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
+								  , wear[1], wear[2], wear[3], wear[4]
+								  , telemetryData[7], telemetryData[8], telemetryData[9]
+								  , driverID)
 
 				theLap := this.Laps[lap]
 
@@ -7734,7 +7734,7 @@ class TeamCenter extends ConfigurationItem {
 			if lastLap
 				lastLap := (lastLap.Nr + 0)
 
-			tyresTable := this.TelemetryDatabase.Database.Tables["Tyres"]
+			tyresTable := this.LapsDatabase.Database.Tables["Tyres"]
 
 			for ignore, pressureData in this.PressuresDatabase.Database.Tables["Tyres.Pressures"] {
 				if !this.Laps.Has(A_Index)
@@ -11230,7 +11230,7 @@ class TeamCenter extends ConfigurationItem {
 
 		if lastLap {
 			pressuresTable := this.PressuresDatabase.Database.Tables["Tyres.Pressures"]
-			tyresTable := this.TelemetryDatabase.Database.Tables["Tyres"]
+			tyresTable := this.LapsDatabase.Database.Tables["Tyres"]
 
 			newLap := (sessionStore.Tables["Lap.Data"].Length + 1)
 
@@ -12050,7 +12050,7 @@ class TeamCenter extends ConfigurationItem {
 				pressuresLosses := values2String(", ", pressuresLosses*)
 
 				if (hotPressures = "-, -, -, -") {
-					tyresTable := this.TelemetryDatabase.Database.Tables["Tyres"]
+					tyresTable := this.LapsDatabase.Database.Tables["Tyres"]
 
 					if (tyresTable.Length >= lap.Nr) {
 						tyres := tyresTable[lap.Nr]
@@ -12125,7 +12125,7 @@ class TeamCenter extends ConfigurationItem {
 					   , translate("Track (Ahead)"), translate("Track (Behind)")]
 		local rowIndices := CaseInsenseMap("Standings.Leader", 1, "Standings.Front", 2, "Standings.Ahead", 2, "Standings.Behind", 3
 										 , "Track.Front", 4, "Track.Ahead", 4, "Track.Behind", 5)
-		local telemetryDB := this.TelemetryDatabase
+		local lapsDB := this.LapsDatabase
 		local rows := [1, 2, 3, 4, 5]
 		local deltas, ignore, entry, carNumber, carName, driverFullName, delta, row
 		local driverForname, driverSurname, driverNickname, entryType, index, label
@@ -12175,7 +12175,7 @@ class TeamCenter extends ConfigurationItem {
 					label := labels[index]
 
 				rows[index] := ("<tr><th class=`"th-std th-left`">" . label . "</th>"
-							  . "<td class=`"td-std`">" . values2String("</td><td class=`"td-std`">" , carNumber, driverFullname, telemetryDB.getCarName(this.Simulator, carName), delta)
+							  . "<td class=`"td-std`">" . values2String("</td><td class=`"td-std`">" , carNumber, driverFullname, lapsDB.getCarName(this.Simulator, carName), delta)
 							  . "</td></tr>")
 			}
 
@@ -12190,7 +12190,7 @@ class TeamCenter extends ConfigurationItem {
 
 	createLapStandings(lap) {
 		local sessionStore := this.SessionStore
-		local telemetryDB := this.TelemetryDatabase
+		local lapsDB := this.LapsDatabase
 		local html := "<table class=`"table-std`">"
 		local lapNr := lap.Nr
 		local cars := true
@@ -12246,7 +12246,7 @@ class TeamCenter extends ConfigurationItem {
 
 				html .= ("<tr><th class=`"th-std`">" . position . "</th>")
 				html .= ("<td class=`"td-std`">" . values2String("</td><td class=`"td-std`">", carNumbers[index], driver
-																							 , telemetryDB.getCarName(this.Simulator, carNames[index]))
+																							 , lapsDB.getCarName(this.Simulator, carNames[index]))
 					   . "</td>")
 
 				if multiClass
@@ -13110,7 +13110,7 @@ class TeamCenter extends ConfigurationItem {
 	}
 
 	showSessionSummary(viewer := false) {
-		local telemetryDB := this.TelemetryDatabase
+		local lapsDB := this.LapsDatabase
 		local html := ("<div id=`"header`"><b>" . translate("Session Summary") . "</b></div>")
 		local stints := []
 		local drivers := []
@@ -13135,8 +13135,8 @@ class TeamCenter extends ConfigurationItem {
 		local sessionTime := this.Time
 		local stint, duration, ignore, lap, width, chart1, fuelConsumption
 
-		carName := (carName ? telemetryDB.getCarName(simulator, carName) : "-")
-		trackName := (trackName ? telemetryDB.getTrackName(simulator, trackName) : "-")
+		carName := (carName ? lapsDB.getCarName(simulator, carName) : "-")
+		trackName := (trackName ? lapsDB.getTrackName(simulator, trackName) : "-")
 
 		if sessionDate
 			sessionDate := FormatTime(sessionDate, "ShortDate")
@@ -13246,16 +13246,16 @@ class TeamCenter extends ConfigurationItem {
 
 	showPlanDetails(viewer := false) {
 		local html := ("<div id=`"header`"><b>" . translate("Plan Summary") . "</b></div>")
-		local telemetryDB := this.TelemetryDatabase
+		local lapsDB := this.LapsDatabase
 		local window := this.Window
 		local currentListView, stint, driver, timePlanned, timeActual, lapPlanned, lapActual, refuelAmount, tyreChange
 		local simulator, carName, trackName, sessionDate, sessionTime
 
 		simulator := this.Simulator
 		carName := this.Car
-		carName := (carName ? telemetryDB.getCarName(simulator, carName) : "-")
+		carName := (carName ? lapsDB.getCarName(simulator, carName) : "-")
 		trackName := this.Track
-		trackName := (trackName ? telemetryDB.getTrackName(simulator, trackName) : "-")
+		trackName := (trackName ? lapsDB.getTrackName(simulator, trackName) : "-")
 
 		sessionDate := this.Date
 

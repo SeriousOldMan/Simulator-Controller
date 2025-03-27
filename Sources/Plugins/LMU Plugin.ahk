@@ -34,6 +34,9 @@ class LMUPlugin extends Sector397Plugin {
 	iTeamData := false
 	iGridData := false
 
+	iCarInfos := false
+	iCarInfosRefresh := 0
+
 	iLastFuelAmount := 0
 	iRemainingFuelAmount := 0
 
@@ -43,6 +46,80 @@ class LMUPlugin extends Sector397Plugin {
 	iVirtualEnergyLevels := []
 
 	iAdjustRefuelAmount := false
+
+	class CarInfos extends LMURestProvider.StandingsData {
+		iCarIDs := false
+		iCarPositions := false
+
+		Position[carID] {
+			Get {
+				try {
+					return this.iCarPositions[inList(this.iCarIDs, carID)]
+				}
+				catch Any as exception {
+					logError(exception)
+
+					return false
+				}
+			}
+		}
+
+		Driver[carID] {
+			Get {
+				try {
+					return super.Driver[this.iCarPositions[inList(this.iCarIDs, carID)]]
+				}
+				catch Any as exception {
+					logError(exception)
+
+					return false
+				}
+			}
+		}
+
+		Class[carID] {
+			Get {
+				try {
+					return super.Class[this.iCarPositions[inList(this.iCarIDs, carID)]]
+				}
+				catch Any as exception {
+					logError(exception)
+
+					return false
+				}
+			}
+		}
+
+		Laps[carID] {
+			Get {
+				try {
+					return super.Laps[this.iCarPositions[inList(this.iCarIDs, carID)]]
+				}
+				catch Any as exception {
+					logError(exception)
+
+					return false
+				}
+			}
+		}
+
+		__New(standingsData) {
+			local ids := []
+			local positions := []
+
+			loop getMultiMapValue(standingsData, "Position Data", "Car.Count", 0) {
+				ids.Push(getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID"))
+				positions.Push(getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Position"))
+			}
+
+			this.iCarIDs := ids
+			this.iCarPositions := positions
+
+			super.__New()
+
+			this.read()
+		}
+	}
 
 	TeamData {
 		Get {
@@ -68,6 +145,12 @@ class LMUPlugin extends Sector397Plugin {
 				this.iGridData := LMURESTProvider.GridData()
 
 			return this.iGridData
+		}
+	}
+
+	CarInfos {
+		Get {
+			return this.iCarInfos
 		}
 	}
 
@@ -486,36 +569,46 @@ class LMUPlugin extends Sector397Plugin {
 		return false
 	}
 
-	parseCarName(carName, &model?, &nr?, &category?, &team?) {
+	parseCarName(carID, carName, &model?, &nr?, &category?, &team?) {
 		local gridData := this.GridData
 
 		model := gridData.Car[carName]
 		team := gridData.Team[carName]
 
-		if ((carName != "") && isNumber(SubStr(carName, 1, 1)))
+		if ((carName != "") && isNumber(SubStr(carName, 1, 1))) {
 			nr := this.parseNr(carName, &carName)
-		else
-			super.parseCarName(carName, , &nr)
 
-		try {
-			category := gridData.Drivers[carName][1].Category
+			super.parseCarName(carID, carName, , , &category)
 		}
-		catch Any {
-			category := false
-		}
+		else
+			super.parseCarName(carID, carName, , &nr, &category)
 	}
 
-	parseDriverName(carName, forName, surName, nickName) {
-		local driver
+	parseDriverName(carID, carName, forName, surName, nickName, &category?) {
+		local drivers, carInfos
 
-		try {
-			driver := this.GridData.Drivers[carName][1]
-		}
-		catch Any {
-			driver := false
+		getCategory(drivers, driver) {
+			local ignore, candidate
+
+			for ignore, candidate in drivers
+				if (InStr(driver, candidate.Name) = 1)
+					return candidate.Category
+
+			return false
 		}
 
-		return (driver ? driver.Name : super.parseDriverName(carName, forName, surName, nickName))
+		if isSet(category)
+			try {
+				drivers := this.GridData.Drivers[carName]
+				carInfos := (carID ? this.CarInfos : false)
+
+				category := (carInfos ? getCategory(drivers, carInfos.Driver[carID]) : false)
+			}
+			catch Any {
+				category := false
+			}
+
+		return super.parseDriverName(carID, carName, forName, surName, nickName)
 	}
 
 	updateSession(session, force := false) {
@@ -535,6 +628,19 @@ class LMUPlugin extends Sector397Plugin {
 
 			this.iAdjustRefuelAmount := false
 		}
+	}
+
+	acquireStandingsData(telemetryData, finished := false) {
+		if (A_TickCount > this.iCarInfosRefresh)
+			this.iCarInfos := false
+
+		if !this.CarInfos {
+			this.iCarInfos := LMUPlugin.CarInfos(this.readStandingsData(telemetryData))
+
+			this.iCarInfosRefresh := (A_TickCount + 30000)
+		}
+
+		return super.acquireStandingsData(telemetryData, finished)
 	}
 
 	readSessionData(options := "", protocol?) {

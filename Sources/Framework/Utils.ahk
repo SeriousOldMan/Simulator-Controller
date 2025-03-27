@@ -492,7 +492,7 @@ callSimulator(simulator, options := "", protocol?) {
 					dllName := (simulator . " SHM Connector.dll")
 					dllFile := (kBinariesDirectory . "Connectors\" . dllName)
 
-					if (!FileExist(dllFile))
+					if !FileExist(dllFile)
 						throw "Unable to find " . dllName . " in " . kBinariesDirectory . "..."
 
 					connector := CLR_LoadLibrary(dllFile).CreateInstance("SHMConnector.SHMConnector")
@@ -747,7 +747,7 @@ testAssistants(configurator, assistants := kRaceAssistants, booster := false) {
 
 	for ignore, assistant in assistants {
 		thePlugin := Plugin(assistant, configuration)
-		
+
 		if thePlugin.Active {
 			options := ""
 
@@ -789,7 +789,7 @@ testAssistants(configurator, assistants := kRaceAssistants, booster := false) {
 
 						found := true
 					}
-					
+
 					if found {
 						if ((value = "On") || (value = kTrue))
 							value := true

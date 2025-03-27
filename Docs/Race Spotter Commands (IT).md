@@ -1,4 +1,4 @@
-Di seguito troverai l'elenco completo di tutti i comandi vocali riconosciuti da Cato, il spotter di gara AI insieme ad una breve introduzione alla sintassi delle grammatiche delle frasi.
+Di seguito troverai l'elenco completo di tutti i comandi vocali riconosciuti da Elisa, il spotter di gara AI insieme ad una breve introduzione alla sintassi delle grammatiche delle frasi.
 
 ## Sintassi
 
@@ -25,7 +25,7 @@ Di seguito troverai l'elenco completo di tutti i comandi vocali riconosciuti da 
    
 		{ pressioni, pressioni dei pneumatici }
 
-	Se un dato elenco di scelte viene utilizzato in diverse frasi, è possibile definirne una variabile e utilizzare un riferimento alla variabile (il nome dell'elenco di scelte racchiuso tra **(** e **)**) invece di un riferimento esplicito sintassi. Tutte le scelte predefinite sono elencate nella sezione "[Scelte]" del [file grammaticale](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Assistants/Grammars/Race%20Engineer.grammars.it) e assomiglia a questo:
+	Se un dato elenco di scelte viene utilizzato in diverse frasi, è possibile definirne una variabile e utilizzare un riferimento alla variabile (il nome dell'elenco di scelte racchiuso tra **(** e **)**) invece di un riferimento esplicito sintassi. Tutte le scelte predefinite sono elencate nella sezione "[Scelte]" del [file grammaticale](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Assistants/Grammars/Choices.it) e assomiglia a questo:
 
 		TellMe=Puoi dirmi, Per favore dimmi, Dimmi, Puoi darmi, Per favore dammi, Dammi
 

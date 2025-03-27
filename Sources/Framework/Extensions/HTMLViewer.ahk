@@ -2041,11 +2041,23 @@ class WebView2Viewer extends HTMLViewer {
 	}
 
 	Write(html, force := false) {
-		local file
+		local file, isFile
 
 		if (force || (html != this.iHTML)) {
 			if this.WebView2 {
-				if !FileExist(this.iHTMLFile)
+				try {
+					isFile := ((StrLen(html) <= 255) && FileExist(html))
+				}
+				catch Any {
+					isFile := false
+				}
+
+				if isFile {
+					this.iHTMLFile := html
+
+					this.iHTML := FileRead(html)
+				}
+				else if !FileExist(this.iHTMLFile)
 					FileAppend(html, this.iHTMLFile, "UTF-8")
 				else
 					loop {

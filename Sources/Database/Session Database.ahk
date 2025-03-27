@@ -40,7 +40,7 @@
 #Include "..\Framework\Extensions\GDIP.ahk"
 #Include "..\Framework\Extensions\CLR.ahk"
 #Include "Libraries\SettingsDatabase.ahk"
-#Include "Libraries\TelemetryDatabase.ahk"
+#Include "Libraries\LapsDatabase.ahk"
 #Include "Libraries\TyresDatabase.ahk"
 #Include "Libraries\PressuresEditor.ahk"
 #Include "Libraries\TelemetryViewer.ahk"
@@ -76,6 +76,12 @@ global gPositionInfoEnabled := true
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Public Classes Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+class EditLapsWindow extends Window {
+	Close(*) {
+		editLaps("Close")
+	}
+}
 
 class SessionDatabaseEditor extends ConfigurationItem {
 	iWindow := false
@@ -197,7 +203,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				this.iRedraw := false
 
-				if (editor.SelectedModule = "Track")
+				if ((editor.SelectedModule = "Track") && editor.TrackMap)
 					editor.updateTrackMap()
 
 				WinRedraw(this.Window)
@@ -1407,6 +1413,108 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				}
 		}
 
+		editData(listView, line, *) {
+			local type, data, simulator, car, track
+
+			DllCall("user32.dll\SendMessage", "Ptr", this.Window.Hwnd, "UInt", 0xB, "Ptr", 0, "Ptr", 0)
+
+			try {
+				if line {
+					simulator := this.SelectedSimulator
+					type := this.AdministrationListView.GetText(line, 1)
+					data := this.AdministrationListView.GetText(line, 2)
+
+					if InStr(data, " / ") {
+						data := string2Values(" / ", data)
+
+						car := this.getCarCode(simulator, data[1])
+						track := this.getTrackCode(simulator, data[2])
+					}
+					else {
+						car := this.SelectedCar
+						track := this.SelectedTrack
+
+						if (!car || (car == true))
+							car := "-"
+
+						if (!track || (track == true))
+							track := "-"
+					}
+
+					switch type, false {
+						case translate("Laps"):
+							driver := this.SessionDatabase.getDriverID(simulator, this.AdministrationListView.GetText(line, 3))
+
+							if (driver = SessionDatabase.ID) {
+								this.Window.Block()
+
+								try {
+									editLaps(this, simulator, car, track)
+								}
+								finally {
+									this.Window.Unblock()
+								}
+							}
+						case translate("Sessions"), translate("Strategies"), translate("Telemetries"), translate("Pressures"), translate("Setups"):
+							if ((car != "-") && (track != "-")) {
+								this.selectModule("Settings")
+
+								this.loadCar(car, true)
+								this.loadTrack(track, true)
+
+								switch type, false {
+									case translate("Sessions"):
+										this.selectModule("Sessions")
+									case translate("Strategies"):
+										this.selectModule("Strategies")
+									case translate("Telemetries"):
+										this.selectModule("Laps")
+									case translate("Pressures"):
+										this.selectModule("Pressures")
+									case translate("Setups"):
+										this.selectModule("Setups")
+								}
+							}
+						case translate("Tracks"), translate("Automations"):
+							if (type = translate("Tracks"))
+								track := SessionDatabase.getTrackCode(simulator, this.AdministrationListView.GetText(line, 2))
+							else if (!car || (car == true))
+								track := false
+
+							if inList(this.getTracks(simulator, true), track) {
+								DllCall("user32.dll\SendMessage", "Ptr", this.Window.Hwnd, "UInt", 0xB, "Ptr", 0, "Ptr", 0)
+
+								try {
+									this.selectModule("Settings")
+
+									if !this.SelectedCar
+										this.loadCar(true, true)
+									else if (this.SelectedCar != true)
+										if !inList(this.getTracks(simulator, this.SelectedCar), track)
+											this.loadCar(true, true)
+
+									this.loadTrack(track, true)
+
+									this.selectModule("Track", true, (type = translate("Tracks")) ? "Sections" : "Automations")
+								}
+								finally {
+									DllCall("user32.dll\SendMessage", "Ptr", this.Window.Hwnd, "UInt", 0xB, "Ptr", 1, "Ptr", 0)
+
+									WinRedraw(this.Window)
+								}
+							}
+					}
+				}
+
+				noSelect(listView, line)
+			}
+			finally {
+				DllCall("user32.dll\SendMessage", "Ptr", this.Window.Hwnd, "UInt", 0xB, "Ptr", 1, "Ptr", 0)
+
+				WinRedraw(this.Window)
+			}
+		}
+
 		deleteData(*) {
 			local msgResult
 
@@ -1920,7 +2028,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.iAdministrationListView := editorGui.Add("ListView", "x314 ys w342 h491 X:Move(0.2) W:Grow(0.8) H:Grow -Multi -LV0x10 Checked AltSubmit", collect(["Type", "Car / Track", "Driver", "#"], translate))
 		this.iAdministrationListView.OnEvent("ItemCheck", selectData)
 		this.iAdministrationListView.OnEvent("Click", noSelect)
-		this.iAdministrationListView.OnEvent("DoubleClick", noSelect)
+		this.iAdministrationListView.OnEvent("DoubleClick", editData)
 
 		editorGui.Add("Button", "x314 yp+506 w90 h23 X:Move(0.2) Y:Move vexportDataButton", translate("Export...")).OnEvent("Click", exportData)
 		editorGui.Add("Button", "xp+95 yp w90 h23 X:Move(0.2) Y:Move vimportDataButton", translate("Import...")).OnEvent("Click", importData)
@@ -3932,7 +4040,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	updateTrackMap() {
-		this.createTrackMap(this.SelectedTrackAutomation ? this.SelectedTrackAutomation.Actions : false)
+		if this.TrackMap
+			this.createTrackMap(this.SelectedTrackAutomation ? this.SelectedTrackAutomation.Actions : false)
 	}
 
 	updateTrackAutomationInfo() {
@@ -3998,7 +4107,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.iTrackSections := []
 	}
 
-	selectTrack() {
+	selectTrack(editor?) {
 		local ignore, column
 
 		if this.TrackMap
@@ -4014,6 +4123,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.loadTrackMap(this.SessionDatabase.getTrackMap(this.SelectedSimulator, this.SelectedTrack)
 							, this.SessionDatabase.getTrackImage(this.SelectedSimulator, this.SelectedTrack))
 		}
+
+		if isSet(editor)
+			if (editor = "Automations") {
+				this.Control["trackEditorTypeDropDown"].Choose(2)
+
+				this.iTrackEditorMode := "Automations"
+			}
+			else {
+				this.Control["trackEditorTypeDropDown"].Choose(1)
+
+				this.iTrackEditorMode := "Sections"
+			}
 
 		loop this.DataListView.GetCount("Col")
 			this.DataListView.DeleteCol(1)
@@ -4063,7 +4184,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local connectors := this.SessionDatabase.Connectors
 		local window := this.Window
 		local progressWindow, simulator, count, row, type, data, car, track
-		local driver, telemetryDB, tyresDB, code, candidate, progress
+		local driver, lapsDB, tyresDB, code, candidate, progress
 		local ignore, identifier, identifiers, name, extension
 
 		progressWindow := showProgress({color: "Green", title: translate("Deleting Data")})
@@ -4115,10 +4236,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				switch type, false {
 					case translate("Laps"):
-						telemetryDB := TelemetryDatabase(simulator, car, track).Database
+						lapsDB := LapsDatabase(simulator, car, track).Database
 
-						this.deleteEntries(connectors, telemetryDB, "Electronics", "Electronics", driver)
-						this.deleteEntries(connectors, telemetryDB, "Tyres", "Tyres", driver)
+						this.deleteEntries(connectors, lapsDB, "Electronics", "Electronics", driver)
+						this.deleteEntries(connectors, lapsDB, "Tyres", "Tyres", driver)
 					case translate("Pressures"):
 						tyresDB := TyresDatabase().getTyresDatabase(simulator, car, track)
 
@@ -4247,11 +4368,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				switch type, false {
 					case translate("Laps"):
-						sourceDB := TelemetryDatabase(simulator, car, track).Database
-						targetDB := Database(targetDirectory, kTelemetrySchemas)
+						sourceDB := LapsDatabase(simulator, car, track).Database
+						targetDB := Database(targetDirectory, kLapsSchemas)
 
-						schemas["Electronics"] := kTelemetrySchemas["ELectronics"]
-						schemas["Tyres"] := kTelemetrySchemas["Tyres"]
+						schemas["Electronics"] := kLapsSchemas["ELectronics"]
+						schemas["Tyres"] := kLapsSchemas["Tyres"]
 
 						for ignore, entry in sourceDB.query("Electronics", {Where: {Driver: driver}})
 							targetDB.add("Electronics", entry, true)
@@ -4399,8 +4520,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			schemas := CaseInsenseMap()
 
-			schemas["Electronics"] := kTelemetrySchemas["Electronics"]
-			schemas["Tyres"] := kTelemetrySchemas["Tyres"]
+			schemas["Electronics"] := kLapsSchemas["Electronics"]
+			schemas["Tyres"] := kLapsSchemas["Tyres"]
 			schemas["Tyres.Pressures"] := kTyresSchemas["Tyres.Pressures"]
 			schemas["Tyres.Pressures.Distribution"] := kTyresSchemas["Tyres.Pressures.Distribution"]
 
@@ -4462,7 +4583,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 								drivers := selection[key . "Telemetry"]
 
 								sourceDB := Database(sourceDirectory . "\", schemas)
-								targetDB := TelemetryDatabase(simulator, car, track).Database
+								targetDB := LapsDatabase(simulator, car, track).Database
 
 								targetDB.lock("Electronics")
 
@@ -4711,7 +4832,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local window := this.Window
 		local progressWindow := showProgress({color: "Green", title: translate("Analyzing Data")})
 		local selectedSimulator, selectedCar, selectedTrack, drivers, simulator, progress, tracks, track
-		local car, carName, found, targetDirectory, telemetryDB, ignore, driver, tyresDB, result, number, strategies
+		local car, carName, found, targetDirectory, lapsDB, ignore, driver, tyresDB, result, number, strategies
 		local sessions, telemetries, automations, trackName, setups, ignore, type, extension
 
 		progressWindow.Opt("+Owner" . window.Hwnd)
@@ -4763,10 +4884,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 									targetDirectory := (kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\")
 
-									telemetryDB := TelemetryDatabase(simulator, car, track)
+									lapsDB := LapsDatabase(simulator, car, track)
 
 									for ignore, driver in drivers {
-										number := (telemetryDB.getElectronicsCount(driver) + telemetryDB.getTyresCount(driver))
+										number := (lapsDB.getElectronicsCount(driver) + lapsDB.getTyresCount(driver))
 
 										if (number > 0)
 											this.AdministrationListView.Add("", translate("Laps"), (carName . " / " . trackName), this.SessionDatabase.getDriverName(selectedSimulator, driver), number)
@@ -5219,7 +5340,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		return this.iAvailableModules[module]
 	}
 
-	selectModule(module, force := false) {
+	selectModule(module, force := false, component?) {
 		local window
 
 		if this.moduleAvailable(module) {
@@ -5245,7 +5366,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					case "Setups":
 						this.selectSetups()
 					case "Track":
-						this.selectTrack()
+						this.selectTrack(component?)
 					case "Pressures":
 						this.selectPressures()
 				}
@@ -6337,7 +6458,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-noSelect(listView, line, *) {
+noSelect(listView, line := false, *) {
 	if line
 		listView.Modify(line, "-Select")
 }
@@ -6393,6 +6514,19 @@ copyFiles(source, destination) {
 	showProgress({progress: 50, color: "Green"})
 
 	copyDirectory(source, destination, 50 / count, &step)
+}
+
+lapTimeDisplayValue(lapTime) {
+	local seconds, fraction, minutes
+
+	if ((lapTime = "-") || isNull(lapTime))
+		return "-"
+	else {
+		if isNumber(lapTime)
+			return displayValue("Time", lapTime)
+		else
+			return lapTime
+	}
 }
 
 actionDialog(xOrCommand := false, y := false, action := false, *) {
@@ -6697,7 +6831,7 @@ selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner :
 
 selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := false, *) {
 	local x, y, w, h, editor, simulator, code, info, drivers, id, name, progressWindow, tracks, progress
-	local car, carName, track, trackName, sourceDirectory, found, telemetryDB, tyresDB, driver, driverName, rows
+	local car, carName, track, trackName, sourceDirectory, found, lapsDB, tyresDB, driver, driverName, rows
 	local strategies, telemetries, setups, automations, row, selection, data, type, number, key, sessions, extension
 
 	static importDataGui
@@ -6823,12 +6957,12 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 
 					found := false
 
-					telemetryDB := TelemetryDatabase()
+					lapsDB := LapsDatabase()
 
-					telemetryDB.setDatabase(Database(sourceDirectory . "\", kTelemetrySchemas))
+					lapsDB.setDatabase(Database(sourceDirectory . "\", kLapsSchemas))
 
 					for driver, driverName in drivers {
-						number := (telemetryDB.getElectronicsCount(driver) + telemetryDB.getTyresCount(driver))
+						number := (lapsDB.getElectronicsCount(driver) + lapsDB.getTyresCount(driver))
 
 						if (number > 0)
 							importListView.Add("Check", translate("Laps"), (carName . " / " . trackName), driverName, number)
@@ -7012,6 +7146,351 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 		importDataGui.Destroy()
 
 		return result
+	}
+}
+
+editLaps(editorOrCommand, arguments*) {
+	local simulator, car, track, ignore, entry, seperator
+	local msgResult, x, y, w, h, lapsTabView
+
+	static electronicsColumns := 9
+	static tyresColumns := 10
+
+	static result
+	static lapsGui
+	static electronicsListView
+	static tyresListView
+
+	static editor
+	static lapsDB
+
+	loadElectronics(entry) {
+		return [translate(entry["Weather"])
+			  , convertUnit("Temperature", entry["Temperature.Air"])
+			  , convertUnit("Temperature", entry["Temperature.Track"])
+			  , translate(compound(entry["Tyre.Compound"], entry["Tyre.Compound.Color"]))
+			  , convertUnit("Volume", entry["Fuel.Consumption"])
+			  , lapTimeDisplayValue(entry["Lap.Time"])
+			  , (entry["Map"] = kNull) ? translate("n/a") : entry["Map"]
+			  , (entry["TC"] = kNull) ? translate("n/a") : entry["TC"]
+			  , (entry["ABS"] = kNull) ? translate("n/a") : entry["ABS"]]
+	}
+
+	loadTyres(entry) {
+		local seperator := ((getFloatSeparator() = ".") ? ", " : "; ")
+		local pressures := []
+		local temperatures := []
+		local wear := []
+		local ignore, tyre, seperator
+
+		for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"] {
+			tyre := entry["Tyre.Pressure." . tyre]
+
+			if isNumber(tyre)
+				pressures.Push(displayValue("Float", convertUnit("Pressure", tyre)))
+			else {
+				pressures := false
+
+				break
+			}
+		}
+
+		for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"] {
+			tyre := entry["Tyre.Temperature." . tyre]
+
+			if isNumber(tyre)
+				temperatures.Push(displayValue("Float", convertUnit("Temperature", tyre)))
+			else {
+				temperatures := false
+
+				break
+			}
+		}
+
+		for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"] {
+			tyre := entry["Tyre.Wear." . tyre]
+
+			if isNumber(tyre)
+				wear.Push(Round(tyre))
+			else {
+				wear := false
+
+				break
+			}
+		}
+
+		return [translate(entry["Weather"])
+			  , convertUnit("Temperature", entry["Temperature.Air"])
+			  , convertUnit("Temperature", entry["Temperature.Track"])
+			  , translate(compound(entry["Tyre.Compound"], entry["Tyre.Compound.Color"]))
+			  , convertUnit("Volume", entry["Fuel.Consumption"])
+			  , lapTimeDisplayValue(entry["Lap.Time"])
+			  , isInteger(entry["Tyre.Laps"]) ? entry["Tyre.Laps"] : translate("n/a")
+			  , pressures ? values2String(seperator, pressures*) : translate("n/a")
+			  , temperatures ? values2String(seperator, temperatures*) : translate("n/a")
+			  , wear ? values2String(seperator, wear*) : translate("n/a")]
+	}
+
+	deleteData(localTable, serverTable, removedPredicate) {
+		withTask(ProgressTask(translate("Deleting Data")), () {
+			local ignore, connector, row, removedRows, removalRows
+
+			lapsDB.Database.lock(localTable)
+
+			try {
+				removedRows := choose(lapsDB.Database.query(localTable, {Where: {Driver: lapsDB.ID}}), removedPredicate)
+				removalRows := removedRows.Clone()
+
+				while (removalRows.Length > 0) {
+					row := removalRows.Pop()
+
+					if (row["Identifier"] != kNull)
+						for ignore, connector in editor.SessionDatabase.Connectors
+							try {
+								connector.DeleteData(serverTable, row["Identifier"])
+							}
+							catch Any as exception {
+								logError(exception, true)
+							}
+				}
+
+				lapsDB.Database.remove(localTable, false, (r) {
+					Sleep(50)
+
+					return inList(removedRows, r)
+				})
+			}
+			finally {
+				lapsDB.Database.unlock(localTable)
+			}
+		})
+	}
+
+	if (editorOrCommand = "Close")
+		result := kOk
+	else if (editorOrCommand = "LoadElectronics") {
+		electronicsListView.Delete()
+
+		electronicsListView.ModifyCol()
+
+		loop 4
+			electronicsListView.ModifyCol(A_Index, "AutoHdr")
+
+		for ignore, entry in lapsDB.Database.query("Electronics", {Where: {Driver: lapsDB.ID} })
+			electronicsListView.Add("", loadElectronics(entry)*)
+
+		electronicsListView.ModifyCol()
+
+		loop 4
+			electronicsListView.ModifyCol(A_Index, "AutoHdr")
+	}
+	else if (editorOrCommand = "LoadTyres") {
+		tyresListView.Delete()
+
+		tyresListView.ModifyCol()
+
+		loop 4
+			tyresListView.ModifyCol(A_Index, "AutoHdr")
+
+		for ignore, entry in lapsDB.Database.query("Tyres", {Where: {Driver: lapsDB.ID} })
+			tyresListView.Add("", loadTyres(entry)*)
+
+		tyresListView.ModifyCol()
+
+		loop 4
+			tyresListView.ModifyCol(A_Index, "AutoHdr")
+	}
+	else if (editorOrCommand = "CleanupElectronics") {
+		OnMessage(0x44, translateYesNoButtons)
+		msgResult := withBlockedWindows(MsgBox, translate("Entries with lap times or fuel consumption outside the standard deviation will be deleted. Do you want to proceed?")
+											  , translate("Delete"), 262436)
+		OnMessage(0x44, translateYesNoButtons, 0)
+
+		if (msgResult = "Yes") {
+			lapsGui.Block()
+
+			try {
+				withTask(ProgressTask(translate("Cleaning ") . translate("Electronics")), () => lapsDB.cleanupElectronics(lapsDB.ID))
+
+				editLaps("LoadElectronics")
+
+				editLaps("UpdateState")
+			}
+			finally {
+				lapsGui.Unblock()
+			}
+		}
+	}
+	else if (editorOrCommand = "CleanupTyres") {
+		OnMessage(0x44, translateYesNoButtons)
+		msgResult := withBlockedWindows(MsgBox, translate("Entries with lap times or fuel consumption outside the standard deviation will be deleted. Do you want to proceed?")
+											  , translate("Delete"), 262436)
+		OnMessage(0x44, translateYesNoButtons, 0)
+
+		if (msgResult = "Yes") {
+			lapsGui.Block()
+
+			try {
+				withTask(ProgressTask(translate("Cleaning ") . translate("Tyres")), () => lapsDB.cleanupTyres(lapsDB.ID))
+
+				editLaps("LoadTyres")
+
+				editLaps("UpdateState")
+			}
+			finally {
+				lapsGui.Unblock()
+			}
+		}
+	}
+	else if (editorOrCommand = "DeleteElectronics") {
+		OnMessage(0x44, translateYesNoButtons)
+		msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected data?"), translate("Delete"), 262436)
+		OnMessage(0x44, translateYesNoButtons, 0)
+
+		if (msgResult = "Yes") {
+			deleteData("Electronics", "Electronics", (entry) {
+				local index := 0
+				local match, data
+
+				while (index := electronicsListView.GetNext(index, "C")) {
+					data := loadElectronics(entry)
+					match := true
+
+					loop electronicsColumns {
+						if (electronicsListView.GetText(index, A_Index) != data[A_Index])
+							match := false
+					}
+					until !match
+
+					if match
+						return true
+				}
+
+				return false
+			})
+
+			editLaps("LoadElectronics")
+
+			editLaps("UpdateState")
+		}
+	}
+	else if (editorOrCommand = "DeleteTyres") {
+		OnMessage(0x44, translateYesNoButtons)
+		msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected data?"), translate("Delete"), 262436)
+		OnMessage(0x44, translateYesNoButtons, 0)
+
+		if (msgResult = "Yes") {
+			deleteData("Tyres", "Tyres", (entry) {
+				local index := 0
+				local match, data
+
+				while (index := tyresListView.GetNext(index, "C")) {
+					data := loadTyres(entry)
+					match := true
+
+					loop tyresColumns {
+						if (tyresListView.GetText(index, A_Index) != data[A_Index])
+							match := false
+					}
+					until !match
+
+					if match
+						return true
+				}
+
+				return false
+			})
+
+			editLaps("LoadTyres")
+
+			editLaps("UpdateState")
+		}
+	}
+	else if (editorOrCommand = "UpdateState") {
+		lapsGui["cleanupElectronicsButton"].Enabled := (electronicsListView.GetCount() > 0)
+		lapsGui["cleanupTyresButton"].Enabled := (tyresListView.GetCount() > 0)
+
+		lapsGui["deleteElectronicsButton"].Enabled := (electronicsListView.GetNext(0, "C") != 0)
+		lapsGui["deleteTyresButton"].Enabled := (tyresListView.GetNext(0, "C") != 0)
+	}
+	else {
+		editor := editorOrCommand
+		result := false
+
+		simulator := arguments[1]
+		car := arguments[2]
+		track := arguments[3]
+
+		lapsDB := LapsDatabase(simulator, car, track)
+
+		lapsGui := EditLapsWindow({Descriptor: "Session Database.LapsData"
+								 , Resizeable: true, Options: "-MaximizeBox -MinimizeBox"}
+								 , translate("Laps"))
+
+		lapsGui.SetFont("s10 Bold", "Arial")
+
+		lapsGui.Add("Text", "w394 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(lapsGui, "Session Database.LapsData"))
+
+		lapsGui.SetFont("s9 Norm", "Arial")
+
+		lapsGui.Add("Documentation", "x153 YP+20 w104 H:Center Center", translate("Laps")
+				  , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database")
+
+		lapsGui.SetFont("s8 Norm", "Arial")
+
+		lapsTabView := lapsGui.Add("Tab3", "x16 yp+30 w393 h400 H:Grow W:Grow AltSubmit -Wrap Section vlapsTabView", collect(["Electronics", "Tyres"], translate))
+
+		lapsTabView.UseTab(1)
+
+		electronicsListView := lapsGui.Add("ListView", "x24 ys+30 w377 h332 H:Grow W:Grow -Multi -LV0x10 Checked AltSubmit"
+													 , collect(["Weather", "Temperature (Air)", "Temperature (Track)", "Compound"
+															  , "Consumption", "Lap Time", "Map", "TC", "ABS"], translate))
+		electronicsListView.OnEvent("Click", noSelect)
+		electronicsListView.OnEvent("DoubleClick", noSelect)
+		electronicsListView.OnEvent("ItemCheck", (lv, *) => (noSelect(lv), editLaps("UpdateState")))
+
+		lapsGui.Add("Button", "x24 yp+340 w90 h23 Y:Move vcleanupElectronicsButton", translate("Cleanup...")).OnEvent("Click", editLaps.Bind("CleanupElectronics"))
+
+		lapsGui.Add("Button", "x311 yp w90 h23 Y:Move X:Move vdeleteElectronicsButton", translate("Delete...")).OnEvent("Click", editLaps.Bind("DeleteElectronics"))
+
+		editLaps("LoadElectronics")
+
+		lapsTabView.UseTab(2)
+
+		tyresListView := lapsGui.Add("ListView", "x24 ys+30 w377 h332 H:Grow W:Grow -Multi -LV0x10 Checked AltSubmit"
+											   , collect(["Weather", "Temperature (Air)", "Temperature (Track)", "Compound"
+														, "Consumption", "Lap Time", "Tyre Laps", "Pressures", "Temperatures", "Wear"], translate))
+		tyresListView.OnEvent("Click", noSelect)
+		tyresListView.OnEvent("DoubleClick", noSelect)
+		tyresListView.OnEvent("ItemCheck", (lv, *) => (noSelect(lv), editLaps("UpdateState")))
+
+		lapsGui.Add("Button", "x24 yp+340 w90 h23 Y:Move vcleanupTyresButton", translate("Cleanup...")).OnEvent("Click", editLaps.Bind("CleanupTyres"))
+
+		lapsGui.Add("Button", "x311 yp w90 h23 Y:Move X:Move vdeleteTyresButton", translate("Delete...")).OnEvent("Click", editLaps.Bind("DeleteTyres"))
+
+		editLaps("LoadTyres")
+
+		lapsTabView.UseTab(0)
+
+		lapsGui.Add("Button", "x174 yp+40 w80 h23 Y:Move X:Move(0.5) Default", translate("Close")).OnEvent("Click", editLaps.Bind("Close"))
+
+		editLaps("UpdateState")
+
+		lapsGui.Opt("+Owner" . editorOrCommand.Window.Hwnd)
+
+		if getWindowPosition("Session Database.LapsData", &x, &y)
+			lapsGui.Show("x" . x . " y" . y)
+		else
+			lapsGui.Show()
+
+		if getWindowSize("Session Database.LapsData", &w, &h)
+			lapsGui.Resize("Initialize", w, h)
+
+		loop
+			Sleep(100)
+		until result
+
+		lapsGui.Destroy()
 	}
 }
 

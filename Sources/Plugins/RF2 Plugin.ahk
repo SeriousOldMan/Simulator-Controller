@@ -297,7 +297,7 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 		return ((temp != "") ? temp : false)
 	}
 
-	parseCarName(carName, &model?, &nr?, &category?, &team?) {
+	parseCarName(carID, carName, &model?, &nr?, &category?, &team?) {
 		local index
 
 		model := false
@@ -344,43 +344,62 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	parseDriverName(carName, forName, surName, nickName) {
+	parseDriverName(carID, carName, forName, surName, nickName, &category?) {
+		category := false
+
 		return driverName(forName, surName, nickName)
 	}
 
-	acquirePositionsData(telemetryData, finished := false) {
-		local positionsData := super.acquirePositionsData(telemetryData, finished)
-		local driver := getMultiMapValue(positionsData, "Position Data", "Driver.Car", 0)
+	acquireStandingsData(telemetryData, finished := false) {
+		local debug := isDebug()
+		local standingsData := super.acquireStandingsData(telemetryData, finished)
+		local driver := getMultiMapValue(standingsData, "Position Data", "Driver.Car", 0)
 		local numbers := Map()
 		local duplicateNrs := false
-		local carRaw, carID, model, category, nr, forName, surName, nickName
+		local carCategory := false
+		local driverCategory := false
+		local model := false
+		local nr := false
+		local carRaw, carID, forName, surName, nickName
 
-		loop getMultiMapValue(positionsData, "Position Data", "Car.Count", 0) {
-			carRaw := getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".CarRaw", kUndefined)
+		loop getMultiMapValue(standingsData, "Position Data", "Car.Count", 0) {
+			carRaw := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".CarRaw", kUndefined)
 
 			if (carRaw != kUndefined) {
-				this.parseCarName(carRaw, &model, &nr, &category)
+				this.parseCarName(getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID")
+								, carRaw, &model, &nr, &carCategory)
 
 				if model
-					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Car", model)
+					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", model)
 
 				if (A_Index != driver) {
-					parseDriverName(this.parseDriverName(carRaw, getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Forname", "")
-															   , getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Surname", "")
-															   , getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", ""))
+					if debug
+						setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Name"
+									   , driverName(getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Forname", "")
+												  , getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Surname", "")
+												  , getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", "")))
+
+					parseDriverName(this.parseDriverName(getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID")
+													   , carRaw, getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Forname", "")
+															   , getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Surname", "")
+															   , getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", "")
+													   , &driverCategory)
 								  , &forName, &surName, &nickName)
 
-					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Forname", forName)
-					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Surname", surName)
-					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", nickName)
+					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Forname", forName)
+					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Surname", surName)
+					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", nickName)
+
+					if driverCategory
+						setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Category", driverCategory)
 				}
 
-				nr := Integer(nr ? nr : getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".ID"))
+				nr := Integer(nr ? nr : getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID"))
 
-				setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Nr", nr)
+				setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Nr", nr)
 
-				if category
-					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Category", category)
+				if carCategory
+					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Category", carCategory)
 
 				if numbers.Has(nr)
 					duplicateNrs := true
@@ -390,14 +409,14 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 		}
 
 		if duplicateNrs
-			loop getMultiMapValue(positionsData, "Position Data", "Car.Count", 0) {
-				carID := getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".ID", kUndefined)
+			loop getMultiMapValue(standingsData, "Position Data", "Car.Count", 0) {
+				carID := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID", kUndefined)
 
 				if (carID != kUndefined)
-					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Nr", carID)
+					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Nr", carID)
 			}
 
-		return positionsData
+		return standingsData
 	}
 
 	acquireTelemetryData() {
@@ -421,7 +440,7 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 														   , (lastSimulator = "rFactor 2") ? 60 : 20)
 		}
 
-		this.parseCarName(getMultiMapValue(telemetryData, "Session Data", "CarRaw"), &model)
+		this.parseCarName(false, getMultiMapValue(telemetryData, "Session Data", "CarRaw"), &model)
 
 		if model
 			setMultiMapValue(telemetryData, "Session Data", "Car", model)

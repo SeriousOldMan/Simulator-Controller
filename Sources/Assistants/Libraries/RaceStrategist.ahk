@@ -1077,43 +1077,52 @@ class RaceStrategist extends GridRaceAssistant {
 		local strategy, nextPitstop, pitstop, pitstops
 
 		if knowledgeBase {
-			if (knowledgeBase.getValue("Strategy.Name", false) && this.activeTopic(options, "Strategy")) {
-				strategy := Map("NumPitstops", knowledgeBase.getValue("Strategy.Pitstop.Count"))
+			try {
+				if (knowledgeBase.getValue("Strategy.Name", false) && this.activeTopic(options, "Strategy")) {
+					strategy := Map("NumPitstops", knowledgeBase.getValue("Strategy.Pitstop.Count"))
 
-				knowledge["Strategy"] := strategy
+					knowledge["Strategy"] := strategy
 
-				nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next", false)
+					nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next", false)
 
-				if nextPitstop {
-					pitstop := Map("Nr", nextPitstop
-								 , "Lap", (knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Lap") + 1)
-								 , "Refuel", (Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"), 1) . " Liters"))
+					if nextPitstop {
+						pitstop := Map("Nr", nextPitstop
+									 , "Lap", (knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Lap") + 1)
+									 , "Refuel", (Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"), 1) . " Liters"))
 
-					if knowledgeBase.getValue("Strategy.Pitstop.Position", false)
-						pitstop["Position"] := knowledgeBase.getValue("Strategy.Pitstop.Position")
+						if knowledgeBase.getValue("Strategy.Pitstop.Position", false)
+							pitstop["Position"] := knowledgeBase.getValue("Strategy.Pitstop.Position")
 
-					if knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change", false) {
-						pitstop["TyreChange"] := kTrue
-						pitstop["TyreCompound"] := compound(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound")
-														  , knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound.Color"))
+						if knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change", false) {
+							pitstop["TyreChange"] := kTrue
+							pitstop["TyreCompound"] := compound(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound")
+															  , knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound.Color"))
+						}
+						else
+							pitstop["TyreChange"] := kFalse
+
+						strategy["NextPitstop"] := pitstop
 					}
-					else
-						pitstop["TyreChange"] := kFalse
-
-					strategy["NextPitstop"] := pitstop
 				}
 			}
-
-			if this.activeTopic(options, "Pitstops") {
-				pitstops := []
-
-				loop knowledgeBase.getValue("Pitstop.Last", 0)
-					if (knowledgeBase.getValue("Pitstop." . A_Index . ".Lap", kUndefined) != kUndefined)
-						pitstops.Push(Map("Nr", pitstops.Length + 1
-										, "Lap", knowledgeBase.getValue("Pitstop." . A_Index . ".Lap")))
-
-				knowledge["Pitstops"] := pitstops
+			catch Any as exception {
+				logError(exception, true)
 			}
+
+			if this.activeTopic(options, "Pitstops")
+				try {
+					pitstops := []
+
+					loop knowledgeBase.getValue("Pitstop.Last", 0)
+						if (knowledgeBase.getValue("Pitstop." . A_Index . ".Lap", kUndefined) != kUndefined)
+							pitstops.Push(Map("Nr", pitstops.Length + 1
+											, "Lap", knowledgeBase.getValue("Pitstop." . A_Index . ".Lap")))
+
+					knowledge["Pitstops"] := pitstops
+				}
+				catch Any as exception {
+					logError(exception, true)
+				}
 		}
 
 		return knowledge

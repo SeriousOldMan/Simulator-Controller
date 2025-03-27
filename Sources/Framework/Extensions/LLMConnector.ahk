@@ -615,7 +615,7 @@ class LLMConnector {
 		static GetDefaults(&serviceURL, &serviceKey, &model) {
 			serviceURL := "https://api.openai.com/v1/chat/completions"
 			serviceKey := ""
-			model := "GPT 3.5 turbo"
+			model := "GPT 4o mini"
 		}
 	}
 
@@ -644,7 +644,7 @@ class LLMConnector {
 		static GetDefaults(&serviceURL, &serviceKey, &model) {
 			serviceURL := "__YOUR_AZURE_OPENAI_ENDPOINT__/openai/deployments/%model%/chat/completions?api-version=2023-05-15"
 			serviceKey := ""
-			model := "GPT 3.5 turbo"
+			model := "GPT 4o mini"
 		}
 
 		CreateServiceURL(server) {

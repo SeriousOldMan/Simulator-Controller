@@ -1769,6 +1769,29 @@ updateInstallationForV500() {
 	}
 }
 
+updateConfigurationForV626() {
+	local sessionDB, ignore, code
+
+	for ignore, code in ["AC", "ACC", "IRC", "AMS2", "PCARS2", "RF2", "LMU", "ACE", "RSP"]
+		if FileExist(kDatabaseDirectory . "User\" . code . "\Drivers.CSV") {
+			sessionDB := Database(kDatabaseDirectory . "User\" . code . "\", kSessionSchemas)
+
+			sessionDB.lock()
+
+			try {
+				sessionDB.Table["Drivers"]
+
+				sessionDB.changed("Drivers")
+			}
+			catch Any as exception {
+				logError(exception, true)
+			}
+			finally {
+				sessionDB.unlock()
+			}
+		}
+}
+
 updateConfigurationForV622() {
 	local appSettings, issueSettings, text
 
@@ -1795,29 +1818,6 @@ updateConfigurationForV622() {
 			FileAppend(text, kUserConfigDirectory . "Startup.settings")
 		}
 	}
-}
-
-updateConfgurationForV626() {
-	local sessionDB, ignore, code
-
-	for ignore, code in ["AC", "ACC", "IRC", "AMS2", "PCARS2", "RF2", "LMU", "ACE", "RSP"]
-		if FileExist(kDatabaseDirectory . "User\" . code . "\Drivers.CSV") {
-			sessionDB := Database(kDatabaseDirectory . "User\" . code . "\", kSessionSchemas)
-
-			sessionDB.lock()
-
-			try {
-				sessionDB.Table["Drivers"]
-
-				sessionDB.changed("Drivers")
-			}
-			catch Any as exception {
-				logError(exception, true)
-			}
-			finally {
-				sessionDB.unlock()
-			}
-		}
 }
 
 updateConfigurationForV610() {

@@ -1770,7 +1770,7 @@ updateInstallationForV500() {
 }
 
 updateConfigurationForV626() {
-	local sessionDB, ignore, code
+	local sessionDB, ignore, code, entry
 
 	for ignore, code in ["AC", "ACC", "IRC", "AMS2", "PCARS2", "RF2", "LMU", "ACE", "RSP"]
 		if FileExist(kDatabaseDirectory . "User\" . code . "\Drivers.CSV") {

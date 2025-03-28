@@ -3026,7 +3026,7 @@ synchronizeDrivers(groups, sessionDB, connector, simulators, timestamp, lastSync
 														 , Driver: driver["ID"], Forname: driver["Forname"]
 														 , Surname: driver["Surname"], Nickname: driver["Nickname"]})
 
-						if (connector.CountData("License", "Identifier = '" . StrLower(driver["Identifier"]) . "'") = 0) {
+						if (connector.CountData("License", "Identifier = '" . StrLower(driver["Identifier"]) . "'") = 0)
 							connector.CreateData("License", properties)
 						else
 							connector.UpdateData("License", driver["Identifier"], properties)

@@ -250,7 +250,7 @@ You can double-click on all types of data which will bring you to the correspond
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2021.jpg)
 
-As said, this editor is available to browse and cleanup your own *Laps* data. You check individual entries and delete them. Or you can use the "Cleanup..." button to automatically cleanup everything. It will remove all entries from the database, whose values for lap time, fuel consumption, and so on, are way off the average value in its group which is defined by "Weather" and "Compound". If you have configured a data replication to the Team Server, the entries will be deleted there as well.
+As said, this editor is available to browse and cleanup your own *Laps* data. To identify the entries in question, you can sort the data by clicking in the header fields as with in almost any other list. After you have identified data you want to delete, check those individual entries and click on the "Delete..." button. Or you can use the "Cleanup..." button to automatically cleanup everything. It will remove all entries from the database, whose values for lap time, fuel consumption, and so on, are way off the average value in its group which is defined by "Weather" and "Compound". If you have configured a data replication to the Team Server, the entries will be deleted there as well.
 
 ##### Exporting and Importing Data
 

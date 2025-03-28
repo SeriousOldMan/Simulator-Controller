@@ -759,9 +759,6 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 											wasNull := false
 										}
 
-										if (connector.CountData("TyresPressuresDistribution", "Identifier = '" . StrLower(identifier) . "'") = 0)
-											identifier := false
-
 										properties := substituteVariables("Identifier=%Identifier%`nDriver=%Driver%`nSimulator=%Simulator%`nCar=%Car%`nTrack=%Track%`n"
 																		. "Weather=%Weather%`nAirTemperature=%AirTemperature%`nTrackTemperature=%TrackTemperature%`n"
 																		. "TyreCompound=%TyreCompound%`nTyreCompoundColor=%TyreCompoundColor%`n"
@@ -774,10 +771,10 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 																		 , Type: pressures["Type"], Tyre: pressures["Tyre"]
 																		 , Pressure: pressures["Pressure"], Count: pressures["Count"]})
 
-										if identifier
-											connector.UpdateData("TyresPressuresDistribution", identifier, properties)
-										else
+										if (connector.CountData("TyresPressuresDistribution", "Identifier = '" . StrLower(identifier) . "'") = 0)
 											connector.CreateData("TyresPressuresDistribution", properties)
+										else
+											connector.UpdateData("TyresPressuresDistribution", identifier, properties)
 
 										counter += 1
 

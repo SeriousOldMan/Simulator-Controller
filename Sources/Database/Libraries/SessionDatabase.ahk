@@ -2977,7 +2977,7 @@ parseData(properties) {
 }
 
 synchronizeDrivers(groups, sessionDB, connector, simulators, timestamp, lastSynchronization, force, &counter) {
-	local ignore, simulator, db, modified, identifier, driver, drivers, wasNull
+	local ignore, simulator, db, modified, identifier, driver, drivers, wasNull, properties
 
 	for ignore, simulator in simulators {
 		simulator := sessionDB.getSimulatorCode(simulator)
@@ -3020,16 +3020,18 @@ synchronizeDrivers(groups, sessionDB, connector, simulators, timestamp, lastSync
 						else
 							wasNull := false
 
-						if (connector.CountData("License", "Identifier = '" . StrLower(driver["Identifier"]) . "'") = 0) {
-							connector.CreateData("License"
-											   , substituteVariables("Identifier=%Identifier%`nSimulator=%Simulator%`n"
-																   . "Driver=%Driver%`nForname=%Forname%`nSurname=%Surname%`nNickname=%Nickname%"
-																   , {Identifier: StrLower(driver["Identifier"]), Simulator: simulator
-																	, Driver: driver["ID"], Forname: driver["Forname"]
-																	, Surname: driver["Surname"], Nickname: driver["Nickname"]}))
+						properties := substituteVariables("Identifier=%Identifier%`nSimulator=%Simulator%`n"
+													    . "Driver=%Driver%`nForname=%Forname%`nSurname=%Surname%`nNickname=%Nickname%"
+														, {Identifier: StrLower(driver["Identifier"]), Simulator: simulator
+														 , Driver: driver["ID"], Forname: driver["Forname"]
+														 , Surname: driver["Surname"], Nickname: driver["Nickname"]})
 
-							counter += 1
-						}
+						if (connector.CountData("License", "Identifier = '" . StrLower(driver["Identifier"]) . "'") = 0) {
+							connector.CreateData("License", properties)
+						else
+							connector.UpdateData("License", driver["Identifier"], properties)
+
+						counter += 1
 
 						driver["Synchronized"] := timestamp
 

@@ -1779,7 +1779,8 @@ updateConfigurationForV626() {
 			sessionDB.lock()
 
 			try {
-				sessionDB.Table["Drivers"]
+				for ignore, entry in sessionDB.Table["Drivers"]
+					entry["Synchronized"] := kNull
 
 				sessionDB.changed("Drivers")
 			}

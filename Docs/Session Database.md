@@ -252,6 +252,8 @@ You can double-click on all types of data which will bring you to the correspond
 
 As said, this editor is available to browse and cleanup your own *Laps* data. To identify the entries in question, you can sort the data by clicking in the header fields as with in almost any other list. After you have identified data you want to delete, check those individual entries and click on the "Delete..." button. Or you can use the "Cleanup..." button to automatically cleanup everything. It will remove all entries from the database, whose values for lap time, fuel consumption, and so on, are way off the average value in its group which is defined by "Weather" and "Compound". If you have configured a data replication to the Team Server, the entries will be deleted there as well.
 
+Attention: Depending on the given data constellation, the command "Cleanup..." can remove quite a lot of data. So be careful and have a backup at hand, if the result is not as desired.
+
 ##### Exporting and Importing Data
 
 You can export data that has been checked by clicking on "Export...". You will be prompted to identify the target directory, where a directory containing all the selected data will be created. This export directory will be automatically named "Export_XXYYZZ", where *XXYYZZ* represents the current date and time. You may change the name afterwards, but make sure that you always pass the complete export directory to the target PC, where the data will be imported again.

@@ -65,6 +65,11 @@ luaAvailable() {
 	return (DllCall("GetModuleHandle", "str", "lua54.dll") != 0)
 }
 
+
+;;;-------------------------------------------------------------------------;;;
+;;;                    Private Functions Declaration Section                ;;;
+;;;-------------------------------------------------------------------------;;;
+
 luaL_loadfilex(L, filename, mode) => DllCall("lua54.dll\luaL_loadfilex", "ptr", L, "astr", String(filename)
 																	   , (mode == LUA_NULL) ? "int" : "str", mode == LUA_NULL ? 0 : String(mode))
 luaL_newstate() => DllCall("lua54.dll\luaL_newstate", "ptr")
@@ -161,15 +166,9 @@ lua_remove(L, idx) => (lua_rotate(L, idx, -1), lua_pop(L, 1))
 lua_replace(L, idx) => (lua_copy(L, -1, idx), lua_pop(L, 1))
 lua_upvalueindex(i) => (LUA_REGISTRYINDEX - (i))
 
-
-;;;-------------------------------------------------------------------------;;;
-;;;                    Private Functions Declaration Section                ;;;
-;;;-------------------------------------------------------------------------;;;
-
 initializeLua() {
-	if FileExist(kUserHomeDirectory . "Programs\Lua Runtime\lua54.dll") {
-		DllCall("LoadLibrary", "Str", kUserHomeDirectory . "Programs\Lua Runtime\lua54.dll", "Ptr")
-	}
+	if FileExist(kBinariesDirectory . "Code Runtime\lua54.dll")
+		DllCall("LoadLibrary", "Str", kBinariesDirectory . "Code Runtime\lua54.dll", "Ptr")
 }
 
 

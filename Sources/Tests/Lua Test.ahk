@@ -114,7 +114,7 @@ class LuaTable {
 ;;;                              Test Section                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class SimpleTest extends Assert {
+class IntegrationTest extends Assert {
 	Print_Test() {
 		global vTestResult
 
@@ -136,7 +136,9 @@ class SimpleTest extends Assert {
 
 		this.AssertEqual(userName, vTestResult, "Global variable binding failed...")
 	}
+}
 
+class BasicTest extends Assert {
 	Assert_Test() {
 		global vTestResult
 
@@ -152,7 +154,9 @@ class SimpleTest extends Assert {
 
 		this.AssertEqual(vTestResult, "Success", "Assert handling failed...")
 	}
+}
 
+class SharedDataTest extends Assert {
 	Table_Test() {
 		global vTestResult
 
@@ -181,6 +185,8 @@ class SimpleTest extends Assert {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-AHKUnit.AddTestClass(SimpleTest)
+AHKUnit.AddTestClass(IntegrationTest)
+AHKUnit.AddTestClass(BasicTest)
+AHKUnit.AddTestClass(SharedDataTest)
 
 AHKUnit.Run()

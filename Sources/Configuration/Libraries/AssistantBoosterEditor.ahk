@@ -28,6 +28,7 @@
 #Include "..\..\Framework\Extensions\JSON.ahk"
 #Include "..\..\Framework\Extensions\CodeEditor.ahk"
 #Include "..\..\Framework\Extensions\RuleEngine.ahk"
+#Include "..\..\Framework\Extensions\Lua.ahk"
 #Include "ConfigurationEditor.ahk"
 
 
@@ -1471,7 +1472,7 @@ class CallbacksEditor {
 
 				this.ScriptEditor.Brace.Chars := "()[]{}"
 				this.ScriptEditor.SyntaxEscapeChar := ""
-				this.ScriptEditor.SyntaxCommentLine := ";"
+				this.ScriptEditor.SyntaxCommentLine := "--"
 			}
 
 			this.ScriptEditor.Tab.Width := 4
@@ -1887,7 +1888,7 @@ class CallbacksEditor {
 		local valid := true
 		local name := this.Control["callbackNameEdit"].Text
 		local errorMessage := ""
-		local ignore, other, type
+		local ignore, other, type, fileName, context
 
 		if this.SelectedParameter
 			if !this.saveParameter(this.SelectedParameter)
@@ -1931,8 +1932,30 @@ class CallbacksEditor {
 				valid := false
 			}
 		}
-		else if (type = "Assistant.Script")
-			MsgBox("Syntax Check Lua Script")
+		else if (type = "Assistant.Script") {
+			fileName := temporaryFilename("luaScript", "lua")
+
+			try {
+				context := luaL_newstate()
+
+				luaL_openlibs(context)
+
+				FileAppend(this.ScriptEditor.Content[true], fileName)
+
+				if (luaL_loadfile(context, fileName) != LUA_OK)
+					throw lua_tostring(context, -1)
+
+				lua_close(context)
+			}
+			catch Any as exception {
+				errorMessage .= ("`n" . translate("Error: ") . (isObject(exception) ? exception.Message : exception))
+
+				valid := false
+			}
+			finally {
+				deleteFile(fileName)
+			}
+		}
 
 		if valid {
 			callback.Name := name
@@ -2087,7 +2110,7 @@ class CallbacksEditor {
 		local extension := ((this.Type = "Agent.Events") ? ".events" : ".actions")
 		local configuration := readMultiMap(kResourcesDirectory . "Actions\" . this.Assistant . extension)
 		local callbacks := []
-		local active, disabled, ignore, type, callback, descriptor, parameters, theCallback
+		local active, disabled, ignore, type, callback, descriptor, parameters, theCallback, context, fileName
 
 		addMultiMapValues(configuration, readMultiMap(kUserHomeDirectory . "Actions\" . this.Assistant . extension))
 
@@ -2129,7 +2152,7 @@ class CallbacksEditor {
 						}
 						catch Any as exception {
 							OnMessage(0x44, translateOkButton)
-							withBlockedWindows(MsgBox, translate("Error in builtin rule " . theCallback.Name . ":`n`n") . (isObject(exception) ? exception.Message : exception), translate("Error"), 262160)
+							withBlockedWindows(MsgBox, "Error in builtin rule " . theCallback.Name . ":`n`n" . (isObject(exception) ? exception.Message : exception), translate("Error"), 262160)
 							OnMessage(0x44, translateOkButton, 0)
 						}
 
@@ -2140,11 +2163,27 @@ class CallbacksEditor {
 
 					if (theCallback.Builtin && isDebug())
 						try {
-							MsgBox("Syntax Check Lua Script")
+							fileName := temporaryFilename("luaScript", "lua")
+
+							try {
+								context := luaL_newstate()
+
+								luaL_openlibs(context)
+
+								FileAppend(theCallback.Script, fileName)
+
+								if (luaL_loadfile(context, fileName) != LUA_OK)
+									throw lua_tostring(context, -1)
+
+								lua_close(context)
+							}
+							finally {
+								deleteFile(fileName)
+							}
 						}
 						catch Any as exception {
 							OnMessage(0x44, translateOkButton)
-							withBlockedWindows(MsgBox, translate("Error in builtin rule " . theCallback.Name . ":`n`n") . (isObject(exception) ? exception.Message : exception), translate("Error"), 262160)
+							withBlockedWindows(MsgBox, "Error in builtin script " . theCallback.Name . ":`n`n" . (isObject(exception) ? exception.Message : exception), translate("Error"), 262160)
 							OnMessage(0x44, translateOkButton, 0)
 						}
 

@@ -132,7 +132,7 @@ class IntegrationTest extends Assert {
 
 		setPrint(L, lua_print)
 
-		luaL_dofile(L, kSourcesDirectory . "Tests\Lua Scripts\test01.lua")
+		luaL_dofile(L, kSourcesDirectory . "Tests\Test Scripts\test01.lua")
 
 		this.AssertEqual(userName, vTestResult, "Global variable binding failed...")
 	}
@@ -150,7 +150,7 @@ class BasicTest extends Assert {
 
 		setPrint(L, lua_print)
 
-		luaL_dofile(L, kSourcesDirectory . "Tests\Lua Scripts\test02.lua")
+		luaL_dofile(L, kSourcesDirectory . "Tests\Test Scripts\test02.lua")
 
 		this.AssertEqual(vTestResult, "Success", "Assert handling failed...")
 	}
@@ -174,7 +174,7 @@ class SharedDataTest extends Assert {
 			.add("test",    "func", lua_test)
 			.finish("globs")
 
-		luaL_dofile(L, kSourcesDirectory . "Tests\Lua Scripts\test03.lua")
+		luaL_dofile(L, kSourcesDirectory . "Tests\Test Scripts\test03.lua")
 
 		this.AssertTrue(vTestResult, "Table handling failed...")
 	}

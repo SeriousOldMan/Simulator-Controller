@@ -354,7 +354,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		choices := ["Windows (Server)", "Windows (Desktop)", "Azure Cognitive Services", "Google Speech Services"]
 		chosen := 0
 
-		if (isDebug() || FileExist(kUserHomeDirectory . "Programs\Whisper Runtime"))
+		if (isDebug() || FileExist(kProgramsDirectory . "Whisper Runtime"))
 			choices.Push("Whisper Runtime")
 
 		widget18 := window.Add("Text", "x" . x . " yp+42 w112 h23 +0x200 vvoiceRecognizerLabel Hidden", translate("Speech Recognizer"))
@@ -490,7 +490,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 			this.Value["voiceSynthesizer"] := inList(["Windows", "dotNET", "Azure", "Google"], synthesizer)
 
-			if FileExist(kUserHomeDirectory . "Programs\Whisper Runtime")
+			if FileExist(kProgramsDirectory . "Whisper Runtime")
 				this.Value["voiceRecognizer"] := (inList(["Server", "Desktop", "Azure", "Google", "Whisper"], recognizer) || 2)
 			else
 				this.Value["voiceRecognizer"] := (inList(["Server", "Desktop", "Azure", "Google"], recognizer) || 2)

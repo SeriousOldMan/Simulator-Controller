@@ -3168,13 +3168,13 @@ installZIP(path, application) {
 	deleteDirectory(A_Temp . "\Simulator Controller\Temp")
 
 	DirCreate(A_Temp . "\Simulator Controller\Temp")
-	DirCreate(kUserHomeDirectory . "Programs")
+	DirCreate(normalizeDirectoryPath(kProgramsDirectory))
 
 	RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kHomeDirectory . path . "' -DestinationPath '" . A_Temp . "\Simulator Controller\Temp' -Force", , "Hide")
 
-	FileCopy(A_Temp . "\Simulator Controller\Temp\" . application, kUserHomeDirectory . "Programs", 1)
+	FileCopy(A_Temp . "\Simulator Controller\Temp\" . application, normalizeDirectoryPath(kProgramsDirectory), 1)
 
-	return (kUserHomeDirectory . "Programs\" . application)
+	return (kProgramsDirectory . application)
 }
 
 installEXE(command) {

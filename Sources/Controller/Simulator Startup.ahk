@@ -230,11 +230,11 @@ class SimulatorStartup extends ConfigurationItem {
 		try {
 			logMessage(kLogInfo, translate("Starting ") . translate("Simulator Controller"))
 
-			if FileExist(kUserHomeDirectory . "Programs\Startup.bat")
-				Run(kUserHomeDirectory . "Programs\Startup.bat")
+			if FileExist(kProgramsDirectory . "Startup.bat")
+				Run(kProgramsDirectory . "Startup.bat")
 
-			if FileExist(kUserHomeDirectory . "Programs\Startup.cmd")
-				Run(kUserHomeDirectory . "Programs\Startup.cmd")
+			if FileExist(kProgramsDirectory . "Startup.cmd")
+				Run(kProgramsDirectory . "Startup.cmd")
 
 			exePath := (kBinariesDirectory . "Process Manager.exe")
 

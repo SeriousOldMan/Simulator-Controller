@@ -752,7 +752,7 @@ class LLMConnector {
 				if llmRuntime
 					this.iLLMRuntime := llmRuntime
 				else {
-					exePath := (kUserHomeDirectory . "Programs\LLM Runtime\LLM Runtime.exe")
+					exePath := (kProgramsDirectory . "LLM Runtime\LLM Runtime.exe")
 
 					if FileExist(exePath) {
 						deleteFile(kTempDirectory . "LLMRuntime.cmd")
@@ -959,7 +959,7 @@ class LLMConnector {
 
 	static Providers {
 		Get {
-			if FileExist(kUserHomeDirectory . "Programs\LLM Runtime\LLM Runtime.exe")
+			if FileExist(kProgramsDirectory . "LLM Runtime\LLM Runtime.exe")
 				return ["Generic", "OpenAI", "Mistral AI", "Azure", "OpenRouter", "Ollama", "GPT4All", "LLM Runtime"]
 			else
 				return ["Generic", "OpenAI", "Mistral AI", "Azure", "OpenRouter", "Ollama", "GPT4All"]

@@ -7,12 +7,20 @@ To change any of the low level configuration options, create a file named "Core 
 
 Please note, that all this confguration options are documented here for the experienced user with technical skills. Do not change any of them, until you are told so by me, or you do know what you are doing.
 
-Let's start with the configuration settings for the task processing engine. Four priority levels are defined and tasks with higher priority will postpone the processing of tasks with lower priority, when scheduled. For systems with a faster CPU you can make the schedule window smaller, whereas slower PCs might need a less demanding schedule plan.
+Let's start with some very low system level settings.
+
+| Category   | Setting  | Default | Description |
+|------------|----------|---------|-------------|
+| Locations  | Temp     | [Documents]\Simulator Controller\Temp     | The location of all temporary files of Simulator Controller. Set this to a different location, if your Documents folder is under control of *One Drive* or alike. |
+| Locations  | Programs | [Documents]\Simulator Controller\Programs | The location of all additional or optional programs installed or created by Simulator Controller. Especially when using Whisper, this can consume quite a lot of disk space. Set this to a different location, if your Documents folder is on a drive with restricted size, but be sure to choose a fast alternative drive. |
 
 | Category | Setting | Default | Description |
 |----------|---------|---------|-------------|
 | Process  | Memory.Max | 1024 | The max memory in MB a process may consume, before it get killed automatically. |
 | Process  | Memory.Critical | 80 | The percentage of max memory usage, when memory reporting starts and special debug code is activated. |
+
+
+Next are the configuration settings for the task processing engine. Four priority levels are defined and tasks with higher priority will postpone the processing of tasks with lower priority, when scheduled. For systems with a faster CPU you can make the schedule window smaller, whereas slower PCs might need a less demanding schedule plan.
 
 | Category | Setting | Default | Description |
 |----------|---------|---------|-------------|

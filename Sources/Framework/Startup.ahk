@@ -190,11 +190,21 @@ loadSimulatorConfiguration() {
 }
 
 initializeEnvironment() {
-	global kSimulatorConfiguration, kDetachedInstallation, kProperInstallation
-	local installOptions, installLocation, install, newID, idFileName, ID, ticks, wait, major, minor, msgResult
+	global kSimulatorConfiguration, kDetachedInstallation, kProperInstallation, kTempDirectory, kProgramsDirectory
+	local installOptions, installLocation, install, newID, idFileName, ID, ticks, wait, major, minor, msgResult, path, settings
 
 	if kLogStartup
 		logMessage(kLogOff, "Initializing environment...")
+
+	settings := readMultiMap(kUserConfigDirectory . "Core Settings.ini")
+
+	path := getMultiMapValue(settings, "Locations", "Temp", false)
+	if path
+		kTempDirectory := (normalizeDirectoryPath(path) . "\")
+
+	path := getMultiMapValue(settings, "Locations", "Programs", false)
+	if path
+		kProgramsDirectory := (normalizeDirectoryPath(path) . "\")
 
 	if !isDebug() {
 		if FileExist(kConfigDirectory . "Simulator Controller.install") {

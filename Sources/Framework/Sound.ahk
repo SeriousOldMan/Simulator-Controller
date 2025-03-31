@@ -22,14 +22,14 @@ requireSoundPlayer(player) {
 	local path
 
 	if (kSox && FileExist(kSox)) {
-		path := (kUserHomeDirectory . "Programs\" . player)
+		path := (kProgramsDirectory . player)
 
 		if FileExist(path)
 			return path
 		else
 			loop
 				try {
-					DirCreate(kUserHomeDirectory . "Programs")
+					DirCreate(normalizeDirectoryPath(kProgramsDirectory))
 
 					FileCopy(kSox, path, true)
 

@@ -492,7 +492,7 @@ class SpeechRecognizer {
 				instance.SetEngine(engine)
 			}
 			else if (engine = "Whisper") {
-				if (!isDebug() && !FileExist(kUserHomeDirectory . "Programs\Whisper Runtime\faster-whisper-xxl.exe"))
+				if (!isDebug() && !FileExist(kProgramsDirectory . "Whisper Runtime\faster-whisper-xxl.exe"))
 					throw Exception("Unsupported engine detected in SpeechRecognizer.__New...")
 
 				this.iEngine := "Whisper"
@@ -805,13 +805,13 @@ class SpeechRecognizer {
 		else if this.Model {
 			DirCreate(kTempDirectory . "Whisper")
 
-			install := !FileExist(kUserHomeDirectory . "Programs\Whisper Runtime\_models\faster-whisper-" . this.Model)
+			install := !FileExist(kProgramsDirectory . "Whisper Runtime\_models\faster-whisper-" . this.Model)
 
 			if (install && !kSilentMode)
 				showProgress({progress: (progress := 0), color: "Blue", title: translate("Downloading ") . this.Model . translate("...")})
 
 			try {
-				Run(kUserHomeDirectory . "Programs\Whisper Runtime\faster-whisper-xxl.exe `"" . audioFile . "`" -o `"" . kTempDirectory . "Whisper" . "`" --language " . StrLower(this.Language) . " -f json -m " . StrLower(this.Model) . " --beep_off", , "Hide", &pid)
+				Run(kProgramsDirectory . "Whisper Runtime\faster-whisper-xxl.exe `"" . audioFile . "`" -o `"" . kTempDirectory . "Whisper" . "`" --language " . StrLower(this.Language) . " -f json -m " . StrLower(this.Model) . " --beep_off", , "Hide", &pid)
 
 				while ProcessExist(pid) {
 					if (install && !kSilentMode) {

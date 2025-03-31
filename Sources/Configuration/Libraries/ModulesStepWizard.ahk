@@ -574,19 +574,19 @@ class RuntimePreset extends NamedPreset {
 
 					Download(url, A_Temp . "\" . this.Prefix . " Runtime.zip")
 
-					deleteDirectory(kUserHomeDirectory . "Programs\" . this.Prefix . " Runtime")
+					deleteDirectory(kProgramsDirectory . this.Prefix . " Runtime")
 
-					DirCreate(kUserHomeDirectory . "Programs\" . this.Prefix . " Runtime")
+					DirCreate(kProgramsDirectory . this.Prefix . " Runtime")
 
 					showProgress({color: "Green", message: translate("Extracting...")})
 
 					try {
-						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\" . this.Prefix . " Runtime.zip' -DestinationPath '" . kUserHomeDirectory . "Programs\" . this.Prefix . " Runtime" . "' -Force", , "Hide")
+						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\" . this.Prefix . " Runtime.zip' -DestinationPath '" . kProgramsDirectory . this.Prefix . " Runtime" . "' -Force", , "Hide")
 
-						if !FileExist(kUserHomeDirectory . "Programs\" . this.Prefix . " Runtime")
+						if !FileExist(kProgramsDirectory . this.Prefix . " Runtime")
 							throw "Archive does not contain a valid download package..."
 						else {
-							SetWorkingDir(kUserHomeDirectory . "Programs\" . this.Prefix . " Runtime")
+							SetWorkingDir(kProgramsDirectory . this.Prefix . " Runtime")
 
 							RunWait("Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File", , "Hide")
 						}
@@ -620,7 +620,7 @@ class RuntimePreset extends NamedPreset {
 	}
 
 	uninstall(wizard) {
-		deleteDirectory(kUserHomeDirectory . "Programs\" . this.Prefix . " Runtime")
+		deleteDirectory(kProgramsDirectory . this.Prefix . " Runtime")
 	}
 }
 

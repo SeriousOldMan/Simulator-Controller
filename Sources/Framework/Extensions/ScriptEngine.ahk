@@ -157,7 +157,7 @@ lua_remove(L, idx) => (lua_rotate(L, idx, -1), lua_pop(L, 1))
 lua_replace(L, idx) => (lua_copy(L, -1, idx), lua_pop(L, 1))
 lua_upvalueindex(i) => (LUA_REGISTRYINDEX - (i))
 
-initializeLua() {
+initializeScriptEngine() {
 	if FileExist(kBinariesDirectory . "Code Runtime\lua54.dll")
 		DllCall("LoadLibrary", "Str", kBinariesDirectory . "Code Runtime\lua54.dll", "Ptr")
 }
@@ -167,7 +167,7 @@ initializeLua() {
 ;;;                    Public Functions Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-scriptAvailable() {
+scriptEngineAvailable() {
 	return (DllCall("GetModuleHandle", "str", "lua54.dll") != 0)
 }
 
@@ -245,4 +245,4 @@ scriptGetBoolean(context) {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-initializeLua()
+initializeScriptEngine()

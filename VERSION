@@ -1,9 +1,9 @@
 [Development]
 Version=6.2.6.0-dev
 Target=6.2.6.0-release
-Date=03/28/2025
+Date=03/30/2025
 Download=
-Changes=Fixed several UTF encoding problems for driver names in the session database
+Changes=Fixed several UTF encoding problems for driver names in the session database, Integrated Lua as scripting language
 Components=Media->5.6.1,Configuration->6.2.4,Utilities->6.2.2
 [Release]
 Version=6.2.5.0-release

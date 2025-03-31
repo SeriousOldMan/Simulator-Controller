@@ -38,6 +38,8 @@
 
 #Include "..\Framework\Extensions\HTMLViewer.ahk"
 #Include "..\Framework\Extensions\CodeEditor.ahk"
+#Include "..\Framework\Extensions\Lua.ahk"
+#Include "..\Framework\Extensions\RuleEngine.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Database\Libraries\SessionDatabaseBrowser.ahk"
 #Include "..\Database\Libraries\SettingsDatabase.ahk"
@@ -4109,10 +4111,45 @@ class ValidatorsEditor {
 		this.updateState()
 	}
 
-	setScript(text, readOnly := false) {
+	setScript(type, text, readOnly := false) {
+		initializeLanguage(type) {
+			this.ScriptEditor.CaseSense := false
+
+			if (type = "Rules") {
+				this.ScriptEditor.SetKeywords("priority"
+											, "Any All None One Predicate"
+											, "Call Prove ProveAll Set Get Clear Produce Option Sqrt Unbound Append get"
+											, "messageShow messageBox"
+											, "? ! fail"
+											, ""
+											, "true false")
+
+				this.ScriptEditor.Brace.Chars := "()[]{}"
+				this.ScriptEditor.SyntaxEscapeChar := "``"
+				this.ScriptEditor.SyntaxCommentLine := ";"
+			}
+			else {
+				this.ScriptEditor.SetKeywords("_VERSION assert collectgarbage dofile error gcinfo loadfile loadstring print rawget rawset require tonumber tostring type unpack"
+											, "_ALERT _ERRORMESSAGE _INPUT _PROMPT _OUTPUT _STDERR _STDIN _STDOUT call dostring foreach foreachi getn globals newtype sort tinsert tremove"
+											, "and break do else elseif end false for function if in local nil not or repeat return then true until while"
+											, "abs acos asin atan atan2 ceil cos deg exp floor format frexp gsub ldexp log log10 max min mod rad random randomseed sin sqrt strbyte strchar strfind strlen strlower strrep strsub strupper tan"
+											, "openfile closefile readfrom writeto appendto remove rename flush seek tmpfile tmpname read write clock date difftime execute exit getenv setlocale time"
+											, "_G getfenv getmetatable ipairs loadlib next pairs pcall rawequal setfenv setmetatable xpcall string table math coroutine io os debug load module select"
+											, "string.byte string.char string.dump string.find string.len string.lower string.rep string.sub string.upper string.format string.gfind string.gsub table.concat table.foreach table.foreachi table.getn table.sort table.insert table.remove table.setn math.abs math.acos math.asin math.atan math.atan2 math.ceil math.cos math.deg math.exp math.floor math.frexp math.ldexp math.log math.log10 math.max math.min math.mod math.pi math.pow math.rad math.random math.randomseed math.sin math.sqrt math.tan string.gmatch string.match string.reverse table.maxn math.cosh math.fmod math.modf math.sinh math.tanh math.huge")
+
+				this.ScriptEditor.Brace.Chars := "()[]{}"
+				this.ScriptEditor.SyntaxEscapeChar := ""
+				this.ScriptEditor.SyntaxCommentLine := "--"
+			}
+
+			this.ScriptEditor.Tab.Width := 4
+		}
+
 		this.ScriptEditor.Loading := true
 
 		try {
+			initializeLanguage(type)
+
 			this.ScriptEditor.Content[true] := text
 			this.ScriptEditor.Editable := !readOnly
 			this.ScriptEditor.Enabled := true
@@ -4187,7 +4224,7 @@ class ValidatorsEditor {
 			}
 
 			if (this.ScriptEditor.Content[true] = "")
-				this.setScript("; Insert your rules here...`n`n", this.SelectedValidator.Builtin)
+				this.setScript("Rules", "; Insert your rules here...`n`n", this.SelectedValidator.Builtin)
 
 			this.ScriptEditor.Visible := true
 		}
@@ -4195,7 +4232,7 @@ class ValidatorsEditor {
 			this.Control["copyValidatorButton"].Enabled := false
 			this.Control["deleteValidatorButton"].Enabled := false
 
-			this.setScript("", true)
+			this.setScript("Rules", "", true)
 			this.Control["validatorNameEdit"].Text := ""
 
 			this.ScriptEditor.Visible := true
@@ -4233,7 +4270,7 @@ class ValidatorsEditor {
 				return
 			}
 
-		validator := {Name: "", Builtin: false, Script: ""}
+		validator := {Type: "Rules", Name: "", Builtin: false, Script: ""}
 
 		this.Validators.Push(validator)
 
@@ -4286,12 +4323,12 @@ class ValidatorsEditor {
 		if validator {
 			this.Control["validatorNameEdit"].Text := validator.Name
 
-			this.setScript(validator.Script, validator.Builtin)
+			this.setScript("Rules", validator.Script, validator.Builtin)
 		}
 		else {
 			this.Control["validatorNameEdit"].Text := ""
 
-			this.setScript("", true)
+			this.setScript("Rules", "", true)
 		}
 
 		this.updateState()
@@ -4301,7 +4338,7 @@ class ValidatorsEditor {
 		local valid := true
 		local name := this.Control["validatorNameEdit"].Text
 		local errorMessage := ""
-		local ignore, other, type
+		local ignore, other, type, fileName, context
 
 		if (Trim(name) = "") {
 			errorMessage .= ("`n" . translate("Error: ") . "Name cannot be empty...")
@@ -4316,13 +4353,39 @@ class ValidatorsEditor {
 				valid := false
 			}
 
-		try {
-			RuleCompiler().compileRules(this.ScriptEditor.Content[true], &ignore := false, &ignore := false)
-		}
-		catch Any as exception {
-			errorMessage .= ("`n" . translate("Error: ") . (isObject(exception) ? exception.Message : exception))
+		if validator.Type = "Rules" {
+			try {
+				RuleCompiler().compileRules(this.ScriptEditor.Content[true], &ignore := false, &ignore := false)
+			}
+			catch Any as exception {
+				errorMessage .= ("`n" . translate("Error: ") . (isObject(exception) ? exception.Message : exception))
 
-			valid := false
+				valid := false
+			}
+		}
+		else {
+			fileName := temporaryFilename("luaScript", "lua")
+
+			try {
+				context := luaL_newstate()
+
+				luaL_openlibs(context)
+
+				FileAppend(this.ScriptEditor.Content[true], fileName)
+
+				if (luaL_loadfile(context, fileName) != LUA_OK)
+					throw lua_tostring(context, -1)
+
+				lua_close(context)
+			}
+			catch Any as exception {
+				errorMessage .= ("`n" . translate("Error: ") . (isObject(exception) ? exception.Message : exception))
+
+				valid := false
+			}
+			finally {
+				deleteFile(fileName)
+			}
 		}
 
 		if valid {
@@ -4346,20 +4409,34 @@ class ValidatorsEditor {
 
 	loadValidators() {
 		local validators := []
-		local ignore, fileName, theValidator
+		local ignore, fileName, validator
 
 		for ignore, fileName in getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\") {
 			SplitPath(fileName, , , , &validator)
 
 			if (choose(validators, (v) => v.Name = validator).Length = 0)
-				validators.Push({Name: validator, Builtin: true, Script: FileRead(fileName)})
+				validators.Push({Type: "Rules", Name: validator, Builtin: true, Script: FileRead(fileName)})
+		}
+
+		for ignore, fileName in getFileNames("*.script", kResourcesDirectory . "Strategy\Validators\") {
+			SplitPath(fileName, , , , &validator)
+
+			if (choose(validators, (v) => v.Name = validator).Length = 0)
+				validators.Push({Type: "Script", Name: validator, Builtin: true, Script: FileRead(fileName)})
 		}
 
 		for ignore, fileName in getFileNames("*.rules", kUserHomeDirectory . "Validators\") {
 			SplitPath(fileName, , , , &validator)
 
 			if (choose(validators, (v) => v.Name = validator).Length = 0)
-				validators.Push({Name: validator, Builtin: false, Script: FileRead(fileName)})
+				validators.Push({Type: "Rules", Name: validator, Builtin: false, Script: FileRead(fileName)})
+		}
+
+		for ignore, fileName in getFileNames("*.script", kUserHomeDirectory . "Validators\") {
+			SplitPath(fileName, , , , &validator)
+
+			if (choose(validators, (v) => v.Name = validator).Length = 0)
+				validators.Push({Type: "Script", Name: validator, Builtin: false, Script: FileRead(fileName)})
 		}
 
 		this.Validators := validators

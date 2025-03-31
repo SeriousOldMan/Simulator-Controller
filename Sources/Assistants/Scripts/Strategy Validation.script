@@ -126,7 +126,7 @@ function pitstop(nr)
 		
 	return {lap = pitstopLaps[nr],
 			time = pitstopTimes[nr],
-			fuel = pitstopRefuels[nr]
+			fuel = pitstopRefuels[nr],
 			tyreCompound = tc,
 			tyreCompoundColor = tcc,
 			tyreSet = ts}

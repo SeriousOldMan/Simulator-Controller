@@ -153,19 +153,26 @@ class StrategySimulation {
 
 			luaL_openlibs(context)
 
-			if (luaL_loadfile(context, kResourcesDirectory . "Strategy\Rules\Strategy Validation.script") != LUA_OK) {
-				lua_close(context)
+			script := FileRead(kResourcesDirectory . "Strategy\Scripts\Strategy Validation.script")
 
-				throw lua_tostring(context, -1)
+			script .= ("`n`n" . FileRead(scriptFileName))
+
+			scriptFileName := temporaryFileName("validation", "script")
+
+			try {
+				FileAppend(script, scriptFileName)
+
+				if (luaL_loadfile(context, scriptFileName) != LUA_OK) {
+					lua_close(context)
+
+					throw lua_tostring(context, -1)
+				}
+				else
+					return context
 			}
-
-			if (luaL_loadfile(context, scriptFileName) != LUA_OK) {
-				lua_close(context)
-
-				throw lua_tostring(context, -1)
+			finally {
+				deleteFile(scriptFileName)
 			}
-			else
-				return context
 		}
 		catch Any as exception {
 			message := (isObject(exception) ? exception.Message : exception)

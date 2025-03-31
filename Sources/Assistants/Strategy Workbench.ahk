@@ -38,7 +38,7 @@
 
 #Include "..\Framework\Extensions\HTMLViewer.ahk"
 #Include "..\Framework\Extensions\CodeEditor.ahk"
-#Include "..\Framework\Extensions\Lua.ahk"
+#Include "..\Framework\Extensions\ScriptEngine.ahk"
 #Include "..\Framework\Extensions\RuleEngine.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Database\Libraries\SessionDatabaseBrowser.ahk"
@@ -4340,7 +4340,7 @@ class ValidatorsEditor {
 		local valid := true
 		local name := this.Control["validatorNameEdit"].Text
 		local errorMessage := ""
-		local ignore, other, type, fileName, context
+		local ignore, other, type, fileName, context, message
 
 		if (Trim(name) = "") {
 			errorMessage .= ("`n" . translate("Error: ") . "Name cannot be empty...")
@@ -4366,19 +4366,17 @@ class ValidatorsEditor {
 			}
 		}
 		else {
-			fileName := temporaryFilename("luaScript", "lua")
+			fileName := temporaryFilename("script", "script")
 
 			try {
-				context := luaL_newstate()
-
-				luaL_openlibs(context)
+				context := scriptOpenContext()
 
 				FileAppend(this.ScriptEditor.Content[true], fileName)
 
-				if (luaL_loadfile(context, fileName) != LUA_OK)
-					throw lua_tostring(context, -1)
+				if !scriptLoadScript(context, fileName, &message)
+					throw message
 
-				lua_close(context)
+				scriptCloseContext(context)
 			}
 			catch Any as exception {
 				errorMessage .= ("`n" . translate("Error: ") . (isObject(exception) ? exception.Message : exception))

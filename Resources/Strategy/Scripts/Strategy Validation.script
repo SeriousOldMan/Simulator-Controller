@@ -14,14 +14,14 @@ function totalFuel()
 end
 
 function startFuel()
-	return setup()
+	return __Setup[1]
 end
 
 function pitstopFuel()
 	local nf = 0
 	local f = 0
 	
-	for pf in pitstopRefuels do
+	for i, pf in ipairs(__PitstopRefuels) do
 		f = f + pf
 		
 		if pf > 0 then
@@ -33,23 +33,25 @@ function pitstopFuel()
 end
 
 function startTyreCompound()
-	local sf, tc, tcc = setup()
-	
-	return tc, tcc
+	return {compound = __Setup[2], color = __Setup[3]}
 end
 
 function startTyreSet()
-	local sf, tc, tcc, tc = setup()
-	
-	return ts
+	return __Setup[4]
 end
 
 function pitstopTyreCompounds()
 	local tcs = {}
 	
-	for tc in pitstopTyreCompounds do
+	for i, tc in ipairs(__PitstopTyreCompounds) do
 		if tc ~= nil and tc ~= false then
-			table.insert(tcs, tc)
+			table.insert(tcs, {compound = tc, color = nil})
+		end
+	end
+	
+	for i, tcc in ipairs(__PitstopTyreCompoundColors) do
+		if tcc ~= nil and tcc ~= false then
+			tcs[i].color = tcc
 		end
 	end
 		
@@ -59,13 +61,9 @@ end
 function pitstopTyreSets()
 	local tss = {}
 	
-	for tc in pitstopTyreCompounds do
-		if tc ~= nil and tc ~= false  then
-			ts = tc.set
-			
-			if ts ~= nil and ts ~= false then
-				table.insert(tss, ts)
-			end
+	for i, ts in ipairs(__PitstopTyreSets) do
+		if ts ~= nil and ts ~= false then
+			table.insert(tss, ts)
 		end
 	end
 	
@@ -81,10 +79,8 @@ end
 function tyreCompounds()
 	local tcs = { startTyreCompound() }
 	
-	for tc in pitstopTyreCompounds do
-		if tc ~= nil and tc ~= false  then
-			table.insert(tcs, tc)
-		end
+	for i, tc in ipairs(pitstopTyreCompounds()) do
+		table.insert(tcs, tc)
 	end
 	
 	return tcs
@@ -93,40 +89,30 @@ end
 function tyreSets()
 	local tss = { startTyreSet() }
 	
-	for tc in pitstopTyreCompounds do
-		if tc ~= nil and tc ~= false  then
-			ts = tc.set
-			
-			if ts ~= nil and ts ~= false  then
-				table.insert(tss, ts)
-			end
-		end
+	for i, ts in ipairs(pitstopTyreSets()) do
+		table.insert(tss, ts)
 	end
 	
 	return tss
 end
 
 function pitstops()
-	return table.getn(pitstopRefuels)
+	return table.getn(__PitstopRefuels)
 end
 
 function pitstop(nr)
-	local cmp = pitstopTyreCompounds[nr]
+	local tc = __PitstopTyreCompounds[nr]
+	local tcc = __PitstopTyreCompoundColors[nr]
 	local tc, tcc, ts
 	
-	if cmp == nil or cmp == false then
-		tc = false
+	if tc == nil or tc == false then
 		tcc = false
 		ts = false
-	else
-		tc = cmp.compound
-		tcc = cmp.color
-		ts = cmp.set
 	end
 		
-	return {lap = pitstopLaps[nr],
-			time = pitstopTimes[nr],
-			fuel = pitstopRefuels[nr],
+	return {lap = __PitstopLaps[nr],
+			time = __PitstopTimes[nr],
+			fuel = __PitstopRefuels[nr],
 			tyreCompound = tc,
 			tyreCompoundColor = tcc,
 			tyreSet = ts}

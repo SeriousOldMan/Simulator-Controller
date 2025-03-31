@@ -28,7 +28,7 @@
 #Include "..\..\Framework\Extensions\JSON.ahk"
 #Include "..\..\Framework\Extensions\CodeEditor.ahk"
 #Include "..\..\Framework\Extensions\RuleEngine.ahk"
-#Include "..\..\Framework\Extensions\Lua.ahk"
+#Include "..\..\Framework\Extensions\ScriptEngine.ahk"
 #Include "ConfigurationEditor.ahk"
 
 
@@ -1888,7 +1888,7 @@ class CallbacksEditor {
 		local valid := true
 		local name := this.Control["callbackNameEdit"].Text
 		local errorMessage := ""
-		local ignore, other, type, fileName, context
+		local ignore, other, type, fileName, context, message
 
 		if this.SelectedParameter
 			if !this.saveParameter(this.SelectedParameter)
@@ -1933,19 +1933,17 @@ class CallbacksEditor {
 			}
 		}
 		else if (type = "Assistant.Script") {
-			fileName := temporaryFilename("luaScript", "lua")
+			fileName := temporaryFilename("script", "script")
 
 			try {
-				context := luaL_newstate()
-
-				luaL_openlibs(context)
+				context := scriptOpenContext()
 
 				FileAppend(this.ScriptEditor.Content[true], fileName)
 
-				if (luaL_loadfile(context, fileName) != LUA_OK)
-					throw lua_tostring(context, -1)
+				if !scriptLoadScript(context, fileName, &message)
+					throw message
 
-				lua_close(context)
+				scriptCloseContext(context)
 			}
 			catch Any as exception {
 				errorMessage .= ("`n" . translate("Error: ") . (isObject(exception) ? exception.Message : exception))
@@ -2110,7 +2108,7 @@ class CallbacksEditor {
 		local extension := ((this.Type = "Agent.Events") ? ".events" : ".actions")
 		local configuration := readMultiMap(kResourcesDirectory . "Actions\" . this.Assistant . extension)
 		local callbacks := []
-		local active, disabled, ignore, type, callback, descriptor, parameters, theCallback, context, fileName
+		local active, disabled, ignore, type, callback, descriptor, parameters, theCallback, context, fileName, message
 
 		addMultiMapValues(configuration, readMultiMap(kUserHomeDirectory . "Actions\" . this.Assistant . extension))
 
@@ -2163,19 +2161,17 @@ class CallbacksEditor {
 
 					if (theCallback.Builtin && isDebug())
 						try {
-							fileName := temporaryFilename("luaScript", "lua")
+							fileName := temporaryFilename("script", "script")
 
 							try {
-								context := luaL_newstate()
-
-								luaL_openlibs(context)
+								context := scriptOpenContext()
 
 								FileAppend(theCallback.Script, fileName)
 
-								if (luaL_loadfile(context, fileName) != LUA_OK)
-									throw lua_tostring(context, -1)
+								if !scriptLoadScript(context, fileName, &message)
+									throw message
 
-								lua_close(context)
+								scriptCloseContext(context)
 							}
 							finally {
 								deleteFile(fileName)

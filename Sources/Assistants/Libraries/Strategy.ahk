@@ -205,6 +205,7 @@ class StrategySimulation {
 	}
 
 	scenarioValid(strategy, validator) {
+		local knowledgeBase := false
 		local scriptEngine := false
 		local rules, rule, resultSet, ignore, pitstop
 		local number, tyreCompound, tyreCompoundColor, tyreSet, productions, reductions, includes, fileName
@@ -215,55 +216,35 @@ class StrategySimulation {
 			static compiler := false
 			static goal := false
 
-			static lastValidator := false
-			static lastKnowledgeBase := false
-
 			if !compiler {
 				compiler := RuleCompiler()
 				goal := compiler.compileGoal("validScenario()")
 			}
 
-			if ((validator != lastValidator) || !lastKnowledgeBase) {
-				fileName := getFileName(validator . ".rules", kUserHomeDirectory . "Validators\", kResourcesDirectory . "Strategy\Validators\")
+			fileName := getFileName(validator . ".rules", kUserHomeDirectory . "Validators\", kResourcesDirectory . "Strategy\Validators\")
 
-				if FileExist(fileName) {
-					productions := false
-					reductions := false
-					includes := false
+			if FileExist(fileName) {
+				productions := false
+				reductions := false
+				includes := false
 
-					if this.loadRules(compiler, fileName, &productions, &reductions, &includes) {
-						lastKnowledgeBase := this.createKnowledgeBase(productions, reductions, false, includes)
-						rules := lastKnowledgeBase.Rules
-					}
-					else
-						lastKnowledgeBase := false
+				if this.loadRules(compiler, fileName, &productions, &reductions, &includes) {
+					knowledgeBase := this.createKnowledgeBase(productions, reductions, false, includes)
+					rules := knowledgeBase.Rules
 				}
-				else {
-					fileName := getFileName(validator . ".script", kUserHomeDirectory . "Validators\", kResourcesDirectory . "Strategy\Validators\")
-
-					if FileExist(fileName)
-						scriptEngine := this.loadScript(fileName)
-
-					lastWasRules := false
-				}
-
-				lastValidator := validator
 			}
 			else {
-				rules := lastKnowledgeBase.Rules
+				fileName := getFileName(validator . ".script", kUserHomeDirectory . "Validators\", kResourcesDirectory . "Strategy\Validators\")
 
-				for ignore, rule in rules.Reductions["setup", 3].clone()
-					rules.removeRule(rule)
-
-				for ignore, rule in rules.Reductions["pitstop", 4].clone()
-					rules.removeRule(rule)
+				if FileExist(fileName)
+					scriptEngine := this.loadScript(fileName)
 			}
 
-			if lastKnowledgeBase {
-				lastKnowledgeBase.addRule(compiler.compileRule("setup(" . strategy.RemainingFuel . ","
-																		. StrReplace(strategy.TyreCompound, A_Space, "\ ") . ","
-																		. StrReplace(strategy.TyreCompoundColor, A_Space, "\ ") . ","
-																		. StrReplace(strategy.TyreSet, A_Space, "\ ") . ")"))
+			if knowledgeBase {
+				knowledgeBase.addRule(compiler.compileRule("setup(" . strategy.RemainingFuel . ","
+																	. StrReplace(strategy.TyreCompound, A_Space, "\ ") . ","
+																	. StrReplace(strategy.TyreCompoundColor, A_Space, "\ ") . ","
+																	. StrReplace(strategy.TyreSet, A_Space, "\ ") . ")"))
 
 				for number, pitstop in strategy.AllPitstops {
 					if pitstop.TyreChange {
@@ -277,14 +258,14 @@ class StrategySimulation {
 						tyreSet := false
 					}
 
-					lastKnowledgeBase.addRule(compiler.compileRule("pitstop(" . number . "," . pitstop.Lap . "," . Round(pitstop.Time / 60) . ","
-																			  . Round(pitstop.RefuelAmount) . "," . tyreCompound . "," . tyreCompoundColor . "," . tyreSet . ")"))
+					knowledgeBase.addRule(compiler.compileRule("pitstop(" . number . "," . pitstop.Lap . "," . Round(pitstop.Time / 60) . ","
+																		  . Round(pitstop.RefuelAmount) . "," . tyreCompound . "," . tyreCompoundColor . "," . tyreSet . ")"))
 				}
 
 				if isDebug()
 					this.dumpRules(knowledgeBase)
 
-				resultSet := lastKnowledgeBase.prove(goal)
+				resultSet := knowledgeBase.prove(goal)
 
 				if resultSet
 					resultSet.dispose()

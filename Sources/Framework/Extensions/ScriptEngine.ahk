@@ -220,10 +220,6 @@ scriptPushArray(context, array) {
 
 		lua_settable(context, -3)
 	}
-
-	lua_pushstring(context, "n")
-	lua_pushinteger(context, Integer(array.Length))
-	lua_settable(context, -3)
 }
 
 scriptCreateGlobal(context, name) {

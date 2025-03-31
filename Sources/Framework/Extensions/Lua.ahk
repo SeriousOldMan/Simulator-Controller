@@ -167,9 +167,8 @@ lua_upvalueindex(i) => (LUA_REGISTRYINDEX - (i))
 ;;;-------------------------------------------------------------------------;;;
 
 initializeLua() {
-	if FileExist(kUserHomeDirectory . "Programs\Lua Runtime\lua54.dll") {
+	if FileExist(kUserHomeDirectory . "Programs\Lua Runtime\lua54.dll")
 		DllCall("LoadLibrary", "Str", kUserHomeDirectory . "Programs\Lua Runtime\lua54.dll", "Ptr")
-	}
 }
 
 

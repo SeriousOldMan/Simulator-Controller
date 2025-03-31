@@ -1,0 +1,133 @@
+-------------------------------------------------------------------------------
+---   Modular Simulator Controller System - Strategy Validation Script      ---
+---                                                                         ---
+---   Author:     Oliver Juwig (TheBigO)                                    ---
+---   License:    (2025) Creative Commons - BY-NC-SA                        ---
+-------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+---                          Public Functions Section                       ---
+-------------------------------------------------------------------------------
+
+function totalFuel()
+	return startFuel(), pitstopFuel()
+end
+
+function startFuel()
+	return setup()
+end
+
+function pitstopFuel()
+	local nf = 0
+	local f = 0
+	
+	for pf in pitstopRefuels do
+		f = f + pf
+		
+		if pf > 0 then
+			nf = nf + 1
+		end
+	end
+		
+	return f, nf
+end
+
+function startTyreCompound()
+	local sf, tc, tcc = setup()
+	
+	return tc, tcc
+end
+
+function startTyreSet()
+	local sf, tc, tcc, tc = setup()
+	
+	return ts
+end
+
+function pitstopTyreCompounds()
+	local tcs = {}
+	
+	for tc in pitstopTyreCompounds do
+		if tc ~= nil and tc ~= false then
+			table.insert(tcs, tc)
+		end
+	end
+		
+	return tcs
+end
+
+function pitstopTyreSets()
+	local tss = {}
+	
+	for tc in pitstopTyreCompounds do
+		if tc ~= nil and tc ~= false  then
+			ts = tc.set
+			
+			if ts ~= nil and ts ~= false then
+				table.insert(tss, ts)
+			end
+		end
+	end
+	
+	return tss
+end
+
+function refuels()
+	local f, nf = pitstopFuel()
+	
+	return nf
+end
+
+function tyreCompounds()
+	local tcs = { startTyreCompound() }
+	
+	for tc in pitstopTyreCompounds do
+		if tc ~= nil and tc ~= false  then
+			table.insert(tcs, tc)
+		end
+	end
+	
+	return tcs
+end
+
+function tyreSets()
+	local tss = { startTyreSet() }
+	
+	for tc in pitstopTyreCompounds do
+		if tc ~= nil and tc ~= false  then
+			ts = tc.set
+			
+			if ts ~= nil and ts ~= false  then
+				table.insert(tss, ts)
+			end
+		end
+	end
+	
+	return tss
+end
+
+function pitstops()
+	return table.getn(pitstopRefuels)
+end
+
+function pitstop(nr)
+	local cmp = pitstopTyreCompounds[nr]
+	local tc, tcc, ts
+	
+	if cmp == nil or cmp == false then
+		tc = false
+		tcc = false
+		ts = false
+	else
+		tc = cmp.compound
+		tcc = cmp.color
+		ts = cmp.set
+	end
+		
+	return {lap = pitstopLaps[nr],
+			time = pitstopTimes[nr],
+			fuel = pitstopRefuels[nr]
+			tyreCompound = tc,
+			tyreCompoundColor = tcc,
+			tyreSet = ts}
+end

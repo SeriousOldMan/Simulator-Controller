@@ -1933,7 +1933,8 @@ class StrategyWorkbench extends ConfigurationItem {
 
 	updateSettingsMenu() {
 		local settingsMenu := collect(["Settings", "---------------------------------------------"], translate)
-		local fileNames := getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\")
+		local fileNames := concatenate(getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\")
+									 , getFileNames("*.script", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\"))
 		local validators, ignore, fileName, validator, found
 
 		if this.AutoInitialize
@@ -1948,10 +1949,10 @@ class StrategyWorkbench extends ConfigurationItem {
 		else
 			settingsMenu.Push(translate("[  ]") . A_Space . translate("Fixed Pitstops"))
 
-		if (fileNames.Length > 0) {
-			settingsMenu.Push(translate("---------------------------------------------"))
-			settingsMenu.Push(translate("Rules:"))
+		settingsMenu.Push(translate("---------------------------------------------"))
+		settingsMenu.Push(translate("Rules:"))
 
+		if (fileNames.Length > 0) {
 			validators := []
 			found := false
 
@@ -3098,7 +3099,8 @@ class StrategyWorkbench extends ConfigurationItem {
 				else if (line > 13) {
 					validators := []
 
-					for ignore, fileName in getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\") {
+					for ignore, fileName in concatenate(getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\")
+													  , getFileNames("*.script", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\")) {
 						SplitPath(fileName, , , , &validator)
 
 						if !inList(validators, validator)

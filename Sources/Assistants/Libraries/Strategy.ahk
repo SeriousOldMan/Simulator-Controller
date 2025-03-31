@@ -17,6 +17,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\..\Framework\Extensions\RuleEngine.ahk"
+#Include "..\..\Framework\Extensions\Lua.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 
 
@@ -115,8 +116,8 @@ class StrategySimulation {
 		return KnowledgeBase(engine, engine.createFacts(), engine.createRules())
 	}
 
-	loadRules(compiler, validator, &productions, &reductions, &includes) {
-		local rules, message, title
+	loadRules(compiler, validatorFileName, &productions, &reductions, &includes) {
+		local rules, message, title, script, context
 
 		rules := FileRead(kResourcesDirectory . "Strategy\Rules\Strategy Validation.rules")
 
@@ -126,10 +127,12 @@ class StrategySimulation {
 		compiler.compileRules(rules, &productions, &reductions, &includes)
 
 		try {
-			rules := FileRead(getFileName(validator . ".rules", kUserHomeDirectory . "Validators\", kResourcesDirectory . "Strategy\Validators\"))
+			rules := FileRead(validatorFileName)
 
-			if (rules != "")
+			if (Trim(rules) != "")
 				compiler.compileRules(rules, &productions, &reductions, &includes)
+
+			return true
 		}
 		catch Any as exception {
 			message := (isObject(exception) ? exception.Message : exception)
@@ -137,6 +140,41 @@ class StrategySimulation {
 			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgBox, translate("Cannot load the custom validation rules.") . "`n`n" . message, translate("Error"), 262192)
 			OnMessage(0x44, translateOkButton, 0)
+
+			return false
+		}
+	}
+
+	loadScript(scriptFileName) {
+		local message, title, context
+
+		try {
+			context := luaL_newstate()
+
+			luaL_openlibs(context)
+
+			if (luaL_loadfile(context, kResourcesDirectory . "Strategy\Rules\Strategy Validation.script") != LUA_OK) {
+				lua_close(context)
+
+				throw lua_tostring(context, -1)
+			}
+
+			if (luaL_loadfile(context, scriptFileName) != LUA_OK) {
+				lua_close(context)
+
+				throw lua_tostring(context, -1)
+			}
+			else
+				return context
+		}
+		catch Any as exception {
+			message := (isObject(exception) ? exception.Message : exception)
+
+			OnMessage(0x44, translateOkButton)
+			withBlockedWindows(MsgBox, translate("Cannot load the custom validation script.") . "`n`n" . message, translate("Error"), 262192)
+			OnMessage(0x44, translateOkButton, 0)
+
+			return false
 		}
 	}
 
@@ -167,33 +205,52 @@ class StrategySimulation {
 	}
 
 	scenarioValid(strategy, validator) {
-		local knowledgeBase, rules, rule, resultSet, ignore, pitstop
-		local number, tyreCompound, tyreCompoundColor, tyreSet, productions, reductions, includes
+		local scriptEngine := false
+		local rules, rule, resultSet, ignore, pitstop
+		local number, tyreCompound, tyreCompoundColor, tyreSet, productions, reductions, includes, fileName
 
 		if !strategy.isValid()
 			return false
 		else if validator {
 			static compiler := false
 			static goal := false
+
 			static lastValidator := false
+			static lastKnowledgeBase := false
 
 			if !compiler {
 				compiler := RuleCompiler()
 				goal := compiler.compileGoal("validScenario()")
 			}
 
-			if (validator != lastValidator) {
-				productions := false
-				reductions := false
-				includes := false
+			if ((validator != lastValidator) || !lastKnowledgeBase) {
+				fileName := getFileName(validator . ".rules", kUserHomeDirectory . "Validators\", kResourcesDirectory . "Strategy\Validators\")
 
-				this.loadRules(compiler, validator, &productions, &reductions, &includes)
+				if FileExist(fileName) {
+					productions := false
+					reductions := false
+					includes := false
 
-				knowledgeBase := this.createKnowledgeBase(productions, reductions, false, includes)
-				rules := knowledgeBase.Rules
+					if this.loadRules(compiler, fileName, &productions, &reductions, &includes) {
+						lastKnowledgeBase := this.createKnowledgeBase(productions, reductions, false, includes)
+						rules := lastKnowledgeBase.Rules
+					}
+					else
+						lastKnowledgeBase := false
+				}
+				else {
+					fileName := getFileName(validator . ".script", kUserHomeDirectory . "Validators\", kResourcesDirectory . "Strategy\Validators\")
+
+					if FileExist(fileName)
+						scriptEngine := this.loadScript(fileName)
+
+					lastWasRules := false
+				}
+
+				lastValidator := validator
 			}
 			else {
-				rules := knowledgeBase.Rules
+				rules := lastKnowledgeBase.Rules
 
 				for ignore, rule in rules.Reductions["setup", 3].clone()
 					rules.removeRule(rule)
@@ -202,36 +259,56 @@ class StrategySimulation {
 					rules.removeRule(rule)
 			}
 
-			knowledgeBase.addRule(compiler.compileRule("setup(" . strategy.RemainingFuel . ","
-																. StrReplace(strategy.TyreCompound, A_Space, "\ ") . ","
-																. StrReplace(strategy.TyreCompoundColor, A_Space, "\ ") . ","
-																. StrReplace(strategy.TyreSet, A_Space, "\ ") . ")"))
+			if lastKnowledgeBase {
+				lastKnowledgeBase.addRule(compiler.compileRule("setup(" . strategy.RemainingFuel . ","
+																		. StrReplace(strategy.TyreCompound, A_Space, "\ ") . ","
+																		. StrReplace(strategy.TyreCompoundColor, A_Space, "\ ") . ","
+																		. StrReplace(strategy.TyreSet, A_Space, "\ ") . ")"))
 
-			for number, pitstop in strategy.AllPitstops {
-				if pitstop.TyreChange {
-					tyreCompound := pitstop.TyreCompound
-					tyreCompoundColor := pitstop.TyreCompoundColor
-					tyreSet := pitstop.TyreSet
-				}
-				else {
-					tyreCompound := false
-					tyreCompoundColor := false
-					tyreSet := false
+				for number, pitstop in strategy.AllPitstops {
+					if pitstop.TyreChange {
+						tyreCompound := pitstop.TyreCompound
+						tyreCompoundColor := pitstop.TyreCompoundColor
+						tyreSet := pitstop.TyreSet
+					}
+					else {
+						tyreCompound := false
+						tyreCompoundColor := false
+						tyreSet := false
+					}
+
+					lastKnowledgeBase.addRule(compiler.compileRule("pitstop(" . number . "," . pitstop.Lap . "," . Round(pitstop.Time / 60) . ","
+																			  . Round(pitstop.RefuelAmount) . "," . tyreCompound . "," . tyreCompoundColor . "," . tyreSet . ")"))
 				}
 
-				knowledgeBase.addRule(compiler.compileRule("pitstop(" . number . "," . pitstop.Lap . "," . Round(pitstop.Time / 60) . ","
-																	  . Round(pitstop.RefuelAmount) . "," . tyreCompound . "," . tyreCompoundColor . "," . tyreSet . ")"))
+				if isDebug()
+					this.dumpRules(knowledgeBase)
+
+				resultSet := lastKnowledgeBase.prove(goal)
+
+				if resultSet
+					resultSet.dispose()
+
+				return (resultSet != false)
 			}
+			else if scriptEngine {
+				try {
+					if (lua_pcall(scriptEngine, 0, LUA_MULTRET, 0) != LUA_OK) {
+						OnMessage(0x44, translateOkButton)
+						withBlockedWindows(MsgBox, translate("Cannot load the custom validation script.") . "`n`n" . lua_tostring(scriptEngine, -1), translate("Error"), 262192)
+						OnMessage(0x44, translateOkButton, 0)
 
-			if isDebug()
-				this.dumpRules(knowledgeBase)
-
-			resultSet := knowledgeBase.prove(goal)
-
-			if resultSet
-				resultSet.dispose()
-
-			return (resultSet != false)
+						return false
+					}
+					else
+						return lua_toboolean(scriptEngine, -1)
+				}
+				finally {
+					lua_close(scriptEngine)
+				}
+			}
+			else
+				return true
 		}
 		else
 			return true

@@ -154,7 +154,7 @@ The previous examples are of course very simple. Therefore, before presenting th
 
 This validation script implements pitstop rules used in Formula 1 races at some time. In such a race, you are not allowed to refuel the car and you have to use at least two different dry tyre compounds, unless you have used a wet or an intermediate tyre set during the race.
 
-##### Builtin Predicates
+###### Builtin Predicates
 
 Although the logical predicates in *Prolog* look like function calls, the semantics are very different. First, as you can see in the "Formula 1" example above, an unlimited set of alternatives can be defined for a give predicate. These alternatives are called rules. And variables, which are identified by a leading question mark, can be used bi-directional. This is called unification, where a variable is bound to the value, which must be used to satisfy the logical constraints imposed by a given rule. If you want to learn rule programming, please read the documentation about the [rule engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine).
 
@@ -294,57 +294,57 @@ This means that the current scenario is considered valid, if at least two pitsto
 
 In this case, the current scenario is considered valid, when only soft tyre compounds have been used throughout the whole scenario.
 
-##### Builtin Functions
+###### Builtin Functions
 
-  1. *totalFuel() => fuelAmount :: <number>, numRefuels :: <integer>*
+  1. *totalFuel() => fuelAmount :: \<number\>, numRefuels :: \<integer\>*
   
      The first value returned by *totalFuel* represents the total amount of fuel which will be used for the session and the second value is the number of refuels at the pitstops during the session.
   
-  2. *startFuel() => startFuel :: <number>*
+  2. *startFuel() => startFuel :: \<number\>*
   
      Returns the amount of fuel in the car at the start of the session.
 
-  3. *pitstopFuel() => refuelAmount :: <number>, numRefuels :: <integer>*
+  3. *pitstopFuel() => refuelAmount :: \<number\>, numRefuels :: \<integer\>*
 	 
 	 The first value returned by *pitstopFuel* represents the amount of fuel which will be refilled at the pitstops and the second value is the number of refuels at the pitstops.
   
-  4. *startTyreCompound() => { compound :: <string>, color :: <string> }*
+  4. *startTyreCompound() => { compound :: \<string\>, color :: \<string\> }*
   
      Returns an object, which describes the tyre compound for the tyres mounted at the start of the session. Please note, that for *simple* "Wet", "Intermediate" and "Dry" compounds the color will always be "Black".
 	 
-  5. *startTyreSet() => tyreSet :: <integer>*
+  5. *startTyreSet() => tyreSet :: \<integer\>*
   
      Same as the previous one, but the number of the mounted tyre set is returned.
 
-  6. *pitstopTyreCompounds() => tyreCompounds :: <array> of { compound :: <string>, color :: <string> }*
+  6. *pitstopTyreCompounds() => tyreCompounds :: \<array\> of { compound :: \<string\>, color :: \<string\> }*
   
      Returns a list of tyre compounds mounted in the various pitstops of the session. This list contains of objects, each of which represents a tyre compound for tyres mounted at a planned pitstop.
 
-  7. *pitstopTyreSets() => tyreSets :: <array> of <integer>*
+  7. *pitstopTyreSets() => tyreSets :: \<array\> of \<integer\>*
   
      ame as the previous one, but the number of the mounted tyre sets are returned in the list.
   
-  8. *refuels() => refuels :: <integer>*
+  8. *refuels() => refuels :: \<integer\>*
   
      Convenience function for: "local ignore, numRefuels = totalFuel()"
 
-  9. *tyreCompounds() => tyreCompounds :: <array> of { compound :: <string>, color :: <string> }*
+  9. *tyreCompounds() => tyreCompounds :: \<array\> of { compound :: \<string\>, color :: \<string\> }*
   
      Similar to *pitstopTyreCompounds*, but also include the info for the tyres mounted at the start of the session as the first value in the list.
 
-  10. *tyreSets() => tyreSets :: <array> of <integer>*
+  10. *tyreSets() => tyreSets :: \<array\> of \<integer\>*
   
       Similar to *pitstopTyreSets*, but also include the info for the tyres mounted at the start of the session as the first value in the list.
 
 The above functions will give you summarized information about all pitstops, which will be sufficient in most cases. But you can also acquire informations about each individual pitstop.
 
-  1. *pitstops() => count :: <integer>*
+  1. *pitstops() => count :: \<integer\>*
 
      Returns the overall number of pitstops.
 	 
-  2. *pitstop(nr) => pitstop :: { lap :: <integer>, time :: <integer>, fuel :: <number>,
-					 tyreCompound :: false or <string>, tyreCompoundColor = false or <string>,
-					 tyreSet :: false or <string>}
+  2. *pitstop(nr) => pitstop :: { lap :: \<integer\>, time :: \<integer\>, fuel :: \<number\>,
+					 tyreCompound :: false or \<string\>, tyreCompoundColor = false or \<string\>,
+					 tyreSet :: false or \<string\>}
   
      This function returns an object which fully describes a planned pitstop. Notes: Tyre information will be *false*, if no tyre change is planned. The time represents the number of minutes into the race. 
 

@@ -131,7 +131,7 @@ Note: The rule-based validation in general requires less coding for complex vali
 
 ##### Rule-based validation
 
-The rules for scenario validation uses the same technology used by the different AI Race Assistants, a [Hybrid Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine), which supports forward and backward logic resolution. For the scenario validation rules, only the backward chaining part is used, which is more or less similar to the *Prolog* logic programming language. Let's begin with an easy example:
+The rules for scenario validation uses the same technology used by the different AI Race Assistants, a [Hybrid Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine), which supports forward and backward logic resolution. For the scenario validation rules, mostly the backward chaining part is used, which is more or less similar to the *Prolog* logic programming language, although you can also define forward chaining rules and trigger them from a reduction rule. Let's begin with an easy example:
 
 	validScenario() <= pitstopFuel(?, ?refuels), ?refuels > 0
 

@@ -1271,6 +1271,11 @@ class LMURESTProvider {
 		}
 	}
 
+	class GarageData extends LMURESTProvider.RESTData {
+		refreshSetups() {
+		}
+	}
+
 	static TyreTypes {
 		Get {
 			return LMURestProvider.sTyreTypes

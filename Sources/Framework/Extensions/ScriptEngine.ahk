@@ -240,6 +240,10 @@ scriptGetBoolean(context) {
 	return lua_toboolean(context, -1)
 }
 
+scriptGetString(context) {
+	return lua_tostring(context, -1)
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Initialization Section                          ;;;

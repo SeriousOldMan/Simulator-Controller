@@ -38,9 +38,9 @@ class LMURESTProvider {
 			}
 		}
 
-		PUTURL {
+		POSTURL {
 			Get {
-				return "Virtual property RESTData.PUTURL must be implemented in a subclass..."
+				return "Virtual property RESTData.POSTURL must be implemented in a subclass..."
 			}
 		}
 
@@ -107,7 +107,7 @@ class LMURESTProvider {
 			return data
 		}
 
-		write(url := this.PUTURL, data := this.Data) {
+		write(url := this.POSTURL, data := this.Data) {
 			static lmuApplication := Application("Le Mans Ultimate", kSimulatorConfiguration)
 
 			if (data && lmuApplication.isRunning()) {
@@ -150,7 +150,7 @@ class LMURESTProvider {
 			}
 		}
 
-		PUTURL {
+		POSTURL {
 			Get {
 				return "http://localhost:6397/rest/garage/PitMenu/loadPitMenu"
 			}
@@ -1272,7 +1272,19 @@ class LMURESTProvider {
 	}
 
 	class GarageData extends LMURESTProvider.RESTData {
+		POSTURL {
+			Get {
+				return "http://localhost:6397/rest/garage/refreshsetups"
+			}
+		}
+
 		refreshSetups() {
+			try {
+				WinHttpRequest({Timeouts: [0, 500, 500, 500]}).POST(this.POSTURL, "", false)
+			}
+			catch Any as exception {
+				logError(exception, true)
+			}
 		}
 	}
 

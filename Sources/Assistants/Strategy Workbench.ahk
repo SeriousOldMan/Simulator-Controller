@@ -4226,7 +4226,10 @@ class ValidatorsEditor {
 			}
 
 			if (this.ScriptEditor.Content[true] = "")
-				this.setScript("Rules", "; Insert your rules here...`n`n", this.SelectedValidator.Builtin)
+				if (this.SelectedValidator.Type = "Rules")
+					this.setScript("Rules", "; Insert your rules here...`n`n", this.SelectedValidator.Builtin)
+				else
+					this.setScript("Script", "; Insert your script here...`n`n", this.SelectedValidator.Builtin)
 
 			this.ScriptEditor.Visible := true
 		}
@@ -4263,7 +4266,7 @@ class ValidatorsEditor {
 	}
 
 	addValidator() {
-		local validator
+		local validator, translator, msgResult
 
 		if this.SelectedValidator
 			if !this.saveValidator(this.SelectedValidator) {
@@ -4272,7 +4275,19 @@ class ValidatorsEditor {
 				return
 			}
 
-		validator := {Type: "Rules", Name: "", Builtin: false, Script: ""}
+		translator := translateMsgBoxButtons.Bind(["Rules", "Script", "Cancel"])
+
+		OnMessage(0x44, translator)
+		msgResult := withBlockedWindows(MsgBox, translate("Do you want to create rules or a script?"), translate("Validator"), 262179)
+		OnMessage(0x44, translator, 0)
+
+		if (msgResult = "Cancel")
+			return
+
+		if (msgResult = "Yes")
+			validator := {Type: "Rules", Name: "", Builtin: false, Script: ""}
+		else
+			validator := {Type: "Script", Name: "", Builtin: false, Script: ""}
 
 		this.Validators.Push(validator)
 
@@ -4325,7 +4340,7 @@ class ValidatorsEditor {
 		if validator {
 			this.Control["validatorNameEdit"].Text := validator.Name
 
-			this.setScript("Rules", validator.Script, validator.Builtin)
+			this.setScript(validator.Type, validator.Script, validator.Builtin)
 		}
 		else {
 			this.Control["validatorNameEdit"].Text := ""
@@ -4366,7 +4381,7 @@ class ValidatorsEditor {
 			}
 		}
 		else {
-			fileName := temporaryFilename("luaScript", "lua")
+			fileName := temporaryFilename("script", "script")
 
 			try {
 				context := luaL_newstate()

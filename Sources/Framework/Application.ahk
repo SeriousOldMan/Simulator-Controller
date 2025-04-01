@@ -343,7 +343,8 @@ startDatabaseSynchronizer() {
 }
 
 checkForUpdates() {
-	local check, lastModified, release, version, current, releasePostFix, currentPostFix, automaticUpdates
+	local release := false
+	local check, lastModified, version, current, releasePostFix, currentPostFix, automaticUpdates, ignore, url
 	local toolTargets, userToolTargets, userToolTargetsFile, updates, target, arguments, versionPostfix, msgResult
 
 	if isDetachedInstallation()
@@ -361,19 +362,37 @@ checkForUpdates() {
 		}
 
 		if check {
-			try {
-				Download("https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/VERSION", kUserConfigDirectory . "VERSION")
-			}
-			catch Any as exception {
+			deleteFile(kUserConfigDirectory . "VERSION")
+
+			for ignore, url in ["https://fileshare.impresion3d.pro/filebrowser/api/public/dl/OH13SGRl"
+							  , "https://www.dropbox.com/scl/fi/qiczuix77p0f1bkc0q4bw/VERSION?rlkey=9y6fs09lnj79ikgr9608i2ajy&st=npovhmgm&dl=1"
+							  , "http://87.177.159.148:800/api/public/dl/bkguewzP"
+							  , "https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/VERSION"]
+				try {
+					Download(url, kUserConfigDirectory . "VERSION")
+
+					release := readMultiMap(kUserConfigDirectory . "VERSION")
+
+					if (release.Count > 0)
+						break
+					else
+						release := false
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+
+			if !release
 				check := false
-			}
 		}
 
 		if check {
 			if FileExist(kUserConfigDirectory . "VERSION")
 				FileSetTime(A_Now, kUserConfigDirectory . "VERSION")
 
-			release := readMultiMap(kUserConfigDirectory . "VERSION")
+			if !release
+				release := readMultiMap(kUserConfigDirectory . "VERSION")
+
 			version := getMultiMapValue(release, "Release", "Version", getMultiMapValue(release, "Version", "Release", false))
 
 			if version {

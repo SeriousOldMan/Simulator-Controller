@@ -17,7 +17,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\..\Framework\Extensions\RuleEngine.ahk"
-#Include "..\..\Framework\Extensions\Lua.ahk"
+#Include "..\..\Framework\Extensions\ScriptEngine.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 
 
@@ -149,23 +149,28 @@ class StrategySimulation {
 		local message, title, context
 
 		try {
-			context := luaL_newstate()
+			context := scriptOpenContext()
 
-			luaL_openlibs(context)
+			script := FileRead(kResourcesDirectory . "Strategy\Scripts\Strategy Validation.script")
 
-			if (luaL_loadfile(context, kResourcesDirectory . "Strategy\Rules\Strategy Validation.script") != LUA_OK) {
-				lua_close(context)
+			script .= ("`n`n" . FileRead(scriptFileName))
 
-				throw lua_tostring(context, -1)
+			scriptFileName := temporaryFileName("validation", "script")
+
+			try {
+				FileAppend(script, scriptFileName)
+
+				if !scriptLoadScript(context, scriptFileName, &message) {
+					scriptCloseContext(context)
+
+					throw message
+				}
+				else
+					return context
 			}
-
-			if (luaL_loadfile(context, scriptFileName) != LUA_OK) {
-				lua_close(context)
-
-				throw lua_tostring(context, -1)
+			finally {
+				deleteFile(scriptFileName)
 			}
-			else
-				return context
 		}
 		catch Any as exception {
 			message := (isObject(exception) ? exception.Message : exception)
@@ -205,9 +210,11 @@ class StrategySimulation {
 	}
 
 	scenarioValid(strategy, validator) {
+		local knowledgeBase := false
 		local scriptEngine := false
 		local rules, rule, resultSet, ignore, pitstop
-		local number, tyreCompound, tyreCompoundColor, tyreSet, productions, reductions, includes, fileName
+		local number, tyreCompound, tyreCompoundColor, tyreSet, productions, reductions, includes, fileName, message
+		local laps, times, refuels, tyreCompounds, tyreCompoundColors, tyreSets
 
 		if !strategy.isValid()
 			return false
@@ -215,55 +222,35 @@ class StrategySimulation {
 			static compiler := false
 			static goal := false
 
-			static lastValidator := false
-			static lastKnowledgeBase := false
-
 			if !compiler {
 				compiler := RuleCompiler()
 				goal := compiler.compileGoal("validScenario()")
 			}
 
-			if ((validator != lastValidator) || !lastKnowledgeBase) {
-				fileName := getFileName(validator . ".rules", kUserHomeDirectory . "Validators\", kResourcesDirectory . "Strategy\Validators\")
+			fileName := getFileName(validator . ".rules", kUserHomeDirectory . "Validators\", kResourcesDirectory . "Strategy\Validators\")
 
-				if FileExist(fileName) {
-					productions := false
-					reductions := false
-					includes := false
+			if FileExist(fileName) {
+				productions := false
+				reductions := false
+				includes := false
 
-					if this.loadRules(compiler, fileName, &productions, &reductions, &includes) {
-						lastKnowledgeBase := this.createKnowledgeBase(productions, reductions, false, includes)
-						rules := lastKnowledgeBase.Rules
-					}
-					else
-						lastKnowledgeBase := false
+				if this.loadRules(compiler, fileName, &productions, &reductions, &includes) {
+					knowledgeBase := this.createKnowledgeBase(productions, reductions, false, includes)
+					rules := knowledgeBase.Rules
 				}
-				else {
-					fileName := getFileName(validator . ".script", kUserHomeDirectory . "Validators\", kResourcesDirectory . "Strategy\Validators\")
-
-					if FileExist(fileName)
-						scriptEngine := this.loadScript(fileName)
-
-					lastWasRules := false
-				}
-
-				lastValidator := validator
 			}
 			else {
-				rules := lastKnowledgeBase.Rules
+				fileName := getFileName(validator . ".script", kUserHomeDirectory . "Validators\", kResourcesDirectory . "Strategy\Validators\")
 
-				for ignore, rule in rules.Reductions["setup", 3].clone()
-					rules.removeRule(rule)
-
-				for ignore, rule in rules.Reductions["pitstop", 4].clone()
-					rules.removeRule(rule)
+				if FileExist(fileName)
+					scriptEngine := this.loadScript(fileName)
 			}
 
-			if lastKnowledgeBase {
-				lastKnowledgeBase.addRule(compiler.compileRule("setup(" . strategy.RemainingFuel . ","
-																		. StrReplace(strategy.TyreCompound, A_Space, "\ ") . ","
-																		. StrReplace(strategy.TyreCompoundColor, A_Space, "\ ") . ","
-																		. StrReplace(strategy.TyreSet, A_Space, "\ ") . ")"))
+			if knowledgeBase {
+				knowledgeBase.addRule(compiler.compileRule("setup(" . strategy.RemainingFuel . ","
+																	. StrReplace(strategy.TyreCompound, A_Space, "\ ") . ","
+																	. StrReplace(strategy.TyreCompoundColor, A_Space, "\ ") . ","
+																	. StrReplace(strategy.TyreSet, A_Space, "\ ") . ")"))
 
 				for number, pitstop in strategy.AllPitstops {
 					if pitstop.TyreChange {
@@ -277,14 +264,14 @@ class StrategySimulation {
 						tyreSet := false
 					}
 
-					lastKnowledgeBase.addRule(compiler.compileRule("pitstop(" . number . "," . pitstop.Lap . "," . Round(pitstop.Time / 60) . ","
-																			  . Round(pitstop.RefuelAmount) . "," . tyreCompound . "," . tyreCompoundColor . "," . tyreSet . ")"))
+					knowledgeBase.addRule(compiler.compileRule("pitstop(" . number . "," . pitstop.Lap . "," . Round(pitstop.Time / 60) . ","
+																		  . Round(pitstop.RefuelAmount) . "," . tyreCompound . "," . tyreCompoundColor . "," . tyreSet . ")"))
 				}
 
 				if isDebug()
 					this.dumpRules(knowledgeBase)
 
-				resultSet := lastKnowledgeBase.prove(goal)
+				resultSet := knowledgeBase.prove(goal)
 
 				if resultSet
 					resultSet.dispose()
@@ -293,18 +280,63 @@ class StrategySimulation {
 			}
 			else if scriptEngine {
 				try {
-					if (lua_pcall(scriptEngine, 0, LUA_MULTRET, 0) != LUA_OK) {
+					scriptPushArray(scriptEngine, [strategy.RemainingFuel
+												 , strategy.TyreCompound, strategy.TyreCompoundColor
+												 , strategy.TyreSet])
+					scriptCreateGlobal(scriptEngine, "__Setup")
+
+					laps := []
+					times := []
+					refuels := []
+					tyreCompounds := []
+					tyreCompoundColors := []
+					tyreSets := []
+
+					for number, pitstop in strategy.AllPitstops {
+						if pitstop.TyreChange {
+							tyreCompound := pitstop.TyreCompound
+							tyreCompoundColor := pitstop.TyreCompoundColor
+							tyreSet := (pitstop.TyreSet ? pitstop.TyreSet : kFalse)
+						}
+						else {
+							tyreCompound := kFalse
+							tyreCompoundColor := kFalse
+							tyreSet := kFalse
+						}
+
+						laps.Push(pitstop.Lap)
+						times.Push(Round(pitstop.Time / 60))
+						refuels.Push(Round(pitstop.RefuelAmount))
+						tyreCompounds.Push(tyreCompound)
+						tyreCompoundColors.Push(tyreCompoundColor)
+						tyreSets.Push(tyreSet)
+					}
+
+					scriptPushArray(scriptEngine, laps)
+					scriptCreateGlobal(scriptEngine, "__PitstopLaps")
+					scriptPushArray(scriptEngine, times)
+					scriptCreateGlobal(scriptEngine, "__PitstopTimes")
+					scriptPushArray(scriptEngine, refuels)
+					scriptCreateGlobal(scriptEngine, "__PitstopRefuels")
+					scriptPushArray(scriptEngine, tyreCompounds)
+					scriptCreateGlobal(scriptEngine, "__PitstopTyreCompounds")
+					scriptPushArray(scriptEngine, tyreCompoundColors)
+					scriptCreateGlobal(scriptEngine, "__PitstopTyreCompoundColors")
+					scriptPushArray(scriptEngine, tyreSets)
+					scriptCreateGlobal(scriptEngine, "__PitstopTyreSets")
+
+					if !scriptExecute(scriptEngine, &message) {
 						OnMessage(0x44, translateOkButton)
-						withBlockedWindows(MsgBox, translate("Cannot load the custom validation script.") . "`n`n" . lua_tostring(scriptEngine, -1), translate("Error"), 262192)
+						withBlockedWindows(MsgBox, translate("Cannot load the custom validation script.") . "`n`n" . message, translate("Error"), 262192)
 						OnMessage(0x44, translateOkButton, 0)
 
 						return false
 					}
 					else
-						return lua_toboolean(scriptEngine, -1)
+						return scriptGetBoolean(scriptEngine)
 				}
 				finally {
-					lua_close(scriptEngine)
+					scriptCloseContext(scriptEngine)
 				}
 			}
 			else

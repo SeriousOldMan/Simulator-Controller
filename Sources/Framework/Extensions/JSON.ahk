@@ -106,9 +106,9 @@ class JSON {
 				} else { ; number | true | false | null
 					val := SubStr(src, pos, i := RegExMatch(src, "[\]\},\s]|$",, pos)-pos)
 
-					if IsInteger(val)
+					if isInteger(val)
 						val += 0
-					else if IsFloat(val)
+					else if isFloat(val)
 						val += 0
 					else if (val == "true" || val == "false")
 						val := (val == "true")

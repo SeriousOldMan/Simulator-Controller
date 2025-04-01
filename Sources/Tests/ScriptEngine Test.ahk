@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Lua Test                        ;;;
+;;;   Modular Simulator Controller System - ScriptEngine Test               ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
@@ -25,7 +25,7 @@ global kBuildConfiguration := "Development"
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Framework\Extensions\Lua.ahk"
+#Include "..\Framework\Extensions\ScriptEngine.ahk"
 #Include "AHKUnit\AHKUnit.ahk"
 
 

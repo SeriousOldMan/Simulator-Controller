@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - LUA Runtime                     ;;;
+;;;   Modular Simulator Controller System - Script Runtime                  ;;;
 ;;;                                                                         ;;;
 ;;;   Created from AHK code by Delta Pythagorean                            ;;;
 ;;;   (https://www.autohotkey.com/boards/viewtopic.php?style=10&t=122655)   ;;;
@@ -55,15 +55,6 @@ global LUA_RIDX_LAST            := LUA_RIDX_GLOBALS
 
 global LUA_NOREF                := -2
 global LUA_REFNIL               := -1
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                    Global Functions Declaration Section                 ;;;
-;;;-------------------------------------------------------------------------;;;
-
-luaAvailable() {
-	return (DllCall("GetModuleHandle", "str", "lua54.dll") != 0)
-}
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -166,9 +157,87 @@ lua_remove(L, idx) => (lua_rotate(L, idx, -1), lua_pop(L, 1))
 lua_replace(L, idx) => (lua_copy(L, -1, idx), lua_pop(L, 1))
 lua_upvalueindex(i) => (LUA_REGISTRYINDEX - (i))
 
-initializeLua() {
+initializeScriptEngine() {
 	if FileExist(kBinariesDirectory . "Code Runtime\lua54.dll")
 		DllCall("LoadLibrary", "Str", kBinariesDirectory . "Code Runtime\lua54.dll", "Ptr")
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                    Public Functions Declaration Section                 ;;;
+;;;-------------------------------------------------------------------------;;;
+
+scriptEngineAvailable() {
+	return (DllCall("GetModuleHandle", "str", "lua54.dll") != 0)
+}
+
+scriptOpenContext() {
+	local context := luaL_newstate()
+
+	luaL_openlibs(context)
+
+	return context
+}
+
+scriptCloseContext(context) {
+	lua_close(context)
+}
+
+scriptLoadScript(context, fileName, &errorMessage?) {
+	if (luaL_loadfile(context, fileName) != LUA_OK) {
+		errorMessage := lua_tostring(context, -1)
+
+		return false
+	}
+	else
+		return true
+}
+
+scriptPushArray(context, array) {
+	local value
+
+	lua_createtable(context, array.Length, 0)
+
+	loop array.Length {
+		lua_pushinteger(context, Integer(A_Index))
+
+		value := array[A_Index]
+
+		if isInteger(value)
+			lua_pushinteger(context, Integer(value))
+		else if isNumber(value)
+			lua_pushnumber(context, Number(value))
+		else if (isInstance(value, Func) || isInstance(value, Closure))
+			lua_pushcclosure(context, CallbackCreate(value, , 1), 0)
+		else if (value = kNull)
+			lua_pushnil(context)
+		else if (value = kTrue)
+			lua_pushinteger(context, Integer(1))
+		else if (value = kFalse)
+			lua_pushnil(context)
+		else
+			lua_pushstring(context, String(value))
+
+		lua_settable(context, -3)
+	}
+}
+
+scriptCreateGlobal(context, name) {
+	lua_setglobal(context, name)
+}
+
+scriptExecute(context, &message?) {
+	if (lua_pcall(context, 0, LUA_MULTRET, 0) != LUA_OK) {
+		message := lua_tostring(context, -1)
+
+		return false
+	}
+	else
+		return true
+}
+
+scriptGetBoolean(context) {
+	return lua_toboolean(context, -1)
 }
 
 
@@ -176,4 +245,4 @@ initializeLua() {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-initializeLua()
+initializeScriptEngine()

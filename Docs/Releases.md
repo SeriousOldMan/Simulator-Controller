@@ -22,7 +22,22 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   
 # Upcoming release
 
-Not yet planned...
+## 6.2.6.0
+
+#### Date: 04/04/25 (planned)
+
+#### Fixes
+
+  - Fixed several UTF encoding problems for driver names in the session database.
+
+#### Changes
+
+  - New [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) has been defined, which allows you to move the *Temp* folder and also the *Programs* folder of the [Documents]\Simulator Controller folder to a different location. This will be helpful, if your [Documents] folder is under control of *One Drive* or a similar replication tool, since there are reports of several issues and conflicts with the operation of Simulator Controller in that case.
+  - The window resizing behaviour for "Strategy Workbench" has been optimized a bit to make the list of available tyre compounds more accessible.
+  - This Release introduces support for a new algorithmic scripting language as addition to the support of rule-based programming, which has been around for some time now. The new scripting engine is based on the well-known and wide-spread programming language [Lua](https://lua.org). A long term goal is to use the scripting language for the implementation of all behavioral actions of the Assistants, once they are based on a LAM (aka Large Action Model).
+    - The new scripting language alread y can be used to implement the [scenario validations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#script-based-validation) in "Strategy Workbench".
+	- You can also use the new scripting language to implement actions in *Conversation* and *Reasoning* boosters for the Assistants, but there are not used yet. This will follow with the next release.
+  - [Developer] A new constant *kProgramsDirectory* references the location of the *Programs* folder as defined in the configuration. The already present constant *kTempDirectory* also references the configured location now.
 
 # Release history
 
@@ -186,7 +201,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   8. The "Team" tab in "Race Settings" are now automatically preselected, when "Race Settings" is opened to edit the team race credentials.
   9. The layout editor for Button Boxes has been extended with additional validations, so that no invalid layouts can be defined anymore.
   10. The Engineer will now use the most recent values of remaining fuel, tyre temperatures and pressures as well as brake temperatures (if available) rather than the values at the start of the current lap, when asked for this information using a voice command or a controller action.
-  11. The special validation rules in "Setup Workbench" can now be edited using a specialized syntax aware editor for the underlying rule language. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#editing-validation-rules) for more information.
+  11. The special validation rules in "Setup Workbench" can now be edited using a specialized syntax aware editor for the underlying rule language. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#editing-validation-rules-and-scripts) for more information.
   12. Inner, Middle and Outer carcass tyre temperature readings are now supported for *rFactor 2*, *Le Mans Ultimate* and *iRacing* in "Solo Center" and in the issue analyzer of "Setup Workbench".
   13. The real setup pressures from the garage are now used by the Race Engineer for *iRacing*.
   14. [Expert] A new version of the local LLM Runtime is available, which includes the latest Llama backend. Support for the deepseek v3 model is included, if you have 800 GB of memory in your machine :-)

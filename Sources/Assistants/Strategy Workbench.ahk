@@ -1205,7 +1205,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm", "Arial")
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("GroupBox", "x24 ys+34 w199 h181", translate("Race"))
+		workbenchGui.Add("GroupBox", "x24 ys+34 w199 h181 H:Grow(0.8)", translate("Race"))
 
 		workbenchGui.SetFont("Norm", "Arial")
 
@@ -1230,7 +1230,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm", "Arial")
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("GroupBox", "x233 ys+34 w364 h181", translate("Pitstop"))
+		workbenchGui.Add("GroupBox", "x233 ys+34 w364 h181 H:Grow(0.8)", translate("Pitstop"))
 
 		workbenchGui.SetFont("Norm", "Arial")
 
@@ -1254,7 +1254,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		w12 := (x11 + 50 - x7)
 
-		this.iTyreSetListView := workbenchGui.Add("ListView", "x" . x7 . " yp w" . w12 . " h44 -Multi -Hdr -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "#"], translate))
+		this.iTyreSetListView := workbenchGui.Add("ListView", "x" . x7 . " yp w" . w12 . " h44 H:Grow(0.8) -Multi -Hdr -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "#"], translate))
 		this.iTyreSetListView.OnEvent("Click", chooseTyreSet)
 		this.iTyreSetListView.OnEvent("DoubleClick", chooseTyreSet)
 		this.iTyreSetListView.OnEvent("ItemSelect", selectTyreSet)
@@ -1267,12 +1267,12 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		x13 := (x7 + w12 + 5 + 116 - 48)
 
-		workbenchGui.Add("Button", "x" . x13 . " yp+6 w23 h23 Center +0x200 vtyreSetAddButton").OnEvent("Click", addTyreSet)
+		workbenchGui.Add("Button", "x" . x13 . " yp+6 w23 h23 Y:Move(0.8) Center +0x200 vtyreSetAddButton").OnEvent("Click", addTyreSet)
 		setButtonIcon(workbenchGui["tyreSetAddButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
 
 		x13 += 25
 
-		workbenchGui.Add("Button", "x" . x13 . " yp w23 h23 Center +0x200 vtyreSetDeleteButton").OnEvent("Click", deleteTyreSet)
+		workbenchGui.Add("Button", "x" . x13 . " yp w23 h23 Y:Move(0.8) Center +0x200 vtyreSetDeleteButton").OnEvent("Click", deleteTyreSet)
 		setButtonIcon(workbenchGui["tyreSetDeleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
 		workbenchTab.UseTab(2)
@@ -1950,7 +1950,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			settingsMenu.Push(translate("[  ]") . A_Space . translate("Fixed Pitstops"))
 
 		settingsMenu.Push(translate("---------------------------------------------"))
-		settingsMenu.Push(translate("Rules:"))
+		settingsMenu.Push(translate("Validation:"))
 
 		if (fileNames.Length > 0) {
 			validators := []
@@ -4229,7 +4229,7 @@ class ValidatorsEditor {
 				if (this.SelectedValidator.Type = "Rules")
 					this.setScript("Rules", "; Insert your rules here...`n`n", this.SelectedValidator.Builtin)
 				else
-					this.setScript("Script", "; Insert your script here...`n`n", this.SelectedValidator.Builtin)
+					this.setScript("Script", "-- Insert your script here...`n`n", this.SelectedValidator.Builtin)
 
 			this.ScriptEditor.Visible := true
 		}
@@ -4278,7 +4278,7 @@ class ValidatorsEditor {
 		translator := translateMsgBoxButtons.Bind(["Rules", "Script", "Cancel"])
 
 		OnMessage(0x44, translator)
-		msgResult := withBlockedWindows(MsgBox, translate("Do you want to create rules or a script?"), translate("Validator"), 262179)
+		msgResult := withBlockedWindows(MsgBox, translate("Do you want to use rules or do you want to write a script?"), translate("Validator"), 262179)
 		OnMessage(0x44, translator, 0)
 
 		if (msgResult = "Cancel")
@@ -4370,7 +4370,7 @@ class ValidatorsEditor {
 				valid := false
 			}
 
-		if validator.Type = "Rules" {
+		if (validator.Type = "Rules") {
 			try {
 				RuleCompiler().compileRules(this.ScriptEditor.Content[true], &ignore := false, &ignore := false)
 			}
@@ -4481,7 +4481,7 @@ class ValidatorsEditor {
 
 		for ignore, validator in this.Validators
 			if !validator.Builtin
-				FileAppend(validator.Script, kUserHomeDirectory . "Validators\" . validator.Name . ".rules")
+				FileAppend(validator.Script, kUserHomeDirectory . "Validators\" . validator.Name . "." . validator.Type)
 
 		return true
 	}

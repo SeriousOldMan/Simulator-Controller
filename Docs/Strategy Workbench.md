@@ -125,7 +125,13 @@ Notes:
   
 #### Scenario validation
 
-Beside the session rules, you can enter into the fields in the "Rules & Settings" tab, the simulation engine supports a rule based validation of strategy scenarios created during the simulation. These rules use the same technology used by the different AI Race Assistants, a [Hybrid Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine), which supports forward and backward logic resolution. For the scenario validation rules, only the backward chaining part is used, which is more or less similar to the *Prolog* logic programming language. Let's begin with an easy example:
+Beside the session rules, you can enter into the fields in the "Rules & Settings" tab, the simulation engine supports two different methods of extended validation of strategy scenarios created during the simulation. The first one uses the builtin [Hybrid Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine) and the second method uses a scipting engine base on the well-know [Lua](https://lua.org) scripting language, which is used in many commercial applications as well.
+
+Note: The rule-based validation in general requires less coding for complex validations, but it requires a good understanding of logical programming. If you are unexperienced with this, I strongly recommend to use script-based validation.
+
+##### Rule-based validation
+
+The rules for scenario validation uses the same technology used by the different AI Race Assistants, a [Hybrid Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine), which supports forward and backward logic resolution. For the scenario validation rules, only the backward chaining part is used, which is more or less similar to the *Prolog* logic programming language. Let's begin with an easy example:
 
 	validScenario() <= pitstopFuel(?, ?refuels), ?refuels > 0
 
@@ -188,11 +194,11 @@ That said, let's take a look at the builtin predicates:
 
   9. *tyreCompounds(?tyreCompounds)*
   
-     Similar to *pitstopTyreCompounds*, but also include the info for the tyres mounted at the start of the session.
+     Similar to *pitstopTyreCompounds*, but also include the info for the tyres mounted at the start of the session as the first value in the list.
 
   10. *tyreSets(?tyreSets)*
   
-      Similar to *pitstopTyreSets*, but also include the info for the tyres mounted at the start of the session.
+      Similar to *pitstopTyreSets*, but also include the info for the tyres mounted at the start of the session as the first value in the list.
   
   11. *tyreCompounds(?tyreCompounds, ?tyreCompound, ?tyreCompoundColors)*
   
@@ -266,13 +272,89 @@ Beside these predicates, which access the data of the current scenario, you have
   
     *?resultList* is unified with a list which contains all elements of *?list* except all occurences of *?value*.
 
-##### Editing validation rules
+##### Script-based validation
 
-To take a look at the predefined validation rules or to create your own ones, you can use a special rule editor, which can be opened by selecting the "Rules:" item in the "Session" menu.
+The other method uses the well-known [Lua](https://lua.org) scripting language, which is certainly more accessible than rule-based programming. Here is a simple example:
+
+	return (pitstops() > 1)
+
+This means that the current scenario is considered valid, if at least two pitstops are planned. The previous example is of course very simple. Therefore, before presenting the available functions, let's take a look at a more complex example.
+
+	valid = true
+
+	for i, tc in ipairs(tyreCompounds()) do
+		if tc.color ~= "S" then
+			valid = false
+
+			break
+		end
+	end
+
+	return valid
+
+In this case, the current scenario is considered valid, when only soft tyre compounds have been used throughout the whole scenario.
+
+##### Builtin Functions
+
+  1. *totalFuel() => fuelAmount :: <number>, numRefuels :: <integer>*
+  
+     The first value returned by *totalFuel* represents the total amount of fuel which will be used for the session and the second value is the number of refuels at the pitstops during the session.
+  
+  2. *startFuel() => startFuel :: <number>*
+  
+     Returns the amount of fuel in the car at the start of the session.
+
+  3. *pitstopFuel() => refuelAmount :: <number>, numRefuels :: <integer>*
+	 
+	 The first value returned by *pitstopFuel* represents the amount of fuel which will be refilled at the pitstops and the second value is the number of refuels at the pitstops.
+  
+  4. *startTyreCompound() => { compound :: <string>, color :: <string> }*
+  
+     Returns an object, which describes the tyre compound for the tyres mounted at the start of the session. Please note, that for *simple* "Wet", "Intermediate" and "Dry" compounds the color will always be "Black".
+	 
+  5. *startTyreSet() => tyreSet :: <integer>*
+  
+     Same as the previous one, but the number of the mounted tyre set is returned.
+
+  6. *pitstopTyreCompounds() => tyreCompounds :: <array> of { compound :: <string>, color :: <string> }*
+  
+     Returns a list of tyre compounds mounted in the various pitstops of the session. This list contains of objects, each of which represents a tyre compound for tyres mounted at a planned pitstop.
+
+  7. *pitstopTyreSets() => tyreSets :: <array> of <integer>*
+  
+     ame as the previous one, but the number of the mounted tyre sets are returned in the list.
+  
+  8. *refuels() => refuels :: <integer>*
+  
+     Convenience function for: "local ignore, numRefuels = totalFuel()"
+
+  9. *tyreCompounds() => tyreCompounds :: <array> of { compound :: <string>, color :: <string> }*
+  
+     Similar to *pitstopTyreCompounds*, but also include the info for the tyres mounted at the start of the session as the first value in the list.
+
+  10. *tyreSets() => tyreSets :: <array> of <integer>*
+  
+      Similar to *pitstopTyreSets*, but also include the info for the tyres mounted at the start of the session as the first value in the list.
+
+The above functions will give you summarized information about all pitstops, which will be sufficient in most cases. But you can also acquire informations about each individual pitstop.
+
+  1. *pitstops() => count :: <integer>*
+
+     Returns the overall number of pitstops.
+	 
+  2. *pitstop(nr) => pitstop :: { lap :: <integer>, time :: <integer>, fuel :: <number>,
+					 tyreCompound :: false or <string>, tyreCompoundColor = false or <string>,
+					 tyreSet :: false or <string>}
+  
+     This function returns an object which fully describes a planned pitstop. Notes: Tyre information will be *false*, if no tyre change is planned. The time represents the number of minutes into the race. 
+
+##### Editing validation rules and scripts
+
+To take a look at the predefined validation rules and scripts or to create your own ones, you can use a special editor, which can be opened by selecting the "Validation:" item in the "Session" menu.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Validation%20Rules.JPG)
 
-You can create new rules by clicking on the "+" button or you can copy one of the existing rules as a starting point. The predefined validation rules cannot be changed, of course.
+You can create new rules by clicking on the "+" button or you can copy one of the existing rules or scripts as a starting point. The predefined validation rules and scripts cannot be changed, of course.
 
 ### Pitstop & Service
 

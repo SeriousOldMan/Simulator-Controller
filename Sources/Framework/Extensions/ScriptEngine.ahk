@@ -224,7 +224,7 @@ scriptPushValue(context, value) {
 		lua_pushstring(context, String(value))
 }
 
-scriptCreateGlobal(context, name) {
+scriptSetGlobal(context, name) {
 	lua_setglobal(context, name)
 }
 

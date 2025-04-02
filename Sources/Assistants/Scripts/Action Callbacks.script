@@ -24,50 +24,62 @@ function Assistant.Ask(question)
 end
 
 function Assistant.Speak(message, ...)
-	assert(#... == 0 or (#... == 1 and type(...[1]) = "boolean"))
+	local arguments = table.pack(...)
 	
-	return __Assistant_Speak(message, ...)
+	assert(#arguments == 0 or (#arguments == 1 and type(arguments[1]) == "boolean"))
+	
+	return __Assistant_Speak(message, table.unpack(arguments))
 end
 
 function Assistant.Raise(event, ...)
-	for i, v in ipairs(...) do
-		...[i] = tostring(v)
+	local arguments = table.pack(...)
+	
+	for i, v in ipairs(arguments) do
+		arguments[i] = tostring(v)
 	end
 	
-	return __Assistant_Raise(event, ...)
+	return __Assistant_Raise(event, table.unpack(arguments))
 end
 
-function Assistant.Call(function, ...)
-	for i, v in ipairs(...) do
-		...[i] = tostring(v)
+function Assistant.Call(func, ...)
+	local arguments = table.pack(...)
+	
+	for i, v in ipairs(arguments) do
+		arguments[i] = tostring(v)
 	end
 	
-	return __Assistant_Call(function, ...)
+	return __Assistant_Call(func, table.unpack(arguments))
 end
 
-function Controller.Call(function, ...)
-	for i, v in ipairs(...) do
-		...[i] = tostring(v)
+function Controller.Call(func, ...)
+	local arguments = table.pack(...)
+	
+	for i, v in ipairs(arguments) do
+		arguments[i] = tostring(v)
 	end
 	
-	return __Controller_Call(function, ...)
+	return __Controller_Call(func, table.unpack(arguments))
 end
 
-function Function.Call(function, ...)
-	for i, v in ipairs(...) do
-		...[i] = tostring(v)
+function Function.Call(func, ...)
+	local arguments = table.pack(...)
+	
+	for i, v in ipairs(arguments) do
+		arguments[i] = tostring(v)
 	end
 	
-	return __Function_Call(function, ...)
+	return __Function_Call(func, table.unpack(arguments))
 end
 
 function Rules.GetValue(name, ...)
+	local arguments = table.pack(...)
 	local value = __Rules_GetValue(name)
 	
-	assert(#... <= 1)
+	assert(#arguments <= 1)
 	
-	if (value == nil or value == __NotInitialized or value == __Undefined) and #... > 0 then
-		value = table.unpack(...)
+	if (value == nil or value == __NotInitialized or value == __Undefined) and #arguments == 1 then
+		value = arguments[1]
+	end
 		
 	return value
 end

@@ -27,6 +27,7 @@ function __normalizeArguments(arguments)
 			arguments[i] = __Undefined
 		else
 			arguments[i] = tostring(v)
+		end
 	end
 	
 	return arguments

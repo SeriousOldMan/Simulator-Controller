@@ -519,7 +519,7 @@ You can enable or disable individual predefined actions using the checkbox on th
    
      Invokes the *method* on the instance of the Race Assistant class with some arguments. A variable number of arguments are supported.
 	 
-   - Assistant.Speak(phrase, [force])
+   - Assistant.Speak(phrase [, force])
    
 	 Outputs the given phrase using the voice of the given Race Assistant. *phrase* can be the label of a predefined phrase from the grammar definition of the Assistant. If *phrase* is not one of the predefined phrases it will be spoken as is. The *phrase* will not be spoken, if the Assistant is muted, unless you supply *true* for the optional parameter *force*.
 	 
@@ -546,14 +546,6 @@ You can enable or disable individual predefined actions using the checkbox on th
 	   [?Track.Grip = Wet] => (Call: Assistant.Speak("It will be too wet. I will come up with a new strategy.")), (Call: Assistant.Call(planPitstop))
 
    Here you can use (Call: *Assistant.Call*(function, p1, ..., pn)), if more than 6 arguments should be passed to the function. Same applies to any other of the above *calls*.
-   
-As you can see, defining individual actions is really an expert topic and therefore nothing for the casual user. If you want use this feature, I can offer a personal introduction and coaching as part of the Patreon membership.
-
-Here is a very simple example:
-
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Action%20Definition.JPG)
-
-This action calls the [controller acton]((https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions)) "trigger" with "!w" as an argument in the Simulator Cntroller process. This sends the keyboard command Alt-w to the current simulator, thereby starting the windscreen wiper. This action may be activated by a voice command like "Can you start the windscreen wiper?" when using the *Conversation* booster, or it can be automatically triggered by the *Reasoning* booster, when an event is signalled that tells that it just started raining.
 
 4. Equally useful as "Assistant Rule" is "Assistant Script" and since *Lua* is a widespread scripting language, it may be more accessible to the typical user. When defining the script for a custom action, you can use the following functions to connect to the given Assistant or even the "Simulator Controller.exe" process:
    
@@ -561,7 +553,7 @@ This action calls the [controller acton]((https://github.com/SeriousOldMan/Simul
    
      Invokes the *method* on the instance of the Race Assistant class with some arguments. A variable number of arguments are supported.
 	 
-   - Assistant.Speak(phrase :: \<string\>, [force :: \<booelan\>])
+   - Assistant.Speak(phrase :: \<string\> [, force :: \<booelan\>])
    
 	 Outputs the given phrase using the voice of the given Race Assistant. *phrase* can be the label of a predefined phrase from the grammar definition of the Assistant. If *phrase* is not one of the predefined phrases it will be spoken as is. The *phrase* will not be spoken, if the Assistant is muted, unless you supply *true* for the optional parameter *force*.
 	 
@@ -589,11 +581,19 @@ This action calls the [controller acton]((https://github.com/SeriousOldMan/Simul
    
      Runs a full production cycle of the Rule Engine of the Assistant.
 	 
-   Here is a *simple* example:
+   Here is an example that demonstrates several of the above functions:
    
    ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Action%20Definition%202.JPG)
    
    For this example it is assumed, that two keyboard commands are defined in the current simulator: 1. "i" increases the brake balance and "k" decreases the brake balance.
+   
+As you can see, defining individual actions is really an expert topic and therefore nothing for the casual user. If you want use this feature, I can offer a personal introduction and coaching as part of the Patreon membership.
+
+But you can actually start small. Here is a *very* simple example:
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Action%20Definition.JPG)
+
+This action calls the [controller action]((https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions)) "trigger" with "!w" as an argument in the Simulator Cntroller process. This sends the keyboard command Alt-w to the current simulator, thereby starting the windscreen wiper. This action may be activated by a voice command like "Can you start the windscreen wiper?" when using the *Conversation* booster, or it can be automatically triggered by the *Reasoning* booster, when an event is signalled that tells that it just started raining.
 
 ## Managing Events
 

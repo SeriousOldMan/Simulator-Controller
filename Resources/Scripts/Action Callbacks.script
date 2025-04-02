@@ -83,6 +83,8 @@ function Rules.GetValue(name, ...)
 		end if (value == __NotInitialized or value == __Undefined) then
 			value = arguments[1]
 		end
+	else if (value == __NotInitialized or value == __Undefined) then
+		value = nil
 	end
 		
 	return value

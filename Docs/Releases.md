@@ -34,6 +34,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 #### Changes
 
+  - Spotter alerts about accidents in a specific distance got a higher priority.
   - New [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) has been defined, which allows you to move the *Temp* folder and also the *Programs* folder of the [Documents]\Simulator Controller folder to a different location. This will be helpful, if your [Documents] folder is under control of *One Drive* or a similar replication tool, since there are reports of several issues and conflicts with the operation of Simulator Controller in that case.
   - The window resizing behaviour for "Strategy Workbench" has been optimized a bit to make the list of available tyre compounds more accessible.
   - This Release introduces support for a new algorithmic scripting language as addition to the support of rule-based programming, which has been around for some time now. The new scripting engine is based on the well-known and wide-spread programming language [Lua](https://lua.org). A long term goal is to use the scripting language for the implementation of all behavioral actions of the Assistants, once they are based on a LAM (aka Large Action Model).

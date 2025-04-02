@@ -2987,7 +2987,8 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	skipAlert(alert) {
-		if this.pendingAlerts(["AccidentAhead", "SlowCarAhead"], true)
+		if this.pendingAlerts(["AccidentAhead", "AccidentAheadDistance"
+							 , "SlowCarAhead", "SlowCarAheadDistance", "SlowCarAheadSide"], true)
 			return true
 		else {
 			switch alert, false {

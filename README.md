@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.2.6.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/YkucHpoO) (Early build for 6.2.6. Changes: Fixed several UTF encoding problems for driver names in the session database, Integrated Lua as scripting language, New core settings for folder locations, New resizing rules for "Strategy Workbech", Fixed several translation errors.)
+[6.2.6.0-beta]() (Test build for 6.2.6. Changes: Fixed several UTF encoding problems for driver names in the session database, Integrated Lua as scripting language, New core settings for folder locations, New resizing rules for "Strategy Workbech", Fixed several translation errors, Integration of scripts in "Strategy Workbench" and in the Assistant boosters.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-626) of this version and all the versions you might have skipped, before installing and using this version.
 

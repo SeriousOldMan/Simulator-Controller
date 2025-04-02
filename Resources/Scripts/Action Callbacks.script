@@ -66,8 +66,13 @@ function Rules.GetValue(name, ...)
 	
 	assert(#... <= 1)
 	
-	if (value == nil or value == __NotInitialized or value == __Undefined) and #... > 0 then
+	if value == nil and #... > 0 then
 		value = table.unpack(...)
+	end
+	
+	if (value == __NotInitialized or value == __Undefined) and #... > 0 then
+		value = table.unpack(...)
+	end
 		
 	return value
 end

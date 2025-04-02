@@ -283,7 +283,7 @@ class StrategySimulation {
 					scriptPushArray(scriptEngine, [strategy.RemainingFuel
 												 , strategy.TyreCompound, strategy.TyreCompoundColor
 												 , strategy.TyreSet])
-					scriptCreateGlobal(scriptEngine, "__Setup")
+					scriptSetGlobal(scriptEngine, "__Setup")
 
 					laps := []
 					times := []
@@ -313,17 +313,17 @@ class StrategySimulation {
 					}
 
 					scriptPushArray(scriptEngine, laps)
-					scriptCreateGlobal(scriptEngine, "__PitstopLaps")
+					scriptSetGlobal(scriptEngine, "__PitstopLaps")
 					scriptPushArray(scriptEngine, times)
-					scriptCreateGlobal(scriptEngine, "__PitstopTimes")
+					scriptSetGlobal(scriptEngine, "__PitstopTimes")
 					scriptPushArray(scriptEngine, refuels)
-					scriptCreateGlobal(scriptEngine, "__PitstopRefuels")
+					scriptSetGlobal(scriptEngine, "__PitstopRefuels")
 					scriptPushArray(scriptEngine, tyreCompounds)
-					scriptCreateGlobal(scriptEngine, "__PitstopTyreCompounds")
+					scriptSetGlobal(scriptEngine, "__PitstopTyreCompounds")
 					scriptPushArray(scriptEngine, tyreCompoundColors)
-					scriptCreateGlobal(scriptEngine, "__PitstopTyreCompoundColors")
+					scriptSetGlobal(scriptEngine, "__PitstopTyreCompoundColors")
 					scriptPushArray(scriptEngine, tyreSets)
-					scriptCreateGlobal(scriptEngine, "__PitstopTyreSets")
+					scriptSetGlobal(scriptEngine, "__PitstopTyreSets")
 
 					if !scriptExecute(scriptEngine, &message) {
 						OnMessage(0x44, translateOkButton)

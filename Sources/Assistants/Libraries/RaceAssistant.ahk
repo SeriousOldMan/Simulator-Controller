@@ -19,6 +19,7 @@
 #Include "..\..\Framework\Extensions\JSON.ahk"
 #Include "..\..\Framework\Extensions\Task.ahk"
 #Include "..\..\Framework\Extensions\RuleEngine.ahk"
+#Include "..\..\Framework\Extensions\ScriptEngine.ahk"
 #Include "..\..\Framework\Extensions\LLMConnector.ahk"
 #Include "..\..\Framework\Extensions\LLMBooster.ahk"
 #Include "..\..\Framework\Extensions\LLMAgent.ahk"
@@ -4410,6 +4411,9 @@ createTools(assistant, type) {
 
 				script .= ("`n`n" . FileRead(getFileName(scriptFileName, kUserHomeDirectory . "Actions\", kResourcesDirectory . "Actions\")))
 
+				for index, parameter in parameters
+					script := StrReplace(script, "%" . parameter.Name . "%", parameter.Name)
+
 				scriptFileName := temporaryFileName("action", "script")
 
 				try {
@@ -4419,7 +4423,8 @@ createTools(assistant, type) {
 						throw message
 				}
 				finally {
-					deleteFile(scriptFileName)
+					if !isDebug()
+						deleteFile(scriptFileName)
 				}
 
 				for index, parameter in parameters

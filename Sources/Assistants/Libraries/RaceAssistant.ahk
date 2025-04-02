@@ -4131,8 +4131,10 @@ getTime(*) {
 }
 
 callAssistant(context, method, arguments*) {
+	local assistant := (isInstance(context, RaceAssistant) ? context : context.KnowledgeBase.RaceAssistant)
+
 	try {
-		context.KnowledgeBase.RaceAssistant.%method%(normalizeArguments(arguments)*)
+		assistant.%method%(normalizeArguments(arguments)*)
 	}
 	catch Any as exception {
 		logError(exception, true)
@@ -4144,7 +4146,8 @@ callAssistant(context, method, arguments*) {
 Assistant_Call := callAssistant
 
 callFunction(context, function, arguments*) {
-	local remoteHandler := context.KnowledgeBase.RaceAssistant.RemoteHandler
+	local assistant := (isInstance(context, RaceAssistant) ? context : context.KnowledgeBase.RaceAssistant)
+	local remoteHandler := assistant.RemoteHandler
 
 	if remoteHandler
 		remoteHandler.customAction("Function", function, normalizeArguments(arguments, true)*)
@@ -4155,7 +4158,8 @@ callFunction(context, function, arguments*) {
 Function_Call := callFunction
 
 callController(context, method, arguments*) {
-	local remoteHandler := context.KnowledgeBase.RaceAssistant.RemoteHandler
+	local assistant := (isInstance(context, RaceAssistant) ? context : context.KnowledgeBase.RaceAssistant)
+	local remoteHandler := assistant.RemoteHandler
 
 	if remoteHandler
 		remoteHandler.customAction("Method", method, normalizeArguments(arguments, true)*)
@@ -4166,7 +4170,8 @@ callController(context, method, arguments*) {
 Controller_Call := callController
 
 askAssistant(context, question) {
-	local assistant := context.KnowledgeBase.RaceAssistant
+	local assistant := (isInstance(context, RaceAssistant) ? context : context.KnowledgeBase.RaceAssistant)
+	local remoteHandler := assistant.RemoteHandler
 
 	if assistant.Listener
 		assistant.VoiceManager.recognize(question)
@@ -4177,7 +4182,7 @@ askAssistant(context, question) {
 Assistant_Ask := askAssistant
 
 speakAssistant(context, message, force := false) {
-	local assistant := context.KnowledgeBase.RaceAssistant
+	local assistant := (isInstance(context, RaceAssistant) ? context : context.KnowledgeBase.RaceAssistant)
 	local speaker, ignore, part
 
 	if assistant.Speaker[force] {
@@ -4198,7 +4203,7 @@ speakAssistant(context, message, force := false) {
 Assistant_Speak := speakAssistant
 
 raiseEvent(context, event, arguments*) {
-	local assistant := context.KnowledgeBase.RaceAssistant
+	local assistant := (isInstance(context, RaceAssistant) ? context : context.KnowledgeBase.RaceAssistant)
 	local pid
 
 	try {
@@ -4390,6 +4395,134 @@ createTools(assistant, type) {
 		}
 	}
 
+	callScript(action, scriptFileName, enoughData, confirm, parameters, arguments*) {
+		local knowledgeBase := assistant.KnowledgeBase
+		local index, parameter, script, context, message
+
+		if knowledgeBase {
+			if !runAction(enoughData, confirm)
+				return
+
+			context := scriptOpenContext()
+
+			try {
+				script := FileRead(kResourcesDirectory . "Scripts\Action Callbacks.script")
+
+				script .= ("`n`n" . FileRead(getFileName(scriptFileName, kUserHomeDirectory . "Actions\", kResourcesDirectory . "Actions\")))
+
+				scriptFileName := temporaryFileName("action", "script")
+
+				try {
+					FileAppend(script, scriptFileName)
+
+					if !scriptLoadScript(context, scriptFileName, &message)
+						throw message
+				}
+				finally {
+					deleteFile(scriptFileName)
+				}
+
+				for index, parameter in parameters
+					try {
+						scriptPushValue(context, arguments[index])
+						scriptSetGlobal(context, parameter.Name)
+					}
+					catch UnsetItemError {
+						scriptPushValue(context, kNull)
+						scriptSetGlobal(context, parameter.Name)
+					}
+
+				scriptPushValue(context, kUndefined)
+				scriptSetGlobal(context, "__Undefined")
+				scriptPushValue(context, kNotInitialized)
+				scriptSetGlobal(context, "__NotInitialized")
+
+				scriptPushValue(context, (c) {
+					knowledgeBase.setFact(scriptGetString(c), scriptGetString(c, 2))
+
+					return Integer(0)
+				})
+				scriptSetGlobal(context, "__Rules_SetValue")
+				scriptPushValue(context, (c) {
+					local value := knowledgeBase.getValue(scriptGetString(c))
+
+					if ((value = kUndefined) || (value = kNotInitialized))
+						value := kNull
+
+					scriptPushValue(c, value)
+
+					return Integer(1)
+				})
+				scriptSetGlobal(context, "__Rules_GetValue")
+				scriptPushValue(context, (c) {
+					knowledgeBase.produce()
+
+					return Integer(0)
+				})
+				scriptSetGlobal(context, "__Rules_Execute")
+
+				scriptPushValue(context, (c) {
+					askAssistant(assistant, scriptGetString(c))
+
+					return Integer(0)
+				})
+				scriptSetGlobal(context, "__Assistant_Ask")
+				scriptPushValue(context, (c) {
+					speakAssistant(assistant, scriptGetString(c)
+								 , (scriptGetArgsCount(c) > 1) ? scriptGetBoolean(c, 2) : unset)
+
+					return Integer(0)
+				})
+				scriptSetGlobal(context, "__Assistant_Speak")
+				scriptPushValue(context, (c) {
+					local arguments := []
+
+					loop scriptGetArgsCount(c)
+						if (A_Index > 1)
+							arguments.Push(scriptGetString(c, A_Index))
+
+					callAssistant(assistant, scriptGetString(c), arguments*)
+
+					return Integer(0)
+				})
+				scriptSetGlobal(context, "__Assistant_Call")
+				scriptPushValue(context, (c) {
+					local arguments := []
+
+					loop scriptGetArgsCount(c)
+						if (A_Index > 1)
+							arguments.Push(scriptGetString(c, A_Index))
+
+					callController(assistant, scriptGetString(c), arguments*)
+
+					return Integer(0)
+				})
+				scriptSetGlobal(context, "__Controller_Call")
+				scriptPushValue(context, (c) {
+					local arguments := []
+
+					loop scriptGetArgsCount(c)
+						if (A_Index > 1)
+							arguments.Push(scriptGetString(c, A_Index))
+
+					callFunction(assistant, scriptGetString(c), arguments*)
+
+					return Integer(0)
+				})
+				scriptSetGlobal(context, "__Function_Call")
+
+				if !scriptExecute(context, &message)
+					throw message
+			}
+			finally {
+				scriptCloseContext(context)
+			}
+
+			if assistant.Debug[kDebugKnowledgeBase]
+				assistant.dumpKnowledgeBase(knowledgeBase)
+		}
+	}
+
 	callRule(action, ruleFileName, enoughData, confirm, parameters, arguments*) {
 		local knowledgeBase := assistant.KnowledgeBase
 		local index, parameter, names, variables
@@ -4524,6 +4657,8 @@ createTools(assistant, type) {
 						handler := callMethod.Bind(definition[2], enoughData, confirm, parameters)
 					case "Assistant.Rule":
 						handler := callRule.Bind(action, definition[2], enoughData, confirm, parameters)
+					case "Assistant.Script":
+						handler := callScript.Bind(action, definition[2], enoughData, confirm, parameters)
 					case "Controller.Method":
 						handler := callControllerMethod.Bind(definition[2], enoughData, confirm, parameters)
 					case "Controller.Function":

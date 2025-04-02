@@ -1888,7 +1888,7 @@ class CallbacksEditor {
 		local valid := true
 		local name := this.Control["callbackNameEdit"].Text
 		local errorMessage := ""
-		local ignore, other, type, fileName, context, message
+		local ignore, other, type, fileName, context, message, script
 
 		if this.SelectedParameter
 			if !this.saveParameter(this.SelectedParameter)
@@ -1938,7 +1938,12 @@ class CallbacksEditor {
 			try {
 				context := scriptOpenContext()
 
-				FileAppend(this.ScriptEditor.Content[true], fileName)
+				script := this.ScriptEditor.Content[true]
+
+				for ignore, parameter in callback.Parameters
+					script := StrReplace(script, "%" . parameter.Name . "%", "__" . parameter.Name . "__")
+
+				FileAppend(script, fileName)
 
 				if !scriptLoadScript(context, fileName, &message)
 					throw message

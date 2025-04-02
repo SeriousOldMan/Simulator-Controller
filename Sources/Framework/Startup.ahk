@@ -257,6 +257,7 @@ initializeEnvironment() {
 	DirCreate(kUserHomeDirectory . "Config")
 	DirCreate(kUserHomeDirectory . "Actions")
 	DirCreate(kUserHomeDirectory . "Rules")
+	DirCreate(kUserHomeDirectory . "Scripts")
 	DirCreate(kUserHomeDirectory . "Garage")
 	DirCreate(kUserHomeDirectory . "Garage\Definitions")
 	DirCreate(kUserHomeDirectory . "Garage\Rules")

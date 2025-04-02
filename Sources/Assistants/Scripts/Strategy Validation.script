@@ -43,14 +43,12 @@ end
 function pitstopTyreCompounds()
 	local tcs = {}
 	
-	for i, tc in ipairs(__PitstopTyreCompounds) do
+	for i=1, #__PitstopTyreCompounds do
+		local tc = __PitstopTyreCompounds[i]
+		
 		if tc ~= nil and tc ~= false then
-			table.insert(tcs, {pitstop = i, compound = tc, color = nil})
+			table.insert(tcs, {compound = tc, color = __PitstopTyreCompoundColors[i]})
 		end
-	end
-	
-	for i, tc in ipairs(tcs) do
-		tc.color = __PitstopTyreCompoundColors[tc.pitstop]
 	end
 		
 	return tcs
@@ -95,13 +93,7 @@ function tyreSets()
 end
 
 function pitstops()
-	local count = 0
-	
-	for i, rf in ipairs(__PitstopRefuels) do
-		count = count + 1
-	end
-	
-	return count
+	return #__PitstopRefuels
 end
 
 function pitstop(nr)

@@ -218,7 +218,10 @@ class AssistantEvent extends AgentEvent {
 	}
 
 	triggerAction(action, arguments*) {
-		throw "Not yet implemented..."
+		action = createTools(this, "Agent", [action])
+
+		if (action.Length > 0)
+			action[1].Callable.Call(arguments*)
 	}
 }
 
@@ -1835,7 +1838,7 @@ class RaceAssistant extends ConfigurationItem {
 
 		compiler.compileRules(rules, &productions, &reductions, &includes)
 
-		if this.ConversationBooster {
+		if (this.ConversationBooster && this.ConversationBooster.Options["Actions"]) {
 			rules := FileRead(getFileName("Conversation Actions.rules", kUserRulesDirectory, kRulesDirectory))
 
 			compiler.compileRules(rules, &productions, &reductions, &includes)

@@ -623,11 +623,19 @@ As you can see, this editor looks very similar to the actions editor discussed a
    
      Raises the given *signal*, thereby identifying the event to be processed by the LLM.
 	 
-   *Assistant.Raise* also comes in a different flavour. When the first argument is the type of an Assistant (like "Race Engineer", "Race Strategist" and so on), the second argument must be the signal and this signal is raised for the supplied Assistant.
+   - Assistant.Trigger(action, p1, p2, ...)
+   
+     Activates a defined action without going through the LLM processing. The action is located by its name and is invoked directly with the supplied arguments.
+	 
+   *Assistant.Raise* and *Assistant.Trigger* also come in a different flavour. When the first argument is the type of an Assistant (like "Race Engineer", "Race Strategist" and so on), the second argument must be the signal and this signal is raised for the supplied Assistant. This can be used for communication between the different Assistants.
    
    - Assistant.Raise(assistant, signal, p1, p2, ...)
    
      Raises the given *signal* for the given *assistant*, thereby identifying the event to be processed by the LLM.
+	 
+   - Assistant.Trigger(assistant, action, p1, p2, ...)
+   
+     Activates a defined *action* for the given *assistant*. The action is located by its name and is invoked directly with the supplied arguments.
 
 Here is an example of a few rules that together detect that it just started raining. Then the event "RainStart" is signalled to the LLM, which then can react and switch on the wiper, for example.
 

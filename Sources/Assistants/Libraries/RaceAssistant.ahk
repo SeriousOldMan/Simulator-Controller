@@ -216,6 +216,10 @@ class AssistantEvent extends AgentEvent {
 		else
 			return false
 	}
+
+	triggerAction(action, arguments*) {
+		throw "Not yet implemented..."
+	}
 }
 
 class RuleEvent extends AssistantEvent {
@@ -4355,7 +4359,7 @@ raiseEvent(context, event, arguments*) {
 
 				if pid {
 					messageSend(kFileMessage, assistant
-											, event . ((arguments.Length > 0) ? (":" . values2String(";", normalizeArguments(arguments, true)*)) : "")
+											, "handleEvent:" . event . ((arguments.Length > 0) ? (";" . values2String(";", normalizeArguments(arguments, true)*)) : "")
 											, pid)
 
 					return true
@@ -4374,14 +4378,54 @@ raiseEvent(context, event, arguments*) {
 	}
 }
 
-Assistant_Raise := raiseEvent
+Assistant_Trigger := triggerAction
+
+triggerAction(context, action, arguments*) {
+	local assistant := (isInstance(context, RaceAssistant) ? context : context.KnowledgeBase.RaceAssistant)
+	local pid
+
+	try {
+		if inList(kRaceAssistants, action) {
+			if (action = assistant.AssistantType) {
+				action := arguments.RemoveAt(1)
+
+				return assistant.triggerAction(normalizeArguments(Array(action, arguments*))*)
+			}
+			else {
+				assistant := action
+				event := arguments.RemoveAt(1)
+
+				pid := ProcessExist(assistant . ".exe")
+
+				if pid {
+					messageSend(kFileMessage, assistant
+											, "triggerAction:" . action . ((arguments.Length > 0) ? (";" . values2String(";", normalizeArguments(arguments, true)*)) : "")
+											, pid)
+
+					return true
+				}
+				else
+					return false
+			}
+		}
+		else
+			return assistant.triggerAction(normalizeArguments(Array(event, arguments*))*)
+	}
+	catch Any as exception {
+		logError(exception, true)
+
+		return false
+	}
+}
+
+Assistant_Trigger:= triggerAction
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-createTools(assistant, type) {
+createTools(assistant, type, names := false) {
 	local configuration := readMultiMap(kResourcesDirectory . "Actions\" . assistant.AssistantType . ".actions")
 	local tools := []
 	local loadedRules := CaseInsenseMap()
@@ -4769,60 +4813,61 @@ createTools(assistant, type) {
 
 	addMultiMapValues(configuration, readMultiMap(kUserHomeDirectory . "Actions\" . assistant.AssistantType . ".actions"))
 
-	for ignore, action in string2Values(",", getMultiMapValue(configuration, type . ".Actions", "Active", "")) {
-		definition := getMultiMapValue(configuration, type . ".Actions.Custom", action, false)
+	for ignore, action in string2Values(",", getMultiMapValue(configuration, type . ".Actions", "Active", ""))
+		if (!names || inList(names, action)) {
+			definition := getMultiMapValue(configuration, type . ".Actions.Custom", action, false)
 
-		if !definition
-			definition := getMultiMapValue(configuration, type . ".Actions.Builtin", action, false)
+			if !definition
+				definition := getMultiMapValue(configuration, type . ".Actions.Builtin", action, false)
 
-		try {
-			if definition {
-				definition := string2Values("|", definition)
-				parameters := []
+			try {
+				if definition {
+					definition := string2Values("|", definition)
+					parameters := []
 
-				loop definition[5] {
-					parameter := string2Values("|", getMultiMapValue(configuration, type . ".Actions.Parameters", action . "." . A_Index, ""))
+					loop definition[5] {
+						parameter := string2Values("|", getMultiMapValue(configuration, type . ".Actions.Parameters", action . "." . A_Index, ""))
 
-					if (parameter.Length >= 5) {
-						enumeration := string2Values(",", parameter[3])
+						if (parameter.Length >= 5) {
+							enumeration := string2Values(",", parameter[3])
 
-						if (enumeration.Length = 0)
-							enumeration := false
+							if (enumeration.Length = 0)
+								enumeration := false
 
-						required := ((parameter[4] = kTrue) ? kTrue : ((parameter[4] = kFalse) ? false : parameter[4]))
+							required := ((parameter[4] = kTrue) ? kTrue : ((parameter[4] = kFalse) ? false : parameter[4]))
 
-						parameters.Push(LLMTool.Function.Parameter(parameter[1], parameter[5], parameter[2], enumeration, required))
+							parameters.Push(LLMTool.Function.Parameter(parameter[1], parameter[5], parameter[2], enumeration, required))
+						}
 					}
+
+					enoughData := ((definition[3] = kTrue) ? true : ((definition[3] = kFalse) ? false : definition[3]))
+					confirm := ((definition[4] = kTrue) ? true : ((definition[4] = kFalse) ? false : definition[4]))
+
+					switch definition[1], false {
+						case "Assistant.Method":
+							handler := callMethod.Bind(definition[2], enoughData, confirm, parameters)
+						case "Assistant.Rule":
+							handler := callRule.Bind(action, definition[2], enoughData, confirm, parameters)
+						case "Assistant.Script":
+							handler := callScript.Bind(action, definition[2], enoughData, confirm, parameters)
+						case "Controller.Method":
+							handler := callControllerMethod.Bind(definition[2], enoughData, confirm, parameters)
+						case "Controller.Function":
+							handler := callControllerFunction.Bind(definition[2], enoughData, confirm, parameters)
+						default:
+							throw "Unknown action type (" definition[1] . ") detected in createTools..."
+					}
+
+					if handler
+						tools.Push(LLMTool.Function(action, definition[6], parameters, handler))
 				}
-
-				enoughData := ((definition[3] = kTrue) ? true : ((definition[3] = kFalse) ? false : definition[3]))
-				confirm := ((definition[4] = kTrue) ? true : ((definition[4] = kFalse) ? false : definition[4]))
-
-				switch definition[1], false {
-					case "Assistant.Method":
-						handler := callMethod.Bind(definition[2], enoughData, confirm, parameters)
-					case "Assistant.Rule":
-						handler := callRule.Bind(action, definition[2], enoughData, confirm, parameters)
-					case "Assistant.Script":
-						handler := callScript.Bind(action, definition[2], enoughData, confirm, parameters)
-					case "Controller.Method":
-						handler := callControllerMethod.Bind(definition[2], enoughData, confirm, parameters)
-					case "Controller.Function":
-						handler := callControllerFunction.Bind(definition[2], enoughData, confirm, parameters)
-					default:
-						throw "Unknown action type (" definition[1] . ") detected in createTools..."
-				}
-
-				if handler
-					tools.Push(LLMTool.Function(action, definition[6], parameters, handler))
+				else
+					throw "Unknown action (" action . ") detected in createTools..."
 			}
-			else
-				throw "Unknown action (" action . ") detected in createTools..."
+			catch Any as exception {
+				logError(exception, true)
+			}
 		}
-		catch Any as exception {
-			logError(exception, true)
-		}
-	}
 
 	return tools
 }

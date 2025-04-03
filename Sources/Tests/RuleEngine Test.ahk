@@ -97,8 +97,8 @@ global kExecutionTestRules := "
 
 				{All: [?Peter], {Prove: isHappy(?Peter, ?gf)}} => (Prove: father(?father, ?gf)), (Call: celebrate())
 
-				scriptTestSuccess(?path) <= execute(?path, "true")
-				scriptTestFail(?path) <= execute(?path, "false")
+				scriptTestSuccess(?path) <= execute(?path, "Yes")
+				scriptTestFail(?path) <= execute(?path, "No")
 )"
 
 
@@ -161,8 +161,10 @@ class ScriptKnowledgeBase extends KnowledgeBase {
 					})
 					scriptSetGlobal(context, "__Rules_Execute")
 
-					if scriptExecute(context, &message)
+					if scriptExecute(context, &message) {
 						result := scriptGetBoolean(context)
+						value := scriptGetString(context, 2)
+					}
 					else
 						throw message
 				}

@@ -1,1 +1,1 @@
-return (Arguments[1] = "true")
+return (Arguments[1] == "Yes"), Arguments[1]

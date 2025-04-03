@@ -4407,9 +4407,12 @@ createTools(assistant, type) {
 			context := scriptOpenContext()
 
 			try {
-				script := FileRead(kResourcesDirectory . "Scripts\Action Callbacks.script")
+				script := FileRead(getFileName("Action Callbacks.script"
+											 , kUserHomeDirectory . "Scripts\", kResourcesDirectory . "Scripts\"))
 
-				script .= ("`n`n" . FileRead(getFileName(scriptFileName, kUserHomeDirectory . "Actions\", kResourcesDirectory . "Actions\")))
+				script .= ("`n`n" . FileRead(getFileName(scriptFileName
+													   , kUserHomeDirectory . "Actions\"
+													   , kResourcesDirectory . "Actions\")))
 
 				for index, parameter in parameters
 					script := StrReplace(script, "%" . parameter.Name . "%", parameter.Name)

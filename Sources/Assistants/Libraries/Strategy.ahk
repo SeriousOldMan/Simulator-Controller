@@ -119,7 +119,8 @@ class StrategySimulation {
 	loadRules(compiler, validatorFileName, &productions, &reductions, &includes) {
 		local rules, message, title, script, context
 
-		rules := FileRead(kResourcesDirectory . "Strategy\Rules\Strategy Validation.rules")
+		rules := FileRead(getFileName("Strategy Validation.rules"
+									, kUserHomeDirectory . "Rules\", kResourcesDirectory . "Strategy\Rules\"))
 
 		productions := false
 		reductions := false
@@ -151,7 +152,9 @@ class StrategySimulation {
 		try {
 			context := scriptOpenContext()
 
-			script := FileRead(kResourcesDirectory . "Strategy\Scripts\Strategy Validation.script")
+			script := FileRead(getFileName("Strategy Validation.script"
+										 , kUserHomeDirectory . "Scripts\"
+										 , kResourcesDirectory . "Strategy\Scripts\"))
 
 			script .= ("`n`n" . FileRead(scriptFileName))
 

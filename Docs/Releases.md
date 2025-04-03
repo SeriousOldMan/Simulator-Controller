@@ -1,30 +1,8 @@
 # Latest stable release
 
-## 6.2.5.0
-
-#### Date: 03/28/25 (planned)
-
-#### Fixes
-
-  - Fixed a bug which crashed the Driving Coach, when the *Reasoning* booster was enabled, but no action had been defined.
-  - Fixed a bug which restricted the number of output tokes for the Driving Coach LLM and also for the different Assistant boosters to a max value of 999.
-  - Fixed some translations and added a few which were missing.
-  - Fixed a bug which caused a request to a *Conversation* booster to fail in case specific informaton wasmissing in the knowledgebase.
-
-#### Changes
-
-  - Changed the default model for a new OpenAI connection to "GPT 4o mini" - this was long overdue.
-  - Most data items in the "Administration" tab of the "Session Database" can now be double-clicked. This will either bring you to the specific item list or editor. In case of *Laps* data, a double-click will open a special editor, which allows you to inspect and remove unwanted data, for example, because it has been collected in a session with a consumption multiplier or a tyre wear multiplier. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#administration) for more information.
-  - [Important] A new version of the local LLM Runtime is available. If you are using the local runtime, please follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-583).
-  - [Developer] Renamed the "TelemetryDatabase" class to "LapsDatabase".
-
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-625), if you are using the local LLM Runtime.
-  
-# Upcoming release
-
 ## 6.2.6.0
 
-#### Date: 04/04/25 (planned)
+#### Date: 04/04/25
 
 #### Fixes
 
@@ -42,8 +20,32 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
     - Scripting can also be used to implement the [scenario validations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#script-based-validation) in "Strategy Workbench".
 	- Both integrations are already fully functional, but are not yet fully tested for each possible scenario.
   - [Developer] A new constant *kProgramsDirectory* references the location of the *Programs* folder as defined in the configuration. The already present constant *kTempDirectory* also references the configured location now.
+  
+# Upcoming release
+
+Not yet planned...
 
 # Release history
+
+## 6.2.5.0
+
+#### Date: 03/28/25
+
+#### Fixes
+
+  - Fixed a bug which crashed the Driving Coach, when the *Reasoning* booster was enabled, but no action had been defined.
+  - Fixed a bug which restricted the number of output tokes for the Driving Coach LLM and also for the different Assistant boosters to a max value of 999.
+  - Fixed some translations and added a few which were missing.
+  - Fixed a bug which caused a request to a *Conversation* booster to fail in case specific informaton wasmissing in the knowledgebase.
+
+#### Changes
+
+  - Changed the default model for a new OpenAI connection to "GPT 4o mini" - this was long overdue.
+  - Most data items in the "Administration" tab of the "Session Database" can now be double-clicked. This will either bring you to the specific item list or editor. In case of *Laps* data, a double-click will open a special editor, which allows you to inspect and remove unwanted data, for example, because it has been collected in a session with a consumption multiplier or a tyre wear multiplier. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#administration) for more information.
+  - [Important] A new version of the local LLM Runtime is available. If you are using the local runtime, please follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-583).
+  - [Developer] Renamed the "TelemetryDatabase" class to "LapsDatabase".
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-625), if you are using the local LLM Runtime.
 
 ## 6.2.4.0
 

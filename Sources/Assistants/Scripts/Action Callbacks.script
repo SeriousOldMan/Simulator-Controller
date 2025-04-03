@@ -50,10 +50,6 @@ function Assistant.Speak(message, ...)
 	return __Assistant_Speak(message, table.unpack(arguments))
 end
 
-function Assistant.Raise(event, ...)
-	return __Assistant_Raise(event, table.unpack(__normalizeArguments(table.pack(...))))
-end
-
 function Assistant.Call(func, ...)
 	return __Assistant_Call(func, table.unpack(__normalizeArguments(table.pack(...))))
 end

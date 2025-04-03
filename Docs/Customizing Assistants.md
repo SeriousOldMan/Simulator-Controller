@@ -587,13 +587,11 @@ You can enable or disable individual predefined actions using the checkbox on th
    
    For this example it is assumed, that two keyboard commands are defined in the current simulator: 1. "i" increases the brake balance and "k" decreases the brake balance.
    
-As you can see, defining individual actions is really an expert topic and therefore nothing for the casual user. If you want use this feature, I can offer a personal introduction and coaching as part of the Patreon membership.
-
-But you can actually start small. Here is a *very* simple example:
+As you can see, defining individual actions is really an expert topic and requires some programming skills when using rules and/or scripts. Therefore it may be no option for the casual user, and even for the experienced programmer it will require some knowledge about the inner workings. If you want to use this feature, I can offer a personal introduction and coaching as part of the Patreon membership. However, when using the *Action Type* "Controller Function", even the technically non-experienced users can achieve impressive results. Here is a corresponding example:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Action%20Definition.JPG)
 
-This action calls the [controller action]((https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions)) "trigger" with "!w" as an argument in the Simulator Cntroller process. This sends the keyboard command Alt-w to the current simulator, thereby starting the windscreen wiper. This action may be activated by a voice command like "Can you start the windscreen wiper?" when using the *Conversation* booster, or it can be automatically triggered by the *Reasoning* booster, when an event is signalled that tells that it just started raining.
+This action calls the [controller aciton]((https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions)) "trigger" with "!w" as an argument in the Simulator Cntroller process. This sends the keyboard command Alt-w to the current simulator, thereby starting the windscreen wiper. This action may be activated by a voice command like "Can you start the windscreen wiper?" when using the *Conversation* booster, or it can be automatically triggered by the *Reasoning* booster, when an event is signalled that tells that it just started raining.
 
 ## Managing Events
 

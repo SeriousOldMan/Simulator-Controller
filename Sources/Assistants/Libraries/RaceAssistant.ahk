@@ -460,16 +460,15 @@ class RaceAssistant extends ConfigurationItem {
 			try {
 				SplitPath(executable, , , &extension)
 
-				if (extension = "script") {
+				if ((extension = "script") || (extension = "lua")) {
 					context := scriptOpenContext()
 
 					try {
 						script := FileRead(getFileName("Assistant Callbacks.script"
 													 , kUserHomeDirectory . "Scripts\", kResourcesDirectory . "Scripts\"))
 
-						script .= ("`n`n" . FileRead(getFileName(scriptFileName
-															   , kUserHomeDirectory . "Actions\"
-															   , kResourcesDirectory . "Actions\")))
+						script .= ("`n`n" . FileRead(getFileName(executable, kUserHomeDirectory . "Actions\"
+																		   , kResourcesDirectory . "Actions\")))
 
 						scriptFileName := temporaryFileName("Assistant", "script")
 

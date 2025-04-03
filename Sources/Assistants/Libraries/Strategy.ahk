@@ -158,7 +158,7 @@ class StrategySimulation {
 
 			script .= ("`n`n" . FileRead(scriptFileName))
 
-			scriptFileName := temporaryFileName("validation", "script")
+			scriptFileName := temporaryFileName("Validation", "script")
 
 			try {
 				FileAppend(script, scriptFileName)

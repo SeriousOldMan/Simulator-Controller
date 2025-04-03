@@ -547,3 +547,47 @@ If you only want to add some rules, there is a much better way. You can create a
 You can place any number of "*.rules" files in this folder and they will be loaded typically in alphapbetical order.
 
 Last but not lest, you can extend the reasoning process of a Race Assistant by connecting the rule engine to a GPT-based large language model. Please see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster) for more information.
+
+## Execution of Scripts
+
+When the rule engine is run as part of an Assistant, the *Execute* action and the *execute* predicate as documented above supports the execution of [Lua]() scripts in addition to executable files which can be run by Windows itself. A script must use the extensions ".script" or ".lua" to be identified.
+
+When this script is executed, the following global variables and functions are available:
+
+   - Arguments
+   
+     This is an array with all arguments passed to the script.
+
+   - Assistant.Call(method :: \<string\>, p1, p2, ...)
+   
+     Invokes the *method* on the instance of the Race Assistant class with some arguments. A variable number of arguments are supported.
+	 
+   - Assistant.Speak(phrase :: \<string\>, [force :: \<booelan\>])
+   
+	 Outputs the given phrase using the voice of the given Race Assistant. *phrase* can be the label of a predefined phrase from the grammar definition of the Assistant. If *phrase* is not one of the predefined phrases it will be spoken as is. The *phrase* will not be spoken, if the Assistant is muted, unless you supply *true* for the optional parameter *force*.
+	 
+   - Assistant.Ask(question :: \<string\>)
+   
+     Asks the given Race Assistant a question or give a command. The result will be the same, as if the question or the command has been given by voice input.
+	 
+   - Controller.Call(method :: \<string\>, p1, p2, ...)
+   
+     Invokes the *method* on the instance of the *SimulatorController* class in the process "Simulator Controller.exe". with some arguments. A variable number of arguments are supported.
+	 
+   - Function.Call(function :: \<string\>, p1, p2, ...)
+   
+     Invokes the global *function* in the process "Simulator Controller.exe". with some arguments. A variable number of arguments are supported.
+
+   - Rules.SetValue(fact :: \<string\>, value :: \<string\>)
+   
+     Changes the value for the given fact in the knowledgebase of the Assistant.
+
+   - Rules.GetValue(fact :: \<string\> [, default)
+   
+     Returns the value for the given fact in the knowledgebase of the Assistant. If there is no such value, the default will be returned if supplied, or nil.
+
+   - Rules.Execute()
+   
+     Runs a full production cycle of the Rule Engine of the Assistant.
+
+The script must return a single boolean value, which indicates success or failure, if the script is used as a predicate.

@@ -4367,7 +4367,7 @@ class ValidatorsEditor {
 			}
 		}
 		else {
-			fileName := temporaryFilename("script", "script")
+			fileName := temporaryFilename("Script", "script")
 
 			try {
 				context := scriptOpenContext()

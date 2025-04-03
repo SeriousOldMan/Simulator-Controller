@@ -1935,7 +1935,7 @@ class CallbacksEditor {
 			}
 		}
 		else if (type = "Assistant.Script") {
-			fileName := temporaryFilename("script", "script")
+			fileName := temporaryFilename("Script", "script")
 
 			try {
 				context := scriptOpenContext()
@@ -2168,7 +2168,7 @@ class CallbacksEditor {
 
 					if (theCallback.Builtin && isDebug())
 						try {
-							fileName := temporaryFilename("script", "script")
+							fileName := temporaryFilename("Script", "script")
 
 							try {
 								context := scriptOpenContext()

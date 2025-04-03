@@ -233,6 +233,12 @@ Once the condition of a production rule is matched, all actions on the right-han
 	Normally, only the first alternative is calculated (see the documentation for reduction rules below for more information on that). If you need to follow all paths of the reduction, you can use the following action syntax.
 	
 	Syntax / Example: (ProveAll: preparePitstop(?Lap))
+	
+  - Execute
+  
+    Syntax / Example: (Execute: "C:\Users\Cheater\Documents\Scripts\StartMyGripCheat.cmd", "/Grip", "Max", "/TyreWear", "0")
+	
+	Executes the executable or script, which is identified with the first argument. Additional arguments will be passed to the executable enclosed by paranthesis and seperated by spaces. The default implementation supports the typical executable files, like EXE, CMD or BAT files, which can be run by Windows.
   
   - Set
   
@@ -515,6 +521,10 @@ The rule engine has some builtin predicates which can be used when formulating r
     Syntax: produce()
 	
 	This is a very special predicate. It interrupts the reduction rule execution and allows the rule engine to run all pending production rules. Since these can *call* reduction rules in their actions and also in their conditions, this results in a stack of active execution environments.
+	
+  - execute(function, arg1, ..., argN)
+  
+    Executes the executable or script, which is identified with the first argument. Additional arguments will be passed to the executable enclosed by paranthesis and seperated by spaces. The default implementation supports the typical executable files, like EXE, CMD or BAT files, which can be run by Windows. Exit code **0** will be interpreted as success and everything else will indicate a failure and trigger backtracking.
   
 ### Event-based programming
 

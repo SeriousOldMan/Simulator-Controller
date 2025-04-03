@@ -452,6 +452,24 @@ class RaceAssistant extends ConfigurationItem {
 
 			super.__New(ruleEngine, facts, rules)
 		}
+
+		execute(executable, arguments) {
+			local extension
+
+			try {
+				SplitPath(executable, , , &extension)
+
+				if (extension = "script") {
+				}
+				else
+					return super.execute(executable, arguments)
+			}
+			catch Any as exception {
+				logError(exception)
+
+				return false
+			}
+		}
 	}
 
 	Debug[option] {
@@ -4407,7 +4425,7 @@ createTools(assistant, type) {
 			context := scriptOpenContext()
 
 			try {
-				script := FileRead(kResourcesDirectory . "Scripts\Action Callbacks.script")
+				script := FileRead(kResourcesDirectory . "Scripts\Assistant Callbacks.script")
 
 				script .= ("`n`n" . FileRead(getFileName(scriptFileName, kUserHomeDirectory . "Actions\", kResourcesDirectory . "Actions\")))
 

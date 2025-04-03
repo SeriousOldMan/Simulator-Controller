@@ -25,6 +25,7 @@ global kBuildConfiguration := "Production"
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\Framework\Extensions\RuleEngine.ahk"
+#Include "..\Framework\Extensions\ScriptEngine.ahk"
 #Include "AHKUnit\AHKUnit.ahk"
 
 
@@ -95,12 +96,90 @@ global kExecutionTestRules := "
 				{Any: [?Paul.grandchild], [?Willy.grandChild]} => (Set: Bound, ?Paul.grandChild), (Set: NotBound, ?Peter.son), (Set: ForcedBound, !Willy.grandchild)
 
 				{All: [?Peter], {Prove: isHappy(?Peter, ?gf)}} => (Prove: father(?father, ?gf)), (Call: celebrate())
+
+				scriptTestSuccess(?path) <= execute(?path, "true")
+				scriptTestFail(?path) <= execute(?path, "false")
 )"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                              Test Section                               ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+class ScriptKnowledgeBase extends KnowledgeBase {
+	execute(executable, arguments) {
+		local result := false
+		local extension, context, script, scriptFileName, message
+
+		try {
+			SplitPath(executable, , , &extension)
+
+			if ((extension = "script") || (extension = "lua")) {
+				context := scriptOpenContext()
+
+				try {
+					scriptFileName := executable
+
+					try {
+						if !scriptLoadScript(context, scriptFileName, &message)
+							throw message
+					}
+					finally {
+						if !isDebug()
+							deleteFile(scriptFileName)
+					}
+
+					scriptPushArray(context, collect(arguments, (a) => ((a = kNotInitialized) ? kUndefined : a)))
+					scriptSetGlobal(context, "Arguments")
+
+					scriptPushValue(context, kUndefined)
+					scriptSetGlobal(context, "__Undefined")
+					scriptPushValue(context, kNotInitialized)
+					scriptSetGlobal(context, "__NotInitialized")
+
+					scriptPushValue(context, (c) {
+						this.setFact(scriptGetString(c), scriptGetString(c, 2))
+
+						return Integer(0)
+					})
+					scriptSetGlobal(context, "__Rules_SetValue")
+					scriptPushValue(context, (c) {
+						local value := this.getValue(scriptGetString(c))
+
+						if ((value = kUndefined) || (value = kNotInitialized))
+							value := kNull
+
+						scriptPushValue(c, value)
+
+						return Integer(1)
+					})
+					scriptSetGlobal(context, "__Rules_GetValue")
+					scriptPushValue(context, (c) {
+						this.produce()
+
+						return Integer(0)
+					})
+					scriptSetGlobal(context, "__Rules_Execute")
+
+					if scriptExecute(context, &message)
+						result := scriptGetBoolean(context)
+					else
+						throw message
+				}
+				finally {
+					scriptCloseContext(context)
+				}
+			}
+			else
+				result := super.execute(executable, arguments)
+		}
+		catch Any as exception {
+			logError(exception)
+		}
+
+		return result
+	}
+}
 
 class Compiler extends Assert {
 	removeWhiteSpace(text) {
@@ -182,7 +261,7 @@ class Compiler extends Assert {
 		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
 
 		this.AssertEqual(4, productions.Length, "Not all production rules compiled...")
-		this.AssertEqual(26, reductions.Length, "Not all reduction rules compiled...")
+		this.AssertEqual(28, reductions.Length, "Not all reduction rules compiled...")
 	}
 }
 
@@ -263,6 +342,31 @@ class CoreEngine extends Assert {
 
 		this.AssertEqual(true, (resultSet == false), "Unexpected remaining results...")
 		this.AssertEqual(false, kb.getValue("Fact", false), "Fact should be missing...")
+	}
+
+	Lua_Script_Test() {
+		local compiler := RuleCompiler()
+		local resultSet, goal
+
+		productions := false
+		reductions := false
+
+		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
+
+		engine := RuleEngine(productions, reductions, Map())
+		kb := ScriptKnowledgeBase(engine, engine.createFacts(), engine.createRules())
+
+		goal := compiler.compileGoal("scriptTestFail(`"" . kSourcesDirectory . "Tests\Test Scripts\Simple.script`")")
+
+		resultSet := kb.prove(goal)
+
+		this.AssertEqual(true, (resultSet == false), "Unexpected success of Lua script...")
+
+		goal := compiler.compileGoal("scriptTestSuccess(`"" . kSourcesDirectory . "Tests\Test Scripts\Simple.script`")")
+
+		resultSet := kb.prove(goal)
+
+		this.AssertEqual(true, (resultSet != false), "Unexpected success of Lua script...")
 	}
 }
 

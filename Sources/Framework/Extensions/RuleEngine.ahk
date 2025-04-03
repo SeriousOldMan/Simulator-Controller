@@ -5253,6 +5253,7 @@ execute(choicePoint, arguments*) {
 		operand1 := arguments.RemoveAt(1)
 		operand1 := operand1.getValue(resultSet, operand1)
 
-		return resultSet.KnowledgeBase.execute(operand1, collect(arguments, (a) => a.getValue(resultSet, a).toString(resultSet)))
+		return resultSet.KnowledgeBase.execute(operand1.toString(resultSet)
+											 , collect(arguments, (a) => a.getValue(resultSet, a).toString(resultSet)))
 	}
 }

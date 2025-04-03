@@ -4087,22 +4087,6 @@ class ValidatorsEditor {
 
 		this.iScriptEditor := editorGui.Add("CodeEditor", "x16 yp+30 w832 h140 DefaultOpt SystemTheme Border Disabled W:Grow Y:Move(0.25) H:Grow(0.75)")
 
-		this.ScriptEditor.CaseSense := false
-
-		this.ScriptEditor.SetKeywords("priority"
-									, "Any All None One Predicate"
-									, "Call Prove ProveAll Set Get Clear Produce Option Sqrt Unbound Append get"
-									, "messageShow messageBox"
-									, "? ! fail"
-									, ""
-									, "true false")
-
-		this.ScriptEditor.Brace.Chars := "()[]{}"
-		this.ScriptEditor.SyntaxEscapeChar := "``"
-		this.ScriptEditor.SyntaxCommentLine := ";"
-
-		this.ScriptEditor.Tab.Width := 4
-
 		editorGui.Add("Text", "x8 yp+150 w848 Y:Move W:Grow 0x10")
 
 		editorGui.SetFont("Norm", "Arial")
@@ -4115,9 +4099,9 @@ class ValidatorsEditor {
 
 	setScript(type, text, readOnly := false) {
 		initializeLanguage(type) {
-			this.ScriptEditor.CaseSense := false
-
 			if (type = "Rules") {
+				this.ScriptEditor.CaseSense := false
+
 				this.ScriptEditor.SetKeywords("priority"
 											, "Any All None One Predicate"
 											, "Call Prove ProveAll Set Get Clear Produce Option Sqrt Unbound Append get"
@@ -4131,6 +4115,8 @@ class ValidatorsEditor {
 				this.ScriptEditor.SyntaxCommentLine := ";"
 			}
 			else {
+				this.ScriptEditor.CaseSense := true
+
 				this.ScriptEditor.SetKeywords("_VERSION assert collectgarbage dofile error gcinfo loadfile loadstring print rawget rawset require tonumber tostring type unpack"
 											, "_ALERT _ERRORMESSAGE _INPUT _PROMPT _OUTPUT _STDERR _STDIN _STDOUT call dostring foreach foreachi getn globals newtype sort tinsert tremove"
 											, "and break do else elseif end false for function if in local nil not or repeat return then true until while"

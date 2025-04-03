@@ -454,21 +454,138 @@ class RaceAssistant extends ConfigurationItem {
 		}
 
 		execute(executable, arguments) {
-			local extension
+			local result := false
+			local extension, context, script, scriptFileName, message
 
 			try {
 				SplitPath(executable, , , &extension)
 
 				if (extension = "script") {
+					context := scriptOpenContext()
+
+					try {
+						script := FileRead(getFileName("Assistant Callbacks.script"
+													 , kUserHomeDirectory . "Scripts\", kResourcesDirectory . "Scripts\"))
+
+						script .= ("`n`n" . FileRead(getFileName(scriptFileName
+															   , kUserHomeDirectory . "Actions\"
+															   , kResourcesDirectory . "Actions\")))
+
+						scriptFileName := temporaryFileName("Assistant", "script")
+
+						try {
+							FileAppend(script, scriptFileName)
+
+							if !scriptLoadScript(context, scriptFileName, &message)
+								throw message
+						}
+						finally {
+							if !isDebug()
+								deleteFile(scriptFileName)
+						}
+
+						scriptPushArray(context, collect(arguments, (a) => ((a = kNotInitialized) ? kUndefined : a)))
+						scriptSetGlobal(context, "Arguments")
+
+						scriptPushValue(context, kUndefined)
+						scriptSetGlobal(context, "__Undefined")
+						scriptPushValue(context, kNotInitialized)
+						scriptSetGlobal(context, "__NotInitialized")
+
+						scriptPushValue(context, (c) {
+							this.setFact(scriptGetString(c), scriptGetString(c, 2))
+
+							return Integer(0)
+						})
+						scriptSetGlobal(context, "__Rules_SetValue")
+						scriptPushValue(context, (c) {
+							local value := this.getValue(scriptGetString(c))
+
+							if ((value = kUndefined) || (value = kNotInitialized))
+								value := kNull
+
+							scriptPushValue(c, value)
+
+							return Integer(1)
+						})
+						scriptSetGlobal(context, "__Rules_GetValue")
+						scriptPushValue(context, (c) {
+							this.produce()
+
+							return Integer(0)
+						})
+						scriptSetGlobal(context, "__Rules_Execute")
+
+						scriptPushValue(context, (c) {
+							askAssistant(this.RaceAssistant, scriptGetString(c))
+
+							return Integer(0)
+						})
+						scriptSetGlobal(context, "__Assistant_Ask")
+						scriptPushValue(context, (c) {
+							speakAssistant(this.RaceAssistant, scriptGetString(c)
+										 , (scriptGetArgsCount(c) > 1) ? scriptGetBoolean(c, 2) : unset)
+
+							return Integer(0)
+						})
+						scriptSetGlobal(context, "__Assistant_Speak")
+						scriptPushValue(context, (c) {
+							local arguments := []
+
+							loop scriptGetArgsCount(c)
+								if (A_Index > 1)
+									arguments.Push(scriptGetString(c, A_Index))
+
+							callAssistant(this.RaceAssistant, scriptGetString(c), arguments*)
+
+							return Integer(0)
+						})
+						scriptSetGlobal(context, "__Assistant_Call")
+						scriptPushValue(context, (c) {
+							local arguments := []
+
+							loop scriptGetArgsCount(c)
+								if (A_Index > 1)
+									arguments.Push(scriptGetString(c, A_Index))
+
+							callController(this.RaceAssistant, scriptGetString(c), arguments*)
+
+							return Integer(0)
+						})
+						scriptSetGlobal(context, "__Controller_Call")
+						scriptPushValue(context, (c) {
+							local arguments := []
+
+							loop scriptGetArgsCount(c)
+								if (A_Index > 1)
+									arguments.Push(scriptGetString(c, A_Index))
+
+							callFunction(this.RaceAssistant, scriptGetString(c), arguments*)
+
+							return Integer(0)
+						})
+						scriptSetGlobal(context, "__Function_Call")
+
+						if scriptExecute(context, &message)
+							result := scriptGetBoolean(context)
+						else
+							throw message
+					}
+					finally {
+						scriptCloseContext(context)
+					}
+
+					if this.RaceAssistant.Debug[kDebugKnowledgeBase]
+						this.RaceAssistant.dumpKnowledgeBase(this)
 				}
 				else
-					return super.execute(executable, arguments)
+					result := super.execute(executable, arguments)
 			}
 			catch Any as exception {
 				logError(exception)
-
-				return false
 			}
+
+			return result
 		}
 	}
 
@@ -4416,7 +4533,7 @@ createTools(assistant, type) {
 
 	callScript(action, scriptFileName, enoughData, confirm, parameters, arguments*) {
 		local knowledgeBase := assistant.KnowledgeBase
-		local index, parameter, script, context, message
+		local index, parameter, argument, script, context, message
 
 		if knowledgeBase {
 			if !runAction(enoughData, confirm)
@@ -4425,14 +4542,17 @@ createTools(assistant, type) {
 			context := scriptOpenContext()
 
 			try {
-				script := FileRead(kResourcesDirectory . "Scripts\Assistant Callbacks.script")
+				script := FileRead(getFileName("Assistant Callbacks.script"
+											 , kUserHomeDirectory . "Scripts\", kResourcesDirectory . "Scripts\"))
 
-				script .= ("`n`n" . FileRead(getFileName(scriptFileName, kUserHomeDirectory . "Actions\", kResourcesDirectory . "Actions\")))
+				script .= ("`n`n" . FileRead(getFileName(scriptFileName
+													   , kUserHomeDirectory . "Actions\"
+													   , kResourcesDirectory . "Actions\")))
 
 				for index, parameter in parameters
 					script := StrReplace(script, "%" . parameter.Name . "%", parameter.Name)
 
-				scriptFileName := temporaryFileName("action", "script")
+				scriptFileName := temporaryFileName("Action", "script")
 
 				try {
 					FileAppend(script, scriptFileName)
@@ -4447,11 +4567,16 @@ createTools(assistant, type) {
 
 				for index, parameter in parameters
 					try {
-						scriptPushValue(context, arguments[index])
+						argument := arguments[index]
+
+						if (argument = kNotInitialized)
+							argument := kUndefined
+
+						scriptPushValue(context, argument)
 						scriptSetGlobal(context, parameter.Name)
 					}
 					catch UnsetItemError {
-						scriptPushValue(context, kNull)
+						scriptPushValue(context, kUndefined)
 						scriptSetGlobal(context, parameter.Name)
 					}
 

@@ -35,7 +35,7 @@ Release 6.2.6=Release 6.2.4 -> updateConfigurationForV626
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%
-Temp Folder=%kUserHomeDirectory%Temp\
+Temp Folder=%TempDirectory%
 Simulator Settings.ini=%kUserConfigDirectory%Simulator Settings.ini
 Tools Settings.ini=%kUserConfigDirectory%Simulator Tools.ini
 *.bak Files=%kHomeDirectory%, *.ahk.bak, R

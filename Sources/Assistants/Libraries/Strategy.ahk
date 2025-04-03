@@ -119,7 +119,8 @@ class StrategySimulation {
 	loadRules(compiler, validatorFileName, &productions, &reductions, &includes) {
 		local rules, message, title, script, context
 
-		rules := FileRead(kResourcesDirectory . "Strategy\Rules\Strategy Validation.rules")
+		rules := FileRead(getFileName("Strategy Validation.rules"
+									, kUserHomeDirectory . "Rules\", kResourcesDirectory . "Strategy\Rules\"))
 
 		productions := false
 		reductions := false
@@ -151,7 +152,9 @@ class StrategySimulation {
 		try {
 			context := scriptOpenContext()
 
-			script := FileRead(kResourcesDirectory . "Strategy\Scripts\Strategy Validation.script")
+			script := FileRead(getFileName("Strategy Validation.script"
+										 , kUserHomeDirectory . "Scripts\"
+										 , kResourcesDirectory . "Strategy\Scripts\"))
 
 			script .= ("`n`n" . FileRead(scriptFileName))
 
@@ -283,7 +286,7 @@ class StrategySimulation {
 					scriptPushArray(scriptEngine, [strategy.RemainingFuel
 												 , strategy.TyreCompound, strategy.TyreCompoundColor
 												 , strategy.TyreSet])
-					scriptCreateGlobal(scriptEngine, "__Setup")
+					scriptSetGlobal(scriptEngine, "__Setup")
 
 					laps := []
 					times := []
@@ -313,17 +316,17 @@ class StrategySimulation {
 					}
 
 					scriptPushArray(scriptEngine, laps)
-					scriptCreateGlobal(scriptEngine, "__PitstopLaps")
+					scriptSetGlobal(scriptEngine, "__PitstopLaps")
 					scriptPushArray(scriptEngine, times)
-					scriptCreateGlobal(scriptEngine, "__PitstopTimes")
+					scriptSetGlobal(scriptEngine, "__PitstopTimes")
 					scriptPushArray(scriptEngine, refuels)
-					scriptCreateGlobal(scriptEngine, "__PitstopRefuels")
+					scriptSetGlobal(scriptEngine, "__PitstopRefuels")
 					scriptPushArray(scriptEngine, tyreCompounds)
-					scriptCreateGlobal(scriptEngine, "__PitstopTyreCompounds")
+					scriptSetGlobal(scriptEngine, "__PitstopTyreCompounds")
 					scriptPushArray(scriptEngine, tyreCompoundColors)
-					scriptCreateGlobal(scriptEngine, "__PitstopTyreCompoundColors")
+					scriptSetGlobal(scriptEngine, "__PitstopTyreCompoundColors")
 					scriptPushArray(scriptEngine, tyreSets)
-					scriptCreateGlobal(scriptEngine, "__PitstopTyreSets")
+					scriptSetGlobal(scriptEngine, "__PitstopTyreSets")
 
 					if !scriptExecute(scriptEngine, &message) {
 						OnMessage(0x44, translateOkButton)

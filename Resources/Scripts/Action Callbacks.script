@@ -1,0 +1,95 @@
+-------------------------------------------------------------------------------
+---   Modular Simulator Controller System - Action Callbacks Script         ---
+---                                                                         ---
+---   Author:     Oliver Juwig (TheBigO)                                    ---
+---   License:    (2025) Creative Commons - BY-NC-SA                        ---
+-------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+---                           Public Modules Section                        ---
+-------------------------------------------------------------------------------
+
+Assistant = {}
+Controller = {}
+Function = {}
+Rules = {}
+
+
+-------------------------------------------------------------------------------
+---                         Private Functions Section                       ---
+-------------------------------------------------------------------------------
+
+function __normalizeArguments(arguments)
+	for i = 1, table.getn(arguments) do
+		local argument = arguments[i]
+		
+		if argument == nil then
+			arguments[i] = __Undefined
+		else
+			arguments[i] = tostring(v)
+		end
+	end
+	
+	return arguments
+end
+
+
+-------------------------------------------------------------------------------
+---                          Public Functions Section                       ---
+-------------------------------------------------------------------------------
+
+function Assistant.Ask(question)
+	return __Assistant_Ask(question)
+end
+
+function Assistant.Speak(message, ...)
+	local arguments = table.pack(...)
+	
+	assert(#arguments == 0 or (#arguments == 1 and type(arguments[1]) == "boolean"))
+	
+	return __Assistant_Speak(message, table.unpack(arguments))
+end
+
+function Assistant.Raise(event, ...)
+	return __Assistant_Raise(event, table.unpack(__normalizeArguments(table.pack(...))))
+end
+
+function Assistant.Call(func, ...)
+	return __Assistant_Call(func, table.unpack(__normalizeArguments(table.pack(...))))
+end
+
+function Controller.Call(func, ...)
+	return __Controller_Call(func, table.unpack(__normalizeArguments(table.pack(...))))
+end
+
+function Function.Call(func, ...)
+	return __Function_Call(func, table.unpack(__normalizeArguments(table.pack(...))))
+end
+
+function Rules.GetValue(name, ...)
+	local arguments = table.pack(...)
+	local value = __Rules_GetValue(name)
+	
+	assert(#arguments <= 1)
+	
+	if #arguments == 1 then
+		if value == nil then
+			value = arguments[1]
+		elseif (value == __NotInitialized or value == __Undefined) then
+			value = arguments[1]
+		end
+	elseif #arguments == 0 and (value == __NotInitialized or value == __Undefined) then
+		value = nil
+	end
+		
+	return value
+end
+
+function Rules.SetValue(name, value)
+	__Rules_SetValue(name, tostring(value))
+end
+
+function Rules.Execute()
+	__Rules_Execute()
+end
+	

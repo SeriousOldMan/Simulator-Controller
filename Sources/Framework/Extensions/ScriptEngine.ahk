@@ -201,28 +201,30 @@ scriptPushArray(context, array) {
 	loop array.Length {
 		lua_pushinteger(context, Integer(A_Index))
 
-		value := array[A_Index]
-
-		if isInteger(value)
-			lua_pushinteger(context, Integer(value))
-		else if isNumber(value)
-			lua_pushnumber(context, Number(value))
-		else if (isInstance(value, Func) || isInstance(value, Closure))
-			lua_pushcclosure(context, CallbackCreate(value, , 1), 0)
-		else if (value = kNull)
-			lua_pushnil(context)
-		else if (value = kTrue)
-			lua_pushinteger(context, Integer(1))
-		else if (value = kFalse)
-			lua_pushnil(context)
-		else
-			lua_pushstring(context, String(value))
+		scriptPushValue(context, array[A_Index])
 
 		lua_settable(context, -3)
 	}
 }
 
-scriptCreateGlobal(context, name) {
+scriptPushValue(context, value) {
+	if isInteger(value)
+		lua_pushinteger(context, Integer(value))
+	else if isNumber(value)
+		lua_pushnumber(context, Number(value))
+	else if (isInstance(value, Func) || isInstance(value, Closure))
+		lua_pushcclosure(context, CallbackCreate(value, , 1), 0)
+	else if (value = kNull)
+		lua_pushnil(context)
+	else if (value = kTrue)
+		lua_pushinteger(context, Integer(1))
+	else if (value = kFalse)
+		lua_pushnil(context)
+	else
+		lua_pushstring(context, String(value))
+}
+
+scriptSetGlobal(context, name) {
 	lua_setglobal(context, name)
 }
 
@@ -236,8 +238,16 @@ scriptExecute(context, &message?) {
 		return true
 }
 
-scriptGetBoolean(context) {
-	return lua_toboolean(context, -1)
+scriptGetArgsCount(context) {
+	return lua_gettop(context)
+}
+
+scriptGetBoolean(context, index := 1) {
+	return lua_toboolean(context, index)
+}
+
+scriptGetString(context, index := 1) {
+	return lua_tostring(context, index)
 }
 
 

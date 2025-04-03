@@ -507,7 +507,7 @@ You can enable or disable individual predefined actions using the checkbox on th
    |-------------|-------------|
    | Assistant Method | A method of the object which represents the given Race Assistant is called. The *method* can either simply be the name of the method or it can have the format of a function call with a fixed number of predefined arguments (Example: *requestInformation("Position")*, which will let the Strategist give you information about your current position in the race). You can also name several methods to be called located on multiple lines.<br><br>If only the method name is supplied, all arguments as defined by the action will be supplied to the method call. If a function call format is used, you can reference arguments by using the parameter name enclosed in percent signs, like "%refuelAmount%, Example:<br><br>planPitstopAction(null, %refuelAmount%, true, "Dry (S)", true, false)<br><br>Important: The usage of the character "\|" is strictly forbidden in a call definition, since it is used internally as a separator. |
    | Assistant Rule | The supplied rules are loaded into the [Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-engine) of the given Race Assistant. These rules have full access to the knowledge base and all other rules of this Assistant.<br><br>All arguments supplied by the LLM are created as facts in the knowledge base for the time of the execution. Please use enclosing percentage signs to reference the arguments. Example: %location%<br><br>A special fact named %activation% will be set as well, which can be used to trigger rules, when no other fact is suitable. |
-   | Assistant Script | Not yet implemented. |
+   | Assistant Script | Similar to "Assistant Rule", but uses [Lua](https://www.lua.org) as scripting language.<br><br>All arguments supplied by the LLM are created as global variables for the time of execution. Please use enclosing percentage signs to reference those arguments. Example: %location% |
    | Controller Method | A method of the single instance of the *SimulatorController* class is called in the process "Simulator Controller.exe". The *method* can either simply be the name of the method or it can have the format of a function call with a fixed number of predefined arguments (Example: *setMode("Launch")*, which activates the *Launch* mode on one of the connected Button Boxes). Additional arguments may be supplied like described above for *Assistant Method*. You can also name several methods to be called located on multiple lines. |
    | Controller Function | A global function is called in the process "Simulator Controller.exe". The *function* can either simply be the name of the function to be called or it can have the format of a function call with a fixed number of predefined arguments (Example: *trigger("!w")*, which sends the keyboard command "Alt w" to the current simulator). Additional arguments may be supplied like described above for *Assistant Method*. You can also name several functions to be called located on multiple lines.<br><br>Good candidates are the controller action functions, which are provided by the different plugins. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for a complete overview. Using the "invoke" controller action function you can even call a method for one of the active plugins installed in Simulator Controller. |
 
@@ -554,6 +554,46 @@ Here is a very simple example:
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Action%20Definition.JPG)
 
 This action calls the [controller acton]((https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions)) "trigger" with "!w" as an argument in the Simulator Cntroller process. This sends the keyboard command Alt-w to the current simulator, thereby starting the windscreen wiper. This action may be activated by a voice command like "Can you start the windscreen wiper?" when using the *Conversation* booster, or it can be automatically triggered by the *Reasoning* booster, when an event is signalled that tells that it just started raining.
+
+4. Equally useful as "Assistant Rule" is "Assistant Script" and since *Lua* is a widespread scripting language, it may be more accessible to the typical user. When defining the script for a custom action, you can use the following functions to connect to the given Assistant or even the "Simulator Controller.exe" process:
+   
+   - Assistant.Call(method :: \<string\>, p1, p2, ...)
+   
+     Invokes the *method* on the instance of the Race Assistant class with some arguments. A variable number of arguments are supported.
+	 
+   - Assistant.Speak(phrase :: \<string\>, [force :: \<booelan\>])
+   
+	 Outputs the given phrase using the voice of the given Race Assistant. *phrase* can be the label of a predefined phrase from the grammar definition of the Assistant. If *phrase* is not one of the predefined phrases it will be spoken as is. The *phrase* will not be spoken, if the Assistant is muted, unless you supply *true* for the optional parameter *force*.
+	 
+   - Assistant.Ask(question :: \<string\>)
+   
+     Asks the given Race Assistant a question or give a command. The result will be the same, as if the question or the command has been given by voice input.
+	 
+   - Controller.Call(method :: \<string\>, p1, p2, ...)
+   
+     Invokes the *method* on the instance of the *SimulatorController* class in the process "Simulator Controller.exe". with some arguments. A variable number of arguments are supported.
+	 
+   - Function.Call(function :: \<string\>, p1, p2, ...)
+   
+     Invokes the global *function* in the process "Simulator Controller.exe". with some arguments. A variable number of arguments are supported.
+
+   - Rules.SetValue(fact :: \<string\>, value :: \<string\>)
+   
+     Changes the value for the given fact in the knowledgebase of the Assistant.
+
+   - Rules.GetValue(fact :: \<string\> [, default)
+   
+     Returns the value for the given fact in the knowledgebase of the Assistant. If there is no such value, the default will be returned if supplied, or nil.
+
+   - Rules.Execute()
+   
+     Runs a full production cycle of the Rule Engine of the Assistant.
+	 
+   Here is a *simple* example:
+   
+   ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Action%20Definition%202.JPG)
+   
+   For this example it is assumed, that two keyboard commands are defined in the current simulator: 1. "i" increases the brake balance and "k" decreases the brake balance.
 
 ## Managing Events
 

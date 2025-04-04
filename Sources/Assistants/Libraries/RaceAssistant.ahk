@@ -216,23 +216,6 @@ class AssistantEvent extends AgentEvent {
 		else
 			return false
 	}
-
-	triggerAction(action, arguments*) {
-		findTool(tools, name) {
-			local ignore, candidate
-
-			for ignore, candidate in tools
-				if (candidate.Name = name)
-					return candidate
-
-			return false
-		}
-
-		action := findTool(this.getTools("Agent"), action)
-
-		if action
-			action.Callable.Call(arguments*)
-	}
 }
 
 class RuleEvent extends AssistantEvent {
@@ -1773,6 +1756,23 @@ class RaceAssistant extends ConfigurationItem {
 		return false
 	}
 
+	triggerAction(action, arguments*) {
+		findTool(tools, name) {
+			local ignore, candidate
+
+			for ignore, candidate in tools
+				if (candidate.Name = name)
+					return candidate
+
+			return false
+		}
+
+		action := findTool(this.getTools("Agent"), action)
+
+		if action
+			action.Callable.Call(arguments*)
+	}
+
 	createAgentEvents(&productions, &reductions, &includes) {
 		local configuration := readMultiMap(kResourcesDirectory . "Actions\" . this.AssistantType . ".events")
 		local events := []
@@ -1843,11 +1843,13 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	createAgentTools() {
+		local booster := this.AgentBooster
 		local tools, ignore, event, categories
 
-		if this.AgentBooster {
-			categories := (isInstance(this.AgentBooster, RaceAssistant.RulesBooster) ? ["Custom"] : ["Custom", "Builtin"])
-			tools := createTools(this, "Agent", categories)
+		if booster {
+			rules := isInstance(booster, RaceAssistant.RulesBooster)
+			categories := (rules ? ["Custom"] : ["Custom", "Builtin"])
+			tools := createTools(this, "Agent", rules ? "Rules" : "LLM", categories)
 
 			for ignore, event in this.iEvents
 				tools := concatenate(tools, event.createTools(categories))
@@ -2413,6 +2415,8 @@ class RaceAssistant extends ConfigurationItem {
 		knowledgeBase.addFact("Lap." . lapNumber . ".Driver.Surname", driverSurname)
 		knowledgeBase.addFact("Lap." . lapNumber . ".Driver.Nickname", driverNickname)
 
+		knowledgeBase.setFact("Position", getMultiMapValue(data, "Stint Data", "Position", 0))
+
 		knowledgeBase.setFact("Driver.Forname", driverForname)
 		knowledgeBase.setFact("Driver.Surname", driverSurname)
 		knowledgeBase.setFact("Driver.Nickname", driverNickname)
@@ -2658,6 +2662,8 @@ class RaceAssistant extends ConfigurationItem {
 			lapPenalty := getMultiMapValue(data, "Stint Data", "Penalty", false)
 
 		knowledgeBase.setFact("Session.Settings.Fuel.Max", getMultiMapValue(data, "Session Data", "FuelAmount", 0))
+
+		knowledgeBase.setFact("Position", getMultiMapValue(data, "Stint Data", "Position", 0))
 
 		knowledgeBase.setFact("Lap.Valid", lapValid)
 		knowledgeBase.setFact("Lap.Penalty", lapPenalty)
@@ -4432,7 +4438,7 @@ triggerAction(context, action, arguments*) {
 			}
 			else {
 				assistant := action
-				event := arguments.RemoveAt(1)
+				action := arguments.RemoveAt(1)
 
 				pid := ProcessExist(assistant . ".exe")
 
@@ -4448,7 +4454,7 @@ triggerAction(context, action, arguments*) {
 			}
 		}
 		else
-			return assistant.triggerAction(normalizeArguments(Array(event, arguments*))*)
+			return assistant.triggerAction(normalizeArguments(Array(action, arguments*))*)
 	}
 	catch Any as exception {
 		logError(exception, true)
@@ -4464,7 +4470,7 @@ Assistant_Trigger:= triggerAction
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-createTools(assistant, type, categories := ["Custom", "Builtin"], names := false) {
+createTools(assistant, type, target := false, categories := ["Custom", "Builtin"], names := false) {
 	local configuration := readMultiMap(kResourcesDirectory . "Actions\" . assistant.AssistantType . ".actions")
 	local tools := []
 	local loadedRules := CaseInsenseMap()
@@ -4852,14 +4858,16 @@ createTools(assistant, type, categories := ["Custom", "Builtin"], names := false
 
 	addMultiMapValues(configuration, readMultiMap(kUserHomeDirectory . "Actions\" . assistant.AssistantType . ".actions"))
 
-	for ignore, action in string2Values(",", getMultiMapValue(configuration, type . ".Actions", "Active", ""))
+	target := (target ? ("." . target) : target)
+
+	for ignore, action in string2Values(",", getMultiMapValue(configuration, type . target . ".Actions", "Active", ""))
 		if (!names || inList(names, action)) {
-			definition := (inList(categories, "Custom") ? getMultiMapValue(configuration, type . ".Actions.Custom", action, false)
+			definition := (inList(categories, "Custom") ? getMultiMapValue(configuration, type . target . ".Actions.Custom", action, false)
 														: false)
 
 
 			if (!definition && inList(categories, "Builtin"))
-				definition := getMultiMapValue(configuration, type . ".Actions.Builtin", action, false)
+				definition := getMultiMapValue(configuration, type . target . ".Actions.Builtin", action, false)
 
 			try {
 				if definition {
@@ -4867,7 +4875,7 @@ createTools(assistant, type, categories := ["Custom", "Builtin"], names := false
 					parameters := []
 
 					loop definition[5] {
-						parameter := string2Values("|", getMultiMapValue(configuration, type . ".Actions.Parameters", action . "." . A_Index, ""))
+						parameter := string2Values("|", getMultiMapValue(configuration, type . target . ".Actions.Parameters", action . "." . A_Index, ""))
 
 						if (parameter.Length >= 5) {
 							enumeration := string2Values(",", parameter[3])

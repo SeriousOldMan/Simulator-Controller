@@ -504,7 +504,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 		this.iCurrentAgentProvider := (service ? string2Values("|", service)[1] : false)
 
-		for ignore, provider in this.Providers {
+		for ignore, provider in concatenate(["Rules"], this.Providers) {
 			providerConfiguration := CaseInsenseMap()
 
 			if (provider = this.iCurrentAgentProvider) {
@@ -616,6 +616,9 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		provider := this.iCurrentAgentProvider
 
 		if provider {
+			if (provider = "Rules")
+				setMultiMapValue(configuration, "Agent Booster", this.Assistant . ".Agent", true)
+
 			providerConfiguration := this.iProviderConfigurations["Agent." . provider]
 
 			setMultiMapValue(configuration, "Agent Booster", this.Assistant . ".Model", providerConfiguration["Model"])
@@ -739,7 +742,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 					this.Control["viAgentServiceKeyEdit"].Text := "Ollama"
 			}
 
-			if this.iCurrentAgentProvider
+			if (this.iCurrentAgentProvider && (this.iCurrentAgentProvider != "Rules"))
 				this.loadModels("Agent", this.iCurrentAgentProvider, configuration["ServiceURL"]
 																   , configuration["ServiceKey"]
 																   , configuration["Model"])

@@ -962,7 +962,7 @@ class RaceAssistant extends ConfigurationItem {
 		}
 
 		if options["AgentBooster"]
-			if (options["AgentBooster"] = "Rules") {
+			if (InStr(getMultiMapValue(this.Configuration, "Agent Booster", this.AssistantType . ".Service", ""), "Rules") = 1) {
 				booster := RaceAssistant.RulesBooster(this, options["AgentBooster"], this.Configuration)
 
 				if booster.Active

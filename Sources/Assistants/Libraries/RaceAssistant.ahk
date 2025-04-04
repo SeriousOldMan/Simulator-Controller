@@ -55,15 +55,6 @@ global kUnknown := false
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class RulesBooster {
-	getTools() {
-		return this.Manager.getTools("Agent")
-	}
-
-	trigger(event, trigger, goal := false, options := false) {
-	}
-}
-
 class AssistantEvent extends AgentEvent {
 	iAssistant := false
 
@@ -317,6 +308,12 @@ class RaceAssistant extends ConfigurationItem {
 	iSaveSettings := kNever
 
 	iEvents := []
+
+	class RulesBooster extends AgentBooster {
+		trigger(event, trigger, goal := false, options := false) {
+			return false
+		}
+	}
 
 	class VariablesMap extends CaseInsenseWeakMap {
 		has(*) {
@@ -966,7 +963,7 @@ class RaceAssistant extends ConfigurationItem {
 
 		if options["AgentBooster"]
 			if (options["AgentBooster"] = "Rules") {
-				booster := RulesBooster(this)
+				booster := RaceAssistant.RulesBooster(this, options["AgentBooster"], this.Configuration)
 
 				if booster.Active
 					this.iAgentBooster := booster
@@ -1779,16 +1776,17 @@ class RaceAssistant extends ConfigurationItem {
 	createAgentEvents(&productions, &reductions, &includes) {
 		local configuration := readMultiMap(kResourcesDirectory . "Actions\" . this.AssistantType . ".events")
 		local events := []
-		local disabled, ignore, event, definition, parameters, parameter, enumeration, required, handler, type, prefix
+		local disabled, ignore, event, definition, parameters, parameter, enumeration, required, handler, type, callbacksType
 
 		addMultiMapValues(configuration, readMultiMap(kUserHomeDirectory . "Actions\" . this.AssistantType . ".events"))
 
-		prefix := (isInstance(this.AgentBooster, RulesBooster) ? "Agent.Rules.Events" : "Agent.LLM.Events")
-		disabled := string2Values(",", getMultiMapValue(configuration, prefix, "Disabled", ""))
+		callbacksType := (isInstance(this.AgentBooster, RaceAssistant.RulesBooster) ? "Agent.Rules.Events" : "Agent.LLM.Events")
+		disabled := string2Values(",", getMultiMapValue(configuration, callbacksType, "Disabled", ""))
 
-		for ignore, type in (isInstance(this.AgentBooster, RulesBooster) ? ["Agent.Rules.Events.Custom"]
-																		 : ["Agent.LLM.Events.Custom", "Agent.LLM.Events.Builtin"])
-			for ignore, event in string2Values(",", getMultiMapValue(configuration, prefix, "Active", "")) {
+		for ignore, type in (isInstance(this.AgentBooster, RaceAssistant.RulesBooster) ? ["Agent.Rules.Events.Custom"]
+																					   : ["Agent.LLM.Events.Custom"
+																						, "Agent.LLM.Events.Builtin"])
+			for ignore, event in string2Values(",", getMultiMapValue(configuration, callbacksType, "Active", "")) {
 				definition := getMultiMapValue(configuration, type, event, false)
 
 				if definition
@@ -1798,7 +1796,8 @@ class RaceAssistant extends ConfigurationItem {
 							parameters := []
 
 							loop definition[5] {
-								parameter := string2Values("|", getMultiMapValue(configuration, prefix . ".Parameters", event . "." . A_Index, ""))
+								parameter := string2Values("|", getMultiMapValue(configuration, callbacksType . ".Parameters"
+																							  , event . "." . A_Index, ""))
 
 								if (parameter.Length >= 5) {
 									enumeration := string2Values(",", parameter[3])
@@ -1815,14 +1814,14 @@ class RaceAssistant extends ConfigurationItem {
 
 							switch definition[1], false {
 								case "Assistant.Class":
-									handler := %definition[2]%(this, (type = (prefix . ".Builtin")), event
+									handler := %definition[2]%(this, (type = (callbacksType . ".Builtin")), event
 															 , !inList(disabled, event), definition[3], parameters)
 								case "Assistant.Rule":
 									RuleCompiler().compileRules(FileRead(getFileName(definition[2], kUserHomeDirectory . "Actions\"
 																								  , kResourcesDirectory . "Actions\"))
 															  , &productions, &reductions, &includes)
 
-									handler := RuleEvent(this, (type = (prefix . ".Builtin")), event
+									handler := RuleEvent(this, (type = (callbacksType . ".Builtin")), event
 													   , !inList(disabled, event), definition[3], definition[4], parameters)
 								default:
 									throw "Unknown event type (" definition[1] . ") detected in RaceAssistant.createAgentEvents..."
@@ -1847,7 +1846,7 @@ class RaceAssistant extends ConfigurationItem {
 		local tools, ignore, event, categories
 
 		if this.AgentBooster {
-			categories := (isInstance(this.AgentBooster, RulesBooster) ? ["Custom"] : ["Custom", "Builtin"])
+			categories := (isInstance(this.AgentBooster, RaceAssistant.RulesBooster) ? ["Custom"] : ["Custom", "Builtin"])
 			tools := createTools(this, "Agent", categories)
 
 			for ignore, event in this.iEvents

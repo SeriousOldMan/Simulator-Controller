@@ -1769,6 +1769,26 @@ updateInstallationForV500() {
 	}
 }
 
+updateConfigurationForV627() {
+	local ignore, assistant, extension, type, fileName, configuration, name, definition
+
+	for ignore, assistant in ["Race Engineer", "Race Strategist", "Race Spotter", "Driving Coach"]
+		for ignore, extension in [".events", ".actions"] {
+			fileName := (kUserHomeDirectory . "Actions\" . assistant . extension)
+
+			if FileExist(fileName) {
+				text := FileRead(fileName)
+
+				text := StrReplace(text, "Agent.Events", "Agent.LLM.Events")
+				text := StrReplace(text, "Agent.Actions", "Agent.LLM.Actions")
+
+				deleteFile(fileName)
+
+				FileAppend(text, fileName, "UTF-16")
+			}
+		}
+}
+
 updateConfigurationForV626() {
 	local sessionDB, ignore, code, entry
 

@@ -311,7 +311,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 		editorGui.Add("Text", "x" . x0 . " yp+24 w110 h23 +0x200", translate("Actions"))
 		editorGui.Add("DropDownList", "x" . x1 . " yp w60 vviConversationActionsDropdown", collect(["Yes", "No"], translate)).OnEvent("Change", (*) => this.updateState())
-		editorGui.Add("Button", "x" . (x1 + 61) . " yp-1 w23 h23 X:Move Center +0x200 vviConversationEditActionsButton").OnEvent("Click", editActions.Bind("Conversation.Actions"))
+		editorGui.Add("Button", "x" . (x1 + 61) . " yp-1 w23 h23 X:Move Center +0x200 vviConversationEditActionsButton").OnEvent("Click", editActions.Bind("Conversation"))
 		setButtonIcon(editorGui["viConversationEditActionsButton"], kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
 
 		editorGui.SetFont("Italic Bold", "Arial")
@@ -321,7 +321,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 		editorGui.Add("Text", "x" . x0 . " yp+20 w110 h23 +0x200 vviAgentProviderLabel", translate("Provider / URL"))
 
-		editorGui.Add("DropDownList", "x" . x1 . " yp w100 Choose1 vviAgentProviderDropDown", concatenate([translate("Disabled")], this.Providers)).OnEvent("Change", chooseAgentProvider)
+		editorGui.Add("DropDownList", "x" . x1 . " yp w100 Choose1 vviAgentProviderDropDown", concatenate([translate("Disabled"), translate("Rules")], this.Providers)).OnEvent("Change", chooseAgentProvider)
 
 		editorGui.Add("Edit", "x" . (x1 + 102) . " yp w" . (w1 - 102) . " h23 vviAgentServiceURLEdit").OnEvent("Change", loadModels.Bind("Agent"))
 
@@ -341,7 +341,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 		editorGui.Add("Button", "x" . (x + 8) . " yp+30 w100 h23 vviAgentEventsButton", translate("Events...")).OnEvent("Click", editEvents)
 
-		editorGui.Add("Button", "x" . (x + 8) + Round((width / 2) - 50) . " yp w100 h23 vviAgentActionsButton X:Move(0.5)", translate("Actions...")).OnEvent("Click", editActions.Bind("Agent.Actions"))
+		editorGui.Add("Button", "x" . (x + 8) + Round((width / 2) - 50) . " yp w100 h23 vviAgentActionsButton X:Move(0.5)", translate("Actions...")).OnEvent("Click", editActions.Bind("Agent"))
 
 		editorGui.Add("Button", "x" . (width - 100) . " yp w100 h23 X:Move vviAgentInstructionsButton", translate("Instructions...")).OnEvent("Click", editInstructions.Bind("Agent", translate("Reasoning")))
 
@@ -636,7 +636,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 	}
 
 	loadProviderConfiguration(type, provider) {
-		local configuration
+		local configuration, index
 
 		if (type = "Conversation") {
 			this.Control["viConversationProviderDropDown"].Choose(inList(this.Providers, provider) + 1)
@@ -700,10 +700,22 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 				this.loadModels("Conversation", false)
 		}
 		else {
-			this.Control["viAgentProviderDropDown"].Choose(inList(this.Providers, provider) + 1)
+			if (provider = translate("Rules") || (provider = "Rules"))
+				this.Control["viAgentProviderDropDown"].Choose(2)
+			else {
+				index := inList(this.Providers, provider)
+
+				this.Control["viAgentProviderDropDown"].Choose(index ? (index + 2) : 1)
+			}
 
 			if (this.Control["viAgentProviderDropDown"].Value = 1) {
 				this.iCurrentAgentProvider := false
+
+				for ignore, setting in ["ServiceURL", "ServiceKey", "LLMRTGPULayers"]
+					this.Control["viAgent" . setting . "Edit"].Text := ""
+			}
+			else if (this.Control["viAgentProviderDropDown"].Value = 2) {
+				this.iCurrentAgentProvider := "Rules"
 
 				for ignore, setting in ["ServiceURL", "ServiceKey", "LLMRTGPULayers"]
 					this.Control["viAgent" . setting . "Edit"].Text := ""
@@ -867,23 +879,27 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 	updateState() {
 		local ignore, setting, llmRuntime
 
-		if ((this.Control["viAgentProviderDropDown"].Value < 2) || !inList(this.iBoosters, "Agent")) {
+		if (this.Control["viAgentProviderDropDown"].Value = 2) {
+			this.Control["viAgentEventsButton"].Enabled := true
+			this.Control["viAgentActionsButton"].Enabled := true
+			this.Control["viAgentInstructionsButton"].Enabled := false
+
+			this.Control["viAgentServiceURLEdit"].Enabled := false
+			this.Control["viAgentServiceURLEdit"].Text := ""
+			this.Control["viAgentModelDropDown"].Enabled := false
+			this.Control["viAgentModelDropDown"].Choose(0)
+			this.Control["viAgentServiceKeyEdit"].Enabled := false
+			this.Control["viAgentServiceKeyEdit"].Text := ""
+		}
+		else if ((this.Control["viAgentProviderDropDown"].Value < 2) || !inList(this.iBoosters, "Agent")) {
 			this.Control["viAgentEventsButton"].Enabled := false
 			this.Control["viAgentActionsButton"].Enabled := false
 			this.Control["viAgentInstructionsButton"].Enabled := false
 		}
 		else {
 			this.Control["viAgentEventsButton"].Enabled := true
-
-			if ((this.Control["viAgentProviderDropDown"].Value = 2)
-			 && ((Trim(this.Control["viAgentServiceURLEdit"].Text) = "") || (Trim(this.Control["viAgentModelDropDown"].Text = "")))) {
-				this.Control["viAgentActionsButton"].Enabled := false
-				this.Control["viAgentInstructionsButton"].Enabled := false
-			}
-			else {
-				this.Control["viAgentActionsButton"].Enabled := true
-				this.Control["viAgentInstructionsButton"].Enabled := true
-			}
+			this.Control["viAgentActionsButton"].Enabled := true
+			this.Control["viAgentInstructionsButton"].Enabled := true
 		}
 
 		if inList(this.iBoosters, "Agent")
@@ -936,17 +952,16 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 			this.Control["viConversationMaxTokensEdit"].Enabled := false
 		}
 
-		if (this.iCurrentAgentProvider && inList(this.iBoosters, "Agent")) {
+		if (this.iCurrentAgentProvider && (this.iCurrentAgentProvider != "Rules") && inList(this.iBoosters, "Agent")) {
 			this.Control["viAgentServiceURLEdit"].Enabled := (this.Control["viAgentProviderDropDown"].Text != "LLM Runtime")
 			this.Control["viAgentServiceKeyEdit"].Enabled := !inList(["GPT4All", "Ollama", "LLM Runtime"], this.Control["viAgentProviderDropDown"].Text)
 
 			this.Control["viAgentModelDropDown"].Enabled := true
 		}
 		else {
-			for ignore, setting in ["ServiceURL", "ServiceKey"]
-				this.Control["viAgent" . setting . "Edit"].Enabled := false
-
+			this.Control["viAgentServiceURLEdit"].Enabled := false
 			this.Control["viAgentModelDropDown"].Enabled := false
+			this.Control["viAgentServiceKeyEdit"].Enabled := false
 		}
 
 		if ((this.Control["viSpeakerCheck"].Value = 0) || !inList(this.iBoosters, "Speaker")) {
@@ -1104,7 +1119,9 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		window.Block()
 
 		try {
-			return EventsEditor(this, "Agent.Events").editEvents(window)
+			return EventsEditor(this, (this.iCurrentAgentProvider = "Rules") ? "Agent.Rules.Events" : "Agent.LLM.Events"
+									, (this.iCurrentAgentProvider != "Rules") ? ["Builtin", "Custom"]
+																			  : ["Custom"]).editEvents(window)
 		}
 		finally {
 			window.Unblock()
@@ -1117,7 +1134,12 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		window.Block()
 
 		try {
-			return ActionsEditor(this, type).editActions(window)
+			if (type = "Agent")
+				return ActionsEditor(this, (this.iCurrentAgentProvider = "Rules") ? "Agent.Rules.Actions" : "Agent.LLM.Actions"
+										 , (this.iCurrentAgentProvider != "Rules") ? ["Builtin", "Custom"]
+																				   : ["Custom"]).editActions(window)
+			else
+				return ActionsEditor(this, "Conversation.Actions", ["Builtin", "Custom"]).editActions(window)
 		}
 		finally {
 			window.Unblock()
@@ -1132,6 +1154,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 class CallbacksEditor {
 	iEditor := false
 	iType := false
+	iCategories := ["Builtin", "Custom"]
 
 	iWindow := false
 	iResult := false
@@ -1145,6 +1168,8 @@ class CallbacksEditor {
 	iCallbacks := []
 	iSelectedCallback := false
 	iSelectedParameter := false
+
+	iDeletedCallbacks := CaseInsenseMap()
 
 	class CallbacksEditorWindow extends Window {
 		iCallbacksEditor := false
@@ -1192,6 +1217,12 @@ class CallbacksEditor {
 	Type {
 		Get {
 			return this.iType
+		}
+	}
+
+	Categories {
+		Get {
+			return this.iCategories
 		}
 	}
 
@@ -1265,9 +1296,10 @@ class CallbacksEditor {
 		}
 	}
 
-	__New(editor, type) {
+	__New(editor, type, categories := ["Builtin", "Custom"]) {
 		this.iEditor := editor
 		this.iType := type
+		this.iCategories := categories
 	}
 
 	createGui() {
@@ -1305,8 +1337,7 @@ class CallbacksEditor {
 
 			updateCallbacksList(arguments*)
 
-			if ((this.Type != "Agent.Events") && this.SelectedCallback && !this.SelectedCallback.Builtin
-											  && (newCallbackType != translate("Event Disabled"))) {
+			if (InStr(this.Type, "Actions") && this.SelectedCallback && !this.SelectedCallback.Builtin) {
 				callbackType := this.SelectedCallback.SelectedType
 
 				if (((callbackType = "Assistant.Rule") && (newCallbackType != translate("Assistant Rule")))
@@ -1332,8 +1363,6 @@ class CallbacksEditor {
 			this.updateState()
 		}
 
-		; editorGui := Window({Descriptor: (this.Type . " Editor"), Resizeable: true, Options: "0x400000"})
-
 		editorGui := CallbacksEditor.CallbacksEditorWindow(this)
 
 		this.iWindow := editorGui
@@ -1347,7 +1376,7 @@ class CallbacksEditor {
 		if (this.Type = "Conversation.Actions")
 			editorGui.Add("Documentation", "x308 YP+20 w248 H:Center Center", translate("Conversation Actions")
 						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions")
-		else if (this.Type = "Agent.Actions")
+		else if (InStr(this.Type, "Agent") && InStr(this.Type, "Actions"))
 			editorGui.Add("Documentation", "x308 YP+20 w248 H:Center Center", translate("Reasoning Actions")
 						, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions")
 		else
@@ -1359,7 +1388,7 @@ class CallbacksEditor {
 		editorGui.Add("Text", "x8 yp+30 w848 W:Grow 0x10")
 
 		this.iCallbacksListView := editorGui.Add("ListView", "x16 y+10 w832 h140 W:Grow H:Grow(0.25) -Multi -LV0x10 AltSubmit NoSort NoSortHdr"
-											   , collect([(this.Type != "Agent.Events") ? "Action" : "Event", "Active", "Description"], translate))
+											   , collect([InStr(this.Type, "Actions") ? "Action" : "Event", "Active", "Description"], translate))
 
 		this.iCallbacksListView.OnEvent("Click", chooseCallback)
 		this.iCallbacksListView.OnEvent("DoubleClick", chooseCallback)
@@ -1374,15 +1403,17 @@ class CallbacksEditor {
 		editorGui.Add("Button", "x824 yp w23 h23 Center +0x200 X:Move Y:Move(0.25) vdeleteCallbackButton").OnEvent("Click", (*) => this.deleteCallback())
 		setButtonIcon(editorGui["deleteCallbackButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
-		if (this.Type = "Agent.Events")
-			editorGui.Add("Text", "x16 yp+28 w70 h23 +0x200 Section Y:Move(0.25)", translate("Event"))
-		else
+		if InStr(this.Type, "Actions")
 			editorGui.Add("Text", "x16 yp+28 w70 h23 +0x200 Section Y:Move(0.25)", translate("Action"))
+		else
+			editorGui.Add("Text", "x16 yp+28 w70 h23 +0x200 Section Y:Move(0.25)", translate("Event"))
 
 		editorGui.Add("CheckBox", "x87 yp h21 w23 Y:Move(0.25) vcallbackActiveCheck").OnEvent("Click", updateCallbacksList)
 
-		if (this.Type = "Agent.Events")
-			editorGui.Add("DropDownList", "x110 yp w127 Y:Move(0.25) vcallbackTypeDropDown", collect(["Event Class", "Event Rule", "Event Disabled"], translate)).OnEvent("Change", updateCallbackType)
+		if InStr(this.Type, "Events")
+			editorGui.Add("DropDownList", "x110 yp w127 Y:Move(0.25) vcallbackTypeDropDown"
+										, collect(InStr(this.Type, "Rules") ? ["Event Rule"]
+																			: ["Event Class", "Event Rule", "Event Disabled"], translate)).OnEvent("Change", updateCallbackType)
 		else
 			editorGui.Add("DropDownList", "x110 yp w127 Y:Move(0.25) vcallbackTypeDropDown", collect(["Assistant Method", "Assistant Rule", "Assistant Script", "Controller Method", "Controller Function"], translate)).OnEvent("Change", updateCallbackType)
 
@@ -1391,29 +1422,29 @@ class CallbacksEditor {
 		editorGui.Add("Text", "x16 yp+28 w90 h23 +0x200 Y:Move(0.25)", translate("Description"))
 		editorGui.Add("Edit", "x110 yp h96 w308 W:Grow(0.34) Y:Move(0.25) vcallbackDescriptionEdit").OnEvent("Change", updateCallbacksList)
 
-		editorGui.Add("Text", "x16 yp+100 w90 h23 +0x200 Y:Move(0.25)", translate("Learning Phase")).Visible := (this.Type != "Agent.Events")
+		editorGui.Add("Text", "x16 yp+100 w90 h23 +0x200 Y:Move(0.25)", translate("Learning Phase")).Visible := InStr(this.Type, "Actions")
 		editorGui.Add("DropDownList", "x110 yp w90 Y:Move(0.25) vcallbackInitializationDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", (*) => this.updateState())
-		editorGui["callbackInitializationDropDown"].Visible := (this.Type != "Agent.Events")
+		editorGui["callbackInitializationDropDown"].Visible := InStr(this.Type, "Actions")
 
-		editorGui.Add("Text", "x16 yp w90 h23 +0x200 Y:Move(0.25)", translate("Signal")).Visible := (this.Type = "Agent.Events")
-		editorGui.Add("Edit", "x110 yp w127 Y:Move(0.25) vcallbackEventEdit").Visible := (this.Type = "Agent.Events")
+		editorGui.Add("Text", "x16 yp w90 h23 +0x200 Y:Move(0.25)", translate("Signal")).Visible := (this.Type = "Agent.LLM.Events")
+		editorGui.Add("Edit", "x110 yp w127 Y:Move(0.25) vcallbackEventEdit").Visible := (this.Type = "Agent.LLM.Events")
 
-		editorGui.Add("Text", "x16 yp+24 w90 h23 +0x200 Y:Move(0.25)", translate("Confirmation")).Visible := (this.Type != "Agent.Events")
+		editorGui.Add("Text", "x16 yp+24 w90 h23 +0x200 Y:Move(0.25)", translate("Confirmation")).Visible := InStr(this.Type, "Actions")
 		editorGui.Add("DropDownList", "x110 yp w90 Y:Move(0.25) vcallbackConfirmationDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", (*) => this.updateState())
-		editorGui["callbackConfirmationDropDown"].Visible := (this.Type != "Agent.Events")
+		editorGui["callbackConfirmationDropDown"].Visible := InStr(this.Type, "Actions")
 
 		this.iPhraseField := [editorGui.Add("Text", "x16 yp w90 h23 +0x200 Y:Move(0.25)", translate("Phrase"))
 							, editorGui.Add("Edit", "x110 yp w308 Y:Move(0.25) vcallbackPhraseEdit")]
 
-		this.iPhraseField[1].Visible := (this.Type = "Agent.Events")
-		this.iPhraseField[2].Visible := (this.Type = "Agent.Events")
+		this.iPhraseField[1].Visible := (this.Type = "Agent.LLM.Events")
+		this.iPhraseField[2].Visible := (this.Type = "Agent.LLM.Events")
 
 		this.iCallableField := [editorGui.Add("Text", "x16 yp+28 w90 h23 +0x200 Y:Move(0.25)", translate("Call"))
 							  , editorGui.Add("Edit", "x110 yp w738 h140 H:Grow(0.75) W:Grow Y:Move(0.25)")]
 
 		editorGui.SetFont("Norm", "Courier New")
 
-		this.iScriptEditor := editorGui.Add("CodeEditor", "x16 yp w832 h140 DefaultOpt SystemTheme Border Disabled W:Grow Y:Move(0.25) H:Grow(0.75)")
+		this.iScriptEditor := editorGui.Add("CodeEditor", "x16 yp" . ((this.Type = "Agent.Rules.Events") ? "-40" : "") . " w832 h140 DefaultOpt SystemTheme Border Disabled W:Grow Y:Move(0.25) H:Grow(0.75)")
 
 		editorGui.SetFont("Norm", "Arial")
 
@@ -1421,7 +1452,7 @@ class CallbacksEditor {
 
 		editorGui.SetFont("Norm", "Arial")
 
-		editorGui.Add("Button", "x350 yp+10 w80 h23 Default X:Move(0.5) Y:Move", translate("Ok")).OnEvent("Click", (*) => (GetKeyState("Ctrl") && (this.Type != "Agent.Events")) ? this.showCallbacks() : (this.iResult := kOk))
+		editorGui.Add("Button", "x350 yp+10 w80 h23 Default X:Move(0.5) Y:Move", translate("Ok")).OnEvent("Click", (*) => (GetKeyState("Ctrl") && InStr(this.Type, "Actions")) ? this.showCallbacks() : (this.iResult := kOk))
 		editorGui.Add("Button", "x436 yp w80 h23 X:Move(0.5) Y:Move", translate("&Cancel")).OnEvent("Click", (*) => this.iResult := kCancel)
 
 		this.iParametersListView := editorGui.Add("ListView", "x430 ys w418 h96 X:Move(0.34) W:Grow(0.66) Y:Move(0.25) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Parameter", "Description"], translate))
@@ -1433,13 +1464,23 @@ class CallbacksEditor {
 		editorGui.Add("Button", "x824 yp w23 h23 Center +0x200 X:Move Y:Move(0.25) vdeleteParameterButton").OnEvent("Click", (*) => this.deleteParameter())
 		setButtonIcon(editorGui["deleteParameterButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
-		editorGui.Add("Text", "x430 yp+28 w100 h23 +0x200 X:Move(0.34) Y:Move(0.25)", translate("Name / Type"))
+		editorGui.Add("Text", "x430 yp+28 w100 h23 +0x200 X:Move(0.34) Y:Move(0.25)", translate("Name / Type")).Visible := (this.Type != "Agent.Rules.Events")
 		editorGui.Add("Edit", "x536 yp h23 w127 Y:Move(0.25) X:Move(0.34) vparameterNameEdit").OnEvent("Change", updateParametersList)
 		editorGui.Add("DropDownList", "x665 yp w90 Y:Move(0.25) X:Move(0.34) vparameterTypeDropDown", collect(["String", "Integer", "Number", "Boolean"], translate)).OnEvent("Change", updateParametersList)
 		editorGui.Add("DropDownList", "x758 yp w90 Y:Move(0.25) X:Move(0.34) vparameterOptionalDropDown", collect(["Required", "Optional"], translate)).OnEvent("Change", updateParametersList)
 
-		editorGui.Add("Text", "x430 yp+24 w100 h23 +0x200 Y:Move(0.25) X:Move(0.34)", translate("Description"))
+		editorGui.Add("Text", "x430 yp+24 w100 h23 +0x200 Y:Move(0.25) X:Move(0.34)", translate("Description")).Visible := (this.Type != "Agent.Rules.Events")
 		editorGui.Add("Edit", "x536 yp h23 w312 Y:Move(0.25) X:Move(0.34) W:Grow(0.66) vparameterDescriptionEdit").OnEvent("Change", updateParametersList)
+
+		if (this.Type = "Agent.Rules.Events") {
+			this.iParametersListView.Visible := false
+			editorGui["addParameterButton"].Visible := false
+			editorGui["deleteParameterButton"].Visible := false
+			editorGui["parameterNameEdit"].Visible := false
+			editorGui["parameterTypeDropDown"].Visible := false
+			editorGui["parameterOptionalDropDown"].Visible := false
+			editorGui["parameterDescriptionEdit"].Visible := false
+		}
 
 		this.updateState()
 	}
@@ -1559,7 +1600,7 @@ class CallbacksEditor {
 				this.Control["callbackNameEdit"].Opt("+ReadOnly")
 				this.Control["callbackDescriptionEdit"].Opt("+ReadOnly")
 
-				if (this.Type = "Agent.Events") {
+				if (this.Type = "Agent.LLM.Events") {
 					this.Control["callbackTypeDropDown"].Enabled := true
 
 					if (this.Control["callbackTypeDropDown"].Text != translate("Event Disabled")) {
@@ -1602,13 +1643,15 @@ class CallbacksEditor {
 			}
 
 			if (this.Control["callbackTypeDropDown"].Value != 0) {
-				if (this.Type = "Agent.Events") {
+				if (this.Type = "Agent.LLM.Events") {
 					if ((this.SelectedCallback.Disabled)
 					 || (this.Control["callbackTypeDropDown"].Text = translate("Event Disabled")))
 						type := ((this.SelectedCallback.Type = "Assistant.Class") ? "Class" : "Rule")
 					else
 						type := ["Class", "Rule", "Disabled"][this.Control["callbackTypeDropDown"].Value]
 				}
+				else if (this.Type = "Agent.Rules.Events")
+					type := ["Rule"][this.Control["callbackTypeDropDown"].Value]
 				else
 					type := ["Method", "Rule", "Script", "Method", "Function"][this.Control["callbackTypeDropDown"].Value]
 			}
@@ -1622,8 +1665,8 @@ class CallbacksEditor {
 				this.ScriptEditor.Visible := true
 				this.CallableField[1].Visible := false
 				this.CallableField[2].Visible := false
-				this.PhraseField[1].Visible := (this.Type = "Agent.Events")
-				this.PhraseField[2].Visible := (this.Type = "Agent.Events")
+				this.PhraseField[1].Visible := (this.Type = "Agent.LLM.Events")
+				this.PhraseField[2].Visible := (this.Type = "Agent.LLM.Events")
 			}
 			else if (type = "Script") {
 				if (this.ScriptEditor.Content[true] = "")
@@ -1632,8 +1675,8 @@ class CallbacksEditor {
 				this.ScriptEditor.Visible := true
 				this.CallableField[1].Visible := false
 				this.CallableField[2].Visible := false
-				this.PhraseField[1].Visible := (this.Type = "Agent.Events")
-				this.PhraseField[2].Visible := (this.Type = "Agent.Events")
+				this.PhraseField[1].Visible := (this.Type = "Agent.LLM.Events")
+				this.PhraseField[2].Visible := (this.Type = "Agent.LLM.Events")
 			}
 			else {
 				this.ScriptEditor.Visible := false
@@ -1642,7 +1685,7 @@ class CallbacksEditor {
 				this.PhraseField[1].Visible := false
 				this.PhraseField[2].Visible := false
 
-				this.CallableField[1].Text := translate(type . ((this.Type != "Agent.Events") ? "(s)" : ""))
+				this.CallableField[1].Text := translate(type . (InStr(this.Type, "Actions") ? "(s)" : ""))
 			}
 		}
 		else {
@@ -1716,7 +1759,7 @@ class CallbacksEditor {
 
 			this.iSelectedCallback := callback
 
-			if (callback && (this.Type = "Agent.Events")) {
+			if (callback && (this.Type = "Agent.LLM.Events")) {
 				this.Control["callbackTypeDropDown"].Delete()
 
 				if callback.Builtin {
@@ -1768,7 +1811,7 @@ class CallbacksEditor {
 				return
 			}
 
-		if (this.Type = "Agent.Events")
+		if InStr(this.Type, "Events")
 			callback := {Name: "", Type: "Assistant.Rule", SelectedType: "Assistant.Rule"
 					   , Active: true, Disabled: false, Description: "", Parameters: []
 					   , Builtin: false, Event: "", Phrase: "", Definition: "", Script: "; Insert your rules here...`n`n"}
@@ -1812,11 +1855,15 @@ class CallbacksEditor {
 	deleteCallback() {
 		local index := inList(this.Callbacks, this.SelectedCallback)
 
-		this.CallbacksListView.Delete(index)
+		if index {
+			this.iDeletedCallbacks[this.SelectedCallback.Name] := true
 
-		this.Callbacks.RemoveAt(index)
+			this.CallbacksListView.Delete(index)
 
-		this.selectCallback(false, true, false)
+			this.Callbacks.RemoveAt(index)
+
+			this.selectCallback(false, true, false)
+		}
 	}
 
 	loadCallback(callback) {
@@ -1828,14 +1875,19 @@ class CallbacksEditor {
 		if callback {
 			this.Control["callbackNameEdit"].Text := callback.Name
 
-			if (this.Type = "Agent.Events") {
+			if InStr(this.Type, "Events") {
 				this.Control["callbackEventEdit"].Text := callback.Event
-				this.PhraseField[2].Text := callback.Phrase
 
-				if callback.Disabled
-					this.Control["callbackTypeDropDown"].Choose(2)
+				if (this.Type = "Agent.LLM.Events") {
+					this.PhraseField[2].Text := callback.Phrase
+
+					if callback.Disabled
+						this.Control["callbackTypeDropDown"].Choose(2)
+					else
+						this.Control["callbackTypeDropDown"].Choose(inList(["Assistant.Class", "Assistant.Rule"], callback.Type))
+				}
 				else
-					this.Control["callbackTypeDropDown"].Choose(inList(["Assistant.Class", "Assistant.Rule"], callback.Type))
+					this.Control["callbackTypeDropDown"].Choose(inList(["Assistant.Rule"], callback.Type))
 			}
 			else {
 				this.Control["callbackInitializationDropDown"].Choose(1 + (!callback.Initialized ? 1 : 0))
@@ -1909,7 +1961,7 @@ class CallbacksEditor {
 				valid := false
 			}
 
-		if (this.Type = "Agent.Events") {
+		if (this.Type = "Agent.LLM.Events") {
 			if (this.Control["callbackTypeDropDown"].Text = translate("Event Disabled")) {
 				callback.Disabled := true
 
@@ -1921,6 +1973,8 @@ class CallbacksEditor {
 				type := ["Assistant.Class", "Assistant.Rule"][this.Control["callbackTypeDropDown"].Value]
 			}
 		}
+		else if (this.Type = "Agent.Rules.Events")
+			type := ["Assistant.Rule"][this.Control["callbackTypeDropDown"].Value]
 		else
 			type := ["Assistant.Method", "Assistant.Rule", "Assistant.Script", "Controller.Method", "Controller.Function"][this.Control["callbackTypeDropDown"].Value]
 
@@ -1968,9 +2022,11 @@ class CallbacksEditor {
 			callback.Description := Trim(this.Control["callbackDescriptionEdit"].Text)
 			callback.Type := type
 
-			if (this.Type = "Agent.Events") {
+			if InStr(this.Type, "Events") {
 				callback.Event := Trim(this.Control["callbackEventEdit"].Text)
-				callback.Phrase := Trim(this.PhraseField[2].Text)
+
+				if (this.Type = "Agent.LLM.Events")
+					callback.Phrase := Trim(this.PhraseField[2].Text)
 			}
 			else {
 				callback.Initialized := (this.Control["callbackInitializationDropDown"].Value = 1)
@@ -2112,17 +2168,21 @@ class CallbacksEditor {
 	}
 
 	loadCallbacks() {
-		local extension := ((this.Type = "Agent.Events") ? ".events" : ".actions")
+		local extension := (InStr(this.Type, "Events") ? ".events" : ".actions")
 		local configuration := readMultiMap(kResourcesDirectory . "Actions\" . this.Assistant . extension)
 		local callbacks := []
-		local active, disabled, ignore, type, callback, descriptor, parameters, theCallback, context, fileName, message
+		local active, disabled, ignore, type, callback, descriptor, parameters, theCallback, context, fileName, message, category
+
+		this.iDeletedCallbacks := CaseInsenseMap()
 
 		addMultiMapValues(configuration, readMultiMap(kUserHomeDirectory . "Actions\" . this.Assistant . extension))
 
 		active := string2Values(",", getMultiMapValue(configuration, this.Type, "Active", ""))
 		disabled := string2Values(",", getMultiMapValue(configuration, this.Type, "Disabled", ""))
 
-		for ignore, type in [this.Type . ".Builtin", this.Type . ".Custom"]
+		for ignore, category in this.Categories {
+			type := (this.Type . "." . category)
+
 			for callback, descriptor in getMultiMapValues(configuration, type) {
 				descriptor := string2Values("|", descriptor)
 
@@ -2136,7 +2196,7 @@ class CallbacksEditor {
 								   , Description: parameter[5]})
 				}
 
-				if (this.Type = "Agent.Events")
+				if InStr(this.Type, "Events")
 					theCallback := {Name: callback, Active: inList(active, callback), Disabled: inList(disabled, callback)
 								  , Type: descriptor[1], SelectedType: descriptor[1], Definition: descriptor[2]
 								  , Description: descriptor[6], Parameters: parameters, Builtin: (type = (this.Type . ".Builtin"))
@@ -2195,6 +2255,7 @@ class CallbacksEditor {
 
 				this.Callbacks.Push(theCallback)
 			}
+		}
 
 		this.CallbacksListView.Delete()
 
@@ -2208,10 +2269,10 @@ class CallbacksEditor {
 	}
 
 	saveCallbacks(save := true) {
-		local extension := ((this.Type = "Agent.Events") ? ".events" : ".actions")
+		local extension := (InStr(this.Type, "Events") ? ".events" : ".actions")
 		local active := []
 		local disabled := []
-		local configuration, ignore, callback, index, parameter
+		local configuration, ignore, callback, index, parameter, name
 
 		if this.SelectedCallback
 			if !this.saveCallback(this.SelectedCallback) {
@@ -2228,6 +2289,9 @@ class CallbacksEditor {
 
 			if callback.Disabled
 				disabled.Push(callback.Name)
+
+			if this.iDeletedCallbacks.Has(callback.Name)
+				this.iDeletedCallbacks.Delete(callback.Name)
 
 			if !callback.Builtin {
 				if save
@@ -2246,7 +2310,7 @@ class CallbacksEditor {
 						FileAppend(callback.Script, kUserHomeDirectory . "Actions\" . callback.Definition)
 					}
 
-				if (this.Type = "Agent.Events")
+				if InStr(this.Type, "Events")
 					setMultiMapValue(configuration, this.Type . ".Custom", callback.Name
 												  , values2String("|", callback.Type, callback.Definition, callback.Event, callback.Phrase
 																	 , callback.Parameters.Length, callback.Description))
@@ -2255,12 +2319,28 @@ class CallbacksEditor {
 												  , values2String("|", callback.Type, callback.Definition, callback.Initialized, callback.Confirm
 																	 , callback.Parameters.Length, callback.Description))
 
+				loop
+					if !getMultiMapValue(configuration, this.Type . ".Parameters", callback.Name . "." . A_Index)
+						break
+					else
+						removeMultiMapValue(configuration, this.Type . ".Parameters", callback.Name . "." . A_Index)
+
 				for index, parameter in callback.Parameters
 					setMultiMapValue(configuration, this.Type . ".Parameters", callback.Name . "." . index
 												  , values2String("|", parameter.Name, parameter.Type
 																	 , values2String(",", parameter.Enumeration*)
 																	 , parameter.Required, parameter.Description))
 			}
+		}
+
+		for name, ignore in this.iDeletedCallbacks {
+			loop
+				if !getMultiMapValue(configuration, this.Type . ".Parameters", name . "." . A_Index)
+					break
+				else
+					removeMultiMapValue(configuration, this.Type . ".Parameters", name . "." . A_Index)
+
+			removeMultiMapValue(configuration, this.Type . ".Custom", name)
 		}
 
 		setMultiMapValue(configuration, this.Type, "Active", values2String(",", active*))

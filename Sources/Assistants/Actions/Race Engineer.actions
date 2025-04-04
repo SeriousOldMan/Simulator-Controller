@@ -11,9 +11,9 @@ plan_pitstop.3=changeTyres|Boolean||false|Indicates whether new tyres should be 
 plan_pitstop.4=tyreCompound|String||false|If a tyre change is requested the compound for the new tyres can be supplied.
 plan_pitstop.5=repairDamage|Boolean||false|Indicates whether all damages should be repaired.
 plan_pitstop.6=swapDriver|Boolean||false|Indicates in a team race whether the next driver according to the stint plan should take the car.
-[Agent.Actions]
+[Agent.LLM.Actions]
 Active=plan_pitstop,cancel_pitstop,report_damage,report_time_loss,report_no_time_loss,report_weather_forecast,report_low_fuel,report_pressure_loss
-[Agent.Actions.Builtin]
+[Agent.LLM.Actions.Builtin]
 plan_pitstop=Assistant.Method|planPitstopAction(%targetLap%, %refuelAmount%, %changeTyres%, %tyreCompound%, %repairDamage%, %swapDriver%)|false|false|6|Creates a plan for the next pitstop.
 cancel_pitstop=Assistant.Rule|Race Engineer.cancel_pitstop.rules|false|false|0|Clears the pitstop plan, if a pitstop is no longer needed.
 report_low_fuel=Assistant.Method|lowFuelWarning(%remainingFuel%, %remainingLaps%)|false|false|2|Reports that the car is running low on fuel.
@@ -22,7 +22,7 @@ report_time_loss=Assistant.Method|reportTimeLossAction(%lapsToDrive%, %timeLoss%
 report_no_time_loss=Assistant.Method|reportNoTimeLossAction(%lapsToDrive%, %timeLoss%)|false|false|2|Reports that the driver has recovered its pace and repairs may no longer be needed.
 report_pressure_loss=Assistant.Method|pressureLossWarning(%tyre%, %lostPressure%)|false|false|2|Reports that a tyre has lost pressure.
 report_weather_forecast=Assistant.Method|weatherForecast(%weather%, %minutes%, %impactsStrategy%)|false|false|3|Reports an upcoming change in the weather conditions.
-[Agent.Actions.Parameters]
+[Agent.LLM.Actions.Parameters]
 plan_pitstop.1=targetLap|Integer||false|The planned lap for the car to come to the pit.
 plan_pitstop.2=refuelAmount|Number||false|The amount of fuel to be filled into the car.
 plan_pitstop.3=changeTyres|Boolean||false|Indicates whether new tyres should be mounted.

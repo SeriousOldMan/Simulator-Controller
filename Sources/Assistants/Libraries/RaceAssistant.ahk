@@ -55,6 +55,15 @@ global kUnknown := false
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+class RulesBooster {
+	getTools() {
+		return this.Manager.getTools("Agent")
+	}
+
+	trigger(event, trigger, goal := false, options := false) {
+	}
+}
+
 class AssistantEvent extends AgentEvent {
 	iAssistant := false
 
@@ -147,7 +156,7 @@ class AssistantEvent extends AgentEvent {
 		this.iOptions := options
 	}
 
-	createTools() {
+	createTools(categories := ["Custom", "Builtin"]) {
 		return []
 	}
 
@@ -218,10 +227,20 @@ class AssistantEvent extends AgentEvent {
 	}
 
 	triggerAction(action, arguments*) {
-		action = createTools(this, "Agent", [action])
+		findTool(tools, name) {
+			local ignore, candidate
 
-		if (action.Length > 0)
-			action[1].Callable.Call(arguments*)
+			for ignore, candidate in tools
+				if (candidate.Name = name)
+					return candidate
+
+			return false
+		}
+
+		action := findTool(this.getTools("Agent"), action)
+
+		if action
+			action.Callable.Call(arguments*)
 	}
 }
 
@@ -945,12 +964,19 @@ class RaceAssistant extends ConfigurationItem {
 				this.iConversationBooster := booster
 		}
 
-		if options["AgentBooster"] {
-			booster := EventBooster(this, options["AgentBooster"], this.Configuration, this.VoiceManager.Language)
+		if options["AgentBooster"]
+			if (options["AgentBooster"] = "Rules") {
+				booster := RulesBooster(this)
 
-			if booster.Active
-				this.iAgentBooster := booster
-		}
+				if booster.Active
+					this.iAgentBooster := booster
+			}
+			else {
+				booster := EventBooster(this, options["AgentBooster"], this.Configuration, this.VoiceManager.Language)
+
+				if booster.Active
+					this.iAgentBooster := booster
+			}
 
 		if muted
 			this.Muted := true
@@ -991,7 +1017,7 @@ class RaceAssistant extends ConfigurationItem {
 
 		if getMultiMapValue(configuration, "Agent Booster", this.AssistantType . ".Agent", true) {
 			if ((getMultiMapValue(configuration, "Agent Booster", this.AssistantType . ".Model", kUndefined) != kUndefined)
-			 || (InStr(getMultiMapValue(configuration, "Agent Booster", this.AssistantType . ".Service", ""), "Generic") == 1))
+			 || (InStr(getMultiMapValue(configuration, "Agent Booster", this.AssistantType . ".Service", ""), "Rules") == 1))
 				options["AgentBooster"] := this.AssistantType
 			else
 				options["AgentBooster"] := false
@@ -1189,8 +1215,16 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	getTools(type := false) {
+		static lastKnowledgeBase := false
 		static conversationTools := false
 		static agentTools := false
+
+		if (this.KnowledgeBase != lastKnowledgeBase) {
+			lastKnowledgeBase := this.KnowledgeBase
+
+			conversationTools := false
+			agentTools := false
+		}
 
 		if (type = "Conversation") {
 			if !conversationTools
@@ -1745,14 +1779,16 @@ class RaceAssistant extends ConfigurationItem {
 	createAgentEvents(&productions, &reductions, &includes) {
 		local configuration := readMultiMap(kResourcesDirectory . "Actions\" . this.AssistantType . ".events")
 		local events := []
-		local disabled, ignore, event, definition, parameters, parameter, enumeration, required, handler, type
+		local disabled, ignore, event, definition, parameters, parameter, enumeration, required, handler, type, prefix
 
 		addMultiMapValues(configuration, readMultiMap(kUserHomeDirectory . "Actions\" . this.AssistantType . ".events"))
 
-		disabled := string2Values(",", getMultiMapValue(configuration, "Agent.Events", "Disabled", ""))
+		prefix := (isInstance(this.AgentBooster, RulesBooster) ? "Agent.Rules.Events" : "Agent.LLM.Events")
+		disabled := string2Values(",", getMultiMapValue(configuration, prefix, "Disabled", ""))
 
-		for ignore, type in ["Agent.Events.Custom", "Agent.Events.Builtin"]
-			for ignore, event in string2Values(",", getMultiMapValue(configuration, "Agent.Events", "Active", "")) {
+		for ignore, type in (isInstance(this.AgentBooster, RulesBooster) ? ["Agent.Rules.Events.Custom"]
+																		 : ["Agent.LLM.Events.Custom", "Agent.LLM.Events.Builtin"])
+			for ignore, event in string2Values(",", getMultiMapValue(configuration, prefix, "Active", "")) {
 				definition := getMultiMapValue(configuration, type, event, false)
 
 				if definition
@@ -1762,7 +1798,7 @@ class RaceAssistant extends ConfigurationItem {
 							parameters := []
 
 							loop definition[5] {
-								parameter := string2Values("|", getMultiMapValue(configuration, "Agent.Events.Parameters", event . "." . A_Index, ""))
+								parameter := string2Values("|", getMultiMapValue(configuration, prefix . ".Parameters", event . "." . A_Index, ""))
 
 								if (parameter.Length >= 5) {
 									enumeration := string2Values(",", parameter[3])
@@ -1779,14 +1815,14 @@ class RaceAssistant extends ConfigurationItem {
 
 							switch definition[1], false {
 								case "Assistant.Class":
-									handler := %definition[2]%(this, (type = "Agent.Events.Builtin"), event
+									handler := %definition[2]%(this, (type = (prefix . ".Builtin")), event
 															 , !inList(disabled, event), definition[3], parameters)
 								case "Assistant.Rule":
 									RuleCompiler().compileRules(FileRead(getFileName(definition[2], kUserHomeDirectory . "Actions\"
 																								  , kResourcesDirectory . "Actions\"))
 															  , &productions, &reductions, &includes)
 
-									handler := RuleEvent(this, (type = "Agent.Events.Builtin"), event
+									handler := RuleEvent(this, (type = (prefix . ".Builtin")), event
 													   , !inList(disabled, event), definition[3], definition[4], parameters)
 								default:
 									throw "Unknown event type (" definition[1] . ") detected in RaceAssistant.createAgentEvents..."
@@ -1808,13 +1844,14 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	createAgentTools() {
-		local tools, ignore, event
+		local tools, ignore, event, categories
 
 		if this.AgentBooster {
-			tools := createTools(this, "Agent")
+			categories := (isInstance(this.AgentBooster, RulesBooster) ? ["Custom"] : ["Custom", "Builtin"])
+			tools := createTools(this, "Agent", categories)
 
 			for ignore, event in this.iEvents
-				tools := concatenate(tools, event.createTools())
+				tools := concatenate(tools, event.createTools(categories))
 
 			return tools
 		}
@@ -4428,7 +4465,7 @@ Assistant_Trigger:= triggerAction
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-createTools(assistant, type, names := false) {
+createTools(assistant, type, categories := ["Custom", "Builtin"], names := false) {
 	local configuration := readMultiMap(kResourcesDirectory . "Actions\" . assistant.AssistantType . ".actions")
 	local tools := []
 	local loadedRules := CaseInsenseMap()
@@ -4818,9 +4855,11 @@ createTools(assistant, type, names := false) {
 
 	for ignore, action in string2Values(",", getMultiMapValue(configuration, type . ".Actions", "Active", ""))
 		if (!names || inList(names, action)) {
-			definition := getMultiMapValue(configuration, type . ".Actions.Custom", action, false)
+			definition := (inList(categories, "Custom") ? getMultiMapValue(configuration, type . ".Actions.Custom", action, false)
+														: false)
 
-			if !definition
+
+			if (!definition && inList(categories, "Builtin"))
 				definition := getMultiMapValue(configuration, type . ".Actions.Builtin", action, false)
 
 			try {

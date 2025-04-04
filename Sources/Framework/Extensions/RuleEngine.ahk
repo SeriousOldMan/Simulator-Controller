@@ -647,7 +647,7 @@ class Fact extends Primary {
 
 	toString(factsOrResultSet := kNotInitialized) {
 		if (factsOrResultSet = kNotInitialized)
-			return false
+			return ("!" . this.Fact)
 		else if isInstance(factsOrResultSet, Facts)
 			return factsOrResultSet.getValue(this.Fact)
 		else if isInstance(factsOrResultSet, ResultSet)

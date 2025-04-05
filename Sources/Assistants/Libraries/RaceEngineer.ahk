@@ -2232,22 +2232,22 @@ class RaceEngineer extends RaceAssistant {
 						session := "Session"
 				}
 
-				speaker.speakPhrase("GreetingEngineer", {session: translate(session)})
+				speaker.speakPhrase("GreetingEngineer", {session: speaker.Fragments[session]})
 
 				if ((this.Session = kSessionRace) && ProcessExist("Race Strategist.exe")) {
 					strategistPlugin := Plugin("Race Strategist", kSimulatorConfiguration)
 					strategistName := strategistPlugin.getArgumentValue("name", strategistPlugin.getArgumentValue("raceAssistantName", false))
 
 					if strategistName {
-						speaker.speakPhrase("GreetingStrategist", {strategist: strategistName, session: translate(session)})
+						speaker.speakPhrase("GreetingStrategist", {strategist: strategistName, session: speaker.Fragments[session]})
 
-						speaker.speakPhrase("CallUs", {session: translate(session)})
+						speaker.speakPhrase("CallUs", {session: speaker.Fragments[session]})
 					}
 					else
-						speaker.speakPhrase("CallMe", {session: translate(session)})
+						speaker.speakPhrase("CallMe", {session: speaker.Fragments[session]})
 				}
 				else
-					speaker.speakPhrase("CallMe", {session: translate(session)})
+					speaker.speakPhrase("CallMe", {session: speaker.Fragments[session]})
 			}
 			finally {
 				speaker.endTalk()

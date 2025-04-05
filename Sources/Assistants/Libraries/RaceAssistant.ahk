@@ -4368,10 +4368,10 @@ speakAssistant(context, message, force := false) {
 		if speaker.Phrases.Has(message)
 			speaker.speakPhrase(message)
 		else if assistant.VoiceManager.UseTalking
-			speaker.speak(message, false, false, {Noise: false, Rephrase: false})
+			speaker.speak(message, false, false, {Noise: false})
 		else
 			for ignore, part in string2Values(". ", message)
-				speaker.speak(part . ".", false, false, {Rephrase: false, Click: (A_Index = 1)})
+				speaker.speak(part . ".", false, false, {Click: (A_Index = 1)})
 	}
 
 	return true

@@ -1849,7 +1849,8 @@ class RaceAssistant extends ConfigurationItem {
 		if booster {
 			rules := isInstance(booster, RaceAssistant.RulesBooster)
 			categories := (rules ? ["Custom"] : ["Custom", "Builtin"])
-			tools := createTools(this, "Agent", rules ? "Rules" : "LLM", categories)
+
+			tools := createTools(this, "Agent", rules ? "Rules" : "LLM", categories, !rules)
 
 			for ignore, event in this.iEvents
 				tools := concatenate(tools, event.createTools(categories))
@@ -4374,7 +4375,7 @@ speakAssistant(context, message, force := false) {
 		if speaker.Phrases.Has(message)
 			speaker.speakPhrase(message)
 		else if assistant.VoiceManager.UseTalking
-			speaker.speak(message, false, false, {Noise: false})
+			speaker.speak(message)
 		else
 			for ignore, part in string2Values(". ", message)
 				speaker.speak(part . ".", false, false, {Click: (A_Index = 1)})
@@ -4470,7 +4471,7 @@ Assistant_Trigger:= triggerAction
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-createTools(assistant, type, target := false, categories := ["Custom", "Builtin"], names := false) {
+createTools(assistant, type, target := false, categories := ["Custom", "Builtin"], chime := true, names := false) {
 	local configuration := readMultiMap(kResourcesDirectory . "Actions\" . assistant.AssistantType . ".actions")
 	local tools := []
 	local loadedRules := CaseInsenseMap()
@@ -4577,7 +4578,8 @@ createTools(assistant, type, target := false, categories := ["Custom", "Builtin"
 	}
 
 	runAction(enoughData, confirm) {
-		playSound("RASoundPlayer.exe", reasoningSound, audioDevice)
+		if chime
+			playSound("RASoundPlayer.exe", reasoningSound, audioDevice)
 
 		if !assistant.KnowledgeBase
 			return assistant.hasEnoughData()

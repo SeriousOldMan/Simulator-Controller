@@ -3499,10 +3499,10 @@ class Strategy extends ConfigurationItem {
 		local tyreSet, tyreSetDescriptor, tyreSetLaps, tyreSetLife
 
 		if this.AvailableTyreSets.Has(qualifiedCompound) {
-			for tyreSet, tyreSetDescriptor in this.AvailableTyreSets[qualifiedCompound] {
-				tyreSetLife := tyreSetDescriptor[1]
-				tyreSetLaps := tyreSetDescriptor[2]
+			tyreSetDescriptor := this.AvailableTyreSets[qualifiedCompound]
+			tyreSetLife := tyreSetDescriptor[1]
 
+			for tyreSet, tyreSetLaps in tyreSetDescriptor[2] {
 				if ((tyreSetLaps >= tyreSetLife) && !over)
 					continue
 
@@ -3527,7 +3527,7 @@ class Strategy extends ConfigurationItem {
 
 	tyreSetLife(tyreCompound, tyreCompoundColor, tyreSet) {
 		try {
-			return this.AvailableTyreSets[compound(tyreCompound, tyreCompoundColor)][tyreSet][1]
+			return this.AvailableTyreSets[compound(tyreCompound, tyreCompoundColor)][1]
 		}
 		catch Any as exception {
 			logError(exception)
@@ -3538,7 +3538,7 @@ class Strategy extends ConfigurationItem {
 
 	tyreSetLaps(tyreCompound, tyreCompoundColor, tyreSet) {
 		try {
-			return this.AvailableTyreSets[compound(tyreCompound, tyreCompoundColor)][tyreSet][2]
+			return this.AvailableTyreSets[compound(tyreCompound, tyreCompoundColor)][2][tyreSet]
 		}
 		catch Any as exception {
 			logError(exception)
@@ -3554,8 +3554,8 @@ class Strategy extends ConfigurationItem {
 		if this.AvailableTyreSets.Has(qualifiedCompound) {
 			tyreSets := this.AvailableTyreSets[qualifiedCompound]
 
-			if tyreSets.Has(tyreSet)
-				tyreSets[tyreSet][2] += tyreLaps
+			if tyreSets[2].Has(tyreSet)
+				tyreSets[2][tyreSet] += tyreLaps
 		}
 	}
 

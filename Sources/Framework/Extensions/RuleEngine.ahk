@@ -632,6 +632,8 @@ class Fact extends Primary {
 	getValue(factsOrResultSet, default := kNotInitialized) {
 		if isInstance(factsOrResultSet, Facts)
 			return factsOrResultSet.getValue(this.Fact, default)
+		else if (default != kNotInitialized)
+			return default
 		else
 			return this
 	}
@@ -3147,17 +3149,22 @@ class Facts {
 	dumpFacts(name := false) {
 		local key, value, text, fileName
 
-		if !name
-			name := StrSplit(A_ScriptName, ".")[1]
+		try {
+			if !name
+				name := StrSplit(A_ScriptName, ".")[1]
 
-		fileName := (kTempDirectory . name . ".knowledge")
+			fileName := (kTempDirectory . name . ".knowledge")
 
-		deleteFile(fileName)
+			deleteFile(fileName)
 
-		for key, value in this.Facts {
-			text := (key . " = " . String(value) . "`n")
+			for key, value in this.Facts {
+				text := (key . " = " . String(value) . "`n")
 
-			FileAppend(text, fileName)
+				FileAppend(text, fileName)
+			}
+		}
+		catch Any as exception {
+			logError(exception)
 		}
 	}
 }

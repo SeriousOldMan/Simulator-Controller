@@ -147,7 +147,7 @@ class AssistantEvent extends AgentEvent {
 		this.iOptions := options
 	}
 
-	createTools() {
+	createTools(categories := ["Custom", "Builtin"]) {
 		return []
 	}
 
@@ -291,6 +291,12 @@ class RaceAssistant extends ConfigurationItem {
 	iSaveSettings := kNever
 
 	iEvents := []
+
+	class RulesBooster extends AgentBooster {
+		trigger(event, trigger, goal := false, options := false) {
+			return false
+		}
+	}
 
 	class VariablesMap extends CaseInsenseWeakMap {
 		has(*) {
@@ -451,6 +457,139 @@ class RaceAssistant extends ConfigurationItem {
 			this.iRaceAssistant := raceAssistant
 
 			super.__New(ruleEngine, facts, rules)
+		}
+
+		execute(executable, arguments) {
+			local result := false
+			local extension, context, script, scriptFileName, message
+
+			try {
+				SplitPath(executable, , , &extension)
+
+				if ((extension = "script") || (extension = "lua")) {
+					context := scriptOpenContext()
+
+					try {
+						script := FileRead(getFileName("Assistant Callbacks.script"
+													 , kUserHomeDirectory . "Scripts\", kResourcesDirectory . "Scripts\"))
+
+						script .= ("`n`n" . FileRead(executable))
+
+						scriptFileName := temporaryFileName("Assistant", "script")
+
+						try {
+							FileAppend(script, scriptFileName)
+
+							if !scriptLoadScript(context, scriptFileName, &message)
+								throw message
+						}
+						finally {
+							if !isDebug()
+								deleteFile(scriptFileName)
+						}
+
+						scriptPushArray(context, collect(arguments, (a) => ((a = kNotInitialized) ? kUndefined : a)))
+						scriptSetGlobal(context, "Arguments")
+
+						scriptPushValue(context, kUndefined)
+						scriptSetGlobal(context, "__Undefined")
+						scriptPushValue(context, kNotInitialized)
+						scriptSetGlobal(context, "__NotInitialized")
+
+						scriptPushValue(context, (c) {
+							this.setFact(scriptGetString(c), scriptGetString(c, 2))
+
+							return Integer(0)
+						})
+						scriptSetGlobal(context, "__Rules_SetValue")
+						scriptPushValue(context, (c) {
+							local value := this.getValue(scriptGetString(c))
+
+							if ((value = kUndefined) || (value = kNotInitialized))
+								value := kNull
+
+							scriptPushValue(c, value)
+
+							return Integer(1)
+						})
+						scriptSetGlobal(context, "__Rules_GetValue")
+						scriptPushValue(context, (c) {
+							this.produce()
+
+							return Integer(0)
+						})
+						scriptSetGlobal(context, "__Rules_Execute")
+
+						scriptPushValue(context, (c) {
+							askAssistant(this.RaceAssistant, scriptGetString(c))
+
+							return Integer(0)
+						})
+						scriptSetGlobal(context, "__Assistant_Ask")
+						scriptPushValue(context, (c) {
+							speakAssistant(this.RaceAssistant, scriptGetString(c)
+										 , (scriptGetArgsCount(c) > 1) ? scriptGetBoolean(c, 2) : unset)
+
+							return Integer(0)
+						})
+						scriptSetGlobal(context, "__Assistant_Speak")
+						scriptPushValue(context, (c) {
+							local arguments := []
+
+							loop scriptGetArgsCount(c)
+								if (A_Index > 1)
+									arguments.Push(scriptGetString(c, A_Index))
+
+							callAssistant(this.RaceAssistant, scriptGetString(c), arguments*)
+
+							return Integer(0)
+						})
+						scriptSetGlobal(context, "__Assistant_Call")
+						scriptPushValue(context, (c) {
+							local arguments := []
+
+							loop scriptGetArgsCount(c)
+								if (A_Index > 1)
+									arguments.Push(scriptGetString(c, A_Index))
+
+							callController(this.RaceAssistant, scriptGetString(c), arguments*)
+
+							return Integer(0)
+						})
+						scriptSetGlobal(context, "__Controller_Call")
+						scriptPushValue(context, (c) {
+							local arguments := []
+
+							loop scriptGetArgsCount(c)
+								if (A_Index > 1)
+									arguments.Push(scriptGetString(c, A_Index))
+
+							callFunction(this.RaceAssistant, scriptGetString(c), arguments*)
+
+							return Integer(0)
+						})
+						scriptSetGlobal(context, "__Function_Call")
+
+						if scriptExecute(context, &message)
+							result := scriptGetBoolean(context)
+						else
+							throw message
+					}
+					finally {
+						scriptCloseContext(context)
+					}
+
+					if this.RaceAssistant.Debug[kDebugKnowledgeBase]
+						this.RaceAssistant.dumpKnowledgeBase(this)
+				}
+				else
+					result := super.execute(executable, arguments)
+			}
+			catch Any as exception {
+				logError(exception)
+			}
+
+			return result
 		}
 	}
 
@@ -805,12 +944,19 @@ class RaceAssistant extends ConfigurationItem {
 				this.iConversationBooster := booster
 		}
 
-		if options["AgentBooster"] {
-			booster := EventBooster(this, options["AgentBooster"], this.Configuration, this.VoiceManager.Language)
+		if options["AgentBooster"]
+			if (InStr(getMultiMapValue(this.Configuration, "Agent Booster", this.AssistantType . ".Service", ""), "Rules") = 1) {
+				booster := RaceAssistant.RulesBooster(this, options["AgentBooster"], this.Configuration)
 
-			if booster.Active
-				this.iAgentBooster := booster
-		}
+				if booster.Active
+					this.iAgentBooster := booster
+			}
+			else {
+				booster := EventBooster(this, options["AgentBooster"], this.Configuration, this.VoiceManager.Language)
+
+				if booster.Active
+					this.iAgentBooster := booster
+			}
 
 		if muted
 			this.Muted := true
@@ -851,7 +997,7 @@ class RaceAssistant extends ConfigurationItem {
 
 		if getMultiMapValue(configuration, "Agent Booster", this.AssistantType . ".Agent", true) {
 			if ((getMultiMapValue(configuration, "Agent Booster", this.AssistantType . ".Model", kUndefined) != kUndefined)
-			 || (InStr(getMultiMapValue(configuration, "Agent Booster", this.AssistantType . ".Service", ""), "Generic") == 1))
+			 || (InStr(getMultiMapValue(configuration, "Agent Booster", this.AssistantType . ".Service", ""), "Rules") == 1))
 				options["AgentBooster"] := this.AssistantType
 			else
 				options["AgentBooster"] := false
@@ -1049,8 +1195,16 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	getTools(type := false) {
+		static lastKnowledgeBase := false
 		static conversationTools := false
 		static agentTools := false
+
+		if (this.KnowledgeBase != lastKnowledgeBase) {
+			lastKnowledgeBase := this.KnowledgeBase
+
+			conversationTools := false
+			agentTools := false
+		}
 
 		if (type = "Conversation") {
 			if !conversationTools
@@ -1602,17 +1756,37 @@ class RaceAssistant extends ConfigurationItem {
 		return false
 	}
 
+	triggerAction(action, arguments*) {
+		findTool(tools, name) {
+			local ignore, candidate
+
+			for ignore, candidate in tools
+				if (candidate.Name = name)
+					return candidate
+
+			return false
+		}
+
+		action := findTool(this.getTools("Agent"), action)
+
+		if action
+			action.Callable.Call(arguments*)
+	}
+
 	createAgentEvents(&productions, &reductions, &includes) {
 		local configuration := readMultiMap(kResourcesDirectory . "Actions\" . this.AssistantType . ".events")
 		local events := []
-		local disabled, ignore, event, definition, parameters, parameter, enumeration, required, handler, type
+		local disabled, ignore, event, definition, parameters, parameter, enumeration, required, handler, type, callbacksType
 
 		addMultiMapValues(configuration, readMultiMap(kUserHomeDirectory . "Actions\" . this.AssistantType . ".events"))
 
-		disabled := string2Values(",", getMultiMapValue(configuration, "Agent.Events", "Disabled", ""))
+		callbacksType := (isInstance(this.AgentBooster, RaceAssistant.RulesBooster) ? "Agent.Rules.Events" : "Agent.LLM.Events")
+		disabled := string2Values(",", getMultiMapValue(configuration, callbacksType, "Disabled", ""))
 
-		for ignore, type in ["Agent.Events.Custom", "Agent.Events.Builtin"]
-			for ignore, event in string2Values(",", getMultiMapValue(configuration, "Agent.Events", "Active", "")) {
+		for ignore, type in (isInstance(this.AgentBooster, RaceAssistant.RulesBooster) ? ["Agent.Rules.Events.Custom"]
+																					   : ["Agent.LLM.Events.Custom"
+																						, "Agent.LLM.Events.Builtin"])
+			for ignore, event in string2Values(",", getMultiMapValue(configuration, callbacksType, "Active", "")) {
 				definition := getMultiMapValue(configuration, type, event, false)
 
 				if definition
@@ -1622,7 +1796,8 @@ class RaceAssistant extends ConfigurationItem {
 							parameters := []
 
 							loop definition[5] {
-								parameter := string2Values("|", getMultiMapValue(configuration, "Agent.Events.Parameters", event . "." . A_Index, ""))
+								parameter := string2Values("|", getMultiMapValue(configuration, callbacksType . ".Parameters"
+																							  , event . "." . A_Index, ""))
 
 								if (parameter.Length >= 5) {
 									enumeration := string2Values(",", parameter[3])
@@ -1639,14 +1814,14 @@ class RaceAssistant extends ConfigurationItem {
 
 							switch definition[1], false {
 								case "Assistant.Class":
-									handler := %definition[2]%(this, (type = "Agent.Events.Builtin"), event
+									handler := %definition[2]%(this, (type = (callbacksType . ".Builtin")), event
 															 , !inList(disabled, event), definition[3], parameters)
 								case "Assistant.Rule":
 									RuleCompiler().compileRules(FileRead(getFileName(definition[2], kUserHomeDirectory . "Actions\"
 																								  , kResourcesDirectory . "Actions\"))
 															  , &productions, &reductions, &includes)
 
-									handler := RuleEvent(this, (type = "Agent.Events.Builtin"), event
+									handler := RuleEvent(this, (type = (callbacksType . ".Builtin")), event
 													   , !inList(disabled, event), definition[3], definition[4], parameters)
 								default:
 									throw "Unknown event type (" definition[1] . ") detected in RaceAssistant.createAgentEvents..."
@@ -1668,13 +1843,16 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	createAgentTools() {
-		local tools, ignore, event
+		local booster := this.AgentBooster
+		local tools, ignore, event, categories
 
-		if this.AgentBooster {
-			tools := createTools(this, "Agent")
+		if booster {
+			rules := isInstance(booster, RaceAssistant.RulesBooster)
+			categories := (rules ? ["Custom"] : ["Custom", "Builtin"])
+			tools := createTools(this, "Agent", rules ? "Rules" : "LLM", categories)
 
 			for ignore, event in this.iEvents
-				tools := concatenate(tools, event.createTools())
+				tools := concatenate(tools, event.createTools(categories))
 
 			return tools
 		}
@@ -1698,7 +1876,7 @@ class RaceAssistant extends ConfigurationItem {
 
 		compiler.compileRules(rules, &productions, &reductions, &includes)
 
-		if this.ConversationBooster {
+		if (this.ConversationBooster && this.ConversationBooster.Options["Actions"]) {
 			rules := FileRead(getFileName("Conversation Actions.rules", kUserRulesDirectory, kRulesDirectory))
 
 			compiler.compileRules(rules, &productions, &reductions, &includes)
@@ -2237,6 +2415,8 @@ class RaceAssistant extends ConfigurationItem {
 		knowledgeBase.addFact("Lap." . lapNumber . ".Driver.Surname", driverSurname)
 		knowledgeBase.addFact("Lap." . lapNumber . ".Driver.Nickname", driverNickname)
 
+		knowledgeBase.setFact("Position", getMultiMapValue(data, "Stint Data", "Position", 0))
+
 		knowledgeBase.setFact("Driver.Forname", driverForname)
 		knowledgeBase.setFact("Driver.Surname", driverSurname)
 		knowledgeBase.setFact("Driver.Nickname", driverNickname)
@@ -2482,6 +2662,8 @@ class RaceAssistant extends ConfigurationItem {
 			lapPenalty := getMultiMapValue(data, "Stint Data", "Penalty", false)
 
 		knowledgeBase.setFact("Session.Settings.Fuel.Max", getMultiMapValue(data, "Session Data", "FuelAmount", 0))
+
+		knowledgeBase.setFact("Position", getMultiMapValue(data, "Stint Data", "Position", 0))
 
 		knowledgeBase.setFact("Lap.Valid", lapValid)
 		knowledgeBase.setFact("Lap.Penalty", lapPenalty)
@@ -4192,10 +4374,10 @@ speakAssistant(context, message, force := false) {
 		if speaker.Phrases.Has(message)
 			speaker.speakPhrase(message)
 		else if assistant.VoiceManager.UseTalking
-			speaker.speak(message, false, false, {Noise: false, Rephrase: false})
+			speaker.speak(message, false, false, {Noise: false})
 		else
 			for ignore, part in string2Values(". ", message)
-				speaker.speak(part . ".", false, false, {Rephrase: false, Click: (A_Index = 1)})
+				speaker.speak(part . ".", false, false, {Click: (A_Index = 1)})
 	}
 
 	return true
@@ -4222,7 +4404,7 @@ raiseEvent(context, event, arguments*) {
 
 				if pid {
 					messageSend(kFileMessage, assistant
-											, event . ((arguments.Length > 0) ? (":" . values2String(";", normalizeArguments(arguments, true)*)) : "")
+											, "handleEvent:" . event . ((arguments.Length > 0) ? (";" . values2String(";", normalizeArguments(arguments, true)*)) : "")
 											, pid)
 
 					return true
@@ -4241,14 +4423,54 @@ raiseEvent(context, event, arguments*) {
 	}
 }
 
-Assistant_Raise := raiseEvent
+Assistant_Trigger := triggerAction
+
+triggerAction(context, action, arguments*) {
+	local assistant := (isInstance(context, RaceAssistant) ? context : context.KnowledgeBase.RaceAssistant)
+	local pid
+
+	try {
+		if inList(kRaceAssistants, action) {
+			if (action = assistant.AssistantType) {
+				action := arguments.RemoveAt(1)
+
+				return assistant.triggerAction(normalizeArguments(Array(action, arguments*))*)
+			}
+			else {
+				assistant := action
+				action := arguments.RemoveAt(1)
+
+				pid := ProcessExist(assistant . ".exe")
+
+				if pid {
+					messageSend(kFileMessage, assistant
+											, "triggerAction:" . action . ((arguments.Length > 0) ? (";" . values2String(";", normalizeArguments(arguments, true)*)) : "")
+											, pid)
+
+					return true
+				}
+				else
+					return false
+			}
+		}
+		else
+			return assistant.triggerAction(normalizeArguments(Array(action, arguments*))*)
+	}
+	catch Any as exception {
+		logError(exception, true)
+
+		return false
+	}
+}
+
+Assistant_Trigger:= triggerAction
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-createTools(assistant, type) {
+createTools(assistant, type, target := false, categories := ["Custom", "Builtin"], names := false) {
 	local configuration := readMultiMap(kResourcesDirectory . "Actions\" . assistant.AssistantType . ".actions")
 	local tools := []
 	local loadedRules := CaseInsenseMap()
@@ -4398,7 +4620,7 @@ createTools(assistant, type) {
 
 	callScript(action, scriptFileName, enoughData, confirm, parameters, arguments*) {
 		local knowledgeBase := assistant.KnowledgeBase
-		local index, parameter, script, context, message
+		local index, parameter, argument, script, context, message
 
 		if knowledgeBase {
 			if !runAction(enoughData, confirm)
@@ -4407,7 +4629,7 @@ createTools(assistant, type) {
 			context := scriptOpenContext()
 
 			try {
-				script := FileRead(getFileName("Action Callbacks.script"
+				script := FileRead(getFileName("Assistant Callbacks.script"
 											 , kUserHomeDirectory . "Scripts\", kResourcesDirectory . "Scripts\"))
 
 				script .= ("`n`n" . FileRead(getFileName(scriptFileName
@@ -4417,7 +4639,7 @@ createTools(assistant, type) {
 				for index, parameter in parameters
 					script := StrReplace(script, "%" . parameter.Name . "%", parameter.Name)
 
-				scriptFileName := temporaryFileName("action", "script")
+				scriptFileName := temporaryFileName("Action", "script")
 
 				try {
 					FileAppend(script, scriptFileName)
@@ -4432,11 +4654,16 @@ createTools(assistant, type) {
 
 				for index, parameter in parameters
 					try {
-						scriptPushValue(context, arguments[index])
+						argument := arguments[index]
+
+						if (argument = kNotInitialized)
+							argument := kUndefined
+
+						scriptPushValue(context, argument)
 						scriptSetGlobal(context, parameter.Name)
 					}
 					catch UnsetItemError {
-						scriptPushValue(context, kNull)
+						scriptPushValue(context, kUndefined)
 						scriptSetGlobal(context, parameter.Name)
 					}
 
@@ -4631,60 +4858,65 @@ createTools(assistant, type) {
 
 	addMultiMapValues(configuration, readMultiMap(kUserHomeDirectory . "Actions\" . assistant.AssistantType . ".actions"))
 
-	for ignore, action in string2Values(",", getMultiMapValue(configuration, type . ".Actions", "Active", "")) {
-		definition := getMultiMapValue(configuration, type . ".Actions.Custom", action, false)
+	target := (target ? ("." . target) : target)
 
-		if !definition
-			definition := getMultiMapValue(configuration, type . ".Actions.Builtin", action, false)
+	for ignore, action in string2Values(",", getMultiMapValue(configuration, type . target . ".Actions", "Active", ""))
+		if (!names || inList(names, action)) {
+			definition := (inList(categories, "Custom") ? getMultiMapValue(configuration, type . target . ".Actions.Custom", action, false)
+														: false)
 
-		try {
-			if definition {
-				definition := string2Values("|", definition)
-				parameters := []
 
-				loop definition[5] {
-					parameter := string2Values("|", getMultiMapValue(configuration, type . ".Actions.Parameters", action . "." . A_Index, ""))
+			if (!definition && inList(categories, "Builtin"))
+				definition := getMultiMapValue(configuration, type . target . ".Actions.Builtin", action, false)
 
-					if (parameter.Length >= 5) {
-						enumeration := string2Values(",", parameter[3])
+			try {
+				if definition {
+					definition := string2Values("|", definition)
+					parameters := []
 
-						if (enumeration.Length = 0)
-							enumeration := false
+					loop definition[5] {
+						parameter := string2Values("|", getMultiMapValue(configuration, type . target . ".Actions.Parameters", action . "." . A_Index, ""))
 
-						required := ((parameter[4] = kTrue) ? kTrue : ((parameter[4] = kFalse) ? false : parameter[4]))
+						if (parameter.Length >= 5) {
+							enumeration := string2Values(",", parameter[3])
 
-						parameters.Push(LLMTool.Function.Parameter(parameter[1], parameter[5], parameter[2], enumeration, required))
+							if (enumeration.Length = 0)
+								enumeration := false
+
+							required := ((parameter[4] = kTrue) ? kTrue : ((parameter[4] = kFalse) ? false : parameter[4]))
+
+							parameters.Push(LLMTool.Function.Parameter(parameter[1], parameter[5], parameter[2], enumeration, required))
+						}
 					}
+
+					enoughData := ((definition[3] = kTrue) ? true : ((definition[3] = kFalse) ? false : definition[3]))
+					confirm := ((definition[4] = kTrue) ? true : ((definition[4] = kFalse) ? false : definition[4]))
+
+					switch definition[1], false {
+						case "Assistant.Method":
+							handler := callMethod.Bind(definition[2], enoughData, confirm, parameters)
+						case "Assistant.Rule":
+							handler := callRule.Bind(action, definition[2], enoughData, confirm, parameters)
+						case "Assistant.Script":
+							handler := callScript.Bind(action, definition[2], enoughData, confirm, parameters)
+						case "Controller.Method":
+							handler := callControllerMethod.Bind(definition[2], enoughData, confirm, parameters)
+						case "Controller.Function":
+							handler := callControllerFunction.Bind(definition[2], enoughData, confirm, parameters)
+						default:
+							throw "Unknown action type (" definition[1] . ") detected in createTools..."
+					}
+
+					if handler
+						tools.Push(LLMTool.Function(action, definition[6], parameters, handler))
 				}
-
-				enoughData := ((definition[3] = kTrue) ? true : ((definition[3] = kFalse) ? false : definition[3]))
-				confirm := ((definition[4] = kTrue) ? true : ((definition[4] = kFalse) ? false : definition[4]))
-
-				switch definition[1], false {
-					case "Assistant.Method":
-						handler := callMethod.Bind(definition[2], enoughData, confirm, parameters)
-					case "Assistant.Rule":
-						handler := callRule.Bind(action, definition[2], enoughData, confirm, parameters)
-					case "Assistant.Script":
-						handler := callScript.Bind(action, definition[2], enoughData, confirm, parameters)
-					case "Controller.Method":
-						handler := callControllerMethod.Bind(definition[2], enoughData, confirm, parameters)
-					case "Controller.Function":
-						handler := callControllerFunction.Bind(definition[2], enoughData, confirm, parameters)
-					default:
-						throw "Unknown action type (" definition[1] . ") detected in createTools..."
-				}
-
-				if handler
-					tools.Push(LLMTool.Function(action, definition[6], parameters, handler))
+				else
+					throw "Unknown action (" action . ") detected in createTools..."
 			}
-			else
-				throw "Unknown action (" action . ") detected in createTools..."
+			catch Any as exception {
+				logError(exception, true)
+			}
 		}
-		catch Any as exception {
-			logError(exception, true)
-		}
-	}
 
 	return tools
 }

@@ -1,6 +1,6 @@
 ; The rules below will raise an event, if rain just stopped.
 
-{None: [?Rain.Last]} => (Prove: Rain.Stop.updateRain(Rain.Last))
+{All: {None: [?Rain.Last]}, [?Weather.Weather.Now]} => (Prove: Rain.Stop.updateRain(Rain.Last))
 
 {All: [?Lap], {Prove: Rain.Stop.updateRain(Rain.Now)},
 	  [?Rain.Now != ?Rain.Last], [?Rain.Now = false]} => (Call: Assistant.Raise(RainStop))

@@ -1,7 +1,7 @@
 #include Position.events
-[Agent.Events]
+[Agent.LLM.Events]
 Active=
-[Agent.Events.Builtin]
+[Agent.LLM.Events.Builtin]
 ahead_gap_update=Assistant.Class|AheadGapUpdateEvent|AheadGapUpdate||3|Periodically signalled to update the gap to the car ahead.
 behind_gap_update=Assistant.Class|BehindGapUpdateEvent|BehindGapUpdate||3|Periodically signalled to update the gap to the car behind.
 attack_imminent=Assistant.Class|AttackImminentEvent|AttackImminent||2|Signals that an opponent is closing in and an attack will happen soon.
@@ -11,7 +11,7 @@ last_lap=Assistant.Class|LastLapEvent|LastLap||0|Signals the last lap of the ses
 stint_ending=Assistant.Class|StintEndingEvent|StintEnding||1|Triggered when the current stint is almost over.
 session_over=Assistant.Class|SessionOverEvent|SessionOver||0|Signals that the session is over.
 opponent_pitting=Assistant.Class|OpponentPittingEvent|OpponentPitting||1|Informs about a direct opponent ahead or behind going to the pits.
-[Agent.Events.Parameters]
+[Agent.LLM.Events.Parameters]
 ahead_gap_update.1=carNumber|Integer||true|The race or car number of the car ahead.
 ahead_gap_update.2=delta|Number||true|The new gap in seconds to the car ahead.
 ahead_gap_update.3=closingIn|Boolean||true|Indicates that the gap got smaller.

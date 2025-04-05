@@ -37,10 +37,11 @@ global kProve := "Prove:"
 global kProveAll := "ProveAll:"
 global kSet := "Set:"
 global kClear := "Clear:"
+global kExecute := "Execute:"
 
-global kBuiltinFunctors := ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=<", ">=", "=", "!=", "builtin0", "builtin1", "unbound?", "append", "get"]
-global kBuiltinFunctions := [option, squareRoot, plus, minus, multiply, divide, greater, less, lessEqual, greaterEqual, equal, unequal, builtin0, builtin1, unbound, append, get]
-global kBuiltinAritys := [2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 3, 1, -1, -1]
+global kBuiltinFunctors := ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=<", ">=", "=", "!=", "builtin0", "builtin1", "unbound?", "append", "get", "execute"]
+global kBuiltinFunctions := [option, squareRoot, plus, minus, multiply, divide, greater, less, lessEqual, greaterEqual, equal, unequal, builtin0, builtin1, unbound, append, get, execute]
+global kBuiltinAritys := [2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 3, 1, -1, -1, -1]
 
 global kProduction := "Production"
 global kReduction := "Reduction"
@@ -631,6 +632,8 @@ class Fact extends Primary {
 	getValue(factsOrResultSet, default := kNotInitialized) {
 		if isInstance(factsOrResultSet, Facts)
 			return factsOrResultSet.getValue(this.Fact, default)
+		else if (default != kNotInitialized)
+			return default
 		else
 			return this
 	}
@@ -646,7 +649,7 @@ class Fact extends Primary {
 
 	toString(factsOrResultSet := kNotInitialized) {
 		if (factsOrResultSet = kNotInitialized)
-			return false
+			return ("!" . this.Fact)
 		else if isInstance(factsOrResultSet, Facts)
 			return factsOrResultSet.getValue(this.Fact)
 		else if isInstance(factsOrResultSet, ResultSet)
@@ -795,6 +798,111 @@ class CallAction extends Action {
 		}
 		catch Any as exception {
 			logMessage(kLogCritical, "Error while calling function " . function . "...")
+
+			logError(exception, true)
+		}
+	}
+
+	getValues(facts) {
+		local values := []
+		local ignore, argument
+
+		for ignore, argument in this.Arguments
+			values.Push(argument.getValue(facts, argument))
+
+		return values
+	}
+
+	toString(facts := kNotInitialized) {
+		local arguments := []
+		local ignore, argument
+
+		for ignore, argument in this.Arguments
+			arguments.Push(argument.toString(facts))
+
+		return ("(" . this.Action . A_Space .  this.Function.toString(facts) . "(" . values2String(", ", arguments*) . "))")
+	}
+
+	toObject(facts := kNotInitialized) {
+		local action := Object()
+		local arguments := []
+		local ignore, argument
+
+		for ignore, argument in this.Arguments
+			arguments.Push(argument.toObject(facts))
+
+		action[this.Action] := Array(this.Function.toObject(facts), arguments*)
+
+		return action
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; Class                    ExecuteAction                                  ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class ExecuteAction extends Action {
+	iExecutable := kNotInitialized
+	iArguments := []
+
+	Action {
+		Get {
+			return kExecute
+		}
+	}
+
+	Executable[variablesOrFacts := kNotInitialized] {
+		Get {
+			if (variablesOrFacts = kNotInitialized)
+				return this.iExecutable
+			else
+				return this.iExecutable.getValue(variablesOrFacts)
+		}
+	}
+
+	Arguments[variablesOrFacts := kNotInitialized] {
+		Get {
+			if isNumber(variablesOrFacts)
+				return this.iArguments[variablesOrFacts]
+			else if (variablesOrFacts = kNotInitialized)
+				return this.iArguments
+			else
+				this.getValues(variablesOrFacts)
+		}
+	}
+
+	__New(executable, arguments) {
+		this.iExecutable := executable
+		this.iArguments := arguments
+	}
+
+	execute(knowledgeBase, variables) {
+		local executable
+		local facts := knowledgeBase.Facts
+		local arguments, argument, ignore
+
+		if isInstance(this.Executable, Variable)
+			executable := this.Executable[variables]
+		else
+			executable := this.Executable[facts]
+
+		arguments := []
+
+		for ignore, argument in this.Arguments
+			if isInstance(argument, Variable)
+				arguments.Push(argument.toString(variables))
+			else
+				arguments.Push(argument.toString(facts))
+
+		if (knowledgeBase.RuleEngine.TraceLevel <= kTraceMedium)
+			knowledgeBase.RuleEngine.trace(kTraceMedium, "Execute " . executable . A_Space
+													   . values2String(", ", collect(arguments, (a) => ("`"" . a . "`""))*))
+
+		try {
+			knowledgeBase.execute(executable, arguments)
+		}
+		catch Any as exception {
+			logMessage(kLogCritical, "Error while executing " . executable . "...")
 
 			logError(exception, true)
 		}
@@ -2865,6 +2973,14 @@ class KnowledgeBase {
 			return false
 	}
 
+	execute(executable, arguments) {
+		local directory
+
+		SplitPath(executable, , &directory)
+
+		return (RunWait("`"" . executable . "`" " . collect(arguments, (a) => ("`"" . a . "`"")), directory) == 0)
+	}
+
 	enableOccurCheck() {
 		this.iOccurCheck := true
 	}
@@ -3033,17 +3149,22 @@ class Facts {
 	dumpFacts(name := false) {
 		local key, value, text, fileName
 
-		if !name
-			name := StrSplit(A_ScriptName, ".")[1]
+		try {
+			if !name
+				name := StrSplit(A_ScriptName, ".")[1]
 
-		fileName := (kTempDirectory . name . ".knowledge")
+			fileName := (kTempDirectory . name . ".knowledge")
 
-		deleteFile(fileName)
+			deleteFile(fileName)
 
-		for key, value in this.Facts {
-			text := (key . " = " . String(value) . "`n")
+			for key, value in this.Facts {
+				text := (key . " = " . String(value) . "`n")
 
-			FileAppend(text, fileName)
+				FileAppend(text, fileName)
+			}
+		}
+		catch Any as exception {
+			logError(exception)
 		}
 	}
 }
@@ -4383,6 +4504,11 @@ class ActionParser extends Parser {
 				struct := this.Compiler.createStructParser(expressions[2]).parse(expressions[2])
 
 				return ProveAction(Literal(struct.Functor), struct.Arguments, true)
+			case kExecute:
+				argument := this.Compiler.createPrimaryParser(expressions[2], this.Variables).parse(expressions[2])
+				arguments := this.parseArguments(expressions, 3)
+
+				return ExecuteAction(argument, arguments)
 			default:
 				argument := this.Compiler.createPrimaryParser(expressions[2], this.Variables).parse(expressions[2])
 
@@ -5120,5 +5246,21 @@ get(choicePoint, arguments*) {
 			return false
 		else
 			return (operand1.toString(resultSet) = operand2.toString(resultSet))
+	}
+}
+
+execute(choicePoint, arguments*) {
+	local resultSet, executable
+
+	if (arguments.Length <= 1)
+		return false
+	else {
+		resultSet := choicePoint.ResultSet
+
+		operand1 := arguments.RemoveAt(1)
+		operand1 := operand1.getValue(resultSet, operand1)
+
+		return resultSet.KnowledgeBase.execute(operand1.toString(resultSet)
+											 , collect(arguments, (a) => a.getValue(resultSet, a).toString(resultSet)))
 	}
 }

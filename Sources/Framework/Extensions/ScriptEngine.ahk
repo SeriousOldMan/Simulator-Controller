@@ -208,13 +208,15 @@ scriptPushArray(context, array) {
 }
 
 scriptPushValue(context, value) {
-	if isInteger(value)
+	if !isSet(value)
+		lua_pushnil(context)
+	else if isInteger(value)
 		lua_pushinteger(context, Integer(value))
 	else if isNumber(value)
 		lua_pushnumber(context, Number(value))
 	else if (isInstance(value, Func) || isInstance(value, Closure))
 		lua_pushcclosure(context, CallbackCreate(value, , 1), 0)
-	else if (value = kNull)
+	else if ((value = kNull) || (value = kUndefined))
 		lua_pushnil(context)
 	else if (value = kTrue)
 		lua_pushinteger(context, Integer(1))

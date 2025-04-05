@@ -36,3 +36,4 @@ Controller.Call(?function, ?p1, ?p2, ?p3, ?p4, ?p5, ?p6) <= Call(callController,
 Assistant.Ask(?question) <= Call(askAssistant, ?question)
 
 Assistant.Speak(?message) <= Call(speakAssistant, ?message)
+Assistant.Speak(?message, ?force) <= Call(speakAssistant, ?message, ?force)

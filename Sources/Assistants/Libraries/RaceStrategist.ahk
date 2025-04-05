@@ -922,7 +922,8 @@ class RaceStrategist extends GridRaceAssistant {
 
 		if values.HasProp("Strategy") {
 			if this.iRejectedStrategy {
-				this.iRejectedStrategy.dispose()
+				if isInstance(this.iRejectedStrategy, Strategy)
+					this.iRejectedStrategy.dispose()
 
 				this.iRejectedStrategy := false
 			}

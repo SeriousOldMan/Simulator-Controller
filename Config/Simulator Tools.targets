@@ -32,6 +32,7 @@ Release 6.1.3=Release 6.1.0 -> updatePluginsForV613, updateStreamDeckIconPreset,
 Release 6.2.2=Release 6.1.3 -> updateConfigurationForV622
 Release 6.2.4=Release 6.2.2 -> updateStreamDeckIconPreset, updateActionLabels, updateActionIcons
 Release 6.2.6=Release 6.2.4 -> updateConfigurationForV626
+Release 6.2.7=Release 6.2.6 -> updateConfigurationForV627
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%
@@ -145,7 +146,7 @@ Race Assistant Configuration.11=%kResourcesDirectory%Rules\Tyre Information Retr
 Race Assistant Configuration.12=%kResourcesDirectory%Rules\Action Callbacks.rules <- %kSourcesDirectory%Assistants\Rules\Action Callbacks.rules
 Race Assistant Configuration.13=%kResourcesDirectory%Rules\Conversation Actions.rules <- %kSourcesDirectory%Assistants\Rules\Conversation Actions.rules
 Race Assistant Configuration.14=%kResourcesDirectory%Rules\Agent Actions.rules <- %kSourcesDirectory%Assistants\Rules\Agent Actions.rules
-Race Assistant Configuration.15=%kResourcesDirectory%Scripts\Action Callbacks.script <- %kSourcesDirectory%Assistants\Scripts\Action Callbacks.script
+Race Assistant Configuration.15=%kResourcesDirectory%Scripts\Assistant Callbacks.script <- %kSourcesDirectory%Assistants\Scripts\Assistant Callbacks.script
 Race Assistant Configuration.16=%kResourcesDirectory%Database\Settings.ini <- %kSourcesDirectory%Database\Definitions\Settings.ini
 Race Assistant Configuration.17=%kTranslationsDirectory% <- %kSourcesDirectory%Database\Translations\Settings.*
 Race Assistant Configuration.18=%kGrammarsDirectory% <- %kSourcesDirectory%Assistants\Grammars\Choices.*

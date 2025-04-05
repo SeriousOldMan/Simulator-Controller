@@ -1,13 +1,13 @@
 #include Weather.events
-[Agent.Events]
+[Agent.LLM.Events]
 Active=fuel_low,damage_detected,damage_time_loss,pressure_loss,weather_forecast
-[Agent.Events.Builtin]
+[Agent.LLM.Events.Builtin]
 fuel_low=Assistant.Class|FuelLowEvent|FuelLow||2|This event is triggered when the car is running low on fuel.
 damage_detected=Assistant.Class|DamageEvent|Damage||3|This event is triggered when new damage has been detected on the car.
 damage_time_loss=Assistant.Class|TimeLossEvent|TimeLoss||2|This event is triggered after it has become clear, that the damage costs too much time per lap.
 damage_no_time_loss=Assistant.Class|NoTimeLossEvent|NoTimeLoss||2|This event is triggered after the driver recovered his pace and repairs may no longer be needed.
 pressure_loss=Assistant.Class|PressureLossEvent|PressureLoss||2|This event is triggered when a loss of pressure on a given tyre is detected.
-[Agent.Events.Parameters]
+[Agent.LLM.Events.Parameters]
 fuel_low.1=remainingFuel|Integer||true|The remaining amount of fuel in liters.
 fuel_low.2=remainingLaps|Integer||true|The maximum number of laps that can be driven with the remaining fuel.
 damage_detected.1=suspensionDamage|Boolean||true|Indicates whether new damage to the suspension occured.

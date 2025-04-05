@@ -601,13 +601,13 @@ class StrategyWorkbench extends ConfigurationItem {
 					break
 				}
 
-			workbench.TyreSetListView.Add("", collect(workbench.TyreCompounds, translate)[index], 40, 99)
+			workbench.TyreSetListView.Add("", collect(workbench.TyreCompounds, translate)[index], 50, 99)
 			workbench.TyreSetListView.Modify(workbench.TyreSetListView.GetCount(), "Select Vis")
 
 			workbench.TyreSetListView.ModifyCol()
 
 			workbenchGui["tyreSetDropDown"].Choose(index)
-			workbenchGui["tyreSetLapsEdit"].Value := 40
+			workbenchGui["tyreSetLapsEdit"].Value := 50
 			workbenchGui["tyreSetCountEdit"].Value := 99
 
 			workbench.updateState()
@@ -1267,7 +1267,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("DropDownList", "x" . x13 . " yp w85 Choose0 vtyreSetDropDown", [translate(normalizeCompound("Dry"))]).OnEvent("Change", updateTyreSet)
 
-		workbenchGui.Add("Edit", "x" . (x13 + 86) . " yp w40 h20 Limit2 Number vtyreSetLapsEdit", 40).OnEvent("Change", updateTyreSet)
+		workbenchGui.Add("Edit", "x" . (x13 + 86) . " yp w40 h20 Limit2 Number vtyreSetLapsEdit", 50).OnEvent("Change", updateTyreSet)
 		workbenchGui.Add("UpDown", "x" . (x13 + 86) . " yp w18 h20 0x80 Range0-99")
 
 		workbenchGui.Add("Edit", "x" . x13 . " yp+24 w40 h20 Limit2 Number vtyreSetCountEdit").OnEvent("Change", updateTyreSet)
@@ -2481,7 +2481,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.TyreSetListView.Delete()
 
 		for ignore, compound in compounds
-			this.TyreSetListView.Add("", translate(compound), 40, 99)
+			this.TyreSetListView.Add("", translate(compound), 50, 99)
 
 		this.TyreSetListView.ModifyCol()
 		this.TyreSetListView.ModifyCol(1, 65)
@@ -2684,8 +2684,6 @@ class StrategyWorkbench extends ConfigurationItem {
 							this.Control["tyreChangeRequirementsDropDown"].Choose(inList(["Optional", "Always", "Disallowed"], strategy.TyreChangeRule))
 						}
 
-						this.TyreSetListView.Delete()
-
 						for ignore, descriptor in strategy.TyreSets {
 							found := false
 
@@ -2700,7 +2698,7 @@ class StrategyWorkbench extends ConfigurationItem {
 								if (descriptor.Length > 3)
 									this.TyreSetListView.Add("", translate(compound(descriptor[1], descriptor[2])), descriptor[4], descriptor[3])
 								else
-									this.TyreSetListView.Add("", translate(compound(descriptor[1], descriptor[2])), 40, descriptor[3])
+									this.TyreSetListView.Add("", translate(compound(descriptor[1], descriptor[2])), 50, descriptor[3])
 
 							loop this.TyreSetListView.GetCount()
 								if (translate(compound(descriptor[1], descriptor[2])) = this.TyreSetListView.GetText(A_Index, 1)) {

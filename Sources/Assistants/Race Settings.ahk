@@ -748,7 +748,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		tyreSetListView.Modify(tyreSetListView.GetCount(), "Select Vis")
 
 		settingsGui["tyreSetDropDown"].Choose(index)
-		settingsGui["tyreSetLapsEdit"].Value := 40
+		settingsGui["tyreSetLapsEdit"].Value := 50
 		settingsGui["tyreSetCountEdit"].Value := 99
 
 		editRaceSettings(&updateState)
@@ -862,7 +862,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		tyreSetListView.Delete()
 
 		for ignore, compound in gTyreCompounds
-			tyreSetListView.Add("", translate(compound), 40, 99)
+			tyreSetListView.Add("", translate(compound), 50, 99)
 
 		tyreSetListView.ModifyCol()
 		tyreSetListView.ModifyCol(1, 75)

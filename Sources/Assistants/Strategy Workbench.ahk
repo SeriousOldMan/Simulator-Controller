@@ -2712,6 +2712,7 @@ class StrategyWorkbench extends ConfigurationItem {
 						}
 
 						this.TyreSetListView.ModifyCol()
+						this.TyreSetListView.ModifyCol(1, 65)
 
 						this.iStintDrivers := []
 
@@ -2957,6 +2958,7 @@ class StrategyWorkbench extends ConfigurationItem {
 								}
 
 								this.TyreSetListView.ModifyCol()
+								this.TyreSetListView.ModifyCol(1, 65)
 
 								this.updateState()
 							}

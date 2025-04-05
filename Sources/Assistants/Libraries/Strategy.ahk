@@ -2843,18 +2843,39 @@ class Strategy extends ConfigurationItem {
 		tyreSets := string2Values(";", getMultiMapValue(configuration, "Settings", "TyreSets", ""))
 
 		loop tyreSets.Length {
-			tyreSets[A_Index] := string2Values(":", tyreSets[A_Index])
+			if InStr(tyreSets[A_Index], ":") {
+				tyreSets[A_Index] := string2Values(":", tyreSets[A_Index])
 
-			if (tyreSets[A_Index].Length < 4) {
-				tyreSetsLaps := []
+				if (tyreSets[A_Index].Length < 4) {
+					tyreSets[A_Index].Push(40)
 
-				loop tyreSets[A_Index][3]
-					tyreSetsLaps.Push(0)
+					tyreSetsLaps := []
 
-				tyreSets[A_Index].Push(tyreSetsLaps)
+					loop tyreSets[A_Index][3]
+						tyreSetsLaps.Push(0)
+
+					tyreSets[A_Index].Push(tyreSetsLaps)
+				}
+				else {
+					tyreSets[A_Index].InsertAt(4, 40)
+
+					tyreSets[5] := string2Values("|", tyreSets[5])
+				}
 			}
-			else
-				tyreSets[4] := string2Values("|", tyreSets[4])
+			else {
+				tyreSets[A_Index] := string2Values("#", tyreSets[A_Index])
+
+				if (tyreSets[A_Index].Length < 5) {
+					tyreSetsLaps := []
+
+					loop tyreSets[A_Index][3]
+						tyreSetsLaps.Push(0)
+
+					tyreSets[A_Index].Push(tyreSetsLaps)
+				}
+				else
+					tyreSets[5] := string2Values("|", tyreSets[4])
+			}
 		}
 
 		this.iTyreSets := tyreSets
@@ -2967,10 +2988,11 @@ class Strategy extends ConfigurationItem {
 
 		for ignore, descriptor in this.TyreSets {
 			if descriptor
-				if (descriptor.Length > 3) {
-					loop descriptor[4].Length
-						if (descriptor[4][A_Index] != 0) {
-							tyreSets.Push(values2String(":", descriptor[1], descriptor[2], descriptor[3], values2String("|", descriptor[4]*)))
+				if (descriptor.Length > 4) {
+					loop descriptor[5].Length
+						if (descriptor[5][A_Index] != 0) {
+							tyreSets.Push(values2String("#", descriptor[1], descriptor[2], descriptor[3], descriptor[4]
+														   , values2String("|", descriptor[5]*)))
 
 							descriptor := false
 
@@ -2978,10 +3000,10 @@ class Strategy extends ConfigurationItem {
 						}
 
 					if descriptor
-						tyreSets.Push(values2String(":", descriptor[1], descriptor[2], descriptor[3]))
+						tyreSets.Push(values2String("#", descriptor[1], descriptor[2], descriptor[3], descriptor[4]))
 				}
 				else
-					tyreSets.Push(values2String(":", descriptor*))
+					tyreSets.Push(values2String("#", descriptor*))
 		}
 
 		setMultiMapValue(configuration, "Settings", "TyreSets", values2String(";", tyreSets*))
@@ -3090,7 +3112,7 @@ class Strategy extends ConfigurationItem {
 				loop 99
 					tyreSetsLaps.Push(0)
 
-				availableTyreSets[compound(tyreCompound, compoundColor)] := tyreSetsLaps
+				availableTyreSets[compound(tyreCompound, compoundColor)] := [40, tyreSetsLaps]
 			}
 		}
 		else
@@ -3105,16 +3127,16 @@ class Strategy extends ConfigurationItem {
 					availableTyreSets[compound(descriptor[1], descriptor[2])] := count
 				*/
 
-				if (descriptor.Length < 4) {
+				if (descriptor.Length < 5) {
 					tyreSetsLaps := []
 
 					loop descriptor[3]
 						tyreSetsLaps.Push(0)
 
-					availableTyreSets[compound(descriptor[1], descriptor[2])] := tyreSetsLaps
+					availableTyreSets[compound(descriptor[1], descriptor[2])] := [descriptor[4], tyreSetsLaps]
 				}
 				else
-					availableTyreSets[compound(descriptor[1], descriptor[2])] := descriptor[4].Clone()
+					availableTyreSets[compound(descriptor[1], descriptor[2])] := [descriptor[4], descriptor[5].Clone()]
 			}
 
 		this.AvailableTyreSets := availableTyreSets
@@ -3474,14 +3496,21 @@ class Strategy extends ConfigurationItem {
 		local qualifiedCompound := compound(tyreCompound, tyreCompoundColor)
 		local bestTyreSet := 0
 		local bestTyreLaps := 9999
-		local tyreSet, tyreSetLaps
+		local tyreSet, tyreSetDescriptor, tyreSetLaps, tyreSetLife
 
 		if this.AvailableTyreSets.Has(qualifiedCompound) {
-			for tyreSet, tyreSetLaps in this.AvailableTyreSets[qualifiedCompound]
+			for tyreSet, tyreSetDescriptor in this.AvailableTyreSets[qualifiedCompound] {
+				tyreSetLife := tyreSetDescriptor[1]
+				tyreSetLaps := tyreSetDescriptor[2]
+
+				if ((tyreSetLaps >= tyreSetLife) && !over)
+					continue
+
 				if (tyreSetLaps < bestTyreLaps) {
 					bestTyreLaps := tyreSetLaps
 					bestTyreSet := tyreSet
 				}
+			}
 
 			if ((bestTyreLaps < this.MaxTyreLaps) || over) {
 				if isSet(tyreLaps)
@@ -3496,9 +3525,20 @@ class Strategy extends ConfigurationItem {
 			return false
 	}
 
+	tyreSetLife(tyreCompound, tyreCompoundColor, tyreSet) {
+		try {
+			return this.AvailableTyreSets[compound(tyreCompound, tyreCompoundColor)][tyreSet][1]
+		}
+		catch Any as exception {
+			logError(exception)
+
+			return false
+		}
+	}
+
 	tyreSetLaps(tyreCompound, tyreCompoundColor, tyreSet) {
 		try {
-			return this.AvailableTyreSets[compound(tyreCompound, tyreCompoundColor)][tyreSet]
+			return this.AvailableTyreSets[compound(tyreCompound, tyreCompoundColor)][tyreSet][2]
 		}
 		catch Any as exception {
 			logError(exception)
@@ -3515,7 +3555,7 @@ class Strategy extends ConfigurationItem {
 			tyreSets := this.AvailableTyreSets[qualifiedCompound]
 
 			if tyreSets.Has(tyreSet)
-				tyreSets[tyreSet] += tyreLaps
+				tyreSets[tyreSet][2] += tyreLaps
 		}
 	}
 

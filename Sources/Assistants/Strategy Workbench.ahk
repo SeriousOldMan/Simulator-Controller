@@ -655,10 +655,6 @@ class StrategyWorkbench extends ConfigurationItem {
 			}
 		}
 
-		validateSimMaxTyreLaps(*) {
-			validateInteger("simMaxTyreLapsEdit", 10)
-		}
-
 		validateSimInitialFuelAmount(*) {
 			validateInteger("simInitialFuelAmountEdit", 0)
 		}
@@ -1458,17 +1454,12 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("DropDownList", "x" . x1 . " yp w84 Choose" . chosen . " VsimCompoundDropDown", choices)
 
-		workbenchGui.Add("Text", "x" . x . " yp+25 w72 h20 +0x200", translate("Tyre Usage"))
-		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w45 h20 Number Limit3 VsimMaxTyreLapsEdit", 40).OnEvent("Change", validateSimMaxTyreLaps)
-		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range1-999", 40)
-		workbenchGui.Add("Text", "x" . x3 . " yp+4 w45 h20", translate("Laps"))
-
-		workbenchGui.Add("Text", "x" . x . " yp+21 w72 h20 +0x200", translate("Initial Fuel"))
+		workbenchGui.Add("Text", "x" . x . " yp+25 w72 h20 +0x200", translate("Initial Fuel"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w45 h20 Number Limit3 VsimInitialFuelAmountEdit", displayValue("Float", convertUnit("Volume", 90), 0)).OnEvent("Change", validateSimInitialFuelAmount)
 		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-999", displayValue("Float", convertUnit("Volume", 90), 0))
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w45 r1", getUnit("Volume", true))
 
-		workbenchGui.Add("Text", "x" . x . " yp+21 w72 h20 +0x200", translate("Map"))
+		workbenchGui.Add("Text", "x" . x . " yp+58 w72 h20 +0x200", translate("Map"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w45 h20 Number Limit2 VsimMapEdit", "n/a").OnEvent("Change", (*) => this.updateState())
 		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99", "n/a")
 
@@ -2793,7 +2784,6 @@ class StrategyWorkbench extends ConfigurationItem {
 
 						this.Control["simAvgLapTimeEdit"].Text := displayValue("Float", strategy.AvgLapTime, 1)
 						this.Control["simFuelConsumptionEdit"].Text := displayValue("Float", convertUnit("Volume", strategy.FuelConsumption))
-						this.Control["simMaxTyreLapsEdit"].Text := Round(strategy.MaxTyreLaps)
 						this.Control["simInitialFuelAmountEdit"].Text := displayValue("Float", convertUnit("Volume", strategy.StartFuel), 0)
 						this.Control["simMapEdit"].Text := strategy.Map
 
@@ -3545,7 +3535,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 	getStrategySettings(&simulator, &car, &track, &weather, &airTemperature, &trackTemperature
 					  , &sessionType, &sessionLength
-					  , &maxTyreLaps, &tyreCompound, &tyreCompoundColor, &tyrePressures) {
+					  , &tyreCompound, &tyreCompoundColor, &tyrePressures) {
 		local lapsDB, lowestLapTime, ignore, row, lapTime, settings
 
 		simulator := this.SelectedSimulator
@@ -3560,8 +3550,6 @@ class StrategyWorkbench extends ConfigurationItem {
 		sessionLength := this.Control["sessionLengthEdit"].Text
 
 		splitCompound(this.TyreCompounds[this.Control["simCompoundDropDown"].Value], &tyreCompound, &tyreCompoundColor)
-
-		maxTyreLaps := this.Control["simMaxTyreLapsEdit"].Text
 
 		tyrePressures := false
 

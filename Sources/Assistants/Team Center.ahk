@@ -5877,7 +5877,7 @@ class TeamCenter extends ConfigurationItem {
 
 	getStrategySettings(&simulator, &car, &track, &weather, &airTemperature, &trackTemperature
 					  , &sessionType, &sessionLength
-					  , &maxTyreLaps, &tyreCompound, &tyreCompoundColor, &tyrePressures) {
+					  , &tyreCompound, &tyreCompoundColor, &tyrePressures) {
 		local strategy := this.Strategy
 		local lapsDB, candidate
 
@@ -5925,7 +5925,6 @@ class TeamCenter extends ConfigurationItem {
 
 			sessionType := strategy.SessionType
 			sessionLength := strategy.SessionLength
-			maxTyreLaps := strategy.MaxTyreLaps
 			tyrePressures := strategy.TyrePressures
 
 			return true

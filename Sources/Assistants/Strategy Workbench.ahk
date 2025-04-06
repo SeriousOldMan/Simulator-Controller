@@ -1171,7 +1171,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Text", "x619 ys+39 w80 h21", translate("Strategy"))
 		workbenchGui.Add("Text", "x700 yp+7 w646 0x10 W:Grow")
 
-		workbenchGui.Add("HTMLViewer", "x619 yp+14 w727 h202 Border vstratViewer H:Grow(0.8) W:Grow")
+		workbenchGui.Add("HTMLViewer", "x619 yp+14 w727 h238 Border vstratViewer H:Grow(0.8) W:Grow")
 
 		this.iStrategyViewer := StrategyViewer(workbenchGui, workbenchGui["stratViewer"])
 
@@ -1185,7 +1185,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Button", "x649 y824 w80 h23 Y:Move H:Center", translate("Close")).OnEvent("Click", closeWorkbench)
 		*/
 
-		workbenchTab := workbenchGui.Add("Tab3", "x16 ys+39 w593 h225 H:Grow(0.8) -Wrap Section", collect(["Rules && Settings", "Pitstop && Service", "Pitstops (fixed)", "Drivers", "Weather", "Simulation", "Strategy"], translate))
+		workbenchTab := workbenchGui.Add("Tab3", "x16 ys+39 w593 h261 H:Grow(0.8) -Wrap Section", collect(["Rules && Settings", "Pitstop && Service", "Pitstops (fixed)", "Drivers", "Weather", "Simulation", "Strategy"], translate))
 
 		workbenchTab.UseTab(1)
 
@@ -1209,7 +1209,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm", "Arial")
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("GroupBox", "x24 ys+34 w199 h181 H:Grow(0.8)", translate("Race"))
+		workbenchGui.Add("GroupBox", "x24 ys+34 w199 h217 H:Grow(0.8)", translate("Race"))
 
 		workbenchGui.SetFont("Norm", "Arial")
 
@@ -1234,7 +1234,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm", "Arial")
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("GroupBox", "x233 ys+34 w364 h181 H:Grow(0.8)", translate("Pitstop"))
+		workbenchGui.Add("GroupBox", "x233 ys+34 w364 h217 H:Grow(0.8)", translate("Pitstop"))
 
 		workbenchGui.SetFont("Norm", "Arial")
 
@@ -1258,7 +1258,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		w12 := (x11 + 40 - x7)
 
-		this.iTyreSetListView := workbenchGui.Add("ListView", "x" . x7 . " yp w" . w12 . " h44 H:Grow(0.8) -Multi -Hdr -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "Laps", "#"], translate))
+		this.iTyreSetListView := workbenchGui.Add("ListView", "x" . x7 . " yp w" . w12 . " h84 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "O", "#"], translate))
 		this.iTyreSetListView.OnEvent("Click", chooseTyreSet)
 		this.iTyreSetListView.OnEvent("DoubleClick", chooseTyreSet)
 		this.iTyreSetListView.OnEvent("ItemSelect", selectTyreSet)
@@ -1334,7 +1334,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		x4 := x3 + w3 - 50
 		x5 := x4 + 25
 
-		this.iFixedPitstopsListView := workbenchGui.Add("ListView", "x24 ys+34 w216 h181 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(kFixedPitstopRefuel ? ["Pitstop", "Lap", "Refuel", "Tyres"] : ["Pitstop", "Lap", "Tyres"], translate))
+		this.iFixedPitstopsListView := workbenchGui.Add("ListView", "x24 ys+34 w216 h217 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(kFixedPitstopRefuel ? ["Pitstop", "Lap", "Refuel", "Tyres"] : ["Pitstop", "Lap", "Tyres"], translate))
 		this.iFixedPitstopsListView.OnEvent("Click", chooseSimFixedPitstop)
 		this.iFixedPitstopsListView.OnEvent("DoubleClick", chooseSimFixedPitstop)
 		this.iFixedPitstopsListView.OnEvent("ItemSelect", selectSimFixedPitstop)
@@ -1381,7 +1381,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		x4 := x3 + w3 - 50
 		x5 := x4 + 25
 
-		this.iDriversListView := workbenchGui.Add("ListView", "x24 ys+34 w216 h181 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Stint", "Driver"], translate))
+		this.iDriversListView := workbenchGui.Add("ListView", "x24 ys+34 w216 h217 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Stint", "Driver"], translate))
 		this.iDriversListView.OnEvent("Click", chooseSimDriver)
 		this.iDriversListView.OnEvent("DoubleClick", chooseSimDriver)
 		this.iDriversListView.OnEvent("ItemSelect", selectSimDriver)
@@ -1407,7 +1407,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		x7 := x6 + 47
 		x8 := x7 + 52
 
-		this.iWeatherListView := workbenchGui.Add("ListView", "x24 ys+34 w216 h181 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Time", "Weather", "T Air", "T Track"], translate))
+		this.iWeatherListView := workbenchGui.Add("ListView", "x24 ys+34 w216 h217 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Time", "Weather", "T Air", "T Track"], translate))
 		this.iWeatherListView.OnEvent("Click", chooseSimWeather)
 		this.iWeatherListView.OnEvent("DoubleClick", chooseSimWeather)
 		this.iWeatherListView.OnEvent("ItemSelect", selectSimWeather)

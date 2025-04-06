@@ -2923,7 +2923,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 	getPitstopRules(&validator, &pitstopRule, &pitstopWindow, &refuelRule, &tyreChangeRule, &tyreSets) {
 		local strategy := this.Strategy
-		local ignore, tyreSet, tyreSetLaps
+		local ignore, tyreSetLaps
 
 		if strategy {
 			validator := strategy.Validator
@@ -2949,25 +2949,42 @@ class RaceStrategist extends GridRaceAssistant {
 			refuelRule := getMultiMapValue(this.Settings, "Session Rules", "Pitstop.Refuel", "Optional")
 			tyreChangeRule := getMultiMapValue(this.Settings, "Session Rules", "Pitstop.Tyre", "Optional")
 
-			tyreSets := []
+			tyreSets := string2Values(";", getMultiMapValue(this.Settings, "Session Rules", "Tyre.Sets", ""))
 
-			for ignore, tyreSet in string2Values(";", getMultiMapValue(this.Settings, "Session Rules"
-																					, "Tyre.Sets", "")) {
-				tyreSet := string2Values(":", tyreSet)
+			loop tyreSets.Length
+				if InStr(tyreSets[A_Index], ":") {
+					tyreSets[A_Index] := string2Values(":", tyreSets[A_Index])
 
-				if (tyreSet.Length < 4) {
-					tyreSetLaps := []
+					if (tyreSets[A_Index].Length < 4) {
+						tyreSets[A_Index].Push(50)
 
-					loop tyreSet[3]
-						tyreSetLaps.Push(0)
+						tyreSetLaps := []
 
-					tyreSet.Push(tyreSetLaps)
+						loop tyreSets[A_Index][3]
+							tyreSetLaps.Push(0)
+
+						tyreSets[A_Index].Push(tyreSetLaps)
+					}
+					else {
+						tyreSets[A_Index].InsertAt(4, 50)
+
+						tyreSets[A_Index][5] := string2Values("|", tyreSets[A_Index][5])
+					}
 				}
-				else
-					tyreSet[4] := string2Values("|", tyreSet[4])
+				else {
+					tyreSets[A_Index] := string2Values("#", tyreSets[A_Index])
 
-				tyreSets.Push(tyreSet)
-			}
+					if (tyreSets[A_Index].Length < 5) {
+						tyreSetsLaps := []
+
+						loop tyreSets[A_Index][3]
+							tyreSetsLaps.Push(0)
+
+						tyreSets[A_Index].Push(tyreSetsLaps)
+					}
+					else
+						tyreSets[A_Index][5] := string2Values("|", tyreSets[A_Index][5])
+				}
 
 			if (pitstopRule > 0)
 				pitstopRule := Max(0, pitstopRule - Task.CurrentTask.Pitstops.Length)

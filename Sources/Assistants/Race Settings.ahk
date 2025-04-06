@@ -1369,7 +1369,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 				splitCompound(gTyreCompounds[inList(translatedCompounds, tyreSetListView.GetText(A_Index, 1))]
 							, &tyreCompound, &tyreCompoundColor)
 
-				tyreSets.Push(values2String(":", tyreCompound, tyreCompoundColor
+				tyreSets.Push(values2String("#", tyreCompound, tyreCompoundColor
 											   , tyreSetListView.GetText(A_Index, 3), tyreSetListView.GetText(A_Index, 2)))
 			}
 
@@ -1997,15 +1997,26 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		for ignore, tyreCompound in string2Values(";", getMultiMapValue(settingsOrCommand, "Session Rules"
 																						 , "Tyre.Sets", "")) {
-			tyreCompound := string2Values(":", tyreCompound)
+			if InStr(tyreCompound, ":") {
+				tyreCompound := string2Values(":", tyreCompound)
 
-			loop tyreSetListView.GetCount()
-				if (translate(compound(tyreCompound[1], tyreCompound[2])) = tyreSetListView.GetText(A_Index, 1)) {
-					tyreSetListView.Modify(A_Index, "Col3", tyreCompound[3])
+				loop tyreSetListView.GetCount()
+					if (translate(compound(tyreCompound[1], tyreCompound[2])) = tyreSetListView.GetText(A_Index, 1)) {
+						tyreSetListView.Modify(A_Index, "Col3", tyreCompound[3])
 
-					if (tyreCompound.Length > 3)
+						if (tyreCompound.Length > 3)
+							tyreSetListView.Modify(A_Index, "Col2", tyreCompound[4])
+					}
+			}
+			else {
+				tyreCompound := string2Values("#", tyreCompound)
+
+				loop tyreSetListView.GetCount()
+					if (translate(compound(tyreCompound[1], tyreCompound[2])) = tyreSetListView.GetText(A_Index, 1)) {
+						tyreSetListView.Modify(A_Index, "Col3", tyreCompound[3])
 						tyreSetListView.Modify(A_Index, "Col2", tyreCompound[4])
-				}
+					}
+			}
 		}
 
 		editRaceSettings(&updateState)

@@ -2846,7 +2846,7 @@ class Strategy extends ConfigurationItem {
 				else {
 					tyreSets[A_Index].InsertAt(4, 50)
 
-					tyreSets[5] := string2Values("|", tyreSets[5])
+					tyreSets[A_Index][5] := string2Values("|", tyreSets[A_Index][5])
 				}
 			}
 			else {
@@ -2861,7 +2861,7 @@ class Strategy extends ConfigurationItem {
 					tyreSets[A_Index].Push(tyreSetsLaps)
 				}
 				else
-					tyreSets[5] := string2Values("|", tyreSets[4])
+					tyreSets[A_Index][5] := string2Values("|", tyreSets[A_Index][5])
 			}
 		}
 
@@ -3675,7 +3675,7 @@ class Strategy extends ConfigurationItem {
 		local lastPitstopLap := 0
 		local surplusPitstops := 0
 		local pitstopNr := currentStint
-		local maxTyreLaps := this.tyreCompoundLife(this.TyreCompound, this.tyreCompoundColor)
+		local maxTyreLaps := this.tyreCompoundLife(this.TyreCompound, this.TyreCompoundColor)
 		local pitstops, lastPitstops, ignore
 		local sessionLaps, numPitstops, fuelLaps, canonicalStintLaps, remainingFuel
 		local tyreChange, tyreCompound, tyreCompoundColor, forcedTyreCompound, driverID, driverName, pitstop, lapsDB, candidate

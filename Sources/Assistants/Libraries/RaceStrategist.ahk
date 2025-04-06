@@ -2648,7 +2648,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 	getStrategySettings(&simulator, &car, &track, &weather, &airTemperature, &trackTemperature
 					  , &sessionType, &sessionLength
-					  , &maxTyreLaps, &tyreCompound, &tyreCompoundColor, &tyrePressures) {
+					  , &tyreCompound, &tyreCompoundColor, &tyrePressures) {
 		local knowledgeBase := this.KnowledgeBase
 		local strategy := this.Strategy["Original"]
 		local lap := Task.CurrentTask.Lap
@@ -2693,7 +2693,6 @@ class RaceStrategist extends GridRaceAssistant {
 
 			sessionType := strategy.SessionType
 			sessionLength := strategy.SessionLength
-			maxTyreLaps := strategy.MaxTyreLaps
 			tyrePressures := strategy.TyrePressures
 
 			return true
@@ -2724,7 +2723,6 @@ class RaceStrategist extends GridRaceAssistant {
 
 			sessionType := ((knowledgeBase.getValue("Session.Format", "Time") = "Time") ? "Duration" : "Laps")
 			sessionLength := (knowledgeBase.getValue("Session.Duration") / 60)
-			maxTyreLaps := getMultiMapValue(this.Settings, "Session Rules", "Tyre.Laps", 40)
 			tyrePressures := [Round(knowledgeBase.getValue("Lap." . lap . ".Tyre.Pressure.FL"), 1)
 							, Round(knowledgeBase.getValue("Lap." . lap . ".Tyre.Pressure.FR"), 1)
 							, Round(knowledgeBase.getValue("Lap." . lap . ".Tyre.Pressure.RL"), 1)

@@ -23,8 +23,26 @@
   
 # Upcoming release
 
-Not yet planned...
+## 6.2.7.0
 
+#### Date: 04/11/25 (planned)
+
+#### Fixes
+
+  - Fixed translation of the session type (race, practice, ...) used by the Engineer in cases where the spoken language is different than the language used for the user interface.
+  - Invisible characters had been introduced into the "Drivers" database with the automated update procedure of Release 6.2.6. This caused many problems in the "Session Database" and in the handling of driver specific data in general. Fixed with this version.
+
+#### Changes
+
+  - Strategies can now handle a specific number of usable laps per tyre compound mixture. For example, if a soft tyre has been chosen for a given stint, this stint will typically be shorter than one, where hard tyres are used.
+    - The usable tyre life can be configured per tyre compound mixture in the [*Rules & Settings* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#rules--settings) of the "Strategy Workbench.
+	- It can also be configured in the [*Rules* tab]((https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-rules), if a race is run on simple rules, rather than a full pre-defined strategy.
+	- The general "Tyre Usage" setting formerly available in the "Strategy Workbench" has been removed.
+	- The strategy simulation will now try to use the best suitable tyre compound mixture for a given stint, even if the "Tyre Compound" *Optimizer* is not used. The decision is based on tyre life and stint length.
+  - [Expert] A new type of *Reasoning* booster has been introduced, which runs without a connected LLM. Only rules are allowed as event source, but all action types, including scripts defined in  [Lua](https://lua.org) are supported. Please read the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster) for more information.
+  - [Expert] The "Assistant.Speak" function / predicate used in the Assistant booster actions now uses the *Rephrasing* booster, if it is configured. This introduces immersive variations of the spoken message.
+  - [Expert] Rules defined in the [Hybrid Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine) can now use the *Execute* clause to [call scripts](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#actions) written in the script language [Lua](https://lua.org) introduced with the last release and vice-versa. This allows you to choose the language, which is best suited for a given task.
+  
 # Release history
 
 ## 6.2.5.0

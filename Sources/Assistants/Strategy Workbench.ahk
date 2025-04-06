@@ -2764,12 +2764,14 @@ class StrategyWorkbench extends ConfigurationItem {
 
 						if (strategy.SessionType = "Duration") {
 							this.Control["sessionTypeDropDown"].Value := 1
-							this.Control["sessionLengthLabel"].Text := translate("Minutes")
+							; this.Control["sessionLengthLabel"].Text := translate("Minutes")
 						}
 						else {
 							this.Control["sessionTypeDropDown"].Value := 2
-							this.Control["sessionLengthLabel"].Text := translate("Laps")
+							; this.Control["sessionLengthLabel"].Text := translate("Laps")
 						}
+
+						this.selectSessionType(strategy.SessionType)
 
 						this.Control["sessionLengthEdit"].Text := Round(strategy.SessionLength)
 

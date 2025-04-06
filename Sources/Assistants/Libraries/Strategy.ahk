@@ -1884,6 +1884,17 @@ class Strategy extends ConfigurationItem {
 
 			freshTyreLaps := (maxTyreLaps + (maxTyreLaps * strategy.TyreLapsVariation / 100 * (Min(100 - Sqrt(Random(0, 10000)), 100) / 100)))
 
+			/*
+			tyreSetLaps := strategy.tyreSetLife(strategy.TyreCompound[true], strategy.TyreCompoundColor[true], strategy.TyreSet[true])
+
+			if (tyreSetLaps >= stintLaps) {
+				tyreChange := false
+
+				freshTyreLaps := (maxTyreLaps - tyreSetLaps)
+			}
+			else
+			*/
+
 			if tyreCompound {
 				strategy.availableTyreSet(tyreCompound, tyreCompoundColor, maxTyreLaps, &tyreSetLaps := false, true)
 
@@ -3617,6 +3628,10 @@ class Strategy extends ConfigurationItem {
 		local qualifiedCompound, count, chooseNext, availableTyreSets
 		local tyreCompoundColors, numColors, tries, candidateColor
 
+		if this.bestTyreSet(tyreCompound, laps, &candidateColor)
+			if (candidateColor != tyreCompoundColor)
+				return candidateColor
+
 		if (tyreSet && this.tyreSetLife(tyreCompound, tyreCompoundColor, tyreSet) >= laps)
 			return tyreCompoundColor
 		else if (false && (pitstopNr <= pitstops.Length)) {
@@ -3627,10 +3642,6 @@ class Strategy extends ConfigurationItem {
 			}
 		}
 		else {
-			if this.bestTyreSet(tyreCompound, laps, &candidateColor)
-				if (candidateColor != tyreCompoundColor)
-					return candidateColor
-
 			chooseNext := Round(Random(0.01, 0.99) * this.StrategyManager.TyreCompoundVariation / 100)
 
 			if !chooseNext {
@@ -3795,7 +3806,7 @@ class Strategy extends ConfigurationItem {
 					tyreCompound := tyreChange[1]
 					tyreCompoundColor := tyreChange[2]
 
-					if (tyreCompound && adjustments.Has(pitstopNr) && adjustments[pitstopNr].HasProp("StintLaps"))
+					if (false && tyreCompound && adjustments.Has(pitstopNr) && adjustments[pitstopNr].HasProp("StintLaps"))
 						tyreCompoundColor := this.chooseTyreCompoundColor(lastPitstops, pitstopNr, tyreCompound, tyreCompoundColor
 																		, false
 																		, Min(adjustments[pitstopNr].StintLaps, this.tyreCompoundLife(tyreCompound, tyreCompoundColor)))
@@ -3827,7 +3838,7 @@ class Strategy extends ConfigurationItem {
 					tyreCompoundColor := false
 				}
 			}
-			else {
+			else if !adjustments {
 				lapsDB := this.StrategyManager.LapsDatabase
 
 				this.getWeather((this.Time[true] + (pitstopLap - currentLap) * avgLapTime) / 60, &weather, &airTemperature, &trackTemperature)

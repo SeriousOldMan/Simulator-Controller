@@ -264,11 +264,13 @@ checkForNews() {
 										RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\News.zip' -DestinationPath '" . kTempDirectory . "News' -Force", , "Hide")
 
 										if FileExist(kTempDirectory . "News\News.htm") {
-											setMultiMapValue(news, "News", nr, A_Now)
-
-											writeMultiMap(kUserConfigDirectory . "NEWS", news)
-
 											viewHTML(kTempDirectory . "News\News.htm")
+
+											Task.startTask(() {
+												setMultiMapValue(news, "News", nr, A_Now)
+
+												writeMultiMap(kUserConfigDirectory . "NEWS", news)
+											}, 10000, kLowPriority)
 
 											break
 										}

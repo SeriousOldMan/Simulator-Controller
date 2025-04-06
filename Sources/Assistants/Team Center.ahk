@@ -5883,7 +5883,7 @@ class TeamCenter extends ConfigurationItem {
 
 		if strategy {
 			if this.Simulator {
-				simulator := SessionDatabase().getSimulatorName(this.Simulator)
+				simulator := SessionDatabase.getSimulatorName(this.Simulator)
 				car := this.Car
 				track := this.Track
 			}
@@ -6041,7 +6041,7 @@ class TeamCenter extends ConfigurationItem {
 			strategy := this.Strategy
 
 			if this.Simulator {
-				simulator := SessionDatabase().getSimulatorName(this.Simulator)
+				simulator := SessionDatabase.getSimulatorName(this.Simulator)
 				car := this.Car
 				track := this.Track
 			}

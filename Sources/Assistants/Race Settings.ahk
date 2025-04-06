@@ -1522,7 +1522,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		w12 := (x11 + 60 - x7)
 
-		tyreSetListView := settingsGui.Add("ListView", "x" . x7 . " yp w" . w12 . " h115 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "O", "#"], translate))
+		tyreSetListView := settingsGui.Add("ListView", "x" . x7 . " yp w" . w12 . " h220 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "O", "#"], translate))
 		tyreSetListView.OnEvent("Click", choosePSTyreSet)
 		tyreSetListView.OnEvent("DoubleClick", choosePSTyreSet)
 		tyreSetListView.OnEvent("ItemSelect", selectPSTyreSet)

@@ -144,6 +144,8 @@ Normally, Cato will use a predefined strategy which can be created using the ["S
 
 To prepare for a race with this kind of strategy handling, set *Active* to "Yes" and enter the race rules using the entry fields below. This settings have more than less the same meaning as in the [tab *Rules & Settings*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#rules--settings) in the "Strategy Workbench". Most important is the number of required pitstops and whether refueling and tyre changes are required. You can also define a pitstop window here. And if the session has a restricted number of tyre sets, you can specify them as well. Please note, that additional information from the other tabs will also be used when the resulting strategy is calculated, for example the session configuration with formation lap and post race lap or the pitstop service times.
 
+Using the list in the lower part you can specify how many laps are typically possible with a give tyre compound mixture and how many tyre sets of each of these are available. This will be used by Cato to determine the best tyre set for each pitstop in the derived strategy. If a given compound mixture is not available in a particular race, set the number of available tyre sets to **0**.
+
 #### Tab *Strategy*
 
 You will find settings for the race strategy analysis and simulation in the fourth tab of the settings tool.

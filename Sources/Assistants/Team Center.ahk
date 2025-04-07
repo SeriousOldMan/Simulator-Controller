@@ -5709,9 +5709,9 @@ class TeamCenter extends ConfigurationItem {
 
 		try {
 			if this.UseTraffic
-				simulation := TrafficSimulation(this, sessionType, lapsDB)
+				simulation := TrafficSimulation(this, lapsDB, sessionType)
 			else
-				simulation := VariationSimulation(this, sessionType, lapsDB)
+				simulation := VariationSimulation(this, lapsDB, sessionType)
 
 			Task.CurrentTask.Simulation := simulation
 
@@ -5876,7 +5876,7 @@ class TeamCenter extends ConfigurationItem {
 	}
 
 	getStrategySettings(&simulator, &car, &track, &weather, &airTemperature, &trackTemperature
-					  , &sessionType, &sessionLength
+					  , &sessionType, &sessionLength, &additionalLaps
 					  , &maxTyreLaps, &tyreCompound, &tyreCompoundColor, &tyrePressures) {
 		local strategy := this.Strategy
 		local lapsDB, candidate
@@ -5925,6 +5925,7 @@ class TeamCenter extends ConfigurationItem {
 
 			sessionType := strategy.SessionType
 			sessionLength := strategy.SessionLength
+			additionalLaps := strategy.AdditionalLaps
 			maxTyreLaps := strategy.MaxTyreLaps
 			tyrePressures := strategy.TyrePressures
 

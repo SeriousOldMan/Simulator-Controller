@@ -3513,7 +3513,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	getStrategySettings(&simulator, &car, &track, &weather, &airTemperature, &trackTemperature
-					  , &sessionType, &sessionLength
+					  , &sessionType, &sessionLength, &additionalLaps
 					  , &maxTyreLaps, &tyreCompound, &tyreCompoundColor, &tyrePressures) {
 		local lapsDB, lowestLapTime, ignore, row, lapTime, settings
 
@@ -3527,6 +3527,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		sessionType := this.SelectedSessionType
 		sessionLength := this.Control["sessionLengthEdit"].Text
+		additionalLaps := 0
 
 		splitCompound(this.TyreCompounds[this.Control["simCompoundDropDown"].Value], &tyreCompound, &tyreCompoundColor)
 
@@ -3782,7 +3783,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.iLapsDatabase := lapsDB
 
 		try {
-			simulation := VariationSimulation(this, this.SelectedSessionType, lapsDB)
+			simulation := VariationSimulation(this, lapsDB, this.SelectedSessionType)
 
 			this.iSimulation := simulation
 

@@ -37,6 +37,9 @@ class StrategySimulation {
 	iTyreCompoundColor := false
 	iTyreCompoundVariation := 0
 
+	iSessionType := "Duration"
+	iAdditionalLaps := 0
+
 	class CancelSimulation {
 	}
 
@@ -55,6 +58,12 @@ class StrategySimulation {
 	SessionType {
 		Get {
 			return this.iSessionType
+		}
+	}
+
+	AdditionalLaps {
+		Get {
+			return this.iAdditionalLaps
 		}
 	}
 
@@ -104,9 +113,10 @@ class StrategySimulation {
 		}
 	}
 
-	__New(strategyManager, sessionType, lapsDatabase) {
+	__New(strategyManager, lapsDatabase, sessionType, additionalLaps := 0) {
 		this.iStrategyManager := strategyManager
 		this.iSessionType := sessionType
+		this.iAdditionalLaps := additionalLaps
 		this.iLapsDatabase := lapsDatabase
 	}
 
@@ -360,9 +370,11 @@ class StrategySimulation {
 	}
 
 	getStrategySettings(&simulator, &car, &track, &weather, &airTemperature, &trackTemperature
-					  , &sessionType, &sessionLength, &maxTyreLaps, &tyreCompound, &tyreCompoundColor, &tyrePressures) {
+					  , &sessionType, &sessionLength, &additionalLaps
+					  , &maxTyreLaps, &tyreCompound, &tyreCompoundColor, &tyrePressures) {
 		return this.StrategyManager.getStrategySettings(&simulator, &car, &track, &weather, &airTemperature, &trackTemperature
-													  , &sessionType, &sessionLength, &maxTyreLaps, &tyreCompound, &tyreCompoundColor, &tyrePressures)
+													  , &sessionType, &sessionLength, &additionalLaps
+													  , &maxTyreLaps, &tyreCompound, &tyreCompoundColor, &tyrePressures)
 	}
 
 	getSessionSettings(&stintLength, &formationLap, &postRaceLap, &fuelCapacity, &safetyFuel
@@ -513,6 +525,7 @@ class StrategySimulation {
 		local trackTemperature := false
 		local sessionType := false
 		local sessionLength := false
+		local additionalLaps := 0
 		local maxTyreLaps := false
 		local tyreCompound := false
 		local tyreCompoundColor := false
@@ -520,7 +533,8 @@ class StrategySimulation {
 		local message, candidate
 
 		this.getStrategySettings(&simulator, &car, &track, &weather, &airTemperature, &trackTemperature
-							   , &sessionType, &sessionLength, &maxTyreLaps, &tyreCompound, &tyreCompoundColor, &tyrePressures)
+							   , &sessionType, &sessionLength, &additionalLaps
+							   , &maxTyreLaps, &tyreCompound, &tyreCompoundColor, &tyrePressures)
 
 		if !lapsDB.suitableTyreCompound(simulator, car, track, weather, compound(tyreCompound, tyreCompoundColor)) {
 			candidate := lapsDB.optimalTyreCompound(simulator, car, track, weather, airTemperature, trackTemperature)
@@ -904,6 +918,7 @@ class VariationSimulation extends StrategySimulation {
 		local trackTemperature := false
 		local sessionType := false
 		local sessionLength := false
+		local additionalLaps := 0
 		local maxTyreLaps := false
 		local tyreCompound := false
 		local tyreCompoundColor := false
@@ -944,7 +959,8 @@ class VariationSimulation extends StrategySimulation {
 		local candidate, targetTyreCompound, targetTyreCompoundColor
 
 		this.getStrategySettings(&simulator, &car, &track, &weather, &airTemperature, &trackTemperature
-							   , &sessionType, &sessionLength, &maxTyreLaps, &tyreCompound, &tyreCompoundColor, &tyrePressures)
+							   , &sessionType, &sessionLength, &additionalLaps
+							   , &maxTyreLaps, &tyreCompound, &tyreCompoundColor, &tyrePressures)
 
 		this.getSessionSettings(&stintLength, &formationLap, &postRaceLap, &fuelCapacity, &safetyFuel
 							  , &pitstopDelta, &pitstopFuelService, &pitstopTyreService, &pitstopServiceOrder)
@@ -1252,6 +1268,7 @@ class TrafficSimulation extends StrategySimulation {
 		local trackTemperature := false
 		local sessionType := false
 		local sessionLength := false
+		local additionalLaps := 0
 		local maxTyreLaps := false
 		local tyreCompound := false
 		local tyreCompoundColor := false
@@ -1300,7 +1317,8 @@ class TrafficSimulation extends StrategySimulation {
 		local candidate, targetTyreCompound, targetTyreCompoundColor
 
 		this.getStrategySettings(&simulator, &car, &track, &weather, &airTemperature, &trackTemperature
-							   , &sessionType, &sessionLength, &maxTyreLaps, &tyreCompound, &tyreCompoundColor, &tyrePressures)
+							   , &sessionType, &sessionLength, &additionalLaps
+							   , &maxTyreLaps, &tyreCompound, &tyreCompoundColor, &tyrePressures)
 
 		this.getSessionSettings(&stintLength, &formationLap, &postRaceLap, &fuelCapacity, &safetyFuel
 							  , &pitstopDelta, &pitstopFuelService, &pitstopTyreService, &pitstopServiceOrder)
@@ -1522,6 +1540,8 @@ class Strategy extends ConfigurationItem {
 
 	iSessionType := "Duration"
 	iSessionLength := 0
+
+	iAdditionalLaps := 0
 
 	iMap := "n/a"
 	iTC := "n/a"
@@ -2146,6 +2166,12 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 
+	AdditionalLaps {
+		Get {
+			return this.iAdditionalLaps
+		}
+	}
+
 	Map[lastStint := false] {
 		Get {
 			if (lastStint && this.LastPitstop)
@@ -2598,7 +2624,7 @@ class Strategy extends ConfigurationItem {
 		local ecuMap := false
 		local fuelConsumption := false
 		local avgLapTime := false
-		local simulator, car, track, weather, airTemperature, trackTemperature, sessionType, sessionLength
+		local simulator, car, track, weather, airTemperature, trackTemperature, sessionType, sessionLength, additionalLaps
 		local maxTyreLaps, tyreCompound, tyreCompoundColor, tyrePressures
 		local stintLength, formationLap, postRaceLap, fuelCapacity, safetyFuel, pitstopDelta
 		local pitstopFuelService, pitstopTyreService, pitstopServiceOrder
@@ -2622,14 +2648,15 @@ class Strategy extends ConfigurationItem {
 			trackTemperature := false
 			sessionType := false
 			sessionLength := false
+			additionalLaps := 0
 			maxTyreLaps := false
 			tyreCompound := false
 			tyreCompoundColor := false
 			tyrePressures := false
 
 			this.StrategyManager.getStrategySettings(&simulator, &car, &track, &weather, &airTemperature, &trackTemperature
-												   , &sessionType, &sessionLength, &maxTyreLaps
-												   , &tyreCompound, &tyreCompoundColor, &tyrePressures)
+												   , &sessionType, &sessionLength, &additionalLaps
+												   , &maxTyreLaps, &tyreCompound, &tyreCompoundColor, &tyrePressures)
 
 			this.iSimulator := simulator
 			this.iCar := car
@@ -2640,6 +2667,7 @@ class Strategy extends ConfigurationItem {
 
 			this.iSessionType := sessionType
 			this.iSessionLength := sessionLength
+			this.iAdditionalLaps := additionalLaps
 
 			this.iMaxTyreLaps := maxTyreLaps
 
@@ -2795,6 +2823,7 @@ class Strategy extends ConfigurationItem {
 
 		this.iSessionType := getMultiMapValue(configuration, "Session", "SessionType", "Duration")
 		this.iSessionLength := getMultiMapValue(configuration, "Session", "SessionLength", 0)
+		this.iAdditionalLaps := getMultiMapValue(configuration, "Session", "AdditionalLaps", 0)
 		this.iFormationLap := getMultiMapValue(configuration, "Session", "FormationLap", false)
 		this.iPostRaceLap := getMultiMapValue(configuration, "Session", "PostRaceLap", false)
 
@@ -3001,6 +3030,7 @@ class Strategy extends ConfigurationItem {
 
 		setMultiMapValue(configuration, "Session", "SessionType", this.SessionType)
 		setMultiMapValue(configuration, "Session", "SessionLength", this.SessionLength)
+		setMultiMapValue(configuration, "Session", "AdditionalLaps", this.AdditionalLaps)
 		setMultiMapValue(configuration, "Session", "FormationLap", this.FormationLap)
 		setMultiMapValue(configuration, "Session", "PostRaceLap", this.PostRaceLap)
 

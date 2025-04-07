@@ -571,13 +571,11 @@ class RaceStrategist extends GridRaceAssistant {
 
 		run() {
 			if this.RaceStrategist.UseTraffic
-				this.iSimulation := TrafficSimulation(this.RaceStrategist
-												    , (this.RaceStrategist.KnowledgeBase.getValue("Session.Format") = "Time") ? "Duration" : "Laps"
-												    , this.LapsDatabase)
+				this.iSimulation := TrafficSimulation(this.RaceStrategist, this.LapsDatabase
+												    , (this.RaceStrategist.KnowledgeBase.getValue("Session.Format") = "Time") ? "Duration" : "Laps")
 			else
-				this.iSimulation := VariationSimulation(this.RaceStrategist
-													  , (this.RaceStrategist.KnowledgeBase.getValue("Session.Format") = "Time") ? "Duration" : "Laps"
-													  , this.LapsDatabase)
+				this.iSimulation := VariationSimulation(this.RaceStrategist, this.LapsDatabase
+													  , (this.RaceStrategist.KnowledgeBase.getValue("Session.Format") = "Time") ? "Duration" : "Laps")
 
 			try {
 				this.Simulation.runSimulation(isDebug())
@@ -2647,7 +2645,7 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	getStrategySettings(&simulator, &car, &track, &weather, &airTemperature, &trackTemperature
-					  , &sessionType, &sessionLength
+					  , &sessionType, &sessionLength, &additionalLaps
 					  , &maxTyreLaps, &tyreCompound, &tyreCompoundColor, &tyrePressures) {
 		local knowledgeBase := this.KnowledgeBase
 		local strategy := this.Strategy["Original"]
@@ -2693,6 +2691,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 			sessionType := strategy.SessionType
 			sessionLength := strategy.SessionLength
+			additionalLaps := strategy.AdditionalLaps
 			maxTyreLaps := strategy.MaxTyreLaps
 			tyrePressures := strategy.TyrePressures
 
@@ -2724,6 +2723,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 			sessionType := ((knowledgeBase.getValue("Session.Format", "Time") = "Time") ? "Duration" : "Laps")
 			sessionLength := (knowledgeBase.getValue("Session.Duration") / 60)
+			additionalLaps := knowledgeBase.getValue("Session.AdditionalLaps", 0)
 			maxTyreLaps := getMultiMapValue(this.Settings, "Session Rules", "Tyre.Laps", 40)
 			tyrePressures := [Round(knowledgeBase.getValue("Lap." . lap . ".Tyre.Pressure.FL"), 1)
 							, Round(knowledgeBase.getValue("Lap." . lap . ".Tyre.Pressure.FR"), 1)

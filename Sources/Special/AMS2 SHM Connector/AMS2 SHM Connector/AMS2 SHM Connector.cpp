@@ -265,6 +265,7 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		printLine(&output, "FuelAmount=", (int)localCopy->mFuelCapacity);
 
 		printLine(&output, "SessionFormat=", (localCopy->mLapsInEvent == 0) ? "Time" : "Laps");
+		printLine(&output, "AdditionalLaps=", localCopy->mSessionAdditionalLaps);
 
 		printLine(&output, "SessionTimeRemaining=", getRemainingTime(localCopy));
 		printLine(&output, "SessionLapsRemaining=", getRemainingLaps(localCopy));

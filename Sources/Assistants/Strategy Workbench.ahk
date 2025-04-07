@@ -89,6 +89,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	iSelectedValidator := false
 
 	iSelectedSessionType := "Duration"
+	iSelectedAdditionalLaps := 0
 
 	iTelemetryChartHTML := false
 	iStrategyChartHTML := false
@@ -273,6 +274,12 @@ class StrategyWorkbench extends ConfigurationItem {
 	SelectedSessionType {
 		Get {
 			return this.iSelectedSessionType
+		}
+	}
+
+	SelectedAdditionalLaps {
+		Get {
+			return this.iSelectedAdditionalLaps
 		}
 	}
 
@@ -513,7 +520,25 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 
 		chooseSessionType(*) {
-			workbench.selectSessionType(["Duration", "Laps"][workbenchGui["sessionTypeDropDown"].Value])
+			local sessionType := ["Time", "Time+1", "Laps", "Laps+1"][workbenchGui["sessionTypeDropDown"].Value]
+			local additionalLaps := 0
+
+			switch sessionType {
+				case "Time":
+					sessionType := "Duration"
+				case "Time+1":
+					sessionType := "Duration"
+					additionalLaps := 1
+				case "Laps":
+					sessionType := "Laps"
+				case "Laps+1":
+					sessionType := "Laps"
+					additionalLaps := 1
+				default:
+					throw "Unsupported session format detected in StrategyWorkbench.chooseSessionType..."
+			}
+
+			workbench.selectSessionType(sessionType, additionalLaps)
 		}
 
 		choosePitstopRule(*) {
@@ -1209,7 +1234,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.SetFont("Norm", "Arial")
 
-		workbenchGui.Add("DropDownList", "x" . x0 . " yp+21 w70 Choose1  VsessionTypeDropDown", collect(["Duration", "Laps"], translate)).OnEvent("Change", chooseSessionType)
+		workbenchGui.Add("DropDownList", "x" . x0 . " yp+21 w70 Choose1  VsessionTypeDropDown", collect(["Time", "Time+1", "Laps", "Laps+1"], translate)).OnEvent("Change", chooseSessionType)
 		workbenchGui.Add("Edit", "x" . x1 . " yp w50 h20 Limit4 Number VsessionLengthEdit", 60)
 		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range1-9999 0x80", 60)
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w50 h20 VsessionLengthLabel", translate("Minutes"))
@@ -2562,14 +2587,17 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.updateState()
 	}
 
-	selectSessionType(sessionType) {
+	selectSessionType(sessionType, additionalLaps := 0) {
 		this.iSelectedSessionType := sessionType
+		this.iSelectedAdditionalLaps := additionalLaps
 
 		if (sessionType = "Duration") {
+			this.Control["sessionTypeDropDown"].Choose(1 + additionalLaps)
 			this.Control["sessionLengthLabel"].Text := translate("Minutes")
 			this.Control["simSessionResultLabel"].Text := translate("Laps")
 		}
 		else {
+			this.Control["sessionTypeDropDown"].Choose(3 + additionalLaps)
 			this.Control["sessionLengthLabel"].Text := translate("Laps")
 			this.Control["simSessionResultLabel"].Text := translate("Seconds")
 		}
@@ -2762,16 +2790,7 @@ class StrategyWorkbench extends ConfigurationItem {
 						loop 4
 							this.WeatherListView.ModifyCol(A_Index, "AutoHdr")
 
-						if (strategy.SessionType = "Duration") {
-							this.Control["sessionTypeDropDown"].Value := 1
-							; this.Control["sessionLengthLabel"].Text := translate("Minutes")
-						}
-						else {
-							this.Control["sessionTypeDropDown"].Value := 2
-							; this.Control["sessionLengthLabel"].Text := translate("Laps")
-						}
-
-						this.selectSessionType(strategy.SessionType)
+						this.selectSessionType(strategy.SessionType, strategy.AdditionalLaps)
 
 						this.Control["sessionLengthEdit"].Text := Round(strategy.SessionLength)
 
@@ -2844,12 +2863,6 @@ class StrategyWorkbench extends ConfigurationItem {
 						settings := readMultiMap(file)
 
 						if (settings.Count > 0) {
-							if (getMultiMapValue(settings, "Session Settings", "Duration", kUndefined) != kUndefined) {
-								this.Control["sessionTypeDropDown"].Choose(1)
-								this.Control["sessionLengthEdit"].Text := Round(getMultiMapValue(settings, "Session Settings", "Duration") / 60)
-								this.Control["sessionLengthlabel"].Text := translate("Minutes")
-							}
-
 							this.Control["formationLapCheck"].Value := getMultiMapValue(settings, "Session Settings", "Lap.Formation", false)
 							this.Control["postRaceLapCheck"].Value := getMultiMapValue(settings, "Session Settings", "Lap.PostRace", false)
 
@@ -2965,12 +2978,6 @@ class StrategyWorkbench extends ConfigurationItem {
 					settings := SettingsDatabase().loadSettings(simulator, car, track, this.SelectedWeather)
 
 					if (settings.Count > 0) {
-						if (getMultiMapValue(settings, "Session Settings", "Duration", kUndefined) != kUndefined) {
-							this.Control["sessionTypeDropDown"].Choose(1)
-							this.Control["sessionLengthEdit"].Text := Round(getMultiMapValue(settings, "Session Settings", "Duration") / 60)
-							this.Control["sessionLengthlabel"].Text := translate("Minutes")
-						}
-
 						if (getMultiMapValue(settings, "Session Settings", "Lap.Formation", kUndefined) != kUndefined)
 							this.Control["formationLapCheck"].Value := getMultiMapValue(settings, "Session Settings", "Lap.Formation")
 
@@ -3550,7 +3557,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		sessionType := this.SelectedSessionType
 		sessionLength := this.Control["sessionLengthEdit"].Text
-		additionalLaps := 0
+		additionalLaps := this.SelectedAdditionalLaps
 
 		splitCompound(this.TyreCompounds[this.Control["simCompoundDropDown"].Value], &tyreCompound, &tyreCompoundColor)
 
@@ -3805,7 +3812,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.iLapsDatabase := lapsDB
 
 		try {
-			simulation := VariationSimulation(this, lapsDB, this.SelectedSessionType)
+			simulation := VariationSimulation(this, lapsDB, this.SelectedSessionType, this.SelectedAdditionalLaps)
 
 			this.iSimulation := simulation
 

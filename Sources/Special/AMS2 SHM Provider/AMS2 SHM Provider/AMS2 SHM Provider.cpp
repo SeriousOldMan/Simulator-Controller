@@ -185,6 +185,7 @@ int main(int argc, char* argv[]) {
 		printf("FuelAmount=%d\n", (int)localCopy->mFuelCapacity);
 
 		printf("SessionFormat=%s\n", (localCopy->mLapsInEvent == 0) ? "Time" : "Laps");
+		printf("AdditionalLaps=%d\n", localCopy->mSessionAdditionalLaps);
 
 		/*
 		if (localCopy->mSessionState == SESSION_PRACTICE) {

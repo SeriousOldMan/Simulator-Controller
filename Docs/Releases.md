@@ -39,6 +39,12 @@
 	- It can also be configured in the [*Rules* tab]((https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-rules), if a race is run on simple rules, rather than a full pre-defined strategy.
 	- The general "Tyre Usage" setting formerly available in the "Strategy Workbench" has been removed.
 	- The strategy simulation will now try to use the best suitable tyre compound mixture for a given stint, even if the "Tyre Compound" *Optimizer* is not used. The decision is based on tyre life and stint length.
+  - Support for "+ 1 lap" race formats has been added throughout the system.
+    - You can choose two additional session types in the "Strategy Workbench" before simulating a strategy - *Time + 1* lap and *Laps + 1* lap. *Time + 1* is supported by *Automobilista 2* and *Project CARS 2* according to my knowledge, but it was easy to add *Laps + 1* as well.
+	- For *Automobilista 2* and *Project CARS 2*, the information about additional laps is read from the API.
+	- The Engineer adjusts fuel for the additional laps.
+	- The announcement of the last lap of the Spotter also uses the information about an additional lap.
+	- Lastly, detection of the end of the session will also use this informaton.
   - [Expert] A new type of *Reasoning* booster named "Rules" has been introduced, which runs without a connected LLM. Only rules are allowed as event source, but all action types, including scripts defined in  [Lua](https://lua.org) are supported. Please read the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster) for more information.
     - A new action function / predicate named *Assistant.Trigger* is available, which allows the event rules to trigger a defined action by name, rather than by using an LLM to select the action by the current situation, since no LLM is active when the "Rules" booster is selected.
   - [Expert] The "Assistant.Speak" function / predicate used in the Assistant booster actions now uses the *Rephrasing* booster, if it is configured. This introduces immersive variations of the spoken message.
@@ -268,7 +274,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   5. Initial support for *Assetto Corsa EVO*. Not much functionality yet...
   6. "Race Settings" has been [extended](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-rules) and allows now to define basic race rules for the next race.
   7. The Strategist can now create a strategy dynamically based on simple race rules configured in the "Race Settings". See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#tab-rules) for more information.
-  8. The default for the [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) "Engineer: Tyre Service" has changed to "Change" for *Automobilista 2*, *Project CARS 2 and *RaceRoom Racing Experience*, because these simulators do not support adjusting pressures during a pitstop.
+  8. The default for the [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) "Engineer: Tyre Service" has changed to "Change" for *Automobilista 2*, *Project CARS 2* and *RaceRoom Racing Experience*, because these simulators do not support adjusting pressures during a pitstop.
   9. Auto requesting the pitstop for *Automobilista 2* can now be configured in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database".
 
      **IMPORTANT**: The default for this setting is *False*, which is **different** from the previously implemented behaviour.

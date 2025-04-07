@@ -2749,7 +2749,8 @@ class Strategy extends ConfigurationItem {
 			this.StrategyManager.getStartConditions(&initialStint, &initialLap, &initialStintTime, &initialSessionTime
 												  , &initialTyreSet, &initialTyreLaps, &initialFuelAmount, &ecuMap, &fuelConsumption, &avgLapTime)
 
-			duration := ((sessionType = "Duration") ? sessionLength : (sessionLength * avgLapTime))
+			duration := ((sessionType = "Duration") ? sessionLength : (sessionLength * avgLapTime)) + (additionalLaps * avgLapTime)
+
 			forecast := []
 			weather := false
 			airTemperature := false
@@ -3370,9 +3371,9 @@ class Strategy extends ConfigurationItem {
 			avgLapTime := this.AvgLapTime["Session"]
 
 		if (this.SessionType = "Duration")
-			return Ceil(((sessionLength * 60) / avgLapTime) + ((postRaceLap && hasPostRaceLap) ? 1 : 0)) ; + ((formationLap && hasFormationLap) ? 1 : 0)
+			return Ceil(((sessionLength * 60) / avgLapTime) + ((postRaceLap && hasPostRaceLap) ? 1 : 0) + this.AdditionalLaps) ; + ((formationLap && hasFormationLap) ? 1 : 0)
 		else
-			return (sessionLength + ((postRaceLap && hasPostRaceLap) ? 1 : 0)) ;  + ((formationLap && hasFormationLap) ? 1 : 0)
+			return (sessionLength + ((postRaceLap && hasPostRaceLap) ? 1 : 0) + this.AdditionalLaps) ;  + ((formationLap && hasFormationLap) ? 1 : 0)
 	}
 
 	calcSessionTime(avgLapTime := false, formationLap := true, postRaceLap := true) {
@@ -3384,9 +3385,9 @@ class Strategy extends ConfigurationItem {
 			avgLapTime := this.AvgLapTime["Session"]
 
 		if (this.SessionType = "Duration")
-			return ((sessionLength * 60) + (((postRaceLap && hasPostRaceLap) ? 1 : 0) * avgLapTime)) ;  + (((formationLap && hasFormationLap) ? 1 : 0) * avgLapTime)
+			return ((sessionLength * 60) + (((postRaceLap && hasPostRaceLap) ? 1 : 0) * avgLapTime) + (this.AdditionalLaps * avgLapTime)) ;  + (((formationLap && hasFormationLap) ? 1 : 0) * avgLapTime)
 		else
-			return ((sessionLength + ((postRaceLap && hasPostRaceLap) ? 1 : 0)) * avgLapTime) ; + ((formationLap && hasFormationLap) ? 1 : 0)
+			return ((sessionLength + ((postRaceLap && hasPostRaceLap) ? 1 : 0) + this.AdditionalLaps) * avgLapTime) ; + ((formationLap && hasFormationLap) ? 1 : 0)
 	}
 
 	calcRefuelAmount(targetFuel, startFuel, remainingSessionLaps, stintLaps) {

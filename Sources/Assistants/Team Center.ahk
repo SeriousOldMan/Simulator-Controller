@@ -5329,7 +5329,7 @@ class TeamCenter extends ConfigurationItem {
 						this.updateState()
 					}
 
-					this.runSimulation(this.Strategy.SessionType)
+					this.runSimulation(this.Strategy.SessionType, this.Strategy.AdditionalLaps)
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
@@ -5690,11 +5690,11 @@ class TeamCenter extends ConfigurationItem {
 		return true
 	}
 
-	runSimulation(sessionType) {
+	runSimulation(sessionType, additionalLaps) {
 		TeamCenterSimulationTask(ObjBindMethod(this, "runSimulationAsync", sessionType)).start()
 	}
 
-	runSimulationAsync(sessionType) {
+	runSimulationAsync(sessionType, additionalLaps) {
 		local lapsDB, simulation
 
 		this.showMessage(translate("Saving session"))
@@ -5709,9 +5709,9 @@ class TeamCenter extends ConfigurationItem {
 
 		try {
 			if this.UseTraffic
-				simulation := TrafficSimulation(this, lapsDB, sessionType)
+				simulation := TrafficSimulation(this, lapsDB, sessionType, additionalLaps)
 			else
-				simulation := VariationSimulation(this, lapsDB, sessionType)
+				simulation := VariationSimulation(this, lapsDB, sessionType, additionalLaps)
 
 			Task.CurrentTask.Simulation := simulation
 

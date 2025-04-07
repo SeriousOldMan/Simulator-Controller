@@ -572,10 +572,12 @@ class RaceStrategist extends GridRaceAssistant {
 		run() {
 			if this.RaceStrategist.UseTraffic
 				this.iSimulation := TrafficSimulation(this.RaceStrategist, this.LapsDatabase
-												    , (this.RaceStrategist.KnowledgeBase.getValue("Session.Format") = "Time") ? "Duration" : "Laps")
+												    , (this.RaceStrategist.KnowledgeBase.getValue("Session.Format") = "Time") ? "Duration" : "Laps"
+													, this.RaceStrategist.KnowledgeBase.getValue("Session.AdditionalLaps", 0))
 			else
 				this.iSimulation := VariationSimulation(this.RaceStrategist, this.LapsDatabase
-													  , (this.RaceStrategist.KnowledgeBase.getValue("Session.Format") = "Time") ? "Duration" : "Laps")
+													  , (this.RaceStrategist.KnowledgeBase.getValue("Session.Format") = "Time") ? "Duration" : "Laps"
+													  , this.RaceStrategist.KnowledgeBase.getValue("Session.AdditionalLaps", 0))
 
 			try {
 				this.Simulation.runSimulation(isDebug())

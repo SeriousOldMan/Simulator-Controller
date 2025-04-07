@@ -67,7 +67,6 @@ Loading of settings is supported for:
      The content of the current *Race.settings* file is used to initialize some fields. If the Control key is pressed, when this command is selected, the file chooser dialog is opened in the directory of the settings for the current simulator / car / track combination, but you may navigate to a totally different location if desired. The following fields are loaded from the settings file:
 	 
 	 - Rules & Settings
-	   - Race Duration
 	   - Formation Lap
 	   - Post Race Lap
 	   - Pitstop rules (if active)

@@ -539,13 +539,15 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		chooseTyreSet(listView, line, *) {
 			local compound := listView.GetText(line, 1)
-			local count := listView.GetText(line, 2)
+			local laps := listView.GetText(line, 2)
+			local count := listView.GetText(line, 3)
 
 			if line {
 				if compound
 					compound := normalizeCompound(compound)
 
 				workbenchGui["tyreSetDropDown"].Choose(inList(collect(workbench.TyreCompounds, translate), compound))
+				workbenchGui["tyreSetLapsEdit"].Text := laps
 				workbenchGui["tyreSetCountEdit"].Text := count
 			}
 
@@ -575,7 +577,8 @@ class StrategyWorkbench extends ConfigurationItem {
 							break
 						}
 
-				workbench.TyreSetListView.Modify(row, "", compound, workbenchGui["tyreSetCountEdit"].Text)
+				workbench.TyreSetListView.Modify(row, "", compound, workbenchGui["tyreSetLapsEdit"].Text
+														, workbenchGui["tyreSetCountEdit"].Text)
 
 				workbench.TyreSetListView.ModifyCol()
 			}
@@ -598,12 +601,13 @@ class StrategyWorkbench extends ConfigurationItem {
 					break
 				}
 
-			workbench.TyreSetListView.Add("", collect(workbench.TyreCompounds, translate)[index], 99)
+			workbench.TyreSetListView.Add("", collect(workbench.TyreCompounds, translate)[index], 50, 99)
 			workbench.TyreSetListView.Modify(workbench.TyreSetListView.GetCount(), "Select Vis")
 
 			workbench.TyreSetListView.ModifyCol()
 
 			workbenchGui["tyreSetDropDown"].Choose(index)
+			workbenchGui["tyreSetLapsEdit"].Value := 50
 			workbenchGui["tyreSetCountEdit"].Value := 99
 
 			workbench.updateState()
@@ -649,10 +653,6 @@ class StrategyWorkbench extends ConfigurationItem {
 				loop 10
 					SendInput("{Right}")
 			}
-		}
-
-		validateSimMaxTyreLaps(*) {
-			validateInteger("simMaxTyreLapsEdit", 10)
 		}
 
 		validateSimInitialFuelAmount(*) {
@@ -1167,7 +1167,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Text", "x619 ys+39 w80 h21", translate("Strategy"))
 		workbenchGui.Add("Text", "x700 yp+7 w646 0x10 W:Grow")
 
-		workbenchGui.Add("HTMLViewer", "x619 yp+14 w727 h202 Border vstratViewer H:Grow(0.8) W:Grow")
+		workbenchGui.Add("HTMLViewer", "x619 yp+14 w727 h238 Border vstratViewer H:Grow(0.8) W:Grow")
 
 		this.iStrategyViewer := StrategyViewer(workbenchGui, workbenchGui["stratViewer"])
 
@@ -1181,7 +1181,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Button", "x649 y824 w80 h23 Y:Move H:Center", translate("Close")).OnEvent("Click", closeWorkbench)
 		*/
 
-		workbenchTab := workbenchGui.Add("Tab3", "x16 ys+39 w593 h225 H:Grow(0.8) -Wrap Section", collect(["Rules && Settings", "Pitstop && Service", "Pitstops (fixed)", "Drivers", "Weather", "Simulation", "Strategy"], translate))
+		workbenchTab := workbenchGui.Add("Tab3", "x16 ys+39 w593 h261 H:Grow(0.8) -Wrap Section", collect(["Rules && Settings", "Pitstop && Service", "Pitstops (fixed)", "Drivers", "Weather", "Simulation", "Strategy"], translate))
 
 		workbenchTab.UseTab(1)
 
@@ -1205,7 +1205,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm", "Arial")
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("GroupBox", "x24 ys+34 w199 h181 H:Grow(0.8)", translate("Race"))
+		workbenchGui.Add("GroupBox", "x24 ys+34 w199 h217 H:Grow(0.8)", translate("Race"))
 
 		workbenchGui.SetFont("Norm", "Arial")
 
@@ -1230,7 +1230,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm", "Arial")
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("GroupBox", "x233 ys+34 w364 h181 H:Grow(0.8)", translate("Pitstop"))
+		workbenchGui.Add("GroupBox", "x233 ys+34 w364 h217 H:Grow(0.8)", translate("Pitstop"))
 
 		workbenchGui.SetFont("Norm", "Arial")
 
@@ -1252,20 +1252,24 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("Text", "x" . (x5 - 10) . " yp+26 w85 h23 +0x200", translate("Tyre Sets"))
 
-		w12 := (x11 + 50 - x7)
+		w12 := (x11 + 40 - x7)
 
-		this.iTyreSetListView := workbenchGui.Add("ListView", "x" . x7 . " yp w" . w12 . " h44 H:Grow(0.8) -Multi -Hdr -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "#"], translate))
+		this.iTyreSetListView := workbenchGui.Add("ListView", "x" . x7 . " yp w" . w12 . " h84 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "O", "#"], translate))
 		this.iTyreSetListView.OnEvent("Click", chooseTyreSet)
 		this.iTyreSetListView.OnEvent("DoubleClick", chooseTyreSet)
 		this.iTyreSetListView.OnEvent("ItemSelect", selectTyreSet)
 
 		x13 := (x7 + w12 + 5)
 
-		workbenchGui.Add("DropDownList", "x" . x13 . " yp w116 Choose0 vtyreSetDropDown", [translate(normalizeCompound("Dry"))]).OnEvent("Change", updateTyreSet)
+		workbenchGui.Add("DropDownList", "x" . x13 . " yp w85 Choose0 vtyreSetDropDown", [translate(normalizeCompound("Dry"))]).OnEvent("Change", updateTyreSet)
+
+		workbenchGui.Add("Edit", "x" . (x13 + 86) . " yp w40 h20 Limit2 Number vtyreSetLapsEdit", 50).OnEvent("Change", updateTyreSet)
+		workbenchGui.Add("UpDown", "x" . (x13 + 86) . " yp w18 h20 0x80 Range0-99")
+
 		workbenchGui.Add("Edit", "x" . x13 . " yp+24 w40 h20 Limit2 Number vtyreSetCountEdit").OnEvent("Change", updateTyreSet)
 		workbenchGui.Add("UpDown", "x" . x13 . " yp w18 h20 0x80 Range0-99")
 
-		x13 := (x7 + w12 + 5 + 116 - 48)
+		x13 := (x7 + w12 + 5 + 126 - 48)
 
 		workbenchGui.Add("Button", "x" . x13 . " yp+6 w23 h23 Y:Move(0.8) Center +0x200 vtyreSetAddButton").OnEvent("Click", addTyreSet)
 		setButtonIcon(workbenchGui["tyreSetAddButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
@@ -1326,7 +1330,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		x4 := x3 + w3 - 50
 		x5 := x4 + 25
 
-		this.iFixedPitstopsListView := workbenchGui.Add("ListView", "x24 ys+34 w216 h181 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(kFixedPitstopRefuel ? ["Pitstop", "Lap", "Refuel", "Tyres"] : ["Pitstop", "Lap", "Tyres"], translate))
+		this.iFixedPitstopsListView := workbenchGui.Add("ListView", "x24 ys+34 w216 h217 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(kFixedPitstopRefuel ? ["Pitstop", "Lap", "Refuel", "Tyres"] : ["Pitstop", "Lap", "Tyres"], translate))
 		this.iFixedPitstopsListView.OnEvent("Click", chooseSimFixedPitstop)
 		this.iFixedPitstopsListView.OnEvent("DoubleClick", chooseSimFixedPitstop)
 		this.iFixedPitstopsListView.OnEvent("ItemSelect", selectSimFixedPitstop)
@@ -1373,7 +1377,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		x4 := x3 + w3 - 50
 		x5 := x4 + 25
 
-		this.iDriversListView := workbenchGui.Add("ListView", "x24 ys+34 w216 h181 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Stint", "Driver"], translate))
+		this.iDriversListView := workbenchGui.Add("ListView", "x24 ys+34 w216 h217 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Stint", "Driver"], translate))
 		this.iDriversListView.OnEvent("Click", chooseSimDriver)
 		this.iDriversListView.OnEvent("DoubleClick", chooseSimDriver)
 		this.iDriversListView.OnEvent("ItemSelect", selectSimDriver)
@@ -1399,7 +1403,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		x7 := x6 + 47
 		x8 := x7 + 52
 
-		this.iWeatherListView := workbenchGui.Add("ListView", "x24 ys+34 w216 h181 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Time", "Weather", "T Air", "T Track"], translate))
+		this.iWeatherListView := workbenchGui.Add("ListView", "x24 ys+34 w216 h217 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Time", "Weather", "T Air", "T Track"], translate))
 		this.iWeatherListView.OnEvent("Click", chooseSimWeather)
 		this.iWeatherListView.OnEvent("DoubleClick", chooseSimWeather)
 		this.iWeatherListView.OnEvent("ItemSelect", selectSimWeather)
@@ -1450,17 +1454,12 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("DropDownList", "x" . x1 . " yp w84 Choose" . chosen . " VsimCompoundDropDown", choices)
 
-		workbenchGui.Add("Text", "x" . x . " yp+25 w72 h20 +0x200", translate("Tyre Usage"))
-		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w45 h20 Number Limit3 VsimMaxTyreLapsEdit", 40).OnEvent("Change", validateSimMaxTyreLaps)
-		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range1-999", 40)
-		workbenchGui.Add("Text", "x" . x3 . " yp+4 w45 h20", translate("Laps"))
-
-		workbenchGui.Add("Text", "x" . x . " yp+21 w72 h20 +0x200", translate("Initial Fuel"))
+		workbenchGui.Add("Text", "x" . x . " yp+25 w72 h20 +0x200", translate("Initial Fuel"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w45 h20 Number Limit3 VsimInitialFuelAmountEdit", displayValue("Float", convertUnit("Volume", 90), 0)).OnEvent("Change", validateSimInitialFuelAmount)
 		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-999", displayValue("Float", convertUnit("Volume", 90), 0))
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w45 r1", getUnit("Volume", true))
 
-		workbenchGui.Add("Text", "x" . x . " yp+21 w72 h20 +0x200", translate("Map"))
+		workbenchGui.Add("Text", "x" . x . " yp+58 w72 h20 +0x200", translate("Map"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w45 h20 Number Limit2 VsimMapEdit", "n/a").OnEvent("Change", (*) => this.updateState())
 		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99", "n/a")
 
@@ -1533,7 +1532,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("Text", "x399 yp+39 w60 h23 +0x200", translate("Use"))
 
-		choices := collect(["Fixed", "Telemetry Data", "Fixed + Telemetry"], translate)
+		choices := collect(["Fixed", "Telemetry", "Fixed + Telemetry"], translate)
 
 		workbenchGui.Add("DropDownList", "x460 yp w136 Choose2 VsimInputDropDown", choices).OnEvent("Change", (*) => this.updateState())
 
@@ -1768,14 +1767,17 @@ class StrategyWorkbench extends ConfigurationItem {
 		if (this.TyreSetListView.GetNext(0) > 0) {
 			this.Control["tyreSetDropDown"].Enabled := true
 			this.Control["tyreSetCountEdit"].Enabled := true
+			this.Control["tyreSetLapsEdit"].Enabled := true
 			this.Control["tyreSetDeleteButton"].Enabled := true
 		}
 		else {
 			this.Control["tyreSetDropDown"].Enabled := false
+			this.Control["tyreSetLapsEdit"].Enabled := false
 			this.Control["tyreSetCountEdit"].Enabled := false
 			this.Control["tyreSetDeleteButton"].Enabled := false
 
 			this.Control["tyreSetDropDown"].Choose(0)
+			this.Control["tyreSetLapsEdit"].Text := ""
 			this.Control["tyreSetCountEdit"].Text := ""
 		}
 
@@ -2470,9 +2472,10 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.TyreSetListView.Delete()
 
 		for ignore, compound in compounds
-			this.TyreSetListView.Add("", translate(compound), 99)
+			this.TyreSetListView.Add("", translate(compound), 50, 99)
 
 		this.TyreSetListView.ModifyCol()
+		this.TyreSetListView.ModifyCol(1, 65)
 	}
 
 	loadCompound(compound, force := false) {
@@ -2580,7 +2583,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		local ignore, descriptor, directory, numPitstops, name, pitstop, tyreCompound, tyreCompoundColor
 		local simulator, car, track, simulatorCode, dirName, file, settings, settingsDB, msgResult
 		local lapsDB, fastestLapTime, row, lapTime, prefix, data, fuelCapacity, initialFuelAmount, map
-		local validators, index, fileName, validator, index, forecast, time, hour, minute, value, fixedPitstop
+		local validators, index, fileName, validator, index, forecast, time, hour, minute, value, fixedPitstop, found
 
 		switch line {
 			case 3:
@@ -2673,14 +2676,32 @@ class StrategyWorkbench extends ConfigurationItem {
 						}
 
 						for ignore, descriptor in strategy.TyreSets {
-							this.TyreSetListView.Add("", translate(compound(descriptor[1], descriptor[2])), descriptor[3])
+							found := false
 
 							loop this.TyreSetListView.GetCount()
-								if (translate(compound(descriptor[1], descriptor[2])) = this.TyreSetListView.GetText(A_Index, 1))
-									this.TyreSetListView.Modify(A_Index, "Col2", descriptor[3])
+								if (translate(compound(descriptor[1], descriptor[2])) = this.TyreSetListView.GetText(A_Index, 1)) {
+									found := true
+
+									break
+								}
+
+							if !found
+								if (descriptor.Length > 3)
+									this.TyreSetListView.Add("", translate(compound(descriptor[1], descriptor[2])), descriptor[4], descriptor[3])
+								else
+									this.TyreSetListView.Add("", translate(compound(descriptor[1], descriptor[2])), 50, descriptor[3])
+
+							loop this.TyreSetListView.GetCount()
+								if (translate(compound(descriptor[1], descriptor[2])) = this.TyreSetListView.GetText(A_Index, 1)) {
+									this.TyreSetListView.Modify(A_Index, "Col3", descriptor[3])
+
+									if (descriptor.Length > 3)
+										this.TyreSetListView.Modify(A_Index, "Col2", descriptor[4])
+								}
 						}
 
 						this.TyreSetListView.ModifyCol()
+						this.TyreSetListView.ModifyCol(1, 65)
 
 						this.iStintDrivers := []
 
@@ -2743,12 +2764,14 @@ class StrategyWorkbench extends ConfigurationItem {
 
 						if (strategy.SessionType = "Duration") {
 							this.Control["sessionTypeDropDown"].Value := 1
-							this.Control["sessionLengthLabel"].Text := translate("Minutes")
+							; this.Control["sessionLengthLabel"].Text := translate("Minutes")
 						}
 						else {
 							this.Control["sessionTypeDropDown"].Value := 2
-							this.Control["sessionLengthLabel"].Text := translate("Laps")
+							; this.Control["sessionLengthLabel"].Text := translate("Laps")
 						}
+
+						this.selectSessionType(strategy.SessionType)
 
 						this.Control["sessionLengthEdit"].Text := Round(strategy.SessionLength)
 
@@ -2763,7 +2786,6 @@ class StrategyWorkbench extends ConfigurationItem {
 
 						this.Control["simAvgLapTimeEdit"].Text := displayValue("Float", strategy.AvgLapTime, 1)
 						this.Control["simFuelConsumptionEdit"].Text := displayValue("Float", convertUnit("Volume", strategy.FuelConsumption))
-						this.Control["simMaxTyreLapsEdit"].Text := Round(strategy.MaxTyreLaps)
 						this.Control["simInitialFuelAmountEdit"].Text := displayValue("Float", convertUnit("Volume", strategy.StartFuel), 0)
 						this.Control["simMapEdit"].Text := strategy.Map
 
@@ -2922,10 +2944,11 @@ class StrategyWorkbench extends ConfigurationItem {
 
 									loop this.TyreSetListView.GetCount()
 										if (translate(compound(descriptor[1], descriptor[2])) = this.TyreSetListView.GetText(A_Index, 1))
-											this.TyreSetListView.Modify(A_Index, "Col2", descriptor[3])
+											this.TyreSetListView.Modify(A_Index, "Col3", descriptor[3])
 								}
 
 								this.TyreSetListView.ModifyCol()
+								this.TyreSetListView.ModifyCol(1, 65)
 
 								this.updateState()
 							}
@@ -3514,7 +3537,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 	getStrategySettings(&simulator, &car, &track, &weather, &airTemperature, &trackTemperature
 					  , &sessionType, &sessionLength, &additionalLaps
-					  , &maxTyreLaps, &tyreCompound, &tyreCompoundColor, &tyrePressures) {
+					  , &tyreCompound, &tyreCompoundColor, &tyrePressures) {
 		local lapsDB, lowestLapTime, ignore, row, lapTime, settings
 
 		simulator := this.SelectedSimulator
@@ -3530,8 +3553,6 @@ class StrategyWorkbench extends ConfigurationItem {
 		additionalLaps := 0
 
 		splitCompound(this.TyreCompounds[this.Control["simCompoundDropDown"].Value], &tyreCompound, &tyreCompoundColor)
-
-		maxTyreLaps := this.Control["simMaxTyreLapsEdit"].Text
 
 		tyrePressures := false
 
@@ -3579,7 +3600,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 	getPitstopRules(&validator, &pitstopRule, &pitstopWindow, &refuelRule, &tyreChangeRule, &tyreSets) {
 		local result := true
-		local tyreCompound, tyreCompoundColor, translatedCompounds, count, index
+		local tyreCompound, tyreCompoundColor, translatedCompounds, count, index, laps
 
 		this.validatePitstopRule("Full")
 		this.validatePitstopWindow("Full")
@@ -3627,11 +3648,12 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		loop this.TyreSetListView.GetCount() {
 			tyreCompound := this.TyreSetListView.GetText(A_Index, 1)
-			count := this.TyreSetListView.GetText(A_Index, 2)
+			laps := this.TyreSetListView.GetText(A_Index, 2)
+			count := this.TyreSetListView.GetText(A_Index, 3)
 
 			splitCompound(this.TyreCompounds[inList(translatedCompounds, tyreCompound)], &tyreCompound, &tyreCompoundColor)
 
-			tyreSets.Push(Array(tyreCompound, tyreCompoundColor, count))
+			tyreSets.Push(Array(tyreCompound, tyreCompoundColor, count, laps))
 		}
 
 		return result

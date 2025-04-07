@@ -1787,6 +1787,17 @@ updateConfigurationForV627() {
 				FileAppend(text, fileName, "UTF-16")
 			}
 		}
+
+	for ignore, code in ["AC", "ACC", "IRC", "AMS2", "PCARS2", "RF2", "LMU", "ACE", "RSP"]
+		if FileExist(kDatabaseDirectory . "User\" . code . "\Drivers.CSV") {
+			text := FileRead(kDatabaseDirectory . "User\" . code . "\Drivers.CSV")
+
+			text := StrReplace(text, "﻿", "")
+
+			deleteFile(kDatabaseDirectory . "User\" . code . "\Drivers.CSV")
+
+			FileAppend(text, kDatabaseDirectory . "User\" . code . "\Drivers.CSV", "UTF-8")
+		}
 }
 
 updateConfigurationForV626() {

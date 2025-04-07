@@ -382,7 +382,7 @@ As already mentioned, you can choose a different LLM for this booster, because h
 	 
 Important: This booster directly alters the behavior of the Assistant for the good or for the bad. Even if you don't change or extend the definition of the events and actions, it still depends on the reasoning capabilities of the used large language model, whether the Assistant will behave as expected. Therefore, always test everything before using it in an important race.
 
-As a special case can the *Reasoning* booster also be used to extend the rules of the Assistant as such, without using an LLM. To do this, use the "Generic" provider, but do not enter additional information like URL, Model and such. In this case, only *Events* can be configured. You can enter as many event rules as you want, but they must execute their corresponding action on its own.
+As a special case can the *Reasoning* booster also be used to extend the rules of the Assistant as such, without using an LLM. To do this, use the "Rules" provider. In this case, you must write rules for each event to be handled. These rules then can either handle the event directly or you can define actions and trigger them from the event rule by calling the "Assistant.Trigger" function / predicate as described below.
 
 ### Using Actions & Events
 
@@ -513,7 +513,7 @@ You can enable or disable individual predefined actions using the checkbox on th
 
 3. The most versatile *Action Type* is obviously the "Assistant Rule", since it allows you to do almost anything, but it requires very good programming skills in the area of logical programming languages like Prolog and forward chaining production rule systems. Simulator Controller comes with a builtin [Hybrid Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-engine), which has been created exclusivly with the requirements of intelligent agents in mind. The Race Assistants have been implemented using this rule engine, but other applications of Simulator Controller are using it as well. You will find an extensive, developer-oriented documentation for the rule engine [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-engine) and you can take a look at the rule sets of the Race Assistants to learn the language. They can be found in the *Resources\Rules* folder in the program folder of Simulator Controller. Start with "Race Engineer.rules".
 
-   When defining the rules for a custom action, you can use the following predicates to connect to the given Assistant or even the "Simulator Controller.exe" process:
+   When defining the rules for a custom action, you can use the following predicates and functions to connect to the given Assistant or even the "Simulator Controller.exe" process:
    
    - Assistant.Call(method, p1, p2, ...)
    
@@ -539,7 +539,7 @@ You can enable or disable individual predefined actions using the checkbox on th
    
 	   estimateTrackWetness() <= calculateTrackWetness(), Assistant.Speak("It will be too wet. I will come up with a new strategy."), Assistant.Call(planPitstop)
 
-   Up to 6 arguments are supported for predicates with a variable number of arguments. If you need to pass more arguments, use the syntax Call(*Assistant.Call*, *function*, p1, ..., pn) for backward chaining rules. Same applies to any other of the above *calls*.
+   Up to 6 arguments are supported for predicates with a variable number of arguments. If you need to pass more arguments, use the syntax Call(*Assistant.Call*, function, p1, ..., pn) for backward chaining rules. Same applies to any other of the above *calls*.
 	   
    In forward chaining rules, the syntax is a bit different:
    
@@ -553,7 +553,7 @@ You can enable or disable individual predefined actions using the checkbox on th
    
      Invokes the *method* on the instance of the Race Assistant class with some arguments. A variable number of arguments are supported.
 	 
-   - Assistant.Speak(phrase :: \<string\>, [force :: \<booelan\>])
+   - Assistant.Speak(phrase :: \<string\> [, force :: \<booelan\>])
    
 	 Outputs the given phrase using the voice of the given Race Assistant. *phrase* can be the label of a predefined phrase from the grammar definition of the Assistant. If *phrase* is not one of the predefined phrases it will be spoken as is. The *phrase* will not be spoken, if the Assistant is muted, unless you supply *true* for the optional parameter *force*.
 	 
@@ -581,7 +581,7 @@ You can enable or disable individual predefined actions using the checkbox on th
    
      Runs a full production cycle of the Rule Engine of the Assistant.
 	 
-   Here is a *simple* example:
+   Here is an example that demonstrates several of the above functions:
    
    ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Action%20Definition%202.JPG)
    
@@ -591,7 +591,7 @@ As you can see, defining individual actions is really an expert topic and requir
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Action%20Definition.JPG)
 
-This action calls the [controller acton]((https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions)) "trigger" with "!w" as an argument in the Simulator Cntroller process. This sends the keyboard command Alt-w to the current simulator, thereby starting the windscreen wiper. This action may be activated by a voice command like "Can you start the windscreen wiper?" when using the *Conversation* booster, or it can be automatically triggered by the *Reasoning* booster, when an event is signalled that tells that it just started raining.
+This action calls the [controller aciton]((https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions)) "trigger" with "!w" as an argument in the Simulator Cntroller process. This sends the keyboard command Alt-w to the current simulator, thereby starting the windscreen wiper. This action may be activated by a voice command like "Can you start the windscreen wiper?" when using the *Conversation* booster, or it can be automatically triggered by the *Reasoning* booster, when an event is signalled that tells that it just started raining.
 
 ## Managing Events
 
@@ -617,7 +617,7 @@ As you can see, this editor looks very similar to the actions editor discussed a
    | Event Rule | The supplied rules are loaded into the rule engine of the given Race Assistant. These rules have full access to the knowledge base and all other rules of this Assistant.<br><br>The event rules can use the full knowledge to derive whether the event in question should be raised. They then raise the event by *calling* the "Assistant.Raise* predicate, optionally supplying additional arguments to the event, which can be referenced in the event phrase.<br><br>Note: Actually, you don't have to raise an event in the event rules, if you are able to handle the situation directly using the rules. In this case, the LLM is not activated. |
    | Event Disabled | This is a special one, inidcated by a "-" in the "Active" column in the list of events. It declares that the event is consumed, so that the rule engine does not do the default processing for this event. But the event is also processed by the LLM effectively disabling this type of event at all. This makes sense in combination with very smart LLMs, which will trigger actions simply by looking at the data (see the discussion [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#connecting-events--actions). This makes only sense for the builtin events, of course. |
 
-3. When defining the rules for a custom event, you can use all the predicates introduced above for actions. Additionally, you can use:
+3. When defining the rules for a custom event, you can use all the predicates and functions introduced above for actions. Additionally, you can use:
    
    - Assistant.Raise(signal, p1, p2, ...)
    
@@ -656,7 +656,7 @@ Another example, this time using arguments:
 
 This event signals a position change. The previous position and the new position are passed to the LLM for further investigation. Please note the subtle usage of the previous value of *Position.Lost* in the rule actions. Although it will be reset in the first action, the old value will be used in the second action. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#referencing-facts-in-production-rules) for more information about this variable behaviour.
  
-Please also take a look at the other predefined events of the Race Engineer or the other Assistants to learn more about writing event rules. And I recommend to take a look at the knowledge base of a session to learn more about all the facts you canuse in the event rules (and also the action rules). To do this, activate the "Debug Knowledgebase" item in the tray bar menu of a given Assistant applicaton. Then open the corrsponding "*.knowledge" file in the *Simulator Controller\Temp* folder which is located in your user *Documents* folder.
+Please also take a look at the other predefined events of the Race Engineer or the other Assistants to learn more about writing event rules. And I recommend to take a look at the knowledge base of a session to learn more about all the facts you can use in the event rules (and also the action rules). To do this, activate the "Debug Knowledgebase" item in the tray bar menu of a given Assistant applicaton. Then open the corrsponding "*.knowledge" file in the *Simulator Controller\Temp* folder which is located in your user *Documents* folder.
 
 Good to know: When an event handler is located for a given event signal, custom events are checked before all predefined events. This allows for customization of the predefined events.
 

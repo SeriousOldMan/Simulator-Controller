@@ -121,7 +121,8 @@ Notes:
   1. If you have set a number of required pitstops **and** a pitstop window, it depends on the starting fuel, whether the requirements can be met.
   2. If you have set a pitstop window, it is possible that some settings of the optimizer will be ignored to fullfil the pitstop window requirements.
   3. If you choose "Disallowed" for refueling or tyre change, this restriction applies to the whole session. If you have to apply more context specific restrictions, this can be achieved using the rule based validations, which are described in the next section.
-  4. If you are simulating a session with a restricted number of tyre sets, the simulation will keep track of the the tyre usage and may reuse a tyre set, when necessary. In this case, the tyre set with the least amount of usage will always be used next.
+  4. Using the list labeled "Tyre Sets" you can specify how many laps are typically possible with a give tyre compound mixture and how many tyre sets of each of these are available. This will be used to determine the best tyre set for each pitstop in the derived strategy. Typically all tyre compound mixtures, which are generally available for a given car are listed here. If a given compound mixture is not available for a particular race or should not be used in the resulting strategy, set the number of available tyre sets to **0**.
+  5. If you are simulating a session with a restricted number of tyre sets, the simulation will keep track of the the tyre usage and may reuse a tyre set, when necessary. In this case, the tyre set with the least amount of usage will always be used next.
   
 #### Scenario validation
 
@@ -412,7 +413,7 @@ Enter the required values in the *Initial Conditions* group, choose the data to 
 	
   - Tyre Usage
   
-	Here you have a range from 0 to 100% to enable some kind of *over-* or *underuse* of tyres. If you set the "Tyre Usage" slider to 30%, for example, this means that the tyres can be used for 54 laps, even if the optimum tyre life is at the beginning 40 laps was set. This might be useful to skip the tyre change in the last shorter stint of an endurance race. The number of possible laps will be varied on a stint by stint base, not only for the whole race.
+	Here you have a range from 0 to 100% to enable some kind of *over-* or *underuse* of tyres. If you set the "Tyre Usage" slider to 30%, for example, this means that the tyres can be used for 54 laps, even if the optimum tyre life for the given tyre compound mixture has been defined as 40 laps. This might be useful to skip the tyre change in the last shorter stint of an endurance race. The number of possible laps will be varied on a stint by stint base, not only for the whole race.
 	
   - Tyre Compound
   

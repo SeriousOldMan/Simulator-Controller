@@ -30,6 +30,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\Framework\Application.ahk"
+#Include "..\Framework\Configuration.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -483,7 +484,7 @@ closeApplication(application) {
 launchPad(command := false, arguments*) {
 	global kSimulatorConfiguration
 
-	local ignore, application, startupConfig, x, y, infoButton, settingsButton
+	local ignore, theApplication, startupConfig, x, y, infoButton, settingsButton
 	local name, options, lastModified, hasTeamServer, restart, version
 
 	static result := false
@@ -782,16 +783,17 @@ launchPad(command := false, arguments*) {
 		writeMultiMap(kUserConfigDirectory . "Application Settings.ini", startupConfig)
 	}
 	else if (command = "Launch") {
-		application := arguments[1]
+		theApplication := arguments[1]
 
-		if ProcessExist(application)
-			WinActivate("ahk_exe " . application)
+		if ProcessExist(theApplication)
+			WinActivate("ahk_exe " . theApplication)
 		else {
 			startupConfig := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-			restart := inList(["Simulator Setup.exe", "Simulator Configuration.exe"], application)
+			restart := inList(["Simulator Setup.exe", "Simulator Configuration.exe"], theApplication)
 
-			if (getMultiMapValue(startupConfig, "Simulator", "Simulator", kUndefined) != kUndefined)
-				application .= (" -Simulator `"" . getMultiMapValue(startupConfig, "Simulator", "Simulator") . "`""
+			if ((getMultiMapValue(startupConfig, "Simulator", "Simulator", kUndefined) != kUndefined) &&
+				Application(SessionDatabase.getSimulatorName(getMultiMapValue(startupConfig, "Simulator", "Simulator")), kSimulatorConfiguration).isRunning())
+				theApplication .= (" -Simulator `"" . getMultiMapValue(startupConfig, "Simulator", "Simulator") . "`""
 							  . " -Car `"" . getMultiMapValue(startupConfig, "Simulator", "Car") . "`""
 							  . " -Track `"" . getMultiMapValue(startupConfig, "Simulator", "Track") . "`"")
 
@@ -801,9 +803,9 @@ launchPad(command := false, arguments*) {
 				try {
 					lastModified := FileGetTime(getFileName(kSimulatorConfigurationFile, kUserConfigDirectory, kConfigDirectory), "M")
 
-					Run(kBinariesDirectory . application)
+					Run(kBinariesDirectory . theApplication)
 
-					while ProcessExist(application)
+					while ProcessExist(theApplication)
 						Sleep(1000)
 
 					if (lastModified != FileGetTime(getFileName(kSimulatorConfigurationFile, kUserConfigDirectory, kConfigDirectory), "M")) {
@@ -817,7 +819,7 @@ launchPad(command := false, arguments*) {
 				}
 			}
 			else
-				Run(kBinariesDirectory . application)
+				Run(kBinariesDirectory . theApplication)
 		}
 
 		if ((arguments.Length > 1) && arguments[2])

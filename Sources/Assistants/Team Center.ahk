@@ -5877,13 +5877,13 @@ class TeamCenter extends ConfigurationItem {
 
 	getStrategySettings(&simulator, &car, &track, &weather, &airTemperature, &trackTemperature
 					  , &sessionType, &sessionLength, &additionalLaps
-					  , &maxTyreLaps, &tyreCompound, &tyreCompoundColor, &tyrePressures) {
+					  , &tyreCompound, &tyreCompoundColor, &tyrePressures) {
 		local strategy := this.Strategy
 		local lapsDB, candidate
 
 		if strategy {
 			if this.Simulator {
-				simulator := SessionDatabase().getSimulatorName(this.Simulator)
+				simulator := SessionDatabase.getSimulatorName(this.Simulator)
 				car := this.Car
 				track := this.Track
 			}
@@ -5926,7 +5926,6 @@ class TeamCenter extends ConfigurationItem {
 			sessionType := strategy.SessionType
 			sessionLength := strategy.SessionLength
 			additionalLaps := strategy.AdditionalLaps
-			maxTyreLaps := strategy.MaxTyreLaps
 			tyrePressures := strategy.TyrePressures
 
 			return true
@@ -6043,7 +6042,7 @@ class TeamCenter extends ConfigurationItem {
 			strategy := this.Strategy
 
 			if this.Simulator {
-				simulator := SessionDatabase().getSimulatorName(this.Simulator)
+				simulator := SessionDatabase.getSimulatorName(this.Simulator)
 				car := this.Car
 				track := this.Track
 			}

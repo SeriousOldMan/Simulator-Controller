@@ -685,13 +685,15 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 	choosePSTyreSet(listView, line, *) {
 		local compound := listView.GetText(line, 1)
-		local count := listView.GetText(line, 2)
+		local laps := listView.GetText(line, 2)
+		local count := listView.GetText(line, 3)
 
 		if line {
 			if compound
 				compound := normalizeCompound(compound)
 
 			settingsGui["tyreSetDropDown"].Choose(inList(collect(gTyreCompounds, translate), compound))
+			settingsGui["tyreSetLapsEdit"].Text := laps
 			settingsGui["tyreSetCountEdit"].Text := count
 		}
 
@@ -721,9 +723,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 						break
 					}
 
-			tyreSetListView.Modify(row, "", compound, settingsGui["tyreSetCountEdit"].Text)
-
-			tyreSetListView.ModifyCol()
+			tyreSetListView.Modify(row, "", compound, settingsGui["tyreSetLapsEdit"].Text, settingsGui["tyreSetCountEdit"].Text)
 		}
 
 		editRaceSettings(&updateState)
@@ -747,9 +747,8 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		tyreSetListView.Add("", collect(gTyreCompounds, translate)[index], 99)
 		tyreSetListView.Modify(tyreSetListView.GetCount(), "Select Vis")
 
-		tyreSetListView.ModifyCol()
-
 		settingsGui["tyreSetDropDown"].Choose(index)
+		settingsGui["tyreSetLapsEdit"].Value := 50
 		settingsGui["tyreSetCountEdit"].Value := 99
 
 		editRaceSettings(&updateState)
@@ -863,9 +862,10 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		tyreSetListView.Delete()
 
 		for ignore, compound in gTyreCompounds
-			tyreSetListView.Add("", translate(compound), 99)
+			tyreSetListView.Add("", translate(compound), 50, 99)
 
 		tyreSetListView.ModifyCol()
+		tyreSetListView.ModifyCol(1, 75)
 	}
 
 	if (settingsOrCommand == kLoad) {
@@ -956,15 +956,18 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		if (rulesActive && (tyreSetListView.GetNext(0) > 0)) {
 			settingsGui["tyreSetDropDown"].Enabled := true
+			settingsGui["tyreSetLapsEdit"].Enabled := true
 			settingsGui["tyreSetCountEdit"].Enabled := true
 			settingsGui["tyreSetDeleteButton"].Enabled := true
 		}
 		else {
 			settingsGui["tyreSetDropDown"].Enabled := false
+			settingsGui["tyreSetLapsEdit"].Enabled := false
 			settingsGui["tyreSetCountEdit"].Enabled := false
 			settingsGui["tyreSetDeleteButton"].Enabled := false
 
 			settingsGui["tyreSetDropDown"].Choose(0)
+			settingsGui["tyreSetLapsEdit"].Text := ""
 			settingsGui["tyreSetCountEdit"].Text := ""
 		}
 
@@ -1366,7 +1369,8 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 				splitCompound(gTyreCompounds[inList(translatedCompounds, tyreSetListView.GetText(A_Index, 1))]
 							, &tyreCompound, &tyreCompoundColor)
 
-				tyreSets.Push(values2String(":", tyreCompound, tyreCompoundColor, tyreSetListView.GetText(A_Index, 2)))
+				tyreSets.Push(values2String("#", tyreCompound, tyreCompoundColor
+											   , tyreSetListView.GetText(A_Index, 3), tyreSetListView.GetText(A_Index, 2)))
 			}
 
 			setMultiMapValue(newSettings, "Session Rules", "Tyre.Sets", values2String(";", tyreSets*))
@@ -1516,20 +1520,24 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.Add("Text", "x" . (x5 - 10) . " yp+30 w85 h23 +0x200", translate("Tyre Sets"))
 
-		w12 := (x11 + 70 - x7)
+		w12 := (x11 + 60 - x7)
 
-		tyreSetListView := settingsGui.Add("ListView", "x" . x7 . " yp w" . w12 . " h115 -Multi -Hdr -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "#"], translate))
+		tyreSetListView := settingsGui.Add("ListView", "x" . x7 . " yp w" . w12 . " h220 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "O", "#"], translate))
 		tyreSetListView.OnEvent("Click", choosePSTyreSet)
 		tyreSetListView.OnEvent("DoubleClick", choosePSTyreSet)
 		tyreSetListView.OnEvent("ItemSelect", selectPSTyreSet)
 
-		x13 := (x7 + w12 + 15)
+		x13 := (x7 + w12 + 5)
 
-		settingsGui.Add("DropDownList", "x" . x13 . " yp w106 Choose0 vtyreSetDropDown", [translate(normalizeCompound("Dry"))]).OnEvent("Change", updatePSTyreSet)
+		settingsGui.Add("DropDownList", "x" . x13 . " yp w85 Choose0 vtyreSetDropDown", [translate(normalizeCompound("Dry"))]).OnEvent("Change", updatePSTyreSet)
+
+		settingsGui.Add("Edit", "x" . (x13 + 86) . " yp w40 h20 Limit2 Number vtyreSetLapsEdit").OnEvent("Change", updatePSTyreSet)
+		settingsGui.Add("UpDown", "x" . (x13 + 86) . " yp w18 h20 0x80 Range0-99")
+
 		settingsGui.Add("Edit", "x" . x13 . " yp+24 w40 h20 Limit2 Number vtyreSetCountEdit").OnEvent("Change", updatePSTyreSet)
 		settingsGui.Add("UpDown", "x" . x13 . " yp w18 h20 0x80 Range0-99")
 
-		x13 := (x7 + w12 + 5 + 116 - 48)
+		x13 := (x7 + w12 + 5 + 126 - 48)
 
 		settingsGui.Add("Button", "x" . x13 . " yp+6 w23 h23 Center +0x200 vtyreSetAddButton").OnEvent("Click", addPSTyreSet)
 		setButtonIcon(settingsGui["tyreSetAddButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
@@ -1985,15 +1993,30 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 																									  , "Optional")))
 
 		loop tyreSetListView.GetCount()
-			tyreSetListView.Modify(A_Index, "-Select Col2", 99)
+			tyreSetListView.Modify(A_Index, "-Select Col3", 99)
 
 		for ignore, tyreCompound in string2Values(";", getMultiMapValue(settingsOrCommand, "Session Rules"
 																						 , "Tyre.Sets", "")) {
-			tyreCompound := string2Values(":", tyreCompound)
+			if InStr(tyreCompound, ":") {
+				tyreCompound := string2Values(":", tyreCompound)
 
-			loop tyreSetListView.GetCount()
-				if (translate(compound(tyreCompound[1], tyreCompound[2])) = tyreSetListView.GetText(A_Index, 1))
-					tyreSetListView.Modify(A_Index, "Col2", tyreCompound[3])
+				loop tyreSetListView.GetCount()
+					if (translate(compound(tyreCompound[1], tyreCompound[2])) = tyreSetListView.GetText(A_Index, 1)) {
+						tyreSetListView.Modify(A_Index, "Col3", tyreCompound[3])
+
+						if (tyreCompound.Length > 3)
+							tyreSetListView.Modify(A_Index, "Col2", tyreCompound[4])
+					}
+			}
+			else {
+				tyreCompound := string2Values("#", tyreCompound)
+
+				loop tyreSetListView.GetCount()
+					if (translate(compound(tyreCompound[1], tyreCompound[2])) = tyreSetListView.GetText(A_Index, 1)) {
+						tyreSetListView.Modify(A_Index, "Col3", tyreCompound[3])
+						tyreSetListView.Modify(A_Index, "Col2", tyreCompound[4])
+					}
+			}
 		}
 
 		editRaceSettings(&updateState)

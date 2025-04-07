@@ -1252,6 +1252,7 @@ class RaceAssistant extends ConfigurationItem {
 		local car := this.SettingsDatabase.getCarName(this.Simulator, this.Car)
 		local track := this.SettingsDatabase.getTrackName(this.Simulator, this.Track)
 		local lapNumber, tyreSet, lapNr, laps, tyreSets, tyreCompound, weather, bestLapTime, stint, engine, value
+		local sessionFormat, additionalLaps
 
 		static sessionTypes
 
@@ -1291,13 +1292,19 @@ class RaceAssistant extends ConfigurationItem {
 																				: (InStr(tyreCompound, "Wet") ? ["LightRain", "MediumRain", "HeavyRain", "Thunderstorm"]
 																											  : ["Drizzle", "LightRain"])))
 
+					sessionFormat := knowledgeBase.getValue("Session.Format", "Time")
+					additionalLaps := knowledgeBase.getValue("Session.AdditionalLaps", 0)
+
+					if (additionalLaps > 0)
+						sessionFormat .= (" + " . additionalLaps . " lap")
+
 					knowledge["Session"] := Map("Simulator", simulator
 											  , "Car", car
 											  , "Track", track
 											  , "TrackType", this.TrackType
 											  , "TrackLength", (this.TrackLength . " Meters")
 											  , "Type", sessionTypes[this.Session]
-											  , "Format", knowledgeBase.getValue("Session.Format", "Time")
+											  , "Format", sessionFormat
 											  , "RemainingLaps", Ceil(knowledgeBase.getValue("Lap.Remaining.Session", 0))
 											  , "RemainingTime", (Round(knowledgeBase.getValue("Session.Time.Remaining", 0) / 1000) . " seconds")
 											  , "AvailableTyres", tyreSets)
@@ -2046,6 +2053,7 @@ class RaceAssistant extends ConfigurationItem {
 		local simulator := getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
 		local simulatorName := this.SettingsDatabase.getSimulatorName(simulator)
 		local sessionFormat := getMultiMapValue(data, "Session Data", "SessionFormat", "Time")
+		local additionalLaps := getMultiMapValue(data, "Session Data", "AdditionalLaps", 0)
 		local sessionTimeRemaining := getDeprecatedValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
 		local sessionLapsRemaining := getDeprecatedValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0)
 		local dataDuration := Round((sessionTimeRemaining + lapTime) / 1000)
@@ -2071,6 +2079,7 @@ class RaceAssistant extends ConfigurationItem {
 					facts.setFact("Session.Laps", laps)
 
 				facts.setFact("Session.Format", sessionFormat)
+				facts.setFact("Session.AdditionalLaps", additionalLaps)
 			}
 			else {
 				if (!facts.Has("Session.Duration") || (facts["Session.Duration"] == 0))
@@ -2080,6 +2089,7 @@ class RaceAssistant extends ConfigurationItem {
 					facts["Session.Laps"] := laps
 
 				facts["Session.Format"] := sessionFormat
+				facts["Session.AdditionalLaps"] := additionalLaps
 			}
 
 		if update

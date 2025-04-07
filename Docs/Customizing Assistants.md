@@ -539,7 +539,7 @@ You can enable or disable individual predefined actions using the checkbox on th
    
 	   estimateTrackWetness() <= calculateTrackWetness(), Assistant.Speak("It will be too wet. I will come up with a new strategy."), Assistant.Call(planPitstop)
 
-   Up to 6 arguments are supported for predicates with a variable number of arguments. If you need to pass more arguments, use the syntax Call(*Assistant.Call*, *function*, p1, ..., pn) for backward chaining rules. Same applies to any other of the above *calls*.
+   Up to 6 arguments are supported for predicates with a variable number of arguments. If you need to pass more arguments, use the syntax Call(*Assistant.Call*, function, p1, ..., pn) for backward chaining rules. Same applies to any other of the above *calls*.
 	   
    In forward chaining rules, the syntax is a bit different:
    

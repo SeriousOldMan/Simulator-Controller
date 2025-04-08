@@ -31,12 +31,14 @@
 
   - Fixed translation of the session type (race, practice, ...) used by the Engineer in cases where the spoken language is different than the language used for the user interface.
   - Invisible characters had been introduced into the "Drivers" database with the automated update procedure of Release 6.2.6. This caused many problems in the "Session Database" and in the handling of driver specific data in general. Fixed with this version.
+  - Fixed refuel calculation for the last stint in races with a fixed number of laps.
 
 #### Changes
 
+  - Changed some calculations for remaining stint laps and remaining session laps for races with a configured post race lap for the last stint.
   - Strategies can now handle a specific number of usable laps per tyre compound mixture. For example, if a soft tyre has been chosen for a given stint, this stint will typically be shorter than one, where hard tyres are used.
     - The usable tyre life can be configured per tyre compound mixture in the [*Rules & Settings* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#rules--settings) of the "Strategy Workbench.
-	- It can also be configured in the [*Rules* tab]((https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-rules), if a race is run on simple rules, rather than a full pre-defined strategy.
+	- It can also be configured in the [*Rules* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-rules), if a race is run on simple rules, rather than a full pre-defined strategy.
 	- The general "Tyre Usage" setting formerly available in the "Strategy Workbench" has been removed.
 	- The strategy simulation will now try to use the best suitable tyre compound mixture for a given stint, even if the "Tyre Compound" *Optimizer* is not used. The decision is based on tyre life and stint length.
   - Support for "+ 1 lap" race formats has been added throughout the system.

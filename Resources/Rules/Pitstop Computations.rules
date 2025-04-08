@@ -67,7 +67,8 @@ pitstopRefuelServiceTime(?lap, ?targetLap, ?refillTime) <=
 		?deltaLaps = ?targetLap - ?lap,
 		lapAvgConsumption(?lap, ?avgConsumption), lapRemainingFuel(?lap, ?temp1),
 		?correction = ?deltaLaps * ?avgConsumption, ?remainingFuel = ?temp1 - ?correction,
-		remainingSessionLaps(?lap, ?tempLaps), ?remainingLaps = ?tempLaps - ?deltaLaps,
+		remainingSessionLaps(?lap, ?sessionLaps), postRaceLaps(?postRaceLaps), ?tempLaps = ?sessionLaps + ?postRaceLaps,
+		?remainingLaps = ?tempLaps - ?deltaLaps,
 		?sessionFuel = ?avgConsumption * ?remainingLaps, safetyFuel(?avgConsumption, ?safetyFuel),
 		?neededFuel = ?sessionFuel + ?safetyFuel, ?refillAmount = ?neededFuel - ?remainingFuel,
 		min(?refillAmount, !Session.Settings.Fuel.Max, ?temp2), max(0, ?temp2, ?adjustedRefillAmount),
@@ -84,8 +85,8 @@ pitstopRefillServiceTime(?, ?refillAmount, ?refillTime) <=
 
 pitstopTyreServiceTime(?lap, ?targetLap, !Session.Settings.Pitstop.Service.Tyres.Duration) <=
 		?deltaLaps = ?targetLap - ?lap,
-		remainingSessionLaps(?lap, ?tempLaps), ?remainingLaps = ?tempLaps - ?deltaLaps,
-		?remainingLaps > 5, ! 
+		remainingSessionLaps(?lap, ?sessionLaps), postRaceLaps(?postRaceLaps), ?tempLaps = ?sessionLaps + ?postRaceLaps,
+		?remainingLaps = ?tempLaps - ?deltaLaps, ?remainingLaps > 5, ! 
 pitstopTyreServiceTime(?, ?, 0)
 
 pitstopTyreServiceTime(false, 0) <= !

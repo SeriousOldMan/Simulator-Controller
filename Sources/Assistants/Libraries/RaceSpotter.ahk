@@ -867,6 +867,8 @@ class RaceSpotter extends GridRaceAssistant {
 
 	iFocusedCar := kUndefined
 
+	iFinalLap := false
+
 	iPendingAlerts := []
 	iAlertProcessing := false
 
@@ -1103,6 +1105,12 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
+	FinalLap {
+		Get {
+			return this.iFinalLap
+		}
+	}
+
 	PrivateSession {
 		Get {
 			return this.iPrivateSession
@@ -1170,6 +1178,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 		if (values.HasProp("Session") && (values.Session == kSessionFinished)) {
 			this.iRunning := false
+			this.iFinalLap := false
 
 			this.initializeHistory()
 		}
@@ -1462,31 +1471,49 @@ class RaceSpotter extends GridRaceAssistant {
 
 	finalLap() {
 		local knowledgeBase := this.KnowledgeBase
+		local additionalLaps := knowledgeBase.getValue("Session.AdditionalLaps")
+		local sessionLapsRemaining := knowledgeBase.getValue("Session.Lap.Remaining")
+		local driverCar := knowledgeBase.getValue("Driver.Car")
+		local finalLap := this.FinalLap
 		local sessionTimeRemaining, driverCar, running, time
 
-		if (knowledgeBase.getValue("Session.Format") = "Time") {
-			sessionTimeRemaining := knowledgeBase.getValue("Session.Time.Remaining")
-			driverCar := knowledgeBase.getValue("Driver.Car")
+		if finalLap
+			return (knowledgeBase.getValue("Car." . finalLap[1] . ".Laps") >= finalLap[2])
+		else {
+			if (knowledgeBase.getValue("Session.Format") = "Time") {
+				sessionTimeRemaining := knowledgeBase.getValue("Session.Time.Remaining")
 
-			if (sessionTimeRemaining < (knowledgeBase.getValue("Car." . driverCar . ".Time", 0) * 2)) {
-				loop knowledgeBase.getValue("Car.Count", 0)
-					if (knowledgeBase.getValue("Car." . A_Index . ".Position") = 1) {
-						time := knowledgeBase.getValue("Car." . A_Index . ".Time")
-						running := knowledgeBase.getValue("Car." . A_Index . ".Lap.Running")
+				if (sessionTimeRemaining < (knowledgeBase.getValue("Car." . driverCar . ".Time", 0) * 2)) {
+					loop knowledgeBase.getValue("Car.Count", 0)
+						if (knowledgeBase.getValue("Car." . A_Index . ".Position") = 1) {
+							time := knowledgeBase.getValue("Car." . A_Index . ".Time")
+							running := knowledgeBase.getValue("Car." . A_Index . ".Lap.Running")
 
-						if ((sessionTimeRemaining - ((1 - running) * time)) <= 0)
-							return true
+							if ((sessionTimeRemaining - ((1 - running) * time)) <= 0)
+								if (additionalLaps > 0) {
+									this.iFinalLap := [A_Index, knowledgeBase.getValue("Car." . A_Index . ".Laps") + additionalLaps]
 
-						break
-					}
+									return false
+								}
+								else
+									return true
 
-				return (sessionTimeRemaining <= 0)
+							break
+						}
+
+					return (sessionTimeRemaining <= 0)
+				}
+				else
+					return false
+			}
+			else if ((additionalLaps > 0) && driverCar && (sessionLapsRemaining = 1)) {
+				this.iFinalLap := [driverCar, knowledgeBase.getValue("Car." . driverCar . ".Laps") + 1 + additionalLaps]
+
+				return false
 			}
 			else
-				return false
+				return (sessionLapsRemaining <= 0)
 		}
-		else
-			return (knowledgeBase.getValue("Session.Lap.Remaining") <= 0)
 	}
 
 	reviewRaceStart(lastLap, sector, positions) {

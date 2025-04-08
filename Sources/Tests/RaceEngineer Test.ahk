@@ -1062,7 +1062,7 @@ if !GetKeyState("Ctrl") {
 	withBlockedWindows(MsgBox, "Full run took " . (A_TickCount - startTime) . " ms")
 }
 else {
-	raceNr := (GetKeyState("Alt") ? 3 : ((GetKeyState("Shift") ? 2 : 1)))
+	raceNr := (GetKeyState("Alt") ? 3 : ((GetKeyState("Shift") ? 2 : 20)))
 
 	engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer.settings")
 							   , TestPitStopHandler(), "Jona", "EN", true, true, false, true, true, true, true, true, true)
@@ -1285,6 +1285,42 @@ else {
 
 						if engineer.Debug[kDebugKnowledgeBase]
 							engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+
+						withBlockedWindows(MsgBox, "Pitstop")
+					}
+
+					if isDebug()
+						showMessage("Data " lap . "." . A_Index . " loaded...")
+				}
+			}
+		}
+		until done
+	}
+	else if (raceNr == 20) {
+		done := false
+
+		loop {
+			lap := A_Index
+
+			loop {
+				data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 20\Race Engineer Lap " . lap . "." . A_Index . ".data")
+
+				if (data.Count == 0) {
+					if (A_Index == 1)
+						done := true
+
+					break
+				}
+				else {
+					if (A_Index == 1)
+						engineer.addLap(lap, &data)
+					else
+						engineer.updateLap(lap, &data)
+
+					if (lap = 37) {
+						engineer.planPitstop()
+
+						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 						withBlockedWindows(MsgBox, "Pitstop")
 					}

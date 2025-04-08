@@ -2753,7 +2753,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	saveSessionSettings() {
-		local knowledgeBase, compound, settingsDB, simulator, car, track, duration, weather, compound, compoundColor, oldValue
+		local knowledgeBase, compound, settingsDB, simulator, car, track, weather, oldValue
 		local loadSettings, lapTime, fileName, settings
 
 		if this.hasEnoughData(false) {
@@ -2763,10 +2763,7 @@ class RaceAssistant extends ConfigurationItem {
 			simulator := settingsDB.getSimulatorName(knowledgeBase.getValue("Session.Simulator"))
 			car := knowledgeBase.getValue("Session.Car")
 			track := knowledgeBase.getValue("Session.Track")
-			duration := knowledgeBase.getValue("Session.Duration")
 			weather := knowledgeBase.getValue("Weather.Weather.Now")
-			compound := knowledgeBase.getValue("Tyre.Compound")
-			compoundColor := knowledgeBase.getValue("Tyre.Compound.Color")
 
 			oldValue := getMultiMapValue(this.Configuration, "Race Engineer Startup", simulator . ".LoadSettings", "Default")
 			loadSettings := getMultiMapValue(this.Configuration, "Race Assistant Startup", simulator . ".LoadSettings", oldValue)

@@ -520,18 +520,18 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 
 		chooseSessionType(*) {
-			local sessionType := ["Time", "Time+1", "Laps", "Laps+1"][workbenchGui["sessionTypeDropDown"].Value]
+			local sessionType := ["Time", "Time + 1", "Laps", "Laps + 1"][workbenchGui["sessionTypeDropDown"].Value]
 			local additionalLaps := 0
 
 			switch sessionType {
 				case "Time":
 					sessionType := "Duration"
-				case "Time+1":
+				case "Time + 1":
 					sessionType := "Duration"
 					additionalLaps := 1
 				case "Laps":
 					sessionType := "Laps"
-				case "Laps+1":
+				case "Laps + 1":
 					sessionType := "Laps"
 					additionalLaps := 1
 				default:
@@ -1234,7 +1234,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.SetFont("Norm", "Arial")
 
-		workbenchGui.Add("DropDownList", "x" . x0 . " yp+21 w70 Choose1  VsessionTypeDropDown", collect(["Time", "Time+1", "Laps", "Laps+1"], translate)).OnEvent("Change", chooseSessionType)
+		workbenchGui.Add("DropDownList", "x" . x0 . " yp+21 w70 Choose1  VsessionTypeDropDown", collect(["Time", "Time + 1", "Laps", "Laps + 1"], translate)).OnEvent("Change", chooseSessionType)
 		workbenchGui.Add("Edit", "x" . x1 . " yp w50 h20 Limit4 Number VsessionLengthEdit", 60)
 		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range1-9999 0x80", 60)
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w50 h20 VsessionLengthLabel", translate("Minutes"))

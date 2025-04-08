@@ -36,7 +36,7 @@
 
   - Strategies can now handle a specific number of usable laps per tyre compound mixture. For example, if a soft tyre has been chosen for a given stint, this stint will typically be shorter than one, where hard tyres are used.
     - The usable tyre life can be configured per tyre compound mixture in the [*Rules & Settings* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#rules--settings) of the "Strategy Workbench.
-	- It can also be configured in the [*Rules* tab]((https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-rules), if a race is run on simple rules, rather than a full pre-defined strategy.
+	- It can also be configured in the [*Rules* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-rules), if a race is run on simple rules, rather than a full pre-defined strategy.
 	- The general "Tyre Usage" setting formerly available in the "Strategy Workbench" has been removed.
 	- The strategy simulation will now try to use the best suitable tyre compound mixture for a given stint, even if the "Tyre Compound" *Optimizer* is not used. The decision is based on tyre life and stint length.
   - Support for "+ 1 lap" race formats has been added throughout the system.

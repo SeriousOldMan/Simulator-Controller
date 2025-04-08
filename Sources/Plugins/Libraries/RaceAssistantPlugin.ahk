@@ -1620,10 +1620,11 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	}
 
 	static finalLap(data, &state) {
+		local additionalLaps := getMultiMapValue(data, "Session Data", "AdditionalLaps", 0)
+		local driverCar := getMultiMapValue(data, "Position Data", "Driver.Car")
 		local leader, driver, sessionTimeRemaining, driverCar, time, leaderRunning, driverRunning
 
 		if (getMultiMapValue(data, "Session Data", "SessionFormat") = "Time") {
-			driverCar := getMultiMapValue(data, "Position Data", "Driver.Car")
 			sessionTimeRemaining := getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0)
 
 			if (sessionTimeRemaining < (getMultiMapValue(data, "Position Data", "Car." . driverCar . ".Time", 0) * 2)) {
@@ -1641,13 +1642,13 @@ class RaceAssistantPlugin extends ControllerPlugin {
 							if ((leaderRunning < 0.1) || (driverRunning < 0.1))
 								return false
 
-							leader := {Car: A_Index, Finish: getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Laps") + 1}
+							leader := {Car: A_Index, Finish: getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Laps") + 1 + additionalLaps}
 
 							if (driverCar != A_Index)
 								if (driverRunning > leaderRunning)
-									driver := {Car: driverCar, Finish: getMultiMapValue(data, "Position Data", "Car." . driverCar . ".Laps") + 2}
+									driver := {Car: driverCar, Finish: getMultiMapValue(data, "Position Data", "Car." . driverCar . ".Laps") + 2 + additionalLaps}
 								else
-									driver := {Car: driverCar, Finish: getMultiMapValue(data, "Position Data", "Car." . driverCar . ".Laps") + 1}
+									driver := {Car: driverCar, Finish: getMultiMapValue(data, "Position Data", "Car." . driverCar . ".Laps") + 1 + additionalLaps}
 						}
 
 						break
@@ -1658,7 +1659,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 						logMessage(kLogDebug, "Time is up...")
 
 					leader := false
-					driver := {Car: driverCar, Finish: getMultiMapValue(data, "Position Data", "Car." . driverCar . ".Laps") + 1}
+					driver := {Car: driverCar, Finish: getMultiMapValue(data, "Position Data", "Car." . driverCar . ".Laps") + 1 + additionalLaps}
 				}
 
 				if (leader || driver) {
@@ -1680,6 +1681,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			else
 				return false
 		}
+		else if ((additionalLaps > 0) && driverCar && (getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0) = 1))
+			return [false, {Car: driverCar, Finish: knowledgeBase.getValue("Car." . driverCar . ".Laps") + 1 + additionalLaps}]
 		else if (getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0) <= 0) {
 			state := [true, true]
 

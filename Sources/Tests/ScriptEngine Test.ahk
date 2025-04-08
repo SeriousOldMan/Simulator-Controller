@@ -180,6 +180,28 @@ class SharedDataTest extends Assert {
 	}
 }
 
+class LibraryTest extends Assert {
+	Module_Test() {
+		global vTestResult
+
+		vTestResult := false
+
+		L := luaL_newstate()
+
+		luaL_openlibs(L)
+
+		setPrint(L, lua_print)
+
+		lua_pushstring(L, kSourcesDirectory . "Tests\Test Scripts\?.lua")
+
+		lua_setglobal(L, "modulesFolder")
+
+		luaL_dofile(L, kSourcesDirectory . "Tests\Test Scripts\test04.lua")
+
+		this.AssertTrue(vTestResult, "Module loading failed...")
+	}
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Initialization Section                          ;;;
@@ -188,5 +210,6 @@ class SharedDataTest extends Assert {
 AHKUnit.AddTestClass(IntegrationTest)
 AHKUnit.AddTestClass(BasicTest)
 AHKUnit.AddTestClass(SharedDataTest)
+AHKUnit.AddTestClass(LibraryTest)
 
 AHKUnit.Run()

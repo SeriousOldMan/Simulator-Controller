@@ -35,7 +35,7 @@ Loading of settings is supported for:
      This is the most complete method for initialization of the Rules & Settings. It is most useful, after you restarted "Simulator Workbench" and want to continue your work on a Strategy. Simply load it using the "Strategy" menu and than choose this command. The following fields are loaded from the strategy:
 	 
 	 - Rules & Settings
-	   - Race Duration
+	   - Race Duration (format "Time" or "Laps" and also whether an additional lap has to be driven)
 	   - Stint Limit
 	   - Formation Lap
 	   - Post Race Lap
@@ -122,6 +122,7 @@ Notes:
   3. If you choose "Disallowed" for refueling or tyre change, this restriction applies to the whole session. If you have to apply more context specific restrictions, this can be achieved using the rule based validations, which are described in the next section.
   4. Using the list labeled "Tyre Sets" you can specify how many laps are typically possible with a give tyre compound mixture and how many tyre sets of each of these are available. This will be used to determine the best tyre set for each pitstop in the derived strategy. Typically all tyre compound mixtures, which are generally available for a given car are listed here. If a given compound mixture is not available for a particular race or should not be used in the resulting strategy, set the number of available tyre sets to **0**.
   5. If you are simulating a session with a restricted number of tyre sets, the simulation will keep track of the the tyre usage and may reuse a tyre set, when necessary. In this case, the tyre set with the least amount of usage will always be used next.
+  6. Be aware, that only *Automobilista 2* and *Project CARS 2* support sessions with one additional lap after the *normal* end of the session, which can be simulated with "Time + 1" or "Laps + 1" session lengths. 
   
 #### Scenario validation
 

@@ -158,8 +158,13 @@ lua_replace(L, idx) => (lua_copy(L, -1, idx), lua_pop(L, 1))
 lua_upvalueindex(i) => (LUA_REGISTRYINDEX - (i))
 
 initializeScriptEngine() {
-	if FileExist(kBinariesDirectory . "Code Runtime\lua54.dll")
-		DllCall("LoadLibrary", "Str", kBinariesDirectory . "Code Runtime\lua54.dll", "Ptr")
+	if !DllCall("LoadLibrary", "Str", kBinariesDirectory . "Code Runtime\lua54.dll", "Ptr") {
+		logMessage(kLogCritical, translate("Error while initializing script engine - please rebuild the applications"))
+
+		if (!kSilentMode)
+			showMessage(translate("Error while initializing script engine - please rebuild the applications") . translate("...")
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+	}
 }
 
 

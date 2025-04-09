@@ -174,3 +174,11 @@ Unfortunately, this simulator does not provide any information about the current
 Tyre compounds are identified by an integer in *iRacing*. As mentioned above, the order of the tyre compounds in the tyre compound rule therefore must resemble the order of available tyre compounds for the given car. The default compound "Dry" is always available. The most simple rule for a car which provides a dry and a wet compound will typically look like this:
 
 	Dry->Dry (M);Wet->Wet (M)
+
+## Usable life of a tyre compound
+
+Depending on the given car and track combination, and also depending on the personal driving style, each tyre compound will have a specific number of laps, after which it will be beneficial to change the tyres. This information is used in the "Stratgy Workbench" and also, if you run a race using *simple* race rules defined in "Race Settings". You can specifiy the default values for the tyre life in the "Session Database" using the "Pitstop: Tyre Compound Usage" setting. The format is as follows:
+
+	Dry (S)->15;Dry (M)->25;Dry (H)->40
+
+where the number specifies the number of laps for which the corresponding tyre compound mixture can be used.

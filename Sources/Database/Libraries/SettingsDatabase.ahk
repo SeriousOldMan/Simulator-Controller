@@ -267,6 +267,9 @@ class SettingsDatabase extends SessionDatabase {
 		car := this.getCarCode(simulator, car)
 		track := this.getTrackCode(simulator, track)
 
+		if ((simulator = "Unknown") || (car = "Unknown") || (track = "Unknown"))
+			return
+
 		while (tries-- > 0) {
 			if database.lock("Settings", false)
 				try {
@@ -309,6 +312,9 @@ class SettingsDatabase extends SessionDatabase {
 
 		car := this.getCarCode(simulator, car)
 		track := this.getTrackCode(simulator, track)
+
+		if ((simulator = "Unknown") || (car = "Unknown") || (track = "Unknown"))
+			return
 
 		while (tries-- > 0) {
 			if database.lock("Settings", false)

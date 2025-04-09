@@ -2623,7 +2623,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		local car := this.SelectedCar
 		local track := this.SelectedTrack
 		local strategy, pitstopRule, pitstopWindow
-		local ignore, descriptor, directory, numPitstops, name, pitstop, tyreCompound, tyreCompoundColor
+		local ignore, descriptor, directory, numPitstops, name, pitstop, tyreCompound, tyreCompoundColor, tyreLife
 		local simulator, car, track, simulatorCode, dirName, file, settings, settingsDB, msgResult
 		local lapsDB, fastestLapTime, row, lapTime, prefix, data, fuelCapacity, initialFuelAmount, map
 		local validators, index, fileName, validator, index, forecast, time, hour, minute, value, fixedPitstop, found
@@ -3040,6 +3040,12 @@ class StrategyWorkbench extends ConfigurationItem {
 
 						if (getMultiMapValue(settings, "Session Settings", "Fuel.AvgConsumption", kUndefined) != kUndefined)
 							this.Control["simFuelConsumptionEdit"].Text := displayValue("Float", convertUnit("Volume", getMultiMapValue(settings, "Session Settings", "Fuel.AvgConsumption")))
+
+						if (getMultiMapValue(settings, "Session Settings", "Tyre.Compound.Usage", kUndefined) != kUndefined)
+							for tyreCompound, tyreLife in string2Map(";", "->", getMultiMapValue(settings, "Session Settings", "Tyre.Compound.Usage"))
+								loop this.TyreSetListView.GetCount()
+									if (translate(tyreCompound) = this.TyreSetListView.GetText(A_Index, 1))
+										this.TyreSetListView.Modify(A_Index, "Col2", tyreLife)
 					}
 				}
 				else {

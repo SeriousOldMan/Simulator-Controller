@@ -1,5 +1,4 @@
 ## Introduction
-
 The "Strategy Workbench" is a very valuable tool, which can be used either stand-alone or together with Cato, the AI Race Strategist. With the help of this tool, you can develop a pitstop and tyre strategy for an upcoming race. Simple sprint races with a single required pitstop are supported as well as endurance races with multiple stints and complex tyre and fuel saving strategies. An important feature of this tool is the ability to analyze telemetry data of past races, that have been collected by Cato. This telemetry information is stored in the local database at the end of a session, as long as this has been activated in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist) for the given simulator.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Workbench.JPG)

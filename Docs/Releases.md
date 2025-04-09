@@ -41,6 +41,7 @@
 	- It can also be configured in the [*Rules* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-rules), if a race is run on simple rules, rather than a full pre-defined strategy.
 	- The general "Tyre Usage" setting formerly available in the "Strategy Workbench" has been removed.
 	- The strategy simulation will now try to use the best suitable tyre compound mixture for a given stint, even if the "Tyre Compound" *Optimizer* is not used. The decision is based on tyre life and stint length.
+	- A [new setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" allows you to define tyre compound miture specific tyre life as default values. If a specific setting is not available, 50 laps will be assumed as default. See also the [new documentation about tyre life](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#usable-life-of-a-tyre-compound).
   - Support for "+ 1 lap" race formats has been added throughout the system.
     - You can choose two additional session types in the "Strategy Workbench" before simulating a strategy - *Time + 1* lap and *Laps + 1* lap. *Time + 1* is supported by *Automobilista 2* and *Project CARS 2* according to my knowledge, but it was easy to add *Laps + 1* as well.
 	- For *Automobilista 2* and *Project CARS 2*, the information about additional laps is read from the API.

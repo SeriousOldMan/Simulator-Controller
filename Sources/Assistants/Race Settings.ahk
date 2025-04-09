@@ -63,7 +63,7 @@ global kRaceSettingsFile := getFileName("Race.settings", kUserConfigDirectory)
 global gSimulator := false
 global gCar := false
 global gTrack := false
-global gWeather := "Dry"
+global gWeather := "*"
 global gAirTemperature := 23
 global gTrackTemperature := 27
 
@@ -852,7 +852,8 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 	}
 
 	loadTyreCompounds() {
-		local translatedCompounds, ignore, compound
+		local settings := SettingsDatabase().loadSettings(gSimulator, gCar, gTrack, gWeather)
+		local translatedCompounds, ignore, compound, tyreLife
 
 		translatedCompounds := collect(gTyreCompounds, translate)
 
@@ -863,6 +864,12 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		for ignore, compound in gTyreCompounds
 			tyreSetListView.Add("", translate(compound), 50, 99)
+
+		if (getMultiMapValue(settings, "Session Settings", "Tyre.Compound.Usage", kUndefined) != kUndefined)
+			for compound, tyreLife in string2Map(";", "->", getMultiMapValue(settings, "Session Settings", "Tyre.Compound.Usage"))
+				loop tyreSetListView.GetCount()
+					if (translate(compound) = tyreSetListView.GetText(A_Index, 1))
+						tyreSetListView.Modify(A_Index, "Col2", tyreLife)
 
 		tyreSetListView.ModifyCol()
 		tyreSetListView.ModifyCol(1, 75)
@@ -2056,7 +2063,7 @@ showRaceSettingsEditor() {
 	gSimulator := false
 	gCar := false
 	gTrack := false
-	gWeather := "Dry"
+	gWeather := "*"
 	gAirTemperature := 23
 	gTrackTemperature := 27
 	gTyreCompound := false

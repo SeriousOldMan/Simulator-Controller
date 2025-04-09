@@ -43,7 +43,7 @@ If you already have collected data for cars or tracks, which have a character fr
 
 1. Go to [Documents]\Simulator Controller\Database\User\[sim] with [sim] the code for the simulator you are using.
 2. Look for the directory with the data for the car. There may be two now. Combine all the data into the directory which fulfills the filter rule.
-3. Open the file [Documents]\Simulator Controller\Simulator Data\[sim]\Car Data.ini and correct the entries in question.
+3. Open the file [Documents]\Simulator Controller\Simulator Data\[sim]\Car Data.ini with a double-byte capable text editor like Notepad++ and correct the entries in question.
 4. Do the same for [Documents]\Simulator Controller\Simulator Data\[sim]\Track Data.ini, if necessary.
 
 In doubt, or if you need support, contact me in our Discord.

@@ -1682,7 +1682,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				return false
 		}
 		else if ((additionalLaps > 0) && driverCar && (getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0) = 1))
-			return [false, {Car: driverCar, Finish: knowledgeBase.getValue("Car." . driverCar . ".Laps") + 1 + additionalLaps}]
+			return [false, {Car: driverCar, Finish: getMultiMapValue(data, "Position Data", "Car." . driverCar . ".Laps") + 1 + additionalLaps}]
 		else if (getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0) <= 0) {
 			state := [true, true]
 

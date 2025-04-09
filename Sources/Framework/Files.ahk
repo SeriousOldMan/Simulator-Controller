@@ -20,6 +20,17 @@
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+normalizeFileName(fileName) {
+	local ignore, character
+
+	static disallowedCharacters := ["/" , ":", "*", "?", "<", ">", "|"]
+
+	for ignore, character in disallowedCharacters
+		fileName := StrReplace(fileName, character, "")
+
+	return fileName
+}
+
 getFileName(fileName, directories*) {
 	local driveName, ignore, directory
 

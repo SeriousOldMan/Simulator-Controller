@@ -1133,9 +1133,11 @@ class SessionDatabase extends ConfigurationItem {
 
 	static getCarName(simulator, car) {
 		local name := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
-									 , "Car Names", car, car)
+									 , "Car Names", car, kUndefined)
 
-		if (!name || (name = ""))
+		if (name == kUndefined)
+			name := normalizeFileName(car)
+		else if (!name || (name = ""))
 			name := car
 
 		return name
@@ -1147,10 +1149,12 @@ class SessionDatabase extends ConfigurationItem {
 
 	static getCarCode(simulator, car) {
 		local code := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
-									 , "Car Codes", car, car)
+									 , "Car Codes", car, kUndefined)
 
-		if (!code || (code = ""))
-			code := car
+		if (code == kUndefined)
+			code := normalizeFileName(car)
+		else if (!code || (code = ""))
+			code := normalizeFileName(car)
 
 		return code
 	}
@@ -1215,13 +1219,15 @@ class SessionDatabase extends ConfigurationItem {
 
 	static getTrackName(simulator, track, long := true) {
 		local name := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
-									 , long ? "Track Names Long" : "Track Names Short", track, track)
+									 , long ? "Track Names Long" : "Track Names Short", track, kUndefined)
 
-		if (StrLen(name) < 5)
+		if ((name != kUndefined) && (StrLen(name) < 5))
 			name := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
 									 , "Track Names Long", track, name)
 
-		if (!name || (name = ""))
+		if (name == kUndefined)
+			name := normalizeFileName(track)
+		else if (!name || (name = ""))
 			name := track
 
 		return StrTitle(name)
@@ -1233,10 +1239,12 @@ class SessionDatabase extends ConfigurationItem {
 
 	static getTrackCode(simulator, track) {
 		local code := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
-									 , "Track Codes", track, track)
+									 , "Track Codes", track, kUndefined)
 
-		if (!code || (code = ""))
-			code := track
+		if (code == kUndefined)
+			code := normalizeFileName(track)
+		else if (!code || (code = ""))
+			code := normalizeFileName(track)
 
 		return code
 	}

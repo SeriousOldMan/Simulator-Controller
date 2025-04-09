@@ -19,9 +19,8 @@
   2. Better answers by the Strategist, when a pitstop cannot be recommended
   3. Support for partial tyre changes
   4. Integrate support for LAMs
-  5. Support for Time+1 session format
-  6. Approaching corner braking point countdown
-  7. Configurable priority for voice output between Spotter and other Assistants
+  5. Approaching corner braking point countdown
+  6. Configurable priority for voice output between Spotter and other Assistants
 
 #### Session Database
   1. Active validation of value ranges in settings definitions

@@ -1670,6 +1670,11 @@ class StrategyWorkbench extends ConfigurationItem {
 		car := this.SelectedCar
 		track := this.SelectedTrack
 
+		workbenchGui["sessionTypeDropDown"].Choose(Max(1, inList(["Time", "Time + 1", "Laps", "Laps + 1"]
+															   , getMultiMapValue(settings, "Strategy Workbench", "Session Type", "Time"))))
+
+		chooseSessionType()
+
 		this.loadSimulator(simulator, true)
 
 		if car
@@ -2588,19 +2593,29 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	selectSessionType(sessionType, additionalLaps := 0) {
+		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
 		this.iSelectedSessionType := sessionType
 		this.iSelectedAdditionalLaps := additionalLaps
 
 		if (sessionType = "Duration") {
+			sessionType := ("Time" . (additionalLaps ? (" + " . additionalLaps) : ""))
+
 			this.Control["sessionTypeDropDown"].Choose(1 + additionalLaps)
 			this.Control["sessionLengthLabel"].Text := translate("Minutes")
 			this.Control["simSessionResultLabel"].Text := translate("Laps")
 		}
 		else {
+			sessionType := ("Laps" . (additionalLaps ? (" + " . additionalLaps) : ""))
+
 			this.Control["sessionTypeDropDown"].Choose(3 + additionalLaps)
 			this.Control["sessionLengthLabel"].Text := translate("Laps")
 			this.Control["simSessionResultLabel"].Text := translate("Seconds")
 		}
+
+		setMultiMapValue(settings, "Strategy Workbench", "Session Type", sessionType)
+
+		writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 	}
 
 	chooseSettingsMenu(line) {

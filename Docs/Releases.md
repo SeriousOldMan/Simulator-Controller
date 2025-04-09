@@ -47,10 +47,14 @@
 	- The Engineer adjusts fuel for the additional laps.
 	- The announcement of the last lap of the Spotter also uses the information about an additional lap.
 	- Lastly, detection of the end of the session will also use this informaton.
+  - The "Strategy Workbench" now *remembers* the selected session type.
+  - A filter has been integrated which removes characters from car names and track names, before these are stored in the session database. This can make exsiting database entries inaccessible. Please consult the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-637) on information how to restore your data.
   - [Expert] A new type of *Reasoning* booster named "Rules" has been introduced, which runs without a connected LLM. Only rules are allowed as event source, but all action types, including scripts defined in  [Lua](https://lua.org) are supported. Please read the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster) for more information.
     - A new action function / predicate named *Assistant.Trigger* is available, which allows the event rules to trigger a defined action by name, rather than by using an LLM to select the action by the current situation, since no LLM is active when the "Rules" booster is selected.
   - [Expert] The "Assistant.Speak" function / predicate used in the Assistant booster actions now uses the *Rephrasing* booster, if it is configured. This introduces immersive variations of the spoken message.
   - [Expert] Rules defined in the [Hybrid Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine) can now use the *Execute* clause to [call scripts](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#actions) written in the script language [Lua](https://lua.org) introduced with the last release and vice-versa. This allows you to choose the language, which is best suited for a given task.
+  
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-627), if you experience inaccessible car or track data in the session database.
   
 # Release history
 

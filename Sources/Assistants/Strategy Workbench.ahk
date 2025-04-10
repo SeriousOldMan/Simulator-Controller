@@ -2728,11 +2728,13 @@ class StrategyWorkbench extends ConfigurationItem {
 									break
 								}
 
+							/*
 							if !found
 								if (descriptor.Length > 3)
 									this.TyreSetListView.Add("", translate(compound(descriptor[1], descriptor[2])), descriptor[4], descriptor[3])
 								else
 									this.TyreSetListView.Add("", translate(compound(descriptor[1], descriptor[2])), 50, descriptor[3])
+							*/
 
 							loop this.TyreSetListView.GetCount()
 								if (translate(compound(descriptor[1], descriptor[2])) = this.TyreSetListView.GetText(A_Index, 1)) {
@@ -2884,22 +2886,12 @@ class StrategyWorkbench extends ConfigurationItem {
 							this.Control["pitstopDeltaEdit"].Text := getMultiMapValue(settings, "Strategy Settings", "Pitstop.Delta", 60)
 							this.Control["pitstopTyreServiceEdit"].Text := getMultiMapValue(settings, "Strategy Settings", "Service.Tyres", 30)
 
-							value := string2Values(":", getMultiMapValue(settings, "Strategy Settings", "Service.Refuel", 1.8))
+							value := getMultiMapValue(settings, "Strategy Settings", "Service.Refuel.Rule", "Dynamic")
 
-							if (value.Length = 1) {
-								value := value[1]
+							this.Control["pitstopFuelServiceRuleDropDown"].Choose(1 + (value != "Fixed"))
+							this.Control["pitstopFuelServiceLabel"].Text := translate(["Seconds", "Seconds (Refuel of 10 liters)"][1 + (value != "Fixed")])
+							this.Control["pitstopFuelServiceEdit"].Text := displayValue("Float", getMultiMapValue(settings, "Strategy Settings", "Service.Refuel", 1.8))
 
-								this.Control["pitstopFuelServiceRuleDropDown"].Choose(2)
-								this.Control["pitstopFuelServiceLabel"].Text := translate("Seconds (Refuel of 10 liters)")
-							}
-							else {
-								this.Control["pitstopFuelServiceRuleDropDown"].Choose(1 + (value[1] != "Fixed"))
-								this.Control["pitstopFuelServiceLabel"].Text := translate(["Seconds", "Seconds (Refuel of 10 liters)"][1 + (value[1] != "Fixed")])
-
-								value := value[2]
-							}
-
-							this.Control["pitstopFuelServiceEdit"].Text := displayValue("Float", value)
 							this.Control["pitstopServiceDropDown"].Choose((getMultiMapValue(settings, "Strategy Settings", "Service.Order", "Simultaneous") = "Simultaneous") ? 1 : 2)
 							this.Control["safetyFuelEdit"].Text := displayValue("Float", convertUnit("Volume", getMultiMapValue(settings, "Session Settings", "Fuel.SafetyMargin", 4)), 0)
 
@@ -2966,13 +2958,16 @@ class StrategyWorkbench extends ConfigurationItem {
 									this.Control["tyreChangeRequirementsDropDown"].Choose(inList(["Optional", "Always", "Disallowed"], getMultiMapValue(settings, "Session Rules", "Pitstop.Tyre", "Optional")))
 								}
 
-								for ignore, descriptor in string2Values(";", getMultiMapValue(settings, "Session Rules"
-																									  , "Tyre.Sets", "")) {
-									descriptor := string2Values(":", descriptor)
+								for ignore, descriptor in string2Values(";", getMultiMapValue(settings, "Session Rules", "Tyre.Sets", "")) {
+									descriptor := string2Values(InStr(descriptor, ":") ? ":" : "#", descriptor)
 
 									loop this.TyreSetListView.GetCount()
-										if (translate(compound(descriptor[1], descriptor[2])) = this.TyreSetListView.GetText(A_Index, 1))
+										if (translate(compound(descriptor[1], descriptor[2])) = this.TyreSetListView.GetText(A_Index, 1)) {
 											this.TyreSetListView.Modify(A_Index, "Col3", descriptor[3])
+
+											if (descriptor.Length > 3)
+												this.TyreSetListView.Modify(A_Index, "Col2", descriptor[4])
+										}
 								}
 
 								this.TyreSetListView.ModifyCol()

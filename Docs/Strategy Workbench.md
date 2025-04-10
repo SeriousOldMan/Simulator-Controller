@@ -38,7 +38,7 @@ Loading of settings is supported for:
 	   - Stint Limit
 	   - Formation Lap
 	   - Post Race Lap
-	   - All Pitstop Rules incl. Tyre Sets
+	   - All Pitstop Rules incl. data for Tyre Sets that are already configured in "Strategy Workbench"
 	 - Pitstop & Service
 	   - Pitstop Delta
 	   - Tyre Service Time
@@ -68,12 +68,12 @@ Loading of settings is supported for:
 	 - Rules & Settings
 	   - Formation Lap
 	   - Post Race Lap
-	   - Pitstop rules (if active)
+	   - Race rules (if active)
 	     - Pitstop Rule
 		 - Pitstop Window (Regular)
 		 - Refuel Rule
 		 - Tyre Change Rule
-		 - Available Tyre Sets
+		 - Tyre Sets (only for those that are already configured in "Strategy Workbench")
 		 - Stint Limit
 	 - Pitstop & Service
 	   - Pitstop Delta

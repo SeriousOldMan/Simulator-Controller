@@ -769,7 +769,7 @@ systemMonitor(command := false, arguments*) {
 			if (temperature != kUndefined) {
 				hasTemperatures := true
 
-				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Temperature (Water)") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Temperature (Water)") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", convertUnit("Temperature", temperature)) . "</td></tr>")
 			}
 
@@ -778,7 +778,7 @@ systemMonitor(command := false, arguments*) {
 			if (temperature != kUndefined) {
 				hasTemperatures := true
 
-				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Temperature (Oil)") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Temperature (Oil)") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", convertUnit("Temperature", temperature)) . "</td></tr>")
 			}
 		}

@@ -32,6 +32,8 @@
   - Fixed translation of the session type (race, practice, ...) used by the Engineer in cases where the spoken language is different than the language used for the user interface.
   - Invisible characters had been introduced into the "Drivers" database with the automated update procedure of Release 6.2.6. This caused many problems in the "Session Database" and in the handling of driver specific data in general. Fixed with this version.
   - Fixed refuel calculation for the last stint in races with a fixed number of laps.
+  - Fixed layout of engine temeperature widget in "System Monitor".
+  - Fixed import of race settings into "Strategy Workbench".
 
 #### Changes
 

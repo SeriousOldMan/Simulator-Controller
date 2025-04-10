@@ -157,6 +157,14 @@ When different mixtures are available for a given tyre type, only the first one 
 
 Looking at the above table, you can understand when and why a tyre change will be recommended by the Race Engineer or when you recalculate the currently active strategy either in the "Team Center" or by instructing the Race Strategist. As long as the currently mounted tyre has a suitable category, no unplanned pitstop will be requested. If you come in for a regular pitstop, the tyre compound with the optimal category will always be chosen, as long as it is available (see note (1)). But in the case, that the currently mounted tyre is not suitable for the current or upcoming weather conditions, an urgent pitstop will be requested and the optimal tyre compound will be chosen, if available.
 
+### Usable life of a Tyre Compound
+
+Depending on the given car and track combination, and also depending on the personal driving style, each tyre compound will have a specific number of laps, after which it will be beneficial to change the tyres. This information is used in the "Stratgy Workbench" and also, if you run a race using *simple* race rules defined in "Race Settings". You can specifiy the default values for the tyre life in the "Session Database" using the "Pitstop: Tyre Compound Usage" setting. The format is as follows:
+
+	Dry (S)->15;Dry (M)->25;Dry (H)->40
+
+where the number specifies the number of laps for which the corresponding tyre compound mixture can be used.
+
 ### Default Tyre Compound
 
 The default tyre compouund is "Dry", when no dedicated information is available for a given car. This was the behaviour before the introduction of the tyre compound model. So everything should work as before, when you do nothing, but you may not be able to change the compound for a pitstop.
@@ -174,11 +182,3 @@ Unfortunately, this simulator does not provide any information about the current
 Tyre compounds are identified by an integer in *iRacing*. As mentioned above, the order of the tyre compounds in the tyre compound rule therefore must resemble the order of available tyre compounds for the given car. The default compound "Dry" is always available. The most simple rule for a car which provides a dry and a wet compound will typically look like this:
 
 	Dry->Dry (M);Wet->Wet (M)
-
-## Usable life of a tyre compound
-
-Depending on the given car and track combination, and also depending on the personal driving style, each tyre compound will have a specific number of laps, after which it will be beneficial to change the tyres. This information is used in the "Stratgy Workbench" and also, if you run a race using *simple* race rules defined in "Race Settings". You can specifiy the default values for the tyre life in the "Session Database" using the "Pitstop: Tyre Compound Usage" setting. The format is as follows:
-
-	Dry (S)->15;Dry (M)->25;Dry (H)->40
-
-where the number specifies the number of laps for which the corresponding tyre compound mixture can be used.

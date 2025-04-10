@@ -342,6 +342,8 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 			model := Trim(carName[1])
 			category := Trim(carName[2])
 		}
+
+		model := normalizeFileName(model)
 	}
 
 	parseDriverName(carID, carName, forName, surName, nickName, &category?) {

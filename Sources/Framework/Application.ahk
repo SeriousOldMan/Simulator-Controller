@@ -266,11 +266,9 @@ checkForNews() {
 										if FileExist(kTempDirectory . "News\News.htm") {
 											viewHTML(kTempDirectory . "News\News.htm")
 
-											Task.startTask(() {
-												setMultiMapValue(news, "News", nr, A_Now)
+											setMultiMapValue(news, "News", nr, A_Now)
 
-												writeMultiMap(kUserConfigDirectory . "NEWS", news)
-											}, 10000, kLowPriority)
+											writeMultiMap(kUserConfigDirectory . "NEWS", news)
 
 											break
 										}

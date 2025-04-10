@@ -249,6 +249,26 @@ void printDataValue(std::ostringstream* output, const irsdk_header* header, cons
 	}
 }
 
+bool replace(std::string& str, const std::string& from, const std::string& to) {
+	size_t start_pos = str.find(from);
+	if (start_pos == std::string::npos)
+		return false;
+	str.replace(start_pos, from.length(), to);
+	return true;
+}
+
+std::string normalizeName(std::string result) {
+	replace(result, "/", "");
+	replace(result, ":", "");
+	replace(result, "*", "");
+	replace(result, "?", "");
+	replace(result, "<", "");
+	replace(result, ">", "");
+	replace(result, "|", "");
+
+	return result;
+}
+
 bool getRawDataValue(char* &value, const irsdk_header* header, const char* data, const char* variable) {
 	if (header && data) {
 		for (int i = 0; i < header->numVars; i++) {
@@ -732,7 +752,7 @@ void writePositions(std::ostringstream* output, const irsdk_header *header, cons
 
 				getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarScreenName:", carIdx);
 
-				printLine(output, "Car." + std::string(carIdx1) + ".Car=" + std::string(result));
+				printLine(output, "Car." + std::string(carIdx1) + ".Car=" + normalizeName(std::string(result)));
 
 				getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarClassShortName:", carIdx);
 
@@ -945,22 +965,22 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 			printLine(output, "FuelAmount=" + std::to_string(maxFuel));
 
 			if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackName:"))
-				printLine(output, "Track=" + std::string(result));
+				printLine(output, "Track=" + normalizeName(std::string(result)));
 			else
 				printLine(output, "Track=Unknown");
 
 			if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackDisplayName:"))
-				printLine(output, "TrackLongName=" + std::string(result));
+				printLine(output, "TrackLongName=" + normalizeName(std::string(result)));
 			else
 				printLine(output, "TrackLongName=Unknown");
 
 			if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackDisplayShortName:"))
-				printLine(output, "TrackShortName=" + std::string(result));
+				printLine(output, "TrackShortName=" + normalizeName(std::string(result)));
 			else
 				printLine(output, "TrackShortName=Unknown");
 
 			if (getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarScreenName:", playerCarIdx))
-				printLine(output, "Car=" + std::string(result));
+				printLine(output, "Car=" + normalizeName(std::string(result)));
 			else
 				printLine(output, "Car=Unknown");
 

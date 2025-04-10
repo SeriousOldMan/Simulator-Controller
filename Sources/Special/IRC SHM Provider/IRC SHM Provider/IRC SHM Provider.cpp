@@ -230,6 +230,26 @@ void printDataValue(const irsdk_header* header, const char* data, const char* va
 	}
 }
 
+bool replace(std::string& str, const std::string& from, const std::string& to) {
+	size_t start_pos = str.find(from);
+	if (start_pos == std::string::npos)
+		return false;
+	str.replace(start_pos, from.length(), to);
+	return true;
+}
+
+std::string normalizeName(std::string result) {
+	replace(result, "/", "");
+	replace(result, ":", "");
+	replace(result, "*", "");
+	replace(result, "?", "");
+	replace(result, "<", "");
+	replace(result, ">", "");
+	replace(result, "|", "");
+
+	return result;
+}
+
 bool getRawDataValue(char* &value, const irsdk_header* header, const char* data, const char* variable) {
 	if (header && data) {
 		for (int i = 0; i < header->numVars; i++) {
@@ -728,7 +748,7 @@ void writePositions(const irsdk_header *header, const char* data)
 
 				getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarScreenName:", carIdx);
 
-				printf("Car.%s.Car=%s\n", carIdx1, result);
+				printf("Car.%s.Car=%s\n", carIdx1, normalizeName(result).c_str());
 
 				getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarClassShortName:", carIdx);
 
@@ -958,22 +978,22 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			printf("FuelAmount=%f\n", maxFuel);
 
 			if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackName:"))
-				printf("Track=%s\n", result);
+				printf("Track=%s\n", normalizeName(result).c_str());
 			else
 				printf("Track=Unknown\n");
 
 			if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackDisplayName:"))
-				printf("TrackLongName=%s\n", result);
+				printf("TrackLongName=%s\n", normalizeName(result).c_str());
 			else
 				printf("TrackLongName=Unknown\n");
 
 			if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackDisplayShortName:"))
-				printf("TrackShortName=%s\n", result);
+				printf("TrackShortName=%s\n", normalizeName(result).c_str());
 			else
 				printf("TrackShortName=Unknown\n");
 
 			if (getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarScreenName:", playerCarIdx))
-				printf("Car=%s\n", result);
+				printf("Car=%s\n", normalizeName(result).c_str());
 			else
 				printf("Car=Unknown\n");
 

@@ -215,6 +215,19 @@ namespace SHMConnector
             return nullIdx >= 0 ? Encoding.Default.GetString(bytes, 0, nullIdx) : Encoding.Default.GetString(bytes);
         }
 
+        string normalizeName(string result)
+        {
+            result = result.Replace("/", "");
+            result = result.Replace(":", "");
+            result = result.Replace("*", "");
+            result = result.Replace("?", "");
+            result = result.Replace("<", "");
+            result = result.Replace(">", "");
+            result = result.Replace("|", "");
+
+            return result;
+        }
+
         public string GetForname(string name)
         {
             if (name.Contains(" "))
@@ -281,7 +294,7 @@ namespace SHMConnector
 
                     string carModel = GetStringFromBytes(car.carModel);
 
-                    strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Car="); strWriter.WriteLine(carModel);
+                    strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Car="); strWriter.WriteLine(normalizeName(carModel));
 
                     string driverName = GetStringFromBytes(car.driverName);
 
@@ -329,8 +342,8 @@ namespace SHMConnector
 
                 strWriter.Write("Session="); strWriter.WriteLine(session);
 
-                strWriter.Write("Car="); strWriter.WriteLine(staticInfo.CarModel);
-                strWriter.Write("Track="); strWriter.WriteLine(staticInfo.Track + "-" + staticInfo.TrackConfiguration);
+                strWriter.Write("Car="); strWriter.WriteLine(normalizeName(staticInfo.CarModel));
+                strWriter.Write("Track="); strWriter.WriteLine(normalizeName(staticInfo.Track) + "-" + normalizeName(staticInfo.TrackConfiguration));
                 strWriter.Write("SessionFormat="); strWriter.WriteLine((session == "Practice" || staticInfo.IsTimedRace != 0) ? "Time" : "Laps");
                 strWriter.Write("FuelAmount="); strWriter.WriteLine(staticInfo.MaxFuel);
 

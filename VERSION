@@ -1,15 +1,15 @@
 [Development]
-Version=6.2.7.0-beta
+Version=6.2.7.0-release
 Target=6.2.7.0-release
-Date=04/10/2025
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/cUA1teJg
+Date=04/11/2025
+Download=https://cutt.ly/LrdV22mb;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/R1Fh7T6X;https://www.dropbox.com/scl/fi/e9rn5oj8x9t4lhhoxq9u2/Simulator-Controller-6.2.7.0-release.zip?rlkey=ygoy8gjlvb5si0zplul70dhrz&st=6ky83iof&dl=1;http://87.177.159.148:800/api/public/dl/RqOSaimc;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.2.7.0-release.zip
 Changes=Fixed translation of session type by Engineer for mixed language settings, Assistant.Speak uses Rephrasing booster, All new Rules Provider for Reasoning booster, Support for bi-directional calls between Rule Engine and Script Engine, Individual tyre life / laps per tyre compound in "Strategy Workbench" and "Race Settings", Strategy simulation now selects the best tyre compound mixture based on the number of laps in a stint, Fixed Drivers.CSV file, Support for time + 1 lap races in "Strategy Workbench", Engineer does understand time + 1 lap races, Fixed refuel calculation in lap races for the last stint, Character filter for car and track names, Updated tyre meta data for AMS2, Fixed layout of engine temeperature widget in "System Monitor", Fixed import of race settings into "Strategy Workbench"
 Components=Media->5.6.1,Configuration->6.2.4,Utilities->6.2.2
 [Release]
-Version=6.2.6.0-release
-Date=04/04/2025
-Download=https://cutt.ly/HrsgQmc1;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/oHisPxfv;https://www.dropbox.com/scl/fi/ii5waziqpm3joq2et3w6y/Simulator-Controller-6.2.6.0-release.zip?rlkey=sfpp5m852jnlz01lmkp97vhpn&st=dkuofi70&dl=1;http://87.177.159.148:800/api/public/dl/yjU9EZDU
-Changes=Fixed several UTF encoding problems for driver names in the session database, Integrated Lua as scripting language, New core settings for folder locations, New resizing rules for "Strategy Workbech", Fixed several translation errors, Integration of scripts in "Strategy Workbench" and in the Assistant boosters, Higher priority for accident ahead in distance alerts by the Spotter
+Version=6.2.7.0-release
+Date=04/11/2025
+Download=https://cutt.ly/LrdV22mb;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/R1Fh7T6X;https://www.dropbox.com/scl/fi/e9rn5oj8x9t4lhhoxq9u2/Simulator-Controller-6.2.7.0-release.zip?rlkey=ygoy8gjlvb5si0zplul70dhrz&st=6ky83iof&dl=1;http://87.177.159.148:800/api/public/dl/RqOSaimc;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.2.7.0-release.zip
+Changes=Fixed translation of session type by Engineer for mixed language settings, Assistant.Speak uses Rephrasing booster, All new Rules Provider for Reasoning booster, Support for bi-directional calls between Rule Engine and Script Engine, Individual tyre life / laps per tyre compound in "Strategy Workbench" and "Race Settings", Strategy simulation now selects the best tyre compound mixture based on the number of laps in a stint, Fixed Drivers.CSV file, Support for time + 1 lap races in "Strategy Workbench", Engineer does understand time + 1 lap races, Fixed refuel calculation in lap races for the last stint, Character filter for car and track names, Updated tyre meta data for AMS2, Fixed layout of engine temeperature widget in "System Monitor", Fixed import of race settings into "Strategy Workbench"
 Components=Media->5.6.1,Configuration->6.2.4,Utilities->6.2.2
 [Components]
 Media.5.6.1.Path=Resources
@@ -24,5 +24,5 @@ Utilities.6.2.2.Download=https://fileshare.impresion3d.pro/filebrowser/api/publi
 [Current]
 Type=Development
 [Version]
-Development=6.2.7.0-dev
-Release=6.2.6.0-release
+Development=6.2.7.0-release
+Release=6.2.7.0-release

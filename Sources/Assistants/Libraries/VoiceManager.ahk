@@ -835,6 +835,9 @@ class VoiceManager extends ConfigurationItem {
 
 		if options.Has("VoiceServer")
 			this.iVoiceServer := options["VoiceServer"]
+
+		if this.PushToTalk
+			this.iPushToTalk := string2Values(InStr(this.PushToTalk, ";") ? ";" : "|", this.PushToTalk)
 	}
 
 	hasPushtoTalk() {
@@ -843,11 +846,13 @@ class VoiceManager extends ConfigurationItem {
 
 	initializePushToTalk() {
 		local p2tHotkey := this.PushToTalk
+		local ignore, key
 
 		switch this.PushToTalkMode, false {
 			case "Press":
-				if p2THotkey
-					Hotkey(p2tHotkey, ObjBindMethod(this, "listen", true), "On")
+				if p2tHotkey
+					for ignore, key in p2tHotkey
+						Hotkey(key, ObjBindMethod(this, "listen", true), "On")
 			case "Hold":
 				if p2THotkey
 					PeriodicTask(ObjBindMethod(this, "listen", false), 50, kInterruptPriority).start()
@@ -892,6 +897,8 @@ class VoiceManager extends ConfigurationItem {
 	listen(toggle, down := true) {
 		local listen := false
 		local pressed := false
+		local clicked := false
+		local ignore, key
 
 		static isPressed := false
 		static lastDown := 0
@@ -905,8 +912,12 @@ class VoiceManager extends ConfigurationItem {
 		static speed := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 									   , "Voice", "Activation Speed", DllCall("GetDoubleClickTime"))
 
-		try
-			pressed := toggle ? down : GetKeyState(this.PushToTalk)
+		try {
+			for ignore, key in this.PushToTalk
+				clicked := (clicked || GetKeyState(key))
+
+			pressed := (toggle ? down : clicked)
+		}
 
 		if (pressed && !isPressed) {
 			lastDown := A_TickCount

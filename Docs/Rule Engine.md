@@ -522,7 +522,9 @@ The rule engine has some builtin predicates which can be used when formulating r
 	
 	This is a very special predicate. It interrupts the reduction rule execution and allows the rule engine to run all pending production rules. Since these can *call* reduction rules in their actions and also in their conditions, this results in a stack of active execution environments.
 	
-  - execute(executable, arg1, ..., argN)
+  - execute
+  
+    Syntax: execute(executable, arg1, ..., argN)
   
     Executes the executable or script identified by the first argument, which must be file name. Additional arguments will be passed to the executable enclosed by paranthesis and seperated by spaces. The default implementation supports the typical executable files, like EXE, CMD or BAT files, which can be run by Windows. Please note, that the working directory will be set to the directory of the executable for the time of execution.
 	

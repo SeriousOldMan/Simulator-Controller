@@ -131,6 +131,8 @@ initializeDebugging() {
 
 	PeriodicTask(reportHighMemoryUsage.Bind(criticalMemory), 1000, kInterruptPriority).start()
 
+	DirCreate(kUserHomeDirectory . "Diagnose")
+
 	if !FileExist(kUserHomeDirectory . "Diagnose\UPLOAD")
 		FileAppend(A_Now, kUserHomeDirectory . "Diagnose\UPLOAD")
 	else {
@@ -296,17 +298,17 @@ logError(exception, unexpected := false, report := true) {
 		logMessage(critical ? kLogCritical : kLogDebug
 				 , translate(unexpected ? "Unexpected exception encountered in " : "Handled exception encountered in ")
 				 . exception.File . translate(" at line ") . exception.Line . translate(": ") . message
-				 , true, critical)
+				 , true, unexpected)
 
 
 		if exception.HasProp("Stack")
 			logMessage(critical ? kLogCritical : kLogDebug, "`n`nStack:`n`n" . exception.Stack
-					 , false, critical)
+					 , false, unexpected)
 	}
 	else
 		logMessage(critical ? kLogCritical : kLogDebug
 				 , translate(unexpected ? "Unexpected exception encountered: " : "Handled exception encountered: ") . exception
-				 , true, critical)
+				 , true, unexpected)
 
 	if (verbose && (unexpected || report))
 		if isObject(exception)

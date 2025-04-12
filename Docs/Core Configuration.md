@@ -36,6 +36,12 @@ Built on top of the Task framework, the Message Manager handles the communcation
 | Messages     | Schedule | 200 | The number of milliseconds to wait between each run of the message scheduler, which sends messages to and receives messages from other processes of Simulator Controller. |
 |      | Dispatch | 100 | All received messages are placed in a queue for processing. This setting defines the number of milliseconds to let other activities run between each message processing. |
 
+The group of *Diagnose* settings define, how diagnose and error information is handled to improve the reliability and stability of Simulator Controller.
+
+| Category | Setting | Default | Description |
+|----------|---------|---------|-------------|
+| Diagnose | Critical | *True* | If this is *True* (which is the default), all internal erros and critical log messages get collected and are send to the development team for further investigation. No private or personal data is transmitted, only the error messages and the stack information. |
+
 The next group of settings are used mainly for development purposes. It allows to control the level of self-diagnosing of the framework during development and testing, but can also be used to track down really complex bugs in the production code. Please note, that some of these settings can also be toggled using the choices in the respective application menus in the tray of the Windows task bar during runtime.
 
 | Category | Setting | Default | Description |

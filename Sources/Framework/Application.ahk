@@ -191,7 +191,7 @@ checkForNews() {
 		check := !FileExist(kUserConfigDirectory . "NEWS")
 
 		if !check {
-			lastModified := FileGetTime(kUserConfigDirectory "NEWS", "M")
+			lastModified := FileGetTime(kUserConfigDirectory . "NEWS", "M")
 
 			lastModified := DateAdd(lastModified, 3, "Days")
 

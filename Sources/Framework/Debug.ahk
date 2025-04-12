@@ -9,10 +9,9 @@
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global gDebug := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-								, "Debug", "Debug", (kBuildConfiguration = "Development") && !A_IsCompiled)
-global gLogLevel := kLogLevels[getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-											  , "Debug", "LogLevel", ((kBuildConfiguration = "Development") && !A_IsCompiled) ? "Debug" : "Warn")]
+global gDebug := false
+global gLogLevel := kLogWarn
+global gDiagnoseCritical := true
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -37,6 +36,7 @@ global LogMenu := Menu()
 #Include "MultiMap.ahk"
 #Include "..\Framework\Extensions\Messages.ahk"
 #Include "..\Framework\Extensions\Task.ahk"
+#Include "..\Framework\Extensions\FTP.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -103,9 +103,16 @@ reportNonObjectUsage(reference, p1 := "", p2 := "", p3 := "", p4 := "") {
 }
 
 initializeDebugging() {
+	global gDebug, gLogLevel, gDiagnoseCritical
+
 	local settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 	local criticalMemory := ((getMultiMapValue(settings, "Process", "Memory.Max", 1024) / 100)
 						   * getMultiMapValue(settings, "Process", "Memory.Critical", 80) * 1024 * 1024)
+	local lastModified, ID, fileName
+
+	gDebug := getMultiMapValue(settings, "Debug", "Debug", (kBuildConfiguration = "Development") && !A_IsCompiled)
+	gLogLevel := kLogLevels[getMultiMapValue(settings, "Debug", "LogLevel", ((kBuildConfiguration = "Development") && !A_IsCompiled) ? "Debug" : "Warn")]
+	gDiagnoseCritical := getMultiMapValue(settings, "Diagnose", "Critical", true)
 
 	if kLogStartup {
 		logMessage(kLogOff, "-----------------------------------------------------------------")
@@ -123,6 +130,31 @@ initializeDebugging() {
 	OnError(logUnhandledError)
 
 	PeriodicTask(reportHighMemoryUsage.Bind(criticalMemory), 1000, kInterruptPriority).start()
+
+	if !FileExist(kUserHomeDirectory . "Diagnose\UPLOAD")
+		FileAppend(A_Now, kUserHomeDirectory . "Diagnose\UPLOAD")
+	else {
+		lastModified := FileGetTime(kUserHomeDirectory . "Diagnose\UPLOAD", "M")
+
+		lastModified := DateAdd(lastModified, 1, "Days")
+
+		if (lastModified < A_Now)
+			try {
+				deleteFile(kUserHomeDirectory . "Diagnose\UPLOAD")
+
+				FileAppend(A_Now, kUserHomeDirectory . "Diagnose\UPLOAD")
+
+				ID := StrSplit(FileRead(kUserConfigDirectory . "ID"), "`n", "`r")[1]
+
+				fileName := (ID . "." . A_Now . ".zip")
+
+				RunWait("PowerShell.exe -Command Compress-Archive -LiteralPath '" . kUserHomeDirectory . "Diagnose\UPLOAD' -CompressionLevel Optimal -DestinationPath '" . kTempDirectory . fileName . "'", , "Hide")
+
+				if ftpUpload("87.177.159.148", "SimulatorController", "Sc-1234567890-Sc", kTempDirectory . fileName, "Diagnose-Uploads/" . fileName)
+					loop Files, kUserHomeDirectory . "Diagnose\*.log"
+						deleteFile(A_LoopFileFullPath)
+			}
+	}
 
 	if kLogStartup
 		logMessage(kLogOff, "Debugger initialized...")
@@ -165,7 +197,7 @@ getLogLevel() {
 	return gLogLevel
 }
 
-logMessage(logLevel, message, monitor := true) {
+logMessage(logLevel, message, monitor := true, error := false) {
 	global gLogLevel
 
 	local script := StrSplit(A_ScriptName, ".")[1]
@@ -197,8 +229,7 @@ logMessage(logLevel, message, monitor := true) {
 		fileName := kLogsDirectory . script . " Logs.txt"
 		logLine := "[" level . " - " . logTime . "]: " . message . "`n"
 
-		SplitPath(fileName, , &directory)
-		DirCreate(directory)
+		DirCreate(kLogsDirectory)
 
 		tries := 5
 
@@ -231,11 +262,30 @@ logMessage(logLevel, message, monitor := true) {
 				}
 			}
 		}
+
+		if (gDiagnoseCritical && (error || (logLevel = kLogCritical))) {
+			DirCreate(kUserHomeDirectory . "Diagnose")
+
+			tries := 5
+
+			while (tries > 0)
+				try {
+					FileAppend(logLine, kUserHomeDirectory . "Diagnose\Critical.log", "UTF-16")
+
+					break
+				}
+				catch Any as exception {
+					Sleep(1)
+
+					tries -= 1
+				}
+		}
 	}
 }
 
 logError(exception, unexpected := false, report := true) {
 	local debug := (isDevelopment() && isDebug())
+	local critical := (unexpected || isDevelopment())
 	local handle, message, settings
 
 	static verbose := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Debug", "Verbose", debug && !A_IsCompiled)
@@ -243,17 +293,20 @@ logError(exception, unexpected := false, report := true) {
 	if isObject(exception) {
 		message := exception.Message
 
-		logMessage((unexpected || isDevelopment()) ? kLogCritical : kLogDebug
+		logMessage(critical ? kLogCritical : kLogDebug
 				 , translate(unexpected ? "Unexpected exception encountered in " : "Handled exception encountered in ")
-				 . exception.File . translate(" at line ") . exception.Line . translate(": ") . message)
+				 . exception.File . translate(" at line ") . exception.Line . translate(": ") . message
+				 , true, critical)
 
 
 		if exception.HasProp("Stack")
-			logMessage((unexpected || isDevelopment()) ? kLogCritical : kLogDebug, "`n`nStack:`n`n" . exception.Stack, false)
+			logMessage(critical ? kLogCritical : kLogDebug, "`n`nStack:`n`n" . exception.Stack
+					 , false, critical)
 	}
 	else
-		logMessage(((unexpected || isDevelopment()) || isDevelopment()) ? kLogCritical : kLogDebug
-				 , translate(unexpected ? "Unexpected exception encountered: " : "Handled exception encountered: ") . exception)
+		logMessage(critical ? kLogCritical : kLogDebug
+				 , translate(unexpected ? "Unexpected exception encountered: " : "Handled exception encountered: ") . exception
+				 , true, critical)
 
 	if (verbose && (unexpected || report))
 		if isObject(exception)

@@ -191,8 +191,8 @@ loadSimulatorConfiguration() {
 			setLogLevel(inList(kLogLevelNames, getMultiMapValue(kSimulatorConfiguration, "Configuration", "Log Level", "Warn")))
 
 	if getMultiMapValue(settings, "Diagnostics", "Usage", true) {
-		if FileExist(kUserHomeDirectory . "Diagnostics\System.usage")
-			usage := readMultiMap(kUserHomeDirectory . "Diagnostics\System.usage")
+		if FileExist(kUserHomeDirectory . "Diagnostics\Usage.stat")
+			usage := readMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat")
 		else {
 			usage := newMultiMap()
 
@@ -201,7 +201,7 @@ loadSimulatorConfiguration() {
 
 		setMultiMapValue(usage, "Usage", appName, getMultiMapValue(usage, "Usage", appName, 0) + 1)
 
-		writeMultiMap(kUserHomeDirectory . "Diagnostics\System.usage", usage)
+		writeMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat", usage)
 	}
 
 	if !FileExist(kUserHomeDirectory . "Diagnostics\UPLOAD")
@@ -231,7 +231,7 @@ loadSimulatorConfiguration() {
 					if !isDebug()
 						deleteFile(kTempDirectory . fileName)
 
-					ftpUpload("87.177.159.148", "SimulatorController", "Sc-1234567890-Sc", kUserHomeDirectory . "Diagnostics\System.usage", "Diagnostics-Uploads/" . ID . ".System.usage")
+					ftpUpload("87.177.159.148", "SimulatorController", "Sc-1234567890-Sc", kUserHomeDirectory . "Diagnostics\Usage.stat", "Diagnostics-Uploads/" . ID . ".Usage.stat")
 				}, 10000, kLowPriority)
 			}
 	}

@@ -170,7 +170,7 @@ getLogLevel() {
 	return gLogLevel
 }
 
-logMessage(logLevel, message, monitor := true, error := false) {
+logMessage(logLevel, message, monitor := true, error := false, header := true) {
 	global gLogLevel
 
 	local script := StrSplit(A_ScriptName, ".")[1]
@@ -243,6 +243,12 @@ logMessage(logLevel, message, monitor := true, error := false) {
 
 			while (tries > 0)
 				try {
+					if header
+						logLine := ("---------------------------------------------------------------------`n"
+								  . "      Error in " . StrSplit(A_ScriptName, ".")[1] . " (" . kVersion . ")`n"
+								  . "---------------------------------------------------------------------`n"
+								  . logLine)
+
 					FileAppend(logLine, kUserHomeDirectory . "Diagnostics\Critical.log", "UTF-16")
 
 					break
@@ -274,7 +280,7 @@ logError(exception, unexpected := false, report := true) {
 
 		if exception.HasProp("Stack")
 			logMessage(critical ? kLogCritical : kLogDebug, "`n`nStack:`n`n" . exception.Stack
-					 , false, unexpected)
+					 , false, unexpected, false)
 	}
 	else
 		logMessage(critical ? kLogCritical : kLogDebug

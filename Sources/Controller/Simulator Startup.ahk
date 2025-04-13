@@ -1317,7 +1317,7 @@ editProfile(launchPadOrCommand := false, *) {
 		profileGui.SetFont("Norm", "Arial")
 		profileGui.SetFont("Italic", "Arial")
 
-		profileGui.Add("GroupBox", "x8 yp+10 w342 h150 Section", translate("Diagnostics"))
+		profileGui.Add("GroupBox", "x8 yp+7 w342 h150 Section", translate("Diagnostics"))
 
 		profileGui.SetFont("Norm", "Arial")
 

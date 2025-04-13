@@ -185,7 +185,7 @@ requestShareSessionDatabaseConsent() {
 }
 
 checkForNews() {
-	local check, lastModified, availableNews, news, nr, html, show, shown, rule, ignre, url
+	local check, lastModified, ignore, url
 
 	if (StrSplit(A_ScriptName, ".")[1] = "Simulator Startup") {
 		check := !FileExist(kUserConfigDirectory . "NEWS")
@@ -193,7 +193,7 @@ checkForNews() {
 		if !check {
 			lastModified := FileGetTime(kUserConfigDirectory . "NEWS", "M")
 
-			lastModified := DateAdd(lastModified, 3, "Days")
+			lastModified := DateAdd(lastModified, 2, "Days")
 
 			check := ((lastModified < A_Now) || isDebug())
 		}
@@ -228,59 +228,81 @@ checkForNews() {
 
 		if check {
 			Task.startTask(() {
-				availableNews := readMultiMap(kTempDirectory . "NEWS.ini")
-				news := readMultiMap(kUserConfigDirectory . "NEWS")
+				local newsNr := false
+				local newsUrls := false
+				local availableNews := readMultiMap(kTempDirectory . "NEWS.ini")
+				local news := readMultiMap(kUserConfigDirectory . "NEWS")
+				local availableNews, news, nr, rule, ignore, html, shown
 
-				for nr, html in getMultiMapValues(availableNews, "News")
+				for nr, url in getMultiMapValues(availableNews, "News")
 					if isNumber(nr) {
-						show := true
-
-						shown := getMultiMapValue(news, "News", nr, false)
 						rule := getMultiMapValue(availableNews, "Rules", nr, "Once")
 
-						if (shown && InStr(rule, "Repeat"))
-							shown := (DateAdd(shown, string2Values(":", rule)[2], "Days") > A_Now)
-						else if (!shown && InStr(rule, "Timed")) {
+						if InStr(rule, "Timed") {
 							rule := string2Values(":", rule)
 
-							show := ((A_Now > rule[2]) && ((rule.Length = 2) || (A_Now <= rule[3])))
+							if ((A_Now > rule[2]) && ((rule.Length = 2) || (A_Now <= rule[3]))) {
+								newsNr := nr
+								newsUrls := url
+
+								break
+							}
 						}
+					}
 
-						if (!shown && show) {
-							try {
-								deleteFile(A_Temp . "\News.zip")
-
-								for ignore, html in string2Values(";", html)
-									try {
-										Download(html, A_Temp . "\News.zip")
-
-										try {
-											deleteFile(kTempDirectory . "News")
-											deleteDirectory(kTempDirectory . "News")
-										}
-
-										DirCreate(kTempDirectory . "News")
-
-										RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\News.zip' -DestinationPath '" . kTempDirectory . "News' -Force", , "Hide")
-
-										if FileExist(kTempDirectory . "News\News.htm") {
-											viewHTML(kTempDirectory . "News\News.htm")
-
-											setMultiMapValue(news, "News", nr, A_Now)
-
-											writeMultiMap(kUserConfigDirectory . "NEWS", news)
-
-											break
-										}
-									}
-									catch Any as exception {
-										logError(exception)
-									}
-								}
+				if !newsNr
+					for nr, url in getMultiMapValues(availableNews, "News")
+						if (isNumber(nr) && !getMultiMapValue(news, "News", nr, false)) {
+							newsNr := nr
+							newsUrls := url
 
 							break
 						}
-					}
+
+				if !newsNr
+					for nr, url in getMultiMapValues(availableNews, "News")
+						if isNumber(nr) {
+							shown := getMultiMapValue(news, "News", nr, false)
+							rules := getMultiMapValue(availableNews, "Rules", nr, "Once")
+
+							if (shown && InStr(rule, "Repeat") && (DateAdd(shown, string2Values(":", rule)[2], "Days") > A_Now)) {
+								newsNr := nr
+								newsUrls := url
+
+								break
+							}
+						}
+
+				if newsNr {
+					deleteFile(A_Temp . "\News.zip")
+
+					for ignore, url in string2Values(";", newsUrls)
+						try {
+							Download(url, A_Temp . "\News.zip")
+
+							try {
+								deleteFile(kTempDirectory . "News")
+								deleteDirectory(kTempDirectory . "News")
+							}
+
+							DirCreate(kTempDirectory . "News")
+
+							RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\News.zip' -DestinationPath '" . kTempDirectory . "News' -Force", , "Hide")
+
+							if FileExist(kTempDirectory . "News\News.htm") {
+								viewHTML(kTempDirectory . "News\News.htm")
+
+								setMultiMapValue(news, "News", newsNr, A_Now)
+
+								writeMultiMap(kUserConfigDirectory . "NEWS", news)
+
+								break
+							}
+						}
+						catch Any as exception {
+							logError(exception)
+						}
+				}
 			}, 10000)
 		}
 	}

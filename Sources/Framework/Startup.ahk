@@ -199,7 +199,7 @@ loadSimulatorConfiguration() {
 			setMultiMapValue(usage, "General", "Created", A_Now)
 		}
 
-		setMultiMapValue(usage, "Usage", appName, getMultiMapValue(usage, "Usage", appName, 0) + 1)
+		setMultiMapValue(usage, "Applications", appName, getMultiMapValue(usage, "Usage", appName, 0) + 1)
 
 		writeMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat", usage)
 	}

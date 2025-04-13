@@ -273,7 +273,7 @@ Cato uses the same AI kernel as Jona. In fact, large parts of the basic rule set
 
 The complete position information is requested from the simulation gane every 10 seconds (this is the default, you can lower that in the settings, if your PC is fast enough). For each car, the data contains the current position, the last lap time and the fraction of the track which has been driven since the car last crossed the S/F line. The data acquisition is controlled by the "Race Strategist" plugin. For *Assetto Corsa*, *RaceRoom Racing Experience*, *rFactor 2*, *Le Mans Ultimate*, *iRacing*, *Automobilista 2* and *Project CARS 2* the data is requested from shared memory using the same data providers, which are used by Jona as well, whereas a special UDP client is used for *Assetto Corsa Competizione* (due to the asynchronous nature of the UDP interface for *Assetto Corsa Competizione*, the provided data is not always exact).
 
-After the data has been gathered, it is then transfered to the *Race Strategist* process and loaded into the knowledge base, where the statistical models create several projections for future position development. Beside that, a historical copy is created for each lap. 
+After the data has been gathered, it is then transferred to the *Race Strategist* process and loaded into the knowledge base, where the statistical models create several projections for future position development. Beside that, a historical copy is created for each lap. 
 
 	[Position Data]
 	Driver.Car=1

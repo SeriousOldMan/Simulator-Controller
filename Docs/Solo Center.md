@@ -176,7 +176,7 @@ The choices (except tyre compounds) will be remembered between different runs of
 
 ### Exporting data to the session database
 
-At the end of your session, you can decide which data should be transfered to the session database by clicking the small check marks for each lap in the list of driven laps. "Solo Center" will already have selected by default all valid laps for your convenience. Then choose the command "Export to Database" from the "Session" menu. This will transfer the data for the selected laps (lap times, consumption, tyre wear and pressures, brake wear, and so on) to the session database.
+At the end of your session, you can decide which data should be transferred to the session database by clicking the small check marks for each lap in the list of driven laps. "Solo Center" will already have selected by default all valid laps for your convenience. Then choose the command "Export to Database" from the "Session" menu. This will transfer the data for the selected laps (lap times, consumption, tyre wear and pressures, brake wear, and so on) to the session database.
 
 Please note, that this export is possible only once, to prevent duplicate data entries in your database, and cannot be undone. Therefore check your selection carefully beforehand.
 

@@ -39,7 +39,24 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   
 # Upcoming release
 
-Not yet planned...
+## 6.2.8.0
+
+#### Date: 04/18/25 (planned)
+
+#### Fixes
+
+  - No fixes this time.
+
+#### Changes
+
+  - Multiple *Push-To-Talk* buttons are now supported, but you must enter them manually. Separate the key codes by a ";" or by a "|".
+  - News & Updates are now shown one at a time on a daily basis and many more articles are available now.
+  - All applications of Simulator Controller now collect critical errors and also some statistical information. This data can be transferred to the developer team based on your consent and will be used to enhance the stability and functionality of Simulator Controller.
+	- If you want to know what data gets colleced, you can inspect the files in [Documents]\Simulator Controller\Diagnostics. All files can be opened with a text editor.
+    - You can specify which type of data will be transferred using a new profile dialog in "Simulator Startup".
+	- Of course it is possible to fully disable the transfer of diagnostic data.
+	- No personal data will ever be transferred. With one exception: Theoretically, your IP address is part of the transferred data, but it will never be used.
+	- **Important:** Transfer of information about critical errors and also statistical usage information is enabled by default.
   
 # Release history
 
@@ -1763,7 +1780,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 ## 5.2.0.0-release 07/28/23
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. Introducing a complete [new tool "Practice Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center), which helps you to manage your practice sessions and allows you to inspect and select the data to be transfered to the session database. The development of this application is still in its early stage, but it is already quite usable.
+  3. Introducing a complete [new tool "Practice Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center), which helps you to manage your practice sessions and allows you to inspect and select the data to be transferred to the session database. The development of this application is still in its early stage, but it is already quite usable.
   4. A new controller action function "openSoloCenter" allows you to open the "Practice Center" from your controller hardware.
   5. A new plugin argument "openSoloCenter" has been introduced for the "Race Engineer" and "Race Strategist" plugins.
   6. Added an "Invalid" column for the "Car" report in "Race Reports".
@@ -2506,7 +2523,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
      - The Race Strategist can now [recalculate / adjust the currently active strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#strategy-handling) anytime during a race.
 	   - New voice command for the Strategist to trigger the recalculation of the current strategy.
 	   - New controller action ["StrategyRecommend"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin, which is equivalent to the above mentioned voice command, incl. a new icon in the Stream Deck icon set for this controller action.
-	 - When the Strategist instructs the Race Engineer to plan and prepare a pitstop, the tyre compound as defined in the strategy will now also be transfered to the Engineer, which will select this specific compound for the tyre change.
+	 - When the Strategist instructs the Race Engineer to plan and prepare a pitstop, the tyre compound as defined in the strategy will now also be transferred to the Engineer, which will select this specific compound for the tyre change.
 	 - The Race Engineer now adjusts the fuel amount for the last stint when the pitstop has been triggered by the active strategy.
   8. Improvements for the Race Engineer:
      - Correct handling of all tyre compounds, incl. Intermediate compounds, for tyre recommendations and for automated pitstops. See the [Tyre Compounds](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds) chapter as well as the corrsponding notes for [tyre compound handling by the "Race Engineer"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#how-it-works) for more information.
@@ -3391,7 +3408,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Tyre pressures can be [transfered from the setup database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#querying-the-session-database) to the *Race Engineer Settings* tool.
+  3. Tyre pressures can be [transferred from the setup database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#querying-the-session-database) to the *Race Engineer Settings* tool.
   4. Jona can consult the setup database for a second opinion for tyre pressures.
   5. [New switches](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-pitstop) in *Race Engineer Settings* to control the different strategies that Jona uses to come up with target tyre pressures.
   6. Refactoring of the setup database code and some file relocations.

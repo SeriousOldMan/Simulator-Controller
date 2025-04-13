@@ -1308,7 +1308,7 @@ editProfile(launchPadOrCommand := false, *) {
 
 		profileGui.SetFont("Norm", "Arial")
 
-		profileGui.Add("Text", "x16 yp+24 w90 h23 +0x200", translate("Identification Key"))
+		profileGui.Add("Text", "x16 yp+18 w90 h23 +0x200", translate("Identification Key"))
 		profileGui.Add("Edit", "x110 yp w240 h23 -VScroll ReadOnly", StrSplit(FileRead(kUserConfigDirectory . "ID"), "`n", "`r")[1])
 
 		profileGui.Add("Button", "x230 yp+30 w120 h23", translate("Consent...")).OnEvent("Click", (*) {
@@ -1330,7 +1330,7 @@ editProfile(launchPadOrCommand := false, *) {
 
 		profileGui.SetFont("Norm", "Arial")
 
-		profileGui.Add("Text", "x16 yp+21 w326 h65", translate("Please choose, which information will be supplied to the development team for further improvement of Simulator Controller. No personal information is involved."))
+		profileGui.Add("Text", "x16 yp+18 w326 h65", translate("Please choose, which information will be supplied to the development team for further improvement of Simulator Controller. No personal information is involved."))
 
 		profileGui.Add("Text", "x16 yp+70 w90 h23", translate("Error Logs"))
 		errorLogsDropDown := profileGui.Add("DropDownList", "x110 yp-2 w80", collect(["Yes", "No"], translate))
@@ -1340,7 +1340,7 @@ editProfile(launchPadOrCommand := false, *) {
 		usageStatsDropDown := profileGui.Add("DropDownList", "x110 yp-3 w80", collect(["Yes", "No"], translate))
 		usageStatsDropDown.Choose(1 + (getMultiMapValue(settings, "Diagnostics", "Usage", true) == false))
 
-		profileGui.Add("Text", "x8 ys+160 w342 0x10")
+		profileGui.Add("Text", "x8 yp+30 w342 0x10")
 
 		profileGui.Add("Button", "x100 yp+10 w80 h23 Default", translate("Ok")).OnEvent("Click", editProfile.Bind(kOk))
 		profileGui.Add("Button", "x186 yp w80 h23", translate("&Cancel")).OnEvent("Click", editProfile.Bind(kCancel))

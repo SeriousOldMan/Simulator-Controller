@@ -16,7 +16,9 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\Framework\Extensions\Task.ahk"
 #Include "..\Framework\Extensions\Messages.ahk"
+#Include "..\Framework\Extensions\FTP.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -41,9 +43,10 @@ global kProperInstallation := true
 ;;;-------------------------------------------------------------------------;;;
 
 loadSimulatorConfiguration() {
-	global kSimulatorConfiguration, kVersion, kDatabaseDirectory, kAHKDirectory, kMSBuildDirectory, kNirCmd, kSox, kSilentMode
+	global kSimulatorConfiguration, kVersion, kDatabaseDirectory, kAHKDirectory, kMSBuildDirectory, kNirCmd, kSox, kSilentMode, kDiagnosticsStartup
 
-	local packageInfo, type, pid, path, argIndex
+	local appName := StrSplit(A_ScriptName, ".")[1]
+	local packageInfo, type, pid, path, argIndex, settings, usage, lastModified, ID, fileName
 
 	if kLogStartup
 		logMessage(kLogOff, "Loading configuration...")
@@ -104,7 +107,7 @@ loadSimulatorConfiguration() {
 	type := getMultiMapValue(packageInfo, "Current", "Type", false)
 
 	if type {
-		if (inList(kForegroundApps, StrSplit(A_ScriptName, ".")[1]) && !inList(A_Args, "-Repair"))
+		if (inList(kForegroundApps, appName) && !inList(A_Args, "-Repair"))
 			if !checkInstallation(string2Map(",", "->", getMultiMapValue(packageInfo, type, "Components", ""))) {
 				Run("`"" . kBinariesDirectory . "Simulator Tools.exe`" -Repair -Start `"" . A_ScriptName . "`"")
 
@@ -177,13 +180,61 @@ loadSimulatorConfiguration() {
 
 	kSilentMode := getMultiMapValue(kSimulatorConfiguration, "Configuration", "Silent Mode", false)
 
-	if (getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Debug", "Debug", kUndefined) = kUndefined)
+	settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+
+	if (getMultiMapValue(settings, "Debug", "Debug", kUndefined) = kUndefined)
 		if (!A_IsCompiled || getMultiMapValue(kSimulatorConfiguration, "Configuration", "Debug", false))
 			setDebug(true)
 
-	if (getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Debug", "LogLevel", kUndefined) = kUndefined)
+	if (getMultiMapValue(settings, "Debug", "LogLevel", kUndefined) = kUndefined)
 		if !isDevelopment()
 			setLogLevel(inList(kLogLevelNames, getMultiMapValue(kSimulatorConfiguration, "Configuration", "Log Level", "Warn")))
+
+	if getMultiMapValue(settings, "Diagnostics", "Usage", true) {
+		if FileExist(kUserHomeDirectory . "Diagnostics\System.usage")
+			usage := readMultiMap(kUserHomeDirectory . "Diagnostics\System.usage")
+		else {
+			usage := newMultiMap()
+
+			setMultiMapValue(usage, "General", "Created", A_Now)
+		}
+
+		setMultiMapValue(usage, "Usage", appName, getMultiMapValue(usage, "Usage", appName, 0) + 1)
+
+		writeMultiMap(kUserHomeDirectory . "Diagnostics\System.usage", usage)
+	}
+
+	if !FileExist(kUserHomeDirectory . "Diagnostics\UPLOAD")
+		FileAppend(A_Now, kUserHomeDirectory . "Diagnostics\UPLOAD")
+	else {
+		lastModified := FileGetTime(kUserHomeDirectory . "Diagnostics\UPLOAD", "M")
+
+		lastModified := DateAdd(lastModified, 1, "Days")
+
+		if (lastModified < A_Now)
+			try {
+				deleteFile(kUserHomeDirectory . "Diagnostics\UPLOAD")
+
+				FileAppend(A_Now, kUserHomeDirectory . "Diagnostics\UPLOAD")
+
+				Task.startTask(() {
+					ID := StrSplit(FileRead(kUserConfigDirectory . "ID"), "`n", "`r")[1]
+
+					fileName := (ID . "." . A_Now . ".zip")
+
+					RunWait("PowerShell.exe -Command Compress-Archive -LiteralPath '" . kUserHomeDirectory . "Diagnostics\*.log' -CompressionLevel Optimal -DestinationPath '" . kTempDirectory . fileName . "'", , "Hide")
+
+					if ftpUpload("87.177.159.148", "SimulatorController", "Sc-1234567890-Sc", kTempDirectory . fileName, "Diagnostics-Uploads/" . fileName)
+						loop Files, kUserHomeDirectory . "Diagnostics\*.log"
+							deleteFile(A_LoopFileFullPath)
+
+					if !isDebug()
+						deleteFile(kTempDirectory . fileName)
+
+					ftpUpload("87.177.159.148", "SimulatorController", "Sc-1234567890-Sc", kUserHomeDirectory . "Diagnostics\System.usage", "Diagnostics-Uploads/" . ID . ".System.usage")
+				}, 10000, kLowPriority)
+			}
+	}
 
 	if kLogStartup
 		logMessage(kLogOff, "Common runtime started...")
@@ -201,6 +252,7 @@ initializeEnvironment() {
 	path := getMultiMapValue(settings, "Locations", "Temp", false)
 	if path
 		kTempDirectory := (normalizeDirectoryPath(path) . "\")
+
 
 	path := getMultiMapValue(settings, "Locations", "Programs", false)
 	if path
@@ -265,7 +317,7 @@ initializeEnvironment() {
 	DirCreate(kUserHomeDirectory . "Garage\Rules\Cars")
 	DirCreate(kUserHomeDirectory . "Validators")
 	DirCreate(kUserHomeDirectory . "Logs")
-	DirCreate(kUserHomeDirectory . "Diagnose")
+	DirCreate(kUserHomeDirectory . "Diagnostics")
 	DirCreate(kUserHomeDirectory . "Sounds")
 	DirCreate(kUserHomeDirectory . "Splash Media")
 	DirCreate(kUserHomeDirectory . "Screen Images")

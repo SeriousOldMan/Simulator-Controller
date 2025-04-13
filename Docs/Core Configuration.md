@@ -38,9 +38,10 @@ Built on top of the Task framework, the Message Manager handles the communcation
 
 The group of *Diagnose* settings define, how diagnose and error information is handled to improve the reliability and stability of Simulator Controller.
 
-| Category | Setting | Default | Description |
-|----------|---------|---------|-------------|
-| Diagnose | Critical | *True* | If this is *True* (which is the default), all internal erros and critical log messages get collected and are send to the development team for further investigation. No private or personal data is transmitted, only the error messages and the stack information. |
+| Category    | Setting | Default | Description |
+|-------------|---------|---------|-------------|
+| Diagnostics | Critical | *True* | If this is *True* (which is the default), all internal erros and critical log messages get collected and are sent to the development team for further investigation. No private or personal data is transmitted, only the error messages and the stack information. |
+|             | Usage    | *True* | If this is *True* (which is the default), several statistical informations are collected about the usage pattern of Simulator Controller - which tools are used how often, what functions are used and so on. This information is sent to the development team to foster further development of Simulator Controller.  No private or personal data is included. |
 
 The next group of settings are used mainly for development purposes. It allows to control the level of self-diagnosing of the framework during development and testing, but can also be used to track down really complex bugs in the production code. Please note, that some of these settings can also be toggled using the choices in the respective application menus in the tray of the Windows task bar during runtime.
 

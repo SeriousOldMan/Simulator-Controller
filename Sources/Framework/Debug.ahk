@@ -11,7 +11,7 @@
 
 global gDebug := false
 global gLogLevel := kLogWarn
-global gDiagnoseCritical := true
+global gDiagnosticsCritical := true
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -36,7 +36,6 @@ global LogMenu := Menu()
 #Include "MultiMap.ahk"
 #Include "..\Framework\Extensions\Messages.ahk"
 #Include "..\Framework\Extensions\Task.ahk"
-#Include "..\Framework\Extensions\FTP.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -103,16 +102,15 @@ reportNonObjectUsage(reference, p1 := "", p2 := "", p3 := "", p4 := "") {
 }
 
 initializeDebugging() {
-	global gDebug, gLogLevel, gDiagnoseCritical
+	global gDebug, gLogLevel, gDiagnosticsCritical
 
 	local settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 	local criticalMemory := ((getMultiMapValue(settings, "Process", "Memory.Max", 1024) / 100)
 						   * getMultiMapValue(settings, "Process", "Memory.Critical", 80) * 1024 * 1024)
-	local lastModified, ID, fileName
 
 	gDebug := getMultiMapValue(settings, "Debug", "Debug", (kBuildConfiguration = "Development") && !A_IsCompiled)
 	gLogLevel := kLogLevels[getMultiMapValue(settings, "Debug", "LogLevel", ((kBuildConfiguration = "Development") && !A_IsCompiled) ? "Debug" : "Warn")]
-	gDiagnoseCritical := getMultiMapValue(settings, "Diagnose", "Critical", true)
+	gDiagnosticsCritical := getMultiMapValue(settings, "Diagnostics", "Critical", true)
 
 	if kLogStartup {
 		logMessage(kLogOff, "-----------------------------------------------------------------")
@@ -130,33 +128,6 @@ initializeDebugging() {
 	OnError(logUnhandledError)
 
 	PeriodicTask(reportHighMemoryUsage.Bind(criticalMemory), 1000, kInterruptPriority).start()
-
-	DirCreate(kUserHomeDirectory . "Diagnose")
-
-	if !FileExist(kUserHomeDirectory . "Diagnose\UPLOAD")
-		FileAppend(A_Now, kUserHomeDirectory . "Diagnose\UPLOAD")
-	else {
-		lastModified := FileGetTime(kUserHomeDirectory . "Diagnose\UPLOAD", "M")
-
-		lastModified := DateAdd(lastModified, 1, "Days")
-
-		if (lastModified < A_Now)
-			try {
-				deleteFile(kUserHomeDirectory . "Diagnose\UPLOAD")
-
-				FileAppend(A_Now, kUserHomeDirectory . "Diagnose\UPLOAD")
-
-				ID := StrSplit(FileRead(kUserConfigDirectory . "ID"), "`n", "`r")[1]
-
-				fileName := (ID . "." . A_Now . ".zip")
-
-				RunWait("PowerShell.exe -Command Compress-Archive -LiteralPath '" . kUserHomeDirectory . "Diagnose\UPLOAD' -CompressionLevel Optimal -DestinationPath '" . kTempDirectory . fileName . "'", , "Hide")
-
-				if ftpUpload("87.177.159.148", "SimulatorController", "Sc-1234567890-Sc", kTempDirectory . fileName, "Diagnose-Uploads/" . fileName)
-					loop Files, kUserHomeDirectory . "Diagnose\*.log"
-						deleteFile(A_LoopFileFullPath)
-			}
-	}
 
 	if kLogStartup
 		logMessage(kLogOff, "Debugger initialized...")
@@ -265,14 +236,14 @@ logMessage(logLevel, message, monitor := true, error := false) {
 			}
 		}
 
-		if (gDiagnoseCritical && (error || (logLevel = kLogCritical))) {
-			DirCreate(kUserHomeDirectory . "Diagnose")
+		if (gDiagnosticsCritical && (error || (logLevel = kLogCritical))) {
+			DirCreate(kUserHomeDirectory . "Diagnostics")
 
 			tries := 5
 
 			while (tries > 0)
 				try {
-					FileAppend(logLine, kUserHomeDirectory . "Diagnose\Critical.log", "UTF-16")
+					FileAppend(logLine, kUserHomeDirectory . "Diagnostics\Critical.log", "UTF-16")
 
 					break
 				}

@@ -782,6 +782,16 @@ launchPad(command := false, arguments*) {
 
 		writeMultiMap(kUserConfigDirectory . "Application Settings.ini", startupConfig)
 	}
+	else if (command = "EditProfile") {
+		launchPadGui.Block()
+
+		try {
+			editProfile(launchPadGui)
+		}
+		finally {
+			launchPadGui.Unblock()
+		}
+	}
 	else if (command = "Launch") {
 		theApplication := arguments[1]
 
@@ -937,7 +947,7 @@ launchPad(command := false, arguments*) {
 		setButtonIcon(infoButton, kIconsDirectory . "Team.ico", 1)
 
 		profileButton := launchPadGui.Add("Button", "x532 yp w23 h23")
-		; profileButton.OnEvent("Click", modifySettings.Bind(editProfile))
+		profileButton.OnEvent("Click", (*) => launchPad("EditProfile"))
 		setButtonIcon(profileButton, kIconsDirectory . "Profile.ico", 1)
 
 		settingsButton := launchPadGui.Add("Button", "x556 yp w23 h23")
@@ -1268,6 +1278,72 @@ loadStartupProfiles(target, fileName := false) {
 	}
 
 	return settings
+}
+
+editProfile(launchPadOrCommand := false, *) {
+	local profileGui, settings, errorLogsDropDown, usageStatsDropDown
+
+	static result := false
+
+	if (launchPadOrCommand == kOk)
+		result := kOk
+	else if (launchPadOrCommand == kCancel)
+		result := kCancel
+	else {
+		settings := readMultiMap(kUserConfigDirectory . "Core Settings.ini")
+
+		result := false
+
+		profileGui := Window({Options: "0x400000"}, translate("Profile"))
+
+		profileGui.SetFont("Norm", "Arial")
+
+		profileGui.Add("Text", "x16 y16 w90 h23 +0x200", translate("Identification Key"))
+		profileGui.Add("Text", "x110 yp w160 h23 +0x200", StrSplit(FileRead(kUserConfigDirectory . "ID"), "`n", "`r")[1])
+
+		profileGui.SetFont("Norm", "Arial")
+		profileGui.SetFont("Italic", "Arial")
+
+		profileGui.Add("GroupBox", "x8 yp+30 w262 h160 Section", translate("Diagnostics"))
+
+		profileGui.SetFont("Norm", "Arial")
+
+		profileGui.Add("Text", "x16 yp+21 w246 h75", translate("Please choose, which information will be supplied to the development team for further improvement of Simulator Controller. No personal information is involved."))
+
+		profileGui.Add("Text", "x16 yp+80 w90 h23", translate("Error Logs"))
+		errorLogsDropDown := profileGui.Add("DropDownList", "x110 yp-2 w80", collect(["Yes", "No"], translate))
+		errorLogsDropDown.Choose(1 + (getMultiMapValue(settings, "Diagnostics", "Critical", true) == false))
+
+		profileGui.Add("Text", "x16 yp+29 w90 h23", translate("Usage Statistics"))
+		usageStatsDropDown := profileGui.Add("DropDownList", "x110 yp-3 w80", collect(["Yes", "No"], translate))
+		usageStatsDropDown.Choose(1 + (getMultiMapValue(settings, "Diagnostics", "Usage", true) == false))
+
+		profileGui.Add("Button", "x60 ys+170 w80 h23 Default", translate("Ok")).OnEvent("Click", editProfile.Bind(kOk))
+		profileGui.Add("Button", "x146 yp w80 h23", translate("&Cancel")).OnEvent("Click", editProfile.Bind(kCancel))
+
+		profileGui.Opt("+Owner" . launchPadOrCommand.Hwnd)
+
+		profileGui.Show("AutoSize Center")
+
+		while !result
+			Sleep(100)
+
+		try {
+			if (result == kOk) {
+				setMultiMapValue(settings, "Diagnostics", "Critical", (errorLogsDropDown.Value = 1))
+				setMultiMapValue(settings, "Diagnostics", "Usage", (usageStatsDropDown.Value = 1))
+
+				writeMultiMap(kUserConfigDirectory . "Core Settings.ini", settings)
+
+				return true
+			}
+			else
+				return false
+		}
+		finally {
+			profileGui.Destroy()
+		}
+	}
 }
 
 editStartupProfiles(launchPadOrCommand, arguments*) {

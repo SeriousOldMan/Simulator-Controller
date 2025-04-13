@@ -1298,10 +1298,20 @@ editProfile(launchPadOrCommand := false, *) {
 
 		profileGui.SetFont("Norm", "Arial")
 
-		profileGui.Add("Text", "x16 y16 w90 h23 +0x200", translate("Identification Key"))
-		profileGui.Add("Edit", "x110 yp w240 h23 -VScroll ReadOnly", "A950C950-B143-4D6A-AC85-40121DE855AC") ; StrSplit(FileRead(kUserConfigDirectory . "ID"), "`n", "`r")[1])
+		profileGui.Add("Text", "x16 y16 w90 +0x200", translate("Driver"))
+		profileGui.Add("Text", "x110 yp w240", SessionDatabase.getUserName())
 
-		profileGui.Add("Button", "x122 yp+30 w120 h23", translate("Consent...")).OnEvent("Click", (*) {
+		profileGui.SetFont("Italic", "Arial")
+
+		profileGui.Add("GroupBox", "x8 yp+30 w342 h9 Section", translate("Database"))
+		profileGui.Add("Text", "x100 yp+7 w250 0x10")
+
+		profileGui.SetFont("Norm", "Arial")
+
+		profileGui.Add("Text", "x16 yp+24 w90 h23 +0x200", translate("Identification Key"))
+		profileGui.Add("Edit", "x110 yp w240 h23 -VScroll ReadOnly", StrSplit(FileRead(kUserConfigDirectory . "ID"), "`n", "`r")[1])
+
+		profileGui.Add("Button", "x230 yp+30 w120 h23", translate("Consent...")).OnEvent("Click", (*) {
 			profileGui.Block()
 
 			try {
@@ -1312,12 +1322,11 @@ editProfile(launchPadOrCommand := false, *) {
 			}
 		})
 
-		profileGui.Add("Text", "x8 yp+30 w342 0x10")
-
 		profileGui.SetFont("Norm", "Arial")
 		profileGui.SetFont("Italic", "Arial")
 
-		profileGui.Add("GroupBox", "x8 yp+10 w342 h150 Section", translate("Diagnostics"))
+		profileGui.Add("GroupBox", "x8 yp+30 w342 h9 Section", translate("Diagnostics"))
+		profileGui.Add("Text", "x100 yp+7 w250 0x10")
 
 		profileGui.SetFont("Norm", "Arial")
 
@@ -1331,7 +1340,9 @@ editProfile(launchPadOrCommand := false, *) {
 		usageStatsDropDown := profileGui.Add("DropDownList", "x110 yp-3 w80", collect(["Yes", "No"], translate))
 		usageStatsDropDown.Choose(1 + (getMultiMapValue(settings, "Diagnostics", "Usage", true) == false))
 
-		profileGui.Add("Button", "x100 ys+160 w80 h23 Default", translate("Ok")).OnEvent("Click", editProfile.Bind(kOk))
+		profileGui.Add("Text", "x8 ys+160 w342 0x10")
+
+		profileGui.Add("Button", "x100 yp+10 w80 h23 Default", translate("Ok")).OnEvent("Click", editProfile.Bind(kOk))
 		profileGui.Add("Button", "x186 yp w80 h23", translate("&Cancel")).OnEvent("Click", editProfile.Bind(kCancel))
 
 		profileGui.Opt("+Owner" . launchPadOrCommand.Hwnd)

@@ -206,34 +206,28 @@ loadSimulatorConfiguration() {
 
 	if !FileExist(kUserHomeDirectory . "Diagnostics\UPLOAD")
 		FileAppend(A_Now, kUserHomeDirectory . "Diagnostics\UPLOAD")
-	else {
-		lastModified := FileGetTime(kUserHomeDirectory . "Diagnostics\UPLOAD", "M")
 
-		lastModified := DateAdd(lastModified, 1, "Days")
+	lastModified := FileGetTime(kUserHomeDirectory . "Diagnostics\UPLOAD", "M")
 
-		if (lastModified < A_Now)
-			try {
-				deleteFile(kUserHomeDirectory . "Diagnostics\UPLOAD")
+	lastModified := DateAdd(lastModified, 1, "Days")
 
-				FileAppend(A_Now, kUserHomeDirectory . "Diagnostics\UPLOAD")
+	if (lastModified < A_Now) {
+		try {
+			deleteFile(kUserHomeDirectory . "Diagnostics\UPLOAD")
 
-				Task.startTask(() {
-					ID := StrSplit(FileRead(kUserConfigDirectory . "ID"), "`n", "`r")[1]
+			FileAppend(A_Now, kUserHomeDirectory . "Diagnostics\UPLOAD")
+		}
 
-					fileName := (ID . "." . A_Now . ".zip")
+		Task.startTask(() {
+			ID := StrSplit(FileRead(kUserConfigDirectory . "ID"), "`n", "`r")[1]
 
-					RunWait("PowerShell.exe -Command Compress-Archive -LiteralPath '" . kUserHomeDirectory . "Diagnostics\*.log' -CompressionLevel Optimal -DestinationPath '" . kTempDirectory . fileName . "'", , "Hide")
+			fileName := (ID . "." . A_Now . ".log")
 
-					if ftpUpload("87.177.159.148", "SimulatorController", "Sc-1234567890-Sc", kTempDirectory . fileName, "Diagnostics-Uploads/" . fileName)
-						loop Files, kUserHomeDirectory . "Diagnostics\*.log"
-							deleteFile(A_LoopFileFullPath)
+			if ftpUpload("87.177.159.148", "SimulatorController", "Sc-1234567890-Sc", kUserHomeDirectory . "Diagnostics\Critical.log", "Diagnostics-Uploads/" . fileName)
+				deleteFile(kUserHomeDirectory . "Diagnostics\Critical.log")
 
-					if !isDebug()
-						deleteFile(kTempDirectory . fileName)
-
-					ftpUpload("87.177.159.148", "SimulatorController", "Sc-1234567890-Sc", kUserHomeDirectory . "Diagnostics\Usage.stat", "Diagnostics-Uploads/" . ID . ".Usage.stat")
-				}, 10000, kLowPriority)
-			}
+			ftpUpload("87.177.159.148", "SimulatorController", "Sc-1234567890-Sc", kUserHomeDirectory . "Diagnostics\Usage.stat", "Diagnostics-Uploads/" . ID . ".Usage.stat")
+		}, 10000, kLowPriority)
 	}
 
 	if kLogStartup

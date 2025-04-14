@@ -180,7 +180,7 @@ class BasicTest extends Assert {
 
 			return Integer(1)
 		})
-		scriptSetGlobal(L, "foreign")
+		scriptSetGlobal(L, "__Foreign")
 
 		luaL_dofile(L, kSourcesDirectory . "Tests\Test Scripts\test05.lua")
 

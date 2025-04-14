@@ -88,4 +88,11 @@ end
 function Rules.Execute()
 	__Rules_Execute()
 end
+
+function foreign(name)
+	local handler = __Foreign(name)
 	
+	return function(...)
+			   return handler(table.unpack(__normalizeArguments(table.pack(...))))
+		   end
+end

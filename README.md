@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.2.8.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/g4fSJKom) (Early build for 6.2.8. Changes: New profile dialog in "Simulator Startup", New diagnostics system, Support for multiple P2T keys, Tweaked news system again.)
+[6.2.8.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/g4fSJKom) (Early build for 6.2.8. Changes: New profile dialog in "Simulator Startup", New diagnostics system, Support for multiple P2T keys, Tweaked news system again, Fixed argument processing in script callbacks.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-628) of this version and all the versions you might have skipped, before installing and using this version.
 

@@ -20,13 +20,13 @@ Rules = {}
 -------------------------------------------------------------------------------
 
 function __normalizeArguments(arguments)
-	for i = 1, table.getn(arguments) do
+	for i = 1, #arguments do
 		local argument = arguments[i]
 		
 		if argument == nil then
 			arguments[i] = __Undefined
 		else
-			arguments[i] = tostring(v)
+			arguments[i] = tostring(argument)
 		end
 	end
 	
@@ -88,4 +88,11 @@ end
 function Rules.Execute()
 	__Rules_Execute()
 end
+
+function foreign(name)
+	local handler = __Foreign(name)
 	
+	return function(...)
+			   return handler(table.unpack(__normalizeArguments(table.pack(...))))
+		   end
+end

@@ -62,6 +62,10 @@ lua_print(L) {
 	; showMessage(msg)
 }
 
+add(v1, v2) {
+	return (v1 + v2)
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Private Classes Section                         ;;;
@@ -170,12 +174,14 @@ class BasicTest extends Assert {
 			local function := %scriptGetString(c, 1)%
 
 			scriptPushValue(c, (c) {
-				function(scriptGetArguments(c)*)
+				scriptPushValue(c, function(scriptGetArguments(c)*))
+
+				return Integer(1)
 			})
 
 			return Integer(1)
 		})
-		scriptSetGlobal(L, "__Foreign")
+		scriptSetGlobal(L, "foreign")
 
 		luaL_dofile(L, kSourcesDirectory . "Tests\Test Scripts\test05.lua")
 

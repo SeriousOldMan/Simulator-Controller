@@ -555,7 +555,9 @@ class RaceAssistant extends ConfigurationItem {
 							local function := %scriptGetString(c, 1)%
 
 							scriptPushValue(c, (c) {
-								function(scriptGetArguments(c)*)
+								scriptPushValue(c, function(scriptGetArguments(c)*))
+
+								return Integer(1)
 							})
 						})
 						scriptSetGlobal(context, "__Foreign")
@@ -4731,7 +4733,9 @@ createTools(assistant, type, target := false, categories := ["Custom", "Builtin"
 					local function := %scriptGetString(c, 1)%
 
 					scriptPushValue(c, (c) {
-						function(scriptGetArguments(c)*)
+						scriptPushValue(c, function(scriptGetArguments(c)*))
+
+						return Integer(1)
 					})
 				})
 				scriptSetGlobal(context, "__Foreign")

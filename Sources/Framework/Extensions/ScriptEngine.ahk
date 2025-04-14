@@ -251,13 +251,16 @@ scriptGetArgsCount(context) {
 
 scriptGetArguments(context) {
 	local arguments := []
+	local number
 
 	loop scriptGetArgsCount(context) {
 		switch lua_type(context, A_Index) {
 			case LUA_TNIL:
 				arguments.Push(unset)
 			case LUA_TNUMBER:
-				arguments.Push(scriptGetNumber(context, A_Index))
+				number := scriptGetNumber(context, A_Index)
+
+				arguments.Push((Round(number) = number) ? Integer(number) : number)
 			case LUA_TBOOLEAN:
 				arguments.Push(scriptGetBoolean(context, A_Index))
 			case LUA_TSTRING:
@@ -276,6 +279,10 @@ scriptGetBoolean(context, index := 1) {
 
 scriptGetString(context, index := 1) {
 	return lua_tostring(context, index)
+}
+
+scriptGetInteger(context, index := 1) {
+	return lua_tointeger(context, index)
 }
 
 scriptGetNumber(context, index := 1) {

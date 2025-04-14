@@ -167,13 +167,22 @@ class BasicTest extends Assert {
 		setPrint(L, lua_print)
 
 		scriptPushValue(L, (c) {
-			scriptPushValue(c, %scriptGetString(c, 1)%)
+			local function := %scriptGetString(c, 1)%
+
+			scriptPushValue(c, (c) {
+				local arguments := []
+
+				loop scriptGetArgsCount(c)
+					arguments.Push(scriptGetString(c, A_Index))
+
+				function(arguments*)
+			})
 
 			return Integer(1)
 		})
 		scriptSetGlobal(L, "foreign")
 
-		luaL_dofile(L, kSourcesDirectory . "Tests\Test Scripts\test04.lua")
+		luaL_dofile(L, kSourcesDirectory . "Tests\Test Scripts\test05.lua")
 
 		this.AssertEqual(vTestResult, "Success", "Assert handling failed...")
 	}

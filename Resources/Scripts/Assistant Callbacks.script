@@ -16,31 +16,11 @@ Rules = {}
 
 
 -------------------------------------------------------------------------------
----                         Private Functions Section                       ---
--------------------------------------------------------------------------------
-
-function __normalizeArguments(arguments)
-	for i = 1, table.getn(arguments) do
-		local argument = arguments[i]
-		
-		if argument == nil then
-			arguments[i] = __Undefined
-		else
-			arguments[i] = tostring(v)
-		end
-	end
-	
-	return arguments
-end
-
-
--------------------------------------------------------------------------------
 ---                          Public Functions Section                       ---
 -------------------------------------------------------------------------------
 
-function Assistant.Ask(question)
-	return __Assistant_Ask(question)
-end
+
+Assistant.Ask = __Assistant_Ask
 
 function Assistant.Speak(message, ...)
 	local arguments = table.pack(...)
@@ -50,17 +30,11 @@ function Assistant.Speak(message, ...)
 	return __Assistant_Speak(message, table.unpack(arguments))
 end
 
-function Assistant.Call(func, ...)
-	return __Assistant_Call(func, table.unpack(__normalizeArguments(table.pack(...))))
-end
+Assistant.Call = __Assistant_Call
 
-function Controller.Call(func, ...)
-	return __Controller_Call(func, table.unpack(__normalizeArguments(table.pack(...))))
-end
+Controller.Call = __Controller_Call
 
-function Function.Call(func, ...)
-	return __Function_Call(func, table.unpack(__normalizeArguments(table.pack(...))))
-end
+Function.Call = __Function_Call
 
 function Rules.GetValue(name, ...)
 	local arguments = table.pack(...)
@@ -81,11 +55,8 @@ function Rules.GetValue(name, ...)
 	return value
 end
 
-function Rules.SetValue(name, value)
-	__Rules_SetValue(name, tostring(value))
-end
+Rules.SetValue = __Rules_SetValue
 
-function Rules.Execute()
-	__Rules_Execute()
-end
-	
+Rules.Execute = __Rules_Execute
+
+foreign = __Foreign

@@ -249,12 +249,37 @@ scriptGetArgsCount(context) {
 	return lua_gettop(context)
 }
 
+scriptGetArguments(context) {
+	local arguments := []
+
+	loop scriptGetArgsCount(context) {
+		switch lua_type(context, A_Index) {
+			case LUA_TNIL:
+				arguments.Push(unset)
+			case LUA_TNUMBER:
+				arguments.Push(scriptGetNumber(context, A_Index))
+			case LUA_TBOOLEAN:
+				arguments.Push(scriptGetBoolean(context, A_Index))
+			case LUA_TSTRING:
+				arguments.Push(scriptGetString(context, A_Index))
+			default:
+				throw "Unknown type detected in scriptGetArguments..."
+		}
+	}
+
+	return arguments
+}
+
 scriptGetBoolean(context, index := 1) {
 	return lua_toboolean(context, index)
 }
 
 scriptGetString(context, index := 1) {
 	return lua_tostring(context, index)
+}
+
+scriptGetNumber(context, index := 1) {
+	return lua_tonumber(context, index)
 }
 
 

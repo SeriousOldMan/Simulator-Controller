@@ -10,13 +10,15 @@ function __normalizeArguments(arguments)
 	return arguments
 end
 
-function foreign(name)
-	local handler = __Foreign(name)
+-- function foreign(name)
+	-- local handler = __Foreign(name)
 	
-	return function(...)
-			   return handler(table.unpack(__normalizeArguments(table.pack(...))))
-		   end
-end
+	-- return function(...)
+			   -- return handler(table.unpack(__normalizeArguments(table.pack(...))))
+		   -- end
+-- end
+
+foreign = __Foreign
 
 foreign("showMessage")("Hello World!")
 

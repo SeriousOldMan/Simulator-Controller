@@ -170,12 +170,7 @@ class BasicTest extends Assert {
 			local function := %scriptGetString(c, 1)%
 
 			scriptPushValue(c, (c) {
-				local arguments := []
-
-				loop scriptGetArgsCount(c)
-					arguments.Push(scriptGetString(c, A_Index))
-
-				function(arguments*)
+				function(scriptGetArguments(c)*)
 			})
 
 			return Integer(1)

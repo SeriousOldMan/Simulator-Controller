@@ -546,6 +546,8 @@ You can enable or disable individual predefined actions using the checkbox on th
 	   [?Track.Grip = Wet] => (Call: Assistant.Speak("It will be too wet. I will come up with a new strategy.")), (Call: Assistant.Call(planPitstop))
 
    Here you can use (Call: *Assistant.Call*(function, p1, ..., pn)), if more than 6 arguments should be passed to the function. Same applies to any other of the above *calls*.
+   
+   Good to know: During the execution of a rule you can use the *execute* action / predicate not only to call batch files and executable, but you can also run any script defined in the *Lua* scripting language. The arguments passed to the script will be available in the global array *Arguments*. Since the script is run in the host process it will have access to the same global functions as defined for "Assistant Script" *Action Type* below.
 
 4. Equally useful as "Assistant Rule" is "Assistant Script" and since *Lua* is a widespread scripting language, it may be more accessible to the typical user. When defining the script for a custom action, you can use the following functions to connect to the given Assistant or even the "Simulator Controller.exe" process:
    
@@ -586,6 +588,8 @@ You can enable or disable individual predefined actions using the checkbox on th
    ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Action%20Definition%202.JPG)
    
    For this example it is assumed, that two keyboard commands are defined in the current simulator: 1. "i" increases the brake balance and "k" decreases the brake balance.
+   
+   Good to know: During the execution of a script you can use the *foreign* function to call any global *AutoHotkey* function in the current process. Example: foreign("showMessage")("Hello World!")
    
 As you can see, defining individual actions is really an expert topic and requires some programming skills when using rules and/or scripts. Therefore it may be no option for the casual user, and even for the experienced programmer it will require some knowledge about the inner workings. If you want to use this feature, I can offer a personal introduction and coaching as part of the Patreon membership. However, when using the *Action Type* "Controller Function", even the technically non-experienced users can achieve impressive results. Here is a corresponding example:
 

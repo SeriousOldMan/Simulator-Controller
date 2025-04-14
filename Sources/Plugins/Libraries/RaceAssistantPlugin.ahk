@@ -1321,7 +1321,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				RaceAssistantPlugin.CollectorTask.Sleep
 					:= Max(RaceAssistantPlugin.CollectorTask.Sleep
 						 , (getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-																   , "Team Server", "Update Frequency", 10) * 1000))
+										   , "Team Server", "Update Frequency", 10) * 1000))
 		}
 
 		if RaceAssistantPlugin.Simulator {
@@ -1350,6 +1350,17 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 			if first
 				startOther()
+
+			Task.startTask(() {
+				local usage := readMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat")
+				local simulator := RaceAssistantPlugin.Simulator.Simulator[true]
+				local session := (simulator . "." . getMultiMapValue(data, "Session Data", "Session", "Other"))
+
+				setMultiMapValue(usage, "Simulators", simulator, getMultiMapValue(usage, "Simulators", simulator, 0) + 1)
+				setMultiMapValue(usage, "Sessions", session, getMultiMapValue(usage, "Sessions", session, 0) + 1)
+
+				writeMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat", usage)
+			}, 10000, kLowPriority)
 		}
 	}
 

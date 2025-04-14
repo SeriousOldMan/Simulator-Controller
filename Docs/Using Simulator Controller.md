@@ -14,6 +14,19 @@ For your convinience, you can click on the version number to open the release no
  
 If you don't want to use the launch window and want "Simulator Startup" to run through, create a shortcut and add the option "-NoLaunchPad" to the *Target* field. When you use this shortcut file, no launch window will be shown, unless you hold down the Shift key, while running "Simulator Startup". The other way around can also be used: If you press the Shift key while running "Simulator Startup" normally, no launch window will be shown and the startup process will run directly.
 
+## Managing your *privacy*
+
+Simulator Controller can provide diagnostics data to the development team to increase the stability and also the functionality in future releases. Additionally, you can share data from your sessions (for example, reference telemetry data, tyre pressure information for different weather conditions, and so on) with the community for which you will receive similar data in return. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#sharing-data-with-the-community) for more information. But sharing data and diagnostics information is voluntary. You can use the profile dialog in "Simulator Setup" to make your choices.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Profile.JPG)
+
+- **Important:** Transfer of information about critical errors and also statistical usage information is enabled by default.
+
+### Notes
+
+- If you want to know what diagnostics data is being colleced, you can inspect the files in [Documents]\Simulator Controller\Diagnostics. All files can be opened with a text editor.
+- No personal data will ever be transferred, with one exception: Theoretically, your IP address is part of the transferred data, but it will never be used.
+
 ## Startup Process & Settings
 
 Before starting up, "Simulator Startup" checks the configuration information. If there is no valid configuration, a tool to edit the settings and supply a valid configuration will be launched automatically. You can trigger this anytime later by holding down the Control key when clicking on the Startup icon in "Simulator Startup". The following settings dialog will show up:

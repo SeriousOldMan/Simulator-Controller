@@ -52,7 +52,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - Multiple *Push-To-Talk* buttons are now supported, but you must enter them manually. Separate the key codes by a ";" or by a "|".
   - News & Updates are now shown one at a time on a daily basis and many more articles are available now.
   - All applications of Simulator Controller now collect critical errors and also some statistical information. This data can be transferred to the developer team based on your consent and will be used to enhance the stability and functionality of Simulator Controller.
-	- If you want to know what data gets colleced, you can inspect the files in [Documents]\Simulator Controller\Diagnostics. All files can be opened with a text editor.
+	- If you want to know what data is being colleced, you can inspect the files in [Documents]\Simulator Controller\Diagnostics. All files can be opened with a text editor.
     - You can specify which type of data will be transferred using a new profile dialog in "Simulator Startup".
 	- Of course it is possible to fully disable the transfer of diagnostic data.
 	- No personal data will ever be transferred. With one exception: Theoretically, your IP address is part of the transferred data, but it will never be used.

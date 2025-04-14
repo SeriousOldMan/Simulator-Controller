@@ -34,6 +34,7 @@
 
 [Using Simulator Controller](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller)
 ------
+  - [Data privacy settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#managing-your-privacy)
   - [Startup Process & Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings)
     - [Customizing Startup Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#customizing-startup-configuration)
 	- [Customizing Controller Notifications](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#customizing-controller-notifications)

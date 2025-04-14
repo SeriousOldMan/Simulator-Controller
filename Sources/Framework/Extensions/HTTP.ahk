@@ -29,7 +29,7 @@ class WinHTTPRequest extends WinHttpRequest._Call {
     static _doc := ""
 
     __New(options := "") {
-        if (!isObject(options))
+        if !isObject(options)
             options := {}
 
         this.whr := ComObject("WinHttp.WinHttpRequest.5.1")

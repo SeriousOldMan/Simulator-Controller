@@ -4755,6 +4755,13 @@ createTools(assistant, type, target := false, categories := ["Custom", "Builtin"
 				})
 				scriptSetGlobal(context, "__Function_Call")
 
+				scriptPushValue(context, (c) {
+					scriptPushValue(c, %scriptGetString(c, 1)%)
+
+					return Integer(1)
+				})
+				scriptSetGlobal(context, "__Foreign")
+
 				if !scriptExecute(context, &message)
 					throw message
 			}

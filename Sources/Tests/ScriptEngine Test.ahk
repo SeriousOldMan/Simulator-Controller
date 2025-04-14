@@ -154,6 +154,29 @@ class BasicTest extends Assert {
 
 		this.AssertEqual(vTestResult, "Success", "Assert handling failed...")
 	}
+
+	Foreign_Test() {
+		global vTestResult
+
+		vTestResult := false
+
+		L := luaL_newstate()
+
+		luaL_openlibs(L)
+
+		setPrint(L, lua_print)
+
+		scriptPushValue(L, (c) {
+			scriptPushValue(c, %scriptGetString(c, 1)%)
+
+			return Integer(1)
+		})
+		scriptSetGlobal(L, "foreign")
+
+		luaL_dofile(L, kSourcesDirectory . "Tests\Test Scripts\test04.lua")
+
+		this.AssertEqual(vTestResult, "Success", "Assert handling failed...")
+	}
 }
 
 class SharedDataTest extends Assert {

@@ -24,7 +24,7 @@ Simulator Controller can provide diagnostics data to the development team to inc
 
 ### Notes
 
-- If you want to know what diagnostics data is being colleced, you can inspect the files in [Documents]\Simulator Controller\Diagnostics. All files can be opened with a text editor.
+- If you want to know what diagnostics data is being collected, you can inspect the files in [Documents]\Simulator Controller\Diagnostics. All files can be opened with a text editor.
 - No personal data will ever be transferred, with one exception: Theoretically, your IP address is part of the transferred data, but it will never be used.
 
 ## Startup Process & Settings

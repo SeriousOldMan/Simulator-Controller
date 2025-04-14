@@ -211,7 +211,7 @@ checkForNews() {
 									  , "http://87.177.159.148:800/api/public/dl/jipSYNLz"
 									  , "https://www.dropbox.com/scl/fi/s5ewrqo9lzwcv6omvx667/NEWS?rlkey=j3t7aopmdye4efc8uc3xlekxz&st=wbuipual&dl=1"] {
 						try
-							Download("https://fileshare.impresion3d.pro/filebrowser/api/public/dl/r0q9-d-3", kTempDirectory . "NEWS.ini")
+							Download(url, kTempDirectory . "NEWS.ini")
 
 						if FileExist(kTempDirectory . "NEWS.ini") {
 							check := true

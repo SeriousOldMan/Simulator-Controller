@@ -193,7 +193,7 @@ checkForNews() {
 		if !check {
 			lastModified := FileGetTime(kUserConfigDirectory . "NEWS", "M")
 
-			lastModified := DateAdd(lastModified, 2, "Days")
+			lastModified := DateAdd(lastModified, 1, "Days")
 
 			check := ((lastModified < A_Now) || isDebug())
 		}
@@ -251,13 +251,16 @@ checkForNews() {
 					}
 
 				if !newsNr
-					for nr, url in getMultiMapValues(availableNews, "News")
-						if (isNumber(nr) && !getMultiMapValue(news, "News", nr, false)) {
+					for nr, url in getMultiMapValues(availableNews, "News") {
+						rule := getMultiMapValue(availableNews, "Rules", nr, "Once")
+
+						if (isNumber(nr) && !InStr(rule, "Timed") && !getMultiMapValue(news, "News", nr, false)) {
 							newsNr := nr
 							newsUrls := url
 
 							break
 						}
+					}
 
 				if !newsNr
 					for nr, url in getMultiMapValues(availableNews, "News")

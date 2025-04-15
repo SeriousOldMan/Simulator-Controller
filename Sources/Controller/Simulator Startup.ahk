@@ -1281,7 +1281,7 @@ loadStartupProfiles(target, fileName := false) {
 }
 
 editProfile(launchPadOrCommand := false, *) {
-	local profileGui, settings, errorLogsDropDown, usageStatsDropDown
+	local profileGui, settings, errorLogsDropDown, usageStatsDropDown, x, y
 
 	static result := false
 
@@ -1294,11 +1294,22 @@ editProfile(launchPadOrCommand := false, *) {
 
 		result := false
 
-		profileGui := Window({Options: "0x400000"}, translate("Profile"))
+		profileGui := Window({Options: "0x400000"})
+
+		profileGui.SetFont("Bold", "Arial")
+
+		profileGui.Add("Text", "w330 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(profileGui, "Simulator Startup.Profile"))
 
 		profileGui.SetFont("Norm", "Arial")
 
-		profileGui.Add("Text", "x16 y16 w90 +0x200", translate("Driver"))
+		profileGui.Add("Documentation", "x108 YP+20 w130 Center", translate("Profile")
+					 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#managing-your-privacy")
+
+		profileGui.SetFont("Norm", "Arial")
+
+		profileGui.Add("Text", "x8 yp+25 w342 0x10")
+
+		profileGui.Add("Text", "x16 yp+10 w90 +0x200", translate("Driver"))
 		profileGui.Add("Text", "x110 yp w240", SessionDatabase.getUserName())
 
 		profileGui.SetFont("Italic", "Arial")
@@ -1347,7 +1358,10 @@ editProfile(launchPadOrCommand := false, *) {
 
 		profileGui.Opt("+Owner" . launchPadOrCommand.Hwnd)
 
-		profileGui.Show("AutoSize Center")
+		if getWindowPosition("Simulator Startup.Profile", &x, &y)
+			profileGui.Show("x" . x . " y" . y)
+		else
+			profileGui.Show("AutoSize Center")
 
 		while !result
 			Sleep(100)

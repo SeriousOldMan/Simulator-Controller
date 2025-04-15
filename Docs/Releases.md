@@ -57,6 +57,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	- Of course it is possible to fully disable the transfer of diagnostic data.
 	- No personal data will ever be transferred. With one exception: Theoretically, your IP address is part of the transferred data, but it will never be used.
 	- **Important:** Transfer of information about critical errors and also statistical usage information is enabled by default.
+  - [Expert] *Lua* scripts now access to any global function in the host process using the *foreign* function. Example: foreign("showMessage")("Hello World!")
   
 # Release history
 

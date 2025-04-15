@@ -534,37 +534,19 @@ class RaceAssistant extends ConfigurationItem {
 						})
 						scriptSetGlobal(context, "__Assistant_Speak")
 						scriptPushValue(context, (c) {
-							local arguments := []
-
-							loop scriptGetArgsCount(c)
-								if (A_Index > 1)
-									arguments.Push(scriptGetString(c, A_Index))
-
-							callAssistant(this.RaceAssistant, scriptGetString(c), arguments*)
+							callAssistant(this.RaceAssistant, scriptGetArguments(c)*)
 
 							return Integer(0)
 						})
 						scriptSetGlobal(context, "__Assistant_Call")
 						scriptPushValue(context, (c) {
-							local arguments := []
-
-							loop scriptGetArgsCount(c)
-								if (A_Index > 1)
-									arguments.Push(scriptGetString(c, A_Index))
-
-							callController(this.RaceAssistant, scriptGetString(c), arguments*)
+							callController(this.RaceAssistant, scriptGetArguments(c)*)
 
 							return Integer(0)
 						})
 						scriptSetGlobal(context, "__Controller_Call")
 						scriptPushValue(context, (c) {
-							local arguments := []
-
-							loop scriptGetArgsCount(c)
-								if (A_Index > 1)
-									arguments.Push(scriptGetString(c, A_Index))
-
-							callFunction(this.RaceAssistant, scriptGetString(c), arguments*)
+							callFunction(this.RaceAssistant, scriptGetArguments(c)*)
 
 							return Integer(0)
 						})
@@ -573,12 +555,9 @@ class RaceAssistant extends ConfigurationItem {
 							local function := %scriptGetString(c, 1)%
 
 							scriptPushValue(c, (c) {
-								local arguments := []
+								scriptPushValue(c, function(scriptGetArguments(c)*))
 
-								loop scriptGetArgsCount(c)
-									arguments.Push(scriptGetString(c, A_Index))
-
-								function(arguments*)
+								return Integer(1)
 							})
 						})
 						scriptSetGlobal(context, "__Foreign")
@@ -4732,37 +4711,19 @@ createTools(assistant, type, target := false, categories := ["Custom", "Builtin"
 				})
 				scriptSetGlobal(context, "__Assistant_Speak")
 				scriptPushValue(context, (c) {
-					local arguments := []
-
-					loop scriptGetArgsCount(c)
-						if (A_Index > 1)
-							arguments.Push(scriptGetString(c, A_Index))
-
-					callAssistant(assistant, scriptGetString(c), arguments*)
+					callAssistant(assistant, scriptGetArguments(c)*)
 
 					return Integer(0)
 				})
 				scriptSetGlobal(context, "__Assistant_Call")
 				scriptPushValue(context, (c) {
-					local arguments := []
-
-					loop scriptGetArgsCount(c)
-						if (A_Index > 1)
-							arguments.Push(scriptGetString(c, A_Index))
-
-					callController(assistant, scriptGetString(c), arguments*)
+					callController(assistant, scriptGetArguments(c)*)
 
 					return Integer(0)
 				})
 				scriptSetGlobal(context, "__Controller_Call")
 				scriptPushValue(context, (c) {
-					local arguments := []
-
-					loop scriptGetArgsCount(c)
-						if (A_Index > 1)
-							arguments.Push(scriptGetString(c, A_Index))
-
-					callFunction(assistant, scriptGetString(c), arguments*)
+					callFunction(assistant, scriptGetArguments(c)*)
 
 					return Integer(0)
 				})
@@ -4772,12 +4733,9 @@ createTools(assistant, type, target := false, categories := ["Custom", "Builtin"
 					local function := %scriptGetString(c, 1)%
 
 					scriptPushValue(c, (c) {
-						local arguments := []
+						scriptPushValue(c, function(scriptGetArguments(c)*))
 
-						loop scriptGetArgsCount(c)
-							arguments.Push(scriptGetString(c, A_Index))
-
-						function(arguments*)
+						return Integer(1)
 					})
 				})
 				scriptSetGlobal(context, "__Foreign")

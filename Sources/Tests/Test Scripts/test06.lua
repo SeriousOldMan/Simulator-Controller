@@ -1,4 +1,4 @@
--- test05
+-- test06
 -- Test to see if we:
 -- * can use HTTP in Lua.
 

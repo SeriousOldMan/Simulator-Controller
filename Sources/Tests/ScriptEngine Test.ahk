@@ -202,7 +202,10 @@ class BasicTest extends Assert {
 
 		setPrint(L, lua_print)
 
-		scriptPushValue(L, A_AppData . "\luarocks")
+		scriptPushValue(L, A_AppData . "\luarocks\share\lua\5.4\?.lua")
+		scriptSetGlobal(L, "__LRepository")
+		scriptPushValue(L, A_AppData . "\luarocks\share\lua\5.4\?.a")
+		scriptSetGlobal(L, "__CRepository")
 
 		scriptPushValue(L, (c) {
 			local function := %scriptGetString(c, 1)%

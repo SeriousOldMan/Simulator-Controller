@@ -3,10 +3,10 @@
 -- * can use HTTP in Lua.
 
 httpGet = foreign("httpGet")
-httpPut = foreign("httpPut")
+httpPost = foreign("httpPost")
 
-text := httpGet("https://api.chucknorris.io/jokes/random")
+text = httpGet("https://api.chucknorris.io/jokes/random")
 
-foreign("MsgBox")(text)
+foreign("showMessage")(text)
 
 print("Success")

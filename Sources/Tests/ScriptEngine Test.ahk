@@ -26,6 +26,7 @@ global kBuildConfiguration := "Development"
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\Framework\Extensions\ScriptEngine.ahk"
+#Include "..\Framework\Extensions\HTTP.ahk"
 #Include "AHKUnit\AHKUnit.ahk"
 
 

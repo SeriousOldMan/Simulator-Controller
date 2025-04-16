@@ -58,6 +58,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	- No personal data will ever be transferred. With one exception: Theoretically, your IP address is part of the transferred data, but it will never be used.
 	- **Important:** Transfer of information about critical errors and also statistical usage information is enabled by default.
   - [Expert] *Lua* scripts now access to any global function in the host process using the *foreign* function. Example: foreign("showMessage")("Hello World!")
+  - [Expert] Arrays can now be passed bidirectionally between *Lua* scripts and the host language, where each element of that array can be a literal value or an array by itself. 
   
 # Release history
 

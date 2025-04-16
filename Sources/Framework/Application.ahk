@@ -251,13 +251,16 @@ checkForNews() {
 					}
 
 				if !newsNr
-					for nr, url in getMultiMapValues(availableNews, "News")
-						if (isNumber(nr) && !getMultiMapValue(news, "News", nr, false)) {
+					for nr, url in getMultiMapValues(availableNews, "News") {
+						rule := getMultiMapValue(availableNews, "Rules", nr, "Once")
+
+						if (isNumber(nr) && !InStr(rule, "Timed") && !getMultiMapValue(news, "News", nr, false)) {
 							newsNr := nr
 							newsUrls := url
 
 							break
 						}
+					}
 
 				if !newsNr
 					for nr, url in getMultiMapValues(availableNews, "News")

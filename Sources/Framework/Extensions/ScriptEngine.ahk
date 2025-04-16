@@ -167,6 +167,53 @@ initializeScriptEngine() {
 	}
 }
 
+table2Array(context, index) {
+	local result := []
+	local type, number
+
+	loop {
+		lua_pushinteger(context, Integer(A_Index))
+
+		type := lua_gettable(context, index)
+
+		try {
+			switch type {
+				case LUA_TNIL:
+					break
+				case LUA_TNUMBER:
+					number := scriptGetNumber(context, -1)
+
+					result.Push((Round(number) = number) ? Integer(number) : number)
+				case LUA_TBOOLEAN:
+					result.Push(scriptGetBoolean(context, -1))
+				case LUA_TSTRING:
+					result.Push(scriptGetString(context, -1))
+				case LUA_TTABLE:
+					result.Push(scriptGetArray(context, -1))
+				default:
+					throw "Unknown type detected in table2Array..."
+			}
+		}
+		finally {
+			lua_pop(context, 1)
+		}
+	}
+
+	return result
+}
+
+array2Table(context, array) {
+	lua_createtable(context, array.Length, 0)
+
+	loop array.Length {
+		lua_pushinteger(context, Integer(A_Index))
+
+		scriptPushValue(context, array[A_Index])
+
+		lua_settable(context, -3)
+	}
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Functions Declaration Section                 ;;;
@@ -181,9 +228,9 @@ scriptOpenContext() {
 	local path
 
 	static libPath := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-									 , "Scripts", "Path", A_AppData . "\luarocks\share\lua\5.4\?.lua")
-	static libCPpath := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-									   , "Scripts", "CPath", A_AppData . "\luarocks\lib\lua\5.4\?.dll")
+									 , "Scripts", "Modules Path", A_AppData . "\luarocks\share\lua\5.4\?.lua")
+	static libCPath := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+									  , "Scripts", "Libraries Path", A_AppData . "\luarocks\lib\lua\5.4\?.dll")
 
 	luaL_openlibs(context)
 
@@ -191,7 +238,7 @@ scriptOpenContext() {
 	lua_pushstring(context, "path")
 	lua_gettable(context, -2)
 
-	path := (lua_tostring(context, -1) . ";" . libPath)
+	path := (libPath . ";" . lua_tostring(context, -1))
 
 	lua_pop(context, 1)
 
@@ -202,7 +249,7 @@ scriptOpenContext() {
 	lua_pushstring(context, "cpath")
 	lua_gettable(context, -2)
 
-	path := (lua_tostring(context, -1) . ";" . libCPath)
+	path := (libCPath . ";" . lua_tostring(context, -1))
 
 	lua_pop(context, 1)
 
@@ -211,6 +258,20 @@ scriptOpenContext() {
 	lua_settable(context, -3)
 
 	lua_pop(context, 1)
+
+	scriptPushValue(context, (c) {
+		local value := %scriptGetString(c, 1)%
+
+		if isInstance(value, Func)
+			value := (c) {
+				scriptPushValue(c, function(scriptGetArguments(c)*))
+
+				return Integer(1)
+			}
+
+		scriptPushValue(c, value)
+	})
+	scriptSetGlobal(context, "extern")
 
 	return context
 }
@@ -240,17 +301,7 @@ scriptExecute(context, &message?) {
 }
 
 scriptPushArray(context, array) {
-	local value
-
-	lua_createtable(context, array.Length, 0)
-
-	loop array.Length {
-		lua_pushinteger(context, Integer(A_Index))
-
-		scriptPushValue(context, array[A_Index])
-
-		lua_settable(context, -3)
-	}
+	array2Table(context, array)
 }
 
 scriptPushValue(context, value) {
@@ -268,6 +319,8 @@ scriptPushValue(context, value) {
 		lua_pushinteger(context, Integer(1))
 	else if (value = kFalse)
 		lua_pushnil(context)
+	else if isInstance(value, Array)
+		scriptPushArray(context, value)
 	else
 		lua_pushstring(context, String(value))
 }
@@ -294,14 +347,12 @@ scriptGetArgsCount(context) {
 
 scriptGetArguments(context) {
 	local arguments := []
-	local number
 
 	loop scriptGetArgsCount(context)
 		if (lua_type(context, A_Index) = LUA_TNIL)
 			arguments.Push(unset)
 		else
 			arguments.Push(scriptGetValue(context, A_Index))
-		}
 
 	return arguments
 }
@@ -320,8 +371,8 @@ scriptGetValue(context, index := 1) {
 			return scriptGetBoolean(context, A_Index)
 		case LUA_TSTRING:
 			return scriptGetString(context, A_Index)
-
-			table support
+		case LUA_TTABLE:
+			return scriptGetArray(context, A_Index)
 		default:
 			throw "Unknown type detected in scriptGetValue..."
 	}
@@ -343,6 +394,10 @@ scriptGetInteger(context, index := 1) {
 
 scriptGetNumber(context, index := 1) {
 	return lua_tonumber(context, index)
+}
+
+scriptGetArray(context, index := 1) {
+	return table2Array(context, index)
 }
 
 

@@ -167,6 +167,53 @@ initializeScriptEngine() {
 	}
 }
 
+table2Array(context, index) {
+	local result := []
+	local type, number
+
+	loop {
+		lua_pushinteger(context, Integer(A_Index))
+
+		type := lua_gettable(context, index)
+
+		try {
+			switch type {
+				case LUA_TNIL:
+					break
+				case LUA_TNUMBER:
+					number := scriptGetNumber(context, -1)
+
+					result.Push((Round(number) = number) ? Integer(number) : number)
+				case LUA_TBOOLEAN:
+					result.Push(scriptGetBoolean(context, -1))
+				case LUA_TSTRING:
+					result.Push(scriptGetString(context, -1))
+				case LUA_TTABLE:
+					arguments.Push(scriptGetArray(context, -1))
+				default:
+					throw "Unknown type detected in table2Array..."
+			}
+		}
+		finally {
+			lua_pop(context, 1)
+		}
+	}
+
+	return result
+}
+
+array2Table(context, array) {
+	lua_createtable(context, array.Length, 0)
+
+	loop array.Length {
+		lua_pushinteger(context, Integer(A_Index))
+
+		scriptPushValue(context, array[A_Index])
+
+		lua_settable(context, -3)
+	}
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Functions Declaration Section                 ;;;
@@ -199,17 +246,7 @@ scriptLoadScript(context, fileName, &errorMessage?) {
 }
 
 scriptPushArray(context, array) {
-	local value
-
-	lua_createtable(context, array.Length, 0)
-
-	loop array.Length {
-		lua_pushinteger(context, Integer(A_Index))
-
-		scriptPushValue(context, array[A_Index])
-
-		lua_settable(context, -3)
-	}
+	array2Table(context, array)
 }
 
 scriptPushValue(context, value) {
@@ -227,6 +264,8 @@ scriptPushValue(context, value) {
 		lua_pushinteger(context, Integer(1))
 	else if (value = kFalse)
 		lua_pushnil(context)
+	else if isInstance(value, Array)
+		scriptPushArray(context, value)
 	else
 		lua_pushstring(context, String(value))
 }
@@ -265,6 +304,8 @@ scriptGetArguments(context) {
 				arguments.Push(scriptGetBoolean(context, A_Index))
 			case LUA_TSTRING:
 				arguments.Push(scriptGetString(context, A_Index))
+			case LUA_TTABLE:
+				arguments.Push(scriptGetArray(context, A_Index))
 			default:
 				throw "Unknown type detected in scriptGetArguments..."
 		}
@@ -287,6 +328,10 @@ scriptGetInteger(context, index := 1) {
 
 scriptGetNumber(context, index := 1) {
 	return lua_tonumber(context, index)
+}
+
+scriptGetArray(context, index := 1) {
+	return table2Array(context, index)
 }
 
 

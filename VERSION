@@ -1,8 +1,8 @@
 [Development]
-Version=6.2.8.0-dev
+Version=6.2.8.0-beta
 Target=6.2.8.0-release
 Date=04/16/2025
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/g4fSJKom
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/WlhweWp4
 Changes=New profile dialog in "Simulator Startup", New diagnostics system, Support for multiple P2T keys, Tweaked news system again, Fixed argument processing in script callbacks, Fixed execution of custom conversation actions
 Components=Media->5.6.1,Configuration->6.2.4,Utilities->6.2.2
 [Release]
@@ -24,5 +24,5 @@ Utilities.6.2.2.Download=https://fileshare.impresion3d.pro/filebrowser/api/publi
 [Current]
 Type=Development
 [Version]
-Development=6.2.8.0-dev
+Development=6.2.8.0-beta
 Release=6.2.7.0-release

@@ -296,22 +296,12 @@ scriptGetArguments(context) {
 	local arguments := []
 	local number
 
-	loop scriptGetArgsCount(context) {
-		switch lua_type(context, A_Index) {
-			case LUA_TNIL:
-				arguments.Push(unset)
-			case LUA_TNUMBER:
-				number := scriptGetNumber(context, A_Index)
-
-				arguments.Push((Round(number) = number) ? Integer(number) : number)
-			case LUA_TBOOLEAN:
-				arguments.Push(scriptGetBoolean(context, A_Index))
-			case LUA_TSTRING:
-				arguments.Push(scriptGetString(context, A_Index))
-			default:
-				throw "Unknown type detected in scriptGetArguments..."
+	loop scriptGetArgsCount(context)
+		if (lua_type(context, A_Index) = LUA_TNIL)
+			arguments.Push(unset)
+		else
+			arguments.Push(scriptGetValue(context, A_Index))
 		}
-	}
 
 	return arguments
 }

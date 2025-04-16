@@ -46,6 +46,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 #### Fixes
 
   - Fixed processing of optional arguments in script engine callbacks.
+  - Fixed execution of custom *Conversation* booster actions, which has been broken since the introduction of *Lua* scripting.
 
 #### Changes
 

@@ -4831,7 +4831,7 @@ createTools(assistant, type, target := false, categories := ["Custom", "Builtin"
 
 	addMultiMapValues(configuration, readMultiMap(kUserHomeDirectory . "Actions\" . assistant.AssistantType . ".actions"))
 
-	target := (target ? ("." . target) : target)
+	target := (target ? ("." . target) : "")
 
 	for ignore, action in string2Values(",", getMultiMapValue(configuration, type . target . ".Actions", "Active", ""))
 		if (!names || inList(names, action)) {

@@ -1290,7 +1290,7 @@ editProfile(launchPadOrCommand := false, *) {
 	else if (launchPadOrCommand == kCancel)
 		result := kCancel
 	else {
-		settings := readMultiMap(kUserConfigDirectory . "Core Settings.ini")
+		settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 
 		result := false
 

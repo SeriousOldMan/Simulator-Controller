@@ -241,7 +241,7 @@ initializeEnvironment() {
 	if kLogStartup
 		logMessage(kLogOff, "Initializing environment...")
 
-	settings := readMultiMap(kUserConfigDirectory . "Core Settings.ini")
+	settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 
 	path := getMultiMapValue(settings, "Locations", "Temp", false)
 	if path

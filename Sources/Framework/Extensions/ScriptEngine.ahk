@@ -178,8 +178,39 @@ scriptEngineAvailable() {
 
 scriptOpenContext() {
 	local context := luaL_newstate()
+	local path
+
+	static libPath := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+									 , "Scripts", "Path", A_AppData . "\luarocks\share\lua\5.4\?.lua")
+	static libCPpath := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+									   , "Scripts", "CPath", A_AppData . "\luarocks\lib\lua\5.4\?.dll")
 
 	luaL_openlibs(context)
+
+	lua_getglobal(context, "package")
+	lua_pushstring(context, "path")
+	lua_gettable(context, -2)
+
+	path := (lua_tostring(context, -1) . ";" . libPath)
+
+	lua_pop(context, 1)
+
+	lua_pushstring(context, "path")
+	lua_pushstring(context, path)
+	lua_settable(context, -3)
+
+	lua_pushstring(context, "cpath")
+	lua_gettable(context, -2)
+
+	path := (lua_tostring(context, -1) . ";" . libCPath)
+
+	lua_pop(context, 1)
+
+	lua_pushstring(context, "cpath")
+	lua_pushstring(context, path)
+	lua_settable(context, -3)
+
+	lua_pop(context, 1)
 
 	return context
 }
@@ -191,6 +222,16 @@ scriptCloseContext(context) {
 scriptLoadScript(context, fileName, &errorMessage?) {
 	if (luaL_loadfile(context, fileName) != LUA_OK) {
 		errorMessage := lua_tostring(context, -1)
+
+		return false
+	}
+	else
+		return true
+}
+
+scriptExecute(context, &message?) {
+	if (lua_pcall(context, 0, LUA_MULTRET, 0) != LUA_OK) {
+		message := lua_tostring(context, -1)
 
 		return false
 	}
@@ -231,18 +272,20 @@ scriptPushValue(context, value) {
 		lua_pushstring(context, String(value))
 }
 
-scriptSetGlobal(context, name) {
-	lua_setglobal(context, name)
+scriptGetGlobal(context, name) {
+	local value
+
+	lua_getglobal(context, name)
+
+	value := scriptGetValue(context, -1)
+
+	lua_pop(context, 1)
+
+	return value
 }
 
-scriptExecute(context, &message?) {
-	if (lua_pcall(context, 0, LUA_MULTRET, 0) != LUA_OK) {
-		message := lua_tostring(context, -1)
-
-		return false
-	}
-	else
-		return true
+scriptSetGlobal(context, name) {
+	lua_setglobal(context, name)
 }
 
 scriptGetArgsCount(context) {
@@ -271,6 +314,29 @@ scriptGetArguments(context) {
 	}
 
 	return arguments
+}
+
+scriptGetValue(context, index := 1) {
+	local number
+
+	switch lua_type(context, index) {
+		case LUA_TNIL:
+			return unset
+		case LUA_TNUMBER:
+			number := scriptGetNumber(context, A_Index)
+
+			return ((Round(number) = number) ? Integer(number) : number)
+		case LUA_TBOOLEAN:
+			return scriptGetBoolean(context, A_Index)
+		case LUA_TSTRING:
+			return scriptGetString(context, A_Index)
+
+			table support
+		default:
+			throw "Unknown type detected in scriptGetValue..."
+	}
+
+	return lua_toboolean(context, index)
 }
 
 scriptGetBoolean(context, index := 1) {

@@ -469,7 +469,7 @@ The following statistical models are currently implemented:
      | rFactor 2                  | Yes (1)                 | No (1)               | No (1) |
      | Le Mans Ultimate           | Yes (1)                 | No (1)               | No (1) |
 	 
-	 (1) It looks like the damage is reported by the corresponding API as an accumulated value for all different damage types. The damage will be reported by the Race Engineer as adamage to the Bodywork and only Bodywork repair will therefore automatically recommended for a pitstop. Select the other repair categories manually as needed.
+	 (1) It looks like the damage is reported by the corresponding API as an accumulated value for all different damage types. The damage will be reported by the Race Engineer as a damage to the Bodywork and only Bodywork repair will therefore automatically recommended for a pitstop. Select the other repair categories manually as needed.
 	 
   5. Repair recommendations
   
@@ -540,7 +540,7 @@ The following statistical models are currently implemented:
 	   
 	 - *iRacing*
 	   
-	   *iRacing* neither provides a weather model nor a sophisticated tyre model with different compounds. SO nothing to see her and move on.
+	   Weather information for *iRacing* is not available for the future, so weather warnings might come in a *little bit* late.
 	   
 	 - *RaceRoom Racing Experience*
 	   
@@ -548,7 +548,7 @@ The following statistical models are currently implemented:
 	 
 	 - *rFactor 2* and *Le Mans Ultimate*
 	   
-	   Tyre Compounds are supported as described in the [Tyre Compounds](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#using-tyre-compounds) chapter. Weather information is not available for the future, so weather warnings might come in a *little bit* late. There might be a possibility to parse the weather control history, this will be implemented in a future release.
+	   Tyre Compounds are supported as described in the [Tyre Compounds](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#using-tyre-compounds) chapter. Weather information for *rFactor 2* is not available for the future, so weather warnings might come in a *little bit* late. There might be a possibility to parse the weather control history, this will be implemented in a future release.
 	 
 Note: Extrem changes in the conditions, for example an incoming thunderstorm on a previously dry and hot track, will result in extreme variances in the statistical models and thereby will lead to strange recommendations in many cases. This is a drawback for the moment, so always double-check under those circumstances. Jona will use the data collection of recent races, if available, to guess the best possible combination of tyre compound and pressures, but especially in changing conditions tyre pressures may be way off. So double check the recommendations fo the Race Engineer against your own experiences and gut feeling.
 

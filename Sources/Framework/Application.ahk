@@ -193,7 +193,7 @@ checkForNews() {
 		if !check {
 			lastModified := FileGetTime(kUserConfigDirectory . "NEWS", "M")
 
-			lastModified := DateAdd(lastModified, 2, "Days")
+			lastModified := DateAdd(lastModified, 1, "Days")
 
 			check := ((lastModified < A_Now) || isDebug())
 		}

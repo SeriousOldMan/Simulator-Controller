@@ -26,6 +26,7 @@ global kBuildConfiguration := "Development"
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\Framework\Extensions\ScriptEngine.ahk"
+#Include "..\Framework\Extensions\HTTP.ahk"
 #Include "AHKUnit\AHKUnit.ahk"
 
 
@@ -184,6 +185,71 @@ class BasicTest extends Assert {
 		scriptSetGlobal(L, "foreign")
 
 		luaL_dofile(L, kSourcesDirectory . "Tests\Test Scripts\test05.lua")
+
+		this.AssertEqual(vTestResult, "Success", "Assert handling failed...")
+	}
+
+	JSON_Test() {
+		global vTestResult
+
+		vTestResult := false
+
+		RunWait(A_ComSpec . " /c `"luarocks install lunajson`"")
+
+		L := luaL_newstate()
+
+		luaL_openlibs(L)
+
+		setPrint(L, lua_print)
+
+		scriptPushValue(L, A_AppData . "\luarocks\share\lua\5.4\?.lua")
+		scriptSetGlobal(L, "__LRepository")
+		scriptPushValue(L, A_AppData . "\luarocks\share\lua\5.4\?.a")
+		scriptSetGlobal(L, "__CRepository")
+
+		scriptPushValue(L, (c) {
+			local function := %scriptGetString(c, 1)%
+
+			scriptPushValue(c, (c) {
+				scriptPushValue(c, function(scriptGetArguments(c)*))
+
+				return Integer(1)
+			})
+
+			return Integer(1)
+		})
+		scriptSetGlobal(L, "foreign")
+
+		luaL_dofile(L, kSourcesDirectory . "Tests\Test Scripts\test07.lua")
+
+		this.AssertEqual(vTestResult, "Success", "Assert handling failed...")
+	}
+
+	Http_Test() {
+		global vTestResult
+
+		vTestResult := false
+
+		L := luaL_newstate()
+
+		luaL_openlibs(L)
+
+		setPrint(L, lua_print)
+
+		scriptPushValue(L, (c) {
+			local function := %scriptGetString(c, 1)%
+
+			scriptPushValue(c, (c) {
+				scriptPushValue(c, function(scriptGetArguments(c)*))
+
+				return Integer(1)
+			})
+
+			return Integer(1)
+		})
+		scriptSetGlobal(L, "foreign")
+
+		luaL_dofile(L, kSourcesDirectory . "Tests\Test Scripts\test06.lua")
 
 		this.AssertEqual(vTestResult, "Success", "Assert handling failed...")
 	}

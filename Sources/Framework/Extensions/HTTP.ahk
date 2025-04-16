@@ -398,3 +398,11 @@ HTTPRequest(options := false) {
 
     return instance
 }
+
+httpGet(url, options := "", encoding := "UTF-8", content := "text/plain") {
+    return WinHttpRequest(options).GET(url, "", false, {Encoding: encoding, Content: content}).Text
+}
+
+httpPost(url, data, options := "", encoding := "UTF-8", content := "text/plain") {
+    WinHttpRequest(options).POST(url, data, false, {Encoding: encoding})
+}

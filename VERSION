@@ -3,7 +3,7 @@ Version=6.2.8.0-dev
 Target=6.2.8.0-release
 Date=04/13/2025
 Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/g4fSJKom
-Changes=New profile dialog in "Simulator Startup", New diagnostics system, Support for multiple P2T keys, Tweaked news system again
+Changes=New profile dialog in "Simulator Startup", New diagnostics system, Support for multiple P2T keys, Tweaked news system again, Fixed argument processing in script callbacks
 Components=Media->5.6.1,Configuration->6.2.4,Utilities->6.2.2
 [Release]
 Version=6.2.7.0-release

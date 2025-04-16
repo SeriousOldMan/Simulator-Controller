@@ -45,7 +45,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 #### Fixes
 
-  - No fixes this time.
+  - Fixed processing of optional arguments in script engine callbacks.
 
 #### Changes
 

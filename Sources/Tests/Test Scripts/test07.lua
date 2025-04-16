@@ -2,7 +2,8 @@
 -- Test to see if we:
 -- * can use a JSON module.
 
-local lunajson = require 'lunajson'
+
+local lunajson = require("lunajson")
 local jsonstr = '{"Hello":["lunajson",1.5]}'
 local t = lunajson.decode(jsonstr)
 

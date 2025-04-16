@@ -2,7 +2,8 @@
 -- Test to see if we:
 -- * can use HTTP in Lua.
 
-local lunajson = require 'lunajson'
+
+local lunajson = require("lunajson")
 
 httpGet = extern("httpGet")
 httpPost = extern("httpPost")

@@ -263,13 +263,15 @@ scriptOpenContext() {
 		local value := %scriptGetString(c, 1)%
 
 		if isInstance(value, Func)
-			value := (c) {
-				scriptPushValue(c, function(scriptGetArguments(c)*))
+			scriptPushValue(c, (c) {
+				scriptPushValue(c, value(scriptGetArguments(c)*))
 
 				return Integer(1)
-			}
+			})
+		else
+			scriptPushValue(c, value)
 
-		scriptPushValue(c, value)
+		return Integer(1)
 	})
 	scriptSetGlobal(context, "extern")
 

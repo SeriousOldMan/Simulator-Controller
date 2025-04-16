@@ -551,16 +551,6 @@ class RaceAssistant extends ConfigurationItem {
 							return Integer(0)
 						})
 						scriptSetGlobal(context, "__Function_Call")
-						scriptPushValue(context, (c) {
-							local function := %scriptGetString(c, 1)%
-
-							scriptPushValue(c, (c) {
-								scriptPushValue(c, function(scriptGetArguments(c)*))
-
-								return Integer(1)
-							})
-						})
-						scriptSetGlobal(context, "__Foreign")
 
 						if scriptExecute(context, &message)
 							result := scriptGetBoolean(context)
@@ -4728,17 +4718,6 @@ createTools(assistant, type, target := false, categories := ["Custom", "Builtin"
 					return Integer(0)
 				})
 				scriptSetGlobal(context, "__Function_Call")
-
-				scriptPushValue(context, (c) {
-					local function := %scriptGetString(c, 1)%
-
-					scriptPushValue(c, (c) {
-						scriptPushValue(c, function(scriptGetArguments(c)*))
-
-						return Integer(1)
-					})
-				})
-				scriptSetGlobal(context, "__Foreign")
 
 				if !scriptExecute(context, &message)
 					throw message

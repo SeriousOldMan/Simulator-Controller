@@ -589,7 +589,7 @@ You can enable or disable individual predefined actions using the checkbox on th
    
    For this example it is assumed, that two keyboard commands are defined in the current simulator: 1. "i" increases the brake balance and "k" decreases the brake balance.
    
-   Good to know: During the execution of a script you can use the *foreign* function to call any global *AutoHotkey* function in the current process. Example: foreign("showMessage")("Hello World!")
+   Good to know: During the execution of a script you can use the *extern* function to call any global *AutoHotkey* function in the current process. Example: extern("showMessage")("Hello World!"). *extern* can also be used to access any global variable in that process.
    
 As you can see, defining individual actions is really an expert topic and requires some programming skills when using rules and/or scripts. Therefore it may be no option for the casual user, and even for the experienced programmer it will require some knowledge about the inner workings. If you want to use this feature, I can offer a personal introduction and coaching as part of the Patreon membership. However, when using the *Action Type* "Controller Function", even the technically non-experienced users can achieve impressive results. Here is a corresponding example:
 

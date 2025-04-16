@@ -34,7 +34,8 @@ global kBuildConfiguration := "Development"
 ;;;                         Private Variables Section                       ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global vLuaResult := false
+global vTestResult := []
+global vTestExports := []
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -58,13 +59,37 @@ lua_print(L) {
 
 	msg := lua_tolstring(L, 1, 0)
 
-	vTestResult := msg
+	vTestResult.Push(msg)
+}
 
-	; showMessage(msg)
+intern(value) {
+	global vTestExports
+
+	vTestExports.Push(value)
 }
 
 add(v1, v2) {
 	return (v1 + v2)
+}
+
+arraysEqual(a1, a2) {
+	if (isInstance(a1, Array) && isInstance(a2, Array) && (a1.Length = a2.Length)) {
+		loop a1.Length {
+			v1 := a1[A_Index]
+			v2 := a2[A_Index]
+
+			if (isInstance(v1, Array) || isInstance(v2, Array)) {
+				if !arraysEqual(v1, v2)
+					return false
+			}
+			else if (v1 != v2)
+				return false
+		}
+
+		return true
+	}
+	else
+		return false
 }
 
 
@@ -123,7 +148,7 @@ class IntegrationTest extends Assert {
 	Print_Test() {
 		global vTestResult
 
-		vTestResult := false
+		vTestResult := []
 
 		L := luaL_newstate()
 
@@ -139,7 +164,10 @@ class IntegrationTest extends Assert {
 
 		luaL_dofile(L, kSourcesDirectory . "Tests\Test Scripts\test01.lua")
 
-		this.AssertEqual(userName, vTestResult, "Global variable binding failed...")
+		this.AssertTrue(vTestResult.Length > 0, "Global variable binding failed...")
+		this.AssertEqual(userName, vTestResult[1], "Global variable binding failed...")
+
+		lua_close(L)
 	}
 }
 
@@ -147,7 +175,7 @@ class BasicTest extends Assert {
 	Assert_Test() {
 		global vTestResult
 
-		vTestResult := false
+		vTestResult := []
 
 		L := luaL_newstate()
 
@@ -157,13 +185,16 @@ class BasicTest extends Assert {
 
 		luaL_dofile(L, kSourcesDirectory . "Tests\Test Scripts\test02.lua")
 
-		this.AssertEqual(vTestResult, "Success", "Assert handling failed...")
+		this.AssertTrue(vTestResult.Length > 0, "Assert handling failed...")
+		this.AssertEqual(vTestResult[1], "Success", "Assert handling failed...")
+
+		lua_close(L)
 	}
 
 	Foreign_Test() {
 		global vTestResult
 
-		vTestResult := false
+		vTestResult := []
 
 		L := luaL_newstate()
 
@@ -186,77 +217,50 @@ class BasicTest extends Assert {
 
 		luaL_dofile(L, kSourcesDirectory . "Tests\Test Scripts\test05.lua")
 
-		this.AssertEqual(vTestResult, "Success", "Assert handling failed...")
+		this.AssertTrue(vTestResult.Length > 0, "Foreign function calling failed...")
+		this.AssertEqual(vTestResult[1], "Success", "Foreign function calling failed...")
+
+		lua_close(L)
 	}
 
 	JSON_Test() {
 		global vTestResult
 
-		vTestResult := false
+		vTestResult := []
 
 		RunWait(A_ComSpec . " /c `"luarocks install lunajson`"")
 
-		L := luaL_newstate()
-
-		luaL_openlibs(L)
+		L := scriptOpenContext()
 
 		setPrint(L, lua_print)
 
-		scriptPushValue(L, A_AppData . "\luarocks\share\lua\5.4\?.lua")
-		scriptSetGlobal(L, "__LRepository")
-		scriptPushValue(L, A_AppData . "\luarocks\share\lua\5.4\?.a")
-		scriptSetGlobal(L, "__CRepository")
-
-		scriptPushValue(L, (c) {
-			local function := %scriptGetString(c, 1)%
-
-			scriptPushValue(c, (c) {
-				scriptPushValue(c, function(scriptGetArguments(c)*))
-
-				return Integer(1)
-			})
-
-			return Integer(1)
-		})
-		scriptSetGlobal(L, "foreign")
-
 		luaL_dofile(L, kSourcesDirectory . "Tests\Test Scripts\test07.lua")
 
-		this.AssertEqual(vTestResult, "Success", "Assert handling failed...")
+		this.AssertTrue(vTestResult.Length = 3, "Library loading failed...")
+		this.AssertEqual(vTestResult[1], 1.5, "Library loading failed...")
+		this.AssertEqual(vTestResult[2], "{`"Hello`":[`"lunajson`",1.5]}", "Library loading failed...")
+		this.AssertEqual(vTestResult[3], "Success", "Library loading failed...")
+
+		scriptCloseContext(L)
 	}
 
 	Http_Test() {
 		global vTestResult
 
-		vTestResult := false
+		vTestResult := []
 
-		L := luaL_newstate()
+		RunWait(A_ComSpec . " /c `"luarocks install lunajson`"")
 
-		luaL_openlibs(L)
+		L := scriptOpenContext()
 
 		setPrint(L, lua_print)
 
-		scriptPushValue(L, A_AppData . "\luarocks\share\lua\5.4\?.lua")
-		scriptSetGlobal(L, "__LRepository")
-		scriptPushValue(L, A_AppData . "\luarocks\share\lua\5.4\?.a")
-		scriptSetGlobal(L, "__CRepository")
-
-		scriptPushValue(L, (c) {
-			local function := %scriptGetString(c, 1)%
-
-			scriptPushValue(c, (c) {
-				scriptPushValue(c, function(scriptGetArguments(c)*))
-
-				return Integer(1)
-			})
-
-			return Integer(1)
-		})
-		scriptSetGlobal(L, "foreign")
-
 		luaL_dofile(L, kSourcesDirectory . "Tests\Test Scripts\test06.lua")
 
-		this.AssertEqual(vTestResult, "Success", "Assert handling failed...")
+		this.AssertTrue(vTestResult.Length > 0, "HTTP integration failed...")
+		this.AssertEqual(vTestResult[1], "Success", "HTTP integration failed...")
+
+		scriptCloseContext(L)
 	}
 }
 
@@ -264,7 +268,7 @@ class SharedDataTest extends Assert {
 	Table_Test() {
 		global vTestResult
 
-		vTestResult := false
+		vTestResult := []
 
 		L := luaL_newstate()
 
@@ -280,7 +284,35 @@ class SharedDataTest extends Assert {
 
 		luaL_dofile(L, kSourcesDirectory . "Tests\Test Scripts\test03.lua")
 
-		this.AssertTrue(vTestResult, "Table handling failed...")
+		this.AssertTrue(vTestResult.Length > 0, "Table handling failed...")
+		this.AssertEqual(vTestResult[vTestResult.Length], "Success", "Table handling failed...")
+
+		lua_close(L)
+	}
+
+	Builtin_Table_Test() {
+		global vTestResult
+		global vTestExports
+
+		vTestResult := []
+		vTestExports := []
+
+		L := scriptOpenContext()
+
+		setPrint(L, lua_print)
+
+		scriptPushArray(L, ["One", "Two", ["Three", 4]])
+		scriptSetGlobal(L, "Arguments")
+
+		luaL_dofile(L, kSourcesDirectory . "Tests\Test Scripts\test08.lua")
+
+		this.AssertTrue(vTestResult.Length > 0, "Table handling failed...")
+		this.AssertTrue(vTestResult[1], "Table handling failed...")
+		this.AssertEqual(vTestExports[1], "One", "Table handling failed...")
+		this.AssertEqual(vTestExports[2], "Two", "Table handling failed...")
+		this.AssertTrue(arraysEqual(vTestExports[3], ["Three", 4]), "Table handling failed...")
+
+		scriptCloseContext(L)
 	}
 }
 
@@ -288,7 +320,7 @@ class LibraryTest extends Assert {
 	Module_Test() {
 		global vTestResult
 
-		vTestResult := false
+		vTestResult := []
 
 		L := luaL_newstate()
 
@@ -302,7 +334,10 @@ class LibraryTest extends Assert {
 
 		luaL_dofile(L, kSourcesDirectory . "Tests\Test Scripts\test04.lua")
 
-		this.AssertTrue(vTestResult, "Module loading failed...")
+		this.AssertTrue(vTestResult.Length > 0, "Module loading failed...")
+		this.AssertTrue(vTestResult[1], "Module loading failed...")
+
+		lua_close(L)
 	}
 }
 

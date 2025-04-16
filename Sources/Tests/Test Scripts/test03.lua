@@ -17,3 +17,5 @@ if checkExists(globs, "test") then
 else
 	print("The function is missing or mispelled.")
 end
+
+print("Success")

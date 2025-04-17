@@ -228,9 +228,9 @@ scriptOpenContext() {
 	local path
 
 	static libPath := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-									 , "Scripts", "Modules Path", A_AppData . "\luarocks\share\lua\5.4\?.lua")
+									 , "Script Engine", "Modules Path", A_AppData . "\luarocks\share\lua\5.4\?.lua")
 	static libCPath := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-									  , "Scripts", "Libraries Path", A_AppData . "\luarocks\lib\lua\5.4\?.dll")
+									  , "Script Engine", "Libraries Path", A_AppData . "\luarocks\lib\lua\5.4\?.dll")
 
 	luaL_openlibs(context)
 

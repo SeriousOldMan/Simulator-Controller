@@ -7,43 +7,42 @@ To change any of the low level configuration options, create a file named "Core 
 
 Please note, that all this confguration options are documented here for the experienced user with technical skills. Do not change any of them, until you are told so by me, or you do know what you are doing.
 
+### System Settings
+
 Let's start with some very low system level settings.
 
 | Category   | Setting  | Default | Description |
 |------------|----------|---------|-------------|
 | Locations  | Temp     | [Documents]\Simulator Controller\Temp     | The location of all temporary files of Simulator Controller. Set this to a different location, if your Documents folder is under control of *One Drive* or alike. |
-| Locations  | Programs | [Documents]\Simulator Controller\Programs | The location of all additional or optional programs installed or created by Simulator Controller. Especially when using Whisper, this can consume quite a lot of disk space. Set this to a different location, if your Documents folder is on a drive with restricted size, but be sure to choose a fast alternative drive. |
-
-| Category | Setting | Default | Description |
-|----------|---------|---------|-------------|
+|            | Programs | [Documents]\Simulator Controller\Programs | The location of all additional or optional programs installed or created by Simulator Controller. Especially when using Whisper, this can consume quite a lot of disk space. Set this to a different location, if your Documents folder is on a drive with restricted size, but be sure to choose a fast alternative drive. |
 | Process  | Memory.Max | 1024 | The max memory in MB a process may consume, before it get killed automatically. |
-| Process  | Memory.Critical | 80 | The percentage of max memory usage, when memory reporting starts and special debug code is activated. |
+|          | Memory.Critical | 80 | The percentage of max memory usage, when memory reporting starts and special debug code is activated. |
+| Diagnostics | Critical | *True* | If this is *True* (which is the default), all internal erros and critical log messages get collected and are sent to the development team for further investigation. No private or personal data is transmitted, only the error messages and the stack information. This setting can be changed in the profile dialog of "Simulator Startup". |
+|             | Usage    | *True* | If this is *True* (which is the default), several statistical informations are collected about the usage pattern of Simulator Controller - which tools are used how often, what functions are used and so on. This information is sent to the development team to foster further development of Simulator Controller.  No private or personal data is included. This setting can be changed in the profile dialog of "Simulator Startup". |
 
+### Task Settings
 
 Next are the configuration settings for the task processing engine. Four priority levels are defined and tasks with higher priority will postpone the processing of tasks with lower priority, when scheduled. For systems with a faster CPU you can make the schedule window smaller, whereas slower PCs might need a less demanding schedule plan.
 
 | Category | Setting | Default | Description |
 |----------|---------|---------|-------------|
 | Task     | Schedule.Interrupt | 50 | The number of milliseconds to wait between each schedule of tasks at interrupt level. Interrupt tasks are very important for the repsonsiveness of the user interface, but if the value is too low on a slower PC, tasks with lower priority might get no time at all. Example: Polling the Push-To-Talk button on the steering wheel is running at interrupt priority. |
-|     | Schedule.High | 200 | The number of milliseconds to wait between each schedule of tasks with high priority. These tasks are very important stuff which can not wait until normal operations complete. Example: Detecting that one Assistant wants to issue an urgent notification to the driver thereby interrupting the speech of another Assistant. |
-|     | Schedule.Normal | 500 | The number of milliseconds to wait between each schedule of tasks with normal priority. The majority of all internal tasks are running at this priority level. Example: Processing a message received by another proces. |
-|     | Schedule.Low | 2000 | The number of milliseconds to wait between each schedule of tasks with low priority. All tasks that can wait until other processing has finihed are running at low priority. Example: The acquisition of telemetry data for the currently running session. |
+|          | Schedule.High | 200 | The number of milliseconds to wait between each schedule of tasks with high priority. These tasks are very important stuff which can not wait until normal operations complete. Example: Detecting that one Assistant wants to issue an urgent notification to the driver thereby interrupting the speech of another Assistant. |
+|          | Schedule.Normal | 500 | The number of milliseconds to wait between each schedule of tasks with normal priority. The majority of all internal tasks are running at this priority level. Example: Processing a message received by another proces. |
+|          | Schedule.Low | 2000 | The number of milliseconds to wait between each schedule of tasks with low priority. All tasks that can wait until other processing has finihed are running at low priority. Example: The acquisition of telemetry data for the currently running session. |
 
-Built on top of the Task framework, the Message Manager handles the communcation between the different applications. The delivery of messages as well as the internal processing of a received message also have a schedule window.
+### Message Settings
+
+Built on top of the Task Manager, the Message Manager handles the communcation between the different applications. The delivery of messages as well as the internal processing of a received message also have a schedule window.
 
 | Category | Setting | Default | Description |
 |----------|---------|---------|-------------|
-| Messages     | Schedule | 200 | The number of milliseconds to wait between each run of the message scheduler, which sends messages to and receives messages from other processes of Simulator Controller. |
-|      | Dispatch | 100 | All received messages are placed in a queue for processing. This setting defines the number of milliseconds to let other activities run between each message processing. |
+| Messages | Schedule | 200 | The number of milliseconds to wait between each run of the message scheduler, which sends messages to and receives messages from other processes of Simulator Controller. |
+|          | Dispatch | 100 | All received messages are placed in a queue for processing. This setting defines the number of milliseconds to let other activities run between each message processing. |
 
-The group of *Diagnose* settings define, how diagnose and error information is handled to improve the reliability and stability of Simulator Controller.
+### Development Settings
 
-| Category    | Setting | Default | Description |
-|-------------|---------|---------|-------------|
-| Diagnostics | Critical | *True* | If this is *True* (which is the default), all internal erros and critical log messages get collected and are sent to the development team for further investigation. No private or personal data is transmitted, only the error messages and the stack information. This setting can be changed in the profile dialog of "Simulator Startup". |
-|             | Usage    | *True* | If this is *True* (which is the default), several statistical informations are collected about the usage pattern of Simulator Controller - which tools are used how often, what functions are used and so on. This information is sent to the development team to foster further development of Simulator Controller.  No private or personal data is included. This setting can be changed in the profile dialog of "Simulator Startup". |
-
-The next group of settings are used mainly for development purposes. It allows to control the level of self-diagnosing of the framework during development and testing, but can also be used to track down really complex bugs in the production code. Please note, that some of these settings can also be toggled using the choices in the respective application menus in the tray of the Windows task bar during runtime.
+The next group of settings is used mainly for development purposes. It allows to control the level of self-diagnosing of the framework during development and testing, but can also be used to track down really complex bugs in the production code. Please note, that some of these settings can also be toggled using the choices in the respective application menus in the tray of the Windows task bar during runtime.
 
 | Category | Setting | Default | Description |
 |----------|---------|---------|-------------|
@@ -52,6 +51,8 @@ The next group of settings are used mainly for development purposes. It allows t
 |      | LogLevel | *depending on configuration* | Defines the level of verbosity of the logging messages. Allowed values are *Debug*, *Info*, *Warn*, *Critical* and *Off*. Defult is *Warn* for production configuration and *Debug* for devlopment configuration. This option overwrites the choice as set in "Simulator Configuration" and it can be switched using the application menu. |
 |      | LogStartup | False | If *True*, special logging is enabled which gives you insights into the timing during the startup process of any of the applications of Simulator Controller. Use this, if any of the applications seems to hang during startup. |
 |      | Verbose | *depending on configuration* | Enables or disables additional and very verbose diagnostic output. Never use it in a real race, since error dialogs might popup while driving. Default is *True* for non-compiled code, when *Debug* is enabled, *False* otherwise. |
+
+### Voice Settings
 
 The following group let's you control a couple of aspects of the voice recognition engine.
 
@@ -63,6 +64,16 @@ The following group let's you control a couple of aspects of the voice recogniti
 |      | Low Rating | 0.7     | This value represents the Sorenson-Dice rating a registered command syntax must reach, when compared to a spoken command, so that this command is even considered. The range of the rating is from 0.0 (no match at all) up to 1.0 (perfect word by word match). |
 |      | Interruptable | False | If not *False*, the currently active speech will be interrupted, if Push-to-Talk is pressed. If the value is "All", all currently pending speeches will be discarded as well, before the listener is activated. |
 
+### Script Settings
+
+The Script Engine used by the Assistants is based on the well-known *Lua* scripting language. *Lua* can use libraries or modules, which can be loaded on demand using the *require* statement. These libraries will be searched in those directories defined in a correspnding *Path* setting. If you have defined your own libraries, put them in a folder and point the settings below to this folder. However, if you are using the *Lua* package manager *luarocks* and use only libraries from there, this is not necessary, as long as the packages are located in "%appdata%\luarocks\share\lua\5.4" and "%appdata%\luarocks\lib\lua\5.4", which are the defaults for *luarocks*.
+
+| Category      | Setting        | Default | Description |
+|---------------|----------------|---------|-------------|
+| Script Engine | Modules Path   | %homePath%\Documents\Simulator Controller\Scripts\?.lua;%APPDATA%\luarocks\share\lua\5.4\?.lua | The path to search for *Lua* modules. Please note the "?.lua" at the end which matches *Lua* source files. The default value contains the local script folder and also the default location for *luarocks* modules. |
+|               | Libraries Path | %APPDATA%\luarocks\lib\lua\5.4\?.lua | The path to search for libraries written in other languages which can be used by *Lua*. Please note the "?.dll". The default value points to the default location of *luarocks* libraries. |
+
+### Miscellaneous Settings
 
 And finally a couple of other settings which configure low level components of Simulator Controller:
 

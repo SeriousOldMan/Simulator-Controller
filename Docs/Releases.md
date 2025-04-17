@@ -58,7 +58,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	- Of course it is possible to fully disable the transfer of diagnostic data.
 	- No personal data will ever be transferred. With one exception: Theoretically, your IP address is part of the transferred data, but it will never be used.
 	- **Important:** Transfer of information about critical errors and also statistical usage information is enabled by default.
-  - [Expert] *Lua* scripts now access to any global function in the host process using the *extern* function. Example: extern("showMessage")("Hello World!"). *extern* can also be used to access any global variable in that process.
+  - [Expert] New [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#script-settings) let you specify the directories where *Lua* searches for modules and libraries.
+  - [Expert] *Lua* scripts can now access any global function in the host process using the *extern* function. Example: extern("showMessage")("Hello World!"). *extern* can also be used to access any global variable in that process.
   - [Expert] Arrays can now be passed bidirectionally between *Lua* scripts and the host language, where each element of that array can be a literal value or an array by itself. 
   
 # Release history

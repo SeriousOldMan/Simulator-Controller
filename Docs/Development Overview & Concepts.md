@@ -187,7 +187,7 @@ Beside these customizable rules, a *special* rule exists, which integrates the *
 
 	dotNET Applications && DLLs=Special
 
-To use this, you must also set the path to the *MSBuild Bin* directory using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). If this path is set, *Simulator Tools* searches the *Sources\Foreign* folder for "*.sln" files and runs *MSBuild* on them.
+To use this, you must also set the path to the *MSBuild Bin* directory using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). If this path is set, *Simulator Tools* searches the *Sources\Special* folder for "*.sln" files and runs *MSBuild* on them.
 
 Normally you will never need to change the build rules when developing your own plugins, as long as they will reside in the standard *Plugins* folders. But, if you decide to put them elsewhere, you might want to add an dependency to this place. To do this, copy *Simulator Tools.targets* to the *Simulator Controller\Config* folder, which is located in the *Documents* folder in your user home folder.
 

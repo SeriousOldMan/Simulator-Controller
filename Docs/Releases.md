@@ -8,6 +8,7 @@
 
   - Fixed processing of optional arguments in script engine callbacks.
   - Fixed execution of custom *Conversation* booster actions, which has been broken since the introduction of *Lua* scripting.
+  - Fixed a critical bug in the session database which prevented settings for wildcard configurations to be applied. This bug was introduced with the character filter for car and track names in the last release.
 
 #### Changes
 

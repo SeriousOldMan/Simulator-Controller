@@ -3,7 +3,7 @@ Version=6.2.8.0-release
 Target=6.2.8.0-release
 Date=04/18/2025
 Download=https://cutt.ly/zrgkRcgP;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/WaweQDrn;https://www.dropbox.com/scl/fi/mpu85khy67s49ndhl4y33/Simulator-Controller-6.2.8.0-release.zip?rlkey=3t5t94jek58wk63w6wg707unj&st=uygrc1f9&dl=1;http://87.177.159.148:800/api/public/dl/e7NYSZH6;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.2.8.0-release.zip
-Changes=New profile dialog in "Simulator Startup", New diagnostics system, Support for multiple P2T keys, Tweaked news system again, Fixed argument processing in script callbacks, Fixed execution of custom conversation actions, New core settings for Lua search paths
+Changes=New profile dialog in "Simulator Startup", New diagnostics system, Support for multiple P2T keys, Tweaked news system again, Fixed argument processing in script callbacks, Fixed execution of custom conversation actions, New core settings for Lua search paths, Fixed wildcard settings handling in session database
 Components=Media->5.6.1,Configuration->6.2.4,Utilities->6.2.2
 [Release]
 Version=6.2.8.0-release

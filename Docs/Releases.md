@@ -1,5 +1,35 @@
 # Latest stable release
 
+## 6.2.8.0
+
+#### Date: 04/18/25
+
+#### Fixes
+
+  - Fixed processing of optional arguments in script engine callbacks.
+  - Fixed execution of custom *Conversation* booster actions, which has been broken since the introduction of *Lua* scripting.
+
+#### Changes
+
+  - Multiple *Push-To-Talk* buttons are now supported, but you must enter them manually. Separate the key codes by a ";" or by a "|".
+  - News & Updates are now shown one at a time on a daily basis and many more articles are available now.
+  - All applications of Simulator Controller now collect critical errors and also some statistical information. This data can be transferred to the developer team based on your consent and will be used to enhance the stability and functionality of Simulator Controller.
+	- If you want to know what data is being collected, you can inspect the files in [Documents]\Simulator Controller\Diagnostics. All files can be opened with a text editor.
+    - You can specify which type of data will be transferred using a [new profile dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#managing-your-privacy) in "Simulator Startup".
+	- Of course it is possible to fully disable the transfer of diagnostic data.
+	- No personal data will ever be transferred. With one exception: Theoretically, your IP address is part of the transferred data, but it will never be used.
+	- **Important:** Transfer of information about critical errors and also statistical usage information is **enabled** by default.
+  - [Expert] Several additions and enhancements for the integrated *Lua* scripting engine:
+    - New [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#script-settings) let you specify the directories where *Lua* searches for modules and libraries.
+    - Arrays can now be passed in both directions between *Lua* scripts and the host language, where each element of that array can be a literal value or an array by itself.
+    - *Lua* scripts have now access to any global object in the host process using the *extern* function. Example: extern("showMessage")("Hello World!"). *extern* can be used to access function objects, but also any other global variable in that process. All global variables, constants and functions of the framework are available using *extern* in any process. See the [Development Guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts) for more infomation and reference. 
+  
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.2.7.0
 
 #### Date: 04/11/25
@@ -37,33 +67,6 @@
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-627), if you experience inaccessible car or track data in the session database.
   
-# Upcoming release
-
-## 6.2.8.0
-
-#### Date: 04/18/25 (planned)
-
-#### Fixes
-
-  - Fixed processing of optional arguments in script engine callbacks.
-  - Fixed execution of custom *Conversation* booster actions, which has been broken since the introduction of *Lua* scripting.
-
-#### Changes
-
-  - Multiple *Push-To-Talk* buttons are now supported, but you must enter them manually. Separate the key codes by a ";" or by a "|".
-  - News & Updates are now shown one at a time on a daily basis and many more articles are available now.
-  - All applications of Simulator Controller now collect critical errors and also some statistical information. This data can be transferred to the developer team based on your consent and will be used to enhance the stability and functionality of Simulator Controller.
-	- If you want to know what data is being collected, you can inspect the files in [Documents]\Simulator Controller\Diagnostics. All files can be opened with a text editor.
-    - You can specify which type of data will be transferred using a [new profile dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#managing-your-privacy) in "Simulator Startup".
-	- Of course it is possible to fully disable the transfer of diagnostic data.
-	- No personal data will ever be transferred. With one exception: Theoretically, your IP address is part of the transferred data, but it will never be used.
-	- **Important:** Transfer of information about critical errors and also statistical usage information is **enabled** by default.
-  - [Expert] New [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#script-settings) let you specify the directories where *Lua* searches for modules and libraries.
-  - [Expert] *Lua* scripts have now access to any global object in the host process using the *extern* function. Example: extern("showMessage")("Hello World!"). *extern* can be used to access function objects, but also any other global variable in that process.
-  - [Expert] Arrays can now be passed in both directions between *Lua* scripts and the host language, where each element of that array can be a literal value or an array by itself. 
-  
-# Release history
-
 ## 6.2.6.0
 
 #### Date: 04/04/25

@@ -2446,7 +2446,7 @@ if kLogStartup
 	logMessage(kLogOff, "Loading plugins...")
 
 #Include "..\Plugins\Controller Plugins.ahk"
-#Include "%A_MyDocuments%\Simulator Controller\Plugins\Controller Plugins.ahk"
+#Include "..\Plugins\Simulator Providers.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

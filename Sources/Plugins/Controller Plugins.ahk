@@ -35,3 +35,5 @@
 #Include "RST Plugin.ahk"
 
 #include "Integration Plugin.ahk"				; Must be loaded last, if at all
+
+#Include "%A_MyDocuments%\Simulator Controller\Plugins\Controller Plugins.ahk"

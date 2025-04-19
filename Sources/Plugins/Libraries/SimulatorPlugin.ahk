@@ -12,20 +12,12 @@
 #Include "..\..\Framework\Extensions\Task.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\..\Database\Libraries\SettingsDatabase.ahk"
+#Include "SimulatorProvider.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-global kSessionUnknown := -2
-global kSessionFinished := 0
-global kSessionPaused := -1
-global kSessionOther := 1
-global kSessionPractice := 2
-global kSessionQualification := 3
-global kSessionRace := 4
-global kSessionTimeTrial := 5
 
 global kPitstopMode := "Pitstop"
 global kAssistantMode := "Assistant"
@@ -212,6 +204,8 @@ class SimulatorPlugin extends ControllerPlugin {
 	iCommandMode := "Event"
 	iCommandDelay := kUndefined
 
+	iProvider := false
+
 	iSimulator := false
 	iSession := kSessionFinished
 
@@ -284,6 +278,15 @@ class SimulatorPlugin extends ControllerPlugin {
 		}
 	}
 
+	Provider {
+		Get {
+			if !this.iProvider
+				this.iProvider := this.createSimulatorProvider()
+
+			return this.iProvider
+		}
+	}
+
 	Simulator[name := false] {
 		Get {
 			return (name ? this.iSimulator.Application : this.iSimulator)
@@ -296,8 +299,11 @@ class SimulatorPlugin extends ControllerPlugin {
 		}
 
 		Set {
-			if (value != this.iCar)
+			if (value != this.iCar) {
+				this.iProvider := false
+
 				this.resetTrackAutomation()
+			}
 
 			this.iCommandDelay := kUndefined
 
@@ -311,8 +317,11 @@ class SimulatorPlugin extends ControllerPlugin {
 		}
 
 		Set {
-			if (value != this.iTrack)
+			if (value != this.iTrack) {
+				this.iProvider := false
+
 				this.resetTrackAutomation()
+			}
 
 			this.iCommandDelay := kUndefined
 
@@ -464,6 +473,10 @@ class SimulatorPlugin extends ControllerPlugin {
 		logMessage(kLogWarn, translate("Action `"") . action . translate("`" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 	}
 
+	createSimulatorProvider() {
+		return SimulatorProvider.createSimulatorProvider(this.Simulator[true], this.Car, this.Track)
+	}
+
 	getPitstopActions(&allActions, &selectActions) {
 		allActions := CaseInsenseMap()
 
@@ -608,6 +621,7 @@ class SimulatorPlugin extends ControllerPlugin {
 
 		if (force || ((session != this.Session) && (session != kSessionPaused))) {
 			this.iSession := session
+			this.iProvider := false
 
 			if (session == kSessionFinished) {
 				this.Car := false
@@ -696,6 +710,35 @@ class SimulatorPlugin extends ControllerPlugin {
 
 	requirePitstopMFD() {
 		return false
+	}
+
+	correctStandingsData(standingsData, needCorrection := false) {
+		return this.Provider.correctStandingsData(standingsData, needCorrection)
+	}
+
+	readTelemetryData() {
+		return this.Provider.readTelemetryData()
+	}
+
+	readStandingsData(telemetryData, correct := false) {
+		return this.Provider.readStandingsData(telemetryData, correct)
+	}
+
+	acquireTelemetryData() {
+		return this.readTelemetryData()
+	}
+
+	acquireStandingsData(telemetryData, finished := false) {
+		return this.readStandingsData(telemetryData, !finished)
+	}
+
+	acquireSessionData(&telemetryData, &standingsData, finished := false) {
+		telemetryData := this.acquireTelemetryData()
+		standingsData := this.acquireStandingsData(telemetryData, finished)
+	}
+
+	readSessionData(options := "", protocol?) {
+		return this.Provider.readSessionData(options, protocol?)
 	}
 }
 
@@ -1232,25 +1275,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	updateStandingsData(data) {
-		local count := getMultiMapValue(data, "Position Data", "Car.Count", 0)
-		local driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
-		local carNr
-
-		loop count {
-			carNr := StrReplace(getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr", ""), "`"", "")
-
-			if !IsAlnum(carNr)
-				carNr := "-"
-
-			setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr", carNr)
-		}
-
-		if (driver && (count > 0))
-			if (getMultiMapValue(data, "Position Data", "Car." . driver . ".InPitLane", false)
-			 && !getMultiMapValue(data, "Stint Data", "InPitLane", false))
-				setMultiMapValue(data, "Stint Data", "InPitLane", true)
-
-		this.iHasStandingsData := (count > 0)
+		this.iHasStandingsData := (getMultiMapValue(data, "Position Data", "Car.Count", 0) > 0)
 	}
 
 	saveSessionState(&sessionSettings, &sessionState) {
@@ -1299,128 +1324,6 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 				this.RequestedTyreCompound := compound(tyreCompound, getMultiMapValue(sessionSettings
 																					, "Simulator Settings", "Tyre.Requested.Compound.Color"))
 		}
-	}
-
-	correctStandingsData(standingsData, needCorrection := false) {
-		local positions := Map()
-		local cars := []
-		local count, position
-
-		count := getMultiMapValue(standingsData, "Position Data", "Car.Count", 0)
-
-		if !needCorrection
-			loop count {
-				position := (getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Position", 0) + 0)
-
-				if positions.Has(position)
-					needCorrection := true
-				else
-					positions[position] := true
-			}
-
-		if needCorrection {
-			loop count
-				cars.Push(Array(A_Index, getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Laps"
-																	   , getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Lap"))
-									   + getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Lap.Running")))
-
-			bubbleSort(&cars, (c1, c2) => c1[2] < c2[2])
-
-			if isDebug() {
-				loop count {
-					if (getMultiMapValue(standingsData, "Position Data", "Car." . cars[A_Index][1] . ".Position") != A_Index)
-						logMessage(kLogDebug, "Corrected position for car " . cars[A_Index][1] . ": "
-											. getMultiMapValue(standingsData, "Position Data", "Car." . cars[A_Index][1] . ".Position")
-											. " -> " . A_Index)
-
-					setMultiMapValue(standingsData, "Position Data", "Car." . cars[A_Index][1] . ".Position", A_Index)
-				}
-			}
-			else
-				loop count
-					setMultiMapValue(standingsData, "Position Data", "Car." . cars[A_Index][1] . ".Position", A_Index)
-		}
-
-		return standingsData
-	}
-
-	readTelemetryData() {
-		local trackData, data
-
-		static sessionDB := false
-
-		if !sessionDB
-			sessionDB := SessionDatabase()
-
-		trackData := sessionDB.getTrackData(this.Code, this.Track)
-
-		return this.readSessionData(trackData ? ("Track=" . trackData) : "")
-	}
-
-	readStandingsData(telemetryData, correct := false) {
-		local standingsData
-
-		if telemetryData.Has("Position Data") {
-			standingsData := newMultiMap()
-
-			setMultiMapValues(standingsData, "Position Data", getMultiMapValues(telemetryData, "Position Data"))
-		}
-		else
-			standingsData := this.readSessionData("Standings=true")
-
-		if correct {
-			standingsData := this.correctStandingsData(standingsData)
-
-			if telemetryData.Has("Position Data")
-				telemetryData["Position Data"] := standingsData["Position Data"]
-		}
-
-		return standingsData
-	}
-
-	acquireTelemetryData() {
-		return this.readTelemetryData()
-	}
-
-	acquireStandingsData(telemetryData, finished := false) {
-		return this.readStandingsData(telemetryData, !finished)
-	}
-
-	acquireSessionData(&telemetryData, &standingsData, finished := false) {
-		telemetryData := this.acquireTelemetryData()
-		standingsData := this.acquireStandingsData(telemetryData, finished)
-	}
-
-	readSessionData(options := "", protocol?) {
-		local simulator := this.Simulator[true]
-		local car := this.Car
-		local track := this.Track
-		local data := callSimulator(this.Code, options, protocol?)
-		local tyreCompound, tyreCompoundColor, ignore, section
-
-		for ignore, section in ["Car Data", "Setup Data"] {
-			tyreCompound := getMultiMapValue(data, section, "TyreCompound", kUndefined)
-
-			if (tyreCompound = kUndefined) {
-				tyreCompound := getMultiMapValue(data, section, "TyreCompoundRaw", kUndefined)
-
-				if ((tyreCompound != kUndefined) && tyreCompound) {
-					tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, kUndefined)
-
-					if (tyreCompound = kUndefined)
-						tyreCompound := normalizeCompound("Dry")
-
-					if tyreCompound {
-						splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor := false)
-
-						setMultiMapValue(data, section, "TyreCompound", tyreCompound)
-						setMultiMapValue(data, section, "TyreCompoundColor", tyreCompoundColor)
-					}
-				}
-			}
-		}
-
-		return data
 	}
 }
 

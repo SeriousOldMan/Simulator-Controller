@@ -51,9 +51,6 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	iPitstopOptions := []
 	iPitstopOptionStates := []
 
-	static sCarDB := false
-	static sClassDB := false
-
 	OpenPitstopMFDHotkey {
 		Get {
 			return this.iOpenPitstopMFDHotkey
@@ -123,17 +120,6 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 								   , "BodyworkRepair", "Repair Bodywork", "SuspensionRepair", "Repair Suspension")
 
 		selectActions := []
-	}
-
-	static loadDatabase() {
-		local data
-
-		if !R3EPlugin.sCarDB {
-			data := JSON.parse(FileRead(kResourcesDirectory . "Simulator Data\R3E\r3e-data.json", "UTF-8"))
-
-			R3EPlugin.sClassDB := data["classes"]
-			R3EPlugin.sCarDB := data["cars"]
-		}
 	}
 
 	simulatorStartup(simulator) {
@@ -651,67 +637,6 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	getCarName(carID) {
-		local carDB
-
-		static lastCarID := false
-		static lastCarName := false
-
-		if !R3EPlugin.sCarDB
-			R3EPlugin.loadDatabase()
-
-		if (carID != lastCarID) {
-			carDB := R3EPlugin.sCarDB
-
-			lastCarID := carID
-			lastCarName := (carDB.Has(carID) ? carDB[carID]["Name"] : "Unknown")
-		}
-
-		return lastCarName
-	}
-
-	getClassName(classID) {
-		local classDB
-
-		static lastClassID := false
-		static lastClassName := false
-
-		if !R3EPlugin.sClassDB
-			R3EPlugin.loadDatabase()
-
-		if (classID != lastClassID) {
-			classDB := R3EPlugin.sClassDB
-
-			lastClassID := classID
-			lastClassName := (classDB.Has(classID) ? classDB[classID]["Name"] : "Unknown")
-		}
-
-		return lastClassName
-	}
-
-	updateStandingsData(data) {
-		local carID
-
-		super.updateStandingsData(data)
-
-		loop getMultiMapValue(data, "Position Data", "Car.Count", 0) {
-			carID := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Car", kUndefined)
-
-			if (carID != kUndefined) {
-				setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Car", this.getCarName(carID))
-
-				setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class"
-									 , this.getClassName(getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class")))
-			}
-		}
-	}
-
-	updateTelemetryData(data) {
-		setMultiMapValue(data, "Session Data", "Car", this.getCarName(getMultiMapValue(data, "Session Data", "Car", "")))
-
-		super.updateTelemetryData(data)
-	}
-
 	getImageFileNames(imageNames*) {
 		local fileNames := []
 		local ignore, imageName, fileName
@@ -808,38 +733,6 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			setMultiMapValue(settings, "Simulator.RaceRoom Racing Experience", "Pitstop.Service.Tyres", "Change")
 
 		return settings
-	}
-
-	readSessionData(options := "", protocol?) {
-		local simulator := this.Simulator[true]
-		local car := this.Car
-		local track := this.Track
-		local data := super.readSessionData(options, protocol?)
-		local tyreCompound, tyreCompoundColor, ignore, postFix
-
-		static tyres := ["Front", "Rear"]
-
-		for ignore, section in ["Car Data", "Setup Data"]
-			for ignore, postfix in tyres {
-				tyreCompound := getMultiMapValue(data, section, "TyreCompound" . postFix, kUndefined)
-
-				if (tyreCompound = kUndefined) {
-					tyreCompound := getMultiMapValue(data, section, "TyreCompoundRaw" . postFix, kUndefined)
-
-					if ((tyreCompound != kUndefined) && tyreCompound) {
-						tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
-
-						if tyreCompound {
-							splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
-
-							setMultiMapValue(data, section, "TyreCompound" . postFix, tyreCompound)
-							setMultiMapValue(data, section, "TyreCompoundColor" . postFix, tyreCompoundColor)
-						}
-					}
-				}
-			}
-
-		return data
 	}
 }
 

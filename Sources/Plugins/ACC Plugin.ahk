@@ -100,7 +100,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			if (getMultiMapValues(telemetryData, "Setup Data", false)
 			 && (this.iPlugin.iLastTyreCompound && this.iPlugin.iPSChangeTyres)) {
-				setMultiMapValue(telemetryData, "Setup Data", "TyreCompound", this.iLastTyreCompound)
+				setMultiMapValue(telemetryData, "Setup Data", "TyreCompound", this.iPlugin.iLastTyreCompound)
 				setMultiMapValue(telemetryData, "Setup Data", "TyreCompoundColor", "Black")
 			}
 

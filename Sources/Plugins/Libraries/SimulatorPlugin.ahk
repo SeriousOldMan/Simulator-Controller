@@ -725,16 +725,15 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 
 	acquireTelemetryData() {
-		return this.readTelemetryData()
+		return this.Provider.readTelemetryData()
 	}
 
 	acquireStandingsData(telemetryData, finished := false) {
-		return this.readStandingsData(telemetryData, !finished)
+		return this.Provider.acquireStandingsData(telemetryData, finished)
 	}
 
 	acquireSessionData(&telemetryData, &standingsData, finished := false) {
-		telemetryData := this.acquireTelemetryData()
-		standingsData := this.acquireStandingsData(telemetryData, finished)
+		return this.Provider.acquireSessionData(&telemetryData, &standingsData, finished)
 	}
 
 	readSessionData(options := "", protocol?) {

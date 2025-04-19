@@ -57,6 +57,32 @@ class ACCProvider extends SimulatorProvider {
 		}
 	}
 
+	computeBrakePadWear(location, compound, thickness) {
+		if (location = "Front") {
+			switch compound {
+				case 1, 4:
+					return Max(0, Min(100, 100 - ((thickness - 15) / 14 * 100)))
+				case 2:
+					return Max(0, Min(100, 100 - ((thickness - 13) / 16 * 100)))
+				case 3:
+					return Max(0, Min(100, 100 - ((thickness - 12) / 17 * 100)))
+				default:
+					return Max(0, Min(100, 100 - ((thickness - 14.5) / 14.5 * 100)))
+			}
+		}
+		else
+			switch compound {
+				case 1, 4:
+					return Max(0, Min(100, 100 - ((thickness - 15.5) / 13.5 * 100)))
+				case 2:
+					return Max(0, Min(100, 100 - ((thickness - 12.5) / 16.5 * 100)))
+				case 3:
+					return Max(0, Min(100, 100 - ((thickness - 12) / 17 * 100)))
+				default:
+					return Max(0, Min(100, 100 - ((thickness - 14.5) / 14.5 * 100)))
+			}
+	}
+
 	acquireTelemetryData() {
 		local data := super.acquireTelemetryData()
 		local brakePadThickness, frontBrakePadCompound, rearBrakePadCompound, brakePadWear

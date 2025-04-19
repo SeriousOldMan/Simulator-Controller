@@ -247,7 +247,6 @@ initializeEnvironment() {
 	if path
 		kTempDirectory := (normalizeDirectoryPath(path) . "\")
 
-
 	path := getMultiMapValue(settings, "Locations", "Programs", false)
 	if path
 		kProgramsDirectory := (normalizeDirectoryPath(path) . "\")
@@ -319,9 +318,10 @@ initializeEnvironment() {
 	DirCreate(kUserHomeDirectory . "Translations")
 	DirCreate(kUserHomeDirectory . "Grammars")
 	DirCreate(kUserHomeDirectory . "Simulator Data")
-	DirCreate(kUserHomeDirectory . "Temp")
 	DirCreate(kDatabaseDirectory . "Community")
 	DirCreate(kDatabaseDirectory . "User")
+	DirCreate(kTempDirectory)
+	DirCreate(kProgramsDirectory)
 
 	if FileExist(kResourcesDirectory . "Templates") {
 		if !FileExist(A_MyDocuments . "\Simulator Controller\Plugins\Controller Plugins.ahk")

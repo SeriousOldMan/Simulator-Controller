@@ -26,7 +26,8 @@ class R3EProvider extends SimulatorProvider {
 	}
 
 	__New(arguments*) {
-		Task.startTask(ObjBindMethod(R3EPlugin, "loadDatabase"), 1000, kLowPriority)
+		if isSet(R3EPlugin)
+			Task.startTask(ObjBindMethod(R3EProvider, "loadDatabase"), 1000, kLowPriority)
 
 		super.__New(arguments*)
 	}
@@ -138,3 +139,20 @@ class R3EProvider extends SimulatorProvider {
 		return data
 	}
 }
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                   Private Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+initializeR3EProvider() {
+	if !isSet(R3EPlugin)
+		Task.startTask(ObjBindMethod(R3EProvider, "loadDatabase"), 1000, kLowPriority)
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Initialization Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+initializeR3EProvider()

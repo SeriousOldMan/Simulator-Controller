@@ -208,7 +208,7 @@ class Sector397Provider extends SimulatorProvider {
 		local car := this.Car
 		local track := this.Track
 		local data := super.readSessionData(options, protocol?)
-		local tyreCompound, tyreCompoundColor, ignore, postFix
+		local tyreCompound, tyreCompoundColor, ignore, section, postFix
 
 		static tyres := ["Front", "Rear"]
 

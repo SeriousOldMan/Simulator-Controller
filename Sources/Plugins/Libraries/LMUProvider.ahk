@@ -25,6 +25,8 @@ class LMUProvider extends Sector397Provider {
 	iCarInfos := false
 	iCarInfosRefresh := 0
 
+	iFuelRatio := 1
+
 	class CarInfos extends LMURestProvider.StandingsData {
 		iCarIDs := false
 		iCarPositions := false
@@ -138,6 +140,10 @@ class LMUProvider extends Sector397Provider {
 		}
 	}
 
+	getRefuelAmount(setupData) {
+		return setupData.getRefuelLevel()
+	}
+
 	parseCategory(candidate, &rest) {
 		super.parseCategory(candidate, &rest)
 
@@ -220,7 +226,7 @@ class LMUProvider extends Sector397Provider {
 			setupData := LMURESTProvider.PitstopData(simulator, car, track)
 			data := newMultiMap()
 
-			setMultiMapValue(data, "Setup Data", "FuelAmount", this.getOptionHandler("Refuel").Call("Get", , setupData))
+			setMultiMapValue(data, "Setup Data", "FuelAmount", this.getRefuelAmount(setupData))
 
 			for key, postFix in keys {
 				tyreCompound := setupData.TyreCompound[key]

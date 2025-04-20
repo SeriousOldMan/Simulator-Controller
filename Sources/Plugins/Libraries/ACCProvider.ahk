@@ -39,6 +39,9 @@ class ACCProvider extends SimulatorProvider {
 	}
 
 	__New(car, track, provider := false) {
+		if !ACCProvider.kUnknown
+			ACCProvider.kUnknown := translate("Unknown")
+
 		this.iUDPProvider := (provider ? provider : ACCUDPProvider())
 
 		super.__New(car, track)
@@ -207,10 +210,7 @@ class ACCProvider extends SimulatorProvider {
 
 			return (finished ? standingsData : this.correctStandingsData(standingsData))
 		}
-		else {
+		else
 			this.UDPProvider.shutdown(true)
-
-			return newMultiMap()
-		}
 	}
 }

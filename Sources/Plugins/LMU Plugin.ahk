@@ -13,6 +13,7 @@
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "Libraries\SimulatorPlugin.ahk"
 #Include "Libraries\LMURESTProvider.ahk"
+#Include "Libraries\LMUProvider.ahk"
 #Include "RF2 Plugin.ahk"
 
 
@@ -33,12 +34,28 @@ class LMUPlugin extends Sector397Plugin {
 	iLastFuelAmount := 0
 	iRemainingFuelAmount := 0
 
-	iFuelRatio := 1
-
 	iFuelLevels := []
 	iVirtualEnergyLevels := []
 
 	iAdjustRefuelAmount := false
+
+	class LMUProvider extends LMUProvider {
+		iPlugin := false
+
+		__New(plugin, car, track) {
+			this.iPlugin := plugin
+
+			super.__New(car, track)
+		}
+
+		getRefuelAmount(setupData) {
+			return this.iPlugin.getOptionHandler("Refuel").Call("Get", , setupData)
+		}
+	}
+
+	createSimulatorProvider() {
+		return LMUPlugin.LMUProvider(this, this.Car, this.Track)
+	}
 
 	getPitstopActions(&allActions, &selectActions) {
 		allActions := CaseInsenseMap("NoRefuel", "No Refuel", "Refuel", "Refuel"
@@ -458,7 +475,6 @@ class LMUPlugin extends Sector397Plugin {
 
 			this.iFuelLevels := []
 			this.iVirtualEnergyLevels := []
-			this.iFuelRatio := 1
 
 			this.iAdjustRefuelAmount := false
 		}

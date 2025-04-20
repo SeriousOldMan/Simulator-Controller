@@ -3104,19 +3104,21 @@ class RaceEngineer extends RaceAssistant {
 												   , delta: fragments[(increment%suffix% > 0) ? "Increased" : "Decreased"]
 												   , by: fragments["By"]})
 
-					pressureCorrection := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.Correction", 0), 1)
+					if (tyrePressures = kUndefined) {
+						pressureCorrection := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.Correction", 0), 1)
 
-					if (Abs(pressureCorrection) > 0.05) {
-						temperatureDelta := knowledgeBase.getValue("Weather.Temperature.Air.Delta", 0)
+						if (Abs(pressureCorrection) > 0.05) {
+							temperatureDelta := knowledgeBase.getValue("Weather.Temperature.Air.Delta", 0)
 
-						if (temperatureDelta = 0)
-							temperatureDelta := ((pressureCorrection > 0) ? -1 : 1)
+							if (temperatureDelta = 0)
+								temperatureDelta := ((pressureCorrection > 0) ? -1 : 1)
 
-						speaker.speakPhrase((pressureCorrection > 0) ? "PressureCorrectionUp" : "PressureCorrectionDown"
-										  , {value: speaker.number2Speech(convertUnit("Pressure", Abs(pressureCorrection)))
-										   , unit: fragments[getUnit("Pressure")]
-										   , pressureDirection: (pressureCorrection > 0) ? fragments["Increase"] : fragments["Decrease"]
-										   , temperatureDirection: (temperatureDelta > 0) ? fragments["Rising"] : fragments["Falling"]})
+							speaker.speakPhrase((pressureCorrection > 0) ? "PressureCorrectionUp" : "PressureCorrectionDown"
+											  , {value: speaker.number2Speech(convertUnit("Pressure", Abs(pressureCorrection)))
+											   , unit: fragments[getUnit("Pressure")]
+											   , pressureDirection: (pressureCorrection > 0) ? fragments["Increase"] : fragments["Decrease"]
+											   , temperatureDirection: (temperatureDelta > 0) ? fragments["Rising"] : fragments["Falling"]})
+						}
 					}
 
 					deviationThreshold := knowledgeBase.getValue("Session.Settings.Tyre.Pressure.Deviation")

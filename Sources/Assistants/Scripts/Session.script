@@ -1,0 +1,89 @@
+-------------------------------------------------------------------------------
+---   Modular Simulator Controller System - Session Module                  ---
+---                                                                         ---
+---   Author:     Oliver Juwig (TheBigO)                                    ---
+---   License:    (2025) Creative Commons - BY-NC-SA                        ---
+-------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+---                           Public Modules Section                        ---
+-------------------------------------------------------------------------------
+
+Session = {}
+Standings = {}
+Stint = {}
+
+
+-------------------------------------------------------------------------------
+---                         Private Functions Section                       ---
+-------------------------------------------------------------------------------
+
+createHandler(class, method)
+	return function(...)
+		extern("simulatorConnector")(class, method)
+	end
+end
+
+
+-------------------------------------------------------------------------------
+---                          Public Functions Section                       ---
+-------------------------------------------------------------------------------
+
+Session.Active = createHandler("Session", "Active")
+Session.Simulator = createHandler("Session", "Simulator")
+Session.Track = createHandler("Session", "Track")
+Session.Car = createHandler("Session", "Car")
+Session.Nr = createHandler("Session", "Nr")
+Session.Type = createHandler("Session", "Type")
+
+Standings.Cars = createHandler("Standings", "Count")
+Standings.Positions = function()
+	local cars, nrs, laps, times, drivers = createHandler("Standings", "Positions")()
+	local positions = {}
+	
+	for position, car in ipairs(cars) do
+		table.insert(positions, {position = position, car = car, nr = nrs[position],
+								 laps = laps[position], time = times[position], driver = drivers[position]}
+	end
+	
+	return positions
+end
+Standings.Position = function(position)
+	local car, nr, laps, time, driver = createHandler("Standings", "Position")(position)
+	
+	if car then
+		return {position = position, car = car, nr = nr, laps = laps, time = time, driver = driver}
+	else
+		return {}
+	end
+end
+
+Stint.Driver = createHandler("Stint", "Driver")
+Stint.Car = function()
+	local compounds, tyrePressures, tyreTemperatures, tyreWears, brakeTemperatures, brakeWears,
+		  fuel, bodyworkDamage, suspensionDamage, engineDamage = createHandler("Stint", "Car")()
+	
+	return {tyres = {front_left = {compound = compounds[1], pressure = tyrePressures[1], temperature = tyreTemperatures[1], wear = tyreWears[1]},
+					 front_right = {compound = compound[2], pressure = tyrePressures[2], temperature = tyreTemperatures[2], wear = tyreWears[2]},
+					 front_right = {compound = compound[3], pressure = tyrePressures[3], temperature = tyreTemperatures[3], wear = tyreWears[3]},
+					 front_right = {compound = compound[4], pressure = tyrePressures[4], temperature = tyreTemperatures[4], wear = tyreWears[4]}},
+			brakes = {front_left = {temperature = brakeTemperatures[1], wear = brakeWears[1]},
+					  front_right = {temperature = brakeTemperatures[2], wear = brakeWears[2]},
+					  front_right = {temperature = brakeTemperatures[3], wear = brakeWears[3]},
+					  front_right = {temperature = brakeTemperatures[4], wear = brakeWears[4]}},
+			fuel = fuel,
+			damage = {bodywork = bodyworkDamage,
+					  suspension = suspensionDamage,
+					  engine = engineDamage}}
+end
+Stint.Conditions = function()
+	local weather, airT, trackT, grip, weather10Min, weather30Min = createHandler("Stint", "Conditions")()
+	
+	return {weather = weather, air_temperature = airT, track_temeprature = trackT, grip = grip,
+			weather_10_min = weather10Min, weather_30_min = weather30Min}
+end
+Stint.Lap = createHandler("Stint", "Lap")
+Stint.Sector = createHandler("Stint", "Sector")
+Stint.LastTime = createHandler("Stint", "LastTime")
+Stint.BestTime = createHandler("Stint", "BestTime")
+Stint.Laps = createHandler("Stint", "Laps")

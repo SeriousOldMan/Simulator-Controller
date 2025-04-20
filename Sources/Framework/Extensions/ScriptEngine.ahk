@@ -238,7 +238,8 @@ scriptOpenContext() {
 	lua_pushstring(context, "path")
 	lua_gettable(context, -2)
 
-	path := (kUserHomeDirectory . "Scripts\?.lua;" . kResourcesDirectory . "Scripts\?.lua;"
+	path := (kUserHomeDirectory . "Scripts\?.script;" . kResourcesDirectory . "Scripts\?.script;"
+			 kUserHomeDirectory . "Scripts\?.lua;" . kResourcesDirectory . "Scripts\?.lua;"
 												   . libPath . ";" . lua_tostring(context, -1))
 
 	lua_pop(context, 1)
@@ -250,7 +251,8 @@ scriptOpenContext() {
 	lua_pushstring(context, "cpath")
 	lua_gettable(context, -2)
 
-	path := (kUserHomeDirectory . "Scripts\?.dll;" . libCPath . ";" . lua_tostring(context, -1))
+	path := (kUserHomeDirectory . "Scripts\?.dll;" . kResourcesDirectory . "Scripts\?.dll;"
+												   . libCPath . ";" . lua_tostring(context, -1))
 
 	lua_pop(context, 1)
 

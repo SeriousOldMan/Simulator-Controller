@@ -4937,3 +4937,13 @@ normalizeArguments(arguments, remote := false) {
 
 	return result
 }
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                          Plugin Include Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+if kLogStartup
+	logMessage(kLogOff, "Loading plugins...")
+
+#Include "..\..\Plugins\Simulator Providers.ahk"

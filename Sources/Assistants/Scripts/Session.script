@@ -18,9 +18,9 @@ Stint = {}
 ---                         Private Functions Section                       ---
 -------------------------------------------------------------------------------
 
-createHandler(class, method)
+function createHandler(class, method)
 	return function(...)
-		extern("simulatorConnector")(class, method)
+		extern("simulatorConnector")(class, method)(...)
 	end
 end
 
@@ -43,12 +43,12 @@ Standings.Positions = function()
 	
 	for position, car in ipairs(cars) do
 		table.insert(positions, {position = position, car = car, nr = nrs[position],
-								 laps = laps[position], time = times[position], driver = drivers[position]}
+								 laps = laps[position], time = times[position], driver = drivers[position]})
 	end
 	
 	return positions
 end
-Standings.Position = function(position)
+Standings.Car = function(position)
 	local car, nr, laps, time, driver = createHandler("Standings", "Position")(position)
 	
 	if car then

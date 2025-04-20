@@ -804,8 +804,8 @@ launchPad(command := false, arguments*) {
 			if ((getMultiMapValue(startupConfig, "Simulator", "Simulator", kUndefined) != kUndefined) &&
 				Application(SessionDatabase.getSimulatorName(getMultiMapValue(startupConfig, "Simulator", "Simulator")), kSimulatorConfiguration).isRunning())
 				theApplication .= (" -Simulator `"" . getMultiMapValue(startupConfig, "Simulator", "Simulator") . "`""
-							  . " -Car `"" . getMultiMapValue(startupConfig, "Simulator", "Car") . "`""
-							  . " -Track `"" . getMultiMapValue(startupConfig, "Simulator", "Track") . "`"")
+								 . " -Car `"" . getMultiMapValue(startupConfig, "Simulator", "Car") . "`""
+								 . " -Track `"" . getMultiMapValue(startupConfig, "Simulator", "Track") . "`"")
 
 			if restart {
 				launchPadGui.Block()

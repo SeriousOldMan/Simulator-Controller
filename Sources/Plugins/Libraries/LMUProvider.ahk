@@ -197,7 +197,7 @@ class LMUProvider extends Sector397Provider {
 			this.iCarInfos := false
 
 		if !this.CarInfos {
-			this.iCarInfos := LMUPlugin.CarInfos(this.readStandingsData(telemetryData))
+			this.iCarInfos := LMUProvider.CarInfos(this.readStandingsData(telemetryData))
 
 			this.iCarInfosRefresh := (A_TickCount + 30000)
 		}

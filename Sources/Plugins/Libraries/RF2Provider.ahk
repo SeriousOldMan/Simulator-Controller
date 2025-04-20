@@ -17,6 +17,37 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class Sector397Provider extends SimulatorProvider {
+	parseNr(candidate, &rest) {
+		local temp, char
+
+		candidate := Trim(candidate)
+
+		if isNumber(candidate) {
+			rest := ""
+
+			return candidate
+		}
+		else {
+			temp := ""
+
+			loop StrLen(candidate) {
+				char := SubStr(candidate, A_Index, 1)
+
+				if isNumber(char)
+					temp .= char
+				else if (char != A_Space) {
+					rest := SubStr(candidate, A_Index)
+
+					return temp
+				}
+			}
+
+			rest := ""
+
+			return ((temp != "") ? temp : false)
+		}
+	}
+
 	parseCategory(candidate, &rest) {
 		local temp := ""
 		local char

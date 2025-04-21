@@ -219,6 +219,34 @@ array2Table(context, array) {
 ;;;                    Public Functions Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+scriptExternHandler(context) {
+	local value := %scriptGetString(context, 1)%
+	local ignore, theValue
+
+	if isInstance(value, Func)
+		scriptPushValue(context, (c) {
+			local result := value(scriptGetArguments(c)*)
+
+			if isInstance(result, Values) {
+				for ignore, theValue in result
+					scriptPushValue(context, theValue)
+
+				result := result.Length
+			}
+			else {
+				scriptPushValue(c, result)
+
+				result := 1
+			}
+
+			return Integer(result)
+		})
+	else
+		scriptPushValue(context, value)
+
+	return Integer(1)
+}
+
 scriptEngineAvailable() {
 	return (DllCall("GetModuleHandle", "str", "lua54.dll") != 0)
 }
@@ -262,20 +290,7 @@ scriptOpenContext() {
 
 	lua_pop(context, 1)
 
-	scriptPushValue(context, (c) {
-		local value := %scriptGetString(c, 1)%
-
-		if isInstance(value, Func)
-			scriptPushValue(c, (c) {
-				scriptPushValue(c, value(scriptGetArguments(c)*))
-
-				return Integer(1)
-			})
-		else
-			scriptPushValue(c, value)
-
-		return Integer(1)
-	})
+	scriptPushValue(context, scriptExternHandler)
 	scriptSetGlobal(context, "extern")
 
 	return context

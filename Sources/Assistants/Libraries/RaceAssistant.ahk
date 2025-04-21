@@ -552,6 +552,33 @@ class RaceAssistant extends ConfigurationItem {
 						})
 						scriptSetGlobal(context, "__Function_Call")
 
+						scriptPushValue(context, (c) {
+							local name := scriptGetString(c, 1)
+
+							if (name = "__Session_Data") {
+								scriptPushValue(context, (c) {
+									local result := this.getData("Rule", scriptGetArguments(c)*)
+
+									if isInstance(result, Values) {
+										for ignore, theValue in result.Values
+											scriptPushValue(context, theValue)
+
+										result := result.Values.Length
+									}
+									else {
+										scriptPushValue(c, result)
+
+										result := 1
+									}
+
+									return Integer(result)
+								})
+							}
+							else
+								return scriptExternalHandler(c)
+						})
+						scriptSetGlobal(context, "extern")
+
 						if scriptExecute(context, &message)
 							result := scriptGetBoolean(context)
 						else
@@ -1225,6 +1252,79 @@ class RaceAssistant extends ConfigurationItem {
 		}
 		else
 			return inList(this.Knowledge, topic)
+	}
+
+	getData(type, topic, item) {
+		local knowledgeBase := this.KnowledgeBase
+		local simulator := SimulatorProvider.Simulator
+		local car := SimulatorProvider.Car
+		local track := SimulatorProvider.Track
+		local telemetryData, standingsData, data
+
+		static sessionTypes
+
+		if !isSet(sessionTypes) {
+			sessionTypes := Map(kSessionPractice, "Practice", kSessionQualification, "Qualification"
+							  , kSessionRace, "Race", kSessionTimeTrial, "Time Trial", kSessionOther, "Other")
+
+			sessionTypes.Default := "Other"
+		}
+
+		if knowledgeBase {
+			simulator := knowledgeBase.getValue("Simulator")
+			car := knowledgeBase.getValue("Car")
+			track := knowledgeBase.getValue("Track")
+
+			switch topic, false {
+				case "Session":
+					switch item, false {
+						case "Active":
+							return true
+						case "Simulator":
+							return SessionDatabase.getSimulatorName(simulator)
+						case "Car":
+							return SessionDatabase.getCarName(simulator, car)
+						case "Track":
+							return SessionDatabase.getCarName(simulator, track)
+						case "Type":
+							return sessionTypes[this.Session]
+						case "Format":
+							return knowledgeBase.getValue("Session.Format", "Time")
+						case "Laps":
+							return knowledgeBase.getValue("Lap", 0)
+						case "Data"
+							data := newMultiMap()
+
+							setMultiMapValue(data, "System", "Time", A_TickCount)
+
+							SimulatorProvider.createSimulatorProvider(simulator
+																			, car, track).acquireSessionData(&telemetryData, &positionsData)
+
+							addMultiMapValues(data, telemetryData)
+							addMultiMapValues(data, standingsData)
+
+							return printMultiMap(data)
+						case "Knowledge":
+							return StrReplace(JSON.print(this.getKnowledge(type)), "%", "\%")
+					}
+				case "Stint":
+					switch item, false {
+						case "Driver":
+							return this.DriverFullName
+						case "Lap":
+							return (knowledgeBase.getValue("Lap", 0) + 1)
+						case "Laps":
+							return (knowledgeBase.getValue("Lap", 0) - this.BaseLap + 1)
+
+					}
+			}
+
+			return kUndefined
+		}
+		else if ((topic = "Session") && (value = "Active"))
+			return false
+		else
+			return kUndefined
 	}
 
 	getKnowledge(type, options := false) {
@@ -2951,6 +3051,21 @@ class GridRaceAssistant extends RaceAssistant {
 			default:
 				super.handleVoiceCommand(grammar, words)
 		}
+	}
+
+
+
+	getData(type, topic, item) {
+		local knowledgeBase := this.KnowledgeBase
+
+		if (knowledgeBase && (topic = "Standings")) {
+			switch item, false {
+				case "Position":
+					return Values(this.getPosition(), this.getPosition(false, "Class"))
+			}
+		}
+		else
+			return super.getData(topic, item)
 	}
 
 	getKnowledge(type, options := false) {
@@ -4718,6 +4833,33 @@ createTools(assistant, type, target := false, categories := ["Custom", "Builtin"
 					return Integer(0)
 				})
 				scriptSetGlobal(context, "__Function_Call")
+
+				scriptPushValue(context, (c) {
+					local name := scriptGetString(c, 1)
+
+					if (name = "__Session_Data") {
+						scriptPushValue(context, (c) {
+							local result := this.getData(type, scriptGetArguments(c)*)
+
+							if isInstance(result, Values) {
+								for ignore, theValue in result
+									scriptPushValue(context, theValue)
+
+								result := result.Length
+							}
+							else {
+								scriptPushValue(c, result)
+
+								result := 1
+							}
+
+							return Integer(result)
+						})
+					}
+					else
+						return scriptExternalHandler(c)
+				})
+				scriptSetGlobal(context, "extern")
 
 				if !scriptExecute(context, &message)
 					throw message

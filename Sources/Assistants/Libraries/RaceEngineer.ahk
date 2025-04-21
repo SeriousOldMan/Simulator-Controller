@@ -599,13 +599,13 @@ class RaceEngineer extends RaceAssistant {
 			brakeWears := []
 
 			for ignore, wheel in ["FL", "FR", "RL", "RR"] {
-				compounds.Push(compound(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound", "Dry")
-									  , knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color", "Black")))
+				compounds.Push(compound(knowledgeBase.getValue("Lap." . lapNr . ".Tyre.Compound", "Dry")
+									  , knowledgeBase.getValue("Lap." . lapNr . ".Tyre.Compound.Color", "Black")))
 				tyreTemperatures.Push(knowledgeBase.getValue("Lap." . lapNr . ".Tyre.Temperature." . wheel, kNull))
 				tyrePressures.Push(knowledgeBase.getValue("Lap." . lapNr . ".Tyre.Pressure." . wheel, kNull))
 				tyreWears.Push(knowledgeBase.getValue("Lap." . lapNr . ".Tyre.Wear." . wheel, kNull))
 				brakeTemperatures.Push(knowledgeBase.getValue("Lap." . lapNr . ".Brake.Temperature." . wheel, kNull))
-				brakeWear.Push(knowledgeBase.getValue("Lap." . lapNr . ".Brake.Wear." . wheel, kNull))
+				brakeWears.Push(knowledgeBase.getValue("Lap." . lapNr . ".Brake.Wear." . wheel, kNull))
 			}
 
 			fuelConsumption := this.AvgFuelConsumption
@@ -619,7 +619,7 @@ class RaceEngineer extends RaceAssistant {
 						, fuelConsumption, remainingFuel, bodyworkDamage, suspensionDamage, engineDamage)
 		}
 		else
-			return super.getData(topic, item)
+			return super.getData(type, topic, item)
 	}
 
 	getKnowledge(type, options := false) {

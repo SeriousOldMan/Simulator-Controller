@@ -3088,11 +3088,61 @@ class GridRaceAssistant extends RaceAssistant {
 
 	getData(type, topic, item) {
 		local knowledgeBase := this.KnowledgeBase
+		local ignore, car, carData, standings
+		local cars, classes, drivers, nrs, classPositions, laps, times
+
+		getCar(car) {
+			try {
+				return {Nr: this.getNr(car)
+					  , Car: SessionDatabase.getCarName(simulator, knowledgeBase.getValue("Car." . car . ".Car", false))
+					  , Driver: this.getDriver(car)
+					  , Class: this.getClass(car)
+					  , OverallPosition: this.getPosition(car, "Overall")
+					  , ClassPosition: this.getPosition(car, "Class")
+					  , Laps: knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0))
+					  , LapTime: Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1)}
+			}
+			catch Any as exception {
+				return false
+			}
+		}
 
 		if (knowledgeBase && (topic = "Standings")) {
 			switch item, false {
 				case "Position":
 					return Values(this.getPosition(), this.getPosition(false, "Class"))
+				case "Standings":
+					standings := []
+					cars := []
+					classes := []
+					drivers := []
+					nrs := []
+					classPositions := []
+					laps := []
+					times := []
+
+					for ignore, car in this.getCars() {
+						carData := getCar(car)
+
+						if carData
+							standings.Push(carData)
+					}
+
+					bubbleSort(&standings, (c1, c2) => c1.OverallPosition > c2.OverallPosition)
+
+					for ignore, car in standings {
+						nrs.Push(car.Nr)
+						cars.Push(car.Car)
+						drivers.Push(car.Driver)
+						classes.Push(car.Class)
+						classPositions.Push(car.ClassPosition)
+						laps.Push(car.Laps)
+						times.Push(car.Time)
+					}
+
+					return Values(nrs, cars, drivers, classes, classPositions, laps, times)
+				default:
+					return super.getData(topic, item)
 			}
 		}
 		else

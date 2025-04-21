@@ -45,7 +45,7 @@ Session.GetKnowledge = createHandler("Session", "Knowledge")
 
 Standings.Position = __get_data("Standings", "Position")
 Standings.GetStandings = function()
-	local cars, classPositions, nrs, laps, times, drivers = createHandler("Standings", "Standingd")()
+	local cars, classes, drivers, nrs, classPositions, laps, times = createHandler("Standings", "Standingd")()
 	local positions = {}
 	
 	for position, car in ipairs(cars) do

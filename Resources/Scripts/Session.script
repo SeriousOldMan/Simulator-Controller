@@ -18,52 +18,49 @@ Stint = {}
 ---                         Private Functions Section                       ---
 -------------------------------------------------------------------------------
 
-function createHandler(class, method)
+__get_data = extern("__Session_Data")
+
+__createHandler(class, method)
 	return function(...)
-		extern("simulatorConnector")(class, method)(...)
+		__get_data(class, method, ...)
 	end
 end
-
-extern("showMessage")("Yep")
 
 
 -------------------------------------------------------------------------------
 ---                          Public Functions Section                       ---
 -------------------------------------------------------------------------------
 
-Session.Active = createHandler("Session", "Active")
-Session.Simulator = createHandler("Session", "Simulator")
-Session.Track = createHandler("Session", "Track")
-Session.Car = createHandler("Session", "Car")
-Session.Nr = createHandler("Session", "Nr")
-Session.Type = createHandler("Session", "Type")
+Session.Active = __get_data("Session", "Active")
+Session.Simulator = __get_data("Session", "Simulator")
+Session.Track = __get_data("Session", "Track")
+Session.Car = __get_data("Session", "Car")
+Session.Type = __get_data("Session", "Type")
+Session.Format = __get_data("Session", "Format")
+Session.Laps = __get_data("Session", "Laps")
+Session.RemainingLaps = __get_data("Session", "RemainingLaps")
+Session.RemainingTime = __get_data("Session", "RemainingTime")
+Session.GetData = createHandler("Session", "Data")
+Session.GetKnowledge = createHandler("Session", "Knowledge")
 
-Standings.Cars = createHandler("Standings", "Count")
-Standings.Positions = function()
-	local cars, nrs, laps, times, drivers = createHandler("Standings", "Positions")()
+Standings.Position = __get_data("Standings", "Position")
+Standings.GetStandings = function()
+	local cars, classPositions, nrs, laps, times, drivers = createHandler("Standings", "Standingd")()
 	local positions = {}
 	
 	for position, car in ipairs(cars) do
-		table.insert(positions, {position = position, car = car, nr = nrs[position],
-								 laps = laps[position], time = times[position], driver = drivers[position]})
+		table.insert(positions, {overallPosition = position, classPosition = classPositions[position],
+								 car = car, nr = nrs[position],
+								 laps = laps[position], time = times[position], driver = drivers[position]}}
 	end
 	
 	return positions
 end
-Standings.Car = function(position)
-	local car, nr, laps, time, driver = createHandler("Standings", "Position")(position)
-	
-	if car then
-		return {position = position, car = car, nr = nr, laps = laps, time = time, driver = driver}
-	else
-		return {}
-	end
-end
 
-Stint.Driver = createHandler("Stint", "Driver")
-Stint.Car = function()
+Stint.Driver = __get_data("Stint", "Driver")
+Stint.Car = do
 	local compounds, tyrePressures, tyreTemperatures, tyreWears, brakeTemperatures, brakeWears,
-		  fuel, bodyworkDamage, suspensionDamage, engineDamage = createHandler("Stint", "Car")()
+		  fuelConsumption, remainingFuel, bodyworkDamage, suspensionDamage, engineDamage = __get_data("Stint", "Car")()
 	
 	return {tyres = {front_left = {compound = compounds[1], pressure = tyrePressures[1], temperature = tyreTemperatures[1], wear = tyreWears[1]},
 					 front_right = {compound = compound[2], pressure = tyrePressures[2], temperature = tyreTemperatures[2], wear = tyreWears[2]},
@@ -73,19 +70,21 @@ Stint.Car = function()
 					  front_right = {temperature = brakeTemperatures[2], wear = brakeWears[2]},
 					  front_right = {temperature = brakeTemperatures[3], wear = brakeWears[3]},
 					  front_right = {temperature = brakeTemperatures[4], wear = brakeWears[4]}},
-			fuel = fuel,
+			fuel_consumption = fuelConsumption, remaining_fuel = remainingFuel,
 			damage = {bodywork = bodyworkDamage,
 					  suspension = suspensionDamage,
 					  engine = engineDamage}}
 end
-Stint.Conditions = function()
-	local weather, airT, trackT, grip, weather10Min, weather30Min = createHandler("Stint", "Conditions")()
+Stint.Conditions = do
+	local weather, airT, trackT, grip, weather10Min, weather30Min = __get_data("Stint", "Conditions")()
 	
 	return {weather = weather, air_temperature = airT, track_temeprature = trackT, grip = grip,
 			weather_10_min = weather10Min, weather_30_min = weather30Min}
 end
-Stint.Lap = createHandler("Stint", "Lap")
-Stint.Sector = createHandler("Stint", "Sector")
-Stint.LastTime = createHandler("Stint", "LastTime")
-Stint.BestTime = createHandler("Stint", "BestTime")
-Stint.Laps = createHandler("Stint", "Laps")
+Stint.Lap = __get_data("Stint", "Lap")
+Stint.Sector = __get_data("Stint", "Sector")
+Stint.LastTime = __get_data("Stint", "LastTime")
+Stint.BestTime = __get_data("Stint", "BestTime")
+Stint.Laps = __get_data("Stint", "Laps")
+Stint.RemainingLaps = __get_data("Stint", "RemainingLaps")
+Stint.RemainingTime = __get_data("Stint", "RemainingTime")

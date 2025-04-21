@@ -582,6 +582,46 @@ class RaceEngineer extends RaceAssistant {
 		this.reportDamageAnalysis(false, lapsToDrive, delta, true)
 	}
 
+	getData(type, topic, item) {
+		local knowledgeBase := this.KnowledgeBase
+		local lapNr, ignore, wheel
+		local compounds, tyrePressures, tyreTemperatures, tyreWears, brakeTemperatures, brakeWears
+		local fuelConsumption, remainingFuel, bodyworkDamage, suspensionDamage, engineDamage
+
+		if (knowledgeBase && (topic = "Stint") && (item = "Car")) {
+			lapNr := knowledgeBase.getValue("Lap", 0)
+
+			compounds := []
+			tyreTemperatures := []
+			tyrePressures := []
+			tyreWears := []
+			brakeTemperatures := []
+			brakeWears := []
+
+			for ignore, wheel in ["FL", "FR", "RL", "RR"] {
+				compounds.Push(compound(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound", "Dry")
+									  , knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color", "Black")))
+				tyreTemperatures.Push(knowledgeBase.getValue("Lap." . lapNr . ".Tyre.Temperature." . wheel, kNull))
+				tyrePressures.Push(knowledgeBase.getValue("Lap." . lapNr . ".Tyre.Pressure." . wheel, kNull))
+				tyreWears.Push(knowledgeBase.getValue("Lap." . lapNr . ".Tyre.Wear." . wheel, kNull))
+				brakeTemperatures.Push(knowledgeBase.getValue("Lap." . lapNr . ".Brake.Temperature." . wheel, kNull))
+				brakeWear.Push(knowledgeBase.getValue("Lap." . lapNr . ".Brake.Wear." . wheel, kNull))
+			}
+
+			fuelConsumption := this.AvgFuelConsumption
+			remainingFuel := (Round(this.CurrentRemainingFuel, 1) . " Liter")
+
+			bodyworkDamage := knowledgeBase.getValue("Lap." . lapNr . ".Damage.Bodywork", 0)
+			suspensionDamage := knowledgeBase.getValue("Lap." . lapNr . ".Damage.Suspension", 0)
+			engineDamage := knowledgeBase.getValue("Lap." . lapNr . ".Damage.Engine", 0)
+
+			return Values(compounds, tyrePressures, tyreTemperatures, tyreWears, brakeTemperatures, brakeWears
+						, fuelConsumption, remainingFuel, bodyworkDamage, suspensionDamage, engineDamage)
+		}
+		else
+			return super.getData(topic, item)
+	}
+
 	getKnowledge(type, options := false) {
 		local knowledgeBase := this.KnowledgeBase
 		local knowledge := super.getKnowledge(type, options)

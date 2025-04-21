@@ -268,6 +268,8 @@ class RaceAssistant extends ConfigurationItem {
 	iPrepared := false
 	iKnowledgeBase := false
 
+	iData := newMultiMap()
+
 	iTrackType := 0
 	iTrackLength := 0
 
@@ -764,6 +766,12 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
+	Data {
+		Get {
+			return this.iData
+		}
+	}
+
 	Knowledge {
 		Get {
 			static knowledge := ["Session", "Stint", "Fuel", "Laps", "Weather", "Track", "Tyres", "Engine"]
@@ -1107,6 +1115,9 @@ class RaceAssistant extends ConfigurationItem {
 		if values.HasProp("KnowledgeBase")
 			this.iKnowledgeBase := values.KnowledgeBase
 
+		if values.HasProp("Data")
+			this.iData := values.Data
+
 		if values.HasProp("OverallTime")
 			this.iOverallTime := values.OverallTime
 
@@ -1292,7 +1303,11 @@ class RaceAssistant extends ConfigurationItem {
 							return knowledgeBase.getValue("Session.Format", "Time")
 						case "Laps":
 							return knowledgeBase.getValue("Lap", 0)
-						case "Data"
+						case "RemainingLaps":
+							return Ceil(knowledgeBase.getValue("Lap.Remaining.Session", 0))
+						case "RemainingTime":
+							return Round(knowledgeBase.getValue("Session.Time.Remaining", 0) / 1000)
+						case "Data":
 							data := newMultiMap()
 
 							setMultiMapValue(data, "System", "Time", A_TickCount)
@@ -1315,7 +1330,23 @@ class RaceAssistant extends ConfigurationItem {
 							return (knowledgeBase.getValue("Lap", 0) + 1)
 						case "Laps":
 							return (knowledgeBase.getValue("Lap", 0) - this.BaseLap + 1)
-
+						case "RemainingLaps":
+							return Ceil(Min(knowledgeBase.getValue("Driver.Time.Remaining", 0), knowledgeBase.getValue("Driver.Time.Stint.Remaining", 0)) / (getMultiMapValue(this.Data, "Stint Data", "LapLastTime", 0) + 1))
+						case "RemainingTime":
+							return Round(Min(knowledgeBase.getValue("Driver.Time.Remaining", 0), knowledgeBase.getValue("Driver.Time.Stint.Remaining", 0)) / 1000)
+						case "Sector":
+							return getMultiMapValue(this.Data, "Stint Data", "Sector", kUndefined)
+						case "LastTime":
+							return Round(getMultiMapValue(this.Data, "Stint Data", "LapLastTime", 0) / 1000, 2)
+						case "BestTime":
+							return Round(getMultiMapValue(this.Data, "Stint Data", "LapBestTime", 0) / 1000, 2)
+						case "Conditions":
+							return Values(knowledgeBase.getValue("Weather.Weather.Now")
+										, knowledgeBase.getValue("Weather.Temperature.Air")
+										, knowledgeBase.getValue("Track.Temperature")
+										, knowledgeBase.getValue("Track.Grip")
+										, knowledgeBase.getValue("Weather.Weather.10Min")
+										, knowledgeBase.getValue("Weather.Weather.30Min"))
 					}
 			}
 
@@ -2488,7 +2519,7 @@ class RaceAssistant extends ConfigurationItem {
 
 		this.iLastLap := lapNumber
 
-		this.updateDynamicValues({EnoughData: enoughData})
+		this.updateDynamicValues({EnoughData: enoughData, Data: data})
 
 		sessionTimeRemaining := getDeprecatedValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
 
@@ -2743,10 +2774,12 @@ class RaceAssistant extends ConfigurationItem {
 		local knowledgeBase := this.KnowledgeBase
 		local result, newValue
 
-		if (lapNumber > this.LastLap)
-			this.updateDynamicValues({EnoughData: false})
-
 		data := this.prepareData(lapNumber, data)
+
+		if (lapNumber > this.LastLap)
+			this.updateDynamicValues({EnoughData: false, Data: data})
+		else
+			this.updateDynamicValues({Data: data})
 
 		if (lapValid = kUndefined)
 			lapValid := getMultiMapValue(data, "Stint Data", "LapValid", true)
@@ -3052,8 +3085,6 @@ class GridRaceAssistant extends RaceAssistant {
 				super.handleVoiceCommand(grammar, words)
 		}
 	}
-
-
 
 	getData(type, topic, item) {
 		local knowledgeBase := this.KnowledgeBase

@@ -37,6 +37,9 @@ Session.Track = __get_data("Session", "Track")
 Session.Car = __get_data("Session", "Car")
 Session.Type = __get_data("Session", "Type")
 Session.Format = __get_data("Session", "Format")
+Session.Laps = __get_data("Session", "Laps")
+Session.RemainingLaps = __get_data("Session", "RemainingLaps")
+Session.RemainingTime = __get_data("Session", "RemainingTime")
 Session.GetData = createHandler("Session", "Data")
 Session.GetKnowledge = createHandler("Session", "Knowledge")
 
@@ -57,7 +60,7 @@ end
 Stint.Driver = __get_data("Stint", "Driver")
 Stint.Car = do
 	local compounds, tyrePressures, tyreTemperatures, tyreWears, brakeTemperatures, brakeWears,
-		  fuel, bodyworkDamage, suspensionDamage, engineDamage = __get_data("Stint", "Car")()
+		  fuelConsumption, remainingFuel, bodyworkDamage, suspensionDamage, engineDamage = __get_data("Stint", "Car")()
 	
 	return {tyres = {front_left = {compound = compounds[1], pressure = tyrePressures[1], temperature = tyreTemperatures[1], wear = tyreWears[1]},
 					 front_right = {compound = compound[2], pressure = tyrePressures[2], temperature = tyreTemperatures[2], wear = tyreWears[2]},
@@ -67,7 +70,7 @@ Stint.Car = do
 					  front_right = {temperature = brakeTemperatures[2], wear = brakeWears[2]},
 					  front_right = {temperature = brakeTemperatures[3], wear = brakeWears[3]},
 					  front_right = {temperature = brakeTemperatures[4], wear = brakeWears[4]}},
-			fuel = fuel,
+			fuel_consumption = fuelConsumption, remaining_fuel = remainingFuel,
 			damage = {bodywork = bodyworkDamage,
 					  suspension = suspensionDamage,
 					  engine = engineDamage}}
@@ -83,3 +86,5 @@ Stint.Sector = __get_data("Stint", "Sector")
 Stint.LastTime = __get_data("Stint", "LastTime")
 Stint.BestTime = __get_data("Stint", "BestTime")
 Stint.Laps = __get_data("Stint", "Laps")
+Stint.RemainingLaps = __get_data("Stint", "RemainingLaps")
+Stint.RemainingTime = __get_data("Stint", "RemainingTime")

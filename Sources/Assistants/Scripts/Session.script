@@ -22,7 +22,7 @@ __get_data = extern("__Session_Data")
 
 __createHandler(class, method)
 	return function(...)
-		__get_data(class, method)
+		__get_data(class, method, ...)
 	end
 end
 
@@ -48,7 +48,7 @@ Standings.GetStandings = function()
 	for position, car in ipairs(cars) do
 		table.insert(positions, {overallPosition = position, classPosition = classPositions[position],
 								 car = car, nr = nrs[position],
-								 laps = laps[position], time = times[position], driver = drivers[position]}
+								 laps = laps[position], time = times[position], driver = drivers[position]}}
 	end
 	
 	return positions

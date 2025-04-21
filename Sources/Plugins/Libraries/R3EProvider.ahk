@@ -19,6 +19,9 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class R3EProvider extends SimulatorProvider {
+	static sCarDB := false
+	static sClassDB := false
+
 	Simulator {
 		Get {
 			return "RaceRoom Racing Experience"

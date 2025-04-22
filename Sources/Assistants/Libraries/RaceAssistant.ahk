@@ -1275,7 +1275,7 @@ class RaceAssistant extends ConfigurationItem {
 		static sessionTypes
 
 		if !isSet(sessionTypes) {
-			sessionTypes := Map(kSessionPractice, "Practice", kSessionQualification, "Qualification"
+			sessionTypes := Map(kSessionPractice, "Practice", kSessionQualification, "Qualifying"
 							  , kSessionRace, "Race", kSessionTimeTrial, "Time Trial", kSessionOther, "Other")
 
 			sessionTypes.Default := "Other"
@@ -1375,7 +1375,7 @@ class RaceAssistant extends ConfigurationItem {
 		}
 
 		if !isSet(sessionTypes) {
-			sessionTypes := Map(kSessionPractice, "Practice", kSessionQualification, "Qualification"
+			sessionTypes := Map(kSessionPractice, "Practice", kSessionQualification, "Qualifying"
 							  , kSessionRace, "Race", kSessionTimeTrial, "Time Trial", kSessionOther, "Other")
 
 			sessionTypes.Default := "Other"

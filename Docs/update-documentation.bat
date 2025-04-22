@@ -21,6 +21,7 @@ copy "AI Race Engineer.md" ..\..\Controller.Wiki\AI-Race-Engineer.md
 copy "AI Race Strategist.md" ..\..\Controller.Wiki\AI-Race-Strategist.md
 copy "AI Race Spotter.md" ..\..\Controller.Wiki\AI-Race-Spotter.md
 copy "Customizing Assistants.md" ..\..\Controller.Wiki\Customizing-Assistants.md
+copy "Session Module.md" ..\..\Controller.Wiki\Session-Module.md
 copy "Team Server.md" ..\..\Controller.Wiki\Team-Server.md
 copy "Setup Workbench.md" ..\..\Controller.Wiki\Setup-Workbench.md
 copy "Solo Center.md" ..\..\Controller.Wiki\Solo-Center.md

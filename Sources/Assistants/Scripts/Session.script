@@ -27,6 +27,12 @@ function __get_standings_value(table, item)
 		end
 		
 		return positions
+	elseif item == "OverallPosition" then
+		return __get_data("Standings", "Position")
+	elseif item == "ClassPosition" then
+		local oPos, cPos = __get_data("Standings", "Position")
+		
+		return cPos
 	else
 		return __get_data("Standings", item)
 	end

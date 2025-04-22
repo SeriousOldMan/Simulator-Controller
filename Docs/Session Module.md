@@ -59,6 +59,10 @@ Following you will find several examples which demonstrate the usage of the "Ses
 
 This example demonstrates a conversation action which let you control the fuel ratio using a voice command like "Can you set the fuel ratio to 94 percent."
 
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Module%20Example%201.jpg)
+
+Here is the full code:
+
 	-- Action: set_fuel_ratio
 	-- Activation: "Can you set the fuel ratio to 94 percent."
 	-- Description: Call this, if the driver wants to assign a new value to the fuel ratio.

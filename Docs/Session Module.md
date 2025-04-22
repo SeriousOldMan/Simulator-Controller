@@ -61,7 +61,7 @@ This example demonstrates a conversation action which let you control the fuel r
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Module%20Example%201.jpg)
 
-Here is the full code:
+This example demonstrates many techniques to interface to a simulator. *Le Mans Ultimate* provide an HTTP-based API for which you can get the documentation uing a Swagger page while the simulator is running. With regards to the "Session" module, only the property *Session.Simulator* is used to make sure, that *Le Mans Ultimate* is actually running, before calling the HTTP API. Here is the full code:
 
 	-- Action: set_fuel_ratio
 	-- Activation: "Can you set the fuel ratio to 94 percent."
@@ -122,5 +122,3 @@ Here is the full code:
 	else
 		Assistant.Speak("Are you kidding?")
 	end
-
-This example demonstrates many techniques to interface to a simulator. *Le Mans Ultimate* provide an HTTP-based API for which you can get the documentation uing a Swagger page while the simulator is running. With regards to the "Session" module, only the property *Session.Simulator* is used to make sure, that *Le Mans Ultimate* is actually running, before calling the HTTP API.

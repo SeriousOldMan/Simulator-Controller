@@ -27,8 +27,6 @@ class ACProvider extends SimulatorProvider {
 		local data := super.acquireTelemetryData()
 		local forName, surName, nickName, name
 
-		super.updateTelemetryData(data)
-
 		setMultiMapValue(data, "Car Data", "TC", Round((getMultiMapValue(data, "Car Data", "TCRaw", 0) / 0.2) * 10))
 		setMultiMapValue(data, "Car Data", "ABS", Round((getMultiMapValue(data, "Car Data", "ABSRaw", 0) / 0.2) * 10))
 

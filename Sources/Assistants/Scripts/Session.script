@@ -6,97 +6,112 @@
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
----                           Public Modules Section                        ---
--------------------------------------------------------------------------------
-
-Session = {}
-Standings = {}
-Stint = {}
-
-
--------------------------------------------------------------------------------
 ---                         Private Functions Section                       ---
 -------------------------------------------------------------------------------
 
 __get_data = extern("__Session_Data")
 
-function __createHandler(class, method)
-	return function(...)
-		return __get_data(class, method, ...)
-	end
+function __get_session_value(table, item)
+	return __get_data("Session", item)
 end
 
-
--------------------------------------------------------------------------------
----                          Public Functions Section                       ---
--------------------------------------------------------------------------------
-
-Session.Active = __get_data("Session", "Active")
-Session.Simulator = __get_data("Session", "Simulator")
-Session.Track = __get_data("Session", "Track")
-Session.Car = __get_data("Session", "Car")
-Session.Type = __get_data("Session", "Type")
-Session.Format = __get_data("Session", "Format")
-Session.Laps = __get_data("Session", "Laps")
-Session.RemainingLaps = __get_data("Session", "RemainingLaps")
-Session.RemainingTime = __get_data("Session", "RemainingTime")
-Session.GetData = __createHandler("Session", "Data")
-Session.GetKnowledge = __createHandler("Session", "Knowledge")
-
-Standings.Position = __get_data("Standings", "Position")
-Standings.GetStandings = function()
-	local nrs, cars, drivers, classes, classPositions, laps, times = __get_data("Standings", "Standings")
-	local positions = {}
-	
-	if nrs then
+function __get_standings_value(table, item)
+	if item == "Standings" then
+		local nrs, cars, drivers, classes, classPositions, laps, times = __get_data("Standings", "Standings")
+		local positions = {}
+		
 		for position, car in ipairs(cars) do
 			table.insert(positions, {overallPosition = position, classPosition = classPositions[position],
 									 car = car, nr = nrs[position],
 									 laps = laps[position], time = times[position], driver = drivers[position]})
 		end
+		
+		return positions
+	else
+		return __get_data("Standings", item)
 	end
-	
-	return positions
 end
 
-Stint.Driver = __get_data("Stint", "Driver")
-function __car_data()
-	local compounds, tyrePressures, tyreTemperatures, tyreWears, brakeTemperatures, brakeWears,
-		  fuelConsumption, remainingFuel, bodyworkDamage, suspensionDamage, engineDamage = __get_data("Stint", "Car")
-	
-	if compounds then
-		return {tyres = {front_left = {compound = compounds[1], pressure = tyrePressures[1], temperature = tyreTemperatures[1], wear = tyreWears[1]},
-						 front_right = {compound = compounds[2], pressure = tyrePressures[2], temperature = tyreTemperatures[2], wear = tyreWears[2]},
-						 front_right = {compound = compounds[3], pressure = tyrePressures[3], temperature = tyreTemperatures[3], wear = tyreWears[3]},
-						 front_right = {compound = compounds[4], pressure = tyrePressures[4], temperature = tyreTemperatures[4], wear = tyreWears[4]}},
+function __get_stint_value(table, item)
+	if item == "Car" then
+		local compounds, tyrePressures, tyreTemperatures, tyreWears, brakeTemperatures, brakeWears,
+			  fuelConsumption, remainingFuel, bodyworkDamage, suspensionDamage, engineDamage = __get_data("Stint", "Car")
+		
+		return {tyres = {front_left = {compound = compounds[1], pressure = tyrePressures[1],
+									   temperature = tyreTemperatures[1], wear = tyreWears[1]},
+						 front_right = {compound = compounds[2], pressure = tyrePressures[2],
+										temperature = tyreTemperatures[2], wear = tyreWears[2]},
+						 rear_left = {compound = compounds[3], pressure = tyrePressures[3],
+									  temperature = tyreTemperatures[3], wear = tyreWears[3]},
+						 rear_right = {compound = compounds[4], pressure = tyrePressures[4],
+									   temperature = tyreTemperatures[4], wear = tyreWears[4]}},
 				brakes = {front_left = {temperature = brakeTemperatures[1], wear = brakeWears[1]},
 						  front_right = {temperature = brakeTemperatures[2], wear = brakeWears[2]},
-						  front_right = {temperature = brakeTemperatures[3], wear = brakeWears[3]},
-						  front_right = {temperature = brakeTemperatures[4], wear = brakeWears[4]}},
+						  rear_left = {temperature = brakeTemperatures[3], wear = brakeWears[3]},
+						  rear_right = {temperature = brakeTemperatures[4], wear = brakeWears[4]}},
 				fuel_consumption = fuelConsumption, remaining_fuel = remainingFuel,
 				damage = {bodywork = bodyworkDamage,
 						  suspension = suspensionDamage,
 						  engine = engineDamage}}
-	else
-		return nil
-	end
-end
-Stint.Car = __car_data()
-function __conditions_data()
-	local weather, airT, trackT, grip, weather10Min, weather30Min = __get_data("Stint", "Conditions")
+	elseif item == "Conditions" then
+		local weather, airT, trackT, grip, weather10Min, weather30Min = __get_data("Stint", "Conditions")
 	
-	if weather then
 		return {weather = weather, air_temperature = airT, track_temperature = trackT, grip = grip,
 				weather_10_min = weather10Min, weather_30_min = weather30Min}
 	else
-		return nil
+		return __get_data("Standings", item)
 	end
 end
-Stint.Conditions = __conditions_data()
-Stint.Lap = __get_data("Stint", "Lap")
-Stint.Sector = __get_data("Stint", "Sector")
-Stint.LastTime = __get_data("Stint", "LastTime")
-Stint.BestTime = __get_data("Stint", "BestTime")
-Stint.Laps = __get_data("Stint", "Laps")
-Stint.RemainingLaps = __get_data("Stint", "RemainingLaps")
-Stint.RemainingTime = __get_data("Stint", "RemainingTime")
+
+
+-------------------------------------------------------------------------------
+---                           Public Modules Section                        ---
+-------------------------------------------------------------------------------
+
+Session = {}
+
+---------------------------
+---     Properties      ---
+---------------------------
+
+-- Session.Active
+-- Session.Simulator
+-- Session.Track
+-- Session.Car
+-- Session.Type
+-- Session.Format
+-- Session.Laps
+-- Session.RemainingLaps
+-- Session.RemainingTime
+-- Session.Data
+-- Session.Knowledge
+
+Standings = {}
+
+---------------------------
+---     Properties      ---
+---------------------------
+
+-- Standings.Position
+-- Standings.Standings
+
+Stint = {}
+
+---------------------------
+---     Properties      ---
+---------------------------
+
+-- Stint.Driver
+-- Stint.Car
+-- Stint.Conditions
+-- Stint.Lap
+-- Stint.Sector
+-- Stint.LastTime
+-- Stint.BestTime
+-- Stint.Laps
+-- Stint.RemainingLaps
+-- Stint.RemainingTime
+
+setmetatable(Session, {__index = __get_session_value})
+setmetatable(Standings, {__index = __get_standings_value})
+setmetatable(Stint, {__index = __get_stint_value})

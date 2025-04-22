@@ -609,7 +609,7 @@ class RaceEngineer extends RaceAssistant {
 			}
 
 			fuelConsumption := this.AvgFuelConsumption
-			remainingFuel := (Round(this.CurrentRemainingFuel, 1) . " Liter")
+			remainingFuel := Round(this.CurrentRemainingFuel, 1)
 
 			bodyworkDamage := knowledgeBase.getValue("Lap." . lapNr . ".Damage.Bodywork", 0)
 			suspensionDamage := knowledgeBase.getValue("Lap." . lapNr . ".Damage.Suspension", 0)

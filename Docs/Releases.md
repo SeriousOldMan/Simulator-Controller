@@ -27,7 +27,19 @@
   
 # Upcoming release
 
-Not yet planned...
+## 6.2.9.0
+
+#### Date: 04/25/25 (planned)
+
+#### Fixes
+
+  - Fixed installation and updating Simulator Controller in the case the Temp folder has been relocated.
+
+#### Changes
+
+  - The Race Engineer no longer announces temeperature related pressure corrections, if the pitstop had been completely planned externally, for example in the "Team Center".
+  - [Expert] Once again comprehensive extensions of the integrated script engine:
+    - An all new "Session" module, which can be included in a *Lua* script using the "require" function, gives access to the state of the simulation in scripts running in an Assistant booster. See the [new documentation](*) for more information.
 
 # Release history
 
@@ -1524,7 +1536,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed sorting of the "Overview" report to the race number column in "Race Reports" and "Race Center".
-  4. Windows size constraints can now be disabled in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration), to make windows smaller than originally designed. Usefull in environments with very small monitors.
+  4. Windows size constraints can now be disabled in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration), to make windows smaller than originally designed. useful in environments with very small monitors.
   5. The original size of the "Strategy Workbench" window has been reduced a little bit.
   6. The "Pitstop" menu in "Race Center" has been extended with additional commands, which were available only as buttons before.
   7. The tyre info widget on the "Session" page of the "System Monitor" now includes the currently mounted tyre set.

@@ -308,27 +308,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	updateStandingsData(data) {
-		local car, carCategory, cupCategory
-
-		static carCategories := false
-
-		super.updateStandingsData(data)
-
-		if !carCategories {
-			ACCPlugin.requireCarDatabase()
-
-			carCategories := getMultiMapValues(ACCPlugin.sCarData, "Car Categories")
-		}
-
-		loop getMultiMapValue(data, "Position Data", "Car.Count", 0) {
-			car := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Car", kUndefined)
-
-			if (car != kUndefined)
-				setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", carCategories.Has(car) ? carCategories[car] : ACCPlugin.kUnknown)
-		}
-	}
-
 	sendCommand(command, count?) {
 		if isSet(count) {
 			loop count
@@ -2018,6 +1997,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		local driverID, driverForname, driverSurname, driverNickname, lapTime, driverCar, driverCarCandidate, carID, car
 
 		static carIDs := false
+		static carCategories := false
+
 		static lastDriverCar := false
 		static sessionID := 0
 		static lastLap := 0
@@ -2026,6 +2007,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			ACCPlugin.requireCarDatabase()
 
 			carIDs := getMultiMapValues(ACCPlugin.sCarData, "Car IDs")
+			carCategories := getMultiMapValues(ACCPlugin.sCarData, "Car Categories")
 		}
 
 		lap := getMultiMapValue(telemetryData, "Stint Data", "Laps", 0)
@@ -2078,6 +2060,9 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				carID := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", kUndefined)
 
 				if (carID != kUndefined) {
+					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Class"
+								   , carCategories.Has(carID) ? carCategories[carID] : ACCProvider.kUnknown)
+
 					car := (carIDs.Has(carID) ? carIDs[carID] : ACCPlugin.kUnknown)
 
 					if ((car = ACCPlugin.kUnknown) && isDebug())

@@ -122,11 +122,13 @@ class ACCProvider extends SimulatorProvider {
 		local driverID, driverForname, driverSurname, driverNickname, lapTime, driverCar, driverCarCandidate, carID, car
 
 		static carIDs := false
+		static carCategories := false
 
 		if !carIDs {
 			ACCProvider.requireCarDatabase()
 
 			carIDs := getMultiMapValues(ACCProvider.sCarData, "Car IDs")
+			carCategories := getMultiMapValues(ACCProvider.sCarData, "Car Categories")
 		}
 
 		try {
@@ -164,6 +166,9 @@ class ACCProvider extends SimulatorProvider {
 				carID := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", kUndefined)
 
 				if (carID != kUndefined) {
+					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Class"
+								   , carCategories.Has(carID) ? carCategories[carID] : ACCProvider.kUnknown)
+
 					car := (carIDs.Has(carID) ? carIDs[carID] : ACCProvider.kUnknown)
 
 					if ((car = ACCProvider.kUnknown) && isDebug())

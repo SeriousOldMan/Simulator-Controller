@@ -241,7 +241,8 @@ checkForNews() {
 						if InStr(rule, "Timed") {
 							rule := string2Values(":", rule)
 
-							if ((A_Now > rule[2]) && ((rule.Length = 2) || (A_Now <= rule[3]))) {
+							if (((A_Now > rule[2]) && ((rule.Length = 2) || (A_Now <= rule[3])))
+							 && !getMultiMapValue(news, "News", nr, false)) {
 								newsNr := nr
 								newsUrls := url
 
@@ -266,9 +267,9 @@ checkForNews() {
 					for nr, url in getMultiMapValues(availableNews, "News")
 						if isNumber(nr) {
 							shown := getMultiMapValue(news, "News", nr, false)
-							rules := getMultiMapValue(availableNews, "Rules", nr, "Once")
+							rule := getMultiMapValue(availableNews, "Rules", nr, "Once")
 
-							if (shown && InStr(rule, "Repeat") && (DateAdd(shown, string2Values(":", rule)[2], "Days") > A_Now)) {
+							if (InStr(rule, "Repeat") && shown && (DateAdd(shown, string2Values(":", rule)[2], "Days") > A_Now)) {
 								newsNr := nr
 								newsUrls := url
 

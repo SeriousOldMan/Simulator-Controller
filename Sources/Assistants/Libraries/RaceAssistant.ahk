@@ -3118,9 +3118,7 @@ class GridRaceAssistant extends RaceAssistant {
 							standings.Push(carData)
 					}
 
-					bubbleSort(&standings, (c1, c2) => c1.OverallPosition > c2.OverallPosition)
-
-					for ignore, car in standings {
+					for ignore, car in bubbleSort(&standings, (c1, c2) => c1.OverallPosition > c2.OverallPosition) {
 						nrs.Push(car.Nr)
 						cars.Push(car.Car)
 						drivers.Push(car.Driver)

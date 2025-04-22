@@ -2,7 +2,7 @@
 Version=6.2.9.0-dev
 Target=6.2.9.0-release
 Date=04/22/2025
-Download=
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/X3XWD_GQ
 Changes=Fixed relocation of Temp folder, "Session" module for Lua scripts, Rewrite of data provider interface
 Components=Media->5.6.1,Configuration->6.2.4,Utilities->6.2.2
 [Release]

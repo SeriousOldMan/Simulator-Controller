@@ -39,7 +39,7 @@
 
   - The Race Engineer no longer announces temeperature related pressure corrections, if the pitstop had been completely planned externally, for example in the "Team Center".
   - [Expert] Once again comprehensive extensions of the integrated script engine:
-    - An all new "Session" module, which can be included in a *Lua* script using the "require" function, gives access to the state of the simulation in scripts running in an Assistant booster. See the [new documentation](*) for more information.
+    - An all new "Session" module, which can be included in a *Lua* script using the "require" function, gives access to the state of the simulation in scripts running in an Assistant booster. See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Module) for more information.
   - [Internal] Full rewrite of the simulator data acquisition interface.
 
 # Release history

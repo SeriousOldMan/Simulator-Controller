@@ -577,7 +577,7 @@ class RaceAssistant extends ConfigurationItem {
 								})
 							}
 							else
-								return scriptExternalHandler(c)
+								return scriptExternHandler(c)
 						})
 						scriptSetGlobal(context, "extern")
 
@@ -1267,9 +1267,9 @@ class RaceAssistant extends ConfigurationItem {
 
 	getData(type, topic, item) {
 		local knowledgeBase := this.KnowledgeBase
-		local simulator := SimulatorProvider.Simulator
-		local car := SimulatorProvider.Car
-		local track := SimulatorProvider.Track
+		local simulator := this.Simulator
+		local car := this.Car
+		local track := this.Track
 		local telemetryData, standingsData, data
 
 		static sessionTypes
@@ -1282,9 +1282,9 @@ class RaceAssistant extends ConfigurationItem {
 		}
 
 		if knowledgeBase {
-			simulator := knowledgeBase.getValue("Simulator")
-			car := knowledgeBase.getValue("Car")
-			track := knowledgeBase.getValue("Track")
+			simulator := this.Simulator
+			car := this.Car
+			track := this.Track
 
 			switch topic, false {
 				case "Session":
@@ -1308,17 +1308,7 @@ class RaceAssistant extends ConfigurationItem {
 						case "RemainingTime":
 							return Round(knowledgeBase.getValue("Session.Time.Remaining", 0) / 1000)
 						case "Data":
-							data := newMultiMap()
-
-							setMultiMapValue(data, "System", "Time", A_TickCount)
-
-							SimulatorProvider.createSimulatorProvider(simulator
-																			, car, track).acquireSessionData(&telemetryData, &positionsData)
-
-							addMultiMapValues(data, telemetryData)
-							addMultiMapValues(data, standingsData)
-
-							return printMultiMap(data)
+							return printMultiMap(this.Data)
 						case "Knowledge":
 							return StrReplace(JSON.print(this.getKnowledge(type)), "%", "\%")
 					}
@@ -1352,7 +1342,7 @@ class RaceAssistant extends ConfigurationItem {
 
 			return kUndefined
 		}
-		else if ((topic = "Session") && (value = "Active"))
+		else if ((topic = "Session") && (item = "Active"))
 			return false
 		else
 			return kUndefined
@@ -3094,7 +3084,7 @@ class GridRaceAssistant extends RaceAssistant {
 		getCar(car) {
 			try {
 				return {Nr: this.getNr(car)
-					  , Car: SessionDatabase.getCarName(simulator, knowledgeBase.getValue("Car." . car . ".Car", false))
+					  , Car: SessionDatabase.getCarName(this.Simulator, this.Car)
 					  , Driver: this.getDriver(car)
 					  , Class: this.getClass(car)
 					  , OverallPosition: this.getPosition(car, "Overall")
@@ -3142,11 +3132,11 @@ class GridRaceAssistant extends RaceAssistant {
 
 					return Values(nrs, cars, drivers, classes, classPositions, laps, times)
 				default:
-					return super.getData(topic, item)
+					return super.getData(type, topic, item)
 			}
 		}
 		else
-			return super.getData(topic, item)
+			return super.getData(type, topic, item)
 	}
 
 	getKnowledge(type, options := false) {
@@ -4920,7 +4910,7 @@ createTools(assistant, type, target := false, categories := ["Custom", "Builtin"
 
 					if (name = "__Session_Data") {
 						scriptPushValue(context, (c) {
-							local result := this.getData(type, scriptGetArguments(c)*)
+							local result := assistant.getData(type, scriptGetArguments(c)*)
 
 							if isInstance(result, Values) {
 								for ignore, theValue in result
@@ -4936,9 +4926,11 @@ createTools(assistant, type, target := false, categories := ["Custom", "Builtin"
 
 							return Integer(result)
 						})
+
+						return Integer(1)
 					}
 					else
-						return scriptExternalHandler(c)
+						return scriptExternHandler(c)
 				})
 				scriptSetGlobal(context, "extern")
 

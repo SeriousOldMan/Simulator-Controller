@@ -1399,12 +1399,17 @@ class CallbacksEditor {
 		editorGui.Add("Text", "x16 yp+146 w90 h23 +0x200 Y:Move(0.25) Hidden", translate("Assistant"))
 		editorGui.Add("Text", "x113 yp w200 h23 +0x200 Y:Move(0.25) Hidden", translate(this.Editor.Assistant))
 
-		editorGui.Add("Button", "x776 yp-4 w23 h23 Center +0x200 X:Move Y:Move(0.25) vaddCallbackButton").OnEvent("Click", (*) => this.addCallback())
+		editorGui.Add("Button", "x726 yp-4 w23 h23 Center +0x200 X:Move Y:Move(0.25) vaddCallbackButton").OnEvent("Click", (*) => this.addCallback())
 		setButtonIcon(editorGui["addCallbackButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
-		editorGui.Add("Button", "x800 yp w23 h23 Center +0x200 X:Move Y:Move(0.25) vcopyCallbackButton").OnEvent("Click", (*) => this.copyCallback())
+		editorGui.Add("Button", "x750 yp w23 h23 Center +0x200 X:Move Y:Move(0.25) vcopyCallbackButton").OnEvent("Click", (*) => this.copyCallback())
 		setButtonIcon(editorGui["copyCallbackButton"], kIconsDirectory . "Copy.ico", 1, "L4 T4 R4 B4")
-		editorGui.Add("Button", "x824 yp w23 h23 Center +0x200 X:Move Y:Move(0.25) vdeleteCallbackButton").OnEvent("Click", (*) => this.deleteCallback())
+		editorGui.Add("Button", "x774 yp w23 h23 Center +0x200 X:Move Y:Move(0.25) vdeleteCallbackButton").OnEvent("Click", (*) => this.deleteCallback())
 		setButtonIcon(editorGui["deleteCallbackButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+
+		editorGui.Add("Button", "x800 yp w23 h23 Center +0x200 X:Move Y:Move(0.25) vuploadCallbacksButton").OnEvent("Click", (*) => this.importCallbacks())
+		setButtonIcon(editorGui["uploadCallbacksButton"], kIconsDirectory . "Upload.ico", 1, "L4 T4 R4 B4")
+		editorGui.Add("Button", "x824 yp w23 h23 Center +0x200 X:Move Y:Move(0.25) vdownloadCallbackButton").OnEvent("Click", (*) => this.exportCallback())
+		setButtonIcon(editorGui["downloadCallbackButton"], kIconsDirectory . "Download.ico", 1, "L4 T4 R4 B4")
 
 		if InStr(this.Type, "Actions")
 			editorGui.Add("Text", "x16 yp+28 w70 h23 +0x200 Section Y:Move(0.25)", translate("Action"))
@@ -1587,6 +1592,7 @@ class CallbacksEditor {
 		local type
 
 		this.Control["addCallbackButton"].Enabled := true
+		this.Control["uploadCallbacksButton"].Enabled := true
 
 		if this.SelectedCallback {
 			this.Control["copyCallbackButton"].Enabled := true
@@ -1597,6 +1603,7 @@ class CallbacksEditor {
 				this.Control["deleteParameterButton"].Enabled := false
 
 				this.Control["deleteCallbackButton"].Enabled := false
+				this.Control["downloadCallbackButton"].Enabled := false
 
 				this.CallableField[2].Opt("+ReadOnly")
 
@@ -1630,6 +1637,7 @@ class CallbacksEditor {
 				this.Control["callbackConfirmationDropDown"].Enabled := false
 			}
 			else {
+				this.Control["downloadCallbackButton"].Enabled := true
 				this.Control["deleteCallbackButton"].Enabled := true
 				this.Control["addParameterButton"].Enabled := true
 				this.Control["deleteParameterButton"].Enabled := (this.SelectedParameter != false)
@@ -1694,6 +1702,7 @@ class CallbacksEditor {
 		else {
 			this.Control["copyCallbackButton"].Enabled := false
 			this.Control["deleteCallbackButton"].Enabled := false
+			this.Control["downloadCallbackButton"].Enabled := false
 			this.Control["addParameterButton"].Enabled := false
 			this.Control["deleteParameterButton"].Enabled := false
 
@@ -1866,6 +1875,193 @@ class CallbacksEditor {
 			this.Callbacks.RemoveAt(index)
 
 			this.selectCallback(false, true, false)
+		}
+	}
+
+	importCallbacks() {
+		local directory := (kTempDirectory . "Callback Import")
+		local extension := (InStr(this.Type, "Events") ? ".event" : ".action")
+		local type := (InStr(this.Type, "Events") ? "Event" : "Action")
+		local fileName, ignore
+
+		importCallback(fileName) {
+			local name, newName, generation, duplicate, definition
+			local ignore, type, callback, descriptor, parameter, parameters, theCallback
+
+			deleteDirectory(directory)
+
+			DirCreate(directory)
+
+			try {
+				SplitPath(fileName, , , , &name)
+
+				FileCopy(fileName, kTempDirectory . name . ".zip", 1)
+
+				RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kTempDirectory . name . ".zip" . "' -DestinationPath '" . directory . "' -Force", , "Hide")
+
+				loop Files, directory . "\*" . extension {
+					SplitPath(A_LoopFileFullPath, , , , &name)
+
+					newName := name
+
+					loop {
+						generation := A_Index
+						duplicate := false
+
+						for ignore, callback in this.Callbacks
+							if (callBack.Name = newName) {
+								duplicate := true
+
+								break
+							}
+
+						if duplicate
+							newName := (name . "_" . generation)
+						else
+							break
+					}
+
+					definition := readMultiMap(A_LoopFileFullPath)
+
+					type := (this.Type . ".Custom")
+
+					for callback, descriptor in getMultiMapValues(definition, type) {
+						descriptor := string2Values("|", descriptor)
+
+						parameters := []
+
+						loop descriptor[5] {
+							parameter := string2Values("|", getMultiMapValue(definition, this.Type . ".Parameters", ConfigurationItem.descriptor(callback, A_Index)))
+
+							parameters.Push({Name: parameter[1], Type: parameter[2], Enumeration: string2Values(",", parameter[3])
+										   , Required: ((parameter[4] = kTrue) ? true : ((parameter[4] = kFalse) ? false : parameter[4]))
+										   , Description: parameter[5]})
+						}
+
+						if InStr(this.Type, "Events")
+							theCallback := {Name: newName, Active: true, Disabled: false
+										  , Type: descriptor[1], SelectedType: descriptor[1], Definition: descriptor[2]
+										  , Description: descriptor[6], Parameters: parameters, Builtin: false
+										  , Event: descriptor[3], Phrase: descriptor[4]}
+						else
+							theCallback := {Name: newName, Active: true, Disabled: false
+										  , Type: descriptor[1], SelectedType: descriptor[1], Definition: descriptor[2]
+										  , Description: descriptor[6], Parameters: parameters, Builtin: false
+										  , Initialized: ((descriptor[3] = kTrue) ? true : ((descriptor[3] = kFalse) ? false : descriptor[3]))
+										  , Confirm: ((descriptor[4] = kTrue) ? true : ((descriptor[4] = kFalse) ? false : descriptor[4]))}
+
+						if (theCallback.Type = "Assistant.Rule") {
+							theCallback.Script := FileRead(directory . "\" . descriptor[2])
+
+							theCallback.Definition := ""
+						}
+						else if (theCallback.Type = "Assistant.Script") {
+							theCallback.Script := FileRead(directory . "\" . descriptor[2])
+
+							theCallback.Definition := ""
+						}
+
+						this.Callbacks.Push(theCallback)
+
+						this.CallbacksListView.Add("", theCallback.Name, theCallback.Active ? translate(theCallback.Disabled ? "-" : "x") : "", theCallback.Description)
+					}
+
+					this.CallbacksListView.ModifyCol()
+
+					loop this.CallbacksListView.GetCount("Col")
+						this.CallbacksListView.ModifyCol(A_Index, "AutoHdr")
+				}
+			}
+			catch Any as exception {
+				logError(exception, true)
+			}
+		}
+
+		if this.SelectedCallback
+			if !this.saveCallback(this.SelectedCallback)
+				return
+
+		this.Window.Opt("+OwnDialogs")
+
+		OnMessage(0x44, translateLoadCancelButtons)
+		fileName := withBlockedWindows(FileSelect, "M1", , translate("Load ") . translate(type) . translate("..."), type . " (*" . extension . ")")
+		OnMessage(0x44, translateLoadCancelButtons, 0)
+
+		if ((fileName != "") || (isObject(fileName) && (fileName.Length > 0)))
+			for ignore, fileName in isObject(fileName) ? fileName : [fileName]
+				importCallback(fileName)
+	}
+
+	exportCallback() {
+		local directory := (kTempDirectory . "Callback Export")
+		local extension := (InStr(this.Type, "Events") ? ".event" : ".action")
+		local type := (InStr(this.Type, "Events") ? "Event" : "Action")
+		local callback := this.SelectedCallback
+		local configuration := newMultiMap()
+		local index, parameter, fileName, newFileName, targetDirectory
+
+		if !this.saveCallback(callback)
+			return
+
+		this.Window.Opt("+OwnDialogs")
+
+		fileName := callback.Name
+
+		newFileName := (fileName . extension)
+
+		while FileExist(newFileName)
+			newFileName := (fileName . " (" . (A_Index + 1) . ")" . extension)
+
+		fileName := newFileName
+
+		OnMessage(0x44, translateSaveCancelButtons)
+		fileName := withBlockedWindows(FileSelect, "S17", fileName, translate("Save ") . translate(type) . translate("..."), type . " (*" . extension . ")")
+		OnMessage(0x44, translateSaveCancelButtons, 0)
+
+		if (fileName != "") {
+			deleteDirectory(directory)
+
+			DirCreate(directory)
+
+			if (callback.Type = "Assistant.Rule") {
+				callback.Definition := (this.Assistant . "." . callback.Name . ".rules")
+
+				FileAppend(callback.Script, directory . "\" . callback.Definition)
+			}
+			else if (callback.Type = "Assistant.Script") {
+				callback.Definition := (this.Assistant . "." . callback.Name . ".script")
+
+				FileAppend(callback.Script, directory . "\" . callback.Definition)
+			}
+
+			if InStr(this.Type, "Events")
+				setMultiMapValue(configuration, this.Type . ".Custom", callback.Name
+											  , values2String("|", callback.Type, callback.Definition, callback.Event, callback.Phrase
+																 , callback.Parameters.Length, callback.Description))
+			else
+				setMultiMapValue(configuration, this.Type . ".Custom", callback.Name
+											  , values2String("|", callback.Type, callback.Definition, callback.Initialized, callback.Confirm
+																 , callback.Parameters.Length, callback.Description))
+
+			loop
+				if !getMultiMapValue(configuration, this.Type . ".Parameters", callback.Name . "." . A_Index)
+					break
+				else
+					removeMultiMapValue(configuration, this.Type . ".Parameters", callback.Name . "." . A_Index)
+
+			for index, parameter in callback.Parameters
+				setMultiMapValue(configuration, this.Type . ".Parameters", callback.Name . "." . index
+											  , values2String("|", parameter.Name, parameter.Type
+																 , values2String(",", parameter.Enumeration*)
+																 , parameter.Required, parameter.Description))
+
+			writeMultiMap(directory . "\" . callback.Name . extension, configuration)
+
+			SplitPath(fileName, , &targetDirectory, , &name)
+
+			RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*.*' -CompressionLevel Optimal -DestinationPath '" . targetDirectory . "\" . name . ".zip'", , "Hide")
+
+			FileMove(targetDirectory . "\" . name . ".zip", fileName, 1)
 		}
 	}
 

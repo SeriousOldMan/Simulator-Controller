@@ -37,6 +37,7 @@
 
 #### Changes
 
+  - Added support for more track grip types like "Dusty".
   - The Race Engineer no longer announces temperature related pressure corrections, if the pitstop had been completely planned externally, for example in the "Team Center".
   - Actions and Events can now be exported and imported in the Assistant booster editor, so that it is possible now to share them with community or your team mates.
   - [Expert] Once again comprehensive extensions of the integrated script engine:

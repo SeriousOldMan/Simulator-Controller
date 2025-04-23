@@ -212,7 +212,7 @@ class SimulatorProvider {
 		local simulator := this.Simulator
 		local car := this.Car
 		local track := this.Track
-		local data := callSimulator(SessionDatabase.getSimulatorCode(simulator), options, protocol?)
+		local data := callSimulator(SessionDatabase.getSimulatorCode(simulator), options, "MultiMap", protocol?)
 		local tyreCompound, tyreCompoundColor, ignore, section
 
 		for ignore, section in ["Car Data", "Setup Data"] {

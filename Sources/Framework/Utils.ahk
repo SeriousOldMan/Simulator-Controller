@@ -425,7 +425,7 @@ createGUID() {
     return ""
 }
 
-callSimulator(simulator, options := "", protocol?) {
+callSimulator(simulator, options := "", type := "MultiMap", protocol?) {
 	local exePath, dataFile, data
 	local connector, curWorkingDir, buf
 	local dllName, dllFile

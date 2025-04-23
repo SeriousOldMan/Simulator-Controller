@@ -268,7 +268,7 @@ class RF2Plugin extends Sector397Plugin {
 			exePath := (kBinariesDirectory . "Connectors\" . simulator . " SHM Connector.dll")
 
 			try {
-				callSimulator(simulator, command . "=" . operation . "=" . message . ":" . values2String(";", arguments*), "CLR")
+				callSimulator(simulator, command . "=" . operation . "=" . message . ":" . values2String(";", arguments*), "MultiMap", "CLR")
 			}
 			catch Any as exception {
 				logError(exception, true)

@@ -1,14 +1,14 @@
-The "Session" module for the integrated script engine defines three global objects, which can be used to access important information about the currently running simulation. The module session can be loaded into any script which has been defined as an action for an [Assistant booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) as described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions). Use the "require" function to import the module.
+The "Session" module for the integrated script engine defines three topics, which can be used to access important information about the currently running simulation. The module can be loaded into any script which is used to implement an action for an [Assistant booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) as described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions). Use the "require" function to load the "Session" module.
 
 	require("Session")
 
-## Global objects
+## Topics
 
-In th following sections you will find an overview for all objects. Please note that not every property may be available for all simulators or that individual properties will have individual value ranges for a specific simulator.
+In the following sections you will find an overview for all objects. Please note that not every property may be available for all simulators or that individual properties will have individual value ranges for a specific simulator.
 
 ### Session
 
-The *Session* object gives you access to the overall state of the current session. *Session* provides the following properties (please note, that *Lua* ia a case-sensitive language):
+The *Session* topic gives you access to the overall state of the current session. *Session* provides the following properties (please note, that *Lua* ia a case-sensitive language):
 
 | Property      | Description |
 |---------------|-------------|
@@ -25,7 +25,7 @@ The *Session* object gives you access to the overall state of the current sessio
 
 ### Stint
 
-The *Stint* object provides a couple of properties which rerpesents real-time data of the currently running stint:
+The *Stint* topic provides a couple of properties which rerpesents real-time data of the currently running stint:
 
 | Property      | Description |
 |---------------|-------------|
@@ -42,7 +42,7 @@ The *Stint* object provides a couple of properties which rerpesents real-time da
 
 ### Standings
 
-This object gives you access to the current standings including information about all opponents. This information is only available in scripts which have been defined for either the Race Strategist, the Race Spotter or the Driving Coach.
+This topic gives you access to the current standings including information about all opponents. This information is only available in scripts which have been defined for either the Race Strategist, the Race Spotter or the Driving Coach.
 
 | Property        | Description |
 |-----------------|-------------|
@@ -61,7 +61,7 @@ This example demonstrates a conversation action which let you control the fuel r
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Module%20Example%201.jpg)
 
-Here is the full code:
+This example demonstrates many techniques to interface to a simulator. *Le Mans Ultimate* provide an HTTP-based API for which you can get the documentation uing a Swagger page while the simulator is running. With regards to the "Session" module, only the property *Session.Simulator* is used to make sure, that *Le Mans Ultimate* is actually running, before calling the HTTP API. Here is the full code:
 
 	-- Action: set_fuel_ratio
 	-- Activation: "Can you set the fuel ratio to 94 percent."
@@ -122,5 +122,3 @@ Here is the full code:
 	else
 		Assistant.Speak("Are you kidding?")
 	end
-
-This example demonstrates many techniques to interface to a simulator. *Le Mans Ultimate* provide an HTTP-based API for which you can get the documentation uing a Swagger page while the simulator is running. With regards to the "Session" module, only the property *Session.Simulator* is used to make sure, that *Le Mans Ultimate* is actually running, before calling the HTTP API.

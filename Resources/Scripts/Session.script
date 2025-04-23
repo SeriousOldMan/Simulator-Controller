@@ -74,7 +74,7 @@ end
 ---                           Public Modules Section                        ---
 -------------------------------------------------------------------------------
 
-Session = {}
+Session = setmetatable({}, {__index = __get_session_value})
 
 ---------------------------
 ---     Properties      ---
@@ -92,7 +92,7 @@ Session = {}
 -- Session.Data
 -- Session.Knowledge
 
-Standings = {}
+Standings = setmetatable({}, {__index = __get_standings_value})
 
 ---------------------------
 ---     Properties      ---
@@ -101,7 +101,7 @@ Standings = {}
 -- Standings.Position
 -- Standings.Standings
 
-Stint = {}
+Stint = setmetatable({}, {__index = __get_stint_value})
 
 ---------------------------
 ---     Properties      ---
@@ -117,7 +117,3 @@ Stint = {}
 -- Stint.Laps
 -- Stint.RemainingLaps
 -- Stint.RemainingTime
-
-setmetatable(Session, {__index = __get_session_value})
-setmetatable(Standings, {__index = __get_standings_value})
-setmetatable(Stint, {__index = __get_stint_value})

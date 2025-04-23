@@ -1768,6 +1768,9 @@ class CallbacksEditor {
 
 			if callback
 				this.CallbacksListView.Modify(inList(this.Callbacks, callback), "Select Vis")
+			else
+				loop this.CallbacksListView.GetCount()
+					this.CallbacksListView.Modify(A_Index, "-Select")
 
 			this.iSelectedCallback := callback
 
@@ -1965,6 +1968,8 @@ class CallbacksEditor {
 
 						this.CallbacksListView.Add("", theCallback.Name, theCallback.Active ? translate(theCallback.Disabled ? "-" : "x") : "", theCallback.Description)
 					}
+
+					this.selectCallback(false)
 
 					this.CallbacksListView.ModifyCol()
 

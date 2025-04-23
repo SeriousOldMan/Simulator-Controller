@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.2.9.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/X3XWD_GQ) (Early build for 6.2.9. Changes: Fixed relocation of Temp folder, "Session" module for Lua scripts, Rewrite of data provider interface, Fixed minor issues in the News system, Export and import of Actions and Events, Support for more grip types.)
+[6.2.9.0-beta]() (Test build for 6.2.9. Changes: Fixed relocation of Temp folder, "Session" module for Lua scripts, Rewrite of data provider interface, Fixed minor issues in the News system, Export and import of Actions and Events, Support for more grip types.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-629) of this version and all the versions you might have skipped, before installing and using this version.
 

@@ -1534,8 +1534,8 @@ class SetupWorkbench extends ConfigurationItem {
 						this.TelemetryViewer.restart(kTempDirectory . "Garage\Telemetry")
 					}
 
-					trackLength := getMultiMapValue(readSimulatorData(simulator, this.SelectedCar[false], track), "Track Data", "Length", 0)
-
+					trackLength := getMultiMapValue(readSimulator(simulator, this.SelectedCar[false], track), "Track Data", "Length", 0)
+showMessage(trackLength)
 					/*
 					simulatorCode := SessionDatabase.getSimulatorCode(simulator)
 

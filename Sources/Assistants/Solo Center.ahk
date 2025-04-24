@@ -45,6 +45,7 @@
 #Include "..\Database\Libraries\TyresDatabase.ahk"
 #Include "..\Database\Libraries\LapsDatabase.ahk"
 #Include "..\Database\Libraries\TelemetryViewer.ahk"
+#Include "..\Plugins\Libraries\SimulatorProvider.ahk"
 #Include "Libraries\RaceReportViewer.ahk"
 
 
@@ -2169,7 +2170,7 @@ class SoloCenter extends ConfigurationItem {
 			return
 		}
 
-		data := readSimulatorData(prefix, this.Car, this.Track)
+		data := readSimulator(prefix, this.Car, this.Track)
 
 		if ((getMultiMapValue(data, "Session Data", "Car") != this.Car)
 		 || (getMultiMapValue(data, "Session Data", "Track") != this.Track))
@@ -8164,6 +8165,16 @@ startupSoloCenter() {
 		ExitApp(1)
 	}
 }
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                          Plugin Include Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+if kLogStartup
+	logMessage(kLogOff, "Loading plugins...")
+
+#Include "..\Plugins\Simulator Providers.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

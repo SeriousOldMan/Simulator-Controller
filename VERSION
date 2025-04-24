@@ -1,15 +1,15 @@
 [Development]
-Version=6.2.9.0-beta
+Version=6.2.9.0-release
 Target=6.2.9.0-release
-Date=04/23/2025
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/0_zFOcnU
-Changes=Fixed relocation of Temp folder, "Session" module for Lua scripts, Rewrite of data provider interface, Fixed minor issues in the News system, Export and import of Actions and Events, Support for more grip types
+Date=04/25/2025
+Download=https://cutt.ly/qrhSOcmm;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/WObJdq1q;https://www.dropbox.com/scl/fi/cd47bqut8pj6sbnzgnsk8/Simulator-Controller-6.2.9.0-release.zip?rlkey=n61lxwhzbuxjvwbw68u80wfsg&st=ocma239z&dl=1;http://87.177.159.148:800/api/public/dl/fAFiIGbI;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.2.9.0-release.zip
+Changes=Fixed relocation of Temp folder, "Session" module for Lua scripts, Rewrite of data provider interface, Fixed minor issues in the News system, Export and import of Actions and Events, Support for more grip types, Fixed "Telemetry..." command in "Setup Workbench"
 Components=Media->5.6.1,Configuration->6.2.4,Utilities->6.2.2
 [Release]
-Version=6.2.8.0-release
-Date=04/18/2025
-Download=https://cutt.ly/zrgkRcgP;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/WaweQDrn;https://www.dropbox.com/scl/fi/mpu85khy67s49ndhl4y33/Simulator-Controller-6.2.8.0-release.zip?rlkey=3t5t94jek58wk63w6wg707unj&st=uygrc1f9&dl=1;http://87.177.159.148:800/api/public/dl/e7NYSZH6;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.2.8.0-release.zip
-Changes=New profile dialog in "Simulator Startup", New diagnostics system, Support for multiple P2T keys, Tweaked news system again, Fixed argument processing in script callbacks, Fixed execution of custom conversation actions, New core settings for Lua search paths
+Version=6.2.9.0-release
+Date=04/25/2025
+Download=https://cutt.ly/qrhSOcmm;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/WObJdq1q;https://www.dropbox.com/scl/fi/cd47bqut8pj6sbnzgnsk8/Simulator-Controller-6.2.9.0-release.zip?rlkey=n61lxwhzbuxjvwbw68u80wfsg&st=ocma239z&dl=1;http://87.177.159.148:800/api/public/dl/fAFiIGbI;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.2.9.0-release.zip
+Changes=Fixed relocation of Temp folder, "Session" module for Lua scripts, Rewrite of data provider interface, Fixed minor issues in the News system, Export and import of Actions and Events, Support for more grip types, Fixed "Telemetry..." command in "Setup Workbench"
 Components=Media->5.6.1,Configuration->6.2.4,Utilities->6.2.2
 [Components]
 Media.5.6.1.Path=Resources
@@ -22,7 +22,7 @@ Utilities.6.2.2.Path=.
 Utilities.6.2.2.Content=Utilities
 Utilities.6.2.2.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Cn-Rmw_8;https://www.dropbox.com/scl/fi/lgc20h3afx2msjcarh9hi/Utilities-6.2.2.zip?rlkey=4aff0vxge03ghdr2umlhd1ex9&st=plp4tedq&dl=1;http://87.177.159.148:800/api/public/dl/UUVNodWq;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.2.2.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=6.2.9.0-beta
-Release=6.2.8.0-release
+Development=6.2.9.0-release
+Release=6.2.9.0-release

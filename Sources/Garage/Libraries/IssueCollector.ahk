@@ -12,6 +12,7 @@
 #Include "..\..\Framework\Extensions\Task.ahk"
 #Include "..\..\Framework\Extensions\Math.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
+#Include "..\..\Plugins\Libraries\SimulatorProvider.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

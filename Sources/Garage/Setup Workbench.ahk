@@ -42,7 +42,8 @@
 #Include "..\Framework\Extensions\RuleEngine.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Database\Libraries\TelemetryViewer.ahk"
-#Include "..\Plugins\Libraries\ACCUDPProvider.ahk"
+#Include "..\Plugins\Libraries\SimulatorProvider.ahk"
+; #Include "..\Plugins\Libraries\ACCUDPProvider.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1533,12 +1534,16 @@ class SetupWorkbench extends ConfigurationItem {
 						this.TelemetryViewer.restart(kTempDirectory . "Garage\Telemetry")
 					}
 
+					trackLength := getMultiMapValue(readSimulatorData(simulator, this.SelectedCar[false], track), "Track Data", "Length", 0)
+
+					/*
 					simulatorCode := SessionDatabase.getSimulatorCode(simulator)
 
 					if (simulatorCode = "ACC")
 						trackLength := getMultiMapValue(ACCUDPProvider().acquire(), "Track Data", "Length", 0)
 					else
 						trackLength := getMultiMapValue(callSimulator(simulatorCode), "Track Data", "Length", 0)
+					*/
 
 					if (trackLength > 0) {
 						lastSimulator := simulator
@@ -1817,7 +1822,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 		characteristicsMenu.Add(label, (*) => this.openTelemetryViewer())
 
-		if (this.SelectedSimulator[false] == true)
+		if ((this.SelectedSimulator[false] == true) || (this.SelectedCar[false] == true) || (this.SelectedTrack[false] == true))
 			characteristicsMenu.Disable(label)
 
 		if (!this.SimulatorDefinition || !getMultiMapValue(this.SimulatorDefinition, "Simulator", "Analyzer", false)
@@ -3849,6 +3854,16 @@ startupSetupWorkbench() {
 		ExitApp(1)
 	}
 }
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                          Plugin Include Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+if kLogStartup
+	logMessage(kLogOff, "Loading plugins...")
+
+#Include "..\Plugins\Simulator Providers.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -39,7 +39,7 @@
 #Include "..\Framework\Extensions\Messages.ahk"
 #Include "..\Framework\Extensions\CLR.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
-#Include "..\Plugins\Libraries\LMURESTProvider.ahk"
+#Include "..\Plugins\Libraries\SimulatorProvider.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -471,7 +471,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			prefix := SessionDatabase.getSimulatorCode(simulator)
 		}
 
-		data := readSimulatorData(prefix, gCar, gTrack)
+		data := readSimulator(prefix, gCar, gTrack)
 
 		if (getMultiMapValues(data, "Setup Data").Count > 0) {
 			readTyreSetup(readMultiMap(kRaceSettingsFile))
@@ -2180,6 +2180,16 @@ setTyrePressures(tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPres
 
 	editRaceSettings(&message, tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPressure, rrPressure)
 }
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                          Plugin Include Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+if kLogStartup
+	logMessage(kLogOff, "Loading plugins...")
+
+#Include "..\Plugins\Simulator Providers.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

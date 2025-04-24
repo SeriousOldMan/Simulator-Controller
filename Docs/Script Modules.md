@@ -179,10 +179,10 @@ This example demonstrates simulator specific coding of pitstop service requests.
 			Assistant.Speak("Cannot do this right now!")
 		end
 	elseif Session.Simulator == "rFactor 2" then
-		Simulator.Call("rFactor 2", "Pitstop=Decrease=Tyre Compound Front:20")
+		Simulator.Call("rFactor 2", "Pitstop=Decrease=Tyre Compound Front:None")
 	elseif Session.Simulator == "iRacing" then
-		Simulator.Call("iRacing", "Pitstop=Decrease=Tyre Change Front Left:20")
-		Simulator.Call("iRacing", "Pitstop=Decrease=Tyre Change Front Right:20")
+		Simulator.Call("iRacing", "Pitstop=Decrease=Tyre Change Front Left:false")
+		Simulator.Call("iRacing", "Pitstop=Decrease=Tyre Change Front Right:false")
 	else
 		Assistant.Speak("Are you kidding?")
 	end

@@ -27,9 +27,6 @@ global kAssistantMode := "Assistant"
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kSessions := [kSessionOther, kSessionPractice, kSessionQualification, kSessionRace, kSessionTimeTrial]
-global kSessionNames := ["Other", "Practice", "Qualification", "Race", "Time Trial"]
-
 global kAssistantAnswerActions := ["Accept", "Reject"]
 global kAssistantRaceActions := ["FuelRatioOptimize", "PitstopPlan", "DriverSwapPlan", "PitstopPrepare", "PitstopRecommend", "StrategyRecommend", "FCYRecommend", "StrategyCancel"]
 

@@ -2445,8 +2445,8 @@ initializeSimulatorController()
 if kLogStartup
 	logMessage(kLogOff, "Loading plugins...")
 
-#Include "..\Plugins\Controller Plugins.ahk"
 #Include "..\Plugins\Simulator Providers.ahk"
+#Include "..\Plugins\Controller Plugins.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

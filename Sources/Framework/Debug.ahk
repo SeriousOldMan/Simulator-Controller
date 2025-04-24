@@ -199,7 +199,7 @@ logMessage(logLevel, message, monitor := true, error := false, header := true) {
 
 		logTime := FormatTime(time, "dd.MM.yy HH:mm:ss")
 
-		fileName := kLogsDirectory . script . " Logs.txt"
+		fileName := kLogsDirectory . script . ".log"
 		logLine := "[" level . " - " . logTime . "]: " . message . "`n"
 
 		DirCreate(kLogsDirectory)

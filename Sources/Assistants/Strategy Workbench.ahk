@@ -44,6 +44,7 @@
 #Include "..\Database\Libraries\SessionDatabaseBrowser.ahk"
 #Include "..\Database\Libraries\SettingsDatabase.ahk"
 #Include "..\Database\Libraries\LapsDatabase.ahk"
+#Include "..\Plugins\Libraries\SimulatorProvider.ahk"
 #Include "Libraries\Strategy.ahk"
 #Include "Libraries\StrategyViewer.ahk"
 
@@ -3083,7 +3084,7 @@ class StrategyWorkbench extends ConfigurationItem {
 						return
 					}
 
-					data := readSimulatorData(prefix, car, track)
+					data := readSimulator(prefix, car, track)
 
 					if ((getMultiMapValue(data, "Session Data", "Car") != car) || (getMultiMapValue(data, "Session Data", "Track") != track))
 						return
@@ -4632,6 +4633,16 @@ startupStrategyWorkbench() {
 		ExitApp(1)
 	}
 }
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                          Plugin Include Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+if kLogStartup
+	logMessage(kLogOff, "Loading plugins...")
+
+#Include "..\Plugins\Simulator Providers.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

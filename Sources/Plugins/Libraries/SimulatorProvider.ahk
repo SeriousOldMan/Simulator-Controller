@@ -9,6 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\..\Framework\Extensions\CLR.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 
 
@@ -24,11 +25,6 @@ global kSessionPractice := 2
 global kSessionQualification := 3
 global kSessionRace := 4
 global kSessionTimeTrial := 5
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                        Private Constant Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
 
 global kSessions := [kSessionOther, kSessionPractice, kSessionQualification, kSessionRace, kSessionTimeTrial]
 global kSessionNames := ["Other", "Practice", "Qualification", "Race", "Time Trial"]
@@ -212,7 +208,7 @@ class SimulatorProvider {
 		local simulator := this.Simulator
 		local car := this.Car
 		local track := this.Track
-		local data := callSimulator(SessionDatabase.getSimulatorCode(simulator), options, "MultiMap", protocol?)
+		local data := callSimulator(SessionDatabase.getSimulatorCode(simulator), options, protocol?)
 		local tyreCompound, tyreCompoundColor, ignore, section
 
 		for ignore, section in ["Car Data", "Setup Data"] {
@@ -239,4 +235,153 @@ class SimulatorProvider {
 
 		return data
 	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Public Functions Section                        ;;;
+;;;-------------------------------------------------------------------------;;;
+
+callSimulator(simulator, options := "", protocol?) {
+	local exePath, dataFile, data
+	local connector, curWorkingDir, buf
+	local dllName, dllFile
+
+	static defaultProtocol := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Simulator", "Data Provider", "DLL")
+	static protocols := CaseInsenseMap("AC", "CLR", "ACC", "DLL", "R3E", "DLL", "IRC", "DLL"
+									 , "AMS2", "DLL", "PCARS2", "DLL", "RF2", "CLR", "LMU", "CLR")
+	static connectors := CaseInsenseMap()
+
+	simulator := SessionDatabase.getSimulatorCode(simulator)
+
+	if (defaultProtocol = "EXE")
+		protocol := "EXE"
+	else if (!isSet(protocol) && protocols.Has(simulator))
+		protocol := protocols[simulator]
+
+	if (options = "Close") {
+		connector := false
+
+		if ((protocol = "DLL") && connectors.Has(simulator . ".DLL"))
+			connector := connectors[simulator . ".DLL"]
+		else if ((protocol = "CLR") && connectors.Has(simulator . ".CLR"))
+			connector := connectors[simulator . ".CLR"]
+
+		if connector
+			if (protocol = "DLL")
+				DLLCall(simulator . " SHM Connector\close")
+			else
+				connector.Close()
+	}
+	else
+		try {
+			if (protocol = "DLL") {
+				if connectors.Has(simulator . ".DLL")
+					connector := connectors[simulator . ".DLL"]
+				else {
+					curWorkingDir := A_WorkingDir
+
+					SetWorkingDir(kBinariesDirectory . "Connectors\")
+
+					try {
+						connector := DllCall("LoadLibrary", "Str", simulator . " SHM Connector.dll", "Ptr")
+
+						DLLCall(simulator . " SHM Connector\open")
+
+						connectors[simulator . ".DLL"] := connector
+					}
+					finally {
+						SetWorkingDir(curWorkingDir)
+					}
+				}
+
+				buf := Buffer(1024 * 1024)
+
+				DllCall(simulator . " SHM Connector\call", "AStr", options, "Ptr", buf, "Int", buf.Size)
+
+				data := parseMultiMap(StrGet(buf, "UTF-8"))
+
+				if (data.Count = 0)
+					throw ("DLL returned empty data in callSimulator for " . simulator . "...")
+			}
+			else if (protocol = "CLR") {
+				if connectors.Has(simulator . ".CLR")
+					connector := connectors[simulator . ".CLR"]
+				else {
+					dllName := (simulator . " SHM Connector.dll")
+					dllFile := (kBinariesDirectory . "Connectors\" . dllName)
+
+					if !FileExist(dllFile)
+						throw "Unable to find " . dllName . " in " . kBinariesDirectory . "..."
+
+					connector := CLR_LoadLibrary(dllFile).CreateInstance("SHMConnector.SHMConnector")
+
+					if (!connector.Open() && !isDebug())
+						throw "Cannot startup " . dllName . " in " . kBinariesDirectory . "..."
+
+					connectors[simulator . ".CLR"] := connector
+				}
+
+				data := parseMultiMap(connector.Call(options))
+
+				if (data.Count = 0)
+					throw ("DLL returned empty data in callSimulator for " . simulator . "...")
+			}
+			else if (protocol = "EXE") {
+				exePath := (kBinariesDirectory . "Providers\" . simulator . " SHM Provider.exe")
+
+				if !FileExist(exePath)
+					throw "File not found..."
+
+				DirCreate(kTempDirectory . simulator . " Data")
+
+				dataFile := temporaryFileName(simulator . " Data\SHM", "data")
+
+				RunWait(A_ComSpec . " /c `"`"" . exePath . "`" `"" . options . "`" > `"" . dataFile . "`"`"", , "Hide")
+
+				data := readMultiMap(dataFile)
+
+				deleteFile(dataFile)
+			}
+
+			setMultiMapValue(data, "Session Data", "Simulator", simulator)
+
+			return data
+		}
+		catch Any as exception {
+			if (protocol = "EXE") {
+				logError(exception, true)
+
+				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider (")
+														   , {simulator: simulator, protocol: protocol})
+									   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+									   . kBinariesDirectory . translate(")"))
+
+				if !kSilentMode
+					showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
+												  , {exePath: exePath, simulator: simulator, protocol: "SHM"})
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+
+				return newMultiMap()
+			}
+			else {
+				logError(exception)
+
+				return callSimulator(simulator, options, "EXE")
+			}
+		}
+}
+
+readSimulator(simulator, car, track, format := "Object", options := "", protocol?) {
+	local data := newMultiMap()
+	local telemetryData, standingsData
+
+	SimulatorProvider.createSimulatorProvider(simulator, car, track).acquireSessionData(&telemetryData, &standingsData)
+
+	setMultiMapValue(data, "System", "Time", A_TickCount)
+
+	addMultiMapValues(data, telemetryData)
+	addMultiMapValues(data, standingsData)
+
+	return ((format = "Text") ? printMultiMap(data) : data)
 }

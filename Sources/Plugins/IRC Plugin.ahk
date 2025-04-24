@@ -78,7 +78,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 		local exePath := (kBinariesDirectory . "Connectors\" . "IRC SHM Connector.dll")
 
 		try {
-			callSimulator(this.Code, command . "=" . operation . "=" . message . ":" . values2String(";", arguments*), "MultiMap", "DLL")
+			callSimulator(this.Code, command . "=" . operation . "=" . message . ":" . values2String(";", arguments*), "DLL")
 		}
 		catch Any as exception {
 			logError(exception, true)

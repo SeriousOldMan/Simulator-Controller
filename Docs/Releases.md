@@ -34,16 +34,19 @@
 #### Fixes
 
   - Fixed installation and updating Simulator Controller in the case the Temp folder has been relocated.
+  - Fixed a bug which allowed the Telemetry Viewer to be opened without selecting a track beforehand.
 
 #### Changes
 
   - Added support for more track grip types like "Dusty".
   - The Race Engineer no longer announces temperature related pressure corrections, if the pitstop had been completely planned externally, for example in the "Team Center".
-  - Actions and Events can now be exported and imported in the Assistant booster editor, so that it is possible now to share them with community or your team mates.
+  - Actions and Events can now be exported and imported in the Assistant booster editor, so that it is possible now to share them with the community or your team mates.
   - [Expert] Once again comprehensive extensions of the integrated script engine:
-    - An all new "Session" module, which can be included in a *Lua* script using the "require" function, gives access to the state of the simulation in scripts running in an Assistant booster. See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Module) for more information.
+    - Several modules haven been defined, which can be included in a *Lua* script using the "require" function. They give you access to the state of the session and also to some functions of the simulator in scripts running in an Assistant booster. See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Script-Modules) for more information.
 	- It is now possible to use *Lua* coroutines even while interface with the host environments or with the Rule Engine.
   - [Internal] Full rewrite of the simulator data acquisition interface.
+
+As mentioned above, this version contains an all new simulator data interface. It has passed all my tests, but tests may not cover everything. Therefore, if you encounter an unexpected behavior, let me know immediately.
 
 # Release history
 

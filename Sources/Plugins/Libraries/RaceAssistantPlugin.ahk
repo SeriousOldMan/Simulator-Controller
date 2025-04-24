@@ -1692,8 +1692,11 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			else
 				return false
 		}
-		else if ((additionalLaps > 0) && driverCar && (getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0) = 1))
-			return [false, {Car: driverCar, Finish: getMultiMapValue(data, "Position Data", "Car." . driverCar . ".Laps") + 1 + additionalLaps}]
+		else if ((additionalLaps > 0) && driverCar && (getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0) = 1)) {
+			state := [false, {Car: driverCar, Finish: getMultiMapValue(data, "Position Data", "Car." . driverCar . ".Laps") + 1 + additionalLaps}]
+
+			return true
+		}
 		else if (getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0) <= 0) {
 			state := [true, true]
 
@@ -2598,6 +2601,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 							}
 							else if (lastLap < (dataLastLap - 1)) {
 								; Regained the car after a driver swap, stint
+
+								if !RaceAssistantPlugin.TeamSessionActive
+									return
 
 								RaceAssistantPlugin.sStintStartTime := false
 

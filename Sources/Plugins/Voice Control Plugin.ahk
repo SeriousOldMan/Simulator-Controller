@@ -36,3 +36,17 @@ stopListen() {
 
 	FileAppend("Stop", kTempDirectory . "Voice.cmd")
 }
+
+enableVoiceRecognition() {
+	while FileExist(kTempDirectory . "Voice.cmd")
+		deleteFile(kTempDirectory . "Voice.cmd")
+
+	FileAppend("Enable", kTempDirectory . "Voice.cmd")
+}
+
+disableVoiceRecognition() {
+	while FileExist(kTempDirectory . "Voice.cmd")
+		deleteFile(kTempDirectory . "Voice.cmd")
+
+	FileAppend("Disable", kTempDirectory . "Voice.cmd")
+}

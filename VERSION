@@ -1,9 +1,9 @@
 [Development]
-Version=6.2.9.0-release
-Target=6.2.9.0-release
+Version=6.3.0.0-dev
+Target=6.3.0.0-release
 Date=04/25/2025
-Download=https://cutt.ly/qrhSOcmm;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/WObJdq1q;https://www.dropbox.com/scl/fi/cd47bqut8pj6sbnzgnsk8/Simulator-Controller-6.2.9.0-release.zip?rlkey=n61lxwhzbuxjvwbw68u80wfsg&st=ocma239z&dl=1;http://87.177.159.148:800/api/public/dl/fAFiIGbI;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.2.9.0-release.zip
-Changes=Fixed relocation of Temp folder, "Session" module for Lua scripts, Rewrite of data provider interface, Fixed minor issues in the News system, Export and import of Actions and Events, Support for more grip types, Fixed "Telemetry..." command in "Setup Workbench"
+Download=
+Changes=Controller action function to disable voice recognition
 Components=Media->5.6.1,Configuration->6.2.4,Utilities->6.2.2
 [Release]
 Version=6.2.9.0-release
@@ -22,7 +22,7 @@ Utilities.6.2.2.Path=.
 Utilities.6.2.2.Content=Utilities
 Utilities.6.2.2.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Cn-Rmw_8;https://www.dropbox.com/scl/fi/lgc20h3afx2msjcarh9hi/Utilities-6.2.2.zip?rlkey=4aff0vxge03ghdr2umlhd1ex9&st=plp4tedq&dl=1;http://87.177.159.148:800/api/public/dl/UUVNodWq;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.2.2.zip
 [Current]
-Type=Release
+Type=Development
 [Version]
-Development=6.2.9.0-release
+Development=6.3.0.0-dev
 Release=6.2.9.0-release

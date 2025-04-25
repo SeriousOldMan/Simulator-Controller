@@ -83,7 +83,7 @@ class VoiceServer extends ConfigurationItem {
 
 	iSpeaking := false
 	iListening := false
-	
+
 	iListenerActive := true
 
 	iPendingCommands := []
@@ -812,7 +812,7 @@ class VoiceServer extends ConfigurationItem {
 			return this.iListening
 		}
 	}
-	
+
 	ListenerActive {
 		Get {
 			return this.iListenerActive
@@ -888,7 +888,7 @@ class VoiceServer extends ConfigurationItem {
 		super.__New(configuration)
 
 		VoiceServer.Instance := this
-		
+
 		deleteFile(kTempDirectory . "Voice.cmd")
 
 		PeriodicTask(ObjBindMethod(this, "runPendingCommands"), 500).start()
@@ -939,7 +939,7 @@ class VoiceServer extends ConfigurationItem {
 			case "Custom":
 				PeriodicTask(ObjBindMethod(this, "processExternalCommand"), 50, kInterruptPriority).start()
 		}
-		
+
 		if (this.PushToTalkMode != "Custom")
 			PeriodicTask(ObjBindMethod(this, "processExternalCommand"), 1000).start()
 	}
@@ -967,7 +967,7 @@ class VoiceServer extends ConfigurationItem {
 
 				if ((command != "Disable") && (command != "Enable")) {
 					deleteFile(fileName)
-					
+
 					if !this.ListenerActive
 						return
 				}
@@ -1020,16 +1020,18 @@ class VoiceServer extends ConfigurationItem {
 			clicks := 0
 			activation := false
 			listening := false
-			
+
 			if listenTask {
 				listenTask.stop()
 
 				listenTask := false
 			}
-		
+
+			this.stopListening()
+
 			return
 		}
-		
+
 		try {
 			for ignore, key in this.PushToTalk
 				clicked := (clicked || GetKeyState(key))
@@ -1233,11 +1235,11 @@ class VoiceServer extends ConfigurationItem {
 				return true
 			}
 	}
-	
+
 	enableListening() {
 		this.iListenerActive := true
 	}
-	
+
 	disableListening() {
 		this.iListenerActive := false
 	}

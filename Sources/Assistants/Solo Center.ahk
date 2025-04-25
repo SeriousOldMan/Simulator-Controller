@@ -5754,7 +5754,29 @@ class SoloCenter extends ConfigurationItem {
 	}
 
 	showRaceReport(report) {
-		local raceData, drivers, ignore
+		local ignore
+
+		getDrivers() {
+			local drivers := []
+			local hasDriver := false
+			local driver, raceData, ignore
+
+			this.ReportViewer.loadReportData(false, &raceData := true, &ignore := false, &ignore := false, &ignore := false)
+
+			driver := getMultiMapValue(raceData, "Cars", "Driver", 0)
+
+			loop Min(5, getMultiMapValue(raceData, "Cars", "Count")) {
+				if (A_Index = driver)
+					hasDriver := true
+
+				drivers.Push(A_Index)
+			}
+
+			if (!hasDriver && driver)
+				drivers.Push(driver)
+
+			return drivers
+		}
 
 		switch report, false {
 			case "Overview":
@@ -5762,19 +5784,8 @@ class SoloCenter extends ConfigurationItem {
 			case "Car":
 				this.showCarReport()
 			case "Drivers":
-				if !this.ReportViewer.Settings.Has("Drivers") {
-					raceData := true
-
-					this.ReportViewer.loadReportData(false, &raceData, &ignore := false, &ignore := false, &ignore := false)
-
-					drivers := []
-
-					loop Min(5, getMultiMapValue(raceData, "Cars", "Count"))
-						drivers.Push(A_Index)
-
-					if !this.ReportViewer.Settings.Has("Drivers")
-						this.ReportViewer.Settings["Drivers"] := drivers
-				}
+				if !this.ReportViewer.Settings.Has("Drivers")
+					this.ReportViewer.Settings["Drivers"] := getDrivers()
 
 				this.showDriverReport()
 			case "Positions":
@@ -5782,19 +5793,8 @@ class SoloCenter extends ConfigurationItem {
 			case "Lap Times":
 				this.showLapTimesReport()
 			case "Consistency":
-				if !this.ReportViewer.Settings.Has("Drivers") {
-					raceData := true
-
-					this.ReportViewer.loadReportData(false, &raceData, &ingore := false, &ingore := false, &ingore := false)
-
-					drivers := []
-
-					loop Min(5, getMultiMapValue(raceData, "Cars", "Count"))
-						drivers.Push(A_Index)
-
-					if !this.ReportViewer.Settings.Has("Drivers")
-						this.ReportViewer.Settings["Drivers"] := drivers
-				}
+				if !this.ReportViewer.Settings.Has("Drivers")
+					this.ReportViewer.Settings["Drivers"] := getDrivers()
 
 				this.showConsistencyReport()
 			case "Pace":

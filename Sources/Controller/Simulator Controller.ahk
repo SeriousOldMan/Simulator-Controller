@@ -40,7 +40,6 @@
 #Include "..\Framework\Extensions\GIFViewer.ahk"
 #Include "..\Framework\Extensions\Task.ahk"
 #Include "..\Framework\Extensions\Messages.ahk"
-#Include "..\Framework\Extensions\SpeechRecognizer.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

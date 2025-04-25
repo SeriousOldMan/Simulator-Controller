@@ -892,7 +892,7 @@ class Plugin extends ConfigurationItem {
 
 			for argument, values in arguments
 				if (values == "")
-					result.Push(argument)
+					result.Push(argument . ":")
 				else
 					result.Push(argument . ": " . values)
 

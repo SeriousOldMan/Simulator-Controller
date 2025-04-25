@@ -251,7 +251,7 @@ class RaceReports extends ConfigurationItem {
 			local car := reports.SelectedCar
 			local track := reports.SelectedTrack
 
-			reports.loadSimulator(reports.SelectedTrack, true)
+			reports.loadSimulator(reports.SelectedSimulator, true)
 			reports.loadCar(car, true)
 			reports.loadTrack(track, true)
 		}

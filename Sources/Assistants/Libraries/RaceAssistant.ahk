@@ -472,7 +472,7 @@ class RaceAssistant extends ConfigurationItem {
 					context := scriptOpenContext()
 
 					try {
-						script := FileRead(getFileName("Assistant Callbacks.script"
+						script := FileRead(getFileName("Assistant.script"
 													 , kUserHomeDirectory . "Scripts\", kResourcesDirectory . "Scripts\"))
 
 						script .= ("`n`n" . FileRead(executable))
@@ -4804,7 +4804,7 @@ createTools(assistant, type, target := false, categories := ["Custom", "Builtin"
 			context := scriptOpenContext()
 
 			try {
-				script := FileRead(getFileName("Assistant Callbacks.script"
+				script := FileRead(getFileName("Assistant.script"
 											 , kUserHomeDirectory . "Scripts\", kResourcesDirectory . "Scripts\"))
 
 				script .= ("`n`n" . FileRead(getFileName(scriptFileName

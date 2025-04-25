@@ -2552,19 +2552,30 @@ class CodeEditor extends Gui.Custom {
 ;;;-------------------------------------------------------------------------;;;
 
 initializeCodeEditor() {
-    if !DllCall("LoadLibrary", "Str", kBinariesDirectory . "Code Editor\Scintilla.dll", "UPtr")
-        throw "Scintilla library not found..."
+    try {
+        if !DllCall("LoadLibrary", "Str", kBinariesDirectory . "Code Editor\Scintilla.dll", "UPtr")
+            throw "Scintilla library not found..."
 
-    if !DllCall("LoadLibrary", "Str", kBinariesDirectory . "Code Editor\CustomLexer.dll", "UPtr")
-        throw "CustomLexer library not found..."
+        if !DllCall("LoadLibrary", "Str", kBinariesDirectory . "Code Editor\CustomLexer.dll", "UPtr")
+            throw "CustomLexer library not found..."
 
-    Window.Prototype.AddCodeEditor := ObjBindMethod(CodeEditor, "AddCodeEditor")
+        Window.Prototype.AddCodeEditor := ObjBindMethod(CodeEditor, "AddCodeEditor")
 
-    Window.DefineCustomControl("CodeEditor", ObjBindMethod(CodeEditor, "AddCodeEditor"))
+        Window.DefineCustomControl("CodeEditor", ObjBindMethod(CodeEditor, "AddCodeEditor"))
 
-    for prop in CodeEditor.scint_base.Prototype.OwnProps() ; attach utility methods to prototype
-        if !(SubStr(prop,1,2) = "__") And (SubStr(prop,1,1) = "_")
-            CodeEditor.Prototype.%prop% := CodeEditor.scint_base.prototype.%prop%
+        for prop in CodeEditor.scint_base.Prototype.OwnProps() ; attach utility methods to prototype
+            if !(SubStr(prop,1,2) = "__") And (SubStr(prop,1,1) = "_")
+                CodeEditor.Prototype.%prop% := CodeEditor.scint_base.prototype.%prop%
+    }
+    catch Any as exception {
+        logError(exception, true)
+
+		logMessage(kLogCritical, translate("Error while initializing code editor - please rebuild the applications"))
+
+		if (!kSilentMode)
+			showMessage(translate("Error while initializing code editor - please rebuild the applications") . translate("...")
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+	}
 }
 
 

@@ -4,7 +4,6 @@
   3. New GPT booster that supports automatic translation to a different language for voice generation
   4. HTTP Server to run Whisper on a remote machine
   5. Support a combination of activation phrase and a first command in one voice interaction
-  6. Support for Google Gemini as GPT/LLM provider ( https://aistudio.google.com/apikey and https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=GEMINI_API_KEY )
 
 #### Simulation Support
   1. Better integration with the weather forecast data of *rFactor 2*

@@ -3,7 +3,7 @@ Version=6.3.0.0-dev
 Target=6.3.0.0-release
 Date=04/25/2025
 Download=
-Changes=Controller action function to disable voice recognition, Driver is now part of the default selection in race reports, Reload in reports now also reloads any new cars and tracks
+Changes=Controller action function to disable voice recognition, Driver is now part of the default selection in race reports, Reload in reports now also reloads any new cars and tracks, Support for Google as GPT provider
 Components=Media->5.6.1,Configuration->6.2.4,Utilities->6.2.2
 [Release]
 Version=6.2.9.0-release

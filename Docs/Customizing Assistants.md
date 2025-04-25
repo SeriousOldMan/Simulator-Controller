@@ -32,7 +32,7 @@ As said, the Driving Coach is a bit different in the sense, that it allows free 
 
 IMPORTANT: As said in the beginning, all this is optional. The Race Assistants will do their job really good even without being connected to an LLM. Additionally, using a GPT service like OpenAI may create some costs, and running an LLM locally on your PC will require a very powerful system, especially when doing this while on the track. Therefore I recommend to use this feature not before everything else has been configured and is fully functional.
 
-Disclaimer: Large Language Models, although incredibly impressive, are still under heavy development. Therefore it depends on the quality and capabilities of the model, whether the Assistant will react like expected. And in most cases, the support for non-English languages is quite limited. I recommend to use the Assistant Booster only for English-speaking Assistants for the time being. Beside that, you will get good results for the *Rephrasing* booster with almost any model, whereas for the *Conversation* or *Reasoning* boosters you will need one of the big boys like GPT 3.5 and above for decent results. The requirements in terms of language understanding is somewhat in between for the *Recognition* booster. You will have to invest some time experimenting with different models, but that is part of the the fun.
+Disclaimer: Large Language Models, although incredibly impressive, are still under heavy development. Therefore it depends on the quality and capabilities of the model, whether the Assistant will react like expected. And in most cases, the support for non-English languages is quite limited. I recommend to use the Assistant Booster only for English-speaking Assistants for the time being. Beside that, you will get good results for the *Rephrasing* booster with almost any model, whereas for the *Conversation* or *Reasoning* boosters you will need one of the big boys like GPT 4o or o1 and above for decent results. The requirements in terms of language understanding is somewhat in between for the *Recognition* booster. You will have to invest some time experimenting with different models, but that is part of the the fun.
 
 ## Overview of the different Assistant Boosters
 
@@ -71,7 +71,7 @@ Normally an Assistant will tell you that he didn't understand you, when the spok
 
 (1) Depending on the availabilty of the data by the current simulator.
 
-Since large parts of the knowledge base of the Assistants will be supplied to the LLM for matching, a larger model with a context window of at least 16k tokens is required for this booster. Full standings history isn't possible at the moment, since this will overflow the input context area of the LLM, at least for the *smaller* models like GPT 3.5, Mistral 7b, and so on. Time will cure this problem, and I will update the capabilities of the integration, when more capable models become available. For the time being, the position data is available for the most recent laps and also the gaps for the most important opponents are passed to the LLM (for Strategist and Spotter).
+Since large parts of the knowledge base of the Assistants will be supplied to the LLM for matching, a larger model with a context window of at least 16k tokens is required for this booster. Full standings history isn't possible at the moment, since this will overflow the input context area of the LLM, at least for the *smaller* models like Mistral 7b, and so on. Time will cure this problem, and I will update the capabilities of the integration, when more capable models become available. For the time being, the position data is available for the most recent laps and also the gaps for the most important opponents are passed to the LLM (for Strategist and Spotter).
 
 Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 
@@ -388,8 +388,9 @@ As a special case can the *Reasoning* booster also be used to extend the rules o
 
 The *Reasoning* booster as well as to some extent the *Conversation* booster rely on the capability of the configured LLM to *call* external functions as part of their reasoning process. This is achieved by the so-called tool interface of the LLM. Tools are supported at the time of this writing by the following models:
 
-  - GPT 3.5 and above from *OpenAI*
+  - GPT 4o mini and above from *OpenAI*
   - Mistral Small, Mistral Large and Mixtral 8x22b from *Mistral AI*
+  - Gemini 1.5 and above from *Google*
   - Claude3 and above by *Anthropic* (via *OpenRouter*)
   - Command-R+ by *Cohere* (via *OpenRouter*, but not working properly yet)
   - Some Open Source models, such as Open Hermes, also support tools but with a varying degree of reliability

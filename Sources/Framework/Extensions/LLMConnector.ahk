@@ -673,6 +673,37 @@ class LLMConnector {
 		}
 	}
 
+	class GoogleConnector extends LLMConnector.APIConnector {
+		static Models {
+			Get {
+				return ["gemini-2.0-flash", "gemini-2.0-flash-lite", "gemini-1.5-flash", "gemini-1.5-pro"]
+			}
+		}
+
+		Models {
+			Get {
+				return choose(super.Models, (m) => (InStr(m, "gemini") = 1))
+			}
+		}
+
+		static GetDefaults(&serviceURL, &serviceKey, &model) {
+			serviceURL := "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+			serviceKey := ""
+			model := "gemini-2.0-flash-lite"
+		}
+
+		ParseModels(response) {
+			local result := []
+
+			for ignore, element in response["data"]
+				result.Push(StrReplace(element["id"], "models/", ""))
+
+			return result
+		}
+
+
+	}
+
 	class OpenRouterConnector extends LLMConnector.APIConnector {
 		static GetDefaults(&serviceURL, &serviceKey, &model) {
 			serviceURL := "http://localhost:11434/v1/chat/completions"
@@ -960,9 +991,9 @@ class LLMConnector {
 	static Providers {
 		Get {
 			if FileExist(kProgramsDirectory . "LLM Runtime\LLM Runtime.exe")
-				return ["Generic", "OpenAI", "Mistral AI", "Azure", "OpenRouter", "Ollama", "GPT4All", "LLM Runtime"]
+				return ["Generic", "OpenAI", "Mistral AI", "Azure", "Google", "OpenRouter", "Ollama", "GPT4All", "LLM Runtime"]
 			else
-				return ["Generic", "OpenAI", "Mistral AI", "Azure", "OpenRouter", "Ollama", "GPT4All"]
+				return ["Generic", "OpenAI", "Mistral AI", "Azure", "Google", "OpenRouter", "Ollama", "GPT4All"]
 		}
 	}
 

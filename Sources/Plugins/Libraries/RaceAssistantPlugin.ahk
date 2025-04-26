@@ -45,6 +45,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 	static sSimulator := false
 
+	static sCollectData := CaseInsenseMap()
+
 	iEnabled := false
 	iName := false
 	iLogo := false
@@ -751,6 +753,16 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		}
 	}
 
+	static CollectData[type] {
+		Get {
+			return RaceAssistantPlugin.sCollectData[type]
+		}
+
+		Set {
+			return (RaceAssistantPlugin.sCollectData[type] := value)
+		}
+	}
+
 	__New(controller, name, configuration := false, register := true) {
 		local teamServer, raceAssistantToggle, teamServerToggle, arguments, ignore, theAction, assistant
 		local openRaceSettings, openRaceReports, openSessionDatabase, openSetupWorkbench
@@ -758,6 +770,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		local assistantSpeaker, assistantListener, first, index
 
 		super.__New(controller, name, configuration, register)
+
+		RaceAssistantPlugin.sCollectData.Default := true
 
 		if (RaceAssistantPlugin.sTeamServer = kUndefined) {
 			for ignore, assistant in kRaceAssistants {
@@ -3065,4 +3079,12 @@ disableRaceAssistant(name) {
 	finally {
 		protectionOff()
 	}
+}
+
+enableDataCollection(type) {
+	RaceAssistantPlugin.CollectData[type] := true
+}
+
+disableDataCollection(type) {
+	RaceAssistantPlugin.CollectData[type] := false
 }

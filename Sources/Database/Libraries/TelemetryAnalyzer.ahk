@@ -658,7 +658,7 @@ class Corner extends Section {
 				if (brakingStart == kNull)
 					brakingStart := startIdx
 
-				if telemetry.getValue(index, "ABS", false)
+				if nullZero(telemetry.getValue(index, "ABS", false))
 					absActivations += 1
 
 				if (brake > maxBrake) {
@@ -711,7 +711,7 @@ class Corner extends Section {
 					acceleratingRPM := telemetry.getValue(index, "RPM")
 				}
 
-				if telemetry.getValue(index, "TC", false)
+				if nullZero(telemetry.getValue(index, "TC", false))
 					tcActivations += 1
 
 				throttleCount += 1
@@ -1591,7 +1591,7 @@ computeSectionLength(trackMap, sections, index, section) {
 ;;;-------------------------------------------------------------------------;;;
 
 nullZero(value) {
-	return (isNull(value) ? 0 : value)
+	return ((isNull(value) || (value = "n/a")) ? 0 : value)
 }
 
 nullRound(value, precision := 0) {

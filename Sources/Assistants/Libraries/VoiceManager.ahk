@@ -60,7 +60,7 @@ class VoiceManager extends ConfigurationItem {
 	iRecognizer := "Desktop"
 	iListener := false
 	iListenerBooster := false
-	
+
 	iListenerActive := true
 
 	iBooster := false
@@ -661,7 +661,7 @@ class VoiceManager extends ConfigurationItem {
 			return this.iListener
 		}
 	}
-	
+
 	ListenerActive {
 		Get {
 			return this.iListenerActive
@@ -757,7 +757,7 @@ class VoiceManager extends ConfigurationItem {
 		this.iName := name
 
 		super.__New(configuration)
-		
+
 		deleteFile(kTempDirectory . "Voice.cmd")
 
 		this.initialize(options)
@@ -869,7 +869,7 @@ class VoiceManager extends ConfigurationItem {
 			case "Custom":
 				PeriodicTask(ObjBindMethod(this, "processExternalCommand"), 50, kInterruptPriority).start()
 		}
-		
+
 		if (this.PushToTalkMode != "Custom")
 			PeriodicTask(ObjBindMethod(this, "processExternalCommand"), 1000).start()
 	}
@@ -897,7 +897,7 @@ class VoiceManager extends ConfigurationItem {
 
 				if ((command != "Disable") && (command != "Enable")) {
 					deleteFile(fileName)
-					
+
 					if !this.ListenerActive
 						return
 				}
@@ -941,13 +941,15 @@ class VoiceManager extends ConfigurationItem {
 			clicks := 0
 			activation := false
 			listening := false
-			
+
 			if listenTask {
 				listenTask.stop()
 
 				listenTask := false
 			}
-		
+
+			this.stopListening()
+
 			return
 		}
 
@@ -1143,11 +1145,11 @@ class VoiceManager extends ConfigurationItem {
 	startActivationListener(retry := true) {
 		this.startListening(retry)
 	}
-	
+
 	enableListening() {
 		this.iListenerActive := true
 	}
-	
+
 	disableListening() {
 		this.iListenerActive := false
 	}

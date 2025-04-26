@@ -23,7 +23,20 @@ As mentioned above, this version contains an all new simulator data interface. I
   
 # Upcoming release
 
-Not yet planned...
+## 6.3.0.0
+
+#### Date: 05/02/25 (planned)
+
+#### Fixes
+
+  - No fixes necessary.
+
+#### Changes
+
+  - Two new controller action functions [*enableListening* and *disableListening*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allow you to fully mute and unmute voice recognition by a button, for example. This can help, if you are using the same *Push-To-Talk* button with Simulator Controller and Discord or TeamSpeak.
+  - The driver is now always included in the default selection of drivers/cars in reports for "Race Reports", "Team Center" or "Solo Center".
+  - If the "Reload" button is used in "Race Reports", new cars and tracks, which may have been registered since the start of "Race Reports" will be considered as well.
+  - [*Google*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#google) has been added to the list of supported GPT service providers for the Driving Coach and also the Assistant boosters. This makes it possible to the use the *Gemini* models, of which some are even available for free.
 
 # Release history
 

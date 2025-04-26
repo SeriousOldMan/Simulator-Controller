@@ -37,16 +37,32 @@ stopListen() {
 	FileAppend("Stop", kTempDirectory . "Voice.cmd")
 }
 
-enableVoiceRecognition() {
+enableListening() {
 	while FileExist(kTempDirectory . "Voice.cmd")
 		deleteFile(kTempDirectory . "Voice.cmd")
 
 	FileAppend("Enable", kTempDirectory . "Voice.cmd")
 }
 
-disableVoiceRecognition() {
+disableListening() {
 	while FileExist(kTempDirectory . "Voice.cmd")
 		deleteFile(kTempDirectory . "Voice.cmd")
 
 	FileAppend("Disable", kTempDirectory . "Voice.cmd")
 }
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                   Private Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+initializeVoiceControl() {
+	deleteFile(kTempDirectory . "Voice.cmd")
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Initialization Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+initializeVoiceControl()

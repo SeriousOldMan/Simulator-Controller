@@ -28,7 +28,7 @@ Simulator = {}
 -------------------------------------------------------------------------------
 
 Simulator.Read = function (simulator, car, track)
-	return __read_simulator(simulator, car, track. "Text")
+	return __read_simulator(simulator, car, track, "Text")
 end
 
 Simulator.Call = function (simulator, command)

@@ -440,7 +440,7 @@ class DrivingCoach extends GridRaceAssistant {
 		static sessions := false
 
 		if !sessions {
-			sessions := ["Other", "Practice", "Qualifying", "Race"]
+			sessions := ["Other", "Practice", "Qualifying", "Race", "Time Trial"]
 
 			sessions.Default := "Other"
 		}

@@ -30,6 +30,7 @@ As mentioned above, this version contains an all new simulator data interface. I
 #### Fixes
 
   - Fixed auto selection of controller modes (aka Controller Automation) depending of session type. Was broken with the last release with the rewrite of data interfaces.
+  - Fixed a bug, which caused the Strategist to recommend a tyre change in heavy rain conditions although wet tyres already were mounted.
 
 #### Changes
 

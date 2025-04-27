@@ -626,7 +626,7 @@ class SimulatorPlugin extends ControllerPlugin {
 
 				this.Controller.setModes(this.Simulator.Application)
 			}
-			else if inList(kSessionNames, session)
+			else if inList(kSessions, session)
 				this.Controller.setModes(this.Simulator.Application, kSessionNames[session])
 			else
 				this.Controller.setModes(this.Simulator.Application, "Other")

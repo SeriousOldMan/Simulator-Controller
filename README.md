@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[6.3.0.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/yRyGmsj3) (Early build for 6.3.0. Changes: Controller action function to disable voice recognition, Driver is now part of the default selection in race reports, Reload in reports now also reloads any new cars and tracks, Support for Google as GPT provider, New action functions to enable / disable data collection, Fixed controller automation, Fixed compound recommendation by Strategist, Debugging support for Strategist handling of strategies.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-630) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

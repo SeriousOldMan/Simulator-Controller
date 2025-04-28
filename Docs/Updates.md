@@ -37,7 +37,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 6.3.0
 
-No actions required, but you may give the new Google GPT integration a try.
+No actions required, but you may want to give the new Google GPT integration a try.
 
 ***
 

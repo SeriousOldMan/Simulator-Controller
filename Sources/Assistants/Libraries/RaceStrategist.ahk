@@ -27,6 +27,13 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Public Constants Section                        ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global kDebugStrategy := 4
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -100,6 +107,9 @@ class RaceStrategist extends GridRaceAssistant {
 
 	iSessionReportsDatabase := false
 	iSessionDataActive := false
+
+	iDebugStrategyCounter := 1
+	iDebugPistopCounter := 1
 
 	class RaceStrategistRemoteHandler extends RaceAssistant.RaceAssistantRemoteHandler {
 		__New(remotePID) {
@@ -877,7 +887,11 @@ class RaceStrategist extends GridRaceAssistant {
 
 		deleteDirectory(kTempDirectory . "Race Strategist")
 
-		DirCreate(kTempDirectory "Race Strategist")
+		DirCreate(kTempDirectory . "Race Strategist")
+
+		if getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+						  , "Debug", "DebugStrategy", false)
+			this.setDebug(kDebugStrategy, true)
 
 		this.iLapsDatabaseDirectory := (kTempDirectory . "Race Strategist\")
 	}
@@ -1644,6 +1658,9 @@ class RaceStrategist extends GridRaceAssistant {
 					this.loadStrategy(theStrategy, facts)
 
 					this.updateSessionValues({OriginalStrategy: theStrategy, Strategy: theStrategy})
+
+					if this.Debug[kDebugStrategy]
+						FileCopy(kUserConfigDirectory . "Race.strategy", kTempDirectory . "Race Strategist\Strategy\Race.strategy", 1)
 				}
 			}
 		}
@@ -2541,7 +2558,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 					writeMultiMap(fileName, configuration)
 
-					if isDebug()
+					if (isDebug() || this.Debug[kDebugStrategy])
 						try {
 							FileCopy(fileName, kTempDirectory . "Race Strategist.strategy", 1)
 						}
@@ -2551,12 +2568,19 @@ class RaceStrategist extends GridRaceAssistant {
 
 					this.RemoteHandler.updateStrategy(fileName, newStrategy.Version)
 				}
-				else if isDebug() {
+				else if (isDebug() || this.Debug[kDebugStrategy]) {
 					configuration := newMultiMap()
 
 					newStrategy.saveToConfiguration(configuration)
 
 					writeMultiMap(kTempDirectory . "Race Strategist.strategy", configuration)
+				}
+
+				if this.Debug[kDebugStrategy] {
+					DirCreate(kTempDirectory . "Race Strategist\Strategy")
+
+					FileCopy(kTempDirectory . "Race Strategist.strategy"
+						   , kTempDirectory . "Race Strategist\Strategy\Strategy " . this.iDebugStrategyCounter++ . ".strategy", 1)
 				}
 			}
 		}
@@ -3817,6 +3841,13 @@ class RaceStrategist extends GridRaceAssistant {
 			}
 			else
 				messageSend(kFileMessage, "Race Engineer", this.TeamSession ? "planDriverSwap" : "planPitstop:Now", engineerPID)
+
+		if this.Debug[kDebugStrategy]
+			FileAppend("Lap: " . (plannedLap ? plannedLap : "?") . "`n"
+					 . "Refuel: " . ((refuel != kUndefined) ? refuel : "?") . "`n"
+					 . "Tyre Change: " . ((tyreChange != kUndefined) ? (tyreChange ? "Yes" : "No") : "?") . "`n"
+					 . "Tyre Compound: " ((tyreCompound != kUndefined) ? compound(tyreCompound, tyreCompoundColor) : "?")
+					 , kTempDirectory . "Race Strategist\Strategy\Pitstop " . this.iDebugPistopCounter++ . ".pitstop", 1)
 	}
 
 	executePitstop(lapNumber) {

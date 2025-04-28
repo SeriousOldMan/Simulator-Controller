@@ -108,8 +108,7 @@ class RaceStrategist extends GridRaceAssistant {
 	iSessionReportsDatabase := false
 	iSessionDataActive := false
 
-	iDebugStrategyCounter := 1
-	iDebugPistopCounter := 1
+	iDebugStrategyCounter := [1, 1, 1]
 
 	class RaceStrategistRemoteHandler extends RaceAssistant.RaceAssistantRemoteHandler {
 		__New(remotePID) {
@@ -1659,8 +1658,12 @@ class RaceStrategist extends GridRaceAssistant {
 
 					this.updateSessionValues({OriginalStrategy: theStrategy, Strategy: theStrategy})
 
-					if this.Debug[kDebugStrategy]
-						FileCopy(kUserConfigDirectory . "Race.strategy", kTempDirectory . "Race Strategist\Strategy\Race.strategy", 1)
+					if this.Debug[kDebugStrategy] {
+						DirCreate(kTempDirectory . "Race Strategist\Strategy")
+
+						FileCopy(kUserConfigDirectory . "Race.strategy"
+							   , kTempDirectory . "Race Strategist\Strategy\Original " . this.iDebugStrategyCounter[1]++ . ".strategy", 1)
+					}
 				}
 			}
 		}
@@ -2580,7 +2583,9 @@ class RaceStrategist extends GridRaceAssistant {
 					DirCreate(kTempDirectory . "Race Strategist\Strategy")
 
 					FileCopy(kTempDirectory . "Race Strategist.strategy"
-						   , kTempDirectory . "Race Strategist\Strategy\Strategy " . this.iDebugStrategyCounter++ . ".strategy", 1)
+						   , kTempDirectory . (original ? ("Race Strategist\Strategy\Original " . this.iDebugStrategyCounter[1]++ . ".strategy")
+														: ("Race Strategist\Strategy\Updated " . this.iDebugStrategyCounter[2]++ . ".strategy"))
+						   , 1)
 				}
 			}
 		}
@@ -3847,7 +3852,7 @@ class RaceStrategist extends GridRaceAssistant {
 					 . "Refuel: " . ((refuel != kUndefined) ? refuel : "?") . "`n"
 					 . "Tyre Change: " . ((tyreChange != kUndefined) ? (tyreChange ? "Yes" : "No") : "?") . "`n"
 					 . "Tyre Compound: " ((tyreCompound != kUndefined) ? compound(tyreCompound, tyreCompoundColor) : "?")
-					 , kTempDirectory . "Race Strategist\Strategy\Pitstop " . this.iDebugPistopCounter++ . ".pitstop", 1)
+					 , kTempDirectory . "Race Strategist\Strategy\Pitstop " . this.iDebugStrategyCounter[3]++ . ".pitstop", 1)
 	}
 
 	executePitstop(lapNumber) {

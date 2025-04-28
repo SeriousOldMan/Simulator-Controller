@@ -13,8 +13,8 @@ Let's start with some very low system level settings.
 
 | Category   | Setting  | Default | Description |
 |------------|----------|---------|-------------|
-| Locations  | Temp     | [Documents]\Simulator Controller\Temp     | The location of all temporary files of Simulator Controller. Set this to a different location, if your Documents folder is under control of *One Drive* or alike. |
-|            | Programs | [Documents]\Simulator Controller\Programs | The location of all additional or optional programs installed or created by Simulator Controller. Especially when using Whisper, this can consume quite a lot of disk space. Set this to a different location, if your Documents folder is on a drive with restricted size, but be sure to choose a fast alternative drive. |
+| Locations  | Temp     | %homePath%\Documents\Simulator Controller\Temp | The location of all temporary files of Simulator Controller. Set this to a different location, if your Documents folder is under control of *One Drive* or alike. |
+|            | Programs | %homePath%\Documents\Simulator Controller\Programs | The location of all additional or optional programs installed or created by Simulator Controller. Especially when using Whisper, this can consume quite a lot of disk space. Set this to a different location, if your Documents folder is on a drive with restricted size, but be sure to choose a fast alternative drive. |
 | Process  | Memory.Max | 1024 | The max memory in MB a process may consume, before it get killed automatically. |
 |          | Memory.Critical | 80 | The percentage of max memory usage, when memory reporting starts and special debug code is activated. |
 | Diagnostics | Critical | *True* | If this is *True* (which is the default), all internal erros and critical log messages get collected and are sent to the development team for further investigation. No private or personal data is transmitted, only the error messages and the stack information. This setting can be changed in the profile dialog of "Simulator Startup". |
@@ -46,11 +46,12 @@ The next group of settings is used mainly for development purposes. It allows to
 
 | Category | Setting | Default | Description |
 |----------|---------|---------|-------------|
-| Build     | Configuration | Production | Chooses the runtime mode (*Production* or *Development*) of the framework. This normaly determined during compile time, but it is possible to activate parts of the *Development* mode even for production code.  |
-| Debug     | Debug | *depending on configuration* | Specifies, whether the framework is running in a special debug mode. Default is *False* for a production (release) configuration and *True* for a development configuration. This option overwrites the choice as set in "Simulator Configuration" and it can be switched using the application menu. |
+| Build    | Configuration | Production | Chooses the runtime mode (*Production* or *Development*) of the framework. This normaly determined during compile time, but it is possible to activate parts of the *Development* mode even for production code.  |
+| Debug    | Debug | *depending on configuration* | Specifies, whether the framework is running in a special debug mode. Default is *False* for a production (release) configuration and *True* for a development configuration. This option overwrites the choice as set in "Simulator Configuration" and it can be switched using the application menu. |
 |      | LogLevel | *depending on configuration* | Defines the level of verbosity of the logging messages. Allowed values are *Debug*, *Info*, *Warn*, *Critical* and *Off*. Defult is *Warn* for production configuration and *Debug* for devlopment configuration. This option overwrites the choice as set in "Simulator Configuration" and it can be switched using the application menu. |
 |      | LogStartup | False | If *True*, special logging is enabled which gives you insights into the timing during the startup process of any of the applications of Simulator Controller. Use this, if any of the applications seems to hang during startup. |
 |      | Verbose | *depending on configuration* | Enables or disables additional and very verbose diagnostic output. Never use it in a real race, since error dialogs might popup while driving. Default is *True* for non-compiled code, when *Debug* is enabled, *False* otherwise. |
+|      | DebugStrategy | If *True*, the Strategist protocols the history of strategies and also his communication with the Race Engineer in the directory %homePath%\Documents\Simulator Controller\Temp\Race Strategist\Strategy. |
 
 ### Voice Settings
 
@@ -70,7 +71,7 @@ The Script Engine used by the Assistants is based on the well-known *Lua* script
 
 | Category      | Setting        | Default | Description |
 |---------------|----------------|---------|-------------|
-| Script Engine | Modules Path   | %homePath%\Documents\Simulator Controller\Scripts\\?.script;%homePath%\Documents\Simulator Controller\Scripts\\?.lua;%APPDATA%\luarocks\share\lua\5.4\\?.lua | The path to search for *Lua* modules. Please note the "?.lua" at the end which matches *Lua* source files. When placing scripts in the [Documents]\Simulator Controller\Scripts direectory, they can have also the extension ".script". The default value contains the local script folder and also the default location for *luarocks* modules. |
+| Script Engine | Modules Path   | %homePath%\Documents\Simulator Controller\Scripts\\?.script;%homePath%\Documents\Simulator Controller\Scripts\\?.lua;%APPDATA%\luarocks\share\lua\5.4\\?.lua | The path to search for *Lua* modules. Please note the "?.lua" at the end which matches *Lua* source files. When placing scripts in the %homePath%\Documents\Simulator Controller\Scripts direectory, they can have also the extension ".script". The default value contains the local script folder and also the default location for *luarocks* modules. |
 |               | Libraries Path | %APPDATA%\luarocks\lib\lua\5.4\\?.lua | The path to search for libraries written in other languages which can be used by *Lua*. Please note the "?.dll". The default value points to the default location of *luarocks* libraries. |
 
 ### Miscellaneous Settings

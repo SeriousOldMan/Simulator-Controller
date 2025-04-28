@@ -53,8 +53,9 @@ updateProgress(max) {
 
 downloadSimulatorController() {
 	local icon := kIconsDirectory . "Installer.ico"
+	local error := false
 	local options, index, cState, devVersion, release, version, package, updateTask
-	local directory, currentDirectory, ignore, url, error
+	local directory, currentDirectory, ignore, url
 
 	exitOthers() {
 		loop 20
@@ -116,11 +117,23 @@ downloadSimulatorController() {
 
 	devVersion := (cState || inList(A_Args, "-Development"))
 
-	try {
-		Download("https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/VERSION", kTempDirectory . "VERSION")
-	}
-	catch Any as exception {
-		logError(exception, true)
+	deleteFile(kTempDirectory . "VERSION")
+
+	for ignore, url in ["https://www.dropbox.com/scl/fi/z47gla0adkbk7gup3khwx/VERSION?rlkey=pwo8ffhpkrteyfcnptra6x7y7&st=7lbgjkgu&dl=0"
+					  , "http://87.177.158.163:800/api/public/dl/bkguewzP"
+					  , "https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/VERSION"]
+		try {
+			error := false
+
+			Download("https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/VERSION", kTempDirectory . "VERSION")
+		}
+		catch Any as exception {
+			error := exception
+		}
+
+	if (error || !FileExist(kTempDirectory . "VERSION")) {
+		if error
+			logError(error, true)
 
 		OnMessage(0x44, translateOkButton)
 		withBlockedWindows(MsgBox, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)

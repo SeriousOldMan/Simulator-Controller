@@ -208,7 +208,7 @@ checkForNews() {
 					check := false
 
 					for ignore, url in ["https://fileshare.impresion3d.pro/filebrowser/api/public/dl/r0q9-d-3"
-									  , "http://87.177.159.148:800/api/public/dl/jipSYNLz"
+									  , "http://87.177.158.163:800/api/public/dl/jipSYNLz"
 									  , "https://www.dropbox.com/scl/fi/s5ewrqo9lzwcv6omvx667/NEWS?rlkey=j3t7aopmdye4efc8uc3xlekxz&st=wbuipual&dl=1"] {
 						try
 							Download(url, kTempDirectory . "NEWS.ini")
@@ -392,7 +392,7 @@ checkForUpdates() {
 
 			for ignore, url in ["https://fileshare.impresion3d.pro/filebrowser/api/public/dl/OH13SGRl"
 							  , "https://www.dropbox.com/scl/fi/qiczuix77p0f1bkc0q4bw/VERSION?rlkey=9y6fs09lnj79ikgr9608i2ajy&st=npovhmgm&dl=1"
-							  , "http://87.177.159.148:800/api/public/dl/bkguewzP"
+							  , "http://87.177.158.163:800/api/public/dl/bkguewzP"
 							  , "https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/VERSION"]
 				try {
 					Download(url, kUserConfigDirectory . "VERSION")

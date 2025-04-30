@@ -51,7 +51,7 @@ The next group of settings is used mainly for development purposes. It allows to
 |      | LogLevel | *depending on configuration* | Defines the level of verbosity of the logging messages. Allowed values are *Debug*, *Info*, *Warn*, *Critical* and *Off*. Defult is *Warn* for production configuration and *Debug* for devlopment configuration. This option overwrites the choice as set in "Simulator Configuration" and it can be switched using the application menu. |
 |      | LogStartup | False | If *True*, special logging is enabled which gives you insights into the timing during the startup process of any of the applications of Simulator Controller. Use this, if any of the applications seems to hang during startup. |
 |      | Verbose | *depending on configuration* | Enables or disables additional and very verbose diagnostic output. Never use it in a real race, since error dialogs might popup while driving. Default is *True* for non-compiled code, when *Debug* is enabled, *False* otherwise. |
-|      | DebugStrategy | If *True*, the Strategist protocols the history of strategies and also his communication with the Race Engineer in the directory %homePath%\Documents\Simulator Controller\Temp\Race Strategist\Strategy. |
+|      | DebugStrategy | False | If *True*, the Strategist protocols the history of strategies and also his communication with the Race Engineer in the directory %homePath%\Documents\Simulator Controller\Temp\Race Strategist\Strategy. |
 
 ### Voice Settings
 

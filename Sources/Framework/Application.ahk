@@ -232,7 +232,7 @@ checkForNews() {
 				local newsUrls := false
 				local availableNews := readMultiMap(kTempDirectory . "NEWS.ini")
 				local news := readMultiMap(kUserConfigDirectory . "NEWS")
-				local availableNews, news, nr, rule, ignore, html, shown
+				local availableNews, nr, rule, ignore, html, shown, candidates
 
 				for nr, url in getMultiMapValues(availableNews, "News")
 					if isNumber(nr) {
@@ -263,19 +263,25 @@ checkForNews() {
 						}
 					}
 
-				if !newsNr
+				if !newsNr {
+					candidates := []
+
 					for nr, url in getMultiMapValues(availableNews, "News")
 						if isNumber(nr) {
 							shown := getMultiMapValue(news, "News", nr, false)
 							rule := getMultiMapValue(availableNews, "Rules", nr, "Once")
 
-							if (InStr(rule, "Repeat") && shown && (DateAdd(shown, string2Values(":", rule)[2], "Days") > A_Now)) {
-								newsNr := nr
-								newsUrls := url
-
-								break
-							}
+							if (InStr(rule, "Repeat") && shown && (DateAdd(shown, string2Values(":", rule)[2], "Days") > A_Now))
+								candidates.Push([nr, url])
 						}
+
+					if (candidates.Length > 0) {
+						candidates := candidates[Round(Random(1, candidates.Length))]
+
+						newsNr := candidates[1]
+						newsUrls := candidates[2]
+					}
+				}
 
 				if newsNr {
 					deleteFile(A_Temp . "\News.zip")

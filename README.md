@@ -131,6 +131,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 34. [Telemetry System Revisited](https://youtu.be/pPPSqs5Bdrk) - This video provides you with updated information about the telemetry system of Simulator Controller, since many functions have been added recently.
 
+35. [Scripting Assistant Behavior](https://youtu.be/Kvs_YePeMRI) - This video introduces Lua scripting for the Race Assistants. Lua is an easy to learn, simple language which now can be used to define new voice commands, interact with the simulator and so on.
+
 This list will be extended from time to time to cover new functionalities.
 
 ### Discord Community

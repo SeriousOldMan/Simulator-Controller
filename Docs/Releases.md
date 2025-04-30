@@ -31,6 +31,7 @@ As mentioned above, this version contains an all new simulator data interface. I
 
   - Fixed auto selection of controller modes (aka Controller Automation) depending of session type. Was broken with the last release with the rewrite of data interfaces.
   - Fixed a bug, which caused the Strategist to recommend a tyre change in heavy rain conditions although wet tyres already were mounted.
+  - Removed an orphane entry in the *Temp* directory, if this directory had been moved to a different location.
   - Fixed a typo in the "Simulator" *Lua* module, which prevented the script from being loaded correctly.
   - [Important] It has been reported that one of the latest Windows update removed the VC++ runtime, that is used by the plugin for *rFactor 2* and *Le Mans Ultimate*. Please see the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-630) for information how to fix that.
 

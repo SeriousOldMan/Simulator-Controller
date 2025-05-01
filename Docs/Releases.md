@@ -1,5 +1,56 @@
 # Latest stable release
 
+## 6.3.0.0
+
+#### Date: 05/02/25
+
+#### Fixes
+
+  - Fixed auto selection of controller modes (aka Controller Automation) depending of session type. Was broken with the last release with the rewrite of data interfaces.
+  - Fixed a bug, which caused the Strategist to recommend a tyre change in heavy rain conditions although wet tyres already were mounted.
+  - Removed an orphane entry in the *Temp* directory, if this directory had been moved to a different location.
+  - Fixed a typo in the "Simulator" *Lua* module, which prevented the script from being loaded correctly.
+  - Fixed a freeze of the "News" window in cases where the user has clicked on "Startup" already.
+  - [Important] It has been reported that one of the latest Windows update removed the VC++ runtime, that is used by the plugin for *rFactor 2* and *Le Mans Ultimate*. Please see the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-630) for information how to fix that.
+
+#### Changes
+
+  - Two new controller action functions [*enableListening* and *disableListening*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allow you to fully mute and unmute voice recognition by a button, for example. This can help, if you are using the same *Push-To-Talk* button with Simulator Controller and Discord or TeamSpeak.
+  - Two new controller action functions [*enableDataCollection* and *disableDataCollection*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allow you to disable the transfer of collected data of the Assistants to the session database. This is especially useful to prevent data which originates from sessions with 2x fuel consumption, for example, to pollute the database.
+  - The driver is now always included in the default selection of drivers/cars in reports for "Race Reports", "Team Center" or "Solo Center".
+  - If the "Reload" button is used in "Race Reports", new cars and tracks, which may have been registered since the start of "Race Reports" will be considered as well.
+  - [*Google*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#google) has been added to the list of supported GPT service providers for the Driving Coach and also the Assistant boosters. This makes it possible to the use the *Gemini* models, of which some are even available for free.
+  - [Internal] A specialized debugging mode for strategy handling by the Race Strategist can now be enabled in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#development-settings).
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-630), if you are experiencing problems with *rFactor 2* and *le Mans Ultimate*.
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
+## 6.2.9.0
+
+#### Date: 04/25/25
+
+#### Fixes
+
+  - Fixed installation and updating Simulator Controller in the case the Temp folder has been relocated.
+  - Fixed a bug which allowed the Telemetry Viewer to be opened without selecting a track beforehand.
+
+#### Changes
+
+  - Added support for more track grip conditions like "Dusty".
+  - The Race Engineer no longer announces temperature related pressure corrections, if the pitstop had been completely planned externally, for example in the "Team Center".
+  - Actions and Events can now be exported and imported in the Assistant booster editor, so that it is possible now to share them with the community or your team mates.
+  - [Expert] Once again comprehensive extensions of the integrated script engine:
+    - Several modules haven been defined, which can be included in a *Lua* script using the "require" function. They give you access to the state of the session and also to some functions of the simulator in scripts running in an Assistant booster. See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Script-Modules) for more information.
+	- It is now possible to use *Lua* coroutines even while interface with the host environments or with the Rule Engine.
+  - [Internal] Full rewrite of the simulator data acquisition interface.
+
+As mentioned above, this version contains an all new simulator data interface. It has passed all my tests, but tests may not cover everything. Therefore, if you encounter an unexpected behavior, let me know immediately.
+  
 ## 6.2.8.0
 
 #### Date: 04/18/25
@@ -24,26 +75,6 @@
     - New [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#script-settings) let you specify the directories where *Lua* searches for modules and libraries.
     - Arrays can now be passed in both directions between *Lua* scripts and the host language, where each element of that array can be a literal value or an array by itself.
     - *Lua* scripts have now access to any global object in the host process using the *extern* function. Example: extern("showMessage")("Hello World!"). *extern* can be used to access function objects, but also any other global variable in that process. All global variables, constants and functions of the framework are available using *extern* in any process. See the [Development Guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts) for more infomation and reference. 
-  
-# Upcoming release
-
-## 6.2.9.0
-
-#### Date: 04/25/25 (planned)
-
-#### Fixes
-
-  - Fixed installation and updating Simulator Controller in the case the Temp folder has been relocated.
-
-#### Changes
-
-  - Added support for more track grip types like "Dusty".
-  - The Race Engineer no longer announces temeperature related pressure corrections, if the pitstop had been completely planned externally, for example in the "Team Center".
-  - [Expert] Once again comprehensive extensions of the integrated script engine:
-    - An all new "Session" module, which can be included in a *Lua* script using the "require" function, gives access to the state of the simulation in scripts running in an Assistant booster. See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Module) for more information.
-  - [Internal] Full rewrite of the simulator data acquisition interface.
-
-# Release history
 
 ## 6.2.7.0
 

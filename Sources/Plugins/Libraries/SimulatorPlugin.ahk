@@ -27,9 +27,6 @@ global kAssistantMode := "Assistant"
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kSessions := [kSessionOther, kSessionPractice, kSessionQualification, kSessionRace, kSessionTimeTrial]
-global kSessionNames := ["Other", "Practice", "Qualification", "Race", "Time Trial"]
-
 global kAssistantAnswerActions := ["Accept", "Reject"]
 global kAssistantRaceActions := ["FuelRatioOptimize", "PitstopPlan", "DriverSwapPlan", "PitstopPrepare", "PitstopRecommend", "StrategyRecommend", "FCYRecommend", "StrategyCancel"]
 
@@ -629,7 +626,7 @@ class SimulatorPlugin extends ControllerPlugin {
 
 				this.Controller.setModes(this.Simulator.Application)
 			}
-			else if inList(kSessionNames, session)
+			else if inList(kSessions, session)
 				this.Controller.setModes(this.Simulator.Application, kSessionNames[session])
 			else
 				this.Controller.setModes(this.Simulator.Application, "Other")

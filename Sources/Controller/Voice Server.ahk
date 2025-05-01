@@ -84,6 +84,8 @@ class VoiceServer extends ConfigurationItem {
 	iSpeaking := false
 	iListening := false
 
+	iListenerActive := true
+
 	iPendingCommands := []
 	iHasPendingActivation := false
 	iLastCommand := A_TickCount
@@ -811,6 +813,12 @@ class VoiceServer extends ConfigurationItem {
 		}
 	}
 
+	ListenerActive {
+		Get {
+			return this.iListenerActive
+		}
+	}
+
 	SpeakerVolume {
 		Get {
 			return this.iSpeakerVolume
@@ -881,6 +889,8 @@ class VoiceServer extends ConfigurationItem {
 
 		VoiceServer.Instance := this
 
+		deleteFile(kTempDirectory . "Voice.cmd")
+
 		PeriodicTask(ObjBindMethod(this, "runPendingCommands"), 500).start()
 		PeriodicTask(ObjBindMethod(this, "unregisterStaleVoiceClients"), 5000, kLowPriority).start()
 
@@ -929,6 +939,9 @@ class VoiceServer extends ConfigurationItem {
 			case "Custom":
 				PeriodicTask(ObjBindMethod(this, "processExternalCommand"), 50, kInterruptPriority).start()
 		}
+
+		if (this.PushToTalkMode != "Custom")
+			PeriodicTask(ObjBindMethod(this, "processExternalCommand"), 1000).start()
 	}
 
 	processExternalCommand() {
@@ -952,7 +965,12 @@ class VoiceServer extends ConfigurationItem {
 
 				file.Close()
 
-				deleteFile(fileName)
+				if ((command != "Disable") && (command != "Enable")) {
+					deleteFile(fileName)
+
+					if !this.ListenerActive
+						return
+				}
 
 				if (InStr(command, "Target:") = 1) {
 					descriptor := string2Values(":", command)[2]
@@ -967,6 +985,10 @@ class VoiceServer extends ConfigurationItem {
 					this.stopActivationListener()
 					this.stopListening()
 				}
+				else if (command = "Disable")
+					this.disableListening()
+				else if (command = "Enable")
+					this.enableListening()
 			}
 		}
 		catch Any {
@@ -990,6 +1012,25 @@ class VoiceServer extends ConfigurationItem {
 
 		static speed := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 									   , "Voice", "Activation Speed", DllCall("GetDoubleClickTime"))
+
+		if !this.ListenerActive {
+			isPressed := false
+			lastDown := 0
+			lastUp := 0
+			clicks := 0
+			activation := false
+			listening := false
+
+			if listenTask {
+				listenTask.stop()
+
+				listenTask := false
+			}
+
+			this.stopListening()
+
+			return
+		}
 
 		try {
 			for ignore, key in this.PushToTalk
@@ -1195,19 +1236,34 @@ class VoiceServer extends ConfigurationItem {
 			}
 	}
 
+	enableListening() {
+		this.iListenerActive := true
+	}
+
+	disableListening() {
+		this.iListenerActive := false
+	}
+
 	startListening(retry := true) {
 		local activeClient := this.getVoiceClient()
 
-		if this.Interruptable
-			this.interrupt(false, (this.Interruptable = "All"))
+		if this.ListenerActive {
+			if this.Interruptable
+				this.interrupt(false, (this.Interruptable = "All"))
 
-		return (activeClient ? activeClient.startListening(retry) : this.startActivationListener(retry))
+			return (activeClient ? activeClient.startListening(retry) : this.startActivationListener(retry))
+		}
+		else
+			return false
 	}
 
 	stopListening(retry := false) {
 		local activeClient := this.getVoiceClient()
 
-		return (activeClient ? activeClient.stopListening(retry) : this.stopActivationListener(retry))
+		if this.ListenerActive
+			return (activeClient ? activeClient.stopListening(retry) : this.stopActivationListener(retry))
+		else
+			return false
 	}
 
 	interrupt(descriptor := false, pending := false) {

@@ -224,10 +224,10 @@ loadSimulatorConfiguration() {
 
 				fileName := (ID . "." . A_Now . ".log")
 
-				if ftpUpload("87.177.159.148", "SimulatorController", "Sc-1234567890-Sc", kUserHomeDirectory . "Diagnostics\Critical.log", "Diagnostics-Uploads/" . fileName)
+				if ftpUpload("87.177.158.163", "SimulatorController", "Sc-1234567890-Sc", kUserHomeDirectory . "Diagnostics\Critical.log", "Diagnostics-Uploads/" . fileName)
 					deleteFile(kUserHomeDirectory . "Diagnostics\Critical.log")
 
-				ftpUpload("87.177.159.148", "SimulatorController", "Sc-1234567890-Sc", kUserHomeDirectory . "Diagnostics\Usage.stat", "Diagnostics-Uploads/" . ID . ".Usage.stat")
+				ftpUpload("87.177.158.163", "SimulatorController", "Sc-1234567890-Sc", kUserHomeDirectory . "Diagnostics\Usage.stat", "Diagnostics-Uploads/" . ID . ".Usage.stat")
 			}, 10000, kLowPriority)
 		}
 	}

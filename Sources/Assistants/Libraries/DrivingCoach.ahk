@@ -440,7 +440,7 @@ class DrivingCoach extends GridRaceAssistant {
 		static sessions := false
 
 		if !sessions {
-			sessions := ["Other", "Practice", "Qualifying", "Race"]
+			sessions := ["Other", "Practice", "Qualifying", "Race", "Time Trial"]
 
 			sessions.Default := "Other"
 		}
@@ -878,6 +878,15 @@ class DrivingCoach extends GridRaceAssistant {
 		static report := true
 		static conversationNr := 1
 
+		normalizeAnswer(answer) {
+			answer := Trim(StrReplace(StrReplace(answer, "*", ""), "|||", ""), " `t`r`n")
+
+			while InStr(answer, "\n", , -2)
+				answer := SubStr(answer, 1, StrLen(answer) - 2)
+
+			return answer
+		}
+
 		try {
 			if (this.Speaker && this.Options["Driving Coach.Confirmation"]
 							 && (this.ConnectionState = "Active") && (this.Mode != "Coaching"))
@@ -887,6 +896,8 @@ class DrivingCoach extends GridRaceAssistant {
 				answer := this.Connector.Ask(text)
 
 				if answer {
+					answer := normalizeAnswer(answer)
+
 					report := true
 
 					if (this.CoachingActive && !InStr(kVersion, "-release")) {

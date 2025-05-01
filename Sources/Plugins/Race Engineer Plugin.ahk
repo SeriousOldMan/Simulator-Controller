@@ -559,6 +559,9 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 		local stint, lastStint, newStint, driverID, lapPressures, ignore, lapData, driverName
 		local coldPressures, hotPressures, pressureLosses
 
+		if !this.Controller.CollectData("Pressures")
+			return
+
 		if Task.CurrentTask
 			Task.CurrentTask.Critical := true
 

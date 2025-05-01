@@ -9,6 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\..\Framework\Extensions\HTTP.ahk"
 #Include "SessionDatabase.ahk"
 
 

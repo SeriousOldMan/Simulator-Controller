@@ -37,21 +37,19 @@ Here is a short video which shows how to configure Simulator Controller for the 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[6.2.8.0-release](https://cutt.ly/zrgkRcgP) (Changes: New profile dialog in "Simulator Startup", New diagnostics system, Support for multiple P2T keys, Tweaked news system again, Fixed argument processing in script callbacks, Fixed execution of custom conversation actions, New core settings for Lua search paths, Fixed wildcard settings handling in session database.)
+[6.3.0.0-release](https://cutt.ly/XrkrA7E0) (Changes: Controller action function to disable voice recognition, Driver is now part of the default selection in race reports, Reload in reports now also reloads any new cars and tracks, Support for Google as GPT provider, New action functions to enable / disable data collection, Fixed controller automation, Fixed compound recommendation by Strategist, Debugging support for Strategist handling of strategies, Added new VC++ installer.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-628) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-630) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[6.2.7.0-release](https://cutt.ly/LrdV22mb) (Changes: Fixed translation of session type by Engineer for mixed language settings, Assistant.Speak uses Rephrasing booster, All new Rules Provider for Reasoning booster, Support for bi-directional calls between Rule Engine and Script Engine, Individual tyre life / laps per tyre compound in "Strategy Workbench" and "Race Settings", Strategy simulation now selects the best tyre compound mixture based on the number of laps in a stint, Fixed Drivers.CSV file, Support for time + 1 lap races in "Strategy Workbench", Engineer does understand time + 1 lap races, Fixed refuel calculation in lap races for the last stint, Character filter for car and track names, Updated tyre meta data for AMS2, Fixed layout of engine temeperature widget in "System Monitor", Fixed import of race settings into "Strategy Workbench".)
+[6.2.9.0-release](https://cutt.ly/qrhSOcmm) (Changes: Fixed relocation of Temp folder, "Session" module for Lua scripts, Rewrite of data provider interface, Fixed minor issues in the News system, Export and import of Actions and Events, Support for more grip types, Fixed "Telemetry..." command in "Setup Workbench".)
 
-[6.2.6.0-release](https://cutt.ly/HrsgQmc1) (Changes: Fixed several UTF encoding problems for driver names in the session database, Integrated Lua as scripting language, New core settings for folder locations, New resizing rules for "Strategy Workbech", Fixed several translation errors, Integration of scripts in "Strategy Workbench" and in the Assistant boosters, Higher priority for accident ahead in distance alerts by the Spotter.)
+[6.2.8.0-release](https://cutt.ly/zrgkRcgP) (Changes: New profile dialog in "Simulator Startup", New diagnostics system, Support for multiple P2T keys, Tweaked news system again, Fixed argument processing in script callbacks, Fixed execution of custom conversation actions, New core settings for Lua search paths, Fixed wildcard settings handling in session database.)
 
 #### Latest development build
 
-[6.2.9.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/X3XWD_GQ) (Early build for 6.2.9. Changes: Fixed relocation of Temp folder, "Session" module for Lua scripts, Rewrite of data provider interface, Support for more grip types.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-629) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 
@@ -130,6 +128,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 33. [Section feedback of the Driving Coach](https://youtu.be/jexBxAjmU1s) - This short video demonstrates a new feature of the Drivng Coach. If this is enabled, you will get immediate feedback for your driving performance in the last section of the track.
 
 34. [Telemetry System Revisited](https://youtu.be/pPPSqs5Bdrk) - This video provides you with updated information about the telemetry system of Simulator Controller, since many functions have been added recently.
+
+35. [Scripting Assistant Behavior](https://youtu.be/Kvs_YePeMRI) - This video introduces Lua scripting for the Race Assistants. Lua is an easy to learn, simple language which now can be used to define new voice commands, interact with the simulator and so on.
 
 This list will be extended from time to time to cover new functionalities.
 

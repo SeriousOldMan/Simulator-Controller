@@ -295,7 +295,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 				}
 			}
 			else {
-				pitMenuState := getMultiMapValues(callSimulator(this.Code), "Pit Menu State=true")
+				pitMenuState := getMultiMapValues(callSimulator(this.Code), "Pit Menu State")
 
 				if (pitMenuState["Strategy"] != "Unavailable") {
 					this.iPitstopOptions.Push("Strategy")

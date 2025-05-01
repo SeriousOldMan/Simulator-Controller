@@ -1,10 +1,9 @@
-#### Core System
+#### Voice System
   1. Integration of local TTS engines for voice generation
   2. Support automatic language translation when using Whisper voice recognition
   3. New GPT booster that supports automatic translation to a different language for voice generation
   4. HTTP Server to run Whisper on a remote machine
   5. Support a combination of activation phrase and a first command in one voice interaction
-  6. Support for Google Gemini as GPT/LLM provider ( https://aistudio.google.com/apikey and https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=GEMINI_API_KEY )
 
 #### Simulation Support
   1. Better integration with the weather forecast data of *rFactor 2*
@@ -16,12 +15,11 @@
   1. Cleanup of "Session State.json" file, i.e. not using *null* anymore for unavailable data
 
 #### Assistants
-  1. Controller action and voice command to enable/disable data collection
-  2. Better answers by the Strategist, when a pitstop cannot be recommended
-  3. Support for partial tyre changes
-  4. Integrate support for LAMs
-  5. Approaching corner braking point countdown
-  6. Configurable priority for voice output between Spotter and other Assistants
+  1. Better answers by the Strategist, when a pitstop cannot be recommended
+  2. Support for partial tyre changes
+  3. Integrate support for LAMs
+  4. Approaching corner braking point countdown
+  5. Configurable priority for voice output between Spotter and other Assistants
 
 #### Session Database
   1. Active validation of value ranges in settings definitions

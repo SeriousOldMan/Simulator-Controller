@@ -474,6 +474,140 @@ class SimulatorStartup extends ConfigurationItem {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+checkForNews() {
+	local check := !FileExist(kUserConfigDirectory . "NEWS")
+	local lastModified, ignore, url
+
+	if !check {
+		lastModified := FileGetTime(kUserConfigDirectory . "NEWS", "M")
+
+		lastModified := DateAdd(lastModified, 1, "Days")
+
+		check := ((lastModified < A_Now) || isDebug())
+	}
+
+	if check {
+		try {
+			deleteFile(kTempDirectory . "NEWS.ini")
+
+			if FileExist(kConfigDirectory . "NEWS")
+				FileCopy(kConfigDirectory . "NEWS", kTempDirectory . "NEWS.ini")
+			else {
+				check := false
+
+				for ignore, url in ["https://fileshare.impresion3d.pro/filebrowser/api/public/dl/r0q9-d-3"
+								  , "http://87.177.158.163:800/api/public/dl/jipSYNLz"
+								  , "https://www.dropbox.com/scl/fi/s5ewrqo9lzwcv6omvx667/NEWS?rlkey=j3t7aopmdye4efc8uc3xlekxz&st=wbuipual&dl=1"] {
+					try
+						Download(url, kTempDirectory . "NEWS.ini")
+
+					if FileExist(kTempDirectory . "NEWS.ini") {
+						check := true
+
+						break
+					}
+				}
+			}
+		}
+		catch Any as exception {
+			check := false
+		}
+	}
+
+	if check {
+		Task.startTask(() {
+			local newsNr := false
+			local newsUrls := false
+			local availableNews := readMultiMap(kTempDirectory . "NEWS.ini")
+			local news := readMultiMap(kUserConfigDirectory . "NEWS")
+			local availableNews, nr, rule, ignore, html, shown, candidates
+
+			for nr, url in getMultiMapValues(availableNews, "News")
+				if isNumber(nr) {
+					rule := getMultiMapValue(availableNews, "Rules", nr, "Once")
+
+					if InStr(rule, "Timed") {
+						rule := string2Values(":", rule)
+
+						if (((A_Now > rule[2]) && ((rule.Length = 2) || (A_Now <= rule[3])))
+						 && !getMultiMapValue(news, "News", nr, false)) {
+							newsNr := nr
+							newsUrls := url
+
+							break
+						}
+					}
+				}
+
+			if !newsNr
+				for nr, url in getMultiMapValues(availableNews, "News") {
+					rule := getMultiMapValue(availableNews, "Rules", nr, "Once")
+
+					if (isNumber(nr) && !InStr(rule, "Timed") && !getMultiMapValue(news, "News", nr, false)) {
+						newsNr := nr
+						newsUrls := url
+
+						break
+					}
+				}
+
+			if !newsNr {
+				candidates := []
+
+				for nr, url in getMultiMapValues(availableNews, "News")
+					if isNumber(nr) {
+						shown := getMultiMapValue(news, "News", nr, false)
+						rule := getMultiMapValue(availableNews, "Rules", nr, "Once")
+
+						if (InStr(rule, "Repeat") && shown && (DateAdd(shown, string2Values(":", rule)[2], "Days") > A_Now))
+							candidates.Push([nr, url])
+					}
+
+				if (candidates.Length > 0) {
+					candidates := candidates[Round(Random(1, candidates.Length))]
+
+					newsNr := candidates[1]
+					newsUrls := candidates[2]
+				}
+			}
+
+			if (newsNr && !SimulatorStartup.Instance) {
+				deleteFile(A_Temp . "\News.zip")
+
+				for ignore, url in string2Values(";", newsUrls)
+					try {
+						Download(url, A_Temp . "\News.zip")
+
+						try {
+							if InStr(FileExist(kTempDirectory . "News"), "F")
+								deleteFile(kTempDirectory . "News")
+
+							if InStr(FileExist(kTempDirectory . "News"), "D")
+								deleteDirectory(kTempDirectory . "News")
+						}
+
+						DirCreate(kTempDirectory . "News")
+
+						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\News.zip' -DestinationPath '" . kTempDirectory . "News' -Force", , "Hide")
+
+						if FileExist(kTempDirectory . "News\News.htm") {
+							viewHTML(kTempDirectory . "News\News.htm")
+
+							setMultiMapValue(news, "News", newsNr, A_Now)
+
+							writeMultiMap(kUserConfigDirectory . "NEWS", news)
+
+							break
+						}
+					}
+					catch Any as exception {
+						logError(exception)
+					}
+			}
+		}, 10000)
+	}
+}
+
 closeApplication(application) {
 	local pid := ProcessExist(application ".exe")
 
@@ -2897,6 +3031,8 @@ startSimulator() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Simulator Startup"
 
+	SimulatorStartup.Instance := false
+
 	if (inList(A_Args, "-Unblock") || (GetKeyState("Ctrl") && GetKeyState("Alt")))
 		unblockExecutables()
 
@@ -2906,16 +3042,24 @@ startSimulator() {
 		gStartupProfile := A_Args[startup + 1]
 
 	try {
+		noLaunch := inList(A_Args, "-NoLaunchPad")
+		noLaunch := ((noLaunch && !GetKeyState("Shift")) || (!noLaunch && GetKeyState("Shift")))
+
+		if !noLaunch {
+			if kLogStartup
+				logMessage(kLogOff, "Checking for news...")
+
+			checkForNews()
+		}
+
 		startupApplication()
 
-		noLaunch := inList(A_Args, "-NoLaunchPad")
-
-		if ((noLaunch && !GetKeyState("Shift")) || (!noLaunch && GetKeyState("Shift")))
+		if noLaunch
 			startupSimulator()
 		else {
 			showSplashScreen("Logo")
 
-			Task.startTask(hideSplashScreen, 2000)
+			Task.startTask(hideSplashScreen, 4000)
 
 			while launchPad()
 				ignore := 1

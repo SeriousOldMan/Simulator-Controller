@@ -3,13 +3,13 @@ Version=6.3.0.0-release
 Target=6.3.0.0-release
 Date=05/02/2025
 Download=https://cutt.ly/XrkrA7E0;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/OBNvGX5P;https://www.dropbox.com/scl/fi/l8aprmz0bfmjvs2qiy4uw/Simulator-Controller-6.3.0.0-release.zip?rlkey=z6845evkq8rvpkrff72mkvfx9&st=i2548dat&dl=1;http://87.177.158.163:800/api/public/dl/TfRns-1G;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.3.0.0-release.zip
-Changes=Controller action function to disable voice recognition, Driver is now part of the default selection in race reports, Reload in reports now also reloads any new cars and tracks, Support for Google as GPT provider, New action functions to enable / disable data collection, Fixed controller automation, Fixed compound recommendation by Strategist, Debugging support for Strategist handling of strategies, Added new VC++ installer
+Changes=Controller action function to disable voice recognition, Driver is now part of the default selection in race reports, Reload in reports now also reloads any new cars and tracks, Support for Google as GPT provider, New action functions to enable / disable data collection, Fixed controller automation, Fixed compound recommendation by Strategist, Debugging support for Strategist handling of strategies, Added new VC++ installer, Better adjust refuel remark by the Engineer
 Components=Media->5.6.1,Configuration->6.3.0,Utilities->6.3.0
 [Release]
 Version=6.3.0.0-release
 Date=05/02/2025
 Download=https://cutt.ly/XrkrA7E0;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/OBNvGX5P;https://www.dropbox.com/scl/fi/l8aprmz0bfmjvs2qiy4uw/Simulator-Controller-6.3.0.0-release.zip?rlkey=z6845evkq8rvpkrff72mkvfx9&st=i2548dat&dl=1;http://87.177.158.163:800/api/public/dl/TfRns-1G;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.3.0.0-release.zip
-Changes=Controller action function to disable voice recognition, Driver is now part of the default selection in race reports, Reload in reports now also reloads any new cars and tracks, Support for Google as GPT provider, New action functions to enable / disable data collection, Fixed controller automation, Fixed compound recommendation by Strategist, Debugging support for Strategist handling of strategies, Added new VC++ installer
+Changes=Controller action function to disable voice recognition, Driver is now part of the default selection in race reports, Reload in reports now also reloads any new cars and tracks, Support for Google as GPT provider, New action functions to enable / disable data collection, Fixed controller automation, Fixed compound recommendation by Strategist, Debugging support for Strategist handling of strategies, Added new VC++ installer, Better adjust refuel remark by the Engineer
 Components=Media->5.6.1,Configuration->6.3.0,Utilities->6.3.0
 [Components]
 Media.5.6.1.Path=Resources

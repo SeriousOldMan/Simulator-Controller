@@ -15,6 +15,7 @@
 
 #### Changes
 
+  - The Engineer now better informs about auto adjustments to the refuel amount after a pitstop has been planned and prepared in LMU races.
   - Two new controller action functions [*enableListening* and *disableListening*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allow you to fully mute and unmute voice recognition by a button, for example. This can help, if you are using the same *Push-To-Talk* button with Simulator Controller and Discord or TeamSpeak.
   - Two new controller action functions [*enableDataCollection* and *disableDataCollection*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allow you to disable the transfer of collected data of the Assistants to the session database. This is especially useful to prevent data which originates from sessions with 2x fuel consumption, for example, to pollute the database.
   - The driver is now always included in the default selection of drivers/cars in reports for "Race Reports", "Team Center" or "Solo Center".

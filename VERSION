@@ -1,9 +1,9 @@
 [Development]
-Version=6.3.0.0-dev
+Version=6.3.0.0-beta
 Target=6.3.0.0-release
-Date=04/28/2025
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/yRyGmsj3
-Changes=Controller action function to disable voice recognition, Driver is now part of the default selection in race reports, Reload in reports now also reloads any new cars and tracks, Support for Google as GPT provider, New action functions to enable / disable data collection, Fixed controller automation, Fixed compound recommendation by Strategist, Debugging support for Strategist handling of strategies
+Date=04/30/2025
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/5GSAq7My
+Changes=Controller action function to disable voice recognition, Driver is now part of the default selection in race reports, Reload in reports now also reloads any new cars and tracks, Support for Google as GPT provider, New action functions to enable / disable data collection, Fixed controller automation, Fixed compound recommendation by Strategist, Debugging support for Strategist handling of strategies, Added new VC++ installer
 Components=Media->5.6.1,Configuration->6.2.4,Utilities->6.2.2
 [Release]
 Version=6.2.9.0-release
@@ -30,5 +30,5 @@ Utilities.6.3.0.Download=
 [Current]
 Type=Development
 [Version]
-Development=6.3.0.0-dev
+Development=6.3.0.0-beta
 Release=6.2.9.0-release

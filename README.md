@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.3.0.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/yRyGmsj3) (Early build for 6.3.0. Changes: Controller action function to disable voice recognition, Driver is now part of the default selection in race reports, Reload in reports now also reloads any new cars and tracks, Support for Google as GPT provider, New action functions to enable / disable data collection, Fixed controller automation, Fixed compound recommendation by Strategist, Debugging support for Strategist handling of strategies.)
+[6.3.0.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/5GSAq7My) (Test build for 6.3.0. Changes: Controller action function to disable voice recognition, Driver is now part of the default selection in race reports, Reload in reports now also reloads any new cars and tracks, Support for Google as GPT provider, New action functions to enable / disable data collection, Fixed controller automation, Fixed compound recommendation by Strategist, Debugging support for Strategist handling of strategies, Added new VC++ installer.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-630) of this version and all the versions you might have skipped, before installing and using this version.
 
@@ -130,6 +130,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 33. [Section feedback of the Driving Coach](https://youtu.be/jexBxAjmU1s) - This short video demonstrates a new feature of the Drivng Coach. If this is enabled, you will get immediate feedback for your driving performance in the last section of the track.
 
 34. [Telemetry System Revisited](https://youtu.be/pPPSqs5Bdrk) - This video provides you with updated information about the telemetry system of Simulator Controller, since many functions have been added recently.
+
+35. [Scripting Assistant Behavior](https://youtu.be/Kvs_YePeMRI) - This video introduces Lua scripting for the Race Assistants. Lua is an easy to learn, simple language which now can be used to define new voice commands, interact with the simulator and so on.
 
 This list will be extended from time to time to cover new functionalities.
 

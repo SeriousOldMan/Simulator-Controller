@@ -33,6 +33,7 @@ As mentioned above, this version contains an all new simulator data interface. I
   - Fixed a bug, which caused the Strategist to recommend a tyre change in heavy rain conditions although wet tyres already were mounted.
   - Removed an orphane entry in the *Temp* directory, if this directory had been moved to a different location.
   - Fixed a typo in the "Simulator" *Lua* module, which prevented the script from being loaded correctly.
+  - Fixed a freeze of the "News" window in cases where the user has clicked on "Startup" already.
   - [Important] It has been reported that one of the latest Windows update removed the VC++ runtime, that is used by the plugin for *rFactor 2* and *Le Mans Ultimate*. Please see the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-630) for information how to fix that.
 
 #### Changes

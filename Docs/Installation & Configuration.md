@@ -505,6 +505,8 @@ An action is simply a textual representation of a call to a function in the scri
 
 Although you may call any globally defined function, you should use only the following functions for your actions, since they are specially prepared to be called from an external source. Many of these functions are particular useful in combination with a [*Conversation* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#conversation-booster).
 
+Please note, that action functions must be written as a function call with "()" as in "increaseLogLevel()", even if there are no actual arguments.
+
 | Function | Parameter(s) | Plugin | Description |
 | ------ | ------ | ------ | ------ |
 | setDebug | debug | Builtin | Enables or disables debugging. *debug* must be either *true* or *false*. |

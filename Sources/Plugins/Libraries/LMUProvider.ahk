@@ -208,7 +208,7 @@ class LMUProvider extends Sector397Provider {
 	readSessionData(options := "", protocol?) {
 		local simulator := this.Simulator
 		local car, track, data, setupData, tyreCompound, tyreCompoundColor, key, postFix, fuelAmount
-		local weatherData, lap, weather, time, session, remainingTime
+		local weatherData, lap, weather, time, session, remainingTime, fuelRatio
 
 		static keys := Map("All", "", "Front Left", "FrontLeft", "Front Right", "FrontRight"
 									, "Rear Left", "RearLeft", "Rear Right", "RearRight")
@@ -256,8 +256,10 @@ class LMUProvider extends Sector397Provider {
 			setMultiMapValue(data, "Setup Data", "RepairSuspension", setupData.RepairSuspension)
 			setMultiMapValue(data, "Setup Data", "RepairEngine", setupData.RepairEngine)
 
-			if isNumber(setupData.FuelRatio)
-				this.iFuelRatio := setupData.FuelRatio
+			fuelRatio := setupData.FuelRatio
+
+			if isNumber(fuelRatio)
+				this.iFuelRatio := fuelRatio
 
 			setMultiMapValue(data, "Setup Data", "ServiceTime", LMURESTProvider.ServiceData().ServiceTime)
 		}

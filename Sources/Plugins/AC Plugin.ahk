@@ -143,14 +143,6 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		super.simulatorStartup(simulator)
 	}
 
-	supportsPitstop() {
-		return true
-	}
-
-	supportsTrackMap() {
-		return true
-	}
-
 	updateSession(session, force := false) {
 		super.updateSession(session, force)
 

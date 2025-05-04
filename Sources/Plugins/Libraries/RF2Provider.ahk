@@ -17,6 +17,18 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class Sector397Provider extends SimulatorProvider {
+	supportsPitstop() {
+		return true
+	}
+
+	supportsTrackMap() {
+		return true
+	}
+
+	supportsSetupImport() {
+		return true
+	}
+	
 	parseNr(candidate, &rest) {
 		local temp, char
 

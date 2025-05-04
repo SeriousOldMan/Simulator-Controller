@@ -46,6 +46,14 @@ class R3EProvider extends SimulatorProvider {
 		}
 	}
 
+	supportsPitstop() {
+		return true
+	}
+
+	supportsTrackMap() {
+		return true
+	}
+
 	getCarName(carID) {
 		local carDB
 

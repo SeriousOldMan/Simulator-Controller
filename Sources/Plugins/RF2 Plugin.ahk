@@ -232,18 +232,6 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 
 		return false
 	}
-
-	supportsPitstop() {
-		return true
-	}
-
-	supportsTrackMap() {
-		return true
-	}
-
-	supportsSetupImport() {
-		return true
-	}
 }
 
 class RF2Plugin extends Sector397Plugin {

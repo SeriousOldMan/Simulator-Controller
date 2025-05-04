@@ -294,6 +294,8 @@ class RaceAssistant extends ConfigurationItem {
 
 	iEvents := []
 
+	iProvider := false
+
 	class RulesBooster extends AgentBooster {
 		trigger(event, trigger, goal := false, options := false) {
 			return false
@@ -754,6 +756,15 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
+	Provider {
+		Get {
+			if !this.iProvider
+				this.iProvider := this.createSimulatorProvider()
+
+			return this.iProvider
+		}
+	}
+
 	Prepared {
 		Get {
 			return this.iPrepared
@@ -1023,6 +1034,13 @@ class RaceAssistant extends ConfigurationItem {
 			options["AgentBooster"] := false
 	}
 
+	createSimulatorProvider() {
+		if (this.Simulator && this.Car && this.Track)
+			return SimulatorProvider.createSimulatorProvider(this.Simulator, this.Car, this.Track)
+		else
+			return false
+	}
+
 	createVoiceManager(name, options) {
 		return RaceAssistant.RaceVoiceManager(this, name, options)
 	}
@@ -1064,14 +1082,23 @@ class RaceAssistant extends ConfigurationItem {
 		if values.HasProp("SessionTime")
 			this.iSessionTime := values.SessionTime
 
-		if values.HasProp("Simulator")
+		if values.HasProp("Simulator") {
 			this.iSimulator := values.Simulator
 
-		if values.HasProp("Car")
+			this.iProvider := false
+		}
+
+		if values.HasProp("Car") {
 			this.iCar := values.Car
 
-		if values.HasProp("Track")
+			this.iProvider := false
+		}
+
+		if values.HasProp("Track") {
 			this.iTrack := values.Track
+
+			this.iProvider := false
+		}
 
 		if values.HasProp("Driver")
 			this.iDriverForName := values.Driver
@@ -1099,6 +1126,8 @@ class RaceAssistant extends ConfigurationItem {
 				this.iWeather := false
 
 				this.iAutonomy := "Custom"
+
+				this.iProvider := false
 
 				this.updateConfigurationValues({Settings: newMultiMap()})
 			}

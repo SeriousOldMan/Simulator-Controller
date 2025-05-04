@@ -23,6 +23,14 @@ class PCARS2Provider extends SimulatorProvider {
 		}
 	}
 
+	supportsPitstop() {
+		return true
+	}
+
+	supportsTrackMap() {
+		return true
+	}
+
 	readSessionData(options := "", protocol?) {
 		local simulator := this.Simulator
 		local car := this.Car

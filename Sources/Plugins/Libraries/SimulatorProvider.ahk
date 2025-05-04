@@ -95,6 +95,22 @@ class SimulatorProvider {
 		}
 	}
 
+	supportsPitstop() {
+		return false
+	}
+
+	supportsMixedTyres() {
+		return false
+	}
+
+	supportsSetupImport() {
+		return false
+	}
+
+	supportsTrackMap() {
+		return false
+	}
+
 	correctStandingsData(standingsData, needCorrection := false) {
 		local positions := Map()
 		local cars := []

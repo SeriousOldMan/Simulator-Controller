@@ -211,18 +211,6 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	supportsPitstop() {
-		return true
-	}
-
-	supportsTrackMap() {
-		return true
-	}
-
-	supportsSetupImport() {
-		return true
-	}
-
 	prepareSettings(settings, data) {
 		settings := super.prepareSettings(settings, data)
 

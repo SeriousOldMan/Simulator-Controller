@@ -23,6 +23,14 @@ class ACProvider extends SimulatorProvider {
 		}
 	}
 
+	supportsPitstop() {
+		return true
+	}
+
+	supportsTrackMap() {
+		return true
+	}
+
 	acquireTelemetryData() {
 		local data := super.acquireTelemetryData()
 		local forName, surName, nickName, name

@@ -2903,6 +2903,11 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	supportsPitstop() {
+		local provider := this.Provider
+
+		if (provider && !this.Provider.supportsPitstop())
+			return false
+
 		if this.RemoteHandler {
 			switch this.Session {
 				case kSessionPractice:

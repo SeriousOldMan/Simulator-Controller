@@ -1471,7 +1471,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			local compounds := []
 			local tyreCompound, index, axle, tyre
 
-			if (hasCompounds && (mixedCompounds = "Axle")) {
+			if (mixedCompounds = "Axle") {
 				for index, axle in ["Front", "Rear"] {
 					tyreCompound := getMultiMapValue(sessionSettings, "Simulator Settings", "Tyre." . type . ".Compound." . axle, false)
 
@@ -1482,7 +1482,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 						compounds.Push(false)
 				}
 			}
-			else if (hasCompounds && (mixedCompounds = "Wheel")) {
+			else if (mixedCompounds = "Wheel") {
 				for index, wheel in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
 					tyreCompound := getMultiMapValue(sessionSettings, "Simulator Settings", "Tyre." . type . ".Compound." . wheel, false)
 

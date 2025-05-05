@@ -753,6 +753,35 @@ class LMURESTProvider {
 		}
 	}
 
+	class TyreData extends LMURESTProvider.RESTData {
+		GETURL {
+			Get {
+				return "http://localhost:6397/rest/garage/UIScreen/TireManagement"
+			}
+		}
+
+		TyreCompound[tyre] {
+			Get {
+				return this.getTyreCompound(tyre)
+			}
+		}
+
+		getTyreCompound(tyre) {
+			if this.Data {
+				try {
+					tyre := this.Data["wheelInfo"]["wheelLocs"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.TyreTypes[tyre])]["compound"]
+
+					return this.Data["optimalCompoundConditions"]["compounds"][tyre + 1]["type"]
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+			}
+
+			return false
+		}
+	}
+
 	class EnergyData extends LMURESTProvider.RESTData {
 		GETURL {
 			Get {

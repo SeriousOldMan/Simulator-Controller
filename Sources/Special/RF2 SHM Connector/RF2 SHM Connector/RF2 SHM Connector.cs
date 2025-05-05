@@ -406,10 +406,14 @@ namespace SHMConnector {
 								    GetCelcius(playerTelemetry.mWheels[3].mBrakeTemp));
 
 				string compound = GetStringFromBytes(playerTelemetry.mFrontTireCompoundName);
-			
-				strWriter.Write("TyreCompoundRaw="); strWriter.WriteLine(compound);
 
-				strWriter.Write("BodyworkDamage=0, 0, 0, 0, "); strWriter.WriteLine(extended.mTrackedDamages[playerTelemetry.mID].mAccumulatedImpactMagnitude / 1000);
+                strWriter.Write("TyreCompoundRaw="); strWriter.WriteLine(compound);
+                strWriter.Write("TyreCompoundRawFront="); strWriter.WriteLine(compound);
+
+                compound = GetStringFromBytes(playerTelemetry.mRearTireCompoundName);
+                strWriter.Write("TyreCompoundRawRear="); strWriter.WriteLine(compound);
+
+                strWriter.Write("BodyworkDamage=0, 0, 0, 0, "); strWriter.WriteLine(extended.mTrackedDamages[playerTelemetry.mID].mAccumulatedImpactMagnitude / 1000);
 				strWriter.WriteLine("SuspensionDamage=0, 0, 0, 0");
 				strWriter.WriteLine("EngineDamage=0");
 

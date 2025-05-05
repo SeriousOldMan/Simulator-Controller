@@ -381,10 +381,14 @@ namespace RF2SHMProvider {
 								  GetCelcius(playerTelemetry.mWheels[3].mBrakeTemp));
 
 				string compound = GetStringFromBytes(playerTelemetry.mFrontTireCompoundName);
-			
-				Console.Write("TyreCompoundRaw="); Console.WriteLine(compound);
 
-				Console.Write("BodyworkDamage=0, 0, 0, 0, "); Console.WriteLine(extended.mTrackedDamages[playerTelemetry.mID].mAccumulatedImpactMagnitude / 1000);
+                Console.Write("TyreCompoundRaw="); Console.WriteLine(compound);
+                Console.Write("TyreCompoundRawFront="); Console.WriteLine(compound);
+
+                compound = GetStringFromBytes(playerTelemetry.mRearTireCompoundName);
+                Console.Write("TyreCompoundRawRear="); Console.WriteLine(compound);
+
+                Console.Write("BodyworkDamage=0, 0, 0, 0, "); Console.WriteLine(extended.mTrackedDamages[playerTelemetry.mID].mAccumulatedImpactMagnitude / 1000);
 				Console.WriteLine("SuspensionDamage=0, 0, 0, 0");
 				Console.WriteLine("EngineDamage=0");
 

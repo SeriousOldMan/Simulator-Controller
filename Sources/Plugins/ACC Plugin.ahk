@@ -1857,10 +1857,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 	}
 
-	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
+	setPitstopTyreCompound(pitstopNumber, compound, compoundColor := false, set := false) {
 		local tyreSetIncrement, finished
 
-		super.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
+		super.setPitstopTyreCompound(pitstopNumber, compound, compoundColor, set)
 
 		if this.requirePitstopMFD()
 			if compound {

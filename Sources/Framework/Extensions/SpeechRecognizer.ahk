@@ -422,10 +422,10 @@ class SpeechRecognizer {
 
 				this.Instance := instance
 
-				this.iEngine := ((engine = "Compiler") ? "Compiler" : string2Values("|", engine)[1])
+				this.iEngine := ((engine = "Compiler") ? "Compiler" : string2Values("|", engine, 2)[1])
 
 				if (engine != "Compiler") {
-					engine := string2Values("|", engine)
+					engine := string2Values("|", engine, 3)
 
 					if !instance.Connect(engine[2], engine[3], ObjBindMethod(this, "_onTextCallback")) {
 						logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
@@ -456,7 +456,7 @@ class SpeechRecognizer {
 
 				this.iEngine := "Google"
 
-				engine := string2Values("|", engine)
+				engine := string2Values("|", engine, 2)
 
 				if (this.iGoogleMode = "RPC")
 					EnvSet("GOOGLE_APPLICATION_CREDENTIALS", engine[2])

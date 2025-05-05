@@ -17,10 +17,6 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class Sector397Provider extends SimulatorProvider {
-	supportsPitstop() {
-		return true
-	}
-
 	supportsTrackMap() {
 		return true
 	}
@@ -28,7 +24,7 @@ class Sector397Provider extends SimulatorProvider {
 	supportsSetupImport() {
 		return true
 	}
-	
+
 	parseNr(candidate, &rest) {
 		local temp, char
 
@@ -289,5 +285,15 @@ class RF2Provider extends Sector397Provider {
 		Get {
 			return "rFactor 2"
 		}
+	}
+
+	supportsPitstop(&refuelService?, &tyreService?, &mixedCompounds?, &tyreSets?, &repairService?) {
+		refuelService := true
+		tyreService := "Axle"
+		mixedCompounds := true
+		tyreSets := false
+		repairService := ["Bodywork", "Suspension"]
+
+		return true
 	}
 }

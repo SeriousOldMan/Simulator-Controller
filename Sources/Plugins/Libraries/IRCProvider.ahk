@@ -23,7 +23,13 @@ class IRCProvider extends SimulatorProvider {
 		}
 	}
 
-	supportsPitstop() {
+	supportsPitstop(&refuelService?, &tyreService?, &mixedCompounds?, &tyreSets?, &repairService?) {
+		refuelService := true
+		tyreService := "Wheel"
+		mixedCompounds := false
+		tyreSets := false
+		repairService := true
+
 		return true
 	}
 

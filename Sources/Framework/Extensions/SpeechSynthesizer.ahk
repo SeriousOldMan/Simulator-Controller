@@ -247,7 +247,7 @@ class SpeechSynthesizer {
 
 				this.iSpeechSynthesizer := CLR_LoadLibrary(dllFile).CreateInstance("Speech.MicrosoftSpeechSynthesizer")
 
-				synthesizer := string2Values("|", synthesizer)
+				synthesizer := string2Values("|", synthesizer, 3)
 
 				if !this.iSpeechSynthesizer.Connect(synthesizer[2], synthesizer[3]) {
 					logMessage(kLogCritical, translate("Could not communicate with speech synthesizer library (") . dllName . translate(")"))
@@ -288,7 +288,7 @@ class SpeechSynthesizer {
 				this.iSpeechSynthesizer := CLR_LoadLibrary(dllFile)
 				this.iSpeechSynthesizer := this.iSpeechSynthesizer.CreateInstance("Speech.GoogleSpeechSynthesizer")
 
-				synthesizer := string2Values("|", synthesizer)
+				synthesizer := string2Values("|", synthesizer, 2)
 
 				if (this.iGoogleMode = "RPC")
 					EnvSet("GOOGLE_APPLICATION_CREDENTIALS", synthesizer[2])

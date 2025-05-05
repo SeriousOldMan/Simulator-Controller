@@ -214,8 +214,8 @@ class RaceEngineer extends RaceAssistant {
 			this.callRemote("setPitstopRefuelAmount", arguments*)
 		}
 
-		setPitstopTyreSet(arguments*) {
-			this.callRemote("setPitstopTyreSet", arguments*)
+		setPitstopTyreCompound(arguments*) {
+			this.callRemote("setPitstopTyreCompound", arguments*)
 		}
 
 		setPitstopTyrePressures(arguments*) {
@@ -3947,9 +3947,9 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
-	setPitstopTyreSet(pitstopNumber, compound, compoundColor, set) {
+	setPitstopTyreCompound(pitstopNumber, compound, compoundColor, set) {
 		if this.RemoteHandler
-			this.RemoteHandler.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
+			this.RemoteHandler.setPitstopTyreCompound(pitstopNumber, compound, compoundColor, set)
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
@@ -4042,8 +4042,8 @@ setPitstopRefuelAmount(context, pitstopNumber, fuel) {
 	return true
 }
 
-setPitstopTyreSet(context, pitstopNumber, compound, compoundColor, set) {
-	context.KnowledgeBase.RaceAssistant.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
+setPitstopTyreCompound(context, pitstopNumber, compound, compoundColor, set) {
+	context.KnowledgeBase.RaceAssistant.setPitstopTyreCompound(pitstopNumber, compound, compoundColor, set)
 
 	return true
 }

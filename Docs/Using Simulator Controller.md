@@ -407,7 +407,7 @@ Simulator Controller is a complex system with lots of different processes and ev
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/System%20Monitor%201.JPG)
 
-This tool, which either can be startet on demand by using the launch pad described above or automatically whenever you enter a simulation with Simualtor Controller (check "System Monitor" in the *Core* section of the settings as described above), provides you complete information about all the components of Simulator Controller. In order to give you a quick graphical clue, "System Monitor" uses color-coded traffic lights for each component and process.
+This tool, which either can be started on demand by using the launch pad described above or automatically whenever you enter a simulation with Simualtor Controller (check "System Monitor" in the *Core* section of the settings as described above), provides you complete information about all the components of Simulator Controller. In order to give you a quick graphical clue, "System Monitor" uses color-coded traffic lights for each component and process.
 
 | Color                                                                                           | Meaning                                                                                                                              |
 | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |

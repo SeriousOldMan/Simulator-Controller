@@ -95,7 +95,12 @@ class SimulatorProvider {
 		}
 	}
 
-	supportsPitstop() {
+	supportsPitstop(refuelService?, tyreService?, mixedCompounds?, repairService?) {
+		refuelService := false
+		tyreService := false
+		mixedCompounds := false
+		repairService := false
+
 		return false
 	}
 

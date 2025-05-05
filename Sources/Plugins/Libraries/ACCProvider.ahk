@@ -60,7 +60,12 @@ class ACCProvider extends SimulatorProvider {
 		}
 	}
 
-	supportsPitstop() {
+	supportsPitstop(refuelService?, tyreService?, mixedCompounds?, repairService?) {
+		refuelService := true
+		tyreService := "All"
+		mixedCompounds := false
+		repairService := ["Bodywork", "Suspension"]
+
 		return true
 	}
 

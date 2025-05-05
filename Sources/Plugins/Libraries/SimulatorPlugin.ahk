@@ -971,12 +971,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			return hasProvider
 	}
 
-	supportsPitstop() {
-		return this.Provider.supportsPitstop()
-	}
-
-	supportsMixedTyres() {
-		return this.Provider.supportsMixedTyres()
+	supportsPitstop(refuelService?, tyreService?, mixedCompounds?, repairService?) {
+		return this.Provider.supportsPitstop(refuelService?, tyreService?, mixedCompounds?, repairService?)
 	}
 
 	supportsSetupImport() {

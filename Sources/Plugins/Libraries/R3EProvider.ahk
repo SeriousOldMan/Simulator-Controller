@@ -46,7 +46,12 @@ class R3EProvider extends SimulatorProvider {
 		}
 	}
 
-	supportsPitstop() {
+	supportsPitstop(refuelService?, tyreService?, mixedCompounds?, repairService?) {
+		refuelService := true
+		tyreService := "Axle"
+		mixedCompounds := false
+		repairService := ["Bodywork", "Suspension"]
+
 		return true
 	}
 

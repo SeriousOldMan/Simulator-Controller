@@ -140,6 +140,15 @@ class LMUProvider extends Sector397Provider {
 		}
 	}
 
+	supportsPitstop(refuelService?, tyreService?, mixedCompounds?, repairService?) {
+		refuelService := true
+		tyreService := "Wheel"
+		mixedCompounds := true
+		repairService := ["Bodywork", "Suspension"]
+
+		return true
+	}
+
 	getRefuelAmount(setupData) {
 		return setupData.getRefuelLevel()
 	}

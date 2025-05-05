@@ -60,6 +60,18 @@ class ACCProvider extends SimulatorProvider {
 		}
 	}
 
+	supportsPitstop() {
+		return true
+	}
+
+	supportsTrackMap() {
+		return true
+	}
+
+	supportsSetupImport() {
+		return true
+	}
+
 	computeBrakePadWear(location, compound, thickness) {
 		if (location = "Front") {
 			switch compound {

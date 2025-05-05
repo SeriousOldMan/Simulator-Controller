@@ -172,8 +172,8 @@ class RaceEngineer extends RaceAssistant {
 	iSessionDataActive := false
 
 	iPitstopOptionsFile := false
-
 	iPitstopAdjustments := false
+	iPitstopFillUp := false
 
 	iCurrentTyreTemperatures := false
 	iCurrentTyrePressures := false
@@ -343,6 +343,7 @@ class RaceEngineer extends RaceAssistant {
 
 		if (values.HasProp("Session") && (values.Session == kSessionFinished)) {
 			this.iPitstopAdjustments := false
+			this.iPitstopFillUp := false
 
 			this.iCurrentTyreTemperatures := false
 			this.iCurrentTyrePressures := false
@@ -1327,7 +1328,6 @@ class RaceEngineer extends RaceAssistant {
 		local fragments := speaker.Fragments
 		local convert := false
 		local volumePosition := false
-		local fillUp := false
 		local fuel, ignore, word, lap, remainingFuel
 
 		if !this.hasPlannedPitstop() {
@@ -2604,6 +2604,7 @@ class RaceEngineer extends RaceAssistant {
 
 		if ((lastLap < (lapNumber - 2)) && (driverName(driverForname, driverSurname, driverNickname) != this.DriverFullName)) {
 			this.iPitstopAdjustments := false
+			this.iPitstopFillUp := false
 
 			if this.Speaker[false]
 				this.getSpeaker().speakPhrase("WelcomeBack")
@@ -2902,6 +2903,11 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	supportsPitstop() {
+		local provider := this.Provider
+
+		if (provider && !this.Provider.supportsPitstop())
+			return false
+
 		if this.RemoteHandler {
 			switch this.Session {
 				case kSessionPractice:
@@ -3093,7 +3099,7 @@ class RaceEngineer extends RaceAssistant {
 						speaker.speakPhrase("Refuel", {fuel: speaker.number2Speech(convertUnit("Volume", fuel), 1), unit: fragments[getUnit("Volume")]})
 
 					if correctedFuel
-						speaker.speakPhrase("RefuelAdjusted")
+						speaker.speakPhrase("RefuelAdjustedLast")
 				}
 
 				compound := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound", false)
@@ -3421,12 +3427,16 @@ class RaceEngineer extends RaceAssistant {
 				this.dumpKnowledgeBase(knowledgeBase)
 
 			if (verbose && this.Speaker[false])
-				this.getSpeaker().speakPhrase("ConfirmPlanUpdate")
+				if (this.iPitstopAdjustments && (option = "Refuel") && !this.iPitstopFillUp)
+					this.getSpeaker().speakPhrase("RefuelAdjustedNext")
+				else
+					this.getSpeaker().speakPhrase("ConfirmPlanUpdate")
 		}
 	}
 
 	performPitstop(lapNumber := false, optionsFile := false) {
 		this.iPitstopAdjustments := false
+		this.iPitstopFillUp := false
 		this.iPitstopOptionsFile := optionsFile
 
 		super.performPitstop(lapNumber, optionsFile)
@@ -3929,6 +3939,8 @@ class RaceEngineer extends RaceAssistant {
 			fillUp := ((knowledgeBase.getValue("Lap." . knowledgeBase.getValue("Lap") . ".Fuel.Remaining", 0)
 					  + knowledgeBase.getValue("Pitstop.Planned.Fuel", 0))
 					>= (knowledgeBase.getValue("Session.Settings.Fuel.Max", 0) - this.AvgFuelConsumption))
+
+			this.iPitstopFillUp := fillUp
 
 			this.RemoteHandler.setPitstopRefuelAmount(pitstopNumber, fuel, fillUp)
 		}

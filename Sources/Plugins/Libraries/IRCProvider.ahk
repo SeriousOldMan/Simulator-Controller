@@ -23,6 +23,18 @@ class IRCProvider extends SimulatorProvider {
 		}
 	}
 
+	supportsPitstop() {
+		return true
+	}
+
+	supportsTrackMap() {
+		return true
+	}
+
+	supportsSetupImport() {
+		return true
+	}
+
 	acquireTelemetryData() {
 		local data := super.acquireTelemetryData()
 

@@ -531,14 +531,6 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	supportsPitstop() {
-		return true
-	}
-
-	supportsTrackMap() {
-		return true
-	}
-
 	startPitstopSetup(pitstopNumber) {
 		super.startPitstopSetup(pitstopNumber)
 

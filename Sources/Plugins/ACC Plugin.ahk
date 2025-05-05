@@ -1631,18 +1631,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		this.openPitstopMFD(false, update)
 	}
 
-	supportsPitstop() {
-		return true
-	}
-
-	supportsTrackMap() {
-		return true
-	}
-
-	supportsSetupImport() {
-		return true
-	}
-
 	restoreSessionState(&sessionSettings, &sessionState) {
 		super.restoreSessionState(&sessionSettings, &sessionState)
 

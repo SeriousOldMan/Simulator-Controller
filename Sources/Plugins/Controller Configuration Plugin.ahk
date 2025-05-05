@@ -516,19 +516,26 @@ class FunctionsList extends ConfigurationItemList {
 	buildItemFromEditor(isNew := false) {
 		local functionType
 
-		functionType := [false, k1WayToggleType, k2WayToggleType, kButtonType, kDialType, kCustomType][this.Control["functionTypeDropDown"].Value + 1]
+		try {
+			functionType := [false, k1WayToggleType, k2WayToggleType, kButtonType, kDialType, kCustomType][this.Control["functionTypeDropDown"].Value + 1]
 
-		if (functionType && (this.Control["functionNumberEdit"].Text >= 0)) {
-			if ((functionType != k2WayToggleType) && (functionType != kDialType)) {
-				this.Control["functionOffHotkeysEdit"].Text := ""
-				this.Control["functionOffActionEdit"].Text := ""
+			if (functionType && (this.Control["functionNumberEdit"].Text >= 0)) {
+				if ((functionType != k2WayToggleType) && (functionType != kDialType)) {
+					this.Control["functionOffHotkeysEdit"].Text := ""
+					this.Control["functionOffActionEdit"].Text := ""
+				}
+
+				return Function.createFunction(ConfigurationItem.descriptor(functionType, this.Control["functionNumberEdit"].Text), false
+											 , this.Control["functionOnHotkeysEdit"].Text, this.Control["functionOnActionEdit"].Text
+											 , this.Control["functionOffHotkeysEdit"].Text, this.Control["functionOffActionEdit"].Text)
 			}
-
-			return Function.createFunction(ConfigurationItem.descriptor(functionType, this.Control["functionNumberEdit"].Text), false
-										 , this.Control["functionOnHotkeysEdit"].Text, this.Control["functionOnActionEdit"].Text
-										 , this.Control["functionOffHotkeysEdit"].Text, this.Control["functionOffActionEdit"].Text)
+			else
+				throw "Invalid values detected..."
 		}
-		else {
+		catch Any as exception {
+			if (exception != "Invalid values detected...")
+				logError(exception, true)
+
 			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)

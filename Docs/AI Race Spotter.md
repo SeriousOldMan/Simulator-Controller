@@ -325,7 +325,7 @@ And a final warning: This kind of automation might be considered illegal accordi
 
 ### Enabling and disabling Track Automations
 
-For Track Automations to be active, you must enable them, when you are on the track. Once Track Automation is enabled, the default automation (see above) is loaded and activated at the beginning of the next lap. The ["Race Spotter" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) provides an action, which you can bind to your controller to enable or disable Track Automations.
+For Track Automations to be active, you must enable them, when you are on the track. Once Track Automation is enabled, the default automation (see above) is loaded and activated at the beginning of the next lap. The ["Race Spotter" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) provides an action, which you can bind to your controller to enable or disable Track Automations. The are also controller action functions ["enableTrackAutomation" and "disableTrackAutomation"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) available.
 
 ### Choosing between different Track Automations
 

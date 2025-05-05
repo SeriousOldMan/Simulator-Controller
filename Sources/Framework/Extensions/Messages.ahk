@@ -324,6 +324,8 @@ class MessageManager extends PeriodicTask {
 		local file := false
 
 		try {
+			DirCreate(kTempDirectory . "Messages")
+
 			file := FileOpen(fileName, "a-rwd")
 
 			if !file
@@ -610,7 +612,15 @@ stopMessageManager(arguments*) {
 }
 
 startMessageManager(*) {
-	local pid
+	global kTempDirectory
+
+	local pid, path
+
+	path := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+						   , "Locations", "Temp", false)
+
+	if path
+		kTempDirectory := (normalizeDirectoryPath(path) . "\")
 
 	DirCreate(kTempDirectory . "Messages")
 

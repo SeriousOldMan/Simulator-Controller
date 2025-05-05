@@ -972,15 +972,19 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	supportsPitstop() {
-		return false
+		return this.Provider.supportsPitstop()
+	}
+
+	supportsMixedTyres() {
+		return this.Provider.supportsMixedTyres()
 	}
 
 	supportsSetupImport() {
-		return false
+		return this.Provider.supportsSetupImport()
 	}
 
 	supportsTrackMap() {
-		return false
+		return this.Provider.supportsTrackMap()
 	}
 
 	updateSession(session, force := false) {

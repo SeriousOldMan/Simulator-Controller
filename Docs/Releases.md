@@ -1,5 +1,36 @@
 # Latest stable release
 
+## 6.3.0.0
+
+#### Date: 05/02/25
+
+#### Fixes
+
+  - Fixed auto selection of controller modes (aka Controller Automation) depending of session type. Was broken with the last release with the rewrite of data interfaces.
+  - Fixed a bug, which caused the Strategist to recommend a tyre change in heavy rain conditions although wet tyres already were mounted.
+  - Removed an orphane entry in the *Temp* directory, if this directory had been moved to a different location.
+  - Fixed a typo in the "Simulator" *Lua* module, which prevented the script from being loaded correctly.
+  - Fixed a freeze of the "News" window in cases where the user has clicked on "Startup" already.
+  - [Important] It has been reported that one of the latest Windows update removed the VC++ runtime, that is used by the plugin for *rFactor 2* and *Le Mans Ultimate*. Please see the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-630) for information how to fix that.
+
+#### Changes
+
+  - The Engineer now better informs about auto adjustments to the refuel amount after a pitstop has been planned and prepared in LMU races.
+  - Two new controller action functions [*enableListening* and *disableListening*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allow you to fully mute and unmute voice recognition by a button, for example. This can help, if you are using the same *Push-To-Talk* button with Simulator Controller and Discord or TeamSpeak.
+  - Two new controller action functions [*enableDataCollection* and *disableDataCollection*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allow you to disable the transfer of collected data of the Assistants to the session database. This is especially useful to prevent data which originates from sessions with 2x fuel consumption, for example, to pollute the database.
+  - The driver is now always included in the default selection of drivers/cars in reports for "Race Reports", "Team Center" or "Solo Center".
+  - If the "Reload" button is used in "Race Reports", new cars and tracks, which may have been registered since the start of "Race Reports" will be considered as well.
+  - [*Google*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#google) has been added to the list of supported GPT service providers for the Driving Coach and also the Assistant boosters. This makes it possible to the use the *Gemini* models, of which some are even available for free.
+  - [Internal] A specialized debugging mode for strategy handling by the Race Strategist can now be enabled in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#development-settings).
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-630), if you are experiencing problems with *rFactor 2* and *le Mans Ultimate*.
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.2.9.0
 
 #### Date: 04/25/25
@@ -21,29 +52,6 @@
 
 As mentioned above, this version contains an all new simulator data interface. It has passed all my tests, but tests may not cover everything. Therefore, if you encounter an unexpected behavior, let me know immediately.
   
-# Upcoming release
-
-## 6.3.0.0
-
-#### Date: 05/02/25 (planned)
-
-#### Fixes
-
-  - Fixed auto selection of controller modes (aka Controller Automation) depending of session type. Was broken with the last release with the rewrite of data interfaces.
-  - Fixed a bug, which caused the Strategist to recommend a tyre change in heavy rain conditions although wet tyres already were mounted.
-  - Fixed a typo in the "Simulator" *Lua* module, which prevented the script from being loaded correctly.
-
-#### Changes
-
-  - Two new controller action functions [*enableListening* and *disableListening*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allow you to fully mute and unmute voice recognition by a button, for example. This can help, if you are using the same *Push-To-Talk* button with Simulator Controller and Discord or TeamSpeak.
-  - Two new controller action functions [*enableDataCollection* and *disableDataCollection*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allow you to disable the transfer of collected data of the Assistants to the session database. This is especially useful to prevent data which originates from sessions with 2x fuel consumption, for example, to pollute the database.
-  - The driver is now always included in the default selection of drivers/cars in reports for "Race Reports", "Team Center" or "Solo Center".
-  - If the "Reload" button is used in "Race Reports", new cars and tracks, which may have been registered since the start of "Race Reports" will be considered as well.
-  - [*Google*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#google) has been added to the list of supported GPT service providers for the Driving Coach and also the Assistant boosters. This makes it possible to the use the *Gemini* models, of which some are even available for free.
-  - [Internal] A specialized debugging mode for strategy handling by the Race Strategist can now be enabled in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#development-settings).
-
-# Release history
-
 ## 6.2.8.0
 
 #### Date: 04/18/25

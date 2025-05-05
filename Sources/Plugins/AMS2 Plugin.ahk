@@ -91,14 +91,6 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 		selectActions := []
 	}
 
-	supportsPitstop() {
-		return true
-	}
-
-	supportsTrackMap() {
-		return true
-	}
-
 	openPitstopMFD(descriptor := false) {
 		static reported := false
 

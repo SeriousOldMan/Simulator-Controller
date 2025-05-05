@@ -333,7 +333,7 @@ class DrivingCoach extends GridRaceAssistant {
 		options["Driving Coach.MaxTokens"] := getMultiMapValue(configuration, "Driving Coach Service", "MaxTokens", 2048)
 		options["Driving Coach.Temperature"] := getMultiMapValue(configuration, "Driving Coach Personality", "Temperature", 0.5)
 
-		if (string2Values("|", options["Driving Coach.Service"])[1] = "LLM Runtime")
+		if (string2Values("|", options["Driving Coach.Service"], 2)[1] = "LLM Runtime")
 			options["Driving Coach.GPULayers"] := getMultiMapValue(configuration, "Driving Coach Service", "GPULayers", 0)
 
 		options["Driving Coach.MaxHistory"] := getMultiMapValue(configuration, "Driving Coach Personality", "MaxHistory", 3)
@@ -605,7 +605,7 @@ class DrivingCoach extends GridRaceAssistant {
 		this.iTranscript := (normalizeDirectoryPath(this.Options["Driving Coach.Archive"]) . "\" . translate("Conversation ") . A_Now . ".txt")
 
 		if service {
-			service := string2Values("|", service)
+			service := string2Values("|", service, 3)
 
 			if !inList(this.Providers, service[1])
 				throw "Unsupported service detected in DrivingCoach.startConversation..."

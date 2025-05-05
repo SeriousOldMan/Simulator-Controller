@@ -248,6 +248,26 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 
 				return [getMultiMapValue(data, "Setup Data", "TyreCompound", false)
 					  , getMultiMapValue(data, "Setup Data", "TyreCompoundColor", false)]
+			case "Tyre Compound Front Left", "TyreCompoundFrontLeft":
+				data := this.readSessionData("Setup=true")
+
+				return [getMultiMapValue(data, "Setup Data", "TyreCompoundFrontLeft", false)
+					  , getMultiMapValue(data, "Setup Data", "TyreCompoundColorFrontLeft", false)]
+			case "Tyre Compound Front Right", "TyreCompoundFrontRight":
+				data := this.readSessionData("Setup=true")
+
+				return [getMultiMapValue(data, "Setup Data", "TyreCompoundFrontRight", false)
+					  , getMultiMapValue(data, "Setup Data", "TyreCompoundColorFrontRight", false)]
+			case "Tyre Compound Rear Left", "TyreCompoundRearLeft":
+				data := this.readSessionData("Setup=true")
+
+				return [getMultiMapValue(data, "Setup Data", "TyreCompoundRearLeft", false)
+					  , getMultiMapValue(data, "Setup Data", "TyreCompoundColorRearLeft", false)]
+			case "Tyre Compound Rear Right", "TyreCompoundRearRight":
+				data := this.readSessionData("Setup=true")
+
+				return [getMultiMapValue(data, "Setup Data", "TyreCompoundRearRight", false)
+					  , getMultiMapValue(data, "Setup Data", "TyreCompoundColorRearRight", false)]
 			default:
 				return super.getPitstopOptionValues(option)
 		}
@@ -288,20 +308,36 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 			this.sendPitstopCommand("Pitstop", "Set", "Refuel", Round(liters))
 	}
 
-	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
-		super.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
+	setPitstopTyreCompound(pitstopNumber, compound, compoundColor := false, set := false) {
+		local targetCompound := false
+		local index, tyre, tyreCompound
+
+		super.setPitstopTyreCompound(pitstopNumber, compound, compoundColor, set)
 
 		if this.requirePitstopMFD("Tyre") {
-			this.sendPitstopCommand("Pitstop", "Set", "Tyre Change", compound ? "true" : "false")
+			if InStr(compound, ";") {
+				compound := string2Values(";", compound)
+				compoundColor := string2Values(";", compoundColor)
+			}
+			else {
+				compound := [compound, compound, compound, compound]
+				compoundColor := [compoundColor, compoundColor, compoundColor, compoundColor]
+			}
 
-			if compound {
-				compound := this.tyreCompoundCode(compound, compoundColor)
+			for index, tyre in ["Front Left", "Front Right", "Rear Left", "Rear Right"] {
+				this.sendPitstopCommand("Pitstop", "Set", "Tyre Change " . tyre, compound[index] ? "true" : "false")
 
-				if compound {
-					this.sendPitstopCommand("Pitstop", "Set", "Tyre Compound", compound)
+				if compound[index] {
+					tyreCompound := this.tyreCompoundCode(compound[index], compoundColor[index])
 
-					if set
-						this.sendPitstopCommand("Pitstop", "Set", "Tyre Set", Round(set))
+					if tyreCompound {
+						if (targetCompound && (targetCompound != tyreCompound))
+							throw "Invalid tyre compound detected in IRCPlugin.setPitstopTyreCompound..."
+
+						targetCompound := tyreCompound
+
+						this.sendPitstopCommand("Pitstop", "Set", "Tyre Compound", tyreCompound)
+					}
 				}
 			}
 		}

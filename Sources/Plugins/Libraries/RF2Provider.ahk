@@ -287,10 +287,11 @@ class RF2Provider extends Sector397Provider {
 		}
 	}
 
-	supportsPitstop(refuelService?, tyreService?, mixedCompounds?, repairService?) {
+	supportsPitstop(&refuelService?, &tyreService?, &mixedCompounds?, &tyreSets?, &repairService?) {
 		refuelService := true
 		tyreService := "Axle"
 		mixedCompounds := true
+		tyreSets := false
 		repairService := ["Bodywork", "Suspension"]
 
 		return true

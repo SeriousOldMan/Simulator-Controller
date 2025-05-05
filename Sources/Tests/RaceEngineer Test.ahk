@@ -82,7 +82,7 @@ class TestRaceEngineer extends RaceEngineer {
 		return knowledgeBase
 	}
 
-	supportsPitstop() {
+	supportsPitstop(*) {
 		return true
 	}
 
@@ -196,13 +196,13 @@ class TestPitstopHandler {
 		vPitstopFuel := Round(liters)
 	}
 
-	setPitstopTyreSet(pitstopNumber, compound, compoundColor, set := false) {
+	setPitstopTyreCompound(pitstopNumber, compound, compoundColor, set := false) {
 		global vPitstopFuel, vPitstopTyreCompound, vPitstopTyreCompoundColor, vPitstopTyreSet, vPitstopTyrePressures
 		global vPitstopRepairSuspension, vPitstopRepairBodywork, vPitstopRepairEngine
 
-		this.showAction("setPitstopTyreSet", pitstopNumber, compound, set)
+		this.showAction("setPitstopTyreCompound", pitstopNumber, compound, set)
 
-		vCompletedActions["setPitstopTyreSet"] := pitstopNumber
+		vCompletedActions["setPitstopTyreCompound"] := pitstopNumber
 
 		vPitstopTyreCompound := compound
 		vPitstopTyreCompoundColor := compoundColor
@@ -650,7 +650,7 @@ class PitstopHandling extends Assert {
 		this.AssertEqual(false, vCompletedActions.Has("startPitstopSetup"), "Unexpected pitstop action startPitstopSetup reported...")
 		this.AssertEqual(false, vCompletedActions.Has("finishPitstopSetup"), "Unexpected pitstop action finishPitstopSetup reported...")
 		this.AssertEqual(false, vCompletedActions.Has("setPitstopRefuelAmount"), "Unexpected pitstop action setPitstopRefuelAmount reported...")
-		this.AssertEqual(false, vCompletedActions.Has("setPitstopTyreSet"), "Unexpected pitstop action setPitstopTyreSet reported...")
+		this.AssertEqual(false, vCompletedActions.Has("setPitstopTyreCompound"), "Unexpected pitstop action setPitstopTyreCompound reported...")
 		this.AssertEqual(false, vCompletedActions.Has("setPitstopTyrePressures"), "Unexpected pitstop action setPitstopTyrePressures reported...")
 		this.AssertEqual(false, vCompletedActions.Has("requestPitstopRepairs"), "Unexpected pitstop action requestPitstopRepairs reported...")
 
@@ -700,7 +700,7 @@ class PitstopHandling extends Assert {
 		this.AssertEqual(false, vCompletedActions.Has("startPitstopSetup"), "Unexpected pitstop action startPitstopSetup reported...")
 		this.AssertEqual(false, vCompletedActions.Has("finishPitstopSetup"), "Unexpected pitstop action finishPitstopSetup reported...")
 		this.AssertEqual(false, vCompletedActions.Has("setPitstopRefuelAmount"), "Unexpected pitstop action setPitstopRefuelAmount reported...")
-		this.AssertEqual(false, vCompletedActions.Has("setPitstopTyreSet"), "Unexpected pitstop action setPitstopTyreSet reported...")
+		this.AssertEqual(false, vCompletedActions.Has("setPitstopTyreCompound"), "Unexpected pitstop action setPitstopTyreCompound reported...")
 		this.AssertEqual(false, vCompletedActions.Has("setPitstopTyrePressures"), "Unexpected pitstop action setPitstopTyrePressures reported...")
 		this.AssertEqual(false, vCompletedActions.Has("requestPitstopRepairs"), "Unexpected pitstop action requestPitstopRepairs reported...")
 
@@ -753,7 +753,7 @@ class PitstopHandling extends Assert {
 		this.AssertEqual(false, vCompletedActions.Has("startPitstopSetup"), "Unexpected pitstop action startPitstopSetup reported...")
 		this.AssertEqual(false, vCompletedActions.Has("finishPitstopSetup"), "Unexpected pitstop action finishPitstopSetup reported...")
 		this.AssertEqual(false, vCompletedActions.Has("setPitstopRefuelAmount"), "Unexpected pitstop action setPitstopRefuelAmount reported...")
-		this.AssertEqual(false, vCompletedActions.Has("setPitstopTyreSet"), "Unexpected pitstop action setPitstopTyreSet reported...")
+		this.AssertEqual(false, vCompletedActions.Has("setPitstopTyreCompound"), "Unexpected pitstop action setPitstopTyreCompound reported...")
 		this.AssertEqual(false, vCompletedActions.Has("setPitstopTyrePressures"), "Unexpected pitstop action setPitstopTyrePressures reported...")
 		this.AssertEqual(false, vCompletedActions.Has("requestPitstopRepairs"), "Unexpected pitstop action requestPitstopRepairs reported...")
 
@@ -810,7 +810,7 @@ class PitstopHandling extends Assert {
 		this.AssertEqual(true, vCompletedActions.Has("startPitstopSetup"), "Pitstop action startPitstopSetup not reported...")
 		this.AssertEqual(true, vCompletedActions.Has("finishPitstopSetup"), "Pitstop action finishPitstopSetup not reported...")
 		this.AssertEqual(true, vCompletedActions.Has("setPitstopRefuelAmount"), "Pitstop action setPitstopRefuelAmount not reported...")
-		this.AssertEqual(true, vCompletedActions.Has("setPitstopTyreSet"), "Pitstop action setPitstopTyreSet not reported...")
+		this.AssertEqual(true, vCompletedActions.Has("setPitstopTyreCompound"), "Pitstop action setPitstopTyreCompound not reported...")
 		this.AssertEqual(true, vCompletedActions.Has("setPitstopTyrePressures"), "Pitstop action setPitstopTyrePressures not reported...")
 		this.AssertEqual(true, vCompletedActions.Has("requestPitstopRepairs"), "Pitstop action requestPitstopRepairs not reported...")
 
@@ -877,7 +877,7 @@ class PitstopHandling extends Assert {
 		this.AssertEqual(true, vCompletedActions.Has("startPitstopSetup"), "Pitstop action startPitstopSetup not reported...")
 		this.AssertEqual(true, vCompletedActions.Has("finishPitstopSetup"), "Pitstop action finishPitstopSetup not reported...")
 		this.AssertEqual(true, vCompletedActions.Has("setPitstopRefuelAmount"), "Pitstop action setPitstopRefuelAmount not reported...")
-		this.AssertEqual(true, vCompletedActions.Has("setPitstopTyreSet"), "Pitstop action setPitstopTyreSet not reported...")
+		this.AssertEqual(true, vCompletedActions.Has("setPitstopTyreCompound"), "Pitstop action setPitstopTyreCompound not reported...")
 		this.AssertEqual(true, vCompletedActions.Has("setPitstopTyrePressures"), "Pitstop action setPitstopTyrePressures not reported...")
 		this.AssertEqual(true, vCompletedActions.Has("requestPitstopRepairs"), "Pitstop action requestPitstopRepairs not reported...")
 

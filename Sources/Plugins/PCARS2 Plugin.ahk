@@ -271,10 +271,10 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 			}
 	}
 
-	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
+	setPitstopTyreCompound(pitstopNumber, compound, compoundColor := false, set := false) {
 		local delta
 
-		super.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
+		super.setPitstopTyreCompound(pitstopNumber, compound, compoundColor, set)
 
 		delta := this.tyreCompoundIndex(compound, compoundColor)
 

@@ -1,3 +1,6 @@
+#### General
+  1. Support for unit conversions per simulator
+
 #### Voice System
   1. Integration of local TTS engines for voice generation
   2. Support automatic language translation when using Whisper voice recognition

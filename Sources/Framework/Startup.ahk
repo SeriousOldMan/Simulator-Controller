@@ -46,7 +46,7 @@ loadSimulatorConfiguration() {
 	global kSimulatorConfiguration, kVersion, kDatabaseDirectory, kAHKDirectory, kMSBuildDirectory, kNirCmd, kSox, kSilentMode, kDiagnosticsStartup
 
 	local appName := StrSplit(A_ScriptName, ".")[1]
-	local packageInfo, type, pid, path, argIndex, settings, usage, lastModified, ID, fileName
+	local packageInfo, type, pid, path, argIndex, settings, usage
 
 	if kLogStartup
 		logMessage(kLogOff, "Loading configuration...")
@@ -202,34 +202,6 @@ loadSimulatorConfiguration() {
 		setMultiMapValue(usage, "Applications", appName, getMultiMapValue(usage, "Applications", appName, 0) + 1)
 
 		writeMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat", usage)
-	}
-
-	if (StrSplit(A_ScriptName, ".")[1] = "Simulator Startup") {
-		if !FileExist(kUserHomeDirectory . "Diagnostics\UPLOAD")
-			FileAppend(A_Now, kUserHomeDirectory . "Diagnostics\UPLOAD")
-
-		lastModified := FileGetTime(kUserHomeDirectory . "Diagnostics\UPLOAD", "M")
-
-		lastModified := DateAdd(lastModified, 1, "Days")
-
-		if (lastModified < A_Now) {
-			try {
-				deleteFile(kUserHomeDirectory . "Diagnostics\UPLOAD")
-
-				FileAppend(A_Now, kUserHomeDirectory . "Diagnostics\UPLOAD")
-			}
-
-			Task.startTask(() {
-				ID := StrSplit(FileRead(kUserConfigDirectory . "ID"), "`n", "`r")[1]
-
-				fileName := (ID . "." . A_Now . ".log")
-
-				if ftpUpload("87.177.158.163", "SimulatorController", "Sc-1234567890-Sc", kUserHomeDirectory . "Diagnostics\Critical.log", "Diagnostics-Uploads/" . fileName)
-					deleteFile(kUserHomeDirectory . "Diagnostics\Critical.log")
-
-				ftpUpload("87.177.158.163", "SimulatorController", "Sc-1234567890-Sc", kUserHomeDirectory . "Diagnostics\Usage.stat", "Diagnostics-Uploads/" . ID . ".Usage.stat")
-			}, 10000, kLowPriority)
-		}
 	}
 
 	if kLogStartup

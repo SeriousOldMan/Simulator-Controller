@@ -55,6 +55,7 @@ global gSynchronizing := false
 ;;;-------------------------------------------------------------------------;;;
 
 uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploadTelemetries) {
+	local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 	local sessionDB := SessionDatabase()
 	local sessionDBPath := sessionDB.DatabasePath
 	local uploadTimeStamp := sessionDBPath . "UPLOAD"
@@ -302,7 +303,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 
 		; ftpUpload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", kTempDirectory . "Shared Database\Database." . id . ".zip", "htdocs/simulator-controller/database-uploads/Database." . id . ".zip")
 
-		ftpUpload("87.177.158.163", "SimulatorController", "Sc-1234567890-Sc", kTempDirectory . "Shared Database\Database." . id . ".zip", "Database-Uploads/Database." . id . ".zip")
+		ftpUpload(MASTER, "SimulatorController", "Sc-1234567890-Sc", kTempDirectory . "Shared Database\Database." . id . ".zip", "Database-Uploads/Database." . id . ".zip")
 
 		deleteDirectory(kTempDirectory . "Shared Database")
 		deleteFile(sessionDBPath . "UPLOAD")
@@ -324,6 +325,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 }
 
 downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategies, downloadTelemetries) {
+	local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 	local sessionDBPath := SessionDatabase.DatabasePath
 	local downloadTimeStamp := sessionDBPath . "DOWNLOAD"
 	local configuration := newMultiMap()
@@ -357,7 +359,7 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 
 		updateState()
 
-		for ignore, fileName in ftpListFiles("87.177.158.163", "SimulatorController", "Sc-1234567890-Sc", "Database-Downloads") { ; ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads") {
+		for ignore, fileName in ftpListFiles(MASTER, "SimulatorController", "Sc-1234567890-Sc", "Database-Downloads") { ; ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads") {
 			SplitPath(fileName, , , , &databaseDirectory)
 
 			type := StrSplit(Trim(fileName), ".", "", 2)[1]
@@ -366,7 +368,7 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 				if (SessionDatabase.DatabaseVersion != databaseDirectory) {
 					; ftpDownload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads/" . fileName, kTempDirectory . fileName)
 
-					ftpDownload("87.177.158.163", "SimulatorController", "Sc-1234567890-Sc", "Database-Downloads/" . fileName, kTempDirectory . fileName)
+					ftpDownload(MASTER, "SimulatorController", "Sc-1234567890-Sc", "Database-Downloads/" . fileName, kTempDirectory . fileName)
 
 					updateState()
 

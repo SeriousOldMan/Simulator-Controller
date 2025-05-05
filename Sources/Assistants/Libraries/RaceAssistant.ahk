@@ -23,6 +23,7 @@
 #Include "..\..\Framework\Extensions\LLMConnector.ahk"
 #Include "..\..\Framework\Extensions\LLMBooster.ahk"
 #Include "..\..\Framework\Extensions\LLMAgent.ahk"
+#Include "..\..\Plugins\Libraries\SimulatorProvider.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\..\Database\Libraries\SettingsDatabase.ahk"
 #Include "..\..\Database\Libraries\TyresDatabase.ahk"

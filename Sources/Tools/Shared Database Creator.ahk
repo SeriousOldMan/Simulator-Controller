@@ -286,7 +286,8 @@ windowsPath(path) {
 }
 
 downloadUserDatabases(directory) {
-	wDirectory := windowsPath(directory)
+	local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
+	local wDirectory := windowsPath(directory)
 
 	renameDirectory(directory, newName) {
 		loop 5 {
@@ -301,7 +302,7 @@ downloadUserDatabases(directory) {
 		}
 	}
 
-	for ignore, fileName in ftpListFiles("87.177.158.163", "SimulatorController", "Sc-1234567890-Sc", "Database-Uploads") { ; ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-uploads") {
+	for ignore, fileName in ftpListFiles(MASTER, "SimulatorController", "Sc-1234567890-Sc", "Database-Uploads") { ; ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-uploads") {
 		SplitPath(fileName, , , , &idName)
 
 		idName := StrReplace(idName, "Database.", "")
@@ -310,7 +311,7 @@ downloadUserDatabases(directory) {
 
 		; ftpDownload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-uploads/" . fileName, directory . fileName)
 
-		ftpDownload("87.177.158.163", "SimulatorController", "Sc-1234567890-Sc", "Database-Uploads/" . fileName, directory . fileName)
+		ftpDownload(MASTER, "SimulatorController", "Sc-1234567890-Sc", "Database-Uploads/" . fileName, directory . fileName)
 
 		updateProgress("Extracting " . idName . "...")
 
@@ -447,6 +448,7 @@ createDatabases(inputDirectory, outputDirectory) {
 createSharedDatabases() {
 	global vProgressCount
 
+	local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 	local command, ignore, file
 
 	vProgressCount := 0
@@ -478,12 +480,12 @@ createSharedDatabases() {
 		ftpCreateDirectory("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller", "database-downloads")
 	}
 	else {
-		ftpClearDirectory("87.177.158.163", "SimulatorController", "Sc-1234567890-Sc", "Database-Downloads")
-		ftpRemoveDirectory("87.177.158.163", "SimulatorController", "Sc-1234567890-Sc", ".", "Database-Downloads")
-		ftpCreateDirectory("87.177.158.163", "SimulatorController", "Sc-1234567890-Sc", ".", "Database-Downloads")
+		ftpClearDirectory(MASTER, "SimulatorController", "Sc-1234567890-Sc", "Database-Downloads")
+		ftpRemoveDirectory(MASTER, "SimulatorController", "Sc-1234567890-Sc", ".", "Database-Downloads")
+		ftpCreateDirectory(MASTER, "SimulatorController", "Sc-1234567890-Sc", ".", "Database-Downloads")
 	}
 
-	for ignore, file in ftpListFiles("87.177.158.163", "SimulatorController", "Sc-1234567890-Sc", "Database-Downloads") { ; ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads") {
+	for ignore, file in ftpListFiles(MASTER, "SimulatorController", "Sc-1234567890-Sc", "Database-Downloads") { ; ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads") {
 		deleteFile(A_Temp . "\clearRemoteDirectory.txt")
 
 /*
@@ -502,7 +504,7 @@ quit
 
 		command := "
 (
-open 87.177.158.163
+open %master%
 SimulatorController
 Sc-1234567890-Sc
 cd Database-Downloads
@@ -510,7 +512,7 @@ del %file%
 quit
 )"
 
-		command := substituteVariables(command, {file: file})
+		command := substituteVariables(command, {file: file, master: MASTER})
 
 		FileAppend(command, A_Temp . "\clearRemoteDirectory.txt")
 
@@ -533,7 +535,7 @@ quit
 
 		; ftpUpload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", filePath, "htdocs/simulator-controller/database-downloads/" . fileName)
 
-		ftpUpload("87.177.158.163", "SimulatorController", "Sc-1234567890-Sc", filePath, "Database-Downloads/" . fileName)
+		ftpUpload(MASTER, "SimulatorController", "Sc-1234567890-Sc", filePath, "Database-Downloads/" . fileName)
 	}
 
 	showProgress({progress: 100, message: "Finished..."})

@@ -496,7 +496,7 @@ checkForNews() {
 				check := false
 
 				for ignore, url in ["https://fileshare.impresion3d.pro/filebrowser/api/public/dl/r0q9-d-3"
-								  , "http://87.177.158.163:800/api/public/dl/jipSYNLz"
+								  , "http://" . StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1] . ":800/api/public/dl/jipSYNLz"
 								  , "https://www.dropbox.com/scl/fi/s5ewrqo9lzwcv6omvx667/NEWS?rlkey=j3t7aopmdye4efc8uc3xlekxz&st=wbuipual&dl=1"] {
 					try
 						Download(url, kTempDirectory . "NEWS.ini")

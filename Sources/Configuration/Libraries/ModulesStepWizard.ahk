@@ -542,6 +542,7 @@ class RuntimePreset extends NamedPreset {
 	}
 
 	install(wizard, edit := true) {
+		local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 		local currentDirectory := A_WorkingDir
 		local counter :=  0
 		local updateTask, ignore, url, found
@@ -572,7 +573,7 @@ class RuntimePreset extends NamedPreset {
 				for ignore, url in string2Values(";", this.URL) {
 					showProgress({color: "Blue", message: translate("Downloading...")})
 
-					Download(url, A_Temp . "\" . this.Prefix . " Runtime.zip")
+					Download(substituteVariables(url, {master: MASTER}), A_Temp . "\" . this.Prefix . " Runtime.zip")
 
 					deleteDirectory(kProgramsDirectory . this.Prefix . " Runtime")
 
@@ -907,6 +908,7 @@ class DownloadablePreset extends NamedPreset {
 
 class AssettoCorsaCarMetas extends DownloadablePreset {
 	loadDefinition(url) {
+		local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 		local counter :=  0
 		local updateTask, ignore
 
@@ -930,7 +932,7 @@ class AssettoCorsaCarMetas extends DownloadablePreset {
 				for ignore, url in string2Values(";", url) {
 					showProgress({color: "Blue", title: translate("Downloading Components"), message: translate("Downloading...")})
 
-					Download(url, A_Temp . "\Simulator Controller DLC.zip")
+					Download(substituteVariables(url, {master: MASTER}), A_Temp . "\Simulator Controller DLC.zip")
 
 					deleteDirectory(A_Temp . "\Simulator Controller DLC")
 
@@ -1057,13 +1059,14 @@ class SplashMedia extends DownloadablePreset {
 	}
 
 	loadDefinition(url) {
+		local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 		local ignore, result
 
 		deleteFile(A_Temp . "\Splash Media.ini")
 
 		if (Trim(url) != "")
 			for ignore, url in string2Values(";", url) {
-				Download(url, A_Temp . "\Splash Media.ini")
+				Download(substituteVariables(url, {master: MASTER}), A_Temp . "\Splash Media.ini")
 
 				result := readMultiMap(A_Temp . "\Splash Media.ini")
 
@@ -1075,6 +1078,7 @@ class SplashMedia extends DownloadablePreset {
 	}
 
 	loadMedia() {
+		local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 		local counter :=  0
 		local updateTask, ignore, url, found
 
@@ -1099,7 +1103,7 @@ class SplashMedia extends DownloadablePreset {
 			for ignore, url in string2Values(";", this.ContentURL) {
 				showProgress({color: "Blue", message: translate("Downloading...")})
 
-				Download(url, A_Temp . "\Simulator Controller DLC.zip")
+				Download(substituteVariables(url, {master: MASTER}), A_Temp . "\Simulator Controller DLC.zip")
 
 				deleteDirectory(A_Temp . "\Simulator Controller DLC")
 

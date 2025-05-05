@@ -232,18 +232,6 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 
 		return false
 	}
-
-	supportsPitstop() {
-		return true
-	}
-
-	supportsTrackMap() {
-		return true
-	}
-
-	supportsSetupImport() {
-		return true
-	}
 }
 
 class RF2Plugin extends Sector397Plugin {
@@ -254,7 +242,8 @@ class RF2Plugin extends Sector397Plugin {
 								   , "TyreCompound", "Tyre Compound"
 								   , "TyreCompoundFront", "Tyre Compound Front", "TyreCompoundRear", "Tyre Compound Rear"
 								   , "TyreAllAround", "All Around"
-								   , "TyreFrontLeft", "Front Left", "TyreFrontRight", "Front Right", "TyreRearLeft", "Rear Left", "TyreRearRight", "Rear Right"
+								   , "TyreFrontLeft", "Front Left", "TyreFrontRight", "Front Right"
+								   , "TyreRearLeft", "Rear Left", "TyreRearRight", "Rear Right"
 								   , "DriverSelect", "Driver", "RepairRequest", "Repair", "PitstopRequest", "RequestPitstop")
 
 		selectActions := []
@@ -347,6 +336,12 @@ class RF2Plugin extends Sector397Plugin {
 				case "Tyre Compound", "TyreCompound":
 					return [getMultiMapValue(data, "Setup Data", "TyreCompound", false)
 						  , getMultiMapValue(data, "Setup Data", "TyreCompoundColor", false)]
+				case "Tyre Compound Front", "TyreCompoundFront":
+					return [getMultiMapValue(data, "Setup Data", "TyreCompoundFront", false)
+						  , getMultiMapValue(data, "Setup Data", "TyreCompoundColorFront", false)]
+				case "Tyre Compound Rear", "TyreCompoundRear":
+					return [getMultiMapValue(data, "Setup Data", "TyreCompoundRear", false)
+						  , getMultiMapValue(data, "Setup Data", "TyreCompoundColorRear", false)]
 				case "Repair Suspension":
 					return [getMultiMapValue(data, "Setup Data", "RepairSuspension", false)]
 				case "Repair Bodywork":
@@ -372,22 +367,31 @@ class RF2Plugin extends Sector397Plugin {
 			this.sendPitstopCommand("Pitstop", "Set", "Refuel", Round(liters))
 	}
 
-	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
-		super.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
+	setPitstopTyreCompound(pitstopNumber, compound, compoundColor := false, set := false) {
+		local index, axle, tyreCompound
 
-		if (this.OpenPitstopMFDHotkey != "Off")
-			if compound {
-				compound := this.tyreCompoundCode(compound, compoundColor)
+		super.setPitstopTyreCompound(pitstopNumber, compound, compoundColor, set)
 
-				if compound {
-					this.sendPitstopCommand("Pitstop", "Set", "Tyre Compound", compound)
-
-					if set
-						this.sendPitstopCommand("Pitstop", "Set", "Tyre Set", Round(set))
-				}
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			if InStr(compound, ";") {
+				compound := string2Values(";", compound)
+				compoundColor := string2Values(";", compoundColor)
 			}
-			else
-				this.sendPitstopCommand("Pitstop", "Set", "Tyre Compound", "None")
+			else {
+				compound := [compound, compound]
+				compoundColor := [compoundColor, compoundColor]
+			}
+
+			for index, axle in ["Front", "Rear"]
+				if compound[index] {
+					tyreCompound := this.tyreCompoundCode(compound[index], compoundColor[index])
+
+					if tyreCompound
+						this.sendPitstopCommand("Pitstop", "Set", "Tyre Compound " . axle, tyreCompound)
+				}
+				else
+					this.sendPitstopCommand("Pitstop", "Set", "Tyre Compound " . axle, "None")
+		}
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {

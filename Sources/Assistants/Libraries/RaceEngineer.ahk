@@ -19,8 +19,9 @@
 #Include "..\..\Framework\Extensions\Task.ahk"
 #Include "..\..\Framework\Extensions\RuleEngine.ahk"
 #Include "..\..\Framework\Extensions\LLMConnector.ahk"
-#Include "RaceAssistant.ahk"
+#Include "..\..\Plugins\Libraries\SimulatorProvider.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
+#Include "RaceAssistant.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -213,8 +214,8 @@ class RaceEngineer extends RaceAssistant {
 			this.callRemote("setPitstopRefuelAmount", arguments*)
 		}
 
-		setPitstopTyreSet(arguments*) {
-			this.callRemote("setPitstopTyreSet", arguments*)
+		setPitstopTyreCompound(arguments*) {
+			this.callRemote("setPitstopTyreCompound", arguments*)
 		}
 
 		setPitstopTyrePressures(arguments*) {
@@ -2903,6 +2904,11 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	supportsPitstop() {
+		local provider := this.Provider
+
+		if (provider && !this.Provider.supportsPitstop())
+			return false
+
 		if this.RemoteHandler {
 			switch this.Session {
 				case kSessionPractice:
@@ -3941,9 +3947,9 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
-	setPitstopTyreSet(pitstopNumber, compound, compoundColor, set) {
+	setPitstopTyreCompound(pitstopNumber, compound, compoundColor, set) {
 		if this.RemoteHandler
-			this.RemoteHandler.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
+			this.RemoteHandler.setPitstopTyreCompound(pitstopNumber, compound, compoundColor, set)
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
@@ -4036,8 +4042,8 @@ setPitstopRefuelAmount(context, pitstopNumber, fuel) {
 	return true
 }
 
-setPitstopTyreSet(context, pitstopNumber, compound, compoundColor, set) {
-	context.KnowledgeBase.RaceAssistant.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
+setPitstopTyreCompound(context, pitstopNumber, compound, compoundColor, set) {
+	context.KnowledgeBase.RaceAssistant.setPitstopTyreCompound(pitstopNumber, compound, compoundColor, set)
 
 	return true
 }

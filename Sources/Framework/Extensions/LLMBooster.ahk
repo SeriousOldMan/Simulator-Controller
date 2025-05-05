@@ -89,7 +89,7 @@ class LLMBooster extends ConfigurationItem {
 		options["Model"] := getMultiMapValue(configuration, this.Type . " Booster", descriptor . ".Model", false)
 		options["MaxTokens"] := getMultiMapValue(configuration, this.Type . " Booster", descriptor . ".MaxTokens", 2048)
 
-		if (string2Values("|", options["Service"])[1] = "LLM Runtime")
+		if (string2Values("|", options["Service"], 2)[1] = "LLM Runtime")
 			options["GPULayers"] := getMultiMapValue(configuration, this.Type . " Booster", descriptor . ".GPULayers", 0)
 	}
 
@@ -98,7 +98,7 @@ class LLMBooster extends ConfigurationItem {
 		local ignore, instruction
 
 		if service {
-			service := string2Values("|", service)
+			service := string2Values("|", service, 3)
 
 			if !inList(this.Providers, service[1])
 				throw "Unsupported service detected in LLMBooster.startBooster..."

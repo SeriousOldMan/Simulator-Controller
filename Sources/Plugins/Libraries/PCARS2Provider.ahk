@@ -23,6 +23,20 @@ class PCARS2Provider extends SimulatorProvider {
 		}
 	}
 
+	supportsPitstop(&refuelService?, &tyreService?, &mixedCompounds?, &tyreSets?, &repairService?) {
+		refuelService := true
+		tyreService := "All"
+		mixedCompounds := false
+		tyreSets := false
+		repairService := ["Bodywork", "Suspension"]
+
+		return true
+	}
+
+	supportsTrackMap() {
+		return true
+	}
+
 	readSessionData(options := "", protocol?) {
 		local simulator := this.Simulator
 		local car := this.Car

@@ -274,6 +274,38 @@ class LMUPlugin extends Sector397Plugin {
 						splitCompound(compound, &compound, &compoundColor)
 
 					return [compound, compoundColor]
+				case "Tyre Compound Front Left", "TyreCompoundFrontLeft":
+					compound := this.getOptionHandler("Tyre Compound Front Left").Call("Get")
+					compoundColor := false
+
+					if compound
+						splitCompound(compound, &compound, &compoundColor)
+
+					return [compound, compoundColor]
+				case "Tyre Compound Front Right", "TyreCompoundFrontRight":
+					compound := this.getOptionHandler("Tyre Compound Front Right").Call("Get")
+					compoundColor := false
+
+					if compound
+						splitCompound(compound, &compound, &compoundColor)
+
+					return [compound, compoundColor]
+				case "Tyre Compound Rear Left", "TyreCompoundRearLeft":
+					compound := this.getOptionHandler("Tyre Compound Rear Left").Call("Get")
+					compoundColor := false
+
+					if compound
+						splitCompound(compound, &compound, &compoundColor)
+
+					return [compound, compoundColor]
+				case "Tyre Compound Rear Right", "TyreCompoundRearRight":
+					compound := this.getOptionHandler("Tyre Compound Rear Right").Call("Get")
+					compoundColor := false
+
+					if compound
+						splitCompound(compound, &compound, &compoundColor)
+
+					return [compound, compoundColor]
 				case "Repair Suspension", "Repair Bodywork", "Repair Engine":
 					return [this.getOptionHandler(option).Call("Get")]
 				case "Change Brakes":
@@ -424,11 +456,25 @@ class LMUPlugin extends Sector397Plugin {
 		}
 	}
 
-	setPitstopTyreSet(pitstopNumber, tyreCompound, tyreCompoundColor := false, set := false) {
-		super.setPitstopTyreSet(pitstopNumber, tyreCompound, tyreCompoundColor, set)
+	setPitstopTyreCompound(pitstopNumber, tyreCompound, tyreCompoundColor := false, set := false) {
+		local index, tyre
 
-		if (this.OpenPitstopMFDHotkey != "Off")
-			this.setPitstopOption("Tyre Compound", compound ? compound(tyreCompound, tyreCompoundColor) : false)
+		super.setPitstopTyreCompound(pitstopNumber, tyreCompound, tyreCompoundColor, set)
+
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			if InStr(tyreCompound, ";") {
+				tyreCompound := string2Values(";", tyreCompound)
+				tyreCompoundColor := string2Values(";", tyreCompoundColor)
+			}
+			else {
+				tyreCompound := [tyreCompound, tyreCompound, tyreCompound, tyreCompound]
+				tyreCompoundColor := [tyreCompoundColor, tyreCompoundColor, tyreCompoundColor, tyreCompoundColor]
+			}
+
+			for index, tyre in ["Front Left", "Front Right", "Rear Left", "Rear Right"]
+				this.setPitstopOption("Tyre Compound " . tyre
+									, tyreCompound[index] ? compound(tyreCompound[index], tyreCompoundColor[index]) : false)
+		}
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {

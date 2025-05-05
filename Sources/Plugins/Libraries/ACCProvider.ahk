@@ -60,6 +60,24 @@ class ACCProvider extends SimulatorProvider {
 		}
 	}
 
+	supportsPitstop(&refuelService?, &tyreService?, &mixedCompounds?, &tyreSets?, &repairService?) {
+		refuelService := true
+		tyreService := "All"
+		mixedCompounds := false
+		tyreSets := true
+		repairService := ["Bodywork", "Suspension"]
+
+		return true
+	}
+
+	supportsTrackMap() {
+		return true
+	}
+
+	supportsSetupImport() {
+		return true
+	}
+
 	computeBrakePadWear(location, compound, thickness) {
 		if (location = "Front") {
 			switch compound {

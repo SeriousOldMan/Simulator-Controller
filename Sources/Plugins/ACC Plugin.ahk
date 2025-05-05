@@ -1631,18 +1631,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		this.openPitstopMFD(false, update)
 	}
 
-	supportsPitstop() {
-		return true
-	}
-
-	supportsTrackMap() {
-		return true
-	}
-
-	supportsSetupImport() {
-		return true
-	}
-
 	restoreSessionState(&sessionSettings, &sessionState) {
 		super.restoreSessionState(&sessionSettings, &sessionState)
 
@@ -1869,10 +1857,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 	}
 
-	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
+	setPitstopTyreCompound(pitstopNumber, compound, compoundColor := false, set := false) {
 		local tyreSetIncrement, finished
 
-		super.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
+		super.setPitstopTyreCompound(pitstopNumber, compound, compoundColor, set)
 
 		if this.requirePitstopMFD()
 			if compound {

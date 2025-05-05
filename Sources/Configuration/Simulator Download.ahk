@@ -52,6 +52,7 @@ updateProgress(max) {
 }
 
 downloadSimulatorController() {
+	local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 	local icon := kIconsDirectory . "Installer.ico"
 	local error := false
 	local options, index, cState, devVersion, release, version, package, updateTask
@@ -118,10 +119,10 @@ downloadSimulatorController() {
 	devVersion := (cState || inList(A_Args, "-Development"))
 
 	deleteFile(kTempDirectory . "VERSION")
-
+	
 	for ignore, url in ["https://fileshare.impresion3d.pro/filebrowser/api/public/dl/OH13SGRl"
 					  , "https://www.dropbox.com/scl/fi/z47gla0adkbk7gup3khwx/VERSION?rlkey=pwo8ffhpkrteyfcnptra6x7y7&st=7lbgjkgu&dl=0"
-					  , "http://87.177.158.163:800/api/public/dl/bkguewzP"
+					  , "http://" . MASTER . ":800/api/public/dl/bkguewzP"
 					  , "https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/VERSION"]
 		try {
 			error := false
@@ -156,6 +157,8 @@ downloadSimulatorController() {
 			package := getMultiMapValue(release, "Release", "Download", false)
 
 		if package {
+			package := substituteVariables(package, {master: MASTER})
+			
 			exitOthers()
 
 			for ignore, url in string2Values(";", package)

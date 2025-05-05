@@ -343,6 +343,7 @@ uninstallOptions(options, *) {
 checkInstallation() {
 	global gProgressCount
 
+	local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 	local installLocation := ""
 	local installInfo, quiet, options, msgResult, hasSplash, command, component, source
 	local install, index, options, isNew, packageLocation, packageInfo, packageType, version
@@ -351,6 +352,7 @@ checkInstallation() {
 	installComponents(packageLocation, installLocation, temporary := false) {
 		global gProgressCount
 
+		local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 		local packageInfo := readMultiMap(packageLocation . "\VERSION")
 		local installInfo := readMultiMap(installLocation . "\VERSION")
 		local installedComponents := string2Map(",", "->", getMultiMapValue(installInfo
@@ -377,7 +379,7 @@ checkInstallation() {
 
 							deleteFile(kTempDirectory . "ComponentPackage.zip")
 
-							Download(url, kTempDirectory . "ComponentPackage.zip")
+							Download(substituteVariables(url, {master: MASTER}), kTempDirectory . "ComponentPackage.zip")
 
 							if !FileExist(kTempDirectory . "ComponentPackage.zip")
 								urlError := "Package URL not defined..."

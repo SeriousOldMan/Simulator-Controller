@@ -23,6 +23,20 @@ class ACProvider extends SimulatorProvider {
 		}
 	}
 
+	supportsPitstop(&refuelService?, &tyreService?, &mixedCompounds?, &tyreSets?, &repairService?) {
+		refuelService := true
+		tyreService := "All"
+		mixedCompounds := false
+		tyreSets := false
+		repairService := ["Bodywork", "Suspension", "Engine"]
+
+		return true
+	}
+
+	supportsTrackMap() {
+		return true
+	}
+
 	acquireTelemetryData() {
 		local data := super.acquireTelemetryData()
 		local forName, surName, nickName, name

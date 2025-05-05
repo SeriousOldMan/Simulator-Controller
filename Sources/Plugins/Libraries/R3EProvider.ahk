@@ -46,6 +46,20 @@ class R3EProvider extends SimulatorProvider {
 		}
 	}
 
+	supportsPitstop(&refuelService?, &tyreService?, &mixedCompounds?, &tyreSets?, &repairService?) {
+		refuelService := true
+		tyreService := "Axle"
+		mixedCompounds := false
+		tyreSets := false
+		repairService := ["Bodywork", "Suspension"]
+
+		return true
+	}
+
+	supportsTrackMap() {
+		return true
+	}
+
 	getCarName(carID) {
 		local carDB
 

@@ -1087,6 +1087,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		local track := getMultiMapValue(data, "Session Data", "Track", "Unknown")
 		local tyreCompound := getMultiMapValue(settings, "Session Setup", "Tyre.Compound", "Dry")
 		local tyreCompoundColor := getMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
+		local mixedCompounds
 
 		static lastSimulator := false
 		static lastCar := false
@@ -1123,7 +1124,30 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			Task.startTask(registerSimulator.Bind(simulator, car, track), 1000, kLowPriority)
 		}
 
-		this.CurrentTyreCompounds := compound(tyreCompound, tyreCompoundColor)
+		if this.Provider.supportsPitstop( , , &mixedCompounds) {
+			if (mixedCompounds = "Axle")
+				this.CurrentTyreCompounds := [compound(getMultiMapValue(data, "Car Data", "TyreCompoundFront", "Dry")
+													 , getMultiMapValue(data, "Car Data", "TyreCompoundColorFront", "Black"))
+											, compound(getMultiMapValue(data, "Car Data", "TyreCompoundRear", "Dry")
+													 , getMultiMapValue(data, "Car Data", "TyreCompoundColorRear", "Black"))]
+			else if (mixedCompounds = "Wheel") {
+				this.CurrentTyreCompounds := [compound(getMultiMapValue(data, "Car Data", "TyreCompoundFrontLeft", "Dry")
+													 , getMultiMapValue(data, "Car Data", "TyreCompoundColorFrontLeft", "Black"))
+											, compound(getMultiMapValue(data, "Car Data", "TyreCompoundFrontRight", "Dry")
+													 , getMultiMapValue(data, "Car Data", "TyreCompoundColorFrontRight", "Black"))
+											, compound(getMultiMapValue(data, "Car Data", "TyreCompoundRearLeft", "Dry")
+													 , getMultiMapValue(data, "Car Data", "TyreCompoundColorRearLeft", "Black"))
+											, compound(getMultiMapValue(data, "Car Data", "TyreCompoundRearRight", "Dry")
+													 , getMultiMapValue(data, "Car Data", "TyreCompoundColorRearRight", "Black"))]
+			}
+			else if getMultiMapValue(data, "Car Data", "TyreCompound", false)
+				this.CurrentTyreCompounds := compound(getMultiMapValue(data, "Car Data", "TyreCompound", false)
+													, getMultiMapValue(data, "Car Data", "TyreCompoundColor", false))
+			else
+				this.CurrentTyreCompounds := compound(tyreCompound, tyreCompoundColor)
+		}
+		else
+			this.CurrentTyreCompounds := compound(tyreCompound, tyreCompoundColor)
 
 		this.updateTyreCompound(data)
 	}

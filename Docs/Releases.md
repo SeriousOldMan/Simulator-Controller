@@ -27,7 +27,20 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 # Upcoming release
 
-Not yet planned...
+## 6.3.1.0
+
+#### Date: 05/09/25 (planned)
+
+#### Fixes
+
+  - Fixed validation of function call syntax in controller actions
+  - Fixed the handling of special characters in the API keys for REST/JSON services
+
+#### Changes
+
+  - Updated the handling of the master download mirror
+  - Updated and extended the tyre meta data for *Automobilista 2*
+  - Extensive internal reword and refactoring in preparation for single tyre handling support
 
 # Release history
 

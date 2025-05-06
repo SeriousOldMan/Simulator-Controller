@@ -659,34 +659,30 @@ class SimulatorPlugin extends ControllerPlugin {
 	notifyPitstopChanged(option) {
 		local newValues, ignore, postfix
 
-		if this.RaceEngineer
+		if this.RaceEngineer {
 			switch option, false {
-				case "Refuel", "Tyre Compound", "TyreCompound", "Tyre Set"
-				   , "Tyre Compound Front", "TyreCompoundFront"
-				   , "Tyre Compound Rear", "TyreCompoundRear"
-				   , "Tyre Compound Front Left", "TyreCompoundFrontLeft"
-				   , "Tyre Compound Front Right", "TyreCompoundFrontRight"
-				   , "Tyre Compound Rear Left", "TyreCompoundRearLeft"
-				   , "Tyre Compound Rear Right", "TyreCompoundRearRight"
-				   , "Repair Suspension", "Repair Bodywork", "Repair Engine":
-					if InStr(option, "TyreCompound")
-						switch option, false {
-							case "TyreCompound":
-								option := "Tyre Compound"
-							case "TyreCompoundFront":
-								option := "Tyre Compound Front"
-							case "TyreCompoundRear":
-								option := "Tyre Compound Rear"
-							case "TyreCompoundFrontLeft":
-								option := "Tyre Compound Front Left"
-							case "TyreCompoundFrontRight":
-								option := "Tyre Compound Front Right"
-							case "TyreCompoundRearLeft":
-								option := "Tyre Compound Rear Left"
-							case "TyreCompoundRearRight":
-								option := "Tyre Compound Rear Right"
-						}
+				case "TyreCompound":
+					option := "Tyre Compound"
+				case "TyreCompoundFront":
+					option := "Tyre Compound Front"
+				case "TyreCompoundRear":
+					option := "Tyre Compound Rear"
+				case "TyreCompoundFrontLeft":
+					option := "Tyre Compound Front Left"
+				case "TyreCompoundFrontRight":
+					option := "Tyre Compound Front Right"
+				case "TyreCompoundRearLeft":
+					option := "Tyre Compound Rear Left"
+				case "TyreCompoundRearRight":
+					option := "Tyre Compound Rear Right"
+			}
 
+			switch option, false {
+				case "Refuel", "Tyre Compound", "Tyre Set"
+				   , "Tyre Compound Front", "Tyre Compound Rear"
+				   , "Tyre Compound Front Left", "Tyre Compound Front Right"
+				   , "Tyre Compound Rear Left", "Tyre Compound Rear Right"
+				   , "Repair Suspension", "Repair Bodywork", "Repair Engine":
 					newValues := this.getPitstopOptionValues(option)
 
 					if newValues {
@@ -705,11 +701,12 @@ class SimulatorPlugin extends ControllerPlugin {
 						this.RaceEngineer.pitstopOptionChanged("Tyre Pressures", true, newValues*)
 					}
 			}
+		}
 	}
 
 	getPitstopAllOptionValues() {
 		local options := CaseInsenseMap()
-		local mixedCompounds, tyreSet, refuelService, tyreService, repairService
+		local tyreSet, refuelService, tyreService, repairService
 
 		if this.supportsPitstop(&refuelService, &tyreService, &repairService) {
 			if refuelService
@@ -718,23 +715,21 @@ class SimulatorPlugin extends ControllerPlugin {
 			if tyreService {
 				options["Tyre Pressures"] := this.getPitstopOptionValues("Tyre Pressures")
 
-				if this.supportsTyreManagement(&mixedCompounds, &tyreSet) {
-					if (mixedCompounds = "Axle") {
-						options["Tyre Compound Front"] := this.getPitstopOptionValues("Tyre Compound Front")
-						options["Tyre Compound Rear"] := this.getPitstopOptionValues("Tyre Compound Rear")
-					}
-					else if (mixedCompounds = "Wheel") {
-						options["Tyre Compound Front Left"] := this.getPitstopOptionValues("Tyre Compound Front Left")
-						options["Tyre Compound Front Right"] := this.getPitstopOptionValues("Tyre Compound Front Right")
-						options["Tyre Compound Rear Left"] := this.getPitstopOptionValues("Tyre Compound Rear Left")
-						options["Tyre Compound Rear Right"] := this.getPitstopOptionValues("Tyre Compound Rear Right")
-					}
-					else
-						options["Tyre Compound"] := this.getPitstopOptionValues("Tyre Compound")
-
-					if tyreSet
-						options["Tyre Set"] := this.getPitstopOptionValues("Tyre Set")
+				if (tyreService = "Axle") {
+					options["Tyre Compound Front"] := this.getPitstopOptionValues("Tyre Compound Front")
+					options["Tyre Compound Rear"] := this.getPitstopOptionValues("Tyre Compound Rear")
 				}
+				else if (tyreService = "Wheel") {
+					options["Tyre Compound Front Left"] := this.getPitstopOptionValues("Tyre Compound Front Left")
+					options["Tyre Compound Front Right"] := this.getPitstopOptionValues("Tyre Compound Front Right")
+					options["Tyre Compound Rear Left"] := this.getPitstopOptionValues("Tyre Compound Rear Left")
+					options["Tyre Compound Rear Right"] := this.getPitstopOptionValues("Tyre Compound Rear Right")
+				}
+				else
+					options["Tyre Compound"] := this.getPitstopOptionValues("Tyre Compound")
+
+				if (this.supportsTyreManagement( , &tyreSet) && tyreSet)
+					options["Tyre Set"] := this.getPitstopOptionValues("Tyre Set")
 			}
 
 			if repairService {
@@ -1360,43 +1355,62 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	updateTyreCompound(data) {
-		local mixedCompounds, index, axle, tyre
+		local mixedCompounds, tyreCompounds, index, axle, tyre
 
-		if !getMultiMapValue(data, "Car Data", "TyreCompound", false)
-			if (this.CurrentTyreCompounds && this.supportsTyreManagement(&mixedCompounds)) {
-				if ((mixedCompounds = "Axle") && (this.CurrentTyreCompounds.Length = 2)) {
-					for index, axle in ["Front", "Rear"] {
+		if !getMultiMapValue(data, "Car Data", "TyreCompound", false) {
+			if this.CurrentTyreCompounds {
+				tyreCompounds := this.CurrentTyreCompounds
+
+				if this.supportsTyreManagement(&mixedCompounds) {
+					if ((mixedCompounds = "Axle") && (tyreCompounds.Length = 2)) {
+						for index, axle in ["Front", "Rear"] {
+							tyreCompound := "Dry"
+							tyreCompoundColor := "Black"
+
+							splitCompound(tyreCompounds[index], &tyreCompound, &tyreCompoundColor)
+
+							setMultiMapValue(data, "Car Data", "TyreCompound" . axle, tyreCompound)
+							setMultiMapValue(data, "Car Data", "TyreCompoundColor" . axle, tyreCompoundColor)
+
+							if (index = 1) {
+								setMultiMapValue(data, "Car Data", "TyreCompound", tyreCompound)
+								setMultiMapValue(data, "Car Data", "TyreCompoundColor", tyreCompoundColor)
+							}
+						}
+
+						return
+					}
+					else if ((mixedCompounds = "Wheel") && (tyreCompounds.Length = 4)) {
+						for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
+							tyreCompound := "Dry"
+							tyreCompoundColor := "Black"
+
+							splitCompound(tyreCompounds[index], &tyreCompound, &tyreCompoundColor)
+
+							setMultiMapValue(data, "Car Data", "TyreCompound" . tyre, tyreCompound)
+							setMultiMapValue(data, "Car Data", "TyreCompoundColor" . tyre, tyreCompoundColor)
+
+							if (index = 1) {
+								setMultiMapValue(data, "Car Data", "TyreCompound", tyreCompound)
+								setMultiMapValue(data, "Car Data", "TyreCompoundColor", tyreCompoundColor)
+							}
+						}
+
+						return
+					}
+					else if (tyreCompounds.Length = 1) {
 						tyreCompound := "Dry"
 						tyreCompoundColor := "Black"
 
-						splitCompound(this.CurrentTyreCompounds[index], &tyreCompound, &tyreCompoundColor)
+						splitCompound(this.CurrentTyreCompounds[1], &tyreCompound, &tyreCompoundColor)
 
-						setMultiMapValue(data, "Car Data", "TyreCompound" . axle, tyreCompound)
-						setMultiMapValue(data, "Car Data", "TyreCompoundColor" . axle, tyreCompoundColor)
+						setMultiMapValue(data, "Car Data", "TyreCompound", tyreCompound)
+						setMultiMapValue(data, "Car Data", "TyreCompoundColor", tyreCompoundColor)
 
-						if (index = 1) {
-							setMultiMapValue(data, "Car Data", "TyreCompound", tyreCompound)
-							setMultiMapValue(data, "Car Data", "TyreCompoundColor", tyreCompoundColor)
-						}
+						return
 					}
 				}
-				else if ((mixedCompounds = "Wheel") && (this.CurrentTyreCompounds.Length = 4)) {
-					for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
-						tyreCompound := "Dry"
-						tyreCompoundColor := "Black"
-
-						splitCompound(this.CurrentTyreCompounds[index], &tyreCompound, &tyreCompoundColor)
-
-						setMultiMapValue(data, "Car Data", "TyreCompound" . tyre, tyreCompound)
-						setMultiMapValue(data, "Car Data", "TyreCompoundColor" . tyre, tyreCompoundColor)
-
-						if (index = 1) {
-							setMultiMapValue(data, "Car Data", "TyreCompound", tyreCompound)
-							setMultiMapValue(data, "Car Data", "TyreCompoundColor", tyreCompoundColor)
-						}
-					}
-				}
-				else if (this.CurrentTyreCompounds.Length = 1) {
+				else if (tyreCompounds.Length = 1) {
 					tyreCompound := "Dry"
 					tyreCompoundColor := "Black"
 
@@ -1404,17 +1418,14 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 					setMultiMapValue(data, "Car Data", "TyreCompound", tyreCompound)
 					setMultiMapValue(data, "Car Data", "TyreCompoundColor", tyreCompoundColor)
+
+					return
 				}
 			}
-			else if (this.CurrentTyreCompounds.Length = 1) {
-				tyreCompound := "Dry"
-				tyreCompoundColor := "Black"
 
-				splitCompound(this.CurrentTyreCompounds[1], &tyreCompound, &tyreCompoundColor)
-
-				setMultiMapValue(data, "Car Data", "TyreCompound", tyreCompound)
-				setMultiMapValue(data, "Car Data", "TyreCompoundColor", tyreCompoundColor)
-			}
+			setMultiMapValue(data, "Car Data", "TyreCompound", "Dry")
+			setMultiMapValue(data, "Car Data", "TyreCompoundColor", "Black")
+		}
 	}
 
 	updateTelemetryData(data) {

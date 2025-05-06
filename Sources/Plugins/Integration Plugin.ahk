@@ -442,10 +442,10 @@ class IntegrationPlugin extends ControllerPlugin {
 
 			if (tyreService = "Wheel") {
 				for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
-					tyreCompound := getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Compound." . tyre)
+					tyreCompound := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Compound." . tyre)
 
 					if (tyreCompound && (tyreCompound != "-"))
-						tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Compound.Color." . tyre)))
+						tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Compound.Color." . tyre)))
 					else
 						tyreCompound := kNull
 
@@ -454,10 +454,10 @@ class IntegrationPlugin extends ControllerPlugin {
 			}
 			else if (tyreService = "Axle") {
 				for index, axle in ["Front", "Rear"] {
-					tyreCompound := getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Compound." . axle)
+					tyreCompound := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Compound." . axle)
 
 					if (tyreCompound && (tyreCompound != "-"))
-						tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Compound.Color." . axle)))
+						tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Compound.Color." . axle)))
 					else
 						tyreCompound := kNull
 
@@ -530,10 +530,10 @@ class IntegrationPlugin extends ControllerPlugin {
 
 			if (tyreService = "Wheel") {
 				for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
-					tyreCompound := getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Compound." . tyre)
+					tyreCompound := getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Compound." . tyre)
 
 					if (tyreCompound && (tyreCompound != "-"))
-						tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Compound.Color." . tyre)))
+						tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Compound.Color." . tyre)))
 					else
 						tyreCompound := kNull
 
@@ -542,10 +542,10 @@ class IntegrationPlugin extends ControllerPlugin {
 			}
 			else if (tyreService = "Axle") {
 				for index, axle in ["Front", "Rear"] {
-					tyreCompound := getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Compound." . axle)
+					tyreCompound := getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Compound." . axle)
 
 					if (tyreCompound && (tyreCompound != "-"))
-						tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Compound." . axle)))
+						tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Compound." . axle)))
 					else
 						tyreCompound := kNull
 

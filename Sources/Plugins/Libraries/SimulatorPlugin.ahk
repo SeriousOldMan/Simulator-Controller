@@ -474,6 +474,22 @@ class SimulatorPlugin extends ControllerPlugin {
 		return SimulatorProvider.createSimulatorProvider(this.Simulator[true], this.Car, this.Track)
 	}
 
+	supportsPitstop(&refuelService?, &tyreService?, &repairService?) {
+		return this.Provider.supportsPitstop(&refuelService, &tyreService, &repairService)
+	}
+
+	supportsTyreManagement(&mixedCompounds?, &tyreSets?) {
+		return this.Provider.supportsTyreManagement(&mixedCompounds, &tyreSets)
+	}
+
+	supportsSetupImport() {
+		return this.Provider.supportsSetupImport()
+	}
+
+	supportsTrackMap() {
+		return this.Provider.supportsTrackMap()
+	}
+
 	getPitstopActions(&allActions, &selectActions) {
 		allActions := CaseInsenseMap()
 
@@ -693,27 +709,45 @@ class SimulatorPlugin extends ControllerPlugin {
 
 	getPitstopAllOptionValues() {
 		local options := CaseInsenseMap()
-		local mixedCompounds
+		local mixedCompounds, tyreSet, refuelService, tyreService, repairService
 
-		options["Refuel"] := this.getPitstopOptionValues("Refuel")
-		options["Tyre Compound"] := this.getPitstopOptionValues("Tyre Compound")
-		options["Tyre Set"] := this.getPitstopOptionValues("Tyre Set")
-		options["Tyre Pressures"] := this.getPitstopOptionValues("Tyre Pressures")
-		options["Repair Suspension"] := this.getPitstopOptionValues("Repair Suspension")
-		options["Repair Bodywork"] := this.getPitstopOptionValues("Repair Bodywork")
-		options["Repair Engine"] := this.getPitstopOptionValues("Repair Engine")
+		if this.supportsPitstop(&refuelService, &tyreService, &repairService) {
+			if refuelService
+				options["Refuel"] := this.getPitstopOptionValues("Refuel")
 
-		if this.Provider.supportsPitstop( , , &mixedCompounds)
-			if (mixedCompounds = "Axle") {
-				options["Tyre Compound Front"] := this.getPitstopOptionValues("Tyre Compound Front")
-				options["Tyre Compound Rear"] := this.getPitstopOptionValues("Tyre Compound Rear")
+			if tyreService {
+				options["Tyre Pressures"] := this.getPitstopOptionValues("Tyre Pressures")
+
+				if this.supportsTyreManagement(&mixedCompounds, &tyreSet) {
+					if (mixedCompounds = "Axle") {
+						options["Tyre Compound Front"] := this.getPitstopOptionValues("Tyre Compound Front")
+						options["Tyre Compound Rear"] := this.getPitstopOptionValues("Tyre Compound Rear")
+					}
+					else if (mixedCompounds = "Wheel") {
+						options["Tyre Compound Front Left"] := this.getPitstopOptionValues("Tyre Compound Front Left")
+						options["Tyre Compound Front Right"] := this.getPitstopOptionValues("Tyre Compound Front Right")
+						options["Tyre Compound Rear Left"] := this.getPitstopOptionValues("Tyre Compound Rear Left")
+						options["Tyre Compound Rear Right"] := this.getPitstopOptionValues("Tyre Compound Rear Right")
+					}
+					else
+						options["Tyre Compound"] := this.getPitstopOptionValues("Tyre Compound")
+
+					if tyreSet
+						options["Tyre Set"] := this.getPitstopOptionValues("Tyre Set")
+				}
 			}
-			else if (mixedCompounds = "Wheel") {
-				options["Tyre Compound Front Left"] := this.getPitstopOptionValues("Tyre Compound Front Left")
-				options["Tyre Compound Front Right"] := this.getPitstopOptionValues("Tyre Compound Front Right")
-				options["Tyre Compound Rear Left"] := this.getPitstopOptionValues("Tyre Compound Rear Left")
-				options["Tyre Compound Rear Right"] := this.getPitstopOptionValues("Tyre Compound Rear Right")
+
+			if repairService {
+				if inList(repairService, "Suspension")
+					options["Repair Suspension"] := this.getPitstopOptionValues("Repair Suspension")
+
+				if inList(repairService, "Bodywork")
+					options["Repair Bodywork"] := this.getPitstopOptionValues("Repair Bodywork")
+
+				if inList(repairService, "Engine")
+					options["Repair Engine"] := this.getPitstopOptionValues("Repair Engine")
 			}
+		}
 
 		return options
 	}
@@ -1011,18 +1045,6 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			return hasProvider
 	}
 
-	supportsPitstop(&refuelService?, &tyreService?, &mixedCompounds?, &tyreSets?, &repairService?) {
-		return this.Provider.supportsPitstop(&refuelService, &tyreService, &mixedCompounds, &tyreSets, &repairService)
-	}
-
-	supportsSetupImport() {
-		return this.Provider.supportsSetupImport()
-	}
-
-	supportsTrackMap() {
-		return this.Provider.supportsTrackMap()
-	}
-
 	updateSession(session, force := false) {
 		super.updateSession(session, force)
 
@@ -1124,7 +1146,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			Task.startTask(registerSimulator.Bind(simulator, car, track), 1000, kLowPriority)
 		}
 
-		if this.Provider.supportsPitstop( , , &mixedCompounds) {
+		if this.supportsTyreManagement(&mixedCompounds) {
 			if (mixedCompounds = "Axle")
 				this.CurrentTyreCompounds := [compound(getMultiMapValue(data, "Car Data", "TyreCompoundFront", "Dry")
 													 , getMultiMapValue(data, "Car Data", "TyreCompoundColorFront", "Black"))
@@ -1299,20 +1321,20 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 	setPitstopTyreCompound(pitstopNumber, tyreCompound, tyreCompoundColor := false, set := false) {
 		local compounds := []
-		local mixedCompounds
+		local tyreService
 
 		this.RequestedTyreCompounds := false
 
-		if this.Provider.supportsPitstop( , , &mixedCompounds) {
+		if (this.supportsPitstop( , &tyreService) && tyreService) {
 			if InStr(tyreCompound, ";") {
 				tyreCompound := string2Values(";", tyreCompound)
 				tyreCompoundColor := string2Values(";", tyreCompoundColor)
 			}
-			else if (mixedCompounds = "Wheel") {
+			else if (tyreService = "Wheel") {
 				tyreCompound := [tyreCompound, tyreCompound, tyreCompound, tyreCompound]
 				tyreCompoundColor := [tyreCompoundColor, tyreCompoundColor, tyreCompoundColor, tyreCompoundColor]
 			}
-			else if (mixedCompounds = "Axle") {
+			else if (tyreService = "Axle") {
 				tyreCompound := [tyreCompound, tyreCompound]
 				tyreCompoundColor := [tyreCompoundColor, tyreCompoundColor]
 			}
@@ -1338,14 +1360,11 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	updateTyreCompound(data) {
-		local mixedCompounds, hasCompounds, index, axle, tyre
+		local mixedCompounds, index, axle, tyre
 
-		if (!getMultiMapValue(data, "Car Data", "TyreCompound", false)
-		 && !getMultiMapValue(data, "Car Data", "TyreCompoundRaw", false))
-			if (this.CurrentTyreCompounds && this.Provider.supportsPitstop( , , &mixedCompounds)) {
-				hasCompounds := (this.CurrentTyreCompounds.Length > 1)
-
-				if (hasCompounds && (mixedCompounds = "Axle")) {
+		if !getMultiMapValue(data, "Car Data", "TyreCompound", false)
+			if (this.CurrentTyreCompounds && this.supportsTyreManagement(&mixedCompounds)) {
+				if ((mixedCompounds = "Axle") && (this.CurrentTyreCompounds.Length = 2)) {
 					for index, axle in ["Front", "Rear"] {
 						tyreCompound := "Dry"
 						tyreCompoundColor := "Black"
@@ -1361,7 +1380,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 						}
 					}
 				}
-				else if (hasCompounds && (mixedCompounds = "Wheel")) {
+				else if ((mixedCompounds = "Wheel") && (this.CurrentTyreCompounds.Length = 4)) {
 					for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
 						tyreCompound := "Dry"
 						tyreCompoundColor := "Black"
@@ -1377,7 +1396,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 						}
 					}
 				}
-				else {
+				else if (this.CurrentTyreCompounds.Length = 1) {
 					tyreCompound := "Dry"
 					tyreCompoundColor := "Black"
 
@@ -1386,6 +1405,15 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 					setMultiMapValue(data, "Car Data", "TyreCompound", tyreCompound)
 					setMultiMapValue(data, "Car Data", "TyreCompoundColor", tyreCompoundColor)
 				}
+			}
+			else if (this.CurrentTyreCompounds.Length = 1) {
+				tyreCompound := "Dry"
+				tyreCompoundColor := "Black"
+
+				splitCompound(this.CurrentTyreCompounds[1], &tyreCompound, &tyreCompoundColor)
+
+				setMultiMapValue(data, "Car Data", "TyreCompound", tyreCompound)
+				setMultiMapValue(data, "Car Data", "TyreCompoundColor", tyreCompoundColor)
 			}
 	}
 
@@ -1406,12 +1434,10 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		local mixedCompounds
 
 		updateTyreCompound(compounds, type) {
-			local hasCompounds, index, axle, tyre, tyreCompound, tyreCompoundColor
+			local index, axle, tyre, tyreCompound, tyreCompoundColor
 
 			if compounds {
-				hasCompounds := (compounds.Length > 1)
-
-				if (hasCompounds && (mixedCompounds = "Axle")) {
+				if ((mixedCompounds = "Axle") && (compounds.Length = 2)) {
 					for index, axle in ["Front", "Rear"] {
 						tyreCompound := "Dry"
 						tyreCompoundColor := "Black"
@@ -1427,7 +1453,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 						}
 					}
 				}
-				else if (hasCompounds && (mixedCompounds = "Wheel")) {
+				else if ((mixedCompounds = "Wheel") && (compounds.Length = 4)) {
 					for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
 						tyreCompound := "Dry"
 						tyreCompoundColor := "Black"
@@ -1443,7 +1469,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 						}
 					}
 				}
-				else {
+				else if (compounds.Length = 1) {
 					tyreCompound := "Dry"
 					tyreCompoundColor := "Black"
 
@@ -1458,7 +1484,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		if !sessionSettings
 			sessionSettings := newMultiMap()
 
-		if this.Provider.supportsPitstop( , , &mixedCompounds) {
+		if this.supportsTyreManagement(&mixedCompounds) {
 			updateTyreCompound(this.CurrentTyreCompounds, "Current")
 			updateTyreCompound(this.RequestedTyreCompounds, "Requested")
 		}
@@ -1506,9 +1532,13 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			return compounds
 		}
 
-		if (sessionSettings && this.Provider.supportsPitstop( , , &mixedCompounds)) {
+		if (sessionSettings && this.supportsTyreManagement(&mixedCompounds)) {
 			this.CurrentTyreCompounds := updateTyreCompound("Current")
 			this.RequestedTyreCompounds := updateTyreCompound("Requested")
+		}
+		else {
+			this.CurrentTyreCompounds := false
+			this.RequestedTyreCompounds := false
 		}
 	}
 }

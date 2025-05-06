@@ -140,13 +140,18 @@ class LMUProvider extends Sector397Provider {
 		}
 	}
 
-	supportsPitstop(&refuelService?, &tyreService?, &mixedCompounds?, &tyreSets?, &repairService?) {
+	supportsPitstop(&refuelService?, &tyreService?, &repairService?) {
 		refuelService := true
 		tyreService := "Wheel"
-		mixedCompounds := true
-		tyreSets := false
 		repairService := ["Bodywork", "Suspension"]
 
+		return true
+	}
+	
+	supportsTyreManagement(&mixedCompounds?, &tyreSets?) {
+		mixedCompounds := "Wheel"
+		tyreSets := false
+		
 		return true
 	}
 

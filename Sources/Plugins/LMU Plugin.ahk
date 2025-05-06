@@ -461,20 +461,17 @@ class LMUPlugin extends Sector397Plugin {
 
 		super.setPitstopTyreCompound(pitstopNumber, tyreCompound, tyreCompoundColor, set)
 
-		if (this.OpenPitstopMFDHotkey != "Off") {
+		if (this.OpenPitstopMFDHotkey != "Off")
 			if InStr(tyreCompound, ";") {
 				tyreCompound := string2Values(";", tyreCompound)
 				tyreCompoundColor := string2Values(";", tyreCompoundColor)
-			}
-			else {
-				tyreCompound := [tyreCompound, tyreCompound, tyreCompound, tyreCompound]
-				tyreCompoundColor := [tyreCompoundColor, tyreCompoundColor, tyreCompoundColor, tyreCompoundColor]
-			}
 
-			for index, tyre in ["Front Left", "Front Right", "Rear Left", "Rear Right"]
-				this.setPitstopOption("Tyre Compound " . tyre
-									, tyreCompound[index] ? compound(tyreCompound[index], tyreCompoundColor[index]) : false)
-		}
+				for index, tyre in ["Front Left", "Front Right", "Rear Left", "Rear Right"]
+					this.setPitstopOption("Tyre Compound " . tyre
+										, tyreCompound[index] ? compound(tyreCompound[index], tyreCompoundColor[index]) : false)
+			}
+			else
+				this.setPitstopOption("Tyre Compound", tyreCompound ? compound(tyreCompound, tyreCompoundColor) : false)
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {

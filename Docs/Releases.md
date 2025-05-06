@@ -39,7 +39,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 #### Changes
 
   - Updated the handling of the master download mirror
-  - Updated and extended the tyre meta data for *Automobilista 2*
+  - Updated and extended the tyre meta data for *Automobilista 2* (by @alejandrocq)
   - Extensive internal reword and refactoring in preparation for single tyre handling support
 
 # Release history

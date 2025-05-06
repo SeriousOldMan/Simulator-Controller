@@ -1,10 +1,10 @@
 [Development]
 Version=6.3.1.0-dev
 Target=6.3.1.0-release
-Date=05/05/2025
-Download=
-Changes=Fixed validation of function names in controller actions, Fixed handling of REST API Keys, First part of individual tyre handling by the Engineer
-Components=Media->5.6.1,Configuration->6.3.0,Utilities->6.3.0
+Date=05/06/2025
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/ubZHDcgB
+Changes=Fixed validation of function names in controller actions, Fixed handling of REST API Keys, First part of individual tyre handling by the Engineer, Tyre meta data update for Automobilista 2, Update of download mirrors
+Components=Media->5.6.1,Configuration->6.3.1,Utilities->6.3.0
 [Release]
 Version=6.3.0.0-release
 Date=05/02/2025
@@ -18,6 +18,9 @@ Media.5.6.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl
 Configuration.6.3.0.Path=Resources
 Configuration.6.3.0.Content=Setup
 Configuration.6.3.0.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/XHS2Uq6E;https://www.dropbox.com/scl/fi/pkbe4l8h22xi5zdri2qec/Configuration-6.3.0.zip?rlkey=h4isk0ufdv4bhuqs1e8k0ynto&st=5zfslfxm&dl=1;http://%master%:800/api/public/dl/fU33JPL_;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.3.0.zip
+Configuration.6.3.1.Path=Resources
+Configuration.6.3.1.Content=Setup
+Configuration.6.3.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/VdHgCofy;https://www.dropbox.com/scl/fi/nnoml8ghid3qyv8l3txej/Configuration-6.3.1.zip?rlkey=x0mvvmy1tuqcyr216bymrdagn&st=u1ehm0cq&dl=1;http://87.178.12.140:800/api/public/dl/7ajP9Mu-;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.3.1.zip
 Utilities.6.3.0.Path=.
 Utilities.6.3.0.Content=Utilities
 Utilities.6.3.0.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/BCbe0uKY;https://www.dropbox.com/scl/fi/uauxhuyecnwmgft3w6roj/Utilities-6.3.0.zip?rlkey=1luua85df5q5w88hcxxza0lsr&st=e8f4bqgz&dl=1;http://%master%:800/api/public/dl/cAzNQ6G_;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.3.0.zip

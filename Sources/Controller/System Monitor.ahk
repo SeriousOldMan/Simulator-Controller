@@ -852,7 +852,7 @@ systemMonitor(command := false, arguments*) {
 
 							tyreCompound := getMultiMapValue(sessionState, "Strategy", "Pitstop.Next.Tyre.Compound." . tyre)
 
-							if tyreCompound
+							if (tyreCompound && (tyreCompound != "-"))
 								tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionState, "Strategy", "Pitstop.Next.Tyre.Compound.Color." . tyre)))
 							else
 								tyreCompound := translate("No")
@@ -872,7 +872,7 @@ systemMonitor(command := false, arguments*) {
 
 							tyreCompound := getMultiMapValue(sessionState, "Strategy", "Pitstop.Next.Tyre.Compound." . axle)
 
-							if tyreCompound
+							if (tyreCompound && (tyreCompound != "-"))
 								tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionState, "Strategy", "Pitstop.Next.Tyre.Compound.Color." . axle)))
 							else
 								tyreCompound := translate("No")
@@ -885,7 +885,7 @@ systemMonitor(command := false, arguments*) {
 					else if tyreService {
 						tyreCompound := getMultiMapValue(sessionState, "Strategy", "Pitstop.Next.Tyre.Compound")
 
-						if tyreCompound
+						if (tyreCompound && (tyreCompound != "-"))
 							tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionState, "Strategy", "Pitstop.Next.Tyre.Compound.Color")))
 						else
 							tyreCompound := translate("No")

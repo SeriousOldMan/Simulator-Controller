@@ -1925,8 +1925,11 @@ class RaceStrategist extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local sessionInfo := super.createSessionInfo(lapNumber, valid, data, simulator, car, track)
 		local nextPitstop, pitstop, ignore, theFact
+		local fuelService, tyreService, index, tyre, axle, tyreCompound, tyreCompoundColor
 
 		if (knowledgeBase && knowledgeBase.getValue("Strategy.Name", false)) {
+			this.Provider.supportsPitstop(&fuelService, &tyreService)
+
 			setMultiMapValue(sessionInfo, "Strategy", "Pitstops", knowledgeBase.getValue("Strategy.Pitstop.Count"))
 
 			nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next", false)
@@ -1935,18 +1938,36 @@ class RaceStrategist extends GridRaceAssistant {
 				setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next", nextPitstop)
 
 				setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Lap", knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Lap") + 1)
-				setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Refuel", Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"), 1))
+
+				if fuelService
+					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Refuel", Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"), 1))
 
 				if knowledgeBase.getValue("Strategy.Pitstop.Position", false)
 					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Position", knowledgeBase.getValue("Strategy.Pitstop.Position"))
 
 				if knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change", false) {
-					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound", knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound"))
-					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound.Color", knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound.Color"))
+					tyreCompound := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound")
+					tyreCompoundColor := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound.Color")
 				}
 				else {
-					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound", false)
-					setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound.Color", false)
+					tyreCompound := false
+					tyreCompoundColor := false
+				}
+
+				setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound", tyreCompound)
+				setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound.Color", tyreCompoundColor)
+
+				if (tyreService = "Wheel") {
+					for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
+						setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound." . tyre, tyreCompound)
+						setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound.Color." . tyre, tyreCompoundColor)
+					}
+				}
+				else if (tyreService = "Axle") {
+					for index, axle in ["Front", "Rear"] {
+						setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound." . axle, tyreCompound)
+						setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound.Color." . axle, tyreCompoundColor)
+					}
 				}
 			}
 

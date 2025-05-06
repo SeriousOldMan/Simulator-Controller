@@ -2440,7 +2440,7 @@ class RaceEngineer extends RaceAssistant {
 		local fuelService, tyreService, repairService, index, tyre, axle
 
 		if knowledgeBase {
-			this.Provider.supportsPitstop(&refuelService, &tyreService, &repairService)
+			this.Provider.supportsPitstop(&fuelService, &tyreService, &repairService)
 			this.Provider.supportsTyreManagement( , &tyreSet)
 
 			if fuelService

@@ -335,26 +335,28 @@ class LMUProvider extends Sector397Provider {
 			else
 				track := this.Track
 
-			if data.Has("Car Data") {
-				fuelAmount := getMultiMapValue(data, "Session Data", "FuelAmount", false)
+			if getMultiMapValue(data, "Session Data", "Active", false) {
+				if data.Has("Car Data") {
+					fuelAmount := getMultiMapValue(data, "Session Data", "FuelAmount", false)
 
-				if (fuelAmount && this.iFuelRatio)
-					setMultiMapValue(data, "Session Data", "FuelAmount", Round(this.iFuelRatio * 100, 1))
-				else if !fuelAmount
-					setMultiMapValue(data, "Session Data", "FuelAmount", LMURESTProvider.EnergyData(simulator, car, track).MaxFuelAmount)
-			}
+					if (fuelAmount && this.iFuelRatio)
+						setMultiMapValue(data, "Session Data", "FuelAmount", Round(this.iFuelRatio * 100, 1))
+					else if !fuelAmount
+						setMultiMapValue(data, "Session Data", "FuelAmount", LMURESTProvider.EnergyData(simulator, car, track).MaxFuelAmount)
+				}
 
-			tyreData := LMURestProvider.TyreData()
+				tyreData := LMURestProvider.TyreData()
 
-			for key, postFix in tyres {
-				tyreCompound := tyreData.TyreCompound[key]
-				tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
+				for key, postFix in tyres {
+					tyreCompound := tyreData.TyreCompound[key]
+					tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
 
-				if tyreCompound {
-					splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
+					if tyreCompound {
+						splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
 
-					setMultiMapValue(data, "Car Data", "TyreCompound" . postFix, tyreCompound)
-					setMultiMapValue(data, "Car Data", "TyreCompoundColor" . postFix, tyreCompoundColor)
+						setMultiMapValue(data, "Car Data", "TyreCompound" . postFix, tyreCompound)
+						setMultiMapValue(data, "Car Data", "TyreCompoundColor" . postFix, tyreCompoundColor)
+					}
 				}
 			}
 		}

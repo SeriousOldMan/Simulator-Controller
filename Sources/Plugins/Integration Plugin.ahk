@@ -12,6 +12,7 @@
 #Include "..\Framework\Extensions\Task.ahk"
 #Include "..\Framework\Extensions\JSON.ahk"
 #Include "Driving Coach Plugin.ahk"
+#Include "Simulator Providers.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -28,12 +29,20 @@ global kIntegrationPlugin := "Integration"
 class IntegrationPlugin extends ControllerPlugin {
 	iDrivingCoach := false
 
+	iProvider := false
+
 	iStateFile := (kTempDirectory . "Session State.json")
 	iAssistantsStateTask := false
 
 	DrivingCoach {
 		Get {
 			return this.iDrivingCoach
+		}
+	}
+
+	Provider {
+		Get {
+			return this.iProvider
 		}
 	}
 
@@ -176,7 +185,12 @@ class IntegrationPlugin extends ControllerPlugin {
 
 	createTyresState(sessionInfo) {
 		local state := Map()
+		local mixedCompounds := false
+		local tyreSet := false
 		local pressures, temperatures, wear, tyreSet
+
+		if this.Provider
+			this.Provider.supportsTyreManagement(&mixedCompounds, &tyreSet)
 
 		pressures := string2Values(",", getMultiMapValue(sessionInfo, "Tyres", "Pressures.Hot", ""))
 
@@ -213,9 +227,19 @@ class IntegrationPlugin extends ControllerPlugin {
 
 		state["TyreCompound"] := translate(getMultiMapValue(sessionInfo, "Tyres", "Compound", "-"))
 
-		tyreSet := getMultiMapValue(sessionInfo, "Tyres", "Set", false)
+		if (mixedCompounds = "Wheel") {
+			for ignore, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
+				state["TyreCompound" . tyre] := translate(getMultiMapValue(sessionInfo, "Tyres", "Compound" . tyre, "-"))
+		}
+		else if (mixedCompounds = "Axle")
+			for ignore, tyre in ["Front", "Rear"]
+				state["TyreCompound" . tyre] := translate(getMultiMapValue(sessionInfo, "Tyres", "Compound" . tyre, "-"))
 
-		state["TyreSet"] := (tyreSet ? tyreSet : kNull)
+		if tyreSet {
+			tyreSet := getMultiMapValue(sessionInfo, "Tyres", "Set", false)
+
+			state["TyreSet"] := (tyreSet ? tyreSet : kNull)
+		}
 
 		return state
 	}
@@ -263,7 +287,12 @@ class IntegrationPlugin extends ControllerPlugin {
 		local remainingPitstops := 0
 		local state := Map()
 		local pitstops := []
-		local nextPitstop, tyreCompound, tyreCompoundColor, pitstop, position
+		local fuelService := false
+		local tyreService := false
+		local nextPitstop, tyreCompound, tyreCompoundColor, pitstop, position, index, tyre, axle
+
+		if this.Provider
+			this.Provider.supportsPitstop(&fuelService, &tyreService)
 
 		if (pitstopsCount == kUndefined) {
 			pitstopsCount := 0
@@ -281,16 +310,43 @@ class IntegrationPlugin extends ControllerPlugin {
 
 		if nextPitstop {
 			state["Lap"] := getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Lap", kNull)
-			state["Fuel"] := convertUnit("Volume", getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Refuel", 0))
+			state["Fuel"] := (fuelService ? convertUnit("Volume", getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Refuel", 0)) : kNull)
 
-			tyreCompound := getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound")
+			if (tyreService = "Wheel") {
+				for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
+					tyreCompound := getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound." . tyre)
 
-			if tyreCompound
-				tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound.Color")))
-			else
-				tyreCompound := kNull
+					if tyreCompound
+						tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound.Color." . tyre)))
+					else
+						tyreCompound := kNull
 
-			state["TyreCompound"] := tyreCompound
+					state["TyreCompound" . tyre] := tyreCompound
+				}
+			}
+			else if (tyreService = "Axle") {
+				for index, axle in ["Front", "Rear"] {
+					tyreCompound := getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound." . axle)
+
+					if tyreCompound
+						tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound.Color." . axle)))
+					else
+						tyreCompound := kNull
+
+					state["TyreCompound" . axle] := tyreCompound
+				}
+			}
+
+			if tyreService {
+				tyreCompound := getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound")
+
+				if tyreCompound
+					tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound.Color")))
+				else
+					tyreCompound := kNull
+
+				state["TyreCompound"] := tyreCompound
+			}
 
 			position := getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Position", false)
 
@@ -306,7 +362,7 @@ class IntegrationPlugin extends ControllerPlugin {
 		loop pitstopsCount {
 			pitstop := Map("Nr", A_Index
 						 , "Lap", getMultiMapValue(sessionInfo, "Strategy", "Pitstop." . A_Index . ".Lap")
-						 , "Fuel", getMultiMapValue(sessionInfo, "Strategy", "Pitstop." . A_Index . ".Fuel.Amount"))
+						 , "Fuel", (fuelService ? getMultiMapValue(sessionInfo, "Strategy", "Pitstop." . A_Index . ".Fuel.Amount") : kNull))
 
 			if getMultiMapValue(sessionInfo, "Strategy", "Pitstop." . A_Index . ".Tyre.Change") {
 				tyreCompound := getMultiMapValue(sessionInfo, "Strategy", "Pitstop." . A_Index . ".Tyre.Compound")
@@ -329,7 +385,12 @@ class IntegrationPlugin extends ControllerPlugin {
 		local pitstopNr := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Nr", kUndefined)
 		local pitstopLap := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Lap", 0)
 		local state := Map()
-		local tyreCompound, tyreSet, tyrePressures
+		local fuelService := false
+		local tyreService := false
+		local repairService := []
+		local tyreSet := false
+		local tyreCompound, tyreSet, tyrePressures, index, tyre, axle
+		local pressures, pressure, pressureIncrements
 
 		computeRepairs(bodywork, suspension, engine) {
 			local repairs := ""
@@ -354,6 +415,11 @@ class IntegrationPlugin extends ControllerPlugin {
 			return ((StrLen(repairs) > 0) ? repairs : "-")
 		}
 
+		if this.Provider {
+			this.Provider.supportsPitstop(&fuelService, &tyreService, &repairService)
+			this.Provider.supportsTyreManagement( , &tyreSet)
+		}
+
 		if (pitstopNr == kUndefined) {
 			pitstopNr := false
 
@@ -366,45 +432,90 @@ class IntegrationPlugin extends ControllerPlugin {
 			state["Number"] := pitstopNr
 			state["Lap"] := ((pitstopLap != 0) ? pitstopLap : kNull)
 			state["ServiceTime"] := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Service", 0)
-			state["RepairTime"] := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Repairs", 0)
 			state["PitlaneDelta"] := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Pitlane", 0)
-			state["Fuel"] := convertUnit("Volume", getMultiMapValue(sessionInfo, "Pitstop", "Planned.Refuel"))
+			state["Fuel"] := (fuelService ? convertUnit("Volume", getMultiMapValue(sessionInfo, "Pitstop", "Planned.Refuel")) : kNull)
 
-			tyreCompound := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Compound")
+			if (repairService.Length > 0)
+				state["RepairTime"] := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Repairs", 0)
+			else
+				state["RepairTime"] := kNull
 
-			if (tyreCompound && (tyreCompound != "-")) {
-				tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Compound.Color")))
+			if (tyreService = "Wheel") {
+				for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
+					tyreCompound := getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Compound." . tyre)
 
-				state["TyreCompound"] := tyreCompound
+					if (tyreCompound && (tyreCompound != "-"))
+						tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Compound.Color." . tyre)))
+					else
+						tyreCompound := kNull
 
-				tyreSet := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Set")
-
-				state["TyreSet"] := (tyreSet ? tyreSet : kNull)
-
-				if getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.FL", false) {
-					state["TyrePressures"] := [convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.FL"))
-											 , convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.FR"))
-											 , convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.RL"))
-											 , convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.RR"))]
-					state["TyrePressureIncrements"] := [convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.FL.Increment"))
-													  , convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.FR.Increment"))
-													  , convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.RL.Increment"))
-													  , convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.RR.Increment"))]
+					state["TyreCompound" . tyre] := tyreCompound
 				}
-				else {
-					state["TyrePressures"] := [kNull, kNull, kNull, kNull]
-					state["TyrePressureIncrements"] := [0, 0, 0, 0]
+			}
+			else if (tyreService = "Axle") {
+				for index, axle in ["Front", "Rear"] {
+					tyreCompound := getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Compound." . axle)
+
+					if (tyreCompound && (tyreCompound != "-"))
+						tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Compound.Color." . axle)))
+					else
+						tyreCompound := kNull
+
+					state["TyreCompound" . axle] := tyreCompound
 				}
+			}
+
+			if tyreService {
+				tyreCompound := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Compound")
+
+				if (tyreCompound && (tyreCompound != "-")) {
+					tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Compound.Color")))
+
+					state["TyreCompound"] := tyreCompound
+				}
+				else
+					state["TyreCompound"] := kNull
+
+				if tyreSet {
+					tyreSet := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Set")
+
+					state["TyreSet"] := (tyreSet ? tyreSet : kNull)
+				}
+				else
+					state["TyreSet"] := kNull
+
+				pressures := []
+				pressureIncrements := []
+
+				for ignore, tyre in ["FL", "FR", "RL", "RR"] {
+					pressure := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure." . tyre, false)
+
+					if pressure {
+						pressures.Push(convertUnit("Pressure", pressure))
+						pressureIncrements.Push(convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure." . tyre . ".Increment")))
+					}
+					else {
+						pressures.Push(kNull)
+						pressureIncrements.Push(0)
+					}
+				}
+
+				state["TyrePressures"] := pressures
+				state["TyrePressureIncrements"] := pressureIncrements
 			}
 			else {
 				state["TyreCompound"] := kNull
 				state["TyreSet"] := kNull
 				state["TyrePressures"] := [kNull, kNull, kNull, kNull]
+				state["TyrePressureIncrements"] := [0, 0, 0, 0]
 			}
 
-			state["Repairs"] := computeRepairs(getMultiMapValue(sessionInfo, "Pitstop", "Planned.Repair.Bodywork")
-											 , getMultiMapValue(sessionInfo, "Pitstop", "Planned.Repair.Suspension")
-											 , getMultiMapValue(sessionInfo, "Pitstop", "Planned.Repair.Engine"))
+			if (repairService.Length > 0)
+				state["Repairs"] := computeRepairs(getMultiMapValue(sessionInfo, "Pitstop", "Planned.Repair.Bodywork")
+												 , getMultiMapValue(sessionInfo, "Pitstop", "Planned.Repair.Suspension")
+												 , getMultiMapValue(sessionInfo, "Pitstop", "Planned.Repair.Engine"))
+			else
+				state["Repairs"] := kNull
 
 			state["Prepared"] := getMultiMapValue(sessionInfo, "Pitstop", "Prepared")
 		}
@@ -415,33 +526,76 @@ class IntegrationPlugin extends ControllerPlugin {
 			state["Repairs"] := kNull
 			state["Prepared"] := kNull
 
-			state["Fuel"] := convertUnit("Volume", getMultiMapValue(sessionInfo, "Pitstop", "Target.Fuel.Amount"))
+			state["Fuel"] := (fuelService ? convertUnit("Volume", getMultiMapValue(sessionInfo, "Pitstop", "Target.Fuel.Amount")) : kNull)
 
-			tyreCompound := getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Compound")
+			if (tyreService = "Wheel") {
+				for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
+					tyreCompound := getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Compound." . tyre)
 
-			if (tyreCompound && (tyreCompound != "-")) {
-				tyreCompound := translate(normalizeCompound(tyreCompound))
+					if (tyreCompound && (tyreCompound != "-"))
+						tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Compound.Color." . tyre)))
+					else
+						tyreCompound := kNull
 
-				state["TyreCompound"] := tyreCompound
+					state["TyreCompound" . tyre] := tyreCompound
+				}
+			}
+			else if (tyreService = "Axle") {
+				for index, axle in ["Front", "Rear"] {
+					tyreCompound := getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Compound." . axle)
 
-				tyreSet := getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Set")
+					if (tyreCompound && (tyreCompound != "-"))
+						tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Compound." . axle)))
+					else
+						tyreCompound := kNull
 
-				state["TyreSet"] := (tyreSet ? tyreSet : kNull)
+					state["TyreCompound" . axle] := tyreCompound
+				}
+			}
 
-				state["TyrePressures"] := [convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Pressure.FL"))
-										 , convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Pressure.FR"))
-										 , convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Pressure.RL"))
-										 , convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Pressure.RR"))]
-				state["TyrePressureIncrements"] := [convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Pressure.FL.Increment"))
-												  , convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Pressure.FR.Increment"))
-												  , convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Pressure.RL.Increment"))
-										          , convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Pressure.RR.Increment"))]
+			if tyreService {
+				tyreCompound := getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Compound")
+
+				if (tyreCompound && (tyreCompound != "-")) {
+					tyreCompound := translate(normalizeCompound(tyreCompound))
+
+					state["TyreCompound"] := tyreCompound
+				}
+				else
+					state["TyreCompound"] := kNull
+
+				if tyreSet {
+					tyreSet := getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Set")
+
+					state["TyreSet"] := (tyreSet ? tyreSet : kNull)
+				}
+				else
+					state["TyreSet"] := kNull
+
+				pressures := []
+				pressureIncrements := []
+
+				for ignore, tyre in ["FL", "FR", "RL", "RR"] {
+					pressure := getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Pressure." . tyre, false)
+
+					if pressure {
+						pressures.Push(convertUnit("Pressure", pressure))
+						pressureIncrements.Push(convertUnit("Pressure", getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Pressure." . tyre . ".Increment")))
+					}
+					else {
+						pressures.Push(kNull)
+						pressureIncrements.Push(0)
+					}
+				}
+
+				state["TyrePressures"] := pressures
+				state["TyrePressureIncrements"] := pressureIncrements
 			}
 			else {
 				state["TyreCompound"] := kNull
 				state["TyreSet"] := kNull
 				state["TyrePressures"] := [kNull, kNull, kNull, kNull]
-				state["TyrePressureIncrements"] := [kNull, kNull, kNull, kNull]
+				state["TyrePressureIncrements"] := [0, 0, 0, 0]
 			}
 		}
 		else {
@@ -451,7 +605,7 @@ class IntegrationPlugin extends ControllerPlugin {
 			state["TyreCompound"] := kNull
 			state["TyreSet"] := kNull
 			state["TyrePressures"] := [kNull, kNull, kNull, kNull]
-			state["TyrePressureIncrements"] := [kNull, kNull, kNull, kNull]
+			state["TyrePressureIncrements"] := [0, 0, 0, 0]
 			state["Repairs"] := kNull
 			state["Prepared"] := kNull
 		}
@@ -670,6 +824,15 @@ class IntegrationPlugin extends ControllerPlugin {
 
 			for ignore, assistant in kRaceAssistants
 				addMultiMapValues(sessionInfo, readMultiMap(kTempDirectory . assistant . " Session.state"))
+
+			try {
+				this.iProvider := SimulatorProvider.createSimulatorProvider(getMultiMapValue(sessionInfo, "Session", "Simulator")
+																		  , getMultiMapValue(sessionInfo, "Session", "Car")
+																		  , getMultiMapValue(sessionInfo, "Session", "Track"))
+			}
+			catch Any {
+				this.iProvider := false
+			}
 
 			sessionState := Map("Session", this.createSessionState(sessionInfo)
 							  , "Duration", this.createDurationState(sessionInfo)

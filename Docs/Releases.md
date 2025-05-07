@@ -35,6 +35,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
   - Fixed validation of function call syntax in controller actions
   - Fixed the handling of special characters in the API keys for REST/JSON services
+  - Fixed session length calculation for lap-based sessions with active rules set in "Race Settings"
 
 #### Changes
 

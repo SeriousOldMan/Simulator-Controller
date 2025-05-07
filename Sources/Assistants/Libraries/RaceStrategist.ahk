@@ -2751,8 +2751,15 @@ class RaceStrategist extends GridRaceAssistant {
 					splitCompound(candidate, &tyreCompound, &tyreCompoundColor)
 			}
 
-			sessionType := ((knowledgeBase.getValue("Session.Format", "Time") = "Time") ? "Duration" : "Laps")
-			sessionLength := (knowledgeBase.getValue("Session.Duration") / 60)
+			if (knowledgeBase.getValue("Session.Format", "Time") = "Time") {
+				sessionType := "Duration"
+				sessionLength := (knowledgeBase.getValue("Session.Duration") / 60)
+			}
+			else {
+				sessionType := "Laps"
+				sessionLength := knowledgeBase.getValue("Session.Laps")
+			}
+
 			additionalLaps := knowledgeBase.getValue("Session.AdditionalLaps", 0)
 			tyrePressures := [Round(knowledgeBase.getValue("Lap." . lap . ".Tyre.Pressure.FL"), 1)
 							, Round(knowledgeBase.getValue("Lap." . lap . ".Tyre.Pressure.FR"), 1)

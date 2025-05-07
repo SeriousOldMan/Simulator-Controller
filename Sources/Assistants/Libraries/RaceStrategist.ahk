@@ -3861,7 +3861,7 @@ class RaceStrategist extends GridRaceAssistant {
 					 . "Refuel: " . ((refuel != kUndefined) ? refuel : "?") . "`n"
 					 . "Tyre Change: " . ((tyreChange != kUndefined) ? (tyreChange ? "Yes" : "No") : "?") . "`n"
 					 . "Tyre Compound: " ((tyreCompound != kUndefined) ? compound(tyreCompound, tyreCompoundColor) : "?")
-					 , kTempDirectory . "Race Strategist\Strategy\Pitstop " . this.iDebugStrategyCounter[3]++ . ".pitstop", 1)
+					 , kTempDirectory . "Race Strategist\Strategy\Pitstop " . this.iDebugStrategyCounter[3]++ . ".pitstop")
 		}
 	}
 
@@ -4003,7 +4003,7 @@ class RaceStrategist extends GridRaceAssistant {
 						DirCreate(kTempDirectory . "Race Strategist\Strategy")
 
 						FileAppend("Original Lap: " . plannedPitstopLap . "`nNew lap: " . plannedLap
-								 , kTempDirectory . "Race Strategist\Strategy\Pitstop " . this.iDebugStrategyCounter[3] . ".recommendation", 1)
+								 , kTempDirectory . "Race Strategist\Strategy\Pitstop " . this.iDebugStrategyCounter[3] . ".recommendation")
 					}
 
 					plannedPitstopLap := plannedLap

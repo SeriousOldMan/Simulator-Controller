@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.3.1.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/ubZHDcgB) (Early build for 6.3.1. Changes: Fixed validation of function names in controller actions, Fixed handling of REST API Keys, First part of individual tyre handling by the Engineer, Tyre meta data update for Automobilista 2, Update of download mirrors, Fixed session length calculation for lap-based sessions with active rules.)
+[6.3.1.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/ubZHDcgB) (Early build for 6.3.1. Changes: Fixed validation of function names in controller actions, Fixed handling of REST API Keys, First part of individual tyre handling by the Engineer, Tyre meta data update for Automobilista 2, Update of download mirrors, Fixed session length calculation for lap-based sessions with active rules, Fixed an off by one error for pitstop handling.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-631) of this version and all the versions you might have skipped, before installing and using this version.
 

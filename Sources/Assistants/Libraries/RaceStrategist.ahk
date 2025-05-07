@@ -1089,9 +1089,13 @@ class RaceStrategist extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local knowledge := super.getKnowledge(type, options)
 		local strategy, nextPitstop, pitstop, pitstops
+		local fuelService, tyreService, repairService, tyreSet
 
 		if knowledgeBase {
 			try {
+				this.Provider.supportsPitstop(&fuelService, &tyreService, &repairService)
+				this.Provider.supportsTyreManagement( , &tyreSet)
+
 				if (knowledgeBase.getValue("Strategy.Name", false) && this.activeTopic(options, "Strategy")) {
 					strategy := Map("NumPitstops", knowledgeBase.getValue("Strategy.Pitstop.Count"))
 
@@ -1101,8 +1105,10 @@ class RaceStrategist extends GridRaceAssistant {
 
 					if nextPitstop {
 						pitstop := Map("Nr", nextPitstop
-									 , "Lap", (knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Lap") + 1)
-									 , "Refuel", (Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"), 1) . " Liters"))
+									 , "Lap", (knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Lap") + 1))
+
+						if fuelService
+							pitstop["Refuel"] := (Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"), 1) . " Liters")
 
 						if knowledgeBase.getValue("Strategy.Pitstop.Position", false)
 							pitstop["Position"] := knowledgeBase.getValue("Strategy.Pitstop.Position")

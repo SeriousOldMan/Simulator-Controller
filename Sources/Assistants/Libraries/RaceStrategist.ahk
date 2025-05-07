@@ -3854,12 +3854,15 @@ class RaceStrategist extends GridRaceAssistant {
 			else
 				messageSend(kFileMessage, "Race Engineer", this.TeamSession ? "planDriverSwap" : "planPitstop:Now", engineerPID)
 
-		if this.Debug[kDebugStrategy]
+		if this.Debug[kDebugStrategy] {
+			DirCreate(kTempDirectory . "Race Strategist\Strategy")
+
 			FileAppend("Lap: " . (plannedLap ? plannedLap : "?") . "`n"
 					 . "Refuel: " . ((refuel != kUndefined) ? refuel : "?") . "`n"
 					 . "Tyre Change: " . ((tyreChange != kUndefined) ? (tyreChange ? "Yes" : "No") : "?") . "`n"
 					 . "Tyre Compound: " ((tyreCompound != kUndefined) ? compound(tyreCompound, tyreCompoundColor) : "?")
 					 , kTempDirectory . "Race Strategist\Strategy\Pitstop " . this.iDebugStrategyCounter[3]++ . ".pitstop", 1)
+		}
 	}
 
 	executePitstop(lapNumber) {
@@ -3995,8 +3998,16 @@ class RaceStrategist extends GridRaceAssistant {
 
 				plannedLap := knowledgeBase.getValue("Pitstop.Strategy.Lap", kUndefined)
 
-				if (plannedLap && (plannedLap != kUndefined))
+				if (plannedLap && (plannedLap != kUndefined)) {
+					if this.Debug[kDebugStrategy] {
+						DirCreate(kTempDirectory . "Race Strategist\Strategy")
+
+						FileAppend("Original Lap: " . plannedPitstopLap . "`nNew lap: " . plannedLap
+								 , kTempDirectory . "Race Strategist\Strategy\Pitstop " . this.iDebugStrategyCounter[3] . ".recommendation", 1)
+					}
+
 					plannedPitstopLap := plannedLap
+				}
 			}
 
 			knowledgeBase.clearFact("Strategy.Recalculate")

@@ -1473,7 +1473,9 @@ class RaceStrategist extends GridRaceAssistant {
 
 	loadStrategy(strategy, facts, lastLap := false, lastPitstop := false, lastPitstopLap := false) {
 		local pitstopWindow := (this.Settings ? getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Window.Considered", 3) : 3)
-		local fullCourseYellow, forcedPitstop, pitstop, count, ignore, pitstopLap, pitstopMaxLap, first, rootStrategy, pitstopDeviation
+		local fullCourseYellow, forcedPitstop, pitstop, count, ignore, pitstopLap, pitstopMaxLap, rootStrategy, pitstopDeviation, skip
+
+		facts.Delete("Strategy.Pitstop.Next")
 
 		if !strategy.HasProp("RunningPitstops")
 			strategy.RunningPitstops := 0
@@ -1512,19 +1514,19 @@ class RaceStrategist extends GridRaceAssistant {
 		count := 0
 
 		for ignore, pitstop in strategy.Pitstops {
+			skip := false
+
 			if !fullCourseYellow
 				if ((lastPitstop && (pitstop.Nr <= lastPitstop)) || (lastPitstopLap && (Abs(pitstop.Lap - lastPitstopLap) <= pitstopWindow))
 																 || (lastLap && (pitstop.Lap < lastLap)))
-					continue
+					skip := true
 
 			pitstopLap := pitstop.Lap
 
 			count += 1
 
-			if (count == 1) {
-				first := false
-
-				facts["Strategy.Pitstop.Next"] := 1
+			if (!skip && !facts.Has("Strategy.Pitstop.Next")) {
+				facts["Strategy.Pitstop.Next"] := count
 				facts["Strategy.Pitstop.Lap"] := pitstopLap
 
 				if isInstance(strategy, RaceStrategist.TrafficRaceStrategy)

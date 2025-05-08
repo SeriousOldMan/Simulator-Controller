@@ -177,7 +177,8 @@ class TyresDatabase extends SessionDatabase {
 		database := this.requireDatabase(simulator, car, track)
 
 		for ignore, condition in database.query("Tyres.Pressures.Distribution"
-											  , {By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]
+											  , {Group: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]
+											   , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]
 											   , Where: where})
 			conditions[values2String("|", condition["Weather"], condition["Temperature.Air"], condition["Temperature.Track"]
 										, condition["Compound"], condition["Compound.Color"])] := true
@@ -185,8 +186,9 @@ class TyresDatabase extends SessionDatabase {
 		if this.UseCommunity {
 			database := this.getTyresDatabase(simulator, car, track, "Community")
 
-			for ignore, condition in database.query("Tyres.Pressures", {Group: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]
-																	  , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]})
+			for ignore, condition in database.query("Tyres.Pressures.Distribution"
+												  , {Group: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]
+												   , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]})
 				conditions[values2String("|", condition["Weather"], condition["Temperature.Air"], condition["Temperature.Track"]
 										    , condition["Compound"], condition["Compound.Color"])] := true
 		}

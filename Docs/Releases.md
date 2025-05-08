@@ -12,6 +12,7 @@
   - Fixed an off by one error, when the Strategist informs the Engineer about the upcoming pitstop
   - Fixed a bug which allowed for alien tyre compounds for a given car / track combination, if these are defined in the "Rules" of "Race Settings"
   - Fixed handling of used tyre sets in rule-based strategies defined in the "Race Settings"
+  - Fixed handling of community tyre pressures in the "Session Database"
 
 #### Changes
 

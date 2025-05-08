@@ -1,5 +1,30 @@
 # Latest stable release
 
+## 6.3.1.0
+
+#### Date: 05/09/25
+
+#### Fixes
+
+  - Fixed validation of function call syntax in controller actions
+  - Fixed the handling of special characters in the API keys for REST/JSON services
+  - Fixed session length calculation for lap-based sessions with active rules set in "Race Settings"
+  - Fixed an off by one error, when the Strategist informs the Engineer about the upcoming pitstop
+  - Fixed a bug which allowed for alien tyre compounds for a given car / track combination, if these are defined in the "Rules" of "Race Settings"
+  - Fixed handling of used tyre sets in rule-based strategies defined in the "Race Settings"
+
+#### Changes
+
+  - Updated the handling of the master download mirror
+  - Updated and extended the tyre meta data for *Automobilista 2* (by @alejandrocq)
+  - [Internal] Extensive rework and refactoring in preparation for single tyre handling support
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.3.0.0
 
 #### Date: 05/02/25
@@ -24,26 +49,6 @@
   - [Internal] A specialized debugging mode for strategy handling by the Race Strategist can now be enabled in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#development-settings).
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-630), if you are experiencing problems with *rFactor 2* and *le Mans Ultimate*.
-
-# Upcoming release
-
-## 6.3.1.0
-
-#### Date: 05/09/25 (planned)
-
-#### Fixes
-
-  - Fixed validation of function call syntax in controller actions
-  - Fixed the handling of special characters in the API keys for REST/JSON services
-  - Fixed session length calculation for lap-based sessions with active rules set in "Race Settings"
-
-#### Changes
-
-  - Updated the handling of the master download mirror
-  - Updated and extended the tyre meta data for *Automobilista 2* (by @alejandrocq)
-  - Extensive internal reword and refactoring in preparation for single tyre handling support
-
-# Release history
 
 ## 6.2.9.0
 

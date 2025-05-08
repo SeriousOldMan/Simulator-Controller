@@ -1490,7 +1490,9 @@ class RaceStrategist extends GridRaceAssistant {
 
 	loadStrategy(strategy, facts, lastLap := false, lastPitstop := false, lastPitstopLap := false) {
 		local pitstopWindow := (this.Settings ? getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Window.Considered", 3) : 3)
-		local fullCourseYellow, forcedPitstop, pitstop, count, ignore, pitstopLap, pitstopMaxLap, first, rootStrategy, pitstopDeviation
+		local fullCourseYellow, forcedPitstop, pitstop, count, ignore, pitstopLap, pitstopMaxLap, rootStrategy, pitstopDeviation, skip
+
+		facts.Delete("Strategy.Pitstop.Next")
 
 		if !strategy.HasProp("RunningPitstops")
 			strategy.RunningPitstops := 0
@@ -1529,19 +1531,19 @@ class RaceStrategist extends GridRaceAssistant {
 		count := 0
 
 		for ignore, pitstop in strategy.Pitstops {
+			skip := false
+
 			if !fullCourseYellow
 				if ((lastPitstop && (pitstop.Nr <= lastPitstop)) || (lastPitstopLap && (Abs(pitstop.Lap - lastPitstopLap) <= pitstopWindow))
 																 || (lastLap && (pitstop.Lap < lastLap)))
-					continue
+					skip := true
 
 			pitstopLap := pitstop.Lap
 
 			count += 1
 
-			if (count == 1) {
-				first := false
-
-				facts["Strategy.Pitstop.Next"] := 1
+			if (!skip && !facts.Has("Strategy.Pitstop.Next")) {
+				facts["Strategy.Pitstop.Next"] := count
 				facts["Strategy.Pitstop.Lap"] := pitstopLap
 
 				if isInstance(strategy, RaceStrategist.TrafficRaceStrategy)
@@ -3001,7 +3003,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 	getPitstopRules(&validator, &pitstopRule, &pitstopWindow, &refuelRule, &tyreChangeRule, &tyreSets) {
 		local strategy := this.Strategy
-		local ignore, tyreSetLaps
+		local ignore, tyreSetLaps, tyreCompounds
 
 		if strategy {
 			validator := strategy.Validator
@@ -3027,13 +3029,16 @@ class RaceStrategist extends GridRaceAssistant {
 			refuelRule := getMultiMapValue(this.Settings, "Session Rules", "Pitstop.Refuel", "Optional")
 			tyreChangeRule := getMultiMapValue(this.Settings, "Session Rules", "Pitstop.Tyre", "Optional")
 
+			tyreCompounds := SessionDatabase.getTyreCompounds(this.Simulator, this.Car, this.Track)
 			tyreSets := string2Values(";", getMultiMapValue(this.Settings, "Session Rules", "Tyre.Sets", ""))
 
 			loop tyreSets.Length
 				if InStr(tyreSets[A_Index], ":") {
 					tyreSets[A_Index] := string2Values(":", tyreSets[A_Index])
 
-					if (tyreSets[A_Index].Length < 4) {
+					if !inList(tyreCompounds, compound(tyreSets[A_Index][1], tyreSets[A_Index][2]))
+						tyreSets[A_Index] := false
+					else if (tyreSets[A_Index].Length < 4) {
 						tyreSets[A_Index].Push(50)
 
 						tyreSetLaps := []
@@ -3052,7 +3057,9 @@ class RaceStrategist extends GridRaceAssistant {
 				else {
 					tyreSets[A_Index] := string2Values("#", tyreSets[A_Index])
 
-					if (tyreSets[A_Index].Length < 5) {
+					if !inList(tyreCompounds, compound(tyreSets[A_Index][1], tyreSets[A_Index][2]))
+						tyreSets[A_Index] := false
+					else if (tyreSets[A_Index].Length < 5) {
 						tyreSetsLaps := []
 
 						loop tyreSets[A_Index][3]
@@ -3063,6 +3070,8 @@ class RaceStrategist extends GridRaceAssistant {
 					else
 						tyreSets[A_Index][5] := string2Values("|", tyreSets[A_Index][5])
 				}
+
+			tyreSets := choose(tyreSets, (ts) => (ts != false))
 
 			if (pitstopRule > 0)
 				pitstopRule := Max(0, pitstopRule - Task.CurrentTask.Pitstops.Length)
@@ -3105,8 +3114,8 @@ class RaceStrategist extends GridRaceAssistant {
 		for ignore, tyreSet in usedTyreSets {
 			tyreCompound := compound(tyreSet.Compound, tyreSet.CompoundColor)
 
-			if (availableTyreSets.Has(tyreCompound) && availableTyreSets[tyreCompound].Has(tyreSet.Set))
-				availableTyreSets[tyreCompound][tyreSet.Set] += tyreSet.Laps
+			if (availableTyreSets.Has(tyreCompound) && availableTyreSets[tyreCompound][2].Has(tyreSet.Set))
+				availableTyreSets[tyreCompound][2][tyreSet.Set] += tyreSet.Laps
 		}
 
 		/*
@@ -3901,7 +3910,7 @@ class RaceStrategist extends GridRaceAssistant {
 					 . "Refuel: " . ((refuel != kUndefined) ? refuel : "?") . "`n"
 					 . "Tyre Change: " . ((tyreChange != kUndefined) ? (tyreChange ? "Yes" : "No") : "?") . "`n"
 					 . "Tyre Compound: " ((tyreCompound != kUndefined) ? compound(tyreCompound, tyreCompoundColor) : "?")
-					 , kTempDirectory . "Race Strategist\Strategy\Pitstop " . this.iDebugStrategyCounter[3]++ . ".pitstop", 1)
+					 , kTempDirectory . "Race Strategist\Strategy\Pitstop " . this.iDebugStrategyCounter[3]++ . ".pitstop")
 		}
 	}
 
@@ -4043,7 +4052,7 @@ class RaceStrategist extends GridRaceAssistant {
 						DirCreate(kTempDirectory . "Race Strategist\Strategy")
 
 						FileAppend("Original Lap: " . plannedPitstopLap . "`nNew lap: " . plannedLap
-								 , kTempDirectory . "Race Strategist\Strategy\Pitstop " . this.iDebugStrategyCounter[3] . ".recommendation", 1)
+								 , kTempDirectory . "Race Strategist\Strategy\Pitstop " . this.iDebugStrategyCounter[3] . ".recommendation")
 					}
 
 					plannedPitstopLap := plannedLap

@@ -1321,9 +1321,9 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		this.RequestedTyreCompounds := false
 
 		if (this.supportsPitstop( , &tyreService) && tyreService) {
-			if InStr(tyreCompound, ";") {
-				tyreCompound := string2Values(";", tyreCompound)
-				tyreCompoundColor := string2Values(";", tyreCompoundColor)
+			if InStr(tyreCompound, ",") {
+				tyreCompound := string2Values(",", tyreCompound)
+				tyreCompoundColor := string2Values(",", tyreCompoundColor)
 			}
 			else if (tyreService = "Wheel") {
 				tyreCompound := [tyreCompound, tyreCompound, tyreCompound, tyreCompound]

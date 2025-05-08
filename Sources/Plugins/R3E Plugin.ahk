@@ -575,9 +575,9 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		super.setPitstopTyreCompound(pitstopNumber, compound, compoundColor, set)
 
 		if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey != "Off")) {
-			if InStr(compound, ";") {
-				compound := string2Values(";", compound)
-				compoundColor := string2Values(";", compoundColor)
+			if InStr(compound, ",") {
+				compound := string2Values(",", compound)
+				compoundColor := string2Values(",", compoundColor)
 			}
 			else {
 				compound := [compound, compound]

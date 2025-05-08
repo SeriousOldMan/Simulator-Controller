@@ -26,7 +26,7 @@ class IRCProvider extends SimulatorProvider {
 	supportsPitstop(&refuelService?, &tyreService?, &repairService?) {
 		refuelService := true
 		tyreService := "Wheel"
-		repairService := true
+		repairService := ["Bodywork", "Suspension", "Engine"]
 
 		return true
 	}

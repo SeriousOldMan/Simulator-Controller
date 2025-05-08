@@ -373,9 +373,9 @@ class RF2Plugin extends Sector397Plugin {
 		super.setPitstopTyreCompound(pitstopNumber, compound, compoundColor, set)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			if InStr(compound, ";") {
-				compound := string2Values(";", compound)
-				compoundColor := string2Values(";", compoundColor)
+			if InStr(compound, ",") {
+				compound := string2Values(",", compound)
+				compoundColor := string2Values(",", compoundColor)
 			}
 			else {
 				compound := [compound, compound]

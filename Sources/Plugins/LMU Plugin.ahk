@@ -462,9 +462,9 @@ class LMUPlugin extends Sector397Plugin {
 		super.setPitstopTyreCompound(pitstopNumber, tyreCompound, tyreCompoundColor, set)
 
 		if (this.OpenPitstopMFDHotkey != "Off")
-			if InStr(tyreCompound, ";") {
-				tyreCompound := string2Values(";", tyreCompound)
-				tyreCompoundColor := string2Values(";", tyreCompoundColor)
+			if InStr(tyreCompound, ",") {
+				tyreCompound := string2Values(",", tyreCompound)
+				tyreCompoundColor := string2Values(",", tyreCompoundColor)
 
 				for index, tyre in ["Front Left", "Front Right", "Rear Left", "Rear Right"]
 					this.setPitstopOption("Tyre Compound " . tyre

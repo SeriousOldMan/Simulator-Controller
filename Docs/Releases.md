@@ -38,6 +38,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - Fixed session length calculation for lap-based sessions with active rules set in "Race Settings"
   - Fixed an off by one error, when the Strategist informs the Engineer about the upcoming pitstop
   - Fixed a bug which allowed for alien tyre compounds for a given car / track combination, if these are defined in the "Rules" of "Race Settings"
+  - Fixed handling of used tyre sets in rule-based strategies defined in the "Race Settings"
 
 #### Changes
 

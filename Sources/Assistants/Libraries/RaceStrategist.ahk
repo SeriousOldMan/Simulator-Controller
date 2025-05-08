@@ -3074,8 +3074,8 @@ class RaceStrategist extends GridRaceAssistant {
 		for ignore, tyreSet in usedTyreSets {
 			tyreCompound := compound(tyreSet.Compound, tyreSet.CompoundColor)
 
-			if (availableTyreSets.Has(tyreCompound) && availableTyreSets[tyreCompound].Has(tyreSet.Set))
-				availableTyreSets[tyreCompound][tyreSet.Set] += tyreSet.Laps
+			if (availableTyreSets.Has(tyreCompound) && availableTyreSets[tyreCompound][2].Has(tyreSet.Set))
+				availableTyreSets[tyreCompound][2][tyreSet.Set] += tyreSet.Laps
 		}
 
 		/*

@@ -98,7 +98,7 @@ class SimulatorProvider {
 	supportsPitstop(&refuelService?, &tyreService?, &repairService?) {
 		refuelService := false
 		tyreService := false
-		repairService := false
+		repairService := []
 
 		return false
 	}

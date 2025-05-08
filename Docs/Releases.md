@@ -37,12 +37,13 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - Fixed the handling of special characters in the API keys for REST/JSON services
   - Fixed session length calculation for lap-based sessions with active rules set in "Race Settings"
   - Fixed an off by one error, when the Strategist informs the Engineer about the upcoming pitstop
+  - Fixed a bug which allowed for alien tyre compounds for a given car / track combination, if these are defined in the "Rules" of "Race Settings"
 
 #### Changes
 
   - Updated the handling of the master download mirror
   - Updated and extended the tyre meta data for *Automobilista 2* (by @alejandrocq)
-  - Extensive internal reword and refactoring in preparation for single tyre handling support
+  - [Internal] Extensive rework and refactoring in preparation for single tyre handling support
 
 # Release history
 

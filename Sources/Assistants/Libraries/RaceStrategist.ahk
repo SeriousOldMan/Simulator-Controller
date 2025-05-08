@@ -2963,7 +2963,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 	getPitstopRules(&validator, &pitstopRule, &pitstopWindow, &refuelRule, &tyreChangeRule, &tyreSets) {
 		local strategy := this.Strategy
-		local ignore, tyreSetLaps
+		local ignore, tyreSetLaps, tyreCompounds
 
 		if strategy {
 			validator := strategy.Validator
@@ -2989,13 +2989,16 @@ class RaceStrategist extends GridRaceAssistant {
 			refuelRule := getMultiMapValue(this.Settings, "Session Rules", "Pitstop.Refuel", "Optional")
 			tyreChangeRule := getMultiMapValue(this.Settings, "Session Rules", "Pitstop.Tyre", "Optional")
 
+			tyreCompounds := SessionDatabase.getTyreCompounds(this.Simulator, this.Car, this.Track)
 			tyreSets := string2Values(";", getMultiMapValue(this.Settings, "Session Rules", "Tyre.Sets", ""))
 
 			loop tyreSets.Length
 				if InStr(tyreSets[A_Index], ":") {
 					tyreSets[A_Index] := string2Values(":", tyreSets[A_Index])
 
-					if (tyreSets[A_Index].Length < 4) {
+					if !inList(tyreCompounds, compound(tyreSets[A_Index][1], tyreSets[A_Index][2]))
+						tyreSets[A_Index] := false
+					else if (tyreSets[A_Index].Length < 4) {
 						tyreSets[A_Index].Push(50)
 
 						tyreSetLaps := []
@@ -3014,7 +3017,9 @@ class RaceStrategist extends GridRaceAssistant {
 				else {
 					tyreSets[A_Index] := string2Values("#", tyreSets[A_Index])
 
-					if (tyreSets[A_Index].Length < 5) {
+					if !inList(tyreCompounds, compound(tyreSets[A_Index][1], tyreSets[A_Index][2]))
+						tyreSets[A_Index] := false
+					else if (tyreSets[A_Index].Length < 5) {
 						tyreSetsLaps := []
 
 						loop tyreSets[A_Index][3]
@@ -3025,6 +3030,8 @@ class RaceStrategist extends GridRaceAssistant {
 					else
 						tyreSets[A_Index][5] := string2Values("|", tyreSets[A_Index][5])
 				}
+
+			tyreSets := choose(tyreSets, (ts) => (ts != false))
 
 			if (pitstopRule > 0)
 				pitstopRule := Max(0, pitstopRule - Task.CurrentTask.Pitstops.Length)

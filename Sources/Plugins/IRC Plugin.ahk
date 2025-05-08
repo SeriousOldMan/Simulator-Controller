@@ -315,9 +315,9 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 		super.setPitstopTyreCompound(pitstopNumber, compound, compoundColor, set)
 
 		if this.requirePitstopMFD("Tyre") {
-			if InStr(compound, ";") {
-				compound := string2Values(";", compound)
-				compoundColor := string2Values(";", compoundColor)
+			if InStr(compound, ",") {
+				compound := string2Values(",", compound)
+				compoundColor := string2Values(",", compoundColor)
 			}
 			else {
 				compound := [compound, compound, compound, compound]

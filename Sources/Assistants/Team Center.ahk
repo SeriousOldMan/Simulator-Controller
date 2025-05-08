@@ -6167,8 +6167,8 @@ class TeamCenter extends ConfigurationItem {
 					if (tyreSet && (tyreSet != lastTyreSet)) {
 						tyreCompound := compound(tyreCompound, tyreCompoundColor)
 
-						if (availableTyreSets.Has(tyreCompound) && availableTyreSets[tyreCompound].Has(tyreSet))
-							availableTyreSets[tyreCompound][tyreSet] += this.Stints[A_Index].Laps.Length
+						if (availableTyreSets.Has(tyreCompound) && availableTyreSets[tyreCompound][2].Has(tyreSet))
+							availableTyreSets[tyreCompound][2][tyreSet] += this.Stints[A_Index].Laps.Length
 					}
 
 					lastTyreSet := tyreSet

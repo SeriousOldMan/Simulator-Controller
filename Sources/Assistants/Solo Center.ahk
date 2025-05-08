@@ -3734,9 +3734,11 @@ class SoloCenter extends ConfigurationItem {
 		local tyresTable := this.LapsDatabase.Database.Tables["Tyres"]
 		local driver := lap.Run.Driver
 		local telemetry, telemetryData, pressuresData, temperaturesData, wearData, recentLap, tyreLaps
-		local newRun, oldRun, driverID, baseLap, lastLap
+		local newRun, oldRun, driverID, baseLap, lastLap, tyreCompound, tyreCompoundColor, mixedCompounds
 
 		this.initializeSimulator(simulator, car, track)
+
+		this.Provider.supportsTyreManagement(&mixedCompounds)
 
 		driverID := ((driver != "-") ? driver.ID : SessionDatabase.ID)
 
@@ -3773,6 +3775,26 @@ class SoloCenter extends ConfigurationItem {
 				tyreLaps := (recentLap.Run.TyreLaps + (recentLap.Nr - recentLap.Run.Lap) + 2)
 				telemetry := lap.Data
 
+				tyreCompound := getMultiMapValue(telemetry, "Car Data", "TyreCompound", "Dry")
+				tyreCompoundColor := getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor", "Black")
+
+				if (mixedCompounds = "Wheel") {
+					tyreCompound
+						:= values2String(",", collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
+													, (tyre) => getMultiMapValue(telemetry, "Car Data", "TyreCompound" . tyre, tyreCompound))*)
+					tyreCompoundColor
+						:= values2String(",", collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
+													, (tyre) => getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor" . tyre, tyreCompoundColor))*)
+				}
+				else if (mixedCompounds = "Axle") {
+					tyreCompound
+						:= values2String(",", collect(["Front", "Rear"]
+													, (tyre) => getMultiMapValue(telemetry, "Car Data", "TyreCompound" . tyre, tyreCompound))*)
+					tyreCompoundColor
+						:= values2String(",", collect(["Front", "Rear"]
+													, (tyre) => getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor" . tyre, tyreCompoundColor))*)
+				}
+
 				telemetryData := [simulator, car, track
 								, getMultiMapValue(telemetry, "Weather Data", "Weather", "Dry")
 								, getMultiMapValue(telemetry, "Weather Data", "Temperature", 23)
@@ -3784,8 +3806,7 @@ class SoloCenter extends ConfigurationItem {
 								, getMultiMapValue(telemetry, "Car Data", "Map", "n/a")
 								, getMultiMapValue(telemetry, "Car Data", "TC", "n/a")
 								, getMultiMapValue(telemetry, "Car Data", "ABS", "n/a")
-								, getMultiMapValue(telemetry, "Car Data", "TyreCompound", "Dry")
-								, getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor", "Black")
+								, tyreCompound, tyreCompoundColor
 								, tyreLaps
 								, getMultiMapValue(telemetry, "Car Data", "TyrePressure", "-,-,-,-")
 								, getMultiMapValue(telemetry, "Car Data", "TyreTemperature", "-,-,-,-")
@@ -3860,10 +3881,14 @@ class SoloCenter extends ConfigurationItem {
 		local pressuresDB := this.PressuresDatabase
 		local pressuresTable := pressuresDB.Database.Tables["Tyres.Pressures"]
 		local driverID := lap.Run.Driver.ID
-		local pressures, pressuresData, lastLap, baseLap
+		local pressures, pressuresData, lastLap, baseLap, tyreCompound, tyreCompoundColor, mixedCompounds
+
+		this.initializeSimulator(simulator, car, track)
 
 		lastLap := (lap.Nr - 1)
 		baseLap := pressuresTable.Length
+
+		this.Provider.supportsTyreManagement(&mixedCompounds)
 
 		loop (lastLap - baseLap) {
 			recentLap := (baseLap + A_Index)
@@ -3873,12 +3898,31 @@ class SoloCenter extends ConfigurationItem {
 
 				pressures := this.Laps[recentLap].Data
 
+				tyreCompound := getMultiMapValue(pressures, "Car Data", "TyreCompound", "Dry")
+				tyreCompoundColor := getMultiMapValue(pressures, "Car Data", "TyreCompoundColor", "Black")
+
+				if (mixedCompounds = "Wheel") {
+					tyreCompound
+						:= values2String(",", collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
+													, (tyre) => getMultiMapValue(pressures, "Car Data", "TyreCompound" . tyre, tyreCompound))*)
+					tyreCompoundColor
+						:= values2String(",", collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
+													, (tyre) => getMultiMapValue(pressures, "Car Data", "TyreCompoundColor" . tyre, tyreCompoundColor))*)
+				}
+				else if (mixedCompounds = "Axle") {
+					tyreCompound
+						:= values2String(",", collect(["Front", "Rear"]
+													, (tyre) => getMultiMapValue(pressures, "Car Data", "TyreCompound" . tyre, tyreCompound))*)
+					tyreCompoundColor
+						:= values2String(",", collect(["Front", "Rear"]
+													, (tyre) => getMultiMapValue(pressures, "Car Data", "TyreCompoundColor" . tyre, tyreCompoundColor))*)
+				}
+
 				pressuresData := [simulator, car, track
 								, getMultiMapValue(pressures, "Weather Data", "Weather", "Dry")
 								, getMultiMapValue(pressures, "Weather Data", "Temperature", 23)
 								, getMultiMapValue(pressures, "Track Data", "Temperature", 27)
-								, getMultiMapValue(pressures, "Car Data", "TyreCompound", "Dry")
-								, getMultiMapValue(pressures, "Car Data", "TyreCompoundColor", "Black")
+								, tyreCompound, tyreCompoundColor
 								, "-,-,-,-"
 								, getMultiMapValue(pressures, "Car Data", "TyrePressure", "-,-,-,-")
 								, "null,null,null,null"]

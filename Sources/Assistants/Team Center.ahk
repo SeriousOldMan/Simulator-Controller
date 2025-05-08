@@ -7789,6 +7789,7 @@ class TeamCenter extends ConfigurationItem {
 		local lastLap, tyresTable, ignore, pressureData, pressureFL, pressureFR, pressureRL, pressureRR, tyres
 		local row, session, pressuresDB, message, newData, lap, flush, driverID, row
 		local lapPressures, coldPressures, hotPressures, pressuresLosses, pressuresTable, pressures, pressure
+		local tyreCompound, tyreCompoundColor, mixedCompounds
 
 		static fails := 0
 
@@ -7848,6 +7849,8 @@ class TeamCenter extends ConfigurationItem {
 			pressuresDB := this.PressuresDatabase
 			lastLap := this.LastLap
 
+			this.Provider.supportsTyreManagement(&mixedCompounds)
+
 			if lastLap
 				lastLap := lastLap.Nr
 			else
@@ -7903,14 +7906,33 @@ class TeamCenter extends ConfigurationItem {
 					if (this.Laps.Has(lap) && this.Laps[lap].HasOwnProp("Telemetry")) {
 						telemetry := parseMultiMap(this.Laps[lap].Telemetry)
 
+						tyreCompound := getMultiMapValue(telemetry, "Car Data", "TyreCompound", "Dry")
+						tyreCompoundColor := getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor", "Black")
+
+						if (mixedCompounds = "Wheel") {
+							tyreCompound
+								:= values2String(",", collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
+															, (tyre) => getMultiMapValue(telemetry, "Car Data", "TyreCompound" . tyre, tyreCompound))*)
+							tyreCompoundColor
+								:= values2String(",", collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
+															, (tyre) => getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor" . tyre, tyreCompoundColor))*)
+						}
+						else if (mixedCompounds = "Axle") {
+							tyreCompound
+								:= values2String(",", collect(["Front", "Rear"]
+															, (tyre) => getMultiMapValue(telemetry, "Car Data", "TyreCompound" . tyre, tyreCompound))*)
+							tyreCompoundColor
+								:= values2String(",", collect(["Front", "Rear"]
+															, (tyre) => getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor" . tyre, tyreCompoundColor))*)
+						}
+
 						lapPressures := values2String(";", this.Simulator ? this.Simulator : "-"
 														 , this.Car ? this.Car : "-"
 														 , this.Track ? this.Track : "-"
 														 , getMultiMapValue(telemetry, "Weather Data", "Weather", "Dry")
 														 , getMultiMapValue(telemetry, "Weather Data", "Temperature", 23)
 														 , getMultiMapValue(telemetry, "Track Data", "Temperature", 27)
-														 , getMultiMapValue(telemetry, "Car Data", "TyreCompound", "Dry")
-														 , getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor", "Black")
+														 , tyreCompound, tyreCompoundColor
 														 , "-,-,-,-"
 														 , getMultiMapValue(telemetry, "Car Data", "TyrePressure", ",,,")
 														 , "-,-,-,-")

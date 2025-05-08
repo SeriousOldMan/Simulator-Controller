@@ -970,7 +970,7 @@ updatePitstopTime() <= computePitstopDamages(?damages),
 					   Set(Pitstop.Planned.Time.Service, ?pitstopServiceTime), Set(Pitstop.Planned.Time.Repairs, ?pitstopRepairTime)
 
 computePitstopDamages(?damages) <=
-		computeDamages([!Pitstop.Planned.Repair.Bodywork, !Pitstop.Planned.Repair.Suspension, Pitstop.Planned.Repair.Engine],
+		computeDamages([!Pitstop.Planned.Repair.Bodywork, !Pitstop.Planned.Repair.Suspension, !Pitstop.Planned.Repair.Engine],
 					   [!Damage.Bodywork, !Damage.Suspension, !Damage.Engine], ?damages)
 
 priority: -20, [?Pitstop.Plan] => (Set: Pitstop.Planned), (Clear: Pitstop.Plan),

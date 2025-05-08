@@ -187,8 +187,17 @@ class TyresDatabase extends SessionDatabase {
 
 			for ignore, condition in database.query("Tyres.Pressures", {Group: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]
 																	  , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]})
-				conditions[values2String("|", condition["Weather"], condition["Temperature.Air"], condition["Temperature.Track"]
-										    , condition["Compound"], condition["Compound.Color"])] := true
+				if InStr(condition["Compound"], ",") {
+					compound := string2Values(",", condition["Compound"])
+					color := string2Values(",", condition["Compound.Color"])
+
+					loop compound.Length
+						conditions[values2String("|", condition["Weather"], condition["Temperature.Air"], condition["Temperature.Track"]
+													, compound[A_Index], color[A_Index])] := true
+				}
+				else
+					conditions[values2String("|", condition["Weather"], condition["Temperature.Air"], condition["Temperature.Track"]
+												, condition["Compound"], condition["Compound.Color"])] := true
 		}
 
 		result := []
@@ -423,7 +432,7 @@ class TyresDatabase extends SessionDatabase {
 
 	updatePressures(simulator, car, track, weather, airTemperature, trackTemperature
 				  , compound, compoundColor, coldPressures, hotPressures, flush := true, driver := false, retry := 100) {
-		local db, tyres, types, typeIndex, tPressures, tyreIndex, pressure
+		local db, tyres, types, typeIndex, tPressures, tyreIndex, pressure, compounds, compoundColors
 
 		if !driver
 			driver := this.ID
@@ -450,10 +459,28 @@ class TyresDatabase extends SessionDatabase {
 			tyres := ["FL", "FR", "RL", "RR"]
 			types := ["Cold", "Hot"]
 
-			for typeIndex, tPressures in [coldPressures, hotPressures]
-				for tyreIndex, pressure in tPressures
-					this.updatePressure(simulator, car, track, weather, Round(airTemperature), Round(trackTemperature), compound, compoundColor
-									  , types[typeIndex], tyres[tyreIndex], pressure, 1, false, false, "User", driver, retry)
+			if InStr(compound, ",") {
+				compounds := string2Values(",", compound)
+				compoundColors := string2Values(",", compoundColor)
+
+				if (compounds.Length = 2) {
+					compounds.InsertAt(1, compounds[1])
+					compoundColors.InsertAt(1, compoundColors[1])
+					compounds.Push(compounds[3])
+					compoundColors.Push(compoundColors[3])
+				}
+
+				for typeIndex, tPressures in [coldPressures, hotPressures]
+					for tyreIndex, pressure in tPressures
+						this.updatePressure(simulator, car, track, weather, Round(airTemperature), Round(trackTemperature)
+										  , compounds[tyreIndex], compoundColors[tyreIndex]
+										  , types[typeIndex], tyres[tyreIndex], pressure, 1, false, false, "User", driver, retry)
+			}
+			else
+				for typeIndex, tPressures in [coldPressures, hotPressures]
+					for tyreIndex, pressure in tPressures
+						this.updatePressure(simulator, car, track, weather, Round(airTemperature), Round(trackTemperature), compound, compoundColor
+										  , types[typeIndex], tyres[tyreIndex], pressure, 1, false, false, "User", driver, retry)
 		}
 		catch Any as exception {
 			if retry

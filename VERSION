@@ -1,9 +1,9 @@
 [Development]
-Version=6.3.1.0-release
-Target=6.3.1.0-release
+Version=6.3.2.0-dev
+Target=6.3.2.0-release
 Date=05/09/2025
-Download=https://cutt.ly/urlYb22f;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/_JPh8jyw;https://www.dropbox.com/scl/fi/eo1o5mamtfv35azbjqkzs/Simulator-Controller-6.3.1.0-release.zip?rlkey=vssa0wv1gggj1ow16xth34262&st=gy3cd4s3&dl=1;http://87.178.12.140:800/api/public/dl/3Ix3Musi;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.3.1.0-release.zip
-Changes=Fixed validation of function names in controller actions, Fixed handling of REST API Keys, First part of individual tyre handling by the Engineer, Tyre meta data update for Automobilista 2, Update of download mirrors, Fixed session length calculation for lap-based sessions with active rules, Fixed an off by one error for pitstop handling, Fixed tyre set handling in rule-based strategies
+Download=
+Changes=Optimized handling of restricted tyre sets in strategy simulation, Active handling of individual tyre compounds in many parts of Simulator Controller
 Components=Media->5.6.1,Configuration->6.3.1,Utilities->6.3.0
 [Release]
 Version=6.3.1.0-release
@@ -22,7 +22,7 @@ Utilities.6.3.0.Path=.
 Utilities.6.3.0.Content=Utilities
 Utilities.6.3.0.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/BCbe0uKY;https://www.dropbox.com/scl/fi/uauxhuyecnwmgft3w6roj/Utilities-6.3.0.zip?rlkey=1luua85df5q5w88hcxxza0lsr&st=e8f4bqgz&dl=1;http://%master%:800/api/public/dl/cAzNQ6G_;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.3.0.zip
 [Current]
-Type=Release
+Type=Development
 [Version]
-Development=6.3.1.0-release
+Development=6.3.2.0-dev
 Release=6.3.1.0-release

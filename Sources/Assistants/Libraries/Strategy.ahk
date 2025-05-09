@@ -3831,6 +3831,9 @@ class Strategy extends ConfigurationItem {
 
 			forcedTyreCompound := false
 
+			if lastPitstop
+				this.consumeTyreSet(lastPitstop.TyreCompound, lastPitstop.TyreCompoundColor, lastPitstop.TyreSet, lastPitstop.StintLaps)
+
 			if adjustments {
 				if (adjustments.Has(pitstopNr) && adjustments[pitstopNr].HasProp("TyreChange")) {
 					tyreChange := adjustments[pitstopNr].TyreChange
@@ -3935,8 +3938,6 @@ class Strategy extends ConfigurationItem {
 
 				if (pitstopNr = 1)
 					this.consumeTyreSet(this.TyreCompound, this.TyreCompoundColor, this.TyreSet, pitstop.Lap)
-				else if lastPitstop
-					this.consumeTyreSet(lastPitstop.TyreCompound, lastPitstop.TyreCompoundColor, lastPitstop.TyreSet, lastPitstop.StintLaps)
 
 				if (pitstop.TyreChange && !pitstop.TyreSet) {
 					newTyreSet := this.availableTyreSet(pitstop.TyreCompound, pitstop.TyreCompoundColor

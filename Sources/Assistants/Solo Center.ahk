@@ -175,6 +175,8 @@ class SoloCenter extends ConfigurationItem {
 	iAirTemperature := 23
 	iTrackTemperature := 27
 
+	iProvider := false
+
 	iRunning := Map()
 
 	iAvailableTyreCompounds := [normalizeCompound("Dry")]
@@ -843,6 +845,15 @@ class SoloCenter extends ConfigurationItem {
 	Track {
 		Get {
 			return this.iTrack
+		}
+	}
+
+	Provider {
+		Get {
+			if !this.iProvider
+				this.iProvider := this.createSimulatorProvider()
+
+			return this.iProvider
 		}
 	}
 
@@ -1859,6 +1870,13 @@ class SoloCenter extends ConfigurationItem {
 		this.updateState()
 	}
 
+	createSimulatorProvider() {
+		if (this.Simulator && this.Car && this.Track)
+			return SimulatorProvider.createSimulatorProvider(this.Simulator, this.Car, this.Track)
+		else
+			return false
+	}
+
 	openTelemetryViewer() {
 		if this.TelemetryViewer
 			WinActivate(this.TelemetryViewer.Window)
@@ -2870,6 +2888,8 @@ class SoloCenter extends ConfigurationItem {
 			this.iCar := car
 			this.iTrack := track
 
+			this.iProvider := false
+
 			if (this.Simulator = "") {
 				this.iSimulator := false
 				this.iCar := false
@@ -3819,7 +3839,7 @@ class SoloCenter extends ConfigurationItem {
 				recentLap.TelemetryData := values2String("|||", telemetryData*)
 
 				lapsDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6]
-										, telemetryData[14], telemetryData[15]
+										, string2Values(",", telemetryData[14])[1], string2Values(",", telemetryData[15])[1]
 										, telemetryData[11], telemetryData[12], telemetryData[13]
 										, kNull, telemetryData[8], telemetryData[9], driverID)
 
@@ -3828,7 +3848,7 @@ class SoloCenter extends ConfigurationItem {
 				wearData := collect(string2Values(",", telemetryData[18]), null)
 
 				lapsDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]
-								  , telemetryData[14], telemetryData[15], tyreLaps
+								  , string2Values(",", telemetryData[14])[1], string2Values(",", telemetryData[15])[1], tyreLaps
 								  , pressuresData[1], pressuresData[2], pressuresData[3], pressuresData[4]
 								  , temperaturesData[1], temperaturesData[2], temperaturesData[3], temperaturesData[4]
 								  , wearData[1], wearData[2], wearData[3], wearData[4], kNull, telemetryData[8], telemetryData[9]
@@ -3847,7 +3867,8 @@ class SoloCenter extends ConfigurationItem {
 												, compound, compoundColor, tyreLaps, pressures, temperatures, wear, state
 												, waterTemperature, oilTemperature)
 
-		lapsDB.addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor
+		lapsDB.addElectronicEntry(weather, airTemperature, trackTemperature
+								, string2Values(",", compound)[1], string2Values(",", compoundColor)[1]
 								, map, tc, abs, fuelConsumption, fuelRemaining, lapTime
 								, driverID)
 
@@ -3855,7 +3876,8 @@ class SoloCenter extends ConfigurationItem {
 		temperatures := collect(string2Values(",", temperatures), null)
 		wear := collect(string2Values(",", wear), null)
 
-		lapsDB.addTyreEntry(weather, airTemperature, trackTemperature, compound, compoundColor, tyreLaps
+		lapsDB.addTyreEntry(weather, airTemperature, trackTemperature
+						  , string2Values(",", compound)[1], string2Values(",", compoundColor)[1], tyreLaps
 						  , pressures[1], pressures[2], pressures[3], pressures[4]
 						  , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
 						  , wear[1], wear[2], wear[3], wear[4], fuelConsumption, fuelRemaining, lapTime
@@ -4146,7 +4168,8 @@ class SoloCenter extends ConfigurationItem {
 							else
 								telemetryData := string2Values("---", lap.TelemetryData)
 
-							lapsDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
+							lapsDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6]
+													, string2Values(",", telemetryData[14])[1], string2Values(",", telemetryData[15])[1]
 													, telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9]
 													, driver)
 
@@ -4155,7 +4178,7 @@ class SoloCenter extends ConfigurationItem {
 							wear := string2Values(",", telemetryData[19])
 
 							lapsDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]
-											  , telemetryData[14], telemetryData[15], telemetryData[16]
+											  , string2Values(",", telemetryData[14])[1], string2Values(",", telemetryData[15])[1], telemetryData[16]
 											  , pressures[1], pressures[2], pressures[3], pressures[4]
 											  , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
 											  , wear[1], wear[2], wear[3], wear[4]

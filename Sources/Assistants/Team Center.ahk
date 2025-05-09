@@ -7598,6 +7598,7 @@ class TeamCenter extends ConfigurationItem {
 		local tyreChange := true
 		local newData, message, session, lapsDB, tyresTable, lap, theLap, runningLap, driverID, telemetry
 		local telemetryData, pressures, temperatures, wear, lapPressures, pressure, driver, row
+		local tyreCompound, tyreCompoundColor, mixedCompounds
 
 		wasPitstop(lap, &tyreChange := false) {
 			local fuel, tyreCompounds, tyreCompoundColors, tyreSet, tyrePressures
@@ -7624,6 +7625,8 @@ class TeamCenter extends ConfigurationItem {
 		static fails := 0
 
 		newData := false
+
+		this.Provider.supportsTyreManagement(&mixedCompounds)
 
 		if !load {
 			message := (translate("Syncing telemetry data (Lap: ") . lastLap . translate(")"))
@@ -7684,6 +7687,26 @@ class TeamCenter extends ConfigurationItem {
 					if (this.Laps.Has(lap) && this.Laps[lap].HasOwnProp("Telemetry")) {
 						telemetry := parseMultiMap(this.Laps[lap].Telemetry)
 
+						tyreCompound := getMultiMapValue(telemetry, "Car Data", "TyreCompound", "Dry")
+						tyreCompoundColor := getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor", "Black")
+
+						if (mixedCompounds = "Wheel") {
+							tyreCompound
+								:= values2String(",", collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
+															, (tyre) => getMultiMapValue(telemetry, "Car Data", "TyreCompound" . tyre, tyreCompound))*)
+							tyreCompoundColor
+								:= values2String(",", collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
+															, (tyre) => getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor" . tyre, tyreCompoundColor))*)
+						}
+						else if (mixedCompounds = "Axle") {
+							tyreCompound
+								:= values2String(",", collect(["Front", "Rear"]
+															, (tyre) => getMultiMapValue(telemetry, "Car Data", "TyreCompound" . tyre, tyreCompound))*)
+							tyreCompoundColor
+								:= values2String(",", collect(["Front", "Rear"]
+															, (tyre) => getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor" . tyre, tyreCompoundColor))*)
+						}
+
 						telemetryData := values2String(";", this.Simulator ? this.Simulator : "-"
 														  , this.Car ? this.Car : "-"
 														  , this.Track ? this.Track : "-"
@@ -7697,8 +7720,7 @@ class TeamCenter extends ConfigurationItem {
 														  , getMultiMapValue(telemetry, "Car Data", "Map", "n/a")
 														  , getMultiMapValue(telemetry, "Car Data", "TC", "n/a")
 														  , getMultiMapValue(telemetry, "Car Data", "ABS", "n/a")
-														  , getMultiMapValue(telemetry, "Car Data", "TyreCompound", "Dry")
-														  , getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor", "Black")
+														  , tyreCompound, tyreCompoundColor
 														  , getMultiMapValue(telemetry, "Car Data", "TyrePressure", ",,,")
 														  , getMultiMapValue(telemetry, "Car Data", "TyreTemperature", ",,,")
 														  , getMultiMapValue(telemetry, "Car Data", "TyreWear", "null,null,null,null")
@@ -7743,11 +7765,14 @@ class TeamCenter extends ConfigurationItem {
 				else
 					wear := [kNull, kNull, kNull, kNull]
 
-				lapsDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
+				lapsDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6]
+										, string2Values(",", telemetryData[14])[1], string2Values(",", telemetryData[15])[2]
 										, telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9]
 										, driverID)
 
-				lapsDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15], runningLap
+				lapsDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]
+								  , string2Values(",", telemetryData[14])[1], string2Values(",", telemetryData[15])[2]
+								  , runningLap
 								  , pressures[1], pressures[2], pressures[4], pressures[4]
 								  , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
 								  , wear[1], wear[2], wear[3], wear[4]

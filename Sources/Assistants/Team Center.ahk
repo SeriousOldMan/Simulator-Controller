@@ -6966,8 +6966,10 @@ class TeamCenter extends ConfigurationItem {
 												  , getMultiMapValue(data, "Car Data", "TyreCompoundColor" . axle)))
 				default:
 					lap.Compounds := [compound(getMultiMapValue(data, "Car Data", "TyreCompound")
-									, getMultiMapValue(data, "Car Data", "TyreCompoundColor"))]
+											 , getMultiMapValue(data, "Car Data", "TyreCompoundColor"))]
 			}
+
+			combineCompounds(&lap.Compounds)
 
 			lap.TyreSet := (tyreSet ? getMultiMapValue(data, "Car Data", "TyreSet", false) : false)
 
@@ -7706,14 +7708,16 @@ class TeamCenter extends ConfigurationItem {
 							for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
 								compounds.Push(getMultiMapValue(telemetry, "Car Data", "TyreCompound" . tyre, tyreCompound))
 
-							tyreCompound := values2String(",", compounds)
+							tyreCompound := compounds
 
 							compounds := []
 
 							for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
 								compounds.Push(getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor" . tyre, tyreCompoundColor))
 
-							tyreCompoundColor := values2String(",", compounds)
+							tyreCompoundColor := compounds
+
+							combineCompounds(&tyreCompound, &tyreCompoundColor)
 						}
 						else if (mixedCompounds = "Axle") {
 							compounds := []
@@ -7721,15 +7725,24 @@ class TeamCenter extends ConfigurationItem {
 							for index, axle in ["Front", "Rear"]
 								compounds.Push(getMultiMapValue(telemetry, "Car Data", "TyreCompound" . axle, tyreCompound))
 
-							tyreCompound := values2String(",", compounds)
+							tyreCompound := compounds
 
 							compounds := []
 
 							for index, axle in ["Front", "Rear"]
 								compounds.Push(getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor" . axle, tyreCompoundColor))
 
-							tyreCompoundColor := values2String(",", compounds)
+							tyreCompoundColor := compounds
+
+							combineCompounds(&tyreCompound, &tyreCompoundColor)
 						}
+						else {
+							tyreCompound := [tyreCompound]
+							tyreCompoundColor := [tyreCompoundColor]
+						}
+
+						tyreCompound := values2String(",", tyreCompound*)
+						tyreCompoundColor := values2String(",", tyreCompoundColor*)
 
 						telemetryData := values2String(";", this.Simulator ? this.Simulator : "-"
 														  , this.Car ? this.Car : "-"
@@ -7959,21 +7972,28 @@ class TeamCenter extends ConfigurationItem {
 						tyreCompoundColor := getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor", "Black")
 
 						if (mixedCompounds = "Wheel") {
-							tyreCompound
-								:= values2String(",", collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
-															, (tyre) => getMultiMapValue(telemetry, "Car Data", "TyreCompound" . tyre, tyreCompound))*)
-							tyreCompoundColor
-								:= values2String(",", collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
-															, (tyre) => getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor" . tyre, tyreCompoundColor))*)
+							tyreCompound := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
+												  , (tyre) => getMultiMapValue(telemetry, "Car Data", "TyreCompound" . tyre, tyreCompound))
+							tyreCompoundColor := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
+													   , (tyre) => getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor" . tyre, tyreCompoundColor))
+
+							combineCompounds(&tyreCompound, &tyreCompoundColor)
 						}
 						else if (mixedCompounds = "Axle") {
-							tyreCompound
-								:= values2String(",", collect(["Front", "Rear"]
-															, (axle) => getMultiMapValue(telemetry, "Car Data", "TyreCompound" . axle, tyreCompound))*)
-							tyreCompoundColor
-								:= values2String(",", collect(["Front", "Rear"]
-															, (axle) => getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor" . axle, tyreCompoundColor))*)
+							tyreCompound := collect(["Front", "Rear"]
+															, (axle) => getMultiMapValue(telemetry, "Car Data", "TyreCompound" . axle, tyreCompound))
+							tyreCompoundColor := collect(["Front", "Rear"]
+													   , (axle) => getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor" . axle, tyreCompoundColor))
+
+							combineCompounds(&tyreCompound, &tyreCompoundColor)
 						}
+						else {
+							tyreCompound := [tyreCompound]
+							tyreCompoundColor := [tyreCompoundColor]
+						}
+
+						tyreCompound := values2String(",", tyreCompound*)
+						tyreCompoundColor := values2String(",", tyreCompoundColor*)
 
 						lapPressures := values2String(";", this.Simulator ? this.Simulator : "-"
 														 , this.Car ? this.Car : "-"
@@ -8094,58 +8114,36 @@ class TeamCenter extends ConfigurationItem {
 						dtcc := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound.Color", false)
 
 						if (tyreService = "Wheel") {
-							tyreCompound := ""
-							tyreCompoundColor := ""
-							displayTyreCompound := ""
+							tyreCompound := []
+							tyreCompoundColor := []
 
 							for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
-								if (index > 1) {
-									tyreCompound .= translate(", ")
-									tyreCompoundColor .= translate(", ")
-									displayTyreCompound .= translate(", ")
-								}
-
-								tc := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound." . tyre, dtc)
-								tcc := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound.Color." . tyre, dtcc)
-
-								if tc {
-									tyreCompound .= tc
-									tyreCompoundColor .= tcc
-									displayTyreCompound .= translate(compound(tc, tcc))
-								}
-								else {
-									tyreCompound .= "-"
-									tyreCompoundColor .= "-"
-									displayTyreCompound .= "-"
-								}
+								tyreCompound.Push(getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound." . tyre, dtc))
+								tyreCompoundColor.Push(getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound.Color." . tyre, dtcc))
 							}
+
+							combineCompounds(&tyreCompound, &tyreCompoundColor)
+
+							displayTyreCompound := values2String(", ", collect(compounds(tyreCompound, tyreCompoundColor), translate)*)
+
+							tyreCompound := values2String(",", tyreCompound)
+							tyreCompoundColor := values2String(",", tyreCompoundColor)
 						}
 						else if (tyreService = "Axle") {
-							tyreCompound := ""
-							tyreCompoundColor := ""
-							displayTyreCompound := ""
+							tyreCompound := []
+							tyreCompoundColor := []
 
 							for index, axle in ["Front", "Rear"] {
-								if (index > 1) {
-									tyreCompound .= translate(", ")
-									tyreCompoundColor .= translate(", ")
-									displayTyreCompound .= translate(", ")
-								}
-
-								tc := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound." . axle, dtc)
-								tcc := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound.Color." . axle, dtcc)
-
-								if tc {
-									tyreCompound .= tc
-									tyreCompoundColor .= tcc
-									displayTyreCompound .= translate(compound(tc, tcc))
-								}
-								else {
-									tyreCompound .= "-"
-									tyreCompoundColor .= "-"
-									displayTyreCompound .= "-"
-								}
+								tyreCompound.Push(getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound." . axle, dtc))
+								tyreCompoundColor.Push(getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound.Color." . axle, dtcc))
 							}
+
+							combineCompounds(&tyreCompound, &tyreCompoundColor)
+
+							displayTyreCompound := values2String(", ", collect(compounds(tyreCompound, tyreCompoundColor), translate)*)
+
+							tyreCompound := values2String(",", tyreCompound)
+							tyreCompoundColor := values2String(",", tyreCompoundColor)
 						}
 						else {
 							tyreCompound := dtc
@@ -8379,62 +8377,40 @@ class TeamCenter extends ConfigurationItem {
 						else
 							tyreSet := "-"
 
-						dtc := getMultiMapValue(state, "Pitstop Pending", "Pitstop." . nextStop . ".Tyre.Compound", false)
-						dtcc := getMultiMapValue(state, "Pitstop Pending", "Pitstop." . nextStop . ".Tyre.Compound.Color", false)
+						dtc := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound", false)
+						dtcc := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound.Color", false)
 
 						if (tyreService = "Wheel") {
-							tyreCompound := ""
-							tyreCompoundColor := ""
-							displayTyreCompound := ""
+							tyreCompound := []
+							tyreCompoundColor := []
 
 							for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
-								if (index > 1) {
-									tyreCompound .= translate(", ")
-									tyreCompoundColor .= translate(", ")
-									displayTyreCompound .= translate(", ")
-								}
-
-								tc := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound." . tyre, dtc)
-								tcc := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound.Color." . tyre, dtcc)
-
-								if tc {
-									tyreCompound .= tc
-									tyreCompoundColor .= tcc
-									displayTyreCompound .= translate(compound(tc, tcc))
-								}
-								else {
-									tyreCompound .= "-"
-									tyreCompoundColor .= "-"
-									displayTyreCompound .= "-"
-								}
+								tyreCompound.Push(getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound." . tyre, dtc))
+								tyreCompoundColor.Push(getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound.Color." . tyre, dtcc))
 							}
+
+							combineCompounds(&tyreCompound, &tyreCompoundColor)
+
+							displayTyreCompound := values2String(", ", collect(compounds(tyreCompound, tyreCompoundColor), translate)*)
+
+							tyreCompound := values2String(",", tyreCompound)
+							tyreCompoundColor := values2String(",", tyreCompoundColor)
 						}
 						else if (tyreService = "Axle") {
-							tyreCompound := ""
-							tyreCompoundColor := ""
-							displayTyreCompound := ""
+							tyreCompound := []
+							tyreCompoundColor := []
 
 							for index, axle in ["Front", "Rear"] {
-								if (index > 1) {
-									tyreCompound .= translate(", ")
-									tyreCompoundColor .= translate(", ")
-									displayTyreCompound .= translate(", ")
-								}
-
-								tc := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound." . axle, dtc)
-								tcc := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound.Color." . axle, dtcc)
-
-								if tc {
-									tyreCompound .= tc
-									tyreCompoundColor .= tcc
-									displayTyreCompound .= translate(compound(tc, tcc))
-								}
-								else {
-									tyreCompound .= "-"
-									tyreCompoundColor .= "-"
-									displayTyreCompound .= "-"
-								}
+								tyreCompound.Push(getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound." . axle, dtc))
+								tyreCompoundColor.Push(getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound.Color." . axle, dtcc))
 							}
+
+							combineCompounds(&tyreCompound, &tyreCompoundColor)
+
+							displayTyreCompound := values2String(", ", collect(compounds(tyreCompound, tyreCompoundColor), translate)*)
+
+							tyreCompound := values2String(",", tyreCompound)
+							tyreCompoundColor := values2String(",", tyreCompoundColor)
 						}
 						else {
 							tyreCompound := dtc
@@ -8648,20 +8624,26 @@ class TeamCenter extends ConfigurationItem {
 								tyreCompoundColor := getMultiMapValue(state, "Pitstop Data", "Service.Tyre.Compound.Color", false)
 
 								if (tyreService = "Wheel") {
-									tyreCompound
-										:= values2String(",", collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
-																	, (tyre) => getMultiMapValue(telemetry, "Pitstop Data", "Service.Tyre.Compound." . tyre, tyreCompound))*)
-									tyreCompoundColor
-										:= values2String(",", collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
-																	, (tyre) => getMultiMapValue(telemetry, "Pitstop Data", "Service.Tyre.Compound." . tyre, tyreCompoundColor))*)
+									tyreCompound := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
+														  , (tyre) => getMultiMapValue(telemetry, "Pitstop Data", "Service.Tyre.Compound." . tyre, tyreCompound))
+									tyreCompoundColor := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
+															   , (tyre) => getMultiMapValue(telemetry, "Pitstop Data", "Service.Tyre.Compound." . tyre, tyreCompoundColor))
+
+									combineCompunds(&tyreCompound, &tyreCompoundColor)
+
+									tyreCompound := values2String(",", tyreCompound*)
+									tyreCompoundColor := values2String(",", tyreCompoundColor*)
 								}
 								else if (tyreService = "Axle") {
-									tyreCompound
-										:= values2String(",", collect(["Front", "Rear"]
-																	, (axle) => getMultiMapValue(telemetry, "Pitstop Data", "Service.Tyre.Compound." . axle, tyreCompound))*)
-									tyreCompoundColor
-										:= values2String(",", collect(["Front", "Rear"]
-																	, (axle) => getMultiMapValue(telemetry, "Pitstop Data", "Service.Tyre.Compound." . axle, tyreCompoundColor))*)
+									tyreCompound := collect(["Front", "Rear"]
+														  , (axle) => getMultiMapValue(telemetry, "Pitstop Data", "Service.Tyre.Compound." . axle, tyreCompound))
+									tyreCompoundColor := collect(["Front", "Rear"]
+															   , (axle) => getMultiMapValue(telemetry, "Pitstop Data", "Service.Tyre.Compound." . axle, tyreCompoundColor))
+
+									combineCompunds(&tyreCompound, &tyreCompoundColor)
+
+									tyreCompound := values2String(",", tyreCompound*)
+									tyreCompoundColor := values2String(",", tyreCompoundColor*)
 								}
 
 								if ((full || !hasServiceData)
@@ -12927,14 +12909,15 @@ class TeamCenter extends ConfigurationItem {
 				hasFlatSpot := true
 		}
 
+		combineCompounds(&tyreCompounds)
+
 		if driver
 			html .= ("<tr><td><b>" . translate("Driver:") . "</b></div></td><td>" . driver . "</td></tr>")
 
 		if laps
 			html .= ("<tr><td><b>" . translate("Laps:") . "</b></div></td><td>" . laps . "</td></tr>")
 
-		if tyreCompounds
-			html .= ("<tr><td><b>" . translate("Tyre Compound:") . "</b></div></td><td>" . values2String(", ", collect(tyreCompounds, translate)*) . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Tyre Compound:") . "</b></div></td><td>" . values2String(", ", collect(tyreCompounds, translate)*) . "</td></tr>")
 
 		if tyreSet
 			html .= ("<tr><td><b>" . translate("Tyre Set:") . "</b></div></td><td>" . tyreSet . "</td></tr>")
@@ -13782,69 +13765,6 @@ class TeamCenter extends ConfigurationItem {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-equalCompounds(compounds1, compounds2) {
-	if (compounds1.Length != compounds2.Length)
-		return false
-	else
-		loop compounds1.Length
-			if (compounds1[A_Index] != compounds2[A_Index])
-				return false
-
-	return true
-}
-
-compounds(tyreCompounds, tyreCompoundColors) {
-	local compounds := []
-	local theCompound
-
-	loop tyreCompounds.Length {
-		theCompound := tyreCompounds[A_Index]
-
-		if (theCompound && (theCompound != "-"))
-			compounds.Push(compound(theCompound, tyreCompoundColors[A_Index]))
-		else
-			compounds.Push("-")
-	}
-
-	return compounds
-}
-
-normalizeCompounds(compounds) {
-	if !isObject(compounds)
-		compounds := string2Values(",", compounds)
-
-	loop compounds.Length {
-		compound := compounds[A_Index]
-
-		if (!compound || (compound = "-"))
-			compounds[A_Index] := "-"
-		else
-			compounds[A_Index] := normalizeCompound(compound)
-	}
-
-	return compounds
-}
-
-splitCompounds(compounds, &tyreCompounds, &tyreCompoundColors) {
-	tyreCompounds := []
-	tyreCompoundColors := []
-
-	do(compounds, (compound) {
-		local color
-
-		if (compound = "-") {
-			tyreCompounds.Push("-")
-			tyreCompoundColors.Push("-")
-		}
-		else {
-			splitCompound(compound, &compound, &color)
-
-			tyreCompounds.Push(compound)
-			tyreCompoundColors.Push(color)
-		}
-	})
-}
-
 getDeprecatedValue(data, section, newKey, oldKey, default := false) {
 	local value := getMultiMapValue(data, section, newKey, kUndefined)
 
@@ -14124,7 +14044,7 @@ pitstopSettings(teamCenterOrCommand := false, arguments*) {
 							if arguments[1].Has("Pitstop.Planned.Tyre.Compound." . tyre)
 								tyreCompound := translate(arguments[1]["Pitstop.Planned.Tyre.Compound." . tyre]
 															  ? compound(arguments[1]["Pitstop.Planned.Tyre.Compound." . tyre]
-																	   , arguments[1]["Pitstop.Planned.Tyre.Compound.Color"])
+																	   , arguments[1]["Pitstop.Planned.Tyre.Compound.Color." . tyre])
 															  : "-")
 							else
 								tyreCompound := dtc
@@ -14137,7 +14057,7 @@ pitstopSettings(teamCenterOrCommand := false, arguments*) {
 							if arguments[1].Has("Pitstop.Planned.Tyre.Compound." . axle)
 								tyreCompound := translate(arguments[1]["Pitstop.Planned.Tyre.Compound." . axle]
 															  ? compound(arguments[1]["Pitstop.Planned.Tyre.Compound." . axle]
-																	   , arguments[1]["Pitstop.Planned.Tyre.Compound.Color"])
+																	   , arguments[1]["Pitstop.Planned.Tyre.Compound.Color." . axle])
 															  : "-")
 							else
 								tyreCompound := dtc

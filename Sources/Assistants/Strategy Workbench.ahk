@@ -2314,7 +2314,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			this.loadWeather(this.SelectedWeather, true)
 
-			if this.AutoInitialize
+			if (track && this.AutoInitialize)
 				this.chooseSettingsMenu("Database")
 		}
 	}

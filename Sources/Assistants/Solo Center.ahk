@@ -3027,7 +3027,7 @@ class SoloCenter extends ConfigurationItem {
 
 	createRun(lapNumber) {
 		local newRun := {Nr: (this.CurrentRun ? (this.CurrentRun.Nr + 1) : 1), Lap: lapNumber, StartTime: A_Now, TyreLaps: 0
-					   , Driver: "-", FuelInitial: "-", FuelConsumption: 0.0, Accidents: 0, Weather: "-", Compound: "-", TyreSet: "-"
+					   , Driver: "-", FuelInitial: "-", FuelConsumption: 0.0, Accidents: 0, Weather: "-", Compounds: ["-"], TyreSet: "-"
 					   , AvgLapTime: "-", Potential: "-", RaceCraft: "-", Speed: "-", Consistency: "-", CarControl: "-"
 					   , StartPosition: "-", EndPosition: "-", Laps: [], Notes: ""}
 
@@ -3328,7 +3328,7 @@ class SoloCenter extends ConfigurationItem {
 
 	createLap(run, lapNumber) {
 		local newLap := {Run: run, Nr: lapNumber, Weather: "-", Grip: "-", LapTime: "-", FuelConsumption: "-", FuelRemaining: "-"
-					   , Compound: "-", TyreSet: kNull, Pressures: "-,-,-,-", Temperatures: "-,-,-,-", State: "Unknown", Accident: ""
+					   , Compounds: ["-"], TyreSet: kNull, Pressures: "-,-,-,-", Temperatures: "-,-,-,-", State: "Unknown", Accident: ""
 					   , Electronics: false, Tyres: false
 					   , HotPressures: false, ColdPressures: false, PressureLosses: false}
 

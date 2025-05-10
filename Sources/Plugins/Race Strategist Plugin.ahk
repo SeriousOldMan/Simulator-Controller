@@ -380,7 +380,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 		local runningLap := 0
 		local stint, newStint, lastStint, driverID, driverName, ignore, telemetryData, pitstop, pressures, temperatures, wear
 
-		if !this.Controller.CollectData("Laps")
+		if !RaceAssistantPlugin.CollectData["Laps"]
 			return
 
 		if Task.CurrentTask

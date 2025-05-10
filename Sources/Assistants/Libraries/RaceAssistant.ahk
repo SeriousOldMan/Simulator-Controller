@@ -2257,12 +2257,19 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	readSettings(simulator, car, track, &settings) {
+		local mixedCompounds, tyreService
+
 		if !isObject(settings)
 			settings := readMultiMap(settings)
+
+		this.Provider.supportsTyreManagement(&mixedCompounds)
+		this.Provider.supportsPitstop( , &tyreService)
 
 		return CaseInsenseMap("Session.Simulator", simulator
 							, "Session.Car", car
 							, "Session.Track", track
+							, "Session.Settings.Tyre.Service", tyreService
+							, "Session.Settings.Tyre.Management", mixedCompounds
 							, "Session.Settings.Lap.Formation", getDeprecatedValue(settings, "Session Settings", "Race Settings", "Lap.Formation", true)
 						    , "Session.Settings.Lap.PostRace", getDeprecatedValue(settings, "Session Settings", "Race Settings", "Lap.PostRace", true)
 						    , "Session.Settings.Lap.AvgTime", getDeprecatedValue(settings, "Session Settings", "Race Settings", "Lap.AvgTime", 0)
@@ -2304,11 +2311,13 @@ class RaceAssistant extends ConfigurationItem {
 	createFacts(settings, data) {
 		local configuration := this.Configuration
 		local simulator := getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
+		local car := getMultiMapValue(data, "Session Data", "Car", "Unknown")
+		local track := getMultiMapValue(data, "Session Data", "Track", "Unknown")
 		local simulatorName := this.SettingsDatabase.getSimulatorName(simulator)
 
-		return combine(this.readSettings(simulator
-									   , getMultiMapValue(data, "Session Data", "Car", "")
-									   , getMultiMapValue(data, "Session Data", "Track", ""), &settings)
+		this.updateSessionValues({Simulator: this.SettingsDatabase.getSimulatorName(simulator), Car: car, Track: track})
+
+		return combine(this.readSettings(simulator, car, track, &settings)
 					 , CaseInsenseMap("Session.Type", this.Session
 									, "Session.Track.Type", getMultiMapValue(settings, ("Simulator." . simulatorName), "Track.Type", "Circuit")
 									, "Session.Track.Length", getMultiMapValue(data, "Track Data", "Length", 0)

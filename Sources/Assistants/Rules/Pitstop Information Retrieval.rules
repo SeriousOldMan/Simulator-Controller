@@ -30,8 +30,14 @@ lastPitstopTyreSet(?tyreSet) <= lastTyreChange(?nr), Get(Pitstop, ?nr, Tyre.Set,
 
 lastPitstopTyreCompound(?tyreCompound) <= lastTyreChange(?nr), Get(Pitstop, ?nr, Tyre.Compound, ?tyreCompound)
 
+lastPitstopTyreCompound(?position, ?tyreCompound) <= lastTyreChange(?nr), Get(Pitstop, ?nr, Tyre.Compound, ?position, ?tyreCompound)
+
 lastPitstopTyreCompound(?tyreCompound, ?tyreCompoundColor) <= lastTyreChange(?nr), Get(Pitstop, ?nr, Tyre.Compound, ?tyreCompound),
 															  Get(Pitstop, ?nr, Tyre.Compound.Color, ?tyreCompoundColor)
+
+lastPitstopTyreCompound(?position, ?tyreCompound, ?tyreCompoundColor) <=
+		lastTyreChange(?nr), Get(Pitstop, ?nr, Tyre.Compound, ?position, ?tyreCompound),
+		Get(Pitstop, ?nr, Tyre.Compound.Color, ?position, ?tyreCompoundColor)
 
 lastPitstopTyrePressure(?compound, ?tyreType, ?pressure) <= lastPitstopTyreCompound(?compound), lastTyreChange(?nr),
 															Get(Pitstop, ?nr, Tyre.Pressure, ?tyreType, ?pressure)

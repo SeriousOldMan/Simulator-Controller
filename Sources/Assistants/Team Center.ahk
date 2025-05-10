@@ -9880,11 +9880,11 @@ class TeamCenter extends ConfigurationItem {
 				try {
 					this.Connector.ClearSession(session)
 
-					this.Connector.DeleteSessionValue("Race Engineer Session Info")
-					this.Connector.DeleteSessionValue("Race Strategist Session Info")
-					this.Connector.DeleteSessionValue("Race Spotter Session Info")
+					this.Connector.DeleteSessionValue(session, "Race Engineer Session Info")
+					this.Connector.DeleteSessionValue(session, "Race Strategist Session Info")
+					this.Connector.DeleteSessionValue(session, "Race Spotter Session Info")
 
-					this.Connector.DeleteSessionValue("Race Engineer State")
+					this.Connector.DeleteSessionValue(session, "Race Engineer State")
 				}
 				catch Any as exception {
 					logError(exception)

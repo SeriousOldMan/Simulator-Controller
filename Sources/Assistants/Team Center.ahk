@@ -4850,7 +4850,7 @@ class TeamCenter extends ConfigurationItem {
 				break
 			}
 
-		if (tyreCompound[1] && (tyreCompound[1] != "-")) {
+		if exist(tyreCompound, (c) => (c && (c != "-"))) {
 			if ((tyreCompound[1] = "Wet") && (SessionDatabase.getSimulatorCode(this.Simulator) = "ACC"))
 				tyreSet := "-"
 			else
@@ -4858,14 +4858,14 @@ class TeamCenter extends ConfigurationItem {
 
 			pressures := string2Values(",", getMultiMapValue(pitstopPlan, "Pitstop", "Tyre.Pressures"))
 
-			displayPressures := values2String(", ", displayValue("Float", convertUnit("Pressure", pressures[1]))
-												  , displayValue("Float", convertUnit("Pressure", pressures[2]))
-												  , displayValue("Float", convertUnit("Pressure", pressures[3]))
-												  , displayValue("Float", convertUnit("Pressure", pressures[4])))
+			displayPressures := values2String(", ", pressures[1] ? displayValue("Float", convertUnit("Pressure", pressures[1])) : "-"
+												  , pressures[2] ? displayValue("Float", convertUnit("Pressure", pressures[2])) : "-"
+												  , pressures[3] ? displayValue("Float", convertUnit("Pressure", pressures[3])) : "-"
+												  , pressures[4] ? displayValue("Float", convertUnit("Pressure", pressures[4])) : "-")
 
 			pressures := values2String(", ", pressures*)
 		}
-		else if !exist(tyreCompound, (c) => (c && (c != "-"))) {
+		else {
 			tyreCompound := ["-"]
 			tyreCompoundColor := [false]
 

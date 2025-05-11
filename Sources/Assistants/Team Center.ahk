@@ -4874,6 +4874,8 @@ class TeamCenter extends ConfigurationItem {
 			displayPressures := pressures
 		}
 
+		combineCompounds(&tyreCompound, &tyreCompoundColor)
+
 		requestDriver := getMultiMapValue(pitstopPlan, "Pitstop", "Driver", kUndefined)
 
 		if (requestDriver != kUndefined) {

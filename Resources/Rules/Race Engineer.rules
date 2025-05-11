@@ -1100,7 +1100,7 @@ setRefuelAmount(?)
 setTyreCompound(?pitstopNumber) <= !Session.Settings.Tyre.Service = Axle, !Session.Settings.Pitstop.Service.Tyres != Off, !,
 								   Append(!Pitstop.Planned.Tyre.Compound.Front, ",", !Pitstop.Planned.Tyre.Compound.Rear, ?compound),
 								   Append(!Pitstop.Planned.Tyre.Compound.Color.Front, ",", !Pitstop.Planned.Tyre.Compound.Color.Rear, ?color),
-								   Call(setPitstopTyreCompound, ?pitstopNumber, ?ompound, ?olor, !Pitstop.Planned.Tyre.Set)
+								   Call(setPitstopTyreCompound, ?pitstopNumber, ?compound, ?color, !Pitstop.Planned.Tyre.Set)
 setTyreCompound(?pitstopNumber) <= !Session.Settings.Tyre.Service = Wheel, !Session.Settings.Pitstop.Service.Tyres != Off, !,
 								   Append(!Pitstop.Planned.Tyre.Compound.FrontLeft, ",", !Pitstop.Planned.Tyre.Compound.FrontRight, ",",
 										  !Pitstop.Planned.Tyre.Compound.RearLeft, ",", !Pitstop.Planned.Tyre.Compound.RearRight, ?compound),
@@ -1108,7 +1108,7 @@ setTyreCompound(?pitstopNumber) <= !Session.Settings.Tyre.Service = Wheel, !Sess
 										  !Pitstop.Planned.Tyre.Compound.Color.FrontRight, ",",
 										  !Pitstop.Planned.Tyre.Compound.Color.RearLeft, ",",
 										  !Pitstop.Planned.Tyre.Compound.Color.RearRight, ?color),
-								   Call(setPitstopTyreCompound, ?pitstopNumber, ?ompound, ?olor, !Pitstop.Planned.Tyre.Set)
+								   Call(setPitstopTyreCompound, ?pitstopNumber, ?compound, ?color, !Pitstop.Planned.Tyre.Set)
 setTyreCompound(?pitstopNumber) <= !Session.Settings.Pitstop.Service.Tyres != Off, !,
 								   Call(setPitstopTyreCompound, ?pitstopNumber,
 										!Pitstop.Planned.Tyre.Compound, !Pitstop.Planned.Tyre.Compound.Color, !Pitstop.Planned.Tyre.Set)

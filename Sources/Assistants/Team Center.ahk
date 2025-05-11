@@ -5732,7 +5732,7 @@ class TeamCenter extends ConfigurationItem {
 	}
 
 	runSimulation(sessionType, additionalLaps) {
-		TeamCenterSimulationTask(ObjBindMethod(this, "runSimulationAsync", sessionType)).start()
+		TeamCenterSimulationTask(ObjBindMethod(this, "runSimulationAsync", sessionType, additionalLaps)).start()
 	}
 
 	runSimulationAsync(sessionType, additionalLaps) {
@@ -6211,7 +6211,7 @@ class TeamCenter extends ConfigurationItem {
 												  , &tyreCompounds, &tyreCompoundColors, &tyreSet, &tyrePressures)
 
 					if (tyreCompounds && tyreSet && (tyreSet != lastTyreSet)) {
-						tyreCompounds := compound(tyreCompounds, tyreCompoundColors)
+						tyreCompounds := compounds(tyreCompounds, tyreCompoundColors)
 
 						if (availableTyreSets.Has(tyreCompounds[1]) && availableTyreSets[tyreCompounds[1]][2].Has(tyreSet))
 							availableTyreSets[tyreCompounds[1]][2][tyreSet] += this.Stints[A_Index].Laps.Length

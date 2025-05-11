@@ -1970,7 +1970,7 @@ class TeamCenter extends ConfigurationItem {
 
 		copyPressures(*) {
 			local hasPitstops := false
-			local lap, driver, conditions, fuel, tyreCompounds, tyreCompoundColors, tyreSet, pressures
+			local lap, driver, conditions, fuel, tyreCompounds, tyreCompoundColors, tyreCompound, tyreSet, pressures
 			local pressuresMenu, label
 
 			copyPressure(driver, compound, pressures, *) {
@@ -2011,11 +2011,12 @@ class TeamCenter extends ConfigurationItem {
 								 . displayValue("Float", convertUnit("Temperature", lap.TrackTemperature)) . translate(")"))
 
 					tyreCompounds := compounds(tyreCompounds, tyreCompoundColors)
+					tyreCompound := values2String(", ", collect(tyreCompounds, translate)*)
 
 					pressures := values2String(", ", pressures*)
 
 					label := (translate("Session") . translate(" - ") . driver . translate(" - ")) . (conditions . translate(" - ")
-						   . values2String(", ", collect(tyreCompounds, translate)*) . translate(": ") . pressures)
+						    . tyreCompound . translate(": ") . pressures)
 
 					pressuresMenu.Add(label, copyPressure.Bind(driver, tyreCompound, pressures))
 
@@ -4913,8 +4914,8 @@ class TeamCenter extends ConfigurationItem {
 
 		sessionStore.add("Pitstop.Data"
 					   , Database.Row("Lap", pitstopLap - 1, "Fuel", fuel
-									, "Tyre.Compound", values2String(",", tyreCompound)
-									, "Tyre.Compound.Color", values2String(",", tyreCompoundColor)
+									, "Tyre.Compound", values2String(",", tyreCompound*)
+									, "Tyre.Compound.Color", values2String(",", tyreCompoundColor*)
 									, "Tyre.Set", tyreSet
 									, "Tyre.Pressure.Cold.Front.Left", pressures[1], "Tyre.Pressure.Cold.Front.Right", pressures[2]
 									, "Tyre.Pressure.Cold.Rear.Left", pressures[3], "Tyre.Pressure.Cold.Rear.Right", pressures[4]
@@ -8631,7 +8632,7 @@ class TeamCenter extends ConfigurationItem {
 									tyreCompoundColor := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
 															   , (tyre) => getMultiMapValue(telemetry, "Pitstop Data", "Service.Tyre.Compound." . tyre, tyreCompoundColor))
 
-									combineCompunds(&tyreCompound, &tyreCompoundColor)
+									combineCompounds(&tyreCompound, &tyreCompoundColor)
 
 									tyreCompound := values2String(",", tyreCompound*)
 									tyreCompoundColor := values2String(",", tyreCompoundColor*)
@@ -8642,7 +8643,7 @@ class TeamCenter extends ConfigurationItem {
 									tyreCompoundColor := collect(["Front", "Rear"]
 															   , (axle) => getMultiMapValue(telemetry, "Pitstop Data", "Service.Tyre.Compound." . axle, tyreCompoundColor))
 
-									combineCompunds(&tyreCompound, &tyreCompoundColor)
+									combineCompounds(&tyreCompound, &tyreCompoundColor)
 
 									tyreCompound := values2String(",", tyreCompound*)
 									tyreCompoundColor := values2String(",", tyreCompoundColor*)
@@ -10210,11 +10211,11 @@ class TeamCenter extends ConfigurationItem {
 				try {
 					this.Connector.ClearSession(session)
 
-					this.Connector.DeleteSessionValue("Race Engineer Session Info")
-					this.Connector.DeleteSessionValue("Race Strategist Session Info")
-					this.Connector.DeleteSessionValue("Race Spotter Session Info")
+					this.Connector.DeleteSessionValue(session, "Race Engineer Session Info")
+					this.Connector.DeleteSessionValue(session, "Race Strategist Session Info")
+					this.Connector.DeleteSessionValue(session, "Race Spotter Session Info")
 
-					this.Connector.DeleteSessionValue("Race Engineer State")
+					this.Connector.DeleteSessionValue(session, "Race Engineer State")
 				}
 				catch Any as exception {
 					logError(exception)
@@ -14020,7 +14021,7 @@ pitstopSettings(teamCenterOrCommand := false, arguments*) {
 				settingsListView.Delete()
 
 				tCenter.Provider.supportsPitstop(&fuelService, &tyreService, &repairService)
-				tCenter.PupportsTyreManagement( , &tyreSet)
+				tCenter.Provider.supportsTyreManagement( , &tyreSet)
 
 				if (fuelService && arguments[1].Has("FuelAmount"))
 					settingsListView.Add("", translate("Refuel"), displayValue("Float", convertUnit("Volume", arguments[1]["FuelAmount"])) . A_Space . getUnit("Volume", true))

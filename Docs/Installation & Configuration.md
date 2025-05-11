@@ -321,7 +321,7 @@ After you have sucessfully installed all the necessary support packages, we can 
 
 You can define the spoken language you want to use for speech generation with the first dropdown menu. With the second drop down menu, you can choose the speech synthesis engine, which you want to use for speech generation. You have the choice between two different synthesizers which execute on your local PC and you can also use the speech services of the Azure Cognitive Services cloud or the Google Cloud. "Windows (Win32)" and "Windows (.NET)" are built into the Windows operating system and provide more or less the same voice quality, but you may have access to dfferent sets of available voices.
 
-###### Azure Congnitive Services
+###### Azure Cognitive Services
 
 If you choose "Azure Cognitive Services", two additional fields will appear, where you have to enter your Azure subscription key and the endpoint for your region.
 

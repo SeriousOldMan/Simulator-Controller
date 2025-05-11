@@ -22,7 +22,20 @@
 
 # Upcoming release
 
-Not yet planned...
+## 6.3.2.0
+
+#### Date: 05/16/25 (planned)
+
+#### Fixes
+
+  - Fixed the data collection and transfer to the session database by the Race Assistants, if the "Solo Center" is **not** active. This bug was introduced with version 6.3.0.
+  - Fixed the race situation dependend strategy simulation in "Team Center".
+  - Fixed the calculation of stint statistics in "Team Center".
+
+#### Changes
+
+  - The handling of restricted tyre sets in the strategy simulation has been optimized. It is no longer possible create strategies where a tyre set is used for more laps than usually possible.
+  - This release introduces the first set of functions which supports the handling of individual tyre compounds for individual wheels, as supported by some simulators.
 
 # Release history
 

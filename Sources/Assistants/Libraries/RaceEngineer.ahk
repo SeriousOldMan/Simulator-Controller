@@ -1897,7 +1897,7 @@ class RaceEngineer extends RaceAssistant {
 
 				for index, axle in ["Front", "Rear"] {
 					tyreCompound := getMultiMapValue(data, "Setup Data", "TyreCompound" . axle, tc)
-					tyreCompoundColor := getMultiMapValue(data, "Setup Data", "TyreCompound" . axle, tcc)
+					tyreCompoundColor := getMultiMapValue(data, "Setup Data", "TyreCompoundColor" . axle, tcc)
 
 					tyreCompounds.Push(tyreCompound)
 					tyreCompoundColors.Push(tyreCompoundColor)
@@ -1920,7 +1920,7 @@ class RaceEngineer extends RaceAssistant {
 
 				for index, wheel in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
 					tyreCompound := getMultiMapValue(data, "Setup Data", "TyreCompound" . wheel, tc)
-					tyreCompoundColor := getMultiMapValue(data, "Setup Data", "TyreCompound" . wheel, tcc)
+					tyreCompoundColor := getMultiMapValue(data, "Setup Data", "TyreCompoundColor" . wheel, tcc)
 
 					tyreCompounds.Push(tyreCompound)
 					tyreCompoundColors.Push(tyreCompoundColor)

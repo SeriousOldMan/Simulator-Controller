@@ -1903,7 +1903,7 @@ class RaceEngineer extends RaceAssistant {
 					tyreCompoundColors.Push(tyreCompoundColor)
 
 					if ((tyreCompound != kUndefined) && ((knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound." . axle) != tyreCompound)
-													  || (knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound.Color." . axle) != tcc)))
+													  || (knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound.Color." . axle) != tyreCompoundColor)))
 						changed := true
 				}
 
@@ -1926,7 +1926,7 @@ class RaceEngineer extends RaceAssistant {
 					tyreCompoundColors.Push(tyreCompoundColor)
 
 					if ((tyreCompound != kUndefined) && ((knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound." . wheel) != tyreCompound)
-													  || (knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound.Color." . wheel) != tcc)))
+													  || (knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound.Color." . wheel) != tyreCompoundColor)))
 						changed := true
 				}
 

@@ -6642,7 +6642,7 @@ class TeamCenter extends ConfigurationItem {
 		local row, compound, settings
 
 		if (force || !this.Simulator || (this.Simulator != simulator) || (this.Car != car) || (this.Track != track)) {
-			this.iSimulator := simulator
+			this.iSimulator := SessionDatabase.getSimulatorName(simulator)
 			this.iCar := car
 			this.iTrack := track
 

@@ -2365,6 +2365,8 @@ class RaceEngineer extends RaceAssistant {
 																												  , "Tyre.Pressure.Correction.Setup", false)
 									, "Session.Settings.Tyre.Pressure.Correction.Pressure", getMultiMapValue(settings, "Session Settings"
 																													 , "Tyre.Pressure.Correction.Pressure", false)
+									, "Session.Settings.Tyre.Pressure.Loss.Threshold", getMultiMapValue(settings, "Session Settings"
+																												, "Tyre.Pressure.Loss.Threshold", 0.2)
 									, "Session.Settings.Tyre.Dry.Pressure.Target.FL", getDeprecatedValue(settings, "Session Settings", "Race Settings"
 																												 , "Tyre.Dry.Pressure.Target.FL", 26.5)
 									, "Session.Settings.Tyre.Dry.Pressure.Target.FR", getDeprecatedValue(settings, "Session Settings", "Race Settings"

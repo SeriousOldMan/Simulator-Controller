@@ -257,7 +257,7 @@ updatePressureLoss(?, ?, ?, [], [], ?)
 updatePressureLoss(?lap, ?avg, ?stdDev, [?tyreType | ?tyreTypes], [0 | ?losses]) <=
 		!, Clear(Tyre.Pressure.Loss, ?tyreType), updatePressureLoss(?lap, ?avg, ?stdDev, ?tyreTypes, ?losses)
 updatePressureLoss(?, ?avg, ?stdDev, [?tyreType | ?tyreTypes], [?loss | ?losses]) <=
-		?temp = ?avg + ?stdDev, ?loss > ?temp,	?loss >= !Session.Settings.Tyre.Pressure.Deviation, !,
+		?temp = ?avg + ?stdDev, ?loss > ?temp,	?loss >= !Session.Settings.Tyre.Pressure.Loss.Threshold, !,
 		Set(Tyre.Pressure.Loss, ?tyreType, ?loss), updatePressureLoss(?lap, ?avg, ?stdDev, ?tyreTypes, ?losses)
 updatePressureLoss(?lap, ?avg, ?stdDev, [? | ?tyreTypes], [? | ?losses]) <=
 		Clear(Tyre.Pressure.Loss, ?tyreType), updatePressureLoss(?lap, ?avg, ?stdDev, ?tyreTypes, ?losses)

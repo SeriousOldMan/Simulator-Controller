@@ -13,6 +13,7 @@
   2. Full support for hybrid and fully electric cars
   3. Support for new and also historic simulators
   4. Work around the jumping lap counter in *rFactor 2* and *Le Mans Ultimate* after an RTG in practice
+  5. Support for Time *or* Laps session format
 
 #### Plugins
   1. Cleanup of "Session State.json" file, i.e. not using *null* anymore for unavailable data
@@ -37,6 +38,7 @@
   2. Introduce data groups (for example all data belonging to a complete weekend w. practice, qualiy and race) and make this group usable for future strategy calculation
   3. Handle DT as an alternative to reset the stint timer at the end of a race
   4. Make X-Axis in consumption graph configurable
+  5. Make eating into the safety fuel possible, if this results in an additional lap
 
 #### Team Center
   1. Change hot target pressures for the next pitstop

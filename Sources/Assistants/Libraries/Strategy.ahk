@@ -267,8 +267,8 @@ class StrategySimulation {
 
 				for number, pitstop in strategy.AllPitstops {
 					if pitstop.TyreChange {
-						tyreCompound := pitstop.TyreCompound
-						tyreCompoundColor := pitstop.TyreCompoundColor
+						tyreCompound := first(pitstop.TyreCompounds, (c) => c)
+						tyreCompoundColor := first(pitstop.TyreCompoundColors, (cc) => cc)
 						tyreSet := pitstop.TyreSet
 					}
 					else {
@@ -307,8 +307,8 @@ class StrategySimulation {
 
 					for number, pitstop in strategy.AllPitstops {
 						if pitstop.TyreChange {
-							tyreCompound := pitstop.TyreCompound
-							tyreCompoundColor := pitstop.TyreCompoundColor
+							tyreCompound := first(pitstop.TyreCompounds, (c) => c)
+							tyreCompoundColor := first(pitstop.TyreCompoundColors, (cc) => cc)
 							tyreSet := (pitstop.TyreSet ? pitstop.TyreSet : kFalse)
 						}
 						else {

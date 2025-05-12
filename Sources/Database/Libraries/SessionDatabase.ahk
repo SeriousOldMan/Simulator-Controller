@@ -2839,6 +2839,105 @@ normalizeCompound(qualifiedCompound) {
 	return compound(tyreCompound, tyreCompoundColor)
 }
 
+equalCompounds(compounds1, compounds2) {
+	if (compounds1.Length != compounds2.Length)
+		return false
+	else
+		loop compounds1.Length
+			if (compounds1[A_Index] != compounds2[A_Index])
+				return false
+
+	return true
+}
+
+compounds(tyreCompounds, tyreCompoundColors := false) {
+	local compounds := []
+	local theCompound
+
+	loop tyreCompounds.Length {
+		theCompound := tyreCompounds[A_Index]
+
+		if (theCompound && (theCompound != "-"))
+			compounds.Push(compound(theCompound, (tyreCompoundColors ? tyreCompoundColors[A_Index] : false)))
+		else
+			compounds.Push("-")
+	}
+
+	return compounds
+}
+
+compoundColors(tyreCompounds) {
+	local compounds := []
+
+	loop tyreCompounds.Length {
+		theCompound := tyreCompounds[A_Index]
+
+		if (theCompound && (theCompound != "-"))
+			compounds.Push(compoundColor(theCompound))
+		else
+			compounds.Push("-")
+	}
+
+	return compounds
+}
+
+normalizeCompounds(compounds) {
+	if !isObject(compounds)
+		compounds := string2Values(",", compounds)
+
+	loop compounds.Length {
+		compound := compounds[A_Index]
+
+		if (!compound || (compound = "-"))
+			compounds[A_Index] := "-"
+		else
+			compounds[A_Index] := normalizeCompound(compound)
+	}
+
+	return compounds
+}
+
+splitCompounds(compounds, &tyreCompounds, &tyreCompoundColors) {
+	tyreCompounds := []
+	tyreCompoundColors := []
+
+	do(compounds, (compound) {
+		local color
+
+		if (compound = "-") {
+			tyreCompounds.Push("-")
+			tyreCompoundColors.Push("-")
+		}
+		else {
+			splitCompound(compound, &compound, &color)
+
+			tyreCompounds.Push(compound)
+			tyreCompoundColors.Push(color)
+		}
+	})
+}
+
+combineCompounds(&compounds, &compoundColors := false) {
+	local newCompounds, newCompoundColors
+	if (compounds.Length = 1)
+		return
+	else {
+		newCompounds := removeDuplicates(compounds)
+
+		if (newCompounds.Length = 1)
+			if !compoundColors
+				compounds := newCompounds
+			else {
+				newCompoundColors := removeDuplicates(compoundColors)
+
+				if (newCompoundColors.Length = 1) {
+					compounds := newCompounds
+					compoundColors := newCompoundColors
+				}
+			}
+	}
+}
+
 parseDriverName(fullName, &forName, &surName, &nickName) {
 	if InStr(fullName, "(") {
 		fullname := StrSplit(fullName, "(", " `t", 2)

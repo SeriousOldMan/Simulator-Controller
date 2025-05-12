@@ -762,7 +762,7 @@ Note: For convenience, all commands available for the *assistantCommands* parame
 
 ### Installation of the *Assetto Corsa* data interface
 
-For *Assetto Corsa*, you need to install a plugin into a special location for everything to work. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
+For *Assetto Corsa*, you need to install a plugin into a special location for everything to work. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation-of-telemetry-providers) for installation instructions.
 
 ### Special requirements when using the Pitstop automation
 
@@ -884,7 +884,7 @@ Note: For convenience, all commands available for the *assistantCommands* parame
 
 This plugin handles the *rFactor 2* simulation game. An application with the name "rFactor 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startRF2" as a special function hook in this configuration. The plugin supports a "Pitstop" mode to control the pitstop settings and an integration with Jona is available through the "Race Engineer" plugin, an integration with Cato through the plugin "Race Strategist", and an integration with Elisa through the plugin "Race Spotter".
 
-Important: You must install a plugin into *rFactor 2* plugins directory ([rF2]\Bin64\Plugins\) for the telemetry interface and the pitstop mode to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip*. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
+Important: You must install a plugin into *rFactor 2* plugins directory ([rF2]\Bin64\Plugins\) for the telemetry interface and the pitstop mode to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip*. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation-of-telemetry-providers) for installation instructions.
 
 ### Mode *Chat*
 
@@ -988,7 +988,7 @@ Note: For convenience, all commands available for the *assistantCommands* parame
 
 ### Installation of the *rFactor 2* data interface
 
-For *rFactor 2*, you need to install a plugin into a special location for everything to work. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
+For *rFactor 2*, you need to install a plugin into a special location for everything to work. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation-of-telemetry-providers) for installation instructions.
 
 ### Special notes for *rFactor 2*
 
@@ -1309,7 +1309,7 @@ It is very important, that you do not use the *Project CARS 2* ICM on your own, 
 
 This plugin handles the *Le Mans Ultimate* simulation game. An application with the name "Le Mans Ultimate" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startLMU" as a special function hook in this configuration. The plugin supports a "Pitstop" mode to control the pitstop settings and an integration with Jona is available through the "Race Engineer" plugin, an integration with Cato through the plugin "Race Strategist", and an integration with Elisa through the plugin "Race Spotter".
 
-Important: You must install a plugin into *Le Mans Ultimate* plugins directory ([LMU]\Plugins\) for the telemetry interface and the pitstop mode to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip*. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
+Important: You must install a plugin into *Le Mans Ultimate* plugins directory ([LMU]\Plugins\) for the telemetry interface and the pitstop mode to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip*. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation-of-telemetry-providers) for installation instructions.
 
 ### Disclaimer
 
@@ -1420,7 +1420,7 @@ Note: For convenience, all commands available for the *assistantCommands* parame
 
 ### Installation of the *Le Mans Ultimate* data interface
 
-For *Le Mans Ultimate*, you need to install a plugin into a special location for everything to work. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
+For *Le Mans Ultimate*, you need to install a plugin into a special location for everything to work. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation-of-telemetry-providers) for installation instructions.
 
 ### Special notes for *Le Mans Ultimate*
 

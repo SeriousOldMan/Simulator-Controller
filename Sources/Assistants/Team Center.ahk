@@ -47,6 +47,7 @@
 #Include "..\Database\Libraries\TyresDatabase.ahk"
 #Include "..\Database\Libraries\LapsDatabase.ahk"
 #Include "..\Database\Libraries\TelemetryViewer.ahk"
+#Include "..\Plugins\Simulator Providers.ahk"
 #Include "Libraries\RaceReportViewer.ahk"
 #Include "Libraries\Strategy.ahk"
 #Include "Libraries\StrategyViewer.ahk"
@@ -250,6 +251,8 @@ class TeamCenter extends ConfigurationItem {
 	iSimulator := false
 	iCar := false
 	iTrack := false
+
+	iProvider := false
 
 	iWeather := false
 	iWeather10Min := false
@@ -693,7 +696,7 @@ class TeamCenter extends ConfigurationItem {
 		}
 
 		updatePressures(weather, airTemperature, trackTemperature, tyreCompound, tyreCompoundColor, coldPressures, hotPressures, pressuresLosses, driver, flush) {
-			local tyres, types, typeIndex, tPressures, tyreIndex, pressure
+			local tyres, types, typeIndex, tPressures, tyreIndex, pressure, compounds, compoundColors
 
 			if (!tyreCompoundColor || (tyreCompoundColor = ""))
 				tyreCompoundColor := "Black"
@@ -723,10 +726,27 @@ class TeamCenter extends ConfigurationItem {
 			tyres := ["FL", "FR", "RL", "RR"]
 			types := ["Cold", "Hot"]
 
-			for typeIndex, tPressures in [coldPressures, hotPressures]
-				for tyreIndex, pressure in tPressures
-					this.updatePressure(weather, airTemperature, trackTemperature, tyreCompound, tyreCompoundColor
-									  , types[typeIndex], tyres[tyreIndex], pressure, 1, driver, flush)
+			if InStr(tyreCompound, ",") {
+				compounds := string2Values(",", tyreCompound)
+				compoundColors := string2Values(",", tyreCompoundColor)
+
+				if (compounds.Length = 2) {
+					compounds.InsertAt(1, compounds[1])
+					compoundColors.InsertAt(1, compoundColors[1])
+					compounds.Push(compounds[3])
+					compoundColors.Push(compoundColors[3])
+				}
+
+				for typeIndex, tPressures in [coldPressures, hotPressures]
+					for tyreIndex, pressure in tPressures
+						this.updatePressure(weather, airTemperature, trackTemperature, compounds[tyreIndex], compoundColors[tyreIndex]
+										  , types[typeIndex], tyres[tyreIndex], pressure, 1, driver, flush)
+			}
+			else
+				for typeIndex, tPressures in [coldPressures, hotPressures]
+					for tyreIndex, pressure in tPressures
+						this.updatePressure(weather, airTemperature, trackTemperature, tyreCompound, tyreCompoundColor
+										  , types[typeIndex], tyres[tyreIndex], pressure, 1, driver, flush)
 		}
 
 		updatePressure(weather, airTemperature, trackTemperature, tyreCompound, tyreCompoundColor
@@ -1023,6 +1043,15 @@ class TeamCenter extends ConfigurationItem {
 	Track {
 		Get {
 			return this.iTrack
+		}
+	}
+
+	Provider {
+		Get {
+			if !this.iProvider
+				this.iProvider := this.createSimulatorProvider()
+
+			return this.iProvider
 		}
 	}
 
@@ -1356,9 +1385,11 @@ class TeamCenter extends ConfigurationItem {
 					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
 
-		this.iSimulator := simulator
-		this.iCar := car
-		this.iTrack := track
+		if simulator {
+			this.iSimulator := SessionDatabase.getSimulatorName(simulator)
+			this.iCar := car
+			this.iTrack := track
+		}
 
 		super.__New(configuration)
 
@@ -1941,7 +1972,7 @@ class TeamCenter extends ConfigurationItem {
 
 		copyPressures(*) {
 			local hasPitstops := false
-			local lap, driver, conditions, fuel, tyreCompound, tyreCompoundColor, tyreSet, pressures
+			local lap, driver, conditions, fuel, tyreCompounds, tyreCompoundColors, tyreCompound, tyreSet, pressures
 			local pressuresMenu, label
 
 			copyPressure(driver, compound, pressures, *) {
@@ -1972,21 +2003,22 @@ class TeamCenter extends ConfigurationItem {
 			if this.Laps.Has(1) {
 				lap := this.Laps[1]
 
-				this.getStintSetup(1, true, &driver, &fuel, &tyreCompound, &tyreCompoundColor, &tyreSet, &pressures)
+				this.getStintSetup(1, true, &driver, &fuel, &tyreCompounds, &tyreCompoundColors, &tyreSet, &pressures)
 
-				if pressures {
+				if (tyreCompounds && pressures) {
 					driver := driver.FullName
 
 					conditions := (translate(lap.Weather) . A_Space . translate("(")
 								 . displayValue("Float", convertUnit("Temperature", lap.AirTemperature)) . ", "
 								 . displayValue("Float", convertUnit("Temperature", lap.TrackTemperature)) . translate(")"))
 
-					tyreCompound := compound(tyreCompound, tyreCompoundColor)
+					tyreCompounds := compounds(tyreCompounds, tyreCompoundColors)
+					tyreCompound := values2String(", ", collect(tyreCompounds, translate)*)
 
 					pressures := values2String(", ", pressures*)
 
-					label := (translate("Session") . translate(" - ") . driver . translate(" - "))
-						   . (conditions . translate(" - ") . tyreCompound . translate(": ") . pressures)
+					label := (translate("Session") . translate(" - ") . driver . translate(" - ")) . (conditions . translate(" - ")
+						    . tyreCompound . translate(": ") . pressures)
 
 					pressuresMenu.Add(label, copyPressure.Bind(driver, tyreCompound, pressures))
 
@@ -2634,6 +2666,13 @@ class TeamCenter extends ConfigurationItem {
 			prefix := translate("Task: ")
 
 		this.Control["messageField"].Text := ((message && (message != "")) ? (translate(prefix) . message) : "")
+	}
+
+	createSimulatorProvider() {
+		if (this.Simulator && this.Car && this.Track)
+			return SimulatorProvider.createSimulatorProvider(this.Simulator, this.Car, this.Track)
+		else
+			return false
 	}
 
 	connect(silent := false) {
@@ -4522,7 +4561,7 @@ class TeamCenter extends ConfigurationItem {
 					if this.Stints.Has(A_Index) {
 						stint := this.Stints[A_Index]
 
-						if ((stint.Compound = theCompound) && stint.TyreSet)
+						if ((stint.Compounds.Length = 1) && (stint.Compounds[1] = theCompound) && stint.TyreSet)
 							tyreSet := Max(tyreSet, stint.TyreSet)
 					}
 
@@ -4793,14 +4832,15 @@ class TeamCenter extends ConfigurationItem {
 		local sessionStore := this.SessionStore
 		local pitstopLap := getMultiMapValue(pitstopPlan, "Pitstop", "Lap")
 		local fuel := getMultiMapValue(pitstopPlan, "Pitstop", "Refuel")
-		local tyreCompound := getMultiMapValue(pitstopPlan, "Pitstop", "Tyre.Compound")
-		local tyreCompoundColor := getMultiMapValue(pitstopPlan, "Pitstop", "Tyre.Compound.Color")
+		local tyreCompound := string2Values(",", getMultiMapValue(pitstopPlan, "Pitstop", "Tyre.Compound"))
+		local tyreCompoundColor := string2Values(",", getMultiMapValue(pitstopPlan, "Pitstop", "Tyre.Compound.Color"))
 		local repairBodywork := getMultiMapValue(pitstopPlan, "Pitstop", "Repair.Bodywork")
 		local repairSuspension := getMultiMapValue(pitstopPlan, "Pitstop", "Repair.Suspension")
 		local repairEngine := getMultiMapValue(pitstopPlan, "Pitstop", "Repair.Engine")
 		local currentDriver := kNull
 		local nextDriver := kNull
-		local pressures, displayPressures, tyreSet, displayFuel, requestDriver
+		local theCompound := first(tyreCompound, (c) => (c && (c != "-")))
+		local pressures, displayPressures, tyreSet, displayFuel, requestDriver, theCompound
 
 		sessionStore.remove("Pitstop.Data", {Status: "Planned"}, always.Bind(true))
 
@@ -4813,30 +4853,32 @@ class TeamCenter extends ConfigurationItem {
 				break
 			}
 
-		if (tyreCompound && (tyreCompound != "-")) {
-			if ((tyreCompound = "Wet") && (SessionDatabase.getSimulatorCode(this.Simulator) = "ACC"))
+		if theCompound {
+			if ((theCompound = "Wet") && (SessionDatabase.getSimulatorCode(this.Simulator) = "ACC"))
 				tyreSet := "-"
 			else
 				tyreSet := getMultiMapValue(pitstopPlan, "Pitstop", "Tyre.Set")
 
 			pressures := string2Values(",", getMultiMapValue(pitstopPlan, "Pitstop", "Tyre.Pressures"))
 
-			displayPressures := values2String(", ", displayValue("Float", convertUnit("Pressure", pressures[1]))
-												  , displayValue("Float", convertUnit("Pressure", pressures[2]))
-												  , displayValue("Float", convertUnit("Pressure", pressures[3]))
-												  , displayValue("Float", convertUnit("Pressure", pressures[4])))
+			displayPressures := values2String(", ", pressures[1] ? displayValue("Float", convertUnit("Pressure", pressures[1])) : "-"
+												  , pressures[2] ? displayValue("Float", convertUnit("Pressure", pressures[2])) : "-"
+												  , pressures[3] ? displayValue("Float", convertUnit("Pressure", pressures[3])) : "-"
+												  , pressures[4] ? displayValue("Float", convertUnit("Pressure", pressures[4])) : "-")
 
 			pressures := values2String(", ", pressures*)
 		}
 		else {
-			tyreCompound := "-"
-			tyreCompoundColor := false
+			tyreCompound := ["-"]
+			tyreCompoundColor := [false]
 
 			tyreSet := "-"
 			pressures := "-, -, -, -"
 
 			displayPressures := pressures
 		}
+
+		combineCompounds(&tyreCompound, &tyreCompoundColor)
 
 		requestDriver := getMultiMapValue(pitstopPlan, "Pitstop", "Driver", kUndefined)
 
@@ -4861,7 +4903,7 @@ class TeamCenter extends ConfigurationItem {
 			displayFuel := fuel
 
 		this.PitstopsListView.Add("", this.PitstopsListView.GetCount() + 1, pitstopLap, displayNullValue(nextDriver), displayFuel
-									, (tyreCompound = "-") ? tyreCompound : translate(compound(tyreCompound, tyreCompoundColor)), (tyreSet != 0) ? tyreSet : "-"
+									, values2String(", ", collect(compounds(tyreCompound, tyreCompoundColor), translate)*), (tyreSet != 0) ? tyreSet : "-"
 									, displayPressures, this.computeRepairs(repairBodywork, repairSuspension, repairEngine))
 
 		this.iPitstopStints.Push(this.CurrentStint.Nr)
@@ -4875,7 +4917,9 @@ class TeamCenter extends ConfigurationItem {
 
 		sessionStore.add("Pitstop.Data"
 					   , Database.Row("Lap", pitstopLap - 1, "Fuel", fuel
-									, "Tyre.Compound", tyreCompound, "Tyre.Compound.Color", tyreCompoundColor, "Tyre.Set", tyreSet
+									, "Tyre.Compound", values2String(",", tyreCompound*)
+									, "Tyre.Compound.Color", values2String(",", tyreCompoundColor*)
+									, "Tyre.Set", tyreSet
 									, "Tyre.Pressure.Cold.Front.Left", pressures[1], "Tyre.Pressure.Cold.Front.Right", pressures[2]
 									, "Tyre.Pressure.Cold.Rear.Left", pressures[3], "Tyre.Pressure.Cold.Rear.Right", pressures[4]
 									, "Repair.Bodywork", repairBodywork, "Repair.Suspension", repairSuspension, "Repair.Engine", repairEngine
@@ -5691,7 +5735,7 @@ class TeamCenter extends ConfigurationItem {
 	}
 
 	runSimulation(sessionType, additionalLaps) {
-		TeamCenterSimulationTask(ObjBindMethod(this, "runSimulationAsync", sessionType)).start()
+		TeamCenterSimulationTask(ObjBindMethod(this, "runSimulationAsync", sessionType, additionalLaps)).start()
 	}
 
 	runSimulationAsync(sessionType, additionalLaps) {
@@ -5739,18 +5783,18 @@ class TeamCenter extends ConfigurationItem {
 	}
 
 	getStintSetup(stintNr, carryOver, &driver, &fuel := false
-									, &tyreCompound := false, &tyreCompoundColor := false
+									, &tyreCompounds := false, &tyreCompoundColors := false
 									, &tyreSet := false, &tyrePressures := false) {
 		local sessionStore := this.SessionStore
 		local stint := this.Stints[stintNr]
 		local lap := stint.Laps[1]
-		local pressureTable, pressures, pressure, theCompound, pitstop, candidate, index
+		local pressureTable, pressures, pressure, pitstop, candidate, index
 
 		driver := stint.Driver
 		tyrePressures := false
 		fuel := lap.FuelRemaining
 
-		splitCompound(lap.Compound, &tyreCompound, &tyreCompoundColor)
+		splitCompounds(lap.Compounds, &tyreCompounds, &tyreCompoundColors)
 
 		if lap.Telemetry
 			tyreSet := getMultiMapValue(parseMultiMap(lap.Telemetry), "Car Data", "TyreSet", false)
@@ -5783,9 +5827,7 @@ class TeamCenter extends ConfigurationItem {
 				if (pitstop.Length > 0) {
 					pitstop := pitstop[1]
 
-					theCompound := pitstop["Tyre.Compound"]
-
-					if (theCompound != "-") {
+					if exist(string2Values(",", pitstop["Tyre.Compound"]), (c) => (c && (c != "-"))) {
 						tyreSet := pitstop["Tyre.Set"]
 
 						tyrePressures := []
@@ -5798,8 +5840,8 @@ class TeamCenter extends ConfigurationItem {
 						break
 					}
 					else if !carryOver {
-						tyreCompound := false
-						tyreCompoundColor := false
+						tyreCompounds := false
+						tyreCompoundColors := false
 						tyreSet := false
 						tyrePressures := false
 
@@ -5812,9 +5854,7 @@ class TeamCenter extends ConfigurationItem {
 							index := (this.iPitstopStints.Length - A_Index + 1)
 
 							if index {
-								theCompound := this.PitstopsListView.GetText(index, 5)
-
-								if (theCompound != "-") {
+								if exist(string2Values(",", this.PitstopsListView.GetText(index, 5)), (c) => (c && (c != "-"))) {
 									if !tyreSet {
 										tyreSet := this.PitstopsListView.GetText(index, 6)
 
@@ -5836,8 +5876,8 @@ class TeamCenter extends ConfigurationItem {
 									break
 								}
 								else if !carryOver {
-									tyreCompound := false
-									tyreCompoundColor := false
+									tyreCompounds := false
+									tyreCompoundColors := false
 									tyreSet := false
 									tyrePressures := false
 
@@ -5853,19 +5893,28 @@ class TeamCenter extends ConfigurationItem {
 
 	getCompletedPitstops() {
 		local pitstops := []
-		local stint, driver, fuel, tyreCompound, tyreCompoundColor, tyreSet, tyrePressures
+		local stint, driver, fuel, tyreCompounds, tyreCompoundColors, tyreSet, tyrePressures
 
 		loop this.CurrentStint.Nr
 			if ((A_Index > 1) && this.Stints.Has(A_Index)) {
 				this.getStintSetup(A_Index, false, &driver, &fuel
-												 , &tyreCompound, &tyreCompoundColor, &tyreSet, &tyrePressures)
+												 , &tyreCompounds, &tyreCompoundColors, &tyreSet, &tyrePressures)
+
+				if tyreCompounds {
+					tyreCompounds := collect(tyreCompounds, (c) => ((c = "-") ? false : c))
+					tyreCompoundColors := collect(tyreCompounds, (cc) => ((cc = "-") ? false : cc))
+				}
+				else {
+					tyreCompounds := []
+					tyreCompoundColors := []
+				}
 
 				try {
 					pitstops.Push({Nr: (A_Index - 1)
 								 , Time: Round(DateDiff(this.computeStartTime(this.Stints[A_Index]), this.computeStartTime(this.Stints[1]), "Seconds"))
 								 , Lap: this.Stints[A_Index].Lap, RefuelAmount: fuel
-								 , TyreChange: (tyreCompound != false)
-								 , TyreCompound: tyreCompound, TyreCompoundColor: tyreCompoundColor, TyreSet:tyreSet})
+								 , TyreChange: exist(tyreCompounds, (c) => c)
+								 , TyreCompounds: tyreCompounds, TyreCompoundColors: tyreCompoundColors, TyreSet:tyreSet})
 				}
 				catch Any as exception {
 					logError(exception)
@@ -6154,7 +6203,7 @@ class TeamCenter extends ConfigurationItem {
 
 	computeAvailableTyreSets(availableTyreSets) {
 		local lastTyreSet := 0
-		local stint, driver, fuel, tyreCompound, tyreCompoundColor, tyreSet, tyrePressures
+		local stint, driver, fuel, tyreCompounds, tyreCompoundColors, tyreSet, tyrePressures
 
 		if this.CurrentStint
 			loop this.CurrentStint.Nr {
@@ -6162,13 +6211,13 @@ class TeamCenter extends ConfigurationItem {
 
 				if this.Stints.Has(stint) {
 					this.getStintSetup(stint, true, &driver, &fuel
-												  , &tyreCompound, &tyreCompoundColor, &tyreSet, &tyrePressures)
+												  , &tyreCompounds, &tyreCompoundColors, &tyreSet, &tyrePressures)
 
-					if (tyreSet && (tyreSet != lastTyreSet)) {
-						tyreCompound := compound(tyreCompound, tyreCompoundColor)
+					if (tyreCompounds && tyreSet && (tyreSet != lastTyreSet)) {
+						tyreCompounds := compounds(tyreCompounds, tyreCompoundColors)
 
-						if (availableTyreSets.Has(tyreCompound) && availableTyreSets[tyreCompound][2].Has(tyreSet))
-							availableTyreSets[tyreCompound][2][tyreSet] += this.Stints[A_Index].Laps.Length
+						if (availableTyreSets.Has(tyreCompounds[1]) && availableTyreSets[tyreCompounds[1]][2].Has(tyreSet))
+							availableTyreSets[tyreCompounds[1]][2][tyreSet] += this.Stints[A_Index].Laps.Length
 					}
 
 					lastTyreSet := tyreSet
@@ -6596,9 +6645,11 @@ class TeamCenter extends ConfigurationItem {
 		local row, compound, settings
 
 		if (force || !this.Simulator || (this.Simulator != simulator) || (this.Car != car) || (this.Track != track)) {
-			this.iSimulator := simulator
+			this.iSimulator := SessionDatabase.getSimulatorName(simulator)
 			this.iCar := car
 			this.iTrack := track
+
+			this.iProvider := false
 
 			if (this.Simulator = "") {
 				this.iSimulator := false
@@ -6679,7 +6730,7 @@ class TeamCenter extends ConfigurationItem {
 	loadNewStints(currentStint) {
 		local session := this.SelectedSession[true]
 		local newStints := []
-		local ignore, identifier, newStint, time, identifier, driver, message, stint
+		local ignore, identifier, newStint, time, identifier, driver, message, stint, mixedCompounds
 
 		if (!this.CurrentStint || (currentStint.Nr > this.CurrentStint.Nr)) {
 			for ignore, identifier in string2Values(";", this.Connector.GetSessionStints(session))
@@ -6713,6 +6764,8 @@ class TeamCenter extends ConfigurationItem {
 					newStints.Push(newStint)
 				}
 
+			this.Provider.supportsTyreManagement(&mixedCompounds)
+
 			loop newStints.Length {
 				stint := newStints[A_Index]
 				identifier := stint.Identifier
@@ -6734,7 +6787,14 @@ class TeamCenter extends ConfigurationItem {
 				stint.Accidents := 0
 				stint.Penalties := 0
 				stint.Weather := "-"
-				stint.Compound := "-"
+
+				if (mixedCompounds = "Wheel")
+					stint.Compounds := ["-", "-", "-", "-"]
+				else if (mixedCompounds = "Axle")
+					stint.Compounds := ["-", "-"]
+				else
+					stint.Compounds := ["-"]
+
 				stint.TyreSet := false
 				stint.StartPosition := "-"
 				stint.EndPosition := "-"
@@ -6763,7 +6823,7 @@ class TeamCenter extends ConfigurationItem {
 		local newLaps := []
 		local newTelemetry := false
 		local ignore, identifier, newLap, count, lap, tries, rawData, data, damage, ignore, value
-		local fuelConsumption, car, pLap, sectorTimes
+		local fuelConsumption, car, pLap, sectorTimes, mixedCompounds, tyreSet, index, tyre, axle
 
 		for ignore, identifier in stintLaps
 			if !this.Laps.Has(identifier) {
@@ -6774,6 +6834,8 @@ class TeamCenter extends ConfigurationItem {
 				if !this.Laps.Has(newLap.Nr)
 					newLaps.Push(newLap)
 			}
+
+		this.Provider.supportsTyreManagement(&mixedCompounds, &tyreSet)
 
 		bubbleSort(&newLaps, (a, b) => a.Nr > b.Nr)
 
@@ -6895,9 +6957,27 @@ class TeamCenter extends ConfigurationItem {
 			lap.TrackTemperature := Round(getMultiMapValue(data, "Track Data", "Temperature"), 1)
 			lap.Grip := getMultiMapValue(data, "Track Data", "Grip")
 
-			lap.Compound := compound(getMultiMapValue(data, "Car Data", "TyreCompound")
-								   , getMultiMapValue(data, "Car Data", "TyreCompoundColor"))
-			lap.TyreSet := getMultiMapValue(data, "Car Data", "TyreSet", false)
+			switch mixedCompounds, false {
+				case "Wheel":
+					lap.Compounds := []
+
+					for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
+						lap.Compounds.Push(compound(getMultiMapValue(data, "Car Data", "TyreCompound" . tyre)
+												  , getMultiMapValue(data, "Car Data", "TyreCompoundColor" . tyre)))
+				case "Axle":
+					lap.Compounds := []
+
+					for index, axle in ["Front", "Rear"]
+						lap.Compounds.Push(compound(getMultiMapValue(data, "Car Data", "TyreCompound" . axle)
+												  , getMultiMapValue(data, "Car Data", "TyreCompoundColor" . axle)))
+				default:
+					lap.Compounds := [compound(getMultiMapValue(data, "Car Data", "TyreCompound")
+											 , getMultiMapValue(data, "Car Data", "TyreCompoundColor"))]
+			}
+
+			combineCompounds(&lap.Compounds)
+
+			lap.TyreSet := (tyreSet ? getMultiMapValue(data, "Car Data", "TyreSet", false) : false)
 
 			try {
 				tries := ((A_Index == count) ? ((isDebug() || (lap.Nr = 1)) ? 40 : 15) : 1)
@@ -7101,12 +7181,12 @@ class TeamCenter extends ConfigurationItem {
 			airTemperatures.Push(lap.AirTemperature)
 			trackTemperatures.Push(lap.TrackTemperature)
 
-			if (stint.Compound != lap.Compound) {
-				stint.Compound := lap.Compound
+			if !equalCompounds(stint.Compounds, lap.Compounds) {
+				stint.Compounds := lap.Compounds
 				stint.TyreSet := lap.TyreSet
 
 				for ignore, theLap in stint.Laps {
-					theLap.Compound := lap.Compound
+					theLap.Compounds := lap.Compounds
 					theLap.TyreSet := lap.TyreSet
 				}
 			}
@@ -7144,7 +7224,8 @@ class TeamCenter extends ConfigurationItem {
 
 		if row
 			this.StintsListView.Modify(row, "", stint.Nr, stint.Driver.FullName, values2String(", ", collect(string2Values(",", stint.Weather), translate)*)
-											  , translate(stint.Compound), stint.Laps.Length, stint.StartPosition, stint.EndPosition, lapTimeDisplayValue(stint.AvgLaptime)
+											  , values2String(", ", collect(stint.Compounds, translate)*)
+											  , stint.Laps.Length, stint.StartPosition, stint.EndPosition, lapTimeDisplayValue(stint.AvgLaptime)
 											  , displayValue("Float", convertUnit("Volume", stint.FuelConsumption)), stint.Accidents, stint.Penalties
 											  , stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
 
@@ -7197,7 +7278,8 @@ class TeamCenter extends ConfigurationItem {
 
 				for ignore, stint in newStints {
 					this.StintsListView.Add("", stint.Nr, stint.Driver.FullName, values2String(", ", collect(string2Values(",", stint.Weather), translate)*)
-											  , translate(stint.Compound), stint.Laps.Length, stint.StartPosition, stint.EndPosition, lapTimeDisplayValue(stint.AvgLaptime)
+											  , values2String(", ", collect(stint.Compounds, translate)*)
+											  , stint.Laps.Length, stint.StartPosition, stint.EndPosition, lapTimeDisplayValue(stint.AvgLaptime)
 											  , displayValue("Float", convertUnit("Volume", stint.FuelConsumption)), stint.Accidents, stint.Penalties
 											  , stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
 
@@ -7291,8 +7373,8 @@ class TeamCenter extends ConfigurationItem {
 				currentStint := this.CurrentStint
 
 				if currentStint {
-					this.iTyreCompound := compound(currentStint.Compound)
-					this.iTyreCompoundColor := compoundColor(currentStint.Compound)
+					this.iTyreCompound := compound(currentStint.Compounds[1])
+					this.iTyreCompoundColor := compoundColor(currentStint.Compounds[1])
 				}
 			}
 			catch Any as exception {
@@ -7534,17 +7616,18 @@ class TeamCenter extends ConfigurationItem {
 		local tyreChange := true
 		local newData, message, session, lapsDB, tyresTable, lap, theLap, runningLap, driverID, telemetry
 		local telemetryData, pressures, temperatures, wear, lapPressures, pressure, driver, row
+		local tyreCompound, tyreCompoundColor, mixedCompounds, index, tyre, axle, compounds
 
 		wasPitstop(lap, &tyreChange := false) {
-			local fuel, tyreCompound, tyreCompoundColor, tyreSet, tyrePressures
+			local fuel, tyreCompounds, tyreCompoundColors, tyreSet, tyrePressures
 
 			lap := this.Laps[lap]
 
 			if (Abs(lap.Stint.Lap - lap.Nr) <= 1) {
 				this.getStintSetup(lap.Stint.Nr, false, &driver, &fuel
-													  , &tyreCompound, &tyreCompoundColor, &tyreSet, &tyrePressures)
+													  , &tyreCompounds, &tyreCompoundColors, &tyreSet, &tyrePressures)
 
-				tyreChange := (tyreCompound != false)
+				tyreChange := (tyreCompounds ? exist(tyreCompounds, (c) => (c && (c != "-"))) : false)
 
 				return true
 			}
@@ -7560,6 +7643,8 @@ class TeamCenter extends ConfigurationItem {
 		static fails := 0
 
 		newData := false
+
+		this.Provider.supportsTyreManagement(&mixedCompounds)
 
 		if !load {
 			message := (translate("Syncing telemetry data (Lap: ") . lastLap . translate(")"))
@@ -7620,6 +7705,51 @@ class TeamCenter extends ConfigurationItem {
 					if (this.Laps.Has(lap) && this.Laps[lap].HasOwnProp("Telemetry")) {
 						telemetry := parseMultiMap(this.Laps[lap].Telemetry)
 
+						tyreCompound := getMultiMapValue(telemetry, "Car Data", "TyreCompound", "Dry")
+						tyreCompoundColor := getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor", "Black")
+
+						if (mixedCompounds = "Wheel") {
+							compounds := []
+
+							for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
+								compounds.Push(getMultiMapValue(telemetry, "Car Data", "TyreCompound" . tyre, tyreCompound))
+
+							tyreCompound := compounds
+
+							compounds := []
+
+							for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
+								compounds.Push(getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor" . tyre, tyreCompoundColor))
+
+							tyreCompoundColor := compounds
+
+							combineCompounds(&tyreCompound, &tyreCompoundColor)
+						}
+						else if (mixedCompounds = "Axle") {
+							compounds := []
+
+							for index, axle in ["Front", "Rear"]
+								compounds.Push(getMultiMapValue(telemetry, "Car Data", "TyreCompound" . axle, tyreCompound))
+
+							tyreCompound := compounds
+
+							compounds := []
+
+							for index, axle in ["Front", "Rear"]
+								compounds.Push(getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor" . axle, tyreCompoundColor))
+
+							tyreCompoundColor := compounds
+
+							combineCompounds(&tyreCompound, &tyreCompoundColor)
+						}
+						else {
+							tyreCompound := [tyreCompound]
+							tyreCompoundColor := [tyreCompoundColor]
+						}
+
+						tyreCompound := values2String(",", tyreCompound*)
+						tyreCompoundColor := values2String(",", tyreCompoundColor*)
+
 						telemetryData := values2String(";", this.Simulator ? this.Simulator : "-"
 														  , this.Car ? this.Car : "-"
 														  , this.Track ? this.Track : "-"
@@ -7633,8 +7763,7 @@ class TeamCenter extends ConfigurationItem {
 														  , getMultiMapValue(telemetry, "Car Data", "Map", "n/a")
 														  , getMultiMapValue(telemetry, "Car Data", "TC", "n/a")
 														  , getMultiMapValue(telemetry, "Car Data", "ABS", "n/a")
-														  , getMultiMapValue(telemetry, "Car Data", "TyreCompound", "Dry")
-														  , getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor", "Black")
+														  , tyreCompound, tyreCompoundColor
 														  , getMultiMapValue(telemetry, "Car Data", "TyrePressure", ",,,")
 														  , getMultiMapValue(telemetry, "Car Data", "TyreTemperature", ",,,")
 														  , getMultiMapValue(telemetry, "Car Data", "TyreWear", "null,null,null,null")
@@ -7679,11 +7808,14 @@ class TeamCenter extends ConfigurationItem {
 				else
 					wear := [kNull, kNull, kNull, kNull]
 
-				lapsDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
+				lapsDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6]
+										, string2Values(",", telemetryData[14])[1], string2Values(",", telemetryData[15])[1]
 										, telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9]
 										, driverID)
 
-				lapsDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15], runningLap
+				lapsDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]
+								  , string2Values(",", telemetryData[14])[1], string2Values(",", telemetryData[15])[1]
+								  , runningLap
 								  , pressures[1], pressures[2], pressures[4], pressures[4]
 								  , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
 								  , wear[1], wear[2], wear[3], wear[4]
@@ -7725,6 +7857,7 @@ class TeamCenter extends ConfigurationItem {
 		local lastLap, tyresTable, ignore, pressureData, pressureFL, pressureFR, pressureRL, pressureRR, tyres
 		local row, session, pressuresDB, message, newData, lap, flush, driverID, row
 		local lapPressures, coldPressures, hotPressures, pressuresLosses, pressuresTable, pressures, pressure
+		local tyreCompound, tyreCompoundColor, mixedCompounds
 
 		static fails := 0
 
@@ -7784,6 +7917,8 @@ class TeamCenter extends ConfigurationItem {
 			pressuresDB := this.PressuresDatabase
 			lastLap := this.LastLap
 
+			this.Provider.supportsTyreManagement(&mixedCompounds)
+
 			if lastLap
 				lastLap := lastLap.Nr
 			else
@@ -7839,14 +7974,40 @@ class TeamCenter extends ConfigurationItem {
 					if (this.Laps.Has(lap) && this.Laps[lap].HasOwnProp("Telemetry")) {
 						telemetry := parseMultiMap(this.Laps[lap].Telemetry)
 
+						tyreCompound := getMultiMapValue(telemetry, "Car Data", "TyreCompound", "Dry")
+						tyreCompoundColor := getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor", "Black")
+
+						if (mixedCompounds = "Wheel") {
+							tyreCompound := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
+												  , (tyre) => getMultiMapValue(telemetry, "Car Data", "TyreCompound" . tyre, tyreCompound))
+							tyreCompoundColor := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
+													   , (tyre) => getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor" . tyre, tyreCompoundColor))
+
+							combineCompounds(&tyreCompound, &tyreCompoundColor)
+						}
+						else if (mixedCompounds = "Axle") {
+							tyreCompound := collect(["Front", "Rear"]
+															, (axle) => getMultiMapValue(telemetry, "Car Data", "TyreCompound" . axle, tyreCompound))
+							tyreCompoundColor := collect(["Front", "Rear"]
+													   , (axle) => getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor" . axle, tyreCompoundColor))
+
+							combineCompounds(&tyreCompound, &tyreCompoundColor)
+						}
+						else {
+							tyreCompound := [tyreCompound]
+							tyreCompoundColor := [tyreCompoundColor]
+						}
+
+						tyreCompound := values2String(",", tyreCompound*)
+						tyreCompoundColor := values2String(",", tyreCompoundColor*)
+
 						lapPressures := values2String(";", this.Simulator ? this.Simulator : "-"
 														 , this.Car ? this.Car : "-"
 														 , this.Track ? this.Track : "-"
 														 , getMultiMapValue(telemetry, "Weather Data", "Weather", "Dry")
 														 , getMultiMapValue(telemetry, "Weather Data", "Temperature", 23)
 														 , getMultiMapValue(telemetry, "Track Data", "Temperature", 27)
-														 , getMultiMapValue(telemetry, "Car Data", "TyreCompound", "Dry")
-														 , getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor", "Black")
+														 , tyreCompound, tyreCompoundColor
 														 , "-,-,-,-"
 														 , getMultiMapValue(telemetry, "Car Data", "TyrePressure", ",,,")
 														 , "-,-,-,-")
@@ -7913,6 +8074,7 @@ class TeamCenter extends ConfigurationItem {
 		local pressureFL, pressureFR, pressureRL, pressureRR, repairBodywork, repairSuspension, repairEngine
 		local pressures, displayPressures, displayFuel, driverRequest, tries, pitstopNr, stint, hasPlanned
 		local pitstop, serviceTime, repairsTime, pitlaneTime
+		local fuelService, tyreService, repairService, tyreSets, index, tyre, axle, displayTyreCompound, tc, tcc, dtc, dtcc
 
 		loop this.PitstopsListView.GetCount()
 			if (this.PitstopsListView.GetNext(A_Index - 1, "C") != A_Index) {
@@ -7922,6 +8084,9 @@ class TeamCenter extends ConfigurationItem {
 			}
 
 		this.showMessage(translate("Updating pitstops"))
+
+		this.Provider.supportsPitstop(&fuelService, &tyreService, &repairService)
+		this.Provider.supportsTyreManagement( , &tyreSets)
 
 		if newLaps {
 			try {
@@ -7941,37 +8106,102 @@ class TeamCenter extends ConfigurationItem {
 					lap := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Lap", false)
 
 					if lap {
-						fuel := Round(getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Fuel", 0))
-						tyreCompound := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound", false)
-						tyreCompoundColor := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound.Color", false)
-						tyreSet := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Set", "-")
+						if fuelService
+							fuel := Round(getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Fuel", 0))
+						else
+							fuel := "-"
+
+						if tyreSets
+							tyreSet := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Set", "-")
+						else
+							tyreSet := "-"
+
+						dtc := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound", false)
+						dtcc := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound.Color", false)
+
+						if (tyreService = "Wheel") {
+							tyreCompound := []
+							tyreCompoundColor := []
+
+							for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
+								tyreCompound.Push(getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound." . tyre, dtc))
+								tyreCompoundColor.Push(getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound.Color." . tyre, dtcc))
+							}
+
+							combineCompounds(&tyreCompound, &tyreCompoundColor)
+
+							displayTyreCompound := values2String(", ", collect(compounds(tyreCompound, tyreCompoundColor), translate)*)
+
+							tyreCompound := values2String(",", tyreCompound*)
+							tyreCompoundColor := values2String(",", tyreCompoundColor*)
+						}
+						else if (tyreService = "Axle") {
+							tyreCompound := []
+							tyreCompoundColor := []
+
+							for index, axle in ["Front", "Rear"] {
+								tyreCompound.Push(getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound." . axle, dtc))
+								tyreCompoundColor.Push(getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound.Color." . axle, dtcc))
+							}
+
+							combineCompounds(&tyreCompound, &tyreCompoundColor)
+
+							displayTyreCompound := values2String(", ", collect(compounds(tyreCompound, tyreCompoundColor), translate)*)
+
+							tyreCompound := values2String(",", tyreCompound*)
+							tyreCompoundColor := values2String(",", tyreCompoundColor*)
+						}
+						else {
+							tyreCompound := dtc
+							tyreCompoundColor := dtcc
+
+							if (tyreCompound && (tyreCompound != "-")) {
+								displayTyreCompound := translate(compound(tyreCompound, tyreCompoundColor))
+
+								if this.Laps.Has(lap + 1)
+									splitCompound(this.Laps[lap + 1].Stint.Compounds[1], &tyreCompound, &tyreCompoundColor)
+
+								if ((tyreCompound = "Wet") && (SessionDatabase.getSimulatorCode(this.Simulator) = "ACC"))
+									tyreSet := "-"
+							}
+							else {
+								displayTyreCompound := "-"
+								tyreSet := "-"
+							}
+						}
+
+						if (repairService.Length > 0) {
+							repairBodywork := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Repair.Bodywork", false)
+							repairSuspension := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Repair.Suspension", false)
+							repairEngine := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Repair.Engine", false)
+						}
+						else {
+							repairBodywork := false
+							repairSuspension := false
+							repairEngine := false
+						}
+
+						driverRequest := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Driver.Request", false)
+
 						pressureFL := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.FL", "-")
 						pressureFR := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.FR", "-")
 						pressureRL := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.RL", "-")
 						pressureRR := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.RR", "-")
-						repairBodywork := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Repair.Bodywork", false)
-						repairSuspension := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Repair.Suspension", false)
-						repairEngine := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Repair.Engine", false)
-						driverRequest := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Driver.Request", false)
 
-						if (tyreCompound && (tyreCompound != "-")) {
-							if this.Laps.Has(lap + 1)
-								splitCompound(this.Laps[lap + 1].Stint.Compound, &tyreCompound, &tyreCompoundColor)
+						if (displayTyreCompound && (displayTyreCompound != "-")) {
+							pressures := values2String(", ", isNumber(pressureFL) ? Round(pressureFL, 1) : pressureFL
+														   , isNumber(pressureFR) ? Round(pressureFR, 1) : pressureFR
+														   , isNumber(pressureRL) ? Round(pressureRL, 1) : pressureRL
+														   , isNumber(pressureRR) ? Round(pressureRR, 1) : pressureRR)
 
-							if ((tyreCompound = "Wet") && (SessionDatabase.getSimulatorCode(this.Simulator) = "ACC"))
-								tyreSet := "-"
-
-							pressures := values2String(", ", Round(pressureFL, 1), Round(pressureFR, 1)
-														   , Round(pressureRL, 1), Round(pressureRR, 1))
-
-							displayPressures := values2String(", ", displayValue("Float", convertUnit("Pressure", pressureFL))
-																  , displayValue("Float", convertUnit("Pressure", pressureFR))
-																  , displayValue("Float", convertUnit("Pressure", pressureRL))
-																  , displayValue("Float", convertUnit("Pressure", pressureRR)))
+							displayPressures
+								:= values2String(", ", isNumber(pressureFL) ? displayValue("Float", convertUnit("Pressure", pressureFL)) : pressureFL
+													 , isNumber(pressureFR) ? displayValue("Float", convertUnit("Pressure", pressureFR)) : pressureFR
+													 , isNumber(pressureRL) ? displayValue("Float", convertUnit("Pressure", pressureRL)) : pressureRL
+													 , isNumber(pressureRR) ? displayValue("Float", convertUnit("Pressure", pressureRR)) : pressureRR)
 						}
 						else {
-							tyreCompound := "-"
-							tyreCompoundColor := false
+							displayTyreCompound := "-"
 
 							tyreSet := "-"
 							pressures := "-, -, -, -"
@@ -8034,8 +8264,7 @@ class TeamCenter extends ConfigurationItem {
 								break
 							}
 
-						this.PitstopsListView.Add("Check", nextStop, lap + 1, displayNullValue(nextDriver), displayFuel
-														 , (tyreCompound = "-") ? tyreCompound : translate(compound(tyreCompound, tyreCompoundColor))
+						this.PitstopsListView.Add("Check", nextStop, lap + 1, displayNullValue(nextDriver), displayFuel, displayTyreCompound
 														 , ((tyreSet = 0) ? "-" : tyreSet), displayPressures
 														 , this.computeRepairs(repairBodywork, repairSuspension, repairEngine))
 
@@ -8066,7 +8295,8 @@ class TeamCenter extends ConfigurationItem {
 						sessionStore.remove("Pitstop.Data", {Status: "Planned"}, always.Bind(true))
 
 						sessionStore.add("Pitstop.Data"
-									   , Database.Row("Lap", lap, "Fuel", fuel, "Tyre.Compound", tyreCompound, "Tyre.Compound.Color", tyreCompoundColor, "Tyre.Set", tyreSet
+									   , Database.Row("Lap", lap, "Fuel", fuel
+													, "Tyre.Compound", tyreCompound, "Tyre.Compound.Color", tyreCompoundColor, "Tyre.Set", tyreSet
 													, "Tyre.Pressure.Cold.Front.Left", pressures[1], "Tyre.Pressure.Cold.Front.Right", pressures[2]
 													, "Tyre.Pressure.Cold.Rear.Left", pressures[3], "Tyre.Pressure.Cold.Rear.Right", pressures[4]
 													, "Repair.Bodywork", repairBodywork, "Repair.Suspension", repairSuspension, "Repair.Engine", repairEngine
@@ -8143,10 +8373,66 @@ class TeamCenter extends ConfigurationItem {
 						if !lap
 							lap := "-"
 
-						fuel := Round(getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Fuel", 0))
-						tyreCompound := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound", false)
-						tyreCompoundColor := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound.Color", false)
-						tyreSet := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Set", "-")
+						if fuelService
+							fuel := Round(getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Fuel", 0))
+						else
+							fuel := 0
+
+						if tyreSets
+							tyreSet := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Set", "-")
+						else
+							tyreSet := "-"
+
+						dtc := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound", false)
+						dtcc := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound.Color", false)
+
+						if (tyreService = "Wheel") {
+							tyreCompound := []
+							tyreCompoundColor := []
+
+							for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
+								tyreCompound.Push(getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound." . tyre, dtc))
+								tyreCompoundColor.Push(getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound.Color." . tyre, dtcc))
+							}
+
+							combineCompounds(&tyreCompound, &tyreCompoundColor)
+
+							displayTyreCompound := values2String(", ", collect(compounds(tyreCompound, tyreCompoundColor), translate)*)
+
+							tyreCompound := values2String(",", tyreCompound*)
+							tyreCompoundColor := values2String(",", tyreCompoundColor*)
+						}
+						else if (tyreService = "Axle") {
+							tyreCompound := []
+							tyreCompoundColor := []
+
+							for index, axle in ["Front", "Rear"] {
+								tyreCompound.Push(getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound." . axle, dtc))
+								tyreCompoundColor.Push(getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound.Color." . axle, dtcc))
+							}
+
+							combineCompounds(&tyreCompound, &tyreCompoundColor)
+
+							displayTyreCompound := values2String(", ", collect(compounds(tyreCompound, tyreCompoundColor), translate)*)
+
+							tyreCompound := values2String(",", tyreCompound*)
+							tyreCompoundColor := values2String(",", tyreCompoundColor*)
+						}
+						else {
+							tyreCompound := dtc
+							tyreCompoundColor := dtcc
+
+							if (tyreCompound && (tyreCompound != "-")) {
+								displayTyreCompound := translate(compound(tyreCompound, tyreCompoundColor))
+
+								if ((tyreCompound = "Wet") && (SessionDatabase.getSimulatorCode(this.Simulator) = "ACC"))
+									tyreSet := "-"
+							}
+							else {
+								displayTyreCompound := "-"
+								tyreSet := "-"
+							}
+						}
 
 						pressureFL := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Pressure.FL", "-")
 						pressureFR := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Pressure.FR", "-")
@@ -8162,9 +8448,17 @@ class TeamCenter extends ConfigurationItem {
 						if !pressureRR
 							pressureRR := "-"
 
-						repairBodywork := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Repair.Bodywork", false)
-						repairSuspension := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Repair.Suspension", false)
-						repairEngine := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Repair.Engine", false)
+						if (repairService.Length > 0) {
+							repairBodywork := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Repair.Bodywork", false)
+							repairSuspension := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Repair.Suspension", false)
+							repairEngine := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Repair.Engine", false)
+						}
+						else {
+							repairBodywork := false
+							repairSuspension := false
+							repairEngine := false
+						}
+
 						driverRequest := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Driver.Request", false)
 						serviceTime := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Time.Service", kNull)
 						repairsTime := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Time.Repairs", kNull)
@@ -8179,21 +8473,20 @@ class TeamCenter extends ConfigurationItem {
 						if (pitlaneTime != kNull)
 							pitlaneTime := Round(pitlaneTime / 1000)
 
-						if (tyreCompound && (tyreCompound != "-")) {
-							if ((tyreCompound = "Wet") && (SessionDatabase.getSimulatorCode(this.Simulator) = "ACC"))
-								tyreSet := "-"
+						if (displayTyreCompound && (displayTyreCompound != "-")) {
+							pressures := values2String(", ", isNumber(pressureFL) ? Round(pressureFL, 1) : pressureFL
+														   , isNumber(pressureFR) ? Round(pressureFR, 1) : pressureFR
+														   , isNumber(pressureRL) ? Round(pressureRL, 1) : pressureRL
+														   , isNumber(pressureRR) ? Round(pressureRR, 1) : pressureRR)
 
-							pressures := values2String(", ", Round(pressureFL, 1), Round(pressureFR, 1)
-														   , Round(pressureRL, 1), Round(pressureRR, 1))
-
-							displayPressures := values2String(", ", displayValue("Float", convertUnit("Pressure", pressureFL))
-																  , displayValue("Float", convertUnit("Pressure", pressureFR))
-																  , displayValue("Float", convertUnit("Pressure", pressureRL))
-																  , displayValue("Float", convertUnit("Pressure", pressureRR)))
+							displayPressures
+								:= values2String(", ", isNumber(pressureFL) ? displayValue("Float", convertUnit("Pressure", pressureFL)) : pressureFL
+													 , isNumber(pressureFR) ? displayValue("Float", convertUnit("Pressure", pressureFR)) : pressureFR
+													 , isNumber(pressureRL) ? displayValue("Float", convertUnit("Pressure", pressureRL)) : pressureRL
+													 , isNumber(pressureRR) ? displayValue("Float", convertUnit("Pressure", pressureRR)) : pressureRR)
 						}
 						else {
-							tyreCompound := "-"
-							tyreCompoundColor := false
+							displayTyreCompound := "-"
 
 							tyreSet := "-"
 							pressures := "-, -, -, -"
@@ -8226,7 +8519,7 @@ class TeamCenter extends ConfigurationItem {
 							displayFuel := fuel
 
 						this.PitstopsListView.Add("", this.PitstopsListView.GetCount() + 1, (lap = "-") ? "-" : (lap + 1), displayNullValue(nextDriver), displayFuel
-													, (tyreCompound = "-") ? tyreCompound : translate(compound(tyreCompound, tyreCompoundColor)), ((tyreSet = 0) ? "-" : tyreSet)
+													, displayTyreCompound, ((tyreSet = 0) ? "-" : tyreSet)
 													, displayPressures, this.computeRepairs(repairBodywork, repairSuspension, repairEngine))
 
 						this.iPitstopStints.Push(this.CurrentStint.Nr)
@@ -8236,7 +8529,8 @@ class TeamCenter extends ConfigurationItem {
 						sessionStore.remove("Pitstop.Data", {Status: "Planned"}, always.Bind(true))
 
 						sessionStore.add("Pitstop.Data"
-									   , Database.Row("Lap", lap, "Fuel", fuel, "Tyre.Compound", tyreCompound, "Tyre.Compound.Color", tyreCompoundColor, "Tyre.Set", tyreSet
+									   , Database.Row("Lap", lap, "Fuel", fuel
+													, "Tyre.Compound", tyreCompound, "Tyre.Compound.Color", tyreCompoundColor, "Tyre.Set", tyreSet
 													, "Tyre.Pressure.Cold.Front.Left", pressures[1], "Tyre.Pressure.Cold.Front.Right", pressures[2]
 													, "Tyre.Pressure.Cold.Rear.Left", pressures[3], "Tyre.Pressure.Cold.Rear.Right", pressures[4]
 													, "Repair.Bodywork", repairBodywork, "Repair.Suspension", repairSuspension, "Repair.Engine", repairEngine
@@ -8276,9 +8570,12 @@ class TeamCenter extends ConfigurationItem {
 		local modifiedPitstops := []
 		local hasServiceData, hasTyreData, nextLap, startLapCandidate, state, pitstop, pitstopNr
 		local driver, laps, tyreCompound, tyreCompoundColor, tyreSet, ignore, tyre, nextPitstop, nextLap, pitstopLap
+		local tyreService
 
 		if lastLap
 			lastLap := lastLap.Nr
+
+		this.Provider.supportsPitstop( , &tyreService)
 
 		loop {
 			if (!full && (A_Index > 1))
@@ -8329,6 +8626,32 @@ class TeamCenter extends ConfigurationItem {
 
 								pitstop := getMultiMapValue(state, "Pitstop Data", "Pitstop", kUndefined)
 
+								tyreCompound := getMultiMapValue(state, "Pitstop Data", "Service.Tyre.Compound", false)
+								tyreCompoundColor := getMultiMapValue(state, "Pitstop Data", "Service.Tyre.Compound.Color", false)
+
+								if (tyreService = "Wheel") {
+									tyreCompound := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
+														  , (tyre) => getMultiMapValue(state, "Pitstop Data", "Service.Tyre.Compound." . tyre, tyreCompound))
+									tyreCompoundColor := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
+															   , (tyre) => getMultiMapValue(state, "Pitstop Data", "Service.Tyre.Compound." . tyre, tyreCompoundColor))
+
+									combineCompounds(&tyreCompound, &tyreCompoundColor)
+
+									tyreCompound := values2String(",", tyreCompound*)
+									tyreCompoundColor := values2String(",", tyreCompoundColor*)
+								}
+								else if (tyreService = "Axle") {
+									tyreCompound := collect(["Front", "Rear"]
+														  , (axle) => getMultiMapValue(state, "Pitstop Data", "Service.Tyre.Compound." . axle, tyreCompound))
+									tyreCompoundColor := collect(["Front", "Rear"]
+															   , (axle) => getMultiMapValue(state, "Pitstop Data", "Service.Tyre.Compound." . axle, tyreCompoundColor))
+
+									combineCompounds(&tyreCompound, &tyreCompoundColor)
+
+									tyreCompound := values2String(",", tyreCompound*)
+									tyreCompoundColor := values2String(",", tyreCompoundColor*)
+								}
+
 								if ((full || !hasServiceData)
 								 && (getMultiMapValue(state, "Pitstop Data", "Service.Lap", kUndefined) != kUndefined)) {
 									hasServiceData := true
@@ -8343,8 +8666,7 @@ class TeamCenter extends ConfigurationItem {
 																, "Driver.Previous", getMultiMapValue(state, "Pitstop Data", "Service.Driver.Previous", false)
 																, "Driver.Next", getMultiMapValue(state, "Pitstop Data", "Service.Driver.Next", false)
 																, "Fuel", getMultiMapValue(state, "Pitstop Data", "Service.Refuel", 0)
-																, "Tyre.Compound", getMultiMapValue(state, "Pitstop Data", "Service.Tyre.Compound", false)
-																, "Tyre.Compound.Color", getMultiMapValue(state, "Pitstop Data", "Service.Tyre.Compound.Color", false)
+																, "Tyre.Compound", tyreCompound, "Tyre.Compound.Color", tyreCompoundColor
 																, "Tyre.Set", getMultiMapValue(state, "Pitstop Data", "Service.Tyre.Set", false)
 																, "Tyre.Pressures", getMultiMapValue(state, "Pitstop Data", "Service.Tyre.Pressures", "")
 																, "Bodywork.Repair", getMultiMapValue(state, "Pitstop Data", "Service.Bodywork.Repair", false)
@@ -8361,14 +8683,24 @@ class TeamCenter extends ConfigurationItem {
 
 									driver := getMultiMapValue(state, "Pitstop Data", "Tyre.Driver")
 									laps := getMultiMapValue(state, "Pitstop Data", "Tyre.Laps", false)
-									tyreCompound := getMultiMapValue(state, "Pitstop Data", "Tyre.Compound", "Dry")
-									tyreCompoundColor := getMultiMapValue(state, "Pitstop Data", "Tyre.Compound.Color", "Black")
 									tyreSet := getMultiMapValue(state, "Pitstop Data", "Tyre.Set", "-")
+
+									tyreCompound := string2Values(",", tyreCompound)
+									tyreCompoundColor := string2Values(",", tyreCompoundColor)
+
+									if (tyreCompound.Length = 1) {
+										tyreCompound := [tyreCompound, tyreCompound, tyreCompound, tyreCompound]
+										tyreCompoundColor := [tyreCompoundColor, tyreCompoundColor, tyreCompoundColor, tyreCompoundColor]
+									}
+									else if (tyreCompound.Length = 2) {
+										tyreCompound := [tyreCompound[1], tyreCompound[1], tyreCompound[2], tyreCompound[2]]
+										tyreCompoundColor := [tyreCompoundColor[1], tyreCompoundColor[1], tyreCompoundColor[2], tyreCompoundColor[2]]
+									}
 
 									for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"]
 										sessionStore.add("Pitstop.Tyre.Data"
 													   , Database.Row("Pitstop", pitstop, "Driver", driver, "Laps", laps
-																	, "Compound", tyreCompound, "Compound.Color", tyreCompoundColor
+																	, "Compound", tyreCompound[A_Index], "Compound.Color", tyreCompoundColor[A_Index]
 																	, "Set", tyreSet, "Tyre", tyre
 																	, "Tread", getMultiMapValue(state, "Pitstop Data", "Tyre.Tread." . tyre, "-")
 																	, "Wear", getMultiMapValue(state, "Pitstop Data", "Tyre.Wear." . tyre, 0)
@@ -9486,7 +9818,8 @@ class TeamCenter extends ConfigurationItem {
 					 , FuelRemaining: lap["Fuel.Remaining"], FuelConsumption: lap["Fuel.Consumption"]
 					 , Damage: lap["Damage"], EngineDamage: lap["EngineDamage"]
 					 , Accident: lap["Accident"], Penalty: ((lap["Penalty"] != kNull) ? lap["Penalty"] : false)
-					 , Compound: compound(lap["Tyre.Compound"], lap["Tyre.Compound.Color"])
+					 , Compounds: compounds(string2Values(",", lap["Tyre.Compound"])
+										  , string2Values(",", lap["Tyre.Compound.Color"]))
 					 , RemainingDriverTime: lap["Time.Driver.Remaining"], RemainingStintTime: lap["Time.Stint.Remaining"]
 					 , Telemetry: false
 					 , WaterTemperature: lap.HasOwnProp("WaterTemperature") ? lap.WaterTemperature : kNull
@@ -9553,7 +9886,7 @@ class TeamCenter extends ConfigurationItem {
 			driver := this.createDriver({Forname: stint["Driver.Forname"], Surname: stint["Driver.Surname"], Nickname: stint["Driver.Nickname"], ID: stint["Driver.ID"]})
 
 			newStint := {Nr: stint["Nr"], Row: false, Lap: stint["Lap"], Driver: driver
-					   , Weather: stint["Weather"], Compound: normalizeCompound(stint["Compound"]), TyreSet: stint["TyreSet"]
+					   , Weather: stint["Weather"], Compounds: normalizeCompounds(stint["Compound"]), TyreSet: stint["TyreSet"]
 					   , AvgLaptime: stint["Lap.Time.Average"], BestLaptime: stint["Lap.Time.Best"], FuelConsumption: stint["Fuel.Consumption"]
 					   , Accidents: stint["Accidents"], Penalties: stint["Penalties"], StartPosition: stint["Position.Start"], EndPosition: stint["Position.End"]
 					   , StartTime: stint["Time.Start"], EndTime: stint["Time.End"]}
@@ -9642,7 +9975,7 @@ class TeamCenter extends ConfigurationItem {
 					stint.Row := (this.StintsListView.GetCount() + 1)
 
 					this.StintsListView.Add("", stint.Nr, stint.Driver.FullName, values2String(", ", collect(string2Values(",", stint.Weather), translate)*)
-											  , translate(stint.Compound), stint.Laps.Length, stint.StartPosition, stint.EndPosition
+											  , values2String(", ", collect(stint.Compounds, translate)*), stint.Laps.Length, stint.StartPosition, stint.EndPosition
 											  , lapTimeDisplayValue(stint.AvgLaptime)
 											  , isNumber(stint.FuelConsumption) ? displayValue("Float", convertUnit("Volume", stint.FuelConsumption)) : stint.FuelConsumption
 											  , stint.Accidents, stint.Penalties, stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
@@ -9821,12 +10154,12 @@ class TeamCenter extends ConfigurationItem {
 			pressures := [pitstop["Tyre.Pressure.Cold.Front.Left"], pitstop["Tyre.Pressure.Cold.Front.Right"]
 						, pitstop["Tyre.Pressure.Cold.Rear.Left"], pitstop["Tyre.Pressure.Cold.Rear.Right"]]
 
-			tyreCompound := pitstop["Tyre.Compound"]
-			tyreCompoundColor := pitstop["Tyre.Compound.Color"]
+			tyreCompound := string2Values(",", pitstop["Tyre.Compound"])
+			tyreCompoundColor := string2Values(",", pitstop["Tyre.Compound.Color"])
 
-			if (!tyreCompound || (tyreCompound = "-")) {
-				tyreCompound := "-"
-				tyreCompoundColor := false
+			if !exist(tyreCompound, (c) => (c && (c != "-"))) {
+				tyreCompound := ["-"]
+				tyreCompoundColor := [false]
 			}
 
 			loop 4 {
@@ -9853,7 +10186,7 @@ class TeamCenter extends ConfigurationItem {
 
 			this.PitstopsListView.Add((pitstop["Status"] = "Planned") ? "" : "Check", A_Index
 									, (pitstop["Lap"] = "-") ? "-" : (pitstop["Lap"] + 1), displayNullValue(pitstop["Driver.Next"]), fuel
-									, (tyreCompound = "-") ? tyreCompound : translate(compound(tyreCompound, tyreCompoundColor)), (tyreSet = 0) ? "-" : tyreSet
+									, values2String(", ", collect(compounds(tyreCompound, tyreCompoundColor), translate)*), (tyreSet = 0) ? "-" : tyreSet
 									, values2String(", ", pressures*), this.computeRepairs(repairBodywork, repairSuspension, repairEngine))
 
 			stint := pitstop["Stint"]
@@ -10101,8 +10434,8 @@ class TeamCenter extends ConfigurationItem {
 							currentStint := this.CurrentStint
 
 							if currentStint {
-								this.iTyreCompound := compound(currentStint.Compound)
-								this.iTyreCompoundColor := compoundColor(currentStint.Compound)
+								this.iTyreCompound := compound(currentStint.Compounds[1])
+								this.iTyreCompoundColor := compoundColor(currentStint.Compounds[1])
 							}
 						}
 
@@ -11251,7 +11584,8 @@ class TeamCenter extends ConfigurationItem {
 										  , "Fuel.Consumption", null(lap.FuelConsumption), "Fuel.Remaining", null(lap.FuelRemaining)
 										  , "Weather", lap.Weather, "Temperature.Air", null(lap.AirTemperature), "Temperature.Track", null(lap.TrackTemperature)
 										  , "Grip", lap.Grip, "Map", null(lap.Map), "TC", null(lap.TC), "ABS", null(lap.ABS)
-										  , "Tyre.Compound", compound(lap.Compound), "Tyre.Compound.Color", compoundColor(lap.Compound)
+										  , "Tyre.Compound", values2String(",", collect(lap.Compounds, compound)*)
+										  , "Tyre.Compound.Color", values2String(",", collect(lap.Compounds, compoundColor)*)
 										  , "Time.Stint.Remaining", lap.RemainingStintTime, "Time.Driver.Remaining", lap.RemainingDriverTime
 										  , "Engine.Temperature.Water", lap.HasOwnProp("WaterTemperature") ? lap.WaterTemperature : kNull
 										  , "Engine.Temperature.Oil", lap.HasOwnProp("OilTemperature") ? lap.OilTemperature : kNull)
@@ -11561,7 +11895,7 @@ class TeamCenter extends ConfigurationItem {
 
 						stintData := Database.Row("Nr", newStint, "Lap", stint.Lap
 												, "Driver.Forname", stint.Driver.Forname, "Driver.Surname", stint.Driver.Surname, "Driver.Nickname", stint.Driver.Nickname
-												, "Weather", stint.Weather, "Compound", stint.Compound, "TyreSet", stint.TyreSet
+												, "Weather", stint.Weather, "Compound", values2String(",", stint.Compounds*), "TyreSet", stint.TyreSet
 												, "Lap.Time.Average", null(stint.AvgLaptime), "Lap.Time.Best", null(stint.BestLapTime)
 												, "Fuel.Consumption", null(stint.FuelConsumption), "Accidents", stint.Accidents, "Penalties", stint.Penalties
 												, "Position.Start", null(stint.StartPosition), "Position.End", null(stint.EndPosition)
@@ -11967,7 +12301,7 @@ class TeamCenter extends ConfigurationItem {
 		local hasColdPressures := false
 		local pressuresDB := this.PressuresDatabase
 		local pressuresTable, pressures, tyresTable, tyres
-		local driver, fuel, tyreCompound, tyreCompoundColor, tyreSet, tyrePressures, pressureCorrections, pressure
+		local driver, fuel, tyreCompounds, tyreCompoundColors, tyreSet, tyrePressures, pressureCorrections, pressure
 		local fuelConsumption, remainingFuel, remainingDriverTime, remainingStintTime
 
 		if pressuresDB {
@@ -11979,7 +12313,7 @@ class TeamCenter extends ConfigurationItem {
 				coldPressures := [displayNullValue(pressures["Tyre.Pressure.Cold.Front.Left"]), displayNullValue(pressures["Tyre.Pressure.Cold.Front.Right"])
 								, displayNullValue(pressures["Tyre.Pressure.Cold.Rear.Left"]), displayNullValue(pressures["Tyre.Pressure.Cold.Rear.Right"])]
 
-				this.getStintSetup(lap.Stint.Nr, true, &driver, &fuel, &tyreCompound, &tyreCompoundColor, &tyreSet, &tyrePressures)
+				this.getStintSetup(lap.Stint.Nr, true, &driver, &fuel, &tyreCompounds, &tyreCompoundColors, &tyreSet, &tyrePressures)
 
 				if tyrePressures {
 					loop 4 {
@@ -12338,7 +12672,7 @@ class TeamCenter extends ConfigurationItem {
 				pressures[A_Index] := "-"
 		}
 
-		pressures := values2String(", ", pressures*)
+		pressures := (exist(pressures, (p) => (p != 0)) ? values2String(", ", pressures*) : false)
 
 		html .= ("<tr><td><b>" . translate("Lap:") . "</b></div></td><td>" . ((pitstopData["Lap"] = "-") ? "-" : (pitstopData["Lap"] + 1)) . "</td></tr>")
 
@@ -12370,17 +12704,19 @@ class TeamCenter extends ConfigurationItem {
 		if ((pitstopData["Fuel"] != "-") && (pitstopData["Fuel"] > 0))
 			html .= ("<tr><td><b>" . translate("Refuel:") . "</b></div></td><td>" . displayValue("Float", convertUnit("Volume", pitstopData["Fuel"])) . "</td></tr>")
 
-		tyreCompound := translate(compound(pitstopData["Tyre.Compound"], pitstopData["Tyre.Compound.Color"]))
+		tyreCompound := string2Values(",", pitstopData["Tyre.Compound"])
 
-		if (tyreCompound != "-") {
+		if exist(tyreCompound, (c) => (c && (c != "-"))) {
+			tyreCompoundColor := string2Values(",", pitstopData["Tyre.Compound.Color"])
 			tyreSet := pitstopData["Tyre.Set"]
 
-			html .= ("<tr><td><b>" . translate("Tyre Compound:") . "</b></div></td><td>" . tyreCompound . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Tyre Compound:") . "</b></div></td><td>" . values2String(", ", collect(compounds(tyreCompound, tyreCompoundColor), translate)*) . "</td></tr>")
 
 			if ((tyreSet != false) && (tyreSet != "-"))
 				html .= ("<tr><td><b>" . translate("Tyre Set:") . "</b></div></td><td>" . pitstopData["Tyre.Set"] . "</td></tr>")
 
-			html .= ("<tr><td><b>" . translate("Tyre Pressures:") . "</b></div></td><td>" . pressures . "</td></tr>")
+			if pressures
+				html .= ("<tr><td><b>" . translate("Tyre Pressures:") . "</b></div></td><td>" . pressures . "</td></tr>")
 		}
 
 		if (repairs != "-")
@@ -12401,7 +12737,7 @@ class TeamCenter extends ConfigurationItem {
 		local repairEngine := pitstopData["Repair.Engine"]
 		local repairs := this.computeRepairs(repairBodyWork, repairSuspension, repairEngine)
 		local serviceData := this.SessionStore.query("Pitstop.Service.Data", {Where: {Pitstop: pitstopNr}})
-		local tyreCompound, tyreSet, name, key, pressure, fuel
+		local tyreCompound, tyreCompoundColor, tyreSet, name, key, pressure, fuel
 
 		if (serviceData.Length > 0) {
 			loop 4 {
@@ -12413,7 +12749,7 @@ class TeamCenter extends ConfigurationItem {
 					pressures[A_Index] := "-"
 			}
 
-			pressures := values2String(", ", pressures*)
+			pressures := (exist(pressures, (p) => (p != 0)) ? values2String(", ", pressures*) : false)
 
 			serviceData := serviceData[1]
 
@@ -12438,12 +12774,13 @@ class TeamCenter extends ConfigurationItem {
 
 			html .= ("<tr><td><b>" . translate("Refuel:") . "</b></div></td><td>" . fuel  . "</td></tr>")
 
-			tyreCompound := translate(compound(pitstopData["Tyre.Compound"], pitstopData["Tyre.Compound.Color"]))
+			tyreCompound := string2Values(",", pitstopData["Tyre.Compound"])
 
-			if (tyreCompound != "-") {
+			if exist(tyreCompound, (c) => (c && (c != "-"))) {
+				tyreCompoundColor := string2Values(",", pitstopData["Tyre.Compound.Color"])
 				tyreSet := pitstopData["Tyre.Set"]
 
-				html .= ("<tr><td><b>" . translate("Tyre Compound:") . "</b></div></td><td>" . tyreCompound . "</td></tr>")
+				html .= ("<tr><td><b>" . translate("Tyre Compound:") . "</b></div></td><td>" . values2String(", ", collect(compounds(tyreCompound, tyreCompoundColor), translate)*) . "</td></tr>")
 
 				if ((tyreSet != false) && (tyreSet != "-"))
 					if (serviceData["Tyre.Set"] && (serviceData["Tyre.Set"] != kNull) && (serviceData["Tyre.Set"] != "-"))
@@ -12451,7 +12788,8 @@ class TeamCenter extends ConfigurationItem {
 					else
 						html .= ("<tr><td><b>" . translate("Tyre Set:") . "</b></div></td><td>" . tyreSet . "</td></tr>")
 
-				html .= ("<tr><td><b>" . translate("Tyre Pressures:") . "</b></div></td><td>" . pressures . "</td></tr>")
+				if pressures
+					html .= ("<tr><td><b>" . translate("Tyre Pressures:") . "</b></div></td><td>" . pressures . "</td></tr>")
 			}
 
 			if (repairs != "-")
@@ -12491,7 +12829,7 @@ class TeamCenter extends ConfigurationItem {
 			return "bgcolor=`"DarkRed`" style=`"color:#FFFFFF`""
 	}
 
-	createTyreWearDetails(pitstopNr, tyreCompound := false) {
+	createTyreWearDetails(pitstopNr, tyreCompounds := false) {
 		local html := "<table>"
 		local driver := false
 		local laps := false
@@ -12507,19 +12845,27 @@ class TeamCenter extends ConfigurationItem {
 		local hasGrain := false
 		local hasBlister := false
 		local hasFlatSpot := false
+		local updateCompounds := false
 		local tyres := CaseInsenseWeakMap()
 		local ignore, tyreData, tyre, key, wear, tread, grain, blister, flatSpot
-		local lastDriver, lastFuel, lastTyreCompound, lastTyreCompoundColor, lastTyreSet, lastTyrePressures
+		local lastDriver, lastFuel, lastTyreCompounds, lastTyreCompoundColors, lastTyreSet, lastTyrePressures
 
-		this.getStintSetup(pitstopNr, true, &lastDriver, &lastFuel, &lastTyreCompound, &lastTyreCompoundColor, &lastTyreSet, &lastTyrePressures)
+		this.getStintSetup(pitstopNr, true, &lastDriver, &lastFuel, &lastTyreCompounds, &lastTyreCompoundColors, &lastTyreSet, &lastTyrePressures)
 
-		if (inList(["ACC", "Assetto Corsa Competizione"], this.Simulator) && (lastTyreCompound = "Wet"))
-			return ""
-		else if lastTyreCompound
-			tyreCompound := compound(lastTyreCompound, lastTyreCompoundColor)
+		if lastTyreCompounds
+			if (inList(["ACC", "Assetto Corsa Competizione"], this.Simulator) && inList(lastTyreCompounds, "Wet"))
+				return ""
+			else
+				tyreCompounds := compounds(lastTyreCompounds, lastTyreCompoundColors)
 
 		for ignore, tyreData in this.SessionStore.query("Pitstop.Tyre.Data", {Where: {Pitstop: pitstopNr}})
 			tyres[tyreData["Tyre"]] := tyreData
+
+		if !tyreCompounds {
+			tyreCompounds := ["-", "-", "-", "-"]
+
+			updateCompounds := true
+		}
 
 		for tyre, key in Map("FL", "Front.Left", "FR", "Front.Right", "RL", "Rear.Left", "RR", "Rear.Right") {
 			if !driver
@@ -12528,8 +12874,8 @@ class TeamCenter extends ConfigurationItem {
 			if !laps
 				laps := tyres[key]["Laps"]
 
-			if !tyreCompound
-				tyreCompound := compound(tyres[key]["Compound"], tyres[key]["Compound.Color"])
+			if updateCompounds
+				tyreCompounds[A_Index] := [compound(tyres[key]["Compound"], tyres[key]["Compound.Color"])]
 
 			if !tyreSet
 				tyreSet := tyres[key]["Set"]
@@ -12571,14 +12917,15 @@ class TeamCenter extends ConfigurationItem {
 				hasFlatSpot := true
 		}
 
+		combineCompounds(&tyreCompounds)
+
 		if driver
 			html .= ("<tr><td><b>" . translate("Driver:") . "</b></div></td><td>" . driver . "</td></tr>")
 
 		if laps
 			html .= ("<tr><td><b>" . translate("Laps:") . "</b></div></td><td>" . laps . "</td></tr>")
 
-		if tyreCompound
-			html .= ("<tr><td><b>" . translate("Tyre Compound:") . "</b></div></td><td>" . translate(tyreCompound) . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Tyre Compound:") . "</b></div></td><td>" . values2String(", ", collect(tyreCompounds, translate)*) . "</td></tr>")
 
 		if tyreSet
 			html .= ("<tr><td><b>" . translate("Tyre Set:") . "</b></div></td><td>" . tyreSet . "</td></tr>")
@@ -12610,7 +12957,7 @@ class TeamCenter extends ConfigurationItem {
 	showPitstopDetails(pitstopNr, viewer := false) {
 		showPitstopDetailsAsync(pitstopNr) {
 			local pitstopData := this.SessionStore.Tables["Pitstop.Data"][pitstopNr]
-			local html, tyreCompound, tyreCompoundColor, tyreWearDetails
+			local html, tyreCompounds, tyreWearDetails
 
 			if (pitstopData["Lap"] != "-") {
 				html := ("<div id=`"header`"><b>" . translate("Pitstop: ") . pitstopNr . "</b></div>")
@@ -12623,11 +12970,11 @@ class TeamCenter extends ConfigurationItem {
 
 				if (this.SessionStore.query("Pitstop.Tyre.Data", {Where: {Pitstop: pitstopNr}}).Length > 0) {
 					if (isNumber(pitstopData["Stint"]) && this.Stints.Has(pitstopData["Stint"] - 1))
-						tyreCompound := this.Stints[pitstopData["Stint"] - 1].Compound
+						tyreCompounds := this.Stints[pitstopData["Stint"] - 1].Compounds
 					else
-						tyreCompound := false
+						tyreCompounds := false
 
-					tyreWearDetails := this.createTyreWearDetails(pitstopNr, tyreCompound)
+					tyreWearDetails := this.createTyreWearDetails(pitstopNr, tyreCompounds)
 
 					if (Trim(tyreWearDetails) != "")
 						html .= ("<br><br><div id=`"header`"><i>" . translate("Tyre Wear") . "</i></div><br>" . tyreWearDetails)
@@ -12658,7 +13005,7 @@ class TeamCenter extends ConfigurationItem {
 		local tyreSetData := []
 		local tyrePressuresData := []
 		local repairsData := []
-		local tyreCompound, tyreSet, index, pitstopData, serviceData, pressures, repairBodywork, repairSuspension, repairs, fuel
+		local tyreCompound, tyreCompoundColor, tyreSet, index, pitstopData, serviceData, pressures, repairBodywork, repairSuspension, repairs, fuel
 		local name, key, tyrePressures, header, repairEngine
 		local time
 
@@ -12714,13 +13061,15 @@ class TeamCenter extends ConfigurationItem {
 
 				refuelData.Push("<td class=`"td-std`">" . (isNumber(pitstopData["Fuel"]) ? ((pitstopData["Fuel"] != 0) ? displayValue("Float", convertUnit("Volume", pitstopData["Fuel"])) : "-") : "-") . "</td>")
 
-				tyreCompound := translate(compound(pitstopData["Tyre.Compound"], pitstopData["Tyre.Compound.Color"]))
 
-				tyreCompoundData.Push("<td class=`"td-std`">" . tyreCompound . "</td>")
+				tyreCompound := string2Values(",", pitstopData["Tyre.Compound"])
+				tyreCompoundColor := string2Values(",", pitstopData["Tyre.Compound.Color"])
+
+				tyreCompoundData.Push("<td class=`"td-std`">" . values2String(", ", collect(compounds(tyreCompound, tyreCompoundColor), translate)*) . "</td>")
 
 				tyreSet := pitstopData["Tyre.Set"]
 
-				if (tyreCompound = "-") {
+				if !exist(tyreCompound, (c) => (c && (c != "-"))) {
 					tyreSet := "-"
 					pressures := "-, -, -, -"
 				}
@@ -12751,9 +13100,10 @@ class TeamCenter extends ConfigurationItem {
 
 				refuelData.Push("<td class=`"td-std`">" . fuel . "</td>")
 
-				tyreCompound := translate(compound(serviceData["Tyre.Compound"], serviceData["Tyre.Compound.Color"]))
+				tyreCompound := string2Values(",", serviceData["Tyre.Compound"])
+				tyreCompoundColor := string2Values(",", serviceData["Tyre.Compound.Color"])
 
-				tyreCompoundData.Push("<td class=`"td-std`">" . tyreCompound . "</td>")
+				tyreCompoundData.Push("<td class=`"td-std`">" . values2String(", ", collect(compounds(tyreCompound, tyreCompoundColor), translate)*) . "</td>")
 
 				tyreSet := serviceData["Tyre.Set"]
 
@@ -12762,7 +13112,7 @@ class TeamCenter extends ConfigurationItem {
 
 				tyrePressures := serviceData["Tyre.Pressures"]
 
-				if (tyreCompound = "-") {
+				if !exist(tyreCompound, (c) => (c && (c != "-"))) {
 					tyreSet := "-"
 					tyrePressures := "-, -, -, -"
 				}
@@ -12809,7 +13159,7 @@ class TeamCenter extends ConfigurationItem {
 	showPitstopsDetails(viewer := false) {
 		showPitstopsDetailsAsync() {
 			local html := ("<div id=`"header`"><b>" . translate("Pitstops Summary") . "</b></div>")
-			local pitstopData, tyreCompound, tyreWearDetails
+			local pitstopData, tyreCompounds, tyreWearDetails
 
 			html .= ("<br><br><div id=`"header`"><i>" . translate("Service") . "</i></div>")
 
@@ -12821,11 +13171,11 @@ class TeamCenter extends ConfigurationItem {
 						pitstopData := this.SessionStore.Tables["Pitstop.Data"][A_Index]
 
 						if (isNumber(pitstopData["Stint"]) && this.Stints.Has(pitstopData["Stint"] - 1))
-							tyreCompound := this.Stints[pitstopData["Stint"] - 1].Compound
+							tyreCompounds := this.Stints[pitstopData["Stint"] - 1].Compounds
 						else
-							tyreCompound := false
+							tyreCompounds := false
 
-						tyreWearDetails := this.createTyreWearDetails(A_Index, tyreCompound)
+						tyreWearDetails := this.createTyreWearDetails(A_Index, tyreCompounds)
 
 						if (Trim(tyreWearDetails) != "")
 							html .= ("<br><br><div id=`"header`"><i>" . translate("Tyre Wear (Pitstop: ") . A_Index . translate(")")
@@ -13445,7 +13795,7 @@ convertValue(name, value) {
 		return value
 }
 
-manageTeam(raceCenterOrCommand, teamDrivers := false, arguments*) {
+manageTeam(teamCenterOrCommand, teamDrivers := false, arguments*) {
 	local x, y, row, driver, ignore, name, connection
 
 	static result := false
@@ -13462,11 +13812,11 @@ manageTeam(raceCenterOrCommand, teamDrivers := false, arguments*) {
 
 	static connectedDrivers := []
 
-	if (raceCenterOrCommand = kCancel)
+	if (teamCenterOrCommand = kCancel)
 		result := kCancel
-	else if (raceCenterOrCommand = kOk)
+	else if (teamCenterOrCommand = kOk)
 		result := kOk
-	else if (raceCenterOrCommand = "SelectDriver") {
+	else if (teamCenterOrCommand = "SelectDriver") {
 		row := availableDriversListView.GetNext(0)
 
 		driver := availableDriversListView.GetText(row, 1)
@@ -13476,7 +13826,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false, arguments*) {
 
 		manageTeam("UpdateState")
 	}
-	else if (raceCenterOrCommand = "DeselectDriver") {
+	else if (teamCenterOrCommand = "DeselectDriver") {
 		row := selectedDriversListView.GetNext(0)
 
 		driver := selectedDriversListView.GetText(row, 1)
@@ -13486,7 +13836,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false, arguments*) {
 
 		manageTeam("UpdateState")
 	}
-	else if (raceCenterOrCommand = "UpDriver") {
+	else if (teamCenterOrCommand = "UpDriver") {
 		row := selectedDriversListView.GetNext(0)
 
 		driver := selectedDriversListView.GetText(row, 1)
@@ -13497,7 +13847,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false, arguments*) {
 
 		manageTeam("UpdateState")
 	}
-	else if (raceCenterOrCommand = "DownDriver") {
+	else if (teamCenterOrCommand = "DownDriver") {
 		row := selectedDriversListView.GetNext(0)
 
 		driver := selectedDriversListView.GetText(row, 1)
@@ -13508,7 +13858,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false, arguments*) {
 
 		manageTeam("UpdateState")
 	}
-	else if (raceCenterOrCommand = "UpdateState") {
+	else if (teamCenterOrCommand = "UpdateState") {
 		if availableDriversListView.GetNext(0)
 			selectDriverButton.Enabled := true
 		else
@@ -13540,7 +13890,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false, arguments*) {
 
 		teamGui := Window({Descriptor: "Team Center.Team Manager", Options: "0x400000"})
 
-		teamGui.Opt("+Owner" . raceCenterOrCommand.Window.Hwnd)
+		teamGui.Opt("+Owner" . teamCenterOrCommand.Window.Hwnd)
 
 		teamGui.SetFont("s10 Bold", "Arial")
 
@@ -13555,9 +13905,9 @@ manageTeam(raceCenterOrCommand, teamDrivers := false, arguments*) {
 
 		connectedDrivers := []
 
-		if raceCenterOrCommand.SessionActive
-			for ignore, connection in string2Values(";", raceCenterOrCommand.Connector.GetSessionConnections(raceCenterOrCommand.SelectedSession[true])) {
-				connection := parseObject(raceCenterOrCommand.Connector.GetConnection(connection))
+		if teamCenterOrCommand.SessionActive
+			for ignore, connection in string2Values(";", teamCenterOrCommand.Connector.GetSessionConnections(teamCenterOrCommand.SelectedSession[true])) {
+				connection := parseObject(teamCenterOrCommand.Connector.GetConnection(connection))
 
 				if (connection.Name && (connection.Name != "") && (connection.Type = "Driver"))
 					connectedDrivers.Push(connection.Name)
@@ -13569,9 +13919,9 @@ manageTeam(raceCenterOrCommand, teamDrivers := false, arguments*) {
 		availableDriversListView.OnEvent("ItemSelect", manageTeam.Bind("UpdateState"))
 
 		if !teamDrivers
-			teamDrivers := raceCenterOrCommand.TeamDrivers
+			teamDrivers := teamCenterOrCommand.TeamDrivers
 
-		for name, ignore in raceCenterOrCommand.SessionDrivers
+		for name, ignore in teamCenterOrCommand.SessionDrivers
 			if !inDrivers(teamDrivers, name)
 				availableDriversListView.Add("", name, inDrivers(connectedDrivers, name) ? translate("x") : "")
 
@@ -13639,8 +13989,9 @@ manageTeam(raceCenterOrCommand, teamDrivers := false, arguments*) {
 	}
 }
 
-pitstopSettings(raceCenterOrCommand := false, arguments*) {
+pitstopSettings(teamCenterOrCommand := false, arguments*) {
 	local tyreChange := false
+	local fuelService, tyreService, repairService, tyreSet, index, tyre, axle, tyreCompound, dtc
 
 	static tCenter := false
 	static isOpen := false
@@ -13658,26 +14009,29 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 		tCenter := TeamCenter.Instance
 
 	try {
-		if (raceCenterOrCommand = "Visible")
+		if (teamCenterOrCommand = "Visible")
 			return isOpen
-		else if (raceCenterOrCommand = kClose) {
+		else if (teamCenterOrCommand = kClose) {
 			if isOpen {
 				settingsGui.Hide()
 
 				isOpen := false
 			}
 		}
-		else if (raceCenterOrCommand = "Update") {
+		else if (teamCenterOrCommand = "Update") {
 			if isOpen {
 				if !settingsListView
 					pitstopSettings()
 
 				settingsListView.Delete()
 
-				if arguments[1].Has("FuelAmount")
+				tCenter.Provider.supportsPitstop(&fuelService, &tyreService, &repairService)
+				tCenter.Provider.supportsTyreManagement( , &tyreSet)
+
+				if (fuelService && arguments[1].Has("FuelAmount"))
 					settingsListView.Add("", translate("Refuel"), displayValue("Float", convertUnit("Volume", arguments[1]["FuelAmount"])) . A_Space . getUnit("Volume", true))
 
-				if inList(["ACC", "Assetto Corsa Competizione"], tCenter.Simulator) && arguments[1].Has("Pitstop.Planned.Tyre.Compound") {
+				if (inList(["ACC", "Assetto Corsa Competizione"], tCenter.Simulator) && arguments[1].Has("Pitstop.Planned.Tyre.Compound")) {
 					settingsListView.Add("", translate("Tyre Compound")
 										   , (arguments[1]["Pitstop.Planned.Tyre.Compound"] ? compound(arguments[1]["Pitstop.Planned.Tyre.Compound"]
 																									 , arguments[1]["Pitstop.Planned.Tyre.Compound.Color"])
@@ -13685,10 +14039,45 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 
 					tyreChange := true
 				}
-				else if arguments[1].Has("TyreCompound") && arguments[1]["TyreCompound"] {
-					settingsListView.Add("", translate("Tyre Compound"), compound(arguments[1]["TyreCompound"], arguments[1]["TyreCompoundColor"]))
+				else {
+					dtc := (arguments[1].Has("TyreCompound") && arguments[1]["TyreCompound"])
 
-					tyreChange := true
+					if dtc
+						dtc := translate(compound(dtc, arguments[1].Has("TyreCompoundColor") && arguments[1]["TyreCompoundColor"]))
+					else
+						dtc := translate("-")
+
+					if (tyreService = "Wheel") {
+						for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
+							if arguments[1].Has("Pitstop.Planned.Tyre.Compound." . tyre)
+								tyreCompound := translate(arguments[1]["Pitstop.Planned.Tyre.Compound." . tyre]
+															  ? compound(arguments[1]["Pitstop.Planned.Tyre.Compound." . tyre]
+																	   , arguments[1]["Pitstop.Planned.Tyre.Compound.Color." . tyre])
+															  : "-")
+							else
+								tyreCompound := dtc
+
+							settingsListView.Add("", (index = 1) ? translate("Tyre Compound") : "", tyreCompound)
+						}
+					}
+					else if (tyreService = "Axle") {
+						for index, axle in ["Front", "Rear"] {
+							if arguments[1].Has("Pitstop.Planned.Tyre.Compound." . axle)
+								tyreCompound := translate(arguments[1]["Pitstop.Planned.Tyre.Compound." . axle]
+															  ? compound(arguments[1]["Pitstop.Planned.Tyre.Compound." . axle]
+																	   , arguments[1]["Pitstop.Planned.Tyre.Compound.Color." . axle])
+															  : "-")
+							else
+								tyreCompound := dtc
+
+							settingsListView.Add("", (index = 1) ? translate("Tyre Compound") : "", tyreCompound)
+						}
+					}
+					else if tyreService {
+						tyreChange := (dtc != translate("-"))
+
+						settingsListView.Add("", translate("Tyre Compound"), dtc)
+					}
 				}
 
 				if tyreChange {
@@ -13705,15 +14094,16 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 																			. A_Space . getUnit("Pressure", true))
 				}
 
-				if (arguments[1].Has("RepairBodywork") || arguments[1].Has("RepairSuspension") || arguments[1].Has("RepairEngine"))
-					settingsListView.Add("", translate("Repairs"), tCenter.computeRepairs(arguments[1].Has("RepairBodywork") ? arguments[1]["RepairBodywork"] : false
-																						, arguments[1].Has("RepairSuspension") ? arguments[1]["RepairSuspension"] : false
-																						, arguments[1].Has("RepairEngine") ? arguments[1]["RepairEngine"] : false))
+				if (repairService.Length > 0)
+					if (arguments[1].Has("RepairBodywork") || arguments[1].Has("RepairSuspension") || arguments[1].Has("RepairEngine"))
+						settingsListView.Add("", translate("Repairs"), tCenter.computeRepairs(arguments[1].Has("RepairBodywork") ? arguments[1]["RepairBodywork"] : false
+																							, arguments[1].Has("RepairSuspension") ? arguments[1]["RepairSuspension"] : false
+																							, arguments[1].Has("RepairEngine") ? arguments[1]["RepairEngine"] : false))
 
 				if arguments[1].Has("Pitstop.Planned.Time.Service")
 					settingsListView.Add("", translate("Service"), Round(arguments[1]["Pitstop.Planned.Time.Service"] / 1000) . translate(" Seconds"))
 
-				if arguments[1].Has("Pitstop.Planned.Time.Repairs")
+				if ((repairService.Length > 0) && arguments[1].Has("Pitstop.Planned.Time.Repairs"))
 					settingsListView.Add("", translate("Repairs"), Round(arguments[1]["Pitstop.Planned.Time.Repairs"] / 1000) . translate(" Seconds"))
 
 				if arguments[1].Has("Pitstop.Planned.Time.Pitlane")

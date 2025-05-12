@@ -1386,6 +1386,7 @@ class RaceAssistant extends ConfigurationItem {
 		local track := this.SettingsDatabase.getTrackName(this.Simulator, this.Track)
 		local lapNumber, tyreSet, lapNr, laps, tyreSets, tyreCompound, weather, bestLapTime, stint, engine, value
 		local sessionFormat, additionalLaps
+		local mixedCompounds, tyreSet, index, tyre, axle
 
 		static sessionTypes
 
@@ -1529,13 +1530,37 @@ class RaceAssistant extends ConfigurationItem {
 
 			if this.activeTopic(options, "Tyres")
 				try {
-					knowledge["Tyres"] := Map("Compound", compound(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound", "Dry")
-																 , knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color", "Black")))
+					if this.Provider.supportsTyreManagement(&mixedCompounds, &tyreSet) {
+						knowledge["Tyres"] := Map()
 
-					tyreSet := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Set", kUndefined)
+						if (mixedCompounds = "Wheel") {
+							for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
+								knowledge["Tyres"]["Compound" . tyre]
+									:= compound(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound." . tyre, "Dry")
+											  , knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color." . tyre, "Black"))
+						}
+						else if (mixedCompounds = "Axle") {
+							for index, axle in ["Front", "Rear"]
+								if knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound." . axle, false)
+									knowledge["Tyres"]["Compound" . axle]
+										:= compound(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound." . axle, "Dry")
+												  , knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color." . axle, "Black"))
+						}
+						else
+							knowledge["Tyres"]["Compound"]
+								:= compound(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound", "Dry")
+										  , knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color", "Black"))
 
-					if ((tyreSet != kUndefined) && (tyreSet != 0))
-						knowledge["Tyres"]["TyreSet"] := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Set")
+						if tyreSet {
+							tyreSet := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Set", kUndefined)
+
+							if ((tyreSet != kUndefined) && (tyreSet != 0))
+								knowledge["Tyres"]["TyreSet"] := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Set")
+						}
+					}
+					else
+						knowledge["Tyres"] := Map("Compound", compound(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound", "Dry")
+																	 , knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color", "Black")))
 				}
 				catch Any as exception {
 					logError(exception, true)
@@ -2232,12 +2257,19 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	readSettings(simulator, car, track, &settings) {
+		local mixedCompounds, tyreService
+
 		if !isObject(settings)
 			settings := readMultiMap(settings)
+
+		this.Provider.supportsTyreManagement(&mixedCompounds)
+		this.Provider.supportsPitstop( , &tyreService)
 
 		return CaseInsenseMap("Session.Simulator", simulator
 							, "Session.Car", car
 							, "Session.Track", track
+							, "Session.Settings.Tyre.Service", tyreService
+							, "Session.Settings.Tyre.Management", mixedCompounds
 							, "Session.Settings.Lap.Formation", getDeprecatedValue(settings, "Session Settings", "Race Settings", "Lap.Formation", true)
 						    , "Session.Settings.Lap.PostRace", getDeprecatedValue(settings, "Session Settings", "Race Settings", "Lap.PostRace", true)
 						    , "Session.Settings.Lap.AvgTime", getDeprecatedValue(settings, "Session Settings", "Race Settings", "Lap.AvgTime", 0)
@@ -2279,11 +2311,13 @@ class RaceAssistant extends ConfigurationItem {
 	createFacts(settings, data) {
 		local configuration := this.Configuration
 		local simulator := getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
+		local car := getMultiMapValue(data, "Session Data", "Car", "Unknown")
+		local track := getMultiMapValue(data, "Session Data", "Track", "Unknown")
 		local simulatorName := this.SettingsDatabase.getSimulatorName(simulator)
 
-		return combine(this.readSettings(simulator
-									   , getMultiMapValue(data, "Session Data", "Car", "")
-									   , getMultiMapValue(data, "Session Data", "Track", ""), &settings)
+		this.updateSessionValues({Simulator: this.SettingsDatabase.getSimulatorName(simulator), Car: car, Track: track})
+
+		return combine(this.readSettings(simulator, car, track, &settings)
 					 , CaseInsenseMap("Session.Type", this.Session
 									, "Session.Track.Type", getMultiMapValue(settings, ("Simulator." . simulatorName), "Track.Type", "Circuit")
 									, "Session.Track.Length", getMultiMapValue(data, "Track Data", "Length", 0)
@@ -2399,6 +2433,7 @@ class RaceAssistant extends ConfigurationItem {
 		local knowledgeBase := this.KnowledgeBase
 		local sessionInfo := newMultiMap()
 		local tyreWear, brakeWear, duration, sessionTime, driverTime
+		local mixedCompounds, tyreSet
 
 		static sessionTypes
 
@@ -2464,7 +2499,33 @@ class RaceAssistant extends ConfigurationItem {
 			else
 				setMultiMapValue(sessionInfo, "Tyres", "Compound", "-")
 
-			setMultiMapValue(sessionInfo, "Tyres", "Set", getMultiMapValue(data, "Car Data", "TyreSet", false))
+			if this.Provider.supportsTyreManagement(&mixedCompounds, &tyreSet) {
+				if (mixedCompounds = "Wheel") {
+					for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
+						if knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound." . tyre, false)
+							setMultiMapValue(sessionInfo, "Tyres", "Compound" . tyre
+										   , compound(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound." . tyre)
+													, knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color." . tyre)))
+						else
+							setMultiMapValue(sessionInfo, "Tyres", "Compound" . tyre, "-")
+				}
+				else if (mixedCompounds = "Axle")
+					for index, axle in ["Front", "Rear"]
+						if knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound." . axle, false)
+							setMultiMapValue(sessionInfo, "Tyres", "Compound" . tyre
+										   , compound(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound." . axle)
+													, knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color." . axle)))
+						else
+							setMultiMapValue(sessionInfo, "Tyres", "Compound" . axle, "-")
+
+				if tyreSet {
+					tyreSet := getMultiMapValue(data, "Car Data", "TyreSet", kUndefined)
+
+					if (tyreSet != kUndefined)
+						setMultiMapValue(sessionInfo, "Tyres", "Set", getMultiMapValue(data, "Car Data", "TyreSet"))
+				}
+			}
+
 			setMultiMapValue(sessionInfo, "Tyres", "Pressures", getMultiMapValue(data, "Car Data", "TyrePressure", ""))
 			setMultiMapValue(sessionInfo, "Tyres", "Pressures.Hot", getMultiMapValue(data, "Car Data", "TyrePressure", ""))
 			setMultiMapValue(sessionInfo, "Tyres", "Temperatures", getMultiMapValue(data, "Car Data", "TyreTemperature", ""))
@@ -2517,6 +2578,7 @@ class RaceAssistant extends ConfigurationItem {
 		local driverForname, driverSurname, driverNickname, tyreSet, airTemperature, trackTemperature, sessionTimeRemaining, driverTimeRemaining
 		local weatherNow, weather10Min, weather30Min, lapTime, settingsLapTime, overallTime, values, result, baseLap, enoughData
 		local fuelRemaining, avgFuelConsumption, tyrePressures, tyreTemperatures, tyreWear, brakeTemperatures, brakeWear, key
+		local mixedCompounds, tyreSet, index, tyre, axle
 
 		if (knowledgeBase && (knowledgeBase.getValue("Lap", 0) == lapNumber))
 			return false
@@ -2572,10 +2634,30 @@ class RaceAssistant extends ConfigurationItem {
 		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Compound", getMultiMapValue(data, "Car Data", "TyreCompound", "Dry"))
 		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Compound.Color", getMultiMapValue(data, "Car Data", "TyreCompoundColor", "Black"))
 
-		tyreSet := getMultiMapValue(data, "Car Data", "TyreSet", kUndefined)
+		if this.Provider.supportsTyreManagement(&mixedCompounds, &tyreSet) {
+			if (mixedCompounds = "Wheel") {
+				for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
+					knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Compound." . tyre
+										, getMultiMapValue(data, "Car Data", "TyreCompound" . tyre, "Dry"))
+					knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Compound.Color." . tyre
+										, getMultiMapValue(data, "Car Data", "TyreCompoundColor" . tyre, "Black"))
+				}
+			}
+			else if (mixedCompounds = "Axle")
+				for index, axle in ["Front", "Rear"] {
+					knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Compound." . axle
+										, getMultiMapValue(data, "Car Data", "TyreCompound" . axle, "Dry"))
+					knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Compound.Color." . axle
+										, getMultiMapValue(data, "Car Data", "TyreCompoundColor" . axle, "Black"))
+				}
 
-		if (tyreSet != kUndefined)
-			knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Set", tyreSet)
+			if tyreSet {
+				tyreSet := getMultiMapValue(data, "Car Data", "TyreSet", kUndefined)
+
+				if (tyreSet != kUndefined)
+					knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Set", tyreSet)
+			}
+		}
 
 		if this.TeamSession
 			driverTimeRemaining := getMultiMapValue(data, "Stint Data", "DriverTimeRemaining", sessionTimeRemaining)

@@ -191,6 +191,16 @@ reverse(list) {
 	return result
 }
 
+first(list, predicate) {
+	local ignore, value
+
+	for ignore, value in list
+		if predicate.Call(value)
+			return value
+
+	return false
+}
+
 choose(list, predicate) {
 	local result := []
 	local ignore, value

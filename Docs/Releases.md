@@ -1208,7 +1208,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   6. Integrated support for *Le Mans Ultimate*:
      - [New plugin "LMU"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-lmu), which provides the same level of integration and similar controller actions as the "RF2" plugin for *rFactor 2*.
 	 - Full support in "Simulator Setup" to configure the "LMU" plugin.
-	 - Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for more information on how to install and configure the data integration plugin (*rFactor2SharedMemoryMapPlugin64.dll*) in the *Le Mans Ultimate* installation directory.
+	 - Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation-of-telemetry-providers) for more information on how to install and configure the data integration plugin (*rFactor2SharedMemoryMapPlugin64.dll*) in the *Le Mans Ultimate* installation directory.
 	 - *Le Mans Ultimate* is still under heavy development. Although it uses the same engine as *rFactor 2*, it looks like that several aspects of the shared memory API have changed. This is what has been achieved so far and what is not working:
 	   - General telemetry is working
        - Pressures, temperatures, and so on are all there
@@ -2781,7 +2781,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   7. All Race Assistants can entertain you now you by telling some jokes. Try: "Can you tell me a joke?"
   8. Reduced click area for window subtitles fixes the unwanted opening of a browser with context-sensitive documentation.
   9. Minimum number of tyre laps and minimum amount of start fuel is set to 10 now.
-  10. Full support for the Spotter and Strategist in *Assetto Corsa*. You have to install a plugin in *Assetto Corsa* for the data acquisition. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for more information.
+  10. Full support for the Spotter and Strategist in *Assetto Corsa*. You have to install a plugin in *Assetto Corsa* for the data acquisition. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation-of-telemetry-providers) for more information.
   11. "Simulator Setup" no longer overwrites the Team Server settings in "Simulator Configuration".
   12. Added installation support for all integration plugins to "Simulator Setup".
   13. Assistants can be muted and unmuted with a voice command by saying: "Be quiet please" and "I can listen again" or "You can talk again".

@@ -705,7 +705,7 @@ systemMonitor(command := false, arguments*) {
 
 			wear := string2Values(",", getMultiMapValue(sessionState, "Tyres", "Wear", ""))
 
-			if (wear.Length = 4) {
+			if ((wear.Length = 4) && exist(wear, (w) => (w != 0))) {
 				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Wear") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", wear[1]) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", wear[2]) . "</td></tr>")
@@ -754,7 +754,7 @@ systemMonitor(command := false, arguments*) {
 
 			wear := string2Values(",", getMultiMapValue(sessionState, "Brakes", "Wear", ""))
 
-			if (wear.Length = 4) {
+			if ((wear.Length = 4) && exist(wear, (w) => (w != 0))) {
 				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Wear") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", convertUnit("Temperature", wear[1])) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", convertUnit("Temperature", wear[2])) . "</td></tr>")
@@ -1125,7 +1125,8 @@ systemMonitor(command := false, arguments*) {
 						html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`" style=`"text-align: center`">" . translate("No") . "</td></tr>")
 				}
 
-				if tyreService {
+				if (tyreService && exist([computePressure("Planned.Tyre.Pressure.FL"), computePressure("Planned.Tyre.Pressure.FR")
+										, computePressure("Planned.Tyre.Pressure.RL"), computePressure("Planned.Tyre.Pressure.RR")], (p) => (p != 0))) {
 					html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures") . "</th><td class=`"td-wdg`" style=`"text-align: right`">"
 						   . computePressure("Planned.Tyre.Pressure.FL") . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
 						   . computePressure("Planned.Tyre.Pressure.FR") . "</td></tr>")
@@ -1228,7 +1229,8 @@ systemMonitor(command := false, arguments*) {
 						html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`" style=`"text-align: center`">" . translate("No") . "</td></tr>")
 				}
 
-				if tyreService {
+				if (tyreService && exist([computePressure("Target.Tyre.Pressure.FL"), computePressure("Target.Tyre.Pressure.FR")
+										, computePressure("Target.Tyre.Pressure.RL"), computePressure("Target.Tyre.Pressure.RR")], (p) => (p != 0))) {
 					html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures") . "</th><td class=`"td-wdg`" style=`"text-align: right`">"
 						   . computePressure("Target.Tyre.Pressure.FL") . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
 						   . computePressure("Target.Tyre.Pressure.FR") . "</td></tr>")

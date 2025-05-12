@@ -3,7 +3,7 @@ Version=6.3.2.0-dev
 Target=6.3.2.0-release
 Date=05/09/2025
 Download=
-Changes=Optimized handling of restricted tyre sets in strategy simulation, Active handling of individual tyre compounds in many parts of Simulator Controller, Fixed data collection without "Solo Center", Fixed strategy simulation in "Team Center"
+Changes=Optimized handling of restricted tyre sets in strategy simulation, Active handling of individual tyre compounds in many parts of Simulator Controller, Fixed data collection without "Solo Center", Fixed strategy simulation in "Team Center", No display of all-zero infos in "System Monitor"
 Components=Media->5.6.1,Configuration->6.3.1,Utilities->6.3.0
 [Release]
 Version=6.3.1.0-release

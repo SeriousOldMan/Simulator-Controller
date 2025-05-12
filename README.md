@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[6.3.2.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/8z0NJmlD) (Early build for 6.3.2. Changes: Optimized handling of restricted tyre sets in strategy simulation, Active handling of individual tyre compounds in many parts of Simulator Controller, Fixed data collection without "Solo Center", Fixed strategy simulation in "Team Center", Fixed stint statistics update in "Team Center", No display of all-zero infos in "System Monitor".)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-632) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

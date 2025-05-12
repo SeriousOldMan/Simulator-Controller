@@ -36,7 +36,7 @@
 
   - Info widgets with information that is all zero, like tyre wear if the data is not supplied by the simulator, are no longer displayed.
   - The handling of restricted tyre sets in the strategy simulation has been optimized. It is no longer possible create strategies where a tyre set is used for more laps than usually possible.
-  - This release introduces the first set of functions which supports the handling of individual tyre compounds for individual wheels, as supported by some simulators.
+  - This release introduces the first set of functions which supports the handling of individual tyre compounds for individual wheels, if supported by the current simulator.
 
 # Release history
 

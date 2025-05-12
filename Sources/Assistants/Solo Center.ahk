@@ -3067,7 +3067,7 @@ class SoloCenter extends ConfigurationItem {
 		local tyreSet := false
 		local driver := false
 		local laps, numLaps, lapTimes, airTemperatures, trackTemperatures
-		local ignore, lap, consumption, weather, fuelAmount, tyreInfo, row
+		local ignore, lap, consumption, weather, fuelAmount, tyreInfo, row, theCompound
 
 		run.FuelConsumption := 0.0
 		run.Accidents := 0
@@ -3119,7 +3119,9 @@ class SoloCenter extends ConfigurationItem {
 		}
 
 		if (this.SessionActive && (run.TyreMode = "Auto")) {
-			if (exist(tyreCompound, (c) => (c && (c != "-"))) && !exist(run.Compounds, (c) => (c && (c != "-"))))
+			theCompound := first(tyreCompound, (c) => (c && (c != "-")))
+			
+			if (theCompound && !exist(run.Compounds, (c) => (c && (c != "-"))))
 				run.Compounds := tyreCompound
 
 			if (tyreSet && (run.TyreSet != tyreSet) && (run.Laps.Length > 1)) {
@@ -3131,7 +3133,7 @@ class SoloCenter extends ConfigurationItem {
 
 				this.updateUsedTyreSets()
 
-				tyreInfo := this.UsedTyreSets[tyreCompound[1], tyreSet]
+				tyreInfo := this.UsedTyreSets[theCompound, tyreSet]
 
 				if tyreInfo {
 					run.TyreLaps := (tyreInfo.Laps - run.Laps.Length)
@@ -3437,7 +3439,7 @@ class SoloCenter extends ConfigurationItem {
 										, getMultiMapValue(data, "Car Data", "TyreCompoundColor"))]
 		}
 
-		if ((tyreCompound[1] = "Wet") && (SessionDatabase.getSimulatorCode(this.Simulator) = "ACC"))
+		if ((SessionDatabase.getSimulatorCode(this.Simulator) = "ACC") && (first(tyreCompound, (c) => (c && (c != "-"))) = "Wet"))
 			tyreSet := "-"
 
 		if (lastLap && (!equalCompounds(lastLap.Compounds, tyreCompound) || (lastLap.TyreSet != tyreSet) || (lastLap.Driver != driver))) {

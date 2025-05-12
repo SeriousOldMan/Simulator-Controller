@@ -5076,7 +5076,7 @@ class TeamCenter extends ConfigurationItem {
 					}
 				case 14: ; Telemetry Viewer
 					this.openTelemetryViewer()
-				case 15: ; Update Statistics
+				case 16: ; Update Statistics
 					this.updateStatistics()
 				case 18: ; Race Summary
 					this.showSessionSummary(GetKeyState("Ctrl"))

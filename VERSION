@@ -4,7 +4,7 @@ Target=6.3.2.0-release
 Date=05/12/2025
 Download=
 Changes=Optimized handling of restricted tyre sets in strategy simulation, Active handling of individual tyre compounds in many parts of Simulator Controller, Fixed data collection without "Solo Center", Fixed strategy simulation in "Team Center", Fixed stint statistics update in "Team Center", No display of all-zero infos in "System Monitor"
-Components=Media->5.6.1,Configuration->6.3.1,Utilities->6.3.0
+Components=Media->5.6.1,Configuration->6.3.2,Utilities->6.3.0
 [Release]
 Version=6.3.1.0-release
 Date=05/09/2025
@@ -18,6 +18,9 @@ Media.5.6.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl
 Configuration.6.3.1.Path=Resources
 Configuration.6.3.1.Content=Setup
 Configuration.6.3.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/VdHgCofy;https://www.dropbox.com/scl/fi/nnoml8ghid3qyv8l3txej/Configuration-6.3.1.zip?rlkey=x0mvvmy1tuqcyr216bymrdagn&st=u1ehm0cq&dl=1;http://87.178.12.140:800/api/public/dl/7ajP9Mu-;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.3.1.zip
+Configuration.6.3.2.Path=Resources
+Configuration.6.3.2.Content=Setup
+Configuration.6.3.2.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/4Nh-E9uO;https://www.dropbox.com/scl/fi/paibnvv9dqw3ukruhfnbk/Conifguration-6.3.2.zip?rlkey=w59u6i50bt4v5u7k9u0m07rjx&st=2hcedvh0&dl=1;http://87.178.12.140:800/api/public/dl/6ECw9H64;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Conifguration+6.3.2.zip
 Utilities.6.3.0.Path=.
 Utilities.6.3.0.Content=Utilities
 Utilities.6.3.0.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/BCbe0uKY;https://www.dropbox.com/scl/fi/uauxhuyecnwmgft3w6roj/Utilities-6.3.0.zip?rlkey=1luua85df5q5w88hcxxza0lsr&st=e8f4bqgz&dl=1;http://%master%:800/api/public/dl/cAzNQ6G_;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.3.0.zip

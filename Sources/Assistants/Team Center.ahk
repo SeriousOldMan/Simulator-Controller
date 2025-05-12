@@ -4837,7 +4837,8 @@ class TeamCenter extends ConfigurationItem {
 		local repairEngine := getMultiMapValue(pitstopPlan, "Pitstop", "Repair.Engine")
 		local currentDriver := kNull
 		local nextDriver := kNull
-		local pressures, displayPressures, tyreSet, displayFuel, requestDriver
+		local theCompound := first(tyreCompound, (c) => (c && (c != "-")))
+		local pressures, displayPressures, tyreSet, displayFuel, requestDriver, theCompound
 
 		sessionStore.remove("Pitstop.Data", {Status: "Planned"}, always.Bind(true))
 
@@ -4849,9 +4850,9 @@ class TeamCenter extends ConfigurationItem {
 
 				break
 			}
-
-		if exist(tyreCompound, (c) => (c && (c != "-"))) {
-			if ((tyreCompound[1] = "Wet") && (SessionDatabase.getSimulatorCode(this.Simulator) = "ACC"))
+		
+		if theCompound {
+			if ((theCompound = "Wet") && (SessionDatabase.getSimulatorCode(this.Simulator) = "ACC"))
 				tyreSet := "-"
 			else
 				tyreSet := getMultiMapValue(pitstopPlan, "Pitstop", "Tyre.Set")
@@ -10153,7 +10154,6 @@ class TeamCenter extends ConfigurationItem {
 
 			tyreCompound := string2Values(",", pitstop["Tyre.Compound"])
 			tyreCompoundColor := string2Values(",", pitstop["Tyre.Compound.Color"])
-
 
 			if !exist(tyreCompound, (c) => (c && (c != "-"))) {
 				tyreCompound := ["-"]

@@ -4043,6 +4043,9 @@ class RaceEngineer extends RaceAssistant {
 		local numTyreSets := 1
 		local lastLap := 0
 		local fileName, pitstopLap, tyreCompound, tyreCompoundColor, tyreSet
+		local tyreService, pitstop, tyreChange
+
+		this.Provider.supportsPitstop( , &tyreService)
 
 		setMultiMapValue(pitstopHistory, "TyreSets", "1.Compound"
 					   , knowledgeBase.getValue("Session.Setup.Tyre.Compound"))
@@ -4083,6 +4086,47 @@ class RaceEngineer extends RaceAssistant {
 			}
 			else
 				setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreChange", false)
+
+			tyreChange := false
+			pitstop := A_Index
+
+			if (tyreService = "Axle")
+				do(["Front", "Rear"], (axle) {
+					local tc := knowledgeBase.getValue("Pitstop." . pitstop . ".Tyre.Compound." . axle, false)
+					local tcc := knowledgeBase.getValue("Pitstop." . pitstop . ".Tyre.Compound.Color." . axle, false)
+
+					if (tc && (tc != "-")) {
+						setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompound" . axle, tc)
+						setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompoundColor" . axle, tcc)
+
+						tyreChange := true
+					}
+					else  {
+						setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompound" . axle, false)
+						setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompoundColor" . axle, false)
+					}
+				}
+			}
+			else if (tyreService = "Wheel")
+				do(["FrontLeft", "FrontRight", "RearLeft", "RearRight"], (wheel) {
+					local tc := knowledgeBase.getValue("Pitstop." . pitstop . ".Tyre.Compound." . wheel, false)
+					local tcc := knowledgeBase.getValue("Pitstop." . pitstop . ".Tyre.Compound.Color." . wheel, false)
+
+					if (tc && (tc != "-")) {
+						setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompound" . wheel, tc)
+						setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompoundColor" . wheel, tcc)
+
+						tyreChange := true
+					}
+					else  {
+						setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompound" . wheel, false)
+						setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompoundColor" . wheel, false)
+					}
+				}
+			}
+
+			if tyreChange
+				setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreChange", true)
 
 			setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".RepairBodywork"
 						   , knowledgeBase.getValue("Pitstop." . A_Index . ".Repair.Bodywork", false))

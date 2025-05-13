@@ -1650,7 +1650,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.Add("CheckBox", "x126 yp-4 w17 h21 Checked" . chosen . " VpressureLossCorrectionCheck", chosen)
 		settingsGui.Add("Text", "x147 yp+4 w145 h20", translate("based on pressure loss"))
 
-		settingsGui.Add("Edit", "x292 yp w50 h20 vtyrePressureLossThresholdEdit"
+		settingsGui.Add("Edit", "x292 yp-1 w50 h20 vtyrePressureLossThresholdEdit"
 							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Loss.Threshold", 0.2), 1))).OnEvent("Change", validateNumber.Bind("tyrePressureLossThresholdEdit"))
 		settingsGui.Add("Text", "x350 yp+2 w60 h20", getUnit("Pressure"))
 

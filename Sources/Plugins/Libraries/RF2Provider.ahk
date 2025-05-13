@@ -212,9 +212,8 @@ class Sector397Provider extends SimulatorProvider {
 		static loadSetup := false
 		static nextSetupUpdate := false
 
-		if !getMultiMapValue(telemetryData, "Stint Data", "InPit", false)
-			if (getMultiMapValue(telemetryData, "Car Data", "FuelRemaining", 0) = 0)
-				setMultiMapValue(telemetryData, "Session Data", "Paused", true)
+		if (!getMultiMapValue(telemetryData, "Stint Data", "InPit", false) && (getMultiMapValue(telemetryData, "Car Data", "FuelRemaining", 0) = 0))
+			setMultiMapValue(telemetryData, "Session Data", "Paused", true)
 
 		if ((this.Simulator != lastSimulator) || (this.Car != lastCar) || (this.Track != lastTrack)) {
 			lastSimulator := this.Simulator

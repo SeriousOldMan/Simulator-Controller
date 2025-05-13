@@ -196,6 +196,7 @@ All applications of Simulator Controller can handle individual tyre compounds fo
 | All other simulators       | All                   |
 
 (1) Individual tyre changes are supported, but all tyres must be of the same compound.
+
 (2) No support for chosen pitstop settings provided in the API, so the understanding of tyre compounds in Simulator Controller is very restricted.
 
 At the time of this writing, tyre changes are planned by the Engineer always at the same time for all four wheels with a single tyre compound. This is also true for all pre-calculated or dynamically created strategies handled by the Strategist. But once a pitstop has been prepared, you can change the tyre compound selection or even deactivate a tyre change on a selected wheel altogether using the in-game controls, and as long as this information is available in the API, the Assistants and all applications like "Solo Center" will notice that and will react accordingly.

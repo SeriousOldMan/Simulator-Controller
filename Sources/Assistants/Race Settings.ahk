@@ -1237,6 +1237,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		setTyrePressures(arguments*)
 	else if ((settingsOrCommand == kSave) || (settingsOrCommand == kOk)) {
 		if (!isPositiveFloat(settingsGui["tyrePressureDeviationEdit"].Text
+						   , settingsGui["tyrePressureLossThresholdEdit"].Text
 						   , settingsGui["tpDryFrontLeftEdit"].Text, settingsGui["tpDryFrontRightEdit"].Text
 						   , settingsGui["tpDryRearLeftEdit"].Text, settingsGui["tpDryRearRightEdit"].Text
 						   , settingsGui["tpWetFrontLeftEdit"].Text, settingsGui["tpWetFrontRightEdit"].Text
@@ -1279,6 +1280,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		setMultiMapValue(newSettings, "Session Settings", "Tyre.Pressure.Correction.Temperature", settingsGui["temperatureCorrectionCheck"].Value)
 		setMultiMapValue(newSettings, "Session Settings", "Tyre.Pressure.Correction.Setup", settingsGui["setupPressureCompareCheck"].Value)
 		setMultiMapValue(newSettings, "Session Settings", "Tyre.Pressure.Correction.Pressure", settingsGui["pressureLossCorrectionCheck"].Value)
+		setMultiMapValue(newSettings, "Session Settings", "Tyre.Pressure.Loss.Threshold", internalValue("Float", settingsGui["tyrePressureLossThresholdEdit"].Text, 1))
 
 		setMultiMapValue(newSettings, "Session Settings", "Tyre.Dry.Pressure.Target.FL"
 									, convertUnit("Pressure", internalValue("Float", settingsGui["tpDryFrontLeftEdit"].Text), false))
@@ -1627,7 +1629,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.Add("Text", "x16 yp+30 w105 h20 Section", translate("Deviation Threshold"))
 		settingsGui.Add("Edit", "x126 yp-2 w50 h20 VtyrePressureDeviationEdit"
-							  , displayValue("Float", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Deviation", 0.2), 1)).OnEvent("Change", validateNumber.Bind("tyrePressureDeviationEdit"))
+							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Deviation", 0.2), 1))).OnEvent("Change", validateNumber.Bind("tyrePressureDeviationEdit"))
 		settingsGui.Add("Text", "x184 yp+2 w70 h20", getUnit("Pressure"))
 
 		chosen := getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Correction.Temperature", true)
@@ -1646,7 +1648,11 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.Add("Text", "x16 yp+24 w105 h20 Section", translate("Correction"))
 		settingsGui.Add("CheckBox", "x126 yp-4 w17 h21 Checked" . chosen . " VpressureLossCorrectionCheck", chosen)
-		settingsGui.Add("Text", "x147 yp+4 w240 h20", translate("based on pressure loss"))
+		settingsGui.Add("Text", "x147 yp+4 w145 h20", translate("based on pressure loss"))
+
+		settingsGui.Add("Edit", "x292 yp-1 w50 h20 vtyrePressureLossThresholdEdit"
+							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Loss.Threshold", 0.2), 1))).OnEvent("Change", validateNumber.Bind("tyrePressureLossThresholdEdit"))
+		settingsGui.Add("Text", "x350 yp+2 w60 h20", getUnit("Pressure"))
 
 		settingsGui.SetFont("Norm", "Arial")
 		settingsGui.SetFont("Italic", "Arial")

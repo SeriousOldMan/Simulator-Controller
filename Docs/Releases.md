@@ -40,7 +40,7 @@
   - Info widgets with information that is all zero, like tyre wear if the data is not supplied by the simulator, are no longer displayed.
   - The handling of restricted tyre sets in the strategy simulation has been optimized. It is no longer possible create strategies where a tyre set is used for more laps than usually possible.
   - This release introduces initial functionality which supports the handling of individual tyre compounds and tyre changes for individual wheels, if supported by the current simulator, of course. See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#handling-of-tyre-compounds-on-inidividual-wheels) for more information.
-
+  - [Internal] Migrated to AHK 2.1-alpha.18.
 
 # Release history
 

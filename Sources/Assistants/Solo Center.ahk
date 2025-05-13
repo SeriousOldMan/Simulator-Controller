@@ -3120,7 +3120,7 @@ class SoloCenter extends ConfigurationItem {
 
 		if (this.SessionActive && (run.TyreMode = "Auto")) {
 			theCompound := first(tyreCompound, (c) => (c && (c != "-")))
-			
+
 			if (theCompound && !exist(run.Compounds, (c) => (c && (c != "-"))))
 				run.Compounds := tyreCompound
 
@@ -3854,8 +3854,8 @@ class SoloCenter extends ConfigurationItem {
 				tyreCompoundColor := getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor", "Black")
 
 				if (mixedCompounds = "Wheel") {
-					tyreCompoundcollect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
-									  , (tyre) => getMultiMapValue(telemetry, "Car Data", "TyreCompound" . tyre, tyreCompound))
+					tyreCompound := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
+										  , (tyre) => getMultiMapValue(telemetry, "Car Data", "TyreCompound" . tyre, tyreCompound))
 					tyreCompoundColor := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
 											   , (tyre) => getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor" . tyre, tyreCompoundColor))
 
@@ -3868,7 +3868,7 @@ class SoloCenter extends ConfigurationItem {
 					tyreCompound := collect(["Front", "Rear"]
 										  , (axle) => getMultiMapValue(telemetry, "Car Data", "TyreCompound" . axle, tyreCompound))
 					tyreCompoundColor := collect(["Front", "Rear"]
-											   , (axle) => getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor" . tyre, tyreCompoundColor))
+											   , (axle) => getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor" . axle, tyreCompoundColor))
 
 					combineCompounds(&tyreCompound, &tyreCompoundColor)
 

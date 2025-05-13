@@ -31,9 +31,12 @@
   - Fixed the data collection and transfer to the session database by the Race Assistants, if the "Solo Center" is **not** active. This bug was introduced with version 6.3.0.
   - Fixed the race situation dependend strategy simulation in "Team Center".
   - Fixed the calculation of stint statistics in "Team Center".
+  - Fixed unit conversion for tyre pressure deviation threshold in "Race Settings".
 
 #### Changes
 
+  - A [new setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" allows you to define the threshold for reporting and handling of tyre pressure loss events.
+  - The same setting for pressure loss threshold is also available in the "Race Settings" app.
   - Info widgets with information that is all zero, like tyre wear if the data is not supplied by the simulator, are no longer displayed.
   - The handling of restricted tyre sets in the strategy simulation has been optimized. It is no longer possible create strategies where a tyre set is used for more laps than usually possible.
   - This release introduces the first set of functions which supports the handling of individual tyre compounds for individual wheels, if supported by the current simulator.

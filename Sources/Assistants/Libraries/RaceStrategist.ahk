@@ -542,7 +542,7 @@ class RaceStrategist extends GridRaceAssistant {
 		loadFromConfiguration(configuration) {
 			local pitstops := []
 			local tyreSets := []
-			local knowledgeBase, lapNumber
+			local knowledgeBase, lapNumber, mixedCompounds, tyreCompound, tyreCompoundColor
 
 			loop getMultiMapValue(configuration, "Pitstops", "Count", 0)
 				pitstops.Push({Nr: A_Index
@@ -568,10 +568,24 @@ class RaceStrategist extends GridRaceAssistant {
 
 				lapNumber := knowledgeBase.getValue("Lap")
 
-				tyreSets.Push({Laps: lapNumber
-							 , Set: knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Set", 1)
-							 , Compound: knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound", "Dry")
-							 , CompoundColor: knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color", "Black")})
+				if this.Provider.supportsTyreManagement(&mixedCompounds) {
+					if (mixedCompounds = "Wheel") {
+						tyreCompound := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.FrontLeft", "Dry")
+						tyreCompoundColor := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color.FrontLeft", "Black")
+					}
+					else if (mixedCompounds = "Axle") {
+						tyreCompound := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Front", "Dry")
+						tyreCompoundColor := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color.Front", "Black")
+					}
+					else {
+						tyreCompound := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound", "Dry")
+						tyreCompoundColor := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color", "Black")
+					}
+
+					tyreSets.Push({Laps: lapNumber
+								 , Set: knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Set", 1)
+								 , Compound: tyreCompound, CompoundColor: tyreCompoundColor})
+				}
 			}
 
 			this.iPitstops := pitstops
@@ -2723,7 +2737,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local strategy := this.Strategy["Original"]
 		local lap := Task.CurrentTask.Lap
-		local availableTyreSets, strategyTask, lapsDB, candidate
+		local availableTyreSets, strategyTask, lapsDB, candidate, mixedCompounds
 
 		if strategy {
 			simulator := strategy.Simulator
@@ -2744,6 +2758,17 @@ class RaceStrategist extends GridRaceAssistant {
 
 			tyreCompound := knowledgeBase.getValue("Lap." . lap . ".Tyre.Compound", false)
 			tyreCompoundColor := knowledgeBase.getValue("Lap." . lap . ".Tyre.Compound.Color", false)
+
+			if this.Provider.supportsTyreManagement(&mixedCompounds) {
+				if (mixedCompounds = "Wheel") {
+					tyreCompound := knowledgeBase.getValue("Lap." . lap . ".Tyre.Compound.FrontLeft", false)
+					tyreCompoundColor := knowledgeBase.getValue("Lap." . lap . ".Tyre.Compound.Color.FrontLeft", false)
+				}
+				else if (mixedCompounds = "Axle") {
+					tyreCompound := knowledgeBase.getValue("Lap." . lap . ".Tyre.Compound.Front", false)
+					tyreCompoundColor := knowledgeBase.getValue("Lap." . lap . ".Tyre.Compound.Color.Front", false)
+				}
+			}
 
 			if !tyreCompound {
 				tyreCompound := strategy.TyreCompound
@@ -2780,6 +2805,17 @@ class RaceStrategist extends GridRaceAssistant {
 
 			tyreCompound := knowledgeBase.getValue("Lap." . lap . ".Tyre.Compound", false)
 			tyreCompoundColor := knowledgeBase.getValue("Lap." . lap . ".Tyre.Compound.Color", false)
+
+			if this.Provider.supportsTyreManagement(&mixedCompounds) {
+				if (mixedCompounds = "Wheel") {
+					tyreCompound := knowledgeBase.getValue("Lap." . lap . ".Tyre.Compound.FrontLeft", false)
+					tyreCompoundColor := knowledgeBase.getValue("Lap." . lap . ".Tyre.Compound.Color.FrontLeft", false)
+				}
+				else if (mixedCompounds = "Axle") {
+					tyreCompound := knowledgeBase.getValue("Lap." . lap . ".Tyre.Compound.Front", false)
+					tyreCompoundColor := knowledgeBase.getValue("Lap." . lap . ".Tyre.Compound.Color.Front", false)
+				}
+			}
 
 			weather := knowledgeBase.getValue("Weather.Weather.10Min", "Dry")
 			strategyTask := Task.CurrentTask

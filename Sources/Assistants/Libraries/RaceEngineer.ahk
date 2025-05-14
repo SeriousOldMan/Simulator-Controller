@@ -3805,7 +3805,7 @@ class RaceEngineer extends RaceAssistant {
 
 		lastPitstop := knowledgeBase.getValue("Pitstop.Last", 0)
 
-		if (this.RemoteHandler && (mixedCompounds != "Wheel") && (mixedCompounds != "Axle")) {
+		if this.RemoteHandler {
 			lastLap := (lapNumber - 1)
 
 			flWear := knowledgeBase.getValue("Lap." . lastLap . ".Tyre.Wear.FL", kUndefined)
@@ -3823,12 +3823,20 @@ class RaceEngineer extends RaceAssistant {
 				tyreCompoundColor := knowledgeBase.getValue("Lap." . lastLap . ".Tyre.Compound.Color")
 
 				if (mixedCompounds = "Wheel") {
-					tyreCompound := knowledgeBase.getValue("Lap." . lastLap . ".Tyre.Compound.FrontLeft", tyreCompound)
-					tyreCompoundColor := knowledgeBase.getValue("Lap." . lastLap . ".Tyre.Compound.Color.FrontLeft", tyreCompoundColor)
+					tyreCompound := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"], (wheel) {
+										return knowledgeBase.getValue("Lap." . lastLap . ".Tyre.Compound." . wheel, tyreCompound)
+									})
+					tyreCompoundColor := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"], (wheel) {
+											 return knowledgeBase.getValue("Lap." . lastLap . ".Tyre.Compound.Color." . wheel, tyreCompoundColor)
+										 })
 				}
 				else if (mixedCompounds = "Axle") {
-					tyreCompound := knowledgeBase.getValue("Lap." . lastLap . ".Tyre.Compound.Front", tyreCompound)
-					tyreCompoundColor := knowledgeBase.getValue("Lap." . lastLap . ".Tyre.Compound.Color.Front", tyreCompoundColor)
+					tyreCompound := collect(["Front", "Rear"], (axle) {
+										return knowledgeBase.getValue("Lap." . lastLap . ".Tyre.Compound." . axle, tyreCompound)
+									})
+					tyreCompoundColor := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"], (axle) {
+											 return knowledgeBase.getValue("Lap." . lastLap . ".Tyre.Compound.Color." . axle, tyreCompoundColor)
+										 })
 				}
 
 				if tyreSet

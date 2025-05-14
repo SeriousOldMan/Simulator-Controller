@@ -83,8 +83,8 @@ Announcements=avisos meteorológicos
 	[Como esta el tiempo, Puede llover, hay cambio de teimpo, (CanYou) comprobar el tiempo]
 
 	[(TellMe) las vueltas restantes, Cuántas vueltas quedan, Cuántas vueltas quedan, Cuántas vueltas faltan]
-
-	[Simula la {carrera, la clasificación} en (Number) vueltas, (CanYou) simular la {carrera, clasificación} en (Number) vueltas, ¿Cuál será mi posición en (Number) vueltas, ¿Cuál sera mi posición en (Number) vueltas]
+	
+	[Simula la {carrera, la clasificación} en (Number) vueltas, (CanYou) simular la {carrera, clasificación} en (Number) vueltas, ¿Cuál será mi posición en (Number) vueltas, ¿Cuál será mi posición en (Number) vueltas]
 
 	[Simula la {carrera, la clasificación} en (Number) vueltas, (CanYou) simular la {carrera, clasificación} en (Number) vueltas, ¿Cuál será mi posición en (Number) vueltas, ¿Cuál sera mi posición en (Number) vueltas]
 	
@@ -124,7 +124,7 @@ Announcements=avisos meteorológicos
 
 3. Parada en boxes
 
-	[(WhatIs) la mejor {vuelta, opción} para el próximo pitstop, ¿Cuándo recomienda el próximo pitstop, (CanYou) recomendar la próxima parada en boxes, en qué vuelta debo entrar en boxes]
+	[(WhatIs) la mejor {vuelta, opción} para el próximo pitstop, ¿Cuándo recomienda el próximo pitstop?, (CanYou) recomendar la próxima parada en boxes, ¿En qué vuelta debo entrar en boxes?]
 	
 	[(CanYou) simular la {siguiente parada en boxes, pitstop} {alrededor, en} la vuelta (Number), Planificar la {siguiente parada en boxes, pitstop} {alrededor, en} la vuelta (Number), (CanYou) planificar la {siguiente parada en boxes, pitstop} {alrededor, en} la vuelta (Number)]
 

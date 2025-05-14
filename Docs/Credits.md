@@ -13,7 +13,7 @@ Therefore, I would like to thank everyone who made this project possible and I w
 
 Simulator Controller today supports multiple different languages for the user interface and also for the Assistants. This would not have been possible without the great effort of community members, which provided the corresponding translations, namely:
 
-- Jose Krilin (@jkrilin) for the Spanish translation
+- Jose Krilin (@jkrilin) and @alejandrocq for the Spanish translation
 - @SlatMars for the French translation
 - Diego Falcone (@Diego Falcone Dev_Dk HawkOne) for the Italien translation
 - @Hudson Alves for the Portuguese translation

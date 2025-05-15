@@ -564,6 +564,11 @@ namespace SHMConnector {
 			return psi * 6.895;
 		}
 
+		private static float GetFuel(string fuelChoice)
+		{
+			return float.Parse(fuelChoice);
+		}
+
 		private static string GetStringFromBytes(byte[] bytes) {
 			if (bytes == null)
 				return "";
@@ -684,12 +689,13 @@ namespace SHMConnector {
 			if (!SelectPitstopCategory("FUEL:"))
 				return;
 
-			int deltaFuel = targetFuel - pitInfo.mPitMenu.mChoiceIndex;
+			if (pitInfo.mPitMenu.mChoiceIndex > 0)
+				SendPitstopCommand(new string('-', pitInfo.mPitMenu.mChoiceIndex));
 
-			if (deltaFuel > 0)
-				SendPitstopCommand(new string('+', deltaFuel));
-			else
-				SendPitstopCommand(new string('-', Math.Abs(deltaFuel)));
+			int index = 0;
+
+			while (GetFuel(GetStringFromBytes(pitInfo.mPitMenu.mChoiceString)) < targetFuel && index++ < pitInfo.mPitMenu.mNumChoices)
+				SendPitstopCommand(new string('+', 1));
 		}
 		
 		private void ExecuteChangeRefuelCommand(char action, string stepsArgument) {
@@ -1047,8 +1053,10 @@ namespace SHMConnector {
 
 			if (connected)
 			{
-				if (SelectPitstopCategory("FUEL:"))
-					strWriter.Write("FuelAmount="); strWriter.WriteLine(pitInfo.mPitMenu.mChoiceIndex);
+				if (SelectPitstopCategory("FUEL:")) {
+					strWriter.Write("FuelAmount=");
+					strWriter.WriteLine(GetFuel(GetStringFromBytes(pitInfo.mPitMenu.mChoiceString)));
+				}
 
 				if (SelectPitstopCategory("F TIRES:") || SelectPitstopCategory("FL TIRE:"))
 				{

@@ -564,9 +564,18 @@ namespace SHMConnector {
 			return psi * 6.895;
 		}
 
-		private static float GetFuel(string fuelChoice)
+		private int GetFuel(string fuelChoice)
 		{
-			return float.Parse(fuelChoice);
+			int fuel = 0;
+
+			// We expect the fuel choice to be in the format "+<value>" or "+<value>/<value>"
+			if (!string.IsNullOrEmpty(fuelChoice) && fuelChoice[0] == '+')
+			{
+				var parts = fuelChoice.Substring(1).Split('/');
+				int.TryParse(parts[0], out fuel);
+			}
+
+			return fuel;
 		}
 
 		private static string GetStringFromBytes(byte[] bytes) {

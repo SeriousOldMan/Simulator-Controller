@@ -1,30 +1,8 @@
 # Latest stable release
 
-## 6.3.1.0
-
-#### Date: 05/09/25
-
-#### Fixes
-
-  - Fixed validation of function call syntax in controller actions.
-  - Fixed the handling of special characters in the API keys for REST/JSON services.
-  - Fixed session length calculation for lap-based sessions with active rules set in "Race Settings".
-  - Fixed an off by one error, when the Strategist informs the Engineer about the upcoming pitstop.
-  - Fixed a bug which allowed for alien tyre compounds for a given car / track combination, if these are defined in the "Rules" of "Race Settings".
-  - Fixed handling of used tyre sets in rule-based strategies defined in the "Race Settings".
-  - Fixed handling of community tyre pressures in the "Session Database".
-
-#### Changes
-
-  - Updated the handling of the master download mirror.
-  - Updated and extended the tyre meta data for *Automobilista 2* (by @alejandrocq).
-  - [Internal] Extensive rework and refactoring in preparation for single tyre handling support.
-
-# Upcoming release
-
 ## 6.3.2.0
 
-#### Date: 05/16/25 (planned)
+#### Date: 05/16/25
 
 #### Fixes
 
@@ -44,7 +22,31 @@
   - This release introduces initial functionality which supports the handling of individual tyre compounds and tyre changes for individual wheels, if supported by the current simulator, of course. See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#handling-of-tyre-compounds-on-inidividual-wheels) for more information.
   - [Internal] Migrated to AHK 2.1-alpha.18.
 
+# Upcoming release
+
+Not yet planned...
+
 # Release history
+
+## 6.3.1.0
+
+#### Date: 05/09/25
+
+#### Fixes
+
+  - Fixed validation of function call syntax in controller actions.
+  - Fixed the handling of special characters in the API keys for REST/JSON services.
+  - Fixed session length calculation for lap-based sessions with active rules set in "Race Settings".
+  - Fixed an off by one error, when the Strategist informs the Engineer about the upcoming pitstop.
+  - Fixed a bug which allowed for alien tyre compounds for a given car / track combination, if these are defined in the "Rules" of "Race Settings".
+  - Fixed handling of used tyre sets in rule-based strategies defined in the "Race Settings".
+  - Fixed handling of community tyre pressures in the "Session Database".
+
+#### Changes
+
+  - Updated the handling of the master download mirror.
+  - Updated and extended the tyre meta data for *Automobilista 2* (by @alejandrocq).
+  - [Internal] Extensive rework and refactoring in preparation for single tyre handling support.
 
 ## 6.3.0.0
 

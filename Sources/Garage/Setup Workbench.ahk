@@ -2628,7 +2628,8 @@ class SetupEditor extends ConfigurationItem {
 	}
 
 	editableSetup(car) {
-		return FileExist(kResourcesDirectory . "Garage\Definitions\Cars\" . this.Workbench.SelectedSimulator . "." . this.Workbench.SelectedCar . ".ini")
+		return (FileExist(kResourcesDirectory . "Garage\Definitions\Cars\" . this.Workbench.SelectedSimulator . "." . this.Workbench.SelectedCar . ".ini")
+			 || FileExist(kUserHomeDirectory . "Garage\Definitions\Cars\" . this.Workbench.SelectedSimulator . "." . this.Workbench.SelectedCar . ".ini"))
 	}
 
 	editSetup(setup := false) {

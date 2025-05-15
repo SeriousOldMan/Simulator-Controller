@@ -3838,6 +3838,10 @@ class RaceEngineer extends RaceAssistant {
 											 return knowledgeBase.getValue("Lap." . lastLap . ".Tyre.Compound.Color." . axle, tyreCompoundColor)
 										 })
 				}
+				else {
+					tyreCompound := [tyreCompound]
+					tyreCompoundColor := [tyreCompoundColor]
+				}
 
 				if tyreSet
 					tyreSet := knowledgeBase.getValue("Lap." . lastLap . ".Tyre.Set", false)
@@ -3925,7 +3929,7 @@ class RaceEngineer extends RaceAssistant {
 
 		if (this.RemoteHandler && (flWear != kUndefined) && (pitstop != lastPitstop))
 			this.RemoteHandler.updateTyreSet(pitstop, driver, false
-										   , tyreCompound, tyreCompoundColor, tyreSet
+										   , values2String(",", tyreCompound*), values2String(",", tyreCompoundColor*), tyreSet
 										   , flWear, frWear, rlWear, rrWear)
 
 		return result

@@ -54,7 +54,7 @@ CanYou=Puedes, por favor
 
 CanWe=Puedes, podemos, por favor
 
-Announcements=información delta, consejos tácticos, alertas laterales, alertas traseras, avisos de bandera azul, avisos de bandera amarilla, avisos de atajo, información de penalización, alertas de coche lento, alertas de accidentes por delante, alertas de accidentes detrás
+Announcements=información delta, consejos tácticos, alertas laterales, alertas traseras, avisos de bandera azul, avisos de bandera amarilla, avisos de límites de pista, información de penalización, alertas de coche lento, alertas de accidentes por delante, alertas de accidentes detrás
 
 #### Comandos
 

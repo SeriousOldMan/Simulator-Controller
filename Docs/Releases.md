@@ -1,5 +1,33 @@
 # Latest stable release
 
+## 6.3.2.0
+
+#### Date: 05/16/25
+
+#### Fixes
+
+  - Several fixex for the Spanish grammars for the Assistants thanks to @alejandrocq.
+  - Fixed the data collection and transfer to the session database by the Race Assistants, if the "Solo Center" is **not** active. This bug was introduced with version 6.3.0.
+  - Fixed the race situation dependend strategy simulation in "Team Center".
+  - Fixed the calculation of stint statistics in "Team Center".
+  - Fixed unit conversion for tyre pressure deviation threshold in "Race Settings".
+
+#### Changes
+
+  - A [new setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" allows you to define the threshold for reporting and handling of tyre pressure loss events.
+  - The same setting for pressure loss threshold is also available in the ["Race Settings"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-pitstop).
+  - Info widgets with information that is all zero, like tyre wear if the data is not supplied by the simulator, are no longer displayed.
+  - The handling of restricted tyre sets in the strategy simulation has been optimized. It is no longer possible create strategies where a tyre set is used for more laps than usually possible.
+  - Information about available tyre sets is now passed by the Strategist to the LLM, if a strategy is active for the current race.
+  - This release introduces initial functionality which supports the handling of individual tyre compounds and tyre changes for individual wheels, if supported by the current simulator, of course. See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#handling-of-tyre-compounds-on-inidividual-wheels) for more information.
+  - [Internal] Migrated to AHK 2.1-alpha.18.
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.3.1.0
 
 #### Date: 05/09/25
@@ -19,12 +47,6 @@
   - Updated the handling of the master download mirror.
   - Updated and extended the tyre meta data for *Automobilista 2* (by @alejandrocq).
   - [Internal] Extensive rework and refactoring in preparation for single tyre handling support.
-
-# Upcoming release
-
-Not yet planned...
-
-# Release history
 
 ## 6.3.0.0
 

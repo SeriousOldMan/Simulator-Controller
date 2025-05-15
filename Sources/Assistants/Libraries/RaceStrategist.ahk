@@ -1104,12 +1104,32 @@ class RaceStrategist extends GridRaceAssistant {
 		local knowledge := super.getKnowledge(type, options)
 		local strategy, nextPitstop, pitstop, pitstops
 		local fuelService, tyreService, tyreCompound, tyreCompoundColor
+		local availableTyreSets, tyreSets, tyreSet, ignore
 
 		if knowledgeBase {
-			try {
-				this.Provider.supportsPitstop(&fuelService, &tyreService)
+			this.Provider.supportsPitstop(&fuelService, &tyreService)
 
-				if (knowledgeBase.getValue("Strategy.Name", false) && this.activeTopic(options, "Strategy")) {
+			if (this.Strategy && this.activeTopic(options, "Session"))
+				try {
+					availableTyreSets := this.Strategy.AvailableTyreSets
+					tyreSets := knowledge["Session"]["AvailableTyres"]
+
+					for ignore, tyreCompound in SessionDatabase.getTyreCompounds(this.Simulator, this.Car, this.Track) {
+						tyreSet := first(tyreSets, (ts) => (ts.Compound = tyreCompound))
+
+						if (tyreSet && availableTyreSets.Has(tyreCompound))
+							if (availableTyreSets[tyreCompound][2].Length > 0)
+								tyreSet["Sets"] := availableTyreSets[tyreCompound][2].Length
+							else
+								tyreSets.RemoveAt(inList(tyreSets, tyreSet))
+					}
+				}
+				catch Any as exception {
+					logError(exception, true)
+				}
+
+			if (knowledgeBase.getValue("Strategy.Name", false) && this.activeTopic(options, "Strategy"))
+				try {
 					strategy := Map("NumPitstops", knowledgeBase.getValue("Strategy.Pitstop.Count"))
 
 					knowledge["Strategy"] := strategy
@@ -1149,10 +1169,9 @@ class RaceStrategist extends GridRaceAssistant {
 						strategy["NextPitstop"] := pitstop
 					}
 				}
-			}
-			catch Any as exception {
-				logError(exception, true)
-			}
+				catch Any as exception {
+					logError(exception, true)
+				}
 
 			if this.activeTopic(options, "Pitstops")
 				try {
@@ -3153,25 +3172,6 @@ class RaceStrategist extends GridRaceAssistant {
 			if (availableTyreSets.Has(tyreCompound) && availableTyreSets[tyreCompound][2].Has(tyreSet.Set))
 				availableTyreSets[tyreCompound][2][tyreSet.Set] += tyreSet.Laps
 		}
-
-		/*
-		local tyreCompound, ignore, tyreSet, count
-
-		availableTyreSets := availableTyreSets.Clone()
-
-		for ignore, tyreSet in usedTyreSets {
-			tyreCompound := compound(tyreSet.Compound, tyreSet.CompoundColor)
-
-			if availableTyreSets.Has(tyreCompound) {
-				count := (availableTyreSets[tyreCompound] - 1)
-
-				if (count > 0)
-					availableTyreSets[tyreCompound] := count
-				else
-					availableTyreSets.Delete(tyreCompound)
-			}
-		}
-		*/
 
 		return availableTyreSets
 	}

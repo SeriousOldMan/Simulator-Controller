@@ -2919,6 +2919,7 @@ splitCompounds(compounds, &tyreCompounds, &tyreCompoundColors) {
 
 combineCompounds(&compounds, &compoundColors := false) {
 	local newCompounds, newCompoundColors
+
 	if (compounds.Length = 1)
 		return
 	else {

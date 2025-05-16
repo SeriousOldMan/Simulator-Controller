@@ -676,13 +676,18 @@ namespace RF2SHMProvider {
 				return;
 
 			if (pitInfo.mPitMenu.mChoiceIndex > 0)
+			{
 				SendPitstopCommand(new string('-', pitInfo.mPitMenu.mChoiceIndex));
+				pitInfoBuffer.GetMappedData(ref pitInfo);
+			}
 
 			int index = 0;
-
 			while (GetFuel(GetStringFromBytes(pitInfo.mPitMenu.mChoiceString)) < targetFuel && index++ < pitInfo.mPitMenu.mNumChoices)
-                SendPitstopCommand(new string('+', 1));
-        }
+			{
+				SendPitstopCommand(new string('+', 1));
+				pitInfoBuffer.GetMappedData(ref pitInfo);
+			}
+		}
 		
 		private void ExecuteChangeRefuelCommand(char action, string stepsArgument) {
 			if (!SelectPitstopCategory("FUEL:"))

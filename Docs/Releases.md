@@ -6,11 +6,12 @@
 
 #### Fixes
 
-  - Several fixex for the Spanish grammars for the Assistants thanks to @alejandrocq.
+  - Several fixes for the Spanish grammars for the Assistants thanks to @alejandrocq.
   - Fixed the data collection and transfer to the session database by the Race Assistants, if the "Solo Center" is **not** active. This bug was introduced with version 6.3.0.
   - Fixed the race situation dependend strategy simulation in "Team Center".
   - Fixed the calculation of stint statistics in "Team Center".
   - Fixed unit conversion for tyre pressure deviation threshold in "Race Settings".
+  - Fixed enabling / disabling of setup editor activation in "Setup Workbench" for cars with custom meta data definitions.
 
 #### Changes
 

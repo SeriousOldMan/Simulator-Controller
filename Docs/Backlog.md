@@ -1,6 +1,5 @@
 #### General
   1. Support for unit conversions per simulator
-  2. Add a NuGet restore to the build process
 
 #### Voice System
   1. Integration of local TTS engines for voice generation

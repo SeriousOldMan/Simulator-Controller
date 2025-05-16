@@ -539,6 +539,20 @@ namespace RF2SHMProvider {
 			return psi * 6.895;
 		}
 
+		private int GetFuel(string fuelChoice)
+		{
+			int fuel = 0;
+
+			// We expect the fuel choice to be in the format "+<value>" or "+<value>/<value>"
+			if (!string.IsNullOrEmpty(fuelChoice) && fuelChoice[0] == '+')
+			{
+				var parts = fuelChoice.Substring(1).Split('/');
+				int.TryParse(parts[0], out fuel);
+			}
+
+			return fuel;
+		}
+
 		private static string GetStringFromBytes(byte[] bytes) {
 			if (bytes == null)
 				return "";
@@ -661,13 +675,14 @@ namespace RF2SHMProvider {
 			if (!SelectPitstopCategory("FUEL:"))
 				return;
 
-			int deltaFuel = targetFuel - pitInfo.mPitMenu.mChoiceIndex;
+			if (pitInfo.mPitMenu.mChoiceIndex > 0)
+				SendPitstopCommand(new string('-', pitInfo.mPitMenu.mChoiceIndex));
 
-			if (deltaFuel > 0)
-				SendPitstopCommand(new string('+', deltaFuel));
-			else
-				SendPitstopCommand(new string('-', Math.Abs(deltaFuel)));
-		}
+			int index = 0;
+
+			while (GetFuel(GetStringFromBytes(pitInfo.mPitMenu.mChoiceString)) < targetFuel && index++ < pitInfo.mPitMenu.mNumChoices)
+                SendPitstopCommand(new string('+', 1));
+        }
 		
 		private void ExecuteChangeRefuelCommand(char action, string stepsArgument) {
 			if (!SelectPitstopCategory("FUEL:"))
@@ -1018,10 +1033,11 @@ namespace RF2SHMProvider {
 			Console.WriteLine("[Setup Data]");
 			
 			if (connected) {
-				if (!SelectPitstopCategory("FUEL:"))
-					return;
-
-				Console.Write("FuelAmount="); Console.WriteLine(pitInfo.mPitMenu.mChoiceIndex);
+				if (SelectPitstopCategory("FUEL:"))
+				{
+					Console.Write("FuelAmount=");
+					Console.WriteLine(GetFuel(GetStringFromBytes(pitInfo.mPitMenu.mChoiceString)));
+				}
 
 				if (SelectPitstopCategory("F TIRES:") || SelectPitstopCategory("FL TIRE:"))
 				{

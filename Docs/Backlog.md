@@ -39,7 +39,6 @@
   2. Introduce data groups (for example all data belonging to a complete weekend w. practice, qualiy and race) and make this group usable for future strategy calculation
   3. Handle DT as an alternative to reset the stint timer at the end of a race
   4. Make X-Axis in consumption graph configurable
-  5. Make eating into the safety fuel possible, if this results in an additional lap
 
 #### Team Center
   1. Change hot target pressures for the next pitstop

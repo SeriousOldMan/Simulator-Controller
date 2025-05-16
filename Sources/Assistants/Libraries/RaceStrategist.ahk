@@ -1696,7 +1696,7 @@ class RaceStrategist extends GridRaceAssistant {
 					if ((duration = 0) || ((Abs(sessionLength - duration) / duration) >  0.1))
 						applicableStrategy := false
 				}
-				else if ((sessionType = "Laps") && (facts["Session.Format"] = "Lap")) {
+				else if ((sessionType = "Laps") && (facts["Session.Format"] = "Laps")) {
 					laps := facts["Session.Laps"]
 
 					if ((Abs(sessionLength - laps) / laps) >  0.05)

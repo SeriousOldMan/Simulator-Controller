@@ -1520,12 +1520,12 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 				}
 			}
 			else if (mixedCompounds = "Wheel") {
-				for index, wheel in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
-					tyreCompound := getMultiMapValue(sessionSettings, "Simulator Settings", "Tyre." . type . ".Compound." . wheel, false)
+				for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
+					tyreCompound := getMultiMapValue(sessionSettings, "Simulator Settings", "Tyre." . type . ".Compound." . tyre, false)
 
 					if tyreCompound
 						compounds.Push(compound(tyreCompound, getMultiMapValue(sessionSettings
-																			 , "Simulator Settings", "Tyre." . type . ".Compound.Color." . wheel)))
+																			 , "Simulator Settings", "Tyre." . type . ".Compound.Color." . tyre)))
 					else
 						compounds.Push(false)
 				}

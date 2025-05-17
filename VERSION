@@ -1,23 +1,20 @@
 [Development]
 Version=6.3.3.0-dev
 Target=6.3.3.0-release
-Date=05/15/2025
+Date=05/16/2025
 Download=
-Changes=Bumped a couple of NuGet packages, Updated LLM Runtime, Support Nuget package restore in build process, Fixed pitstop refueling for rF2 in case of non-linear fuel settings
+Changes=Bumped a couple of NuGet packages, Updated LLM Runtime, Support Nuget package restore in build process, Fixed pitstop refueling for rF2 in case of non-linear fuel settings, Fixed off by error in the target lap of strategy controlled pitstops, Fixed loading of lap-based strategies, Fixed several bugs for axle-based tyre compound handling
 Components=Media->5.6.1,Configuration->6.3.2,Utilities->6.3.0
 [Release]
 Version=6.3.2.0-release
 Date=05/16/2025
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/ho37s1lr;https://www.dropbox.com/scl/fi/mlj86ul5hscknl9q3z8v8/Simulator-Controller-6.3.2.0-release.zip?rlkey=dnw31gkyfausjsib5lqifz6tn&st=g2a5ah3e&dl=1;http://87.178.12.140:800/api/public/dl/cvSsLgxt;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.3.2.0-release.zip
+Download=https://cutt.ly/crxyBYf3;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/ho37s1lr;https://www.dropbox.com/scl/fi/mlj86ul5hscknl9q3z8v8/Simulator-Controller-6.3.2.0-release.zip?rlkey=dnw31gkyfausjsib5lqifz6tn&st=g2a5ah3e&dl=1;http://87.178.12.140:800/api/public/dl/cvSsLgxt;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.3.2.0-release.zip
 Changes=Optimized handling of restricted tyre sets in strategy simulation, Active handling of individual tyre compounds in many parts of Simulator Controller, Fixed data collection without "Solo Center", Fixed strategy simulation in "Team Center", Fixed stint statistics update in "Team Center", No display of all-zero infos in "System Monitor", New setting for pressure loss threshold in session settings, New setting for pressure loss threshold in "Race Settings", Migrated to AHK 2.1-alpha.18, Fixes to Spanisch translation, Information about available tyre sets in LLM knowledge
 Components=Media->5.6.1,Configuration->6.3.2,Utilities->6.3.0
 [Components]
 Media.5.6.1.Path=Resources
 Media.5.6.1.Content=Splash Media
 Media.5.6.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/DfSnfhLR;https://www.dropbox.com/scl/fi/3c56fjdvdd4od5t7rsuc9/Media-5.6.1.zip?rlkey=x0icl05jy05nn886due4dsblv&dl=1;http://%master%:800/api/public/dl/QoDnWZ83;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Media+5.6.1.zip
-Configuration.6.3.1.Path=Resources
-Configuration.6.3.1.Content=Setup
-Configuration.6.3.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/VdHgCofy;https://www.dropbox.com/scl/fi/nnoml8ghid3qyv8l3txej/Configuration-6.3.1.zip?rlkey=x0mvvmy1tuqcyr216bymrdagn&st=u1ehm0cq&dl=1;http://87.178.12.140:800/api/public/dl/7ajP9Mu-;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.3.1.zip
 Configuration.6.3.2.Path=Resources
 Configuration.6.3.2.Content=Setup
 Configuration.6.3.2.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/4Nh-E9uO;https://www.dropbox.com/scl/fi/paibnvv9dqw3ukruhfnbk/Conifguration-6.3.2.zip?rlkey=w59u6i50bt4v5u7k9u0m07rjx&st=2hcedvh0&dl=1;http://87.178.12.140:800/api/public/dl/6ECw9H64;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Conifguration+6.3.2.zip

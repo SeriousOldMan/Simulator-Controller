@@ -1244,7 +1244,7 @@ namespace RF2SHMSpotter {
 
             pushValue(recentGLongs, acceleration);
 
-            double angularVelocity = smoothValue(recentRealAngVels, (float)telemetry.mVehicles[carID].mLocalRot.y);
+            double angularVelocity = smoothValue(recentRealAngVels, (float)telemetry.mVehicles[carID].mLocalRot.z);
             double steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
             double steerAngleRadians = -steeredAngleDegs / 57.2958;
             double wheelBaseMeter = (float)wheelbase / 100;
@@ -1334,7 +1334,7 @@ namespace RF2SHMSpotter {
 					lastCompletedLaps = completedLaps;
 					
 					while (true)
-						if (cornerDynamicsList[0].CompletedLaps < completedLaps - 2)
+						if (cornerDynamicsList[0].CompletedLaps < completedLaps - 1)
 							cornerDynamicsList.RemoveAt(0);
 						else
 							break;

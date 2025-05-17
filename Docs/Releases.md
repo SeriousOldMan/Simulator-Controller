@@ -25,7 +25,24 @@
 
 # Upcoming release
 
-Not yet planned...
+## 6.3.3.0
+
+#### Date: 05/23/25 (planned)
+
+#### Fixes
+
+  - Fixed pitstop refueling for rF2 in case of non-linear fuel settings.
+  - Fixed off by error in the target lap of strategy controlled pitstops.
+  - Fixed loading of lap-based strategies.
+  - Fixed several bugs for axle-based tyre compound handling (used in *rFactor 2* and *RaceRoom Racing Experience*), which prevented session data to be shown in the "System Monitor".
+  - Fixed the issue analyzer of "Setup Workbench" for *rFactor 2* and *Le Mans Ultimate*. Previously, only oversteer events had been reported.
+  - Fixed "Initialize from session" command for pitstops in the "Team Center" (had been broken with the last release).
+
+#### Changes
+
+  - [Important] A new version of the local LLM Runtime is available. If you are using the local runtime, please follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-633).
+  - [Internal] Updated to newer versions of several imported packages for the internal apps and DLLs.
+  - [Developer] NuGet packages are now updated automatically in the build pipeline.
 
 # Release history
 

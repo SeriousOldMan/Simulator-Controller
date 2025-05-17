@@ -1922,15 +1922,15 @@ class RaceEngineer extends RaceAssistant {
 				tyreCompounds := []
 				tyreCompoundColors := []
 
-				for index, wheel in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
-					tyreCompound := getMultiMapValue(data, "Setup Data", "TyreCompound" . wheel, tc)
-					tyreCompoundColor := getMultiMapValue(data, "Setup Data", "TyreCompoundColor" . wheel, tcc)
+				for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
+					tyreCompound := getMultiMapValue(data, "Setup Data", "TyreCompound" . tyre, tc)
+					tyreCompoundColor := getMultiMapValue(data, "Setup Data", "TyreCompoundColor" . tyre, tcc)
 
 					tyreCompounds.Push(tyreCompound)
 					tyreCompoundColors.Push(tyreCompoundColor)
 
-					if ((tyreCompound != kUndefined) && ((knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound." . wheel) != tyreCompound)
-													  || (knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound.Color." . wheel) != tyreCompoundColor)))
+					if ((tyreCompound != kUndefined) && ((knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound." . tyre) != tyreCompound)
+													  || (knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound.Color." . tyre) != tyreCompoundColor)))
 						changed := true
 				}
 
@@ -3721,7 +3721,7 @@ class RaceEngineer extends RaceAssistant {
 
 	pitstopOptionChanged(option, verbose, values*) {
 		local knowledgeBase := this.KnowledgeBase
-		local prssKey, incrKey, targetPressure, index, suffix, axle, wheel
+		local prssKey, incrKey, targetPressure, index, suffix, axle, tyre
 
 		if this.hasPreparedPitstop() {
 			if isDebug()
@@ -3739,9 +3739,9 @@ class RaceEngineer extends RaceAssistant {
 						knowledgeBase.setFact("Pitstop.Planned.Tyre.Compound.Color." . axle, values[2][index])
 					}
 				case "Tyre Compound Wheel":
-					for index, wheel in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
-						knowledgeBase.setFact("Pitstop.Planned.Tyre.Compound." . wheel, values[1][index])
-						knowledgeBase.setFact("Pitstop.Planned.Tyre.Compound.Color." . wheel, values[2][index])
+					for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
+						knowledgeBase.setFact("Pitstop.Planned.Tyre.Compound." . tyre, values[1][index])
+						knowledgeBase.setFact("Pitstop.Planned.Tyre.Compound.Color." . tyre, values[2][index])
 					}
 				case "Tyre Set":
 					knowledgeBase.setFact("Pitstop.Planned.Tyre.Set", values[1])
@@ -3823,11 +3823,11 @@ class RaceEngineer extends RaceAssistant {
 				tyreCompoundColor := knowledgeBase.getValue("Lap." . lastLap . ".Tyre.Compound.Color")
 
 				if (mixedCompounds = "Wheel") {
-					tyreCompound := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"], (wheel) {
-										return knowledgeBase.getValue("Lap." . lastLap . ".Tyre.Compound." . wheel, tyreCompound)
+					tyreCompound := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"], (tyre) {
+										return knowledgeBase.getValue("Lap." . lastLap . ".Tyre.Compound." . tyre, tyreCompound)
 									})
-					tyreCompoundColor := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"], (wheel) {
-											 return knowledgeBase.getValue("Lap." . lastLap . ".Tyre.Compound.Color." . wheel, tyreCompoundColor)
+					tyreCompoundColor := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"], (tyre) {
+											 return knowledgeBase.getValue("Lap." . lastLap . ".Tyre.Compound.Color." . tyre, tyreCompoundColor)
 										 })
 				}
 				else if (mixedCompounds = "Axle") {
@@ -3872,19 +3872,19 @@ class RaceEngineer extends RaceAssistant {
 					knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.Compound.Color", false)
 
 				if (mixedCompounds = "Wheel") {
-					do(["FrontLeft", "FrontRight", "RearLeft", "RearRight"], (wheel) {
-						compound := getMultiMapValue(options, "Pitstop", "Tyre.Compound." . wheel, false)
+					do(["FrontLeft", "FrontRight", "RearLeft", "RearRight"], (tyre) {
+						compound := getMultiMapValue(options, "Pitstop", "Tyre.Compound." . tyre, false)
 
-						knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.Compound." . wheel, compound)
+						knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.Compound." . tyre, compound)
 
 						if compound {
-							knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.CompoundColor." . wheel
-												, getMultiMapValue(options, "Pitstop", "Tyre.Compound.Color." . wheel, false))
+							knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.CompoundColor." . tyre
+												, getMultiMapValue(options, "Pitstop", "Tyre.Compound.Color." . tyre, false))
 
 							tyreChange := true
 						}
 						else
-							knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.CompoundColor." . wheel, false)
+							knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.CompoundColor." . tyre, false)
 					})
 				}
 				else if (mixedCompounds = "Axle") {
@@ -4189,14 +4189,14 @@ class RaceEngineer extends RaceAssistant {
 				})
 			}
 			else if (tyreService = "Wheel")
-				do(["FrontLeft", "FrontRight", "RearLeft", "RearRight"], (wheel) {
-					local tc := knowledgeBase.getValue("Pitstop." . pitstop . ".Tyre.Compound." . wheel, false)
-					local tcc := knowledgeBase.getValue("Pitstop." . pitstop . ".Tyre.Compound.Color." . wheel, false)
+				do(["FrontLeft", "FrontRight", "RearLeft", "RearRight"], (tyre) {
+					local tc := knowledgeBase.getValue("Pitstop." . pitstop . ".Tyre.Compound." . tyre, false)
+					local tcc := knowledgeBase.getValue("Pitstop." . pitstop . ".Tyre.Compound.Color." . tyre, false)
 					local first := false
 
 					if (tc && (tc != "-")) {
-						setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompound" . wheel, tc)
-						setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompoundColor" . wheel, tcc)
+						setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompound" . tyre, tc)
+						setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompoundColor" . tyre, tcc)
 
 						if first {
 							first := false
@@ -4208,8 +4208,8 @@ class RaceEngineer extends RaceAssistant {
 						tyreChange := true
 					}
 					else  {
-						setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompound" . wheel, false)
-						setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompoundColor" . wheel, false)
+						setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompound" . tyre, false)
+						setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompoundColor" . tyre, false)
 					}
 				})
 

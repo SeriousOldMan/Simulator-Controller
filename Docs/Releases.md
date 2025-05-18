@@ -6,11 +6,12 @@
 
 #### Fixes
 
-  - Several fixex for the Spanish grammars for the Assistants thanks to @alejandrocq.
+  - Several fixes for the Spanish grammars for the Assistants thanks to @alejandrocq.
   - Fixed the data collection and transfer to the session database by the Race Assistants, if the "Solo Center" is **not** active. This bug was introduced with version 6.3.0.
   - Fixed the race situation dependend strategy simulation in "Team Center".
   - Fixed the calculation of stint statistics in "Team Center".
   - Fixed unit conversion for tyre pressure deviation threshold in "Race Settings".
+  - Fixed enabling / disabling of setup editor activation in "Setup Workbench" for cars with custom meta data definitions.
 
 #### Changes
 
@@ -24,7 +25,27 @@
 
 # Upcoming release
 
-Not yet planned...
+## 6.3.3.0
+
+#### Date: 05/23/25 (planned)
+
+#### Fixes
+
+  - Fixed pitstop refueling for *rFactor 2* in case of non-linear fuel settings.
+  - Fixed off by one error in the target lap of strategy controlled pitstops.
+  - Fixed loading of lap-based strategies.
+  - Fixed several bugs for axle-based tyre compound handling (used in *rFactor 2* and *RaceRoom Racing Experience*), which prevented session data to be shown in the "System Monitor".
+  - Fixed the issue analyzer of "Setup Workbench" for *rFactor 2* and *Le Mans Ultimate*. Previously, only oversteer events had been reported. Detecting oversteer events, especially when counter-steering, is still not very reliable, but this is due to invalid angular velocity data in the API.
+  - Fixed "Initialize from Session" command for pitstops in the "Team Center" (had been broken with the last release).
+
+#### Changes
+
+  - The Engineer does not issue multiple pressure loss warnings for the same tyre anymore.
+  - Pressure loss information has been added to the session info widgets in "System Monitor".
+  - [Important] A new version of the local LLM Runtime is available. If you are using the local runtime, please follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-633).
+  - [Developer] NuGet packages are now updated automatically in the build pipeline.
+  - [Developer] Pressure loss information has been added to the "Session State.json" file.
+  - [Internal] Updated to newer versions of several imported packages for the internal apps and DLLs.
 
 # Release history
 

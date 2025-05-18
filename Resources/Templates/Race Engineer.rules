@@ -668,10 +668,10 @@ setDamageReported(?damageType, true) <= Set(Damage.Reported, !Lap), Set(Damage, 
 ;;; the driver.                                                             ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-{None: [?Tyre.Pressure.Loss.FL]} => (Clear: Tyre.Pressure.Loss.Reported.FL)
-{None: [?Tyre.Pressure.Loss.FR]} => (Clear: Tyre.Pressure.Loss.Reported.FR)
-{None: [?Tyre.Pressure.Loss.RL]} => (Clear: Tyre.Pressure.Loss.Reported.RL)
-{None: [?Tyre.Pressure.Loss.RR]} => (Clear: Tyre.Pressure.Loss.Reported.RR)
+{None: [?Tyre.Pressure.Reference.FL]} => (Clear: Tyre.Pressure.Loss.Reported.FL)
+{None: [?Tyre.Pressure.Reference.FR]} => (Clear: Tyre.Pressure.Loss.Reported.FR)
+{None: [?Tyre.Pressure.Reference.RL]} => (Clear: Tyre.Pressure.Loss.Reported.RL)
+{None: [?Tyre.Pressure.Reference.RR]} => (Clear: Tyre.Pressure.Loss.Reported.RR)
 
 {All: [?Tyre.Pressure.Loss.FL],
 	  {Any: {None: [?Tyre.Pressure.Loss.Reported.FL]},

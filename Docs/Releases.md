@@ -40,6 +40,7 @@
 
 #### Changes
 
+  - Individual tyre service can be selected during the pitstop preparation in "Team Center".
   - The Engineer does not issue multiple pressure loss warnings for the same tyre anymore.
   - Pressure loss information has been added to the session info widgets in "System Monitor".
   - [Important] A new version of the local LLM Runtime is available. If you are using the local runtime, please follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-633).

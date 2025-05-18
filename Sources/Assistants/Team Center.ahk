@@ -1976,17 +1976,33 @@ class TeamCenter extends ConfigurationItem {
 			local pressuresMenu, label
 
 			copyPressure(driver, compound, pressures, *) {
-				local chosen := inList(collect(concatenate(["No Tyre Change"], center.TyreCompounds), translate), compound)
+				local tyreService, chosen, index
 
-				if chosen
-					centerGui["pitstopTyreCompoundDropDown"].Choose(chosen)
+				static dropDowns := ["pitstopTyreCompoundFLDropDown", "pitstopTyreCompoundFRDropDown"
+								   , "pitstopTyreCompoundRLDropDown", "pitstopTyreCompoundRRDropDown"]
+
+				this.Provider.supportsPitstop( , &tyreService)
+
+				for index, compound in string2Values(",", compound) {
+					if (compound = "-")
+						chosen := 1
+					else
+						chosen := inList(collect(concatenate(["No Change"], center.TyreCompounds), translate), compound)
+
+					if (tyreService = "Wheel")
+						centerGui[dropDowns[index]].Choose(chosen ? chosen : 1)
+					else if (tyreService = "Axle")
+						centerGui[dropDowns[index + (index - 1)]].Choose(chosen ? chosen : 1)
+					else
+						centerGui["pitstopTyreCompoundFLDropDown"].Choose(chosen ? chosen : 1)
+				}
 
 				pressures := string2Values(",", pressures)
 
-				centerGui["pitstopPressureFLEdit"].Text := pressures[1]
-				centerGui["pitstopPressureFREdit"].Text := pressures[2]
-				centerGui["pitstopPressureRLEdit"].Text := pressures[3]
-				centerGui["pitstopPressureRREdit"].Text := pressures[4]
+				centerGui["pitstopPressureFLEdit"].Text := (isNumber(pressures[1]) ? pressures[1] : "")
+				centerGui["pitstopPressureFREdit"].Text := (isNumber(pressures[2]) ? pressures[2] : "")
+				centerGui["pitstopPressureRLEdit"].Text := (isNumber(pressures[3]) ? pressures[3] : "")
+				centerGui["pitstopPressureRREdit"].Text := (isNumber(pressures[4]) ? pressures[4] : "")
 
 				if driver {
 					driver := inDrivers(center.TeamDrivers, driver)
@@ -2518,14 +2534,18 @@ class TeamCenter extends ConfigurationItem {
 		centerGui.Add("UpDown", "x138 yp-2 w18 h20 Range0-999")
 		centerGui.Add("Text", "x164 yp+2 w80 h20", getUnit("Volume", true))
 
-		centerGui.Add("Text", "x24 yp+24 w80 h23 +0x200", translate("Tyre Change"))
+		centerGui.Add("Text", "x24 yp+24 w56 h23 +0x200", translate("Tyres"))
 
-		choices := collect(["No Tyre Change", normalizeCompound("Dry")], translate)
-
-		centerGui.Add("DropDownList", "x106 yp w133 Choose1 vpitstopTyreCompoundDropDown", choices).OnEvent("Change", updateState)
-
-		centerGui.Add("Button", "x240 yp w23 h23 Center +0x200 vcopyPressuresButton").OnEvent("Click", copyPressures)
+		centerGui.Add("Button", "x82 yp w23 h23 Center +0x200 vcopyPressuresButton").OnEvent("Click", copyPressures)
 		setButtonIcon(centerGui["copyPressuresButton"], kIconsDirectory . "Copy.ico", 1, "")
+
+		choices := collect(["No Change", normalizeCompound("Dry")], translate)
+
+		centerGui.Add("DropDownList", "x106 yp w78 Choose1 vpitstopTyreCompoundFLDropDown", choices).OnEvent("Change", updateState)
+		centerGui.Add("DropDownList", "x185 yp w78 Choose1 vpitstopTyreCompoundFRDropDown", choices).OnEvent("Change", updateState)
+
+		centerGui.Add("DropDownList", "x106 yp+24 w78 Choose1 vpitstopTyreCompoundRLDropDown", choices).OnEvent("Change", updateState)
+		centerGui.Add("DropDownList", "x185 yp w78 Choose1 vpitstopTyreCompoundRRDropDown", choices).OnEvent("Change", updateState)
 
 		centerGui.Add("Text", "x24 yp+26 w80 h20", translate("Tyre Set"))
 		centerGui.Add("Edit", "x106 yp-2 w50 h20 Limit2 Number vpitstopTyreSetEdit").OnEvent("Change", (*) => this.updateState())
@@ -3173,15 +3193,57 @@ class TeamCenter extends ConfigurationItem {
 	updateState() {
 		local window := this.Window
 		local selected, stint, hasPitstops
+		local tyreService, tyreSets, ignore, dropDown
 
-		if (window["pitstopTyreCompoundDropDown"].Value > 1) {
-			window["pitstopTyreSetEdit"].Enabled := true
+		this.Provider.supportsPitstop( , &tyreService)
+		this.Provider.supportsTyreManagement( , &tyreSets)
+
+		if (tyreService = "Wheel") {
+			for ignore, dropDown in ["pitstopTyreCompoundFLDropDown", "pitstopTyreCompoundFRDropDown"
+								   , "pitstopTyreCompoundRLDropDown", "pitstopTyreCompoundRRDropDown"] {
+				window[dropDown].Enabled := true
+
+				if (window[dropDown].Value = 0)
+					window[dropDown].Choose(1)
+			}
+		}
+		else if (tyreService = "Axle") {
+			for ignore, dropDown in ["pitstopTyreCompoundFLDropDown", "pitstopTyreCompoundRLDropDown"] {
+				window[dropDown].Enabled := true
+
+				if (window[dropDown].Value = 0)
+					window[dropDown].Choose(1)
+			}
+
+			for ignore, dropDown in ["pitstopTyreCompoundFRDropDown", "pitstopTyreCompoundRRDropDown"] {
+				window[dropDown].Enabled := false
+
+				window[dropDown].Choose(0)
+			}
+		}
+		else {
+			for ignore, dropDown in ["pitstopTyreCompoundFRDropDown"
+								   , "pitstopTyreCompoundRLDropDown", "pitstopTyreCompoundRRDropDown"] {
+				window[dropDown].Enabled := false
+
+				window[dropDown].Choose(0)
+			}
+		}
+
+		if exist(["pitstopTyreCompoundFLDropDown", "pitstopTyreCompoundFRDropDown"
+				, "pitstopTyreCompoundRLDropDown", "pitstopTyreCompoundRRDropDown"]
+			   , (c) => (window[c].Value > 1)) {
+			window["pitstopTyreSetEdit"].Enabled := tyreSets
 			window["pitstopPressureFLEdit"].Enabled := true
 			window["pitstopPressureFREdit"].Enabled := true
 			window["pitstopPressureRLEdit"].Enabled := true
 			window["pitstopPressureRREdit"].Enabled := true
 
-			if ((InStr(window["pitstopTyreCompoundDropDown"].Text, "Wet") = 1) && (SessionDatabase.getSimulatorCode(this.Simulator) = "ACC"))
+			if (window["pitstopTyreSetEdit"].Text = "")
+				window["pitstopTyreSetEdit"].Text := "Auto"
+
+			if ((InStr(window["pitstopTyreCompoundFLDropDown"].Text, translate(normalizeCompound("Wet"))) = 1)
+			 && (SessionDatabase.getSimulatorCode(this.Simulator) = "ACC"))
 				window["pitstopTyreSetEdit"].Text := "Auto"
 			else if ((window["pitstopTyreSetEdit"].Text = 0) || (window["pitstopTyreSetEdit"].Text = "-"))
 				window["pitstopTyreSetEdit"].Text := "Auto"
@@ -3198,6 +3260,11 @@ class TeamCenter extends ConfigurationItem {
 			window["pitstopPressureFREdit"].Text := ""
 			window["pitstopPressureRLEdit"].Text := ""
 			window["pitstopPressureRREdit"].Text := ""
+		}
+
+		if !tyreSets {
+			window["pitstopTyreSetEdit"].Enabled := false
+			window["pitstopTyreSetEdit"].Text := ""
 		}
 
 		if (this.Mode = "Normal") {
@@ -4600,9 +4667,9 @@ class TeamCenter extends ConfigurationItem {
 					this.adjustPitstopTyrePressures(this.TyrePressureMode, this.Weather, this.AirTemperature, this.TrackTemperature
 												  , tyreCompound, tyreCompoundColor, &flPressure, &frPressure, &rlPressure, &rrPressure)
 
-				chosen := inList(concatenate(["No Tyre Change"], this.TyreCompounds), compound(tyreCompound, tyreCompoundColor))
+				chosen := inList(concatenate(["No Change"], this.TyreCompounds), compound(tyreCompound, tyreCompoundColor))
 
-				this.Control["pitstopTyreCompoundDropDown"].Choose((chosen == 0) ? 1 : chosen)
+				this.Control["pitstopTyreCompoundFLDropDown"].Choose((chosen == 0) ? 1 : chosen)
 
 				if calcTyreSet
 					this.Control["pitstopTyreSetEdit"].Text := tyreSet
@@ -4613,7 +4680,10 @@ class TeamCenter extends ConfigurationItem {
 				this.Control["pitstopPressureRREdit"].Text := (isNumber(rrPressure) ? displayValue("Float", convertUnit("Pressure", rrPressure)) : "")
 			}
 			else {
-				this.Control["pitstopTyreCompoundDropDown"].Choose(1)
+				this.Control["pitstopTyreCompoundFLDropDown"].Choose(1)
+				this.Control["pitstopTyreCompoundFRDropDown"].Choose(1)
+				this.Control["pitstopTyreCompoundRLDropDown"].Choose(1)
+				this.Control["pitstopTyreCompoundRRDropDown"].Choose(1)
 
 				this.Control["pitstopTyreSetEdit"].Text := 0
 
@@ -4710,7 +4780,7 @@ class TeamCenter extends ConfigurationItem {
 
 			pitstopRefuel := this.Control["pitstopRefuelEdit"].Text
 
-			pitstopTyreCompound := this.Control["pitstopTyreCompoundDropDown"].Value
+			pitstopTyreCompound := this.Control["pitstopTyreCompoundFLDropDown"].Value
 
 			if (pitstopTyreCompound > 1)
 				splitCompound(this.TyreCompounds[pitstopTyreCompound - 1], &pitstopTyreCompound, &pitstopTyreCompoundColor)
@@ -4840,7 +4910,7 @@ class TeamCenter extends ConfigurationItem {
 		local currentDriver := kNull
 		local nextDriver := kNull
 		local theCompound := first(tyreCompound, (c) => (c && (c != "-")))
-		local pressures, displayPressures, tyreSet, displayFuel, requestDriver, theCompound
+		local pressures, displayPressures, tyreSet, displayFuel, requestDriver
 
 		sessionStore.remove("Pitstop.Data", {Status: "Planned"}, always.Bind(true))
 
@@ -6642,7 +6712,7 @@ class TeamCenter extends ConfigurationItem {
 	}
 
 	initializeSimulator(simulator, car, track, force := false) {
-		local row, compound, settings
+		local row, compound, settings, ignore, dropDown
 
 		if (force || !this.Simulator || (this.Simulator != simulator) || (this.Car != car) || (this.Track != track)) {
 			this.iSimulator := SessionDatabase.getSimulatorName(simulator)
@@ -6680,9 +6750,12 @@ class TeamCenter extends ConfigurationItem {
 				else
 					this.Control["setupCompoundDropDownMenu"].Choose((compounds.Length > 0) ? 1 : 0)
 
-				this.Control["pitstopTyreCompoundDropDown"].Delete()
-				this.Control["pitstopTyreCompoundDropDown"].Add(collect(concatenate(["No Tyre Change"], compounds), translate))
-				this.Control["pitstopTyreCompoundDropDown"].Choose(1)
+				for ignore, dropDown in ["pitstopTyreCompoundFLDropDown", "pitstopTyreCompoundFRDropDown"
+									   , "pitstopTyreCompoundRLDropDown", "pitstopTyreCompoundRRDropDown"] {
+					this.Control[dropDown].Delete()
+					this.Control[dropDown].Add(collect(concatenate(["No Change"], compounds), translate))
+					this.Control[dropDown].Choose(1)
+				}
 			}
 		}
 	}

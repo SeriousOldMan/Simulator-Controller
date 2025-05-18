@@ -1387,7 +1387,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			chosen := 2
 		}
 
-		workbenchGui.Add("DropDownList", "x" . x3 . " yp-1 w" . w3 . " Choose" . chosen . " VsimFixedPitstopCompoundDropDown", concatenate([translate("No Tyre Change")], choices)).OnEvent("Change", updateSimFixedPitstop)
+		workbenchGui.Add("DropDownList", "x" . x3 . " yp-1 w" . w3 . " Choose" . chosen . " VsimFixedPitstopCompoundDropDown", concatenate([translate("No Change")], choices)).OnEvent("Change", updateSimFixedPitstop)
 
 		workbenchGui.Add("Button", "x" . x4 . " yp+24 w23 h23 Center +0x200 vaddFixedPitstopButton").OnEvent("Click", addSimFixedPitstop)
 		setButtonIcon(workbenchGui["addFixedPitstopButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
@@ -2487,7 +2487,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.Control["strategyCompoundDropDown"].Delete()
 		this.Control["strategyCompoundDropDown"].Add(translatedCompounds)
 		this.Control["simFixedPitstopCompoundDropDown"].Delete()
-		this.Control["simFixedPitstopCompoundDropDown"].Add(concatenate([translate("No Tyre Change")], translatedCompounds))
+		this.Control["simFixedPitstopCompoundDropDown"].Add(concatenate([translate("No Change")], translatedCompounds))
 
 		index := inList(compounds, this.SelectedCompound[true])
 

@@ -35,7 +35,7 @@
   - Fixed off by error in the target lap of strategy controlled pitstops.
   - Fixed loading of lap-based strategies.
   - Fixed several bugs for axle-based tyre compound handling (used in *rFactor 2* and *RaceRoom Racing Experience*), which prevented session data to be shown in the "System Monitor".
-  - Fixed the issue analyzer of "Setup Workbench" for *rFactor 2* and *Le Mans Ultimate*. Previously, only oversteer events had been reported.
+  - Fixed the issue analyzer of "Setup Workbench" for *rFactor 2* and *Le Mans Ultimate*. Previously, only oversteer events had been reported. Detecting oversteer events, especially when counter-steering, is still not very reliable, but this is due to invalid angular velocity data in the API.
   - Fixed "Initialize from session" command for pitstops in the "Team Center" (had been broken with the last release).
 
 #### Changes

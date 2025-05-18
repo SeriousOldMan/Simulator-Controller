@@ -112,50 +112,6 @@ class SystemMonitorResizer extends Window.Resizer {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-nonZero(value) {
-	return ((value != 0) && (value != "-"))
-}
-
-computePressure(state, key) {
-	local value := getMultiMapValue(state, "Pitstop", key, false)
-	local increment, sign
-
-	if (value = "-")
-		return "-"
-	else if value {
-		increment := getMultiMapValue(state, "Pitstop", key . ".Increment", 0)
-		sign := ((increment > 0) ? "+ " : ((increment < 0) ? "- " : ""))
-
-		return (displayValue("Float", convertUnit("Pressure", value))
-			  . translate(" (") . sign . displayValue("Float", convertUnit("Pressure", Abs(increment))) . translate(")"))
-	}
-	else
-		return "-"
-}
-
-computeRepairs(repairService, bodywork, suspension, engine) {
-	local repairs := ""
-
-	if (bodywork && inList(repairService, "Bodywork"))
-		repairs := translate("Bodywork")
-
-	if (suspension && inList(repairService, "Suspension")) {
-		if (StrLen(repairs) > 0)
-			repairs .= ", "
-
-		repairs .= translate("Suspension")
-	}
-
-	if (engine && inList(repairService, "Engine")) {
-		if (StrLen(repairs) > 0)
-			repairs .= ", "
-
-		repairs .= translate("Engine")
-	}
-
-	return ((StrLen(repairs) > 0) ? repairs : "-")
-}
-
 updateDashboard(window, viewer, html := "") {
 	local script, ignore, chart
 
@@ -456,6 +412,10 @@ systemMonitor(command := false, arguments*) {
 	static sessionInfoSleep := 30000
 	static sessionInfoSize := 11
 	static nextSessionUpdate := A_TickCount
+
+	nonZero(value) {
+		return ((value != 0) && (value != "-"))
+	}
 
 	modifySettings(systemMonitorGui, *) {
 		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
@@ -758,14 +718,6 @@ systemMonitor(command := false, arguments*) {
 					   . displayValue("Float", convertUnit("Temperature", temperatures[4])) . "</td></tr>")
 			}
 
-
-
-
-
-
-
-
-
 			wear := string2Values(",", getMultiMapValue(sessionState, "Tyres", "Wear", ""))
 
 			if ((wear.Length = 4) && exist(wear, nonZero)) {
@@ -1061,39 +1013,45 @@ systemMonitor(command := false, arguments*) {
 		local tyreSet := false
 		local tyreCompound, tyreCompounds, tyrePressures, index, tyre, axle, fragment
 
+		computePressure(key) {
+			local value := getMultiMapValue(sessionState, "Pitstop", key, false)
+			local increment, sign
 
+			if (value = "-")
+				return "-"
+			else if value {
+				increment := getMultiMapValue(sessionState, "Pitstop", key . ".Increment", 0)
+				sign := ((increment > 0) ? "+ " : ((increment < 0) ? "- " : ""))
 
+				return (displayValue("Float", convertUnit("Pressure", value))
+					  . translate(" (") . sign . displayValue("Float", convertUnit("Pressure", Abs(increment))) . translate(")"))
+			}
+			else
+				return "-"
+		}
 
+		computeRepairs(bodywork, suspension, engine) {
+			local repairs := ""
 
+			if (bodywork && inList(repairService, "Bodywork"))
+				repairs := translate("Bodywork")
 
+			if (suspension && inList(repairService, "Suspension")) {
+				if (StrLen(repairs) > 0)
+					repairs .= ", "
 
+				repairs .= translate("Suspension")
+			}
 
+			if (engine && inList(repairService, "Engine")) {
+				if (StrLen(repairs) > 0)
+					repairs .= ", "
 
+				repairs .= translate("Engine")
+			}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+			return ((StrLen(repairs) > 0) ? repairs : "-")
+		}
 
 		try {
 			html .= "<table class=`"table-std`">"
@@ -1214,23 +1172,20 @@ systemMonitor(command := false, arguments*) {
 						html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`" style=`"text-align: center`">" . translate("No") . "</td></tr>")
 				}
 
-				if (tyreService && exist([computePressure(sessionState, "Planned.Tyre.Pressure.FL")
-										, computePressure(sessionState, "Planned.Tyre.Pressure.FR")
-										, computePressure(sessionState, "Planned.Tyre.Pressure.RL")
-										, computePressure(sessionState, "Planned.Tyre.Pressure.RR")]
+				if (tyreService && exist([computePressure("Planned.Tyre.Pressure.FL"), computePressure("Planned.Tyre.Pressure.FR")
+										, computePressure("Planned.Tyre.Pressure.RL"), computePressure("Planned.Tyre.Pressure.RR")]
 									   , nonZero)) {
 					html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures") . "</th><td class=`"td-wdg`" style=`"text-align: right`">"
-						   . computePressure(sessionState, "Planned.Tyre.Pressure.FL") . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
-						   . computePressure(sessionState, "Planned.Tyre.Pressure.FR") . "</td></tr>")
+						   . computePressure("Planned.Tyre.Pressure.FL") . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+						   . computePressure("Planned.Tyre.Pressure.FR") . "</td></tr>")
 					html .= ("<tr><td class=`"td-wdg`" style=`"text-align: right`">"
-						   . computePressure(sessionState, "Planned.Tyre.Pressure.RL") . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
-						   . computePressure(sessionState, "Planned.Tyre.Pressure.RR") . "</td></tr>")
+						   . computePressure("Planned.Tyre.Pressure.RL") . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+						   . computePressure("Planned.Tyre.Pressure.RR") . "</td></tr>")
 				}
 
 				if (repairService.Length > 0)
 					html .= ("<tr><th class=`"th-std th-left`">" . translate("Repairs") . "</th><td class=`"td-wdg`" colspan=`"2`">"
-																 . computeRepairs(repairService
-																				, getMultiMapValue(sessionState, "Pitstop", "Planned.Repair.Bodywork")
+																 . computeRepairs(getMultiMapValue(sessionState, "Pitstop", "Planned.Repair.Bodywork")
 																				, getMultiMapValue(sessionState, "Pitstop", "Planned.Repair.Suspension")
 																				, getMultiMapValue(sessionState, "Pitstop", "Planned.Repair.Engine"))
 																 . "</td></tr>")
@@ -1348,17 +1303,15 @@ systemMonitor(command := false, arguments*) {
 						html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`" style=`"text-align: center`">" . translate("No") . "</td></tr>")
 				}
 
-				if (tyreService && exist([computePressure(sessionState, "Target.Tyre.Pressure.FL")
-										, computePressure(sessionState, "Target.Tyre.Pressure.FR")
-										, computePressure(sessionState, "Target.Tyre.Pressure.RL")
-										, computePressure(sessionState, "Target.Tyre.Pressure.RR")]
+				if (tyreService && exist([computePressure("Target.Tyre.Pressure.FL"), computePressure("Target.Tyre.Pressure.FR")
+										, computePressure("Target.Tyre.Pressure.RL"), computePressure("Target.Tyre.Pressure.RR")]
 									   , nonZero)) {
 					html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures") . "</th><td class=`"td-wdg`" style=`"text-align: right`">"
-						   . computePressure(sessionState, "Target.Tyre.Pressure.FL") . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
-						   . computePressure(sessionState, "Target.Tyre.Pressure.FR") . "</td></tr>")
+						   . computePressure("Target.Tyre.Pressure.FL") . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+						   . computePressure("Target.Tyre.Pressure.FR") . "</td></tr>")
 					html .= ("<tr><td class=`"td-wdg`" style=`"text-align: right`">"
-						   . computePressure(sessionState, "Target.Tyre.Pressure.RL") . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
-						   . computePressure(sessionState, "Target.Tyre.Pressure.RR") . "</td></tr>")
+						   . computePressure("Target.Tyre.Pressure.RL") . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+						   . computePressure("Target.Tyre.Pressure.RR") . "</td></tr>")
 				}
 
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Loss of time") . "</th><td class=`"td-wdg`" colspan=`"2`">" . (getMultiMapValue(sessionState, "Pitstop", "Target.Time.Box") + getMultiMapValue(sessionState, "Pitstop", "Target.Time.Pitlane")) . translate(" Seconds") . "</td></tr>")

@@ -210,6 +210,15 @@ class IntegrationPlugin extends ControllerPlugin {
 		else
 			state["ColdPressures"] := [kNull, kNull, kNull, kNull]
 
+		pressures := string2Values(",", getMultiMapValue(sessionInfo, "Tyres", "Pressures.Loss", ""))
+
+		if ((pressures.Length = 4) && exist(pressures, (p) => (p != 0))) {
+			state["PressureLosses"] := [convertUnit("Pressure", pressures[1]), convertUnit("Pressure", pressures[2])
+									  , convertUnit("Pressure", pressures[3]), convertUnit("Pressure", pressures[4])]
+		}
+		else
+			state["PressureLosses"] := [kNull, kNull, kNull, kNull]
+
 		temperatures := string2Values(",", getMultiMapValue(sessionInfo, "Tyres", "Temperatures", ""))
 
 		if (temperatures.Length = 4)

@@ -2855,6 +2855,11 @@ class RaceEngineer extends RaceAssistant {
 																					   , knowledgeBase.getValue("Tyre.Pressure.Target.RL", 0)
 																					   , knowledgeBase.getValue("Tyre.Pressure.Target.RR", 0)))
 
+			setMultiMapValue(sessionInfo, "Tyres", "Pressures.Loss", values2String(", ", knowledgeBase.getValue("Tyre.Pressure.Loss.FL", 0)
+																					   , knowledgeBase.getValue("Tyre.Pressure.Loss.FR", 0)
+																					   , knowledgeBase.getValue("Tyre.Pressure.Loss.RL", 0)
+																					   , knowledgeBase.getValue("Tyre.Pressure.Loss.RR", 0)))
+
 			if data {
 				bodyworkDamage := string2Values(",", getMultiMapValue(data, "Car Data", "BodyworkDamage", ""))
 				suspensionDamage := string2Values(",", getMultiMapValue(data, "Car Data", "SuspensionDamage", ""))

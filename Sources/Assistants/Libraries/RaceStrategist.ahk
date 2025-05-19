@@ -1158,10 +1158,9 @@ class RaceStrategist extends GridRaceAssistant {
 								for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
 									pitstop["TyreCompound" . tyre] := pitstop["TyreCompound"]
 							}
-							else if (tyreService = "Axle") {
+							else if (tyreService = "Axle")
 								for index, axle in ["Front", "Rear"]
 									pitstop["TyreCompound" . axle] := pitstop["TyreCompound"]
-							}
 						}
 						else
 							pitstop["TyreChange"] := kFalse
@@ -1385,8 +1384,15 @@ class RaceStrategist extends GridRaceAssistant {
 
 			refuel := Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"), 1)
 			tyreChange := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change")
-			tyreCompound := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound")
-			tyreCompoundColor := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound.Color")
+
+			if tyreChange {
+				tyreCompound := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound")
+				tyreCompoundColor := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound.Color")
+			}
+			else {
+				tyreCompound := false
+				tyreCompoundColor := false
+			}
 
 			if (knowledgeBase.getValue("Strategy.Pitstop.Count") > nextPitstop)
 				refuel := ("!" . refuel)
@@ -2015,12 +2021,11 @@ class RaceStrategist extends GridRaceAssistant {
 						setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound.Color." . tyre, tyreCompoundColor)
 					}
 				}
-				else if (tyreService = "Axle") {
+				else if (tyreService = "Axle")
 					for index, axle in ["Front", "Rear"] {
 						setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound." . axle, tyreCompound)
 						setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound.Color." . axle, tyreCompoundColor)
 					}
-				}
 			}
 
 			setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Count"
@@ -4114,8 +4119,15 @@ class RaceStrategist extends GridRaceAssistant {
 					if fullCourseYellow {
 						refuel := Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"), 1)
 						tyreChange := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change")
-						tyreCompound := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound")
-						tyreCompoundColor := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound.Color")
+
+						if tyreChange {
+							tyreCompound := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound")
+							tyreCompoundColor := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound.Color")
+						}
+						else {
+							tyreCompound := false
+							tyreCompoundColor := false
+						}
 
 						if (knowledgeBase.getValue("Strategy.Pitstop.Count") > nextPitstop)
 							refuel := ("!" . refuel)

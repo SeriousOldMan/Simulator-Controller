@@ -7987,7 +7987,7 @@ class TeamCenter extends ConfigurationItem {
 						}
 						else if (mixedCompounds = "Axle") {
 							tyreCompound := collect(["Front", "Rear"]
-															, (axle) => getMultiMapValue(telemetry, "Car Data", "TyreCompound" . axle, tyreCompound))
+												  , (axle) => getMultiMapValue(telemetry, "Car Data", "TyreCompound" . axle, tyreCompound))
 							tyreCompoundColor := collect(["Front", "Rear"]
 													   , (axle) => getMultiMapValue(telemetry, "Car Data", "TyreCompoundColor" . axle, tyreCompoundColor))
 

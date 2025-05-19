@@ -24,6 +24,7 @@
   3. Integrate support for LAMs
   4. Approaching corner braking point countdown
   5. Configurable priority for voice output between Spotter and other Assistants
+  6. Disable Spotter informations during FCY
 
 #### Session Database
   1. Active validation of value ranges in settings definitions

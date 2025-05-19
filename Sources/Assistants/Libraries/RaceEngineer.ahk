@@ -3306,6 +3306,7 @@ class RaceEngineer extends RaceAssistant {
 		local result, pitstopNumber, speaker, fragments, fuel, lap, correctedFuel, targetFuel
 		local correctedTyres, compound, color, incrementFL, incrementFR, incrementRL, incrementRR, pressureCorrection
 		local temperatureDelta, debug, tyre, tyreType, lostPressure, deviationThreshold, ignore, suffix
+		local tyreService, index, tyre, axle, first
 
 		this.clearContinuation()
 
@@ -3333,7 +3334,7 @@ class RaceEngineer extends RaceAssistant {
 			if !this.hasEnoughData()
 				return false
 
-		if !this.supportsPitstop() {
+		if !this.supportsPitstop( , &tyreService) {
 			if this.Speaker
 				this.getSpeaker().speakPhrase("NoPitstop")
 
@@ -3387,10 +3388,62 @@ class RaceEngineer extends RaceAssistant {
 				if (tyreSet != kUndefined)
 					knowledgeBase.addFact("Pitstop.Plan.Tyre.Set", tyreSet)
 
-				if (tyreCompound != kUndefined)
+				if ((tyreCompound != kUndefined) && InStr(tyreCompound, ",")) {
+					tyreCompound := collect(string2Values(",", tyreCompound), (c) => ((c = "-") ? false : c))
+					first := true
+
+					if (tyreService = "Wheel") {
+						for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
+							knowledgeBase.addFact("Pitstop.Plan.Tyre.Compound." . tyre, tyreCompound[index])
+
+							if (first && tyreCompound[index]) {
+								knowledgeBase.addFact("Pitstop.Plan.Tyre.Compound", tyreCompound[index])
+
+								first := false
+							}
+						}
+					}
+					else if (tyreService = "Axle")
+						for index, axle in ["Front", "Rear"] {
+							knowledgeBase.addFact("Pitstop.Plan.Tyre.Compound." . axle, tyreCompound[index])
+
+							if (first && tyreCompound[index]) {
+								knowledgeBase.addFact("Pitstop.Plan.Tyre.Compound", tyreCompound[index])
+
+								first := false
+							}
+						}
+				}
+				else if (tyreCompound != kUndefined)
 					knowledgeBase.addFact("Pitstop.Plan.Tyre.Compound", tyreCompound)
 
-				if (tyreCompoundColor != kUndefined)
+				if ((tyreCompoundColor != kUndefined) && InStr(tyreCompoundColor, ",")) {
+					tyreCompoundColor := collect(string2Values(",", tyreCompoundColor), (cc) => ((cc = "-") ? false : cc))
+					first := false
+
+					if (tyreService = "Wheel") {
+						for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
+							knowledgeBase.addFact("Pitstop.Plan.Tyre.Compound.Color." . tyre, tyreCompoundColor[index])
+
+							if (first && tyreCompoundColor[index]) {
+								knowledgeBase.addFact("Pitstop.Plan.Tyre.Compound.Color", tyreCompoundColor[index])
+
+								first := false
+							}
+						}
+					}
+					else if (tyreService = "Axle")
+						for index, axle in ["Front", "Rear"] {
+							knowledgeBase.addFact("Pitstop.Plan.Tyre.Compound.Color." . axle, tyreCompoundColor[index])
+
+							if (first && tyreCompoundColor[index]) {
+								knowledgeBase.addFact("Pitstop.Plan.Tyre.Compound.Color", tyreCompoundColor[index])
+
+								first := false
+							}
+						}
+				}
+				else if (tyreCompoundColor != kUndefined)
 					knowledgeBase.addFact("Pitstop.Plan.Tyre.Compound.Color", tyreCompoundColor)
 
 				if (tyrePressures != kUndefined) {

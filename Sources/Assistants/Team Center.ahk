@@ -3215,18 +3215,18 @@ class TeamCenter extends ConfigurationItem {
 					window[dropDown].Choose(1)
 			}
 
-			for ignore, dropDown in ["pitstopTyreCompoundFRDropDown", "pitstopTyreCompoundRRDropDown"] {
+			for ignore, dropDown in ["pitstopTyreCompoundFRDropDown", "pitstopTyreCompoundRRDropDown"]
 				window[dropDown].Enabled := false
 
-				window[dropDown].Choose(0)
-			}
+			window["pitstopTyreCompoundFRDropDown"].Choose(window["pitstopTyreCompoundFLDropDown"].Value)
+			window["pitstopTyreCompoundRRDropDown"].Choose(window["pitstopTyreCompoundRLDropDown"].Value)
 		}
 		else {
 			for ignore, dropDown in ["pitstopTyreCompoundFRDropDown"
 								   , "pitstopTyreCompoundRLDropDown", "pitstopTyreCompoundRRDropDown"] {
 				window[dropDown].Enabled := false
 
-				window[dropDown].Choose(0)
+				window[dropDown].Choose(window["pitstopTyreCompoundFLDropDown"].Value)
 			}
 		}
 
@@ -3242,11 +3242,13 @@ class TeamCenter extends ConfigurationItem {
 			if (window["pitstopTyreSetEdit"].Text = "")
 				window["pitstopTyreSetEdit"].Text := "Auto"
 
-			if ((InStr(window["pitstopTyreCompoundFLDropDown"].Text, translate(normalizeCompound("Wet"))) = 1)
-			 && (SessionDatabase.getSimulatorCode(this.Simulator) = "ACC"))
-				window["pitstopTyreSetEdit"].Text := "Auto"
-			else if ((window["pitstopTyreSetEdit"].Text = 0) || (window["pitstopTyreSetEdit"].Text = "-"))
-				window["pitstopTyreSetEdit"].Text := "Auto"
+			if tyreSets
+				if ((InStr(window["pitstopTyreCompoundFLDropDown"].Text, translate(normalizeCompound("Wet"))) = 1)
+				 && (SessionDatabase.getSimulatorCode(this.Simulator) = "ACC"))
+					window["pitstopTyreSetEdit"].Text := "Auto"
+				else if ((window["pitstopTyreSetEdit"].Text = 0) || (window["pitstopTyreSetEdit"].Text = "-")
+																 || (Trim(window["pitstopTyreSetEdit"].Text) = ""))
+					window["pitstopTyreSetEdit"].Text := "Auto"
 		}
 		else {
 			window["pitstopTyreSetEdit"].Enabled := false
@@ -3255,7 +3257,9 @@ class TeamCenter extends ConfigurationItem {
 			window["pitstopPressureRLEdit"].Enabled := false
 			window["pitstopPressureRREdit"].Enabled := false
 
-			window["pitstopTyreSetEdit"].Text := "Auto"
+			if tyreSets
+				window["pitstopTyreSetEdit"].Text := "Auto"
+
 			window["pitstopPressureFLEdit"].Text := ""
 			window["pitstopPressureFREdit"].Text := ""
 			window["pitstopPressureRLEdit"].Text := ""
@@ -4616,9 +4620,27 @@ class TeamCenter extends ConfigurationItem {
 							 , remote := false, adjust := true) {
 		local currentStint := this.CurrentStint
 		local calcTyreSet := tyreSet
-		local chosen, stint, theCompound
+		local chosen, stint, theCompound, theCompoundColor, tyreSets
 
-		if calcTyreSet {
+		this.Provider.supportsTyreManagement( , &tyreSets)
+
+		if (tyreCompound && InStr(tyreCompound, ",")) {
+			theCompound := string2Values(",", tyreCompound)
+			theCompoundColor := string2Values(",", tyreCompoundColor)
+
+			combineCompounds(&theCompound, &theCompoundColor)
+
+			if (theCompound.Length = 1) {
+				tyreCompound := theCompound[1]
+				tyreCompoundColor := theCompoundColor[1]
+			}
+			else {
+				tyreCompound := false
+				tyreCompoundColor := false
+			}
+		}
+
+		if (tyreSets && calcTyreSet) {
 			tyreSet := 0
 
 			if (this.SelectTyreSet && tyreCompound && currentStint) {
@@ -4632,8 +4654,8 @@ class TeamCenter extends ConfigurationItem {
 							tyreSet := Max(tyreSet, stint.TyreSet)
 					}
 
-					if (tyreSet > 0)
-						tyreSet += 1
+				if (tyreSet > 0)
+					tyreSet += 1
 			}
 		}
 
@@ -4670,6 +4692,9 @@ class TeamCenter extends ConfigurationItem {
 				chosen := inList(concatenate(["No Change"], this.TyreCompounds), compound(tyreCompound, tyreCompoundColor))
 
 				this.Control["pitstopTyreCompoundFLDropDown"].Choose((chosen == 0) ? 1 : chosen)
+				this.Control["pitstopTyreCompoundFRDropDown"].Choose((chosen == 0) ? 1 : chosen)
+				this.Control["pitstopTyreCompoundRLDropDown"].Choose((chosen == 0) ? 1 : chosen)
+				this.Control["pitstopTyreCompoundRRDropDown"].Choose((chosen == 0) ? 1 : chosen)
 
 				if calcTyreSet
 					this.Control["pitstopTyreSetEdit"].Text := tyreSet
@@ -4768,9 +4793,15 @@ class TeamCenter extends ConfigurationItem {
 		local repairBodywork := false
 		local repairSuspension := false
 		local repairEngine := false
-		local stint, drivers, currentDriver, currentNr, nextNr
+		local stint, drivers, currentDriver, currentNr, nextNr, tyreService, index, tyre, axle
+		local selectedTyreCompound, selectedTyreCompoundColor
+
+		static dropDowns := ["pitstopTyreCompoundFLDropDown", "pitstopTyreCompoundFRDropDown"
+						   , "pitstopTyreCompoundRLDropDown", "pitstopTyreCompoundRRDropDown"]
 
 		if !remote {
+			this.Provider.supportsPitstop( , &tyreService)
+
 			pitstopLap := this.Control["pitstopLapEdit"].Text
 
 			pitstopDriver := this.Control["pitstopDriverDropDownMenu"].Text
@@ -4780,18 +4811,59 @@ class TeamCenter extends ConfigurationItem {
 
 			pitstopRefuel := this.Control["pitstopRefuelEdit"].Text
 
-			pitstopTyreCompound := this.Control["pitstopTyreCompoundFLDropDown"].Value
+			if (tyreService = "Wheel") {
+				pitstopTyreCompound := []
+				pitstopTyreCompoundColor := []
 
-			if (pitstopTyreCompound > 1)
-				splitCompound(this.TyreCompounds[pitstopTyreCompound - 1], &pitstopTyreCompound, &pitstopTyreCompoundColor)
+				for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
+					selectedTyreCompound := this.Control[dropDowns[index]].Value
+
+					if (selectedTyreCompound > 1)
+						splitCompound(this.TyreCompounds[selectedTyreCompound - 1], &selectedTyreCompound, &selectedTyreCompoundColor)
+					else {
+						selectedTyreCompound := false
+						selectedTyreCompoundColor := false
+					}
+
+					pitstopTyreCompound.Push(selectedTyreCompound)
+					pitstopTyreCompoundColor.Push(selectedTyreCompoundColor)
+				}
+			}
+			else if (tyreService = "Axle") {
+				pitstopTyreCompound := []
+				pitstopTyreCompoundColor := []
+
+				for index, axle in ["Front", "Rear"] {
+					selectedTyreCompound := this.Control[dropDowns[index + (index - 1)]].Value
+
+					if (selectedTyreCompound > 1)
+						splitCompound(this.TyreCompounds[selectedTyreCompound - 1], &selectedTyreCompound, &selectedTyreCompoundColor)
+					else {
+						selectedTyreCompound := false
+						selectedTyreCompoundColor := false
+					}
+
+					pitstopTyreCompound.Push(selectedTyreCompound)
+					pitstopTyreCompoundColor.Push(selectedTyreCompoundColor)
+				}
+			}
 			else {
-				pitstopTyreCompound := false
-				pitstopTyreCompoundColor := false
+				pitstopTyreCompound := this.Control["pitstopTyreCompoundFLDropDown"].Value
+
+				if (pitstopTyreCompound > 1)
+					splitCompound(this.TyreCompounds[pitstopTyreCompound - 1], &pitstopTyreCompound, &pitstopTyreCompoundColor)
+				else {
+					pitstopTyreCompound := false
+					pitstopTyreCompoundColor := false
+				}
+
+				pitstopTyreCompound := [pitstopTyreCompound]
+				pitstopTyreCompoundColor := [pitstopTyreCompoundColor]
 			}
 
 			pitstopTyreSet := this.Control["pitstopTyreSetEdit"].Text
 
-			if ((pitstopTyreSet = "Auto") || (pitstopTyreSet = "-"))
+			if ((pitstopTyreSet = "Auto") || (pitstopTyreSet = "-") || (pitstopTyreSet = ""))
 				pitstopTyreSet := false
 
 			pitstopPressureFL := false
@@ -4818,6 +4890,11 @@ class TeamCenter extends ConfigurationItem {
 			repairBodywork := inList(pitstopRepairs, "Bodywork")
 			repairSuspension := inList(pitstopRepairs, "Suspension")
 			repairEngine := inList(pitstopRepairs, "Engine")
+
+			if (pitstopTyreCompound && !isObject(pitstopTyreCompound)) {
+				pitstopTyreCompound := string2Values(",", pitstopTyreCompound)
+				pitstopTyreCompoundColor := string2Values(",", pitstopTyreCompoundColor)
+			}
 		}
 
 		if (!isNumber(pitstopLap) || (pitstopLap <= 0))
@@ -4874,17 +4951,17 @@ class TeamCenter extends ConfigurationItem {
 			setMultiMapValue(pitstopPlan, "Pitstop", "Driver.Next", stint.Driver.Fullname)
 		}
 
-		if pitstopTyreCompound {
+		if exist(pitstopTyreCompound, (c) => (c && (c != "-"))) {
 			setMultiMapValue(pitstopPlan, "Pitstop", "Tyre.Change", true)
 
-			if (((SessionDatabase.getSimulatorCode(this.Simulator) = "ACC") && (pitstopTyreCompound = "Wet"))
+			if (((SessionDatabase.getSimulatorCode(this.Simulator) = "ACC") && (InStr(pitstopTyreCompound[1], "Wet") = 1))
 			 || ((pitstopTyreSet = "") || (pitstopTyreSet = "-") || (pitstopTyreSet = "Auto")))
 				pitstopTyreSet := false
 
 			setMultiMapValue(pitstopPlan, "Pitstop", "Tyre.Set", pitstopTyreSet)
 
-			setMultiMapValue(pitstopPlan, "Pitstop", "Tyre.Compound", pitstopTyreCompound)
-			setMultiMapValue(pitstopPlan, "Pitstop", "Tyre.Compound.Color", pitstopTyreCompoundColor)
+			setMultiMapValue(pitstopPlan, "Pitstop", "Tyre.Compound", values2String(",", pitstopTyreCompound*))
+			setMultiMapValue(pitstopPlan, "Pitstop", "Tyre.Compound.Color", values2String(",", pitstopTyreCompoundColor*))
 
 			setMultiMapValue(pitstopPlan, "Pitstop", "Tyre.Pressures", values2String(",", pitstopPressureFL, pitstopPressureFR, pitstopPressureRL, pitstopPressureRR))
 		}

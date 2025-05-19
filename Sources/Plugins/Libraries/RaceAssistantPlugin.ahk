@@ -2121,12 +2121,16 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	performPitstop(lapNumber, options) {
 		local data, dataFile, ignore, key, value
 
+
 		if this.RaceAssistant {
 			dataFile := temporaryFileName(this.Plugin, "pitstop")
 
 			data := newMultiMap()
 
-			for ignore, key in ["Refuel", "Tyre Compound", "Tyre Set", "Tyre Pressures"
+			for ignore, key in ["Refuel", "Tyre Compound", "Tyre Compound Front", "Tyre Compound Rear"
+							  , "Tyre Compound Front Left", "Tyre Compound Front Right"
+							  , "Tyre Compound Rear Left", "Tyre Compound Rear Right"
+							  , "Tyre Set", "Tyre Pressures"
 							  , "Repair Suspension", "Repair Bodywork", "Repair Engine"]
 				if options.Has(key) {
 					value := options[key]
@@ -2136,6 +2140,24 @@ class RaceAssistantPlugin extends ControllerPlugin {
 							case "Tyre Compound":
 								setMultiMapValue(data, "Pitstop", "Tyre.Compound", value[1])
 								setMultiMapValue(data, "Pitstop", "Tyre.Compound.Color", value[2])
+							case "Tyre Compound Front":
+								setMultiMapValue(data, "Pitstop", "Tyre.Compound.Front", value[1])
+								setMultiMapValue(data, "Pitstop", "Tyre.Compound.Color.Front", value[2])
+							case "Tyre Compound Rear":
+								setMultiMapValue(data, "Pitstop", "Tyre.Compound.Rear", value[1])
+								setMultiMapValue(data, "Pitstop", "Tyre.Compound.Color.Rear", value[2])
+							case "Tyre Compound Front Left":
+								setMultiMapValue(data, "Pitstop", "Tyre.Compound.FrontLeft", value[1])
+								setMultiMapValue(data, "Pitstop", "Tyre.Compound.Color.FrontLeft", value[2])
+							case "Tyre Compound Front Right":
+								setMultiMapValue(data, "Pitstop", "Tyre.Compound.FrontRight", value[1])
+								setMultiMapValue(data, "Pitstop", "Tyre.Compound.Color.FrontRight", value[2])
+							case "Tyre Compound Rear Left":
+								setMultiMapValue(data, "Pitstop", "Tyre.Compound.RearLeft", value[1])
+								setMultiMapValue(data, "Pitstop", "Tyre.Compound.Color.RearLeft", value[2])
+							case "Tyre Compound Rear Right":
+								setMultiMapValue(data, "Pitstop", "Tyre.Compound.RearRight", value[1])
+								setMultiMapValue(data, "Pitstop", "Tyre.Compound.Color.RearRight", value[2])
 							case "Tyre Pressures":
 								setMultiMapValue(data, "Pitstop", "Tyre.Pressures", values2String(";", value*))
 							default:

@@ -2512,7 +2512,7 @@ class RaceAssistant extends ConfigurationItem {
 				else if (mixedCompounds = "Axle")
 					for index, axle in ["Front", "Rear"]
 						if knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound." . axle, false)
-							setMultiMapValue(sessionInfo, "Tyres", "Compound" . tyre
+							setMultiMapValue(sessionInfo, "Tyres", "Compound" . axle
 										   , compound(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound." . axle)
 													, knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color." . axle)))
 						else

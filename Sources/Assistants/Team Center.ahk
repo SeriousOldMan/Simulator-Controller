@@ -6644,8 +6644,11 @@ class TeamCenter extends ConfigurationItem {
 	initializeSimulator(simulator, car, track, force := false) {
 		local row, compound, settings
 
+		if simulator
+			simulator := SessionDatabase.getSimulatorName(simulator)
+
 		if (force || !this.Simulator || (this.Simulator != simulator) || (this.Car != car) || (this.Track != track)) {
-			this.iSimulator := SessionDatabase.getSimulatorName(simulator)
+			this.iSimulator := simulator
 			this.iCar := car
 			this.iTrack := track
 

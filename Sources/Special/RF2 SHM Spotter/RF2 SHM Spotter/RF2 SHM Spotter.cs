@@ -1244,7 +1244,7 @@ namespace RF2SHMSpotter {
 
             pushValue(recentGLongs, acceleration);
 
-            double angularVelocity = smoothValue(recentRealAngVels, (float)telemetry.mVehicles[carID].mLocalRot.y);
+            double angularVelocity = smoothValue(recentRealAngVels, (float)telemetry.mVehicles[carID].mLocalRot.z);
             double steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
             double steerAngleRadians = -steeredAngleDegs / 57.2958;
             double wheelBaseMeter = (float)wheelbase / 100;
@@ -1281,10 +1281,12 @@ namespace RF2SHMSpotter {
 					if (steerAngle > 0) {
 						if (angularVelocity > 0)
                         {
-                            if (calibrate)
-                                slip *= -1;
-                            else
-                                slip = (oversteerHeavyThreshold - 1) / 57.2989;
+							if (calibrate)
+								slip *= -1;
+							// else
+							//	slip = (oversteerHeavyThreshold - 1) / 57.2989;
+							else
+								slip *= -1;
                         }
                         else if (angularVelocity < idealAngularVelocity)
 							slip *= -1;
@@ -1292,41 +1294,49 @@ namespace RF2SHMSpotter {
 					else {
 						if (angularVelocity < 0)
                         {
-                            if (calibrate)
-                                slip *= -1;
+							if (calibrate)
+								slip *= -1;
+                            // else
+                            //    slip = (oversteerHeavyThreshold - 1) / 57.2989;
                             else
-                                slip = (oversteerHeavyThreshold - 1) / 57.2989;
+                                slip *= -1;
                         }
                         else if (angularVelocity > idealAngularVelocity)
 							slip *= -1;
 					}
 
-                    cd.Usos = slip * 57.2989 * 1;
+					if (slip != 0)
+					{
+						cd.Usos = slip * 57.2989 * 1;
 
-                    if ((soundsDirectory != "") && Environment.TickCount > (lastSound + 300))
-                        if (triggerUSOSBeep(soundsDirectory, audioDevice, cd.Usos))
-                            lastSound = Environment.TickCount;
+						if ((soundsDirectory != "") && Environment.TickCount > (lastSound + 300))
+							if (triggerUSOSBeep(soundsDirectory, audioDevice, cd.Usos))
+								lastSound = Environment.TickCount;
 
-                    if (false)
-                    {
-                        StreamWriter output = new StreamWriter(dataFile + ".trace", true);
+						if (false)
+						{
+							StreamWriter output = new StreamWriter(dataFile + ".trace", true);
 
-						output.Write(steerAngle + "  ");
-						output.Write(steeredAngleDegs + "  ");
-						output.Write(steerAngleRadians + "  ");
-						output.Write(lastSpeed + "  ");
-						output.Write(idealAngularVelocity + "  ");
-						output.Write(angularVelocity + "  ");
-						output.Write(slip + "  ");
-                        output.WriteLine(cd.Usos);
+							output.Write(steerAngle + "  ");
+							output.Write(steeredAngleDegs + "  ");
+							output.Write(steerAngleRadians + "  ");
+							output.Write(lastSpeed + "  ");
+							output.Write(idealAngularVelocity + "  ");
+							output.Write(angularVelocity + "  ");
+							output.Write(slip + "  ");
+							output.WriteLine(cd.Usos);
 
-                        output.Close();
-						
-						Thread.Sleep(200);
-                    }
+							output.Close();
+
+							Thread.Sleep(200);
+						}
+					}
+                    else
+						cd = null;
                 }
 
-				cornerDynamicsList.Add(cd);
+				if (cd != null)
+					cornerDynamicsList.Add(cd);
 
 				int completedLaps = playerScoring.mTotalLaps;
 
@@ -1334,7 +1344,7 @@ namespace RF2SHMSpotter {
 					lastCompletedLaps = completedLaps;
 					
 					while (true)
-						if (cornerDynamicsList[0].CompletedLaps < completedLaps - 2)
+						if (cornerDynamicsList[0].CompletedLaps < completedLaps - 1)
 							cornerDynamicsList.RemoveAt(0);
 						else
 							break;

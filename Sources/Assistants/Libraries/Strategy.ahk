@@ -3506,7 +3506,7 @@ class Strategy extends ConfigurationItem {
 		}
 
 		if (pitstopWindow && (pitstopNr <= pitstopRule)) {
-			newTargetLap := Max(Ceil(pitstopWindow[1] * 60 / avgLapTime), Min(Floor(pitstopWindow[2] * 60 / avgLapTime), targetLap))
+			newTargetLap := Max(Ceil(pitstopWindow[1] * 60 / avgLapTime), Min(Floor(pitstopWindow[2] * 60 / avgLapTime) - 1, targetLap))
 
 			if (newTargetLap != targetLap) {
 				targetLap := newTargetLap

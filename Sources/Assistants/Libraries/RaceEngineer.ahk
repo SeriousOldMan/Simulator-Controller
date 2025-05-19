@@ -3839,7 +3839,7 @@ class RaceEngineer extends RaceAssistant {
 					tyreCompound := collect(["Front", "Rear"], (axle) {
 										return knowledgeBase.getValue("Lap." . lastLap . ".Tyre.Compound." . axle, tyreCompound)
 									})
-					tyreCompoundColor := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"], (axle) {
+					tyreCompoundColor := collect(["Front", "Rear"], (axle) {
 											 return knowledgeBase.getValue("Lap." . lastLap . ".Tyre.Compound.Color." . axle, tyreCompoundColor)
 										 })
 				}

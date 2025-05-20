@@ -3334,7 +3334,7 @@ class RaceEngineer extends RaceAssistant {
 			if !this.hasEnoughData()
 				return false
 
-		if !this.supportsPitstop( , &tyreService) {
+		if !this.Provider.supportsPitstop( , &tyreService) {
 			if this.Speaker
 				this.getSpeaker().speakPhrase("NoPitstop")
 

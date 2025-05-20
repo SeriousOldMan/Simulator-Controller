@@ -559,7 +559,7 @@ checkForNews() {
 						shown := getMultiMapValue(news, "News", nr, false)
 						rule := getMultiMapValue(availableNews, "Rules", nr, "Once")
 
-						if (InStr(rule, "Repeat") && shown && (DateAdd(shown, string2Values(":", rule)[2], "Days") > A_Now))
+						if (InStr(rule, "Repeat") && shown && (DateAdd(shown, string2Values(":", rule)[2], "Days") < A_Now))
 							candidates.Push([nr, url])
 					}
 

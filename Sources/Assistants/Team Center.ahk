@@ -1385,12 +1385,6 @@ class TeamCenter extends ConfigurationItem {
 					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
 
-		if simulator {
-			this.iSimulator := SessionDatabase.getSimulatorName(simulator)
-			this.iCar := car
-			this.iTrack := track
-		}
-
 		super.__New(configuration)
 
 		TeamCenter.Instance := this
@@ -3192,11 +3186,15 @@ class TeamCenter extends ConfigurationItem {
 
 	updateState() {
 		local window := this.Window
+		local tyreService := false
+		local tyreSets := false
 		local selected, stint, hasPitstops
 		local tyreService, tyreSets, ignore, dropDown
 
-		this.Provider.supportsPitstop( , &tyreService)
-		this.Provider.supportsTyreManagement( , &tyreSets)
+		if this.Provider {
+			this.Provider.supportsPitstop( , &tyreService)
+			this.Provider.supportsTyreManagement( , &tyreSets)
+		}
 
 		if (tyreService = "Wheel") {
 			for ignore, dropDown in ["pitstopTyreCompoundFLDropDown", "pitstopTyreCompoundFRDropDown"

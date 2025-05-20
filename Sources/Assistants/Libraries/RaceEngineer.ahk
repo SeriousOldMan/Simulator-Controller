@@ -3304,6 +3304,7 @@ class RaceEngineer extends RaceAssistant {
 		local forceRefuel := false
 		local forceTyreChange := false
 		local result, pitstopNumber, speaker, fragments, fuel, lap, correctedFuel, targetFuel, pressure
+		local pressureFL, pressureFR, pressureRL, pressureRR
 		local correctedTyres, compound, color, incrementFL, incrementFR, incrementRL, incrementRR, pressureCorrection
 		local temperatureDelta, debug, tyre, tyreType, lostPressure, deviationThreshold, ignore, suffix
 		local tyreService, index, tyre, axle, first
@@ -3523,65 +3524,71 @@ class RaceEngineer extends RaceAssistant {
 				debug := this.VoiceManager.Debug[kDebugPhrases]
 
 				if (compound && ((options == true) || (options.HasProp("Pressures") && options.Pressures))) {
+					pressureFL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL", 0), 1)
+					pressureFR := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR", 0), 1)
+					pressureRL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL", 0), 1)
+					pressureRR := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR", 0), 1)
 					incrementFL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL.Increment", 0), 1)
 					incrementFR := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR.Increment", 0), 1)
 					incrementRL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL.Increment", 0), 1)
 					incrementRR := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR.Increment", 0), 1)
 
-					if (isObject(tyrePressures) && !exist(tyrePressures, (p) => (p != 0.0)))
-						tyrePressures := false
+					pressure := false
 
-					if (debug || (incrementFL != 0) || (incrementFR != 0) || (incrementRL != 0) || (incrementRR != 0)
-							  || isObject(tyrePressures))
+					for ignore, suffix in ["FL", "FR", "RL", "RR"]
+						if (((tyrePressures != kUndefined) && (pressure%suffix% != 0.0)) || (increment%suffix% != 0.0)) {
+							pressure := true
+
+							break
+						}
+
+					if (debug || pressure) {
 						speaker.speakPhrase("NewPressures")
 
-					if ((knowledgeBase.getValue("Tyre.Compound") != compound) || (knowledgeBase.getValue("Tyre.Compound.Color") != color)
-																			  || isObject(tyrePressures)) {
-						for ignore, suffix in ["FL", "FR", "RL", "RR"]
-							if (debug || (increment%suffix% != 0) || isObject(tyrePressures)) {
-								pressure := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . suffix)
-
-								if (debug || (pressure != 0))
+						if ((knowledgeBase.getValue("Tyre.Compound") != compound) || (knowledgeBase.getValue("Tyre.Compound.Color") != color)
+																				  || (tyrePressures != kUndefined)) {
+							for ignore, suffix in ["FL", "FR", "RL", "RR"]
+								if (debug || (pressure%suffix% != 0.0))
 									speaker.speakPhrase("Tyre" . suffix
-													  , {value: speaker.number2Speech(convertUnit("Pressure", pressure))
+													  , {value: speaker.number2Speech(convertUnit("Pressure", pressure%suffix%))
 													   , unit: fragments[getUnit("Pressure")], delta: "", by: ""})
-							}
-					}
-					else
-						for ignore, suffix in ["FL", "FR", "RL", "RR"]
-							if (debug || (increment%suffix% != 0))
-								speaker.speakPhrase("Tyre" . suffix
-												  , {value: speaker.number2Speech(convertUnit("Pressure", Round(Abs(increment%suffix%), 1)))
-												   , unit: fragments[getUnit("Pressure")]
-												   , delta: fragments[(increment%suffix% > 0) ? "Increased" : "Decreased"]
-												   , by: fragments["By"]})
-
-					if (tyrePressures = kUndefined) {
-						pressureCorrection := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.Correction", 0), 1)
-
-						if (Abs(pressureCorrection) > 0.05) {
-							temperatureDelta := knowledgeBase.getValue("Weather.Temperature.Air.Delta", 0)
-
-							if (temperatureDelta = 0)
-								temperatureDelta := ((pressureCorrection > 0) ? -1 : 1)
-
-							speaker.speakPhrase((pressureCorrection > 0) ? "PressureCorrectionUp" : "PressureCorrectionDown"
-											  , {value: speaker.number2Speech(convertUnit("Pressure", Abs(pressureCorrection)))
-											   , unit: fragments[getUnit("Pressure")]
-											   , pressureDirection: (pressureCorrection > 0) ? fragments["Increase"] : fragments["Decrease"]
-											   , temperatureDirection: (temperatureDelta > 0) ? fragments["Rising"] : fragments["Falling"]})
 						}
-					}
+						else
+							for ignore, suffix in ["FL", "FR", "RL", "RR"]
+								if (debug || (increment%suffix% != 0.0))
+									speaker.speakPhrase("Tyre" . suffix
+													  , {value: speaker.number2Speech(convertUnit("Pressure", Round(Abs(increment%suffix%), 1)))
+													   , unit: fragments[getUnit("Pressure")]
+													   , delta: fragments[(increment%suffix% > 0) ? "Increased" : "Decreased"]
+													   , by: fragments["By"]})
 
-					deviationThreshold := knowledgeBase.getValue("Session.Settings.Tyre.Pressure.Deviation")
+						if (tyrePressures = kUndefined) {
+							pressureCorrection := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.Correction", 0), 1)
 
-					for tyre, tyreType in Map("FrontLeft", "FL", "FrontRight", "FR", "RearLeft", "RL", "RearRight", "RR") {
-						lostPressure := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.Lost." . tyreType, false)
+							if (Abs(pressureCorrection) > 0.05) {
+								temperatureDelta := knowledgeBase.getValue("Weather.Temperature.Air.Delta", 0)
 
-						if (lostPressure && (lostPressure >= deviationThreshold) && (increment%tyreType% != 0))
-							speaker.speakPhrase("PressureAdjustment", {tyre: fragments[tyre]
-																	 , lost: speaker.number2Speech(convertUnit("Pressure", lostPressure))
-																	 , unit: fragments[getUnit("Pressure")]})
+								if (temperatureDelta = 0)
+									temperatureDelta := ((pressureCorrection > 0) ? -1 : 1)
+
+								speaker.speakPhrase((pressureCorrection > 0) ? "PressureCorrectionUp" : "PressureCorrectionDown"
+												  , {value: speaker.number2Speech(convertUnit("Pressure", Abs(pressureCorrection)))
+												   , unit: fragments[getUnit("Pressure")]
+												   , pressureDirection: (pressureCorrection > 0) ? fragments["Increase"] : fragments["Decrease"]
+												   , temperatureDirection: (temperatureDelta > 0) ? fragments["Rising"] : fragments["Falling"]})
+							}
+						}
+
+						deviationThreshold := knowledgeBase.getValue("Session.Settings.Tyre.Pressure.Deviation")
+
+						for tyre, tyreType in Map("FrontLeft", "FL", "FrontRight", "FR", "RearLeft", "RL", "RearRight", "RR") {
+							lostPressure := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.Lost." . tyreType, false)
+
+							if (lostPressure && (lostPressure >= deviationThreshold) && (increment%tyreType% != 0))
+								speaker.speakPhrase("PressureAdjustment", {tyre: fragments[tyre]
+																		 , lost: speaker.number2Speech(convertUnit("Pressure", lostPressure))
+																		 , unit: fragments[getUnit("Pressure")]})
+						}
 					}
 				}
 

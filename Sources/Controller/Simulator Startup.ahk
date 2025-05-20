@@ -552,7 +552,7 @@ viewNews(fileName, title := false, x := kUndefined, y := kUndefined, width := 80
 
 		htmlGui.Add("Text", "x8 yp+" . (editHeight + 10) . " w" . innerWidth . " 0x10")
 
-		htmlGui.Add("Button", "Default X" . buttonX . " y+10 w80", translate("Ok")).OnEvent("Click", viewNews.Bind(false))
+		htmlGui.Add("Button", "Default X" . buttonX . " y+10 w80", translate("Close")).OnEvent("Click", viewNews.Bind(false))
 
 		htmlGui.Opt("+AlwaysOnTop")
 		htmlGui.Show("X" . x . " Y" . y . " W" . width . " NoActivate")

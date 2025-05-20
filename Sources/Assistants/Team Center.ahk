@@ -6857,18 +6857,21 @@ class TeamCenter extends ConfigurationItem {
 
 	computeRepairs(bodywork, suspension, engine) {
 		local repairs := ""
+		local repairService
 
-		if bodywork
+		this.Provider.supportsPitstop( , , &repairService)
+
+		if (bodywork && inList(repairService, "Bodywork"))
 			repairs := translate("Bodywork")
 
-		if suspension {
+		if (suspension && inList(repairService, "Suspension")) {
 			if (StrLen(repairs) > 0)
 				repairs .= ", "
 
 			repairs .= translate("Suspension")
 		}
 
-		if engine {
+		if (engine && inList(repairService, "Engine")) {
 			if (StrLen(repairs) > 0)
 				repairs .= ", "
 
@@ -14146,13 +14149,15 @@ manageTeam(teamCenterOrCommand, teamDrivers := false, arguments*) {
 pitstopSettings(teamCenterOrCommand := false, arguments*) {
 	local tyreChange := false
 	local fuelService, tyreService, repairService, tyreSet, index, tyre, axle, tyreCompound, dtc
+	local tyreCompoundFL, tyreCompoundFR, tyreCompoundRL, tyreCompoundRR
 
 	static tCenter := false
 	static isOpen := false
 
 	static settingsGui := false
-
 	static settingsListView := false
+
+	static wheels := ["FL", "FR", "RL", "RR"]
 
 	noSelect(*) {
 		loop settingsListView.GetCount()
@@ -14203,7 +14208,12 @@ pitstopSettings(teamCenterOrCommand := false, arguments*) {
 
 					if (tyreService = "Wheel") {
 						for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
-							if arguments[1].Has("Pitstop.Planned.Tyre.Compound." . tyre)
+							if arguments[1].Has("TyreCompound" . tyre)
+								tyreCompound := translate(arguments[1]["TyreCompound" . tyre]
+															  ? compound(arguments[1]["TyreCompound" . tyre]
+																	   , arguments[1]["TyreCompoundColor" . tyre])
+															  : "-")
+							else if arguments[1].Has("Pitstop.Planned.Tyre.Compound." . tyre)
 								tyreCompound := translate(arguments[1]["Pitstop.Planned.Tyre.Compound." . tyre]
 															  ? compound(arguments[1]["Pitstop.Planned.Tyre.Compound." . tyre]
 																	   , arguments[1]["Pitstop.Planned.Tyre.Compound.Color." . tyre])
@@ -14211,12 +14221,20 @@ pitstopSettings(teamCenterOrCommand := false, arguments*) {
 							else
 								tyreCompound := dtc
 
+							tyreChange := (tyreChange || (tyreCompound != translate("-")))
+							tyreCompound%wheels[index]% := tyreCompound
+
 							settingsListView.Add("", (index = 1) ? translate("Tyre Compound") : "", tyreCompound)
 						}
 					}
 					else if (tyreService = "Axle") {
 						for index, axle in ["Front", "Rear"] {
-							if arguments[1].Has("Pitstop.Planned.Tyre.Compound." . axle)
+							if arguments[1].Has("TyreCompound" . axle)
+								tyreCompound := translate(arguments[1]["TyreCompound" . axle]
+															  ? compound(arguments[1]["TyreCompound" . axle]
+																	   , arguments[1]["TyreCompoundColor" . axle])
+															  : "-")
+							else if arguments[1].Has("Pitstop.Planned.Tyre.Compound." . axle)
 								tyreCompound := translate(arguments[1]["Pitstop.Planned.Tyre.Compound." . axle]
 															  ? compound(arguments[1]["Pitstop.Planned.Tyre.Compound." . axle]
 																	   , arguments[1]["Pitstop.Planned.Tyre.Compound.Color." . axle])
@@ -14224,27 +14242,43 @@ pitstopSettings(teamCenterOrCommand := false, arguments*) {
 							else
 								tyreCompound := dtc
 
+							tyreChange := (tyreChange || (tyreCompound != translate("-")))
+
+							if (index = 1) {
+								tyreCompoundFL := tyreCompound
+								tyreCompoundFR := tyreCompound
+							}
+							else {
+								tyreCompoundRL := tyreCompound
+								tyreCompoundRR := tyreCompound
+							}
+
 							settingsListView.Add("", (index = 1) ? translate("Tyre Compound") : "", tyreCompound)
 						}
 					}
 					else if tyreService {
 						tyreChange := (dtc != translate("-"))
 
+						for index, tyre in wheels
+							tyreCompound%tyre% := dtc
+
 						settingsListView.Add("", translate("Tyre Compound"), dtc)
 					}
 				}
 
 				if tyreChange {
-					if arguments[1].Has("TyreSet")
-						if (arguments[1].Has("TyreCompound") && arguments[1]["TyreCompound"])
-							settingsListView.Add("", translate("Tyre Set"), arguments[1]["TyreSet"] ? arguments[1]["TyreSet"] : "-")
+					if (tyreSet && arguments[1].Has("TyreSet"))
+						settingsListView.Add("", translate("Tyre Set"), arguments[1]["TyreSet"] ? arguments[1]["TyreSet"] : translate("-"))
 
-					if arguments[1].Has("TyrePressureFL")
-						if (arguments[1].Has("TyreCompound") && arguments[1]["TyreCompound"])
-							settingsListView.Add("", translate("Tyre Pressures"), values2String(", ", displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureFL"]))
-																									, displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureFR"]))
-																									, displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureRL"]))
-																									, displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureRR"])))
+					if (arguments[1].Has("TyrePressureFL") || arguments[1].Has("TyrePressureFR") || arguments[1].Has("TyrePressureRL") || arguments[1].Has("TyrePressureRR"))
+						settingsListView.Add("", translate("Tyre Pressures"), values2String(", ", (tyreCompoundFL != translate("-")) ? displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureFL"]))
+																																	 : translate("-")
+																								, (tyreCompoundFR != translate("-")) ? displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureFR"]))
+																																	 : translate("-")
+																								, (tyreCompoundRL != translate("-")) ? displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureRL"]))
+																																	 : translate("-")
+																								, (tyreCompoundRR != translate("-")) ? displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureRR"]))
+																																	 : translate("-"))
 																			. A_Space . getUnit("Pressure", true))
 				}
 
@@ -14253,6 +14287,12 @@ pitstopSettings(teamCenterOrCommand := false, arguments*) {
 						settingsListView.Add("", translate("Repairs"), tCenter.computeRepairs(arguments[1].Has("RepairBodywork") ? arguments[1]["RepairBodywork"] : false
 																							, arguments[1].Has("RepairSuspension") ? arguments[1]["RepairSuspension"] : false
 																							, arguments[1].Has("RepairEngine") ? arguments[1]["RepairEngine"] : false))
+					else if (arguments[1].Has("Pitstop.Planned.Repair.Bodywork") || arguments[1].Has("Pitstop.Planned.Repair.Suspension")
+																				 || arguments[1].Has("Pitstop.Planned.Repair.Engine"))
+						settingsListView.Add("", translate("Repairs")
+										       , tCenter.computeRepairs(arguments[1].Has("Pitstop.Planned.Repair.Bodywork") ? arguments[1]["Pitstop.Planned.Repair.Bodywork"] : false
+																	  , arguments[1].Has("Pitstop.Planned.Repair.Suspension") ? arguments[1]["Pitstop.Planned.Repair.Suspension"] : false
+																	  , arguments[1].Has("Pitstop.Planned.Repair.Engine") ? arguments[1]["Pitstop.Planned.Repair.Engine"] : false))
 
 				if arguments[1].Has("Pitstop.Planned.Time.Service")
 					settingsListView.Add("", translate("Service"), Round(arguments[1]["Pitstop.Planned.Time.Service"] / 1000) . translate(" Seconds"))

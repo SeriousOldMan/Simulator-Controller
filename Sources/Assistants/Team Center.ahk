@@ -14229,13 +14229,21 @@ pitstopSettings(teamCenterOrCommand := false, arguments*) {
 				if (fuelService && arguments[1].Has("FuelAmount"))
 					settingsListView.Add("", translate("Refuel"), displayValue("Float", convertUnit("Volume", arguments[1]["FuelAmount"])) . A_Space . getUnit("Volume", true))
 
-				if (inList(["ACC", "Assetto Corsa Competizione"], tCenter.Simulator) && arguments[1].Has("Pitstop.Planned.Tyre.Compound")) {
-					settingsListView.Add("", translate("Tyre Compound")
-										   , (arguments[1]["Pitstop.Planned.Tyre.Compound"] ? compound(arguments[1]["Pitstop.Planned.Tyre.Compound"]
-																									 , arguments[1]["Pitstop.Planned.Tyre.Compound.Color"])
-																							: translate("-")) . translate(" (probably)"))
+				if inList(["ACC", "Assetto Corsa Competizione"], tCenter.Simulator) {
+					if arguments[1].Has("Pitstop.Planned.Tyre.Compound") {
+						tyreCompound := translate(arguments[1]["Pitstop.Planned.Tyre.Compound"] ? compound(arguments[1]["Pitstop.Planned.Tyre.Compound"]
+																										 , arguments[1]["Pitstop.Planned.Tyre.Compound.Color"])
+																								: "-")
 
-					tyreChange := true
+						tyreChange := true
+
+						for index, tyre in wheels
+							tyreCompound%tyre% := tyreCompound
+					}
+					else
+						tyreCompound := translate("-")
+
+					settingsListView.Add("", translate("Tyre Compound"), tyreCompound . translate(" (probably)"))
 				}
 				else {
 					dtc := (arguments[1].Has("TyreCompound") && arguments[1]["TyreCompound"])

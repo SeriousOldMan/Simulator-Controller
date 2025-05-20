@@ -8246,7 +8246,7 @@ class TeamCenter extends ConfigurationItem {
 	syncPitstops(newLaps := false) {
 		local sessionStore := this.SessionStore
 		local session := this.SelectedSession[true]
-		local nextStop := 1
+		local nextStop := 0
 		local newData := false
 		local currentDriver := false
 		local nextDriver := false
@@ -8259,7 +8259,9 @@ class TeamCenter extends ConfigurationItem {
 		loop this.PitstopsListView.GetCount()
 			nextStop := Max(nextStop, this.PitstopsListView.GetText(A_Index))
 
-		wasEmpty := (nextStop == 1)
+		wasEmpty := (nextStop == 0)
+
+		nextStop += 1
 
 		loop this.PitstopsListView.GetCount()
 			if (this.PitstopsListView.GetNext(A_Index - 1, "C") != A_Index) {
@@ -8495,7 +8497,12 @@ class TeamCenter extends ConfigurationItem {
 
 						nextStop += 1
 					}
-					else if (nextStop >= getMultiMapValue(state, "Session State", "Pitstop.Last", 0))
+					else if (nextStop = getMultiMapValue(state, "Session State", "Pitstop.Last", 0)) {
+						nextStop += 1
+
+						break
+					}
+					else if (nextStop > getMultiMapValue(state, "Session State", "Pitstop.Last", 0))
 						break
 					else {
 						this.PitstopsListView.Add("Check", nextStop, "-", "-", "-", "-", "-", "-, -, -, -", this.computeRepairs(false, false, false))
@@ -8539,23 +8546,18 @@ class TeamCenter extends ConfigurationItem {
 							break
 						}
 
-					if hasPlanned
-						lastPitstop := (hasPlanned - 1)
-					else
-						lastPitstop := (this.PitstopsListView.GetCount() ? this.PitstopsListView.GetText(this.PitstopsListView.GetCount()) : false)
-
 					pitstopNr := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Nr", false)
 
 					this.iPendingPitstop := false
 
-					if (pitstopNr && ((!hasPlanned && (pitstopNr > this.PitstopsListView.GetCount()))
-								   || (hasPlanned && (pitstopNr = (this.PitstopsListView.GetCount()) + 1)))) {
+					if (pitstopNr && ((!hasPlanned && (pitstopNr >= nextStop))
+								   || (hasPlanned && (pitstopNr = (this.PitstopsListView.GetText(hasPlanned)))))) {
 						this.iPendingPitstop := getMultiMapValues(state, "Pitstop Pending")
 
 						if hasPlanned {
-							this.PitstopsListView.Delete(A_Index)
+							this.PitstopsListView.Delete(hasPlanned)
 
-							this.iPitstopStints.RemoveAt(A_Index)
+							this.iPitstopStints.RemoveAt(hasPlanned)
 						}
 
 						newData := true
@@ -8710,7 +8712,7 @@ class TeamCenter extends ConfigurationItem {
 						else
 							displayFuel := fuel
 
-						this.PitstopsListView.Add("", lastPitstop + 1, (lap = "-") ? "-" : (lap + 1), displayNullValue(nextDriver), displayFuel
+						this.PitstopsListView.Add("", nextStop, (lap = "-") ? "-" : (lap + 1), displayNullValue(nextDriver), displayFuel
 													, displayTyreCompound, ((tyreSet = 0) ? "-" : tyreSet)
 													, displayPressures, this.computeRepairs(repairBodywork, repairSuspension, repairEngine))
 
@@ -8721,7 +8723,7 @@ class TeamCenter extends ConfigurationItem {
 						sessionStore.remove("Pitstop.Data", {Status: "Planned"}, always.Bind(true))
 
 						sessionStore.add("Pitstop.Data"
-									   , Database.Row("Nr", lastPitstop + 1, "Lap", lap, "Fuel", fuel
+									   , Database.Row("Nr", nextStop, "Lap", lap, "Fuel", fuel
 													, "Tyre.Compound", tyreCompound, "Tyre.Compound.Color", tyreCompoundColor, "Tyre.Set", tyreSet
 													, "Tyre.Pressure.Cold.Front.Left", pressures[1], "Tyre.Pressure.Cold.Front.Right", pressures[2]
 													, "Tyre.Pressure.Cold.Rear.Left", pressures[3], "Tyre.Pressure.Cold.Rear.Right", pressures[4]

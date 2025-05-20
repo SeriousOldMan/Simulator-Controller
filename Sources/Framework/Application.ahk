@@ -24,7 +24,6 @@
 
 #Include "..\Framework\Extensions\Task.ahk"
 #Include "..\Framework\Extensions\Messages.ahk"
-#Include "..\Framework\Extensions\HTMLViewer.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -354,98 +353,6 @@ checkForUpdates() {
 
 				break
 			}
-	}
-}
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                    Public Function Declaration Section                  ;;;
-;;;-------------------------------------------------------------------------;;;
-
-viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 800, height := 400, *) {
-	local curWorkingDir := A_WorkingDir
-	local html, innerWidth, editHeight, buttonX
-	local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom, directory
-
-	static htmlGui
-	static htmlViewer
-
-	if !title
-		title := translate("News and Updates")
-
-	if !fileName {
-		htmlGui.Destroy()
-
-		return
-	}
-
-	SplitPath(fileName, , &directory)
-
-	SetWorkingDir(directory)
-
-	try {
-		; html := FileRead(fileName)
-
-		innerWidth := width - 16
-
-		htmlGui := Window({Descriptor: "HTML Viewer", Options: "0x400000"}, translate("News and Updates"))
-
-		htmlGui.SetFont("s10 Bold")
-
-		htmlGui.Add("Text", "x8 y8 W" . innerWidth . " +0x200 +0x1 BackgroundTrans", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(htmlGui, "HTML Viewer"))
-
-		htmlGui.SetFont()
-
-		htmlGui.Add("Text", "x8 yp+26 W" . innerWidth . " +0x200 +0x1 BackgroundTrans", title)
-
-		htmlGui.Add("Text", "x8 yp+26 w" . innerWidth . " 0x10")
-
-		editHeight := height - 102
-
-		htmlViewer := htmlGui.Add("WebView2Viewer", "X8 YP+10 W" . innerWidth . " H" . editHeight)
-
-		htmlViewer.document.open()
-		htmlViewer.document.write(fileName)
-		htmlViewer.document.close()
-
-		MonitorGetWorkArea(, &mainScreenLeft, &mainScreenTop, &mainScreenRight, &mainScreenBottom)
-
-		if !getWindowPosition("HTML Viewer", &x, &y) {
-			x := kUndefined
-			y := kUndefined
-		}
-
-		if (x = kUndefined)
-			switch x, false {
-				case "Left":
-					x := 25
-				case "Right":
-					x := mainScreenRight - width - 25
-				default:
-					x := "Center"
-			}
-
-		if (y = kUndefined)
-			switch y, false {
-				case "Top":
-					y := 25
-				case "Bottom":
-					y := mainScreenBottom - height - 25
-				default:
-					y := "Center"
-			}
-
-		buttonX := Round(width / 2) - 40
-
-		htmlGui.Add("Text", "x8 yp+" . (editHeight + 10) . " w" . innerWidth . " 0x10")
-
-		htmlGui.Add("Button", "Default X" . buttonX . " y+10 w80", translate("Ok")).OnEvent("Click", viewHTML.Bind(false))
-
-		htmlGui.Opt("+AlwaysOnTop")
-		htmlGui.Show("X" . x . " Y" . y . " W" . width . " NoActivate")
-	}
-	finally {
-		SetWorkingDir(curWorkingDir)
 	}
 }
 

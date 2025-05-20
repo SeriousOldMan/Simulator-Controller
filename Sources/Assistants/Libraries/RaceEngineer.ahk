@@ -3303,7 +3303,7 @@ class RaceEngineer extends RaceAssistant {
 		local force := false
 		local forceRefuel := false
 		local forceTyreChange := false
-		local result, pitstopNumber, speaker, fragments, fuel, lap, correctedFuel, targetFuel
+		local result, pitstopNumber, speaker, fragments, fuel, lap, correctedFuel, targetFuel, pressure
 		local correctedTyres, compound, color, incrementFL, incrementFR, incrementRL, incrementRR, pressureCorrection
 		local temperatureDelta, debug, tyre, tyreType, lostPressure, deviationThreshold, ignore, suffix
 		local tyreService, index, tyre, axle, first
@@ -3528,20 +3528,28 @@ class RaceEngineer extends RaceAssistant {
 					incrementRL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL.Increment", 0), 1)
 					incrementRR := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR.Increment", 0), 1)
 
-					if (debug || (incrementFL != 0) || (incrementFR != 0) || (incrementRL != 0) || (incrementRR != 0) || (tyrePressures != kUndefined))
+					if (isObject(tyrePressures) && !exist(tyrePressures, (p) => (p != 0.0)))
+						tyrePressures := false
+
+					if (debug || (incrementFL != 0) || (incrementFR != 0) || (incrementRL != 0) || (incrementRR != 0)
+							  || isObject(tyrePressures))
 						speaker.speakPhrase("NewPressures")
 
 					if ((knowledgeBase.getValue("Tyre.Compound") != compound) || (knowledgeBase.getValue("Tyre.Compound.Color") != color)
-																			  || (tyrePressures != kUndefined)) {
+																			  || isObject(tyrePressures)) {
 						for ignore, suffix in ["FL", "FR", "RL", "RR"]
-							if (debug || (increment%suffix% != 0) || (tyrePressures != kUndefined))
-								speaker.speakPhrase("Tyre" . suffix
-												  , {value: speaker.number2Speech(convertUnit("Pressure", knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . suffix)))
-												   , unit: fragments[getUnit("Pressure")], delta: "", by: ""})
+							if (debug || (increment%suffix% != 0) || isObject(tyrePressures)) {
+								pressure := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . suffix)
+
+								if (debug || (pressure != 0))
+									speaker.speakPhrase("Tyre" . suffix
+													  , {value: speaker.number2Speech(convertUnit("Pressure", pressure))
+													   , unit: fragments[getUnit("Pressure")], delta: "", by: ""})
+							}
 					}
 					else
 						for ignore, suffix in ["FL", "FR", "RL", "RR"]
-							if (debug || (increment%suffix% != 0) || (tyrePressures != kUndefined))
+							if (debug || (increment%suffix% != 0))
 								speaker.speakPhrase("Tyre" . suffix
 												  , {value: speaker.number2Speech(convertUnit("Pressure", Round(Abs(increment%suffix%), 1)))
 												   , unit: fragments[getUnit("Pressure")]
@@ -3911,7 +3919,7 @@ class RaceEngineer extends RaceAssistant {
 		pitstop := knowledgeBase.getValue("Pitstop.Last", 0)
 
 		if this.iPitstopOptionsFile {
-			if (knowledgeBase.getValue("Pitstop." . pitstop . ".Refuel", kUndefined) = kUndefined) {
+			if (knowledgeBase.getValue("Pitstop." . pitstop . ".Fuel", kUndefined) = kUndefined) {
 				options := readMultiMap(this.iPitstopOptionsFile)
 
 				knowledgeBase.setFact("Pitstop." . pitstop . ".Fuel", getMultiMapValue(options, "Pitstop", "Refuel", 0))
@@ -3936,13 +3944,13 @@ class RaceEngineer extends RaceAssistant {
 						knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.Compound." . tyre, compound)
 
 						if compound {
-							knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.CompoundColor." . tyre
+							knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.Compound.Color." . tyre
 												, getMultiMapValue(options, "Pitstop", "Tyre.Compound.Color." . tyre, false))
 
 							tyreChange := true
 						}
 						else
-							knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.CompoundColor." . tyre, false)
+							knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.Compound.Color." . tyre, false)
 					})
 				}
 				else if (mixedCompounds = "Axle") {
@@ -3952,13 +3960,13 @@ class RaceEngineer extends RaceAssistant {
 						knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.Compound." . axle, compound)
 
 						if compound {
-							knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.CompoundColor." . axle
+							knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.Compound.Color." . axle
 												, getMultiMapValue(options, "Pitstop", "Tyre.Compound.Color." . axle, false))
 
 							tyreChange := true
 						}
 						else
-							knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.CompoundColor." . axle, false)
+							knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.Compound.Color." . axle, false)
 					})
 				}
 

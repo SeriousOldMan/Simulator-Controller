@@ -3193,37 +3193,41 @@ class TeamCenter extends ConfigurationItem {
 	updateState() {
 		local window := this.Window
 		local selected, stint, hasPitstops
-		local tyreService, tyreSets, ignore, dropDown
+		local mixedCompounds, tyreService, tyreSets, index, dropDown
 
 		this.Provider.supportsPitstop( , &tyreService)
-		this.Provider.supportsTyreManagement( , &tyreSets)
+		this.Provider.supportsTyreManagement(&mixedCompounds , &tyreSets)
 
 		if (tyreService = "Wheel") {
-			for ignore, dropDown in ["pitstopTyreCompoundFLDropDown", "pitstopTyreCompoundFRDropDown"
-								   , "pitstopTyreCompoundRLDropDown", "pitstopTyreCompoundRRDropDown"] {
+			for index, dropDown in ["pitstopTyreCompoundFLDropDown", "pitstopTyreCompoundFRDropDown"
+								  , "pitstopTyreCompoundRLDropDown", "pitstopTyreCompoundRRDropDown"] {
 				window[dropDown].Enabled := true
 
 				if (window[dropDown].Value = 0)
 					window[dropDown].Choose(1)
+				else if (!mixedCompounds && (index > 1))
+					window[dropDown].Choose(window["pitstopTyreCompoundFLDropDown"].Value)
 			}
 		}
 		else if (tyreService = "Axle") {
-			for ignore, dropDown in ["pitstopTyreCompoundFLDropDown", "pitstopTyreCompoundRLDropDown"] {
+			for index, dropDown in ["pitstopTyreCompoundFLDropDown", "pitstopTyreCompoundRLDropDown"] {
 				window[dropDown].Enabled := true
 
 				if (window[dropDown].Value = 0)
 					window[dropDown].Choose(1)
+				else if (!mixedCompounds && (index > 1))
+					window[dropDown].Choose(window["pitstopTyreCompoundFLDropDown"].Value)
 			}
 
-			for ignore, dropDown in ["pitstopTyreCompoundFRDropDown", "pitstopTyreCompoundRRDropDown"]
+			for index, dropDown in ["pitstopTyreCompoundFRDropDown", "pitstopTyreCompoundRRDropDown"]
 				window[dropDown].Enabled := false
 
 			window["pitstopTyreCompoundFRDropDown"].Choose(window["pitstopTyreCompoundFLDropDown"].Value)
 			window["pitstopTyreCompoundRRDropDown"].Choose(window["pitstopTyreCompoundRLDropDown"].Value)
 		}
 		else {
-			for ignore, dropDown in ["pitstopTyreCompoundFRDropDown"
-								   , "pitstopTyreCompoundRLDropDown", "pitstopTyreCompoundRRDropDown"] {
+			for index, dropDown in ["pitstopTyreCompoundFRDropDown"
+								  , "pitstopTyreCompoundRLDropDown", "pitstopTyreCompoundRRDropDown"] {
 				window[dropDown].Enabled := false
 
 				window[dropDown].Choose(window["pitstopTyreCompoundFLDropDown"].Value)

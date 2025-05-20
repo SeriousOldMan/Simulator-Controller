@@ -39,6 +39,7 @@
 
 #Include "..\Framework\Extensions\Task.ahk"
 #Include "..\Framework\Extensions\Messages.ahk"
+#Include "..\Framework\Extensions\HTMLViewer.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Configuration\Libraries\SettingsEditor.ahk"
 #Include "..\Configuration\Libraries\TeamManagementPanel.ahk"
@@ -474,6 +475,93 @@ class SimulatorStartup extends ConfigurationItem {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+viewNews(fileName, title := false, x := kUndefined, y := kUndefined, width := 800, height := 400, *) {
+	local curWorkingDir := A_WorkingDir
+	local html, innerWidth, editHeight, buttonX
+	local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom, directory
+
+	static htmlGui
+	static htmlViewer
+
+	if !title
+		title := translate("News and Updates")
+
+	if !fileName {
+		htmlGui.Destroy()
+
+		return
+	}
+
+	SplitPath(fileName, , &directory)
+
+	SetWorkingDir(directory)
+
+	try {
+		; html := FileRead(fileName)
+
+		innerWidth := width - 16
+
+		htmlGui := Window({Descriptor: "HTML Viewer", Options: "0x400000"}, translate("News and Updates"))
+
+		htmlGui.SetFont("s10 Bold")
+
+		htmlGui.Add("Text", "x8 y8 W" . innerWidth . " +0x200 +0x1 BackgroundTrans", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(htmlGui, "HTML Viewer"))
+
+		htmlGui.SetFont()
+
+		htmlGui.Add("Text", "x8 yp+26 W" . innerWidth . " +0x200 +0x1 BackgroundTrans", title)
+
+		htmlGui.Add("Text", "x8 yp+26 w" . innerWidth . " 0x10")
+
+		editHeight := height - 102
+
+		htmlViewer := htmlGui.Add("WebView2Viewer", "X8 YP+10 W" . innerWidth . " H" . editHeight)
+
+		htmlViewer.document.open()
+		htmlViewer.document.write(fileName)
+		htmlViewer.document.close()
+
+		MonitorGetWorkArea(, &mainScreenLeft, &mainScreenTop, &mainScreenRight, &mainScreenBottom)
+
+		if !getWindowPosition("HTML Viewer", &x, &y) {
+			x := kUndefined
+			y := kUndefined
+		}
+
+		if (x = kUndefined)
+			switch x, false {
+				case "Left":
+					x := 25
+				case "Right":
+					x := mainScreenRight - width - 25
+				default:
+					x := "Center"
+			}
+
+		if (y = kUndefined)
+			switch y, false {
+				case "Top":
+					y := 25
+				case "Bottom":
+					y := mainScreenBottom - height - 25
+				default:
+					y := "Center"
+			}
+
+		buttonX := Round(width / 2) - 40
+
+		htmlGui.Add("Text", "x8 yp+" . (editHeight + 10) . " w" . innerWidth . " 0x10")
+
+		htmlGui.Add("Button", "Default X" . buttonX . " y+10 w80", translate("Close")).OnEvent("Click", viewNews.Bind(false))
+
+		htmlGui.Opt("+AlwaysOnTop")
+		htmlGui.Show("X" . x . " Y" . y . " W" . width . " NoActivate")
+	}
+	finally {
+		SetWorkingDir(curWorkingDir)
+	}
+}
+
 checkForNews() {
 	local check := !FileExist(kUserConfigDirectory . "NEWS")
 	local lastModified, ignore, url
@@ -559,7 +647,7 @@ checkForNews() {
 						shown := getMultiMapValue(news, "News", nr, false)
 						rule := getMultiMapValue(availableNews, "Rules", nr, "Once")
 
-						if (InStr(rule, "Repeat") && shown && (DateAdd(shown, string2Values(":", rule)[2], "Days") > A_Now))
+						if (InStr(rule, "Repeat") && shown && (DateAdd(shown, string2Values(":", rule)[2], "Days") < A_Now))
 							candidates.Push([nr, url])
 					}
 
@@ -591,7 +679,7 @@ checkForNews() {
 						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\News.zip' -DestinationPath '" . kTempDirectory . "News' -Force", , "Hide")
 
 						if FileExist(kTempDirectory . "News\News.htm") {
-							viewHTML(kTempDirectory . "News\News.htm")
+							viewNews(kTempDirectory . "News\News.htm")
 
 							setMultiMapValue(news, "News", newsNr, A_Now)
 

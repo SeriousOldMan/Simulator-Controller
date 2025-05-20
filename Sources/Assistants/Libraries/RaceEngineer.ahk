@@ -3303,7 +3303,8 @@ class RaceEngineer extends RaceAssistant {
 		local force := false
 		local forceRefuel := false
 		local forceTyreChange := false
-		local result, pitstopNumber, speaker, fragments, fuel, lap, correctedFuel, targetFuel
+		local result, pitstopNumber, speaker, fragments, fuel, lap, correctedFuel, targetFuel, pressure
+		local pressureFL, pressureFR, pressureRL, pressureRR
 		local correctedTyres, compound, color, incrementFL, incrementFR, incrementRL, incrementRR, pressureCorrection
 		local temperatureDelta, debug, tyre, tyreType, lostPressure, deviationThreshold, ignore, suffix
 		local tyreService, index, tyre, axle, first
@@ -3334,7 +3335,7 @@ class RaceEngineer extends RaceAssistant {
 			if !this.hasEnoughData()
 				return false
 
-		if !this.supportsPitstop( , &tyreService) {
+		if !this.Provider.supportsPitstop( , &tyreService) {
 			if this.Speaker
 				this.getSpeaker().speakPhrase("NoPitstop")
 
@@ -3523,57 +3524,71 @@ class RaceEngineer extends RaceAssistant {
 				debug := this.VoiceManager.Debug[kDebugPhrases]
 
 				if (compound && ((options == true) || (options.HasProp("Pressures") && options.Pressures))) {
+					pressureFL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL", 0), 1)
+					pressureFR := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR", 0), 1)
+					pressureRL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL", 0), 1)
+					pressureRR := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR", 0), 1)
 					incrementFL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL.Increment", 0), 1)
 					incrementFR := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR.Increment", 0), 1)
 					incrementRL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL.Increment", 0), 1)
 					incrementRR := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR.Increment", 0), 1)
 
-					if (debug || (incrementFL != 0) || (incrementFR != 0) || (incrementRL != 0) || (incrementRR != 0) || (tyrePressures != kUndefined))
+					pressure := false
+
+					for ignore, suffix in ["FL", "FR", "RL", "RR"]
+						if (((tyrePressures != kUndefined) && (pressure%suffix% != 0.0)) || (increment%suffix% != 0.0)) {
+							pressure := true
+
+							break
+						}
+
+					if (debug || pressure) {
 						speaker.speakPhrase("NewPressures")
 
-					if ((knowledgeBase.getValue("Tyre.Compound") != compound) || (knowledgeBase.getValue("Tyre.Compound.Color") != color)
-																			  || (tyrePressures != kUndefined)) {
-						for ignore, suffix in ["FL", "FR", "RL", "RR"]
-							if (debug || (increment%suffix% != 0) || (tyrePressures != kUndefined))
-								speaker.speakPhrase("Tyre" . suffix
-												  , {value: speaker.number2Speech(convertUnit("Pressure", knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . suffix)))
-												   , unit: fragments[getUnit("Pressure")], delta: "", by: ""})
-					}
-					else
-						for ignore, suffix in ["FL", "FR", "RL", "RR"]
-							if (debug || (increment%suffix% != 0) || (tyrePressures != kUndefined))
-								speaker.speakPhrase("Tyre" . suffix
-												  , {value: speaker.number2Speech(convertUnit("Pressure", Round(Abs(increment%suffix%), 1)))
-												   , unit: fragments[getUnit("Pressure")]
-												   , delta: fragments[(increment%suffix% > 0) ? "Increased" : "Decreased"]
-												   , by: fragments["By"]})
-
-					if (tyrePressures = kUndefined) {
-						pressureCorrection := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.Correction", 0), 1)
-
-						if (Abs(pressureCorrection) > 0.05) {
-							temperatureDelta := knowledgeBase.getValue("Weather.Temperature.Air.Delta", 0)
-
-							if (temperatureDelta = 0)
-								temperatureDelta := ((pressureCorrection > 0) ? -1 : 1)
-
-							speaker.speakPhrase((pressureCorrection > 0) ? "PressureCorrectionUp" : "PressureCorrectionDown"
-											  , {value: speaker.number2Speech(convertUnit("Pressure", Abs(pressureCorrection)))
-											   , unit: fragments[getUnit("Pressure")]
-											   , pressureDirection: (pressureCorrection > 0) ? fragments["Increase"] : fragments["Decrease"]
-											   , temperatureDirection: (temperatureDelta > 0) ? fragments["Rising"] : fragments["Falling"]})
+						if ((knowledgeBase.getValue("Tyre.Compound") != compound) || (knowledgeBase.getValue("Tyre.Compound.Color") != color)
+																				  || (tyrePressures != kUndefined)) {
+							for ignore, suffix in ["FL", "FR", "RL", "RR"]
+								if (debug || (pressure%suffix% != 0.0))
+									speaker.speakPhrase("Tyre" . suffix
+													  , {value: speaker.number2Speech(convertUnit("Pressure", pressure%suffix%))
+													   , unit: fragments[getUnit("Pressure")], delta: "", by: ""})
 						}
-					}
+						else
+							for ignore, suffix in ["FL", "FR", "RL", "RR"]
+								if (debug || (increment%suffix% != 0.0))
+									speaker.speakPhrase("Tyre" . suffix
+													  , {value: speaker.number2Speech(convertUnit("Pressure", Round(Abs(increment%suffix%), 1)))
+													   , unit: fragments[getUnit("Pressure")]
+													   , delta: fragments[(increment%suffix% > 0) ? "Increased" : "Decreased"]
+													   , by: fragments["By"]})
 
-					deviationThreshold := knowledgeBase.getValue("Session.Settings.Tyre.Pressure.Deviation")
+						if (tyrePressures = kUndefined) {
+							pressureCorrection := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.Correction", 0), 1)
 
-					for tyre, tyreType in Map("FrontLeft", "FL", "FrontRight", "FR", "RearLeft", "RL", "RearRight", "RR") {
-						lostPressure := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.Lost." . tyreType, false)
+							if (Abs(pressureCorrection) > 0.05) {
+								temperatureDelta := knowledgeBase.getValue("Weather.Temperature.Air.Delta", 0)
 
-						if (lostPressure && (lostPressure >= deviationThreshold) && (increment%tyreType% != 0))
-							speaker.speakPhrase("PressureAdjustment", {tyre: fragments[tyre]
-																	 , lost: speaker.number2Speech(convertUnit("Pressure", lostPressure))
-																	 , unit: fragments[getUnit("Pressure")]})
+								if (temperatureDelta = 0)
+									temperatureDelta := ((pressureCorrection > 0) ? -1 : 1)
+
+								speaker.speakPhrase((pressureCorrection > 0) ? "PressureCorrectionUp" : "PressureCorrectionDown"
+												  , {value: speaker.number2Speech(convertUnit("Pressure", Abs(pressureCorrection)))
+												   , unit: fragments[getUnit("Pressure")]
+												   , pressureDirection: (pressureCorrection > 0) ? fragments["Increase"] : fragments["Decrease"]
+												   , temperatureDirection: (temperatureDelta > 0) ? fragments["Rising"] : fragments["Falling"]})
+							}
+						}
+
+						deviationThreshold := knowledgeBase.getValue("Session.Settings.Tyre.Pressure.Deviation")
+
+						for tyre, tyreType in Map("FrontLeft", "FL", "FrontRight", "FR", "RearLeft", "RL", "RearRight", "RR") {
+							lostPressure := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.Lost." . tyreType, false)
+
+							if (lostPressure && (lostPressure >= deviationThreshold) && (increment%tyreType% != 0))
+								speaker.speakPhrase("PressureAdjustment", {tyre: fragments[tyre]
+																		 , lost: speaker.number2Speech(convertUnit("Pressure", lostPressure))
+																		 , unit: fragments[getUnit("Pressure")]})
+						}
 					}
 				}
 
@@ -3911,7 +3926,7 @@ class RaceEngineer extends RaceAssistant {
 		pitstop := knowledgeBase.getValue("Pitstop.Last", 0)
 
 		if this.iPitstopOptionsFile {
-			if (knowledgeBase.getValue("Pitstop." . pitstop . ".Refuel", kUndefined) = kUndefined) {
+			if (knowledgeBase.getValue("Pitstop." . pitstop . ".Fuel", kUndefined) = kUndefined) {
 				options := readMultiMap(this.iPitstopOptionsFile)
 
 				knowledgeBase.setFact("Pitstop." . pitstop . ".Fuel", getMultiMapValue(options, "Pitstop", "Refuel", 0))
@@ -3936,13 +3951,13 @@ class RaceEngineer extends RaceAssistant {
 						knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.Compound." . tyre, compound)
 
 						if compound {
-							knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.CompoundColor." . tyre
+							knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.Compound.Color." . tyre
 												, getMultiMapValue(options, "Pitstop", "Tyre.Compound.Color." . tyre, false))
 
 							tyreChange := true
 						}
 						else
-							knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.CompoundColor." . tyre, false)
+							knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.Compound.Color." . tyre, false)
 					})
 				}
 				else if (mixedCompounds = "Axle") {
@@ -3952,13 +3967,13 @@ class RaceEngineer extends RaceAssistant {
 						knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.Compound." . axle, compound)
 
 						if compound {
-							knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.CompoundColor." . axle
+							knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.Compound.Color." . axle
 												, getMultiMapValue(options, "Pitstop", "Tyre.Compound.Color." . axle, false))
 
 							tyreChange := true
 						}
 						else
-							knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.CompoundColor." . axle, false)
+							knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.Compound.Color." . axle, false)
 					})
 				}
 

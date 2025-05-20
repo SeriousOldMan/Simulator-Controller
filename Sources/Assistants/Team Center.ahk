@@ -1385,12 +1385,6 @@ class TeamCenter extends ConfigurationItem {
 					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
 
-		if simulator {
-			this.iSimulator := SessionDatabase.getSimulatorName(simulator)
-			this.iCar := car
-			this.iTrack := track
-		}
-
 		super.__New(configuration)
 
 		TeamCenter.Instance := this
@@ -3192,11 +3186,16 @@ class TeamCenter extends ConfigurationItem {
 
 	updateState() {
 		local window := this.Window
+		local mixedCompounds := false
+		local tyreService := false
+		local tyreSets := false
 		local selected, stint, hasPitstops
-		local mixedCompounds, tyreService, tyreSets, index, dropDown
+		local tyreService, tyreSets, index, dropDown
 
-		this.Provider.supportsPitstop( , &tyreService)
-		this.Provider.supportsTyreManagement(&mixedCompounds , &tyreSets)
+		if this.Provider {
+			this.Provider.supportsPitstop( , &tyreService)
+			this.Provider.supportsTyreManagement( , &tyreSets)
+		}
 
 		if (tyreService = "Wheel") {
 			for index, dropDown in ["pitstopTyreCompoundFLDropDown", "pitstopTyreCompoundFRDropDown"
@@ -10375,6 +10374,9 @@ class TeamCenter extends ConfigurationItem {
 					this.Connector.DeleteSessionValue(session, "Race Spotter Session Info")
 
 					this.Connector.DeleteSessionValue(session, "Race Engineer State")
+					this.Connector.DeleteSessionValue(session, "Pitstop State")
+
+					this.Connector.DeleteSessionValue(session, "HasTelemetry")
 				}
 				catch Any as exception {
 					logError(exception)

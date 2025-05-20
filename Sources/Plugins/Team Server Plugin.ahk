@@ -1442,7 +1442,6 @@ class TeamServerPlugin extends ControllerPlugin {
 
 	startupTelemetryCollector(provider, directory := false) {
 		local loadedLaps := CaseInsenseMap()
-		local hasTelemetry := false
 
 		updateTelemetry() {
 			local newLaps := []
@@ -1464,14 +1463,9 @@ class TeamServerPlugin extends ControllerPlugin {
 					for ignore, lap in newLaps {
 						if (lap > (lastLap - 4)) {
 							try {
-								if !hasTelemetry {
-									hasTelemetry := true
-
-									this.setSessionValue("HasTelemetry", true)
-								}
-
 								this.setLapValue(lap, "Lap Telemetry", FileRead(this.TelemetryDirectory . "\Lap " . lap . ".telemetry"))
-
+								this.setSessionValue("HasTelemetry", true)
+								
 								loadedLaps[lap] := true
 							}
 							catch Any as exception {

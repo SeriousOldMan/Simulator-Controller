@@ -10369,6 +10369,9 @@ class TeamCenter extends ConfigurationItem {
 					this.Connector.DeleteSessionValue(session, "Race Spotter Session Info")
 
 					this.Connector.DeleteSessionValue(session, "Race Engineer State")
+					this.Connector.DeleteSessionValue(session, "Pitstop State")
+
+					this.Connector.DeleteSessionValue(session, "HasTelemetry")
 				}
 				catch Any as exception {
 					logError(exception)

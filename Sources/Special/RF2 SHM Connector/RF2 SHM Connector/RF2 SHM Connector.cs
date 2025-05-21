@@ -5,13 +5,13 @@ Small parts original by: The Iron Wolf (vleonavicius@hotmail.com; thecrewchief.o
 */
 using SHMConnector.rFactor2Data;
 using System;
-using System.Diagnostics.Eventing.Reader;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using static SHMConnector.rFactor2Constants;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 using static SHMConnector.rFactor2Constants.rF2GamePhase;
 using static SHMConnector.rFactor2Constants.rF2PitState;
 
@@ -50,6 +50,17 @@ namespace SHMConnector {
 		rF2WeatherControl weatherControl;
 		rF2RulesControl rulesControl;
 		rF2PluginControl pluginControl;
+
+		// Fuel cache: maps fuel liters to mChoiceIndex
+		private Dictionary<int, int> fuelLitersToChoiceIndex = new Dictionary<int, int>();
+		private volatile bool buildingCache = false;
+		private Task buildCacheTask = null;
+
+
+		// Fields to track last car, track, and lap for cache invalidation
+		private string lastCarName = null;
+		private string lastTrackName = null;
+		private int lastLap = -1;
 
 		public SHMConnector() {
 		}
@@ -285,12 +296,62 @@ namespace SHMConnector {
 
             return strWriter.ToString();
 		}
+		
+		public void LogToTempFile(string message)
+		{
+			try
+			{
+				string tempPath = Path.GetTempPath();
+				string logFile = Path.Combine(tempPath, "RF2SHMConnector.log");
+				string logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} - {message}{Environment.NewLine}";
+				File.AppendAllText(logFile, logEntry);
+			}
+			catch
+			{
+				// Ignore logging errors
+			}
+		}
 
-		public string ReadData() {
-            StringWriter strWriter = new StringWriter();
+		public string ReadData()
+		{
+			StringWriter strWriter = new StringWriter();
 
-            ref rF2VehicleScoring playerScoring = ref GetPlayerScoring(ref scoring);
+			ref rF2VehicleScoring playerScoring = ref GetPlayerScoring(ref scoring);
 			ref rF2VehicleTelemetry playerTelemetry = ref GetPlayerTelemetry(playerScoring.mID, ref telemetry);
+
+			string currentCarName = GetStringFromBytes(playerScoring.mVehicleName);
+			string currentTrackName = GetStringFromBytes(playerTelemetry.mTrackName);
+			int currentLap = playerScoring.mTotalLaps;
+
+			// Build fuel cache if not initialized or whether:
+			// - Car changed
+			// - Track changed
+			// - Lap < LastLap
+			// Avoid building cache if in pitlane to avoid problems
+			bool buildCache = false;
+			if (connected
+				&& playerScoring.mInPits == 0 /*not in pitlane*/
+				&& currentLap >= 0
+				&& currentCarName.Length != 0
+				&& currentTrackName.Length != 0)
+			{
+				buildCache = !buildingCache &&
+					(fuelLitersToChoiceIndex.Count() == 0
+					|| lastCarName != currentCarName
+					|| lastTrackName != currentTrackName
+					|| currentLap < lastLap);
+
+				// Run this asynchronously so we don't block data reading
+				if (buildCache)
+				{
+					buildingCache = true;
+					buildCacheTask = Task.Run(() => BuildFuelCache());
+				}
+			}
+
+			lastCarName = currentCarName;
+			lastTrackName = currentTrackName;
+			lastLap = currentLap;
 
 			string session = "";
 
@@ -322,9 +383,9 @@ namespace SHMConnector {
 				string vehicleClass = GetStringFromBytes(playerScoring.mVehicleClass);
 				string vehicleName = GetStringFromBytes(playerScoring.mVehicleName);
 
-                strWriter.Write("Car="); strWriter.WriteLine(GetCarName(vehicleClass, vehicleName));
-                strWriter.Write("CarRaw="); strWriter.WriteLine(vehicleName);
-                strWriter.Write("CarName="); strWriter.WriteLine(vehicleName);
+				strWriter.Write("Car="); strWriter.WriteLine(GetCarName(vehicleClass, vehicleName));
+				strWriter.Write("CarRaw="); strWriter.WriteLine(vehicleName);
+				strWriter.Write("CarName="); strWriter.WriteLine(vehicleName);
 				strWriter.Write("CarClass="); strWriter.WriteLine(vehicleClass);
 				strWriter.Write("Track="); strWriter.WriteLine(GetStringFromBytes(playerTelemetry.mTrackName));
 				strWriter.Write("SessionFormat="); strWriter.WriteLine((scoring.mScoringInfo.mEndET <= 0.0) ? "Laps" : "Time");
@@ -345,28 +406,28 @@ namespace SHMConnector {
 
 				strWriter.Write("Position="); strWriter.WriteLine(playerScoring.mPlace);
 
-                strWriter.Write("LapValid="); strWriter.WriteLine((playerScoring.mCountLapFlag == 2) ? "true" : "false");
-				
+				strWriter.Write("LapValid="); strWriter.WriteLine((playerScoring.mCountLapFlag == 2) ? "true" : "false");
+
 				strWriter.Write("LapLastTime="); strWriter.WriteLine(Math.Round(Normalize(playerScoring.mLastLapTime > 0 ? playerScoring.mLastLapTime
 																													 : playerScoring.mBestLapTime) * 1000));
 				strWriter.Write("LapBestTime="); strWriter.WriteLine(Math.Round(Normalize(playerScoring.mBestLapTime) * 1000));
 
 				if (playerScoring.mNumPenalties > 0)
-                    strWriter.WriteLine("Penalty=true");
+					strWriter.WriteLine("Penalty=true");
 
-                strWriter.Write("Sector="); strWriter.WriteLine(playerScoring.mSector == 0 ? 3 : playerScoring.mSector);
-				strWriter.Write("Laps="); strWriter.WriteLine(playerScoring.mTotalLaps);
+				strWriter.Write("Sector="); strWriter.WriteLine(playerScoring.mSector == 0 ? 3 : playerScoring.mSector);
+				strWriter.Write("Laps="); strWriter.WriteLine(currentLap);
 
 				long time = GetRemainingTime(ref playerScoring);
 
 				strWriter.Write("StintTimeRemaining="); strWriter.WriteLine(time);
 				strWriter.Write("DriverTimeRemaining="); strWriter.WriteLine(time);
 
-                strWriter.Write("InPitLane="); strWriter.WriteLine(playerScoring.mInPits != 0 ? "true" : "false");
+				strWriter.Write("InPitLane="); strWriter.WriteLine(playerScoring.mInPits != 0 ? "true" : "false");
 
                 if (playerScoring.mInPits != 0) {
 					double speed = VehicleSpeed(ref playerScoring);
-					
+
 					if (speed < 5 || playerScoring.mPitState == (byte)Stopped)
 						strWriter.WriteLine("InPit=true");
 					else
@@ -379,56 +440,56 @@ namespace SHMConnector {
 				strWriter.WriteLine("MAP=n/a");
 				strWriter.Write("TC="); strWriter.WriteLine(extended.mPhysics.mTractionControl);
 				strWriter.Write("ABS="); strWriter.WriteLine(extended.mPhysics.mAntiLockBrakes);
-				
+
 				strWriter.Write("FuelRemaining="); strWriter.WriteLine(playerTelemetry.mFuel);
 				strWriter.Write("TyreTemperature=");
 				strWriter.WriteLine(GetCelcius(playerTelemetry.mWheels[0].mTireCarcassTemperature) + "," +
-								    GetCelcius(playerTelemetry.mWheels[1].mTireCarcassTemperature) + "," +
-								    GetCelcius(playerTelemetry.mWheels[2].mTireCarcassTemperature) + "," +
-								    GetCelcius(playerTelemetry.mWheels[3].mTireCarcassTemperature));
+									GetCelcius(playerTelemetry.mWheels[1].mTireCarcassTemperature) + "," +
+									GetCelcius(playerTelemetry.mWheels[2].mTireCarcassTemperature) + "," +
+									GetCelcius(playerTelemetry.mWheels[3].mTireCarcassTemperature));
 				strWriter.Write("TyrePressure=");
 				strWriter.WriteLine(GetPsi(playerTelemetry.mWheels[0].mPressure) + "," +
-								    GetPsi(playerTelemetry.mWheels[1].mPressure) + "," +
-								    GetPsi(playerTelemetry.mWheels[2].mPressure) + "," +
-								    GetPsi(playerTelemetry.mWheels[3].mPressure));
+									GetPsi(playerTelemetry.mWheels[1].mPressure) + "," +
+									GetPsi(playerTelemetry.mWheels[2].mPressure) + "," +
+									GetPsi(playerTelemetry.mWheels[3].mPressure));
 				strWriter.Write("TyreWear=");
 				if (extended.mPhysics.mTireMult > 0)
 					strWriter.WriteLine((100 - Math.Round(playerTelemetry.mWheels[0].mWear * 100)) + "," +
-									    (100 - Math.Round(playerTelemetry.mWheels[1].mWear * 100)) + "," +
-									    (100 - Math.Round(playerTelemetry.mWheels[2].mWear * 100)) + "," +
-									    (100 - Math.Round(playerTelemetry.mWheels[3].mWear * 100)));
+										(100 - Math.Round(playerTelemetry.mWheels[1].mWear * 100)) + "," +
+										(100 - Math.Round(playerTelemetry.mWheels[2].mWear * 100)) + "," +
+										(100 - Math.Round(playerTelemetry.mWheels[3].mWear * 100)));
 				else
 					strWriter.WriteLine("0,0,0,0");
 				strWriter.Write("BrakeTemperature=");
 				strWriter.WriteLine(GetCelcius(playerTelemetry.mWheels[0].mBrakeTemp) + "," +
-								    GetCelcius(playerTelemetry.mWheels[1].mBrakeTemp) + "," +
-								    GetCelcius(playerTelemetry.mWheels[2].mBrakeTemp) + "," +
-								    GetCelcius(playerTelemetry.mWheels[3].mBrakeTemp));
+									GetCelcius(playerTelemetry.mWheels[1].mBrakeTemp) + "," +
+									GetCelcius(playerTelemetry.mWheels[2].mBrakeTemp) + "," +
+									GetCelcius(playerTelemetry.mWheels[3].mBrakeTemp));
 
 				string compound = GetStringFromBytes(playerTelemetry.mFrontTireCompoundName);
 
-                strWriter.Write("TyreCompoundRaw="); strWriter.WriteLine(compound);
-                strWriter.Write("TyreCompoundRawFront="); strWriter.WriteLine(compound);
+				strWriter.Write("TyreCompoundRaw="); strWriter.WriteLine(compound);
+				strWriter.Write("TyreCompoundRawFront="); strWriter.WriteLine(compound);
 
-                compound = GetStringFromBytes(playerTelemetry.mRearTireCompoundName);
-                strWriter.Write("TyreCompoundRawRear="); strWriter.WriteLine(compound);
+				compound = GetStringFromBytes(playerTelemetry.mRearTireCompoundName);
+				strWriter.Write("TyreCompoundRawRear="); strWriter.WriteLine(compound);
 
-                strWriter.Write("BodyworkDamage=0, 0, 0, 0, "); strWriter.WriteLine(extended.mTrackedDamages[playerTelemetry.mID].mAccumulatedImpactMagnitude / 1000);
+				strWriter.Write("BodyworkDamage=0, 0, 0, 0, "); strWriter.WriteLine(extended.mTrackedDamages[playerTelemetry.mID].mAccumulatedImpactMagnitude / 1000);
 				strWriter.WriteLine("SuspensionDamage=0, 0, 0, 0");
 				strWriter.WriteLine("EngineDamage=0");
 
 				if (playerTelemetry.mEngineWaterTemp > 0)
-                    strWriter.WriteLine("WaterTemperature=" + playerTelemetry.mEngineWaterTemp);
+					strWriter.WriteLine("WaterTemperature=" + playerTelemetry.mEngineWaterTemp);
 
-                if (playerTelemetry.mEngineOilTemp > 0)
-                    strWriter.WriteLine("OilTemperature=" + playerTelemetry.mEngineOilTemp);
-            }
+				if (playerTelemetry.mEngineOilTemp > 0)
+					strWriter.WriteLine("OilTemperature=" + playerTelemetry.mEngineOilTemp);
+			}
 
 			strWriter.WriteLine("[Track Data]");
 			if (connected)
 			{
-                strWriter.Write("Length="); strWriter.WriteLine(scoring.mScoringInfo.mLapDist);
-				
+				strWriter.Write("Length="); strWriter.WriteLine(scoring.mScoringInfo.mLapDist);
+
 				string grip = "Optimum";
 
 				if (scoring.mScoringInfo.mAvgPathWetness >= 0.7)
@@ -441,12 +502,12 @@ namespace SHMConnector {
 					grip = "Greasy";
 				else
 					grip = "Fast";
-				
-                strWriter.WriteLine("Grip=" + grip);
+
+				strWriter.WriteLine("Grip=" + grip);
 				strWriter.Write("Temperature="); strWriter.WriteLine(scoring.mScoringInfo.mTrackTemp);
 
 				for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)	{
-                    ref rF2VehicleScoring vehicle = ref scoring.mVehicles[i];
+					ref rF2VehicleScoring vehicle = ref scoring.mVehicles[i];
 
 					strWriter.WriteLine("Car." + (i + 1) + ".Position=" + vehicle.mPos.x + "," + (- vehicle.mPos.z));
 				}
@@ -475,14 +536,48 @@ namespace SHMConnector {
 			return strWriter.ToString();
 		}
 
-		private long Normalize(long value) {
-			return (value < 0) ? 0 : value;
+		private void BuildFuelCache()
+		{
+			LogToTempFile("Building fuel cache...");
 
+			if (!SelectPitstopCategory("FUEL:"))
+				return;
+
+			fuelLitersToChoiceIndex.Clear();
+			MoveToFirstPitChoice();
+
+			int numChoices = pitInfo.mPitMenu.mNumChoices;
+			for (int i = 0; i < numChoices; ++i)
+			{
+				int liters = GetFuel(GetStringFromBytes(pitInfo.mPitMenu.mChoiceString));
+				int idx = pitInfo.mPitMenu.mChoiceIndex;
+				if (!fuelLitersToChoiceIndex.ContainsKey(liters))
+					fuelLitersToChoiceIndex[liters] = idx;
+				SendPitstopCommand("+");
+				pitInfoBuffer.GetMappedData(ref pitInfo);
+			}
+
+			MoveToFirstPitChoice();
+			buildingCache = false;
+			
+			LogToTempFile("Fuel cache contents: " + string.Join(", ", fuelLitersToChoiceIndex.Select(kvp => $"{kvp.Key}:{kvp.Value}")));
+        }
+
+        private void MoveToFirstPitChoice()
+        {
+            if (pitInfo.mPitMenu.mChoiceIndex > 0)
+            {
+                SendPitstopCommand(new string('-', pitInfo.mPitMenu.mChoiceIndex));
+                pitInfoBuffer.GetMappedData(ref pitInfo);
+            }
+        }
+
+        private long Normalize(long value) {
+			return (value < 0) ? 0 : value;
 		}
 
 		private double Normalize(double value) {
 			return (value < 0) ? 0 : value;
-
 		}
 
         double VehicleSpeed(ref rF2VehicleScoring vehicle)
@@ -698,11 +793,19 @@ namespace SHMConnector {
 			if (!SelectPitstopCategory("FUEL:"))
 				return;
 
-			if (pitInfo.mPitMenu.mChoiceIndex > 0)
-			{
-				SendPitstopCommand(new string('-', pitInfo.mPitMenu.mChoiceIndex));
-				pitInfoBuffer.GetMappedData(ref pitInfo);
+			// Use cache if available
+			if (!buildingCache && fuelLitersToChoiceIndex.TryGetValue(targetFuel, out int cachedIndex)) {
+				int currentIndex = pitInfo.mPitMenu.mChoiceIndex;
+				int delta = cachedIndex - currentIndex;
+				if (delta != 0) {
+					string cmd = delta > 0 ? new string('+', delta) : new string('-', -delta);
+					SendPitstopCommand(cmd);
+					pitInfoBuffer.GetMappedData(ref pitInfo);
+				}
+				return;
 			}
+
+			MoveToFirstPitChoice();
 
 			int index = 0;
 			while (GetFuel(GetStringFromBytes(pitInfo.mPitMenu.mChoiceString)) < targetFuel && index++ < pitInfo.mPitMenu.mNumChoices)
@@ -1065,9 +1168,17 @@ namespace SHMConnector {
 
             strWriter.WriteLine("[Setup Data]");
 
+			// Wait for fuel cache building to finish
+			// We need this to get consistent data here
+			if (buildCacheTask != null && !buildCacheTask.IsCompleted)
+			{
+				buildCacheTask.Wait();
+			}
+
 			if (connected)
 			{
-				if (SelectPitstopCategory("FUEL:")) {
+				if (SelectPitstopCategory("FUEL:"))
+				{
 					strWriter.Write("FuelAmount=");
 					strWriter.WriteLine(GetFuel(GetStringFromBytes(pitInfo.mPitMenu.mChoiceString)));
 				}
@@ -1076,17 +1187,19 @@ namespace SHMConnector {
 				{
 					string compound = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
 
-					if (compound != "No Change") {
+					if (compound != "No Change")
+					{
 						strWriter.WriteLine("TyreCompoundRaw=" + compound);
 						strWriter.WriteLine("TyreCompoundRawFront=" + compound);
 					}
-					else {
+					else
+					{
 						strWriter.WriteLine("TyreCompoundRaw=false");
 						strWriter.WriteLine("TyreCompoundRawFront=false");
 					}
 				}
 
-                if (SelectPitstopCategory("R TIRES:") || SelectPitstopCategory("RL TIRE:"))
+				if (SelectPitstopCategory("R TIRES:") || SelectPitstopCategory("RL TIRE:"))
 				{
 					string compound = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
 

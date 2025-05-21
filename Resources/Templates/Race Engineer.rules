@@ -991,8 +991,35 @@ planPitstop() <= Set(Pitstop.Planned.Nr, 1)
 	  {None: [?Pitstop.Planned.Tyre.Pressure.Lost.RR]}} => (Set: Pitstop.Planned.Tyre.Pressure.Lost.RR, ?Tyre.Pressure.Loss.RR)
 {All: [?Pitstop.Plan], [?Tyre.Compound.Target],	{None: [?Pitstop.Planned.Tyre.Compound], [?Pitstop.Planned.Tyre.Compound = false]}} =>
 		(Set: Pitstop.Planned.Tyre.Compound, ?Tyre.Compound.Target), (Set: Pitstop.Planned.Tyre.Compound.Color, !Tyre.Compound.Color.Target)
+		
+{All: [?Pitstop.Plan], [?Tyre.Compound.Target.Front],
+	  {None: [?Pitstop.Planned.Tyre.Compound.Front], [?Pitstop.Planned.Tyre.Compound.Front = false]}} =>
+		(Set: Pitstop.Planned.Tyre.Compound.Front, ?Tyre.Compound.Target.Front),
+		(Set: Pitstop.Planned.Tyre.Compound.Color.Front, !Tyre.Compound.Color.Target.Front)
+{All: [?Pitstop.Plan], [?Tyre.Compound.Target.Rear],
+	  {None: [?Pitstop.Planned.Tyre.Compound.Rear], [?Pitstop.Planned.Tyre.Compound.Rear = false]}} =>
+		(Set: Pitstop.Planned.Tyre.Compound.Rear, ?Tyre.Compound.Target.Rear),
+		(Set: Pitstop.Planned.Tyre.Compound.Color.Rear, !Tyre.Compound.Color.Target.Rear)
+{All: [?Pitstop.Plan], [?Tyre.Compound.Target.FrontLeft],
+	  {None: [?Pitstop.Planned.Tyre.Compound.FrontLeft], [?Pitstop.Planned.Tyre.Compound.FrontLeft = false]}} =>
+		(Set: Pitstop.Planned.Tyre.Compound.FrontLeft, ?Tyre.Compound.Target.FrontLeft),
+		(Set: Pitstop.Planned.Tyre.Compound.Color.FrontLeft, !Tyre.Compound.Color.Target.FrontLeft)
+{All: [?Pitstop.Plan], [?Tyre.Compound.Target.FrontRight],
+	  {None: [?Pitstop.Planned.Tyre.Compound.FrontRight], [?Pitstop.Planned.Tyre.Compound.FrontRight = false]}} =>
+		(Set: Pitstop.Planned.Tyre.Compound.FrontRight, ?Tyre.Compound.Target.FrontRight),
+		(Set: Pitstop.Planned.Tyre.Compound.Color.FrontRight, !Tyre.Compound.Color.Target.FrontRight)
+{All: [?Pitstop.Plan], [?Tyre.Compound.Target.RearLeft],
+	  {None: [?Pitstop.Planned.Tyre.Compound.RearLeft], [?Pitstop.Planned.Tyre.Compound.RearLeft = false]}} =>
+		(Set: Pitstop.Planned.Tyre.Compound.RearLeft, ?Tyre.Compound.Target.RearLeft),
+		(Set: Pitstop.Planned.Tyre.Compound.Color.RearLeft, !Tyre.Compound.Color.Target.RearLeft)
+{All: [?Pitstop.Plan], [?Tyre.Compound.Target.RearRight],
+	  {None: [?Pitstop.Planned.Tyre.Compound.RearRight], [?Pitstop.Planned.Tyre.Compound.RearRight = false]}} =>
+		(Set: Pitstop.Planned.Tyre.Compound.RearRight, ?Tyre.Compound.Target.RearRight),
+		(Set: Pitstop.Planned.Tyre.Compound.Color.RearRight, !Tyre.Compound.Color.Target.RearRight)
+		
 {All: [?Pitstop.Plan], [?Tyre.Set.Target], {None: [?Pitstop.Planned.Tyre.Set], [?Pitstop.Planned.Tyre.Compound = false]}} =>
 		(Set: Pitstop.Planned.Tyre.Set, ?Tyre.Set.Target)
+
 {All: [?Pitstop.Plan], [?Tyre.Pressure.Target.FL], {None: [?Pitstop.Planned.Tyre.Pressure.FL],
 		{Any: [?Pitstop.Planned.Tyre.Compound = false], [?Pitstop.Planned.Tyre.Compound.Front = false],
 			  [?Pitstop.Planned.Tyre.Compound.FrontLeft = false]}}} =>

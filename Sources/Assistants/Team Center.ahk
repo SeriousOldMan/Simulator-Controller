@@ -2800,7 +2800,8 @@ class TeamCenter extends ConfigurationItem {
 
 				if !silent {
 					OnMessage(0x44, translateOkButton)
-					withBlockedWindows(MsgBox, (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
+					withBlockedWindows(MsgBox, (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ")
+											  . (isObject(exception) ? exception.Message : exception)), translate("Error"), 262160)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 

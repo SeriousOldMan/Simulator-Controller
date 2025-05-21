@@ -380,45 +380,50 @@ readSetting(database, simulator, owner, user, community, car, track, weather
 	local success := false
 	local rows, ignore, row, settingsDB
 
-	if user {
-		settingsDB := database.getSettingsDatabase(simulator, "User")
+	try {
+		if user {
+			settingsDB := database.getSettingsDatabase(simulator, "User")
 
-		while (tries-- > 0) {
-			if settingsDB.lock("Settings", false)
-				try {
-					rows := settingsDB.query("Settings", {Where: {Car: car, Track: track
-																, Weather: weather
-																, Section: section, Key: key
-																, Owner: owner}})
+			while (tries-- > 0) {
+				if settingsDB.lock("Settings", false)
+					try {
+						rows := settingsDB.query("Settings", {Where: {Car: car, Track: track
+																	, Weather: weather
+																	, Section: section, Key: key
+																	, Owner: owner}})
 
-					success := true
+						success := true
 
-					if (rows.Length > 0)
-						return rows[1]["Value"]
-					else
-						break
-				}
-				catch Any as exception {
-					logError(exception)
-				}
-				finally {
-					settingsDB.unlock("Settings")
-				}
+						if (rows.Length > 0)
+							return rows[1]["Value"]
+						else
+							break
+					}
+					catch Any as exception {
+						logError(exception)
+					}
+					finally {
+						settingsDB.unlock("Settings")
+					}
 
-			Sleep(200)
+				Sleep(200)
+			}
+
+			if (!success && isDevelopment())
+				logMessage(kLogWarn, "Waiting for file `"Settings.CSV`"...")
 		}
 
-		if (!success && isDevelopment())
-			logMessage(kLogWarn, "Waiting for file `"Settings.CSV`"...")
+		if community
+			for ignore, row in database.getSettingsDatabase(simulator, "Community").query("Settings"
+																						, {Where: {Car: car, Track: track
+																								 , Weather: weather
+																								 , Section: section, Key: key}})
+				if (row["Owner"] != owner)
+					return rows[1]["Value"]
 	}
-
-	if community
-		for ignore, row in database.getSettingsDatabase(simulator, "Community").query("Settings"
-																					, {Where: {Car: car, Track: track
-																							 , Weather: weather
-																							 , Section: section, Key: key}})
-			if (row["Owner"] != owner)
-				return rows[1]["Value"]
+	catch Any as exception {
+		logError(exception, true)
+	}
 
 	return default
 }

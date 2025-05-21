@@ -647,10 +647,12 @@ class RaceEngineer extends RaceAssistant {
 		local celsius := " Celsius"
 		local percent := " %"
 		local seconds := " Seconds"
-		local lapNumber, tyres, brakes, tyreCompound, tyreType, setupPressures, ignore, tyreType, goal, resultSet
+		local lapNumber, tyres, brakes, tyreCompound, tyreType, setupPressures, idealPressures, ignore, tyreType, goal, resultSet
 		local bodyworkDamage, suspensionDamage, engineDamage, bodyworkDamageSum, suspensionDamageSum, pitstop, pitstops, lap, lapNr
 		local tyres, brakes, postfix, tyre, brake, tyreTemperatures, tyrePressures, tyreWear, brakeTemperatures, brakeWear
 		local fuelService, tyreService, repairService, tyreSet
+
+		static wheels := ["FL", "FR", "RL", "RR"]
 
 		getPitstopForecast() {
 			local pitstop := Map("Status", "Forecast")
@@ -978,31 +980,89 @@ class RaceEngineer extends RaceAssistant {
 				try {
 					tyres := knowledge["Tyres"]
 
-					tyreCompound := compound(tyres["Compound"])
+					if tyres.Has("Compound") {
+						tyreCompound := compound(tyres["Compound"])
 
-					setupPressures := []
+						setupPressures := []
 
-					for ignore, tyreType in ["FL", "FR", "RL", "RR"] {
-						goal := RuleCompiler().compileGoal("lastPressure(" . tyreCompound . ", " . tyreType . ", ?pressure)")
-						resultSet := knowledgeBase.prove(goal)
+						for ignore, tyreType in ["FL", "FR", "RL", "RR"] {
+							goal := RuleCompiler().compileGoal("lastPressure(" . tyreCompound . ", " . tyreType . ", ?pressure)")
+							resultSet := knowledgeBase.prove(goal)
 
-						setupPressures.Push(resultSet ? Round(resultSet.getValue(goal.Arguments[3]).toString(), 1) : 0)
+							setupPressures.Push(resultSet ? Round(resultSet.getValue(goal.Arguments[3]).toString(), 1) : 0)
+						}
+
+						if (tyreCompound = "Intermediate")
+							tyreCompound := "Wet"
+
+						tyres["Pressures"]
+							:= Map("Current", Map("FrontLeft", (Round(this.CurrentTyrePressures[1], 1) . psi)
+												, "FrontRight", (Round(this.CurrentTyrePressures[2], 1) . psi)
+												, "RearLeft", (Round(this.CurrentTyrePressures[3], 1) . psi)
+												, "RearRight", (Round(this.CurrentTyrePressures[4], 1) . psi))
+								 , "Ideal", Map("FrontLeft", (knowledgeBase.getValue("Session.Settings.Tyre." . tyreCompound . ".Pressure.Target.FL", 0) . psi)
+											  , "FrontRight", (knowledgeBase.getValue("Session.Settings.Tyre." . tyreCompound . ".Pressure.Target.FR", 0) . psi)
+											  , "RearLeft", (knowledgeBase.getValue("Session.Settings.Tyre." . tyreCompound . ".Pressure.Target.RL", 0) . psi)
+											  , "RearRight", (knowledgeBase.getValue("Session.Settings.Tyre." . tyreCompound . ".Pressure.Target.RR", 0) . psi))
+								 , "Setup", Map("FrontLeft", (setupPressures[1] . psi), "FrontRight", (setupPressures[2] . psi)
+											  , "RearLeft", (setupPressures[3] . psi), "RearRight", (setupPressures[4] . psi)))
 					}
+					else if tyres.Has("CompoundFrontLeft") {
+						setupPressures := Map()
+						idealPressures := Map()
 
-					if (tyreCompound = "Intermediate")
-						tyreCompound := "Wet"
+						for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
+							tyreCompound := compound(tyres["Compound"])
 
-					tyres["Pressures"]
-						:= Map("Current", Map("FrontLeft", (Round(this.CurrentTyrePressures[1], 1) . psi)
-											, "FrontRight", (Round(this.CurrentTyrePressures[2], 1) . psi)
-											, "RearLeft", (Round(this.CurrentTyrePressures[3], 1) . psi)
-											, "RearRight", (Round(this.CurrentTyrePressures[4], 1) . psi))
-							 , "Ideal", Map("FrontLeft", (knowledgeBase.getValue("Session.Settings.Tyre." . tyreCompound . ".Pressure.Target.FL", 0) . psi)
-										  , "FrontRight", (knowledgeBase.getValue("Session.Settings.Tyre." . tyreCompound . ".Pressure.Target.FR", 0) . psi)
-										  , "RearLeft", (knowledgeBase.getValue("Session.Settings.Tyre." . tyreCompound . ".Pressure.Target.RL", 0) . psi)
-										  , "RearRight", (knowledgeBase.getValue("Session.Settings.Tyre." . tyreCompound . ".Pressure.Target.RR", 0) . psi))
-							 , "Setup", Map("FrontLeft", (setupPressures[1] . psi), "FrontRight", (setupPressures[2] . psi)
-										  , "RearLeft", (setupPressures[3] . psi), "RearRight", (setupPressures[4] . psi)))
+							goal := RuleCompiler().compileGoal("lastPressure(" . tyreCompound . ", " . wheels[index] . ", ?pressure)")
+							resultSet := knowledgeBase.prove(goal)
+
+							setupPressures[tyre] := ((resultSet ? Round(resultSet.getValue(goal.Arguments[3]).toString(), 1) : 0) . psi)
+
+							if (tyreCompound = "Intermediate")
+								tyreCompound := "Wet"
+
+							idealPressures[tyre] := (knowledgeBase.getValue("Session.Settings.Tyre." . tyreCompound . ".Pressure.Target." . wheels[index], 0) . psi)
+						}
+
+						tyres["Pressures"] := Map("Current", Map("FrontLeft", (Round(this.CurrentTyrePressures[1], 1) . psi)
+															   , "FrontRight", (Round(this.CurrentTyrePressures[2], 1) . psi)
+															   , "RearLeft", (Round(this.CurrentTyrePressures[3], 1) . psi)
+															   , "RearRight", (Round(this.CurrentTyrePressures[4], 1) . psi))
+												, "Ideal", idealPressures
+												, "Setup", setupPressures)
+					}
+					else if tyres.Has("CompoundFront") {
+						setupPressures := Map()
+						idealPressures := Map()
+
+						for index, axle in ["Front", "Rear"] {
+							tyreCompound := compound(tyres["Compound"])
+
+							goal := RuleCompiler().compileGoal("lastPressure(" . tyreCompound . ", " . wheels[index + (index - 1)] . ", ?pressure)")
+							resultSet := knowledgeBase.prove(goal)
+
+							setupPressures[axle . "Left"] := ((resultSet ? Round(resultSet.getValue(goal.Arguments[3]).toString(), 1) : 0) . psi)
+
+							goal := RuleCompiler().compileGoal("lastPressure(" . tyreCompound . ", " . wheels[index + (index - 1) + 1] . ", ?pressure)")
+							resultSet := knowledgeBase.prove(goal)
+
+							setupPressures[axle . "Right"] := ((resultSet ? Round(resultSet.getValue(goal.Arguments[3]).toString(), 1) : 0) . psi)
+
+							if (tyreCompound = "Intermediate")
+								tyreCompound := "Wet"
+
+							idealPressures[axle . "Left"] := (knowledgeBase.getValue("Session.Settings.Tyre." . tyreCompound . ".Pressure.Target." . wheels[index + (index - 1)], 0) . psi)
+							idealPressures[axle . "Right"] := (knowledgeBase.getValue("Session.Settings.Tyre." . tyreCompound . ".Pressure.Target." . wheels[index + (index - 1) + 1], 0) . psi)
+						}
+
+						tyres["Pressures"] := Map("Current", Map("FrontLeft", (Round(this.CurrentTyrePressures[1], 1) . psi)
+															   , "FrontRight", (Round(this.CurrentTyrePressures[2], 1) . psi)
+															   , "RearLeft", (Round(this.CurrentTyrePressures[3], 1) . psi)
+															   , "RearRight", (Round(this.CurrentTyrePressures[4], 1) . psi))
+												, "Ideal", idealPressures
+												, "Setup", setupPressures)
+					}
 
 					if (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Wear.FL", kUndefined) != kUndefined)
 						tyres["Wear"] := Map("FrontLeft", (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Wear.FL", 0) . percent)

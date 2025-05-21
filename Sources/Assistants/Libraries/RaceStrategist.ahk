@@ -1115,7 +1115,7 @@ class RaceStrategist extends GridRaceAssistant {
 					tyreSets := knowledge["Session"]["AvailableTyres"]
 
 					for ignore, tyreCompound in SessionDatabase.getTyreCompounds(this.Simulator, this.Car, this.Track) {
-						tyreSet := first(tyreSets, (ts) => (ts.Compound = tyreCompound))
+						tyreSet := first(tyreSets, (ts) => (ts["Compound"] = tyreCompound))
 
 						if (tyreSet && availableTyreSets.Has(tyreCompound))
 							if (availableTyreSets[tyreCompound][2].Length > 0)

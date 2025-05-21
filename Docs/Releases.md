@@ -31,6 +31,7 @@
 
 #### Fixes
 
+  - Fixed a critical bug for the Race Strategist and the Race Engineer, that prevented the internal knowledge to be passed to the LLM, which prevented the LLM to answer any questions about the current session. Bug was introduced with the last release.
   - Fixed pitstop refueling for *rFactor 2* in case of non-linear fuel settings.
   - Fixed off by one error in the target lap of strategy controlled pitstops.
   - Fixed loading of lap-based strategies.

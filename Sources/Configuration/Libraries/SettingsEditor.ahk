@@ -250,7 +250,7 @@ editSettings(&settingsOrCommand, owner := false, withContinue := false, fromSetu
 	static result
 	static restart
 	static newSettings
-	static origSettings
+	static origSettings := newMultiMap()
 
 	static settingsEditorGui
 	static voiceRecognition

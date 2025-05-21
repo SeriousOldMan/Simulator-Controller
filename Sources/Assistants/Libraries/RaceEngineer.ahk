@@ -2042,7 +2042,7 @@ class RaceEngineer extends RaceAssistant {
 				}
 			}
 
-			value := getMultiMapValue(data, "Setup Data", "RepairSupension", kUndefined)
+			value := getMultiMapValue(data, "Setup Data", "RepairSuspension", kUndefined)
 
 			if ((value != kUndefined) && (knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension") != value)) {
 				this.pitstopOptionChanged("Repair Suspension", verbose, value)

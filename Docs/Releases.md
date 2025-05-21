@@ -45,6 +45,8 @@
   - Individual tyre service can be selected during the pitstop preparation in "Team Center". See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#planning-a-pitstop) for more information.
   - The Engineer does not issue multiple pressure loss warnings for the same tyre anymore.
   - Pressure loss information has been added to the session info widgets in "System Monitor".
+  - The News reader window can now be resized and will remember its last position.
+  - News can be marked as read and will not show again then.
   - [Important] A new version of the local LLM Runtime is available. If you are using the local runtime, please follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-633).
   - [Developer] NuGet packages are now updated automatically in the build pipeline.
   - [Developer] Pressure loss information has been added to the "Session State.json" file.

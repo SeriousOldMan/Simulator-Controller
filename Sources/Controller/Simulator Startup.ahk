@@ -535,7 +535,7 @@ viewNews(fileName, title := false, readCallback := false) {
 	static callback := false
 
 	if !title
-		title := translate("News and Updates")
+		title := translate("News, tips and tricks")
 
 	if readCallback
 		callback := readCallback
@@ -607,6 +607,7 @@ viewNews(fileName, title := false, readCallback := false) {
 }
 
 checkForNews() {
+	local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 	local check := !FileExist(kUserConfigDirectory . "NEWS")
 	local lastModified, ignore, url
 
@@ -628,7 +629,7 @@ checkForNews() {
 				check := false
 
 				for ignore, url in ["https://fileshare.impresion3d.pro/filebrowser/api/public/dl/r0q9-d-3"
-								  , "http://" . StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1] . ":800/api/public/dl/jipSYNLz"
+								  , "http://" . MASTER . ":800/api/public/dl/jipSYNLz"
 								  , "https://www.dropbox.com/scl/fi/s5ewrqo9lzwcv6omvx667/NEWS?rlkey=j3t7aopmdye4efc8uc3xlekxz&st=wbuipual&dl=1"] {
 					try
 						Download(url, kTempDirectory . "NEWS.ini")
@@ -708,7 +709,7 @@ checkForNews() {
 
 				for ignore, url in string2Values(";", newsUrls)
 					try {
-						Download(url, A_Temp . "\News.zip")
+						Download(substituteVariables(url, {master: MASTER}), A_Temp . "\News.zip")
 
 						try {
 							if InStr(FileExist(kTempDirectory . "News"), "F")

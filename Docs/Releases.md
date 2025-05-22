@@ -1,5 +1,41 @@
 # Latest stable release
 
+## 6.3.3.0
+
+#### Date: 05/23/25
+
+#### Fixes
+
+  - Fixed a critical bug for the Race Strategist and the Race Engineer, that prevented the internal knowledge to be passed to the LLM, which prevented the LLM to answer any questions about the current session. Bug was introduced with the last release.
+  - Fixed pitstop refueling for *rFactor 2* in case of non-linear fuel settings.
+  - Fixed off by one error in the target lap of strategy controlled pitstops.
+  - Fixed loading of lap-based strategies.
+  - Fixed several bugs for axle-based tyre compound handling (used in *rFactor 2* and *RaceRoom Racing Experience*), which prevented session data to be shown in the "System Monitor".
+  - Fixed the issue analyzer of "Setup Workbench" for *rFactor 2* and *Le Mans Ultimate*. Previously, only oversteer events had been reported. Detecting oversteer events, especially when counter-steering, is still not very reliable, but this is due to invalid angular velocity data in the API.
+  - Fixed "Initialize from Session" command for pitstops in the "Team Center" (had been broken with the last release).
+  - Added missing reset of session state variables when a session is cleared in the "Team Center".
+  - Fixed a bug in the News system that caused articles to be shown too often.
+
+#### Changes
+
+  - Individual tyre service can be selected during the pitstop preparation in "Team Center". See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#planning-a-pitstop) for more information.
+  - The Engineer does not issue multiple pressure loss warnings for the same tyre anymore.
+  - Pressure loss information has been added to the session info widgets in "System Monitor".
+  - The News reader window can now be resized and will remember its last position.
+  - News can be marked as read and will not show again then.
+  - [Important] A new version of the local LLM Runtime is available. If you are using the local runtime, please follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-633).
+  - [Developer] NuGet packages are now updated automatically in the build pipeline.
+  - [Developer] Pressure loss information has been added to the "Session State.json" file.
+  - [Internal] Updated to newer versions of several imported packages for the internal apps and DLLs.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-633), if you are using the local LLM Runtime.
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.3.2.0
 
 #### Date: 05/16/25
@@ -22,35 +58,6 @@
   - Information about available tyre sets is now passed by the Strategist to the LLM, if a strategy is active for the current race.
   - This release introduces initial functionality which supports the handling of individual tyre compounds and tyre changes for individual wheels, if supported by the current simulator, of course. See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#handling-of-tyre-compounds-on-inidividual-wheels) for more information.
   - [Internal] Migrated to AHK 2.1-alpha.18.
-
-# Upcoming release
-
-## 6.3.3.0
-
-#### Date: 05/23/25 (planned)
-
-#### Fixes
-
-  - Fixed pitstop refueling for *rFactor 2* in case of non-linear fuel settings.
-  - Fixed off by one error in the target lap of strategy controlled pitstops.
-  - Fixed loading of lap-based strategies.
-  - Fixed several bugs for axle-based tyre compound handling (used in *rFactor 2* and *RaceRoom Racing Experience*), which prevented session data to be shown in the "System Monitor".
-  - Fixed the issue analyzer of "Setup Workbench" for *rFactor 2* and *Le Mans Ultimate*. Previously, only oversteer events had been reported. Detecting oversteer events, especially when counter-steering, is still not very reliable, but this is due to invalid angular velocity data in the API.
-  - Fixed "Initialize from Session" command for pitstops in the "Team Center" (had been broken with the last release).
-  - Added missing reset of session state variables when a session is cleared in the "Team Center".
-  - Fixed a bug in the NEWS system that caused articles to be shown too often.
-
-#### Changes
-
-  - Individual tyre service can be selected during the pitstop preparation in "Team Center". See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#planning-a-pitstop) for more information.
-  - The Engineer does not issue multiple pressure loss warnings for the same tyre anymore.
-  - Pressure loss information has been added to the session info widgets in "System Monitor".
-  - [Important] A new version of the local LLM Runtime is available. If you are using the local runtime, please follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-633).
-  - [Developer] NuGet packages are now updated automatically in the build pipeline.
-  - [Developer] Pressure loss information has been added to the "Session State.json" file.
-  - [Internal] Updated to newer versions of several imported packages for the internal apps and DLLs.
-
-# Release history
 
 ## 6.3.1.0
 

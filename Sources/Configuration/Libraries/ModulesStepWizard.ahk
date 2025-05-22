@@ -284,6 +284,8 @@ class FilesPreset extends NamedPreset {
 
 		for ignore, file in this.Files
 			try {
+				DirCreate(directory)
+
 				FileCopy(file, directory, 1)
 			}
 			catch Any as exception {
@@ -1003,6 +1005,9 @@ class AssettoCorsaCarMetas extends DownloadablePreset {
 		setMultiMapValue(tyreData, "Cars", carCode . ";*", getMultiMapValue(this.Definition, car, "Tyres"))
 
 		writeMultiMap(kUserHomeDirectory . "Simulator Data\AC\Tyre Data.ini", tyreData)
+
+		DirCreate(kUserHomeDirectory . "Garage\Definitions\Cars")
+		DirCreate(kUserHomeDirectory . "Garage\Rules\Cars")
 
 		FileCopy(A_Temp . "\Simulator Controller DLC\" . getMultiMapValue(this.Definition, car, "Definition")
 			   , kUserHomeDirectory . "Garage\Definitions\Cars", 1)

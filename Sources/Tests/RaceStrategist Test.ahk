@@ -27,6 +27,7 @@ global kBuildConfiguration := "Production"
 #Include "..\Framework\Startup.ahk"
 #Include "..\Framework\Extensions\Task.ahk"
 #Include "..\Framework\Extensions\RuleEngine.ahk"
+#Include "..\Plugins\Libraries\SimulatorProvider.ahk"
 #Include "..\Assistants\Libraries\RaceStrategist.ahk"
 #Include "AHKUnit\AHKUnit.ahk"
 
@@ -34,6 +35,29 @@ global kBuildConfiguration := "Production"
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Private Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+class UnknownProvider extends SimulatorProvider {
+	Simulator {
+		Get {
+			return "Unknown"
+		}
+	}
+
+	supportsPitstop(&refuelService?, &tyreService?, &repairService?) {
+		refuelService := true
+		tyreService := "All"
+		repairService := ["Bodywork", "Suspension", "Engine"]
+
+		return true
+	}
+
+	supportsTyreManagement(&mixedCompounds?, &tyreSets?) {
+		mixedCompounds := "All"
+		tyreSets := true
+
+		return true
+	}
+}
 
 class TestRaceStrategist extends RaceStrategist {
 	__New(configuration, settings, remoteHandler := false, name := false, language := kUndefined

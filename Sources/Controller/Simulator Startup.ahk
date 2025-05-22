@@ -104,6 +104,58 @@ class TeamManagerWindow extends Window {
 	}
 }
 
+class NewsWindow extends Window {
+	Close(*) {
+		viewNews(false)
+	}
+}
+
+class NewsResizer extends Window.Resizer {
+	iHTMLViewer := false
+	iRedraw := true
+	iHTML := false
+
+	__New(htmlViewer, html, arguments*) {
+		this.iHTMLViewer := htmlViewer
+		this.iHTML := html
+
+		super.__New(arguments*)
+
+		Task.startTask(ObjBindMethod(this, "RedrawHTMLViewer"), 500, kHighPriority)
+	}
+
+	Resize(deltaWidth, deltaHeight) {
+		this.iRedraw := true
+	}
+
+	RedrawHTMLViewer() {
+		if this.iRedraw
+			try {
+				local ignore, button
+
+				for ignore, button in ["LButton", "MButton", "RButton"]
+					if GetKeyState(button)
+						return Task.CurrentTask
+
+				this.iRedraw := false
+
+				this.iHTMLViewer.Resized()
+
+				this.iHTMLViewer.document.open()
+				this.iHTMLViewer.document.write(this.iHTML)
+				this.iHTMLViewer.document.close()
+			}
+			catch Any as exception {
+				logError(exception)
+			}
+			finally {
+				this.iRedraw := false
+			}
+
+		return Task.CurrentTask
+	}
+}
+
 class SimulatorStartup extends ConfigurationItem {
 	static Instance := false
 
@@ -475,87 +527,79 @@ class SimulatorStartup extends ConfigurationItem {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-viewNews(fileName, title := false, x := kUndefined, y := kUndefined, width := 800, height := 400, *) {
+viewNews(fileName, title := false, readCallback := false) {
 	local curWorkingDir := A_WorkingDir
-	local html, innerWidth, editHeight, buttonX
-	local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom, directory
+	local html, innerWidth, editHeight, buttonX, x, y, w, h, directory, newsViewer
 
-	static htmlGui
-	static htmlViewer
+	static newsGui := false
+	static callback := false
 
 	if !title
-		title := translate("News and Updates")
+		title := translate("News, tips and tricks")
+
+	if readCallback
+		callback := readCallback
 
 	if !fileName {
-		htmlGui.Destroy()
+		if newsGui {
+			if callback
+				callback.Call(!newsGui["readCheck"].Value)
+
+			callback := false
+
+			newsGui.Destroy()
+
+			newsGui := false
+		}
 
 		return
 	}
+	else if newsGui
+		throw "Multiple active news viewer not supported in viewNews..."
 
 	SplitPath(fileName, , &directory)
 
 	SetWorkingDir(directory)
 
 	try {
-		; html := FileRead(fileName)
+		innerWidth := (800 - 16)
+		editHeight := (400 - 102)
 
-		innerWidth := width - 16
+		newsGui := NewsWindow({Descriptor: "News Reader", Moveable: true, Resizeable: true, Options: "0x400000"}, title)
 
-		htmlGui := Window({Descriptor: "HTML Viewer", Options: "0x400000"}, translate("News and Updates"))
+		newsGui.SetFont("s10 Bold")
 
-		htmlGui.SetFont("s10 Bold")
+		newsGui.Add("Text", "x8 y8 W" . innerWidth . " +0x200 +0x1 H:Center BackgroundTrans", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(newsGui, "News Reader"))
 
-		htmlGui.Add("Text", "x8 y8 W" . innerWidth . " +0x200 +0x1 BackgroundTrans", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(htmlGui, "HTML Viewer"))
+		newsGui.SetFont()
 
-		htmlGui.SetFont()
+		newsGui.Add("Text", "x8 yp+26 W" . innerWidth . " +0x200 +0x1 H:Center BackgroundTrans", title)
 
-		htmlGui.Add("Text", "x8 yp+26 W" . innerWidth . " +0x200 +0x1 BackgroundTrans", title)
+		newsGui.Add("Text", "x8 yp+26 w" . innerWidth . " 0x10 W:Grow")
 
-		htmlGui.Add("Text", "x8 yp+26 w" . innerWidth . " 0x10")
+		newsViewer := newsGui.Add("WebView2Viewer", "X8 YP+10 W:Grow H:Grow W" . innerWidth . " H" . editHeight)
 
-		editHeight := height - 102
+		newsViewer.document.open()
+		newsViewer.document.write(fileName)
+		newsViewer.document.close()
 
-		htmlViewer := htmlGui.Add("WebView2Viewer", "X8 YP+10 W" . innerWidth . " H" . editHeight)
+		newsGui.Add(NewsResizer(newsViewer, fileName, newsGui))
 
-		htmlViewer.document.open()
-		htmlViewer.document.write(fileName)
-		htmlViewer.document.close()
+		buttonX := Round(800 / 2) - 40
 
-		MonitorGetWorkArea(, &mainScreenLeft, &mainScreenTop, &mainScreenRight, &mainScreenBottom)
+		newsGui.Add("Text", "x8 yp+" . (editHeight + 10) . " Y:Move W:Grow w" . innerWidth . " 0x10")
 
-		if !getWindowPosition("HTML Viewer", &x, &y) {
-			x := kUndefined
-			y := kUndefined
-		}
+		newsGui.Add("CheckBox", "x16 yp+10 w150 h21 Y:Move vreadCheck", translate("Do not show again"))
 
-		if (x = kUndefined)
-			switch x, false {
-				case "Left":
-					x := 25
-				case "Right":
-					x := mainScreenRight - width - 25
-				default:
-					x := "Center"
-			}
+		newsGui.Add("Button", "Default X" . buttonX . " yp w80 Y:Move X:Move(0.5)", translate("Close")).OnEvent("Click", (*) => viewNews(false))
 
-		if (y = kUndefined)
-			switch y, false {
-				case "Top":
-					y := 25
-				case "Bottom":
-					y := mainScreenBottom - height - 25
-				default:
-					y := "Center"
-			}
+		if getWindowPosition("News Reader", &x, &y)
+			newsGui.Show("AutoSize x" . x . " y" . y . " w800")
+		else
+			newsGui.Show("AutoSize Center")
 
-		buttonX := Round(width / 2) - 40
-
-		htmlGui.Add("Text", "x8 yp+" . (editHeight + 10) . " w" . innerWidth . " 0x10")
-
-		htmlGui.Add("Button", "Default X" . buttonX . " y+10 w80", translate("Close")).OnEvent("Click", viewNews.Bind(false))
-
-		htmlGui.Opt("+AlwaysOnTop")
-		htmlGui.Show("X" . x . " Y" . y . " W" . width . " NoActivate")
+		if getWindowSize("News Reader", &w, &h)
+			newsGui.Resize("Initialize", w, h)
 	}
 	finally {
 		SetWorkingDir(curWorkingDir)
@@ -563,6 +607,7 @@ viewNews(fileName, title := false, x := kUndefined, y := kUndefined, width := 80
 }
 
 checkForNews() {
+	local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 	local check := !FileExist(kUserConfigDirectory . "NEWS")
 	local lastModified, ignore, url
 
@@ -584,7 +629,7 @@ checkForNews() {
 				check := false
 
 				for ignore, url in ["https://fileshare.impresion3d.pro/filebrowser/api/public/dl/r0q9-d-3"
-								  , "http://" . StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1] . ":800/api/public/dl/jipSYNLz"
+								  , "http://" . MASTER . ":800/api/public/dl/jipSYNLz"
 								  , "https://www.dropbox.com/scl/fi/s5ewrqo9lzwcv6omvx667/NEWS?rlkey=j3t7aopmdye4efc8uc3xlekxz&st=wbuipual&dl=1"] {
 					try
 						Download(url, kTempDirectory . "NEWS.ini")
@@ -664,7 +709,7 @@ checkForNews() {
 
 				for ignore, url in string2Values(";", newsUrls)
 					try {
-						Download(url, A_Temp . "\News.zip")
+						Download(substituteVariables(url, {master: MASTER}), A_Temp . "\News.zip")
 
 						try {
 							if InStr(FileExist(kTempDirectory . "News"), "F")
@@ -679,11 +724,11 @@ checkForNews() {
 						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\News.zip' -DestinationPath '" . kTempDirectory . "News' -Force", , "Hide")
 
 						if FileExist(kTempDirectory . "News\News.htm") {
-							viewNews(kTempDirectory . "News\News.htm")
+							viewNews(kTempDirectory . "News\News.htm", false, (showAgain) {
+								setMultiMapValue(news, "News", newsNr, showAgain ? A_Now : DateAdd(A_Now, 99999, "Days"))
 
-							setMultiMapValue(news, "News", newsNr, A_Now)
-
-							writeMultiMap(kUserConfigDirectory . "NEWS", news)
+								writeMultiMap(kUserConfigDirectory . "NEWS", news)
+							})
 
 							break
 						}

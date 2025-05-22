@@ -3948,9 +3948,9 @@ class RaceStrategist extends GridRaceAssistant {
 			DirCreate(kTempDirectory . "Race Strategist\Strategy")
 
 			FileAppend("Lap: " . (plannedLap ? plannedLap : "?") . "`n"
-					 . "Refuel: " . ((refuel != kUndefined) ? refuel : "?") . "`n"
-					 . "Tyre Change: " . ((tyreChange != kUndefined) ? (tyreChange ? "Yes" : "No") : "?") . "`n"
-					 . "Tyre Compound: " ((tyreCompound != kUndefined) ? compound(tyreCompound, tyreCompoundColor) : "?")
+					 . "Refuel: " . ((refuel != kUndefined) ? StrReplace(refuel, "!", "") : "?") . "`n"
+					 . "Tyre Change: " . ((tyreChange != kUndefined) ? ((StrCompare(StrReplace(tyreChange, "!", ""), "0") != 0) ? "Yes" : "No") : "?") . "`n"
+					 . "Tyre Compound: " ((tyreCompound != kUndefined) ? (tyreCompound ? compound(tyreCompound, tyreCompoundColor) : "-") : "?")
 					 , kTempDirectory . "Race Strategist\Strategy\Pitstop " . this.iDebugStrategyCounter[3]++ . ".pitstop")
 		}
 	}

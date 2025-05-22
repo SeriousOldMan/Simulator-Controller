@@ -3622,7 +3622,7 @@ prepareTargets(&buildProgress, updateOnly) {
 		else if inList(t1[3], t2[1])
 			return true
 		else
-			return (String(t1[1]) >= String(t2[1]))
+			return (StrCompare(t1[1], t2[1]) >= 0)
 	}
 
 	for target, arguments in updateTargets {

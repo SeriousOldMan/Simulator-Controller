@@ -1,8 +1,8 @@
 [Development]
-Version=6.3.3.0-dev
+Version=6.3.3.0-beta
 Target=6.3.3.0-release
-Date=05/21/2025
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/xWOMyNFc
+Date=05/22/2025
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/3LJMVUqI
 Changes=Bumped a couple of NuGet packages, Updated LLM Runtime, Support Nuget package restore in build process, Fixed pitstop refueling for rF2 in case of non-linear fuel settings, Fixed off by error in the target lap of strategy controlled pitstops, Fixed loading of lap-based strategies, Fixed several bugs for axle-based tyre compound handling, Fixed issue analyzer of "Setup Workbench" for rF2 and LMU, Prevent multiple pressure loss warnings, Handling individual tyres in "Team Center", Fixed NEWS frequency, Fixed session reset in "Team Center", News reader is resizeable, News can be dismissed forever
 Components=Media->5.6.1,Configuration->6.3.2,Utilities->6.3.0
 [Release]
@@ -24,5 +24,5 @@ Utilities.6.3.0.Download=https://fileshare.impresion3d.pro/filebrowser/api/publi
 [Current]
 Type=Development
 [Version]
-Development=6.3.3.0-dev
+Development=6.3.3.0-beta
 Release=6.3.2.0-release

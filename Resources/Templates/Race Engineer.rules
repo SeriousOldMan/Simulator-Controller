@@ -1102,7 +1102,10 @@ priority: -5, {All: [?Pitstop.Plan], [?Lap.Remaining.Session <= 5], {None: [?Pit
 		(Set: Pitstop.Planned.Tyre.Compound.FrontLeft, false), (Set: Pitstop.Planned.Tyre.Compound.Color.FrontLeft, false),
 		(Set: Pitstop.Planned.Tyre.Compound.FrontRight, false), (Set: Pitstop.Planned.Tyre.Compound.Color.FrontRight, false),
 		(Set: Pitstop.Planned.Tyre.Compound.RearLeft, false), (Set: Pitstop.Planned.Tyre.Compound.Color.RearLeft, false),
-		(Set: Pitstop.Planned.Tyre.Compound.RearRight, false), (Set: Pitstop.Planned.Tyre.Compound.Color.RearRight, false)
+		(Set: Pitstop.Planned.Tyre.Compound.RearRight, false), (Set: Pitstop.Planned.Tyre.Compound.Color.RearRight, false),
+		(Set: Pitstop.Planned.Tyre.Set, false)
+
+; {All: [?Pitstop.Plan], {None: [?Pitstop.Plan.Tyre.Set]}} => (Set: Pitstop.Planned.Tyre.Set, false)
 
 priority: -5, {Any: [?Pitstop.Plan], {All: [?Lap], [?Pitstop.Planned.Time]}} => (Prove: updatePitstopTime())
 

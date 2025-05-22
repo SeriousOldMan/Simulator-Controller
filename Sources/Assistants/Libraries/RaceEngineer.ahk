@@ -1012,7 +1012,7 @@ class RaceEngineer extends RaceAssistant {
 						idealPressures := Map()
 
 						for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
-							tyreCompound := compound(tyres["Compound"])
+							tyreCompound := compound(tyres["Compound" . tyre])
 
 							goal := RuleCompiler().compileGoal("lastPressure(" . tyreCompound . ", " . wheels[index] . ", ?pressure)")
 							resultSet := knowledgeBase.prove(goal)
@@ -1037,7 +1037,7 @@ class RaceEngineer extends RaceAssistant {
 						idealPressures := Map()
 
 						for index, axle in ["Front", "Rear"] {
-							tyreCompound := compound(tyres["Compound"])
+							tyreCompound := compound(tyres["Compound" . axle])
 
 							goal := RuleCompiler().compileGoal("lastPressure(" . tyreCompound . ", " . wheels[index + (index - 1)] . ", ?pressure)")
 							resultSet := knowledgeBase.prove(goal)
@@ -2042,7 +2042,7 @@ class RaceEngineer extends RaceAssistant {
 				}
 			}
 
-			value := getMultiMapValue(data, "Setup Data", "RepairSupension", kUndefined)
+			value := getMultiMapValue(data, "Setup Data", "RepairSuspension", kUndefined)
 
 			if ((value != kUndefined) && (knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension") != value)) {
 				this.pitstopOptionChanged("Repair Suspension", verbose, value)

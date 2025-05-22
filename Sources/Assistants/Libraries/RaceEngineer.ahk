@@ -2446,6 +2446,10 @@ class RaceEngineer extends RaceAssistant {
 		local configuration := this.Configuration
 		local facts := super.createFacts(settings, data)
 		local simulatorName := this.SettingsDatabase.getSimulatorName(facts["Session.Simulator"])
+		local mixedCompounds, index, tyre, axle
+
+		SimulatorProvider.createSimulatorProvider(simulatorName, getMultiMapValue(data, "Session Data", "Car")
+															   , getMultiMapValue(data, "Session Data", "Track").supportsTyreManagement(&mixedCompounds)
 
 		facts["Session.Settings.Damage.Analysis.Laps"]
 			:= getMultiMapValue(configuration, "Race Engineer Analysis", simulatorName . ".DamageAnalysisLaps", 1)
@@ -2461,6 +2465,26 @@ class RaceEngineer extends RaceAssistant {
 		facts["Session.Setup.Tyre.Compound.Color"]
 			:= getMultiMapValue(data, "Car Data", "TyreCompoundColor"
 									, getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Compound.Color", "Black"))
+
+		if (mixedCompounds = "Wheel") {
+			for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
+				facts["Session.Setup.Tyre.Compound." . tyre]
+					:= getMultiMapValue(data, "Car Data", "TyreCompound" . tyre
+											, getMultiMapValue(settings, "Session Setup", "Tyre.Compound." . tyre, facts["Session.Setup.Tyre.Compound"]))
+				facts["Session.Setup.Tyre.Compound.Color." . tyre]
+					:= getMultiMapValue(data, "Car Data", "TyreCompoundColor" . tyre
+											, getMultiMapValue(settings, "Session Setup", "Tyre.Compound." . tyre, facts["Session.Setup.Tyre.Compound.Color"]))
+			}
+		}
+		else if (mixedCompounds = "Axle")
+			for index, axle in ["Front", "Rear"] {
+				facts["Session.Setup.Tyre.Compound." . axle]
+					:= getMultiMapValue(data, "Car Data", "TyreCompound" . axle
+											, getMultiMapValue(settings, "Session Setup", "Tyre.Compound." . axle, facts["Session.Setup.Tyre.Compound"]))
+				facts["Session.Setup.Tyre.Compound.Color." . axle]
+					:= getMultiMapValue(data, "Car Data", "TyreCompoundColor" . axle
+											, getMultiMapValue(settings, "Session Setup", "Tyre.Compound." . axle, facts["Session.Setup.Tyre.Compound.Color"]))
+			}
 
 		return facts
 	}

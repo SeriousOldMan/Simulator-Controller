@@ -215,13 +215,15 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 		local tyresDB, simulatorName, compound, compoundColor
 		local tpSettings, pressures, certainty, collectPressure, pitstopService, ignore, session
 		local fuelWarning, damageWarning, pressureWarning, correctByTemperatures, correctByDatabase, correctForPressureLoss
+		local mixedCompounds, index, tyre, axle
+		local weather, airTemperature, trackTemperature
 
 		settings := super.loadSettings(simulator, car, track, data, settings)
 
 		if data {
-			local weather := getMultiMapValue(data, "Weather Data", "Weather", "Dry")
-			local airTemperature := getMultiMapValue(data, "Weather Data", "Temperature", 27)
-			local trackTemperature := getMultiMapValue(data, "Track Data", "Temperature", 23)
+			weather := getMultiMapValue(data, "Weather Data", "Weather", "Dry")
+			airTemperature := getMultiMapValue(data, "Weather Data", "Temperature", 27)
+			trackTemperature := getMultiMapValue(data, "Track Data", "Temperature", 23)
 
 			tyresDB := TyresDatabase()
 
@@ -236,6 +238,8 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 				pressures := []
 				certainty := 1.0
 
+				SimulatorProvider.createSimulatorProvider(simulator, car, track).supportsTyreManagement(&mixedCompounds)
+
 				if tyresDB.getTyreSetup(simulatorName, car, track
 									  , getMultiMapValue(data, "Weather Data", "Weather", "Dry")
 									  , getMultiMapValue(data, "Weather Data", "Temperature", 23)
@@ -243,6 +247,18 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 									  , &compound, &compoundColor, &pressures, &certainty, true) {
 					setMultiMapValue(settings, "Session Setup", "Tyre.Compound", compound)
 					setMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color", compoundColor)
+
+					if (mixedCompounds = "Wheel") {
+						for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
+							setMultiMapValue(settings, "Session Setup", "Tyre.Compound." . tyre, compound)
+							setMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color." . tyre, compoundColor)
+						}
+					}
+					else if (mixedCompounds = "Axle")
+						for index, axle in ["Front", "Rear"] {
+							setMultiMapValue(settings, "Session Setup", "Tyre.Compound." . axle, compound)
+							setMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color." . axle, compoundColor)
+						}
 
 					setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FL", Round(pressures[1], 1))
 					setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FR", Round(pressures[2], 1))

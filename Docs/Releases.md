@@ -1,33 +1,8 @@
 # Latest stable release
 
-## 6.3.2.0
-
-#### Date: 05/16/25
-
-#### Fixes
-
-  - Several fixes for the Spanish grammars for the Assistants thanks to @alejandrocq.
-  - Fixed the data collection and transfer to the session database by the Race Assistants, if the "Solo Center" is **not** active. This bug was introduced with version 6.3.0.
-  - Fixed the race situation dependend strategy simulation in "Team Center".
-  - Fixed the calculation of stint statistics in "Team Center".
-  - Fixed unit conversion for tyre pressure deviation threshold in "Race Settings".
-  - Fixed enabling / disabling of setup editor activation in "Setup Workbench" for cars with custom meta data definitions.
-
-#### Changes
-
-  - A [new setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" allows you to define the threshold for reporting and handling of tyre pressure loss events.
-  - The same setting for pressure loss threshold is also available in the ["Race Settings"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-pitstop).
-  - Info widgets with information that is all zero, like tyre wear if the data is not supplied by the simulator, are no longer displayed.
-  - The handling of restricted tyre sets in the strategy simulation has been optimized. It is no longer possible create strategies where a tyre set is used for more laps than usually possible.
-  - Information about available tyre sets is now passed by the Strategist to the LLM, if a strategy is active for the current race.
-  - This release introduces initial functionality which supports the handling of individual tyre compounds and tyre changes for individual wheels, if supported by the current simulator, of course. See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#handling-of-tyre-compounds-on-inidividual-wheels) for more information.
-  - [Internal] Migrated to AHK 2.1-alpha.18.
-
-# Upcoming release
-
 ## 6.3.3.0
 
-#### Date: 05/23/25 (planned)
+#### Date: 05/23/25
 
 #### Fixes
 
@@ -53,7 +28,36 @@
   - [Developer] Pressure loss information has been added to the "Session State.json" file.
   - [Internal] Updated to newer versions of several imported packages for the internal apps and DLLs.
 
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-633), if you are using the local LLM Runtime.
+
+# Upcoming release
+
+Not yet planned...
+
 # Release history
+
+## 6.3.2.0
+
+#### Date: 05/16/25
+
+#### Fixes
+
+  - Several fixes for the Spanish grammars for the Assistants thanks to @alejandrocq.
+  - Fixed the data collection and transfer to the session database by the Race Assistants, if the "Solo Center" is **not** active. This bug was introduced with version 6.3.0.
+  - Fixed the race situation dependend strategy simulation in "Team Center".
+  - Fixed the calculation of stint statistics in "Team Center".
+  - Fixed unit conversion for tyre pressure deviation threshold in "Race Settings".
+  - Fixed enabling / disabling of setup editor activation in "Setup Workbench" for cars with custom meta data definitions.
+
+#### Changes
+
+  - A [new setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" allows you to define the threshold for reporting and handling of tyre pressure loss events.
+  - The same setting for pressure loss threshold is also available in the ["Race Settings"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-pitstop).
+  - Info widgets with information that is all zero, like tyre wear if the data is not supplied by the simulator, are no longer displayed.
+  - The handling of restricted tyre sets in the strategy simulation has been optimized. It is no longer possible create strategies where a tyre set is used for more laps than usually possible.
+  - Information about available tyre sets is now passed by the Strategist to the LLM, if a strategy is active for the current race.
+  - This release introduces initial functionality which supports the handling of individual tyre compounds and tyre changes for individual wheels, if supported by the current simulator, of course. See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#handling-of-tyre-compounds-on-inidividual-wheels) for more information.
+  - [Internal] Migrated to AHK 2.1-alpha.18.
 
 ## 6.3.1.0
 

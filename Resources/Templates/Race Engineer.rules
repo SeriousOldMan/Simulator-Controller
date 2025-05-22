@@ -1132,7 +1132,7 @@ priority: -5, {All: [?Pitstop.Plan], [?Lap.Remaining.Session <= 5], {None: [?Pit
 		(Set: Pitstop.Planned.Tyre.Compound.RearRight, false), (Set: Pitstop.Planned.Tyre.Compound.Color.RearRight, false),
 		(Set: Pitstop.Planned.Tyre.Set, false)
 
-; {All: [?Pitstop.Plan], {None: [?Pitstop.Plan.Tyre.Set]}} => (Set: Pitstop.Planned.Tyre.Set, false)
+{All: [?Pitstop.Plan], {None: [?Pitstop.Plan.Tyre.Set]}} => (Set: Pitstop.Planned.Tyre.Set, false)
 
 priority: -5, {Any: [?Pitstop.Plan], {All: [?Lap], [?Pitstop.Planned.Time]}} => (Prove: updatePitstopTime())
 

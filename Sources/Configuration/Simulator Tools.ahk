@@ -3616,15 +3616,6 @@ prepareTargets(&buildProgress, updateOnly) {
 	local updateTargets := getMultiMapValues(targets, "Update")
 	local target, arguments, update, cleanupTargets, targetName, cleanup, copyTargets, copy, buildTargets, build, rule
 
-	compareUpdateTargets(t1, t2) {
-		if inList(t2[3], t1[1])
-			return false
-		else if inList(t1[3], t2[1])
-			return true
-		else
-			return (StrCompare(t1[1], t2[1]) >= 0)
-	}
-
 	for target, arguments in updateTargets {
 		buildProgress += (A_Index / updateTargets.Count)
 
@@ -3646,7 +3637,14 @@ prepareTargets(&buildProgress, updateOnly) {
 		Sleep(50)
 	}
 
-	bubbleSort(&gUpdateTargets, compareUpdateTargets)
+	bubbleSort(&gUpdateTargets, (t1, t2) {
+		if inList(t2[3], t1[1])
+			return false
+		else if inList(t1[3], t2[1])
+			return true
+		else
+			return (StrCompare(t1[1], t2[1]) >= 0)
+	})
 
 	if !updateOnly {
 		cleanupTargets := getMultiMapValues(targets, "Cleanup")

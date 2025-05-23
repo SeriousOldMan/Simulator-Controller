@@ -4423,6 +4423,8 @@ class RaceStrategist extends GridRaceAssistant {
 
 			this.Provider.supportsTyreManagement(&mixedCompounds)
 
+			prefix := "Lap." . lapNumber
+
 			tyreCompound := knowledgeBase.getValue(prefix . ".Tyre.Compound", "Dry")
 			tyreCompoundColor := knowledgeBase.getValue(prefix . ".Tyre.Compound.Color", "Black")
 
@@ -4450,8 +4452,6 @@ class RaceStrategist extends GridRaceAssistant {
 				tyreCompound := [tyreCompound]
 				tyreCompoundColor := [tyreCompoundColor]
 			}
-
-			prefix := "Lap." . lapNumber
 
 			if validLap
 				validLap := knowledgeBase.getValue(prefix . ".Valid", validLap)

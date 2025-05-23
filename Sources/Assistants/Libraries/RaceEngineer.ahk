@@ -2509,7 +2509,7 @@ class RaceEngineer extends RaceAssistant {
 		local mixedCompounds, index, tyre, axle
 
 		SimulatorProvider.createSimulatorProvider(simulatorName, getMultiMapValue(data, "Session Data", "Car")
-															   , getMultiMapValue(data, "Session Data", "Track").supportsTyreManagement(&mixedCompounds))
+															   , getMultiMapValue(data, "Session Data", "Track")).supportsTyreManagement(&mixedCompounds)
 
 		facts["Session.Settings.Damage.Analysis.Laps"]
 			:= getMultiMapValue(configuration, "Race Engineer Analysis", simulatorName . ".DamageAnalysisLaps", 1)

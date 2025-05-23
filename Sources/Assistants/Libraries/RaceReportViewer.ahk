@@ -521,8 +521,11 @@ class RaceReportViewer extends RaceReportReader {
 					weather := (weather ? translate(weather) : "n/a")
 
 					if getMultiMapValue(raceData, "Laps", "Lap." . lap . ".Compound", false)
-						tyreCompound := translate(compound(getMultiMapValue(raceData, "Laps", "Lap." . lap . ".Compound", "Dry")
-														 , getMultiMapValue(raceData, "Laps", "Lap." . lap . ".CompoundColor", "Black")))
+						tyreCompound := values2String(", ", collect(compounds(string2Values(",", getMultiMapValue(raceData, "Laps"
+																												, "Lap." . lap . ".Compound", "Dry"))
+																			, string2Values(",", getMultiMapValue(raceData, "Laps"
+																												, "Lap." . lap . ".CompoundColor", "Black")))
+																  , translate)*)
 					else
 						tyreCompound := "-"
 

@@ -195,15 +195,18 @@ loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false,
 editRaceSettings(&settingsOrCommand, arguments*) {
 	global kLoad, kSave, kOk, kCancel, kConnect, kUpdate
 
-	local dllFile, names, exception, value, chosen, choices, tabs, import, simulator, ignore, option
-	local dirName, simulatorCode, file, tyreCompound, tyreCompoundColor, fileName, token
-	local x, y, e, directory, connection, settings, serverURLs, settingsTab, oldTChoice, oldFChoice
-	local tyreSets, tyreSet, translatedCompounds, rulesActive, index
-
 	local setupTyreCompound := "Dry"
 	local setupTyreCompoundColor := "Black"
 	local dryFrontLeft := 26.1, dryFrontRight := 26.1, dryRearLeft := 26.1, dryRearRight := 26.1
 	local wetFrontLeft := 28.5, wetFrontRight := 28.5, wetRearLeft := 28.5, wetRearRight := 28.5
+
+	local mixedCompounds, tyreService, index, tyre, axle, dropDown
+	local dllFile, names, exception, value, chosen, choices, tabs, import, simulator, ignore, option
+	local dirName, simulatorCode, file, tyreCompound, tyreCompoundColor, tc, tcc, fileName, token
+	local x, y, e, directory, connection, settings, serverURLs, settingsTab, oldTChoice, oldFChoice
+	local tyreSets, tyreSet, translatedCompounds, rulesActive, index
+
+	static wheels := ["FL", "FR", "RL", "RR"]
 
 	static updateState := "UpdateState"
 
@@ -447,7 +450,8 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 	importFromSimulation(message := false, simulator := false, prefix := false, settings := false) {
 		local result := false
-		local candidate, ignore, data, tyreCompound, tyreCompoundColor
+		local candidate, ignore, data, tyreCompound, tyreCompoundColor, tc, tcc
+		local mixedCompounds, tyreSets, index, tyre, axle
 
 		getSetupPressure(tyre, default) {
 			return displayValue("Float"
@@ -474,12 +478,14 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		data := readSimulator(prefix, gCar, gTrack)
 
 		if (getMultiMapValues(data, "Setup Data").Count > 0) {
+			SimulatorProvider.createSimulatorProvider(gSimulator, gCar, gTrack).supportsTyreManagement(&mixedCompounds, &tyreSets)
+
 			readTyreSetup(readMultiMap(kRaceSettingsFile))
 
 			pitstopTyreSet := getMultiMapValue(data, "Setup Data", "TyreSet", pitstopTyreSet)
 			setupTyreSet := getMultiMapValue(data, "Car Data", "TyreSet", setupTyreSet ? setupTyreSet : Max(0, pitstopTyreSet - 1))
 
-			if settings {
+			if (settings & tyreSets) {
 				if (getMultiMapValue(settings, "Session Setup", "Tyre.Set.Fresh", 0) != 0)
 					setMultiMapValue(settings, "Session Setup", "Tyre.Set.Fresh", pitstopTyreSet)
 
@@ -487,11 +493,71 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 					setMultiMapValue(settings, "Session Setup", "Tyre.Set", setupTyreSet)
 			}
 
-			tyreCompound := getMultiMapValue(data, "Setup Data", "TyreCompound", getMultiMapValue(data, "Car Data", "TyreCompound", setupTyreCompound))
-			tyreCompoundColor := getMultiMapValue(data, "Setup Data", "TyreCompoundColor", getMultiMapValue(data, "Car Data", "TyreCompoundColor", setupTyreCompoundColor))
+			if (mixedCompounds = "Wheel") {
+				tc := []
+				tcc := []
 
-			setMultiMapValue(data, "Setup Data", "TyreCompound", tyreCompound)
-			setMultiMapValue(data, "Setup Data", "TyreCompoundColor", tyreCompoundColor)
+				for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
+					tc.Push(getMultiMapValue(data, "Setup Data", "TyreCompound" . tyre
+										   , getMultiMapValue(data, "Car Data", "TyreCompound" . tyre)))
+					tcc.Push(getMultiMapValue(data, "Setup Data", "TyreCompound" . tyre
+											, getMultiMapValue(data, "Car Data", "TyreCompoundColor" . tyre)))
+
+					if (index = 1) {
+						tyreCompound := tc[1]
+						tyreCompoundColor := tcc[1]
+					}
+
+					if settings {
+						setMultiMapValue(settings, "Session Setup", "Tyre.Compound." . tyre, tc[tc.Length])
+						setMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color." . tyre, tcc[tcc.Length])
+					}
+				}
+
+				tc := values2String("," tc*)
+				tcc := values2String("," tcc*)
+			}
+			else if (mixedCompounds = "Axle") {
+				tc := []
+				tcc := []
+
+				for index, axle in ["Front", "Rear"] {
+					tc.Push(getMultiMapValue(data, "Setup Data", "TyreCompound" . axle
+										   , getMultiMapValue(data, "Car Data", "TyreCompound" . axle)))
+					tcc.Push(getMultiMapValue(data, "Setup Data", "TyreCompound" . axle
+											, getMultiMapValue(data, "Car Data", "TyreCompoundColor" . axle)))
+
+					if (index = 1) {
+						tyreCompound := tc[1]
+						tyreCompoundColor := tcc[1]
+					}
+
+					if settings {
+						setMultiMapValue(settings, "Session Setup", "Tyre.Compound." . axle, tc[tc.Length])
+						setMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color." . axle, tcc[tcc.Length])
+					}
+				}
+
+				tc := values2String("," tc*)
+				tcc := values2String("," tcc*)
+			}
+			else {
+				tyreCompound := getMultiMapValue(data, "Setup Data", "TyreCompound"
+											   , getMultiMapValue(data, "Car Data", "TyreCompound"))
+				tyreCompoundColor := getMultiMapValue(data, "Setup Data", "TyreCompoundColor"
+													, getMultiMapValue(data, "Car Data", "TyreCompoundColor"))
+
+				tc := [tyreCompound]
+				tcc := [tyreCompoundColor]
+			}
+
+			setupTyreCompound := values2String(",", tc*)
+			setupTyreCompoundColor := values2String(",", tcc*)
+
+			if settings {
+				setMultiMapValue(settings, "Session Setup", "Tyre.Compound", tyreCompound)
+				setMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color", tyreCompoundColor)
+			}
 
 			if (tyreCompound = "Dry") {
 				dryFrontLeft := getSetupPressure("FL", dryFrontLeft)
@@ -500,9 +566,6 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 				dryRearRight := getSetupPressure("RR", dryRearRight)
 
 				if settings {
-					setMultiMapValue(settings, "Session Setup", "Tyre.Compound", tyreCompound)
-					setMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color", tyreCompoundColor)
-
 					setMultiMapValue(settings, "Session Setup", "Tyre.Dry.Pressure.FL", convertUnit("Pressure", internalValue("Float", dryFrontLeft), false))
 					setMultiMapValue(settings, "Session Setup", "Tyre.Dry.Pressure.FR", convertUnit("Pressure", internalValue("Float", dryFrontRight), false))
 					setMultiMapValue(settings, "Session Setup", "Tyre.Dry.Pressure.RL", convertUnit("Pressure", internalValue("Float", dryRearLeft), false))
@@ -526,9 +589,6 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 				wetRearRight := getSetupPressure("RR", wetRearRight)
 
 				if settings {
-					setMultiMapValue(settings, "Session Setup", "Tyre.Compound", tyreCompound)
-					setMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color", tyreCompoundColor)
-
 					setMultiMapValue(settings, "Session Setup", "Tyre.Wet.Pressure.FL", convertUnit("Pressure", internalValue("Float", wetFrontLeft), false))
 					setMultiMapValue(settings, "Session Setup", "Tyre.Wet.Pressure.FR", convertUnit("Pressure", internalValue("Float", wetFrontRight), false))
 					setMultiMapValue(settings, "Session Setup", "Tyre.Wet.Pressure.RL", convertUnit("Pressure", internalValue("Float", wetRearLeft), false))
@@ -545,9 +605,6 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 				result := tyreCompound
 			}
-
-			setupTyreCompound := tyreCompound
-			setupTyreCompoundColor := tyreCompoundColor
 		}
 
 		return result
@@ -575,13 +632,55 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 	}
 
 	readTyreSetup(settings) {
+		local tyreCompound, tyreCompoundColor, tc, tcc
+		local mixedCompounds, tyreSets, index, tyre, axle
+
+		SimulatorProvider.createSimulatorProvider(gSimulator, gCar, gTrack).supportsTyreManagement(&mixedCompounds, &tyreSets)
+
 		if (gTyreCompound && gTyreCompoundColor) {
-			setupTyreCompound := gTyreCompound
-			setupTyreCompoundColor := gTyreCompoundColor
+			if (mixedCompounds = "Wheel") {
+				setupTyreCompound := values2String(",", gTyreCompound, gTyreCompound, gTyreCompound, gTyreCompound)
+				setupTyreCompoundColor := values2String(",", gTyreCompoundColor, gTyreCompoundColor, gTyreCompoundColor, gTyreCompoundColor)
+			}
+			else if (mixedCompounds = "Axle") {
+				setupTyreCompound := values2String(",", gTyreCompound, gTyreCompound)
+				setupTyreCompoundColor := values2String(",", gTyreCompoundColor, gTyreCompoundColor)
+			}
+			else {
+				setupTyreCompound := gTyreCompound
+				setupTyreCompoundColor := gTyreCompoundColor
+			}
 		}
 		else {
 			setupTyreCompound := getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Compound", "Dry")
 			setupTyreCompoundColor := getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Compound.Color", "Black")
+
+			if (mixedCompounds = "Wheel") {
+				setupTyreCompound := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"], (tyre) {
+										 return getDeprecatedValue(settings, "Session Setup", "Race Setup"
+																		   , "Tyre.Compound." . tyre, setupTyreCompound)
+									 })
+				setupTyreCompoundColor := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"], (tyre) {
+											  return getDeprecatedValue(settings, "Session Setup", "Race Setup"
+																				, "Tyre.Compound.Color." . tyre, setupTyreCompoundColor)
+										  })
+
+				setupTyreCompound := values2String(",", setupTyreCompound*)
+				setupTyreCompoundColor := values2String(",", setupTyreCompoundColor*)
+			}
+			else if (mixedCompounds = "Axle") {
+				setupTyreCompound := collect(["Front", "Rear"], (axle) {
+										 return getDeprecatedValue(settings, "Session Setup", "Race Setup"
+																		   , "Tyre.Compound." . axle, setupTyreCompound)
+									 })
+				setupTyreCompoundColor := collect(["Front", "Rear"], (axle) {
+											  return getDeprecatedValue(settings, "Session Setup", "Race Setup"
+																				, "Tyre.Compound.Color." . axle, setupTyreCompoundColor)
+										  })
+
+				setupTyreCompound := values2String(",", setupTyreCompound*)
+				setupTyreCompoundColor := values2String(",", setupTyreCompoundColor*)
+			}
 		}
 
 		setupTyreSet := getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Set", false)
@@ -676,6 +775,10 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 	updatePitstopWindow(*) {
 		validatePitstopWindow()
+	}
+
+	chooseTyreCompound(*) {
+		editRaceSettings(&updateState)
 	}
 
 	selectPSTyreSet(listView, line, selected) {
@@ -910,7 +1013,23 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			settingsGui["spSetupTyreSetEdit"].Text := (setupTyreSet ? setupTyreSet : translate("Auto "))
 			settingsGui["spPitstopTyreSetEdit"].Text := (pitstopTyreSet ? pitstopTyreSet : translate("Auto "))
 
-			settingsGui["spSetupTyreCompoundDropDown"].Choose(inList(gTyreCompounds, compound(setupTyreCompound, setupTyreCompoundColor)))
+			SimulatorProvider.createSimulatorProvider(gSimulator, gCar, gTrack).supportsTyreManagement(&mixedCompounds)
+
+			if (mixedCompounds = "Wheel") {
+				tyreCompound := compounds(string2Values(",", setupTyreCompound), string2Values(",", setupTyreCompoundColor))
+
+				for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
+					settingsGui["spSetupTyreCompound" . wheels[index] . "DropDown"].Choose(inList(gTyreCompounds, tyreCompound[index]))
+			}
+			else if (mixedCompounds = "Axle") {
+				tyreCompound := compounds(string2Values(",", setupTyreCompound), string2Values(",", setupTyreCompoundColor))
+
+				for index, axle in ["Front", "Rear"]
+					settingsGui["spSetupTyreCompound" . wheels[index + (index - 1)] . "DropDown"].Choose(inList(gTyreCompounds, tyreCompound[index]))
+			}
+			else
+				settingsGui["spSetupTyreCompoundFLDropDown"].Choose(inList(gTyreCompounds, compound(string2Values(",", setupTyreCompound)[1]
+																								  , string2Values(",", setupTyreCompoundColor)[1])))
 		}
 
 		if (value = "Dry") {
@@ -925,8 +1044,62 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			settingsGui["spWetRearLeftEdit"].Text := wetRearLeft
 			settingsGui["spWetRearRightEdit"].Text := wetRearRight
 		}
+
+		editRaceSettings(&updateState)
 	}
 	else if (settingsOrCommand = "UpdateState") {
+		SimulatorProvider.createSimulatorProvider(gSimulator, gCar, gTrack).supportsTyreManagement(&mixedCompounds, &tyreSets)
+
+		if tyreSets {
+			settingsGui["spSetupTyreSetEdit"].Enabled := true
+			settingsGui["spPitstopTyreSetEdit"].Enabled := true
+		}
+		else {
+			settingsGui["spSetupTyreSetEdit"].Enabled := false
+			settingsGui["spPitstopTyreSetEdit"].Enabled := false
+
+			settingsGui["spSetupTyreSetEdit"].Text := translate("Auto ")
+			settingsGui["spPitstopTyreSetEdit"].Text := translate("Auto ")
+		}
+
+		if (mixedCompounds = "Wheel") {
+			for index, dropDown in ["spSetupTyreCompoundFLDropDown", "spSetupTyreCompoundFRDropDown"
+								  , "spSetupTyreCompoundRLDropDown", "spSetupTyreCompoundRRDropDown"] {
+				settingsGui[dropDown].Enabled := true
+
+				if (settingsGui[dropDown].Value = 0)
+					if (index > 1)
+						settingsGui[dropDown].Choose(settingsGui["spSetupTyreCompoundFLDropDown"].Value)
+					else
+						settingsGui[dropDown].Choose(1)
+			}
+		}
+		else if (mixedCompounds = "Axle") {
+			for index, dropDown in ["spSetupTyreCompoundFLDropDown", "spSetupTyreCompoundRLDropDown"] {
+				settingsGui[dropDown].Enabled := true
+
+				if (settingsGui[dropDown].Value = 0)
+					if (index > 1)
+						settingsGui[dropDown].Choose(settingsGui["spSetupTyreCompoundFLDropDown"].Value)
+					else
+						settingsGui[dropDown].Choose(1)
+			}
+
+			for index, dropDown in ["spSetupTyreCompoundFRDropDown", "spSetupTyreCompoundRRDropDown"]
+				settingsGui[dropDown].Enabled := false
+
+			settingsGui["spSetupTyreCompoundFRDropDown"].Choose(settingsGui["spSetupTyreCompoundFLDropDown"].Value)
+			settingsGui["spSetupTyreCompoundRRDropDown"].Choose(settingsGui["spSetupTyreCompoundRLDropDown"].Value)
+		}
+		else {
+			for index, dropDown in ["spSetupTyreCompoundFRDropDown"
+								  , "spSetupTyreCompoundRLDropDown", "spSetupTyreCompoundRRDropDown"] {
+				settingsGui[dropDown].Enabled := false
+
+				settingsGui[dropDown].Choose(settingsGui["spSetupTyreCompoundFLDropDown"].Value)
+			}
+		}
+
 		rulesActive := (settingsGui["rulesActiveDropDown"].Value = 1)
 
 		settingsGui["tyreSetAddButton"].Enabled := (gTyreCompounds.Length > tyreSetListView.GetCount())
@@ -1256,6 +1429,8 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			return false
 		}
 
+		SimulatorProvider.createSimulatorProvider(gSimulator, gCar, gTrack).supportsTyreManagement(&mixedCompounds)
+
 		newSettings := oldSettings.Clone()
 
 		setMultiMapValue(newSettings, "Session Settings", "Lap.PitstopWarning", settingsGui["pitstopWarningEdit"].Text)
@@ -1306,10 +1481,29 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		setMultiMapValue(newSettings, "Session Settings", "Lap.Formation", settingsGui["formationLapCheck"].Value)
 		setMultiMapValue(newSettings, "Session Settings", "Lap.PostRace", settingsGui["postRaceLapCheck"].Value)
 
-		splitCompound(gTyreCompounds[settingsGui["spSetupTyreCompoundDropDown"].Value], &tyreCompound, &tyreCompoundColor)
+		splitCompound(gTyreCompounds[settingsGui["spSetupTyreCompoundFLDropDown"].Value], &tyreCompound, &tyreCompoundColor)
 
 		setMultiMapValue(newSettings, "Session Setup", "Tyre.Compound", tyreCompound)
 		setMultiMapValue(newSettings, "Session Setup", "Tyre.Compound.Color", tyreCompoundColor)
+
+		if (mixedCompounds = "Wheel") {
+			for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
+				splitCompound(gTyreCompounds[settingsGui["spSetupTyreCompound" . wheels[index] . "DropDown"].Value]
+							, &tyreCompound, &tyreCompoundColor)
+
+				setMultiMapValue(newSettings, "Session Setup", "Tyre.Compound." . tyre, tyreCompound)
+				setMultiMapValue(newSettings, "Session Setup", "Tyre.Compound.Color." . tyre, tyreCompoundColor)
+			}
+		}
+		else if (mixedCompounds = "Axle") {
+			for index, axle in ["Front", "Rear"] {
+				splitCompound(gTyreCompounds[settingsGui["spSetupTyreCompound" . wheels[index + (index - 1)] . "DropDown"].Value]
+							, &tyreCompound, &tyreCompoundColor)
+
+				setMultiMapValue(newSettings, "Session Setup", "Tyre.Compound." . axle, tyreCompound)
+				setMultiMapValue(newSettings, "Session Setup", "Tyre.Compound.Color." . axle, tyreCompoundColor)
+			}
+		}
 
 		setMultiMapValue(newSettings, "Session Setup", "Tyre.Set", isInteger(settingsGui["spSetupTyreSetEdit"].Text) ? settingsGui["spSetupTyreSetEdit"].Text : false)
 		setMultiMapValue(newSettings, "Session Setup", "Tyre.Set.Fresh", isInteger(settingsGui["spPitstopTyreSetEdit"].Text) ? settingsGui["spPitstopTyreSetEdit"].Text : false)
@@ -1743,15 +1937,49 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.Add("Text", "x16 yp+30 w88 h23 +0x200", translate("Tyre Compound"))
 
+		SimulatorProvider.createSimulatorProvider(gSimulator, gCar, gTrack).supportsTyreManagement(&mixedCompounds, &tyreSets)
+
 		readTyreSetup(settingsOrCommand)
 
 		choices := collect(gTyreCompounds, translate)
-		chosen := inList(gTyreCompounds, compound(setupTyreCompound, setupTyreCompoundColor))
 
-		if ((chosen == 0) && (choices.Length > 0))
-			chosen := 1
+		settingsGui.Add("DropDownList", "x106 yp w93 VspSetupTyreCompoundFLDropDown", choices).OnEvent("Change", chooseTyreCompound)
+		settingsGui.Add("DropDownList", "x200 yp w93 Disabled VspSetupTyreCompoundFRDropDown", choices).OnEvent("Change", chooseTyreCompound)
+		settingsGui.Add("DropDownList", "x106 yp+24 w93 Disabled VspSetupTyreCompoundRLDropDown", choices).OnEvent("Change", chooseTyreCompound)
+		settingsGui.Add("DropDownList", "x200 yp w93 Disabled VspSetupTyreCompoundRRDropDown", choices).OnEvent("Change", chooseTyreCompound)
 
-		settingsGui.Add("DropDownList", "x106 yp w110 Choose" . chosen . " VspSetupTyreCompoundDropDown", choices)
+		if (mixedCompounds = "Wheel") {
+			for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
+				chosen := inList(gTyreCompounds, compound(string2Values(",", setupTyreCompound)[index]
+											   , string2Values(",", setupTyreCompoundColor)[index]))
+
+				if ((chosen == 0) && (choices.Length > 0))
+					chosen := 1
+
+				settingsGui["spSetupTyreCompound" . wheels[index] . "DropDown"].Choose(chosen)
+			}
+		}
+		else if (mixedCompounds = "Axle") {
+			for index, axle in ["Front", "Rear"] {
+				chosen := inList(gTyreCompounds, compound(string2Values(",", setupTyreCompound)[index]
+											   , string2Values(",", setupTyreCompoundColor)[index]))
+
+				if ((chosen == 0) && (choices.Length > 0))
+					chosen := 1
+
+				settingsGui["spSetupTyreCompound" . wheels[index + (index - 1)] . "DropDown"].Choose(chosen)
+			}
+		}
+		else {
+			chosen := inList(gTyreCompounds, compound(string2Values(",", setupTyreCompound)[1], string2Values(",", setupTyreCompoundColor)[1]))
+
+			if ((chosen == 0) && (choices.Length > 0))
+				chosen := 1
+
+			for index, dropDown in ["spSetupTyreCompoundFLDropDown", "spSetupTyreCompoundFRDropDown"
+								  , "spSetupTyreCompoundRLDropDown", "spSetupTyreCompoundRRDropDown"]
+				settingsGui[dropDown].Choose(chosen)
+		}
 
 		settingsGui.Add("Text", "x16 yp+26 w88 h20", translate("Start Tyre Set"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit2 VspSetupTyreSetEdit").OnEvent("Change", updateTyreSet.Bind("spSetupTyreSetEdit"))

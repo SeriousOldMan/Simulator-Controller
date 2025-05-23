@@ -569,22 +569,24 @@ class RaceStrategist extends GridRaceAssistant {
 				lapNumber := knowledgeBase.getValue("Lap")
 
 				if this.Provider.supportsTyreManagement(&mixedCompounds) {
+					tyreCompound := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound", "Dry")
+					tyreCompoundColor := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color", "Black")
+
 					if (mixedCompounds = "Wheel") {
-						tyreCompound := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.FrontLeft", "Dry")
-						tyreCompoundColor := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color.FrontLeft", "Black")
+						tyreCompound := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.FrontLeft", tyreCompound)
+						tyreCompoundColor := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color.FrontLeft", tyreCompoundColor)
 					}
 					else if (mixedCompounds = "Axle") {
-						tyreCompound := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Front", "Dry")
-						tyreCompoundColor := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color.Front", "Black")
-					}
-					else {
-						tyreCompound := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound", "Dry")
-						tyreCompoundColor := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color", "Black")
+						tyreCompound := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Front", tyreCompound)
+						tyreCompoundColor := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color.Front", tyreCompoundColor)
 					}
 
-					tyreSets.Push({Laps: lapNumber
-								 , Set: knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Set", 1)
-								 , Compound: tyreCompound, CompoundColor: tyreCompoundColor})
+					if tyreSet
+						tyreSets.Push({Laps: lapNumber
+									 , Set: knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Set", 1)
+									 , Compound: tyreCompound, CompoundColor: tyreCompoundColor})
+					else
+						tyreSets.Push({Laps: lapNumber, Compound: tyreCompound, CompoundColor: tyreCompoundColor})
 				}
 			}
 
@@ -4279,6 +4281,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local driver, driverID, carCount, data, raceInfo, slots, grid, carNr, carID, key, fileName, slotsString
 		local data, pitstop, pitstops, prefix, times, position, positions, drivers, laps, carPrefix, carIndex
 		local driverForname, driverSurname, driverNickname, driverCategory, carCar, carCategory, lapState
+		local mixedCompounds, index, tyre, axle, tyreCompound, tyreCompoundColor
 
 		if this.RemoteHandler {
 			driver := knowledgeBase.getValue("Driver.Car", 0)
@@ -4418,6 +4421,36 @@ class RaceStrategist extends GridRaceAssistant {
 							pitstop := true
 			}
 
+			this.Provider.supportsTyreManagement(&mixedCompounds)
+
+			tyreCompound := knowledgeBase.getValue(prefix . ".Tyre.Compound", "Dry")
+			tyreCompoundColor := knowledgeBase.getValue(prefix . ".Tyre.Compound.Color", "Black")
+
+			if (mixedCompounds = "Wheel") {
+				tyreCompound := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"], (tyre) {
+									return knowledgeBase.getValue(prefix . ".Tyre.Compound." . tyre, tyreCompound)
+								})
+				tyreCompoundColor := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"], (tyre) {
+										 return knowledgeBase.getValue(prefix . ".Tyre.Compound.Color." . tyre, tyreCompoundColor)
+									 })
+
+				combineCompounds(&tyreCompound, &tyreCompoundColor)
+			}
+			else if (mixedCompounds = "Axle") {
+				tyreCompound := collect(["Front", "Rear"], (axle) {
+									return knowledgeBase.getValue(prefix . ".Tyre.Compound." . axle, tyreCompound)
+								})
+				tyreCompoundColor := collect(["Front", "Rear"], (axle) {
+										 return knowledgeBase.getValue(prefix . ".Tyre.Compound.Color." . axle, tyreCompoundColor)
+									 })
+
+				combineCompounds(&tyreCompound, &tyreCompoundColor)
+			}
+			else {
+				tyreCompound := [tyreCompound]
+				tyreCompoundColor := [tyreCompoundColor]
+			}
+
 			prefix := "Lap." . lapNumber
 
 			if validLap
@@ -4434,8 +4467,8 @@ class RaceStrategist extends GridRaceAssistant {
 
 			setMultiMapValue(data, "Lap", prefix . ".Weather", knowledgeBase.getValue("Standings.Lap." . lapNumber . ".Weather"))
 			setMultiMapValue(data, "Lap", prefix . ".LapTime", knowledgeBase.getValue(prefix . ".Time"))
-			setMultiMapValue(data, "Lap", prefix . ".Compound", knowledgeBase.getValue(prefix . ".Tyre.Compound", "Dry"))
-			setMultiMapValue(data, "Lap", prefix . ".CompoundColor", knowledgeBase.getValue(prefix . ".Tyre.Compound.Color", "Black"))
+			setMultiMapValue(data, "Lap", prefix . ".Compound", values2String(",", tyreCompound*))
+			setMultiMapValue(data, "Lap", prefix . ".CompoundColor", values2String(",", tyreCompoundColor*))
 			setMultiMapValue(data, "Lap", prefix . ".Map", knowledgeBase.getValue(prefix . ".Map", "n/a"))
 			setMultiMapValue(data, "Lap", prefix . ".TC", knowledgeBase.getValue(prefix . ".TC", "n/a"))
 			setMultiMapValue(data, "Lap", prefix . ".ABS", knowledgeBase.getValue(prefix . ".ABS", "n/a"))

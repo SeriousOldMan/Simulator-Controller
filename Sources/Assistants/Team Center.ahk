@@ -1049,7 +1049,12 @@ class TeamCenter extends ConfigurationItem {
 	Provider {
 		Get {
 			if !this.iProvider
-				this.iProvider := this.createSimulatorProvider()
+				try {
+					this.iProvider := this.createSimulatorProvider()
+				}
+				catch {
+					return SimulatorProvider.GenericSimulatorProvider("Unknown", "Unknown", "Unknown")
+				}
 
 			return this.iProvider
 		}

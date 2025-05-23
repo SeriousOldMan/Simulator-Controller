@@ -720,19 +720,14 @@ namespace RF2SHMProvider {
 			if (!SelectPitstopCategory("FUEL:"))
 				return;
 
+			MoveToFirstPitChoice();
+
 			// Use cache if available
-			if (!buildingCache && fuelLitersToChoiceIndex.TryGetValue(targetFuel, out int cachedIndex)) {
-				int currentIndex = pitInfo.mPitMenu.mChoiceIndex;
-				int delta = cachedIndex - currentIndex;
-				if (delta != 0) {
-					string cmd = delta > 0 ? new string('+', delta) : new string('-', -delta);
-					SendPitstopCommand(cmd);
-					pitInfoBuffer.GetMappedData(ref pitInfo);
-				}
+			if (!buildingCache && fuelLitersToChoiceIndex.TryGetValue(targetFuel, out int cachedIndex))
+			{
+				SendPitstopCommand(new string('+', cachedIndex));
 				return;
 			}
-
-			MoveToFirstPitChoice();
 
 			int index = 0;
 			while (GetFuel(GetStringFromBytes(pitInfo.mPitMenu.mChoiceString)) < targetFuel && index++ < pitInfo.mPitMenu.mNumChoices)
@@ -1112,11 +1107,9 @@ namespace RF2SHMProvider {
 
 		private void MoveToFirstPitChoice()
 		{
-			if (pitInfo.mPitMenu.mChoiceIndex > 0)
-			{
-				SendPitstopCommand(new string('-', pitInfo.mPitMenu.mChoiceIndex));
-				pitInfoBuffer.GetMappedData(ref pitInfo);
-			}
+			// Use numChoices to be 100% sure we are at first choice
+			SendPitstopCommand(new string('-', pitInfo.mPitMenu.mNumChoices));
+			pitInfoBuffer.GetMappedData(ref pitInfo);
 		}
 
 		public void ReadSetup() {

@@ -478,7 +478,8 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		data := readSimulator(prefix, gCar, gTrack)
 
 		if (getMultiMapValues(data, "Setup Data").Count > 0) {
-			SimulatorProvider.createSimulatorProvider(gSimulator, gCar, gTrack).supportsTyreManagement(&mixedCompounds, &tyreSets)
+			SimulatorProvider.createSimulatorProvider(gSimulator, getMultiMapValue(data, "Session Data", "Car")
+																, getMultiMapValue(data, "Session Data", "Track")).supportsTyreManagement(&mixedCompounds, &tyreSets)
 
 			readTyreSetup(readMultiMap(kRaceSettingsFile))
 

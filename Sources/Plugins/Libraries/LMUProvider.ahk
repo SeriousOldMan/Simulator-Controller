@@ -25,7 +25,7 @@ class LMUProvider extends Sector397Provider {
 	iCarInfos := false
 	iCarInfosRefresh := 0
 
-	iFuelRatio := 1
+	iFuelRatio := false
 
 	class CarInfos extends LMURestProvider.StandingsData {
 		iCarIDs := false
@@ -147,11 +147,11 @@ class LMUProvider extends Sector397Provider {
 
 		return true
 	}
-	
+
 	supportsTyreManagement(&mixedCompounds?, &tyreSets?) {
 		mixedCompounds := "Wheel"
 		tyreSets := false
-		
+
 		return true
 	}
 
@@ -276,7 +276,7 @@ class LMUProvider extends Sector397Provider {
 
 			fuelRatio := setupData.FuelRatio
 
-			if isNumber(fuelRatio)
+			if (fuelRatio && isNumber(fuelRatio))
 				this.iFuelRatio := fuelRatio
 
 			setMultiMapValue(data, "Setup Data", "ServiceTime", LMURESTProvider.ServiceData().ServiceTime)

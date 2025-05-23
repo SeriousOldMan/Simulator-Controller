@@ -2339,6 +2339,19 @@ showRaceSettingsEditor() {
 		}
 	}
 
+	if !gSimulator {
+		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+		gSimulator := getMultiMapValue(settings, "Simulator", "Simulator", false)
+
+		if (gSimulator && Application(gSimulator, kSimulatorConfiguration).isRunning()) {
+			gCar := getMultiMapValue(settings, "Simulator", "Car")
+			gTrack := getMultiMapValue(settings, "Simulator", "Track")
+		}
+		else
+			gSimulator := false
+	}
+
 	if (gSimulator && gCar)
 		gTyreCompounds := SessionDatabase.getTyreCompounds(gSimulator, gCar, gTrack ? gTrack : "*")
 

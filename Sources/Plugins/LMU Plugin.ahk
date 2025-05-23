@@ -100,10 +100,14 @@ class LMUPlugin extends Sector397Plugin {
 				case "Refuel":
 					switch operation, false {
 						case "Get":
-							return (pitstop.getRefuelLevel() - this.iRemainingFuelAmount)
+							return (pitstop.getRefuelLevel() - (this.iRemainingFuelAmount ? this.iRemainingFuelAmount
+																						  : this.iLastFuelAmount))
 						case "Set":
 							if initial
 								this.iRemainingFuelAmount := this.iLastFuelAmount
+								
+							if isDebug()
+								kLogMessage(kLogDebug, (initial ? "Inital" : "Updated") . " fuel plan - Remaining: " . Round(this.iLastFuelAmount, 1) . "; Refuel: " . Round(value, 1))
 
 							pitstop.setRefuelLevel(value + this.iRemainingFuelAmount)
 						case "Change":
@@ -437,6 +441,7 @@ class LMUPlugin extends Sector397Plugin {
 	performPitstop(lapNumber, options) {
 		super.performPitstop(lapNumber, options)
 
+		this.iRemainingFuelAmount := 0
 		this.iLastFuelAmount := 0
 
 		this.iFuelLevels := []

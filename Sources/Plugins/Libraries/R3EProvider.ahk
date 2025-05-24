@@ -35,15 +35,17 @@ class R3EProvider extends SimulatorProvider {
 		super.__New(arguments*)
 	}
 
-	static loadDatabase() {
+	static loadDatabase(force := false) {
 		local data
 
-		if !R3EProvider.sCarDB {
+		if (!R3EProvider.sCarDB && (force || Application("RaceRoom Racing Experience", kSimulatorConfiguration).isRunning())) {
 			data := JSON.parse(FileRead(kResourcesDirectory . "Simulator Data\R3E\r3e-data.json", "UTF-8"))
 
 			R3EProvider.sClassDB := data["classes"]
 			R3EProvider.sCarDB := data["cars"]
 		}
+		else
+			return Task.CurrentTask
 	}
 
 	supportsPitstop(&refuelService?, &tyreService?, &repairService?) {
@@ -53,11 +55,11 @@ class R3EProvider extends SimulatorProvider {
 
 		return true
 	}
-	
+
 	supportsTyreManagement(&mixedCompounds?, &tyreSets?) {
 		mixedCompounds := "Axle"
 		tyreSets := false
-		
+
 		return true
 	}
 
@@ -72,7 +74,7 @@ class R3EProvider extends SimulatorProvider {
 		static lastCarName := false
 
 		if !R3EProvider.sCarDB
-			R3EProvider.loadDatabase()
+			R3EProvider.loadDatabase(true)
 
 		if (carID != lastCarID) {
 			carDB := R3EProvider.sCarDB
@@ -91,7 +93,7 @@ class R3EProvider extends SimulatorProvider {
 		static lastClassName := false
 
 		if !R3EProvider.sClassDB
-			R3EProvider.loadDatabase()
+			R3EProvider.loadDatabase(true)
 
 		if (classID != lastClassID) {
 			classDB := R3EProvider.sClassDB

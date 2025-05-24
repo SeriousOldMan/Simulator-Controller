@@ -450,6 +450,8 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 	importFromSimulation(message := false, simulator := false, prefix := false, settings := false) {
 		local result := false
+		local car := gCar
+		local track := gTrack
 		local candidate, ignore, data, tyreCompound, tyreCompoundColor, tc, tcc
 		local mixedCompounds, tyreSets, index, tyre, axle
 
@@ -468,20 +470,23 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			for candidate, ignore in getMultiMapValues(getControllerState(), "Simulators")
 				if Application(candidate, kSimulatorConfiguration).isRunning() {
 					simulator := candidate
+					prefix := SessionDatabase.getSimulatorCode(simulator)
+
+					data := callSimulator(prefix)
+
+					car := getMultiMapValue(data, "Session Data", "Car", car)
+					track := getMultiMapValue(data, "Session Data", "Car", track)
 
 					break
 				}
-
-			prefix := SessionDatabase.getSimulatorCode(simulator)
 		}
 
-		data := readSimulator(prefix, gCar, gTrack)
+		data := readSimulator(prefix, car, track)
 
 		if (getMultiMapValues(data, "Setup Data").Count > 0) {
-			SimulatorProvider.createSimulatorProvider(gSimulator, getMultiMapValue(data, "Session Data", "Car")
-																, getMultiMapValue(data, "Session Data", "Track")).supportsTyreManagement(&mixedCompounds, &tyreSets)
+			SimulatorProvider.createSimulatorProvider(simulator, car, track).supportsTyreManagement(&mixedCompounds, &tyreSets)
 
-			readTyreSetup(readMultiMap(kRaceSettingsFile))
+			readTyreSetup(readMultiMap(kRaceSettingsFile), simulator, car, track)
 
 			pitstopTyreSet := getMultiMapValue(data, "Setup Data", "TyreSet", pitstopTyreSet)
 			setupTyreSet := getMultiMapValue(data, "Car Data", "TyreSet", setupTyreSet ? setupTyreSet : Max(0, pitstopTyreSet - 1))
@@ -632,11 +637,11 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		return false
 	}
 
-	readTyreSetup(settings) {
+	readTyreSetup(settings, simulator := gSimulator, car := gCar, track := gTrack) {
 		local tyreCompound, tyreCompoundColor, tc, tcc
 		local mixedCompounds, tyreSets, index, tyre, axle
 
-		SimulatorProvider.createSimulatorProvider(gSimulator, gCar, gTrack).supportsTyreManagement(&mixedCompounds, &tyreSets)
+		SimulatorProvider.createSimulatorProvider(simulator, car, track).supportsTyreManagement(&mixedCompounds, &tyreSets)
 
 		if (gTyreCompound && gTyreCompoundColor) {
 			if (mixedCompounds = "Wheel") {
@@ -1020,17 +1025,18 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 				tyreCompound := compounds(string2Values(",", setupTyreCompound), string2Values(",", setupTyreCompoundColor))
 
 				for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
-					settingsGui["spSetupTyreCompound" . wheels[index] . "DropDown"].Choose(inList(gTyreCompounds, tyreCompound[index]))
+					settingsGui["spSetupTyreCompound" . wheels[index] . "DropDown"].Choose(Min(1, inList(gTyreCompounds, tyreCompound[index])))
 			}
 			else if (mixedCompounds = "Axle") {
 				tyreCompound := compounds(string2Values(",", setupTyreCompound), string2Values(",", setupTyreCompoundColor))
 
 				for index, axle in ["Front", "Rear"]
-					settingsGui["spSetupTyreCompound" . wheels[index + (index - 1)] . "DropDown"].Choose(inList(gTyreCompounds, tyreCompound[index]))
+					settingsGui["spSetupTyreCompound" . wheels[index + (index - 1)] . "DropDown"].Choose(Min(1, inList(gTyreCompounds, tyreCompound[index])))
 			}
 			else
-				settingsGui["spSetupTyreCompoundFLDropDown"].Choose(inList(gTyreCompounds, compound(string2Values(",", setupTyreCompound)[1]
-																								  , string2Values(",", setupTyreCompoundColor)[1])))
+				settingsGui["spSetupTyreCompoundFLDropDown"].Choose(Min(1, inList(gTyreCompounds
+																				, compound(string2Values(",", setupTyreCompound)[1]
+																						 , string2Values(",", setupTyreCompoundColor)[1]))))
 		}
 
 		if (value = "Dry") {
@@ -2291,6 +2297,7 @@ showRaceSettingsEditor() {
 	local message := "Export"
 	local icon := kIconsDirectory . "Race Settings.ico"
 	local index, fileName, settings, hasTeamServer
+	local candidate, ignore, data
 
 	TraySetIcon(icon, "1")
 	A_IconTip := "Race Settings"
@@ -2337,6 +2344,30 @@ showRaceSettingsEditor() {
 				index += 2
 			default:
 				index += 1
+		}
+	}
+
+	if !gSimulator {
+		for candidate, ignore in getMultiMapValues(getControllerState(), "Simulators")
+			if Application(candidate, kSimulatorConfiguration).isRunning() {
+				gSimulator := candidate
+
+				break
+			}
+
+		if gSimulator {
+			data := callSimulator(gSimulator)
+
+			if (data.Count > 0) {
+				gCar := getMultiMapValue(data, "Session Data", "Car", false)
+				gTrack := getMultiMapValue(data, "Session Data", "Track", false)
+			}
+
+			if (!gCar || !gTrack) {
+				gSimulator := false
+				gCar := false
+				gTrack := false
+			}
 		}
 	}
 

@@ -2348,6 +2348,30 @@ showRaceSettingsEditor() {
 	}
 
 	if !gSimulator {
+		for candidate, ignore in getMultiMapValues(getControllerState(), "Simulators")
+			if Application(candidate, kSimulatorConfiguration).isRunning() {
+				gSimulator := candidate
+
+				break
+			}
+
+		if gSimulator {
+			data := callSimulator(gSimulator)
+
+			if (data.Count > 0) {
+				gCar := getMultiMapValue(data, "Session Data", "Car", false)
+				gTrack := getMultiMapValue(data, "Session Data", "Track", false)
+			}
+
+			if (!gCar || !gTrack) {
+				gSimulator := false
+				gCar := false
+				gTrack := false
+			}
+		}
+	}
+
+	if !gSimulator {
 		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
 		gSimulator := getMultiMapValue(settings, "Simulator", "Simulator", false)
@@ -2356,31 +2380,8 @@ showRaceSettingsEditor() {
 			gCar := getMultiMapValue(settings, "Simulator", "Car")
 			gTrack := getMultiMapValue(settings, "Simulator", "Track")
 		}
-		else {
+		else
 			gSimulator := false
-
-			for candidate, ignore in getMultiMapValues(getControllerState(), "Simulators")
-				if Application(candidate, kSimulatorConfiguration).isRunning() {
-					gSimulator := candidate
-
-					break
-				}
-
-			if gSimulator {
-				data := callSimulator(gSimulator)
-
-				if (data.Count > 0) {
-					gCar := getMultiMapValue(data, "Session Data", "Car", false)
-					gTrack := getMultiMapValue(data, "Session Data", "Track", false)
-				}
-
-				if (!gCar || !gTrack) {
-					gSimulator := false
-					gCar := false
-					gTrack := false
-				}
-			}
-		}
 	}
 
 	if (gSimulator && gCar)

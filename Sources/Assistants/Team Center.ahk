@@ -14753,9 +14753,8 @@ setTyrePressures(tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPres
 																						, &tyreSet := false
 																						, &flPressure, &frPressure
 																						, &rlPressure, &rrPressure, false, false))
-	else
-		if (tCenter.SetupsListView.GetNext(0) = tCenter.iPressuresRequest)
-			tCenter.withExceptionhandler(ObjBindMethod(tCenter, "initializeSetup", tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPressure, rrPressure))
+	else if (tCenter.SetupsListView.GetNext(0) = tCenter.iPressuresRequest)
+		tCenter.withExceptionhandler(ObjBindMethod(tCenter, "initializeSetup", tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPressure, rrPressure))
 
 	return false
 }

@@ -433,6 +433,15 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 			options.Push(ProcessExist())
 
+			if (gSimulator && gCar && gTrack) {
+				options.Push("-Simulator")
+				options.Push("`"" . gSimulator . "`"")
+				options.Push("-Car")
+				options.Push("`"" . gCar . "`"")
+				options.Push("-Track")
+				options.Push("`"" . gTrack . "`"")
+			}
+
 			options := values2String(A_Space, options*)
 
 			Run("`"" . exePath . "`" " . options, kBinariesDirectory, , &pid)
@@ -621,6 +630,13 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 	}
 
 	setTyrePressures(tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPressure, rrPressure) {
+		local tcIndex := inList(gTyreCompounds, compound(tyreCompound, tyreCompoundColor))
+		local tyre
+
+		if tcIndex
+			for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
+				settingsGui["spSetupTyreCompound" . wheels[index] . "DropDown"].Choose(tcIndex)
+
 		if (tyreCompound = "Wet") {
 			settingsGui["spWetFrontLeftEdit"].Text := displayValue("Float", convertUnit("Pressure", flPressure))
 			settingsGui["spWetFrontRightEdit"].Text := displayValue("Float", convertUnit("Pressure", frPressure))
@@ -633,6 +649,9 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			settingsGui["spDryRearLeftEdit"].Text := displayValue("Float", convertUnit("Pressure", rlPressure))
 			settingsGui["spDryRearRightEdit"].Text := displayValue("Float", convertUnit("Pressure", rrPressure))
 		}
+
+		if tcIndex
+			editRaceSettings(&updateState)
 
 		return false
 	}

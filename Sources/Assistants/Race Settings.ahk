@@ -2380,6 +2380,11 @@ showRaceSettingsEditor() {
 			if (data.Count > 0) {
 				gCar := getMultiMapValue(data, "Session Data", "Car", false)
 				gTrack := getMultiMapValue(data, "Session Data", "Track", false)
+
+				data := readSimulator(gSimulator, gCar, gTrack)
+
+				gCar := getMultiMapValue(data, "Session Data", "Car", false)
+				gTrack := getMultiMapValue(data, "Session Data", "Track", false)
 			}
 
 			if (!gCar || !gTrack) {

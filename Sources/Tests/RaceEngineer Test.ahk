@@ -1057,6 +1057,8 @@ class PitstopHandling extends Assert {
 					engineer.preparePitstop()
 					engineer.performPitstop()
 
+					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+
 					this.AssertEqual(kNotInitialized, vSuspensionDamage, "Expected no suspension damage to be reported...")
 					this.AssertEqual(kNotInitialized, vBodyworkDamage, "Expected no bodywork damage to be reported...")
 

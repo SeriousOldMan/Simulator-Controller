@@ -1105,7 +1105,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local knowledge := super.getKnowledge(type, options)
 		local strategy, nextPitstop, pitstop, pitstops
-		local fuelService, tyreService, tyreCompound, tyreCompoundColor
+		local fuelService, tyreService, tyreCompound, tyreCompoundColor, tcCandidate
 		local availableTyreSets, tyreSets, tyreSet, ignore
 
 		if knowledgeBase {
@@ -1117,7 +1117,9 @@ class RaceStrategist extends GridRaceAssistant {
 					tyreSets := knowledge["Session"]["AvailableTyres"]
 
 					for ignore, tyreCompound in SessionDatabase.getTyreCompounds(this.Simulator, this.Car, this.Track) {
-						tyreSet := first(tyreSets, (ts) => (ts["Compound"] = tyreCompound))
+						tcCandidate := tyreCompound
+
+						tyreSet := first(tyreSets, (ts) => (ts["Compound"] = tcCandidate))
 
 						if (tyreSet && availableTyreSets.Has(tyreCompound))
 							if (availableTyreSets[tyreCompound][2].Length > 0)

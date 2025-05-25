@@ -40,6 +40,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
   - Fixed the preparation of the available tyre sets for the LLM by the Race Strategist in case of multiple tyre compounds mounted on the car.
   - Fixed a crash in "Race Reports", "Solo Center" and "Team Center", if an already retired car is reported by the simulator API.
+  - Fixed the handling of explicit tyre sets by Race Engineer as configured in "Race Settings", which has been broken with the last release.
+  - Fixed handling of database tyre pressures for upcoming pitstop by the Race Engineer, which has been broken with the last release.
 
 #### Changes
 

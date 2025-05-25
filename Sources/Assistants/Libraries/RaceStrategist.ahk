@@ -4606,8 +4606,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local tyreLaps, lastPitstop
 
 		if ((lapState = "Valid") && !pitstop) {
-			lapsDB.addElectronicEntry(weather, airTemperature, trackTemperature
-											 , string2Values(",", compound)[1], string2Values(",", compoundColor)[1]
+			lapsDB.addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor
 											 , map, tc, abs, fuelConsumption, fuelRemaining, lapTime
 											 , isDebug() ? SessionDatabase.getDriverID(this.Simulator, this.DriverFullName) : false)
 
@@ -4620,7 +4619,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 			if (tyreLaps > 1)
 				lapsDB.addTyreEntry(weather, airTemperature, trackTemperature
-										   , string2Values(",", compound)[1], string2Values(",", compoundColor)[1], tyreLaps
+										   , compound, compoundColor, tyreLaps
 										   , pressures[1], pressures[2], pressures[3], pressures[4]
 										   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
 										   , wear ? wear[1] : kNull, wear ? wear[2] : kNull

@@ -437,12 +437,12 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 
 							try {
 								lapsDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6]
-														, string2Values(",", telemetryData[14])[1], string2Values(",", telemetryData[15])[1]
+														, telemetryData[14], telemetryData[15]
 														, telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8]
 														, telemetryData[9], driverID, telemetryData.Has(19) ? telemetryData[19] : false)
 
 								lapsDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]
-												  , string2Values(",", telemetryData[14])[1], string2Values(",", telemetryData[15])[1], runningLap
+												  , telemetryData[14], telemetryData[15], runningLap
 												  , pressures[1], pressures[2], pressures[4], pressures[4]
 												  , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
 												  , wear[1], wear[2], wear[3], wear[4]
@@ -473,7 +473,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 				if (!telemetryData["Pitstop"] && (telemetryData["State"] = "Valid"))
 					try {
 						lapsDB.addElectronicEntry(telemetryData["Weather"], telemetryData["Temperature.Air"], telemetryData["Temperature.Track"]
-												, string2Values(",", telemetryData["Compound"])[1], string2Values(",", telemetryData["Compound.Color"])[1]
+												, telemetryData["Compound"], telemetryData["Compound.Color"]
 												, telemetryData["Map"], telemetryData["TC"], telemetryData["ABS"]
 												, telemetryData["Fuel.Consumption"], telemetryData["Fuel.Remaining"], telemetryData["LapTime"])
 
@@ -482,7 +482,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 						wear := string2Values(",", telemetryData["Wear"])
 
 						lapsDB.addTyreEntry(telemetryData["Weather"], telemetryData["Temperature.Air"], telemetryData["Temperature.Track"]
-										  , string2Values(",", telemetryData["Compound"])[1], string2Values(",", telemetryData["Compound.Color"])[1], runningLap
+										  , telemetryData["Compound"], telemetryData["Compound.Color"], runningLap
 										  , pressures[1], pressures[2], pressures[4], pressures[4]
 										  , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
 										  , wear[1], wear[2], wear[3], wear[4]

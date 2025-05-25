@@ -32,7 +32,21 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 # Upcoming release
 
-Not yet planned...
+## 6.3.4.0
+
+#### Date: 05/30/25 (planned)
+
+#### Fixes
+
+  - Fixed the preparation of the available tyre sets for the LLM by the Race Strategist in case of multiple tyre compounds mounted on the car.
+  - Fixed a crash in "Race Reports", "Solo Center" and "Team Center", if an already retired car is reported by the simulator API.
+
+#### Changes
+
+  - Multiple tyre compounds will be shown in the "Race Reports", if they have been used on the car.
+  - "Race Settings" now support multiple tyre compounds for the initial car setup, if supported by the current simulator.
+  - The detection of the currently active simulator has been improved for "Race Settings".
+  - Multiple tyre compounds are now also stored in "Laps" entries in the session database. This is a preparation for multiple tyre compound support in strategies.
 
 # Release history
 

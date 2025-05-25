@@ -137,6 +137,18 @@ class LapsDatabase extends SessionDatabase {
 			return []
 	}
 
+	normalizeCompounds(&compound, &compoundColor) {
+		if InStr(compound, ",") {
+			compound := string2Values(",", compound)
+			compoundColor := string2Values(",", compoundColor)
+
+			combineCompounds(&compound, &compoundColor)
+
+			compound := values2String(",", compound*)
+			compoundColor := values2String(",", compoundColor*)
+		}
+	}
+
 	getElectronicsCount(drivers := kUndefined) {
 		local result := this.combineResults("Electronics", {Group: [["Lap.Time", count, "Count"]]
 														  ; , Transform: removeInvalidLaps
@@ -154,12 +166,16 @@ class LapsDatabase extends SessionDatabase {
 	}
 
 	getElectronicEntries(weather, compound, compoundColor, drivers := kUndefined) {
+		this.normalizeCompounds(&compound, &compoundColor)
+
 		return this.combineResults("Electronics", {Transform: removeInvalidLaps
 												 , Where: Map("Weather", weather, "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor)}
 												, drivers)
 	}
 
 	getTyreEntries(weather, compound, compoundColor, drivers := kUndefined) {
+		this.normalizeCompounds(&compound, &compoundColor)
+
 		return this.combineResults("Tyres", {Transform: compose(removeInvalidLaps, computePressures, computeTemperatures, computeWear)
 										   , Where: Map("Weather", weather, "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor)}
 										  , drivers)
@@ -173,6 +189,8 @@ class LapsDatabase extends SessionDatabase {
 	}
 
 	getMapData(weather, compound, compoundColor, drivers := kUndefined) {
+		this.normalizeCompounds(&compound, &compoundColor)
+
 		return this.combineResults("Electronics", {Group: [["Lap.Time", average, "Lap.Time"], ["Fuel.Consumption", average, "Fuel.Consumption"]]
 												 , By: "Map", Transform: removeInvalidLaps
 												 , Where: Map("Weather", weather, "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor)}
@@ -180,6 +198,8 @@ class LapsDatabase extends SessionDatabase {
 	}
 
 	getTyreData(weather, compound, compoundColor, drivers := kUndefined) {
+		this.normalizeCompounds(&compound, &compoundColor)
+
 		return this.combineResults("Tyres", {Group: [["Lap.Time", minimum, "Lap.Time"]], By: "Tyre.Laps"
 										   , Transform: removeInvalidLaps
 										   , Where: Map("Weather", weather, "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor)}
@@ -194,6 +214,8 @@ class LapsDatabase extends SessionDatabase {
 	}
 
 	getMapLapTimes(weather, compound, compoundColor, drivers := kUndefined) {
+		this.normalizeCompounds(&compound, &compoundColor)
+
 		return this.combineResults("Electronics", {Group: [["Lap.Time", minimum, "Lap.Time"]], By: ["Map", "Fuel.Remaining"]
 												 , Transform: removeInvalidLaps
 												 , Where: Map("Weather", weather, "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor)}
@@ -201,6 +223,8 @@ class LapsDatabase extends SessionDatabase {
 	}
 
 	getTyreLapTimes(weather, compound, compoundColor, withFuel := false, drivers := kUndefined) {
+		this.normalizeCompounds(&compound, &compoundColor)
+
 		return this.combineResults("Tyres", {Group: [["Lap.Time", minimum, "Lap.Time"]], By: (withFuel ? ["Tyre.Laps", "Fuel.Remaining"] : "Tyre.Laps")
 										   , Transform: removeInvalidLaps
 										   , Where: Map("Weather", weather, "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor)}
@@ -208,6 +232,8 @@ class LapsDatabase extends SessionDatabase {
 	}
 
 	getFuelLapTimes(weather, compound, compoundColor, drivers := kUndefined) {
+		this.normalizeCompounds(&compound, &compoundColor)
+
 		return this.combineResults("Tyres", {Group: [["Lap.Time", minimum, "Lap.Time"]], By: "Fuel.Remaining"
 										   , Transform: removeInvalidLaps
 										   , Where: Map("Weather", weather, "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor)}
@@ -222,6 +248,8 @@ class LapsDatabase extends SessionDatabase {
 	}
 
 	getLapTimePressures(weather, compound, compoundColor, drivers := kUndefined) {
+		this.normalizeCompounds(&compound, &compoundColor)
+
 		return this.combineResults("Tyres", {Group: [["Tyre.Pressure.Front.Left", average, "Tyre.Pressure.Front.Left"]
 												   , ["Tyre.Pressure.Front.Right", average, "Tyre.Pressure.Front.Right"]
 												   , ["Tyre.Pressure.Rear.Left", average, "Tyre.Pressure.Rear.Left"]
@@ -235,6 +263,8 @@ class LapsDatabase extends SessionDatabase {
 		local database := this.Database
 		local oldCritical := Task.Critical
 		local where, ltAvg, ltStdDev, cAvg, cStdDev, rows, identifiers, filter, ignore, row, identifier, connector
+
+		this.normalizeCompounds(&compound, &compoundColor)
 
 		if database {
 			Task.Critical := true
@@ -358,6 +388,8 @@ class LapsDatabase extends SessionDatabase {
 
 		if (!this.Shared || db.lock("Electronics", false))
 			try {
+				this.normalizeCompounds(&compound, &compoundColor)
+
 				db.add("Electronics", Database.Row("Driver", driver, "Weather", weather
 											     , "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
 											     , "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor
@@ -392,6 +424,8 @@ class LapsDatabase extends SessionDatabase {
 
 		if (!this.Shared || db.lock("Tyres", false))
 			try {
+				this.normalizeCompounds(&compound, &compoundColor)
+
 				db.add("Tyres", Database.Row("Driver", driver, "Weather", weather
 										   , "Temperature.Air", valueOrNull(airTemperature)
 										   , "Temperature.Track", valueOrNull(trackTemperature)

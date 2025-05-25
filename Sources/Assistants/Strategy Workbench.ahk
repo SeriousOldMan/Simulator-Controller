@@ -2330,7 +2330,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	loadDataType(dataType, force := false) {
-		local tyreCompound, lapsDB, ignore, column, categories, field, category, value, settings
+		local tyreCompound, tyreCompoundColor, lapsDB, ignore, column, categories, field, category, value, settings
 		local driverNames, index, names, schema, availableCompounds, settings, axis, value
 
 		if (force || (this.SelectedDataType != dataType)) {
@@ -2376,12 +2376,22 @@ class StrategyWorkbench extends ConfigurationItem {
 				if (value = "n/a")
 					value := translate(value)
 
-				tyreCompound := compound(category["Tyre.Compound"], category["Tyre.Compound.Color"])
+				tyreCompound := category["Tyre.Compound"]
 
-				this.DataListView.Add("", translate(tyreCompound), value, category["Count"])
+				if InStr(tyreCompound, ",")
+					tyreCompound := compounds(string2Values(",", tyreCompound)
+											, string2Values(",", category["Tyre.Compound.Color"]))
+				else
+					tyreCompound := [compound(tyreCompound, category["Tyre.Compound.Color"])]
 
-				if !inList(availableCompounds, tyreCompound)
-					availableCompounds.Push(tyreCompound)
+				this.DataListView.Add("", values2String(", ", collect(tyreCompound, translate)*), value, category["Count"])
+
+				if (tyreCompound.Length = 1) {
+					tyreCompound := tyreCompound[1]
+
+					if !inList(availableCompounds, tyreCompound)
+						availableCompounds.Push(tyreCompound)
+				}
 			}
 
 			this.DataListView.ModifyCol(1, "AutoHdr")

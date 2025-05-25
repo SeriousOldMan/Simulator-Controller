@@ -7999,13 +7999,12 @@ class TeamCenter extends ConfigurationItem {
 					wear := [kNull, kNull, kNull, kNull]
 
 				lapsDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6]
-										, string2Values(",", telemetryData[14])[1], string2Values(",", telemetryData[15])[1]
+										, telemetryData[14], telemetryData[15]
 										, telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9]
 										, driverID)
 
 				lapsDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]
-								  , string2Values(",", telemetryData[14])[1], string2Values(",", telemetryData[15])[1]
-								  , runningLap
+								  , telemetryData[14], telemetryData[15], runningLap
 								  , pressures[1], pressures[2], pressures[4], pressures[4]
 								  , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
 								  , wear[1], wear[2], wear[3], wear[4]

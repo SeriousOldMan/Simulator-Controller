@@ -1015,11 +1015,18 @@ class PitstopHandling extends Assert {
 
 				if (A_Index = 3) {
 					engineer.planPitstop()
+
+					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+
 					engineer.preparePitstop()
+
+					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 				}
 
 				if (A_Index = 4) {
 					engineer.performPitstop()
+
+					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					this.AssertEqual(1, engineer.KnowledgeBase.getValue("Pitstop.Last", 0), "Last Pitstop not in history memory...")
 					this.AssertEqual(true, vSuspensionDamage, "Expected suspension damage to be reported...")
@@ -1042,6 +1049,8 @@ class PitstopHandling extends Assert {
 
 					engineer.preparePitstop()
 					engineer.performPitstop()
+
+					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					this.AssertEqual(kNotInitialized, vSuspensionDamage, "Expected no suspension damage to be reported...")
 					this.AssertEqual(kNotInitialized, vBodyworkDamage, "Expected no bodywork damage to be reported...")

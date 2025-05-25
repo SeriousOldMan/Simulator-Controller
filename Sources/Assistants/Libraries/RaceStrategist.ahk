@@ -542,7 +542,7 @@ class RaceStrategist extends GridRaceAssistant {
 		loadFromConfiguration(configuration) {
 			local pitstops := []
 			local tyreSets := []
-			local knowledgeBase, lapNumber, mixedCompounds, tyreCompound, tyreCompoundColor
+			local knowledgeBase, lapNumber, mixedCompounds, tyreSet, tyreCompound, tyreCompoundColor
 
 			loop getMultiMapValue(configuration, "Pitstops", "Count", 0)
 				pitstops.Push({Nr: A_Index
@@ -568,7 +568,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 				lapNumber := knowledgeBase.getValue("Lap")
 
-				if this.Provider.supportsTyreManagement(&mixedCompounds) {
+				if this.Provider.supportsTyreManagement(&mixedCompounds, &tyreSet) {
 					tyreCompound := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound", "Dry")
 					tyreCompoundColor := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color", "Black")
 

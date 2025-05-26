@@ -850,6 +850,7 @@ class PositionInfo {
 class RaceSpotter extends GridRaceAssistant {
 	iSpotterPID := false
 	iRunning := false
+	iEnabled := true
 
 	iSessionDataActive := false
 
@@ -1003,6 +1004,12 @@ class RaceSpotter extends GridRaceAssistant {
 	Running {
 		Get {
 			return this.iRunning
+		}
+	}
+
+	Enabled {
+		Get {
+			return this.iEnabled
 		}
 	}
 
@@ -1189,6 +1196,9 @@ class RaceSpotter extends GridRaceAssistant {
 		if (values.HasProp("BaseLap") && (values.BaseLap != this.BaseLap))
 			if this.SessionInfos.Has("AirTemperature")
 				this.SessionInfos.Delete("AirTemperature")
+
+		if values.HasProp("Enabled")
+			this.iEnabled := values.Enabled
 
 		super.updateDynamicValues(values)
 	}
@@ -2951,7 +2961,7 @@ class RaceSpotter extends GridRaceAssistant {
 			if ((lastLap > 1) || (this.Session = kSessionQualification))
 				this.updatePositionInfos(lastLap, sector, positions)
 
-			if (this.DriverCar && !this.DriverCar.InPit && update) {
+			if (this.DriverCar && !this.DriverCar.InPit && update && this.Enabled) {
 				if isDebug()
 					logMessage(kLogDebug, "UpdateDriver: " . lastLap . ", " . sector . " Driver: " . (this.DriverCar != false) . ", " . (this.DriverCar && this.DriverCar.InPit) . " Race: " . raceInfo)
 
@@ -3249,11 +3259,11 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	disableSpotter() {
-		updateDynamicValues({Enabled: false})
+		this.updateDynamicValues({Enabled: false})
 	}
 
 	enableSpotter() {
-		updateDynamicValues({Enabled: true})
+		this.updateDynamicValues({Enabled: true})
 	}
 
 	internalError(arguments*) {

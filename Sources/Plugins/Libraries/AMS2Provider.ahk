@@ -30,11 +30,11 @@ class AMS2Provider extends SimulatorProvider {
 
 		return true
 	}
-	
+
 	supportsTyreManagement(&mixedCompounds?, &tyreSets?) {
 		mixedCompounds := false
 		tyreSets := false
-		
+
 		return true
 	}
 
@@ -50,6 +50,12 @@ class AMS2Provider extends SimulatorProvider {
 		local tyreCompound, tyreCompoundColor, ignore, section, postFix
 
 		static tyres := ["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
+
+		if !car
+			car := getMultiMapValue(data, "Session Data", "Car", false)
+
+		if !track
+			track := getMultiMapValue(data, "Session Data", "Track", false)
 
 		for ignore, section in ["Car Data", "Setup Data"]
 			for ignore, postfix in tyres {

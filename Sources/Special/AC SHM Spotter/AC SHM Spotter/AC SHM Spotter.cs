@@ -1943,12 +1943,13 @@ namespace ACSHMSpotter {
 
 								cycle += 1;
 
-								if (checkAccident())
-									wait = false;
-								else if (checkFlagState() || checkPositions())
-									wait = false;
-								else
-									wait = !checkPitWindow();
+								if (enabled)
+									if (checkAccident())
+										wait = false;
+									else if (checkFlagState() || checkPositions())
+										wait = false;
+									else
+										wait = !checkPitWindow();
 							}
 							else
 							{

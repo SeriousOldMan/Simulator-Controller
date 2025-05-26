@@ -275,7 +275,6 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 			}
 			else if (data && (tpSetting = "Setup")) {
 				compound := getMultiMapValue(data, "Car Data", "TyreCompound", "Dry")
-				compoundColor := getMultiMapValue(data, "Car Data", "TyreCompoundColor", "Black")
 				pressures := string2Values(",", getMultiMapValue(data, "Car Data", "TyrePressure", ""))
 
 				if (pressures.Length >= 4) {

@@ -140,6 +140,12 @@ class R3EProvider extends SimulatorProvider {
 
 		static tyres := ["Front", "Rear"]
 
+		if !car
+			car := getMultiMapValue(data, "Session Data", "Car", false)
+
+		if !track
+			track := getMultiMapValue(data, "Session Data", "Track", false)
+
 		for ignore, section in ["Car Data", "Setup Data"]
 			for ignore, postfix in tyres {
 				tyreCompound := getMultiMapValue(data, section, "TyreCompound" . postFix, kUndefined)

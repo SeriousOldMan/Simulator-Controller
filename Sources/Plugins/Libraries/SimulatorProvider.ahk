@@ -234,6 +234,12 @@ class SimulatorProvider {
 		local data := callSimulator(SessionDatabase.getSimulatorCode(simulator), options, protocol?)
 		local tyreCompound, tyreCompoundColor, ignore, section
 
+		if !car
+			car := getMultiMapValue(data, "Session Data", "Car", false)
+
+		if !track
+			track := getMultiMapValue(data, "Session Data", "Track", false)
+
 		for ignore, section in ["Car Data", "Setup Data"] {
 			tyreCompound := getMultiMapValue(data, section, "TyreCompound", kUndefined)
 

@@ -2934,7 +2934,7 @@ openRaceSettings(import := false, silent := false, plugin := false, fileName := 
 			RunWait("`"" . exePath . "`" " . options, kBinariesDirectory)
 		}
 		else {
-			options := "-File `"" . fileName . "`" " . getSimulatorOptions(plugin)
+			options := ("-File `"" . fileName . "`" " . getSimulatorOptions(plugin))
 
 			Run("`"" . exePath . "`" " . options, kBinariesDirectory, , &pid)
 

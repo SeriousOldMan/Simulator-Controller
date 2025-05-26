@@ -250,6 +250,12 @@ class Sector397Provider extends SimulatorProvider {
 
 		static tyres := ["Front", "Rear"]
 
+		if !car
+			car := getMultiMapValue(data, "Session Data", "Car", false)
+
+		if !track
+			track := getMultiMapValue(data, "Session Data", "Track", false)
+
 		for ignore, section in ["Car Data", "Setup Data"]
 			for ignore, postfix in tyres {
 				tyreCompound := getMultiMapValue(data, section, "TyreCompound" . postFix, kUndefined)
@@ -293,11 +299,11 @@ class RF2Provider extends Sector397Provider {
 
 		return true
 	}
-	
+
 	supportsTyreManagement(&mixedCompounds?, &tyreSets?) {
 		mixedCompounds := "Axle"
 		tyreSets := false
-		
+
 		return true
 	}
 }

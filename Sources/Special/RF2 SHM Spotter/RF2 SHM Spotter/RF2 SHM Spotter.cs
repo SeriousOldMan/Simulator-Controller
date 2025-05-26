@@ -2010,15 +2010,17 @@ namespace RF2SHMSpotter {
 
                                         if (cycle > nextSpeedUpdate)
                                         {
+											float speed = (float)vehicleSpeed(ref playerScoring);
+
                                             nextSpeedUpdate = cycle + 50;
 
-                                            if (((float)vehicleSpeed(ref playerScoring) >= thresholdSpeed) && !enabled)
+                                            if ((speed >= thresholdSpeed) && !enabled)
                                             {
                                                 enabled = true;
 
                                                 SendSpotterMessage("enableSpotter");
                                             }
-                                            else if (((float)vehicleSpeed(ref playerScoring) < thresholdSpeed) && enabled)
+                                            else if ((speed < thresholdSpeed) && enabled)
                                             {
                                                 enabled = false;
 
@@ -2029,12 +2031,13 @@ namespace RF2SHMSpotter {
                                         cycle += 1;
 
 										if (!startGo || !greenFlag())
-											if (checkAccident(ref playerScoring))
-												wait = false;
-											else if (checkFlagState(ref playerScoring) || checkPositions(ref playerScoring))
-												wait = false;
-											else
-												wait = !checkPitWindow(ref playerScoring);
+											if (enabled)
+												if (checkAccident(ref playerScoring))
+													wait = false;
+												else if (checkFlagState(ref playerScoring) || checkPositions(ref playerScoring))
+													wait = false;
+												else
+													wait = !checkPitWindow(ref playerScoring);
 									}
 									else
 									{

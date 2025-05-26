@@ -2404,12 +2404,13 @@ int main(int argc, char* argv[])
 
 									if (greenFlag(pHeader, g_data))
 										wait = false;
-									else if (checkAccident(pHeader, g_data, playerCarIndex, trackLength))
-										wait = false;
-									else if (checkFlagState(pHeader, g_data) || checkPositions(pHeader, g_data, playerCarIndex, trackLength))
-										wait = false;
-									else
-										wait = !checkPitWindow(pHeader, g_data);
+									else if (enabled)
+										if (checkAccident(pHeader, g_data, playerCarIndex, trackLength))
+											wait = false;
+										else if (checkFlagState(pHeader, g_data) || checkPositions(pHeader, g_data, playerCarIndex, trackLength))
+											wait = false;
+										else
+											wait = !checkPitWindow(pHeader, g_data);
 
 									continue;
 								}

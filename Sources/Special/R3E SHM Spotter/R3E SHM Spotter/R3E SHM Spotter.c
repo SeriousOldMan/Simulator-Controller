@@ -1965,12 +1965,13 @@ int main(int argc, char* argv[])
 							cycle += 1;
 
 							if (!startGo || !greenFlag())
-								if (checkAccident())
-									wait = FALSE;
-								else if (checkFlagState() || checkPositions(playerID))
-									wait = FALSE;
-								else
-									wait = !checkPitWindow();
+								if (enabled)
+									if (checkAccident())
+										wait = FALSE;
+									else if (checkFlagState() || checkPositions(playerID))
+										wait = FALSE;
+									else
+										wait = !checkPitWindow();
 						}
 					}
 					else {

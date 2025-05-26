@@ -1760,12 +1760,13 @@ int main(int argc, char* argv[]) {
 							cycle += 1;
 
 							if (!startGo || !greenFlag(localCopy))
-								if (checkAccident(localCopy))
-									wait = false;
-								else if (checkFlagState(localCopy) || checkPositions(localCopy))
-									wait = false;
-								else
-									wait = !checkPitWindow(localCopy);
+								if (enabled)
+									if (checkAccident(localCopy))
+										wait = false;
+									else if (checkFlagState(localCopy) || checkPositions(localCopy))
+										wait = false;
+									else
+										wait = !checkPitWindow(localCopy);
 						}
 						else {
 							longitudinalRearDistance = 5;

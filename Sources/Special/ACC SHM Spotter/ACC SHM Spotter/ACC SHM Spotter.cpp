@@ -2385,12 +2385,13 @@ int main(int argc, char* argv[])
 						cycle += 1;
 
 						if (!startGo || !greenFlag())
-							if (checkAccident())
-								wait = false;
-							else if (checkFlagState() || checkPositions())
-								wait = false;
-							else
-								wait = !checkPitWindow();
+							if (enabled)
+								if (checkAccident())
+									wait = false;
+								else if (checkFlagState() || checkPositions())
+									wait = false;
+								else
+									wait = !checkPitWindow();
 					}
 					else {
 						longitudinalRearDistance = 5;

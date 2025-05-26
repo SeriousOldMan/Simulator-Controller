@@ -307,7 +307,7 @@ Using the technology developed for Jona, Release 3.1 introduced an additional Ra
 
 #### Elisa, the AI Race Spotter
 
-The third Assistant, Elisa, is not so much of a dialog partner, but gives you crucial information about the traffic, your opponents and the current race situation. See the separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist) for more information.
+The third Assistant, Elisa, is not so much of a dialog partner, but gives you crucial information about the traffic, your opponents and the current race situation. See the separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter) for more information.
 
 #### Aiden, the AI Driving Coach
 

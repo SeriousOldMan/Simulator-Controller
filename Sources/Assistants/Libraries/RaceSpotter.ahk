@@ -1179,6 +1179,7 @@ class RaceSpotter extends GridRaceAssistant {
 		if (values.HasProp("Session") && (values.Session == kSessionFinished)) {
 			this.iRunning := false
 			this.iFinalLap := false
+			this.iEnabled := true
 
 			this.initializeHistory()
 		}
@@ -3247,6 +3248,14 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
+	disableSpotter() {
+		updateDynamicValues({Enabled: false})
+	}
+
+	enableSpotter() {
+		updateDynamicValues({Enabled: true})
+	}
+
 	internalError(arguments*) {
 		if isDebug()
 			showMessage("Internal error: " . values2String(A_Space, arguments*))
@@ -3281,6 +3290,7 @@ class RaceSpotter extends GridRaceAssistant {
 											   . getMultiMapValue(this.Settings, "Assistant.Spotter", "Accident.Distance.Behind.Threshold", 500) . A_Space
 											   . getMultiMapValue(this.Settings, "Assistant.Spotter", "SlowCar.Distance.Ahead.Threshold", 500) . A_Space
 											   . ("`"" . kTempDirectory . "Race Spotter.semaphore`"") . A_Space
+											   . getMultiMapValue(this.Settings, "Assistant.Spotter", "Activation.Speed", 60) . A_Space
 											   . (isDebug() ? ("`"" . kTempDirectory . "Race Spotter.trace`"") : "-")
 											   . (trackData ? (" `"" . trackData . "`"") : "")
 					  , kBinariesDirectory, "Hide", &pid)

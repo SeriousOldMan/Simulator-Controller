@@ -180,6 +180,8 @@ namespace RF2SHMSpotter {
 		const double PI = 3.14159265;
 
 		long cycle = 0;
+		long nextSpeedUpdate = 0;
+		bool enabled = true;
 
 		const double nearByXYDistance = 10.0;
 		const double nearByZDistance = 6.0;
@@ -717,6 +719,8 @@ namespace RF2SHMSpotter {
 		int numAccidents = 0;
 
 		string semFileName = "";
+
+		int thresholdSpeed = 60;
 
         bool checkAccident(ref rF2VehicleScoring playerScoring)
         {
@@ -1907,6 +1911,9 @@ namespace RF2SHMSpotter {
 
             if (args.Length > 4)
                 semFileName = args[4];
+
+            if (args.Length > 5)
+                thresholdSpeed = int.Parse(args[5]);
         }
 
         bool started = false;
@@ -2001,7 +2008,25 @@ namespace RF2SHMSpotter {
 									{
 										updateTopSpeed(ref playerScoring);
 
-										cycle += 1;
+                                        if (cycle > nextSpeedUpdate)
+                                        {
+                                            nextSpeedUpdate = cycle + 50;
+
+                                            if (((float)vehicleSpeed(ref playerScoring) >= thresholdSpeed) && !enabled)
+                                            {
+                                                enabled = true;
+
+                                                SendSpotterMessage("enableSpotter");
+                                            }
+                                            else if (((float)vehicleSpeed(ref playerScoring) < thresholdSpeed) && enabled)
+                                            {
+                                                enabled = false;
+
+                                                SendSpotterMessage("disableSpotter");
+                                            }
+                                        }
+
+                                        cycle += 1;
 
 										if (!startGo || !greenFlag())
 											if (checkAccident(ref playerScoring))

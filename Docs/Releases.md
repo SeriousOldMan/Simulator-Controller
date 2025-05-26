@@ -45,8 +45,9 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 #### Changes
 
+  - A [new setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" let you define the minimu speed for the Race Spotter to be active, for example, to let the Spotter shut up during FCY phases. Default is 60 km/h.
   - Multiple tyre compounds will be shown in the "Race Reports", if they have been used on the car.
-  - "Race Settings" now support multiple tyre compounds for the initial car setup, if supported by the current simulator.
+  - "Race Settings" now support multiple tyre compounds for the initial car setup, if supported by the current simulator. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-session) for additional remarks.
   - The detection of the currently active simulator has been improved for "Race Settings".
   - Multiple tyre compounds are now also stored in "Laps" entries in the session database. This is a preparation for multiple tyre compound support in strategies.
 

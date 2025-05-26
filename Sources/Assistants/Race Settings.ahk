@@ -2029,7 +2029,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		option := (import ? "yp-25" : "yp")
 
-		settingsGui.Add("Button", "x292 " . option . " w90 h23", translate("Setups...")).OnEvent("Click", openSessionDatabase)
+		settingsGui.Add("Button", "x292 " . option . " w90 h23", translate("Database") . translate("...")).OnEvent("Click", openSessionDatabase)
 
 		if import {
 			local message := "Import"

@@ -161,6 +161,8 @@ With the second field, *Overtake Delta*, you specify the number of seconds as ti
 
 The second group of fields specify the time required for several pitstop activities, as well as the pitstop window, in which the best pitstop lap will be derived. With the value of *Pitstop Delta*, you supply the difference time needed for a normal pitstop (time for pit in and pit out but without any service time minus the time to pass the pit area on the track, i.e. Drive through vs. Drive by), The fields below specify the time required for the various pit services, like changing tyres, refueling, and so on, as well as these times are combined into an overall pitstop service time.
 
+Additionally worth to be mentioned is the field *Pitlane Delta*, with which you supply the difference time needed for a normal pitstop (time for pit in and pit out but without any service minus the time to pass the pit area on the track). This information is used by the Assistants to decide, whether an early pitstop for a tyre change or damage repair might be worthwhile.
+
 ### Pitstop Recommendation
 
 You can ask Cato to evaluate a couple of possible laps for an upcoming pitstop, either by using a voice command or the ["RecommendPitstop" controller action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist). You can either ask to simulate a pitstop around a specific lap or you can simply ask for the best option for the next pitstop. In this case, the target lap is either taken from an active strategy or, when no such strategy has been created, it is determined depending on the amount of fuel left.

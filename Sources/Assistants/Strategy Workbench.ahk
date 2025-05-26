@@ -444,7 +444,7 @@ class StrategyWorkbench extends ConfigurationItem {
 							this.Window.Block()
 
 							try {
-								LapsDatabase(workbench.SelectedSimulator , workbench.SelectedCar, workbench.SelectedTrack
+								LapsDatabase(workbench.SelectedSimulator, workbench.SelectedCar, workbench.SelectedTrack
 										   , workbench.SelectedDrivers).cleanupData(workbench.SelectedWeather, workbench.SelectedCompound
 																				  , workbench.SelectedCompoundColor, workbench.SelectedDrivers ? workbench.SelectedDrivers : true)
 
@@ -2346,7 +2346,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
 			lapsDB := LapsDatabase(this.SelectedSimulator, this.SelectedCar
-									  , this.SelectedTrack, this.SelectedDrivers)
+								 , this.SelectedTrack, this.SelectedDrivers)
 
 			this.DataListView.Delete()
 

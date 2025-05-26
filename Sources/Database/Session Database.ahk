@@ -7165,10 +7165,24 @@ editLaps(editorOrCommand, arguments*) {
 	static lapsDB
 
 	loadElectronics(entry) {
+		local tyreCompound := entry["Tyre.Compound"]
+		local tyreCompoundColor := entry["Tyre.Compound.Color"]
+
+		if InStr(tyreCompound, ",") {
+			tyreCompound := string2Values(",", tyreCompound)
+			tyreCompoundColor := string2Values(",", tyreCompoundColor)
+
+			combineCompounds(&tyreCompound, &tyreCompoundColor)
+
+			tyreCompound := values2String(", ", collect(compounds(tyreCompound, tyreCompoundColor), translate)*)
+		}
+		else
+			tyreCompound := translate(compound(tyreCompound, tyreCompoundColor))
+
 		return [translate(entry["Weather"])
 			  , convertUnit("Temperature", entry["Temperature.Air"])
 			  , convertUnit("Temperature", entry["Temperature.Track"])
-			  , translate(compound(entry["Tyre.Compound"], entry["Tyre.Compound.Color"]))
+			  , tyreCompound
 			  , convertUnit("Volume", entry["Fuel.Consumption"])
 			  , lapTimeDisplayValue(entry["Lap.Time"])
 			  , (entry["Map"] = kNull) ? translate("n/a") : entry["Map"]

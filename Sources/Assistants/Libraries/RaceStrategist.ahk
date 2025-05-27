@@ -2054,8 +2054,9 @@ class RaceStrategist extends GridRaceAssistant {
 		local driverForname := ""
 		local driverSurname := ""
 		local driverNickname := ""
-		local knowledgeBase, compound, result, lap, simulator, car, track, frequency, curContinuation
-		local pitstop, prefix, validLap, lapState, weather, airTemperature, trackTemperature, compound, compoundColor
+		local knowledgeBase, result, lap, simulator, car, track, frequency, curContinuation
+		local pitstop, prefix, validLap, lapState, weather, airTemperature, trackTemperature
+		local mixedCompounds, compound, compoundColor
 		local fuelConsumption, fuelRemaining, lapTime, map, tc, antiBS, pressures, temperatures, wear, multiClass
 		local sessionInfo, driverCar, driverID, lastTime, waterTemperature, oilTemperature
 
@@ -2191,6 +2192,33 @@ class RaceStrategist extends GridRaceAssistant {
 			fuelRemaining := Round(knowledgeBase.getValue(prefix . ".Fuel.Remaining"), 1)
 			lapTime := Round(knowledgeBase.getValue(prefix . ".Time") / 1000, 1)
 
+			this.Provider.supportsTyreManagement(&mixedCompounds)
+
+			if (mixedCompounds = "Wheel") {
+				compound := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"], (tyre) {
+								return knowledgeBase.getValue(prefix . ".Tyre.Compound." . tyre, compound)
+							})
+				compoundColor := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"], (tyre) {
+									 return knowledgeBase.getValue(prefix . ".Tyre.Compound.Color." . tyre, compoundColor)
+								 })
+
+				combineCompounds(&compound, &compoundColor)
+			}
+			else if (mixedCompounds = "Axle") {
+				compound := collect(["Front", "Rear"], (axle) {
+								return knowledgeBase.getValue(prefix . ".Tyre.Compound." . axle, compound)
+							})
+				compoundColor := collect(["Front", "Rear"], (axle) {
+									 return knowledgeBase.getValue(prefix . ".Tyre.Compound.Color." . axle, compoundColor)
+								 })
+
+				combineCompounds(&compound, &compoundColor)
+			}
+			else {
+				compound := [compound]
+				compoundColor := [compoundColor]
+			}
+
 			map := knowledgeBase.getValue(prefix . ".Map")
 			tc := knowledgeBase.getValue(prefix . ".TC")
 			antiBS := knowledgeBase.getValue(prefix . ".ABS")
@@ -2218,7 +2246,8 @@ class RaceStrategist extends GridRaceAssistant {
 
 			this.saveLapsData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 							, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, antiBS
-							, compound, compoundColor, pressures, temperatures, wear, lapState
+							, values2String(",", compound*), values2String(",", compoundColor*)
+							, pressures, temperatures, wear, lapState
 							, waterTemperature, oilTemperature)
 		}
 

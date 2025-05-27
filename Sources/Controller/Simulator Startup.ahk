@@ -2097,14 +2097,12 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 
 			if (line > 1)
 				editStartupProfiles(kEvent, "ProfileLoad", line)
-			else if (line = 1) {
-				profilesListView.Modify(1, "-Select")
+			else {
+				if (line = 1)
+					profilesListView.Modify(1, "-Select")
 
-				if selectedProfile
-					profilesListView.Modify(selectedProfile, "Select")
-			}
-			else
 				selectedProfile := false
+			}
 		}
 
 		editStartupProfiles("Update State")

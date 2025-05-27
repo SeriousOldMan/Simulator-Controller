@@ -49,16 +49,6 @@ namespace RF2SHMProvider {
 		rF2RulesControl rulesControl;
 		rF2PluginControl pluginControl;
 
-		// Fuel cache: maps fuel liters to mChoiceIndex
-		private Dictionary<int, int> fuelLitersToChoiceIndex = new System.Collections.Generic.Dictionary<int, int>();
-		private volatile bool buildingCache = false;
-		private Task buildCacheTask = null;
-
-		// Fields to track last car, track, and lap for cache invalidation
-		private string lastCarName = null;
-		private string lastTrackName = null;
-		private int lastLap = -1;
-
 		public SHMProvider() {
 			if (!this.connected)
 				this.Connect();
@@ -231,40 +221,6 @@ namespace RF2SHMProvider {
 			ref rF2VehicleTelemetry playerTelemetry = ref GetPlayerTelemetry(playerScoring.mID, ref telemetry);
 
 			string session = "";
-
-			string currentCarName = GetStringFromBytes(playerScoring.mVehicleName);
-			string currentTrackName = GetStringFromBytes(playerTelemetry.mTrackName);
-			int currentLap = playerScoring.mTotalLaps;
-
-			// Build fuel cache if not initialized or whether:
-			// - Car changed
-			// - Track changed
-			// - Lap < LastLap
-			// Avoid building cache if in pitlane to avoid problems
-			bool buildCache = false;
-			if (connected
-				&& playerScoring.mInPits == 0 /*not in pitlane*/
-				&& currentLap >= 0
-				&& currentCarName.Length != 0
-				&& currentTrackName.Length != 0)
-			{
-				buildCache = !buildingCache &&
-					(fuelLitersToChoiceIndex.Count() == 0
-					|| lastCarName != currentCarName
-					|| lastTrackName != currentTrackName
-					|| currentLap < lastLap);
-
-				// Run this asynchronously so we don't block data reading
-				if (buildCache)
-				{
-					buildingCache = true;
-					buildCacheTask = Task.Run(() => BuildFuelCache());
-				}
-			}
-
-			lastCarName = currentCarName;
-			lastTrackName = currentTrackName;
-			lastLap = currentLap;
 
 			Console.WriteLine("[Session Data]");
 			Console.Write("Active="); Console.WriteLine((connected && (extended.mSessionStarted != 0)) ? "true" : "false");
@@ -712,7 +668,8 @@ namespace RF2SHMProvider {
 			}
 		}
 
-		private void ExecuteSetRefuelCommand(string fuelArgument) {
+		private void ExecuteSetRefuelCommand(string fuelArgument)
+		{
 			Console.Write("Adjusting Refuel: "); Console.WriteLine(fuelArgument);
 
 			int targetFuel = Int16.Parse(fuelArgument);
@@ -720,24 +677,43 @@ namespace RF2SHMProvider {
 			if (!SelectPitstopCategory("FUEL:"))
 				return;
 
-			MoveToFirstPitChoice();
+			int currentFuel = GetFuel(GetStringFromBytes(pitInfo.mPitMenu.mChoiceString));
 
-			// Use cache if available
-			if (!buildingCache && fuelLitersToChoiceIndex.TryGetValue(targetFuel, out int cachedIndex))
+			if (currentFuel < targetFuel)
 			{
-				SendPitstopCommand(new string('+', cachedIndex));
-				return;
-			}
+				while (pitInfo.mPitMenu.mChoiceIndex < pitInfo.mPitMenu.mNumChoices)
+				{
+					SendPitstopCommand("+");
 
-			int index = 0;
-			while (GetFuel(GetStringFromBytes(pitInfo.mPitMenu.mChoiceString)) < targetFuel && index++ < pitInfo.mPitMenu.mNumChoices)
-			{
-				SendPitstopCommand(new string('+', 1));
-				pitInfoBuffer.GetMappedData(ref pitInfo);
+					pitInfoBuffer.GetMappedData(ref pitInfo);
+
+					currentFuel = GetFuel(GetStringFromBytes(pitInfo.mPitMenu.mChoiceString));
+
+					if (currentFuel >= targetFuel)
+						break;
+				}
 			}
+			else if (currentFuel > targetFuel)
+                while (pitInfo.mPitMenu.mChoiceIndex > 0)
+                {
+                    SendPitstopCommand("-");
+
+                    pitInfoBuffer.GetMappedData(ref pitInfo);
+
+                    currentFuel = GetFuel(GetStringFromBytes(pitInfo.mPitMenu.mChoiceString));
+
+					if (currentFuel == targetFuel)
+						break;
+					else if (currentFuel < targetFuel)
+					{
+						SendPitstopCommand("+");
+
+						pitInfoBuffer.GetMappedData(ref pitInfo);
+					}
+                }
 		}
-		
-		private void ExecuteChangeRefuelCommand(char action, string stepsArgument) {
+
+        private void ExecuteChangeRefuelCommand(char action, string stepsArgument) {
 			if (!SelectPitstopCategory("FUEL:"))
 				return;
 
@@ -1082,45 +1058,8 @@ namespace RF2SHMProvider {
 			this.nextKeyHandlingTime = now + TimeSpan.FromMilliseconds(100);
 		}
 
-		private void BuildFuelCache()
-		{
-			if (!SelectPitstopCategory("FUEL:"))
-				return;
-
-			fuelLitersToChoiceIndex.Clear();
-			MoveToFirstPitChoice();
-
-			int numChoices = pitInfo.mPitMenu.mNumChoices;
-			for (int i = 0; i < numChoices; ++i)
-			{
-				int liters = GetFuel(GetStringFromBytes(pitInfo.mPitMenu.mChoiceString));
-				int idx = pitInfo.mPitMenu.mChoiceIndex;
-				if (!fuelLitersToChoiceIndex.ContainsKey(liters))
-					fuelLitersToChoiceIndex[liters] = idx;
-				SendPitstopCommand("+");
-				pitInfoBuffer.GetMappedData(ref pitInfo);
-			}
-
-			MoveToFirstPitChoice();
-			buildingCache = false;
-		}
-
-		private void MoveToFirstPitChoice()
-		{
-			// Use numChoices to be 100% sure we are at first choice
-			SendPitstopCommand(new string('-', pitInfo.mPitMenu.mNumChoices));
-			pitInfoBuffer.GetMappedData(ref pitInfo);
-		}
-
 		public void ReadSetup() {
 			Console.WriteLine("[Setup Data]");
-
-			// Wait for fuel cache building to finish
-			// We need this to get consistent data here
-			if (buildCacheTask != null && !buildCacheTask.IsCompleted)
-			{
-				buildCacheTask.Wait();
-			}
 
 			if (connected) {
 				if (SelectPitstopCategory("FUEL:"))

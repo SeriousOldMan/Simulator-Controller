@@ -211,7 +211,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			else
 				this.iOpenPitstopMFDHotkey := "Off"
 
-			if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey := "Off"))
+			if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey = "Off"))
 				this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
 
 			this.iUDPProvider := ACCUDPProvider(this.getArgumentValue("udpConnection", false))

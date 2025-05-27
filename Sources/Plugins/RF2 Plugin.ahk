@@ -118,7 +118,7 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 			else
 				this.iOpenPitstopMFDHotkey := "Off"
 
-			if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey := "Off"))
+			if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey = "Off"))
 				this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
 
 			this.iRequestPitstopHotkey := this.getArgumentValue("requestPitstop", false)

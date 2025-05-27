@@ -118,7 +118,8 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 			else
 				this.iOpenPitstopMFDHotkey := "Off"
 
-			this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
+			if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey := "Off"))
+				this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
 
 			this.iRequestPitstopHotkey := this.getArgumentValue("requestPitstop", false)
 
@@ -467,7 +468,8 @@ class RF2Plugin extends Sector397Plugin {
 			this.changePitstopOption("RequestPitstop")
 		}
 
-		this.closePitstopMFD()
+		if this.ClosePitstopMFDHotkey
+			this.closePitstopMFD()
 	}
 }
 

@@ -45,6 +45,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 #### Changes
 
+  - [Important] The handling of the pitstop settings has changed for *rFactor 2*. It is now required to have the hotkeys for opening and closing the Pitstop MFD to be defined. This is necessary, because settings are not changed correctly, if the Pitstop MFD is not open while the change happens.
   - A [new setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" lets you define the minimum speed for the Race Spotter to be active. This useful, for example, to let the Spotter shut up during FCY phases. Default for "Spotter: Activation Speed" is 60 km/h.
   - Multiple tyre compounds will be shown in the "Race Reports", if they have been used on the car.
   - "Race Settings" now support multiple tyre compounds for the initial car setup, if supported by the current simulator. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-session) for additional remarks.

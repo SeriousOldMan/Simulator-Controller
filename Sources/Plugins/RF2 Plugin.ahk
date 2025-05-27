@@ -216,7 +216,15 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	requirePitstopMFD() {
-		return true
+		static nextRequest := 0
+
+		if (A_TickCount > nextRequest) {
+			nextRequest := (A_TickCount + 20000)
+
+			return this.openPitstopMFD()
+		}
+		else
+			return true
 	}
 
 	selectPitstopOption(option) {
@@ -361,6 +369,8 @@ class RF2Plugin extends Sector397Plugin {
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, liters, fillUp) {
+		this.requirePitstopMFD()
+
 		super.setPitstopRefuelAmount(pitstopNumber, liters, fillUp)
 
 		if (this.OpenPitstopMFDHotkey != "Off")
@@ -369,6 +379,8 @@ class RF2Plugin extends Sector397Plugin {
 
 	setPitstopTyreCompound(pitstopNumber, compound, compoundColor := false, set := false) {
 		local index, axle, tyreCompound
+
+		this.requirePitstopMFD()
 
 		super.setPitstopTyreCompound(pitstopNumber, compound, compoundColor, set)
 
@@ -395,6 +407,8 @@ class RF2Plugin extends Sector397Plugin {
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
+		this.requirePitstopMFD()
+
 		super.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
 
 		if (this.OpenPitstopMFDHotkey != "Off")
@@ -403,6 +417,8 @@ class RF2Plugin extends Sector397Plugin {
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
+		this.requirePitstopMFD()
+
 		super.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
 
 		if (this.OpenPitstopMFDHotkey != "Off")
@@ -418,6 +434,8 @@ class RF2Plugin extends Sector397Plugin {
 
 	requestPitstopDriver(pitstopNumber, driver) {
 		local delta, currentDriver, nextDriver
+
+		this.requirePitstopMFD()
 
 		super.requestPitstopDriver(pitstopNumber, driver)
 
@@ -443,8 +461,13 @@ class RF2Plugin extends Sector397Plugin {
 	finishPitstopSetup(pitstopNumber) {
 		super.finishPitstopSetup(pitstopNumber)
 
-		if getMultiMapValue(this.Settings, "Simulator.rFactor 2", "Pitstop.Request", false)
+		if getMultiMapValue(this.Settings, "Simulator.rFactor 2", "Pitstop.Request", false) {
+			this.requirePitstopMFD()
+
 			this.changePitstopOption("RequestPitstop")
+		}
+
+		this.closePitstopMFD()
 	}
 }
 

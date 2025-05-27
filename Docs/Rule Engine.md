@@ -594,4 +594,6 @@ When this script is executed, the following global variables and functions are a
    
      Runs a full production cycle of the Rule Engine of the Assistant.
 
+Additionally, the script can load any number of additional modules by using the builtin "require" function, either from external sources like the [LuaRocks](https://luarocks.org/) package maneger, or by using one of the predefined modules of Simulator Controller, that allow you to interface with the currently running simulation. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Script-Modules) for an introduction and reference for these modules.
+
 The script must return a single boolean value, which indicates success or failure, if the script is used as a predicate.

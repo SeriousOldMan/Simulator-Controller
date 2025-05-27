@@ -222,7 +222,10 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 		if (A_TickCount > nextRequest) {
 			nextRequest := (A_TickCount + 20000)
 
-			return this.openPitstopMFD()
+			if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey != "Off"))
+				return this.openPitstopMFD()
+			else
+				return true
 		}
 		else
 			return true

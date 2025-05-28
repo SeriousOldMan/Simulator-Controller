@@ -1521,7 +1521,7 @@ class SetupWorkbench extends ConfigurationItem {
 		startupCollector() {
 			local simulator := this.SelectedSimulator[false]
 			local track := this.SelectedTrack[false]
-			local simmulatorCode, trackLength, provider, fileName
+			local simmulatorCode, trackLength, provider, fileName, theCar, theTrack
 
 			if (this.TelemetryViewer && simulator && (simulator != true) && track) {
 				if ((simulator != lastSimulator) || (track != lastTrack)) {
@@ -1534,7 +1534,8 @@ class SetupWorkbench extends ConfigurationItem {
 						this.TelemetryViewer.restart(kTempDirectory . "Garage\Telemetry")
 					}
 
-					trackLength := getMultiMapValue(readSimulator(simulator, this.SelectedCar[false], track), "Track Data", "Length", 0)
+					trackLength := getMultiMapValue(readSimulator(simulator, &theCar := this.SelectedCar[false]
+																		   , &theTrack := track), "Track Data", "Length", 0)
 
 					/*
 					simulatorCode := SessionDatabase.getSimulatorCode(simulator)

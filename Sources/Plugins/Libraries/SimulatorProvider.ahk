@@ -398,17 +398,28 @@ callSimulator(simulator, options := "", protocol?) {
 		}
 }
 
-readSimulator(simulator, car, track, format := "Object") {
+readSimulator(simulator, &car, &track, format := "Object") {
 	local provider := SimulatorProvider.createSimulatorProvider(simulator, car, track)
 	local data := provider.readSessionData("Setup=true")
 	local telemetryData, standingsData
 
 	provider.acquireSessionData(&telemetryData, &standingsData)
 
+	if ((car != getMultiMapValue(telemetryData, "Session Data", "Car", car))
+	 || (track != getMultiMapValue(telemetryData, "Session Data", "Track", track))) {
+		car := getMultiMapValue(telemetryData, "Session Data", "Car")
+		track := getMultiMapValue(telemetryData, "Session Data", "Track")
+
+		provider := SimulatorProvider.createSimulatorProvider(simulator, car, track)
+		data := provider.readSessionData("Setup=true")
+
+		provider.acquireSessionData(&telemetryData, &standingsData)
+	}
+
 	setMultiMapValue(data, "System", "Time", A_TickCount)
 
-	addMultiMapValues(data, telemetryData)
 	addMultiMapValues(data, standingsData)
+	addMultiMapValues(data, telemetryData)
 
 	return ((format = "Text") ? printMultiMap(data) : data)
 }

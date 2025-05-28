@@ -1548,7 +1548,7 @@ loadStartupProfiles(target, fileName := false) {
 }
 
 editProfile(launchPadOrCommand := false, *) {
-	local profileGui, settings, errorLogsDropDown, usageStatsDropDown, x, y
+	local profileGui, settings, errorLogsDropDown, usageStatsDropDown, sessionDataDropDown, x, y
 
 	static result := false
 
@@ -1618,6 +1618,11 @@ editProfile(launchPadOrCommand := false, *) {
 		usageStatsDropDown := profileGui.Add("DropDownList", "x110 yp-3 w80", collect(["Yes", "No"], translate))
 		usageStatsDropDown.Choose(1 + (getMultiMapValue(settings, "Diagnostics", "Usage", true) == false))
 
+		profileGui.Add("Text", "x16 yp+29 w90 h23", translate("Session Data"))
+		sessionDataDropDown := profileGui.Add("DropDownList", "x110 yp-3 w80", collect(["Yes", "No"], translate))
+		sessionDataDropDown.Choose(1 + (getMultiMapValue(settings, "Diagnostics", "Session", true) == false))
+		profileGui.Add("Text", "x195 yp+3 w160 h23", translate("(for model training)"))
+
 		profileGui.Add("Text", "x8 yp+30 w342 0x10")
 
 		profileGui.Add("Button", "x100 yp+10 w80 h23 Default", translate("Ok")).OnEvent("Click", editProfile.Bind(kOk))
@@ -1637,6 +1642,7 @@ editProfile(launchPadOrCommand := false, *) {
 			if (result == kOk) {
 				setMultiMapValue(settings, "Diagnostics", "Critical", (errorLogsDropDown.Value = 1))
 				setMultiMapValue(settings, "Diagnostics", "Usage", (usageStatsDropDown.Value = 1))
+				setMultiMapValue(settings, "Diagnostics", "Session", (sessionDataDropDown.Value = 1))
 
 				writeMultiMap(kUserConfigDirectory . "Core Settings.ini", settings)
 

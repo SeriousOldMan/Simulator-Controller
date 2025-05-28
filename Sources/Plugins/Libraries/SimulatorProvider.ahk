@@ -84,14 +84,11 @@ class SimulatorProvider {
 	}
 
 	static createSimulatorProvider(simulator, car, track) {
-		local name := SessionDatabase.getSimulatorName(simulator)
-		local code := SessionDatabase.getSimulatorCode(simulator)
-
 		try {
-			return %code%Provider(car, track)
+			return %SessionDatabase.getSimulatorCode(simulator)%Provider(car, track)
 		}
 		catch Any {
-			return SimulatorProvider.GenericSimulatorProvider(name, car, track)
+			return SimulatorProvider.GenericSimulatorProvider(SessionDatabase.getSimulatorName(simulator), car, track)
 		}
 	}
 
@@ -401,11 +398,12 @@ callSimulator(simulator, options := "", protocol?) {
 		}
 }
 
-readSimulator(simulator, car, track, format := "Object", options := "", protocol?) {
-	local data := newMultiMap()
+readSimulator(simulator, car, track, format := "Object") {
+	local provider := SimulatorProvider.createSimulatorProvider(simulator, car, track)
+	local data := provider.readSessionData("Setup=true")
 	local telemetryData, standingsData
 
-	SimulatorProvider.createSimulatorProvider(simulator, car, track).acquireSessionData(&telemetryData, &standingsData)
+	provider.acquireSessionData(&telemetryData, &standingsData)
 
 	setMultiMapValue(data, "System", "Time", A_TickCount)
 

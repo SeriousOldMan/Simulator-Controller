@@ -13,6 +13,7 @@
 #Include "..\Framework\Extensions\Messages.ahk"
 #Include "..\Framework\Extensions\SpeechSynthesizer.ahk"
 #Include "..\Framework\Extensions\SpeechRecognizer.ahk"
+#Include "..\Framework\Extensions\ScriptEngine.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -835,12 +836,44 @@ play(soundFileName) {
 
 execute(command) {
 	local thePlugin := false
+	local extension, context, message
 
 	SimulatorController.Instance.runningSimulator(&thePlugin)
 
 	if (thePlugin && thePlugin.activateWindow())
 		try {
-			Run(substituteVariables(command))
+			command := substituteVariables(command)
+
+			if FileExist(command) {
+				SplitPath(command, , , &extension)
+
+				if ((extension = "script") || (extension = "lua")) {
+					try {
+						context := scriptOpenContext()
+
+						if !scriptLoadScript(context, command, &message)
+							throw message
+
+						scriptPushValue(context, (c) {
+							return scriptExternHandler(c)
+						})
+						scriptSetGlobal(context, "extern")
+
+						if scriptExecute(context, &message)
+							result := scriptGetBoolean(context)
+						else
+							throw message
+					}
+					finally {
+						try
+							scriptCloseContext(context)
+					}
+
+					return
+				}
+			}
+
+			Run(command)
 		}
 		catch Any as exception {
 			logError(exception, true)

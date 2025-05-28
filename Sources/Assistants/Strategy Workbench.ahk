@@ -2638,7 +2638,6 @@ class StrategyWorkbench extends ConfigurationItem {
 		local simulator, car, track, simulatorCode, dirName, file, settings, settingsDB, msgResult
 		local lapsDB, fastestLapTime, row, lapTime, prefix, data, fuelCapacity, initialFuelAmount, map
 		local validators, index, fileName, validator, index, forecast, time, hour, minute, value, fixedPitstop, found
-		local theCar, theTrack
 
 		switch line {
 			case 3:
@@ -3095,7 +3094,7 @@ class StrategyWorkbench extends ConfigurationItem {
 						return
 					}
 
-					data := readSimulator(prefix, &theCar := car, &theTrack := track)
+					data := readSimulator(prefix, car, track)
 
 					if ((getMultiMapValue(data, "Session Data", "Car") != car) || (getMultiMapValue(data, "Session Data", "Track") != track))
 						return

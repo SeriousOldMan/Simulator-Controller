@@ -490,7 +490,10 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 				}
 		}
 
-		data := readSimulator(prefix, &car, &track)
+		data := readSimulator(prefix, car, track)
+
+		car := getMultiMapValue(data, "Session Data", "Car", car)
+		track := getMultiMapValue(data, "Session Data", "Car", track)
 
 		if (getMultiMapValues(data, "Setup Data").Count > 0) {
 			SimulatorProvider.createSimulatorProvider(simulator, car, track).supportsTyreManagement(&mixedCompounds, &tyreSets)
@@ -2381,7 +2384,10 @@ showRaceSettingsEditor() {
 				gCar := getMultiMapValue(data, "Session Data", "Car", false)
 				gTrack := getMultiMapValue(data, "Session Data", "Track", false)
 
-				data := readSimulator(gSimulator, &gCar, &gTrack)
+				data := readSimulator(gSimulator, gCar, gTrack)
+				
+				gCar := getMultiMapValue(data, "Session Data", "Car", gCar)
+				gTrack := getMultiMapValue(data, "Session Data", "Track", gTrack)
 			}
 
 			if (!gCar || !gTrack) {

@@ -398,7 +398,7 @@ callSimulator(simulator, options := "", protocol?) {
 		}
 }
 
-readSimulator(simulator, &car, &track, format := "Object") {
+readSimulator(simulator, car, track, format := "Object") {
 	local provider := SimulatorProvider.createSimulatorProvider(simulator, car, track)
 	local data := provider.readSessionData("Setup=true")
 	local telemetryData, standingsData

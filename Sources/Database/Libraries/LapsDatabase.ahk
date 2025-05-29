@@ -138,7 +138,13 @@ class LapsDatabase extends SessionDatabase {
 	}
 
 	normalizeCompounds(&compound, &compoundColor) {
-		if InStr(compound, ",") {
+		if isObject(compound) {
+			combineCompounds(&compound, &compoundColor)
+
+			compound := values2String(",", compound*)
+			compoundColor := values2String(",", compoundColor*)
+		}
+		else if InStr(compound, ",") {
 			compound := string2Values(",", compound)
 			compoundColor := string2Values(",", compoundColor)
 

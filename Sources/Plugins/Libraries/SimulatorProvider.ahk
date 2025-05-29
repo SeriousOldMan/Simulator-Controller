@@ -405,6 +405,17 @@ readSimulator(simulator, car, track, format := "Object") {
 
 	provider.acquireSessionData(&telemetryData, &standingsData)
 
+	if ((car != getMultiMapValue(telemetryData, "Session Data", "Car", car))
+	 || (track != getMultiMapValue(telemetryData, "Session Data", "Track", track))) {
+		car := getMultiMapValue(telemetryData, "Session Data", "Car")
+		track := getMultiMapValue(telemetryData, "Session Data", "Track")
+
+		provider := SimulatorProvider.createSimulatorProvider(simulator, car, track)
+		data := provider.readSessionData("Setup=true")
+
+		provider.acquireSessionData(&telemetryData, &standingsData)
+	}
+
 	setMultiMapValue(data, "System", "Time", A_TickCount)
 
 	addMultiMapValues(data, standingsData)

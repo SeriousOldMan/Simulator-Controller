@@ -200,7 +200,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 	local dryFrontLeft := 26.1, dryFrontRight := 26.1, dryRearLeft := 26.1, dryRearRight := 26.1
 	local wetFrontLeft := 28.5, wetFrontRight := 28.5, wetRearLeft := 28.5, wetRearRight := 28.5
 
-	local mixedCompounds, tyreService, index, tyre, axle, dropDown
+	local provider, mixedCompounds, tyreService, index, tyre, axle, dropDown
 	local dllFile, names, exception, value, chosen, choices, tabs, import, simulator, ignore, option
 	local dirName, simulatorCode, file, tyreCompound, tyreCompoundColor, tc, tcc, fileName, token
 	local x, y, e, directory, connection, settings, serverURLs, settingsTab, oldTChoice, oldFChoice
@@ -500,6 +500,9 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		provider := SimulatorProvider.createSimulatorProvider(simulator, car, track)
 
 		data := readSimulator(simulator, car, track)
+
+		car := getMultiMapValue(data, "Session Data", "Car", car)
+		track := getMultiMapValue(data, "Session Data", "Car", track)
 
 		if (getMultiMapValues(data, "Setup Data").Count > 0) {
 			provider.supportsTyreManagement(&mixedCompounds, &tyreSets)
@@ -1960,7 +1963,9 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.Add("Text", "x16 yp+30 w88 h23 +0x200", translate("Tyre Compound"))
 
-		SimulatorProvider.createSimulatorProvider(gSimulator, gCar, gTrack).supportsTyreManagement(&mixedCompounds, &tyreSets)
+		provider := SimulatorProvider.createSimulatorProvider(gSimulator, gCar, gTrack)
+
+		provider.supportsTyreManagement(&mixedCompounds, &tyreSets)
 
 		readTyreSetup(settingsOrCommand)
 
@@ -2019,7 +2024,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		for simulator, ignore in getMultiMapValues(getControllerState(), "Simulators")
 			if Application(simulator, kSimulatorConfiguration).isRunning() {
-				import := true
+				import := provider.supportsSetupImport()
 
 				break
 			}
@@ -2375,13 +2380,11 @@ showRaceSettingsEditor() {
 			data := callSimulator(gSimulator)
 
 			if (data.Count > 0) {
-				gCar := getMultiMapValue(data, "Session Data", "Car", false)
-				gTrack := getMultiMapValue(data, "Session Data", "Track", false)
+				data := readSimulator(gSimulator, getMultiMapValue(data, "Session Data", "Car", false)
+												, getMultiMapValue(data, "Session Data", "Track", false))
 
-				data := readSimulator(gSimulator, gCar, gTrack)
-
-				gCar := getMultiMapValue(data, "Session Data", "Car", false)
-				gTrack := getMultiMapValue(data, "Session Data", "Track", false)
+				gCar := getMultiMapValue(data, "Session Data", "Car", gCar)
+				gTrack := getMultiMapValue(data, "Session Data", "Track", gTrack)
 			}
 
 			if (!gCar || !gTrack) {

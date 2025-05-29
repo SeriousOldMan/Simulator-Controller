@@ -144,7 +144,7 @@ class LapsDatabase extends SessionDatabase {
 			compound := values2String(",", compound*)
 			compoundColor := values2String(",", compoundColor*)
 		}
-		else if InStr(compound, ",")) {
+		else if InStr(compound, ",") {
 			compound := string2Values(",", compound)
 			compoundColor := string2Values(",", compoundColor)
 

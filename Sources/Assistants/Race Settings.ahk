@@ -462,13 +462,13 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		local car := gCar
 		local track := gTrack
 		local candidate, ignore, data, tyreCompound, tyreCompoundColor, tc, tcc
-		local mixedCompounds, tyreSets, index, tyre, axle
+		local mixedCompounds, tyreSets, index, tyre, axle, provider
 
 		getSetupPressure(tyre, default) {
 			return displayValue("Float"
 							  , convertUnit("Pressure"
-										  , getMultiMapValue(data, "Setup Data", "SetupTyrePressure" . tyre
-																 , getMultiMapValue(data, "Setup Data", "TyrePressure" . tyre, default))))
+										  , getMultiMapValue(data, "Setup Data", "SetupTyrePressure" . tyre, false)
+										 || getMultiMapValue(data, "Setup Data", "TyrePressure" . tyre, default)))
 		}
 
 		if (message != "Import") {
@@ -484,16 +484,25 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 					data := callSimulator(prefix)
 
 					car := getMultiMapValue(data, "Session Data", "Car", car)
-					track := getMultiMapValue(data, "Session Data", "Car", track)
+					track := getMultiMapValue(data, "Session Data", "Track", track)
 
 					break
 				}
 		}
 
-		data := readSimulator(prefix, car, track)
+		provider := SimulatorProvider.createSimulatorProvider(simulator, car, track)
+
+		data := readSimulator(simulator, car, track)
+
+		car := getMultiMapValue(data, "Session Data", "Car", car)
+		track := getMultiMapValue(data, "Session Data", "Track", track)
+
+		provider := SimulatorProvider.createSimulatorProvider(simulator, car, track)
+
+		data := readSimulator(simulator, car, track)
 
 		if (getMultiMapValues(data, "Setup Data").Count > 0) {
-			SimulatorProvider.createSimulatorProvider(simulator, car, track).supportsTyreManagement(&mixedCompounds, &tyreSets)
+			provider.supportsTyreManagement(&mixedCompounds, &tyreSets)
 
 			readTyreSetup(readMultiMap(kRaceSettingsFile), simulator, car, track)
 
@@ -513,10 +522,8 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 				tcc := []
 
 				for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
-					tc.Push(getMultiMapValue(data, "Setup Data", "TyreCompound" . tyre
-										   , getMultiMapValue(data, "Car Data", "TyreCompound" . tyre)))
-					tcc.Push(getMultiMapValue(data, "Setup Data", "TyreCompound" . tyre
-											, getMultiMapValue(data, "Car Data", "TyreCompoundColor" . tyre)))
+					tc.Push(getMultiMapValue(data, "Setup Data", "TyreCompound" . tyre, false) || getMultiMapValue(data, "Car Data", "TyreCompound" . tyre))
+					tcc.Push(getMultiMapValue(data, "Setup Data", "TyreCompound" . tyre, false) || getMultiMapValue(data, "Car Data", "TyreCompoundColor" . tyre))
 
 					if (index = 1) {
 						tyreCompound := tc[1]
@@ -528,19 +535,14 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 						setMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color." . tyre, tcc[tcc.Length])
 					}
 				}
-
-				tc := values2String("," tc*)
-				tcc := values2String("," tcc*)
 			}
 			else if (mixedCompounds = "Axle") {
 				tc := []
 				tcc := []
 
 				for index, axle in ["Front", "Rear"] {
-					tc.Push(getMultiMapValue(data, "Setup Data", "TyreCompound" . axle
-										   , getMultiMapValue(data, "Car Data", "TyreCompound" . axle)))
-					tcc.Push(getMultiMapValue(data, "Setup Data", "TyreCompound" . axle
-											, getMultiMapValue(data, "Car Data", "TyreCompoundColor" . axle)))
+					tc.Push(getMultiMapValue(data, "Setup Data", "TyreCompound" . axle, false) || getMultiMapValue(data, "Car Data", "TyreCompound" . axle))
+					tcc.Push(getMultiMapValue(data, "Setup Data", "TyreCompound" . axle, false) || getMultiMapValue(data, "Car Data", "TyreCompoundColor" . axle))
 
 					if (index = 1) {
 						tyreCompound := tc[1]
@@ -552,15 +554,10 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 						setMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color." . axle, tcc[tcc.Length])
 					}
 				}
-
-				tc := values2String("," tc*)
-				tcc := values2String("," tcc*)
 			}
 			else {
-				tyreCompound := getMultiMapValue(data, "Setup Data", "TyreCompound"
-											   , getMultiMapValue(data, "Car Data", "TyreCompound"))
-				tyreCompoundColor := getMultiMapValue(data, "Setup Data", "TyreCompoundColor"
-													, getMultiMapValue(data, "Car Data", "TyreCompoundColor"))
+				tyreCompound := (getMultiMapValue(data, "Setup Data", "TyreCompound", false) || getMultiMapValue(data, "Car Data", "TyreCompound"))
+				tyreCompoundColor := (getMultiMapValue(data, "Setup Data", "TyreCompoundColor", false) || getMultiMapValue(data, "Car Data", "TyreCompoundColor"))
 
 				tc := [tyreCompound]
 				tcc := [tyreCompoundColor]
@@ -1044,16 +1041,16 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 				tyreCompound := compounds(string2Values(",", setupTyreCompound), string2Values(",", setupTyreCompoundColor))
 
 				for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
-					settingsGui["spSetupTyreCompound" . wheels[index] . "DropDown"].Choose(Min(1, inList(gTyreCompounds, tyreCompound[index])))
+					settingsGui["spSetupTyreCompound" . wheels[index] . "DropDown"].Choose(Max(1, inList(gTyreCompounds, tyreCompound[index])))
 			}
 			else if (mixedCompounds = "Axle") {
 				tyreCompound := compounds(string2Values(",", setupTyreCompound), string2Values(",", setupTyreCompoundColor))
 
 				for index, axle in ["Front", "Rear"]
-					settingsGui["spSetupTyreCompound" . wheels[index + (index - 1)] . "DropDown"].Choose(Min(1, inList(gTyreCompounds, tyreCompound[index])))
+					settingsGui["spSetupTyreCompound" . wheels[index + (index - 1)] . "DropDown"].Choose(Max(1, inList(gTyreCompounds, tyreCompound[index])))
 			}
 			else
-				settingsGui["spSetupTyreCompoundFLDropDown"].Choose(Min(1, inList(gTyreCompounds
+				settingsGui["spSetupTyreCompoundFLDropDown"].Choose(Max(1, inList(gTyreCompounds
 																				, compound(string2Values(",", setupTyreCompound)[1]
 																						 , string2Values(",", setupTyreCompoundColor)[1]))))
 		}

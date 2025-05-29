@@ -284,8 +284,8 @@ class LMUProvider extends Sector397Provider {
 		else {
 			data := super.readSessionData(options, protocol?)
 
-			car := this.TeamData.Car
-			track := this.TrackData.Track
+			car := (this.Car || this.TeamData.Car)
+			track := (this.Track || this.TrackData.Track)
 
 			if data.Has("Weather Data") {
 				lap := getMultiMapValue(data, "Stint Data", "Laps", 0)

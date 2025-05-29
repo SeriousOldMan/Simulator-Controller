@@ -945,7 +945,7 @@ class LMURESTProvider {
 			if this.iCachedCar
 				return this.iCachedCar
 			else if (this.Data && this.Data.Has("teamInfo")) {
-				this.iCachedTeam := this.Data["teamInfo"]["vehicleName"]
+				this.iCachedCar := this.Data["teamInfo"]["vehicleName"]
 
 				return this.iCachedCar
 			}

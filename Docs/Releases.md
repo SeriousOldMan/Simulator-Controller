@@ -1,5 +1,33 @@
 # Latest stable release
 
+## 6.3.4.0
+
+#### Date: 05/30/25
+
+#### Fixes
+
+  - Fixed the preparation of the available tyre sets for the LLM by the Race Strategist in case of multiple tyre compounds mounted on the car.
+  - Fixed a crash in "Race Reports", "Solo Center" and "Team Center", if an already retired car is reported by the simulator API.
+  - Fixed the handling of explicit tyre sets by Race Engineer as configured in "Race Settings", which has been broken with the last release.
+  - Fixed handling of database tyre pressures for upcoming pitstop by the Race Engineer, which has been broken with the last release.
+
+#### Changes
+
+  - [Important] The handling of the pitstop settings has changed for *rFactor 2*. It is now required to have the hotkeys for opening and closing the Pitstop MFD to be defined. This is necessary, because settings are not changed correctly, if the Pitstop MFD is not open while the change happens.
+  - A [new setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" lets you define the minimum speed for the Race Spotter to be active. This useful, for example, to let the Spotter shut up during FCY phases. Default for "Spotter: Activation Speed" is 60 km/h.
+  - Information about the current tyre wear is now supported for *Le Mans Ultimate*.
+  - Support for executing *Lua* scripts has been added to the ["execute"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) controller action function. The scripts are executed in the "Simulator Controller" process and have access to the simulator and session state.
+  - Multiple tyre compounds will be shown in the "Race Reports", if they have been used on the car.
+  - "Race Settings" now support multiple tyre compounds for the initial car setup, if supported by the current simulator. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-session) for additional remarks.
+  - The detection of the currently active simulator has been improved for "Race Settings".
+  - Multiple tyre compounds are now also stored in "Laps" entries in the session database. This is a preparation for multiple tyre compound support in strategies.
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.3.3.0
 
 #### Date: 05/23/25
@@ -29,32 +57,6 @@
   - [Internal] Updated to newer versions of several imported packages for the internal apps and DLLs.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-633), if you are using the local LLM Runtime.
-
-# Upcoming release
-
-## 6.3.4.0
-
-#### Date: 05/30/25 (planned)
-
-#### Fixes
-
-  - Fixed the preparation of the available tyre sets for the LLM by the Race Strategist in case of multiple tyre compounds mounted on the car.
-  - Fixed a crash in "Race Reports", "Solo Center" and "Team Center", if an already retired car is reported by the simulator API.
-  - Fixed the handling of explicit tyre sets by Race Engineer as configured in "Race Settings", which has been broken with the last release.
-  - Fixed handling of database tyre pressures for upcoming pitstop by the Race Engineer, which has been broken with the last release.
-
-#### Changes
-
-  - [Important] The handling of the pitstop settings has changed for *rFactor 2*. It is now required to have the hotkeys for opening and closing the Pitstop MFD to be defined. This is necessary, because settings are not changed correctly, if the Pitstop MFD is not open while the change happens.
-  - A [new setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" lets you define the minimum speed for the Race Spotter to be active. This useful, for example, to let the Spotter shut up during FCY phases. Default for "Spotter: Activation Speed" is 60 km/h.
-  - Information about the current tyre wear is now supported for *Le Mans Ultimate*.
-  - Support for executing *Lua* scripts has been added to the ["execute"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) controller action function. The scripts are executed in the "Simulator Controller" process and have access to the simulator and session state.
-  - Multiple tyre compounds will be shown in the "Race Reports", if they have been used on the car.
-  - "Race Settings" now support multiple tyre compounds for the initial car setup, if supported by the current simulator. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-session) for additional remarks.
-  - The detection of the currently active simulator has been improved for "Race Settings".
-  - Multiple tyre compounds are now also stored in "Laps" entries in the session database. This is a preparation for multiple tyre compound support in strategies.
-
-# Release history
 
 ## 6.3.2.0
 

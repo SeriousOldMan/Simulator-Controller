@@ -418,8 +418,8 @@ readSimulator(simulator, car, track, format := "Object") {
 
 	setMultiMapValue(data, "System", "Time", A_TickCount)
 
-	addMultiMapValues(data, standingsData)
 	addMultiMapValues(data, telemetryData)
+	addMultiMapValues(data, standingsData)
 
 	return ((format = "Text") ? printMultiMap(data) : data)
 }

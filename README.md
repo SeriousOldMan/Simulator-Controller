@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.3.4.0-beta](http://87.178.12.140:800/api/public/dl/cYJLOMu9) (Test build for 6.3.4. Changes: Show tyre compounds in "Race Reports", Handling individual tyres in "Race Settings", "Race Settings" detect the currently running simulator, Fixed AvaialableTyreSets knowledge for Race Strategist, Fixed missing car times in Race Reports, Support for multiple tyre compounds in "Laps" database, Fixed explicit tyre set handling for the Race Engineer, Setting for Spotter activation speed, Updated handling of the Pitstop MFD in rFactor 2.), Extended "execute" to handle Lua scripts
+[6.3.4.0-beta](http://87.178.12.140:800/api/public/dl/cYJLOMu9) (Test build for 6.3.4. Changes: Show tyre compounds in "Race Reports", Handling individual tyres in "Race Settings", "Race Settings" detect the currently running simulator, Fixed AvaialableTyreSets knowledge for Race Strategist, Fixed missing car times in Race Reports, Support for multiple tyre compounds in "Laps" database, Fixed explicit tyre set handling for the Race Engineer, Setting for Spotter activation speed, Updated handling of the Pitstop MFD in rFactor 2, Extended "execute" to handle Lua scripts, Tyre Wear for Le Mans Ultimate.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-634) of this version and all the versions you might have skipped, before installing and using this version.
 

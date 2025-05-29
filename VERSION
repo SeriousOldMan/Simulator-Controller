@@ -3,7 +3,7 @@ Version=6.3.4.0-beta
 Target=6.3.4.0-release
 Date=05/27/2025
 Download=http://87.178.12.140:800/api/public/dl/cYJLOMu9
-Changes=Show tyre compounds in "Race Reports", Handling individual tyres in "Race Settings", "Race Settings" detect the currently running simulator, Fixed AvaialableTyreSets knowledge for Race Strategist, Fixed missing car times in Race Reports, Support for multiple tyre compounds in "Laps" database, Fixed explicit tyre set handling for the Race Engineer, Setting for Spotter activation speed, Updated handling of the Pitstop MFD in rFactor 2, Extended "execute" to handle Lua scripts
+Changes=Show tyre compounds in "Race Reports", Handling individual tyres in "Race Settings", "Race Settings" detect the currently running simulator, Fixed AvaialableTyreSets knowledge for Race Strategist, Fixed missing car times in Race Reports, Support for multiple tyre compounds in "Laps" database, Fixed explicit tyre set handling for the Race Engineer, Setting for Spotter activation speed, Updated handling of the Pitstop MFD in rFactor 2, Extended "execute" to handle Lua scripts, Tyre Wear for Le Mans Ultimate
 Components=Media->5.6.1,Configuration->6.3.2,Utilities->6.3.0
 [Release]
 Version=6.3.3.0-release

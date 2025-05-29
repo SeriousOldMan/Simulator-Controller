@@ -10,7 +10,7 @@
 -------------------------------------------------------------------------------
 
 __call_simulator = extern("callSimulator")
-__read_simulator= extern("readSimulator")
+__read_simulator = extern("readSimulator")
 
 
 -------------------------------------------------------------------------------

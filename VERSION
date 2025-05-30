@@ -2,13 +2,13 @@
 Version=6.3.4.0-release
 Target=6.3.4.0-release
 Date=05/30/2025
-Download=https://cutt.ly/ArbsFIKb;http://%master%:800/api/public/dl/Ol93-boc;https://www.dropbox.com/scl/fi/nqyfvn0qfo7pvwipge8k3/Simulator-Controller-6.3.4.0-release.zip?rlkey=0jquq69vb99e6ijp3xnwcszli&st=9hl8iknm&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.3.4.0-release.zip
+Download=https://cutt.ly/ArbsFIKb;http://87.178.12.140:800/api/public/dl/Ol93-boc;https://www.dropbox.com/scl/fi/nqyfvn0qfo7pvwipge8k3/Simulator-Controller-6.3.4.0-release.zip?rlkey=0jquq69vb99e6ijp3xnwcszli&st=9hl8iknm&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.3.4.0-release.zip
 Changes=Show tyre compounds in "Race Reports", Handling individual tyres in "Race Settings", "Race Settings" detect the currently running simulator, Fixed AvaialableTyreSets knowledge for Race Strategist, Fixed missing car times in Race Reports, Support for multiple tyre compounds in "Laps" database, Fixed explicit tyre set handling for the Race Engineer, Setting for Spotter activation speed, Updated handling of the Pitstop MFD in rFactor 2, Extended "execute" to handle Lua scripts, Tyre Wear for Le Mans Ultimate
 Components=Media->5.6.1,Configuration->6.3.2,Utilities->6.3.0
 [Release]
 Version=6.3.4.0-release
 Date=05/30/2025
-Download=https://cutt.ly/ArbsFIKb;http://%master%:800/api/public/dl/Ol93-boc;https://www.dropbox.com/scl/fi/nqyfvn0qfo7pvwipge8k3/Simulator-Controller-6.3.4.0-release.zip?rlkey=0jquq69vb99e6ijp3xnwcszli&st=9hl8iknm&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.3.4.0-release.zip
+Download=https://cutt.ly/ArbsFIKb;http://87.178.12.140:800/api/public/dl/Ol93-boc;https://www.dropbox.com/scl/fi/nqyfvn0qfo7pvwipge8k3/Simulator-Controller-6.3.4.0-release.zip?rlkey=0jquq69vb99e6ijp3xnwcszli&st=9hl8iknm&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.3.4.0-release.zip
 Changes=Show tyre compounds in "Race Reports", Handling individual tyres in "Race Settings", "Race Settings" detect the currently running simulator, Fixed AvaialableTyreSets knowledge for Race Strategist, Fixed missing car times in Race Reports, Support for multiple tyre compounds in "Laps" database, Fixed explicit tyre set handling for the Race Engineer, Setting for Spotter activation speed, Updated handling of the Pitstop MFD in rFactor 2, Extended "execute" to handle Lua scripts, Tyre Wear for Le Mans Ultimate
 Components=Media->5.6.1,Configuration->6.3.2,Utilities->6.3.0
 [Components]

@@ -4096,6 +4096,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 	reportUpcomingPitstop(plannedPitstopLap, planPitstop := true) {
 		local knowledgeBase := this.KnowledgeBase
+		local lastLap := knowledgeBase.getValue("Lap")
 		local fullCourseYellow, forcedPitstop, speaker, plannedLap, nextPitstop, maxLap
 		local refuel, tyreChange, tyreCompound, tyreCompoundColor
 
@@ -4104,7 +4105,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 			nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next")
 			fullCourseYellow := (this.Strategy && (this.Strategy.FullCourseYellow = nextPitstop))
-			forcedPitstop := (this.Strategy && (this.Strategy.ForcedPitstop > knowledgeBase.getValue("Lap")))
+			forcedPitstop := (this.Strategy && (this.Strategy.ForcedPitstop > lastLap))
 
 			if (!fullCourseYellow && !forcedPitstop && !this.Strategy.PitstopWindow) {
 				knowledgeBase.setFact("Pitstop.Strategy.Plan", plannedPitstopLap)
@@ -4135,6 +4136,8 @@ class RaceStrategist extends GridRaceAssistant {
 
 			knowledgeBase.clearFact("Strategy.Recalculate")
 
+			plannedPitstopLap := Max(lastLap + 1, plannedPitstopLap)
+
 			this.iLastStrategyUpdate := plannedPitstopLap
 
 			speaker.beginTalk()
@@ -4144,8 +4147,7 @@ class RaceStrategist extends GridRaceAssistant {
 					if this.Announcements["StrategyPitstop"]
 						this.reportStrategy({Strategy: true, Pitstops: true, NextPitstop: false, TyreChange: true, Refuel: true})
 
-					speaker.speakPhrase("PitstopAhead", {lap: plannedPitstopLap
-													   , laps: (plannedPitstopLap - knowledgeBase.getValue("Lap"))})
+					speaker.speakPhrase("PitstopAhead", {lap: plannedPitstopLap, laps: (plannedPitstopLap - (lastLap + 1))})
 				}
 
 				if (ProcessExist("Race Engineer.exe") && planPitstop)

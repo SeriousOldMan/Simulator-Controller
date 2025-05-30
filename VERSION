@@ -3,7 +3,7 @@ Version=6.3.5.0-dev
 Target=6.3.5.0-release
 Date=05/30/2025
 Download=
-Changes=Fixed tyre compound choice for strategy pitstops
+Changes=Fixed tyre compound choice for strategy pitstops, Prevent strategy pitstops to be in the "past" 
 Components=Media->5.6.1,Configuration->6.3.2,Utilities->6.3.0
 [Release]
 Version=6.3.4.0-release

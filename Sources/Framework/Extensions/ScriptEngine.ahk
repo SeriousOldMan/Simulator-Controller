@@ -384,15 +384,15 @@ scriptGetValue(context, index := 1) {
 		case LUA_TNIL:
 			return unset
 		case LUA_TNUMBER:
-			number := scriptGetNumber(context, A_Index)
+			number := scriptGetNumber(context, index)
 
 			return ((Round(number) = number) ? Integer(number) : number)
 		case LUA_TBOOLEAN:
-			return scriptGetBoolean(context, A_Index)
+			return scriptGetBoolean(context, index)
 		case LUA_TSTRING:
-			return scriptGetString(context, A_Index)
+			return scriptGetString(context, index)
 		case LUA_TTABLE:
-			return scriptGetArray(context, A_Index)
+			return scriptGetArray(context, index)
 		default:
 			throw "Unknown type detected in scriptGetValue..."
 	}

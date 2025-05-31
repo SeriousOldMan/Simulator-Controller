@@ -1,0 +1,28 @@
+-------------------------------------------------------------------------------
+---   Modular Simulator Controller System - Setting Handler Support         ---
+---                                                                         ---
+---   Author:     Oliver Juwig (TheBigO)                                    ---
+---   License:    (2025) Creative Commons - BY-NC-SA                        ---
+-------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+---                              Control Section                            ---
+-------------------------------------------------------------------------------
+
+local __Result = 0
+
+if __COMMAND == "IS_VALID" then
+	__Result = validValue(__VALUE)
+elseif __COMMAND == "FORMAT" then
+	__Result = formatValue(__VALUE)
+elseif __COMMAND == "TO_DISPLAY" then
+	__Result = convertToDisplayValue(__VALUE)
+elseif __COMMAND == "TO_RAW" then
+	__Result = convertToRawValue(__VALUE)
+elseif __COMMAND == "INCREASE" then
+	__Result = increaseValue(__VALUE)
+elseif __COMMAND == "DECREASE" then
+	__Result = decreaseValue(__VALUE)
+end
+
+return __Result

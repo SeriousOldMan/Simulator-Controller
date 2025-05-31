@@ -182,7 +182,8 @@ class StrategySimulation {
 					return context
 			}
 			finally {
-				deleteFile(scriptFileName)
+				if !isDebug()
+					deleteFile(scriptFileName)
 			}
 		}
 		catch Any as exception {

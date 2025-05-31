@@ -267,8 +267,8 @@ class StrategySimulation {
 
 				for number, pitstop in strategy.AllPitstops {
 					if pitstop.TyreChange {
-						tyreCompound := first(pitstop.TyreCompounds, (c) => c)
-						tyreCompoundColor := first(pitstop.TyreCompoundColors, (cc) => cc)
+						tyreCompound := pitstop.TyreCompound
+						tyreCompoundColor := pitstop.TyreCompoundColor
 						tyreSet := pitstop.TyreSet
 					}
 					else {
@@ -307,8 +307,8 @@ class StrategySimulation {
 
 					for number, pitstop in strategy.AllPitstops {
 						if pitstop.TyreChange {
-							tyreCompound := first(pitstop.TyreCompounds, (c) => c)
-							tyreCompoundColor := first(pitstop.TyreCompoundColors, (cc) => cc)
+							tyreCompound := pitstop.TyreCompound
+							tyreCompoundColor := pitstop.TyreCompoundColor
 							tyreSet := (pitstop.TyreSet ? pitstop.TyreSet : kFalse)
 						}
 						else {
@@ -337,6 +337,11 @@ class StrategySimulation {
 					scriptSetGlobal(scriptEngine, "__PitstopTyreCompoundColors")
 					scriptPushArray(scriptEngine, tyreSets)
 					scriptSetGlobal(scriptEngine, "__PitstopTyreSets")
+
+					scriptPushValue(scriptEngine, (c) {
+						return scriptExternHandler(c)
+					})
+					scriptSetGlobal(scriptEngine, "extern")
 
 					if !scriptExecute(scriptEngine, &message) {
 						OnMessage(0x44, translateOkButton)

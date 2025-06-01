@@ -169,7 +169,7 @@ initializeScriptEngine() {
 
 table2Array(context, index) {
 	local result := []
-	local type, number
+	local type
 
 	loop {
 		lua_pushinteger(context, Integer(A_Index))
@@ -181,9 +181,7 @@ table2Array(context, index) {
 				case LUA_TNIL:
 					break
 				case LUA_TNUMBER:
-					number := scriptGetNumber(context, -1)
-
-					result.Push((Round(number) = number) ? Integer(number) : number)
+					result.Push(scriptGetNumber(context, -1))
 				case LUA_TBOOLEAN:
 					result.Push(scriptGetBoolean(context, -1))
 				case LUA_TSTRING:
@@ -384,9 +382,7 @@ scriptGetValue(context, index := 1) {
 		case LUA_TNIL:
 			return unset
 		case LUA_TNUMBER:
-			number := scriptGetNumber(context, index)
-
-			return ((Round(number) = number) ? Integer(number) : number)
+			return scriptGetNumber(context, index)
 		case LUA_TBOOLEAN:
 			return scriptGetBoolean(context, index)
 		case LUA_TSTRING:
@@ -413,7 +409,9 @@ scriptGetInteger(context, index := 1) {
 }
 
 scriptGetNumber(context, index := 1) {
-	return lua_tonumber(context, index)
+	local number := lua_tonumber(context, index)
+
+	return ((Round(number) = number) ? Integer(number) : number)
 }
 
 scriptGetArray(context, index := 1) {

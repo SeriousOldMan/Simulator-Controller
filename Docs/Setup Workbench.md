@@ -379,7 +379,6 @@ The most important part is the "[Setup.Settings.Handler]" section. Here you spec
 	
 	As you can see, the first argument is the full path to the script file (using the sample handler here), followed by a number of arguments to the script, which are 0, 10, 52.0, 62.0, 0.5, 1 in this case.
 
-
 The sections "[Setup.Settings.Units.DE]" and "[Setup.Settings.Units.EN]" and so on allow you to supply language specific unit labels for all the settings. If an entry is missing, "Clicks" (or a corresponding translation) will be used.
 
 #### Defining car specific setup settings

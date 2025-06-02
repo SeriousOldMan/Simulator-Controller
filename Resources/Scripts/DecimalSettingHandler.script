@@ -11,36 +11,36 @@ math.round = function(value, places)
     return math.floor(value * mult + 0.5) / mult
 end
 
-function validValue(value)
+function _is_valid(value)
 	return value >= MIN and value <= MAX
 end
 
-function formatValue(value)
+function format_value(value)
 	return math.round(value, PRECISION)
 end
 
-function convertToDisplayValue(value)
-	return formatValue(BASE + (value / SCALE))
+function convert_to_display_value(value)
+	return format_value(BASE + (value / SCALE))
 end
 
-function convertToRawValue(value)
+function convert_to_raw_value(value)
 	return math.tointeger(math.round((value * SCALE) - BASE))
 end
 
-function increaseValue(value)
+function increase_value(value)
 	local incValue = (value + INCREMENT)
 
-	if not validValue(incValue) then
+	if not _is_valid(incValue) then
 		incValue = math.min(MAX, math.max(MIN, value))
 	end
 	
 	return incValue
 end
 
-function decreaseValue(value)
+function decrease_value(value)
 	local decValue = (value - INCREMENT)
 
-	if not validValue(decValue) then
+	if not _is_valid(decValue) then
 		decValue = math.max(MIN, math.min(MAX, value))
 	end
 	

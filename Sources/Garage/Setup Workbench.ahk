@@ -2445,10 +2445,6 @@ class ScriptHandler extends SettingHandler {
 		}
 	}
 
-	validValue(value) {
-		return this.runScript("IS_VALID", value)
-	}
-
 	formatValue(value) {
 		return this.runScript("FORMAT", value)
 	}

@@ -9,20 +9,18 @@
 ---                              Control Section                            ---
 -------------------------------------------------------------------------------
 
-local __Result = 0
+local __RESULT = 0
 
-if __COMMAND == "IS_VALID" then
-	__Result = validValue(__VALUE)
-elseif __COMMAND == "FORMAT" then
-	__Result = formatValue(__VALUE)
+if __COMMAND == "FORMAT" then
+	__RESULT = format_value(__VALUE)
 elseif __COMMAND == "TO_DISPLAY" then
-	__Result = convertToDisplayValue(__VALUE)
+	__RESULT = convert_to_display_value(__VALUE)
 elseif __COMMAND == "TO_RAW" then
-	__Result = convertToRawValue(__VALUE)
+	__RESULT = convert_to_raw_value(__VALUE)
 elseif __COMMAND == "INCREASE" then
-	__Result = increaseValue(__VALUE)
+	__RESULT = increase_value(__VALUE)
 elseif __COMMAND == "DECREASE" then
-	__Result = decreaseValue(__VALUE)
+	__RESULT = decrease_value(__VALUE)
 end
 
-return __Result
+return __RESULT

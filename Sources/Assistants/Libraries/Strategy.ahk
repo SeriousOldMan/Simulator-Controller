@@ -449,7 +449,7 @@ class StrategySimulation {
 			for ignore, entry in tyreLapTimes {
 				lapTime := entry["Lap.Time"]
 
-				xValues.Push(entry["Tyre.Laps"])
+				xValues.Push(entry["Tyre.Laps.Front.Left"])
 				yValues.Push(lapTime)
 
 				theMin := (theMin ? Min(theMin, lapTime) : lapTime)

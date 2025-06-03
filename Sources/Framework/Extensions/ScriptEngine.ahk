@@ -169,7 +169,7 @@ initializeScriptEngine() {
 
 table2Array(context, index) {
 	local result := []
-	local type, number
+	local type
 
 	loop {
 		lua_pushinteger(context, Integer(A_Index))
@@ -181,9 +181,7 @@ table2Array(context, index) {
 				case LUA_TNIL:
 					break
 				case LUA_TNUMBER:
-					number := scriptGetNumber(context, -1)
-
-					result.Push((Round(number) = number) ? Integer(number) : number)
+					result.Push(scriptGetNumber(context, -1))
 				case LUA_TBOOLEAN:
 					result.Push(scriptGetBoolean(context, -1))
 				case LUA_TSTRING:
@@ -384,15 +382,13 @@ scriptGetValue(context, index := 1) {
 		case LUA_TNIL:
 			return unset
 		case LUA_TNUMBER:
-			number := scriptGetNumber(context, A_Index)
-
-			return ((Round(number) = number) ? Integer(number) : number)
+			return scriptGetNumber(context, index)
 		case LUA_TBOOLEAN:
-			return scriptGetBoolean(context, A_Index)
+			return scriptGetBoolean(context, index)
 		case LUA_TSTRING:
-			return scriptGetString(context, A_Index)
+			return scriptGetString(context, index)
 		case LUA_TTABLE:
-			return scriptGetArray(context, A_Index)
+			return scriptGetArray(context, index)
 		default:
 			throw "Unknown type detected in scriptGetValue..."
 	}
@@ -413,7 +409,9 @@ scriptGetInteger(context, index := 1) {
 }
 
 scriptGetNumber(context, index := 1) {
-	return lua_tonumber(context, index)
+	local number := lua_tonumber(context, index)
+
+	return ((Round(number) = number) ? Integer(number) : number)
 }
 
 scriptGetArray(context, index := 1) {

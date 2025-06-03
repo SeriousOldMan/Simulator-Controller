@@ -46,7 +46,7 @@ function pitstopTyreCompounds()
 	for i=1, #__PitstopTyreCompounds do
 		local tc = __PitstopTyreCompounds[i]
 		
-		if tc ~= nil and tc ~= false then
+		if tc ~= nil and tc ~= false and tc ~= 0 then
 			table.insert(tcs, {compound = tc, color = __PitstopTyreCompoundColors[i]})
 		end
 	end
@@ -58,7 +58,7 @@ function pitstopTyreSets()
 	local tss = {}
 	
 	for i, ts in ipairs(__PitstopTyreSets) do
-		if ts ~= nil and ts ~= false then
+		if ts ~= nil and ts ~= false and ts ~= 0 then
 			table.insert(tss, ts)
 		end
 	end
@@ -101,7 +101,7 @@ function pitstop(nr)
 	local tcc = __PitstopTyreCompoundColors[nr]
 	local tc, tcc, ts
 	
-	if tc == nil or tc == false then
+	if tc == nil or tc == false or tc == 0 then
 		tcc = false
 		ts = false
 	end

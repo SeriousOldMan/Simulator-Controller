@@ -343,7 +343,43 @@ The most important part is the "[Setup.Settings.Handler]" section. Here you spec
 	
 	defines six discrete values. *No Deploy* will be mapped to **0** and *Attack* will be mapped to **5**.
 
-The sections "[Setup.Settings.Units.DE]" and "[Setup.Settings.Units.EN]" and so on allow you to supply language specific unit labels for all the settings. If an entry is missing for a given setting, the label will be "Clicks" (or a corresponding translation).
+  - **ScriptHandler(scriptFileName, arg1, arg2, ...)**
+  
+    This is a very special handler in the sense, that you can write a script in the well-known [Lua](https://lua.org) scripting language. This script has to define five global functions, that are called by the setup editor to handle a given setting. These functions are:
+
+    - *convert_to_display_value(value)*
+	
+	  This function must accept a *raw* (2) value and convert it to the corresponding *display* (1) value.
+
+    - *convert_to_raw_value(value)*
+	
+	  This function must accept a *display* (1) value and convert it to the corresponding *raw* (2) value.
+	
+    - *format_value(value)*
+	
+	  *format_value* is called with a *display* (1) value to prepare it for display in the user interface of the setup editor. An implementation may round a numerical value to a specific number of digits, for example.
+
+    - *increase_value(value)*
+	
+	  *increase_value* takes a *display* value and returns the next value *above* the given value. If there are no more values available, the *highest* allowed value must be returned.
+
+	- *decrease_value(value)*
+	
+	  *decrease_value* takes a *display* value and returns the next value *below* the given value. If there are no more values available, the *lowest* allowed value must be returned.
+	
+	Notes:
+	
+	  (1) A *display* value is the value used in the setup editor user interface.
+	  (2) A *raw* value is the value, that is stored in the setup file.
+	  (3) All arguments, that have been passed to the *ScriptHandler* in the car definition file, are available in the global array *Arguments*.
+	
+	You can take a look at [this implementation](https://github.com/SeriousOldMan/Simulator-Controller/blob/Main/Sources/Garage/Scripts/DecimalSettingHandler.script) of a handler script for decimal values for an inspiration for your own handler script. Once you have created your script, you can use it in your car definition file like this:
+	
+		Brake.Balance=ScriptHandler(%kResourcesDirectory%Scripts\DecimalSettingHandler.script, 0, 10, 52.0, 62.0, 0.5, 1)
+	
+	As you can see, the first argument is the full path to the script file (using the sample handler here), followed by a number of arguments to the script, which are 0, 10, 52.0, 62.0, 0.5, 1 in this case.
+
+The sections "[Setup.Settings.Units.DE]" and "[Setup.Settings.Units.EN]" and so on allow you to supply language specific unit labels for all the settings. If an entry is missing, "Clicks" (or a corresponding translation) will be used.
 
 #### Defining car specific setup settings
 

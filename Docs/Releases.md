@@ -24,7 +24,22 @@
 
 # Upcoming release
 
-Not yet planned...
+## 6.3.5.0
+
+#### Date: 06/06/25 (planned)
+
+#### Fixes
+
+  - A bug has been fixed in the strategy-based pitstop handling, which caused the wrong tyre compound to be chosen.
+  - Fixed a bug, that caused an emergency pitstop to be planned for lap, that was actually in the "past".
+  - Fixed the handling of tyre compounds in the strategy validation scripts, which has been broken with the introduction of multiple tyre compounds in one of the last releases.
+  - Fixed several type conversion problems between *Lua* scripts and the host process, which caused especially floating point values to be coerced to integer values.
+
+#### Changes
+
+  - The "Laps" data entries in the session database can now handle wheel specific information about the number of driven laps on the mounted tyre. Not used by any application yet, but more to come here.
+  - Consent can now be given in the [personal profile dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#managing-your-privacy) to share anonymous data from your sessions that will be used to train models for the Assistants AI.
+  - [Expert] When [defining the meta data for a new car](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-a-new-car) in the "Setup Workbench", [Lua](https://lua.org/) scripts can now be used to create handlers for complex settings in the setup, which cannot be defined correctly by using one of the predefined handlers.
 
 # Release history
 

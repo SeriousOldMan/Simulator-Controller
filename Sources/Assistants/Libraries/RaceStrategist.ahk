@@ -1,4 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - AI Race Strategist              ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -315,7 +316,8 @@ class RaceStrategist extends GridRaceAssistant {
 						found := false
 
 						for ignore, candidate in entries
-							if ((candidate["Tyre.Laps"] = entry["Tyre.Laps"]) && (candidate["Lap.Time"] = entry["Lap.Time"])) {
+							if ((candidate["Tyre.Laps.Front.Left"] = entry["Tyre.Laps.Front.Left"])
+							 && (candidate["Lap.Time"] = entry["Lap.Time"])) {
 								found := true
 
 								break
@@ -384,7 +386,8 @@ class RaceStrategist extends GridRaceAssistant {
 						found := false
 
 						for ignore, candidate in entries
-							if ((candidate["Tyre.Laps"] = entry["Tyre.Laps"]) && (candidate["Lap.Time"] = entry["Lap.Time"])) {
+							if ((candidate["Tyre.Laps.Front.Left"] = entry["Tyre.Laps.Front.Left"])
+							 && (candidate["Lap.Time"] = entry["Lap.Time"])) {
 								found := true
 
 								break

@@ -7191,11 +7191,24 @@ editLaps(editorOrCommand, arguments*) {
 	}
 
 	loadTyres(entry) {
+		local tyreCompound := entry["Tyre.Compound"]
+		local tyreCompoundColor := entry["Tyre.Compound.Color"]
 		local seperator := ((getFloatSeparator() = ".") ? ", " : "; ")
 		local pressures := []
 		local temperatures := []
 		local wear := []
 		local ignore, tyre, seperator
+
+		if InStr(tyreCompound, ",") {
+			tyreCompound := string2Values(",", tyreCompound)
+			tyreCompoundColor := string2Values(",", tyreCompoundColor)
+
+			combineCompounds(&tyreCompound, &tyreCompoundColor)
+
+			tyreCompound := values2String(", ", collect(compounds(tyreCompound, tyreCompoundColor), translate)*)
+		}
+		else
+			tyreCompound := translate(compound(tyreCompound, tyreCompoundColor))
 
 		for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"] {
 			tyre := entry["Tyre.Pressure." . tyre]
@@ -7236,10 +7249,10 @@ editLaps(editorOrCommand, arguments*) {
 		return [translate(entry["Weather"])
 			  , convertUnit("Temperature", entry["Temperature.Air"])
 			  , convertUnit("Temperature", entry["Temperature.Track"])
-			  , translate(compound(entry["Tyre.Compound"], entry["Tyre.Compound.Color"]))
+			  , tyreCompound
 			  , convertUnit("Volume", entry["Fuel.Consumption"])
 			  , lapTimeDisplayValue(entry["Lap.Time"])
-			  , isInteger(entry["Tyre.Laps"]) ? entry["Tyre.Laps"] : translate("n/a")
+			  , (isInteger(entry["Tyre.Laps"]) || InStr(entry["Tyre.Laps"], ",")) ? entry["Tyre.Laps"] : translate("n/a")
 			  , pressures ? values2String(seperator, pressures*) : translate("n/a")
 			  , temperatures ? values2String(seperator, temperatures*) : translate("n/a")
 			  , wear ? values2String(seperator, wear*) : translate("n/a")]

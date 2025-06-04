@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.3.5.0-dev](http://87.178.12.140:800/api/public/dl/Q6wvU9ri) (Early build for 6.3.4. Changes: Fixed tyre compound choice for strategy pitstops, Prevent strategy pitstops to be in the "past", Fixed tyre compound handling in strategy validation scripts, Script support in "Setup Workbench", Fixed AHK <-> LUA type conversion, Support for wheel specific tyre laps in laps database, Consent for session data sharing.)
+[6.3.5.0-dev](http://87.178.12.140:800/api/public/dl/Q6wvU9ri) (Early build for 6.3.4. Changes: Fixed tyre compound choice for strategy pitstops, Prevent strategy pitstops to be in the "past", Fixed tyre compound handling in strategy validation scripts, Script support in "Setup Workbench", Fixed AHK <-> LUA type conversion, Support for wheel specific tyre laps in laps database, Consent for session data sharing, Fixed DLC download mirror handling.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-635) of this version and all the versions you might have skipped, before installing and using this version.
 

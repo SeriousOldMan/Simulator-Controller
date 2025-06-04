@@ -1,9 +1,9 @@
 [Development]
 Version=6.3.5.0-dev
 Target=6.3.5.0-release
-Date=06/03/2025
+Date=06/04/2025
 Download=http://87.178.12.140:800/api/public/dl/Q6wvU9ri
-Changes=Fixed tyre compound choice for strategy pitstops, Prevent strategy pitstops to be in the "past", Fixed tyre compound handling in strategy validation scripts, Script support in "Setup Workbench", Fixed AHK <-> LUA type conversion, Support for wheel specific tyre laps in laps database, Consent for session data sharing
+Changes=Fixed tyre compound choice for strategy pitstops, Prevent strategy pitstops to be in the "past", Fixed tyre compound handling in strategy validation scripts, Script support in "Setup Workbench", Fixed AHK <-> LUA type conversion, Support for wheel specific tyre laps in laps database, Consent for session data sharing, Fixed DLC download mirror handling
 Components=Media->5.6.1,Configuration->6.3.2,Utilities->6.3.0
 [Release]
 Version=6.3.4.0-release

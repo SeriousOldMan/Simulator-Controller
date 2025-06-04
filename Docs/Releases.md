@@ -34,6 +34,7 @@
   - Fixed a bug, that caused an emergency pitstop to be planned for lap, that was actually in the "past".
   - Fixed the handling of tyre compounds in the strategy validation scripts, which has been broken with the introduction of multiple tyre compounds in one of the last releases.
   - Fixed several type conversion problems between *Lua* scripts and the host process, which caused especially floating point values to be coerced to integer values.
+  - Fixed a bug that prevented on-track strategy simulation for sessions with undefined tyre sets.
 
 #### Changes
 

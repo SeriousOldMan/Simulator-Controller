@@ -571,7 +571,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 				lapNumber := knowledgeBase.getValue("Lap")
 
-				if this.Provider.supportsTyreManagement(&mixedCompounds, &tyreSet) {
+				if this.RaceStrategist.Provider.supportsTyreManagement(&mixedCompounds, &tyreSet) {
 					tyreCompound := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound", "Dry")
 					tyreCompoundColor := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color", "Black")
 

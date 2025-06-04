@@ -284,8 +284,8 @@ class LMUProvider extends Sector397Provider {
 		else {
 			data := super.readSessionData(options, protocol?)
 
-			car := this.TeamData.Car
-			track := this.TrackData.Track
+			car := (this.Car || this.TeamData.Car)
+			track := (this.Track || this.TrackData.Track)
 
 			if data.Has("Weather Data") {
 				lap := getMultiMapValue(data, "Stint Data", "Laps", 0)
@@ -330,38 +330,46 @@ class LMUProvider extends Sector397Provider {
 				setMultiMapValue(data, "Weather Data", "Weather30Min", lastWeather30Min)
 			}
 
-			if car
-				setMultiMapValue(data, "Session Data", "Car", car)
-			else
-				car := this.Car
+			if !InStr(options, "Standings=true") {
+				if car
+					setMultiMapValue(data, "Session Data", "Car", car)
+				else
+					car := this.Car
 
-			if track
-				setMultiMapValue(data, "Session Data", "Track", track)
-			else
-				track := this.Track
+				if track
+					setMultiMapValue(data, "Session Data", "Track", track)
+				else
+					track := this.Track
 
-			if getMultiMapValue(data, "Session Data", "Active", false) {
-				if data.Has("Car Data") {
-					fuelAmount := getMultiMapValue(data, "Session Data", "FuelAmount", false)
+				if getMultiMapValue(data, "Session Data", "Active", false) {
+					if data.Has("Car Data") {
+						fuelAmount := getMultiMapValue(data, "Session Data", "FuelAmount", false)
 
-					if (fuelAmount && this.iFuelRatio)
-						setMultiMapValue(data, "Session Data", "FuelAmount", Round(this.iFuelRatio * 100, 1))
-					else if !fuelAmount
-						setMultiMapValue(data, "Session Data", "FuelAmount", LMURESTProvider.EnergyData(simulator, car, track).MaxFuelAmount)
-				}
-
-				tyreData := LMURestProvider.TyreData()
-
-				for key, postFix in tyres {
-					tyreCompound := tyreData.TyreCompound[key]
-					tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
-
-					if tyreCompound {
-						splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
-
-						setMultiMapValue(data, "Car Data", "TyreCompound" . postFix, tyreCompound)
-						setMultiMapValue(data, "Car Data", "TyreCompoundColor" . postFix, tyreCompoundColor)
+						if (fuelAmount && this.iFuelRatio)
+							setMultiMapValue(data, "Session Data", "FuelAmount", Round(this.iFuelRatio * 100, 1))
+						else if !fuelAmount
+							setMultiMapValue(data, "Session Data", "FuelAmount", LMURESTProvider.EnergyData(simulator, car, track).MaxFuelAmount)
 					}
+
+					tyreData := LMURestProvider.TyreData()
+					tyreWear := []
+
+					for key, postFix in tyres {
+						tyreCompound := tyreData.TyreCompound[key]
+						tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
+
+						if tyreCompound {
+							splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
+
+							setMultiMapValue(data, "Car Data", "TyreCompound" . postFix, tyreCompound)
+							setMultiMapValue(data, "Car Data", "TyreCompoundColor" . postFix, tyreCompoundColor)
+						}
+
+						tyreWear.Push(Round(tyreData.TyreWear[key], 1))
+					}
+
+					if exist(tyreWear, (w) => (w != false))
+						setMultiMapValue(data, "Car Data", "TyreWear", values2String(",", tyreWear*))
 				}
 			}
 		}

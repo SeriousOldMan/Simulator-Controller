@@ -1292,8 +1292,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			RaceAssistantPlugin.updateAssistantsTelemetryData(telemetryData)
 			RaceAssistantPlugin.updateAssistantsStandingsData(standingsData)
 
-			addMultiMapValues(data, telemetryData)
 			addMultiMapValues(data, standingsData)
+			addMultiMapValues(data, telemetryData)
 
 			return data
 		}

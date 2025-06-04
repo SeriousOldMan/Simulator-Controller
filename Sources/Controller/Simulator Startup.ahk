@@ -1620,7 +1620,7 @@ editProfile(launchPadOrCommand := false, *) {
 
 		profileGui.Add("Text", "x16 yp+29 w90 h23", translate("Session Data"))
 		sessionDataDropDown := profileGui.Add("DropDownList", "x110 yp-3 w80", collect(["Yes", "No"], translate))
-		sessionDataDropDown.Choose(1 + (getMultiMapValue(settings, "Diagnostics", "Session", true) == false))
+		sessionDataDropDown.Choose(1 + (getMultiMapValue(settings, "Diagnostics", "Session", false) == false))
 		profileGui.Add("Text", "x195 yp+3 w160 h23", translate("(for model training)"))
 
 		profileGui.Add("Text", "x8 yp+30 w342 0x10")
@@ -2103,14 +2103,12 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 
 			if (line > 1)
 				editStartupProfiles(kEvent, "ProfileLoad", line)
-			else if (line = 1) {
-				profilesListView.Modify(1, "-Select")
+			else {
+				if (line = 1)
+					profilesListView.Modify(1, "-Select")
 
-				if selectedProfile
-					profilesListView.Modify(selectedProfile, "Select")
-			}
-			else
 				selectedProfile := false
+			}
 		}
 
 		editStartupProfiles("Update State")

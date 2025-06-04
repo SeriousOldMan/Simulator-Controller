@@ -766,12 +766,31 @@ class LMURESTProvider {
 			}
 		}
 
+		TyreWear[tyre] {
+			Get {
+				return this.getTyreWear(tyre)
+			}
+		}
+
 		getTyreCompound(tyre) {
 			if this.Data {
 				try {
 					tyre := this.Data["wheelInfo"]["wheelLocs"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.TyreTypes[tyre])]["compound"]
 
 					return this.Data["optimalCompoundConditions"]["compounds"][tyre + 1]["type"]
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+			}
+
+			return false
+		}
+
+		getTyreWear(tyre) {
+			if this.Data {
+				try {
+					return (100 * (1 - this.Data["wearables"]["tires"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.TyreTypes[tyre])]))
 				}
 				catch Any as exception {
 					logError(exception)
@@ -945,7 +964,7 @@ class LMURESTProvider {
 			if this.iCachedCar
 				return this.iCachedCar
 			else if (this.Data && this.Data.Has("teamInfo")) {
-				this.iCachedTeam := this.Data["teamInfo"]["vehicleName"]
+				this.iCachedCar := this.Data["teamInfo"]["vehicleName"]
 
 				return this.iCachedCar
 			}

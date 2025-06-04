@@ -40,6 +40,7 @@
 #Include "..\Framework\Extensions\Task.ahk"
 #Include "..\Framework\Extensions\Math.ahk"
 #Include "..\Framework\Extensions\RuleEngine.ahk"
+#Include "..\Framework\Extensions\ScriptEngine.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Database\Libraries\TelemetryViewer.ahk"
 #Include "..\Plugins\Libraries\SimulatorProvider.ahk"
@@ -2370,6 +2371,98 @@ class EnumerationHandler extends SettingHandler {
 			return this.Values[1]
 		else
 			return "-"
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; ScriptHandler                                                           ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class ScriptHandler extends SettingHandler {
+	iScript := false
+	iArguments := []
+
+	Script {
+		Get {
+			return this.iScript
+		}
+	}
+
+	Arguments {
+		Get {
+			return this.iArguments
+		}
+	}
+
+	__New(script, arguments*) {
+		this.iScript := substituteVariables(script)
+		this.iArguments := arguments
+	}
+
+	runScript(command, value) {
+		local context := scriptOpenContext()
+		local script, scriptFileName
+
+		try {
+			script := FileRead(this.Script)
+
+			script .= ("`n`n" . FileRead(getFileName("SettingHandlerExecutor.script"
+												   , kUserHomeDirectory . "Scripts\", kResourcesDirectory . "Scripts\")))
+
+			scriptFileName := temporaryFileName("Setting Handler", "script")
+
+			try {
+				FileAppend(script, scriptFileName)
+
+				if !scriptLoadScript(context, scriptFileName, &message)
+					throw message
+			}
+			finally {
+				if !isDebug()
+					deleteFile(scriptFileName)
+			}
+
+			scriptPushArray(context, this.Arguments)
+			scriptSetGlobal(context, "Arguments")
+
+			scriptPushValue(context, command)
+			scriptSetGlobal(context, "__COMMAND")
+			scriptPushValue(context, value)
+			scriptSetGlobal(context, "__VALUE")
+
+			scriptPushValue(context, (c) {
+				return scriptExternHandler(c)
+			})
+			scriptSetGlobal(context, "extern")
+
+			if scriptExecute(context, &message)
+				return scriptGetValue(context)
+			else
+				throw message
+		}
+		finally {
+			scriptCloseContext(context)
+		}
+	}
+
+	formatValue(value) {
+		return this.runScript("FORMAT", value)
+	}
+
+	convertToDisplayValue(value) {
+		return this.runScript("TO_DISPLAY", value)
+	}
+
+	convertToRawValue(value) {
+		return this.runScript("TO_RAW", value)
+	}
+
+	increaseValue(value) {
+		return this.runScript("INCREASE", value)
+	}
+
+	decreaseValue(value) {
+		return this.runScript("DECREASE", value)
 	}
 }
 

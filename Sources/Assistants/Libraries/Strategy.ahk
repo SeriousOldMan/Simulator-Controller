@@ -182,7 +182,8 @@ class StrategySimulation {
 					return context
 			}
 			finally {
-				deleteFile(scriptFileName)
+				if !isDebug()
+					deleteFile(scriptFileName)
 			}
 		}
 		catch Any as exception {
@@ -267,8 +268,8 @@ class StrategySimulation {
 
 				for number, pitstop in strategy.AllPitstops {
 					if pitstop.TyreChange {
-						tyreCompound := first(pitstop.TyreCompounds, (c) => c)
-						tyreCompoundColor := first(pitstop.TyreCompoundColors, (cc) => cc)
+						tyreCompound := pitstop.TyreCompound
+						tyreCompoundColor := pitstop.TyreCompoundColor
 						tyreSet := pitstop.TyreSet
 					}
 					else {
@@ -307,8 +308,8 @@ class StrategySimulation {
 
 					for number, pitstop in strategy.AllPitstops {
 						if pitstop.TyreChange {
-							tyreCompound := first(pitstop.TyreCompounds, (c) => c)
-							tyreCompoundColor := first(pitstop.TyreCompoundColors, (cc) => cc)
+							tyreCompound := pitstop.TyreCompound
+							tyreCompoundColor := pitstop.TyreCompoundColor
 							tyreSet := (pitstop.TyreSet ? pitstop.TyreSet : kFalse)
 						}
 						else {
@@ -337,6 +338,11 @@ class StrategySimulation {
 					scriptSetGlobal(scriptEngine, "__PitstopTyreCompoundColors")
 					scriptPushArray(scriptEngine, tyreSets)
 					scriptSetGlobal(scriptEngine, "__PitstopTyreSets")
+
+					scriptPushValue(scriptEngine, (c) {
+						return scriptExternHandler(c)
+					})
+					scriptSetGlobal(scriptEngine, "extern")
 
 					if !scriptExecute(scriptEngine, &message) {
 						OnMessage(0x44, translateOkButton)
@@ -443,7 +449,7 @@ class StrategySimulation {
 			for ignore, entry in tyreLapTimes {
 				lapTime := entry["Lap.Time"]
 
-				xValues.Push(entry["Tyre.Laps"])
+				xValues.Push(entry["Tyre.Laps.Front.Left"])
 				yValues.Push(lapTime)
 
 				theMin := (theMin ? Min(theMin, lapTime) : lapTime)

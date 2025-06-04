@@ -92,6 +92,9 @@ class RaceStrategist extends GridRaceAssistant {
 
 	iStrategyCreated := false
 
+	iPitstopHistory := false
+	iUsedTyreSets := false
+
 	iUseTraffic := false
 
 	iCollectLaps := true
@@ -411,16 +414,6 @@ class RaceStrategist extends GridRaceAssistant {
 		iFullCourseYellow := false
 		iForcedPitstop := false
 
-		Statistics {
-			Get {
-				return this.iStatistics
-			}
-
-			Set {
-				return (this.iStatistics := value)
-			}
-		}
-
 		__New(manager, data, confirm, request, fullCourseYellow, forcedPitstop) {
 			this.iData := data
 			this.iConfirm := confirm
@@ -521,77 +514,28 @@ class RaceStrategist extends GridRaceAssistant {
 			}
 		}
 
-		__New(strategist, configuration, confirm := false, request := "User", statistics := false, fullCourseYellow := false, forcedPitstop := false) {
-			local knowledgeBase := strategist.KnowledgeBase
+		__New(strategist, pitstopHistory, confirm := false, request := "User", statistics := false, fullCourseYellow := false, forcedPitstop := false) {
+			this.iRaceStrategist := strategist
 
 			super.__New(false, 0, kLowPriority)
 
 			this.iConfirm := confirm
 			this.iRequest := request
 			this.iStatistics := statistics
-			this.iRaceStrategist := strategist
-			this.iLap := knowledgeBase.getValue("Lap")
+			this.iLap := strategist.KnowledgeBase.getValue("Lap")
 			this.iLapsDatabase := RaceStrategist.SessionLapsDatabase(strategist, strategist.Simulator, strategist.Car, strategist.Track)
 
 			this.iFullCourseYellow := fullCourseYellow
 			this.iForcedPitstop := forcedPitstop
 
-			this.loadFromConfiguration(configuration)
+			this.loadPitstopHistory(pitstopHistory)
 		}
 
-		loadFromConfiguration(configuration) {
-			local pitstops := []
-			local tyreSets := []
-			local knowledgeBase, lapNumber, mixedCompounds, tyreSet, tyreCompound, tyreCompoundColor
+		loadPitstopHistory(pitstopHistory) {
+			local usedTyreSets
 
-			loop getMultiMapValue(configuration, "Pitstops", "Count", 0)
-				pitstops.Push({Nr: A_Index
-							 , Time: getMultiMapValue(configuration, "Pitstops", A_Index . ".Time")
-							 , Lap: getMultiMapValue(configuration, "Pitstops", A_Index . ".Lap")
-							 , RefuelAmount: getMultiMapValue(configuration, "Pitstops", A_Index . ".Refuel", 0)
-							 , TyreChange: getMultiMapValue(configuration, "Pitstops", A_Index . ".TyreChange")
-							 , TyreCompound: getMultiMapValue(configuration, "Pitstops", A_Index . ".TyreCompound", false)
-							 , TyreCompoundColor: getMultiMapValue(configuration, "Pitstops", A_Index . ".TyreCompoundColor", false)
-							 , TyreSet: getMultiMapValue(configuration, "Pitstops", A_Index . ".TyreSet", false)
-							 , RepairBodywork: getMultiMapValue(configuration, "Pitstops", A_Index . ".RepairBodywork", false)
-							 , RepairSuspension: getMultiMapValue(configuration, "Pitstops", A_Index . ".RepairSuspension", false)
-							 , RepairEngine: getMultiMapValue(configuration, "Pitstops", A_Index . ".RepairEngine")})
-
-			loop getMultiMapValue(configuration, "TyreSets", "Count", 0)
-				tyreSets.Push({Laps: getMultiMapValue(configuration, "TyreSets", A_Index . ".Laps")
-							 , Set: getMultiMapValue(configuration, "TyreSets", A_Index . ".Set")
-							 , Compound: getMultiMapValue(configuration, "TyreSets", A_Index . ".Compound")
-							 , CompoundColor: getMultiMapValue(configuration, "TyreSets", A_Index . ".CompoundColor")})
-
-			if (tyreSets.Length = 0) {
-				knowledgeBase := this.RaceStrategist.KnowledgeBase
-
-				lapNumber := knowledgeBase.getValue("Lap")
-
-				if this.Provider.supportsTyreManagement(&mixedCompounds, &tyreSet) {
-					tyreCompound := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound", "Dry")
-					tyreCompoundColor := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color", "Black")
-
-					if (mixedCompounds = "Wheel") {
-						tyreCompound := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.FrontLeft", tyreCompound)
-						tyreCompoundColor := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color.FrontLeft", tyreCompoundColor)
-					}
-					else if (mixedCompounds = "Axle") {
-						tyreCompound := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Front", tyreCompound)
-						tyreCompoundColor := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color.Front", tyreCompoundColor)
-					}
-
-					if tyreSet
-						tyreSets.Push({Laps: lapNumber
-									 , Set: knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Set", 1)
-									 , Compound: tyreCompound, CompoundColor: tyreCompoundColor})
-					else
-						tyreSets.Push({Laps: lapNumber, Compound: tyreCompound, CompoundColor: tyreCompoundColor})
-				}
-			}
-
-			this.iPitstops := pitstops
-			this.iUsedTyreSets := tyreSets
+			this.iPitstops := this.RaceStrategist.createPitstopHistory(pitstopHistory, &usedTyreSets)
+			this.iUsedTyreSets := usedTyreSets
 		}
 
 		run() {
@@ -830,6 +774,18 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
+	PitstopHistory {
+		Get {
+			return this.iPitstopHistory
+		}
+	}
+
+	UsedTyreSets {
+		Get {
+			return this.iUsedTyreSets
+		}
+	}
+
 	UseTraffic {
 		Get {
 			return this.iUseTraffic
@@ -937,6 +893,9 @@ class RaceStrategist extends GridRaceAssistant {
 			this.iLastStrategyUpdate := 0
 			this.iRejectedStrategy := false
 			this.iRaceInfoSaved := false
+
+			this.iPitstopHistory := false
+			this.iUsedTyreSets := false
 		}
 	}
 
@@ -983,6 +942,12 @@ class RaceStrategist extends GridRaceAssistant {
 
 			this.iRejectedStrategy := values.RejectedStrategy
 		}
+
+		if values.HasProp("PitstopHistory")
+			this.iPitstopHistory := values.PitstopHistory
+
+		if values.HasProp("UsedTyreSets")
+			this.iUsedTyreSets := values.UsedTyreSets
 	}
 
 	confirmAction(action) {
@@ -2715,7 +2680,9 @@ class RaceStrategist extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local data, lap
 
-		if !isObject(pitstopHistory) {
+		if (pitstopHistory == true)
+			data := true
+		else if !isObject(pitstopHistory) {
 			data := readMultiMap(pitstopHistory)
 
 			if !isDebug()
@@ -3988,9 +3955,86 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
+	createPitstopHistory(pitstopHistory, &tyreSets?) {
+		local knowledgeBase := this.KnowledgeBase
+		local pitstops := []
+		local lapNumber, mixedCompounds, tyreSet, tyreCompound, tyreCompoundColor
+
+		tyreSets := []
+
+		this.Provider.supportsTyreManagement(&mixedCompounds, &tyreSet)
+
+		loop getMultiMapValue(pitstopHistory, "Pitstops", "Count", 0) {
+			pitstops.Push({Nr: A_Index
+						 , Time: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Time")
+						 , Lap: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Lap")
+						 , RefuelAmount: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Refuel", 0)
+						 , TyreChange: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreChange")
+						 , TyreCompound: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompound", false)
+						 , TyreCompoundColor: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompoundColor", false)
+						 , RepairBodywork: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".RepairBodywork", false)
+						 , RepairSuspension: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".RepairSuspension", false)
+						 , RepairEngine: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".RepairEngine")})
+
+			if tyreSet
+				pitstops[pitstops.Length].TyreSet := getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreSet", false)
+		}
+
+		loop getMultiMapValue(pitstopHistory, "TyreSets", "Count", 0) {
+			tyreSets.Push({Laps: getMultiMapValue(pitstopHistory, "TyreSets", A_Index . ".Laps")
+						 , Compound: getMultiMapValue(pitstopHistory, "TyreSets", A_Index . ".Compound")
+						 , CompoundColor: getMultiMapValue(pitstopHistory, "TyreSets", A_Index . ".CompoundColor")})
+
+			if tyreSet
+				tyreSets[tyreSets.Length].Set := getMultiMapValue(pitstopHistory, "TyreSets", A_Index . ".Set")
+		}
+
+		if (tyreSets.Length = 0) {
+			lapNumber := knowledgeBase.getValue("Lap")
+
+			tyreCompound := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound", "Dry")
+			tyreCompoundColor := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color", "Black")
+
+			if (mixedCompounds = "Wheel") {
+				tyreCompound := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.FrontLeft", tyreCompound)
+				tyreCompoundColor := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color.FrontLeft", tyreCompoundColor)
+			}
+			else if (mixedCompounds = "Axle") {
+				tyreCompound := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Front", tyreCompound)
+				tyreCompoundColor := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color.Front", tyreCompoundColor)
+			}
+
+			if tyreSet
+				tyreSets.Push({Laps: lapNumber
+							 , Set: knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Set", 1)
+							 , Compound: tyreCompound, CompoundColor: tyreCompoundColor})
+			else
+				tyreSets.Push({Laps: lapNumber, Compound: tyreCompound, CompoundColor: tyreCompoundColor})
+		}
+
+		return pitstops
+	}
+
+	updatePitstopHistory(pitstopHistory) {
+		local data, pitstops, usedTyreSets
+
+		if !isObject(pitstopHistory) {
+			data := readMultiMap(pitstopHistory)
+
+			if !isDebug()
+				deleteFile(pitstopHistory)
+		}
+		else
+			data := pitstopHistory
+
+		pitstops := this.createPitstopHistory(data, &usedTyreSets)
+
+		this.updateDynamicValues({PitstopHistory: pitstops, UsedTyreSets: usedTyreSets})
+	}
+
 	executePitstop(lapNumber) {
 		local knowledgeBase := this.KnowledgeBase
-		local nextPitstop, result, map
+		local nextPitstop, result, map, engineerPID
 
 		if this.Strategy
 			nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next", false)
@@ -4015,6 +4059,14 @@ class RaceStrategist extends GridRaceAssistant {
 				knowledgeBase.setFact("Strategy.Recalculate", "Pitstop")
 
 		this.updateDynamicValues({RejectedStrategy: false})
+
+		engineerPID := ProcessExist("Race Engineer.exe")
+
+		if engineerPID
+			Task.startTask(() => messageSend(kFileMessage, "Race Engineer"
+														 , "requestPitstopHistory:Race Strategist;updatePitstopHistory;" . ProcessExist()
+														 , engineerPID)
+						 , 20000, kLowPriority)
 
 		return result
 	}

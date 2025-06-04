@@ -4273,16 +4273,19 @@ class RaceEngineer extends RaceAssistant {
 		local numTyreSets := 1
 		local lastLap := 0
 		local fileName, pitstopLap, tyreCompound, tyreCompoundColor, tyreSet
-		local tyreService, pitstop, tyreChange
+		local tyreService, tyreSets, pitstop, tyreChange
 
 		this.Provider.supportsPitstop( , &tyreService)
+		this.Provider.supportstyreManagemet( , &tyreSets)
 
 		setMultiMapValue(pitstopHistory, "TyreSets", "1.Compound"
 					   , knowledgeBase.getValue("Session.Setup.Tyre.Compound"))
 		setMultiMapValue(pitstopHistory, "TyreSets", "1.CompoundColor"
 					   , knowledgeBase.getValue("Session.Setup.Tyre.Compound.Color"))
-		setMultiMapValue(pitstopHistory, "TyreSets", "1.Set"
-					   , knowledgeBase.getValue("Session.Setup.Tyre.Set"))
+
+		if tyreSets
+			setMultiMapValue(pitstopHistory, "TyreSets", "1.Set"
+						   , knowledgeBase.getValue("Session.Setup.Tyre.Set"))
 
 		loop knowledgeBase.getValue("Pitstop.Last") {
 			numPitstops += 1
@@ -4297,6 +4300,7 @@ class RaceEngineer extends RaceAssistant {
 
 			tyreCompound := knowledgeBase.getValue("Pitstop." . A_Index . ".Tyre.Compound", false)
 			tyreCompoundColor := knowledgeBase.getValue("Pitstop." . A_Index . ".Tyre.Compound.Color", false)
+
 			tyreSet := knowledgeBase.getValue("Pitstop." . A_Index . ".Tyre.Set", false)
 
 			if tyreCompound {
@@ -4307,12 +4311,16 @@ class RaceEngineer extends RaceAssistant {
 
 				setMultiMapValue(pitstopHistory, "TyreSets", numTyreSets . ".Compound", tyreCompound)
 				setMultiMapValue(pitstopHistory, "TyreSets", numTyreSets . ".CompoundColor", tyreCompoundColor)
-				setMultiMapValue(pitstopHistory, "TyreSets", numTyreSets . ".Set", tyreSet)
+
+				if tyreSets
+					setMultiMapValue(pitstopHistory, "TyreSets", numTyreSets . ".Set", tyreSet)
 
 				setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompound", tyreCompound)
 				setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompoundColor", tyreCompoundColor)
-				setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreSet", tyreSet)
 				setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreChange", true)
+
+				if tyreSets
+					setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreSet", tyreSet)
 			}
 			else
 				setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreChange", false)

@@ -188,8 +188,8 @@ class LapsDatabase extends SessionDatabase {
 
 		if (newTyreLaps.Length = 1)
 			tyreLaps := newTyreLaps[1]
-		else
-			tyreLaps := values2String(",", newTyreLaps*)
+		else if isObject(tyreLaps)
+			tyreLaps := values2String(",", tyreLaps*)
 	}
 
 	getElectronicsCount(drivers := kUndefined) {

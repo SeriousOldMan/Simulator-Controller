@@ -3940,9 +3940,9 @@ class SoloCenter extends ConfigurationItem {
 										, telemetryData[11], telemetryData[12], telemetryData[13]
 										, kNull, telemetryData[8], telemetryData[9], driverID)
 
-				pressuresData := collect(string2Values(",", telemetryData[16]), null)
-				temperaturesData := collect(string2Values(",", telemetryData[17]), null)
-				wearData := collect(string2Values(",", telemetryData[18]), null)
+				pressuresData := collect(string2Values(",", telemetryData[17]), null)
+				temperaturesData := collect(string2Values(",", telemetryData[18]), null)
+				wearData := collect(string2Values(",", telemetryData[19]), null)
 
 				lapsDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]
 								  , telemetryData[14], telemetryData[15], tyreLaps

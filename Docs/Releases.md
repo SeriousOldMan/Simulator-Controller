@@ -36,6 +36,7 @@
   - Fixed several type conversion problems between *Lua* scripts and the host process, which caused especially floating point values to be coerced to integer values.
   - Fixed a bug that prevented on-track strategy simulation for sessions with undefined tyre sets.
   - Fixed a bug in "Simulator Setup", which prevented alternative download mirrors to be used for DLCs.
+  - Fixed updating of recent lap telemetry data in "Solo Center". This bug resulted in unavailable tyre pressure and temperatur data for laps shortly after a pitstop.
 
 #### Changes
 

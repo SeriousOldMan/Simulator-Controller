@@ -181,22 +181,15 @@ class LapsDatabase extends SessionDatabase {
 	normalizeTyreLaps(&tyreLaps) {
 		local newTyreLaps
 
-		if isObject(tyreLaps) {
-			newTyreLaps := removeDuplicates(newTyreLaps)
-
-			if (newTyreLaps.Length = 1)
-				tyreLaps := newTyreLaps[1]
-			else
-				tyreLaps := values2String(",", tyreLaps*)
-		}
-		else if InStr(tyreLaps, ",") {
+		if isObject(tyreLaps)
+			newTyreLaps := removeDuplicates(tyreLaps)
+		else
 			newTyreLaps := removeDuplicates(string2Values(",", tyreLaps))
 
-			if (newTyreLaps.Length = 1)
-				tyreLaps := newTyreLaps[1]
-			else
-				tyreLaps := values2String(",", newTyreLaps*)
-		}
+		if (newTyreLaps.Length = 1)
+			tyreLaps := newTyreLaps[1]
+		else
+			tyreLaps := values2String(",", newTyreLaps*)
 	}
 
 	getElectronicsCount(drivers := kUndefined) {

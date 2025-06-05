@@ -3968,40 +3968,41 @@ class RaceStrategist extends GridRaceAssistant {
 
 		this.Provider.supportsTyreManagement(&mixedCompounds, &tyreSet)
 
-		loop getMultiMapValue(pitstopHistory, "Pitstops", "Count", 0) {
-			pitstop := {Nr: A_Index
-					  , Time: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Time")
-					  , Lap: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Lap")
-					  , RefuelAmount: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Refuel", 0)
-					  , TyreChange: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreChange")
-					  , TyreCompound: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompound", false)
-					  , TyreCompoundColor: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompoundColor", false)
-					  , TyreLapsFrontLeft: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreLapsFrontLeft", 0)
-					  , TyreLapsFrontRight: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreLapsFrontRight", 0)
-					  , TyreLapsRearLeft: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreLapsRearLeft", 0)
-					  , TyreLapsRearRight: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreLapsRearRight", 0)
-					  , RepairBodywork: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".RepairBodywork", false)
-					  , RepairSuspension: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".RepairSuspension", false)
-					  , RepairEngine: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".RepairEngine")}
+		loop getMultiMapValue(pitstopHistory, "Pitstops", "Count", 0)
+			if (getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Lap", kUndefined) != kUndefined) {
+				pitstop := {Nr: A_Index
+						  , Time: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Time")
+						  , Lap: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Lap")
+						  , RefuelAmount: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Refuel", 0)
+						  , TyreChange: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreChange")
+						  , TyreCompound: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompound", false)
+						  , TyreCompoundColor: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompoundColor", false)
+						  , TyreLapsFrontLeft: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreLapsFrontLeft", 0)
+						  , TyreLapsFrontRight: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreLapsFrontRight", 0)
+						  , TyreLapsRearLeft: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreLapsRearLeft", 0)
+						  , TyreLapsRearRight: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreLapsRearRight", 0)
+						  , RepairBodywork: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".RepairBodywork", false)
+						  , RepairSuspension: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".RepairSuspension", false)
+						  , RepairEngine: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".RepairEngine")}
 
-			if tyreSet
-				pitstops[pitstops.Length].TyreSet := getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreSet", false)
+				if tyreSet
+					pitstops[pitstops.Length].TyreSet := getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreSet", false)
 
-			if (mixedCompounds = "Wheel") {
-				for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
-					pitstop.%TyreCompound . tyre% := getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompound" . tyre, false)
-					pitstop.%TyreCompoundColor . tyre% := getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompoundColor" . tyre, false)
+				if (mixedCompounds = "Wheel") {
+					for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
+						pitstop.%TyreCompound . tyre% := getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompound" . tyre, false)
+						pitstop.%TyreCompoundColor . tyre% := getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompoundColor" . tyre, false)
+					}
 				}
-			}
-			else if (mixedCompounds = "Axle") {
-				for index, axle in ["Front", "Rear"] {
-					pitstop.%TyreCompound . axle% := getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompound" . axle, false)
-					pitstop.%TyreCompoundColor . axle% := getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompoundColor" . axle, false)
+				else if (mixedCompounds = "Axle") {
+					for index, axle in ["Front", "Rear"] {
+						pitstop.%TyreCompound . axle% := getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompound" . axle, false)
+						pitstop.%TyreCompoundColor . axle% := getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompoundColor" . axle, false)
+					}
 				}
-			}
 
-			pitstops.Push(pitstop)
-		}
+				pitstops.Push(pitstop)
+			}
 
 		loop getMultiMapValue(pitstopHistory, "TyreSets", "Count", 0) {
 			tyreSets.Push({Laps: getMultiMapValue(pitstopHistory, "TyreSets", A_Index . ".Laps")
@@ -4708,22 +4709,37 @@ class RaceStrategist extends GridRaceAssistant {
 			   , compound, compoundColor, pressures, temperatures, wear, lapState
 			   , waterTemperature, oilTemperature) {
 		local knowledgeBase := this.KnowledgeBase
+		local lastPitstop := knowledgeBase.getValue("Pitstop.Last", false)
 		local lapsDB := this.LapsDatabase
-		local tyreLaps, lastPitstop
+		local tyreLaps := false
+		local stintLaps
+
+		if lastPitstop
+			stintLaps := (lapNumber - (knowledgeBase.getValue("Pitstop." . lastPitstop . ".Lap")))
+		else
+			stintLaps := lapNumber
+
+		if this.PitstopHistory {
+			tyreLaps := false
+
+			for ignore, pitstop in this.PitstopHistory
+				if (pitstop.Nr = lastPitstop) {
+					tyreLaps := values2String(",", pitstop.TyreLapsFrontLeft + stintLaps, pitstop.TyreLapsFrontRight + stintLaps
+												 , pitstop.TyreLapsRearLeft + stintLaps, pitstop.TyreLapsRearRight + stintLaps)
+
+					break
+				}
+		}
+
+		if !tyreLaps
+			tyreLaps := values2String(",", lapNumber, lapNumber, lapNumber, lapNumber)
 
 		if ((lapState = "Valid") && !pitstop) {
 			lapsDB.addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor
 											 , map, tc, abs, fuelConsumption, fuelRemaining, lapTime
 											 , isDebug() ? SessionDatabase.getDriverID(this.Simulator, this.DriverFullName) : false)
 
-			lastPitstop := knowledgeBase.getValue("Pitstop.Last", false)
-
-			if lastPitstop
-				tyreLaps := (lapNumber - (knowledgeBase.getValue("Pitstop." . lastPitstop . ".Lap")))
-			else
-				tyreLaps := lapNumber
-
-			if (tyreLaps > 1)
+			if (stintLaps > 1)
 				lapsDB.addTyreEntry(weather, airTemperature, trackTemperature
 										   , compound, compoundColor, tyreLaps
 										   , pressures[1], pressures[2], pressures[3], pressures[4]
@@ -4739,7 +4755,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 			this.RemoteHandler.saveLapsData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 										  , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
-										  , compound, compoundColor, values2String(",", pressures*), values2String(",", temperatures*)
+										  , compound, compoundColor, tyreLaps, values2String(",", pressures*), values2String(",", temperatures*)
 										  , wear ? values2String(",", wear*) : false
 										  , lapState, waterTemperature, oilTemperature)
 		}

@@ -7836,7 +7836,7 @@ class TeamCenter extends ConfigurationItem {
 		local tyreChange := true
 		local newData, message, session, lapsDB, tyresTable, lap, theLap, runningLap, driverID, telemetry
 		local telemetryData, pressures, temperatures, wear, lapPressures, pressure, driver, row
-		local tyreCompound, tyreCompoundColor, mixedCompounds, index, tyre, axle, compounds
+		local tyreCompound, tyreCompoundColor, mixedCompounds, index, tyre, axle, compounds, tyreLaps
 
 		wasPitstop(lap, &tyreChange := false) {
 			local fuel, tyreCompounds, tyreCompoundColors, tyreSet, tyrePressures
@@ -8020,6 +8020,11 @@ class TeamCenter extends ConfigurationItem {
 
 				runningLap += 1
 
+				if (telemetryData.Length >= 24)
+					tyreLaps := tyreLaps := telemetryData[24]
+				else
+					tyreLaps := values2String(",", runningLap, runningLap, runningLap, runningLap)
+
 				pressures := string2Values(",", telemetryData[16])
 				temperatures := string2Values(",", telemetryData[17])
 
@@ -8034,7 +8039,7 @@ class TeamCenter extends ConfigurationItem {
 										, driverID)
 
 				lapsDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]
-								  , telemetryData[14], telemetryData[15], runningLap
+								  , telemetryData[14], telemetryData[15], tyreLaps
 								  , pressures[1], pressures[2], pressures[4], pressures[4]
 								  , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
 								  , wear[1], wear[2], wear[3], wear[4]

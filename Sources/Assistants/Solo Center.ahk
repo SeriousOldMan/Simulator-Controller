@@ -3839,12 +3839,12 @@ class SoloCenter extends ConfigurationItem {
 
 	addTelemetry(lap, simulator, car, track, weather, airTemperature, trackTemperature
 			   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
-			   , compound, compoundColor, pressures, temperatures, wear, state
+			   , compound, compoundColor, tyreLaps, pressures, temperatures, wear, state
 			   , waterTemperature := kNull, oilTemperature := kNull) {
 		local lapsDB := this.LapsDatabase
 		local tyresTable := this.LapsDatabase.Database.Tables["Tyres"]
 		local driver := lap.Run.Driver
-		local telemetry, telemetryData, pressuresData, temperaturesData, wearData, recentLap, tyreLaps
+		local telemetry, telemetryData, pressuresData, temperaturesData, wearData, recentLap
 		local newRun, oldRun, driverID, baseLap, lastLap, tyreCompound, tyreCompoundColor, mixedCompounds
 
 		this.initializeSimulator(simulator, car, track)
@@ -3883,7 +3883,7 @@ class SoloCenter extends ConfigurationItem {
 
 				recentLap := this.Laps[recentLap]
 
-				tyreLaps := (recentLap.Run.TyreLaps + (recentLap.Nr - recentLap.Run.Lap) + 2)
+				; tyreLaps := (recentLap.Run.TyreLaps + (recentLap.Nr - recentLap.Run.Lap) + 2)
 				telemetry := lap.Data
 
 				tyreCompound := getMultiMapValue(telemetry, "Car Data", "TyreCompound", "Dry")
@@ -3923,8 +3923,7 @@ class SoloCenter extends ConfigurationItem {
 								, getMultiMapValue(telemetry, "Car Data", "Map", "n/a")
 								, getMultiMapValue(telemetry, "Car Data", "TC", "n/a")
 								, getMultiMapValue(telemetry, "Car Data", "ABS", "n/a")
-								, tyreCompound, tyreCompoundColor
-								, tyreLaps
+								, tyreCompound, tyreCompoundColor, tyreLaps
 								, getMultiMapValue(telemetry, "Car Data", "TyrePressure", "-,-,-,-")
 								, getMultiMapValue(telemetry, "Car Data", "TyreTemperature", "-,-,-,-")
 								, getMultiMapValue(telemetry, "Car Data", "TyreWear", "null,null,null,null")
@@ -3957,7 +3956,7 @@ class SoloCenter extends ConfigurationItem {
 
 		lap.State := state
 
-		tyreLaps := (lap.Run.TyreLaps + (lap.Nr - lap.Run.Lap) + 1)
+		; tyreLaps := (lap.Run.TyreLaps + (lap.Nr - lap.Run.Lap) + 1)
 
 		lap.TelemetryData := values2String("|||", simulator, car, track, weather, airTemperature, trackTemperature
 												, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
@@ -3965,8 +3964,7 @@ class SoloCenter extends ConfigurationItem {
 												, waterTemperature, oilTemperature)
 
 		lapsDB.addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor
-								, map, tc, abs, fuelConsumption, fuelRemaining, lapTime
-								, driverID)
+								, map, tc, abs, fuelConsumption, fuelRemaining, lapTime, driverID)
 
 		pressures := collect(string2Values(",", pressures), null)
 		temperatures := collect(string2Values(",", temperatures), null)
@@ -8076,13 +8074,13 @@ class SoloCenter extends ConfigurationItem {
 
 	updateTelemetry(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 				  , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
-				  , compound, compoundColor, pressures, temperatures, wear, state
+				  , compound, compoundColor, tyreLaps, pressures, temperatures, wear, state
 				  , waterTemperature, oilTemperature) {
 		udateTelemetryAsync() {
 			if (this.SessionActive && (this.LastLap.Nr = lapNumber)) {
 				this.addTelemetry(this.LastLap, simulator, car, track, weather, airTemperature, trackTemperature
 								, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
-								, compound, compoundColor, pressures, temperatures, wear, state
+								, compound, compoundColor, tyreLaps, pressures, temperatures, wear, state
 								, waterTemperature, oilTemperature)
 
 				this.analyzeTelemetry()

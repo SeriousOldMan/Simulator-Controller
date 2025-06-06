@@ -4275,113 +4275,167 @@ class RaceEngineer extends RaceAssistant {
 		local numPitstops := 0
 		local numTyreSets := 1
 		local lastLap := 0
-		local fileName, pitstopLap, tyreCompound, tyreCompoundColor, tyreSet
-		local tyreService, pitstop, tyreChange
+		local tyreLapsFL := 0
+		local tyreLapsFR := 0
+		local tyreLapsRL := 0
+		local tyreLapsRR := 0
+		local fileName, pitstopLap, pitstopLaps, tyreCompound, tyreCompoundColor, tyreSet
+		local tyreService, tyreSets, pitstop, tyreChange, index, axle, tyre
+
+		static postfixes := ["FL", "FR", "RL", "RR"]
 
 		this.Provider.supportsPitstop( , &tyreService)
+		this.Provider.supportsTyreManagement( , &tyreSets)
 
 		setMultiMapValue(pitstopHistory, "TyreSets", "1.Compound"
 					   , knowledgeBase.getValue("Session.Setup.Tyre.Compound"))
 		setMultiMapValue(pitstopHistory, "TyreSets", "1.CompoundColor"
 					   , knowledgeBase.getValue("Session.Setup.Tyre.Compound.Color"))
-		setMultiMapValue(pitstopHistory, "TyreSets", "1.Set"
-					   , knowledgeBase.getValue("Session.Setup.Tyre.Set"))
+
+		if tyreSets
+			setMultiMapValue(pitstopHistory, "TyreSets", "1.Set"
+						   , knowledgeBase.getValue("Session.Setup.Tyre.Set"))
 
 		loop knowledgeBase.getValue("Pitstop.Last") {
 			numPitstops += 1
 
-			pitstopLap := knowledgeBase.getValue("Pitstop." . A_Index . ".Lap")
+			if (knowledgeBase.getValue("Pitstop." . A_Index . ".Lap", kUndefined) != kUndefined) {
+				pitstopLap := knowledgeBase.getValue("Pitstop." . A_Index . ".Lap")
+				pitstopLaps := (pitstopLap - lastLap)
 
-			setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Lap", pitstopLap)
-			setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Time"
-						   , Round(knowledgeBase.getValue("Pitstop." . A_Index . ".Time", 0) / 1000))
-			setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Refuel"
-						   , knowledgeBase.getValue("Pitstop." . A_Index . ".Fuel", 0))
+				setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Lap", pitstopLap)
+				setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Time"
+							   , Round(knowledgeBase.getValue("Pitstop." . A_Index . ".Time", 0) / 1000))
+				setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Refuel"
+							   , knowledgeBase.getValue("Pitstop." . A_Index . ".Fuel", 0))
 
-			tyreCompound := knowledgeBase.getValue("Pitstop." . A_Index . ".Tyre.Compound", false)
-			tyreCompoundColor := knowledgeBase.getValue("Pitstop." . A_Index . ".Tyre.Compound.Color", false)
-			tyreSet := knowledgeBase.getValue("Pitstop." . A_Index . ".Tyre.Set", false)
+				tyreCompound := knowledgeBase.getValue("Pitstop." . A_Index . ".Tyre.Compound", false)
+				tyreCompoundColor := knowledgeBase.getValue("Pitstop." . A_Index . ".Tyre.Compound.Color", false)
 
-			if tyreCompound {
-				setMultiMapValue(pitstopHistory, "TyreSets", numTyreSets . ".Laps", pitstopLap - lastLap)
+				tyreSet := knowledgeBase.getValue("Pitstop." . A_Index . ".Tyre.Set", false)
 
-				numTyreSets += 1
-				lastLap := pitstopLap
+				if tyreCompound {
+					setMultiMapValue(pitstopHistory, "TyreSets", numTyreSets . ".Laps", pitstopLaps)
 
-				setMultiMapValue(pitstopHistory, "TyreSets", numTyreSets . ".Compound", tyreCompound)
-				setMultiMapValue(pitstopHistory, "TyreSets", numTyreSets . ".CompoundColor", tyreCompoundColor)
-				setMultiMapValue(pitstopHistory, "TyreSets", numTyreSets . ".Set", tyreSet)
+					numTyreSets += 1
+					lastLap := pitstopLap
 
-				setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompound", tyreCompound)
-				setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompoundColor", tyreCompoundColor)
-				setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreSet", tyreSet)
-				setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreChange", true)
-			}
-			else
-				setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreChange", false)
+					setMultiMapValue(pitstopHistory, "TyreSets", numTyreSets . ".Compound", tyreCompound)
+					setMultiMapValue(pitstopHistory, "TyreSets", numTyreSets . ".CompoundColor", tyreCompoundColor)
 
-			tyreChange := false
-			pitstop := A_Index
+					if tyreSets
+						setMultiMapValue(pitstopHistory, "TyreSets", numTyreSets . ".Set", tyreSet)
 
-			if (tyreService = "Axle") {
-				do(["Front", "Rear"], (axle) {
-					local tc := knowledgeBase.getValue("Pitstop." . pitstop . ".Tyre.Compound." . axle, false)
-					local tcc := knowledgeBase.getValue("Pitstop." . pitstop . ".Tyre.Compound.Color." . axle, false)
-					local first := false
+					setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompound", tyreCompound)
+					setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompoundColor", tyreCompoundColor)
+					setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreChange", true)
 
-					if (tc && (tc != "-")) {
-						setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompound" . axle, tc)
-						setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompoundColor" . axle, tcc)
+					if tyreSets
+						setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreSet", tyreSet)
+				}
+				else
+					setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreChange", false)
 
-						if first {
-							first := false
+				tyreChange := false
+				pitstop := A_Index
 
-							setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompound", tc)
-							setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompoundColor", tc)
+				if (tyreService = "Axle") {
+					for index, axle in ["Front", "Rear"] {
+						local tc := knowledgeBase.getValue("Pitstop." . pitstop . ".Tyre.Compound." . axle, false)
+						local tcc := knowledgeBase.getValue("Pitstop." . pitstop . ".Tyre.Compound.Color." . axle, false)
+						local first := false
+
+						if (tc && (tc != "-")) {
+							setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompound" . axle, tc)
+							setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompoundColor" . axle, tcc)
+
+							if first {
+								first := false
+
+								setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompound", tc)
+								setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompoundColor", tc)
+							}
+
+							tyreChange := true
+
+							if (axle = "Front") {
+								tyreLapsFL := 0
+								tyreLapsFR := 0
+							}
+							else {
+								tyreLapsRL := 0
+								tyreLapsRR := 0
+							}
 						}
-
-						tyreChange := true
-					}
-					else  {
-						setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompound" . axle, false)
-						setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompoundColor" . axle, false)
-					}
-				})
-			}
-			else if (tyreService = "Wheel")
-				do(["FrontLeft", "FrontRight", "RearLeft", "RearRight"], (tyre) {
-					local tc := knowledgeBase.getValue("Pitstop." . pitstop . ".Tyre.Compound." . tyre, false)
-					local tcc := knowledgeBase.getValue("Pitstop." . pitstop . ".Tyre.Compound.Color." . tyre, false)
-					local first := false
-
-					if (tc && (tc != "-")) {
-						setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompound" . tyre, tc)
-						setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompoundColor" . tyre, tcc)
-
-						if first {
-							first := false
-
-							setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompound", tc)
-							setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompoundColor", tc)
+						else  {
+							if (axle = "Front") {
+								tyreLapsFL += pitstopLaps
+								tyreLapsFR += pitstopLaps
+							}
+							else {
+								tyreLapsRL += pitstopLaps
+								tyreLapsRR += pitstopLaps
+							}
 						}
-
-						tyreChange := true
 					}
-					else  {
-						setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompound" . tyre, false)
-						setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompoundColor" . tyre, false)
+				}
+				else if (tyreService = "Wheel") {
+					for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
+						local tc := knowledgeBase.getValue("Pitstop." . pitstop . ".Tyre.Compound." . tyre, false)
+						local tcc := knowledgeBase.getValue("Pitstop." . pitstop . ".Tyre.Compound.Color." . tyre, false)
+						local first := false
+
+						if (tc && (tc != "-")) {
+							setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompound" . tyre, tc)
+							setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompoundColor" . tyre, tcc)
+
+							if first {
+								first := false
+
+								setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompound", tc)
+								setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompoundColor", tc)
+							}
+
+							tyreChange := true
+
+							%"tyreLaps" . postfixes[index]% := 0
+						}
+						else  {
+							setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompound" . tyre, false)
+							setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompoundColor" . tyre, false)
+
+							%"tyreLaps" . postfixes[index]% += pitstopLaps
+						}
 					}
-				})
+				}
+				else if tyreCompound {
+					tyreLapsFL += pitstopLaps
+					tyreLapsFR += pitstopLaps
+					tyreLapsRL += pitstopLaps
+					tyreLapsRR += pitstopLaps
+				}
+				else {
+					tyreLapsFL := 0
+					tyreLapsFR := 0
+					tyreLapsRL := 0
+					tyreLapsRR := 0
+				}
 
-			if tyreChange
-				setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreChange", true)
+				setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreLapsFrontLeft", tyreLapsFL)
+				setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreLapsFrontRight", tyreLapsFR)
+				setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreLapsRearLeft", tyreLapsRL)
+				setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreLapsRearRight", tyreLapsRR)
 
-			setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".RepairBodywork"
-						   , knowledgeBase.getValue("Pitstop." . A_Index . ".Repair.Bodywork", false))
-			setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".RepairSuspension"
-						   , knowledgeBase.getValue("Pitstop." . A_Index . ".Repair.Suspension", false))
-			setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".RepairEngine"
-						   , knowledgeBase.getValue("Pitstop." . A_Index . ".Repair.Engine", false))
+				if tyreChange
+					setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreChange", true)
+
+				setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".RepairBodywork"
+							   , knowledgeBase.getValue("Pitstop." . A_Index . ".Repair.Bodywork", false))
+				setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".RepairSuspension"
+							   , knowledgeBase.getValue("Pitstop." . A_Index . ".Repair.Suspension", false))
+				setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".RepairEngine"
+							   , knowledgeBase.getValue("Pitstop." . A_Index . ".Repair.Engine", false))
+			}
 		}
 
 		setMultiMapValue(pitstopHistory, "TyreSets", numTyreSets . ".Laps", knowledgeBase.getValue("Lap") - lastLap)

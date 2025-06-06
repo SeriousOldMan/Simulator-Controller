@@ -3366,7 +3366,7 @@ class SoloCenter extends ConfigurationItem {
 
 	createLap(run, lapNumber) {
 		local newLap := {Run: run, Nr: lapNumber, Weather: "-", Grip: "-", LapTime: "-", FuelConsumption: "-", FuelRemaining: "-"
-					   , Compounds: ["-"], TyreSet: kNull, Pressures: "-,-,-,-", Temperatures: "-,-,-,-", State: "Unknown", Accident: ""
+					   , Compounds: ["-"], TyreSet: kNull, TyreWear: "-,-,-,-", Pressures: "-,-,-,-", Temperatures: "-,-,-,-", State: "Unknown", Accident: ""
 					   , Electronics: false, Tyres: false
 					   , HotPressures: false, ColdPressures: false, PressureLosses: false}
 
@@ -3505,6 +3505,7 @@ class SoloCenter extends ConfigurationItem {
 		lap.Driver := driver
 		lap.Compounds := tyreCompound
 		lap.TyreSet := tyreSet
+		lap.TyreWear := getMultiMapValue(data, "Car Data", "TyreWear", "-,-,-,-")
 
 		damage := 0
 
@@ -7633,6 +7634,8 @@ class SoloCenter extends ConfigurationItem {
 		html .= ("<tr><td><b>" . translate("Consumption:") . "</b></td><td>" . displayNullValue(fuelConsumption) . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Fuel Level:") . "</b></td><td>" . remainingFuel . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Temperatures (A / T):") . "</b></td><td>" . displayValue("Float", convertUnit("Temperature", lap.AirTemperature)) . ", " . displayValue("Float", convertUnit("Temperature", lap.TrackTemperature)) . "</td></tr>")
+		
+		html .= ("<tr><td><b>" . translate("Tyre wear:") . "</b></td><td>" . (lap.HasProp("TyreWear") ? lap.TyreWear : "-,-,-,-") . "</td></tr>")
 
 		if (hotPressures != "-, -, -, -")
 			html .= ("<tr><td><b>" . translate("Pressures (hot):") . "</b></td><td>" . hotPressures . "</td></tr>")

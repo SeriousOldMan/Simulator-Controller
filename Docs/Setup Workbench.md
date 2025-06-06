@@ -369,11 +369,11 @@ The most important part is the "[Setup.Settings.Handler]" section. Here you spec
 	
 	Notes:
 	
-	  (1) A *display* value is the value used in the setup editor user interface.
-	  (2) A *raw* value is the value, that is stored in the setup file.
+	  (1) A *display* value is the value used in the setup editor user interface.<br>
+	  (2) A *raw* value is the value, that is stored in the setup file.<br>
 	  (3) All arguments, that have been passed to the *ScriptHandler* in the car definition file, are available in the global array *Arguments*.
 	
-	You can take a look at [this implementation](https://github.com/SeriousOldMan/Simulator-Controller/blob/Main/Sources/Garage/Scripts/DecimalSettingHandler.script) of a handler script for decimal values for an inspiration for your own handler script. Once you have created your script, you can use it in your car definition file like this:
+	You can take a look at [this implementation](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Garage/Scripts/DecimalSettingHandler.script) of a handler script for decimal values for an inspiration for your own handler script. Once you have created your script, you can use it in your car definition file like this:
 	
 		Brake.Balance=ScriptHandler(%kResourcesDirectory%Scripts\DecimalSettingHandler.script, 0, 10, 52.0, 62.0, 0.5, 1)
 	

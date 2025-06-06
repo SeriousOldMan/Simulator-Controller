@@ -2434,7 +2434,12 @@ class StrategyWorkbench extends ConfigurationItem {
 
 					this.iSelectedChartType := value
 
-					this.Control["dataXDropDown"].Choose(inList(schema, getMultiMapValue(settings, "Strategy Workbench", "Chart." . dataType . ".X-Axis")))
+					field := getMultiMapValue(settings, "Strategy Workbench", "Chart." . dataType . ".X-Axis")
+
+					if (field = "Tyre.Laps")
+						field := "Tyre.Laps.Front.Left"
+
+					this.Control["dataXDropDown"].Choose(inList(schema, field))
 
 					loop 3
 						this.Control["dataY" . A_Index . "DropDown"].Choose(1)
@@ -2449,7 +2454,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					this.Control["dataY3DropDown"].Choose(1)
 				}
 				else if (dataType = "Tyres") {
-					this.Control["dataXDropDown"].Choose(inList(schema, "Tyre.Laps"))
+					this.Control["dataXDropDown"].Choose(inList(schema, "Tyre.Laps.Front.Left"))
 					this.Control["dataY1DropDown"].Choose(inList(schema, "Tyre.Pressure"))
 					this.Control["dataY2DropDown"].Choose(inList(schema, "Tyre.Temperature") + 1)
 					this.Control["dataY3DropDown"].Choose(1)
@@ -4540,7 +4545,7 @@ filterSchema(schema) {
 	local ignore, column
 
 	for ignore, column in schema
-		if !inList(["Driver", "Identifier", "Synchronized", "Weather", "Tyre.Compound", "Tyre.Compound.Color"], column)
+		if !inList(["Driver", "Identifier", "Synchronized", "Weather", "Tyre.Laps", "Tyre.Compound", "Tyre.Compound.Color"], column)
 			newSchema.Push(column)
 
 	return newSchema

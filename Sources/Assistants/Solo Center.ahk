@@ -62,15 +62,16 @@ global kSessionReports := concatenate(kRaceReports, ["Running", "Pressures", "Te
 global kDetailReports := ["Run", "Lap", "Session", "Drivers"]
 
 global kSessionDataSchemas := CaseInsenseMap("Run.Data", ["Nr", "Lap", "Driver.Forname", "Driver.Surname", "Driver.Nickname", "Driver.ID"
-													    , "Weather", "Tyre.Compound", "Tyre.Compound.Color", "Tyre.Set", "Tyre.Laps"
+													    , "Weather", "Tyre.Compound", "Tyre.Compound.Color", "Tyre.Set", "Tyre.Laps.Front.Left"
 														, "Lap.Time.Average", "Lap.Time.Best"
 														, "Fuel.Initial", "Fuel.Consumption", "Accidents"
-														, "Position.Start", "Position.End", "Time.Start", "Time.End", "Notes"]
+														, "Position.Start", "Position.End", "Time.Start", "Time.End", "Notes"
+														, "Tyre.Laps.Front.Right", "Tyre.Laps.Rear.Left", "Tyre.Laps.Rear.Right"]
 										   , "Driver.Data", ["Forname", "Surname", "Nickname", "ID"]
 										   , "Lap.Data", ["Run", "Nr", "Lap", "Position", "Lap.Time", "Lap.State", "Lap.Valid", "Grip", "Map", "TC", "ABS"
 														, "Weather", "Temperature.Air", "Temperature.Track"
 														, "Fuel.Initial", "Fuel.Remaining", "Fuel.Consumption", "Damage", "EngineDamage", "Accident"
-														, "Tyre.Laps", "Tyre.Compound", "Tyre.Compound.Color", "Tyre.Set"
+														, "Tyre.Laps.Front.Left", "Tyre.Compound", "Tyre.Compound.Color", "Tyre.Set"
 														, "Tyre.Pressure.Cold.Average", "Tyre.Pressure.Cold.Front.Average", "Tyre.Pressure.Cold.Rear.Average"
 														, "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right"
 														, "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
@@ -92,7 +93,8 @@ global kSessionDataSchemas := CaseInsenseMap("Run.Data", ["Nr", "Lap", "Driver.F
 														, "Brake.Wear.Front.Left", "Brake.Wear.Front.Right"
 														, "Brake.Wear.Rear.Left", "Brake.Wear.Rear.Right"
 														, "Data.Telemetry", "Data.Pressures", "Sectors.Time"
-														, "Engine.Temperature.Water", "Engine.Temperature.Oil"]
+														, "Engine.Temperature.Water", "Engine.Temperature.Oil"
+														, "Tyre.Laps.Front.Right", "Tyre.Laps.Rear.Left", "Tyre.Laps.Rear.Right"]
 										   , "Delta.Data", ["Lap", "Car", "Type", "Delta", "Distance", "ID"]
 										   , "Standings.Data", ["Lap", "Car", "Driver", "Position", "Time", "Laps", "Delta", "ID", "Category"])
 
@@ -386,6 +388,33 @@ class SoloCenter extends ConfigurationItem {
 		}
 	}
 
+	class ExtendedDatabase extends Database {
+		Tables[name := false] {
+			Get {
+				local ignore, rows, laps
+
+				if ((name = "Run.Data") || (name = "Lap.Data")) {
+					rows := super.Tables[name]
+
+					for ignore, row in rows {
+						if isNull(row["Tyre.Laps.Front.Right"])
+							row["Tyre.Laps.Front.Right"] := row["Tyre.Laps.Front.Left"]
+
+						if isNull(row["Tyre.Laps.Rear.Left"])
+							row["Tyre.Laps.Rear.Left"] := row["Tyre.Laps.Front.Left"]
+
+						if isNull(row["Tyre.Laps.Rear.Right"])
+							row["Tyre.Laps.Rear.Right"] := row["Tyre.Laps.Front.Left"]
+					}
+
+					return rows
+				}
+				else
+					return super.Tables[name]
+			}
+		}
+	}
+
 	class SessionLapsDatabase extends LapsDatabase {
 		iSoloCenter := false
 		iLapsDatabase := false
@@ -421,7 +450,7 @@ class SoloCenter extends ConfigurationItem {
 
 			this.Shared := false
 
-			this.setDatabase(Database(soloCenter.SessionDirectory, kLapsSchemas))
+			this.setDatabase(LapsDatabase.ExtendedDatabase(soloCenter.SessionDirectory, kLapsSchemas))
 
 			if simulator
 				this.iLapsDatabase := LapsDatabase(simulator, car, track)
@@ -487,7 +516,8 @@ class SoloCenter extends ConfigurationItem {
 						found := false
 
 						for ignore, candidate in entries
-							if ((candidate["Tyre.Laps"] = entry["Tyre.Laps"]) && (candidate["Lap.Time"] = entry["Lap.Time"])) {
+							if ((candidate["Tyre.Laps.Front.Left"] = entry["Tyre.Laps.Front.Left"])
+							 && (candidate["Lap.Time"] = entry["Lap.Time"])) {
 								found := true
 
 								break
@@ -558,7 +588,8 @@ class SoloCenter extends ConfigurationItem {
 						found := false
 
 						for ignore, candidate in entries
-							if ((candidate["Tyre.Laps"] = entry["Tyre.Laps"]) && (candidate["Lap.Time"] = entry["Lap.Time"])) {
+							if ((candidate["Tyre.Laps.Front.Left"] = entry["Tyre.Laps.Front.Left"])
+							 && (candidate["Lap.Time"] = entry["Lap.Time"])) {
 								found := true
 
 								break
@@ -1053,7 +1084,7 @@ class SoloCenter extends ConfigurationItem {
 	SessionStore {
 		Get {
 			if !this.iSessionStore
-				this.iSessionStore := Database(this.SessionDirectory, kSessionDataSchemas)
+				this.iSessionStore := SoloCenter.ExtendedDatabase(this.SessionDirectory, kSessionDataSchemas)
 
 			return this.iSessionStore
 		}
@@ -3149,8 +3180,8 @@ class SoloCenter extends ConfigurationItem {
 						if (row.Length > 0) {
 							row := row[1]
 
-							if (row["Tyre.Laps"] != (run.TyreLaps + A_Index)) {
-								row["Tyre.Laps"] := (run.TyreLaps + A_Index)
+							if (row["Tyre.Laps.Front.Left"] != (run.TyreLaps + A_Index)) {
+								row["Tyre.Laps.Front.Left"] := (run.TyreLaps + A_Index)
 
 								sessionStore.changed("Lap.Data")
 							}
@@ -3909,9 +3940,9 @@ class SoloCenter extends ConfigurationItem {
 										, telemetryData[11], telemetryData[12], telemetryData[13]
 										, kNull, telemetryData[8], telemetryData[9], driverID)
 
-				pressuresData := collect(string2Values(",", telemetryData[16]), null)
-				temperaturesData := collect(string2Values(",", telemetryData[17]), null)
-				wearData := collect(string2Values(",", telemetryData[18]), null)
+				pressuresData := collect(string2Values(",", telemetryData[17]), null)
+				temperaturesData := collect(string2Values(",", telemetryData[18]), null)
+				wearData := collect(string2Values(",", telemetryData[19]), null)
 
 				lapsDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]
 								  , telemetryData[14], telemetryData[15], tyreLaps
@@ -4094,7 +4125,7 @@ class SoloCenter extends ConfigurationItem {
 				if !tyreLaps.Has(fuel)
 					tyreLaps[fuel] := collect(kTyreLapsBuckets, always.Bind(false))
 
-				index := Min(kTyreLapsBuckets.Length, Floor(entry["Tyre.Laps"] / kTyreLapsBucketSize) + 1)
+				index := Min(kTyreLapsBuckets.Length, Floor(entry["Tyre.Laps.Front.Left"] / kTyreLapsBucketSize) + 1)
 
 				if (tyreLaps[fuel][index] != false)
 					tyreLaps[fuel][index] := Min(entry["Lap.Time"], tyreLaps[fuel][index])
@@ -5014,7 +5045,7 @@ class SoloCenter extends ConfigurationItem {
 			newRun := {Nr: run["Nr"], Lap: run["Lap"], Driver: driver, Weather: run["Weather"]
 					 , FuelInitial: run["Fuel.Initial"], FuelConsumption: run["Fuel.Consumption"]
 					 , Compounds: compounds(string2Values(",", run["Tyre.Compound"]), string2Values(",", run["Tyre.Compound.Color"]))
-					 , TyreSet: run["Tyre.Set"], TyreLaps: run["Tyre.Laps"]
+					 , TyreSet: run["Tyre.Set"], TyreLaps: run["Tyre.Laps.Front.Left"]
 					 , AvgLapTime: run["Lap.Time.Average"], BestLapTime: run["Lap.Time.Best"]
 					 , Accidents: run["Accidents"], StartPosition: run["Position.Start"], EndPosition: run["Position.End"]
 					 , StartTime: run["Time.Start"], EndTime: run["Time.End"], Notes: decode(run["Notes"])}
@@ -6125,7 +6156,8 @@ class SoloCenter extends ConfigurationItem {
 			if (report = "Running") {
 				xChoices := ["Running"]
 
-				y1Choices := ["Temperature.Air", "Temperature.Track", "Fuel.Remaining", "Tyre.Laps"
+				y1Choices := ["Temperature.Air", "Temperature.Track", "Fuel.Remaining"
+							, "Tyre.Laps.Front.Left", "Tyre.Laps.Front.Right", "Tyre.Laps.Rear.Left", "Tyre.Laps.Rear.Right"
 							, "Tyre.Pressure.Hot.Average", "Tyre.Pressure.Hot.Front.Average", "Tyre.Pressure.Hot.Rear.Average"
 							, "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right", "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right"
 							, "Tyre.Pressure.Loss.Front.Left", "Tyre.Pressure.Loss.Front.Right", "Tyre.Pressure.Loss.Rear.Left", "Tyre.Pressure.Loss.Rear.Right"
@@ -6154,7 +6186,8 @@ class SoloCenter extends ConfigurationItem {
 			else if (report = "Pressures") {
 				xChoices := ["Run", "Lap", "Lap.Time", "Tyre.Wear.Average"]
 
-				y1Choices := ["Temperature.Air", "Temperature.Track", "Fuel.Remaining", "Tyre.Laps"
+				y1Choices := ["Temperature.Air", "Temperature.Track", "Fuel.Remaining"
+							, "Tyre.Laps.Front.Left", "Tyre.Laps.Front.Right", "Tyre.Laps.Rear.Left", "Tyre.Laps.Rear.Right"
 							, "Tyre.Pressure.Cold.Average", "Tyre.Pressure.Cold.Front.Average", "Tyre.Pressure.Cold.Rear.Average"
 							, "Tyre.Pressure.Hot.Average", "Tyre.Pressure.Hot.Front.Average", "Tyre.Pressure.Hot.Rear.Average"
 							, "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right", "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
@@ -6187,7 +6220,8 @@ class SoloCenter extends ConfigurationItem {
 			else if (report = "Temperatures") {
 				xChoices := ["Run", "Lap", "Lap.Time", "Tyre.Wear.Average", "Brake.Wear.Average"]
 
-				y1Choices := ["Temperature.Air", "Temperature.Track", "Fuel.Remaining", "Tyre.Laps"
+				y1Choices := ["Temperature.Air", "Temperature.Track", "Fuel.Remaining"
+							, "Tyre.Laps.Front.Left", "Tyre.Laps.Front.Right", "Tyre.Laps.Rear.Left", "Tyre.Laps.Rear.Right"
 							, "Tyre.Pressure.Hot.Average", "Tyre.Pressure.Hot.Front.Average", "Tyre.Pressure.Hot.Rear.Average"
 							, "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right", "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right"
 							, "Tyre.Pressure.Loss.Front.Left", "Tyre.Pressure.Loss.Front.Right", "Tyre.Pressure.Loss.Rear.Left", "Tyre.Pressure.Loss.Rear.Right"
@@ -6208,10 +6242,13 @@ class SoloCenter extends ConfigurationItem {
 				y6Choices := y1Choices
 			}
 			else if (report = "Custom") {
-				xChoices := ["Run", "Lap", "Lap.Time", "Lap.Valid", "Tyre.Laps", "Map", "TC", "ABS", "Temperature.Air", "Temperature.Track", "Tyre.Wear.Average", "Brake.Wear.Average"]
+				xChoices := ["Run", "Lap", "Lap.Time", "Lap.Valid"
+						   , "Tyre.Laps.Front.Left", "Tyre.Laps.Front.Right", "Tyre.Laps.Rear.Left", "Tyre.Laps.Rear.Right"
+						   , "Map", "TC", "ABS", "Temperature.Air", "Temperature.Track", "Tyre.Wear.Average", "Brake.Wear.Average"]
 
 				y1Choices := ["Temperature.Air", "Temperature.Track", "Fuel.Initial", "Fuel.Remaining", "Fuel.Consumption"
-							, "Lap.Time", "Lap.Valid", "Tyre.Laps", "Map", "TC", "ABS"
+							, "Lap.Time", "Lap.Valid", "Map", "TC", "ABS"
+							, "Tyre.Laps.Front.Left", "Tyre.Laps.Front.Right", "Tyre.Laps.Rear.Left", "Tyre.Laps.Rear.Right"
 							, "Tyre.Pressure.Cold.Average", "Tyre.Pressure.Cold.Front.Average", "Tyre.Pressure.Cold.Rear.Average"
 							, "Tyre.Pressure.Hot.Average", "Tyre.Pressure.Hot.Front.Average", "Tyre.Pressure.Hot.Rear.Average"
 							, "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right", "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right"
@@ -6273,13 +6310,22 @@ class SoloCenter extends ConfigurationItem {
 
 				this.iSelectedChartType := value
 
-				dataXChoice := inList(xChoices, getMultiMapValue(settings, "Chart", report . ".X-Axis"))
+				dataXChoice := getMultiMapValue(settings, "Chart", report . ".X-Axis")
+
+				if (dataXChoice = "Tyre.Laps")
+					dataXChoice := "Tyre.Laps.Front.Left"
+
+				dataXChoice := inList(xChoices, dataXChoice)
 
 				loop 6
 					%"dataY" . A_Index . "Choice"% := 1
 
-				for axis, value in string2Values(";", getMultiMapValue(settings, "Chart", report . ".Y-Axises"))
+				for axis, value in string2Values(";", getMultiMapValue(settings, "Chart", report . ".Y-Axises")) {
+					if (value = "Tyre.Laps")
+						value := "Tyre.Laps.Front.Left"
+
 					%"dataY" . axis . "Choice"% := (inList(%"y" . axis . "Choices"%, value) + ((axis = 1) ? 0 : 1))
+				}
 			}
 			else {
 				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
@@ -6291,13 +6337,22 @@ class SoloCenter extends ConfigurationItem {
 
 					this.iSelectedChartType := value
 
-					dataXChoice := inList(xChoices, getMultiMapValue(settings, "Solo Center", "Chart." . report . ".X-Axis"))
+					dataXChoice := getMultiMapValue(settings, "Solo Center", "Chart." . report . ".X-Axis")
+
+					if (dataXChoice = "Tyre.Laps")
+						dataXChoice := "Tyre.Laps.Front.Left"
+
+					dataXChoice := inList(xChoices, dataXChoice)
 
 					loop 6
 						%"dataY" . A_Index . "Choice"% := 1
 
-					for axis, value in string2Values(";", getMultiMapValue(settings, "Solo Center", "Chart." . report . ".Y-Axises"))
+					for axis, value in string2Values(";", getMultiMapValue(settings, "Solo Center", "Chart." . report . ".Y-Axises")) {
+						if (value = "Tyre.Laps")
+							value := "Tyre.Laps.Front.Left"
+
 						%"dataY" . axis . "Choice"% := (inList(%"y" . axis . "Choices"%, value) + ((axis = 1) ? 0 : 1))
+					}
 				}
 				else if (report = "Running") {
 					window["chartTypeDropDown"].Choose(4)
@@ -6358,7 +6413,7 @@ class SoloCenter extends ConfigurationItem {
 
 					dataXChoice := inList(xChoices, "Lap")
 					dataY1Choice := inList(y1Choices, "Lap.Time")
-					dataY2Choice := inList(y2Choices, "Tyre.Laps") + 1
+					dataY2Choice := inList(y2Choices, "Tyre.Laps.Front.Left") + 1
 					dataY3Choice := inList(y3Choices, "Temperature.Air") + 1
 					dataY4Choice := inList(y4Choices, "Temperature.Track") + 1
 					dataY5Choice := inList(y5Choices, "Tyre.Pressure.Cold.Average") + 1
@@ -6499,7 +6554,10 @@ class SoloCenter extends ConfigurationItem {
 			lapData["Tyre.Pressure.Loss.Rear.Left"] := null(pressureLossRL)
 			lapData["Tyre.Pressure.Loss.Rear.Right"] := null(pressureLossRR)
 
-			lapData["Tyre.Laps"] := null(tyres["Tyre.Laps"])
+			lapData["Tyre.Laps.Front.Left"] := null(tyres["Tyre.Laps.Front.Left"])
+			lapData["Tyre.Laps.Front.Right"] := null(tyres["Tyre.Laps.Front.Right"])
+			lapData["Tyre.Laps.Rear.Left"] := null(tyres["Tyre.Laps.Rear.Left"])
+			lapData["Tyre.Laps.Rear.Right"] := null(tyres["Tyre.Laps.Rear.Right"])
 
 			temperatureFL := tyres["Tyre.Temperature.Front.Left"]
 			temperatureFR := tyres["Tyre.Temperature.Front.Right"]
@@ -6649,7 +6707,9 @@ class SoloCenter extends ConfigurationItem {
 											  , "Weather", run.Weather
 											  , "Tyre.Compound", values2String(",", tyreCompound*)
 											  , "Tyre.Compound.Color", values2String(",", tyreCompoundColor*)
-											  , "Tyre.Set", run.TyreSet, "Tyre.Laps", run.TyreLaps
+											  , "Tyre.Set", run.TyreSet
+											  , "Tyre.Laps.Front.Left", run.TyreLaps, "Tyre.Laps.Front.Right", run.TyreLaps
+											  , "Tyre.Laps.Rear.Left", run.TyreLaps, "Tyre.Laps.Rear.Right", run.TyreLaps
 											  , "Lap.Time.Average", null(run.AvgLapTime), "Lap.Time.Best", null(run.BestLapTime)
 											  , "Fuel.Initial", null(run.FuelInitial), "Fuel.Consumption", null(run.FuelConsumption)
 											  , "Accidents", run.Accidents, "Position.Start", null(run.StartPosition), "Position.End", null(run.EndPosition)

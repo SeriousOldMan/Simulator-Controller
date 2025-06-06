@@ -575,15 +575,15 @@ class RuntimePreset extends NamedPreset {
 				for ignore, url in string2Values(";", this.URL) {
 					showProgress({color: "Blue", message: translate("Downloading...")})
 
-					Download(substituteVariables(url, {master: MASTER}), A_Temp . "\" . this.Prefix . " Runtime.zip")
-
-					deleteDirectory(kProgramsDirectory . this.Prefix . " Runtime")
-
-					DirCreate(kProgramsDirectory . this.Prefix . " Runtime")
-
-					showProgress({color: "Green", message: translate("Extracting...")})
-
 					try {
+						Download(substituteVariables(url, {master: MASTER}), A_Temp . "\" . this.Prefix . " Runtime.zip")
+
+						deleteDirectory(kProgramsDirectory . this.Prefix . " Runtime")
+
+						DirCreate(kProgramsDirectory . this.Prefix . " Runtime")
+
+						showProgress({color: "Green", message: translate("Extracting...")})
+
 						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\" . this.Prefix . " Runtime.zip' -DestinationPath '" . kProgramsDirectory . this.Prefix . " Runtime" . "' -Force", , "Hide")
 
 						if !FileExist(kProgramsDirectory . this.Prefix . " Runtime")
@@ -819,11 +819,20 @@ class DownloadablePreset extends NamedPreset {
 	uninstall(wizard) {
 		local ignore, object
 
-		if !this.Definition
-			this.Definition := this.loadDefinition(this.URL)
+		try {
+			if !this.Definition
+				this.Definition := this.loadDefinition(this.URL)
 
-		for ignore, object in this.installedObjects()
-			this.uninstallObject(object)
+			for ignore, object in this.installedObjects()
+				this.uninstallObject(object)
+		}
+		catch Any as exception {
+			logError(exception, true)
+
+			OnMessage(0x44, translateOkButton)
+			withBlockedWindows(MsgBox, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
+			OnMessage(0x44, translateOkButton, 0)
+		}
 	}
 
 	installItem(name) {
@@ -912,7 +921,7 @@ class AssettoCorsaCarMetas extends DownloadablePreset {
 	loadDefinition(url) {
 		local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 		local counter :=  0
-		local updateTask, ignore
+		local updateTask, ignore, found
 
 		updateProgress() {
 			counter := Min(counter + 1, 100)
@@ -931,24 +940,36 @@ class AssettoCorsaCarMetas extends DownloadablePreset {
 			updateTask.start()
 
 			try {
+				found := false
+
 				for ignore, url in string2Values(";", url) {
 					showProgress({color: "Blue", title: translate("Downloading Components"), message: translate("Downloading...")})
 
-					Download(substituteVariables(url, {master: MASTER}), A_Temp . "\Simulator Controller DLC.zip")
+					try {
+						Download(substituteVariables(url, {master: MASTER}), A_Temp . "\Simulator Controller DLC.zip")
 
-					deleteDirectory(A_Temp . "\Simulator Controller DLC")
+						deleteDirectory(A_Temp . "\Simulator Controller DLC")
 
-					DirCreate(A_Temp . "\Simulator Controller DLC")
+						DirCreate(A_Temp . "\Simulator Controller DLC")
 
-					showProgress({color: "Green", message: translate("Extracting...")})
+						showProgress({color: "Green", message: translate("Extracting...")})
 
-					RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Simulator Controller DLC.zip' -DestinationPath '" . A_Temp . "\Simulator Controller DLC' -Force", , "Hide")
+						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Simulator Controller DLC.zip' -DestinationPath '" . A_Temp . "\Simulator Controller DLC' -Force", , "Hide")
 
-					if !FileExist(A_Temp . "\Simulator Controller DLC\*.*")
-						throw "Archive does not contain a valid download package..."
-					else
+						if !FileExist(A_Temp . "\Simulator Controller DLC\*.*")
+							throw "Archive does not contain a valid download package..."
+
+						found := true
+
 						break
+					}
+					catch Any as exception {
+						logError(exception)
+					}
 				}
+
+				if !found
+					throw "Download mirror unavailable..."
 			}
 			finally {
 				updateTask.stop()
@@ -1071,7 +1092,8 @@ class SplashMedia extends DownloadablePreset {
 
 		if (Trim(url) != "")
 			for ignore, url in string2Values(";", url) {
-				Download(substituteVariables(url, {master: MASTER}), A_Temp . "\Splash Media.ini")
+				try
+					Download(substituteVariables(url, {master: MASTER}), A_Temp . "\Splash Media.ini")
 
 				result := readMultiMap(A_Temp . "\Splash Media.ini")
 
@@ -1106,22 +1128,27 @@ class SplashMedia extends DownloadablePreset {
 			updateTask.start()
 
 			for ignore, url in string2Values(";", this.ContentURL) {
-				showProgress({color: "Blue", message: translate("Downloading...")})
+				try {
+					showProgress({color: "Blue", message: translate("Downloading...")})
 
-				Download(substituteVariables(url, {master: MASTER}), A_Temp . "\Simulator Controller DLC.zip")
+					Download(substituteVariables(url, {master: MASTER}), A_Temp . "\Simulator Controller DLC.zip")
 
-				deleteDirectory(A_Temp . "\Simulator Controller DLC")
+					deleteDirectory(A_Temp . "\Simulator Controller DLC")
 
-				DirCreate(A_Temp . "\Simulator Controller DLC")
+					DirCreate(A_Temp . "\Simulator Controller DLC")
 
-				showProgress({color: "Green", message: translate("Extracting...")})
+					showProgress({color: "Green", message: translate("Extracting...")})
 
-				RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Simulator Controller DLC.zip' -DestinationPath '" . A_Temp . "\Simulator Controller DLC' -Force", , "Hide")
+					RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Simulator Controller DLC.zip' -DestinationPath '" . A_Temp . "\Simulator Controller DLC' -Force", , "Hide")
 
-				if FileExist(A_Temp . "\Simulator Controller DLC\*.*") {
-					found := true
+					if FileExist(A_Temp . "\Simulator Controller DLC\*.*") {
+						found := true
 
-					break
+						break
+					}
+				}
+				catch Any as exception {
+					logError(exception)
 				}
 			}
 

@@ -1,15 +1,15 @@
 [Development]
-Version=6.3.5.0-dev
+Version=6.3.5.0-release
 Target=6.3.5.0-release
-Date=06/03/2025
-Download=http://87.178.12.140:800/api/public/dl/Q6wvU9ri
-Changes=Fixed tyre compound choice for strategy pitstops, Prevent strategy pitstops to be in the "past", Fixed tyre compound handling in strategy validation scripts, Script support in "Setup Workbench", Fixed AHK <-> LUA type conversion, Support for wheel specific tyre laps in laps database, Consent for session data sharing
+Date=06/06/2025
+Download=https://cutt.ly/ErnSPTZq;http://87.178.12.140:800/api/public/dl/xGTm0KWp;https://www.dropbox.com/scl/fi/lao14yjfearcu7m5o9avd/Simulator-Controller-6.3.5.0-release.zip?rlkey=nhndxyu4ie8j33780mnikm0nf&st=6p49ww9b&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.3.5.0-release.zip
+Changes=Fixed tyre compound choice for strategy pitstops, Prevent strategy pitstops to be in the "past", Fixed tyre compound handling in strategy validation scripts, Script support in "Setup Workbench", Fixed AHK <-> LUA type conversion, Support for wheel specific tyre laps in laps database, Consent for session data sharing, Fixed DLC download mirror handling, Fixed history lap data in "Solo Center"
 Components=Media->5.6.1,Configuration->6.3.2,Utilities->6.3.0
 [Release]
-Version=6.3.4.0-release
-Date=05/30/2025
-Download=https://cutt.ly/ArbsFIKb;http://87.178.12.140:800/api/public/dl/Ol93-boc;https://www.dropbox.com/scl/fi/nqyfvn0qfo7pvwipge8k3/Simulator-Controller-6.3.4.0-release.zip?rlkey=0jquq69vb99e6ijp3xnwcszli&st=9hl8iknm&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.3.4.0-release.zip
-Changes=Show tyre compounds in "Race Reports", Handling individual tyres in "Race Settings", "Race Settings" detect the currently running simulator, Fixed AvaialableTyreSets knowledge for Race Strategist, Fixed missing car times in Race Reports, Support for multiple tyre compounds in "Laps" database, Fixed explicit tyre set handling for the Race Engineer, Setting for Spotter activation speed, Updated handling of the Pitstop MFD in rFactor 2, Extended "execute" to handle Lua scripts, Tyre Wear for Le Mans Ultimate
+Version=6.3.5.0-release
+Date=06/06/2025
+Download=https://cutt.ly/ErnSPTZq;http://87.178.12.140:800/api/public/dl/xGTm0KWp;https://www.dropbox.com/scl/fi/lao14yjfearcu7m5o9avd/Simulator-Controller-6.3.5.0-release.zip?rlkey=nhndxyu4ie8j33780mnikm0nf&st=6p49ww9b&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.3.5.0-release.zip
+Changes=Fixed tyre compound choice for strategy pitstops, Prevent strategy pitstops to be in the "past", Fixed tyre compound handling in strategy validation scripts, Script support in "Setup Workbench", Fixed AHK <-> LUA type conversion, Support for wheel specific tyre laps in laps database, Consent for session data sharing, Fixed DLC download mirror handling, Fixed history lap data in "Solo Center"
 Components=Media->5.6.1,Configuration->6.3.2,Utilities->6.3.0
 [Components]
 Media.5.6.1.Path=Resources
@@ -22,7 +22,7 @@ Utilities.6.3.0.Path=.
 Utilities.6.3.0.Content=Utilities
 Utilities.6.3.0.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/BCbe0uKY;https://www.dropbox.com/scl/fi/uauxhuyecnwmgft3w6roj/Utilities-6.3.0.zip?rlkey=1luua85df5q5w88hcxxza0lsr&st=e8f4bqgz&dl=1;http://%master%:800/api/public/dl/cAzNQ6G_;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.3.0.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=6.3.5.0-dev
-Release=6.3.4.0-release
+Development=6.3.5.0-release
+Release=6.3.5.0-release

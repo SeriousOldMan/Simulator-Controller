@@ -48,6 +48,24 @@ class LapsDatabase extends SessionDatabase {
 	iDrivers := false
 	iShared := true
 
+	class ExtendedDatabase extends Database {
+		Tables[name := false] {
+			Get {
+				local ignore, rows, laps
+
+				if (name = "Tyres") {
+					rows := super.Tables[name]
+
+					computeTyreLaps(rows)
+
+					return rows
+				}
+				else
+					return super.Tables[name]
+			}
+		}
+	}
+
 	Database {
 		Get {
 			return this.iDatabase
@@ -83,7 +101,7 @@ class LapsDatabase extends SessionDatabase {
 			car := this.getCarCode(simulator, car)
 			track := this.getCarCode(simulator, track)
 
-			this.iDatabase := Database(this.DatabasePath . "User\" . simulatorCode . "\" . car . "\" . track . "\", kLapsSchemas)
+			this.iDatabase := LapsDatabase.ExtendedDatabase(this.DatabasePath . "User\" . simulatorCode . "\" . car . "\" . track . "\", kLapsSchemas)
 		}
 	}
 
@@ -111,10 +129,10 @@ class LapsDatabase extends SessionDatabase {
 			schema.Push("Tyre.Wear.Front")
 			schema.Push("Tyre.Wear.Rear")
 
-			schema.Push("Tyre.Laps.FrontLeft")
-			schema.Push("Tyre.Laps.FrontRight")
-			schema.Push("Tyre.Laps.RearLeft")
-			schema.Push("Tyre.Laps.RearRight")
+			schema.Push("Tyre.Laps.Front.Left")
+			schema.Push("Tyre.Laps.Front.Right")
+			schema.Push("Tyre.Laps.Rear.Left")
+			schema.Push("Tyre.Laps.Rear.Right")
 		}
 
 		bubbleSort(&schema)
@@ -142,7 +160,7 @@ class LapsDatabase extends SessionDatabase {
 			return []
 	}
 
-	normalizeCompounds(&compound, &compoundColor) {
+	combineCompounds(&compound, &compoundColor) {
 		if isObject(compound) {
 			combineCompounds(&compound, &compoundColor)
 
@@ -160,25 +178,18 @@ class LapsDatabase extends SessionDatabase {
 		}
 	}
 
-	normalizeTyreLaps(&tyreLaps) {
+	combineTyreLaps(&tyreLaps) {
 		local newTyreLaps
 
-		if isObject(tyreLaps) {
-			newTyreLaps := removeDuplicates(newTyreLaps)
-
-			if (newTyreLaps.Length = 1)
-				tyreLaps := newTyreLaps[1]
-			else
-				tyreLaps := values2String(",", tyreLaps*)
-		}
-		else if InStr(tyreLaps, ",") {
+		if isObject(tyreLaps)
+			newTyreLaps := removeDuplicates(tyreLaps)
+		else
 			newTyreLaps := removeDuplicates(string2Values(",", tyreLaps))
 
-			if (newTyreLaps.Length = 1)
-				tyreLaps := newTyreLaps[1]
-			else
-				tyreLaps := values2String(",", tyreLaps*)
-		}
+		if (newTyreLaps.Length = 1)
+			tyreLaps := newTyreLaps[1]
+		else if isObject(tyreLaps)
+			tyreLaps := values2String(",", tyreLaps*)
 	}
 
 	getElectronicsCount(drivers := kUndefined) {
@@ -198,7 +209,7 @@ class LapsDatabase extends SessionDatabase {
 	}
 
 	getElectronicEntries(weather, compound, compoundColor, drivers := kUndefined) {
-		this.normalizeCompounds(&compound, &compoundColor)
+		this.combineCompounds(&compound, &compoundColor)
 
 		return this.combineResults("Electronics", {Transform: removeInvalidLaps
 												 , Where: Map("Weather", weather, "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor)}
@@ -206,9 +217,9 @@ class LapsDatabase extends SessionDatabase {
 	}
 
 	getTyreEntries(weather, compound, compoundColor, drivers := kUndefined) {
-		this.normalizeCompounds(&compound, &compoundColor)
+		this.combineCompounds(&compound, &compoundColor)
 
-		return this.combineResults("Tyres", {Transform: compose(removeInvalidLaps, computePressures, computeTemperatures, computeWear, computeTyreLaps)
+		return this.combineResults("Tyres", {Transform: compose(removeInvalidLaps, computePressures, computeTemperatures, computeWear)
 										   , Where: Map("Weather", weather, "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor)}
 										  , drivers)
 	}
@@ -221,7 +232,7 @@ class LapsDatabase extends SessionDatabase {
 	}
 
 	getMapData(weather, compound, compoundColor, drivers := kUndefined) {
-		this.normalizeCompounds(&compound, &compoundColor)
+		this.combineCompounds(&compound, &compoundColor)
 
 		return this.combineResults("Electronics", {Group: [["Lap.Time", average, "Lap.Time"], ["Fuel.Consumption", average, "Fuel.Consumption"]]
 												 , By: "Map", Transform: removeInvalidLaps
@@ -230,10 +241,10 @@ class LapsDatabase extends SessionDatabase {
 	}
 
 	getTyreData(weather, compound, compoundColor, drivers := kUndefined) {
-		this.normalizeCompounds(&compound, &compoundColor)
+		this.combineCompounds(&compound, &compoundColor)
 
-		return this.combineResults("Tyres", {Group: [["Lap.Time", minimum, "Lap.Time"]], By: "Tyre.Laps"
-										   , Transform: compose(removeInvalidLaps, computeTyreLaps)
+		return this.combineResults("Tyres", {Group: [["Lap.Time", minimum, "Lap.Time"]], By: "Tyre.Laps.Front.Left"
+										   , Transform: removeInvalidLaps
 										   , Where: Map("Weather", weather, "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor)}
 										  , drivers)
 	}
@@ -246,7 +257,7 @@ class LapsDatabase extends SessionDatabase {
 	}
 
 	getMapLapTimes(weather, compound, compoundColor, drivers := kUndefined) {
-		this.normalizeCompounds(&compound, &compoundColor)
+		this.combineCompounds(&compound, &compoundColor)
 
 		return this.combineResults("Electronics", {Group: [["Lap.Time", minimum, "Lap.Time"]], By: ["Map", "Fuel.Remaining"]
 												 , Transform: removeInvalidLaps
@@ -255,16 +266,18 @@ class LapsDatabase extends SessionDatabase {
 	}
 
 	getTyreLapTimes(weather, compound, compoundColor, withFuel := false, drivers := kUndefined) {
-		this.normalizeCompounds(&compound, &compoundColor)
+		local rows
 
-		return this.combineResults("Tyres", {Group: [["Lap.Time", minimum, "Lap.Time"]], By: (withFuel ? ["Tyre.Laps", "Fuel.Remaining"] : "Tyre.Laps")
-										   , Transform: compose(removeInvalidLaps, computeTyreLaps)
+		this.combineCompounds(&compound, &compoundColor)
+
+		return this.combineResults("Tyres", {Group: [["Lap.Time", minimum, "Lap.Time"]], By: (withFuel ? ["Tyre.Laps.Front.Left", "Fuel.Remaining"] : "Tyre.Laps.Front.Left")
+										   , Transform: removeInvalidLaps
 										   , Where: Map("Weather", weather, "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor)}
 										  , drivers)
 	}
 
 	getFuelLapTimes(weather, compound, compoundColor, drivers := kUndefined) {
-		this.normalizeCompounds(&compound, &compoundColor)
+		this.combineCompounds(&compound, &compoundColor)
 
 		return this.combineResults("Tyres", {Group: [["Lap.Time", minimum, "Lap.Time"]], By: "Fuel.Remaining"
 										   , Transform: removeInvalidLaps
@@ -280,7 +293,7 @@ class LapsDatabase extends SessionDatabase {
 	}
 
 	getLapTimePressures(weather, compound, compoundColor, drivers := kUndefined) {
-		this.normalizeCompounds(&compound, &compoundColor)
+		this.combineCompounds(&compound, &compoundColor)
 
 		return this.combineResults("Tyres", {Group: [["Tyre.Pressure.Front.Left", average, "Tyre.Pressure.Front.Left"]
 												   , ["Tyre.Pressure.Front.Right", average, "Tyre.Pressure.Front.Right"]
@@ -296,7 +309,7 @@ class LapsDatabase extends SessionDatabase {
 		local oldCritical := Task.Critical
 		local where, ltAvg, ltStdDev, cAvg, cStdDev, rows, identifiers, filter, ignore, row, identifier, connector
 
-		this.normalizeCompounds(&compound, &compoundColor)
+		this.combineCompounds(&compound, &compoundColor)
 
 		if database {
 			Task.Critical := true
@@ -420,7 +433,7 @@ class LapsDatabase extends SessionDatabase {
 
 		if (!this.Shared || db.lock("Electronics", false))
 			try {
-				this.normalizeCompounds(&compound, &compoundColor)
+				this.combineCompounds(&compound, &compoundColor)
 
 				db.add("Electronics", Database.Row("Driver", driver, "Weather", weather
 											     , "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
@@ -456,8 +469,8 @@ class LapsDatabase extends SessionDatabase {
 
 		if (!this.Shared || db.lock("Tyres", false))
 			try {
-				this.normalizeCompounds(&compound, &compoundColor)
-				this.normalizeTyreLaps(&tyreLaps)
+				this.combineCompounds(&compound, &compoundColor)
+				this.combineTyreLaps(&tyreLaps)
 
 				db.add("Tyres", Database.Row("Driver", driver, "Weather", weather
 										   , "Temperature.Air", valueOrNull(airTemperature)
@@ -578,34 +591,33 @@ computeWear(rows) {
 computeTyreLaps(rows) {
 	local ignore, row, tyreLaps
 
-	for ignore, row in rows {
-		tyreLaps := row["Tyre.Laps"]
+	for ignore, row in rows
+		if row.Has("Tyre.Laps") {
+			tyreLaps := row["Tyre.Laps"]
 
-		if InStr(tyreLaps, ",") {
-			tyreLaps := string2Values(",", tyreLaps)
+			if InStr(tyreLaps, ",") {
+				tyreLaps := string2Values(",", tyreLaps)
 
-			if (tyreLaps.Length = 2) {
-				row["Tyre.Laps.FrontLeft"] := tyreLaps[1]
-				row["Tyre.Laps.FrontRight"] := tyreLaps[1]
-				row["Tyre.Laps.RearLeft"] := tyreLaps[2]
-				row["Tyre.Laps.RearRight"] := tyreLaps[2]
+				if (tyreLaps.Length = 2) {
+					row["Tyre.Laps.Front.Left"] := tyreLaps[1]
+					row["Tyre.Laps.Front.Right"] := tyreLaps[1]
+					row["Tyre.Laps.Rear.Left"] := tyreLaps[2]
+					row["Tyre.Laps.Rear.Right"] := tyreLaps[2]
+				}
+				else {
+					row["Tyre.Laps.Front.Left"] := tyreLaps[1]
+					row["Tyre.Laps.Front.Right"] := tyreLaps[2]
+					row["Tyre.Laps.Rear.Left"] := tyreLaps[3]
+					row["Tyre.Laps.Rear.Right"] := tyreLaps[4]
+				}
 			}
 			else {
-				row["Tyre.Laps.FrontLeft"] := tyreLaps[1]
-				row["Tyre.Laps.FrontRight"] := tyreLaps[2]
-				row["Tyre.Laps.RearLeft"] := tyreLaps[3]
-				row["Tyre.Laps.RearRight"] := tyreLaps[4]
+				row["Tyre.Laps.Front.Left"] := tyreLaps
+				row["Tyre.Laps.Front.Right"] := tyreLaps
+				row["Tyre.Laps.Rear.Left"] := tyreLaps
+				row["Tyre.Laps.Rear.Right"] := tyreLaps
 			}
-
-			row["Tyre.Laps"] := tyreLaps[1]
 		}
-		else {
-			row["Tyre.Laps.FrontLeft"] := tyreLaps
-			row["Tyre.Laps.FrontRight"] := tyreLaps
-			row["Tyre.Laps.RearLeft"] := tyreLaps
-			row["Tyre.Laps.RearRight"] := tyreLaps
-		}
-	}
 
 	return rows
 }

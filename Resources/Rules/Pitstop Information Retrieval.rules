@@ -9,14 +9,14 @@
 ;;;                            Private Rules Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-tyrePosition(FL, FrontLeft)
-tyrePosition(FL, Front)
-tyrePosition(FR, FrontRight)
-tyrePosition(FR, Front)
-tyrePosition(RL, RearLeft)
-tyrePosition(RL, Rear)
-tyrePosition(RR, RearRight)
-tyrePosition(RR, Rear)
+tyrePosition(FL, FrontLeft) <= !Session.Settings.Tyre.Service = Wheel
+tyrePosition(FL, Front) <= !Session.Settings.Tyre.Service = Axle
+tyrePosition(FR, FrontRight) <= !Session.Settings.Tyre.Service = Wheel
+tyrePosition(FR, Front) <= !Session.Settings.Tyre.Service = Axle
+tyrePosition(RL, RearLeft) <= !Session.Settings.Tyre.Service = Wheel
+tyrePosition(RL, Rear) <= !Session.Settings.Tyre.Service = Axle
+tyrePosition(RR, RearRight) <= !Session.Settings.Tyre.Service = Wheel
+tyrePosition(RR, Rear) <= !Session.Settings.Tyre.Service = Axle
 
 
 ;;;-------------------------------------------------------------------------;;;

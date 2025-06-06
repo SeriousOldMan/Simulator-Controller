@@ -6,18 +6,42 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                            Private Rules Section                        ;;;
+;;;-------------------------------------------------------------------------;;;
+
+tyrePosition(FL, FrontLeft)
+tyrePosition(FL, Front)
+tyrePosition(FR, FrontRight)
+tyrePosition(FR, Front)
+tyrePosition(RL, RearLeft)
+tyrePosition(RL, Rear)
+tyrePosition(RR, RearRight)
+tyrePosition(RR, Rear)
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                            Public Rules Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 lastPitstop(?nr) <= Get(Pitstop.Last, ?nr)
 
-lastTyreChange(?nr) <= lastTyreChange(!Pitstop.Last, ?nr)
+lastTyreChange(?tyre, ?nr) <= lastTyreChange(?tyre, !Pitstop.Last, ?nr)
 
-lastTyreChange(0, ?) <= !, fail
-lastTyreChange(?nr, ?result) <= Get(Pitstop, ?nr, Tyre.Compound, ?tyreCompound), ?tyreCompound = false, !,
-								?next = ?nr - 1, lastTyreChange(?next, ?result)
-lastTyreChange(?nr, ?nr) <= Get(Pitstop, ?nr, Tyre.Compound, ?tyreCompound), !
-lastTyreChange(?nr, ?result) <= ?next = ?nr - 1, lastTyreChange(?next, ?result)
+lastTyreChange(?, 0, ?) <= !, fail
+
+lastTyreChange(ALL, ?nr, ?result) <= Get(Pitstop, ?nr, Tyre.Compound, ?tyreCompound), ?tyreCompound = false, !,
+										 ?next = ?nr - 1, lastTyreChange(ALL, ?next, ?result)
+lastTyreChange(ALL, ?nr, ?nr) <= Get(Pitstop, ?nr, Tyre.Compound, ?), !
+
+lastTyreChange(ANY, ?nr, ?result) <= tyrePosition(?, ?position), lastTyreChange(?position, ?nr, ?result), !
+
+lastTyreChange(?tyre, ?nr, ?result) <= tyrePosition(?tyre, ?position), lastTyreChange(?position, ?nr, ?result), !
+
+lastTyreChange(?position, ?nr, ?result) <= Get(Pitstop, ?nr, Tyre.Compound, ?position, ?tyreCompound), ?tyreCompound = false, !,
+											   ?next = ?nr - 1, lastTyreChange(?position, ?next, ?result)
+lastTyreChange(?position, ?nr, ?nr) <= Get(Pitstop, ?nr, Tyre.Compound, ?position, ?), !
+
+lastTyreChange(?tyre, ?nr, ?result) <= ?next = ?nr - 1, lastTyreChange(?tyre, ?next, ?result)
 
 pitstopLap(?lap) <= lastPitstopLap(?lap)
 
@@ -26,31 +50,33 @@ lastPitstopLap(?lap) <= lastPitstop(?nr), Get(Pitstop, ?nr, Lap, ?lap)
 recentPitstopLap(?lap) <= lastPitstopLap(?lap)
 recentPitstopLap(?lap) <= lastPitstopLap(?lastLap), ?lap = ?lastLap + 1
 
-lastPitstopTyreSet(?tyreSet) <= lastTyreChange(?nr), Get(Pitstop, ?nr, Tyre.Set, ?tyreSet)
+lastPitstopTyreSet(?tyreSet) <= lastTyreChange(ALL, ?nr), Get(Pitstop, ?nr, Tyre.Set, ?tyreSet)
 
-lastPitstopTyreCompound(?tyreCompound) <= lastTyreChange(?nr), Get(Pitstop, ?nr, Tyre.Compound, ?tyreCompound)
+lastPitstopTyreCompound(?tyreCompound) <= lastTyreChange(ALL, ?nr), Get(Pitstop, ?nr, Tyre.Compound, ?tyreCompound)
 
-lastPitstopTyreCompound(?position, ?tyreCompound) <= lastTyreChange(?nr), Get(Pitstop, ?nr, Tyre.Compound, ?position, ?tyreCompound)
-
-lastPitstopTyreCompound(?tyreCompound, ?tyreCompoundColor) <= lastTyreChange(?nr), Get(Pitstop, ?nr, Tyre.Compound, ?tyreCompound),
-															  Get(Pitstop, ?nr, Tyre.Compound.Color, ?tyreCompoundColor)
+lastPitstopTyreCompound(?position, ?tyreCompound) <= lastTyreChange(?position, ?nr),
+													 Get(Pitstop, ?nr, Tyre.Compound, ?position, ?tyreCompound), !
+lastPitstopTyreCompound(?tyre, ?tyreCompound) <= tyrePosition(?tyre, ?position), lastPitstopTyreCompound(?position, ?tyreCompound)
 
 lastPitstopTyreCompound(?position, ?tyreCompound, ?tyreCompoundColor) <=
-		lastTyreChange(?nr), Get(Pitstop, ?nr, Tyre.Compound, ?position, ?tyreCompound),
+		lastTyreChange(?position, ?nr), Get(Pitstop, ?nr, Tyre.Compound, ?position, ?tyreCompound),
 		Get(Pitstop, ?nr, Tyre.Compound.Color, ?position, ?tyreCompoundColor)
+lastPitstopTyreCompound(?tyre, ?tyreCompound, ?tyreCompoundColor) <= tyrePosition(?tyre, ?position),
+																	 lastPitstopTyreCompound(?position, ?tyreCompound, ?tyreCompoundColor)
 
-lastPitstopTyrePressure(?compound, ?tyreType, ?pressure) <= lastPitstopTyreCompound(?compound), lastTyreChange(?nr),
-															Get(Pitstop, ?nr, Tyre.Pressure, ?tyreType, ?pressure)
+lastPitstopTyrePressure(?compound, ?tyre, ?pressure) <= lastPitstopTyreCompound(?tyre, ?compound), lastTyreChange(?tyre, ?nr),
+														Get(Pitstop, ?nr, Tyre.Pressure, ?tyre, ?pressure)
 
 lastPitstopTyrePressures(?compound, [], [])
-lastPitstopTyrePressures(?compound, [?tyreType | ?tyreTypes], [?pressure | ?pressures]) <=
-		lastPitstopTyrePressure(?compound, ?tyreType, ?pressure), lastPitstopTyrePressures(?compound, ?tyreTypes, ?pressures)
+lastPitstopTyrePressures(?compound, [?tyre | ?tyreTypes], [?pressure | ?pressures]) <=
+		lastPitstopTyrePressure(?compound, ?tyre, ?pressure), lastPitstopTyrePressures(?compound, ?tyreTypes, ?pressures)
 
 lastPitstopDamageRepair(Suspension, ?repair) <= lastPitstop(?nr), Get(Pitstop, ?nr, Repair.Suspension, ?repair)
 lastPitstopDamageRepair(Bodywork, ?repair) <= lastPitstop(?nr), Get(Pitstop, ?nr, Repair.Bodywork, ?repair)
 lastPitstopDamageRepair(Engine, ?repair) <= lastPitstop(?nr), Get(Pitstop, ?nr, Repair.Engine, ?repair)
 
-pitstopTyreCompound(?compound, ?color) <= lastPitstop(?nr), pitstopTyreCompound(?nr, ?compound, ?color)
+pitstopTyreCompound(?compound, ?color) <= lastPitstop(?nr), pitstopTyreCompound(?nr, ?compound, ?color), !
+pitstopTyreCompound(?compound, ?color) <= tyrePosition(?, ?position), lastPitstopTyreCompound(?position, ?compound, ?color)
 
 pitstopTyreCompound(0, ?, ?) <= !, fail
 pitstopTyreCompound(?nr, ?compound, ?color) <= Get(Pitstop, ?nr, Tyre.Compound, ?compound), ?compound = false, !,

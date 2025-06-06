@@ -187,7 +187,7 @@ priority: 5,
 
 {All: {Any: [?Lap], [?Pitstop.Lap]}, {None: [?Tyre.Compound.Target]}} => (Prove: keepTyreCompound(!Lap)), (Clear: Tyre.Set.Target)
 
-keepTyreCompound(?lap) <= lastPitstopTyreCompound(?compound, ?color),
+keepTyreCompound(?lap) <= lastPitstopTyreCompound(ANY, ?compound, ?color),
 						  lapWeather(?lap, ?index), weatherSymbol(?index, ?weather), Set(Tyre.Weather.Target, ?weather),
 						  Set(Tyre.Compound.Target, ?compound), Set(Tyre.Compound.Color.Target, ?color), !
 keepTyreCompound(?lap) <= lapWeather(?lap, ?index), weatherSymbol(?index, ?weather), Set(Tyre.Weather.Target, ?weather),

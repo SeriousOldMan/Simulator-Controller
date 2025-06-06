@@ -4285,7 +4285,7 @@ class RaceEngineer extends RaceAssistant {
 		static postfixes := ["FL", "FR", "RL", "RR"]
 
 		this.Provider.supportsPitstop( , &tyreService)
-		this.Provider.supportstyreManagemet( , &tyreSets)
+		this.Provider.supportsTyreManagement( , &tyreSets)
 
 		setMultiMapValue(pitstopHistory, "TyreSets", "1.Compound"
 					   , knowledgeBase.getValue("Session.Setup.Tyre.Compound"))
@@ -4398,13 +4398,13 @@ class RaceEngineer extends RaceAssistant {
 
 							tyreChange := true
 
-							%tyreLaps . postfixes[index]% := 0
+							%"tyreLaps" . postfixes[index]% := 0
 						}
 						else  {
 							setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompound" . tyre, false)
 							setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompoundColor" . tyre, false)
 
-							%tyreLaps . postfixes[index]% += pitstopLaps
+							%"tyreLaps" . postfixes[index]% += pitstopLaps
 						}
 					}
 				}

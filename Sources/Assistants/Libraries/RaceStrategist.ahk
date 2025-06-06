@@ -3990,14 +3990,14 @@ class RaceStrategist extends GridRaceAssistant {
 
 				if (mixedCompounds = "Wheel") {
 					for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
-						pitstop.%TyreCompound . tyre% := getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompound" . tyre, false)
-						pitstop.%TyreCompoundColor . tyre% := getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompoundColor" . tyre, false)
+						pitstop.%"TyreCompound" . tyre% := getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompound" . tyre, false)
+						pitstop.%"TyreCompoundColor" . tyre% := getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompoundColor" . tyre, false)
 					}
 				}
 				else if (mixedCompounds = "Axle") {
 					for index, axle in ["Front", "Rear"] {
-						pitstop.%TyreCompound . axle% := getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompound" . axle, false)
-						pitstop.%TyreCompoundColor . axle% := getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompoundColor" . axle, false)
+						pitstop.%"TyreCompound" . axle% := getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompound" . axle, false)
+						pitstop.%"TyreCompoundColor" . axle% := getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompoundColor" . axle, false)
 					}
 				}
 

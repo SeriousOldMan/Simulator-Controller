@@ -17,7 +17,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 currentTyreCompound(?compound, ?color) <= Get(Lap, !Lap, Tyre.Compound, ?compound), Get(Lap, !Lap, Tyre.Compound.Color, ?color), !
-currentTyreCompound(?compound, ?color) <= lastPitstopTyreCompound(ALL, ?compound, ?color), !
+currentTyreCompound(?compound, ?color) <= lastPitstopTyreCompound(ANY, ?compound, ?color), !
 currentTyreCompound(?compound, ?color) <= setupTyreCompound(?compound, ?color)
 
 currentTyreCompound(?position, ?compound, ?color) <= Get(Lap, !Lap, Tyre.Compound, ?position, ?compound),

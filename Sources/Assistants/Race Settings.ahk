@@ -512,7 +512,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			pitstopTyreSet := getMultiMapValue(data, "Setup Data", "TyreSet", pitstopTyreSet)
 			setupTyreSet := getMultiMapValue(data, "Car Data", "TyreSet", setupTyreSet ? setupTyreSet : Max(0, pitstopTyreSet - 1))
 
-			if (settings & tyreSets) {
+			if (settings && tyreSets) {
 				if (getMultiMapValue(settings, "Session Setup", "Tyre.Set.Fresh", 0) != 0)
 					setMultiMapValue(settings, "Session Setup", "Tyre.Set.Fresh", pitstopTyreSet)
 

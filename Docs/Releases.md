@@ -22,8 +22,19 @@
 
 # Upcoming release
 
-Not yet planned...
+## 6.3.6.0
 
+#### Date: 06/13/25
+
+#### Fixes
+
+  - Fixed a wrong download mirror reference when checking for available updates.
+  - Fixed cold pressure calculation after a partial tyre change at the last pitstop.
+
+#### Changes
+
+  - More internal updates for wheel specific data handling. All applications now differentiate between driven laps for each tyre individually.
+  
 # Release history
 
 ## 6.3.4.0

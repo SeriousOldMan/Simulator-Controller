@@ -37,6 +37,12 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 6.3.6
 
+Nothing to do.
+
+***
+
+## Release 6.3.6
+
 No required manual updates.
 
 ***

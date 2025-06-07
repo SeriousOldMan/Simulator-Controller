@@ -30,6 +30,7 @@
 
   - Fixed a wrong download mirror reference when checking for available updates.
   - Fixed cold pressure calculation after a partial tyre change at the last pitstop.
+  - Fixed a timeout when checking for news, which caused a very slow startup of "Simulator Startup".
 
 #### Changes
 

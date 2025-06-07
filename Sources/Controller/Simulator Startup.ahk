@@ -731,6 +731,8 @@ checkForNews() {
 
 							break
 						}
+						else
+							writeMultiMap(kUserConfigDirectory . "NEWS", news)
 					}
 					catch Any as exception {
 						logError(exception)

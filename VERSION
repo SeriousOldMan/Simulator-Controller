@@ -8,19 +8,19 @@ Components=Media->5.6.1,Configuration->6.3.2,Utilities->6.3.0
 [Release]
 Version=6.3.5.0-release
 Date=06/06/2025
-Download=https://cutt.ly/ErnSPTZq;http://87.178.12.140:800/api/public/dl/xGTm0KWp;https://www.dropbox.com/scl/fi/lao14yjfearcu7m5o9avd/Simulator-Controller-6.3.5.0-release.zip?rlkey=nhndxyu4ie8j33780mnikm0nf&st=6p49ww9b&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.3.5.0-release.zip
+Download=https://cutt.ly/7rmtPVCC;https://simulator-controller.selfhost.co:801/api/public/dl/xGTm0KWp;https://www.dropbox.com/scl/fi/lao14yjfearcu7m5o9avd/Simulator-Controller-6.3.5.0-release.zip?rlkey=nhndxyu4ie8j33780mnikm0nf&st=6p49ww9b&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.3.5.0-release.zip
 Changes=Fixed tyre compound choice for strategy pitstops, Prevent strategy pitstops to be in the "past", Fixed tyre compound handling in strategy validation scripts, Script support in "Setup Workbench", Fixed AHK <-> LUA type conversion, Support for wheel specific tyre laps in laps database, Consent for session data sharing, Fixed DLC download mirror handling, Fixed history lap data in "Solo Center"
 Components=Media->5.6.1,Configuration->6.3.2,Utilities->6.3.0
 [Components]
 Media.5.6.1.Path=Resources
 Media.5.6.1.Content=Splash Media
-Media.5.6.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/DfSnfhLR;https://www.dropbox.com/scl/fi/3c56fjdvdd4od5t7rsuc9/Media-5.6.1.zip?rlkey=x0icl05jy05nn886due4dsblv&dl=1;http://%master%:800/api/public/dl/QoDnWZ83;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Media+5.6.1.zip
+Media.5.6.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/DfSnfhLR;https://www.dropbox.com/scl/fi/3c56fjdvdd4od5t7rsuc9/Media-5.6.1.zip?rlkey=x0icl05jy05nn886due4dsblv&dl=1;https://simulator-controller.selfhost.co:801/api/public/dl/QoDnWZ83;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Media+5.6.1.zip
 Configuration.6.3.2.Path=Resources
 Configuration.6.3.2.Content=Setup
-Configuration.6.3.2.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/4Nh-E9uO;https://www.dropbox.com/scl/fi/paibnvv9dqw3ukruhfnbk/Conifguration-6.3.2.zip?rlkey=w59u6i50bt4v5u7k9u0m07rjx&st=2hcedvh0&dl=1;http://87.178.12.140:800/api/public/dl/6ECw9H64;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Conifguration+6.3.2.zip
+Configuration.6.3.2.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/4Nh-E9uO;https://www.dropbox.com/scl/fi/paibnvv9dqw3ukruhfnbk/Conifguration-6.3.2.zip?rlkey=w59u6i50bt4v5u7k9u0m07rjx&st=2hcedvh0&dl=1;https://simulator-controller.selfhost.co:801/api/public/dl/6ECw9H64;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Conifguration+6.3.2.zip
 Utilities.6.3.0.Path=.
 Utilities.6.3.0.Content=Utilities
-Utilities.6.3.0.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/BCbe0uKY;https://www.dropbox.com/scl/fi/uauxhuyecnwmgft3w6roj/Utilities-6.3.0.zip?rlkey=1luua85df5q5w88hcxxza0lsr&st=e8f4bqgz&dl=1;http://%master%:800/api/public/dl/cAzNQ6G_;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.3.0.zip
+Utilities.6.3.0.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/BCbe0uKY;https://www.dropbox.com/scl/fi/uauxhuyecnwmgft3w6roj/Utilities-6.3.0.zip?rlkey=1luua85df5q5w88hcxxza0lsr&st=e8f4bqgz&dl=1;https://simulator-controller.selfhost.co:801/api/public/dl/cAzNQ6G_;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.3.0.zip
 [Current]
 Type=Development
 [Version]

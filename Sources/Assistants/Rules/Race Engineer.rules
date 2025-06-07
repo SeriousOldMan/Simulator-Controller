@@ -340,7 +340,8 @@ updatePressureDelta(?compound, ?tyreType, ?deviation, ?correction) <=
 updateTargetPressure(?compound, ?tyreType, ?delta) <= lastPressure(?compound, ?tyreType, ?pressure),
 													  ?targetPressure = ?pressure + ?delta, Set(Tyre.Pressure.Target, ?tyreType, ?targetPressure)
 
-lastPressure(?compound, ?tyreType, ?pressure) <= lastPitstopTyrePressure(?compound, ?tyreType, ?pressure), !
+lastPressure(?compound, ?tyreType, ?pressure) <= !Session.Settings.Pitstop.Service.Tyres = Full,
+												 lastPitstopTyrePressure(?compound, ?tyreType, ?pressure), !
 lastPressure(?compound, ?tyreType, ?pressure) <= setupTyrePressure(?compound, ?tyreType, ?pressure)
 
 

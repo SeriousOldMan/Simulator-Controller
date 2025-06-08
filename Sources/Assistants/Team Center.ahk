@@ -12562,10 +12562,13 @@ class TeamCenter extends ConfigurationItem {
 
 	createLapOverview(lap) {
 		local html := "<table>"
+		local lapTable := this.SessionStore.Tables["Lap.Data"]
 		local hotPressures := "-, -, -, -"
 		local coldPressures := "-, -, -, -"
 		local pressuresLosses := "-, -, -, -"
 		local hasColdPressures := false
+		local tyreWear := "-, -, -, -"
+		local brakeWear := "-, -, -, -"
 		local pressuresDB := this.PressuresDatabase
 		local pressuresTable, pressures, tyresTable, tyres
 		local driver, fuel, tyreCompounds, tyreCompoundColors, tyreSet, tyrePressures, pressureCorrections, pressure
@@ -12699,6 +12702,12 @@ class TeamCenter extends ConfigurationItem {
 
 		if (pressuresLosses != "-, -, -, -")
 			html .= ("<tr><td><b>" . translate("Pressures (loss):") . "</b></td><td>" . pressuresLosses . "</td></tr>")
+
+		if (tyreWear != "-, -, -, -")
+			html .= ("<tr><td><b>" . translate("Tyre Wear:") . "</b></td><td>" . tyreWear . "</td></tr>")
+
+		if (brakeWear != "-, -, -, -")
+			html .= ("<tr><td><b>" . translate("Brake Wear:") . "</b></td><td>" . brakeWear . "</td></tr>")
 
 		html .= ("<tr><td></td><td></td></tr>")
 
@@ -13705,7 +13714,7 @@ class TeamCenter extends ConfigurationItem {
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Lap") . "');")
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Position") . "');")
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Fuel Level") . "');")
-		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Tyre Laps") . "');")
+		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Tyre Laps (FL)") . "');")
 		drawChartFunction .= "`ndata.addRows(["
 
 		for ignore, time in lapSeries {
@@ -13749,7 +13758,7 @@ class TeamCenter extends ConfigurationItem {
 		local remainingFuels := []
 		local tyreLaps := []
 		local lastLap := this.LastLap
-		local lapDataTable := this.SessionStore.Tables["Lap.Data"]
+		local lapTable := this.SessionStore.Tables["Lap.Data"]
 		local simulator := this.Simulator
 		local carName := this.Car
 		local trackName := this.Track
@@ -13851,8 +13860,8 @@ class TeamCenter extends ConfigurationItem {
 				positions.Push(lap.Position)
 				remainingFuels.Push(lap.FuelRemaining)
 
-				if lapDataTable.Has(A_Index)
-					tyreLaps.Push(lapDataTable[A_Index]["Tyre.Laps.Front.Left"])
+				if lapTable.Has(A_Index)
+					tyreLaps.Push(lapTable[A_Index]["Tyre.Laps.Front.Left"])
 				else
 					tyreLaps.Push(kNull)
 			}

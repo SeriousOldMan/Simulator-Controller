@@ -6832,7 +6832,7 @@ class SoloCenter extends ConfigurationItem {
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Lap") . "');")
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Position") . "');")
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Fuel Level") . "');")
-		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Tyre Laps") . "');")
+		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Tyre Laps (FL)") . "');")
 		drawChartFunction .= "`ndata.addRows(["
 
 		for ignore, time in lapSeries {
@@ -7557,6 +7557,7 @@ class SoloCenter extends ConfigurationItem {
 		local coldPressures := "-, -, -, -"
 		local pressuresLosses := "-, -, -, -"
 		local tyreWear := "-, -, -, -"
+		local brakeWear := "-, -, -, -"
 		local hasColdPressures := false
 		local fuel, tyrePressures, pressure, fuelConsumption, remainingFuel, pressures, tyres
 
@@ -7633,11 +7634,17 @@ class SoloCenter extends ConfigurationItem {
 				}
 		}
 
-		if lapTable.Has(lap.Nr)
+		if lapTable.Has(lap.Nr) {
 			tyreWear := values2String(", ", displayNullValue(lapTable[lap.Nr]["Tyre.Wear.Front.Left"])
 										  , displayNullValue(lapTable[lap.Nr]["Tyre.Wear.Front.Right"])
 										  , displayNullValue(lapTable[lap.Nr]["Tyre.Wear.Rear.Left"])
 										  , displayNullValue(lapTable[lap.Nr]["Tyre.Wear.Rear.Right"]))
+
+			brakeWear := values2String(", ", displayNullValue(lapTable[lap.Nr]["Brake.Wear.Front.Left"])
+										  , displayNullValue(lapTable[lap.Nr]["Brake.Wear.Front.Right"])
+										  , displayNullValue(lapTable[lap.Nr]["Brake.Wear.Rear.Left"])
+										  , displayNullValue(lapTable[lap.Nr]["Brake.Wear.Rear.Right"]))
+		}
 
 		remainingFuel := lap.FuelRemaining
 
@@ -7667,6 +7674,9 @@ class SoloCenter extends ConfigurationItem {
 
 		if (tyreWear != "-, -, -, -")
 			html .= ("<tr><td><b>" . translate("Tyre Wear:") . "</b></td><td>" . tyreWear . "</td></tr>")
+
+		if (brakeWear != "-, -, -, -")
+			html .= ("<tr><td><b>" . translate("Brake Wear:") . "</b></td><td>" . brakeWear . "</td></tr>")
 
 		html .= ("<tr><td></td><td></td></tr>")
 

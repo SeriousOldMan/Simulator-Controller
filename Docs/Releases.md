@@ -31,6 +31,8 @@
   - Fixed a wrong download mirror reference when checking for available updates.
   - Fixed cold pressure calculation after a partial tyre change at the last pitstop.
   - Fixed a timeout when checking for news, which caused a very slow startup of "Simulator Startup".
+  - The system no longer complains with an error dialog, if the hotkey for closing the Pitstop MFD is not defined.
+  - Fixed the import of the initial setup at the start of the session. Was broken with the last release.
 
 #### Changes
 

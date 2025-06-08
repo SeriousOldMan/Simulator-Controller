@@ -199,6 +199,8 @@ loadSimulatorConfiguration() {
 			setMultiMapValue(usage, "General", "Created", A_Now)
 		}
 
+		setMultiMapValue(usage, "General", "Updated", A_Now)
+		
 		setMultiMapValue(usage, "Applications", appName, getMultiMapValue(usage, "Applications", appName, 0) + 1)
 		setMultiMapValues(usage, "Diagnostics", getMultiMapValues(settings, "Diagnostics"))
 

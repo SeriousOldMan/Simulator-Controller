@@ -759,15 +759,17 @@ class RaceAssistant extends ConfigurationItem {
 
 	Provider {
 		Get {
-			if !this.iProvider
-				try {
+			if this.iProvider
+				return this.iProvider
+			else {
+				try
 					this.iProvider := this.createSimulatorProvider()
-				}
-				catch {
-					return SimulatorProvider.GenericSimulatorProvider("Unknown", "Unknown", "Unknown")
-				}
 
-			return this.iProvider
+				if this.iProvider
+					return this.iProvider
+				else
+					return SimulatorProvider.GenericSimulatorProvider("Unknown", "Unknown", "Unknown")
+			}
 		}
 	}
 

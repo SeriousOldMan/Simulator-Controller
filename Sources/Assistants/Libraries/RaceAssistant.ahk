@@ -2540,7 +2540,8 @@ class RaceAssistant extends ConfigurationItem {
 			if (tyreWear != "") {
 				tyreWear := string2Values(",", tyreWear)
 
-				setMultiMapValue(sessionInfo, "Tyres", "Wear", values2String(",", Round(tyreWear[1]), Round(tyreWear[2]), Round(tyreWear[3]), Round(tyreWear[4])))
+				setMultiMapValue(sessionInfo, "Tyres", "Wear", values2String(",", Round(tyreWear[1], 1), Round(tyreWear[2], 1)
+																				, Round(tyreWear[3], 1), Round(tyreWear[4], 1)))
 			}
 
 			setMultiMapValue(sessionInfo, "Brakes", "Temperatures", getMultiMapValue(data, "Car Data", "BrakeTemperature", ""))
@@ -2812,10 +2813,10 @@ class RaceAssistant extends ConfigurationItem {
 			tyreWear := string2Values(",", tyreWear)
 
 			if !exist(tyreWear, (w) => !isNumber(w)) {
-				knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Wear.FL", Round(tyreWear[1]))
-				knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Wear.FR", Round(tyreWear[2]))
-				knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Wear.RL", Round(tyreWear[3]))
-				knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Wear.RR", Round(tyreWear[4]))
+				knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Wear.FL", Round(tyreWear[1], 1))
+				knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Wear.FR", Round(tyreWear[2], 1))
+				knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Wear.RL", Round(tyreWear[3], 1))
+				knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Wear.RR", Round(tyreWear[4], 1))
 			}
 		}
 

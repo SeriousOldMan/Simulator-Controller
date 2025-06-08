@@ -379,7 +379,7 @@ class LMUProvider extends Sector397Provider {
 						}
 
 						tyreWear.Push(Round(wheelData.TyreWear[key], 1))
-						brakeWear.Push(Min(100, 100 - Round(((wheelData.BrakePadThickness[key] / brakeData.BrakePadThickness[key]) * 115), 2)))
+						brakeWear.Push(Min(100, 100 - Round(((wheelData.BrakePadThickness[key] / brakeData.BrakePadThickness[key]) * 100), 2)))
 					}
 
 					if exist(tyreWear, (w) => (w != false))

@@ -268,7 +268,7 @@ class IntegrationPlugin extends ControllerPlugin {
 		wear := string2Values(",", getMultiMapValue(sessionInfo, "Brakes", "Wear", ""))
 
 		if (wear.Length = 4)
-			state["Wear"] := [wear[1], wear[2], wear[3], wear[4]]
+			state["Wear"] := [Round(wear[1], 2), Round(wear[2], 2), Round(wear[3], 2), Round(wear[4], 2)]
 		else
 			state["Wear"] := [kNull, kNull, kNull, kNull]
 

@@ -3930,13 +3930,14 @@ class SoloCenter extends ConfigurationItem {
 								, getMultiMapValue(telemetry, "Car Data", "Map", "n/a")
 								, getMultiMapValue(telemetry, "Car Data", "TC", "n/a")
 								, getMultiMapValue(telemetry, "Car Data", "ABS", "n/a")
-								, tyreCompound, tyreCompoundColor, dataTyreLaps
+								, tyreCompound, tyreCompoundColor
 								, getMultiMapValue(telemetry, "Car Data", "TyrePressure", "-,-,-,-")
 								, getMultiMapValue(telemetry, "Car Data", "TyreTemperature", "-,-,-,-")
+								, getMultiMapValue(telemetry, "Car Data", "TyreWear", "null,null,null,null")
 								, "Unknown"
 								, getMultiMapValue(telemetry, "Car Data", "WaterTemperature", kNull)
 								, getMultiMapValue(telemetry, "Car Data", "OilTemperature", kNull)
-								, getMultiMapValue(telemetry, "Car Data", "TyreWear", "null,null,null,null")]
+								, dataTyreLaps]
 
 				recentLap.State := "Unknown"
 				recentLap.TelemetryData := values2String("|||", telemetryData*)
@@ -3946,9 +3947,9 @@ class SoloCenter extends ConfigurationItem {
 										, telemetryData[11], telemetryData[12], telemetryData[13]
 										, kNull, telemetryData[8], telemetryData[9], driverID)
 
-				pressuresData := collect(string2Values(",", telemetryData[17]), null)
-				temperaturesData := collect(string2Values(",", telemetryData[18]), null)
-				wearData := collect(string2Values(",", telemetryData[19]), null)
+				pressuresData := collect(string2Values(",", telemetryData[16]), null)
+				temperaturesData := collect(string2Values(",", telemetryData[17]), null)
+				wearData := collect(string2Values(",", telemetryData[18]), null)
 
 				lapsDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]
 								  , telemetryData[14], telemetryData[15], dataTyreLaps
@@ -4286,12 +4287,12 @@ class SoloCenter extends ConfigurationItem {
 													, telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9]
 													, driver)
 
-							pressures := string2Values(",", telemetryData[17])
-							temperatures := string2Values(",", telemetryData[18])
-							wear := string2Values(",", telemetryData[19])
+							pressures := string2Values(",", telemetryData[16])
+							temperatures := string2Values(",", telemetryData[17])
+							wear := string2Values(",", telemetryData[18])
 
 							lapsDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]
-											  , telemetryData[14], telemetryData[15], telemetryData[16]
+											  , telemetryData[14], telemetryData[15], telemetryData[22]
 											  , pressures[1], pressures[2], pressures[3], pressures[4]
 											  , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
 											  , wear[1], wear[2], wear[3], wear[4]

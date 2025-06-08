@@ -22,7 +22,7 @@
 class LMURESTProvider {
 	static sTyreTypes := CaseInsenseMap("All", "FL", "FL", "FL", "FR", "FR", "RL", "RL", "RR", "RR"
 									  , "Front Left", "FL", "Front Right", "FR", "Rear Left", "RL", "Rear Right", "RR")
-	static sBrakeTypes := CaseInsenseMap("FL", "frontLeft", "FL", "frontRight", "FR", "rearLeft", "RL", "RR", "rearRight"
+	static sBrakeTypes := CaseInsenseMap("FL", "frontLeft", "FR", "frontRight", "RL", "rearLeft", "RR", "rearRight"
 									   , "Front Left", "frontLeft", "Front Right", "frontRight"
 									   , "Rear Left", "rearLeft", "Rear Right", "rearRight")
 
@@ -839,7 +839,7 @@ class LMURESTProvider {
 		getBrakepadThickness(tyre) {
 			if this.Data {
 				try {
-					return (100 * (1 - this.Data["wearables"]["brakes"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.TyreTypes[tyre])]))
+					return this.Data["wearables"]["brakes"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.TyreTypes[tyre])]
 				}
 				catch Any as exception {
 					logError(exception)

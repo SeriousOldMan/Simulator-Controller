@@ -190,23 +190,12 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	closePitstopMFD() {
-		static reported := false
-
 		if this.activateWindow()
 			if this.pitstopMFDIsOpen() {
 				if this.ClosePitstopMFDHotkey {
 					this.sendCommand(this.ClosePitstopMFDHotkey)
 
 					Sleep(50)
-				}
-				else if !reported {
-					reported := true
-
-					logMessage(kLogCritical, translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration"))
-
-					if !kSilentMode
-						showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
-								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 			}
 	}

@@ -31,6 +31,7 @@
   - Fixed a wrong download mirror reference when checking for available updates.
   - Fixed cold pressure calculation after a partial tyre change at the last pitstop.
   - Fixed a timeout when checking for news, which caused a very slow startup of "Simulator Startup".
+  - Fixed a couple of minor problems with regards to pitstop tyre data display in "Team Center", which were introduced with the new tyre compound handling for individual wheels.
 
 #### Changes
 

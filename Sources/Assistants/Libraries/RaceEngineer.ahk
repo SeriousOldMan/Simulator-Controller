@@ -49,6 +49,50 @@ class FuelLowEvent extends EngineerEvent {
 	}
 }
 
+class TyreWearEvent extends EngineerEvent {
+	createTrigger(event, phrase, arguments) {
+		static wheels := false
+
+		if !wheels {
+			wheels := CaseInsenseMap("FL", "front left", "FR", "front right"
+								   , "RL", "rear left", "RR", "rear right")
+
+			wheels.Default := "worst"
+		}
+
+		return ("Tyres are worn out. Only " . (100 - Round(arguments[1])) . " percentage of tread left on the " . wheels[arguments[2]] . " tyre.")
+	}
+
+	handleEvent(event, arguments*) {
+		if !super.handleEvent(event, arguments*)
+			this.Assistant.tyreWearWarning(Round(arguments[1]), arguments[2])
+
+		return true
+	}
+}
+
+class BrakeWearEvent extends EngineerEvent {
+	createTrigger(event, phrase, arguments) {
+		static wheels := false
+
+		if !wheels {
+			wheels := CaseInsenseMap("FL", "front left", "FR", "front right"
+								   , "RL", "rear left", "RR", "rear right")
+
+			wheels.Default := "worst"
+		}
+
+		return ("Brake pads are worn out. Only " . (100 - Round(arguments[1])) . " percentage left on the " . wheels[arguments[2]] . " pad.")
+	}
+
+	handleEvent(event, arguments*) {
+		if !super.handleEvent(event, arguments*)
+			this.Assistant.brakeWearWarning(Round(arguments[1]), arguments[2])
+
+		return true
+	}
+}
+
 class DamageEvent extends EngineerEvent {
 	createArguments(event, arguments) {
 		local result := []
@@ -317,7 +361,10 @@ class RaceEngineer extends RaceAssistant {
 												  , recognizer, listener, listenerBooster, conversationBooster, agentBooster
 												  , muted, voiceServer)
 
-		this.updateConfigurationValues({Announcements: {FuelWarning: true, DamageReporting: true, DamageAnalysis: true, PressureReporting: true, WeatherUpdate: true}})
+		this.updateConfigurationValues({Announcements: {FuelWarning: true
+													  , TyreWearWarning: true, BrakeWearWarning: true
+													  , DamageReporting: true, DamageAnalysis: true
+													  , PressureReporting: true, WeatherUpdate: true}})
 	}
 
 	updateConfigurationValues(values) {
@@ -385,7 +432,7 @@ class RaceEngineer extends RaceAssistant {
 					return true
 				else
 					return confirmation
-			case "Pitstop.Fuel", "Pitstop.Repair", "Pitstop.Weather":
+			case "Pitstop.Fuel", "Pitstop.Tyre", "Pitstop.Brake", "Pitstop.Repair", "Pitstop.Weather":
 				return confirmation
 			default:
 				return super.confirmAction(action)
@@ -2461,21 +2508,29 @@ class RaceEngineer extends RaceAssistant {
 
 			if (this.Session = kSessionPractice)
 				announcements := {FuelWarning: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Practice.LowFuel", true)
+								, TyreWearWarning: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Practice.TyreWear", true)
+								, BrakeWearWarning: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Practice.BrakeWear", false)
 								, DamageReporting: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Practice.Damage", false)
 								, DamageAnalysis: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Practice.Damage", false)
 								, PressureReporting: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Practice.Pressure", true)}
 			else if (this.Session = kSessionQualification)
 				announcements := {FuelWarning: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Qualification.LowFuel", false)
+								, TyreWearWarning: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Qualification.TyreWear", false)
+								, BrakeWearWarning: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Qualification.BrakeWear", false)
 								, DamageReporting: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Qualification.Damage", false)
 								, DamageAnalysis: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Qualification.Damage", false)
 								, PressureReporting: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Qualification.Pressure", true)}
 			else if (this.Session = kSessionRace)
 				announcements := {FuelWarning: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Race.LowFuel", true)
+								, TyreWearWarning: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Race.TyreWear", true)
+								, BrakeWearWarning: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Race.BrakeWear", true)
 								, DamageReporting: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Race.Damage", true)
 								, DamageAnalysis: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Race.Damage", true)
 								, PressureReporting: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Race.Pressure", true)}
 			else if (this.Session = kSessionTimeTrial)
 				announcements := {FuelWarning: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Time Trial.LowFuel", false)
+								, TyreWearWarning: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Time Trial.TyreWear", false)
+								, BrakeWearWarning: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Time Trial.BrakeWear", false)
 								, DamageReporting: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Time Trial.Damage", false)
 								, DamageAnalysis: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Time Trial.Damage", false)
 								, PressureReporting: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Time Trial.Pressure", true)}
@@ -4494,6 +4549,96 @@ class RaceEngineer extends RaceAssistant {
 			}
 	}
 
+	tyreWearWarning(wear, tyre, planPitstop := true) {
+		local knowledgeBase := this.KnowledgeBase
+		local speaker
+
+		static wheels := CaseInsenseMap("FL", "FrontLeft", "FR", "FrontRight"
+								      , "RL", "RearLeft", "RR", "RearRight")
+
+		if (this.hasEnoughData(false) && this.Speaker[false] && this.Announcements["TyreWearWarning"])
+			if (!knowledgeBase.getValue("InPitLane", false) && !knowledgeBase.getValue("InPit", false)) {
+				speaker := this.getSpeaker()
+
+				speaker.beginTalk()
+
+				try {
+					speaker.speakPhrase("TyreWear", {wear: Round(wear), remaining: 100 - Round(wear)
+												   , tyre: speaker.Fragments[wheels[tyre]]})
+
+					if this.supportsPitstop()
+						if this.hasPreparedPitstop()
+							speaker.speakPhrase("ComeIn")
+						else if (!this.hasPlannedPitstop() && planPitstop) {
+							if this.confirmAction("Pitstop.Tyre") {
+								speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
+
+								this.setContinuation(ObjBindMethod(this, "planPitstop", "Now"))
+							}
+							else
+								this.planPitstop("Now")
+						}
+						else if planPitstop {
+							if this.confirmAction("Pitstop.Tyre") {
+								speaker.speakPhrase("ConfirmPrepare", false, true)
+
+								this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
+							}
+							else
+								this.preparePitstop()
+						}
+				}
+				finally {
+					speaker.endTalk()
+				}
+			}
+	}
+
+	brakeWearWarning(wear, brake, planPitstop := true) {
+		local knowledgeBase := this.KnowledgeBase
+		local speaker
+
+		static wheels := CaseInsenseMap("FL", "FrontLeft", "FR", "FrontRight"
+								      , "RL", "RearLeft", "RR", "RearRight")
+
+		if (this.hasEnoughData(false) && this.Speaker[false] && this.Announcements["BrakeWearWarning"])
+			if (!knowledgeBase.getValue("InPitLane", false) && !knowledgeBase.getValue("InPit", false)) {
+				speaker := this.getSpeaker()
+
+				speaker.beginTalk()
+
+				try {
+					speaker.speakPhrase("BrakeWear", {wear: Round(wear), remaining: 100 - Round(wear)
+												    , brake: speaker.Fragments[wheels[tyre]]})
+
+					if this.supportsPitstop()
+						if this.hasPreparedPitstop()
+							speaker.speakPhrase("ComeIn")
+						else if (!this.hasPlannedPitstop() && planPitstop) {
+							if this.confirmAction("Pitstop.Brake") {
+								speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
+
+								this.setContinuation(ObjBindMethod(this, "planPitstop", "Now"))
+							}
+							else
+								this.planPitstop("Now")
+						}
+						else if planPitstop {
+							if this.confirmAction("Pitstop.Brake") {
+								speaker.speakPhrase("ConfirmPrepare", false, true)
+
+								this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
+							}
+							else
+								this.preparePitstop()
+						}
+				}
+				finally {
+					speaker.endTalk()
+				}
+			}
+	}
+
 	damageWarning(newSuspensionDamage, newBodyworkDamage, newEngineDamage) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker, phrase
@@ -4700,6 +4845,12 @@ class RaceEngineer extends RaceAssistant {
 
 lowFuelWarning(context, remainingFuel, remainingLaps) {
 	context.KnowledgeBase.RaceAssistant.lowFuelWarning(Round(remainingFuel, 1), Floor(remainingLaps))
+
+	return true
+}
+
+tyreWearWarning(context, wear, tyre) {
+	context.KnowledgeBase.RaceAssistant.tyreWearWarning(Round(wear), tyre)
 
 	return true
 }

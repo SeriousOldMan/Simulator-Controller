@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[6.3.6.0-dev](http://simulator-controller.selfhost.co:800/api/public/dl/Q4DTsNDg) (Early build for 6.3.6. Changes: Collect tyre specific data like the driven laps, Fixed download mirror for VERSION file, Fixed pressure calculation after partial tyre change, Fixed slow startup of "Simulator Startup", Fixed closing of Pitstop MFD, Fixed pitstop service data handling, Tyre and brake wear in lap reports of "Solo Center" and "Team Center", Brake wear information for Le Mans Ultimate.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-636) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

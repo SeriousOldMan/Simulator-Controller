@@ -2253,16 +2253,20 @@ class SoloCenter extends ConfigurationItem {
 			switch mixedCompounds, false {
 				case "Wheel":
 					tyreCompound := []
+					tyreCompoundColor := []
 
-					for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
-						tyreCompound.Push(compound(getMultiMapValue(data, "Car Data", "TyreCompound" . tyre)
-												 , getMultiMapValue(data, "Car Data", "TyreCompoundColor" . tyre)))
+					for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
+						tyreCompound.Push(getMultiMapValue(data, "Car Data", "TyreCompound" . tyre))
+						tyreCompoundColor.Push(getMultiMapValue(data, "Car Data", "TyreCompoundColor" . tyre))
+					}
 				case "Axle":
 					tyreCompound := []
+					tyreCompoundColor := []
 
-					for index, axle in ["Front", "Rear"]
-						tyreCompound.Push(compound(getMultiMapValue(data, "Car Data", "TyreCompound" . axle)
-												 , getMultiMapValue(data, "Car Data", "TyreCompoundColor" . axle)))
+					for index, axle in ["Front", "Rear"] {
+						tyreCompound.Push(getMultiMapValue(data, "Car Data", "TyreCompound" . axle))
+						tyreCompoundColor.Push(getMultiMapValue(data, "Car Data", "TyreCompoundColor" . axle))
+					}
 				default:
 					tyreCompound := [getMultiMapValue(data, "Car Data", "TyreCompound")]
 					tyreCompoundColor := [getMultiMapValue(data, "Car Data", "TyreCompoundColor")]

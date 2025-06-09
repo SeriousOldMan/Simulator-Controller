@@ -944,7 +944,7 @@ class RaceEngineer extends RaceAssistant {
 							brakeWear := Map()
 
 							for postfix, brake in Map("FL", "Front.Left", "FR", "Front.Right"
-												   , "RL", "Rear.Left", "RR", "Rear.Right")
+												    , "RL", "Rear.Left", "RR", "Rear.Right")
 								brakeWear[brake] := (knowledgeBase.getValue("Lap." . lapNr . ".Brake.Wear." . postfix, 0) . percent)
 
 							brakes["Wear"] := brakeWear

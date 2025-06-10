@@ -121,8 +121,8 @@ downloadSimulatorController() {
 	deleteFile(kTempDirectory . "VERSION")
 	
 	for ignore, url in ["https://fileshare.impresion3d.pro/filebrowser/api/public/dl/OH13SGRl"
-					  , "https://www.dropbox.com/scl/fi/z47gla0adkbk7gup3khwx/VERSION?rlkey=pwo8ffhpkrteyfcnptra6x7y7&st=7lbgjkgu&dl=0"
-					  , "http://" . MASTER . ":800/api/public/dl/bkguewzP"
+					  , "https://www.dropbox.com/scl/fi/3m941rw7qz7voftjoqalq/VERSION?rlkey=b1r9ecrztj1t3cr0jmmbor6du&st=zhl9bzbm&dl=1"
+					  , "https://" . MASTER . ":801/api/public/dl/bkguewzP"
 					  , "https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/VERSION"]
 		try {
 			error := false

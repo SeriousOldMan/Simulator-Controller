@@ -37,7 +37,7 @@ Here is a short video which shows how to configure Simulator Controller for the 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[6.3.5.0-release](https://cutt.ly/ErnSPTZq) (Changes: Fixed tyre compound choice for strategy pitstops, Prevent strategy pitstops to be in the "past", Fixed tyre compound handling in strategy validation scripts, Script support in "Setup Workbench", Fixed AHK <-> LUA type conversion, Support for wheel specific tyre laps in laps database, Consent for session data sharing, Fixed DLC download mirror handling, Fixed history lap data in "Solo Center".)
+[6.3.5.0-release](https://cutt.ly/7rmtPVCC) (Changes: Fixed tyre compound choice for strategy pitstops, Prevent strategy pitstops to be in the "past", Fixed tyre compound handling in strategy validation scripts, Script support in "Setup Workbench", Fixed AHK <-> LUA type conversion, Support for wheel specific tyre laps in laps database, Consent for session data sharing, Fixed DLC download mirror handling, Fixed history lap data in "Solo Center".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-635) of this version and all the versions you might have skipped, before installing and using this version.
 
@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[6.3.6.0-dev](http://simulator-controller.selfhost.co:800/api/public/dl/Q4DTsNDg) (Early build for 6.3.6. Changes: Collect tyre specific data like the driven laps, Fixed download mirror for VERSION file, Fixed pressure calculation after partial tyre change, Fixed slow startup of "Simulator Startup", Fixed closing of Pitstop MFD, Fixed pitstop service data handling, Tyre and brake wear in lap reports of "Solo Center" and "Team Center", Brake wear information for Le Mans Ultimate, The LLM now gets information about the driver names of each car, New settings to handle tyre wear and brake wear warnings, New events and actions for the reasoning booster for tyre and brake wear awarnings.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-636) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

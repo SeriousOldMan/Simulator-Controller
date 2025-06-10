@@ -8864,92 +8864,97 @@ class TeamCenter extends ConfigurationItem {
 
 								pitstop := getMultiMapValue(state, "Pitstop Data", "Pitstop", kUndefined)
 
-								tyreCompound := getMultiMapValue(state, "Pitstop Data", "Service.Tyre.Compound", false)
-								tyreCompoundColor := getMultiMapValue(state, "Pitstop Data", "Service.Tyre.Compound.Color", false)
+								if (pitstop != kUndefined) {
+									hasServiceData := (sessionStore.query("Pitstop.Service.Data", {Where: {Pitstop: pitstop}}).Length > 0)
+									hasTyreData := (sessionStore.query("Pitstop.Tyre.Data", {Where: {Pitstop: pitstop}}).Length > 0)
 
-								if (tyreService = "Wheel") {
-									tyreCompound := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
-														  , (tyre) => getMultiMapValue(state, "Pitstop Data", "Service.Tyre.Compound." . tyre, tyreCompound))
-									tyreCompoundColor := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
-															   , (tyre) => getMultiMapValue(state, "Pitstop Data", "Service.Tyre.Compound." . tyre, tyreCompoundColor))
+									tyreCompound := getMultiMapValue(state, "Pitstop Data", "Service.Tyre.Compound", false)
+									tyreCompoundColor := getMultiMapValue(state, "Pitstop Data", "Service.Tyre.Compound.Color", false)
 
-									combineCompounds(&tyreCompound, &tyreCompoundColor)
+									if (tyreService = "Wheel") {
+										tyreCompound := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
+															  , (tyre) => getMultiMapValue(state, "Pitstop Data", "Service.Tyre.Compound." . tyre, tyreCompound))
+										tyreCompoundColor := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
+																   , (tyre) => getMultiMapValue(state, "Pitstop Data", "Service.Tyre.Compound." . tyre, tyreCompoundColor))
 
-									tyreCompound := values2String(",", tyreCompound*)
-									tyreCompoundColor := values2String(",", tyreCompoundColor*)
-								}
-								else if (tyreService = "Axle") {
-									tyreCompound := collect(["Front", "Rear"]
-														  , (axle) => getMultiMapValue(state, "Pitstop Data", "Service.Tyre.Compound." . axle, tyreCompound))
-									tyreCompoundColor := collect(["Front", "Rear"]
-															   , (axle) => getMultiMapValue(state, "Pitstop Data", "Service.Tyre.Compound." . axle, tyreCompoundColor))
+										combineCompounds(&tyreCompound, &tyreCompoundColor)
 
-									combineCompounds(&tyreCompound, &tyreCompoundColor)
-
-									tyreCompound := values2String(",", tyreCompound*)
-									tyreCompoundColor := values2String(",", tyreCompoundColor*)
-								}
-
-								if ((full || !hasServiceData)
-								 && (getMultiMapValue(state, "Pitstop Data", "Service.Lap", kUndefined) != kUndefined)) {
-									hasServiceData := true
-									newData := true
-
-									modifiedPitstops.Push(pitstop)
-
-									sessionStore.add("Pitstop.Service.Data"
-												   , Database.Row("Pitstop", pitstop
-																, "Lap", getMultiMapValue(state, "Pitstop Data", "Service.Lap", false)
-																, "Time", getMultiMapValue(state, "Pitstop Data", "Service.Time", false)
-																, "Driver.Previous", getMultiMapValue(state, "Pitstop Data", "Service.Driver.Previous", false)
-																, "Driver.Next", getMultiMapValue(state, "Pitstop Data", "Service.Driver.Next", false)
-																, "Fuel", getMultiMapValue(state, "Pitstop Data", "Service.Refuel", 0)
-																, "Tyre.Compound", tyreCompound, "Tyre.Compound.Color", tyreCompoundColor
-																, "Tyre.Set", getMultiMapValue(state, "Pitstop Data", "Service.Tyre.Set", false)
-																, "Tyre.Pressures", getMultiMapValue(state, "Pitstop Data", "Service.Tyre.Pressures", "")
-																, "Bodywork.Repair", getMultiMapValue(state, "Pitstop Data", "Service.Bodywork.Repair", false)
-																, "Suspension.Repair", getMultiMapValue(state, "Pitstop Data", "Service.Suspension.Repair", false)
-																, "Engine.Repair", getMultiMapValue(state, "Pitstop Data", "Service.Engine.Repair", false)))
-								}
-
-								if ((full || !hasTyreData)
-								 && (getMultiMapValue(state, "Pitstop Data", "Tyre.Compound", kUndefined) != kUndefined)) {
-									hasTyreData := true
-									newData := true
-
-									modifiedPitstops.Push(pitstop)
-
-									driver := getMultiMapValue(state, "Pitstop Data", "Tyre.Driver")
-									laps := getMultiMapValue(state, "Pitstop Data", "Tyre.Laps", false)
-									tyreSet := getMultiMapValue(state, "Pitstop Data", "Tyre.Set", "-")
-
-									tyreCompound := string2Values(",", tyreCompound)
-									tyreCompoundColor := string2Values(",", tyreCompoundColor)
-
-									if (tyreCompound.Length = 1) {
-										tyreCompound := [tyreCompound, tyreCompound, tyreCompound, tyreCompound]
-										tyreCompoundColor := [tyreCompoundColor, tyreCompoundColor, tyreCompoundColor, tyreCompoundColor]
+										tyreCompound := values2String(",", tyreCompound*)
+										tyreCompoundColor := values2String(",", tyreCompoundColor*)
 									}
-									else if (tyreCompound.Length = 2) {
-										tyreCompound := [tyreCompound[1], tyreCompound[1], tyreCompound[2], tyreCompound[2]]
-										tyreCompoundColor := [tyreCompoundColor[1], tyreCompoundColor[1], tyreCompoundColor[2], tyreCompoundColor[2]]
+									else if (tyreService = "Axle") {
+										tyreCompound := collect(["Front", "Rear"]
+															  , (axle) => getMultiMapValue(state, "Pitstop Data", "Service.Tyre.Compound." . axle, tyreCompound))
+										tyreCompoundColor := collect(["Front", "Rear"]
+																   , (axle) => getMultiMapValue(state, "Pitstop Data", "Service.Tyre.Compound." . axle, tyreCompoundColor))
+
+										combineCompounds(&tyreCompound, &tyreCompoundColor)
+
+										tyreCompound := values2String(",", tyreCompound*)
+										tyreCompoundColor := values2String(",", tyreCompoundColor*)
 									}
 
-									for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"]
-										sessionStore.add("Pitstop.Tyre.Data"
-													   , Database.Row("Pitstop", pitstop, "Driver", driver, "Laps", laps
-																	, "Compound", tyreCompound[A_Index], "Compound.Color", tyreCompoundColor[A_Index]
-																	, "Set", tyreSet, "Tyre", tyre
-																	, "Tread", getMultiMapValue(state, "Pitstop Data", "Tyre.Tread." . tyre, "-")
-																	, "Wear", getMultiMapValue(state, "Pitstop Data", "Tyre.Wear." . tyre, 0)
-																	, "Grain", getMultiMapValue(state, "Pitstop Data", "Tyre.Grain." . tyre, "-")
-																	, "Blister", getMultiMapValue(state, "Pitstop Data", "Tyre.Blister." . tyre, "-")
-																	, "FlatSpot", getMultiMapValue(state, "Pitstop Data", "Tyre.FlatSpot." . tyre, "-")))
+									if ((full || !hasServiceData)
+									 && (getMultiMapValue(state, "Pitstop Data", "Service.Lap", kUndefined) != kUndefined)) {
+										hasServiceData := true
+										newData := true
+
+										modifiedPitstops.Push(pitstop)
+
+										sessionStore.add("Pitstop.Service.Data"
+													   , Database.Row("Pitstop", pitstop
+																	, "Lap", getMultiMapValue(state, "Pitstop Data", "Service.Lap", false)
+																	, "Time", getMultiMapValue(state, "Pitstop Data", "Service.Time", false)
+																	, "Driver.Previous", getMultiMapValue(state, "Pitstop Data", "Service.Driver.Previous", false)
+																	, "Driver.Next", getMultiMapValue(state, "Pitstop Data", "Service.Driver.Next", false)
+																	, "Fuel", getMultiMapValue(state, "Pitstop Data", "Service.Refuel", 0)
+																	, "Tyre.Compound", tyreCompound, "Tyre.Compound.Color", tyreCompoundColor
+																	, "Tyre.Set", getMultiMapValue(state, "Pitstop Data", "Service.Tyre.Set", false)
+																	, "Tyre.Pressures", getMultiMapValue(state, "Pitstop Data", "Service.Tyre.Pressures", "")
+																	, "Bodywork.Repair", getMultiMapValue(state, "Pitstop Data", "Service.Bodywork.Repair", false)
+																	, "Suspension.Repair", getMultiMapValue(state, "Pitstop Data", "Service.Suspension.Repair", false)
+																	, "Engine.Repair", getMultiMapValue(state, "Pitstop Data", "Service.Engine.Repair", false)))
+									}
+
+									if ((full || !hasTyreData)
+									 && (getMultiMapValue(state, "Pitstop Data", "Tyre.Compound", kUndefined) != kUndefined)) {
+										hasTyreData := true
+										newData := true
+
+										modifiedPitstops.Push(pitstop)
+
+										driver := getMultiMapValue(state, "Pitstop Data", "Tyre.Driver")
+										laps := getMultiMapValue(state, "Pitstop Data", "Tyre.Laps", false)
+										tyreSet := getMultiMapValue(state, "Pitstop Data", "Tyre.Set", "-")
+
+										tyreCompound := string2Values(",", tyreCompound)
+										tyreCompoundColor := string2Values(",", tyreCompoundColor)
+
+										if (tyreCompound.Length = 1) {
+											tyreCompound := [tyreCompound, tyreCompound, tyreCompound, tyreCompound]
+											tyreCompoundColor := [tyreCompoundColor, tyreCompoundColor, tyreCompoundColor, tyreCompoundColor]
+										}
+										else if (tyreCompound.Length = 2) {
+											tyreCompound := [tyreCompound[1], tyreCompound[1], tyreCompound[2], tyreCompound[2]]
+											tyreCompoundColor := [tyreCompoundColor[1], tyreCompoundColor[1], tyreCompoundColor[2], tyreCompoundColor[2]]
+										}
+
+										for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"]
+											sessionStore.add("Pitstop.Tyre.Data"
+														   , Database.Row("Pitstop", pitstop, "Driver", driver, "Laps", laps
+																		, "Compound", tyreCompound[A_Index], "Compound.Color", tyreCompoundColor[A_Index]
+																		, "Set", tyreSet, "Tyre", tyre
+																		, "Tread", getMultiMapValue(state, "Pitstop Data", "Tyre.Tread." . tyre, "-")
+																		, "Wear", getMultiMapValue(state, "Pitstop Data", "Tyre.Wear." . tyre, 0)
+																		, "Grain", getMultiMapValue(state, "Pitstop Data", "Tyre.Grain." . tyre, "-")
+																		, "Blister", getMultiMapValue(state, "Pitstop Data", "Tyre.Blister." . tyre, "-")
+																		, "FlatSpot", getMultiMapValue(state, "Pitstop Data", "Tyre.FlatSpot." . tyre, "-")))
+									}
+
+									startLap += 1
+
+									break
 								}
-
-								startLap += 1
-
-								break
 							}
 						}
 					}
@@ -12557,10 +12562,13 @@ class TeamCenter extends ConfigurationItem {
 
 	createLapOverview(lap) {
 		local html := "<table>"
+		local lapTable := this.SessionStore.Tables["Lap.Data"]
 		local hotPressures := "-, -, -, -"
 		local coldPressures := "-, -, -, -"
 		local pressuresLosses := "-, -, -, -"
 		local hasColdPressures := false
+		local tyreWear := "-, -, -, -"
+		local brakeWear := "-, -, -, -"
 		local pressuresDB := this.PressuresDatabase
 		local pressuresTable, pressures, tyresTable, tyres
 		local driver, fuel, tyreCompounds, tyreCompoundColors, tyreSet, tyrePressures, pressureCorrections, pressure
@@ -12694,6 +12702,12 @@ class TeamCenter extends ConfigurationItem {
 
 		if (pressuresLosses != "-, -, -, -")
 			html .= ("<tr><td><b>" . translate("Pressures (loss):") . "</b></td><td>" . pressuresLosses . "</td></tr>")
+
+		if (tyreWear != "-, -, -, -")
+			html .= ("<tr><td><b>" . translate("Tyre Wear:") . "</b></td><td>" . tyreWear . "</td></tr>")
+
+		if (brakeWear != "-, -, -, -")
+			html .= ("<tr><td><b>" . translate("Brake Wear:") . "</b></td><td>" . brakeWear . "</td></tr>")
 
 		html .= ("<tr><td></td><td></td></tr>")
 
@@ -13147,7 +13161,7 @@ class TeamCenter extends ConfigurationItem {
 			wear := tyres[key]["Wear"]
 			wearData.Push("<td class=`"td-std`" " . this.computeTyreWearColor(tyres[key]["Wear"]) . ">" . wear . "</td>")
 
-			if (wear != "-")
+			if (wear && (wear != "-"))
 				hasWear := true
 
 			tread := tyres[key]["Tread"]
@@ -13181,37 +13195,41 @@ class TeamCenter extends ConfigurationItem {
 
 		combineCompounds(&tyreCompounds)
 
-		if driver
-			html .= ("<tr><td><b>" . translate("Driver:") . "</b></div></td><td>" . driver . "</td></tr>")
+		if (hasWear || hasTread || hasGrain || hasBlister || hasFlatSpot) {
+			if driver
+				html .= ("<tr><td><b>" . translate("Driver:") . "</b></div></td><td>" . driver . "</td></tr>")
 
-		if laps
-			html .= ("<tr><td><b>" . translate("Laps:") . "</b></div></td><td>" . laps . "</td></tr>")
+			if laps
+				html .= ("<tr><td><b>" . translate("Laps:") . "</b></div></td><td>" . laps . "</td></tr>")
 
-		html .= ("<tr><td><b>" . translate("Tyre Compound:") . "</b></div></td><td>" . values2String(", ", collect(tyreCompounds, translate)*) . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Tyre Compound:") . "</b></div></td><td>" . values2String(", ", collect(tyreCompounds, translate)*) . "</td></tr>")
 
-		if tyreSet
-			html .= ("<tr><td><b>" . translate("Tyre Set:") . "</b></div></td><td>" . tyreSet . "</td></tr>")
+			if tyreSet
+				html .= ("<tr><td><b>" . translate("Tyre Set:") . "</b></div></td><td>" . tyreSet . "</td></tr>")
 
-		html .= "</table><br><br>"
+			html .= "</table><br><br>"
 
-		html .= "<table class=`"table-std`">"
-		html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyre") . "</th>" . values2String("", tyreNames*) . "</tr>")
+			html .= "<table class=`"table-std`">"
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyre") . "</th>" . values2String("", tyreNames*) . "</tr>")
 
-		if hasTread
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Tread (mm)") . "</th>" . values2String("", treadData*) . "</tr>")
-		else if hasWear
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Wear (%)") . "</th>" . values2String("", wearData*) . "</tr>")
+			if hasTread
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Tread (mm)") . "</th>" . values2String("", treadData*) . "</tr>")
+			else if hasWear
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Wear (%)") . "</th>" . values2String("", wearData*) . "</tr>")
 
-		if hasGrain
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Grain (%)") . "</th>" . values2String("", grainData*) . "</tr>")
+			if hasGrain
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Grain (%)") . "</th>" . values2String("", grainData*) . "</tr>")
 
-		if hasBlister
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Blister (%)") . "</th>" . values2String("", blisterData*) . "</tr>")
+			if hasBlister
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Blister (%)") . "</th>" . values2String("", blisterData*) . "</tr>")
 
-		if hasFlatSpot
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Flat Spot (%)") . "</th>" . values2String("", flatSpotData*) . "</tr>")
+			if hasFlatSpot
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Flat Spot (%)") . "</th>" . values2String("", flatSpotData*) . "</tr>")
 
-		html .= "</table>"
+			html .= "</table>"
+		}
+		else
+			html := ""
 
 		return html
 	}
@@ -13696,7 +13714,7 @@ class TeamCenter extends ConfigurationItem {
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Lap") . "');")
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Position") . "');")
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Fuel Level") . "');")
-		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Tyre Laps") . "');")
+		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Tyre Laps (FL)") . "');")
 		drawChartFunction .= "`ndata.addRows(["
 
 		for ignore, time in lapSeries {
@@ -13740,7 +13758,7 @@ class TeamCenter extends ConfigurationItem {
 		local remainingFuels := []
 		local tyreLaps := []
 		local lastLap := this.LastLap
-		local lapDataTable := this.SessionStore.Tables["Lap.Data"]
+		local lapTable := this.SessionStore.Tables["Lap.Data"]
 		local simulator := this.Simulator
 		local carName := this.Car
 		local trackName := this.Track
@@ -13842,8 +13860,8 @@ class TeamCenter extends ConfigurationItem {
 				positions.Push(lap.Position)
 				remainingFuels.Push(lap.FuelRemaining)
 
-				if lapDataTable.Has(A_Index)
-					tyreLaps.Push(lapDataTable[A_Index]["Tyre.Laps.Front.Left"])
+				if lapTable.Has(A_Index)
+					tyreLaps.Push(lapTable[A_Index]["Tyre.Laps.Front.Left"])
 				else
 					tyreLaps.Push(kNull)
 			}

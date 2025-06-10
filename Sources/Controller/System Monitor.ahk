@@ -771,11 +771,11 @@ systemMonitor(command := false, arguments*) {
 
 			if ((wear.Length = 4) && exist(wear, nonZero)) {
 				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Wear") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
-					   . displayValue("Float", convertUnit("Temperature", wear[1])) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
-					   . displayValue("Float", convertUnit("Temperature", wear[2])) . "</td></tr>")
+					   . displayValue("Float", Round(wear[1], 2)) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . displayValue("Float", Round(wear[2], 2)) . "</td></tr>")
 				html .= ("<tr><td class=`"td-wdg`" style=`"text-align: center`">"
-					   . displayValue("Float", convertUnit("Temperature", wear[3])) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
-					   . displayValue("Float", convertUnit("Temperature", wear[4])) . "</td></tr>")
+					   . displayValue("Float", Round(wear[3], 2)) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . displayValue("Float", Round(wear[4], 2)) . "</td></tr>")
 			}
 		}
 		catch Any as exception {

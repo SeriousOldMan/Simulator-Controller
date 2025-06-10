@@ -262,8 +262,8 @@ checkForUpdates() {
 			deleteFile(kUserConfigDirectory . "VERSION")
 
 			for ignore, url in ["https://fileshare.impresion3d.pro/filebrowser/api/public/dl/OH13SGRl"
-							  , "https://www.dropbox.com/scl/fi/qiczuix77p0f1bkc0q4bw/VERSION?rlkey=9y6fs09lnj79ikgr9608i2ajy&st=npovhmgm&dl=1"
-							  , "http://" . StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1] . ":800/api/public/dl/bkguewzP"
+							  , "https://www.dropbox.com/scl/fi/3m941rw7qz7voftjoqalq/VERSION?rlkey=b1r9ecrztj1t3cr0jmmbor6du&st=zhl9bzbm&dl=1"
+							  , "https://" . StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1] . ":801/api/public/dl/bkguewzP"
 							  , "https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/VERSION"]
 				try {
 					Download(url, kUserConfigDirectory . "VERSION")

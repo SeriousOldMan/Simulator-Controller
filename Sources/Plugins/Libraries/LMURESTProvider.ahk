@@ -22,6 +22,9 @@
 class LMURESTProvider {
 	static sTyreTypes := CaseInsenseMap("All", "FL", "FL", "FL", "FR", "FR", "RL", "RL", "RR", "RR"
 									  , "Front Left", "FL", "Front Right", "FR", "Rear Left", "RL", "Rear Right", "RR")
+	static sBrakeTypes := CaseInsenseMap("FL", "frontLeft", "FR", "frontRight", "RL", "rearLeft", "RR", "rearRight"
+									   , "Front Left", "frontLeft", "Front Right", "frontRight"
+									   , "Rear Left", "rearLeft", "Rear Right", "rearRight")
 
 	class RESTData {
 		iSimulator := false
@@ -753,7 +756,34 @@ class LMURESTProvider {
 		}
 	}
 
-	class TyreData extends LMURESTProvider.RESTData {
+	class BrakeData extends LMURESTProvider.RESTData {
+		GETURL {
+			Get {
+				return "http://localhost:6397/rest/garage/brakeinfo"
+			}
+		}
+
+		BrakePadThickness[tyre] {
+			Get {
+				return this.getBrakePadThickness(tyre)
+			}
+		}
+
+		getBrakepadThickness(tyre) {
+			if this.Data {
+				try {
+					return this.Data[LMURESTProvider.BrakeTypes[tyre]]
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+			}
+
+			return false
+		}
+	}
+
+	class WheelData extends LMURESTProvider.RESTData {
 		GETURL {
 			Get {
 				return "http://localhost:6397/rest/garage/UIScreen/TireManagement"
@@ -769,6 +799,12 @@ class LMURESTProvider {
 		TyreWear[tyre] {
 			Get {
 				return this.getTyreWear(tyre)
+			}
+		}
+
+		BrakePadThickness[tyre] {
+			Get {
+				return this.getBrakePadThickness(tyre)
 			}
 		}
 
@@ -791,6 +827,19 @@ class LMURESTProvider {
 			if this.Data {
 				try {
 					return (100 * (1 - this.Data["wearables"]["tires"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.TyreTypes[tyre])]))
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+			}
+
+			return false
+		}
+
+		getBrakepadThickness(tyre) {
+			if this.Data {
+				try {
+					return this.Data["wearables"]["brakes"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.TyreTypes[tyre])]
 				}
 				catch Any as exception {
 					logError(exception)
@@ -1339,6 +1388,12 @@ class LMURESTProvider {
 	static TyreTypes {
 		Get {
 			return LMURestProvider.sTyreTypes
+		}
+	}
+
+	static BrakeTypes {
+		Get {
+			return LMURestProvider.sBrakeTypes
 		}
 	}
 }

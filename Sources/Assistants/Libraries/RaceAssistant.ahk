@@ -759,15 +759,17 @@ class RaceAssistant extends ConfigurationItem {
 
 	Provider {
 		Get {
-			if !this.iProvider
-				try {
+			if this.iProvider
+				return this.iProvider
+			else {
+				try
 					this.iProvider := this.createSimulatorProvider()
-				}
-				catch {
-					return SimulatorProvider.GenericSimulatorProvider("Unknown", "Unknown", "Unknown")
-				}
 
-			return this.iProvider
+				if this.iProvider
+					return this.iProvider
+				else
+					return SimulatorProvider.GenericSimulatorProvider("Unknown", "Unknown", "Unknown")
+			}
 		}
 	}
 
@@ -2540,7 +2542,8 @@ class RaceAssistant extends ConfigurationItem {
 			if (tyreWear != "") {
 				tyreWear := string2Values(",", tyreWear)
 
-				setMultiMapValue(sessionInfo, "Tyres", "Wear", values2String(",", Round(tyreWear[1]), Round(tyreWear[2]), Round(tyreWear[3]), Round(tyreWear[4])))
+				setMultiMapValue(sessionInfo, "Tyres", "Wear", values2String(",", Round(tyreWear[1], 1), Round(tyreWear[2], 1)
+																				, Round(tyreWear[3], 1), Round(tyreWear[4], 1)))
 			}
 
 			setMultiMapValue(sessionInfo, "Brakes", "Temperatures", getMultiMapValue(data, "Car Data", "BrakeTemperature", ""))
@@ -2550,7 +2553,8 @@ class RaceAssistant extends ConfigurationItem {
 			if (brakeWear != "") {
 				brakeWear := string2Values(",", brakeWear)
 
-				setMultiMapValue(sessionInfo, "Brakes", "Wear", values2String(",", Round(brakeWear[1]), Round(brakeWear[2]), Round(brakeWear[3]), Round(brakeWear[4])))
+				setMultiMapValue(sessionInfo, "Brakes", "Wear", values2String(",", Round(brakeWear[1], 2), Round(brakeWear[2], 2)
+																				 , Round(brakeWear[3], 2), Round(brakeWear[4], 2)))
 			}
 
 			if (getMultiMapValue(data, "Car Data", "WaterTemperature", kUndefined) != kUndefined)
@@ -2811,10 +2815,10 @@ class RaceAssistant extends ConfigurationItem {
 			tyreWear := string2Values(",", tyreWear)
 
 			if !exist(tyreWear, (w) => !isNumber(w)) {
-				knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Wear.FL", Round(tyreWear[1]))
-				knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Wear.FR", Round(tyreWear[2]))
-				knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Wear.RL", Round(tyreWear[3]))
-				knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Wear.RR", Round(tyreWear[4]))
+				knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Wear.FL", Round(tyreWear[1], 1))
+				knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Wear.FR", Round(tyreWear[2], 1))
+				knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Wear.RL", Round(tyreWear[3], 1))
+				knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Wear.RR", Round(tyreWear[4], 1))
 			}
 		}
 
@@ -2833,10 +2837,10 @@ class RaceAssistant extends ConfigurationItem {
 			brakeWear := string2Values(",", brakeWear)
 
 			if !exist(brakeWear, (w) => !isNumber(w)) {
-				knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Wear.FL", Round(brakeWear[1], 1))
-				knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Wear.FR", Round(brakeWear[2], 1))
-				knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Wear.RL", Round(brakeWear[3], 1))
-				knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Wear.RR", Round(brakeWear[4], 1))
+				knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Wear.FL", Round(brakeWear[1], 2))
+				knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Wear.FR", Round(brakeWear[2], 2))
+				knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Wear.RL", Round(brakeWear[3], 2))
+				knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Wear.RR", Round(brakeWear[4], 2))
 			}
 		}
 
@@ -3272,6 +3276,9 @@ class GridRaceAssistant extends RaceAssistant {
 
 			try {
 				carData := Map("Nr", this.getNr(car)
+							 , "DriverName", driverName(knowledgeBase.getValue("Car." . car . ".Driver.Forname")
+													  , knowledgeBase.getValue("Car." . car . ".Driver.Surname")
+													  , knowledgeBase.getValue("Car." . car . ".Driver.Nickname"))
 							 , "Class", this.getClass(car)
 							 , "Laps", knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0))
 							 , "OverallPosition", this.getPosition(car, "Overall")

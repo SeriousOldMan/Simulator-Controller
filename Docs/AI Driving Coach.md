@@ -525,6 +525,8 @@ In summary work with the Coach as you would work with ChatGPT. Always use your o
 
 ## Troubleshooting
 
+Whenever Aiden answers your question or request with an answer like "Sorry, I am currently on the other line. Please come back in a few minutes.", this indicates that there is a technical problem with the connection to the GPT service. This might be correct, if you are running the Driving Coach in the so called restricted mode, as discussed above and *Restricted* will be shown in the "System Monitor" to indicate that. But if you have configured a connection to a GPT service, the issue will be a depleted account balance most of the time or a temporary service outage. Use the tray menu of the Driving Coach to enable *Debug* and a *Debug* log level to show the result code of the GPT service request in the logs, which may help to identify the issue.
+
 For some tips n tricks for the best voice recognition experience, see the [corresponding chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#troubleshooting) in the documentation of Jona.
 
 A typical problem which shows up in conversations with Aiden, is, that the Driving Coach does not wait with its answer until you have finished your question. This happens especially, when you are formulating very long questions. In this case, use the *Push-To-Talk* method "Hold & Talk", which will prevent this.

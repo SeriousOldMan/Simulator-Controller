@@ -21,6 +21,7 @@ class LMUProvider extends Sector397Provider {
 	iTeamData := false
 	iTrackData := false
 	iGridData := false
+	iBrakeData := false
 
 	iCarInfos := false
 	iCarInfosRefresh := 0
@@ -134,6 +135,15 @@ class LMUProvider extends Sector397Provider {
 		}
 	}
 
+	BrakeData {
+		Get {
+			if !this.iBrakeData
+				this.iBrakeData := LMURESTProvider.BrakeData()
+
+			return this.iBrakeData
+		}
+	}
+
 	CarInfos {
 		Get {
 			return this.iCarInfos
@@ -223,13 +233,13 @@ class LMUProvider extends Sector397Provider {
 	readSessionData(options := "", protocol?) {
 		local simulator := this.Simulator
 		local car, track, data, setupData, tyreCompound, tyreCompoundColor, key, postFix, fuelAmount
-		local weatherData, lap, weather, time, session, remainingTime, fuelRatio
+		local weatherData, wheelData, brakeData, lap, weather, time, session, remainingTime, fuelRatio
 
 		static keys := Map("All", "", "Front Left", "FrontLeft", "Front Right", "FrontRight"
 									, "Rear Left", "RearLeft", "Rear Right", "RearRight")
 
-		static tyres := Map("Front Left", "FrontLeft", "Front Right", "FrontRight"
-						  , "Rear Left", "RearLeft", "Rear Right", "RearRight")
+		static wheels := Map("Front Left", "FrontLeft", "Front Right", "FrontRight"
+						   , "Rear Left", "RearLeft", "Rear Right", "RearRight")
 
 		static lastLap := 0
 		static duration := 0
@@ -351,11 +361,14 @@ class LMUProvider extends Sector397Provider {
 							setMultiMapValue(data, "Session Data", "FuelAmount", LMURESTProvider.EnergyData(simulator, car, track).MaxFuelAmount)
 					}
 
-					tyreData := LMURestProvider.TyreData()
-					tyreWear := []
+					wheelData := LMURestProvider.WheelData()
+					brakeData := this.BrakeData
 
-					for key, postFix in tyres {
-						tyreCompound := tyreData.TyreCompound[key]
+					tyreWear := []
+					brakeWear := []
+
+					for key, postFix in wheels {
+						tyreCompound := wheelData.TyreCompound[key]
 						tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
 
 						if tyreCompound {
@@ -365,11 +378,15 @@ class LMUProvider extends Sector397Provider {
 							setMultiMapValue(data, "Car Data", "TyreCompoundColor" . postFix, tyreCompoundColor)
 						}
 
-						tyreWear.Push(Round(tyreData.TyreWear[key], 1))
+						tyreWear.Push(Round(wheelData.TyreWear[key], 1))
+						brakeWear.Push(Min(100, 100 - Round(((wheelData.BrakePadThickness[key] / brakeData.BrakePadThickness[key]) * 100), 2)))
 					}
 
 					if exist(tyreWear, (w) => (w != false))
 						setMultiMapValue(data, "Car Data", "TyreWear", values2String(",", tyreWear*))
+
+					if exist(brakeWear, (w) => (w != false))
+						setMultiMapValue(data, "Car Data", "BrakeWear", values2String(",", brakeWear*))
 				}
 			}
 		}

@@ -397,8 +397,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	closePitstopMFD() {
-		static reported := false
-
 		if this.ClosePitstopMFDHotkey {
 			if (this.OpenPitstopMFDHotkey != "Off") {
 				if this.activateWindow() {
@@ -407,15 +405,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					this.iPSIsOpen := false
 				}
 			}
-		}
-		else if !reported {
-			reported := true
-
-			logMessage(kLogCritical, translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration"))
-
-			if !kSilentMode
-				showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
 	}
 

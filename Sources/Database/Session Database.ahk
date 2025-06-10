@@ -7259,38 +7259,45 @@ editLaps(editorOrCommand, arguments*) {
 	}
 
 	deleteData(localTable, serverTable, removedPredicate) {
-		withTask(ProgressTask(translate("Deleting Data")), () {
-			local ignore, connector, row, removedRows, removalRows
+		lapsGui.Block()
 
-			lapsDB.Database.lock(localTable)
+		try {
+			withTask(ProgressTask(translate("Deleting Data")), () {
+				local ignore, connector, row, removedRows, removalRows
 
-			try {
-				removedRows := choose(lapsDB.Database.query(localTable, {Where: {Driver: lapsDB.ID}}), removedPredicate)
-				removalRows := removedRows.Clone()
+				lapsDB.Database.lock(localTable)
 
-				while (removalRows.Length > 0) {
-					row := removalRows.Pop()
+				try {
+					removedRows := choose(lapsDB.Database.query(localTable, {Where: {Driver: lapsDB.ID}}), removedPredicate)
+					removalRows := removedRows.Clone()
 
-					if (row["Identifier"] != kNull)
-						for ignore, connector in editor.SessionDatabase.Connectors
-							try {
-								connector.DeleteData(serverTable, row["Identifier"])
-							}
-							catch Any as exception {
-								logError(exception, true)
-							}
+					while (removalRows.Length > 0) {
+						row := removalRows.Pop()
+
+						if (row["Identifier"] != kNull)
+							for ignore, connector in editor.SessionDatabase.Connectors
+								try {
+									connector.DeleteData(serverTable, row["Identifier"])
+								}
+								catch Any as exception {
+									logError(exception, true)
+								}
+					}
+
+					lapsDB.Database.remove(localTable, false, (r) {
+						Sleep(50)
+
+						return inList(removedRows, r)
+					})
 				}
-
-				lapsDB.Database.remove(localTable, false, (r) {
-					Sleep(50)
-
-					return inList(removedRows, r)
-				})
-			}
-			finally {
-				lapsDB.Database.unlock(localTable)
-			}
-		})
+				finally {
+					lapsDB.Database.unlock(localTable)
+				}
+			})
+		}
+		finally {
+			lapsGui.Unblock()
+		}
 	}
 
 	if (editorOrCommand = "Close")

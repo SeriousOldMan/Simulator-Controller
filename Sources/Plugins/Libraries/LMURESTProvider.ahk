@@ -772,7 +772,7 @@ class LMURESTProvider {
 		getBrakepadThickness(tyre) {
 			if this.Data {
 				try {
-					return this.Data[LMURESTProvider.BrakeTypes[tyre]]
+					return this.Data[inList(["FL", "FR", "RL", "RR"], LMURESTProvider.TyreTypes[tyre])]
 				}
 				catch Any as exception {
 					logError(exception)

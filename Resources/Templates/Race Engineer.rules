@@ -706,7 +706,8 @@ pressureLossWarning(?tyre, ?lostPressure) <= Call(pressureLossWarning, ?tyre, ?l
 ;;; Issues a warning to the driver, if the tyre wear gets critical.         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: -15, {All: [?Lap], {None: [?Tyre.Wear.Reported]}} => (Prove: checkTyreWear(?Lap))
+priority: -15, {All: [?Lap], {None: [?Tyre.Wear.Reported],
+					 [?Lap.Remaining.Session > ?Session.Settings.Pitstop.Service.Last]}} => (Prove: checkTyreWear(?Lap))
 
 checkTyreWear(?lap) <= ?threshold = 100 - !Session.Settings.Tyre.Wear.Warning,
 					   criticalTyreWear(?lap, [FL, FR, RL, RR], ?threshold, ?tyre, ?wear),
@@ -727,7 +728,8 @@ tyreWearWarning(?lap, ?tyre, ?wear) <= Call(tyreWearWarning, ?tyre, ?wear)
 ;;; Issues a warning to the driver, if the brake wear gets critical.        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: -15, {All: [?Lap], {None: [?Brake.Wear.Reported]}} => (Prove: checkBrakeWear(?Lap))
+priority: -15, {All: [?Lap], {None: [?Brake.Wear.Reported],
+					 [?Lap.Remaining.Session > ?Session.Settings.Pitstop.Service.Last]}} => (Prove: checkBrakeWear(?Lap))
 
 checkBrakeWear(?lap) <= ?threshold = 100 - !Session.Settings.Brake.Wear.Warning,
 						criticalBrakeWear(?lap, [FL, FR, RL, RR], ?threshold, ?brake, ?wear),

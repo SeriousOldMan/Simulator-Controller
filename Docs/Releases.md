@@ -41,6 +41,7 @@
   - More internal updates for wheel specific data handling. All applications now differentiate between driven laps for each tyre individually.
   - The data acquisition for *Le Mans Ultimate* now includes information about brake wear.
   - Tyre wear and also brake wear are now displayed in the lap reports of "Solo Center" and "Team Center", if that data is available.
+  - The driver name is now passed for each car to the LLM, so that you can get information about your opponents by name (by @alejandrocq). 
   
 # Release history
 

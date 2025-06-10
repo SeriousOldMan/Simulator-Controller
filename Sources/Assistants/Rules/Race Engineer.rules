@@ -472,6 +472,7 @@ updatePitstopTargetTime() <= computeTargetDamages(?damages),
 
 computeTargetDamages(?damages) <= computeDamages([true, true, true], [!Damage.Bodywork, !Damage.Suspension, !Damage.Engine], ?damages)
 
+
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Damage Impact Analysis                         ;;;
 ;;;                                                                         ;;;
@@ -696,6 +697,48 @@ setDamageReported(?damageType, true) <= Set(Damage.Reported, !Lap), Set(Damage, 
 
 pressureLossWarning(?tyre, ?lostPressure) <= Call(raiseEvent, PressureLoss, ?tyre, ?lostPressure), !
 pressureLossWarning(?tyre, ?lostPressure) <= Call(pressureLossWarning, ?tyre, ?lostPressure)
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Tyre Wear Warning                            ;;;
+;;;                                                                         ;;;
+;;; Issues a warning to the driver, if the tyre wear gets critical.         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+priority: -15, {All: [?Lap], {None: [?Tyre.Wear.Reported]}} => (Prove: checkTyreWear(?Lap))
+
+checkTyreWear(?lap) <= ?threshold = 100 - !Session.Settings.Tyre.Wear.Warning,
+					   criticalTyreWear(?lap, [FL, FR, RL, RR], ?threshold, ?tyre, ?wear),
+					   tyreWearWarning(?lap, ?tyre, ?wear), Set(Tyre.Wear.Reported, ?lap)
+
+criticalTyreWear(?, [], ?, ?, ?) <= !, fail
+criticalTyreWear(?lap, [?tyre | ?], ?threshold, ?tyre, ?wear) <= Get(Lap, ?lap, Tyre.Wear, ?tyre, ?wear), ?wear >= ?threshold
+criticalTyreWear(?lap, [? | ?tyres], ?threshold, ?tyre, ?wear) <= criticalTyreWear(?lap, ?tyres, ?threshold, ?tyre, ?wear)
+
+tyreWearWarning(?lap, ?tyre, ?wear) <= recentPitstopLap(?lap), !, fail
+tyreWearWarning(?lap, ?tyre, ?wear) <= Call(raiseEvent, TyreWear, ?tyre, ?wear), !
+tyreWearWarning(?lap, ?tyre, ?wear) <= Call(tyreWearWarning, ?tyre, ?wear)
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Brake Wear Warning                           ;;;
+;;;                                                                         ;;;
+;;; Issues a warning to the driver, if the brake wear gets critical.        ;;;
+;;;-------------------------------------------------------------------------;;;
+
+priority: -15, {All: [?Lap], {None: [?Brake.Wear.Reported]}} => (Prove: checkBrakeWear(?Lap))
+
+checkBrakeWear(?lap) <= ?threshold = 100 - !Session.Settings.Brake.Wear.Warning,
+						criticalBrakeWear(?lap, [FL, FR, RL, RR], ?threshold, ?brake, ?wear),
+						brakeWearWarning(?lap, ?brake, ?wear), Set(Brake.Wear.Reported, ?lap)
+
+criticalBrakeWear(?, [], ?, ?, ?) <= !, fail
+criticalBrakeWear(?lap, [?brake | ?], ?threshold, ?brake, ?wear) <= Get(Lap, ?lap, Brake.Wear, ?brake, ?wear), ?wear >= ?threshold
+criticalBrakeWear(?lap, [? | ?brakes], ?threshold, ?brake, ?wear) <= criticalBrakeWear(?lap, ?brakes, ?threshold, ?brake, ?wear)
+
+brakeWearWarning(?lap, ?brake, ?wear) <= recentPitstopLap(?lap), !, fail
+brakeWearWarning(?lap, ?brake, ?wear) <= Call(raiseEvent, BrakeWear, ?brake, ?wear), !
+brakeWearWarning(?lap, ?brake, ?wear) <= Call(brakeWearWarning, ?brake, ?wear)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1121,7 +1164,9 @@ priority: 5, {All: [?Session.Settings.Tyre.Service = Wheel], [?Pitstop.Planned.T
 				   {None: [Pitstop.Planned.Tyre.Compound.Color.RearRight]}} =>
 		(Set: Pitstop.Planned.Tyre.Compound.Color.RearRight, ?Pitstop.Planned.Tyre.Compound.Color)
 
-priority: -5, {All: [?Pitstop.Plan], [?Lap.Remaining.Session <= 5], {None: [?Pitstop.Plan.Tyre.Change = true]}} =>
+priority: -5, {All: [?Pitstop.Plan],
+					[?Lap.Remaining.Session <= ?Session.Settings.Pitstop.Service.Last],
+					{None: [?Pitstop.Plan.Tyre.Change = true]}} =>
 		(Set: Pitstop.Planned.Tyre.Compound, false), (Set: Pitstop.Planned.Tyre.Compound.Color, false),
 		(Set: Pitstop.Planned.Tyre.Compound.Front, false), (Set: Pitstop.Planned.Tyre.Compound.Color.Front, false),
 		(Set: Pitstop.Planned.Tyre.Compound.Rear, false), (Set: Pitstop.Planned.Tyre.Compound.Color.Rear, false),
@@ -1295,6 +1340,7 @@ priority: -10, [?Pitstop.Lap] => (Set: Pitstop.Clear, ?Pitstop.Lap)
 					(Prove: updateDamageReported(?Pitstop.Clear)),
 					(Set: Damage.Suspension.Reported, ?Pitstop.Clear), (Set: Damage.Bodywork.Reported, ?Pitstop.Clear),
 					(Set: Damage.Engine.Reported, ?Pitstop.Clear),
+					(Clear: Tyre.Wear.Reported), (Clear: Brake.Wear.Reported),
 					(Clear: Pitstop.Planned.Lap),
 					(Clear: Pitstop.Planned.Fuel),
 					(Clear: Pitstop.Planned.Tyre.Compound), (Clear: Pitstop.Planned.Tyre.Compound.Color),

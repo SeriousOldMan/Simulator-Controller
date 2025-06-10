@@ -60,12 +60,12 @@ class TyreWearEvent extends EngineerEvent {
 			wheels.Default := "worst"
 		}
 
-		return ("Tyres are worn out. Only " . (100 - Round(arguments[1])) . " percentage of tread left on the " . wheels[arguments[2]] . " tyre.")
+		return ("Tyres are worn out. Only " . (100 - Round(arguments[2])) . " percentage of tread left on the " . wheels[arguments[1]] . " tyre.")
 	}
 
 	handleEvent(event, arguments*) {
 		if !super.handleEvent(event, arguments*)
-			this.Assistant.tyreWearWarning(Round(arguments[1]), arguments[2])
+			this.Assistant.tyreWearWarning(arguments[1], Round(arguments[2]))
 
 		return true
 	}
@@ -82,12 +82,12 @@ class BrakeWearEvent extends EngineerEvent {
 			wheels.Default := "worst"
 		}
 
-		return ("Brake pads are worn out. Only " . (100 - Round(arguments[1])) . " percentage left on the " . wheels[arguments[2]] . " pad.")
+		return ("Brake pads are worn out. Only " . (100 - Round(arguments[2])) . " percentage left on the " . wheels[arguments[1]] . " pad.")
 	}
 
 	handleEvent(event, arguments*) {
 		if !super.handleEvent(event, arguments*)
-			this.Assistant.brakeWearWarning(Round(arguments[1]), arguments[2])
+			this.Assistant.brakeWearWarning(arguments[1], Round(arguments[2]))
 
 		return true
 	}
@@ -2437,6 +2437,7 @@ class RaceEngineer extends RaceAssistant {
 																											      , "Service.Tyres", 30)
 									, "Session.Settings.Pitstop.Service.Order", getMultiMapValue(settings, "Strategy Settings"
 																										 , "Service.Order", "Simultaneous")
+									, "Session.Settings.Pitstop.Service.Last", getMultiMapValue(settings, "Session Settings", "Pitstop.Service.Last", 5)
 									, "Session.Settings.Damage.Suspension.Repair", suspensionRepair
 									, "Session.Settings.Damage.Suspension.Repair.Threshold", suspensionThreshold
 									, "Session.Settings.Damage.Bodywork.Repair", bodyworkRepair
@@ -2448,9 +2449,9 @@ class RaceEngineer extends RaceAssistant {
 									, "Session.Settings.Tyre.Compound.Change.Threshold", getDeprecatedValue(settings, "Session Settings", "Race Settings"
 																													, "Tyre.Compound.Change.Threshold", 0)
 									, "Session.Settings.Tyre.Dry.Temperature.Ideal", getMultiMapValue(settings, "Session Settings"
-																														, "Tyre.Dry.Temperature.Ideal", 90)
+																											  , "Tyre.Dry.Temperature.Ideal", 90)
 									, "Session.Settings.Tyre.Wet.Temperature.Ideal", getMultiMapValue(settings, "Session Settings"
-																														, "Tyre.Wet.Temperature.Ideal", 55)
+																											  , "Tyre.Wet.Temperature.Ideal", 55)
 									, "Session.Settings.Tyre.Pressure.Correction.Temperature", getMultiMapValue(settings, "Session Settings"
 																														, "Tyre.Pressure.Correction.Temperature", true)
 									, "Session.Settings.Tyre.Pressure.Correction.Setup", getMultiMapValue(settings, "Session Settings"
@@ -2477,6 +2478,8 @@ class RaceEngineer extends RaceAssistant {
 																												 , "Tyre.Wet.Pressure.Target.RR", 30.0)
 									, "Session.Settings.Tyre.Pressure.Deviation", getDeprecatedValue(settings, "Session Settings", "Race Settings"
 																											 , "Tyre.Pressure.Deviation", 0.2)
+									, "Session.Settings.Tyre.Wear.Warning", getMultiMapValue(settings, "Session Settings", "Tyre.Wear.Warning", 25)
+									, "Session.Settings.Brake.Wear.Warning", getMultiMapValue(settings, "Session Settings", "Brake.Wear.Warning", 10)
 									, "Session.Setup.Tyre.Set.Fresh", getDeprecatedValue(settings, "Session Setup", "Race Setup"
 																								 , "Tyre.Set.Fresh", 8)
 									, "Session.Setup.Tyre.Set", getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Set", 7)
@@ -3656,7 +3659,8 @@ class RaceEngineer extends RaceAssistant {
 							speaker.speakPhrase(!tyreSet ? "WetTyresNoSet" : "WetTyres", {compound: fragments[compound . "Tyre"], color: color, set: tyreSet})
 					}
 					else {
-						if (forceTyreChange || (knowledgeBase.getValue("Lap.Remaining.Stint", 0) > 5))
+						if (forceTyreChange || (knowledgeBase.getValue("Lap.Remaining.Stint", 0)
+											  > knowledgeBase.getValue("Session.Settings.Pitstop.Service.Last", 5)))
 							speaker.speakPhrase("NoTyreChange")
 						else
 							speaker.speakPhrase("NoTyreChangeLap")
@@ -4549,7 +4553,7 @@ class RaceEngineer extends RaceAssistant {
 			}
 	}
 
-	tyreWearWarning(wear, tyre, planPitstop := true) {
+	tyreWearWarning(tyre, wear, planPitstop := true) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker
 
@@ -4594,7 +4598,7 @@ class RaceEngineer extends RaceAssistant {
 			}
 	}
 
-	brakeWearWarning(wear, brake, planPitstop := true) {
+	brakeWearWarning(brake, wear, planPitstop := true) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker
 
@@ -4609,7 +4613,7 @@ class RaceEngineer extends RaceAssistant {
 
 				try {
 					speaker.speakPhrase("BrakeWear", {wear: Round(wear), remaining: 100 - Round(wear)
-												    , brake: speaker.Fragments[wheels[tyre]]})
+												    , brake: speaker.Fragments[wheels[brake]]})
 
 					if this.supportsPitstop()
 						if this.hasPreparedPitstop()
@@ -4849,8 +4853,14 @@ lowFuelWarning(context, remainingFuel, remainingLaps) {
 	return true
 }
 
-tyreWearWarning(context, wear, tyre) {
-	context.KnowledgeBase.RaceAssistant.tyreWearWarning(Round(wear), tyre)
+tyreWearWarning(context, tyre, wear) {
+	context.KnowledgeBase.RaceAssistant.tyreWearWarning(tyre, Round(wear))
+
+	return true
+}
+
+brakeWearWarning(context, brake, wear) {
+	context.KnowledgeBase.RaceAssistant.brakeWearWarning(brake, Round(wear))
 
 	return true
 }

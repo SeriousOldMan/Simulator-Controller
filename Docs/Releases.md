@@ -42,6 +42,12 @@
   - The data acquisition for *Le Mans Ultimate* now includes information about brake wear.
   - Tyre wear and also brake wear are now displayed in the lap reports of "Solo Center" and "Team Center", if that data is available.
   - The driver name is now passed for each car to the LLM, so that you can get information about your opponents by name (by @alejandrocq). 
+  - The Engineer now observes the tyre wear and also the wear of the brake pads (if available in the data supplied by the simulator) and warns you, if the available tread or brake pad thickness falls below a given threshold.
+    - A new [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" lets you define the minimum available tyre tread, before a wear warning is issued.
+	- Also, a new [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" lets you define the minimum available brake pad thickness, before a wear warning is issued.
+	- Additionally, a couple of new [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) let you define in the "Session Database", in what sessions these warnings will be given. Reasonable defaults are already chosen, of course.
+	- New [events and actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-engineer) for the *Reasoning* booster have been defined, which allows a connected LLM to handle the tyre wear and brake wear accordingly.
+  - A new [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" lets you specify the number of laps before the end of the race, for which the Engineer does not consider pitstop services like tyre change, brake pad change and so on anymore.
   
 # Release history
 

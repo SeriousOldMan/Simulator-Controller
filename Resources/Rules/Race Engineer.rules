@@ -714,7 +714,7 @@ checkTyreWear(?lap) <= ?threshold = 100 - !Session.Settings.Tyre.Wear.Warning,
 					   tyreWearWarning(?lap, ?tyre, ?wear), Set(Tyre.Wear.Reported, ?lap)
 
 criticalTyreWear(?, [], ?, ?, ?) <= !, fail
-criticalTyreWear(?lap, [?tyre | ?], ?threshold, ?tyre, ?wear) <= Get(Lap, ?lap, Tyre.Wear, ?tyre, ?wear), ?wear >= ?threshold
+criticalTyreWear(?lap, [?tyre | ?], ?threshold, ?tyre, ?wear) <= Get(Lap, ?lap, Tyre.Wear, ?tyre, ?wear), ?wear >= ?threshold, !
 criticalTyreWear(?lap, [? | ?tyres], ?threshold, ?tyre, ?wear) <= criticalTyreWear(?lap, ?tyres, ?threshold, ?tyre, ?wear)
 
 tyreWearWarning(?lap, ?tyre, ?wear) <= recentPitstopLap(?lap), !, fail
@@ -736,7 +736,7 @@ checkBrakeWear(?lap) <= ?threshold = 100 - !Session.Settings.Brake.Wear.Warning,
 						brakeWearWarning(?lap, ?brake, ?wear), Set(Brake.Wear.Reported, ?lap)
 
 criticalBrakeWear(?, [], ?, ?, ?) <= !, fail
-criticalBrakeWear(?lap, [?brake | ?], ?threshold, ?brake, ?wear) <= Get(Lap, ?lap, Brake.Wear, ?brake, ?wear), ?wear >= ?threshold
+criticalBrakeWear(?lap, [?brake | ?], ?threshold, ?brake, ?wear) <= Get(Lap, ?lap, Brake.Wear, ?brake, ?wear), ?wear >= ?threshold, !
 criticalBrakeWear(?lap, [? | ?brakes], ?threshold, ?brake, ?wear) <= criticalBrakeWear(?lap, ?brakes, ?threshold, ?brake, ?wear)
 
 brakeWearWarning(?lap, ?brake, ?wear) <= recentPitstopLap(?lap), !, fail

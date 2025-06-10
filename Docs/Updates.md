@@ -37,13 +37,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 6.3.6
 
-Nothing to do.
-
-***
-
-## Release 6.3.6
-
-No required manual updates.
+New events and new actions have been defined for the *Reasoning* Booster of the Race Engineer. You may want to update your Events and Actions configuration and include the "tyre_wear" and "brake_wear" events and the "report_tyre_wear" and "report_brake_wear" actions, if necessary.
 
 ***
 

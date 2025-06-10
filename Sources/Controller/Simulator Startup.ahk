@@ -1405,6 +1405,8 @@ availableFunctions(configuration, &hasTeamServer := false
 	if hasRaceEngineer {
 		functions.Push(Array("Race Engineer", "Pressure Collection"))
 		functions.Push(Array("Race Engineer", "Fuel Warning"))
+		functions.Push(Array("Race Engineer", "Tyre Warning"))
+		functions.Push(Array("Race Engineer", "Brake Warning"))
 		functions.Push(Array("Race Engineer", "Damage Warning"))
 		functions.Push(Array("Race Engineer", "Pressure Warning"))
 		functions.Push(Array("Race Engineer", "Pressure Correction by Temperature"))

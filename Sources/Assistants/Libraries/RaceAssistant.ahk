@@ -3276,6 +3276,9 @@ class GridRaceAssistant extends RaceAssistant {
 
 			try {
 				carData := Map("Nr", this.getNr(car)
+							 , "DriverName", driverName(knowledgeBase.getValue("Car." . car . ".Driver.Forname")
+													  , knowledgeBase.getValue("Car." . car . ".Driver.Surname")
+													  , knowledgeBase.getValue("Car." . car . ".Driver.Nickname"))
 							 , "Class", this.getClass(car)
 							 , "Laps", knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0))
 							 , "OverallPosition", this.getPosition(car, "Overall")

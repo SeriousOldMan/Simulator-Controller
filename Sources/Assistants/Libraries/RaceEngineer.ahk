@@ -4567,8 +4567,9 @@ class RaceEngineer extends RaceAssistant {
 				speaker.beginTalk()
 
 				try {
-					speaker.speakPhrase("TyreWear", {wear: Round(wear), remaining: 100 - Round(wear)
-												   , tyre: speaker.Fragments[wheels[tyre]]})
+					speaker.speakPhrase("TyreWearWarning", {tyre: speaker.Fragments[wheels[tyre]]})
+
+					speaker.speakPhrase("Wear" . tyre, {used: Round(wear), remaining: Round(100 - wear)})
 
 					if this.supportsPitstop()
 						if this.hasPreparedPitstop()
@@ -4612,8 +4613,9 @@ class RaceEngineer extends RaceAssistant {
 				speaker.beginTalk()
 
 				try {
-					speaker.speakPhrase("BrakeWear", {wear: Round(wear), remaining: 100 - Round(wear)
-												    , brake: speaker.Fragments[wheels[brake]]})
+					speaker.speakPhrase("BrakeWearWarning", {brake: speaker.Fragments[wheels[brake]]})
+
+					speaker.speakPhrase("Wear" . tyre, {used: Round(wear), remaining: Round(100 - wear)})
 
 					if this.supportsPitstop()
 						if this.hasPreparedPitstop()

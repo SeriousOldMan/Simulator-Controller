@@ -54,7 +54,7 @@ CanYou=Você pode
 
 CanWe=Podemos
 
-Announcements=avisos de combustível, avisos de danos, análise de danos, atualizações meteorológicas, avisos de pressão
+Announcements=avisos de combustível, avisos de desgaste dos pneus, avisos de desgaste do freio, avisos de danos, análise de danos, atualizações meteorológicas, avisos de pressão
 
 #### Commands
 

@@ -55,7 +55,7 @@ KoennenWir=Kannst Du, Können wir, Kannst Du bitte, Können wir bitte
 
 Mir=mir, mir bitte
 
-Announcements=Benzinmangel Warnungen, Schadenswarnungen, Schadensanalysen, Wetterwarnungen, Luftdruckwarnungen
+Announcements=Benzinmangel Warnungen, Reifenverschleiß Warnungen, Bremsenverschleiß Warnungen, Schadenswarnungen, Schadensanalysen, Wetterwarnungen, Luftdruckwarnungen
 
 #### Befehle
 

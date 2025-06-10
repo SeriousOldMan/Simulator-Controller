@@ -35,6 +35,7 @@
   - Fixed the import of the initial setup at the start of the session. Was broken with the last release.
   - Fixed a couple of minor problems with regards to pitstop tyre data display in "Team Center", which were introduced with the new tyre compound handling for individual wheels.
   - Fixed an unhandled exception in the voice recognition test mode which prevents a normal interaction with the Driving Coach.
+  - Fixed importing the currently mounted tyre compound into "Solo Center" by using the copy button.
 
 #### Changes
 

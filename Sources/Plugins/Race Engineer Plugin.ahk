@@ -214,7 +214,8 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 	loadSettings(simulator, car, track, data := false, settings := false) {
 		local tyresDB, simulatorName, compound, compoundColor
 		local tpSettings, pressures, certainty, collectPressure, pitstopService, ignore, session
-		local fuelWarning, damageWarning, pressureWarning, correctByTemperatures, correctByDatabase, correctForPressureLoss
+		local fuelWarning, tyreWarning, brakeWarning, damageWarning, pressureWarning
+		local correctByTemperatures, correctByDatabase, correctForPressureLoss
 		local mixedCompounds, index, tyre, axle
 		local weather, airTemperature, trackTemperature
 
@@ -290,49 +291,61 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 			collectPressure := getMultiMapValue(this.StartupSettings, "Functions", "Pressure Collection", kUndefined)
 
 			if (collectPressure != kUndefined)
-				for ignore, session in ["Practice", "Qualification", "Race"]
+				for ignore, session in ["Practice", "Qualification", "Race", "Time Trial"]
 					setMultiMapValue(settings, "Session Settings", "Telemetry." . session, collectPressure)
 
 			pitstopService := getMultiMapValue(this.StartupSettings, "Functions", "Pitstop Service", kUndefined)
 
 			if (pitstopService != kUndefined)
-				for ignore, session in ["Practice", "Qualification", "Race"]
+				for ignore, session in ["Practice", "Qualification", "Race", "Time Trial"]
 					setMultiMapValue(settings, "Session Settings", "Pitstop." . session, pitstopService)
 
 			fuelWarning := getMultiMapValue(this.StartupSettings, "Functions", "Fuel Warning", kUndefined)
 
 			if (fuelWarning != kUndefined)
-				for ignore, session in ["Practice", "Qualification", "Race"]
+				for ignore, session in ["Practice", "Qualification", "Race", "Time Trial"]
 					setMultiMapValue(settings, "Assistant.Engineer", "Announcement." . session . ".LowFuel", fuelWarning)
+
+			tyreWarning := getMultiMapValue(this.StartupSettings, "Functions", "Tyre Warning", kUndefined)
+
+			if (tyreWarning != kUndefined)
+				for ignore, session in ["Practice", "Qualification", "Race", "Time Trial"]
+					setMultiMapValue(settings, "Assistant.Engineer", "Announcement." . session . ".TyreWear", tyreWarning)
+
+			brakeWarning := getMultiMapValue(this.StartupSettings, "Functions", "Brake Warning", kUndefined)
+
+			if (brakeWarning != kUndefined)
+				for ignore, session in ["Practice", "Qualification", "Race", "Time Trial"]
+					setMultiMapValue(settings, "Assistant.Engineer", "Announcement." . session . ".BrakeWear", brakeWarning)
 
 			damageWarning := getMultiMapValue(this.StartupSettings, "Functions", "Damage Warning", kUndefined)
 
 			if (damageWarning != kUndefined)
-				for ignore, session in ["Practice", "Qualification", "Race"]
+				for ignore, session in ["Practice", "Qualification", "Race", "Time Trial"]
 					setMultiMapValue(settings, "Assistant.Engineer", "Announcement." . session . ".Damage", damageWarning)
 
 			pressureWarning := getMultiMapValue(this.StartupSettings, "Functions", "Pressure Warning", kUndefined)
 
 			if (pressureWarning != kUndefined)
-				for ignore, session in ["Practice", "Qualification", "Race"]
+				for ignore, session in ["Practice", "Qualification", "Race", "Time Trial"]
 					setMultiMapValue(settings, "Assistant.Engineer", "Announcement." . session . ".Pressure", pressureWarning)
 
 			correctByTemperatures := getMultiMapValue(this.StartupSettings, "Functions", "Pressure Correction by Temperature", kUndefined)
 
 			if (correctByTemperatures != kUndefined)
-				for ignore, session in ["Practice", "Qualification", "Race"]
+				for ignore, session in ["Practice", "Qualification", "Race", "Time Trial"]
 					setMultiMapValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature", correctByTemperatures)
 
 			correctByDatabase := getMultiMapValue(this.StartupSettings, "Functions", "Pressure Correction from Database", kUndefined)
 
 			if (correctByDatabase != kUndefined)
-				for ignore, session in ["Practice", "Qualification", "Race"]
+				for ignore, session in ["Practice", "Qualification", "Race", "Time Trial"]
 					setMultiMapValue(settings, "Session Settings", "Tyre.Pressure.Correction.Setup", correctByDatabase)
 
 			correctForPressureLoss := getMultiMapValue(this.StartupSettings, "Functions", "Pressure Correction for Pressure Loss", kUndefined)
 
 			if (correctForPressureLoss != kUndefined)
-				for ignore, session in ["Practice", "Qualification", "Race"]
+				for ignore, session in ["Practice", "Qualification", "Race", "Time Trial"]
 					setMultiMapValue(settings, "Session Settings", "Tyre.Pressure.Correction.Pressure", correctForPressureLoss)
 		}
 

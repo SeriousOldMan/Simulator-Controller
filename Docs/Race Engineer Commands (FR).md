@@ -55,7 +55,7 @@ CanYou=Pouvez-vous, S'il vous plaît pouvez-vous
 
 CanWe=Pouvez-vous, Pouvons-nous, S'il vous plaît pouvez-vous, S'il vous plaît pouvons-nous
 
-Announcements=avertissements de carburant, avertissements de dommages, analyse des dommages, avertissements météo, avertissements de pression
+Announcements=avertissements de carburant, avertissements d'usure des pneus, avertissements d'usure des freins, avertissements de dommages, analyse des dommages, avertissements météo, avertissements de pression
 
 #### Commandes
 

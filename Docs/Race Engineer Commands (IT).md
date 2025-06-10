@@ -55,7 +55,7 @@ CanYou=Puoi, Possiamo, Per favore
 
 CanWe=Puoi, Possiamo, Per favore
 
-Information=avvisi carburante, avvisi danni, analisi danni, avvisi meteo, avvisi pressione
+Information=avvisi carburante, avvisi sull'usura dei pneumatici, avvisi di usura dei freni, avvisi danni, analisi danni, avvisi meteo, avvisi pressione
 
 #### Comandi
 

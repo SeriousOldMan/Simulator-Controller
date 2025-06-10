@@ -54,7 +54,7 @@ CanYou=Puedes, por favor
 
 CanWe=Puedes, podemos, por favor
 
-Announcements=advertencias de combustible, advertencias de daños, análisis de daños, advertencias meteorológicas, advertencias de presión
+Announcements=advertencias de combustible, avisos de desgaste de neumáticos, aviso de desgaste de frenos, advertencias de daños, análisis de daños, advertencias meteorológicas, advertencias de presión
 
 #### Comandos
 

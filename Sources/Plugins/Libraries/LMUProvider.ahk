@@ -234,12 +234,15 @@ class LMUProvider extends Sector397Provider {
 		local simulator := this.Simulator
 		local car, track, data, setupData, tyreCompound, tyreCompoundColor, key, postFix, fuelAmount
 		local weatherData, wheelData, brakeData, lap, weather, time, session, remainingTime, fuelRatio
+		local newPositions, position
 
 		static keys := Map("All", "", "Front Left", "FrontLeft", "Front Right", "FrontRight"
 									, "Rear Left", "RearLeft", "Rear Right", "RearRight")
 
 		static wheels := Map("Front Left", "FrontLeft", "Front Right", "FrontRight"
 						   , "Rear Left", "RearLeft", "Rear Right", "RearRight")
+
+		static lastPositions := false
 
 		static lastLap := 0
 		static duration := 0
@@ -341,6 +344,31 @@ class LMUProvider extends Sector397Provider {
 			}
 
 			if !InStr(options, "Standings=true") {
+				loop {
+					position := getMultiMapValue(data, "Track Data", "Car." . A_Index . ".Position", false)
+
+					if position
+						newPositions.Push(position)
+					else
+						break
+				}
+
+				if (lastPositions && (lastPositions.Length = newPositions.Length)) {
+					paused := true
+
+					loop lastPositions.Length
+						if (lastPositions[A_Index] != newPositions[A_Index]) {
+							paused := false
+
+							break
+						}
+
+					if paused
+						setMultiMapValue(data, "Session Data", "Paused", true)
+				}
+
+				lastPositions := newPositions
+
 				if car
 					setMultiMapValue(data, "Session Data", "Car", car)
 				else

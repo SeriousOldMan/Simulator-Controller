@@ -50,6 +50,8 @@
 	- Two new [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) let you specify, whether the Engineer will ask for confirmation to plan a pitstop, after excessive tyre or brake pad wear had been detected. This is also part of the so called "Autonomous" mode.
 	- Additionally, a couple of new [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) let you define in the "Session Database", in what sessions these warnings will be given. Reasonable defaults are already chosen, of course.
 	- New [events and actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-engineer) for the *Reasoning* booster have been defined, which allows a connected LLM to handle the tyre wear and brake wear accordingly. Revisit your event and action configuration, if you have configured a *Reasoning* booster and include the new events and actions, if necessary.
+	
+	Please note, that brake pad changes are not (yet) handled by the Race Engineer.
   - A new [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" lets you specify the number of laps before the end of the race, for which the Engineer does not consider pitstop services like tyre change, brake pad change and so on anymore.
   - Added car meta data for the new Pack 5 cars for *Le Mans Ultimate*.
   - Pausing the game is now detected for *Le Mans Ultimate*.

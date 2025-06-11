@@ -344,6 +344,8 @@ class LMUProvider extends Sector397Provider {
 			}
 
 			if !InStr(options, "Standings=true") {
+				newPositions := []
+
 				loop {
 					position := getMultiMapValue(data, "Track Data", "Car." . A_Index . ".Position", false)
 

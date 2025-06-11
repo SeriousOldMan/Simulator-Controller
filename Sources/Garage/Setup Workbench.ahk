@@ -2139,6 +2139,8 @@ class NumberHandler extends SettingHandler {
 class DiscreteValuesHandler extends NumberHandler {
 	iZero := false
 	iIncrement := false
+	iStep := false
+
 	iMinValue := kUndefined
 	iMaxValue := kUndefined
 
@@ -2153,6 +2155,12 @@ class DiscreteValuesHandler extends NumberHandler {
 	Increment {
 		Get {
 			return this.iIncrement
+		}
+	}
+
+	Step {
+		Get {
+			return this.iStep
 		}
 	}
 
@@ -2179,21 +2187,19 @@ class DiscreteValuesHandler extends NumberHandler {
 		this.iMinValue := minValue
 		this.iMaxValue := maxValue
 		this.iReverse := ((isNumber(minValue) && isNumber(maxValue)) && (maxValue < minValue))
-		this.iIncrement := Abs(increment)
+		this.iIncrement := increment
+		this.iStep := Abs(increment)
 	}
 
 	convertToDisplayValue(rawValue) {
-		if this.Reverse
-			return this.formatValue(this.Zero - (rawValue * this.Increment))
-		else
-			return this.formatValue(this.Zero + (rawValue * this.Increment))
+		return this.formatValue(this.Zero + (rawValue * this.Increment))
 	}
 
 	convertToRawValue(displayValue) {
 		if this.Reverse
-			return Round((this.Zero - displayValue) / this.Increment)
+			return Round((this.Zero - displayValue) / this.Step)
 		else
-			return Round((displayValue - this.Zero) / this.Increment)
+			return Round((displayValue - this.Zero) / this.Step)
 	}
 
 	increaseValue(displayValue) {

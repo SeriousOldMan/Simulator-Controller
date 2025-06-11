@@ -51,6 +51,7 @@
 	- New [events and actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-engineer) for the *Reasoning* booster have been defined, which allows a connected LLM to handle the tyre wear and brake wear accordingly. Revisit your event and action configuration, if you have configured a *Reasoning* booster and include the new events and actions, if necessary.
   - A new [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" lets you specify the number of laps before the end of the race, for which the Engineer does not consider pitstop services like tyre change, brake pad change and so on anymore.
   - Added car meta data for the new Pack 5 cars for *Le Mans Ultimate*.
+  - Support for setting handlers with negative step values has been added to "Setup Workbench". This is used for the damper settings for the Lamborghini Huracan in *Le Mans Ultimate*.
   - New car models for "Setup Workbench":
     - Le Mans Ultimate
 	  - Lamborghini Huracán LMGT3 Evo2

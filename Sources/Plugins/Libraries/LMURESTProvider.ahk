@@ -846,7 +846,7 @@ class LMURESTProvider {
 				}
 			}
 
-			return false
+			return 0.032
 		}
 	}
 

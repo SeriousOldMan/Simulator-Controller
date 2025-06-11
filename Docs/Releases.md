@@ -36,6 +36,7 @@
   - Fixed a couple of minor problems with regards to pitstop tyre data display in "Team Center", which were introduced with the new tyre compound handling for individual wheels.
   - Fixed an unhandled exception in the voice recognition test mode which prevents a normal interaction with the Driving Coach.
   - Fixed importing the currently mounted tyre compound into "Solo Center" by using the copy button.
+  - Fixed many glitches and incompatibilities with the new version of the *Le Mans Ultimate* API, which was changed without notice with their last release.
 
 #### Changes
 
@@ -53,6 +54,8 @@
 	Please note, that brake pad changes are not (yet) handled by the Race Engineer.
   - A new [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" lets you specify the number of laps before the end of the race, for which the Engineer does not consider pitstop services like tyre change, brake pad change and so on anymore.
   - Added car meta data for the new Pack 5 cars for *Le Mans Ultimate*.
+  - Pausing the game is now detected for *Le Mans Ultimate*.
+  - Support for setting handlers with negative step values has been added to "Setup Workbench". This is used for the damper settings for the Lamborghini Huracan in *Le Mans Ultimate*.
   - New car models for "Setup Workbench":
     - Le Mans Ultimate
 	  - Lamborghini Huracán LMGT3 Evo2

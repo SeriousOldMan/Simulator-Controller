@@ -4615,7 +4615,7 @@ class RaceEngineer extends RaceAssistant {
 				try {
 					speaker.speakPhrase("BrakeWearWarning", {brake: speaker.Fragments[wheels[brake]]})
 
-					speaker.speakPhrase("Wear" . tyre, {used: Round(wear), remaining: Round(100 - wear)})
+					speaker.speakPhrase("Wear" . brake, {used: Round(wear), remaining: Round(100 - wear)})
 
 					if this.supportsPitstop()
 						if this.hasPreparedPitstop()

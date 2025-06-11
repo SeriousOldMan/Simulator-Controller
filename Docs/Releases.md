@@ -36,6 +36,7 @@
   - Fixed a couple of minor problems with regards to pitstop tyre data display in "Team Center", which were introduced with the new tyre compound handling for individual wheels.
   - Fixed an unhandled exception in the voice recognition test mode which prevents a normal interaction with the Driving Coach.
   - Fixed importing the currently mounted tyre compound into "Solo Center" by using the copy button.
+  - Fixed many glitches and incompatibilities with the new version of the *Le Mans Ultimate* API, which was changed without notice with their last release.
 
 #### Changes
 

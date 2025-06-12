@@ -1,30 +1,8 @@
 # Latest stable release
 
-## 6.3.5.0
-
-#### Date: 06/06/25
-
-#### Fixes
-
-  - A bug has been fixed in the strategy-based pitstop handling, which caused the wrong tyre compound to be chosen.
-  - Fixed a bug, that caused an emergency pitstop to be planned for lap, that was actually in the "past".
-  - Fixed the handling of tyre compounds in the strategy validation scripts, which has been broken with the introduction of multiple tyre compounds in one of the last releases.
-  - Fixed several type conversion problems between *Lua* scripts and the host process, which caused especially floating point values to be coerced to integer values.
-  - Fixed a bug that prevented on-track strategy simulation for sessions with undefined tyre sets.
-  - Fixed a bug in "Simulator Setup", which prevented alternative download mirrors to be used for DLCs.
-  - Fixed updating of recent lap telemetry data in "Solo Center". This bug resulted in unavailable tyre pressure and temperatur data for laps shortly after a pitstop.
-
-#### Changes
-
-  - The "Laps" data entries in the session database can now handle wheel specific information about the number of driven laps on the mounted tyre. You will find now four different tyre laps properties in the data reports in the "Strategy Workbench", "Solo Center" and "Team Center" applications, one for each wheel. Data points are still uniform for all four wheels with this release, but this will change with the next release.
-  - Consent can now be given in the [personal profile dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#managing-your-privacy) to share anonymous data from your sessions that will be used to train models for the Assistants AI. The default for this setting is "No", so make sure, that you change it, if you want to contribute.
-  - [Expert] When [defining the meta data for a new car](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-a-new-car) in the "Setup Workbench", [Lua](https://lua.org/) scripts can now be used to create handlers for complex settings in the setup, which cannot be defined correctly by using one of the predefined handlers.
-
-# Upcoming release
-
 ## 6.3.6.0
 
-#### Date: 06/13/25 (planned)
+#### Date: 06/13/25
 
 #### Fixes
 
@@ -60,8 +38,32 @@
       - Lexus RC F LMGT3
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-636), if you have configured a *Reasoning* booster for the Race Engineer.
+
+# Upcoming release
+
+Not yet planned...
   
 # Release history
+
+## 6.3.5.0
+
+#### Date: 06/06/25
+
+#### Fixes
+
+  - A bug has been fixed in the strategy-based pitstop handling, which caused the wrong tyre compound to be chosen.
+  - Fixed a bug, that caused an emergency pitstop to be planned for lap, that was actually in the "past".
+  - Fixed the handling of tyre compounds in the strategy validation scripts, which has been broken with the introduction of multiple tyre compounds in one of the last releases.
+  - Fixed several type conversion problems between *Lua* scripts and the host process, which caused especially floating point values to be coerced to integer values.
+  - Fixed a bug that prevented on-track strategy simulation for sessions with undefined tyre sets.
+  - Fixed a bug in "Simulator Setup", which prevented alternative download mirrors to be used for DLCs.
+  - Fixed updating of recent lap telemetry data in "Solo Center". This bug resulted in unavailable tyre pressure and temperatur data for laps shortly after a pitstop.
+
+#### Changes
+
+  - The "Laps" data entries in the session database can now handle wheel specific information about the number of driven laps on the mounted tyre. You will find now four different tyre laps properties in the data reports in the "Strategy Workbench", "Solo Center" and "Team Center" applications, one for each wheel. Data points are still uniform for all four wheels with this release, but this will change with the next release.
+  - Consent can now be given in the [personal profile dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#managing-your-privacy) to share anonymous data from your sessions that will be used to train models for the Assistants AI. The default for this setting is "No", so make sure, that you change it, if you want to contribute.
+  - [Expert] When [defining the meta data for a new car](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-a-new-car) in the "Setup Workbench", [Lua](https://lua.org/) scripts can now be used to create handlers for complex settings in the setup, which cannot be defined correctly by using one of the predefined handlers.
 
 ## 6.3.4.0
 

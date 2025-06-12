@@ -40,7 +40,7 @@
 #Include "..\Framework\Extensions\Task.ahk"
 #Include "..\Framework\Extensions\Messages.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
-#Include "..\Plugins\Simulator Providers.ahk"
+#Include "..\Plugins\Libraries\SimulatorProvider.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -2462,6 +2462,16 @@ monitoringMessageHandler(category, data) {
 		else
 			return functionMessageHandler(category, data)
 }
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                          Plugin Include Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+if kLogStartup
+	logMessage(kLogOff, "Loading plugins...")
+
+#Include "..\Plugins\Simulator Providers.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

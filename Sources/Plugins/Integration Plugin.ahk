@@ -12,7 +12,7 @@
 #Include "..\Framework\Extensions\Task.ahk"
 #Include "..\Framework\Extensions\JSON.ahk"
 #Include "Driving Coach Plugin.ahk"
-#Include "Simulator Providers.ahk"
+#Include "Libraries\SimulatorProvider.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

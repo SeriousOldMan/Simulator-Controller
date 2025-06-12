@@ -47,7 +47,7 @@
 #Include "..\Database\Libraries\TyresDatabase.ahk"
 #Include "..\Database\Libraries\LapsDatabase.ahk"
 #Include "..\Database\Libraries\TelemetryViewer.ahk"
-#Include "..\Plugins\Simulator Providers.ahk"
+#Include "..\Plugins\Libraries\SimulatorProvider.ahk"
 #Include "Libraries\RaceReportViewer.ahk"
 #Include "Libraries\Strategy.ahk"
 #Include "Libraries\StrategyViewer.ahk"
@@ -14837,6 +14837,16 @@ setTyrePressures(tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPres
 
 	return false
 }
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                          Plugin Include Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+if kLogStartup
+	logMessage(kLogOff, "Loading plugins...")
+
+#Include "..\Plugins\Simulator Providers.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

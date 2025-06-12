@@ -1594,8 +1594,8 @@ class RaceSpotter extends GridRaceAssistant {
 			knowledgeBase := this.KnowledgeBase
 			remainingSessionLaps := knowledgeBase.getValue("Lap.Remaining.Session", 0)
 			remainingStintLaps := knowledgeBase.getValue("Lap.Remaining.Stint", 0)
-			remainingSessionTime := Round(knowledgeBase.getValue("Session.Time.Remaining") / 60000)
-			remainingStintTime := Round(knowledgeBase.getValue("Driver.Time.Stint.Remaining") / 60000)
+			remainingSessionTime := Round(knowledgeBase.getValue("Session.Time.Remaining", 0) / 60000)
+			remainingStintTime := Round(knowledgeBase.getValue("Driver.Time.Stint.Remaining", 0) / 60000)
 
 			if (remainingSessionLaps > 0) {
 				speaker.beginTalk()
@@ -1605,7 +1605,7 @@ class RaceSpotter extends GridRaceAssistant {
 														, laps: remainingSessionLaps
 														, position: Round(positions["Position.Class"])})
 
-					remainingFuelLaps := Floor(knowledgeBase.getValue("Lap.Remaining.Fuel"))
+					remainingFuelLaps := Floor(knowledgeBase.getValue("Lap.Remaining.Fuel", 0))
 
 					if (remainingStintTime < remainingSessionTime) {
 						speaker.speakPhrase("HalfTimeStint", {minutes: remainingStintTime, laps: Floor(remainingStintLaps)})

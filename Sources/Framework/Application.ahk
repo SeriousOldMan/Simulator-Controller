@@ -192,48 +192,50 @@ startDatabaseSynchronizer() {
 
 		ID := StrSplit(FileRead(idFileName), "`n", "`r")[1]
 
-		dbIDFileName := kDatabaseDirectory . "ID"
+		dbIDFileName := (kDatabaseDirectory . "ID")
 
-		try {
-			dbID := StrSplit(FileRead(dbIDFileName),"`n","`r")[1]
-		}
-		catch Any as exception {
-			logError(exception, true)
-
-			dbID := false
-		}
-
-		if (ID = dbID) {
-			consent := readMultiMap(kUserConfigDirectory . "CONSENT")
-
-			shareTyrePressures := (getMultiMapValue(consent, "Consent", "Share Tyre Pressures", "No") = "Yes")
-			shareCarSetups := (getMultiMapValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
-			shareRaceStrategies := (getMultiMapValue(consent, "Consent", "Share Race Strategies", "No") = "Yes")
-			shareLapTelemetries := (getMultiMapValue(consent, "Consent", "Share Lap Telemetries", "No") = "Yes")
-
-			options := ("-ID `"" . ID . "`" -Synchronize " . true)
-
-			if shareTyrePressures
-				options .= " -Pressures"
-
-			if shareCarSetups
-				options .= " -Setups"
-
-			if shareRaceStrategies
-				options .= " -Strategies"
-
-			if shareLapTelemetries
-				options .= " -Telemetries"
-
+		if FileExist(dbIDFileName) {
 			try {
-				Run(kBinariesDirectory . "Database Synchronizer.exe " . options)
+				dbID := StrSplit(FileRead(dbIDFileName), "`n", "`r")[1]
 			}
 			catch Any as exception {
-				logMessage(kLogCritical, translate("Cannot start Database Synchronizer - please rebuild the applications..."))
+				logError(exception, true)
 
-				if !kSilentMode
-					showMessage(translate("Cannot start Database Synchronizer - please rebuild the applications...")
-							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				dbID := false
+			}
+
+			if (ID = dbID) {
+				consent := readMultiMap(kUserConfigDirectory . "CONSENT")
+
+				shareTyrePressures := (getMultiMapValue(consent, "Consent", "Share Tyre Pressures", "No") = "Yes")
+				shareCarSetups := (getMultiMapValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
+				shareRaceStrategies := (getMultiMapValue(consent, "Consent", "Share Race Strategies", "No") = "Yes")
+				shareLapTelemetries := (getMultiMapValue(consent, "Consent", "Share Lap Telemetries", "No") = "Yes")
+
+				options := ("-ID `"" . ID . "`" -Synchronize " . true)
+
+				if shareTyrePressures
+					options .= " -Pressures"
+
+				if shareCarSetups
+					options .= " -Setups"
+
+				if shareRaceStrategies
+					options .= " -Strategies"
+
+				if shareLapTelemetries
+					options .= " -Telemetries"
+
+				try {
+					Run(kBinariesDirectory . "Database Synchronizer.exe " . options)
+				}
+				catch Any as exception {
+					logMessage(kLogCritical, translate("Cannot start Database Synchronizer - please rebuild the applications..."))
+
+					if !kSilentMode
+						showMessage(translate("Cannot start Database Synchronizer - please rebuild the applications...")
+								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				}
 			}
 		}
 	}

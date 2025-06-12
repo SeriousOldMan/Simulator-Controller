@@ -126,7 +126,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 
 	simulatorStartup(simulator) {
 		if (simulator = kR3EApplication)
-			Task.startTask(ObjBindMethod(R3EPlugin, "loadDatabase"), 1000, kLowPriority)
+			Task.startTask(ObjBindMethod(R3EProvider, "loadDatabase"), 1000, kLowPriority)
 
 		super.simulatorStartup(simulator)
 	}

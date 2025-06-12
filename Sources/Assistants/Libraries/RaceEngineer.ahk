@@ -4560,6 +4560,9 @@ class RaceEngineer extends RaceAssistant {
 		static wheels := CaseInsenseMap("FL", "FrontLeft", "FR", "FrontRight"
 								      , "RL", "RearLeft", "RR", "RearRight")
 
+		if !inList(["FL", "FR", "RL", "RR"], tyre)
+			throw "Unknown tyre descriptor (" . tyre . ") detected in RaceEngineer.tyreWearWarning..."
+
 		if (this.hasEnoughData(false) && this.Speaker[false] && this.Announcements["TyreWearWarning"])
 			if (!knowledgeBase.getValue("InPitLane", false) && !knowledgeBase.getValue("InPit", false)) {
 				speaker := this.getSpeaker()
@@ -4605,6 +4608,9 @@ class RaceEngineer extends RaceAssistant {
 
 		static wheels := CaseInsenseMap("FL", "FrontLeft", "FR", "FrontRight"
 								      , "RL", "RearLeft", "RR", "RearRight")
+
+		if !inList(["FL", "FR", "RL", "RR"], brake)
+			throw "Unknown tyre descriptor (" . brake . ") detected in RaceEngineer.brakeWearWarning..."
 
 		if (this.hasEnoughData(false) && this.Speaker[false] && this.Announcements["BrakeWearWarning"])
 			if (!knowledgeBase.getValue("InPitLane", false) && !knowledgeBase.getValue("InPit", false)) {
@@ -4731,6 +4737,9 @@ class RaceEngineer extends RaceAssistant {
 		local speaker, fragments
 
 		static tyreLookup := CaseInsenseMap("FL", "FrontLeft", "FR", "FrontRight", "RL", "RearLeft", "RR", "RearRight")
+
+		if !inList(["FL", "FR", "RL", "RR"], tyre)
+			throw "Unknown tyre descriptor (" . tyre . ") detected in RaceEngineer.pressureLossWarning..."
 
 		if (this.hasEnoughData(false) && (this.Session == kSessionRace))
 			if (!knowledgeBase.getValue("InPitLane", false) && !knowledgeBase.getValue("InPit", false))

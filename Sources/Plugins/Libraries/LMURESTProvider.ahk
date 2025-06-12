@@ -783,9 +783,15 @@ class LMURESTProvider {
 		}
 
 		getBrakepadThickness(tyre) {
+			local thickness
 			if this.Data
 				try {
-					return this.Data[inList(["FL", "FR", "RL", "RR"], LMURESTProvider.TyreTypes[tyre])]
+					thickness := this.Data[inList(["FL", "FR", "RL", "RR"], LMURESTProvider.TyreTypes[tyre])]
+
+					if (thickness > 0)
+						return thickness
+					else
+						this.reload()
 				}
 				catch Any as exception {
 					logError(exception)
@@ -853,9 +859,16 @@ class LMURESTProvider {
 		}
 
 		getBrakepadThickness(tyre) {
+			local thickness
+
 			if this.Data
 				try {
-					return this.Data["wearables"]["brakes"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.TyreTypes[tyre])]
+					thickness := this.Data["wearables"]["brakes"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.TyreTypes[tyre])]
+
+					if (thickness > 0)
+						return thickness
+					else
+						this.reload()
 				}
 				catch Any as exception {
 					logError(exception)

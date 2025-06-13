@@ -1353,6 +1353,9 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
 	}
 
+	requestPitstopBrakeChange(frontBrakePads, rearBrakePads) {
+	}
+
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
 	}
 

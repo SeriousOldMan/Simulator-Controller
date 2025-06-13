@@ -381,9 +381,13 @@ Please note, that the range of supported pitstop services depends on the specifi
 ##### Notes
 
 (1) The Engineer will always change *All* four tyres or none, but manual adjustments are possible.
+
 (2) The Engineer will always choose the same tyre compound for all four tyres, but manual adjustments are possible.
+
 (3) See the [table](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-pitstop) in the section about the pitstop settings.
+
 (4) The Engineer will not (yet) plan automatically for a brake pad change.
+
 (5) The Engineer will not activate fast repairs, but manual adjustments are possible, of course.
 
 Good to know: If Jona has planned the pitstop based on a request from Cato, the AI Race Engineer, the lap in which you should come to the pit is already known. In this case, the preparation phase does not have to be triggered explicitly, since the preparation for the pitstop takes place automatically when you start the selected lap.
@@ -469,6 +473,8 @@ The following statistical models are currently implemented:
      | RaceRoom Racing Experience | Yes                     | Yes                  | Yes    |
      | rFactor 2                  | Yes (1)                 | No (1)               | No (1) |
      | Le Mans Ultimate           | Yes (1)                 | No (1)               | No (1) |
+	 
+	 Notes:
 	 
 	 (1) It looks like the damage is reported by the corresponding API as an accumulated value for all different damage types. The damage will be reported by the Race Engineer as a damage to the Bodywork and only Bodywork repair will therefore automatically recommended for a pitstop. Select the other repair categories manually as needed.
 	 

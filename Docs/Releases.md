@@ -29,8 +29,8 @@
 #### Fixes
 
   - Fixed a wrong download mirror reference when checking for available updates.
-  - Fixed cold pressure calculation after a partial tyre change at the last pitstop.
   - Fixed a timeout when checking for news, which caused a very slow startup of "Simulator Startup".
+  - Fixed cold pressure calculation after a partial tyre change at the last pitstop.
   - The system no longer complains with an error dialog, if the hotkey for closing the Pitstop MFD is not defined.
   - Fixed the import of the initial setup at the start of the session. Was broken with the last release.
   - Fixed a couple of minor problems with regards to pitstop tyre data display in "Team Center", which were introduced with the new tyre compound handling for individual wheels.
@@ -51,7 +51,7 @@
 	- Additionally, a couple of new [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) let you define in the "Session Database", in what sessions these warnings will be given. Reasonable defaults are already chosen, of course.
 	- New [events and actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-engineer) for the *Reasoning* booster have been defined, which allows a connected LLM to handle the tyre wear and brake wear accordingly. Revisit your event and action configuration, if you have configured a *Reasoning* booster and include the new events and actions, if necessary.
 	
-	Please note, that brake pad changes are not (yet) handled by the Race Engineer.
+	Please note, that brake pad changes are not (yet) handled by the Race Engineer at a pitstop.
   - A new [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" lets you specify the number of laps before the end of the race, for which the Engineer does not consider pitstop services like tyre change, brake pad change and so on anymore.
   - Added car meta data for the new Pack 5 cars for *Le Mans Ultimate*.
   - Pausing the game is now detected for *Le Mans Ultimate*.

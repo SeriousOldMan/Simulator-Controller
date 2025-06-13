@@ -131,7 +131,7 @@ class ControllerActionsEditor extends ConfiguratorPanel {
 			local code, language
 
 			for code, language in availableLanguages()
-				if (language = actionsGui["caLanguageDropDown"]) {
+				if (language = actionsGui["caLanguageDropDown"].Text) {
 					this.selectLanguage(code)
 
 					break

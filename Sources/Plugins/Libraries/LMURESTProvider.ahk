@@ -308,7 +308,7 @@ class LMURESTProvider {
 				fuel := this.lookup("FUEL:")
 
 				if fuel {
-					fuel := StrLower(fuel["settings"][fuel["currentSetting"]]["text"])
+					fuel := StrLower(fuel["settings"][fuel["currentSetting"] + 1]["text"])
 
 					if InStr(fuel, "gal/")
 						fuel := (string2Values("gal/", fuel)[1] * 3.785411)
@@ -783,9 +783,15 @@ class LMURESTProvider {
 		}
 
 		getBrakepadThickness(tyre) {
+			local thickness
 			if this.Data
 				try {
-					return this.Data[inList(["FL", "FR", "RL", "RR"], LMURESTProvider.TyreTypes[tyre])]
+					thickness := this.Data[inList(["FL", "FR", "RL", "RR"], LMURESTProvider.TyreTypes[tyre])]
+
+					if (thickness > 0)
+						return thickness
+					else
+						this.reload()
 				}
 				catch Any as exception {
 					logError(exception)
@@ -853,9 +859,16 @@ class LMURESTProvider {
 		}
 
 		getBrakepadThickness(tyre) {
+			local thickness
+
 			if this.Data
 				try {
-					return this.Data["wearables"]["brakes"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.TyreTypes[tyre])]
+					thickness := this.Data["wearables"]["brakes"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.TyreTypes[tyre])]
+
+					if (thickness > 0)
+						return thickness
+					else
+						this.reload()
 				}
 				catch Any as exception {
 					logError(exception)

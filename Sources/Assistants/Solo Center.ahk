@@ -5376,7 +5376,7 @@ class SoloCenter extends ConfigurationItem {
 							this.iSessionLoaded := folder
 
 							if this.TelemetryViewer
-								this.TelemetryViewer.restart(folder . "Telemetry", false)
+								this.TelemetryViewer.restart(folder . "Telemetry")
 
 							this.iSessionExported := getMultiMapValue(info, "Session", "Exported", true)
 							this.iDate := getMultiMapValue(info, "Session", "Date", A_Now)

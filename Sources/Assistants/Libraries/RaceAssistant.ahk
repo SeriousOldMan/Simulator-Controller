@@ -4725,7 +4725,7 @@ raiseEvent(context, event, arguments*) {
 	}
 }
 
-Assistant_Trigger := triggerAction
+Assistant_Raise := raiseEvent
 
 triggerAction(context, action, arguments*) {
 	local assistant := (isInstance(context, RaceAssistant) ? context : context.KnowledgeBase.RaceAssistant)
@@ -5278,13 +5278,3 @@ normalizeArguments(arguments, remote := false) {
 
 	return result
 }
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                          Plugin Include Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-if kLogStartup
-	logMessage(kLogOff, "Loading plugins...")
-
-#Include "..\..\Plugins\Simulator Providers.ahk"

@@ -224,7 +224,7 @@ class PressuresEditor {
 		this.Window.Block()
 
 		try {
-			withTask(ProgressTask(translate("Saving") . name), () {
+			withTask(ProgressTask(translate("Saving")), () {
 				database.reload("Tyres.Pressures.Distribution", false)
 
 				if database.lock("Tyres.Pressures.Distribution", false)

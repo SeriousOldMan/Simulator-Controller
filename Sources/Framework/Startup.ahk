@@ -134,17 +134,21 @@ loadSimulatorConfiguration() {
 	if (kSimulatorConfiguration.Count == 0)
 		logMessage(kLogCritical, translate("No configuration found - please run the configuration tool"))
 
+    logMessage(kLogInfo, translate("Installation path set to ") . kHomeDirectory)
+
 	path := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Session Database.ini"), "Database", "Path")
 	if path {
 		kDatabaseDirectory := (normalizeDirectoryPath(path) . "\")
 
+		DirCreate(kDatabaseDirectory)
 		DirCreate(kDatabaseDirectory . "Community")
 		DirCreate(kDatabaseDirectory . "User")
 
+		if !FileExist(kDatabaseDirectory . "ID")
+			FileCopy(kUserConfigDirectory . "ID", kDatabaseDirectory . "ID")
+
 		logMessage(kLogInfo, translate("Session database path set to ") . path)
 	}
-
-    logMessage(kLogInfo, translate("Installation path set to ") . kHomeDirectory)
 
 	path := getMultiMapValue(kSimulatorConfiguration, "Configuration", "AHK Path")
 	if path {
@@ -200,7 +204,7 @@ loadSimulatorConfiguration() {
 		}
 
 		setMultiMapValue(usage, "General", "Updated", A_Now)
-		
+
 		setMultiMapValue(usage, "Applications", appName, getMultiMapValue(usage, "Applications", appName, 0) + 1)
 		setMultiMapValues(usage, "Diagnostics", getMultiMapValues(settings, "Diagnostics"))
 
@@ -295,6 +299,7 @@ initializeEnvironment() {
 	DirCreate(kUserHomeDirectory . "Translations")
 	DirCreate(kUserHomeDirectory . "Grammars")
 	DirCreate(kUserHomeDirectory . "Simulator Data")
+	DirCreate(kDatabaseDirectory)
 	DirCreate(kDatabaseDirectory . "Community")
 	DirCreate(kDatabaseDirectory . "User")
 	DirCreate(kTempDirectory)

@@ -794,7 +794,10 @@ stopStartupSong() {
 }
 
 startupExited() {
-	SimulatorController.Instance.findPlugin(kSystemPlugin).iChildProcess := false
+	local thePlugin := SimulatorController.Instance.findPlugin(kSystemPlugin)
+
+	if thePlugin
+		thePlugin.iChildProcess := false
 }
 
 

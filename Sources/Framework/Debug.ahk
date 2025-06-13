@@ -305,18 +305,19 @@ getMemoryUsage(pid) {
 	local size := (8 + A_PtrSize * 9)
 	local PMC_EX := Buffer(size, 0)
 	local hProcess := DllCall("OpenProcess", "uint", 0x1000, "int", 0, "uint", pid)
-	local sucess := false
+	local success := false
 
 	if hProcess {
 		NumPut("uint", size, PMC_EX)
 
 		try
 			if DllCall("GetProcessMemoryInfo", "ptr", hProcess, "ptr", PMC_EX, "uint", size)
-				sucess := true
-
-		try
-			if DllCall("psapi\GetProcessMemoryInfo", "ptr", hProcess, "ptr", PMC_EX, "uint", size)
 				success := true
+
+		if !success
+			try
+				if DllCall("psapi\GetProcessMemoryInfo", "ptr", hProcess, "ptr", PMC_EX, "uint", size)
+					success := true
 
 		DllCall("CloseHandle", "ptr", hProcess)
 

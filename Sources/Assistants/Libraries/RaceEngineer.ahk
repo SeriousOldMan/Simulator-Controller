@@ -266,6 +266,10 @@ class RaceEngineer extends RaceAssistant {
 			this.callRemote("setPitstopTyrePressures", arguments*)
 		}
 
+		setPitstopBrakeChange(arguments*) {
+			this.callRemote("setPitstopBrakeChange", arguments*)
+		}
+
 		requestPitstopRepairs(arguments*) {
 			this.callRemote("requestPitstopRepairs", arguments*)
 		}
@@ -2423,6 +2427,7 @@ class RaceEngineer extends RaceAssistant {
 		return combine(super.readSettings(simulator, car, track, &settings)
 					 , CaseInsenseMap("Session.Settings.Pitstop.Service.Refuel", getMultiMapValue(settings, section, "Pitstop.Service.Refuel", true)
 									, "Session.Settings.Pitstop.Service.Tyres", tyreService
+									, "Session.Settings.Pitstop.Service.Brakes", getMultiMapValue(settings, section, "Pitstop.Service.Brakes", true)
 									, "Session.Settings.Pitstop.Service.Repairs", getMultiMapValue(settings, section, "Pitstop.Service.Repairs", true)
 									, "Session.Settings.Pitstop.Repair.Bodywork.Duration", bodyworkDuration
 									, "Session.Settings.Pitstop.Repair.Suspension.Duration", suspensionDuration
@@ -4824,6 +4829,11 @@ class RaceEngineer extends RaceAssistant {
 				this.RemoteHandler.setPitstopTyrePressures(pitstopNumber, Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
 	}
 
+	setPitstopBrakeChange(pitstopNumber,change) {
+		if this.RemoteHandler
+			this.RemoteHandler.setPitstopBrakeChange(pitstopNumber, change)
+	}
+
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine) {
 		if this.RemoteHandler
 			this.RemoteHandler.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
@@ -4925,6 +4935,12 @@ setPitstopTyreCompound(context, pitstopNumber, compound, compoundColor, set) {
 
 setPitstopTyrePressures(context, pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
 	context.KnowledgeBase.RaceAssistant.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
+
+	return true
+}
+
+setPitstopBrackChange(context, pitstopNumber, change) {
+	context.KnowledgeBase.RaceAssistant.setPitstopBrakeChange(pitstopNumber, change)
 
 	return true
 }

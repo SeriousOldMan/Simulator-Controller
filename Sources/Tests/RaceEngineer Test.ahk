@@ -244,6 +244,15 @@ class TestPitstopHandler {
 		vPitstopTyrePressures := [pressureFL, pressureFR, pressureRL, pressureRR]
 	}
 
+	setPitstopBrakeChange(pitstopNumber, change) {
+		global vPitstopFuel, vPitstopTyreCompound, vPitstopTyreCompoundColor, vPitstopTyreSet, vPitstopTyrePressures
+		global vPitstopRepairSuspension, vPitstopRepairBodywork, vPitstopRepairEngine
+
+		this.showAction("setPitstopBrakeChange", pitstopNumber, change)
+
+		vCompletedActions["setPitstopBrakeChange"] := pitstopNumber
+	}
+
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine) {
 		global vPitstopFuel, vPitstopTyreCompound, vPitstopTyreCompoundColor, vPitstopTyreSet, vPitstopTyrePressures
 		global vPitstopRepairSuspension, vPitstopRepairBodywork, vPitstopRepairEngine

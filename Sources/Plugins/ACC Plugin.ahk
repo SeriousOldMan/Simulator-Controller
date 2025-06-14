@@ -1928,13 +1928,13 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 	}
 
-	requestPitstopBrakeChange(frontBrakePads, rearBrakePads) {
-		super.requestPitstopBrakeChange(frontBrakePads, rearBrakePads)
+	setPitstopBrakeChange(pitstopNumber, change, frontBrakePads := false, rearBrakePads := false) {
+		super.setPitstopBrakeChange(pitstopNumber, change, frontBrakePads, rearBrakePads)
 
 		if this.requirePitstopMFD()
-			if (this.iPSChangeBrakes && !frontBrakePads && !rearBrakePads)
+			if (this.iPSChangeBrakes && !change)
 				this.toggleActivity("Change Brakes")
-			else if (frontBrakePads || rearBrakePads) {
+			else if change {
 				if !this.iPSChangeBrakes
 					this.toggleActivity("Change Brakes")
 

@@ -723,21 +723,38 @@ tyreWearWarning(?lap, ?tyre, ?wear) <= Call(tyreWearWarning, ?tyre, ?wear)
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                     Brake Change Target Calculation                     ;;;
+;;;                                                                         ;;;
+;;; Update the brake change target for the next pitstop.                    ;;;
+;;;-------------------------------------------------------------------------;;;
+
+{All: [?Lap], [?Lap.Remaining.Session <= ?Session.Settings.Pitstop.Service.Last],
+	  [?Brake.Change.Target = true]} => Set(Brake.Change.Target, false)
+
+{All: [?Lap], [?Lap.Remaining.Session > ?Session.Settings.Pitstop.Service.Last]} => (Prove: checkBrakeWear(?Lap))
+
+checkBrakeWear(?lap) <= ?threshold = 100 - !Session.Settings.Brake.Wear.Warning,
+						criticalBrakeWear(?lap, [FL, FR, RL, RR], ?threshold, ?brake, ?wear), !,
+						Set(Brake.Change.Target, true)
+
+criticalBrakeWear(?, [], ?, ?, ?) <= !, fail
+criticalBrakeWear(?lap, [?brake | ?], ?threshold, ?brake, ?wear) <=
+		Get(Lap, ?lap, Brake.Wear, ?brake, ?wear), ?wear >= ?threshold
+criticalBrakeWear(?lap, [? | ?brakes], ?threshold, ?brake, ?wear) <= criticalBrakeWear(?lap, ?brakes, ?threshold, ?brake, ?wear)
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                            Brake Wear Warning                           ;;;
 ;;;                                                                         ;;;
 ;;; Issues a warning to the driver, if the brake wear gets critical.        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: -15, {All: [?Lap], {None: [?Brake.Wear.Reported],
-					 [?Lap.Remaining.Session > ?Session.Settings.Pitstop.Service.Last]}} => (Prove: checkBrakeWear(?Lap))
+priority: -15, {All: [?Lap], [?Brake.Change.Target = true], {None: [?Brake.Wear.Reported],
+					 [?Lap.Remaining.Session > ?Session.Settings.Pitstop.Service.Last]}} => (Prove: reportBrakeWear(?Lap))
 
-checkBrakeWear(?lap) <= ?threshold = 100 - !Session.Settings.Brake.Wear.Warning,
+reportBrakeWear(?lap) <= ?threshold = 100 - !Session.Settings.Brake.Wear.Warning,
 						criticalBrakeWear(?lap, [FL, FR, RL, RR], ?threshold, ?brake, ?wear),
 						brakeWearWarning(?lap, ?brake, ?wear), Set(Brake.Wear.Reported, ?lap)
-
-criticalBrakeWear(?, [], ?, ?, ?) <= !, fail
-criticalBrakeWear(?lap, [?brake | ?], ?threshold, ?brake, ?wear) <= Get(Lap, ?lap, Brake.Wear, ?brake, ?wear), ?wear >= ?threshold
-criticalBrakeWear(?lap, [? | ?brakes], ?threshold, ?brake, ?wear) <= criticalBrakeWear(?lap, ?brakes, ?threshold, ?brake, ?wear)
 
 brakeWearWarning(?lap, ?brake, ?wear) <= recentPitstopLap(?lap), !, fail
 brakeWearWarning(?lap, ?brake, ?wear) <= Call(raiseEvent, BrakeWear, ?brake, ?wear), !
@@ -911,6 +928,7 @@ priority: 20, [?Pitstop.Plan = true] =>
 		(Clear: Pitstop.Planned.Tyre.Pressure.Correction),
 		(Clear: Pitstop.Planned.Tyre.Pressure.Lost.FL), (Clear: Pitstop.Planned.Tyre.Pressure.Lost.FR),
 		(Clear: Pitstop.Planned.Tyre.Pressure.Lost.RL), (Clear: Pitstop.Planned.Tyre.Pressure.Lost.RR),
+		(Clear: Pitstop.Planned.Brake.Change),
 		(Clear: Pitstop.Planned.Driver.Request),
 		(Clear: Pitstop.Planned.Repair.Suspension), (Clear: Pitstop.Planned.Repair.Bodywork), (Clear: Pitstop.Planned.Repair.Engine),
 		(Clear: Pitstop.Planned.Time.Pitlane), (Clear: Pitstop.Planned.Time.Box),
@@ -956,6 +974,8 @@ planPitstop() <= Set(Pitstop.Planned.Nr, 1)
 															 (Set: Pitstop.Planned.Tyre.Pressure.RL.Increment, false),
 															 (Set: Pitstop.Planned.Tyre.Pressure.RR.Increment, false)
 {All: [?Pitstop.Plan],
+	  [?Session.Settings.Pitstop.Service.Brakes = Off]} => (Set: Pitstop.Planned.Brake.Change, false)
+{All: [?Pitstop.Plan],
 	  [?Session.Settings.Pitstop.Service.Repairs = false]} => (Set: Pitstop.Planned.Repair.Suspension, false),
 															  (Set: Pitstop.Planned.Repair.Bodywork, false),
 															  (Set: Pitstop.Planned.Repair.Engine, false)
@@ -977,6 +997,7 @@ planPitstop() <= Set(Pitstop.Planned.Nr, 1)
 															   (Set: Pitstop.Planned.Tyre.Compound.Color.RearLeft, false),
 															   (Set: Pitstop.Planned.Tyre.Compound.RearRight, false),
 															   (Set: Pitstop.Planned.Tyre.Compound.Color.RearRight, false)
+{All: [?Pitstop.Plan], [?Pitstop.Plan.Brake.Change = false]} => (Set: Pitstop.Planned.Brake.Change, false)
 {All: [?Pitstop.Plan], [?Pitstop.Plan.Tyre.Set], {None: [?Pitstop.Planned.Tyre.Set]}} =>
 		(Set: Pitstop.Planned.Tyre.Set, ?Pitstop.Plan.Tyre.Set)
 {All: [?Pitstop.Plan], [?Pitstop.Plan.Tyre.Compound], {None: [?Pitstop.Planned.Tyre.Compound]}} =>
@@ -1021,6 +1042,8 @@ planPitstop() <= Set(Pitstop.Planned.Nr, 1)
 		(Set: Pitstop.Planned.Repair.Bodywork, ?Pitstop.Plan.Repair.Bodywork)
 {All: [?Pitstop.Plan], [?Pitstop.Plan.Repair.Engine], {None: [?Pitstop.Planned.Repair.Engine]}} =>
 		(Set: Pitstop.Planned.Repair.Engine, ?Pitstop.Plan.Repair.Engine)
+{All: [?Pitstop.Plan], [?Pitstop.Plan.Brake.Change], {None: [?Pitstop.Planned.Brake.Change]}} =>
+		(Set: Pitstop.Planned.Brake.Change, ?Pitstop.Plan.Brake.Change)
 {All: [?Pitstop.Plan], [?Pitstop.Plan.Driver.Request], {None: [?Pitstop.Planned.Driver.Request]}} =>
 		(Set: Pitstop.Planned.Driver.Request, ?Pitstop.Plan.Driver.Request)
 
@@ -1092,6 +1115,9 @@ planPitstop() <= Set(Pitstop.Planned.Nr, 1)
 		(Set: Pitstop.Planned.Tyre.Compound, !Session.Setup.Tyre.Compound),
 		(Set: Pitstop.Planned.Tyre.Compound.Color, !Session.Setup.Tyre.Compound.Color)	
 
+{All: [?Pitstop.Plan], [?Brake.Change.Target], {None: [?Pitstop.Planned.Brake.Change]}} =>
+		(Set: Pitstop.Planned.Brake.Change, ?Brake.Change.Target)
+		
 {All: [?Pitstop.Plan], [?Damage.Repair.Suspension.Target], {None: [?Pitstop.Planned.Repair.Suspension]}} =>
 		(Set: Pitstop.Planned.Repair.Suspension, ?Damage.Repair.Suspension.Target)
 {All: [?Pitstop.Plan], [?Damage.Repair.Bodywork.Target], {None: [?Pitstop.Planned.Repair.Bodywork]}} =>
@@ -1225,6 +1251,7 @@ priority: -20, [?Pitstop.Set] => (Clear: Pitstop.Planned), (Clear: Pitstop.Plann
 preparePitstop(?pitstopNumber) <= Call(startPitstopSetup, ?pitstopNumber)
 preparePitstop(?pitstopNumber) <= setRefuelAmount(?pitstopNumber),
 								  setTyreCompound(?pitstopNumber), setTyrePressures(?pitstopNumber),
+								  setBrakeChange(?pitstopNumber),
 								  requestRepairs(?pitstopNumber), requestDriver(?pitstopNumber)
 preparePitstop(?pitstopNumber) <= Call(finishPitstopSetup, ?pitstopNumber)
 
@@ -1256,6 +1283,10 @@ setTyrePressures(?pitstopNumber) <=
 									  !Pitstop.Planned.Tyre.Pressure.FL, !Pitstop.Planned.Tyre.Pressure.FR,
 									  !Pitstop.Planned.Tyre.Pressure.RL, !Pitstop.Planned.Tyre.Pressure.RR)
 setTyrePressures(?)
+
+setBrakeChange(?pitstopNumber) <= !Session.Settings.Pitstop.Service.Brakes != Off, !,
+								  Call(setPitstopBrakeChange, ?pitstopNumber, !Pitstop.Planned.Brake.Change)
+setBrakeChange(?)
 
 requestRepairs(?pitstopNumber) <= !Session.Settings.Pitstop.Service.Repairs = true, !,
 								  Call(requestPitstopRepairs, ?pitstopNumber,
@@ -1320,6 +1351,7 @@ pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Tyre.Pressure.FR, !P
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Tyre.Pressure.RL, !Pitstop.Planned.Tyre.Pressure.RL)
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Tyre.Pressure.RR, !Pitstop.Planned.Tyre.Pressure.RR)
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Tyre.Pressure.Correction, !Pitstop.Planned.Tyre.Pressure.Correction)
+pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Brake.Change, !Pitstop.Planned.Brake.Change)
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Driver.Request, !Pitstop.Planned.Driver.Request)
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Repair.Suspension, !Pitstop.Planned.Repair.Suspension)
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Repair.Bodywork, !Pitstop.Planned.Repair.Bodywork)
@@ -1361,6 +1393,7 @@ priority: -10, [?Pitstop.Lap] => (Set: Pitstop.Clear, ?Pitstop.Lap)
 					(Clear: Pitstop.Planned.Tyre.Pressure.Correction),
 					(Clear: Pitstop.Planned.Tyre.Pressure.Lost.FL), (Clear: Pitstop.Planned.Tyre.Pressure.Lost.FR),
 					(Clear: Pitstop.Planned.Tyre.Pressure.Lost.RL), (Clear: Pitstop.Planned.Tyre.Pressure.Lost.RR),
+					(Clear: Pitstop.Planned.Brake.Change),
 					(Clear: Pitstop.Planned.Driver.Request),
 					(Clear: Pitstop.Planned.Repair.Suspension), (Clear: Pitstop.Planned.Repair.Bodywork),
 					(Clear: Pitstop.Planned.Repair.Engine),

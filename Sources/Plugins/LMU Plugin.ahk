@@ -492,11 +492,11 @@ class LMUPlugin extends Sector397Plugin {
 		}
 	}
 
-	requestPitstopBrakeChange(frontBrakePads, rearBrakePads) {
-		super.requestPitstopBrakeChange(frontBrakePads, rearBrakePads)
+	setPitstopBrakeChange(pitstopNumber, change, frontBrakePads := false, rearBrakePads := false) {
+		super.setPitstopBrakeChange(pitstopNumber, change, frontBrakePads, rearBrakePads)
 
 		if (this.OpenPitstopMFDHotkey != "Off")
-			this.setPitstopOption("Change Brakes", frontBrakePads || rearBrakePads)
+			this.setPitstopOption("Change Brakes", change)
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {

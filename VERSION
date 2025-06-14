@@ -1,9 +1,9 @@
 [Development]
-Version=6.3.6.0-dev
-Target=6.3.6.0-release
-Date=06/09/2025
-Download=http://simulator-controller.selfhost.co:800/api/public/dl/Q4DTsNDg
-Changes=Collect tyre specific data like the driven laps, Fixed download mirror for VERSION file, Fixed pressure calculation after partial tyre change, Fixed slow startup of "Simulator Startup", Fixed closing of Pitstop MFD, Fixed pitstop service data handling, Tyre and brake wear in lap reports of "Solo Center" and "Team Center", Brake wear information for Le Mans Ultimate, The LLM now gets information about the driver names of each car, Tyre wear warnings by Engineer, Brake wear warnings by Engineer, New settings to handle tyre wear and brake wear warnings, New events and actions for the reasoning booster for tyre and brake wear awarnings
+Version=6.3.7.0-dev
+Target=6.3.7.0-release
+Date=06/14/2025
+Download=
+Changes=Engineer handles brake change, Setting for brake service, Setting for brake service duration
 Components=Media->5.6.1,Configuration->6.3.6,Utilities->6.3.0
 [Release]
 Version=6.3.5.0-release
@@ -27,5 +27,5 @@ Utilities.6.3.0.Download=https://www.dropbox.com/scl/fi/uauxhuyecnwmgft3w6roj/Ut
 [Current]
 Type=Development
 [Version]
-Development=6.3.6.0-dev
+Development=6.3.7.0-dev
 Release=6.3.5.0-release

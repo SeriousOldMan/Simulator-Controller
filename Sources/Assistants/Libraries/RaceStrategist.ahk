@@ -3986,7 +3986,7 @@ class RaceStrategist extends GridRaceAssistant {
 						  , RepairEngine: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".RepairEngine")}
 
 				if tyreSet
-					pitstops[pitstops.Length].TyreSet := getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreSet", false)
+					pitstop.TyreSet := getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreSet", false)
 
 				if (mixedCompounds = "Wheel") {
 					for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {

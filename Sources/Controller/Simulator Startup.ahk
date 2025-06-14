@@ -1063,8 +1063,10 @@ launchPad(command := false, arguments*) {
 	else if (command = "Launch") {
 		theApplication := arguments[1]
 
-		if ProcessExist(theApplication)
-			WinActivate("ahk_exe " . theApplication)
+		if ProcessExist(theApplication) {
+			try
+				WinActivate("ahk_exe " . theApplication)
+		}
 		else {
 			startupConfig := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 			restart := inList(["Simulator Setup.exe", "Simulator Configuration.exe"], theApplication)

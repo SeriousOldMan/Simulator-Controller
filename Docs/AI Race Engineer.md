@@ -367,12 +367,12 @@ The pitstop is handled by Jona in two phases. In the first phase, the planning p
 
 Please note, that the range of supported pitstop services depends on the specific simulator. See the [plugin reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) for full information about each simulator. Additionally, some simulators support the use of different tyre compounds for each wheel or at least separate for each axle (see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#handling-of-tyre-compounds-on-inidividual-wheels) for more information). Jona fully understands individual tyre compounds on each wheel and even pitstops, where not all tyres are changed, but he will always plan a pitstop with one of the available tyre compounds for all wheels and will also change all tyres at once. But eiher by using the controller actions for the given simulator before the pitstop is prepared or by using the in-game Pitstop MFD after the pitstop has been prepared (see below), you can alter the tyre compound choices made by Jona. The following table gives you an overview over the supplied pitstop services for the different simulators:
 
-| Simulator                  | Refuel | Tyre Change (1) | Tyre Compound (2) | Tyre Pressures | Repairs (3) | Brakes (4) |
+| Simulator                  | Refuel | Tyre Change (1) | Tyre Compound (2) | Tyre Pressures | Repairs (3) | Brakes     |
 | -------------------------- | ------ | --------------- | ----------------- | -------------- | ----------- | ---------- |
 | Assetto Corsa              | Yes    | All             | Uniform           | Yes            | Yes         | No         |
 | Assetto Corsa Competizione | Yes    | All             | Uniform           | Yes            | Yes         | Yes        |
 | Automobilista 2            | Yes    | All             | Uniform           | Yes            | Yes         | No         |
-| iRacing                    | Yes    | Wheel           | Uniform           | Yes            | No (5)      | No         |
+| iRacing                    | Yes    | Wheel           | Uniform           | Yes            | No (4)      | No         |
 | Projects CARS 2            | Yes    | All             | Uniform           | Yes            | Yes         | No         |
 | RaceRoom Racing Experience | Yes    | Axle            | Axle              | Yes            | Yes         | No         |
 | rFactor 2                  | Yes    | Axle            | Axle              | Yes            | Yes         | No         |
@@ -386,9 +386,7 @@ Please note, that the range of supported pitstop services depends on the specifi
 
 (3) See the [table](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-pitstop) in the section about the pitstop settings.
 
-(4) The Engineer will not (yet) plan automatically for a brake pad change.
-
-(5) The Engineer will not activate fast repairs, but manual adjustments are possible, of course.
+(4) The Engineer will not activate fast repairs, but manual adjustments are possible, of course.
 
 Good to know: If Jona has planned the pitstop based on a request from Cato, the AI Race Engineer, the lap in which you should come to the pit is already known. In this case, the preparation phase does not have to be triggered explicitly, since the preparation for the pitstop takes place automatically when you start the selected lap.
 

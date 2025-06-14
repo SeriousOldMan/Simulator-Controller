@@ -1,5 +1,4 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - AI Race Strategist              ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -21,6 +20,7 @@
 #Include "..\..\Framework\Extensions\RuleEngine.ahk"
 #Include "..\..\Framework\Extensions\Database.ahk"
 #Include "..\..\Framework\Extensions\LLMConnector.ahk"
+#Include "..\..\Plugins\Libraries\SimulatorProvider.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\..\Database\Libraries\LapsDatabase.ahk"
 #Include "RaceAssistant.ahk"
@@ -178,7 +178,7 @@ class RaceStrategist extends GridRaceAssistant {
 	class TyreChangeContinuation extends VoiceManager.ReplyContinuation {
 		cancel() {
 			if ProcessExist("Race Engineer.exe") {
-				if this.Listener {
+				if this.Manager.Listener {
 					this.Manager.getSpeaker().speakPhrase("ConfirmInformEngineerAnyway", false, true)
 
 					this.Manager.setContinuation(ObjBindMethod(this.Manager, "planPitstop"))
@@ -216,7 +216,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 		cancel() {
 			if ProcessExist("Race Engineer.exe") {
-				if this.Listener {
+				if this.Manager.Listener {
 					this.Manager.getSpeaker().speakPhrase("ConfirmInformEngineerAnyway", false, true)
 
 					this.Manager.setContinuation(ObjBindMethod(this.Manager, "planPitstop", this.PlannedLap, this.PitstopOptions*))

@@ -468,7 +468,7 @@ checkInstallation() {
 	}
 
 	try {
-		installLocation := RegRead("HKLM\" . kUninstallKey, "InstallLocation")
+		installLocation := RegRead("HKLM\" . kUninstallKey, "InstallLocation", false)
 	}
 	catch Any as exception {
 		logError(exception, false, false)

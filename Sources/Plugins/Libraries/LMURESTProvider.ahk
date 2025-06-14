@@ -33,8 +33,6 @@ class LMURESTProvider {
 
 		iData := false
 
-		iCachedObjects := CaseInsenseMap()
-
 		GETURL {
 			Get {
 				return "Virtual property RESTData.GETURL must be implemented in a subclass..."
@@ -125,28 +123,14 @@ class LMURESTProvider {
 			}
 		}
 
-		lookup(name, data := this.Data, cache := true) {
-			local ignore, candidate
-
-			if (cache && this.iCachedObjects.Has(name))
-				return this.iCachedObjects[name]
-			else if data {
-				for ignore, candidate in data
-					if (candidate.Has("name") && (candidate["name"] = name)) {
-						if cache
-							this.iCachedObjects[name] := candidate
-
-						return candidate
-					}
-
-				return false
-			}
-			else
-				return false
+		reload() {
+			this.iData := false
 		}
 	}
 
 	class PitstopData extends LMURESTProvider.RESTData {
+		iCachedObjects := CaseInsenseMap()
+
 		GETURL {
 			Get {
 				return "http://localhost:6397/rest/garage/PitMenu/receivePitMenu"
@@ -287,6 +271,32 @@ class LMURESTProvider {
 			return false
 		}
 
+		lookup(name, data := this.Data, cache := true) {
+			local ignore, candidate
+
+			if (cache && this.iCachedObjects.Has(name))
+				return this.iCachedObjects[name]
+			else if data {
+				for ignore, candidate in data
+					if (candidate.Has("name") && (candidate["name"] = name)) {
+						if cache
+							this.iCachedObjects[name] := candidate
+
+						return candidate
+					}
+
+				return false
+			}
+			else
+				return false
+		}
+
+		reload() {
+			super.reload()
+
+			this.iCachedObjects := CaseInsenseMap()
+		}
+
 		getRefuelLevel() {
 			local ratio := this.lookup("FUEL RATIO:")
 			local energy := this.lookup("VIRTUAL ENERGY:")
@@ -298,7 +308,7 @@ class LMURESTProvider {
 				fuel := this.lookup("FUEL:")
 
 				if fuel {
-					fuel := StrLower(fuel["settings"][fuel["currentSetting"]]["text"])
+					fuel := StrLower(fuel["settings"][fuel["currentSetting"] + 1]["text"])
 
 					if InStr(fuel, "gal/")
 						fuel := (string2Values("gal/", fuel)[1] * 3.785411)
@@ -728,6 +738,8 @@ class LMURESTProvider {
 				catch Any as exception {
 					logError(exception)
 
+					this.reload()
+
 					return SessionDatabase.getTyreCompounds(this.Simulator, this.Car, this.Track, true)[1]
 				}
 			}
@@ -738,7 +750,7 @@ class LMURESTProvider {
 		getTyrePressure(tyre) {
 			local pressure
 
-			if this.Data {
+			if this.Data
 				try {
 					pressure := this.Data["carSetup"]["garageValues"]["WM_PRESSURE-W_" . LMURESTProvider.TyreTypes[tyre]]["stringValue"]
 
@@ -749,8 +761,9 @@ class LMURESTProvider {
 				}
 				catch Any as exception {
 					logError(exception)
+
+					this.reload()
 				}
-			}
 
 			return false
 		}
@@ -770,16 +783,23 @@ class LMURESTProvider {
 		}
 
 		getBrakepadThickness(tyre) {
-			if this.Data {
+			local thickness
+			if this.Data
 				try {
-					return this.Data[LMURESTProvider.BrakeTypes[tyre]]
+					thickness := this.Data[inList(["FL", "FR", "RL", "RR"], LMURESTProvider.TyreTypes[tyre])]
+
+					if (thickness > 0)
+						return thickness
+					else
+						this.reload()
 				}
 				catch Any as exception {
 					logError(exception)
-				}
-			}
 
-			return false
+					this.reload()
+				}
+
+			return 0.032
 		}
 	}
 
@@ -809,7 +829,7 @@ class LMURESTProvider {
 		}
 
 		getTyreCompound(tyre) {
-			if this.Data {
+			if this.Data
 				try {
 					tyre := this.Data["wheelInfo"]["wheelLocs"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.TyreTypes[tyre])]["compound"]
 
@@ -817,36 +837,46 @@ class LMURESTProvider {
 				}
 				catch Any as exception {
 					logError(exception)
+
+					this.reload()
 				}
-			}
 
 			return false
 		}
 
 		getTyreWear(tyre) {
-			if this.Data {
+			if this.Data
 				try {
 					return (100 * (1 - this.Data["wearables"]["tires"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.TyreTypes[tyre])]))
 				}
 				catch Any as exception {
 					logError(exception)
+
+					this.reload()
 				}
-			}
 
 			return false
 		}
 
 		getBrakepadThickness(tyre) {
-			if this.Data {
+			local thickness
+
+			if this.Data
 				try {
-					return this.Data["wearables"]["brakes"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.TyreTypes[tyre])]
+					thickness := this.Data["wearables"]["brakes"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.TyreTypes[tyre])]
+
+					if (thickness > 0)
+						return thickness
+					else
+						this.reload()
 				}
 				catch Any as exception {
 					logError(exception)
-				}
-			}
 
-			return false
+					this.reload()
+				}
+
+			return 0.032
 		}
 	}
 
@@ -932,6 +962,8 @@ class LMURESTProvider {
 				}
 				catch Any as exception {
 					logError(exception)
+
+					this.reload()
 				}
 
 			return false
@@ -953,6 +985,8 @@ class LMURESTProvider {
 				}
 				catch Any as exception {
 					logError(exception)
+
+					this.reload()
 				}
 
 			return false
@@ -1380,7 +1414,7 @@ class LMURESTProvider {
 				WinHttpRequest({Timeouts: [0, 500, 500, 500]}).POST(this.POSTURL, "", false)
 			}
 			catch Any as exception {
-				logError(exception, true)
+				logError(exception)
 			}
 		}
 	}

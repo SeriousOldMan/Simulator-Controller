@@ -1,5 +1,55 @@
 # Latest stable release
 
+## 6.3.6.0
+
+#### Date: 06/13/25
+
+#### Fixes
+
+  - Fixed a wrong download mirror reference when checking for available updates.
+  - Fixed cold pressure calculation after a partial tyre change at the last pitstop.
+  - Fixed a timeout when checking for news, which caused a very slow startup of "Simulator Startup".
+  - The system no longer complains with an error dialog, if the hotkey for closing the Pitstop MFD is not defined.
+  - Fixed the import of the initial setup at the start of the session. Was broken with the last release.
+  - Fixed a couple of minor problems with regards to pitstop tyre data display in "Team Center", which were introduced with the new tyre compound handling for individual wheels.
+  - Fixed an unhandled exception in the voice recognition test mode which prevents a normal interaction with the Driving Coach.
+  - Fixed importing the currently mounted tyre compound into "Solo Center" by using the copy button.
+  - Fixed many glitches and incompatibilities with the new version of the *Le Mans Ultimate* API, which was changed without notice with their last release.
+  - Fixed language selection in the *Plugin Actions & Labels* editor.
+  - Fixed dozens of minor bugs that was documented in the supplied log files via diagnostics upload.
+
+#### Changes
+
+  - More internal updates for wheel specific data handling. All applications now differentiate between driven laps for each tyre individually.
+  - The data acquisition for *Le Mans Ultimate* now includes information about brake wear.
+  - Tyre wear and also brake wear are now displayed in the lap reports of "Solo Center" and "Team Center", if that data is available.
+  - The driver name is now passed for each car to the LLM, so that you can get information about your opponents by name (by @alejandrocq). 
+  - The Engineer now observes the tyre wear and also the wear of the brake pads (if available in the data supplied by the simulator) and warns you, if the available tread or brake pad thickness falls below a given threshold.
+    - A new [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" lets you define the minimum available tyre tread, before a wear warning is issued.
+	- Also, a new [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" lets you define the minimum available brake pad thickness, before a wear warning is issued.
+	- Two new [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) let you specify, whether the Engineer will ask for confirmation to plan a pitstop, after excessive tyre or brake pad wear had been detected. This is also part of the so called "Autonomous" mode.
+	- Additionally, a couple of new [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) let you define in the "Session Database", in what sessions these warnings will be given. Reasonable defaults are already chosen, of course.
+	- New [events and actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-engineer) for the *Reasoning* booster have been defined, which allows a connected LLM to handle the tyre wear and brake wear accordingly. Revisit your event and action configuration, if you have configured a *Reasoning* booster and include the new events and actions, if necessary.
+	
+	Please note, that brake pad changes are not (yet) handled automatically by the Race Engineer.
+  - A new [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" lets you specify the number of laps before the end of the race, for which the Engineer does not consider pitstop services like tyre change, brake pad change and so on anymore.
+  - The [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#the-pitstop) for the Race Engineer capabilities for pitstop planning and preparation has been extended to cover all the latest additions.
+  - Added car meta data for the new Pack 5 cars for *Le Mans Ultimate*.
+  - Pausing the game is now detected for *Le Mans Ultimate*.
+  - Support for setting handlers with negative step values has been added to "Setup Workbench". This is used for the damper settings for the Lamborghini Huracan in *Le Mans Ultimate*.
+  - New car models for "Setup Workbench":
+    - Le Mans Ultimate
+	  - Lamborghini Huracán LMGT3 Evo2
+      - Lexus RC F LMGT3
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-636), if you have configured a *Reasoning* booster for the Race Engineer.
+
+# Upcoming release
+
+Not yet planned...
+  
+# Release history
+
 ## 6.3.5.0
 
 #### Date: 06/06/25
@@ -19,38 +69,6 @@
   - The "Laps" data entries in the session database can now handle wheel specific information about the number of driven laps on the mounted tyre. You will find now four different tyre laps properties in the data reports in the "Strategy Workbench", "Solo Center" and "Team Center" applications, one for each wheel. Data points are still uniform for all four wheels with this release, but this will change with the next release.
   - Consent can now be given in the [personal profile dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#managing-your-privacy) to share anonymous data from your sessions that will be used to train models for the Assistants AI. The default for this setting is "No", so make sure, that you change it, if you want to contribute.
   - [Expert] When [defining the meta data for a new car](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-a-new-car) in the "Setup Workbench", [Lua](https://lua.org/) scripts can now be used to create handlers for complex settings in the setup, which cannot be defined correctly by using one of the predefined handlers.
-
-# Upcoming release
-
-## 6.3.6.0
-
-#### Date: 06/13/25 (planned)
-
-#### Fixes
-
-  - Fixed a wrong download mirror reference when checking for available updates.
-  - Fixed cold pressure calculation after a partial tyre change at the last pitstop.
-  - Fixed a timeout when checking for news, which caused a very slow startup of "Simulator Startup".
-  - The system no longer complains with an error dialog, if the hotkey for closing the Pitstop MFD is not defined.
-  - Fixed the import of the initial setup at the start of the session. Was broken with the last release.
-  - Fixed a couple of minor problems with regards to pitstop tyre data display in "Team Center", which were introduced with the new tyre compound handling for individual wheels.
-  - Fixed an unhandled exception in the voice recognition test mode which prevents a normal interaction with the Driving Coach.
-
-#### Changes
-
-  - More internal updates for wheel specific data handling. All applications now differentiate between driven laps for each tyre individually.
-  - The data acquisition for *Le Mans Ultimate* now includes information about brake wear.
-  - Tyre wear and also brake wear are now displayed in the lap reports of "Solo Center" and "Team Center", if that data is available.
-  - The driver name is now passed for each car to the LLM, so that you can get information about your opponents by name (by @alejandrocq). 
-  - The Engineer now observes the tyre wear and also the wear of the brake pads (if available in the data supplied by the simulator) and warns you, if the available tread or brake pad thickness falls below a given threshold.
-    - A new [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" lets you define the minimum available tyre tread, before a wear warning is issued.
-	- Also, a new [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" lets you define the minimum available brake pad thickness, before a wear warning is issued.
-	- Two new [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) let you specify, whether the Engineer will ask for confirmation to plan a pitstop, after excessive tyre or brake pad wear had been detected. This is also part of the so called "Autonomous" mode.
-	- Additionally, a couple of new [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) let you define in the "Session Database", in what sessions these warnings will be given. Reasonable defaults are already chosen, of course.
-	- New [events and actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-engineer) for the *Reasoning* booster have been defined, which allows a connected LLM to handle the tyre wear and brake wear accordingly.
-  - A new [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" lets you specify the number of laps before the end of the race, for which the Engineer does not consider pitstop services like tyre change, brake pad change and so on anymore.
-  
-# Release history
 
 ## 6.3.4.0
 

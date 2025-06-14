@@ -365,16 +365,41 @@ The process of the pitstop handling differs between the various supported simula
 
 The pitstop is handled by Jona in two phases. In the first phase, the planning phase, Jona creates a list of the necessary activities (refueling, changing tires, repairs) and gives you the chosen service tasks by radio. If you then agree with the selected services, or after you have made any necessary corrections, the settings are transferred to the simulation in the second phase, the preparation phase. After the preparation is finished, you can come to the pit anytime (depending on the simulation, it might be necessary, to activate a "Request pitstop" function as well).
 
+Please note, that the range of supported pitstop services depends on the specific simulator. See the [plugin reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) for full information about each simulator. Additionally, some simulators support the use of different tyre compounds for each wheel or at least separate for each axle (see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#handling-of-tyre-compounds-on-inidividual-wheels) for more information). Jona fully understands individual tyre compounds on each wheel and even pitstops, where not all tyres are changed, but he will always plan a pitstop with one of the available tyre compounds for all wheels and will also change all tyres at once. But eiher by using the controller actions for the given simulator before the pitstop is prepared or by using the in-game Pitstop MFD after the pitstop has been prepared (see below), you can alter the tyre compound choices made by Jona. The following table gives you an overview over the supplied pitstop services for the different simulators:
+
+| Simulator                  | Refuel | Tyre Change (1) | Tyre Compound (2) | Tyre Pressures | Repairs (3) | Brakes (4) |
+| -------------------------- | ------ | --------------- | ----------------- | -------------- | ----------- | ---------- |
+| Assetto Corsa              | Yes    | All             | Uniform           | Yes            | Yes         | No         |
+| Assetto Corsa Competizione | Yes    | All             | Uniform           | Yes            | Yes         | Yes        |
+| Automobilista 2            | Yes    | All             | Uniform           | Yes            | Yes         | No         |
+| iRacing                    | Yes    | Wheel           | Uniform           | Yes            | No (5)      | No         |
+| Projects CARS 2            | Yes    | All             | Uniform           | Yes            | Yes         | No         |
+| RaceRoom Racing Experience | Yes    | Axle            | Axle              | Yes            | Yes         | No         |
+| rFactor 2                  | Yes    | Axle            | Axle              | Yes            | Yes         | No         |
+| Le Mans Ultimate           | Yes    | Wheel           | Wheel             | Yes            | Yes         | Yes        |
+
+##### Notes
+
+(1) The Engineer will always change *All* four tyres or none, but manual adjustments are possible.
+
+(2) The Engineer will always choose the same tyre compound for all four tyres, but manual adjustments are possible.
+
+(3) See the [table](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-pitstop) in the section about the pitstop settings.
+
+(4) The Engineer will not (yet) plan automatically for a brake pad change.
+
+(5) The Engineer will not activate fast repairs, but manual adjustments are possible, of course.
+
 Good to know: If Jona has planned the pitstop based on a request from Cato, the AI Race Engineer, the lap in which you should come to the pit is already known. In this case, the preparation phase does not have to be triggered explicitly, since the preparation for the pitstop takes place automatically when you start the selected lap.
 
-Some final notes: If you ever perform a pitstop, which has not been planned and prepared by Jona, Jona will be very confused, say the least. You can do this, but please double check the recommendations of Jona for each subsequent pitstop, especially the chosen tyre set, if you don't want to end up with worn out tyres for your last stint. Also be very careful, when using the "Pitstop" mode on your Button Box to change the pitstop settings. Jona will not know about your changes, and might overwrite them during the pitstop preparation. There is one notable exception, if Jona has planned and prepared a pitstop, but this pitstop has not been carried out yet, every change to the pitstop settings using the "Pitstop" mode will be recognized and taken into account by Jona. If you change pitstop settings using the pitstop menu in the simulation directly, it depends on the data integration support of the given simulator, whether this change is recognized by Jona or not. Please see the following table:
+Some final notes: If you ever perform a pitstop, which has not been planned and prepared by Jona, Jona will be very confused, to say the least. You can do this, but please double check the recommendations of Jona for each subsequent pitstop, especially the chosen tyre set, if you don't want to end up with worn out tyres for your last stint. Also be very careful, when using the "Pitstop" mode on your Button Box to change the pitstop settings. Jona will not know about your changes, and might overwrite them during the pitstop preparation. There is one notable exception, if Jona has planned and prepared a pitstop, but this pitstop has not been carried out yet, every change to the pitstop settings using the "Pitstop" mode will be recognized and taken into account by Jona. If you change pitstop settings using the pitstop menu in the simulation directly, it depends on the data integration support of the given simulator, whether this change is recognized by Jona or not. Please see the following table:
 
 | Simulator                  | Fuel | Tyre Compound | Tyre Set | Tyre Pressures | Repairs |
 | -------------------------- | ---- | ------------- | -------- | -------------- | ------- |
 | Assetto Corsa              | No   | No            | -        | No             | No      |
 | Assetto Corsa Competizione | Yes  | No            | Yes      | Yes            | No      |
 | Automobilista 2            | No   | No            | -        | No             | No      |
-| iRacing                    | Yes  | No            | -        | Yes            | No      |
+| iRacing                    | Yes  | Yes           | -        | Yes            | No      |
 | Projects CARS 2            | No   | No            | -        | No             | No      |
 | RaceRoom Racing Experience | No   | No            | -        | No             | No      |
 | rFactor 2                  | Yes  | Yes           | -        | Yes            | Yes     |
@@ -448,6 +473,8 @@ The following statistical models are currently implemented:
      | RaceRoom Racing Experience | Yes                     | Yes                  | Yes    |
      | rFactor 2                  | Yes (1)                 | No (1)               | No (1) |
      | Le Mans Ultimate           | Yes (1)                 | No (1)               | No (1) |
+	 
+	 Notes:
 	 
 	 (1) It looks like the damage is reported by the corresponding API as an accumulated value for all different damage types. The damage will be reported by the Race Engineer as a damage to the Bodywork and only Bodywork repair will therefore automatically recommended for a pitstop. Select the other repair categories manually as needed.
 	 

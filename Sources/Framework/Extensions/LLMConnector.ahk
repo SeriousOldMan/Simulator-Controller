@@ -571,7 +571,7 @@ class LLMConnector {
 						answer := WinHttpRequest({Certificate: this.Certificate}).GET(this.CreateModelsURL(this.Server), "", this.CreateHeaders(), {Encoding: "UTF-8"})
 					}
 					catch Any as exception {
-						logError(exception, true)
+						logError(exception)
 
 						answer := WinHttpRequest().GET(this.CreateModelsURL(this.Server), "", this.CreateHeaders(), {Encoding: "UTF-8"})
 					}
@@ -589,7 +589,7 @@ class LLMConnector {
 				}
 			}
 			catch Any as exception {
-				logError(exception, true)
+				logError(exception)
 
 				return []
 			}

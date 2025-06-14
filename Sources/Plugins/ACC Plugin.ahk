@@ -305,7 +305,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 
 			if (session != kSessionPaused)
-				this.UDPProvider.shutdown(true)
+				if this.UDPProvider
+					this.UDPProvider.shutdown(true)
 		}
 	}
 
@@ -2114,7 +2115,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			return (finished ? standingsData : this.correctStandingsData(standingsData))
 		}
 		else {
-			this.UDPProvider.shutdown(true)
+			if this.UDPProvider
+				this.UDPProvider.shutdown(true)
 
 			return newMultiMap()
 		}

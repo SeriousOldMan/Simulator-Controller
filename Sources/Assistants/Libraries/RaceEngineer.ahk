@@ -995,7 +995,7 @@ class RaceEngineer extends RaceAssistant {
 							brakeWear := Map()
 
 							for postfix, brake in Map("FL", "Front.Left", "FR", "Front.Right"
-												   , "RL", "Rear.Left", "RR", "Rear.Right")
+												    , "RL", "Rear.Left", "RR", "Rear.Right")
 								brakeWear[brake] := (knowledgeBase.getValue("Lap." . lapNr . ".Brake.Wear." . postfix, 0) . percent)
 
 							brakes["Wear"] := brakeWear
@@ -4565,6 +4565,9 @@ class RaceEngineer extends RaceAssistant {
 		static wheels := CaseInsenseMap("FL", "FrontLeft", "FR", "FrontRight"
 								      , "RL", "RearLeft", "RR", "RearRight")
 
+		if !inList(["FL", "FR", "RL", "RR"], tyre)
+			throw "Unknown tyre descriptor (" . tyre . ") detected in RaceEngineer.tyreWearWarning..."
+
 		if (this.hasEnoughData(false) && this.Speaker[false] && this.Announcements["TyreWearWarning"])
 			if (!knowledgeBase.getValue("InPitLane", false) && !knowledgeBase.getValue("InPit", false)) {
 				speaker := this.getSpeaker()
@@ -4572,8 +4575,9 @@ class RaceEngineer extends RaceAssistant {
 				speaker.beginTalk()
 
 				try {
-					speaker.speakPhrase("TyreWear", {wear: Round(wear), remaining: 100 - Round(wear)
-												   , tyre: speaker.Fragments[wheels[tyre]]})
+					speaker.speakPhrase("TyreWearWarning", {tyre: speaker.Fragments[wheels[tyre]]})
+
+					speaker.speakPhrase("Wear" . tyre, {used: Round(wear), remaining: Round(100 - wear)})
 
 					if this.supportsPitstop()
 						if this.hasPreparedPitstop()
@@ -4610,6 +4614,9 @@ class RaceEngineer extends RaceAssistant {
 		static wheels := CaseInsenseMap("FL", "FrontLeft", "FR", "FrontRight"
 								      , "RL", "RearLeft", "RR", "RearRight")
 
+		if !inList(["FL", "FR", "RL", "RR"], brake)
+			throw "Unknown tyre descriptor (" . brake . ") detected in RaceEngineer.brakeWearWarning..."
+
 		if (this.hasEnoughData(false) && this.Speaker[false] && this.Announcements["BrakeWearWarning"])
 			if (!knowledgeBase.getValue("InPitLane", false) && !knowledgeBase.getValue("InPit", false)) {
 				speaker := this.getSpeaker()
@@ -4617,8 +4624,9 @@ class RaceEngineer extends RaceAssistant {
 				speaker.beginTalk()
 
 				try {
-					speaker.speakPhrase("BrakeWear", {wear: Round(wear), remaining: 100 - Round(wear)
-												    , brake: speaker.Fragments[wheels[brake]]})
+					speaker.speakPhrase("BrakeWearWarning", {brake: speaker.Fragments[wheels[brake]]})
+
+					speaker.speakPhrase("Wear" . brake, {used: Round(wear), remaining: Round(100 - wear)})
 
 					if this.supportsPitstop()
 						if this.hasPreparedPitstop()
@@ -4734,6 +4742,9 @@ class RaceEngineer extends RaceAssistant {
 		local speaker, fragments
 
 		static tyreLookup := CaseInsenseMap("FL", "FrontLeft", "FR", "FrontRight", "RL", "RearLeft", "RR", "RearRight")
+
+		if !inList(["FL", "FR", "RL", "RR"], tyre)
+			throw "Unknown tyre descriptor (" . tyre . ") detected in RaceEngineer.pressureLossWarning..."
 
 		if (this.hasEnoughData(false) && (this.Session == kSessionRace))
 			if (!knowledgeBase.getValue("InPitLane", false) && !knowledgeBase.getValue("InPit", false))

@@ -294,12 +294,14 @@ class RaceStrategistConfigurator extends ConfiguratorPanel {
 
 		this.saveSimulatorConfiguration()
 
-		configuration := this.iSimulatorConfigurations[this.iCurrentSimulator]
+		if this.iCurrentSimulator {
+			configuration := this.iSimulatorConfigurations[this.iCurrentSimulator]
 
-		for simulator, simulatorConfiguration in this.iSimulatorConfigurations
-			if (simulator != this.iCurrentSimulator)
-				for ignore, key in ["LearningLaps", "ConsideredHistoryLaps", "HistoryLapsDamping", "SaveRaceReport", "SaveTelemetry", "RaceReview"]
-					simulatorConfiguration[key] := configuration[key]
+			for simulator, simulatorConfiguration in this.iSimulatorConfigurations
+				if (simulator != this.iCurrentSimulator)
+					for ignore, key in ["LearningLaps", "ConsideredHistoryLaps", "HistoryLapsDamping", "SaveRaceReport", "SaveTelemetry", "RaceReview"]
+						simulatorConfiguration[key] := configuration[key]
+		}
 	}
 }
 

@@ -767,6 +767,8 @@ class RaceEngineer extends RaceAssistant {
 								 , "RearLeft", (Round(knowledgeBase.getValue("Tyre.Pressure.Target.RL", 0), 1) . psi)
 								 , "RearRight", (Round(knowledgeBase.getValue("Tyre.Pressure.Target.RR", 0), 1) . psi))
 					}
+
+					pitstop["BrakeChange"] := knowledgeBase.getValue("Brake.Change.Target", false)
 				}
 
 				return pitstop
@@ -853,6 +855,8 @@ class RaceEngineer extends RaceAssistant {
 									 , "RearLeft", (Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL", 0), 1) . psi)
 									 , "RearRight", (Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR", 0), 1) . psi))
 					}
+
+					pitstop["BrakeChange"] := knowledgeBase.getValue("Pitstop.Planned.Brake.Change", false)
 				}
 
 				return pitstop
@@ -938,6 +942,8 @@ class RaceEngineer extends RaceAssistant {
 								 , "RearLeft", (Round(knowledgeBase.getValue("Pitstop." . nr . ".Tyre.Pressure.RL", 0), 1) . psi)
 								 , "RearRight", (Round(knowledgeBase.getValue("Pitstop." . nr . ".Tyre.Pressure.RR", 0), 1) . psi))
 					}
+
+					pitstop["BrakeChange"] := knowledgeBase.getValue("Pitstop." . nr . ".Brake.Change", false)
 				}
 
 				return pitstop
@@ -2440,6 +2446,8 @@ class RaceEngineer extends RaceAssistant {
 																												   , "Service.Refuel", 1.8)
 									, "Session.Settings.Pitstop.Service.Tyres.Duration", getMultiMapValue(settings, "Strategy Settings"
 																											      , "Service.Tyres", 30)
+									, "Session.Settings.Pitstop.Service.Brakes.Duration", getMultiMapValue(settings, "Strategy Settings"
+																											       , "Service.Brakes", 50)
 									, "Session.Settings.Pitstop.Service.Order", getMultiMapValue(settings, "Strategy Settings"
 																										 , "Service.Order", "Simultaneous")
 									, "Session.Settings.Pitstop.Service.Last", getMultiMapValue(settings, "Session Settings", "Pitstop.Service.Last", 5)
@@ -2873,6 +2881,8 @@ class RaceEngineer extends RaceAssistant {
 					setMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Set", knowledgeBase.getValue("Tyre.Set.Target", 0))
 			}
 
+			setMultiMapValue(sessionInfo, "Pitstop", "Target.Brake.Change", knowledgeBase.getValue("Brake.Change.Target", false))
+
 			setMultiMapValue(sessionInfo, "Pitstop", "Target.Time.Box", Round(knowledgeBase.getValue("Target.Time.Box", 0) / 1000))
 			setMultiMapValue(sessionInfo, "Pitstop", "Target.Time.Pitlane", Round(knowledgeBase.getValue("Target.Time.Pitlane", 0) / 1000))
 			setMultiMapValue(sessionInfo, "Pitstop", "Target.Time.Service", Round(knowledgeBase.getValue("Target.Time.Service", 0) / 1000))
@@ -2969,6 +2979,8 @@ class RaceEngineer extends RaceAssistant {
 					setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.RL.Increment", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL.Increment", 0), 1))
 					setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.RR.Increment", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR.Increment", 0), 1))
 				}
+
+				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Brake.Change", knowledgeBase.getValue("Pitstop.Planned.Brake.Change", false))
 
 				if inList(repairService, "Bodywork")
 					setMultiMapValue(sessionInfo, "Pitstop", "Planned.Repair.Bodywork", knowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork", false))
@@ -4950,7 +4962,7 @@ setPitstopTyrePressures(context, pitstopNumber, pressureFL, pressureFR, pressure
 	return true
 }
 
-setPitstopBrackChange(context, pitstopNumber, change) {
+setPitstopBrakeChange(context, pitstopNumber, change) {
 	context.KnowledgeBase.RaceAssistant.setPitstopBrakeChange(pitstopNumber, change)
 
 	return true

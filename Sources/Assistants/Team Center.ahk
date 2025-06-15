@@ -8386,13 +8386,16 @@ class TeamCenter extends ConfigurationItem {
 							tyreCompoundColor := dtcc
 
 							if (tyreCompound && (tyreCompound != "-")) {
-								displayTyreCompound := translate(compound(tyreCompound, tyreCompoundColor))
-
 								if this.Laps.Has(lap + 1)
 									splitCompound(this.Laps[lap + 1].Stint.Compounds[1], &tyreCompound, &tyreCompoundColor)
 
-								if ((tyreCompound = "Wet") && (SessionDatabase.getSimulatorCode(this.Simulator) = "ACC"))
-									tyreSet := "-"
+								if (SessionDatabase.getSimulatorCode(this.Simulator) = "ACC")
+									if (tyreCompound = "Wet")
+										tyreSet := "-"
+									else if (tyreSet = "-")
+										splitCompound(normalizeCompound("Wet"), &tyreCompound, &tyreCompoundColor)
+
+								displayTyreCompound := translate(compound(tyreCompound, tyreCompoundColor))
 							}
 							else {
 								displayTyreCompound := "-"

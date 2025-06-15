@@ -460,15 +460,16 @@ updateEngineRepair(?lap) <= lapDamage(?lap, Engine, ?damage), Set(Damage.Engine,
 
 priority: -20, {Any: [?Lap], [?Damage.Update.Bodywork], [?Damage.Update.Suspension], [?Damage.Update.Engine]} => (Prove: updatePitstopTargetTime())
 
-updatePitstopTargetTime() <= bound?(!Fuel.Amount.Target), bound?(!Tyre.Compound.Target), !, computeTargetDamages(?damages),
-							 pitstopDeltaTime(!Lap, !Fuel.Amount.Target, !Tyre.Compound.Target, ?damages,
+updatePitstopTargetTime() <= bound?(!Fuel.Amount.Target), bound?(!Tyre.Compound.Target), bound?(!Brake.Change.Target), !,
+							 computeTargetDamages(?damages),
+							 pitstopDeltaTime(!Lap, !Fuel.Amount.Target, !Tyre.Compound.Target, !Brake.Change.Target, ?damages,
 											  ?targetServiceTime, ?targetRepairTime, ?pitlaneDelta),
 							 ?targetTime = ?targetServiceTime + ?targetRepairTime,
 							 Set(Target.Time.Box, ?targetTime), Set(Target.Time.Pitlane, ?pitlaneDelta), 
 							 Set(Target.Time.Service, ?targetServiceTime), Set(Target.Time.Repairs, ?targetRepairTime)
 
 updatePitstopTargetTime() <= computeTargetDamages(?damages),
-							 pitstopDeltaTime(!Lap, 0, Dry, ?damages, ?, ?targetRepairTime, ?),
+							 pitstopDeltaTime(!Lap, 0, Dry, false, ?damages, ?, ?targetRepairTime, ?),
 							 Set(Target.Time.Repairs, ?targetRepairTime)
 
 computeTargetDamages(?damages) <= computeDamages([true, true, true], [!Damage.Bodywork, !Damage.Suspension, !Damage.Engine], ?damages)
@@ -1210,8 +1211,7 @@ priority: -5, {All: [?Pitstop.Plan],
 priority: -5, [?Pitstop.Plan] => (Prove: updatePitstopTime())
 
 updatePitstopTime() <= computePitstopDamages(?damages),
-					   pitstopDeltaTime(!Lap, !Pitstop.Planned.Fuel, !Pitstop.Planned.Tyre.Compound, ?damages,
-											  ?pitstopServiceTime, ?pitstopRepairTime, ?pitlaneDelta),
+					   pitstopDeltaTime(!Lap, !Pitstop.Planned.Fuel, !Pitstop.Planned.Tyre.Compound, !Pitstop.Planned.Brake.Change, ?damages, ?pitstopServiceTime, ?pitstopRepairTime, ?pitlaneDelta),
 					   ?pitstopTime = ?pitstopServiceTime + ?pitstopRepairTime,
 					   Set(Pitstop.Planned.Time.Box, ?pitstopTime), Set(Pitstop.Planned.Time.Pitlane, ?pitlaneDelta), 
 					   Set(Pitstop.Planned.Time.Service, ?pitstopServiceTime), Set(Pitstop.Planned.Time.Repairs, ?pitstopRepairTime)

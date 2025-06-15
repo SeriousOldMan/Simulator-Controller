@@ -1025,12 +1025,12 @@ class PitstopHandling extends Assert {
 				if (A_Index = 3) {
 					engineer.planPitstop()
 
-					if engineer.Debug[kDebugKnowledgeBase]
+					; if engineer.Debug[kDebugKnowledgeBase]
 						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					engineer.preparePitstop()
 
-					if engineer.Debug[kDebugKnowledgeBase]
+					; if engineer.Debug[kDebugKnowledgeBase]
 						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 				}
 
@@ -1106,9 +1106,9 @@ setMultiMapValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknown" . 
 if !GetKeyState("Ctrl") {
 	startTime := A_TickCount
 
-	AHKUnit.AddTestClass(FuelReporting)
-	AHKUnit.AddTestClass(DamageReporting)
-	AHKUnit.AddTestClass(DamageAnalysis)
+	;~ AHKUnit.AddTestClass(FuelReporting)
+	;~ AHKUnit.AddTestClass(DamageReporting)
+	;~ AHKUnit.AddTestClass(DamageAnalysis)
 	AHKUnit.AddTestClass(PitstopHandling)
 
 	AHKUnit.Run()

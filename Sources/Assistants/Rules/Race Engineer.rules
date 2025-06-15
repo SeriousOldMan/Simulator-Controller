@@ -728,14 +728,14 @@ tyreWearWarning(?lap, ?tyre, ?wear) <= Call(tyreWearWarning, ?tyre, ?wear)
 ;;; Update the brake change target for the next pitstop.                    ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-{All: [?Lap], [?Lap.Remaining.Session <= ?Session.Settings.Pitstop.Service.Last],
-	  [?Brake.Change.Target = true]} => Set(Brake.Change.Target, false)
+{All: [?Lap], [?Lap.Remaining.Session <= ?Session.Settings.Pitstop.Service.Last]} => (Set: Brake.Change.Target, false)
 
 {All: [?Lap], [?Lap.Remaining.Session > ?Session.Settings.Pitstop.Service.Last]} => (Prove: checkBrakeWear(?Lap))
 
 checkBrakeWear(?lap) <= ?threshold = 100 - !Session.Settings.Brake.Wear.Warning,
 						criticalBrakeWear(?lap, [FL, FR, RL, RR], ?threshold, ?brake, ?wear), !,
 						Set(Brake.Change.Target, true)
+checkBrakeWear(?lap) <= Set(Brake.Change.Target, false)
 
 criticalBrakeWear(?, [], ?, ?, ?) <= !, fail
 criticalBrakeWear(?lap, [?brake | ?], ?threshold, ?brake, ?wear) <=

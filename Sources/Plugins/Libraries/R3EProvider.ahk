@@ -48,9 +48,10 @@ class R3EProvider extends SimulatorProvider {
 			return Task.CurrentTask
 	}
 
-	supportsPitstop(&refuelService?, &tyreService?, &repairService?) {
+	supportsPitstop(&refuelService?, &tyreService?, &brakeService?, &repairService?) {
 		refuelService := true
 		tyreService := "Axle"
+		brakeService := false
 		repairService := ["Bodywork", "Suspension"]
 
 		return true

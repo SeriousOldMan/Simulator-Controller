@@ -92,9 +92,10 @@ class SimulatorProvider {
 		}
 	}
 
-	supportsPitstop(&refuelService?, &tyreService?, &repairService?) {
+	supportsPitstop(&refuelService?, &tyreService?, &brakeService?, &repairService?) {
 		refuelService := false
 		tyreService := false
+		brakeService := false
 		repairService := []
 
 		return false

@@ -701,7 +701,7 @@ class RaceEngineer extends RaceAssistant {
 		local lapNumber, tyres, brakes, tyreCompound, tyreType, setupPressures, idealPressures, ignore, tyreType, goal, resultSet
 		local bodyworkDamage, suspensionDamage, engineDamage, bodyworkDamageSum, suspensionDamageSum, pitstop, pitstops, lap, lapNr
 		local tyres, brakes, postfix, tyre, brake, tyreTemperatures, tyrePressures, tyreWear, brakeTemperatures, brakeWear
-		local fuelService, tyreService, repairService, tyreSet
+		local fuelService, tyreService, brakeService, repairService, tyreSet
 
 		static wheels := ["FL", "FR", "RL", "RR"]
 
@@ -768,7 +768,8 @@ class RaceEngineer extends RaceAssistant {
 								 , "RearRight", (Round(knowledgeBase.getValue("Tyre.Pressure.Target.RR", 0), 1) . psi))
 					}
 
-					pitstop["BrakeChange"] := knowledgeBase.getValue("Brake.Change.Target", false)
+					if brakeService
+						pitstop["BrakeChange"] := knowledgeBase.getValue("Brake.Change.Target", false)
 				}
 
 				return pitstop
@@ -856,7 +857,8 @@ class RaceEngineer extends RaceAssistant {
 									 , "RearRight", (Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR", 0), 1) . psi))
 					}
 
-					pitstop["BrakeChange"] := knowledgeBase.getValue("Pitstop.Planned.Brake.Change", false)
+					if brakeService
+						pitstop["BrakeChange"] := knowledgeBase.getValue("Pitstop.Planned.Brake.Change", false)
 				}
 
 				return pitstop
@@ -943,7 +945,8 @@ class RaceEngineer extends RaceAssistant {
 								 , "RearRight", (Round(knowledgeBase.getValue("Pitstop." . nr . ".Tyre.Pressure.RR", 0), 1) . psi))
 					}
 
-					pitstop["BrakeChange"] := knowledgeBase.getValue("Pitstop." . nr . ".Brake.Change", false)
+					if brakeService
+						pitstop["BrakeChange"] := knowledgeBase.getValue("Pitstop." . nr . ".Brake.Change", false)
 				}
 
 				return pitstop
@@ -956,7 +959,7 @@ class RaceEngineer extends RaceAssistant {
 		}
 
 		if knowledgeBase {
-			this.Provider.supportsPitstop(&fuelService, &tyreService, &repairService)
+			this.Provider.supportsPitstop(&fuelService, &tyreService, &brakeService, &repairService)
 			this.Provider.supportsTyreManagement( , &tyreSet)
 
 			lapNumber := knowledgeBase.getValue("Lap", 0)
@@ -1993,12 +1996,12 @@ class RaceEngineer extends RaceAssistant {
 		local result := false
 		local verbose := knowledgeBase.getValue("Pitstop.Planned.Adjusted", false)
 		local index, suffix, prssKey, changed, values, value, tyreCompound, tyreCompoundColor
-		local mixedCompounds, tyreSet, tyreService, index, tyre, axle, tc, tcc
+		local mixedCompounds, tyreSet, tyreService, brakeService, index, tyre, axle, tc, tcc
 		local tyreCompounds, tyreCompoundColors
 
 		if (this.iPitstopAdjustments && this.hasPreparedPitstop()) {
 			this.Provider.supportsTyreManagement(&mixedCompounds, &tyreSet)
-			this.Provider.supportsPitstop( , &tyreService)
+			this.Provider.supportsPitstop( , &tyreService, &brakeService)
 
 			value := getMultiMapValue(data, "Setup Data", "FuelAmount", kUndefined)
 
@@ -2099,12 +2102,14 @@ class RaceEngineer extends RaceAssistant {
 				}
 			}
 
-			value := getMultiMapValue(data, "Setup Data", "ChangeBrakes", kUndefined)
+			if brakeService {
+				value := getMultiMapValue(data, "Setup Data", "ChangeBrakes", kUndefined)
 
-			if ((value != kUndefined) && (knowledgeBase.getValue("Pitstop.Planned.Brake.Change") != value)) {
-				this.pitstopOptionChanged("Change Brakes", verbose, value)
+				if ((value != kUndefined) && (knowledgeBase.getValue("Pitstop.Planned.Brake.Change") != value)) {
+					this.pitstopOptionChanged("Change Brakes", verbose, value)
 
-				result := true
+					result := true
+				}
 			}
 
 			value := getMultiMapValue(data, "Setup Data", "RepairSuspension", kUndefined)
@@ -2815,10 +2820,10 @@ class RaceEngineer extends RaceAssistant {
 		local tyreChange := false
 		local planned, prepared, tyreCompound, lap
 		local bodyworkDamage, suspensionDamage, index, position, defaultTyreCompound, defaultTyreCompoundColor
-		local fuelService, tyreService, repairService, index, tyre, axle
+		local fuelService, tyreService, brakeService, repairService, index, tyre, axle
 
 		if knowledgeBase {
-			this.Provider.supportsPitstop(&fuelService, &tyreService, &repairService)
+			this.Provider.supportsPitstop(&fuelService, &tyreService, &brakeService, &repairService)
 			this.Provider.supportsTyreManagement( , &tyreSet)
 
 			if fuelService
@@ -2889,7 +2894,8 @@ class RaceEngineer extends RaceAssistant {
 					setMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Set", knowledgeBase.getValue("Tyre.Set.Target", 0))
 			}
 
-			setMultiMapValue(sessionInfo, "Pitstop", "Target.Brake.Change", knowledgeBase.getValue("Brake.Change.Target", false))
+			if brakeService
+				setMultiMapValue(sessionInfo, "Pitstop", "Target.Brake.Change", knowledgeBase.getValue("Brake.Change.Target", false))
 
 			setMultiMapValue(sessionInfo, "Pitstop", "Target.Time.Box", Round(knowledgeBase.getValue("Target.Time.Box", 0) / 1000))
 			setMultiMapValue(sessionInfo, "Pitstop", "Target.Time.Pitlane", Round(knowledgeBase.getValue("Target.Time.Pitlane", 0) / 1000))
@@ -2988,7 +2994,8 @@ class RaceEngineer extends RaceAssistant {
 					setMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Pressure.RR.Increment", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR.Increment", 0), 1))
 				}
 
-				setMultiMapValue(sessionInfo, "Pitstop", "Planned.Brake.Change", knowledgeBase.getValue("Pitstop.Planned.Brake.Change", false))
+				if brakeService
+					setMultiMapValue(sessionInfo, "Pitstop", "Planned.Brake.Change", knowledgeBase.getValue("Pitstop.Planned.Brake.Change", false))
 
 				if inList(repairService, "Bodywork")
 					setMultiMapValue(sessionInfo, "Pitstop", "Planned.Repair.Bodywork", knowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork", false))

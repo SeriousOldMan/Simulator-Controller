@@ -1009,6 +1009,7 @@ systemMonitor(command := false, arguments*) {
 		local html := ""
 		local fuelService := false
 		local tyreService := false
+		local brakeService := false
 		local repairService := []
 		local tyreSet := false
 		local tyreCompound, tyreCompounds, tyrePressures, index, tyre, axle, fragment
@@ -1057,7 +1058,7 @@ systemMonitor(command := false, arguments*) {
 			html .= "<table class=`"table-std`">"
 
 			if provider {
-				provider.supportsPitstop(&fuelService, &tyreService, &repairService)
+				provider.supportsPitstop(&fuelService, &tyreService, &brakeService, &repairService)
 				provider.supportsTyreManagement( , &tyreSet)
 			}
 

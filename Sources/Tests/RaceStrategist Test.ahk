@@ -43,9 +43,10 @@ class UnknownProvider extends SimulatorProvider {
 		}
 	}
 
-	supportsPitstop(&refuelService?, &tyreService?, &repairService?) {
+	supportsPitstop(&refuelService?, &tyreService?, &brakeService?, &repairService?) {
 		refuelService := true
 		tyreService := "All"
+		brakeService := true
 		repairService := ["Bodywork", "Suspension", "Engine"]
 
 		return true

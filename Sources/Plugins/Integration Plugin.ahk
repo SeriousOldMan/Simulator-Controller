@@ -425,7 +425,7 @@ class IntegrationPlugin extends ControllerPlugin {
 		}
 
 		if this.Provider {
-			this.Provider.supportsPitstop(&fuelService, &tyreService, &repairService)
+			this.Provider.supportsPitstop(&fuelService, &tyreService, , &repairService)
 			this.Provider.supportsTyreManagement( , &tyreSet)
 		}
 

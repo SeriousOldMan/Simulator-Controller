@@ -313,7 +313,7 @@ class LMUPlugin extends Sector397Plugin {
 				case "Repair Suspension", "Repair Bodywork", "Repair Engine":
 					return [this.getOptionHandler(option).Call("Get")]
 				case "Change Brakes":
-					return [this.getOptionHandler("Change Brakes").Call("Get")]
+					return [this.getOptionHandler(option).Call("Get")]
 				case "Driver":
 					return [this.getOptionHandler(option).Call("Get")]
 				default:

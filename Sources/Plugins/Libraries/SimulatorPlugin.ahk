@@ -479,8 +479,8 @@ class SimulatorPlugin extends ControllerPlugin {
 		return SimulatorProvider.createSimulatorProvider(this.Simulator[true], this.Car, this.Track)
 	}
 
-	supportsPitstop(&refuelService?, &tyreService?, &repairService?) {
-		return this.Provider.supportsPitstop(&refuelService, &tyreService, &repairService)
+	supportsPitstop(&refuelService?, &tyreService?, &brakeService?, &repairService?) {
+		return this.Provider.supportsPitstop(&refuelService, &tyreService, &brakeService, &repairService)
 	}
 
 	supportsTyreManagement(&mixedCompounds?, &tyreSets?) {
@@ -711,9 +711,9 @@ class SimulatorPlugin extends ControllerPlugin {
 
 	getPitstopAllOptionValues() {
 		local options := CaseInsenseMap()
-		local tyreSet, refuelService, tyreService, repairService
+		local tyreSet, refuelService, tyreService, brakeService, repairService
 
-		if this.supportsPitstop(&refuelService, &tyreService, &repairService) {
+		if this.supportsPitstop(&refuelService, &tyreService, &brakeService, &repairService) {
 			if refuelService
 				options["Refuel"] := this.getPitstopOptionValues("Refuel")
 
@@ -737,7 +737,8 @@ class SimulatorPlugin extends ControllerPlugin {
 					options["Tyre Set"] := this.getPitstopOptionValues("Tyre Set")
 			}
 			
-			options["Change Brakes"] := this.getPitstopOptionValues("Change Brakes")
+			if brakeService
+				options["Change Brakes"] := this.getPitstopOptionValues("Change Brakes")
 
 			if repairService {
 				if inList(repairService, "Suspension")

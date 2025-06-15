@@ -23,9 +23,10 @@ class AMS2Provider extends SimulatorProvider {
 		}
 	}
 
-	supportsPitstop(&refuelService?, &tyreService?, &repairService?) {
+	supportsPitstop(&refuelService?, &tyreService?, &brakeService?, &repairService?) {
 		refuelService := true
 		tyreService := "All"
+		brakeService := false
 		repairService := ["Bodywork", "Suspension"]
 
 		return true

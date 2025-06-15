@@ -8297,7 +8297,8 @@ class TeamCenter extends ConfigurationItem {
 		local pressureFL, pressureFR, pressureRL, pressureRR, repairBodywork, repairSuspension, repairEngine
 		local pressures, displayPressures, displayFuel, driverRequest, tries, pitstopNr, stint, hasPlanned, lastPitstop
 		local pitstop, serviceTime, repairsTime, pitlaneTime
-		local fuelService, tyreService, repairService, tyreSets, index, tyre, axle, displayTyreCompound, tc, tcc, dtc, dtcc
+		local fuelService, tyreService, brakeService, repairService, tyreSets, index, tyre, axle
+		local displayTyreCompound, tc, tcc, dtc, dtcc
 
 		loop this.PitstopsListView.GetCount()
 			nextStop := Max(nextStop, this.PitstopsListView.GetText(A_Index))
@@ -8315,7 +8316,7 @@ class TeamCenter extends ConfigurationItem {
 
 		this.showMessage(translate("Updating pitstops"))
 
-		this.Provider.supportsPitstop(&fuelService, &tyreService, &repairService)
+		this.Provider.supportsPitstop(&fuelService, &tyreService, &brakeService, &repairService)
 		this.Provider.supportsTyreManagement( , &tyreSets)
 
 		if newLaps {
@@ -14275,7 +14276,7 @@ manageTeam(teamCenterOrCommand, teamDrivers := false, arguments*) {
 
 pitstopSettings(teamCenterOrCommand := false, arguments*) {
 	local tyreChange := false
-	local fuelService, tyreService, repairService, tyreSet, index, tyre, axle, tyreCompound, dtc
+	local fuelService, tyreService, brakeService, repairService, tyreSet, index, tyre, axle, tyreCompound, dtc
 	local tyreCompoundFL, tyreCompoundFR, tyreCompoundRL, tyreCompoundRR
 
 	static tCenter := false
@@ -14311,7 +14312,7 @@ pitstopSettings(teamCenterOrCommand := false, arguments*) {
 
 				settingsListView.Delete()
 
-				tCenter.Provider.supportsPitstop(&fuelService, &tyreService, &repairService)
+				tCenter.Provider.supportsPitstop(&fuelService, &tyreService, &brakeService, &repairService)
 				tCenter.Provider.supportsTyreManagement( , &tyreSet)
 
 				if (fuelService && arguments[1].Has("FuelAmount"))

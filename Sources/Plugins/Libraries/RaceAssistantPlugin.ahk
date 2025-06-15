@@ -2121,7 +2121,6 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	performPitstop(lapNumber, options) {
 		local data, dataFile, ignore, key, value
 
-
 		if this.RaceAssistant {
 			dataFile := temporaryFileName(this.Plugin, "pitstop")
 
@@ -2130,7 +2129,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			for ignore, key in ["Refuel", "Tyre Compound", "Tyre Compound Front", "Tyre Compound Rear"
 							  , "Tyre Compound Front Left", "Tyre Compound Front Right"
 							  , "Tyre Compound Rear Left", "Tyre Compound Rear Right"
-							  , "Tyre Set", "Tyre Pressures"
+							  , "Tyre Set", "Tyre Pressures", "Change Brakes"
 							  , "Repair Suspension", "Repair Bodywork", "Repair Engine"]
 				if options.Has(key) {
 					value := options[key]

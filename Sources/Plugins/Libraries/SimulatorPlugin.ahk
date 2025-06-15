@@ -736,6 +736,8 @@ class SimulatorPlugin extends ControllerPlugin {
 				if (this.supportsTyreManagement( , &tyreSet) && tyreSet)
 					options["Tyre Set"] := this.getPitstopOptionValues("Tyre Set")
 			}
+			
+			options["Change Brakes"] := this.getPitstopOptionValues("Change Brakes")
 
 			if repairService {
 				if inList(repairService, "Suspension")

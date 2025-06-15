@@ -283,6 +283,8 @@ class LMUProvider extends Sector397Provider {
 			setMultiMapValue(data, "Setup Data", "TyrePressureRL", setupData.TyrePressure["Rear Left"])
 			setMultiMapValue(data, "Setup Data", "TyrePressureRR", setupData.TyrePressure["Rear Right"])
 
+			setMultiMapValue(data, "Setup Data", "ChangeBrakes", setupData.BrakeChange)
+
 			setMultiMapValue(data, "Setup Data", "RepairBodywork", setupData.RepairBodywork)
 			setMultiMapValue(data, "Setup Data", "RepairSuspension", setupData.RepairSuspension)
 			setMultiMapValue(data, "Setup Data", "RepairEngine", setupData.RepairEngine)

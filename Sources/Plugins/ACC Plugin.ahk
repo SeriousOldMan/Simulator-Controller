@@ -1661,6 +1661,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 						return (inList(this.iPSOptions, "Tyre Set") ? ["Dry", "Black"] : ["Wet", "Black"])
 					else
 						return [false, false]
+				case "Brake Change":
+					return [this.iPSChangeBrakes]
 				case "Repair Suspension":
 					return [this.iRepairSuspensionChosen]
 				case "Repair Bodywork":

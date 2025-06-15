@@ -2099,6 +2099,14 @@ class RaceEngineer extends RaceAssistant {
 				}
 			}
 
+			value := getMultiMapValue(data, "Setup Data", "ChangeBrakes", kUndefined)
+
+			if ((value != kUndefined) && (knowledgeBase.getValue("Pitstop.Planned.Brake.Change") != value)) {
+				this.pitstopOptionChanged("Change Brakes", verbose, value)
+
+				result := true
+			}
+
 			value := getMultiMapValue(data, "Setup Data", "RepairSuspension", kUndefined)
 
 			if ((value != kUndefined) && (knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension") != value)) {
@@ -3997,6 +4005,8 @@ class RaceEngineer extends RaceAssistant {
 							knowledgeBase.setFact(prssKey, targetPressure)
 						}
 					}
+				case "Change Brakes":
+					knowledgeBase.setFact("Pitstop.Planned.Brake.Change", values[1])
 				case "Repair Suspension":
 					knowledgeBase.setFact("Pitstop.Planned.Repair.Suspension", values[1])
 				case "Repair Bodywork":
@@ -4149,6 +4159,8 @@ class RaceEngineer extends RaceAssistant {
 					for index, tyre in ["FL", "FR", "RL", "RR"]
 						knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.Pressure." . tyre, pressures[index])
 				}
+
+				knowledgeBase.setFact("Pitstop." . pitstop . ".Brake.Change", getMultiMapValue(options, "Pitstop", "Change.Brakes", false))
 
 				knowledgeBase.setFact("Pitstop." . pitstop . ".Repair.Suspension", getMultiMapValue(options, "Pitstop", "Repair.Suspension", false))
 				knowledgeBase.setFact("Pitstop." . pitstop . ".Repair.Bodywork", getMultiMapValue(options, "Pitstop", "Repair.Bodywork", false))

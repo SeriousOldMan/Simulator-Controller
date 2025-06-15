@@ -822,9 +822,11 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 						case "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right":
 							this.changeTyrePressure(option, action, steps)
 						case "Front Brake", "Rear Brake":
-							this.changeBrakeType(option, action)
+							loop steps
+								this.changeBrakeType(option, action)
 						case "Driver":
-							this.changeDriver(action)
+							loop steps
+								this.changeDriver(action)
 						default:
 							super.updatePitstopOption(option, action, steps)
 					}
@@ -1924,6 +1926,30 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 				if finished
 					break
+			}
+	}
+
+	setPitstopBrakeChange(pitstopNumber, change, frontBrakePads := false, rearBrakePads := false) {
+		super.setPitstopBrakeChange(pitstopNumber, change, frontBrakePads, rearBrakePads)
+
+		if this.requirePitstopMFD()
+			if (this.iPSChangeBrakes && !change)
+				this.toggleActivity("Change Brakes")
+			else if change {
+				if !this.iPSChangeBrakes
+					this.toggleActivity("Change Brakes")
+
+				if frontBrakePads {
+					this.changePitstopOption("Front Brake", "Previous", 4)
+
+					this.changePitstopOption("Front Brake", "Next", frontBrakePads - 1)
+				}
+
+				if rearBrakePads {
+					this.changePitstopOption("Rear Brake", "Previous", 4)
+
+					this.changePitstopOption("Rear Brake", "Next", rearBrakePads - 1)
+				}
 			}
 	}
 

@@ -167,22 +167,6 @@ class LMURESTProvider {
 			}
 		}
 
-		RepairBodywork {
-			Get {
-				local ignore, bodywork
-
-				this.getRepairs(&bodywork, &ignore, &ignore)
-
-				return bodywork
-			}
-
-			Set {
-				this.setRepairs(value, this.RepairSuspension, this.RepairEngine)
-
-				return this.RepairBodywork
-			}
-		}
-
 		TyreCompound[tyre := "All"] {
 			Get {
 				return this.getTyreCompound(tyre)
@@ -204,6 +188,22 @@ class LMURESTProvider {
 				this.setTyrePressure(tyre, value)
 
 				return this.TyrePressure[tyre]
+			}
+		}
+
+		RepairBodywork {
+			Get {
+				local ignore, bodywork
+
+				this.getRepairs(&bodywork, &ignore, &ignore)
+
+				return bodywork
+			}
+
+			Set {
+				this.setRepairs(value, this.RepairSuspension, this.RepairEngine)
+
+				return this.RepairBodywork
 			}
 		}
 

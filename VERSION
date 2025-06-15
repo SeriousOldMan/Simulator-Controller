@@ -1,9 +1,9 @@
 [Development]
 Version=6.3.7.0-dev
 Target=6.3.7.0-release
-Date=06/14/2025
+Date=06/15/2025
 Download=
-Changes=Engineer handles brake change, Setting for brake service, Setting for brake service duration, Fixed pitstop history building for the Strategist
+Changes=Engineer handles brake change, Setting for brake service, Setting for brake service duration, Fixed pitstop history building for the Strategist, Show brake change in "System Monitor", Include brake change in "Session State.json", Engineer reacts to post-prepare brake change setting
 Components=Media->5.6.1,Configuration->6.3.6,Utilities->6.3.0
 [Release]
 Version=6.3.6.0-release
@@ -15,9 +15,6 @@ Components=Media->5.6.1,Configuration->6.3.6,Utilities->6.3.0
 Media.5.6.1.Path=Resources
 Media.5.6.1.Content=Splash Media
 Media.5.6.1.Download=https://www.dropbox.com/scl/fi/3c56fjdvdd4od5t7rsuc9/Media-5.6.1.zip?rlkey=x0icl05jy05nn886due4dsblv&dl=1;https://%master%:801/api/public/dl/QoDnWZ83;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Media+5.6.1.zip
-Configuration.6.3.2.Path=Resources
-Configuration.6.3.2.Content=Setup
-Configuration.6.3.2.Download=https://%master%:801/api/public/dl/6ECw9H64;https://www.dropbox.com/scl/fi/paibnvv9dqw3ukruhfnbk/Conifguration-6.3.2.zip?rlkey=w59u6i50bt4v5u7k9u0m07rjx&st=2hcedvh0&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Conifguration+6.3.2.zip
 Configuration.6.3.6.Path=Resources
 Configuration.6.3.6.Content=Setup
 Configuration.6.3.6.Download=https://www.dropbox.com/scl/fi/j72tjzf0b2dn2sfzj0lqq/Configuration-6.3.6.zip?rlkey=nbl0uyq7odm3wpumdoidnz33j&st=f2zfgkih&dl=1;https://%master%:801/api/public/dl/uIxKRbv0;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.3.6.zip

@@ -1185,7 +1185,7 @@ systemMonitor(command := false, arguments*) {
 						   . computePressure("Planned.Tyre.Pressure.RR") . "</td></tr>")
 				}
 
-				if getMultiMapValue(sessionState, "Pitstop", "Planned.Brake.Change", false)
+				if (brakeService && getMultiMapValue(sessionState, "Pitstop", "Planned.Brake.Change", false))
 					html .= ("<tr><th class=`"th-std th-left`">" . translate("Brakes") . "</th><td class=`"td-wdg`" colspan=`"2`">" . (getMultiMapValue(sessionState, "Pitstop", "Planned.Brake.Change", false) ? translate("Yes") : translate("No")) . "</td></tr>")
 
 				if (repairService.Length > 0)
@@ -1319,7 +1319,7 @@ systemMonitor(command := false, arguments*) {
 						   . computePressure("Target.Tyre.Pressure.RR") . "</td></tr>")
 				}
 
-				if getMultiMapValue(sessionState, "Pitstop", "Target.Brake.Change", false)
+				if (brakeService && getMultiMapValue(sessionState, "Pitstop", "Target.Brake.Change", false))
 					html .= ("<tr><th class=`"th-std th-left`">" . translate("Brakes") . "</th><td class=`"td-wdg`" colspan=`"2`">" . (getMultiMapValue(sessionState, "Pitstop", "Target.Brake.Change", false) ? translate("Yes") : translate("No")) . "</td></tr>")
 
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Loss of time") . "</th><td class=`"td-wdg`" colspan=`"2`">" . (getMultiMapValue(sessionState, "Pitstop", "Target.Time.Box") + getMultiMapValue(sessionState, "Pitstop", "Target.Time.Pitlane")) . translate(" Seconds") . "</td></tr>")

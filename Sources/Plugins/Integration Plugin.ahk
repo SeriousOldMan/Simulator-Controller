@@ -396,6 +396,7 @@ class IntegrationPlugin extends ControllerPlugin {
 		local state := Map()
 		local fuelService := false
 		local tyreService := false
+		local brakeService := false
 		local repairService := []
 		local tyreSet := false
 		local tyreCompound, tyreSet, tyrePressures, index, tyre, axle
@@ -425,7 +426,7 @@ class IntegrationPlugin extends ControllerPlugin {
 		}
 
 		if this.Provider {
-			this.Provider.supportsPitstop(&fuelService, &tyreService, , &repairService)
+			this.Provider.supportsPitstop(&fuelService, &tyreService, &brakeService, &repairService)
 			this.Provider.supportsTyreManagement( , &tyreSet)
 		}
 
@@ -519,6 +520,11 @@ class IntegrationPlugin extends ControllerPlugin {
 				state["TyrePressureIncrements"] := [0, 0, 0, 0]
 			}
 
+			if brakeService
+				state["Brakes"] := (getMultiMapValue(sessionInfo, "Pitstop", "Planned.Brake.Change", false) ? kTrue : kFalse)
+			else
+				state["Brakes"] := kNull
+
 			if (repairService.Length > 0)
 				state["Repairs"] := computeRepairs(getMultiMapValue(sessionInfo, "Pitstop", "Planned.Repair.Bodywork")
 												 , getMultiMapValue(sessionInfo, "Pitstop", "Planned.Repair.Suspension")
@@ -606,6 +612,11 @@ class IntegrationPlugin extends ControllerPlugin {
 				state["TyrePressures"] := [kNull, kNull, kNull, kNull]
 				state["TyrePressureIncrements"] := [0, 0, 0, 0]
 			}
+
+			if brakeService
+				state["Brakes"] := (getMultiMapValue(sessionInfo, "Pitstop", "Target.Brake.Change", false) ? kTrue : kFalse)
+			else
+				state["Brakes"] := kNull
 		}
 		else {
 			state["Number"] := kNull

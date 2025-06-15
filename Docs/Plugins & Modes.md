@@ -1576,7 +1576,6 @@ The content of the JSON file looks like this (depending on the current situation
 			"PitlaneDelta": 23,
 			"Number": 1,
 			"Prepared": 0,
-			"Repairs": "-",
 			"TyreCompound": "Dry (Black)",
 			"TyrePressures": [
 				25.2,
@@ -1585,7 +1584,9 @@ The content of the JSON file looks like this (depending on the current situation
 				24.3
 			],
 			"TyrePressureIncrements": [0.2, 0.1, -0.3, -0.2],
-			"TyreSet": 2
+			"TyreSet": 2,
+			"Brakes": false,
+			"Repairs": "-"
 		},
 		"Session": {
 			"Car": "McLaren 720S GT3",
@@ -1667,6 +1668,12 @@ The content of the JSON file looks like this (depending on the current situation
 				25.1,
 				24.5
 			],
+			"PressureLosses": [
+				0.0,
+				- 0.1,
+				0.0,
+				- 0.2
+			],
 			"Temperatures": [
 				80.6,
 				80.6,
@@ -1680,6 +1687,10 @@ The content of the JSON file looks like this (depending on the current situation
 				null
 			],
 			"TyreCompound": "Dry (M)"
+			"TyreCompoundFrontLeft": "Dry (M)"
+			"TyreCompoundFrontRight": "Dry (S)"
+			"TyreCompoundRearLeft": "Dry (M)"
+			"TyreCompoundRearRight": "Dry (M)"
 			"TyreSet": 3
 		},
 		"Instructions": {

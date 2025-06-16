@@ -46,8 +46,26 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 # Upcoming release
 
-Not yet planned...
-  
+## 6.3.7.0
+
+#### Date: 06/20/25 (planned)
+
+#### Fixes
+
+  - Fixed a critical bug with pitstop history building for the Strategist, which could cause wrong strategy decisions.
+
+#### Changes
+
+  - The Race Engineer now can handle brake pad changes during pitstop.
+    - A brake change will be automatically planned in solo races, if a high brake pad wear had been detected and reported before.
+	- The upcoming change of brake pads will be announced by the Engineer, when he informs about the pitstop plan.
+	- The Engineer will also react to [changes made using the in-game Pitstop MFD settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#the-pitstop), once a pitstop has been prepared (in ACC and Le Mans Ultimate).
+	- Several new [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) let you specify, whether the Engineer will provide brake service at all and how long a brake service will take at a pitstop (default is 50 seconds).
+	- Brake pad changes can be controlled from the "Team Center" when [planning a pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#planning-a-pitstop).
+	- Information about recent brake pad changes has been added to various reports in the "Team Center".
+	- Information about planned brake changes are shown on the pitstop information widget in the "System Monitor".
+	- [Developer] Also, the same information is available in the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.
+
 # Release history
 
 ## 6.3.5.0

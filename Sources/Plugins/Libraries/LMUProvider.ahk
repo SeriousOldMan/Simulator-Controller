@@ -290,6 +290,8 @@ class LMUProvider extends Sector397Provider {
 			setMultiMapValue(data, "Setup Data", "RepairSuspension", setupData.RepairSuspension)
 			setMultiMapValue(data, "Setup Data", "RepairEngine", setupData.RepairEngine)
 
+			setMultiMapValue(data, "Setup Data", "Driver", setupData.Driver)
+
 			fuelRatio := setupData.FuelRatio
 
 			if (fuelRatio && isNumber(fuelRatio))

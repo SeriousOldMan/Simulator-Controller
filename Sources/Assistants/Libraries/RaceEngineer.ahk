@@ -1991,6 +1991,38 @@ class RaceEngineer extends RaceAssistant {
 			this.getSpeaker().speakPhrase("Later")
 	}
 
+	updateDriver(name) {
+		local knowledgeBase := this.KnowledgeBase
+		local driverRequest := knowledgeBase.getValue("Pitstop.Planned.Driver.Request", false)
+		local driver, index, candidate, forName, surName
+
+		if driverRequest {
+			driverRequest := string2Values("|", driverRequest)
+
+			parseDriverName(name, &forName, &surName)
+
+			name := driverName(forName, surName, "")
+
+			parseDriverName(string2Values(":", driverRequest[2])[1], &forName, &surName)
+
+			if (name != driverName(forName, surName, ""))
+				for index, driver in string2Values(";", driverRequest[3]) {
+					parseDriverName(driver, &forName, &surName)
+
+					if (driverName(forName, surName, "") = name) {
+						value :=
+
+						this.pitstopOptionChanged("Driver Request", verbose
+												, values2String("|", driverRequest[1], values2String(":", driver, index), driverRequest[3]))
+
+						return true
+					}
+				}
+		}
+
+		return false
+	}
+
 	updatePitstop(data) {
 		local knowledgeBase := this.KnowledgeBase
 		local result := false
@@ -2136,7 +2168,14 @@ class RaceEngineer extends RaceAssistant {
 				result := true
 			}
 
-			knowledgeBase.setFact("Pitstop.Planned.Adjusted", true)
+			value := getMultiMapValue(data, "Setup Data", "Driver", kUndefined)
+
+			if (value != kUndefined)
+				if this.updateDriver(value)
+					result := true
+
+			if result
+				knowledgeBase.setFact("Pitstop.Planned.Adjusted", true)
 		}
 
 		return result
@@ -4027,6 +4066,12 @@ class RaceEngineer extends RaceAssistant {
 					knowledgeBase.setFact("Pitstop.Planned.Repair.Bodywork", values[1])
 				case "Repair Engine":
 					knowledgeBase.setFact("Pitstop.Planned.Repair.Engine", values[1])
+				case "Driver Request":
+					knowledgeBase.setFact("Pitstop.Planned.Driver.Request", values[1])
+				case "Driver":
+					this.updateDriver(values[1])
+
+					return
 			}
 
 			knowledgeBase.setFact("Pitstop.Update", true)

@@ -3,7 +3,7 @@ Version=6.3.7.0-dev
 Target=6.3.7.0-release
 Date=06/16/2025
 Download=http://simulator-controller.selfhost.co:800/api/public/dl/Fs-Lnpsy
-Changes=Engineer handles brake change, Setting for brake service, Setting for brake service duration, Fixed pitstop history building for the Strategist, Show brake change in "System Monitor", Include brake change in "Session State.json", Engineer reacts to post-prepare brake change setting, Information about brake changes in lists and reports in "Team Center", Engineer announces a brake change during pitstop planning
+Changes=Engineer handles brake change, Setting for brake service, Setting for brake service duration, Fixed pitstop history building for the Strategist, Show brake change in "System Monitor", Include brake change in "Session State.json", Engineer reacts to post-prepare brake change setting, Information about brake changes in lists and reports in "Team Center", Engineer announces a brake change during pitstop planning, Driver selection for Le Mans Ultimate, Live update of selected driver in Le Mans Ultimate
 Components=Media->5.6.1,Configuration->6.3.6,Utilities->6.3.0
 [Release]
 Version=6.3.6.0-release

@@ -2944,7 +2944,7 @@ combineCompounds(&compounds, &compoundColors := false) {
 	}
 }
 
-parseDriverName(fullName, &forName, &surName, &nickName) {
+parseDriverName(fullName, &forName, &surName, &nickName?) {
 	if InStr(fullName, "(") {
 		fullname := StrSplit(fullName, "(", " `t", 2)
 
@@ -2966,7 +2966,7 @@ parseDriverName(fullName, &forName, &surName, &nickName) {
 	}
 }
 
-driverName(forName, surName, nickName) {
+driverName(forName, surName, nickName := false) {
 	local name := ""
 
 	if (forName != "")
@@ -2974,6 +2974,9 @@ driverName(forName, surName, nickName) {
 
 	if (surName != "")
 		name .= (surName . A_Space)
+
+	if !nickName
+		nickName := (SubStr(forName, 1, 1) . SubStr(surName, 1, 1))
 
 	if (nickName != "")
 		name .= (translate("(") . nickName . translate(")"))

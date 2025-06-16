@@ -268,7 +268,7 @@ class LMURESTProvider {
 		}
 
 		supportsDriverSwap() {
-			return false
+			return (this.lookup("DRIVER:") != false)
 		}
 
 		lookup(name, data := this.Data, cache := true) {
@@ -653,10 +653,30 @@ class LMURESTProvider {
 						   : SessionDatabase.getDriverName(this.Simulator, SessionDatabase.ID))
 		}
 
-		setDriver(driver) {
+		setDriver(name) {
+			local driver := this.lookup("DRIVER:")
+			local index, candidate, forName, surName, cForName, cSurName, ignore
+
+			if driver {
+				parseDriverName(name, &forName, &surName, &ignore)
+
+				for index, candidate in driver["settings"] {
+					parseDriverName(candidate["text"], &cForName, &cSurName, &ignore)
+
+					if ((forName = cForName) && (surName = cSurName)) {
+						driver["currentSetting"] := (index - 1)
+
+						break
+					}
+				}
+			}
 		}
 
 		changeDriver(steps := 1) {
+			local driver := this.lookup("DRIVER:")
+
+			if driver
+				driver["currentSetting"] := Max(0, Min(driver["settings"].Length - 1, driver["currentSetting"] + steps))
 		}
 	}
 

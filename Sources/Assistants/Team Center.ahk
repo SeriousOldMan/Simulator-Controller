@@ -4992,11 +4992,11 @@ class TeamCenter extends ConfigurationItem {
 				if currentNr {
 					setMultiMapValue(pitstopPlan, "Pitstop", "Driver.Current", currentDriver)
 
-					setMultiMapValue(pitstopPlan, "Pitstop", "Driver", currentDriver . ":" . currentNr . "|" . pitstopDriver . ":" . nextNr)
+					setMultiMapValue(pitstopPlan, "Pitstop", "Driver"
+												, values2String("|", currentDriver . ":" . currentNr, pitstopDriver . ":" . nextNr
+																   , values2String(";", this.TeamDrivers)*))
 				}
 				else {
-					drivers := this.getPlanDrivers()
-
 					if (drivers.Has(stint.Nr)) {
 						currentDriver := drivers[stint.Nr]
 						currentNr := inDrivers(this.TeamDrivers, currentDriver)
@@ -5004,7 +5004,9 @@ class TeamCenter extends ConfigurationItem {
 						if currentNr {
 							setMultiMapValue(pitstopPlan, "Pitstop", "Driver.Current", currentDriver)
 
-							setMultiMapValue(pitstopPlan, "Pitstop", "Driver", currentDriver . ":" . currentNr . "|" . pitstopDriver . ":" . nextNr)
+							setMultiMapValue(pitstopPlan, "Pitstop", "Driver"
+														, values2String("|", currentDriver . ":" . currentNr, pitstopDriver . ":" . nextNr
+																		   , values2String(";", this.TeamDrivers)*))
 						}
 					}
 				}
@@ -14506,6 +14508,9 @@ pitstopSettings(teamCenterOrCommand := false, arguments*) {
 										       , tCenter.computeRepairs(arguments[1].Has("Pitstop.Planned.Repair.Bodywork") ? arguments[1]["Pitstop.Planned.Repair.Bodywork"] : false
 																	  , arguments[1].Has("Pitstop.Planned.Repair.Suspension") ? arguments[1]["Pitstop.Planned.Repair.Suspension"] : false
 																	  , arguments[1].Has("Pitstop.Planned.Repair.Engine") ? arguments[1]["Pitstop.Planned.Repair.Engine"] : false))
+
+				if arguments[1].Has("Driver")
+					settingsListView.Add("", translate("Driver"), arguments[1]["Driver"])
 
 				if arguments[1].Has("Pitstop.Planned.Time.Service")
 					settingsListView.Add("", translate("Service"), Round(arguments[1]["Pitstop.Planned.Time.Service"] / 1000) . translate(" Seconds"))

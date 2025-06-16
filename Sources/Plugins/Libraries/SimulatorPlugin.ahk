@@ -687,7 +687,7 @@ class SimulatorPlugin extends ControllerPlugin {
 				   , "Tyre Compound Front", "Tyre Compound Rear"
 				   , "Tyre Compound Front Left", "Tyre Compound Front Right"
 				   , "Tyre Compound Rear Left", "Tyre Compound Rear Right"
-				   , "Repair Suspension", "Repair Bodywork", "Repair Engine":
+				   , "Repair Suspension", "Repair Bodywork", "Repair Engine", "Driver":
 					newValues := this.getPitstopOptionValues(option)
 
 					if newValues {

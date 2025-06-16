@@ -4994,7 +4994,7 @@ class TeamCenter extends ConfigurationItem {
 
 					setMultiMapValue(pitstopPlan, "Pitstop", "Driver"
 												, values2String("|", currentDriver . ":" . currentNr, pitstopDriver . ":" . nextNr
-																   , values2String(";", this.TeamDrivers)*))
+																   , values2String(",", this.TeamDrivers*)))
 				}
 				else {
 					drivers := this.getPlanDrivers()
@@ -5008,7 +5008,7 @@ class TeamCenter extends ConfigurationItem {
 
 							setMultiMapValue(pitstopPlan, "Pitstop", "Driver"
 														, values2String("|", currentDriver . ":" . currentNr, pitstopDriver . ":" . nextNr
-																		   , values2String(";", this.TeamDrivers)*))
+																		   , values2String(",", this.TeamDrivers*)))
 						}
 					}
 				}

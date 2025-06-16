@@ -2001,17 +2001,21 @@ class RaceEngineer extends RaceAssistant {
 
 			parseDriverName(name, &forName, &surName)
 
+			forName := SubStr(forName, 1, 1)
+
 			name := driverName(forName, surName, "")
 
 			parseDriverName(string2Values(":", driverRequest[2])[1], &forName, &surName)
 
+			forName := SubStr(forName, 1, 1)
+
 			if (name != driverName(forName, surName, ""))
-				for index, driver in string2Values(";", driverRequest[3]) {
+				for index, driver in string2Values(",", driverRequest[3]) {
 					parseDriverName(driver, &forName, &surName)
 
-					if (driverName(forName, surName, "") = name) {
-						value :=
+					forName := SubStr(forName, 1, 1)
 
+					if (driverName(forName, surName, "") = name) {
 						this.pitstopOptionChanged("Driver Request", verbose
 												, values2String("|", driverRequest[1], values2String(":", driver, index), driverRequest[3]))
 
@@ -4107,7 +4111,7 @@ class RaceEngineer extends RaceAssistant {
 		local lastPitstop, pitstop, options, compound, pressures, tyre, mixedCompounds, brakeService
 
 		this.Provider.supportsTyreManagement(&mixedCompounds, &tyreSet)
-		this.Provider.supportsPitstops( , , &brakeService)
+		this.Provider.supportsPitstop( , , &brakeService)
 
 		if this.Speaker[false]
 			this.getSpeaker().speakPhrase("Perform")

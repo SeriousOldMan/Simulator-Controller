@@ -3961,12 +3961,13 @@ class RaceStrategist extends GridRaceAssistant {
 	createPitstopHistory(pitstopHistory, &tyreSets?) {
 		local knowledgeBase := this.KnowledgeBase
 		local pitstops := []
-		local lapNumber, mixedCompounds, tyreSet, tyreCompound, tyreCompoundColor, pitstop
+		local lapNumber, mixedCompounds, tyreSet, tyreService, brakeService, tyreCompound, tyreCompoundColor, pitstop
 		local index, tyre, axle
 
 		tyreSets := []
 
 		this.Provider.supportsTyreManagement(&mixedCompounds, &tyreSet)
+		this.Provider.supportsPitstop(&mixedCompounds, &tyreService, &brakeService)
 
 		loop getMultiMapValue(pitstopHistory, "Pitstops", "Count", 0)
 			if (getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Lap", kUndefined) != kUndefined) {
@@ -3987,6 +3988,9 @@ class RaceStrategist extends GridRaceAssistant {
 
 				if tyreSet
 					pitstop.TyreSet := getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreSet", false)
+
+				if brakeService
+					pitstop.BrakeChange := getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".BrakeChange", false)
 
 				if (mixedCompounds = "Wheel") {
 					for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {

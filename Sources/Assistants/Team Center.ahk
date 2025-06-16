@@ -103,10 +103,12 @@ global kSessionDataSchemas := CaseInsenseMap("Stint.Data", ["Nr", "Lap", "Driver
 															, "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
 															, "Repair.Bodywork", "Repair.Suspension", "Repair.Engine"
 															, "Driver.Current", "Driver.Next", "Status", "Stint"
-															, "Time.Service", "Time.Repairs", "Time.Pitlane", "Nr"]
+															, "Time.Service", "Time.Repairs", "Time.Pitlane", "Nr"
+															, "Brake.Change"]
 										   , "Pitstop.Service.Data", ["Pitstop", "Lap", "Time", "Driver.Previous", "Driver.Next", "Fuel"
 																	, "Tyre.Compound", "Tyre.Compound.Color", "Tyre.Set", "Tyre.Pressures"
-																	, "Bodywork.Repair", "Suspension.Repair", "Engine.Repair"]
+																	, "Bodywork.Repair", "Suspension.Repair", "Engine.Repair"
+																	, "Brake.Change"]
 										   , "Pitstop.Tyre.Data", ["Pitstop", "Driver", "Laps", "Compound", "Compound.Color", "Set"
 																 , "Tyre", "Tread", "Wear", "Grain", "Blister", "FlatSpot"]
 										   , "Delta.Data", ["Lap", "Car", "Type", "Delta", "Distance", "ID"]
@@ -2548,14 +2550,14 @@ class TeamCenter extends ConfigurationItem {
 
 		centerTab.UseTab(5 + ((this.Mode = "Normal") ? 1 : 0))
 
-		centerGui.Add("Text", "x24 ys+36 w80 h20", translate("Lap"))
+		centerGui.Add("Text", "x24 ys+33 w80 h20", translate("Lap"))
 		centerGui.Add("Edit", "x106 yp-2 w50 h20 Limit3 Number vpitstopLapEdit")
 		centerGui.Add("UpDown", "x138 yp-2 w18 h20 Range1-999")
 
 		centerGui.Add("Button", "x240 yp w23 h23 Center +0x200 vpitstopSettingsButton").OnEvent("Click", pitstopSettings.Bind(centerGui))
 		setButtonIcon(centerGui["pitstopSettingsButton"], kIconsDirectory . "Tools BW.ico", 1, "")
 
-		centerGui.Add("Text", "x24 yp+30 w80 h23 +0x200", translate("Driver"))
+		centerGui.Add("Text", "x24 yp+28 w80 h23 +0x200", translate("Driver"))
 		centerGui.Add("DropDownList", "x106 yp w157 vpitstopDriverDropDownMenu")
 
 		centerGui.Add("Text", "x24 yp+30 w80 h20", translate("Refuel"))
@@ -2589,15 +2591,18 @@ class TeamCenter extends ConfigurationItem {
 		centerGui.Add("Edit", "x160 yp w50 h20 Limit4 vpitstopPressureRREdit").OnEvent("Change", validateNumber.Bind("pitstopPressureRREdit"))
 		centerGui.Add("Text", "x214 yp+2 w30 h20", getUnit("Pressure"))
 
+		centerGui.Add("Text", "x24 yp+24 w80 h23 +0x200", translate("Brakes"))
+		centerGui.Add("DropDownList", "x106 yp w50 vpitstopBrakesDropDown", collect(["Yes", "No"], translate))
+
 		centerGui.Add("Text", "x24 yp+24 w80 h23 +0x200", translate("Repairs"))
 
 		choices := collect(["No Repairs", "Bodywork & Aerodynamics", "Suspension & Chassis", "Engine", "Everything"], translate)
 
 		centerGui.Add("DropDownList", "x106 yp w157 Choose5 vpitstopRepairsDropDown", choices)
 
-		centerGui.Add("Button", "x66 ys+279 w160 " . ((this.Mode = "Normal") ? "Y:Move(0.8)" : "Y:move"), translate("Instruct Engineer")).OnEvent("Click", planPitstop)
+		centerGui.Add("Button", "x66 ys+282 w160 " . ((this.Mode = "Normal") ? "Y:Move(0.8)" : "Y:move"), translate("Instruct Engineer")).OnEvent("Click", planPitstop)
 
-		this.iPitstopsListView := centerGui.Add("ListView", "x270 ys+34 w331 h269 " . ((this.Mode = "Normal") ? "H:Grow(0.8)" : "H:Grow W:Grow") . " -Multi -LV0x10 AltSubmit Checked NoSort NoSortHdr", collect(["#", "Lap", "Driver", "Refuel", "Compound", "Set", "Pressures", "Repairs"], translate))
+		this.iPitstopsListView := centerGui.Add("ListView", "x270 ys+31 w331 h274 " . ((this.Mode = "Normal") ? "H:Grow(0.8)" : "H:Grow W:Grow") . " -Multi -LV0x10 AltSubmit Checked NoSort NoSortHdr", collect(["#", "Lap", "Driver", "Refuel", "Compound", "Set", "Pressures", "Repairs"], translate))
 		this.iPitstopsListView.OnEvent("Click", choosePitstop.Bind(false))
 		this.iPitstopsListView.OnEvent("DoubleClick", openPitstop)
 		this.iPitstopsListView.OnEvent("ItemSelect", selectPitstop)
@@ -3224,12 +3229,13 @@ class TeamCenter extends ConfigurationItem {
 		local window := this.Window
 		local mixedCompounds := false
 		local tyreService := false
+		local brakeService := false
 		local tyreSets := false
 		local selected, stint, hasPitstops
-		local tyreService, tyreSets, index, dropDown
+		local index, dropDown
 
 		if this.Provider {
-			this.Provider.supportsPitstop( , &tyreService)
+			this.Provider.supportsPitstop( , &tyreService, &brakeService)
 			this.Provider.supportsTyreManagement(&mixedCompounds, &tyreSets)
 		}
 
@@ -3267,6 +3273,18 @@ class TeamCenter extends ConfigurationItem {
 
 				window[dropDown].Choose(window["pitstopTyreCompoundFLDropDown"].Value)
 			}
+		}
+
+		if brakeService {
+			window["pitstopBrakesDropDown"].Enabled := true
+
+			if (window["pitstopBrakesDropDown"].Value = 0)
+				window["pitstopBrakesDropDown"].Choose(2)
+		}
+		else {
+			window["pitstopBrakesDropDown"].Enabled := false
+
+			window["pitstopBrakesDropDown"].Choose(0)
 		}
 
 		if exist(["pitstopTyreCompoundFLDropDown", "pitstopTyreCompoundFRDropDown"
@@ -4438,6 +4456,10 @@ class TeamCenter extends ConfigurationItem {
 					pitstopTyreSetup := [tyreCompound, tyreCompoundColor, tyreSet, flPressure, frPressure, rlPressure, rrPressure]
 			}
 		}
+
+		this.Control["pitstopBrakesDropDown"].Choose(2)
+
+		this.updateState()
 	}
 
 	getDriver(stintNr) {
@@ -4826,20 +4848,20 @@ class TeamCenter extends ConfigurationItem {
 	createPitstopPlan(remote := false, pitstopLap := false, pitstopDriver := false, pitstopRefuel := false
 									 , pitstopTyreCompound := false, pitstopTyreCompoundColor := false, pitstopTyreSet := false
 									 , pitstopPressureFL := false, pitstopPressureFR := false, pitstopPressureRL := false, pitstopPressureRR := false
-									 , pitstopRepairs := []) {
+									 , pitstopRepairs := [], changeBrakes := kUndefined) {
 		local sessionStore := this.SessionStore
 		local pitstopPlan := newMultiMap()
 		local repairBodywork := false
 		local repairSuspension := false
 		local repairEngine := false
-		local stint, drivers, currentDriver, currentNr, nextNr, tyreService, index, tyre, axle
+		local stint, drivers, currentDriver, currentNr, nextNr, tyreService, brakeService, index, tyre, axle
 		local selectedTyreCompound, selectedTyreCompoundColor
 
 		static dropDowns := ["pitstopTyreCompoundFLDropDown", "pitstopTyreCompoundFRDropDown"
 						   , "pitstopTyreCompoundRLDropDown", "pitstopTyreCompoundRRDropDown"]
 
 		if !remote {
-			this.Provider.supportsPitstop( , &tyreService)
+			this.Provider.supportsPitstop( , &tyreService, &brakeService)
 
 			pitstopLap := this.Control["pitstopLapEdit"].Text
 
@@ -4918,6 +4940,9 @@ class TeamCenter extends ConfigurationItem {
 				pitstopPressureRL := convertUnit("Pressure", internalValue("Float", this.Control["pitstopPressureRLEdit"].Text), false)
 			if isNumber(internalValue("Float", this.Control["pitstopPressureRREdit"].Text))
 				pitstopPressureRR := convertUnit("Pressure", internalValue("Float", this.Control["pitstopPressureRREdit"].Text), false)
+
+			if brakeService
+				changeBrakes := (this.Control["pitstopBrakesDropDown"].Value = 1)
 
 			local pitstopRepairsDropDown := this.Control["pitstopRepairsDropDown"].Value
 
@@ -5007,6 +5032,9 @@ class TeamCenter extends ConfigurationItem {
 		else
 			setMultiMapValue(pitstopPlan, "Pitstop", "Tyre.Change", false)
 
+		if (brakeService && (changeBrakes != kUndefined))
+			setMultiMapValue(pitstopPlan, "Pitstop", "Change.Brakes", changeBrakes)
+
 		setMultiMapValue(pitstopPlan, "Pitstop", "Repair.Bodywork", repairBodywork)
 		setMultiMapValue(pitstopPlan, "Pitstop", "Repair.Suspension", repairSuspension)
 		setMultiMapValue(pitstopPlan, "Pitstop", "Repair.Engine", repairEngine)
@@ -5020,6 +5048,7 @@ class TeamCenter extends ConfigurationItem {
 		local fuel := getMultiMapValue(pitstopPlan, "Pitstop", "Refuel")
 		local tyreCompound := string2Values(",", getMultiMapValue(pitstopPlan, "Pitstop", "Tyre.Compound"))
 		local tyreCompoundColor := string2Values(",", getMultiMapValue(pitstopPlan, "Pitstop", "Tyre.Compound.Color"))
+		local changeBrakes := getMultiMapValue(pitstopPlan, "Pitstop", "Change.Brakes")
 		local repairBodywork := getMultiMapValue(pitstopPlan, "Pitstop", "Repair.Bodywork")
 		local repairSuspension := getMultiMapValue(pitstopPlan, "Pitstop", "Repair.Suspension")
 		local repairEngine := getMultiMapValue(pitstopPlan, "Pitstop", "Repair.Engine")
@@ -5114,6 +5143,7 @@ class TeamCenter extends ConfigurationItem {
 									, "Tyre.Set", tyreSet
 									, "Tyre.Pressure.Cold.Front.Left", pressures[1], "Tyre.Pressure.Cold.Front.Right", pressures[2]
 									, "Tyre.Pressure.Cold.Rear.Left", pressures[3], "Tyre.Pressure.Cold.Rear.Right", pressures[4]
+									, "Brake.Change", changeBrakes
 									, "Repair.Bodywork", repairBodywork, "Repair.Suspension", repairSuspension, "Repair.Engine", repairEngine
 									, "Driver.Current", currentDriver, "Driver.Next", nextDriver, "Status", "Planned"
 									, "Stint", this.CurrentStint.Nr + 1))
@@ -6925,7 +6955,7 @@ class TeamCenter extends ConfigurationItem {
 		local repairs := ""
 		local repairService
 
-		this.Provider.supportsPitstop( , , &repairService)
+		this.Provider.supportsPitstop( , , , &repairService)
 
 		if (bodywork && inList(repairService, "Bodywork"))
 			repairs := translate("Bodywork")
@@ -8534,6 +8564,7 @@ class TeamCenter extends ConfigurationItem {
 													, "Tyre.Pressure.Cold.Front.Left", pressures[1], "Tyre.Pressure.Cold.Front.Right", pressures[2]
 													, "Tyre.Pressure.Cold.Rear.Left", pressures[3], "Tyre.Pressure.Cold.Rear.Right", pressures[4]
 													, "Repair.Bodywork", repairBodywork, "Repair.Suspension", repairSuspension, "Repair.Engine", repairEngine
+													, "Brake.Change", getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Brake.Change", false)
 													, "Driver.Current", currentDriver, "Driver.Next", nextDriver, "Status", "Performed"
 													, "Stint", (lap <= 1) ? stint.Nr : (stint.Nr + 1)
 													, "Time.Service", serviceTime, "Time.Repairs", repairsTime, "Time.Pitlane", pitlaneTime))
@@ -8561,6 +8592,7 @@ class TeamCenter extends ConfigurationItem {
 													, "Tyre.Pressure.Cold.Front.Left", "-", "Tyre.Pressure.Cold.Front.Right", "-"
 													, "Tyre.Pressure.Cold.Rear.Left", "-", "Tyre.Pressure.Cold.Rear.Right", "-"
 													, "Repair.Bodywork", false, "Repair.Suspension", false, "Repair.Engine", false
+													, "Brake.Change", false
 													, "Driver.Current", kNull, "Driver.Next", kNull, "Status", "Performed"
 													, "Stint", "-"))
 
@@ -8775,6 +8807,7 @@ class TeamCenter extends ConfigurationItem {
 													, "Tyre.Pressure.Cold.Front.Left", pressures[1], "Tyre.Pressure.Cold.Front.Right", pressures[2]
 													, "Tyre.Pressure.Cold.Rear.Left", pressures[3], "Tyre.Pressure.Cold.Rear.Right", pressures[4]
 													, "Repair.Bodywork", repairBodywork, "Repair.Suspension", repairSuspension, "Repair.Engine", repairEngine
+													, "Brake.Change", getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Brake.Change", false)
 													, "Driver.Current", currentDriver, "Driver.Next", nextDriver, "Status", "Planned"
 													, "Stint", this.CurrentStint.Nr + 1
 													, "Time.Service", serviceTime, "Time.Repairs", repairsTime, "Time.Pitlane", pitlaneTime))
@@ -8917,7 +8950,8 @@ class TeamCenter extends ConfigurationItem {
 																	, "Tyre.Pressures", getMultiMapValue(state, "Pitstop Data", "Service.Tyre.Pressures", "")
 																	, "Bodywork.Repair", getMultiMapValue(state, "Pitstop Data", "Service.Bodywork.Repair", false)
 																	, "Suspension.Repair", getMultiMapValue(state, "Pitstop Data", "Service.Suspension.Repair", false)
-																	, "Engine.Repair", getMultiMapValue(state, "Pitstop Data", "Service.Engine.Repair", false)))
+																	, "Engine.Repair", getMultiMapValue(state, "Pitstop Data", "Service.Engine.Repair", false)
+																	, "Brake.Change", getMultiMapValue(state, "Pitstop Data", "Service.Brake.Change", false)))
 									}
 
 									if ((full || !hasTyreData)
@@ -12937,11 +12971,15 @@ class TeamCenter extends ConfigurationItem {
 		local pitstopData := this.SessionStore.query("Pitstop.Data", {Where: {Nr: pitstopNr}})[1]
 		local pressures := [pitstopData["Tyre.Pressure.Cold.Front.Left"], pitstopData["Tyre.Pressure.Cold.Front.Right"]
 						  , pitstopData["Tyre.Pressure.Cold.Rear.Left"], pitstopData["Tyre.Pressure.Cold.Rear.Right"]]
+		local brakeChange := pitstopData["Brake.Change"]
 		local repairBodywork := pitstopData["Repair.Bodywork"]
 		local repairSuspension := pitstopData["Repair.Suspension"]
 		local repairEngine := pitstopData["Repair.Engine"]
 		local repairs := this.computeRepairs(repairBodyWork, repairSuspension, repairEngine)
 		local tyreCompound, tyreSet, pressure, time
+
+		if isNull(brakeChange)
+			brakeChange := false
 
 		loop 4 {
 			pressure := pressures[A_Index]
@@ -12999,6 +13037,9 @@ class TeamCenter extends ConfigurationItem {
 				html .= ("<tr><td><b>" . translate("Tyre Pressures:") . "</b></div></td><td>" . pressures . "</td></tr>")
 		}
 
+		if brakeChange
+			html .= ("<tr><td><b>" . translate("Brakes") . translate(":") . "</b></div></td><td>" . translate("Yes") . "</td></tr>")
+
 		if (repairs != "-")
 			html .= ("<tr><td><b>" . translate("Repairs:") . "</b></div></td><td>" . repairs . "</td></tr>")
 
@@ -13012,12 +13053,16 @@ class TeamCenter extends ConfigurationItem {
 		local pitstopData := this.SessionStore.query("Pitstop.Data", {Where: {Nr: pitstopNr}})[1]
 		local pressures := [pitstopData["Tyre.Pressure.Cold.Front.Left"], pitstopData["Tyre.Pressure.Cold.Front.Right"]
 						  , pitstopData["Tyre.Pressure.Cold.Rear.Left"], pitstopData["Tyre.Pressure.Cold.Rear.Right"]]
+		local brakeChange := pitstopData["Brake.Change"]
 		local repairBodywork := pitstopData["Repair.Bodywork"]
 		local repairSuspension := pitstopData["Repair.Suspension"]
 		local repairEngine := pitstopData["Repair.Engine"]
 		local repairs := this.computeRepairs(repairBodyWork, repairSuspension, repairEngine)
 		local serviceData := this.SessionStore.query("Pitstop.Service.Data", {Where: {Pitstop: pitstopNr}})
 		local tyreCompound, tyreCompoundColor, tyreSet, name, key, pressure, fuel
+
+		if isNull(brakeChange)
+			brakeChange := false
 
 		if (serviceData.Length > 0) {
 			loop 4 {
@@ -13071,6 +13116,9 @@ class TeamCenter extends ConfigurationItem {
 				if pressures
 					html .= ("<tr><td><b>" . translate("Tyre Pressures:") . "</b></div></td><td>" . pressures . "</td></tr>")
 			}
+
+			if brakeChange
+				html .= ("<tr><td><b>" . translate("Brakes") . translate(":") . "</b></div></td><td>" . translate("Yes") . "</td></tr>")
 
 			if (repairs != "-")
 				html .= ("<tr><td><b>" . translate("Repairs:") . "</b></div></td><td>" . repairs . "</td></tr>")
@@ -13288,10 +13336,13 @@ class TeamCenter extends ConfigurationItem {
 		local tyreCompoundData := []
 		local tyreSetData := []
 		local tyrePressuresData := []
+		local brakeData := []
 		local repairsData := []
 		local tyreCompound, tyreCompoundColor, tyreSet, index, pitstopData, serviceData, pressures, repairBodywork, repairSuspension, repairs, fuel
-		local name, key, tyrePressures, header, repairEngine
+		local name, key, tyrePressures, header, repairEngine, brakeService, brakeChange
 		local time
+
+		this.Provider.supportsPitstop( , , &brakeService)
 
 		for index, pitstopData in this.SessionStore.Tables["Pitstop.Data"] {
 			pitstopNRs.Push("<th class=`"th-std`">" . index . "</th>")
@@ -13333,6 +13384,15 @@ class TeamCenter extends ConfigurationItem {
 
 				pressures := values2String(", ", pressures*)
 
+				if brakeService {
+					brakeChange := pitstopData["Brake.Change"]
+
+					if isNull(brakeChange)
+						brakeChange := false
+
+					brakeData.Push("<td class=`"td-std`">" . (brakeChange ? translate("Yes") : translate("No")) . "</td>")
+				}
+
 				repairBodywork := pitstopData["Repair.Bodywork"]
 				repairSuspension := pitstopData["Repair.Suspension"]
 				repairEngine := pitstopData["Repair.Engine"]
@@ -13363,6 +13423,15 @@ class TeamCenter extends ConfigurationItem {
 			}
 			else {
 				serviceData := serviceData[1]
+
+				if brakeService {
+					brakeChange := serviceData["Brake.Change"]
+
+					if isNull(brakeChange)
+						brakeChange := false
+
+					brakeData.Push("<td class=`"td-std`">" . (brakeChange ? translate("Yes") : translate("No")) . "</td>")
+				}
 
 				repairs := this.computeRepairs(serviceData["Bodywork.Repair"]
 											 , serviceData["Suspension.Repair"]
@@ -13423,7 +13492,8 @@ class TeamCenter extends ConfigurationItem {
 			}
 		}
 
-		for ignore, header in ["Pitstop", "Lap", "Service Time", "Last Driver", "Next Driver", "Refuel", "Tyre Compound", "Tyre Set", "Tyre Pressures", "Repairs"]
+		for ignore, header in (brakeService ? ["Pitstop", "Lap", "Service Time", "Last Driver", "Next Driver", "Refuel", "Tyre Compound", "Tyre Set", "Tyre Pressures", "Brakes", "Repairs"]
+											: ["Pitstop", "Lap", "Service Time", "Last Driver", "Next Driver", "Refuel", "Tyre Compound", "Tyre Set", "Tyre Pressures", "Repairs"])
 			headers.Push("<th class=`"th-std`">" . translate(header) . "</th>")
 
 		html .= ("<tr>" . values2String("", headers*) . "</tr>")
@@ -13432,6 +13502,7 @@ class TeamCenter extends ConfigurationItem {
 			html .= ("<tr>" . pitstopNRs[A_Index] . lapData[A_Index] . timeData[A_Index]
 							. previousDriverData[A_Index] . nextDriverData[A_Index] . refuelData[A_Index]
 							. tyreCompoundData[A_Index] . tyreSetData[A_Index] . tyrePressuresData[A_Index]
+							. (brakeService . brakeData[A_Index] . "")
 							. repairsData[A_Index]
 				   . "</tr>")
 
@@ -14417,6 +14488,12 @@ pitstopSettings(teamCenterOrCommand := false, arguments*) {
 																																	 : translate("-"))
 																			. A_Space . getUnit("Pressure", true))
 				}
+
+				if brakeService
+					if arguments[1].Has("ChangeBrakes")
+						settingsListView.Add("", translate("Brakes"), translate(arguments[1]["ChangeBrakes"] ? "Yes" : "No"))
+					else if arguments[1].Has("Pitstop.Planned.Brake.Change")
+						settingsListView.Add("", translate("Brakes"), translate(arguments[1]["Pitstop.Planned.Brake.Change"] ? "Yes" : "No"))
 
 				if (repairService.Length > 0)
 					if (arguments[1].Has("RepairBodywork") || arguments[1].Has("RepairSuspension") || arguments[1].Has("RepairEngine"))

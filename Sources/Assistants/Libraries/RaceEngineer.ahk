@@ -3453,7 +3453,7 @@ class RaceEngineer extends RaceAssistant {
 			  , changeTyres := kUndefined, tyreSet := kUndefined
 			  , tyreCompound := kUndefined, tyreCompoundColor := kUndefined, tyrePressures := kUndefined
 			  , repairBodywork := kUndefined, repairSuspension := kUndefined, repairEngine := kUndefined
-			  , requestDriver := kUndefined) {
+			  , requestDriver := kUndefined, changeBrakes := kUndefined) {
 		local knowledgeBase := this.KnowledgeBase
 		local lapNr := knowledgeBase.getValue("Lap")
 		local confirm := true
@@ -3647,6 +3647,9 @@ class RaceEngineer extends RaceAssistant {
 		if (requestDriver != kUndefined)
 			knowledgeBase.addFact("Pitstop.Plan.Driver.Request", requestDriver)
 
+		if (changeBrakes != kUndefined)
+			knowledgeBase.addFact("Pitstop.Plan.Brake.Change", changeBrakes)
+
 		result := knowledgeBase.produce()
 
 		if this.Debug[kDebugKnowledgeBase]
@@ -3769,6 +3772,10 @@ class RaceEngineer extends RaceAssistant {
 						}
 					}
 				}
+
+				if ((options == true) || (options.HasProp("Brakes") && options.Brakes) || (changeBrakes != kUndefined))
+					if knowledgeBase.getValue("Pitstop.Planned.Brake.Change", false)
+						speaker.speakPhrase("ChangeBrakes")
 
 				if ((options == true) || (options.HasProp("Repairs") && options.Repairs)
 				 || (repairBodywork != kUndefined) || (repairSuspension != kUndefined) || (repairEngine != kUndefined)) {
@@ -4049,9 +4056,10 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local tyreChange := false
 		local lastLap, flWear, frWear, rlWear, rrWear, driver, tyreCompound, tyreCompoundColor, tyreSet, result
-		local lastPitstop, pitstop, options, compound, pressures, tyre, mixedCompounds
+		local lastPitstop, pitstop, options, compound, pressures, tyre, mixedCompounds, brakeService
 
 		this.Provider.supportsTyreManagement(&mixedCompounds, &tyreSet)
+		this.Provider.supportsPitstops( , , &brakeService)
 
 		if this.Speaker[false]
 			this.getSpeaker().speakPhrase("Perform")
@@ -4167,7 +4175,8 @@ class RaceEngineer extends RaceAssistant {
 						knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.Pressure." . tyre, pressures[index])
 				}
 
-				knowledgeBase.setFact("Pitstop." . pitstop . ".Brake.Change", getMultiMapValue(options, "Pitstop", "Change.Brakes", false))
+				if brakeService
+					knowledgeBase.setFact("Pitstop." . pitstop . ".Brake.Change", getMultiMapValue(options, "Pitstop", "Change.Brakes", false))
 
 				knowledgeBase.setFact("Pitstop." . pitstop . ".Repair.Suspension", getMultiMapValue(options, "Pitstop", "Repair.Suspension", false))
 				knowledgeBase.setFact("Pitstop." . pitstop . ".Repair.Bodywork", getMultiMapValue(options, "Pitstop", "Repair.Bodywork", false))
@@ -4375,11 +4384,11 @@ class RaceEngineer extends RaceAssistant {
 		local tyreLapsRL := 0
 		local tyreLapsRR := 0
 		local fileName, pitstopLap, pitstopLaps, tyreCompound, tyreCompoundColor, tyreSet
-		local tyreService, tyreSets, pitstop, tyreChange, index, axle, tyre
+		local tyreService, brakeService, tyreSets, pitstop, tyreChange, index, axle, tyre
 
 		static postfixes := ["FL", "FR", "RL", "RR"]
 
-		this.Provider.supportsPitstop( , &tyreService)
+		this.Provider.supportsPitstop( , &tyreService, &brakeService)
 		this.Provider.supportsTyreManagement( , &tyreSets)
 
 		setMultiMapValue(pitstopHistory, "TyreSets", "1.Compound"
@@ -4523,6 +4532,10 @@ class RaceEngineer extends RaceAssistant {
 
 				if tyreChange
 					setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreChange", true)
+
+				if brakeService
+					setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".BrakeChange"
+												   , knowledgeBase.getValue("Pitstop." . A_Index . ".Brake.Change", false))
 
 				setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".RepairBodywork"
 							   , knowledgeBase.getValue("Pitstop." . A_Index . ".Repair.Bodywork", false))

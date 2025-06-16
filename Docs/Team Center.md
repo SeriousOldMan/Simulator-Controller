@@ -312,6 +312,8 @@ Of course, you can calculate and enter all values here on your own. For your con
 
 A menu appears, which let you choose one of the tyre pressure setups from the "Setups" tab or one of the settings for a past pitstop, which will then be entered together with the corresponding driver into the tyre pressure fields, where you can edit them afterwards, if desired.
 
+Lastly a note about brake changes: You have to decide on your own, when to change brakes. There may be a warning given by the Engineer for worn brake pads, but when it comes to planning and preparing a pitstop in the "Team Center", you are in charge. So take a look at the data, and plan for the best opportunity to change brakes, if necessary. 
+
 #### Automatically select the next driver
 
 The automatic selection of the next driver is supported for *Assetto Corsa Competizione*, *rFactor 2* and *Le Mans Ultimate* (in the future), as long as the following apply:

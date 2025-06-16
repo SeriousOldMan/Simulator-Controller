@@ -4997,6 +4997,8 @@ class TeamCenter extends ConfigurationItem {
 																   , values2String(";", this.TeamDrivers)*))
 				}
 				else {
+					drivers := this.getPlanDrivers()
+
 					if (drivers.Has(stint.Nr)) {
 						currentDriver := drivers[stint.Nr]
 						currentNr := inDrivers(this.TeamDrivers, currentDriver)

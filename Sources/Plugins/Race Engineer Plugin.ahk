@@ -66,7 +66,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 						driverSwapPlan := parseMultiMap(driverSwapPlan)
 
 						requestDriver := getMultiMapValue(driverSwapPlan, "Pitstop", "Driver", false)
-						
+
 						if !requestDriver
 							requestDriver := kUndefined
 
@@ -395,10 +395,10 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 					pitstopSettings := parseMultiMap(pitstopSettings)
 
 					requestDriver := getMultiMapValue(pitstopSettings, "Pitstop", "Driver", false)
-					
+
 					if !requestDriver
 						requestDriver := kUndefined
-						
+
 					this.RaceEngineer.planPitstop(getMultiMapValue(pitstopSettings, "Pitstop", "Lap", 0)
 												, "!" . getMultiMapValue(pitstopSettings, "Pitstop", "Refuel", 0)
 												, "!" . getMultiMapValue(pitstopSettings, "Pitstop", "Tyre.Change", false)
@@ -409,7 +409,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 												, getMultiMapValue(pitstopSettings, "Pitstop", "Repair.Bodywork", false)
 												, getMultiMapValue(pitstopSettings, "Pitstop", "Repair.Suspension", false)
 												, getMultiMapValue(pitstopSettings, "Pitstop", "Repair.Engine", false)
-												, requestDriver, getMultiMapValue(pitstopPlan, "Pitstop", "Change.Brakes", kUndefined))
+												, requestDriver, getMultiMapValue(pitstopSettings, "Pitstop", "Change.Brakes", kUndefined))
 				}
 			}
 		}

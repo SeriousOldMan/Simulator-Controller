@@ -1991,7 +1991,7 @@ class RaceEngineer extends RaceAssistant {
 			this.getSpeaker().speakPhrase("Later")
 	}
 
-	updateDriver(name) {
+	updateDriver(name, verbose := true) {
 		local knowledgeBase := this.KnowledgeBase
 		local driverRequest := knowledgeBase.getValue("Pitstop.Planned.Driver.Request", false)
 		local driver, index, candidate, forName, surName
@@ -2171,7 +2171,7 @@ class RaceEngineer extends RaceAssistant {
 			value := getMultiMapValue(data, "Setup Data", "Driver", kUndefined)
 
 			if (value != kUndefined)
-				if this.updateDriver(value)
+				if this.updateDriver(value, verbose)
 					result := true
 
 			if result
@@ -4072,7 +4072,7 @@ class RaceEngineer extends RaceAssistant {
 				case "Driver Request":
 					knowledgeBase.setFact("Pitstop.Planned.Driver.Request", values[1])
 				case "Driver":
-					this.updateDriver(values[1])
+					this.updateDriver(values[1], verbose)
 
 					return
 			}

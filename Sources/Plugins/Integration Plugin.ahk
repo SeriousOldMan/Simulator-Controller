@@ -447,7 +447,7 @@ class IntegrationPlugin extends ControllerPlugin {
 			state["Fuel"] := (fuelService ? convertUnit("Volume", getMultiMapValue(sessionInfo, "Pitstop", "Planned.Refuel")) : kNull)
 			state["Driver"] := kNull
 
-			driverRequest := getMultiMapValue(sessionState, "Pitstop", "Planned.Driver.Request", false)
+			driverRequest := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Driver.Request", false)
 
 			if driverRequest {
 				driverRequest := string2Values("|", driverRequest)

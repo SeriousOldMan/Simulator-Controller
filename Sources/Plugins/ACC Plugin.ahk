@@ -1749,6 +1749,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 												   , "Service.Driver.Previous", currentDriver
 												   , "Service.Driver.Next", pitstopState["newDriverNameToDisplay"]
 												   , "Service.Refuel", pitstopState["fuelToAdd"]
+												   , "Service.Brake.Change", pitstopState["changeBrakeDiscs"]
 												   , "Service.Bodywork.Repair", (pitstopState["repairBody"] ? true : false)
 												   , "Service.Suspension.Repair", (pitstopState["repairSuspension"] ? true : false)
 												   , "Service.Engine.Repair", (pitstopState["repairEngine"] ? true : false))

@@ -1571,6 +1571,7 @@ The content of the JSON file looks like this (depending on the current situation
 			"State": "Planned",
 			"Fuel": 68.0,
 			"Lap": null,
+			"Driver": "Oliver Juwig",
 			"ServiceTime": 30,
 			"RepairTime": 7,
 			"PitlaneDelta": 23,

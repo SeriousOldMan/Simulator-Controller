@@ -401,6 +401,7 @@ class IntegrationPlugin extends ControllerPlugin {
 		local tyreSet := false
 		local tyreCompound, tyreSet, tyrePressures, index, tyre, axle
 		local pressures, pressure, pressureIncrements
+		local driverRequest, driver
 
 		computeRepairs(bodywork, suspension, engine) {
 			local repairs := ""
@@ -444,6 +445,18 @@ class IntegrationPlugin extends ControllerPlugin {
 			state["ServiceTime"] := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Service", 0)
 			state["PitlaneDelta"] := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Pitlane", 0)
 			state["Fuel"] := (fuelService ? convertUnit("Volume", getMultiMapValue(sessionInfo, "Pitstop", "Planned.Refuel")) : kNull)
+			state["Driver"] := kNull
+
+			driverRequest := getMultiMapValue(sessionState, "Pitstop", "Planned.Driver.Request", false)
+
+			if driverRequest {
+				driverRequest := string2Values("|", driverRequest)
+
+				driver := string2Values(":", driverRequest[2])[1]
+
+				if (driver != string2Values(":", driverRequest[1])[1])
+					state["Driver"] := driver
+			}
 
 			if (repairService.Length > 0)
 				state["RepairTime"] := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Repairs", 0)

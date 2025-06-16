@@ -2962,6 +2962,9 @@ class RaceEngineer extends RaceAssistant {
 				if (repairService.Length > 0)
 					setMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Repairs", Round(knowledgeBase.getValue("Pitstop.Planned.Time.Repairs", 0) / 1000))
 
+				if knowledgeBase.getValue("Pitstop.Planned.Driver.Request", false)
+					setMultiMapValue(sessionInfo, "Pitstop", "Planned.Driver.Request", knowledgeBase.getValue("Pitstop.Planned.Driver.Request", false))
+
 				if fuelService
 					setMultiMapValue(sessionInfo, "Pitstop", "Planned.Refuel", knowledgeBase.getValue("Pitstop.Planned.Fuel", 0))
 

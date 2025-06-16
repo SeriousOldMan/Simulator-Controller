@@ -1014,6 +1014,7 @@ systemMonitor(command := false, arguments*) {
 		local repairService := []
 		local tyreSet := false
 		local tyreCompound, tyreCompounds, tyrePressures, index, tyre, axle, fragment
+		local driverRequest, driver
 
 		computePressure(key) {
 			local value := getMultiMapValue(sessionState, "Pitstop", key, false)
@@ -1069,6 +1070,17 @@ systemMonitor(command := false, arguments*) {
 
 				if pitstopLap
 					html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap") . "</th><td class=`"td-wdg`" colspan=`"2`">" . pitstopLap . "</td></tr>")
+
+				driverRequest := getMultiMapValue(sessionState, "Pitstop", "Planned.Driver.Request", false)
+
+				if driverRequest {
+					driverRequest := string2Values("|", driverRequest)
+
+					driver := string2Values(":", driverRequest[2])[1]
+
+					if (driver != string2Values(":", driverRequest[1])[1])
+						html .= ("<tr><th class=`"th-std th-left`">" . translate("Driver") . "</th><td class=`"td-wdg`" colspan=`"2`">" . driver . "</td></tr>")
+				}
 
 				if fuelService
 					html .= ("<tr><th class=`"th-std th-left`">" . translate("Fuel") . "</th><td class=`"td-wdg`" colspan=`"2`">" . displayValue("Float", convertUnit("Volume", getMultiMapValue(sessionState, "Pitstop", "Planned.Refuel"))) . "</td></tr>")

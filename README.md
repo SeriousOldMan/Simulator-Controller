@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.3.7.0-dev](http://simulator-controller.selfhost.co:800/api/public/dl/Fs-Lnpsy) (Early build for 6.3.7. Changes: Engineer handles brake change, Setting for brake service, Setting for brake service duration, Fixed pitstop history building for the Strategist, Show brake change in "System Monitor", Include brake change in "Session State.json", Engineer reacts to post-prepare brake change setting, Information about brake changes in lists and reports in "Team Center", Engineer announces a brake change during pitstop planning, Driver selection for Le Mans Ultimate, Live update of selected driver in Le Mans Ultimate.)
+[6.3.7.0-beta](http://simulator-controller.selfhost.co:800/api/public/dl/lVdFZT-Z) (Test build for 6.3.7. Changes: Engineer handles brake change, Setting for brake service, Setting for brake service duration, Fixed pitstop history building for the Strategist, Show brake change in "System Monitor", Include brake change in "Session State.json", Engineer reacts to post-prepare brake change setting, Information about brake changes in lists and reports in "Team Center", Engineer announces a brake change during pitstop planning, Driver selection for Le Mans Ultimate, Live update of selected driver in Le Mans Ultimate, Calculations in production rules.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-637) of this version and all the versions you might have skipped, before installing and using this version.
 

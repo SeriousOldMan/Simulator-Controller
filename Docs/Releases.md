@@ -66,6 +66,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	- Information about planned brake changes are shown on the pitstop information widget in the "System Monitor".
 	- [Developer] Also, the same information is available in the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.
   - The driver for the next stint can now be selected in *Le Mans Ultimate*, as long as the corresponding setting is available in the Pitstop MFD.
+    - This has not been tested, because no LMU servers with team support are yet available.
     - Supported in the "Team Center" pitstop planning tab. Make sure that the order of the drivers set in the entry list of the "Team Center" is identical to the order of the drivers as they appear in the in-game Pitstop MFD.
 	- Also supported by using the repective controller action of the ["LMU" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-lmu).
 	- The Engineer recognizes the manual [change of the next driver in the in-game Pitstop MFD settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#the-pitstop), once a pitstop has been prepared.

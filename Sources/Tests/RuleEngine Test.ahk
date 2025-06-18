@@ -91,7 +91,7 @@ global kExecutionTestRules := "
 
 				complexClause(?x, ?y) <= ?x = [1, 2, 3], ?y = complex(A, foo([1, 2]))
 
-				{All: [?Input], {Is: ?Result = ?Input + 1}} => (Let: ?Temp = ?Result + 1), (Set: CalcResult, ?Temp)
+				{All: [?Input], {Is: ?Result = ?Input + 1}} => (Let: ?Temp = ?Result + 1), (Set: CalcResult = ?Temp)
 
 				{Any: [?Peter.grandchild], [?Peter.son]} => (Set: Peter, happy)
 				[?Peter = happy] => (Call: celebrate())

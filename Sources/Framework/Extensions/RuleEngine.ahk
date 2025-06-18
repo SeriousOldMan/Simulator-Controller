@@ -4205,7 +4205,7 @@ class RuleCompiler {
 
 	readActions(&text, &nextCharIndex) {
 		local actions := []
-		local action, arguments
+		local action, arguments, delimiter
 
 		loop {
 			this.skipDelimiter("(", &text, &nextCharIndex)
@@ -4220,7 +4220,16 @@ class RuleCompiler {
 				arguments := Array(action)
 
 				loop {
-					if ((A_Index > 1) && !this.skipDelimiter(",", &text, &nextCharIndex, false))
+					delimiter := ","
+
+					if (action = kSet) {
+						this.skipWhiteSpace(&text, &nextCharIndex)
+
+						if (SubStr(text, nextCharIndex, 1) = "=")
+							delimiter := "="
+					}
+
+					if ((A_Index > 1) && !this.skipDelimiter(delimiter, &text, &nextCharIndex, false))
 						break
 
 					arguments.Push(this.readLiteral(&text, &nextCharIndex))

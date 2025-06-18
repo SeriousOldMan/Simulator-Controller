@@ -145,7 +145,7 @@ Syntax: condition **=>** action1, ..., actionN
 	
 The left hand side of the rule therefore is an expression which repreusents a condition, followed by a "=>" and the a comma-seperated list of actions. Example:
 
-	{Any: [?Lap], {None: [?Fuel.Amount.Target]}} => (Prove: updateFuelTarget(?Lap)), (Set: Pitstop.Ready, true)
+	{Any: [?Lap], {None: [?Fuel.Amount.Target]}} => (Prove: updateFuelTarget(?Lap)), (Set: Pitstop.Ready = true)
 
 #### Referencing facts in Production Rules
 
@@ -256,7 +256,7 @@ Once the condition of a production rule is matched, all actions on the right-han
   
   - Set
   
-    Syntax / Example: (Set: Session.Laps, ?Lap)
+    Syntax / Example: (Set: Session.Laps, ?Lap) or (Set: Session.Laps = ?Lap)
 	
 	Using this action, you can create a fact in the knowledge base or alter the value of an existing one. If you omit the value, the fact is set to *true*.
   

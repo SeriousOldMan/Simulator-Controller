@@ -91,6 +91,8 @@ global kExecutionTestRules := "
 
 				complexClause(?x, ?y) <= ?x = [1, 2, 3], ?y = complex(A, foo([1, 2]))
 
+				{All: [?Input], {Is: ?Result = ?Input + 1}} => (Let: ?Temp = ?Result + 1), (Set: CalcResult = ?Temp)
+
 				{Any: [?Peter.grandchild], [?Peter.son]} => (Set: Peter, happy)
 				[?Peter = happy] => (Call: celebrate())
 				{Any: [?Paul.grandchild], [?Willy.grandChild]} => (Set: Bound, ?Paul.grandChild), (Set: NotBound, ?Peter.son), (Set: ForcedBound, !Willy.grandchild)
@@ -262,7 +264,7 @@ class Compiler extends Assert {
 
 		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
 
-		this.AssertEqual(4, productions.Length, "Not all production rules compiled...")
+		this.AssertEqual(5, productions.Length, "Not all production rules compiled...")
 		this.AssertEqual(28, reductions.Length, "Not all reduction rules compiled...")
 	}
 }
@@ -574,6 +576,24 @@ class HybridEngine extends Assert {
 				this.AssertEqual(false, (resultSet != false), "Unexpected remaining results...")
 		}
 	}
+
+	Calculation_Test() {
+		local compiler := RuleCompiler()
+		local resultSet, goal
+
+		productions := false
+		reductions := false
+
+		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
+
+		engine := RuleEngine(productions, reductions, Map())
+		kb := engine.createKnowledgeBase(engine.createFacts(), engine.createRules())
+
+		kb.setFact("Input", 5)
+		kb.produce()
+
+		this.AssertEqual(7, kb.getValue("CalcResult"), "Unexpected calculation results...")
+	}
 }
 
 celebrate(knowledgeBase) {
@@ -703,6 +723,8 @@ else {
 
 		reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= max(?sDelta, ?bDelta, ?tDelta), max(?tDelta, ?eDelta, ?delta),
 													 Call(messageBox, ?delta)
+
+		{All: [?Input], {Calc: ?Result = ?Input + 1}} => (Call: messageBox(?Result))
 	)"
 
 	productions := false
@@ -716,6 +738,8 @@ else {
 
 	kb := eng.createKnowledgeBase(eng.createFacts(), eng.createRules())
 	; eng.setTraceLevel(kTraceFull)
+
+	/*
 	g := rc.compileGoal("reportAnalysis(0, 0, 0)")
 
 	rs := kb.prove(g)
@@ -728,4 +752,8 @@ else {
 	}
 
 	withBlockedWindows(MsgBox, "Done")
+	*/
+
+	kb.setFact("Input", 5)
+	kb.produce()
 }

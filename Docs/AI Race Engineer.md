@@ -578,8 +578,8 @@ The rule engine used for Jona and the other Assistants implements support for a 
 Forward chaining rules (aka Productions) look like this:
 
 	{All: [?Pitstop.Plan], [?Tyre.Pressure.Target.FL]} =>
-		(Set: Pitstop.Planned.Tyre.Pressure.FL, ?Tyre.Pressure.Target.FL),
-		(Set: Pitstop.Planned.Tyre.Pressure.FL.Increment, !Tyre.Pressure.Target.FL.Increment)
+		(Set: Pitstop.Planned.Tyre.Pressure.FL = ?Tyre.Pressure.Target.FL),
+		(Set: Pitstop.Planned.Tyre.Pressure.FL.Increment = !Tyre.Pressure.Target.FL.Increment)
 
 This rule, for example, is triggered, when a new pitstop plan had been requested (*[?Pitstop.Plan]*) and when at the same time a target pressure for the front left tyre had been derived (typically by another rule). The rule above then *fires* and thereby copies this information to the pitstop plan.
 

@@ -62,7 +62,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	- The Engineer will also react to [changes made using the in-game Pitstop MFD settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#the-pitstop), once a pitstop has been prepared (in ACC and Le Mans Ultimate).
 	- Several new [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) let you specify, whether the Engineer will provide brake service at all and how long a brake service will take at a pitstop (default is 50 seconds).
 	- Brake pad changes can be controlled from the "Team Center" when [planning a pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#planning-a-pitstop).
-	- Information about recent brake pad changes has been added to various reports in the "Team Center".
+	- Information about executed brake pad changes has been added to various reports in the "Team Center".
 	- Information about planned brake changes are shown on the pitstop information widget in the "System Monitor".
 	- [Developer] Also, the same information is available in the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.
   - The driver for the next stint can now be selected in *Le Mans Ultimate*, as long as the corresponding setting is available in the Pitstop MFD.
@@ -72,6 +72,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	- The Engineer recognizes the manual [change of the next driver in the in-game Pitstop MFD settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#the-pitstop), once a pitstop has been prepared.
   - The selected driver for the next stint will now be shown on the pitstop information widget in the "System Monitor".
   - [Developer] The same information is also available in the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.
+  - [Developer] General expressions, that even can produce side effects, are now allowed in the [conditions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#conditions) and also in the [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#actions) of production rules.
 
 # Release history
 

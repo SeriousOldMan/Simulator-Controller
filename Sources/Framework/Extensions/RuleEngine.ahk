@@ -22,6 +22,7 @@ global kOne := "One:"
 global kNone := "None:"
 global kPredicate := "Predicate:"
 global kProve := "Prove:"
+global kCalc := "Calc:"
 
 global kEqual := "="
 global kNotEqual := "!="
@@ -450,13 +451,89 @@ class Goal extends Condition {
 	}
 
 	toString(facts := kNotInitialized) {
-		return ("{" . kProve . A_Space . this.Goal.toString() . "}")
+		return ("{" . kProve . A_Space . this.Goal.toString(facts) . "}")
 	}
 
 	toObject(facts := kNotInitialized) {
 		local predicate := Object()
 
-		predicate[kProve] := [this.Goal.toObject()]
+		predicate[kProve] := [this.Goal.toObject(facts)]
+
+		return predicate
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; Class                    Calc                                           ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class Calc extends Condition {
+	iRule := false
+
+	Type {
+		Get {
+			return kCalc
+		}
+	}
+
+	Rule {
+		Get {
+			return this.iRule
+		}
+	}
+
+	__New(rule) {
+		this.iRule := rule
+	}
+
+	getFacts(facts) {
+		local ignore, term
+
+		for ignore, term in this.Rule.Head.Arguments
+			if isInstance(term, Variable)
+				facts.Push(term.Variable[true])
+			else if isInstance(term, Fact)
+				facts.Push(term.Fact)
+	}
+
+	match(knowledgeBase, variables) {
+		local arguments := []
+		local engine := RuleEngine([], [this.Rule], Map())
+		local resultSet, arguments, ignore, argument, goal
+
+		for ignore, argument in this.Rule.Head.Arguments
+			if isInstance(argument, Variable) {
+				if (argument.getValue(variables) != kNotInitialized)
+					arguments.Push(Literal(argument.toString(variables)))
+				else
+					arguments.Push(argument)
+			}
+			else
+				arguments.Push(argument.substituteVariables(variables))
+
+		goal := Struct(this.Rule.Head.Functor, arguments)
+
+		resultSet := engine.createKnowledgeBase(knowledgeBase.Facts, engine.createRules()).prove(goal)
+
+		if resultSet {
+			goal.doVariables(resultSet, (var, value) => variables.setValue(var, value.toString(resultSet)))
+
+			resultSet.dispose()
+
+			return true
+		}
+		else
+			return false
+	}
+
+	toString(facts := kNotInitialized) {
+		return ("{" . kCalc . A_Space . this.Rule.Tail[1].toString(facts) . "}")
+	}
+
+	toObject(facts := kNotInitialized) {
+		local predicate := Object()
+
+		predicate[kCalc] := [this.Rule.Tail[1].toObject(facts)]
 
 		return predicate
 	}
@@ -1002,6 +1079,78 @@ class ProveAction extends CallAction {
 
 			resultSet.dispose()
 		}
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; Class                    CalcAction                                     ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class CalcAction extends Action {
+	iRule := false
+
+	Action {
+		Get {
+			return kCalc
+		}
+	}
+
+	Rule {
+		Get {
+			return this.iRule
+		}
+	}
+
+	__New(rule) {
+		this.iRule := rule
+	}
+
+	execute(knowledgeBase, variables) {
+		local arguments := []
+		local engine := RuleEngine([], [this.Rule], Map())
+		local resultSet, arguments, ignore, argument, goal
+
+		for ignore, argument in this.Rule.Head.Arguments
+			if isInstance(argument, Variable) {
+				if (argument.getValue(variables) != kNotInitialized)
+					arguments.Push(Literal(argument.toString(variables)))
+				else
+					arguments.Push(argument)
+			}
+			else
+				arguments.Push(argument.substituteVariables(variables))
+
+		goal := Struct(this.Rule.Head.Functor, arguments)
+
+		resultSet := engine.createKnowledgeBase(knowledgeBase.Facts, engine.createRules()).prove(goal)
+
+		if resultSet {
+			goal.doVariables(resultSet, (var, value) => variables.setValue(var, value.toString(resultSet)))
+
+			resultSet.dispose()
+		}
+	}
+
+	getValues(facts) {
+		local values := []
+		local ignore, argument
+
+		for ignore, argument in this.Rule.Head.Arguments
+			values.Push(argument.getValue(facts, argument))
+
+		return values
+	}
+
+	toString(facts := kNotInitialized) {
+		return ("(" . kCalc . A_Space . this.Rule.Tail[1].toString(facts) . ")")
+	}
+
+	toObject(facts := kNotInitialized) {
+		local action := Object()
+
+		action[kCalc] := [this.Rule.Tail[1].toObject(facts)]
+
+		return action
 	}
 }
 
@@ -4018,6 +4167,8 @@ class RuleCompiler {
 
 				if (keyword = kProve)
 					conditions.Push(Array(keyword, this.readStruct(&text, &nextCharIndex)))
+				else if (keyword = kCalc)
+					conditions.Push(Array(keyword, this.readTailTerm(&text, &nextCharIndex)))
 				else
 					conditions.Push(Array(keyword, this.readConditions(&text, &nextCharIndex)*))
 
@@ -4062,6 +4213,8 @@ class RuleCompiler {
 
 			if inList([kCall, kProve, kProveAll], action)
 				actions.Push(Array(action, this.readStruct(&text, &nextCharIndex)))
+			else if (action = kCalc)
+				actions.Push(Array(action, this.readTailTerm(&text, &nextCharIndex)))
 			else {
 				arguments := Array(action)
 
@@ -4429,6 +4582,8 @@ class ConditionParser extends Parser {
 				return NotExistQuantor(this.parseArguments(expressions, 2))
 			case kProve:
 				return Goal(this.parseStruct(expressions, 2))
+			case kCalc:
+				return Calc(this.parseCalcRule(expressions, 2))
 			default:
 				return this.Compiler.createPredicateParser(expressions, this.Variables).parse(expressions)
 		}
@@ -4447,6 +4602,13 @@ class ConditionParser extends Parser {
 
 	parseStruct(conditions, start) {
 		return this.Compiler.createStructParser(conditions[2], this.Variables).parse(conditions[2])
+	}
+
+	parseCalcRule(conditions, start) {
+		local variables := CaseInsenseMap()
+		local term := this.Compiler.createTermParser(conditions[2], variables).parse(conditions[2])
+
+		return ReductionRule(Struct("calc", collect(getKeys(variables), (v) => Variable(v))), [term])
 	}
 }
 
@@ -4504,6 +4666,8 @@ class ActionParser extends Parser {
 				struct := this.Compiler.createStructParser(expressions[2]).parse(expressions[2])
 
 				return ProveAction(Literal(struct.Functor), struct.Arguments, true)
+			case kCalc:
+				return CalcAction(this.parseCalcRule(expressions))
 			case kExecute:
 				argument := this.Compiler.createPrimaryParser(expressions[2], this.Variables).parse(expressions[2])
 				arguments := this.parseArguments(expressions, 3)
@@ -4544,6 +4708,13 @@ class ActionParser extends Parser {
 				result.Push(this.Compiler.createPrimaryParser(expression, this.Variables).parse(expression))
 
 		return result
+	}
+
+	parseCalcRule(expressions) {
+		local variables := CaseInsenseMap()
+		local term := this.Compiler.createTermParser(expressions[2], variables).parse(expressions[2])
+
+		return ReductionRule(Struct("calc", collect(getKeys(variables), (v) => Variable(v))), [term])
 	}
 }
 

@@ -1,5 +1,40 @@
 # Latest stable release
 
+## 6.3.7.0
+
+#### Date: 06/20/25
+
+#### Fixes
+
+  - Fixed a critical bug with pitstop history building for the Strategist, which could cause wrong strategy decisions.
+  - Fixed some rare problems with outdated or incomplete configuration information when using the voice recognition test mode in "Simulator Setup".
+
+#### Changes
+
+  - The Race Engineer now can handle brake pad changes during pitstop.
+    - A brake change will be automatically planned in solo races, if a high brake pad wear had been detected and reported before.
+	- The upcoming change of brake pads will be announced by the Engineer, when he informs about the pitstop plan.
+	- The Engineer will also react to [changes made using the in-game Pitstop MFD settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#the-pitstop), once a pitstop has been prepared (in ACC and Le Mans Ultimate).
+	- Several new [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) let you specify, whether the Engineer will provide brake service at all and how long a brake service will take at a pitstop (default is 50 seconds).
+	- Brake pad changes can be controlled from the "Team Center" when [planning a pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#planning-a-pitstop).
+	- Information about executed brake pad changes has been added to various reports in the "Team Center".
+	- Information about planned brake changes are shown on the pitstop information widget in the "System Monitor".
+	- [Developer] Also, the same information is available in the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.
+  - The driver for the next stint can now be selected in *Le Mans Ultimate*, as long as the corresponding setting is available in the Pitstop MFD.
+    - This has not been tested, because no LMU servers with team support are yet available.
+    - Supported in the "Team Center" pitstop planning tab. Make sure that the order of the drivers set in the entry list of the "Team Center" is identical to the order of the drivers as they appear in the in-game Pitstop MFD.
+	- Also supported by using the repective controller action of the ["LMU" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-lmu).
+	- The Engineer recognizes the manual [change of the next driver in the in-game Pitstop MFD settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#the-pitstop), once a pitstop has been prepared.
+  - The selected driver for the next stint will now be shown on the pitstop information widget in the "System Monitor".
+  - [Developer] The same information is also available in the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.
+  - [Developer] General expressions, that even can produce side effects, are now allowed in the [conditions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#conditions) and also in the [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#actions) of production rules.
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.3.6.0
 
 #### Date: 06/13/25
@@ -43,39 +78,6 @@
       - Lexus RC F LMGT3
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-636), if you have configured a *Reasoning* booster for the Race Engineer.
-
-# Upcoming release
-
-## 6.3.7.0
-
-#### Date: 06/20/25 (planned)
-
-#### Fixes
-
-  - Fixed a critical bug with pitstop history building for the Strategist, which could cause wrong strategy decisions.
-  - Fixed some rare problems with outdated or incomplete configuration information when using the voice recognition test mode in "Simulator Setup".
-
-#### Changes
-
-  - The Race Engineer now can handle brake pad changes during pitstop.
-    - A brake change will be automatically planned in solo races, if a high brake pad wear had been detected and reported before.
-	- The upcoming change of brake pads will be announced by the Engineer, when he informs about the pitstop plan.
-	- The Engineer will also react to [changes made using the in-game Pitstop MFD settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#the-pitstop), once a pitstop has been prepared (in ACC and Le Mans Ultimate).
-	- Several new [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) let you specify, whether the Engineer will provide brake service at all and how long a brake service will take at a pitstop (default is 50 seconds).
-	- Brake pad changes can be controlled from the "Team Center" when [planning a pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#planning-a-pitstop).
-	- Information about executed brake pad changes has been added to various reports in the "Team Center".
-	- Information about planned brake changes are shown on the pitstop information widget in the "System Monitor".
-	- [Developer] Also, the same information is available in the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.
-  - The driver for the next stint can now be selected in *Le Mans Ultimate*, as long as the corresponding setting is available in the Pitstop MFD.
-    - This has not been tested, because no LMU servers with team support are yet available.
-    - Supported in the "Team Center" pitstop planning tab. Make sure that the order of the drivers set in the entry list of the "Team Center" is identical to the order of the drivers as they appear in the in-game Pitstop MFD.
-	- Also supported by using the repective controller action of the ["LMU" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-lmu).
-	- The Engineer recognizes the manual [change of the next driver in the in-game Pitstop MFD settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#the-pitstop), once a pitstop has been prepared.
-  - The selected driver for the next stint will now be shown on the pitstop information widget in the "System Monitor".
-  - [Developer] The same information is also available in the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.
-  - [Developer] General expressions, that even can produce side effects, are now allowed in the [conditions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#conditions) and also in the [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#actions) of production rules.
-
-# Release history
 
 ## 6.3.5.0
 

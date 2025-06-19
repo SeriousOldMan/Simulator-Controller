@@ -8,7 +8,7 @@
 
   - Fixed a critical bug with pitstop history building for the Strategist, which could cause wrong strategy decisions.
   - Fixed some rare problems with outdated or incomplete configuration information when using the voice recognition test mode in "Simulator Setup".
-  - Fixed a bug in the strategy handling for the Strategist, that prevented using a strategy with restricted tyre sets, but the simulator actually provides no information about tyre sets in the API. Mostly affected iRacing.
+  - Fixed a bug in the strategy handling for the Strategist, that prevented using a strategy with restricted tyre sets, if the simulator actually provides no information about tyre sets in the API. Mostly affected iRacing.
 
 #### Changes
 

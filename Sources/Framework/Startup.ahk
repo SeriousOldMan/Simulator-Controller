@@ -46,7 +46,7 @@ loadSimulatorConfiguration() {
 	global kSimulatorConfiguration, kVersion, kDatabaseDirectory, kAHKDirectory, kMSBuildDirectory, kNirCmd, kSox, kSilentMode, kDiagnosticsStartup
 
 	local appName := StrSplit(A_ScriptName, ".")[1]
-	local packageInfo, type, pid, path, argIndex, settings, usage
+	local packageInfo, type, pid, path, argIndex, settings, usage, diagnostics
 
 	if kLogStartup
 		logMessage(kLogOff, "Loading configuration...")
@@ -205,8 +205,14 @@ loadSimulatorConfiguration() {
 
 		setMultiMapValue(usage, "General", "Updated", A_Now)
 
+		diagnostics := getMultiMapValues(settings, "Diagnostics")
+
+		if (diagnostics.Count > 0)
+			setMultiMapValues(usage, "Diagnostics", diagnostics)
+		else
+			setMultiMapValue(usage, "Diagnostics", "Default", true)
+
 		setMultiMapValue(usage, "Applications", appName, getMultiMapValue(usage, "Applications", appName, 0) + 1)
-		setMultiMapValues(usage, "Diagnostics", getMultiMapValues(settings, "Diagnostics"))
 
 		writeMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat", usage)
 	}

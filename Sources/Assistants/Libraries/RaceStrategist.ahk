@@ -3172,14 +3172,17 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	computeAvailableTyreSets(availableTyreSets, usedTyreSets) {
-		local tyreCompound, ignore, tyreSet
+		local tyreCompound, ignore, tyreSet, tyreSets
 
-		for ignore, tyreSet in usedTyreSets {
-			tyreCompound := compound(tyreSet.Compound, tyreSet.CompoundColor)
+		this.Provider.supportsTyreManagement( , &tyreSets)
 
-			if (availableTyreSets.Has(tyreCompound) && availableTyreSets[tyreCompound][2].Has(tyreSet.Set))
-				availableTyreSets[tyreCompound][2][tyreSet.Set] += tyreSet.Laps
-		}
+		if tyreSets
+			for ignore, tyreSet in usedTyreSets {
+				tyreCompound := compound(tyreSet.Compound, tyreSet.CompoundColor)
+
+				if (availableTyreSets.Has(tyreCompound) && availableTyreSets[tyreCompound][2].Has(tyreSet.Set))
+					availableTyreSets[tyreCompound][2][tyreSet.Set] += tyreSet.Laps
+			}
 
 		return availableTyreSets
 	}

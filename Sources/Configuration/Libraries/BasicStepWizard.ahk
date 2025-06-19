@@ -491,13 +491,21 @@ class BasicStepWizard extends StepWizard {
 		if !this.SetupWizard.Initialize
 			page := 2
 
-		if (page = 2) {
-			this.updateSelectedSimulators()
-
-			this.saveSetup()
-		}
-
 		return super.hidePage(page)
+	}
+
+	savePage(page) {
+		if super.savePage(page) {
+			if (page = 2) {
+				this.updateSelectedSimulators()
+
+				this.saveSetup()
+			}
+
+			return true
+		}
+		else
+			return false
 	}
 
 	updateState() {
@@ -523,6 +531,10 @@ class BasicStepWizard extends StepWizard {
 	}
 
 	testPushToTalk() {
+		this.updateSelectedSimulators()
+
+		this.saveSetup()
+
 		testAssistants(this.SetupWizard, , GetKeyState("Ctrl"))
 	}
 

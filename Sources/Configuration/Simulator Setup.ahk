@@ -1076,13 +1076,17 @@ class SetupWizard extends ConfiguratorPanel {
 			return false
 	}
 
-	getSimulatorConfiguration() {
+	getSimulatorConfiguration(save := true) {
 		local configuration := (this.Initialize ? newMultiMap()
 												: readMultiMap(kUserConfigDirectory . "Simulator Configuration.ini"))
 
-		this.saveToConfiguration(configuration)
+		if (!save || this.savePage(this.Step, this.Page)) {
+			this.saveToConfiguration(configuration)
 
-		return configuration
+			return configuration
+		}
+		else
+			return newMultiMap()
 	}
 
 	getFirstPage(&step, &page) {
@@ -1225,6 +1229,23 @@ class SetupWizard extends ConfiguratorPanel {
 	hidePage(step, page) {
 		try {
 			if step.hidePage(page) {
+				this.saveKnowledgeBase()
+
+				return true
+			}
+			else
+				return false
+		}
+		catch Any as exception {
+			logError(exception, true)
+
+			return false
+		}
+	}
+
+	savePage(step, page) {
+		try {
+			if step.savePage(page) {
 				this.saveKnowledgeBase()
 
 				return true
@@ -2531,16 +2552,24 @@ class StepWizard extends ConfiguratorPanel {
 	hidePage(page) {
 		local ignore, widget
 
-		if this.iWidgets.Has(page)
-			for ignore, widget in this.iWidgets[page] {
-				widget.Enabled := false
+		if this.savePage(page) {
+			if this.iWidgets.Has(page)
+				for ignore, widget in this.iWidgets[page] {
+					widget.Enabled := false
 
-				if widget.HasProp("Hide")
-					widget.Hide()
-				else
-					widget.Visible := false
-			}
+					if widget.HasProp("Hide")
+						widget.Hide()
+					else
+						widget.Visible := false
+				}
 
+			return true
+		}
+		else
+			return false
+	}
+
+	savePage(page) {
 		return true
 	}
 

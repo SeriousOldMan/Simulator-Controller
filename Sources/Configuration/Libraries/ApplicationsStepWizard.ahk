@@ -243,10 +243,14 @@ class ApplicationsStepWizard extends StepWizard {
 		this.loadApplications(page == 1)
 	}
 
-	hidePage(page) {
-		this.updateSelectedApplications(page, false)
+	savePage(page) {
+		if super.savePage(page) {
+			this.updateSelectedApplications(page, false)
 
-		return super.hidePage(page)
+			return true
+		}
+		else
+			return false
 	}
 
 	updateAvailableApplications(initialize := false) {

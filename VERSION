@@ -1,9 +1,9 @@
 [Development]
-Version=6.3.7.0-release
-Target=6.3.7.0-release
+Version=6.3.8.0-dev
+Target=6.3.8.0-release
 Date=06/20/2025
-Download=https://cutt.ly/2rWDRbda;https://%master%:801/api/public/dl/BmmMdMzM;https://www.dropbox.com/scl/fi/ptgybqw8bkkptogcoc9h9/Simulator-Controller-6.3.7.0-release.zip?rlkey=7vl9fhp787j8gyiwu7agzeza2&st=4xe8yeh9&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.3.7.0-release.zip
-Changes=Engineer handles brake change, Setting for brake service, Setting for brake service duration, Fixed pitstop history building for the Strategist, Show brake change in "System Monitor", Include brake change in "Session State.json", Engineer reacts to post-prepare brake change setting, Information about brake changes in lists and reports in "Team Center", Engineer announces a brake change during pitstop planning, Driver selection for Le Mans Ultimate, Live update of selected driver in Le Mans Ultimate, Calculations in production rules, Fixed outdated configuration for voice test mode
+Download=
+Changes=Last pitstop for all opponents in Strategist Knowledge
 Components=Media->5.6.1,Configuration->6.3.6,Utilities->6.3.0
 [Release]
 Version=6.3.7.0-release
@@ -22,7 +22,7 @@ Utilities.6.3.0.Path=.
 Utilities.6.3.0.Content=Utilities
 Utilities.6.3.0.Download=https://www.dropbox.com/scl/fi/uauxhuyecnwmgft3w6roj/Utilities-6.3.0.zip?rlkey=1luua85df5q5w88hcxxza0lsr&st=e8f4bqgz&dl=1;https://%master%:801/api/public/dl/cAzNQ6G_;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.3.0.zip
 [Current]
-Type=Release
+Type=Development
 [Version]
-Development=6.3.7.0-release
+Development=6.3.8.0-dev
 Release=6.3.7.0-release

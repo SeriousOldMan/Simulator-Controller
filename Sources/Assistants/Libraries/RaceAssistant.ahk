@@ -3269,12 +3269,14 @@ class GridRaceAssistant extends RaceAssistant {
 		local standingsData := CaseInsenseWeakMap()
 		local standings := []
 		local keys, ignore, car, carData, sectorTimes
-		local positions, position, classPosition, car
+		local positions, position, classPosition, car, numPitstops
 
 		getCar(car, type?) {
 			local carData
 
 			try {
+				numPitstops := this.Pitstops[knowledgeBase.getValue("Car." . car . ".ID")].Length
+
 				carData := Map("Nr", this.getNr(car)
 							 , "DriverName", driverName(knowledgeBase.getValue("Car." . car . ".Driver.Forname")
 													  , knowledgeBase.getValue("Car." . car . ".Driver.Surname")
@@ -3285,7 +3287,8 @@ class GridRaceAssistant extends RaceAssistant {
 							 , "ClassPosition", this.getPosition(car, "Class")
 							 , "DistanceIntoTrack", (Round(this.getRunning(car) * this.TrackLength) . " Meters")
 							 , "LapTime", (Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1) . " Seconds")
-							 , "NumPitstops", this.Pitstops[knowledgeBase.getValue("Car." . car . ".ID")].Length
+							 , "NumPitstops", numPitstops
+							 , "LastPitstop", ((numPitstops > 0) ? ("Lap " . this.Pitstops[numPitstops].Lap) : kNull)
 							 , "InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false)) ? kTrue : kFalse)
 
 				if isSet(type)

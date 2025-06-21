@@ -534,6 +534,9 @@ else {
 		loop {
 			lap := A_Index
 
+			if (lap = 6)
+				strategist.recommendPitstop(17)
+
 			loop {
 				data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist Lap " . lap . "." . A_Index . ".data")
 

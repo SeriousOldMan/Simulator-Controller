@@ -69,7 +69,7 @@ pitstopDeltaTime(?lap, ?targetLap, ?pitstopDeltaTime) <= bound?(!Target.Time.Box
 														 ?pitstopDeltaTime = !Target.Time.Box.Fixed + ?temp 
 pitstopDeltaTime(?lap, ?targetLap, ?pitstopDeltaTime) <= pitstopRefuelServiceTime(?lap, ?targetLap, ?refuelServiceTime),
 														 pitstopTyreServiceTime(?lap, ?targetLap, ?tyreServiceTime),
-														 pitstopServiceTime(?refuelServiceTime, ?tyreServiceTime, ?brakeServiceTime, ?temp1),
+														 pitstopServiceTime(?refuelServiceTime, ?tyreServiceTime, 0, ?temp1),
 														 ?temp2 = !Session.Settings.Pitstop.Delta + ?temp1, ?pitstopDeltaTime = ?temp2 * 1000
 
 pitstopRefuelServiceTime(?lap, ?targetLap, ?refillTime) <=

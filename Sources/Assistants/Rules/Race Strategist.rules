@@ -304,13 +304,13 @@ priority: 5, [?Pitstop.Strategy.Plan] => (Clear: Pitstop.Strategy.Lap), (Prove: 
 setMaxLap() <= unbound(!Pitstop.Strategy.Lap.Max), Set(Pitstop.Strategy.Lap.Max, 99999)
 
 {All: [?Pitstop.Strategy.Plan = true], {Prove: pitstopRequired(!Lap)}} => (Prove: updatePitstopStrategy(!Lap))
-{All: [?Pitstop.Strategy.Plan > 1], {Prove: pitstopRequired(!Lap)}} => (Prove: updatePitstopStrategy(!Pitstop.Strategy.Plan))
+{All: [?Pitstop.Strategy.Plan > 1], {Prove: pitstopRequired(!Lap)}} => (Prove: updatePitstopStrategy(?Pitstop.Strategy.Plan))
 
 {All: {None: [?Pitstop.Strategy.Lap]}, [?Lap.Remaining.Session < ?Lap.Remaining.Fuel]} => (Set: Pitstop.Strategy.Lap, false)
 
 priority: -5, [?Pitstop.Strategy.Plan] => (Clear: Pitstop.Strategy.Plan), (Clear: Pitstop.Strategy.Lap.Max)
 
-pitstopRequired(?lap) <= Get(Strategy.Pitstop.Lap, ?strategyLap)
+pitstopRequired(?lap) <= Get(Strategy.Pitstop.Lap, ?)
 pitstopRequired(?lap) <= plannedPitstopLap(?pitstopLap), ?pitstopLap =< !Lap.Remaining.Session
 
 plannedPitstopLap(?pitstopLap) <= Get(Strategy.Pitstop.Lap, ?pitstopLap), ?pitstopLap >= !Lap, !
@@ -325,8 +325,8 @@ updatePitstopStrategy(!Lap) <= plannedPitstopLap(?pitstopLap),
 							   ?temp = ?pitstopLap - !Session.Settings.Pitstop.Strategy.Window.Considered, round(?temp, ?targetLap),
 							   ?targetLap > !Lap, !, updatePitstopStrategy(?targetLap)
 updatePitstopStrategy(!Lap) <= plannedPitstopLap(?pitstopLap), ?pitstopLap > !Lap, !, updatePitstopStrategy(?pitstopLap)
-updatePitstopStrategy(?lap) <= ?deltaLaps = ?lap - !Lap, ?temp = !Lap.Remaining - ?deltaLaps, round(?temp, ?remainingLaps), ?remainingLaps > 0,
-							   updatePitstopStrategy(?lap, ?remainingLaps)
+updatePitstopStrategy(?lap) <= ?deltaLaps = ?lap - !Lap, ?temp = !Lap.Remaining - ?deltaLaps,
+							   round(?temp, ?remainingLaps), ?remainingLaps > 0, updatePitstopStrategy(?lap, ?remainingLaps)
 							   
 updatePitstopStrategy(?targetLap, ?remainingLaps) <= ?remainingLaps < 3, Set(Pitstop.Strategy.Lap, ?targetLap), !
 updatePitstopStrategy(?targetLap, ?remainingLaps) <= pitstopWindow(!Lap, ?targetLap, ?remainingLaps, ?fromLap, ?toLap), ?toLap >= ?fromLap,
@@ -342,7 +342,7 @@ choosePitstopStrategy(?lap, ?fromLap, ?fromLap) <= !, Set(Pitstop.Strategy.Lap, 
 choosePitstopStrategy(?lap, ?fromLap, ?toLap) <= createPitstopScenarios(?lap, ?fromLap, ?toLap,
 																		?laps, ?positions, ?carsInFront, ?trafficDensities),
 												 Set(Pitstop.Strategy.Evaluation.Laps, ?laps),
-												 Set(Pitstop.Strategy.Evaluation.Positions, ?Positions),
+												 Set(Pitstop.Strategy.Evaluation.Positions, ?positions),
 												 Set(Pitstop.Strategy.Evaluation.Traffics, ?carsInFront),
 												 choosePitstopScenario(?laps, ?positions, ?carsInFront, ?trafficDensities,
 																	   ?targetLap, ?position, ?carsAhead),

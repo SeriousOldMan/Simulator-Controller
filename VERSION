@@ -1,9 +1,9 @@
 [Development]
 Version=6.3.8.0-dev
 Target=6.3.8.0-release
-Date=06/20/2025
+Date=06/21/2025
 Download=
-Changes=Last pitstop for all opponents in Strategist Knowledge
+Changes=Last pitstop for all opponents in Strategist Knowledge, Fixed multiple bugs in traffic simulation for pitstop prediction
 Components=Media->5.6.1,Configuration->6.3.6,Utilities->6.3.0
 [Release]
 Version=6.3.7.0-release

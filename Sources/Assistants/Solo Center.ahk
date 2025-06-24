@@ -4982,7 +4982,7 @@ class SoloCenter extends ConfigurationItem {
 	}
 
 	loadLaps() {
-		local ignore, lap, newLap, engineDamage
+		local ignore, lap, newLap, engineDamage, position, wear
 
 		this.iLaps := CaseInsenseWeakMap()
 
@@ -5003,6 +5003,12 @@ class SoloCenter extends ConfigurationItem {
 					 , WaterTemperature: lap["Engine.Temperature.Water"]
 					 , OilTemperature: lap["Engine.Temperature.Oil"]
 					 , Data: false}
+
+			for ignore, position in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"] {
+				wear := lap["Brake.Wear." . position]
+
+				lap["Brake.Wear." . position] := (isNumber(wear) ? Round(wear, 2) : wear)
+			}
 
 			if lap.Has("Data.Telemetry")
 				newLap.TelemetryData := lap["Data.Telemetry"]
@@ -6635,10 +6641,10 @@ class SoloCenter extends ConfigurationItem {
 						wearRL := brakeWears[3]
 						wearRR := brakeWears[4]
 
-						lapData["Brake.Wear.Front.Left"] := null(wearFL)
-						lapData["Brake.Wear.Front.Right"] := null(wearFR)
-						lapData["Brake.Wear.Rear.Left"] := null(wearRL)
-						lapData["Brake.Wear.Rear.Right"] := null(wearRR)
+						lapData["Brake.Wear.Front.Left"] := null(isNumber(wearFL) ? Round(wearFL, 2) : wearFL)
+						lapData["Brake.Wear.Front.Right"] := null(isNumber(wearFR) ? Round(wearFR, 2) : wearFR)
+						lapData["Brake.Wear.Rear.Left"] := null(isNumber(wearRL) ? Round(wearRL, 2) : wearRL)
+						lapData["Brake.Wear.Rear.Right"] := null(isNumber(wearRR) ? Round(wearRR, 2) : wearRR)
 						lapData["Brake.Wear.Average"] := ((wearFL = kNull) ? kNull : null(average([wearFL, wearFR, wearRL, wearRR])))
 						lapData["Brake.Wear.Front.Average"] := ((wearFL = kNull) ? kNull : null(average([wearFL, wearFR])))
 						lapData["Brake.Wear.Rear.Average"] := ((wearFL = kNull) ? kNull : null(average([wearRL, wearRR])))
@@ -7646,9 +7652,9 @@ class SoloCenter extends ConfigurationItem {
 										  , displayNullValue(lapTable[lap.Nr]["Tyre.Wear.Rear.Right"]))
 
 			brakeWear := values2String(", ", displayNullValue(lapTable[lap.Nr]["Brake.Wear.Front.Left"])
-										  , displayNullValue(lapTable[lap.Nr]["Brake.Wear.Front.Right"])
-										  , displayNullValue(lapTable[lap.Nr]["Brake.Wear.Rear.Left"])
-										  , displayNullValue(lapTable[lap.Nr]["Brake.Wear.Rear.Right"]))
+										   , displayNullValue(lapTable[lap.Nr]["Brake.Wear.Front.Right"])
+										   , displayNullValue(lapTable[lap.Nr]["Brake.Wear.Rear.Left"])
+										   , displayNullValue(lapTable[lap.Nr]["Brake.Wear.Rear.Right"]))
 		}
 
 		remainingFuel := lap.FuelRemaining

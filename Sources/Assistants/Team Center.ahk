@@ -10090,7 +10090,7 @@ class TeamCenter extends ConfigurationItem {
 	}
 
 	loadLaps() {
-		local ignore, lap, newLap, engineDamage
+		local ignore, lap, newLap, engineDamage, position, wear
 
 		this.iLaps := CaseInsenseWeakMap()
 
@@ -10109,6 +10109,12 @@ class TeamCenter extends ConfigurationItem {
 					 , Telemetry: false
 					 , WaterTemperature: lap.HasOwnProp("WaterTemperature") ? lap.WaterTemperature : kNull
 					 , OilTemperature: lap.HasOwnProp("OilTemperature") ? lap.OilTemperature : kNull}
+
+			for ignore, position in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"] {
+				wear := lap["Brake.Wear." . position]
+
+				lap["Brake.Wear." . position] := (isNumber(wear) ? Round(wear, 2) : wear)
+			}
 
 			if isNull(newLap.State)
 				newLap.State := "Valid"
@@ -12009,10 +12015,10 @@ class TeamCenter extends ConfigurationItem {
 							wearRL := brakeWears[3]
 							wearRR := brakeWears[4]
 
-							lapData["Brake.Wear.Front.Left"] := null(wearFL)
-							lapData["Brake.Wear.Front.Right"] := null(wearFR)
-							lapData["Brake.Wear.Rear.Left"] := null(wearRL)
-							lapData["Brake.Wear.Rear.Right"] := null(wearRR)
+							lapData["Brake.Wear.Front.Left"] := null(isNumber(wearFL) ? Round(wearFL, 2) : wearFL)
+							lapData["Brake.Wear.Front.Right"] := null(isNumber(wearFR) ? Round(wearFR, 2) : wearFR)
+							lapData["Brake.Wear.Rear.Left"] := null(isNumber(wearRL) ? Round(wearRL, 2) : wearRL)
+							lapData["Brake.Wear.Rear.Right"] := null(isNumber(wearRR) ? Round(wearRR, 2) : wearRR)
 							lapData["Brake.Wear.Average"] := ((wearFL = kNull) ? kNull : null(average([wearFL, wearFR, wearRL, wearRR])))
 							lapData["Brake.Wear.Front.Average"] := ((wearFL = kNull) ? kNull : null(average([wearFL, wearFR])))
 							lapData["Brake.Wear.Rear.Average"] := ((wearFL = kNull) ? kNull : null(average([wearRL, wearRR])))

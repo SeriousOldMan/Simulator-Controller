@@ -1749,7 +1749,8 @@ class RaceStrategist extends GridRaceAssistant {
 		this.updateSessionValues({LapsDatabase: lapsDB})
 
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts), HasLapsData: false
-								, BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0
+								, BestLapTime: 0, OverallTime: 0
+								, LastFuelAmount: 0, InitialFuelAmount: 0, LastEnergyAmount: 0, InitialEnergyAmount: 0
 								, EnoughData: false, StrategyReported: (getMultiMapValue(data, "Stint Data", "Laps", 0) > 1)})
 
 		if (this.Speaker[false] && !raceEngineer && (this.Session = kSessionRace))
@@ -1827,7 +1828,9 @@ class RaceStrategist extends GridRaceAssistant {
 			this.updateDynamicValues({KnowledgeBase: false, Prepared: false})
 		}
 
-		this.updateDynamicValues({OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false
+		this.updateDynamicValues({OverallTime: 0, BestLapTime: 0
+								, LastFuelAmount: 0, InitialFuelAmount: 0, LastEnergyAmount: 0, InitialEnergyAmount: 0
+								, EnoughData: false
 								, StrategyReported: false, RejectedStrategy: false, StrategyCreated: false
 								, HasLapsData: false})
 		this.updateSessionValues({Simulator: "", Car: "", Track: "", Session: kSessionFinished

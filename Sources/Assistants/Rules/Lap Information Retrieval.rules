@@ -51,10 +51,15 @@ lapDamage(?lap, Bodywork, ?damage) <= lapDamage(?lap, Bodywork, Center, ?damage)
 ;										Set(Lap, ?lap, Damage.Bodywork, ?damage)
 lapDamage(?lap, Engine, ?damage) <= Get(Lap, ?lap, Damage.Engine, ?damage)
 									  
-lapAvgConsumption(?lap, ?avgConsumption) <= Get(Lap, ?lap, Fuel.AvgConsumption, ?avgConsumption), ?avgConsumption > 0, !
-lapAvgConsumption(?lap, !Session.Settings.Fuel.AvgConsumption)
+lapAvgFuelConsumption(?lap, ?avgConsumption) <= Get(Lap, ?lap, Fuel.AvgConsumption, ?avgConsumption), ?avgConsumption > 0, !
+lapAvgFuelConsumption(?lap, !Session.Settings.Fuel.AvgConsumption)
 
 lapRemainingFuel(?lap, ?remainingFuel) <= Get(Lap, ?lap, Fuel.Remaining, ?remainingFuel)
+
+lapAvgEnergyConsumption(?lap, ?avgConsumption) <= Get(Lap, ?lap, Energy.AvgConsumption, ?avgConsumption), ?avgConsumption > 0, !
+lapAvgEnergyConsumption(?lap, 0)
+
+lapRemainingEnergy(?lap, ?remainingEnergy) <= Get(Lap, ?lap, Energy.Remaining, ?remainingEnergy)
 
 lapTime(?lap, ?time) <= Get(Lap, ?lap, Time, ?time)
 
@@ -166,7 +171,9 @@ clearLap(?lap) <= Append(Lap., ?lap, .Driver.Forname, ?fact), fact?(?fact), !,
 								  Tyre.Compound.Rear.Left, Tyre.Compound.Color.Rear.Left,
 								  Tyre.Compound.Rear.Right, Tyre.Compound.Color.Rear.Right,
 								  Valid, Position.Overall, Position.Class,
-								  Time, Time.Average, Time.Start, Time.End, Fuel.Remaining, Fuel.Consumption, Fuel.AvgConsumption,
+								  Time, Time.Average, Time.Start, Time.End,
+								  Fuel.Remaining, Fuel.Consumption, Fuel.AvgConsumption,
+								  Energy.Remaining, Energy.Consumption, Energy.AvgConsumption,
 								  Tyre.Pressure.FL, Tyre.Pressure.FR, Tyre.Pressure.RL, Tyre.Pressure.RR,
 								  Tyre.Temperature.FL, Tyre.Temperature.FR, Tyre.Temperature.RL, Tyre.Temperature.RR, Tyre.Temperature,
 								  Tyre.Wear.FL, Tyre.Wear.FR, Tyre.Wear.RL, Tyre.Wear.RR, Tyre.Wear,

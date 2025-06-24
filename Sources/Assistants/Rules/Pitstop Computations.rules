@@ -74,7 +74,7 @@ pitstopDeltaTime(?lap, ?targetLap, ?pitstopDeltaTime) <= pitstopRefuelServiceTim
 
 pitstopRefuelServiceTime(?lap, ?targetLap, ?refillTime) <=
 		?deltaLaps = ?targetLap - ?lap,
-		lapAvgConsumption(?lap, ?avgConsumption), lapRemainingFuel(?lap, ?temp1),
+		lapAvgFuelConsumption(?lap, ?avgConsumption), lapRemainingFuel(?lap, ?temp1),
 		?correction = ?deltaLaps * ?avgConsumption, ?remainingFuel = ?temp1 - ?correction,
 		remainingSessionLaps(?lap, ?sessionLaps), postRaceLaps(?postRaceLaps), ?tempLaps = ?sessionLaps + ?postRaceLaps,
 		?remainingLaps = ?tempLaps - ?deltaLaps,

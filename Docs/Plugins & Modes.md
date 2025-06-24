@@ -1562,10 +1562,14 @@ The content of the JSON file looks like this (depending on the current situation
 			"StintTimeLeft": "54:53,0"
 		},
 		"Fuel": {
-			"AvgConsumption": 4.1,
-			"LastConsumption": 4.1,
+			"AvgFuelConsumption": 4.1,
+			"LastFuelConsumption": 4.1,
 			"RemainingFuel": 36.9,
-			"RemainingLaps": 9
+			"RemainingFuelLaps": 9
+			"AvgEnergyConsumption": 3.2,
+			"LastEnergyConsumption": 3.0,
+			"RemainingEnergy": 26.7,
+			"RemainingEnergyLaps": 8
 		},
 		"Pitstop": {
 			"State": "Planned",

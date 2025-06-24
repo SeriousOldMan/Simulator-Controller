@@ -12,11 +12,12 @@ plan_pitstop.4=tyreCompound|String||false|If a tyre change is requested the comp
 plan_pitstop.5=repairDamage|Boolean||false|Indicates whether all damages should be repaired.
 plan_pitstop.6=swapDriver|Boolean||false|Indicates in a team race whether the next driver according to the stint plan should take the car.
 [Agent.LLM.Actions]
-Active=plan_pitstop,cancel_pitstop,report_damage,report_time_loss,report_no_time_loss,report_weather_forecast,report_low_fuel,report_tyre_wear,report_brake_wear,report_pressure_loss
+Active=plan_pitstop,cancel_pitstop,report_damage,report_time_loss,report_no_time_loss,report_weather_forecast,report_low_fuel,report_low_energy,report_tyre_wear,report_brake_wear,report_pressure_loss
 [Agent.LLM.Actions.Builtin]
 plan_pitstop=Assistant.Method|planPitstopAction(%targetLap%, %refuelAmount%, %changeTyres%, %tyreCompound%, %repairDamage%, %swapDriver%)|false|false|6|Creates a plan for the next pitstop.
 cancel_pitstop=Assistant.Rule|Race Engineer.cancel_pitstop.rules|false|false|0|Clears the pitstop plan, if a pitstop is no longer needed.
 report_low_fuel=Assistant.Method|lowFuelWarning(%remainingFuel%, %remainingLaps%)|false|false|2|Reports that the car is running low on fuel.
+report_low_energy=Assistant.Method|lowEnergyWarning(%remainingEnergy%, %remainingLaps%)|false|false|2|Reports that the car is running low on virtual energy.
 report_tyre_wear=Assistant.Method|tyreWearWarning(%tyre%, %wear%)|false|false|2|Reports a high tread wear on one of the tyres.
 report_brake_wear=Assistant.Method|brakeWearWarning(%wheel%, %wear%)|false|false|2|Reports a high wear on one of the brake pads.
 report_damage=Assistant.Method|damageWarning(%suspensionDamage%, %bodyworkDamage%, %engineDamage%)|false|false|3|Reports recent damage to the car to the driver.
@@ -34,6 +35,8 @@ plan_pitstop.5=repairDamage|Boolean||false|Indicates whether all damages should 
 plan_pitstop.6=swapDriver|Boolean||false|Indicates in a team race whether the next driver according to the stint plan should take the car.
 report_low_fuel.1=remainingFuel|Number||true|The remaining amount of fuel in liters.
 report_low_fuel.2=remainingLaps|Integer||true|The maximum number of laps that can be driven with the remaining fuel.
+report_low_energy.1=remainingFuel|Number||true|The remaining amount of virtual energy in percentage.
+report_low_eergy.2=remainingLaps|Integer||true|The maximum number of laps that can be driven with the remaining virtual energy.
 report_tyre_wear.1=tyre|String|FL,FR,RL,RR|true|The tyre that has too much tread wear. FL indicates front left, FR indicates front right and so on.
 report_tyre_wear.2=wear|Number||true|The wear of the tyre tread as percentage.
 report_brake_wear.1=wheel|String|FL,FR,RL,RR|true|The wheel that has too much brake pad wear. FL indicates front left, FR indicates front right and so on.

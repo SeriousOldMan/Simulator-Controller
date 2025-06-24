@@ -85,7 +85,7 @@ priority: -20, [?Update] => (Clear: Update)
 
 {Any: [?Lap], {None: [?Fuel.Amount.Target]}} => (Prove: updateFuelTarget(?Lap))
 
-updateFuelTarget(?lap) <= lapAvgConsumption(?lap, ?avgConsumption), lapRemainingFuel(?lap, ?remainingFuel),
+updateFuelTarget(?lap) <= lapAvgFuelConsumption(?lap, ?avgConsumption), lapRemainingFuel(?lap, ?remainingFuel),
 						  remainingSessionLaps(?lap, ?sessionLaps), postRaceLaps(?postRaceLaps),
 						  ?remainingLaps = ?sessionLaps + ?postRaceLaps,
 						  ?sessionFuel = ?avgConsumption * ?remainingLaps, safetyFuel(?avgConsumption, ?safetyFuel, false),
@@ -773,25 +773,32 @@ brakeWearWarning(?lap, ?brake, ?wear) <= Call(brakeWearWarning, ?brake, ?wear)
 priority: 20, [?Lap] => (ProveAll: updateRemainingLaps(?Lap))
 
 updateRemainingLaps(?lap) <= remainingStintLaps(?lap, Fuel, ?fuelLaps), Set(Lap.Remaining.Fuel, ?fuelLaps)
+updateRemainingLaps(?lap) <= Clear(Lap.Remaining.Energy), remainingStintLaps(?lap, Energy, ?energyLaps), Set(Lap.Remaining.Energy, ?energyLaps)
 updateRemainingLaps(?lap) <= remainingStintLaps(?lap, Driver, ?driverLaps), Set(Lap.Remaining.Stint, ?driverLaps)
 updateRemainingLaps(?lap) <= remainingSessionLaps(?lap, ?sessionLaps), Set(Lap.Remaining.Session, ?sessionLaps)
 updateRemainingLaps(?lap) <= !Lap.Remaining.Stint > !Lap.Remaining.Fuel, Set(Lap.Remaining.Stint, !Lap.Remaining.Fuel)
+updateRemainingLaps(?lap) <= !Lap.Remaining.Stint > !Lap.Remaining.Energy, Set(Lap.Remaining.Stint, !Lap.Remaining.Energy)
 updateRemainingLaps(?lap) <= !Lap.Remaining.Stint > !Lap.Remaining.Session, Set(Lap.Remaining.Stint, !Lap.Remaining.Session)
 
-priority: -50, {All: {Any: [?Lap.Remaining.Fuel < ?Lap.Remaining.Stint], [?Lap.Remaining.Fuel < ?Lap.Remaining.Session]},
-					 [?Lap.Remaining.Fuel <= ?Session.Settings.Lap.PitstopWarning], [?Lap.Remaining.Session > 0]} =>
-		(Prove: lowFuelWarning(!Lap, !Lap.Remaining.Fuel))
+priority: -50, {All: {Any: [?Lap.Remaining.Fuel < ?Lap.Remaining.Session], [?Lap.Remaining.Energy < ?Lap.Remaining.Session]},
+					 {Any: [?Lap.Remaining.Fuel <= ?Session.Settings.Lap.PitstopWarning],
+						   [?Lap.Remaining.Energy <= ?Session.Settings.Lap.PitstopWarning]},
+					 [?Lap.Remaining.Session > 0]} =>
+		(Prove: lowFuelWarning(!Lap))
 
-lowFuelWarning(?lap, ?remainingLaps) <= recentPitstopLap(?lap), !, fail
+lowFuelWarning(?lap) <= recentPitstopLap(?lap), !, fail
+lowFuelWarning(?lap) <= !Lap.Remaining.Fuel > !Lap.Remaining.Energy,
+						floor(!Lap.Remaining.Energy, ?remainingLaps), !, lowEnergyWarning(?lap, ?remainingLaps)
+lowFuelWarning(?lap) <= floor(!Lap.Remaining.Fuel, ?remainingLaps), lowFuelWarning(!Lap, ?remainingLaps)
+
 lowFuelWarning(?lap, ?remainingLaps) <= lapRemainingFuel(?lap, ?remainingFuel), Call(raiseEvent, FuelLow, ?remainingFuel, ?remainingLaps), !
 lowFuelWarning(?lap, ?remainingLaps) <= lapRemainingFuel(?lap, ?remainingFuel), Call(lowFuelWarning, ?remainingFuel, ?remainingLaps)
 
-priority: 20, {All: [?Lap.Remaining.Stint <= ?Lap.Remaining.Fuel],
-					[?Lap.Remaining.Stint <= ?Lap.Remaining.Session]} => (Set: Lap.Remaining, ?Lap.Remaining.Stint)
-priority: 20, {All: [?Lap.Remaining.Session <= ?Lap.Remaining.Fuel],
-					[?Lap.Remaining.Session <= ?Lap.Remaining.Stint]} => (Set: Lap.Remaining, ?Lap.Remaining.Session)
-priority: 20, {All: [?Lap.Remaining.Fuel <= ?Lap.Remaining.Stint],
-					[?Lap.Remaining.Fuel <= ?Lap.Remaining.Session]} => (Set: Lap.Remaining, ?Lap.Remaining.Fuel)
+lowEnergyWarning(?lap, ?remainingLaps) <= lapRemainingEnergy(?lap, ?remainingEnergy), Call(raiseEvent, EnergyLow, ?remainingEnergy, ?remainingLaps), !
+lowEnergyWarning(?lap, ?remainingLaps) <= lapRemainingEnergy(?lap, ?remainingEnergy), Call(lowEnergyWarning, ?remainingEnergy, ?remainingLaps)
+
+priority: 20, {All: [?Lap.Remaining.Stint <= ?Lap.Remaining.Session]} => (Set: Lap.Remaining, ?Lap.Remaining.Stint)
+priority: 20, {All: [?Lap.Remaining.Session <= ?Lap.Remaining.Stint]} => (Set: Lap.Remaining, ?Lap.Remaining.Session)
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[6.3.8.0-dev]() (Early build for 6.3.8. Changes: Last pitstop for all opponents in Strategist Knowledge, Fixed multiple bugs in traffic simulation for pitstop prediction, Changed OpenAI model default to GPT 4.1 mini, Low energy reporting by the Engineer, New energy related events and and actions for the *Reasoning* booster, Renamed fields in "Integration" Plugin, Energy information in "Integration" plugin, Energy information on "System Monitor".)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-638) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

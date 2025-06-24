@@ -97,17 +97,15 @@ priority: -20, [?Update] => (Clear: Update)
 priority: 20, [?Lap] => (ProveAll: updateRemainingLaps(?Lap))
 
 updateRemainingLaps(?lap) <= remainingStintLaps(?lap, Fuel, ?fuelLaps), Set(Lap.Remaining.Fuel, ?fuelLaps)
+updateRemainingLaps(?lap) <= Clear(Lap.Remaining.Energy), remainingStintLaps(?lap, Energy, ?energyLaps), Set(Lap.Remaining.Energy, ?energyLaps)
 updateRemainingLaps(?lap) <= remainingStintLaps(?lap, Driver, ?driverLaps), Set(Lap.Remaining.Stint, ?driverLaps)
 updateRemainingLaps(?lap) <= remainingSessionLaps(?lap, ?sessionLaps), Set(Lap.Remaining.Session, ?sessionLaps)
 updateRemainingLaps(?lap) <= !Lap.Remaining.Stint > !Lap.Remaining.Fuel, Set(Lap.Remaining.Stint, !Lap.Remaining.Fuel)
+updateRemainingLaps(?lap) <= !Lap.Remaining.Stint > !Lap.Remaining.Energy, Set(Lap.Remaining.Stint, !Lap.Remaining.Energy)
 updateRemainingLaps(?lap) <= !Lap.Remaining.Stint > !Lap.Remaining.Session, Set(Lap.Remaining.Stint, !Lap.Remaining.Session)
 
-priority: 20, {All: [?Lap.Remaining.Stint <= ?Lap.Remaining.Fuel],
-					[?Lap.Remaining.Stint <= ?Lap.Remaining.Session]} => (Set: Lap.Remaining, ?Lap.Remaining.Stint)
-priority: 20, {All: [?Lap.Remaining.Session <= ?Lap.Remaining.Fuel],
-					[?Lap.Remaining.Session <= ?Lap.Remaining.Stint]} => (Set: Lap.Remaining, ?Lap.Remaining.Session)
-priority: 20, {All: [?Lap.Remaining.Fuel <= ?Lap.Remaining.Stint],
-					[?Lap.Remaining.Fuel <= ?Lap.Remaining.Session]} => (Set: Lap.Remaining, ?Lap.Remaining.Fuel)
+priority: 20, {All: [?Lap.Remaining.Stint <= ?Lap.Remaining.Session]} => (Set: Lap.Remaining, ?Lap.Remaining.Stint)
+priority: 20, {All: [?Lap.Remaining.Session <= ?Lap.Remaining.Stint]} => (Set: Lap.Remaining, ?Lap.Remaining.Session)
 
 
 ;;;-------------------------------------------------------------------------;;;

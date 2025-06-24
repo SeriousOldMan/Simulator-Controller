@@ -2518,8 +2518,12 @@ class RaceAssistant extends ConfigurationItem {
 			setMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Fuel", Floor(knowledgeBase.getValue("Lap.Remaining.Fuel", 0)))
 			setMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Stint", Floor(knowledgeBase.getValue("Lap.Remaining.Stint", 0)))
 
-			if getMultiMapValue(data, "Car Data", "EnergyRemaining", kUndefined)
-				setMultiMapValue(sessionInfo, "Stint", "Energy.Remaining", Round(getMultiMapValue(data, "Car Data", "EnergyRemaining"), 1))
+			if (knowledgeBase.getValue("Lap." . lapNumber . ".Energy.Consumption", kUndefined) != kUndefined) {
+				setMultiMapValue(sessionInfo, "Stint", "Energy.AvgConsumption", Round(knowledgeBase.getValue("Lap." . lapNumber . ".Energy.AvgConsumption", 0), 1))
+				setMultiMapValue(sessionInfo, "Stint", "Energy.Consumption", Round(knowledgeBase.getValue("Lap." . lapNumber . ".Energy.Consumption"), 1))
+				setMultiMapValue(sessionInfo, "Stint", "Energy.Remaining", Round(getMultiMapValue(data, "Car Data", "EnergyRemaining", 0), 1))
+				setMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Energy", Floor(knowledgeBase.getValue("Lap.Remaining.Energy", 0)))
+			}
 
 			if (getMultiMapValue(data, "Session Data", "Mode", "Solo") = "Team")
 				driverTime := Round(getMultiMapValue(data, "Stint Data", "DriverTimeRemaining") / 1000)
@@ -3039,7 +3043,7 @@ class RaceAssistant extends ConfigurationItem {
 
 		if this.RemoteHandler {
 			if isDebug()
-				logMessage(kLogCritical, "Saving session state for " . this.AssistantType . "...")
+				logMessage(kLogDebug, "Saving session state for " . this.AssistantType . "...")
 
 			settingsFile := temporaryFileName(this.AssistantType, "settings")
 			stateFile := temporaryFileName(this.AssistantType, "state")

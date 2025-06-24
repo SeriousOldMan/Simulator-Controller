@@ -782,7 +782,7 @@ updateRemainingLaps(?lap) <= !Lap.Remaining.Stint > !Lap.Remaining.Session, Set(
 
 priority: -50, {All: {Any: [?Lap.Remaining.Fuel < ?Lap.Remaining.Session], [?Lap.Remaining.Energy < ?Lap.Remaining.Session]},
 					 {Any: [?Lap.Remaining.Fuel <= ?Session.Settings.Lap.PitstopWarning],
-						   [?Lap.Remaining.Energy <= ?Session.Settings.Lap.PitstopWarning]}
+						   [?Lap.Remaining.Energy <= ?Session.Settings.Lap.PitstopWarning]},
 					 [?Lap.Remaining.Session > 0]} =>
 		(Prove: lowFuelWarning(!Lap))
 

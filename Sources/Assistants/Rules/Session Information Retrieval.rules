@@ -51,6 +51,8 @@ remainingStintLaps(?lap, ?remainingLaps) <= remainingStintLaps(?lap, Fuel, ?fuel
 remainingStintLaps(?lap, ?remainingLaps) <= remainingSessionLaps(?lap, ?remainingLaps)
 
 remainingStintLaps(?lap, Fuel, ?remainingLaps) <= remainingStintLaps(?lap, Fuel, ?remainingLaps, false)
+remainingStintLaps(?lap, Energy, ?remainingLaps) <= lapRemainingEnergy(?lap, ?energyLeft), lapAvgEnergyConsumption(?lap, ?energyPerLap),
+													?remainingLaps = ?energyLeft / ?energyPerLap
 remainingStintLaps(?lap, Driver, ?remainingLaps) <= remainingStintTime(?stintTime), lapAvgTime(?lap, ?avgTime),
 													?remainingLaps = ?stintTime / ?avgTime
 
@@ -59,9 +61,6 @@ remainingStintLaps(?lap, Fuel, ?remainingLaps, true) <= lapRemainingFuel(?lap, ?
 														?remainingLaps = ?fuelLeft / ?fuelPerLap
 remainingStintLaps(?lap, Fuel, ?remainingLaps, false) <= lapRemainingFuel(?lap, ?fuelLeft), lapAvgFuelConsumption(?lap, ?fuelPerLap),
 														 ?remainingLaps = ?fuelLeft / ?fuelPerLap
-
-remainingStintLaps(?lap, Energy, ?remainingLaps, true) <= lapRemainingEnergy(?lap, ?energyLeft), lapAvgEnergyConsumption(?lap, ?energyPerLap),
-														  ?remainingLaps = ?energyLeft / ?energyPerLap
 
 remainingStintTime(?lap, ?remainingTime) <= remainingStintLaps(?lap, Driver, ?remainingLaps), lapAvgTime(?lap, ?avgTime),
 											?remainingTime = ?remainingLaps * ?avgTime, remainingSessionTime(?lap, ?sessionTime),

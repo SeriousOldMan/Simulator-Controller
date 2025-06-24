@@ -3553,7 +3553,8 @@ class RaceSpotter extends GridRaceAssistant {
 									  , SaveSettings: saveSettings})
 
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts)
-								, BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0
+								, BestLapTime: 0, OverallTime: 0
+								, LastFuelAmount: 0, InitialFuelAmount: 0, LastEnergyAmount: 0, InitialEnergyAmount: 0
 								, EnoughData: false})
 
 		this.initializeHistory()
@@ -3597,7 +3598,9 @@ class RaceSpotter extends GridRaceAssistant {
 			this.updateDynamicValues({KnowledgeBase: false, Prepared: false})
 		}
 
-		this.updateDynamicValues({OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
+		this.updateDynamicValues({OverallTime: 0, BestLapTime: 0
+								, LastFuelAmount: 0, InitialFuelAmount: 0, LastEnergyAmount: 0, InitialEnergyAmount: 0
+								, EnoughData: false})
 		this.updateSessionValues({Simulator: "", Car: "", Track: "", Session: kSessionFinished, SessionTime: false})
 	}
 

@@ -49,6 +49,19 @@ class FuelLowEvent extends EngineerEvent {
 	}
 }
 
+class EnergyLowEvent extends EngineerEvent {
+	createTrigger(event, phrase, arguments) {
+		return ("Running out of virtual energy. " . Round(arguments[1], 1) . " percent remaining which are good for " . Floor(arguments[2]) . " more laps.")
+	}
+
+	handleEvent(event, arguments*) {
+		if !super.handleEvent(event, arguments*)
+			this.Assistant.lowEnergyWarning(Round(arguments[1], 1), Floor(arguments[2]))
+
+		return true
+	}
+}
+
 class TyreWearEvent extends EngineerEvent {
 	createTrigger(event, phrase, arguments) {
 		static wheels := false
@@ -2677,7 +2690,9 @@ class RaceEngineer extends RaceAssistant {
 									  , SaveTyrePressures: getMultiMapValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveTyrePressures", kAsk)})
 
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts), HasPressureData: false
-								, BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
+								, BestLapTime: 0, OverallTime: 0
+								, LastFuelAmount: 0, InitialFuelAmount: 0, LastEnergyAmount: 0, InitialEnergyAmount: 0
+								, EnoughData: false})
 
 		if this.Speaker[false] {
 			speaker := this.getSpeaker()
@@ -2777,7 +2792,9 @@ class RaceEngineer extends RaceAssistant {
 			this.updateDynamicValues({KnowledgeBase: false, Prepared: false})
 		}
 
-		this.updateDynamicValues({BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false, HasPressureData: false})
+		this.updateDynamicValues({BestLapTime: 0, OverallTime: 0
+								, LastFuelAmount: 0, InitialFuelAmount: 0, LastEnergyAmount: 0, InitialEnergyAmount: 0
+								, EnoughData: false, HasPressureData: false})
 		this.updateSessionValues({Simulator: "", Car: "", Track: "", Session: kSessionFinished, SessionTime: false})
 	}
 
@@ -4660,6 +4677,50 @@ class RaceEngineer extends RaceAssistant {
 			}
 	}
 
+	lowEnergyWarning(remainingEnergy, remainingLaps, planPitstop := true) {
+		local knowledgeBase := this.KnowledgeBase
+		local speaker
+
+		if (this.hasEnoughData(false) && this.Speaker[false] && this.Announcements["FuelWarning"])
+			if (!knowledgeBase.getValue("InPitLane", false) && !knowledgeBase.getValue("InPit", false)) {
+				remainingEnergy := Round(remainingEnergy, 1)
+				remainingLaps := Floor(remainingLaps)
+
+				speaker := this.getSpeaker()
+
+				speaker.beginTalk()
+
+				try {
+					speaker.speakPhrase((remainingLaps <= 2) ? "VeryLowEnergy" : "LowEnergy", {laps: remainingLaps})
+
+					if this.supportsPitstop()
+						if this.hasPreparedPitstop()
+							speaker.speakPhrase((remainingLaps <= 2) ? "LowComeIn" : "ComeIn")
+						else if (!this.hasPlannedPitstop() && planPitstop) {
+							if this.confirmAction("Pitstop.Fuel") {
+								speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
+
+								this.setContinuation(ObjBindMethod(this, "planPitstop", "Now"))
+							}
+							else
+								this.planPitstop("Now")
+						}
+						else if planPitstop {
+							if this.confirmAction("Pitstop.Fuel") {
+								speaker.speakPhrase("ConfirmPrepare", false, true)
+
+								this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
+							}
+							else
+								this.preparePitstop()
+						}
+				}
+				finally {
+					speaker.endTalk()
+				}
+			}
+	}
+
 	tyreWearWarning(tyre, wear, planPitstop := true) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker
@@ -4972,6 +5033,12 @@ class RaceEngineer extends RaceAssistant {
 
 lowFuelWarning(context, remainingFuel, remainingLaps) {
 	context.KnowledgeBase.RaceAssistant.lowFuelWarning(Round(remainingFuel, 1), Floor(remainingLaps))
+
+	return true
+}
+
+lowEnergyWarning(context, remainingEnergy, remainingLaps) {
+	context.KnowledgeBase.RaceAssistant.lowEnergyWarning(Round(remainingEnergy, 1), Floor(remainingLaps))
 
 	return true
 }

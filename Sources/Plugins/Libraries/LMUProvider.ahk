@@ -235,7 +235,7 @@ class LMUProvider extends Sector397Provider {
 		local simulator := this.Simulator
 		local car, track, data, setupData, tyreCompound, tyreCompoundColor, key, postFix, fuelAmount
 		local weatherData, wheelData, brakeData, lap, weather, time, session, remainingTime, fuelRatio
-		local newPositions, position
+		local newPositions, position, energyData, virtualEnergy
 
 		static keys := Map("All", "", "Front Left", "FrontLeft", "Front Right", "FrontRight"
 									, "Rear Left", "RearLeft", "Rear Right", "RearRight")
@@ -388,12 +388,20 @@ class LMUProvider extends Sector397Provider {
 
 				if getMultiMapValue(data, "Session Data", "Active", false) {
 					if data.Has("Car Data") {
+						energyData := LMURESTProvider.EnergyData(simulator, car, track)
+
 						fuelAmount := getMultiMapValue(data, "Session Data", "FuelAmount", false)
 
 						if (fuelAmount && this.iFuelRatio)
 							setMultiMapValue(data, "Session Data", "FuelAmount", Round(this.iFuelRatio * 100, 1))
 						else if !fuelAmount
-							setMultiMapValue(data, "Session Data", "FuelAmount", LMURESTProvider.EnergyData(simulator, car, track).MaxFuelAmount)
+							setMultiMapValue(data, "Session Data", "FuelAmount", energyData.MaxFuelAmount)
+
+						virtualEnergy := energyData.RemainingVirtualEnergy
+
+						if virtualEnergy
+							setMultiMapValue(data, "Car Data", "EnergyRemaining", virtualEnergy)
+
 					}
 
 					wheelData := LMURestProvider.WheelData()

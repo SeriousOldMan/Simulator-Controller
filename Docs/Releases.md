@@ -39,6 +39,7 @@
 #### Fixes
 
   - Fixed multiple bugs in traffic simulation for pitstop prediction.
+  - Fixed a critical bug in "Solo Center", which prevented loading of sessions created in *rFactor 2*.
 
 #### Changes
 

@@ -5225,7 +5225,8 @@ class SoloCenter extends ConfigurationItem {
 						else
 							telemetryData := string2Values("---", lap.TelemetryData)
 
-						telemetryData.RemoveAt(16)
+						if !InStr(telemetryData[16], ",")
+							telemetryData.RemoveAt(16)
 
 						this.addTelemetry(lap, telemetryData*)
 					}

@@ -463,6 +463,8 @@ I also recommend to take a look at this video, which covers the complete process
 
 [![](https://img.youtube.com/vi/oKq8k9VZ2jU/0.jpg)](https://www.youtube.com/watch?v=oKq8k9VZ2jU)
 
+Last, but not least, if you are want to do all this for cars of *Assetto Corsa*, I can recommend the brilliant tool of Maurice Bish (@bishman), which handles all the stuff described above automatically for the most part. The tool is free and can be [downloaded from GitHub](https://github.com/mauricebish/SimControllerCreator), where you can also find important documentation.
+
 ### Introducing new simulators
 
 Most of the stuff we talked about so far is independent of a specific simulator, since all of them store the setups more or less in the same way - as numbers. The file format, though, is very different. As you have seen above, the setups are stored as a JSON file in *Assetto Corsa Competizione*, whereas INI files are used by *Assetto Corsa*. Therefore, let's take a look into the simulator specific configuration.

@@ -849,36 +849,40 @@ execute(command) {
 
 		command := Trim(command)
 
-		if (!InStr(command, A_Space) || (!InStr(command, "`"") && !InStr(command, "'")))
-			return [command]
-		else
-			while (next <= StrLen(command)) {
-				char := SubStr(command, next, 1)
+		while (next <= StrLen(command)) {
+			char := SubStr(command, next, 1)
 
-				if (delimiter && (char = delimiter)) {
-					parts.Push(part)
+			if (delimiter && (char = delimiter)) {
+				parts.Push(part)
+				part := ""
 
-					command := SubStr(command, next)
-					delimiter := false
-					next := 1
-				}
-				else if (!delimiter && (StrLen(part) = 0) && ((char = "`"") || (char = "'"))) {
-					delimiter := char
-					next += 1
-				}
-				else if (!delimiter && ((char = A_Space) || (char = "`t"))) {
-					parts.Push(part)
+				command := LTrim(SubStr(command, ++next))
 
-					command := SubStr(command, next)
-					next := 1
-				}
-				else {
-					part .= char
-					next += 1
-				}
+				delimiter := false
+				next := 1
 			}
+			else if (!delimiter && (StrLen(part) = 0) && ((char = "`"") || (char = "'"))) {
+				delimiter := char
+				next += 1
+			}
+			else if (!delimiter && ((char = A_Space) || (char = "`t"))) {
+				parts.Push(part)
+				part := ""
 
-			return parts
+				command := LTrim(SubStr(command, next))
+
+				next := 1
+			}
+			else {
+				part .= char
+				next += 1
+			}
+		}
+
+		if (StrLen(part) > 0)
+			parts.Push(part)
+
+		return parts
 	}
 
 	SimulatorController.Instance.runningSimulator(&thePlugin)

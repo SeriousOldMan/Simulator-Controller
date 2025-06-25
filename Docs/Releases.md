@@ -49,6 +49,7 @@
     - Information about the available virtual energy and also energy consumption is displayed in the "Fuel" widget in the "System Monitor".
 	- [Developer] The same information is also available in the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.
 	- A new [event and a new action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-engineer) have been defined for the *Reasoning* booster of the Race Engineer, which allows a connected LLM to handle low energy conditions. Revisit your event and action configuration, if you have configured a *Reasoning* booster and include the new event and the new action, if necessary.
+  - [Expert] The controller action function [*execute*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) can now handle arguments which are then passed to the external application or script.
   - [Developer] All fuel releated fields have changed their name to be aligned with the new energy related fields. The old fields are still available for compatibility reasons.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-638), especially if you have configured a *Reasoning* booster for the Race Engineer.

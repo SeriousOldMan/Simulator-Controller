@@ -839,23 +839,69 @@ play(soundFileName) {
 
 execute(command) {
 	local thePlugin := false
-	local extension, context, message
+	local extension, context, message, arguments
+
+	parseCommand(command) {
+		local parts := []
+		local delimiter := false
+		local next := 1
+		local part := ""
+
+		command := Trim(command)
+
+		if (!InStr(command, A_Space) || (!InStr(command, "`"") && !InStr(command, "'")))
+			return [command]
+		else
+			while (next <= StrLen(command)) {
+				char := SubStr(command, next, 1)
+
+				if (delimiter && (char = delimiter)) {
+					parts.Push(part)
+
+					command := SubStr(command, next)
+					delimiter := false
+					next := 1
+				}
+				else if (!delimiter && (StrLen(part) = 0) && ((char = "`"") || (char = "'"))) {
+					delimiter := char
+					next += 1
+				}
+				else if (!delimiter && ((char = A_Space) || (char = "`t"))) {
+					parts.Push(part)
+
+					command := SubStr(command, next)
+					next := 1
+				}
+				else {
+					part .= char
+					next += 1
+				}
+			}
+
+			return parts
+	}
 
 	SimulatorController.Instance.runningSimulator(&thePlugin)
 
 	if (thePlugin && thePlugin.activateWindow())
 		try {
-			command := substituteVariables(command)
+			command := parseCommand(substituteVariables(command))
 
-			if FileExist(command) {
-				SplitPath(command, , , &extension)
+			if FileExist(command[1]) {
+				SplitPath(command[1], , , &extension)
 
 				if ((extension = "script") || (extension = "lua")) {
 					try {
 						context := scriptOpenContext()
 
-						if !scriptLoadScript(context, command, &message)
+						if !scriptLoadScript(context, command[1], &message)
 							throw message
+
+						arguments := command.Clone()
+						arguments.RemoveAt(1)
+
+						scriptPushArray(context, arguments)
+						scriptSetGlobal(context, "Arguments")
 
 						scriptPushValue(context, (c) {
 							return scriptExternHandler(c)
@@ -876,7 +922,7 @@ execute(command) {
 				}
 			}
 
-			Run(command)
+			Run(values2String(A_Space, command*))
 		}
 		catch Any as exception {
 			logError(exception, true)

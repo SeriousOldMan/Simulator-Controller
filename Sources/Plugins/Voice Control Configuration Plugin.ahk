@@ -360,7 +360,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		choices := ["Windows (Server)", "Windows (Desktop)", "Azure Cognitive Services", "Google Speech Services", "Whisper Server"]
 		chosen := 0
 
-		if (isDebug() || FileExist(Whisper Server Part 2))
+		if (isDebug() || FileExist(kProgramsDirectory . "Whisper Runtime\faster-whisper-xxl.exe"))
 			choices.Push("Whisper Local")
 
 		widget18 := window.Add("Text", "x" . x . " yp+42 w112 h23 +0x200 vvoiceRecognizerLabel Hidden", translate("Speech Recognizer"))
@@ -520,6 +520,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 			this.Value["googleAPIKeyFile"] := getMultiMapValue(configuration, "Voice Control", "APIKeyFile", "")
 
+			this.Value["whisperServerURL"] := getMultiMapValue(configuration, "Voice Control", "ServerURL", "")
+
 			this.Value["speakerVolume"] := getMultiMapValue(configuration, "Voice Control", "SpeakerVolume", 100)
 			this.Value["speakerPitch"] := getMultiMapValue(configuration, "Voice Control", "SpeakerPitch", 0)
 			this.Value["speakerSpeed"] := getMultiMapValue(configuration, "Voice Control", "SpeakerSpeed", 0)
@@ -615,6 +617,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		setMultiMapValue(configuration, "Voice Control", "Speaker.Google", googleSpeaker)
 		setMultiMapValue(configuration, "Voice Control", "APIKeyFile", Trim(this.Control["googleAPIKeyFileEdit"].Text))
 
+		setMultiMapValue(configuration, "Voice Control", "ServerURL", Trim(this.Control["whisperServerURLEdit"].Text))
+
 		setMultiMapValue(configuration, "Voice Control", "SpeakerVolume", this.Control["speakerVolumeSlider"].Value)
 		setMultiMapValue(configuration, "Voice Control", "SpeakerPitch", this.Control["speakerPitchSlider"].Value)
 		setMultiMapValue(configuration, "Voice Control", "SpeakerSpeed", this.Control["speakerSpeedSlider"].Value)
@@ -691,6 +695,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		this.Control["googleAPIKeyFileEdit"].Text := this.Value["googleAPIKeyFile"]
 
 		this.Control["googleAPIKeyFilePathButton"].Enabled := false
+
+		this.Control["whisperServerURLEdit"].Text := this.Value["whisperServerURL"]
 
 		if (this.Value["voiceSynthesizer"] = 1)
 			this.updateWindowsVoices(configuration)

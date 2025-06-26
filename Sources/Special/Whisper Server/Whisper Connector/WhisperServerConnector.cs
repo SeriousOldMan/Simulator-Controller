@@ -1,10 +1,9 @@
 ﻿using System.Net;
 using System.Text;
-using System.Xml.Linq;
 
-namespace WhisperConnector
+namespace WhisperServerConnector
 {
-    public class WhisperConnector
+    public class WhisperServerConnector
     {
         static readonly HttpClient httpClient = new HttpClient();
 
@@ -30,7 +29,7 @@ namespace WhisperConnector
         string Language = "";
         string Model = "";
 
-        public WhisperConnector()
+        public WhisperServerConnector()
         {
             ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
         }

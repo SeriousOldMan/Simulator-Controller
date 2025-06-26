@@ -515,7 +515,7 @@ class SpeechRecognizer {
 				this.Instance := {AudioRecorder: SpeechRecognizer.AudioCapture()}
 
 				if (engine = "Whisper Server")
-					this.Instance.Connector := CLR_LoadLibrary(kUserHomeDirectory . "Programs\Whisper Server\Whisper Connector.dll").CreateInstance("WhisperConnector.WhisperConnector")
+					this.Instance.Connector := CLR_LoadLibrary(kBinariesDirectory . "Connectors\Whisper Server Connector.dll").CreateInstance("WhisperServerConnector.WhisperServerConnector")
 
 				choices := []
 
